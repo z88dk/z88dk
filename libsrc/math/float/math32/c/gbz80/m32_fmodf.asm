@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Fri Sep  4 13:08:42 2026
+;	Module compile time: Wed Sep  2 09:30:58 2026
 
 
 	C_LINE	0,"m32_fmodf.c"
@@ -318,39 +318,6 @@
 	call	l_f32_sub
 	pop	bc
 	call	l_plong
-	ld	hl,sp+10
-	call	l_glong
-	push	de
-	push	hl
-	ld	hl,0	;const
-	ld	d,h
-	ld	e,l
-	call	l_f32_gt
-	ld	a,h
-	or	l
-	jp	z,i_3	;
-	ld	hl,sp+0
-	call	l_glong
-	push	de
-	push	hl
-	ld	hl,0	;const
-	ld	d,h
-	ld	e,l
-	call	l_f32_lt
-	ld	a,h
-	or	l
-	jp	z,i_4	;
-	ld	hl,sp+0
-	push	hl
-	call	l_glong
-	push	de
-	push	hl
-	ld	hl,sp+16
-	call	l_glong
-	call	l_f32_add
-	pop	bc
-	call	l_plong
-.i_4
 	ld	hl,sp+0
 	call	l_glong
 	push	de
@@ -360,64 +327,19 @@
 	call	l_f32_ge
 	ld	a,h
 	or	l
-	jp	z,i_5	;
-	ld	hl,sp+0
-	push	hl
-	call	l_glong
-	push	de
-	push	hl
-	ld	hl,sp+16
-	call	l_glong
-	call	l_f32_sub
-	pop	bc
-	call	l_plong
-	jp	i_6	;EOS
-.i_3
-	ld	hl,sp+0
-	call	l_glong
-	push	de
-	push	hl
-	ld	hl,0	;const
-	ld	d,h
-	ld	e,l
-	call	l_f32_gt
-	ld	a,h
-	or	l
-	jp	z,i_7	;
-	ld	hl,sp+0
-	push	hl
-	call	l_glong
-	push	de
-	push	hl
-	ld	hl,sp+16
-	call	l_glong
-	call	l_f32_add
-	pop	bc
-	call	l_plong
-.i_7
+	jp	z,i_3	;
 	ld	hl,sp+0
 	call	l_glong
 	push	de
 	push	hl
 	ld	hl,sp+14
 	call	l_glong
-	call	l_f32_le
-	ld	a,h
-	or	l
-	jp	z,i_8	;
-	ld	hl,sp+0
-	push	hl
-	call	l_glong
-	push	de
-	push	hl
-	ld	hl,sp+16
-	call	l_glong
 	call	l_f32_sub
-	pop	bc
-	call	l_plong
-.i_8
+	jp	i_4	;
+.i_3
 	ld	hl,sp+0
 	call	l_glong
+.i_4
 	add	sp,8
 	ret
 
@@ -425,8 +347,6 @@
 	SECTION	bss_compiler
 	SECTION	code_compiler
 ; --- Start of Optimiser additions ---
-	defc	i_5 = i_6
-	defc	i_6 = i_8
 
 
 ; --- Start of Static Variables ---

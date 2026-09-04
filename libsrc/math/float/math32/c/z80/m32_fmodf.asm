@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.6.0 #16639 (Linux)
+; Version 4.5.0 #15242 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -404,7 +404,7 @@ IF 0
 ENDIF
 
 ;--------------------------------------------------------
-; absolute ram data
+; absolute external ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -424,31 +424,26 @@ ENDIF
 ; ---------------------------------
 _m32_fmodf:
 	push	ix
-	ld	ix,	+0
-	add	ix, sp
-	ld	hl, -8
-	add	hl, sp
-	ld	sp, hl
+	ld	ix,0
+	add	ix,sp
+	push	af
+	push	af
 	ld	a,(ix+11)
 	and	a,0x7f
 	or	a,(ix+10)
 	or	a,(ix+9)
 	or	a,(ix+8)
-	jr	nz,l_m32_fmodf_00102
-	ld	hl,0
-	add	hl, sp
-	ld	(hl),0xff
-	inc	hl
-	ld	(hl),0xff
-	inc	hl
-	ld	(hl),0xff
-	inc	hl
-	ld	(hl),0x7f
+	jr	NZ,l_m32_fmodf_00102
+	ld	a,0xff
+	ld	(ix-4),a
+	ld	(ix-3),a
+	ld	(ix-2),a
+	ld	(ix-1),0x7f
 	pop	hl
-	pop	de
-	push	de
 	push	hl
-	jp	l_m32_fmodf_00114
+	ld	e,(ix-2)
+	ld	d,(ix-1)
+	jp	l_m32_fmodf_00103
 l_m32_fmodf_00102:
 	ld	l,(ix+10)
 	ld	h,(ix+11)
@@ -488,131 +483,32 @@ l_m32_fmodf_00102:
 	push	hl
 	call	___fssub_callee
 	push	hl
-	ld	c,l
-	ld	b,h
 	push	de
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	push	de
+	ld	c,(ix+10)
+	ld	b,(ix+11)
 	push	bc
-	call	___fsadd_callee
-	ld	(ix-4),l
-	ld	(ix-3),h
-	ld	(ix-2),e
-	ld	(ix-1),d
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	ld	hl,0x0000
-	push	hl
+	ld	c,(ix+8)
+	ld	b,(ix+9)
+	push	bc
+	push	de
 	push	hl
 	call	___fslt_callee
-	ld	a, l
-	pop	de
-	pop	bc
-	or	a, a
-	jr	z,l_m32_fmodf_00112
-	push	bc
-	push	de
-	ld	hl,0x0000
-	push	hl
-	push	hl
-	push	de
-	push	bc
-	call	___fslt_callee
-	ld	a, l
-	pop	de
-	pop	bc
-	or	a, a
-	jr	z,l_m32_fmodf_00104
-	ld	c,(ix-4)
-	ld	b,(ix-3)
-	ld	e,(ix-2)
-	ld	d,(ix-1)
-l_m32_fmodf_00104:
-	push	bc
-	push	de
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	push	de
-	push	bc
-	call	___fslt_callee
-	pop	de
-	pop	bc
-	bit	0, l
-	jr	nz,l_m32_fmodf_00113
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	push	de
-	push	bc
-	call	___fssub_callee
 	ld	c, l
-	ld	b, h
-	jr	l_m32_fmodf_00113
-l_m32_fmodf_00112:
-	push	bc
-	push	de
-	push	de
-	push	bc
-	ld	hl,0x0000
-	push	hl
-	push	hl
-	call	___fslt_callee
-	ld	a, l
 	pop	de
-	pop	bc
-	or	a, a
-	jr	z,l_m32_fmodf_00108
-	ld	c,(ix-4)
-	ld	b,(ix-3)
-	ld	e,(ix-2)
-	ld	d,(ix-1)
-l_m32_fmodf_00108:
+	pop	hl
+	bit	0, c
+	jr	NZ,l_m32_fmodf_00105
+	ld	c,(ix+10)
+	ld	b,(ix+11)
+	push	bc
+	ld	c,(ix+8)
+	ld	b,(ix+9)
 	push	bc
 	push	de
-	push	de
-	push	bc
-	ld	l,(ix+10)
-	ld	h,(ix+11)
 	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	call	___fslt_callee
-	pop	de
-	pop	bc
-	bit	0, l
-	jr	nz,l_m32_fmodf_00113
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	push	de
-	push	bc
 	call	___fssub_callee
-	ld	c, l
-	ld	b, h
-l_m32_fmodf_00113:
-	ld	l, c
-	ld	h, b
-l_m32_fmodf_00114:
+l_m32_fmodf_00105:
+l_m32_fmodf_00103:
 	ld	sp, ix
 	pop	ix
 	ret

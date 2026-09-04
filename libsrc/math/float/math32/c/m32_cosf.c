@@ -38,7 +38,7 @@ extern float m32_coeff_cos[];
 float m32_cosf (float f) __z88dk_fastcall
 {
     float x, y, z;
-    uint32_t j;
+    uint16_t j;
     int8_t sign = 1;
 
     x = f;
@@ -53,11 +53,8 @@ float m32_cosf (float f) __z88dk_fastcall
     {
         union float_long u;
         u.f = x;
-        if( (((uint32_t)u.l >> 23) & 0xff) >= (127+7) ) {
+        if( (((uint32_t)u.l >> 23) & 0xff) >= (127+7) )
             x = m32_fmodf(x, (float)(2.0 * M_PI));
-            if( x < 0.0 )
-                x += (float)(2.0 * M_PI);
-        }
     }
 
     j = (int)(x * M_4_PI); /* integer part of x/(PI/4) */
