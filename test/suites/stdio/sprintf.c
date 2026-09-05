@@ -5,7 +5,7 @@
 #include "test.h"
 
 
-#if __EZ80_Z80
+#if __EZ80_Z80 | __Z180 | __KC160_Z80
 #pragma output CLIB_OPT_PRINTF=0x7dffffff
 #elif __RCMX000__ | __GBZ80 | __8080
 #pragma output CLIB_OPT_PRINTF=0x40ffffff

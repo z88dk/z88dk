@@ -55,13 +55,13 @@ testrcm_clib.lib: $(TARGET_CLIB_DEPS) $(TEST_TARGETS)
 	@echo ''
 	@echo '--- Building Test System Library (Rabbit) ---'
 	@echo ''
-	TARGET=test TYPE=r2ka $(LIBLINKER2) -mr2ka -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(TARGET_DIRECTORY)/test/test_nofar.lst
+	TARGET=test TYPE=r2ka $(LIBLINKER2) -mr2ka -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
 
 testrcm4k_clib.lib: $(TARGET_CLIB_DEPS) $(TEST_TARGETS)
 	@echo ''
 	@echo '--- Building Test System Library (Rabbit4k) ---'
 	@echo ''
-	TARGET=test TYPE=r4k $(LIBLINKER2) -mr4k -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm4k_clib @$(TARGET_DIRECTORY)/test/test_nofar.lst
+	TARGET=test TYPE=r4k $(LIBLINKER2) -mr4k -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm4k_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
 
 test8080_clib.lib: $(TARGET_CLIB_DEPS) $(TEST_TARGETS)
 	@echo ''
