@@ -89,7 +89,7 @@ jobs:
     - name: Identify perl runtime
       id: perl_runtime
       run: |
-        echo "version=$(perl -MConfig -e 'print \"$Config{version}-$Config{archname}\"')" >> "$GITHUB_OUTPUT"
+        echo "version=$(perl -MConfig -e 'print "$Config{version}-$Config{archname}"')" >> "$GITHUB_OUTPUT"
     # C:\perl5, not ~/perl5: actions/cache resolves ~ through node, to
     # C:\Users\runneradmin, while cygwin's ~ is /home/runneradmin inside the
     # cygwin root. The cache was watching a directory cpanm never wrote to, so

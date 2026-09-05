@@ -36,7 +36,7 @@ jobs:
     - name: Identify perl runtime
       id: perl_runtime
       run: |
-        echo "version=$(perl -MConfig -e 'print \"$Config{version}-$Config{archname}\"')" >> "$GITHUB_OUTPUT"
+        echo "version=$(perl -MConfig -e 'print "$Config{version}-$Config{archname}"')" >> "$GITHUB_OUTPUT"
     # This job was the only one rebuilding all 21 CPAN modules from source on
     # every run -- homebrew packages almost no perl modules, so there is
     # nothing to substitute; it just needs caching like the others.
