@@ -1339,6 +1339,45 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         }
         int byte_shift = count / 8;
         int bit_shift  = count % 8;
+        /* Bytes of the DEHL value that carry data after the byte shift. The
+           low `byte_shift` are discarded, so 4 - byte_shift remain — unless
+           [IR_SHRNARROW] proved the result is truncated to W bytes, in which
+           case only source bytes up to (count + 8W - 1)/8 matter and the ones
+           above may be left ZERO. Everything below is indexed by this count
+           rather than by byte_shift, so the untrimmed case is unchanged. */
+        int active = 4 - byte_shift;
+        {
+            int W = L.la.cur_shr_trunc_bytes;
+            if (W > 0 && W < 4) {
+                int hi = (count + 8 * W - 1) / 8;
+                if (hi > 3) hi = 3;
+                int want = hi - byte_shift + 1;
+                if (want >= 1 && want < active && !dehl_has(op->src[0])
+                    && partial_load_long_window(out, f, op->src[0],
+                                                byte_shift, hi)) {
+                    invalidate_hl_cache();
+                    active = want;
+                    /* DIRECTION FLIP. Shifting a 2-byte window RIGHT by K to
+                       keep byte 0 is the same as shifting it LEFT by 8-K and
+                       keeping byte 1 — `add hl,hl` is ONE byte against the
+                       two-op `srl h; rr l`, so past K=4 the other direction is
+                       strictly shorter and fewer iterations. K=5 goes from
+                       5x(srl h; rr l) to 3x`add hl,hl` plus `ld l,h`. This is
+                       what sdcc does. Only for a single-byte result: a wider
+                       one needs two bytes off the top, which `ld l,h` cannot
+                       deliver. H is left dirty — permitted by the same
+                       single-use guard that lets the high bytes be wrong. */
+                    if (W == 1 && active == 2 && bit_shift >= 4) {
+                        for (int i = 0; i < 8 - bit_shift; i++)
+                            emit(out, "add\thl,hl");
+                        emit(out, "ld\tl,h");
+                        bit_shift = 0;
+                        active = 1;
+                    }
+                    goto shr_long_bit_shift;
+                }
+            }
+        }
         /* Partial-load fastpath: for byte_shift ≥ 1 the low source bytes
            are discarded, so skip them at load time. */
         if (byte_shift >= 1 && !dehl_has(op->src[0])) {
@@ -1376,8 +1415,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
            shifting them just rotates 0 — trim to the bytes with data. Wrap
            in a djnz loop when it strictly saves bytes (mirror of SHL). */
         {
-        static const int body_sz_shr[4] = { 8, 6, 4, 2 };
-        int body_sz = body_sz_shr[byte_shift];
+        int body_sz = 2 * active;
         int use_djnz = (bit_shift * body_sz > body_sz + 4);
         int iters = use_djnz ? 1 : bit_shift;
         int loop_label = 0;
@@ -1388,14 +1426,14 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                     L.func_emit_idx, loop_label);
         }
         for (int i = 0; i < iters; i++) {
-            switch (byte_shift) {
-            case 0: /* all 4 bytes have data */
+            switch (active) {
+            case 4: /* all 4 bytes have data */
                 emit(out, "srl\td");
                 emit(out, "rr\te");
                 emit(out, "rr\th");
                 emit(out, "rr\tl");
                 break;
-            case 1: /* D=0; E,H,L have data */
+            case 3: /* D=0; E,H,L have data */
                 emit(out, "srl\te");
                 emit(out, "rr\th");
                 emit(out, "rr\tl");
@@ -1404,7 +1442,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                 emit(out, "srl\th");
                 emit(out, "rr\tl");
                 break;
-            case 3: /* D=E=H=0; only L has data */
+            case 1: /* D=E=H=0; only L has data */
                 emit(out, "srl\tl");
                 break;
             }

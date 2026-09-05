@@ -1467,6 +1467,190 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
                                const int *bb_cond_shift,
                                int R, int discount);
 
+/* [IR_BCCALLCOST=1] Charge a whole-function BC home for the call saves it forces.
+
+   A plain PR_BC tenant is preserved across every call its live range covers:
+   gen_call / gen_push_arg / gen_hcall emit `push bc` / `pop bc` around it, and
+   [IR_BCSAVE_LIVE] emits the pair on exactly the calls where a tenant IS live —
+   so "calls inside the live range" is not an estimate of the emitted code, it is
+   the emitted code. interval_benefit prices the accesses a register home saves
+   and charges nothing for that traffic, and the BC arm of the arbiter has no
+   benefit gate at all, so on a CHEAP-SLOT target a home worth a handful of
+   cycles is taken and then pays a pair at every call it spans.
+
+   shiftbench's `shift_compute` is the shape: `chk` accumulates through seven
+   calls in a doubly-nested loop, interval_benefit rates BC at 256 on ez80 (the
+   fp slot is a native `ld hl,(ix+d)`), and the home costs 7 pairs x weight 16.
+   The z80 does not have the problem — there the slot is dear enough that BC wins
+   anyway, and `chk` goes to a call-free RANGED home instead.
+
+   Declining the whole-function home does not spill the value: ir_bc_pack and the
+   call-bounded split still place it over a CALL-FREE range, which is the home it
+   should have had. The gate is therefore deliberately narrow — it fires only
+   when a charge exists (a call-free function is untouched), only when the
+   charge is what sinks the home, only when the home does not SAVE bytes, and
+   only where the cycle model can tell a slot from a register at all.
+
+   DEFAULT-ON at margin 2; `IR_BCCALLCOST=0` opts out, byte-identical to the
+   pre-change compiler on all 638 corpus cells; `IR_BCCALLCOST=<N>` sets the
+   margin. Flipped on: corpus -92 B, 12 tick cells faster and NONE slower
+   (r2ka -1.000 %, r4k -0.928 %, r6k -0.964 %); ez80 and the other seven CPUs
+   byte-identical; long_ir 671/671 sp and fp. */
+static int bccallcost_on(void)
+{
+    static int c = -1;
+    if (c < 0) { const char *e = getenv("IR_BCCALLCOST"); c = !(e && e[0] == '0'); }
+    return c;
+}
+
+/* Eviction hysteresis, as the arbiter's counter-yield uses at 1.4x: decline the
+   home only when the charge beats the benefit by this factor. A thin margin is
+   a coin-flip the cycle-only cost model cannot call, and losing it costs BYTES —
+   a cheap-slot CPU's slot access is cheap in cycles and still 3-4 bytes against
+   a 1-2 byte register copy. IR_BCCALLCOST=<N> sets the factor. */
+static int bccallcost_margin(void)
+{
+    static int m = -1;
+    if (m < 0) { const char *e = getenv("IR_BCCALLCOST"); m = (e && e[0] >= '1' && e[0] <= '9') ? e[0] - '0' : 2; }
+    return m;
+}
+
+/* Cycles one `push bc` / `pop bc` pair costs. Datasheet, in the same units as
+   g0_word_cost: z80 11+10, rabbit 10+7, gbz80 16+12, ez80 z80-mode 4+4,
+   kc160 2+2. The 8080/8085/VM1 all share the z80 pair. */
+static int g0_bc_call_save(void)
+{
+    if (IS_KC160())  return 4;
+    if (IS_EZ80())   return 8;
+    if (IS_RABBIT()) return 17;
+    if (IS_GBZ80())  return 28;
+    return 21;
+}
+
+/* Word-access BYTES, the size companion to g0_word_cost's cycles. [reg][kind],
+   SLOT row is sp-mode and fp adjusts below, exactly as the cycle table does.
+
+   Measured by assembling the idioms the lowerer emits (z88dk-z80asm -m<cpu> -b,
+   byte count of the produced binary), not derived from a datasheet:
+
+     BC read/write `ld l,c; ld h,b`            2 on every CPU here
+     BC deref      `ld a,(bc)`                 1 (gbz80 has no such op: 3, via HL)
+     BC step       `inc bc`                    1
+     slot fp       `ld hl,(ix-2)`              z80 6, ez80 3, RABBIT 2, kc160 3
+     slot sp       `ld hl,n; add hl,sp; ...`   8; rabbit `ld hl,(sp+n)` 2; gbz80 5
+     push bc / pop bc                          1 + 1
+
+   The RABBIT row is the reason this table has to exist. Its native
+   `ld hl,(ix+d)` and `ld hl,(sp+n)` are BOTH two bytes — the same as the
+   `ld l,c; ld h,b` a BC home costs — so on rabbit a whole-function BC home saves
+   ZERO bytes per access while still paying two at every call it spans. It is
+   byte-NEGATIVE. On ez80 the same home is byte-POSITIVE (+1 an access, 3 vs 2).
+   The cycle model cannot see that difference and rates the two the same way,
+   which is why charging cycles alone made rabbit smaller and ez80 +424 B larger.
+
+   Bytes are STATIC: this table is summed over the op scan with NO loop-depth
+   weighting, unlike the cycle model. A body inside a loop is not bigger. */
+static int g0_word_bytes(int reg, int kind)
+{
+    static const int Z80B[GR_N][GK_N] = {
+        /*SLOT*/{8,8,9,11}, /*BC*/{2,2,1,1}, /*DE*/{2,2,1,1},
+        /*IX*/{4,4,3,2}, /*IY*/{4,4,3,2} };
+    static const int EZ80B[GR_N][GK_N] = {
+        /*SLOT*/{8,8,9,11}, /*BC*/{2,2,1,1}, /*DE*/{2,2,1,1},
+        /*IX*/{3,3,3,2}, /*IY*/{3,3,3,2} };
+    static const int RABBITB[GR_N][GK_N] = {
+        /*SLOT*/{2,2,3,5}, /*BC*/{2,2,1,1}, /*DE*/{2,2,1,1},
+        /*IX*/{2,2,3,2}, /*IY*/{2,2,3,2} };
+    static const int KC160B[GR_N][GK_N] = {
+        /*SLOT*/{3,3,4,7}, /*BC*/{2,2,1,1}, /*DE*/{2,2,1,1},
+        /*IX*/{3,3,3,2}, /*IY*/{3,3,3,2} };
+    /* No `ld a,(bc)` and no index registers — see the GBZ80 cycle row. */
+    static const int GBZ80B[GR_N][GK_N] = {
+        /*SLOT*/{5,5,6,9}, /*BC*/{2,2,3,1}, /*DE*/{2,2,3,1},
+        /*IX*/{99,99,99,99}, /*IY*/{99,99,99,99} };
+    const int (*t)[GK_N] = IS_KC160() ? KC160B
+                         : IS_EZ80() ? EZ80B
+                         : IS_GBZ80() ? GBZ80B
+                         : IS_RABBIT() ? RABBITB : Z80B;
+    int b = t[reg][kind];
+    if (reg == GR_SLOT && c_framepointer_is_ix != -1) {   /* fp slot = (ix+d) */
+        if (t == Z80B)        b = (kind == GK_STEP) ? 13 : (kind == GK_DEREF) ? 7 : 6;
+        else if (t == EZ80B)  b = (kind == GK_STEP) ?  7 : (kind == GK_DEREF) ? 4 : 3;
+        else if (t == KC160B) b = (kind == GK_STEP) ?  7 : (kind == GK_DEREF) ? 4 : 3;
+        /* rabbit fp `ld hl,(ix+d)` is 2 as well — the sp row already says 2. */
+    }
+    return b;
+}
+
+/* STATIC bytes a whole-function BC home for v saves over the slot, net of the
+   `push bc` / `pop bc` (2 B) it adds at every call inside its live range. >0
+   means the home pays for itself in SIZE. No loop weighting — see above. */
+static long bc_byte_benefit(const Func *f, int v)
+{
+    const LiveRange *lr = ir_live_range(f, v);
+    long ben = 0;
+    int flat = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++, flat++) {
+            const Op *o = &bb->ops[j];
+            if ((o->kind == IR_CALL || o->kind == IR_HCALL)
+                && lr && lr->start >= 0
+                && flat >= lr->start && flat <= lr->end)
+                ben -= 2;                       /* push bc + pop bc */
+            int sv = -1;
+            if ((o->kind == IR_INC || o->kind == IR_DEC) && o->dst >= 0
+                && o->src[0] == o->dst) sv = o->dst;
+            else if (o->kind == IR_POSTSTEP && o->src[0] >= 0) sv = o->src[0];
+            if (sv == v) {
+                ben += g0_word_bytes(GR_SLOT, GK_STEP) - g0_word_bytes(GR_BC, GK_STEP);
+                continue;
+            }
+            if (o->dst == v && (o->src[0] == v || o->src[1] == v)) {
+                ben += g0_word_bytes(GR_SLOT, GK_STEP) - g0_word_bytes(GR_BC, GK_STEP);
+                continue;
+            }
+            if (o->dst == v)
+                ben += g0_word_bytes(GR_SLOT, GK_WRITE) - g0_word_bytes(GR_BC, GK_WRITE);
+            int mb = ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                      && o->mem.kind == IR_MEM_VREG) ? o->mem.base : -1;
+            int u[16]; int nu = ir_op_uses(o, u, 16);
+            for (int k = 0; k < nu; k++) if (u[k] == v)
+                ben += (v == mb)
+                     ? g0_word_bytes(GR_SLOT, GK_DEREF) - g0_word_bytes(GR_BC, GK_DEREF)
+                     : g0_word_bytes(GR_SLOT, GK_READ)  - g0_word_bytes(GR_BC, GK_READ);
+        }
+    }
+    return ben;
+}
+
+/* Depth-weighted cost of the saves a whole-function BC home for v would force,
+   over the calls inside v's live range. Same weights as interval_benefit_x, so
+   the two are directly comparable. */
+static long bc_call_save_charge(const Func *f, int v, const int *bb_loop_depth,
+                                const int *bb_cond_shift)
+{
+    const LiveRange *lr = ir_live_range(f, v);
+    if (!lr || lr->start < 0) return 0;
+    int pair = g0_bc_call_save();
+    long charge = 0;
+    int flat = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        int d = bb_loop_depth ? bb_loop_depth[b] : 0;
+        long w = 1;
+        for (int i = 0; i < d && i < 8; i++) w *= 4;
+        if (bb_cond_shift)
+            for (int i = 0; i < bb_cond_shift[b] && w > 1; i++) w /= 2;
+        for (int j = 0; j < f->bbs[b].n_ops; j++, flat++) {
+            OpKind k = f->bbs[b].ops[j].kind;
+            if (k != IR_CALL && k != IR_HCALL) continue;
+            if (flat < lr->start || flat > lr->end) continue;
+            charge += w * pair;
+        }
+    }
+    return charge;
+}
+
 
 /* A compared counter should give up BC/DE for its uncontended index home ONLY when a
    deref-base genuinely competes for BC — i.e. the same overlapping, localized
@@ -1719,6 +1903,28 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
 
         if (c->allowed & RC_BC) {
             if (byte_reg == 'C') continue;          /* C owned by a byte */
+            /* [IR_BCCALLCOST] The home must out-earn the saves it forces. */
+            if (bccallcost_on() && bb_loop_depth) {
+                long chg = bc_call_save_charge(f, v, bb_loop_depth, bb_cond_shift);
+                long ben = interval_benefit_x(f, v, bb_loop_depth,
+                                              bb_cond_shift, GR_BC, 0);
+                /* Decline only when the home loses on BOTH axes. A home that
+                   loses cycles but SAVES bytes is a byte-for-tick trade the
+                   allocator has no mandate to make on its own — and on ez80 fp
+                   that trade is the whole of a +424 B corpus regression. */
+                /* Only where the cycle model can SEE a difference. On ez80 fp
+                   a slot read is a native `ld hl,(ix+d)` costing the same 2
+                   cycles as `ld l,c; ld h,b`, so interval_benefit rates EVERY
+                   candidate 0 and the arbiter's tie is broken by pool order,
+                   not merit. Declining on a benefit the model cannot compute is
+                   churn: it wins queenbench 2.81% and loses hashbench 1.76% on
+                   the same CPU, mode and shape. Ask for a real gap first. */
+                int seen = g0_word_cost(GR_SLOT, GK_READ)
+                         > g0_word_cost(GR_BC, GK_READ);
+                if (seen && chg > 0 && bccallcost_margin() * ben <= chg
+                    && bc_byte_benefit(f, v) <= 0)
+                    continue;
+            }
             /* An index-eligible compared COUNTER belongs in the uncontended
                index (`inc ix`), not a GP pair it will contend for and then get promoted
                out of (BC→DE via the general phase). Skip BC so its idx candidate parks

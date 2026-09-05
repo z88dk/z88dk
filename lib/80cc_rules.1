@@ -654,20 +654,6 @@
 	ld	l,a
 	ld	h,0
 
-;; A byte global load zero-extended into HL (`ld a,(_g); ld l,a; ld h,0`) folds to
-;; a word load `ld hl,(_g); ld h,0`: HL ends identical (H re-zeroed), the `ld l,a`
-;; is gone (-1b) and A is left untouched. `(_%1)` restricts to a symbol address —
-;; register/index indirects (`ld a,(hl)`, `ld a,(ix-2)`) have no `ld hl,(...)` form
-;; and must not match. The extra read of _g+1 is harmless (discarded); a volatile
-;; load carries a `;volatile` stamp so this bare line never matches it.
-%title #IR byte global load widened to HL: fold ld l,a into the word load (-1b)
-	ld	a,(_%1)
-	ld	l,a
-	ld	h,0
-=
-	ld	hl,(_%1)
-	ld	h,0
-
 ;; #IR: `ld a,l; ld l,a` is a redundant round-trip — after `ld a,l` we have A==L,
 ;; so `ld l,a` writes L=L (a no-op on L), and A was already clobbered by `ld a,l`
 ;; so dropping the write-back changes nothing. Drop the dead `ld l,a` (-1b).

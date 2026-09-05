@@ -203,6 +203,10 @@ typedef struct {
         int cur_br_value_dead;   /* BR_ZERO/COND: tested value dead after → test in place */
         int cur_branch_test_label, cur_skip_next_op;
         int shl_skip_n, cur_skip_shl_add_hl, cur_skip_shl_byte;
+        /* [IR_SHRNARROW] Bytes of a width-4 shift result that actually
+           survive: set only when the shift's SOLE use is a CONV_TRUNC to that
+           width, so the high bytes may be left wrong. 0 = all four. */
+        int cur_shr_trunc_bytes;
     } la;
 } LowerState;
 
@@ -1693,6 +1697,165 @@ static int xline_c_call(const char *line)
     return p[0] == '_' && p[1] != '_' && p[1] != 0;
 }
 
+/* ---- [gwiden] byte-global widen: fold `ld l,a` into the word load ----------
+   `ld a,(_g); ld l,a; ld h,0` (a byte global zero-extended into HL) is one byte
+   longer than `ld hl,(_g); ld h,0`, which leaves HL identical — H is re-zeroed,
+   and the extra read of _g+1 lands in H and is discarded.
+
+   THE FOLD DESTROYS A. It deletes the only instruction that puts the byte in A,
+   so it is legal ONLY where A is dead afterwards. copt used to do this as a text
+   rule and could not tell a dead A from a live one, which was a silent
+   wrong-answer bug: `(unsigned char)W` twice off one load reads A the second
+   time and got garbage (test/suites/long_ir/copta.c). The rule is gone; this is
+   the same fold done where liveness is a fact.
+
+   Deliberately INVALIDATE-BY-DEFAULT, the opposite polarity to the A-carry
+   tracker above: there, an unrecognised line costs bytes; here it would cost
+   CORRECTNESS. So a_dead_after() concludes "dead" only by REACHING a proven
+   killer with every intervening line on a proven no-read list. Anything
+   unrecognised — any branch, any call, any line not in the tables — answers
+   LIVE and the fold does not happen. */
+static int  gwiden_on = -1;
+static int  gwiden_enabled(void)
+{
+    if (gwiden_on < 0) {
+        const char *e = getenv("IR_GWIDEN");
+        gwiden_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; =0 opts out */
+    }
+    return gwiden_on && !opt_disabled("gwiden");
+}
+
+/* mnemonic + operand split, shared by the two tables below. Returns 0 for a
+   label, directive, comment or blank — none of which is code. */
+static int gw_split(const char *line, char *m, size_t msz, const char **ops)
+{
+    const char *p = line;
+    if (*p != ' ' && *p != '\t') return 0;         /* label / defc: not code */
+    while (*p == ' ' || *p == '\t') p++;
+    if (!*p || *p == ';' || *p == '\n' || *p == '\r') return 0;
+    size_t i = 0;
+    while (*p && *p != ' ' && *p != '\t' && *p != '\n' && *p != '\r'
+           && *p != ';' && i + 1 < msz) m[i++] = *p++;
+    m[i] = '\0';
+    while (*p == ' ' || *p == '\t') p++;
+    *ops = p;
+    return 1;
+}
+
+/* Does the operand text mention A as a register? Catches `a`, `a,...`, `...,a`
+   and `af`, but not a symbol that merely starts with the letter. */
+static int gw_ops_touch_a(const char *o)
+{
+    for (const char *p = o; *p && *p != ';' && *p != '\n' && *p != '\r'; p++) {
+        if (*p != 'a') continue;
+        int lb = (p == o) || !(isalnum((unsigned char)p[-1]) || p[-1] == '_');
+        int rb = !(isalnum((unsigned char)p[1]) || p[1] == '_');
+        if (lb && rb) return 1;                    /* a bare `a` operand */
+        if (lb && p[1] == 'f' && !(isalnum((unsigned char)p[2]) || p[2] == '_'))
+            return 1;                              /* `af` / `af'` */
+    }
+    return 0;
+}
+
+/* PROVEN to write A without reading it — reaching one of these means the byte
+   in A was never consumed. `ld a,<x>` qualifies unless x mentions A itself. */
+static int gw_kills_a(const char *line)
+{
+    char m[16]; const char *o;
+    if (!gw_split(line, m, sizeof m, &o)) return 0;
+    if (!strcmp(m, "ld") || !strcmp(m, "ldh")) {
+        if (o[0] != 'a' || o[1] != ',') return 0;  /* not `ld a,...` */
+        return !gw_ops_touch_a(o + 2);             /* `ld a,a` reads A */
+    }
+    if (!strcmp(m, "pop"))  return !strncmp(o, "af", 2);
+    if (!strcmp(m, "xor"))  return o[0] == 'a' && !isalnum((unsigned char)o[1]);
+    return 0;
+}
+
+/* PROVEN not to read A, and not a control transfer. Everything absent from this
+   table answers "may read A" — including every branch, call and return, the
+   whole rotate/carry family (rla/rra/daa read A), and anything unrecognised. */
+static int gw_no_a_read(const char *line)
+{
+    char m[16]; const char *o;
+    if (!gw_split(line, m, sizeof m, &o)) return 1;   /* comment/blank/C_LINE */
+    /* A label is a join point: a predecessor we have not scanned may leave A
+       live, so stop rather than skip. gw_split already rejected it (no leading
+       whitespace), so guard the directive spellings that DO indent. */
+    if (!strcmp(m, "C_LINE") || !strcmp(m, "SECTION") || !strcmp(m, "GLOBAL")
+        || !strcmp(m, "EXTERN") || !strcmp(m, "PUBLIC") || !strcmp(m, "MODULE")
+        || !strcmp(m, "defc"))
+        return 1;
+    static const char *const never_reads_a[] = {
+        /* pair/8-bit moves and arithmetic that cannot name A implicitly */
+        "ld", "inc", "dec", "push", "pop", "ex", "add", "adc", "sbc",
+        "bit", "set", "res", "sla", "sra", "srl", "sll", "rlc", "rrc",
+        "rl", "rr", "swap", "nop", "mlt", "nextreg", "bsla", "bsra",
+        "bsrl", "bsrf", "brlc",
+        NULL
+    };
+    int known = 0;
+    for (int i = 0; never_reads_a[i]; i++)
+        if (!strcmp(m, never_reads_a[i])) { known = 1; break; }
+    if (!known) return 0;                          /* unknown mnemonic: assume it reads A */
+    /* `ex af,af'` and `push af` read A; `rl a` / `sla a` etc. read A; a memory
+       store through (hl) is fine, but `ld (hl),a` reads A. One operand test
+       covers all of them. */
+    return !gw_ops_touch_a(o);
+}
+
+/* Is A dead immediately after line `start`? Bounded forward walk: skip lines
+   proven not to read A, and answer YES only on reaching a proven killer. */
+static int gw_a_dead_after(char **lines, int n, int start)
+{
+    int budget = 48;                               /* cheap; sites resolve in a few lines */
+    for (int j = start; j < n && budget-- > 0; j++) {
+        if (gw_kills_a(lines[j])) return 1;
+        if (!gw_no_a_read(lines[j])) return 0;
+    }
+    return 0;                                      /* ran out of rope: assume live */
+}
+
+/* `\tld\ta,(_sym)\n` — the symbol form only. A register or index indirect
+   (`ld a,(hl)`, `ld a,(ix-2)`) has no `ld hl,(...)` counterpart, and a volatile
+   access carries a trailing `;volatile` stamp so it fails the exact-shape test
+   below and keeps the width the program asked for. */
+static int gw_byte_global_load(const char *line, char *sym, size_t symsz)
+{
+    if (strncmp(line, "\tld\ta,(_", 8)) return 0;
+    const char *p = line + 6;                      /* at '(' */
+    const char *e = strchr(p, ')');
+    if (!e || e[1] != '\n') return 0;              /* trailing text (;volatile): decline */
+    size_t len = (size_t)(e - p) + 1;              /* include '(' and ')' */
+    if (len + 1 > symsz) return 0;
+    memcpy(sym, p, len); sym[len] = '\0';
+    return 1;
+}
+
+/* The rewrite itself. Runs before the park sweep so the shorter form is what
+   the liveness scan below sees. */
+static void gw_fold_byte_global_widens(char **lines, int n, char *drop)
+{
+    if (!gwiden_enabled()) return;
+    /* gbz80 has no `ld hl,(nn)`; z80asm would synthesise one, which is longer
+       AND goes through A — the very register this fold is spending. */
+    if (IS_GBZ80()) return;
+    for (int i = 0; i + 2 < n; i++) {
+        char sym[128];
+        if (!gw_byte_global_load(lines[i], sym, sizeof sym)) continue;
+        if (strcmp(lines[i + 1], "\tld\tl,a\n")) continue;
+        if (strcmp(lines[i + 2], "\tld\th,0\n")) continue;
+        if (drop[i] || drop[i + 1] || drop[i + 2]) continue;
+        if (!gw_a_dead_after(lines, n, i + 3)) continue;
+        char *nl = malloc(strlen(sym) + 10);
+        if (!nl) continue;
+        sprintf(nl, "\tld\thl,%s\n", sym);
+        free(lines[i]); lines[i] = nl;
+        drop[i + 1] = 1;                           /* the `ld l,a` is now dead */
+        i += 2;
+    }
+}
+
 /* IR_BCFLOW: follow intra-function branches when deciding BC liveness in the
    park sweep. Without it every branch is treated as "a successor may read BC",
    which keeps a stash alive that the target provably never reads — 64 of the
@@ -1893,6 +2056,12 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             if (strcmp(lines[i], "\tld\tbc,hl\n") == 0
                 && strcmp(lines[i + 1], "\tld\thl,bc\n") == 0)
                 drop[i + 1] = 1;
+        /* [gwiden] Fold `ld a,(_g); ld l,a; ld h,0` -> `ld hl,(_g); ld h,0`
+           where A is provably dead after. Done here, before the liveness scan,
+           so the scan sees the final text — and done here at all because this
+           is the only place in the pipeline with real per-line liveness. copt
+           did it blind and miscompiled; see gw_fold_byte_global_widens. */
+        gw_fold_byte_global_widens(lines, n, drop);
         int b_live = 0, c_live = 0, d_live = 0, e_live = 0;
         /* [IR_XORA] F-liveness for the `ld a,0` -> `xor a` rewrite. Starts LIVE:
            the buffer end is the end of this function's text, and the walk has
@@ -7371,6 +7540,24 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                (`ld l,c; ld h,b`), no slot read, no register clobber. */
             L.la.cur_dehl_dst_dead_safe = 0;
             L.la.cur_dehl_dst_no_bc_stash = 0;
+            /* [IR_SHRNARROW] A width-4 constant shift whose ONLY use is the
+               CONV_TRUNC on its heels needs to compute just the bytes the
+               truncation keeps: result byte i is source bits [8i+K, 8i+K+8),
+               so for a W-byte result only source bytes [K/8, (K+8W-1)/8]
+               matter. The whole-function single-use test is what makes it safe
+               to leave the high bytes wrong — a second reader could take them
+               from the DEHL cache, not just from the slot. */
+            L.la.cur_shr_trunc_bytes = 0;
+            if (shrnarrow_on() && op->kind == IR_SHR && op->dst >= 0
+                && f->vregs[op->dst].width == 4
+                && op->src[1] < 0                     /* constant count */
+                && j + 1 < bb->n_ops) {
+                const Op *nx = &bb->ops[j + 1];
+                if (nx->kind == IR_CONV_TRUNC && nx->src[0] == op->dst
+                    && nx->dst >= 0
+                    && vreg_use_count_fn(f, op->dst) == 1)
+                    L.la.cur_shr_trunc_bytes = f->vregs[nx->dst].width;
+            }
             /* FP-mode: the trailing `ld bc,hl` DEHL-cache maintenance in a
                width-4 store is dead when, scanning forward, the value's BC=low
                invariant is clobbered before any read — first event is a

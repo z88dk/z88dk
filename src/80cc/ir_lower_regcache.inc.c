@@ -1573,6 +1573,113 @@ static void partial_load_long_shr(FILE *out, const Func *f, int v,
     }
 }
 
+/* [IR_SHRNARROW=0] Opt OUT of narrowing a width-4 constant shift to the bytes a
+   following CONV_TRUNC keeps.
+
+   DEFAULT-ON. Corpus -257 B over 660 cells, 18 smaller and NONE larger, every
+   CPU improving (gbz80 -38, z80/z80n/z180 -32, kc160 -30, ez80 -29, rabbit
+   -24/-20); widthbench -6.4 % z80 sp / -7.1 % fp, -11.2 % ez80 fp, -11.1 %
+   kc160 fp. long_ir 673/673 sp AND fp; every shift count 0..31 x 8 values x
+   both result widths checked against a reference on 6 CPUs x both frame modes.
+   `IR_SHRNARROW=0` reverts, byte-identical to the pre-change compiler. */
+static int shrnarrow_on(void)
+{
+    static int c = -1;
+    if (c < 0) { const char *e = getenv("IR_SHRNARROW"); c = !(e && e[0] == '0'); }
+    return c;
+}
+
+/* Uses of v across the whole function — the single-use test [IR_SHRNARROW]
+   needs, because a second reader can be served from the DEHL cache rather than
+   from the slot, so an in-BB or dead-store test would not be enough. */
+static int vreg_use_count_fn(const Func *f, int v)
+{
+    int n = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int u[16];
+            int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
+            for (int k = 0; k < nu; k++) if (u[k] == v) n++;
+        }
+    return n;
+}
+
+/* [IR_SHRNARROW] Load source bytes 0..hi of a width-4 slot into DEHL (L=byte0,
+   H=byte1, E=byte2) and zero the rest. The high-end counterpart to
+   partial_load_long_shr, which trims only the LOW bytes a shift discards; this
+   trims BOTH ends — the low bytes the shift drops and the high bytes the
+   truncation drops — loading source bytes [lo..hi] into L,H,E from the bottom.
+
+   Returns 1 if it emitted the load, 0 if the caller must fall back (an fp
+   offset out of displacement range). */
+static int partial_load_long_window(FILE *out, const Func *f, int v,
+                                    int lo, int hi)
+{
+    int n = hi - lo + 1;
+    if (lo < 0 || hi > 3 || n < 1 || n > 3) return 0;
+    if (fp_active(f)) {
+        int ix = slot_ix_off(f, v) + lo;
+        if (!fp_offset_fits(ix) || !fp_offset_fits(ix + n - 1)) return 0;
+        /* `ld hl,(ix+d)` is native and SHORT on ez80/rabbit/kc160, and is
+           synthesised into the same two byte loads on plain z80, so prefer it
+           over hand-rolled halves — hand-rolling cost rabbit and kc160 bytes. */
+        if (n >= 2) emit(out, "ld\thl,(%s%+d)", frame_reg(), ix + 0);
+        else      { emit(out, "ld\tl,(%s%+d)", frame_reg(), ix + 0);
+                    emit(out, "ld\th,0"); }
+        if (n >= 3) emit(out, "ld\te,(%s%+d)", frame_reg(), ix + 2);
+        else        emit(out, "ld\te,0");
+        emit(out, "ld\td,0");
+        return 1;
+    }
+    int off = slot_off(f, v) + L.cur_sp_adjust + lo;
+    /* Rabbit/kc160 read a word off sp natively in ONE two-byte op, so the
+       generic add-hl-sp byte walk below is a REGRESSION there — it cost
+       +13 B a cell on r2ka/r4k/r6k and +9 on kc160 before this path existed. */
+    if (n == 2 && off >= 0 && off <= sp_rel_max(f)) {
+        emit(out, "ld\thl,(sp+%d)", off);
+        emit(out, "ld\te,0");
+        emit(out, "ld\td,e");
+        return 1;
+    }
+    /* A 3-byte window has no native form, and on a target that reads a WORD
+       off sp in one op the BC-staging walk below costs more than trimming the
+       fourth byte saves (+7 B a cell on rabbit, +1 on kc160). Decline. */
+    if (n == 3 && sp_rel_max(f) >= 0) return 0;
+    switch (n) {
+    case 1:
+        emit(out, "ld\thl,%d", off);
+        emit(out, "add\thl,sp");
+        emit(out, "ld\tl,(hl)");
+        emit(out, "ld\th,0");
+        emit(out, "ld\te,h");
+        emit(out, "ld\td,h");
+        return 1;
+    case 2:
+        emit(out, "ld\thl,%d", off);
+        emit(out, "add\thl,sp");
+        emit(out, "ld\ta,(hl+)");
+        emit(out, "ld\th,(hl)");
+        emit(out, "ld\tl,a");
+        emit(out, "ld\te,0");
+        emit(out, "ld\td,e");
+        return 1;
+    case 3:
+        /* HL carries the running address, so H cannot be written mid-walk —
+           stage through BC exactly as the byte_shift==1 case does. */
+        emit(out, "ld\thl,%d", off);
+        emit(out, "add\thl,sp");
+        emit(out, "ld\tc,(hl)");
+        emit(out, "inc\thl");
+        emit(out, "ld\tb,(hl)");
+        emit(out, "inc\thl");
+        emit(out, "ld\te,(hl)");
+        emit(out, "ld\thl,bc");
+        emit(out, "ld\td,0");
+        return 1;
+    }
+    return 0;
+}
+
 /* Mirror of partial_load_long_shr for SHL: byte_shift ≥ 1 means the
    high bytes of the source are discarded.
 

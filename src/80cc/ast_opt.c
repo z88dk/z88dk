@@ -603,8 +603,19 @@ static int nodes_equivalent(Node *a, Node *b)
                 || a->type->bit_offset != b->type->bit_offset) return 0;
         }
         return nodes_equivalent(a->operand, b->operand);
-    case OP_NEG: case OP_COMP: case OP_LNEG:
     case OP_CAST:
+        /* A CAST's VALUE is its target type, not just its operand. Comparing
+           operands alone made `(unsigned char)(v >> 3)` and
+           `(unsigned int)(v >> 3)` equivalent, so ast_cse substituted the byte
+           for the int and the wider read silently came back truncated —
+           35535 read back as 207. Exactly the bitfield bug above, one node
+           type along: same address, different width. */
+        if (!a->type || !b->type) return 0;
+        if (a->type->kind != b->type->kind) return 0;
+        if (a->type->size != b->type->size) return 0;
+        if (a->type->isunsigned != b->type->isunsigned) return 0;
+        return nodes_equivalent(a->operand, b->operand);
+    case OP_NEG: case OP_COMP: case OP_LNEG:
     case OP_ADDR:  case AST_ADDR:
         return nodes_equivalent(a->operand, b->operand);
     case OP_ADD: case OP_SUB: case OP_MULT: case OP_DIV: case OP_MOD:
