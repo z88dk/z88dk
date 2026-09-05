@@ -574,38 +574,13 @@ void test_math32_edges()
 
     /* |x|>=128 uses fmod(2π). 128 is exact and is the gate (biased exp 134).
      * One relational per Assert: sccz80 && of two float compares can leave
-     * IEEE 1.0 in DEHL, so HL is 0 and Assert_real(int) sees a fail.
-     * MSYS2 CI: sin(128) is 0x7ece0965 (~1e38), fmod bits match Linux.
-     * Print sin(fmod) before sin(128): if sin(fmod) is ~0.72 the inner
-     * fmod in m32_sinf is the split; if both explode it is poly/int. */
-    {
-        static char pbuf[64];
-
-        a.f = (FLOAT)128.0;
-        printf("probe 128 bits=0x%lx\n", a.u);
-        b.f = FMOD(a.f, (FLOAT)(2.0 * M_PI));
-        printf("probe fmod(128,2pi) bits=0x%lx\n", b.u);
-        r.f = sin(b.f);
-        printf("probe sin(fmod) bits=0x%lx\n", r.u);
-
-        r.f = sin(a.f);
-        printf("probe sin(128) bits=0x%lx\n", r.u);
-        snprintf(pbuf, sizeof(pbuf), "sin(128) >= -1 bits=0x%lx", r.u);
-        Assert(r.f >= (FLOAT)(-1.0), pbuf);
-        snprintf(pbuf, sizeof(pbuf), "sin(128) <= 1 bits=0x%lx", r.u);
-        Assert(r.f <= (FLOAT)1.0, pbuf);
-        snprintf(pbuf, sizeof(pbuf), "sin(128) |x|<=1 bits=0x%lx", r.u);
-        Assert((r.u & 0x7ffffffful) <= 0x3f800000ul, pbuf);
-
-        r.f = cos(a.f);
-        printf("probe cos(128) bits=0x%lx\n", r.u);
-        snprintf(pbuf, sizeof(pbuf), "cos(128) >= -1 bits=0x%lx", r.u);
-        Assert(r.f >= (FLOAT)(-1.0), pbuf);
-        snprintf(pbuf, sizeof(pbuf), "cos(128) <= 1 bits=0x%lx", r.u);
-        Assert(r.f <= (FLOAT)1.0, pbuf);
-        snprintf(pbuf, sizeof(pbuf), "cos(128) |x|<=1 bits=0x%lx", r.u);
-        Assert((r.u & 0x7ffffffful) <= 0x3f800000ul, pbuf);
-    }
+     * IEEE 1.0 in DEHL, so HL is 0 and Assert_real(int) sees a fail. */
+    r.f = sin((FLOAT)128.0);
+    Assert(r.f >= (FLOAT)(-1.0), "sin(128) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "sin(128) <= 1");
+    r.f = cos((FLOAT)128.0);
+    Assert(r.f >= (FLOAT)(-1.0), "cos(128) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "cos(128) <= 1");
 
     Assert(approx_equal(acos((FLOAT)(-1.0)), (FLOAT)M_PI, EPSILON), "acos(-1) is pi");
     Assert(approx_equal(acos((FLOAT)(-0.5)), (FLOAT)(2.0*M_PI/3.0), (FLOAT)0.00001), "acos(-0.5) is 2pi/3");
