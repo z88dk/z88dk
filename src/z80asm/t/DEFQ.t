@@ -19,6 +19,9 @@ END_ERR
 
 	z80asm_ok("", "", "", "xx: $defq xx" 			=> bytes(0,0,0,0));
 	z80asm_ok("", "", "", "xx: $defq xx,xx+1020304h"=> bytes(0,0,0,0, 4,3,2,1));
+	# bit 31 set: must not clamp to LONG_MAX on LLP64 (MSYS2)
+	z80asm_ok("", "", "", "$defq 0xBE2AAAA3"		=> bytes(0xA3, 0xAA, 0x2A, 0xBE));
+	z80asm_ok("", "", "", "$defq 0x80000000"		=> bytes(0, 0, 0, 0x80));
 }
 
 unlink_testfiles;
