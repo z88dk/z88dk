@@ -1,4 +1,3 @@
 @classic/stdio/stdio.lst
-target/rex/input8
-target/rex/output8
-
+target/rex/obj/rex/x/target/rex/input8.o
+target/rex/obj/rex/x/target/rex/output8.o

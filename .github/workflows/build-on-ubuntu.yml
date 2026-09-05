@@ -56,7 +56,7 @@ jobs:
     - name: Identify perl runtime
       id: perl_runtime
       run: |
-        echo "version=$(perl -MConfig -e 'print \"$Config{version}-$Config{archname}\"')" >> "$GITHUB_OUTPUT"
+        echo "version=$(perl -MConfig -e 'print "$Config{version}-$Config{archname}"')" >> "$GITHUB_OUTPUT"
     # Rolled because actions/cache never overwrites an existing key: a fixed one
     # is written once and cannot even recover from the 7-day eviction.
     - name: Cache perl modules

@@ -1,8 +1,8 @@
-target/bee/graphics/clg
-target/bee/graphics/clsgraph
-target/bee/graphics/loadudg6.asm
-target/bee/graphics/plotpixl
-target/bee/graphics/respixl
-target/bee/graphics/xorpixl
-target/bee/graphics/pointxy
+target/bee/obj/${TARGET}/x/target/bee/graphics/clg.o
+target/bee/obj/${TARGET}/x/target/bee/graphics/clsgraph.o
+target/bee/obj/${TARGET}/x/target/bee/graphics/loadudg6.o
+target/bee/obj/${TARGET}/x/target/bee/graphics/plotpixl.o
+target/bee/obj/${TARGET}/x/target/bee/graphics/respixl.o
+target/bee/obj/${TARGET}/x/target/bee/graphics/xorpixl.o
+target/bee/obj/${TARGET}/x/target/bee/graphics/pointxy.o
 @classic/gfx/text6/gfx_text6.lst

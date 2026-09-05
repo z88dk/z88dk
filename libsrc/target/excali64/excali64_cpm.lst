@@ -1,10 +1,10 @@
-target/excali64/stdio/generic_console
-target/excali64/stdio/generic_console_ioctl
-target/excali64/stdio/conio_vars
-target/excali64/stdio/conio_map_colour
-target/excali64/stdio/CRT_FONT
-target/excali64/stdio/copy_font
-target/excali64/stdio/loadudg6
+target/excali64/obj/${TARGET}/x/target/excali64/stdio/generic_console.o
+target/excali64/obj/${TARGET}/x/target/excali64/stdio/generic_console_ioctl.o
+target/excali64/obj/${TARGET}/x/target/excali64/stdio/conio_vars.o
+target/excali64/obj/${TARGET}/x/target/excali64/stdio/conio_map_colour.o
+target/excali64/obj/${TARGET}/x/target/excali64/stdio/CRT_FONT.o
+target/excali64/obj/${TARGET}/x/target/excali64/stdio/copy_font.o
+target/excali64/obj/${TARGET}/x/target/excali64/stdio/loadudg6.o
 
 @classic/input/input_keyboard.lst
 @classic/gfx/gencon/gfx_gencon6.lst

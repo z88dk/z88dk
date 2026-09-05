@@ -20,6 +20,13 @@ CPM_ASM_TARGETS := $(foreach cpu,$(CPM_VARIANTS),target/cpm/obj/target-cpm-$(cpu
 CPM_C_TARGETS := $(foreach cpu,$(CPM_VARIANTS),$(patsubst target/cpm/%,target/cpm/obj/$(cpu)/%,$(CPM_NONFCNTL_CFILES:.c=.o)))
 CPM_FCNTL_TARGETS := $(foreach cpu,$(CPM_VARIANTS),$(foreach device,nodevice device,$(patsubst target/cpm/fcntl/%,target/cpm/obj/$(cpu)/$(device)/fcntl/%,$(CPM_FCNTL_CFILES:.c=.o))))
 
+MBC200_SOURCES := $(call rwildcard,target/mbc200,*.asm)
+MBC200_TARGETS := target/mbc200/obj/target-mbc200-mbc200
+TIKI100_SOURCES := $(call rwildcard,target/tiki100,*.asm)
+TIKI100_TARGETS := target/tiki100/obj/target-tiki100-tiki100
+V1050_SOURCES := $(call rwildcard,target/v1050,*.asm)
+V1050_TARGETS := target/v1050/obj/target-v1050-v1050
+
 CPM_TARGETS := $(CPM_ASM_TARGETS) $(CPM_C_TARGETS) $(CPM_FCNTL_TARGETS) classic/gfx/obj/.stamp-cpm
 
 $(eval $(call gfx_stamp_portable,cpm,cpm))
@@ -55,6 +62,9 @@ TOCREATE += $(call check_target,mbc200,mbc200.lib $(CPMLIBS))
 TOCREATE += $(call check_target,tiki100,tiki100.lib $(CPMLIBS))
 TOCREATE += $(call check_target,v1050,v1050.lib gfx1050udg.lib $(CPMLIBS))
 TOCREATE += $(call check_target,z80retro,z80retro_cpm.lib)
+$(eval $(call buildtargetasm,target/mbc200,z80,mbc200,-mz80,$(MBC200_SOURCES),$(MBC200_SOURCES)))
+$(eval $(call buildtargetasm,target/tiki100,z80,tiki100,-mz80,$(TIKI100_SOURCES),$(TIKI100_SOURCES)))
+$(eval $(call buildtargetasm,target/v1050,z80,v1050,-mz80,$(V1050_SOURCES),$(V1050_SOURCES)))
 define cpm_asm
 target/cpm/obj/target-cpm-$(1): $(CPM_SOURCES)
 	$(Q)mkdir -p target/cpm/obj/$(1)
@@ -75,13 +85,13 @@ target/cpm/obj/$(1)/$(2)/fcntl/%.o: target/cpm/fcntl/%.c
 endef
 $(foreach cpu,$(CPM_VARIANTS),$(foreach device,nodevice device,$(eval $(call cpm_fcntl_rule,$(cpu),$(device)))))
 
-v1050.lib: cpm_clib.lib gfx1050udg.lib classic/games/obj/.stamp-cpm-v1050 classic/gfx/obj/.stamp-cpm-v1050
+v1050.lib: cpm_clib.lib gfx1050udg.lib $(V1050_TARGETS) classic/games/obj/.stamp-cpm-v1050 classic/gfx/obj/.stamp-cpm-v1050
 	@echo ''
 	@echo '--- Building Visual 1050 Library (CP/M) ---'
 	@echo ''
 	TARGET=v1050 TYPE=z80 $(LIBLINKER) -DFORv1050 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/v1050.lib @$(TARGET_DIRECTORY)/v1050/v1050.lst
 
-gfx1050udg.lib: $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-cpm-v1050udg
+gfx1050udg.lib: $(TARGET_CLIB_DEPS) $(V1050_TARGETS) classic/gfx/obj/.stamp-cpm-v1050udg
 	@echo ''
 	@echo '--- Building Visual 1050 UDG based Graphics Library ---'
 	@echo ''
@@ -148,7 +158,7 @@ cpmdevice_z180.lib: cpmz180_clib.lib
 	@echo ''
 	TARGET=cpm TYPE=z180 DEVICE=device $(LIBLINKER) -mz180 -x$(OUTPUT_DIRECTORY)/cpmdevice_z180 @$(TARGET_DIRECTORY)/cpm/fcntl/fcntl.lst
 
-mbc200.lib: cpm_clib.lib classic/games/obj/.stamp-cpm-mbc200 classic/gfx/obj/.stamp-cpm-mbc200
+mbc200.lib: cpm_clib.lib $(MBC200_TARGETS) classic/games/obj/.stamp-cpm-mbc200 classic/gfx/obj/.stamp-cpm-mbc200
 	@echo ''
 	@echo '--- Building Sanyo MBC-200 Library (CP/M) ---'
 	@echo ''
@@ -160,7 +170,7 @@ z80retro_cpm.lib: cpm_clib.lib classic/video/tms9918/obj/z80retro classic/games/
 	@echo ''
 	TARGET=z80retro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80retro -x$(OUTPUT_DIRECTORY)/z80retro_cpm @$(TARGET_DIRECTORY)/z80retro/z80retro.lst
 
-tiki100.lib: cpm_clib.lib classic/games/obj/.stamp-cpm-tiki100 classic/gfx/obj/.stamp-cpm-tiki100
+tiki100.lib: cpm_clib.lib $(TIKI100_TARGETS) classic/games/obj/.stamp-cpm-tiki100 classic/gfx/obj/.stamp-cpm-tiki100
 	@echo ''
 	@echo '--- Building TIKI-100 Library ---'
 	@echo ''
@@ -186,4 +196,4 @@ target-cpm: $(CPM_TARGETS)
 
 
 target-cpm-clean:
-	$(RM) -fr target/cpm/obj
+	$(RM) -fr target/cpm/obj target/mbc200/obj target/tiki100/obj target/v1050/obj

@@ -1,8 +1,11 @@
-SVI_SOURCES := $(call rwildcard,target/svi,*.asm) $(call rwildcard,target/svi,*.c) $(call rwildcard,target/svi,Makefile)
+SVI_ASM_SOURCES := $(call rwildcard,target/svi,*.asm)
+SVI_C_SOURCES := $(call rwildcard,target/svi,*.c)
+SVI_C_TARGETS := $(patsubst target/svi/%,target/svi/obj/svi/%,$(SVI_C_SOURCES:.c=.o))
 
 SVI_TARGETS := \
-	target/svi/obj/target-svi-support \
+	target/svi/obj/target-svi-svi \
 	target/svi/obj/target-svi-msx \
+	$(SVI_C_TARGETS) \
 	classic/video/tms9918/obj/svi \
 	classic/video/mc6845/obj/svi \
 	classic/games/obj/.stamp-svi \
@@ -13,17 +16,14 @@ TOCREATE += $(call check_target,svi,svi_clib.lib svibios.lib)
 $(eval $(call gfx_stamp_args,svi,TARGET=svi))
 $(eval $(call buildvideo,tms9918,TMS9918,svi,))
 $(eval $(call buildvideo,mc6845,MC6845,svi,))
+$(eval $(call buildtargetasm,target/svi,z80,svi,-mz80,$(SVI_ASM_SOURCES),$(SVI_ASM_SOURCES)))
+$(eval $(call buildtargetc,target/svi,svi))
 
 svi_clib.lib: $(TARGET_CLIB_DEPS) msx_clib.lib $(SVI_TARGETS)
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(TARGET_DIRECTORY)/svi/svi.lst
 
 svibios.lib: $(TARGET_CLIB_DEPS) msx_clib.lib $(SVI_TARGETS)
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svibios @$(TARGET_DIRECTORY)/svi/arch_svibios.lst
-
-target/svi/obj/target-svi-support: $(SVI_SOURCES)
-	$(Q)mkdir -p $(dir $@)
-	$(MAKE) -C target/svi
-	@touch $@
 
 target/svi/obj/target-svi-msx: $(MSX_GLOBS_ex)
 	$(Q)mkdir -p target/svi/obj/msx
