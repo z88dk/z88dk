@@ -549,7 +549,7 @@ Object  file test_t_issue_2320_b_t.lib at $059C: Z80RMF18
 
 Object  file test_t_issue_2320_b_t.lib at $0654: Z80RMF18
   Name: test_t_issue_2320_b_t.a
-  CPU:  z80 
+  CPU:  ti83 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -563,7 +563,7 @@ Object  file test_t_issue_2320_b_t.lib at $0654: Z80RMF18
 
 Object  file test_t_issue_2320_b_t.lib at $072C: Z80RMF18
   Name: b
-  CPU:  z80 
+  CPU:  ti83 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -576,7 +576,7 @@ Object  file test_t_issue_2320_b_t.lib at $072C: Z80RMF18
 
 Object  file test_t_issue_2320_b_t.lib at $07E4: Z80RMF18
   Name: test_t_issue_2320_b_t.a
-  CPU:  z80 (-IXIY)
+  CPU:  ti83 (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -590,7 +590,7 @@ Object  file test_t_issue_2320_b_t.lib at $07E4: Z80RMF18
 
 Object  file test_t_issue_2320_b_t.lib at $08BC: Z80RMF18
   Name: b
-  CPU:  z80 (-IXIY)
+  CPU:  ti83 (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -603,7 +603,7 @@ Object  file test_t_issue_2320_b_t.lib at $08BC: Z80RMF18
 
 Object  file test_t_issue_2320_b_t.lib at $0974: Z80RMF18
   Name: test_t_issue_2320_b_t.a
-  CPU:  z80 
+  CPU:  ti83plus 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -617,7 +617,7 @@ Object  file test_t_issue_2320_b_t.lib at $0974: Z80RMF18
 
 Object  file test_t_issue_2320_b_t.lib at $0A4C: Z80RMF18
   Name: b
-  CPU:  z80 
+  CPU:  ti83plus 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -630,7 +630,7 @@ Object  file test_t_issue_2320_b_t.lib at $0A4C: Z80RMF18
 
 Object  file test_t_issue_2320_b_t.lib at $0B04: Z80RMF18
   Name: test_t_issue_2320_b_t.a
-  CPU:  z80 (-IXIY)
+  CPU:  ti83plus (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -644,7 +644,7 @@ Object  file test_t_issue_2320_b_t.lib at $0B04: Z80RMF18
 
 Object  file test_t_issue_2320_b_t.lib at $0BDC: Z80RMF18
   Name: b
-  CPU:  z80 (-IXIY)
+  CPU:  ti83plus (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80

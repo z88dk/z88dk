@@ -28,7 +28,7 @@ TARGET_LIB	:= $(PROJ).lib
 Z80NM_DIR	:= ../z80nm
 Z80NM		:= z88dk-z80nm$(EXESUFFIX)
 
-TASKS ?= 9
+TASKS 		?= 16
 
 CC 			?= gcc
 CXX			?= g++

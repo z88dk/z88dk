@@ -19,7 +19,7 @@ INSTALL 	?= install
 Z80ASM_EXE	?= ../../$(PROJ)$(EXESUFFIX)
 SRC			:= $(wildcard *.asm)
 
-TASKS ?= 9
+TASKS 		?= 16
 
 all:		$(PROJ).lib
 

@@ -965,25 +965,25 @@ void Options::set_cpu(int cpu) {
         define_static_symbol("__CPU_KC160_Z80_STRICT__");
         break;
     case CPU_TI83:
-        m_cpu = CPU_Z80;
+        m_cpu = CPU_TI83;
         define_static_symbol("__CPU_Z80__");
         define_static_symbol("__CPU_TI83__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_TI83_STRICT:
-        m_cpu = CPU_Z80;
+        m_cpu = CPU_TI83_STRICT;
         define_static_symbol("__CPU_Z80_STRICT__");
         define_static_symbol("__CPU_TI83_STRICT__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_TI83PLUS:
-        m_cpu = CPU_Z80;
+        m_cpu = CPU_TI83PLUS;
         define_static_symbol("__CPU_Z80__");
         define_static_symbol("__CPU_TI83PLUS__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_TI83PLUS_STRICT:
-        m_cpu = CPU_Z80_STRICT;
+        m_cpu = CPU_TI83PLUS_STRICT;
         define_static_symbol("__CPU_Z80_STRICT__");
         define_static_symbol("__CPU_TI83PLUS_STRICT__");
         define_static_symbol("__CPU_ZILOG__");
@@ -1011,13 +1011,23 @@ void Options::set_cpu(const string& name) {
         set_cpu(CPU_Z80);
         lib_for_all_cpus = true;
     }
-    else if (name == ARCH_TI83_NAME) {
-        set_cpu(CPU_Z80_STRICT);
+    else if (name == "ti83") {
+        set_cpu(CPU_TI83);
         m_ti83 = true;
         m_ti83plus = false;
     }
-    else if (name == ARCH_TI83PLUS_NAME) {
-        set_cpu(CPU_Z80_STRICT);
+    else if (name == "ti83_strict") {
+        set_cpu(CPU_TI83_STRICT);
+        m_ti83 = true;
+        m_ti83plus = false;
+    }
+    else if (name == "ti83plus") {
+        set_cpu(CPU_TI83PLUS);
+        m_ti83 = false;
+        m_ti83plus = true;
+    }
+    else if (name == "ti83plus_strict") {
+        set_cpu(CPU_TI83PLUS_STRICT);
         m_ti83 = false;
         m_ti83plus = true;
     }
@@ -1154,15 +1164,6 @@ void Options::define_assembly_defines() {
         set_cpu(CPU_Z80);
 
     set_swap_ixiy(m_swap_ixiy);
-
-	if (m_ti83) {
-		define_static_symbol("__CPU_TI83__");
-        undefine_static_symbol("__CPU_TI83PLUS__");
-	}
-	else if (m_ti83plus) {
-        undefine_static_symbol("__CPU_TI83__");
-        define_static_symbol("__CPU_TI83PLUS__");
-	}
 
 	// __FLOAT__xxx__
 	define_static_symbol(get_float_format_define());

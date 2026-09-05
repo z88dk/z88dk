@@ -18,22 +18,26 @@ my $OBJ_FILE_VERSION = "18";
 use vars '$test', '$null', '@CPUS';
 $test = "test_".($0 =~ s/[\.\/\\]/_/gr);
 $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
-@CPUS = qw( z80 		z80_strict 
-			z80n 		z80n_strict
-			z180 		z180_strict 
-			ez80 		ez80_strict
-			ez80_z80 	ez80_z80_strict
-			r800 		r800_strict
-			r2ka		r2ka_strict
-			r3k			r3k_strict
-			r4k 		r4k_strict 
-			r5k 		r5k_strict
-			r6k 		r6k_strict
-			8080 		8085 
-			gbz80 		gbz80_strict 
-			kc160		kc160_strict
-			kc160_z80	kc160_z80_strict
-			vm1			vm1_strict
+@CPUS = qw( 
+        z80			z80_strict
+        z80n		z80n_strict
+        z180		z180_strict
+        ez80		ez80_strict
+        ez80_z80	ez80_z80_strict
+        r800		r800_strict
+        r2ka		r2ka_strict
+        r3k			r3k_strict
+        r4k			r4k_strict
+        r5k			r5k_strict
+        r6k			r6k_strict
+        8080 		8080_strict
+        8085		8085_strict
+        gbz80		gbz80_strict
+        kc160		kc160_strict
+        kc160_z80	kc160_z80_strict
+        vm1			vm1_strict
+        ti83        ti83_strict
+        ti83plus    ti83plus_strict
 );
 
 unlink_testfiles();
@@ -44,7 +48,7 @@ sub check_bin_file {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
 	my $got_bin = slurp($got_file);
-	eq_or_dump_diff($exp_bin, $got_bin, "bin file $got_file ok");
+	eq_or_dump_diff($got_bin, $exp_bin, "bin file $got_file ok");
 	
 	(Test::More->builder->is_passing) or die;
 }
@@ -57,7 +61,7 @@ sub check_text_file {
 	(my $got_text = slurp($got_file)) =~ s/\r\n/\n/g;
 	$exp_text =~ s/\r\n/\n/g;
 	
-	my $diff = diff(\$exp_text, \$got_text, {STYLE => 'Table'});
+	my $diff = diff(\$got_text, \$exp_text, {STYLE => 'Table'});
 	is $diff, "", "text file $got_file ok";
 	
 	(Test::More->builder->is_passing) or die;
@@ -121,7 +125,8 @@ sub ticks {
 	(Test::More->builder->is_passing) or die;
 
 	my $cpu = ($options =~ /(?:-m=?)(\S+)/) ? $1 : "z80";
-	run_ok("z88dk-ticks -z80asm-tests -m$cpu $test.bin -output $test.out");
+	my $dis_cpu = $cpu =~ s/_strict//r =~ s/(ti83plus|ti83)/z80/r;
+	run_ok("z88dk-ticks -z80asm-tests -m$dis_cpu $test.bin -output $test.out");
 
 	(Test::More->builder->is_passing) or die;
 

@@ -30,23 +30,6 @@ bool opt_obj_hide_code = false;
 static void objfile_read_strid(objfile_t* obj, FILE* fp, UT_string* str);
 
 //-----------------------------------------------------------------------------
-// CPU name for the future version 19 object file format
-//-----------------------------------------------------------------------------
-
-static const char* cpu_name_v19(cpu_t id) {
-	if ((int)id == 0)
-		return NULL;
-	
-	switch ((int)id) {
-#define X(id_, name_, name_str_, non_strict_, ancestor_, defines_)	\
-    case id_: return name_str_;
-#include "../z80asm/cpu.def"
-	default:;
-	}
-	return NULL;
-}
-
-//-----------------------------------------------------------------------------
 // string table
 //-----------------------------------------------------------------------------
 
@@ -877,12 +860,7 @@ void objfile_read(objfile_t* obj, FILE* fp)
 
     // cpu
     if (opt_obj_list && obj->version >= 18) {
-        const char* cpu_str = NULL;
-		if (obj->version >= 19) 
-			cpu_str = cpu_name_v19(obj->cpu_id);
-		else
-			cpu_str = cpu_name(obj->cpu_id);
-		
+        const char* cpu_str = cpu_name(obj->cpu_id);
         if (cpu_str)
             printf("  CPU:  %s ", cpu_str);
         else
@@ -1215,7 +1193,7 @@ static void file_read_library(file_t* file, FILE* fp, UT_string* signature, int 
 			index_pos = ftell(fp);
 			
 			if (list_pos >= 0 && size > 0) {
-				const char* cpu_str = cpu_name_v19(cpu_id);
+				const char* cpu_str = cpu_name(cpu_id);
 				const char* swap_ixiy_str = swap_ixiy ? " (-IXIY)" : "";
 				
 				xfseek(fp, list_pos, SEEK_SET);

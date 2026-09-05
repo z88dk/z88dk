@@ -57,7 +57,7 @@ Skipping test_t_issue_2320_a_t.b.o - different CPU-IXIY combination
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_TI83__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Adding test_t_issue_2320_a_t.a.o to library
+Skipping test_t_issue_2320_a_t.a.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_a_t.b.o - different CPU-IXIY combination
 
 Predefined constant: __SWAP_IX_IY__ = 1
@@ -67,7 +67,7 @@ Skipping test_t_issue_2320_a_t.b.o - different CPU-IXIY combination
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_TI83PLUS__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Adding test_t_issue_2320_a_t.a.o to library
+Skipping test_t_issue_2320_a_t.a.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_a_t.b.o - different CPU-IXIY combination
 
 Predefined constant: __SWAP_IX_IY__ = 1
@@ -226,34 +226,6 @@ Object  file test_t_issue_2320_a_t.lib at $0014: Z80RMF18
     S   4 = "test_t_issue_2320_a_t.a"
 
 Object  file test_t_issue_2320_a_t.lib at $00EC: Z80RMF18
-  Name: test_t_issue_2320_a_t.a
-  CPU:  z80 
-  Section "": 0 bytes
-  Section code2: 3 bytes
-    C $0000: 21 00 40
-  Symbols:
-    L A $0000: a (section code2) (file test_t_issue_2320_a_t.a.asm:2)
-  Strings:
-    S   1 = "code2"
-    S   2 = "a"
-    S   3 = "test_t_issue_2320_a_t.a.asm"
-    S   4 = "test_t_issue_2320_a_t.a"
-
-Object  file test_t_issue_2320_a_t.lib at $01C4: Z80RMF18
-  Name: test_t_issue_2320_a_t.a
-  CPU:  z80 
-  Section "": 0 bytes
-  Section code2: 3 bytes
-    C $0000: 21 00 40
-  Symbols:
-    L A $0000: a (section code2) (file test_t_issue_2320_a_t.a.asm:2)
-  Strings:
-    S   1 = "code2"
-    S   2 = "a"
-    S   3 = "test_t_issue_2320_a_t.a.asm"
-    S   4 = "test_t_issue_2320_a_t.a"
-
-Object  file test_t_issue_2320_a_t.lib at $029C: Z80RMF18
   Name: b
   CPU:  r3k 
   Section "": 0 bytes

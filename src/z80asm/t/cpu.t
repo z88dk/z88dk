@@ -102,7 +102,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		
 		if (!$ixiy) {
 			# run disassembler and assemble again; check binary
-			(my $dis_cpu = $cpu) =~ s/_strict//;
+			my $dis_cpu = $cpu =~ s/_strict//r =~ s/(ti83plus|ti83)/z80/r;
 			run_ok("z88dk-dis -m$dis_cpu $file_bin > $test.asm");
 
 			# assemble

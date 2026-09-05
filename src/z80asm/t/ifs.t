@@ -431,6 +431,7 @@ END_ERR
 #-------------------------------------------------------------------------------
 # test CPU-defining constants
 #-------------------------------------------------------------------------------
+
 spew("$test.asm", <<'END_ASM');
 	if __CPU_INTEL__			: defm "intel "				: endif
 	if __CPU_8080__				: defm "8080 "				: endif
@@ -474,7 +475,9 @@ spew("$test.asm", <<'END_ASM');
 	if __CPU_R6K_STRICT__		: defm "r6k_strict "		: endif
 															
 	if __CPU_TI83__				: defm "ti83 "  			: endif
+	if __CPU_TI83_STRICT__		: defm "ti83_strict "		: endif
 	if __CPU_TI83PLUS__			: defm "ti83plus "  		: endif
+	if __CPU_TI83PLUS_STRICT__	: defm "ti83plus_strict "	: endif
 
     if __CPU_VM1__				: defm "vm1 "				: endif
     if __CPU_VM1_STRICT__		: defm "vm1_strict "		: endif
@@ -529,13 +532,15 @@ my %defines = (
 	r5k_strict			=> "rabbit r5k_strict ",
 	r6k					=> "rabbit r6k ",
 	r6k_strict			=> "rabbit r6k_strict ",
-	ti83				=> "zilog z80_strict ti83 ",
-	ti83plus			=> "zilog z80_strict ti83plus ",
+	ti83				=> "zilog z80 ti83 ",
+	ti83_strict			=> "zilog z80_strict ti83_strict ",
+	ti83plus			=> "zilog z80 ti83plus ",
+	ti83plus_strict		=> "zilog z80_strict ti83plus_strict ",
 	vm1					=> "intel vm1 ",
 	vm1_strict			=> "intel vm1_strict ",
 );
 
-for my $cpu (@CPUS, qw( ti83 ti83plus )) {
+for my $cpu (@CPUS) {
 	for my $ixiy ("", "-IXIY ") {
 		for my $math (qw( genmath math48 ieee16 ieee32 ieee64 
 						  z80 zx81 zx z88 mbfs mbf40 mbf64 am9511 )) {

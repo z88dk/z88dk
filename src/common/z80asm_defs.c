@@ -160,12 +160,16 @@ static void init_cpus() {
 
 // convert cpu_t to string, NULL if not found
 const char* cpu_name(cpu_t id) {
-    init_cpus();
-    cpu_lookup_t* found = cpu_id_to_lookup(id);
-    if (found)
-        return found->name;
-    else
-        return NULL;
+	if ((int)id == 0)
+		return NULL;
+	
+	switch ((int)id) {
+#define X(id_, name_, name_str_, non_strict_, ancestor_, defines_)	\
+    case id_: return name_str_;
+#include "../z80asm/cpu.def"
+	default:;
+	}
+	return NULL;
 }
 
 // lookup cpu name, return cpu_t, CPU_UNDEF if not found
