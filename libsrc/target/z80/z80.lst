@@ -1,2 +1,2 @@
-target/z80/stdio/fputc_cons_native
+target/z80/obj/${TYPE}/x/target/z80/stdio/fputc_cons_native.o
 @classic/stdio/stdio.lst

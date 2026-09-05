@@ -1,6 +1,6 @@
 $(eval $(call gfx_stamp_args,embedded,TARGET=embedded))
 TOCREATE += $(call check_target,embedded,embedded_clib.lib)
-embedded_clib.lib: $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-embedded
+embedded_clib.lib: $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-embedded target/rex/obj/target-rex-rex
 	@echo ''
 	@echo '--- Building Embedded (ns16450) Library ---'
 	@echo ''
