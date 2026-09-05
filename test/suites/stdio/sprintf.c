@@ -5,7 +5,9 @@
 #include "test.h"
 
 
-#if __RCMX000__ | __GBZ80 | __8080
+#if __EZ80_Z80
+#pragma output CLIB_OPT_PRINTF=0x7dffffff
+#elif __RCMX000__ | __GBZ80 | __8080
 #pragma output CLIB_OPT_PRINTF=0x40ffffff
 #else
 #pragma output CLIB_OPT_PRINTF=0x7fffffff
