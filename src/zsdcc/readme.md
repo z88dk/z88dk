@@ -14,7 +14,7 @@ For Linux users follow the instructions on the [installation page](https://githu
 
 `sdcc-z88dk.patch` is the current default standard patch.
 
-`sdcc-16639-z88dk.patch` is the current zsdcc patch, for comparison and building against sdcc 4.6.0 r16639 (final release tag).
+`sdcc-16639-z88dk.patch` is the current zsdcc patch, for comparison and building against sdcc 4.6.0 r16639 (final release tag). The r16639 patch also backports SDCC [r16827](https://sourceforge.net/p/sdcc/code/16827/) and [r16828](https://sourceforge.net/p/sdcc/code/16828/) (`nextreg` in the Z80N peephole; SDCC bug [#4062](https://sourceforge.net/p/sdcc/bugs/4062/), z88dk [#3077](https://github.com/z88dk/z88dk/issues/3077)). The r16827 `gen.c` change does not apply to this pin.
 
 `sdcc-15248-z88dk.patch` is the previous zsdcc patch, retained for comparison and building against sdcc 4.5.0 r15248.
 

@@ -111,7 +111,7 @@ Index: src/SDCCmain.c
  #endif
 -           " #%s (%s)\n", getBuildNumber (), getBuildEnvironment ());
 -  fprintf (stream, "published under GNU General Public License (GPL)\n");
-+    " #%s (%s) " __DATE__ "\n\n", getBuildNumber(), getBuildEnvironment());
++    " #%s (%s) pr3093 " __DATE__ "\n\n", getBuildNumber(), getBuildEnvironment());
 +  fprintf(stream, "sdcc website:\nhttps://sourceforge.net/projects/sdcc/\n\n");
 +  fprintf(stream, "patch details:\nhttps://github.com/z88dk/z88dk/blob/master/src/zsdcc/sdcc-z88dk.patch\n\n");
 +  fprintf(stream, "published under GNU General Public License (GPL)\n");
@@ -141,7 +141,6 @@ Index: src/SDCCmain.c
          }
  
        preProcess (envp); // Sets yyin to pipe from preprocessor
- 
 Index: src/SDCCopt.c
 ===================================================================
 --- src/SDCCopt.c	(revision 16639)
@@ -391,7 +390,17 @@ Index: src/z80/peep.c
  static bool
  z80MightBeParmInCallFromCurrentFunction(const char *what)
  {
-@@ -420,6 +502,16 @@
+@@ -378,7 +460,8 @@
+     lineIsInst (pl, "bsra") ||
+     lineIsInst (pl, "bsrl") ||
+     lineIsInst (pl, "bsrf") ||
+-    lineIsInst (pl, "brlc")))
++    lineIsInst (pl, "brlc") ||
++    lineIsInst (pl, "nextreg")))
+     return(false);
+ 
+   if((IS_Z180 || IS_EZ80 || IS_Z80N) &&
+@@ -420,6 +503,16 @@
    if(lineIsInst (pl, "call") && strcmp(what, "sp") == 0)
      return TRUE;
  
@@ -408,7 +417,25 @@ Index: src/z80/peep.c
    if(strcmp(pl->line, "call\t__initrleblock") == 0 && (strchr(what, 'd') != 0 || strchr(what, 'e') != 0))
      return TRUE;
  
-@@ -1023,6 +1115,16 @@
+@@ -731,6 +824,9 @@
+     lineIsInst (pl, "brlc")))
+     return(strchr("bde", *what));
+ 
++  if (IS_Z80N && lineIsInst (pl, "nextreg") && rarg)
++    return (!STRNCASECMP (rarg, "a", 1) && !strcmp (what, "a"));
++
+   if(IS_TLCS90 &&
+     (lineIsInst (pl, "decx") ||
+     lineIsInst (pl, "incx")))
+@@ -910,6 +1006,7 @@
+     lineIsInst (pl, "bsra") ||
+     lineIsInst (pl, "bsrl") ||
+     lineIsInst (pl, "bsrf") ||
++    lineIsInst (pl, "nextreg") ||
+     lineIsInst (pl, "swap")))
+     return false;
+     
+@@ -1023,6 +1120,16 @@
    if(!strcmp(what, "ix"))
      return(false);
  
