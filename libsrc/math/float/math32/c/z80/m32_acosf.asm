@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -395,16 +395,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -424,8 +424,8 @@ ENDIF
 ; ---------------------------------
 _m32_acosf:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
 	push	af
 	push	af
 	push	af
@@ -434,7 +434,7 @@ _m32_acosf:
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
-	call	_fabs_fastcall
+	call	_m32_fabsf
 	push	de
 	push	hl
 	ld	hl,0x3f80
@@ -444,16 +444,20 @@ _m32_acosf:
 	call	___fslt_callee
 	ld	a, l
 	or	a, a
-	jr	Z,l_m32_acosf_00102
-	ld	a,0xff
-	ld	(ix-8),a
-	ld	(ix-7),a
-	ld	(ix-6),a
-	ld	(ix-5),a
+	jr	z,l_m32_acosf_00102
+	ld	hl,0
+	add	hl, sp
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
 	pop	hl
+	pop	de
+	push	de
 	push	hl
-	ld	e,(ix-6)
-	ld	d,(ix-5)
 	jr	l_m32_acosf_00103
 l_m32_acosf_00102:
 	ld	l,(ix-4)
@@ -477,8 +481,11 @@ l_m32_acosf_00102:
 	push	bc
 	push	de
 	push	hl
-	call	___fsdiv_callee
-	call	_m32_atanf
+	call	_m32_atan2f
+	pop	af
+	pop	af
+	pop	af
+	pop	af
 l_m32_acosf_00103:
 	ld	sp, ix
 	pop	ix

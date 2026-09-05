@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -206,7 +206,7 @@
 ;--------------------------------------------------------
 ; Public variables in this module
 ;--------------------------------------------------------
-	GLOBAL _am9511_sinhf
+	GLOBAL _am9511_sinh
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
@@ -231,7 +231,6 @@
 	GLOBAL _am9511_asinh
 	GLOBAL _am9511_tanh
 	GLOBAL _am9511_cosh
-	GLOBAL _am9511_sinh
 	GLOBAL _am9511_atan2
 	GLOBAL _atan_fastcall
 	GLOBAL _acos_fastcall
@@ -365,16 +364,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -390,12 +389,12 @@ ENDIF
 ;--------------------------------------------------------
 	SECTION code_compiler
 ;	---------------------------------
-; Function am9511_sinhf
+; Function am9511_sinh
 ; ---------------------------------
-_am9511_sinhf:
+_am9511_sinh:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
 	push	af
 	push	af
 	call	_exp_fastcall

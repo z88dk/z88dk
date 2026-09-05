@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -395,16 +395,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -424,10 +424,112 @@ ENDIF
 ; ---------------------------------
 _m32_atanhf:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
 	push	af
 	push	af
+	push	af
+	push	af
+	push	hl
+	push	de
+	ld	bc,0x3f80
+	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
+	push	hl
+	call	___fslt_callee
+	ld	c, l
+	pop	de
+	pop	hl
+	bit	0, c
+	jr	z,l_m32_atanhf_00105
+	push	hl
+	push	de
+	push	de
+	push	hl
+	ld	bc,0xbf80
+	push	bc
+	ld	bc,0x0000
+	push	bc
+	call	___fslt_callee
+	ld	c, l
+	pop	de
+	pop	hl
+	bit	0, c
+	jr	nz,l_m32_atanhf_00106
+l_m32_atanhf_00105:
+	push	hl
+	push	de
+	ld	bc,0x3f80
+	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
+	push	hl
+	call	___fseq_callee
+	ld	a, l
+	pop	de
+	pop	hl
+	or	a, a
+	jr	z,l_m32_atanhf_00102
+	ld	hl,0
+	add	hl, sp
+	xor	a, a
+	ld	(hl), a
+	inc	hl
+	ld	(hl), a
+	inc	hl
+	ld	(hl),0x80
+	inc	hl
+	ld	(hl),0x7f
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	jp	l_m32_atanhf_00108
+l_m32_atanhf_00102:
+	ld	bc,0xbf80
+	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
+	push	hl
+	call	___fseq_callee
+	ld	a, l
+	or	a, a
+	jr	z,l_m32_atanhf_00104
+	ld	hl,0
+	add	hl, sp
+	xor	a, a
+	ld	(hl), a
+	inc	hl
+	ld	(hl), a
+	inc	hl
+	ld	(hl),0x80
+	inc	hl
+	ld	(hl),0xff
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	jr	l_m32_atanhf_00108
+l_m32_atanhf_00104:
+	ld	hl,0
+	add	hl, sp
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	jr	l_m32_atanhf_00108
+l_m32_atanhf_00106:
 	push	hl
 	push	de
 	ld	bc,0x3f80
@@ -461,6 +563,7 @@ _m32_atanhf:
 	call	___fsdiv_callee
 	call	_m32_div2f
 	call	_m32_logf
+l_m32_atanhf_00108:
 	ld	sp, ix
 	pop	ix
 	ret

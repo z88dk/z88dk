@@ -526,6 +526,78 @@ void test_float_arithmetic()
     Assert(approx_equal(c, (FLOAT)0.333333333, EPSILON), "1/3 ~ 0.333...");
 }
 
+#ifdef MATH32
+/* IEEE edges that the math32 cores document: FTZ/specials, exp overflow,
+ * signed zero sqrt, packed qNaN divide, dissimilar-magnitude add (align). */
+void test_math32_edges()
+{
+    union { FLOAT f; unsigned long u; } a, b, r;
+    static FLOAT vz, vo;
+
+    vz = (FLOAT)0.0;
+    vo = (FLOAT)1.0;
+
+    a.u = 0x80000000ul; /* -0 */
+    r.f = SQRT(a.f);
+    Assert(r.u == 0x80000000ul, "sqrt(-0) is -0");
+    r.f = invsqrt(a.f);
+    Assert(r.u == 0xff800000ul, "invsqrt(-0) is -Inf");
+
+    r.f = exp((FLOAT)100.0);
+    Assert(r.f == (FLOAT)HUGE_POS_F32, "exp(100) overflows to HUGE_POS");
+    r.f = exp((FLOAT)(-100.0));
+    Assert(r.f == vz, "exp(-100) underflows to 0");
+
+    a.u = 0x7fc00000ul; /* qNaN, quiet bit only */
+    b.f = (FLOAT)2.0;
+    r.f = a.f / b.f;
+    Assert(((r.u & 0x7f800000ul) == 0x7f800000ul) && (r.u & 0x007ffffful), "qNaN/2 is NaN");
+    r.f = a.f / a.f;
+    Assert(((r.u & 0x7f800000ul) == 0x7f800000ul) && (r.u & 0x007ffffful), "qNaN/qNaN is NaN");
+
+    a.u = 0x3f800000ul; /* 1.0 */
+    b.u = ((unsigned long)(127-5) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f840000ul, "1+2^-5");
+    b.u = ((unsigned long)(127-8) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f808000ul, "1+2^-8");
+    b.u = ((unsigned long)(127-16) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f800080ul, "1+2^-16");
+    b.u = ((unsigned long)(127-20) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f800008ul, "1+2^-20");
+    b.u = ((unsigned long)(127-23) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f800001ul, "1+2^-23");
+
+    /* |x|>=128 uses fmod(2π). 128 is exact and is the gate (biased exp 134).
+     * One relational per Assert: sccz80 && of two float compares can leave
+     * IEEE 1.0 in DEHL, so HL is 0 and Assert_real(int) sees a fail. */
+    r.f = sin((FLOAT)128.0);
+    Assert(r.f >= (FLOAT)(-1.0), "sin(128) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "sin(128) <= 1");
+    r.f = cos((FLOAT)128.0);
+    Assert(r.f >= (FLOAT)(-1.0), "cos(128) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "cos(128) <= 1");
+
+    Assert(approx_equal(acos((FLOAT)(-1.0)), (FLOAT)M_PI, EPSILON), "acos(-1) is pi");
+    Assert(approx_equal(acos((FLOAT)(-0.5)), (FLOAT)(2.0*M_PI/3.0), (FLOAT)0.00001), "acos(-0.5) is 2pi/3");
+    Assert(approx_equal(asin((FLOAT)1.0), (FLOAT)M_PI_2, EPSILON), "asin(1) is pi/2");
+    Assert(approx_equal(asin((FLOAT)(-1.0)), (FLOAT)(-M_PI_2), EPSILON), "asin(-1) is -pi/2");
+    Assert(approx_equal(asinh((FLOAT)(-1.0)), -asinh((FLOAT)1.0), EPSILON), "asinh is odd");
+    Assert(approx_equal(POW((FLOAT)(-2.0), (FLOAT)3.0), (FLOAT)(-8.0), EPSILON), "pow(-2,3) is -8");
+    Assert(POW((FLOAT)(-2.0), (FLOAT)2.0) == (FLOAT)4.0, "pow(-2,2) is 4");
+
+    a.f = acosh((FLOAT)0.5);
+    Assert(((a.u & 0x7f800000ul) == 0x7f800000ul) && (a.u & 0x007ffffful), "acosh(0.5) is NaN");
+    a.f = (FLOAT)0.0;
+    r.f = log(a.f);
+    Assert(r.u == 0xff800000ul, "log(0) is -Inf");
+}
+#endif
+
 int suite_math()
 {
     suite_setup(MATH_LIBRARY " Tests");
@@ -553,6 +625,9 @@ int suite_math()
     suite_add_test(test_specials_div);
     suite_add_test(test_specials_mul_add);
     suite_add_test(test_specials_sqrt);
+#endif
+#ifdef MATH32
+    suite_add_test(test_math32_edges);
 #endif
     return suite_run();
 }

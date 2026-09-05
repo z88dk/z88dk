@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -364,16 +364,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -393,8 +393,8 @@ ENDIF
 ; ---------------------------------
 _am9511_log2:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
 	push	af
 	push	af
 	push	hl
@@ -410,16 +410,20 @@ _am9511_log2:
 	pop	de
 	pop	bc
 	bit	0, l
-	jr	NZ,l_am9511_log2_00102
-	ld	a,0xff
-	ld	(ix-4),a
-	ld	(ix-3),a
-	ld	(ix-2),a
-	ld	(ix-1),a
+	jr	nz,l_am9511_log2_00102
+	ld	hl,0
+	add	hl, sp
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
 	pop	hl
+	pop	de
+	push	de
 	push	hl
-	ld	e,(ix-2)
-	ld	d,(ix-1)
 	jr	l_am9511_log2_00103
 l_am9511_log2_00102:
 	ld	l, c

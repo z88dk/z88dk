@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Sep  2 09:30:58 2026
+;	Module compile time: Fri Sep  4 00:15:24 2026
 
 
 	C_LINE	0,"m32_asinf.c"
@@ -265,7 +265,7 @@
 	add	sp,-8
 	ld	hl,sp+8
 	call	l_glong
-	call	fabs_fastcall
+	call	_m32_fabsf
 	push	de
 	push	hl
 	ld	hl,0	;const
@@ -274,8 +274,7 @@
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	add	sp,-4
-	ld	hl,sp+0
+	ld	hl,sp+4
 	ld	(hl),255
 	inc	hl
 	ld	(hl),255
@@ -283,9 +282,9 @@
 	ld	(hl),255
 	inc	hl
 	ld	(hl),255
-	ld	hl,sp+0
+	ld	hl,sp+4
 	call	l_glong
-	add	sp,16
+	add	sp,12
 	ret
 
 
@@ -309,9 +308,10 @@
 	push	hl
 	ld	hl,sp+4
 	call	l_glong
-	call	l_f32_div
-	call	_m32_atanf
-	add	sp,12
+	push	de
+	push	hl
+	call	_m32_atan2f
+	add	sp,20
 	ret
 
 

@@ -18,16 +18,12 @@
 
 float am9511_log2 (float x) __z88dk_fastcall
 {
-    union fl32 {
-        float f;
-        uint32_t l;
-    };
+    union float_long fl;
 
     /* Test for domain */
     if( x <= 0.0 )
     {
-        union fl32 fl;
-        fl.l = NAN_NEG_F32;
+        fl.l = (int32_t)NAN_NEG_F32;
         return fl.f;
     }
 

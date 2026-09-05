@@ -40,6 +40,11 @@ union float_long
     int32_t l;
 };
 
+/* Top 8 bits of the IEEE word (sign + exp[7:1]). Shift the int, not a
+ * memory index, so LE and BE match.  0x42 => |x| in [32, 128);
+ * 0x43 => |x| >= 128.  >> 24 not >> 23: SDCC emits 7x srl/rra/djnz for >> 23. */
+#define m32_ieee_hi(u)  ((uint8_t)((uint32_t)(u).l >> 24))
+
     /****************************************
      * Prototypes for ANSI C math functions *
      ****************************************/

@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -396,16 +396,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -425,36 +425,97 @@ ENDIF
 ; ---------------------------------
 _m32_exp10f:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
 	ld	c, l
 	ld	b, h
-	ld	hl, -12
+	ld	hl, -16
 	add	hl, sp
 	ld	sp, hl
-	ld	l, c
-	ld	h, b
-	ex	(sp), hl
+	ld	(ix-12),c
+	ld	(ix-11),b
 	ld	(ix-10),e
 	ld	(ix-9),d
-	ld	a, d
+	ld	hl,0
+	add	hl, sp
+	ex	de, hl
+	ld	hl,4
+	add	hl, sp
+	ld	bc,0x0004
+	ldir
+	ld	hl,0+1+1+1
+	add	hl,sp
+	ld	a,(hl)
+	ld	h,a
+	and	a,0x7f
+	cp	a,0x43
+	jr	c,l_m32_exp10f_00102
+	add	hl, hl
+	jr	nc,l_m32_exp10f_00113
+	ld	hl,0x0000
+	ld	e,l
+	ld	d,h
+	jr	l_m32_exp10f_00114
+l_m32_exp10f_00113:
+	ld	de,0x7f7f
+	ld	hl,0xffff
+l_m32_exp10f_00114:
+	jp	l_m32_exp10f_00111
+l_m32_exp10f_00102:
+	sub	a,0x42
+	jr	c,l_m32_exp10f_00108
+	ld	l,(ix-10)
+	ld	h,(ix-9)
+	push	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
+	push	hl
+	ld	hl,0x4218
+	push	hl
+	ld	hl,0xec59
+	push	hl
+	call	___fslt_callee
+	ld	a, l
+	or	a, a
+	jr	z,l_m32_exp10f_00104
+	ld	de,0x7f7f
+	ld	hl,0xffff
+	jp	l_m32_exp10f_00111
+l_m32_exp10f_00104:
+	ld	hl,0xc217
+	push	hl
+	ld	hl,0xb818
+	push	hl
+	ld	l,(ix-10)
+	ld	h,(ix-9)
+	push	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
+	push	hl
+	call	___fslt_callee
+	ld	a, l
+	or	a, a
+	jr	z,l_m32_exp10f_00108
+	ld	hl,0x0000
+	ld	e,l
+	ld	d,h
+	jp	l_m32_exp10f_00111
+l_m32_exp10f_00108:
+	ld	a,(ix-9)
 	and	a,0x7f
 	or	a,(ix-10)
 	or	a,(ix-11)
 	or	a,(ix-12)
-	jr	NZ,l_m32_exp10f_00102
+	jr	nz,l_m32_exp10f_00110
 	ld	de,0x3f80
 	ld	hl,0x0000
-	jp	l_m32_exp10f_00103
-l_m32_exp10f_00102:
-	pop	de
-	pop	hl
+	jp	l_m32_exp10f_00111
+l_m32_exp10f_00110:
+	ld	l,(ix-10)
+	ld	h,(ix-9)
 	push	hl
-	push	de
-	ex	de,hl
-	pop	hl
-	push	hl
-	push	de
+	ld	l,(ix-12)
+	ld	h,(ix-11)
 	push	hl
 	ld	hl,0x4054
 	push	hl
@@ -515,31 +576,31 @@ l_m32_exp10f_00102:
 	call	___fssub_callee
 	push	hl
 	push	de
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	call	___fs2sint_callee
-	ld	(ix-6),l
-	ld	(ix-5),h
-	pop	de
-	pop	bc
-	ld	hl,0x0007
-	push	hl
-	ld	hl,_m32_coeff_exp10f
-	push	hl
-	push	de
-	push	bc
-	call	_m32_polyf
 	ld	c,(ix-6)
 	ld	b,(ix-5)
 	push	bc
+	ld	c,(ix-8)
+	ld	b,(ix-7)
+	push	bc
+	call	___fs2sint_callee
+	ld	c, l
+	ld	b, h
+	pop	de
+	pop	hl
+	push	bc
+	push	hl
+	ld	hl,0x0007
+	ex	(sp), hl
+	push	hl
+	ld	hl,_m32_coeff_exp10f
+	ex	(sp), hl
+	push	de
+	push	hl
+	call	_m32_polyf
 	push	de
 	push	hl
 	call	_m32_ldexpf
-l_m32_exp10f_00103:
+l_m32_exp10f_00111:
 	ld	sp, ix
 	pop	ix
 	ret

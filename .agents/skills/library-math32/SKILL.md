@@ -9,8 +9,7 @@ description: >
 
 # Library — math32
 
-Home: `libsrc/math/float/math32/`. Docs of record: `libsrc/math/float/math32/readme.md`
-(working rewrite may live as root `math32-README.md` until merged).
+Home: `libsrc/math/float/math32/`. Docs of record: `libsrc/math/float/math32/readme.md`.
 Link via **`--math32`** (`-lmath32@{ZCC_LIBCPU}`).
 
 ## 0b. Math32 multi-CPU float library (layout + policy)
@@ -74,11 +73,23 @@ engines are not bit-identical.
 | Op | Algorithm | Notes |
 |----|-----------|--------|
 | **`div` / `m32_fsdiv`** | **Restoring** 24-bit mantissa | z80 + **8085** + **8080** + **gbz80** cores; z80n/z180/ez80_z80 share z80 `asm/z80/f32_fsdiv.asm` |
-| **`inv` / `m32_fsinv`** | Newton–Raphson | Still mul-heavy; HW mul helps inv only |
+| **`inv` / `m32_fsinv`** | Newton–Raphson | Slower than `div` for a reciprocal. HW mul helps inv only |
+| **`invsqrt` / `m32_fsinvsqrt`** | Quake seed + 3× NR | **Still the fastest** `1/sqrt`. Do not replace with `1.0/sqrt` |
 | math16 | Same split: restoring `asm_f16_div`, NR `asm_f16_inv` | |
 
 Do **not** reintroduce NR trampoline `fsdiv` = `fsinv`+`fsmul` without A/B proof.
 Docs: `math32/readme.md` § div/inv; measurement: **z88dk-tooling** § A/B.
+
+In **C higher functions** (`c/m32_*.c`):
+
+| Need | Write | Do not write |
+|------|--------|----------------|
+| Reciprocal `1/n` | `1.0/x` (restoring `div`) | `m32_invf(x)` |
+| Inverse square root | `m32_invsqrtf(x)` | `1.0/m32_sqrtf(x)` |
+
+`pow(x, -1)` / `sinh` / `cosh` / `tanh` / `atan` recip / `asinh` / `acosh` use divide. `pow(x, -0.5)` keeps `m32_invsqrtf`.
+
+IEEE bit punning: use **`union float_long`** from `c/m32_math.h` (`float f; int32_t l`). Do not invent a local `uint32_t` union. Assign `NAN_*` / `INFINITY_*` as `(int32_t)NAN_NEG_F32` so zsdcc does not warn on unsigned→signed.
 
 ### Micro-opt patterns that port
 

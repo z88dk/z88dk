@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -397,16 +397,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -426,15 +426,16 @@ ENDIF
 ; ---------------------------------
 _m32_cosf:
 	push	ix
-	ld	ix,0
-	add	ix,sp
-	push	af
-	push	af
-	dec	sp
+	ld	ix,	+0
+	add	ix, sp
+	ld	c, l
+	ld	b, h
+	ld	hl, -9
+	add	hl, sp
+	ld	sp, hl
 	ld	(ix-1),0x01
-	ld	c,l
-	ld	b,h
-	ex	(sp),hl
+	ld	(ix-5),c
+	ld	(ix-4),b
 	ld	(ix-3),e
 	ld	(ix-2),d
 	push	bc
@@ -449,22 +450,51 @@ _m32_cosf:
 	pop	de
 	pop	bc
 	or	a, a
-	jr	Z,l_m32_cosf_00102
+	jr	z,l_m32_cosf_00102
+	ld	(ix-5),c
+	ld	(ix-4),b
+	ld	(ix-3),e
 	ld	a, d
 	xor	a,0x80
 	ld	(ix-2),a
-	pop	hl
-	push	bc
-	ld	(ix-3),e
 l_m32_cosf_00102:
-	pop	de
-	pop	hl
+	ld	hl,0
+	add	hl, sp
+	ex	de, hl
+	ld	hl,4
+	add	hl, sp
+	ld	bc,0x0004
+	ldir
+	ld	hl,0+1+1+1
+	add	hl,sp
+	ld	a, (hl)
+	sub	a,0x43
+	jr	c,l_m32_cosf_00104
+	ld	hl,0x40c9
 	push	hl
-	push	de
-	ex	de,hl
-	pop	hl
+	ld	hl,0x0fdb
 	push	hl
-	push	de
+	ld	l,(ix-3)
+	ld	h,(ix-2)
+	push	hl
+	ld	l,(ix-5)
+	ld	h,(ix-4)
+	push	hl
+	call	_m32_fmodf
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	ld	(ix-5),l
+	ld	(ix-4),h
+	ld	(ix-3),e
+	ld	(ix-2),d
+l_m32_cosf_00104:
+	ld	l,(ix-3)
+	ld	h,(ix-2)
+	push	hl
+	ld	l,(ix-5)
+	ld	h,(ix-4)
 	push	hl
 	ld	hl,0x3fa2
 	push	hl
@@ -477,13 +507,11 @@ l_m32_cosf_00102:
 	push	hl
 	push	hl
 	call	___uint2fs_callee
-	ld	c, l
-	ld	b, h
-	pop	hl
-	bit	0, l
-	jr	Z,l_m32_cosf_00104
-	inc	hl
-	push	hl
+	pop	bc
+	bit	0, c
+	jr	z,l_m32_cosf_00106
+	inc	bc
+	push	bc
 	push	hl
 	ld	hl,0x3f80
 	ex	(sp), hl
@@ -491,80 +519,70 @@ l_m32_cosf_00102:
 	ld	hl,0x0000
 	ex	(sp), hl
 	push	de
-	push	bc
+	push	hl
 	call	___fsadd_callee
-	ld	c, l
-	ld	b, h
-	pop	hl
-l_m32_cosf_00104:
-	ld	a, l
-	and	a,0x07
-	ld	l, a
-	ld	h,0x00
-	ld	a,0x03
-	cp	a, l
-	jr	NC,l_m32_cosf_00106
-	ld	(ix-1),0xff
-	ld	a, l
-	add	a,0xfc
-	ld	l, a
-	ld	a, h
-	adc	a,0xff
-	ld	h, a
+	pop	bc
 l_m32_cosf_00106:
+	ld	a, c
+	and	a,0x07
+	ld	c, a
+	ld	b,0x00
+	ld	a,0x03
+	cp	a, c
+	jr	nc,l_m32_cosf_00108
+	ld	(ix-1),0xff
+	ld	a, c
+	add	a,0xfc
+	ld	c, a
+	ld	a, b
+	adc	a,0xff
+	ld	b, a
+l_m32_cosf_00108:
 	ld	a,0x01
-	cp	a, l
-	jr	NC,l_m32_cosf_00108
+	cp	a, c
+	jr	nc,l_m32_cosf_00110
 	xor	a, a
 	sub	a,(ix-1)
 	ld	(ix-1),a
-l_m32_cosf_00108:
-	push	hl
-	push	de
+l_m32_cosf_00110:
 	push	bc
-	ld	de,0x3f49
 	push	de
-	ld	de,0x0fdb
-	push	de
+	push	hl
+	ld	hl,0x3f49
+	push	hl
+	ld	hl,0x0fdb
+	push	hl
 	call	___fsmul_callee
 	push	de
 	push	hl
-	ld	e,(ix-3)
-	ld	d,(ix-2)
-	push	de
-	ld	e,(ix-5)
-	ld	d,(ix-4)
-	push	de
+	ld	l,(ix-3)
+	ld	h,(ix-2)
+	push	hl
+	ld	l,(ix-5)
+	ld	h,(ix-4)
+	push	hl
 	call	___fssub_callee
 	ld	(ix-5),l
 	ld	(ix-4),h
 	ld	(ix-3),e
 	ld	(ix-2),d
-	pop	de
-	pop	hl
-	push	hl
-	push	de
-	ld	e,(ix-3)
-	ld	d,(ix-2)
 	call	_m32_sqrf
-	ld	c, l
-	ld	b, h
-	pop	hl
-	ld	a, l
+	pop	bc
+	ld	a, c
 	dec	a
-	or	a, h
-	jr	Z,l_m32_cosf_00109
-	ld	a, l
+	or	a, b
+	jr	z,l_m32_cosf_00111
+	ld	a, c
 	sub	a,0x02
-	or	a, h
-	jr	NZ,l_m32_cosf_00110
-l_m32_cosf_00109:
-	ld	hl,0x0003
-	push	hl
-	ld	hl,_m32_coeff_sin
-	push	hl
-	push	de
+	or	a, b
+	jr	nz,l_m32_cosf_00112
+l_m32_cosf_00111:
+	ld	bc,0x0003
 	push	bc
+	ld	bc,_m32_coeff_sin
+	push	bc
+	push	de
+	push	hl
 	call	_m32_polyf
 	ld	c,(ix-3)
 	ld	b,(ix-2)
@@ -584,25 +602,25 @@ l_m32_cosf_00109:
 	push	de
 	push	hl
 	call	___fsadd_callee
-	jr	l_m32_cosf_00111
-l_m32_cosf_00110:
-	push	bc
-	push	de
-	ld	hl,0x0004
-	push	hl
-	ld	hl,_m32_coeff_cos
+	jr	l_m32_cosf_00113
+l_m32_cosf_00112:
 	push	hl
 	push	de
+	ld	bc,0x0004
 	push	bc
+	ld	bc,_m32_coeff_cos
+	push	bc
+	push	de
+	push	hl
 	call	_m32_polyf
 	ld	(ix-5),l
 	ld	(ix-4),h
 	ld	(ix-3),e
 	ld	(ix-2),d
 	pop	de
-	pop	bc
+	pop	hl
 	push	de
-	push	bc
+	push	hl
 	ld	hl,0x3f00
 	push	hl
 	ld	h, l
@@ -624,13 +642,13 @@ l_m32_cosf_00110:
 	push	de
 	push	hl
 	call	___fsadd_callee
-l_m32_cosf_00111:
+l_m32_cosf_00113:
 	bit	7,(ix-1)
-	jr	Z,l_m32_cosf_00115
+	jr	z,l_m32_cosf_00117
 	ld	a, d
 	xor	a,0x80
 	ld	d, a
-l_m32_cosf_00115:
+l_m32_cosf_00117:
 	ld	sp, ix
 	pop	ix
 	ret

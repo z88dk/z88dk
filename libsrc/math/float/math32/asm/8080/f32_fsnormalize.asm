@@ -23,7 +23,9 @@ PUBLIC m32_fsnormalize
 
 .m32_fsnormalize
     ex de,hl                    ; E = high, HL = mid:low
-    ld d,0                      ; shift total
+    ; D = shift count + 1.  sub D then sets C for both underflow and
+    ; FTZ exp==0 (signed zero), so one jr c covers both; inc a restores exp.
+    ld d,1
 
     ; ---------------------------------------------------------------
     ; Byte scan on E:HL and byte-alignment of it
@@ -32,7 +34,7 @@ PUBLIC m32_fsnormalize
     ld a,e
     or a
     jp m,normalised             ; already normalised (hot path)
-    jr nz,need_shift            ; non-zero lead in E, D = 0, A:HL ready
+    jr nz,need_shift            ; non-zero lead in E, D = 1, A:HL ready
     or h
     jr nz,need8                 ; non-zero lead in H, align by byte first
     or l
@@ -40,14 +42,14 @@ PUBLIC m32_fsnormalize
 
 ; .need16 ; A == L ; leading non zero is in L → exp -16
     ld l,h                      ; A:HL shifted by 16 (hl = 0)
-    ld d,16
+    ld d,17                     ; 16 + 1
     jr bitshift_check           ; process byte-aligned non-zero lead
 
 .need8
     ; A == H ; leading non zero is in H → exp -8
     ld h,l
     ld l,e                      ; A:HL shifted by 8 (l = 0)
-    ld d,8
+    ld d,9                      ; 8 + 1
 .bitshift_check                 ; check SF set by last `or` instruction
     jp m,normalised             ; normalised by 8/16 shift, pack it
     ; fall through to need_shift
@@ -68,8 +70,9 @@ PUBLIC m32_fsnormalize
     add a,a                     ; drop implicit 1 → C, A = mant high << 1
     ld e,a
     ld a,c
-    sub d                       ; a = final exp
-    jr c,normzero
+    sub d                       ; a = final exp - 1; C if exp <= 0
+    jr c,normzero               ; FTZ signed zero (exp==0) and underflow
+    inc a                       ; a = final exp
 
     ld d,a                      ; D = final exp (temp)
     ld a,b
@@ -84,6 +87,9 @@ PUBLIC m32_fsnormalize
     ret
 
 .normzero
-    ld hl,0
-    ld de,hl
+    ld hl,0                     ; signed zero (sign in B)
+    ld e,l
+    ld a,b
+    and 080h
+    ld d,a
     ret

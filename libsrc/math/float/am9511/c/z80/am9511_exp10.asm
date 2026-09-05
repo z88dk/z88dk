@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -364,16 +364,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -392,24 +392,120 @@ ENDIF
 ; Function am9511_exp10
 ; ---------------------------------
 _am9511_exp10:
+	push	ix
+	ld	ix,	+0
+	add	ix, sp
+	push	af
+	push	af
+	push	af
+	push	af
+	ld	c, l
+	ld	b, h
+	ld	hl,0
+	add	hl, sp
+	ld	(hl), c
+	inc	hl
+	ld	(hl), b
+	inc	hl
+	ld	(hl), e
+	inc	hl
+	ld	(hl), d
+	ld	a,(ix-8)
+	ld	(ix-4),a
+	ld	a,(ix-7)
+	ld	(ix-3),a
+	ld	a,(ix-6)
+	ld	(ix-2),a
+	ld	a,(ix-5)
+	ld	(ix-1),a
+	ld	h,a
+	and	a,0x7f
+	cp	a,0x42
+	jr	c,l_am9511_exp10_00104
+	add	hl, hl
+	jr	nc,l_am9511_exp10_00102
+	ld	hl,0x0000
+	ld	e,l
+	ld	d,h
+	jp	l_am9511_exp10_00113
+l_am9511_exp10_00102:
+	xor	a, a
+	ld	(ix-8),a
+	ld	(ix-7),a
+	ld	(ix-6),0x80
+	ld	(ix-5),0x7f
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	jp	l_am9511_exp10_00113
+l_am9511_exp10_00104:
+	sub	a,0x41
+	jr	c,l_am9511_exp10_00110
+	push	bc
+	push	de
+	push	de
+	push	bc
+	ld	hl,0x4197
+	push	hl
+	ld	hl,0xb5dd
+	push	hl
+	call	___fslt_callee
+	ld	a, l
+	pop	de
+	pop	bc
+	or	a, a
+	jr	z,l_am9511_exp10_00106
+	xor	a, a
+	ld	(ix-8),a
+	ld	(ix-7),a
+	ld	(ix-6),0x80
+	ld	(ix-5),0x7f
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	jr	l_am9511_exp10_00113
+l_am9511_exp10_00106:
+	push	bc
+	push	de
+	ld	hl,0xc19c
+	push	hl
+	ld	hl,0x8c7e
+	push	hl
+	push	de
+	push	bc
+	call	___fslt_callee
+	ld	a, l
+	pop	de
+	pop	bc
+	or	a, a
+	jr	z,l_am9511_exp10_00110
+	ld	hl,0x0000
+	ld	e,l
+	ld	d,h
+	jr	l_am9511_exp10_00113
+l_am9511_exp10_00110:
 	ld	a, d
 	and	a,0x7f
 	or	a, e
-	or	a, h
-	or	a, l
-	jr	NZ,l_am9511_exp10_00102
+	or	a, b
+	or	a, c
+	jr	nz,l_am9511_exp10_00112
 	ld	de,0x3f80
 	ld	hl,0x0000
-	jr	l_am9511_exp10_00103
-l_am9511_exp10_00102:
+	jr	l_am9511_exp10_00113
+l_am9511_exp10_00112:
 	push	de
-	push	hl
+	push	bc
 	ld	hl,0x4013
 	push	hl
 	ld	hl,0x5d8e
 	push	hl
 	call	___fsmul_callee
-	jp	_exp_fastcall
-l_am9511_exp10_00103:
+	call	_exp_fastcall
+l_am9511_exp10_00113:
+	ld	sp, ix
+	pop	ix
 	ret
 	SECTION IGNORE

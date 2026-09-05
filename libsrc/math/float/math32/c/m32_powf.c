@@ -33,18 +33,43 @@
 
 float m32_powf (float x, float y)
 {
+    union float_long fl;
+    float yi, yf, r;
+
     if(y == 0.0) return 1.0;
 
-    if(x <= 0.0) return 0.0;
-
     if(y == 1.0) return x;
-    if(y == -1.0) return m32_invf(x);
+    if(y == -1.0) return 1.0/x;
 
-    if(y == 0.5) return m32_sqrtf(x);
-    if(y == -0.5) return m32_invsqrtf(x);
+    if(x > 0.0)
+    {
+        if(y == 0.5) return m32_sqrtf(x);
+        if(y == -0.5) return m32_invsqrtf(x);
+        if(y == 2.0) return m32_sqrf(x);
+        if(y == -2.0) return 1.0/m32_sqrf(x);
+        return m32_expf( m32_logf(x) * y);
+    }
 
+    if(x == 0.0)
+    {
+        if(y > 0.0) return 0.0;
+        fl.l = (int32_t)INFINITY_POS_F32;
+        return fl.f;
+    }
+
+    /* x < 0: defined only for integer y. */
     if(y == 2.0) return m32_sqrf(x);
-    if(y == -2.0) return m32_invf(m32_sqrf(x));
+    if(y == -2.0) return 1.0/m32_sqrf(x);
 
-    return m32_expf( m32_logf(x) * y);
+    yf = m32_modff(y, &yi);
+    if(yf != 0.0)
+    {
+        fl.l = (int32_t)NAN_NEG_F32;
+        return fl.f;
+    }
+
+    r = m32_expf( m32_logf(-x) * y);
+    if(m32_fmodf(yi, 2.0) != 0.0)
+        r = -r;
+    return r;
 }

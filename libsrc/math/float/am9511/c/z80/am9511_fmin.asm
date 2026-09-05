@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -366,16 +366,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -395,8 +395,8 @@ ENDIF
 ; ---------------------------------
 _am9511_fmin_callee:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
 	ld	l,(ix+10)
 	ld	h,(ix+11)
 	push	hl
@@ -412,7 +412,7 @@ _am9511_fmin_callee:
 	call	___fslt_callee
 	ld	a, l
 	or	a, a
-	jr	Z,l_am9511_fmin_callee_00102
+	jr	z,l_am9511_fmin_callee_00102
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	ld	e,(ix+6)
@@ -437,8 +437,8 @@ l_am9511_fmin_callee_00103:
 ; ---------------------------------
 _am9511_fmin:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
 	ld	l,(ix+10)
 	ld	h,(ix+11)
 	push	hl

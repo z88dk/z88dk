@@ -19,17 +19,30 @@
 
 float am9511_exp10 (float x) __z88dk_fastcall
 {
-#if 0
-    if( x > MAXL10_F32 )
-    {
-        return( HUGE_POS_F32 );
-    }
+    union float_long fl;
 
-    if( x < MINL10_F32 )
+    /* MAXL10 is ~19.  |x| < 4 (hi < 0x41) is in range.  |x| >= 32 overflows. */
+    fl.f = x;
     {
-        return(0.0);
+        uint8_t hi = am9511_ieee_hi(fl);
+        if( (hi & 0x7f) >= 0x42 )
+        {
+            if( hi & 0x80 )
+                return 0.0;
+            fl.l = (int32_t)INFINITY_POS_F32;
+            return fl.f;
+        }
+        if( (hi & 0x7f) >= 0x41 )
+        {
+            if( x > MAXL10_F32 )
+            {
+                fl.l = (int32_t)INFINITY_POS_F32;
+                return fl.f;
+            }
+            if( x < MINL10_F32 )
+                return 0.0;
+        }
     }
-#endif
 
     if( x == 0.0 )
         return 1.0;

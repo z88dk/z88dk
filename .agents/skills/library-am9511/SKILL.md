@@ -219,7 +219,7 @@ Prove link: `z88dk-z80nm lib/clibs/am9511.lib | rg 'spec_|popf|fdiv|ftoa'`.
 
 ## Measure / suite
 
-- Suite: `test/suites/math` → `test_9511.bin`, `test_9511_8085.bin` with
+- Suite: `test/suites/math` → `test_am9511.bin`, `test_am9511_8085.bin` with
   **`-DMATH_SPECIALS`** (finite + Inf/NaN algebra via `am32_fspecial` + `popf`).
 - Do **not** add bare `-lm`/`-lgenmath` ahead of `--math-am9511`: genmath’s
   `sqrt` can win the link and bypass the APU path.

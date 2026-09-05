@@ -12,6 +12,8 @@
 #include "utils2.h"
 #include <cassert>
 #include <cmath>
+#include <cstdint>
+#include <cstdlib>
 #include <unordered_map>
 using namespace std;
 
@@ -45,7 +47,10 @@ using namespace std;
 //-----------------------------------------------------------------------------
 
 static int a2i(const char* start, const char* end, int base) {
-    return static_cast<int>(strtol(string(start, end).c_str(), NULL, base));
+    unsigned long long v = strtoull(string(start, end).c_str(), NULL, base);
+    if (v > UINT32_MAX)
+        v = UINT32_MAX;
+    return (int)(uint32_t)v;
 }
 
 static double a2f(const char* start, const char* end) {

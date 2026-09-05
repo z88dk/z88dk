@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Sep  2 09:30:58 2026
+;	Module compile time: Fri Sep  4 00:14:29 2026
 
 
 	C_LINE	0,"m32_atanf.c"
@@ -305,7 +305,11 @@
 	ld	hl,sp+0
 	push	hl
 	call	l_glong
-	call	_m32_invf
+	ld	bc,16256
+	push	bc
+	ld	bc,0
+	push	bc
+	call	l_f32_div
 	pop	bc
 	call	l_plong
 .i_3

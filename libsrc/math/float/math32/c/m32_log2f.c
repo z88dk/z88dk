@@ -54,19 +54,14 @@ extern float m32_coeff_logf[];
 
 float m32_log2f (float x) __z88dk_fastcall
 {
-    union fl32 {
-        float f;
-        uint32_t l;
-    };
-
+    union float_long fl;
     float y, z;
     int16_t e;
 
     /* Test for domain */
     if( x <= 0.0 )
     {
-        union fl32 fl;
-        fl.l = NAN_NEG_F32;
+        fl.l = (x == 0.0) ? (int32_t)INFINITY_NEG_F32 : (int32_t)NAN_NEG_F32;
         return fl.f;
     }
 

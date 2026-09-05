@@ -49,6 +49,14 @@ float m32_cosf (float f) __z88dk_fastcall
         x = -x;
     }
 
+    /* Same bound as m32_sinf: |x| >= 128 → fmod(2π). x is already >= 0. */
+    {
+        union float_long u;
+        u.f = x;
+        if( m32_ieee_hi(u) >= 0x43 )
+            x = m32_fmodf(x, (float)(2.0 * M_PI));
+    }
+
     j = (int)(x * M_4_PI); /* integer part of x/(PI/4) */
     y = (float)j;
 

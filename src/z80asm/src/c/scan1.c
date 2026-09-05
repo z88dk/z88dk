@@ -24,7 +24,7 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 #include "xmalloc.h"
 #include "z80asm_defs.h"
 #include <ctype.h>
-#include <limits.h>
+#include <stdint.h>
 
 /*-----------------------------------------------------------------------------
 * 	Globals
@@ -188,11 +188,13 @@ void scan_expect_operands(void)
 
 
 /*-----------------------------------------------------------------------------
-*	convert number to long, range warning if greater than LONG_MAX
+*	Convert digits to int (sym.number is 32-bit).
+*	Cap at UINT32_MAX, not LONG_MAX: on LLP64 long is 32-bit signed, so
+*	LONG_MAX is 0x7FFFFFFF and constants with bit 31 set would clamp.
 *----------------------------------------------------------------------------*/
-static long scan_num ( char *text, size_t length, int base )
+static int scan_num ( char *text, size_t length, int base )
 {
-	long value;
+	uint32_t value;
 	int digit = 0;
 	char c;
 	int i;
@@ -223,17 +225,16 @@ static long scan_num ( char *text, size_t length, int base )
 			xassert(0); /* digit out of range - should not be reached */
 		}
 
-		/* check for integer overflow before accumulating */
-		if (value > (LONG_MAX - digit) / base)
+		if (value > (UINT32_MAX - (uint32_t)digit) / (uint32_t)base)
 		{
 			warning(ErrIntRange, NULL);
-			value = LONG_MAX;
+			value = UINT32_MAX;
 			break;
 		}
-		value = value * base + digit;
+		value = value * (uint32_t)base + (uint32_t)digit;
 	}
 	
-	return value;
+	return (int)value;
 }
 
 /*-----------------------------------------------------------------------------

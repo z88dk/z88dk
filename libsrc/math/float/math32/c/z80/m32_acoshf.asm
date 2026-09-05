@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -395,16 +395,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -424,18 +424,53 @@ ENDIF
 ; ---------------------------------
 _m32_acoshf:
 	push	ix
-	ld	ix,0
-	add	ix,sp
-	push	af
-	push	af
-	push	af
-	push	af
-	ld	(ix-4),l
-	ld	(ix-3),h
+	ld	ix,	+0
+	add	ix, sp
+	ld	c, l
+	ld	b, h
+	ld	hl, -12
+	add	hl, sp
+	ld	sp, hl
+	ld	(ix-4),c
+	ld	(ix-3),b
 	ld	(ix-2),e
 	ld	(ix-1),d
+	ld	hl,0x3f80
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	ld	l,(ix-2)
+	ld	h,(ix-1)
+	push	hl
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	push	hl
+	call	___fslt_callee
+	ld	a, l
+	or	a, a
+	jr	z,l_m32_acoshf_00102
+	ld	hl,0
+	add	hl, sp
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	jp	l_m32_acoshf_00103
+l_m32_acoshf_00102:
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	ld	e,(ix-2)
+	ld	d,(ix-1)
 	call	_m32_mul2f
-	ex	(sp), hl
+	ld	(ix-8),l
+	ld	(ix-7),h
 	ld	(ix-6),e
 	ld	(ix-5),d
 	ld	l,(ix-4)
@@ -460,7 +495,13 @@ _m32_acoshf:
 	ld	h,(ix-3)
 	push	hl
 	call	___fsadd_callee
-	call	_m32_invf
+	push	de
+	push	hl
+	ld	hl,0x3f80
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	call	___fsdiv_callee
 	push	de
 	push	hl
 	ld	l,(ix-6)
@@ -471,6 +512,7 @@ _m32_acoshf:
 	push	hl
 	call	___fssub_callee
 	call	_m32_logf
+l_m32_acoshf_00103:
 	ld	sp, ix
 	pop	ix
 	ret

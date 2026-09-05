@@ -156,9 +156,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ; exponent
     ld hl,sp+13
     ld a,(hl)                       ; X.exp
-    or a
-    jp Z,mulzero
-
+    ; ±0 is classified by the IEEE caller (fsmul / inv / sqrt / poly)
     sub 07fh
     jp C,fmchkuf
 

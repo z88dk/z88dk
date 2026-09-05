@@ -71,7 +71,7 @@ The APU float format has **no Inf/NaN** and only a **7-bit unbiased** exponent (
 FDIV note (datasheet FDIV): if the divisor (TOS) is zero, **R is set equal to NOS** and divide-by-zero is reported; exponent overflow/underflow may also appear with mantissa “correct” and exponent offset by 128 when the APU range is exceeded.
 
 IEEE specials algebra (`0/0`, `Inf−Inf`, `0*Inf`, `sqrt(−x)`, …) is covered by
-`test/suites/math` (`test_9511.bin` / `test_9511_8085.bin` with `-DMATH_SPECIALS`).
+`test/suites/math` (`test_am9511.bin` / `test_am9511_8085.bin` with `-DMATH_SPECIALS`).
 Do not link bare `-lm` ahead of `--math-am9511` if you need the APU `sqrt`.
 
 ---

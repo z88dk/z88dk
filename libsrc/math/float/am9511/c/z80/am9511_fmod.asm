@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -374,7 +374,7 @@ IF 0
 ENDIF
 
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -394,16 +394,29 @@ ENDIF
 ; ---------------------------------
 _am9511_fmod:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
+	push	af
+	push	af
 	ld	a,(ix+11)
 	and	a,0x7f
 	or	a,(ix+10)
 	or	a,(ix+9)
 	or	a,(ix+8)
-	jr	NZ,l_am9511_fmod_00102
-	ld	hl,0xffff
-	ld	de,0x7fff
+	jr	nz,l_am9511_fmod_00102
+	ld	hl,0
+	add	hl, sp
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0xff
+	inc	hl
+	ld	(hl),0x7f
+	pop	hl
+	pop	de
+	push	de
+	push	hl
 	jp	l_am9511_fmod_00103
 l_am9511_fmod_00102:
 	ld	l,(ix+10)
@@ -458,7 +471,7 @@ l_am9511_fmod_00102:
 	pop	de
 	pop	hl
 	bit	0, c
-	jr	NZ,l_am9511_fmod_00105
+	jr	nz,l_am9511_fmod_00105
 	ld	c,(ix+10)
 	ld	b,(ix+11)
 	push	bc
@@ -470,6 +483,7 @@ l_am9511_fmod_00102:
 	call	___fssub_callee
 l_am9511_fmod_00105:
 l_am9511_fmod_00103:
+	ld	sp, ix
 	pop	ix
 	ret
 	SECTION IGNORE

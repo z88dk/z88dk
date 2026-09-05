@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Sep  2 09:30:58 2026
+;	Module compile time: Fri Sep  4 21:14:57 2026
 
 
 	C_LINE	0,"m32_cosf.c"
@@ -215,42 +215,42 @@
 	C_LINE	37,"/data/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"m32_math.h"
 	C_LINE	37,"m32_math.h"
-	C_LINE	48,"m32_math.h"
-	C_LINE	49,"m32_math.h"
-	C_LINE	50,"m32_math.h"
-	C_LINE	51,"m32_math.h"
-	C_LINE	52,"m32_math.h"
 	C_LINE	53,"m32_math.h"
 	C_LINE	54,"m32_math.h"
+	C_LINE	55,"m32_math.h"
+	C_LINE	56,"m32_math.h"
 	C_LINE	57,"m32_math.h"
 	C_LINE	58,"m32_math.h"
 	C_LINE	59,"m32_math.h"
-	C_LINE	60,"m32_math.h"
-	C_LINE	61,"m32_math.h"
 	C_LINE	62,"m32_math.h"
+	C_LINE	63,"m32_math.h"
+	C_LINE	64,"m32_math.h"
 	C_LINE	65,"m32_math.h"
 	C_LINE	66,"m32_math.h"
 	C_LINE	67,"m32_math.h"
-	C_LINE	68,"m32_math.h"
-	C_LINE	69,"m32_math.h"
 	C_LINE	70,"m32_math.h"
 	C_LINE	71,"m32_math.h"
+	C_LINE	72,"m32_math.h"
+	C_LINE	73,"m32_math.h"
 	C_LINE	74,"m32_math.h"
 	C_LINE	75,"m32_math.h"
 	C_LINE	76,"m32_math.h"
-	C_LINE	77,"m32_math.h"
-	C_LINE	78,"m32_math.h"
 	C_LINE	79,"m32_math.h"
+	C_LINE	80,"m32_math.h"
+	C_LINE	81,"m32_math.h"
 	C_LINE	82,"m32_math.h"
 	C_LINE	83,"m32_math.h"
 	C_LINE	84,"m32_math.h"
-	C_LINE	85,"m32_math.h"
-	C_LINE	86,"m32_math.h"
 	C_LINE	87,"m32_math.h"
 	C_LINE	88,"m32_math.h"
 	C_LINE	89,"m32_math.h"
 	C_LINE	90,"m32_math.h"
 	C_LINE	91,"m32_math.h"
+	C_LINE	92,"m32_math.h"
+	C_LINE	93,"m32_math.h"
+	C_LINE	94,"m32_math.h"
+	C_LINE	95,"m32_math.h"
+	C_LINE	96,"m32_math.h"
 	C_LINE	33,"m32_cosf.c"
 	C_LINE	35,"m32_cosf.c"
 	C_LINE	36,"m32_cosf.c"
@@ -295,6 +295,36 @@
 	pop	bc
 	call	l_plong
 .i_2
+	add	sp,-4
+	ld	hl,sp+0
+	push	hl
+	ld	hl,sp+17
+	call	l_glong
+	pop	bc
+	call	l_plong
+	ld	hl,sp+3
+	ld	l,(hl)
+	ld	h,0
+	ld	de,0
+	ld	a,l
+	sub	67
+	ccf
+	jp	nc,i_3	;
+	ld	hl,sp+15
+	push	hl
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,4059	;const
+	ld	de,16585
+	push	de
+	push	hl
+	call	_m32_fmodf
+	add	sp,8
+	pop	bc
+	call	l_plong
+.i_3
+	add	sp,4
 	ld	hl,sp+1
 	push	hl
 	ld	hl,sp+13
@@ -325,7 +355,7 @@
 	ld	h,(hl)
 	ld	l,a
 	and	1
-	jp	z,i_3	;
+	jp	z,i_4	;
 	ld	hl,sp+1
 	inc	(hl)
 	ld	a,(hl+)
@@ -341,7 +371,7 @@
 	call	l_f32_add
 	pop	bc
 	call	l_plong
-.i_3
+.i_4
 	ld	hl,sp+1
 	push	hl
 	ld	a,(hl)
@@ -363,7 +393,7 @@
 	sub	e
 	ld	a,h
 	sbc	d
-	jp	nc,i_4	;
+	jp	nc,i_5	;
 	ld	hl,sp+0
 	push	hl
 	ld	a,(hl)	;l_gchar
@@ -394,7 +424,7 @@
 	inc	hl
 	ld	(hl),d
  	ex	de,hl
-.i_4
+.i_5
 	ld	hl,sp+1
 	ld	e,(hl)
 	inc	hl
@@ -404,14 +434,14 @@
 	sub	e
 	ld	a,h
 	sbc	d
-	jp	nc,i_5	;
+	jp	nc,i_6	;
 	ld	hl,sp+0
 	push	hl
 	ld	a,(hl)
 	neg
 	pop	de
 	ld	(de),a
-.i_5
+.i_6
 	ld	hl,sp+11
 	push	hl
 	call	l_glong
@@ -440,15 +470,15 @@
 	ld	l,a
 	ld	de,1
 	call	l_eq
-	jp	c,i_7	;
+	jp	c,i_8	;
 	ld	hl,sp+1
 	ld	a,(hl+)
 	ld	h,(hl)
 	ld	l,a
 	ld	de,2
 	call	l_eq
-	jp	nc,i_6	;
-.i_7
+	jp	nc,i_7	;
+.i_8
 	ld	hl,sp+7
 	push	hl
 	ld	hl,sp+5
@@ -472,8 +502,8 @@
 	call	l_f32_add
 	pop	bc
 	call	l_plong
-	jp	i_9	;EOS
-.i_6
+	jp	i_10	;EOS
+.i_7
 	ld	hl,sp+7
 	push	hl
 	ld	hl,sp+5
@@ -499,21 +529,21 @@
 	call	l_f32_add
 	pop	bc
 	call	l_plong
-.i_9
+.i_10
 	ld	hl,sp+0
 	ld	a,(hl)
 	rla
-	jp	nc,i_10	;
+	jp	nc,i_11	;
 	ld	hl,sp+7
 	call	l_glong
 	ld	a,d
 	xor	128
 	ld	d,a
-	jp	i_11	;
-.i_10
+	jp	i_12	;
+.i_11
 	ld	hl,sp+7
 	call	l_glong
-.i_11
+.i_12
 	add	sp,19
 	ret
 
