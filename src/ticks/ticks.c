@@ -128,11 +128,11 @@
 #define INCPI(a, b) do {            \
           st +=isez80() ? 5 : israbbit() ? 12 : isr800() ? 7 : iskc160() ? 6 : 19; \
           if (altd) {           \
-            fa_= get_memory_data(t= ((get_memory_inst(pc++)^128)-128+(b|a<<8))&65535), \
+            fa_= get_memory_data(t= (get_memory_inst(pc++)^128)-128+(b|a<<8)), \
             ff_= ff_&256          \
                 | (fr_= put_memory(t,fa_+(fb_=1))), VM1_OF_ARITH(); \
           } else {              \
-            fa= get_memory_data(t= ((get_memory_inst(pc++)^128)-128+(b|a<<8))&65535), \
+            fa= get_memory_data(t= (get_memory_inst(pc++)^128)-128+(b|a<<8)), \
             ff= ff&256          \
                 | (fr= put_memory(t,fa+(fb=1))), VM1_OF_ARITH(); \
           }                      \
@@ -141,11 +141,11 @@
 #define DECPI(a, b) do {        \
           st +=isez80() ? 5 : israbbit() ? 12 : isr800() ? 7 : iskc160() ? 6 : 19; \
           if (altd) {           \
-            fa_= get_memory_data(t= ((get_memory_inst(pc++)^128)-128+(b|a<<8))&65535), \
+            fa_= get_memory_data(t= (get_memory_inst(pc++)^128)-128+(b|a<<8)), \
             ff_= ff_&256          \
                 | (fr_= put_memory(t,fa_+(fb_=-1))), VM1_OF_ARITH(); \
           } else {              \
-            fa= get_memory_data(t= ((get_memory_inst(pc++)^128)-128+(b|a<<8))&65535), \
+            fa= get_memory_data(t= (get_memory_inst(pc++)^128)-128+(b|a<<8)), \
             ff= ff&256          \
                 | (fr= put_memory(t,fa+(fb=-1))), VM1_OF_ARITH(); \
           }                     \
@@ -5176,9 +5176,9 @@ static void handle_cb_page(void)
     else{
         st+= isz180() ? 9 : 11;
         if( iy )
-            t= get_memory_data(mp= ((get_memory_inst(pc++)^128)-128+(yl|yh<<8))&65535);
+            t= get_memory_data(mp= ((get_memory_inst(pc++)^128)-128+(yl|yh<<8)));
         else
-            t= get_memory_data(mp= ((get_memory_inst(pc++)^128)-128+(xl|xh<<8))&65535);
+            t= get_memory_data(mp= ((get_memory_inst(pc++)^128)-128+(xl|xh<<8)));
         switch( get_memory_inst(pc++) ){
         case 0x00: RLC(t,t); put_memory(mp, b=t); break;         // LD B,RLC (IX+d) // LD B,RLC (IY+d)
         case 0x01: RLC(t,t); put_memory(mp, c=t); break;         // LD C,RLC (IX+d) // LD C,RLC (IY+d)

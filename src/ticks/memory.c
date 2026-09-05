@@ -72,11 +72,6 @@ void memory_init(char *model) {
 
 uint8_t get_memory(uint32_t pc, memtype type)
 {
-  /* Logical Z80 space is 16-bit. Callers pass uint32_t; extra bits
-     (sign-extended IX+d as int, pc+1 promoted to int) must not reach
-     paging tables such as msx_mmu[4]. Writes already take uint16_t. */
-  if (type != MEM_TYPE_PHYSICAL)
-    pc &= 0xffff;
   bk.debugger_read_memory(pc);
   return  *get_memory_addr(pc,type);
 }
@@ -131,7 +126,6 @@ static uint8_t z180_BBR = 0x00;
 
 static uint8_t *z180_get_memory_addr(uint32_t pc, memtype type)
 {
-    pc &= 0xffff;
     /*
     CBAR is an 8 bit I/O port that can be accessed by the processor's OUT and IN instructions. 
     The lower 4 bits specify the starting address of the bank area, and the upper 4 give the start of common 1. 
@@ -189,12 +183,13 @@ static void standard_init(void)
 
 static uint8_t *standard_get_memory_addr(uint32_t pc, memtype type)
 {
+  int segment = pc / 8192;
   pc &= 0xffff;
 
   if ( vm1_bank1 && type == MEM_TYPE_DATA && vm1_bank_select() )
     return &vm1_bank1[pc];
 
-  return &mem[pc];
+  return &mem[pc & 65535];
 }
 
 
@@ -215,13 +210,13 @@ static void zxn_init(void)
 
 static uint8_t *zxn_get_memory_addr(uint32_t pc, memtype type)
 {
-  pc &= 0xffff;
   int segment = pc / 8192;
+  pc &= 0xffff;
 
   if ( zxnext_mmu[segment] != 0xff ) {
     return &zxn_banks[zxnext_mmu[segment]][pc % 8192];
   }
-  return &mem[pc];
+  return &mem[pc & 65535];
 }
 
 
@@ -289,9 +284,10 @@ static void zx_init(char *config)
 
 static uint8_t *zx_get_memory_addr(uint32_t pc, memtype type)
 {
-    pc &= 0xffff;
     int segment = pc / 16384;
     int bank = zx_pages[segment];
+
+    pc &= 0xffff;
 
     if ( bank >= 0x10 ) {
         return &zx_rom[bank - 0x10][pc % 16384];
@@ -378,7 +374,6 @@ static void msx_init(void)
 
 static uint8_t *msx_get_memory_addr(uint32_t pc, memtype type)
 {
-  pc &= 0xffff;
   int segment = pc / 16384;
 
   return &msx_banks[msx_mmu[segment]][pc % 16384];
