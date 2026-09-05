@@ -24,7 +24,6 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 #include "xmalloc.h"
 #include "z80asm_defs.h"
 #include <ctype.h>
-#include <limits.h>
 #include <stdint.h>
 
 /*-----------------------------------------------------------------------------
@@ -189,14 +188,13 @@ void scan_expect_operands(void)
 
 
 /*-----------------------------------------------------------------------------
-*	convert number to long
-*	Cap at 32-bit unsigned, not LONG_MAX: on LLP64 long is 32-bit signed, so
-*	LONG_MAX is 0x7FFFFFFF and IEEE DEFQ constants with bit 31 set
-*	(0x80000000, 0xBE2AAAA3, ...) would clamp.
+*	Convert digits to int (sym.number is 32-bit).
+*	Cap at UINT32_MAX, not LONG_MAX: on LLP64 long is 32-bit signed, so
+*	LONG_MAX is 0x7FFFFFFF and constants with bit 31 set would clamp.
 *----------------------------------------------------------------------------*/
-static long scan_num ( char *text, size_t length, int base )
+static int scan_num ( char *text, size_t length, int base )
 {
-	unsigned long long value;
+	uint32_t value;
 	int digit = 0;
 	char c;
 	int i;
@@ -227,16 +225,16 @@ static long scan_num ( char *text, size_t length, int base )
 			xassert(0); /* digit out of range - should not be reached */
 		}
 
-		if (value > (0xFFFFFFFFULL - (unsigned)digit) / (unsigned)base)
+		if (value > (UINT32_MAX - (uint32_t)digit) / (uint32_t)base)
 		{
 			warning(ErrIntRange, NULL);
-			value = 0xFFFFFFFFULL;
+			value = UINT32_MAX;
 			break;
 		}
-		value = value * (unsigned)base + (unsigned)digit;
+		value = value * (uint32_t)base + (uint32_t)digit;
 	}
 	
-	return (long)(int32_t)(uint32_t)value;
+	return (int)value;
 }
 
 /*-----------------------------------------------------------------------------
