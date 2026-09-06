@@ -14,6 +14,7 @@ adc (hl+)|r6k|adc a, (hl);inc hl
 adc (hl+)|r800|adc a, (hl);inc hl
 adc (hl+)|ti83|adc a, (hl);inc hl
 adc (hl+)|ti83plus|adc a, (hl);inc hl
+adc (hl+)|vm1|adc m;inx h
 adc (hl+)|z180|adc a, (hl);inc hl
 adc (hl+)|z80|adc a, (hl);inc hl
 adc (hl+)|z80n|adc a, (hl);inc hl
@@ -32,6 +33,7 @@ adc (hl-)|r6k|adc a, (hl);dec hl
 adc (hl-)|r800|adc a, (hl);dec hl
 adc (hl-)|ti83|adc a, (hl);dec hl
 adc (hl-)|ti83plus|adc a, (hl);dec hl
+adc (hl-)|vm1|adc m;dcx h
 adc (hl-)|z180|adc a, (hl);dec hl
 adc (hl-)|z80|adc a, (hl);dec hl
 adc (hl-)|z80n|adc a, (hl);dec hl
@@ -60,6 +62,7 @@ adc a, (hl+)|r6k|adc a, (hl);inc hl
 adc a, (hl+)|r800|adc a, (hl);inc hl
 adc a, (hl+)|ti83|adc a, (hl);inc hl
 adc a, (hl+)|ti83plus|adc a, (hl);inc hl
+adc a, (hl+)|vm1|adc m;inx h
 adc a, (hl+)|z180|adc a, (hl);inc hl
 adc a, (hl+)|z80|adc a, (hl);inc hl
 adc a, (hl+)|z80n|adc a, (hl);inc hl
@@ -78,6 +81,7 @@ adc a, (hl-)|r6k|adc a, (hl);dec hl
 adc a, (hl-)|r800|adc a, (hl);dec hl
 adc a, (hl-)|ti83|adc a, (hl);dec hl
 adc a, (hl-)|ti83plus|adc a, (hl);dec hl
+adc a, (hl-)|vm1|adc m;dcx h
 adc a, (hl-)|z180|adc a, (hl);dec hl
 adc a, (hl-)|z80|adc a, (hl);dec hl
 adc a, (hl-)|z80n|adc a, (hl);dec hl
@@ -124,6 +128,7 @@ add (hl+)|r6k|add a, (hl);inc hl
 add (hl+)|r800|add a, (hl);inc hl
 add (hl+)|ti83|add a, (hl);inc hl
 add (hl+)|ti83plus|add a, (hl);inc hl
+add (hl+)|vm1|add m;inx h
 add (hl+)|z180|add a, (hl);inc hl
 add (hl+)|z80|add a, (hl);inc hl
 add (hl+)|z80n|add a, (hl);inc hl
@@ -142,6 +147,7 @@ add (hl-)|r6k|add a, (hl);dec hl
 add (hl-)|r800|add a, (hl);dec hl
 add (hl-)|ti83|add a, (hl);dec hl
 add (hl-)|ti83plus|add a, (hl);dec hl
+add (hl-)|vm1|add m;dcx h
 add (hl-)|z180|add a, (hl);dec hl
 add (hl-)|z80|add a, (hl);dec hl
 add (hl-)|z80n|add a, (hl);dec hl
@@ -170,6 +176,7 @@ add a, (hl+)|r6k|add a, (hl);inc hl
 add a, (hl+)|r800|add a, (hl);inc hl
 add a, (hl+)|ti83|add a, (hl);inc hl
 add a, (hl+)|ti83plus|add a, (hl);inc hl
+add a, (hl+)|vm1|add m;inx h
 add a, (hl+)|z180|add a, (hl);inc hl
 add a, (hl+)|z80|add a, (hl);inc hl
 add a, (hl+)|z80n|add a, (hl);inc hl
@@ -188,6 +195,7 @@ add a, (hl-)|r6k|add a, (hl);dec hl
 add a, (hl-)|r800|add a, (hl);dec hl
 add a, (hl-)|ti83|add a, (hl);dec hl
 add a, (hl-)|ti83plus|add a, (hl);dec hl
+add a, (hl-)|vm1|add m;dcx h
 add a, (hl-)|z180|add a, (hl);dec hl
 add a, (hl-)|z80|add a, (hl);dec hl
 add a, (hl-)|z80n|add a, (hl);dec hl
@@ -206,6 +214,7 @@ add bc, %m|r6k|push hl;ld hl, %m;add hl, bc;ld bc, hl;pop hl
 add bc, %m|r800|push hl;ld hl, %m;add hl, bc;ld b, h;ld c, l;pop hl
 add bc, %m|ti83|push hl;ld hl, %m;add hl, bc;ld b, h;ld c, l;pop hl
 add bc, %m|ti83plus|push hl;ld hl, %m;add hl, bc;ld b, h;ld c, l;pop hl
+add bc, %m|vm1|push h;lxi h, %m;dad b;mov b, h;mov c, l;pop h
 add bc, %m|z180|push hl;ld hl, %m;add hl, bc;ld b, h;ld c, l;pop hl
 add bc, %m|z80|push hl;ld hl, %m;add hl, bc;ld b, h;ld c, l;pop hl
 add bc, a|8080|extern __z80asm__add_bc_a;call __z80asm__add_bc_a
@@ -223,6 +232,7 @@ add bc, a|r6k|extern __z80asm__add_bc_a;call __z80asm__add_bc_a
 add bc, a|r800|extern __z80asm__add_bc_a;call __z80asm__add_bc_a
 add bc, a|ti83|extern __z80asm__add_bc_a;call __z80asm__add_bc_a
 add bc, a|ti83plus|extern __z80asm__add_bc_a;call __z80asm__add_bc_a
+add bc, a|vm1|extern __z80asm__add_bc_a;call __z80asm__add_bc_a
 add bc, a|z180|extern __z80asm__add_bc_a;call __z80asm__add_bc_a
 add bc, a|z80|extern __z80asm__add_bc_a;call __z80asm__add_bc_a
 add de, %m|8080|push h;lxi h, %m;dad d;mov d, h;mov e, l;pop h
@@ -240,6 +250,7 @@ add de, %m|r6k|push hl;ld hl, %m;add hl, de;ld de, hl;pop hl
 add de, %m|r800|push hl;ld hl, %m;add hl, de;ld d, h;ld e, l;pop hl
 add de, %m|ti83|push hl;ld hl, %m;add hl, de;ld d, h;ld e, l;pop hl
 add de, %m|ti83plus|push hl;ld hl, %m;add hl, de;ld d, h;ld e, l;pop hl
+add de, %m|vm1|push h;lxi h, %m;dad d;mov d, h;mov e, l;pop h
 add de, %m|z180|push hl;ld hl, %m;add hl, de;ld d, h;ld e, l;pop hl
 add de, %m|z80|push hl;ld hl, %m;add hl, de;ld d, h;ld e, l;pop hl
 add de, a|8080|extern __z80asm__add_de_a;call __z80asm__add_de_a
@@ -257,6 +268,7 @@ add de, a|r6k|extern __z80asm__add_de_a;call __z80asm__add_de_a
 add de, a|r800|extern __z80asm__add_de_a;call __z80asm__add_de_a
 add de, a|ti83|extern __z80asm__add_de_a;call __z80asm__add_de_a
 add de, a|ti83plus|extern __z80asm__add_de_a;call __z80asm__add_de_a
+add de, a|vm1|extern __z80asm__add_de_a;call __z80asm__add_de_a
 add de, a|z180|extern __z80asm__add_de_a;call __z80asm__add_de_a
 add de, a|z80|extern __z80asm__add_de_a;call __z80asm__add_de_a
 add hl, %m|8080|push d;lxi d, %m;dad d;pop d
@@ -274,6 +286,7 @@ add hl, %m|r6k|push de;ld de, %m;add hl, de;pop de
 add hl, %m|r800|push de;ld de, %m;add hl, de;pop de
 add hl, %m|ti83|push de;ld de, %m;add hl, de;pop de
 add hl, %m|ti83plus|push de;ld de, %m;add hl, de;pop de
+add hl, %m|vm1|push d;lxi d, %m;dad d;pop d
 add hl, %m|z180|push de;ld de, %m;add hl, de;pop de
 add hl, %m|z80|push de;ld de, %m;add hl, de;pop de
 add hl, a|8080|extern __z80asm__add_hl_a;call __z80asm__add_hl_a
@@ -291,6 +304,7 @@ add hl, a|r6k|extern __z80asm__add_hl_a;call __z80asm__add_hl_a
 add hl, a|r800|extern __z80asm__add_hl_a;call __z80asm__add_hl_a
 add hl, a|ti83|extern __z80asm__add_hl_a;call __z80asm__add_hl_a
 add hl, a|ti83plus|extern __z80asm__add_hl_a;call __z80asm__add_hl_a
+add hl, a|vm1|extern __z80asm__add_hl_a;call __z80asm__add_hl_a
 add hl, a|z180|extern __z80asm__add_hl_a;call __z80asm__add_hl_a
 add hl, a|z80|extern __z80asm__add_hl_a;call __z80asm__add_hl_a
 add sp, %d|8080|extern __z80asm__add_sp_d;call __z80asm__add_sp_d;defb %d
@@ -302,6 +316,7 @@ add sp, %d|kc160_z80|extern __z80asm__add_sp_d;call __z80asm__add_sp_d;defb %d
 add sp, %d|r800|extern __z80asm__add_sp_d;call __z80asm__add_sp_d;defb %d
 add sp, %d|ti83|extern __z80asm__add_sp_d;call __z80asm__add_sp_d;defb %d
 add sp, %d|ti83plus|extern __z80asm__add_sp_d;call __z80asm__add_sp_d;defb %d
+add sp, %d|vm1|extern __z80asm__add_sp_d;call __z80asm__add_sp_d;defb %d
 add sp, %d|z180|extern __z80asm__add_sp_d;call __z80asm__add_sp_d;defb %d
 add sp, %d|z80|extern __z80asm__add_sp_d;call __z80asm__add_sp_d;defb %d
 add sp, %d|z80n|extern __z80asm__add_sp_d;call __z80asm__add_sp_d;defb %d
@@ -335,6 +350,7 @@ adi hl, %n|r6k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 adi hl, %n|r800|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 adi hl, %n|ti83|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 adi hl, %n|ti83plus|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|vm1|push h;lxi d, unsigned8(%n);dad d;xchg;pop h
 adi hl, %n|z180|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 adi hl, %n|z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 adi hl, %n|z80n|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
@@ -352,6 +368,7 @@ adi sp, %n|r6k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 adi sp, %n|r800|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 adi sp, %n|ti83|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 adi sp, %n|ti83plus|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|vm1|xchg;lxi h, unsigned8(%n);dad sp;xchg
 adi sp, %n|z180|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 adi sp, %n|z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 adi sp, %n|z80n|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
@@ -1711,6 +1728,7 @@ and (hl+)|r6k|and (hl);inc hl
 and (hl+)|r800|and (hl);inc hl
 and (hl+)|ti83|and (hl);inc hl
 and (hl+)|ti83plus|and (hl);inc hl
+and (hl+)|vm1|ana m;inx h
 and (hl+)|z180|and (hl);inc hl
 and (hl+)|z80|and (hl);inc hl
 and (hl+)|z80n|and (hl);inc hl
@@ -1729,6 +1747,7 @@ and (hl-)|r6k|and (hl);dec hl
 and (hl-)|r800|and (hl);dec hl
 and (hl-)|ti83|and (hl);dec hl
 and (hl-)|ti83plus|and (hl);dec hl
+and (hl-)|vm1|ana m;dcx h
 and (hl-)|z180|and (hl);dec hl
 and (hl-)|z80|and (hl);dec hl
 and (hl-)|z80n|and (hl);dec hl
@@ -1757,6 +1776,7 @@ and a, (hl+)|r6k|and (hl);inc hl
 and a, (hl+)|r800|and (hl);inc hl
 and a, (hl+)|ti83|and (hl);inc hl
 and a, (hl+)|ti83plus|and (hl);inc hl
+and a, (hl+)|vm1|ana m;inx h
 and a, (hl+)|z180|and (hl);inc hl
 and a, (hl+)|z80|and (hl);inc hl
 and a, (hl+)|z80n|and (hl);inc hl
@@ -1775,6 +1795,7 @@ and a, (hl-)|r6k|and (hl);dec hl
 and a, (hl-)|r800|and (hl);dec hl
 and a, (hl-)|ti83|and (hl);dec hl
 and a, (hl-)|ti83plus|and (hl);dec hl
+and a, (hl-)|vm1|ana m;dcx h
 and a, (hl-)|z180|and (hl);dec hl
 and a, (hl-)|z80|and (hl);dec hl
 and a, (hl-)|z80n|and (hl);dec hl
@@ -1793,6 +1814,7 @@ and hl, bc|r6k|push af;ld a, h;and b;ld h, a;ld a, l;and c;ld l, a;pop af
 and hl, bc|r800|push af;ld a, h;and b;ld h, a;ld a, l;and c;ld l, a;pop af
 and hl, bc|ti83|push af;ld a, h;and b;ld h, a;ld a, l;and c;ld l, a;pop af
 and hl, bc|ti83plus|push af;ld a, h;and b;ld h, a;ld a, l;and c;ld l, a;pop af
+and hl, bc|vm1|push psw;mov a, h;ana b;mov h, a;mov a, l;ana c;mov l, a;pop psw
 and hl, bc|z180|push af;ld a, h;and b;ld h, a;ld a, l;and c;ld l, a;pop af
 and hl, bc|z80|push af;ld a, h;and b;ld h, a;ld a, l;and c;ld l, a;pop af
 and hl, bc|z80n|push af;ld a, h;and b;ld h, a;ld a, l;and c;ld l, a;pop af
@@ -1806,6 +1828,7 @@ and hl, de|kc160_z80|push af;ld a, h;and d;ld h, a;ld a, l;and e;ld l, a;pop af
 and hl, de|r800|push af;ld a, h;and d;ld h, a;ld a, l;and e;ld l, a;pop af
 and hl, de|ti83|push af;ld a, h;and d;ld h, a;ld a, l;and e;ld l, a;pop af
 and hl, de|ti83plus|push af;ld a, h;and d;ld h, a;ld a, l;and e;ld l, a;pop af
+and hl, de|vm1|push psw;mov a, h;ana d;mov h, a;mov a, l;ana e;mov l, a;pop psw
 and hl, de|z180|push af;ld a, h;and d;ld h, a;ld a, l;and e;ld l, a;pop af
 and hl, de|z80|push af;ld a, h;and d;ld h, a;ld a, l;and e;ld l, a;pop af
 and hl, de|z80n|push af;ld a, h;and d;ld h, a;ld a, l;and e;ld l, a;pop af
@@ -1867,6 +1890,7 @@ arhl|r6k|sra h;rr l
 arhl|r800|sra h;rr l
 arhl|ti83|sra h;rr l
 arhl|ti83plus|sra h;rr l
+arhl|vm1|extern __z80asm__sra_hl;call __z80asm__sra_hl
 arhl|z180|sra h;rr l
 arhl|z80|sra h;rr l
 arhl|z80n|sra h;rr l
@@ -1880,6 +1904,7 @@ bool hl|kc160_z80|push af;ld a, h;or l;jr z, %t1;ld hl, 1;%t1:;pop af
 bool hl|r800|push af;ld a, h;or l;jr z, %t1;ld hl, 1;%t1:;pop af
 bool hl|ti83|push af;ld a, h;or l;jr z, %t1;ld hl, 1;%t1:;pop af
 bool hl|ti83plus|push af;ld a, h;or l;jr z, %t1;ld hl, 1;%t1:;pop af
+bool hl|vm1|push psw;mov a, h;ora l;jz %t1;ld hl, 1;%t1:;pop psw
 bool hl|z180|push af;ld a, h;or l;jr z, %t1;ld hl, 1;%t1:;pop af
 bool hl|z80|push af;ld a, h;or l;jr z, %t1;ld hl, 1;%t1:;pop af
 bool hl|z80n|push af;ld a, h;or l;jr z, %t1;ld hl, 1;%t1:;pop af
@@ -1923,6 +1948,7 @@ c_eq %m|r6k|jr nz, %t;call %m;%t:
 c_eq %m|r800|call z, %m
 c_eq %m|ti83|call z, %m
 c_eq %m|ti83plus|call z, %m
+c_eq %m|vm1|cz %m
 c_eq %m|z180|call z, %m
 c_eq %m|z80|call z, %m
 c_eq %m|z80n|call z, %m
@@ -1941,6 +1967,7 @@ c_geu %m|r6k|jr c, %t;call %m;%t:
 c_geu %m|r800|call nc, %m
 c_geu %m|ti83|call nc, %m
 c_geu %m|ti83plus|call nc, %m
+c_geu %m|vm1|cnc %m
 c_geu %m|z180|call nc, %m
 c_geu %m|z80|call nc, %m
 c_geu %m|z80n|call nc, %m
@@ -1959,6 +1986,7 @@ c_gtu %m|r6k|jr z, %t;jr c, %t;call %m;%t:
 c_gtu %m|r800|jr z, %t;call nc, %m;%t:
 c_gtu %m|ti83|jr z, %t;call nc, %m;%t:
 c_gtu %m|ti83plus|jr z, %t;call nc, %m;%t:
+c_gtu %m|vm1|jz %t;cnc %m;%t:
 c_gtu %m|z180|jr z, %t;call nc, %m;%t:
 c_gtu %m|z80|jr z, %t;call nc, %m;%t:
 c_gtu %m|z80n|jr z, %t;call nc, %m;%t:
@@ -1977,6 +2005,7 @@ c_leu %m|r6k|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 c_leu %m|r800|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 c_leu %m|ti83|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 c_leu %m|ti83plus|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
+c_leu %m|vm1|jz %t3;jnc %t;%t3:;call %m;%t:
 c_leu %m|z180|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 c_leu %m|z80|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 c_leu %m|z80n|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
@@ -2000,6 +2029,7 @@ c_ltu %m|r6k|jr nc, %t;call %m;%t:
 c_ltu %m|r800|call c, %m
 c_ltu %m|ti83|call c, %m
 c_ltu %m|ti83plus|call c, %m
+c_ltu %m|vm1|cc %m
 c_ltu %m|z180|call c, %m
 c_ltu %m|z80|call c, %m
 c_ltu %m|z80n|call c, %m
@@ -2033,6 +2063,7 @@ c_ne %m|r6k|jr z, %t;call %m;%t:
 c_ne %m|r800|call nz, %m
 c_ne %m|ti83|call nz, %m
 c_ne %m|ti83plus|call nz, %m
+c_ne %m|vm1|cnz %m
 c_ne %m|z180|call nz, %m
 c_ne %m|z80|call nz, %m
 c_ne %m|z80n|call nz, %m
@@ -2050,6 +2081,7 @@ c_nv %m|r6k|jp v, %t;call %m;%t:
 c_nv %m|r800|call po, %m
 c_nv %m|ti83|call po, %m
 c_nv %m|ti83plus|call po, %m
+c_nv %m|vm1|cpo %m
 c_nv %m|z180|call po, %m
 c_nv %m|z80|call po, %m
 c_nv %m|z80n|call po, %m
@@ -2087,6 +2119,7 @@ c_v %m|r6k|jp v, %t3;jr %t;%t3:;call %m;%t:
 c_v %m|r800|call pe, %m
 c_v %m|ti83|call pe, %m
 c_v %m|ti83plus|call pe, %m
+c_v %m|vm1|cpe %m
 c_v %m|z180|call pe, %m
 c_v %m|z80|call pe, %m
 c_v %m|z80n|call pe, %m
@@ -2107,6 +2140,7 @@ call (hl)|r3k|extern __z80asm__call_hl;call __z80asm__call_hl
 call (hl)|r800|extern __z80asm__call_hl;call __z80asm__call_hl
 call (hl)|ti83|extern __z80asm__call_hl;call __z80asm__call_hl
 call (hl)|ti83plus|extern __z80asm__call_hl;call __z80asm__call_hl
+call (hl)|vm1|extern __z80asm__call_hl;call __z80asm__call_hl
 call (hl)|z180|extern __z80asm__call_hl;call __z80asm__call_hl
 call (hl)|z80|extern __z80asm__call_hl;call __z80asm__call_hl
 call (hl)|z80n|extern __z80asm__call_hl;call __z80asm__call_hl
@@ -2154,6 +2188,7 @@ call eq, %m|r6k|jr nz, %t;call %m;%t:
 call eq, %m|r800|call z, %m
 call eq, %m|ti83|call z, %m
 call eq, %m|ti83plus|call z, %m
+call eq, %m|vm1|cz %m
 call eq, %m|z180|call z, %m
 call eq, %m|z80|call z, %m
 call eq, %m|z80n|call z, %m
@@ -2172,6 +2207,7 @@ call geu, %m|r6k|jr c, %t;call %m;%t:
 call geu, %m|r800|call nc, %m
 call geu, %m|ti83|call nc, %m
 call geu, %m|ti83plus|call nc, %m
+call geu, %m|vm1|cnc %m
 call geu, %m|z180|call nc, %m
 call geu, %m|z80|call nc, %m
 call geu, %m|z80n|call nc, %m
@@ -2190,6 +2226,7 @@ call gtu, %m|r6k|jr z, %t;jr c, %t;call %m;%t:
 call gtu, %m|r800|jr z, %t;call nc, %m;%t:
 call gtu, %m|ti83|jr z, %t;call nc, %m;%t:
 call gtu, %m|ti83plus|jr z, %t;call nc, %m;%t:
+call gtu, %m|vm1|jz %t;cnc %m;%t:
 call gtu, %m|z180|jr z, %t;call nc, %m;%t:
 call gtu, %m|z80|jr z, %t;call nc, %m;%t:
 call gtu, %m|z80n|jr z, %t;call nc, %m;%t:
@@ -2208,6 +2245,7 @@ call leu, %m|r6k|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 call leu, %m|r800|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 call leu, %m|ti83|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 call leu, %m|ti83plus|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
+call leu, %m|vm1|jz %t3;jnc %t;%t3:;call %m;%t:
 call leu, %m|z180|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 call leu, %m|z80|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 call leu, %m|z80n|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
@@ -2231,6 +2269,7 @@ call ltu, %m|r6k|jr nc, %t;call %m;%t:
 call ltu, %m|r800|call c, %m
 call ltu, %m|ti83|call c, %m
 call ltu, %m|ti83plus|call c, %m
+call ltu, %m|vm1|cc %m
 call ltu, %m|z180|call c, %m
 call ltu, %m|z80|call c, %m
 call ltu, %m|z80n|call c, %m
@@ -2264,6 +2303,7 @@ call ne, %m|r6k|jr z, %t;call %m;%t:
 call ne, %m|r800|call nz, %m
 call ne, %m|ti83|call nz, %m
 call ne, %m|ti83plus|call nz, %m
+call ne, %m|vm1|cnz %m
 call ne, %m|z180|call nz, %m
 call ne, %m|z80|call nz, %m
 call ne, %m|z80n|call nz, %m
@@ -2281,6 +2321,7 @@ call nv, %m|r6k|jp v, %t;call %m;%t:
 call nv, %m|r800|call po, %m
 call nv, %m|ti83|call po, %m
 call nv, %m|ti83plus|call po, %m
+call nv, %m|vm1|cpo %m
 call nv, %m|z180|call po, %m
 call nv, %m|z80|call po, %m
 call nv, %m|z80n|call po, %m
@@ -2318,6 +2359,7 @@ call v, %m|r6k|jp v, %t3;jr %t;%t3:;call %m;%t:
 call v, %m|r800|call pe, %m
 call v, %m|ti83|call pe, %m
 call v, %m|ti83plus|call pe, %m
+call v, %m|vm1|cpe %m
 call v, %m|z180|call pe, %m
 call v, %m|z80|call pe, %m
 call v, %m|z80n|call pe, %m
@@ -2426,6 +2468,7 @@ ceq %m|r6k|jr nz, %t;call %m;%t:
 ceq %m|r800|call z, %m
 ceq %m|ti83|call z, %m
 ceq %m|ti83plus|call z, %m
+ceq %m|vm1|cz %m
 ceq %m|z180|call z, %m
 ceq %m|z80|call z, %m
 ceq %m|z80n|call z, %m
@@ -2444,6 +2487,7 @@ cgeu %m|r6k|jr c, %t;call %m;%t:
 cgeu %m|r800|call nc, %m
 cgeu %m|ti83|call nc, %m
 cgeu %m|ti83plus|call nc, %m
+cgeu %m|vm1|cnc %m
 cgeu %m|z180|call nc, %m
 cgeu %m|z80|call nc, %m
 cgeu %m|z80n|call nc, %m
@@ -2462,6 +2506,7 @@ cgtu %m|r6k|jr z, %t;jr c, %t;call %m;%t:
 cgtu %m|r800|jr z, %t;call nc, %m;%t:
 cgtu %m|ti83|jr z, %t;call nc, %m;%t:
 cgtu %m|ti83plus|jr z, %t;call nc, %m;%t:
+cgtu %m|vm1|jz %t;cnc %m;%t:
 cgtu %m|z180|jr z, %t;call nc, %m;%t:
 cgtu %m|z80|jr z, %t;call nc, %m;%t:
 cgtu %m|z80n|jr z, %t;call nc, %m;%t:
@@ -2480,6 +2525,7 @@ cleu %m|r6k|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 cleu %m|r800|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 cleu %m|ti83|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 cleu %m|ti83plus|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
+cleu %m|vm1|jz %t3;jnc %t;%t3:;call %m;%t:
 cleu %m|z180|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 cleu %m|z80|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
 cleu %m|z80n|jr z, %t3;jr nc, %t;%t3:;call %m;%t:
@@ -2503,6 +2549,7 @@ clr (hl)|r6k|ld (hl), 0
 clr (hl)|r800|ld (hl), 0
 clr (hl)|ti83|ld (hl), 0
 clr (hl)|ti83plus|ld (hl), 0
+clr (hl)|vm1|ld (hl), 0
 clr (hl)|z180|ld (hl), 0
 clr (hl)|z80|ld (hl), 0
 clr (hl)|z80n|ld (hl), 0
@@ -2581,6 +2628,7 @@ clr a|r6k|ld a, 0
 clr a|r800|ld a, 0
 clr a|ti83|ld a, 0
 clr a|ti83plus|ld a, 0
+clr a|vm1|ld a, 0
 clr a|z180|ld a, 0
 clr a|z80|ld a, 0
 clr a|z80n|ld a, 0
@@ -2604,6 +2652,7 @@ clr b|r6k|ld b, 0
 clr b|r800|ld b, 0
 clr b|ti83|ld b, 0
 clr b|ti83plus|ld b, 0
+clr b|vm1|ld b, 0
 clr b|z180|ld b, 0
 clr b|z80|ld b, 0
 clr b|z80n|ld b, 0
@@ -2627,6 +2676,7 @@ clr bc|r6k|ld bc, 0
 clr bc|r800|ld bc, 0
 clr bc|ti83|ld bc, 0
 clr bc|ti83plus|ld bc, 0
+clr bc|vm1|ld bc, 0
 clr bc|z180|ld bc, 0
 clr bc|z80|ld bc, 0
 clr bc|z80n|ld bc, 0
@@ -2650,6 +2700,7 @@ clr c|r6k|ld c, 0
 clr c|r800|ld c, 0
 clr c|ti83|ld c, 0
 clr c|ti83plus|ld c, 0
+clr c|vm1|ld c, 0
 clr c|z180|ld c, 0
 clr c|z80|ld c, 0
 clr c|z80n|ld c, 0
@@ -2673,6 +2724,7 @@ clr d|r6k|ld d, 0
 clr d|r800|ld d, 0
 clr d|ti83|ld d, 0
 clr d|ti83plus|ld d, 0
+clr d|vm1|ld d, 0
 clr d|z180|ld d, 0
 clr d|z80|ld d, 0
 clr d|z80n|ld d, 0
@@ -2696,6 +2748,7 @@ clr de|r6k|ld de, 0
 clr de|r800|ld de, 0
 clr de|ti83|ld de, 0
 clr de|ti83plus|ld de, 0
+clr de|vm1|ld de, 0
 clr de|z180|ld de, 0
 clr de|z80|ld de, 0
 clr de|z80n|ld de, 0
@@ -2719,6 +2772,7 @@ clr e|r6k|ld e, 0
 clr e|r800|ld e, 0
 clr e|ti83|ld e, 0
 clr e|ti83plus|ld e, 0
+clr e|vm1|ld e, 0
 clr e|z180|ld e, 0
 clr e|z80|ld e, 0
 clr e|z80n|ld e, 0
@@ -2742,6 +2796,7 @@ clr h|r6k|ld h, 0
 clr h|r800|ld h, 0
 clr h|ti83|ld h, 0
 clr h|ti83plus|ld h, 0
+clr h|vm1|ld h, 0
 clr h|z180|ld h, 0
 clr h|z80|ld h, 0
 clr h|z80n|ld h, 0
@@ -2750,6 +2805,7 @@ clr h'|r3k|altd ld h, 0
 clr h'|r4k|altd ld h, 0
 clr h'|r5k|altd ld h, 0
 clr h'|r6k|altd ld h, 0
+clr h'|vm1|ld h', 0
 clr hl|8080|ld hl, 0
 clr hl|8085|ld hl, 0
 clr hl|ez80|ld hl, 0
@@ -2762,11 +2818,13 @@ clr hl|r3k|ld hl, 0
 clr hl|r800|ld hl, 0
 clr hl|ti83|ld hl, 0
 clr hl|ti83plus|ld hl, 0
+clr hl|vm1|ld hl, 0
 clr hl|z180|ld hl, 0
 clr hl|z80|ld hl, 0
 clr hl|z80n|ld hl, 0
 clr hl'|r2ka|altd ld hl, 0
 clr hl'|r3k|altd ld hl, 0
+clr hl'|vm1|ld hl', 0
 clr ix|ez80|ld ix, 0
 clr ix|ez80_z80|ld ix, 0
 clr ix|kc160|ld ix, 0
@@ -2840,6 +2898,7 @@ clr l|r6k|ld l, 0
 clr l|r800|ld l, 0
 clr l|ti83|ld l, 0
 clr l|ti83plus|ld l, 0
+clr l|vm1|ld l, 0
 clr l|z180|ld l, 0
 clr l|z80|ld l, 0
 clr l|z80n|ld l, 0
@@ -2848,6 +2907,7 @@ clr l'|r3k|altd ld l, 0
 clr l'|r4k|altd ld l, 0
 clr l'|r5k|altd ld l, 0
 clr l'|r6k|altd ld l, 0
+clr l'|vm1|ld l', 0
 cltu %m|8080|cc %m
 cltu %m|8085|cc %m
 cltu %m|ez80|call c, %m
@@ -2863,6 +2923,7 @@ cltu %m|r6k|jr nc, %t;call %m;%t:
 cltu %m|r800|call c, %m
 cltu %m|ti83|call c, %m
 cltu %m|ti83plus|call c, %m
+cltu %m|vm1|cc %m
 cltu %m|z180|call c, %m
 cltu %m|z80|call c, %m
 cltu %m|z80n|call c, %m
@@ -2891,6 +2952,7 @@ cmp (hl+)|r6k|cp (hl);inc hl
 cmp (hl+)|r800|cp (hl);inc hl
 cmp (hl+)|ti83|cp (hl);inc hl
 cmp (hl+)|ti83plus|cp (hl);inc hl
+cmp (hl+)|vm1|cmp m;inx h
 cmp (hl+)|z180|cp (hl);inc hl
 cmp (hl+)|z80|cp (hl);inc hl
 cmp (hl+)|z80n|cp (hl);inc hl
@@ -2909,6 +2971,7 @@ cmp (hl-)|r6k|cp (hl);dec hl
 cmp (hl-)|r800|cp (hl);dec hl
 cmp (hl-)|ti83|cp (hl);dec hl
 cmp (hl-)|ti83plus|cp (hl);dec hl
+cmp (hl-)|vm1|cmp m;dcx h
 cmp (hl-)|z180|cp (hl);dec hl
 cmp (hl-)|z80|cp (hl);dec hl
 cmp (hl-)|z80n|cp (hl);dec hl
@@ -2937,6 +3000,7 @@ cmp a, (hl+)|r6k|cp (hl);inc hl
 cmp a, (hl+)|r800|cp (hl);inc hl
 cmp a, (hl+)|ti83|cp (hl);inc hl
 cmp a, (hl+)|ti83plus|cp (hl);inc hl
+cmp a, (hl+)|vm1|cmp m;inx h
 cmp a, (hl+)|z180|cp (hl);inc hl
 cmp a, (hl+)|z80|cp (hl);inc hl
 cmp a, (hl+)|z80n|cp (hl);inc hl
@@ -2955,6 +3019,7 @@ cmp a, (hl-)|r6k|cp (hl);dec hl
 cmp a, (hl-)|r800|cp (hl);dec hl
 cmp a, (hl-)|ti83|cp (hl);dec hl
 cmp a, (hl-)|ti83plus|cp (hl);dec hl
+cmp a, (hl-)|vm1|cmp m;dcx h
 cmp a, (hl-)|z180|cp (hl);dec hl
 cmp a, (hl-)|z80|cp (hl);dec hl
 cmp a, (hl-)|z80n|cp (hl);dec hl
@@ -2994,6 +3059,7 @@ cne %m|r6k|jr z, %t;call %m;%t:
 cne %m|r800|call nz, %m
 cne %m|ti83|call nz, %m
 cne %m|ti83plus|call nz, %m
+cne %m|vm1|cnz %m
 cne %m|z180|call nz, %m
 cne %m|z80|call nz, %m
 cne %m|z80n|call nz, %m
@@ -3011,6 +3077,7 @@ cnv %m|r6k|jp v, %t;call %m;%t:
 cnv %m|r800|call po, %m
 cnv %m|ti83|call po, %m
 cnv %m|ti83plus|call po, %m
+cnv %m|vm1|cpo %m
 cnv %m|z180|call po, %m
 cnv %m|z80|call po, %m
 cnv %m|z80n|call po, %m
@@ -3034,6 +3101,7 @@ cp (hl+)|r6k|cp (hl);inc hl
 cp (hl+)|r800|cp (hl);inc hl
 cp (hl+)|ti83|cp (hl);inc hl
 cp (hl+)|ti83plus|cp (hl);inc hl
+cp (hl+)|vm1|cmp m;inx h
 cp (hl+)|z180|cp (hl);inc hl
 cp (hl+)|z80|cp (hl);inc hl
 cp (hl+)|z80n|cp (hl);inc hl
@@ -3052,6 +3120,7 @@ cp (hl-)|r6k|cp (hl);dec hl
 cp (hl-)|r800|cp (hl);dec hl
 cp (hl-)|ti83|cp (hl);dec hl
 cp (hl-)|ti83plus|cp (hl);dec hl
+cp (hl-)|vm1|cmp m;dcx h
 cp (hl-)|z180|cp (hl);dec hl
 cp (hl-)|z80|cp (hl);dec hl
 cp (hl-)|z80n|cp (hl);dec hl
@@ -3080,6 +3149,7 @@ cp a, (hl+)|r6k|cp (hl);inc hl
 cp a, (hl+)|r800|cp (hl);inc hl
 cp a, (hl+)|ti83|cp (hl);inc hl
 cp a, (hl+)|ti83plus|cp (hl);inc hl
+cp a, (hl+)|vm1|cmp m;inx h
 cp a, (hl+)|z180|cp (hl);inc hl
 cp a, (hl+)|z80|cp (hl);inc hl
 cp a, (hl+)|z80n|cp (hl);inc hl
@@ -3098,6 +3168,7 @@ cp a, (hl-)|r6k|cp (hl);dec hl
 cp a, (hl-)|r800|cp (hl);dec hl
 cp a, (hl-)|ti83|cp (hl);dec hl
 cp a, (hl-)|ti83plus|cp (hl);dec hl
+cp a, (hl-)|vm1|cmp m;dcx h
 cp a, (hl-)|z180|cp (hl);dec hl
 cp a, (hl-)|z80|cp (hl);dec hl
 cp a, (hl-)|z80n|cp (hl);dec hl
@@ -3125,6 +3196,7 @@ cpd|r3k|extern __z80asm__cpd;call __z80asm__cpd
 cpd|r4k|extern __z80asm__cpd;call __z80asm__cpd
 cpd|r5k|extern __z80asm__cpd;call __z80asm__cpd
 cpd|r6k|extern __z80asm__cpd;call __z80asm__cpd
+cpd|vm1|extern __z80asm__cpd;call __z80asm__cpd
 cpdr|8080|extern __z80asm__cpdr;call __z80asm__cpdr
 cpdr|8085|extern __z80asm__cpdr;call __z80asm__cpdr
 cpdr|gbz80|extern __z80asm__cpdr;call __z80asm__cpdr
@@ -3133,6 +3205,7 @@ cpdr|r3k|extern __z80asm__cpdr;call __z80asm__cpdr
 cpdr|r4k|extern __z80asm__cpdr;call __z80asm__cpdr
 cpdr|r5k|extern __z80asm__cpdr;call __z80asm__cpdr
 cpdr|r6k|extern __z80asm__cpdr;call __z80asm__cpdr
+cpdr|vm1|extern __z80asm__cpdr;call __z80asm__cpdr
 cpe %m|r2ka|jp po, %t;call %m;%t:
 cpe %m|r3k|jp po, %t;call %m;%t:
 cpe %m|r4k|jp po, %t;call %m;%t:
@@ -3146,6 +3219,7 @@ cpi|r3k|extern __z80asm__cpi;call __z80asm__cpi
 cpi|r4k|extern __z80asm__cpi;call __z80asm__cpi
 cpi|r5k|extern __z80asm__cpi;call __z80asm__cpi
 cpi|r6k|extern __z80asm__cpi;call __z80asm__cpi
+cpi|vm1|extern __z80asm__cpi;call __z80asm__cpi
 cpir|8080|extern __z80asm__cpir;call __z80asm__cpir
 cpir|8085|extern __z80asm__cpir;call __z80asm__cpir
 cpir|gbz80|extern __z80asm__cpir;call __z80asm__cpir
@@ -3154,6 +3228,7 @@ cpir|r3k|extern __z80asm__cpir;call __z80asm__cpir
 cpir|r4k|extern __z80asm__cpir;call __z80asm__cpir
 cpir|r5k|extern __z80asm__cpir;call __z80asm__cpir
 cpir|r6k|extern __z80asm__cpir;call __z80asm__cpir
+cpir|vm1|extern __z80asm__cpir;call __z80asm__cpir
 cpo %m|r2ka|jp v, %t;call %m;%t:
 cpo %m|r3k|jp v, %t;call %m;%t:
 cpo %m|r4k|jp pe, %t;call %m;%t:
@@ -3173,6 +3248,7 @@ cv %m|r6k|jp v, %t3;jr %t;%t3:;call %m;%t:
 cv %m|r800|call pe, %m
 cv %m|ti83|call pe, %m
 cv %m|ti83plus|call pe, %m
+cv %m|vm1|cpe %m
 cv %m|z180|call pe, %m
 cv %m|z80|call pe, %m
 cv %m|z80n|call pe, %m
@@ -3201,6 +3277,7 @@ dec (hl+)|r6k|dec (hl);inc hl
 dec (hl+)|r800|dec (hl);inc hl
 dec (hl+)|ti83|dec (hl);inc hl
 dec (hl+)|ti83plus|dec (hl);inc hl
+dec (hl+)|vm1|dcr m;inx h
 dec (hl+)|z180|dec (hl);inc hl
 dec (hl+)|z80|dec (hl);inc hl
 dec (hl+)|z80n|dec (hl);inc hl
@@ -3219,6 +3296,7 @@ dec (hl-)|r6k|dec (hl);dec hl
 dec (hl-)|r800|dec (hl);dec hl
 dec (hl-)|ti83|dec (hl);dec hl
 dec (hl-)|ti83plus|dec (hl);dec hl
+dec (hl-)|vm1|dcr m;dcx h
 dec (hl-)|z180|dec (hl);dec hl
 dec (hl-)|z80|dec (hl);dec hl
 dec (hl-)|z80n|dec (hl);dec hl
@@ -3233,9 +3311,11 @@ dec.sil (hl-)|ez80|dec.sil (hl);dec.sil hl
 djnz %j|8080|dcr b;jnz %j
 djnz %j|8085|dcr b;jnz %j
 djnz %j|gbz80|dec b;jr nz, %j
+djnz %j|vm1|dcr b;jnz %j
 djnz b, %j|8080|dcr b;jnz %j
 djnz b, %j|8085|dcr b;jnz %j
 djnz b, %j|gbz80|dec b;jr nz, %j
+djnz b, %j|vm1|dcr b;jnz %j
 dsub|8080|extern __z80asm__sub_hl_bc;call __z80asm__sub_hl_bc
 dsub|ez80|extern __z80asm__sub_hl_bc;call __z80asm__sub_hl_bc
 dsub|ez80_z80|extern __z80asm__sub_hl_bc;call __z80asm__sub_hl_bc
@@ -3250,6 +3330,7 @@ dsub|r6k|extern __z80asm__sub_hl_bc;call __z80asm__sub_hl_bc
 dsub|r800|extern __z80asm__sub_hl_bc;call __z80asm__sub_hl_bc
 dsub|ti83|extern __z80asm__sub_hl_bc;call __z80asm__sub_hl_bc
 dsub|ti83plus|extern __z80asm__sub_hl_bc;call __z80asm__sub_hl_bc
+dsub|vm1|extern __z80asm__sub_hl_bc;call __z80asm__sub_hl_bc
 dsub|z180|extern __z80asm__sub_hl_bc;call __z80asm__sub_hl_bc
 dsub|z80|extern __z80asm__sub_hl_bc;call __z80asm__sub_hl_bc
 dsub|z80n|extern __z80asm__sub_hl_bc;call __z80asm__sub_hl_bc
@@ -3296,6 +3377,7 @@ ex bc, hl|r3k|push hl;push bc;pop hl;pop bc
 ex bc, hl|r800|push hl;push bc;pop hl;pop bc
 ex bc, hl|ti83|push hl;push bc;pop hl;pop bc
 ex bc, hl|ti83plus|push hl;push bc;pop hl;pop bc
+ex bc, hl|vm1|push h;push b;pop h;pop b
 ex bc, hl|z180|push hl;push bc;pop hl;pop bc
 ex bc, hl|z80|push hl;push bc;pop hl;pop bc
 ex bc, hl|z80n|push hl;push bc;pop hl;pop bc
@@ -3340,6 +3422,7 @@ ex hl, bc|r6k|ex bc, hl
 ex hl, bc|r800|push hl;push bc;pop hl;pop bc
 ex hl, bc|ti83|push hl;push bc;pop hl;pop bc
 ex hl, bc|ti83plus|push hl;push bc;pop hl;pop bc
+ex hl, bc|vm1|push h;push b;pop h;pop b
 ex hl, bc|z180|push hl;push bc;pop hl;pop bc
 ex hl, bc|z80|push hl;push bc;pop hl;pop bc
 ex hl, bc|z80n|push hl;push bc;pop hl;pop bc
@@ -3361,6 +3444,7 @@ ex hl, de|r6k|ex de, hl
 ex hl, de|r800|ex de, hl
 ex hl, de|ti83|ex de, hl
 ex hl, de|ti83plus|ex de, hl
+ex hl, de|vm1|xchg
 ex hl, de|z180|ex de, hl
 ex hl, de|z80|ex de, hl
 ex hl, de|z80n|ex de, hl
@@ -3390,6 +3474,7 @@ inc (hl+)|r6k|inc (hl);inc hl
 inc (hl+)|r800|inc (hl);inc hl
 inc (hl+)|ti83|inc (hl);inc hl
 inc (hl+)|ti83plus|inc (hl);inc hl
+inc (hl+)|vm1|inr m;inx h
 inc (hl+)|z180|inc (hl);inc hl
 inc (hl+)|z80|inc (hl);inc hl
 inc (hl+)|z80n|inc (hl);inc hl
@@ -3408,6 +3493,7 @@ inc (hl-)|r6k|inc (hl);dec hl
 inc (hl-)|r800|inc (hl);dec hl
 inc (hl-)|ti83|inc (hl);dec hl
 inc (hl-)|ti83plus|inc (hl);dec hl
+inc (hl-)|vm1|inr m;dcx h
 inc (hl-)|z180|inc (hl);dec hl
 inc (hl-)|z80|inc (hl);dec hl
 inc (hl-)|z80n|inc (hl);dec hl
@@ -6564,6 +6650,7 @@ j_eq %m|r6k|jp z, %m
 j_eq %m|r800|jp z, %m
 j_eq %m|ti83|jp z, %m
 j_eq %m|ti83plus|jp z, %m
+j_eq %m|vm1|jz %m
 j_eq %m|z180|jp z, %m
 j_eq %m|z80|jp z, %m
 j_eq %m|z80n|jp z, %m
@@ -6585,6 +6672,7 @@ j_geu %m|r6k|jp nc, %m
 j_geu %m|r800|jp nc, %m
 j_geu %m|ti83|jp nc, %m
 j_geu %m|ti83plus|jp nc, %m
+j_geu %m|vm1|jnc %m
 j_geu %m|z180|jp nc, %m
 j_geu %m|z80|jp nc, %m
 j_geu %m|z80n|jp nc, %m
@@ -6600,6 +6688,7 @@ j_gtu %m|r3k|jr z, %t;jp nc, %m;%t:
 j_gtu %m|r800|jr z, %t;jp nc, %m;%t:
 j_gtu %m|ti83|jr z, %t;jp nc, %m;%t:
 j_gtu %m|ti83plus|jr z, %t;jp nc, %m;%t:
+j_gtu %m|vm1|jz %t;jnc %m;%t:
 j_gtu %m|z180|jr z, %t;jp nc, %m;%t:
 j_gtu %m|z80|jr z, %t;jp nc, %m;%t:
 j_gtu %m|z80n|jr z, %t;jp nc, %m;%t:
@@ -6621,6 +6710,7 @@ j_leu %m|r6k|jp gtu, %t;jp %m;%t:
 j_leu %m|r800|jp z, %m;jp c, %m
 j_leu %m|ti83|jp z, %m;jp c, %m
 j_leu %m|ti83plus|jp z, %m;jp c, %m
+j_leu %m|vm1|jz %m;jc %m
 j_leu %m|z180|jp z, %m;jp c, %m
 j_leu %m|z80|jp z, %m;jp c, %m
 j_leu %m|z80n|jp z, %m;jp c, %m
@@ -6639,6 +6729,7 @@ j_ltu %m|r6k|jp c, %m
 j_ltu %m|r800|jp c, %m
 j_ltu %m|ti83|jp c, %m
 j_ltu %m|ti83plus|jp c, %m
+j_ltu %m|vm1|jc %m
 j_ltu %m|z180|jp c, %m
 j_ltu %m|z80|jp c, %m
 j_ltu %m|z80n|jp c, %m
@@ -6657,6 +6748,7 @@ j_ne %m|r6k|jp nz, %m
 j_ne %m|r800|jp nz, %m
 j_ne %m|ti83|jp nz, %m
 j_ne %m|ti83plus|jp nz, %m
+j_ne %m|vm1|jnz %m
 j_ne %m|z180|jp nz, %m
 j_ne %m|z80|jp nz, %m
 j_ne %m|z80n|jp nz, %m
@@ -6672,6 +6764,7 @@ j_nv %m|r6k|jp v, %t;jp %m;%t:
 j_nv %m|r800|jp po, %m
 j_nv %m|ti83|jp po, %m
 j_nv %m|ti83plus|jp po, %m
+j_nv %m|vm1|jpo %m
 j_nv %m|z180|jp po, %m
 j_nv %m|z80|jp po, %m
 j_nv %m|z80n|jp po, %m
@@ -6684,6 +6777,7 @@ j_v %m|kc160_z80|jp pe, %m
 j_v %m|r800|jp pe, %m
 j_v %m|ti83|jp pe, %m
 j_v %m|ti83plus|jp pe, %m
+j_v %m|vm1|jpe %m
 j_v %m|z180|jp pe, %m
 j_v %m|z80|jp pe, %m
 j_v %m|z80n|jp pe, %m
@@ -6702,6 +6796,7 @@ jeq %m|r6k|jp z, %m
 jeq %m|r800|jp z, %m
 jeq %m|ti83|jp z, %m
 jeq %m|ti83plus|jp z, %m
+jeq %m|vm1|jz %m
 jeq %m|z180|jp z, %m
 jeq %m|z80|jp z, %m
 jeq %m|z80n|jp z, %m
@@ -6723,6 +6818,7 @@ jgeu %m|r6k|jp nc, %m
 jgeu %m|r800|jp nc, %m
 jgeu %m|ti83|jp nc, %m
 jgeu %m|ti83plus|jp nc, %m
+jgeu %m|vm1|jnc %m
 jgeu %m|z180|jp nc, %m
 jgeu %m|z80|jp nc, %m
 jgeu %m|z80n|jp nc, %m
@@ -6738,6 +6834,7 @@ jgtu %m|r3k|jr z, %t;jp nc, %m;%t:
 jgtu %m|r800|jr z, %t;jp nc, %m;%t:
 jgtu %m|ti83|jr z, %t;jp nc, %m;%t:
 jgtu %m|ti83plus|jr z, %t;jp nc, %m;%t:
+jgtu %m|vm1|jz %t;jnc %m;%t:
 jgtu %m|z180|jr z, %t;jp nc, %m;%t:
 jgtu %m|z80|jr z, %t;jp nc, %m;%t:
 jgtu %m|z80n|jr z, %t;jp nc, %m;%t:
@@ -6759,6 +6856,7 @@ jleu %m|r6k|jp gtu, %t;jp %m;%t:
 jleu %m|r800|jp z, %m;jp c, %m
 jleu %m|ti83|jp z, %m;jp c, %m
 jleu %m|ti83plus|jp z, %m;jp c, %m
+jleu %m|vm1|jz %m;jc %m
 jleu %m|z180|jp z, %m;jp c, %m
 jleu %m|z80|jp z, %m;jp c, %m
 jleu %m|z80n|jp z, %m;jp c, %m
@@ -6777,6 +6875,7 @@ jltu %m|r6k|jp c, %m
 jltu %m|r800|jp c, %m
 jltu %m|ti83|jp c, %m
 jltu %m|ti83plus|jp c, %m
+jltu %m|vm1|jc %m
 jltu %m|z180|jp c, %m
 jltu %m|z80|jp c, %m
 jltu %m|z80n|jp c, %m
@@ -6795,6 +6894,7 @@ jmp (bc)|r6k|push bc;ret
 jmp (bc)|r800|push bc;ret
 jmp (bc)|ti83|push bc;ret
 jmp (bc)|ti83plus|push bc;ret
+jmp (bc)|vm1|push b;ret
 jmp (bc)|z180|push bc;ret
 jmp (bc)|z80|push bc;ret
 jmp (bc)|z80n|push bc;ret
@@ -6813,6 +6913,7 @@ jmp (de)|r6k|push de;ret
 jmp (de)|r800|push de;ret
 jmp (de)|ti83|push de;ret
 jmp (de)|ti83plus|push de;ret
+jmp (de)|vm1|push d;ret
 jmp (de)|z180|push de;ret
 jmp (de)|z80|push de;ret
 jmp (de)|z80n|push de;ret
@@ -6831,6 +6932,7 @@ jmp eq, %m|r6k|jp z, %m
 jmp eq, %m|r800|jp z, %m
 jmp eq, %m|ti83|jp z, %m
 jmp eq, %m|ti83plus|jp z, %m
+jmp eq, %m|vm1|jz %m
 jmp eq, %m|z180|jp z, %m
 jmp eq, %m|z80|jp z, %m
 jmp eq, %m|z80n|jp z, %m
@@ -6849,6 +6951,7 @@ jmp geu, %m|r6k|jp nc, %m
 jmp geu, %m|r800|jp nc, %m
 jmp geu, %m|ti83|jp nc, %m
 jmp geu, %m|ti83plus|jp nc, %m
+jmp geu, %m|vm1|jnc %m
 jmp geu, %m|z180|jp nc, %m
 jmp geu, %m|z80|jp nc, %m
 jmp geu, %m|z80n|jp nc, %m
@@ -6864,6 +6967,7 @@ jmp gtu, %m|r3k|jr z, %t;jp nc, %m;%t:
 jmp gtu, %m|r800|jr z, %t;jp nc, %m;%t:
 jmp gtu, %m|ti83|jr z, %t;jp nc, %m;%t:
 jmp gtu, %m|ti83plus|jr z, %t;jp nc, %m;%t:
+jmp gtu, %m|vm1|jz %t;jnc %m;%t:
 jmp gtu, %m|z180|jr z, %t;jp nc, %m;%t:
 jmp gtu, %m|z80|jr z, %t;jp nc, %m;%t:
 jmp gtu, %m|z80n|jr z, %t;jp nc, %m;%t:
@@ -6882,6 +6986,7 @@ jmp leu, %m|r6k|jp gtu, %t;jp %m;%t:
 jmp leu, %m|r800|jp z, %m;jp c, %m
 jmp leu, %m|ti83|jp z, %m;jp c, %m
 jmp leu, %m|ti83plus|jp z, %m;jp c, %m
+jmp leu, %m|vm1|jz %m;jc %m
 jmp leu, %m|z180|jp z, %m;jp c, %m
 jmp leu, %m|z80|jp z, %m;jp c, %m
 jmp leu, %m|z80n|jp z, %m;jp c, %m
@@ -6900,6 +7005,7 @@ jmp ltu, %m|r6k|jp c, %m
 jmp ltu, %m|r800|jp c, %m
 jmp ltu, %m|ti83|jp c, %m
 jmp ltu, %m|ti83plus|jp c, %m
+jmp ltu, %m|vm1|jc %m
 jmp ltu, %m|z180|jp c, %m
 jmp ltu, %m|z80|jp c, %m
 jmp ltu, %m|z80n|jp c, %m
@@ -6918,6 +7024,7 @@ jmp ne, %m|r6k|jp nz, %m
 jmp ne, %m|r800|jp nz, %m
 jmp ne, %m|ti83|jp nz, %m
 jmp ne, %m|ti83plus|jp nz, %m
+jmp ne, %m|vm1|jnz %m
 jmp ne, %m|z180|jp nz, %m
 jmp ne, %m|z80|jp nz, %m
 jmp ne, %m|z80n|jp nz, %m
@@ -6933,6 +7040,7 @@ jmp nv, %m|r6k|jp v, %t;jp %m;%t:
 jmp nv, %m|r800|jp po, %m
 jmp nv, %m|ti83|jp po, %m
 jmp nv, %m|ti83plus|jp po, %m
+jmp nv, %m|vm1|jpo %m
 jmp nv, %m|z180|jp po, %m
 jmp nv, %m|z80|jp po, %m
 jmp nv, %m|z80n|jp po, %m
@@ -6945,6 +7053,7 @@ jmp v, %m|kc160_z80|jp pe, %m
 jmp v, %m|r800|jp pe, %m
 jmp v, %m|ti83|jp pe, %m
 jmp v, %m|ti83plus|jp pe, %m
+jmp v, %m|vm1|jpe %m
 jmp v, %m|z180|jp pe, %m
 jmp v, %m|z80|jp pe, %m
 jmp v, %m|z80n|jp pe, %m
@@ -6995,6 +7104,7 @@ jne %m|r6k|jp nz, %m
 jne %m|r800|jp nz, %m
 jne %m|ti83|jp nz, %m
 jne %m|ti83plus|jp nz, %m
+jne %m|vm1|jnz %m
 jne %m|z180|jp nz, %m
 jne %m|z80|jp nz, %m
 jne %m|z80n|jp nz, %m
@@ -7010,6 +7120,7 @@ jnv %m|r6k|jp v, %t;jp %m;%t:
 jnv %m|r800|jp po, %m
 jnv %m|ti83|jp po, %m
 jnv %m|ti83plus|jp po, %m
+jnv %m|vm1|jpo %m
 jnv %m|z180|jp po, %m
 jnv %m|z80|jp po, %m
 jnv %m|z80n|jp po, %m
@@ -7028,6 +7139,7 @@ jp (bc)|r6k|push bc;ret
 jp (bc)|r800|push bc;ret
 jp (bc)|ti83|push bc;ret
 jp (bc)|ti83plus|push bc;ret
+jp (bc)|vm1|push b;ret
 jp (bc)|z180|push bc;ret
 jp (bc)|z80|push bc;ret
 jp (bc)|z80n|push bc;ret
@@ -7046,6 +7158,7 @@ jp (de)|r6k|push de;ret
 jp (de)|r800|push de;ret
 jp (de)|ti83|push de;ret
 jp (de)|ti83plus|push de;ret
+jp (de)|vm1|push d;ret
 jp (de)|z180|push de;ret
 jp (de)|z80|push de;ret
 jp (de)|z80n|push de;ret
@@ -7064,6 +7177,7 @@ jp eq, %m|r6k|jp z, %m
 jp eq, %m|r800|jp z, %m
 jp eq, %m|ti83|jp z, %m
 jp eq, %m|ti83plus|jp z, %m
+jp eq, %m|vm1|jz %m
 jp eq, %m|z180|jp z, %m
 jp eq, %m|z80|jp z, %m
 jp eq, %m|z80n|jp z, %m
@@ -7085,6 +7199,7 @@ jp geu, %m|r6k|jp nc, %m
 jp geu, %m|r800|jp nc, %m
 jp geu, %m|ti83|jp nc, %m
 jp geu, %m|ti83plus|jp nc, %m
+jp geu, %m|vm1|jnc %m
 jp geu, %m|z180|jp nc, %m
 jp geu, %m|z80|jp nc, %m
 jp geu, %m|z80n|jp nc, %m
@@ -7100,6 +7215,7 @@ jp gtu, %m|r3k|jr z, %t;jp nc, %m;%t:
 jp gtu, %m|r800|jr z, %t;jp nc, %m;%t:
 jp gtu, %m|ti83|jr z, %t;jp nc, %m;%t:
 jp gtu, %m|ti83plus|jr z, %t;jp nc, %m;%t:
+jp gtu, %m|vm1|jz %t;jnc %m;%t:
 jp gtu, %m|z180|jr z, %t;jp nc, %m;%t:
 jp gtu, %m|z80|jr z, %t;jp nc, %m;%t:
 jp gtu, %m|z80n|jr z, %t;jp nc, %m;%t:
@@ -7121,6 +7237,7 @@ jp leu, %m|r6k|jp gtu, %t;jp %m;%t:
 jp leu, %m|r800|jp z, %m;jp c, %m
 jp leu, %m|ti83|jp z, %m;jp c, %m
 jp leu, %m|ti83plus|jp z, %m;jp c, %m
+jp leu, %m|vm1|jz %m;jc %m
 jp leu, %m|z180|jp z, %m;jp c, %m
 jp leu, %m|z80|jp z, %m;jp c, %m
 jp leu, %m|z80n|jp z, %m;jp c, %m
@@ -7139,6 +7256,7 @@ jp ltu, %m|r6k|jp c, %m
 jp ltu, %m|r800|jp c, %m
 jp ltu, %m|ti83|jp c, %m
 jp ltu, %m|ti83plus|jp c, %m
+jp ltu, %m|vm1|jc %m
 jp ltu, %m|z180|jp c, %m
 jp ltu, %m|z80|jp c, %m
 jp ltu, %m|z80n|jp c, %m
@@ -7157,6 +7275,7 @@ jp ne, %m|r6k|jp nz, %m
 jp ne, %m|r800|jp nz, %m
 jp ne, %m|ti83|jp nz, %m
 jp ne, %m|ti83plus|jp nz, %m
+jp ne, %m|vm1|jnz %m
 jp ne, %m|z180|jp nz, %m
 jp ne, %m|z80|jp nz, %m
 jp ne, %m|z80n|jp nz, %m
@@ -7172,6 +7291,7 @@ jp nv, %m|r6k|jp v, %t;jp %m;%t:
 jp nv, %m|r800|jp po, %m
 jp nv, %m|ti83|jp po, %m
 jp nv, %m|ti83plus|jp po, %m
+jp nv, %m|vm1|jpo %m
 jp nv, %m|z180|jp po, %m
 jp nv, %m|z80|jp po, %m
 jp nv, %m|z80n|jp po, %m
@@ -7184,6 +7304,7 @@ jp v, %m|kc160_z80|jp pe, %m
 jp v, %m|r800|jp pe, %m
 jp v, %m|ti83|jp pe, %m
 jp v, %m|ti83plus|jp pe, %m
+jp v, %m|vm1|jpe %m
 jp v, %m|z180|jp pe, %m
 jp v, %m|z80|jp pe, %m
 jp v, %m|z80n|jp pe, %m
@@ -7233,8 +7354,10 @@ jp3 po, %m|kc160|jp pe, %t;jp3 %m;%t:
 jp3 v, %m|kc160|jp po, %t;jp3 %m;%t:
 jr %j|8080|jp %j
 jr %j|8085|jp %j
+jr %j|vm1|jp %j
 jr c, %j|8080|jc %j
 jr c, %j|8085|jc %j
+jr c, %j|vm1|jc %j
 jr eq, %j|8080|jz %j
 jr eq, %j|8085|jz %j
 jr eq, %j|ez80|jr z, %j
@@ -7250,6 +7373,7 @@ jr eq, %j|r6k|jr z, %j
 jr eq, %j|r800|jr z, %j
 jr eq, %j|ti83|jr z, %j
 jr eq, %j|ti83plus|jr z, %j
+jr eq, %j|vm1|jz %j
 jr eq, %j|z180|jr z, %j
 jr eq, %j|z80|jr z, %j
 jr eq, %j|z80n|jr z, %j
@@ -7268,6 +7392,7 @@ jr geu, %j|r6k|jr nc, %j
 jr geu, %j|r800|jr nc, %j
 jr geu, %j|ti83|jr nc, %j
 jr geu, %j|ti83plus|jr nc, %j
+jr geu, %j|vm1|jnc %j
 jr geu, %j|z180|jr nc, %j
 jr geu, %j|z80|jr nc, %j
 jr geu, %j|z80n|jr nc, %j
@@ -7283,6 +7408,7 @@ jr gtu, %j|r3k|jr z, %t;jr nc, %j;%t:
 jr gtu, %j|r800|jr z, %t;jr nc, %j;%t:
 jr gtu, %j|ti83|jr z, %t;jr nc, %j;%t:
 jr gtu, %j|ti83plus|jr z, %t;jr nc, %j;%t:
+jr gtu, %j|vm1|jz %t;jnc %j;%t:
 jr gtu, %j|z180|jr z, %t;jr nc, %j;%t:
 jr gtu, %j|z80|jr z, %t;jr nc, %j;%t:
 jr gtu, %j|z80n|jr z, %t;jr nc, %j;%t:
@@ -7301,6 +7427,7 @@ jr leu, %j|r6k|jr z, %j;jr c, %j
 jr leu, %j|r800|jr z, %j;jr c, %j
 jr leu, %j|ti83|jr z, %j;jr c, %j
 jr leu, %j|ti83plus|jr z, %j;jr c, %j
+jr leu, %j|vm1|jz %j;jc %j
 jr leu, %j|z180|jr z, %j;jr c, %j
 jr leu, %j|z80|jr z, %j;jr c, %j
 jr leu, %j|z80n|jr z, %j;jr c, %j
@@ -7319,11 +7446,13 @@ jr ltu, %j|r6k|jr c, %j
 jr ltu, %j|r800|jr c, %j
 jr ltu, %j|ti83|jr c, %j
 jr ltu, %j|ti83plus|jr c, %j
+jr ltu, %j|vm1|jc %j
 jr ltu, %j|z180|jr c, %j
 jr ltu, %j|z80|jr c, %j
 jr ltu, %j|z80n|jr c, %j
 jr nc, %j|8080|jnc %j
 jr nc, %j|8085|jnc %j
+jr nc, %j|vm1|jnc %j
 jr ne, %j|8080|jnz %j
 jr ne, %j|8085|jnz %j
 jr ne, %j|ez80|jr nz, %j
@@ -7339,13 +7468,16 @@ jr ne, %j|r6k|jr nz, %j
 jr ne, %j|r800|jr nz, %j
 jr ne, %j|ti83|jr nz, %j
 jr ne, %j|ti83plus|jr nz, %j
+jr ne, %j|vm1|jnz %j
 jr ne, %j|z180|jr nz, %j
 jr ne, %j|z80|jr nz, %j
 jr ne, %j|z80n|jr nz, %j
 jr nz, %j|8080|jnz %j
 jr nz, %j|8085|jnz %j
+jr nz, %j|vm1|jnz %j
 jr z, %j|8080|jz %j
 jr z, %j|8085|jz %j
+jr z, %j|vm1|jz %j
 jre eq, %J|r4k|jre z, %J
 jre eq, %J|r5k|jre z, %J
 jre eq, %J|r6k|jre z, %J
@@ -7373,18 +7505,22 @@ jv %m|kc160_z80|jp pe, %m
 jv %m|r800|jp pe, %m
 jv %m|ti83|jp pe, %m
 jv %m|ti83plus|jp pe, %m
+jv %m|vm1|jpe %m
 jv %m|z180|jp pe, %m
 jv %m|z80|jp pe, %m
 jv %m|z80n|jp pe, %m
 ld (%m), bc|8080|push h;mov h, b;mov l, c;shld %m;pop h
 ld (%m), bc|8085|push h;mov h, b;mov l, c;shld %m;pop h
 ld (%m), bc|gbz80|push af;ld a, c;ld (%m), a;ld a, b;ld (+(%m)+1), a;pop af
+ld (%m), bc|vm1|push h;mov h, b;mov l, c;shld %m;pop h
 ld (%m), de|8080|xchg;shld %m;xchg
 ld (%m), de|8085|xchg;shld %m;xchg
 ld (%m), de|gbz80|push af;ld a, e;ld (%m), a;ld a, d;ld (+(%m)+1), a;pop af
+ld (%m), de|vm1|xchg;shld %m;xchg
 ld (%m), hl|gbz80|push af;ld a, l;ld (%m), a;ld a, h;ld (+(%m)+1), a;pop af
 ld (%m), sp|8080|push h;ld hl, 2;dad sp;shld %m;pop h
 ld (%m), sp|8085|push h;ld hl, 2;dad sp;shld %m;pop h
+ld (%m), sp|vm1|push h;ld hl, 2;dad sp;shld %m;pop h
 ld (bc+), a|8080|stax b;inx b
 ld (bc+), a|8085|stax b;inx b
 ld (bc+), a|ez80|ld (bc), a;inc bc
@@ -7400,6 +7536,7 @@ ld (bc+), a|r6k|ld (bc), a;inc bc
 ld (bc+), a|r800|ld (bc), a;inc bc
 ld (bc+), a|ti83|ld (bc), a;inc bc
 ld (bc+), a|ti83plus|ld (bc), a;inc bc
+ld (bc+), a|vm1|stax b;inx b
 ld (bc+), a|z180|ld (bc), a;inc bc
 ld (bc+), a|z80|ld (bc), a;inc bc
 ld (bc+), a|z80n|ld (bc), a;inc bc
@@ -7419,6 +7556,7 @@ ld (bc-), a|r6k|ld (bc), a;dec bc
 ld (bc-), a|r800|ld (bc), a;dec bc
 ld (bc-), a|ti83|ld (bc), a;dec bc
 ld (bc-), a|ti83plus|ld (bc), a;dec bc
+ld (bc-), a|vm1|stax b;dcx b
 ld (bc-), a|z180|ld (bc), a;dec bc
 ld (bc-), a|z80|ld (bc), a;dec bc
 ld (bc-), a|z80n|ld (bc), a;dec bc
@@ -7437,6 +7575,7 @@ ld (de), %n|r6k|ex de, hl;ld (hl), %n;ex de, hl
 ld (de), %n|r800|ex de, hl;ld (hl), %n;ex de, hl
 ld (de), %n|ti83|ex de, hl;ld (hl), %n;ex de, hl
 ld (de), %n|ti83plus|ex de, hl;ld (hl), %n;ex de, hl
+ld (de), %n|vm1|xchg;mvi m, %n;xchg
 ld (de), %n|z180|ex de, hl;ld (hl), %n;ex de, hl
 ld (de), %n|z80|ex de, hl;ld (hl), %n;ex de, hl
 ld (de), %n|z80n|ex de, hl;ld (hl), %n;ex de, hl
@@ -7454,6 +7593,7 @@ ld (de), b|r6k|ex de, hl;ld (hl), b;ex de, hl
 ld (de), b|r800|ex de, hl;ld (hl), b;ex de, hl
 ld (de), b|ti83|ex de, hl;ld (hl), b;ex de, hl
 ld (de), b|ti83plus|ex de, hl;ld (hl), b;ex de, hl
+ld (de), b|vm1|xchg;mov m, b;xchg
 ld (de), b|z180|ex de, hl;ld (hl), b;ex de, hl
 ld (de), b|z80|ex de, hl;ld (hl), b;ex de, hl
 ld (de), b|z80n|ex de, hl;ld (hl), b;ex de, hl
@@ -7471,6 +7611,7 @@ ld (de), c|r6k|ex de, hl;ld (hl), c;ex de, hl
 ld (de), c|r800|ex de, hl;ld (hl), c;ex de, hl
 ld (de), c|ti83|ex de, hl;ld (hl), c;ex de, hl
 ld (de), c|ti83plus|ex de, hl;ld (hl), c;ex de, hl
+ld (de), c|vm1|xchg;mov m, c;xchg
 ld (de), c|z180|ex de, hl;ld (hl), c;ex de, hl
 ld (de), c|z80|ex de, hl;ld (hl), c;ex de, hl
 ld (de), c|z80n|ex de, hl;ld (hl), c;ex de, hl
@@ -7488,6 +7629,7 @@ ld (de), d|r6k|ex de, hl;ld (hl), h;ex de, hl
 ld (de), d|r800|ex de, hl;ld (hl), h;ex de, hl
 ld (de), d|ti83|ex de, hl;ld (hl), h;ex de, hl
 ld (de), d|ti83plus|ex de, hl;ld (hl), h;ex de, hl
+ld (de), d|vm1|xchg;mov m, h;xchg
 ld (de), d|z180|ex de, hl;ld (hl), h;ex de, hl
 ld (de), d|z80|ex de, hl;ld (hl), h;ex de, hl
 ld (de), d|z80n|ex de, hl;ld (hl), h;ex de, hl
@@ -7505,6 +7647,7 @@ ld (de), e|r6k|ex de, hl;ld (hl), l;ex de, hl
 ld (de), e|r800|ex de, hl;ld (hl), l;ex de, hl
 ld (de), e|ti83|ex de, hl;ld (hl), l;ex de, hl
 ld (de), e|ti83plus|ex de, hl;ld (hl), l;ex de, hl
+ld (de), e|vm1|xchg;mov m, l;xchg
 ld (de), e|z180|ex de, hl;ld (hl), l;ex de, hl
 ld (de), e|z80|ex de, hl;ld (hl), l;ex de, hl
 ld (de), e|z80n|ex de, hl;ld (hl), l;ex de, hl
@@ -7522,6 +7665,7 @@ ld (de), h|r6k|ex de, hl;ld (hl), d;ex de, hl
 ld (de), h|r800|ex de, hl;ld (hl), d;ex de, hl
 ld (de), h|ti83|ex de, hl;ld (hl), d;ex de, hl
 ld (de), h|ti83plus|ex de, hl;ld (hl), d;ex de, hl
+ld (de), h|vm1|xchg;mov m, d;xchg
 ld (de), h|z180|ex de, hl;ld (hl), d;ex de, hl
 ld (de), h|z80|ex de, hl;ld (hl), d;ex de, hl
 ld (de), h|z80n|ex de, hl;ld (hl), d;ex de, hl
@@ -7556,6 +7700,7 @@ ld (de), l|r6k|ex de, hl;ld (hl), e;ex de, hl
 ld (de), l|r800|ex de, hl;ld (hl), e;ex de, hl
 ld (de), l|ti83|ex de, hl;ld (hl), e;ex de, hl
 ld (de), l|ti83plus|ex de, hl;ld (hl), e;ex de, hl
+ld (de), l|vm1|xchg;mov m, e;xchg
 ld (de), l|z180|ex de, hl;ld (hl), e;ex de, hl
 ld (de), l|z80|ex de, hl;ld (hl), e;ex de, hl
 ld (de), l|z80n|ex de, hl;ld (hl), e;ex de, hl
@@ -7573,6 +7718,7 @@ ld (de+), %n|r6k|ex de, hl;ld (hl), %n;ex de, hl;inc de
 ld (de+), %n|r800|ex de, hl;ld (hl), %n;ex de, hl;inc de
 ld (de+), %n|ti83|ex de, hl;ld (hl), %n;ex de, hl;inc de
 ld (de+), %n|ti83plus|ex de, hl;ld (hl), %n;ex de, hl;inc de
+ld (de+), %n|vm1|xchg;mvi m, %n;xchg;inx d
 ld (de+), %n|z180|ex de, hl;ld (hl), %n;ex de, hl;inc de
 ld (de+), %n|z80|ex de, hl;ld (hl), %n;ex de, hl;inc de
 ld (de+), %n|z80n|ex de, hl;ld (hl), %n;ex de, hl;inc de
@@ -7591,6 +7737,7 @@ ld (de+), a|r6k|ld (de), a;inc de
 ld (de+), a|r800|ld (de), a;inc de
 ld (de+), a|ti83|ld (de), a;inc de
 ld (de+), a|ti83plus|ld (de), a;inc de
+ld (de+), a|vm1|stax d;inx d
 ld (de+), a|z180|ld (de), a;inc de
 ld (de+), a|z80|ld (de), a;inc de
 ld (de+), a|z80n|ld (de), a;inc de
@@ -7609,6 +7756,7 @@ ld (de+), b|r6k|ex de, hl;ld (hl), b;ex de, hl;inc de
 ld (de+), b|r800|ex de, hl;ld (hl), b;ex de, hl;inc de
 ld (de+), b|ti83|ex de, hl;ld (hl), b;ex de, hl;inc de
 ld (de+), b|ti83plus|ex de, hl;ld (hl), b;ex de, hl;inc de
+ld (de+), b|vm1|xchg;mov m, b;xchg;inx d
 ld (de+), b|z180|ex de, hl;ld (hl), b;ex de, hl;inc de
 ld (de+), b|z80|ex de, hl;ld (hl), b;ex de, hl;inc de
 ld (de+), b|z80n|ex de, hl;ld (hl), b;ex de, hl;inc de
@@ -7626,6 +7774,7 @@ ld (de+), c|r6k|ex de, hl;ld (hl), c;ex de, hl;inc de
 ld (de+), c|r800|ex de, hl;ld (hl), c;ex de, hl;inc de
 ld (de+), c|ti83|ex de, hl;ld (hl), c;ex de, hl;inc de
 ld (de+), c|ti83plus|ex de, hl;ld (hl), c;ex de, hl;inc de
+ld (de+), c|vm1|xchg;mov m, c;xchg;inx d
 ld (de+), c|z180|ex de, hl;ld (hl), c;ex de, hl;inc de
 ld (de+), c|z80|ex de, hl;ld (hl), c;ex de, hl;inc de
 ld (de+), c|z80n|ex de, hl;ld (hl), c;ex de, hl;inc de
@@ -7643,6 +7792,7 @@ ld (de+), d|r6k|ex de, hl;ld (hl), h;ex de, hl;inc de
 ld (de+), d|r800|ex de, hl;ld (hl), h;ex de, hl;inc de
 ld (de+), d|ti83|ex de, hl;ld (hl), h;ex de, hl;inc de
 ld (de+), d|ti83plus|ex de, hl;ld (hl), h;ex de, hl;inc de
+ld (de+), d|vm1|xchg;mov m, h;xchg;inx d
 ld (de+), d|z180|ex de, hl;ld (hl), h;ex de, hl;inc de
 ld (de+), d|z80|ex de, hl;ld (hl), h;ex de, hl;inc de
 ld (de+), d|z80n|ex de, hl;ld (hl), h;ex de, hl;inc de
@@ -7660,6 +7810,7 @@ ld (de+), e|r6k|ex de, hl;ld (hl), l;ex de, hl;inc de
 ld (de+), e|r800|ex de, hl;ld (hl), l;ex de, hl;inc de
 ld (de+), e|ti83|ex de, hl;ld (hl), l;ex de, hl;inc de
 ld (de+), e|ti83plus|ex de, hl;ld (hl), l;ex de, hl;inc de
+ld (de+), e|vm1|xchg;mov m, l;xchg;inx d
 ld (de+), e|z180|ex de, hl;ld (hl), l;ex de, hl;inc de
 ld (de+), e|z80|ex de, hl;ld (hl), l;ex de, hl;inc de
 ld (de+), e|z80n|ex de, hl;ld (hl), l;ex de, hl;inc de
@@ -7677,6 +7828,7 @@ ld (de+), h|r6k|ex de, hl;ld (hl), d;ex de, hl;inc de
 ld (de+), h|r800|ex de, hl;ld (hl), d;ex de, hl;inc de
 ld (de+), h|ti83|ex de, hl;ld (hl), d;ex de, hl;inc de
 ld (de+), h|ti83plus|ex de, hl;ld (hl), d;ex de, hl;inc de
+ld (de+), h|vm1|xchg;mov m, d;xchg;inx d
 ld (de+), h|z180|ex de, hl;ld (hl), d;ex de, hl;inc de
 ld (de+), h|z80|ex de, hl;ld (hl), d;ex de, hl;inc de
 ld (de+), h|z80n|ex de, hl;ld (hl), d;ex de, hl;inc de
@@ -7694,6 +7846,7 @@ ld (de+), l|r6k|ex de, hl;ld (hl), e;ex de, hl;inc de
 ld (de+), l|r800|ex de, hl;ld (hl), e;ex de, hl;inc de
 ld (de+), l|ti83|ex de, hl;ld (hl), e;ex de, hl;inc de
 ld (de+), l|ti83plus|ex de, hl;ld (hl), e;ex de, hl;inc de
+ld (de+), l|vm1|xchg;mov m, e;xchg;inx d
 ld (de+), l|z180|ex de, hl;ld (hl), e;ex de, hl;inc de
 ld (de+), l|z80|ex de, hl;ld (hl), e;ex de, hl;inc de
 ld (de+), l|z80n|ex de, hl;ld (hl), e;ex de, hl;inc de
@@ -7711,6 +7864,7 @@ ld (de-), %n|r6k|ex de, hl;ld (hl), %n;ex de, hl;dec de
 ld (de-), %n|r800|ex de, hl;ld (hl), %n;ex de, hl;dec de
 ld (de-), %n|ti83|ex de, hl;ld (hl), %n;ex de, hl;dec de
 ld (de-), %n|ti83plus|ex de, hl;ld (hl), %n;ex de, hl;dec de
+ld (de-), %n|vm1|xchg;mvi m, %n;xchg;dcx d
 ld (de-), %n|z180|ex de, hl;ld (hl), %n;ex de, hl;dec de
 ld (de-), %n|z80|ex de, hl;ld (hl), %n;ex de, hl;dec de
 ld (de-), %n|z80n|ex de, hl;ld (hl), %n;ex de, hl;dec de
@@ -7729,6 +7883,7 @@ ld (de-), a|r6k|ld (de), a;dec de
 ld (de-), a|r800|ld (de), a;dec de
 ld (de-), a|ti83|ld (de), a;dec de
 ld (de-), a|ti83plus|ld (de), a;dec de
+ld (de-), a|vm1|stax d;dcx d
 ld (de-), a|z180|ld (de), a;dec de
 ld (de-), a|z80|ld (de), a;dec de
 ld (de-), a|z80n|ld (de), a;dec de
@@ -7747,6 +7902,7 @@ ld (de-), b|r6k|ex de, hl;ld (hl), b;ex de, hl;dec de
 ld (de-), b|r800|ex de, hl;ld (hl), b;ex de, hl;dec de
 ld (de-), b|ti83|ex de, hl;ld (hl), b;ex de, hl;dec de
 ld (de-), b|ti83plus|ex de, hl;ld (hl), b;ex de, hl;dec de
+ld (de-), b|vm1|xchg;mov m, b;xchg;dcx d
 ld (de-), b|z180|ex de, hl;ld (hl), b;ex de, hl;dec de
 ld (de-), b|z80|ex de, hl;ld (hl), b;ex de, hl;dec de
 ld (de-), b|z80n|ex de, hl;ld (hl), b;ex de, hl;dec de
@@ -7764,6 +7920,7 @@ ld (de-), c|r6k|ex de, hl;ld (hl), c;ex de, hl;dec de
 ld (de-), c|r800|ex de, hl;ld (hl), c;ex de, hl;dec de
 ld (de-), c|ti83|ex de, hl;ld (hl), c;ex de, hl;dec de
 ld (de-), c|ti83plus|ex de, hl;ld (hl), c;ex de, hl;dec de
+ld (de-), c|vm1|xchg;mov m, c;xchg;dcx d
 ld (de-), c|z180|ex de, hl;ld (hl), c;ex de, hl;dec de
 ld (de-), c|z80|ex de, hl;ld (hl), c;ex de, hl;dec de
 ld (de-), c|z80n|ex de, hl;ld (hl), c;ex de, hl;dec de
@@ -7781,6 +7938,7 @@ ld (de-), d|r6k|ex de, hl;ld (hl), h;ex de, hl;dec de
 ld (de-), d|r800|ex de, hl;ld (hl), h;ex de, hl;dec de
 ld (de-), d|ti83|ex de, hl;ld (hl), h;ex de, hl;dec de
 ld (de-), d|ti83plus|ex de, hl;ld (hl), h;ex de, hl;dec de
+ld (de-), d|vm1|xchg;mov m, h;xchg;dcx d
 ld (de-), d|z180|ex de, hl;ld (hl), h;ex de, hl;dec de
 ld (de-), d|z80|ex de, hl;ld (hl), h;ex de, hl;dec de
 ld (de-), d|z80n|ex de, hl;ld (hl), h;ex de, hl;dec de
@@ -7798,6 +7956,7 @@ ld (de-), e|r6k|ex de, hl;ld (hl), l;ex de, hl;dec de
 ld (de-), e|r800|ex de, hl;ld (hl), l;ex de, hl;dec de
 ld (de-), e|ti83|ex de, hl;ld (hl), l;ex de, hl;dec de
 ld (de-), e|ti83plus|ex de, hl;ld (hl), l;ex de, hl;dec de
+ld (de-), e|vm1|xchg;mov m, l;xchg;dcx d
 ld (de-), e|z180|ex de, hl;ld (hl), l;ex de, hl;dec de
 ld (de-), e|z80|ex de, hl;ld (hl), l;ex de, hl;dec de
 ld (de-), e|z80n|ex de, hl;ld (hl), l;ex de, hl;dec de
@@ -7815,6 +7974,7 @@ ld (de-), h|r6k|ex de, hl;ld (hl), d;ex de, hl;dec de
 ld (de-), h|r800|ex de, hl;ld (hl), d;ex de, hl;dec de
 ld (de-), h|ti83|ex de, hl;ld (hl), d;ex de, hl;dec de
 ld (de-), h|ti83plus|ex de, hl;ld (hl), d;ex de, hl;dec de
+ld (de-), h|vm1|xchg;mov m, d;xchg;dcx d
 ld (de-), h|z180|ex de, hl;ld (hl), d;ex de, hl;dec de
 ld (de-), h|z80|ex de, hl;ld (hl), d;ex de, hl;dec de
 ld (de-), h|z80n|ex de, hl;ld (hl), d;ex de, hl;dec de
@@ -7832,6 +7992,7 @@ ld (de-), l|r6k|ex de, hl;ld (hl), e;ex de, hl;dec de
 ld (de-), l|r800|ex de, hl;ld (hl), e;ex de, hl;dec de
 ld (de-), l|ti83|ex de, hl;ld (hl), e;ex de, hl;dec de
 ld (de-), l|ti83plus|ex de, hl;ld (hl), e;ex de, hl;dec de
+ld (de-), l|vm1|xchg;mov m, e;xchg;dcx d
 ld (de-), l|z180|ex de, hl;ld (hl), e;ex de, hl;dec de
 ld (de-), l|z80|ex de, hl;ld (hl), e;ex de, hl;dec de
 ld (de-), l|z80n|ex de, hl;ld (hl), e;ex de, hl;dec de
@@ -7848,6 +8009,7 @@ ld (hl), bc|r6k|ld (hl), c;inc hl;ld (hl), b;dec hl
 ld (hl), bc|r800|ld (hl), c;inc hl;ld (hl), b;dec hl
 ld (hl), bc|ti83|ld (hl), c;inc hl;ld (hl), b;dec hl
 ld (hl), bc|ti83plus|ld (hl), c;inc hl;ld (hl), b;dec hl
+ld (hl), bc|vm1|mov m, c;inx h;mov m, b;dcx h
 ld (hl), bc|z180|ld (hl), c;inc hl;ld (hl), b;dec hl
 ld (hl), bc|z80|ld (hl), c;inc hl;ld (hl), b;dec hl
 ld (hl), bc|z80n|ld (hl), c;inc hl;ld (hl), b;dec hl
@@ -7864,6 +8026,7 @@ ld (hl), de|r6k|ld (hl), e;inc hl;ld (hl), d;dec hl
 ld (hl), de|r800|ld (hl), e;inc hl;ld (hl), d;dec hl
 ld (hl), de|ti83|ld (hl), e;inc hl;ld (hl), d;dec hl
 ld (hl), de|ti83plus|ld (hl), e;inc hl;ld (hl), d;dec hl
+ld (hl), de|vm1|mov m, e;inx h;mov m, d;dcx h
 ld (hl), de|z180|ld (hl), e;inc hl;ld (hl), d;dec hl
 ld (hl), de|z80|ld (hl), e;inc hl;ld (hl), d;dec hl
 ld (hl), de|z80n|ld (hl), e;inc hl;ld (hl), d;dec hl
@@ -7875,6 +8038,7 @@ ld (hl), hl|kc160_z80|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;dec hl
 ld (hl), hl|r800|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;dec hl
 ld (hl), hl|ti83|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;dec hl
 ld (hl), hl|ti83plus|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;dec hl
+ld (hl), hl|vm1|push psw;mov a, h;mov m, l;inx h;mov m, a;pop psw;dcx h
 ld (hl), hl|z180|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;dec hl
 ld (hl), hl|z80|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;dec hl
 ld (hl), hl|z80n|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;dec hl
@@ -7919,6 +8083,7 @@ ld (hl+), %n|r6k|ld (hl), %n;inc hl
 ld (hl+), %n|r800|ld (hl), %n;inc hl
 ld (hl+), %n|ti83|ld (hl), %n;inc hl
 ld (hl+), %n|ti83plus|ld (hl), %n;inc hl
+ld (hl+), %n|vm1|mvi m, %n;inx h
 ld (hl+), %n|z180|ld (hl), %n;inc hl
 ld (hl+), %n|z80|ld (hl), %n;inc hl
 ld (hl+), %n|z80n|ld (hl), %n;inc hl
@@ -7936,6 +8101,7 @@ ld (hl+), a|r6k|ld (hl), a;inc hl
 ld (hl+), a|r800|ld (hl), a;inc hl
 ld (hl+), a|ti83|ld (hl), a;inc hl
 ld (hl+), a|ti83plus|ld (hl), a;inc hl
+ld (hl+), a|vm1|mov m, a;inx h
 ld (hl+), a|z180|ld (hl), a;inc hl
 ld (hl+), a|z80|ld (hl), a;inc hl
 ld (hl+), a|z80n|ld (hl), a;inc hl
@@ -7955,6 +8121,7 @@ ld (hl+), b|r6k|ld (hl), b;inc hl
 ld (hl+), b|r800|ld (hl), b;inc hl
 ld (hl+), b|ti83|ld (hl), b;inc hl
 ld (hl+), b|ti83plus|ld (hl), b;inc hl
+ld (hl+), b|vm1|mov m, b;inx h
 ld (hl+), b|z180|ld (hl), b;inc hl
 ld (hl+), b|z80|ld (hl), b;inc hl
 ld (hl+), b|z80n|ld (hl), b;inc hl
@@ -7974,6 +8141,7 @@ ld (hl+), bc|r6k|ld (hl), c;inc hl;ld (hl), b;inc hl
 ld (hl+), bc|r800|ld (hl), c;inc hl;ld (hl), b;inc hl
 ld (hl+), bc|ti83|ld (hl), c;inc hl;ld (hl), b;inc hl
 ld (hl+), bc|ti83plus|ld (hl), c;inc hl;ld (hl), b;inc hl
+ld (hl+), bc|vm1|mov m, c;inx h;mov m, b;inx h
 ld (hl+), bc|z180|ld (hl), c;inc hl;ld (hl), b;inc hl
 ld (hl+), bc|z80|ld (hl), c;inc hl;ld (hl), b;inc hl
 ld (hl+), bc|z80n|ld (hl), c;inc hl;ld (hl), b;inc hl
@@ -7992,6 +8160,7 @@ ld (hl+), c|r6k|ld (hl), c;inc hl
 ld (hl+), c|r800|ld (hl), c;inc hl
 ld (hl+), c|ti83|ld (hl), c;inc hl
 ld (hl+), c|ti83plus|ld (hl), c;inc hl
+ld (hl+), c|vm1|mov m, c;inx h
 ld (hl+), c|z180|ld (hl), c;inc hl
 ld (hl+), c|z80|ld (hl), c;inc hl
 ld (hl+), c|z80n|ld (hl), c;inc hl
@@ -8011,6 +8180,7 @@ ld (hl+), d|r6k|ld (hl), d;inc hl
 ld (hl+), d|r800|ld (hl), d;inc hl
 ld (hl+), d|ti83|ld (hl), d;inc hl
 ld (hl+), d|ti83plus|ld (hl), d;inc hl
+ld (hl+), d|vm1|mov m, d;inx h
 ld (hl+), d|z180|ld (hl), d;inc hl
 ld (hl+), d|z80|ld (hl), d;inc hl
 ld (hl+), d|z80n|ld (hl), d;inc hl
@@ -8030,6 +8200,7 @@ ld (hl+), de|r6k|ld (hl), e;inc hl;ld (hl), d;inc hl
 ld (hl+), de|r800|ld (hl), e;inc hl;ld (hl), d;inc hl
 ld (hl+), de|ti83|ld (hl), e;inc hl;ld (hl), d;inc hl
 ld (hl+), de|ti83plus|ld (hl), e;inc hl;ld (hl), d;inc hl
+ld (hl+), de|vm1|mov m, e;inx h;mov m, d;inx h
 ld (hl+), de|z180|ld (hl), e;inc hl;ld (hl), d;inc hl
 ld (hl+), de|z80|ld (hl), e;inc hl;ld (hl), d;inc hl
 ld (hl+), de|z80n|ld (hl), e;inc hl;ld (hl), d;inc hl
@@ -8048,6 +8219,7 @@ ld (hl+), e|r6k|ld (hl), e;inc hl
 ld (hl+), e|r800|ld (hl), e;inc hl
 ld (hl+), e|ti83|ld (hl), e;inc hl
 ld (hl+), e|ti83plus|ld (hl), e;inc hl
+ld (hl+), e|vm1|mov m, e;inx h
 ld (hl+), e|z180|ld (hl), e;inc hl
 ld (hl+), e|z80|ld (hl), e;inc hl
 ld (hl+), e|z80n|ld (hl), e;inc hl
@@ -8067,6 +8239,7 @@ ld (hl+), h|r6k|ld (hl), h;inc hl
 ld (hl+), h|r800|ld (hl), h;inc hl
 ld (hl+), h|ti83|ld (hl), h;inc hl
 ld (hl+), h|ti83plus|ld (hl), h;inc hl
+ld (hl+), h|vm1|mov m, h;inx h
 ld (hl+), h|z180|ld (hl), h;inc hl
 ld (hl+), h|z80|ld (hl), h;inc hl
 ld (hl+), h|z80n|ld (hl), h;inc hl
@@ -8081,6 +8254,7 @@ ld (hl+), hl|kc160_z80|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc h
 ld (hl+), hl|r800|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl
 ld (hl+), hl|ti83|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl
 ld (hl+), hl|ti83plus|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl
+ld (hl+), hl|vm1|push psw;mov a, h;mov m, l;inx h;mov m, a;pop psw;inx h
 ld (hl+), hl|z180|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl
 ld (hl+), hl|z80|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl
 ld (hl+), hl|z80n|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl
@@ -8129,6 +8303,7 @@ ld (hl+), l|r6k|ld (hl), l;inc hl
 ld (hl+), l|r800|ld (hl), l;inc hl
 ld (hl+), l|ti83|ld (hl), l;inc hl
 ld (hl+), l|ti83plus|ld (hl), l;inc hl
+ld (hl+), l|vm1|mov m, l;inx h
 ld (hl+), l|z180|ld (hl), l;inc hl
 ld (hl+), l|z80|ld (hl), l;inc hl
 ld (hl+), l|z80n|ld (hl), l;inc hl
@@ -8148,6 +8323,7 @@ ld (hl-), %n|r6k|ld (hl), %n;dec hl
 ld (hl-), %n|r800|ld (hl), %n;dec hl
 ld (hl-), %n|ti83|ld (hl), %n;dec hl
 ld (hl-), %n|ti83plus|ld (hl), %n;dec hl
+ld (hl-), %n|vm1|mvi m, %n;dcx h
 ld (hl-), %n|z180|ld (hl), %n;dec hl
 ld (hl-), %n|z80|ld (hl), %n;dec hl
 ld (hl-), %n|z80n|ld (hl), %n;dec hl
@@ -8165,6 +8341,7 @@ ld (hl-), a|r6k|ld (hl), a;dec hl
 ld (hl-), a|r800|ld (hl), a;dec hl
 ld (hl-), a|ti83|ld (hl), a;dec hl
 ld (hl-), a|ti83plus|ld (hl), a;dec hl
+ld (hl-), a|vm1|mov m, a;dcx h
 ld (hl-), a|z180|ld (hl), a;dec hl
 ld (hl-), a|z80|ld (hl), a;dec hl
 ld (hl-), a|z80n|ld (hl), a;dec hl
@@ -8184,6 +8361,7 @@ ld (hl-), b|r6k|ld (hl), b;dec hl
 ld (hl-), b|r800|ld (hl), b;dec hl
 ld (hl-), b|ti83|ld (hl), b;dec hl
 ld (hl-), b|ti83plus|ld (hl), b;dec hl
+ld (hl-), b|vm1|mov m, b;dcx h
 ld (hl-), b|z180|ld (hl), b;dec hl
 ld (hl-), b|z80|ld (hl), b;dec hl
 ld (hl-), b|z80n|ld (hl), b;dec hl
@@ -8203,6 +8381,7 @@ ld (hl-), c|r6k|ld (hl), c;dec hl
 ld (hl-), c|r800|ld (hl), c;dec hl
 ld (hl-), c|ti83|ld (hl), c;dec hl
 ld (hl-), c|ti83plus|ld (hl), c;dec hl
+ld (hl-), c|vm1|mov m, c;dcx h
 ld (hl-), c|z180|ld (hl), c;dec hl
 ld (hl-), c|z80|ld (hl), c;dec hl
 ld (hl-), c|z80n|ld (hl), c;dec hl
@@ -8222,6 +8401,7 @@ ld (hl-), d|r6k|ld (hl), d;dec hl
 ld (hl-), d|r800|ld (hl), d;dec hl
 ld (hl-), d|ti83|ld (hl), d;dec hl
 ld (hl-), d|ti83plus|ld (hl), d;dec hl
+ld (hl-), d|vm1|mov m, d;dcx h
 ld (hl-), d|z180|ld (hl), d;dec hl
 ld (hl-), d|z80|ld (hl), d;dec hl
 ld (hl-), d|z80n|ld (hl), d;dec hl
@@ -8241,6 +8421,7 @@ ld (hl-), e|r6k|ld (hl), e;dec hl
 ld (hl-), e|r800|ld (hl), e;dec hl
 ld (hl-), e|ti83|ld (hl), e;dec hl
 ld (hl-), e|ti83plus|ld (hl), e;dec hl
+ld (hl-), e|vm1|mov m, e;dcx h
 ld (hl-), e|z180|ld (hl), e;dec hl
 ld (hl-), e|z80|ld (hl), e;dec hl
 ld (hl-), e|z80n|ld (hl), e;dec hl
@@ -8260,6 +8441,7 @@ ld (hl-), h|r6k|ld (hl), h;dec hl
 ld (hl-), h|r800|ld (hl), h;dec hl
 ld (hl-), h|ti83|ld (hl), h;dec hl
 ld (hl-), h|ti83plus|ld (hl), h;dec hl
+ld (hl-), h|vm1|mov m, h;dcx h
 ld (hl-), h|z180|ld (hl), h;dec hl
 ld (hl-), h|z80|ld (hl), h;dec hl
 ld (hl-), h|z80n|ld (hl), h;dec hl
@@ -8279,6 +8461,7 @@ ld (hl-), l|r6k|ld (hl), l;dec hl
 ld (hl-), l|r800|ld (hl), l;dec hl
 ld (hl-), l|ti83|ld (hl), l;dec hl
 ld (hl-), l|ti83plus|ld (hl), l;dec hl
+ld (hl-), l|vm1|mov m, l;dcx h
 ld (hl-), l|z180|ld (hl), l;dec hl
 ld (hl-), l|z80|ld (hl), l;dec hl
 ld (hl-), l|z80n|ld (hl), l;dec hl
@@ -8297,6 +8480,7 @@ ld (hld), a|r6k|ld (hl), a;dec hl
 ld (hld), a|r800|ld (hl), a;dec hl
 ld (hld), a|ti83|ld (hl), a;dec hl
 ld (hld), a|ti83plus|ld (hl), a;dec hl
+ld (hld), a|vm1|mov m, a;dcx h
 ld (hld), a|z180|ld (hl), a;dec hl
 ld (hld), a|z80|ld (hl), a;dec hl
 ld (hld), a|z80n|ld (hl), a;dec hl
@@ -8316,6 +8500,7 @@ ld (hld), b|r6k|ld (hl), b;dec hl
 ld (hld), b|r800|ld (hl), b;dec hl
 ld (hld), b|ti83|ld (hl), b;dec hl
 ld (hld), b|ti83plus|ld (hl), b;dec hl
+ld (hld), b|vm1|mov m, b;dcx h
 ld (hld), b|z180|ld (hl), b;dec hl
 ld (hld), b|z80|ld (hl), b;dec hl
 ld (hld), b|z80n|ld (hl), b;dec hl
@@ -8335,6 +8520,7 @@ ld (hld), c|r6k|ld (hl), c;dec hl
 ld (hld), c|r800|ld (hl), c;dec hl
 ld (hld), c|ti83|ld (hl), c;dec hl
 ld (hld), c|ti83plus|ld (hl), c;dec hl
+ld (hld), c|vm1|mov m, c;dcx h
 ld (hld), c|z180|ld (hl), c;dec hl
 ld (hld), c|z80|ld (hl), c;dec hl
 ld (hld), c|z80n|ld (hl), c;dec hl
@@ -8354,6 +8540,7 @@ ld (hld), d|r6k|ld (hl), d;dec hl
 ld (hld), d|r800|ld (hl), d;dec hl
 ld (hld), d|ti83|ld (hl), d;dec hl
 ld (hld), d|ti83plus|ld (hl), d;dec hl
+ld (hld), d|vm1|mov m, d;dcx h
 ld (hld), d|z180|ld (hl), d;dec hl
 ld (hld), d|z80|ld (hl), d;dec hl
 ld (hld), d|z80n|ld (hl), d;dec hl
@@ -8373,6 +8560,7 @@ ld (hld), e|r6k|ld (hl), e;dec hl
 ld (hld), e|r800|ld (hl), e;dec hl
 ld (hld), e|ti83|ld (hl), e;dec hl
 ld (hld), e|ti83plus|ld (hl), e;dec hl
+ld (hld), e|vm1|mov m, e;dcx h
 ld (hld), e|z180|ld (hl), e;dec hl
 ld (hld), e|z80|ld (hl), e;dec hl
 ld (hld), e|z80n|ld (hl), e;dec hl
@@ -8392,6 +8580,7 @@ ld (hld), h|r6k|ld (hl), h;dec hl
 ld (hld), h|r800|ld (hl), h;dec hl
 ld (hld), h|ti83|ld (hl), h;dec hl
 ld (hld), h|ti83plus|ld (hl), h;dec hl
+ld (hld), h|vm1|mov m, h;dcx h
 ld (hld), h|z180|ld (hl), h;dec hl
 ld (hld), h|z80|ld (hl), h;dec hl
 ld (hld), h|z80n|ld (hl), h;dec hl
@@ -8411,6 +8600,7 @@ ld (hld), l|r6k|ld (hl), l;dec hl
 ld (hld), l|r800|ld (hl), l;dec hl
 ld (hld), l|ti83|ld (hl), l;dec hl
 ld (hld), l|ti83plus|ld (hl), l;dec hl
+ld (hld), l|vm1|mov m, l;dcx h
 ld (hld), l|z180|ld (hl), l;dec hl
 ld (hld), l|z80|ld (hl), l;dec hl
 ld (hld), l|z80n|ld (hl), l;dec hl
@@ -8429,6 +8619,7 @@ ld (hli), a|r6k|ld (hl), a;inc hl
 ld (hli), a|r800|ld (hl), a;inc hl
 ld (hli), a|ti83|ld (hl), a;inc hl
 ld (hli), a|ti83plus|ld (hl), a;inc hl
+ld (hli), a|vm1|mov m, a;inx h
 ld (hli), a|z180|ld (hl), a;inc hl
 ld (hli), a|z80|ld (hl), a;inc hl
 ld (hli), a|z80n|ld (hl), a;inc hl
@@ -8448,6 +8639,7 @@ ld (hli), b|r6k|ld (hl), b;inc hl
 ld (hli), b|r800|ld (hl), b;inc hl
 ld (hli), b|ti83|ld (hl), b;inc hl
 ld (hli), b|ti83plus|ld (hl), b;inc hl
+ld (hli), b|vm1|mov m, b;inx h
 ld (hli), b|z180|ld (hl), b;inc hl
 ld (hli), b|z80|ld (hl), b;inc hl
 ld (hli), b|z80n|ld (hl), b;inc hl
@@ -8467,6 +8659,7 @@ ld (hli), c|r6k|ld (hl), c;inc hl
 ld (hli), c|r800|ld (hl), c;inc hl
 ld (hli), c|ti83|ld (hl), c;inc hl
 ld (hli), c|ti83plus|ld (hl), c;inc hl
+ld (hli), c|vm1|mov m, c;inx h
 ld (hli), c|z180|ld (hl), c;inc hl
 ld (hli), c|z80|ld (hl), c;inc hl
 ld (hli), c|z80n|ld (hl), c;inc hl
@@ -8486,6 +8679,7 @@ ld (hli), d|r6k|ld (hl), d;inc hl
 ld (hli), d|r800|ld (hl), d;inc hl
 ld (hli), d|ti83|ld (hl), d;inc hl
 ld (hli), d|ti83plus|ld (hl), d;inc hl
+ld (hli), d|vm1|mov m, d;inx h
 ld (hli), d|z180|ld (hl), d;inc hl
 ld (hli), d|z80|ld (hl), d;inc hl
 ld (hli), d|z80n|ld (hl), d;inc hl
@@ -8505,6 +8699,7 @@ ld (hli), e|r6k|ld (hl), e;inc hl
 ld (hli), e|r800|ld (hl), e;inc hl
 ld (hli), e|ti83|ld (hl), e;inc hl
 ld (hli), e|ti83plus|ld (hl), e;inc hl
+ld (hli), e|vm1|mov m, e;inx h
 ld (hli), e|z180|ld (hl), e;inc hl
 ld (hli), e|z80|ld (hl), e;inc hl
 ld (hli), e|z80n|ld (hl), e;inc hl
@@ -8524,6 +8719,7 @@ ld (hli), h|r6k|ld (hl), h;inc hl
 ld (hli), h|r800|ld (hl), h;inc hl
 ld (hli), h|ti83|ld (hl), h;inc hl
 ld (hli), h|ti83plus|ld (hl), h;inc hl
+ld (hli), h|vm1|mov m, h;inx h
 ld (hli), h|z180|ld (hl), h;inc hl
 ld (hli), h|z80|ld (hl), h;inc hl
 ld (hli), h|z80n|ld (hl), h;inc hl
@@ -8543,6 +8739,7 @@ ld (hli), l|r6k|ld (hl), l;inc hl
 ld (hli), l|r800|ld (hl), l;inc hl
 ld (hli), l|ti83|ld (hl), l;inc hl
 ld (hli), l|ti83plus|ld (hl), l;inc hl
+ld (hli), l|vm1|mov m, l;inx h
 ld (hli), l|z180|ld (hl), l;inc hl
 ld (hli), l|z80|ld (hl), l;inc hl
 ld (hli), l|z80n|ld (hl), l;inc hl
@@ -8822,6 +9019,7 @@ ld a, (bc+)|r6k|ld a, (bc);inc bc
 ld a, (bc+)|r800|ld a, (bc);inc bc
 ld a, (bc+)|ti83|ld a, (bc);inc bc
 ld a, (bc+)|ti83plus|ld a, (bc);inc bc
+ld a, (bc+)|vm1|ldax b;inx b
 ld a, (bc+)|z180|ld a, (bc);inc bc
 ld a, (bc+)|z80|ld a, (bc);inc bc
 ld a, (bc+)|z80n|ld a, (bc);inc bc
@@ -8840,6 +9038,7 @@ ld a, (bc-)|r6k|ld a, (bc);dec bc
 ld a, (bc-)|r800|ld a, (bc);dec bc
 ld a, (bc-)|ti83|ld a, (bc);dec bc
 ld a, (bc-)|ti83plus|ld a, (bc);dec bc
+ld a, (bc-)|vm1|ldax b;dcx b
 ld a, (bc-)|z180|ld a, (bc);dec bc
 ld a, (bc-)|z80|ld a, (bc);dec bc
 ld a, (bc-)|z80n|ld a, (bc);dec bc
@@ -8858,6 +9057,7 @@ ld a, (de+)|r6k|ld a, (de);inc de
 ld a, (de+)|r800|ld a, (de);inc de
 ld a, (de+)|ti83|ld a, (de);inc de
 ld a, (de+)|ti83plus|ld a, (de);inc de
+ld a, (de+)|vm1|ldax d;inx d
 ld a, (de+)|z180|ld a, (de);inc de
 ld a, (de+)|z80|ld a, (de);inc de
 ld a, (de+)|z80n|ld a, (de);inc de
@@ -8876,6 +9076,7 @@ ld a, (de-)|r6k|ld a, (de);dec de
 ld a, (de-)|r800|ld a, (de);dec de
 ld a, (de-)|ti83|ld a, (de);dec de
 ld a, (de-)|ti83plus|ld a, (de);dec de
+ld a, (de-)|vm1|ldax d;dcx d
 ld a, (de-)|z180|ld a, (de);dec de
 ld a, (de-)|z80|ld a, (de);dec de
 ld a, (de-)|z80n|ld a, (de);dec de
@@ -8893,6 +9094,7 @@ ld a, (hl+)|r6k|ld a, (hl);inc hl
 ld a, (hl+)|r800|ld a, (hl);inc hl
 ld a, (hl+)|ti83|ld a, (hl);inc hl
 ld a, (hl+)|ti83plus|ld a, (hl);inc hl
+ld a, (hl+)|vm1|mov a, m;inx h
 ld a, (hl+)|z180|ld a, (hl);inc hl
 ld a, (hl+)|z80|ld a, (hl);inc hl
 ld a, (hl+)|z80n|ld a, (hl);inc hl
@@ -8910,6 +9112,7 @@ ld a, (hl-)|r6k|ld a, (hl);dec hl
 ld a, (hl-)|r800|ld a, (hl);dec hl
 ld a, (hl-)|ti83|ld a, (hl);dec hl
 ld a, (hl-)|ti83plus|ld a, (hl);dec hl
+ld a, (hl-)|vm1|mov a, m;dcx h
 ld a, (hl-)|z180|ld a, (hl);dec hl
 ld a, (hl-)|z80|ld a, (hl);dec hl
 ld a, (hl-)|z80n|ld a, (hl);dec hl
@@ -8927,6 +9130,7 @@ ld a, (hld)|r6k|ld a, (hl);dec hl
 ld a, (hld)|r800|ld a, (hl);dec hl
 ld a, (hld)|ti83|ld a, (hl);dec hl
 ld a, (hld)|ti83plus|ld a, (hl);dec hl
+ld a, (hld)|vm1|mov a, m;dcx h
 ld a, (hld)|z180|ld a, (hl);dec hl
 ld a, (hld)|z80|ld a, (hl);dec hl
 ld a, (hld)|z80n|ld a, (hl);dec hl
@@ -8944,6 +9148,7 @@ ld a, (hli)|r6k|ld a, (hl);inc hl
 ld a, (hli)|r800|ld a, (hl);inc hl
 ld a, (hli)|ti83|ld a, (hl);inc hl
 ld a, (hli)|ti83plus|ld a, (hl);inc hl
+ld a, (hli)|vm1|mov a, m;inx h
 ld a, (hli)|z180|ld a, (hl);inc hl
 ld a, (hli)|z80|ld a, (hl);inc hl
 ld a, (hli)|z80n|ld a, (hl);inc hl
@@ -8981,6 +9186,7 @@ ld b, (de)|r6k|ex de, hl;ld b, (hl);ex de, hl
 ld b, (de)|r800|ex de, hl;ld b, (hl);ex de, hl
 ld b, (de)|ti83|ex de, hl;ld b, (hl);ex de, hl
 ld b, (de)|ti83plus|ex de, hl;ld b, (hl);ex de, hl
+ld b, (de)|vm1|xchg;mov b, m;xchg
 ld b, (de)|z180|ex de, hl;ld b, (hl);ex de, hl
 ld b, (de)|z80|ex de, hl;ld b, (hl);ex de, hl
 ld b, (de)|z80n|ex de, hl;ld b, (hl);ex de, hl
@@ -8998,6 +9204,7 @@ ld b, (de+)|r6k|ex de, hl;ld b, (hl);ex de, hl;inc de
 ld b, (de+)|r800|ex de, hl;ld b, (hl);ex de, hl;inc de
 ld b, (de+)|ti83|ex de, hl;ld b, (hl);ex de, hl;inc de
 ld b, (de+)|ti83plus|ex de, hl;ld b, (hl);ex de, hl;inc de
+ld b, (de+)|vm1|xchg;mov b, m;xchg;inx d
 ld b, (de+)|z180|ex de, hl;ld b, (hl);ex de, hl;inc de
 ld b, (de+)|z80|ex de, hl;ld b, (hl);ex de, hl;inc de
 ld b, (de+)|z80n|ex de, hl;ld b, (hl);ex de, hl;inc de
@@ -9015,6 +9222,7 @@ ld b, (de-)|r6k|ex de, hl;ld b, (hl);ex de, hl;dec de
 ld b, (de-)|r800|ex de, hl;ld b, (hl);ex de, hl;dec de
 ld b, (de-)|ti83|ex de, hl;ld b, (hl);ex de, hl;dec de
 ld b, (de-)|ti83plus|ex de, hl;ld b, (hl);ex de, hl;dec de
+ld b, (de-)|vm1|xchg;mov b, m;xchg;dcx d
 ld b, (de-)|z180|ex de, hl;ld b, (hl);ex de, hl;dec de
 ld b, (de-)|z80|ex de, hl;ld b, (hl);ex de, hl;dec de
 ld b, (de-)|z80n|ex de, hl;ld b, (hl);ex de, hl;dec de
@@ -9033,6 +9241,7 @@ ld b, (hl+)|r6k|ld b, (hl);inc hl
 ld b, (hl+)|r800|ld b, (hl);inc hl
 ld b, (hl+)|ti83|ld b, (hl);inc hl
 ld b, (hl+)|ti83plus|ld b, (hl);inc hl
+ld b, (hl+)|vm1|mov b, m;inx h
 ld b, (hl+)|z180|ld b, (hl);inc hl
 ld b, (hl+)|z80|ld b, (hl);inc hl
 ld b, (hl+)|z80n|ld b, (hl);inc hl
@@ -9051,6 +9260,7 @@ ld b, (hl-)|r6k|ld b, (hl);dec hl
 ld b, (hl-)|r800|ld b, (hl);dec hl
 ld b, (hl-)|ti83|ld b, (hl);dec hl
 ld b, (hl-)|ti83plus|ld b, (hl);dec hl
+ld b, (hl-)|vm1|mov b, m;dcx h
 ld b, (hl-)|z180|ld b, (hl);dec hl
 ld b, (hl-)|z80|ld b, (hl);dec hl
 ld b, (hl-)|z80n|ld b, (hl);dec hl
@@ -9069,6 +9279,7 @@ ld b, (hld)|r6k|ld b, (hl);dec hl
 ld b, (hld)|r800|ld b, (hl);dec hl
 ld b, (hld)|ti83|ld b, (hl);dec hl
 ld b, (hld)|ti83plus|ld b, (hl);dec hl
+ld b, (hld)|vm1|mov b, m;dcx h
 ld b, (hld)|z180|ld b, (hl);dec hl
 ld b, (hld)|z80|ld b, (hl);dec hl
 ld b, (hld)|z80n|ld b, (hl);dec hl
@@ -9087,6 +9298,7 @@ ld b, (hli)|r6k|ld b, (hl);inc hl
 ld b, (hli)|r800|ld b, (hl);inc hl
 ld b, (hli)|ti83|ld b, (hl);inc hl
 ld b, (hli)|ti83plus|ld b, (hl);inc hl
+ld b, (hli)|vm1|mov b, m;inx h
 ld b, (hli)|z180|ld b, (hl);inc hl
 ld b, (hli)|z80|ld b, (hl);inc hl
 ld b, (hli)|z80n|ld b, (hl);inc hl
@@ -9133,6 +9345,7 @@ ld bc', iy|r6k|push iy;pop bc'
 ld bc, (%m)|8080|push h;lhld %m;mov b, h;mov c, l;pop h
 ld bc, (%m)|8085|push h;lhld %m;mov b, h;mov c, l;pop h
 ld bc, (%m)|gbz80|push af;ld a, (%m);ld c, a;ld a, (+(%m)+1);ld b, a;pop af
+ld bc, (%m)|vm1|push h;lhld %m;mov b, h;mov c, l;pop h
 ld bc, (hl)|8080|mov c, m;inx h;mov b, m;dcx h
 ld bc, (hl)|8085|mov c, m;inx h;mov b, m;dcx h
 ld bc, (hl)|gbz80|ld c, (hl);inc hl;ld b, (hl);dec hl
@@ -9146,6 +9359,7 @@ ld bc, (hl)|r6k|ld c, (hl);inc hl;ld b, (hl);dec hl
 ld bc, (hl)|r800|ld c, (hl);inc hl;ld b, (hl);dec hl
 ld bc, (hl)|ti83|ld c, (hl);inc hl;ld b, (hl);dec hl
 ld bc, (hl)|ti83plus|ld c, (hl);inc hl;ld b, (hl);dec hl
+ld bc, (hl)|vm1|mov c, m;inx h;mov b, m;dcx h
 ld bc, (hl)|z180|ld c, (hl);inc hl;ld b, (hl);dec hl
 ld bc, (hl)|z80|ld c, (hl);inc hl;ld b, (hl);dec hl
 ld bc, (hl)|z80n|ld c, (hl);inc hl;ld b, (hl);dec hl
@@ -9164,6 +9378,7 @@ ld bc, (hl+)|r6k|ld c, (hl);inc hl;ld b, (hl);inc hl
 ld bc, (hl+)|r800|ld c, (hl);inc hl;ld b, (hl);inc hl
 ld bc, (hl+)|ti83|ld c, (hl);inc hl;ld b, (hl);inc hl
 ld bc, (hl+)|ti83plus|ld c, (hl);inc hl;ld b, (hl);inc hl
+ld bc, (hl+)|vm1|mov c, m;inx h;mov b, m;inx h
 ld bc, (hl+)|z180|ld c, (hl);inc hl;ld b, (hl);inc hl
 ld bc, (hl+)|z80|ld c, (hl);inc hl;ld b, (hl);inc hl
 ld bc, (hl+)|z80n|ld c, (hl);inc hl;ld b, (hl);inc hl
@@ -9245,6 +9460,7 @@ ld bc, de|r6k|ld b, d;ld c, e
 ld bc, de|r800|ld b, d;ld c, e
 ld bc, de|ti83|ld b, d;ld c, e
 ld bc, de|ti83plus|ld b, d;ld c, e
+ld bc, de|vm1|mov b, d;mov c, e
 ld bc, de|z180|ld b, d;ld c, e
 ld bc, de|z80|ld b, d;ld c, e
 ld bc, de|z80n|ld b, d;ld c, e
@@ -9275,6 +9491,7 @@ ld bc, hl|r3k|ld b, h;ld c, l
 ld bc, hl|r800|ld b, h;ld c, l
 ld bc, hl|ti83|ld b, h;ld c, l
 ld bc, hl|ti83plus|ld b, h;ld c, l
+ld bc, hl|vm1|mov b, h;mov c, l
 ld bc, hl|z180|ld b, h;ld c, l
 ld bc, hl|z80|ld b, h;ld c, l
 ld bc, hl|z80n|ld b, h;ld c, l
@@ -9290,6 +9507,7 @@ ld bc, hl'|r6k|exx;push hl;exx;pop bc
 ld bc, hl'|r800|exx;push hl;exx;pop bc
 ld bc, hl'|ti83|exx;push hl;exx;pop bc
 ld bc, hl'|ti83plus|exx;push hl;exx;pop bc
+ld bc, hl'|vm1|mov b, h';mov c, l'
 ld bc, hl'|z180|exx;push hl;exx;pop bc
 ld bc, hl'|z80|exx;push hl;exx;pop bc
 ld bc, hl'|z80n|exx;push hl;exx;pop bc
@@ -9357,6 +9575,7 @@ ld c, (de)|r6k|ex de, hl;ld c, (hl);ex de, hl
 ld c, (de)|r800|ex de, hl;ld c, (hl);ex de, hl
 ld c, (de)|ti83|ex de, hl;ld c, (hl);ex de, hl
 ld c, (de)|ti83plus|ex de, hl;ld c, (hl);ex de, hl
+ld c, (de)|vm1|xchg;mov c, m;xchg
 ld c, (de)|z180|ex de, hl;ld c, (hl);ex de, hl
 ld c, (de)|z80|ex de, hl;ld c, (hl);ex de, hl
 ld c, (de)|z80n|ex de, hl;ld c, (hl);ex de, hl
@@ -9374,6 +9593,7 @@ ld c, (de+)|r6k|ex de, hl;ld c, (hl);ex de, hl;inc de
 ld c, (de+)|r800|ex de, hl;ld c, (hl);ex de, hl;inc de
 ld c, (de+)|ti83|ex de, hl;ld c, (hl);ex de, hl;inc de
 ld c, (de+)|ti83plus|ex de, hl;ld c, (hl);ex de, hl;inc de
+ld c, (de+)|vm1|xchg;mov c, m;xchg;inx d
 ld c, (de+)|z180|ex de, hl;ld c, (hl);ex de, hl;inc de
 ld c, (de+)|z80|ex de, hl;ld c, (hl);ex de, hl;inc de
 ld c, (de+)|z80n|ex de, hl;ld c, (hl);ex de, hl;inc de
@@ -9391,6 +9611,7 @@ ld c, (de-)|r6k|ex de, hl;ld c, (hl);ex de, hl;dec de
 ld c, (de-)|r800|ex de, hl;ld c, (hl);ex de, hl;dec de
 ld c, (de-)|ti83|ex de, hl;ld c, (hl);ex de, hl;dec de
 ld c, (de-)|ti83plus|ex de, hl;ld c, (hl);ex de, hl;dec de
+ld c, (de-)|vm1|xchg;mov c, m;xchg;dcx d
 ld c, (de-)|z180|ex de, hl;ld c, (hl);ex de, hl;dec de
 ld c, (de-)|z80|ex de, hl;ld c, (hl);ex de, hl;dec de
 ld c, (de-)|z80n|ex de, hl;ld c, (hl);ex de, hl;dec de
@@ -9409,6 +9630,7 @@ ld c, (hl+)|r6k|ld c, (hl);inc hl
 ld c, (hl+)|r800|ld c, (hl);inc hl
 ld c, (hl+)|ti83|ld c, (hl);inc hl
 ld c, (hl+)|ti83plus|ld c, (hl);inc hl
+ld c, (hl+)|vm1|mov c, m;inx h
 ld c, (hl+)|z180|ld c, (hl);inc hl
 ld c, (hl+)|z80|ld c, (hl);inc hl
 ld c, (hl+)|z80n|ld c, (hl);inc hl
@@ -9427,6 +9649,7 @@ ld c, (hl-)|r6k|ld c, (hl);dec hl
 ld c, (hl-)|r800|ld c, (hl);dec hl
 ld c, (hl-)|ti83|ld c, (hl);dec hl
 ld c, (hl-)|ti83plus|ld c, (hl);dec hl
+ld c, (hl-)|vm1|mov c, m;dcx h
 ld c, (hl-)|z180|ld c, (hl);dec hl
 ld c, (hl-)|z80|ld c, (hl);dec hl
 ld c, (hl-)|z80n|ld c, (hl);dec hl
@@ -9445,6 +9668,7 @@ ld c, (hld)|r6k|ld c, (hl);dec hl
 ld c, (hld)|r800|ld c, (hl);dec hl
 ld c, (hld)|ti83|ld c, (hl);dec hl
 ld c, (hld)|ti83plus|ld c, (hl);dec hl
+ld c, (hld)|vm1|mov c, m;dcx h
 ld c, (hld)|z180|ld c, (hl);dec hl
 ld c, (hld)|z80|ld c, (hl);dec hl
 ld c, (hld)|z80n|ld c, (hl);dec hl
@@ -9463,6 +9687,7 @@ ld c, (hli)|r6k|ld c, (hl);inc hl
 ld c, (hli)|r800|ld c, (hl);inc hl
 ld c, (hli)|ti83|ld c, (hl);inc hl
 ld c, (hli)|ti83plus|ld c, (hl);inc hl
+ld c, (hli)|vm1|mov c, m;inx h
 ld c, (hli)|z180|ld c, (hl);inc hl
 ld c, (hli)|z80|ld c, (hl);inc hl
 ld c, (hli)|z80n|ld c, (hl);inc hl
@@ -9500,6 +9725,7 @@ ld d, (de)|r6k|ex de, hl;ld h, (hl);ex de, hl
 ld d, (de)|r800|ex de, hl;ld h, (hl);ex de, hl
 ld d, (de)|ti83|ex de, hl;ld h, (hl);ex de, hl
 ld d, (de)|ti83plus|ex de, hl;ld h, (hl);ex de, hl
+ld d, (de)|vm1|xchg;mov h, m;xchg
 ld d, (de)|z180|ex de, hl;ld h, (hl);ex de, hl
 ld d, (de)|z80|ex de, hl;ld h, (hl);ex de, hl
 ld d, (de)|z80n|ex de, hl;ld h, (hl);ex de, hl
@@ -9517,6 +9743,7 @@ ld d, (de+)|r6k|ex de, hl;ld h, (hl);ex de, hl;inc de
 ld d, (de+)|r800|ex de, hl;ld h, (hl);ex de, hl;inc de
 ld d, (de+)|ti83|ex de, hl;ld h, (hl);ex de, hl;inc de
 ld d, (de+)|ti83plus|ex de, hl;ld h, (hl);ex de, hl;inc de
+ld d, (de+)|vm1|xchg;mov h, m;xchg;inx d
 ld d, (de+)|z180|ex de, hl;ld h, (hl);ex de, hl;inc de
 ld d, (de+)|z80|ex de, hl;ld h, (hl);ex de, hl;inc de
 ld d, (de+)|z80n|ex de, hl;ld h, (hl);ex de, hl;inc de
@@ -9534,6 +9761,7 @@ ld d, (de-)|r6k|ex de, hl;ld h, (hl);ex de, hl;dec de
 ld d, (de-)|r800|ex de, hl;ld h, (hl);ex de, hl;dec de
 ld d, (de-)|ti83|ex de, hl;ld h, (hl);ex de, hl;dec de
 ld d, (de-)|ti83plus|ex de, hl;ld h, (hl);ex de, hl;dec de
+ld d, (de-)|vm1|xchg;mov h, m;xchg;dcx d
 ld d, (de-)|z180|ex de, hl;ld h, (hl);ex de, hl;dec de
 ld d, (de-)|z80|ex de, hl;ld h, (hl);ex de, hl;dec de
 ld d, (de-)|z80n|ex de, hl;ld h, (hl);ex de, hl;dec de
@@ -9552,6 +9780,7 @@ ld d, (hl+)|r6k|ld d, (hl);inc hl
 ld d, (hl+)|r800|ld d, (hl);inc hl
 ld d, (hl+)|ti83|ld d, (hl);inc hl
 ld d, (hl+)|ti83plus|ld d, (hl);inc hl
+ld d, (hl+)|vm1|mov d, m;inx h
 ld d, (hl+)|z180|ld d, (hl);inc hl
 ld d, (hl+)|z80|ld d, (hl);inc hl
 ld d, (hl+)|z80n|ld d, (hl);inc hl
@@ -9570,6 +9799,7 @@ ld d, (hl-)|r6k|ld d, (hl);dec hl
 ld d, (hl-)|r800|ld d, (hl);dec hl
 ld d, (hl-)|ti83|ld d, (hl);dec hl
 ld d, (hl-)|ti83plus|ld d, (hl);dec hl
+ld d, (hl-)|vm1|mov d, m;dcx h
 ld d, (hl-)|z180|ld d, (hl);dec hl
 ld d, (hl-)|z80|ld d, (hl);dec hl
 ld d, (hl-)|z80n|ld d, (hl);dec hl
@@ -9588,6 +9818,7 @@ ld d, (hld)|r6k|ld d, (hl);dec hl
 ld d, (hld)|r800|ld d, (hl);dec hl
 ld d, (hld)|ti83|ld d, (hl);dec hl
 ld d, (hld)|ti83plus|ld d, (hl);dec hl
+ld d, (hld)|vm1|mov d, m;dcx h
 ld d, (hld)|z180|ld d, (hl);dec hl
 ld d, (hld)|z80|ld d, (hl);dec hl
 ld d, (hld)|z80n|ld d, (hl);dec hl
@@ -9606,6 +9837,7 @@ ld d, (hli)|r6k|ld d, (hl);inc hl
 ld d, (hli)|r800|ld d, (hl);inc hl
 ld d, (hli)|ti83|ld d, (hl);inc hl
 ld d, (hli)|ti83plus|ld d, (hl);inc hl
+ld d, (hli)|vm1|mov d, m;inx h
 ld d, (hli)|z180|ld d, (hl);inc hl
 ld d, (hli)|z80|ld d, (hl);inc hl
 ld d, (hli)|z80n|ld d, (hl);inc hl
@@ -9652,6 +9884,7 @@ ld de', iy|r6k|push iy;pop de'
 ld de, (%m)|8080|xchg;lhld %m;xchg
 ld de, (%m)|8085|xchg;lhld %m;xchg
 ld de, (%m)|gbz80|push af;ld a, (%m);ld e, a;ld a, (+(%m)+1);ld d, a;pop af
+ld de, (%m)|vm1|xchg;lhld %m;xchg
 ld de, (hl)|8080|mov e, m;inx h;mov d, m;dcx h
 ld de, (hl)|8085|mov e, m;inx h;mov d, m;dcx h
 ld de, (hl)|gbz80|ld e, (hl);inc hl;ld d, (hl);dec hl
@@ -9665,6 +9898,7 @@ ld de, (hl)|r6k|ld e, (hl);inc hl;ld d, (hl);dec hl
 ld de, (hl)|r800|ld e, (hl);inc hl;ld d, (hl);dec hl
 ld de, (hl)|ti83|ld e, (hl);inc hl;ld d, (hl);dec hl
 ld de, (hl)|ti83plus|ld e, (hl);inc hl;ld d, (hl);dec hl
+ld de, (hl)|vm1|mov e, m;inx h;mov d, m;dcx h
 ld de, (hl)|z180|ld e, (hl);inc hl;ld d, (hl);dec hl
 ld de, (hl)|z80|ld e, (hl);inc hl;ld d, (hl);dec hl
 ld de, (hl)|z80n|ld e, (hl);inc hl;ld d, (hl);dec hl
@@ -9683,6 +9917,7 @@ ld de, (hl+)|r6k|ld e, (hl);inc hl;ld d, (hl);inc hl
 ld de, (hl+)|r800|ld e, (hl);inc hl;ld d, (hl);inc hl
 ld de, (hl+)|ti83|ld e, (hl);inc hl;ld d, (hl);inc hl
 ld de, (hl+)|ti83plus|ld e, (hl);inc hl;ld d, (hl);inc hl
+ld de, (hl+)|vm1|mov e, m;inx h;mov d, m;inx h
 ld de, (hl+)|z180|ld e, (hl);inc hl;ld d, (hl);inc hl
 ld de, (hl+)|z80|ld e, (hl);inc hl;ld d, (hl);inc hl
 ld de, (hl+)|z80n|ld e, (hl);inc hl;ld d, (hl);inc hl
@@ -9749,6 +9984,7 @@ ld de, bc|r6k|ld d, b;ld e, c
 ld de, bc|r800|ld d, b;ld e, c
 ld de, bc|ti83|ld d, b;ld e, c
 ld de, bc|ti83plus|ld d, b;ld e, c
+ld de, bc|vm1|mov d, b;mov e, c
 ld de, bc|z180|ld d, b;ld e, c
 ld de, bc|z80|ld d, b;ld e, c
 ld de, bc|z80n|ld d, b;ld e, c
@@ -9794,6 +10030,7 @@ ld de, hl|r3k|ld d, h;ld e, l
 ld de, hl|r800|ld d, h;ld e, l
 ld de, hl|ti83|ld d, h;ld e, l
 ld de, hl|ti83plus|ld d, h;ld e, l
+ld de, hl|vm1|mov d, h;mov e, l
 ld de, hl|z180|ld d, h;ld e, l
 ld de, hl|z80|ld d, h;ld e, l
 ld de, hl|z80n|ld d, h;ld e, l
@@ -9809,6 +10046,7 @@ ld de, hl'|r6k|exx;push hl;exx;pop de
 ld de, hl'|r800|exx;push hl;exx;pop de
 ld de, hl'|ti83|exx;push hl;exx;pop de
 ld de, hl'|ti83plus|exx;push hl;exx;pop de
+ld de, hl'|vm1|mov d, h';mov e, l'
 ld de, hl'|z180|exx;push hl;exx;pop de
 ld de, hl'|z80|exx;push hl;exx;pop de
 ld de, hl'|z80n|exx;push hl;exx;pop de
@@ -9826,6 +10064,7 @@ ld de, hl+%n|r6k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ld de, hl+%n|r800|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ld de, hl+%n|ti83|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ld de, hl+%n|ti83plus|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|vm1|push h;lxi d, unsigned8(%n);dad d;xchg;pop h
 ld de, hl+%n|z180|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ld de, hl+%n|z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ld de, hl+%n|z80n|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
@@ -9873,6 +10112,7 @@ ld de, sp|r6k|ex de, hl;ld hl, 0;add hl, sp;ex de, hl
 ld de, sp|r800|ex de, hl;ld hl, 0;add hl, sp;ex de, hl
 ld de, sp|ti83|ex de, hl;ld hl, 0;add hl, sp;ex de, hl
 ld de, sp|ti83plus|ex de, hl;ld hl, 0;add hl, sp;ex de, hl
+ld de, sp|vm1|xchg;ld hl, 0;dad sp;xchg
 ld de, sp|z180|ex de, hl;ld hl, 0;add hl, sp;ex de, hl
 ld de, sp|z80|ex de, hl;ld hl, 0;add hl, sp;ex de, hl
 ld de, sp|z80n|ex de, hl;ld hl, 0;add hl, sp;ex de, hl
@@ -9890,6 +10130,7 @@ ld de, sp+%n|r6k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 ld de, sp+%n|r800|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 ld de, sp+%n|ti83|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 ld de, sp+%n|ti83plus|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|vm1|xchg;lxi h, unsigned8(%n);dad sp;xchg
 ld de, sp+%n|z180|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 ld de, sp+%n|z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 ld de, sp+%n|z80n|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
@@ -9927,6 +10168,7 @@ ld e, (de)|r6k|ex de, hl;ld l, (hl);ex de, hl
 ld e, (de)|r800|ex de, hl;ld l, (hl);ex de, hl
 ld e, (de)|ti83|ex de, hl;ld l, (hl);ex de, hl
 ld e, (de)|ti83plus|ex de, hl;ld l, (hl);ex de, hl
+ld e, (de)|vm1|xchg;mov l, m;xchg
 ld e, (de)|z180|ex de, hl;ld l, (hl);ex de, hl
 ld e, (de)|z80|ex de, hl;ld l, (hl);ex de, hl
 ld e, (de)|z80n|ex de, hl;ld l, (hl);ex de, hl
@@ -9944,6 +10186,7 @@ ld e, (de+)|r6k|ex de, hl;ld l, (hl);ex de, hl;inc de
 ld e, (de+)|r800|ex de, hl;ld l, (hl);ex de, hl;inc de
 ld e, (de+)|ti83|ex de, hl;ld l, (hl);ex de, hl;inc de
 ld e, (de+)|ti83plus|ex de, hl;ld l, (hl);ex de, hl;inc de
+ld e, (de+)|vm1|xchg;mov l, m;xchg;inx d
 ld e, (de+)|z180|ex de, hl;ld l, (hl);ex de, hl;inc de
 ld e, (de+)|z80|ex de, hl;ld l, (hl);ex de, hl;inc de
 ld e, (de+)|z80n|ex de, hl;ld l, (hl);ex de, hl;inc de
@@ -9961,6 +10204,7 @@ ld e, (de-)|r6k|ex de, hl;ld l, (hl);ex de, hl;dec de
 ld e, (de-)|r800|ex de, hl;ld l, (hl);ex de, hl;dec de
 ld e, (de-)|ti83|ex de, hl;ld l, (hl);ex de, hl;dec de
 ld e, (de-)|ti83plus|ex de, hl;ld l, (hl);ex de, hl;dec de
+ld e, (de-)|vm1|xchg;mov l, m;xchg;dcx d
 ld e, (de-)|z180|ex de, hl;ld l, (hl);ex de, hl;dec de
 ld e, (de-)|z80|ex de, hl;ld l, (hl);ex de, hl;dec de
 ld e, (de-)|z80n|ex de, hl;ld l, (hl);ex de, hl;dec de
@@ -9979,6 +10223,7 @@ ld e, (hl+)|r6k|ld e, (hl);inc hl
 ld e, (hl+)|r800|ld e, (hl);inc hl
 ld e, (hl+)|ti83|ld e, (hl);inc hl
 ld e, (hl+)|ti83plus|ld e, (hl);inc hl
+ld e, (hl+)|vm1|mov e, m;inx h
 ld e, (hl+)|z180|ld e, (hl);inc hl
 ld e, (hl+)|z80|ld e, (hl);inc hl
 ld e, (hl+)|z80n|ld e, (hl);inc hl
@@ -9997,6 +10242,7 @@ ld e, (hl-)|r6k|ld e, (hl);dec hl
 ld e, (hl-)|r800|ld e, (hl);dec hl
 ld e, (hl-)|ti83|ld e, (hl);dec hl
 ld e, (hl-)|ti83plus|ld e, (hl);dec hl
+ld e, (hl-)|vm1|mov e, m;dcx h
 ld e, (hl-)|z180|ld e, (hl);dec hl
 ld e, (hl-)|z80|ld e, (hl);dec hl
 ld e, (hl-)|z80n|ld e, (hl);dec hl
@@ -10015,6 +10261,7 @@ ld e, (hld)|r6k|ld e, (hl);dec hl
 ld e, (hld)|r800|ld e, (hl);dec hl
 ld e, (hld)|ti83|ld e, (hl);dec hl
 ld e, (hld)|ti83plus|ld e, (hl);dec hl
+ld e, (hld)|vm1|mov e, m;dcx h
 ld e, (hld)|z180|ld e, (hl);dec hl
 ld e, (hld)|z80|ld e, (hl);dec hl
 ld e, (hld)|z80n|ld e, (hl);dec hl
@@ -10033,6 +10280,7 @@ ld e, (hli)|r6k|ld e, (hl);inc hl
 ld e, (hli)|r800|ld e, (hl);inc hl
 ld e, (hli)|ti83|ld e, (hl);inc hl
 ld e, (hli)|ti83plus|ld e, (hl);inc hl
+ld e, (hli)|vm1|mov e, m;inx h
 ld e, (hli)|z180|ld e, (hl);inc hl
 ld e, (hli)|z80|ld e, (hl);inc hl
 ld e, (hli)|z80n|ld e, (hl);inc hl
@@ -10070,6 +10318,7 @@ ld h, (de)|r6k|ex de, hl;ld d, (hl);ex de, hl
 ld h, (de)|r800|ex de, hl;ld d, (hl);ex de, hl
 ld h, (de)|ti83|ex de, hl;ld d, (hl);ex de, hl
 ld h, (de)|ti83plus|ex de, hl;ld d, (hl);ex de, hl
+ld h, (de)|vm1|xchg;mov d, m;xchg
 ld h, (de)|z180|ex de, hl;ld d, (hl);ex de, hl
 ld h, (de)|z80|ex de, hl;ld d, (hl);ex de, hl
 ld h, (de)|z80n|ex de, hl;ld d, (hl);ex de, hl
@@ -10087,6 +10336,7 @@ ld h, (de+)|r6k|ex de, hl;ld d, (hl);ex de, hl;inc de
 ld h, (de+)|r800|ex de, hl;ld d, (hl);ex de, hl;inc de
 ld h, (de+)|ti83|ex de, hl;ld d, (hl);ex de, hl;inc de
 ld h, (de+)|ti83plus|ex de, hl;ld d, (hl);ex de, hl;inc de
+ld h, (de+)|vm1|xchg;mov d, m;xchg;inx d
 ld h, (de+)|z180|ex de, hl;ld d, (hl);ex de, hl;inc de
 ld h, (de+)|z80|ex de, hl;ld d, (hl);ex de, hl;inc de
 ld h, (de+)|z80n|ex de, hl;ld d, (hl);ex de, hl;inc de
@@ -10104,6 +10354,7 @@ ld h, (de-)|r6k|ex de, hl;ld d, (hl);ex de, hl;dec de
 ld h, (de-)|r800|ex de, hl;ld d, (hl);ex de, hl;dec de
 ld h, (de-)|ti83|ex de, hl;ld d, (hl);ex de, hl;dec de
 ld h, (de-)|ti83plus|ex de, hl;ld d, (hl);ex de, hl;dec de
+ld h, (de-)|vm1|xchg;mov d, m;xchg;dcx d
 ld h, (de-)|z180|ex de, hl;ld d, (hl);ex de, hl;dec de
 ld h, (de-)|z80|ex de, hl;ld d, (hl);ex de, hl;dec de
 ld h, (de-)|z80n|ex de, hl;ld d, (hl);ex de, hl;dec de
@@ -10122,6 +10373,7 @@ ld h, (hl+)|r6k|ld h, (hl);inc hl
 ld h, (hl+)|r800|ld h, (hl);inc hl
 ld h, (hl+)|ti83|ld h, (hl);inc hl
 ld h, (hl+)|ti83plus|ld h, (hl);inc hl
+ld h, (hl+)|vm1|mov h, m;inx h
 ld h, (hl+)|z180|ld h, (hl);inc hl
 ld h, (hl+)|z80|ld h, (hl);inc hl
 ld h, (hl+)|z80n|ld h, (hl);inc hl
@@ -10140,6 +10392,7 @@ ld h, (hl-)|r6k|ld h, (hl);dec hl
 ld h, (hl-)|r800|ld h, (hl);dec hl
 ld h, (hl-)|ti83|ld h, (hl);dec hl
 ld h, (hl-)|ti83plus|ld h, (hl);dec hl
+ld h, (hl-)|vm1|mov h, m;dcx h
 ld h, (hl-)|z180|ld h, (hl);dec hl
 ld h, (hl-)|z80|ld h, (hl);dec hl
 ld h, (hl-)|z80n|ld h, (hl);dec hl
@@ -10158,6 +10411,7 @@ ld h, (hld)|r6k|ld h, (hl);dec hl
 ld h, (hld)|r800|ld h, (hl);dec hl
 ld h, (hld)|ti83|ld h, (hl);dec hl
 ld h, (hld)|ti83plus|ld h, (hl);dec hl
+ld h, (hld)|vm1|mov h, m;dcx h
 ld h, (hld)|z180|ld h, (hl);dec hl
 ld h, (hld)|z80|ld h, (hl);dec hl
 ld h, (hld)|z80n|ld h, (hl);dec hl
@@ -10176,9 +10430,11 @@ ld h, (hli)|r6k|ld h, (hl);inc hl
 ld h, (hli)|r800|ld h, (hl);inc hl
 ld h, (hli)|ti83|ld h, (hl);inc hl
 ld h, (hli)|ti83plus|ld h, (hl);inc hl
+ld h, (hli)|vm1|mov h, m;inx h
 ld h, (hli)|z180|ld h, (hl);inc hl
 ld h, (hli)|z80|ld h, (hl);inc hl
 ld h, (hli)|z80n|ld h, (hl);inc hl
+ld hl', bc|vm1|mov h', b;mov l', c
 ld hl', bc'|ez80|exx;ld h, b;ld l, c;exx
 ld hl', bc'|ez80_z80|exx;ld h, b;ld l, c;exx
 ld hl', bc'|kc160|exx;ld h, b;ld l, c;exx
@@ -10193,6 +10449,7 @@ ld hl', bc'|ti83plus|exx;ld h, b;ld l, c;exx
 ld hl', bc'|z180|exx;ld h, b;ld l, c;exx
 ld hl', bc'|z80|exx;ld h, b;ld l, c;exx
 ld hl', bc'|z80n|exx;ld h, b;ld l, c;exx
+ld hl', de|vm1|mov h', d;mov l', e
 ld hl', de'|ez80|exx;ld h, d;ld l, e;exx
 ld hl', de'|ez80_z80|exx;ld h, d;ld l, e;exx
 ld hl', de'|kc160|exx;ld h, d;ld l, e;exx
@@ -10212,6 +10469,7 @@ ld hl', hl|r3k|ld h', h;ld l', l
 ld hl', hl|r4k|ld h', h;ld l', l
 ld hl', hl|r5k|ld h', h;ld l', l
 ld hl', hl|r6k|ld h', h;ld l', l
+ld hl', hl|vm1|push h;pop h'
 ld hl, (%m)|gbz80|push af;ld a, (%m);ld l, a;ld a, (+(%m)+1);ld h, a;pop af
 ld hl, (de)|8080|xchg;mov e, m;inx h;mov d, m;dcx h;xchg
 ld hl, (de)|ez80|ex de, hl;ld e, (hl);inc hl;ld d, (hl);dec hl;ex de, hl
@@ -10238,6 +10496,7 @@ ld hl, (hl)|kc160_z80|push af;ld a, (hl);inc hl;ld h, (hl);ld l, a;pop af
 ld hl, (hl)|r800|push af;ld a, (hl);inc hl;ld h, (hl);ld l, a;pop af
 ld hl, (hl)|ti83|push af;ld a, (hl);inc hl;ld h, (hl);ld l, a;pop af
 ld hl, (hl)|ti83plus|push af;ld a, (hl);inc hl;ld h, (hl);ld l, a;pop af
+ld hl, (hl)|vm1|push psw;mov a, m;inx h;mov h, m;mov l, a;pop psw
 ld hl, (hl)|z180|push af;ld a, (hl);inc hl;ld h, (hl);ld l, a;pop af
 ld hl, (hl)|z80|push af;ld a, (hl);inc hl;ld h, (hl);ld l, a;pop af
 ld hl, (hl)|z80n|push af;ld a, (hl);inc hl;ld h, (hl);ld l, a;pop af
@@ -10281,6 +10540,7 @@ ld hl, bc|r3k|ld h, b;ld l, c
 ld hl, bc|r800|ld h, b;ld l, c
 ld hl, bc|ti83|ld h, b;ld l, c
 ld hl, bc|ti83plus|ld h, b;ld l, c
+ld hl, bc|vm1|mov h, b;mov l, c
 ld hl, bc|z180|ld h, b;ld l, c
 ld hl, bc|z80|ld h, b;ld l, c
 ld hl, bc|z80n|ld h, b;ld l, c
@@ -10311,6 +10571,7 @@ ld hl, de|r3k|ld h, d;ld l, e
 ld hl, de|r800|ld h, d;ld l, e
 ld hl, de|ti83|ld h, d;ld l, e
 ld hl, de|ti83plus|ld h, d;ld l, e
+ld hl, de|vm1|mov h, d;mov l, e
 ld hl, de|z180|ld h, d;ld l, e
 ld hl, de|z80|ld h, d;ld l, e
 ld hl, de|z80n|ld h, d;ld l, e
@@ -10341,6 +10602,7 @@ ld hl, hl'|r6k|exx;push hl;exx;pop hl
 ld hl, hl'|r800|exx;push hl;exx;pop hl
 ld hl, hl'|ti83|exx;push hl;exx;pop hl
 ld hl, hl'|ti83plus|exx;push hl;exx;pop hl
+ld hl, hl'|vm1|push h';pop h
 ld hl, hl'|z180|exx;push hl;exx;pop hl
 ld hl, hl'|z80|exx;push hl;exx;pop hl
 ld hl, hl'|z80n|exx;push hl;exx;pop hl
@@ -10377,6 +10639,7 @@ ld hl, sp|r6k|ld hl, 0;add hl, sp
 ld hl, sp|r800|ld hl, 0;add hl, sp
 ld hl, sp|ti83|ld hl, 0;add hl, sp
 ld hl, sp|ti83plus|ld hl, 0;add hl, sp
+ld hl, sp|vm1|ld hl, 0;dad sp
 ld hl, sp|z180|ld hl, 0;add hl, sp
 ld hl, sp|z80|ld hl, 0;add hl, sp
 ld hl, sp|z80n|ld hl, 0;add hl, sp
@@ -10393,6 +10656,7 @@ ld hl, sp+%d|r6k|ld hl, signed8(%d);add hl, sp
 ld hl, sp+%d|r800|ld hl, signed8(%d);add hl, sp
 ld hl, sp+%d|ti83|ld hl, signed8(%d);add hl, sp
 ld hl, sp+%d|ti83plus|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|vm1|lxi h, signed8(%d);dad sp
 ld hl, sp+%d|z180|ld hl, signed8(%d);add hl, sp
 ld hl, sp+%d|z80|ld hl, signed8(%d);add hl, sp
 ld hl, sp+%d|z80n|ld hl, signed8(%d);add hl, sp
@@ -10781,6 +11045,7 @@ ld l, (de)|r6k|ex de, hl;ld e, (hl);ex de, hl
 ld l, (de)|r800|ex de, hl;ld e, (hl);ex de, hl
 ld l, (de)|ti83|ex de, hl;ld e, (hl);ex de, hl
 ld l, (de)|ti83plus|ex de, hl;ld e, (hl);ex de, hl
+ld l, (de)|vm1|xchg;mov e, m;xchg
 ld l, (de)|z180|ex de, hl;ld e, (hl);ex de, hl
 ld l, (de)|z80|ex de, hl;ld e, (hl);ex de, hl
 ld l, (de)|z80n|ex de, hl;ld e, (hl);ex de, hl
@@ -10798,6 +11063,7 @@ ld l, (de+)|r6k|ex de, hl;ld e, (hl);ex de, hl;inc de
 ld l, (de+)|r800|ex de, hl;ld e, (hl);ex de, hl;inc de
 ld l, (de+)|ti83|ex de, hl;ld e, (hl);ex de, hl;inc de
 ld l, (de+)|ti83plus|ex de, hl;ld e, (hl);ex de, hl;inc de
+ld l, (de+)|vm1|xchg;mov e, m;xchg;inx d
 ld l, (de+)|z180|ex de, hl;ld e, (hl);ex de, hl;inc de
 ld l, (de+)|z80|ex de, hl;ld e, (hl);ex de, hl;inc de
 ld l, (de+)|z80n|ex de, hl;ld e, (hl);ex de, hl;inc de
@@ -10815,6 +11081,7 @@ ld l, (de-)|r6k|ex de, hl;ld e, (hl);ex de, hl;dec de
 ld l, (de-)|r800|ex de, hl;ld e, (hl);ex de, hl;dec de
 ld l, (de-)|ti83|ex de, hl;ld e, (hl);ex de, hl;dec de
 ld l, (de-)|ti83plus|ex de, hl;ld e, (hl);ex de, hl;dec de
+ld l, (de-)|vm1|xchg;mov e, m;xchg;dcx d
 ld l, (de-)|z180|ex de, hl;ld e, (hl);ex de, hl;dec de
 ld l, (de-)|z80|ex de, hl;ld e, (hl);ex de, hl;dec de
 ld l, (de-)|z80n|ex de, hl;ld e, (hl);ex de, hl;dec de
@@ -10833,6 +11100,7 @@ ld l, (hl+)|r6k|ld l, (hl);inc hl
 ld l, (hl+)|r800|ld l, (hl);inc hl
 ld l, (hl+)|ti83|ld l, (hl);inc hl
 ld l, (hl+)|ti83plus|ld l, (hl);inc hl
+ld l, (hl+)|vm1|mov l, m;inx h
 ld l, (hl+)|z180|ld l, (hl);inc hl
 ld l, (hl+)|z80|ld l, (hl);inc hl
 ld l, (hl+)|z80n|ld l, (hl);inc hl
@@ -10851,6 +11119,7 @@ ld l, (hl-)|r6k|ld l, (hl);dec hl
 ld l, (hl-)|r800|ld l, (hl);dec hl
 ld l, (hl-)|ti83|ld l, (hl);dec hl
 ld l, (hl-)|ti83plus|ld l, (hl);dec hl
+ld l, (hl-)|vm1|mov l, m;dcx h
 ld l, (hl-)|z180|ld l, (hl);dec hl
 ld l, (hl-)|z80|ld l, (hl);dec hl
 ld l, (hl-)|z80n|ld l, (hl);dec hl
@@ -10869,6 +11138,7 @@ ld l, (hld)|r6k|ld l, (hl);dec hl
 ld l, (hld)|r800|ld l, (hl);dec hl
 ld l, (hld)|ti83|ld l, (hl);dec hl
 ld l, (hld)|ti83plus|ld l, (hl);dec hl
+ld l, (hld)|vm1|mov l, m;dcx h
 ld l, (hld)|z180|ld l, (hl);dec hl
 ld l, (hld)|z80|ld l, (hl);dec hl
 ld l, (hld)|z80n|ld l, (hl);dec hl
@@ -10887,6 +11157,7 @@ ld l, (hli)|r6k|ld l, (hl);inc hl
 ld l, (hli)|r800|ld l, (hl);inc hl
 ld l, (hli)|ti83|ld l, (hl);inc hl
 ld l, (hli)|ti83plus|ld l, (hl);inc hl
+ld l, (hli)|vm1|mov l, m;inx h
 ld l, (hli)|z180|ld l, (hl);inc hl
 ld l, (hli)|z80|ld l, (hl);inc hl
 ld l, (hli)|z80n|ld l, (hl);inc hl
@@ -11349,6 +11620,7 @@ ld.sil l, (hli)|ez80|ld.sil l, (hl);inc.sil hl
 ldd|8080|extern __z80asm__ldd;call __z80asm__ldd
 ldd|8085|extern __z80asm__ldd;call __z80asm__ldd
 ldd|gbz80|extern __z80asm__ldd;call __z80asm__ldd
+ldd|vm1|extern __z80asm__ldd;call __z80asm__ldd
 ldd (bc), a|8080|stax b;dcx b
 ldd (bc), a|8085|stax b;dcx b
 ldd (bc), a|ez80|ld (bc), a;dec bc
@@ -11364,6 +11636,7 @@ ldd (bc), a|r6k|ld (bc), a;dec bc
 ldd (bc), a|r800|ld (bc), a;dec bc
 ldd (bc), a|ti83|ld (bc), a;dec bc
 ldd (bc), a|ti83plus|ld (bc), a;dec bc
+ldd (bc), a|vm1|stax b;dcx b
 ldd (bc), a|z180|ld (bc), a;dec bc
 ldd (bc), a|z80|ld (bc), a;dec bc
 ldd (bc), a|z80n|ld (bc), a;dec bc
@@ -11382,6 +11655,7 @@ ldd (de), %n|r6k|ex de, hl;ld (hl), %n;ex de, hl;dec de
 ldd (de), %n|r800|ex de, hl;ld (hl), %n;ex de, hl;dec de
 ldd (de), %n|ti83|ex de, hl;ld (hl), %n;ex de, hl;dec de
 ldd (de), %n|ti83plus|ex de, hl;ld (hl), %n;ex de, hl;dec de
+ldd (de), %n|vm1|xchg;mvi m, %n;xchg;dcx d
 ldd (de), %n|z180|ex de, hl;ld (hl), %n;ex de, hl;dec de
 ldd (de), %n|z80|ex de, hl;ld (hl), %n;ex de, hl;dec de
 ldd (de), %n|z80n|ex de, hl;ld (hl), %n;ex de, hl;dec de
@@ -11400,6 +11674,7 @@ ldd (de), a|r6k|ld (de), a;dec de
 ldd (de), a|r800|ld (de), a;dec de
 ldd (de), a|ti83|ld (de), a;dec de
 ldd (de), a|ti83plus|ld (de), a;dec de
+ldd (de), a|vm1|stax d;dcx d
 ldd (de), a|z180|ld (de), a;dec de
 ldd (de), a|z80|ld (de), a;dec de
 ldd (de), a|z80n|ld (de), a;dec de
@@ -11418,6 +11693,7 @@ ldd (de), b|r6k|ex de, hl;ld (hl), b;ex de, hl;dec de
 ldd (de), b|r800|ex de, hl;ld (hl), b;ex de, hl;dec de
 ldd (de), b|ti83|ex de, hl;ld (hl), b;ex de, hl;dec de
 ldd (de), b|ti83plus|ex de, hl;ld (hl), b;ex de, hl;dec de
+ldd (de), b|vm1|xchg;mov m, b;xchg;dcx d
 ldd (de), b|z180|ex de, hl;ld (hl), b;ex de, hl;dec de
 ldd (de), b|z80|ex de, hl;ld (hl), b;ex de, hl;dec de
 ldd (de), b|z80n|ex de, hl;ld (hl), b;ex de, hl;dec de
@@ -11435,6 +11711,7 @@ ldd (de), c|r6k|ex de, hl;ld (hl), c;ex de, hl;dec de
 ldd (de), c|r800|ex de, hl;ld (hl), c;ex de, hl;dec de
 ldd (de), c|ti83|ex de, hl;ld (hl), c;ex de, hl;dec de
 ldd (de), c|ti83plus|ex de, hl;ld (hl), c;ex de, hl;dec de
+ldd (de), c|vm1|xchg;mov m, c;xchg;dcx d
 ldd (de), c|z180|ex de, hl;ld (hl), c;ex de, hl;dec de
 ldd (de), c|z80|ex de, hl;ld (hl), c;ex de, hl;dec de
 ldd (de), c|z80n|ex de, hl;ld (hl), c;ex de, hl;dec de
@@ -11452,6 +11729,7 @@ ldd (de), d|r6k|ex de, hl;ld (hl), h;ex de, hl;dec de
 ldd (de), d|r800|ex de, hl;ld (hl), h;ex de, hl;dec de
 ldd (de), d|ti83|ex de, hl;ld (hl), h;ex de, hl;dec de
 ldd (de), d|ti83plus|ex de, hl;ld (hl), h;ex de, hl;dec de
+ldd (de), d|vm1|xchg;mov m, h;xchg;dcx d
 ldd (de), d|z180|ex de, hl;ld (hl), h;ex de, hl;dec de
 ldd (de), d|z80|ex de, hl;ld (hl), h;ex de, hl;dec de
 ldd (de), d|z80n|ex de, hl;ld (hl), h;ex de, hl;dec de
@@ -11469,6 +11747,7 @@ ldd (de), e|r6k|ex de, hl;ld (hl), l;ex de, hl;dec de
 ldd (de), e|r800|ex de, hl;ld (hl), l;ex de, hl;dec de
 ldd (de), e|ti83|ex de, hl;ld (hl), l;ex de, hl;dec de
 ldd (de), e|ti83plus|ex de, hl;ld (hl), l;ex de, hl;dec de
+ldd (de), e|vm1|xchg;mov m, l;xchg;dcx d
 ldd (de), e|z180|ex de, hl;ld (hl), l;ex de, hl;dec de
 ldd (de), e|z80|ex de, hl;ld (hl), l;ex de, hl;dec de
 ldd (de), e|z80n|ex de, hl;ld (hl), l;ex de, hl;dec de
@@ -11486,6 +11765,7 @@ ldd (de), h|r6k|ex de, hl;ld (hl), d;ex de, hl;dec de
 ldd (de), h|r800|ex de, hl;ld (hl), d;ex de, hl;dec de
 ldd (de), h|ti83|ex de, hl;ld (hl), d;ex de, hl;dec de
 ldd (de), h|ti83plus|ex de, hl;ld (hl), d;ex de, hl;dec de
+ldd (de), h|vm1|xchg;mov m, d;xchg;dcx d
 ldd (de), h|z180|ex de, hl;ld (hl), d;ex de, hl;dec de
 ldd (de), h|z80|ex de, hl;ld (hl), d;ex de, hl;dec de
 ldd (de), h|z80n|ex de, hl;ld (hl), d;ex de, hl;dec de
@@ -11503,6 +11783,7 @@ ldd (de), l|r6k|ex de, hl;ld (hl), e;ex de, hl;dec de
 ldd (de), l|r800|ex de, hl;ld (hl), e;ex de, hl;dec de
 ldd (de), l|ti83|ex de, hl;ld (hl), e;ex de, hl;dec de
 ldd (de), l|ti83plus|ex de, hl;ld (hl), e;ex de, hl;dec de
+ldd (de), l|vm1|xchg;mov m, e;xchg;dcx d
 ldd (de), l|z180|ex de, hl;ld (hl), e;ex de, hl;dec de
 ldd (de), l|z80|ex de, hl;ld (hl), e;ex de, hl;dec de
 ldd (de), l|z80n|ex de, hl;ld (hl), e;ex de, hl;dec de
@@ -11521,6 +11802,7 @@ ldd (hl), %n|r6k|ld (hl), %n;dec hl
 ldd (hl), %n|r800|ld (hl), %n;dec hl
 ldd (hl), %n|ti83|ld (hl), %n;dec hl
 ldd (hl), %n|ti83plus|ld (hl), %n;dec hl
+ldd (hl), %n|vm1|mvi m, %n;dcx h
 ldd (hl), %n|z180|ld (hl), %n;dec hl
 ldd (hl), %n|z80|ld (hl), %n;dec hl
 ldd (hl), %n|z80n|ld (hl), %n;dec hl
@@ -11538,6 +11820,7 @@ ldd (hl), a|r6k|ld (hl), a;dec hl
 ldd (hl), a|r800|ld (hl), a;dec hl
 ldd (hl), a|ti83|ld (hl), a;dec hl
 ldd (hl), a|ti83plus|ld (hl), a;dec hl
+ldd (hl), a|vm1|mov m, a;dcx h
 ldd (hl), a|z180|ld (hl), a;dec hl
 ldd (hl), a|z80|ld (hl), a;dec hl
 ldd (hl), a|z80n|ld (hl), a;dec hl
@@ -11557,6 +11840,7 @@ ldd (hl), b|r6k|ld (hl), b;dec hl
 ldd (hl), b|r800|ld (hl), b;dec hl
 ldd (hl), b|ti83|ld (hl), b;dec hl
 ldd (hl), b|ti83plus|ld (hl), b;dec hl
+ldd (hl), b|vm1|mov m, b;dcx h
 ldd (hl), b|z180|ld (hl), b;dec hl
 ldd (hl), b|z80|ld (hl), b;dec hl
 ldd (hl), b|z80n|ld (hl), b;dec hl
@@ -11576,6 +11860,7 @@ ldd (hl), c|r6k|ld (hl), c;dec hl
 ldd (hl), c|r800|ld (hl), c;dec hl
 ldd (hl), c|ti83|ld (hl), c;dec hl
 ldd (hl), c|ti83plus|ld (hl), c;dec hl
+ldd (hl), c|vm1|mov m, c;dcx h
 ldd (hl), c|z180|ld (hl), c;dec hl
 ldd (hl), c|z80|ld (hl), c;dec hl
 ldd (hl), c|z80n|ld (hl), c;dec hl
@@ -11595,6 +11880,7 @@ ldd (hl), d|r6k|ld (hl), d;dec hl
 ldd (hl), d|r800|ld (hl), d;dec hl
 ldd (hl), d|ti83|ld (hl), d;dec hl
 ldd (hl), d|ti83plus|ld (hl), d;dec hl
+ldd (hl), d|vm1|mov m, d;dcx h
 ldd (hl), d|z180|ld (hl), d;dec hl
 ldd (hl), d|z80|ld (hl), d;dec hl
 ldd (hl), d|z80n|ld (hl), d;dec hl
@@ -11614,6 +11900,7 @@ ldd (hl), e|r6k|ld (hl), e;dec hl
 ldd (hl), e|r800|ld (hl), e;dec hl
 ldd (hl), e|ti83|ld (hl), e;dec hl
 ldd (hl), e|ti83plus|ld (hl), e;dec hl
+ldd (hl), e|vm1|mov m, e;dcx h
 ldd (hl), e|z180|ld (hl), e;dec hl
 ldd (hl), e|z80|ld (hl), e;dec hl
 ldd (hl), e|z80n|ld (hl), e;dec hl
@@ -11633,6 +11920,7 @@ ldd (hl), h|r6k|ld (hl), h;dec hl
 ldd (hl), h|r800|ld (hl), h;dec hl
 ldd (hl), h|ti83|ld (hl), h;dec hl
 ldd (hl), h|ti83plus|ld (hl), h;dec hl
+ldd (hl), h|vm1|mov m, h;dcx h
 ldd (hl), h|z180|ld (hl), h;dec hl
 ldd (hl), h|z80|ld (hl), h;dec hl
 ldd (hl), h|z80n|ld (hl), h;dec hl
@@ -11652,6 +11940,7 @@ ldd (hl), l|r6k|ld (hl), l;dec hl
 ldd (hl), l|r800|ld (hl), l;dec hl
 ldd (hl), l|ti83|ld (hl), l;dec hl
 ldd (hl), l|ti83plus|ld (hl), l;dec hl
+ldd (hl), l|vm1|mov m, l;dcx h
 ldd (hl), l|z180|ld (hl), l;dec hl
 ldd (hl), l|z80|ld (hl), l;dec hl
 ldd (hl), l|z80n|ld (hl), l;dec hl
@@ -11686,6 +11975,7 @@ ldd a, (bc)|r6k|ld a, (bc);dec bc
 ldd a, (bc)|r800|ld a, (bc);dec bc
 ldd a, (bc)|ti83|ld a, (bc);dec bc
 ldd a, (bc)|ti83plus|ld a, (bc);dec bc
+ldd a, (bc)|vm1|ldax b;dcx b
 ldd a, (bc)|z180|ld a, (bc);dec bc
 ldd a, (bc)|z80|ld a, (bc);dec bc
 ldd a, (bc)|z80n|ld a, (bc);dec bc
@@ -11704,6 +11994,7 @@ ldd a, (de)|r6k|ld a, (de);dec de
 ldd a, (de)|r800|ld a, (de);dec de
 ldd a, (de)|ti83|ld a, (de);dec de
 ldd a, (de)|ti83plus|ld a, (de);dec de
+ldd a, (de)|vm1|ldax d;dcx d
 ldd a, (de)|z180|ld a, (de);dec de
 ldd a, (de)|z80|ld a, (de);dec de
 ldd a, (de)|z80n|ld a, (de);dec de
@@ -11721,6 +12012,7 @@ ldd a, (hl)|r6k|ld a, (hl);dec hl
 ldd a, (hl)|r800|ld a, (hl);dec hl
 ldd a, (hl)|ti83|ld a, (hl);dec hl
 ldd a, (hl)|ti83plus|ld a, (hl);dec hl
+ldd a, (hl)|vm1|mov a, m;dcx h
 ldd a, (hl)|z180|ld a, (hl);dec hl
 ldd a, (hl)|z80|ld a, (hl);dec hl
 ldd a, (hl)|z80n|ld a, (hl);dec hl
@@ -11743,6 +12035,7 @@ ldd b, (de)|r6k|ex de, hl;ld b, (hl);ex de, hl;dec de
 ldd b, (de)|r800|ex de, hl;ld b, (hl);ex de, hl;dec de
 ldd b, (de)|ti83|ex de, hl;ld b, (hl);ex de, hl;dec de
 ldd b, (de)|ti83plus|ex de, hl;ld b, (hl);ex de, hl;dec de
+ldd b, (de)|vm1|xchg;mov b, m;xchg;dcx d
 ldd b, (de)|z180|ex de, hl;ld b, (hl);ex de, hl;dec de
 ldd b, (de)|z80|ex de, hl;ld b, (hl);ex de, hl;dec de
 ldd b, (de)|z80n|ex de, hl;ld b, (hl);ex de, hl;dec de
@@ -11761,6 +12054,7 @@ ldd b, (hl)|r6k|ld b, (hl);dec hl
 ldd b, (hl)|r800|ld b, (hl);dec hl
 ldd b, (hl)|ti83|ld b, (hl);dec hl
 ldd b, (hl)|ti83plus|ld b, (hl);dec hl
+ldd b, (hl)|vm1|mov b, m;dcx h
 ldd b, (hl)|z180|ld b, (hl);dec hl
 ldd b, (hl)|z80|ld b, (hl);dec hl
 ldd b, (hl)|z80n|ld b, (hl);dec hl
@@ -11783,6 +12077,7 @@ ldd c, (de)|r6k|ex de, hl;ld c, (hl);ex de, hl;dec de
 ldd c, (de)|r800|ex de, hl;ld c, (hl);ex de, hl;dec de
 ldd c, (de)|ti83|ex de, hl;ld c, (hl);ex de, hl;dec de
 ldd c, (de)|ti83plus|ex de, hl;ld c, (hl);ex de, hl;dec de
+ldd c, (de)|vm1|xchg;mov c, m;xchg;dcx d
 ldd c, (de)|z180|ex de, hl;ld c, (hl);ex de, hl;dec de
 ldd c, (de)|z80|ex de, hl;ld c, (hl);ex de, hl;dec de
 ldd c, (de)|z80n|ex de, hl;ld c, (hl);ex de, hl;dec de
@@ -11801,6 +12096,7 @@ ldd c, (hl)|r6k|ld c, (hl);dec hl
 ldd c, (hl)|r800|ld c, (hl);dec hl
 ldd c, (hl)|ti83|ld c, (hl);dec hl
 ldd c, (hl)|ti83plus|ld c, (hl);dec hl
+ldd c, (hl)|vm1|mov c, m;dcx h
 ldd c, (hl)|z180|ld c, (hl);dec hl
 ldd c, (hl)|z80|ld c, (hl);dec hl
 ldd c, (hl)|z80n|ld c, (hl);dec hl
@@ -11823,6 +12119,7 @@ ldd d, (de)|r6k|ex de, hl;ld h, (hl);ex de, hl;dec de
 ldd d, (de)|r800|ex de, hl;ld h, (hl);ex de, hl;dec de
 ldd d, (de)|ti83|ex de, hl;ld h, (hl);ex de, hl;dec de
 ldd d, (de)|ti83plus|ex de, hl;ld h, (hl);ex de, hl;dec de
+ldd d, (de)|vm1|xchg;mov h, m;xchg;dcx d
 ldd d, (de)|z180|ex de, hl;ld h, (hl);ex de, hl;dec de
 ldd d, (de)|z80|ex de, hl;ld h, (hl);ex de, hl;dec de
 ldd d, (de)|z80n|ex de, hl;ld h, (hl);ex de, hl;dec de
@@ -11841,6 +12138,7 @@ ldd d, (hl)|r6k|ld d, (hl);dec hl
 ldd d, (hl)|r800|ld d, (hl);dec hl
 ldd d, (hl)|ti83|ld d, (hl);dec hl
 ldd d, (hl)|ti83plus|ld d, (hl);dec hl
+ldd d, (hl)|vm1|mov d, m;dcx h
 ldd d, (hl)|z180|ld d, (hl);dec hl
 ldd d, (hl)|z80|ld d, (hl);dec hl
 ldd d, (hl)|z80n|ld d, (hl);dec hl
@@ -11863,6 +12161,7 @@ ldd e, (de)|r6k|ex de, hl;ld l, (hl);ex de, hl;dec de
 ldd e, (de)|r800|ex de, hl;ld l, (hl);ex de, hl;dec de
 ldd e, (de)|ti83|ex de, hl;ld l, (hl);ex de, hl;dec de
 ldd e, (de)|ti83plus|ex de, hl;ld l, (hl);ex de, hl;dec de
+ldd e, (de)|vm1|xchg;mov l, m;xchg;dcx d
 ldd e, (de)|z180|ex de, hl;ld l, (hl);ex de, hl;dec de
 ldd e, (de)|z80|ex de, hl;ld l, (hl);ex de, hl;dec de
 ldd e, (de)|z80n|ex de, hl;ld l, (hl);ex de, hl;dec de
@@ -11881,6 +12180,7 @@ ldd e, (hl)|r6k|ld e, (hl);dec hl
 ldd e, (hl)|r800|ld e, (hl);dec hl
 ldd e, (hl)|ti83|ld e, (hl);dec hl
 ldd e, (hl)|ti83plus|ld e, (hl);dec hl
+ldd e, (hl)|vm1|mov e, m;dcx h
 ldd e, (hl)|z180|ld e, (hl);dec hl
 ldd e, (hl)|z80|ld e, (hl);dec hl
 ldd e, (hl)|z80n|ld e, (hl);dec hl
@@ -11903,6 +12203,7 @@ ldd h, (de)|r6k|ex de, hl;ld d, (hl);ex de, hl;dec de
 ldd h, (de)|r800|ex de, hl;ld d, (hl);ex de, hl;dec de
 ldd h, (de)|ti83|ex de, hl;ld d, (hl);ex de, hl;dec de
 ldd h, (de)|ti83plus|ex de, hl;ld d, (hl);ex de, hl;dec de
+ldd h, (de)|vm1|xchg;mov d, m;xchg;dcx d
 ldd h, (de)|z180|ex de, hl;ld d, (hl);ex de, hl;dec de
 ldd h, (de)|z80|ex de, hl;ld d, (hl);ex de, hl;dec de
 ldd h, (de)|z80n|ex de, hl;ld d, (hl);ex de, hl;dec de
@@ -11921,6 +12222,7 @@ ldd h, (hl)|r6k|ld h, (hl);dec hl
 ldd h, (hl)|r800|ld h, (hl);dec hl
 ldd h, (hl)|ti83|ld h, (hl);dec hl
 ldd h, (hl)|ti83plus|ld h, (hl);dec hl
+ldd h, (hl)|vm1|mov h, m;dcx h
 ldd h, (hl)|z180|ld h, (hl);dec hl
 ldd h, (hl)|z80|ld h, (hl);dec hl
 ldd h, (hl)|z80n|ld h, (hl);dec hl
@@ -11943,6 +12245,7 @@ ldd l, (de)|r6k|ex de, hl;ld e, (hl);ex de, hl;dec de
 ldd l, (de)|r800|ex de, hl;ld e, (hl);ex de, hl;dec de
 ldd l, (de)|ti83|ex de, hl;ld e, (hl);ex de, hl;dec de
 ldd l, (de)|ti83plus|ex de, hl;ld e, (hl);ex de, hl;dec de
+ldd l, (de)|vm1|xchg;mov e, m;xchg;dcx d
 ldd l, (de)|z180|ex de, hl;ld e, (hl);ex de, hl;dec de
 ldd l, (de)|z80|ex de, hl;ld e, (hl);ex de, hl;dec de
 ldd l, (de)|z80n|ex de, hl;ld e, (hl);ex de, hl;dec de
@@ -11961,6 +12264,7 @@ ldd l, (hl)|r6k|ld l, (hl);dec hl
 ldd l, (hl)|r800|ld l, (hl);dec hl
 ldd l, (hl)|ti83|ld l, (hl);dec hl
 ldd l, (hl)|ti83plus|ld l, (hl);dec hl
+ldd l, (hl)|vm1|mov l, m;dcx h
 ldd l, (hl)|z180|ld l, (hl);dec hl
 ldd l, (hl)|z80|ld l, (hl);dec hl
 ldd l, (hl)|z80n|ld l, (hl);dec hl
@@ -12095,6 +12399,7 @@ ldd.sil l, (hl)|ez80|ld.sil l, (hl);dec.sil hl
 lddr|8080|extern __z80asm__lddr;call __z80asm__lddr
 lddr|8085|extern __z80asm__lddr;call __z80asm__lddr
 lddr|gbz80|extern __z80asm__lddr;call __z80asm__lddr
+lddr|vm1|extern __z80asm__lddr;call __z80asm__lddr
 ldhi %n|8080|push h;lxi d, unsigned8(%n);dad d;xchg;pop h
 ldhi %n|ez80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ldhi %n|ez80_z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
@@ -12109,12 +12414,14 @@ ldhi %n|r6k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ldhi %n|r800|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ldhi %n|ti83|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ldhi %n|ti83plus|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|vm1|push h;lxi d, unsigned8(%n);dad d;xchg;pop h
 ldhi %n|z180|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ldhi %n|z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ldhi %n|z80n|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ldi|8080|extern __z80asm__ldi;call __z80asm__ldi
 ldi|8085|extern __z80asm__ldi;call __z80asm__ldi
 ldi|gbz80|extern __z80asm__ldi;call __z80asm__ldi
+ldi|vm1|extern __z80asm__ldi;call __z80asm__ldi
 ldi (bc), a|8080|stax b;inx b
 ldi (bc), a|8085|stax b;inx b
 ldi (bc), a|ez80|ld (bc), a;inc bc
@@ -12130,6 +12437,7 @@ ldi (bc), a|r6k|ld (bc), a;inc bc
 ldi (bc), a|r800|ld (bc), a;inc bc
 ldi (bc), a|ti83|ld (bc), a;inc bc
 ldi (bc), a|ti83plus|ld (bc), a;inc bc
+ldi (bc), a|vm1|stax b;inx b
 ldi (bc), a|z180|ld (bc), a;inc bc
 ldi (bc), a|z80|ld (bc), a;inc bc
 ldi (bc), a|z80n|ld (bc), a;inc bc
@@ -12148,6 +12456,7 @@ ldi (de), %n|r6k|ex de, hl;ld (hl), %n;ex de, hl;inc de
 ldi (de), %n|r800|ex de, hl;ld (hl), %n;ex de, hl;inc de
 ldi (de), %n|ti83|ex de, hl;ld (hl), %n;ex de, hl;inc de
 ldi (de), %n|ti83plus|ex de, hl;ld (hl), %n;ex de, hl;inc de
+ldi (de), %n|vm1|xchg;mvi m, %n;xchg;inx d
 ldi (de), %n|z180|ex de, hl;ld (hl), %n;ex de, hl;inc de
 ldi (de), %n|z80|ex de, hl;ld (hl), %n;ex de, hl;inc de
 ldi (de), %n|z80n|ex de, hl;ld (hl), %n;ex de, hl;inc de
@@ -12166,6 +12475,7 @@ ldi (de), a|r6k|ld (de), a;inc de
 ldi (de), a|r800|ld (de), a;inc de
 ldi (de), a|ti83|ld (de), a;inc de
 ldi (de), a|ti83plus|ld (de), a;inc de
+ldi (de), a|vm1|stax d;inx d
 ldi (de), a|z180|ld (de), a;inc de
 ldi (de), a|z80|ld (de), a;inc de
 ldi (de), a|z80n|ld (de), a;inc de
@@ -12184,6 +12494,7 @@ ldi (de), b|r6k|ex de, hl;ld (hl), b;ex de, hl;inc de
 ldi (de), b|r800|ex de, hl;ld (hl), b;ex de, hl;inc de
 ldi (de), b|ti83|ex de, hl;ld (hl), b;ex de, hl;inc de
 ldi (de), b|ti83plus|ex de, hl;ld (hl), b;ex de, hl;inc de
+ldi (de), b|vm1|xchg;mov m, b;xchg;inx d
 ldi (de), b|z180|ex de, hl;ld (hl), b;ex de, hl;inc de
 ldi (de), b|z80|ex de, hl;ld (hl), b;ex de, hl;inc de
 ldi (de), b|z80n|ex de, hl;ld (hl), b;ex de, hl;inc de
@@ -12201,6 +12512,7 @@ ldi (de), c|r6k|ex de, hl;ld (hl), c;ex de, hl;inc de
 ldi (de), c|r800|ex de, hl;ld (hl), c;ex de, hl;inc de
 ldi (de), c|ti83|ex de, hl;ld (hl), c;ex de, hl;inc de
 ldi (de), c|ti83plus|ex de, hl;ld (hl), c;ex de, hl;inc de
+ldi (de), c|vm1|xchg;mov m, c;xchg;inx d
 ldi (de), c|z180|ex de, hl;ld (hl), c;ex de, hl;inc de
 ldi (de), c|z80|ex de, hl;ld (hl), c;ex de, hl;inc de
 ldi (de), c|z80n|ex de, hl;ld (hl), c;ex de, hl;inc de
@@ -12218,6 +12530,7 @@ ldi (de), d|r6k|ex de, hl;ld (hl), h;ex de, hl;inc de
 ldi (de), d|r800|ex de, hl;ld (hl), h;ex de, hl;inc de
 ldi (de), d|ti83|ex de, hl;ld (hl), h;ex de, hl;inc de
 ldi (de), d|ti83plus|ex de, hl;ld (hl), h;ex de, hl;inc de
+ldi (de), d|vm1|xchg;mov m, h;xchg;inx d
 ldi (de), d|z180|ex de, hl;ld (hl), h;ex de, hl;inc de
 ldi (de), d|z80|ex de, hl;ld (hl), h;ex de, hl;inc de
 ldi (de), d|z80n|ex de, hl;ld (hl), h;ex de, hl;inc de
@@ -12235,6 +12548,7 @@ ldi (de), e|r6k|ex de, hl;ld (hl), l;ex de, hl;inc de
 ldi (de), e|r800|ex de, hl;ld (hl), l;ex de, hl;inc de
 ldi (de), e|ti83|ex de, hl;ld (hl), l;ex de, hl;inc de
 ldi (de), e|ti83plus|ex de, hl;ld (hl), l;ex de, hl;inc de
+ldi (de), e|vm1|xchg;mov m, l;xchg;inx d
 ldi (de), e|z180|ex de, hl;ld (hl), l;ex de, hl;inc de
 ldi (de), e|z80|ex de, hl;ld (hl), l;ex de, hl;inc de
 ldi (de), e|z80n|ex de, hl;ld (hl), l;ex de, hl;inc de
@@ -12252,6 +12566,7 @@ ldi (de), h|r6k|ex de, hl;ld (hl), d;ex de, hl;inc de
 ldi (de), h|r800|ex de, hl;ld (hl), d;ex de, hl;inc de
 ldi (de), h|ti83|ex de, hl;ld (hl), d;ex de, hl;inc de
 ldi (de), h|ti83plus|ex de, hl;ld (hl), d;ex de, hl;inc de
+ldi (de), h|vm1|xchg;mov m, d;xchg;inx d
 ldi (de), h|z180|ex de, hl;ld (hl), d;ex de, hl;inc de
 ldi (de), h|z80|ex de, hl;ld (hl), d;ex de, hl;inc de
 ldi (de), h|z80n|ex de, hl;ld (hl), d;ex de, hl;inc de
@@ -12269,6 +12584,7 @@ ldi (de), l|r6k|ex de, hl;ld (hl), e;ex de, hl;inc de
 ldi (de), l|r800|ex de, hl;ld (hl), e;ex de, hl;inc de
 ldi (de), l|ti83|ex de, hl;ld (hl), e;ex de, hl;inc de
 ldi (de), l|ti83plus|ex de, hl;ld (hl), e;ex de, hl;inc de
+ldi (de), l|vm1|xchg;mov m, e;xchg;inx d
 ldi (de), l|z180|ex de, hl;ld (hl), e;ex de, hl;inc de
 ldi (de), l|z80|ex de, hl;ld (hl), e;ex de, hl;inc de
 ldi (de), l|z80n|ex de, hl;ld (hl), e;ex de, hl;inc de
@@ -12287,6 +12603,7 @@ ldi (hl), %n|r6k|ld (hl), %n;inc hl
 ldi (hl), %n|r800|ld (hl), %n;inc hl
 ldi (hl), %n|ti83|ld (hl), %n;inc hl
 ldi (hl), %n|ti83plus|ld (hl), %n;inc hl
+ldi (hl), %n|vm1|mvi m, %n;inx h
 ldi (hl), %n|z180|ld (hl), %n;inc hl
 ldi (hl), %n|z80|ld (hl), %n;inc hl
 ldi (hl), %n|z80n|ld (hl), %n;inc hl
@@ -12304,6 +12621,7 @@ ldi (hl), a|r6k|ld (hl), a;inc hl
 ldi (hl), a|r800|ld (hl), a;inc hl
 ldi (hl), a|ti83|ld (hl), a;inc hl
 ldi (hl), a|ti83plus|ld (hl), a;inc hl
+ldi (hl), a|vm1|mov m, a;inx h
 ldi (hl), a|z180|ld (hl), a;inc hl
 ldi (hl), a|z80|ld (hl), a;inc hl
 ldi (hl), a|z80n|ld (hl), a;inc hl
@@ -12323,6 +12641,7 @@ ldi (hl), b|r6k|ld (hl), b;inc hl
 ldi (hl), b|r800|ld (hl), b;inc hl
 ldi (hl), b|ti83|ld (hl), b;inc hl
 ldi (hl), b|ti83plus|ld (hl), b;inc hl
+ldi (hl), b|vm1|mov m, b;inx h
 ldi (hl), b|z180|ld (hl), b;inc hl
 ldi (hl), b|z80|ld (hl), b;inc hl
 ldi (hl), b|z80n|ld (hl), b;inc hl
@@ -12342,6 +12661,7 @@ ldi (hl), bc|r6k|ld (hl), c;inc hl;ld (hl), b;inc hl
 ldi (hl), bc|r800|ld (hl), c;inc hl;ld (hl), b;inc hl
 ldi (hl), bc|ti83|ld (hl), c;inc hl;ld (hl), b;inc hl
 ldi (hl), bc|ti83plus|ld (hl), c;inc hl;ld (hl), b;inc hl
+ldi (hl), bc|vm1|mov m, c;inx h;mov m, b;inx h
 ldi (hl), bc|z180|ld (hl), c;inc hl;ld (hl), b;inc hl
 ldi (hl), bc|z80|ld (hl), c;inc hl;ld (hl), b;inc hl
 ldi (hl), bc|z80n|ld (hl), c;inc hl;ld (hl), b;inc hl
@@ -12360,6 +12680,7 @@ ldi (hl), c|r6k|ld (hl), c;inc hl
 ldi (hl), c|r800|ld (hl), c;inc hl
 ldi (hl), c|ti83|ld (hl), c;inc hl
 ldi (hl), c|ti83plus|ld (hl), c;inc hl
+ldi (hl), c|vm1|mov m, c;inx h
 ldi (hl), c|z180|ld (hl), c;inc hl
 ldi (hl), c|z80|ld (hl), c;inc hl
 ldi (hl), c|z80n|ld (hl), c;inc hl
@@ -12379,6 +12700,7 @@ ldi (hl), d|r6k|ld (hl), d;inc hl
 ldi (hl), d|r800|ld (hl), d;inc hl
 ldi (hl), d|ti83|ld (hl), d;inc hl
 ldi (hl), d|ti83plus|ld (hl), d;inc hl
+ldi (hl), d|vm1|mov m, d;inx h
 ldi (hl), d|z180|ld (hl), d;inc hl
 ldi (hl), d|z80|ld (hl), d;inc hl
 ldi (hl), d|z80n|ld (hl), d;inc hl
@@ -12398,6 +12720,7 @@ ldi (hl), de|r6k|ld (hl), e;inc hl;ld (hl), d;inc hl
 ldi (hl), de|r800|ld (hl), e;inc hl;ld (hl), d;inc hl
 ldi (hl), de|ti83|ld (hl), e;inc hl;ld (hl), d;inc hl
 ldi (hl), de|ti83plus|ld (hl), e;inc hl;ld (hl), d;inc hl
+ldi (hl), de|vm1|mov m, e;inx h;mov m, d;inx h
 ldi (hl), de|z180|ld (hl), e;inc hl;ld (hl), d;inc hl
 ldi (hl), de|z80|ld (hl), e;inc hl;ld (hl), d;inc hl
 ldi (hl), de|z80n|ld (hl), e;inc hl;ld (hl), d;inc hl
@@ -12416,6 +12739,7 @@ ldi (hl), e|r6k|ld (hl), e;inc hl
 ldi (hl), e|r800|ld (hl), e;inc hl
 ldi (hl), e|ti83|ld (hl), e;inc hl
 ldi (hl), e|ti83plus|ld (hl), e;inc hl
+ldi (hl), e|vm1|mov m, e;inx h
 ldi (hl), e|z180|ld (hl), e;inc hl
 ldi (hl), e|z80|ld (hl), e;inc hl
 ldi (hl), e|z80n|ld (hl), e;inc hl
@@ -12435,6 +12759,7 @@ ldi (hl), h|r6k|ld (hl), h;inc hl
 ldi (hl), h|r800|ld (hl), h;inc hl
 ldi (hl), h|ti83|ld (hl), h;inc hl
 ldi (hl), h|ti83plus|ld (hl), h;inc hl
+ldi (hl), h|vm1|mov m, h;inx h
 ldi (hl), h|z180|ld (hl), h;inc hl
 ldi (hl), h|z80|ld (hl), h;inc hl
 ldi (hl), h|z80n|ld (hl), h;inc hl
@@ -12449,6 +12774,7 @@ ldi (hl), hl|kc160_z80|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc h
 ldi (hl), hl|r800|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl
 ldi (hl), hl|ti83|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl
 ldi (hl), hl|ti83plus|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl
+ldi (hl), hl|vm1|push psw;mov a, h;mov m, l;inx h;mov m, a;pop psw;inx h
 ldi (hl), hl|z180|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl
 ldi (hl), hl|z80|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl
 ldi (hl), hl|z80n|push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl
@@ -12497,6 +12823,7 @@ ldi (hl), l|r6k|ld (hl), l;inc hl
 ldi (hl), l|r800|ld (hl), l;inc hl
 ldi (hl), l|ti83|ld (hl), l;inc hl
 ldi (hl), l|ti83plus|ld (hl), l;inc hl
+ldi (hl), l|vm1|mov m, l;inx h
 ldi (hl), l|z180|ld (hl), l;inc hl
 ldi (hl), l|z80|ld (hl), l;inc hl
 ldi (hl), l|z80n|ld (hl), l;inc hl
@@ -12531,6 +12858,7 @@ ldi a, (bc)|r6k|ld a, (bc);inc bc
 ldi a, (bc)|r800|ld a, (bc);inc bc
 ldi a, (bc)|ti83|ld a, (bc);inc bc
 ldi a, (bc)|ti83plus|ld a, (bc);inc bc
+ldi a, (bc)|vm1|ldax b;inx b
 ldi a, (bc)|z180|ld a, (bc);inc bc
 ldi a, (bc)|z80|ld a, (bc);inc bc
 ldi a, (bc)|z80n|ld a, (bc);inc bc
@@ -12549,6 +12877,7 @@ ldi a, (de)|r6k|ld a, (de);inc de
 ldi a, (de)|r800|ld a, (de);inc de
 ldi a, (de)|ti83|ld a, (de);inc de
 ldi a, (de)|ti83plus|ld a, (de);inc de
+ldi a, (de)|vm1|ldax d;inx d
 ldi a, (de)|z180|ld a, (de);inc de
 ldi a, (de)|z80|ld a, (de);inc de
 ldi a, (de)|z80n|ld a, (de);inc de
@@ -12566,6 +12895,7 @@ ldi a, (hl)|r6k|ld a, (hl);inc hl
 ldi a, (hl)|r800|ld a, (hl);inc hl
 ldi a, (hl)|ti83|ld a, (hl);inc hl
 ldi a, (hl)|ti83plus|ld a, (hl);inc hl
+ldi a, (hl)|vm1|mov a, m;inx h
 ldi a, (hl)|z180|ld a, (hl);inc hl
 ldi a, (hl)|z80|ld a, (hl);inc hl
 ldi a, (hl)|z80n|ld a, (hl);inc hl
@@ -12588,6 +12918,7 @@ ldi b, (de)|r6k|ex de, hl;ld b, (hl);ex de, hl;inc de
 ldi b, (de)|r800|ex de, hl;ld b, (hl);ex de, hl;inc de
 ldi b, (de)|ti83|ex de, hl;ld b, (hl);ex de, hl;inc de
 ldi b, (de)|ti83plus|ex de, hl;ld b, (hl);ex de, hl;inc de
+ldi b, (de)|vm1|xchg;mov b, m;xchg;inx d
 ldi b, (de)|z180|ex de, hl;ld b, (hl);ex de, hl;inc de
 ldi b, (de)|z80|ex de, hl;ld b, (hl);ex de, hl;inc de
 ldi b, (de)|z80n|ex de, hl;ld b, (hl);ex de, hl;inc de
@@ -12606,6 +12937,7 @@ ldi b, (hl)|r6k|ld b, (hl);inc hl
 ldi b, (hl)|r800|ld b, (hl);inc hl
 ldi b, (hl)|ti83|ld b, (hl);inc hl
 ldi b, (hl)|ti83plus|ld b, (hl);inc hl
+ldi b, (hl)|vm1|mov b, m;inx h
 ldi b, (hl)|z180|ld b, (hl);inc hl
 ldi b, (hl)|z80|ld b, (hl);inc hl
 ldi b, (hl)|z80n|ld b, (hl);inc hl
@@ -12624,6 +12956,7 @@ ldi bc, (hl)|r6k|ld c, (hl);inc hl;ld b, (hl);inc hl
 ldi bc, (hl)|r800|ld c, (hl);inc hl;ld b, (hl);inc hl
 ldi bc, (hl)|ti83|ld c, (hl);inc hl;ld b, (hl);inc hl
 ldi bc, (hl)|ti83plus|ld c, (hl);inc hl;ld b, (hl);inc hl
+ldi bc, (hl)|vm1|mov c, m;inx h;mov b, m;inx h
 ldi bc, (hl)|z180|ld c, (hl);inc hl;ld b, (hl);inc hl
 ldi bc, (hl)|z80|ld c, (hl);inc hl;ld b, (hl);inc hl
 ldi bc, (hl)|z80n|ld c, (hl);inc hl;ld b, (hl);inc hl
@@ -12646,6 +12979,7 @@ ldi c, (de)|r6k|ex de, hl;ld c, (hl);ex de, hl;inc de
 ldi c, (de)|r800|ex de, hl;ld c, (hl);ex de, hl;inc de
 ldi c, (de)|ti83|ex de, hl;ld c, (hl);ex de, hl;inc de
 ldi c, (de)|ti83plus|ex de, hl;ld c, (hl);ex de, hl;inc de
+ldi c, (de)|vm1|xchg;mov c, m;xchg;inx d
 ldi c, (de)|z180|ex de, hl;ld c, (hl);ex de, hl;inc de
 ldi c, (de)|z80|ex de, hl;ld c, (hl);ex de, hl;inc de
 ldi c, (de)|z80n|ex de, hl;ld c, (hl);ex de, hl;inc de
@@ -12664,6 +12998,7 @@ ldi c, (hl)|r6k|ld c, (hl);inc hl
 ldi c, (hl)|r800|ld c, (hl);inc hl
 ldi c, (hl)|ti83|ld c, (hl);inc hl
 ldi c, (hl)|ti83plus|ld c, (hl);inc hl
+ldi c, (hl)|vm1|mov c, m;inx h
 ldi c, (hl)|z180|ld c, (hl);inc hl
 ldi c, (hl)|z80|ld c, (hl);inc hl
 ldi c, (hl)|z80n|ld c, (hl);inc hl
@@ -12686,6 +13021,7 @@ ldi d, (de)|r6k|ex de, hl;ld h, (hl);ex de, hl;inc de
 ldi d, (de)|r800|ex de, hl;ld h, (hl);ex de, hl;inc de
 ldi d, (de)|ti83|ex de, hl;ld h, (hl);ex de, hl;inc de
 ldi d, (de)|ti83plus|ex de, hl;ld h, (hl);ex de, hl;inc de
+ldi d, (de)|vm1|xchg;mov h, m;xchg;inx d
 ldi d, (de)|z180|ex de, hl;ld h, (hl);ex de, hl;inc de
 ldi d, (de)|z80|ex de, hl;ld h, (hl);ex de, hl;inc de
 ldi d, (de)|z80n|ex de, hl;ld h, (hl);ex de, hl;inc de
@@ -12704,6 +13040,7 @@ ldi d, (hl)|r6k|ld d, (hl);inc hl
 ldi d, (hl)|r800|ld d, (hl);inc hl
 ldi d, (hl)|ti83|ld d, (hl);inc hl
 ldi d, (hl)|ti83plus|ld d, (hl);inc hl
+ldi d, (hl)|vm1|mov d, m;inx h
 ldi d, (hl)|z180|ld d, (hl);inc hl
 ldi d, (hl)|z80|ld d, (hl);inc hl
 ldi d, (hl)|z80n|ld d, (hl);inc hl
@@ -12722,6 +13059,7 @@ ldi de, (hl)|r6k|ld e, (hl);inc hl;ld d, (hl);inc hl
 ldi de, (hl)|r800|ld e, (hl);inc hl;ld d, (hl);inc hl
 ldi de, (hl)|ti83|ld e, (hl);inc hl;ld d, (hl);inc hl
 ldi de, (hl)|ti83plus|ld e, (hl);inc hl;ld d, (hl);inc hl
+ldi de, (hl)|vm1|mov e, m;inx h;mov d, m;inx h
 ldi de, (hl)|z180|ld e, (hl);inc hl;ld d, (hl);inc hl
 ldi de, (hl)|z80|ld e, (hl);inc hl;ld d, (hl);inc hl
 ldi de, (hl)|z80n|ld e, (hl);inc hl;ld d, (hl);inc hl
@@ -12744,6 +13082,7 @@ ldi e, (de)|r6k|ex de, hl;ld l, (hl);ex de, hl;inc de
 ldi e, (de)|r800|ex de, hl;ld l, (hl);ex de, hl;inc de
 ldi e, (de)|ti83|ex de, hl;ld l, (hl);ex de, hl;inc de
 ldi e, (de)|ti83plus|ex de, hl;ld l, (hl);ex de, hl;inc de
+ldi e, (de)|vm1|xchg;mov l, m;xchg;inx d
 ldi e, (de)|z180|ex de, hl;ld l, (hl);ex de, hl;inc de
 ldi e, (de)|z80|ex de, hl;ld l, (hl);ex de, hl;inc de
 ldi e, (de)|z80n|ex de, hl;ld l, (hl);ex de, hl;inc de
@@ -12762,6 +13101,7 @@ ldi e, (hl)|r6k|ld e, (hl);inc hl
 ldi e, (hl)|r800|ld e, (hl);inc hl
 ldi e, (hl)|ti83|ld e, (hl);inc hl
 ldi e, (hl)|ti83plus|ld e, (hl);inc hl
+ldi e, (hl)|vm1|mov e, m;inx h
 ldi e, (hl)|z180|ld e, (hl);inc hl
 ldi e, (hl)|z80|ld e, (hl);inc hl
 ldi e, (hl)|z80n|ld e, (hl);inc hl
@@ -12784,6 +13124,7 @@ ldi h, (de)|r6k|ex de, hl;ld d, (hl);ex de, hl;inc de
 ldi h, (de)|r800|ex de, hl;ld d, (hl);ex de, hl;inc de
 ldi h, (de)|ti83|ex de, hl;ld d, (hl);ex de, hl;inc de
 ldi h, (de)|ti83plus|ex de, hl;ld d, (hl);ex de, hl;inc de
+ldi h, (de)|vm1|xchg;mov d, m;xchg;inx d
 ldi h, (de)|z180|ex de, hl;ld d, (hl);ex de, hl;inc de
 ldi h, (de)|z80|ex de, hl;ld d, (hl);ex de, hl;inc de
 ldi h, (de)|z80n|ex de, hl;ld d, (hl);ex de, hl;inc de
@@ -12802,6 +13143,7 @@ ldi h, (hl)|r6k|ld h, (hl);inc hl
 ldi h, (hl)|r800|ld h, (hl);inc hl
 ldi h, (hl)|ti83|ld h, (hl);inc hl
 ldi h, (hl)|ti83plus|ld h, (hl);inc hl
+ldi h, (hl)|vm1|mov h, m;inx h
 ldi h, (hl)|z180|ld h, (hl);inc hl
 ldi h, (hl)|z80|ld h, (hl);inc hl
 ldi h, (hl)|z80n|ld h, (hl);inc hl
@@ -12854,6 +13196,7 @@ ldi l, (de)|r6k|ex de, hl;ld e, (hl);ex de, hl;inc de
 ldi l, (de)|r800|ex de, hl;ld e, (hl);ex de, hl;inc de
 ldi l, (de)|ti83|ex de, hl;ld e, (hl);ex de, hl;inc de
 ldi l, (de)|ti83plus|ex de, hl;ld e, (hl);ex de, hl;inc de
+ldi l, (de)|vm1|xchg;mov e, m;xchg;inx d
 ldi l, (de)|z180|ex de, hl;ld e, (hl);ex de, hl;inc de
 ldi l, (de)|z80|ex de, hl;ld e, (hl);ex de, hl;inc de
 ldi l, (de)|z80n|ex de, hl;ld e, (hl);ex de, hl;inc de
@@ -12872,6 +13215,7 @@ ldi l, (hl)|r6k|ld l, (hl);inc hl
 ldi l, (hl)|r800|ld l, (hl);inc hl
 ldi l, (hl)|ti83|ld l, (hl);inc hl
 ldi l, (hl)|ti83plus|ld l, (hl);inc hl
+ldi l, (hl)|vm1|mov l, m;inx h
 ldi l, (hl)|z180|ld l, (hl);inc hl
 ldi l, (hl)|z80|ld l, (hl);inc hl
 ldi l, (hl)|z80n|ld l, (hl);inc hl
@@ -13042,6 +13386,7 @@ ldi.sil l, (hl)|ez80|ld.sil l, (hl);inc.sil hl
 ldir|8080|extern __z80asm__ldir;call __z80asm__ldir
 ldir|8085|extern __z80asm__ldir;call __z80asm__ldir
 ldir|gbz80|extern __z80asm__ldir;call __z80asm__ldir
+ldir|vm1|extern __z80asm__ldir;call __z80asm__ldir
 ldsi %n|8080|xchg;lxi h, unsigned8(%n);dad sp;xchg
 ldsi %n|ez80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 ldsi %n|ez80_z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
@@ -13056,6 +13401,7 @@ ldsi %n|r6k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 ldsi %n|r800|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 ldsi %n|ti83|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 ldsi %n|ti83plus|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|vm1|xchg;lxi h, unsigned8(%n);dad sp;xchg
 ldsi %n|z180|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 ldsi %n|z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 ldsi %n|z80n|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
@@ -13097,9 +13443,11 @@ lhlx|z80n|ex de, hl;ld e, (hl);inc hl;ld d, (hl);dec hl;ex de, hl
 neg|8080|cma;inr a
 neg|8085|cma;inr a
 neg|gbz80|cpl;inc a
+neg|vm1|cma;inr a
 neg a|8080|cma;inr a
 neg a|8085|cma;inr a
 neg a|gbz80|cpl;inc a
+neg a|vm1|cma;inr a
 neg b|8080|push psw;mov a, b;cma;mov b, a;inr b;pop psw
 neg b|8085|push psw;mov a, b;cma;mov b, a;inr b;pop psw
 neg b|ez80|push af;ld a, b;cpl;ld b, a;inc b;pop af
@@ -13115,6 +13463,7 @@ neg b|r6k|push af;ld a, b;cpl a;ld b, a;inc b;pop af
 neg b|r800|push af;ld a, b;cpl;ld b, a;inc b;pop af
 neg b|ti83|push af;ld a, b;cpl;ld b, a;inc b;pop af
 neg b|ti83plus|push af;ld a, b;cpl;ld b, a;inc b;pop af
+neg b|vm1|push psw;mov a, b;cma;mov b, a;inr b;pop psw
 neg b|z180|push af;ld a, b;cpl;ld b, a;inc b;pop af
 neg b|z80|push af;ld a, b;cpl;ld b, a;inc b;pop af
 neg b|z80n|push af;ld a, b;cpl;ld b, a;inc b;pop af
@@ -13133,6 +13482,7 @@ neg bc|r6k|push af;ld a, b;cpl a;ld b, a;ld a, c;cpl a;ld c, a;inc bc;pop af
 neg bc|r800|push af;ld a, b;cpl;ld b, a;ld a, c;cpl;ld c, a;inc bc;pop af
 neg bc|ti83|push af;ld a, b;cpl;ld b, a;ld a, c;cpl;ld c, a;inc bc;pop af
 neg bc|ti83plus|push af;ld a, b;cpl;ld b, a;ld a, c;cpl;ld c, a;inc bc;pop af
+neg bc|vm1|push psw;mov a, b;cma;mov b, a;mov a, c;cma;mov c, a;inx b;pop psw
 neg bc|z180|push af;ld a, b;cpl;ld b, a;ld a, c;cpl;ld c, a;inc bc;pop af
 neg bc|z80|push af;ld a, b;cpl;ld b, a;ld a, c;cpl;ld c, a;inc bc;pop af
 neg bc|z80n|push af;ld a, b;cpl;ld b, a;ld a, c;cpl;ld c, a;inc bc;pop af
@@ -13151,6 +13501,7 @@ neg c|r6k|push af;ld a, c;cpl a;ld c, a;inc c;pop af
 neg c|r800|push af;ld a, c;cpl;ld c, a;inc c;pop af
 neg c|ti83|push af;ld a, c;cpl;ld c, a;inc c;pop af
 neg c|ti83plus|push af;ld a, c;cpl;ld c, a;inc c;pop af
+neg c|vm1|push psw;mov a, c;cma;mov c, a;inr c;pop psw
 neg c|z180|push af;ld a, c;cpl;ld c, a;inc c;pop af
 neg c|z80|push af;ld a, c;cpl;ld c, a;inc c;pop af
 neg c|z80n|push af;ld a, c;cpl;ld c, a;inc c;pop af
@@ -13169,6 +13520,7 @@ neg d|r6k|push af;ld a, d;cpl a;ld d, a;inc d;pop af
 neg d|r800|push af;ld a, d;cpl;ld d, a;inc d;pop af
 neg d|ti83|push af;ld a, d;cpl;ld d, a;inc d;pop af
 neg d|ti83plus|push af;ld a, d;cpl;ld d, a;inc d;pop af
+neg d|vm1|push psw;mov a, d;cma;mov d, a;inr d;pop psw
 neg d|z180|push af;ld a, d;cpl;ld d, a;inc d;pop af
 neg d|z80|push af;ld a, d;cpl;ld d, a;inc d;pop af
 neg d|z80n|push af;ld a, d;cpl;ld d, a;inc d;pop af
@@ -13187,6 +13539,7 @@ neg de|r6k|push af;ld a, d;cpl a;ld d, a;ld a, e;cpl a;ld e, a;inc de;pop af
 neg de|r800|push af;ld a, d;cpl;ld d, a;ld a, e;cpl;ld e, a;inc de;pop af
 neg de|ti83|push af;ld a, d;cpl;ld d, a;ld a, e;cpl;ld e, a;inc de;pop af
 neg de|ti83plus|push af;ld a, d;cpl;ld d, a;ld a, e;cpl;ld e, a;inc de;pop af
+neg de|vm1|push psw;mov a, d;cma;mov d, a;mov a, e;cma;mov e, a;inx d;pop psw
 neg de|z180|push af;ld a, d;cpl;ld d, a;ld a, e;cpl;ld e, a;inc de;pop af
 neg de|z80|push af;ld a, d;cpl;ld d, a;ld a, e;cpl;ld e, a;inc de;pop af
 neg de|z80n|push af;ld a, d;cpl;ld d, a;ld a, e;cpl;ld e, a;inc de;pop af
@@ -13205,6 +13558,7 @@ neg e|r6k|push af;ld a, e;cpl a;ld e, a;inc e;pop af
 neg e|r800|push af;ld a, e;cpl;ld e, a;inc e;pop af
 neg e|ti83|push af;ld a, e;cpl;ld e, a;inc e;pop af
 neg e|ti83plus|push af;ld a, e;cpl;ld e, a;inc e;pop af
+neg e|vm1|push psw;mov a, e;cma;mov e, a;inr e;pop psw
 neg e|z180|push af;ld a, e;cpl;ld e, a;inc e;pop af
 neg e|z80|push af;ld a, e;cpl;ld e, a;inc e;pop af
 neg e|z80n|push af;ld a, e;cpl;ld e, a;inc e;pop af
@@ -13223,9 +13577,11 @@ neg h|r6k|push af;ld a, h;cpl a;ld h, a;inc h;pop af
 neg h|r800|push af;ld a, h;cpl;ld h, a;inc h;pop af
 neg h|ti83|push af;ld a, h;cpl;ld h, a;inc h;pop af
 neg h|ti83plus|push af;ld a, h;cpl;ld h, a;inc h;pop af
+neg h|vm1|push psw;mov a, h;cma;mov h, a;inr h;pop psw
 neg h|z180|push af;ld a, h;cpl;ld h, a;inc h;pop af
 neg h|z80|push af;ld a, h;cpl;ld h, a;inc h;pop af
 neg h|z80n|push af;ld a, h;cpl;ld h, a;inc h;pop af
+neg h'|vm1|push psw;mov a, h';cma;mov h', a;inr h';pop psw
 neg hl|8080|push psw;mov a, h;cma;mov h, a;mov a, l;cma;mov l, a;inx h;pop psw
 neg hl|8085|push psw;mov a, h;cma;mov h, a;mov a, l;cma;mov l, a;inx h;pop psw
 neg hl|ez80|push af;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;pop af
@@ -13238,9 +13594,11 @@ neg hl|r3k|push af;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;pop af
 neg hl|r800|push af;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;pop af
 neg hl|ti83|push af;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;pop af
 neg hl|ti83plus|push af;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;pop af
+neg hl|vm1|push psw;mov a, h;cma;mov h, a;mov a, l;cma;mov l, a;inx h;pop psw
 neg hl|z180|push af;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;pop af
 neg hl|z80|push af;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;pop af
 neg hl|z80n|push af;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;pop af
+neg hl'|vm1|push psw;mov a, h';cma;mov h', a;mov a, l';cma;mov l', a;inx h';pop psw
 neg ix|ez80|push af;ld a, ixh;cpl;ld ixh, a;ld a, ixl;cpl;ld ixl, a;inc ix;pop af
 neg ix|ez80_z80|push af;ld a, ixh;cpl;ld ixh, a;ld a, ixl;cpl;ld ixl, a;inc ix;pop af
 neg ix|kc160|push af;push hl;push ix;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop ix;pop hl;pop af
@@ -13286,9 +13644,11 @@ neg l|r6k|push af;ld a, l;cpl a;ld l, a;inc l;pop af
 neg l|r800|push af;ld a, l;cpl;ld l, a;inc l;pop af
 neg l|ti83|push af;ld a, l;cpl;ld l, a;inc l;pop af
 neg l|ti83plus|push af;ld a, l;cpl;ld l, a;inc l;pop af
+neg l|vm1|push psw;mov a, l;cma;mov l, a;inr l;pop psw
 neg l|z180|push af;ld a, l;cpl;ld l, a;inc l;pop af
 neg l|z80|push af;ld a, l;cpl;ld l, a;inc l;pop af
 neg l|z80n|push af;ld a, l;cpl;ld l, a;inc l;pop af
+neg l'|vm1|push psw;mov a, l';cma;mov l', a;inr l';pop psw
 or (hl+)|8080|ora m;inx h
 or (hl+)|8085|ora m;inx h
 or (hl+)|ez80|or a, (hl);inc hl
@@ -13304,6 +13664,7 @@ or (hl+)|r6k|or (hl);inc hl
 or (hl+)|r800|or (hl);inc hl
 or (hl+)|ti83|or (hl);inc hl
 or (hl+)|ti83plus|or (hl);inc hl
+or (hl+)|vm1|ora m;inx h
 or (hl+)|z180|or (hl);inc hl
 or (hl+)|z80|or (hl);inc hl
 or (hl+)|z80n|or (hl);inc hl
@@ -13322,6 +13683,7 @@ or (hl-)|r6k|or (hl);dec hl
 or (hl-)|r800|or (hl);dec hl
 or (hl-)|ti83|or (hl);dec hl
 or (hl-)|ti83plus|or (hl);dec hl
+or (hl-)|vm1|ora m;dcx h
 or (hl-)|z180|or (hl);dec hl
 or (hl-)|z80|or (hl);dec hl
 or (hl-)|z80n|or (hl);dec hl
@@ -13350,6 +13712,7 @@ or a, (hl+)|r6k|or (hl);inc hl
 or a, (hl+)|r800|or (hl);inc hl
 or a, (hl+)|ti83|or (hl);inc hl
 or a, (hl+)|ti83plus|or (hl);inc hl
+or a, (hl+)|vm1|ora m;inx h
 or a, (hl+)|z180|or (hl);inc hl
 or a, (hl+)|z80|or (hl);inc hl
 or a, (hl+)|z80n|or (hl);inc hl
@@ -13368,6 +13731,7 @@ or a, (hl-)|r6k|or (hl);dec hl
 or a, (hl-)|r800|or (hl);dec hl
 or a, (hl-)|ti83|or (hl);dec hl
 or a, (hl-)|ti83plus|or (hl);dec hl
+or a, (hl-)|vm1|ora m;dcx h
 or a, (hl-)|z180|or (hl);dec hl
 or a, (hl-)|z80|or (hl);dec hl
 or a, (hl-)|z80n|or (hl);dec hl
@@ -13386,6 +13750,7 @@ or hl, bc|r6k|push af;ld a, h;or b;ld h, a;ld a, l;or c;ld l, a;pop af
 or hl, bc|r800|push af;ld a, h;or b;ld h, a;ld a, l;or c;ld l, a;pop af
 or hl, bc|ti83|push af;ld a, h;or b;ld h, a;ld a, l;or c;ld l, a;pop af
 or hl, bc|ti83plus|push af;ld a, h;or b;ld h, a;ld a, l;or c;ld l, a;pop af
+or hl, bc|vm1|push psw;mov a, h;ora b;mov h, a;mov a, l;ora c;mov l, a;pop psw
 or hl, bc|z180|push af;ld a, h;or b;ld h, a;ld a, l;or c;ld l, a;pop af
 or hl, bc|z80|push af;ld a, h;or b;ld h, a;ld a, l;or c;ld l, a;pop af
 or hl, bc|z80n|push af;ld a, h;or b;ld h, a;ld a, l;or c;ld l, a;pop af
@@ -13399,6 +13764,7 @@ or hl, de|kc160_z80|push af;ld a, h;or d;ld h, a;ld a, l;or e;ld l, a;pop af
 or hl, de|r800|push af;ld a, h;or d;ld h, a;ld a, l;or e;ld l, a;pop af
 or hl, de|ti83|push af;ld a, h;or d;ld h, a;ld a, l;or e;ld l, a;pop af
 or hl, de|ti83plus|push af;ld a, h;or d;ld h, a;ld a, l;or e;ld l, a;pop af
+or hl, de|vm1|push psw;mov a, h;ora d;mov h, a;mov a, l;ora e;mov l, a;pop psw
 or hl, de|z180|push af;ld a, h;or d;ld h, a;ld a, l;or e;ld l, a;pop af
 or hl, de|z80|push af;ld a, h;or d;ld h, a;ld a, l;or e;ld l, a;pop af
 or hl, de|z80n|push af;ld a, h;or d;ld h, a;ld a, l;or e;ld l, a;pop af
@@ -13506,6 +13872,7 @@ r_eq|r6k|ret z
 r_eq|r800|ret z
 r_eq|ti83|ret z
 r_eq|ti83plus|ret z
+r_eq|vm1|rz
 r_eq|z180|ret z
 r_eq|z80|ret z
 r_eq|z80n|ret z
@@ -13524,6 +13891,7 @@ r_geu|r6k|ret nc
 r_geu|r800|ret nc
 r_geu|ti83|ret nc
 r_geu|ti83plus|ret nc
+r_geu|vm1|rnc
 r_geu|z180|ret nc
 r_geu|z80|ret nc
 r_geu|z80n|ret nc
@@ -13542,6 +13910,7 @@ r_gtu|r6k|jr z, %t;ret nc;%t:
 r_gtu|r800|jr z, %t;ret nc;%t:
 r_gtu|ti83|jr z, %t;ret nc;%t:
 r_gtu|ti83plus|jr z, %t;ret nc;%t:
+r_gtu|vm1|jz %t;rnc;%t:
 r_gtu|z180|jr z, %t;ret nc;%t:
 r_gtu|z80|jr z, %t;ret nc;%t:
 r_gtu|z80n|jr z, %t;ret nc;%t:
@@ -13560,6 +13929,7 @@ r_leu|r6k|ret z;ret c
 r_leu|r800|ret z;ret c
 r_leu|ti83|ret z;ret c
 r_leu|ti83plus|ret z;ret c
+r_leu|vm1|rz;rc
 r_leu|z180|ret z;ret c
 r_leu|z80|ret z;ret c
 r_leu|z80n|ret z;ret c
@@ -13578,6 +13948,7 @@ r_ltu|r6k|ret c
 r_ltu|r800|ret c
 r_ltu|ti83|ret c
 r_ltu|ti83plus|ret c
+r_ltu|vm1|rc
 r_ltu|z180|ret c
 r_ltu|z80|ret c
 r_ltu|z80n|ret c
@@ -13596,6 +13967,7 @@ r_ne|r6k|ret nz
 r_ne|r800|ret nz
 r_ne|ti83|ret nz
 r_ne|ti83plus|ret nz
+r_ne|vm1|rnz
 r_ne|z180|ret nz
 r_ne|z80|ret nz
 r_ne|z80n|ret nz
@@ -13613,6 +13985,7 @@ r_nv|r6k|jp v, %t;ret;%t:
 r_nv|r800|ret po
 r_nv|ti83|ret po
 r_nv|ti83plus|ret po
+r_nv|vm1|rpo
 r_nv|z180|ret po
 r_nv|z80|ret po
 r_nv|z80n|ret po
@@ -13630,6 +14003,7 @@ r_v|r6k|jp v, %t1;jr %t;%t1:;ret;%t:
 r_v|r800|ret pe
 r_v|ti83|ret pe
 r_v|ti83plus|ret pe
+r_v|vm1|rpe
 r_v|z180|ret pe
 r_v|z80|ret pe
 r_v|z80n|ret pe
@@ -13647,6 +14021,7 @@ rdel|r6k|rl de
 rdel|r800|rl e;rl d
 rdel|ti83|rl e;rl d
 rdel|ti83plus|rl e;rl d
+rdel|vm1|extern __z80asm__rl_de;call __z80asm__rl_de
 rdel|z180|rl e;rl d
 rdel|z80|rl e;rl d
 rdel|z80n|rl e;rl d
@@ -13665,6 +14040,7 @@ req|r6k|ret z
 req|r800|ret z
 req|ti83|ret z
 req|ti83plus|ret z
+req|vm1|rz
 req|z180|ret z
 req|z80|ret z
 req|z80n|ret z
@@ -13683,6 +14059,7 @@ ret eq|r6k|ret z
 ret eq|r800|ret z
 ret eq|ti83|ret z
 ret eq|ti83plus|ret z
+ret eq|vm1|rz
 ret eq|z180|ret z
 ret eq|z80|ret z
 ret eq|z80n|ret z
@@ -13701,6 +14078,7 @@ ret geu|r6k|ret nc
 ret geu|r800|ret nc
 ret geu|ti83|ret nc
 ret geu|ti83plus|ret nc
+ret geu|vm1|rnc
 ret geu|z180|ret nc
 ret geu|z80|ret nc
 ret geu|z80n|ret nc
@@ -13719,6 +14097,7 @@ ret gtu|r6k|jr z, %t;ret nc;%t:
 ret gtu|r800|jr z, %t;ret nc;%t:
 ret gtu|ti83|jr z, %t;ret nc;%t:
 ret gtu|ti83plus|jr z, %t;ret nc;%t:
+ret gtu|vm1|jz %t;rnc;%t:
 ret gtu|z180|jr z, %t;ret nc;%t:
 ret gtu|z80|jr z, %t;ret nc;%t:
 ret gtu|z80n|jr z, %t;ret nc;%t:
@@ -13737,6 +14116,7 @@ ret leu|r6k|ret z;ret c
 ret leu|r800|ret z;ret c
 ret leu|ti83|ret z;ret c
 ret leu|ti83plus|ret z;ret c
+ret leu|vm1|rz;rc
 ret leu|z180|ret z;ret c
 ret leu|z80|ret z;ret c
 ret leu|z80n|ret z;ret c
@@ -13755,6 +14135,7 @@ ret ltu|r6k|ret c
 ret ltu|r800|ret c
 ret ltu|ti83|ret c
 ret ltu|ti83plus|ret c
+ret ltu|vm1|rc
 ret ltu|z180|ret c
 ret ltu|z80|ret c
 ret ltu|z80n|ret c
@@ -13773,6 +14154,7 @@ ret ne|r6k|ret nz
 ret ne|r800|ret nz
 ret ne|ti83|ret nz
 ret ne|ti83plus|ret nz
+ret ne|vm1|rnz
 ret ne|z180|ret nz
 ret ne|z80|ret nz
 ret ne|z80n|ret nz
@@ -13790,6 +14172,7 @@ ret nv|r6k|jp v, %t;ret;%t:
 ret nv|r800|ret po
 ret nv|ti83|ret po
 ret nv|ti83plus|ret po
+ret nv|vm1|rpo
 ret nv|z180|ret po
 ret nv|z80|ret po
 ret nv|z80n|ret po
@@ -13807,6 +14190,7 @@ ret v|r6k|jp v, %t1;jr %t;%t1:;ret;%t:
 ret v|r800|ret pe
 ret v|ti83|ret pe
 ret v|ti83plus|ret pe
+ret v|vm1|rpe
 ret v|z180|ret pe
 ret v|z80|ret pe
 ret v|z80n|ret pe
@@ -13873,6 +14257,7 @@ rgeu|r6k|ret nc
 rgeu|r800|ret nc
 rgeu|ti83|ret nc
 rgeu|ti83plus|ret nc
+rgeu|vm1|rnc
 rgeu|z180|ret nc
 rgeu|z80|ret nc
 rgeu|z80n|ret nc
@@ -13891,6 +14276,7 @@ rgtu|r6k|jr z, %t;ret nc;%t:
 rgtu|r800|jr z, %t;ret nc;%t:
 rgtu|ti83|jr z, %t;ret nc;%t:
 rgtu|ti83plus|jr z, %t;ret nc;%t:
+rgtu|vm1|jz %t;rnc;%t:
 rgtu|z180|jr z, %t;ret nc;%t:
 rgtu|z80|jr z, %t;ret nc;%t:
 rgtu|z80n|jr z, %t;ret nc;%t:
@@ -13906,6 +14292,7 @@ rl bc|r3k|rl c;rl b
 rl bc|r800|rl c;rl b
 rl bc|ti83|rl c;rl b
 rl bc|ti83plus|rl c;rl b
+rl bc|vm1|extern __z80asm__rl_bc;call __z80asm__rl_bc
 rl bc|z180|rl c;rl b
 rl bc|z80|rl c;rl b
 rl bc|z80n|rl c;rl b
@@ -13918,6 +14305,7 @@ rl de|kc160_z80|rl e;rl d
 rl de|r800|rl e;rl d
 rl de|ti83|rl e;rl d
 rl de|ti83plus|rl e;rl d
+rl de|vm1|extern __z80asm__rl_de;call __z80asm__rl_de
 rl de|z180|rl e;rl d
 rl de|z80|rl e;rl d
 rl de|z80n|rl e;rl d
@@ -13933,6 +14321,7 @@ rl hl|r3k|rl l;rl h
 rl hl|r800|rl l;rl h
 rl hl|ti83|rl l;rl h
 rl hl|ti83plus|rl l;rl h
+rl hl|vm1|extern __z80asm__rl_hl;call __z80asm__rl_hl
 rl hl|z180|rl l;rl h
 rl hl|z80|rl l;rl h
 rl hl|z80n|rl l;rl h
@@ -13944,6 +14333,7 @@ rld|r3k|extern __z80asm__rld;call __z80asm__rld
 rld|r4k|extern __z80asm__rld;call __z80asm__rld
 rld|r5k|extern __z80asm__rld;call __z80asm__rld
 rld|r6k|extern __z80asm__rld;call __z80asm__rld
+rld|vm1|extern __z80asm__rld;call __z80asm__rld
 rlde|8080|extern __z80asm__rl_de;call __z80asm__rl_de
 rlde|ez80|rl e;rl d
 rlde|ez80_z80|rl e;rl d
@@ -13958,6 +14348,7 @@ rlde|r6k|rl de
 rlde|r800|rl e;rl d
 rlde|ti83|rl e;rl d
 rlde|ti83plus|rl e;rl d
+rlde|vm1|extern __z80asm__rl_de;call __z80asm__rl_de
 rlde|z180|rl e;rl d
 rlde|z80|rl e;rl d
 rlde|z80n|rl e;rl d
@@ -13976,6 +14367,7 @@ rleu|r6k|ret z;ret c
 rleu|r800|ret z;ret c
 rleu|ti83|ret z;ret c
 rleu|ti83plus|ret z;ret c
+rleu|vm1|rz;rc
 rleu|z180|ret z;ret c
 rleu|z80|ret z;ret c
 rleu|z80n|ret z;ret c
@@ -13994,6 +14386,7 @@ rltu|r6k|ret c
 rltu|r800|ret c
 rltu|ti83|ret c
 rltu|ti83plus|ret c
+rltu|vm1|rc
 rltu|z180|ret c
 rltu|z80|ret c
 rltu|z80n|ret c
@@ -14012,6 +14405,7 @@ rne|r6k|ret nz
 rne|r800|ret nz
 rne|ti83|ret nz
 rne|ti83plus|ret nz
+rne|vm1|rnz
 rne|z180|ret nz
 rne|z80|ret nz
 rne|z80n|ret nz
@@ -14029,6 +14423,7 @@ rnv|r6k|jp v, %t;ret;%t:
 rnv|r800|ret po
 rnv|ti83|ret po
 rnv|ti83plus|ret po
+rnv|vm1|rpo
 rnv|z180|ret po
 rnv|z80|ret po
 rnv|z80n|ret po
@@ -14044,6 +14439,7 @@ rr bc|r3k|rr b;rr c
 rr bc|r800|rr b;rr c
 rr bc|ti83|rr b;rr c
 rr bc|ti83plus|rr b;rr c
+rr bc|vm1|extern __z80asm__rr_bc;call __z80asm__rr_bc
 rr bc|z180|rr b;rr c
 rr bc|z80|rr b;rr c
 rr bc|z80n|rr b;rr c
@@ -14057,6 +14453,7 @@ rr de|kc160_z80|rr d;rr e
 rr de|r800|rr d;rr e
 rr de|ti83|rr d;rr e
 rr de|ti83plus|rr d;rr e
+rr de|vm1|extern __z80asm__rr_de;call __z80asm__rr_de
 rr de|z180|rr d;rr e
 rr de|z80|rr d;rr e
 rr de|z80n|rr d;rr e
@@ -14070,6 +14467,7 @@ rr hl|kc160_z80|rr h;rr l
 rr hl|r800|rr h;rr l
 rr hl|ti83|rr h;rr l
 rr hl|ti83plus|rr h;rr l
+rr hl|vm1|extern __z80asm__rr_hl;call __z80asm__rr_hl
 rr hl|z180|rr h;rr l
 rr hl|z80|rr h;rr l
 rr hl|z80n|rr h;rr l
@@ -14081,6 +14479,7 @@ rrd|r3k|extern __z80asm__rrd;call __z80asm__rrd
 rrd|r4k|extern __z80asm__rrd;call __z80asm__rrd
 rrd|r5k|extern __z80asm__rrd;call __z80asm__rrd
 rrd|r6k|extern __z80asm__rrd;call __z80asm__rrd
+rrd|vm1|extern __z80asm__rrd;call __z80asm__rrd
 rrhl|8080|extern __z80asm__sra_hl;call __z80asm__sra_hl
 rrhl|ez80|sra h;rr l
 rrhl|ez80_z80|sra h;rr l
@@ -14095,6 +14494,7 @@ rrhl|r6k|sra h;rr l
 rrhl|r800|sra h;rr l
 rrhl|ti83|sra h;rr l
 rrhl|ti83plus|sra h;rr l
+rrhl|vm1|extern __z80asm__sra_hl;call __z80asm__sra_hl
 rrhl|z180|sra h;rr l
 rrhl|z80|sra h;rr l
 rrhl|z80n|sra h;rr l
@@ -14112,6 +14512,7 @@ rv|r6k|jp v, %t1;jr %t;%t1:;ret;%t:
 rv|r800|ret pe
 rv|ti83|ret pe
 rv|ti83plus|ret pe
+rv|vm1|rpe
 rv|z180|ret pe
 rv|z80|ret pe
 rv|z80n|ret pe
@@ -14130,6 +14531,7 @@ sbc (hl+)|r6k|sbc a, (hl);inc hl
 sbc (hl+)|r800|sbc a, (hl);inc hl
 sbc (hl+)|ti83|sbc a, (hl);inc hl
 sbc (hl+)|ti83plus|sbc a, (hl);inc hl
+sbc (hl+)|vm1|sbb m;inx h
 sbc (hl+)|z180|sbc a, (hl);inc hl
 sbc (hl+)|z80|sbc a, (hl);inc hl
 sbc (hl+)|z80n|sbc a, (hl);inc hl
@@ -14148,6 +14550,7 @@ sbc (hl-)|r6k|sbc a, (hl);dec hl
 sbc (hl-)|r800|sbc a, (hl);dec hl
 sbc (hl-)|ti83|sbc a, (hl);dec hl
 sbc (hl-)|ti83plus|sbc a, (hl);dec hl
+sbc (hl-)|vm1|sbb m;dcx h
 sbc (hl-)|z180|sbc a, (hl);dec hl
 sbc (hl-)|z80|sbc a, (hl);dec hl
 sbc (hl-)|z80n|sbc a, (hl);dec hl
@@ -14176,6 +14579,7 @@ sbc a, (hl+)|r6k|sbc a, (hl);inc hl
 sbc a, (hl+)|r800|sbc a, (hl);inc hl
 sbc a, (hl+)|ti83|sbc a, (hl);inc hl
 sbc a, (hl+)|ti83plus|sbc a, (hl);inc hl
+sbc a, (hl+)|vm1|sbb m;inx h
 sbc a, (hl+)|z180|sbc a, (hl);inc hl
 sbc a, (hl+)|z80|sbc a, (hl);inc hl
 sbc a, (hl+)|z80n|sbc a, (hl);inc hl
@@ -14194,6 +14598,7 @@ sbc a, (hl-)|r6k|sbc a, (hl);dec hl
 sbc a, (hl-)|r800|sbc a, (hl);dec hl
 sbc a, (hl-)|ti83|sbc a, (hl);dec hl
 sbc a, (hl-)|ti83plus|sbc a, (hl);dec hl
+sbc a, (hl-)|vm1|sbb m;dcx h
 sbc a, (hl-)|z180|sbc a, (hl);dec hl
 sbc a, (hl-)|z80|sbc a, (hl);dec hl
 sbc a, (hl-)|z80n|sbc a, (hl);dec hl
@@ -14206,9 +14611,11 @@ sbc hl, de|gbz80|extern __z80asm__sbc_hl_de;call __z80asm__sbc_hl_de
 sbc hl, hl|8080|extern __z80asm__sbc_hl_hl;call __z80asm__sbc_hl_hl
 sbc hl, hl|8085|extern __z80asm__sbc_hl_hl;call __z80asm__sbc_hl_hl
 sbc hl, hl|gbz80|extern __z80asm__sbc_hl_hl;call __z80asm__sbc_hl_hl
+sbc hl, hl|vm1|extern __z80asm__sbc_hl_hl;call __z80asm__sbc_hl_hl
 sbc hl, sp|8080|extern __z80asm__sbc_hl_sp;call __z80asm__sbc_hl_sp
 sbc hl, sp|8085|extern __z80asm__sbc_hl_sp;call __z80asm__sbc_hl_sp
 sbc hl, sp|gbz80|extern __z80asm__sbc_hl_sp;call __z80asm__sbc_hl_sp
+sbc hl, sp|vm1|extern __z80asm__sbc_hl_sp;call __z80asm__sbc_hl_sp
 sbc.l (hl+)|ez80_z80|sbc.lis a, (hl);inc.lis hl
 sbc.l (hl-)|ez80_z80|sbc.lis a, (hl);dec.lis hl
 sbc.l a, (hl+)|ez80_z80|sbc.lis a, (hl);inc.lis hl
@@ -14275,6 +14682,7 @@ sra bc|r6k|sra b;rr c
 sra bc|r800|sra b;rr c
 sra bc|ti83|sra b;rr c
 sra bc|ti83plus|sra b;rr c
+sra bc|vm1|extern __z80asm__sra_bc;call __z80asm__sra_bc
 sra bc|z180|sra b;rr c
 sra bc|z80|sra b;rr c
 sra bc|z80n|sra b;rr c
@@ -14293,6 +14701,7 @@ sra de|r6k|sra d;rr e
 sra de|r800|sra d;rr e
 sra de|ti83|sra d;rr e
 sra de|ti83plus|sra d;rr e
+sra de|vm1|extern __z80asm__sra_de;call __z80asm__sra_de
 sra de|z180|sra d;rr e
 sra de|z80|sra d;rr e
 sra de|z80n|sra d;rr e
@@ -14310,6 +14719,7 @@ sra hl|r6k|sra h;rr l
 sra hl|r800|sra h;rr l
 sra hl|ti83|sra h;rr l
 sra hl|ti83plus|sra h;rr l
+sra hl|vm1|extern __z80asm__sra_hl;call __z80asm__sra_hl
 sra hl|z180|sra h;rr l
 sra hl|z80|sra h;rr l
 sra hl|z80n|sra h;rr l
@@ -14328,6 +14738,7 @@ sub (hl+)|r6k|sub (hl);inc hl
 sub (hl+)|r800|sub (hl);inc hl
 sub (hl+)|ti83|sub (hl);inc hl
 sub (hl+)|ti83plus|sub (hl);inc hl
+sub (hl+)|vm1|sub m;inx h
 sub (hl+)|z180|sub (hl);inc hl
 sub (hl+)|z80|sub (hl);inc hl
 sub (hl+)|z80n|sub (hl);inc hl
@@ -14346,6 +14757,7 @@ sub (hl-)|r6k|sub (hl);dec hl
 sub (hl-)|r800|sub (hl);dec hl
 sub (hl-)|ti83|sub (hl);dec hl
 sub (hl-)|ti83plus|sub (hl);dec hl
+sub (hl-)|vm1|sub m;dcx h
 sub (hl-)|z180|sub (hl);dec hl
 sub (hl-)|z80|sub (hl);dec hl
 sub (hl-)|z80n|sub (hl);dec hl
@@ -14374,6 +14786,7 @@ sub a, (hl+)|r6k|sub (hl);inc hl
 sub a, (hl+)|r800|sub (hl);inc hl
 sub a, (hl+)|ti83|sub (hl);inc hl
 sub a, (hl+)|ti83plus|sub (hl);inc hl
+sub a, (hl+)|vm1|sub m;inx h
 sub a, (hl+)|z180|sub (hl);inc hl
 sub a, (hl+)|z80|sub (hl);inc hl
 sub a, (hl+)|z80n|sub (hl);inc hl
@@ -14392,6 +14805,7 @@ sub a, (hl-)|r6k|sub (hl);dec hl
 sub a, (hl-)|r800|sub (hl);dec hl
 sub a, (hl-)|ti83|sub (hl);dec hl
 sub a, (hl-)|ti83plus|sub (hl);dec hl
+sub a, (hl-)|vm1|sub m;dcx h
 sub a, (hl-)|z180|sub (hl);dec hl
 sub a, (hl-)|z80|sub (hl);dec hl
 sub a, (hl-)|z80n|sub (hl);dec hl
@@ -14442,6 +14856,7 @@ sub hl, hl|r6k|extern __z80asm__sub_hl_hl;call __z80asm__sub_hl_hl
 sub hl, hl|r800|extern __z80asm__sub_hl_hl;call __z80asm__sub_hl_hl
 sub hl, hl|ti83|extern __z80asm__sub_hl_hl;call __z80asm__sub_hl_hl
 sub hl, hl|ti83plus|extern __z80asm__sub_hl_hl;call __z80asm__sub_hl_hl
+sub hl, hl|vm1|extern __z80asm__sub_hl_hl;call __z80asm__sub_hl_hl
 sub hl, hl|z180|extern __z80asm__sub_hl_hl;call __z80asm__sub_hl_hl
 sub hl, hl|z80|extern __z80asm__sub_hl_hl;call __z80asm__sub_hl_hl
 sub hl, hl|z80n|extern __z80asm__sub_hl_hl;call __z80asm__sub_hl_hl
@@ -14460,6 +14875,7 @@ sub hl, sp|r6k|extern __z80asm__sub_hl_sp;call __z80asm__sub_hl_sp
 sub hl, sp|r800|extern __z80asm__sub_hl_sp;call __z80asm__sub_hl_sp
 sub hl, sp|ti83|extern __z80asm__sub_hl_sp;call __z80asm__sub_hl_sp
 sub hl, sp|ti83plus|extern __z80asm__sub_hl_sp;call __z80asm__sub_hl_sp
+sub hl, sp|vm1|extern __z80asm__sub_hl_sp;call __z80asm__sub_hl_sp
 sub hl, sp|z180|extern __z80asm__sub_hl_sp;call __z80asm__sub_hl_sp
 sub hl, sp|z80|extern __z80asm__sub_hl_sp;call __z80asm__sub_hl_sp
 sub hl, sp|z80n|extern __z80asm__sub_hl_sp;call __z80asm__sub_hl_sp
@@ -14495,6 +14911,7 @@ xor (hl+)|r6k|xor (hl);inc hl
 xor (hl+)|r800|xor (hl);inc hl
 xor (hl+)|ti83|xor (hl);inc hl
 xor (hl+)|ti83plus|xor (hl);inc hl
+xor (hl+)|vm1|xra m;inx h
 xor (hl+)|z180|xor (hl);inc hl
 xor (hl+)|z80|xor (hl);inc hl
 xor (hl+)|z80n|xor (hl);inc hl
@@ -14513,6 +14930,7 @@ xor (hl-)|r6k|xor (hl);dec hl
 xor (hl-)|r800|xor (hl);dec hl
 xor (hl-)|ti83|xor (hl);dec hl
 xor (hl-)|ti83plus|xor (hl);dec hl
+xor (hl-)|vm1|xra m;dcx h
 xor (hl-)|z180|xor (hl);dec hl
 xor (hl-)|z80|xor (hl);dec hl
 xor (hl-)|z80n|xor (hl);dec hl
@@ -14541,6 +14959,7 @@ xor a, (hl+)|r6k|xor (hl);inc hl
 xor a, (hl+)|r800|xor (hl);inc hl
 xor a, (hl+)|ti83|xor (hl);inc hl
 xor a, (hl+)|ti83plus|xor (hl);inc hl
+xor a, (hl+)|vm1|xra m;inx h
 xor a, (hl+)|z180|xor (hl);inc hl
 xor a, (hl+)|z80|xor (hl);inc hl
 xor a, (hl+)|z80n|xor (hl);inc hl
@@ -14559,6 +14978,7 @@ xor a, (hl-)|r6k|xor (hl);dec hl
 xor a, (hl-)|r800|xor (hl);dec hl
 xor a, (hl-)|ti83|xor (hl);dec hl
 xor a, (hl-)|ti83plus|xor (hl);dec hl
+xor a, (hl-)|vm1|xra m;dcx h
 xor a, (hl-)|z180|xor (hl);dec hl
 xor a, (hl-)|z80|xor (hl);dec hl
 xor a, (hl-)|z80n|xor (hl);dec hl
@@ -14577,6 +14997,7 @@ xor hl, bc|r6k|push af;ld a, h;xor b;ld h, a;ld a, l;xor c;ld l, a;pop af
 xor hl, bc|r800|push af;ld a, h;xor b;ld h, a;ld a, l;xor c;ld l, a;pop af
 xor hl, bc|ti83|push af;ld a, h;xor b;ld h, a;ld a, l;xor c;ld l, a;pop af
 xor hl, bc|ti83plus|push af;ld a, h;xor b;ld h, a;ld a, l;xor c;ld l, a;pop af
+xor hl, bc|vm1|push psw;mov a, h;xra b;mov h, a;mov a, l;xra c;mov l, a;pop psw
 xor hl, bc|z180|push af;ld a, h;xor b;ld h, a;ld a, l;xor c;ld l, a;pop af
 xor hl, bc|z80|push af;ld a, h;xor b;ld h, a;ld a, l;xor c;ld l, a;pop af
 xor hl, bc|z80n|push af;ld a, h;xor b;ld h, a;ld a, l;xor c;ld l, a;pop af
@@ -14592,6 +15013,7 @@ xor hl, de|r3k|push af;ld a, h;xor d;ld h, a;ld a, l;xor e;ld l, a;pop af
 xor hl, de|r800|push af;ld a, h;xor d;ld h, a;ld a, l;xor e;ld l, a;pop af
 xor hl, de|ti83|push af;ld a, h;xor d;ld h, a;ld a, l;xor e;ld l, a;pop af
 xor hl, de|ti83plus|push af;ld a, h;xor d;ld h, a;ld a, l;xor e;ld l, a;pop af
+xor hl, de|vm1|push psw;mov a, h;xra d;mov h, a;mov a, l;xra e;mov l, a;pop psw
 xor hl, de|z180|push af;ld a, h;xor d;ld h, a;ld a, l;xor e;ld l, a;pop af
 xor hl, de|z80|push af;ld a, h;xor d;ld h, a;ld a, l;xor e;ld l, a;pop af
 xor hl, de|z80n|push af;ld a, h;xor d;ld h, a;ld a, l;xor e;ld l, a;pop af

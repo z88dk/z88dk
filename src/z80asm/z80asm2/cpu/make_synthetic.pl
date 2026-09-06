@@ -692,6 +692,34 @@ ops:
             shift @ops;
             next ops;
         }
+        if (   @{ $ops[0] } == 3
+            && $ops[0][0] == 0x38
+            && $ops[0][1] == 0x26
+            && $ops[0][2] == 0 )
+        {
+            push @instr, "ld h', 0";
+            shift @ops;
+            next ops;
+        }
+        if (   @{ $ops[0] } == 3
+            && $ops[0][0] == 0x38
+            && $ops[0][1] == 0x2E
+            && $ops[0][2] == 0 )
+        {
+            push @instr, "ld l', 0";
+            shift @ops;
+            next ops;
+        }
+        if (   @{ $ops[0] } == 4
+            && $ops[0][0] == 0x38
+            && $ops[0][1] == 0x21
+            && $ops[0][2] == 0
+            && $ops[0][3] == 0 )
+        {
+            push @instr, "ld hl', 0";
+            shift @ops;
+            next ops;
+        }
         for my $i ( 0 .. $#ops ) {
             my @flat = map { @$_ } @ops[ 0 .. $i ];
             if ( exists $ops->{"@flat"}{$cpu} ) {
@@ -701,7 +729,9 @@ ops:
             }
         }
         die "$asm $cpu ", join( ":", @instr ), ", ",
-            join( " ", map { @$_ } @ops );
+            join( " ",
+            map { /^\d+$/ ? sprintf( "%02X", $_ ) : $_ }
+            map { @$_ } @ops );
     }
 
     # check relative jumps converted to absolute jumps

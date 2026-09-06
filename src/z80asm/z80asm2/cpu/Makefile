@@ -5,11 +5,6 @@
 #------------------------------------------------------------------------------
 
 all: opcodes.dat opcodes.txt
-all: synthetic.dat
-all: ../opcodes_trie_token.h ../opcodes_trie_token.cpp
-all: ../opcodes_synth_trie.h ../opcodes_synth_trie.cpp
-all: ../opcodes_parse_trie.h ../opcodes_parse_trie.cpp
-
 opcodes.dat: make_opcodes.pl Opcodes.pm $(wildcard opcodes*.pl) Makefile
 	perl make_opcodes.pl opcodes.dat
 	dos2unix opcodes.dat
@@ -18,6 +13,12 @@ opcodes.txt: dump_opcodes.pl opcodes.dat Opcodes.pm Makefile
 	perl dump_opcodes.pl opcodes.dat opcodes.txt
 	dos2unix opcodes.txt
 
+all: cpu_test_z80_ok.asm
+cpu_test_z80_ok.asm: opcodes.dat make_cpu_test.pl Opcodes.pm Makefile
+	perl make_cpu_test.pl opcodes.dat cpu_test 
+	dos2unix cpu_test_*.asm
+
+all: synthetic.dat
 synthetic.dat: opcodes.dat make_synthetic.pl validate_synthetic.pl Makefile
 	$(RM) synthetic.dat
 	perl make_synthetic.pl opcodes.dat synthetic.dat.tmp
@@ -25,12 +26,14 @@ synthetic.dat: opcodes.dat make_synthetic.pl validate_synthetic.pl Makefile
 	perl validate_synthetic.pl synthetic.dat.tmp
 	mv synthetic.dat.tmp synthetic.dat
 
+all: ../opcodes_trie_token.h ../opcodes_trie_token.cpp
 ../opcodes_trie_token.h ../opcodes_trie_token.cpp &: \
 		make_trie_token.pl Makefile \
 		../../cpu.def ../lexer_tokens.def ../lexer_keywords.def
 	perl make_trie_token.pl opcodes_trie_token
 	dos2unix ../opcodes_trie_token.h ../opcodes_trie_token.cpp
 
+all: ../opcodes_synth_trie.h ../opcodes_synth_trie.cpp
 ../opcodes_synth_trie.h ../opcodes_synth_trie.cpp &: \
 		make_synth_trie.pl synthetic.dat ../opcodes_trie_token.h Trie.pm Makefile \
 		../opcodes_trie_token.h \
@@ -38,6 +41,7 @@ synthetic.dat: opcodes.dat make_synthetic.pl validate_synthetic.pl Makefile
 	perl make_synth_trie.pl synthetic.dat ../opcodes_trie_token.h opcodes_synth_trie
 	dos2unix ../opcodes_synth_trie.h ../opcodes_synth_trie.cpp
 
+all: ../opcodes_parse_trie.h ../opcodes_parse_trie.cpp
 ../opcodes_parse_trie.h ../opcodes_parse_trie.cpp &: \
 		make_parse_trie.pl opcodes.dat ../opcodes_trie_token.h Trie.pm Makefile \
 		../opcodes_trie_token.h

@@ -37,7 +37,7 @@ for my $cpu ( Opcode->cpus ) {
     #--------------------------------------------------------------------------
 
     # JR in intel
-    if ( $cpu =~ /^(8080|8085)/ ) {
+    if ( $cpu =~ /^(8080|8085|vm1)/ ) {
         add_synth( $cpu, "jr %j", "jp %m" );
         for my $flag ( 'nz', 'z', 'nc', 'c' ) {
             add_synth( $cpu, "jr $flag, %j", "jp $flag, %m" );
@@ -45,7 +45,7 @@ for my $cpu ( Opcode->cpus ) {
     }
 
     # DJNZ
-    if ( $cpu =~ /^(8080|8085)/ ) {
+    if ( $cpu =~ /^(8080|8085|vm1)/ ) {
         add_synth( $cpu, "djnz %j",    "dec b", "jp nz, %m" );
         add_synth( $cpu, "djnz b, %j", "dec b", "jp nz, %m" );
     }
@@ -386,6 +386,16 @@ for my $cpu ( Opcode->cpus ) {
                     "${pref}ld $l1, $l2"
                 );
             }
+        }
+    }
+
+    # LD rp1, rp2 on vm1 with hl'
+    for my $rp1 ( 'bc', 'de', "hl'" ) {
+        my ( $h1, $l1 ) = $rp1 eq "hl'" ? ( "h'", "l'" ) : split //, $rp1;
+        for my $rp2 ( 'bc', 'de', "hl'" ) {
+            next if $rp1 eq $rp2;
+            my ( $h2, $l2 ) = $rp2 eq "hl'" ? ( "h'", "l'" ) : split //, $rp2;
+            add_synth( $cpu, "ld $rp1, $rp2", "ld $h1, $h2", "ld $l1, $l2" );
         }
     }
 
@@ -960,8 +970,8 @@ for my $cpu ( Opcode->cpus ) {
         "pop af" );
     if ( get_opcode( $cpu, "ld ix, %m" ) ) {
         for my $x ( 'ix', 'iy' ) {
-            add_synth( $cpu, "bool $x", "push af", "ld a, ${x}h", "or ${x}l",
-                "jr z, %t1", "ld $x, 0x0001",
+            add_synth( $cpu, "bool $x", "push af",
+                "ld a, ${x}h", "or ${x}l", "jr z, %t1", "ld $x, 0x0001",
                 "pop af" );
             add_synth(
                 $cpu,

@@ -105,8 +105,7 @@ tidy:
 	@[ -f $(TIDY_STAMP) ] || touch -t 197001010000 $(TIDY_STAMP)
 	find . \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.re' \) \
 		-newer $(TIDY_STAMP) -exec $(ASTYLE) {} +
-	find . -name cpu -prune -o \
-		   \( -name '*.pl' -o -name '*.pm' -o -name '*.t' \) \
+	find . \( -name '*.pl' -o -name '*.pm' -o -name '*.t' \) \
 		   -newer $(TIDY_STAMP) -exec $(PERLTIDY) {} +
 	touch $(TIDY_STAMP)
 

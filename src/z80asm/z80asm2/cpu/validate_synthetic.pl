@@ -4695,6 +4695,7 @@ sub normalize_effects {
                     && $effects[ $i + 1 ]{args}[1]{type} eq "reg" )
                 {
                     my $reg = $effects[ $i + 1 ]{args}[1]{name};
+                    my $alt = $effects[ $i + 1 ]{args}[1]{alt};
 
                     if (   $effects[ $i + 2 ]{type} eq "inst"
                         && $effects[ $i + 2 ]{opcode} eq "cpl"
@@ -4707,6 +4708,7 @@ sub normalize_effects {
                             && @{ $effects[ $i + 3 ]{args} } == 2
                             && $effects[ $i + 3 ]{args}[0]{type} eq "reg"
                             && $effects[ $i + 3 ]{args}[0]{name} eq $reg
+                            && $effects[ $i + 3 ]{args}[0]{alt} == $alt
                             && $effects[ $i + 3 ]{args}[1]{type} eq "reg"
                             && $effects[ $i + 3 ]{args}[1]{name} eq "a" )
                         {
@@ -4714,7 +4716,8 @@ sub normalize_effects {
                                 && $effects[ $i + 4 ]{opcode} eq "inc"
                                 && @{ $effects[ $i + 4 ]{args} } == 1
                                 && $effects[ $i + 4 ]{args}[0]{type} eq "reg"
-                                && $effects[ $i + 4 ]{args}[0]{name} eq $reg )
+                                && $effects[ $i + 4 ]{args}[0]{name} eq $reg
+                                && $effects[ $i + 4 ]{args}[0]{alt} == $alt )
                             {
                                 if (   $effects[ $i + 5 ]{type} eq "inst"
                                     && $effects[ $i + 5 ]{opcode} eq "pop"
@@ -4732,7 +4735,7 @@ sub normalize_effects {
                                             {
                                                 type  => 'reg',
                                                 name  => $reg,
-                                                alt   => 0,
+                                                alt   => $alt,
                                                 width => undef
                                             }
                                         ],
@@ -4766,6 +4769,7 @@ sub normalize_effects {
                     && $effects[ $i + 1 ]{args}[1]{type} eq "reg" )
                 {
                     my $reg_h = $effects[ $i + 1 ]{args}[1]{name};
+                    my $alt_h = $effects[ $i + 1 ]{args}[1]{alt};
 
                     if (   $effects[ $i + 2 ]{type} eq "inst"
                         && $effects[ $i + 2 ]{opcode} eq "cpl"
@@ -4778,6 +4782,7 @@ sub normalize_effects {
                             && @{ $effects[ $i + 3 ]{args} } == 2
                             && $effects[ $i + 3 ]{args}[0]{type} eq "reg"
                             && $effects[ $i + 3 ]{args}[0]{name} eq $reg_h
+                            && $effects[ $i + 3 ]{args}[0]{alt} == $alt_h
                             && $effects[ $i + 3 ]{args}[1]{type} eq "reg"
                             && $effects[ $i + 3 ]{args}[1]{name} eq "a" )
                         {
@@ -4789,7 +4794,12 @@ sub normalize_effects {
                                 && $effects[ $i + 4 ]{args}[1]{type} eq "reg" )
                             {
                                 my $reg_l = $effects[ $i + 4 ]{args}[1]{name};
-                                if ( $reg_h ne "a" && $reg_l ne "a" ) {
+                                my $alt_l = $effects[ $i + 4 ]{args}[1]{alt};
+
+                                if (   $alt_h == $alt_l
+                                    && $reg_h ne "a"
+                                    && $reg_l ne "a" )
+                                {
                                     my $reg_pair = reg_pair( $reg_h, $reg_l );
 
                                     if (   $effects[ $i + 5 ]{type} eq "inst"
@@ -4809,6 +4819,8 @@ sub normalize_effects {
                                             eq "reg"
                                             && $effects[ $i + 6 ]{args}[0]{name}
                                             eq $reg_l
+                                            && $effects[ $i + 6 ]{args}[0]{alt}
+                                            == $alt_l
                                             && $effects[ $i + 6 ]{args}[1]{type}
                                             eq "reg"
                                             && $effects[ $i + 6 ]{args}[1]{name}
@@ -4823,7 +4835,9 @@ sub normalize_effects {
                                                 && $effects[ $i + 7 ]{args}[0]
                                                 {type} eq "regpair"
                                                 && $effects[ $i + 7 ]{args}[0]
-                                                {name} eq $reg_pair )
+                                                {name} eq $reg_pair
+                                                && $effects[ $i + 7 ]{args}[0]
+                                                {alt} == $alt_l )
                                             {
                                                 if ( $effects[ $i + 8 ]{type} eq
                                                     "inst"
@@ -4845,7 +4859,7 @@ sub normalize_effects {
                                                                     'regpair',
                                                                 name =>
                                                                     $reg_pair,
-                                                                alt   => 0,
+                                                                alt   => $alt_l,
                                                                 width => undef
                                                         } ],
                                                         };

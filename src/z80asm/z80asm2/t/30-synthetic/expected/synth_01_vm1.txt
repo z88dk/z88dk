@@ -5,17 +5,17 @@ Define constant: __FLOAT_GENMATH__ = 1
 Assembling t/30-synthetic/input/synth_01.asm...
 # file: t/30-synthetic/input/synth_01.asm
 Identifier	"adc"	1:1	keyword=ADC 
-LeftParen	"("	1:5	
-Identifier	"hl"	1:6	keyword=HL 
-Plus	"+"	1:8	
-RightParen	")"	1:9	
-EndOfLine	"\n"	1:10	
+Identifier	"m"	1:4	keyword=M 
+EndOfLine	"\n"	1:5	
+Identifier	"inx"	1:1	keyword=INX 
+Identifier	"h"	1:4	keyword=H 
+EndOfLine	"\n"	1:5	
 Identifier	"adc"	2:1	keyword=ADC 
-LeftParen	"("	2:5	
-Identifier	"hl"	2:6	keyword=HL 
-Minus	"-"	2:8	
-RightParen	")"	2:9	
-EndOfLine	"\n"	2:10	
+Identifier	"m"	2:4	keyword=M 
+EndOfLine	"\n"	2:5	
+Identifier	"dcx"	2:1	keyword=DCX 
+Identifier	"h"	2:4	keyword=H 
+EndOfLine	"\n"	2:5	
 Identifier	"adc"	3:1	keyword=ADC 
 Identifier	"a"	3:5	keyword=A 
 Tick	"'"	3:6	
@@ -59,56 +59,113 @@ Identifier	"hl"	7:11	keyword=HL
 Minus	"-"	7:13	
 RightParen	")"	7:14	
 EndOfLine	"\n"	7:15	
-Identifier	"add"	8:1	keyword=ADD 
-Identifier	"bc"	8:5	keyword=BC 
-Comma	","	8:7	
+Identifier	"push"	8:1	keyword=PUSH 
+Identifier	"h"	8:5	keyword=H 
+EndOfLine	"\n"	8:6	
+Identifier	"lxi"	8:1	keyword=LXI 
+Identifier	"h"	8:4	keyword=H 
+Comma	","	8:5	
 Integer	"1"	8:9	int_value=1 
 Plus	"+"	8:10	
 Integer	"2"	8:11	int_value=2 
 Multiply	"*"	8:12	
 Integer	"3"	8:13	int_value=3 
 EndOfLine	"\n"	8:14	
-Identifier	"add"	9:1	keyword=ADD 
-Identifier	"bc"	9:5	keyword=BC 
-Comma	","	9:7	
-Identifier	"a"	9:9	keyword=A 
-EndOfLine	"\n"	9:10	
-Identifier	"add"	10:1	keyword=ADD 
-Identifier	"hl"	10:5	keyword=HL 
-Comma	","	10:7	
+Identifier	"dad"	8:1	keyword=DAD 
+Identifier	"b"	8:4	keyword=B 
+EndOfLine	"\n"	8:5	
+Identifier	"mov"	8:1	keyword=MOV 
+Identifier	"b"	8:4	keyword=B 
+Comma	","	8:5	
+Identifier	"h"	8:6	keyword=H 
+EndOfLine	"\n"	8:7	
+Identifier	"mov"	8:1	keyword=MOV 
+Identifier	"c"	8:4	keyword=C 
+Comma	","	8:5	
+Identifier	"l"	8:6	keyword=L 
+EndOfLine	"\n"	8:7	
+Identifier	"pop"	8:1	keyword=POP 
+Identifier	"h"	8:4	keyword=H 
+EndOfLine	"\n"	8:5	
+Identifier	"extern"	9:1	keyword=EXTERN 
+Identifier	"__z80asm__add_bc_a"	9:7	keyword=__Z80ASM__ADD_BC_A 
+EndOfLine	"\n"	9:25	
+Identifier	"call"	9:1	keyword=CALL 
+Identifier	"__z80asm__add_bc_a"	9:5	keyword=__Z80ASM__ADD_BC_A 
+EndOfLine	"\n"	9:23	
+Identifier	"push"	10:1	keyword=PUSH 
+Identifier	"d"	10:5	keyword=D 
+EndOfLine	"\n"	10:6	
+Identifier	"lxi"	10:1	keyword=LXI 
+Identifier	"d"	10:4	keyword=D 
+Comma	","	10:5	
 Integer	"1"	10:9	int_value=1 
 Plus	"+"	10:10	
 Integer	"2"	10:11	int_value=2 
 Multiply	"*"	10:12	
 Integer	"3"	10:13	int_value=3 
 EndOfLine	"\n"	10:14	
-Identifier	"add"	11:1	keyword=ADD 
-Identifier	"sp"	11:5	keyword=SP 
-Comma	","	11:7	
+Identifier	"dad"	10:1	keyword=DAD 
+Identifier	"d"	10:4	keyword=D 
+EndOfLine	"\n"	10:5	
+Identifier	"pop"	10:1	keyword=POP 
+Identifier	"d"	10:4	keyword=D 
+EndOfLine	"\n"	10:5	
+Identifier	"extern"	11:1	keyword=EXTERN 
+Identifier	"__z80asm__add_sp_d"	11:7	keyword=__Z80ASM__ADD_SP_D 
+EndOfLine	"\n"	11:25	
+Identifier	"call"	11:1	keyword=CALL 
+Identifier	"__z80asm__add_sp_d"	11:5	keyword=__Z80ASM__ADD_SP_D 
+EndOfLine	"\n"	11:23	
+Identifier	"defb"	11:1	keyword=DEFB 
 Integer	"1"	11:9	int_value=1 
 Plus	"+"	11:10	
 Integer	"2"	11:11	int_value=2 
 Multiply	"*"	11:12	
 Integer	"3"	11:13	int_value=3 
 EndOfLine	"\n"	11:14	
-Identifier	"adi"	12:1	keyword=ADI 
-Identifier	"hl"	12:5	keyword=HL 
-Comma	","	12:7	
+Identifier	"push"	12:1	keyword=PUSH 
+Identifier	"h"	12:5	keyword=H 
+EndOfLine	"\n"	12:6	
+Identifier	"lxi"	12:1	keyword=LXI 
+Identifier	"d"	12:4	keyword=D 
+Comma	","	12:5	
+Identifier	"unsigned8"	12:6	keyword=UNSIGNED8 
+LeftParen	"("	12:15	
 Integer	"1"	12:9	int_value=1 
 Plus	"+"	12:10	
 Integer	"2"	12:11	int_value=2 
 Multiply	"*"	12:12	
 Integer	"3"	12:13	int_value=3 
-EndOfLine	"\n"	12:14	
-Identifier	"adi"	13:1	keyword=ADI 
-Identifier	"sp"	13:5	keyword=SP 
-Comma	","	13:7	
+RightParen	")"	12:14	
+EndOfLine	"\n"	12:15	
+Identifier	"dad"	12:1	keyword=DAD 
+Identifier	"d"	12:4	keyword=D 
+EndOfLine	"\n"	12:5	
+Identifier	"xchg"	12:1	keyword=XCHG 
+EndOfLine	"\n"	12:5	
+Identifier	"pop"	12:1	keyword=POP 
+Identifier	"h"	12:4	keyword=H 
+EndOfLine	"\n"	12:5	
+Identifier	"xchg"	13:1	keyword=XCHG 
+EndOfLine	"\n"	13:5	
+Identifier	"lxi"	13:1	keyword=LXI 
+Identifier	"h"	13:4	keyword=H 
+Comma	","	13:5	
+Identifier	"unsigned8"	13:6	keyword=UNSIGNED8 
+LeftParen	"("	13:15	
 Integer	"1"	13:9	int_value=1 
 Plus	"+"	13:10	
 Integer	"2"	13:11	int_value=2 
 Multiply	"*"	13:12	
 Integer	"3"	13:13	int_value=3 
-EndOfLine	"\n"	13:14	
+RightParen	")"	13:14	
+EndOfLine	"\n"	13:15	
+Identifier	"dad"	13:1	keyword=DAD 
+Identifier	"sp"	13:4	keyword=SP 
+EndOfLine	"\n"	13:6	
+Identifier	"xchg"	13:1	keyword=XCHG 
+EndOfLine	"\n"	13:5	
 Identifier	"altd"	14:1	keyword=ALTD 
 Identifier	"adc"	14:6	keyword=ADC 
 Identifier	"a"	14:10	keyword=A 
@@ -146,16 +203,69 @@ Identifier	"bc"	18:9	keyword=BC
 Comma	","	18:11	
 Identifier	"de"	18:13	keyword=DE 
 EndOfLine	"\n"	18:15	
-Identifier	"and"	19:1	keyword=AND 
-Identifier	"hl"	19:5	keyword=HL 
-Comma	","	19:7	
-Identifier	"bc"	19:9	keyword=BC 
-EndOfLine	"\n"	19:11	
-Identifier	"arhl"	20:1	keyword=ARHL 
-EndOfLine	"\n"	20:5	
-Identifier	"bool"	21:1	keyword=BOOL 
-Identifier	"hl"	21:6	keyword=HL 
+Identifier	"push"	19:1	keyword=PUSH 
+Identifier	"psw"	19:5	keyword=PSW 
+EndOfLine	"\n"	19:8	
+Identifier	"mov"	19:1	keyword=MOV 
+Identifier	"a"	19:4	keyword=A 
+Comma	","	19:5	
+Identifier	"h"	19:6	keyword=H 
+EndOfLine	"\n"	19:7	
+Identifier	"ana"	19:1	keyword=ANA 
+Identifier	"b"	19:4	keyword=B 
+EndOfLine	"\n"	19:5	
+Identifier	"mov"	19:1	keyword=MOV 
+Identifier	"h"	19:4	keyword=H 
+Comma	","	19:5	
+Identifier	"a"	19:6	keyword=A 
+EndOfLine	"\n"	19:7	
+Identifier	"mov"	19:1	keyword=MOV 
+Identifier	"a"	19:4	keyword=A 
+Comma	","	19:5	
+Identifier	"l"	19:6	keyword=L 
+EndOfLine	"\n"	19:7	
+Identifier	"ana"	19:1	keyword=ANA 
+Identifier	"c"	19:4	keyword=C 
+EndOfLine	"\n"	19:5	
+Identifier	"mov"	19:1	keyword=MOV 
+Identifier	"l"	19:4	keyword=L 
+Comma	","	19:5	
+Identifier	"a"	19:6	keyword=A 
+EndOfLine	"\n"	19:7	
+Identifier	"pop"	19:1	keyword=POP 
+Identifier	"psw"	19:4	keyword=PSW 
+EndOfLine	"\n"	19:7	
+Identifier	"extern"	20:1	keyword=EXTERN 
+Identifier	"__z80asm__sra_hl"	20:7	keyword=__Z80ASM__SRA_HL 
+EndOfLine	"\n"	20:23	
+Identifier	"call"	20:1	keyword=CALL 
+Identifier	"__z80asm__sra_hl"	20:5	keyword=__Z80ASM__SRA_HL 
+EndOfLine	"\n"	20:21	
+Identifier	"push"	21:1	keyword=PUSH 
+Identifier	"psw"	21:5	keyword=PSW 
 EndOfLine	"\n"	21:8	
+Identifier	"mov"	21:1	keyword=MOV 
+Identifier	"a"	21:4	keyword=A 
+Comma	","	21:5	
+Identifier	"h"	21:6	keyword=H 
+EndOfLine	"\n"	21:7	
+Identifier	"ora"	21:1	keyword=ORA 
+Identifier	"l"	21:4	keyword=L 
+EndOfLine	"\n"	21:5	
+Identifier	"jz"	21:1	keyword=JZ 
+Identifier	"__HLA_1"	21:3	
+EndOfLine	"\n"	21:10	
+Identifier	"ld"	21:1	keyword=LD 
+Identifier	"hl"	21:3	keyword=HL 
+Comma	","	21:5	
+Integer	"1"	21:6	int_value=1 
+EndOfLine	"\n"	21:7	
+Identifier	"__HLA_1"	21:1	
+Colon	":"	21:8	
+EndOfLine	"\n"	21:9	
+Identifier	"pop"	21:1	keyword=POP 
+Identifier	"psw"	21:4	keyword=PSW 
+EndOfLine	"\n"	21:7	
 Identifier	"bool"	22:1	keyword=BOOL 
 Identifier	"ix"	22:6	keyword=IX 
 EndOfLine	"\n"	22:8	
@@ -169,34 +279,42 @@ Identifier	"c"	24:6	keyword=C
 Comma	","	24:7	
 Identifier	"lbl1"	24:9	
 EndOfLine	"\n"	24:13	
-Identifier	"call"	25:1	keyword=CALL 
-Identifier	"eq"	25:6	keyword=EQ 
-Comma	","	25:8	
+Identifier	"cz"	25:1	keyword=CZ 
 Identifier	"lbl1"	25:10	
 EndOfLine	"\n"	25:14	
-Identifier	"call"	26:1	keyword=CALL 
-Identifier	"geu"	26:6	keyword=GEU 
-Comma	","	26:9	
+Identifier	"cnc"	26:1	keyword=CNC 
 Identifier	"lbl1"	26:11	
 EndOfLine	"\n"	26:15	
-Identifier	"call"	27:1	keyword=CALL 
-Identifier	"gtu"	27:6	keyword=GTU 
-Comma	","	27:9	
+Identifier	"jz"	27:1	keyword=JZ 
+Identifier	"__HLA_2"	27:3	
+EndOfLine	"\n"	27:10	
+Identifier	"cnc"	27:1	keyword=CNC 
 Identifier	"lbl1"	27:11	
 EndOfLine	"\n"	27:15	
+Identifier	"__HLA_2"	27:1	
+Colon	":"	27:8	
+EndOfLine	"\n"	27:9	
+Identifier	"jz"	28:1	keyword=JZ 
+Identifier	"__HLA_3"	28:3	
+EndOfLine	"\n"	28:10	
+Identifier	"jnc"	28:1	keyword=JNC 
+Identifier	"__HLA_4"	28:4	
+EndOfLine	"\n"	28:11	
+Identifier	"__HLA_3"	28:1	
+Colon	":"	28:8	
+EndOfLine	"\n"	28:9	
 Identifier	"call"	28:1	keyword=CALL 
-Identifier	"leu"	28:6	keyword=LEU 
-Comma	","	28:9	
 Identifier	"lbl1"	28:11	
 EndOfLine	"\n"	28:15	
+Identifier	"__HLA_4"	28:1	
+Colon	":"	28:8	
+EndOfLine	"\n"	28:9	
 Identifier	"call"	29:1	keyword=CALL 
 Identifier	"lo"	29:6	keyword=LO 
 Comma	","	29:8	
 Identifier	"lbl1"	29:10	
 EndOfLine	"\n"	29:14	
-Identifier	"call"	30:1	keyword=CALL 
-Identifier	"ltu"	30:6	keyword=LTU 
-Comma	","	30:9	
+Identifier	"cc"	30:1	keyword=CC 
 Identifier	"lbl1"	30:11	
 EndOfLine	"\n"	30:15	
 Identifier	"call"	31:1	keyword=CALL 
@@ -214,9 +332,7 @@ Identifier	"nc"	33:6	keyword=NC
 Comma	","	33:8	
 Identifier	"lbl1"	33:10	
 EndOfLine	"\n"	33:14	
-Identifier	"call"	34:1	keyword=CALL 
-Identifier	"ne"	34:6	keyword=NE 
-Comma	","	34:8	
+Identifier	"cnz"	34:1	keyword=CNZ 
 Identifier	"lbl1"	34:10	
 EndOfLine	"\n"	34:14	
 Identifier	"call"	35:1	keyword=CALL 
@@ -292,10 +408,12 @@ Identifier	"ltu"	47:7	keyword=LTU
 Comma	","	47:10	
 Identifier	"lbl1"	47:12	
 EndOfLine	"\n"	47:16	
-Identifier	"clr"	48:1	keyword=CLR 
-LeftParen	"("	48:5	
-Identifier	"hl"	48:6	keyword=HL 
-RightParen	")"	48:8	
+Identifier	"ld"	48:1	keyword=LD 
+LeftParen	"("	48:3	
+Identifier	"hl"	48:4	keyword=HL 
+RightParen	")"	48:6	
+Comma	","	48:7	
+Integer	"0"	48:8	int_value=0 
 EndOfLine	"\n"	48:9	
 Identifier	"clr"	49:1	keyword=CLR 
 LeftParen	"("	49:5	
@@ -319,32 +437,54 @@ Multiply	"*"	50:12
 Integer	"3"	50:13	int_value=3 
 RightParen	")"	50:14	
 EndOfLine	"\n"	50:15	
-Identifier	"clr"	51:1	keyword=CLR 
-Identifier	"a"	51:5	keyword=A 
+Identifier	"ld"	51:1	keyword=LD 
+Identifier	"a"	51:3	keyword=A 
+Comma	","	51:4	
+Integer	"0"	51:5	int_value=0 
 EndOfLine	"\n"	51:6	
-Identifier	"clr"	52:1	keyword=CLR 
-Identifier	"hl"	52:5	keyword=HL 
+Identifier	"ld"	52:1	keyword=LD 
+Identifier	"hl"	52:3	keyword=HL 
+Comma	","	52:5	
+Integer	"0"	52:6	int_value=0 
 EndOfLine	"\n"	52:7	
-Identifier	"clr"	53:1	keyword=CLR 
-Identifier	"hl"	53:5	keyword=HL 
-Tick	"'"	53:7	
+Identifier	"ld"	53:1	keyword=LD 
+Identifier	"hl"	53:3	keyword=HL 
+Tick	"'"	53:5	
+Comma	","	53:6	
+Integer	"0"	53:7	int_value=0 
 EndOfLine	"\n"	53:8	
-Identifier	"cpd"	54:1	keyword=CPD 
-EndOfLine	"\n"	54:4	
-Identifier	"cpdr"	55:1	keyword=CPDR 
-EndOfLine	"\n"	55:5	
-Identifier	"cpi"	56:1	keyword=CPI 
-EndOfLine	"\n"	56:4	
-Identifier	"cpir"	57:1	keyword=CPIR 
-EndOfLine	"\n"	57:5	
+Identifier	"extern"	54:1	keyword=EXTERN 
+Identifier	"__z80asm__cpd"	54:7	keyword=__Z80ASM__CPD 
+EndOfLine	"\n"	54:20	
+Identifier	"call"	54:1	keyword=CALL 
+Identifier	"__z80asm__cpd"	54:5	keyword=__Z80ASM__CPD 
+EndOfLine	"\n"	54:18	
+Identifier	"extern"	55:1	keyword=EXTERN 
+Identifier	"__z80asm__cpdr"	55:7	keyword=__Z80ASM__CPDR 
+EndOfLine	"\n"	55:21	
+Identifier	"call"	55:1	keyword=CALL 
+Identifier	"__z80asm__cpdr"	55:5	keyword=__Z80ASM__CPDR 
+EndOfLine	"\n"	55:19	
+Identifier	"extern"	56:1	keyword=EXTERN 
+Identifier	"__z80asm__cpi"	56:7	keyword=__Z80ASM__CPI 
+EndOfLine	"\n"	56:20	
+Identifier	"call"	56:1	keyword=CALL 
+Identifier	"__z80asm__cpi"	56:5	keyword=__Z80ASM__CPI 
+EndOfLine	"\n"	56:18	
+Identifier	"extern"	57:1	keyword=EXTERN 
+Identifier	"__z80asm__cpir"	57:7	keyword=__Z80ASM__CPIR 
+EndOfLine	"\n"	57:21	
+Identifier	"call"	57:1	keyword=CALL 
+Identifier	"__z80asm__cpir"	57:5	keyword=__Z80ASM__CPIR 
+EndOfLine	"\n"	57:19	
 Identifier	"daa"	58:1	keyword=DAA 
 EndOfLine	"\n"	58:4	
-Identifier	"dec"	59:1	keyword=DEC 
-LeftParen	"("	59:5	
-Identifier	"hl"	59:6	keyword=HL 
-Minus	"-"	59:8	
-RightParen	")"	59:9	
-EndOfLine	"\n"	59:10	
+Identifier	"dcr"	59:1	keyword=DCR 
+Identifier	"m"	59:4	keyword=M 
+EndOfLine	"\n"	59:5	
+Identifier	"dcx"	59:1	keyword=DCX 
+Identifier	"h"	59:4	keyword=H 
+EndOfLine	"\n"	59:5	
 Identifier	"dec"	60:1	keyword=DEC 
 Dot	"."	60:4	
 Identifier	"l"	60:5	keyword=L 
@@ -353,16 +493,24 @@ Identifier	"hl"	60:8	keyword=HL
 Minus	"-"	60:10	
 RightParen	")"	60:11	
 EndOfLine	"\n"	60:12	
-Identifier	"djnz"	61:1	keyword=DJNZ 
-Identifier	"b"	61:6	keyword=B 
-Comma	","	61:7	
+Identifier	"dcr"	61:1	keyword=DCR 
+Identifier	"b"	61:4	keyword=B 
+EndOfLine	"\n"	61:5	
+Identifier	"jnz"	61:1	keyword=JNZ 
 Identifier	"lbl1"	61:9	
 EndOfLine	"\n"	61:13	
-Identifier	"djnz"	62:1	keyword=DJNZ 
+Identifier	"dcr"	62:1	keyword=DCR 
+Identifier	"b"	62:4	keyword=B 
+EndOfLine	"\n"	62:5	
+Identifier	"jnz"	62:1	keyword=JNZ 
 Identifier	"lbl1"	62:6	
 EndOfLine	"\n"	62:10	
-Identifier	"dsub"	63:1	keyword=DSUB 
-EndOfLine	"\n"	63:5	
+Identifier	"extern"	63:1	keyword=EXTERN 
+Identifier	"__z80asm__sub_hl_bc"	63:7	keyword=__Z80ASM__SUB_HL_BC 
+EndOfLine	"\n"	63:26	
+Identifier	"call"	63:1	keyword=CALL 
+Identifier	"__z80asm__sub_hl_bc"	63:5	keyword=__Z80ASM__SUB_HL_BC 
+EndOfLine	"\n"	63:24	
 Identifier	"ex"	64:1	keyword=EX 
 LeftParen	"("	64:4	
 Identifier	"sp"	64:5	keyword=SP 
@@ -381,11 +529,18 @@ Identifier	"af"	66:4	keyword=AF
 Comma	","	66:6	
 Identifier	"af"	66:8	keyword=AF 
 EndOfLine	"\n"	66:10	
-Identifier	"ex"	67:1	keyword=EX 
-Identifier	"bc"	67:4	keyword=BC 
-Comma	","	67:6	
-Identifier	"hl"	67:8	keyword=HL 
-EndOfLine	"\n"	67:10	
+Identifier	"push"	67:1	keyword=PUSH 
+Identifier	"h"	67:5	keyword=H 
+EndOfLine	"\n"	67:6	
+Identifier	"push"	67:1	keyword=PUSH 
+Identifier	"b"	67:5	keyword=B 
+EndOfLine	"\n"	67:6	
+Identifier	"pop"	67:1	keyword=POP 
+Identifier	"h"	67:4	keyword=H 
+EndOfLine	"\n"	67:5	
+Identifier	"pop"	67:1	keyword=POP 
+Identifier	"b"	67:4	keyword=B 
+EndOfLine	"\n"	67:5	
 Identifier	"ex"	68:1	keyword=EX 
 Identifier	"de"	68:4	keyword=DE 
 Comma	","	68:6	
@@ -397,12 +552,12 @@ Tick	"'"	69:6
 Comma	","	69:7	
 Identifier	"de"	69:9	keyword=DE 
 EndOfLine	"\n"	69:11	
-Identifier	"inc"	70:1	keyword=INC 
-LeftParen	"("	70:5	
-Identifier	"hl"	70:6	keyword=HL 
-Plus	"+"	70:8	
-RightParen	")"	70:9	
-EndOfLine	"\n"	70:10	
+Identifier	"inr"	70:1	keyword=INR 
+Identifier	"m"	70:4	keyword=M 
+EndOfLine	"\n"	70:5	
+Identifier	"inx"	70:1	keyword=INX 
+Identifier	"h"	70:4	keyword=H 
+EndOfLine	"\n"	70:5	
 Identifier	"inc"	71:1	keyword=INC 
 Dot	"."	71:4	
 Identifier	"l"	71:5	keyword=L 
@@ -478,14 +633,12 @@ Integer	"2"	78:17	int_value=2
 Multiply	"*"	78:18	
 Integer	"3"	78:19	int_value=3 
 EndOfLine	"\n"	78:20	
-Identifier	"jp"	79:1	keyword=JP 
-LeftParen	"("	79:4	
-Identifier	"bc"	79:5	keyword=BC 
-RightParen	")"	79:7	
-EndOfLine	"\n"	79:8	
-Identifier	"jp"	80:1	keyword=JP 
-Identifier	"eq"	80:4	keyword=EQ 
-Comma	","	80:6	
+Identifier	"push"	79:1	keyword=PUSH 
+Identifier	"b"	79:5	keyword=B 
+EndOfLine	"\n"	79:6	
+Identifier	"ret"	79:1	keyword=RET 
+EndOfLine	"\n"	79:4	
+Identifier	"jz"	80:1	keyword=JZ 
 Identifier	"lbl1"	80:8	
 EndOfLine	"\n"	80:12	
 Identifier	"jp"	81:1	keyword=JP 
@@ -493,24 +646,27 @@ Identifier	"ge"	81:4	keyword=GE
 Comma	","	81:6	
 Identifier	"lbl1"	81:8	
 EndOfLine	"\n"	81:12	
-Identifier	"jp"	82:1	keyword=JP 
-Identifier	"geu"	82:4	keyword=GEU 
-Comma	","	82:7	
+Identifier	"jnc"	82:1	keyword=JNC 
 Identifier	"lbl1"	82:9	
 EndOfLine	"\n"	82:13	
-Identifier	"jp"	83:1	keyword=JP 
-Identifier	"gtu"	83:4	keyword=GTU 
-Comma	","	83:7	
+Identifier	"jz"	83:1	keyword=JZ 
+Identifier	"__HLA_5"	83:3	
+EndOfLine	"\n"	83:10	
+Identifier	"jnc"	83:1	keyword=JNC 
 Identifier	"lbl1"	83:9	
 EndOfLine	"\n"	83:13	
+Identifier	"__HLA_5"	83:1	
+Colon	":"	83:8	
+EndOfLine	"\n"	83:9	
 Identifier	"jp"	84:1	keyword=JP 
 Identifier	"le"	84:4	keyword=LE 
 Comma	","	84:6	
 Identifier	"lbl1"	84:8	
 EndOfLine	"\n"	84:12	
-Identifier	"jp"	85:1	keyword=JP 
-Identifier	"leu"	85:4	keyword=LEU 
-Comma	","	85:7	
+Identifier	"jz"	85:1	keyword=JZ 
+Identifier	"lbl1"	85:9	
+EndOfLine	"\n"	85:13	
+Identifier	"jc"	85:1	keyword=JC 
 Identifier	"lbl1"	85:9	
 EndOfLine	"\n"	85:13	
 Identifier	"jp"	86:1	keyword=JP 
@@ -518,9 +674,7 @@ Identifier	"lo"	86:4	keyword=LO
 Comma	","	86:6	
 Identifier	"lbl1"	86:8	
 EndOfLine	"\n"	86:12	
-Identifier	"jp"	87:1	keyword=JP 
-Identifier	"ltu"	87:4	keyword=LTU 
-Comma	","	87:7	
+Identifier	"jc"	87:1	keyword=JC 
 Identifier	"lbl1"	87:9	
 EndOfLine	"\n"	87:13	
 Identifier	"jp"	88:1	keyword=JP 
@@ -528,9 +682,7 @@ Identifier	"lz"	88:4	keyword=LZ
 Comma	","	88:6	
 Identifier	"lbl1"	88:8	
 EndOfLine	"\n"	88:12	
-Identifier	"jp"	89:1	keyword=JP 
-Identifier	"ne"	89:4	keyword=NE 
-Comma	","	89:6	
+Identifier	"jnz"	89:1	keyword=JNZ 
 Identifier	"lbl1"	89:8	
 EndOfLine	"\n"	89:12	
 Identifier	"jp"	90:1	keyword=JP 
@@ -581,54 +733,43 @@ Identifier	"ltu"	97:5	keyword=LTU
 Comma	","	97:8	
 Identifier	"lbl1"	97:10	
 EndOfLine	"\n"	97:14	
-Identifier	"jr"	98:1	keyword=JR 
-Identifier	"c"	98:4	keyword=C 
-Comma	","	98:5	
+Identifier	"jc"	98:1	keyword=JC 
 Identifier	"lbl1"	98:7	
 EndOfLine	"\n"	98:11	
-Identifier	"jr"	99:1	keyword=JR 
-Identifier	"eq"	99:4	keyword=EQ 
-Comma	","	99:6	
+Identifier	"jz"	99:1	keyword=JZ 
 Identifier	"lbl1"	99:8	
 EndOfLine	"\n"	99:12	
-Identifier	"jr"	100:1	keyword=JR 
-Identifier	"geu"	100:4	keyword=GEU 
-Comma	","	100:7	
+Identifier	"jnc"	100:1	keyword=JNC 
 Identifier	"lbl1"	100:9	
 EndOfLine	"\n"	100:13	
-Identifier	"jr"	101:1	keyword=JR 
-Identifier	"gtu"	101:4	keyword=GTU 
-Comma	","	101:7	
+Identifier	"jz"	101:1	keyword=JZ 
+Identifier	"__HLA_6"	101:3	
+EndOfLine	"\n"	101:10	
+Identifier	"jnc"	101:1	keyword=JNC 
 Identifier	"lbl1"	101:9	
 EndOfLine	"\n"	101:13	
-Identifier	"jr"	102:1	keyword=JR 
-Identifier	"leu"	102:4	keyword=LEU 
-Comma	","	102:7	
+Identifier	"__HLA_6"	101:1	
+Colon	":"	101:8	
+EndOfLine	"\n"	101:9	
+Identifier	"jz"	102:1	keyword=JZ 
 Identifier	"lbl1"	102:9	
 EndOfLine	"\n"	102:13	
-Identifier	"jr"	103:1	keyword=JR 
-Identifier	"ltu"	103:4	keyword=LTU 
-Comma	","	103:7	
+Identifier	"jc"	102:1	keyword=JC 
+Identifier	"lbl1"	102:9	
+EndOfLine	"\n"	102:13	
+Identifier	"jc"	103:1	keyword=JC 
 Identifier	"lbl1"	103:9	
 EndOfLine	"\n"	103:13	
-Identifier	"jr"	104:1	keyword=JR 
-Identifier	"nc"	104:4	keyword=NC 
-Comma	","	104:6	
+Identifier	"jnc"	104:1	keyword=JNC 
 Identifier	"lbl1"	104:8	
 EndOfLine	"\n"	104:12	
-Identifier	"jr"	105:1	keyword=JR 
-Identifier	"ne"	105:4	keyword=NE 
-Comma	","	105:6	
+Identifier	"jnz"	105:1	keyword=JNZ 
 Identifier	"lbl1"	105:8	
 EndOfLine	"\n"	105:12	
-Identifier	"jr"	106:1	keyword=JR 
-Identifier	"nz"	106:4	keyword=NZ 
-Comma	","	106:6	
+Identifier	"jnz"	106:1	keyword=JNZ 
 Identifier	"lbl1"	106:8	
 EndOfLine	"\n"	106:12	
-Identifier	"jr"	107:1	keyword=JR 
-Identifier	"z"	107:4	keyword=Z 
-Comma	","	107:5	
+Identifier	"jz"	107:1	keyword=JZ 
 Identifier	"lbl1"	107:7	
 EndOfLine	"\n"	107:11	
 Identifier	"jre"	108:1	keyword=JRE 
@@ -681,76 +822,102 @@ Identifier	"z"	117:5	keyword=Z
 Comma	","	117:6	
 Identifier	"lbl1"	117:8	
 EndOfLine	"\n"	117:12	
-Identifier	"ld"	118:1	keyword=LD 
-LeftParen	"("	118:4	
+Identifier	"xchg"	118:1	keyword=XCHG 
+EndOfLine	"\n"	118:5	
+Identifier	"shld"	118:1	keyword=SHLD 
 Integer	"1"	118:5	int_value=1 
 Plus	"+"	118:6	
 Integer	"2"	118:7	int_value=2 
 Multiply	"*"	118:8	
 Integer	"3"	118:9	int_value=3 
-RightParen	")"	118:10	
-Comma	","	118:11	
-Identifier	"de"	118:13	keyword=DE 
-EndOfLine	"\n"	118:15	
-Identifier	"ld"	119:1	keyword=LD 
-LeftParen	"("	119:4	
-Identifier	"de"	119:5	keyword=DE 
-RightParen	")"	119:7	
-Comma	","	119:8	
+EndOfLine	"\n"	118:10	
+Identifier	"xchg"	118:1	keyword=XCHG 
+EndOfLine	"\n"	118:5	
+Identifier	"xchg"	119:1	keyword=XCHG 
+EndOfLine	"\n"	119:5	
+Identifier	"mvi"	119:1	keyword=MVI 
+Identifier	"m"	119:4	keyword=M 
+Comma	","	119:5	
 Integer	"1"	119:10	int_value=1 
 Plus	"+"	119:11	
 Integer	"2"	119:12	int_value=2 
 Multiply	"*"	119:13	
 Integer	"3"	119:14	int_value=3 
 EndOfLine	"\n"	119:15	
-Identifier	"ld"	120:1	keyword=LD 
-LeftParen	"("	120:4	
-Identifier	"de"	120:5	keyword=DE 
-RightParen	")"	120:7	
-Comma	","	120:8	
+Identifier	"xchg"	119:1	keyword=XCHG 
+EndOfLine	"\n"	119:5	
+Identifier	"xchg"	120:1	keyword=XCHG 
+EndOfLine	"\n"	120:5	
+Identifier	"mvi"	120:1	keyword=MVI 
+Identifier	"m"	120:4	keyword=M 
+Comma	","	120:5	
 Identifier	"a"	120:10	keyword=A 
 EndOfLine	"\n"	120:11	
-Identifier	"ld"	121:1	keyword=LD 
-LeftParen	"("	121:4	
-Identifier	"de"	121:5	keyword=DE 
-RightParen	")"	121:7	
-Comma	","	121:8	
+Identifier	"xchg"	120:1	keyword=XCHG 
+EndOfLine	"\n"	120:5	
+Identifier	"xchg"	121:1	keyword=XCHG 
+EndOfLine	"\n"	121:5	
+Identifier	"mvi"	121:1	keyword=MVI 
+Identifier	"m"	121:4	keyword=M 
+Comma	","	121:5	
 Identifier	"hl"	121:10	keyword=HL 
 EndOfLine	"\n"	121:12	
-Identifier	"ld"	122:1	keyword=LD 
-LeftParen	"("	122:4	
-Identifier	"hl"	122:5	keyword=HL 
-Plus	"+"	122:7	
-RightParen	")"	122:8	
-Comma	","	122:9	
+Identifier	"xchg"	121:1	keyword=XCHG 
+EndOfLine	"\n"	121:5	
+Identifier	"mvi"	122:1	keyword=MVI 
+Identifier	"m"	122:4	keyword=M 
+Comma	","	122:5	
 Integer	"1"	122:11	int_value=1 
 Plus	"+"	122:12	
 Integer	"2"	122:13	int_value=2 
 Multiply	"*"	122:14	
 Integer	"3"	122:15	int_value=3 
 EndOfLine	"\n"	122:16	
-Identifier	"ld"	123:1	keyword=LD 
-LeftParen	"("	123:4	
-Identifier	"hl"	123:5	keyword=HL 
-Plus	"+"	123:7	
-RightParen	")"	123:8	
-Comma	","	123:9	
-Identifier	"bc"	123:11	keyword=BC 
-EndOfLine	"\n"	123:13	
-Identifier	"ld"	124:1	keyword=LD 
-LeftParen	"("	124:4	
-Identifier	"hl"	124:5	keyword=HL 
-Minus	"-"	124:7	
-RightParen	")"	124:8	
-Comma	","	124:9	
+Identifier	"inx"	122:1	keyword=INX 
+Identifier	"h"	122:4	keyword=H 
+EndOfLine	"\n"	122:5	
+Identifier	"mov"	123:1	keyword=MOV 
+Identifier	"m"	123:4	keyword=M 
+Comma	","	123:5	
+Identifier	"c"	123:6	keyword=C 
+EndOfLine	"\n"	123:7	
+Identifier	"inx"	123:1	keyword=INX 
+Identifier	"h"	123:4	keyword=H 
+EndOfLine	"\n"	123:5	
+Identifier	"mov"	123:1	keyword=MOV 
+Identifier	"m"	123:4	keyword=M 
+Comma	","	123:5	
+Identifier	"b"	123:6	keyword=B 
+EndOfLine	"\n"	123:7	
+Identifier	"inx"	123:1	keyword=INX 
+Identifier	"h"	123:4	keyword=H 
+EndOfLine	"\n"	123:5	
+Identifier	"mvi"	124:1	keyword=MVI 
+Identifier	"m"	124:4	keyword=M 
+Comma	","	124:5	
 Integer	"1"	124:11	int_value=1 
 Plus	"+"	124:12	
 Integer	"2"	124:13	int_value=2 
 Multiply	"*"	124:14	
 Integer	"3"	124:15	int_value=3 
 EndOfLine	"\n"	124:16	
-Identifier	"ld"	125:1	keyword=LD 
-LeftParen	"("	125:4	
+Identifier	"dcx"	124:1	keyword=DCX 
+Identifier	"h"	124:4	keyword=H 
+EndOfLine	"\n"	124:5	
+Identifier	"push"	125:1	keyword=PUSH 
+Identifier	"h"	125:5	keyword=H 
+EndOfLine	"\n"	125:6	
+Identifier	"mov"	125:1	keyword=MOV 
+Identifier	"h"	125:4	keyword=H 
+Comma	","	125:5	
+Identifier	"b"	125:6	keyword=B 
+EndOfLine	"\n"	125:7	
+Identifier	"mov"	125:1	keyword=MOV 
+Identifier	"l"	125:4	keyword=L 
+Comma	","	125:5	
+Identifier	"c"	125:6	keyword=C 
+EndOfLine	"\n"	125:7	
+Identifier	"shld"	125:1	keyword=SHLD 
 Identifier	"ix"	125:5	keyword=IX 
 Plus	"+"	125:7	
 Integer	"1"	125:8	int_value=1 
@@ -758,12 +925,13 @@ Plus	"+"	125:9
 Integer	"2"	125:10	int_value=2 
 Multiply	"*"	125:11	
 Integer	"3"	125:12	int_value=3 
-RightParen	")"	125:13	
-Comma	","	125:14	
-Identifier	"bc"	125:16	keyword=BC 
-EndOfLine	"\n"	125:18	
-Identifier	"ld"	126:1	keyword=LD 
-LeftParen	"("	126:4	
+EndOfLine	"\n"	125:13	
+Identifier	"pop"	125:1	keyword=POP 
+Identifier	"h"	125:4	keyword=H 
+EndOfLine	"\n"	125:5	
+Identifier	"xchg"	126:1	keyword=XCHG 
+EndOfLine	"\n"	126:5	
+Identifier	"shld"	126:1	keyword=SHLD 
 Identifier	"iy"	126:5	keyword=IY 
 Minus	"-"	126:7	
 Integer	"1"	126:8	int_value=1 
@@ -771,10 +939,9 @@ Minus	"-"	126:9
 Integer	"2"	126:10	int_value=2 
 Multiply	"*"	126:11	
 Integer	"3"	126:12	int_value=3 
-RightParen	")"	126:13	
-Comma	","	126:14	
-Identifier	"de"	126:16	keyword=DE 
-EndOfLine	"\n"	126:18	
+EndOfLine	"\n"	126:13	
+Identifier	"xchg"	126:1	keyword=XCHG 
+EndOfLine	"\n"	126:5	
 Identifier	"ld"	127:1	keyword=LD 
 Identifier	"a"	127:4	keyword=A 
 Tick	"'"	127:5	
@@ -784,68 +951,99 @@ Identifier	"bc"	127:9	keyword=BC
 Minus	"-"	127:11	
 RightParen	")"	127:12	
 EndOfLine	"\n"	127:13	
-Identifier	"ld"	128:1	keyword=LD 
-Identifier	"a"	128:4	keyword=A 
-Comma	","	128:5	
-LeftParen	"("	128:7	
-Identifier	"bc"	128:8	keyword=BC 
-Plus	"+"	128:10	
-RightParen	")"	128:11	
-EndOfLine	"\n"	128:12	
-Identifier	"ld"	129:1	keyword=LD 
+Identifier	"ldax"	128:1	keyword=LDAX 
+Identifier	"b"	128:5	keyword=B 
+EndOfLine	"\n"	128:6	
+Identifier	"inx"	128:1	keyword=INX 
+Identifier	"b"	128:4	keyword=B 
+EndOfLine	"\n"	128:5	
+Identifier	"mov"	129:1	keyword=MOV 
 Identifier	"a"	129:4	keyword=A 
 Comma	","	129:5	
-LeftParen	"("	129:7	
-Identifier	"hld"	129:8	keyword=HLD 
-RightParen	")"	129:11	
-EndOfLine	"\n"	129:12	
-Identifier	"ld"	130:1	keyword=LD 
+Identifier	"m"	129:6	keyword=M 
+EndOfLine	"\n"	129:7	
+Identifier	"dcx"	129:1	keyword=DCX 
+Identifier	"h"	129:4	keyword=H 
+EndOfLine	"\n"	129:5	
+Identifier	"mov"	130:1	keyword=MOV 
 Identifier	"a"	130:4	keyword=A 
 Comma	","	130:5	
-LeftParen	"("	130:7	
-Identifier	"hli"	130:8	keyword=HLI 
-RightParen	")"	130:11	
-EndOfLine	"\n"	130:12	
+Identifier	"m"	130:6	keyword=M 
+EndOfLine	"\n"	130:7	
+Identifier	"inx"	130:1	keyword=INX 
+Identifier	"h"	130:4	keyword=H 
+EndOfLine	"\n"	130:5	
 Identifier	"ld"	131:1	keyword=LD 
 Identifier	"bc"	131:4	keyword=BC 
 Tick	"'"	131:6	
 Comma	","	131:7	
 Identifier	"de"	131:9	keyword=DE 
 EndOfLine	"\n"	131:11	
-Identifier	"ld"	132:1	keyword=LD 
-Identifier	"bc"	132:4	keyword=BC 
-Comma	","	132:6	
-LeftParen	"("	132:8	
+Identifier	"push"	132:1	keyword=PUSH 
+Identifier	"h"	132:5	keyword=H 
+EndOfLine	"\n"	132:6	
+Identifier	"lhld"	132:1	keyword=LHLD 
 Integer	"1"	132:9	int_value=1 
 Plus	"+"	132:10	
 Integer	"2"	132:11	int_value=2 
 Multiply	"*"	132:12	
 Integer	"3"	132:13	int_value=3 
-RightParen	")"	132:14	
-EndOfLine	"\n"	132:15	
-Identifier	"ld"	133:1	keyword=LD 
-Identifier	"bc"	133:4	keyword=BC 
-Comma	","	133:6	
-LeftParen	"("	133:8	
-Identifier	"hl"	133:9	keyword=HL 
-RightParen	")"	133:11	
-EndOfLine	"\n"	133:12	
-Identifier	"ld"	134:1	keyword=LD 
-Identifier	"hl"	134:4	keyword=HL 
-Comma	","	134:6	
-Identifier	"bc"	134:8	keyword=BC 
-EndOfLine	"\n"	134:10	
-Identifier	"ld"	135:1	keyword=LD 
-Identifier	"hl"	135:4	keyword=HL 
-Comma	","	135:6	
-Identifier	"sp"	135:8	keyword=SP 
+EndOfLine	"\n"	132:14	
+Identifier	"mov"	132:1	keyword=MOV 
+Identifier	"b"	132:4	keyword=B 
+Comma	","	132:5	
+Identifier	"h"	132:6	keyword=H 
+EndOfLine	"\n"	132:7	
+Identifier	"mov"	132:1	keyword=MOV 
+Identifier	"c"	132:4	keyword=C 
+Comma	","	132:5	
+Identifier	"l"	132:6	keyword=L 
+EndOfLine	"\n"	132:7	
+Identifier	"pop"	132:1	keyword=POP 
+Identifier	"h"	132:4	keyword=H 
+EndOfLine	"\n"	132:5	
+Identifier	"mov"	133:1	keyword=MOV 
+Identifier	"c"	133:4	keyword=C 
+Comma	","	133:5	
+Identifier	"m"	133:6	keyword=M 
+EndOfLine	"\n"	133:7	
+Identifier	"inx"	133:1	keyword=INX 
+Identifier	"h"	133:4	keyword=H 
+EndOfLine	"\n"	133:5	
+Identifier	"mov"	133:1	keyword=MOV 
+Identifier	"b"	133:4	keyword=B 
+Comma	","	133:5	
+Identifier	"m"	133:6	keyword=M 
+EndOfLine	"\n"	133:7	
+Identifier	"dcx"	133:1	keyword=DCX 
+Identifier	"h"	133:4	keyword=H 
+EndOfLine	"\n"	133:5	
+Identifier	"mov"	134:1	keyword=MOV 
+Identifier	"h"	134:4	keyword=H 
+Comma	","	134:5	
+Identifier	"b"	134:6	keyword=B 
+EndOfLine	"\n"	134:7	
+Identifier	"mov"	134:1	keyword=MOV 
+Identifier	"l"	134:4	keyword=L 
+Comma	","	134:5	
+Identifier	"c"	134:6	keyword=C 
+EndOfLine	"\n"	134:7	
+Identifier	"lxi"	135:1	keyword=LXI 
+Identifier	"h"	135:4	keyword=H 
+Comma	","	135:5	
+Identifier	"signed8"	135:6	keyword=SIGNED8 
+LeftParen	"("	135:13	
 Plus	"+"	135:10	
 Integer	"1"	135:11	int_value=1 
 Plus	"+"	135:12	
 Integer	"2"	135:13	int_value=2 
 Multiply	"*"	135:14	
 Integer	"3"	135:15	int_value=3 
-EndOfLine	"\n"	135:16	
+RightParen	")"	135:16	
+EndOfLine	"\n"	135:17	
+Identifier	"dad"	135:1	keyword=DAD 
+Identifier	"sp"	135:4	keyword=SP 
+EndOfLine	"\n"	135:6	
 Identifier	"ld"	136:1	keyword=LD 
 Identifier	"ix"	136:4	keyword=IX 
 Comma	","	136:6	
@@ -875,53 +1073,150 @@ Integer	"2"	138:15	int_value=2
 Multiply	"*"	138:16	
 Integer	"3"	138:17	int_value=3 
 EndOfLine	"\n"	138:18	
-Identifier	"ldd"	139:1	keyword=LDD 
-EndOfLine	"\n"	139:4	
-Identifier	"ldd"	140:1	keyword=LDD 
-Identifier	"a"	140:5	keyword=A 
-Comma	","	140:6	
-LeftParen	"("	140:8	
-Identifier	"hl"	140:9	keyword=HL 
-RightParen	")"	140:11	
-EndOfLine	"\n"	140:12	
-Identifier	"lddr"	141:1	keyword=LDDR 
-EndOfLine	"\n"	141:5	
-Identifier	"ldhi"	142:1	keyword=LDHI 
+Identifier	"extern"	139:1	keyword=EXTERN 
+Identifier	"__z80asm__ldd"	139:7	keyword=__Z80ASM__LDD 
+EndOfLine	"\n"	139:20	
+Identifier	"call"	139:1	keyword=CALL 
+Identifier	"__z80asm__ldd"	139:5	keyword=__Z80ASM__LDD 
+EndOfLine	"\n"	139:18	
+Identifier	"mov"	140:1	keyword=MOV 
+Identifier	"a"	140:4	keyword=A 
+Comma	","	140:5	
+Identifier	"m"	140:6	keyword=M 
+EndOfLine	"\n"	140:7	
+Identifier	"dcx"	140:1	keyword=DCX 
+Identifier	"h"	140:4	keyword=H 
+EndOfLine	"\n"	140:5	
+Identifier	"extern"	141:1	keyword=EXTERN 
+Identifier	"__z80asm__lddr"	141:7	keyword=__Z80ASM__LDDR 
+EndOfLine	"\n"	141:21	
+Identifier	"call"	141:1	keyword=CALL 
+Identifier	"__z80asm__lddr"	141:5	keyword=__Z80ASM__LDDR 
+EndOfLine	"\n"	141:19	
+Identifier	"push"	142:1	keyword=PUSH 
+Identifier	"h"	142:5	keyword=H 
+EndOfLine	"\n"	142:6	
+Identifier	"lxi"	142:1	keyword=LXI 
+Identifier	"d"	142:4	keyword=D 
+Comma	","	142:5	
+Identifier	"unsigned8"	142:6	keyword=UNSIGNED8 
+LeftParen	"("	142:15	
 Integer	"1"	142:6	int_value=1 
 Plus	"+"	142:7	
 Integer	"2"	142:8	int_value=2 
 Multiply	"*"	142:9	
 Integer	"3"	142:10	int_value=3 
-EndOfLine	"\n"	142:11	
-Identifier	"ldi"	143:1	keyword=LDI 
-EndOfLine	"\n"	143:4	
-Identifier	"ldi"	144:1	keyword=LDI 
-Identifier	"a"	144:5	keyword=A 
-Comma	","	144:6	
-LeftParen	"("	144:8	
-Identifier	"hl"	144:9	keyword=HL 
-RightParen	")"	144:11	
-EndOfLine	"\n"	144:12	
-Identifier	"ldir"	145:1	keyword=LDIR 
-EndOfLine	"\n"	145:5	
-Identifier	"ldsi"	146:1	keyword=LDSI 
+RightParen	")"	142:11	
+EndOfLine	"\n"	142:12	
+Identifier	"dad"	142:1	keyword=DAD 
+Identifier	"d"	142:4	keyword=D 
+EndOfLine	"\n"	142:5	
+Identifier	"xchg"	142:1	keyword=XCHG 
+EndOfLine	"\n"	142:5	
+Identifier	"pop"	142:1	keyword=POP 
+Identifier	"h"	142:4	keyword=H 
+EndOfLine	"\n"	142:5	
+Identifier	"extern"	143:1	keyword=EXTERN 
+Identifier	"__z80asm__ldi"	143:7	keyword=__Z80ASM__LDI 
+EndOfLine	"\n"	143:20	
+Identifier	"call"	143:1	keyword=CALL 
+Identifier	"__z80asm__ldi"	143:5	keyword=__Z80ASM__LDI 
+EndOfLine	"\n"	143:18	
+Identifier	"mov"	144:1	keyword=MOV 
+Identifier	"a"	144:4	keyword=A 
+Comma	","	144:5	
+Identifier	"m"	144:6	keyword=M 
+EndOfLine	"\n"	144:7	
+Identifier	"inx"	144:1	keyword=INX 
+Identifier	"h"	144:4	keyword=H 
+EndOfLine	"\n"	144:5	
+Identifier	"extern"	145:1	keyword=EXTERN 
+Identifier	"__z80asm__ldir"	145:7	keyword=__Z80ASM__LDIR 
+EndOfLine	"\n"	145:21	
+Identifier	"call"	145:1	keyword=CALL 
+Identifier	"__z80asm__ldir"	145:5	keyword=__Z80ASM__LDIR 
+EndOfLine	"\n"	145:19	
+Identifier	"xchg"	146:1	keyword=XCHG 
+EndOfLine	"\n"	146:5	
+Identifier	"lxi"	146:1	keyword=LXI 
+Identifier	"h"	146:4	keyword=H 
+Comma	","	146:5	
+Identifier	"unsigned8"	146:6	keyword=UNSIGNED8 
+LeftParen	"("	146:15	
 Integer	"1"	146:6	int_value=1 
 Plus	"+"	146:7	
 Integer	"2"	146:8	int_value=2 
 Multiply	"*"	146:9	
 Integer	"3"	146:10	int_value=3 
-EndOfLine	"\n"	146:11	
+RightParen	")"	146:11	
+EndOfLine	"\n"	146:12	
+Identifier	"dad"	146:1	keyword=DAD 
+Identifier	"sp"	146:4	keyword=SP 
+EndOfLine	"\n"	146:6	
+Identifier	"xchg"	146:1	keyword=XCHG 
+EndOfLine	"\n"	146:5	
 Identifier	"lhlde"	147:1	keyword=LHLDE 
 EndOfLine	"\n"	147:6	
 Identifier	"lhlx"	148:1	keyword=LHLX 
 EndOfLine	"\n"	148:5	
-Identifier	"neg"	149:1	keyword=NEG 
+Identifier	"cma"	149:1	keyword=CMA 
 EndOfLine	"\n"	149:4	
-Identifier	"neg"	150:1	keyword=NEG 
-Identifier	"b"	150:5	keyword=B 
-EndOfLine	"\n"	150:6	
-Identifier	"neg"	151:1	keyword=NEG 
-Identifier	"bc"	151:5	keyword=BC 
+Identifier	"inr"	149:1	keyword=INR 
+Identifier	"a"	149:4	keyword=A 
+EndOfLine	"\n"	149:5	
+Identifier	"push"	150:1	keyword=PUSH 
+Identifier	"psw"	150:5	keyword=PSW 
+EndOfLine	"\n"	150:8	
+Identifier	"mov"	150:1	keyword=MOV 
+Identifier	"a"	150:4	keyword=A 
+Comma	","	150:5	
+Identifier	"b"	150:6	keyword=B 
+EndOfLine	"\n"	150:7	
+Identifier	"cma"	150:1	keyword=CMA 
+EndOfLine	"\n"	150:4	
+Identifier	"mov"	150:1	keyword=MOV 
+Identifier	"b"	150:4	keyword=B 
+Comma	","	150:5	
+Identifier	"a"	150:6	keyword=A 
+EndOfLine	"\n"	150:7	
+Identifier	"inr"	150:1	keyword=INR 
+Identifier	"b"	150:4	keyword=B 
+EndOfLine	"\n"	150:5	
+Identifier	"pop"	150:1	keyword=POP 
+Identifier	"psw"	150:4	keyword=PSW 
+EndOfLine	"\n"	150:7	
+Identifier	"push"	151:1	keyword=PUSH 
+Identifier	"psw"	151:5	keyword=PSW 
+EndOfLine	"\n"	151:8	
+Identifier	"mov"	151:1	keyword=MOV 
+Identifier	"a"	151:4	keyword=A 
+Comma	","	151:5	
+Identifier	"b"	151:6	keyword=B 
+EndOfLine	"\n"	151:7	
+Identifier	"cma"	151:1	keyword=CMA 
+EndOfLine	"\n"	151:4	
+Identifier	"mov"	151:1	keyword=MOV 
+Identifier	"b"	151:4	keyword=B 
+Comma	","	151:5	
+Identifier	"a"	151:6	keyword=A 
+EndOfLine	"\n"	151:7	
+Identifier	"mov"	151:1	keyword=MOV 
+Identifier	"a"	151:4	keyword=A 
+Comma	","	151:5	
+Identifier	"c"	151:6	keyword=C 
+EndOfLine	"\n"	151:7	
+Identifier	"cma"	151:1	keyword=CMA 
+EndOfLine	"\n"	151:4	
+Identifier	"mov"	151:1	keyword=MOV 
+Identifier	"c"	151:4	keyword=C 
+Comma	","	151:5	
+Identifier	"a"	151:6	keyword=A 
+EndOfLine	"\n"	151:7	
+Identifier	"inx"	151:1	keyword=INX 
+Identifier	"b"	151:4	keyword=B 
+EndOfLine	"\n"	151:5	
+Identifier	"pop"	151:1	keyword=POP 
+Identifier	"psw"	151:4	keyword=PSW 
 EndOfLine	"\n"	151:7	
 Identifier	"or"	152:1	keyword=OR 
 Identifier	"ix"	152:4	keyword=IX 
@@ -932,32 +1227,38 @@ Identifier	"push"	153:1	keyword=PUSH
 Identifier	"bc"	153:6	keyword=BC 
 Tick	"'"	153:8	
 EndOfLine	"\n"	153:9	
-Identifier	"rdel"	154:1	keyword=RDEL 
-EndOfLine	"\n"	154:5	
-Identifier	"ret"	155:1	keyword=RET 
-Identifier	"eq"	155:5	keyword=EQ 
-EndOfLine	"\n"	155:7	
-Identifier	"ret"	156:1	keyword=RET 
-Identifier	"geu"	156:5	keyword=GEU 
-EndOfLine	"\n"	156:8	
-Identifier	"ret"	157:1	keyword=RET 
-Identifier	"gtu"	157:5	keyword=GTU 
-EndOfLine	"\n"	157:8	
-Identifier	"ret"	158:1	keyword=RET 
-Identifier	"leu"	158:5	keyword=LEU 
-EndOfLine	"\n"	158:8	
+Identifier	"extern"	154:1	keyword=EXTERN 
+Identifier	"__z80asm__rl_de"	154:7	keyword=__Z80ASM__RL_DE 
+EndOfLine	"\n"	154:22	
+Identifier	"call"	154:1	keyword=CALL 
+Identifier	"__z80asm__rl_de"	154:5	keyword=__Z80ASM__RL_DE 
+EndOfLine	"\n"	154:20	
+Identifier	"rz"	155:1	keyword=RZ 
+EndOfLine	"\n"	155:3	
+Identifier	"rnc"	156:1	keyword=RNC 
+EndOfLine	"\n"	156:4	
+Identifier	"jz"	157:1	keyword=JZ 
+Identifier	"__HLA_7"	157:3	
+EndOfLine	"\n"	157:10	
+Identifier	"rnc"	157:1	keyword=RNC 
+EndOfLine	"\n"	157:4	
+Identifier	"__HLA_7"	157:1	
+Colon	":"	157:8	
+EndOfLine	"\n"	157:9	
+Identifier	"rz"	158:1	keyword=RZ 
+EndOfLine	"\n"	158:3	
+Identifier	"rc"	158:1	keyword=RC 
+EndOfLine	"\n"	158:3	
 Identifier	"ret"	159:1	keyword=RET 
 Identifier	"lo"	159:5	keyword=LO 
 EndOfLine	"\n"	159:7	
-Identifier	"ret"	160:1	keyword=RET 
-Identifier	"ltu"	160:5	keyword=LTU 
-EndOfLine	"\n"	160:8	
+Identifier	"rc"	160:1	keyword=RC 
+EndOfLine	"\n"	160:3	
 Identifier	"ret"	161:1	keyword=RET 
 Identifier	"lz"	161:5	keyword=LZ 
 EndOfLine	"\n"	161:7	
-Identifier	"ret"	162:1	keyword=RET 
-Identifier	"ne"	162:5	keyword=NE 
-EndOfLine	"\n"	162:7	
+Identifier	"rnz"	162:1	keyword=RNZ 
+EndOfLine	"\n"	162:4	
 Identifier	"ret"	163:1	keyword=RET 
 Dot	"."	163:4	
 Identifier	"l"	163:5	keyword=L 
@@ -1040,25 +1341,50 @@ EndOfLine	"\n"	179:9
 Identifier	"ret3"	180:1	keyword=RET3 
 Identifier	"ltu"	180:6	keyword=LTU 
 EndOfLine	"\n"	180:9	
-Identifier	"rl"	181:1	keyword=RL 
-Identifier	"hl"	181:4	keyword=HL 
-EndOfLine	"\n"	181:6	
-Identifier	"rld"	182:1	keyword=RLD 
-EndOfLine	"\n"	182:4	
-Identifier	"rlde"	183:1	keyword=RLDE 
-EndOfLine	"\n"	183:5	
-Identifier	"rr"	184:1	keyword=RR 
-Identifier	"de"	184:4	keyword=DE 
-EndOfLine	"\n"	184:6	
-Identifier	"rrd"	185:1	keyword=RRD 
-EndOfLine	"\n"	185:4	
-Identifier	"rrhl"	186:1	keyword=RRHL 
-EndOfLine	"\n"	186:5	
+Identifier	"extern"	181:1	keyword=EXTERN 
+Identifier	"__z80asm__rl_hl"	181:7	keyword=__Z80ASM__RL_HL 
+EndOfLine	"\n"	181:22	
+Identifier	"call"	181:1	keyword=CALL 
+Identifier	"__z80asm__rl_hl"	181:5	keyword=__Z80ASM__RL_HL 
+EndOfLine	"\n"	181:20	
+Identifier	"extern"	182:1	keyword=EXTERN 
+Identifier	"__z80asm__rld"	182:7	keyword=__Z80ASM__RLD 
+EndOfLine	"\n"	182:20	
+Identifier	"call"	182:1	keyword=CALL 
+Identifier	"__z80asm__rld"	182:5	keyword=__Z80ASM__RLD 
+EndOfLine	"\n"	182:18	
+Identifier	"extern"	183:1	keyword=EXTERN 
+Identifier	"__z80asm__rl_de"	183:7	keyword=__Z80ASM__RL_DE 
+EndOfLine	"\n"	183:22	
+Identifier	"call"	183:1	keyword=CALL 
+Identifier	"__z80asm__rl_de"	183:5	keyword=__Z80ASM__RL_DE 
+EndOfLine	"\n"	183:20	
+Identifier	"extern"	184:1	keyword=EXTERN 
+Identifier	"__z80asm__rr_de"	184:7	keyword=__Z80ASM__RR_DE 
+EndOfLine	"\n"	184:22	
+Identifier	"call"	184:1	keyword=CALL 
+Identifier	"__z80asm__rr_de"	184:5	keyword=__Z80ASM__RR_DE 
+EndOfLine	"\n"	184:20	
+Identifier	"extern"	185:1	keyword=EXTERN 
+Identifier	"__z80asm__rrd"	185:7	keyword=__Z80ASM__RRD 
+EndOfLine	"\n"	185:20	
+Identifier	"call"	185:1	keyword=CALL 
+Identifier	"__z80asm__rrd"	185:5	keyword=__Z80ASM__RRD 
+EndOfLine	"\n"	185:18	
+Identifier	"extern"	186:1	keyword=EXTERN 
+Identifier	"__z80asm__sra_hl"	186:7	keyword=__Z80ASM__SRA_HL 
+EndOfLine	"\n"	186:23	
+Identifier	"call"	186:1	keyword=CALL 
+Identifier	"__z80asm__sra_hl"	186:5	keyword=__Z80ASM__SRA_HL 
+EndOfLine	"\n"	186:21	
 Identifier	"shlde"	187:1	keyword=SHLDE 
 EndOfLine	"\n"	187:6	
-Identifier	"sra"	188:1	keyword=SRA 
-Identifier	"bc"	188:5	keyword=BC 
-EndOfLine	"\n"	188:7	
+Identifier	"extern"	188:1	keyword=EXTERN 
+Identifier	"__z80asm__sra_bc"	188:7	keyword=__Z80ASM__SRA_BC 
+EndOfLine	"\n"	188:23	
+Identifier	"call"	188:1	keyword=CALL 
+Identifier	"__z80asm__sra_bc"	188:5	keyword=__Z80ASM__SRA_BC 
+EndOfLine	"\n"	188:21	
 Identifier	"sub"	189:1	keyword=SUB 
 Identifier	"hl"	189:5	keyword=HL 
 Comma	","	189:7	
