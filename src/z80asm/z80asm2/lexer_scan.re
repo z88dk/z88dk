@@ -253,9 +253,9 @@ static int parse_int_from_chars(std::string_view s, int base) {
         }
     }
 
-    int value = 0;
+    unsigned long long value = 0;
     std::from_chars(t.data(), t.data() + t.size(), value, base);
-    return value;
+    return static_cast<uint32_t>(value);
 }
 
 void tokenize_scan_line(const ScanLine& line,

@@ -35,4 +35,8 @@ Float	".1e1"	4:28	float_value=1
 Float	"1.e-1"	4:33	float_value=0.1 
 Float	"1.e+1"	4:39	float_value=10 
 EndOfLine	"\n"	4:44	
-EndOfLine	"\n"	5:1	
+Integer	"0x7fffffff"	5:1	int_value=2147483647 
+Integer	"0x80000000"	5:12	int_value=-2147483648 
+Integer	"0xffffffff"	5:23	int_value=-1 
+EndOfLine	"\n"	5:33	
+EndOfLine	"\n"	6:1	
