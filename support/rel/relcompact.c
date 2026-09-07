@@ -372,6 +372,9 @@ int main(int argc,char *argv[])
             fprintf(stderr,
                     "Unknown token %02X\n",
                     tok);
+            fprintf(stderr,
+                    "--> at file position %Xh (%d)\n",
+                    ftell(fin),ftell(fin));
 
             fclose(fin);
             fclose(fout);
