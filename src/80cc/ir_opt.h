@@ -166,6 +166,15 @@ int ir_opt_prune_unreachable(Func *f);
  * Returns the number of ops narrowed. */
 int ir_opt_narrow_byte(Func *f);
 
+/* [IR_CMPSIGN_PROBE] Inert: classify each signed compare by which
+   non-negativity proof would let its 7-byte sign correction be dropped. */
+void ir_opt_cmpsign_probe(Func *f);
+
+/* Rewrite a signed compare to its unsigned counterpart where both operands are
+   provably non-negative, dropping the 7-byte sign correction. Returns the
+   number rewritten. --opt-disable=cmp-unsign / IR_CMPUNSIGN=0 opts out. */
+int ir_opt_cmp_unsign(Func *f);
+
 /* Range-narrow a loop counter proven to fit [0,256) to a byte (width-1):
  * byte inc/dec step, 1-byte slot, int uses auto-widen. IR_NO_IV_NARROW opts
  * out. Returns the number of counters narrowed. */

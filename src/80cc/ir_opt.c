@@ -2160,6 +2160,14 @@ int ir_opt_sym_addr_fold(Func *f)
         for (int j = 0; j < f->bbs[b].n_ops; j++) {
             const Op *op = &f->bbs[b].ops[j];
             if (op->dst < 0 || op->dst >= nv || ndef[op->dst] != 1) continue;
+            /* ►► A PARAMETER'S INCOMING VALUE IS AN INVISIBLE DEF — ndef counts
+               only the defs in this function, so a parameter assigned once under
+               a condition is not the single-def constant it looks like. Same
+               hole that made remat load `ld hl,0` for a parameter and made
+               sym_deref_fold read the wrong array (long_ir/parremat.c). */
+            if (f->vregs[op->dst].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                           | IR_VREG_VOLATILE))
+                continue;
             if (op->kind == IR_LD_SYM && op->mem.sym && !op->mem.bank_fn) {
                 sym[op->dst] = op->mem.sym; off[op->dst] = op->mem.offset;
             } else if (op->kind == IR_LD_IMM && !op->imm_sym) {
@@ -2208,7 +2216,10 @@ int ir_opt_sym_addr_fold(Func *f)
             op->mem.offset = o;
             op->src[0] = op->src[1] = -1;
             op->imm = 0;
-            if (ndef[op->dst] == 1) { sym[op->dst] = g; off[op->dst] = o; }
+            if (ndef[op->dst] == 1
+                && !(f->vregs[op->dst].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                                | IR_VREG_VOLATILE)))
+                { sym[op->dst] = g; off[op->dst] = o; }
             changed++;
         }
     }
@@ -2285,6 +2296,18 @@ int ir_opt_sym_deref_fold(Func *f)
             const Op *op = &f->bbs[b].ops[j];
             if (op->kind != IR_LD_SYM || op->dst < 0 || op->dst >= nv) continue;
             if (ndef[op->dst] != 1) continue;
+            /* ►► A PARAMETER'S INCOMING VALUE IS AN INVISIBLE DEF. ndef counts
+               the defs in THIS function; the caller's pointer arrives without
+               one, so a pointer parameter assigned once under a condition looks
+               single-def and is not:
+                   int pick(int *p, int flag) { if (flag) p = tbl; return p[1]; }
+               every `p[i]` folded to the absolute `tbl+i`, so pick(other,0) read
+               tbl instead of the caller's array. Same family as the post-step
+               defect noted above, and the same hole remat had.
+               See test/suites/long_ir/parremat.c. */
+            if (f->vregs[op->dst].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                           | IR_VREG_VOLATILE))
+                continue;
             if (!op->mem.sym || op->mem.bank_fn) continue;
             if (ir_sym_bank_fn(op->mem.sym)) continue;
             if (strcmp(ir_sym_prefix(op->mem.sym), "_") != 0) continue;
@@ -2889,6 +2912,295 @@ static int demands_low_byte_only(const Func *f, int v)
         }
     }
     return seen;   /* a dead vreg (no uses) stays width-2 */
+}
+
+/* ---- [IR_CMPSIGN_PROBE] sizing the signed-compare sign correction -------
+   A signed 16-bit compare lowers to `and a; sbc hl,de` followed by SEVEN BYTES
+   of pure sign correction — `ld a,h; jp po,L; xor 0x80; L: rla` — because the
+   carry out of `sbc` is the UNSIGNED answer and the signed one is S^V. The
+   unsigned compare branches straight off that carry.
+
+   Measured over the bench corpus and the four real files: 74 sites, 518 B, and
+   present in EVERY real file (adv_a 91 B, clisp 63 B, enigma 63 B) — so this is
+   a real-world shape, not a corpus artifact. It sits in loop exit tests, so it
+   is ticks as well as bytes.
+
+   A signed compare needs the correction only if an operand can actually BE
+   negative. This probe classifies each signed compare by which non-negativity
+   proof would settle it, so the achievable subset is known before any codegen
+   changes. Prints one line per compare; aggregate by the verdict field. */
+static int cs_probe_on(void)
+{ static int c = -1; if (c < 0) c = getenv("IR_CMPSIGN_PROBE") ? 1 : 0; return c; }
+
+static int cs_is_signed_cmp(OpKind k)
+{
+    return k == IR_CMP_LT || k == IR_CMP_LE || k == IR_CMP_GT || k == IR_CMP_GE;
+}
+
+/* A basic induction variable that cannot be negative where it is TESTED:
+   every def is either a non-negative constant init or an in-place increment by
+   a positive constant. The value therefore starts >= 0 and only rises, and the
+   test itself is what stops it — it cannot wrap to negative before the compare
+   fires, because reaching 0x8000 would need the bound check to have passed
+   32768 times against a bound that is itself <= 32767.
+
+   Deliberately NOT using v_fits_byte for this: that helper accepts only masked
+   ANDs, small constants, zero-extends, compare results and copies of those, so
+   an `i = i + 1` induction variable fails it — which is exactly the shape in
+   the localbench/widthbench loop tests. The two proofs are complementary. */
+static int v_nonneg_iv(const Func *f, int v)
+{
+    int seen_init = 0, seen_step = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            if (op->dst != v) continue;
+            if (op->kind == IR_LD_IMM) {
+                if (op->imm < 0) return 0;
+                seen_init = 1; continue;
+            }
+            /* in-place step by a positive immediate */
+            if ((op->kind == IR_ADD || op->kind == IR_INC)
+                && op->src[0] == v && op->src[1] == -1 && op->imm > 0) {
+                seen_step = 1; continue;
+            }
+            if (op->kind == IR_INC && op->src[0] == v && op->src[1] == -1
+                && op->imm == 0) {                  /* imm-less INC steps by 1 */
+                seen_step = 1; continue;
+            }
+            return 0;                                /* any other def: unknown */
+        }
+    }
+    return seen_init && seen_step;
+}
+
+/* The step immediate of a non-negative IV (0 if not one / unknown). */
+static long v_iv_step(const Func *f, int v)
+{
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            if (op->dst != v) continue;
+            if ((op->kind == IR_ADD || op->kind == IR_INC)
+                && op->src[0] == v && op->src[1] == -1)
+                return op->imm ? op->imm : 1;
+        }
+    return 0;
+}
+
+/* Is v provably >= 0 when read as a signed int? */
+static int v_nonneg(const Func *f, int v, const char **why)
+{
+    if (v < 0 || v >= f->n_vregs) return 0;
+    if (v_fits_byte(f, v))  { if (why) *why = "fitsbyte"; return 1; }
+    if (v_nonneg_iv(f, v))  { if (why) *why = "nonneg-iv"; return 1; }
+    return 0;
+}
+
+/* Does the compare in BB `cb` actually STOP v's growth? Required for the IV
+   proof: `every def is init>=0 or += positive` allows v to rise past 32767 and
+   become negative UNLESS the compare is the test that leaves the loop v is
+   stepped in. Without this, `while (other) { if (i < 5) f(); i += 1; }` is a
+   miscompile — i wraps negative, signed says true, unsigned says false.
+
+   Sound conditions, all required:
+     - cb is inside a loop, and v's step is inside the SAME loop;
+     - cb has a successor OUTSIDE that loop (so it is an exit test);
+     - cb dominates the step (the test runs before each increment). Approximated
+       conservatively by requiring the step to be in cb itself or in a BB the
+       loop header reaches only through cb — here simplified to "the step is in
+       cb or cb is the loop's last block", which is what the shapes in the
+       corpus are; anything else answers NO. */
+static int cs_compare_bounds_loop(const Func *f, int cb, int v)
+{
+    int n = f->n_bbs;
+    if (n <= 0) return 0;
+    int *in_loop = calloc((size_t)n, sizeof(int));
+    int *hdr = calloc((size_t)n, sizeof(int));
+    int *end = calloc((size_t)n, sizeof(int));
+    int ok = 0;
+    if (in_loop && hdr && end) {
+        licm_find_loops((Func *)f, in_loop, hdr, end);
+        if (in_loop[cb] && hdr[cb] >= 0) {
+            int lo = hdr[cb], hi = end[cb];
+            /* the step must live in the same loop */
+            int step_in = 0;
+            for (int b2 = lo; b2 <= hi && b2 < n; b2++)
+                for (int j2 = 0; j2 < f->bbs[b2].n_ops; j2++) {
+                    const Op *o2 = &f->bbs[b2].ops[j2];
+                    if (o2->dst == v && o2->src[0] == v
+                        && (o2->kind == IR_ADD || o2->kind == IR_INC))
+                        step_in = 1;
+                }
+            /* and this BB must be able to LEAVE the loop */
+            int exits = 0;
+            const BB *cbb = &f->bbs[cb];
+            int ns = ir_bb_n_succ((BB *)cbb);
+            for (int sI = 0; sI < ns; sI++) {
+                int sid = ir_bb_succ_at((BB *)cbb, sI);
+                if (sid < 0 || sid >= n) continue;
+                if (sid < lo || sid > hi || !in_loop[sid]) exits = 1;
+            }
+            ok = step_in && exits;
+        }
+    }
+    free(in_loop); free(hdr); free(end);
+    return ok;
+}
+
+/* Is operand `x` (a vreg id, or -1 meaning "the immediate in op->imm")
+   provably non-negative AND unable to wrap into negative before this compare?
+   `cb` is the compare's BB, needed for the loop-exit condition. */
+static int cs_operand_safe(const Func *f, int cb, int x, long imm, long bound,
+                           const char **why)
+{
+    if (x < 0) { if (why) *why = "imm"; return imm >= 0; }
+    if (x >= f->n_vregs) return 0;
+    /* ►► THE INVISIBLE DEF. Both provers below reason over the defs they can
+       SEE in this function, so a value that can arrive from somewhere else is
+       outside their reach:
+         - a PARAMETER carries the caller's value, which has no def op at all;
+         - an ADDRESS-TAKEN or VOLATILE vreg can be written through a pointer.
+       depark.c's `satband(int v)` is the shape: `if (v > 255) v = 255;
+       if (v < 0) v = 0;` — the only visible defs are two non-negative
+       constants, so v_fits_byte says "[0,255]" and `v < 0` folds to
+       always-false. satband(-5) then returns the wrong answer. The long_ir
+       suite caught it; nothing else did.
+       (This is a hazard in the PROVERS, not in narrow_byte's use of them —
+       truncating to a byte is correct whatever the sign, so the hole does not
+       bite there. A SIGNEDNESS proof is what makes it fatal.) */
+    if (f->vregs[x].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                             | IR_VREG_VOLATILE))
+        return 0;
+    /* [0,255] by construction — cannot be negative and cannot wrap. */
+    if (v_fits_byte(f, x)) { if (why) *why = "fitsbyte"; return 1; }
+    /* A non-negative induction variable only rises, so it needs the compare to
+       be what STOPS it — see cs_compare_bounds_loop. */
+    if (v_nonneg_iv(f, x)) {
+        long step = v_iv_step(f, x);
+        if (why) *why = "nonneg-iv";
+        return step > 0 && bound >= 0 && bound + step - 1 <= 32767
+            && cs_compare_bounds_loop(f, cb, x);
+    }
+    return 0;
+}
+
+/* The signed -> unsigned counterpart. */
+static OpKind cs_unsigned_of(OpKind k)
+{
+    switch (k) {
+    case IR_CMP_LT: return IR_CMP_ULT;
+    case IR_CMP_LE: return IR_CMP_ULE;
+    case IR_CMP_GT: return IR_CMP_UGT;
+    case IR_CMP_GE: return IR_CMP_UGE;
+    default:        return k;
+    }
+}
+
+/* ---- Signed compares that need no sign correction (ir_opt_cmp_unsign) ----
+   A signed 16-bit compare lowers to `and a; sbc hl,de` plus SEVEN BYTES of pure
+   sign correction — `ld a,h; jp po,L; xor 0x80; L: rla` — because the carry out
+   of `sbc` is the UNSIGNED answer and the signed one is S^V. When BOTH operands
+   are provably non-negative the two answers coincide, so the unsigned kind
+   branches straight off that carry and the correction disappears.
+
+   MEASURED with the inert IR_CMPSIGN_PROBE before this was written: 153 signed
+   16-bit compares over the corpus + the four real files, 50 of them provable =
+   350 B in fp mode (adv_a 28 B, localbench 28, predbench 28, listbench 21...).
+   Every site is a LOOP EXIT TEST, so the correction also costs ~18-25 T per
+   iteration — bytes and cycles move together here.
+
+   TWO THINGS THE PROBE CORRECTED, both load-bearing:
+     - v_fits_byte carries only 10 of the 50. The other 40 are `i = i + 1`
+       induction variables, which that helper rejects (it takes only masked
+       ANDs, small constants, zero-extends and copies). Hence v_nonneg_iv.
+     - "every def is init>=0 or += positive" is NOT a proof on its own. A value
+       that only RISES can pass 32767 and become negative:
+           int i = 0; while (other) { if (i < 5) f(); i += 1; }
+       there the signed answer is true and the unsigned rewrite says false.
+       cs_compare_bounds_loop supplies the missing condition — the compare must
+       be the test that leaves the loop the step lives in. It REJECTED 6 of the
+       56 otherwise-passing sites, 2 of them in adv_a.
+
+   `IR_CMPUNSIGN=0` / `--opt-disable=cmp-unsign` opts out. */
+int ir_opt_cmp_unsign(Func *f)
+{
+    if (!f) return 0;
+    if (opt_disabled("cmp-unsign")) return 0;
+    { const char *e = getenv("IR_CMPUNSIGN"); if (e && e[0] == '0') return 0; }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (!cs_is_signed_cmp(op->kind)) continue;
+            int a = op->src[0], c = op->src[1];
+            /* Width 1 has its own byte lowering with no 16-bit sign tail, and
+               width 4 is the long helper — neither is what this pays for. */
+            if (a < 0 || a >= f->n_vregs || f->vregs[a].width != 2) continue;
+            long bound = (c == -1) ? op->imm : -1;
+            if (c >= 0) {
+                /* var vs var: the bound that stops the IV is unknown, so only a
+                   [0,255]-bounded operand qualifies on each side. */
+                if (f->vregs[a].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                         | IR_VREG_VOLATILE)) continue;
+                if (f->vregs[c].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                         | IR_VREG_VOLATILE)) continue;
+                if (!v_fits_byte(f, a) || !v_fits_byte(f, c)) continue;
+            } else {
+                if (!cs_operand_safe(f, b, a, op->imm, bound, NULL)) continue;
+                if (bound < 0) continue;
+            }
+            op->kind = cs_unsigned_of(op->kind);
+            changed++;
+        }
+    }
+    return changed;
+}
+
+void ir_opt_cmpsign_probe(Func *f)
+{
+    if (!f || !cs_probe_on()) return;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            if (!cs_is_signed_cmp(op->kind)) continue;
+            int a = op->src[0], c = op->src[1];
+            /* width: only the 16-bit form carries the 7-byte tail */
+            int w = (a >= 0 && a < f->n_vregs) ? f->vregs[a].width : 2;
+            const char *wa = "?", *wb = "?";
+            int oka = 0, okb = 0;
+            if (a >= 0) oka = v_nonneg(f, a, &wa);
+            else        { oka = (op->imm >= 0); wa = "imm"; }
+            if (c >= 0) okb = v_nonneg(f, c, &wb);
+            else        { okb = (op->imm >= 0); wb = "imm"; }
+            /* THE WRAP QUESTION. `every def is init>=0 or += positive` does
+               NOT by itself prove v >= 0 at the compare: a value that only
+               RISES can pass 32767 and become negative, and then a signed
+               `v < K` is TRUE where the unsigned rewrite says false. That is a
+               miscompile, so the proof needs one of:
+                 - v_fits_byte, which bounds v to [0,255] outright (no wrap), or
+                 - the compare being the test that STOPS the growth, with a
+                   bound small enough that v cannot reach 0x8000 first.
+               Report the step and the bound so the sound subset is countable
+               rather than assumed. */
+            long step = (a >= 0) ? v_iv_step(f, a) : 0;
+            long bound = (c == -1) ? op->imm : -1;
+            int no_wrap = 0;
+            if (oka && !strcmp(wa, "fitsbyte")) no_wrap = 1;          /* [0,255] */
+            else if (oka && step > 0 && bound >= 0
+                     && bound + step - 1 <= 32767
+                     && cs_compare_bounds_loop(f, b, a)) no_wrap = 1;
+            fprintf(stderr, "CMPSIGN %s kind=%d w=%d lhs=%s rhs=%s step=%ld "
+                            "bound=%ld %s\n",
+                    f->fn ? ir_sym_name(f->fn) : "?", (int)op->kind, w,
+                    oka ? wa : "UNKNOWN", okb ? wb : "UNKNOWN", step, bound,
+                    (oka && okb && no_wrap) ? "DROPPABLE"
+                                            : ((oka && okb) ? "WRAPRISK" : "keep"));
+        }
+    }
 }
 
 int ir_opt_narrow_byte(Func *f)

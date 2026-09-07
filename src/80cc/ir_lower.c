@@ -5886,6 +5886,8 @@ int ir_lower_func(FILE *out, Func *f)
            and slot sizing (which reads the now-narrowed widths). */
         int ivnarrow = ir_opt_narrow_iv(f);
         int narrow  = ir_opt_narrow_byte(f);
+        ir_opt_cmpsign_probe(f);        /* [IR_CMPSIGN_PROBE] inert */
+        ir_opt_cmp_unsign(f);           /* drop the signed-compare sign tail */
         /* narrow_byte turns promoting CONV_SX|ZX operands into
            byte-identity copies; propagate them away (else they spill to a
            slot) and DCE the now-dead copies. */
@@ -6141,7 +6143,20 @@ int ir_lower_func(FILE *out, Func *f)
                     int d = o->dst;
                     if (d < 0 || d >= f->n_vregs || ndef[d] != 1) continue;
                     if (f->vregs[d].width != 2) continue;
-                    if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                    /* ►► A PARAMETER'S INCOMING VALUE IS AN INVISIBLE DEF.
+                       ndef counts the defs in THIS function; the caller's value
+                       arrives without one. So a parameter assigned once, under a
+                       condition, looks single-def-constant and is not:
+
+                           int floor0(int v) { if (v < 0) v = 0; return v + 1; }
+
+                       remat took the `LD_IMM 0` as v's defining value and every
+                       read became `ld hl,0` — the parameter was never loaded, and
+                       floor0(5) returned 1. A SILENT wrong answer in an extremely
+                       ordinary idiom, on every CPU and both frame modes.
+                       See test/suites/long_ir/parremat.c. */
+                    if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                             | IR_VREG_PARAM))
                         continue;
                     const Op *rd = NULL;
                     if (o->kind == IR_LD_IMM)

@@ -1047,8 +1047,169 @@ static int iv_home_realizable(const Func *f, int v,
     if (entry_live && ir_bitset_get(entry_live, v)) return 0;  /* read-before-def */
     if (write_count[v] < 2) return 0;   /* write-many */
     if (!all_defs_ok[v]) return 0;      /* every def stamps BC */
-    if (use_count[v] < 8) return 0;     /* hot → in a loop */
     return 1;
+}
+
+/* Grounded cost-model kinds/registers (defined with g0_word_cost below) — declared
+   here so the arbiter's contention comparison, and the IV hotness gate below,
+   can reference GR_BC. */
+enum { GK_READ, GK_WRITE, GK_DEREF, GK_STEP, GK_N };
+enum { GR_SLOT, GR_BC, GR_DE, GR_IX, GR_IY, GR_N };
+
+static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
+                               const int *bb_cond_shift, int R, int discount);
+static inline int iv_overlap(const Func *f, int a, int b,
+                             int alo, int ahi, int blo, int bhi);
+static long bc_call_save_charge(const Func *f, int v, const int *bb_loop_depth,
+                                const int *bb_cond_shift);
+
+/* The hotness half, split out from the shape half above.
+   `use_count >= 8` is an UNGROUNDED CONSTANT — the only raw count left in the
+   candidate gates, everything else having moved to interval_benefit. It exists
+   to mean "in a loop", but it says so by counting static uses, which misses the
+   accumulator shape: `s = s OP x` four times over is 4 writes and 4 uses, so it
+   fails BOTH gates — bc_home_realizable wants write_count == 1 (write-once) and
+   this wants 8 uses (hot). widthbench's mix_char is exactly that value.
+   IR_IVWHY reports every candidate that clears the shape but not this. */
+static int iv_home_hot_enough(const Func *f, int v, const int *use_count,
+                              const int *bb_loop_depth, const int *bb_cond_shift)
+{
+    static int thr = -1;
+    if (thr < 0) {
+        const char *e = getenv("IR_IVHOT");
+        thr = e ? atoi(e) : 8;
+    }
+    if (use_count[v] >= thr) return 1;
+    /* [IR_IVACC] The REASSIGNED-VALUE arm. `use_count >= thr` is the only raw
+       count left in the candidate gates, and it is the wrong question for a
+       value that is WRITTEN many times and read once per write:
+
+           acc = acc + t;  acc = acc + u;  ...     (an accumulator)
+           if (v > 255) v = 255;  if (v < 0) v = 0;  (a clamp chain)
+
+       Such a value clears the IV shape (write-many, every def stamps BC) but
+       never the use count, and bc_home_realizable refuses it too because that
+       arm demands write_count == 1. It falls between the two BC gates and lands
+       in a slot, paying a round trip per term. predbench's `sat` is the clamp
+       shape; widthbench's `mix_char` is the accumulator.
+
+       ADMISSION IS BY CONTENTION, not by hotness and NOT by the arbiter's
+       interval_benefit. Two things had to be measured to get here:
+
+       1. interval_benefit does NOT separate these. It is a cycle model, and the
+          outcome here is byte- and mode-driven. It rates shiftbench's `kshift`
+          at 590 — the highest of any candidate — on both z80 (where admitting
+          it costs +23 B and +2.1 % ticks) and gbz80 (-36 B, -4.3 %). Same
+          number, opposite sign. Admitting every gap candidate is corpus +229 B
+          for an aggregate -0.021 % on ticks: a wash bought with bytes.
+       2. Call-freeness does not separate them either. It correctly rejects
+          fixedbench's `iir`/`fxdot` (they call qmul), but `kmul`, `udiv` and
+          `kshift` are call-FREE — `v * 25`, `v / 2u`, `v << 4` all lower
+          INLINE. Their loss is register PRESSURE, not call saves.
+
+       What does separate them is whether the value WINS its contention for BC —
+       whether it beats the best thing it would displace, by a wide margin. See
+       iv_acc_bc_wins for the measured ben:rival table that sets the margin.
+
+       So: call-free AND it out-earns its rival 3:1.
+
+       `IR_IVACC=0` / `--opt-disable=iv-acc` opts out, restoring the bare
+       `use_count >= thr` answer. `IR_IVHOT=<N>` re-sweeps the constant,
+       `IR_IVACCK=<N>` the margin. IR_IVWHY prints the census, rival benefit
+       included. */
+    {
+        static int acc_on = -1;
+        if (acc_on < 0) {
+            const char *e = getenv("IR_IVACC");
+            acc_on = (e && e[0] == '0') ? 0 : 1;
+        }
+        if (!acc_on || opt_disabled("iv-acc")) return 0;
+    }
+    if (!bb_loop_depth) return 0;      /* no loop map: keep the old answer */
+    return bc_call_save_charge(f, v, bb_loop_depth, bb_cond_shift) == 0;
+}
+
+/* Second half of the accumulator gate: is BC actually FREE over v's life?
+   The accumulator only wins if it is not displacing something better. Every
+   other proposer has already filled the pool by the time the IV arm runs, so
+   an overlapping candidate that also wants BC is visible right here. */
+/* The strongest overlapping BC rival's benefit, on the SAME scale as the
+   accumulator's (interval_benefit_x with discount=1) so the two are comparable.
+   Returns 0 for "no rival", -1 when there is no loop map to price with. */
+static long iv_acc_rival_benefit(const Func *f, int v, const Cand *pool, int n,
+                                 const int *first_use, const int *last_use,
+                                 const int *bb_loop_depth, const int *bb_cond_shift,
+                                 int *nrivals)
+{
+    long best = 0;
+    if (nrivals) *nrivals = 0;
+    if (!bb_loop_depth) return -1;
+    for (int j = 0; j < n; j++) {
+        if (pool[j].vreg == v) continue;
+        if (!(pool[j].allowed & RC_BC)) continue;
+        if (pool[j].flags & CF_SPECULATIVE) continue;
+        if (!iv_overlap(f, v, pool[j].vreg, first_use[v], last_use[v],
+                        pool[j].lo, pool[j].hi))
+            continue;
+        if (nrivals) (*nrivals)++;
+        long b = interval_benefit_x(f, pool[j].vreg, bb_loop_depth,
+                                    bb_cond_shift, GR_BC, 1);
+        if (b > best) best = b;
+    }
+    return best;
+}
+
+/* Does v WIN its contention for BC outright? Not "is it uncontended" — an
+   accumulator almost always overlaps something — but "does it beat the best
+   thing it would displace, by a wide margin".
+
+   THE MARGIN IS 3x AND IT IS NOT ARBITRARY. Benefit here is a CYCLE model, and
+   §5.1 already established it cannot arbitrate a register home on its own (it
+   rates shiftbench's kshift highest on the CPU where the home costs +23 B and
+   on the CPU where it saves 36). Measured ben:rival over every candidate in the
+   gap, against the per-cell size and tick outcome of admitting it:
+
+     mix_char  3.0 / 3.5   admit  widthbench: ticks faster on EVERY cell
+     sat       no rival    admit  predbench:  -462 B, 16/16 cells faster
+     reg_get   2.7 / 2.6   refuse bitfieldbench: +7 B z80 fp for -0.15 % ticks
+     kmul      2.3 / 2.7   refuse divbench:  +37 B and +4.5 % ticks
+     kshift    2.3 / 2.3   refuse shiftbench: +23 B and +2.1 % ticks
+     sdiv/iir/fxdot/matrix_compute/lex_compute  0.6-0.9  refuse (rival is
+                                                worth MORE than the accumulator)
+
+   So the cut sits between 2.7 (a byte-for-tick trade the allocator has no
+   mandate to make) and 3.0 (a two-axis win). A margin of 3 is the hysteresis
+   this needs, in the same spirit as the 1.4x eviction margin on the counter
+   yield below — a thin win does not justify displacing a placed value.
+   IR_IVACCK=<N> re-sweeps it. */
+static int iv_acc_bc_margin(void)
+{
+    static int k = -1;
+    if (k < 0) { const char *e = getenv("IR_IVACCK"); k = e ? atoi(e) : 3; }
+    return k;
+}
+
+static int iv_acc_bc_wins(const Func *f, int v, const Cand *pool, int n,
+                          const int *first_use, const int *last_use,
+                          const int *bb_loop_depth, const int *bb_cond_shift)
+{
+    int nrivals = 0;
+    long rival = iv_acc_rival_benefit(f, v, pool, n, first_use, last_use,
+                                      bb_loop_depth, bb_cond_shift, &nrivals);
+    if (rival < 0) return 0;               /* no loop map: keep the old answer */
+    if (nrivals == 0) return 1;            /* BC is genuinely free over the window */
+    /* Rivals EXIST but the model prices them all at zero. That is not "BC is
+       free", it is the model being BLIND — the known ez80 fp row of
+       g0_word_cost, where a slot read is a native `ld hl,(ix+d)` costing the
+       same 2 cycles as `ld l,c; ld h,b`, so interval_benefit rates every
+       candidate 0 and the arbiter's order, not merit, decides. Acting on that
+       zero is how divbench ez80 fp took a home worth -1 B and +3.4 % TICKS.
+       Same reasoning as the `seen` condition in IR_BCCALLCOST: ask for a real
+       gap before displacing anything. Distinguishing the two is why
+       iv_acc_rival_benefit reports a COUNT as well as a maximum. */
+    if (rival == 0) return 0;
+    long ben = interval_benefit_x(f, v, bb_loop_depth, bb_cond_shift, GR_BC, 1);
+    return ben >= (long)iv_acc_bc_margin() * rival;
 }
 
 
@@ -1073,6 +1234,10 @@ typedef struct {
     const int *is_base, *cstep, *cinit, *cother;      /* idx2 maps */
     const int *wd_base, *wd_acc, *wd_ldef, *wd_lread, *wd_addr; /* de/idx3/exx */
     int exx_writables;                                /* exx enabler count */
+    /* [IR_IVACC] the reassigned-value arm's inputs: a loop map to price call
+       saves, and the candidate pool to test BC contention. */
+    const int *bb_loop_depth, *bb_cond_shift, *first_use, *last_use;
+    const Cand *pool; int npool;
 } HomeCtx;
 
 /* Func-level enablers (envelopes + opt flags) — the whole-function conditions
@@ -1132,7 +1297,13 @@ static int home_realizable(const Func *f, int v, unsigned R,
             || (!opt_disabled("iv-resident")
                 && iv_home_realizable(f, v, c->use_count, c->write_count,
                                       c->all_defs_ok, c->has_prepushed_call,
-                                      c->entry_live));
+                                      c->entry_live)
+                && iv_home_hot_enough(f, v, c->use_count,
+                                      c->bb_loop_depth, c->bb_cond_shift)
+                && (c->use_count[v] >= 8
+                    || iv_acc_bc_wins(f, v, c->pool, c->npool,
+                                      c->first_use, c->last_use,
+                                      c->bb_loop_depth, c->bb_cond_shift)));
     case RC_BYTE:
         return c_byte_resident && !opt_disabled("byte-resident")
             && byte_home_realizable(f, v, c->use_count, c->write_count);
@@ -1183,7 +1354,9 @@ static void hr_agreement_check(const Func *f, const Cand *pool, int np,
                                const int *use_count, const int *write_count,
                                const int *def_kind, const int *all_defs_ok,
                                int has_prepushed_call, const BitSet *entry_live,
-                               const int *bb_in_loop)
+                               const int *bb_in_loop,
+                               const int *bb_loop_depth, const int *bb_cond_shift,
+                               const int *first_use, const int *last_use)
 {
     if (!getenv("IR_HR_CHECK") || f->n_vregs <= 0) return;
     size_t nv = (size_t)f->n_vregs;
@@ -1211,7 +1384,9 @@ static void hr_agreement_check(const Func *f, const Cand *pool, int np,
         HomeCtx c = { use_count, write_count, def_kind, all_defs_ok,
                       has_prepushed_call, entry_live,
                       is_base, cstep, cinit, cother,
-                      wd_base, wd_acc, wd_ldef, wd_lread, wd_addr, writables };
+                      wd_base, wd_acc, wd_ldef, wd_lread, wd_addr, writables,
+                      bb_loop_depth, bb_cond_shift, first_use, last_use,
+                      pool, np };
         static const unsigned CLASSES[] =
             { RC_BC, RC_BYTE, RC_IDX2, RC_IDX3, RC_EXX, RC_DE_ACC };
         for (int v = 0; v < f->n_vregs; v++)
@@ -1318,6 +1493,7 @@ static int collect_home_candidates(const Func *f,
                                    const int *def_kind, const int *all_defs_ok,
                                    int has_prepushed_call, const BitSet *entry_live,
                                    const int *bb_in_loop,
+                                   const int *bb_loop_depth, const int *bb_cond_shift,
                                    const int *first_use, const int *last_use,
                                    Cand *pool)
 {
@@ -1421,9 +1597,29 @@ static int collect_home_candidates(const Func *f,
     if (!opt_disabled("iv-resident"))
         for (int v = 0; v < f->n_vregs; v++)
             if (iv_home_realizable(f, v, use_count, write_count, all_defs_ok,
-                                   has_prepushed_call, entry_live))
+                                   has_prepushed_call, entry_live)) {
+                /* [IR_IVWHY] INERT census of the gap between the two BC gates:
+                   a value that clears the IV shape but is turned away as "cold"
+                   is one bc_home_realizable also refused (it is write-many). */
+                int hot = iv_home_hot_enough(f, v, use_count,
+                                             bb_loop_depth, bb_cond_shift)
+                       && (use_count[v] >= 8
+                           || iv_acc_bc_wins(f, v, pool, n, first_use, last_use,
+                                             bb_loop_depth, bb_cond_shift));
+                if (getenv("IR_IVWHY"))
+                    fprintf(stderr, "IVWHY %s v%d w=%d u=%d ben=%ld rival=%ld %s\n",
+                            f->fn ? ir_sym_name(f->fn) : "?", v,
+                            write_count[v], use_count[v],
+                            bb_loop_depth ? interval_benefit_x(f, v, bb_loop_depth,
+                                                bb_cond_shift, GR_BC, 1) : -1L,
+                            iv_acc_rival_benefit(f, v, pool, n, first_use,
+                                                 last_use, bb_loop_depth,
+                                                 bb_cond_shift, NULL),
+                            hot ? "ADMIT" : "REJECT cold");
+                if (!hot) continue;
                 add_cand(pool, &n, v, use_count[v], first_use[v], last_use[v],
                          RC_BC, CF_SPECULATIVE);
+            }
 done:
     free(is_base); free(cstep); free(cinit); free(cother);
     free(wd_base); free(wd_acc); free(wd_ldef); free(wd_lread); free(wd_addr);
@@ -1455,10 +1651,6 @@ static int cand_more_important(const Cand *a, const Cand *b)
     return na < nb;
 }
 
-/* Grounded cost-model kinds/registers (defined with g0_word_cost below) — declared
-   here so the arbiter's contention comparison can reference GR_BC. */
-enum { GK_READ, GK_WRITE, GK_DEREF, GK_STEP, GK_N };
-enum { GR_SLOT, GR_BC, GR_DE, GR_IX, GR_IY, GR_N };
 static int  g0_word_cost(int reg, int kind);
 static int  is_compared_counter(const Func *f, int v);
 static int  is_deref_base(const Func *f, int v);
@@ -5008,11 +5200,13 @@ void ir_alloc(Func *f)
                 int na = collect_home_candidates(f, use_count, write_count,
                                                  def_kind, all_defs_ok,
                                                  has_prepushed_call, entry_live,
-                                                 bb_in_loop, first_use, last_use, a);
+                                                 bb_in_loop, bb_loop_depth, bb_cond_shift,
+                                                 first_use, last_use, a);
                 int nb = collect_home_candidates(f, use_count, write_count,
                                                  def_kind, all_defs_ok,
                                                  narrow, entry_live,
-                                                 bb_in_loop, first_use, last_use, b);
+                                                 bb_in_loop, bb_loop_depth, bb_cond_shift,
+                                                 first_use, last_use, b);
                 fprintf(stderr, "PREPUSH %-22s calls=%-2d struct=%-2d uncovered=%-2d "
                         "narrow=%d now=%-3d then=%-3d gain=%d\n",
                         f->fn ? ir_sym_name(f->fn) : "?", npre, nstruct, uncovered,
@@ -5065,7 +5259,8 @@ void ir_alloc(Func *f)
                 int pn = collect_home_candidates(f, use_count, write_count,
                                                  def_kind, all_defs_ok,
                                                  has_prepushed_call, entry_live,
-                                                 bb_in_loop, first_use, last_use,
+                                                 bb_in_loop, bb_loop_depth, bb_cond_shift,
+                                                 first_use, last_use,
                                                  pp);
                 int detail = getenv("IR_BCVETO_PROBE")[0] == '2';
                 int prop[NCL], clean[NCL], tp = 0, tc = 0;
@@ -5115,12 +5310,15 @@ void ir_alloc(Func *f)
                 int np = collect_home_candidates(f, use_count, write_count,
                                                  def_kind, all_defs_ok,
                                                  has_prepushed_call, entry_live,
-                                                 bb_in_loop, first_use, last_use,
+                                                 bb_in_loop, bb_loop_depth, bb_cond_shift,
+                                                 first_use, last_use,
                                                  pool);
                 /* B4 (inert, IR_HR_CHECK): home_realizable == pool membership? */
                 hr_agreement_check(f, pool, np, use_count, write_count,
                                    def_kind, all_defs_ok, has_prepushed_call,
-                                   entry_live, bb_in_loop);
+                                   entry_live, bb_in_loop,
+                                   bb_loop_depth, bb_cond_shift,
+                                   first_use, last_use);
                 /* Rank each candidate by the grounded interval_benefit of its best
                    allowed register class (rank_benefit) — the unified cost model that
                    replaced the old cost_benefit hotness heuristic + keep-rules as the
