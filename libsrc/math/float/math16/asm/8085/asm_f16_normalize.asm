@@ -12,9 +12,10 @@
 ;
 ;  unpacked: exponent in d, sign in e[7], mantissa in hl
 ;
-;  Byte scan; residual merge loop.  add hl,hl does not set S from H.
-;  Until normalised H.7 is 0.  Entry leaves A = H with A.7 clear, so each
-;  step is or h / jp p (cheaper than ld a,h / or a).
+;  Byte scan; residual merge loop (at most 7).  add hl,hl does not set S
+;  from H.  Until normalised H.7 is 0.  Entry leaves A = H with A.7 clear,
+;  so each step is or h / jp p (cheaper than ld a,h / or a).
+;  8085 has S: ret m / jp p are native.  gbz80 must not copy this file.
 ;
 ;-------------------------------------------------------------------------
 

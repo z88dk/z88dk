@@ -5,7 +5,7 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, May 2020 / 2026 July (8085)
+;  feilipu, May 2020 / 2026 August (8085)
 ;
 ;-------------------------------------------------------------------------
 ;  asm_f16_f32 - 8085 unpacked format conversion code
@@ -37,29 +37,23 @@ PUBLIC asm_f32_f16
 
 ; convert f32 to f24
 .asm_f24_f32
-    ld a,l                      ; capture LSB
-    ; sla e: open-code (no sla e on 8085)
+    ld a,l                      ; capture LSB (rounding)
+    ld b,a
+    or a                        ; C=0 (A is L).  sla e; rl d ≡ or a; rl de
+    rl de                       ; DE<<1, C = old D7 = f32 sign
+    ld a,b
+    rra                         ; sign in A[7]
+    scf                         ; implicit 1
     ld b,a
     ld a,e
-    add a,a                     ; sla e, C = old e[7]
-    ld e,a
-    ld a,d
-    rla                         ; rl d through C
-    ld d,a
-    ld a,b
-    rra                         ; capture sign in a[7]
-    scf                         ; set implicit bit
-    ; rr e through C
-    ld b,a
-    ld a,e
-    rra
+    rra                         ; rr e through C (no rr e on 8085)
     ld e,a
     ld a,b
-    ld l,h                      ; create 16 bit mantissa by truncation
+    ld l,h                      ; 16-bit mant by truncation
     ld h,e
-    ld e,a                      ; save sign in e[7]
-    and a,070h                  ; check for 3 lost bits rounding
-    ret Z                       ; result in dehl
+    ld e,a                      ; sign in E[7]
+    and a,070h
+    ret Z
     ld a,l
     or 001h
     ld l,a
@@ -115,12 +109,10 @@ PUBLIC asm_f32_f16
     ld l,a                      ; mantissa lsb to l
 
     ld a,d                      ; exponent to a
-    cp 255                      ; IEEE specials in f24 (from half exp 31)
-    jp Z,f16_f24_special
-    sub a,127-15                ; convert from f24 bias to half exp
-    jp M,asm_f16_zero           ; zero if number too small
+    sub a,127-15                ; f24 bias 127 → half bias 15
+    jp C,asm_f16_zero           ; unsigned: d<112 (not jp M: d=255 → 143 looks minus)
     cp 31
-    jp NC,asm_f16_inf           ; overflow → infinity
+    jp NC,f16_f24_ovf           ; overflow / Inf / NaN (cold arm)
 
     ; position mantissa: sla l; rl h ×3 ≡ add hl,hl ×3 (C ← old H7)
     ld b,a                      ; half exp
@@ -141,6 +133,10 @@ PUBLIC asm_f32_f16
     ld l,h
     ld h,a
     ret
+
+.f16_f24_ovf
+    cp 143                      ; d==255 ⇔ A==143
+    jp NZ,asm_f16_inf
 
 .f16_f24_special
     ; d==255: Inf if mant==0, else NaN (preserve sign in e)

@@ -15,7 +15,7 @@
 ;   A:HL = rem (17-bit; A is the high bit)
 ;   BC   = div (full 16-bit mant)
 ;   DE   = quot
-;   stack +0 = bit count (B is part of BC)
+;   16 bits via stacked ret (push div_pack, 15× div_bit, jp div_bit)
 ;
 ;   trial : sub hl,bc / sbc a,0; restore on borrow  (DSUB, no C-in)
 ;   rem<< : add hl,hl / rla
@@ -168,57 +168,41 @@ PUBLIC asm_f24_div_f24
     pop af
 .div_prenorm_ok
     ; BC=div held, A:HL=rem
-    ld de,16
-    push de                     ; [count][expR/sign][X...][cret][Y...]
-    ld de,0                     ; quot
-
-;=========================================================================
-; Hot path — 16 bits.  BC=div, A:HL=rem, DE=quot, count on stack
-;=========================================================================
-
-.div_bit_loop
-    ; trial (DSUB has no borrow-in)
-    sub hl,bc
-    sbc a,0
-    jr C,div_bit_fail
-    scf
-    jr div_quot_shift
-
-.div_bit_fail
-    add hl,bc
-    adc a,0
-    or a                        ; qbit = 0
-.div_quot_shift
-    rl de
-    add hl,hl
-    rla
-
-    ; dec count: preserve A (rem hi) and DE (quot); Z from dec (hl)
+    ; DE free: push div_pack, 15× div_bit, jp div_bit.
+    ; ret is 10c; call+ret is 28c.  Setup is one ld de,nn + 16 push.
+    ld de,div_pack
     push de
-    ld de,sp+2                  ; &count
-    push hl
-    ex de,hl                    ; HL = &count
-    dec (hl)
-    pop hl                      ; rem.lo
-    pop de                      ; quot
-    jp NZ,div_bit_loop
+    ld de,div_bit
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    ld de,0                     ; quot
+    jp div_bit
 
 ;=========================================================================
 ; Pack
 ;=========================================================================
 
-    pop bc                      ; drop count
+.div_pack
+
     pop bc                      ; B=expR C=sign
 
     ld a,d
-    and 080h
+    and 080h                    ; C=0 (AND).  bit15 of quot?
     jr NZ,div_normed
-    ld a,e
-    add a,a
-    ld e,a
-    ld a,d
-    rla
-    ld d,a
+    rl de                       ; quot << 1 (C was 0); one prenorm restore
     dec b
 .div_normed
     ld a,b
@@ -236,6 +220,22 @@ PUBLIC asm_f24_div_f24
     pop af                      ; Y.hl
     pop af                      ; Y.de
     push bc
+    ret
+
+.div_bit
+    sub hl,bc                   ; DSUB: no C-in (incoming C from rla is ignored)
+    sbc a,0
+    jr C,div_bit_fail
+    scf
+    jr div_quot_shift
+.div_bit_fail
+    add hl,bc
+    adc a,0
+    or a                        ; C=0 for rl de
+.div_quot_shift
+    rl de                       ; qbit from C
+    add hl,hl
+    rla
     ret
 
 ;=========================================================================

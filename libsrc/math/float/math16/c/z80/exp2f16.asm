@@ -5,7 +5,6 @@
 ;
 ;	Module compile time: Thu Jan 30 00:49:22 2025
 
-
 	C_LINE	0,"exp2f16.c"
 
 	MODULE	exp2f16_c

@@ -1,5 +1,10 @@
 ;
-;  feilipu, 2020 May / 2026 July (8085)
+;  feilipu, 2020 May / 2026 August (8085)
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
 ;-------------------------------------------------------------------------
 ;  asm_f16_add
 ;-------------------------------------------------------------------------
@@ -64,19 +69,9 @@ PUBLIC asm_f24_add_f24
     push hl
     push bc                     ; [cret][Y.hl][Y.de][X.hl][X.de]
 
-    ; ---- specials gate (f24 exp 255) ----
-    ; Frame: [cret][Y.hl][Y.de][X.hl][X.de]; de word L=sign H=exp.
-    ;   NaN ± * → NaN;  Inf ± finite → Inf;  Inf−Inf → NaN
-    ld de,sp+4
-    ld hl,(de)
-    ld a,h
-    inc a
-    jp Z,hadd_spec_y
-    ld de,sp+8
-    ld hl,(de)
-    ld a,h
-    inc a
-    jp Z,hadd_spec_x
+    ; Specials off the finite path (adjunct).  Half Inf → f24 exp 255;
+    ; half finite max → 142, so Inf±finite hits cp 16 and returns the larger.
+    ; Inf±Inf / NaN only at equal-exp 255 (align_add, A=0).
 
     ; Y.de @+4 (L=sign,H=exp), X.de @+8
     ld de,sp+4
@@ -131,7 +126,15 @@ PUBLIC asm_f24_add_f24
 ; stack: [l.mant][l.de][cret][Y.hl][Y.de][X.hl][X.de]
 .align_add
     or a
-    jp Z,got_small
+    jp NZ,algn
+    ; equal exp.  Inf±Inf / NaN only if large exp is 255.
+    push hl                     ; ld de,sp+* does not touch flags
+    ld de,sp+4                  ; l.de after saved small
+    ld hl,(de)
+    inc h                       ; 8-bit inc sets Z, not C: exp==255?
+    pop hl                      ; C (subflag) still live
+    jr NZ,got_small
+    jp hadd_eq_hi
 
 .algn
     cp 8
@@ -300,57 +303,32 @@ PUBLIC asm_f24_add_f24
     push bc
     jp asm_f24_inf
 
-    ; ---- cold specials ----
-    ; f24: Inf HL=0, NaN HL≠0, exp 255 in de.H
-
-; Y.exp == 255
-.hadd_spec_y
-    ld de,sp+2
-    ld hl,(de)                      ; Y.mant
+    ; ---- equal-exp 255: Inf±Inf / NaN ----
+    ; stack: [l.mant][l.de][cret][Y.hl][Y.de][X.hl][X.de]
+    ; HL=small mant, C=subflag
+.hadd_eq_hi
     ld a,h
     or l
-    jp NZ,hadd_nan
-    ld de,sp+8
-    ld hl,(de)
-    ld a,h
-    inc a
-    jp NZ,hadd_inf_y                ; Inf ± finite → Y Inf
-    ld de,sp+6
-    ld hl,(de)
+    jp NZ,hadd_nan_eq
+    pop hl                      ; large mant
     ld a,h
     or l
-    jp NZ,hadd_nan                  ; X NaN
-    ld de,sp+4
-    ld a,(de)                       ; Y.sign
-    ld b,a
-    ld de,sp+8
-    ld a,(de)
-    xor b
-    and 080h
-    jp NZ,hadd_nan                  ; Inf − Inf
-.hadd_inf_y
-    ld de,sp+4
-    ld a,(de)
+    jp NZ,hadd_nan_de
+    ld a,c
+    or a
+    jp NZ,hadd_nan_de           ; Inf − Inf
+    pop de                      ; large.de
+    ld a,e
     and 080h
     ld e,a
     ld d,255
     ld hl,0
     jp hadd_epi
 
-; X.exp == 255, Y finite
-.hadd_spec_x
-    ld de,sp+6
-    ld hl,(de)
-    ld a,h
-    or l
-    jp NZ,hadd_nan
-    ld de,sp+8
-    ld a,(de)
-    and 080h
-    ld e,a
-    ld d,255
-    ld hl,0
-    jp hadd_epi
+.hadd_nan_eq
+    pop af                      ; l.mant
+.hadd_nan_de
+    pop af                      ; l.de
 
 .hadd_nan
     ld de,0

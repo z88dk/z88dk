@@ -1,4 +1,3 @@
-
     SECTION code_clib
     SECTION code_fp_math16
     PUBLIC ___h2schar

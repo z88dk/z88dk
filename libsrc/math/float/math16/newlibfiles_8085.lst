@@ -23,6 +23,7 @@
 ../../../math/float/math16/asm/8085/asm_f16_discardfraction.asm
 ../../../math/float/math16/asm/8085/asm_f16_add.asm
 ../../../math/float/math16/asm/8085/asm_f16_mul.asm
+../../../math/float/math16/asm/8085/asm_f16_sqr.asm
 ../../../math/float/math16/asm/8085/asm_f16_div.asm
 ../../../math/float/math16/asm/8085/asm_f16_inv.asm
 ../../../math/float/math16/asm/8085/asm_f16_floor.asm
@@ -106,6 +107,7 @@
 ../../../math/float/math16/c/sccz80/cm16_sccz80_pow.asm
 ../../../math/float/math16/c/sccz80/cm16_sccz80_pow_callee.asm
 ../../../math/float/math16/c/sccz80/cm16_sccz80_sqrt.asm
+../../../math/float/math16/c/sccz80/cm16_sccz80_sqr.asm
 ../../../math/float/math16/c/8085/cm16_sccz80_hypot.asm
 ../../../math/float/math16/c/8085/cm16_sccz80_hypot_callee.asm
 ../../../math/float/math16/c/8085/cm16_sccz80_poly.asm
@@ -127,6 +129,8 @@
 ../../../math/float/math16/lm16/c/sccz80/mul10.asm
 ../../../math/float/math16/lm16/c/sccz80/sqrt.asm
 ../../../math/float/math16/lm16/c/sccz80/sqrt_fastcall.asm
+../../../math/float/math16/lm16/c/sccz80/sqr.asm
+../../../math/float/math16/lm16/c/sccz80/sqr_fastcall.asm
 ../../../math/float/math16/lm16/c/sccz80/invsqrt.asm
 ../../../math/float/math16/lm16/c/sccz80/invsqrt_fastcall.asm
 ../../../math/float/math16/lm16/c/sccz80/hypot.asm

@@ -1,4 +1,3 @@
-
 /*
  Cephes Math Library Release 2.2:  June, 1992
  Copyright 1985, 1987, 1988, 1992 by Stephen L. Moshier
@@ -50,6 +49,21 @@ half_t sinf16( half_t xx )
         x = -x;
     }
 
+    /* |x| >= 128: reduce by 2π so uint16_t j cannot wrap. x is already >= 0;
+     * IEEE hi byte 0x58 => 128 = 0x5800. Do not fmod for |x| < 128. */
+    {
+        union float16_int u;
+        u.f = x;
+        if( m16_ieee_hi(u) >= 0x58 )
+        {
+            half_t twopi = (half_t)M_TWOPI;
+            int16_t k = (int16_t)(x / twopi);
+            x = x - (half_t)k * twopi;
+            if( x >= twopi )
+                x -= twopi;
+        }
+    }
+
     j = (int)(x * M_4_PI); /* integer part of x/(PI/4) */
     y = (half_t)j;
 
@@ -69,7 +83,7 @@ half_t sinf16( half_t xx )
     }
 
     x -= y * M_PI_4;
-    z = x * x;
+    z = sqrf16(x);
 
     if( (j==1) || (j==2) )
     {

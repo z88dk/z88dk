@@ -1,5 +1,10 @@
 ;
-;  feilipu, 2020 June / 2026 July (8085)
+;  feilipu, 2020 June / 2026 August (8085)
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
 ;-------------------------------------------------------------------------
 ;  asm_f16_sqrt / invsqrt — Newton (Z80 algorithm, no exx)
 ;-------------------------------------------------------------------------
@@ -31,21 +36,10 @@ PUBLIC asm_f24_invsqrt
     jp asm_f16_f24
 
 .asm_f24_sqrt
-    inc d
+    inc d                       ; 8-bit inc sets Z, not C: exp==255?
+    jr Z,sqrt_hi
     dec d
-    jp Z,asm_f24_zero
-    ld a,d
-    inc a
-    jp NZ,sqrt_finite
-    ld a,h
-    or l
-    jp NZ,asm_f24_nan
-    ld a,e
-    and 080h
-    jp NZ,asm_f24_nan
-    jp asm_f24_inf
-
-.sqrt_finite
+    jp Z,asm_f24_zero           ; extern — jp, not jr
     ld a,e
     and 080h
     jp NZ,asm_f24_nan           ; negative finite
@@ -56,20 +50,29 @@ PUBLIC asm_f24_invsqrt
     call asm_f24_invsqrt_body
     jp asm_f24_mul_callee
 
-.asm_f24_invsqrt
-    inc d
-    dec d
-    jp Z,asm_f24_inf
+.sqrt_hi
+    ld a,h
+    or l
+    jp NZ,asm_f24_nan
     ld a,e
     and 080h
     jp NZ,asm_f24_nan
-    ld a,d
-    inc a
-    jp NZ,asm_f24_invsqrt_body
+    jp asm_f24_inf
+
+.invsqrt_hi
     ld a,h
     or l
     jp NZ,asm_f24_nan
     jp asm_f24_zero
+
+.asm_f24_invsqrt
+    inc d                       ; 8-bit inc sets Z, not C: exp==255?
+    jr Z,invsqrt_hi
+    dec d
+    jp Z,asm_f24_inf            ; extern — jp, not jr
+    ld a,e
+    and 080h
+    jp NZ,asm_f24_nan
 
 .asm_f24_invsqrt_body
     ld a,e

@@ -1,4 +1,3 @@
-
 ; half __inv (half number)
 
 SECTION code_clib

@@ -1,0 +1,173 @@
+;
+;  Copyright (c) 2020 Phillip Stevens
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+;  feilipu, May 2020 / 2026 September (gbz80)
+;
+;-------------------------------------------------------------------------
+;  asm_f16_f32 - gbz80 unpacked format conversion code
+;-------------------------------------------------------------------------
+;
+;  unpacked format: exponent in d, sign in e[7], mantissa in hl
+;  return f32 and f24 float in dehl, and f16 in hl
+;
+;  Hot: asm_f24_f16 (expand), asm_f16_f24 (pack). 16-bit shifts via add hl,hl.
+;
+;  uses: af, bc, de, hl  (expand: af, de, hl only)
+;
+;-------------------------------------------------------------------------
+
+SECTION code_clib
+SECTION code_fp_math16
+
+EXTERN asm_f16_zero
+EXTERN asm_f16_inf
+EXTERN asm_f24_zero
+
+PUBLIC asm_f24_f32
+PUBLIC asm_f32_f24
+PUBLIC asm_f24_f16
+PUBLIC asm_f16_f24
+
+PUBLIC asm_f16_f32
+PUBLIC asm_f32_f16
+
+; convert f32 to f24
+.asm_f24_f32
+    ld a,l                      ; capture LSB (rounding)
+    sla e                       ; native CB; C = old E[7]
+    rl d                        ; C = f32 sign
+    rra                         ; sign in A[7]
+    scf                         ; implicit 1
+    rr e
+    ld l,h                      ; 16-bit mant by truncation
+    ld h,e
+    ld e,a                      ; sign in E[7]
+    and a,070h
+    ret Z
+    set 0,l
+    ret
+
+; convert f16 to f32
+.asm_f32_f16
+    call asm_f24_f16
+
+; convert f24 to f32
+.asm_f32_f24
+    ld a,e                      ; preserve sign in A
+    ld e,h                      ; mantissa padded to EHL
+    ld h,l
+    ld l,0
+    sla e                       ; drop implicit
+    rla                         ; sign in C
+    rr de                       ; rr d / rr e: C→D7, D0→E7
+    ret
+
+; convert f24 to f16
+.asm_f16_f24
+    ld a,l                      ; rounding using 3 lost bits
+    and 00eh
+    ld a,l
+    jr Z,rounded
+    add a,010h                  ; if there were rounding bits
+    jr NC,rounded
+    inc h
+    jr NZ,rounded
+    ; mant overflow: C still set from add a,010h; h == 0
+    ld b,a                      ; save rounded lsb
+    xor a
+    rra                         ; a = 0x80 (C→bit7), C=0
+    ld h,a
+    ld a,b
+    rra                         ; continue shift into lsb
+    inc d
+
+.rounded
+    ld l,a                      ; mantissa lsb to l
+
+    ld a,d                      ; exponent to a
+    sub a,127-15                ; f24 bias 127 → half bias 15
+    jp C,asm_f16_zero           ; unsigned: d<112 (no S flag on gbz80)
+    cp 31
+    jp NC,f16_f24_ovf           ; overflow / Inf / NaN (cold arm)
+
+    ; position mantissa: sla l; rl h ×3 ≡ add hl,hl ×3 (C ← old H7)
+    ld b,a                      ; half exp
+    add hl,hl
+    add hl,hl
+    ld a,b
+    rla                         ; mix C into exp field
+    ld b,a
+    add hl,hl
+    ld a,b
+    rla
+    rla                         ; room for sign at bit7
+    ld b,a
+    ld a,e
+    add a,a                     ; sign → C
+    ld a,b
+    rra                         ; place sign with exp+mant
+    ld l,h
+    ld h,a
+    ret
+
+.f16_f24_ovf
+    cp 143                      ; d==255 ⇔ A==143
+    jp NZ,asm_f16_inf
+
+.f16_f24_special
+    ; d==255: Inf if mant==0, else NaN (preserve sign in e)
+    ld a,h
+    or l
+    jp Z,asm_f16_inf
+    ld a,e
+    and 080h
+    or 07ch
+    ld h,a
+    ld l,080h
+    ret
+
+; convert f32 to f16
+.asm_f16_f32
+    call asm_f24_f32
+
+; convert f16 to f24
+.asm_f24_f16
+    ld e,h                      ; capture sign in e[7]
+    ld a,h
+    and 07ch                    ; exp field H[6:2]
+    jp Z,asm_f24_zero
+    rrca
+    rrca                        ; exp in A[4:0]
+    cp 31
+    jp Z,f24_f16_special        ; half Inf/NaN → f24 exp 255
+    add a,127-15
+    ld d,a
+    ld a,h
+    and 003h                    ; top 2 mant bits
+    ld h,a                      ; HL = 10-bit mant
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    add hl,hl                   ; <<5 → bits 14..5
+    ld a,h
+    or 080h                     ; implicit 1
+    ld h,a
+    ret
+
+.f24_f16_special
+    ; explicit mant only; Inf ⇒ HL=0; NaN ⇒ HL≠0 (no implicit 1)
+    ld a,h
+    and 003h
+    ld h,a
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    ld d,255
+    ret

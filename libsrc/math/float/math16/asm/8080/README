@@ -1,0 +1,29 @@
+# 8080 math16 cores
+
+CPU-specific half / f24 implementation. Assembled with `-m8080` into **`math16_8080.lib`** (`newlibfiles_8080.lst`).
+
+## Rules
+
+- Original 8080 ISA only. No 8085 extras (`ld de,sp+*`, `ld hl,(de)`, `rl de`, `sra hl`, `sub hl,bc`).
+- No `exx`, IX, or IY. Second f24 operand and temps on the **stack** only.
+- Stack access: `ld hl,sp+n` (clobbers C). Word traffic through `(hl)` and `ld a,(hl+)` / `ld (hl+),a`. Park a pair with `ld bc,hl`.
+- **Never** `pop af` a return address (F bit 3 hardwired 0). Use BC/DE/HL for return words; `pop af` only to discard unused stack words.
+- Library asm is not run through copt. Zilog mnemonics only.
+
+HL walks are deliberate: the gbz80 port maps them to native `(hl+)` and native `ld hl,sp+*`.
+Where HL is live (div rem on the hot path), `ld de,sp+n` is the 8080 synthetic (ex / add hl,sp / ex). Do not turn those into HL walks without parking rem.
+
+Classic suite `test_math16_8080.bin` (`-DMATH_SPECIALS`): 18 run, 18 passed.
+
+## Shared with Z80 / 8085 products
+
+Portable specials and coeffs live in parent `asm/`:
+
+- `asm_f16_{zero,inf,nan,neg,classify,sigdig}.asm`
+- `coeff_f16_*.asm`
+
+Public entry **names** match the 8085 cores (`asm_f16_mul_callee`, `asm_f24_add_f24`, …).
+
+## Strategy vs 8085
+
+Same algorithms. Rewrite every 8085 extra through A or HL. `ret m` / `jp p` are legal here (S flag). gbz80 cannot copy those; it uses `bit 7`.

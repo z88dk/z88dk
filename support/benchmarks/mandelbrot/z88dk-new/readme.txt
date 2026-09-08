@@ -93,9 +93,9 @@ cycle count  = 1049525678
 time @ 4MHz  = 1049525678 / 4*10^6 =  4 min 22 sec
 
 
-Z88DK August 10, 2026
+Z88DK September 9, 2026
 sccz80 / new / math16
-2404 bytes less page zero
+2260 bytes less page zero
 
-cycle count  =  789885425
-time @ 4MHz  = 789885425 / 4*10^6 =  3 min 17 sec
+cycle count  =  788675466
+time @ 4MHz  = 788675466 / 4*10^6 =  3 min 17 sec

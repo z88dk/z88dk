@@ -52,19 +52,14 @@ extern float f16_coeff_log[];
 
 half_t log10f16 (half_t x)
 {
-    union fl16 {
-        half_t f;
-        uint16_t l;
-    };
-
+    union float16_int fl;
     half_t y, z;
     int16_t e;
 
     /* Test for domain */
     if( x <= 0.0 )
     {
-        union fl16 fl;
-        fl.l = NAN_NEG_F16;
+        fl.l = (x == 0.0) ? INFINITY_NEG_F16 : NAN_NEG_F16;
         return fl.f;
     }
 
@@ -83,7 +78,7 @@ half_t log10f16 (half_t x)
         x -= 1.0;
     }
 
-    z = x*x;
+    z = sqrf16(x);
     
     y = polyf16( x, f16_coeff_log, 9) * z;
     

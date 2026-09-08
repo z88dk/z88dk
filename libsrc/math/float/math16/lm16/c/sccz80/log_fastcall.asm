@@ -1,4 +1,3 @@
-
 	SECTION	code_fp_math32
 	PUBLIC	logf16_fastcall
 	EXTERN	_m32_logf

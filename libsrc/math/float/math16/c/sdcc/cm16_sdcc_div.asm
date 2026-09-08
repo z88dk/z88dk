@@ -1,4 +1,3 @@
-
 ; half __div (half left, half right)
 
 SECTION code_clib

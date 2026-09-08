@@ -1,4 +1,3 @@
-
 ; half __sub_callee (half left, half right)
 
 SECTION code_clib

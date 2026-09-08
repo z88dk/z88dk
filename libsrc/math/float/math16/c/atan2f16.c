@@ -1,13 +1,16 @@
-
 #include "math16.h"
 
 half_t atan2f16 (half_t y, half_t x)
 {
-    half_t v;
+    half_t v, ax, ay;
 
     if( x != 0.0)
     {
-        if(fabsf16(x) >= fabsf16(y))
+        /* Locals, not nested fabs(): 8080/8085/gbz80 sccz80 stack offsets
+         * around a live push of fabs(x) were wrong (2-byte half slots). */
+        ax = fabsf16(x);
+        ay = fabsf16(y);
+        if(ax >= ay)
         {
             v = atanf16(y/x);
             if( x < 0.0)

@@ -1,4 +1,3 @@
-
 ; half __sqrt (half number)
 
 SECTION code_clib

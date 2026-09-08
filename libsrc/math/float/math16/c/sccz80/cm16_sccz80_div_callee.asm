@@ -1,4 +1,3 @@
-
 ; half __div_callee (half left, half right) — restoring div
 
 SECTION code_clib

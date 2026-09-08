@@ -17,9 +17,12 @@
 ;   DE   = quot
 ;   B'   = bit count (exx)
 ;
-;   trial : or a; sbc hl,bc; sbc a,0; restore on borrow
-;   rem<< : add hl,hl / rla
+;   trial : or a; sbc hl,bc (C-in); sbc a,0; restore on borrow
+;   rem<< : add hl,hl / rla  (after each bit except the last)
 ;   qbit  : rl de
+;
+; Specials (0/Inf/NaN) are classified before this loop. Finite / finite
+; only.  Inf/NaN mix on the packed IEEE wrappers is acceptable.
 ;
 ; Labels match asm/8085/asm_f16_div.asm.  Specials use asm_f24_zero/inf/nan.
 ;
@@ -149,7 +152,7 @@ PUBLIC asm_f24_div_f24
 ;=========================================================================
 
 .div_bit_loop
-    or a                        ; C clear for sbc hl,bc
+    or a                        ; C=0: Z80 sbc hl,bc uses C-in
     sbc hl,bc
     sbc a,0
     jr C,div_bit_fail
@@ -159,11 +162,9 @@ PUBLIC asm_f24_div_f24
 .div_bit_fail
     add hl,bc
     adc a,0
-    or a
+    or a                        ; C=0 for rl de (qbit already 0)
 .div_quot_shift
     rl de
-    add hl,hl
-    rla
     exx
     djnz div_bit_next
     exx
@@ -171,6 +172,8 @@ PUBLIC asm_f24_div_f24
 
 .div_bit_next
     exx
+    add hl,hl                   ; rem << 1 for the next trial
+    rla
     jr div_bit_loop
 
 ;=========================================================================

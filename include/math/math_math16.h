@@ -128,10 +128,10 @@ extern half_t __LIB__ hypotf16(half_t x,half_t y) __smallc;
 
 /* Power functions */
 extern half_t __LIB__ sqrtf16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ sqrf16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ div2f16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ mul2f16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ mul10f16(half_t x) __z88dk_fastcall;
-#define sqrf16(x) mulf16((x),(x))
 
 /* Trigonometric functions */
 extern half_t __LIB__ acosf16(half_t x) __z88dk_fastcall;

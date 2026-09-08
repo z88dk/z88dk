@@ -35,18 +35,42 @@ half_t __LIB__ asm_f16_pow (half_t x, half_t y) __smallc  __z88dk_callee;
 
 half_t asm_f16_pow (half_t x, half_t y)
 {
+    union float16_int fl;
+    half_t r;
+
     if(y == 0.0) return 1.0;
 
-    if(x <= 0.0) return 0.0;
-
     if(y == 1.0) return x;
-    if(y == -1.0) return invf16(x);
+    if(y == -1.0) return 1.0 / x;
 
-    if(y == 0.5) return sqrtf16(x);
-    if(y == -0.5) return invsqrtf16(x);
+    if(x > 0.0)
+    {
+        if(y == 0.5) return sqrtf16(x);
+        if(y == -0.5) return invsqrtf16(x);
+        if(y == 2.0) return sqrf16(x);
+        if(y == -2.0) return 1.0 / sqrf16(x);
+        return exp2f16( log2f16(x) * y);
+    }
 
-    if(y == 2.0) return x*x;
-    if(y == -2.0) return invf16(x*x);
+    if(x == 0.0)
+    {
+        if(y > 0.0) return 0.0;
+        fl.l = INFINITY_POS_F16;
+        return fl.f;
+    }
 
-    return exp2f16( log2f16(x) * y);
+    /* x < 0: defined only for integer y. */
+    if(y == 2.0) return sqrf16(x);
+    if(y == -2.0) return 1.0 / sqrf16(x);
+
+    if( y != floorf16(y) )
+    {
+        fl.l = NAN_NEG_F16;
+        return fl.f;
+    }
+
+    r = exp2f16( log2f16(-x) * y);
+    if( (y * (half_t)0.5) != floorf16(y * (half_t)0.5) )
+        r = -r;
+    return r;
 }

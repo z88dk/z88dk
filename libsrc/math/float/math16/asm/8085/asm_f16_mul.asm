@@ -1,5 +1,10 @@
 ;
-;  feilipu, 2020 May / 2026 July (8085)
+;  feilipu, 2020 May / 2026 August (8085)
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
 ;-------------------------------------------------------------------------
 ;  asm_f16_mul — 8085 half mul (stack-balanced)
 ;-------------------------------------------------------------------------
@@ -25,6 +30,7 @@ PUBLIC asm_f16_mul_callee
 PUBLIC asm_f24_mul_callee
 PUBLIC asm_f24_mul_f24
 PUBLIC f16_8085_mulu_32_16x16
+PUBLIC f16_8085_mulu_32_11x11
 
 ;-------------------------------------------------------------------------
 ; Packed half×half mul (8085-native: no exx / ex af,af / srl / bit / set).
@@ -52,8 +58,6 @@ PUBLIC f16_8085_mulu_32_16x16
     jp Z,hmul_uzero
     rrca
     rrca
-    cp 31
-    jp Z,hmul_y_hi
     ld b,a                      ; B = y.exp
     ld a,h
     and 003h
@@ -67,8 +71,6 @@ PUBLIC f16_8085_mulu_32_16x16
     jp Z,hmul_xzero_pop
     rrca
     rrca
-    cp 31
-    jp Z,hmul_x_hi
     ld c,a                      ; C = x.exp
     ld a,d
     and 003h
@@ -84,13 +86,14 @@ PUBLIC f16_8085_mulu_32_16x16
     jp Z,hmul_uzero_s           ; under (sign still on stack)
     jp C,hmul_uzero_s
     cp 31
-    jp NC,hmul_uinf_s
+    jp NC,hmul_ovf              ; overflow / Inf / NaN.  Inf × tiny finite
+                                ; (sum-15 < 31) stays on the add path — adjunct
 
     add a,127-15
     ld b,a                      ; B = f24 exp
     push bc                     ; [f24exp][sign][uret]  (C free)
 
-    call f16_8085_mulu_32_16x16 ; DE * HL → DEHL (11×11, early-out)
+    call f16_8085_mulu_32_11x11 ; DE * HL → DEHL (packed 11×11)
 
     pop bc                      ; B = f24 exp
     ; D = 0 for 11×11; bit21 of p is E[5]
@@ -98,7 +101,8 @@ PUBLIC f16_8085_mulu_32_16x16
     and 020h
     jr NZ,hmul_ge2
 
-    ; mant = p >> 5  (logical: clear C, then rra E→H→L ×5)
+    ; Logical EHL >> 5.  No srl e: or a; rra injects 0 into E7.
+    ; Unrolled (a counted loop is smaller, slower on TIMER).
     ld a,e
     or a
     rra
@@ -160,7 +164,7 @@ PUBLIC f16_8085_mulu_32_16x16
 .hmul_ge2
     inc b
     jr Z,hmul_uinf_pop
-    ; mant = p >> 6
+    ; Logical EHL >> 6 (same or a; rra chain).
     ld a,e
     or a
     rra
@@ -235,8 +239,10 @@ PUBLIC f16_8085_mulu_32_16x16
     jp asm_f16_f24
 
 .hmul_xzero_pop
-    pop hl                      ; drop y mant11
-    ; x==0, y finite → signed zero
+    pop hl                      ; drop y mant11; B = y.exp
+    ld a,b
+    cp 31
+    jp Z,hmul_nan_s             ; 0 × Inf/NaN
     jp hmul_uzero_s
 
 .hmul_uzero
@@ -260,28 +266,28 @@ PUBLIC f16_8085_mulu_32_16x16
     ld e,a
     jp asm_f16_inf
 
-; y.exp == 31.  HL=y DE=x; [sign][uret]
-.hmul_y_hi
+    ; Overflow or Inf/NaN.  B=y.exp C=x.exp, DE=y mant11, HL=x mant11.
+.hmul_ovf
+    ld a,b
+    cp 31
+    jr Z,hmul_ovf_y
+    ld a,c
+    cp 31
+    jr Z,hmul_ovf_x
+    jp hmul_uinf_s
+
+.hmul_ovf_y
+    ld a,d
+    and 003h
+    or e
+    jp NZ,hmul_nan_s
+    ld a,c
+    cp 31
+    jp NZ,hmul_uinf_s
+.hmul_ovf_x
     ld a,h
     and 003h
     or l
-    jp NZ,hmul_nan_s
-    ld a,d
-    and 07ch
-    jp Z,hmul_nan_s             ; Inf × 0
-    cp 07ch
-    jp NZ,hmul_uinf_s           ; Inf × finite
-    ld a,d
-    and 003h
-    or e
-    jp NZ,hmul_nan_s
-    jp hmul_uinf_s              ; Inf × Inf
-
-.hmul_x_hi                      ; x exp 31; [ym][sign][uret]
-    pop hl                      ; drop y mant11
-    ld a,d
-    and 003h
-    or e
     jp NZ,hmul_nan_s
     jp hmul_uinf_s
 
@@ -305,13 +311,7 @@ PUBLIC f16_8085_mulu_32_16x16
     ld a,l
     xor c
     ld c,a                      ; result sign
-    ld a,h                      ; X.exp
-    or a
-    jp Z,mulz
-    ld a,b                      ; Y.exp
-    or a
-    jp Z,mulz
-
+    ; ±0 classified by IEEE caller (packed mul / sqr / inv / sqrt / poly)
     ld d,b                      ; D = Y.exp
     ld a,h                      ; X.exp
     sub 07fh
@@ -398,47 +398,26 @@ PUBLIC f16_8085_mulu_32_16x16
     jp asm_f24_zero
 
 ;--------------------------------------------------------------------
+; No operand-zero test (IEEE caller). bit10 / bit15 skip into the chain.
+.f16_8085_mulu_32_11x11
+    ld a,d
+    ld d,0
+    ld bc,hl
+    add a,a
+    add a,a
+    add a,a
+    add a,a
+    add a,a
+    add a,a                     ; C = bit10 = 1; chain label is the next bit
+    jp bit9
+
 .f16_8085_mulu_32_16x16
     ld a,d
     ld d,0
     ld bc,hl
     add a,a
-    jr C,bit14
-    add a,a
-    jr C,bit13
-    add a,a
-    jr C,bit12
-    add a,a
-    jr C,bit11
-    add a,a
-    jr C,bit10
-    add a,a
-    jr C,bit9
-    add a,a
-    jr C,bit8
-    add a,a
-    jr C,bit7
-    ld a,e
-    and 0feh
-    add a,a
-    jr C,bit6
-    add a,a
-    jr C,bit5
-    add a,a
-    jr C,bit4
-    add a,a
-    jr C,bit3
-    add a,a
-    jr C,bit2
-    add a,a
-    jr C,bit1
-    add a,a
-    jr C,bit0
-    ld a,e
-    rra
-    ret C
-    ld hl,de
-    ret
+    jp bit14
+
 .bit14
     add hl,hl
     adc a,a

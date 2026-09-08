@@ -56,8 +56,8 @@ z88dk-classic/readme.txt. N=1000.
 
 Compiler | CPU  | Library | Ticks
 ---------|------|---------|----------------
-sccz80   | z80  | math16  |   295_642_916 (Aug 10, 2026; DT=1e-1)
-sccz80   | 8085 | math16  |   344_383_717 (Aug 10, 2026; DT=1e-1)
+sccz80   | z80  | math16  |   295_229_389 (Sep 9, 2026; DT=1e-1)
+sccz80   | 8085 | math16  |   344_855_174 (Sep 9, 2026; DT=1e-1)
 sccz80   | z80  | math32  |   797_460_656 (Aug 15, 2026)
 zsdcc    | z80  | math32  |   849_403_541 (Aug 16, 2026)
 sccz80   | 8085 | math32  | 1_526_138_871 (Aug 15, 2026)
@@ -218,15 +218,15 @@ IEEE 32-bit float implementation, accurate to 7 significant digits.
 (After sccz80 newlib math32 *_fastcall header remap; sqrt path correct.)
 
 11.
-Z88DK August 10, 2026
+Z88DK September 9, 2026
 sccz80 / new / math16
-3431 bytes less page zero
+3306 bytes less page zero
 
 first number error : 5 * 10^(-4)
 second number error: 5 * 10^(-2)
 
-cycle count  = 295697456
-time @ 4MHz  = 295697456 / 4*10^6 =  1 min 14 sec
+cycle count  = 295229389
+time @ 4MHz  = 295229389 / 4*10^6 =  1 min 14 sec
 
 IEEE 16-bit float implementation, accurate to 3 significant digits.
 

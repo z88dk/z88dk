@@ -1,4 +1,3 @@
-;
 ;  8085 hypot callee — stack only, no exx
 ;
 

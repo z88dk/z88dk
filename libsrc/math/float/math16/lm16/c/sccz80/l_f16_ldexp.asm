@@ -1,4 +1,3 @@
-;
 ; Intrinsic sccz80 routine to multiply by a power of 2
 ;
 ;

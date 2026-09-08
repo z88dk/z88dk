@@ -86,12 +86,10 @@ PUBLIC asm_f32_f16
     ld l,a                      ; mantissa lsb to l
 
     ld a,d                      ; exponent to a
-    cp 255                      ; IEEE specials in f24 (from half exp 31)
-    jr Z,f16_f24_special
-    sub a,127-15                ; convert from f24 bias to half exp
-    jp M,asm_f16_zero           ; zero if number too small
+    sub a,127-15                ; f24 bias 127 → half bias 15
+    jp C,asm_f16_zero           ; unsigned: d<112 (not jp M: d=255 → 143 looks minus)
     cp 31
-    jp NC,asm_f16_inf           ; overflow → infinity
+    jp NC,f16_f24_ovf           ; overflow / Inf / NaN (cold arm)
 
     ; Position mantissa into half layout (bit-identical to sla l/rl h ×3).
     ; add hl,hl is 11T vs sla l+rl h = 16T per double — ~15T saved here.
@@ -106,6 +104,12 @@ PUBLIC asm_f32_f16
     ld l,h                      ; position f16 in hl
     ld h,a
     ret
+
+; A = d-112 >= 31.  Expand maps half Inf/NaN to d=255 ⇒ A=143.
+; Finite overflow (max+max, etc.) has A≠143 → Inf, never NaN.
+.f16_f24_ovf
+    cp 143
+    jp NZ,asm_f16_inf
 
 .f16_f24_special
     ; d==255: Inf if mant==0, else NaN (preserve sign in e)

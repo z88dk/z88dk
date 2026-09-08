@@ -1,4 +1,3 @@
-
 ; half_t __fma_callee (half_t left, half_t middle, half_t right)
 
 SECTION code_clib

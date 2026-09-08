@@ -1,4 +1,3 @@
-
 ; half __hypot(half left, half right)
 
 SECTION code_clib

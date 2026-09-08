@@ -1,4 +1,3 @@
-
 ; half __invsqrt (half number)
 
 SECTION code_clib
