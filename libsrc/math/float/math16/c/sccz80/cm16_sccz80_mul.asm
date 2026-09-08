@@ -1,37 +1,17 @@
-
 ; half __mul (half left, half right)
+; Packed 11×11, same as l_f16_mul / 8080 mulf16.
 
 SECTION code_clib
 SECTION code_fp_math16
 
 PUBLIC cm16_sccz80_mul
 
-EXTERN asm_f24_f16
-EXTERN asm_f16_f24
-
-EXTERN asm_f24_mul_f24
+EXTERN asm_f16_mul_callee
 
 .cm16_sccz80_mul
-
-    ; multiply two sccz80 halfs
-    ;
-    ; enter : stack = sccz80_half left, sccz80_half right, ret
-    ;
-    ; exit  :    HL = sccz80_half(left*right)
-    ;
-    ; uses  : af, bc, de, hl, af', bc', de', hl'
-
-    pop bc                      ; pop return address
-    pop hl                      ; get right operand off of the stack
-    exx
-
-    pop hl                      ; get left operand off of the stack
-    push hl
-    call asm_f24_f16            ; expand to dehl
-    exx                         ; x      d  = eeeeeeee e  = s-------
-                                ;        hl = 1mmmmmmm mmmmmmmm
-    push hl
-    push bc                     ; return address on stack
-    call asm_f24_f16            ; expand to dehl
-    call asm_f24_mul_f24
-    jp asm_f16_f24              ; return   HL = sccz80_half
+    ; enter : stack = left, right, ret
+    ; exit  :    HL = left*right
+    pop bc                      ; ret
+    pop hl                      ; right
+    push bc                     ; ret; left remains
+    jp asm_f16_mul_callee

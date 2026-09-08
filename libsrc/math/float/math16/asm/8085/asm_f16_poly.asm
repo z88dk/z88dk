@@ -1,5 +1,10 @@
 ;
-;  feilipu, 2020 June / 2026 July (8085)
+;  feilipu, 2020 June / 2026 August (8085)
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
 ;-------------------------------------------------------------------------
 ;  asm_f16_poly — Horner: res=d[n]; while(n) res=res*x+d[--n];
 ;-------------------------------------------------------------------------
@@ -14,8 +19,10 @@ SECTION code_fp_math16
 EXTERN asm_f24_f16
 EXTERN asm_f24_f32
 EXTERN asm_f16_f24
-EXTERN asm_f24_mul_f24
 EXTERN asm_f24_add_f24
+EXTERN asm_f24_zero
+EXTERN asm_f24_inf
+EXTERN f16_8085_mulu_32_16x16
 
 PUBLIC asm_f16_poly_callee
 PUBLIC asm_f16_poly
@@ -64,17 +71,7 @@ PUBLIC asm_f16_poly
     pop hl
     pop de                      ; DEHL = res
 
-    ; res * x : X=res, Y=x
-    push de
-    push hl                     ; X=res
-    ld de,sp+4
-    ld hl,(de)                  ; x.hl
-    push hl
-    ld de,sp+8
-    ld hl,(de)                  ; x.de as L=sign H=exp
-    ex de,hl
-    pop hl                      ; DEHL=x
-    call asm_f24_mul_f24
+    call poly_mulx              ; res *= stacked x; x stays on frame
 
     ; + d[n] (n already decremented; step coeff back first)
     push de
@@ -114,3 +111,68 @@ PUBLIC asm_f16_poly
     pop de                      ; DE = b1:b0
     ex de,hl                    ; DE = b3:b2, HL = b1:b0
     ret
+
+; Finite f24 mul: DEHL = res, stack [ret][x.hl][x.de]...
+.poly_mulx
+    ld b,d                      ; B = res.exp
+    ld c,e                      ; C = res.sign
+    push hl                     ; [rm][ret][x.hl][x.de]
+    ld de,sp+6
+    ld hl,(de)                  ; L=x.sign H=x.exp
+    ld a,l
+    xor c
+    ld c,a                      ; result sign
+    ld a,h                      ; x.exp; ±0 classified by IEEE caller
+    ld d,b
+    sub 07fh
+    jr C,pm_uf
+    add a,d
+    jr C,pm_ov
+    jr pm_ok
+.pm_uf
+    add a,d
+    jp NC,pm_zero_pop
+.pm_ok
+    or a
+    jp Z,pm_zero_pop
+    ld b,a
+    pop hl                      ; res.mant
+    push bc                     ; [exp/sign][ret][x.hl][x.de]
+    ld de,sp+4
+    push hl
+    ld hl,(de)                  ; x.mant
+    pop de                      ; DE = res.mant
+    call f16_8085_mulu_32_16x16
+    pop bc
+    ld a,d
+    rla
+    jr C,pm_ge2
+    add hl,hl
+    rl de
+    jr pm_norm
+.pm_ge2
+    inc b
+    jr Z,pm_ov2
+.pm_norm
+    ex de,hl
+    ld a,d
+    and 0c0h
+    jr Z,pm_rnd
+    ld a,l
+    or 001h
+    ld l,a
+.pm_rnd
+    ld de,bc
+    ret
+
+.pm_zero_pop
+    pop hl
+.pm_zero
+    ld e,c
+    jp asm_f24_zero
+
+.pm_ov
+    pop hl
+.pm_ov2
+    ld e,c
+    jp asm_f24_inf

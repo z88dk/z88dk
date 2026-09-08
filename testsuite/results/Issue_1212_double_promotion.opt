@@ -199,6 +199,7 @@
 	GLOBAL	polyf16
 	GLOBAL	hypotf16
 	GLOBAL	sqrtf16
+	GLOBAL	sqrf16
 	GLOBAL	div2f16
 	GLOBAL	mul2f16
 	GLOBAL	mul10f16

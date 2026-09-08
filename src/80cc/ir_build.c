@@ -6508,8 +6508,12 @@ static int build_muldiv_integer(Builder *b, Node *n)
         }
     }
     /* kc160: 16x16 int multiply is a single `mul de,hl` (low 16 bits are
-       sign-agnostic, so the unsigned form serves signed and unsigned alike). */
-    if (n->ast_type == OP_MULT && IS_KC160() && width == 2)
+       sign-agnostic, so the unsigned form serves signed and unsigned alike).
+       Do not take this for _Float16 / accum16: those stay on l_f16_mul /
+       l_fix16_*. Width 2 matches half, so the integer HW mul used to fire
+       on `1.5h * 1.5h` (math16 80cc kc160 suite). */
+    if (n->ast_type == OP_MULT && IS_KC160() && width == 2
+        && !is_flt && !is_fix16)
         return emit_ir_mul(b, l, r, 2, 1);
     const char *helper;
     int n_stacked = 0;

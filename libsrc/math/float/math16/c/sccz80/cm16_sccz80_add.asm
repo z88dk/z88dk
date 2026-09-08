@@ -1,4 +1,3 @@
-
 ; half __add (half left, half right)
 
 SECTION code_clib

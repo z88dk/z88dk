@@ -1,4 +1,3 @@
-
 /*
  Cephes Math Library Release 2.2:  June, 1992
  Copyright 1985, 1987, 1988, 1992 by Stephen L. Moshier
@@ -49,6 +48,20 @@ half_t cosf16( half_t xx )
         x = -x;
     }
 
+    /* Same bound as sinf16: |x| >= 128 → reduce by 2π. x is already >= 0. */
+    {
+        union float16_int u;
+        u.f = x;
+        if( m16_ieee_hi(u) >= 0x58 )
+        {
+            half_t twopi = (half_t)M_TWOPI;
+            int16_t k = (int16_t)(x / twopi);
+            x = x - (half_t)k * twopi;
+            if( x >= twopi )
+                x -= twopi;
+        }
+    }
+
     j = (int)(x * M_4_PI); /* integer part of x/(PI/4) */
     y = (half_t)j;
 
@@ -71,7 +84,7 @@ half_t cosf16( half_t xx )
         sign = -sign;
 
     x -= y * M_PI_4;
-    z = x * x;
+    z = sqrf16(x);
 
     if( (j==1) || (j==2) )
     {

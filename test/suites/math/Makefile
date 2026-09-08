@@ -12,7 +12,9 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 # IEEE specials harness (-DMATH_SPECIALS in math.c): light Inf/NaN checks
 # (div, mul/add, sqrt).  Enabled on products that pass:
 #   math32, math32_ez80_z80, math32_8085, math32_8080, math32_gbz80,
-#   math16, math16_8085, am9511, am9511_8085
+#   math16, math16_ez80_z80, math16_8085, math16_8080, math16_gbz80,
+#   math16_z180, math16_z80n, math16_r2ka, math16_r4k, math16_r6k,
+#   math16_kc160, am9511, am9511_8085
 #
 # Other math32 CPU products (z180/z80n/r2ka/…) share specials cores but are
 # not suite-gated here — add -DMATH_SPECIALS after a green run if desired.
@@ -25,8 +27,10 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 # integer self-identity folds onto floats will fail this harness (CI uses 80cc).
 # ---------------------------------------------------------------------------
 
-all: test_genmath.bin test_daimath32.bin test_bbcmath.bin test_math16.bin test_math16_8085.bin \
-	test_math16_r6k.bin \
+all: test_genmath.bin test_daimath32.bin test_bbcmath.bin test_math16.bin \
+	test_math16_z180.bin test_math16_ez80_z80.bin test_math16_z80n.bin \
+	test_math16_r2ka.bin test_math16_r4k.bin test_math16_r6k.bin test_math16_kc160.bin \
+	test_math16_8085.bin test_math16_8080.bin test_math16_gbz80.bin \
 	test_math32.bin test_math32_z180.bin test_math32_ez80_z80.bin test_math32_z80n.bin \
 	test_math32_r2ka.bin test_math32_r4k.bin test_math32_r6k.bin test_math32_kc160.bin \
 	test_math32_8085.bin test_math32_8080.bin test_math32_gbz80.bin \
@@ -171,9 +175,41 @@ test_math16_8085.bin: $(FPSOURCES)
 	$(call compile_8085, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-8085\\\"\"", --math16 -lmath32_8085)
 	$(runtest_8085)
 
+test_math16_8080.bin: $(FPSOURCES)
+	$(call compile_8080, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-8080\\\"\"", --math16 -lmath32_8080)
+	$(runtest_8080)
+
+test_math16_gbz80.bin: $(FPSOURCES)
+	$(call compile_gbz80, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-gbz80\\\"\"", --math16 -lmath32_gbz80)
+	$(runtest_gbz80)
+
+test_math16_z180.bin: $(FPSOURCES)
+	$(call compile_z180, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-z180\\\"\"", --math16 -lmath32_z180)
+	$(runtest_z180)
+
+test_math16_ez80_z80.bin: $(FPSOURCES)
+	$(call compile_ez80_z80, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-ez80_z80\\\"\"", --math16 -lmath32_ez80_z80)
+	$(runtest_ez80_z80)
+
+test_math16_z80n.bin: $(FPSOURCES)
+	$(call compile_z80n, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-z80n\\\"\"", --math16 -lmath32_z80n)
+	$(runtest_z80n)
+
+test_math16_r2ka.bin: $(FPSOURCES)
+	$(call compile_r2ka, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-r2ka\\\"\"", --math16 -lmath32_r2ka)
+	$(runtest_r2ka)
+
+test_math16_r4k.bin: $(FPSOURCES)
+	$(call compile_r4k, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-r4k\\\"\"", --math16 -lmath32_r4k)
+	$(runtest_r4k)
+
 test_math16_r6k.bin: $(FPSOURCES)
-	$(call compile_r6k, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-8085\\\"\"", --math16 -lmath32_r6k)
+	$(call compile_r6k, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-r6k\\\"\"", --math16 -lmath32_r6k)
 	$(runtest_r6k)
+
+test_math16_kc160.bin: $(FPSOURCES)
+	$(call compile_kc160, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-kc160\\\"\"", --math16 -lmath32_kc160)
+	$(runtest_kc160)
 
 test_daimath32.bin: $(FPSOURCES)
 	$(call compile, -DMATHDAI32 -D__MATH_DAI32 --math-dai32 -DMATH_LIBRARY="\"\\\"daimath32\\\"\"",)

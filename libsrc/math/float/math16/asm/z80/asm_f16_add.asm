@@ -103,19 +103,11 @@ PUBLIC asm_f24_add_f24
     xor e                       ; check if op1.s==op2.s
     ex af,af                    ; save results sign in f' (C clear in af')
 
-    ; ---- specials gate (f24 exp 255 = half Inf/NaN) ----
-    ; Finite: 2×(ld/inc/jp) + 2×exx.  primary=y, alt=x.
-    ;   NaN ± * → NaN;  Inf ± finite → Inf;  Inf−Inf → NaN
-    ld a,d
-    inc a
-    jp Z,hadd_spec_y
-    exx
-    ld a,d
-    inc a
-    jp Z,hadd_spec_x
-    exx                         ; primary=y again for sort
-
 ; sort larger from smaller and compute exponent difference
+; Specials (adjunct: keep them off the finite path).
+;   Expand maps half exp 31 → d=255.  Half finite max is f24 exp 142, so
+;   Inf±finite has |Δexp|≥113 and returns the larger at cp 16.
+;   Equal-exp 255 (Inf±Inf / NaN) is classified only on alignzero.
     ld a,d
     exx                         ; y mantissa: hl' = 1mmmmmmm mmmmmmmm
                                 ; x mantissa: hl  = 1mmmmmmm mmmmmmmm
@@ -222,8 +214,11 @@ PUBLIC asm_f24_add_f24
     ret                         ; return f24 in DEHL
 
 .alignzero
+    inc d                       ; 8-bit inc sets Z, not C: exp==255?
+    jr Z,hadd_eq_hi             ; both exp 255 (Inf±Inf / NaN)
+    dec d                       ; restore exp; F' still holds sign-xor
     ex af,af
-    jp P,doadd
+    jp P,doadd                  ; same signs → add (P from xor of E[7])
 ;   jr dosub
 
 ; here do subtract
@@ -255,30 +250,17 @@ PUBLIC asm_f24_add_f24
 ; now do normalize
     jp asm_f24_normalize        ; now begin to normalize with dehl
 
-    ; ---- cold specials (f24: Inf HL=0, NaN HL≠0, exp 255) ----
-
-; y.exp == 255.  Primary = y, alt = x.
-.hadd_spec_y
+    ; ---- equal-exp 255: Inf±Inf / NaN (main=x, alt=y) ----
+.hadd_eq_hi
+    ld a,h
+    or l
+    jp NZ,asm_f24_nan           ; x NaN
+    exx
     ld a,h
     or l
     jp NZ,asm_f24_nan           ; y NaN
     exx
-    ld a,d
-    inc a
-    jr NZ,hadd_ret_inf_y        ; Inf ± finite → y Inf
-    ld a,h
-    or l
-    jp NZ,asm_f24_nan           ; x NaN
     ex af,af
     jp M,asm_f24_nan            ; Inf − Inf
-.hadd_ret_inf_y
-    exx                         ; y primary
-    jp asm_f24_inf
-
-; x.exp == 255, y finite.  Primary = x.
-.hadd_spec_x
-    ld a,h
-    or l
-    jp NZ,asm_f24_nan           ; x NaN
-    jp asm_f24_inf              ; Inf ± finite → x Inf
+    jp asm_f24_inf              ; Inf + Inf (sign in E of x)
 

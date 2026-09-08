@@ -182,21 +182,21 @@ cycle count  = 1492016293
 time @ 4MHz  = 1492016293 / 4*10^6 =  6 min 13 sec
 
 
-Z88DK August 10, 2026
+Z88DK September 9, 2026
 sccz80 / classic / math16
-4248 bytes less page zero
+4124 bytes less page zero
 
-cycle count  = 295642916
-time @ 4MHz  = 295642916 / 4*10^6 =  1 min 14 sec
+cycle count  = 295229389
+time @ 4MHz  = 295229389 / 4*10^6 =  1 min 14 sec
 
 IEEE 16-bit half-float (math16). DT=1e-1 for half range.
 
 
-Z88DK August 10, 2026
+Z88DK September 9, 2026
 sccz80 / classic / 8085 / math16
-4024 bytes less page zero
+4170 bytes less page zero
 
-cycle count  = 344383717
-time @ 4MHz  = 344383717 / 4*10^6 =  1 min 26 sec
+cycle count  = 344855174
+time @ 4MHz  = 344855174 / 4*10^6 =  1 min 26 sec
 
 IEEE 16-bit half-float (math16_8085). DT=1e-1 for half range.

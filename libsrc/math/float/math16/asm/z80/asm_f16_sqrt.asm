@@ -64,22 +64,10 @@ PUBLIC asm_f24_invsqrt
 
 
 .asm_f24_sqrt
-    inc d
+    inc d                       ; 8-bit inc sets Z, not C: exp==255?
+    jr Z,sqrt_hi
     dec d
-    jp Z,asm_f24_zero           ; zero exponent? zero result
-
-    ld a,d
-    inc a
-    jr NZ,sqrt_finite
-    ; exp 255: +Inf→+Inf, NaN/−Inf→NaN
-    ld a,h
-    or l
-    jp NZ,asm_f24_nan
-    bit 7,e
-    jp NZ,asm_f24_nan
-    jp asm_f24_inf
-
-.sqrt_finite
+    jp Z,asm_f24_zero           ; exp was 0
     bit 7,e
     jp NZ,asm_f24_nan           ; negative finite
     pop bc                      ; ret
@@ -89,23 +77,30 @@ PUBLIC asm_f24_invsqrt
     call asm_f24_invsqrt_body
     jp asm_f24_mul_callee
 
-
-.asm_f24_invsqrt
-    inc d
-    dec d
-    jp Z,asm_f24_inf            ; zero exponent? infinite result
-
+.sqrt_hi
+    ; D was 255, now 0. +Inf→+Inf, NaN/−Inf→NaN
+    ld a,h
+    or l
+    jp NZ,asm_f24_nan
     bit 7,e
-    jp NZ,asm_f24_nan           ; negative number?
+    jp NZ,asm_f24_nan
+    jp asm_f24_inf
 
-    ld a,d
-    inc a
-    jr NZ,asm_f24_invsqrt_body
-    ; exp 255 non-neg: Inf→0, NaN→NaN
+.invsqrt_hi
+    ; D was 255, now 0. +Inf→0, NaN→NaN
     ld a,h
     or l
     jp NZ,asm_f24_nan
     jp asm_f24_zero
+
+
+.asm_f24_invsqrt
+    inc d                       ; 8-bit inc sets Z, not C: exp==255?
+    jr Z,invsqrt_hi
+    dec d
+    jp Z,asm_f24_inf            ; exp was 0 → Inf
+    bit 7,e
+    jp NZ,asm_f24_nan           ; negative number?
 
 .asm_f24_invsqrt_body
     set 7,e                     ; make y negative

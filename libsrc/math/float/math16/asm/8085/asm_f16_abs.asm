@@ -5,7 +5,7 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, 2020 May / 2026 July (8085)
+;  feilipu, 2020 May / 2026 August (8085)
 ;
 ;-------------------------------------------------------------------------
 ;  asm_f16_fabs - 8085 half floating point absolute value

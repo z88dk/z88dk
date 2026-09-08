@@ -526,6 +526,91 @@ void test_float_arithmetic()
     Assert(approx_equal(c, (FLOAT)0.333333333, EPSILON), "1/3 ~ 0.333...");
 }
 
+#ifdef MATH16
+/* Packed half mul must call l_f16_mul, not integer 16×16. 80cc on kc160
+ * used to emit `mul de,hl` for width-2 _Float16 * _Float16. Mixed
+ * half*int must convert (l_f16_sint2f / uint2f) then mul. Operands are
+ * runtime-written so the compiler cannot fold. */
+static FLOAT m16_x, m16_y;
+static int m16_n;
+static unsigned m16_un;
+void test_math16_mul()
+{
+    m16_x = (FLOAT)1.5; m16_y = (FLOAT)1.5;
+    Assert(m16_x * m16_y == (FLOAT)2.25, "half*half 1.5*1.5 == 2.25");
+    m16_x = (FLOAT)0.5; m16_y = (FLOAT)0.5;
+    Assert(m16_x * m16_y == (FLOAT)0.25, "half*half 0.5*0.5 == 0.25");
+    m16_x = (FLOAT)1.5; m16_n = 2;
+    Assert(m16_x * m16_n == (FLOAT)3.0, "half*int 1.5*2 == 3");
+    Assert(m16_n * m16_x == (FLOAT)3.0, "int*half 2*1.5 == 3");
+    m16_n = -2;
+    Assert(m16_x * m16_n == (FLOAT)(-3.0), "half*int 1.5*(-2) == -3");
+    m16_n = 0;
+    Assert(m16_n * m16_x == (FLOAT)0.0, "int*half 0*1.5 == 0");
+    m16_x = (FLOAT)0.5; m16_un = 4u;
+    Assert(m16_x * m16_un == (FLOAT)2.0, "half*uint 0.5*4 == 2");
+}
+
+/* Half-float edges: 10-bit mantissa, MAXLOG ~11.  Dissimilar add, exp
+ * overflow, and a modest trig argument (j fits in uint16).  One relational
+ * per Assert (sccz80 && of two float compares can fail Assert_real). */
+void test_math16_edges()
+{
+    union { FLOAT f; unsigned u; } a, b, r;
+    static FLOAT vz;
+
+    vz = (FLOAT)0.0;
+
+    a.u = 0x3c00u; /* 1.0 */
+    b.u = (unsigned)((15-5) << 10); /* 2^-5 */
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3c20u, "1+2^-5");
+    b.u = (unsigned)((15-8) << 10);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3c04u, "1+2^-8");
+    b.u = (unsigned)((15-10) << 10);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3c01u, "1+2^-10");
+
+    r.f = expf16((FLOAT)16.0);
+    Assert(r.f == (FLOAT)HUGE_POS_F16, "exp(16) overflows to HUGE_POS");
+    r.f = expf16((FLOAT)(-16.0));
+    Assert(r.f == vz, "exp(-16) underflows to 0");
+
+    r.f = sinf16((FLOAT)1.0);
+    Assert(r.f >= (FLOAT)(-1.0), "sin(1) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "sin(1) <= 1");
+    r.f = cosf16((FLOAT)1.0);
+    Assert(r.f >= (FLOAT)(-1.0), "cos(1) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "cos(1) <= 1");
+
+    /* |x|>=128 uses 2π reduction. 128 is exact and is the gate (0x5800).
+     * One relational per Assert: sccz80 && of two float compares can leave
+     * IEEE 1.0 in DEHL, so HL is 0 and Assert_real(int) sees a fail. */
+    r.f = sinf16((FLOAT)128.0);
+    Assert(r.f >= (FLOAT)(-1.0), "sin(128) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "sin(128) <= 1");
+    r.f = cosf16((FLOAT)128.0);
+    Assert(r.f >= (FLOAT)(-1.0), "cos(128) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "cos(128) <= 1");
+
+    Assert(approx_equal(acosf16((FLOAT)(-1.0)), (FLOAT)M_PI, EPSILON), "acos(-1) is pi");
+    Assert(approx_equal(acosf16((FLOAT)(-0.5)), (FLOAT)(2.0*M_PI/3.0), EPSILON), "acos(-0.5) is 2pi/3");
+    Assert(approx_equal(asinf16((FLOAT)1.0), (FLOAT)M_PI_2, EPSILON), "asin(1) is pi/2");
+    Assert(approx_equal(asinf16((FLOAT)(-1.0)), (FLOAT)(-M_PI_2), EPSILON), "asin(-1) is -pi/2");
+    Assert(approx_equal(POW((FLOAT)(-2.0), (FLOAT)3.0), (FLOAT)(-8.0), EPSILON), "pow(-2,3) is -8");
+    Assert(POW((FLOAT)(-2.0), (FLOAT)2.0) == (FLOAT)4.0, "pow(-2,2) is 4");
+
+    a.f = (FLOAT)0.0;
+    r.f = logf16(a.f);
+    Assert(r.u == 0xfc00u, "log(0) is -Inf");
+
+    a.u = 0x7bffu; /* max finite */
+    r.f = a.f + a.f;
+    Assert(((r.u & 0x7c00u) == 0x7c00u) && ((r.u & 0x03ffu) == 0), "half max+max is Inf");
+}
+#endif
+
 #ifdef MATH32
 /* IEEE edges that the math32 cores document: FTZ/specials, exp overflow,
  * signed zero sqrt, packed qNaN divide, dissimilar-magnitude add (align). */
@@ -628,6 +713,10 @@ int suite_math()
 #endif
 #ifdef MATH32
     suite_add_test(test_math32_edges);
+#endif
+#ifdef MATH16
+    suite_add_test(test_math16_mul);
+    suite_add_test(test_math16_edges);
 #endif
     return suite_run();
 }

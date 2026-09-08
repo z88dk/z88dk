@@ -316,7 +316,13 @@ while [[ $idx -lt $TOTAL || ${#pids[@]} -gt 0 ]]; do
       new_pids+=("$p")
     fi
   done
-  pids=("${new_pids[@]:-}")
+  # Do not use "${arr[@]:-}" — that yields one empty slot and the wait
+  # never exits after the last job (idle CPU, completed==total).
+  if ((${#new_pids[@]})); then
+    pids=("${new_pids[@]}")
+  else
+    pids=()
+  fi
 
   while [[ ${#pids[@]} -lt $THREADS && $idx -lt $TOTAL ]]; do
     run_one "${JOBS[$idx]}" &

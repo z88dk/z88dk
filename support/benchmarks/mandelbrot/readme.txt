@@ -70,8 +70,8 @@ z88dk-classic/readme.txt. w=h=60.
 
 Compiler | CPU  | Library | Ticks
 ---------|------|---------|----------------
-sccz80   | z80  | math16  |   789_222_173 (Aug 10, 2026)
-sccz80   | 8085 | math16  | 969_324_571 (Aug 10, 2026)
+sccz80   | z80  | math16  |   788_675_466 (Sep 9, 2026)
+sccz80   | 8085 | math16  | 955_053_921 (Sep 9, 2026)
 sccz80   | z80  | math32  | 1_031_176_011 (Aug 15, 2026)
 zsdcc    | z80  | math32  | 1_301_251_782 (Aug 16, 2026)
 sccz80   | 8085 | math32  | 2_041_768_834 (Aug 15, 2026)
@@ -219,12 +219,12 @@ time @ 4MHz  = 1988563544 / 4*10^6 =  8 min 17 sec
 IEEE 32-bit float implementation (math32_8085).
 
 14.
-Z88DK August 10, 2026
+Z88DK September 9, 2026
 sccz80 / new c library / math16
-2404 bytes less page zero
+2260 bytes less page zero
 
-cycle count  =  789885425
-time @ 4MHz  = 789885425 / 4*10^6 =  3 min 17 sec
+cycle count  =  788675466
+time @ 4MHz  = 788675466 / 4*10^6 =  3 min 17 sec
 
 IEEE 16-bit float implementation.
 

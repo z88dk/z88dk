@@ -75,6 +75,8 @@ Or: `make -C libsrc/math/float/math32` then install all `math32*.lib` into
 
 Prove the object is current: `z88dk-z80nm lib/clibs/math32_8085.lib | rg 'f32_fsadd|ay16_njam'`.
 
+**math16** is the same `-d` trap. 8085/8080/gbz80 targets have **no OBJECTS deps** — delete `obj/<cpu>/…/asm_f16_*.o` and `libsrc/math16*.lib` before `make -C libsrc math16.lib`. Newlib sccz80 **bakes math16 into `z80.lib`**: after core edits `make -C libsrc/newlib math16 z80` (delete `*math16*` objects first). Detail: **`library-math16`**.
+
 ---
 
 ## Tool map (what to reach for)
@@ -389,6 +391,9 @@ and classic / newlib:
    Each job: private directory + `export TMPDIR=$job/tmp` (zcc temp races
    otherwise cause flaky `undefined symbol: dmul` / f48 link errors).
    Copy **newlib** `zpragma.inc` only for **new** jobs — not into classic workdirs.
+   If `status.txt` shows `completed==total` and `active=0` but the script still
+   sleeps with idle CPUs, the jobs are done — read `results.tsv` and kill the
+   parent (`pids=("${arr[@]:-}")` used to leave one empty slot).
 3. Classic: `+test` TIMER recipes from `z88dk-classic/readme.txt`
    (`-o name.bin -m -lndos`). Newlib: `+z80 -startup=0 … -create-app` with
    that bench’s `zpragma.inc` when present. Math16 TIMER jobs must use
@@ -504,6 +509,7 @@ tree; they are **not** part of the product PR.
 | Newlib n-body much faster than classic math32 | Check for **source** cheat (`invsqrt` under `__MATH_MATH32` only on newlib). Align to `1.0/sqrt` then remeasure; after #3061 header fix sccz80 new ≈ classic (~791M ticks) |
 | sccz80 newlib “correct” TIMER but wrong KWIPS | Remeasure **after** header regen (`make -C include/_DEVELOPMENT common/math.h`). Stale numbers from pre-#3061 trees are invalid for product claims |
 | `+test` n-body second `%.9f` prints `10000000x` | Not `ftoa`. Default ticks `-counter` is 1e8; n=200 is ~161M. First energy prints, then the cap. Same on sccz80 and 80cc. Fix: `-counter 999999999999` |
+| Newlib math16 TIMER still on the old specials-tax ticks | `sccz80/z80.lib` still has Sep-vintage math16 objects. `cm16_sccz80_mul_callee` is `G A` not `G =`. Rebuild `math16` **and** `z80` |
 
 ### Float library A/B (math32 / math16)
 
@@ -523,6 +529,8 @@ tree; they are **not** part of the product PR.
 | sccz80 8080 / gbz80 | `8-8080/`, `8-gbz80/` | `8080_crt0.lib` / `gbz80_crt0.lib` |
 | math32 8085 | `libsrc/math/float/math32/` + `newlibfiles_8085.lst` | `math32_8085.lib` |
 | math32 z80 family | same tree + `newlibfiles_{z80,z80n,z180,…}.lst` | `math32.lib`, `math32_z80n.lib`, … |
+| math16 classic | `libsrc/math/float/math16/` + `newlibfiles_{z80,8085,8080,gbz80}.lst` | `math16.lib`, `math16_8085.lib`, … |
+| math16 newlib z80 | `make -C libsrc/newlib math16 z80` | `sccz80/math16.lib` **and** `sccz80/z80.lib` |
 | classic tests | `+test -clib=8085` | pulls `test8085_clib` + crt0 + math libs |
 
 After install, **force** recompile of the test/benchmark binary (delete `.bin` /

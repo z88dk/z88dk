@@ -1116,6 +1116,15 @@ extern half_t sqrtf16_fastcall(half_t x) __z88dk_fastcall;
 #endif
 
 
+#ifdef __SCCZ80
+extern half_t __LIB__ sqrf16(half_t x) __SMALLC __z88dk_fastcall;
+#else
+extern half_t sqrf16(half_t x);
+extern half_t sqrf16_fastcall(half_t x) __z88dk_fastcall;
+#define sqrf16(a) sqrf16_fastcall(a)
+#endif
+
+
 
 #ifdef __SCCZ80
 extern half_t __LIB__ div2f16(half_t x) __SMALLC __z88dk_fastcall;

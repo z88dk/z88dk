@@ -1,4 +1,3 @@
-
 #include "math16.h"
 
 //  Approximation of f(x) = atan(x)
@@ -29,7 +28,7 @@ half_t atanf16 (half_t f)
         return 0.0;
 
     if(recip = (val > 1.0))
-        val = invf16( val );
+        val = 1.0 / val;
 
     val = polyf16( val, f16_coeff_atan, 7 );
 

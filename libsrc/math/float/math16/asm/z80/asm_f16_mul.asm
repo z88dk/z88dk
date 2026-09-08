@@ -82,8 +82,6 @@ PUBLIC asm_f24_mul_f24
     jp Z,hmul_uzero
     rrca
     rrca
-    cp 31
-    jp Z,hmul_y_hi              ; y Inf/NaN
     ld b,a                      ; B = y.exp
     ld a,h
     and 003h
@@ -97,8 +95,6 @@ PUBLIC asm_f24_mul_f24
     jp Z,hmul_xzero_pop         ; jp: far labels (r4k/r2ka encoding can exceed jr)
     rrca
     rrca
-    cp 31
-    jp Z,hmul_x_hi              ; x Inf/NaN (y finite)
     ld c,a                      ; C = x.exp
     ld a,d
     and 003h
@@ -114,12 +110,16 @@ PUBLIC asm_f24_mul_f24
     jp Z,hmul_uzero_fin         ; under: both finite, DE/HL are mant11
     jp C,hmul_uzero_fin
     cp 31
-    jp NC,hmul_uinf
+    jp NC,hmul_ovf              ; overflow, or an operand was Inf/NaN
+                                ; Inf × tiny finite (sum-15 < 31) is not
+                                ; classified here — adjunct, keep the add hot
 
     add a,127-15
     push af                     ; B gets f24 exp on pop (push af → pop bc: B=A)
 
-    ; ---- 11×11 product (small high byte → early-out mulu) ----
+    ; ---- 11×11 product ----
+    ; Plain Z80: unrolled bit10-skip.  HW-mul CPUs (z80n, z180, ez80,
+    ; kc160, rabbit) use l_mulu_32_16x16 — do not take the unrolled core.
 IF __CPU_Z80__
     call mulu_32_16x16_gen
 ELSE
@@ -188,8 +188,10 @@ ENDIF
     jp asm_f16_f24
 
 .hmul_xzero_pop
-    pop hl                      ; drop y mant11
-    ; x==0, y finite nonzero → signed zero
+    pop hl                      ; drop y mant11; B = y.exp
+    ld a,b
+    cp 31
+    jp Z,hmul_nan               ; 0 × Inf/NaN
     jr hmul_uzero_fin
 
 .hmul_uzero
@@ -209,34 +211,33 @@ ENDIF
     ld e,a
     jp asm_f16_inf
 
-    ; ---- cold specials (packed half: exp in bits 14..10 = 0x7c mask) ----
-    ;   0 × Inf → NaN;  Inf × finite → ±Inf;  NaN × * → NaN
+    ; Overflow, or an operand was Inf/NaN (exp 31).  B=y.exp C=x.exp,
+    ; DE=y mant11, HL=x mant11.  Finite overflow (neither exp 31) → Inf.
+    ; Payload of mant11 is (HL|DE)&0x3ff; Inf is implicit 1 only.
+.hmul_ovf
+    ld a,b
+    cp 31
+    jr Z,hmul_ovf_y
+    ld a,c
+    cp 31
+    jr Z,hmul_ovf_x
+    jr hmul_uinf                ; finite overflow
 
-; y.exp == 31.  HL = y half, DE = x half.
-.hmul_y_hi
+.hmul_ovf_y
+    ld a,d
+    and 003h
+    or e
+    jp NZ,hmul_nan              ; y NaN
+    ld a,c
+    cp 31
+    jr NZ,hmul_uinf             ; Inf × finite
+    ; both exp 31
+.hmul_ovf_x
     ld a,h
     and 003h
     or l
-    jp NZ,hmul_nan              ; y NaN
-    ld a,d
-    and 07ch
-    jp Z,hmul_nan               ; Inf × 0
-    cp 07ch
-    jr NZ,hmul_uinf             ; Inf × finite
-    ld a,d
-    and 003h
-    or e
-    jp NZ,hmul_nan              ; Inf × NaN
-    jr hmul_uinf                ; Inf × Inf
-
-; x.exp == 31, y finite (y mant11 still on stack).
-.hmul_x_hi
-    pop hl                      ; drop y mant11
-    ld a,d
-    and 003h
-    or e
     jp NZ,hmul_nan              ; x NaN
-    jr hmul_uinf                ; Inf × finite y
+    jr hmul_uinf                ; Inf × Inf / Inf × finite x
 
 .hmul_nan
     jp asm_f16_nan
@@ -252,9 +253,9 @@ ENDIF
     push bc                     ; return address on stack
 
 .asm_f24_mul_f24
-    ; Low-tax finite path (master + one-sided zero like math32).
-    ; Inf/NaN algebra is not done here; half specials are handled at
-    ; pack/expand (exp→half) and packed helpers (mul2/ldexp/…).
+    ; Finite path. ±0 is classified by the IEEE caller (packed mul /
+    ; sqr / inv / sqrt / poly). Inf/NaN at pack/expand and packed helpers.
+    ; This kernel only tests the exponent *sum* (under/overflow).
     ld a,e                      ; place op1.s in a[7]
     exx                         ; y in main, x in '
 
@@ -262,19 +263,10 @@ ENDIF
     ex af,af                    ; save sign in f'
 
     ld a,d                      ; y.exp
-    or a
-    jr Z,mulzero                ; y == 0 → signed zero
-
     sub a,07fh                  ; subtract bias
     jr C,fmchkuf
 
     exx                         ; main = x
-
-    ld b,a
-    ld a,d                      ; x.exp
-    or a
-    jr Z,mulzero                ; 0 * finite → signed zero
-    ld a,b
     add a,d                     ; sum of exponents
     jr C,mulovl
     ; fall through to fmnouf (common finite path)
@@ -304,7 +296,7 @@ ELSE
 
     EXTERN l_mulu_32_16x16
 
-    call l_mulu_32_16x16        ; exit  : de * hl = dehl  = 32-bit product
+    call l_mulu_32_16x16        ; HW integer 16×16 (z80n/z180/ez80/kc160/rabbit)
 
 ENDIF
 
@@ -334,12 +326,6 @@ ENDIF
 
 .fmchkuf
     exx                         ; main = x
-
-    ld b,a
-    ld a,d                      ; x.exp
-    or a
-    jr Z,mulzero
-    ld a,b
     add a,d                     ; add the exponents
     jr NC,mulzero
     jr fmnouf
@@ -355,63 +341,35 @@ ENDIF
     jp asm_f24_zero             ; done underflow
 
 
-IF __CPU_Z80__
+IF __CPU_Z80__                  ; not assembled for z80n/z180/ez80/kc160/rabbit
+
+PUBLIC mulu_32_16x16
+PUBLIC mulu_32_16x16_gen
 
 ; Made by Runer112 / Analysed by Zeda / Tested by jacobly
 ; https://raw.githubusercontent.com/Zeda/z80float/master/common/mul16.z80
 ;
-; Two entries, one unrolled body:
+; Two entries, one unrolled body. No operand-zero test (IEEE caller).
 ;   mulu_32_16x16     — f24 path: bit15 set, skip leading-zero scan
-;   mulu_32_16x16_gen — packed half: 11-bit mants, full early-out
+;   mulu_32_16x16_gen — packed half: bit10 set, skip to .bit9
 ;
 ; DE*HL --> DEHL
 ; uses  : af, bc, de, hl
 
-; Packed-half entry first: early-out jumps forward into shared body
+; Packed 11×11: implicit 1 is bit 10 (D = 0x04…0x07). Six sla of D
+; put that bit in C; skip the 5 leading-zero jr NC of a 16-bit scan.
 .mulu_32_16x16_gen
 
     ld a,d
     ld d,0
     ld bc,hl
-
     add a,a
-    jr C,bit14
     add a,a
-    jr C,bit13
     add a,a
-    jr C,bit12
     add a,a
-    jr C,bit11
     add a,a
-    jr C,bit10
-    add a,a
-    jr C,bit9
-    add a,a
-    jr C,bit8
-    add a,a
-    jr C,bit7
-
-    ld a,e
-    and %11111110
-    add a,a
-    jr C,bit6
-    add a,a
-    jr C,bit5
-    add a,a
-    jr C,bit4
-    add a,a
-    jr C,bit3
-    add a,a
-    jr C,bit2
-    add a,a
-    jr C,bit1
-    add a,a
-    jr C,bit0
-    rr e
-    ret C
-
-    ld hl,de
-    ret
+    add a,a                     ; C = bit10 = 1; chain label is the next bit
+    jp bit9
 
 ; f24 entry: bit15 set → fall into shared chain
 .mulu_32_16x16

@@ -1,10 +1,9 @@
 ;* * * * *  Small-C/Plus z88dk * * * * *
-;  Version: 23073-08765eb48b-20250127
+;  Version: 25461-415806f08c-20260813
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jan 30 00:49:23 2025
-
+;	Module compile time: Tue Sep  8 21:16:03 2026
 
 	C_LINE	0,"sinf16.c"
 
@@ -15,198 +14,202 @@
 
 
 	C_LINE	0,"math16.h"
-	C_LINE	0,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	7,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	8,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	9,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	11,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	12,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	13,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	15,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	16,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	17,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	19,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	20,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	21,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	23,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	24,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	25,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	27,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	28,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	29,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	35,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	36,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	38,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	39,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	41,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	42,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	46,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	49,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	55,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
-	C_LINE	56,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/stdint.h"
+	C_LINE	0,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	0,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/sys/compiler.h"
+	C_LINE	8,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	10,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	11,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	12,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	14,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	15,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	16,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	18,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	19,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	20,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	22,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	23,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	24,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	26,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	27,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	28,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	30,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	31,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	32,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	62,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	63,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	65,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	66,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	68,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	69,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	75,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	78,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	96,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
+	C_LINE	97,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/stdint.h"
 	C_LINE	34,"math16.h"
-	C_LINE	0,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	17,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	28,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	37,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	62,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	65,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	68,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	72,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	73,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	78,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	81,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	84,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	88,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	91,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	94,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	98,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	101,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	104,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	108,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	111,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	114,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	117,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	118,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	122,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	123,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	127,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	128,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	132,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	133,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	138,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	142,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	145,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	148,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	151,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	154,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	158,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	161,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	162,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	166,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	167,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	172,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	175,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	179,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	182,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	185,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	188,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	192,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	195,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	198,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	201,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	204,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	207,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	210,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	213,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	218,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	219,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	223,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	224,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	229,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	230,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	234,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	235,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	240,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	241,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	245,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	249,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	250,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	254,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	255,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	260,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	261,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	265,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	266,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	270,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	271,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	276,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	277,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	282,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	283,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	287,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	288,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	292,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	293,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	297,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	298,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	302,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	303,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	307,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	308,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	316,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	319,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	323,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	326,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	330,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	333,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	336,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	339,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	343,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	346,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	349,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	352,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	355,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	358,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	362,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	363,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	367,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	368,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	372,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	373,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	377,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	378,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	383,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	384,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	388,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	389,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	393,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	394,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	399,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	402,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	406,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	410,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	413,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	416,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	419,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	420,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	424,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	425,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	430,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	433,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	436,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	439,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	440,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	445,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	448,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	451,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	455,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	458,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	461,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	464,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	467,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	470,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	473,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	474,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	479,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	482,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	485,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	488,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	492,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	493,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	497,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	498,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	502,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	503,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	507,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	508,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	512,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	513,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	517,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	518,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	522,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
-	C_LINE	523,"/home/phillip/Z80/z88dk/lib/config/../..//include/sccz80/math.h"
+	C_LINE	0,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	25,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	42,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	54,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	199,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	208,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	217,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	229,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	230,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	237,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	246,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	255,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	265,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	274,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	283,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	293,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	302,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	311,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	321,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	330,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	339,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	347,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	348,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	352,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	353,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	357,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	358,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	362,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	363,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	369,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	379,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	388,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	397,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	406,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	415,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	425,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	433,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	434,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	438,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	439,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	445,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	454,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	464,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	473,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	482,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	491,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	501,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	510,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	519,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	528,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	537,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	546,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	555,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	564,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	579,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	580,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	584,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	585,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	591,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	592,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	596,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	597,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	602,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	603,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	608,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	617,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	618,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	622,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	623,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	628,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	629,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	633,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	634,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	638,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	639,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	644,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	645,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	650,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	651,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	655,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	656,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	660,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	661,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	665,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	666,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	670,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	671,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	675,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	676,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	925,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	934,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	944,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	953,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	963,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	972,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	981,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	990,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1000,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1009,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1018,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1027,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1036,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1045,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1054,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1055,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1059,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1060,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1064,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1065,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1069,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1070,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1075,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1076,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1080,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1081,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1085,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1086,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1092,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1101,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1111,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1120,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1130,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1139,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1148,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1156,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1157,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1161,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1162,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1168,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1177,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1186,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1194,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1195,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1201,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1210,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1219,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1229,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1238,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1247,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1256,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1265,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1274,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1282,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1283,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1289,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1298,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1307,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1316,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1325,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1326,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1330,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1331,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1335,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1336,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1340,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1341,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1345,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1346,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1350,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1351,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1355,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
+	C_LINE	1356,"/data/z88dk/lib/config/../..//include/_DEVELOPMENT/common/math.h"
 	C_LINE	35,"math16.h"
+	C_LINE	37,"math16.h"
 	C_LINE	33,"sinf16.c"
 	C_LINE	35,"sinf16.c"
 	C_LINE	36,"sinf16.c"
@@ -233,11 +236,14 @@
 	push	hl
 	ld	hl,7	;const
 	add	hl,sp
-	ex	de,hl
-	ld	hl,9	;const
-	add	hl,sp
-	ldi
-	ldi
+	ld	d,h
+	ld	e,l
+	call	l_gint2	;
+	ex	de,hl	;l_pint
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+ 	ex	de,hl
 	ld	hl,7	;const
 	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
@@ -273,6 +279,92 @@
 	ld	(hl),d
  	ex	de,hl
 .i_2
+	push	bc
+	ld	hl,0	;const
+	add	hl,sp
+	ex	de,hl
+	ld	hl,9	;const
+	add	hl,sp
+	ldi
+	ldi
+	pop	hl
+	push	hl
+	ld	l,h
+	ld	h,0
+	ld	a,l
+	sub	88
+	ccf
+	jp	nc,i_3	;
+	ld	hl,17992	;const
+	push	hl
+	ld	hl,11	;const
+	add	hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	call	l_f16_div
+	call	l_f16_f2sint
+	push	hl
+	ld	hl,13	;const
+	add	hl,sp
+	push	hl
+	ld	hl,15	;const
+	add	hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
+	call	l_gint4sp	;
+	call	l_f16_sint2f
+	push	hl
+	call	l_gint8sp	;
+	call	l_f16_mul
+	call	l_f16_sub
+	pop	de
+	ex	de,hl	;l_pint
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+ 	ex	de,hl
+	ld	hl,13	;const
+	add	hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
+	call	l_gint4sp	;
+	call	l_f16_ge
+	ld	a,h
+	or	l
+	jp	z,i_5	;
+	ld	hl,13	;const
+	add	hl,sp
+	push	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	call	l_gint6sp	;
+	call	l_f16_sub
+	pop	de
+	ex	de,hl	;l_pint
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+ 	ex	de,hl
+.i_5
+	pop	bc
+	pop	bc
+.i_3
+	pop	bc
 	ld	hl,1	;const
 	add	hl,sp
 	push	hl
@@ -306,7 +398,7 @@
 	call	l_gint1sp	;
 	ld	a,l
 	and	1
-	jp	z,i_4	;
+	jp	z,i_7	;
 	ld	hl,1	;const
 	add	hl,sp
 	inc	(hl)
@@ -329,7 +421,7 @@
 	inc	hl
 	ld	(hl),d
  	ex	de,hl
-.i_4
+.i_7
 	ld	hl,1	;const
 	add	hl,sp
 	push	hl
@@ -348,7 +440,7 @@
 	ex	de,hl
 	and	a
 	sbc	hl,de
-	jp	nc,i_6	;
+	jp	nc,i_9	;
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
@@ -381,7 +473,7 @@
 	inc	hl
 	ld	(hl),d
  	ex	de,hl
-.i_6
+.i_9
 	ld	hl,7	;const
 	add	hl,sp
 	push	hl
@@ -414,8 +506,7 @@
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
-	push	hl
-	call	l_f16_mul
+	call	sqrf16
 	pop	de
 	ex	de,hl	;l_pint
 	ld	(hl),e
@@ -426,13 +517,13 @@
 	ld	de,1
 	and	a
 	sbc	hl,de
-	jp	z,i_9	;
+	jp	z,i_12	;
 	call	l_gint1sp	;
 	ld	de,2
 	and	a
 	sbc	hl,de
-	jp	nz,i_8	;
-.i_9
+	jp	nz,i_11	;
+.i_12
 	ld	hl,5	;const
 	add	hl,sp
 	push	hl
@@ -461,8 +552,8 @@
 	inc	hl
 	ld	(hl),d
  	ex	de,hl
-	jp	i_12	;EOS
-.i_8
+	jp	i_15	;EOS
+.i_11
 	ld	hl,5	;const
 	add	hl,sp
 	push	hl
@@ -499,20 +590,20 @@
 	inc	hl
 	ld	(hl),d
  	ex	de,hl
-.i_12
+.i_15
 	ld	hl,0	;const
 	add	hl,sp
 	ld	a,(hl)
 	rla
-	jp	nc,i_13	;
+	jp	nc,i_16	;
 	call	l_gint5sp	;
 	ld	a,h
 	xor	128
 	ld	h,a
-	jp	i_14	;
-.i_13
+	jp	i_17	;
+.i_16
 	call	l_gint5sp	;
-.i_14
+.i_17
 	exx
 	ld	hl,11	;const
 	add	hl,sp
@@ -650,6 +741,7 @@
 	GLOBAL	invf16
 	GLOBAL	invsqrtf16
 	GLOBAL	sqrtf16
+	GLOBAL	sqrf16
 	GLOBAL	div2f16
 	GLOBAL	mul2f16
 	GLOBAL	mul10f16

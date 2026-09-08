@@ -1,4 +1,3 @@
-
 ; half_t __poly (const half_t x, const float_t d[], uint16_t n)
 
 SECTION code_clib

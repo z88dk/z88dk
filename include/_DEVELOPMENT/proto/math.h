@@ -423,6 +423,7 @@ __DPROTO(,,half_t,,invf16,half_t x)
 __DPROTO(,,half_t,,invsqrtf16,half_t x)
 
 __DPROTO(,,half_t,,sqrtf16,half_t x)
+__DPROTO(,,half_t,,sqrf16,half_t x)
 
 __DPROTO(,,half_t,,div2f16,half_t x)
 __DPROTO(,,half_t,,mul2f16,half_t x)

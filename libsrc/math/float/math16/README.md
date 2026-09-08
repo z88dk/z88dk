@@ -2,18 +2,28 @@
 ## z88dk IEEE Floating Point Package - `math16`
 
 This is the z88dk 16-bit IEEE-754 standard math16 half precision floating point maths package, designed to work with the SCCZ80 IEEE-754 half precision 16-bit interfaces.
-  
-This library is designed for z80, z180, z80n, and Intel 8085 processors. On z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n, hardware `16_8x8` multiply accelerates mantissa work. On 8085, CPU-specific cores live under `asm/8085/` (shared specials/coeffs under `asm/`) (no `exx`/IX/IY; stack frames for the second operand) and link as **`math16_8085.lib`** via `--math16` with `-clib=8085`.
+
+`--math16` links `-lmath16@{ZCC_LIBCPU}`. Products:
+
+| Product | Cores |
+|---------|-------|
+| `math16.lib` | `asm/z80/` |
+| `math16_{ixiy,z80n,z180,ez80_z80,r2ka,r4k,r6k,kc160}.lib` | same `newlibfiles_z80.lst` (Z80-family) |
+| `math16_8085.lib` | `asm/8085/` |
+| `math16_8080.lib` | `asm/8080/` |
+| `math16_gbz80.lib` | `asm/gbz80/` |
+
+Shared specials and coeff tables live under `asm/`. 8080 / 8085 / gbz80 are stack-only (no `exx` / IX / IY). Packed half×half and `sqrf16` use an 11×11 product; f24 (poly / inv / hypot / fma / sqrt) uses 16×16. Plain z80 unrolls both in-file (`mulu_32_16x16_gen` / `mulu_32_16x16`). Other Z80-family products call `l_mulu_32_16x16` (z80n `mul de`, z180 / ez80 `mlt`, kc160 / rabbit integer HW).
 
 The specialised nature of 16-bit floating point implies that this is an adjunct or special purpose maths library. It can be used to accelerate the calculation of floating point, where the results are only needed to 3.5 significant digits. Applications can include video games, or neural networks, for example. There is **no stdio / printf / scanf / dtoa requirement** on the math16 product itself; apps that need float print may pair another float library (e.g. math32) for I/O only.
 
-*@feilipu, May 2020 / 8085 July 2026*
+*@feilipu, May 2020 / 8085 August 2026 / 8080 September 2026 / gbz80 September 2026*
 
 ---
 
 ## Key Features
 
-  *  All the intrinsic functions are written in z80 assembly language.
+  *  All the intrinsic functions are written in assembly language.
 
   *  All the code is re-entrant.
 
@@ -21,7 +31,9 @@ The specialised nature of 16-bit floating point implies that this is an adjunct 
 
  *  8085: no alternate register set; second f24 operand and temps on the **stack** only (`ld de,sp+*`, `ld hl,(de)`). Extended 8085 ops preferred. Library asm is not copt’d.
 
-  *  Made for the Spectrum Next. The z80n `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
+ *  8080 / gbz80: no alternate register set; second f24 operand on the stack. 8080: `ld hl,sp+n` clobbers C. gbz80: native `ld hl,sp+*` (signed; Z←0).
+
+  *  Z80-family products assemble the same z80 cores (`-mz80n` / `-mz180` / `-mez80_z80` / …). Packed-half and f24 multiply on those CPUs call `l_mulu_32_16x16` (HW integer mul). The unrolled 11×11 / 16×16 body is plain z80 only.
 
   *  Mantissa calculations are done with 16-bits (11-bits plus 5-bits for rounding). Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
 
@@ -92,6 +104,10 @@ This format is provided for both the multiply and add intrinsic internal 16-bit 
     d == 0xff   -> ±Inf if hl==0, else ±NaN
 ```
 
+Pack underflow uses unsigned `jp C` after `sub 112` (not sign). `d=255` maps to 143 and is classified on the overflow arm.
+
+IEEE specials are classified on overflow, operand-zero, and equal-exp 255 (packed exp 31) only. The finite add/mul path does not scan Inf/NaN. Packed Inf × a tiny finite (half exp sum − 15 < 31) may return a finite. `inc r` / `jp Z` tests f24 exp == 255 (8-bit `inc` sets Z, not C).
+
 ## Calling Convention
 
 The z88dk math16 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or the right hand side parameter is passed in `HL`, and the second or LHS parameter is passed on the stack. For zsdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
@@ -110,7 +126,8 @@ The intrinsic functions `l_f16_`, written in assembly, assume the sccz80 calling
     ;
     ; exit  :    HL = sccz80_half(left-right)
     ;
-    ; uses  : af, bc, de, hl, af', bc', de', hl'
+    ; uses  : af, bc, de, hl, af', bc', de', hl'   ; z80 family
+    ;         af, bc, de, hl                      ; 8080 / 8085 / gbz80
     
      RETURN HL <- LHS STACK - RHS STACK 
 
@@ -122,7 +139,8 @@ The intrinsic functions `l_f16_`, written in assembly, assume the sccz80 calling
     ;
     ; exit  :    HL = sdcc_half(left-right)
     ;
-    ; uses  : af, bc, de, hl, af', bc', de', hl'
+    ; uses  : af, bc, de, hl, af', bc', de', hl'   ; z80 family
+    ;         af, bc, de, hl                      ; 8080 / 8085 / gbz80 (no alternate set)
 ```
 
 Normal functions `f16_`, assume the calling convention of sccz80 or sdcc depending on the selected compiler.
@@ -138,7 +156,8 @@ Normal functions `f16_`, assume the calling convention of sccz80 or sdcc dependi
     ;
     ; exit  :    HL = sccz80_half(left-right)
     ;
-    ; uses  : af, bc, de, hl, af', bc', de', hl'
+    ; uses  : af, bc, de, hl, af', bc', de', hl'   ; z80 family
+    ;         af, bc, de, hl                      ; 8080 / 8085 / gbz80
 
      RETURN HL <- LHS STACK - RHS STACK
 
@@ -150,7 +169,8 @@ Normal functions `f16_`, assume the calling convention of sccz80 or sdcc dependi
     ;
     ; exit  :    HL = sdcc_half(left-right)
     ;
-    ; uses  : af, bc, de, hl, af', bc', de', hl'
+    ; uses  : af, bc, de, hl, af', bc', de', hl'   ; z80 family
+    ;         af, bc, de, hl                      ; 8080 / 8085 / gbz80
 ```
 
 
@@ -170,13 +190,21 @@ Z80-family cores (also assembled for z180 / z80n / r2ka / … where the same sou
 
 Intel 8085 cores only (`math16_8085.lib`). Same public entry names as the Z80 tree where the API matches; implementation is stack-based (no `exx` / IX / IY). See **CPU implementation strategies** below and `asm/8085/README`.
 
+### asm/8080/
+
+Intel 8080 cores only (`math16_8080.lib`). Stack-only like 8085; no 8085 extras (`rl de`, `sub hl,bc`, `ld de,sp+*`). `ld hl,sp+n` clobbers C.
+
+### asm/gbz80/
+
+Game Boy CPU cores only (`math16_gbz80.lib`). Stack-only; native `ld hl,sp+*` / `add sp,*` / CB shifts. No `ex de,hl` (56c); no `ex (sp),hl` (148c helper — open-code a DE-parked side-load). No S flag: leading-one tests use `bit 7,h`.
+
 ### c
 
-Contains the trigonometric, logarithmic, power and other functions implemented in C. Compiled versions for the Z80 family are prepared and saved in `c/z80` to be assembled and built as required (Z80 codegen). For 8085, higher-level helpers are precompiled with **sccz80** into `c/8085` (`make -C c 8085`) and linked into `math16_8085.lib`. Hand-written `cm16_sccz80_*.asm` bridges also live under `c/8085/`.
+Contains the trigonometric, logarithmic, power and other functions implemented in C. Compiled versions for the Z80 family are prepared and saved in `c/z80` to be assembled and built as required (Z80 codegen). 8085 / 8080 / gbz80 higher-level helpers are precompiled with **sccz80** into `c/8085`, `c/8080`, `c/gbz80` (`make -C c 8085` / `8080` / `gbz80`). Hand-written `cm16_sccz80_*.asm` bridges live in those dirs too.
 
 ### c/sdcc and c/sccz80
 
-Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the `asm/z80` (or `asm/8085`) directory. Float conversion between the math16 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
+Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in `asm/z80`, `asm/8085`, `asm/8080`, or `asm/gbz80`. Float conversion between the math16 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
 
 ### lm16
 
@@ -188,17 +216,17 @@ An alias is provided to simplify usage of the library. `--math16` provides all t
 
 Half and f24 **semantics** (bias, rounding sticky rules, specials at pack/expand) are shared. **Code paths are CPU-specific** — there is no single cross-CPU source for hot cores.
 
-| Area | Shared strategy | Z80-family | 8085 |
-|------|-----------------|------------|------|
-| **Half×half mul** (`asm_f16_mul_callee`) | Packed field extract; 11-bit mants; integer product; place (`>>5` / `>>6`+inc exp); pack via `asm_f16_f24` | `ex af,af` for sign; `srl`/`bit`/`set`; local Runer112 mulu with early-out entry for 11-bit and bit15-specialised entry for f24 | Sign on stack; open-coded logical EHL `>>`; one early-out `f16_8085_mulu_32_16x16` for both packed and f24 |
-| **f24 mul** (poly / inv / div / sqrt) | Left-aligned 16-bit mants; exp sum with bias 127; renorm + sticky | Alternate register set for second operand | Stack frame for second f24 (`ld de,sp+*`) |
-| **f24 div** (`asm_f16_div` / `asm_f24_div`) | Restoring 16×1-bit; prenorm if rem &lt; div; exp 0 → signed zero; specials via `asm_f24_zero` / `inf` / `nan` | rem `A:HL`, div `BC`, quot `DE`, count `B'` (`exx` + `djnz`) | rem `A:HL`, div `BC` (held), quot `DE`, count on stack (`dec (hl)`); labels match the z80 core |
+| Area | Shared strategy | Z80-family | 8085 / 8080 / gbz80 |
+|------|-----------------|------------|---------------------|
+| **Half×half mul** (`asm_f16_mul_callee`) / **`sqrf16`** | Packed field extract; 11-bit mants; integer product; place (`>>5` / `>>6`+inc exp); pack via `asm_f16_f24` | `ex af,af` for sign; `srl`/`bit`/`set`; Runer112 `mulu_32_16x16_gen` (plain z80) or `l_mulu_32_16x16` | Sign on stack; 11×11 helper (`f16_*_mulu_32_11x11`); logical EHL `>>` (8085/8080 open-code; gbz80 `srl`/`rr`) |
+| **f24 mul** (poly / inv / hypot / fma / sqrt) | Left-aligned 16-bit mants; exp sum with bias 127; renorm + sticky | Alternate register set for second operand; `mulu_32_16x16` or `l_mulu_32_16x16` | Stack frame for second f24; 16×16 helper (`f16_*_mulu_32_16x16`) |
+| **f24 div** (`asm_f16_div` / `asm_f24_div`) | Restoring 16×1-bit; prenorm if rem &lt; div; exp 0 → signed zero; specials via `asm_f24_zero` / `inf` / `nan` | rem `A:HL`, div `BC`, quot `DE`, count `B'` (`exx` + `djnz`); last rem≪ skipped | rem `A:HL`, div `BC`, quot `DE`. Stacked ret: push `div_pack`, 15× `div_bit`, `jp div_bit` (B is the divisor). 8085: `sub hl,bc` + `rl de`. 8080/gbz80: trial through A |
 | **classify** (`asm_f16_classify`) | Packed half in `HL`; return 0 number / 1 zero / 2 nan / 3 inf | Shared `asm/asm_f16_classify.asm` (no f24 expand; AF only) | Same shared source |
 | **Expand** (`asm_f24_f16`) | Half → f24 | `rr hl` / `rra` path (cheaper on Z80) | Field extract + `add hl,hl` ×5 + implicit bit (no cheap 16-bit `rr`) |
 | **Pack** (`asm_f16_f24`) | f24 → half with low-bit rounding | `add hl,hl` for mant positioning | Same idea (`add hl,hl` ×3 + sign via A) |
-| **Add / compare / …** | Same algorithms | `exx`, native CB shifts | Stack second operand; open-coded shifts |
+| **Add / compare / …** | Same algorithms | `exx`, native CB shifts | Stack second operand. 8085: `sra hl` / `sub hl,bc`. 8080: through A. gbz80: `srl`/`rr`; no `ex de,hl` |
 
-Deliberate non-goals: one shared mul body for both CPUs; forcing Z80 expand into the 8085 field form (or the reverse) — each form is the cheaper expand on that ISA.
+Deliberate non-goals: one shared mul body for all CPUs; forcing Z80 expand into the 8085/8080/gbz80 field form (or the reverse) — each form is the cheaper expand on that ISA.
 
 ## Function Discussion
 
@@ -210,6 +238,7 @@ There are essentially two different grades of functions in this library. Those i
 half_t addf16 (half_t x, half_t y);
 half_t subf16 (half_t x, half_t y);
 half_t mulf16 (half_t x, half_t y);
+half_t sqrf16 (half_t x);          /* packed 11×11; result always + */
 half_t divf16 (half_t x, half_t y);
 ```
 
@@ -219,9 +248,9 @@ half_t divf16 (half_t x, half_t y);
 half_t divf16 (half_t x, half_t y);
 ```
 
-**`divf16` / `asm_f16_div`** is a **restoring** divider on the f24 path (z80 + 8085 cores). Result exp 0 underflows to signed zero (no subnormals; same policy as half exp==0 → ±0).
+**`divf16` / `asm_f16_div`** is a **restoring** divider on the f24 path (z80, 8085, 8080, gbz80). Result exp 0 underflows to signed zero (no subnormals; same policy as half exp==0 → ±0).
 
-Both cores use the same label set (`div_body`, `div_bit_loop`, `div_bit_fail`, `div_quot_shift`, `div_normed`, `div_zero` / `div_inf` / `div_nan`, …). The f24 mantissa is 16 bits, so the divisor stays in `BC` for the whole loop. The z80 core puts the step count in `B'` (`djnz`). The 8085 core keeps the count on the stack and updates it with `dec (hl)` so the hot path does not spill `AF` each bit. Specials call shared `asm_f24_zero`, `asm_f24_inf`, and `asm_f24_nan`.
+Cores share the same label set (`div_body`, `div_bit_fail`, `div_quot_shift`, `div_normed`, `div_zero` / `div_inf` / `div_nan`, …). The f24 mantissa is 16 bits, so the divisor stays in `BC` for the whole loop. The z80 core puts the step count in `B'` (`djnz`) and does not shift rem after the last quot bit. 8085 / 8080 / gbz80: DE is free after prenorm, so 15 copies of `div_bit` and one `div_pack` are pushed and `div_bit` ends with `ret` (B is the divisor). Specials call shared `asm_f24_zero`, `asm_f24_inf`, and `asm_f24_nan`.
 
 ### Derived Floating Point Functions
 
@@ -245,7 +274,7 @@ half_t invsqrtf16 (half_t x);
 ```
 Recently, in the Quake video game, a novel method of seeding the Newton-Raphson iteration for the inverse square root was invented. This fancy process is covered in detail in [Lomont 2003](http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf) and the suggested magic number `0x5f375a86`, better than was used by the original Quake game, was implemented.
 
-Following this magic number seeding and traditional Newtwon-Raphson iterations an accurate inverse square root `invsqrtf16()` is produced. The square root `sqrtf16()` is then obtained by multiplying the number by its inverse square root.
+Following this magic number seeding and traditional Newton-Raphson iterations an accurate inverse square root `invsqrtf16()` is produced. The square root `sqrtf16()` is then obtained by multiplying the number by its inverse square root.
 
 Two N-R iterations produce 5 or 6 significant digits of accuracy. Also, as in the original Quake game, 1 N-R iteration produces a good enough answer for most applications, and is substantially faster.
 
@@ -307,6 +336,8 @@ The hypotenuse function `hypotf16()` is provided as it is part of the standard m
 
 The rest of the maths library is derived from source code obtained from the Hi-Tech C Compiler floating point library, the Cephes Math Library Release 2.2, and from the GCC IEEE floating point library. If desired, alternative and extended coefficient matrices can be tested for accuracy and performance.
 
+C sources use `sqrf16(x)` for `x*x` and `1.0/x` (restoring `div`) for a reciprocal. `invsqrtf16` stays for inverse square root (`pow(x, -0.5)` included).
+
 ```c
 /* Trigonometric functions */
 half_t sinf16 (half_t x);
@@ -325,6 +356,23 @@ half_t log2f16 (half_t x);
 half_t log10f16 (half_t x);
 half_t powf16 (half_t x, half_t y);
 ```
+
+## TIMER (sccz80, Sep 9 2026)
+
+Classic `+test` recipes in `support/benchmarks/*/z88dk-classic/`. Newlib `+z80 -clib=new`. Pure `--math16` (8085 TIMER also `-lmath32_8085` as a helper side-link). Map: `__code_fp_math32_size = $0000`.
+
+| Bench | Clib | CPU | Bytes | Ticks |
+|-------|------|-----|------:|------:|
+| n-body N=1000, DT=1e-1 | classic | z80 | 4124 | 295,229,389 |
+| n-body N=1000, DT=1e-1 | classic | 8085 | 4170 | 344,855,174 |
+| n-body N=1000, DT=1e-1 | newlib | z80 | 3306 | 295,229,389 |
+| mandelbrot w=h=60 | classic | z80 | 3091 | 788,675,466 |
+| mandelbrot w=h=60 | classic | 8085 | 3301 | 955,053,921 |
+| mandelbrot w=h=60 | newlib | z80 | 2260 | 788,675,466 |
+| spectral-norm N=100 | classic | z80 | 3709 | 2,536,762,681 |
+| spectral-norm N=100 | classic | 8085 | 3948 | 2,465,495,200 |
+
+No published newlib spectral math16 row. Full RESULT blocks: those `readme.txt` files.
 
 ## Licence
 

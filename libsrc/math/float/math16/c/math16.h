@@ -34,5 +34,17 @@
 #include <stdint.h>
 #include <math.h>
 
+union float16_int
+{
+    half_t f;
+    uint16_t l;
+};
+
+/* Top 8 bits of the packed half (sign + exp[4:0] + mant[9:8]).
+ * Shift the int, not a memory index, so LE and BE match.
+ * After abs: 0x58 => |x| >= 128 (128 = 0x5800). Inf/NaN hi >= 0x7c.
+ * >> 8 not a 5-bit field extract (shift cost on sccz80/SDCC). */
+#define m16_ieee_hi(u)  ((uint8_t)((uint16_t)(u).l >> 8))
+
 #endif  /* _INC_MATH16_C */
 
