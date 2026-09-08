@@ -17,6 +17,7 @@ Binary: `z88dk-80cc`. Source: `src/80cc/`. Rules file: `lib/80cc_rules.1`.
 4. Prefer reading `src/80cc` notes for current status before large work.
 5. Rebuild: `make -C src/80cc PREFIX=$(pwd)` from the z88dk root, then `make -C src/80cc PREFIX=$(pwd) install`.
 6. The `--version` / `-h` banner comes from `src/config.h` `Z88DK_VERSION`. That string can be stale after a rebuild. Prove a hunk with `strings bin/z88dk-80cc`, not the banner.
+7. kc160 `mul de,hl` is **integer** 16×16. `_Float16` / accum16 stay on `l_f16_mul` / `l_fix16_*`. Do not emit IR_MUL for those (math16 80cc kc160 suite: `1.5*1.5` and `0*Inf`).
 
 ## Frame pointer (Z80 benches)
 

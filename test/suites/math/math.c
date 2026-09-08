@@ -527,6 +527,30 @@ void test_float_arithmetic()
 }
 
 #ifdef MATH16
+/* Packed half mul must call l_f16_mul, not integer 16×16. 80cc on kc160
+ * used to emit `mul de,hl` for width-2 _Float16 * _Float16. Mixed
+ * half*int must convert (l_f16_sint2f / uint2f) then mul. Operands are
+ * runtime-written so the compiler cannot fold. */
+static FLOAT m16_x, m16_y;
+static int m16_n;
+static unsigned m16_un;
+void test_math16_mul()
+{
+    m16_x = (FLOAT)1.5; m16_y = (FLOAT)1.5;
+    Assert(m16_x * m16_y == (FLOAT)2.25, "half*half 1.5*1.5 == 2.25");
+    m16_x = (FLOAT)0.5; m16_y = (FLOAT)0.5;
+    Assert(m16_x * m16_y == (FLOAT)0.25, "half*half 0.5*0.5 == 0.25");
+    m16_x = (FLOAT)1.5; m16_n = 2;
+    Assert(m16_x * m16_n == (FLOAT)3.0, "half*int 1.5*2 == 3");
+    Assert(m16_n * m16_x == (FLOAT)3.0, "int*half 2*1.5 == 3");
+    m16_n = -2;
+    Assert(m16_x * m16_n == (FLOAT)(-3.0), "half*int 1.5*(-2) == -3");
+    m16_n = 0;
+    Assert(m16_n * m16_x == (FLOAT)0.0, "int*half 0*1.5 == 0");
+    m16_x = (FLOAT)0.5; m16_un = 4u;
+    Assert(m16_x * m16_un == (FLOAT)2.0, "half*uint 0.5*4 == 2");
+}
+
 /* Half-float edges: 10-bit mantissa, MAXLOG ~11.  Dissimilar add, exp
  * overflow, and a modest trig argument (j fits in uint16).  One relational
  * per Assert (sccz80 && of two float compares can fail Assert_real). */
@@ -691,6 +715,7 @@ int suite_math()
     suite_add_test(test_math32_edges);
 #endif
 #ifdef MATH16
+    suite_add_test(test_math16_mul);
     suite_add_test(test_math16_edges);
 #endif
     return suite_run();
