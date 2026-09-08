@@ -6224,6 +6224,65 @@ int ir_lower_func(FILE *out, Func *f)
        (distinct from the pre-lower IR_DUMP — reflects the allocator's view). */
     if (getenv("IR_DUMP_ALLOC"))
         ir_dump_func(stderr, f);
+    /* [IR_ADDRRES_PROBE] INERT sizing of address residency. bitfieldbench's
+       reg_step is 2.14x sdcc and its most-emitted instructions are all address
+       plumbing — 13 `push hl`, 8 `pop hl`, 7 `ld hl,bc` base re-forms and 12
+       `inc hl` to service FIVE read-modify-writes into ONE storage unit. sdcc
+       forms the address once and walks it. This reports, per function, every
+       vreg used as a memory base: how many derefs read through it, at how many
+       distinct constant offsets, and where the allocator put it — so the
+       question "how many functions have a member-access run that would keep one
+       address resident" is answered with counts rather than an impression.
+
+       ►► WHAT IT FOUND (2026-09-08), and it REFUTED the lever it was built for.
+       118 multi-deref bases over the corpus + the four real files, but the
+       distribution kills a general lever: 91 have only TWO accesses, 19 have
+       3-4, and just 8 have five or more. Only 28 sites reach 3 accesses and half
+       of those are in long_ir itself. Residency on a two-access base saves one
+       address re-form.
+
+       It also refuted the bitfieldbench diagnosis it was aimed at: reg_step's
+       base is ALREADY homed in BC (ld=5 st=1 home=BC param), so the base is
+       resident and the waste is the FIELD address being re-formed from it
+       (`ld hl,bc; inc hl`) plus values parked on the stack mid-RMW. That is
+       register pressure inside the bitfield read-modify-write, not residency.
+
+       The one thing worth chasing came out of the top row: clisp's `_fcall`
+       does 54 loads through a SPILLED pointer parameter, emitted as 54 x
+       `ld hl,(ix+4)` — SIX bytes each on z80 (dd 6e 04 dd 66 05; there is no
+       real `ld hl,(ix+d)`) against 2 for `ld hl,bc`. 509 such reloads across the
+       real files = ~3 KB. That is §5.4 stage 3 (frame/long operand residency),
+       and it wants a CALL-BOUNDED ranged home, not a whole-function one —
+       `_fcall` is call-heavy (368 `pop bc` already). */
+    if (getenv("IR_ADDRRES_PROBE")) {
+        for (int v = 0; v < f->n_vregs; v++) {
+            int derefs = 0, stores = 0, minoff = 1 << 30, maxoff = -(1 << 30);
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    const Op *o = &f->bbs[b].ops[j];
+                    if ((o->kind != IR_LD_MEM && o->kind != IR_ST_MEM)
+                        || o->mem.kind != IR_MEM_VREG || o->mem.base != v)
+                        continue;
+                    if (o->kind == IR_LD_MEM) derefs++; else stores++;
+                    if (o->mem.offset < minoff) minoff = o->mem.offset;
+                    if (o->mem.offset > maxoff) maxoff = o->mem.offset;
+                }
+            if (derefs + stores < 2) continue;      /* one access needs no residency */
+            const char *home = "spill";
+            switch (f->vreg_to_phys[v]) {
+            case IR_PR_BC: home = "BC"; break;
+            case IR_PR_DE: home = "DE"; break;
+            case IR_PR_HL: home = "HL"; break;
+            case IR_PR_IX: home = "IX"; break;
+            case IR_PR_IY: home = "IY"; break;
+            default: break;
+            }
+            fprintf(stderr, "ADDRRES %s v%d ld=%d st=%d span=%d home=%s%s\n",
+                    f->fn ? ir_sym_name(f->fn) : "?", v, derefs, stores,
+                    (maxoff >= minoff) ? maxoff - minoff : 0, home,
+                    (f->vregs[v].flags & IR_VREG_PARAM) ? " param" : "");
+        }
+    }
     /* Bumped once per function — both lowering passes (when lazy spill
        does two) share the same func label prefix. */
     L.func_emit_idx++;

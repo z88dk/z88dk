@@ -4167,6 +4167,33 @@ int ir_opt_insert_long_pushes(Func *f)
             if (dst < 0 || dst >= f->n_vregs) continue;
             if (f->vregs[dst].width != 4) continue;
             if (f->vregs[dst].flags & IR_VREG_ADDR_TAKEN) continue;
+            /* [IR_LONGPUSH_PROBE] INERT census of what the MVP gates turn away.
+               This pass is the mechanism behind md5's 0.64x win over sdcc — a
+               chained long op parks its operand on the DATA STACK (`push de;
+               push hl`, ~22 T) instead of a frame slot (~100 T) and the consumer
+               pops the halves back through BC. The eligibility list above is
+               labelled "MVP — conservative"; this counts each rejection so the
+               next widening is chosen by number, not guess. */
+            if (getenv("IR_LONGPUSH_PROBE")) {
+                const char *why = NULL;
+                int k2 = bb_use_idx[dst];
+                if (use_count[dst] != 1)                       why = "usecount>1";
+                else if (k2 < 0)                               why = "use-other-bb";
+                else if (k2 <= j + 1)                          why = "adjacent";
+                else if (!long_producer_kind_d(def_op->kind))  why = "producer-kind";
+                else {
+                    const Op *uo = &bb->ops[k2];
+                    if (!long_consumer_kind_d(uo->kind))       why = "consumer-kind";
+                    else {
+                        for (int x = j + 1; x < k2; x++)
+                            if (op_is_branch_or_call_d(bb->ops[x].kind))
+                                { why = "call-or-branch-between"; break; }
+                    }
+                }
+                fprintf(stderr, "LONGPUSH %s v%d %s\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", dst,
+                        why ? why : "ELIGIBLE");
+            }
             if (use_count[dst] != 1) continue;
             int k = bb_use_idx[dst];
             if (k < 0 || k <= j + 1) continue;

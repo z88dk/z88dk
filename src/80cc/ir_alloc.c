@@ -206,6 +206,17 @@ enum {
 typedef struct {
     int      vreg;
     long     benefit;   /* higher = more valuable (Phase 0 = depth-weighted use_count) */
+    /* [IR_BYTETIE] STATIC bytes the best allowed home saves, used ONLY to break a
+       tie in `benefit`. The cycle model goes BLIND on a target whose slot and
+       register cost the same — ez80 fp is the case: a slot read is a native
+       `ld hl,(ix+d)` at 2 cycles, exactly what `ld l,c; ld h,b` costs, so
+       interval_benefit rates every read and write at ZERO and the arbiter's
+       order, not merit, decides. Bytes still separate them there (fp slot 3 B
+       against BC's 2), so rank lexicographically: cycles first, bytes to break
+       the tie. Kept as a SEPARATE field rather than summed — the two are in
+       different units and adding them would let a 3-byte candidate outrank a
+       2-cycle one. */
+    long     bytes;
     int      lo, hi;    /* live interval [first_use, last_use] */
     unsigned allowed;   /* RC_* mask */
     unsigned flags;     /* CF_* */
@@ -1640,9 +1651,61 @@ done:
    BC-vs-byteC, DE-acc-vs-byteE, and idx2-vs-BC for a shared read-only param
    (the param keeps its BC preference via stable tie-break: BC candidates are
    collected first, so on an equal-benefit tie they win over idx2). */
+/* [IR_BYTETIE] OPT-IN (default OFF). `IR_BYTETIE=1` enables, `=<N>` sets a
+   minimum byte gap before the tie-break fires.
+
+   ►► WHY THIS IS NOT DEFAULT-ON, and why handover §5 item 3 is MIS-FRAMED.
+   That item reads "the ez80 fp cost row of g0_word_cost cannot separate a
+   register from a slot — bounded; the same treatment the gbz80 row got". The
+   gbz80 treatment was MEASURING real, distinct cycle numbers. There is nothing
+   equivalent to measure here: on ez80 fp a slot read genuinely IS a native
+   `ld hl,(ix+d)` at 2 cycles, exactly what `ld l,c; ld h,b` costs. The row is
+   RIGHT. The hardware ties, so no better cycle number exists.
+
+   Bytes do still separate the candidates (fp slot 3 B against BC's 2), and
+   ranking by them is a clean SIZE win: corpus -106 B, 13 cells smaller, ZERO
+   larger, and concentrated exactly where the item predicted — ez80 -85 B over
+   8 cells, ALL of them fp, plus bitfieldbench on rabbit/kc160 (the other
+   cheap-slot targets).
+
+   But bytes carry NO information about the tick outcome here. The 12 changed
+   tick cells are 9 faster / 3 slower, aggregate -0.04 %: queenbench ez80 fp
+   -2.81 % against hashbench +1.76 % — which is VERBATIM the trade IR_BCCALLCOST
+   already measured and refused on this row ("it wins queenbench 2.81 % and
+   loses hashbench 1.76 % on the same CPU, mode and shape"). Sweeping a minimum
+   byte gap does not separate them: at gap 1-4 all four benches move, at gap 8+
+   only lexbench does and lexbench is itself a tick loser. So there is no
+   threshold that keeps the wins and drops the losses.
+
+   Conclusion to carry forward: the missing information on this row is NOT
+   recoverable from the byte table either. It is second-order (HL pressure,
+   spill placement) and needs a real term, not a proxy. Do not "fix the row" —
+   there is nothing wrong with it. */
+static int bytetie_gap(void)
+{
+    static int g = -1;
+    if (g < 0) {
+        const char *e = getenv("IR_BYTETIE");
+        g = e ? atoi(e) : 0;               /* default OFF: tick coin-flip */
+    }
+    return g;
+}
+static int bytetie_on(void)
+{
+    return bytetie_gap() > 0 && !opt_disabled("byte-tie");
+}
+
 static int cand_more_important(const Cand *a, const Cand *b)
 {
     if (a->benefit != b->benefit) return a->benefit > b->benefit;
+    /* [IR_BYTETIE] cycles tied — ask BYTES before falling back to pool order.
+       This is the whole of the ez80 fp problem: there a slot and a register cost
+       the same 2 cycles, so every candidate ties at 0 and the winner was decided
+       by the order the proposers happened to run in. */
+    if (bytetie_on()) {
+        long d = a->bytes - b->bytes;
+        if (d >= bytetie_gap() || -d >= bytetie_gap()) return d > 0;
+    }
     /* most-constrained-first: fewer allowed classes wins the tie */
     unsigned pa = a->allowed, pb = b->allowed;
     int na = 0, nb = 0;
@@ -1777,6 +1840,46 @@ static int g0_word_bytes(int reg, int kind)
 /* STATIC bytes a whole-function BC home for v saves over the slot, net of the
    `push bc` / `pop bc` (2 B) it adds at every call inside its live range. >0
    means the home pays for itself in SIZE. No loop weighting — see above. */
+/* [IR_BYTETIE] bc_byte_benefit generalised to any register class, for the
+   tie-break. Same walk, same STATIC (unweighted) accounting — a body inside a
+   loop is not bigger — and the same `push`/`pop` charge at every call the live
+   range spans, which is what stops a call-heavy value from looking free. */
+static long g0_byte_benefit(const Func *f, int v, int R)
+{
+    const LiveRange *lr = ir_live_range(f, v);
+    long ben = 0;
+    int flat = 0;
+    int save = (R == GR_IX || R == GR_IY) ? 4 : 2;   /* push/pop pair, idx is 2+2 */
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++, flat++) {
+            const Op *o = &bb->ops[j];
+            if ((o->kind == IR_CALL || o->kind == IR_HCALL)
+                && lr && lr->start >= 0
+                && flat >= lr->start && flat <= lr->end)
+                ben -= save;
+            int sv = -1;
+            if ((o->kind == IR_INC || o->kind == IR_DEC) && o->dst >= 0
+                && o->src[0] == o->dst) sv = o->dst;
+            else if (o->kind == IR_POSTSTEP && o->src[0] >= 0) sv = o->src[0];
+            if (sv == v || (o->dst == v && (o->src[0] == v || o->src[1] == v))) {
+                ben += g0_word_bytes(GR_SLOT, GK_STEP) - g0_word_bytes(R, GK_STEP);
+                continue;
+            }
+            if (o->dst == v)
+                ben += g0_word_bytes(GR_SLOT, GK_WRITE) - g0_word_bytes(R, GK_WRITE);
+            int mb = ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                      && o->mem.kind == IR_MEM_VREG) ? o->mem.base : -1;
+            int u[16]; int nu = ir_op_uses(o, u, 16);
+            for (int k = 0; k < nu; k++) if (u[k] == v)
+                ben += (v == mb)
+                     ? g0_word_bytes(GR_SLOT, GK_DEREF) - g0_word_bytes(R, GK_DEREF)
+                     : g0_word_bytes(GR_SLOT, GK_READ)  - g0_word_bytes(R, GK_READ);
+        }
+    }
+    return ben;
+}
+
 static long bc_byte_benefit(const Func *f, int v)
 {
     const LiveRange *lr = ir_live_range(f, v);
@@ -5324,10 +5427,29 @@ void ir_alloc(Func *f)
                    replaced the old cost_benefit hotness heuristic + keep-rules as the
                    selection mechanism ("tuning = costs, not passes"). Byte/exx-only
                    candidates still fall back to cost_benefit inside rank_benefit. */
-                for (int i = 0; i < np; i++)
+                for (int i = 0; i < np; i++) {
                     pool[i].benefit = rank_benefit(f, pool[i].vreg, pool[i].allowed,
                                                    cost_benefit, bb_loop_depth,
                                                    bb_cond_shift);
+                    /* [IR_BYTETIE] the tie-break companion, in BYTES. Best over
+                       the same allowed classes rank_benefit considered. */
+                    {
+                        long bb2 = 0; int have = 0;
+                        if (pool[i].allowed & RC_BC) {
+                            long x = g0_byte_benefit(f, pool[i].vreg, GR_BC);
+                            if (!have || x > bb2) { bb2 = x; have = 1; }
+                        }
+                        if (pool[i].allowed & RC_DE_ACC) {
+                            long x = g0_byte_benefit(f, pool[i].vreg, GR_DE);
+                            if (!have || x > bb2) { bb2 = x; have = 1; }
+                        }
+                        if (pool[i].allowed & (RC_IDX2 | RC_IDX3)) {
+                            long x = g0_byte_benefit(f, pool[i].vreg, GR_IX);
+                            if (!have || x > bb2) { bb2 = x; have = 1; }
+                        }
+                        pool[i].bytes = have ? bb2 : 0;
+                    }
+                }
                 /* Index gate (DEFAULT-ON; --opt-disable=graph-alloc removes it →
                    pre-gate codegen). Driven by the realisation-aware interval_benefit
                    (RANGED_ALLOC_PLAN Phase 0-1c): reject an index home whose grounded
