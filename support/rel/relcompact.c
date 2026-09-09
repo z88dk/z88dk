@@ -52,6 +52,8 @@
 #define TOK_DATAREL  0x02
 #define TOK_COMREL   0x03
 #define TOK_SPECIAL  0x80
+#define TOK_TRAILER  0xFC
+#define TOK_STATE    0xFD
 #define TOK_PAD      0xFE
 
 static FILE *fin;
@@ -59,6 +61,24 @@ static FILE *fout;
 
 static unsigned char outbyte = 0;
 static int bitcount = 0;
+
+static int state_present = 0;
+static unsigned state_byte;
+static unsigned state_consumed;
+
+static unsigned char *trailer = NULL;
+static unsigned trailer_len = 0;
+
+
+/* --------------------------------------------------------- */
+
+static void emit_trailer(void)
+{
+    unsigned i;
+
+    for (i = 0; i < trailer_len; i++)
+        fputc(trailer[i], fout);
+}
 
 /* --------------------------------------------------------- */
 
@@ -143,12 +163,12 @@ if (consumed_bits == 0)
     return;
 }
 
-//	if (consumed_bits == 0 && bitcount != 0)
-//	{
-//		fprintf(stderr,
-//				"PAD inconsistency\n");
-//		exit(1);
-//	}
+//  if (consumed_bits == 0 && bitcount != 0)
+//  {
+//      fprintf(stderr,
+//              "PAD inconsistency\n");
+//      exit(1);
+//  }
 //
     if (bitcount != (int)consumed_bits)
     {
@@ -187,7 +207,6 @@ if (consumed_bits == 0)
 }
 
 /* --------------------------------------------------------- */
-
 
 int main(int argc,char *argv[])
 {
@@ -257,115 +276,186 @@ int main(int argc,char *argv[])
 
             break;
 
-		case TOK_SPECIAL:
-		{
-			ctrl = get8();
+        case TOK_SPECIAL:
+        {
+            ctrl = get8();
 
-			putbit(1);
-			putbits(0, 2);
-			putbits(ctrl, 4);
+            putbit(1);
+            putbits(0, 2);
+            putbits(ctrl, 4);
 
-			switch (ctrl)
-			{
-				/*
-				 * GROUP A
-				 * Name only
-				 */
-				case 0:
-				case 1:
-				case 2:
-				case 3:
-				case 4:
+            switch (ctrl)
+            {
+                /*
+                 * GROUP A
+                 * Name only
+                 */
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
 
-					len = get8();
+                    len = get8();
 
-					putbits(len, 3);
+                    putbits(len, 3);
 
-					for (i = 0; i < (int)len; i++)
-						putbits(get8(), 8);
+                    for (i = 0; i < (int)len; i++)
+                        putbits(get8(), 8);
 
-					break;
+                    break;
 
-				/*
-				 * GROUP B
-				 * A-field + Name
-				 */
-				case 5:
-				case 6:
-				case 7:
-				case 8:
+                /*
+                 * GROUP B
+                 * A-field + Name
+                 */
+                case 5:
+                case 6:
+                case 7:
+                case 8:
 
-					atype = get8();
+                    atype = get8();
 
-					value  = get8();
-					value |= ((unsigned)get8()) << 8;
+                    value  = get8();
+                    value |= ((unsigned)get8()) << 8;
 
-					putbits(atype, 2);
+                    putbits(atype, 2);
 
-					putbits(value & 0xff, 8);
-					putbits((value >> 8) & 0xff, 8);
+                    putbits(value & 0xff, 8);
+                    putbits((value >> 8) & 0xff, 8);
 
-					len = get8();
+                    len = get8();
 
-					putbits(len, 3);
+                    putbits(len, 3);
 
-					for (i = 0; i < (int)len; i++)
-						putbits(get8(), 8);
+                    for (i = 0; i < (int)len; i++)
+                        putbits(get8(), 8);
 
-					break;
+                    break;
 
-				/*
-				 * GROUP C
-				 * A-field only
-				 */
-				case 9:
-				case 10:
-				case 11:
-				case 12:
-				case 13:
-				case 14:
+                /*
+                 * GROUP C
+                 * A-field only
+                 */
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
 
-					atype = get8();
+                    atype = get8();
 
-					value  = get8();
-					value |= ((unsigned)get8()) << 8;
+                    value  = get8();
+                    value |= ((unsigned)get8()) << 8;
 
-					putbits(atype, 2);
+                    putbits(atype, 2);
 
-					putbits(value & 0xff, 8);
-					putbits((value >> 8) & 0xff, 8);
+                    putbits(value & 0xff, 8);
+                    putbits((value >> 8) & 0xff, 8);
 
-					break;
+                    break;
 
-				/*
-				 * GROUP D
-				 * End File
-				 */
-				case 15:
+                /*
+                 * GROUP D
+                 * End File
+                 */
+                case 15:
 
-					flushbits();
+					if (state_present)
+					{
+						restore_pad(state_consumed, state_byte);
+						state_present = 0;
+					}
+					else
+					{
+						flushbits();
+					}
 
-					fclose(fin);
-					fclose(fout);
+                    emit_trailer();
 
-					return 0;
+                    if (trailer)
+                    {
+                        fprintf(stderr,
+                                "Warning: Duplicate TRAILER record\n");
+						free(trailer);
+						trailer = NULL;
+						trailer_len = 0;
+                    }
+
+                    fclose(fin);
+                    fclose(fout);
+
+                    return 0;
+
+            }
+
+            break;
+        }
+
+        case TOK_PAD:
+        {
+            unsigned rawbyte;
+            unsigned consumed_bits;
+
+            rawbyte    = get8();
+            consumed_bits = get8();
+            
+            restore_pad (consumed_bits,rawbyte);
+
+            break;
+        }
+
+        case TOK_STATE:
+        {
+            state_byte     = get8();
+            state_consumed = get8();
+
+            if (state_consumed > 7)
+            {
+                fprintf(stderr,
+                        "Invalid STATE bitcount %u\n",
+                        state_consumed);
+                exit(1);
+            }
+
+            state_present = 1;
+
+            break;
+        }
+
+        case TOK_TRAILER:
+        {
+            unsigned i;
+
+            if (trailer)
+            {
+                fprintf(stderr,
+                        "Warning: Duplicate TRAILER record\n");
+                free(trailer);
+				trailer = NULL;
+				trailer_len = 0;
 			}
 
-			break;
-		}
+            trailer_len  = get8();
+            trailer_len |= ((unsigned)get8()) << 8;
 
-		case TOK_PAD:
-		{
-			unsigned rawbyte;
-			unsigned consumed_bits;
+			if (trailer_len)
+			{
+				trailer = malloc(trailer_len);
 
-			rawbyte    = get8();
-			consumed_bits = get8();
-			
-			restore_pad (consumed_bits,rawbyte);
+				if (!trailer)
+				{
+					fprintf(stderr,"Out of memory\n");
+					exit(1);
+				}
 
-			break;
-		}
+				for (i = 0; i < trailer_len; i++)
+					trailer[i] = get8();
+			}
+
+            break;
+        }
 
         default:
 
