@@ -2,44 +2,29 @@
  * relexpand.c
  *
  * By Stefano Bodrato, 2026
-
+ *
  * Microsoft M80/L80 REL
  * -> expanded binary representation
- *    the result can be inspected with a simple HEX EDITOR
- *    and compressed back with relcompact.c
  *
- * Reversible version.
+ * Physical reversible extension
  *
- * ABS:
- *   00 value
+ * TOKENS
  *
- * PROGREL:
- *   01 lo hi
+ * 00 ABS
+ * 01 PRGREL
+ * 02 DATAREL
+ * 03 COMREL
  *
- * DATAREL:
- *   02 lo hi
+ * 80 SPECIAL
  *
- * COMREL:
- *   03 lo hi
+ * FE PAD
+ *    rawbyte consumed_bits
  *
- * SPECIAL:
- *   80 ctrl
+ * FD STATE
+ *    rawbyte consumed_bits
  *
- * PAD:
- *   FE rawbyte consumed-bits
- *
- * ctrl 0..4
- *   len chars...
- *
- * ctrl 5..8
- *   atype lo hi len chars...
- *
- * ctrl 9..14
- *   atype lo hi
- *
- * ctrl 15
- *   EOF
- 
+ * FC TRAILER
+ *    len_lo len_hi data...
  */
 
 #include <stdio.h>
@@ -49,7 +34,11 @@
 #define TOK_PRGREL   0x01
 #define TOK_DATAREL  0x02
 #define TOK_COMREL   0x03
+
 #define TOK_SPECIAL  0x80
+
+#define TOK_TRAILER  0xFC
+#define TOK_STATE    0xFD
 #define TOK_PAD      0xFE
 
 static FILE *fin;
@@ -57,6 +46,7 @@ static FILE *fout;
 
 static unsigned char curbyte;
 static int bitcount = 0;
+
 static unsigned char rawbyte;
 
 /* --------------------------------------------------------- */
@@ -73,9 +63,8 @@ static void refill(void)
         exit(1);
     }
 
-	rawbyte = (unsigned char)c;
-	curbyte = rawbyte;
-
+    rawbyte = (unsigned char)c;
+    curbyte = rawbyte;
     bitcount = 8;
 }
 
@@ -128,6 +117,68 @@ static void put16(unsigned v)
 
 /* --------------------------------------------------------- */
 
+static void emit_state(void)
+{
+    put8(TOK_STATE);
+
+    put8(rawbyte);
+
+    if (bitcount == 0)
+        put8(0);
+    else
+        put8(8 - bitcount);
+}
+
+/* --------------------------------------------------------- */
+
+static void emit_trailer(void)
+{
+    long pos;
+    long end;
+    long len;
+    long i;
+
+    pos = ftell(fin);
+
+    if (pos < 0)
+        return;
+
+    if (fseek(fin, 0, SEEK_END) != 0)
+        return;
+
+    end = ftell(fin);
+
+    if (end < 0)
+        return;
+
+    len = end - pos;
+
+    if (len <= 0)
+    {
+        fseek(fin, pos, SEEK_SET);
+        return;
+    }
+
+    fseek(fin, pos, SEEK_SET);
+
+    put8(TOK_TRAILER);
+
+    put8(len & 0xff);
+    put8((len >> 8) & 0xff);
+
+    for (i = 0; i < len; i++)
+    {
+        int c = fgetc(fin);
+
+        if (c == EOF)
+            break;
+
+        put8(c);
+    }
+}
+
+/* --------------------------------------------------------- */
+
 int main(int argc, char *argv[])
 {
     unsigned type;
@@ -135,6 +186,7 @@ int main(int argc, char *argv[])
     unsigned atype;
     unsigned value;
     unsigned len;
+
     int i;
 
     if (argc != 3)
@@ -156,6 +208,7 @@ int main(int argc, char *argv[])
     if (!fout)
     {
         printf("Cannot open output file\n");
+
         fclose(fin);
         return 1;
     }
@@ -191,11 +244,24 @@ int main(int argc, char *argv[])
 
         ctrl = getbits(4);
 
-        put8(TOK_SPECIAL);
-        put8(ctrl);
+        /*
+         * EOF requires physical state preservation
+         */
 
         if (ctrl == 15)
+        {
+            emit_trailer();
+
+            emit_state();
+
+            put8(TOK_SPECIAL);
+            put8(15);
+
             break;
+        }
+
+        put8(TOK_SPECIAL);
+        put8(ctrl);
 
         /*
          * Controls 5..14 have A-field
@@ -227,24 +293,22 @@ int main(int argc, char *argv[])
         }
 
         /*
-         * SPECIAL 14: preserve discarded state
-		 * It was mostly used to re-align logical metadata groups 
+         * SPECIAL 14
          */
 
-		if (ctrl == 14)
-		{
-			put8(TOK_PAD);
-			put8(rawbyte);
+        if (ctrl == 14)
+        {
+            put8(TOK_PAD);
 
-			/* save consumed bits, not residual bits */
-			if (bitcount == 0)
-				put8(0);
-			else
-				put8(8 - bitcount);
+            put8(rawbyte);
 
-			bitcount = 0;
-		}
+            if (bitcount == 0)
+                put8(0);
+            else
+                put8(8 - bitcount);
 
+            bitcount = 0;
+        }
     }
 
     fclose(fin);
