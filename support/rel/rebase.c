@@ -21,6 +21,7 @@
 int diff;
 int lsb1, lsb2, msb1, msb2;
 int sv1, sv2;
+long len;
 int loc, shift;
 FILE *fp1, *fp2, *fpout;
 
@@ -39,12 +40,15 @@ int main(int argc, char *argv[])
 	shift = atoi(argv[4]);
 
 	if ( (fp1=fopen(argv[1],"rb") ) == NULL ) {
-		printf("Can't first file\n");
+		printf("Can't open the first file\n");
 		exit(1);
 	}
+	fseek(fp1,0,SEEK_END);
+	len = ftell(fp1);
+	rewind(fp1);
 
 	if ( (fp2=fopen(argv[2],"rb") ) == NULL ) {
-		printf("Can't second file\n");
+		printf("Can't open the second file\n");
 		exit(1);
 	}
 
@@ -110,6 +114,7 @@ void writeword(unsigned int i, FILE *fp)
 
 void writebyte(unsigned char c, FILE *fp)
 {
-	fputc(c,fp);
+	if (ftell(fpout) < len)
+		fputc(c,fp);
 }
 
