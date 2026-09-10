@@ -412,7 +412,10 @@ PUBLIC f16_8080_mulu_32_11x11
     jp asm_f24_zero
 
 ;--------------------------------------------------------------------
-; No operand-zero test (IEEE caller). Packed 11×11: bit10 set. f24: bit15 set.
+; No operand-zero test (IEEE caller). Packed 11×11 joins the 16×16
+; chain at bit9 (same as z80/gbz80). Last bit needs the multiplicand
+; in BC, so park the mid byte with push bc / pop bc (`rr e` is not
+; on 8080; parking in D clobbers the high product after bit7).
 .f16_8080_mulu_32_11x11
     ld a,d
     ld d,0
@@ -423,7 +426,7 @@ PUBLIC f16_8080_mulu_32_11x11
     add a,a
     add a,a
     add a,a                     ; C = bit10 = 1; chain label is the next bit
-    jp hbit9                    ; 11×11 tail parks mid in D (D is 0)
+    jp bit9
 
 .f16_8080_mulu_32_16x16
     ld a,d
@@ -431,95 +434,6 @@ PUBLIC f16_8080_mulu_32_11x11
     ld bc,hl
     add a,a
     jp bit14                    ; f24: bit 15 always 1
-
-; Packed 11×11: after bit7, D is 0 (product < 2^24).  Park the mid
-; byte in D instead of BC (B is the multiplicand).  `rr e` is not on
-; 8080; C ← E0 then E ← mid, D ← 0.
-.hbit9
-    add hl,hl
-    adc a,a
-    jr NC,hbit8
-    add hl,bc
-    adc a,d
-.hbit8
-    add hl,hl
-    adc a,a
-    jr NC,hbit7
-    add hl,bc
-    adc a,d
-.hbit7
-    ld d,a
-    ld a,e
-    and 0feh
-    add hl,hl
-    adc a,a
-    jr NC,hbit6
-    add hl,bc
-    adc a,0
-.hbit6
-    add hl,hl
-    adc a,a
-    jr NC,hbit5
-    add hl,bc
-    adc a,0
-.hbit5
-    add hl,hl
-    adc a,a
-    jr NC,hbit4
-    add hl,bc
-    adc a,0
-.hbit4
-    add hl,hl
-    adc a,a
-    jr NC,hbit3
-    add hl,bc
-    adc a,0
-.hbit3
-    add hl,hl
-    adc a,a
-    jr NC,hbit2
-    add hl,bc
-    adc a,0
-.hbit2
-    add hl,hl
-    adc a,a
-    jr NC,hbit1
-    add hl,bc
-    adc a,0
-.hbit1
-    add hl,hl
-    adc a,a
-    jr NC,hbit0
-    add hl,bc
-    adc a,0
-.hbit0
-    add hl,hl
-    adc a,a
-    jr C,hfunky
-    ld d,a                      ; park mid (D was 0)
-    ld a,e
-    rra                         ; C ← E0
-    ld e,d
-    ld d,0
-    ret NC
-    add hl,bc
-    ret NC
-    inc e
-    ret NZ
-    inc d
-    ret
-.hfunky
-    inc d                       ; D was 0 → 1
-    ld d,a                      ; park mid
-    ld a,e
-    rra
-    ld e,d
-    ld d,1
-    ret NC
-    add hl,bc
-    ret NC
-    inc e
-    ret
 
 .bit14
     add hl,hl

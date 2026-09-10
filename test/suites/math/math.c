@@ -572,14 +572,17 @@ void test_math16_mul()
     m16_x = (FLOAT)0.5; m16_un = 4u;
     Assert(m16_x * m16_un == (FLOAT)2.0, "half*uint 0.5*4 == 2");
     /* Packed 11×11 last bit: odd mantissa. 8080/8085 used to clobber B
-     * (multiplicand high) while parking the product byte for rra. */
+     * (multiplicand high) while parking the product byte for rra.
+     * Use the same static operands as the rest of this test so 80cc
+     * 8085 does not go through a stack-union `*` (CI compiler). */
     {
         union { FLOAT f; unsigned u; } a, r;
         a.u = 0x3d55u;
-        r.f = a.f * a.f;
-        Assert(r.u == 0x3f1bu, "half sqr odd mant 0x3d55");
         r.f = sqrf16(a.f);
         Assert(r.u == 0x3f1bu, "sqrf16 odd mant 0x3d55");
+        m16_x = a.f;
+        r.f = m16_x * m16_x;
+        Assert(r.u == 0x3f1bu, "half sqr odd mant 0x3d55");
     }
 }
 
