@@ -91,7 +91,12 @@ PUBLIC  m32_compare, m32_compare_callee
 .positive_right
     rr de
 
-    res 0,l             ;remove least significant bit
+    ; z180/z80n/ez80 24x24 omit (c*f)<<0; packed mul can be 1 ulp off.
+    ; Plain Z80 uses three 24x8 terms and keeps the LSB.  Rabbit/KC160
+    ; use a wide integer mul.  8080/8085/gbz80 have a separate compare.
+IF __CPU_Z80N__ | __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__
+    res 0,l             ; remove least significant bit
+ENDIF
 
     exx                 ;left
     sla e
@@ -114,7 +119,9 @@ PUBLIC  m32_compare, m32_compare_callee
 .positive_left
     rr de
 
-    res 0,l             ;remove least significant bit
+IF __CPU_Z80N__ | __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__
+    res 0,l             ; remove least significant bit
+ENDIF
 
     ld a,l
 

@@ -13,7 +13,7 @@ SECTION code_clib
 SECTION code_fp_math32
 
 EXTERN  l_neg_dehl
-EXTERN m32_fszero, m32_fsmax
+EXTERN m32_fsmax
 
 PUBLIC m32_f2slong
 PUBLIC m32_f2ulong
@@ -31,7 +31,7 @@ m32_f2ulong:
     rl e
     rla                         ;a = Exponent
     and a
-    jp Z,m32_fszero             ;exponent was 0, return 0
+    jp Z,f2_izero               ; exp 0: integer 0, not signed IEEE zero
     cp $7e + 32
     jp NC,m32_fsmax             ;number too large
     ; e register is rotated by bit, restore the hidden bit and rotate back
@@ -50,5 +50,13 @@ loop:
     jr NZ,loop
     rl b                        ;check sign bit
     call C,l_neg_dehl
+    ret
+
+; Integer conversion of ±0 / subnormal-as-zero.  m32_fszero keeps the
+; sign in D (0x80000000), which is INT_MIN as a long and breaks
+; sin/cos range reduction of -0 (whetstone module 7: 0.5-0.5 → -0).
+.f2_izero
+    ld de,0
+    ld hl,0
     ret
 

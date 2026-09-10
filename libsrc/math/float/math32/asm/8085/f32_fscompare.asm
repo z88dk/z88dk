@@ -12,6 +12,9 @@
 ; Sign/magnitude + high-word first early-out + no left-copy on callee.
 ;
 ; Exit: Z=equal, NZ=unequal, C=left<right, NC=left>=right, HL=1
+;
+; Low-word: jp C,lr_neg then or c; ret.  Do not or c first (clears C).
+; High-word differ (usual finite path) is still jp NZ,hi_fin.
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -124,9 +127,9 @@ PUBLIC m32_compare, m32_compare_callee
     ld c,a
     ld a,b
     sbc a,h
-    ld b,a
-    or c
-    ret                                 ; C from sbc; Z if equal
+    jp C,lr_neg                         ; C from sbc; high-word path still jp NZ,hi_fin
+    or c                                ; NC: Z if equal
+    ret
 
 .cp_neg
     ; both -: high first R.H - L.H
@@ -153,8 +156,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld c,a
     ld a,b
     sbc a,h
-    ld b,a
-    or c
+    jp C,lr_neg                         ; C from sbc; high-word path still jp NZ,hi_fin
+    or c                                ; NC: Z if equal
     ret
 
 .cp_dsign
@@ -216,8 +219,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld c,a
     ld a,b
     sbc a,h
-    ld b,a
-    or c
+    jp C,lr_neg                         ; C from sbc; high-word path still jp NZ,hi_fin
+    or c                                ; NC: Z if equal
     ret
 
 .cc_neg
@@ -245,8 +248,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld c,a
     ld a,b
     sbc a,h
-    ld b,a
-    or c
+    jp C,lr_neg                         ; C from sbc; high-word path still jp NZ,hi_fin
+    or c                                ; NC: Z if equal
     ret
 
 .cc_dsign

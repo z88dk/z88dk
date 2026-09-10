@@ -12,6 +12,7 @@
 ; Sign/magnitude + high-word first early-out + no left-copy on callee.
 ;
 ; Exit: Z=equal, NZ=unequal, C=left<right, NC=left>=right, HL=1
+; Low-word: jp C,lr_neg then or c; ret.  High-word differ: jp NZ,hi_fin.
 ;
 ; Frame access via ld hl,sp+n and ld r,(hl).  No ld de,sp+* / ld hl,(de).
 
@@ -121,8 +122,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld c,a
     ld a,d
     sbc a,(hl)
-    ld b,a
-    or c
+    jp C,lr_neg                         ; C from sbc; high-word path still jp NZ,hi_fin
+    or c                                ; NC: Z if equal
     ret
 
 .cp_neg
@@ -148,8 +149,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld c,a
     ld a,d
     sbc a,(hl)
-    ld b,a
-    or c
+    jp C,lr_neg                         ; C from sbc; high-word path still jp NZ,hi_fin
+    or c                                ; NC: Z if equal
     ret
 
 .cp_dsign
@@ -206,8 +207,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld c,a
     ld a,d
     sbc a,(hl)
-    ld b,a
-    or c
+    jp C,lr_neg                         ; C from sbc; high-word path still jp NZ,hi_fin
+    or c                                ; NC: Z if equal
     ret
 
 .cc_neg
@@ -232,8 +233,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld c,a
     ld a,d
     sbc a,(hl)
-    ld b,a
-    or c
+    jp C,lr_neg                         ; C from sbc; high-word path still jp NZ,hi_fin
+    or c                                ; NC: Z if equal
     ret
 
 .cc_dsign

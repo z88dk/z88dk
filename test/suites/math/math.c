@@ -78,6 +78,28 @@ void test_comparison()
 
      Assert( a == a, "a == a");
      Assert( !(a != a), "!(a != a)");
+     Assert( !(a < a), "!(a < a)");
+     Assert( !(b > b), "!(b > b)");
+
+     /* Same-sign nearby values (same exponent).  One relational per
+      * Assert: sccz80 && of two float compares can leave 1.0 in DEHL. */
+     {
+          FLOAT p = (FLOAT)8.0;
+          FLOAT q = (FLOAT)9.0;
+          FLOAT r = (FLOAT)1.5;
+          FLOAT s = (FLOAT)(-1.5);
+          Assert( p < q, "8 < 9");
+          Assert( q > p, "9 > 8");
+          Assert( p <= q, "8 <= 9");
+          Assert( q >= p, "9 >= 8");
+          Assert( !(q < p), "!(9 < 8)");
+          Assert( !(p > q), "!(8 > 9)");
+          Assert( (FLOAT)1.0 < r, "1 < 1.5");
+          Assert( r > (FLOAT)1.0, "1.5 > 1");
+          Assert( s < (FLOAT)(-1.0), "-1.5 < -1");
+          Assert( (FLOAT)(-1.0) > s, "-1 > -1.5");
+          Assert( (FLOAT)0.25 < (FLOAT)0.5, "0.25 < 0.5");
+     }
 }
 
 void test_integer_constant_operations()
@@ -549,6 +571,16 @@ void test_math16_mul()
     Assert(m16_n * m16_x == (FLOAT)0.0, "int*half 0*1.5 == 0");
     m16_x = (FLOAT)0.5; m16_un = 4u;
     Assert(m16_x * m16_un == (FLOAT)2.0, "half*uint 0.5*4 == 2");
+    /* Packed 11×11 last bit: odd mantissa. 8080/8085 used to clobber B
+     * (multiplicand high) while parking the product byte for rra. */
+    {
+        union { FLOAT f; unsigned u; } a, r;
+        a.u = 0x3d55u;
+        r.f = a.f * a.f;
+        Assert(r.u == 0x3f1bu, "half sqr odd mant 0x3d55");
+        r.f = sqrf16(a.f);
+        Assert(r.u == 0x3f1bu, "sqrf16 odd mant 0x3d55");
+    }
 }
 
 /* Half-float edges: 10-bit mantissa, MAXLOG ~11.  Dissimilar add, exp
@@ -656,6 +688,39 @@ void test_math32_edges()
     b.u = ((unsigned long)(127-23) << 23);
     r.f = a.f + b.f;
     Assert(r.u == 0x3f800001ul, "1+2^-23");
+
+    /* Same high IEEE word (bits 16..31). 8080-family compare used to
+     * drop C after the low-word sbc, so these relations were all false.
+     * 1 ulp: z180/z80n/ez80 compare still clears mantissa bit 0. */
+#if !defined(__Z180) && !defined(__Z80N) && !defined(__EZ80_Z80)
+    a.u = 0x3f800000ul; /* 1.0 */
+    b.u = 0x3f800001ul; /* 1.0 + ulp */
+    Assert(a.f < b.f, "1.0 < 1.0+ulp");
+    Assert(b.f > a.f, "1.0+ulp > 1.0");
+    Assert(a.f <= b.f, "1.0 <= 1.0+ulp");
+    Assert(b.f >= a.f, "1.0+ulp >= 1.0");
+    Assert(!(a.f > b.f), "!(1.0 > 1.0+ulp)");
+    Assert(!(b.f < a.f), "!(1.0+ulp < 1.0)");
+    a.u = 0xbf800000ul; /* -1.0 */
+    b.u = 0xbf800001ul; /* -1.0 - ulp */
+    Assert(b.f < a.f, "-1.0-ulp < -1.0");
+    Assert(a.f > b.f, "-1.0 > -1.0-ulp");
+#endif
+    a.f = (FLOAT)9999.0;
+    b.f = (FLOAT)10000.0;
+    Assert(a.f < b.f, "9999 < 10000");
+    Assert(b.f > a.f, "10000 > 9999");
+    Assert(!(a.f > b.f), "!(9999 > 10000)");
+    Assert(!(b.f < a.f), "!(10000 < 9999)");
+
+    /* f2sint(±0) must be integer 0, not signed IEEE zero (0x80000000).
+     * That INT_MIN broke SDCC sin/cos range reduction of -0, which is
+     * how z80 whetstone module 7 (0.5-0.5) went to Inf. */
+    a.u = 0x80000000ul; /* -0 */
+    r.f = cos(a.f);
+    Assert(r.u == 0x3f800000ul, "cos(-0) is +1");
+    r.f = sin(a.f);
+    Assert(r.u == 0x80000000ul, "sin(-0) is -0");
 
     /* |x|>=128 uses fmod(2π). 128 is exact and is the gate (biased exp 134).
      * One relational per Assert: sccz80 && of two float compares can leave
