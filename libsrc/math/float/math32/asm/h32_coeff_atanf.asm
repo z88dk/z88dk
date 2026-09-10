@@ -33,7 +33,7 @@ PUBLIC _m32_coeff_atan
 
 ._m32_coeff_atan
 DEFQ 0x00000000;       +4.2012834e-19 or approximately 0.0
-DEFQ 0x3F800000;       +1.0000081e+0  or approximately 1.0
+DEFQ 0x3F800044;       +1.0000081e+0  (RNE; not 1.0)
 DEFQ 0xB9BBC722;       -3.5815786e-4
 DEFQ 0xBEA8003A;       -3.2812673e-1
 DEFQ 0xBD0E21F5;       -3.4700353e-2

@@ -732,6 +732,7 @@ void test_math32_edges()
     Assert(r.f >= (FLOAT)(-1.0), "cos(128) >= -1");
     Assert(r.f <= (FLOAT)1.0, "cos(128) <= 1");
 
+    Assert(approx_equal(atan((FLOAT)1.0), (FLOAT)M_PI_4, EPSILON), "atan(1) is pi/4");
     Assert(approx_equal(acos((FLOAT)(-1.0)), (FLOAT)M_PI, EPSILON), "acos(-1) is pi");
     Assert(approx_equal(acos((FLOAT)(-0.5)), (FLOAT)(2.0*M_PI/3.0), (FLOAT)0.00001), "acos(-0.5) is 2pi/3");
     Assert(approx_equal(asin((FLOAT)1.0), (FLOAT)M_PI_2, EPSILON), "asin(1) is pi/2");
