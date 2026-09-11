@@ -86,7 +86,7 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
     unsigned c;
 
     if ((!dumpmode) || ctrl < 3)
-        printf("SPECIAL %-20s", ctrl_name[ctrl]);
+        printf("SPECIAL %-20s  ", ctrl_name[ctrl]);
 
     if (ctrl >= 5 && ctrl <= 14)
     {
@@ -96,6 +96,9 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
         if (dumpmode) printf("  type=%u value=%04X",
                atype,
                value);
+
+        if ((dumpmode) || ((ctrl<=13) && (ctrl>=8))) printf("$%04X", value);
+
     }
 
     if (ctrl <= 8)
