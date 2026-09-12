@@ -18,16 +18,16 @@ PUBLIC asm_am9511_discardfraction
 ; Exit:  dehl = 32 bit float without fractional part
 ;        NC = already integer (result equals input)
 ;        C  = fractional part was discarded
+;
+; 8085 RDEL does not write Z. Take the exponent with adc a,a so
+; DEHL stays packed until a mask is required.
 
 .asm_am9511_discardfraction
-    push de                     ; keep sign and exponent safe
-    push hl                     ; keep mantissa safe
-
-    rl de                       ; get exponent in d
-
-    ld a,d                      ; exponent
-    or a
-    jp Z,zero_legal             ; exp 0 -> signed zero, NC
+    ld a,e
+    rla
+    ld a,d
+    adc a,a                     ; A = exp, C = sign, Z iff exp=0
+    jp Z,zero_legal
 
     sub $7f                     ; exponent value of 127 is 1.xx
     jp C,return_zero            ; |x| < 1 -> signed zero, C
@@ -36,12 +36,12 @@ PUBLIC asm_am9511_discardfraction
     cp 24
     jp NC,shift_none            ; |x| >= 2^23: already integer, NC
 
-                                ; build mask of integer bits
-                                ; a = number of bits to keep
+    push de                     ; original packed
+    push hl
+
     ld hl,0
     ld e,l
-
-    ld d,a                      ; use d for loop counter
+    ld d,a                      ; bits to keep
 
 .shift_right                    ; shift mantissa mask right
     scf                         ; by setting 1s as we go
@@ -75,7 +75,7 @@ PUBLIC asm_am9511_discardfraction
     ld e,a
     cp c
     jp NZ,frac_done
-    ld d,b                      ; get original sign and exponent
+    ld d,b                      ; original sign and exponent
     or a                        ; NC: unchanged
     ret
 
@@ -90,29 +90,20 @@ PUBLIC asm_am9511_discardfraction
     ret
 
 .shift_none
-    pop hl                      ; return mantissa
-    pop de                      ; return sign and exponent
-    or a                        ; NC
+    or a                        ; NC, DEHL original
     ret
 
 .return_zero
-    pop hl                      ; balance stack
-    pop de
-
-    ld a,d                      ; get the sign bit
+    ld a,d                      ; sign from original
     rla
-
     ld de,0
     ld hl,de
-
-    rra                         ; return sign and exponent
+    rra
     ld d,a
     scf                         ; C: discarded fraction
     ret
 
 .zero_legal
-    pop hl
-    pop de
     ld a,d
     rla
     ld de,0

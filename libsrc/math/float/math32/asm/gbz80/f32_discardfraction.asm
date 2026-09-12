@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; gbz80 m32_discardfraction — rl de expanded through A.
+; gbz80 m32_discardfraction
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -14,119 +14,101 @@ SECTION code_fp_math32
 
 PUBLIC m32_discardfraction
 
+; Entry: dehl = 32 bit float
+; Exit:  dehl = 32 bit float without fractional part
+;        NC = already integer (result equals input)
+;        C  = fractional part was discarded
+;
+; rla forces Z=0. Take the exponent with adc a,a so DEHL stays
+; packed until a mask is required. No ex de,hl.
+
 .m32_discardfraction
     ld a,e
     rla
-    ld e,a
     ld a,d
-    rla
-    ld d,a                          ; D = exp, C = sign (rla does not set Z)
-    push af
-    ld a,d
-    or a
+    adc a,a                     ; A = exp, C = sign, Z iff exp=0
     jp Z,zero_legal
-    pop af
 
-    ld a,d
-    push af
-    ld a,d
-    rra
-    ld d,a
-    ld a,e
-    rra
-    ld e,a
-    pop af
-
-    sub $7f
-    jr C,return_zero
+    sub $7f                     ; exponent value of 127 is 1.xx
+    jp C,return_zero            ; |x| < 1 -> signed zero, C
 
     inc a
     cp 24
-    jr C,mask_frac
-    or a
-    ret
+    jp NC,shift_none            ; |x| >= 2^23: already integer, NC
 
-.mask_frac
-    ld b,a                      ; n bits to keep
-    push de
-    push hl
-    push de
+    push de                     ; original packed
     push hl
 
     ld hl,0
-    ld c,0
-.sr
-    scf
-    ld a,c
-    rra
-    ld c,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    dec b
-    jr NZ,sr
+    ld e,l
+    ld d,a                      ; bits to keep
 
-    push hl                    ; DE=mask15
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
-    pop de
-    ld a,c                      ; A=mask23
-    pop hl                      ; HL0
-    ld c,a
-    ld a,l
-    and e
-    ld l,a
-    ld a,h
-    and d
-    ld h,a
-    pop de                      ; DE0
+.shift_right
+    scf
     ld a,e
-    and c
+    rra
     ld e,a
-    pop bc                      ; BC = HL0
-    ld a,l
-    cp c
-    jr NZ,ch_pop
     ld a,h
-    cp b
-    jr NZ,ch_pop
-    pop bc                      ; BC = DE0
-    ld a,e
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    dec d
+    jp NZ,shift_right
+
+    pop bc                      ; orig HL
+    ld a,c
+    and l
+    ld l,a
     cp c
-    jr NZ,ch
-    ld a,d
+    jp NZ,frac_pop_de
+    ld a,b
+    and h
+    ld h,a
     cp b
-    jr NZ,ch
-    or a                        ; NC identical
+    jp NZ,frac_pop_de
+
+    pop bc                      ; orig DE
+    ld a,c
+    and e
+    ld e,a
+    cp c
+    jp NZ,frac_done
+    ld d,b                      ; original sign and exponent
+    or a                        ; NC: unchanged
     ret
 
-.ch_pop
-    pop bc
-.ch
-    scf
+.frac_pop_de
+    pop bc                      ; orig DE
+    ld a,c
+    and e
+    ld e,a
+.frac_done
+    ld d,b
+    scf                         ; C: fraction discarded
+    ret
+
+.shift_none
+    or a                        ; NC, DEHL original
     ret
 
 .return_zero
-    ld a,d
-    rla                         ; sign -> C
-    ld d,0
-    ld e,d
+    ld a,d                      ; sign from original
+    rla
+    ld de,0
     ld hl,de
-    ld a,d
     rra
     ld d,a
     scf
     ret
 
 .zero_legal
-    pop af                          ; C = sign, D = 0
-    ld e,d
-    ld hl,de
     ld a,d
+    rla
+    ld de,0
+    ld hl,de
     rra
     ld d,a
-    or a                            ; NC
+    or a                        ; NC: already integer zero
     ret
