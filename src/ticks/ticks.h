@@ -409,6 +409,8 @@ extern void i8085_ld_de_spn(uint8_t opcode);
 extern void i8085_ld_hl_ide(uint8_t opcode);
 extern void i8085_ld_ide_hl(uint8_t opcode);
 extern void i8085_sub_hl_bc(uint8_t opcode);
+extern void i8085_rl_de(uint8_t opcode);
+extern void i8085_sra_hl(uint8_t opcode);
 
 /* KR580VM1 */
 extern int  vm1_mf;

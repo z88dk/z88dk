@@ -25,7 +25,7 @@ separate `--math32_8085` flag).
 | Tree | Role |
 |------|------|
 | `asm/z80/` | Z80-family cores; shared by z80n/z180/ez80_z80/r2ka/… when the lst points here |
-| `asm/8085/` | Stack-only 8085 cores (no EXX / IX / IY); extended opcodes + synthetics |
+| `asm/8085/` | Stack-only 8085 cores (no EXX / IX / IY); extended opcodes + synthetics. After `rl de`, test exp with `inc d`/`dec d` — RDEL does not write Z |
 | `asm/8080/` | Stack-only 8080 cores (original ISA; no 8085 extras). `ld hl,sp+n`; park HL |
 | `asm/gbz80/` | Stack-only Game Boy cores (`ld hl,sp+*`, `bit 7` leading-one; no cheap `ex`) |
 | `c/z80/`, `c/8085/`, `c/8080/`, `c/gbz80/` | Higher functions (C → precompiled asm); 8080/8085/gbz80 higher via **sccz80 only** |

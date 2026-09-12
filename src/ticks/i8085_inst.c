@@ -91,3 +91,34 @@ void i8085_sub_hl_bc(uint8_t opcode)
     SUBHLRR(b,c);
     st += 10;
 }
+
+/* RDEL: 16-bit rotate left through C.  Flags -----VC (pastraiser).
+   Z80 CB RL writes Z.  8085 RDEL does not.  Z/S/K stay in fr/ff/fk. */
+void i8085_rl_de(uint8_t opcode)
+{
+    unsigned int t = (d << 9) | (e << 1) | (ff >> 8 & 1);
+
+    e = t & 255;
+    d = (t >> 8) & 255;
+    ff = (ff & 255) | ((t >> 8) & 256);
+    fb = (fb & 128) | ((fa ^ fr) & 16);
+    st += 10;
+    (void)opcode;
+}
+
+/* ARHL: arithmetic right shift HL.  Flags -----0C (pastraiser).
+   C ← old L.0, V ← 0, H bit 7 kept.  Z80 CB SRA/RR write Z. */
+void i8085_sra_hl(uint8_t opcode)
+{
+    unsigned int cbit = l & 1;
+    unsigned int new_l = ((h & 1) << 7) | (l >> 1);
+    unsigned int new_h = (h & 0x80) | (h >> 1);
+
+    l = new_l;
+    h = new_h;
+    ff = (ff & 255) | (cbit << 8);
+    fb = (fb & 128) | ((fa ^ fr) & 16);
+    fk = 0;
+    st += 7;
+    (void)opcode;
+}

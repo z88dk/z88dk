@@ -63,7 +63,7 @@ Flags column: **SZKAPVC**.
 
 | Op | Zilog | Intel | B | Cyc | Flags | Notes |
 |----|-------|-------|---|-----|-------|-------|
-| 10 | sra hl | ARHL | 1 | 7 | -----0C | undoc; bit15 preserved; C←old bit0; V←0 |
+| 10 | sra hl | ARHL | 1 | 7 | -----0C | undoc; bit15 preserved; C←old bit0; V←0; Z unchanged |
 | 11 | ld de,** | LXI D,d16 | 3 | 10 | ------- | |
 | 12 | ld (de),a | STAX D | 1 | 7 | ------- | |
 | 13 | inc de | INX D | 1 | 6 | --K---- | |
@@ -71,7 +71,7 @@ Flags column: **SZKAPVC**.
 | 15 | dec d | DCR D | 1 | 4 | SZKAPV- | |
 | 16 | ld d,* | MVI D,d8 | 2 | 7 | ------- | |
 | 17 | rla | RAL | 1 | 4 | -----VC | |
-| 18 | rl de | RDEL | 1 | 10 | -----VC | undoc; 16-bit rotate left through C |
+| 18 | rl de | RDEL | 1 | 10 | -----VC | undoc; 16-bit rotate left through C; Z unchanged |
 | 19 | add hl,de | DAD D | 1 | 10 | -----VC | |
 | 1A | ld a,(de) | LDAX D | 1 | 7 | ------- | |
 | 1B | dec de | DCX D | 1 | 6 | --K---- | |

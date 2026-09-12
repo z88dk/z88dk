@@ -134,8 +134,8 @@ Use Zilog in all generated/edited z88dk code. Intel names appear in fixtures and
 | Op | Intel | Zilog | Bytes | Cycles | Flags (SZKAPVC) | Effect |
 |----|-------|-------|-------|--------|-----------------|--------|
 | `08` | DSUB | `sub hl,bc` | 1 | 10 | `SZKAPVC` | HL ← HL − BC |
-| `10` | ARHL | `sra hl` | 1 | 7 | `-----0C` | Arithmetic right shift HL; V←0 |
-| `18` | RDEL | `rl de` | 1 | 10 | `-----VC` | Rotate DE left through C |
+| `10` | ARHL | `sra hl` | 1 | 7 | `-----0C` | Arithmetic right shift HL; V←0; Z unchanged |
+| `18` | RDEL | `rl de` | 1 | 10 | `-----VC` | Rotate DE left through C; Z unchanged |
 | `28` | LDHI d8 | `ld de,hl+*` | 2 | 10 | `-------` | DE ← HL + unsigned * |
 | `38` | LDSI d8 | `ld de,sp+*` | 2 | 10 | `-------` | DE ← SP + unsigned * |
 | `CB` | RSTV | `rst v` | 1 | 12/6 | `-------` | If V set: push PC, PC←40h |
@@ -159,8 +159,8 @@ These are **not** standard Z80 opcodes at those encodings (Z80 uses `CB`/`DD`/`E
 | `daa` | `SZKAPVC` | |
 | `cpl` | `-------` | **No flags** (Z80 `cpl` sets H,N) |
 | `sub hl,bc` (undoc) | `SZKAPVC` | Full set |
-| `sra hl` (undoc) | `-----0C` | V←0, C from bit 0 |
-| `rl de` (undoc) | `-----VC` | V and C |
+| `sra hl` (undoc) | `-----0C` | V←0, C from bit 0, **Z unchanged** |
+| `rl de` (undoc) | `-----VC` | V and C, **Z unchanged** |
 | `scf` | `------1` | C←1 |
 | `ccf` | `------C` | C toggled |
 | `pop af` | `SZKAPVC` | Restores **all** flags including K,V. Bit 3 stays 0 |
@@ -233,8 +233,8 @@ Background: [8085 Software — Extended Instructions](https://feilipu.me/2021/09
 | `ld de,hl+*` | DE ← HL + unsigned offset (struct/buffer) | Same unsigned rule |
 | `ld hl,(de)` / `ld (de),hl` | 16-bit load/store through DE | Not Z80 prefix encodings |
 | `sub hl,bc` | 16-bit subtract; **== / !=**; signed compares with K | **No borrow-in**; not multi-word subtract chains |
-| `sra hl` | Signed 16-bit arithmetic right shift | Clears V; C ← old bit 0 |
-| `rl de` | Rotate DE left through C; ×2 on DE; 32-bit with HL | Pair with `add hl,hl` / `ex de,hl` as needed |
+| `sra hl` | Signed 16-bit arithmetic right shift | V←0; C ← old bit 0; **Z unchanged** — never `sra hl; jp z` |
+| `rl de` | Rotate DE left through C; ×2 on DE; 32-bit with HL | **Z unchanged** — never `rl de; jp z`. Pair with `add hl,hl` |
 | `jp k,**` / `jp nk,**` | After 16-bit `dec`; signed compare outcomes | K after `dec rp` sets on **−1**, not on **0** |
 | `rst v` | Branch to handler if V set | Vector **0040h** must exist |
 
@@ -507,7 +507,7 @@ Other common synthetics (not pair-copy): e.g. `ld a,(hl+)` (load + inc index).
 3. **K ≠ Z on 16-bit dec** — pre-dec + `jp k`/`jp nk`.
 4. **Offsets on `ld de,sp+*` / `ld de,hl+*` are unsigned.**
 5. **`rst v`** only if **0040h** is defined.
-6. **`rla` / `rra` / `rlca` / `rrca` do not set Z** — never `rla; jp z,...`. Test with `or a` / `and a` / explicit mask first, or use `inc`/`dec` on a copy.
+6. **Rotates do not write Z** (pastraiser). `rla` / `rlca` / `rl de` = `-----VC`. `rra` / `rrca` / `sra hl` = `-----0C`. Never `rl de; jp z` or `sra hl; jp z`. Z80 CB `RL` / `SRA` do write Z. Test with `or a` / `and a`, or `inc r` / `dec r` / `jp z` (C kept).
 7. **No `exx`, IX, IY, native `djnz` / native `jr`.** `jr` **is allowed** in normal mode (→ `jp`; shared Z80 source). Strict: write `jp`. Second long operand on stack; counted loops via `dec b`/`jr nz` or K pre-dec (§5).
 8. **Forward overlapping stack copy corrupts** — see multi-word frame rebuild above.
 9. **No copt pass on library asm** — hand-written `libsrc/**` is assembled as-is. Remove copy-backs (`ld r,a` then `ld a,r`) and other dead moves yourself. Match the **target file’s** whitespace (spaces vs tabs); do not reformat to sccz80/copt tab style. **Before finalising** any hand-coded math16/math32 (or similar) edit: scan for copt-equivalent wins (`ex de,hl` / `ld bc,hl` instead of push/pop transfers; drop `ld a,e` after `ld e,a`; pair zeros → `ld hl,0`; etc.) and run the matching suite. Do **not** use `xor a` for `ld a,0` when CF must survive. Full checklist: **`tool-copt`** and **`methodology-measure`** (“Before finalising hand-coded library work”).

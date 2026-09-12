@@ -15,8 +15,10 @@ SECTION code_fp_math32
 PUBLIC m32_discardfraction
 
 .m32_discardfraction
-    rl de
-    jr Z,zero_legal
+    rl de                       ; D = exp, C = sign
+    inc d
+    dec d
+    jp Z,zero_legal
 
     ld a,d
     push af

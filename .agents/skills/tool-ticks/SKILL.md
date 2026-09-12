@@ -64,6 +64,17 @@ Run **`z88dk-ticks`** with no arguments to print usage.
 
 Wrong CPU model → wrong illegal-opcode behaviour and wrong timings. Always match `-m…` to the binary.
 
+### 8085 extended flags (pastraiser)
+
+Do **not** emulate these with Z80 CB rotate macros. Those macros write **Z**. Silicon does not.
+
+| Op | Flags (SZKAPVC) | Wrong ticks path |
+|----|-----------------|------------------|
+| `rl de` (RDEL) | `-----VC` | CB `RL e` / `RL d` |
+| `sra hl` (ARHL) | `-----0C` | CB `SRA h` / `RR l` |
+
+A `jp z` after either op uses a **stale Z**. Implement in `i8085_rl_de` / `i8085_sra_hl`.
+
 ### Corrected names (old wiki was wrong)
 
 | Old wiki text | Live tool |

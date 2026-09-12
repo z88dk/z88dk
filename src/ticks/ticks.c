@@ -1509,13 +1509,8 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x18: // JR
         if ( isvm1() ) vm1_dsub(d, e);   // (VM1) SUB/SBC HL,DE (DSUB D)
-        else if ( is8085() ) { // (8085) RL DE (RDEL)
-          long long savest = st;
-          RL(e,e);
-          RL(d,d);
-          st = savest;
-          st+=10;
-        } else if ( is8080() ) {
+        else if ( is8085() ) i8085_rl_de(opc); // (8085) RL DE (RDEL)
+        else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 opcode JR\n",pc-1);
           st+=4;
         } else {
@@ -1595,9 +1590,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           vm1_memop(opc);
           break;
         } else if ( is8085() ) {   // (8085) SRA HL (ARHL)
-          SRA(h,h);
-          RR(l,l);
-          st += (-16 + 7);
+          i8085_sra_hl(opc);
           break;
         } else if ( isgbz80() ) {  // STOP
           t = get_memory_inst(pc++);    // collect and ignore 00 byte
