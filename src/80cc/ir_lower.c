@@ -914,104 +914,35 @@ static int hlde_full_reload(const char *s, const char *pair)
 }
 
 /* ---- branch relaxation: `jp` -> `jr` for in-range local targets ---------- */
-/* 80cc renders every CFG branch as a 3-byte `jp` because the displacement is
-   unknown at render time, and NOTHING downstream recovers it: copt has no
-   addresses, and z80asm only ever WIDENS (`-opt-speed` turns `jr` into `jp`;
-   an out-of-range `jr` is a hard "integer range" error, never auto-widened).
-   So every in-range branch costs a byte. This pass converts them, using an
-   UPPER BOUND on the span: an exact size model is impossible to maintain
-   (z88dk synthetics differ per CPU — `ld hl,(ix+d)` is synthetic on z80 but
-   native on ez80/kc160/rabbit — and r4k moves much of the main page behind a
-   0x7f prefix), but an upper bound only ever costs us a conversion, never
-   correctness. Getting it wrong is a LOUD assembler error, not a miscompile.
+/* 80cc renders every CFG branch as a 3-byte `jp`: the displacement is unknown
+   at render time and nothing downstream recovers it (copt has no addresses, and
+   z80asm only ever WIDENS). This pass converts the in-range ones.
 
-   The bound is one table with no per-CPU branches: each entry is the worst
-   case over ALL targets, validated against real z80asm listings on
-   z80/z80n/z180/ez80/gbz80/rabbit/r4k/kc160. `call` is charged 8 rather than 3
-   because copt runs AFTER us and its only code-GROWING rules are call
-   substitutions (`z80rules.9`'s intrinsic inlining, the per-CPU `l_gint`/
-   `l_pint`/`l_long_aslo` helper inlining) — charging every call its worst case
-   makes the bound valid post-copt without modelling copt at all.
+   The span model is an UPPER BOUND, one table with no per-CPU branches, because
+   an exact one is unmaintainable — z88dk synthetics differ per CPU (`ld hl,(ix+d)`
+   is synthetic on z80, native on ez80/kc160/rabbit) and r4k moves much of the
+   main page behind a 0x7f prefix. Over-estimating only costs a conversion;
+   under-estimating would be a LOUD assembler error, never a miscompile.
+   `call` is charged 8 rather than 3 because copt runs after us and its only
+   code-GROWING rules are call substitutions — charging the worst case keeps the
+   bound valid post-copt without modelling copt.
 
-   Ticks: `jr cc` is 12 T taken / 7 T not-taken vs `jp cc`'s flat 10 T, and an
-   unconditional `jr` is a flat +2 T. So the ONLY conversion that cannot pay for
-   itself is one that is always taken — which is exactly the unconditional jump.
-   Excluding those (and only those) is what makes this a win on both axes; on
-   z80 it takes the aggregate from −0.167 % to −0.458 % ticks and cuts the
-   slower cells from 10 to 4 (worst +0.18 %), for roughly half the bytes. The
-   exclusion was once qualified by loop depth; the block below says why it no
-   longer is. Two structural proxies were tried and REFUTED first — do not
-   retry:
-     - forward-only (skip back edges): 13 slower cells instead of 15. A taken
-       FORWARD guard costs the same +2 T, so direction is not taken-ness.
-     - skip everything at max loop depth: no tick change at all (the hot branch
-       in a nested loop sits at depth 1, not max); and skipping every in-loop
-       branch leaves just −8 B corpus-wide — the bytes ARE in the loops, so
-       there is no free lunch to be had by excluding loops wholesale.
-
-   DEFAULT-ON; `IR_JR=0` opts out (byte-identical to the pre-relaxation
-   compiler). Regression: test/suites/long_ir/jrelax.c. */
+   DEFAULT-ON; `IR_JR=0` opts out. Regression: test/suites/long_ir/jrelax.c. */
 static int relax_uc = -1;
-/* The one conversion that cannot pay for itself is an always-taken branch, and
-   the paragraph above prices that from the Z80's timings. It is not a universal
-   fact. An unconditional `jr` is +2 T on z80 but CHEAPER than `jp` on the
-   gameboy (12 cycles vs 16) and on z180 (8 vs 9), and free on kc160 — so the
-   question is per-CPU, and on the CPUs that pay the +2 T the answer is a flat
-   NO. An unconditional jump is always taken WHEREVER it stands, so there is no
-   sub-case to carve out; the loop-depth qualifier this rule used to carry is
-   gone, and §3 below records what it cost.
+/* Whether to relax UNCONDITIONAL jumps is a per-CPU question, and the answer
+   follows the `jr`-vs-`jp` timing rather than the byte saving (which is always
+   1 B in our favour). An unconditional jump is taken every time it is reached,
+   so it cannot amortise a slower form:
 
-   1. Relaxing unconditional jumps on z80 IS worth real bytes, and it is a
-      byte-for-tick trade the corpus rejects. Whole bench corpus, both frame
-      modes, `IR_JR_UNCOND=1` vs default:
+     z80 / z80n   `jr` +2 T over `jp`      -> do NOT relax (bytes cost ticks)
+     z180         8 T vs 9                 -> relax
+     gbz80        12 T vs 16               -> relax
+     rabbit       5 T (2k/3k) / 6 (4k/6k) vs `jp` 7  -> relax
+     ez80, kc160  no penalty               -> relax
 
-        SIZE   z80 -211 B, z80n -211 B, r2ka/r4k/r6k -239 B each; 55 of 58
-               cells smaller, ZERO larger. emu.c -142 B sp / -169 B fp.
-        TICKS  z80 +0.148 % sp / +0.166 % fp — 58 of 58 cells SLOWER, none
-               faster. Worst listbench +1.30 %, ptrbench +0.91 %, rle +0.90 %.
-
-      A single-bench figure will understate this badly: predbench alone reads
-      +0.028 %, five times under the aggregate, and it is the second-quietest
-      bench in the set. Measure the corpus.
-
-   2. Two finer rules were tried and REFUTED. Both relaxed an in-loop
-      unconditional jump only where it CROSSES a loop boundary — a jump that
-      leaves or enters a nest runs once per loop entry, not once per iteration.
-      Either way every cell stayed slower, so the trade only got cheaper, never
-      free: crossing-in-either-direction kept 51 % of the bytes for +0.031 %,
-      leaving-only kept 19 % for +0.011 %. They also inherited a wrong loop
-      model — the back-edge-span depth approximation counts a diamond JOIN as a
-      back edge (charbench `schar_mix`: the arm laid out after the join makes
-      the join look one level deeper), so the genuine back edge read as
-      "leaves the nest" and got relaxed. Any retry needs real natural loops.
-
-   3. The loop-depth qualifier that used to allow relaxation OUTSIDE a loop
-      bought 3 bytes over the whole corpus (3 sites) and 11-14 B on emu.c, and
-      cost 25 622 ticks on predbench alone — `sat()` is a loop-free leaf called
-      from a hot loop, so its jumps are cold by loop depth and hot in fact.
-      Depth is a per-function property and call frequency is not. Dropping the
-      qualifier: 2 benches faster, 0 slower, +3 B.
-
-   4. RABBIT RELAXES, and it is the one CPU here where doing so is free money.
-      The figures that once excluded it (+3.15 % r2ka, +3.05 % r4k) were an
-      EMULATOR artifact: `src/ticks/ticks.c` gave no `JR` form an `israbbit()`
-      arm, so rabbit paid the z80's 12/7 for its cheapest branch, while `JP nn`
-      read 3 through a shadowed clause. Rabbit `jr` is 5 clocks on the
-      2000/3000 and 6 on the 4000/6000 against `jp`'s flat 7 — CHEAPER in both
-      bytes and clocks, unlike z80. With the emulator fixed, remeasured over
-      the corpus in both frame modes:
-
-        SIZE   r2ka -121 B sp / -124 B fp, r4k and r6k the same;
-               29 of 29 benches smaller, ZERO larger, on every variant
-        TICKS  r2ka -0.342 % sp / -0.336 % fp, r4k -0.168 % / -0.164 %,
-               r6k -0.171 % / -0.167 %
-               174 of 174 cells FASTER, ZERO slower
-
-      r4k/r6k gaining exactly half of r2ka's ticks is the 1-clock-vs-2-clock
-      saving per converted jump showing through, which is the check that the
-      win is the branch and not something else.
-
-   `IR_JR_UNCOND=1` forces relaxation on anywhere, `=0` off. */
+   Conditional branches are relaxed everywhere: `jr cc` is 12 T taken / 7 not
+   taken against `jp cc`'s flat 10, so the not-taken path pays for the rest.
+   `IR_JR_UNCOND=1` forces it on anywhere, `=0` off. */
 static int relax_uncond_ok(void)
 {
     if (relax_uc < 0) {
@@ -1496,32 +1427,25 @@ static int de_forward_needed(char **lines, int n, int start, int *readerp)
 static int xline_c_call(const char *line);
 
 /* ---- [IR_DELIVE_PROBE] inert sizing of the DE-liveness opportunity --------
-   The park sweep above keeps a DE park alive whenever it cannot prove the old
-   pair dead, and instr_effects marks BOTH a branch and a call as READING DE
-   (a successor may read it; __sdcccall(1) passes arguments in it). BC and F
-   were freed of exactly those two blanket assumptions -- see bc_live_at_labels
-   and xline_c_call -- and DE is the register that has not been.
+   instr_effects marks both a branch and a call as READING DE (a successor may
+   read it; __sdcccall(1) passes arguments there), so the park sweep keeps a
+   park whenever it cannot prove the old pair dead. BC and F were freed of those
+   blanket assumptions; DE has not been. This walks forward from each park and
+   records the FIRST thing that ends the walk — an upper bound on what any
+   liveness improvement could recover:
 
-   Before building that, size it. This walks FORWARD from each park and records
-   the FIRST thing that ends the walk, which is an upper bound on what any
-   liveness improvement could recover: a park whose old DE is genuinely read by
-   straight-line code is needed whatever the sweep learns about branches.
-
-     READ    a real read of a still-live half   -- park is NEEDED, unrecoverable
-     CCALL   `call _sym` with no read before it -- recoverable IF the convention
-                                                   at that site passes nothing in DE
-     XCALL   any other call/rst                 -- asm linkage, stays conservative
-     BRANCH  jp/jr/djnz to a label              -- recoverable via a DE fixpoint
-     LABEL   fell into a label                  -- ditto (needs the join's answer)
-     RET     a return                           -- reads DE only when the function
-                                                   returns a long/float (DE:HL)
-     DEAD    both halves overwritten unread     -- the sweep already drops these
+     READ    real read of a live half  — needed, unrecoverable
+     CCALL   `call _sym`, no read yet  — recoverable if that convention passes
+                                         nothing in DE
+     XCALL   any other call/rst        — asm linkage, stays conservative
+     BRANCH  jp/jr/djnz to a label     — recoverable via a DE fixpoint
+     LABEL   fell into a label         — ditto
+     RET     a return                  — reads DE only for a long/float result
+     DEAD    both halves overwritten   — the sweep already drops these
      END     ran off the buffer
 
-   Counts both the 8085 slot-load park (de_park_group, the only one the sweep
-   rewrites today) and every GENERIC `push de` ... `pop de` group, to say whether
-   the opportunity is 8085-only. Nothing is rewritten; IR_DELIVE_PROBE=2 lists
-   each park with its class. */
+   Covers the 8085 slot-load park and every generic `push de`/`pop de` group, to
+   say whether the opportunity is 8085-only. IR_DELIVE_PROBE=2 lists each. */
 enum { DPB_READ, DPB_CCALL, DPB_XCALL, DPB_BRANCH, DPB_LABEL, DPB_RET,
        DPB_DEAD, DPB_END, DPB_NCLASS };
 static const char *const dpb_name[DPB_NCLASS] =
@@ -2301,6 +2225,530 @@ static int retthread_parts(const char *l, char *cc, size_t ccsz, int *bb)
     return 1;
 }
 
+/* ---- tail merging (cross-jumping) --------------------------------------- */
+/* Tail merging: an identical run of instructions ending at an UNCONDITIONAL
+   terminator is kept once, and every other copy becomes a `jp` to it.
+   Two rules, both of which miscompile if broken:
+     - the terminator must be UNCONDITIONAL — replacing a conditional tail
+       redirects its fall-through too, and the sites do not share that;
+     - per-function only — `#pragma codeseg` and NONBANKED put two functions of
+       one module in different BANKS, where a cross-function `jp` breaks.
+   Placed after the peepholes (needs final text), before relaxation (so the
+   inserted `jp` can still become a `jr`).
+
+   DEFAULT-ON; `--opt-disable=tail-merge` or `IR_TAILMERGE=0` opts out,
+   byte-identical to the pre-flip compiler. It is a byte-for-cycle trade: the
+   bytes are saved once, the ~10 T of the inserted `jp` is paid per execution.
+   Regression: test/suites/long_ir/tailmerge.c. */
+static int tm_on = -1;
+static int tail_merge_enabled(void)
+{
+    if (tm_on < 0) {
+        const char *e = getenv("IR_TAILMERGE");
+        tm_on = (e && e[0] == '0') ? 0 : !opt_disabled("tail-merge");
+    }
+    return tm_on;
+}
+
+/* Minimum BYTES one merge must save. The `jp` costs ~10 T per execution and
+   saves its bytes once, so this floor is a floor on the bytes-per-cycle rate. */
+static int tm_mingain = -1;
+static int tail_merge_min_gain(void)
+{
+    if (tm_mingain < 0) {
+        const char *e = getenv("IR_TM_MINGAIN");
+        tm_mingain = (e && e[0]) ? atoi(e) : 1;
+        if (tm_mingain < 1) tm_mingain = 1;
+    }
+    return tm_mingain;
+}
+
+/* An instruction line: indented, lowercase mnemonic, not a directive. */
+static int tm_is_insn(const char *l)
+{
+    const char *s = l;
+    while (*s == '\t' || *s == ' ') s++;
+    if (s == l) return 0;                        /* column 0: label / defc */
+    if (*s < 'a' || *s > 'z') return 0;
+    if (!strncmp(s, "def", 3)) return 0;
+    return 1;
+}
+
+/* A run may not span this line: control can arrive at a label, and data
+   directives are not code. C_LINE, blanks and comments are transparent. */
+static int tm_is_barrier(const char *l)
+{
+    if (l[0] == '\n' || l[0] == '\r' || l[0] == ';' || l[0] == '\0') return 0;
+    if (l[0] != '\t' && l[0] != ' ') return 1;   /* column 0 => label or defc */
+    const char *s = l;
+    while (*s == '\t' || *s == ' ') s++;
+    if (!strncmp(s, "C_LINE", 6)) return 0;
+    if (*s >= 'a' && *s <= 'z' && strncmp(s, "def", 3)) return 0;  /* instruction */
+    return 1;                                    /* defb/defw/SECTION/... */
+}
+
+/* `ret`, `jp X`, `jr X`, `jp (hl)` — but not `ret cc`, `jp cc,X` or `djnz`.
+   Spelled out, not pattern-matched: getting it wrong is a silent miscompile. */
+static int tm_is_uncond_term(const char *l)
+{
+    const char *s = l;
+    while (*s == '\t' || *s == ' ') s++;
+    if (!strncmp(s, "ret", 3)) {
+        const char *p = s + 3;
+        while (*p == '\t' || *p == ' ') p++;
+        return (*p == '\n' || *p == '\r' || *p == '\0' || *p == ';');
+    }
+    if (strncmp(s, "jp", 2) && strncmp(s, "jr", 2)) return 0;
+    const char *p = s + 2;
+    if (*p != '\t' && *p != ' ') return 0;        /* `jrxx`, not `jr` */
+    while (*p == '\t' || *p == ' ') p++;
+    /* a condition code is exactly the text before a comma */
+    const char *c = strchr(p, ',');
+    if (c) {
+        size_t n = (size_t)(c - p);
+        if (n <= 2) return 0;                     /* z/nz/c/nc/p/m/pe/po */
+    }
+    return 1;
+}
+
+/* LOWER bound on a line's encoded size, min over the supported CPUs — the
+   opposite of relax_line_size. Under-charging costs merges, never bytes. */
+static int tm_line_size_lo(const char *l)
+{
+    const char *s = l;
+    while (*s == '\t' || *s == ' ') s++;
+    const char *e = s;
+    while (*e && *e != '\t' && *e != ' ' && *e != '\n') e++;
+    size_t n = (size_t)(e - s);
+    const char *arg = e;
+    while (*arg == '\t' || *arg == ' ') arg++;
+    #define MNL(x) (n == strlen(x) && !strncmp(s, x, n))
+    if (MNL("jp") || MNL("call")) return 3;
+    if (MNL("jr") || MNL("djnz")) return 2;
+    if (MNL("bit") || MNL("set") || MNL("res") || MNL("sla") || MNL("sra")
+        || MNL("srl") || MNL("rl") || MNL("rr") || MNL("rlc") || MNL("rrc")
+        || MNL("neg") || MNL("ldi") || MNL("ldir") || MNL("ldd") || MNL("lddr")
+        || MNL("exx") || MNL("swap") || MNL("in") || MNL("out"))
+        return 2;
+    if (MNL("ld")) {
+        /* `ld r,r'` is 1; anything with an immediate, a memory operand or an
+           index register is at least 2. */
+        if (strchr(arg, '(') || strchr(arg, '+')) return 2;
+        const char *c = strchr(arg, ',');
+        if (c && ((c[1] >= 'a' && c[1] <= 'l') || c[1] == 'h')) return 1;
+        return 2;
+    }
+    #undef MNL
+    return 1;                                    /* the safe floor */
+}
+
+/* Does anything between adjacent instructions `a` and `b` block a run? */
+static int tm_blocked_between(char **lines, long a, long b)
+{
+    for (long i = a + 1; i < b; i++)
+        if (tm_is_barrier(lines[i])) return 1;
+    return 0;
+}
+
+#define TM_MAXD 64
+
+/* The label already defined immediately above line `li`, if any. Tail merging
+   should REUSE it rather than mint a second name for the same address: two
+   labels on one address is a hazard for every later pass (block layout has to
+   move them as a set), and threading/label-elision ran long before us so they
+   cannot clean it up. */
+static const char *tm_label_above(char **lines, long li, char *buf, size_t bufsz)
+{
+    for (long j = li - 1; j >= 0; j--) {
+        const char *l = lines[j];
+        if (!l[0] || l[0] == '\n' || l[0] == '\r' || l[0] == ';') continue;
+        if (l[0] == '\t' || l[0] == ' ') return NULL;    /* an instruction */
+        const char *e = l;
+        while ((*e >= 'A' && *e <= 'Z') || (*e >= 'a' && *e <= 'z')
+               || (*e >= '0' && *e <= '9') || *e == '_' || *e == '.' || *e == '$')
+            e++;
+        if (e == l || *e != ':') return NULL;
+        const char *t = e + 1;
+        while (*t == '\r') t++;
+        if (*t != '\n' && *t != '\0') return NULL;
+        size_t n = (size_t)(e - l);
+        if (n == 0 || n >= bufsz) return NULL;
+        memcpy(buf, l, n); buf[n] = '\0';
+        return buf;
+    }
+    return NULL;
+}
+
+/* Is every ordinal of the run [k-d+1, k] still unclaimed? */
+static int tm_range_free(const int *used, long k, int d)
+{
+    for (long q = k - d + 1; q <= k; q++)
+        if (q < 0 || used[q]) return 0;
+    return 1;
+}
+
+/* Merge duplicated tails in one rendered function body. */
+static void filter_tail_merge(FILE *out, FILE *src, const Func *f)
+{
+    (void)f;
+    char buf[1024];
+    long cap = 256, n = 0;
+    char **lines = malloc((size_t)cap * sizeof *lines);
+    if (!lines) goto verbatim;
+    rewind(src);
+    while (fgets(buf, sizeof buf, src)) {
+        if (n == cap) {
+            long nc = cap * 2;
+            char **t = realloc(lines, (size_t)nc * sizeof *t);
+            if (!t) { for (long i = 0; i < n; i++) free(lines[i]);
+                      free(lines); lines = NULL; goto verbatim; }
+            lines = t; cap = nc;
+        }
+        lines[n] = strdup(buf);
+        if (!lines[n]) { for (long i = 0; i < n; i++) free(lines[i]);
+                         free(lines); lines = NULL; goto verbatim; }
+        n++;
+    }
+    long *code = malloc((size_t)(n > 0 ? n : 1) * sizeof *code);
+    if (!code) { for (long i = 0; i < n; i++) free(lines[i]);
+                 free(lines); lines = NULL; goto verbatim; }
+    long nc = 0;
+    for (long i = 0; i < n; i++)
+        if (tm_is_insn(lines[i])) code[nc++] = i;
+
+    /* maxd[k]: how many instructions ending at code ordinal k a run may cover. */
+    int *maxd = calloc((size_t)(nc > 0 ? nc : 1), sizeof *maxd);
+    int *used = calloc((size_t)(nc > 0 ? nc : 1), sizeof *used);
+    long *jmp = malloc((size_t)(nc > 0 ? nc : 1) * sizeof *jmp);   /* run start -> label */
+    long *jend= malloc((size_t)(nc > 0 ? nc : 1) * sizeof *jend);  /* run start -> last */
+    int  *lab = calloc((size_t)(nc > 0 ? nc : 1), sizeof *lab);    /* label id at ordinal */
+    if (!maxd || !used || !jmp || !jend || !lab) {
+        free(maxd); free(used); free(jmp); free(jend); free(lab); free(code);
+        for (long i = 0; i < n; i++) free(lines[i]);
+        free(lines); lines = NULL; goto verbatim;
+    }
+    for (long k = 0; k < nc; k++) { jmp[k] = -1; jend[k] = -1; lab[k] = 0; }
+    for (long k = 0; k < nc; k++) {
+        if (!tm_is_uncond_term(lines[code[k]])) { maxd[k] = 0; continue; }
+        int d = 1;
+        while (k - d >= 0 && d < TM_MAXD
+               && !tm_blocked_between(lines, code[k - d], code[k - d + 1]))
+            d++;
+        maxd[k] = d;
+    }
+
+    /* Deepest first, so every tail merges at the longest suffix it shares. */
+    /* A run's WHOLE range must be free, not just its terminator: an earlier,
+       deeper merge can have consumed ordinals in the middle of this one, and
+       two overlapping deletions would drop a label or a jump. */
+    #define TM_RANGE_FREE(k, d) tm_range_free(used, (k), (d))
+    int nlab = 0;
+    for (int d = TM_MAXD; d >= 1; d--) {
+        for (long i = 0; i < nc; i++) {
+            if (maxd[i] < d || !TM_RANGE_FREE(i, d)) continue;
+            /* price the run once; a lower bound, so a merge only happens when
+               it certainly pays */
+            int bytes = 0;
+            for (int j = 0; j < d; j++) bytes += tm_line_size_lo(lines[code[i - j]]);
+            if (bytes - 3 < tail_merge_min_gain()) continue;
+            long grp[64]; int ng = 0;
+            long last_end = i;                   /* keep runs disjoint */
+            for (long j = i + 1; j < nc && ng < 64; j++) {
+                if (maxd[j] < d || !TM_RANGE_FREE(j, d)) continue;
+                int eq = 1;
+                for (int q = 0; q < d; q++)
+                    if (strcmp(lines[code[i - q]], lines[code[j - q]])) { eq = 0; break; }
+                if (!eq) continue;
+                if (j - d + 1 <= last_end) continue;   /* overlaps a kept run */
+                grp[ng++] = j; last_end = j;
+            }
+            if (!ng) continue;
+            nlab++;
+            lab[i - d + 1] = nlab;               /* survivor keeps the code */
+            for (long q = i - d + 1; q <= i; q++) used[q] = 1;
+            for (int g = 0; g < ng; g++) {
+                long j = grp[g];
+                jmp[j - d + 1] = nlab;
+                jend[j - d + 1] = j;
+                for (long q = j - d + 1; q <= j; q++) used[q] = 1;
+            }
+        }
+    }
+
+    /* Emit. A merged run's lines are dropped and replaced by one `jp`; the only
+       non-instruction lines inside a run are C_LINE markers, which go with it. */
+    /* label id -> an existing name to reuse, or "" to mint one */
+    char (*labnm)[64] = calloc((size_t)(nlab + 1), sizeof *labnm);
+    if (labnm) {
+        for (long k = 0; k < nc; k++) {
+            if (!lab[k]) continue;
+            char b[64];
+            const char *ex = tm_label_above(lines, code[k], b, sizeof b);
+            if (ex) snprintf(labnm[lab[k]], sizeof labnm[lab[k]], "%s", ex);
+        }
+    }
+    long *runend = malloc((size_t)(n > 0 ? n : 1) * sizeof *runend);
+    int  *isstart = calloc((size_t)(n > 0 ? n : 1), sizeof *isstart);
+    int  *labat = calloc((size_t)(n > 0 ? n : 1), sizeof *labat);
+    if (runend && isstart && labat) {
+        for (long k = 0; k < nc; k++) {
+            if (lab[k]) labat[code[k]] = lab[k];
+            if (jmp[k] >= 0) {
+                isstart[code[k]] = jmp[k];
+                runend[code[k]] = code[jend[k]];
+            }
+        }
+        long skip_to = -1;
+        for (long i = 0; i < n; i++) {
+            if (i <= skip_to) continue;
+            if (labat[i] && !(labnm && labnm[labat[i]][0]))
+                fprintf(out, "L_f%d_tm_%d:\n", L.func_emit_idx, labat[i]);
+            if (isstart[i]) {
+                if (labnm && labnm[isstart[i]][0])
+                    fprintf(out, "\tjp\t%s\n", labnm[isstart[i]]);
+                else
+                    fprintf(out, "\tjp\tL_f%d_tm_%d\n",
+                            L.func_emit_idx, isstart[i]);
+                skip_to = runend[i];
+                continue;
+            }
+            fputs(lines[i], out);
+        }
+    } else {
+        for (long i = 0; i < n; i++) fputs(lines[i], out);
+    }
+    #undef TM_RANGE_FREE
+    free(runend); free(isstart); free(labat); free(labnm);
+    free(maxd); free(used); free(jmp); free(jend); free(lab); free(code);
+    for (long i = 0; i < n; i++) free(lines[i]);
+    free(lines);
+    return;
+verbatim:
+    rewind(src);
+    while (fgets(buf, sizeof buf, src)) fputs(buf, out);
+}
+
+/* ---- block layout: delete a jump by moving its target under it ----------- */
+/* 80cc lays basic blocks in IR order and never reorders them, so a block whose
+   only entry is one `jp` still sits wherever it was numbered, and the jump is
+   pure overhead. Move that block's TRACE — itself plus everything it falls
+   through into, up to the first unconditional terminator — to sit under the
+   jump, and the jump goes away.
+
+   Three conditions, and each one is a way to miscompile:
+     - the target's labels must have exactly ONE reference between them, and
+       nothing may FALL THROUGH into them, or the moved code loses an entry;
+     - a trace head can carry SEVERAL labels on one address (tail merging puts
+       `L_f7_tm_1:` directly under `L_f7_bb_4:`), so the reference count is
+       summed over all of them and they all travel with the code;
+     - the trace must END in an unconditional terminator, or control runs off
+       the end of the moved code into whatever now follows.
+
+   Runs after tail merging (whose labels and jumps it can then move) and before
+   branch relaxation, which re-sizes the displacements the move changed.
+   DEFAULT-ON; `--opt-disable=block-layout` or `IR_BLAYOUT=0` opts out. */
+static int bl_on = -1;
+static int block_layout_enabled(void)
+{
+    if (bl_on < 0) {
+        const char *e = getenv("IR_BLAYOUT");
+        bl_on = (e && e[0] == '0') ? 0 : !opt_disabled("block-layout");
+    }
+    return bl_on;
+}
+
+/* A label DEFINITION line, `name:` or bare `name` at column 0. Returns the name
+   length, or 0. */
+static size_t bl_label_name(const char *l, const char **np)
+{
+    if (l[0] == '\t' || l[0] == ' ' || l[0] == ';' || l[0] == '\n'
+        || l[0] == '\r' || l[0] == '\0')
+        return 0;
+    const char *s = l;
+    if (*s == '.') s++;                       /* `.fn` function entry */
+    if (!((*s >= 'A' && *s <= 'Z') || (*s >= 'a' && *s <= 'z') || *s == '_'))
+        return 0;
+    const char *e = s;
+    while ((*e >= 'A' && *e <= 'Z') || (*e >= 'a' && *e <= 'z')
+           || (*e >= '0' && *e <= '9') || *e == '_' || *e == '.' || *e == '$')
+        e++;
+    const char *t = e;
+    if (*t == ':') t++;
+    while (*t == '\r') t++;
+    if (*t != '\n' && *t != '\0') return 0;   /* `defc X = Y`, data, etc. */
+    *np = s;
+    return (size_t)(e - s);
+}
+
+/* `\tjp\tTARGET\n` / `\tjr\tTARGET\n`, unconditional only. */
+static int bl_uncond_jump(const char *l, const char **tp, size_t *tn)
+{
+    if (strncmp(l, "\tjp\t", 4) && strncmp(l, "\tjr\t", 4)) return 0;
+    const char *p = l + 4;
+    if (strchr(p, ',')) return 0;                    /* conditional */
+    const char *e = p;
+    while ((*e >= 'A' && *e <= 'Z') || (*e >= 'a' && *e <= 'z')
+           || (*e >= '0' && *e <= '9') || *e == '_' || *e == '.' || *e == '$')
+        e++;
+    const char *t = e;
+    while (*t == '\r') t++;
+    if (*t != '\n' && *t != '\0') return 0;          /* `jp (hl)`, expressions */
+    if (e == p) return 0;
+    *tp = p; *tn = (size_t)(e - p);
+    return 1;
+}
+
+static int bl_is_uncond_term(const char *l)
+{
+    return tm_is_uncond_term(l);
+}
+
+static void filter_block_layout(FILE *out, FILE *src)
+{
+    char buf[1024];
+    long cap = 256, n = 0;
+    char **L = malloc((size_t)cap * sizeof *L);
+    if (!L) goto verbatim;
+    rewind(src);
+    while (fgets(buf, sizeof buf, src)) {
+        if (n == cap) {
+            char **t = realloc(L, (size_t)(cap * 2) * sizeof *t);
+            if (!t) { for (long i = 0; i < n; i++) free(L[i]);
+                      free(L); L = NULL; goto verbatim; }
+            L = t; cap *= 2;
+        }
+        L[n] = strdup(buf);
+        if (!L[n]) { for (long i = 0; i < n; i++) free(L[i]);
+                     free(L); L = NULL; goto verbatim; }
+        n++;
+    }
+    long *jmp_to = malloc((size_t)(n > 0 ? n : 1) * sizeof *jmp_to);
+    long *jmp_end = malloc((size_t)(n > 0 ? n : 1) * sizeof *jmp_end);
+    int  *claimed = calloc((size_t)(n > 0 ? n : 1), sizeof *claimed);
+    if (!jmp_to || !jmp_end || !claimed) {
+        free(jmp_to); free(jmp_end); free(claimed);
+        for (long i = 0; i < n; i++) free(L[i]);
+        free(L); L = NULL; goto verbatim;
+    }
+    for (long i = 0; i < n; i++) { jmp_to[i] = -1; jmp_end[i] = -1; }
+
+    for (long i = 0; i < n; i++) {
+        const char *tp; size_t tn;
+        if (!bl_uncond_jump(L[i], &tp, &tn)) continue;
+        /* find the target's definition */
+        long li = -1;
+        for (long j = 0; j < n; j++) {
+            const char *np; size_t nl = bl_label_name(L[j], &np);
+            if (nl == tn && !strncmp(np, tp, tn)) { li = j; break; }
+        }
+        if (li < 0) continue;
+        /* walk back over the alias run so every label on this address moves */
+        while (li > 0) {
+            const char *np;
+            if (L[li - 1][0] == '\n' || L[li - 1][0] == '\r') { li--; continue; }
+            if (!bl_label_name(L[li - 1], &np)) break;
+            if (L[li - 1][0] == '.') break;              /* function entry */
+            li--;
+        }
+        /* one reference in total across the alias run, and it is our jump */
+        long nref = 0;
+        for (long j = li; j < n; j++) {
+            const char *np0; size_t nl = bl_label_name(L[j], &np0);
+            if (!nl) { if (L[j][0] == '\n' || L[j][0] == '\r') continue; break; }
+            /* np0 points INTO the definition line and is not terminated there —
+               copy it out before using it as a search string. */
+            char nbuf[128];
+            if (nl >= sizeof nbuf) { nref = 2; break; }
+            memcpy(nbuf, np0, nl); nbuf[nl] = '\0';
+            const char *np = nbuf;
+            for (long k = 0; k < n; k++) {
+                if (!tm_is_insn(L[k]) && strncmp(L[k], "defc", 4)) continue;
+                const char *q = L[k];
+                while ((q = strstr(q, np)) != NULL) {
+                    char before = (q == L[k]) ? ' ' : q[-1];
+                    char after  = q[nl];
+                    int wordish = (before >= 'A' && before <= 'Z')
+                               || (before >= 'a' && before <= 'z')
+                               || (before >= '0' && before <= '9')
+                               || before == '_' || before == '.';
+                    int wafter  = (after >= 'A' && after <= 'Z')
+                               || (after >= 'a' && after <= 'z')
+                               || (after >= '0' && after <= '9')
+                               || after == '_' || after == '.' || after == '$';
+                    if (!wordish && !wafter) nref++;
+                    q += nl;
+                }
+            }
+        }
+        if (nref != 1) continue;
+        /* nothing may fall through into the trace head */
+        int falls = 0;
+        for (long j = li - 1; j >= 0; j--) {
+            if (!L[j][0] || L[j][0] == '\n' || L[j][0] == '\r' || L[j][0] == ';')
+                continue;
+            if (tm_is_insn(L[j])) {
+                falls = !bl_is_uncond_term(L[j]);
+                break;
+            }
+            { const char *np; if (bl_label_name(L[j], &np)) continue; }
+            falls = 1; break;                   /* directive / data */
+        }
+        if (falls) continue;
+        /* the trace runs to the first UNCONDITIONAL terminator */
+        long end = -1;
+        for (long j = li; j < n; j++) {
+            if (tm_is_barrier(L[j]) && !bl_label_name(L[j], &(const char *){0}))
+                break;                          /* SECTION / data */
+            if (!tm_is_insn(L[j])) continue;
+            if (bl_is_uncond_term(L[j])) { end = j; break; }
+        }
+        if (end < 0) continue;
+        if (i >= li && i <= end) continue;       /* the jump is inside its trace */
+        int busy = claimed[i];
+        for (long j = li; j <= end && !busy; j++) busy = claimed[j];
+        if (busy) continue;
+        jmp_to[i] = li; jmp_end[i] = end;
+        claimed[i] = 1;
+        for (long j = li; j <= end; j++) claimed[j] = 1;
+    }
+
+    if (getenv("IR_BLAYOUT_LOG")) {
+        long nm = 0, njump = 0;
+        for (long i = 0; i < n; i++) {
+            const char *tp; size_t tn;
+            if (bl_uncond_jump(L[i], &tp, &tn)) njump++;
+            if (jmp_to[i] >= 0) nm++;
+        }
+        fprintf(stderr, "BLAYOUT lines=%ld uncond_jumps=%ld moves=%ld\n",
+                n, njump, nm);
+    }
+    /* emit: a moved trace replaces its jump, and is skipped where it was */
+    int *skip = calloc((size_t)(n > 0 ? n : 1), sizeof *skip);
+    if (skip) {
+        for (long i = 0; i < n; i++)
+            if (jmp_to[i] >= 0)
+                for (long j = jmp_to[i]; j <= jmp_end[i]; j++) skip[j] = 1;
+        for (long i = 0; i < n; i++) {
+            if (skip[i]) continue;
+            if (jmp_to[i] >= 0) {
+                for (long j = jmp_to[i]; j <= jmp_end[i]; j++) fputs(L[j], out);
+                continue;
+            }
+            fputs(L[i], out);
+        }
+        free(skip);
+    } else {
+        for (long i = 0; i < n; i++) fputs(L[i], out);
+    }
+    free(jmp_to); free(jmp_end); free(claimed);
+    for (long i = 0; i < n; i++) free(L[i]);
+    free(L);
+    return;
+verbatim:
+    rewind(src);
+    while (fgets(buf, sizeof buf, src)) fputs(buf, out);
+}
+
 static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
                                          const Func *f)
 {
@@ -2488,8 +2936,16 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
        else dst == out. */
     int do_regcopy = !opt_disabled("dead-regcopy");
     int do_bc_live = !opt_disabled("bc-live");
+    /* Tail merging sits between the peepholes and relaxation: it needs the FINAL
+       text (so it can see identical tails the peepholes just produced) and its
+       inserted `jp`s must still be relaxable to `jr`. */
+    FILE *tmf = tail_merge_enabled() ? tmpfile() : NULL;
+    /* Layout runs AFTER tail merging — it can move the traces tail merging
+       creates — and before relaxation, which re-sizes the moved displacements. */
+    FILE *blf = block_layout_enabled() ? tmpfile() : NULL;
+    FILE *fout2 = tmf ? tmf : (blf ? blf : fout);
     FILE *peep = (do_regcopy || do_bc_live) ? tmpfile() : NULL;
-    FILE *dst = peep ? peep : fout;
+    FILE *dst = peep ? peep : fout2;
     /* Pass 2: emit, dropping `L_f<d>_bb_<n>:` lines whose n is unreferenced, and
        DEFERRING `defc L_f..._bb_...` alias lines. The defc's are 0-byte symbol
        definitions emitted inline at the alias BBs' layout slots; moving them out
@@ -2544,17 +3000,28 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
             if (scratch) {
                 filter_dead_reg_copies(scratch, peep);
                 rewind(scratch);
-                filter_dead_bc_parks(fout, scratch);
+                filter_dead_bc_parks(fout2, scratch);
                 fclose(scratch);
             } else {
-                filter_dead_reg_copies(fout, peep);  /* OOM: skip bc stage */
+                filter_dead_reg_copies(fout2, peep);  /* OOM: skip bc stage */
             }
         } else if (do_bc_live) {
-            filter_dead_bc_parks(fout, peep);
+            filter_dead_bc_parks(fout2, peep);
         } else {
-            filter_dead_reg_copies(fout, peep);
+            filter_dead_reg_copies(fout2, peep);
         }
         fclose(peep);
+    }
+    if (tmf) {
+        rewind(tmf);
+        if (blf) { filter_tail_merge(blf, tmf, f); }
+        else       filter_tail_merge(fout, tmf, f);
+        fclose(tmf);
+    }
+    if (blf) {
+        rewind(blf);
+        filter_block_layout(fout, blf);
+        fclose(blf);
     }
     if (relax) {
         rewind(relax);
@@ -3026,6 +3493,27 @@ static void rec_note_violation(const Func *f, int v);  /* require_slot fail */
    elisions use. The offending render is discarded. If it fires again AFTER the
    demote, something deeper is wrong and we still abort.
    `--opt-disable=home-demote` restores the immediate abort. */
+/* [home-rearb] Completes the `[home-demote]` recovery below. Demoting an
+   unrealizable home frees a register and then offers it to nobody, because the
+   arbiter has already finished — so the next-best candidate stays spilled for
+   the whole function. This is missing logic in the recovery, not a gbz80 thing
+   and not a tuning knob.
+
+   DEFAULT-ON. It is INERT on the shipping configuration — `IR_REC_VERIFY`
+   reports ZERO unrealizable homes across the corpus on all nine CPUs, in both
+   frame modes — so it changes nothing today. Its value is that a re-ranking
+   (a cost-row change, a new loop-depth model) no longer silently strands a
+   register: the gbz80 SLOT+BC row was blocked on exactly that.
+   `IR_REHOME=0` or `--opt-disable=home-rearb` opts out. */
+static int hr_on = -1;
+static int home_rearb_enabled(void)
+{
+    if (hr_on < 0) { const char *e = getenv("IR_REHOME");
+                     hr_on = (e && e[0] == '0') ? 0
+                           : !opt_disabled("home-rearb"); }
+    return hr_on;
+}
+
 static int hd_retry_ok;          /* this render is discardable → recovery possible */
 static int hd_bad[32];
 static int hd_nbad;
@@ -4031,37 +4519,10 @@ static void rec_end(const Func *f)
                partial shrink would move live slot offsets. */
             L.frame_fully_dead = (deadbytes == fs);
         }
-        /* [IR_FRAMEPROBE, INERT] Frame-traffic census. The +1921B (emu.c) /
-           +192B (binary-trees) that 80cc spends on (ix+d) over sdcc is three
-           different diseases wearing one symptom, and the aggregate cannot
-           tell them apart:
-             REDUNDANT reads  -> residency: the value was re-fetched inside a
-                                 call-free region when a register would have
-                                 held it. Fixable by keeping it resident.
-             FIRST reads      -> unavoidable given the value is spilled at all.
-             spilled VREGS    -> allocation pressure: too many values spilled
-                                 in the first place. A different lever.
-             width-4 traffic  -> a long costs 4 slot bytes per touch; sdcc does
-                                 ALU straight off (ix+d) instead.
-           Split by class (param / named local / compiler temp) because the
-           fixes differ, and reported per function so a target can be picked.
-           Reads are the honest emitted count (rec_slotuse - rec_slotwrite);
-           `bytes` / `redbytes` are counted at the EMIT site (vemit) and are the
-           convertible figures — validated to the assembler listing exactly on
-           binary-trees (360) and to 0.5% on emu.c (6105 vs 6072).
-
-           TWO THINGS A CONSUMER MUST KNOW.
-           (1) The pass driver re-lowers functions (dead-store, deadframe,
-               spflip), so a function can print more than once — keep the LAST
-               line per name. On emu.c that is 74 lines for 45 functions;
-               summing all of them gives 8250 instead of 6105.
-           (2) `redundant` is an UPPER BOUND on the residency opportunity, not a
-               saving. It counts every re-read in a call-free region, including
-               ones no allocator could avoid because no register was free. The
-               check: emu.c redundant = 3546 bytes, but sdcc compiles the same
-               source with 4151 bytes of frame access against 80cc's 6072 — so
-               at most 1921 is addressable. Use this census to find WHERE the
-               traffic is, and the sdcc delta to bound HOW MUCH. */
+                /* [IR_FRAMEPROBE, INERT] Per-function (ix+d) traffic census, split by
+           class (param / local / temp) because the fixes differ. `redundant` is
+           an upper bound on the residency opportunity, not a saving. The driver
+           re-lowers some functions, so keep the LAST line per name. */
         if (frameprobe_on()) {
             long rd[3] = {0,0,0}, wr[3] = {0,0,0}, red[3] = {0,0,0};
             long rd_w4 = 0, red_w4 = 0;
@@ -4116,37 +4577,7 @@ static void rec_end(const Func *f)
                             f->fn ? ir_sym_name(f->fn) : "?", v, vr->width, reads);
             }
         }
-        /* [IR_PARAMHOME, INERT] Sizing probe for the param register-home lever.
-           IR_PARAMRELOAD above says WHICH params are reloaded and how often;
-           this says what a register home would be WORTH, which is the number
-           the lever has to be argued on.
-
-           The gap this measures: a param read in place costs the frame-address
-           setup plus the load at EVERY use, while a register home pays that
-           once and then 2 bytes (push/pop) per call the live range crosses —
-           what sdcc does with BC. The existing residency gates never see these
-           values: IR_SPLIT_PROBE / IR_GPHOME_PROBE report nothing on a function
-           whose params are read in place, because such a param is not a spilled
-           reused vreg and so never enters the call-split candidate set.
-
-           Per candidate: emitted reads (honest — belief-cache hits already
-           removed), writes, calls crossed, and whether it is ever a deref base
-           (the class Phase-1 call-split excludes, since `ld a,(bc)` serves those
-           without a reload). `save` is bytes under the model below; the raw
-           counts are there so the model can be re-argued without re-running.
-
-           Approximations, all deliberately conservative:
-             - the span is first-to-last op referencing v in linear op order,
-               ignoring control flow, so a loop-carried param under-counts the
-               calls actually crossed (save is over-stated for those — the
-               deref/write columns are the ones to check before trusting a row);
-             - only width<=2 scores, since a 4-byte param cannot live in one
-               pair. Wider params print with save=0 rather than being dropped,
-               so the reads they cost stay visible.
-
-           IR_PARAMHOME=1 per-candidate lines + a per-function total;
-           IR_PARAMHOME=2 adds the function totals for functions with no
-           candidate, to confirm coverage rather than silence. */
+        /* [IR_PARAMHOME, INERT] Sizing probe for the param register-home lever. */
         if (getenv("IR_PARAMHOME")) {
             int verbose = getenv("IR_PARAMHOME")[0] == '2';
             /* Bytes per counted read event. The two modes count DIFFERENT
@@ -6224,36 +6655,8 @@ int ir_lower_func(FILE *out, Func *f)
        (distinct from the pre-lower IR_DUMP — reflects the allocator's view). */
     if (getenv("IR_DUMP_ALLOC"))
         ir_dump_func(stderr, f);
-    /* [IR_ADDRRES_PROBE] INERT sizing of address residency. bitfieldbench's
-       reg_step is 2.14x sdcc and its most-emitted instructions are all address
-       plumbing — 13 `push hl`, 8 `pop hl`, 7 `ld hl,bc` base re-forms and 12
-       `inc hl` to service FIVE read-modify-writes into ONE storage unit. sdcc
-       forms the address once and walks it. This reports, per function, every
-       vreg used as a memory base: how many derefs read through it, at how many
-       distinct constant offsets, and where the allocator put it — so the
-       question "how many functions have a member-access run that would keep one
-       address resident" is answered with counts rather than an impression.
-
-       ►► WHAT IT FOUND (2026-09-08), and it REFUTED the lever it was built for.
-       118 multi-deref bases over the corpus + the four real files, but the
-       distribution kills a general lever: 91 have only TWO accesses, 19 have
-       3-4, and just 8 have five or more. Only 28 sites reach 3 accesses and half
-       of those are in long_ir itself. Residency on a two-access base saves one
-       address re-form.
-
-       It also refuted the bitfieldbench diagnosis it was aimed at: reg_step's
-       base is ALREADY homed in BC (ld=5 st=1 home=BC param), so the base is
-       resident and the waste is the FIELD address being re-formed from it
-       (`ld hl,bc; inc hl`) plus values parked on the stack mid-RMW. That is
-       register pressure inside the bitfield read-modify-write, not residency.
-
-       The one thing worth chasing came out of the top row: clisp's `_fcall`
-       does 54 loads through a SPILLED pointer parameter, emitted as 54 x
-       `ld hl,(ix+4)` — SIX bytes each on z80 (dd 6e 04 dd 66 05; there is no
-       real `ld hl,(ix+d)`) against 2 for `ld hl,bc`. 509 such reloads across the
-       real files = ~3 KB. That is §5.4 stage 3 (frame/long operand residency),
-       and it wants a CALL-BOUNDED ranged home, not a whole-function one —
-       `_fcall` is call-heavy (368 `pop bc` already). */
+    /* [IR_ADDRRES_PROBE, INERT] Sizing for address-temp residency: a computed
+   address spilled to a slot and reloaded for its own deref. */
     if (getenv("IR_ADDRRES_PROBE")) {
         for (int v = 0; v < f->n_vregs; v++) {
             int derefs = 0, stores = 0, minoff = 1 << 30, maxoff = -(1 << 30);
@@ -6632,6 +7035,7 @@ int ir_lower_func(FILE *out, Func *f)
             int v = hd_bad[i];
             if (v < 0 || v >= f->n_vregs) continue;
             if (f->vreg_to_phys) f->vreg_to_phys[v] = IR_PR_SPILL;
+            if (home_rearb_enabled()) ir_alloc_veto_add(v);
             /* These three all suppress a slot; the point is to get one. */
             f->vregs[v].flags &= ~(IR_VREG_NO_SLOT | IR_VREG_DEAD_SPILL
                                    | IR_VREG_PARAM_IN_PLACE);
@@ -6642,6 +7046,16 @@ int ir_lower_func(FILE *out, Func *f)
         if (demoted) {
             hd_retry_done = 1;
             hd_nbad = 0;
+            /* [home-rearb] Re-ARBITRATE, don't just re-slot. Demoting alone
+               leaves the register the value vacated offered to nobody, because
+               the arbiter never runs again — so the next-best candidate stays
+               spilled for the whole function. Vetoing the unrealizable value
+               and re-running ir_alloc hands its register to whoever is next.
+               Default-on; see home_rearb_enabled. */
+            if (home_rearb_enabled()) {
+                ir_alloc(f);
+                ir_alloc_veto_reset();
+            }
             ir_assign_slots(f);
             L.cur_frameless = frameless_ok(f);
             free(bb_hl_out_p1); bb_hl_out_p1 = NULL;

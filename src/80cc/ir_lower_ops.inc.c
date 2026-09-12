@@ -1269,12 +1269,11 @@ static int bc_args_save_depth;
    there, instead of whenever the function has one anywhere.
 
    func_has_pr_bc is a whole-function question and every BC save in the lowerer
-   asks it. strbench's str_compute is the cost: its BC tenant (`seed`) has its
-   last use at instruction 138, yet the three calls at 180/195/211 — inside the
-   REPS loop — each still emit `push bc` / `pop bc` around a dead register, worth
-   +2.64 % on that bench. The tenant set already excludes IR_VREG_BC_PACK and
-   IR_VREG_CALL_SPLIT, ranged homes whose spans are call-free; this adds the
-   liveness the plain whole-function home lacks.
+   asks it, so a call after the tenant's last use still saves a dead register —
+   strbench's str_compute pays that on three calls inside its hot loop. The
+   tenant set already excludes IR_VREG_BC_PACK and IR_VREG_CALL_SPLIT, ranged
+   homes whose spans are call-free; this adds the liveness the plain
+   whole-function home lacks.
 
    ASK ir_live_range, NOT ir_op_live_in. The per-op live-in sets give a TIGHTER
    answer and it is not a usable one here: driving the skip from them miscompiles
@@ -1284,11 +1283,9 @@ static int bc_args_save_depth;
    conservative superset — and on that query enigma is correct while strbench
    keeps the whole win. Do not "tighten" this back to the live-in sets.
 
-   DEFAULT-ON; `IR_BCSAVE_LIVE=0` opts out. Flipped together with
-   IR_PREPUSH_NARROW, which it is the necessary partner of: the narrowing alone
-   regresses divbench +6.94 fp and shiftbench +6.03 fp on the push/pop pairs it
-   adds, and removing the pairs whose tenant is not live takes both to exactly
-   zero. See the note at prepushnarrow_on. */
+   DEFAULT-ON; `IR_BCSAVE_LIVE=0` opts out. It is the necessary PARTNER of
+   IR_PREPUSH_NARROW and was flipped with it — see the note at
+   prepushnarrow_on. */
 static int bcsave_live_on(void)
 {
     static int c = -1;

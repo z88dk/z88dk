@@ -25,3 +25,9 @@ void ir_alloc(Func *f);
 int *ir_alloc_take_word_home_prepick(void);
 
 #endif /* IR_ALLOC_H */
+
+/* [home-rearb] The lowerer proved a register home unrealizable: veto the value
+   so a re-run of ir_alloc offers its register to the next candidate instead of
+   leaving it unused. Reset per function. */
+void ir_alloc_veto_reset(void);
+void ir_alloc_veto_add(int vreg);

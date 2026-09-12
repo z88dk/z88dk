@@ -225,9 +225,39 @@ typedef struct {
 /* Append a proposal to the arbiter pool. The single point where a candidate enters
    the pool (every proposer used the same 6-field fill). benefit is a placeholder —
    unified_arbitrate overwrites it with cost_benefit[v] before ranking. */
+/* [home-rearb] Values the LOWERER proved unrealizable. `[home-demote]` demotes
+   such a value to SPILL and re-renders, which fixes correctness but leaves the
+   register it vacated OFFERED TO NOBODY — the arbiter does not run again, so
+   the next-best candidate never gets its chance. histbench's `hist_pass` on
+   gbz80 is the witness: v1 takes BC, cannot realize it, is demoted, and v26 —
+   which would have used BC perfectly well — stays spilled for the rest of the
+   function.
+
+   So record the veto and let the driver re-arbitrate: a vetoed value is not
+   proposed at all, and the register goes to whoever is next. */
+static int alloc_veto[64];
+static int alloc_nveto;
+
+void ir_alloc_veto_reset(void) { alloc_nveto = 0; }
+
+void ir_alloc_veto_add(int v)
+{
+    if (v < 0) return;
+    for (int i = 0; i < alloc_nveto; i++) if (alloc_veto[i] == v) return;
+    if (alloc_nveto < (int)(sizeof alloc_veto / sizeof alloc_veto[0]))
+        alloc_veto[alloc_nveto++] = v;
+}
+
+static int alloc_vetoed(int v)
+{
+    for (int i = 0; i < alloc_nveto; i++) if (alloc_veto[i] == v) return 1;
+    return 0;
+}
+
 static inline void add_cand(Cand *out, int *n, int v, long benefit,
                             int lo, int hi, unsigned allowed, unsigned flags)
 {
+    if (alloc_vetoed(v)) return;          /* [home-rearb] proved unrealizable */
     out[*n].vreg = v;
     out[*n].benefit = benefit;
     out[*n].lo = lo;
@@ -810,29 +840,15 @@ static int cs_evict_on(void)
 
    DEFAULT-ON; `IR_PREPUSH_NARROW=0` opts out (and takes IR_CS_EVICT with it).
 
-   It was opt-in for a long time because ALONE it regresses five benches and two
-   badly — divbench +3.30 sp / +6.94 fp, shiftbench +2.27 / +6.03, bitfieldbench
-   +2.8/+3.3, strbench fp +2.64, structbench sp +0.32. That is still true of the
-   narrowing on its own, and the note that used to stand here said "find it
-   before flipping this on".
+   ►► IT IS A PAIR WITH IR_BCSAVE_LIVE — DO NOT SEPARATE THEM. Alone, the
+   narrowing regresses divbench and shiftbench badly, because it adds `push bc` /
+   `pop bc` pairs around calls; IR_BCSAVE_LIVE removes the ones whose tenant is
+   not live there, and together the regressions go to exactly zero. Flipping this
+   one on its own reinstates them.
 
-   It was found, and it is not a placement problem: those regressions are the
-   `push bc` / `pop bc` pairs the narrowing adds around calls, and IR_BCSAVE_LIVE
-   removes the ones whose tenant is not live. PAIRED WITH IT the three bad
-   benches go to EXACTLY zero:
-
-     divbench 0.000 %   shiftbench 0.000 %   bitfieldbench 0.000 %
-
-   and the corpus reads −1.70 % fp / −1.51 % sp ticks, 19 cpu-modes faster
-   against 2, with only three regressing cells left in the whole matrix
-   (structbench sp +0.32 %, matrixbench fp +0.20 %, strbench fp +0.14 %). Size is
-   −11728 B (−1.56 %), 461 cells smaller against 36 larger. The two gates are
-   therefore a PAIR — flipping this one alone reinstates the divbench and
-   shiftbench regressions. Do not separate them.
-
-   Refuted en route: pricing a BC home for the push/pop pair it pays at each
-   spanned pre-pushed call. At the natural weight divbench does not move at all;
-   at 20x it recovers 1.3M of 4.6M while distorting everything else. */
+   Refuted en route: pricing a BC home for the pair it pays at each spanned
+   pre-pushed call. At the natural weight divbench does not move; at 20x it
+   recovers part of the loss while distorting everything else. */
 static int prepushnarrow_on(void)
 {
     static int c = -1;
@@ -1101,43 +1117,25 @@ static int iv_home_hot_enough(const Func *f, int v, const int *use_count,
         thr = e ? atoi(e) : 8;
     }
     if (use_count[v] >= thr) return 1;
-    /* [IR_IVACC] The REASSIGNED-VALUE arm. `use_count >= thr` is the only raw
-       count left in the candidate gates, and it is the wrong question for a
-       value that is WRITTEN many times and read once per write:
+    /* [IR_IVACC] The REASSIGNED-VALUE arm, for a value WRITTEN many times and
+       read once per write — an accumulator (`acc = acc + t; ...`) or a clamp
+       chain (`if (v > 255) v = 255;`). Such a value clears the IV shape but
+       never `use_count >= thr`, and bc_home_realizable demands write_count == 1,
+       so it falls between both BC gates and lands in a slot, paying a round trip
+       per term.
 
-           acc = acc + t;  acc = acc + u;  ...     (an accumulator)
-           if (v > 255) v = 255;  if (v < 0) v = 0;  (a clamp chain)
-
-       Such a value clears the IV shape (write-many, every def stamps BC) but
-       never the use count, and bc_home_realizable refuses it too because that
-       arm demands write_count == 1. It falls between the two BC gates and lands
-       in a slot, paying a round trip per term. predbench's `sat` is the clamp
-       shape; widthbench's `mix_char` is the accumulator.
-
-       ADMISSION IS BY CONTENTION, not by hotness and NOT by the arbiter's
-       interval_benefit. Two things had to be measured to get here:
-
-       1. interval_benefit does NOT separate these. It is a cycle model, and the
-          outcome here is byte- and mode-driven. It rates shiftbench's `kshift`
-          at 590 — the highest of any candidate — on both z80 (where admitting
-          it costs +23 B and +2.1 % ticks) and gbz80 (-36 B, -4.3 %). Same
-          number, opposite sign. Admitting every gap candidate is corpus +229 B
-          for an aggregate -0.021 % on ticks: a wash bought with bytes.
-       2. Call-freeness does not separate them either. It correctly rejects
-          fixedbench's `iir`/`fxdot` (they call qmul), but `kmul`, `udiv` and
-          `kshift` are call-FREE — `v * 25`, `v / 2u`, `v << 4` all lower
-          INLINE. Their loss is register PRESSURE, not call saves.
-
-       What does separate them is whether the value WINS its contention for BC —
-       whether it beats the best thing it would displace, by a wide margin. See
-       iv_acc_bc_wins for the measured ben:rival table that sets the margin.
+       ADMISSION IS BY CONTENTION, not hotness and not interval_benefit — that is
+       a cycle model, and the outcome here is byte- and mode-driven (it rates the
+       same candidate identically on z80 and gbz80, where admitting it costs
+       bytes and ticks on one and saves both on the other). Call-freeness does not
+       separate them either: the losers are call-free too, and their cost is
+       register PRESSURE. The test is whether the value out-earns the rival it
+       would displace — see iv_acc_bc_wins for the margin.
 
        So: call-free AND it out-earns its rival 3:1.
 
-       `IR_IVACC=0` / `--opt-disable=iv-acc` opts out, restoring the bare
-       `use_count >= thr` answer. `IR_IVHOT=<N>` re-sweeps the constant,
-       `IR_IVACCK=<N>` the margin. IR_IVWHY prints the census, rival benefit
-       included. */
+       `IR_IVACC=0` / `--opt-disable=iv-acc` opts out. `IR_IVHOT=<N>` re-sweeps
+       the constant, `IR_IVACCK=<N>` the margin, `IR_IVWHY` prints the census. */
     {
         static int acc_on = -1;
         if (acc_on < 0) {
@@ -1371,6 +1369,27 @@ static int home_realizable(const Func *f, int v, unsigned R,
    no); expect ZERO on the corpus → home_realizable is a faithful generator,
    ready for increment 3 to drive the colouring. Builds its OWN maps (independent
    recomputation via the factored helpers), so a mismatch would catch a real gap. */
+/* How many SPILLED, writable, non-address-taken width-2 values could take a
+   loop home? The idx2 and EXX arms both gate on this same count, and they must
+   agree — keeping one copy is what stops them drifting apart. */
+static int count_writable_loopvars(const Func *f, const int *use_count,
+                                   const int *write_count, const int *wd_base,
+                                   const int *wd_acc, const int *wd_ldef)
+{
+    int n = 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        const VReg *vr = &f->vregs[v];
+        if (vr->width != 2) continue;
+        if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
+            continue;
+        if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+        if (wd_base[v] || wd_acc[v] || !wd_ldef[v]) continue;
+        if (use_count[v] < 4 || write_count[v] < 2) continue;
+        n++;
+    }
+    return n;
+}
+
 static void hr_agreement_check(const Func *f, const Cand *pool, int np,
                                const int *use_count, const int *write_count,
                                const int *def_kind, const int *all_defs_ok,
@@ -1391,17 +1410,8 @@ static void hr_agreement_check(const Func *f, const Cand *pool, int np,
         build_idx2_maps(f, is_base, cstep, cinit, cother);
         scan_wd_props(f, bb_in_loop, wd_base, wd_acc, wd_ldef, wd_lread);
         build_idx3_addr(f, wd_base, wd_addr);
-        int writables = 0;
-        for (int v = 0; v < f->n_vregs; v++) {
-            const VReg *vr = &f->vregs[v];
-            if (vr->width != 2) continue;
-            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
-                continue;
-            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-            if (wd_base[v] || wd_acc[v] || !wd_ldef[v]) continue;
-            if (use_count[v] < 4 || write_count[v] < 2) continue;
-            writables++;
-        }
+        int writables = count_writable_loopvars(
+            f, use_count, write_count, wd_base, wd_acc, wd_ldef);
         HomeCtx c = { use_count, write_count, def_kind, all_defs_ok,
                       has_prepushed_call, entry_live,
                       is_base, cstep, cinit, cother,
@@ -1543,17 +1553,8 @@ static int collect_home_candidates(const Func *f,
        loop var) — must precede idx2 so the stable arbiter grabs it first. */
     if (f->exx_reg != IR_PR_NONE && !f->is_interrupt && !f->is_naked
         && !f->uses_acc && func_is_call_free(f)) {
-        int writables = 0;
-        for (int v = 0; v < f->n_vregs; v++) {
-            const VReg *vr = &f->vregs[v];
-            if (vr->width != 2) continue;
-            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
-                continue;
-            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-            if (wd_base[v] || wd_acc[v] || !wd_ldef[v]) continue;
-            if (use_count[v] < 4 || write_count[v] < 2) continue;
-            writables++;
-        }
+        int writables = count_writable_loopvars(
+            f, use_count, write_count, wd_base, wd_acc, wd_ldef);
         if (writables >= 2)
             for (int v = 0; v < f->n_vregs; v++)
                 if (exx_home_realizable(f, v, use_count, wd_base, wd_ldef,
@@ -1664,33 +1665,15 @@ done:
 /* [IR_BYTETIE] OPT-IN (default OFF). `IR_BYTETIE=1` enables, `=<N>` sets a
    minimum byte gap before the tie-break fires.
 
-   ►► WHY THIS IS NOT DEFAULT-ON, and why handover §5 item 3 is MIS-FRAMED.
-   That item reads "the ez80 fp cost row of g0_word_cost cannot separate a
-   register from a slot — bounded; the same treatment the gbz80 row got". The
-   gbz80 treatment was MEASURING real, distinct cycle numbers. There is nothing
-   equivalent to measure here: on ez80 fp a slot read genuinely IS a native
-   `ld hl,(ix+d)` at 2 cycles, exactly what `ld l,c; ld h,b` costs. The row is
-   RIGHT. The hardware ties, so no better cycle number exists.
+   On ez80 fp the cost row genuinely CANNOT separate a register from a slot, and
+   that is the hardware, not a modelling gap: a slot read is a native
+   `ld hl,(ix+d)` at 2 cycles, exactly what `ld l,c; ld h,b` costs. Bytes do
+   separate them (fp slot 3 B against BC's 2), so ranking by bytes is a clean
+   size win on the cheap-slot targets — ez80 fp, rabbit, kc160.
 
-   Bytes do still separate the candidates (fp slot 3 B against BC's 2), and
-   ranking by them is a clean SIZE win: corpus -106 B, 13 cells smaller, ZERO
-   larger, and concentrated exactly where the item predicted — ez80 -85 B over
-   8 cells, ALL of them fp, plus bitfieldbench on rabbit/kc160 (the other
-   cheap-slot targets).
-
-   But bytes carry NO information about the tick outcome here. The 12 changed
-   tick cells are 9 faster / 3 slower, aggregate -0.04 %: queenbench ez80 fp
-   -2.81 % against hashbench +1.76 % — which is VERBATIM the trade IR_BCCALLCOST
-   already measured and refused on this row ("it wins queenbench 2.81 % and
-   loses hashbench 1.76 % on the same CPU, mode and shape"). Sweeping a minimum
-   byte gap does not separate them: at gap 1-4 all four benches move, at gap 8+
-   only lexbench does and lexbench is itself a tick loser. So there is no
-   threshold that keeps the wins and drops the losses.
-
-   Conclusion to carry forward: the missing information on this row is NOT
-   recoverable from the byte table either. It is second-order (HL pressure,
-   spill placement) and needs a real term, not a proxy. Do not "fix the row" —
-   there is nothing wrong with it. */
+   It stays opt-in because bytes carry no information about the tick outcome
+   here: the same ranking wins one bench and loses another on the same CPU, mode
+   and shape, which is the trade IR_BCCALLCOST already measured and refused. */
 static int bytetie_gap(void)
 {
     static int g = -1;
@@ -1734,33 +1717,25 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
 
 /* [IR_BCCALLCOST=1] Charge a whole-function BC home for the call saves it forces.
 
-   A plain PR_BC tenant is preserved across every call its live range covers:
-   gen_call / gen_push_arg / gen_hcall emit `push bc` / `pop bc` around it, and
-   [IR_BCSAVE_LIVE] emits the pair on exactly the calls where a tenant IS live —
-   so "calls inside the live range" is not an estimate of the emitted code, it is
-   the emitted code. interval_benefit prices the accesses a register home saves
-   and charges nothing for that traffic, and the BC arm of the arbiter has no
-   benefit gate at all, so on a CHEAP-SLOT target a home worth a handful of
-   cycles is taken and then pays a pair at every call it spans.
+   A PR_BC tenant is preserved across every call its live range covers — gen_call
+   and friends emit the `push bc`/`pop bc`, and [IR_BCSAVE_LIVE] emits it on
+   exactly the calls where a tenant IS live, so "calls inside the live range" is
+   the emitted code, not an estimate. interval_benefit prices the accesses a
+   register home saves and charges nothing for that traffic, and the BC arm has
+   no benefit gate, so on a CHEAP-SLOT target a home worth a few cycles is taken
+   and then pays a pair at every call it spans.
 
-   shiftbench's `shift_compute` is the shape: `chk` accumulates through seven
-   calls in a doubly-nested loop, interval_benefit rates BC at 256 on ez80 (the
-   fp slot is a native `ld hl,(ix+d)`), and the home costs 7 pairs x weight 16.
-   The z80 does not have the problem — there the slot is dear enough that BC wins
-   anyway, and `chk` goes to a call-free RANGED home instead.
+   It is a cheap-slot problem: on ez80 an fp slot is a native `ld hl,(ix+d)`, so
+   a marginal BC home wins on cycles and loses on the saves. On z80 the slot is
+   dear enough that BC wins anyway and the value takes a call-free RANGED home
+   instead — which is also what declining here leaves it with, since ir_bc_pack
+   and the call-bounded split still place it over a call-free range.
 
-   Declining the whole-function home does not spill the value: ir_bc_pack and the
-   call-bounded split still place it over a CALL-FREE range, which is the home it
-   should have had. The gate is therefore deliberately narrow — it fires only
-   when a charge exists (a call-free function is untouched), only when the
-   charge is what sinks the home, only when the home does not SAVE bytes, and
-   only where the cycle model can tell a slot from a register at all.
+   The gate is deliberately narrow: only when a charge exists, only when it is
+   what sinks the home, only when the home does not SAVE bytes, and only where
+   the cycle model can tell a slot from a register at all.
 
-   DEFAULT-ON at margin 2; `IR_BCCALLCOST=0` opts out, byte-identical to the
-   pre-change compiler on all 638 corpus cells; `IR_BCCALLCOST=<N>` sets the
-   margin. Flipped on: corpus -92 B, 12 tick cells faster and NONE slower
-   (r2ka -1.000 %, r4k -0.928 %, r6k -0.964 %); ez80 and the other seven CPUs
-   byte-identical; long_ir 671/671 sp and fp. */
+   DEFAULT-ON at margin 2; `IR_BCCALLCOST=0` opts out, `=<N>` sets the margin. */
 static int bccallcost_on(void)
 {
     static int c = -1;
@@ -2790,20 +2765,16 @@ static void ir_iy_reduction_pack(Func *f, const int *bb_in_loop,
    A loop-carried accumulator prices very high for a register home: every
    `s = s OP x` is an RMW, and interval_benefit credits the whole slot round
    trip against it. That is a fair price for the accumulator in isolation, but
-   it says nothing about what BC is worth to the value it displaces. In
-   lexbench's `lex` the accumulator `chk` outranks the loop counter `i` and the
-   walking state, takes BC, and leaves them in frame slots — measurably worse
-   than the reverse on every target measured: z80 fp +12%, z80 sp +15%, 8080
-   +6.6%, gbz80 +3.3%, kc160 +4.6%, 8085 +1.8%.
+   it says nothing about what BC is worth to the value it displaces — in
+   lexbench's `lex` the accumulator outranks the loop counter and the walking
+   state, takes BC, and leaves them in slots, which is worse on every target.
 
    So when an accumulator is CONTENDED — another BC candidate overlaps it and is
    still unplaced — it yields. Where a spare index register exists the
-   accumulator is not even penalised: `ir_iy_reduction_pack` collects it into IY
-   afterwards, which is why this was first written as a reservation FOR that
-   pass. It is not. On a target with no spare index the accumulator simply
-   spills, and that is still the better trade — the four non-IY CPUs above all
-   return to baseline on the yield alone. Uncontended BC is never yielded: with
-   nothing else wanting the register the accumulator should keep it.
+   accumulator is not penalised: `ir_iy_reduction_pack` collects it into IY
+   afterwards. Where none does it simply spills, and that is still the better
+   trade. Uncontended BC is never yielded: with nothing else wanting the
+   register the accumulator should keep it.
 
    Two restrictions:
      - Accumulators only. A reduction chain member is a single-use partial, so
@@ -3514,33 +3485,18 @@ static void ir_trip_probe(const Func *f, const int *bb_loop_depth,
     free(seen);
 }
 
-/* [IR_GRAPH_PROBE] REBUILT 11/9/2026 (original dfcbae603d, deleted b69a6697b6 as
-   "questions answered" — the question is live again). INERT: getenv-gated, stderr
-   only, zero codegen effect.
-
-   It answers the one thing the greedy arbiter cannot be asked directly: WHERE DOES
-   THE PLACEMENT DISAGREE WITH THE GROUNDED COST MODEL, and what is the disagreement
-   worth? `rank_benefit` prices a candidate IN ISOLATION and the arbiter then walks
-   the sorted list claiming registers through boolean taken-flags, so nothing in the
-   pipeline ever compares a chosen home against the one it displaced.
-
-   TWO THINGS THE ORIGINAL COULD NOT SEE, both added here:
-     1. It skipped every SPILLED vreg (`if (areg < 0) continue`), so it could only
-        find values in the WRONG register — never a value that should have had one
-        and got none. That is the direction the 4-way census points at: 80cc's frame
-        traffic is 2-3x sdcc's on four of the six loses-to-all benches.
-     2. It reported no CONCURRENCY. The pressure question is "how many values want a
-        register at the same program point, against how many homes exist" — so the
-        sweep below reports peak simultaneous demand and the excess over supply.
+/* [IR_GRAPH_PROBE] INERT: getenv-gated, stderr only, zero codegen effect.
+   Measures where the greedy placement disagrees with the grounded cost model —
+   `rank_benefit` prices a candidate in isolation and the arbiter claims
+   registers through boolean flags, so nothing otherwise compares a chosen home
+   against the one it displaced. Also reports peak simultaneous demand against
+   the number of homes.
 
    Verdicts, per width-2 vreg:
-     UNDER  spilled, but the model says a register pays          <- the missed win
-     WRONG  homed in R, but the model prefers a different R
+     UNDER  spilled, but the model says a register pays   <- the missed win
+     WRONG  homed in R, but the model prefers another R
      OVER   homed, but the model says the slot was better
-     (agree counted silently)
-   Byte estimate is deliberately crude and conservative: a pair slot access is 6 B
-   (`ld hl,(ix+d)` is two prefixed byte loads) against 2 B for `ld l,c; ld h,b`, so
-   4 B per RAW (unweighted) access. Cycles drive the verdict; bytes only size it. */
+   Bytes are a crude sizing only (4 B per raw access); cycles drive the verdict. */
 static void ir_graph_probe(const Func *f, const int *bb_in_loop)
 {
     if (!getenv("IR_GRAPH_PROBE")) return;
@@ -4210,6 +4166,46 @@ static int g0_word_cost(int reg, int kind)
                          : (IS_GBZ80() && gbz80_cost_on()) ? GBZ80
                          : IS_RABBIT() ? RABBIT
                          : g0measured_on() ? Z80 : Z80_EST;
+    /* gbz80 carries TWO independent corrections and only one of them is safe.
+       The SLOT row is a plain hardware fact — `ld hl,sp+n` makes a gbz80 slot
+       about 30 % cheaper than the Z80 row claims — and it is DEFAULT-ON here.
+       The PAIR rows (a GP-pair deref costs 16, not 7, for want of `ld a,(bc)`
+       and `ex de,hl`) are equally true but flip a ranking near-tie in
+       histbench's hist_pass, so they stay behind `IR_GBZ80_COST=1`.
+       Bisected by row: SLOT alone is corpus -72 B and -0.005 % ticks with
+       histbench UNTOUCHED; adding the pairs buys another -32 B and costs
+       histbench +10.25 %. */
+    static int gb_slot[GR_N][GK_N];
+    if (IS_GBZ80() && !gbz80_cost_on()) {
+        /* `IR_GBZ80_MASK` selects which ROWS of the measured gbz80 table are
+           used: bit0 SLOT, bit1 BC, bit2 DE, bit3 IX/IY. Default 1 = SLOT only.
+
+           SWEPT over all 16 combinations, gbz80 corpus (sp+fp):
+             DE and IX/IY change NOTHING, in any combination — the whole effect
+             of the measured table is SLOT and BC.
+               mask 0 (z80 row)   72308 B
+               mask 1 (SLOT)      72276 B
+               mask 2 (BC alone)  +worse (bitfieldbench +8)
+               mask 3 (SLOT+BC)   72204 B   == mask 15, the whole win
+                                            72184 B with [home-rearb]  <- DEFAULT
+           mask 3 used to cost histbench +10.38 %, which is what kept it out.
+           That was NOT a ranking tie: v1 took BC, the lowerer could not realize
+           the home, `[home-demote]` demoted it and the register was then offered
+           to nobody. With `[home-rearb]` completing that recovery, histbench is
+           neutral and mask 3 is -92 B against mask 1 with 8 tick cells faster
+           and 0 slower. */
+        static int gbmask = -1;
+        if (gbmask < 0) { const char *e = getenv("IR_GBZ80_MASK");
+                          gbmask = e ? atoi(e) : 3; }
+        for (int r = 0; r < GR_N; r++) {
+            int take = (r == GR_SLOT) ? (gbmask & 1)
+                     : (r == GR_BC)   ? (gbmask & 2)
+                     : (r == GR_DE)   ? (gbmask & 4) : (gbmask & 8);
+            for (int k = 0; k < GK_N; k++)
+                gb_slot[r][k] = take ? GBZ80[r][k] : t[r][k];
+        }
+        t = (const int (*)[GK_N])gb_slot;
+    }
     int c = t[reg][kind];
     if (reg == GR_SLOT) {                             /* fp slot = (ix+d) */
         int fp = (c_framepointer_is_ix != -1);
@@ -5808,32 +5804,16 @@ void ir_alloc(Func *f)
                 }
             }
         }
-        /* [IR_BYTEPRESS] INERT — size the BYTE-PAIR opportunity by COST, not by
-           hotness. The earlier IR_BYTEPOP probe counted vregs passing
-           byte_home_realizable's gates, which include `use_count >= 8`; that
-           admits only loop-resident bytes, so it reported zero candidates
-           corpus-wide and the pair allocator was shelved as "no opportunity".
-           widthbench is the counter-example: mix_char holds SIX short-lived
-           byte values at once, spills every one, and reports zero under the old
-           probe because none is used 8+ times.
-
-           What actually decides whether byte homes pay is (a) how many byte
-           values are live SIMULTANEOUSLY — that is how many of C/E/B/D you
-           would need — and (b) how much frame traffic they carry. So report:
-
+        /* [IR_BYTEPRESS] INERT — size the byte-pair opportunity by PRESSURE
+           rather than hotness. Reports, per function:
              cands    width-1 vregs with no register home, not addr-taken or
-                      volatile, def-first, and whose live interval crosses no
-                      call (B/C/D/E are caller-clobbered, so a home is only
-                      safe across a call-free interval)
-             maxlive  the most of those live at any one op — the pressure the
-                      pair allocator would have to cover
-             hot      how many pass today's use_count>=8 gate (what IR_BYTEPOP
-                      counted); the gap to `cands` is what the old probe missed
-             traffic  total accesses over all candidates = frame loads/stores a
-                      byte home could remove
-             top4     traffic of the four highest-traffic candidates, i.e. what
-                      the four available byte homes could actually capture
-
+                      volatile, def-first, whose interval crosses no call
+                      (B/C/D/E are caller-clobbered)
+             maxlive  most of those live at one op — the pressure a pair
+                      allocator would have to cover
+             hot      how many pass the use_count>=8 gate
+             traffic  total accesses = frame traffic a byte home could remove
+             top4     traffic of the four highest, i.e. what four homes capture
            Sizing only; no allocation decision is taken here. */
         if (getenv("IR_BYTEPRESS")) {
             int total_ops = 0;
@@ -5943,32 +5923,12 @@ void ir_alloc(Func *f)
            --opt-disable=orchestrator — was retired: the orchestrator has been the
            validated default for a long time, and the dual path only complicated the
            interactions the unified allocator is consolidating.) */
-        /* [IR_PREPUSH_PROBE] INERT — size the OTHER whole-function veto.
-           bc_home_realizable rejects every non-param candidate in a function
-           containing one pre-pushed-arg call, and iv_home_realizable rejects
-           every candidate outright. The stated reason is that gen_call cannot
-           wrap such a call in push/pop bc because the save would land above the
-           arg block, leaving only emit_bc_reload (a slot read) — fine for a
-           PARAM, impossible for a slotless LOCAL.
-
-           The lowerer no longer works that way. gen_push_arg stamps the call's
-           FIRST push (op->imm == 1) and emits `push bc` THERE — below the arg
-           block — and gen_call pops it after the cleanup, gated on
-           func_has_pr_bc, which is tenant-agnostic. That machinery predates the
-           gate. What it does NOT cover:
-
-             (a) a by-value struct arg — gen_push_struct emits no save and its
-                 block copy is ldir, which eats BC as the counter;
-             (b) a call that reaches gen_call with the save stack EMPTY, so
-                 there is nothing to pop — either because ir_build stamped the
-                 marker on a push that never ran, or because BC_ARGS_SAVE_MAX
-                 (8) capped the stack and the save was silently skipped.
-
-           This measures the narrowing: classify each function's pre-pushed
-           calls, then run the REAL generator twice — once with
-           has_prepushed_call as computed today, once with it reduced to (a)||(b)
-           — and report both proposal counts. Zero codegen change; the value the
-           allocator uses below is untouched. */
+        /* [IR_PREPUSH_PROBE] INERT — size the pre-pushed-call veto. The veto
+           predates gen_push_arg's `push bc` below the arg block, so it is wider
+           than it needs to be; the shapes it still has to cover are a by-value
+           struct arg (ldir eats BC) and a call reaching gen_call with an empty
+           save stack. Runs the real generator twice, today's veto against the
+           narrowed one, and reports both proposal counts. */
         if (getenv("IR_PREPUSH_PROBE") && has_prepushed_call && f->n_vregs > 0) {
             int npre = 0, nstruct = 0, uncovered = 0;
             /* SIMULATE THE EMITTER, do not re-derive the pairing. gen_push_arg
@@ -6257,53 +6217,21 @@ void ir_alloc(Func *f)
            reduction pack didn't already claim IY. Cost-gated to dear-slot CPUs. */
         if (iy_region_ok)
         ir_iy_temp_pack(f, bb_first_op, bb_in_loop, def_kind, write_count, use_count);
-        /* Stack-transient spill (default on, IR_NO_STACK_SPILL opts out): the register-pressure
-           fallback below BC-pack — a single-def/single-use word transient with
-           no register free goes on the stack (push/pop) instead of a slot. */
         /* Stack-transient spill (default on, IR_NO_STACK_SPILL opts out): the
-           register-pressure fallback below BC-pack — a single-def/single-use word
-           transient with no register free goes on the stack (push/pop) instead of
-           a slot.
+           register-pressure fallback below BC-pack — a single-def/single-use
+           word transient with no register free goes on the stack (push/pop)
+           rather than a slot.
 
-           The `bc_region_ok` gate that used to gate this call is GONE. It was a
-           BC veto (has_long: long ops stage the low half THROUGH BC;
-           has_bc_clobber: l_case / dload / dstore) standing in front of a pass
-           that uses no BC at all — wrong in principle, and load-bearing only
-           because it hid two real defects. Both are now closed: the missing
-           wide-accumulator helper calls in stack_spill_span_hazard (`f4dd243d59`,
-           long_ir/longlong hung without it), and the width-blind span that let a
-           park cross a width-4 IR_XOR/AND/OR whose lowering pushes both halves —
-           that one no longer reproduces, and emu.c is behaviourally clean in both
-           frame modes with the veto removed.
-
-           Re-measured on removal, because the 2026-08-16 figures in
-           STORE_ORDER_PLAN.md (536 functions, 509 parks, −675 instructions) were
-           taken before the BC-veto narrowing landed and no longer hold: the real
-           effect is +54 parks corpus-wide (214 → 268) and −31..−43 B per
-           cpu-mode, concentrated almost entirely in ONE shape — switch dispatch,
-           which is what `has_bc_clobber`'s l_case arm was vetoing (switchbench
-           −15..−47 B on every CPU; md5sum is the only other file that moves, and
-           it grows on 4 of 11 cpu-modes).
-
-           It is dropped in SP mode only, because that is where the measurement
-           says it pays. A park trades a slot access for push/pop, and an fp slot
-           is `(ix+d)` — cheap enough that the trade inverts:
-
-             switchbench  sp -40 B and -2.07 % ticks   fp -15 B but +0.72 %
-             md5          sp  +9 B and -0.30 % ticks   fp -18 B but +0.44 %
-
-           Both files are byte-for-tick in fp and a win on both axes in sp, which
-           is the trade this tree rejects and takes respectively. 8080/8085/gbz80
-           have no index register, so -fframe-pointer is a no-op there and they
-           want the SP answer in both modes (switchbench 8080 -1.94 %, 8085
-           -2.84 %, identical sp and fp) — hence the CPU test rather than a bare
+           SP MODE ONLY, and that is a cost decision, not a safety one. A park
+           trades a slot access for a push/pop; in fp mode the slot is `(ix+d)`,
+           cheap enough to invert the trade (switchbench sp -40 B / -2.07 %
+           ticks, fp -15 B but +0.72 %). 8080/8085/gbz80 have no index register,
+           so -fframe-pointer is a no-op there and they want the SP answer in
+           BOTH modes — hence the CPU test below rather than a bare
            `c_framepointer_is_ix` one.
 
-           The standing gate for this area is now `IR_PARK_VERIFY`, which checks
-           the park's TOS invariant against the EMITTED TEXT rather than
-           cur_sp_adjust (only 24 of 218 push sites maintain that). It reports 268
-           parks / 0 steals / 0 depth mismatches with the veto fully off. Run it
-           before widening stack_spill_span_hazard any further. */
+           `IR_PARK_VERIFY` checks the park's TOS invariant against the emitted
+           text; run it before widening stack_spill_span_hazard. */
         int fp_ix_frame = (c_framepointer_is_ix != -1)
                        && !IS_808x() && !IS_GBZ80();
         if (bc_region_ok || !fp_ix_frame)
@@ -6781,15 +6709,13 @@ void ir_alloc(Func *f)
                        stepped IN PLACE (`inc bc`) every iteration, so evicting it
                        turns a register step into a slot read-modify-write on
                        every trip — a cost no span-local read saving repays.
-                       ir_bc_pack's 5a eviction carries the same guard in its own
-                       form ("don't evict a WRITTEN loop-carried tenant for a mere
-                       AGGREGATE of colder disjoint temps"). Without it, lexbench
-                       trades its loop counter for a 5-read split and pays 13 %.
-                       Reverting to SPILL is sound
-                       here for the same reason it is in 5a — ir_assign_slots runs
-                       later, in the lowerer, and materialises a slot for every
-                       SPILL vreg — and goes through alloc_note_late_home so the
-                       word-home prepick snapshot stays in step. */
+                       ir_bc_pack's 5a eviction carries the same guard; without
+                       it lexbench trades its loop counter for a 5-read split.
+                       Reverting to SPILL is sound here for the same reason it is
+                       in 5a — ir_assign_slots runs later, in the lowerer, and
+                       materialises a slot for every SPILL vreg — and goes
+                       through alloc_note_late_home so the word-home prepick
+                       snapshot stays in step. */
                     if (bc_busy && cs_evict_on()) {
                         long gain = cs_span_benefit(f, v, best_lo, best_hi,
                                                     bb_first_op, bb_loop_depth);

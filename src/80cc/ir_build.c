@@ -1042,6 +1042,49 @@ static int emit_acc_binop(Builder *b, const char *stem, int lv, int rv)
     return dst;
 }
 
+/* Emit a one-argument IR_HCALL to `name`, result in `dst`; returns `dst`.
+   The conversion helpers all share this shape and differ only in the name. */
+static int hcall1(Builder *b, const char *name, int src_v, int dst)
+{
+    int *args = calloc(1, sizeof(int)); args[0] = src_v;
+    Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
+    op->hcall = hi;
+    return dst;
+}
+
+/* ---- IR_ACC_UNOP construction ---------------------------------------- */
+/* Every one-argument accumulator op is the same four statements; what differs
+   between them is only the helper NAME and the accumulator TIER. Build the op
+   here and let the caller stamp the tier, so a new conversion is two lines. */
+static HelperInfo *acc_unop1(Builder *b, const char *name, int src_v, int dst)
+{
+    int *args = calloc(1, sizeof(int)); args[0] = src_v;
+    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
+    op->hcall = hi;
+    return hi;
+}
+
+/* The FA (5/6/8-byte double) tier. */
+static void acc_tier_fa(HelperInfo *hi, int subkind)
+{
+    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
+    hi->acc_width = c_fp_size; hi->acc_subkind = subkind;
+}
+
+/* The __i64_acc (width-8 long long) tier. `store_bc` passes the result address
+   in BC, which the i64 helpers want and the ACC2INT truncation does not. */
+static void acc_tier_i64(HelperInfo *hi, int subkind, int store_bc)
+{
+    hi->acc_load = "l_i64_load"; hi->acc_store = "l_i64_store";
+    hi->acc_width = 8; hi->acc_subkind = subkind; hi->acc_store_bc = store_bc;
+}
+
 /* int/long → 5/6-byte double (IR_ACC_UNOP, subkind 0): l_int2long_{s,u}_float
    (HL source) or float/ufloat (DEHL source). Result width c_fp_size. */
 static int emit_acc_from_int(Builder *b, int src_v, int src_unsigned)
@@ -1050,16 +1093,8 @@ static int emit_acc_from_int(Builder *b, int src_v, int src_unsigned)
     const char *name = acc_name((sw == 4)
         ? (src_unsigned ? "ulong2f" : "slong2f")
         : (src_unsigned ? "uint2f"  : "sint2f"));
-    int w = c_fp_size;
     int dst = new_temp_kind(b, KIND_DOUBLE);
-    int *args = calloc(1, sizeof(int)); args[0] = src_v;
-    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
-    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
-    hi->acc_width = w; hi->acc_subkind = ACC_SUB_INT2ACC;
-    op->hcall = hi;
+    acc_tier_fa(acc_unop1(b, name, src_v, dst), ACC_SUB_INT2ACC);
     return dst;
 }
 
@@ -1070,15 +1105,8 @@ static int emit_acc_to_int(Builder *b, int src_v, int ret_w)
 {
     int dst = new_temp(b, ret_w);
     b->f->vregs[dst].width = (int16_t)ret_w;
-    int *args = calloc(1, sizeof(int)); args[0] = src_v;
-    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = acc_name((ret_w == 4) ? "f2slong" : "f2sint");
-    hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
-    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
-    hi->acc_width = c_fp_size; hi->acc_subkind = ACC_SUB_ACC2INT;
-    op->hcall = hi;
+    acc_tier_fa(acc_unop1(b, acc_name((ret_w == 4) ? "f2slong" : "f2sint"),
+                          src_v, dst), ACC_SUB_ACC2INT);
     return dst;
 }
 
@@ -1088,17 +1116,8 @@ static int emit_acc_to_int(Builder *b, int src_v, int ret_w)
    value's top bit), so the helper is the safe path. */
 static int emit_acc_float_neg(Builder *b, int src_v)
 {
-    int w = c_fp_size;
     int dst = new_temp_kind(b, KIND_DOUBLE);
-    int *args = calloc(1, sizeof(int)); args[0] = src_v;
-    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = acc_name("neg"); hi->args = args; hi->n_args = 1;
-    hi->ret_vreg = dst;
-    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
-    hi->acc_width = w; hi->acc_subkind = ACC_SUB_ACC_UNARY;
-    op->hcall = hi;
+    acc_tier_fa(acc_unop1(b, acc_name("neg"), src_v, dst), ACC_SUB_ACC_UNARY);
     return dst;
 }
 
@@ -1196,14 +1215,7 @@ static int emit_acc_int_from_int(Builder *b, int src_v, int src_unsigned)
         ? (src_unsigned ? "l_i64_ulong2i64" : "l_i64_slong2i64")
         : (src_unsigned ? "l_i64_uint2i64"  : "l_i64_sint2i64");
     int dst = new_temp_kind(b, KIND_LONGLONG);
-    int *args = calloc(1, sizeof(int)); args[0] = src_v;
-    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
-    hi->acc_load = "l_i64_load"; hi->acc_store = "l_i64_store";
-    hi->acc_width = 8; hi->acc_subkind = ACC_SUB_INT2ACC; hi->acc_store_bc = 1;
-    op->hcall = hi;
+    acc_tier_i64(acc_unop1(b, name, src_v, dst), ACC_SUB_INT2ACC, 1);
     return dst;
 }
 
@@ -1215,14 +1227,7 @@ static int emit_acc_int_from_int(Builder *b, int src_v, int src_unsigned)
 static int emit_acc_int_unary(Builder *b, int src_v, const char *name)
 {
     int dst = new_temp_kind(b, KIND_LONGLONG);
-    int *args = calloc(1, sizeof(int)); args[0] = src_v;
-    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
-    hi->acc_load = "l_i64_load"; hi->acc_store = "l_i64_store";
-    hi->acc_width = 8; hi->acc_subkind = ACC_SUB_ACC_UNARY; hi->acc_store_bc = 1;
-    op->hcall = hi;
+    acc_tier_i64(acc_unop1(b, name, src_v, dst), ACC_SUB_ACC_UNARY, 1);
     return dst;
 }
 
@@ -1483,15 +1488,8 @@ static int emit_acc_int_to_int(Builder *b, int src_v, int ret_w)
 {
     int dst = new_temp(b, ret_w);
     b->f->vregs[dst].width = (int16_t)ret_w;
-    int *args = calloc(1, sizeof(int)); args[0] = src_v;
-    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = "l_i64_s64_toi32";
-    hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
-    hi->acc_load = "l_i64_load"; hi->acc_store = "l_i64_store";
-    hi->acc_width = 8; hi->acc_subkind = ACC_SUB_ACC2INT;
-    op->hcall = hi;
+    acc_tier_i64(acc_unop1(b, "l_i64_s64_toi32", src_v, dst),
+                 ACC_SUB_ACC2INT, 0);
     return dst;
 }
 
@@ -1522,22 +1520,12 @@ static int emit_acc_lldouble(Builder *b, int src_v, int to_double, int is_unsign
     if (!name) return -1;
     Kind dst_k = to_double ? KIND_DOUBLE : KIND_LONGLONG;
     int dst = new_temp_kind(b, dst_k);
-    int *args = calloc(1, sizeof(int)); args[0] = src_v;
-    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
+    HelperInfo *hi = acc_unop1(b, name, src_v, dst);
     hi->acc_subkind = ACC_SUB_CROSS;
-    if (to_double) {        /* src ll (l_i64_load) → dst double (dstore) */
-        hi->acc_load = "l_i64_load";
-        hi->acc_store = acc_name("store");
-        hi->acc_store_bc = 0;
-    } else {                /* src double (dload) → dst ll (l_i64_store, BC) */
-        hi->acc_load = acc_name("load");
-        hi->acc_store = "l_i64_store";
-        hi->acc_store_bc = 1;
-    }
-    op->hcall = hi;
+    /* one tier each side: load from the source family, store to the dest's */
+    hi->acc_load    = to_double ? "l_i64_load"  : acc_name("load");
+    hi->acc_store   = to_double ? acc_name("store") : "l_i64_store";
+    hi->acc_store_bc = !to_double;
     return dst;
 }
 
@@ -1546,16 +1534,8 @@ static int emit_acc_lldouble(Builder *b, int src_v, int to_double, int is_unsign
 static int emit_acc_from_f16(Builder *b, int src_v)
 {
     const char *name = (c_fp_size == 8) ? "l_f64_f16tof" : "l_f48_f16tof";
-    int w = c_fp_size;
     int dst = new_temp_kind(b, KIND_DOUBLE);
-    int *args = calloc(1, sizeof(int)); args[0] = src_v;
-    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
-    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
-    hi->acc_width = w; hi->acc_subkind = ACC_SUB_INT2ACC;
-    op->hcall = hi;
+    acc_tier_fa(acc_unop1(b, name, src_v, dst), ACC_SUB_INT2ACC);
     return dst;
 }
 
@@ -1565,14 +1545,7 @@ static int emit_f16_from_acc(Builder *b, int src_v)
 {
     const char *name = (c_fp_size == 8) ? "l_f64_ftof16" : "l_f48_ftof16";
     int dst = new_temp_kind(b, KIND_FLOAT16);
-    int *args = calloc(1, sizeof(int)); args[0] = src_v;
-    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
-    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
-    hi->acc_width = c_fp_size; hi->acc_subkind = ACC_SUB_ACC2INT;
-    op->hcall = hi;
+    acc_tier_fa(acc_unop1(b, name, src_v, dst), ACC_SUB_ACC2INT);
     return dst;
 }
 
@@ -1583,16 +1556,8 @@ static int emit_acc_from_accum(Builder *b, int src_v, Kind src_k)
     const char *name = (src_k == KIND_ACCUM32)
         ? (c_fp_size == 8 ? "l_f64_fix32tof" : "l_f48_fix32tof")
         : (c_fp_size == 8 ? "l_f64_fix16tof" : "l_f48_fix16tof");
-    int w = c_fp_size;
     int dst = new_temp_kind(b, KIND_DOUBLE);
-    int *args = calloc(1, sizeof(int)); args[0] = src_v;
-    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
-    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
-    hi->acc_width = w; hi->acc_subkind = ACC_SUB_INT2ACC;
-    op->hcall = hi;
+    acc_tier_fa(acc_unop1(b, name, src_v, dst), ACC_SUB_INT2ACC);
     return dst;
 }
 
@@ -1606,14 +1571,7 @@ static int emit_accum_from_acc(Builder *b, int src_v, Kind dst_k, int uns)
         : (c_fp_size == 8 ? (uns ? "l_f64_ftofix16u" : "l_f64_ftofix16s")
                           : (uns ? "l_f48_ftofix16u" : "l_f48_ftofix16s"));
     int dst = new_temp_kind(b, dst_k);
-    int *args = calloc(1, sizeof(int)); args[0] = src_v;
-    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
-    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
-    hi->acc_width = c_fp_size; hi->acc_subkind = ACC_SUB_ACC2INT;
-    op->hcall = hi;
+    acc_tier_fa(acc_unop1(b, name, src_v, dst), ACC_SUB_ACC2INT);
     return dst;
 }
 
@@ -5955,16 +5913,7 @@ static int build_cast(Builder *b, Node *n)
                                   : "l_fix16_sint2f";
         }
         int conv_v = new_temp_kind(b, dst_k);
-        int *args = calloc(1, sizeof(int));
-        args[0] = src_v;
-        Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
-        op->dst = conv_v;
-        HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-        hi->name     = helper;
-        hi->args     = args;
-        hi->n_args   = 1;
-        hi->ret_vreg = conv_v;
-        op->hcall = hi;
+        hcall1(b, helper, src_v, conv_v);
         return conv_v;
     }
     /* _Accum → integer: l_fix16_f2{s,u}{int,long} preserves
@@ -5983,16 +5932,7 @@ static int build_cast(Builder *b, Node *n)
                                    : "l_fix16_f2sint";
         int conv_v = new_temp(b, helper_ret_w);
         b->f->vregs[conv_v].width = (int16_t)helper_ret_w;
-        int *args = calloc(1, sizeof(int));
-        args[0] = src_v;
-        Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
-        op->dst = conv_v;
-        HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-        hi->name     = helper;
-        hi->args     = args;
-        hi->n_args   = 1;
-        hi->ret_vreg = conv_v;
-        op->hcall = hi;
+        hcall1(b, helper, src_v, conv_v);
         src_v = conv_v;
         if (helper_ret_w == dst_w) return src_v;
         /* Fall through (e.g. _Accum → char: helper gave int,
@@ -6012,16 +5952,7 @@ static int build_cast(Builder *b, Node *n)
                                    : "l_fix32_f2sint";
         int conv_v = new_temp(b, helper_ret_w);
         b->f->vregs[conv_v].width = (int16_t)helper_ret_w;
-        int *args = calloc(1, sizeof(int));
-        args[0] = src_v;
-        Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
-        op->dst = conv_v;
-        HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-        hi->name     = helper;
-        hi->args     = args;
-        hi->n_args   = 1;
-        hi->ret_vreg = conv_v;
-        op->hcall = hi;
+        hcall1(b, helper, src_v, conv_v);
         src_v = conv_v;
         if (helper_ret_w == dst_w) return src_v;
     }

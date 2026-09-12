@@ -1219,9 +1219,9 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
     /* Byte >> const, in A — the mirror of gen_shl's byte path. Only reached
        when ir_opt_narrow_byte proved the shifted value fits a byte (an int
        source would pull bits down out of its high byte), and only on CPUs
-       with the CB shifts: 8080 and 8085 have no CB prefix at all (8085's
-       undocumented ARHL is 16-bit `sra hl` only), so narrow_shr_kind declines
-       for both and the 16-bit path below still applies. */
+       with the CB shifts — except that a natively byte-typed `*p >>= n` lands
+       here on EVERY CPU, narrowing or not, so the 808x case is handled inline
+       below rather than kept out by narrow_shr_kind. */
     if (op->dst >= 0 && f->vregs[op->dst].width == 1 && op->src[1] < 0) {
         int count = (int)op->imm & 7;
         if (((int)(op->imm & 0xff)) >= 8) {
@@ -1253,6 +1253,21 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             emit(out, "and\t%d", 0x0f);
             for (int k = 4; k < count; k++) emit(out, "srl\ta");
             return finalize_byte_result(out, f, op, 0);
+        }
+        /* 8080/8085 have no CB prefix, so neither `srl a` nor `sra a` exists
+           (8085's undocumented ARHL is the 16-bit `sra hl` only). narrow_shr_kind
+           keeps the NARROWED int out of here, but a natively byte-typed `*p >>= n`
+           arrives with a width-1 dst anyway, so the CPU test has to be here too.
+             logical     rrca/rlca + mask, which every CPU has and which is 1 byte
+                         a step against `srl a`'s 2;
+             arithmetic  no 808x equivalent, so use the bias identity
+                         `sra(a,n) == ((a ^ 0x80) >>_logical n) - (0x80 >> n)`,
+                         branchless and clobbering only A. */
+        if (IS_808x()) {
+            if (arith) emit(out, "xor\t%d", 0x80);
+            emit_byte_lsr_a(out, count);
+            if (arith) emit(out, "sub\t%d", 0x80 >> count);
+            return finalize_byte_result(out, f, op, count == 0);
         }
         for (int k = 0; k < count; k++)
             emit(out, arith ? "sra\ta" : "srl\ta");
