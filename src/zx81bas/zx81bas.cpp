@@ -5,16 +5,18 @@
 //-----------------------------------------------------------------------------
 
 #include "../config.h"
-#include "ast_stmt.h"
+#include "ast.h"
 #include "errors.h"
 #include "lexer.h"
-#include "lower.h"
+#include "lower_asm.h"
+#include "lower_bas.h"
 #include "options.h"
 #include "parser.h"
 #include "preproc.h"
 #include "semantic.h"
 #include "symtab.h"
 #include "utils.h"
+#include "z80asm.h"
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
@@ -121,7 +123,7 @@ int main(int argc, char* argv[]) {
     // input file
     std::string input_file = normalize_path(argv[g_optind]);
     if (str_ends_with(input_file, ".p")) {
-        error("Input file should not have .p extension");
+        error("Input file cannot have .p extension: " + input_file);
         return EXIT_FAILURE;
     }
     std::string input_basename = std::filesystem::path(input_file)
@@ -140,7 +142,7 @@ int main(int argc, char* argv[]) {
 
     // preprocess the input file
     std::vector<SrcLine> src_lines;
-    if (!preproc(input_file, src_lines)) {
+    if (!preproc(input_file, input_basename, src_lines)) {
         exit_error_status();
     }
 
@@ -177,9 +179,9 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
-    // collect declarations
-    std::unique_ptr<Symtab> decl_symtab;
-    if (!create_symtab(*prog, decl_symtab)) {
+    // symbol table collection
+    std::unique_ptr<Symtab> symtab;
+    if (!create_symtab(*prog, symtab)) {
         exit_error_status();
     }
 
@@ -187,13 +189,13 @@ int main(int argc, char* argv[]) {
     if (g_dump_step == 6) {
         if (get_error_count() == 0) {
             DumpContext ctx(std::cout);
-            decl_symtab->dump(ctx);
+            symtab->dump(ctx);
         }
         exit_error_status();
     }
 #endif
 
-    // semantic check of the program
+    // semantic check
     if (!semantic_check(*prog)) {
         exit_error_status();
     }
@@ -208,30 +210,13 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
-    // create the symbol table
-    std::unique_ptr<Symtab> symtab;
-    if (!create_symtab(*prog, symtab)) {
+    // lower to standard BASIC
+    if (!lower_prog(*prog, *symtab)) {
         exit_error_status();
     }
 
 #ifdef _DEBUG
     if (g_dump_step == 8) {
-        if (get_error_count() == 0) {
-            DumpContext ctx(std::cout);
-            symtab->dump(ctx);
-        }
-        exit_error_status();
-    }
-#endif
-
-    // lower the program
-    std::unique_ptr<Prog> lowered_prog;
-    if (!lower_prog(*prog, *symtab, lowered_prog)) {
-        exit_error_status();
-    }
-
-#ifdef _DEBUG
-    if (g_dump_step == 9) {
         if (get_error_count() == 0) {
             DumpContext ctx(std::cout);
             prog->dump(ctx);
@@ -240,8 +225,32 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
-    // --- COMPLETE HERE ---
+    // build assembly source
+    std::vector<std::string> asm_source;
+    if (!build_asm_source(*prog, *symtab, asm_source)) {
+        exit_error_status();
+    }
 
-    // exit with error status if any errors occurred during processing
+#ifdef _DEBUG
+    if (g_dump_step == 9) {
+        if (get_error_count() == 0) {
+            for (auto& text : asm_source) {
+                std::cout << text << std::endl;
+            }
+        }
+        exit_error_status();
+    }
+#endif
+
+    // call the assembler and linker to produce .P and .sym file
+    std::string asm_file = input_basename + ".asm";
+    std::string sym_file = input_basename + ".sym";
+    std::string p_file = input_basename + ".p";
+    g_temp_files.push_back(asm_file);
+    if (!assemble_link(asm_source, asm_file, sym_file, p_file)) {
+        exit_error_status();
+    }
+
+    // exit with error status
     exit_error_status();
 }

@@ -5,8 +5,6 @@
 //-----------------------------------------------------------------------------
 
 #include "ast.h"
-#include "ast_expr.h"
-#include "ast_stmt.h"
 #include "dump_context.h"
 #include "errors.h"
 #include "lexer.h"
@@ -93,7 +91,7 @@ void Parser::check_end_of_stmt() {
     }
 
     // expect end of statement or colon, but found something else
-    syntax_error("expected end of statement, found '" + peek().text + "'");
+    syntax_error("Expected end of statement, found '" + peek().text + "'");
 }
 
 bool Parser::match(TokenType type) {
@@ -118,11 +116,11 @@ const Token& Parser::expect(TokenType type) {
     }
 
     if (at_end()) {
-        syntax_error("expected '" + token_type_name(type) +
+        syntax_error("Expected '" + token_type_name(type) +
                      "', found end of line");
     }
     else {
-        syntax_error("expected '" + token_type_name(type) + "', " +
+        syntax_error("Expected '" + token_type_name(type) + "', " +
                      "found '" + peek().text + "'");
     }
 
@@ -136,11 +134,11 @@ const Token& Parser::expect(Keyword keyword) {
     }
 
     if (at_end()) {
-        syntax_error("expected '" + keyword_name(keyword) +
+        syntax_error("Expected '" + keyword_name(keyword) +
                      "', found end of line");
     }
     else {
-        syntax_error("expected '" + keyword_name(keyword) + "', " +
+        syntax_error("Expected '" + keyword_name(keyword) + "', " +
                      "found '" + peek().text + "'");
     }
 
@@ -170,11 +168,11 @@ std::unique_ptr<Expr> Parser::parse_primary() {
 
     // are we at end
     if (at_end()) {
-        syntax_error("expected expression term, found end of line");
+        syntax_error("Expected expression term, found end of line");
     }
 
     if (at_end_of_stmt()) {
-        syntax_error("expected expression term, found '" +
+        syntax_error("Expected expression term, found '" +
                      peek().text + "'");
     }
 
@@ -200,7 +198,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         const Token& ident = expect(TokenType::Identifier);
         std::string name = ident.text;
         if (is_string_variable(name)) {
-            syntax_error("label reference cannot be a string variable");
+            syntax_error("Label reference cannot be a string variable");
         }
         auto label_ref = std::make_unique<LabelLineRefExpr>(name, loc());
         return label_ref;
@@ -211,7 +209,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         const Token& ident = expect(TokenType::Identifier);
         std::string name = ident.text;
         if (is_string_variable(name)) {
-            syntax_error("label reference cannot be a string variable");
+            syntax_error("Label reference cannot be a string variable");
         }
         auto label_ref = std::make_unique<LabelAddrRefExpr>(name, loc());
         return label_ref;
@@ -375,7 +373,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
     }
 
     // Error fallback
-    syntax_error("unexpected token '" +
+    syntax_error("Unexpected token '" +
                  peek().text + "' in expression");
 }
 
@@ -535,10 +533,10 @@ std::unique_ptr<Expr> Parser::parse_expr() {
 std::unique_ptr<Expr> Parser::parse_assignable() {
     // Must start with identifier that is not end of statement
     if (at_end()) {
-        syntax_error("expected variable name, found end of line");
+        syntax_error("Expected variable name, found end of line");
     }
     if (peek().type != TokenType::Identifier || at_end_of_stmt()) {
-        syntax_error("expected variable name, found '"
+        syntax_error("Expected variable name, found '"
                      + peek().text + "'");
     }
 
@@ -758,7 +756,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
             return stmt;
         }
         else {
-            syntax_error("unrecognized pragma statement '" + keyword_tok.text + "'");
+            syntax_error("Unrecognized pragma statement '" + keyword_tok.text + "'");
         }
     }
 
@@ -805,12 +803,12 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         pos = save_pos;  // restore position if not an assignment
     }
 
-    // fall through : unrecognized statement
+    // fall through : Unrecognized statement
     if (peek().type == TokenType::Identifier) {
-        syntax_error("unrecognized statement '" + peek().text + "'");
+        syntax_error("Unrecognized statement '" + peek().text + "'");
     }
     else {
-        syntax_error("expected a BASIC language statement, found '" +
+        syntax_error("Expected a BASIC language statement, found '" +
                      peek().text + "'");
     }
     return nullptr;
@@ -830,7 +828,7 @@ bool Parser::parse_label_line_num(std::string& out_label,
             expect(TokenType::Colon);
 
             if (found_label) {
-                syntax_error("multiple labels in the same line are not allowed");
+                syntax_error("Multiple labels in the same line");
             }
             out_label = label_token.text;
             found_label = true;
@@ -839,7 +837,7 @@ bool Parser::parse_label_line_num(std::string& out_label,
 
         if (peek().type == TokenType::Integer) {
             if (found_line_num) {
-                syntax_error("multiple line numbers in the same line are not allowed");
+                syntax_error("Multiple line numbers in the same line");
             }
             out_basic_line_num = peek().ivalue;
             pos++;
@@ -915,7 +913,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_autostart_line() {
         return nullptr;
     }
 
-    syntax_error("expected '= number|@label' after '#AUTOSTART_LINE'");
+    syntax_error("Expected '= number|@label' after '#AUTOSTART_LINE'");
     return nullptr;
 }
 
@@ -1083,7 +1081,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_sysvars() {
     while (true) {
         const Token& num = expect(TokenType::Integer);
         if (num.ivalue > 255) {
-            syntax_error("values must be in range 0..255, found " +
+            syntax_error("Values must be in range 0..255, found " +
                          std::to_string(num.ivalue));
         }
         prog.sysvars_data.push_back(static_cast<uint8_t>(num.ivalue));
@@ -1348,7 +1346,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_if() {
                          terminator,
                          stmt->then_stmts);
         if (terminator == Keyword::None) {
-            syntax_error("expected 'ENDIF'");
+            syntax_error("Expected 'ENDIF'");
         }
 
         if (terminator == Keyword::ELSE) {
@@ -1356,7 +1354,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_if() {
                              terminator,
                              stmt->else_stmts);
             if (terminator == Keyword::None) {
-                syntax_error("expected 'ENDIF'");
+                syntax_error("Expected 'ENDIF'");
             }
         }
 
@@ -1392,7 +1390,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_repeat() {
                          terminator,
                          stmt->body);
         if (terminator == Keyword::None) {
-            syntax_error("expected 'UNTIL'");
+            syntax_error("Expected 'UNTIL'");
         }
         stmt->condition = parse_expr();
         return stmt;
@@ -1404,7 +1402,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_repeat() {
                     terminator,
                     stmt->body);
     if (terminator != Keyword::UNTIL) {
-        syntax_error("expected 'UNTIL'");
+        syntax_error("Expected 'UNTIL'");
     }
     stmt->condition = parse_expr();
     return stmt;
@@ -1423,7 +1421,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_while() {
                          terminator,
                          stmt->body);
         if (terminator == Keyword::None) {
-            syntax_error("expected 'WEND'");
+            syntax_error("Expected 'WEND'");
         }
         return stmt;
     }
@@ -1434,14 +1432,14 @@ std::unique_ptr<Stmt> Parser::parse_stmt_while() {
                     terminator,
                     stmt->body);
     if (terminator != Keyword::WEND) {
-        syntax_error("expected 'WEND'");
+        syntax_error("Expected 'WEND'");
     }
     return stmt;
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_for() {
     if (at_end_of_stmt()) {		// guard against FOR UNTIL=...
-        syntax_error("expected variable name, found '" + peek().text + "'");
+        syntax_error("Expected variable name, found '" + peek().text + "'");
     }
     const Token& ident = expect(TokenType::Identifier);
     std::string name = ident.text;
@@ -1478,7 +1476,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_for() {
                          terminator,
                          stmt->body);
         if (terminator == Keyword::None) {
-            syntax_error("missing NEXT");
+            syntax_error("Expected 'NEXT'");
         }
         if (!at_end_of_stmt() && peek().type == TokenType::Identifier) {
             std::string next_var = peek().text;
@@ -1497,7 +1495,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_for() {
                      terminator,
                      stmt->body);
     if (terminator == Keyword::None) {
-        syntax_error("missing NEXT");
+        syntax_error("Expected 'NEXT'");
     }
     if (!at_end_of_stmt() && peek().type == TokenType::Identifier) {
         std::string next_var = peek().text;
@@ -1519,7 +1517,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def() {
         return parse_stmt_def_fn(ident.text);
     }
     else {
-        syntax_error("expected PROCname or FNname, found '" + ident.text + "'");
+        syntax_error("Expected 'PROC<name>' or 'FN<name>', found '" + ident.text + "'");
         return nullptr;
     }
 }
@@ -1535,7 +1533,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def_proc(const std::string& name) {
             const Token& param = expect(TokenType::Identifier);
             std::string name = param.text;
             if (is_string_variable(name)) {
-                syntax_error("string variable '" + name +
+                syntax_error("String variable '" + name +
                              "' not allowed as parameter in DEF PROC statement");
             }
 
@@ -1556,7 +1554,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def_proc(const std::string& name) {
                      terminator,
                      stmt->body);
     if (terminator == Keyword::None) {
-        syntax_error("expected ENDPROC");
+        syntax_error("Expected 'ENDPROC'");
     }
 
     return stmt;
@@ -1573,7 +1571,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def_fn(const std::string& name) {
             const Token& param = expect(TokenType::Identifier);
             std::string name = param.text;
             if (is_string_variable(name)) {
-                syntax_error("string variable '" + name +
+                syntax_error("String variable '" + name +
                              "' not allowed as parameter in DEF FN statement");
             }
 
@@ -1634,12 +1632,9 @@ std::unique_ptr<Stmt> Parser::parse_stmt_local() {
         const Token& ident = expect(TokenType::Identifier);
         std::string name = ident.text;
         if (is_string_variable(name)) {
-            syntax_error("string variable '" + name + "' not allowed in LOCAL statement");
+            syntax_error("String variable '" + name + "' not allowed in LOCAL statement");
         }
-        if (std::find(stmt->locals.begin(), stmt->locals.end(),
-                      name) == stmt->locals.end()) {
-            stmt->locals.push_back(name);
-        }
+        stmt->locals.push_back(name);
         if (match(TokenType::Comma)) {
             continue;
         }

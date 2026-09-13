@@ -1,9 +1,10 @@
 % z88dk-zx81bas -d 4 t//input/15_lexer_error.bas
 Input file:  t/input/15_lexer_error.bas
 Output file: t/input/15_lexer_error.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/15_lexer_error.bas.i" "t/input/15_lexer_error.bas.pp"
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/15_lexer_error.i" "t/input/15_lexer_error.pp"
 t/input/15_lexer_error.bas:2: error: Unknown ZX81 encoding: "'""
-t/input/15_lexer_error.bas:4: error: Unknown ZX81 encoding: "'""
-t/input/15_lexer_error.bas:5: error: end of line expected, found 'extra'
+t/input/15_lexer_error.bas:3: error: Char constant must be a single character
+t/input/15_lexer_error.bas:5: error: Unknown ZX81 encoding: "'""
 t/input/15_lexer_error.bas:6: error: end of line expected, found 'extra'
-4 errors found
+t/input/15_lexer_error.bas:7: error: end of line expected, found 'extra'
+5 errors found

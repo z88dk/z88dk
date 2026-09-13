@@ -6,6 +6,10 @@
 
 #pragma once
 
-#include "ast.h"
+#include <string>
+#include <vector>
 
-bool semantic_check(Prog& prog);
+bool assemble_link(const std::vector<std::string>& asm_source,
+                   const std::string& asm_file,
+                   const std::string& sym_file,
+                   const std::string& p_file);

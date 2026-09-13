@@ -32,10 +32,9 @@ DEBUG_DIR   = build/Debug
 RELEASE_DIR = build/Release
 
 SRCS := $(wildcard *.cpp)
-DEBUG_SRCS := $(wildcard test/*.cpp)
-DEFS := $(wildcard *.def test/*.def)
+DEFS := $(wildcard *.def)
 
-DEBUG_OBJS    := $(patsubst %.cpp,$(DEBUG_DIR)/%.o,$(SRCS) $(DEBUG_SRCS))
+DEBUG_OBJS    := $(patsubst %.cpp,$(DEBUG_DIR)/%.o,$(SRCS))
 RELEASE_OBJS  := $(patsubst %.cpp,$(RELEASE_DIR)/%.o,$(SRCS))
 DEBUG_DEPENDS   := $(DEBUG_OBJS:.o=.d)
 RELEASE_DEPENDS := $(RELEASE_OBJS:.o=.d)
@@ -60,13 +59,13 @@ $(RELEASE_EXE): $(RELEASE_OBJS) $(DEFS)
 	$(CXX) $(CXXFLAGS_RELEASE) $(RELEASE_OBJS) -o $@
 	strip $@
 
-$(DEBUG_DIR)/%.o: %.cpp | $(DEBUG_DIR) $(DEBUG_DIR)/test
+$(DEBUG_DIR)/%.o: %.cpp | $(DEBUG_DIR)
 	$(CXX) $(CXXFLAGS_DEBUG) -c $< -o $@
 
 $(RELEASE_DIR)/%.o: %.cpp | $(RELEASE_DIR)
 	$(CXX) $(CXXFLAGS_RELEASE) -c $< -o $@
 
-$(DEBUG_DIR) $(DEBUG_DIR)/test $(RELEASE_DIR):
+$(DEBUG_DIR) $(RELEASE_DIR):
 	mkdir -p $@
 
 # Rule to produce .cpp from .re using re2c
@@ -75,12 +74,6 @@ scan.cpp: scan.re Makefile
 	dos2unix $@
 
 # test
-$(DEBUG_DIR)/test/test_driver.o : test/test_driver.def
-
-test/test_driver.def : $(wildcard test/*.cpp) tools/make_tests.pl Makefile
-	perl tools/make_tests.pl test $@
-	dos2unix $@
-
 test: $(DEBUG_EXE) $(RELEASE_EXE)
 	perl -S prove -j9 --state=slow,save t/*.t
 
@@ -95,14 +88,8 @@ tidy:
 cloc:
 	perl -S cloc --fullpath .
 
-# test code coverage
-coverage:
-	$(MAKE) clean tidy
-	$(MAKE) COVERAGE=1 test
-	gcov $(DEBUG_DIR)/*.gcno | perl tools/parse_gcov.pl | tee tools/coverage.txt
-
 CLEAN_PATTERNS = *.o *.gcov *.exe *.orig *.core *.bak *.new *~ *.pp *.i *.p
-CLEAN_DIRS = . t t/* test
+CLEAN_DIRS = . t t/*
 CLEAN_FILES = \
   $(foreach d,$(CLEAN_DIRS), \
     $(foreach p,$(CLEAN_PATTERNS), \

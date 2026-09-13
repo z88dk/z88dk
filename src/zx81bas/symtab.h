@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "ast_stmt.h"
+#include "ast.h"
 #include "dump_context.h"
 #include "errors.h"
 #include <string>
@@ -25,4 +25,4 @@ struct Symtab : TreeNode {
 #endif
 };
 
-bool create_symtab(Prog& prog, std::unique_ptr<Symtab>& symtab);
+bool create_symtab(Prog& prog, std::unique_ptr<Symtab>& out_symtab);

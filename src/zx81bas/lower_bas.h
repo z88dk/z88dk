@@ -7,5 +7,7 @@
 #pragma once
 
 #include "ast.h"
+#include "symtab.h"
+#include <memory>
 
-bool semantic_check(Prog& prog);
+bool lower_prog(Prog& prog, Symtab& symtab);

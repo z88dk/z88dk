@@ -6,8 +6,7 @@
 
 #pragma once
 
-#include "ast_expr.h"
-#include "ast_stmt.h"
+#include "ast.h"
 #include "errors.h"
 #include "lexer.h"
 #include <memory>

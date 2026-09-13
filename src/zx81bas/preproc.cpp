@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "dump_context.h"
 #include "errors.h"
 #include "options.h"
 #include "preproc.h"
@@ -167,7 +168,7 @@ static bool read_source_file(const std::string& filename,
     // open file
     std::ifstream infile(filename);
     if (!infile) {
-        error("Failed to open file: " + filename);
+        error("Failed to open input file: " + filename);
         return false;
     }
 
@@ -534,7 +535,7 @@ static bool preproc_with_cpp(const std::string& input_file,
         std::cout << "% " << cmd << std::endl;
     }
     if (system(cmd.c_str()) != 0) {
-        error("cpp failed, command line: " + cmd);
+        error("Tool cpp failed, command line: " + cmd);
         return false;
     }
     return true;
@@ -562,9 +563,11 @@ static bool prepare_input(const std::string& input_file,
     return true;
 }
 
-bool preproc(std::string input_file, std::vector<SrcLine>& out_lines) {
+bool preproc(const std::string& input_file,
+             const std::string& input_basename,
+             std::vector<SrcLine>& out_lines) {
     // prepare input file for ucpp
-    std::string prepared_file = input_file + ".pp";
+    std::string prepared_file = input_basename + ".pp";
     g_temp_files.push_back(prepared_file);
 
     if (!prepare_input(input_file, prepared_file)) {
@@ -581,7 +584,7 @@ bool preproc(std::string input_file, std::vector<SrcLine>& out_lines) {
 #endif
 
     // preprocess with cpp
-    std::string preproc_file = input_file + ".i";
+    std::string preproc_file = input_basename + ".i";
     g_temp_files.push_back(preproc_file);
 
     if (!preproc_with_cpp(prepared_file, preproc_file)) {
@@ -648,3 +651,13 @@ bool match_ASM(const std::string& text, const SourceLoc& loc) {
 bool match_BASIC(const std::string& text, const SourceLoc& loc) {
     return match_mode_change(text, "ENDASM", loc);
 }
+
+#ifdef _DEBUG
+void SrcLine::dump(DumpContext ctx) const {
+    ctx.line("SrcLine {");
+    auto child_ctx = ctx.child();
+    child_ctx.line("text: \"" + text + "\"");
+    loc.dump(child_ctx);
+    ctx.line("}");
+}
+#endif

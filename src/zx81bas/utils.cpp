@@ -17,7 +17,7 @@
 
 void remove_file(const std::string& filename) {
     if (std::remove(filename.c_str()) != 0) {
-        error("Failed to remove temporary file " + filename);
+        error("Failed to remove temporary file: " + filename);
     }
 }
 
