@@ -29,6 +29,12 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0015](0015-ir-pattern-matcher.md) | The IR pattern-matcher engine: declarative production table (templates + check/apply + exclude_cpus), side conditions written once |
 | [0016](0016-two-pass-lowering-and-carry.md) | Two-pass lowering: cross-BB register carry (bb_hl_out / byte-home), lazy spill (store-on-clobber), and rematerialisation |
 | [0018](0018-operand-residency-de-cache.md) | **Rejected** — operand residency via a DE cache (both the single-BB cache and the cross-BB carry) |
+| [0019](0019-cross-function-tail-merging.md) | **Rejected** — cross-function tail merging and shared epilogue helpers (banking) |
+| [0020](0020-narrowing-a-pushed-argument.md) | **Rejected** — narrowing the producer of a byte-wide pushed argument |
+| [0021](0021-per-value-spill-heuristics.md) | **Rejected** — per-value spill/placement heuristics (the decision is interference, not value kind) |
+| [0022](0022-widening-the-long-stack-park.md) | **Rejected** — widening the long stack-park pass (its gate is def-uniqueness, not use count) |
+| [0023](0023-bytewise-word-store.md) | **Rejected** — the bytewise word store (it must drop a belief the pair form keeps) |
+| [0024](0024-byte-home-for-a-single-use-temp.md) | **Rejected** — relaxing the byte-home use-count gate (E is slot-backed; one byte home per function) |
 
 Derived from the `*_PLAN.md` working notes: 0006 ← MULTICPU_IR, 0007 ← KIND_WIDTH,
 0008 ← IVSR, 0009 ← the long-long/double accumulator design. Transient
