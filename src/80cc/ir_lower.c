@@ -1934,12 +1934,6 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             if (bcflow || deflow)
                 bc_live_at_labels(lines, n, lbl, nlbl, lb, lc, lf,
                                   deflow ? ldl : NULL, deflow ? lel : NULL);
-            if (getenv("IR_BCFLOW_DBG")) {
-                int dead = 0;
-                for (int k = 0; k < nlbl; k++) if (!lb[k] && !lc[k]) dead++;
-                fprintf(stderr, "BCFLOW lines=%d labels=%d bc-dead-labels=%d\n",
-                        n, nlbl, dead);
-            }
         }
         int de_verify  = de_sweep_on();              /* IR_DEPARK_SWEEP */
         int de_rewrite = !opt_disabled("de-park");
@@ -2603,16 +2597,6 @@ static void filter_block_layout(FILE *out, FILE *src)
         for (long j = li; j <= end; j++) claimed[j] = 1;
     }
 
-    if (getenv("IR_BLAYOUT_LOG")) {
-        long nm = 0, njump = 0;
-        for (long i = 0; i < n; i++) {
-            const char *tp; size_t tn;
-            if (bl_uncond_jump(L[i], &tp, &tn)) njump++;
-            if (jmp_to[i] >= 0) nm++;
-        }
-        fprintf(stderr, "BLAYOUT lines=%ld uncond_jumps=%ld moves=%ld\n",
-                n, njump, nm);
-    }
     /* emit: a moved trace replaces its jump, and is skipped where it was */
     int *skip = calloc((size_t)(n > 0 ? n : 1), sizeof *skip);
     if (skip) {

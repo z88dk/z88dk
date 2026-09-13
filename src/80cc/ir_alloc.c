@@ -460,8 +460,6 @@ static inline void add_cand(Cand *out, int *n, int cap, int v, long benefit,
    lowerer can serve, so capture is reported twice: over all deserving values (which
    mixes in proposal coverage) and over nominated ones only (pure SELECTION quality).
    Set when the real pool is built, cleared at teardown. */
-static const char *g_pool_member;
-static int         g_pool_member_n;
 
 static const long *g_bb_tripw;      /* real per-BB iteration weight; see below */
 static int         g_bb_tripw_n;
@@ -3002,12 +3000,6 @@ static void ir_iy_reduction_pack(Func *f, const int *bb_in_loop,
     } else {
         for (int m = 0; m < pick.nm; m++) f->vreg_to_phys[pick.members[m]] = IR_PR_IY;
         f->idx3_reg = IR_PR_IY;
-        if (getenv("IR_ALLOC_PROBE")) {
-            fprintf(stderr, "IY_REDUCE bb%d members=%d score=%ld:",
-                    pick.chain_bb, pick.nm, pick.chain_score);
-            for (int m = 0; m < pick.nm; m++) fprintf(stderr, " v%d", pick.members[m]);
-            fprintf(stderr, "\n");
-        }
     }
 }
 
@@ -5036,42 +5028,6 @@ void ir_alloc(Func *f)
        "no IY packing at all" — the opt-out has to be a revert, not a third
        behaviour. */
     int iy_region_ok = iylong_off() ? bc_region_ok : !has_iy_clobber;
-    /* [IR_BCVETO_PROBE] INERT — size the per-op BC veto. bc_region_ok is three
-       per-op facts (width-4 staging, non-char IR_SWITCH dispatch, IR_ACC_*
-       helpers) promoted to a WHOLE-FUNCTION disqualification, so one switch or
-       one long anywhere kills BC homing everywhere in the function. op_clobbers
-       already returns the precise per-op answer, and both IY packs already use it
-       that way ("op_clobbers(o) & IR_R_IY per op across the candidate's live
-       range"). This counts what the precise test would ADMIT that the blunt one
-       rejects: width-2 non-escaping vregs whose own live range never crosses a
-       BC-clobbering op. Upper bound — it ignores the packs' other predicates
-       (write-once, def kind, interference), so real wins are a subset. The
-       PER-CLASS breakdown that does apply them is BCVETOC, below; this line
-       stays because it is the number the corpus survey was taken with.
-       picker_maps=0 marks a function the IY veto ALSO rejects, so the block
-       below never runs and no BCVETOC line follows — 4 of 5523 corpus
-       functions are in that state. */
-    if (getenv("IR_BCVETO_PROBE") && !bc_region_ok) {
-        int cands = 0, clean = 0;
-        for (int v = 0; v < f->n_vregs; v++) {
-            const VReg *vr = &f->vregs[v];
-            if (vr->width != 2) continue;
-            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
-            const LiveRange *lr = ir_live_range(f, v);
-            if (!lr || lr->start < 0) continue;
-            cands++;
-            int crosses = 0, g = 0;
-            for (int i = 0; i < f->n_bbs && !crosses; i++)
-                for (int j = 0; j < f->bbs[i].n_ops; j++, g++) {
-                    if (g < lr->start || g > lr->end) continue;
-                    if (op_clobbers(f, &f->bbs[i].ops[j]) & IR_R_BC) { crosses = 1; break; }
-                }
-            if (!crosses) clean++;
-        }
-        fprintf(stderr, "BCVETO %-22s has_long=%d has_bc_clobber=%d cands=%d bc_clean=%d picker_maps=%d\n",
-                f->fn ? ir_sym_name(f->fn) : "?", has_long, has_bc_clobber, cands, clean,
-                iy_region_ok);
-    }
     if (bc_region_ok || iy_region_ok) {
         /* Per-vreg write count: any op with dst == v writes the vreg.
            Lowerer's PR_BC short-circuit only handles reads (load_to_hl
@@ -5764,15 +5720,6 @@ void ir_alloc(Func *f)
                                                  bb_in_loop, bb_loop_depth, bb_cond_shift,
                                                  first_use, last_use,
                                                  pool, (int)cand_pool_len(f));
-                /* B4 (inert, IR_HR_CHECK): home_realizable == pool membership? */
-                if (getenv("IR_GRAPH_PROBE")) {
-                    static char *pm = NULL; static int pmn = 0;
-                    free(pm); pm = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), 1);
-                    pmn = f->n_vregs;
-                    if (pm) for (int i2 = 0; i2 < np; i2++)
-                        if (pool[i2].vreg >= 0 && pool[i2].vreg < pmn) pm[pool[i2].vreg] = 1;
-                    g_pool_member = pm; g_pool_member_n = pm ? pmn : 0;
-                }
                 /* Rank each candidate by the grounded interval_benefit of its best
                    allowed register class (rank_benefit) — the unified cost model that
                    replaced the old cost_benefit hotness heuristic + keep-rules as the

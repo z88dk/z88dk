@@ -137,22 +137,9 @@ static long dp_total, dp_free, dp_blk_home, dp_blk_de, dp_blk_dehl, dp_blk_pend;
    call clobbers DE regardless. Sound even against a byte staged in E, which is
    what sank the belief-based gate. */
 static long dp_precall;
-static void depark_probe_report(void)
-{
-    if (!dp_total) return;
-    fprintf(stderr, "DEPARKPROBE sites=%ld free=%ld (%.0f%%) blocked:"
-            " de_home=%ld de_belief=%ld dehl=%ld pending=%ld"
-            " | pre_call=%ld (%.0f%%)\n",
-            dp_total, dp_free, 100.0 * (double)dp_free / (double)dp_total,
-            dp_blk_home, dp_blk_de, dp_blk_dehl, dp_blk_pend,
-            dp_precall, 100.0 * (double)dp_precall / (double)dp_total);
-}
 static int depark_probe_on(void)
 {
     static int v = -1;
-    if (v < 0) { const char *e = getenv("IR_DEPARK_PROBE");
-                 v = e ? atoi(e) : 0;
-                 if (v) atexit(depark_probe_report); }
     return v;
 }
 
