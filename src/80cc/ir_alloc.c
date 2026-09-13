@@ -23,6 +23,7 @@
 #include "ccdefs.h"     /* FASTCALL flag bit (sets DEFINE_H for ir.h) */
 #include "ir_alloc.h"
 #include "ir_analysis.h"
+#include "ir_lower.h"   /* ir_assign_slots — the revert re-slots */
 
 #include <stdlib.h>
 #include <limits.h>
@@ -95,11 +96,37 @@ static void alloc_note_late_home(Func *f, int v, PhysReg pr)
         word_home_prepick[v] = pr;
 }
 
-int *ir_alloc_take_word_home_prepick(void)
+/* ---- The word DE-home pick, and its one legal rejection -------------------
+   The allocator picks a word DE-home before lowering can tell whether a
+   resident region will actually form for it. Only the render can answer that,
+   so the answer comes back as a REJECTION — and the revert is applied here, by
+   the owner of the allocation, from a snapshot that never leaves this file.
+   The lowerer used to take the snapshot array and memcpy it back itself, which
+   made it a second writer of vreg_to_phys.
+
+   This is a revert to a saved plan, not a re-arbitration: re-running ir_alloc
+   with the value vetoed would re-place everything else too, and that is a
+   different (and not byte-identical) decision. */
+int ir_alloc_word_home_picked(void)
 {
-    int *p = word_home_prepick;
+    return word_home_prepick != NULL;
+}
+
+void ir_alloc_word_home_reject(Func *f)
+{
+    if (!f || !word_home_prepick || !f->vreg_to_phys) return;
+    memcpy(f->vreg_to_phys, word_home_prepick,
+           (size_t)f->n_vregs * sizeof(int));
+    f->word_home_vreg = -1;
+    f->de_home_general = 0;
+    f->de_home_is_ptr = 0;
+    ir_assign_slots(f);
+}
+
+void ir_alloc_word_home_done(void)
+{
+    free(word_home_prepick);
     word_home_prepick = NULL;
-    return p;
 }
 
 /* Returns 1 if the spill of op->dst at bb->ops[op_idx] is dead — its

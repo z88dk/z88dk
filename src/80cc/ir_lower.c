@@ -6569,8 +6569,7 @@ int ir_lower_func(FILE *out, Func *f)
        formation needs slots + bb_alias, so it's decided here with the SAME
        compute_home_region the render uses. No region ⇒ restore the saved
        pre-pick allocation and re-slot, reverting to baseline. */
-    int *wh_prepick = ir_alloc_take_word_home_prepick();
-    if (wh_prepick) {
+    if (ir_alloc_word_home_picked()) {
         if (f->word_home_vreg >= 0) {
             int wlo = -1, whi = -1;
             g_hc.home_is_word = 1;
@@ -6583,16 +6582,12 @@ int ir_lower_func(FILE *out, Func *f)
             g_hc.home_is_word = 0;
             g_hc.func_whome = -1;
             g_hc.de_home = -1;
-            if (wlo < 0) {
-                memcpy(f->vreg_to_phys, wh_prepick,
-                       (size_t)f->n_vregs * sizeof(int));
-                f->word_home_vreg = -1;
-                f->de_home_general = 0;
-                f->de_home_is_ptr = 0;
-                ir_assign_slots(f);
-            }
+            /* No region formed: the render cannot keep the promise the pick
+               made, so reject it. The allocator reverts its own plan. */
+            if (wlo < 0)
+                ir_alloc_word_home_reject(f);
         }
-        free(wh_prepick);
+        ir_alloc_word_home_done();
     }
 
     /* === Pass driver ===

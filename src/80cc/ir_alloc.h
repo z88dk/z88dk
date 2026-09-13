@@ -19,10 +19,12 @@
    call multiple times on the same Func. */
 void ir_alloc(Func *f);
 
-/* Hand off (and clear) the allocation snapshot saved just before the word
-   DE-home pick, or NULL if no home was picked this function. The lowerer uses
-   it to revert the pick when no resident region forms. Caller frees it. */
-int *ir_alloc_take_word_home_prepick(void);
+/* The word DE-home pick can only be judged by the render: if no resident
+   region forms, the lowerer REJECTS it and the allocator reverts its own plan
+   from a snapshot it never hands out. Call _done either way to release it. */
+int  ir_alloc_word_home_picked(void);
+void ir_alloc_word_home_reject(Func *f);
+void ir_alloc_word_home_done(void);
 
 /* [home-rearb] The lowerer proved a register home unrealizable: veto the value
    so a re-run of ir_alloc offers its register to the next candidate instead of
