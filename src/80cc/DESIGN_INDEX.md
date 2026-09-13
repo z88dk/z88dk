@@ -18,7 +18,7 @@ see `DESIGN_REVIEW_PLAN.md` (same directory), steps 2 to 7. In progress:
 | 3. This index | done |
 | 4. Document pass | done — archived on `80cc-docs-archive`, 9 new ADRs |
 | 5. Home plan (one owner) | done — no code outside `ir_alloc` writes home state |
-| 6. Query boundary | not started |
+| 6. Query boundary | done — `check_ownership.sh` enforces it |
 | 7. Lowering facts | not started |
 
 No optimisation work starts until invariants 2 and 3 hold (see the plan).
@@ -53,9 +53,33 @@ index-half homes the lowerer had assigned, with nothing to put them back. It
 was inert on this corpus (byte-identical before and after the move) but it was
 only ever going to be inert by luck.
 
-Still outstanding for step 6: the parallel arrays are the public contract, and
-a point query can still read `vreg_to_phys` directly instead of asking
-`ir_home_at`, ignoring the interval bounds.
+The reads went the same way. Nothing outside `ir_alloc.c` indexes the arrays;
+it asks one of:
+
+| Question | Accessor |
+| --- | --- |
+| where is v homed AT THIS POINT | `ir_home_at(f, v)` — lowerer wrapper over `ir_home_at_op(f, v, g)` |
+| is v EVER homed in a register | `ir_home_assigned(f, v)` |
+| does v need a frame slot | `ir_home_requires_slot(f, v)` |
+| is v's home window ranged | `ir_home_is_ranged(f, v)` |
+| what window does the home cover | `ir_home_window(f, v, &lo, &hi)` |
+
+`src/80cc/check_ownership.sh` enforces both halves and is the reason this stays
+true: it fails on a direct write, a `memcpy` over the arrays, or an indexed
+read outside `ir_alloc.c`. It was tested against a deliberate bypass. Run it
+with any change that touches residency.
+
+The point query takes its op index as an argument rather than reading lowerer
+state, so allocation, slots, the verifiers and a test can all ask exactly what
+the lowerer asks.
+
+**One question deliberately left open.** The 27 converted reads all became
+`ir_home_assigned`, which ignores the interval — exactly what they did before,
+so the conversion is byte-identical. Some of them are point decisions and
+*should* honour the window. That is not a cleanup: while homes are
+whole-function it changes nothing, and for a call-split value it would change
+emitted code. Decide it per site, with a measurement, when ranged residency is
+next worked on.
 
 ## Opt-outs
 
