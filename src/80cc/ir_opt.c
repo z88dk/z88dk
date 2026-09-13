@@ -2771,6 +2771,32 @@ static int shr_result_byte_wide(const Func *f, const Op *op)
     return shr_uses_masked_within(f, op, 0xFF);
 }
 
+/* [IR_SHRWIDE] Is v produced ONLY by constant-count logical right shifts? That
+   is the shape the relaxation below is for — the shift is what the narrowing
+   buys, and without one there is nothing to win, only a zero-extend to pay at
+   every wide reader. Tying the clause to this keeps divbench (byte-masked ANDs
+   with no shift behind them) from narrowing for no gain. */
+static int v_is_const_shr(const Func *f, int v)
+{
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *d = &bb->ops[j];
+            if (d->dst != v) continue;
+            if (d->kind != IR_SHR || d->src[1] != -1) return 0;
+            if (d->imm & IR_SHR_ARITH) return 0;
+            int n = (int)(d->imm & 0xff);
+            if (n < 1 || n > 7) return 0;
+            seen = 1;
+        }
+    }
+    return seen;
+}
+
+static int shrwide_on(void)
+{ const char *e = getenv("IR_SHRWIDE"); return !(e && e[0] == '0'); }   /* default ON */
+
 static int shrmask_on(void)
 { const char *e = getenv("IR_SHRMASK"); return !(e && e[0] == '0'); }
 
@@ -2927,6 +2953,22 @@ static int demands_low_byte_only(const Func *f, int v)
                 }
                 continue;
             }
+            /* [IR_SHRWIDE] An immediate AND whose mask lies inside one byte
+               reads only v's LOW BYTE — that is true of the mask, and has
+               nothing to do with how wide the AND's own result is. The clause
+               above demands a byte-wide dst as well, which refuses the shape
+               where a bitfield is extracted and then WIDENED into an int
+               accumulator: `((x >> 3) & 31) + acc`. There the extract stayed on
+               the 16-bit `srl h; rr l` walk even though the mask proves a byte
+               suffices — xcc computes it in 8 bits and zero-extends, and is
+               1.55x faster on bitfieldbench partly for this reason.
+
+               Narrowing v makes the shift produce a byte; every reader of the
+               narrowed v loads it through the width-aware path, which
+               zero-extends. IR_SHRWIDE=0 opts out. */
+            if (shrwide_on() && u->kind == IR_AND && u->src[1] == -1
+                && (u->imm & ~0xFFLL) == 0 && v_is_const_shr(f, v))
+                continue;
             /* A constant-count right shift that itself narrowed to a byte.
                An immediate-count SHR has no vreg count operand, so v can only
                be the shifted VALUE — and the shift only narrowed because

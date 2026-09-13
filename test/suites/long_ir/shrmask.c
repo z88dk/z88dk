@@ -83,6 +83,28 @@ static unsigned char mixed_uses(unsigned int x)
     return (s & 31u) + (s & 255u);
 }
 
+/* [IR_SHRWIDE] The same mask proof, one step further up: an immediate AND whose
+ * mask lies inside a byte reads only its operand's LOW BYTE whatever the width
+ * of the AND's own result. Without this the bitfield-extracted-then-WIDENED
+ * shape — a field summed into an int accumulator, which is what reg_get does —
+ * stayed on the 16-bit `srl h; rr l` walk. xcc computes it in 8 bits and
+ * zero-extends, and is 1.55x faster on bitfieldbench partly for this.
+ *
+ * The narrowing must survive being widened: every reader of the narrowed value
+ * loads it through the width-aware path, which zero-extends.
+ *
+ * `wide_4_4095` is the guard, and note what it takes to trip: the mask bound is
+ * checked TWICE, on the def side (shr_result_byte_wide) and on the use side
+ * (the IR_SHRWIDE clause in demands_low_byte_only). Loosening EITHER alone past
+ * 0xFF is invisible — the other still refuses. Loosening BOTH makes this assert
+ * fail, which is how it was verified. Do not "simplify" by dropping one of them
+ * on the grounds that the tests still pass. */
+static unsigned int wide_3_31(unsigned int x) { return ((x >> 3) & 31u) + 1000u; }
+static unsigned int wide_5_7 (unsigned int x) { return ((x >> 5) & 7u)  + 40000u; }
+static unsigned int wide_2_63(unsigned int x) { return ((x >> 2) & 63u) * 3u; }
+/* mask EXCEEDS a byte: must stay wide, and the full 12-bit value must survive */
+static unsigned int wide_4_4095(unsigned int x) { return ((x >> 4) & 4095u) + 1u; }
+
 static void test_shrmask(void)
 {
     unsigned int x = opaque(0xBEEFu);      /* 1011 1110 1110 1111 */
@@ -102,6 +124,10 @@ static void test_shrmask(void)
     assertEqual(span_7_3(x),    0x1u);
     assertEqual(var_shift(x, 3), 0x1Du);
     assertEqual(mixed_uses(x),  0xFAu);
+    assertEqual(wide_3_31(x),   0x1Du + 1000u);
+    assertEqual(wide_5_7(x),    (unsigned int)(0x7u + 40000u));
+    assertEqual(wide_2_63(x),   (unsigned int)(0x3Bu * 3u));
+    assertEqual(wide_4_4095(x), 0xBEEu + 1u);
     /* 0x1234 + 0x9876 = 0xAAAA; (0xAAAA >> 6) & 127 = 42 */
     assertEqual(local_src(opaque(0x1234u), opaque(0x9876u)), 42u);
 
