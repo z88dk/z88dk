@@ -1,7 +1,7 @@
 # AGENTS.md — 80cc backend working rules
 
 Backend-specific rules. Read the repo-root `AGENTS.md` first (build/copy-to-bin,
-validation, commit hygiene, copt edges). Vocabulary is in `context.md`. This file is
+validation, commit hygiene, copt edges). Vocabulary is in `CONTEXT.md`. This file is
 the *how to work on 80cc* checklist; the *what/why* of each arc is in the untracked
 `*_PLAN.md` + agent memory.
 
@@ -19,7 +19,7 @@ frontend (ir_build.c) → IR
   `ir_slots.c` (only `IR_PR_SPILL` vregs, minus `IR_VREG_NO_SLOT`).
 - **The lowerer never asks for a scratch register** — it has fixed per-op register
   roles (Bus = HL/A; Parking = BC/DE/IX/IY) and reads homes from the allocator. See
-  `context.md`.
+  `CONTEXT.md`.
 - `ir_lower*.inc.c` are `#include`d into `ir_lower.c` (one translation unit) — grep
   across all of them.
 
