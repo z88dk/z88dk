@@ -535,7 +535,7 @@ static bool preproc_with_cpp(const std::string& input_file,
         std::cout << "% " << cmd << std::endl;
     }
     if (system(cmd.c_str()) != 0) {
-        error("Tool cpp failed, command line: " + cmd);
+        fatal("cpp failed, command line: " + cmd);
         return false;
     }
     return true;
@@ -550,8 +550,7 @@ static bool prepare_input(const std::string& input_file,
     // open output file for writing
     std::ofstream outfile(output_file);
     if (!outfile) {
-        error("Failed to open output file: " + output_file);
-        return false;
+        fatal("Failed to open file: " + output_file);
     }
 
     // process top level file
@@ -634,8 +633,7 @@ static bool match_mode_change(const std::string& text,
             if (keyword == find_keyword) {
                 skip_whitespace(text, pos);
                 if (pos < text.size()) {
-                    error(loc,
-                          "end of line expected, found '" + text.substr(pos) + "'");
+                    error(loc, "End of line expected, found '" + text.substr(pos) + "'");
                 }
                 return true;
             }

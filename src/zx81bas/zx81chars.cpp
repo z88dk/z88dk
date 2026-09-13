@@ -60,8 +60,7 @@ bool encode_zx81_char(const char*& p, bool check_keywords,
     }
 
     // character not found
-    error(loc, "Unknown ZX81 encoding: \"" +
-          std::string(p, strlen(p)) + "\"");
+    error(loc, "Unknown ZX81 encoding: '" + std::string(1, *p) + "'");
     return false;
 }
 

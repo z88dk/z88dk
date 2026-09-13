@@ -67,7 +67,7 @@ bool tokenize_line(const std::string& text, SourceType source_type,
 
     auto check_trailing_char = [&]() -> bool {
         if (isalnum(*p) || *p == '_') {
-            error(loc, "Invalid character '" + std::string(1, *p));
+            error(loc, "Invalid character '" + std::string(1, *p) + "'");
             return false;
         }
         return true;
@@ -81,7 +81,7 @@ collect_token:
 
         /*!re2c
 
-            *       { error("Unexpected character: " + std::string(1, *p)); break; }
+            *       { error("Unexpected character: '" + std::string(1, *(p-1)) + "'"); break; }
 
             $       { break; }
 

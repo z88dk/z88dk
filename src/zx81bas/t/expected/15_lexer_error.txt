@@ -2,9 +2,17 @@
 Input file:  t/input/15_lexer_error.bas
 Output file: t/input/15_lexer_error.p
 % z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/15_lexer_error.i" "t/input/15_lexer_error.pp"
-t/input/15_lexer_error.bas:2: error: Unknown ZX81 encoding: "'""
+t/input/15_lexer_error.bas:15: unfinished string at end of line
+t/input/15_lexer_error.bas:2: error: Unknown ZX81 encoding: '''
 t/input/15_lexer_error.bas:3: error: Char constant must be a single character
-t/input/15_lexer_error.bas:5: error: Unknown ZX81 encoding: "'""
-t/input/15_lexer_error.bas:6: error: end of line expected, found 'extra'
-t/input/15_lexer_error.bas:7: error: end of line expected, found 'extra'
-5 errors found
+t/input/15_lexer_error.bas:4: error: Invalid character 'h'
+error: Unexpected character: '`'
+t/input/15_lexer_error.bas:6: error: Unknown ZX81 encoding: '#'
+t/input/15_lexer_error.bas:8: error: Unknown ZX81 encoding: '''
+t/input/15_lexer_error.bas:9: error: Invalid character 'h'
+error: Unexpected character: '`'
+t/input/15_lexer_error.bas:11: error: Unknown ZX81 encoding: '#'
+t/input/15_lexer_error.bas:12: error: End of line expected, found 'extra'
+t/input/15_lexer_error.bas:13: error: End of line expected, found 'extra'
+t/input/15_lexer_error.bas:15: error: Unterminated string literal
+12 errors found
