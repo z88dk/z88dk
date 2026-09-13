@@ -1,7 +1,7 @@
 % z88dk-zx81bas -d 5 t//input/20_parser_vars_str.bas
 Input file:  t/input/20_parser_vars_str.bas
 Output file: t/input/20_parser_vars_str.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_vars_str.bas.i" "t/input/20_parser_vars_str.bas.pp"
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_vars_str.i" "t/input/20_parser_vars_str.pp"
 Prog {
     auto_start: false
     auto_start_line: 0

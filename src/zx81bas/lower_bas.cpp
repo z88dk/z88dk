@@ -4,12 +4,27 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "ast_expr.h"
-#include "ast_stmt.h"
+#include "ast.h"
+#include "lower_bas.h"
+#include "symtab.h"
+#include <memory>
+
+bool lower_prog(Prog& prog, Symtab& symtab) {
+    (void)prog;
+    (void)symtab;
+    return true;
+}
+
+
+
+
+#if 0
+
+#include "ast.h"
 #include "dump_context.h"
 #include "errors.h"
 #include "lexer.h"
-#include "lower.h"
+#include "lower_bas.h"
 #include "options.h"
 #include "release_assert.h"
 #include "symtab.h"
@@ -583,7 +598,7 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
         }
         else if (auto exit_stmt = dynamic_cast<ExitStmt*>(stmt.get())) {
             if (control_stack.empty()) {
-                error(exit_stmt->loc, "EXIT outside of loop of DEF PROC not allowed");
+                error(exit_stmt->loc, "EXIT outside of loop or DEF PROC");
             }
             else if (control_stack.back().type == ControlStackEntry::Type::Loop) {
                 // GOTO @end_label
@@ -927,8 +942,8 @@ static void lower(Prog& prog, Symtab& symtab, std::unique_ptr<Prog>& out_prog) {
     out_prog->stmts.push_back(std::move(target_stmt));
 }
 
-bool lower_prog(Prog& prog, Symtab& symtab, std::unique_ptr<Prog>& out_prog) {
-    lower(prog, symtab, out_prog);
+bool lower_prog(Prog& prog, Symtab& symtab) {
+    lower(prog, symtab);
 
 #ifdef _DEBUG
     if (g_dump_step == 9) {
@@ -942,3 +957,5 @@ bool lower_prog(Prog& prog, Symtab& symtab, std::unique_ptr<Prog>& out_prog) {
 
     return get_error_count() == 0;
 }
+
+#endif

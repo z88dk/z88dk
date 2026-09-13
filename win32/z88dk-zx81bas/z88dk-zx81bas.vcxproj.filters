@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\test">
-      <UniqueIdentifier>{0ded4f1b-5b39-41eb-9f8a-18d0b179a3b3}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\zx81bas\errors.h">
@@ -48,12 +45,6 @@
     <ClInclude Include="..\..\src\zx81bas\ast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\zx81bas\ast_expr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\zx81bas\ast_stmt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\zx81bas\parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -63,7 +54,16 @@
     <ClInclude Include="..\..\src\zx81bas\symtab.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\zx81bas\lower.h">
+    <ClInclude Include="..\..\src\zx81bas\lower_asm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\zx81bas\lower_bas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\zx81bas\z80asm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\zx81bas\zx81bas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -95,26 +95,8 @@
     <ClCompile Include="..\..\src\zx81bas\scan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\zx81bas\test\lexer_dump.cpp">
-      <Filter>Source Files\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\zx81bas\test\preproc_dump.cpp">
-      <Filter>Source Files\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\zx81bas\ast_expr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\zx81bas\parser.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\zx81bas\test\ast_dump.cpp">
-      <Filter>Source Files\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\zx81bas\test\ast_expr_dump.cpp">
-      <Filter>Source Files\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\zx81bas\test\ast_stmt_dump.cpp">
-      <Filter>Source Files\test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\zx81bas\semantic.cpp">
       <Filter>Source Files</Filter>
@@ -125,10 +107,13 @@
     <ClCompile Include="..\..\src\zx81bas\symtab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\zx81bas\test\symtab_dump.cpp">
-      <Filter>Source Files\test</Filter>
+    <ClCompile Include="..\..\src\zx81bas\lower_asm.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\zx81bas\lower.cpp">
+    <ClCompile Include="..\..\src\zx81bas\lower_bas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zx81bas\z80asm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

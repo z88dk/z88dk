@@ -1,7 +1,7 @@
 % z88dk-zx81bas -d 4 t//input/15_lexer_ok.bas
 Input file:  t/input/15_lexer_ok.bas
 Output file: t/input/15_lexer_ok.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/15_lexer_ok.bas.i" "t/input/15_lexer_ok.bas.pp"
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/15_lexer_ok.i" "t/input/15_lexer_ok.pp"
 Tokenized input:
 TokFile {
     TokLine {

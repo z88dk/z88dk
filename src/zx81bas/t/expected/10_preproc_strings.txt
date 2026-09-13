@@ -1,7 +1,7 @@
 % z88dk-zx81bas -d 1 t//input/10_preproc_strings.bas
 Input file:  t/input/10_preproc_strings.bas
 Output file: t/input/10_preproc_strings.p
-Contents of t/input/10_preproc_strings.bas.pp:
+Contents of t/input/10_preproc_strings.pp:
 #line 1 "t/input/10_preproc_strings.bas"
 "string/*with comment"
 string "not ended
