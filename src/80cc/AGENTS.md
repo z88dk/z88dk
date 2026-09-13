@@ -75,6 +75,24 @@ frontend (ir_build.c) → IR
         from a previous session and passes. `rm -f` the targets first and check
         both timestamps.
 
+## Allocation ownership (checked)
+
+`ir_alloc.c` is the only code that writes `vreg_to_phys` / `home_lo` / `home_hi`,
+and the only code that reads them by index. Everywhere else asks:
+
+| Question | Ask |
+|---|---|
+| where is v homed AT THIS POINT | `ir_home_at(f, v)` in the lowerer, `ir_home_at_op(f, v, g)` elsewhere |
+| is v EVER homed in a register | `ir_home_assigned(f, v)` |
+| does v need a frame slot | `ir_home_requires_slot(f, v)` |
+| is v's home window ranged | `ir_home_is_ranged(f, v)` |
+
+A point decision that reads the assignment directly ignores the home interval.
+That is inert while homes are whole-function and a miscompile once they are not.
+Run `src/80cc/check_ownership.sh` — it fails on a direct write or an indexed
+read outside `ir_alloc.c`. A render that cannot realise a home REPORTS it
+(`ir_alloc_demote_home`, `ir_alloc_word_home_reject`); it never edits the plan.
+
 ## Gate mechanisms
 
 - Opt-out (default-on, escape hatch): one registry, two front doors —

@@ -208,6 +208,33 @@ PhysReg ir_home_at_op(const Func *f, int v, int g)
     return pr;
 }
 
+/* The window bounds, for a diagnostic that prints them. -1 when absent. */
+int ir_home_lo_of(const Func *f, int v)
+{
+    return (f && f->home_lo && v >= 0 && v < f->n_vregs) ? f->home_lo[v] : -1;
+}
+int ir_home_hi_of(const Func *f, int v)
+{
+    return (f && f->home_hi && v >= 0 && v < f->n_vregs) ? f->home_hi[v] : -1;
+}
+
+/* Is v's home RANGED — a window narrower than the whole function? The window
+   is the allocator's, so the test for "is it the degenerate one" is too. */
+int ir_home_is_ranged(const Func *f, int v)
+{
+    if (!f || !f->home_lo || !f->home_hi || v < 0 || v >= f->n_vregs) return 0;
+    return f->home_lo[v] != INT_MIN || f->home_hi[v] != INT_MAX;
+}
+
+/* v's home window as a flat op-index range, clamped into [*lo,*hi]. Callers
+   pass the live range and get back the part of it the home actually covers. */
+void ir_home_window(const Func *f, int v, int *lo, int *hi)
+{
+    if (!f || v < 0 || v >= f->n_vregs || !lo || !hi) return;
+    if (f->home_lo && f->home_lo[v] > *lo) *lo = f->home_lo[v];
+    if (f->home_hi && f->home_hi[v] < *hi) *hi = f->home_hi[v];
+}
+
 /* The whole-function question: is v EVER homed in a register? Not a point
    query — it deliberately ignores the interval, and callers that scan every
    vreg (prepasses, "does this function use BC at all") want exactly that. */

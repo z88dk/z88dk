@@ -3179,7 +3179,7 @@ static int frame_has_saved_iy(const Func *f)
 {
     if (!f || f->is_naked || f->is_interrupt || !f->vreg_to_phys) return 0;
     for (int i = 0; i < f->n_vregs; i++) {
-        int p = f->vreg_to_phys[i];
+        int p = ir_home_assigned(f, i);
         /* ►► ANY whole-pair IY home, not just idx3. In FP MODE the idx2 spare
            IS IY (ir_idx2_reg: frame IX -> spare IY), and IY is callee-saved in
            that ABI exactly as IX is — but this predicate only ever asked about
@@ -3216,7 +3216,7 @@ static int frame_has_saved_althl(const Func *f)
     if (!f || f->is_naked || f->is_interrupt || !f->vreg_to_phys) return 0;
     if (f->idx2_reg != IR_PR_HL_ALT) return 0;
     for (int i = 0; i < f->n_vregs; i++)
-        if (f->vreg_to_phys[i] == IR_PR_HL_ALT) return 1;
+        if (ir_home_assigned(f, i) == IR_PR_HL_ALT) return 1;
     return 0;
 }
 
@@ -3282,7 +3282,7 @@ static int frame_has_saved_ix(const Func *f)
     if (func_has_indirect_call(f)) return 1;   /* fnptr dispatch via idx2 = IX */
     if (f->vreg_to_phys)
         for (int i = 0; i < f->n_vregs; i++) {
-            int p = f->vreg_to_phys[i];
+            int p = ir_home_assigned(f, i);
             if (p == IR_PR_IX || p == IR_PR_IXL || p == IR_PR_IXH) return 1;
         }
     return 0;
@@ -3326,7 +3326,7 @@ static int frameless_ok(const Func *f)
     for (int v = 0; v < f->n_vregs; v++) {
         const VReg *vr = &f->vregs[v];
         if (!(vr->flags & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))) continue;
-        int ph = f->vreg_to_phys[v];
+        int ph = ir_home_assigned(f, v);
         /* The home must be one that CANNOT send the access back to memory: a
            frameless function has no IX, and a PARAM_IN_PLACE's slot is the
            CALLER's frame at (ix+d), so any reload of it reads through a
@@ -3342,9 +3342,7 @@ static int frameless_ok(const Func *f)
            Whole-function BC is what remains. This is the SHORT-TERM narrowing;
            the real fix is to route every frame access to sp when frameless. */
         if (ph != IR_PR_BC) return 0;
-        if (f->home_lo && f->home_hi
-            && (f->home_lo[v] != INT_MIN || f->home_hi[v] != INT_MAX))
-            return 0;
+        if (ir_home_is_ranged(f, v)) return 0;
     }
     return 1;
 }
@@ -3557,7 +3555,7 @@ static void require_slot(const Func *f, int vreg_id)
             "`for(i==0; ...)` typo, or passing an uninitialised local). If the "
             "variable is definitely set before use, it is a codegen bug. "
             "Aborting rather than emit a below-frame read.\n",
-            vreg_id, f->vreg_to_phys ? f->vreg_to_phys[vreg_id] : -1,
+            vreg_id, f->vreg_to_phys ? ir_home_assigned(f, vreg_id) : -1,
             f->vregs[vreg_id].width);
     ir_lower_src();
     exit(1);
@@ -4054,7 +4052,7 @@ static InstrEffects instr_effects(const char *line)
 RegMask phys_regmask(const Func *f, int v)
 {
     if (v < 0 || !f->vreg_to_phys) return 0;
-    switch (f->vreg_to_phys[v]) {
+    switch (ir_home_assigned(f, v)) {
     case IR_PR_A:                 return IR_R_A;
     case IR_PR_HL:                return IR_R_HL;
     case IR_PR_DE: case IR_PR_E: case IR_PR_D: return IR_R_DE;
@@ -4434,7 +4432,7 @@ static void rec_note_violation(const Func *f, int v)
 {
     if (!rec_enabled()) return;
     PhysReg pr = (f->vreg_to_phys && v >= 0 && v < f->n_vregs)
-        ? f->vreg_to_phys[v] : IR_PR_SPILL;
+        ? ir_home_assigned(f, v) : IR_PR_SPILL;
     fprintf(stderr, "IR_REC VIOLATION: %s v%d homed in %s (w=%d) unrealizable "
             "— read with no register, no slot, no remat\n",
             f->fn ? ir_sym_name(f->fn) : "?", v, ir_phys_name(pr),
@@ -4459,13 +4457,13 @@ static void rec_end(const Func *f)
         for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
             int total = rec_reg[v] + rec_slot[v] + rec_remat[v];
             if (!total) continue;
-            int is_homed = f->vreg_to_phys && f->vreg_to_phys[v] != IR_PR_SPILL;
+            int is_homed = ir_home_assigned(f, v) != IR_PR_SPILL;
             if (!is_homed) continue;
             homed++; ureg += rec_reg[v]; uslot += rec_slot[v]; uremat += rec_remat[v];
             if (rec_reg[v] == 0) cold++;
             if (rec_on >= 2)
                 fprintf(stderr, "IR_REC:   v%d[%s] reg=%d slot=%d remat=%d%s\n",
-                        v, ir_phys_name(f->vreg_to_phys[v]),
+                        v, ir_phys_name(ir_home_assigned(f, v)),
                         rec_reg[v], rec_slot[v], rec_remat[v],
                         rec_reg[v] == 0 ? "  COLD-HOME" : "");
         }
@@ -4514,9 +4512,7 @@ static void rec_end(const Func *f)
                    re-lower read a vreg with neither register nor slot
                    (require_slot abort). Not trustable, same as addr-taken. */
                 int ranged = (f->vregs[v].flags & IR_VREG_CALL_SPLIT)
-                          || (f->home_lo && f->home_hi
-                              && (f->home_lo[v] != INT_MIN
-                                  || f->home_hi[v] != INT_MAX));
+                          || ir_home_is_ranged(f, v);
                 int trustable = w <= 2
                              && !(f->vregs[v].flags & IR_VREG_ADDR_TAKEN)
                              && !ranged;
@@ -4598,7 +4594,7 @@ static void rec_end(const Func *f)
         char *readb_chan = dsx_enabled() ? calloc((size_t)fs, 1) : NULL;
         if (readb && readb_chan && rec_slotwrite) {
             for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
-                int is_spill = !f->vreg_to_phys || f->vreg_to_phys[v] == IR_PR_SPILL;
+                int is_spill = ir_home_assigned(f, v) == IR_PR_SPILL;
                 int off = is_spill ? f->vreg_spill_slot[v] : -1;
                 if (off < 0 || off >= fs) continue;
                 if (rec_slotuse[v] - rec_slotwrite[v] <= 0) continue;   /* not read */
@@ -4622,7 +4618,7 @@ static void rec_end(const Func *f)
             }
             int nfn = 0;
             for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
-                if (!f->vreg_to_phys || f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                if (!f->vreg_to_phys || ir_home_assigned(f, v) != IR_PR_SPILL) continue;
                 const VReg *vr = &f->vregs[v];
                 int off = f->vreg_spill_slot[v];
                 if (off < 0 || off >= fs) continue;
@@ -4699,14 +4695,13 @@ static void home_slot_verify_mark_defs(const Func *f, const Op *op)
     for (int d = 0; d < nd; d++) {
         int v = defs[d];
         if (v < 0 || v >= home_slot_dirty_nv) continue;
-        PhysReg pr = f->vreg_to_phys[v];
+        PhysReg pr = ir_home_assigned(f, v);
         if ((pr != IR_PR_BC && pr != IR_PR_DE) || f->vreg_spill_slot[v] < 0)
             continue;
         const LiveRange *lr = ir_live_range(f, v);
         if (!lr || lr->start < 0) continue;
         int lo = lr->start, hi = lr->end;
-        if (f->home_lo && f->home_lo[v] > lo) lo = f->home_lo[v];
-        if (f->home_hi && f->home_hi[v] < hi) hi = f->home_hi[v];
+        ir_home_window(f, v, &lo, &hi);
         if (L.ss_cur_g >= lo && L.ss_cur_g <= hi) home_slot_dirty[v] = 1;
     }
 }
@@ -4718,15 +4713,14 @@ static void home_slot_verify_actual(const Func *f, const Op *op,
         || !f->vreg_to_phys || !f->vreg_spill_slot || L.ss_cur_g < 0)
         return;
     for (int v = 0; v < f->n_vregs; v++) {
-        PhysReg pr = f->vreg_to_phys[v];
+        PhysReg pr = ir_home_assigned(f, v);
         if ((pr != IR_PR_BC && pr != IR_PR_DE) || f->vreg_spill_slot[v] < 0)
             continue;
         if (v >= home_slot_dirty_nv || !home_slot_dirty[v]) continue;
         const LiveRange *lr = ir_live_range(f, v);
         if (!lr || lr->start < 0) continue;
         int lo = lr->start, hi = lr->end;
-        if (f->home_lo && f->home_lo[v] > lo) lo = f->home_lo[v];
-        if (f->home_hi && f->home_hi[v] < hi) hi = f->home_hi[v];
+        ir_home_window(f, v, &lo, &hi);
         if (L.ss_cur_g < lo || L.ss_cur_g > hi) continue;
 
         RegMask home = phys_regmask(f, v);
@@ -5679,7 +5673,7 @@ static void emit_prologue(FILE *out, Func *f)
     int prologue_v = -1;
     int prologue_first = -1;
     for (int i = 0; i < f->n_vregs; i++) {
-        if (f->vreg_to_phys[i] != IR_PR_BC) continue;
+        if (ir_home_assigned(f, i) != IR_PR_BC) continue;
         if (!(f->vregs[i].flags & IR_VREG_PARAM_IN_PLACE)) continue;
         const LiveRange *lr = ir_live_range(f, i);
         int first = lr ? lr->start : 0;
@@ -5914,7 +5908,7 @@ static void compute_no_slot_bytes(Func *f)
         if (vr->width != 1) continue;
         if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
                          | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE)) continue;
-        if (f->vreg_to_phys && f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+        if (ir_home_assigned(f, v) != IR_PR_SPILL) continue;
         int n_defs = 0, all_dead = 1;
         for (int b = 0; b < f->n_bbs && all_dead; b++) {
             const BB *bb = &f->bbs[b];
@@ -6269,7 +6263,7 @@ int ir_lower_func(FILE *out, Func *f)
                     other_stack_param = 1; break;
                 }
         if (fc >= 0 && !other_stack_param
-            && f->vreg_to_phys && f->vreg_to_phys[fc] == IR_PR_SPILL) {
+            && ir_home_assigned(f, fc) == IR_PR_SPILL) {
             int w = f->vregs[fc].width;
             if (w == 1 || w == 2 || w == 4)
                 f->vregs[fc].flags |= IR_VREG_AUTOPUSH;
@@ -6609,14 +6603,13 @@ int ir_lower_func(FILE *out, Func *f)
        used as SCRATCH. This shows the raw map so the two can be told apart. */
     if (getenv("IR_HOMEMAP")) {
         for (int v = 0; v < f->n_vregs; v++) {
-            PhysReg pr = f->vreg_to_phys ? f->vreg_to_phys[v] : IR_PR_SPILL;
+            PhysReg pr = ir_home_assigned(f, v);
             const LiveRange *lr = ir_live_range(f, v);
             fprintf(stderr, "HOMEMAP %-16s v%-4d phys=%-6s slot=%-5d "
                     "home=[%d,%d] live=[%d,%d] w=%d flags=%#x\n",
                     f->fn ? ir_sym_name(f->fn) : "?", v, ir_phys_name(pr),
                     f->vreg_spill_slot ? f->vreg_spill_slot[v] : -1,
-                    f->home_lo ? f->home_lo[v] : -1,
-                    f->home_hi ? f->home_hi[v] : -1,
+                    ir_home_lo_of(f, v), ir_home_hi_of(f, v),
                     lr ? lr->start : -1, lr ? lr->end : -1,
                     f->vregs[v].width, f->vregs[v].flags);
         }
@@ -7161,7 +7154,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     g_hc.de_home = -1;          /* set by the orchestrator's DE-home decision */
     for (int v = 0; v < f->n_vregs; v++)
         if (f->vreg_to_phys
-            && byte_home_slotbacked(f->vreg_to_phys[v])) { L.cur_func_ehome = v; break; }
+            && byte_home_slotbacked(ir_home_assigned(f, v))) { L.cur_func_ehome = v; break; }
     /* Word DE-home (--word-resident): a width-2 loop accumulator homed in DE.
        Mutually exclusive with a byte E/D-home (allocator gives up the word home
        when DE's low half is taken), so it reuses the same residency machinery

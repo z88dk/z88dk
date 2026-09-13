@@ -75,7 +75,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         for (int i = 0; i < ci->n_args; i++) {
             int av = ci->args[i];
             if (av < 0) continue;
-            if (f->vregs[av].width > 2 || f->vreg_to_phys[av] == IR_PR_BC) {
+            if (f->vregs[av].width > 2 || ir_home_assigned(f, av) == IR_PR_BC) {
                 bc_preserved = 0; break;
             }
         }

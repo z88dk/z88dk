@@ -55,6 +55,14 @@ PhysReg ir_home_at_op(const Func *f, int v, int g);
    interval on purpose. Use it for scans, never for a decision at a point. */
 PhysReg ir_home_assigned(const Func *f, int v);
 
+/* Is v's home window narrower than the whole function? */
+int  ir_home_is_ranged(const Func *f, int v);
+/* Clamp [*lo,*hi] to the part of it v's home window covers. */
+void ir_home_window(const Func *f, int v, int *lo, int *hi);
+/* The raw window bounds, for a diagnostic that prints them. -1 when absent. */
+int  ir_home_lo_of(const Func *f, int v);
+int  ir_home_hi_of(const Func *f, int v);
+
 /* Is a byte/word home in this register clobberable, so that it needs a backing
    slot the lowerer can lazy-spill to? E and D are (DE is scratch); C and B are
    not (the no-clobber envelope keeps them resident for the whole function). */

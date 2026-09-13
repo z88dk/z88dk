@@ -144,14 +144,14 @@ void ir_assign_slots(Func *f)
        with EVERY other slotted vreg so its backing slot is exclusive. */
     for (int v = 0; v < n_vregs; v++) {
         if (!f->vreg_to_phys) break;
-        if (f->vreg_to_phys[v] != IR_PR_E && f->vreg_to_phys[v] != IR_PR_D)
+        if (ir_home_assigned(f, v) != IR_PR_E && ir_home_assigned(f, v) != IR_PR_D)
             continue;
         for (int w = 0; w < n_vregs; w++)
             if (w != v) INTERF_SET(v, w);
     }
     /* Same exclusivity for the word DE-home's backing slot. */
     if (f->word_home_vreg >= 0 && f->word_home_vreg < n_vregs && f->vreg_to_phys
-        && f->vreg_to_phys[f->word_home_vreg] == IR_PR_DE) {
+        && ir_home_assigned(f, f->word_home_vreg) == IR_PR_DE) {
         int v = f->word_home_vreg;
         for (int w = 0; w < n_vregs; w++)
             if (w != v) INTERF_SET(v, w);

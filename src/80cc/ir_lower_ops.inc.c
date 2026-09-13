@@ -489,7 +489,7 @@ static void emit_test_zero(FILE *out, Func *f, int src)
            (there is none, by the dead check) would reload from the slot. */
         if (L.la.cur_br_value_dead && !hl_has(src) && !a_has(src)
             && !bc_has(src) && !de_has(src)
-            && f->vreg_to_phys[src] == IR_PR_SPILL && slot_off(f, src) >= 0) {
+            && ir_home_assigned(f, src) == IR_PR_SPILL && slot_off(f, src) >= 0) {
             if (fp_active(f)) {
                 int lo = slot_ix_off(f, src);
                 if (fp_offset_fits(lo) && fp_offset_fits(lo + 1)) {
@@ -1296,7 +1296,7 @@ static int bcsave_live_on(void)
 /* True if v is one of the plain PR_BC tenants a call must preserve. */
 static int bc_plain_tenant(const Func *f, int v)
 {
-    return f->vreg_to_phys[v] == IR_PR_BC
+    return ir_home_assigned(f, v) == IR_PR_BC
         && !(f->vregs[v].flags & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT));
 }
 
@@ -1355,7 +1355,7 @@ static int func_has_pr_bc(const Func *f)
 {
     if (!f->vreg_to_phys) return 0;
     for (int i = 0; i < f->n_vregs; i++)
-        if (f->vreg_to_phys[i] == IR_PR_BC
+        if (ir_home_assigned(f, i) == IR_PR_BC
             && !(f->vregs[i].flags & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT)))
             return 1;
     return 0;

@@ -1134,7 +1134,7 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
        PR_BC needs an HL→BC copy so later loads hit the BC short-circuit;
        nothing in the no-call envelope clobbers BC. */
     if (vreg_in_register_pool(f, vreg)) {
-        if (f->vreg_to_phys[vreg] == IR_PR_BC) {
+        if (ir_home_assigned(f, vreg) == IR_PR_BC) {
             emit(out, "ld\tbc,hl");
             cache_bc(vreg);
             /* [call-split] A call-split value is BC-resident only inside its
