@@ -879,25 +879,30 @@ Prog {
                                     value: 10.000000
                                 }
                             rhs: 
-                                FnCallExpr {
+                                BinaryExpr {
                                     type: Number
-                                    location: test_t_input_08_t.bas:174
-                                    name: "FNID"
-                                    args: [
+                                    location: test_t_input_08_t.bas:172
+                                    op: +
+                                    lhs: 
                                         NumberExpr {
                                             type: Number
                                             location: test_t_input_08_t.bas:174
                                             value: 42.000000
                                         }
-                                    ]
+                                    rhs: 
+                                        NumberExpr {
+                                            type: Number
+                                            location: test_t_input_08_t.bas:172
+                                            value: 0.000000
+                                        }
                                 }
                         }
                     rhs: 
-                        FnCallExpr {
+                        BinaryExpr {
                             type: Number
-                            location: test_t_input_08_t.bas:174
-                            name: "FNID"
-                            args: [
+                            location: test_t_input_08_t.bas:172
+                            op: +
+                            lhs: 
                                 BinaryExpr {
                                     type: Number
                                     location: test_t_input_08_t.bas:174
@@ -915,7 +920,12 @@ Prog {
                                             value: 3.000000
                                         }
                                 }
-                            ]
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:172
+                                    value: 0.000000
+                                }
                         }
                 }
         }
@@ -927,17 +937,22 @@ Prog {
                     location: test_t_input_08_t.bas:175
                     name: "A"
                     indices: [
-                        FnCallExpr {
+                        BinaryExpr {
                             type: Number
-                            location: test_t_input_08_t.bas:175
-                            name: "FNID"
-                            args: [
+                            location: test_t_input_08_t.bas:172
+                            op: +
+                            lhs: 
                                 NumberExpr {
                                     type: Number
                                     location: test_t_input_08_t.bas:175
                                     value: 42.000000
                                 }
-                            ]
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:172
+                                    value: 0.000000
+                                }
                         }
                     ]
                 }
@@ -1592,17 +1607,60 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_08_t.bas:214
-                    keyword: "PEEKW"
-                    args: [
-                        NumberExpr {
+                    op: +
+                    lhs: 
+                        BasicFuncCallExpr {
                             type: Number
                             location: test_t_input_08_t.bas:214
-                            value: 0.000000
+                            keyword: "PEEK"
+                            args: [
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:214
+                                    value: 0.000000
+                                }
+                            ]
                         }
-                    ]
+                    rhs: 
+                        BinaryExpr {
+                            type: Number
+                            location: test_t_input_08_t.bas:214
+                            op: *
+                            lhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:214
+                                    value: 256.000000
+                                }
+                            rhs: 
+                                BasicFuncCallExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:214
+                                    keyword: "PEEK"
+                                    args: [
+                                        BinaryExpr {
+                                            type: Number
+                                            location: test_t_input_08_t.bas:214
+                                            op: +
+                                            lhs: 
+                                                NumberExpr {
+                                                    type: Number
+                                                    location: test_t_input_08_t.bas:214
+                                                    value: 0.000000
+                                                }
+                                            rhs: 
+                                                NumberExpr {
+                                                    type: Number
+                                                    location: test_t_input_08_t.bas:214
+                                                    value: 1.000000
+                                                }
+                                        }
+                                    ]
+                                }
+                        }
                 }
         }
         LetStmt {
@@ -1760,11 +1818,11 @@ Prog {
                     location: test_t_input_08_t.bas:222
                     keyword: "ABS"
                     args: [
-                        FnCallExpr {
+                        BinaryExpr {
                             type: Number
-                            location: test_t_input_08_t.bas:222
-                            name: "FNID"
-                            args: [
+                            location: test_t_input_08_t.bas:172
+                            op: +
+                            lhs: 
                                 UnaryExpr {
                                     type: Number
                                     location: test_t_input_08_t.bas:222
@@ -1776,7 +1834,12 @@ Prog {
                                             value: 3.000000
                                         }
                                 }
-                            ]
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:172
+                                    value: 0.000000
+                                }
                         }
                     ]
                 }
@@ -1795,30 +1858,40 @@ Prog {
                     location: test_t_input_08_t.bas:223
                     op: +
                     lhs: 
-                        FnCallExpr {
+                        BinaryExpr {
                             type: Number
-                            location: test_t_input_08_t.bas:223
-                            name: "FNID"
-                            args: [
+                            location: test_t_input_08_t.bas:172
+                            op: +
+                            lhs: 
                                 NumberExpr {
                                     type: Number
                                     location: test_t_input_08_t.bas:223
                                     value: 5.000000
                                 }
-                            ]
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:172
+                                    value: 0.000000
+                                }
                         }
                     rhs: 
-                        FnCallExpr {
+                        BinaryExpr {
                             type: Number
-                            location: test_t_input_08_t.bas:223
-                            name: "FNID"
-                            args: [
+                            location: test_t_input_08_t.bas:172
+                            op: +
+                            lhs: 
                                 NumberExpr {
                                     type: Number
                                     location: test_t_input_08_t.bas:223
                                     value: 7.000000
                                 }
-                            ]
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:172
+                                    value: 0.000000
+                                }
                         }
                 }
         }
@@ -1859,11 +1932,11 @@ Prog {
                     location: test_t_input_08_t.bas:226
                     op: +
                     lhs: 
-                        FnCallExpr {
+                        BinaryExpr {
                             type: Number
-                            location: test_t_input_08_t.bas:226
-                            name: "FNF"
-                            args: [
+                            location: test_t_input_08_t.bas:225
+                            op: *
+                            lhs: 
                                 BinaryExpr {
                                     type: Number
                                     location: test_t_input_08_t.bas:226
@@ -1881,7 +1954,24 @@ Prog {
                                             value: 1.000000
                                         }
                                 }
-                            ]
+                            rhs: 
+                                BinaryExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:226
+                                    op: +
+                                    lhs: 
+                                        VariableExpr {
+                                            type: Number
+                                            location: test_t_input_08_t.bas:226
+                                            name: "B"
+                                        }
+                                    rhs: 
+                                        NumberExpr {
+                                            type: Number
+                                            location: test_t_input_08_t.bas:226
+                                            value: 1.000000
+                                        }
+                                }
                         }
                     rhs: 
                         NumberExpr {
@@ -1900,17 +1990,58 @@ Prog {
                     name: "X"
                 }
             rhs: 
-                FnCallExpr {
+                BinaryExpr {
                     type: Number
-                    location: test_t_input_08_t.bas:227
-                    name: "FNG"
-                    args: [
+                    location: test_t_input_08_t.bas:226
+                    op: +
+                    lhs: 
+                        BinaryExpr {
+                            type: Number
+                            location: test_t_input_08_t.bas:225
+                            op: *
+                            lhs: 
+                                BinaryExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:226
+                                    op: +
+                                    lhs: 
+                                        NumberExpr {
+                                            type: Number
+                                            location: test_t_input_08_t.bas:227
+                                            value: 10.000000
+                                        }
+                                    rhs: 
+                                        NumberExpr {
+                                            type: Number
+                                            location: test_t_input_08_t.bas:226
+                                            value: 1.000000
+                                        }
+                                }
+                            rhs: 
+                                BinaryExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:226
+                                    op: +
+                                    lhs: 
+                                        NumberExpr {
+                                            type: Number
+                                            location: test_t_input_08_t.bas:227
+                                            value: 10.000000
+                                        }
+                                    rhs: 
+                                        NumberExpr {
+                                            type: Number
+                                            location: test_t_input_08_t.bas:226
+                                            value: 1.000000
+                                        }
+                                }
+                        }
+                    rhs: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_08_t.bas:227
-                            value: 10.000000
+                            location: test_t_input_08_t.bas:226
+                            value: 3.000000
                         }
-                    ]
                 }
         }
         LetStmt {
@@ -2063,22 +2194,29 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                BasicFuncCallExpr {
                     type: Number
                     location: test_t_input_08_t.bas:238
-                    op: \
-                    lhs: 
-                        NumberExpr {
+                    keyword: "INT"
+                    args: [
+                        BinaryExpr {
                             type: Number
                             location: test_t_input_08_t.bas:238
-                            value: 10.000000
+                            op: /
+                            lhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:238
+                                    value: 10.000000
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:238
+                                    value: 3.000000
+                                }
                         }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_08_t.bas:238
-                            value: 3.000000
-                        }
+                    ]
                 }
         }
         LetStmt {
@@ -2090,22 +2228,29 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                BasicFuncCallExpr {
                     type: Number
                     location: test_t_input_08_t.bas:239
-                    op: \
-                    lhs: 
-                        NumberExpr {
+                    keyword: "INT"
+                    args: [
+                        BinaryExpr {
                             type: Number
                             location: test_t_input_08_t.bas:239
-                            value: 10.000000
+                            op: /
+                            lhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:239
+                                    value: 10.000000
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:239
+                                    value: 3.000000
+                                }
                         }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_08_t.bas:239
-                            value: 3.000000
-                        }
+                    ]
                 }
         }
         LetStmt {
@@ -2120,7 +2265,7 @@ Prog {
                 BinaryExpr {
                     type: Number
                     location: test_t_input_08_t.bas:240
-                    op: MOD
+                    op: -
                     lhs: 
                         NumberExpr {
                             type: Number
@@ -2128,10 +2273,41 @@ Prog {
                             value: 10.000000
                         }
                     rhs: 
-                        NumberExpr {
+                        BinaryExpr {
                             type: Number
                             location: test_t_input_08_t.bas:240
-                            value: 3.000000
+                            op: *
+                            lhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:240
+                                    value: 3.000000
+                                }
+                            rhs: 
+                                BasicFuncCallExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:240
+                                    keyword: "INT"
+                                    args: [
+                                        BinaryExpr {
+                                            type: Number
+                                            location: test_t_input_08_t.bas:240
+                                            op: /
+                                            lhs: 
+                                                NumberExpr {
+                                                    type: Number
+                                                    location: test_t_input_08_t.bas:240
+                                                    value: 10.000000
+                                                }
+                                            rhs: 
+                                                NumberExpr {
+                                                    type: Number
+                                                    location: test_t_input_08_t.bas:240
+                                                    value: 3.000000
+                                                }
+                                        }
+                                    ]
+                                }
                         }
                 }
         }
@@ -4451,29 +4627,29 @@ Prog {
                     location: test_t_input_08_t.bas:387
                     op: +
                     lhs: 
-                        FnCallExpr {
+                        BinaryExpr {
                             type: Number
-                            location: test_t_input_08_t.bas:387
-                            name: "FNNAME"
-                            args: [
+                            location: test_t_input_08_t.bas:385
+                            op: *
+                            lhs: 
                                 NumberExpr {
                                     type: Number
                                     location: test_t_input_08_t.bas:387
                                     value: 10.000000
                                 }
+                            rhs: 
                                 NumberExpr {
                                     type: Number
                                     location: test_t_input_08_t.bas:387
                                     value: 20.000000
                                 }
-                            ]
                         }
                     rhs: 
-                        FnCallExpr {
+                        BinaryExpr {
                             type: Number
-                            location: test_t_input_08_t.bas:387
-                            name: "FNNAME"
-                            args: [
+                            location: test_t_input_08_t.bas:385
+                            op: *
+                            lhs: 
                                 BinaryExpr {
                                     type: Number
                                     location: test_t_input_08_t.bas:387
@@ -4491,6 +4667,7 @@ Prog {
                                             value: 2.000000
                                         }
                                 }
+                            rhs: 
                                 BinaryExpr {
                                     type: Number
                                     location: test_t_input_08_t.bas:387
@@ -4508,7 +4685,6 @@ Prog {
                                             value: 4.000000
                                         }
                                 }
-                            ]
                         }
                 }
         }
@@ -4546,10 +4722,10 @@ Prog {
                             value: 2.000000
                         }
                     rhs: 
-                        FnCallExpr {
+                        BasicFuncCallExpr {
                             type: Number
-                            location: test_t_input_08_t.bas:391
-                            name: "FNEMPTY"
+                            location: test_t_input_08_t.bas:389
+                            keyword: "PI"
                             args: [
                             ]
                         }
@@ -5108,7 +5284,7 @@ Prog {
                     value: 255.000000
                 }
         }
-        PokewStmt {
+        PokeStmt {
             location: test_t_input_08_t.bas:512
             address: 
                 NumberExpr {
@@ -5117,10 +5293,99 @@ Prog {
                     value: 16384.000000
                 }
             value: 
-                NumberExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_08_t.bas:512
-                    value: 258.000000
+                    op: -
+                    lhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_08_t.bas:512
+                            value: 258.000000
+                        }
+                    rhs: 
+                        BinaryExpr {
+                            type: Number
+                            location: test_t_input_08_t.bas:512
+                            op: *
+                            lhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:512
+                                    value: 256.000000
+                                }
+                            rhs: 
+                                BasicFuncCallExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:512
+                                    keyword: "INT"
+                                    args: [
+                                        BinaryExpr {
+                                            type: Number
+                                            location: test_t_input_08_t.bas:512
+                                            op: /
+                                            lhs: 
+                                                NumberExpr {
+                                                    type: Number
+                                                    location: test_t_input_08_t.bas:512
+                                                    value: 258.000000
+                                                }
+                                            rhs: 
+                                                NumberExpr {
+                                                    type: Number
+                                                    location: test_t_input_08_t.bas:512
+                                                    value: 256.000000
+                                                }
+                                        }
+                                    ]
+                                }
+                        }
+                }
+        }
+        PokeStmt {
+            location: test_t_input_08_t.bas:512
+            address: 
+                BinaryExpr {
+                    type: Number
+                    location: test_t_input_08_t.bas:512
+                    op: +
+                    lhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_08_t.bas:512
+                            value: 16384.000000
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_08_t.bas:512
+                            value: 1.000000
+                        }
+                }
+            value: 
+                BasicFuncCallExpr {
+                    type: Number
+                    location: test_t_input_08_t.bas:512
+                    keyword: "INT"
+                    args: [
+                        BinaryExpr {
+                            type: Number
+                            location: test_t_input_08_t.bas:512
+                            op: /
+                            lhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:512
+                                    value: 258.000000
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:512
+                                    value: 256.000000
+                                }
+                        }
+                    ]
                 }
         }
         RandStmt {

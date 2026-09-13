@@ -7,6 +7,7 @@
 #include "ast.h"
 #include "release_assert.h"
 #include "semantic.h"
+#include "walker.h"
 #include <algorithm>
 #include <string>
 #include <unordered_map>

@@ -76,7 +76,6 @@ sub capture_ok {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     run_ok( $cmd . " > ${test}.out 2>&1" );
-    run_ok("dos2unix ${test}.out 2> $null");
     check_text_file( "${test}.out", $exp_file );
 
     ( Test::More->builder->is_passing ) or die;
@@ -88,7 +87,6 @@ sub capture_nok {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     run_nok( $cmd . " 2> ${test}.err 1>&2" );
-    run_ok("dos2unix ${test}.err 2> $null");
     check_text_file( "${test}.err", $exp_file );
 
     ( Test::More->builder->is_passing ) or die;

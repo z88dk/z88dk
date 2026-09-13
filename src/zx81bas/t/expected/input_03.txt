@@ -123,96 +123,96 @@ test_t_input_03_t.bas:242: 	LET A=2**-3
 test_t_input_03_t.bas:243: 	LET A=1+2*3**4
 test_t_input_03_t.bas:249: 	DIM A(2), B(2,3), C(2,3,4)
 test_t_input_03_t.bas:250: 	DIM A$(2), B$(2,3), C$(2,3,4)
-test_t_input_03_t.bas:256: IF A=1 THEN B=2
-test_t_input_03_t.bas:257: IF A=1 THEN :ELSE B=2
-test_t_input_03_t.bas:258: IF A=1 THEN B=2:C=3
-test_t_input_03_t.bas:259: IF A=1 THEN B=2:C=3 ELSE
-test_t_input_03_t.bas:260: IF A=1 THEN B=2:C=3 ELSE D=4
-test_t_input_03_t.bas:261: IF A=1 THEN B=2:C=3 ELSE D=4:E=5
-test_t_input_03_t.bas:262: IF A=1 THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3
-test_t_input_03_t.bas:264: IF A=1 THEN
-test_t_input_03_t.bas:265: 	B=1
-test_t_input_03_t.bas:266: 	C=1
-test_t_input_03_t.bas:267: ENDIF
-test_t_input_03_t.bas:269: IF A=1 THEN
-test_t_input_03_t.bas:270: 	B=1
-test_t_input_03_t.bas:271: 	C=1
-test_t_input_03_t.bas:272: ELSE
-test_t_input_03_t.bas:273: 	B=2
-test_t_input_03_t.bas:274: 	IF A=2 THEN
-test_t_input_03_t.bas:275: 		C=2
-test_t_input_03_t.bas:276: 	ELSE
-test_t_input_03_t.bas:277: 		C=3
-test_t_input_03_t.bas:278: 	ENDIF
-test_t_input_03_t.bas:279: ENDIF
-test_t_input_03_t.bas:281: IF A=1 THEN
-test_t_input_03_t.bas:282: 	B=1 : C=1 : ENDIF : D=1
-test_t_input_03_t.bas:288: REPEAT A=1 UNTIL A=1
-test_t_input_03_t.bas:289: REPEAT B=1: REPEAT C=1 UNTIL A=1 UNTIL A=2
-test_t_input_03_t.bas:291: REPEAT
-test_t_input_03_t.bas:292: 	A=1
-test_t_input_03_t.bas:293: 	B=2
-test_t_input_03_t.bas:294: 	IF A=2 THEN EXIT
-test_t_input_03_t.bas:295: 	REPEAT
-test_t_input_03_t.bas:296: 		C=3
-test_t_input_03_t.bas:297: 	UNTIL A=2
-test_t_input_03_t.bas:298: UNTIL A=1
-test_t_input_03_t.bas:300: REPEAT
-test_t_input_03_t.bas:301: 	A=1 : B=2 : UNTIL A=1 : C=1
-test_t_input_03_t.bas:307: WHILE A<>1: A=1:B=2:C=3 WEND
-test_t_input_03_t.bas:309: WHILE A=1:B=1:WHILE A=2:C=1:WEND:WEND
-test_t_input_03_t.bas:311: WHILE A<>1
-test_t_input_03_t.bas:312: 	A=1
-test_t_input_03_t.bas:313: 	B=2
-test_t_input_03_t.bas:314: 	IF A=2 THEN EXIT
-test_t_input_03_t.bas:315: 	WHILE A<>2
-test_t_input_03_t.bas:316: 		C=3
-test_t_input_03_t.bas:317: 	WEND
-test_t_input_03_t.bas:318: WEND
-test_t_input_03_t.bas:320: WHILE A<>2
-test_t_input_03_t.bas:321: 	C=3 : WEND : C=4
-test_t_input_03_t.bas:327: LET S=0
-test_t_input_03_t.bas:328: FOR I=1 TO 10:LET S=S+I:NEXT I
-test_t_input_03_t.bas:330: FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT J:NEXT I
-test_t_input_03_t.bas:332: FOR I=1 TO 10 STEP 2
-test_t_input_03_t.bas:333: 	S=S+I
-test_t_input_03_t.bas:334: 	IF I=2 THEN EXIT
-test_t_input_03_t.bas:335: 	FOR J=1 TO 10 STEP 2
-test_t_input_03_t.bas:336: 		A=I*J
-test_t_input_03_t.bas:337: 	NEXT J
-test_t_input_03_t.bas:338: NEXT I
-test_t_input_03_t.bas:340: FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT:NEXT
-test_t_input_03_t.bas:342: FOR I=1 TO 10 STEP 2
-test_t_input_03_t.bas:343: 	FOR J=1 TO 10 STEP 2
-test_t_input_03_t.bas:344: 		A=I*J:NEXT:NEXT
-test_t_input_03_t.bas:350: DEF PROCname(A, B)
-test_t_input_03_t.bas:351:     LOCAL L
-test_t_input_03_t.bas:352: 	LOCAL L1, L2
-test_t_input_03_t.bas:353: 	IF 1 THEN
-test_t_input_03_t.bas:354: 		LOCAL L3
-test_t_input_03_t.bas:355: 	ENDIF
-test_t_input_03_t.bas:356: 	L = A + B
-test_t_input_03_t.bas:357: 	IF A = 2 THEN EXIT
-test_t_input_03_t.bas:358: 	RESULT = L
-test_t_input_03_t.bas:359: 	PROCname = L
-test_t_input_03_t.bas:360: ENDPROC
-test_t_input_03_t.bas:362: PROCname 10, 20
-test_t_input_03_t.bas:363: PROCname(30, 40)
-test_t_input_03_t.bas:365: A = 1 + PROCname(50, 60)
-test_t_input_03_t.bas:367: DEF procempty()
-test_t_input_03_t.bas:368: 	procempty = PI
-test_t_input_03_t.bas:369: ENDPROC
-test_t_input_03_t.bas:371: procempty
-test_t_input_03_t.bas:372: procempty()
-test_t_input_03_t.bas:373: A = 1 + procempty()
-test_t_input_03_t.bas:375: DEF PROCj(A)
-test_t_input_03_t.bas:376: 	PROCj=10*A
-test_t_input_03_t.bas:377: ENDPROC
-test_t_input_03_t.bas:379: LET A=10*PROCj(5+5)
-test_t_input_03_t.bas:385: DEF FNname(A,B) = A * B
-test_t_input_03_t.bas:387: A = FNname(10,20) + FNname(1+2,3+4)
-test_t_input_03_t.bas:389: DEF fnempty() = PI
-test_t_input_03_t.bas:391: A = 2 * fnempty()
+test_t_input_03_t.bas:256: 	IF A=1 THEN B=2
+test_t_input_03_t.bas:257: 	IF A=1 THEN :ELSE B=2
+test_t_input_03_t.bas:258: 	IF A=1 THEN B=2:C=3
+test_t_input_03_t.bas:259: 	IF A=1 THEN B=2:C=3 ELSE
+test_t_input_03_t.bas:260: 	IF A=1 THEN B=2:C=3 ELSE D=4
+test_t_input_03_t.bas:261: 	IF A=1 THEN B=2:C=3 ELSE D=4:E=5
+test_t_input_03_t.bas:262: 	IF A=1 THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3
+test_t_input_03_t.bas:264: 	IF A=1 THEN
+test_t_input_03_t.bas:265: 		B=1
+test_t_input_03_t.bas:266: 		C=1
+test_t_input_03_t.bas:267: 	ENDIF
+test_t_input_03_t.bas:269: 	IF A=1 THEN
+test_t_input_03_t.bas:270: 		B=1
+test_t_input_03_t.bas:271: 		C=1
+test_t_input_03_t.bas:272: 	ELSE
+test_t_input_03_t.bas:273: 		B=2
+test_t_input_03_t.bas:274: 		IF A=2 THEN
+test_t_input_03_t.bas:275: 			C=2
+test_t_input_03_t.bas:276: 		ELSE
+test_t_input_03_t.bas:277: 			C=3
+test_t_input_03_t.bas:278: 		ENDIF
+test_t_input_03_t.bas:279: 	ENDIF
+test_t_input_03_t.bas:281: 	IF A=1 THEN
+test_t_input_03_t.bas:282: 		B=1 : C=1 : ENDIF : D=1
+test_t_input_03_t.bas:288: 	REPEAT A=1 UNTIL A=1
+test_t_input_03_t.bas:289: 	REPEAT B=1: REPEAT C=1 UNTIL A=1 UNTIL A=2
+test_t_input_03_t.bas:291: 	REPEAT
+test_t_input_03_t.bas:292: 		A=1
+test_t_input_03_t.bas:293: 		B=2
+test_t_input_03_t.bas:294: 		IF A=2 THEN EXIT
+test_t_input_03_t.bas:295: 		REPEAT
+test_t_input_03_t.bas:296: 			C=3
+test_t_input_03_t.bas:297: 		UNTIL A=2
+test_t_input_03_t.bas:298: 	UNTIL A=1
+test_t_input_03_t.bas:300: 	REPEAT
+test_t_input_03_t.bas:301: 		A=1 : B=2 : UNTIL A=1 : C=1
+test_t_input_03_t.bas:307: 	WHILE A<>1: A=1:B=2:C=3 WEND
+test_t_input_03_t.bas:309: 	WHILE A=1:B=1:WHILE A=2:C=1:WEND:WEND
+test_t_input_03_t.bas:311: 	WHILE A<>1
+test_t_input_03_t.bas:312: 		A=1
+test_t_input_03_t.bas:313: 		B=2
+test_t_input_03_t.bas:314: 		IF A=2 THEN EXIT
+test_t_input_03_t.bas:315: 		WHILE A<>2
+test_t_input_03_t.bas:316: 			C=3
+test_t_input_03_t.bas:317: 		WEND
+test_t_input_03_t.bas:318: 	WEND
+test_t_input_03_t.bas:320: 	WHILE A<>2
+test_t_input_03_t.bas:321: 		C=3 : WEND : C=4
+test_t_input_03_t.bas:327: 	LET S=0
+test_t_input_03_t.bas:328: 	FOR I=1 TO 10:LET S=S+I:NEXT I
+test_t_input_03_t.bas:330: 	FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT J:NEXT I
+test_t_input_03_t.bas:332: 	FOR I=1 TO 10 STEP 2
+test_t_input_03_t.bas:333: 		S=S+I
+test_t_input_03_t.bas:334: 		IF I=2 THEN EXIT
+test_t_input_03_t.bas:335: 		FOR J=1 TO 10 STEP 2
+test_t_input_03_t.bas:336: 			A=I*J
+test_t_input_03_t.bas:337: 		NEXT J
+test_t_input_03_t.bas:338: 	NEXT I
+test_t_input_03_t.bas:340: 	FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT:NEXT
+test_t_input_03_t.bas:342: 	FOR I=1 TO 10 STEP 2
+test_t_input_03_t.bas:343: 		FOR J=1 TO 10 STEP 2
+test_t_input_03_t.bas:344: 			A=I*J:NEXT:NEXT
+test_t_input_03_t.bas:350: 	DEF PROCname(A, B)
+test_t_input_03_t.bas:351: 		LOCAL L
+test_t_input_03_t.bas:352: 		LOCAL L1, L2
+test_t_input_03_t.bas:353: 		IF 1 THEN
+test_t_input_03_t.bas:354: 			LOCAL L3
+test_t_input_03_t.bas:355: 		ENDIF
+test_t_input_03_t.bas:356: 		L = A + B
+test_t_input_03_t.bas:357: 		IF A = 2 THEN EXIT
+test_t_input_03_t.bas:358: 		RESULT = L
+test_t_input_03_t.bas:359: 		PROCname = L
+test_t_input_03_t.bas:360: 	ENDPROC
+test_t_input_03_t.bas:362: 	PROCname 10, 20
+test_t_input_03_t.bas:363: 	PROCname(30, 40)
+test_t_input_03_t.bas:365: 	A = 1 + PROCname(50, 60)
+test_t_input_03_t.bas:367: 	DEF procempty()
+test_t_input_03_t.bas:368: 		procempty = PI
+test_t_input_03_t.bas:369: 	ENDPROC
+test_t_input_03_t.bas:371: 	procempty
+test_t_input_03_t.bas:372: 	procempty()
+test_t_input_03_t.bas:373: 	A = 1 + procempty()
+test_t_input_03_t.bas:375: 	DEF PROCj(A)
+test_t_input_03_t.bas:376: 		PROCj=10*A
+test_t_input_03_t.bas:377: 	ENDPROC
+test_t_input_03_t.bas:379: 	LET A=10*PROCj(5+5)
+test_t_input_03_t.bas:385: 	DEF FNname(A,B) = A * B
+test_t_input_03_t.bas:387: 	A = FNname(10,20) + FNname(1+2,3+4)
+test_t_input_03_t.bas:389: 	DEF fnempty() = PI
+test_t_input_03_t.bas:391: 	A = 2 * fnempty()
 test_t_input_03_t.bas:397: 1000
 test_t_input_03_t.bas:398: 	GOTO 1000
 test_t_input_03_t.bas:399: 	GOTO 1000+20*A
@@ -275,7 +275,7 @@ test_t_input_03_t.bas:560: 	UNPLOT X,Y
 test_t_input_03_t.bas:566: 	SCROLL
 test_t_input_03_t.bas:572: 	CONT
 test_t_input_03_t.bas:578: 	CLEAR
-test_t_input_03_t.bas:584: 		PRINT "HELLO"
+test_t_input_03_t.bas:584: 	PRINT "HELLO"
 test_t_input_03_t.bas:586: !ASM
 test_t_input_03_t.bas:587: end:		ld a, 1
 test_t_input_03_t.bas:588: !ENDASM

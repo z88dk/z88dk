@@ -125,9 +125,9 @@ PEEKW(X) is a shortcut for PEEK(X)+256\*PEEK(X+1).
 
 POKEW(A,X) is a shortcut for POKE A,X-256\*INT(X/256):POKE A+1,INT(X/256).
 
-DIV(A,B) and A\\B are shortcuts for INT(A/B).
+A DIV B and A\\B are shortcuts for INT(A/B).
 
-MOD(A,B) is a shortcut for A-B\*INT(A/B).
+A MOD B is a shortcut for A-B\*INT(A/B).
 
 All BASIC extended features are lowered to standard zx81 BASIC instructions
 or assembly routines before compilation.
