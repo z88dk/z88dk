@@ -3798,13 +3798,14 @@ static void handle_ed_page(void)
             TEST(v, isez80() ? 3 : 9);
         } else UNDOCUMENTED_NEG();
         break;
-    case 0x90:
-        if ( c_cpu & (CPU_R3K|CPU_R4K)) r3k_ldisr(opc);
+    case 0x90: // (R3K) LDISR / (ZXN) OUTINB / (KC160) LD (IY+d),IY
+        if ( iskc160() ) kc160_ld_ixysd_xy(opc); // LD (IY+d),IY
+        else if ( c_cpu & (CPU_R3K|CPU_R4K)) r3k_ldisr(opc);
         else if ( isz80n()) z80n_outinb();
         else st += 8;
         break;
-    case 0x91: // (KC160) LD (IY+d),IY
-        if ( iskc160() ) kc160_ld_ixysd_xy(opc); // LD (IY+d),IY
+    case 0x91: // (KC160) LD (IX+d),IY
+        if ( iskc160() ) kc160_ld_ixysd_xy(opc); // LD (IX+d),IY
         else if ( isz80n() ) z80n_nextreg_8_8();
         else st+=8;
         break;
