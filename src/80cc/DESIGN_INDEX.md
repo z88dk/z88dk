@@ -17,7 +17,7 @@ see `DESIGN_REVIEW_PLAN.md` (same directory), steps 2 to 7. In progress:
 | 2. Gate sweep | in progress — 119 gates to 78; opt-outs unified |
 | 3. This index | done |
 | 4. Document pass | done — archived on `80cc-docs-archive`, 9 new ADRs |
-| 5. Home plan (one owner) | not started |
+| 5. Home plan (one owner) | done — no code outside `ir_alloc` writes home state |
 | 6. Query boundary | not started |
 | 7. Lowering facts | not started |
 
@@ -25,10 +25,37 @@ No optimisation work starts until invariants 2 and 3 hold (see the plan).
 
 ## The four invariants
 
-1. No code outside `ir_alloc` writes home state — **not yet**
+1. No code outside `ir_alloc` writes home state — **yes**
 2. One opt-out mechanism, not eighteen — **yes**, one registry, two front doors
 3. Every surviving gate has a row here — **yes**
 4. Exactly one live next action in the tree — **yes**, this file
+
+## Who owns the allocation
+
+`ir_alloc` is the only writer of `vreg_to_phys`, `home_lo` and `home_hi`.
+Everywhere else reads. Four writers used to exist outside it, and each was a
+way for the plan to be edited behind the allocator's back:
+
+| Was | Now |
+| --- | --- |
+| the lowerer assigned index-half homes after `ir_alloc` returned | `assign_idxhalf_homes` is the last step *of* `ir_alloc` |
+| the lowerer took the word-home snapshot and memcpy'd it back | it calls `ir_alloc_word_home_reject`; the snapshot never leaves `ir_alloc.c` |
+| the lowerer demoted an unrealizable home in place | it calls `ir_alloc_demote_home` with the vreg |
+| `ir_slots.c` re-derived the backing rules | it calls `ir_home_requires_slot` |
+
+The shape is the same in each case: **the render reports a rejection, the owner
+edits the plan.** A rejection names a vreg and a reason; it never carries a
+replacement decision.
+
+That ordering also fixed a latent defect. The re-arbitration retry re-runs
+`ir_alloc`, which rewrote `vreg_to_phys` wholesale — silently erasing the
+index-half homes the lowerer had assigned, with nothing to put them back. It
+was inert on this corpus (byte-identical before and after the move) but it was
+only ever going to be inert by luck.
+
+Still outstanding for step 6: the parallel arrays are the public contract, and
+a point query can still read `vreg_to_phys` directly instead of asking
+`ir_home_at`, ignoring the interval bounds.
 
 ## Opt-outs
 
