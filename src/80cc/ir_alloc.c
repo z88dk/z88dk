@@ -2211,26 +2211,6 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
         }
         pool[j] = c;
     }
-    /* [IR_SHAREPROBE] INERT. BC is already multi-occupant here (it overlap-tests
-       against assigned BC vregs). The index/exx/byte classes are NOT — they are
-       booleans, one tenant per function — so a candidate whose live range is
-       DISJOINT from the incumbent's is refused anyway. This counts exactly those
-       refusals: the ones time-sharing would admit at zero interference cost, the
-       mechanism BC already proves. It also counts refusals where the newcomer
-       OUT-BENEFITS the incumbent, which is what displacement (ir_bc_pack's
-       bc-evict, generalised) would take. No codegen effect. */
-    int sp_lo[4] = {0,0,0,0}, sp_hi[4] = {0,0,0,0}; long sp_ben[4] = {0,0,0,0};
-    int sp_share = 0, sp_evict = 0, sp_refuse = 0;
-    #define SP_NOTE(IX_, LO_, HI_, BEN_) do { \
-        if (getenv("IR_SHAREPROBE")) { sp_lo[IX_]=(LO_); sp_hi[IX_]=(HI_); sp_ben[IX_]=(BEN_); } \
-    } while (0)
-    #define SP_REFUSED(IX_, LO_, HI_, BEN_) do { \
-        if (getenv("IR_SHAREPROBE")) { \
-            sp_refuse++; \
-            if ((HI_) < sp_lo[IX_] || (LO_) > sp_hi[IX_]) sp_share++; \
-            else if ((BEN_) > sp_ben[IX_]) sp_evict++; \
-        } \
-    } while (0)
     int idx2_taken = 0, byte_reg = 0;    /* 0 / 'C' / 'E' */
     int idx2_defer = -1;                 /* best param that yielded to a counter */
     int idx3_taken = 0;                  /* the second index (IY) home */
@@ -2279,7 +2259,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
         if (c->allowed & RC_IDX2) {
             /* idx2 sub-priority: a stepping counter beats a param. Only take
                idx2 for a param if no counter candidate is still assignable. */
-            if (idx2_taken) { SP_REFUSED(0, c->lo, c->hi, (long)c->benefit); continue; }
+            if (idx2_taken) continue;
             if (f->idx2_reg == IR_PR_NONE) continue;
             /* G1 grounded gate: skip an index home that costs more than the slot
                for this value (read-only value on a cheap-slot target). G2: unless
@@ -2330,7 +2310,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                 }
             }
             f->vreg_to_phys[v] = f->idx2_reg;
-            idx2_taken = 1; SP_NOTE(0, c->lo, c->hi, (long)c->benefit);
+            idx2_taken = 1;
             continue;
         }
 
@@ -2653,11 +2633,6 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
             f->de_home_is_ptr = (pool[gbest].flags & CF_DE_PTR) != 0;
         }
     }
-    if (getenv("IR_SHAREPROBE") && sp_refuse)
-        fprintf(stderr, "SHARE %s refused=%d would_share=%d would_evict=%d\n",
-                f->fn ? ir_sym_name(f->fn) : "?", sp_refuse, sp_share, sp_evict);
-    #undef SP_NOTE
-    #undef SP_REFUSED
 }
 
 /* Op-kinds allowed to appear in a BC-pack candidate's span AFTER its def
@@ -6144,13 +6119,6 @@ void ir_alloc(Func *f)
                                                  first_use, last_use,
                                                  pool, (int)cand_pool_len(f));
                 /* B4 (inert, IR_HR_CHECK): home_realizable == pool membership? */
-                /* [IR_SHAREPROBE] Is the gap in SELECTION or in PROPOSAL? The
-                   arbiter can only place what the 11 realizability predicates
-                   nominate. Compare the pool against the values that PLAUSIBLY
-                   want a register (width-2, not escaping, actually accessed) —
-                   if the pool is a small fraction of them, the ~50 % capture gap
-                   is decided before the arbiter ever runs, and tuning selection
-                   cannot reach it. */
                 if (getenv("IR_GRAPH_PROBE")) {
                     static char *pm = NULL; static int pmn = 0;
                     free(pm); pm = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), 1);
@@ -6158,46 +6126,6 @@ void ir_alloc(Func *f)
                     if (pm) for (int i2 = 0; i2 < np; i2++)
                         if (pool[i2].vreg >= 0 && pool[i2].vreg < pmn) pm[pool[i2].vreg] = 1;
                     g_pool_member = pm; g_pool_member_n = pm ? pmn : 0;
-                }
-                if (getenv("IR_SHAREPROBE")) {
-                    int plaus = 0;
-                    for (int v2 = 0; v2 < f->n_vregs; v2++) {
-                        if (f->vregs[v2].width != 2) continue;
-                        if (f->vregs[v2].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
-                        if (use_count[v2] + write_count[v2] == 0) continue;
-                        plaus++;
-                    }
-                    fprintf(stderr, "POOL %s proposed=%d plausible=%d\n",
-                            f->fn ? ir_sym_name(f->fn) : "?", np, plaus);
-                    /* [IR_SHAREPROBE=2] WHY the other ~72 % never reach the
-                       arbiter. A value that is not proposed failed EVERY
-                       predicate, so "which one rejected it" is not single-valued.
-                       What IS actionable is the SHAPE the predicates are keying
-                       on — write-once, a use threshold, deref-base, param-ness,
-                       call-freedom — and how much benefit sits behind each. This
-                       prints one line per unproposed plausible value so the work
-                       list is ranked by value, not by guess. */
-                    if (getenv("IR_SHAREPROBE")[0] == '2') {
-                        int callfree = func_is_call_free(f);
-                        for (int v2 = 0; v2 < f->n_vregs; v2++) {
-                            if (f->vregs[v2].width != 2) continue;
-                            if (f->vregs[v2].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
-                            if (use_count[v2] + write_count[v2] == 0) continue;
-                            int inpool = 0;
-                            for (int i2 = 0; i2 < np && !inpool; i2++)
-                                if (pool[i2].vreg == v2) inpool = 1;
-                            if (inpool) continue;
-                            long ben = interval_benefit(f, v2, bb_loop_depth,
-                                                        bb_cond_shift, GR_BC);
-                            fprintf(stderr, "NOPROP %s v%d uses=%d writes=%d "
-                                    "param=%d spill=%d callfree=%d ben=%ld\n",
-                                    f->fn ? ir_sym_name(f->fn) : "?", v2,
-                                    use_count[v2], write_count[v2],
-                                    !!(f->vregs[v2].flags & IR_VREG_PARAM),
-                                    f->vreg_to_phys[v2] == IR_PR_SPILL,
-                                    callfree, ben);
-                        }
-                    }
                 }
                 hr_agreement_check(f, pool, np, use_count, write_count,
                                    def_kind, all_defs_ok, has_prepushed_call,
@@ -6735,240 +6663,6 @@ void ir_alloc(Func *f)
             }
             free(callpos);
             free(wdb);
-        }
-        /* [IR_SPILLAUDIT] Phase-0 spill-cause audit (POINTER/general-allocation
-           arc). For every SPILLED width-1/2 non-param/addr-taken/volatile value
-           with >=3 raw refs (the ones that cost bytes), classify WHY it spilled,
-           to decide if "better general allocation" is a real lever:
-             pair_free = at least one of BC/DE has NO other homed vreg whose TRUE
-                         live range (ir_live_range — NOT the loop-extended
-                         first/last_use; the call-split lesson) overlaps V's true
-                         range. pair_free ⇒ role-specialisation left a register
-                         idle (bucket A). !pair_free ⇒ genuine pressure (B/C).
-             in_loop   = V is accessed inside a loop ⇒ reloaded per iteration
-                         (the back-edge invalidates the reg cache like a call) ⇒
-                         a REAL opportunity, same structure the call-split took.
-                         pair_free && !in_loop = straight-line cache-served reuse
-                         ⇒ the Phase-4 no-op.
-           So A_loop is the recoverable bucket; A_straight is a mirage; pressure
-           is the hard/floor case. Reports counts + Σrefs (byte-weight proxy). */
-        if (getenv("IR_SPILLAUDIT")) {
-            int nv = f->n_vregs;
-            int a_loop = 0, a_straight = 0, pressure = 0, a_loop_mb = 0;
-            long r_aloop = 0, r_astraight = 0, r_press = 0, r_aloop_mb = 0;
-            /* PEAK register pressure: max simultaneously-live GP-candidate values
-               (width-1/2, >=2 uses, non-addr/vol/param — all that compete for a
-               register HOME) over the function, via interval coverage on the true
-               live ranges. This is the decisive "would coloring help" number:
-               if peak <= cheap-reg capacity (BC/DE + their byte halves ~= 2-4) yet
-               values spill, the greedy allocator left registers idle → coloring
-               wins; if peak >> capacity it is genuine over-subscription → floor. */
-            int peak_gp = 0, max_end = -1;
-            for (int v = 0; v < nv; v++) {
-                const LiveRange *lr = ir_live_range(f, v);
-                if (lr && lr->end > max_end) max_end = lr->end;
-            }
-            if (max_end >= 0) {
-                int span = max_end + 2;
-                int *cov = calloc((size_t)span, sizeof(int));
-                if (cov) {
-                    for (int v = 0; v < nv; v++) {
-                        const VReg *vr = &f->vregs[v];
-                        if (vr->width != 1 && vr->width != 2) continue;
-                        if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
-                                         | IR_VREG_PARAM)) continue;
-                        if (use_count[v] < 2) continue;
-                        const LiveRange *lr = ir_live_range(f, v);
-                        if (!lr || lr->start < 0) continue;
-                        cov[lr->start]++;
-                        if (lr->end + 1 < span) cov[lr->end + 1]--;
-                    }
-                    int run = 0;
-                    for (int k = 0; k < span; k++) {
-                        run += cov[k];
-                        if (run > peak_gp) peak_gp = run;
-                    }
-                    free(cov);
-                }
-            }
-            /* PRECISE peak: same count but from per-op liveness (live_in_per_op),
-               which has HOLES — a value dead between an early def and a late use
-               is NOT counted live in the gap. This is the pressure sdcc actually
-               allocates against; peak_gp (solid interval) overstates it. If
-               precise << peak_gp, the "hardware floor" is really 80cc's coarse
-               whole-interval liveness (no live-range splitting), NOT the z80. */
-            int peak_precise = 0;
-            for (int b = 0; b < f->n_bbs; b++) {
-                const BB *bb = &f->bbs[b];
-                if (!bb->live_in_per_op) continue;
-                for (int j = 0; j < bb->n_ops; j++) {
-                    const BitSet *lin = (const BitSet *)bb->live_in_per_op[j];
-                    if (!lin) continue;
-                    int cnt = 0;
-                    for (int v = 0; v < nv; v++) {
-                        const VReg *vr = &f->vregs[v];
-                        if (vr->width != 1 && vr->width != 2) continue;
-                        if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
-                                         | IR_VREG_PARAM)) continue;
-                        if (use_count[v] < 2) continue;
-                        if (ir_bitset_get(lin, v)) cnt++;
-                    }
-                    if (cnt > peak_precise) peak_precise = cnt;
-                }
-            }
-            /* which BBs are in a loop (for the in_loop test) */
-            for (int v = 0; v < nv; v++) {
-                const VReg *vr = &f->vregs[v];
-                if (vr->width != 1 && vr->width != 2) continue;
-                if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
-                                 | IR_VREG_PARAM)) continue;
-                if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-                const LiveRange *lv = ir_live_range(f, v);
-                if (!lv || lv->start < 0) continue;
-                /* raw refs + whether any ref is in a loop BB + how many DISTINCT
-                   BBs hold accesses (>1 ⇒ accesses span a belief-reset ⇒ actually
-                   reloaded per span; ==1 ⇒ single-BB, cache-served = Phase-4
-                   mirage). multi_bb is the "actually pays" refinement. */
-                int refs = 0, in_loop = 0, acc_bbs = 0;
-                for (int b = 0; b < f->n_bbs; b++) {
-                    int hit = 0;
-                    for (int j = 0; j < f->bbs[b].n_ops; j++) {
-                        const Op *o = &f->bbs[b].ops[j];
-                        if (o->dst == v) { refs++; hit = 1; }
-                        int u[16]; int nu = ir_op_uses(o, u, 16);
-                        for (int k = 0; k < nu; k++)
-                            if (u[k] == v) { refs++; hit = 1; }
-                    }
-                    if (hit) acc_bbs++;
-                    if (hit && bb_in_loop[b]) in_loop = 1;
-                }
-                if (refs < 3) continue;
-                int multi_bb = acc_bbs > 1;
-                /* true-range-free BC/DE pair */
-                int bc_busy = 0, de_busy = 0;
-                for (int w = 0; w < nv; w++) {
-                    if (w == v) continue;
-                    int ph = f->vreg_to_phys[w];
-                    if (ph != IR_PR_BC && ph != IR_PR_DE) continue;
-                    const LiveRange *lw = ir_live_range(f, w);
-                    if (!lw || lw->start < 0) continue;
-                    if (lw->start <= lv->end && lv->start <= lw->end) {
-                        if (ph == IR_PR_BC) bc_busy = 1; else de_busy = 1;
-                    }
-                }
-                int pair_free = !bc_busy || !de_busy;
-                if (pair_free && in_loop) { a_loop++; r_aloop += refs;
-                                            if (multi_bb) { a_loop_mb++; r_aloop_mb += refs; } }
-                else if (pair_free)       { a_straight++; r_astraight += refs; }
-                else                      { pressure++; r_press += refs; }
-                if (getenv("IR_SPILLAUDIT")[0] == '2')
-                    fprintf(stderr, "  spv %s v%d refs=%d loop=%d mbb=%d bcfree=%d "
-                            "defree=%d -> %s\n", f->fn?ir_sym_name(f->fn):"?", v,
-                            refs, in_loop, multi_bb, !bc_busy, !de_busy,
-                            pair_free ? (in_loop?"A_loop":"A_straight") : "pressure");
-            }
-            if (a_loop + a_straight + pressure > 0)
-                fprintf(stderr, "SPILLAUDIT %-20s peakGP=%d peakPrec=%d A_loop=%d(r%ld) "
-                        "A_loopMB=%d(r%ld) A_straight=%d(r%ld) pressure=%d(r%ld)\n",
-                        f->fn?ir_sym_name(f->fn):"?", peak_gp, peak_precise, a_loop, r_aloop,
-                        a_loop_mb, r_aloop_mb,
-                        a_straight, r_astraight, pressure, r_press);
-        }
-        /* [IR_VRED] Value-reduction audit. sdcc "spills less" because its
-           middle-end has FEWER live values, not a better allocator (peak
-           pressure is similar). Classify each spilled GP-candidate by whether an
-           UPSTREAM optimisation would ELIMINATE it (dropping it from the live set)
-           rather than needing a register:
-             remat  = def is a constant / &sym / &string — recomputable at use
-                      (should not be kept live+spilled at all);
-             copy   = def is IR_MOV v=w — coalescable into w's home;
-             cse    = an IDENTICAL def op (same kind+srcs+imm+mem) exists on
-                      another vreg — a redundant computation CSE would merge;
-             distinct = a genuinely-distinct live value (the real floor).
-           If remat+copy+cse dominate, VALUE-REDUCTION (CSE/remat/coalesce) is the
-           lever, upstream of allocation; if distinct dominates, the pressure is
-           real. (Upper bound: no redef-between check on cse — sizing only.) */
-        if (getenv("IR_VRED")) {
-            int nv = f->n_vregs;
-            const Op **defop = calloc((size_t)(nv > 0 ? nv : 1), sizeof(Op *));
-            int *ndef = calloc((size_t)(nv > 0 ? nv : 1), sizeof(int));
-            int *stbase = calloc((size_t)(nv > 0 ? nv : 1), sizeof(int));
-            if (defop && ndef && stbase) {
-                for (int b = 0; b < f->n_bbs; b++)
-                    for (int j = 0; j < f->bbs[b].n_ops; j++) {
-                        const Op *o = &f->bbs[b].ops[j];
-                        if (o->dst >= 0 && o->dst < nv && !defop[o->dst])
-                            defop[o->dst] = o;
-                        int dd[8]; int ndd = ir_op_defs(o, dd, 8);
-                        for (int k = 0; k < ndd; k++)
-                            if (dd[k] >= 0 && dd[k] < nv) ndef[dd[k]]++;
-                        if (o->kind == IR_ST_MEM && o->mem.kind == IR_MEM_VREG
-                            && o->mem.base >= 0 && o->mem.base < nv)
-                            stbase[o->mem.base] = 1;
-                    }
-                int remat = 0, copy = 0, cse = 0, distinct = 0;
-                int remat_imm = 0, remat_sym = 0;
-                /* Actionable remat = SINGLE-def (ndef==1) width-2 LD_IMM/LD_SYM
-                   that's still spilled. Split: storebase (the known bitfield
-                   exclusion), else "clean" (a genuine gap). multidef / byte are
-                   NOT rematerializable (value changes / different machinery). */
-                int rm_storebase = 0, rm_clean = 0, rm_multidef = 0, rm_byte = 0;
-                int cse_lea = 0, cse_ldmem = 0, cse_rest = 0;
-                for (int v = 0; v < nv; v++) {
-                    const VReg *vr = &f->vregs[v];
-                    if (vr->width != 1 && vr->width != 2) continue;
-                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
-                                     | IR_VREG_PARAM | IR_VREG_NO_SLOT)) continue;
-                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-                    if (use_count[v] < 2) continue;
-                    const Op *d = defop[v];
-                    if (!d) continue;
-                    if (d->kind == IR_LD_IMM || d->kind == IR_LD_SYM
-                        || d->kind == IR_LD_STR) { remat++;
-                        if (d->kind == IR_LD_IMM) remat_imm++; else remat_sym++;
-                        if (ndef[v] > 1) rm_multidef++;
-                        else if (vr->width == 1) rm_byte++;
-                        else if (stbase[v]) rm_storebase++;
-                        else rm_clean++;
-                        continue; }
-                    if (d->kind == IR_MOV) { copy++; continue; }
-                    int dup = 0;
-                    for (int w = 0; w < nv && !dup; w++) {
-                        if (w == v) continue;
-                        const Op *e = defop[w];
-                        if (!e || e->kind != d->kind) continue;
-                        if (e->src[0] == d->src[0] && e->src[1] == d->src[1]
-                            && e->imm == d->imm && e->imm_sym == d->imm_sym
-                            && e->mem.kind == d->mem.kind
-                            && e->mem.sym == d->mem.sym
-                            && e->mem.offset == d->mem.offset
-                            && e->mem.base == d->mem.base
-                            && d->src[0] >= 0)   /* has a real operand to share */
-                            dup = 1;
-                    }
-                    if (dup) { cse++;
-                        /* Break the CSE opportunity down by def kind: ADDRESSES
-                           (LEA=&frameslot, LD_MEM=*p deref) that broadening
-                           cse_eligible would newly catch, vs the rest (arith,
-                           already eligible → a scope/table/cross-BB miss). */
-                        if (d->kind == IR_LEA) cse_lea++;
-                        else if (d->kind == IR_LD_MEM) cse_ldmem++;
-                        else cse_rest++;
-                        continue; }
-                    distinct++;
-                    if (getenv("IR_VRED")[0] == '2')
-                        fprintf(stderr, "  vred-distinct %s v%d defkind=%d uc=%d\n",
-                                f->fn?ir_sym_name(f->fn):"?", v, (int)d->kind,
-                                use_count[v]);
-                }
-                if (remat + copy + cse + distinct > 0)
-                    fprintf(stderr, "VRED %-20s remat=%d[sb%d/clean%d/mdef%d/byte%d] "
-                            "copy=%d cse=%d[lea%d/ldmem%d/rest%d] distinct=%d\n",
-                            f->fn?ir_sym_name(f->fn):"?", remat, rm_storebase,
-                            rm_clean, rm_multidef, rm_byte, copy, cse,
-                            cse_lea, cse_ldmem, cse_rest, distinct);
-            }
-            free(defop); free(ndef); free(stbase);
         }
         free(write_count);
         free(use_count);
