@@ -34,6 +34,8 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0021](0021-per-value-spill-heuristics.md) | **Rejected** — per-value spill/placement heuristics (the decision is interference, not value kind) |
 | [0022](0022-widening-the-long-stack-park.md) | **Rejected** — widening the long stack-park pass (its gate is def-uniqueness, not use count) |
 | [0023](0023-bytewise-word-store.md) | **Rejected** — the bytewise word store (it must drop a belief the pair form keeps) |
+| [0025](0025-post-render-code-layout.md) | Post-render code layout: tail merging, then block layout, then branch relaxation (amends 0013) |
+| [0026](0026-index-home-as-addressing-mode.md) | The index home is an addressing mode, not only a value carrier (amends 0011) |
 | [0024](0024-byte-home-for-a-single-use-temp.md) | **Rejected** — relaxing the byte-home use-count gate (E is slot-backed; one byte home per function) |
 
 Derived from the `*_PLAN.md` working notes: 0006 ← MULTICPU_IR, 0007 ← KIND_WIDTH,
