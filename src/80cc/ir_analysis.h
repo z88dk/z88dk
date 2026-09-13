@@ -106,8 +106,13 @@ int ir_func_total_ops(const Func *f);
    `out` and returns the count actually written (or the count it *would*
    have written if `max` had been larger — caller should re-call with
    a bigger buffer if return > max). vreg ids are non-negative. */
+/* Fill out[] with the op's distinct defs/uses and return HOW MANY WERE WRITTEN
+   (never more than max) — safe to iterate over a fixed-size buffer. When the
+   true number matters, size the buffer with the *_count form first. */
 int  ir_op_defs(const Op *op, int *out, int max);
 int  ir_op_uses(const Op *op, int *out, int max);
+int  ir_op_defs_count(const Op *op);
+int  ir_op_uses_count(const Op *op);
 
 /* Structural IR verifier. Walks the function and reports invariant
    violations to stderr (vreg-operand bounds, branch/switch targets,

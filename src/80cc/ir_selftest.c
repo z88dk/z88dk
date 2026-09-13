@@ -1500,6 +1500,80 @@ static int run_match_tests(void)
     return fails;
 }
 
+/* ir_op_uses / ir_op_defs must never report more than they wrote.
+   The convention used to return the true total even when it exceeded `max`,
+   so a caller with a fixed `int uses[16]` — or `[8]`, as four sites in
+   ir_opt.c have — iterated past the end of its own buffer and then used the
+   uninitialised stack it read as a vreg index. A call with more distinct
+   argument vregs than the buffer holds is enough. The *_count entry points
+   are how a caller that needs the true size asks for it. */
+static int run_op_uses_bounds_tests(void)
+{
+    enum { NARGS = 20 };
+    int fails = 0;
+    int args[NARGS];
+    for (int i = 0; i < NARGS; i++) args[i] = i + 1;
+
+    HelperInfo h;
+    memset(&h, 0, sizeof h);
+    h.args = args;
+    h.n_args = NARGS;
+
+    Op op;
+    memset(&op, 0, sizeof op);
+    op.kind = IR_HCALL;
+    op.dst = -1;
+    op.src[0] = op.src[1] = -1;
+    op.hcall = &h;
+
+#define BOUNDS_CHECK(what, cond) \
+    do { if (!(cond)) { printf("  FAIL %s\n", what); fails++; } } while (0)
+
+    /* The true size is available, and it is the real one. */
+    BOUNDS_CHECK("ir_op_uses_count sees every argument",
+                 ir_op_uses_count(&op) == NARGS);
+
+    /* A short buffer is never over-reported, at either of the two sizes the
+       tree actually uses, and nothing is written past the end. */
+    static const int caps[] = { 8, 16 };
+    for (unsigned c = 0; c < sizeof caps / sizeof caps[0]; c++) {
+        int cap = caps[c];
+        int buf[NARGS + 1];
+        for (int i = 0; i < NARGS + 1; i++) buf[i] = -999;
+        int n = ir_op_uses(&op, buf, cap);
+        BOUNDS_CHECK("ir_op_uses returns at most the capacity", n <= cap);
+        BOUNDS_CHECK("ir_op_uses fills the buffer it was given", n == cap);
+        BOUNDS_CHECK("ir_op_uses writes nothing past the capacity",
+                     buf[cap] == -999);
+        for (int i = 0; i < n; i++)
+            BOUNDS_CHECK("every returned entry was actually written",
+                         buf[i] != -999);
+    }
+
+    /* A buffer sized from the count enumerates exactly, with no duplicates. */
+    {
+        int n = ir_op_uses_count(&op);
+        int *big = malloc((size_t)n * sizeof(int));
+        int got = ir_op_uses(&op, big, n);
+        BOUNDS_CHECK("a count-sized buffer takes every use", got == NARGS);
+        for (int i = 0; i < got; i++)
+            for (int j = i + 1; j < got; j++)
+                BOUNDS_CHECK("uses are distinct", big[i] != big[j]);
+        free(big);
+    }
+
+    /* Defs follow the same contract. IR_HCALL defines only its return vreg,
+       so use the zero-capacity case to prove nothing is written at all. */
+    {
+        int n = ir_op_defs(&op, NULL, 0);
+        BOUNDS_CHECK("ir_op_defs with no buffer writes nothing and says so",
+                     n == 0);
+    }
+
+#undef BOUNDS_CHECK
+    return fails;
+}
+
 int main(void)
 {
     printf("=== smoke: add two ints (param form) ===\n");
@@ -1754,6 +1828,16 @@ int main(void)
 
     ir_free_liveness(fL);
     ir_func_free(fL);
+
+    printf("\n=== ir_op_uses / ir_op_defs buffer bounds ===\n");
+    {
+        int fails = run_op_uses_bounds_tests();
+        if (fails) {
+            fprintf(stderr, "FAIL: %d op-uses bounds test(s)\n", fails);
+            return 1;
+        }
+        printf("  all op-uses bounds tests passed\n");
+    }
 
     printf("\n=== ir_match engine (pattern matcher) ===\n");
     {
