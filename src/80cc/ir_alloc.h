@@ -47,6 +47,14 @@ void ir_alloc_veto_add(int vreg);
    keeps its slot as its canonical home outside the split span. */
 int ir_home_requires_slot(const Func *f, int v);
 
+/* Where is v homed at flat op index g? Pass g < 0 for no ambient point. This
+   is the POINT query and the only one that honours the home interval. */
+PhysReg ir_home_at_op(const Func *f, int v, int g);
+
+/* Is v EVER homed in a register? The whole-function question; ignores the
+   interval on purpose. Use it for scans, never for a decision at a point. */
+PhysReg ir_home_assigned(const Func *f, int v);
+
 /* Is a byte/word home in this register clobberable, so that it needs a backing
    slot the lowerer can lazy-spill to? E and D are (DE is scratch); C and B are
    not (the no-clobber envelope keeps them resident for the whole function). */

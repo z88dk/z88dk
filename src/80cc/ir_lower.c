@@ -3076,15 +3076,9 @@ static const BB    *cur_bb;
    Callers must pass an in-range v (the vreg_in_pr_* helpers guard before calling). */
 static PhysReg ir_home_at(const Func *f, int v)
 {
-    PhysReg pr = f->vreg_to_phys[v];
-    /* Ranged residency: the home holds v only within [home_lo, home_hi] (flat
-       op-index). Outside it — or when there is no ambient lowering point
-       (L.ss_cur_g < 0: prologue / assignment-level query) — fall back to the
-       assignment. Whole-function intervals (the default) make this a no-op. */
-    if (pr != IR_PR_SPILL && f->home_lo && L.ss_cur_g >= 0
-        && (L.ss_cur_g < f->home_lo[v] || L.ss_cur_g > f->home_hi[v]))
-        return IR_PR_SPILL;
-    return pr;
+    /* The lowerer's wrapper: supply the ambient point from LowerState and ask
+       the allocator. L.ss_cur_g < 0 means there is no point (prologue). */
+    return ir_home_at_op(f, v, L.ss_cur_g);
 }
 
 /* Framepointer mode predicates.

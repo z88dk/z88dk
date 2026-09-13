@@ -187,6 +187,36 @@ static int op_dst_spill_is_dead(const BB *bb, int op_idx)
     return 1;
 }
 
+/* ---- The point query: where is v homed AT A GIVEN POINT? ------------------
+   Pure: the flat op index is passed in, not read from lowerer state, so
+   allocation, slot assignment, the verifiers and a test can all ask the same
+   question the lowerer asks. Pass g < 0 for "no ambient point" (a prologue or
+   an assignment-level question), which yields the raw assignment.
+
+   Today a home is whole-function — one interval per vreg — so the bounds test
+   is a no-op and this returns the assignment. That is the degenerate case of
+   the interval table, not a different model: when a home becomes ranged, only
+   this body changes. Anything that reads the assignment directly to make a
+   POINT decision silently ignores the bounds and will be wrong then. */
+PhysReg ir_home_at_op(const Func *f, int v, int g)
+{
+    if (!f || !f->vreg_to_phys || v < 0 || v >= f->n_vregs) return IR_PR_SPILL;
+    PhysReg pr = (PhysReg)f->vreg_to_phys[v];
+    if (pr != IR_PR_SPILL && f->home_lo && g >= 0
+        && (g < f->home_lo[v] || g > f->home_hi[v]))
+        return IR_PR_SPILL;
+    return pr;
+}
+
+/* The whole-function question: is v EVER homed in a register? Not a point
+   query — it deliberately ignores the interval, and callers that scan every
+   vreg (prepasses, "does this function use BC at all") want exactly that. */
+PhysReg ir_home_assigned(const Func *f, int v)
+{
+    if (!f || !f->vreg_to_phys || v < 0 || v >= f->n_vregs) return IR_PR_SPILL;
+    return (PhysReg)f->vreg_to_phys[v];
+}
+
 /* ---- The backing requirement: one owner, one answer -----------------------
    ir_slots.c used to re-derive these rules, which meant the question "does this
    value have a slot?" had two implementations that had to agree. It is an
