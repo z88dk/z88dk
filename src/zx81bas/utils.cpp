@@ -8,7 +8,10 @@
 #include "utils.h"
 #include <algorithm>
 #include <cctype>
+#include <cerrno>
 #include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -16,8 +19,8 @@
 #include <string>
 
 void remove_file(const std::string& filename) {
-    if (std::remove(filename.c_str()) != 0) {
-        error("Failed to remove temporary file: " + filename);
+    if (std::remove(filename.c_str()) != 0 && errno != ENOENT) {
+        fatal("Failed to remove file: " + filename);
     }
 }
 
@@ -46,8 +49,7 @@ std::string normalize_path(const std::string& path) {
 void cat_file(const std::string& filename) {
     std::ifstream file(filename);
     if (!file) {
-        error("Failed to open file: " + filename);
-        return;
+        fatal("Failed to open file: " + filename);
     }
     std::string text;
     std::cout << "Contents of " << filename << ":" << std::endl;

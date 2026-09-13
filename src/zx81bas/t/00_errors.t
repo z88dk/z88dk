@@ -9,16 +9,20 @@ my %code_errors;
 while (<>) {
     if (/error\(.*?"(.*?)"/) {
         my $message = $1;
-        note "$message, $ARGV";
-        ok $message !~ /^[a-z]/, "error message should be capitalized";
-        ok !( exists $code_errors{$message}
-            && $code_errors{$message} ne $ARGV ),
-            "unique error message per module";
+        unlike $message, qr/^[a-z]/, "error message should be capitalized";
+        my $unique = !( exists $code_errors{$message}
+            && $code_errors{$message} ne $ARGV );
+        ok $unique, "unique error message per module";
+        if ( !$unique ) {
+            note "message: $message";
+            note "in: $code_errors{$message}";
+            note "in: $ARGV";
+        }
         $code_errors{$message} = $ARGV;
     }
 }
 
-note dump( \%code_errors );
+#note dump( \%code_errors );
 
 # collect all tested error messages
 my %test_errors;
@@ -26,17 +30,20 @@ my %test_errors;
 while (<>) {
     if (/error: (.*)/) {
         my $message = $1;
-        note "$message, $ARGV";
         $test_errors{$message} = $ARGV;
     }
 }
 
-note dump( \%test_errors );
+#note dump( \%test_errors );
 
 # eliminate same messages
-for my $code_message ( keys %code_errors ) {
+my @code_errors_by_length =
+    sort { length($b) <=> length($a) } keys %code_errors;
+for my $code_message (@code_errors_by_length) {
     my $found;
-    for my $test_message ( keys %test_errors ) {
+    my @test_errors_by_length =
+        sort { length($b) <=> length($a) } keys %test_errors;
+    for my $test_message (@test_errors_by_length) {
         if (
             $code_message eq substr( $test_message, 0, length($code_message) ) )
         {
@@ -49,8 +56,8 @@ for my $code_message ( keys %code_errors ) {
     }
 }
 
-#is scalar( keys %code_errors ), 0, "all code messages in code";
-#is scalar( keys %test_errors ), 0, "all test messages in tests";
+is scalar( keys %code_errors ), 0, "all code messages in code";
+is scalar( keys %test_errors ), 0, "all test messages in tests";
 
 # show unmatched
 my @unmatched;

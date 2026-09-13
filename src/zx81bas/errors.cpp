@@ -39,6 +39,12 @@ int get_error_count() {
 }
 
 [[noreturn]]
+void fatal(const std::string& message) {
+    std::cerr << "fatal: " << message << std::endl;
+    exit(EXIT_FAILURE);
+}
+
+[[noreturn]]
 void exit_error_status() {
     if (error_count > 0) {
         std::cerr << std::to_string(error_count)
