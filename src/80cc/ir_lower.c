@@ -461,8 +461,7 @@ static int  call_bremat_on = -1;
 static int  call_bremat_enabled(void)
 {
     if (call_bremat_on < 0) {
-        const char *e = getenv("IR_CALL_BREMAT");
-        call_bremat_on = (e && e[0] == '0') ? 0 : 1;   /* default ON; =0 opts out */
+        call_bremat_on = !opt_disabled("call-bremat");
     }
     return call_bremat_on;
 }
@@ -487,8 +486,7 @@ static int  fclong_carry_on = -1;
 static int  fclong_carry_enabled(void)
 {
     if (fclong_carry_on < 0) {
-        const char *e = getenv("IR_FCLONG_CARRY");
-        fclong_carry_on = (e && e[0] == '0') ? 0 : 1;   /* default ON; =0 opts out */
+        fclong_carry_on = !opt_disabled("fclong-carry");
     }
     return fclong_carry_on;
 }
@@ -1554,8 +1552,9 @@ static int  gwiden_on = -1;
 static int  gwiden_enabled(void)
 {
     if (gwiden_on < 0) {
-        const char *e = getenv("IR_GWIDEN");
-        gwiden_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; =0 opts out */
+        /* opt_disabled("gwiden") at the return is the switch; this private
+           one was a duplicate of it. */
+        gwiden_on = 1;
     }
     return gwiden_on && !opt_disabled("gwiden");
 }
