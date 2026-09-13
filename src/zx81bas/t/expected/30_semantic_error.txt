@@ -2,14 +2,14 @@
 Input file:  t/input/30_semantic_error.bas
 Output file: t/input/30_semantic_error.p
 % z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/30_semantic_error.i" "t/input/30_semantic_error.pp"
-t/input/30_semantic_error.bas:17: error: Recursive PROC or FN detected: FNB
-t/input/30_semantic_error.bas:19: error: Recursive PROC or FN detected: FND
-t/input/30_semantic_error.bas:16: error: Recursive PROC or FN detected: FNA
-t/input/30_semantic_error.bas:11: error: Recursive PROC or FN detected: PROCD
-t/input/30_semantic_error.bas:8: error: Recursive PROC or FN detected: PROCC
-t/input/30_semantic_error.bas:18: error: Recursive PROC or FN detected: FNC
-t/input/30_semantic_error.bas:5: error: Recursive PROC or FN detected: PROCB
-t/input/30_semantic_error.bas:2: error: Recursive PROC or FN detected: PROCA
+t/input/30_semantic_error.bas:16: error: Recursive function: FNA
+t/input/30_semantic_error.bas:17: error: Recursive function: FNB
+t/input/30_semantic_error.bas:18: error: Recursive function: FNC
+t/input/30_semantic_error.bas:19: error: Recursive function: FND
+t/input/30_semantic_error.bas:2: error: Recursive function: PROCA
+t/input/30_semantic_error.bas:5: error: Recursive function: PROCB
+t/input/30_semantic_error.bas:8: error: Recursive function: PROCC
+t/input/30_semantic_error.bas:11: error: Recursive function: PROCD
 t/input/30_semantic_error.bas:22: error: Array index expression must be a number
 t/input/30_semantic_error.bas:23: error: Array index expression must be a number
 t/input/30_semantic_error.bas:24: error: Type mismatch in LET statement
