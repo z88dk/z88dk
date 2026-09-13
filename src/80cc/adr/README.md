@@ -28,6 +28,7 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0014](0014-volatile-behaviour.md) | Volatile behaviour: VREG_VOLATILE locals, `mem.volatile_` derefs, the `;volatile` copt stamp |
 | [0015](0015-ir-pattern-matcher.md) | The IR pattern-matcher engine: declarative production table (templates + check/apply + exclude_cpus), side conditions written once |
 | [0016](0016-two-pass-lowering-and-carry.md) | Two-pass lowering: cross-BB register carry (bb_hl_out / byte-home), lazy spill (store-on-clobber), and rematerialisation |
+| [0018](0018-operand-residency-de-cache.md) | **Rejected** — operand residency via a DE cache (both the single-BB cache and the cross-BB carry) |
 
 Derived from the `*_PLAN.md` working notes: 0006 ← MULTICPU_IR, 0007 ← KIND_WIDTH,
 0008 ← IVSR, 0009 ← the long-long/double accumulator design. Transient
@@ -36,8 +37,16 @@ REORG, the `*_BUG` post-mortems) stay as plans, not ADRs.
 
 ## Conventions
 
-- **Status** of each ADR: Accepted / Superseded / Proposed.
-- Performance figures live in commit messages and plan docs, **never in ADRs or
-  code comments** (they go stale; the mechanism/rationale is what endures).
+- **Status** of each ADR: Accepted / Superseded / Proposed / **Rejected**.
+- A **Rejected** ADR records a lever that was measured and refused: what was
+  tried, why it does not work, and what would have to change to reopen it. This
+  is durable knowledge — it stops the same idea being rebuilt — but it is not a
+  decision about how the compiler works, so it never changes the architecture
+  the other ADRs describe. Keep it short, and link the evidence rather than
+  quoting it.
+- Performance figures live in commit messages, `BENCH_MATRIX.txt` and plan docs,
+  **never in ADRs or code comments** (they go stale; the mechanism/rationale is
+  what endures). This applies to a Rejected ADR too: state the conclusion, link
+  the numbers.
 - Each residency feature is gated so the compiler is **byte-identical with it
   off** — see ADR 0004. New residency work should preserve that property.
