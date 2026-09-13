@@ -1437,106 +1437,8 @@ static int de_forward_needed(char **lines, int n, int start, int *readerp)
 
 static int xline_c_call(const char *line);
 
-/* ---- [IR_DELIVE_PROBE] inert sizing of the DE-liveness opportunity --------
-   instr_effects marks both a branch and a call as READING DE (a successor may
-   read it; __sdcccall(1) passes arguments there), so the park sweep keeps a
-   park whenever it cannot prove the old pair dead. BC and F were freed of those
-   blanket assumptions; DE has not been. This walks forward from each park and
-   records the FIRST thing that ends the walk — an upper bound on what any
-   liveness improvement could recover:
 
-     READ    real read of a live half  — needed, unrecoverable
-     CCALL   `call _sym`, no read yet  — recoverable if that convention passes
-                                         nothing in DE
-     XCALL   any other call/rst        — asm linkage, stays conservative
-     BRANCH  jp/jr/djnz to a label     — recoverable via a DE fixpoint
-     LABEL   fell into a label         — ditto
-     RET     a return                  — reads DE only for a long/float result
-     DEAD    both halves overwritten   — the sweep already drops these
-     END     ran off the buffer
 
-   Covers the 8085 slot-load park and every generic `push de`/`pop de` group, to
-   say whether the opportunity is 8085-only. IR_DELIVE_PROBE=2 lists each. */
-enum { DPB_READ, DPB_CCALL, DPB_XCALL, DPB_BRANCH, DPB_LABEL, DPB_RET,
-       DPB_DEAD, DPB_END, DPB_NCLASS };
-static const char *const dpb_name[DPB_NCLASS] =
-    { "READ", "CCALL", "XCALL", "BRANCH", "LABEL", "RET", "DEAD", "END" };
-static long dpb_slot[DPB_NCLASS], dpb_gen[DPB_NCLASS];
-static long dpb_nslot, dpb_ngen, dpb_funcs;
-static void dpb_report(void)
-{
-    if (!dpb_nslot && !dpb_ngen) return;
-    fprintf(stderr, "DELIVEPROBE funcs=%ld | 8085 slot-parks=%ld generic push/pop-de parks=%ld\n",
-            dpb_funcs, dpb_nslot, dpb_ngen);
-    fprintf(stderr, "  %-7s %8s %8s\n", "class", "slot", "generic");
-    for (int k = 0; k < DPB_NCLASS; k++)
-        fprintf(stderr, "  %-7s %8ld %8ld\n", dpb_name[k], dpb_slot[k], dpb_gen[k]);
-    fprintf(stderr, "  RECOVERABLE(CCALL+BRANCH+LABEL+RET) slot=%ld generic=%ld\n",
-            dpb_slot[DPB_CCALL] + dpb_slot[DPB_BRANCH] + dpb_slot[DPB_LABEL]
-              + dpb_slot[DPB_RET],
-            dpb_gen[DPB_CCALL] + dpb_gen[DPB_BRANCH] + dpb_gen[DPB_LABEL]
-              + dpb_gen[DPB_RET]);
-}
-static int de_probe_on(void)
-{
-    static int v = -1;
-    if (v < 0) { const char *e = getenv("IR_DELIVE_PROBE");
-                 v = e ? atoi(e) : 0;
-                 if (v) atexit(dpb_report); }
-    return v;
-}
-
-/* The forward classification. Mirrors de_forward_needed's walk -- including its
-   two hard-won corrections (a later park is transparent; a read only counts on a
-   half that is still live) -- but tests control transfer BEFORE the read, since
-   instr_effects marks a branch as a DE read and that is precisely the assumption
-   being sized. */
-static int de_probe_class(char **lines, int n, int start)
-{
-    int d_live = 1, e_live = 1;
-    for (int j = start; j < n; j++) {
-        if (lines[j][0] != '\t') return DPB_LABEL;
-        int poff2;
-        if (j + 3 < n && !strcmp(lines[j], "\tpush\tde\n")
-            && de_park_group(lines, j + 3, &poff2)) { j += 3; continue; }
-        InstrEffects e = instr_effects(lines[j]);
-        char tgt[64];
-        if (e.is_boundary) return DPB_RET;
-        if (xline_branch_target(lines[j], tgt, sizeof tgt)) return DPB_BRANCH;
-        if (e.is_call) {
-            if (!strncmp(lines[j] + 1, "ret", 3)) return DPB_RET;  /* `ret cc` */
-            return xline_c_call(lines[j]) ? DPB_CCALL : DPB_XCALL;
-        }
-        if ((e.d_read && d_live) || (e.e_read && e_live)) return DPB_READ;
-        if (e.d_write) d_live = 0;
-        if (e.e_write) e_live = 0;
-        if (!d_live && !e_live) return DPB_DEAD;
-    }
-    return DPB_END;
-}
-
-/* A GENERIC park: `pop de` at i whose matching `push de` is at the same stack
-   depth, with no label, no other stack traffic and no `pop de` in between. The
-   conservative bail-outs matter more than the coverage -- an unmatched push, an
-   `inc sp` or a label all mean the depth cannot be trusted. Returns the push
-   index, or -1. */
-static int de_generic_park(char **lines, int i)
-{
-    if (strcmp(lines[i], "\tpop\tde\n")) return -1;
-    int depth = 0;
-    for (int j = i - 1; j >= 0 && j > i - 400; j--) {
-        if (lines[j][0] != '\t') return -1;              /* label: joins */
-        const char *l = lines[j] + 1;
-        if (!strncmp(l, "push\t", 5)) {
-            if (depth == 0) return (!strcmp(l, "push\tde\n")) ? j : -1;
-            depth--;
-            continue;
-        }
-        if (!strncmp(l, "pop\t", 4)) { depth++; continue; }
-        if (strstr(l, "sp")) return -1;                  /* inc sp / ld sp,ix / … */
-    }
-    return -1;
-}
 
 /* [xor-a] `ld a,0` is 2 bytes and 7 T; `xor a` is 1 and 4. The only
    difference is that `xor a` DEFINES the flags, and the lowerer cannot say
@@ -2039,28 +1941,12 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                         n, nlbl, dead);
             }
         }
-        int de_probe   = de_probe_on();              /* IR_DELIVE_PROBE */
-        if (de_probe) dpb_funcs++;
         int de_verify  = de_sweep_on();              /* IR_DEPARK_SWEEP */
         int de_rewrite = !opt_disabled("de-park");
         int de_sweep   = (de_verify || de_rewrite);
         if (de_verify) dpk_funcs++;
         for (int i = n - 1; i >= 0; i--) {
             if (drop[i]) continue;                 /* collapsed recover: gone */
-            if (de_probe) {                        /* [IR_DELIVE_PROBE] inert */
-                int pp = 0, cls = -1, gen = 0, pj = -1;
-                if (de_park_group(lines, i, &pp)) {
-                    cls = de_probe_class(lines, n, i + 1);
-                    dpb_nslot++; dpb_slot[cls]++;
-                } else if ((pj = de_generic_park(lines, i)) >= 0) {
-                    cls = de_probe_class(lines, n, i + 1);
-                    dpb_ngen++; dpb_gen[cls]++; gen = 1;
-                }
-                if (cls >= 0 && de_probe >= 2)
-                    fprintf(stderr, "  DEPARK %s @%d %-6s span=%d\n",
-                            gen ? "generic" : "slot   ", i, dpb_name[cls],
-                            gen ? i - pj : 3);
-            }
             int poff = 0;
             if (de_sweep && de_park_group(lines, i, &poff)) {
                 int back_dead = (!d_live && !e_live);
@@ -6094,7 +5980,6 @@ int ir_lower_func(FILE *out, Func *f)
            and slot sizing (which reads the now-narrowed widths). */
         int ivnarrow = ir_opt_narrow_iv(f);
         int narrow  = ir_opt_narrow_byte(f);
-        ir_opt_cmpsign_probe(f);        /* [IR_CMPSIGN_PROBE] inert */
         ir_opt_cmp_unsign(f);           /* drop the signed-compare sign tail */
         /* narrow_byte turns promoting CONV_SX|ZX operands into
            byte-identity copies; propagate them away (else they spill to a
