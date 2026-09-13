@@ -8,9 +8,8 @@
 #include "dump_context.h"
 #include "errors.h"
 #include "symtab.h"
+#include "walker.h"
 #include <algorithm>
-#include <memory>
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -39,7 +38,7 @@ struct LocalCollector : ASTVisitor {
                 locals.push_back(local);
             }
         }
-        stmt.mark_for_removal = true; // remove the LOCAL statement after collecting
+        stmt.rewrite.remove = true; // remove the LOCAL statement after collecting
     }
 };
 
@@ -114,7 +113,7 @@ struct ProcRewriter : ASTVisitor {
         if (proc_nesting == 0) {
             error(stmt.loc, "LOCAL outside PROC");
         }
-        stmt.mark_for_removal = true; // remove the LOCAL statement
+        stmt.rewrite.remove = true; // remove the LOCAL statement
     }
 };
 
@@ -266,7 +265,7 @@ struct SymbolCollector : ASTVisitor {
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());
-        stmt.mark_for_removal = true;
+        stmt.rewrite.remove = true;
     }
 
     void visit(PragmaStrVarStmt& stmt) override {
@@ -274,7 +273,7 @@ struct SymbolCollector : ASTVisitor {
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());
-        stmt.mark_for_removal = true;
+        stmt.rewrite.remove = true;
     }
 
     void visit(PragmaNumVarArrayStmt& stmt) override {
@@ -282,7 +281,7 @@ struct SymbolCollector : ASTVisitor {
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());
-        stmt.mark_for_removal = true;
+        stmt.rewrite.remove = true;
     }
 
     void visit(PragmaStrVarArrayStmt& stmt) override {
@@ -290,7 +289,7 @@ struct SymbolCollector : ASTVisitor {
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());
-        stmt.mark_for_removal = true;
+        stmt.rewrite.remove = true;
     }
 };
 

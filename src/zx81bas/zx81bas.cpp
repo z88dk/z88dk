@@ -6,6 +6,7 @@
 
 #include "../config.h"
 #include "ast.h"
+#include "dump_context.h"
 #include "errors.h"
 #include "lexer.h"
 #include "lower_asm.h"
@@ -16,6 +17,7 @@
 #include "semantic.h"
 #include "symtab.h"
 #include "utils.h"
+#include "walker.h"
 #include "z80asm.h"
 #include <cstdlib>
 #include <filesystem>
@@ -55,6 +57,44 @@ static void show_command_line(int argc, char* argv[]) {
         std::cout << " " << argv[i];
     }
     std::cout << std::endl;
+}
+
+[[noreturn]]
+static void dump_tok_file_exit(const TokFile& tok_file) {
+    if (get_error_count() == 0) {
+        DumpContext ctx(std::cout);
+        tok_file.dump(ctx);
+    }
+    exit_error_status();
+}
+
+[[noreturn]]
+static void dump_prog_exit(const Prog& prog) {
+    if (get_error_count() == 0) {
+        DumpContext ctx(std::cout);
+        prog.dump(ctx);
+    }
+    exit_error_status();
+}
+
+[[noreturn]]
+static void dump_symtab_exit(const Symtab& symtab) {
+    if (get_error_count() == 0) {
+        DumpContext ctx(std::cout);
+        symtab.dump(ctx);
+    }
+    exit_error_status();
+}
+
+[[noreturn]]
+static void dump_asm_source_exit(const std::vector<std::string>& asm_source) {
+    if (get_error_count() == 0) {
+        DumpContext ctx(std::cout);
+        for (const auto& line : asm_source) {
+            ctx.line(line);
+        }
+    }
+    exit_error_status();
 }
 #endif
 
@@ -154,28 +194,19 @@ int main(int argc, char* argv[]) {
 
 #ifdef _DEBUG
     if (g_dump_step == 4) {
-        if (get_error_count() == 0) {
-            std::cout << "Tokenized input:" << std::endl;
-            DumpContext ctx(std::cout);
-            tok_file.dump(ctx);
-        }
-        exit_error_status();
+        dump_tok_file_exit(tok_file);
     }
 #endif
 
     // parse the BASIC program
     std::unique_ptr<Prog> prog;
-    if (!parse_basic_program(tok_file, prog)) {
+    if (!parse_basic(tok_file, prog)) {
         exit_error_status();
     }
 
 #ifdef _DEBUG
     if (g_dump_step == 5) {
-        if (get_error_count() == 0) {
-            DumpContext ctx(std::cout);
-            prog->dump(ctx);
-        }
-        exit_error_status();
+        dump_prog_exit(*prog);
     }
 #endif
 
@@ -187,11 +218,7 @@ int main(int argc, char* argv[]) {
 
 #ifdef _DEBUG
     if (g_dump_step == 6) {
-        if (get_error_count() == 0) {
-            DumpContext ctx(std::cout);
-            symtab->dump(ctx);
-        }
-        exit_error_status();
+        dump_symtab_exit(*symtab);
     }
 #endif
 
@@ -202,11 +229,18 @@ int main(int argc, char* argv[]) {
 
 #ifdef _DEBUG
     if (g_dump_step == 7) {
-        if (get_error_count() == 0) {
-            DumpContext ctx(std::cout);
-            prog->dump(ctx);
-        }
+        dump_prog_exit(*prog);
+    }
+#endif
+
+    // transform the program to lower-level constructs
+    if (!semantic_transform(*prog, *symtab)) {
         exit_error_status();
+    }
+
+#ifdef _DEBUG
+    if (g_dump_step == 8) {
+        dump_prog_exit(*prog);
     }
 #endif
 
@@ -216,12 +250,8 @@ int main(int argc, char* argv[]) {
     }
 
 #ifdef _DEBUG
-    if (g_dump_step == 8) {
-        if (get_error_count() == 0) {
-            DumpContext ctx(std::cout);
-            prog->dump(ctx);
-        }
-        exit_error_status();
+    if (g_dump_step == 9) {
+        dump_prog_exit(*prog);
     }
 #endif
 
@@ -232,22 +262,13 @@ int main(int argc, char* argv[]) {
     }
 
 #ifdef _DEBUG
-    if (g_dump_step == 9) {
-        if (get_error_count() == 0) {
-            for (auto& text : asm_source) {
-                std::cout << text << std::endl;
-            }
-        }
-        exit_error_status();
+    if (g_dump_step == 10) {
+        dump_asm_source_exit(asm_source);
     }
 #endif
 
     // call the assembler and linker to produce .P and .sym file
-    std::string asm_file = input_basename + ".asm";
-    std::string sym_file = input_basename + ".sym";
-    std::string p_file = input_basename + ".p";
-    g_temp_files.push_back(asm_file);
-    if (!assemble_link(asm_source, asm_file, sym_file, p_file)) {
+    if (!assemble_link(asm_source, input_basename)) {
         exit_error_status();
     }
 

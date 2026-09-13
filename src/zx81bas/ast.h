@@ -12,10 +12,35 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 struct ASTVisitor;
+struct LoweringPass;
+struct LoweredExpr;
+struct Expr;
+struct Stmt;
+
+using ExprPtr = std::unique_ptr<Expr>;
+using StmtPtr = std::unique_ptr<Stmt>;
+
+template<typename T, typename... Args>
+std::unique_ptr<T> make_node(Args&& ... args) {
+    return std::make_unique<T>(std::forward<Args>(args)...);
+}
 
 bool is_string_variable(const std::string& name);
+
+//-----------------------------------------------------------------------------
+// Rewrite info
+//-----------------------------------------------------------------------------
+
+struct RewriteInfo {
+    std::vector<StmtPtr> prepend;
+    std::vector<StmtPtr> append;
+    bool remove = false;
+    ExprPtr replace_expr;
+};
 
 //-----------------------------------------------------------------------------
 // Expression tree
@@ -30,11 +55,15 @@ struct Expr : TreeNode {
     ExprType type = ExprType::Number;
     SourceLoc loc;			// source location
 
+    // for AST transformations, not cloned and not dumped
+    RewriteInfo rewrite;
+
     explicit Expr(ExprType type_, const SourceLoc& loc_);
     virtual ~Expr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const = 0;
+    virtual ExprPtr clone() const = 0;
     virtual void accept(ASTVisitor& v) = 0;
+    virtual LoweredExpr lower(LoweringPass& pass) = 0;
 };
 
 int precedence(const Expr& e);
@@ -45,8 +74,9 @@ struct NumberExpr : Expr {
     explicit NumberExpr(double value_, SourceLoc loc_);
     virtual ~NumberExpr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const override;
+    virtual ExprPtr clone() const override;
     virtual void accept(ASTVisitor& v) override;
+    virtual LoweredExpr lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -59,8 +89,9 @@ struct LabelLineRefExpr : Expr {
     explicit LabelLineRefExpr(const std::string& name_, SourceLoc loc_);
     virtual ~LabelLineRefExpr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const override;
+    virtual ExprPtr clone() const override;
     virtual void accept(ASTVisitor& v) override;
+    virtual LoweredExpr lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -73,8 +104,9 @@ struct LabelAddrRefExpr : Expr {
     explicit LabelAddrRefExpr(const std::string& name_, SourceLoc loc_);
     virtual ~LabelAddrRefExpr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const override;
+    virtual ExprPtr clone() const override;
     virtual void accept(ASTVisitor& v) override;
+    virtual LoweredExpr lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -87,8 +119,9 @@ struct StringLiteralExpr : Expr {
     explicit StringLiteralExpr(std::string val, SourceLoc loc_);
     virtual ~StringLiteralExpr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const override;
+    virtual ExprPtr clone() const override;
     virtual void accept(ASTVisitor& v) override;
+    virtual LoweredExpr lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -101,8 +134,9 @@ struct VariableExpr : Expr {
     explicit VariableExpr(const std::string& name_, SourceLoc loc_);
     virtual ~VariableExpr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const override;
+    virtual ExprPtr clone() const override;
     virtual void accept(ASTVisitor& v) override;
+    virtual LoweredExpr lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -111,13 +145,14 @@ struct VariableExpr : Expr {
 
 struct ArrayRefExpr : Expr {
     std::string name;  // A or A$
-    std::vector<std::unique_ptr<Expr>> indices;  // one or more expressions
+    std::vector<ExprPtr> indices;  // one or more expressions
 
     explicit ArrayRefExpr(const std::string& name_, SourceLoc loc_);
     virtual ~ArrayRefExpr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const override;
+    virtual ExprPtr clone() const override;
     virtual void accept(ASTVisitor& v) override;
+    virtual LoweredExpr lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -125,15 +160,16 @@ struct ArrayRefExpr : Expr {
 };
 
 struct SliceExpr : Expr {
-    std::unique_ptr<Expr> base;   // A$, A$(I), or any string expression
-    std::unique_ptr<Expr> from;   // may be nullptr
-    std::unique_ptr<Expr> to;     // may be nullptr
+    ExprPtr base;   // A$, A$(I), or any string expression
+    ExprPtr from;   // may be nullptr
+    ExprPtr to;     // may be nullptr
 
-    explicit SliceExpr(std::unique_ptr<Expr> base_, SourceLoc loc_);
+    explicit SliceExpr(ExprPtr base_, SourceLoc loc_);
     virtual ~SliceExpr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const override;
+    virtual ExprPtr clone() const override;
     virtual void accept(ASTVisitor& v) override;
+    virtual LoweredExpr lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -142,14 +178,15 @@ struct SliceExpr : Expr {
 
 struct UnaryExpr : Expr {
     TokenType op;        // '-', NOT
-    std::unique_ptr<Expr> operand;
+    ExprPtr operand;
 
-    explicit UnaryExpr(TokenType op_, std::unique_ptr<Expr> operand_,
+    explicit UnaryExpr(TokenType op_, ExprPtr operand_,
                        SourceLoc loc_);
     virtual ~UnaryExpr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const override;
+    virtual ExprPtr clone() const override;
     virtual void accept(ASTVisitor& v) override;
+    virtual LoweredExpr lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -158,16 +195,17 @@ struct UnaryExpr : Expr {
 
 struct BinaryExpr : Expr {
     TokenType op;        // + - * / ** AND OR NOT = < > <= >= <>
-    std::unique_ptr<Expr> lhs;
-    std::unique_ptr<Expr> rhs;
+    ExprPtr lhs;
+    ExprPtr rhs;
 
     explicit BinaryExpr(TokenType op_,
-                        std::unique_ptr<Expr> lhs_,
-                        std::unique_ptr<Expr> rhs_, SourceLoc loc_);
+                        ExprPtr lhs_,
+                        ExprPtr rhs_, SourceLoc loc_);
     virtual ~BinaryExpr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const override;
+    virtual ExprPtr clone() const override;
     virtual void accept(ASTVisitor& v) override;
+    virtual LoweredExpr lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -176,13 +214,14 @@ struct BinaryExpr : Expr {
 
 struct BasicFuncCallExpr : Expr {
     Keyword keyword;    // SIN, COS, LEN, VAL, STR$, etc.
-    std::vector<std::unique_ptr<Expr>> args;
+    std::vector<ExprPtr> args;
 
     explicit BasicFuncCallExpr(Keyword keyword_, SourceLoc loc_);
     virtual ~BasicFuncCallExpr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const override;
+    virtual ExprPtr clone() const override;
     virtual void accept(ASTVisitor& v) override;
+    virtual LoweredExpr lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -191,13 +230,14 @@ struct BasicFuncCallExpr : Expr {
 
 struct ProcCallExpr : Expr {
     std::string name;                         // PROCname
-    std::vector<std::unique_ptr<Expr>> args;  // (10, 20)
+    std::vector<ExprPtr> args;  // (10, 20)
 
     explicit ProcCallExpr(const std::string& name_, SourceLoc loc_);
     virtual ~ProcCallExpr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const override;
+    virtual ExprPtr clone() const override;
     virtual void accept(ASTVisitor& v) override;
+    virtual LoweredExpr lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -206,13 +246,14 @@ struct ProcCallExpr : Expr {
 
 struct FnCallExpr : Expr {
     std::string name;                         // FNname
-    std::vector<std::unique_ptr<Expr>> args;  // (10, 20)
+    std::vector<ExprPtr> args;  // (10, 20)
 
     explicit FnCallExpr(const std::string& name_, SourceLoc loc_);
     virtual ~FnCallExpr() = default;
 
-    virtual std::unique_ptr<Expr> clone() const override;
+    virtual ExprPtr clone() const override;
     virtual void accept(ASTVisitor& v) override;
+    virtual LoweredExpr lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -225,13 +266,16 @@ struct FnCallExpr : Expr {
 
 struct Stmt : TreeNode {
     SourceLoc loc;			// source location
-    bool mark_for_removal = false;
+
+    // for AST transformations, not cloned and not dumped
+    RewriteInfo rewrite;
 
     explicit Stmt(const SourceLoc& loc_);
     virtual ~Stmt() = default;
 
-    virtual std::unique_ptr<Stmt> clone() const = 0;
+    virtual StmtPtr clone() const = 0;
     virtual void accept(ASTVisitor& v) = 0;
+    virtual std::vector<StmtPtr> lower(LoweringPass& pass) = 0;
 };
 
 struct LabelStmt : Stmt {
@@ -240,8 +284,9 @@ struct LabelStmt : Stmt {
     explicit LabelStmt(const std::string& label_, const SourceLoc& loc_);
     virtual ~LabelStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -254,8 +299,9 @@ struct LineNumStmt : Stmt {
     explicit LineNumStmt(int line_num_, const SourceLoc& loc_);
     virtual ~LineNumStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -263,16 +309,17 @@ struct LineNumStmt : Stmt {
 };
 
 struct LetStmt : Stmt {
-    std::unique_ptr<Expr> lhs;     // variable, array ref, slice
-    std::unique_ptr<Expr> rhs;     // expression
+    ExprPtr lhs;     // variable, array ref, slice
+    ExprPtr rhs;     // expression
 
-    explicit LetStmt(std::unique_ptr<Expr> lhs_,
-                     std::unique_ptr<Expr> rhs_,
+    explicit LetStmt(ExprPtr lhs_,
+                     ExprPtr rhs_,
                      const SourceLoc& loc_);
     virtual ~LetStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -280,8 +327,8 @@ struct LetStmt : Stmt {
 };
 
 struct DimItem {
-    std::string name;                           // A or A$
-    std::vector<std::unique_ptr<Expr>> dims;    // dimensions
+    std::string name;             // A or A$
+    std::vector<ExprPtr> dims;    // dimensions
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const;
@@ -294,22 +341,9 @@ struct DimStmt : Stmt {
     using Stmt::Stmt;
     virtual ~DimStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
-
-#ifdef _DEBUG
-    void dump(DumpContext ctx) const override;
-#endif
-};
-
-struct BlockStmt : Stmt {
-    std::vector<std::unique_ptr<Stmt>> body;
-
-    using Stmt::Stmt;
-    virtual ~BlockStmt() = default;
-
-    std::unique_ptr<Stmt> clone() const override;
-    void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -317,16 +351,17 @@ struct BlockStmt : Stmt {
 };
 
 struct IfStmt : Stmt {
-    std::unique_ptr<Expr> condition;
-    std::vector<std::unique_ptr<Stmt>> then_stmts;
-    std::vector<std::unique_ptr<Stmt>> else_stmts;
+    ExprPtr condition;
+    std::vector<StmtPtr> then_stmts;
+    std::vector<StmtPtr> else_stmts;
 
-    explicit IfStmt(std::unique_ptr<Expr> condition_,
+    explicit IfStmt(ExprPtr condition_,
                     const SourceLoc& loc_);
     virtual ~IfStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -334,15 +369,16 @@ struct IfStmt : Stmt {
 };
 
 struct RepeatStmt : Stmt {
-    std::vector<std::unique_ptr<Stmt>> body;
-    std::unique_ptr<Expr> condition;
+    std::vector<StmtPtr> body;
+    ExprPtr condition;
 
-    explicit RepeatStmt(std::unique_ptr<Expr> condition_,
+    explicit RepeatStmt(ExprPtr condition_,
                         const SourceLoc& loc_);
     virtual ~RepeatStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -350,15 +386,16 @@ struct RepeatStmt : Stmt {
 };
 
 struct WhileStmt : Stmt {
-    std::unique_ptr<Expr> condition;
-    std::vector<std::unique_ptr<Stmt>> body;
+    ExprPtr condition;
+    std::vector<StmtPtr> body;
 
-    explicit WhileStmt(std::unique_ptr<Expr> condition_,
+    explicit WhileStmt(ExprPtr condition_,
                        const SourceLoc& loc_);
     virtual ~WhileStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -367,20 +404,21 @@ struct WhileStmt : Stmt {
 
 struct ForStmt : Stmt {
     std::string name;               // loop variable
-    std::unique_ptr<Expr> start_expr;
-    std::unique_ptr<Expr> end_expr;
-    std::unique_ptr<Expr> step_expr;
-    std::vector<std::unique_ptr<Stmt>> body;
+    ExprPtr start_expr;
+    ExprPtr end_expr;
+    ExprPtr step_expr;
+    std::vector<StmtPtr> body;
 
     explicit ForStmt(const std::string& name_,
-                     std::unique_ptr<Expr> start_expr_,
-                     std::unique_ptr<Expr> end_expr_,
-                     std::unique_ptr<Expr> step_expr_,
+                     ExprPtr start_expr_,
+                     ExprPtr end_expr_,
+                     ExprPtr step_expr_,
                      const SourceLoc& loc_);
     virtual ~ForStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -393,8 +431,9 @@ struct NextStmt : Stmt {
     explicit NextStmt(const std::string& name_, const SourceLoc& loc_);
     virtual ~NextStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -405,14 +444,15 @@ struct DefProcStmt : Stmt {
     std::string name;                         // PROCname
     std::vector<std::string> params;          // A, B
     std::vector<std::string> locals;          // L
-    std::vector<std::unique_ptr<Stmt>> body;  // statements inside PROC
+    std::vector<StmtPtr> body;  // statements inside PROC
     bool called = false;
 
     explicit DefProcStmt(const std::string& name_, const SourceLoc& loc_);
     virtual ~DefProcStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -420,14 +460,15 @@ struct DefProcStmt : Stmt {
 };
 
 struct ProcCallStmt : Stmt {
-    std::string name;                         // PROCname
-    std::vector<std::unique_ptr<Expr>> args;  // 10, 20
+    std::string name;           // PROCname
+    std::vector<ExprPtr> args;  // 10, 20
 
     explicit ProcCallStmt(const std::string& name_, const SourceLoc& loc_);
     virtual ~ProcCallStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -440,8 +481,9 @@ struct LocalStmt : Stmt {
     using Stmt::Stmt;
     virtual ~LocalStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -451,13 +493,14 @@ struct LocalStmt : Stmt {
 struct DefFnStmt : Stmt {
     std::string name;                         // FNname
     std::vector<std::string> params;          // A, B
-    std::unique_ptr<Expr> expr;               // A+B
+    ExprPtr expr;               // A+B
 
     explicit DefFnStmt(const std::string& name_, const SourceLoc& loc_);
     virtual ~DefFnStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -468,8 +511,9 @@ struct ExitStmt : Stmt {
     using Stmt::Stmt;
     virtual ~ExitStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -477,13 +521,14 @@ struct ExitStmt : Stmt {
 };
 
 struct GotoStmt : Stmt {
-    std::unique_ptr<Expr> target_expr;
+    ExprPtr target_expr;
 
-    explicit GotoStmt(std::unique_ptr<Expr> target_expr_, const SourceLoc& loc_);
+    explicit GotoStmt(ExprPtr target_expr_, const SourceLoc& loc_);
     virtual ~GotoStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -491,13 +536,14 @@ struct GotoStmt : Stmt {
 };
 
 struct GosubStmt : Stmt {
-    std::unique_ptr<Expr> target_expr;
+    ExprPtr target_expr;
 
-    explicit GosubStmt(std::unique_ptr<Expr> target_expr_, const SourceLoc& loc_);
+    explicit GosubStmt(ExprPtr target_expr_, const SourceLoc& loc_);
     virtual ~GosubStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -508,8 +554,9 @@ struct ReturnStmt : Stmt {
     using Stmt::Stmt;
     virtual ~ReturnStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -520,8 +567,9 @@ struct StopStmt : Stmt {
     using Stmt::Stmt;
     virtual ~StopStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -532,8 +580,9 @@ struct EndStmt : Stmt {
     using Stmt::Stmt;
     virtual ~EndStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -552,14 +601,14 @@ struct PrintItem {
     Type type;
 
     // For Expr
-    std::unique_ptr<Expr> expr;
+    ExprPtr expr;
 
     // For AT line,col
-    std::unique_ptr<Expr> line_expr;
-    std::unique_ptr<Expr> col_expr;
+    ExprPtr line_expr;
+    ExprPtr col_expr;
 
     // For TAB col
-    std::unique_ptr<Expr> tab_expr;
+    ExprPtr tab_expr;
 };
 
 struct PrintStmt : Stmt {
@@ -568,8 +617,9 @@ struct PrintStmt : Stmt {
     using Stmt::Stmt;
     virtual ~PrintStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -577,13 +627,14 @@ struct PrintStmt : Stmt {
 };
 
 struct InputStmt : Stmt {
-    std::vector<std::unique_ptr<Expr>> vars;      // variables, array refs, slices
+    std::vector<ExprPtr> vars;      // variables, array refs, slices
 
     using Stmt::Stmt;
     virtual ~InputStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -597,8 +648,9 @@ struct RemStmt : Stmt {
     explicit RemStmt(const std::string& text_, const SourceLoc& loc_);
     virtual ~RemStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -606,13 +658,14 @@ struct RemStmt : Stmt {
 };
 
 struct RunStmt : Stmt {
-    std::unique_ptr<Expr> target_expr;   // optional expression
+    ExprPtr target_expr;   // optional expression
 
     using Stmt::Stmt;
     virtual ~RunStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -620,13 +673,14 @@ struct RunStmt : Stmt {
 };
 
 struct ListStmt : Stmt {
-    std::unique_ptr<Expr> target_expr;   // optional expression
+    ExprPtr target_expr;   // optional expression
 
     using Stmt::Stmt;
     virtual ~ListStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -637,8 +691,9 @@ struct NewStmt : Stmt {
     using Stmt::Stmt;
     virtual ~NewStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -649,8 +704,9 @@ struct ClsStmt : Stmt {
     using Stmt::Stmt;
     virtual ~ClsStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -658,13 +714,14 @@ struct ClsStmt : Stmt {
 };
 
 struct LoadStmt : Stmt {
-    std::unique_ptr<Expr> filename_expr;
+    ExprPtr filename_expr;
 
-    explicit LoadStmt(std::unique_ptr<Expr> filename_expr_, const SourceLoc& loc_);
+    explicit LoadStmt(ExprPtr filename_expr_, const SourceLoc& loc_);
     virtual ~LoadStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -672,13 +729,14 @@ struct LoadStmt : Stmt {
 };
 
 struct SaveStmt : Stmt {
-    std::unique_ptr<Expr> filename_expr;
+    ExprPtr filename_expr;
 
-    explicit SaveStmt(std::unique_ptr<Expr> filename_expr_, const SourceLoc& loc_);
+    explicit SaveStmt(ExprPtr filename_expr_, const SourceLoc& loc_);
     virtual ~SaveStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -686,15 +744,16 @@ struct SaveStmt : Stmt {
 };
 
 struct PokeStmt : Stmt {
-    std::unique_ptr<Expr> address_expr;
-    std::unique_ptr<Expr> value_expr;
+    ExprPtr address_expr;
+    ExprPtr value_expr;
 
-    explicit PokeStmt(std::unique_ptr<Expr> address_expr_,
-                      std::unique_ptr<Expr> value_expr_, const SourceLoc& loc_);
+    explicit PokeStmt(ExprPtr address_expr_,
+                      ExprPtr value_expr_, const SourceLoc& loc_);
     virtual ~PokeStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -702,15 +761,16 @@ struct PokeStmt : Stmt {
 };
 
 struct PokewStmt : Stmt {
-    std::unique_ptr<Expr> address_expr;
-    std::unique_ptr<Expr> value_expr;
+    ExprPtr address_expr;
+    ExprPtr value_expr;
 
-    explicit PokewStmt(std::unique_ptr<Expr> address_expr_,
-                       std::unique_ptr<Expr> value_expr_, const SourceLoc& loc_);
+    explicit PokewStmt(ExprPtr address_expr_,
+                       ExprPtr value_expr_, const SourceLoc& loc_);
     virtual ~PokewStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -718,15 +778,16 @@ struct PokewStmt : Stmt {
 };
 
 struct PlotStmt : Stmt {
-    std::unique_ptr<Expr> x_expr;
-    std::unique_ptr<Expr> y_expr;
+    ExprPtr x_expr;
+    ExprPtr y_expr;
 
-    explicit PlotStmt(std::unique_ptr<Expr> x_expr_, std::unique_ptr<Expr> y_expr_,
+    explicit PlotStmt(ExprPtr x_expr_, ExprPtr y_expr_,
                       const SourceLoc& loc_);
     virtual ~PlotStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -734,15 +795,16 @@ struct PlotStmt : Stmt {
 };
 
 struct UnplotStmt : Stmt {
-    std::unique_ptr<Expr> x_expr;
-    std::unique_ptr<Expr> y_expr;
+    ExprPtr x_expr;
+    ExprPtr y_expr;
 
-    explicit UnplotStmt(std::unique_ptr<Expr> x_expr_,
-                        std::unique_ptr<Expr> y_expr_, const SourceLoc& loc_);
+    explicit UnplotStmt(ExprPtr x_expr_,
+                        ExprPtr y_expr_, const SourceLoc& loc_);
     virtual ~UnplotStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -750,13 +812,14 @@ struct UnplotStmt : Stmt {
 };
 
 struct RandStmt : Stmt {
-    std::unique_ptr<Expr> seed_expr;
+    ExprPtr seed_expr;
 
-    explicit RandStmt(std::unique_ptr<Expr> seed_expr_, const SourceLoc& loc_);
+    explicit RandStmt(ExprPtr seed_expr_, const SourceLoc& loc_);
     virtual ~RandStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -764,13 +827,14 @@ struct RandStmt : Stmt {
 };
 
 struct PauseStmt : Stmt {
-    std::unique_ptr<Expr> duration_expr;
+    ExprPtr duration_expr;
 
-    explicit PauseStmt(std::unique_ptr<Expr> duration_expr_, const SourceLoc& loc_);
+    explicit PauseStmt(ExprPtr duration_expr_, const SourceLoc& loc_);
     virtual ~PauseStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -781,8 +845,9 @@ struct FastStmt : Stmt {
     using Stmt::Stmt;
     virtual ~FastStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -793,8 +858,9 @@ struct SlowStmt : Stmt {
     using Stmt::Stmt;
     virtual ~SlowStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -805,8 +871,9 @@ struct ScrollStmt : Stmt {
     using Stmt::Stmt;
     virtual ~ScrollStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -817,8 +884,9 @@ struct ContStmt : Stmt {
     using Stmt::Stmt;
     virtual ~ContStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -829,8 +897,9 @@ struct ClearStmt : Stmt {
     using Stmt::Stmt;
     virtual ~ClearStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -845,8 +914,9 @@ struct PragmaNumVarStmt : Stmt {
                               const SourceLoc& loc_);
     virtual ~PragmaNumVarStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -862,8 +932,9 @@ struct PragmaStrVarStmt : Stmt {
                               const SourceLoc& loc_);
     virtual ~PragmaStrVarStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -878,8 +949,9 @@ struct PragmaNumVarArrayStmt : Stmt {
     explicit PragmaNumVarArrayStmt(std::string name_, const SourceLoc& loc_);
     virtual ~PragmaNumVarArrayStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -894,8 +966,9 @@ struct PragmaStrVarArrayStmt : Stmt {
     explicit PragmaStrVarArrayStmt(std::string name_, const SourceLoc& loc_);
     virtual ~PragmaStrVarArrayStmt() = default;
 
-    std::unique_ptr<Stmt> clone() const override;
+    StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -913,362 +986,12 @@ struct Prog : TreeNode {
     bool dfile_colapsed = false;    // true if display file is collapsed
     std::vector<uint8_t> sysvars_data;   // raw SYSVAR data
 
-    std::vector<std::unique_ptr<Stmt>> stmts;
-    std::vector<std::unique_ptr<Stmt>> pragma_vars;
+    std::vector<StmtPtr> stmts;
+    std::vector<StmtPtr> pragma_vars;
 
     void accept(ASTVisitor& v);
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
 #endif
-};
-
-//-----------------------------------------------------------------------------
-// Visitor
-//-----------------------------------------------------------------------------
-
-struct ASTVisitor {
-    virtual ~ASTVisitor() = default;
-
-    virtual bool enter(NumberExpr&) {
-        return true;
-    }
-    virtual void visit(NumberExpr&) {}
-    virtual void leave(NumberExpr&) {}
-
-    virtual bool enter(LabelLineRefExpr&) {
-        return true;
-    }
-    virtual void visit(LabelLineRefExpr&) {}
-    virtual void leave(LabelLineRefExpr&) {}
-
-    virtual bool enter(LabelAddrRefExpr&) {
-        return true;
-    }
-    virtual void visit(LabelAddrRefExpr&) {}
-    virtual void leave(LabelAddrRefExpr&) {}
-
-    virtual bool enter(StringLiteralExpr&) {
-        return true;
-    }
-    virtual void visit(StringLiteralExpr&) {}
-    virtual void leave(StringLiteralExpr&) {}
-
-    virtual bool enter(VariableExpr&) {
-        return true;
-    }
-    virtual void visit(VariableExpr&) {}
-    virtual void leave(VariableExpr&) {}
-
-    virtual bool enter(ArrayRefExpr&) {
-        return true;
-    }
-    virtual void visit(ArrayRefExpr&) {}
-    virtual void leave(ArrayRefExpr&) {}
-
-    virtual bool enter(SliceExpr&) {
-        return true;
-    }
-    virtual void visit(SliceExpr&) {}
-    virtual void leave(SliceExpr&) {}
-
-    virtual bool enter(UnaryExpr&) {
-        return true;
-    }
-    virtual void visit(UnaryExpr&) {}
-    virtual void leave(UnaryExpr&) {}
-
-    virtual bool enter(BinaryExpr&) {
-        return true;
-    }
-    virtual void visit(BinaryExpr&) {}
-    virtual void leave(BinaryExpr&) {}
-
-    virtual bool enter(BasicFuncCallExpr&) {
-        return true;
-    }
-    virtual void visit(BasicFuncCallExpr&) {}
-    virtual void leave(BasicFuncCallExpr&) {}
-
-    virtual bool enter(ProcCallExpr&) {
-        return true;
-    }
-    virtual void visit(ProcCallExpr&) {}
-    virtual void leave(ProcCallExpr&) {}
-
-    virtual bool enter(FnCallExpr&) {
-        return true;
-    }
-    virtual void visit(FnCallExpr&) {}
-    virtual void leave(FnCallExpr&) {}
-
-    virtual bool enter(LabelStmt&) {
-        return true;
-    }
-    virtual void visit(LabelStmt&) {}
-    virtual void leave(LabelStmt&) {}
-
-    virtual bool enter(LineNumStmt&) {
-        return true;
-    }
-    virtual void visit(LineNumStmt&) {}
-    virtual void leave(LineNumStmt&) {}
-
-    virtual bool enter(LetStmt&) {
-        return true;
-    }
-    virtual void visit(LetStmt&) {}
-    virtual void leave(LetStmt&) {}
-
-    virtual bool enter(DimStmt&) {
-        return true;
-    }
-    virtual void visit(DimStmt&) {}
-    virtual void leave(DimStmt&) {}
-
-    virtual bool enter(BlockStmt&) {
-        return true;
-    }
-    virtual void visit(BlockStmt&) {}
-    virtual void leave(BlockStmt&) {}
-
-    virtual bool enter(IfStmt&) {
-        return true;
-    }
-    virtual void visit(IfStmt&) {}
-    virtual void leave(IfStmt&) {}
-
-    virtual bool enter(RepeatStmt&) {
-        return true;
-    }
-    virtual void visit(RepeatStmt&) {}
-    virtual void leave(RepeatStmt&) {}
-
-    virtual bool enter(WhileStmt&) {
-        return true;
-    }
-    virtual void visit(WhileStmt&) {}
-    virtual void leave(WhileStmt&) {}
-
-    virtual bool enter(ForStmt&) {
-        return true;
-    }
-    virtual void visit(ForStmt&) {}
-    virtual void leave(ForStmt&) {}
-
-    virtual bool enter(NextStmt&) {
-        return true;
-    }
-    virtual void visit(NextStmt&) {}
-    virtual void leave(NextStmt&) {}
-
-    virtual bool enter(DefProcStmt&) {
-        return true;
-    }
-    virtual void visit(DefProcStmt&) {}
-    virtual void leave(DefProcStmt&) {}
-
-    virtual bool enter(ProcCallStmt&) {
-        return true;
-    }
-    virtual void visit(ProcCallStmt&) {}
-    virtual void leave(ProcCallStmt&) {}
-
-    virtual bool enter(LocalStmt&) {
-        return true;
-    }
-    virtual void visit(LocalStmt&) {}
-    virtual void leave(LocalStmt&) {}
-
-    virtual bool enter(DefFnStmt&) {
-        return true;
-    }
-    virtual void visit(DefFnStmt&) {}
-    virtual void leave(DefFnStmt&) {}
-
-    virtual bool enter(ExitStmt&) {
-        return true;
-    }
-    virtual void visit(ExitStmt&) {}
-    virtual void leave(ExitStmt&) {}
-
-    virtual bool enter(GotoStmt&) {
-        return true;
-    }
-    virtual void visit(GotoStmt&) {}
-    virtual void leave(GotoStmt&) {}
-
-    virtual bool enter(GosubStmt&) {
-        return true;
-    }
-    virtual void visit(GosubStmt&) {}
-    virtual void leave(GosubStmt&) {}
-
-    virtual bool enter(ReturnStmt&) {
-        return true;
-    }
-    virtual void visit(ReturnStmt&) {}
-    virtual void leave(ReturnStmt&) {}
-
-    virtual bool enter(StopStmt&) {
-        return true;
-    }
-    virtual void visit(StopStmt&) {}
-    virtual void leave(StopStmt&) {}
-
-    virtual bool enter(EndStmt&) {
-        return true;
-    }
-    virtual void visit(EndStmt&) {}
-    virtual void leave(EndStmt&) {}
-
-    virtual bool enter(PrintStmt&) {
-        return true;
-    }
-    virtual void visit(PrintStmt&) {}
-    virtual void leave(PrintStmt&) {}
-
-    virtual bool enter(InputStmt&) {
-        return true;
-    }
-    virtual void visit(InputStmt&) {}
-    virtual void leave(InputStmt&) {}
-
-    virtual bool enter(RemStmt&) {
-        return true;
-    }
-    virtual void visit(RemStmt&) {}
-    virtual void leave(RemStmt&) {}
-
-    virtual bool enter(RunStmt&) {
-        return true;
-    }
-    virtual void visit(RunStmt&) {}
-    virtual void leave(RunStmt&) {}
-
-    virtual bool enter(ListStmt&) {
-        return true;
-    }
-    virtual void visit(ListStmt&) {}
-    virtual void leave(ListStmt&) {}
-
-    virtual bool enter(NewStmt&) {
-        return true;
-    }
-    virtual void visit(NewStmt&) {}
-    virtual void leave(NewStmt&) {}
-
-    virtual bool enter(ClsStmt&) {
-        return true;
-    }
-    virtual void visit(ClsStmt&) {}
-    virtual void leave(ClsStmt&) {}
-
-    virtual bool enter(LoadStmt&) {
-        return true;
-    }
-    virtual void visit(LoadStmt&) {}
-    virtual void leave(LoadStmt&) {}
-
-    virtual bool enter(SaveStmt&) {
-        return true;
-    }
-    virtual void visit(SaveStmt&) {}
-    virtual void leave(SaveStmt&) {}
-
-    virtual bool enter(PokeStmt&) {
-        return true;
-    }
-    virtual void visit(PokeStmt&) {}
-    virtual void leave(PokeStmt&) {}
-
-    virtual bool enter(PokewStmt&) {
-        return true;
-    }
-    virtual void visit(PokewStmt&) {}
-    virtual void leave(PokewStmt&) {}
-
-    virtual bool enter(PlotStmt&) {
-        return true;
-    }
-    virtual void visit(PlotStmt&) {}
-    virtual void leave(PlotStmt&) {}
-
-    virtual bool enter(UnplotStmt&) {
-        return true;
-    }
-    virtual void visit(UnplotStmt&) {}
-    virtual void leave(UnplotStmt&) {}
-
-    virtual bool enter(RandStmt&) {
-        return true;
-    }
-    virtual void visit(RandStmt&) {}
-    virtual void leave(RandStmt&) {}
-
-    virtual bool enter(PauseStmt&) {
-        return true;
-    }
-    virtual void visit(PauseStmt&) {}
-    virtual void leave(PauseStmt&) {}
-
-    virtual bool enter(FastStmt&) {
-        return true;
-    }
-    virtual void visit(FastStmt&) {}
-    virtual void leave(FastStmt&) {}
-
-    virtual bool enter(SlowStmt&) {
-        return true;
-    }
-    virtual void visit(SlowStmt&) {}
-    virtual void leave(SlowStmt&) {}
-
-    virtual bool enter(ScrollStmt&) {
-        return true;
-    }
-    virtual void visit(ScrollStmt&) {}
-    virtual void leave(ScrollStmt&) {}
-
-    virtual bool enter(ContStmt&) {
-        return true;
-    }
-    virtual void visit(ContStmt&) {}
-    virtual void leave(ContStmt&) {}
-
-    virtual bool enter(ClearStmt&) {
-        return true;
-    }
-    virtual void visit(ClearStmt&) {}
-    virtual void leave(ClearStmt&) {}
-
-    virtual bool enter(PragmaNumVarStmt&) {
-        return true;
-    }
-    virtual void visit(PragmaNumVarStmt&) {}
-    virtual void leave(PragmaNumVarStmt&) {}
-
-    virtual bool enter(PragmaStrVarStmt&) {
-        return true;
-    }
-    virtual void visit(PragmaStrVarStmt&) {}
-    virtual void leave(PragmaStrVarStmt&) {}
-
-    virtual bool enter(PragmaNumVarArrayStmt&) {
-        return true;
-    }
-    virtual void visit(PragmaNumVarArrayStmt&) {}
-    virtual void leave(PragmaNumVarArrayStmt&) {}
-
-    virtual bool enter(PragmaStrVarArrayStmt&) {
-        return true;
-    }
-    virtual void visit(PragmaStrVarArrayStmt&) {}
-    virtual void leave(PragmaStrVarArrayStmt&) {}
-
-    virtual bool enter(Prog&) {
-        return true;
-    }
-    virtual void visit(Prog&) {}
-    virtual void leave(Prog&) {}
 };

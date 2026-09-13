@@ -2,7 +2,6 @@
 Input file:  t/input/15_lexer_ok.bas
 Output file: t/input/15_lexer_ok.p
 % z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/15_lexer_ok.i" "t/input/15_lexer_ok.pp"
-Tokenized input:
 TokFile {
     TokLine {
         source_type: ASM

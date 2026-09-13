@@ -253,142 +253,142 @@ label4:			nop
 // check IF statements
 //------------------------------------------------------------------------------
 
-IF A=1 THEN B=2
-IF A=1 THEN :ELSE B=2
-IF A=1 THEN B=2:C=3
-IF A=1 THEN B=2:C=3 ELSE
-IF A=1 THEN B=2:C=3 ELSE D=4
-IF A=1 THEN B=2:C=3 ELSE D=4:E=5
-IF A=1 THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3
+	IF A=1 THEN B=2
+	IF A=1 THEN :ELSE B=2
+	IF A=1 THEN B=2:C=3
+	IF A=1 THEN B=2:C=3 ELSE
+	IF A=1 THEN B=2:C=3 ELSE D=4
+	IF A=1 THEN B=2:C=3 ELSE D=4:E=5
+	IF A=1 THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3
 
-IF A=1 THEN
-	B=1
-	C=1
-ENDIF
-
-IF A=1 THEN
-	B=1
-	C=1
-ELSE
-	B=2
-	IF A=2 THEN
-		C=2
-	ELSE
-		C=3
+	IF A=1 THEN
+		B=1
+		C=1
 	ENDIF
-ENDIF
 
-IF A=1 THEN
-	B=1 : C=1 : ENDIF : D=1
+	IF A=1 THEN
+		B=1
+		C=1
+	ELSE
+		B=2
+		IF A=2 THEN
+			C=2
+		ELSE
+			C=3
+		ENDIF
+	ENDIF
+
+	IF A=1 THEN
+		B=1 : C=1 : ENDIF : D=1
 
 //------------------------------------------------------------------------------
 // check REPEAT statements
 //------------------------------------------------------------------------------
 
-REPEAT A=1 UNTIL A=1
-REPEAT B=1: REPEAT C=1 UNTIL A=1 UNTIL A=2
+	REPEAT A=1 UNTIL A=1
+	REPEAT B=1: REPEAT C=1 UNTIL A=1 UNTIL A=2
 
-REPEAT
-	A=1
-	B=2
-	IF A=2 THEN EXIT
 	REPEAT
-		C=3
-	UNTIL A=2
-UNTIL A=1
+		A=1
+		B=2
+		IF A=2 THEN EXIT
+		REPEAT
+			C=3
+		UNTIL A=2
+	UNTIL A=1
 
-REPEAT
-	A=1 : B=2 : UNTIL A=1 : C=1
+	REPEAT
+		A=1 : B=2 : UNTIL A=1 : C=1
 
 //------------------------------------------------------------------------------
 // check WHILE statements
 //------------------------------------------------------------------------------
 
-WHILE A<>1: A=1:B=2:C=3 WEND
+	WHILE A<>1: A=1:B=2:C=3 WEND
 
-WHILE A=1:B=1:WHILE A=2:C=1:WEND:WEND
+	WHILE A=1:B=1:WHILE A=2:C=1:WEND:WEND
 
-WHILE A<>1
-	A=1
-	B=2
-	IF A=2 THEN EXIT
-	WHILE A<>2
-		C=3
+	WHILE A<>1
+		A=1
+		B=2
+		IF A=2 THEN EXIT
+		WHILE A<>2
+			C=3
+		WEND
 	WEND
-WEND
 
-WHILE A<>2
-	C=3 : WEND : C=4
+	WHILE A<>2
+		C=3 : WEND : C=4
 
 //------------------------------------------------------------------------------
 // check FOR statements
 //------------------------------------------------------------------------------
 
-LET S=0
-FOR I=1 TO 10:LET S=S+I:NEXT I
+	LET S=0
+	FOR I=1 TO 10:LET S=S+I:NEXT I
 
-FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT J:NEXT I
+	FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT J:NEXT I
 
-FOR I=1 TO 10 STEP 2
-	S=S+I
-	IF I=2 THEN EXIT
-	FOR J=1 TO 10 STEP 2
-		A=I*J
-	NEXT J
-NEXT I
+	FOR I=1 TO 10 STEP 2
+		S=S+I
+		IF I=2 THEN EXIT
+		FOR J=1 TO 10 STEP 2
+			A=I*J
+		NEXT J
+	NEXT I
 
-FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT:NEXT
+	FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT:NEXT
 
-FOR I=1 TO 10 STEP 2
-	FOR J=1 TO 10 STEP 2
-		A=I*J:NEXT:NEXT
+	FOR I=1 TO 10 STEP 2
+		FOR J=1 TO 10 STEP 2
+			A=I*J:NEXT:NEXT
 
 //------------------------------------------------------------------------------
 // check procedures
 //------------------------------------------------------------------------------
 
-DEF PROCname(A, B)
-    LOCAL L
-	LOCAL L1, L2
-	IF 1 THEN
-		LOCAL L3
-	ENDIF
-	L = A + B
-	IF A = 2 THEN EXIT
-	RESULT = L
-	PROCname = L
-ENDPROC
+	DEF PROCname(A, B)
+		LOCAL L
+		LOCAL L1, L2
+		IF 1 THEN
+			LOCAL L3
+		ENDIF
+		L = A + B
+		IF A = 2 THEN EXIT
+		RESULT = L
+		PROCname = L
+	ENDPROC
 
-PROCname 10, 20
-PROCname(30, 40)
+	PROCname 10, 20
+	PROCname(30, 40)
 
-A = 1 + PROCname(50, 60)
+	A = 1 + PROCname(50, 60)
 
-DEF procempty()
-	procempty = PI
-ENDPROC
+	DEF procempty()
+		procempty = PI
+	ENDPROC
 
-procempty
-procempty()
-A = 1 + procempty()
+	procempty
+	procempty()
+	A = 1 + procempty()
 
-DEF PROCj(A)
-	PROCj=10*A
-ENDPROC
+	DEF PROCj(A)
+		PROCj=10*A
+	ENDPROC
 
-LET A=10*PROCj(5+5)
+	LET A=10*PROCj(5+5)
 
 //------------------------------------------------------------------------------
 // check functions
 //------------------------------------------------------------------------------
 
-DEF FNname(A,B) = A * B
+	DEF FNname(A,B) = A * B
 
-A = FNname(10,20) + FNname(1+2,3+4)
+	A = FNname(10,20) + FNname(1+2,3+4)
 
-DEF fnempty() = PI
+	DEF fnempty() = PI
 
-A = 2 * fnempty()
+	A = 2 * fnempty()
 
 //------------------------------------------------------------------------------
 // check GOTO
@@ -581,7 +581,7 @@ A = 2 * fnempty()
 // End with some ASM to check that a final REM line is created
 //------------------------------------------------------------------------------
 
-		PRINT "HELLO"
+	PRINT "HELLO"
 
 #ASM
 end:		ld a, 1

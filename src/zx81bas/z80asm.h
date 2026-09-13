@@ -10,6 +10,4 @@
 #include <vector>
 
 bool assemble_link(const std::vector<std::string>& asm_source,
-                   const std::string& asm_file,
-                   const std::string& sym_file,
-                   const std::string& p_file);
+                   const std::string& input_basename);

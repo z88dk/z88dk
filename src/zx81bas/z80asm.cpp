@@ -7,12 +7,8 @@
 #include "z80asm.h"
 
 bool assemble_link(const std::vector<std::string>& asm_source,
-                   const std::string& asm_file,
-                   const std::string& sym_file,
-                   const std::string& p_file) {
+                   const std::string& input_basename) {
     (void)asm_source;
-    (void)asm_file;
-    (void)sym_file;
-    (void)p_file;
+    (void)input_basename;
     return true;
 }
