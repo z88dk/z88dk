@@ -1,7 +1,7 @@
 % z88dk-zx81bas -d 3 t//input/10_preproc.bas
 Input file:  t/input/10_preproc.bas
 Output file: t/input/10_preproc.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/10_preproc.bas.i" "t/input/10_preproc.bas.pp"
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/10_preproc.i" "t/input/10_preproc.pp"
 Preprocessor output:
 t/input/10_preproc.inc:4: !ASM
 t/input/10_preproc.inc:5: zero EQU 0

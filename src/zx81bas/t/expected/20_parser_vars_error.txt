@@ -1,20 +1,20 @@
 % z88dk-zx81bas -d 5 t//input/20_parser_vars_error.bas
 Input file:  t/input/20_parser_vars_error.bas
 Output file: t/input/20_parser_vars_error.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_vars_error.bas.i" "t/input/20_parser_vars_error.bas.pp"
-t/input/20_parser_vars_error.bas:1: error: unrecognized pragma statement 'NOT_VARS'
-t/input/20_parser_vars_error.bas:2: error: expected '=', found end of line
-t/input/20_parser_vars_error.bas:3: error: expected 'Float', found end of line
-t/input/20_parser_vars_error.bas:4: error: expected end of statement, found ','
-t/input/20_parser_vars_error.bas:5: error: expected end of statement, found ','
-t/input/20_parser_vars_error.bas:6: error: expected end of statement, found 'EXTRA'
-t/input/20_parser_vars_error.bas:7: error: expected end of statement, found 'EXTRA'
-t/input/20_parser_vars_error.bas:8: error: expected 'StringLiteral', found '10'
-t/input/20_parser_vars_error.bas:9: error: expected 'StringLiteral', found '1.23'
-t/input/20_parser_vars_error.bas:10: error: expected 'Float', found '"HELLO"'
-t/input/20_parser_vars_error.bas:11: error: expected 'Integer', found ')'
-t/input/20_parser_vars_error.bas:12: error: expected 'Integer', found ')'
-t/input/20_parser_vars_error.bas:13: error: expected ')', found 'TO'
-t/input/20_parser_vars_error.bas:14: error: expected 'Float', found '"A"'
-t/input/20_parser_vars_error.bas:15: error: expected 'StringLiteral', found '1'
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_vars_error.i" "t/input/20_parser_vars_error.pp"
+t/input/20_parser_vars_error.bas:1: error: Unrecognized pragma statement 'NOT_VARS'
+t/input/20_parser_vars_error.bas:2: error: Expected '=', found end of line
+t/input/20_parser_vars_error.bas:3: error: Expected 'Float', found end of line
+t/input/20_parser_vars_error.bas:4: error: Expected end of statement, found ','
+t/input/20_parser_vars_error.bas:5: error: Expected end of statement, found ','
+t/input/20_parser_vars_error.bas:6: error: Expected end of statement, found 'EXTRA'
+t/input/20_parser_vars_error.bas:7: error: Expected end of statement, found 'EXTRA'
+t/input/20_parser_vars_error.bas:8: error: Expected 'StringLiteral', found '10'
+t/input/20_parser_vars_error.bas:9: error: Expected 'StringLiteral', found '1.23'
+t/input/20_parser_vars_error.bas:10: error: Expected 'Float', found '"HELLO"'
+t/input/20_parser_vars_error.bas:11: error: Expected 'Integer', found ')'
+t/input/20_parser_vars_error.bas:12: error: Expected 'Integer', found ')'
+t/input/20_parser_vars_error.bas:13: error: Expected ')', found 'TO'
+t/input/20_parser_vars_error.bas:14: error: Expected 'Float', found '"A"'
+t/input/20_parser_vars_error.bas:15: error: Expected 'StringLiteral', found '1'
 15 errors found

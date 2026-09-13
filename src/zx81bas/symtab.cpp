@@ -5,25 +5,158 @@
 //-----------------------------------------------------------------------------
 
 #include "ast.h"
-#include "ast_expr.h"
-#include "ast_stmt.h"
+#include "dump_context.h"
 #include "errors.h"
 #include "symtab.h"
+#include <algorithm>
+#include <memory>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
-struct SymbolDefinitionCollector : ASTWalker {
-    using ASTWalker::visit; // so that base class visit methods are visible
+// collect all local statements and allocate to PROC
+// called on the body of the PROC
+struct LocalCollector : ASTVisitor {
+    std::unordered_set<std::string> params;     // input formal params
+    std::vector<std::string> locals;            // collect list of locals
 
+    LocalCollector(const std::unordered_set<std::string>& p)
+        : params(p) {}
+
+    void visit(LocalStmt& stmt) override {
+        for (const auto& local : stmt.locals) {
+            if (params.count(local) > 0) {
+                error(stmt.loc, "Local same as parameter: '" +
+                      local + "'");
+            }
+            else if (std::find(locals.begin(), locals.end(), local) != locals.end()) {
+                error(stmt.loc, "Duplicate local: '" +
+                      local + "'");
+            }
+            else {
+                locals.push_back(local);
+            }
+        }
+        stmt.mark_for_removal = true; // remove the LOCAL statement after collecting
+    }
+};
+
+// rename params and locals to <proc><param/local>
+// called on the body of the PROC
+struct StmtRewriter : ASTVisitor {
+    std::string prefix;
+    std::unordered_set<std::string> vars;
+
+    StmtRewriter(const std::string& p,
+                 const std::unordered_set<std::string>& v)
+        : prefix(p), vars(v) {}
+
+    void visit(VariableExpr& expr) override {
+        if (vars.count(expr.name) > 0) {
+            expr.name = prefix + expr.name;
+        }
+    }
+};
+
+// collect all PROC definitions, collect the LOCAL definitions and rewrite
+// the body to use <proc_name><var>
+struct ProcRewriter : ASTVisitor {
+    int proc_nesting = 0;
+
+    bool enter(DefProcStmt& stmt) override {
+        // already in a PROC body?
+        if (proc_nesting++ > 0) {
+            error(stmt.loc, "Nested DEF PROC");
+            return true;
+        }
+
+        // collect parameters, detect duplicates
+        std::unordered_set<std::string> params;
+        for (auto& param : stmt.params) {
+            if (params.count(param) > 0) {
+                error(stmt.loc, "Duplicate parameter: '" + param + "'");
+            }
+            else {
+                params.insert(param);
+            }
+        }
+
+        // collect locals, detect duplicates
+        LocalCollector local_collector(params);
+        stmt.accept(local_collector);
+        stmt.locals = local_collector.locals;
+
+        // rewrite the PROC body to replace local variables and parameters
+        // with <proc-name><param-name>
+        std::unordered_set<std::string> params_locals;
+        for (auto& param : stmt.params) {
+            params_locals.insert(param);
+            param = stmt.name + param; // rename parameter to <proc><param>
+        }
+        for (auto& local : stmt.locals) {
+            params_locals.insert(local);
+            local = stmt.name + local; // rename local to <proc><local>
+        }
+        StmtRewriter rewriter(stmt.name, params_locals);
+        stmt.accept(rewriter);
+
+        return true;
+    }
+
+    void leave(DefProcStmt&) override {
+        proc_nesting--;
+    }
+
+    void visit(LocalStmt& stmt) override {
+        // outside of a PROC body?
+        if (proc_nesting == 0) {
+            error(stmt.loc, "LOCAL outside PROC");
+        }
+        stmt.mark_for_removal = true; // remove the LOCAL statement
+    }
+};
+
+// check duplicate FN parameters
+struct FnParamChecker : ASTVisitor {
+    void visit(DefFnStmt& stmt) {
+        std::unordered_set<std::string> params;
+        for (auto& param : stmt.params) {
+            if (params.count(param) > 0) {
+                error(stmt.loc, "Duplicate parameter: '" + param + "'");
+            }
+            else {
+                params.insert(param);
+            }
+        }
+    }
+};
+
+// collect all symbol definitions
+// move pragma vars to program header
+struct SymbolCollector : ASTVisitor {
     Prog& prog;
     Symtab& symtab;
-    int proc_nesting = 0;
-    DefProcStmt* cur_def_proc = nullptr;
-    std::unordered_set<std::string> def_proc_locals;
     int last_line_num = -1;
 
-    explicit SymbolDefinitionCollector(Prog& p, Symtab& s) : prog(p), symtab(s) {}
+    explicit SymbolCollector(Prog& p, Symtab& s) : prog(p), symtab(s) {}
+
+    // may be assigned multiple times, store the first location only
+    void update_vars(const std::string& name, const SourceLoc& loc) {
+        auto it = symtab.vars.find(name);
+        if (it == symtab.vars.end()) {
+            symtab.vars[name] = loc;
+        }
+    }
+
+    // may be assigned multiple times, store the first location only
+    void update_arrays(const std::string& name, const SourceLoc& loc) {
+        auto it = symtab.arrays.find(name);
+        if (it == symtab.arrays.end()) {
+            symtab.arrays[name] = loc;
+        }
+    }
 
     void visit(LabelStmt& stmt) override {
         // label already defined?
@@ -55,104 +188,41 @@ struct SymbolDefinitionCollector : ASTWalker {
     void visit(LetStmt& stmt) override {
         // collect variables and arrays from the LHS
         if (auto var_expr = dynamic_cast<VariableExpr*>(stmt.lhs.get())) {
-            // may be assigned multiple times, store the first location only
-            auto it = symtab.vars.find(var_expr->name);
-            if (it == symtab.vars.end()) {
-                symtab.vars[var_expr->name] = var_expr->loc;
-            }
+            update_vars(var_expr->name, var_expr->loc);
         }
         else if (auto array_ref_expr = dynamic_cast<ArrayRefExpr*>(stmt.lhs.get())) {
-            // may be assigned multiple times, store the first location only
-            auto it = symtab.arrays.find(array_ref_expr->name);
-            if (it == symtab.arrays.end()) {
-                symtab.arrays[array_ref_expr->name] = array_ref_expr->loc;
-            }
+            update_arrays(array_ref_expr->name, array_ref_expr->loc);
         }
     }
 
     void visit(DimStmt& stmt) override {
         // collect arrays from the DIM statement
         for (auto& dim_item : stmt.items) {
-            // may be assigned multiple times, store the first location only
-            auto it = symtab.arrays.find(dim_item.name);
-            if (it == symtab.arrays.end()) {
-                symtab.arrays[dim_item.name] = stmt.loc;
-            }
+            update_arrays(dim_item.name, stmt.loc);
         }
     }
 
     void visit(ForStmt& stmt) override {
         // loop variable is defined in the FOR statement
-        auto it = symtab.vars.find(stmt.name);
-        if (it == symtab.vars.end()) {
-            symtab.vars[stmt.name] = stmt.loc;
-        }
+        update_vars(stmt.name, stmt.loc);
     }
 
-    void enter(DefProcStmt& stmt) override {
-        proc_nesting++;
-
-        // already in a PROC body?
-        if (cur_def_proc != nullptr) {
-            error(stmt.loc, "Nested PROC");
-            return;
-        }
-        cur_def_proc = &stmt;
-
+    void visit(DefProcStmt& stmt) override {
         // PROC already defined?
         auto it = symtab.procs.find(stmt.name);
         if (it != symtab.procs.end()) {
-            error(stmt.loc, "Duplicate definition: '" + stmt.name + "'");
+            error(stmt.loc, "Duplicate PROC definition: '" + stmt.name + "'");
             error(it->second->loc, "Previous definition");
             return;
         }
         symtab.procs[stmt.name] = &stmt;
 
-        // collect parameters, detect duplicates
+        // define variables for each parameter and local
         for (auto& param : stmt.params) {
-            if (def_proc_locals.count(param) > 0) {
-                error(stmt.loc, "Duplicate parameter: '" + param + "'");
-            }
-            else {
-                def_proc_locals.insert(param);
-
-                auto it = symtab.vars.find(param);
-                if (it == symtab.vars.end()) {
-                    symtab.vars[param] = stmt.loc;
-                }
-            }
+            update_vars(param, stmt.loc);
         }
-    }
-
-    void visit(LocalStmt& stmt) override {
-        // outside of a PROC body?
-        if (cur_def_proc == nullptr) {
-            error(stmt.loc, "LOCAL outside PROC");
-            return;
-        }
-
-        // collect locals, detect duplicates
         for (auto& local : stmt.locals) {
-            if (def_proc_locals.count(local) > 0) {
-                error(stmt.loc, "Duplicate variable: '" + local + "'");
-            }
-            else {
-                def_proc_locals.insert(local);
-                cur_def_proc->locals.push_back(local);
-
-                auto it = symtab.vars.find(local);
-                if (it == symtab.vars.end()) {
-                    symtab.vars[local] = stmt.loc;
-                }
-            }
-        }
-    }
-
-    void leave(DefProcStmt&) override {
-        proc_nesting--;
-        if (proc_nesting == 0) {
-            cur_def_proc = nullptr;
-            def_proc_locals.clear();
+            update_vars(local, stmt.loc);
         }
     }
 
@@ -160,7 +230,7 @@ struct SymbolDefinitionCollector : ASTWalker {
         // FN already defined?
         auto it = symtab.fns.find(stmt.name);
         if (it != symtab.fns.end()) {
-            error(stmt.loc, "Duplicate definition: '" + stmt.name + "'");
+            error(stmt.loc, "Duplicate FN definition: '" + stmt.name + "'");
             error(it->second->loc, "Previous definition");
             return;
         }
@@ -174,11 +244,7 @@ struct SymbolDefinitionCollector : ASTWalker {
             }
             else {
                 params.insert(param);
-
-                auto it = symtab.vars.find(param);
-                if (it == symtab.vars.end()) {
-                    symtab.vars[param] = stmt.loc;
-                }
+                update_vars(param, stmt.loc);
             }
         }
     }
@@ -187,27 +253,16 @@ struct SymbolDefinitionCollector : ASTWalker {
         // collect variables and arrays from the INPUT statement
         for (const auto& var : stmt.vars) {
             if (auto var_expr = dynamic_cast<VariableExpr*>(var.get())) {
-                // may be assigned multiple times, store the first location only
-                auto it = symtab.vars.find(var_expr->name);
-                if (it == symtab.vars.end()) {
-                    symtab.vars[var_expr->name] = var_expr->loc;
-                }
+                update_vars(var_expr->name, var_expr->loc);
             }
             else if (auto array_ref_expr = dynamic_cast<ArrayRefExpr*>(var.get())) {
-                // may be assigned multiple times, store the first location only
-                auto it = symtab.arrays.find(array_ref_expr->name);
-                if (it == symtab.arrays.end()) {
-                    symtab.arrays[array_ref_expr->name] = array_ref_expr->loc;
-                }
+                update_arrays(array_ref_expr->name, array_ref_expr->loc);
             }
         }
     }
 
     void visit(PragmaNumVarStmt& stmt) override {
-        auto it = symtab.vars.find(stmt.name);
-        if (it == symtab.vars.end()) {
-            symtab.vars[stmt.name] = stmt.loc;
-        }
+        update_vars(stmt.name, stmt.loc);
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());
@@ -215,10 +270,7 @@ struct SymbolDefinitionCollector : ASTWalker {
     }
 
     void visit(PragmaStrVarStmt& stmt) override {
-        auto it = symtab.vars.find(stmt.name);
-        if (it == symtab.vars.end()) {
-            symtab.vars[stmt.name] = stmt.loc;
-        }
+        update_vars(stmt.name, stmt.loc);
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());
@@ -226,10 +278,7 @@ struct SymbolDefinitionCollector : ASTWalker {
     }
 
     void visit(PragmaNumVarArrayStmt& stmt) override {
-        auto it = symtab.arrays.find(stmt.name);
-        if (it == symtab.arrays.end()) {
-            symtab.arrays[stmt.name] = stmt.loc;
-        }
+        update_arrays(stmt.name, stmt.loc);
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());
@@ -237,10 +286,7 @@ struct SymbolDefinitionCollector : ASTWalker {
     }
 
     void visit(PragmaStrVarArrayStmt& stmt) override {
-        auto it = symtab.arrays.find(stmt.name);
-        if (it == symtab.arrays.end()) {
-            symtab.arrays[stmt.name] = stmt.loc;
-        }
+        update_arrays(stmt.name, stmt.loc);
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());
@@ -248,13 +294,13 @@ struct SymbolDefinitionCollector : ASTWalker {
     }
 };
 
-struct SymbolUsageVerifier : ASTWalker {
-    using ASTWalker::visit; // so that base class visit methods are visible
-
-    Prog& prog;
+// collect undefined symbols
+// check mismatched parameters
+// mark called PROCs
+struct UndefinedCollector : ASTVisitor {
     Symtab& symtab;
 
-    explicit SymbolUsageVerifier(Prog& p, Symtab& s) : prog(p), symtab(s) {}
+    explicit UndefinedCollector(Symtab& s) : symtab(s) {}
 
     void visit(ProcCallStmt& stmt) override {
         auto it = symtab.procs.find(stmt.name);
@@ -264,6 +310,7 @@ struct SymbolUsageVerifier : ASTWalker {
         else {
             // check number of arguments
             auto def_proc = it->second;
+            def_proc->called = true;		// mark called for lower stage
             if (stmt.args.size() != def_proc->params.size()) {
                 error(stmt.loc, "Procedure '" + stmt.name + "' expects " +
                       std::to_string(def_proc->params.size()) + " arguments, got " +
@@ -272,15 +319,42 @@ struct SymbolUsageVerifier : ASTWalker {
         }
     }
 
-    void visit(GotoStmt& stmt) override {
-        if (auto label_ref_expr = dynamic_cast<LabelLineRefExpr*>
-                                  (stmt.target_expr.get())) {
-            if (symtab.labels.find(label_ref_expr->name) == symtab.labels.end()) {
-                error(stmt.loc, "Undefined label: '" + label_ref_expr->name + "'");
+    void visit(ProcCallExpr& expr) override {
+        auto it = symtab.procs.find(expr.name);
+        if (it == symtab.procs.end()) {
+            error(expr.loc, "Undefined procedure: '" + expr.name + "'");
+        }
+        else {
+            // check number of arguments
+            auto def_proc = it->second;
+            def_proc->called = true;		// mark called for lower stage
+            if (expr.args.size() != def_proc->params.size()) {
+                error(expr.loc, "Procedure '" + expr.name + "' expects " +
+                      std::to_string(def_proc->params.size()) + " arguments, got " +
+                      std::to_string(expr.args.size()));
             }
         }
-        else if (auto line_num_expr = dynamic_cast<NumberExpr*>
-                                      (stmt.target_expr.get())) {
+    }
+
+    void visit(FnCallExpr& expr) override {
+        auto it = symtab.fns.find(expr.name);
+        if (it == symtab.fns.end()) {
+            error(expr.loc, "Undefined function: '" + expr.name + "'");
+        }
+        else {
+            // check number of arguments
+            auto def_fn = it->second;
+            if (expr.args.size() != def_fn->params.size()) {
+                error(expr.loc, "Function '" + expr.name + "' expects " +
+                      std::to_string(def_fn->params.size()) + " arguments, got " +
+                      std::to_string(expr.args.size()));
+            }
+        }
+    }
+
+    void visit(GotoStmt& stmt) override {
+        if (auto line_num_expr = dynamic_cast<NumberExpr*>
+                                 (stmt.target_expr.get())) {
             int line_num = static_cast<int>(line_num_expr->value);
             if (symtab.line_nums.find(line_num) == symtab.line_nums.end()) {
                 error(stmt.loc, "Undefined line number: '" + std::to_string(line_num) + "'");
@@ -289,14 +363,8 @@ struct SymbolUsageVerifier : ASTWalker {
     }
 
     void visit(GosubStmt& stmt) override {
-        if (auto label_ref_expr = dynamic_cast<LabelLineRefExpr*>
-                                  (stmt.target_expr.get())) {
-            if (symtab.labels.find(label_ref_expr->name) == symtab.labels.end()) {
-                error(stmt.loc, "Undefined label: '" + label_ref_expr->name + "'");
-            }
-        }
-        else if (auto line_num_expr = dynamic_cast<NumberExpr*>
-                                      (stmt.target_expr.get())) {
+        if (auto line_num_expr = dynamic_cast<NumberExpr*>
+                                 (stmt.target_expr.get())) {
             int line_num = static_cast<int>(line_num_expr->value);
             if (symtab.line_nums.find(line_num) == symtab.line_nums.end()) {
                 error(stmt.loc, "Undefined line number: '" + std::to_string(line_num) + "'");
@@ -306,14 +374,8 @@ struct SymbolUsageVerifier : ASTWalker {
 
     void visit(RunStmt& stmt) override {
         if (stmt.target_expr) {
-            if (auto label_ref_expr = dynamic_cast<LabelLineRefExpr*>
-                                      (stmt.target_expr.get())) {
-                if (symtab.labels.find(label_ref_expr->name) == symtab.labels.end()) {
-                    error(stmt.loc, "Undefined label: '" + label_ref_expr->name + "'");
-                }
-            }
-            else if (auto line_num_expr = dynamic_cast<NumberExpr*>
-                                          (stmt.target_expr.get())) {
+            if (auto line_num_expr = dynamic_cast<NumberExpr*>
+                                     (stmt.target_expr.get())) {
                 int line_num = static_cast<int>(line_num_expr->value);
                 if (symtab.line_nums.find(line_num) == symtab.line_nums.end()) {
                     error(stmt.loc, "Undefined line number: '" + std::to_string(line_num) + "'");
@@ -324,14 +386,8 @@ struct SymbolUsageVerifier : ASTWalker {
 
     void visit(ListStmt& stmt) override {
         if (stmt.target_expr) {
-            if (auto label_ref_expr = dynamic_cast<LabelLineRefExpr*>
-                                      (stmt.target_expr.get())) {
-                if (symtab.labels.find(label_ref_expr->name) == symtab.labels.end()) {
-                    error(stmt.loc, "Undefined label: '" + label_ref_expr->name + "'");
-                }
-            }
-            else if (auto line_num_expr = dynamic_cast<NumberExpr*>
-                                          (stmt.target_expr.get())) {
+            if (auto line_num_expr = dynamic_cast<NumberExpr*>
+                                     (stmt.target_expr.get())) {
                 int line_num = static_cast<int>(line_num_expr->value);
                 if (symtab.line_nums.find(line_num) == symtab.line_nums.end()) {
                     error(stmt.loc, "Undefined line number: '" + std::to_string(line_num) + "'");
@@ -363,49 +419,142 @@ struct SymbolUsageVerifier : ASTWalker {
             error(expr.loc, "Undefined array: '" + expr.name + "'");
         }
     }
-
-    void visit(ProcCallExpr& expr) override {
-        auto it = symtab.procs.find(expr.name);
-        if (it == symtab.procs.end()) {
-            error(expr.loc, "Undefined procedure: '" + expr.name + "'");
-        }
-        else {
-            // check number of arguments
-            auto def_proc = it->second;
-            if (expr.args.size() != def_proc->params.size()) {
-                error(expr.loc, "Procedure '" + expr.name + "' expects " +
-                      std::to_string(def_proc->params.size()) + " arguments, got " +
-                      std::to_string(expr.args.size()));
-            }
-        }
-    }
-
-    void visit(FnCallExpr& expr) override {
-        auto it = symtab.fns.find(expr.name);
-        if (it == symtab.fns.end()) {
-            error(expr.loc, "Undefined function: '" + expr.name + "'");
-        }
-        else {
-            // check number of arguments
-            auto def_fn = it->second;
-            if (expr.args.size() != def_fn->params.size()) {
-                error(expr.loc, "Function '" + expr.name + "' expects " +
-                      std::to_string(def_fn->params.size()) + " arguments, got " +
-                      std::to_string(expr.args.size()));
-            }
-        }
-    }
 };
 
-bool create_symtab(Prog& prog, std::unique_ptr<Symtab>& symtab) {
-    // create symbol table and collect definitions
-    symtab = std::make_unique<Symtab>();
-    SymbolDefinitionCollector collector(prog, *symtab);
-    prog.accept(collector);
+bool create_symtab(Prog& prog, std::unique_ptr<Symtab>& out_symtab) {
+    out_symtab = std::make_unique<Symtab>();
 
-    // check for undefined symbols in expressions and statements
-    SymbolUsageVerifier verifier(prog, *symtab);
-    prog.accept(verifier);
+    // rewrite PROC parameters and locals, detect nested PROCs
+    ProcRewriter rewriter;
+    prog.accept(rewriter);
+
+    // check duplicate FN parameters
+    FnParamChecker checker;
+    prog.accept(checker);
+
+    // collect all defined symbols, move pragma vars
+    SymbolCollector symbol_collector(prog, *out_symtab);
+    prog.accept(symbol_collector);
+
+    // collect undefined symbols and
+    // mismatch parameters to args in FN and PROC calls
+    UndefinedCollector undef_collector(*out_symtab);
+    prog.accept(undef_collector);
 
     return get_error_count() == 0;
 }
+
+#ifdef _DEBUG
+static void dump_symtab_map(const char* name,
+                            const std::unordered_map<std::string, SourceLoc>& map,
+                            DumpContext& ctx) {
+    ctx.line(std::string(name) + ": [");
+    auto child_ctx = ctx.child();
+    std::vector<std::string> keys;
+    keys.reserve(map.size());
+    for (const auto& [key, loc] : map) {
+        keys.push_back(key);
+    }
+    std::sort(keys.begin(), keys.end());
+    for (const auto& key : keys) {
+        child_ctx.line("\"" + key + "\" {");
+        auto entry_ctx = child_ctx.child();
+        map.at(key).dump(entry_ctx);
+        child_ctx.line("}");
+    }
+    ctx.line("]");
+}
+
+static void dump_symtab_def_proc_stmt_map(const char* name,
+        const std::unordered_map<std::string, DefProcStmt*>& map,
+        DumpContext& ctx) {
+    ctx.line(std::string(name) + ": [");
+    auto child_ctx = ctx.child();
+    std::vector<std::string> keys;
+    keys.reserve(map.size());
+    for (const auto& [key, stmt] : map) {
+        keys.push_back(key);
+    }
+    std::sort(keys.begin(), keys.end());
+    for (const auto& key : keys) {
+        child_ctx.line("\"" + key + "\" {");
+        auto entry_ctx = child_ctx.child();
+        map.at(key)->loc.dump(entry_ctx);
+        child_ctx.line("}");
+    }
+    ctx.line("]");
+}
+
+static void dump_symtab_def_fn_stmt_map(const char* name,
+                                        const std::unordered_map<std::string, DefFnStmt*>& map,
+                                        DumpContext& ctx) {
+    ctx.line(std::string(name) + ": [");
+    auto child_ctx = ctx.child();
+    std::vector<std::string> keys;
+    keys.reserve(map.size());
+    for (const auto& [key, stmt] : map) {
+        keys.push_back(key);
+    }
+    std::sort(keys.begin(), keys.end());
+    for (const auto& key : keys) {
+        child_ctx.line("\"" + key + "\" {");
+        auto entry_ctx = child_ctx.child();
+        map.at(key)->loc.dump(entry_ctx);
+        child_ctx.line("}");
+    }
+    ctx.line("]");
+}
+
+static void dump_symtab_labels_map(const char* name,
+                                   const std::unordered_map<std::string, LabelStmt*>& map,
+                                   DumpContext& ctx) {
+    ctx.line(std::string(name) + ": [");
+    auto child_ctx = ctx.child();
+    std::vector<std::string> keys;
+    keys.reserve(map.size());
+    for (const auto& [key, stmt] : map) {
+        keys.push_back(key);
+    }
+    std::sort(keys.begin(), keys.end());
+    for (const auto& key : keys) {
+        child_ctx.line("\"" + key + "\" {");
+        auto entry_ctx = child_ctx.child();
+        map.at(key)->loc.dump(entry_ctx);
+        child_ctx.line("}");
+    }
+    ctx.line("]");
+}
+
+static void dump_symtab_line_nums_map(const char* name,
+                                      const std::unordered_map<int, LineNumStmt*>& map,
+                                      DumpContext& ctx) {
+    ctx.line(std::string(name) + ": [");
+    auto child_ctx = ctx.child();
+    std::vector<int> keys;
+    keys.reserve(map.size());
+    for (const auto& [key, stmt] : map) {
+        keys.push_back(key);
+    }
+    std::sort(keys.begin(), keys.end());
+    for (const auto& key : keys) {
+        child_ctx.line(std::to_string(key) + " {");
+        auto entry_ctx = child_ctx.child();
+        map.at(key)->loc.dump(entry_ctx);
+        child_ctx.line("}");
+    }
+    ctx.line("]");
+}
+
+void Symtab::dump(DumpContext ctx) const {
+    ctx.line("Symtab {");
+    auto child_ctx = ctx.child();
+    dump_symtab_map("vars", vars, child_ctx);
+    dump_symtab_map("arrays", arrays, child_ctx);
+    dump_symtab_def_proc_stmt_map("procs", procs, child_ctx);
+    dump_symtab_def_fn_stmt_map("fns", fns, child_ctx);
+    dump_symtab_labels_map("labels", labels, child_ctx);
+    dump_symtab_line_nums_map("line_nums", line_nums, child_ctx);
+    ctx.line("}");
+}
+#endif
+

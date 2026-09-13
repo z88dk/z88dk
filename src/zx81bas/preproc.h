@@ -25,7 +25,9 @@ struct SrcLine : TreeNode {
 #endif
 };
 
-bool preproc(std::string input_file, std::vector<SrcLine>& out_lines);
+bool preproc(const std::string& input_file,
+             const std::string& input_basename,
+             std::vector<SrcLine>& out_lines);
 
 // used during lexing, where pragmas are !ASM and !ENDASM
 bool match_ASM(const std::string& text, const SourceLoc& loc);

@@ -1,2 +1,2 @@
 % z88dk-zx81bas t//input/05_cli_input_file_dot_p.p
-error: Input file should not have .p extension
+error: Input file cannot have .p extension: t/input/05_cli_input_file_dot_p.p

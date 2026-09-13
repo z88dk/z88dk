@@ -1,18 +1,168 @@
 % z88dk-zx81bas -d 6 test_t_input_06_t.bas
 Input file:  test_t_input_06_t.bas
 Output file: test_t_input_06_t.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_06_t.bas.i" "test_t_input_06_t.bas.pp"
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_06_t.i" "test_t_input_06_t.pp"
 Symtab {
     vars: [
+        "A" {
+            location: test_t_input_06_t.bas:29
+        }
+        "A$" {
+            location: test_t_input_06_t.bas:33
+        }
+        "ABC" {
+            location: test_t_input_06_t.bas:149
+        }
+        "B" {
+            location: test_t_input_06_t.bas:139
+        }
+        "C" {
+            location: test_t_input_06_t.bas:139
+        }
+        "D" {
+            location: test_t_input_06_t.bas:260
+        }
+        "E" {
+            location: test_t_input_06_t.bas:261
+        }
+        "I" {
+            location: test_t_input_06_t.bas:328
+        }
+        "I1" {
+            location: test_t_input_06_t.bas:453
+        }
+        "J" {
+            location: test_t_input_06_t.bas:330
+        }
+        "PROCEMPTY" {
+            location: test_t_input_06_t.bas:368
+        }
+        "PROCID" {
+            location: test_t_input_06_t.bas:177
+        }
+        "PROCIDA" {
+            location: test_t_input_06_t.bas:177
+        }
+        "PROCJ" {
+            location: test_t_input_06_t.bas:376
+        }
+        "PROCJA" {
+            location: test_t_input_06_t.bas:375
+        }
+        "PROCNAME" {
+            location: test_t_input_06_t.bas:359
+        }
+        "PROCNAMEA" {
+            location: test_t_input_06_t.bas:350
+        }
+        "PROCNAMEB" {
+            location: test_t_input_06_t.bas:350
+        }
+        "PROCNAMEL" {
+            location: test_t_input_06_t.bas:350
+        }
+        "PROCNAMEL1" {
+            location: test_t_input_06_t.bas:350
+        }
+        "PROCNAMEL2" {
+            location: test_t_input_06_t.bas:350
+        }
+        "PROCNAMEL3" {
+            location: test_t_input_06_t.bas:350
+        }
+        "RESULT" {
+            location: test_t_input_06_t.bas:358
+        }
+        "S" {
+            location: test_t_input_06_t.bas:327
+        }
+        "X" {
+            location: test_t_input_06_t.bas:227
+        }
+        "Y" {
+            location: test_t_input_06_t.bas:551
+        }
+        "Z$" {
+            location: test_t_input_06_t.bas:77
+        }
     ]
     arrays: [
+        "A" {
+            location: test_t_input_06_t.bas:30
+        }
+        "A$" {
+            location: test_t_input_06_t.bas:152
+        }
+        "B" {
+            location: test_t_input_06_t.bas:249
+        }
+        "B$" {
+            location: test_t_input_06_t.bas:34
+        }
+        "C" {
+            location: test_t_input_06_t.bas:249
+        }
+        "C$" {
+            location: test_t_input_06_t.bas:250
+        }
+        "I" {
+            location: test_t_input_06_t.bas:453
+        }
     ]
     procs: [
+        "PROCEMPTY" {
+            location: test_t_input_06_t.bas:367
+        }
+        "PROCID" {
+            location: test_t_input_06_t.bas:177
+        }
+        "PROCJ" {
+            location: test_t_input_06_t.bas:375
+        }
+        "PROCNAME" {
+            location: test_t_input_06_t.bas:350
+        }
     ]
     fns: [
+        "FNEMPTY" {
+            location: test_t_input_06_t.bas:389
+        }
+        "FNF" {
+            location: test_t_input_06_t.bas:225
+        }
+        "FNG" {
+            location: test_t_input_06_t.bas:226
+        }
+        "FNID" {
+            location: test_t_input_06_t.bas:172
+        }
+        "FNNAME" {
+            location: test_t_input_06_t.bas:385
+        }
     ]
     labels: [
+        "LABEL1" {
+            location: test_t_input_06_t.bas:86
+        }
+        "LABEL2" {
+            location: test_t_input_06_t.bas:88
+        }
+        "LABEL3" {
+            location: test_t_input_06_t.bas:89
+        }
     ]
     line_nums: [
+        10 {
+            location: test_t_input_06_t.bas:87
+        }
+        11 {
+            location: test_t_input_06_t.bas:88
+        }
+        12 {
+            location: test_t_input_06_t.bas:89
+        }
+        1000 {
+            location: test_t_input_06_t.bas:397
+        }
     ]
 }

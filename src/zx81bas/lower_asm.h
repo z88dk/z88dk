@@ -7,5 +7,10 @@
 #pragma once
 
 #include "ast.h"
+#include "symtab.h"
+#include <string>
+#include <vector>
 
-bool semantic_check(Prog& prog);
+bool build_asm_source(Prog& prog, Symtab& symtab,
+                      std::vector<std::string>& out_asm_source);
+

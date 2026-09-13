@@ -4,10 +4,11 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "dump_context.h"
 #include "errors.h"
+#include <cstdlib>
 #include <iostream>
 #include <string>
-#include <cstdlib>
 
 static int error_count = 0;
 
@@ -21,6 +22,12 @@ void error(const SourceLoc& loc, const std::string& message) {
     }
     error_count++;
 }
+
+#ifdef _DEBUG
+void SourceLoc::dump(DumpContext ctx) const {
+    ctx.line("location: " + filename + ":" + std::to_string(line_num));
+}
+#endif
 
 void error(const std::string& message) {
     std::cerr << "error: " << message << std::endl;
