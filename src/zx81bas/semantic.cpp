@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "ast.h"
+#include "release_assert.h"
 #include "semantic.h"
 #include <algorithm>
 #include <string>
@@ -167,7 +168,7 @@ struct ExprTypeChecker : ASTVisitor {
             }
             break;
         default:
-            error(expr.loc, "Unknown unary operator");
+            release_assert(0);  // error already reported in parser
             break;
         }
         expr.type = expr.operand->type;
@@ -206,7 +207,7 @@ struct ExprTypeChecker : ASTVisitor {
             // Comparison operators can be used for both numbers and strings
             break;
         default:
-            error(expr.loc, "Unknown binary operator");
+            release_assert(0);  // error already reported in parser
             break;
         }
         expr.type = expr.lhs->type;
@@ -218,14 +219,10 @@ struct ExprTypeChecker : ASTVisitor {
         case Keyword::RND:
         case Keyword::PI:
         case Keyword::INKEY_DLR:
-            if (expr.args.size() != 0) {
-                error(expr.loc, "Function call requires exactly zero arguments");
-            }
+            release_assert(expr.args.size() == 0);  // error already reported in parser
             break;
         default:
-            if (expr.args.size() != 1) {
-                error(expr.loc, "Function call requires exactly one argument");
-            }
+            release_assert(expr.args.size() == 1);  // error already reported in parser
             break;
         }
 
@@ -280,7 +277,7 @@ struct ExprTypeChecker : ASTVisitor {
             expr.type = ExprType::String;
             break;
         default:
-            error(expr.loc, "Unknown function call");
+            release_assert(0);  // error already reported in parser
             break;
         }
     }

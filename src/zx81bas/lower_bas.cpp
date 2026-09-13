@@ -266,7 +266,7 @@ static LoweredExpr lower_expr(Expr& expr, Symtab& symtab) {
         return lowered;
     }
     else {
-        error(expr.loc, "Unknown expression type");
+        error (expr.loc, "Unknown expression type");
         return { {}, std::make_unique<NumberExpr>(0, expr.loc) };
     }
 }
@@ -598,7 +598,7 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
         }
         else if (auto exit_stmt = dynamic_cast<ExitStmt*>(stmt.get())) {
             if (control_stack.empty()) {
-                error(exit_stmt->loc, "EXIT outside of loop or DEF PROC");
+                error (exit_stmt->loc, "EXIT outside of loop or DEF PROC");
             }
             else if (control_stack.back().type == ControlStackEntry::Type::Loop) {
                 // GOTO @end_label

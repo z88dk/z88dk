@@ -26,4 +26,5 @@ struct SourceLoc : TreeNode {
 void error(const SourceLoc& loc, const std::string& message);
 void error(const std::string& message);
 int get_error_count();
+[[noreturn]] void fatal(const std::string& message);
 [[noreturn]] void exit_error_status();

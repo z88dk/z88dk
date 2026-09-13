@@ -9,5 +9,6 @@ t/input/20_parser_defproc_error.bas:5: error: Expected 'Identifier', found '10'
 t/input/20_parser_defproc_error.bas:6: error: String variable 'A$' not allowed as parameter in DEF PROC statement
 t/input/20_parser_defproc_error.bas:7: error: Expected 'Identifier', found ')'
 t/input/20_parser_defproc_error.bas:8: error: Expected 'Identifier', found '10'
-t/input/20_parser_defproc_error.bas:10: error: Expected 'ENDPROC'
-8 errors found
+t/input/20_parser_defproc_error.bas:9: error: Expected 'PROC<name>' or 'FN<name>', found 'X'
+t/input/20_parser_defproc_error.bas:11: error: Expected 'ENDPROC'
+9 errors found
