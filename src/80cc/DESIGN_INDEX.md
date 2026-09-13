@@ -126,8 +126,14 @@ history you have to read. Recover one with:
     git checkout 80cc-docs-archive -- src/80cc/<file>.md
 
 What survives here is the durable layer: `adr/` (27 records), `CONTEXT.md`
-(vocabulary), `AGENTS.md` (working rules), this index, and the retired probe
-sources under `probes-retired/`.
+(vocabulary), `AGENTS.md` (working rules), this index, `DESIGN_REVIEW_PLAN.md`
+(the current work), and the retired probe sources under `probes-retired/`.
+
+One more file survives on its own terms: `DEBUG_LOCALS_PLAN.md`, status
+**shipped** — it records how `-debug` homes a named local in its frame slot
+(the mechanism is `IR_VREG_ADDR_TAKEN`, not a new flag). It is tracked and
+states no next action. Fold it into an ADR the next time debug information is
+touched.
 
 `CONTEXT.md` is spelled in capitals. This workspace is mounted from a
 case-insensitive host filesystem, so `context.md` resolves to the same file
