@@ -1,5 +1,6 @@
 ## TODO
 
+- remove unused labels
 - number lines
 - generate output file
 - add constructors to xxxStmt
@@ -792,5 +793,3 @@ DFS cycle detection
 Tarjan SCC detection
 
 integrating it into your existing pipeline
-
-Just tell me which style you prefer.

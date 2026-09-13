@@ -3073,6 +3073,8 @@ Prog {
                             value: 1.000000
                         }
                 }
+            start_label: "ZX81BAS0REPEATSTART"
+            end_label: "ZX81BAS0REPEATEND"
         }
         RepeatStmt {
             location: test_t_input_08_t.bas:289
@@ -3129,6 +3131,8 @@ Prog {
                                     value: 1.000000
                                 }
                         }
+                    start_label: "ZX81BAS2REPEATSTART"
+                    end_label: "ZX81BAS2REPEATEND"
                 }
             ]
             condition: 
@@ -3149,6 +3153,8 @@ Prog {
                             value: 2.000000
                         }
                 }
+            start_label: "ZX81BAS1REPEATSTART"
+            end_label: "ZX81BAS1REPEATEND"
         }
         RepeatStmt {
             location: test_t_input_08_t.bas:291
@@ -3204,8 +3210,14 @@ Prog {
                                 }
                         }
                     then_stmts: [
-                        ExitStmt {
+                        GotoStmt {
                             location: test_t_input_08_t.bas:294
+                            target_expr: 
+                                LabelLineRefExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:294
+                                    name: "ZX81BAS3REPEATEND"
+                                }
                         }
                     ]
                     else_stmts: [
@@ -3248,6 +3260,8 @@ Prog {
                                     value: 2.000000
                                 }
                         }
+                    start_label: "ZX81BAS4REPEATSTART"
+                    end_label: "ZX81BAS4REPEATEND"
                 }
             ]
             condition: 
@@ -3268,6 +3282,8 @@ Prog {
                             value: 1.000000
                         }
                 }
+            start_label: "ZX81BAS3REPEATSTART"
+            end_label: "ZX81BAS3REPEATEND"
         }
         RepeatStmt {
             location: test_t_input_08_t.bas:300
@@ -3321,6 +3337,8 @@ Prog {
                             value: 1.000000
                         }
                 }
+            start_label: "ZX81BAS5REPEATSTART"
+            end_label: "ZX81BAS5REPEATEND"
         }
         LetStmt {
             location: test_t_input_08_t.bas:301
@@ -3404,6 +3422,8 @@ Prog {
                         }
                 }
             ]
+            start_label: "ZX81BAS6WHILESTART"
+            end_label: "ZX81BAS6WHILEEND"
         }
         WhileStmt {
             location: test_t_input_08_t.bas:309
@@ -3478,8 +3498,12 @@ Prog {
                                 }
                         }
                     ]
+                    start_label: "ZX81BAS8WHILESTART"
+                    end_label: "ZX81BAS8WHILEEND"
                 }
             ]
+            start_label: "ZX81BAS7WHILESTART"
+            end_label: "ZX81BAS7WHILEEND"
         }
         WhileStmt {
             location: test_t_input_08_t.bas:311
@@ -3553,8 +3577,14 @@ Prog {
                                 }
                         }
                     then_stmts: [
-                        ExitStmt {
+                        GotoStmt {
                             location: test_t_input_08_t.bas:314
+                            target_expr: 
+                                LabelLineRefExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:314
+                                    name: "ZX81BAS9WHILEEND"
+                                }
                         }
                     ]
                     else_stmts: [
@@ -3597,8 +3627,12 @@ Prog {
                                 }
                         }
                     ]
+                    start_label: "ZX81BAS10WHILESTART"
+                    end_label: "ZX81BAS10WHILEEND"
                 }
             ]
+            start_label: "ZX81BAS9WHILESTART"
+            end_label: "ZX81BAS9WHILEEND"
         }
         WhileStmt {
             location: test_t_input_08_t.bas:320
@@ -3637,6 +3671,8 @@ Prog {
                         }
                 }
             ]
+            start_label: "ZX81BAS11WHILESTART"
+            end_label: "ZX81BAS11WHILEEND"
         }
         LetStmt {
             location: test_t_input_08_t.bas:321
@@ -3718,6 +3754,7 @@ Prog {
                         }
                 }
             ]
+            end_label: "ZX81BAS12FOREND"
         }
         ForStmt {
             location: test_t_input_08_t.bas:330
@@ -3791,8 +3828,10 @@ Prog {
                                 }
                         }
                     ]
+                    end_label: "ZX81BAS14FOREND"
                 }
             ]
+            end_label: "ZX81BAS13FOREND"
         }
         ForStmt {
             location: test_t_input_08_t.bas:332
@@ -3864,8 +3903,14 @@ Prog {
                                 }
                         }
                     then_stmts: [
-                        ExitStmt {
+                        GotoStmt {
                             location: test_t_input_08_t.bas:334
+                            target_expr: 
+                                LabelLineRefExpr {
+                                    type: Number
+                                    location: test_t_input_08_t.bas:334
+                                    name: "ZX81BAS15FOREND"
+                                }
                         }
                     ]
                     else_stmts: [
@@ -3921,8 +3966,10 @@ Prog {
                                 }
                         }
                     ]
+                    end_label: "ZX81BAS16FOREND"
                 }
             ]
+            end_label: "ZX81BAS15FOREND"
         }
         ForStmt {
             location: test_t_input_08_t.bas:340
@@ -3996,8 +4043,10 @@ Prog {
                                 }
                         }
                     ]
+                    end_label: "ZX81BAS18FOREND"
                 }
             ]
+            end_label: "ZX81BAS17FOREND"
         }
         ForStmt {
             location: test_t_input_08_t.bas:342
@@ -4071,8 +4120,10 @@ Prog {
                                 }
                         }
                     ]
+                    end_label: "ZX81BAS20FOREND"
                 }
             ]
+            end_label: "ZX81BAS19FOREND"
         }
         DefProcStmt {
             location: test_t_input_08_t.bas:350
@@ -4149,7 +4200,7 @@ Prog {
                                 }
                         }
                     then_stmts: [
-                        ExitStmt {
+                        ReturnStmt {
                             location: test_t_input_08_t.bas:357
                         }
                     ]

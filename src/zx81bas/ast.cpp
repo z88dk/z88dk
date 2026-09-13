@@ -548,17 +548,6 @@ void FnCallExpr::dump(DumpContext ctx) const {
 // Statement tree
 //-----------------------------------------------------------------------------
 
-template<typename T>
-void erase_marked(std::vector<std::unique_ptr<T>>& vec) {
-    vec.erase(
-        std::remove_if(vec.begin(), vec.end(),
-    [](auto & ptr) {
-        return ptr->mark_for_removal;
-    }),
-    vec.end()
-    );
-}
-
 Stmt::Stmt(const SourceLoc& loc_)
     : loc(loc_) {
 }
@@ -569,7 +558,6 @@ LabelStmt::LabelStmt(const std::string& label_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> LabelStmt::clone() const {
     auto s = std::make_unique<LabelStmt>(label, loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -597,7 +585,6 @@ LineNumStmt::LineNumStmt(int line_num_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> LineNumStmt::clone() const {
     auto s = std::make_unique<LineNumStmt>(line_num, loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -626,7 +613,6 @@ LetStmt::LetStmt(std::unique_ptr<Expr> lhs_, std::unique_ptr<Expr> rhs_,
 
 std::unique_ptr<Stmt> LetStmt::clone() const {
     auto s = std::make_unique<LetStmt>(lhs->clone(), rhs->clone(), loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -653,7 +639,6 @@ void LetStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> DimStmt::clone() const {
     auto s = std::make_unique<DimStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     for (auto& item : items) {
         DimItem new_item;
         new_item.name = item.name;
@@ -701,44 +686,12 @@ void DimStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> BlockStmt::clone() const {
-    auto s = std::make_unique<BlockStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
-    for (auto& stmt : body) {
-        s->body.push_back(stmt->clone());
-    }
-    return s;
-}
-
-void BlockStmt::accept(ASTVisitor& v) {
-    if (v.enter(*this)) {
-        v.visit(*this);
-        // accept children
-        for (auto& stmt : body) {
-            stmt->accept(v);
-        }
-        erase_marked(body);
-        v.leave(*this);
-    }
-}
-
-#ifdef _DEBUG
-void BlockStmt::dump(DumpContext ctx) const {
-    ctx.line("BlockStmt {");
-    auto child_ctx = ctx.child();
-    dump_stmt_common(*this, child_ctx);
-    dump_stmt_list("body", body, child_ctx);
-    ctx.line("}");
-}
-#endif
-
 IfStmt::IfStmt(std::unique_ptr<Expr> condition_, const SourceLoc& loc_)
     : Stmt(loc_), condition(std::move(condition_)) {
 }
 
 std::unique_ptr<Stmt> IfStmt::clone() const {
     auto s = std::make_unique<IfStmt>(condition->clone(), loc);
-    s->mark_for_removal = mark_for_removal;
     for (auto& stmt : then_stmts) {
         s->then_stmts.push_back(stmt->clone());
     }
@@ -753,14 +706,8 @@ void IfStmt::accept(ASTVisitor& v) {
         v.visit(*this);
         // accept children
         condition->accept(v);
-        for (auto& stmt : then_stmts) {
-            stmt->accept(v);
-        }
-        erase_marked(then_stmts);
-        for (auto& stmt : else_stmts) {
-            stmt->accept(v);
-        }
-        erase_marked(else_stmts);
+        v.rewrite_stmt_list(then_stmts);
+        v.rewrite_stmt_list(else_stmts);
         v.leave(*this);
     }
 }
@@ -783,7 +730,6 @@ RepeatStmt::RepeatStmt(std::unique_ptr<Expr> condition_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> RepeatStmt::clone() const {
     auto s = std::make_unique<RepeatStmt>(condition->clone(), loc);
-    s->mark_for_removal = mark_for_removal;
     for (auto& stmt : body) {
         s->body.push_back(stmt->clone());
     }
@@ -794,10 +740,7 @@ void RepeatStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        for (auto& stmt : body) {
-            stmt->accept(v);
-        }
-        erase_marked(body);
+        v.rewrite_stmt_list(body);
         condition->accept(v);
         v.leave(*this);
     }
@@ -810,6 +753,8 @@ void RepeatStmt::dump(DumpContext ctx) const {
     dump_stmt_common(*this, child_ctx);
     dump_stmt_list("body", body, child_ctx);
     dump_child_expr("condition", condition.get(), child_ctx);
+    child_ctx.line("start_label: \"" + start_label + "\"");
+    child_ctx.line("end_label: \"" + end_label + "\"");
     ctx.line("}");
 }
 #endif
@@ -820,7 +765,6 @@ WhileStmt::WhileStmt(std::unique_ptr<Expr> condition_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> WhileStmt::clone() const {
     auto s = std::make_unique<WhileStmt>(condition->clone(), loc);
-    s->mark_for_removal = mark_for_removal;
     for (auto& stmt : body) {
         s->body.push_back(stmt->clone());
     }
@@ -832,10 +776,7 @@ void WhileStmt::accept(ASTVisitor& v) {
         v.visit(*this);
         // accept children
         condition->accept(v);
-        for (auto& stmt : body) {
-            stmt->accept(v);
-        }
-        erase_marked(body);
+        v.rewrite_stmt_list(body);
         v.leave(*this);
     }
 }
@@ -847,6 +788,8 @@ void WhileStmt::dump(DumpContext ctx) const {
     dump_stmt_common(*this, child_ctx);
     dump_child_expr("condition", condition.get(), child_ctx);
     dump_stmt_list("body", body, child_ctx);
+    child_ctx.line("start_label: \"" + start_label + "\"");
+    child_ctx.line("end_label: \"" + end_label + "\"");
     ctx.line("}");
 }
 #endif
@@ -864,7 +807,6 @@ std::unique_ptr<Stmt> ForStmt::clone() const {
                                        end_expr->clone(),
                                        step_expr->clone(),
                                        loc);
-    s->mark_for_removal = mark_for_removal;
     for (auto& stmt : body) {
         s->body.push_back(stmt->clone());
     }
@@ -878,10 +820,7 @@ void ForStmt::accept(ASTVisitor& v) {
         start_expr->accept(v);
         end_expr->accept(v);
         step_expr->accept(v);
-        for (auto& stmt : body) {
-            stmt->accept(v);
-        }
-        erase_marked(body);
+        v.rewrite_stmt_list(body);
         v.leave(*this);
     }
 }
@@ -896,6 +835,7 @@ void ForStmt::dump(DumpContext ctx) const {
     dump_child_expr("end_expr", end_expr.get(), child_ctx);
     dump_child_expr("step_expr", step_expr.get(), child_ctx);
     dump_stmt_list("body", body, child_ctx);
+    child_ctx.line("end_label: \"" + end_label + "\"");
     ctx.line("}");
 }
 #endif
@@ -906,7 +846,6 @@ NextStmt::NextStmt(const std::string& name_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> NextStmt::clone() const {
     auto s = std::make_unique<NextStmt>(name, loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -934,7 +873,6 @@ DefProcStmt::DefProcStmt(const std::string& name_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> DefProcStmt::clone() const {
     auto s = std::make_unique<DefProcStmt>(name, loc);
-    s->mark_for_removal = mark_for_removal;
     s->params = params;
     s->locals = locals;
     s->called = called;
@@ -948,10 +886,7 @@ void DefProcStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        for (auto& stmt : body) {
-            stmt->accept(v);
-        }
-        erase_marked(body);
+        v.rewrite_stmt_list(body);
         v.leave(*this);
     }
 }
@@ -975,7 +910,6 @@ ProcCallStmt::ProcCallStmt(const std::string& name_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> ProcCallStmt::clone() const {
     auto s = std::make_unique<ProcCallStmt>(name, loc);
-    s->mark_for_removal = mark_for_removal;
     for (auto& arg : args) {
         s->args.push_back(arg->clone());
     }
@@ -1006,7 +940,6 @@ void ProcCallStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> LocalStmt::clone() const {
     auto s = std::make_unique<LocalStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     s->locals = locals;
     return s;
 }
@@ -1035,7 +968,6 @@ DefFnStmt::DefFnStmt(const std::string& name_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> DefFnStmt::clone() const {
     auto s = std::make_unique<DefFnStmt>(name, loc);
-    s->mark_for_removal = mark_for_removal;
     s->params = params;
     s->expr = expr->clone();
     return s;
@@ -1064,7 +996,6 @@ void DefFnStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> ExitStmt::clone() const {
     auto s = std::make_unique<ExitStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1091,7 +1022,6 @@ GotoStmt::GotoStmt(std::unique_ptr<Expr> target_expr_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> GotoStmt::clone() const {
     auto s = std::make_unique<GotoStmt>(target_expr->clone(), loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1120,7 +1050,6 @@ GosubStmt::GosubStmt(std::unique_ptr<Expr> target_expr_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> GosubStmt::clone() const {
     auto s = std::make_unique<GosubStmt>(target_expr->clone(), loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1145,7 +1074,6 @@ void GosubStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> ReturnStmt::clone() const {
     auto s = std::make_unique<ReturnStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1168,7 +1096,6 @@ void ReturnStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> StopStmt::clone() const {
     auto s = std::make_unique<StopStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1191,7 +1118,6 @@ void StopStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> EndStmt::clone() const {
     auto s = std::make_unique<EndStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1214,7 +1140,6 @@ void EndStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> PrintStmt::clone() const {
     auto s = std::make_unique<PrintStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     for (auto& item : items) {
         PrintItem new_item;
         new_item.type = item.type;
@@ -1303,7 +1228,6 @@ void PrintStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> InputStmt::clone() const {
     auto s = std::make_unique<InputStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     for (auto& var : vars) {
         s->vars.push_back(var->clone());
     }
@@ -1337,7 +1261,6 @@ RemStmt::RemStmt(const std::string& text_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> RemStmt::clone() const {
     auto s = std::make_unique<RemStmt>(text, loc);
-    s->mark_for_removal = mark_for_removal;
     s->asm_lines = asm_lines;
     return s;
 }
@@ -1363,7 +1286,6 @@ void RemStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> RunStmt::clone() const {
     auto s = std::make_unique<RunStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     if (target_expr) {
         s->target_expr = target_expr->clone();
     }
@@ -1393,7 +1315,6 @@ void RunStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> ListStmt::clone() const {
     auto s = std::make_unique<ListStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     if (target_expr) {
         s->target_expr = target_expr->clone();
     }
@@ -1423,7 +1344,6 @@ void ListStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> NewStmt::clone() const {
     auto s = std::make_unique<NewStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1446,7 +1366,6 @@ void NewStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> ClsStmt::clone() const {
     auto s = std::make_unique<ClsStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1473,7 +1392,6 @@ LoadStmt::LoadStmt(std::unique_ptr<Expr> filename_expr_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> LoadStmt::clone() const {
     auto s = std::make_unique<LoadStmt>(filename_expr->clone(), loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1502,7 +1420,6 @@ SaveStmt::SaveStmt(std::unique_ptr<Expr> filename_expr_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> SaveStmt::clone() const {
     auto s = std::make_unique<SaveStmt>(filename_expr->clone(), loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1534,7 +1451,6 @@ PokeStmt::PokeStmt(std::unique_ptr<Expr> address_expr_,
 std::unique_ptr<Stmt> PokeStmt::clone() const {
     auto s = std::make_unique<PokeStmt>(address_expr->clone(), value_expr->clone(),
                                         loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1568,7 +1484,6 @@ PokewStmt::PokewStmt(std::unique_ptr<Expr> address_expr_,
 std::unique_ptr<Stmt> PokewStmt::clone() const {
     auto s = std::make_unique<PokewStmt>(address_expr->clone(), value_expr->clone(),
                                          loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1600,7 +1515,6 @@ PlotStmt::PlotStmt(std::unique_ptr<Expr> x_expr_, std::unique_ptr<Expr> y_expr_,
 
 std::unique_ptr<Stmt> PlotStmt::clone() const {
     auto s = std::make_unique<PlotStmt>(x_expr->clone(), y_expr->clone(), loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1632,7 +1546,6 @@ UnplotStmt::UnplotStmt(std::unique_ptr<Expr> x_expr_,
 
 std::unique_ptr<Stmt> UnplotStmt::clone() const {
     auto s = std::make_unique<UnplotStmt>(x_expr->clone(), y_expr->clone(), loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1663,7 +1576,6 @@ RandStmt::RandStmt(std::unique_ptr<Expr> seed_expr_, const SourceLoc& loc_)
 
 std::unique_ptr<Stmt> RandStmt::clone() const {
     auto s = std::make_unique<RandStmt>(seed_expr->clone(), loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1693,7 +1605,6 @@ PauseStmt::PauseStmt(std::unique_ptr<Expr> duration_expr_,
 
 std::unique_ptr<Stmt> PauseStmt::clone() const {
     auto s = std::make_unique<PauseStmt>(duration_expr->clone(), loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1718,7 +1629,6 @@ void PauseStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> FastStmt::clone() const {
     auto s = std::make_unique<FastStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1741,7 +1651,6 @@ void FastStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> SlowStmt::clone() const {
     auto s = std::make_unique<SlowStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1764,7 +1673,6 @@ void SlowStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> ScrollStmt::clone() const {
     auto s = std::make_unique<ScrollStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1787,7 +1695,6 @@ void ScrollStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> ContStmt::clone() const {
     auto s = std::make_unique<ContStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1810,7 +1717,6 @@ void ContStmt::dump(DumpContext ctx) const {
 
 std::unique_ptr<Stmt> ClearStmt::clone() const {
     auto s = std::make_unique<ClearStmt>(loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1838,7 +1744,6 @@ PragmaNumVarStmt::PragmaNumVarStmt(std::string name_, double value_,
 
 std::unique_ptr<Stmt> PragmaNumVarStmt::clone() const {
     auto s = std::make_unique<PragmaNumVarStmt>(name, value, loc);
-    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -1868,7 +1773,6 @@ PragmaStrVarStmt::PragmaStrVarStmt(std::string name_, std::string value_,
 
 std::unique_ptr<Stmt> PragmaStrVarStmt::clone() const {
     auto s = std::make_unique<PragmaStrVarStmt>(name, value, loc);
-    s->mark_for_removal = mark_for_removal;
     s->asm_lines = asm_lines;
     return s;
 }
@@ -1900,7 +1804,6 @@ PragmaNumVarArrayStmt::PragmaNumVarArrayStmt(std::string name_,
 
 std::unique_ptr<Stmt> PragmaNumVarArrayStmt::clone() const {
     auto s = std::make_unique<PragmaNumVarArrayStmt>(name, loc);
-    s->mark_for_removal = mark_for_removal;
     s->dims = dims;
     s->values = values;
     return s;
@@ -1943,7 +1846,6 @@ PragmaStrVarArrayStmt::PragmaStrVarArrayStmt(std::string name_,
 
 std::unique_ptr<Stmt> PragmaStrVarArrayStmt::clone() const {
     auto s = std::make_unique<PragmaStrVarArrayStmt>(name, loc);
-    s->mark_for_removal = mark_for_removal;
     s->dims = dims;
     s->values = values;
     return s;
@@ -1978,10 +1880,7 @@ void Prog::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        for (auto& stmt : stmts) {
-            stmt->accept(v);
-        }
-        erase_marked(stmts);
+        v.rewrite_stmt_list(stmts);
         v.leave(*this);
     }
 }
@@ -2014,3 +1913,261 @@ void Prog::dump(DumpContext ctx) const {
     ctx.line("}");
 }
 #endif
+
+//-----------------------------------------------------------------------------
+// Visitor
+//-----------------------------------------------------------------------------
+
+void ASTVisitor::rewrite_stmt_list(std::vector<std::unique_ptr<Stmt>>& list) {
+    std::vector<std::unique_ptr<Stmt>> new_list;
+
+    for (auto& stmt : list) {
+        // Visit the node
+        stmt->accept(*this);
+
+        // Prepend nodes requested by visitor
+        for (auto& n : stmt->prepend_nodes) {
+            new_list.push_back(std::move(n));
+        }
+        stmt->prepend_nodes.clear();
+
+        // if marked for removal, skip adding the node to the new list
+        if (stmt->marked_for_removal) {
+            release_assert(stmt->append_nodes.empty());
+            continue;
+        }
+        new_list.push_back(std::move(stmt));
+
+        // Append nodes requested by visitor, only if not marked for removal
+        for (auto& n : new_list.back()->append_nodes) {
+            new_list.push_back(std::move(n));
+        }
+        new_list.back()->append_nodes.clear();
+    }
+
+    list = std::move(new_list);
+}
+
+bool ASTVisitor::enter(NumberExpr&) {
+    return true;
+}
+
+bool ASTVisitor::enter(LabelLineRefExpr&) {
+    return true;
+}
+
+bool ASTVisitor::enter(LabelAddrRefExpr&) {
+    return true;
+}
+
+bool ASTVisitor::enter(StringLiteralExpr&) {
+    return true;
+}
+
+bool ASTVisitor::enter(VariableExpr&) {
+    return true;
+}
+
+bool ASTVisitor::enter(ArrayRefExpr&) {
+    return true;
+}
+
+bool ASTVisitor::enter(SliceExpr&) {
+    return true;
+}
+
+bool ASTVisitor::enter(UnaryExpr&) {
+    return true;
+}
+
+bool ASTVisitor::enter(BinaryExpr&) {
+    return true;
+}
+
+bool ASTVisitor::enter(BasicFuncCallExpr&) {
+    return true;
+}
+
+bool ASTVisitor::enter(ProcCallExpr&) {
+    return true;
+}
+
+bool ASTVisitor::enter(FnCallExpr&) {
+    return true;
+}
+
+bool ASTVisitor::enter(LabelStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(LineNumStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(LetStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(DimStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(IfStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(RepeatStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(WhileStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(ForStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(NextStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(DefProcStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(ProcCallStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(LocalStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(DefFnStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(ExitStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(GotoStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(GosubStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(ReturnStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(StopStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(EndStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(PrintStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(InputStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(RemStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(RunStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(ListStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(NewStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(ClsStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(LoadStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(SaveStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(PokeStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(PokewStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(PlotStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(UnplotStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(RandStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(PauseStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(FastStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(SlowStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(ScrollStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(ContStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(ClearStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(PragmaNumVarStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(PragmaStrVarStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(PragmaNumVarArrayStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(PragmaStrVarArrayStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(Prog&) {
+    return true;
+}

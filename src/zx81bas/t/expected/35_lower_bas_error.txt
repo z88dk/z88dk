@@ -1,0 +1,6 @@
+% z88dk-zx81bas -d 8 t//input/35_lower_bas_error.bas
+Input file:  t/input/35_lower_bas_error.bas
+Output file: t/input/35_lower_bas_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/35_lower_bas_error.i" "t/input/35_lower_bas_error.pp"
+t/input/35_lower_bas_error.bas:2: error: EXIT statement not inside a loop or PROC
+1 error found

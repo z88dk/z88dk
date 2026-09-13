@@ -3073,6 +3073,8 @@ Prog {
                             value: 1.000000
                         }
                 }
+            start_label: ""
+            end_label: ""
         }
         RepeatStmt {
             location: test_t_input_07_t.bas:289
@@ -3129,6 +3131,8 @@ Prog {
                                     value: 1.000000
                                 }
                         }
+                    start_label: ""
+                    end_label: ""
                 }
             ]
             condition: 
@@ -3149,6 +3153,8 @@ Prog {
                             value: 2.000000
                         }
                 }
+            start_label: ""
+            end_label: ""
         }
         RepeatStmt {
             location: test_t_input_07_t.bas:291
@@ -3248,6 +3254,8 @@ Prog {
                                     value: 2.000000
                                 }
                         }
+                    start_label: ""
+                    end_label: ""
                 }
             ]
             condition: 
@@ -3268,6 +3276,8 @@ Prog {
                             value: 1.000000
                         }
                 }
+            start_label: ""
+            end_label: ""
         }
         RepeatStmt {
             location: test_t_input_07_t.bas:300
@@ -3321,6 +3331,8 @@ Prog {
                             value: 1.000000
                         }
                 }
+            start_label: ""
+            end_label: ""
         }
         LetStmt {
             location: test_t_input_07_t.bas:301
@@ -3404,6 +3416,8 @@ Prog {
                         }
                 }
             ]
+            start_label: ""
+            end_label: ""
         }
         WhileStmt {
             location: test_t_input_07_t.bas:309
@@ -3478,8 +3492,12 @@ Prog {
                                 }
                         }
                     ]
+                    start_label: ""
+                    end_label: ""
                 }
             ]
+            start_label: ""
+            end_label: ""
         }
         WhileStmt {
             location: test_t_input_07_t.bas:311
@@ -3597,8 +3615,12 @@ Prog {
                                 }
                         }
                     ]
+                    start_label: ""
+                    end_label: ""
                 }
             ]
+            start_label: ""
+            end_label: ""
         }
         WhileStmt {
             location: test_t_input_07_t.bas:320
@@ -3637,6 +3659,8 @@ Prog {
                         }
                 }
             ]
+            start_label: ""
+            end_label: ""
         }
         LetStmt {
             location: test_t_input_07_t.bas:321
@@ -3718,6 +3742,7 @@ Prog {
                         }
                 }
             ]
+            end_label: ""
         }
         ForStmt {
             location: test_t_input_07_t.bas:330
@@ -3791,8 +3816,10 @@ Prog {
                                 }
                         }
                     ]
+                    end_label: ""
                 }
             ]
+            end_label: ""
         }
         ForStmt {
             location: test_t_input_07_t.bas:332
@@ -3921,8 +3948,10 @@ Prog {
                                 }
                         }
                     ]
+                    end_label: ""
                 }
             ]
+            end_label: ""
         }
         ForStmt {
             location: test_t_input_07_t.bas:340
@@ -3996,8 +4025,10 @@ Prog {
                                 }
                         }
                     ]
+                    end_label: ""
                 }
             ]
+            end_label: ""
         }
         ForStmt {
             location: test_t_input_07_t.bas:342
@@ -4071,8 +4102,10 @@ Prog {
                                 }
                         }
                     ]
+                    end_label: ""
                 }
             ]
+            end_label: ""
         }
         DefProcStmt {
             location: test_t_input_07_t.bas:350

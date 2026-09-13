@@ -5,14 +5,124 @@
 //-----------------------------------------------------------------------------
 
 #include "ast.h"
+#include "errors.h"
 #include "lower_bas.h"
+#include "release_assert.h"
 #include "symtab.h"
+#include "utils.h"
+#include "zx81bas.h"
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
+static std::string gen_label(const std::string& prefix) {
+    static int counter = 0;
+    return SYMBOL_PREFIX + std::to_string(counter++) + str_toupper(prefix);;
+}
+
+// lower loops and EXIT statements
+struct LowerExitVisitor : ASTVisitor {
+
+    struct ControlStackEntry {
+        enum class Type {
+            Loop,
+            Proc,
+        };
+        Type type;
+        std::string end_label;      // label for the end of the control structure
+
+        ControlStackEntry(Type type_, const std::string& end_label_)
+            : type(type_), end_label(end_label_) {}
+    };
+
+    std::vector<ControlStackEntry> control_stack;
+
+    bool enter(RepeatStmt& stmt) override {
+        // enter a new block for EXIT
+        std::string radix = gen_label("REPEAT");
+        stmt.start_label = radix + "START";
+        stmt.end_label = radix + "END";
+        control_stack.emplace_back(ControlStackEntry::Type::Loop, stmt.end_label);
+        return true;
+    }
+
+    void leave(RepeatStmt&) override {
+        control_stack.pop_back();
+    }
+
+    bool enter(WhileStmt& stmt) override {
+        // enter a new block for EXIT
+        std::string radix = gen_label("WHILE");
+        stmt.start_label = radix + "START";
+        stmt.end_label = radix + "END";
+        control_stack.emplace_back(ControlStackEntry::Type::Loop, stmt.end_label);
+        return true;
+    }
+
+    void leave(WhileStmt&) override {
+        control_stack.pop_back();
+    }
+
+    bool enter(ForStmt& stmt) override {
+        // enter a new block for EXIT
+        std::string radix = gen_label("FOR");
+        stmt.end_label = radix + "END";
+        control_stack.emplace_back(ControlStackEntry::Type::Loop, stmt.end_label);
+        return true;
+    }
+
+    void leave(ForStmt&) override {
+        control_stack.pop_back();
+    }
+
+    bool enter(DefProcStmt&) override {
+        // enter a new block for EXIT
+        control_stack.emplace_back(ControlStackEntry::Type::Proc, "");
+        return true;
+    }
+
+    void leave(DefProcStmt&) override {
+        control_stack.pop_back();
+    }
+
+    void visit(ExitStmt& stmt) override {
+        if (control_stack.empty()) {
+            error(stmt.loc, "EXIT statement not inside a loop or PROC");
+            return;
+        }
+
+        const auto& entry = control_stack.back();
+        switch (entry.type) {
+        case ControlStackEntry::Type::Loop: {
+            auto target_expr = std::make_unique<LabelLineRefExpr>(entry.end_label,
+                               stmt.loc);
+            stmt.prepend_nodes.push_back(std::make_unique<GotoStmt>(std::move(target_expr),
+                                         stmt.loc));
+            stmt.marked_for_removal = true;
+            break;
+        }
+        case ControlStackEntry::Type::Proc: {
+            stmt.prepend_nodes.push_back(std::make_unique<ReturnStmt>(stmt.loc));
+            stmt.marked_for_removal = true;
+            break;
+        }
+        default:
+            release_assert(0);
+        }
+    }
+};
+
+static void lower_exit(Prog& prog) {
+    LowerExitVisitor visitor;
+    prog.accept(visitor);
+}
 
 bool lower_prog(Prog& prog, Symtab& symtab) {
-    (void)prog;
+    lower_exit(prog);
+
     (void)symtab;
-    return true;
+    return get_error_count() == 0;
 }
 
 
@@ -28,8 +138,6 @@ bool lower_prog(Prog& prog, Symtab& symtab) {
 #include "options.h"
 #include "release_assert.h"
 #include "symtab.h"
-#include "utils.h"
-#include "zx81bas.h"
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
@@ -39,27 +147,12 @@ bool lower_prog(Prog& prog, Symtab& symtab) {
 #include <utility>
 #include <vector>
 
-struct ControlStackEntry {
-    enum class Type {
-        Loop,
-        Proc,
-    };
-    Type type;
-    std::string end_label;  // label for the end of the control structure
-
-    ControlStackEntry(Type type_, const std::string& end_label_)
-        : type(type_), end_label(end_label_) {}
-};
 
 struct LoweredExpr {
     std::vector<std::unique_ptr<Stmt>> preamble;
     std::unique_ptr<Expr> rewritten;
 };
 
-static std::string gen_label(const std::string& prefix) {
-    static int counter = 0;
-    return SYMBOL_PREFIX + std::to_string(counter++) + str_toupper(prefix);;
-}
 
 static void append_stmts(std::vector<std::unique_ptr<Stmt>>& dst,
                          std::vector<std::unique_ptr<Stmt>>& src) {
@@ -438,7 +531,7 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             out_prog.stmts.push_back(std::move(target_stmt));
         }
         else if (auto repeat_stmt = dynamic_cast<RepeatStmt*>(stmt.get())) {
-            // enter a new loop for EXIT
+            // enter a new block for EXIT
             std::string start_label = gen_label("start");
             std::string end_label = gen_label("end");
             control_stack.push_back({ ControlStackEntry::Type::Loop, end_label });
@@ -476,11 +569,11 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             target_stmt = std::make_unique<LabelStmt>(end_label, repeat_stmt->loc);
             out_prog.stmts.push_back(std::move(target_stmt));
 
-            // drop the loop for EXIT
+            // drop the block for EXIT
             control_stack.pop_back();
         }
         else if (auto while_stmt = dynamic_cast<WhileStmt*>(stmt.get())) {
-            // enter a new loop for EXIT
+            // enter a new block for EXIT
             std::string start_label = gen_label("start");
             std::string end_label = gen_label("end");
             control_stack.push_back({ ControlStackEntry::Type::Loop, end_label });
@@ -524,11 +617,11 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             target_stmt = std::make_unique<LabelStmt>(end_label, while_stmt->loc);
             out_prog.stmts.push_back(std::move(target_stmt));
 
-            // drop the loop for EXIT
+            // drop the block for EXIT
             control_stack.pop_back();
         }
         else if (auto for_stmt = dynamic_cast<ForStmt*>(stmt.get())) {
-            // enter a new loop for EXIT
+            // enter a new block for EXIT
             std::string end_label = gen_label("end");
             control_stack.push_back({ ControlStackEntry::Type::Loop, end_label });
 
@@ -564,7 +657,7 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             auto target_stmt = std::make_unique<LabelStmt>(end_label, for_stmt->loc);
             out_prog.stmts.push_back(std::move(target_stmt));
 
-            // drop the loop for EXIT
+            // drop the block for EXIT
             control_stack.pop_back();
         }
         else if (auto proc_call_stmt = dynamic_cast<ProcCallStmt*>(stmt.get())) {

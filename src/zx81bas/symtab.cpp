@@ -39,7 +39,7 @@ struct LocalCollector : ASTVisitor {
                 locals.push_back(local);
             }
         }
-        stmt.mark_for_removal = true; // remove the LOCAL statement after collecting
+        stmt.marked_for_removal = true; // remove the LOCAL statement after collecting
     }
 };
 
@@ -114,7 +114,7 @@ struct ProcRewriter : ASTVisitor {
         if (proc_nesting == 0) {
             error(stmt.loc, "LOCAL outside PROC");
         }
-        stmt.mark_for_removal = true; // remove the LOCAL statement
+        stmt.marked_for_removal = true; // remove the LOCAL statement
     }
 };
 
@@ -266,7 +266,7 @@ struct SymbolCollector : ASTVisitor {
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());
-        stmt.mark_for_removal = true;
+        stmt.marked_for_removal = true;
     }
 
     void visit(PragmaStrVarStmt& stmt) override {
@@ -274,7 +274,7 @@ struct SymbolCollector : ASTVisitor {
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());
-        stmt.mark_for_removal = true;
+        stmt.marked_for_removal = true;
     }
 
     void visit(PragmaNumVarArrayStmt& stmt) override {
@@ -282,7 +282,7 @@ struct SymbolCollector : ASTVisitor {
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());
-        stmt.mark_for_removal = true;
+        stmt.marked_for_removal = true;
     }
 
     void visit(PragmaStrVarArrayStmt& stmt) override {
@@ -290,7 +290,7 @@ struct SymbolCollector : ASTVisitor {
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());
-        stmt.mark_for_removal = true;
+        stmt.marked_for_removal = true;
     }
 };
 
