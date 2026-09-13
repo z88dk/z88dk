@@ -755,7 +755,7 @@ static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
             load_to_hl(out, f, op->src[1]);
             return;
         }
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         swap_hl_de_caches();
         load_to_hl(out, f, op->src[1]);
         return;
@@ -777,7 +777,7 @@ static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
             load_to_hl(out, f, op->src[1]);
             return;
         }
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         swap_hl_de_caches();
         load_to_de_preserve_hl(out, f, op->src[0]);
         cache_de(op->src[0]);
@@ -1018,7 +1018,7 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
             emit(out, "xor\tb");
             emit(out, "or\tc");
             emit(out, "ld\tc,a");
-            emit(out, "pop\thl");          /* HL = RHS high */
+            emit_pop_hl(out);          /* HL = RHS high */
             emit(out, "ld\ta,e");
             emit(out, "xor\tl");
             emit(out, "or\tc");
@@ -1200,13 +1200,16 @@ static int gen_sar16(FILE *out, Func *f, const Op *op);
    `rrca`×r / `rlca`×(8-r) (both land the bits identically) then mask off the
    rotated-in wrap-around. Beats r zero-filling shifts once r grows, and every
    CPU has rrca/rlca/and-immediate. */
-static void emit_byte_lsr_a(FILE *out, int r)
+static void emit_byte_lsr_a(FILE *out, int r, int mask_redundant)
 {
     if (r <= 4)
         for (int i = 0; i < r; i++)     emit(out, "rrca");
     else
         for (int i = 0; i < 8 - r; i++) emit(out, "rlca");
-    emit(out, "and\t%d", 0xff >> r);
+    /* [IR_SHRMASK] The caller's own AND already clears every bit the rotate
+       wrapped round (its mask lies inside 0xff>>r), so this one is dead. */
+    if (!mask_redundant)
+        emit(out, "and\t%d", 0xff >> r);
 }
 
 static int gen_shr(FILE *out, Func *f, const Op *op)
@@ -1219,9 +1222,9 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
     /* Byte >> const, in A — the mirror of gen_shl's byte path. Only reached
        when ir_opt_narrow_byte proved the shifted value fits a byte (an int
        source would pull bits down out of its high byte), and only on CPUs
-       with the CB shifts: 8080 and 8085 have no CB prefix at all (8085's
-       undocumented ARHL is 16-bit `sra hl` only), so narrow_shr_kind declines
-       for both and the 16-bit path below still applies. */
+       with the CB shifts — except that a natively byte-typed `*p >>= n` lands
+       here on EVERY CPU, narrowing or not, so the 808x case is handled inline
+       below rather than kept out by narrow_shr_kind. */
     if (op->dst >= 0 && f->vregs[op->dst].width == 1 && op->src[1] < 0) {
         int count = (int)op->imm & 7;
         if (((int)(op->imm & 0xff)) >= 8) {
@@ -1235,8 +1238,31 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             emit(out, "sbc\ta,a");          /* 0x00 / 0xFF */
             return finalize_byte_result(out, f, op, 0);
         }
+        /* [IR_SHRMASK top-byte] The field straddles the byte boundary, so no
+           single source byte holds it — but `(x >> n) & M` with M inside one
+           byte is just the HIGH byte of `x << (8-n)`. `add hl,hl` is one byte
+           on every target here, so aligning the field upward costs (8-n) bytes
+           against the (8-n < 4n for n >= 2) four-byte `srl h; rr l` pairs — and
+           on 808x it replaces a CALL to the l_asr_u runtime loop. HL is the
+           natural home and no scratch register is needed. */
+        if (!arith && (op->imm & IR_SHR_TOPBYTE) && count >= 2 && count <= 7) {
+            load_to_hl(out, f, op->src[0]);
+            for (int k = 0; k < 8 - count; k++) emit(out, "add\thl,hl");
+            emit(out, "ld\ta,h");
+            hl_about_to_change(-1);      /* HL is the shifted value, not src */
+            return finalize_byte_result(out, f, op, 0);
+        }
         load_byte_to_a(out, f, op->src[0]);
         cache_a(op->src[0]);
+        /* [IR_SHRMASK] A masked shift is cheaper as a bare rotate on EVERY CPU:
+           min(r, 8-r) x 1-byte `rrca`/`rlca` against r x 2-byte `srl a`, and no
+           clean-up mask at all. Better on both axes (rrca is 4 cycles to srl
+           a's 8), so it is tried BEFORE the gbz80 swap path below, which it
+           also beats — swap+and+srl x (r-4) is 6 bytes at r=5 against 3. */
+        if (!arith && (op->imm & IR_SHR_MASKED)) {
+            emit_byte_lsr_a(out, count, 1);
+            return finalize_byte_result(out, f, op, count == 0);
+        }
         /* gbz80 `swap a` exchanges the nibbles, so a logical shift of 4 or more
            gets its first four bits for one op: swap, mask the junk that came
            down from the low nibble, then finish with the remainder. Flat saving
@@ -1253,6 +1279,21 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             emit(out, "and\t%d", 0x0f);
             for (int k = 4; k < count; k++) emit(out, "srl\ta");
             return finalize_byte_result(out, f, op, 0);
+        }
+        /* 8080/8085 have no CB prefix, so neither `srl a` nor `sra a` exists
+           (8085's undocumented ARHL is the 16-bit `sra hl` only). narrow_shr_kind
+           keeps the NARROWED int out of here, but a natively byte-typed `*p >>= n`
+           arrives with a width-1 dst anyway, so the CPU test has to be here too.
+             logical     rrca/rlca + mask, which every CPU has and which is 1 byte
+                         a step against `srl a`'s 2;
+             arithmetic  no 808x equivalent, so use the bias identity
+                         `sra(a,n) == ((a ^ 0x80) >>_logical n) - (0x80 >> n)`,
+                         branchless and clobbering only A. */
+        if (IS_808x()) {
+            if (arith) emit(out, "xor\t%d", 0x80);
+            emit_byte_lsr_a(out, count, !arith && (op->imm & IR_SHR_MASKED));
+            if (arith) emit(out, "sub\t%d", 0x80 >> count);
+            return finalize_byte_result(out, f, op, count == 0);
         }
         for (int k = 0; k < count; k++)
             emit(out, arith ? "sra\ta" : "srl\ta");
@@ -1339,6 +1380,45 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         }
         int byte_shift = count / 8;
         int bit_shift  = count % 8;
+        /* Bytes of the DEHL value that carry data after the byte shift. The
+           low `byte_shift` are discarded, so 4 - byte_shift remain — unless
+           [IR_SHRNARROW] proved the result is truncated to W bytes, in which
+           case only source bytes up to (count + 8W - 1)/8 matter and the ones
+           above may be left ZERO. Everything below is indexed by this count
+           rather than by byte_shift, so the untrimmed case is unchanged. */
+        int active = 4 - byte_shift;
+        {
+            int W = L.la.cur_shr_trunc_bytes;
+            if (W > 0 && W < 4) {
+                int hi = (count + 8 * W - 1) / 8;
+                if (hi > 3) hi = 3;
+                int want = hi - byte_shift + 1;
+                if (want >= 1 && want < active && !dehl_has(op->src[0])
+                    && partial_load_long_window(out, f, op->src[0],
+                                                byte_shift, hi)) {
+                    invalidate_hl_cache();
+                    active = want;
+                    /* DIRECTION FLIP. Shifting a 2-byte window RIGHT by K to
+                       keep byte 0 is the same as shifting it LEFT by 8-K and
+                       keeping byte 1 — `add hl,hl` is ONE byte against the
+                       two-op `srl h; rr l`, so past K=4 the other direction is
+                       strictly shorter and fewer iterations. K=5 goes from
+                       5x(srl h; rr l) to 3x`add hl,hl` plus `ld l,h`. This is
+                       what sdcc does. Only for a single-byte result: a wider
+                       one needs two bytes off the top, which `ld l,h` cannot
+                       deliver. H is left dirty — permitted by the same
+                       single-use guard that lets the high bytes be wrong. */
+                    if (W == 1 && active == 2 && bit_shift >= 4) {
+                        for (int i = 0; i < 8 - bit_shift; i++)
+                            emit(out, "add\thl,hl");
+                        emit(out, "ld\tl,h");
+                        bit_shift = 0;
+                        active = 1;
+                    }
+                    goto shr_long_bit_shift;
+                }
+            }
+        }
         /* Partial-load fastpath: for byte_shift ≥ 1 the low source bytes
            are discarded, so skip them at load time. */
         if (byte_shift >= 1 && !dehl_has(op->src[0])) {
@@ -1376,8 +1456,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
            shifting them just rotates 0 — trim to the bytes with data. Wrap
            in a djnz loop when it strictly saves bytes (mirror of SHL). */
         {
-        static const int body_sz_shr[4] = { 8, 6, 4, 2 };
-        int body_sz = body_sz_shr[byte_shift];
+        int body_sz = 2 * active;
         int use_djnz = (bit_shift * body_sz > body_sz + 4);
         int iters = use_djnz ? 1 : bit_shift;
         int loop_label = 0;
@@ -1388,14 +1467,14 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                     L.func_emit_idx, loop_label);
         }
         for (int i = 0; i < iters; i++) {
-            switch (byte_shift) {
-            case 0: /* all 4 bytes have data */
+            switch (active) {
+            case 4: /* all 4 bytes have data */
                 emit(out, "srl\td");
                 emit(out, "rr\te");
                 emit(out, "rr\th");
                 emit(out, "rr\tl");
                 break;
-            case 1: /* D=0; E,H,L have data */
+            case 3: /* D=0; E,H,L have data */
                 emit(out, "srl\te");
                 emit(out, "rr\th");
                 emit(out, "rr\tl");
@@ -1404,7 +1483,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                 emit(out, "srl\th");
                 emit(out, "rr\tl");
                 break;
-            case 3: /* D=E=H=0; only L has data */
+            case 1: /* D=E=H=0; only L has data */
                 emit(out, "srl\tl");
                 break;
             }
@@ -1446,7 +1525,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             } else if (count >= 8) {                 /* >>9..15: byte + residual */
                 load_to_hl(out, f, op->src[0]);
                 emit(out, "ld\ta,h");                /* surviving byte (no L hop) */
-                emit_byte_lsr_a(out, count - 8);
+                emit_byte_lsr_a(out, count - 8, 0);
                 emit(out, "ld\tl,a");
                 emit(out, "ld\th,0");
                 invalidate_a_cache();
@@ -1465,7 +1544,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             }
             if (handled) {
                 if (vreg_is_pr_de(f, op->dst)) {
-                    emit(out, "ex\tde,hl");
+                    emit_ex_de_hl(out);
                     cache_de(op->dst);
                     return 0;
                 }
@@ -1474,13 +1553,13 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             }
         }
         load_binop_operands(out, f, op);   /* HL=value, DE=count */
-        emit(out, "ex\tde,hl");            /* DE=value, HL=count */
+        emit_ex_de_hl(out);            /* DE=value, HL=count */
         emit_c(out, CLOB_HL, "call\tl_asr_u");
         invalidate_de_cache();
         /* l_asr_u is BC-clean on every non-CB target — do NOT drop a live
            slotless PR_BC resident's belief (would force a bogus reload). */
         if (vreg_is_pr_de(f, op->dst)) {
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
             cache_de(op->dst);
             return 0;
         }
@@ -1535,7 +1614,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                round-trip is amortised once r≥5). */
             if (count - 8 >= 5) {
                 emit(out, "ld\ta,l");
-                emit_byte_lsr_a(out, count - 8);
+                emit_byte_lsr_a(out, count - 8, 0);
                 emit(out, "ld\tl,a");
                 invalidate_a_cache();
             } else {
@@ -1563,7 +1642,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         int bc_live = (L.rs.bc >= 0);  /* `ld b,e` clobbers B — preserve */
         if (bc_live) emit(out, "push\tbc");
         emit(out, "ld\tb,e");              /* B = count low byte */
-        emit(out, "ex\tde,hl");            /* DE = value */
+        emit_ex_de_hl(out);            /* DE = value */
         emit(out, "bsrl\tde,b");           /* DE = value >> B (logical) */
         if (bc_live) emit(out, "pop\tbc");
         invalidate_hl_cache();
@@ -1573,7 +1652,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             cache_de(op->dst);
             return 0;
         }
-        emit(out, "ex\tde,hl");            /* HL = result */
+        emit_ex_de_hl(out);            /* HL = result */
         commit_hl_word(out, f, op->dst);
         return 0;
     }
@@ -1689,14 +1768,14 @@ static int gen_sar16(FILE *out, Func *f, const Op *op)
         int bc_live = (L.rs.bc >= 0);
         if (bc_live) emit(out, "push\tbc");
         emit(out, "ld\tb,e");
-        emit(out, "ex\tde,hl");                  /* DE=value */
+        emit_ex_de_hl(out);                  /* DE=value */
         emit(out, "bsra\tde,b");
         if (bc_live) emit(out, "pop\tbc");
         invalidate_hl_cache();
         invalidate_de_cache();
         if (!bc_live) invalidate_bc_cache();
         if (vreg_is_pr_de(f, op->dst)) { cache_de(op->dst); return 0; }
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         commit_hl_word(out, f, op->dst);
         return 0;
     }
@@ -1721,7 +1800,7 @@ static int gen_sar16(FILE *out, Func *f, const Op *op)
     }
     /* 8080/gbz80 variable → l_asr */
     load_binop_operands(out, f, op);             /* HL=value, DE=count */
-    emit(out, "ex\tde,hl");                      /* DE=value, HL=count */
+    emit_ex_de_hl(out);                      /* DE=value, HL=count */
     emit_c(out, CLOB_HL, "call\tl_asr");
     invalidate_de_cache();
     commit_hl_word(out, f, op->dst);

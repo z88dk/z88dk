@@ -1089,8 +1089,23 @@ Node *declare_local(int local_static)
         if ( local_static ) {
             char  namebuf[NAMESIZE * 2 + 10];
             Node *init_node = NULL;
+            /* The name is scoped to the BLOCK, so a function may declare
+               several statics called the same thing in sibling or nested
+               blocks. Keep the familiar st_<fn>_<name> for the first and
+               number the rest, then record the source name in the alias stack
+               (sym.c) so findstc resolves it innermost-first and it retires
+               with its block. Deriving the global name from the source name
+               alone used to reject this outright. */
             snprintf(namebuf, sizeof(namebuf),"st_%s_%s", currfn->name, type->name);
+            if ( findglb(namebuf) ) {
+                int n = 1;
+                do {
+                    snprintf(namebuf, sizeof(namebuf),"st_%s_%s_%d",
+                             currfn->name, type->name, n++);
+                } while ( findglb(namebuf) );
+            }
             sym = addglb(namebuf, type, ID_VARIABLE, type->kind, 0, LSTATIC);
+            stc_declare(type->name, sym);
             if ( cmatch('=')) {
                 sym->isassigned = 1;
                 sym->initialised = 1;
@@ -1993,6 +2008,7 @@ static void declfunc(Type *functype, enum storage_type storage)
 
     // Reset all local variables
     locptr = STARTLOC;
+    stc_reset();          /* and the block-scoped local-static aliases */
     // Setup local variables
     gen_switch_section(currfn->flags & NONBANKED ? c_home_section : c_code_section);
     

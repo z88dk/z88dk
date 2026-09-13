@@ -416,6 +416,18 @@ typedef enum {
    dedicated bit rather than a new opcode keeps IR_SHR's register shape single
    across analysis/alloc/opt. */
 #define IR_SHR_ARITH ((int64_t)1 << 40)
+/* [IR_SHRMASK] Set by ir_opt_narrow_byte on a constant-count LOGICAL shift that
+   narrowed because every reader masks away the bits the source's high byte
+   would have supplied. It tells gen_shr two things: a rotate may stand in for
+   the shift (the bits it wraps round are exactly the masked-off ones), and the
+   rotate's own clean-up mask is redundant because the program's AND follows. */
+#define IR_SHR_MASKED ((int64_t)1 << 41)
+/* [IR_SHRMASK] Set on a constant-count LOGICAL shift whose result is read only
+   as a BYTE but whose field straddles the byte boundary, so the mask route above
+   cannot apply. `(x >> n) & M` with M <= 0xFF is the high byte of `x << (8-n)`,
+   which costs (8-n) one-byte `add hl,hl` instead of n four-byte `srl h; rr l`
+   — and on 808x replaces a call to the l_asr_u runtime loop outright. */
+#define IR_SHR_TOPBYTE ((int64_t)1 << 42)
 
 /* ----- ABI / call descriptors ------------------------------------------ */
 

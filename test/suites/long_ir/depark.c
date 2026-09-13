@@ -48,6 +48,30 @@
  *                  conservatism is kept on the ABI argument (a long or float
  *                  result IS returned in DE:HL, and `ld a,d` alone appears 529
  *                  times in the 8085 corpus) rather than on evidence.
+ *
+ * [IR_DEFLOW] The branch-following rule was mutation-tested the same way, and
+ * the split is worth knowing before trusting this file alone:
+ *   caught here  — the WIN. satband's park is the one site in this file the gate
+ *                  moves (dead 11 -> 12 on 8085), so depark_8085 against
+ *                  depark_8085_keep is a real differential over it.
+ *   caught by    — every OVER-AGGRESSIVE branch mutant: taking the branch
+ *   the verifier   target's answer without unioning the fall-through, and
+ *                  treating a branch as DE-dead outright. Both are caught by
+ *                  IR_DEPARK_SWEEP=1 on the corpus (a VIOLATION in strbench and
+ *                  md5), and by NOTHING here — the strbench site needs a park
+ *                  whose fall-through reaches a call, and three attempts to
+ *                  reduce it (brkeep, brkeep2, a copy of str_compute's loop)
+ *                  all failed to reproduce the park placement. It is
+ *                  allocation-sensitive, like the other bugs in AGENTS.md's
+ *                  real-file list. RUN THE VERIFIER on this rule, do not trust
+ *                  the suite alone.
+ *   not pinned   — the fixpoint's own `ret` and call conservatism: making either
+ *                  optimistic changes not one park decision in the whole 8085
+ *                  corpus. Kept on the ABI argument, as above.
+ * brkeep, brkeep2 and loopcarry pin no mutant that satband does not. They are
+ * kept as cheap coverage of DE live across a forward branch, a fall-through and
+ * a loop back-edge — the three edges the fixpoint has to get right — and run on
+ * all five CPU variants of this file.
  */
 #include "test.h"
 
@@ -194,6 +218,70 @@ static unsigned long lmix(unsigned long x, unsigned int k)
     return c ^ (unsigned long)(b + 1u);
 }
 
+/* [IR_DEFLOW] The sweep follows a BRANCH to the liveness its target reports,
+   instead of calling every branch a reader of DE. These three pin the three
+   answers that rule has to get right.
+
+   satband is the WIN, taken from predbench's sat() where the sweep first found
+   it: consecutive `if`s assigning the same local render as a park, a conditional
+   branch, and two arms that BOTH start by overwriting DE. Nothing but following
+   the branch can see the pair is dead there. */
+static int satband(int v)
+{
+    if (v > 255) v = 255;
+    if (v < 0)   v = 0;
+    return (v < 64) ? 64 : (v > 192 ? 192 : v);
+}
+
+/* brkeep is why a conditional branch UNIONS its target's answer with the
+   fall-through's rather than taking either alone: the parked word is read on the
+   taken arm and overwritten on the other, so both mutants (target-only,
+   fall-through-only) drop a park that one path still needs. */
+static unsigned int brkeep(unsigned int a, unsigned int b, unsigned int c,
+                           unsigned int k)
+{
+    unsigned int t = (unsigned int)(a + b);
+    unsigned int u = (unsigned int)(c ^ k);
+    if (u & 1u) return (unsigned int)(t * 3u + u);
+    return (unsigned int)(u + 1u);
+}
+
+/* brkeep2 is brkeep with the two arms swapped, and it is the one that catches a
+   sweep taking the TARGET's answer alone: here the parked word is read on the
+   FALL-THROUGH and the branch target is DE-dead. The pair is needed because the
+   two polarities catch opposite mutants -- the real site that exposed this is in
+   strbench, where the fall-through reaches `call _my_strlen` and the target does
+   not. The call in use() is deliberate: it is what makes the arm read DE. */
+static unsigned int deflow_sink;
+static unsigned int use(unsigned int v)
+{
+    deflow_sink = (unsigned int)(deflow_sink + v);
+    return v;
+}
+
+static unsigned int brkeep2(unsigned int a, unsigned int b, unsigned int c,
+                            unsigned int k)
+{
+    unsigned int t = (unsigned int)(a + b);
+    unsigned int u = (unsigned int)(c ^ k);
+    if (u & 1u) return (unsigned int)(u + 1u);
+    return (unsigned int)(use(t) * 3u + u);
+}
+
+/* loopcarry is the BACK-EDGE: the branch target is ABOVE the branch, so the
+   fixpoint has to iterate rather than read an answer already computed. The
+   carried scale factor is live across the edge, so an optimistic first pass that
+   never re-converges drops a park the next iteration reads. */
+static unsigned int loopcarry(unsigned int *p, unsigned int n, unsigned int s)
+{
+    unsigned int acc = 0, i;
+    for (i = 0; i < n; i++) {
+        acc = (unsigned int)(acc + p[i] * s);
+        s   = (unsigned int)(s + p[i]);
+    }
+    return acc;
+}
+
 void test_depark(void)
 {
     unsigned long r;
@@ -254,6 +342,35 @@ void test_depark(void)
 
     g_sink = wsum(0x0f0fu, 0xf0f0u, 0x00ffu, 0xff00u);
     assertEqual(g_sink, wsum(0x0f0fu, 0xf0f0u, 0x00ffu, 0xff00u));
+
+    /* [IR_DEFLOW] Both arms of each `if` are taken across these five, so the
+       park the sweep now drops is exercised on every path through it. */
+    assertEqual(satband(-5), 64);
+    assertEqual(satband(10), 64);
+    assertEqual(satband(100), 100);
+    assertEqual(satband(300), 192);
+    assertEqual(satband(200), 192);
+
+    /* Odd u takes the arm that READS the parked t; even u overwrites DE. */
+    assertEqual(brkeep(0x1111u, 0x2222u, 0x0F0Fu, 0x0F0Eu), 0x999au);
+    assertEqual(brkeep(0xF0F0u, 0x0101u, 0xF0F0u, 0x0F0Eu), 0xffffu);
+    assertEqual(brkeep(0xFFFFu, 0xFFFFu, 0x8000u, 0x0001u), 0x7ffbu);
+    assertEqual(brkeep(0x0123u, 0x4567u, 0x89ABu, 0xCDE0u), 0x17e9u);
+
+    /* The mirror: the parked word is read on the FALL-THROUGH arm here. */
+    deflow_sink = 0;
+    assertEqual(brkeep2(0x1111u, 0x2222u, 0x0F0Fu, 0x0F0Eu), 0x0002u);
+    assertEqual(brkeep2(0xF0F0u, 0x0101u, 0xF0F0u, 0x0F0Eu), 0xd5d1u);
+    assertEqual(brkeep2(0xFFFFu, 0xFFFFu, 0x8000u, 0x0001u), 0x8002u);
+    assertEqual(brkeep2(0x0123u, 0x4567u, 0x89ABu, 0xCDE2u), 0x444au);
+    assertEqual(deflow_sink, 0xf1f1u);
+
+    g_vec[0] = 0x0101u; g_vec[1] = 0x0202u; g_vec[2] = 0x0404u; g_vec[3] = 0x0808u;
+    assertEqual(loopcarry(g_vec, 4u, 0x1234u), 0xa952u);
+    assertEqual(loopcarry(g_vec, 2u, 0xFFFFu), 0x00ffu);
+    g_vec[0] = 0xfffeu; g_vec[1] = 0x0003u; g_vec[2] = 0x8000u; g_vec[3] = 0x8001u;
+    assertEqual(loopcarry(g_vec, 4u, 0x0007u), 0x8009u);
+    assertEqual(loopcarry(g_vec, 3u, 0x8000u), 0xfffau);
 }
 
 int main(int argc, char *argv[])

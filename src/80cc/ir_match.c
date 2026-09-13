@@ -589,17 +589,15 @@ static int rotl_check(Func *f, BB *bb, const int idx[],
    into the next, so only ONE is ever live and try_fp_bytewise_commutative
    carries it in the DEHL cache. The whole park/reload/merge disappears.
 
-   Measured on md5 (F and G are both this shape, 32 of the 64 rounds), by
-   rewriting the macros at source level: -970 B fp, -616 B sp, -4.4 % ticks.
-   Note it pays in BOTH modes: tree-to-chain is about how many values are live,
-   not about how locals are addressed, so unlike the byte-fusion idea this is
-   independent of frame-pointer mode and of the frameless/sp-flip cost model.
+   It pays in BOTH frame modes: tree-to-chain is about how many values are live,
+   not how locals are addressed, so it is independent of frame-pointer mode and
+   of the frameless/sp-flip cost model.
 
    The rewrite reads z twice where the original read x twice, so a VOLATILE
    operand would change its access count — all three are excluded.
 
-   Idiomatic well beyond md5: SHA-1 and SHA-256's Ch(), and the masked blit
-   `(dst & ~m) | (src & m)` that sprite code is built from.
+   Idiomatic well beyond md5: SHA-1/SHA-256's Ch(), and the masked blit
+   `(dst & ~m) | (src & m)`.
 
    DEFAULT ON; `--opt-disable=pattern:mux` opts out. */
 

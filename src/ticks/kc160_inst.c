@@ -131,16 +131,22 @@ void kc160_ld_ixysd_rr(uint8_t opcode)
 
 
 // ld xy,(ix+d), ld xy,(iy+d), ld xy,(sp+d)
+// Base register is the LOW nibble, and this family does NOT share the rr
+// family's base encoding: assembled ground truth is
+//   ld ix,(iy+d) ed 88 | ld ix,(ix+d) ed 89 | ld ix,(sp+d) ed 8a
+//   ld iy,(iy+d) ed 98 | ld iy,(ix+d) ed 99 | ld iy,(sp+d) ed 9a
+// so 8/9/a -> IY/IX/SP (the rr forms use c/d/e). Subtracting 0x0c here made
+// every one of these read from SP.
 void kc160_ld_xy_ixysd(uint8_t opcode)
 {
-    uint16_t addr = get_addr_from_z((opcode & 0x0f) - 0x0c) +  (get_memory_inst(pc++)^128)-128;
+    uint16_t addr = get_addr_from_z((opcode & 0x0f) - 0x08) +  (get_memory_inst(pc++)^128)-128;
 
     if ( (opcode & 0xf0) == 0x80 ) {
         xl = get_memory_data(addr);
         xh = get_memory_data(addr+1);
     } else {
-        xl = get_memory_data(addr);
-        xh = get_memory_data(addr+1);
+        yl = get_memory_data(addr);
+        yh = get_memory_data(addr+1);
     }
 
     st += 4;
@@ -148,10 +154,15 @@ void kc160_ld_xy_ixysd(uint8_t opcode)
 
 
 
-// ld xy,(ix+d), ld xy,(iy+d), ld xy,(sp+d)
+// ld (ix+d),xy, ld (iy+d),xy, ld (sp+d),xy
+// Mirror of the load above; assembled ground truth is
+//   ld (iy+d),ix ed 80 | ld (ix+d),ix ed 81 | ld (sp+d),ix ed 82
+//   ld (iy+d),iy ed 90 | ld (ix+d),iy ed 91 | ld (sp+d),iy ed 92
+// so 0/1/2 -> IY/IX/SP (the rr stores use 4/5/6). Subtracting 0x04 made every
+// one of these write to SP-relative memory.
 void kc160_ld_ixysd_xy(uint8_t opcode)
 {
-    uint16_t addr = get_addr_from_z((opcode & 0x0f) - 0x04) +  (get_memory_inst(pc++)^128)-128;
+    uint16_t addr = get_addr_from_z(opcode & 0x0f) +  (get_memory_inst(pc++)^128)-128;
 
     if ( (opcode & 0xf0) == 0x80 ) {
         put_memory(addr, xl);

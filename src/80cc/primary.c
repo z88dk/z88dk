@@ -66,7 +66,7 @@ int primary(LVALUE* lval)
             lval->flags = FLAGS_NONE;
             lval->node = ast_str_lit(offs);
             return 0;
-        } else if ((ptr = findloc(sname))) {
+        } else if ((ptr = findloc(sname)) && !stc_shadows(sname, ptr->level)) {
             lval->offset = 0;
             lval->symbol = ptr;
             lval->ltype = ptr->ctype;

@@ -654,20 +654,6 @@
 	ld	l,a
 	ld	h,0
 
-;; A byte global load zero-extended into HL (`ld a,(_g); ld l,a; ld h,0`) folds to
-;; a word load `ld hl,(_g); ld h,0`: HL ends identical (H re-zeroed), the `ld l,a`
-;; is gone (-1b) and A is left untouched. `(_%1)` restricts to a symbol address —
-;; register/index indirects (`ld a,(hl)`, `ld a,(ix-2)`) have no `ld hl,(...)` form
-;; and must not match. The extra read of _g+1 is harmless (discarded); a volatile
-;; load carries a `;volatile` stamp so this bare line never matches it.
-%title #IR byte global load widened to HL: fold ld l,a into the word load (-1b)
-	ld	a,(_%1)
-	ld	l,a
-	ld	h,0
-=
-	ld	hl,(_%1)
-	ld	h,0
-
 ;; #IR: `ld a,l; ld l,a` is a redundant round-trip — after `ld a,l` we have A==L,
 ;; so `ld l,a` writes L=L (a no-op on L), and A was already clobbered by `ld a,l`
 ;; so dropping the write-back changes nothing. Drop the dead `ld l,a` (-1b).
@@ -1277,3 +1263,39 @@
 	ld	hl,%1
 	ld	de,sp+%2
 
+
+;; #ANDD / #ORD: a repeated IDENTICAL immediate mask is idempotent — `and N`
+;; twice leaves exactly what `and N` once leaves, and sets the same flags (the
+;; second operates on the first's result, which already satisfies the mask), so
+;; the second is dead in both value and flags.
+;;
+;; Why this is a COPT rule and not an IR fold: the IR-level mask FOLDING
+;; (`(a & M1) & M2 -> a & (M1&M2)`) was built and REFUTED — collapsing a mask
+;; chain lengthens the masked value's live range and cost z80 +40 B. That
+;; argument does not apply here. These two are ADJACENT after register
+;; allocation, so removing one cannot move a live range at all; it is a pure
+;; text deletion of a dead instruction.
+;;
+;; `%check` pins the operand to an 8-bit LITERAL. That is what makes the
+;; idempotence argument airtight: it excludes `and (hl)` / `and (ix+d)`, where
+;; two consecutive reads of the same address are not obviously interchangeable
+;; if the location is volatile, and excludes register operands for the same
+;; reason (nothing writes them between, but the literal form is the one that
+;; actually occurs and the narrow rule is the honest one).
+;;
+;; Source: bitfield extract-then-insert emits the field-width mask twice —
+;; `v & 7u` from the extract and the insert's own width mask land adjacent.
+;; 5 sites in the bench corpus, all in bitfieldbench's reg_set/reg_step.
+%title #ANDD a repeated identical immediate mask is idempotent (-2b)
+%check 0 <= %1 <= 255
+	and	%1
+	and	%1
+=
+	and	%1
+
+%title #ORD a repeated identical immediate or-mask is idempotent (-2b)
+%check 0 <= %1 <= 255
+	or	%1
+	or	%1
+=
+	or	%1

@@ -236,7 +236,7 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
                operand in DE and rematerialise into HL. */
             if (remat_word_clobbers_hl(f, cst)) {
                 int other = (cst == op->src[0]) ? op->src[1] : op->src[0];
-                emit(out, "ex\tde,hl");
+                emit_ex_de_hl(out);
                 swap_hl_de_caches();
                 hl_about_to_change(cst);
                 emit_remat_word(out, f, cst, "hl");
@@ -267,7 +267,7 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
         }
         /* Swap into DE (HL↔DE). After: DE has src[1], HL has whatever DE
            held — caller wants src[0] in HL, so reload it. */
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         swap_hl_de_caches();
         load_to_hl(out, f, op->src[0]);
         return;
@@ -293,7 +293,7 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
         /* DE has src[0], want it in HL: ex de,hl moves it, then load src[1]
            into DE. load_to_de uses HL as scratch, so use the HL-preserving
            push/pop variant. */
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         swap_hl_de_caches();
         load_to_de_preserve_hl(out, f, op->src[1]);
         cache_de(op->src[1]);
@@ -337,20 +337,63 @@ static void cache_hl_slot_addr(const Func *f, int v)
     L.cur_hl_addr_off = slot_off(f, v);
 }
 
-/* Materialize &slot(v) into HL for an sp-rel byte access, reusing a cached
-   slot address: exact → nothing; near → inc/dec hl (preserves A); else
-   ld hl,off;add hl,sp. Cold path clobbers HL → caller resolves any pending
-   spill first. Updates the cache.
+/* A bare `pop hl` restores an HL some emitter pushed to PRESERVE it across a
+   region. Whatever address belief the region established inside itself is
+   discarded by the pop — HL now holds the pushed value again — and nothing
+   restores the belief that was live before the push. Clearing is the safe
+   approximation: it can only cost a recompute, never read a bogus pointer.
+
+   This is what the vm1 maskbench/queenbench/searchbench WRONGs were. A word
+   load into DE published "HL = &slot+1" INSIDE a caller's push/pop preserve
+   region; the pop put a data value back in HL; the stale belief then rode the
+   cross-BB carry into a branch target and became `dec hl` on garbage. Callers
+   that genuinely keep an address in HL re-establish it right after. */
+static void emit_pop_hl(FILE *out)
+{
+    emit(out, "pop\thl");
+    L.cur_hl_addr_off = -1;
+}
+
+/* Every `ex de,hl` moves whatever HL held into DE. There is no DE-address
+   belief, so an HL slot-address belief cannot survive the swap — and unlike a
+   VALUE belief (rs.hl, which hl_about_to_change handles) nothing else clears
+   it. Route the swap through here so the belief dies with it.
+
+   This was latent: before the word paths published addresses, no `ex de,hl`
+   happened to follow a live one. It surfaced as a vm1 WRONG on maskbench —
+   `store_hl` published "HL = &slot+1", the caller swapped the value back into
+   HL, and the stale belief rode a push/pop and then the cross-BB carry into a
+   branch target, where it became `dec hl` from a bogus base. */
+static void emit_ex_de_hl(FILE *out)
+{
+    emit(out, "ex\tde,hl");
+    L.cur_hl_addr_off = -1;
+}
+
+/* As cache_hl_slot_addr, but for an address that is not a slot base: the
+   word store leaves HL on the slot's HIGH byte, which is a perfectly good
+   reuse source for the next access. Offsets are canonical (no cur_sp_adjust)
+   — a slot's absolute address is fixed for the function's lifetime. */
+static void cache_hl_addr_off(int canon_off)
+{
+    L.rs.hl = -1;
+    L.cur_hl_addr_off = canon_off;
+}
+
+/* Materialize a canonical frame address into HL for an sp-rel access of ANY
+   width, reusing a cached slot address: exact → nothing; near → inc/dec hl
+   (preserves A); else ld hl,off;add hl,sp. Cold path clobbers HL → caller
+   resolves any pending spill first. Updates the cache.
 
    The reuse survives sp moves: a frame slot's ABSOLUTE address is fixed for
    the function's lifetime (mid-function pushes allocate temporaries BELOW the
    frame, they don't move the slots), so HL keeps pointing at the same slot
    across a push/pop and the canonical-offset delta below is sp-independent.
    Only a CLOB_HL (invalidate_hl_cache / a call / a BB boundary) kills it. */
-static void emit_byte_slot_addr(FILE *out, const Func *f, int v)
+static void emit_slot_addr_off(FILE *out, const Func *f, int canon_off)
 {
     if (L.cur_hl_addr_off >= 0) {
-        int d = slot_off(f, v) - L.cur_hl_addr_off;
+        int d = canon_off - L.cur_hl_addr_off;
         /* inc/dec hl (6T z80 / 5-6T 808x) beats the 21T/4B `ld hl,nn;add
            hl,sp` for deltas ≤3. gbz80's recompute is the 12T/2B `ld hl,sp+d`
            and its inc hl is 8T, so only delta 1 wins there. gbz80 is the
@@ -359,18 +402,24 @@ static void emit_byte_slot_addr(FILE *out, const Func *f, int v)
         if (d == 0) return;                       /* exact hit */
         if (d >= 1 && d <= cap) {
             while (d-- > 0) emit(out, "inc\thl");
-            cache_hl_slot_addr(f, v);
+            cache_hl_addr_off(canon_off);
             return;
         }
         if (d <= -1 && d >= -cap) {
             while (d++ < 0) emit(out, "dec\thl");
-            cache_hl_slot_addr(f, v);
+            cache_hl_addr_off(canon_off);
             return;
         }
     }
-    emit(out, "ld\thl,%d", slot_off(f, v) + L.cur_sp_adjust);
+    emit(out, "ld\thl,%d", canon_off + L.cur_sp_adjust);
     emit(out, "add\thl,sp");
-    cache_hl_slot_addr(f, v);
+    cache_hl_addr_off(canon_off);
+}
+
+/* Slot-base form — the original byte-access entry point. */
+static void emit_byte_slot_addr(FILE *out, const Func *f, int v)
+{
+    emit_slot_addr_off(out, f, slot_off(f, v));
 }
 
 /* Spill a dirty slot-backed byte home (E/D) to its slot, leaving the register
@@ -430,7 +479,7 @@ static int rehome_byte_home(FILE *out, const Func *f)
         emit(out, "ld\thl,%d", slot_off(f, v) + L.cur_sp_adjust + 2);
         emit(out, "add\thl,sp");
         emit(out, "ld\t%s,(hl)", r);                /* ld e,(hl) */
-        emit(out, "pop\thl");
+        emit_pop_hl(out);
     }
     byte_home_note(v);
     L.cur_byte_home_dirty = 0;                         /* loaded from coherent slot */
@@ -542,7 +591,7 @@ static int rehome_word_home(FILE *out, const Func *f)
         emit(out, "ld\te,(hl)");
         emit(out, "inc\thl");
         emit(out, "ld\td,(hl)");
-        emit(out, "pop\thl");
+        emit_pop_hl(out);
     }
     byte_home_note(v);
     cache_de(v);                                    /* DE physically = home */
@@ -1068,8 +1117,9 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
        intervening sp-relative slot reads stay correct. Handled before the
        cur_dst_dead early-out so the push/pop always balances. */
     if (vreg >= 0 && vreg_is_pr_stack(f, vreg)) {
-        emit_sp(out, 2, "push\thl");
         L.cur_stack_resident = vreg;
+        L.pv_expect_push = 1;     /* [IR_PARK_VERIFY] this push IS the park */
+        emit_sp(out, 2, "push\thl");
         L.cur_stack_resident_spadj = L.cur_sp_adjust;
         /* The value now lives at TOS, not in HL. Forget any HL belief: it must
            NOT be re-advertised (commit_hl_word skips cache_hl for us) — a reader
@@ -1147,7 +1197,7 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
     if (store_hl_keep_hl(out, f, vreg))
         return;                                    /* value already in HL */
     if (!IS_GBZ80()) {
-        emit(out, "ex\tde,hl");                    /* byte-walk: DE -> HL */
+        emit_ex_de_hl(out);                    /* byte-walk: DE -> HL */
     } else {
         emit_de_to_hl(out);
     }
@@ -1187,7 +1237,7 @@ static void commit_hl_word(FILE *out, const Func *f, int v)
    DE = v. Raw ex de,hl — only reached on EX_DE_HL paths. */
 static void commit_hl_to_de(FILE *out, int v)
 {
-    emit(out, "ex\tde,hl");
+    emit_ex_de_hl(out);
     invalidate_hl_cache();
     cache_de(v);
 }
@@ -1212,8 +1262,9 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
        `ld de,K` LD_IMM fastpath reaches here, and PR_STACK is neither dst-dead
        nor register-pool). Its single use pops it; the caller must NOT cache_hl. */
     if (vreg >= 0 && vreg_is_pr_stack(f, vreg)) {
-        emit_sp(out, 2, "push\tde");
         L.cur_stack_resident = vreg;
+        L.pv_expect_push = 1;     /* [IR_PARK_VERIFY] this push IS the park */
+        emit_sp(out, 2, "push\tde");
         L.cur_stack_resident_spadj = L.cur_sp_adjust;
         invalidate_de_cache();
         return;
@@ -1222,7 +1273,7 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
        (it is in DE here) and let the caller's cache_hl advertise it. */
     if (L.la.cur_dst_dead || vreg_in_register_pool(f, vreg)
         || vreg_is_remat(f, vreg)) {
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         invalidate_de_cache();
         return;
     }
@@ -1230,7 +1281,7 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
     if (ss_store_dead_here()) {
         /* Dead spill: skip the slot write, just bring the value into HL
            (the value is in DE on entry here). */
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         invalidate_de_cache();
         return;
     }
@@ -1242,9 +1293,9 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
        these sites have no leading ex, so copt #DE8 never matched them.) */
     if (fp_tos_slot(f, vreg)
         || (off == 0 && !fp_active(f) && tos_pushpop_ok(f))) {
-        emit(out, "pop\thl");          /* discard old TOS word (HL dead: ex sets it) */
+        emit_pop_hl(out);          /* discard old TOS word (HL dead: ex sets it) */
         emit(out, "push\tde");
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         invalidate_de_cache();
         return;
     }
@@ -1253,7 +1304,7 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
     emit(out, "ld\t(hl),e");
     emit(out, "inc\thl");
     emit(out, "ld\t(hl),d");
-    emit(out, "ex\tde,hl");
+    emit_ex_de_hl(out);
     invalidate_de_cache();
 }
 

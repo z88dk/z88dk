@@ -142,6 +142,9 @@ int ir_opt_dce(Func *f);
  * (Op.imm_sym), removing the LD_SYM materialisation. Run before DCE (which
  * reclaims the now-dead LD_SYM). Returns folds made. */
 int ir_opt_sym_cmp_fold(Func *f);
+int ir_opt_sym_addr_fold(Func *f);
+int ir_opt_sym_deref_fold(Func *f);
+int ir_opt_deref_offset(Func *f);
 /* Rewrite AND(CONV_SX(x), full-source-mask) → CONV_ZX(x): the mask clears the
  * sign-extended bits, so the sign-extend is dead. Run before DCE. */
 int ir_opt_conv_mask_fold(Func *f);
@@ -163,6 +166,15 @@ int ir_opt_prune_unreachable(Func *f);
  * ir_lower emits the 8-bit-in-A form. IR_NO_NARROW_BYTE opts out.
  * Returns the number of ops narrowed. */
 int ir_opt_narrow_byte(Func *f);
+
+/* [IR_CMPSIGN_PROBE] Inert: classify each signed compare by which
+   non-negativity proof would let its 7-byte sign correction be dropped. */
+void ir_opt_cmpsign_probe(Func *f);
+
+/* Rewrite a signed compare to its unsigned counterpart where both operands are
+   provably non-negative, dropping the 7-byte sign correction. Returns the
+   number rewritten. --opt-disable=cmp-unsign / IR_CMPUNSIGN=0 opts out. */
+int ir_opt_cmp_unsign(Func *f);
 
 /* Range-narrow a loop counter proven to fit [0,256) to a byte (width-1):
  * byte inc/dec step, 1-byte slot, int uses auto-widen. IR_NO_IV_NARROW opts
