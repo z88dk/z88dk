@@ -956,10 +956,36 @@ static char *ir_opt_disabled_names[80];
 static int   n_ir_opt_disabled;
 static int   ir_opt_disable_all;
 
+static void ir_opt_disable_add(const char *name, size_t len);
+
+/* `IR_OFF=name,name` — the same registry as --opt-disable, reachable from the
+   environment. The corpus and tick scans invoke the compiler as `env VAR=v zcc`
+   and cannot pass a flag, which is the only reason the back end grew a private
+   `IR_<FEATURE>=0` opt-out per optimisation. One registry, two front doors:
+   the flag for a user, the variable for a measurement. */
+static void ir_opt_disable_env(void)
+{
+    static int done;
+    if (done) return;
+    done = 1;
+    const char *e = getenv("IR_OFF");
+    if (!e) return;
+    while (*e) {
+        const char *c = e;
+        while (*c && *c != ',') c++;
+        if (c > e) {
+            if (c - e == 3 && strncmp(e, "all", 3) == 0) ir_opt_disable_all = 1;
+            else ir_opt_disable_add(e, (size_t)(c - e));
+        }
+        e = *c ? c + 1 : c;
+    }
+}
+
 /* Non-zero if the named IR/lowering optimisation was disabled on the command
-   line (or `--opt-disable=all`). Called from the IR passes / lowerer. */
+   line, in IR_OFF, or by `all` in either. Called from the IR passes / lowerer. */
 int opt_disabled(const char *name)
 {
+    ir_opt_disable_env();
     if (ir_opt_disable_all) return 1;
     for (int i = 0; i < n_ir_opt_disabled; i++)
         if (strcmp(ir_opt_disabled_names[i], name) == 0) return 1;

@@ -419,8 +419,7 @@ static int  a_carry_on = -1;
 static int  a_carry_enabled(void)
 {
     if (a_carry_on < 0) {
-        const char *e = getenv("IR_A_CARRY");
-        a_carry_on = (e && e[0] == '0') ? 0 : 1;      /* default ON; IR_A_CARRY=0 opts out */
+        a_carry_on = !opt_disabled("a-carry");      /* default ON; IR_A_CARRY=0 opts out */
     }
     return a_carry_on;
 }
@@ -434,8 +433,7 @@ static int  remat_lea_on = -1;
 static int  remat_lea_enabled(void)
 {
     if (remat_lea_on < 0) {
-        const char *e = getenv("IR_REMAT_LEA");
-        remat_lea_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; IR_REMAT_LEA=0 opts out */
+        remat_lea_on = !opt_disabled("remat-lea");    /* default ON; IR_REMAT_LEA=0 opts out */
     }
     return remat_lea_on;
 }
@@ -517,8 +515,7 @@ static int  truncres_on = -1;
 static int  truncres_enabled(void)
 {
     if (truncres_on < 0) {
-        const char *e = getenv("IR_TRUNCRES");
-        truncres_on = (e && e[0] == '0') ? 0 : 1;   /* default ON; =0 opts out */
+        truncres_on = !opt_disabled("trunc-res");   /* default ON; =0 opts out */
     }
     return truncres_on;
 }
@@ -547,8 +544,7 @@ static int  slotaddr_on = -1;
 static int  slotaddr_widen(void)
 {
     if (slotaddr_on < 0) {
-        const char *e = getenv("IR_SLOTADDR");
-        slotaddr_on = (e && e[0] == '0') ? 0 : 1;   /* default ON */
+        slotaddr_on = !opt_disabled("slot-addr-widen");   /* default ON */
     }
     return slotaddr_on;
 }
@@ -557,8 +553,7 @@ static int  hl_carry_on = -1;
 static int  hl_carry_enabled(void)
 {
     if (hl_carry_on < 0) {
-        const char *e = getenv("IR_HL_CARRY");
-        hl_carry_on = (e && e[0] == '0') ? 0 : 1;   /* default ON; IR_HL_CARRY=0 opts out */
+        hl_carry_on = !opt_disabled("hl-carry");   /* default ON; IR_HL_CARRY=0 opts out */
     }
     return hl_carry_on;
 }
@@ -977,8 +972,7 @@ static int branch_relax_enabled(void)
     if (relax_on < 0) {
         /* 8080/8085 have no `jr` at all. Every other supported CPU has both the
            unconditional form and the nz/z/nc/c conditionals. */
-        const char *e = getenv("IR_JR");
-        relax_on = (e && e[0] == '0') ? 0 : !IS_808x();
+        relax_on = !opt_disabled("jr-relax") && (!IS_808x());
     }
     return relax_on;
 }
@@ -1567,8 +1561,7 @@ static int  xora_on = -1;
 static int  xora_enabled(void)
 {
     if (xora_on < 0) {
-        const char *e = getenv("IR_XORA");
-        xora_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; IR_XORA=0 opts out */
+        xora_on = !opt_disabled("xor-a");    /* default ON; IR_XORA=0 opts out */
     }
     return xora_on;
 }
@@ -1608,8 +1601,7 @@ static int  bccall_on = -1;
 static int  bccall_enabled(void)
 {
     if (bccall_on < 0) {
-        const char *e = getenv("IR_BCCALL");
-        bccall_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; =0 opts out */
+        bccall_on = !opt_disabled("bc-call");    /* default ON; =0 opts out */
     }
     return bccall_on;
 }
@@ -1813,8 +1805,7 @@ static int  bcflow_on = -1;
 static int  bcflow_enabled(void)
 {
     if (bcflow_on < 0) {
-        const char *e = getenv("IR_BCFLOW");
-        bcflow_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; =0 opts out */
+        bcflow_on = !opt_disabled("bc-flow");    /* default ON; =0 opts out */
     }
     return bcflow_on;
 }
@@ -2261,8 +2252,7 @@ static int tm_on = -1;
 static int tail_merge_enabled(void)
 {
     if (tm_on < 0) {
-        const char *e = getenv("IR_TAILMERGE");
-        tm_on = (e && e[0] == '0') ? 0 : !opt_disabled("tail-merge");
+        tm_on = !opt_disabled("tail-merge") && (!opt_disabled("tail-merge"));
     }
     return tm_on;
 }
@@ -2568,8 +2558,7 @@ static int bl_on = -1;
 static int block_layout_enabled(void)
 {
     if (bl_on < 0) {
-        const char *e = getenv("IR_BLAYOUT");
-        bl_on = (e && e[0] == '0') ? 0 : !opt_disabled("block-layout");
+        bl_on = !opt_disabled("block-layout") && (!opt_disabled("block-layout"));
     }
     return bl_on;
 }
@@ -3667,8 +3656,7 @@ static int hladdr_bb_carry_on(void)
 {
     static int on = -1;
     if (on < 0) {
-        const char *e = getenv("IR_HLADDR_BB");
-        on = (e && *e == '0') ? 0 : 1;
+        on = !opt_disabled("hl-addr-carry");
     }
     return on;
 }
@@ -4308,8 +4296,7 @@ static int dsw_on = -1;
 static int dsw_enabled(void)
 {
     if (dsw_on < 0) {
-        const char *e = getenv("IR_DSWORD");
-        dsw_on = (e && e[0] == '0') ? 0 : 1;
+        dsw_on = !opt_disabled("dead-store-word");
     }
     return dsw_on;
 }
@@ -4337,8 +4324,7 @@ static int ds_share = -1;
 static int ds_share_on(void)
 {
     if (ds_share < 0) {
-        const char *e = getenv("IR_DS_SHARE");
-        ds_share = (e && e[0] == '0') ? 0 : 1;
+        ds_share = !opt_disabled("dead-store-share");
     }
     return ds_share;
 }
@@ -4346,8 +4332,8 @@ static int ds_share_on(void)
 static int dsx_enabled(void)
 {
     if (dsx_on < 0) {
-        const char *e = getenv("IR_DEADSTORE");
-        dsx_on = !e ? 1 : (e[0] == '0' ? 0 : (e[0] == '2' ? 2 : 1));
+        /* The old "=2" value had no consumer — a plain on/off switch. */
+        dsx_on = !opt_disabled("dead-store");
     }
     return dsx_on;
 }
@@ -7260,11 +7246,10 @@ static int spflip_enabled(void)
 {
     static int v = -1;
     if (v < 0) {
-        const char *e = getenv("IR_SPFLIP");
-        /* DEFAULT-ON (frameless-via-sp costed flip, fp mode only). Opt out with
-           IR_SPFLIP=0 (matches the IR_DEADSTORE=0 convention). Inert unless
-           c_framepointer_is_ix==1, so default/sp builds are unaffected. */
-        v = (e && strcmp(e, "0") == 0) ? 0 : 1;
+        /* DEFAULT-ON (frameless-via-sp costed flip, fp mode only). Inert
+           unless c_framepointer_is_ix==1, so default/sp builds are
+           unaffected. Opt out with --opt-disable=sp-flip or IR_OFF=sp-flip. */
+        v = !opt_disabled("sp-flip");
     }
     return v;
 }
