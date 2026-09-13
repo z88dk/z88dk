@@ -536,6 +536,23 @@ static int  truncres_enabled(void)
    0 byte regressions AND all tick cells faster / 0 slower (it removes reload
    memory traffic, so bytes and ticks drop together). Opt out with IR_HL_CARRY=0 —
    reproduces the pre-flip codegen byte-for-byte (the regression-test path). */
+/* [IR_SLOTADDR] The sp-mode slot-address cache (cur_hl_addr_off) existed only
+   for BYTE accesses. The WORD load/store paths recomputed `ld hl,nn;add hl,sp`
+   (4 B) even when HL already pointed a byte or two away, and threw the address
+   away afterwards although a two-byte walk provably leaves HL on the slot's
+   high byte. This widens the cache to the word paths in both directions —
+   consume an in-range belief, publish the trailing address. Opt out with
+   IR_SLOTADDR=0, which reproduces the pre-change codegen byte-for-byte. */
+static int  slotaddr_on = -1;
+static int  slotaddr_widen(void)
+{
+    if (slotaddr_on < 0) {
+        const char *e = getenv("IR_SLOTADDR");
+        slotaddr_on = (e && e[0] == '0') ? 0 : 1;   /* default ON */
+    }
+    return slotaddr_on;
+}
+
 static int  hl_carry_on = -1;
 static int  hl_carry_enabled(void)
 {
@@ -3614,7 +3631,11 @@ static const char *exx_half_lo(const Func *f);
 static const char *exx_half_hi(const Func *f);
 static const char *exx_pair(const Func *f);
 static void cache_hl_slot_addr(const Func *f, int v);
+static void cache_hl_addr_off(int canon_off);
+static void emit_ex_de_hl(FILE *out);
+static void emit_pop_hl(FILE *out);
 static void emit_byte_slot_addr(FILE *out, const Func *f, int v);
+static void emit_slot_addr_off(FILE *out, const Func *f, int canon_off);
 
 /* The single choke point through which HL's logical tenant changes.
    `hl_about_to_change(v_new)` is called immediately before HL is loaded
@@ -5130,11 +5151,11 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
             emit(out, "ld\thl,bc");
         } else {
             /* Preserve HL across the sp restore (int return). */
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
             emit(out, "ld\thl,%d", f->frame_size);
             emit(out, "add\thl,sp");
             emit(out, "ld\tsp,hl");
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
         }
     }
     if (!fp_active(f) && frame_has_saved_fp(f)) {
@@ -5171,7 +5192,7 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
              __interrupt(N) / __critical __interrupt(0) → ei; reti        */
         emit(out, "pop\tiy");
         emit(out, "pop\tix");
-        emit(out, "pop\thl");
+        emit_pop_hl(out);
         emit(out, "pop\tde");
         emit(out, "pop\tbc");
         emit(out, "pop\taf");
@@ -5254,12 +5275,12 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
         } else {
             /* 8080/8085, int result in HL (≤2B): park it in DE via ex de,hl
                while HL does the sp math and BC holds the return address. */
-            emit(out, "ex\tde,hl");               /* DE = result (HL now free) */
+            emit_ex_de_hl(out);               /* DE = result (HL now free) */
             emit(out, "pop\tbc");                 /* BC = return address */
             emit(out, "ld\thl,%d", callee_args);
             emit(out, "add\thl,sp");
             emit(out, "ld\tsp,hl");               /* drop the args */
-            emit(out, "ex\tde,hl");               /* HL = result */
+            emit_ex_de_hl(out);               /* HL = result */
             emit(out, "push\tbc");
         }
     }
@@ -5270,7 +5291,7 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
         if (sdcccall1_ret_reg(f->ret_width) == SC1_A)
             emit(out, "ld\ta,l");          /* 1-byte return -> A */
         else
-            emit(out, "ex\tde,hl");        /* 2B -> DE; 4B native DEHL -> sc1 HLDE */
+            emit_ex_de_hl(out);        /* 2B -> DE; 4B native DEHL -> sc1 HLDE */
     }
     emit(out, "ret");
     return 0;
@@ -5465,7 +5486,7 @@ static void emit_prologue(FILE *out, Func *f)
         if (w == 4) {
             emit_hl_to_bc(out);          /* low half → BC */
         } else if (w <= 2) {
-            emit(out, "ex\tde,hl");      /* arg → DE */
+            emit_ex_de_hl(out);      /* arg → DE */
         }
         /* w > 4: fa / __i64_acc is in memory, no register stash needed. */
     }
@@ -5481,7 +5502,7 @@ static void emit_prologue(FILE *out, Func *f)
         if (sc1_ok && sc1_r1 == SC1_HL) {
             emit_hl_to_bc(out);          /* 1st (int) → BC across frame alloc */
         } else if (sc1_ok && sc1_r1 == SC1_DEHL) {
-            emit(out, "ex\tde,hl");      /* sc1 HLDE -> native DEHL (HL=lo, DE=hi) */
+            emit_ex_de_hl(out);      /* sc1 HLDE -> native DEHL (HL=lo, DE=hi) */
             emit_hl_to_bc(out);          /* low half → BC across frame alloc */
         } else if (sc1_ok && sc1_r2 == SC1_L) {
             emit(out, "ld\tc,l");        /* 2nd char (L) → C across frame alloc
@@ -5572,10 +5593,10 @@ static void emit_prologue(FILE *out, Func *f)
             emit(out, "ld\tc,e");
             cache_bc(fc_vreg);
         } else if (vreg_in_register_pool(f, fc_vreg)) {   /* PR_HL */
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
             cache_hl(fc_vreg);
         } else {                                 /* spill slot */
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
             store_hl(out, f, fc_vreg);
         }
     }
@@ -5593,7 +5614,7 @@ static void emit_prologue(FILE *out, Func *f)
         invalidate_de_cache();
     } else if (sc1 && sc1_ok) {
         if (sc1_p2 >= 0) {                 /* 2nd arg in DE */
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
             store_hl(out, f, sc1_p2);
         }
         if (sc1_p1 >= 0) {

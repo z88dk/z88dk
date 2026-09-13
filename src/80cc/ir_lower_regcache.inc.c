@@ -48,9 +48,14 @@ static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
         cache_bc(vreg_id);
         return;
     }
-    emit(out, "ld\thl,%d", off);
-    emit(out, "add\thl,sp");
-    if (IS_EZ80()) {
+    int bc_ez = IS_EZ80();
+    if (sp_adj == 0 && slotaddr_widen()) {
+        emit_slot_addr_off(out, f, slot_off(f, vreg_id));
+    } else {
+        emit(out, "ld\thl,%d", off);
+        emit(out, "add\thl,sp");
+    }
+    if (bc_ez) {
         emit(out, "ld\tbc,(hl)");   /* ez80: BC = *HL (HL preserved) */
     } else {
         load_byte_adv(out, "c", 0);
@@ -58,6 +63,9 @@ static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
     }
     cache_bc(vreg_id);
     invalidate_hl_cache();
+    /* As the DE path: HL is a live slot address, not junk. */
+    if (sp_adj == 0 && slotaddr_widen())
+        cache_hl_addr_off(slot_off(f, vreg_id) + (bc_ez ? 0 : 1));
 }
 
 /* True if vreg_id is homed in PR_BC at the current lowering point (I1 read path;
@@ -441,7 +449,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         emit(out, "exx");
         emit(out, "push\t%s", exx_pair(f));
         emit(out, "exx");
-        emit(out, "pop\thl");
+        emit_pop_hl(out);
         hl_about_to_change(vreg_id);
         return;
     }
@@ -519,7 +527,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
            sp_adj==0: an outstanding caller push (sp_adj>0) moves the slot to
            sp+sp_adj — use IX addressing instead. */
         if (sp_adj == 0 && width == 2 && fp_tos_slot(f, vreg_id)) {
-            emit(out, "pop\thl");
+            emit_pop_hl(out);
             emit(out, "push\thl");
             hl_about_to_change(vreg_id);
             return;
@@ -541,7 +549,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     /* Top-of-stack fast path: a slot at sp+0 read whole with `pop hl;
        push hl` — 2 ops vs ~6, no address compute. sp-mode only. */
     if (width == 2 && off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
-        emit(out, "pop\thl");
+        emit_pop_hl(out);
         emit(out, "push\thl");
         hl_about_to_change(vreg_id);
         return;
@@ -639,8 +647,16 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         hl_about_to_change(vreg_id);
         return;
     }
-    emit(out, "ld\thl,%d", off);
-    emit(out, "add\thl,sp");
+    /* Reuse a cached slot address rather than recomputing it, exactly as the
+       width==1 rung above does — an `inc hl`/`dec hl` walk beats the 4B
+       `ld hl,nn;add hl,sp`. sp_adj must be 0: the cache is kept at the
+       canonical sp (emit_slot_addr_off adds cur_sp_adjust itself). */
+    if (sp_adj == 0 && slotaddr_widen()) {
+        emit_slot_addr_off(out, f, slot_off(f, vreg_id));
+    } else {
+        emit(out, "ld\thl,%d", off);
+        emit(out, "add\thl,sp");
+    }
     emit(out, "ld\ta,(hl+)");
     emit(out, "ld\th,(hl)");
     emit(out, "ld\tl,a");
@@ -830,7 +846,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
             cache_de(vreg_id);
             return;
         }
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         /* HL ↔ DE swap: caches swap too. cur_hl now has what DE held
            (the old rs.de or -1); cur_de gets what HL held. */
         swap_hl_de_caches();
@@ -857,7 +873,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
             pending_spill_resolve();
             ss_note_reload(f, vreg_id);
             emit(out, "ld\thl,(sp+%d)", off);
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
             hl_about_to_change(-1);
             cache_de(vreg_id);
             return;
@@ -880,7 +896,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
             ss_note_reload(f, vreg_id);
             emit(out, "ld\tde,sp+%d", off);
             emit(out, "ld\thl,(de)");
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
             hl_about_to_change(-1);
             cache_de(vreg_id);
             return;
@@ -890,16 +906,26 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
            path above). */
         pending_spill_resolve();
         ss_note_reload(f, vreg_id);
-        emit(out, "ld\thl,%d", off);
-        emit(out, "add\thl,sp");
-        if (IS_EZ80()) {
+        if (slotaddr_widen()) {
+            emit_slot_addr_off(out, f, slot_off(f, vreg_id));
+        } else {
+            emit(out, "ld\thl,%d", off);
+            emit(out, "add\thl,sp");
+        }
+        int ez = IS_EZ80();
+        if (ez) {
             emit(out, "ld\tde,(hl)");   /* ez80: DE = *HL (HL preserved) */
         } else {
             load_byte_adv(out, "e", 0);
             load_byte_adv(out, "d", 1);
         }
-        hl_about_to_change(-1);
         cache_de(vreg_id);
+        /* HL still holds a known slot address — the base on ez80, the high
+           byte after the two-byte walk. Keep it as a reuse source rather
+           than throwing it away. */
+        hl_about_to_change(-1);
+        if (slotaddr_widen())
+            cache_hl_addr_off(slot_off(f, vreg_id) + (ez ? 0 : 1));
         return;
     }
     /* Byte → DE directly (zero-extend: E=byte, D=0), mirroring load_to_hl's
@@ -927,7 +953,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
         }
     }
     load_to_hl(out, f, vreg_id);
-    emit(out, "ex\tde,hl");
+    emit_ex_de_hl(out);
     swap_hl_de_caches();
 }
 
@@ -985,9 +1011,9 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
         int off = slot_off(f, vreg_id) + L.cur_sp_adjust;
         if (off >= 0 && off <= sp_rel_max(f)) {
             ss_note_reload(f, vreg_id);
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
             emit(out, "ld\thl,(sp+%d)", off);
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
             cache_de(vreg_id);
             return;
         }
@@ -1004,7 +1030,7 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
     emit_sp(out, 2, "push\thl");
     load_to_de(out, f, vreg_id);
     L.cur_sp_adjust -= 2;
-    emit(out, "pop\thl");
+    emit_pop_hl(out);
     /* HL is restored to its prior value — cache stands. */
 }
 
@@ -1026,7 +1052,7 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
        readers. A caller that wanted HL back emits its own `ex de,hl` and copt
        #284 cancels the pair. */
     if (vreg_id >= 0 && (f->vregs[vreg_id].flags & IR_VREG_DEAD_SPILL)) {
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         swap_hl_de_caches();
         /* ASSERT the belief, do not merely swap it. This helper's contract is
            that the value arrives in HL, but the CACHE need not already say so
@@ -1057,7 +1083,7 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
            value — cheaper than synthetic ld (ix+d),hl, same contract
            (DE=value, HL=junk). By-coincidence only. */
         if (fp_tos_slot(f, vreg_id)) {
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
             emit(out, "inc\tsp");
             emit(out, "inc\tsp");
             emit(out, "push\tde");
@@ -1069,7 +1095,7 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
                many sites end with `store_hl; ex de,hl` to restore HL. */
             emit(out, "ld\t(%s%+d),hl%s", frame_reg(), ix_off,
                  vol_stamp(f, vreg_id));
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
             return;
         }
     }
@@ -1078,14 +1104,14 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
        contract ex de,hl (DE=value, HL=junk) — mirrors the fp path. */
     if (off >= 0 && off <= sp_rel_max(f)) {
         emit(out, "ld\t(sp+%d),hl%s", off, vol_stamp(f, vreg_id));
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         return;
     }
     /* Top-of-stack: discard the slot word (inc sp x2) and push the value.
        Honours the contract (DE=value, HL=junk). sp-mode only, 4 ops vs the
        6-op byte walk. */
     if (off == 0 && !fp_active(f) && tos_pushpop_ok(f) && f->frame_size >= 2) {
-        emit(out, "ex\tde,hl");        /* DE = value */
+        emit_ex_de_hl(out);        /* DE = value */
         emit(out, "inc\tsp");
         emit(out, "inc\tsp");
         emit(out, "push\tde");
@@ -1098,10 +1124,10 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
     if ((IS_8085()) && off >= 0 && off <= 255) {
         emit(out, "ld\tde,sp+%d", off);
         emit(out, "ld\t(de),hl");
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         return;
     }
-    emit(out, "ex\tde,hl");        /* DE = value */
+    emit_ex_de_hl(out);        /* DE = value */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
     emit(out, "ld\t(hl),e%s", vol_stamp(f, vreg_id));
@@ -1210,13 +1236,18 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
        stage the value in DE and LEAVE it there — forcing it back to HL would
        cost the very `ex de,hl` we are eliminating. Return 0 so the caller caches
        DE. Identical cost to store_hl's fallback. */
-    emit(out, "ex\tde,hl");        /* DE = value; HL scratch for the address */
+    emit_ex_de_hl(out);        /* DE = value; HL scratch for the address */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
     emit(out, "ld\t(hl),e%s", vol_stamp(f, vreg_id));
     emit(out, "inc\thl");
     emit(out, "ld\t(hl),d");
+    /* HL is not junk: it points at the slot's HIGH byte. Publishing that as an
+       address belief lets the next slot access walk to it with inc/dec instead
+       of recomputing `ld hl,nn;add hl,sp`. invalidate_hl_cache() first, for the
+       DE/DEHL/A clobbers and the pending-spill flush it also performs. */
     invalidate_hl_cache();         /* HL holds the slot address, not the value */
+    if (slotaddr_widen()) cache_hl_addr_off(slot_off(f, vreg_id) + 1);
     return 0;                      /* value left in DE */
 }
 
@@ -1919,7 +1950,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
               tw_log(vreg_id, 0, 1, ixo,
                      fp_offset_fits(ixo) && fp_offset_fits(ixo + 3)); }
             ss_note_reload(f, vreg_id);
-            emit(out, "pop\thl");           /* HL = low half (bytes 0-1) */
+            emit_pop_hl(out);           /* HL = low half (bytes 0-1) */
             emit(out, "pop\tde");           /* DE = high half (bytes 2-3) */
             emit(out, "push\tde");
             emit(out, "push\thl");
@@ -1946,7 +1977,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        compute, no 4-byte walk. sp-mode + tos_pushpop_ok only. */
     if (off == 0 && !fp_active(f) && tos_pushpop_noex_ok(f)) {
         tw_log(vreg_id, 0, 0, off, off + 2 <= sp_rel_max(f));
-        emit(out, "pop\thl");           /* HL = low half (bytes 0-1) */
+        emit_pop_hl(out);           /* HL = low half (bytes 0-1) */
         emit(out, "pop\tde");           /* DE = high half (bytes 2-3) */
         emit(out, "push\tde");
         emit(out, "push\thl");
@@ -1962,7 +1993,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
             emit(out, "ld\tde,(sp+%d)", off + 2);
         } else {
             emit(out, "ld\thl,(sp+%d)", off + 2);
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
         }
         emit(out, "ld\thl,(sp+%d)", off);
         emit(out, "ld\tbc,hl");
@@ -1985,7 +2016,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         emit(out, "ld\tbc,hl");      /* BC = low half (cache invariant) */
         emit(out, "ld\tde,sp+%d", off + 2);
         emit(out, "ld\thl,(de)");    /* HL = high half */
-        emit(out, "ex\tde,hl");      /* DE = high half, HL = the address */
+        emit_ex_de_hl(out);      /* DE = high half, HL = the address */
         if (!no_hl)
             emit(out, "ld\thl,bc");  /* HL = low half */
         hl_about_to_change(no_hl ? -1 : vreg_id);
@@ -2055,9 +2086,9 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
                faster too. ez80/kc160 have both natively at 3 bytes, so they take
                the direct form; plain z80 synthesises either way. */
             if (IS_RABBIT()) {
-                emit(out, "ex\tde,hl");
+                emit_ex_de_hl(out);
                 emit(out, "ld\t(%s%+d),hl", frame_reg(), ix_off + 2);
-                emit(out, "ex\tde,hl");
+                emit_ex_de_hl(out);
             } else {
                 emit(out, "ld\t(%s%+d),de", frame_reg(), ix_off + 2);
             }
@@ -2101,9 +2132,9 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
         if (IS_KC160()) {
             emit(out, "ld\t(sp+%d),de", off + 2);
         } else {
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
             emit(out, "ld\t(sp+%d),hl", off + 2);
-            emit(out, "ex\tde,hl");
+            emit_ex_de_hl(out);
         }
         return;
     }
@@ -2117,10 +2148,10 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
        A is untouched. LDSI's offset is an unsigned byte. */
     if (IS_8085() && !opt_disabled("lhlx-long") && off >= 0 && off + 2 <= 255) {
         if (!bc_low) emit(out, "ld\tbc,hl");   /* BC = low half (contract) */
-        emit(out, "ex\tde,hl");          /* HL = high half */
+        emit_ex_de_hl(out);          /* HL = high half */
         emit(out, "ld\tde,sp+%d", off + 2);
         emit(out, "ld\t(de),hl");        /* slot+2..3 = high half */
-        emit(out, "ex\tde,hl");          /* DE = high half again (contract) */
+        emit_ex_de_hl(out);          /* DE = high half again (contract) */
         emit(out, "dec\thl");            /* HL = &slot+1 */
         emit(out, "ld\t(hl),b");         /* slot+1 = low half, high byte */
         emit(out, "dec\thl");            /* HL = &slot+0 */

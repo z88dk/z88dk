@@ -2716,6 +2716,64 @@ static int ldmem_narrowable(const Op *op)
 static int v_fits_byte(const Func *f, int v);
 static int v_is_sx_of_byte(const Func *f, int v);
 
+/* [IR_SHRMASK] Do all readers of this shift mask its result down inside `keep`?
+   Shared by the two narrowing proofs below, which differ only in that mask. */
+static int shr_uses_masked_within(const Func *f, const Op *op, uint64_t keep)
+{
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *u = &bb->ops[j];
+            int uses[16];
+            int nu = ir_op_uses(u, uses, (int)(sizeof uses / sizeof uses[0]));
+            int here = 0;
+            for (int k = 0; k < nu; k++) if (uses[k] == op->dst) here = 1;
+            if (!here) continue;
+            /* EVERY reader must be an immediate AND inside `keep`; any other
+               one may observe the bits the proof is discarding. */
+            if (u->kind != IR_AND || u->src[1] != -1) return 0;
+            if ((uint64_t)u->imm & ~keep) return 0;
+            seen = 1;
+        }
+    }
+    return seen;   /* no readers at all proves nothing */
+}
+
+/* [IR_SHRMASK] The source-fits-a-byte test is not the only proof that a right
+   shift can read ONE BYTE. `(x >> n) & M` takes result bit i from source bit
+   i+n, so the source's HIGH byte reaches result bits 8-n and up. If M has no
+   bit at or above 8-n those bits are discarded, and the shift may read the low
+   byte alone whatever the source's width — the bitfield-extract shape, where
+   80cc otherwise walks the pair with `srl h;rr l` (4 bytes a bit) to produce
+   bits the very next `and` throws away.
+
+   Logical only. An arithmetic shift would also be sound — the sign bits it
+   replicates land at or above 8-n and are masked off too — but signed bitfield
+   containers are rare and it is one more thing to be wrong about. */
+static int shr_result_masked_below(const Func *f, const Op *op)
+{
+    if (op->dst < 0 || op->dst >= f->n_vregs) return 0;
+    int count = (int)(op->imm & 0xff);
+    if (count < 1 || count > 7) return 0;      /* >= 8 has its own path */
+    return shr_uses_masked_within(f, op, ((uint64_t)1 << (8 - count)) - 1);
+}
+
+/* [IR_SHRMASK] Weaker: every reader masks the result inside ONE BYTE, but the
+   mask may reach bits the high byte supplies. That does not license reading a
+   single source byte — it proves only that the RESULT is byte-wide, which is
+   what the top-byte lowering needs (it reads the whole word). */
+static int shr_result_byte_wide(const Func *f, const Op *op)
+{
+    if (op->dst < 0 || op->dst >= f->n_vregs) return 0;
+    int count = (int)(op->imm & 0xff);
+    if (count < 2 || count > 7) return 0;      /* n=1 is cheaper as a shift */
+    return shr_uses_masked_within(f, op, 0xFF);
+}
+
+static int shrmask_on(void)
+{ const char *e = getenv("IR_SHRMASK"); return !(e && e[0] == '0'); }
+
 /* A constant-count right shift narrows only when the SOURCE provably fits a
    byte. Unlike a left shift — where the low byte of `src << n` depends only on
    src's low byte — a right shift pulls bits DOWN out of the high byte, so
@@ -2727,12 +2785,20 @@ static int narrow_shr_kind(const Func *f, const Op *op)
     if (op->kind != IR_SHR || op->src[1] != -1) return 0;
     if (op->src[0] < 0 || op->src[0] >= f->n_vregs) return 0;
     /* 8080 AND 8085 have no CB prefix, so neither `srl a` nor `sra a` exists
-       (8085's undocumented ARHL is the 16-bit `sra hl` only) — there is no byte
-       lowering to narrow into, so leave both on the 16-bit path. Every other
-       target has the CB set, gbz80 included. */
-    if (IS_808x()) return 0;
-    if (op->imm & IR_SHR_ARITH) return v_is_sx_of_byte(f, op->src[0]);
-    return v_fits_byte(f, op->src[0]);
+       (8085's undocumented ARHL is the 16-bit `sra hl` only). That rules out the
+       fits-a-byte route, whose lowering is a run of `srl a`.
+
+       It does NOT rule out the mask route. gen_shr lowers a byte logical shift
+       on 808x with emit_byte_lsr_a — `rrca`/`rlca` plus a mask, all base-page
+       opcodes every CPU has — so there IS a byte lowering to narrow into. And
+       the 16-bit path it would otherwise take on 808x is not an inline `srl h;
+       rr l` walk as on z80: it is a CALL to l_asr_u, a runtime loop (41 such
+       calls in the bench corpus, zero on z80). Keeping the mask route out of
+       808x costs the most exactly where it is dearest. */
+    if (op->imm & IR_SHR_ARITH) return IS_808x() ? 0 : v_is_sx_of_byte(f, op->src[0]);
+    if (!IS_808x() && v_fits_byte(f, op->src[0])) return 1;
+    if (!shrmask_on()) return 0;
+    return shr_result_masked_below(f, op) || shr_result_byte_wide(f, op);
 }
 
 /* Def-side gate: does this op have an 8-bit lowering for its dst? */
@@ -2863,11 +2929,19 @@ static int demands_low_byte_only(const Func *f, int v)
             }
             /* A constant-count right shift that itself narrowed to a byte.
                An immediate-count SHR has no vreg count operand, so v can only
-               be the shifted VALUE — and the shift only narrowed because that
-               value fits a byte (narrow_shr_kind), which is the same condition
-               that makes reading just v's low byte correct here. */
+               be the shifted VALUE — and the shift only narrowed because
+               narrow_shr_kind proved it reads one byte: either v fits a byte,
+               or (IR_SHRMASK) every reader masks away the bits v's high byte
+               would have supplied. Both make reading just v's low byte right. */
             if (u->kind == IR_SHR && u->src[1] == -1 && u->dst >= 0
-                && f->vregs[u->dst].width == 1)
+                && f->vregs[u->dst].width == 1
+                /* ...but NOT one that narrowed by the TOP-BYTE route. That
+                   lowering reads the WHOLE word (`add hl,hl` x (8-n) then
+                   `ld a,h`), so v's high byte is very much alive and narrowing
+                   v would hand it a one-byte slot. The two low-byte routes are
+                   the source fitting a byte, and every reader masking away what
+                   the high byte supplies. */
+                && (v_fits_byte(f, u->src[0]) || shr_result_masked_below(f, u)))
                 continue;
             if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
                 continue;
@@ -3243,6 +3317,29 @@ int ir_opt_narrow_byte(Func *f)
         }
         changed += pass_changed;
     } while (pass_changed);
+    /* [IR_SHRMASK] Mark the shifts that narrowed by the MASK route. gen_shr
+       reads the flag to lower them as a rotate with no clean-up mask: the bits
+       a rotate wraps round are exactly the ones the program's own AND discards,
+       and that AND is the only reader (shr_result_masked_below proved it).
+       Logical only — a rotate does not propagate a sign. Runs after the fixed
+       point, so `width == 1` here means the vreg really did narrow. */
+    if (shrmask_on()) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                if (op->kind != IR_SHR || op->src[1] != -1) continue;
+                if (op->imm & IR_SHR_ARITH) continue;
+                if (op->dst < 0 || op->dst >= f->n_vregs) continue;
+                if (f->vregs[op->dst].width != 1) continue;
+                if (shr_result_masked_below(f, op))
+                    op->imm |= IR_SHR_MASKED;
+                else if (shr_result_byte_wide(f, op))
+                    op->imm |= IR_SHR_TOPBYTE;
+            }
+        }
+    }
+
     /* [IR_NARROWPROBE] Anything still width-2 with a def is a rejected
        candidate — report which gate refused it and the op kind responsible.
        Emitted per function; a consumer should aggregate by (gate, kind). */

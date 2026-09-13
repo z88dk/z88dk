@@ -255,7 +255,7 @@ static int try_tos_step_inplace(FILE *out, Func *f, const Op *op, int delta)
         pending_spill_resolve();
     ss_note_reload(f, v);      /* pop reads the slot */
     ss_note_store(f, v);       /* push writes it back */
-    emit(out, "pop\thl");
+    emit_pop_hl(out);
     int n = delta < 0 ? -delta : delta;
     for (int i = 0; i < n; i++)
         emit(out, delta > 0 ? "inc\thl" : "dec\thl");
@@ -299,7 +299,7 @@ static int try_tos_rmw_reg(FILE *out, Func *f, const Op *op, int is_sub)
     load_to_de(out, f, op->src[1]);   /* DE = src; dst still parked; HL scratched */
     ss_note_reload(f, v);             /* pop reads the slot */
     ss_note_store(f, v);              /* push writes it back */
-    emit(out, "pop\thl");             /* consume dst */
+    emit_pop_hl(out);             /* consume dst */
     if (is_sub && !CPU_HAS_SBC_HL()) {
         /* Byte-wise rather than the `call __z80asm__sbc_hl_de` z80asm would
            substitute (see gen_neg): 6 bytes and 28T against 4 bytes and 90T.
@@ -750,7 +750,7 @@ static int gen_rotl(FILE *out, Func *f, const Op *op)
         emit(out, "ld\tl,a");
         break;
     case 2:                              /* rotl16: swap halves */
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         break;
     case 3:                              /* rotr8 */
         emit(out, "ld\ta,l");
@@ -923,11 +923,11 @@ static int gen_push_struct(FILE *out, Func *f, const Op *op)
     int size = (int)op->imm;
     if (size <= 0) return 0;
     load_to_hl(out, f, op->src[0]);   /* HL = struct source address */
-    emit(out, "ex\tde,hl");           /* DE = source */
+    emit_ex_de_hl(out);           /* DE = source */
     emit(out, "ld\thl,%d", -size);
     emit(out, "add\thl,sp");
     emit(out, "ld\tsp,hl");           /* sp = allocated top; HL = dst */
-    emit(out, "ex\tde,hl");           /* HL = source, DE = dst */
+    emit_ex_de_hl(out);           /* HL = source, DE = dst */
     emit_block_copy(out, f, size);
     L.cur_sp_adjust += size;
     invalidate_hl_bc();
@@ -1040,7 +1040,7 @@ static int gen_poststep(FILE *out, Func *f, const Op *op)
         emit(out, "dec\thl");
         emit(out, "ld\t(hl),e");         /* x = new */
         emit(out, up ? "dec\tde" : "inc\tde");
-        emit(out, "ex\tde,hl");          /* HL = old */
+        emit_ex_de_hl(out);          /* HL = old */
         if (de_live)
             emit(out, "pop\tde");
         /* x changed; HL claims stale. invalidate_hl also clears the
@@ -1454,7 +1454,7 @@ static int gen_pop_dehl_long(FILE *out, Func *f, const Op *op)
             "(cur_sp_adjust=%d)\n", L.cur_sp_adjust);
         return -1;
     }
-    emit(out, "pop\thl");            /* low half (pushed last) */
+    emit_pop_hl(out);            /* low half (pushed last) */
     emit(out, "pop\tde");            /* high half */
     L.cur_sp_adjust -= 4;
     if (L.la.cur_stack_long_top == op->src[0])
@@ -1860,14 +1860,14 @@ static int try_const_barrel(FILE *out, Func *f, const Op *op, int is_shr)
     int bc_live = (L.rs.bc >= 0);
     if (bc_live) emit(out, "push\tbc");
     emit(out, "ld\tb,%d", n);
-    emit(out, "ex\tde,hl");                  /* DE = value */
+    emit_ex_de_hl(out);                  /* DE = value */
     emit(out, is_shr ? "bsrl\tde,b" : "bsla\tde,b");
     if (bc_live) emit(out, "pop\tbc");       /* restore live BC */
     invalidate_hl_cache();
     invalidate_de_cache();
     if (!bc_live) invalidate_bc_cache();
     if (pr_de) { cache_de(op->dst); return 1; }
-    emit(out, "ex\tde,hl");                  /* HL = result */
+    emit_ex_de_hl(out);                  /* HL = result */
     commit_hl_word(out, f, op->dst);
     return 1;
 }
@@ -2419,7 +2419,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
         int bc_live = (L.rs.bc >= 0);  /* `ld b,e` clobbers B — preserve */
         if (bc_live) emit(out, "push\tbc");
         emit(out, "ld\tb,e");              /* B = count low byte */
-        emit(out, "ex\tde,hl");            /* DE = value */
+        emit_ex_de_hl(out);            /* DE = value */
         emit(out, "bsla\tde,b");           /* DE = value << B */
         if (bc_live) emit(out, "pop\tbc");
         invalidate_hl_cache();
@@ -2429,7 +2429,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             cache_de(op->dst);
             return 0;
         }
-        emit(out, "ex\tde,hl");            /* HL = result */
+        emit_ex_de_hl(out);            /* HL = result */
         commit_hl_word(out, f, op->dst);
         return 0;
     }
@@ -3050,7 +3050,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                         && L.cur_sp_adjust == 0 && slot_off(f, base) == 0))) {
                 ss_note_reload(f, base);
                 ss_note_store(f, base);
-                emit(out, "pop\thl");                  /* consume base off TOS */
+                emit_pop_hl(out);                  /* consume base off TOS */
                 emit(out, "ld\ta,(hl)");               /* A = *p */
                 emit(out, op->mem.post_step > 0 ? "inc\thl" : "dec\thl");
                 emit(out, "push\thl");                 /* re-park p±1 (HL = p±1) */
@@ -3230,7 +3230,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
         }
         if (lhlx_deref) {
             if (op->mem.offset == 0) {
-                emit(out, "ex\tde,hl");             /* DE = the address */
+                emit_ex_de_hl(out);             /* DE = the address */
                 emit(out, "ld\thl,(de)");           /* HL = the word */
                 cache_de(op->mem.base);             /* DE still holds the base */
             } else {
@@ -3294,7 +3294,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\ta,(hl+)");        /* A = byte 2 */
                 emit(out, "ld\th,(hl)");        /* H = byte 3 */
                 emit(out, "ld\tl,a");           /* HL = bytes 2,3 = HIGH */
-                emit(out, "ex\tde,hl");         /* DEHL: DE=HIGH, HL=LOW */
+                emit_ex_de_hl(out);         /* DEHL: DE=HIGH, HL=LOW */
             }
             store_dehl_finalize(out, f, op->dst);
         } else {
@@ -3842,7 +3842,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 load_to_hl(out, f, op->mem.base);      /* elided if HL still = base */
             } else {
                 load_to_hl(out, f, op->src[0]);
-                emit(out, "ex\tde,hl");         /* DE = value */
+                emit_ex_de_hl(out);         /* DE = value */
                 /* ex de,hl physically swaps HL<->DE, so the regcache beliefs must
                    swap too. Without this the stale rs.de (e.g. the base pointer,
                    when it arrived in DE — a call result) misleads the load_to_hl
@@ -3888,7 +3888,7 @@ static int try_word_accumulate(FILE *out, Func *f, const Op *op)
     }
     load_to_hl(out, f, t);             /* HL = addend (preserves DE = home) */
     emit(out, "add\thl,de");           /* HL = home + t */
-    emit(out, "ex\tde,hl");            /* DE = new home; HL = old home (junk) */
+    emit_ex_de_hl(out);            /* DE = new home; HL = old home (junk) */
     invalidate_hl_cache();             /* drops HL/DE/A beliefs */
     cache_de(home);                    /* DE now holds the new home */
     byte_home_note(home);              /* residency (re)established */
@@ -4115,7 +4115,7 @@ static int try_de_home_def(FILE *out, Func *f, const Op *op)
     load_to_hl(out, f, op->src[0]);                    /* HL = src0 (DE-clean) */
     for (long i = 0; i < op->imm; i++)
         emit(out, op->kind == IR_ADD ? "inc\thl" : "dec\thl");
-    emit(out, "ex\tde,hl");                            /* DE = new home; HL junk */
+    emit_ex_de_hl(out);                            /* DE = new home; HL junk */
     invalidate_hl_cache();
     cache_de(op->dst);
     byte_home_note(op->dst);
@@ -4318,11 +4318,11 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                 emit(out, "adc\ta,%u", (unsigned)((k >> 24) & 0xff));
                 emit(out, "ld\td,a");
             } else {
-                emit(out, "ex\tde,hl");             /* DE = result LOW, HL = LHS_HIGH */
+                emit_ex_de_hl(out);             /* DE = result LOW, HL = LHS_HIGH */
                 emit(out, "ld\tbc,%u",
                      (unsigned)((k >> 16) & 0xffff));
                 emit(out, "adc\thl,bc");            /* HL = LHS_HIGH + K_HIGH + C */
-                emit(out, "ex\tde,hl");             /* DEHL = result */
+                emit_ex_de_hl(out);             /* DEHL = result */
             }
             store_dehl_finalize(out, f, op->dst);
             return 0;
@@ -4358,9 +4358,9 @@ static int gen_add(FILE *out, Func *f, const Op *op)
             emit_sp(out, -2, "pop\tbc");      /* BC = stacked LOW  */
             emit(out, "add\thl,bc");          /* HL = result LOW, sets carry */
             emit_sp(out, -2, "pop\tbc");      /* BC = stacked HIGH (flags kept) */
-            emit(out, "ex\tde,hl");           /* HL = other HIGH */
+            emit_ex_de_hl(out);           /* HL = other HIGH */
             emit(out, "adc\thl,bc");          /* HL = result HIGH + carry */
-            emit(out, "ex\tde,hl");           /* DEHL = result */
+            emit_ex_de_hl(out);           /* DEHL = result */
             L.la.cur_stack_long_top = -1;
             store_dehl_finalize(out, f, op->dst);
             return 0;
@@ -4428,7 +4428,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         emit(out, "push\thl");                  /* LOW */
         L.la.cur_load_to_dehl_no_hl = 1;
         load_to_dehl_adj(out, f, op->src[0], 4);  /* BC = a.LSW */
-        emit(out, "pop\thl");                       /* HL = b.LSW */
+        emit_pop_hl(out);                       /* HL = b.LSW */
         emit(out, "add\thl,bc");                    /* HL = LOW result; DE = a.MSW */
         if ((IS_808x() || IS_GBZ80())) {
             /* gbz80/808x: `adc hl,bc` and `ex de,hl` are emulated. DE
@@ -4443,10 +4443,10 @@ static int gen_add(FILE *out, Func *f, const Op *op)
             emit(out, "ld\td,a");
             store_dehl_finalize(out, f, op->dst);
         } else {
-            emit(out, "ex\tde,hl");                 /* DE = LOW result */
+            emit_ex_de_hl(out);                 /* DE = LOW result */
             emit(out, "pop\tbc");                   /* BC = b.MSW */
             emit(out, "adc\thl,bc");                /* HL = a.MSW + b.MSW + C */
-            emit(out, "ex\tde,hl");                 /* DEHL = result */
+            emit_ex_de_hl(out);                 /* DEHL = result */
             store_dehl_finalize(out, f, op->dst);
         }
         return 0;
@@ -4509,7 +4509,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         && !g_hc.home_is_word && !IS_GBZ80() && !IS_RABBIT() && !IS_KC160()
         && !de_has(op->src[1]) && !bc_has(op->src[1])
         && !(vreg_in_pr_bc(f, op->src[1]) && fp_active(f))) {
-        emit(out, "ex\tde,hl");            /* DE = src0 (running value) */
+        emit_ex_de_hl(out);            /* DE = src0 (running value) */
         swap_hl_de_caches();
         load_to_hl(out, f, op->src[1]);    /* HL = src1 (preserves DE) */
         emit(out, "add\thl,de");
@@ -4684,11 +4684,11 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\tbc,%u", (unsigned)(k & 0xffff));
                 emit(out, "or\ta");                     /* clear carry */
                 emit(out, "sbc\thl,bc");                /* HL = LHS_LOW - K_LOW */
-                emit(out, "ex\tde,hl");                 /* DE = result LOW, HL = LHS_HIGH */
+                emit_ex_de_hl(out);                 /* DE = result LOW, HL = LHS_HIGH */
                 emit(out, "ld\tbc,%u",
                      (unsigned)((k >> 16) & 0xffff));
                 emit(out, "sbc\thl,bc");                /* HL = LHS_HIGH - K_HIGH - borrow */
-                emit(out, "ex\tde,hl");                 /* DEHL = result */
+                emit_ex_de_hl(out);                 /* DEHL = result */
             }
             store_dehl_finalize(out, f, op->dst);
             return 0;
@@ -4839,7 +4839,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         emit(out, "push\thl");
         L.la.cur_load_to_dehl_no_hl = 1;
         load_to_dehl_adj(out, f, op->src[1], 4);    /* BC = b.LSW */
-        emit(out, "pop\thl");                       /* HL = a.LSW */
+        emit_pop_hl(out);                       /* HL = a.LSW */
         if ((IS_808x() || IS_GBZ80())) {
             /* gbz80/808x: sbc hl,bc and ex de,hl are emulated. Subtract
                byte-wise (a - b) — b is BC=low/DE=high, a's high half is
@@ -4865,11 +4865,11 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         } else {
             emit(out, "or\ta");                     /* clear carry */
             emit(out, "sbc\thl,bc");                /* HL = a-b LOW */
-            emit(out, "ex\tde,hl");                 /* DE = LOW, HL = b.MSW */
+            emit_ex_de_hl(out);                 /* DE = LOW, HL = b.MSW */
             emit(out, "ld\tbc,hl");                 /* BC = b.MSW */
-            emit(out, "pop\thl");                   /* HL = a.MSW */
+            emit_pop_hl(out);                   /* HL = a.MSW */
             emit(out, "sbc\thl,bc");                /* HL = a-b MSW */
-            emit(out, "ex\tde,hl");                 /* DEHL = result */
+            emit_ex_de_hl(out);                 /* DEHL = result */
             store_dehl_finalize(out, f, op->dst);
         }
         return 0;
@@ -5013,9 +5013,9 @@ static int gen_mul(FILE *out, Func *f, const Op *op)
         /* z80n has only `mul de`. The paired ex de,hl restores any cached
            DE value (ex; mul de clobbers DE; ex puts the product in HL and
            the original DE back). */
-        emit(out, "ex\tde,hl");
+        emit_ex_de_hl(out);
         emit(out, "mul\tde");                   /* DE = D*E */
-        emit(out, "ex\tde,hl");                 /* HL = product, DE restored */
+        emit_ex_de_hl(out);                 /* HL = product, DE restored */
     } else if (IS_KC160()) {
         emit(out, uns ? "mul\thl" : "muls\thl");/* HL = H*L */
     } else {
@@ -5467,7 +5467,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             } else {
                 emit(out, "ld\th,a");
                 emit(out, "ld\tl,c");
-                emit(out, "ex\tde,hl");           /* DEHL = result */
+                emit_ex_de_hl(out);           /* DEHL = result */
             }
             /* Drop the data-stack frame. */
             emit(out, "pop\tbc");
@@ -5564,8 +5564,8 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                     emit(out, "pop\taf");
                     emit(out, "pop\taf");
                 } else {
-                    emit(out, "pop\thl");
-                    emit(out, "pop\thl");
+                    emit_pop_hl(out);
+                    emit_pop_hl(out);
                     invalidate_hl_cache();
                 }
                 L.cur_sp_adjust -= 4;
