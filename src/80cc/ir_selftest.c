@@ -46,6 +46,25 @@ const SYMBOL *ir_sym_bank_fn(const SYMBOL *sym)
     return NULL;   /* selftest has no __addressmod symbols */
 }
 
+/* Stub for opt_disabled — the real one lives in main.c, which the selftest
+   doesn't link. Nothing is disabled here, which is the default the compiler
+   sees with no --opt-disable flags. Without this the selftest does not link
+   at all, so `make ir_selftest` was silently unavailable. */
+int opt_disabled(const char *name)
+{
+    (void)name;
+    return 0;
+}
+
+/* Option globals the IR layer reads. Real definitions are in main.c / data.c,
+   which the selftest doesn't link; these carry the same defaults. */
+char c_debug_adb_defc = 0;
+char c_debug_entry_points = 0;
+int  c_reserve_ix = 0;
+int  c_reserve_iy = 0;
+int  c_idx3_residency = 0;
+int  c_exx_residency = 0;
+
 static int build_add_two(Func *f)
 {
     /* C equivalent:
