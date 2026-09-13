@@ -6785,14 +6785,8 @@ int ir_lower_func(FILE *out, Func *f)
         int demoted = 0;
         for (int i = 0; i < hd_nbad; i++) {
             int v = hd_bad[i];
-            if (v < 0 || v >= f->n_vregs) continue;
-            if (f->vreg_to_phys) f->vreg_to_phys[v] = IR_PR_SPILL;
+            if (!ir_alloc_demote_home(f, v)) continue;
             if (home_rearb_enabled()) ir_alloc_veto_add(v);
-            /* These three all suppress a slot; the point is to get one. */
-            f->vregs[v].flags &= ~(IR_VREG_NO_SLOT | IR_VREG_DEAD_SPILL
-                                   | IR_VREG_PARAM_IN_PLACE);
-            if (f->home_lo) f->home_lo[v] = 0;
-            if (f->home_hi) f->home_hi[v] = INT_MAX;
             demoted++;
         }
         if (demoted) {

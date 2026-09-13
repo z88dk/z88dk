@@ -123,6 +123,23 @@ void ir_alloc_word_home_reject(Func *f)
     ir_assign_slots(f);
 }
 
+/* [home-demote] The render found a register home it could not realize — a
+   slotless value read with its register gone. The lowerer names the vreg; the
+   demotion itself is applied here, because it is an edit to the allocation.
+   The three cleared flags all suppress a slot, and the point of a demotion is
+   to get one. Costs the slot traffic the home was meant to save; the
+   alternative was exit(1). */
+int ir_alloc_demote_home(Func *f, int v)
+{
+    if (!f || v < 0 || v >= f->n_vregs) return 0;
+    if (f->vreg_to_phys) f->vreg_to_phys[v] = IR_PR_SPILL;
+    f->vregs[v].flags &= ~(IR_VREG_NO_SLOT | IR_VREG_DEAD_SPILL
+                           | IR_VREG_PARAM_IN_PLACE);
+    if (f->home_lo) f->home_lo[v] = 0;
+    if (f->home_hi) f->home_hi[v] = INT_MAX;
+    return 1;
+}
+
 void ir_alloc_word_home_done(void)
 {
     free(word_home_prepick);

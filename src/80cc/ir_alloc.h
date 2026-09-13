@@ -26,6 +26,13 @@ int  ir_alloc_word_home_picked(void);
 void ir_alloc_word_home_reject(Func *f);
 void ir_alloc_word_home_done(void);
 
+/* [home-demote] Drop v to a frame slot after the render proved its register
+   home unrealizable, clearing the flags that would suppress the slot. Returns
+   0 if v is out of range. The lowerer reports the vreg; the plan is edited
+   here. Pair it with ir_alloc_veto_add so a re-arbitration offers the freed
+   register to the next candidate. */
+int ir_alloc_demote_home(Func *f, int v);
+
 /* [home-rearb] The lowerer proved a register home unrealizable: veto the value
    so a re-run of ir_alloc offers its register to the next candidate instead of
    leaving it unused. Reset per function. */
