@@ -97,8 +97,17 @@ struct RecursionDetector : ASTVisitor {
     }
 
     void leave(Prog&) override {
+        std::vector<std::string> funcs;
         for (const auto& [func, called] : call_tree) {
+            funcs.push_back(func);
+        }
+        std::sort(funcs.begin(), funcs.end());
+
+        for (const auto& func : funcs) {
             std::unordered_set<std::string> visited;
+
+            auto called = call_tree.at(func);
+            std::sort(called.begin(), called.end());
 
             for (const auto& callee : called) {
                 if (callee == func ||
@@ -108,7 +117,7 @@ struct RecursionDetector : ASTVisitor {
                     if (it != defined_loc.end()) {
                         loc = it->second;
                     }
-                    error(loc, "Recursive PROC or FN detected: " + func);
+                    error(loc, "Recursive function: " + func);
                     break;
                 }
             }
