@@ -2131,10 +2131,6 @@ int ir_opt_sym_addr_fold(Func *f)
        sp_cmp_slot) which read a NO_SLOT vreg's slot and emitted `ld hl,-1;
        add hl,sp`. Both now carry the guard their two siblings already had; the
        fold is only safe with those in place. */
-    {
-        const char *e = getenv("IR_SYMADDR");
-        if (e && e[0] == '0') return 0;
-    }
     if (opt_disabled("sym-addr-fold")) return 0;
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
@@ -3401,7 +3397,6 @@ int ir_opt_cmp_unsign(Func *f)
 {
     if (!f) return 0;
     if (opt_disabled("cmp-unsign")) return 0;
-    { const char *e = getenv("IR_CMPUNSIGN"); if (e && e[0] == '0') return 0; }
     int changed = 0;
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];

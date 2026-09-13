@@ -1289,7 +1289,7 @@ static int bc_args_save_depth;
 static int bcsave_live_on(void)
 {
     static int c = -1;
-    if (c < 0) { const char *e = getenv("IR_BCSAVE_LIVE"); c = !(e && e[0] == '0'); }
+    if (c < 0) c = !opt_disabled("bc-save-live");
     return c;
 }
 
@@ -4257,7 +4257,7 @@ static int try_index_half_word_add(FILE *out, Func *f, const Op *op)
 static int addbc_enabled(void)
 {
     static int v = -1;
-    if (v < 0) { const char *e = getenv("IR_ADDBC"); v = (e && e[0] == '0') ? 0 : 1; }
+    if (v < 0) v = !opt_disabled("add-bc");
     return v;
 }
 

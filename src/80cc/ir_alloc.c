@@ -864,12 +864,12 @@ static int ranged_on(void) { static int c = -1; if (c < 0) c = getenv("IR_RANGED
    z80/gbz80/8085 ticks all faster-or-neutral). Opt out with IR_CALLSPLIT=0
    (byte-identical to pre-flip). The dear-slot CPU gate (deref_gap>=15) inside
    the selection keeps cheap-slot CPUs byte-identical regardless. */
-static int callsplit_on(void) { static int c = -1; if (c < 0) { const char *e = getenv("IR_CALLSPLIT"); c = !(e && e[0] == '0'); } return c; }
+static int callsplit_on(void) { static int c = -1; if (c < 0) c = !opt_disabled("call-split"); return c; }
 
 /* [IR_IYLONG=0] Opt OUT of running the IY packs in a function the BC veto
    excludes. They self-guard with a per-op op_clobbers IR_R_IY check over the
    candidate's live range, so the BC veto buys them nothing. */
-static int iylong_off(void) { static int c = -1; if (c < 0) { const char *e = getenv("IR_IYLONG"); c = (e && e[0] == '0'); } return c; }
+static int iylong_off(void) { static int c = -1; if (c < 0) c = opt_disabled("iy-long"); return c; }
 
 /* [IR_GBZ80_COST=1] Opt IN to the measured gbz80 cost row (see GBZ80[] in
    g0_word_cost). OPT-IN, not default: the row is right — gbz80 was using the
@@ -896,8 +896,10 @@ static int cs_evict_on(void)
 {
     static int c = -1;
     if (c < 0) {
-        const char *e = getenv("IR_CS_EVICT");
-        c = e ? (e[0] == '1') : prepushnarrow_on();
+        /* Follows prepush-narrow unless explicitly disabled. (The old
+           IR_CS_EVICT=1 could also force it ON against that default; nothing
+           used that direction, so the switch is disable-only now.) */
+        c = !opt_disabled("cs-evict") && prepushnarrow_on();
     }
     return c;
 }
@@ -919,7 +921,7 @@ static int cs_evict_on(void)
 static int prepushnarrow_on(void)
 {
     static int c = -1;
-    if (c < 0) { const char *e = getenv("IR_PREPUSH_NARROW"); c = !(e && e[0] == '0'); }
+    if (c < 0) c = !opt_disabled("prepush-narrow");
     return c;
 }
 
@@ -931,7 +933,7 @@ static int prepushnarrow_on(void)
 static int mwbc_on(void)
 {
     static int c = -1;
-    if (c < 0) { const char *e = getenv("IR_MWBC"); c = !(e && e[0] == '0'); }
+    if (c < 0) c = !opt_disabled("mwbc");
     return c;
 }
 /* [IR_MWBC_PRESSURE] The BC reservation that keeps a loop-carried accumulator
@@ -3341,7 +3343,7 @@ static RegMask class_home_mask(const Func *f, unsigned R, unsigned flags)
 static int bcpercand_on(void)
 {
     static int on = -1;
-    if (on < 0) { const char *e = getenv("IR_BCPERCAND"); on = !(e && e[0] == '0'); }
+    if (on < 0) on = !opt_disabled("bc-per-cand");
     return on;
 }
 

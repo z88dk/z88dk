@@ -11,7 +11,7 @@
 static int cmpk_enabled(void)
 {
     static int v = -1;
-    if (v < 0) { const char *e = getenv("IR_CMPK"); v = (e && e[0] == '0') ? 0 : 1; }
+    if (v < 0) v = !opt_disabled("cmp-k");
     return v;
 }
 
