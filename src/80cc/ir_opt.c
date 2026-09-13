@@ -2338,6 +2338,163 @@ int ir_opt_sym_deref_fold(Func *f)
     return changed;
 }
 
+/* ---- Fold a constant address temp into the deref's own offset -------------
+   `t = p + K; *t` -> `*(p + K)`. MemOp already carries base AND offset, so
+   this is a pure rewrite, not a representation change; DCE reclaims the ADD
+   once the last deref through it has folded.
+
+   ►► This pass is HALF of a change and REGRESSES ALONE. Measured on its own it
+   cost z80 +77 B (localbench +113): dropping the address temps lengthens the
+   pointer's live range, and a nonzero offset on a VREG base is re-formed with
+   `ld de,K; add hl,de` at every access — so the compiler pays for the offset
+   as many times as it saved the add. Its partner is the `idx-deref` lowering
+   rung (idx_deref_reg, ir_lower_ops.inc.c), which turns base+offset into a
+   free `(iy+d)`. The offset must be FREE for the fold to pay, and it is free
+   only when the base ends up in an index register.
+
+   So the fold is aimed, not general: it fires only on the shape that can WIN
+   the index home, which is the one idx2_home_realizable admits —
+
+     - a width-2 read-only POINTER PARAMETER. A param has no def in this
+       function, so `p` at the deref is provably the same value as at the ADD
+       and the rewrite needs no dominance argument at all. Anything with a def
+       could be redefined between the two (the IR is not SSA) and is rejected
+       rather than proved.
+     - never STEPPED. A walking pointer wants HL/BC and regressed strbench
+       when it was let into the index home; folding its offsets aims it at a
+       home it should not have.
+     - dereferenced at 2 or more sites, counted THROUGH the temps — before the
+       fold a struct pointer reads as one direct deref plus N address temps,
+       which is exactly the census that made the allocator pass it over.
+     - every folded displacement inside the index byte (-128..127, and d+1 for
+       a word). An offset the rung cannot spell is an offset that goes back to
+       being re-formed per access, i.e. the regression above.
+
+   CPUs with no index register (808x, gbz80, and the VM1, whose idx2 is the
+   RS-prefixed h'/l' pair with no displaced form) can never collect the other
+   half, so the fold is skipped there outright.
+   --opt-disable=deref-offset opts out. */
+
+/* Is `o` an `ADD dst <- src0, imm` with a plain constant? */
+static int deref_off_add(const Op *o)
+{
+    return o && o->kind == IR_ADD && o->dst >= 0 && o->src[0] >= 0
+        && o->src[1] < 0 && !o->imm_sym;
+}
+
+/* Does the displacement fit the index byte for a `width`-byte access? */
+static int deref_off_fits(long d, int width)
+{
+    return d >= -128 && d <= 127 && !(width == 2 && d + 1 > 127);
+}
+
+static int deref_off_width(const Func *f, const Op *o)
+{
+    if (o->kind == IR_LD_MEM)
+        return (o->dst >= 0 && o->dst < f->n_vregs) ? f->vregs[o->dst].width : 0;
+    return kind_scalar_width(o->mem.elem);
+}
+
+int ir_opt_deref_offset(Func *f)
+{
+    if (!f || opt_disabled("deref-offset")) return 0;
+    if (IS_808x() || IS_GBZ80()) return 0;      /* no (ix+d) to fold towards */
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    Op **add  = calloc((size_t)nv, sizeof(Op *));   /* t -> its defining ADD */
+    int *derefs  = calloc((size_t)nv, sizeof(int)); /* p -> foldable deref count */
+    int *hostile = calloc((size_t)nv, sizeof(int)); /* p -> do not fold at all */
+    if (!ndef || !add || !derefs || !hostile) {
+        free(ndef); free(add); free(derefs); free(hostile); return 0;
+    }
+
+    /* Defs through ir_op_defs, not op->dst — a post-stepping deref redefines
+       its base in place and reports it there with no dst of its own. The same
+       count that sym_deref_fold needs, for the same reason. */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int d[8];
+            int n = ir_op_defs(&f->bbs[b].ops[j], d, 8);
+            for (int k = 0; k < n; k++)
+                if (d[k] >= 0 && d[k] < nv) ndef[d[k]]++;
+        }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (deref_off_add(o) && o->dst < nv && ndef[o->dst] == 1
+                && f->vregs[o->dst].width == 2
+                && !(f->vregs[o->dst].flags & (IR_VREG_ADDR_TAKEN
+                                               | IR_VREG_VOLATILE)))
+                add[o->dst] = o;
+        }
+
+    /* A candidate base: a read-only width-2 pointer parameter. ndef counts the
+       defs IN this function; a parameter's incoming value is not one of them,
+       which is precisely why zero here means read-only rather than undefined. */
+    #define DO_CAND(v) ((v) >= 0 && (v) < nv && ndef[(v)] == 0 \
+                        && f->vregs[(v)].width == 2 \
+                        && (f->vregs[(v)].flags & IR_VREG_PARAM) \
+                        && !(f->vregs[(v)].flags & (IR_VREG_ADDR_TAKEN \
+                                                    | IR_VREG_VOLATILE)))
+
+    /* Census. Count what the fold WOULD produce (direct derefs + derefs
+       through a constant temp), and veto a base whose shape the index home
+       rejects or whose displacement the rung cannot spell. */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_LD_MEM && o->kind != IR_ST_MEM) continue;
+            if (o->mem.kind != IR_MEM_VREG) continue;
+            int base = o->mem.base;
+            if (base < 0 || base >= nv) continue;
+            int w = deref_off_width(f, o);
+            long ofs = o->mem.offset;
+            int p = base;
+            if (add[base]) { p = add[base]->src[0]; ofs += (long)add[base]->imm; }
+            if (!DO_CAND(p)) continue;
+            /* A stepped deref is a walking pointer, whichever vreg carries the
+               address: it has no business in the index home, so the whole base
+               is out — not just this site. */
+            if (o->mem.post_step != 0 || o->mem.bank_fn) { hostile[p] = 1; continue; }
+            if (w != 1 && w != 2) { hostile[p] = 1; continue; }
+            if (!deref_off_fits(ofs, w)) { hostile[p] = 1; continue; }
+            derefs[p]++;
+        }
+    /* Any other step of the pointer itself disqualifies it too. */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            if (o->kind == IR_POSTSTEP && o->src[0] >= 0 && o->src[0] < nv)
+                hostile[o->src[0]] = 1;
+            if (o->kind == IR_COPY_STEP_BRZ)
+                for (int q = 0; q < 2; q++)
+                    if (o->src[q] >= 0 && o->src[q] < nv) hostile[o->src[q]] = 1;
+        }
+
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_LD_MEM && o->kind != IR_ST_MEM) continue;
+            if (o->mem.kind != IR_MEM_VREG) continue;
+            int t = o->mem.base;
+            if (t < 0 || t >= nv || !add[t]) continue;
+            if (o->mem.post_step != 0 || o->mem.bank_fn) continue;
+            int p = add[t]->src[0];
+            if (!DO_CAND(p) || hostile[p] || derefs[p] < 2) continue;
+            long ofs = (long)o->mem.offset + (long)add[t]->imm;
+            if (!deref_off_fits(ofs, deref_off_width(f, o))) continue;
+            o->mem.base   = p;
+            o->mem.offset = (int)ofs;
+            changed++;
+        }
+    #undef DO_CAND
+    free(ndef); free(add); free(derefs); free(hostile);
+    return changed;
+}
+
 /* ---- Fold a &symbol RHS of an EQ/NE compare into a symbol immediate ------
    A symbol address is a link-time constant, so `if (p == &g)` should lower to
    `ld hl,(p); ld de,g; sbc hl,de` exactly like `if (p == 5)` folds `5` into the

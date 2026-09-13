@@ -521,11 +521,22 @@ static int idx2_counter_hostile_use(const Func *f, int v)
     return hostile;
 }
 
+#define IDX2_BASE_STEPPED  0x10000   /* v is a stepped / post-stepped base */
+#define IDX2_BASE_NMASK    0x0FFFF   /* ...and how many plain deref uses */
+
 /* idx2 map builder (factored from idx2_propose so home_realizable can rebuild
    it independently). is_base = LD_MEM/ST_MEM MEM_VREG base + POSTSTEP src[0] +
    COPY_STEP_BRZ pointers (a deref'd/stepped pointer, never an idx2 counter/
    bound); cstep/cinit/cother = per-vreg def-shape counts. Buffers sized
-   f->n_vregs, caller-zeroed. */
+   f->n_vregs, caller-zeroed.
+
+   [IR_IDX2BASE] is_base is now COUNTED, not just flagged: the low bits hold how
+   many times v is a plain deref base and IDX2_BASE_STEPPED marks a stepped /
+   post-stepped one. Every existing test is `if (is_base[v])`, which nonzero
+   still satisfies; only idx2_home_realizable decodes it. The distinction is the
+   one the measurement demanded — a struct pointer dereffed at SEVERAL fixed
+   offsets wants (iy+d), a WALKING pointer wants HL/BC and regressed strbench
+   +19 B when both were admitted alike. */
 static void build_idx2_maps(const Func *f, int *is_base, int *cstep,
                             int *cinit, int *cother)
 {
@@ -534,15 +545,18 @@ static void build_idx2_maps(const Func *f, int *is_base, int *cstep,
             const Op *o = &f->bbs[i].ops[j];
             if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
                 && o->mem.kind == IR_MEM_VREG
-                && o->mem.base >= 0 && o->mem.base < f->n_vregs)
-                is_base[o->mem.base] = 1;
+                && o->mem.base >= 0 && o->mem.base < f->n_vregs) {
+                is_base[o->mem.base]++;                  /* counted */
+                if (o->mem.post_step != 0)
+                    is_base[o->mem.base] |= IDX2_BASE_STEPPED;
+            }
             if (o->kind == IR_POSTSTEP && o->src[0] >= 0
                 && o->src[0] < f->n_vregs)
-                is_base[o->src[0]] = 1;
+                is_base[o->src[0]] |= IDX2_BASE_STEPPED | 1;
             if (o->kind == IR_COPY_STEP_BRZ)
                 for (int q = 0; q < 2; q++)
                     if (o->src[q] >= 0 && o->src[q] < f->n_vregs)
-                        is_base[o->src[q]] = 1;
+                        is_base[o->src[q]] |= IDX2_BASE_STEPPED | 1;
             int d = o->dst;
             if (d < 0 || d >= f->n_vregs) continue;
             if ((o->kind == IR_INC || o->kind == IR_DEC) && o->src[0] == d)
@@ -561,6 +575,9 @@ static void build_idx2_maps(const Func *f, int *is_base, int *cstep,
    (idx2_reg present, acc-free, call-free), which stays in the proposer since
    it also guards building the maps. home_realizable(...,RC_IDX2,...) := this
    != 0. */
+static int idx2base_on(void)
+{ const char *e = getenv("IR_IDX2BASE"); return !(e && e[0] == '0'); }   /* default ON */
+
 static unsigned idx2_home_realizable(const Func *f, int v,
                                      const int *use_count, const int *write_count,
                                      const int *is_base, const int *cstep,
@@ -570,7 +587,33 @@ static unsigned idx2_home_realizable(const Func *f, int v,
     if (vr->width != 2) return 0;
     if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
     if (f->vreg_to_phys[v] != IR_PR_SPILL) return 0;
-    if (is_base[v]) return 0;
+    /* [IR_IDX2BASE] A deref base used to be rejected here outright, so a struct
+       pointer could never reach the index home however well it scored, while a
+       scalar param read back through `push iy;pop hl` could.
+
+       ►► Be clear about WHY admitting the base wins, because it is not the
+       obvious reason. 80cc's index home is a VALUE carrier, not an addressing
+       mode: emit_idx_word_to_reg reads it with `push iy;pop hl`, and the corpus
+       contains ZERO `(iy+d)` accesses (sdcc's has 47). So the pointer does NOT
+       gain a cheaper deref by moving to IY. What it gains is EVICTION: the
+       scalar that held IY was paying 4 bytes (`push iy;pop hl;ld a,l`) at every
+       read, where reading it in place from its param slot costs 3
+       (`ld a,(ix+4)`). Measured -13 B on bitfieldbench; the pointer's own
+       accesses are unchanged.
+
+       The real xcc-parity win — a pointer dereffed AS (iy+d) — needs a lowering
+       80cc does not have. That is the open item, not this.
+
+       Admit only the shape that measured positive and leave the rest rejected;
+       the assignment site's grounded idx_ben gate then prices it as usual.
+       IR_IDX2BASE=0 opts out. */
+    if (is_base[v]) {
+        if (!idx2base_on()) return 0;
+        if (is_base[v] & IDX2_BASE_STEPPED) return 0;   /* walking ptr: wants HL/BC */
+        if (!(vr->flags & IR_VREG_PARAM) || write_count[v] != 0) return 0;
+        if ((is_base[v] & IDX2_BASE_NMASK) < 2) return 0;  /* one deref: no spread */
+        /* falls through to the read-only-param rule below */
+    }
     if (use_count[v] < 4) return 0;
     /* Stepping counter: only-init(<=1) + steps write it. On z80/z80n/z180 skip
        the idx2 home when the counter feeds address/ALU work that would push iy;
@@ -1850,6 +1893,78 @@ static int g0_word_bytes(int reg, int kind)
     return b;
 }
 
+/* ---- Deref OFFSET: the term that tells an index home from a GP pair -------
+   A deref at a NONZERO constant field offset does not cost the same in every
+   home, and until the `idx-deref` lowering rung existed it did not matter:
+   nothing could reach a field at a displacement, so every class paid the walk
+   and the difference cancelled. Now IX/IY spell the displacement inside the
+   instruction — `ld a,(iy+3)` is the same 3 bytes and 19 T as `ld a,(iy+0)` —
+   and every other class still has to WALK to the field:
+
+     IX/IY   free, at any offset inside the displacement byte
+     BC/DE   copy the pointer into HL first (`ld l,c; ld h,b`) — `ld a,(bc)`
+             has no displaced form — and then step
+     SLOT    the read already left the address in HL; step only
+
+   The walk itself is emit_hl_add_offset's: `inc hl` per unit up to 3, and
+   `ld de,K; add hl,de` beyond, which is 4 bytes however large K is. Both arms
+   are priced off the existing rows so a new CPU inherits them.
+
+   ►► Without this term the model rates a BC home and an index home ALIKE for a
+   struct pointer read at four different field offsets. BC ranks first, takes
+   the pointer, and the index home falls to a scalar that must be pushed and
+   popped at every read — the exact inversion bitfieldbench's reg_set showed
+   (`ALLOCMAP v1 phys=IX` = the VALUE, `v0` = the POINTER, in BC). The
+   asymmetry is the whole point of the rung: an index register cannot feed the
+   ALU, so a value homed there pays at every read, while a pointer homed there
+   pays nothing at all. */
+static int g0_deref_walk(int ofs) { int k = ofs < 0 ? -ofs : ofs;
+                                    return k < 4 ? k : 4; }
+
+/* The term describes the `idx-deref` lowering, so it lives and dies with it:
+   with the rung off an index home reaches its pointee through `push iy;pop hl`
+   and then walks like everything else, which is what the un-adjusted rows
+   already price. Switching the rung off therefore restores the old ALLOCATION
+   as well as the old codegen — the gate-off build stays byte-identical. */
+static int idx_deref_pricing(void)
+{
+    /* IR_IDXPRICE=0 keeps the RUNG but drops the OFFSET TERM — the knob that
+       attributes a size move to the lowering or to the allocation it caused.
+       Both are on by default; --opt-disable=idx-deref takes away both. */
+    static int on = -1;
+    if (on < 0) { const char *e = getenv("IR_IDXPRICE"); on = !(e && e[0] == '0'); }
+    return on && !opt_disabled("idx-deref");
+}
+
+static int g0_deref_offset_bytes(int reg, int ofs)
+{
+    if (ofs == 0 || !idx_deref_pricing()) return 0;
+    if (reg == GR_IX || reg == GR_IY) return 0;
+    int b = g0_deref_walk(ofs) * g0_word_bytes(GR_BC, GK_STEP);
+    if (reg == GR_BC || reg == GR_DE) b += g0_word_bytes(GR_BC, GK_READ);
+    return b;
+}
+
+static int g0_deref_offset_cost(int reg, int ofs)
+{
+    if (ofs == 0 || !idx_deref_pricing()) return 0;
+    if (reg == GR_IX || reg == GR_IY) return 0;
+    int c = g0_deref_walk(ofs) * g0_word_cost(GR_BC, GK_STEP);
+    if (reg == GR_BC || reg == GR_DE) c += g0_word_cost(GR_BC, GK_READ);
+    return c;
+}
+
+/* The offset a deref op carries, or 0 for anything that is not one. Only a
+   MEM_VREG access based on `v` walks; a post-stepped one reaches its field
+   through the step and is left at 0. */
+static int g0_deref_ofs_of(const Op *o, int v)
+{
+    if (!o || (o->kind != IR_LD_MEM && o->kind != IR_ST_MEM)) return 0;
+    if (o->mem.kind != IR_MEM_VREG || o->mem.base != v) return 0;
+    if (o->mem.post_step != 0) return 0;
+    return o->mem.offset;
+}
+
 /* STATIC bytes a whole-function BC home for v saves over the slot, net of the
    `push bc` / `pop bc` (2 B) it adds at every call inside its live range. >0
    means the home pays for itself in SIZE. No loop weighting — see above. */
@@ -1884,9 +1999,13 @@ static long g0_byte_benefit(const Func *f, int v, int R)
             int mb = ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
                       && o->mem.kind == IR_MEM_VREG) ? o->mem.base : -1;
             int u[16]; int nu = ir_op_uses(o, u, 16);
+            int dofs = g0_deref_ofs_of(o, v);
             for (int k = 0; k < nu; k++) if (u[k] == v)
                 ben += (v == mb)
-                     ? g0_word_bytes(GR_SLOT, GK_DEREF) - g0_word_bytes(R, GK_DEREF)
+                     ? (g0_word_bytes(GR_SLOT, GK_DEREF)
+                        + g0_deref_offset_bytes(GR_SLOT, dofs))
+                       - (g0_word_bytes(R, GK_DEREF)
+                          + g0_deref_offset_bytes(R, dofs))
                      : g0_word_bytes(GR_SLOT, GK_READ)  - g0_word_bytes(R, GK_READ);
         }
     }
@@ -1923,9 +2042,13 @@ static long bc_byte_benefit(const Func *f, int v)
             int mb = ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
                       && o->mem.kind == IR_MEM_VREG) ? o->mem.base : -1;
             int u[16]; int nu = ir_op_uses(o, u, 16);
+            int dofs = g0_deref_ofs_of(o, v);
             for (int k = 0; k < nu; k++) if (u[k] == v)
                 ben += (v == mb)
-                     ? g0_word_bytes(GR_SLOT, GK_DEREF) - g0_word_bytes(GR_BC, GK_DEREF)
+                     ? (g0_word_bytes(GR_SLOT, GK_DEREF)
+                        + g0_deref_offset_bytes(GR_SLOT, dofs))
+                       - (g0_word_bytes(GR_BC, GK_DEREF)
+                          + g0_deref_offset_bytes(GR_BC, dofs))
                      : g0_word_bytes(GR_SLOT, GK_READ)  - g0_word_bytes(GR_BC, GK_READ);
         }
     }
@@ -2083,6 +2206,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
         } \
     } while (0)
     int idx2_taken = 0, byte_reg = 0;    /* 0 / 'C' / 'E' */
+    int idx2_defer = -1;                 /* best param that yielded to a counter */
     int idx3_taken = 0;                  /* the second index (IY) home */
     int exx_taken = 0;                   /* alt-bank invariant claimed → IX freed */
     int de_acc_vreg = -1;                /* DE-acc winner, APPLIED after the loop */
@@ -2161,7 +2285,23 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                         && f->vreg_to_phys[pool[k].vreg] == IR_PR_SPILL) {
                         counter_waiting = 1; break;
                     }
-                if (counter_waiting) continue;
+                /* ►► THE DEFERRAL MUST BE REVISITED. Yielding to a counter is
+                   right only if the counter GOES ON to take the index. It often
+                   does not: the counter is also a BC candidate, the BC arm runs
+                   later in this same loop and places it there, and its own IDX2
+                   candidate is then skipped as already-placed — so the index
+                   register ends up claimed by NOBODY and the param, which had
+                   the best index benefit in the function, falls to a slot.
+                   Remember the best deferred param and give it the index after
+                   the loop if it is still free. recordbench/churn on kc160:
+                   the struct pointer was the top IDX2 candidate (ben 288) and
+                   ended up SPILLED, costing -67 B and -24.6 % ticks against
+                   letting it have the register. */
+                if (counter_waiting) {
+                    if (idx2_defer < 0 || c->benefit > pool[idx2_defer].benefit)
+                        idx2_defer = (int)(c - pool);
+                    continue;
+                }
             }
             f->vreg_to_phys[v] = f->idx2_reg;
             idx2_taken = 1; SP_NOTE(0, c->lo, c->hi, (long)c->benefit);
@@ -2340,6 +2480,19 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
             if (ok) f->vreg_to_phys[v] = IR_PR_BC;
             continue;
         }
+    }
+    /* ►► Revisit the param that yielded idx2 to a counter. If the counter did
+       not in fact take the index — it is normally also a BC candidate and the
+       BC arm above places it there, after which its own IDX2 candidate is
+       skipped as already-placed — the register is sitting EMPTY and the param
+       is in a slot. Give it the register. Only when idx2 is genuinely still
+       free and the param is still unplaced, so the yield is preserved whenever
+       the counter DID collect it. `--opt-disable=idx2-revisit` opts out. */
+    if (idx2_defer >= 0 && !idx2_taken && f->idx2_reg != IR_PR_NONE
+        && !opt_disabled("idx2-revisit")
+        && f->vreg_to_phys[pool[idx2_defer].vreg] == IR_PR_SPILL) {
+        f->vreg_to_phys[pool[idx2_defer].vreg] = f->idx2_reg;
+        idx2_taken = 1;
     }
     /* Apply the reserved DE-acc now that BC/idx2/byte are all placed, so the
        prepick snapshot is the full baseline (matches the sequential picker). */
@@ -4665,9 +4818,13 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
             if (o->dst==v) ben += w*(g0_word_cost(GR_SLOT,GK_WRITE)-g0_word_cost(R,GK_WRITE));
             int mb=((o->kind==IR_LD_MEM||o->kind==IR_ST_MEM)&&o->mem.kind==IR_MEM_VREG)?o->mem.base:-1;
             int u[16]; int nu=ir_op_uses(o,u,16);
+            int dofs = g0_deref_ofs_of(o, v);
             for (int k=0;k<nu;k++) if (u[k]==v) {
                 if (v==mb)
-                    ben += w*(g0_word_cost(GR_SLOT,GK_DEREF)-g0_word_cost(R,GK_DEREF));
+                    ben += w*((g0_word_cost(GR_SLOT,GK_DEREF)
+                               + g0_deref_offset_cost(GR_SLOT,dofs))
+                              - (g0_word_cost(R,GK_DEREF)
+                                 + g0_deref_offset_cost(R,dofs)));
                 else if (!is_index)                           /* BC/DE: direct reg copy */
                     ben += w*(g0_word_cost(GR_SLOT,GK_READ)-g0_word_cost(R,GK_READ));
                 else if (idx_read_thru_hl(o->kind)) {

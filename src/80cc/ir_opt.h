@@ -144,6 +144,7 @@ int ir_opt_dce(Func *f);
 int ir_opt_sym_cmp_fold(Func *f);
 int ir_opt_sym_addr_fold(Func *f);
 int ir_opt_sym_deref_fold(Func *f);
+int ir_opt_deref_offset(Func *f);
 /* Rewrite AND(CONV_SX(x), full-source-mask) → CONV_ZX(x): the mask clears the
  * sign-extended bits, so the sign-extend is dead. Run before DCE. */
 int ir_opt_conv_mask_fold(Func *f);

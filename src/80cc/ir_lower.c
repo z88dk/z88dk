@@ -6328,6 +6328,11 @@ int ir_lower_func(FILE *out, Func *f)
            sym_addr_fold so a base it just folded is visible; before dce,
            which reclaims the LD_SYM once every use has folded. */
         (void)ir_opt_sym_deref_fold(f);
+        /* Then the constant address temps in front of a deref (`t = p+K; *t`)
+           into the deref's own offset, so the idx-deref rung can reach the
+           field as `(iy+d)`. After sym_deref_fold (whose absolute form needs no
+           base at all) and before dce, which reclaims the emptied ADDs. */
+        (void)ir_opt_deref_offset(f);
         (void)ir_opt_conv_mask_fold(f);   /* AND(sx,mask)→zx; dce reclaims the sx */
         int dce     = ir_opt_dce(f);
         /* Re-type promoted int ops whose result is only truncated to a

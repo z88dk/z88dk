@@ -2798,6 +2798,40 @@ static int emit_frame_word_store(FILE *out, const Func *f, int slot, int ofs,
     return 0;
 }
 
+/* ---- [idx-deref] (ix+d)/(iy+d) through an INDEX-HOMED deref base ----------
+   80cc's index home has always been a VALUE carrier: emit_idx_word_to_reg
+   reads it with `push iy;pop hl`, so a pointer homed there still had to come
+   back to HL before it could be dereferenced — the corpus contained ZERO
+   `(iy+d)` accesses where sdcc's had 47. This rung makes the home an
+   ADDRESSING MODE: when the base of a MEM_VREG access is homed in IX or IY
+   and the field offset fits the displacement byte, read or write the field in
+   place. `ir_opt_deref_offset` is the other half — it is what puts the field
+   offset in mem.offset instead of a separate address temp, and neither half
+   pays without the other.
+
+   Only IX/IY qualify. The VM1's idx2 is the RS-prefixed h'/l' pair, which has
+   no displaced form, and idx_pr_name would happily spell it `hl'` — so test
+   the PhysReg, not the name. 808x/gbz80 have no index home at all.
+
+   Exclusions mirror the frame rung above: post_step reads the base itself,
+   and a banked (__addressmod) access recovers its namespace through the base.
+   A word access needs d+1 in range too.
+   --opt-disable=idx-deref opts out. */
+static const char *idx_deref_reg(const Func *f, const Op *op, int width)
+{
+    if (opt_disabled("idx-deref")) return NULL;
+    if (!f || !op || op->mem.kind != IR_MEM_VREG) return NULL;
+    if (op->mem.post_step != 0 || mem_bank_fn(&op->mem)) return NULL;
+    int b = op->mem.base;
+    if (b < 0) return NULL;
+    int pr = vreg_idx_home(f, b);
+    if (pr != IR_PR_IX && pr != IR_PR_IY) return NULL;
+    int d = op->mem.offset;
+    if (d < -128 || d > 127) return NULL;
+    if (width == 2 && (d + 1 > 127)) return NULL;
+    return idx_pr_name(pr);
+}
+
 /* True when the LEA's dst is read only as the base of loads/stores that
    frame_ix_disp will handle indexed — so the address is never needed in a
    register. Any other reader (a call argument, pointer arithmetic, a
@@ -2967,6 +3001,36 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 hl_about_to_change(-1);
                 if (emit_frame_word_load(out, f, _slot, _ofs,
                                          mem_vol_stamp(op))) {
+                    commit_hl_result(out, f, op->dst);
+                    return 0;
+                }
+            }
+            /* [idx-deref] The same access through an INDEX-HOMED base:
+               the pointer is already in IX/IY, so the field is reachable at a
+               displacement with no `push iy;pop hl` and no address in HL.
+               Tried after the frame rung, which is equally cheap and more
+               specific. A word is two displaced byte moves — the index pair
+               cannot be loaded whole — which is still shorter than reading the
+               pointer out and walking it, and leaves the base untouched. */
+            {
+                const char *ixr = idx_deref_reg(f, op, _w);
+                if (ixr && _w == 1) {
+                    emit(out, "ld\ta,(%s%+d)%s", ixr, op->mem.offset,
+                         mem_vol_stamp(op));
+                    return finalize_byte_result(out, f, op, 1);
+                }
+                if (ixr && _w == 2) {
+                    if (vreg_in_pr_de(f, op->dst)) {
+                        emit(out, "ld\te,(%s%+d)%s", ixr, op->mem.offset,
+                             mem_vol_stamp(op));
+                        emit(out, "ld\td,(%s%+d)", ixr, op->mem.offset + 1);
+                        cache_de(op->dst);
+                        return 0;
+                    }
+                    hl_about_to_change(-1);
+                    emit(out, "ld\tl,(%s%+d)%s", ixr, op->mem.offset,
+                         mem_vol_stamp(op));
+                    emit(out, "ld\th,(%s%+d)", ixr, op->mem.offset + 1);
                     commit_hl_result(out, f, op->dst);
                     return 0;
                 }
@@ -3618,6 +3682,27 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 if (emit_frame_word_store(out, f, _slot, _ofs,
                                           mem_vol_stamp(op)))
                     return 0;
+            }
+            /* [idx-deref] Mirror of the load rung: the base is already in
+               IX/IY, so write the field at a displacement. Byte goes through
+               A; a word writes both halves from HL. As above, the addressing
+               form is tested BEFORE the value is loaded — falling through with
+               it in hand only makes the generic path reload it. */
+            {
+                const char *ixr = idx_deref_reg(f, op, _w);
+                if (ixr && _w == 1) {
+                    load_byte_to_a(out, f, op->src[0]);
+                    emit(out, "ld\t(%s%+d),a%s", ixr, op->mem.offset,
+                         mem_vol_stamp(op));
+                    return 0;
+                }
+                if (ixr && _w == 2) {
+                    load_to_hl(out, f, op->src[0]);
+                    emit(out, "ld\t(%s%+d),l%s", ixr, op->mem.offset,
+                         mem_vol_stamp(op));
+                    emit(out, "ld\t(%s%+d),h", ixr, op->mem.offset + 1);
+                    return 0;
+                }
             }
         }
         /* Constant value folded into op->imm by ir_opt_const_fold. Store the
