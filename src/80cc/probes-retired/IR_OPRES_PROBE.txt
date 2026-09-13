@@ -1,0 +1,86 @@
+Retired probe: IR_OPRES_PROBE
+Removed from the 80cc back end on branch 80cc-simplify, 2026-09-13.
+Its question is answered; the answer lives in the handover/ADR that
+cites it. Kept here so the census can be re-run without re-deriving it.
+
+--- ir_alloc.c lines 6512..6590 ---
+        /* [IR_OPRES_PROBE] INERT — size the operand-residency (address/word-temp)
+           lever on the CURRENT tree (refreshes OPERAND_RESIDENCY_SPEC's July
+           numbers). Population = reused deref/binop RESULT values the allocator
+           left SPILL (they funnel through HL then spill+reload). Tiers:
+             de_free       = no DE/BC GP-pair home overlaps V's whole range
+                             (Regime-A, buildable on the whole-range model);
+             de_or_bc_free = a DE or BC pair is whole-range-free (Tier-1 ceiling);
+             convertible   = POINT pressure <=2 GP-pair (HL/DE/BC) homes anywhere
+                             in V's range, so a 3rd pair is free for V at every
+                             point (Increment-1c sub-range ceiling — the meat that
+                             needs ranged/split homing). No codegen change. */
+        if (getenv("IR_OPRES_PROBE")) {
+            int nv = f->n_vregs;
+            int *wdb = calloc((size_t)(nv > 0 ? nv : 1), sizeof(int));
+            if (wdb) scan_wd_props(f, bb_in_loop, wdb, NULL, NULL, NULL);
+            int cand = 0, de_free = 0, de_or_bc_free = 0, conv = 0;
+            for (int v = 0; v < nv; v++) {
+                const VReg *vr = &f->vregs[v];
+                if (vr->width != 2) continue;
+                if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                 | IR_VREG_PARAM)) continue;
+                if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                if (wdb && wdb[v]) continue;                /* not a deref base */
+                if (write_count[v] > 1 || use_count[v] < 2) continue;
+                int dk = def_kind[v];
+                if (!(dk == IR_LD_MEM || dk == IR_ADD || dk == IR_SUB
+                      || dk == IR_AND || dk == IR_OR || dk == IR_XOR)) continue;
+                int lo = first_use[v], hi = last_use[v];
+                if (lo < 0 || hi < 0 || hi < lo) continue;
+                cand++;
+                /* whole-range interference vs DE/BC GP homes */
+                int de_busy = 0, bc_busy = 0;
+                for (int w = 0; w < nv; w++) {
+                    if (w == v) continue;
+                    int ph = f->vreg_to_phys[w];
+                    if (ph != IR_PR_DE && ph != IR_PR_BC) continue;
+                    if (first_use[w] < 0 || last_use[w] < 0) continue;
+                    if (iv_overlap(f, v, w, lo, hi, first_use[w], last_use[w]))
+                        { if (ph == IR_PR_DE) de_busy = 1; else bc_busy = 1; }
+                }
+                if (!de_busy) de_free++;
+                if (!de_busy || !bc_busy) de_or_bc_free++;
+                /* Sub-range ceiling (Increment-1c): peak simultaneous HL/DE/BC word
+                   homes over V's TRUE live range (ir_live_range, NOT the allocator's
+                   loop-extended first/last_use — loop extension overstates liveness
+                   and hides the sub-range room a split allocator could exploit).
+                   peak<=2 ⇒ a 3rd GP pair is free at every point ⇒ convertible. */
+                const LiveRange *lrv = ir_live_range(f, v);
+                if (lrv && lrv->start >= 0) {
+                    int tlo = lrv->start, thi = lrv->end;
+                    int span = thi - tlo + 1;
+                    int *cov = span > 0 ? calloc((size_t)span, sizeof(int)) : NULL;
+                    if (cov) {
+                        for (int w = 0; w < nv; w++) {
+                            if (w == v) continue;
+                            int ph = f->vreg_to_phys[w];
+                            if (ph != IR_PR_HL && ph != IR_PR_DE && ph != IR_PR_BC)
+                                continue;
+                            const LiveRange *lw = ir_live_range(f, w);
+                            if (!lw || lw->start < 0) continue;
+                            int a = lw->start > tlo ? lw->start : tlo;
+                            int b = lw->end   < thi ? lw->end   : thi;
+                            if (a > b) continue;
+                            cov[a - tlo]++;
+                            if (b - tlo + 1 < span) cov[b - tlo + 1]--;
+                        }
+                        int run = 0, peak = 0;
+                        for (int k = 0; k < span; k++) { run += cov[k]; if (run > peak) peak = run; }
+                        if (peak <= 2) conv++;
+                        free(cov);
+                    }
+                }
+            }
+            free(wdb);
+            if (cand > 0)
+                fprintf(stderr, "OPRESPROBE %s cand=%d de_free=%d de_or_bc_free=%d "
+                        "convertible=%d\n", f->fn ? ir_sym_name(f->fn) : "?",
+                        cand, de_free, de_or_bc_free, conv);
+        }
+

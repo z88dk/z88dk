@@ -6718,37 +6718,6 @@ int ir_lower_func(FILE *out, Func *f)
        (distinct from the pre-lower IR_DUMP — reflects the allocator's view). */
     if (getenv("IR_DUMP_ALLOC"))
         ir_dump_func(stderr, f);
-    /* [IR_ADDRRES_PROBE, INERT] Sizing for address-temp residency: a computed
-   address spilled to a slot and reloaded for its own deref. */
-    if (getenv("IR_ADDRRES_PROBE")) {
-        for (int v = 0; v < f->n_vregs; v++) {
-            int derefs = 0, stores = 0, minoff = 1 << 30, maxoff = -(1 << 30);
-            for (int b = 0; b < f->n_bbs; b++)
-                for (int j = 0; j < f->bbs[b].n_ops; j++) {
-                    const Op *o = &f->bbs[b].ops[j];
-                    if ((o->kind != IR_LD_MEM && o->kind != IR_ST_MEM)
-                        || o->mem.kind != IR_MEM_VREG || o->mem.base != v)
-                        continue;
-                    if (o->kind == IR_LD_MEM) derefs++; else stores++;
-                    if (o->mem.offset < minoff) minoff = o->mem.offset;
-                    if (o->mem.offset > maxoff) maxoff = o->mem.offset;
-                }
-            if (derefs + stores < 2) continue;      /* one access needs no residency */
-            const char *home = "spill";
-            switch (f->vreg_to_phys[v]) {
-            case IR_PR_BC: home = "BC"; break;
-            case IR_PR_DE: home = "DE"; break;
-            case IR_PR_HL: home = "HL"; break;
-            case IR_PR_IX: home = "IX"; break;
-            case IR_PR_IY: home = "IY"; break;
-            default: break;
-            }
-            fprintf(stderr, "ADDRRES %s v%d ld=%d st=%d span=%d home=%s%s\n",
-                    f->fn ? ir_sym_name(f->fn) : "?", v, derefs, stores,
-                    (maxoff >= minoff) ? maxoff - minoff : 0, home,
-                    (f->vregs[v].flags & IR_VREG_PARAM) ? " param" : "");
-        }
-    }
     /* Bumped once per function — both lowering passes (when lazy spill
        does two) share the same func label prefix. */
     L.func_emit_idx++;
