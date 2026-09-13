@@ -9,14 +9,14 @@ Last swept: 2026-09-13, branch `80cc-simplify`.
 ## Next action
 
 **Finish the gate sweep, then unify home ownership** —
-see `DESIGN_REVIEW_PLAN.md`, steps 2 to 7. In progress:
+see `DESIGN_REVIEW_PLAN.md` (same directory), steps 2 to 7. In progress:
 
 | Step | State |
 | --- | --- |
 | 1. Bounded-buffer fixes | done — `aea4c1594f`, `a25f552397` |
 | 2. Gate sweep | in progress — 119 gates to 78; opt-outs unified |
-| 3. This index | in progress |
-| 4. Document pass | not started |
+| 3. This index | done |
+| 4. Document pass | done — archived on `80cc-docs-archive`, 9 new ADRs |
 | 5. Home plan (one owner) | not started |
 | 6. Query boundary | not started |
 | 7. Lowering facts | not started |
@@ -27,8 +27,8 @@ No optimisation work starts until invariants 2 and 3 hold (see the plan).
 
 1. No code outside `ir_alloc` writes home state — **not yet**
 2. One opt-out mechanism, not eighteen — **yes**, one registry, two front doors
-3. Every surviving gate has a row here — **partly**, see below
-4. Exactly one live next action in the tree — **not yet**, 93 documents still carry their own
+3. Every surviving gate has a row here — **yes**
+4. Exactly one live next action in the tree — **yes**, this file
 
 ## Opt-outs
 
@@ -118,7 +118,35 @@ can be re-run without re-deriving it.
 
 ## Documents
 
-93 of the 95 markdown files here are untracked and carry 17 competing
-`START HERE` markers. Step 4 of the plan resolves that: durable decisions and
-refutations become ADRs, the rest is archived on a branch and deleted. Until
-then, prefer `adr/` and this file over any `*_PLAN.md` or `HANDOVER_*.md`.
+The 92 untracked plans and handovers that used to sit here are committed on the
+branch **`80cc-docs-archive`** — one commit, never merged, not part of any
+history you have to read. Recover one with:
+
+    git show 80cc-docs-archive:src/80cc/WIDTH_HANDOVER.md
+    git checkout 80cc-docs-archive -- src/80cc/<file>.md
+
+What survives here is the durable layer: `adr/` (27 records), `CONTEXT.md`
+(vocabulary), `AGENTS.md` (working rules), this index, and the retired probe
+sources under `probes-retired/`.
+
+`CONTEXT.md` is spelled in capitals. This workspace is mounted from a
+case-insensitive host filesystem, so `context.md` resolves to the same file
+here and would not on a case-sensitive one — always write the capitalised name.
+
+### Refutations not yet promoted
+
+Nine refuted theses became ADRs 0018 to 0024. These remain recorded only in the
+archive branch, and are worth promoting if anyone proposes them again:
+
+- the long/swap thesis (the gap was byte widening, not long handling)
+- the in-place `(ix±d)` byte-ALU lever — no transient load feeds an in-place ALU
+- counter-step cost discounts — refuted seven times over, in several forms
+- `ex de,hl` as the gbz80 gap — sized and mostly refuted
+- HL-staging as a density lever
+- ordered byte-vs-byte compares
+- the remat-LEA callless gate (worth 30 bytes or less)
+
+Known remaining hazard: about 40 untracked `.py` and `.sh` analysis scripts are
+still here and still untracked. They are not documents, so the sweep left them
+alone; a `git clean -fd` would remove them. The five scripts the gauntlet
+depends on are now tracked.
