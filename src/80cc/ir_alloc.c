@@ -143,6 +143,50 @@ static int op_dst_spill_is_dead(const BB *bb, int op_idx)
     return 1;
 }
 
+/* ---- The backing requirement: one owner, one answer -----------------------
+   ir_slots.c used to re-derive these rules, which meant the question "does this
+   value have a slot?" had two implementations that had to agree. It is an
+   allocation fact, so it lives here. The order below is significant: the
+   register assignment decides first, the clobberable and split homes add a slot
+   back, and the three value flags override everything. */
+int ir_home_reg_is_slotbacked(PhysReg pr)
+{
+    return pr == IR_PR_E || pr == IR_PR_D;
+}
+
+int ir_home_requires_slot(const Func *f, int v)
+{
+    if (!f || v < 0 || v >= f->n_vregs) return 0;
+    PhysReg pr = f->vreg_to_phys ? (PhysReg)f->vreg_to_phys[v] : IR_PR_SPILL;
+
+    /* No register home: the slot IS the home. */
+    int needs = (f->vreg_to_phys && pr != IR_PR_SPILL) ? 0 : 1;
+
+    /* A clobberable byte home is spilled to its slot before a DE-clobbering op
+       and reloaded after, so the register home does not remove the slot. */
+    if (f->vreg_to_phys && ir_home_reg_is_slotbacked(pr)) needs = 1;
+
+    /* The word DE-home (a multi-def PR_DE accumulator) is likewise slot-backed:
+       it rides DE across its loop, but the loop test or a DE-scratch op
+       clobbers DE. Ordinary single-def PR_DE transients stay slotless. */
+    if (v == f->word_home_vreg && f->vreg_to_phys && pr == IR_PR_DE) needs = 1;
+
+    /* [call-split] BC only inside the call-free span; the slot stays the
+       canonical home outside it and for the entry reload. */
+    if (f->vregs[v].flags & IR_VREG_CALL_SPLIT) needs = 1;
+
+    /* A read-only param lives in the caller's pushed-arg slot, and slot_off
+       returns that caller offset directly — no frame slot of its own. */
+    if (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE) needs = 0;
+    /* An A-only byte temp: every def is dst-dead, so the value rides A. */
+    if (f->vregs[v].flags & IR_VREG_NO_SLOT) needs = 0;
+    /* [dead-store] Written but never read: the store is skipped on the
+       re-lower and the value rides A, so the frame can shrink. */
+    if (f->vregs[v].flags & IR_VREG_DEAD_SPILL) needs = 0;
+
+    return needs;
+}
+
 /* Enumerate ALL of a BB's CFG successors into out[] (up to max), from its
    branch/switch OPS — not the fixed succ[2] pair, which a short-circuit
    &&/|| lowering (>2 branch ops in one BB) silently truncates. Returns the

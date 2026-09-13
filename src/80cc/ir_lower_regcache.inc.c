@@ -2442,7 +2442,8 @@ static PhysReg byte_home_phys(const Func *f, int v)
 }
 static int byte_home_slotbacked(PhysReg pr)   /* clobberable → lazy-spill */
 {
-    return pr == IR_PR_E || pr == IR_PR_D;
+    /* The register half of ir_home_requires_slot — same fact, one owner. */
+    return ir_home_reg_is_slotbacked(pr);
 }
 static const char *byte_home_reg(PhysReg pr)
 {

@@ -24,10 +24,23 @@ void ir_alloc(Func *f);
    it to revert the pick when no resident region forms. Caller frees it. */
 int *ir_alloc_take_word_home_prepick(void);
 
-#endif /* IR_ALLOC_H */
-
 /* [home-rearb] The lowerer proved a register home unrealizable: veto the value
    so a re-run of ir_alloc offers its register to the next candidate instead of
    leaving it unused. Reset per function. */
 void ir_alloc_veto_reset(void);
 void ir_alloc_veto_add(int vreg);
+
+/* Does v need a frame slot backing its home? THE allocation answer, and the
+   only one — ir_slots asks this instead of re-deriving the rules, and the
+   lowerer's lazy-spill asks ir_home_reg_is_slotbacked for the register half of
+   it. A register home does not by itself mean "no slot": a clobberable home is
+   spilled and reloaded around the ops that clobber it, and a call-split value
+   keeps its slot as its canonical home outside the split span. */
+int ir_home_requires_slot(const Func *f, int v);
+
+/* Is a byte/word home in this register clobberable, so that it needs a backing
+   slot the lowerer can lazy-spill to? E and D are (DE is scratch); C and B are
+   not (the no-clobber envelope keeps them resident for the whole function). */
+int ir_home_reg_is_slotbacked(PhysReg pr);
+
+#endif /* IR_ALLOC_H */
