@@ -1265,7 +1265,7 @@ static int bc_args_save_stack[BC_ARGS_SAVE_MAX];
 static int bc_args_saved_stack[BC_ARGS_SAVE_MAX];
 static int bc_args_save_depth;
 
-/* [IR_BCSAVE_LIVE=1] Save BC around a call only when a PR_BC tenant is LIVE
+/* [bc-save-live=1] Save BC around a call only when a PR_BC tenant is LIVE
    there, instead of whenever the function has one anywhere.
 
    func_has_pr_bc is a whole-function question and every BC save in the lowerer
@@ -1283,8 +1283,8 @@ static int bc_args_save_depth;
    conservative superset — and on that query enigma is correct while strbench
    keeps the whole win. Do not "tighten" this back to the live-in sets.
 
-   DEFAULT-ON; `IR_BCSAVE_LIVE=0` opts out. It is the necessary PARTNER of
-   IR_PREPUSH_NARROW and was flipped with it — see the note at
+   DEFAULT-ON; `IR_OFF=bc-save-live` opts out. It is the necessary PARTNER of
+   prepush-narrow and was flipped with it — see the note at
    prepushnarrow_on. */
 static int bcsave_live_on(void)
 {
@@ -1785,7 +1785,7 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
     if (src_w == 4 && dst_w == 2) {
         /* Long → int: just take the low half (HL of DEHL). */
         load_to_dehl(out, f, op->src[0]);
-        /* [IR_TRUNCRES] HL holds the result — say so. The old form spilled it
+        /* [trunc-res] HL holds the result — say so. The old form spilled it
            and then invalidated the cache, so the consumer one op later reloaded
            the slot that had just been written (`ld (ix-N),hl; ld de,(ix-N)`
            where `ex de,hl` would do). commit_hl_result also lets the dead-store
@@ -3910,7 +3910,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\t(de),hl");     /* both beliefs survive it */
                 return 0;
             }
-            /* [IR_HL_CARRY inc1] Base already resident in HL: load the value
+            /* [hl-carry inc1] Base already resident in HL: load the value
                STRAIGHT to DE (load_to_de preserves HL on the common fp/native
                paths) instead of load_to_hl(value)+ex de,hl (which clobbers the
                base in HL, forcing a reload). The following load_to_hl(base) then
@@ -4253,7 +4253,7 @@ static int try_index_half_word_add(FILE *out, Func *f, const Op *op)
 }
 
 
-/* [IR_ADDBC] `add hl,bc` when ONE operand is BC-resident. IR_ADDBC=0 opts out. */
+/* [add-bc] `add hl,bc` when ONE operand is BC-resident. IR_OFF=add-bc opts out. */
 static int addbc_enabled(void)
 {
     static int v = -1;

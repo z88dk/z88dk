@@ -928,7 +928,7 @@ static int vreg_slot_deferrable(const Func *f, int v)
     if (f->vregs[v].flags
         & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
         return 0;
-    /* [IR_CALLSPLIT] A call-split value is PR_BC only inside its span, SPILL
+    /* [call-split] A call-split value is PR_BC only inside its span, SPILL
        (slot-homed) at its def. Its slot store feeds the in-span reload, so it
        must NEVER be deferred/elided — the point-aware register-pool check below
        would wrongly suppress the in-span reload record (BC there) while the
@@ -1137,7 +1137,7 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
         if (f->vreg_to_phys[vreg] == IR_PR_BC) {
             emit(out, "ld\tbc,hl");
             cache_bc(vreg);
-            /* [IR_CALLSPLIT] A call-split value is BC-resident only inside its
+            /* [call-split] A call-split value is BC-resident only inside its
                span; its frame slot is the canonical home. An in-span DEF must
                keep the slot COHERENT (out-of-span reads read it, and a mid-span
                BC clobber falls back to it — the read-only safety net) so we write

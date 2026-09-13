@@ -70,7 +70,7 @@ void ir_assign_slots(Func *f)
         if (v == f->word_home_vreg && f->vreg_to_phys
             && f->vreg_to_phys[v] == IR_PR_DE)
             needs_slot[v] = 1;
-        /* [IR_CALLSPLIT] A call-bounded split value is PR_BC only inside its
+        /* [call-split] A call-bounded split value is PR_BC only inside its
            call-free span; outside it (and to reload it on entry) it lives in a
            frame slot, which stays its canonical home. So it needs a slot despite
            the register-pool assignment above (same as PR_E/PR_D / the word
@@ -86,7 +86,7 @@ void ir_assign_slots(Func *f)
            the value rides A and never touches a slot — reserve none. */
         if (f->vregs[v].flags & IR_VREG_NO_SLOT)
             needs_slot[v] = 0;
-        /* [IR_DEADSTORE] A dead-spill byte (slot written but never read): the
+        /* [dead-store] A dead-spill byte (slot written but never read): the
            store is skipped on the re-lower and the value rides A — drop its slot
            so the frame shrinks (and, if it empties, deadframe goes frameless). */
         if (f->vregs[v].flags & IR_VREG_DEAD_SPILL)

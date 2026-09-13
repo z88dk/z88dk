@@ -82,7 +82,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
     }
     if (!pre && !bc_preserved) {
         /* IR_VREG_BC_PACK tenants are call-free by construction (never live
-           across this call), so they add no BC-save — Part 1. [IR_BCSAVE_LIVE]
+           across this call), so they add no BC-save — Part 1. [bc-save-live]
            adds the same question for the plain tenants: one that is not LIVE
            here has nothing to preserve either. */
         for (int i = 0; i < f->n_vregs; i++) {
@@ -551,7 +551,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        save time. */
     if (pre && func_has_pr_bc(f) && bc_args_save_depth > 0) {
         /* Pop the entry THIS call's first push stacked. It records whether a
-           `push bc` was actually emitted ([IR_BCSAVE_LIVE] skips it when no
+           `push bc` was actually emitted ([bc-save-live] skips it when no
            tenant is live across the call); when it was not, there is nothing to
            restore and the cached belief must be dropped, because the callee
            clobbered BC. */
@@ -865,7 +865,7 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
     for (int i = 0; i < f->n_vregs; i++) {
         if (bc_plain_tenant(f, i)) { hc_bc_saved = 1; break; }
     }
-    if (hc_bc_saved && !bc_tenant_live_here(f)) hc_bc_saved = 0;   /* [IR_BCSAVE_LIVE] */
+    if (hc_bc_saved && !bc_tenant_live_here(f)) hc_bc_saved = 0;   /* [bc-save-live] */
     if (hc_bc_saved) {
         emit_sp(out, 2, "push\tbc");
     }

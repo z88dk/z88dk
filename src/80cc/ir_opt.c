@@ -2125,7 +2125,7 @@ int ir_opt_dce(Func *f)
 int ir_opt_sym_addr_fold(Func *f)
 {
     if (!f) return 0;
-    /* DEFAULT-ON; `IR_SYMADDR=0` opts out. A folded ADD becomes a symbol
+    /* DEFAULT-ON; `IR_OFF=sym-addr-fold` opts out. A folded ADD becomes a symbol
        address, which the allocator treats as rematerialisable and drops the slot
        for — that exposed two lowerer byte-walk compares (cmp_bytewise_shape_ok,
        sp_cmp_slot) which read a NO_SLOT vreg's slot and emitted `ld hl,-1;
@@ -3392,7 +3392,7 @@ static OpKind cs_unsigned_of(OpKind k)
        be the test that leaves the loop the step lives in. It REJECTED 6 of the
        56 otherwise-passing sites, 2 of them in adv_a.
 
-   `IR_CMPUNSIGN=0` / `--opt-disable=cmp-unsign` opts out. */
+   `IR_OFF=cmp-unsign` / `--opt-disable=cmp-unsign` opts out. */
 int ir_opt_cmp_unsign(Func *f)
 {
     if (!f) return 0;

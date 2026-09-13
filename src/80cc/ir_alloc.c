@@ -861,12 +861,12 @@ static int opres_on(void) { static int c = -1; if (c < 0) c = getenv("IR_OPRES")
 static int ranged_on(void) { static int c = -1; if (c < 0) c = getenv("IR_RANGED") != NULL; return c; }
 /* Call-bounded live-range splitting: DEFAULT-ON after the full byte+ticks
    matrix (all 9 CPUs x candidate benches x sp/fp: 0 regressed cells, -1500B;
-   z80/gbz80/8085 ticks all faster-or-neutral). Opt out with IR_CALLSPLIT=0
+   z80/gbz80/8085 ticks all faster-or-neutral). Opt out with IR_OFF=call-split
    (byte-identical to pre-flip). The dear-slot CPU gate (deref_gap>=15) inside
    the selection keeps cheap-slot CPUs byte-identical regardless. */
 static int callsplit_on(void) { static int c = -1; if (c < 0) c = !opt_disabled("call-split"); return c; }
 
-/* [IR_IYLONG=0] Opt OUT of running the IY packs in a function the BC veto
+/* [IR_OFF=iy-long] Opt OUT of running the IY packs in a function the BC veto
    excludes. They self-guard with a per-op op_clobbers IR_R_IY check over the
    candidate's live range, so the BC veto buys them nothing. */
 static int iylong_off(void) { static int c = -1; if (c < 0) c = opt_disabled("iy-long"); return c; }
@@ -887,7 +887,7 @@ static int gbz80_cost_on(void)
 
 /* [IR_CS_EVICT=0/1] Let a call-bounded split EVICT a picker-placed BC tenant it
    out-benefits, instead of silently losing BC to whoever the picker placed
-   first. Defaults to whatever IR_PREPUSH_NARROW is: the arbitration gap only
+   first. Defaults to whatever prepush-narrow is: the arbitration gap only
    becomes reachable once the narrowing admits whole-function BC candidates into
    functions with pre-pushed calls, so the default build stays byte-identical and
    the opt-in configuration is self-contained. Force either way to isolate it. */
@@ -904,14 +904,14 @@ static int cs_evict_on(void)
     return c;
 }
 
-/* [IR_PREPUSH_NARROW=1] Narrow the whole-function pre-pushed-call veto to the
+/* [prepush-narrow=1] Narrow the whole-function pre-pushed-call veto to the
    calls that can really lose BC (prepush_bc_hazard).
 
-   DEFAULT-ON; `IR_PREPUSH_NARROW=0` opts out (and takes IR_CS_EVICT with it).
+   DEFAULT-ON; `IR_OFF=prepush-narrow` opts out (and takes IR_CS_EVICT with it).
 
-   ►► IT IS A PAIR WITH IR_BCSAVE_LIVE — DO NOT SEPARATE THEM. Alone, the
+   ►► IT IS A PAIR WITH bc-save-live — DO NOT SEPARATE THEM. Alone, the
    narrowing regresses divbench and shiftbench badly, because it adds `push bc` /
-   `pop bc` pairs around calls; IR_BCSAVE_LIVE removes the ones whose tenant is
+   `pop bc` pairs around calls; bc-save-live removes the ones whose tenant is
    not live there, and together the regressions go to exactly zero. Flipping this
    one on its own reinstates them.
 
@@ -925,18 +925,18 @@ static int prepushnarrow_on(void)
     return c;
 }
 
-/* [IR_MWBC] The corrected loop-depth weight plus the two cost-model repairs that
+/* [mwbc] The corrected loop-depth weight plus the two cost-model repairs that
    ride with it (the conditional-execution discount in interval_benefit_x and the
    equal-DE-score tie-break). One accessor for all three, because they are one
    behaviour: the depth correction is what makes the other two necessary.
-   DEFAULT-ON; `IR_MWBC=0` opts out, byte-identical to pre-flip. */
+   DEFAULT-ON; `IR_OFF=mwbc` opts out, byte-identical to pre-flip. */
 static int mwbc_on(void)
 {
     static int c = -1;
     if (c < 0) c = !opt_disabled("mwbc");
     return c;
 }
-/* [IR_MWBC_PRESSURE] The BC reservation that keeps a loop-carried accumulator
+/* [mwbc-pressure] The BC reservation that keeps a loop-carried accumulator
    available to the IY reduction pack. Independent of mwbc_on() — it is a pass
    ORDERING repair, not a cost-model one — but only observable in practice when
    the ranking has changed enough to take the value in the first place. */
@@ -1787,7 +1787,7 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
 /* [IR_BCCALLCOST=1] Charge a whole-function BC home for the call saves it forces.
 
    A PR_BC tenant is preserved across every call its live range covers — gen_call
-   and friends emit the `push bc`/`pop bc`, and [IR_BCSAVE_LIVE] emits it on
+   and friends emit the `push bc`/`pop bc`, and [bc-save-live] emits it on
    exactly the calls where a tenant IS live, so "calls inside the live range" is
    the emitted code, not an estimate. interval_benefit prices the accesses a
    register home saves and charges nothing for that traffic, and the BC arm has
@@ -1804,7 +1804,7 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
    what sinks the home, only when the home does not SAVE bytes, and only where
    the cycle model can tell a slot from a register at all.
 
-   DEFAULT-ON at margin 2; `IR_BCCALLCOST=0` opts out, `=<N>` sets the margin. */
+   DEFAULT-ON at margin 2; `IR_OFF=bc-call-cost` opts out, `=<N>` sets the margin. */
 static int bccallcost_on(void)
 {
     static int c = -1;
@@ -2123,7 +2123,7 @@ static int is_stepped(const Func *f, int v);
    high bound is the better resident: its update is a subtract, which the Z80
    compare/update sequence reaches directly, while the low bound's update is an
    add that has to go the long way round. Score = (subtract defs - add defs), so
-   the bound that is decremented wins. [IR_MWBC] */
+   the bound that is decremented wins. [mwbc] */
 static int de_upper_bound_score(const Func *f, int v)
 {
     int score = 0;
@@ -2408,7 +2408,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
             if (counter_yields_bc_to_index(f, pool, n, v, idx_ben,
                                            idx2_taken, idx3_taken))
                 continue;
-            /* [IR_MWBC_PRESSURE] A loop-carried accumulator prices high for
+            /* [mwbc-pressure] A loop-carried accumulator prices high for
                BC but is worth less there than the value it displaces. Give BC
                to an overlapping candidate that is still unplaced; where a spare
                index exists ir_iy_reduction_pack picks this one up afterwards,
@@ -2974,7 +2974,7 @@ static void ir_iy_reduction_pack(Func *f, const int *bb_in_loop,
     }
 }
 
-/* [IR_MWBC_PRESSURE] Which value BC arbitration should NOT take.
+/* [mwbc-pressure] Which value BC arbitration should NOT take.
 
    A loop-carried accumulator prices very high for a register home: every
    `s = s OP x` is an RMW, and interval_benefit credits the whole slot round
@@ -3194,7 +3194,7 @@ static int collect_bc_temp_cands(const Func *f, const int *bb_first_op,
     return nc;
 }
 
-/* [IR_BCPERCAND] Per-candidate replacement for the whole-function BC veto.
+/* [bc-per-cand] Per-candidate replacement for the whole-function BC veto.
    bc_region_ok is three PER-OP facts (width-4 low-half staging, non-char
    IR_SWITCH dispatch, IR_ACC_* helpers) promoted to a whole-function
    disqualification, so one long or one switch anywhere kills BC homing
@@ -3228,7 +3228,7 @@ static int vreg_bc_clean(const Func *f, int v)
    cannot read it. If that cap moves, move this with it. */
 #define BC_ARGS_SAVE_MAX_PROBE 8
 
-/* [IR_PREPUSH_NARROW] Does a pre-pushed-arg call in this function actually
+/* [prepush-narrow] Does a pre-pushed-arg call in this function actually
    endanger a BC home?
 
    The whole-function `has_prepushed_call` veto was written when gen_call had no
@@ -3311,7 +3311,7 @@ static RegMask class_home_mask(const Func *f, unsigned R, unsigned flags)
     }
 }
 
-/* [IR_BCPERCAND=0] Default-on after the matrix: switchbench -1.96%..-5.63% and
+/* [IR_OFF=bc-per-cand] Default-on after the matrix: switchbench -1.96%..-5.63% and
    widthbench -0.14%..-1.43% on all six valid-tick CPUs, every other suite within
    12 ticks (the shared test.c, both signs); no new aborts over corpus x 10 CPUs x
    sp/fp; adv_a -4/-6, clisp -59/-8, enigma unchanged. Opt out to revert. */
@@ -3346,7 +3346,7 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
     }
     int nc = collect_bc_temp_cands(f, bb_first_op, def_kind, write_count,
                                    use_count, itloc, itlo, ithi, cand);
-    /* [IR_BCPERCAND] In a function the whole-function veto rejected, keep only the
+    /* [bc-per-cand] In a function the whole-function veto rejected, keep only the
        candidates whose own live range never crosses a BC clobber. */
     if (vetoed) {
         int k = 0;
@@ -4852,7 +4852,7 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
         long w = bb_iter_weight(bb_loop_depth, b, 0);
         if (bb_cond_shift)
             for (int i = 0; i < bb_cond_shift[b] && w > 1; i++) w /= 2;
-        /* [IR_MWBC] 4^depth counts ITERATIONS; it says nothing about which
+        /* [mwbc] 4^depth counts ITERATIONS; it says nothing about which
            blocks an iteration actually runs. A block behind a conditional
            branch runs on a fraction of the trips, and weighting it as if it ran
            on all of them overvalues a value read only inside an if-chain
@@ -5380,13 +5380,13 @@ void ir_alloc(Func *f)
        is strictly more precise. op_clobbers models exactly the cases the veto
        stands in for — IR_ASM / IR_SWITCH / IR_ACC_* / helper calls return
        IR_R_ALL, plain calls preserve IX/IY, and width-4 arithmetic clobbers
-       HL/DE/BC but not IY. [IR_IYLONG] lets them run on that basis.
+       HL/DE/BC but not IY. [iy-long] lets them run on that basis.
 
        The general picker (collect_home_candidates / unified_arbitrate) is NOT
        included: it proposes several register classes at once and its safety
        cannot be argued from the IY-clean check alone. */
     int bc_region_ok = !has_long && !has_bc_clobber;
-    /* IR_IYLONG=0 restores the OLD gating (IY packing rides the BC veto), not
+    /* IR_OFF=iy-long restores the OLD gating (IY packing rides the BC veto), not
        "no IY packing at all" — the opt-out has to be a revert, not a third
        behaviour. */
     int iy_region_ok = iylong_off() ? bc_region_ok : !has_iy_clobber;
@@ -5481,7 +5481,7 @@ void ir_alloc(Func *f)
            picks the innermost accumulator/counter for the scarce register
            pairs. */
         int *bb_loop_depth = calloc((size_t)f->n_bbs, sizeof(int));
-        /* [IR_MWBC] How many times to HALVE this BB's iteration weight because
+        /* [mwbc] How many times to HALVE this BB's iteration weight because
            it sits behind conditional branches inside its loop. 0 = it runs on
            every trip. Only ever written by the dominance-based loop scan below,
            so it stays all-zero — and the cost model unchanged — when that scan
@@ -5590,7 +5590,7 @@ void ir_alloc(Func *f)
                         }
                     }
 
-                    /* [IR_MWBC] Recompute bb_loop_depth ONLY — real loops, from
+                    /* [mwbc] Recompute bb_loop_depth ONLY — real loops, from
                        DOMINANCE, one loop per HEADER.
 
                        The loop above calls any edge to a lower-numbered block a
@@ -6262,7 +6262,7 @@ void ir_alloc(Func *f)
             }
         }
         b1_hotness_probe(f, bb_loop_depth);
-        /* [IR_CALLSPLIT] Phase-1 call-bounded live-range splitting (opt-in).
+        /* [call-split] Phase-1 call-bounded live-range splitting (opt-in).
            For a spilled reused width-2 value with a call-free span of >=3 READS
            and NO write inside that span, make it BC-resident across the span:
            set vreg_to_phys=IR_PR_BC + home_lo/hi (op-index) + IR_VREG_CALL_SPLIT.

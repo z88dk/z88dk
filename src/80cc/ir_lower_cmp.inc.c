@@ -4,8 +4,8 @@
    etc.): plain z80, z80n, ez80. NOT z180 (undoc index-half opcodes trap), NOT
    kc160 (z80asm rejects `iyl`/`iyh` as illegal identifiers), Rabbit (no index
    halves), 808x/gbz80 (no index registers). */
-/* [IR_CMPK] Byte-wise width-2 compare against a constant: keeps HL and DE free
-   where `sbc hl,de` clobbers both. Default on; IR_CMPK=0 opts out.
+/* [cmp-k] Byte-wise width-2 compare against a constant: keeps HL and DE free
+   where `sbc hl,de` clobbers both. Default on; IR_OFF=cmp-k opts out.
    808x/gbz80 already lowered the compare byte-wise but still staged the constant
    into DE via load_binop_operands; the immediate form frees it there too. */
 static int cmpk_enabled(void)
@@ -349,7 +349,7 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
        what lets a loop-invariant stay resident (sieve's inner loop reloaded `i`
        from the stack every iteration purely because DE was the compare's).
        Reads the operand where it already lives (cmp_byte_src). The low-byte-zero
-       case above is shorter still, so it goes first. IR_CMPK. */
+       case above is shorter still, so it goes first. cmp-k. */
     if ((op->kind == IR_CMP_ULT || op->kind == IR_CMP_UGE)
         && cmpk_enabled()
         && op->src[0] >= 0 && op->src[1] == -1 && op->imm_sym == NULL

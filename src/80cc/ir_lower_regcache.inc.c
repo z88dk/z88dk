@@ -1034,7 +1034,7 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
     /* HL is restored to its prior value — cache stands. */
 }
 
-/* Store HL to a vreg's frame slot. Wrapper sets the [IR_DEADSTORE] write context
+/* Store HL to a vreg's frame slot. Wrapper sets the [dead-store] write context
    (save/restore — nests via pending_spill_resolve) so every slot_off it makes is
    attributed to the write count. */
 static void store_hl_impl(FILE *out, const Func *f, int vreg_id);
@@ -1046,7 +1046,7 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
 }
 static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
 {
-    /* [IR_DEADSTORE word] Dead slot store (see store_hl_keep_hl_impl). This
+    /* [dead-store word] Dead slot store (see store_hl_keep_hl_impl). This
        helper's contract is DE=value / HL=junk, so the store collapses to the
        single `ex de,hl` that moves the value into place; cache DE for the
        readers. A caller that wanted HL back emits its own `ex de,hl` and copt
@@ -1145,7 +1145,7 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
 /* Write-context wrapper, mirroring store_hl's: this helper IS a store, so every
    slot_off/slot_ix_off it makes must be attributed to the WRITE count. Without
    it a call-result spill (its main caller, ir_lower_call.inc.c) looked "never
-   written but read" to the IR_DEADSTORE read/write split, hiding every dead
+   written but read" to the dead-store read/write split, hiding every dead
    call-result store. */
 static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id);
 static int store_hl_keep_hl(FILE *out, const Func *f, int vreg_id)
@@ -1157,7 +1157,7 @@ static int store_hl_keep_hl(FILE *out, const Func *f, int vreg_id)
 }
 static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
 {
-    /* [IR_DEADSTORE word] Slot written but never read (read/write split,
+    /* [dead-store word] Slot written but never read (read/write split,
        coalescing-checked; ir_assign_slots dropped the slot on the re-lower).
        The value is already in HL and this helper's contract is HL=value, so the
        store simply disappears — cache HL so every reader is served from it
@@ -1279,11 +1279,11 @@ static int a_cache_carry_safe(const Func *f, int vreg_id)
 {
     (void)f;
     if (L.vreg_wc && L.vreg_wc[vreg_id] <= 1) return 1;   /* never rewritten */
-    /* Widened window (IR_A_CARRY): also safe when the VREG is READ-ONLY for the
+    /* Widened window (a-carry): also safe when the VREG is READ-ONLY for the
        rest of this BB (no later dst==v / POSTSTEP on v). Historically this alone
        was UNSOUND — it ignores PHYSICAL A being clobbered between the cache_a and
        the reuse (a class of direct `ld a,…` inline emits). It is sound ONLY paired
-       with the vemit invalidate-by-default A tracker (also gated on IR_A_CARRY),
+       with the vemit invalidate-by-default A tracker (also gated on a-carry),
        which drops rs.a
        across any A-value-changing line. Cross-BB carry stays gated by bb_a_out;
        the A-cache resets at every BB entry, so within-BB read-only suffices. */
@@ -1416,7 +1416,7 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
 }
 
 /* Store A to a vreg's 8-bit frame slot. Clobbers HL+E. Wrapper sets the
-   [IR_DEADSTORE] write context (save/restore — nests via pending_spill_resolve)
+   [dead-store] write context (save/restore — nests via pending_spill_resolve)
    so every slot_off it makes counts as a write, not a read. */
 static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id);
 static void store_a_byte(FILE *out, const Func *f, int vreg_id)
@@ -1427,7 +1427,7 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
 }
 static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id)
 {
-    /* [IR_DEADSTORE] Dead spill: the slot is written but never read (proven by
+    /* [dead-store] Dead spill: the slot is written but never read (proven by
        the read/write split, coalescing-checked). Skip the store entirely — A
        already holds the value; cache it so every use (same BB, or the next via
        bb_a_out) reads it from A. ir_assign_slots dropped the slot, so there is
@@ -1476,7 +1476,7 @@ static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id)
        load_byte_to_a(v) elides the reload AT SOURCE — the byte analog of inc1
        (what copt #269/#R2 recover post-hoc). Slot-backed here ⇒ recoverable, and
        the default-on A-invalidator drops rs.a if a later op value-changes A, so
-       the belief can't go stale. Gated on a_carry_enabled() (IR_A_CARRY=0 =
+       the belief can't go stale. Gated on a_carry_enabled() (IR_OFF=a-carry =
        pre-tracker, byte-identical) and !VOLATILE (a volatile must reload). */
     int a_stays = a_carry_enabled()
                   && !(f->vregs[vreg_id].flags & IR_VREG_VOLATILE);

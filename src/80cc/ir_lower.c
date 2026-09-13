@@ -373,7 +373,7 @@ static int  clob_snap_hl, clob_snap_de, clob_snap_bc, clob_snap_a;
 
 /* Unified instruction-effects query (P0 Step 2 — decomposer consolidation).
    ONE query every consumer uses (ir_verify_op, IR_CLOB_VERIFY, the re-renderer's
-   park sweep, the IR_A_CARRY A-invalidator in vemit), COMPOSING the two
+   park sweep, the a-carry A-invalidator in vemit), COMPOSING the two
    single-responsibility kernels — lra_line_writes (whole-reg WRITE mask) and
    bc_line_effect (sub-register B/C reads/writes + park/control) — plus the
    value-change refinements. So an asm line is decomposed in one place; the
@@ -405,7 +405,7 @@ static InstrEffects instr_effects(const char *line);
    unrecognised (unknown) or A-writing line drops rs.a. An incomplete recogniser
    therefore loses BYTES, never CORRECTNESS.
 
-   DEFAULT-ON. Opt out with IR_A_CARRY=0 — that reproduces the pre-flip codegen
+   DEFAULT-ON. Opt out with IR_OFF=a-carry — that reproduces the pre-flip codegen
    byte-for-byte and is the regression-test path.
 
    ►► REVISIT / TUNE LATER: default-on costs a few bytes on cold sites with a FLAT
@@ -419,21 +419,21 @@ static int  a_carry_on = -1;
 static int  a_carry_enabled(void)
 {
     if (a_carry_on < 0) {
-        a_carry_on = !opt_disabled("a-carry");      /* default ON; IR_A_CARRY=0 opts out */
+        a_carry_on = !opt_disabled("a-carry");      /* default ON; IR_OFF=a-carry opts out */
     }
     return a_carry_on;
 }
 
-/* IR_REMAT_LEA: rematerialise &local frame-slot addresses (see the remat table in
+/* remat-lea: rematerialise &local frame-slot addresses (see the remat table in
    ir_lower_func). Default ON after the gauntlet — full byte matrix 0-regress all 9
    CPUs sp+fp (−747B), ticks 0-slower (interpbench pure win, ez80-fp excluded as a
-   byte-for-tick), long_ir + run-matrix green, real files byte-identical. IR_REMAT_LEA=0
+   byte-for-tick), long_ir + run-matrix green, real files byte-identical. IR_OFF=remat-lea
    opts out (byte-identical to pre-flip). */
 static int  remat_lea_on = -1;
 static int  remat_lea_enabled(void)
 {
     if (remat_lea_on < 0) {
-        remat_lea_on = !opt_disabled("remat-lea");    /* default ON; IR_REMAT_LEA=0 opts out */
+        remat_lea_on = !opt_disabled("remat-lea");    /* default ON; IR_OFF=remat-lea opts out */
     }
     return remat_lea_on;
 }
@@ -493,7 +493,7 @@ static int  fclong_carry_enabled(void)
     return fclong_carry_on;
 }
 
-/* IR_TRUNCRES: a long->int narrowing leaves its result in HL, so say so instead
+/* trunc-res: a long->int narrowing leaves its result in HL, so say so instead
    of spilling it and then invalidating the cache — which made the consumer one
    op later reload the slot that had just been written. commit_hl_result also
    lets the dead-store pass drop the spill outright, and routes a PR_DE dst into
@@ -502,7 +502,7 @@ static int  fclong_carry_enabled(void)
    Default ON. Corpus -285 B over 38 cells with ZERO larger, every CPU gaining
    (gbz80/8085 -30, z80/z80n/z180 -28, rabbit/8080 -26, kc160 -20, ez80 -17);
    emu.c -210 B sp / -247 B fp, clisp -212 / -146. Ticks follow the bytes: z80
-   corpus -0.131%, 3 cells faster and 0 slower. IR_TRUNCRES=0 opts out,
+   corpus -0.131%, 3 cells faster and 0 slower. IR_OFF=trunc-res opts out,
    byte-identical to the pre-flip compiler.
 
    NB this needed the expr.c member-offset fix first. Until then it miscompiled
@@ -520,7 +520,7 @@ static int  truncres_enabled(void)
     return truncres_on;
 }
 
-/* IR_HL_CARRY (opt-in, WIP): the same invalidate-by-default tracker extended to
+/* hl-carry (opt-in, WIP): the same invalidate-by-default tracker extended to
    HL and DE — the vehicle for HL/DE operand-residency carry (the #2 size bucket).
    Increment 0 = the inert safety net: rs.hl/rs.de survive across raw emits and are
    dropped only when the emitted line VALUE-CHANGES the reg. Two HL-specific
@@ -531,15 +531,15 @@ static int  truncres_enabled(void)
 
    DEFAULT-ON: the full valid-tick-CPU ticks matrix is a PURE WIN — fewer bytes,
    0 byte regressions AND all tick cells faster / 0 slower (it removes reload
-   memory traffic, so bytes and ticks drop together). Opt out with IR_HL_CARRY=0 —
+   memory traffic, so bytes and ticks drop together). Opt out with IR_OFF=hl-carry —
    reproduces the pre-flip codegen byte-for-byte (the regression-test path). */
-/* [IR_SLOTADDR] The sp-mode slot-address cache (cur_hl_addr_off) existed only
+/* [slot-addr-widen] The sp-mode slot-address cache (cur_hl_addr_off) existed only
    for BYTE accesses. The WORD load/store paths recomputed `ld hl,nn;add hl,sp`
    (4 B) even when HL already pointed a byte or two away, and threw the address
    away afterwards although a two-byte walk provably leaves HL on the slot's
    high byte. This widens the cache to the word paths in both directions —
    consume an in-range belief, publish the trailing address. Opt out with
-   IR_SLOTADDR=0, which reproduces the pre-change codegen byte-for-byte. */
+   IR_OFF=slot-addr-widen, which reproduces the pre-change codegen byte-for-byte. */
 static int  slotaddr_on = -1;
 static int  slotaddr_widen(void)
 {
@@ -553,7 +553,7 @@ static int  hl_carry_on = -1;
 static int  hl_carry_enabled(void)
 {
     if (hl_carry_on < 0) {
-        hl_carry_on = !opt_disabled("hl-carry");   /* default ON; IR_HL_CARRY=0 opts out */
+        hl_carry_on = !opt_disabled("hl-carry");   /* default ON; IR_OFF=hl-carry opts out */
     }
     return hl_carry_on;
 }
@@ -581,7 +581,7 @@ static int  hlde_belief_droppable(int v)
        param_caller_off. It just is not a SPILL slot, so vreg_spill_slot is -1
        for it and the test above missed every one. That is not a corner case:
        params are most of what the indirect word store stores, and missing them
-       is what kept gen_st_mem's DE-direct path (IR_HL_CARRY inc1) off for
+       is what kept gen_st_mem's DE-direct path (hl-carry inc1) off for
        `p->field = param` — the store then routed the value through HL, evicted
        the base, and paid a park + restore to get it back.
        NB this is a MEMORY home, so the register-home hazard the predicate exists
@@ -746,7 +746,7 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
             }
             L.pv_expect_push = L.pv_expect_pop = 0;
         }
-        /* IR_A_CARRY partner: invalidate-by-default A tracker. Keep rs.a only if
+        /* a-carry partner: invalidate-by-default A tracker. Keep rs.a only if
            this line PROVABLY preserves A's value (recognised AND either does not
            write A or self-preserves it, e.g. `or a`/`and a` flag tests). An
            unknown or A-writing line drops the belief — the sole codegen-affecting
@@ -801,7 +801,7 @@ static void emit(FILE *out, const char *fmt, ...)
    what `ld d,h / ld e,l` does — except on Rabbit 4000/6000, where it is a
    native ONE-byte instruction while the two 8-bit moves are page-prefixed at
    2 bytes EACH. Four bytes to do what one byte does, at every HL->DE staging
-   site, is where r4k's whole IR_DS_SHARE byte regression came from.
+   site, is where r4k's whole dead-store-share byte regression came from.
    Neither form touches flags and D/E do not alias H/L, so this is a pure
    spelling change everywhere else. The copt rules that matched the pair as
    TEXT (#G4, #IR-const/sym-to-DE, #GB6 in lib/80cc_rules.1) were updated to
@@ -939,7 +939,7 @@ static int hlde_full_reload(const char *s, const char *pair)
    code-GROWING rules are call substitutions — charging the worst case keeps the
    bound valid post-copt without modelling copt.
 
-   DEFAULT-ON; `IR_JR=0` opts out. Regression: test/suites/long_ir/jrelax.c. */
+   DEFAULT-ON; `IR_OFF=jr-relax` opts out. Regression: test/suites/long_ir/jrelax.c. */
 static int relax_uc = -1;
 /* Whether to relax UNCONDITIONAL jumps is a per-CPU question, and the answer
    follows the `jr`-vs-`jp` timing rather than the byte saving (which is always
@@ -1357,7 +1357,7 @@ static int de_park_group(char **lines, int i, int *offp)
    reported as a VIOLATION. The opposite (forward unknown, backward dead) is the
    backward pass being more precise.
 
-   [IR_DEFLOW] The walk FOLLOWS branches, because the backward sweep now does.
+   [de-flow] The walk FOLLOWS branches, because the backward sweep now does.
    Before that it stopped at one and answered "reader" — which was the same
    conservative answer the sweep gave, so the two agreed; once the sweep started
    following branches, that stale answer produced four bogus violations on emu.c
@@ -1365,7 +1365,7 @@ static int de_park_group(char **lines, int i, int *offp)
    both arms of a conditional keeps it an independent check rather than a weaker
    one. A call and a `ret` still answer READER: both genuinely read DE (the
    __sdcccall(1) argument and the DE:HL result ABI), which is the boundary of
-   what [IR_DEFLOW] claims.
+   what [de-flow] claims.
 
    `seen` memoises (line, liveness-state) so a loop terminates; revisiting a
    state contributes nothing the in-progress visit will not already report. */
@@ -1538,7 +1538,7 @@ static int de_generic_park(char **lines, int i)
     return -1;
 }
 
-/* [IR_XORA] `ld a,0` is 2 bytes and 7 T; `xor a` is 1 and 4. The only
+/* [xor-a] `ld a,0` is 2 bytes and 7 T; `xor a` is 1 and 4. The only
    difference is that `xor a` DEFINES the flags, and the lowerer cannot say
    whether that matters — it models registers, not F. The rendered text can, so
    the rewrite rides the backward park sweep below, which already walks each
@@ -1554,14 +1554,14 @@ static int de_generic_park(char **lines, int i)
    Default ON. Corpus -230 B over 132 cells with ZERO larger, every CPU smaller
    (gbz80 -40, 8080/8085 -26, z80/z80n/z180 -25, rabbit/ez80/kc160 -21); emu.c
    -38 B fp / -52 B sp. Ticks follow: 7 T becomes 4 T at every site and nothing
-   else moves. IR_XORA=0 opts out, byte-identical to the pre-flip compiler. NB
+   else moves. IR_OFF=xor-a opts out, byte-identical to the pre-flip compiler. NB
    the rewrite rides the park sweep, so --opt-disable=bc-live also turns it
    off. */
 static int  xora_on = -1;
 static int  xora_enabled(void)
 {
     if (xora_on < 0) {
-        xora_on = !opt_disabled("xor-a");    /* default ON; IR_XORA=0 opts out */
+        xora_on = !opt_disabled("xor-a");    /* default ON; IR_OFF=xor-a opts out */
     }
     return xora_on;
 }
@@ -1595,8 +1595,8 @@ static int xora_line_reads_f(const char *line)
     return 1;   /* adc/sbc/rl/rr/rla/rra/daa/ccf, every branch, anything unknown */
 }
 
-/* IR_BCCALL: treat a `call _sym` as killing BC in the park sweep (see
-   xline_c_call). IR_BCCALL=0 opts out. */
+/* bc-call: treat a `call _sym` as killing BC in the park sweep (see
+   xline_c_call). IR_OFF=bc-call opts out. */
 static int  bccall_on = -1;
 static int  bccall_enabled(void)
 {
@@ -1606,7 +1606,7 @@ static int  bccall_enabled(void)
     return bccall_on;
 }
 
-/* [IR_BCCALL] Is this line a call to a COMPILED C function (`call _sym`)? No
+/* [bc-call] Is this line a call to a COMPILED C function (`call _sym`)? No
    z88dk calling convention passes an argument in BC — smallc and stdc stack
    theirs, fastcall uses HL/DE:HL or the memory accumulator, __sdcccall(1) uses
    A/HL and DE — so BC is dead going INTO such a call, and the `ld bc,hl` DEHL
@@ -1789,7 +1789,7 @@ static void gw_fold_byte_global_widens(char **lines, int n, char *drop)
     }
 }
 
-/* IR_BCFLOW: follow intra-function branches when deciding BC liveness in the
+/* bc-flow: follow intra-function branches when deciding BC liveness in the
    park sweep. Without it every branch is treated as "a successor may read BC",
    which keeps a stash alive that the target provably never reads — 64 of the
    151 `ld bc,hl` left on emu.c reach a branch to a LOCAL label. See
@@ -1799,7 +1799,7 @@ static void gw_fold_byte_global_widens(char **lines, int n, char *drop)
    8085 -32, z80/z80n/z180/rabbit/kc160 -24, ez80 -20, gbz80 -16); emu.c -157 B
    sp / -149 fp, clisp -381, adv_a -16. Ticks -0.0278% on the z80 corpus, 4
    cells faster and 0 slower -- it only ever deletes an instruction.
-   IR_BCFLOW=0 opts out, byte-identical to the pre-flip compiler.
+   IR_OFF=bc-flow opts out, byte-identical to the pre-flip compiler.
    IR_BCFLOW_DBG=1 reports the label count and how many have BC dead. */
 static int  bcflow_on = -1;
 static int  bcflow_enabled(void)
@@ -1810,8 +1810,8 @@ static int  bcflow_enabled(void)
     return bcflow_on;
 }
 
-/* IR_DEFLOW: follow intra-function branches when deciding DE liveness in the
-   park sweep, exactly as [IR_BCFLOW] does for BC. Without it a branch is a black
+/* de-flow: follow intra-function branches when deciding DE liveness in the
+   park sweep, exactly as [bc-flow] does for BC. Without it a branch is a black
    box that "may read DE", which keeps an 8085 slot-load park alive whose target
    provably never reads the pair.
 
@@ -1822,7 +1822,7 @@ static int  bcflow_enabled(void)
    conservative, which is what separates this from the wider opportunity sized by
    [IR_DELIVE_PROBE].
 
-   IR_DEFLOW=0 opts out. */
+   IR_OFF=de-flow opts out. */
 static int  deflow_on = -1;
 static int  deflow_enabled(void)
 {
@@ -1832,7 +1832,7 @@ static int  deflow_enabled(void)
     return deflow_on;
 }
 
-/* [IR_BCFLOW] Is this line a label of the form `name:` at column 0? */
+/* [bc-flow] Is this line a label of the form `name:` at column 0? */
 static int xline_label(const char *l, char *out, size_t n)
 {
     if (*l == '\t' || *l == ' ' || *l == ';' || *l == '.' || *l == '\n') return 0;
@@ -1843,7 +1843,7 @@ static int xline_label(const char *l, char *out, size_t n)
     return 1;
 }
 
-/* [IR_BCFLOW] The branch target of `l`, or NULL. Handles `jp L`, `jr cc,L` and
+/* [bc-flow] The branch target of `l`, or NULL. Handles `jp L`, `jr cc,L` and
    `djnz L`; an indirect `jp (hl)` has no static target and answers NULL, which
    the caller must treat as "unknown, assume live". */
 static int xline_branch_target(const char *l, char *out, size_t n)
@@ -1867,7 +1867,7 @@ static int xline_branch_target(const char *l, char *out, size_t n)
     return i > 0;
 }
 
-/* [IR_BCFLOW] BC liveness at every label, by iterating the backward transfer to
+/* [bc-flow] BC liveness at every label, by iterating the backward transfer to
    a fixpoint. Starts optimistic (dead everywhere) and only ever adds liveness,
    so it converges; the iteration cap is a belt-and-braces bail that answers
    "live" for anything unsettled. The transfer mirrors the sweep's own, which is
@@ -1883,7 +1883,7 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
     for (int iter = 0; iter < 8; iter++) {
         int changed = 0;
         int b_live = 0, c_live = 0, f_live = 0;
-        /* [IR_DEFLOW] DE starts DEAD like the rest, and is only tracked when
+        /* [de-flow] DE starts DEAD like the rest, and is only tracked when
            the caller asked for it (ldl/lel non-NULL). */
         int d_live = 0, e_live = 0;
         for (int i = n - 1; i >= 0; i--) {
@@ -1900,7 +1900,7 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
                     }
                 continue;
             }
-            /* [IR_DEFLOW] A park is transparent to DE -- parked, the pair is
+            /* [de-flow] A park is transparent to DE -- parked, the pair is
                restored; unparked, it was dead on both sides -- so step over the
                whole group rather than let its own push/pop decide. This mirrors
                what the sweep does with `i -= 3`, and the group carries no B/C or
@@ -1994,15 +1994,15 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            did it blind and miscompiled; see gw_fold_byte_global_widens. */
         gw_fold_byte_global_widens(lines, n, drop);
         int b_live = 0, c_live = 0, d_live = 0, e_live = 0;
-        /* [IR_XORA] F-liveness for the `ld a,0` -> `xor a` rewrite. Starts LIVE:
+        /* [xor-a] F-liveness for the `ld a,0` -> `xor a` rewrite. Starts LIVE:
            the buffer end is the end of this function's text, and the walk has
            seen nothing yet. */
         int f_live = 1;
         int do_xora = xora_enabled();
-        /* [IR_BCFLOW] Label table + BC liveness at each label, so a branch can
+        /* [bc-flow] Label table + BC liveness at each label, so a branch can
            be followed instead of assumed to read BC. */
         char **lbl = NULL; char *lb = NULL, *lc = NULL, *lf = NULL;
-        /* [IR_DEFLOW] DE liveness at each label, from the same fixpoint. */
+        /* [de-flow] DE liveness at each label, from the same fixpoint. */
         char *ldl = NULL, *lel = NULL;
         int nlbl = 0, bcflow = bcflow_enabled();
         int deflow = deflow_enabled();
@@ -2028,7 +2028,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 }
             }
             /* One fixpoint serves both: DE is computed only when asked for, so
-               IR_DEFLOW=0 leaves the BC/F answers bit-for-bit unchanged. */
+               IR_OFF=de-flow leaves the BC/F answers bit-for-bit unchanged. */
             if (bcflow || deflow)
                 bc_live_at_labels(lines, n, lbl, nlbl, lb, lc, lf,
                                   deflow ? ldl : NULL, deflow ? lel : NULL);
@@ -2097,7 +2097,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             }
             char bftgt[64];
             InstrEffects e = instr_effects(lines[i]);   /* single query (composes bc_line_effect) */
-            /* [IR_XORA] f_live here is the answer for the code AFTER line i,
+            /* [xor-a] f_live here is the answer for the code AFTER line i,
                which is exactly what decides whether defining F costs anything.
                Rewrite first, then fold line i into the liveness. */
             if (do_xora && !f_live && !strcmp(lines[i], "\tld\ta,0\n")) {
@@ -2105,11 +2105,11 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 if (nl) { free(lines[i]); lines[i] = nl; }
             }
             /* A call to compiled C code neither reads the flags nor preserves
-               them — the same fact about BC that [IR_BCCALL] rests on, and the
+               them — the same fact about BC that [bc-call] rests on, and the
                same `_sym` discriminator, so an asm-linkage call stays a reader.
                Checked first: xora_line_reads_f calls every branch a reader. */
             if (xline_c_call(lines[i]) && bccall_enabled()) f_live = 0;
-            /* [IR_BCFLOW] An UNCONDITIONAL branch to a label in this function
+            /* [bc-flow] An UNCONDITIONAL branch to a label in this function
                reads no flags — take the target's. A conditional one reads F by
                definition and stays a reader. */
             else if (bcflow && !strchr(lines[i], ',')
@@ -2131,12 +2131,12 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             /* BC is dead at a return; DE is not (result ABI DE:HL) — e.d_read
                already says so, so route both through the same update below. */
             if (boundary) { b_live = c_live = 0; }
-            /* [IR_BCCALL] A branch's successor may read BC; a call to a compiled
+            /* [bc-call] A branch's successor may read BC; a call to a compiled
                C function cannot — see xline_c_call. Everything else (a jump, an
                asm-linkage call, a conditional call) stays conservative. */
             else if (call && xline_c_call(lines[i]) && bccall_enabled())
                           { b_live = c_live = 0; }
-            /* [IR_BCFLOW] A branch to a label in this function is not a black
+            /* [bc-flow] A branch to a label in this function is not a black
                box: take the liveness the fixpoint computed for its target (plus
                the fall-through for a conditional, and B for djnz). */
             else if (call && bcflow
@@ -2158,7 +2158,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 b_live = rb ? 1 : (wb ? 0 : b_live);
                 c_live = rc ? 1 : (wc ? 0 : c_live);
             }
-            /* [IR_DEFLOW] A branch to a label in this function is not a black
+            /* [de-flow] A branch to a label in this function is not a black
                box for DE either: take the liveness the fixpoint computed for its
                target, plus the fall-through for a conditional. A call and a
                `ret` are NOT covered -- both genuinely read DE (argument and
@@ -2243,7 +2243,7 @@ static int retthread_parts(const char *l, char *cc, size_t ccsz, int *bb)
    Placed after the peepholes (needs final text), before relaxation (so the
    inserted `jp` can still become a `jr`).
 
-   DEFAULT-ON; `--opt-disable=tail-merge` or `IR_TAILMERGE=0` opts out,
+   DEFAULT-ON; `--opt-disable=tail-merge` or `IR_OFF=tail-merge` opts out,
    byte-identical to the pre-flip compiler. It is a byte-for-cycle trade: the
    bytes are saved once, the ~10 T of the inserted `jp` is paid per execution.
    Regression: test/suites/long_ir/tailmerge.c. */
@@ -2552,7 +2552,7 @@ verbatim:
 
    Runs after tail merging (whose labels and jumps it can then move) and before
    branch relaxation, which re-sizes the displacements the move changed.
-   DEFAULT-ON; `--opt-disable=block-layout` or `IR_BLAYOUT=0` opts out. */
+   DEFAULT-ON; `--opt-disable=block-layout` or `IR_OFF=block-layout` opts out. */
 static int bl_on = -1;
 static int block_layout_enabled(void)
 {
@@ -3456,7 +3456,7 @@ static int param_caller_off(const Func *f, int vreg_id)
    byte-pair sequence. PARAM_IN_PLACE vregs return their caller-pushed-arg
    offset directly. */
 static void note_slot_use(int v);   /* frame-slot use accounting: fwd (defined with rec state) */
-/* [IR_DEADSTORE] write-context depth: >0 while lowering a store function body,
+/* [dead-store] write-context depth: >0 while lowering a store function body,
    so note_slot_use attributes its slot_off calls (store + guard checks) to the
    write count. Save/restore (not set/clear) because stores nest via
    pending_spill_resolve. */
@@ -3650,7 +3650,7 @@ static void emit_slot_addr_off(FILE *out, const Func *f, int canon_off);
    rather than through hl_about_to_change. */
 static void hl_about_to_change(int v_new);
 
-/* Cross-BB HL slot-address carry (default on; IR_HLADDR_BB=0 reverts). */
+/* Cross-BB HL slot-address carry (default on; IR_OFF=hl-addr-carry reverts). */
 static int hladdr_bb_carry_on(void)
 {
     static int on = -1;
@@ -4232,7 +4232,7 @@ static int  *rec_remat;           /* per-vreg: uses rematerialised */
 static int   rec_nv;              /* size of the above (this function) */
 static int   rec_counting;        /* 1 while a final render is instrumented */
 
-/* Frame-slot use accounting (shared by IR_DEADSTORE and IR_DEADFRAME).
+/* Frame-slot use accounting (shared by dead-store and IR_DEADFRAME).
    rec_slotuse[v] counts genuine frame-slot accesses emitted for v (hooked in
    slot_off/slot_ix_off — the two chokepoints every frame-slot load/store passes
    through; stack transients and cache hits don't). A SPILL vreg with a slot but
@@ -4240,7 +4240,7 @@ static int   rec_counting;        /* 1 while a final render is instrumented */
    an all-dead frame is dropped frameless (IR_DEADFRAME). Sound: over-counts from
    non-emit slot_off checks → never falsely dead. */
 static int  *rec_slotuse;
-/* [IR_DEADSTORE, inert] rec_slotwrite[v] counts frame-slot WRITES of v — the
+/* [dead-store, inert] rec_slotwrite[v] counts frame-slot WRITES of v — the
    subset of rec_slotuse[v] emitted by the store functions (store_a_byte/
    store_hl, via note_slot_write). Then reads = rec_slotuse - rec_slotwrite. A
    spill vreg WRITTEN but never READ (rec_slotwrite>0, reads==0) is a dead store:
@@ -4267,7 +4267,7 @@ static char *rec_fh_seen;
 static int   frameprobe_on(void)
 { static int c = -1; if (c < 0) c = getenv("IR_FRAMEPROBE") ? 1 : 0; return c; }
 static int   dsx_on = -1;
-/* [IR_DEADSTORE] dead-spill vreg ids found by the last render's read/write split
+/* [dead-store] dead-spill vreg ids found by the last render's read/write split
    (populated in rec_end, consumed by the driver to mark IR_VREG_DEAD_SPILL and
    re-lower). Per-function; reset at the top of rec_end. */
 static int   ds_dead[512];
@@ -4282,14 +4282,14 @@ static int rec_enabled(void)
     return rec_on;
 }
 
-/* IR_DEADSTORE dead byte-spill elision (DEFAULT-ON). The render's read/write
+/* dead-store dead byte-spill elision (DEFAULT-ON). The render's read/write
    split (rec_end) lists byte spills written but never read; the driver marks
    them, drops the slots, and re-lowers (the value rides A to its readers).
    Pure win both axes (bytes and ticks fall together — dead memory traffic
-   removed). Opt out with IR_DEADSTORE=0 (reproduces pre-flip codegen);
-   IR_DEADSTORE=2 adds the per-slot report. */
-/* Width-2 half of IR_DEADSTORE (dead call-result / word slot stores).
-   Default-on; `IR_DSWORD=0` opts out, leaving the width-1 behaviour that
+   removed). Opt out with IR_OFF=dead-store (reproduces pre-flip codegen);
+   dead-store=2 adds the per-slot report. */
+/* Width-2 half of dead-store (dead call-result / word slot stores).
+   Default-on; `IR_OFF=dead-store-word` opts out, leaving the width-1 behaviour that
    shipped with #10 — the bisect handle for this bug family. */
 static int dsw_on = -1;
 static int dsw_enabled(void)
@@ -4300,9 +4300,9 @@ static int dsw_enabled(void)
     return dsw_on;
 }
 
-/* [IR_DS_SHARE] Refine the coalesced-read veto: block a dead store only when a
+/* [dead-store-share] Refine the coalesced-read veto: block a dead store only when a
    byte-sharing reader never writes its own slot (the channel shape), instead of
-   on any sharing reader at all. Default ON; `IR_DS_SHARE=0` opts out and
+   on any sharing reader at all. Default ON; `IR_OFF=dead-store-share` opts out and
    restores the pre-flip codegen byte-for-byte.
 
    Flipped on after the 391-cell matrix (23 benches x 10 cpus x sp/fp): 0 cells
@@ -4454,7 +4454,7 @@ static void rec_note_violation(const Func *f, int v)
 static void rec_end(const Func *f)
 {
     L.frame_fully_dead = 0;
-    ds_ndead = 0;                    /* [IR_DEADSTORE] per-fn dead-spill list reset */
+    ds_ndead = 0;                    /* [dead-store] per-fn dead-spill list reset */
     ds_last_framed = frame_has_saved_fp(f);   /* [#13] */
     if (!rec_counting) { rec_reset(); return; }
     /* Stop counting BEFORE the reports: our own slot_off() calls below must not
@@ -4580,7 +4580,7 @@ static void rec_end(const Func *f)
                     tb, trb,
                     rd[0], red[0], rd[1], red[1], rd[2], red[2], rd_w4, red_w4);
         }
-        /* [IR_DEADSTORE, INERT] Write-only (dead-store) byte-slot report. Uses
+        /* [dead-store, INERT] Write-only (dead-store) byte-slot report. Uses
            the read/write split: reads[v] = rec_slotuse[v] - rec_slotwrite[v].
            Coalescing-aware: readb[p]=1 iff SOME spill covering byte p was read,
            so a shared slot read via a different vreg keeps the store live (the
@@ -4588,7 +4588,7 @@ static void rec_end(const Func *f)
            and NONE of its bytes read-by-others is a genuine dead store. No
            codegen change — this only prints; validates the model before elision. */
         char *readb = dsx_enabled() ? calloc((size_t)fs, 1) : NULL;
-        /* [IR_DS_SHARE] The byte a coalesced reader reads WITHOUT EVER WRITING
+        /* [dead-store-share] The byte a coalesced reader reads WITHOUT EVER WRITING
            IT. `readb` blocks on any sharing reader at all, which is a blanket
            distrust of the slot allocator: ir_slots coalesces only vregs whose
            live ranges do not interfere, so a reader that also STORES its own
@@ -4650,7 +4650,7 @@ static void rec_end(const Func *f)
                     if (blockmap[p]) { shared_read = 1; break; }
                 if (shared_read) {
                     if (dsx_on >= 2)
-                        fprintf(stderr, "IR_DEADSTORE:   v%d w=%d slot=%d write-only "
+                        fprintf(stderr, "dead-store:   v%d w=%d slot=%d write-only "
                                 "but slot COALESCED-READ — keep\n", v, w, off);
                     continue;
                 }
@@ -4658,12 +4658,12 @@ static void rec_end(const Func *f)
                 if (ds_ndead < (int)(sizeof ds_dead / sizeof ds_dead[0]))
                     ds_dead[ds_ndead++] = v;
                 if (dsx_on >= 2)
-                    fprintf(stderr, "IR_DEADSTORE:   v%d w=%d slot=%d wr=%d rd=0 "
+                    fprintf(stderr, "dead-store:   v%d w=%d slot=%d wr=%d rd=0 "
                             "DEAD-STORE\n", v, w, off, rec_slotwrite[v]);
             }
-            if (nfn && dsx_on >= 2)   /* report only at IR_DEADSTORE=2 — default-on
+            if (nfn && dsx_on >= 2)   /* report only at dead-store=2 — default-on
                                          must be SILENT (was printing every compile) */
-                fprintf(stderr, "IR_DEADSTORE: %s dead-stores=%d\n",
+                fprintf(stderr, "dead-store: %s dead-stores=%d\n",
                         f->fn ? ir_sym_name(f->fn) : "?", nfn);
         }
         free(readb);
@@ -6500,7 +6500,7 @@ int ir_lower_func(FILE *out, Func *f)
            safe to treat as the plain symbol-address constant it is. */
         int *store_base_hard = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
                                       sizeof(int));
-        /* remat-LEA is gated to CALLLESS functions (see the [IR_REMAT_LEA] note):
+        /* remat-LEA is gated to CALLLESS functions (see the [remat-lea] note):
            recomputing a frame-slot address mid-call-argument-marshalling would need
            cur_sp_adjust to reflect the already-pushed args, and a &local passed to a
            call is the concrete failure (sortbench qsort_rec's cmp(&v[j],&pivot)). A
@@ -6558,7 +6558,7 @@ int ir_lower_func(FILE *out, Func *f)
                     else if (o->kind == IR_LD_SYM && o->mem.sym
                              && !ns_sym_bails(o->mem.sym))
                         rd = o;
-                    /* [IR_REMAT_LEA] Frame-slot address (&local) rematerialises:
+                    /* [remat-lea] Frame-slot address (&local) rematerialises:
                        recompute at each use (emit_remat_word: `ld hl,slot_off+
                        cur_sp_adjust; add hl,sp`) instead of spilling+reloading — the
                        offset is fixed per function and cur_sp_adjust is tracked, so
@@ -6580,7 +6580,7 @@ int ir_lower_func(FILE *out, Func *f)
                          ez80-SP keeps it: sp addressing is dear there, so it is a pure
                          win (−117B, −6.6% ticks).
                        Store-base LEAs keep their slot (below). Default-on;
-                       IR_REMAT_LEA=0 opts out. */
+                       IR_OFF=remat-lea opts out. */
                     else if (o->kind == IR_LEA && o->src[0] >= 0 && !func_has_call
                              && ir_home_at(f, o->dst) != IR_PR_STACK
                              && !(IS_EZ80() && fp_active(f))
@@ -6787,7 +6787,7 @@ int ir_lower_func(FILE *out, Func *f)
     int *bb_hl_out_p1 = NULL;
     FILE *rout;
     int df_retry_done = 0;   /* dead-frame elision: at most one re-lower */
-    int ds_retry_done = 0;   /* [IR_DEADSTORE] dead byte-spill elision: one re-lower */
+    int ds_retry_done = 0;   /* [dead-store] dead byte-spill elision: one re-lower */
     int hd_retry_done = 0;   /* [home-demote] unrealizable home: one re-lower */
     /* [IR_HOMEMAP] Inert: dump every vreg's home, slot and residency window.
        hr_recoverability_verify only compares vregs that BOTH carry a pair/byte
@@ -6995,7 +6995,7 @@ int ir_lower_func(FILE *out, Func *f)
             goto deadframe_retry;
         }
     }
-    /* [IR_DEADSTORE] Dead byte-spill elision: the render's read/write split
+    /* [dead-store] Dead byte-spill elision: the render's read/write split
        (rec_end) listed byte spills WRITTEN but never READ (ds_dead), coalescing-
        checked. Mark them IR_VREG_DEAD_SPILL, recompute slots (ir_assign_slots
        drops them → frame shrinks), and re-lower — the store helper skips the
@@ -7153,7 +7153,7 @@ int ir_lower_func(FILE *out, Func *f)
     return rc;
 }
 
-/* [#13 frameless-via-sp flip, opt-in IR_SPFLIP] Lower f fp for real (buffered),
+/* [#13 frameless-via-sp flip, opt-in sp-flip] Lower f fp for real (buffered),
    read ds_ixaccess/ds_last_framed; for an ix-frame-dead fn re-lower a pristine
    sp CLONE and emit that. Excludes `main` + IR_SPEXCL (bisect). */
 static int spflip_enabled(void)
@@ -7665,7 +7665,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            below). Skipped when the value carry took HL — the two are mutually
            exclusive, since cache_hl_slot_addr clears rs.hl and
            hl_about_to_change clears the address — and when a home exit-flush
-           already clobbered HL. IR_HLADDR_BB=0 opts out. */
+           already clobbered HL. IR_OFF=hl-addr-carry opts out. */
         if (carry < 0 && !hl_clobbered_at_entry && bb_hl_addr_out
             && hladdr_bb_carry_on()) {
             int addr_carry = -2;
@@ -8464,7 +8464,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 verify_buf[verify_len] = 0;
                 ir_verify_op(f, op, verify_buf);
             }
-            /* [IR_CALLSPLIT] A def of a call-split value OUTSIDE its BC span
+            /* [call-split] A def of a call-split value OUTSIDE its BC span
                writes the slot (its canonical home) but does NOT update BC, so a
                BC belief left over from the span now LIES (holds the pre-def
                value). Drop it so a later out-of-span read reloads from the
