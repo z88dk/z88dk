@@ -2494,6 +2494,66 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
         f->vreg_to_phys[pool[idx2_defer].vreg] = f->idx2_reg;
         idx2_taken = 1;
     }
+    /* ---- PAIRWISE SWAP: BC <-> the index home ----------------------------
+       The loop above is ISOLATION-PRICED GREEDY. It walks candidates in rank
+       order and gives each its own best class; whatever is left takes what
+       remains. It never prices the PAIRING, and for BC against an index home
+       the pairing is what matters, because the two registers are not
+       interchangeable in the same direction:
+
+         a VALUE  in BC is `ld a,c`            (1 B,  4 T)
+         a VALUE  in IX/IY is `push iy;pop hl` (4 B, 25 T) — it cannot feed the ALU
+         a BASE   in IX/IY is `(iy+d)`         (3 B, 19 T) at ANY offset
+         a BASE   in BC is `ld a,(bc)`         (1 B,  7 T) at offset 0 ONLY
+
+       So a pointer prefers BC only narrowly, while a value prefers it hugely —
+       and the greedy order hands BC to the pointer. bitfieldbench reg_set,
+       z80 fp, by the arbiter's OWN benefit numbers:
+
+           v0 pointer   BC 226   IX 217
+           v1 value     BC 150   IX  65
+           greedy  v0->BC + v1->IY = 291
+           swapped v0->IY + v1->BC = 367     <- better by 76
+
+       xcc makes the swapped choice and needs 73 instructions for reg_set where
+       80cc needs 136. This pass asks the question the loop never does.
+
+       Deliberately narrow: ONE BC tenant and ONE index tenant, both already
+       placed, each admissible in the other's class, and the swap must WIN on
+       the same interval_benefit the loop ranked by. `--opt-disable=home-swap`
+       opts out. */
+    if (!opt_disabled("home-swap") && f->idx2_reg != IR_PR_NONE && bb_loop_depth) {
+        int v_bc = -1, v_idx = -1, n_bc = 0;
+        for (int j = 0; j < f->n_vregs; j++) {
+            if (f->vreg_to_phys[j] == IR_PR_BC) { v_bc = j; n_bc++; }
+            else if (f->vreg_to_phys[j] == f->idx2_reg) v_idx = j;
+        }
+        /* BC is multi-occupant; a swap is only well-defined with a single
+           tenant, and the index classes are one-tenant by construction. */
+        if (n_bc == 1 && v_bc >= 0 && v_idx >= 0 && v_bc != v_idx) {
+            /* Each must be ALLOWED in the other's class — the pool records
+               what the proposers admitted, including the idx gates. */
+            int bc_ok_idx = 0, idx_ok_bc = 0;
+            for (int i = 0; i < n; i++) {
+                if (pool[i].vreg == v_bc && (pool[i].allowed & (RC_IDX2 | RC_IDX3)))
+                    bc_ok_idx = 1;
+                if (pool[i].vreg == v_idx && (pool[i].allowed & RC_BC))
+                    idx_ok_bc = 1;
+            }
+            if (bc_ok_idx && idx_ok_bc
+                && (!idx_ben || idx_ben[v_bc] > 0)) {
+                long now  = interval_benefit_x(f, v_bc,  bb_loop_depth, bb_cond_shift, GR_BC, 0)
+                          + interval_benefit_x(f, v_idx, bb_loop_depth, bb_cond_shift, GR_IX, 0);
+                long swp  = interval_benefit_x(f, v_bc,  bb_loop_depth, bb_cond_shift, GR_IX, 0)
+                          + interval_benefit_x(f, v_idx, bb_loop_depth, bb_cond_shift, GR_BC, 0);
+                if (swp > now) {
+                    f->vreg_to_phys[v_bc]  = f->idx2_reg;
+                    f->vreg_to_phys[v_idx] = IR_PR_BC;
+                }
+            }
+        }
+    }
+
     /* Apply the reserved DE-acc now that BC/idx2/byte are all placed, so the
        prepick snapshot is the full baseline (matches the sequential picker). */
     if (de_acc_vreg >= 0 && f->vreg_to_phys[de_acc_vreg] == IR_PR_SPILL) {

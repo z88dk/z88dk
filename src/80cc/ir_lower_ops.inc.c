@@ -3009,9 +3009,18 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                the pointer is already in IX/IY, so the field is reachable at a
                displacement with no `push iy;pop hl` and no address in HL.
                Tried after the frame rung, which is equally cheap and more
-               specific. A word is two displaced byte moves — the index pair
-               cannot be loaded whole — which is still shorter than reading the
-               pointer out and walking it, and leaves the base untouched. */
+               specific. A word goes through the PAIR form, exactly as
+               emit_frame_word_load does for a frame slot: `ld hl,(iy+d)` is ONE
+               3-byte instruction on ez80, kc160 and Rabbit, and elsewhere
+               z80asm expands it to precisely the `ld l,(iy+d); ld h,(iy+d+1)`
+               we would have written by hand — verified byte-identical on z80
+               and r4k, for the load, the store and the DE form. So it needs no
+               CPU test.
+               ►► Do NOT read that as licence for the index pair as a
+               DESTINATION (`ld iy,(ix+d)`, see emit_idx_word_from_frame):
+               there the z80 synthetic is 12 bytes against a 9-byte hand-written
+               sequence, so THAT family must stay gated. The difference is which
+               side the index register is on. */
             {
                 const char *ixr = idx_deref_reg(f, op, _w);
                 if (ixr && _w == 1) {
@@ -3021,16 +3030,14 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 }
                 if (ixr && _w == 2) {
                     if (vreg_in_pr_de(f, op->dst)) {
-                        emit(out, "ld\te,(%s%+d)%s", ixr, op->mem.offset,
+                        emit(out, "ld\tde,(%s%+d)%s", ixr, op->mem.offset,
                              mem_vol_stamp(op));
-                        emit(out, "ld\td,(%s%+d)", ixr, op->mem.offset + 1);
                         cache_de(op->dst);
                         return 0;
                     }
                     hl_about_to_change(-1);
-                    emit(out, "ld\tl,(%s%+d)%s", ixr, op->mem.offset,
+                    emit(out, "ld\thl,(%s%+d)%s", ixr, op->mem.offset,
                          mem_vol_stamp(op));
-                    emit(out, "ld\th,(%s%+d)", ixr, op->mem.offset + 1);
                     commit_hl_result(out, f, op->dst);
                     return 0;
                 }
@@ -3698,9 +3705,8 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 }
                 if (ixr && _w == 2) {
                     load_to_hl(out, f, op->src[0]);
-                    emit(out, "ld\t(%s%+d),l%s", ixr, op->mem.offset,
+                    emit(out, "ld\t(%s%+d),hl%s", ixr, op->mem.offset,
                          mem_vol_stamp(op));
-                    emit(out, "ld\t(%s%+d),h", ixr, op->mem.offset + 1);
                     return 0;
                 }
             }

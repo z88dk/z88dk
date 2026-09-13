@@ -3198,7 +3198,20 @@ static int frame_has_saved_iy(const Func *f)
     if (!f || f->is_naked || f->is_interrupt || !f->vreg_to_phys) return 0;
     for (int i = 0; i < f->n_vregs; i++) {
         int p = f->vreg_to_phys[i];
-        /* IY word home (idx3) — the original case, gated on idx3_reg==IY. */
+        /* ►► ANY whole-pair IY home, not just idx3. In FP MODE the idx2 spare
+           IS IY (ir_idx2_reg: frame IX -> spare IY), and IY is callee-saved in
+           that ABI exactly as IX is — but this predicate only ever asked about
+           idx3, which is sp-mode. So an fp function that homed a value in IY
+           clobbered its CALLER's IY and never saved it.
+
+           That stayed latent while fp idx2 homes were rare; the idx-deref work
+           made them common (every read-only pointer param dereffed twice is now
+           a candidate) and it became a live miscompile — bitfieldbench reg_set
+           and reg_get, recordbench churn, on z180/ez80/kc160/rabbit, plus
+           long_ir/idxderef's bf_get, which is how it was caught. The
+           sp-mode mirror (frame_has_saved_ix) already tests the PhysReg
+           directly and had no such hole; this now matches it. */
+        if (p == IR_PR_IY) return 1;
         if (f->idx3_reg != IR_PR_NONE && p == f->idx3_reg) return 1;
         /* IY byte-half home (assign_idxhalf_homes): also occupies IY, which is
            callee-saved — a leaf that homes a byte in IYL/IYH must push/pop IY to
@@ -5681,6 +5694,30 @@ static void emit_prologue(FILE *out, Func *f)
            The body reads it with `push <idx>;pop de`, never touching the
            slot again. */
         if (vreg_in_idx2(f, v->id) && width == 2) {
+            /* [idx-fill] Where the CPU can load the index pair straight from
+               (hl), form only the ADDRESS and let it do the rest — the
+               value never rides HL and there is no push/pop. See
+               emit_idx_word_from_hl_ptr. */
+            /* [idx-fill] fp mode: the caller slot is at a known displacement
+               from the frame register. IX is pointed at sp AFTER every
+               callee-save push and BEFORE the frame alloc (see the FRAMEPTR
+               setup above), so sp == IX - frame_size here and the param sits
+               at (IX + poff - frame_size) — the same place the BC-homed param
+               path reaches with `ld bc,(ix+6)`. One instruction, no address
+               formation, no HL clobber. */
+            if (emit_idx_word_from_frame(out, f, v->id,
+                                         poff - f->frame_size))
+                continue;      /* one instruction; clobbers neither HL nor A */
+            if (emit_idx_word_from_sp(out, f, v->id, poff))
+                continue;      /* kc160 sp-mode: same, straight off sp */
+            if (IS_EZ80() && !opt_disabled("idx-fill")) {
+                               /* address only; `ld <idx>,(hl)` does the rest */
+                emit(out, "ld\thl,%d", poff);
+                emit(out, "add\thl,sp");
+                emit_idx_word_from_hl_ptr(out, f, v->id);
+                invalidate_hl_cache();
+                continue;
+            }
             load_sp_off_to_hl(out, poff);
             emit_hl_to_idx_word(out, f, v->id);
             invalidate_hl_cache();

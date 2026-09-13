@@ -2292,6 +2292,88 @@ static void store_dehl_finalize(FILE *out, const Func *f, int vreg_id)
 /* Load 16-bit value from a raw sp-relative offset into HL.
    Used by the param-init prologue to read caller-pushed args from
    above the local frame. */
+/* Fill an index home (idx2/idx3) with the WORD AT (HL), for the param
+   prologue: HL already holds the caller-slot address.
+
+   ►► ez80 has `ld <idx>,(hl)` as ONE 2-byte instruction. Everywhere else the
+   pair has to come through HL and then the stack — `ld a,(hl+); ld h,(hl);
+   ld l,a; push hl; pop iy` — so the whole fill is 5 instructions against 1.
+
+   This is the missing SETUP cost the allocator never prices: it charges for
+   ACCESSES and nothing for filling a home, which is why an index home looked
+   free on ez80 fp where filling BC is the native `ld bc,(ix+d)`. Making the
+   fill cheap is better than pricing it.
+
+   ►► z80asm ACCEPTS `ld iy,(hl)` on EVERY cpu and silently expands it to 9
+   bytes where the hardware lacks it, so this MUST stay gated on IS_EZ80().
+   A missing gate would assemble clean and be a large size regression.
+   Returns 1 if it emitted the whole fill; 0 means the caller does it the
+   long way. */
+static void emit_idx_word_to_reg(FILE *out, const Func *f, int vreg_id,
+                                 const char *rr);
+static int emit_idx_word_from_hl_ptr(FILE *out, const Func *f, int vreg_id)
+{
+    if (!IS_EZ80() || opt_disabled("idx-fill")) return 0;
+    emit(out, "ld\t%s,(hl)", vreg_idx_name(f, vreg_id));
+    return 1;
+}
+
+/* Fill an index home DIRECTLY from a frame displacement: `ld iy,(ix+d)`.
+   ez80 and kc160 have it as one 3-byte instruction, which replaces the whole
+   `ld hl,off; add hl,sp; ld iy,(hl)` — and on ez80 forming an sp-relative
+   address is the DEAR part (its fp slot is 2 cycles against 8 for sp).
+
+   ►► Same footgun as above, and worse: z80asm assembles `ld iy,(ix+d)` on
+   EVERY cpu and expands it to 12-14 bytes on z80/z180/rabbit. Gate on the two
+   CPUs that really have it. Returns 1 if it emitted the fill. */
+/* The sp-relative mirror: `ld iy,(sp+n)`. kc160 ONLY — ez80 has the (ix+d)
+   and (hl) forms but NOT this one (z80asm rejects `ld iy,(sp+6)` for ez80),
+   which is why the two helpers are separate rather than one CPU test.
+   Displacement is the same signed byte. */
+static int emit_idx_word_from_sp(FILE *out, const Func *f, int vreg_id,
+                                 int sp_off)
+{
+    if (opt_disabled("idx-fill")) return 0;
+    if (sp_off < 0 || sp_off >= sp_rel_max(f)) return 0;   /* also excludes -1 */
+    if (IS_KC160()) {
+        emit(out, "ld\t%s,(sp+%d)", vreg_idx_name(f, vreg_id), sp_off);
+        return 1;
+    }
+    /* Rabbit: no `ld iy,(sp+n)`, but `ld hl,(sp+n)` is 2 bytes and
+       emit_hl_to_idx_word is the 1-op `ld iy,hl` — so the whole fill is 3
+       bytes against the generic sequence's 11. sp_rel_max is -1 on every
+       target without the form, which the bound above rejects. */
+    emit(out, "ld\thl,(sp+%d)", sp_off);
+    emit_hl_to_idx_word(out, f, vreg_id);
+    invalidate_hl_cache();
+    return 1;
+}
+
+static int emit_idx_word_from_frame(FILE *out, const Func *f, int vreg_id,
+                                    int disp)
+{
+    if (opt_disabled("idx-fill")) return 0;
+    if (!fp_active(f) || L.cur_frameless) return 0;
+    if (!fp_offset_fits(disp) || !fp_offset_fits(disp + 1)) return 0;
+    if (IS_EZ80() || IS_KC160()) {
+        emit(out, "ld\t%s,(%s%+d)", vreg_idx_name(f, vreg_id), frame_reg(), disp);
+        return 1;
+    }
+    /* Everywhere else, go through HL. `ld iy,(ix+d)` would ASSEMBLE here too —
+       z80asm synthesises it — but at 12 bytes against the 9 this costs, so the
+       pair is the destination and the index takes it from HL.
+       ►► The point is not only the 2 bytes this saves over the sp-relative
+       `ld hl,off; add hl,sp; ld a,(hl); inc hl; ld h,(hl); ld l,a`. It is that
+       `ld hl,(ix+d)` is the text the copt layer already knows: lib/80cc_rules.1
+       carries 24 rules keyed on `ld hl,(i[xy]+d)`, and the sp-relative sequence
+       matches none of them. Writing the frame access the way the rest of the
+       backend writes it puts this path inside the existing peepholes. */
+    emit(out, "ld\thl,(%s%+d)", frame_reg(), disp);
+    emit_hl_to_idx_word(out, f, vreg_id);
+    invalidate_hl_cache();
+    return 1;
+}
+
 static void load_sp_off_to_hl(FILE *out, int sp_off)
 {
     emit(out, "ld\thl,%d", sp_off);
