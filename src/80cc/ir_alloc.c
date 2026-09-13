@@ -943,7 +943,7 @@ static int mwbc_on(void)
 static int mwbc_pressure_on(void)
 {
     static int c = -1;
-    if (c < 0) { const char *e = getenv("IR_MWBC_PRESSURE"); c = !(e && e[0] == '0'); }
+    if (c < 0) c = !opt_disabled("mwbc-pressure");
     return c;
 }
 static int de_operand_realizable(const Func *f, int v,
@@ -1808,7 +1808,7 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
 static int bccallcost_on(void)
 {
     static int c = -1;
-    if (c < 0) { const char *e = getenv("IR_BCCALLCOST"); c = !(e && e[0] == '0'); }
+    if (c < 0) c = !opt_disabled("bc-call-cost");
     return c;
 }
 

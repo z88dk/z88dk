@@ -1827,8 +1827,7 @@ static int  deflow_on = -1;
 static int  deflow_enabled(void)
 {
     if (deflow_on < 0) {
-        const char *e = getenv("IR_DEFLOW");
-        deflow_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; =0 opts out */
+        deflow_on = !opt_disabled("de-flow");
     }
     return deflow_on;
 }
