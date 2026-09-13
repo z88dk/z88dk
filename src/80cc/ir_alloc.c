@@ -254,10 +254,34 @@ static int alloc_vetoed(int v)
     return 0;
 }
 
-static inline void add_cand(Cand *out, int *n, int v, long benefit,
+/* Worst-case candidates per vreg: collect_home_candidates has exactly this many
+   proposal paths, and each one runs its own `for v` loop that adds at most one
+   candidate per vreg. The bound is therefore provable rather than observed —
+   but it is only provable while that stays true, so add_cand checks it. A new
+   proposal path means raising this number. */
+#define CAND_PER_VREG 10
+
+static size_t cand_pool_len(const Func *f)
+{
+    return (size_t)(f->n_vregs > 0 ? f->n_vregs : 1) * CAND_PER_VREG;
+}
+
+static inline void add_cand(Cand *out, int *n, int cap, int v, long benefit,
                             int lo, int hi, unsigned allowed, unsigned flags)
 {
     if (alloc_vetoed(v)) return;          /* [home-rearb] proved unrealizable */
+    if (*n >= cap) {
+        /* CAND_PER_VREG is wrong: a proposal path was added without raising it.
+           Drop the candidate rather than write past the pool, and say so — a
+           silently shorter pool would look like an allocator quality change. */
+        static int told;
+        if (!told) {
+            told = 1;
+            fprintf(stderr, "ir_alloc: candidate pool full at %d "
+                            "(raise CAND_PER_VREG)\n", cap);
+        }
+        return;
+    }
     out[*n].vreg = v;
     out[*n].benefit = benefit;
     out[*n].lo = lo;
@@ -1569,7 +1593,7 @@ static int collect_home_candidates(const Func *f,
                                    const int *bb_in_loop,
                                    const int *bb_loop_depth, const int *bb_cond_shift,
                                    const int *first_use, const int *last_use,
-                                   Cand *pool)
+                                   Cand *pool, int pool_cap)
 {
     int n = 0;
     size_t nv = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
@@ -1590,7 +1614,7 @@ static int collect_home_candidates(const Func *f,
     for (int v = 0; v < f->n_vregs; v++)
         if (bc_home_realizable(f, v, use_count, write_count, def_kind,
                                has_prepushed_call, entry_live))
-            add_cand(pool, &n, v, use_count[v], first_use[v], last_use[v],
+            add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v], last_use[v],
                      RC_BC, 0);
     /* (2) EXX co-design FIRST (an alt-bank invariant frees IX for a writable
        loop var) — must precede idx2 so the stable arbiter grabs it first. */
@@ -1602,7 +1626,7 @@ static int collect_home_candidates(const Func *f,
             for (int v = 0; v < f->n_vregs; v++)
                 if (exx_home_realizable(f, v, use_count, wd_base, wd_ldef,
                                         wd_lread))
-                    add_cand(pool, &n, v, use_count[v], first_use[v],
+                    add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v],
                              last_use[v], RC_EXX, 0);
     }
     /* (3) idx2 — spare index register (counter or read-only param). */
@@ -1611,14 +1635,14 @@ static int collect_home_candidates(const Func *f,
             unsigned fl = idx2_home_realizable(f, v, use_count, write_count,
                                                is_base, cstep, cinit, cother);
             if (fl)
-                add_cand(pool, &n, v, use_count[v], first_use[v], last_use[v],
+                add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v], last_use[v],
                          RC_IDX2, fl);
         }
     /* (4) byte home (C slotless if single-BB, else E slot-backed). */
     if (c_byte_resident && !opt_disabled("byte-resident"))
         for (int v = 0; v < f->n_vregs; v++)
             if (byte_home_realizable(f, v, use_count, write_count))
-                add_cand(pool, &n, v, use_count[v], first_use[v], last_use[v],
+                add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v], last_use[v],
                          RC_BYTE,
                          (vreg_single_bb(f, v) >= 0) ? CF_BYTE_SINGLE_BB : 0);
     /* (5) DE-class — three sub-shapes in pool order: acc, general, ptr. */
@@ -1627,18 +1651,18 @@ static int collect_home_candidates(const Func *f,
             for (int v = 0; v < f->n_vregs; v++)
                 if (de_acc_realizable(f, v, use_count, write_count,
                                       wd_base, wd_acc))
-                    add_cand(pool, &n, v, use_count[v], first_use[v],
+                    add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v],
                              last_use[v], RC_DE_ACC, 0);
         if (!opt_disabled("de-home"))
             for (int v = 0; v < f->n_vregs; v++)
                 if (de_general_realizable(f, v, use_count, write_count,
                                           wd_base, wd_acc, wd_ldef))
-                    add_cand(pool, &n, v, use_count[v], first_use[v],
+                    add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v],
                              last_use[v], RC_DE_ACC, CF_DE_GENERAL);
         if (!opt_disabled("de-home") && !opt_disabled("loop-ra"))
             for (int v = 0; v < f->n_vregs; v++)
                 if (de_ptr_realizable(f, v, use_count, wd_base, wd_ldef))
-                    add_cand(pool, &n, v, use_count[v], first_use[v],
+                    add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v],
                              last_use[v], RC_DE_ACC, CF_DE_GENERAL | CF_DE_PTR);
         /* OPRES (opt-in IR_OPRES): reused deref/binop operand → general DE-home.
            The IR_RANGED fail-safe brick does NOT enter this competition — it keeps
@@ -1648,7 +1672,7 @@ static int collect_home_candidates(const Func *f,
             for (int v = 0; v < f->n_vregs; v++)
                 if (de_operand_realizable(f, v, use_count, write_count,
                                           def_kind, wd_base))
-                    add_cand(pool, &n, v, use_count[v], first_use[v],
+                    add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v],
                              last_use[v], RC_DE_ACC, CF_DE_GENERAL);
     }
     /* (6) idx3 — second spare index register (opt-in). */
@@ -1656,7 +1680,7 @@ static int collect_home_candidates(const Func *f,
         for (int v = 0; v < f->n_vregs; v++)
             if (idx3_home_realizable(f, v, use_count, write_count,
                                      wd_base, wd_acc, wd_ldef, wd_addr))
-                add_cand(pool, &n, v, use_count[v], first_use[v], last_use[v],
+                add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v], last_use[v],
                          RC_IDX3, 0);
     /* (7) IV-residency — hot write-many BC-stamped int IV (CF_SPECULATIVE). */
     if (!opt_disabled("iv-resident"))
@@ -1682,7 +1706,7 @@ static int collect_home_candidates(const Func *f,
                                                  bb_cond_shift, NULL),
                             hot ? "ADMIT" : "REJECT cold");
                 if (!hot) continue;
-                add_cand(pool, &n, v, use_count[v], first_use[v], last_use[v],
+                add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v], last_use[v],
                          RC_BC, CF_SPECULATIVE);
             }
 done:
@@ -6174,19 +6198,21 @@ void ir_alloc(Func *f)
             /* Ask the SHIPPED predicate, so probe and gate cannot drift; the
                struct/uncovered counts above are only the breakdown. */
             int narrow = prepush_bc_hazard(f);
-            Cand *a = calloc((size_t)f->n_vregs * 10, sizeof(Cand));
-            Cand *b = calloc((size_t)f->n_vregs * 10, sizeof(Cand));
+            Cand *a = calloc(cand_pool_len(f), sizeof(Cand));
+            Cand *b = calloc(cand_pool_len(f), sizeof(Cand));
             if (a && b) {
                 int na = collect_home_candidates(f, use_count, write_count,
                                                  def_kind, all_defs_ok,
                                                  has_prepushed_call, entry_live,
                                                  bb_in_loop, bb_loop_depth, bb_cond_shift,
-                                                 first_use, last_use, a);
+                                                 first_use, last_use, a,
+                                                 (int)cand_pool_len(f));
                 int nb = collect_home_candidates(f, use_count, write_count,
                                                  def_kind, all_defs_ok,
                                                  narrow, entry_live,
                                                  bb_in_loop, bb_loop_depth, bb_cond_shift,
-                                                 first_use, last_use, b);
+                                                 first_use, last_use, b,
+                                                 (int)cand_pool_len(f));
                 fprintf(stderr, "PREPUSH %-22s calls=%-2d struct=%-2d uncovered=%-2d "
                         "narrow=%d now=%-3d then=%-3d gain=%d\n",
                         f->fn ? ir_sym_name(f->fn) : "?", npre, nstruct, uncovered,
@@ -6234,14 +6260,14 @@ void ir_alloc(Func *f)
                byte, idx3, IV-BC and the four DE sub-shapes = 10. (The live
                allocator sizes its pool at 6 because the classes are mutually
                exclusive in practice; a probe should not rely on that.) */
-            Cand *pp = calloc((size_t)f->n_vregs * 10, sizeof(Cand));
+            Cand *pp = calloc(cand_pool_len(f), sizeof(Cand));
             if (pp) {
                 int pn = collect_home_candidates(f, use_count, write_count,
                                                  def_kind, all_defs_ok,
                                                  has_prepushed_call, entry_live,
                                                  bb_in_loop, bb_loop_depth, bb_cond_shift,
                                                  first_use, last_use,
-                                                 pp);
+                                                 pp, (int)cand_pool_len(f));
                 int detail = getenv("IR_BCVETO_PROBE")[0] == '2';
                 int prop[NCL], clean[NCL], tp = 0, tc = 0;
                 for (int c = 0; c < NCL; c++) prop[c] = clean[c] = 0;
@@ -6280,8 +6306,7 @@ void ir_alloc(Func *f)
         {
             /* General picker: BC region only — see the note on the gate. */
             Cand *pool = bc_region_ok
-                ? calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1) * 6,
-                         sizeof(Cand))
+                ? calloc(cand_pool_len(f), sizeof(Cand))
                 : NULL;
             if (pool) {
                 /* B4 increment 3: one generator emits ALL candidates (in the
@@ -6292,7 +6317,7 @@ void ir_alloc(Func *f)
                                                  has_prepushed_call, entry_live,
                                                  bb_in_loop, bb_loop_depth, bb_cond_shift,
                                                  first_use, last_use,
-                                                 pool);
+                                                 pool, (int)cand_pool_len(f));
                 /* B4 (inert, IR_HR_CHECK): home_realizable == pool membership? */
                 /* [IR_SHAREPROBE] Is the gap in SELECTION or in PROPOSAL? The
                    arbiter can only place what the 11 realizability predicates
