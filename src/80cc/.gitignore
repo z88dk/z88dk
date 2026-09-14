@@ -1,0 +1,9 @@
+# Build output
+*.o
+*.d
+z88dk-80cc
+ir_selftest
+
+# Python byte-cache from the analysis scripts kept here while working
+__pycache__/
+*.pyc
