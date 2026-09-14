@@ -984,19 +984,6 @@ static int de_ptr_realizable(const Func *f, int v, const int *use_count,
     if (use_count[v] < 1) return 0;
     return 1;
 }
-/* OPRES operand-residency (opt-in IR_OPRES) — a reused deref/binop RESULT value.
-   sdcc keeps these in DE so a later compare folds to `sbc hl,de` and the value
-   survives the HL-clobber without a push-spill; 80cc funnels them through HL →
-   `push hl` + byte-wise compare (OPERAND_RESIDENCY_SPEC.md §1). Eligible for a
-   GENERAL DE-home (CF_DE_GENERAL: speculative
-   — the lowerer reverts it to a spill if no DE-clean region forms, so a
-   mis-proposal is byte-safe). Single-def (write_count<=1, distinguishes it from
-   the loop-carried de_general/de_acc shapes), reused (use_count>=2), width-2,
-   not addr-taken/volatile/param, not a deref base (bases want pointer-like
-   homes), def is a deref (IR_LD_MEM) or an ALU binop. DE-freeness across the
-   range is the ARBITER's interference call (it competes for the one general
-   DE-home against the loop-carried words), NOT a proposer gate. */
-static int opres_on(void) { static int c = -1; if (c < 0) c = getenv("IR_OPRES") != NULL; return c; }
 /* IR_RANGED gate: the fail-safe DE-cache fold brick (DENSITY_HANDOVER §4). A
    reused deref/binop that stays IR_PR_SPILL leaves a DE cache at its def so a
    later in-range read prefers DE instead of re-materialising in HL + spilling.
@@ -1093,7 +1080,9 @@ static int de_operand_realizable(const Func *f, int v,
                                  const int *use_count, const int *write_count,
                                  const int *def_kind, const int *wd_base)
 {
-    if (!opres_on() && !ranged_on()) return 0;
+    /* Only the IR_RANGED fail-safe brick uses this now: the operand-residency
+       DE-home it was written for is refused — see ADR 0018. */
+    if (!ranged_on()) return 0;
     const VReg *vr = &f->vregs[v];
     if (vr->width != 2) return 0;
     if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
@@ -1701,16 +1690,6 @@ static int collect_home_candidates(const Func *f,
                 if (de_ptr_realizable(f, v, use_count, wd_base, wd_ldef))
                     add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v],
                              last_use[v], RC_DE_ACC, CF_DE_GENERAL | CF_DE_PTR);
-        /* OPRES (opt-in IR_OPRES): reused deref/binop operand → general DE-home.
-           The IR_RANGED fail-safe brick does NOT enter this competition — it keeps
-           the value SPILL and only leaves a DE cache at its def (hint set in a
-           post-placement pass in ir_alloc). */
-        if (opres_on() && !opt_disabled("de-home"))
-            for (int v = 0; v < f->n_vregs; v++)
-                if (de_operand_realizable(f, v, use_count, write_count,
-                                          def_kind, wd_base))
-                    add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v],
-                             last_use[v], RC_DE_ACC, CF_DE_GENERAL);
     }
     /* (6) idx3 — second spare index register (opt-in). */
     if (idx3_home_available(f))

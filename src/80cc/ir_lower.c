@@ -4198,16 +4198,6 @@ static int dsx_enabled(void)
     return dsx_on;
 }
 
-/* [#13] IR_FLIPCOST report gate (inert): print the frameless-via-sp cost model
-   per framed function — ds_ixaccess (ix+-d accesses = N), the ~11B IX-apparatus
-   save, and the flip verdict. ds_ixaccess==0 = IX dead overhead (zero-cost flip). */
-static int ff_on = -1;
-static int ff_enabled(void)
-{
-    if (ff_on < 0) { const char *e = getenv("IR_FLIPCOST"); ff_on = (e && e[0]) ? 1 : 0; }
-    return ff_on;
-}
-
 static void rec_reset(void)
 {
     free(rec_reg); free(rec_slot); free(rec_remat); free(rec_slotuse);
@@ -4227,8 +4217,7 @@ static void rec_begin(const Func *f)
 {
     rec_reset();
     ds_ixaccess = 0;                  /* [#13] per-render (ix+-d)-access count */
-    if ((!rec_enabled() && !deadframe_on() && !dsx_enabled() && !home_slot_verify_enabled()
-         && !ff_enabled())
+    if ((!rec_enabled() && !deadframe_on() && !dsx_enabled() && !home_slot_verify_enabled())
         || L.ss_phase == 1 || f->n_vregs <= 0)
         return;
     rec_nv = f->n_vregs;
@@ -4535,15 +4524,6 @@ static void rec_end(const Func *f)
        sp-relative (sp-parking / add hl,sp), so a genuine-sp flip is ~zero-cost.
        With ds_ixaccess>0 the flip costs ~+2B per access (sp vs ix), so flip iff
        2*N < save. Reports only; no codegen change. */
-    if (ff_enabled() && frame_has_saved_fp(f)) {
-        int N = ds_ixaccess;
-        int save = 11;                       /* push ix;ld ix,0;add ix,sp;ld sp,ix;pop ix */
-        int cost = 2 * N;
-        fprintf(stderr, "IR_FLIPCOST: %-24s ixacc=%-3d frame=%-3d save=%d cost=%d %s\n",
-                f->fn ? ir_sym_name(f->fn) : "?", N, f->frame_size, save, cost,
-                N == 0 ? "ZERO-COST-FLIP"
-                       : (cost < save ? "FLIP" : "keep"));
-    }
     rec_reset();
 }
 
@@ -6858,19 +6838,6 @@ int ir_lower_func_flip(FILE *out, Func *f)
         return ir_lower_func(out, f);
     const char *nm = f->fn ? ir_sym_name(f->fn) : "";
     int excluded = (strcmp(nm, "main") == 0);
-    /* IR_SPINC (comma list): if set, flip ONLY names containing a listed token. */
-    const char *inc = getenv("IR_SPINC");
-    if (!excluded && inc && inc[0]) {
-        int hit = 0; char buf[512]; strncpy(buf, inc, sizeof buf - 1); buf[sizeof buf-1]=0;
-        for (char *t = strtok(buf, ","); t; t = strtok(NULL, ","))
-            if (strstr(nm, t)) { hit = 1; break; }
-        if (!hit) excluded = 1;
-    }
-    /* IR_SPEXCL (comma list): exclude names containing any listed token. */
-    if (!excluded) { const char *ex = getenv("IR_SPEXCL");
-        if (ex && ex[0]) { char buf[512]; strncpy(buf, ex, sizeof buf-1); buf[sizeof buf-1]=0;
-            for (char *t = strtok(buf, ","); t; t = strtok(NULL, ","))
-                if (strstr(nm, t)) { excluded = 1; break; } } }
     if (excluded) return ir_lower_func(out, f);
     Func *spc = ir_clone_func(f);
     FILE *fpbuf = tmpfile();
@@ -7367,7 +7334,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 if (acarry == -2) acarry = v;
                 else if (acarry != v) { acarry = -1; break; }
             }
-            if (acarry >= 0 && !getenv("IR_NO_A_CARRY") && bb->live_in
+            if (acarry >= 0 && bb->live_in
                 && ir_bitset_get((const BitSet *)bb->live_in, acarry))
                 cache_a(acarry);
             else
