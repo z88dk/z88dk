@@ -1850,72 +1850,6 @@ static int dd_live_on_any_succ(const Func *f, const BB *bb, int d)
     return 0;
 }
 
-/* [IR_DEADDEF_PROBE] Inert per-function sizing probe. Needs liveness.
-     succ_miss  branch targets missing from succ[] (corpus-wide: 0)
-     midbr_def  defs after a mid-block branch — why the redef rule stays guarded
-     cur        dead defs the redef-in-BB rule alone finds
-     ext        EXTRA ones the "dead on every successor" rule finds */
-static void ir_deaddef_probe(Func *f)
-{
-    int succ_miss = 0, midbr_def = 0, cur = 0, ext = 0;
-    int uses[16], defs[8];
-
-    for (int b = 0; b < f->n_bbs; b++) {
-        BB *bb = &f->bbs[b];
-        int seen_branch = 0;
-        for (int j = 0; j < bb->n_ops; j++) {
-            Op *op = &bb->ops[j];
-            /* succ[] completeness */
-            if (op->kind == IR_BR || op->kind == IR_BR_COND
-                || op->kind == IR_BR_ZERO || op->kind == IR_DEREF_CMP_BR
-                || op->kind == IR_COPY_STEP_BRZ) {
-                int t = op->label, found = 0;
-                for (int s = 0; s < ir_bb_n_succ(bb); s++)
-                    if (ir_bb_succ_at(bb, s) == t) found = 1;
-                if (!found) succ_miss++;
-            } else if (op->kind == IR_SWITCH && op->sw) {
-                for (int c = 0; c <= op->sw->n_cases; c++) {
-                    int t = (c < op->sw->n_cases) ? op->sw->target_bb[c]
-                                                  : op->sw->default_bb;
-                    int found = 0;
-                    for (int s = 0; s < ir_bb_n_succ(bb); s++)
-                        if (ir_bb_succ_at(bb, s) == t) found = 1;
-                    if (!found) succ_miss++;
-                }
-            }
-            if (seen_branch && ir_op_defs(op, defs, 8) > 0) midbr_def++;
-            if (dd_is_branch(op->kind)) seen_branch = 1;
-
-            int d = op->dst;
-            if (d < 0 || d >= f->n_vregs || !dce_pure_kind(op)) continue;
-            if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
-                continue;
-
-            /* Walk to the end of the BB. A read anywhere disqualifies. A
-               redef BEFORE the first branch kills for every path; a redef
-               after it kills only the fall-through, so the verdict then rests
-               on successor liveness. */
-            int read = 0, redef_pre = 0, passed = 0;
-            for (int k = j + 1; k < bb->n_ops; k++) {
-                int nu = ir_op_uses(&bb->ops[k], uses, 16);
-                for (int u = 0; u < nu && u < 16; u++)
-                    if (uses[u] == d) { read = 1; break; }
-                if (read) break;
-                int nd = ir_op_defs(&bb->ops[k], defs, 8);
-                for (int x = 0; x < nd; x++)
-                    if (defs[x] == d && !passed) { redef_pre = 1; break; }
-                if (redef_pre) break;
-                if (dd_is_branch(bb->ops[k].kind)) passed = 1;
-            }
-            if (read) continue;
-            if (redef_pre) { cur++; continue; }
-            if (!dd_live_on_any_succ(f, bb, d))
-                ext++;
-        }
-    }
-    fprintf(stderr, "DEADDEF_PROBE %-24s succ_miss=%d midbr_def=%d cur=%d ext=%d\n",
-            f->fn ? ir_sym_name(f->fn) : "?", succ_miss, midbr_def, cur, ext);
-}
 
 /* ---- Dead DEFS --------------------------------------------------
    ir_opt_dce below is a per-VREG use count: it drops a def only when the vreg
@@ -1940,10 +1874,6 @@ static void ir_deaddef_probe(Func *f)
    defining a dead dst still has to run. `--opt-disable=dead-def` opts out. */
 static int ir_opt_dead_defs(Func *f)
 {
-    if (getenv("IR_DEADDEF_PROBE")) {
-        ir_compute_liveness(f);
-        ir_deaddef_probe(f);
-    }
     if (opt_disabled("dead-def")) return 0;
     /* The reach-the-end case is decided by liveness on every successor edge. */
     int have_live = !opt_disabled("dead-def-live");
@@ -2125,16 +2055,12 @@ int ir_opt_dce(Func *f)
 int ir_opt_sym_addr_fold(Func *f)
 {
     if (!f) return 0;
-    /* DEFAULT-ON; `IR_SYMADDR=0` opts out. A folded ADD becomes a symbol
+    /* DEFAULT-ON; `IR_OFF=sym-addr-fold` opts out. A folded ADD becomes a symbol
        address, which the allocator treats as rematerialisable and drops the slot
        for — that exposed two lowerer byte-walk compares (cmp_bytewise_shape_ok,
        sp_cmp_slot) which read a NO_SLOT vreg's slot and emitted `ld hl,-1;
        add hl,sp`. Both now carry the guard their two siblings already had; the
        fold is only safe with those in place. */
-    {
-        const char *e = getenv("IR_SYMADDR");
-        if (e && e[0] == '0') return 0;
-    }
     if (opt_disabled("sym-addr-fold")) return 0;
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
@@ -2952,10 +2878,10 @@ static int v_is_const_shr(const Func *f, int v)
 }
 
 static int shrwide_on(void)
-{ const char *e = getenv("IR_SHRWIDE"); return !(e && e[0] == '0'); }   /* default ON */
+{ return !opt_disabled("shr-wide"); }                                   /* default ON */
 
 static int shrmask_on(void)
-{ const char *e = getenv("IR_SHRMASK"); return !(e && e[0] == '0'); }
+{ return !opt_disabled("shr-mask"); }
 
 /* A constant-count right shift narrows only when the SOURCE provably fits a
    byte. Unlike a left shift — where the low byte of `src << n` depends only on
@@ -3075,14 +3001,6 @@ static int v_is_sx_of_byte(const Func *f, int v)
    truth-test counts too WHEN v provably fits a byte (a byte-mask AND, e.g.
    `crc & 0x80`): then testing the low byte is testing the whole value, so
    the producer can stay 8-bit (no `ld h,0` widen for the branch). */
-/* [IR_NARROWPROBE] Census of values that COULD have been byte-width but were
-   not. Two gates reject a candidate: some def has no 8-bit lowering
-   (narrow_kind), or some use needs more than the low byte
-   (demands_low_byte_only). Knowing WHICH gate, and which op kind, is what
-   picks the next piece of narrowing work — the pass already earns 617B on
-   emu.c and the width census says roughly 4400B is still on the table. */
-static int nb_probe_on(void)
-{ static int c = -1; if (c < 0) c = getenv("IR_NARROWPROBE") ? 1 : 0; return c; }
 static int nb_block_use = -1;   /* op kind of the use that refused, or -1 */
 
 static int demands_low_byte_only(const Func *f, int v)
@@ -3187,23 +3105,6 @@ static int demands_low_byte_only(const Func *f, int v)
     return seen;   /* a dead vreg (no uses) stays width-2 */
 }
 
-/* ---- [IR_CMPSIGN_PROBE] sizing the signed-compare sign correction -------
-   A signed 16-bit compare lowers to `and a; sbc hl,de` followed by SEVEN BYTES
-   of pure sign correction — `ld a,h; jp po,L; xor 0x80; L: rla` — because the
-   carry out of `sbc` is the UNSIGNED answer and the signed one is S^V. The
-   unsigned compare branches straight off that carry.
-
-   Measured over the bench corpus and the four real files: 74 sites, 518 B, and
-   present in EVERY real file (adv_a 91 B, clisp 63 B, enigma 63 B) — so this is
-   a real-world shape, not a corpus artifact. It sits in loop exit tests, so it
-   is ticks as well as bytes.
-
-   A signed compare needs the correction only if an operand can actually BE
-   negative. This probe classifies each signed compare by which non-negativity
-   proof would settle it, so the achievable subset is known before any codegen
-   changes. Prints one line per compare; aggregate by the verdict field. */
-static int cs_probe_on(void)
-{ static int c = -1; if (c < 0) c = getenv("IR_CMPSIGN_PROBE") ? 1 : 0; return c; }
 
 static int cs_is_signed_cmp(OpKind k)
 {
@@ -3262,14 +3163,6 @@ static long v_iv_step(const Func *f, int v)
     return 0;
 }
 
-/* Is v provably >= 0 when read as a signed int? */
-static int v_nonneg(const Func *f, int v, const char **why)
-{
-    if (v < 0 || v >= f->n_vregs) return 0;
-    if (v_fits_byte(f, v))  { if (why) *why = "fitsbyte"; return 1; }
-    if (v_nonneg_iv(f, v))  { if (why) *why = "nonneg-iv"; return 1; }
-    return 0;
-}
 
 /* Does the compare in BB `cb` actually STOP v's growth? Required for the IV
    proof: `every def is init>=0 or += positive` allows v to rise past 32767 and
@@ -3396,12 +3289,11 @@ static OpKind cs_unsigned_of(OpKind k)
        be the test that leaves the loop the step lives in. It REJECTED 6 of the
        56 otherwise-passing sites, 2 of them in adv_a.
 
-   `IR_CMPUNSIGN=0` / `--opt-disable=cmp-unsign` opts out. */
+   `IR_OFF=cmp-unsign` / `--opt-disable=cmp-unsign` opts out. */
 int ir_opt_cmp_unsign(Func *f)
 {
     if (!f) return 0;
     if (opt_disabled("cmp-unsign")) return 0;
-    { const char *e = getenv("IR_CMPUNSIGN"); if (e && e[0] == '0') return 0; }
     int changed = 0;
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
@@ -3432,49 +3324,6 @@ int ir_opt_cmp_unsign(Func *f)
     return changed;
 }
 
-void ir_opt_cmpsign_probe(Func *f)
-{
-    if (!f || !cs_probe_on()) return;
-    for (int b = 0; b < f->n_bbs; b++) {
-        const BB *bb = &f->bbs[b];
-        for (int j = 0; j < bb->n_ops; j++) {
-            const Op *op = &bb->ops[j];
-            if (!cs_is_signed_cmp(op->kind)) continue;
-            int a = op->src[0], c = op->src[1];
-            /* width: only the 16-bit form carries the 7-byte tail */
-            int w = (a >= 0 && a < f->n_vregs) ? f->vregs[a].width : 2;
-            const char *wa = "?", *wb = "?";
-            int oka = 0, okb = 0;
-            if (a >= 0) oka = v_nonneg(f, a, &wa);
-            else        { oka = (op->imm >= 0); wa = "imm"; }
-            if (c >= 0) okb = v_nonneg(f, c, &wb);
-            else        { okb = (op->imm >= 0); wb = "imm"; }
-            /* THE WRAP QUESTION. `every def is init>=0 or += positive` does
-               NOT by itself prove v >= 0 at the compare: a value that only
-               RISES can pass 32767 and become negative, and then a signed
-               `v < K` is TRUE where the unsigned rewrite says false. That is a
-               miscompile, so the proof needs one of:
-                 - v_fits_byte, which bounds v to [0,255] outright (no wrap), or
-                 - the compare being the test that STOPS the growth, with a
-                   bound small enough that v cannot reach 0x8000 first.
-               Report the step and the bound so the sound subset is countable
-               rather than assumed. */
-            long step = (a >= 0) ? v_iv_step(f, a) : 0;
-            long bound = (c == -1) ? op->imm : -1;
-            int no_wrap = 0;
-            if (oka && !strcmp(wa, "fitsbyte")) no_wrap = 1;          /* [0,255] */
-            else if (oka && step > 0 && bound >= 0
-                     && bound + step - 1 <= 32767
-                     && cs_compare_bounds_loop(f, b, a)) no_wrap = 1;
-            fprintf(stderr, "CMPSIGN %s kind=%d w=%d lhs=%s rhs=%s step=%ld "
-                            "bound=%ld %s\n",
-                    f->fn ? ir_sym_name(f->fn) : "?", (int)op->kind, w,
-                    oka ? wa : "UNKNOWN", okb ? wb : "UNKNOWN", step, bound,
-                    (oka && okb && no_wrap) ? "DROPPABLE"
-                                            : ((oka && okb) ? "WRAPRISK" : "keep"));
-        }
-    }
-}
 
 int ir_opt_narrow_byte(Func *f)
 {
@@ -3539,24 +3388,6 @@ int ir_opt_narrow_byte(Func *f)
         }
     }
 
-    /* [IR_NARROWPROBE] Anything still width-2 with a def is a rejected
-       candidate — report which gate refused it and the op kind responsible.
-       Emitted per function; a consumer should aggregate by (gate, kind). */
-    if (nb_probe_on()) {
-        for (int d = 0; d < f->n_vregs; d++) {
-            if (!hasdef[d] || f->vregs[d].width != 2) continue;
-            if (bad[d]) {
-                fprintf(stderr, "NARROWPROBE %s v%d gate=def kind=%d\n",
-                        f->fn ? ir_sym_name(f->fn) : "?", d, badkind[d]);
-            } else {
-                nb_block_use = -1;
-                (void)demands_low_byte_only(f, d);
-                fprintf(stderr, "NARROWPROBE %s v%d gate=use kind=%d fits=%d\n",
-                        f->fn ? ir_sym_name(f->fn) : "?", d, nb_block_use,
-                        v_fits_byte(f, d));
-            }
-        }
-    }
     free(bad);
     free(hasdef);
     free(badkind);
@@ -4463,33 +4294,6 @@ int ir_opt_insert_long_pushes(Func *f)
             if (dst < 0 || dst >= f->n_vregs) continue;
             if (f->vregs[dst].width != 4) continue;
             if (f->vregs[dst].flags & IR_VREG_ADDR_TAKEN) continue;
-            /* [IR_LONGPUSH_PROBE] INERT census of what the MVP gates turn away.
-               This pass is the mechanism behind md5's 0.64x win over sdcc — a
-               chained long op parks its operand on the DATA STACK (`push de;
-               push hl`, ~22 T) instead of a frame slot (~100 T) and the consumer
-               pops the halves back through BC. The eligibility list above is
-               labelled "MVP — conservative"; this counts each rejection so the
-               next widening is chosen by number, not guess. */
-            if (getenv("IR_LONGPUSH_PROBE")) {
-                const char *why = NULL;
-                int k2 = bb_use_idx[dst];
-                if (use_count[dst] != 1)                       why = "usecount>1";
-                else if (k2 < 0)                               why = "use-other-bb";
-                else if (k2 <= j + 1)                          why = "adjacent";
-                else if (!long_producer_kind_d(def_op->kind))  why = "producer-kind";
-                else {
-                    const Op *uo = &bb->ops[k2];
-                    if (!long_consumer_kind_d(uo->kind))       why = "consumer-kind";
-                    else {
-                        for (int x = j + 1; x < k2; x++)
-                            if (op_is_branch_or_call_d(bb->ops[x].kind))
-                                { why = "call-or-branch-between"; break; }
-                    }
-                }
-                fprintf(stderr, "LONGPUSH %s v%d %s\n",
-                        f->fn ? ir_sym_name(f->fn) : "?", dst,
-                        why ? why : "ELIGIBLE");
-            }
             if (use_count[dst] != 1) continue;
             int k = bb_use_idx[dst];
             if (k < 0 || k <= j + 1) continue;

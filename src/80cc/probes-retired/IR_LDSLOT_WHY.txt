@@ -1,0 +1,79 @@
+Retired probe: IR_LDSLOT_WHY
+Removed from the 80cc back end on branch 80cc-simplify, 2026-09-13.
+Its question is answered; the answer lives in the handover/ADR that
+cites it. Kept here so the census can be re-run without re-deriving it.
+
+--- ir_alloc.c lines 5041..5112 ---
+/* [inert, IR_LDSLOT_WHY=<substr>] TASK #6 FIX #1 probe — "deliver read_l(p)
+   straight to its slot, skip DEHL" (HL_ARITH_PLAN.md). The gap is
+   pointer-indirect long loads (`read_l(p)`, p=type8*) that 80cc materialises
+   into DEHL then spills to a slot (push/park juggle), whereas sdcc writes the 4
+   bytes straight to a fixed slot and does memory-operand arith. This probe
+   locates the candidate load sites BEFORE codegen: per width-4 IR_LD_MEM whose
+   base is a vreg-held pointer (IR_MEM_VREG, no post-step), classify (a) is the
+   dst SLOT-homed (would spill — the win case) vs register-resident (PR_DEHL —
+   must NOT touch), (b) the FIRST in-BB consumer's shape: width-4 ALU
+   (add/sub/and/or/xor — already memory-operand, so slot delivery is a pure
+   win), ST_MEM (write_l — the store paired), or other/none. A slot-homed load
+   feeding ALU or ST_MEM is a "deliverable" site. Reports per-function and a
+   corpus roll-up so the ceiling + consumer mix is known before building the
+   gated codegen. Also counts IR_MEM_SYM w4 loads (global longs) separately.
+   IR_LDSLOT_WHY=2 prints per-site. Zero codegen effect. */
+static void ir_ldslot_why_probe(const Func *f)
+{
+    const char *e = getenv("IR_LDSLOT_WHY");
+    if (!e) return;
+    int verbose = e[0] == '2';
+    int n_ptr = 0, n_ptr_slot = 0, n_ptr_reg = 0;
+    int deliver = 0, c_alu = 0, c_stmem = 0, c_other = 0, c_none = 0;
+    int n_sym = 0, n_sym_slot = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (o->kind != IR_LD_MEM || o->dst < 0) continue;
+            if (f->vregs[o->dst].width != 4) continue;
+            if (o->mem.kind == IR_MEM_SYM) {
+                n_sym++;
+                if (f->vreg_to_phys[o->dst] == IR_PR_SPILL) n_sym_slot++;
+                continue;
+            }
+            if (o->mem.kind != IR_MEM_VREG) continue;
+            if (o->mem.post_step != 0 || o->mem.base < 0) continue;
+            n_ptr++;
+            PhysReg ph = f->vreg_to_phys[o->dst];
+            int slot = (ph == IR_PR_SPILL);
+            int reg  = (ph == IR_PR_DEHL);
+            if (slot) n_ptr_slot++;
+            if (reg)  n_ptr_reg++;
+            /* first in-BB consumer of dst */
+            OpKind ck = (OpKind)-1;
+            for (int k = j + 1; k < bb->n_ops; k++) {
+                const Op *ko = &bb->ops[k];
+                int u[16]; int nu = ir_op_uses(ko, u, 16);
+                int hit = 0;
+                for (int q = 0; q < nu; q++) if (u[q] == o->dst) { hit = 1; break; }
+                if (hit) { ck = ko->kind; break; }
+            }
+            int is_alu = (ck == IR_ADD || ck == IR_SUB || ck == IR_AND
+                          || ck == IR_OR || ck == IR_XOR);
+            int is_st = (ck == IR_ST_MEM);
+            if ((int)ck < 0) c_none++;
+            else if (is_alu) c_alu++;
+            else if (is_st) c_stmem++;
+            else c_other++;
+            if (slot && (is_alu || is_st)) deliver++;
+            if (verbose)
+                fprintf(stderr, "  LDSLOT v%d %s cons=%s %s\n", o->dst,
+                        slot ? "SLOT" : reg ? "REG" : "oth",
+                        (int)ck < 0 ? "none" : ir_op_name(ck),
+                        (slot && (is_alu || is_st)) ? "DELIVER" : "");
+        }
+    }
+    if (n_ptr || n_sym)
+        fprintf(stderr, "LDSLOT_WHY %-22s ptr=%d slot=%d reg=%d deliver=%d "
+                "[alu=%d st=%d oth=%d none=%d] sym=%d(slot=%d)\n",
+                f->fn ? ir_sym_name(f->fn) : "?", n_ptr, n_ptr_slot, n_ptr_reg,
+                deliver, c_alu, c_stmem, c_other, c_none, n_sym, n_sym_slot);
+}
+

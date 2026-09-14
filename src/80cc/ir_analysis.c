@@ -122,15 +122,22 @@ static void bitset_clear_all(BitSet *bs)
 
 /* ----- Op def/use ----------------------------------------------------- */
 
+/* Append v to out[] if it is new, and return the running total — which counts
+   values the buffer was too small to hold. The duplicate scan reads only the
+   prefix actually stored: with a short buffer it must not read past the
+   caller's storage (and with out == NULL / max == 0 it must not read at all,
+   which is how the *_count entry points work). A truncated total is therefore
+   an UPPER BOUND on the unique count, which is what a caller sizing a buffer
+   needs; re-running with a large enough buffer yields the exact count. */
 static int add_unique(int *out, int n, int max, int v)
 {
     if (v < 0) return n;
-    for (int i = 0; i < n; i++) if (out[i] == v) return n;
+    for (int i = 0; i < n && i < max; i++) if (out[i] == v) return n;
     if (n < max) out[n] = v;
     return n + 1;
 }
 
-int ir_op_defs(const Op *op, int *out, int max)
+static int op_defs_impl(const Op *op, int *out, int max)
 {
     if (!op) return 0;
     int n = 0;
@@ -205,7 +212,7 @@ int ir_op_defs(const Op *op, int *out, int max)
     }
 }
 
-int ir_op_uses(const Op *op, int *out, int max)
+static int op_uses_impl(const Op *op, int *out, int max)
 {
     if (!op) return 0;
     int n = 0;
@@ -302,6 +309,42 @@ int ir_op_uses(const Op *op, int *out, int max)
     }
 }
 
+/* The public def/use enumerators return the number of vregs WRITTEN to out[],
+   never more. A caller can therefore always iterate the returned count over its
+   own buffer, whatever size that buffer is. This is deliberate: the buffer/count
+   convention used to return the true total even when it exceeded `max`, so a
+   caller with a fixed `int uses[16]` (or `[8]`, in ir_opt.c) read uninitialised
+   stack and then used the result as a vreg index. A call with more distinct
+   argument vregs than the buffer holds is enough to trigger it.
+
+   A caller that needs the true size asks for it first with ir_op_uses_count /
+   ir_op_defs_count, sizes its buffer, then enumerates. ir_analysis.c is the only
+   such caller: liveness must see every use, so it allocates on the rare wide
+   call. Everywhere else a bounded view is the right answer. */
+int ir_op_defs(const Op *op, int *out, int max)
+{
+    int n = op_defs_impl(op, out, max);
+    return n < max ? n : max;
+}
+
+int ir_op_uses(const Op *op, int *out, int max)
+{
+    int n = op_uses_impl(op, out, max);
+    return n < max ? n : max;
+}
+
+/* Upper bound on the distinct defs/uses of op: enough to size a buffer that the
+   matching enumerator can then fill exactly. Stores nothing. */
+int ir_op_defs_count(const Op *op)
+{
+    return op_defs_impl(op, NULL, 0);
+}
+
+int ir_op_uses_count(const Op *op)
+{
+    return op_uses_impl(op, NULL, 0);
+}
+
 /* ----- BB USE / DEF --------------------------------------------------- */
 
 /* Compute the BB's USE (vregs read before being written in this BB)
@@ -313,17 +356,18 @@ static void bb_use_def(const BB *bb, BitSet *use, BitSet *def)
     for (int i = 0; i < bb->n_ops; i++) {
         const Op *op = &bb->ops[i];
         /* USE: any read whose vreg isn't already in DEF. */
-        int n = ir_op_uses(op, buf, (int)(sizeof buf / sizeof buf[0]));
+        int n = ir_op_uses_count(op);
         if (n > (int)(sizeof buf / sizeof buf[0])) {
             /* Rare (long arg list on IR_CALL) — allocate. */
             int *big = malloc(n * sizeof(int));
-            ir_op_uses(op, big, n);
+            n = ir_op_uses(op, big, n);
             for (int j = 0; j < n; j++) {
                 if (!ir_bitset_get(def, big[j]))
                     ir_bitset_set(use, big[j]);
             }
             free(big);
         } else {
+            n = ir_op_uses(op, buf, (int)(sizeof buf / sizeof buf[0]));
             for (int j = 0; j < n; j++) {
                 if (!ir_bitset_get(def, buf[j]))
                     ir_bitset_set(use, buf[j]);
@@ -433,25 +477,27 @@ void ir_compute_op_liveness(Func *f)
             const Op *op = &bb->ops[j];
             /* live_in[j] = USE[j] ∪ (live-after − DEF[j]). Same heap
                fallback as bb_use_def for wide IR_CALL arg lists. */
-            int n = ir_op_defs(op, defs, (int)(sizeof defs / sizeof defs[0]));
+            int n = ir_op_defs_count(op);
             if (n > (int)(sizeof defs / sizeof defs[0])) {
                 int *big = malloc(n * sizeof(int));
-                ir_op_defs(op, big, n);
+                n = ir_op_defs(op, big, n);
                 for (int k = 0; k < n; k++)
                     if (big[k] >= 0) ir_bitset_clear(cur, big[k]);
                 free(big);
             } else {
+                n = ir_op_defs(op, defs, (int)(sizeof defs / sizeof defs[0]));
                 for (int k = 0; k < n; k++)
                     if (defs[k] >= 0) ir_bitset_clear(cur, defs[k]);
             }
-            n = ir_op_uses(op, uses, (int)(sizeof uses / sizeof uses[0]));
+            n = ir_op_uses_count(op);
             if (n > (int)(sizeof uses / sizeof uses[0])) {
                 int *big = malloc(n * sizeof(int));
-                ir_op_uses(op, big, n);
+                n = ir_op_uses(op, big, n);
                 for (int k = 0; k < n; k++)
                     if (big[k] >= 0) ir_bitset_set(cur, big[k]);
                 free(big);
             } else {
+                n = ir_op_uses(op, uses, (int)(sizeof uses / sizeof uses[0]));
                 for (int k = 0; k < n; k++)
                     if (uses[k] >= 0) ir_bitset_set(cur, uses[k]);
             }
@@ -548,15 +594,25 @@ void ir_compute_live_ranges(Func *f)
                 if (r->start < 0 || global < r->start) r->start = global;
                 if (global > r->end) r->end = global;
             }
+            /* Every use must widen its range: silently dropping the tail of a
+               wide arg list would shorten a live range and let an allocator
+               place a home over a point where the value is still live. Same
+               allocate-on-wide-call shape as the liveness builder. */
             int uses[16];
-            int nu = ir_op_uses(op, uses, (int)(sizeof uses / sizeof uses[0]));
-            for (int u = 0; u < nu && u < (int)(sizeof uses / sizeof uses[0]); u++) {
-                int v = uses[u];
+            int *up = uses;
+            int nu = ir_op_uses_count(op);
+            if (nu > (int)(sizeof uses / sizeof uses[0]))
+                up = malloc((size_t)nu * sizeof(int));
+            nu = ir_op_uses(op, up, up == uses
+                            ? (int)(sizeof uses / sizeof uses[0]) : nu);
+            for (int u = 0; u < nu; u++) {
+                int v = up[u];
                 if (v < 0 || v >= f->n_vregs) continue;
                 LiveRange *r = &lr[v];
                 if (r->start < 0 || global < r->start) r->start = global;
                 if (global > r->end) r->end = global;
             }
+            if (up != uses) free(up);
             /* Live-in widening: every vreg live at entry of this op is
                part of the live range here, even if not directly used. */
             const BitSet *lin = bb->live_in_per_op

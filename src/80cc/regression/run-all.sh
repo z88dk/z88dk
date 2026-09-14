@@ -29,7 +29,18 @@ reg_check_env || exit 2
 # asserted exact instruction shapes from the AST-walker era and the IR emits
 # different (often better) code, so they reported false failures. Behavioural
 # coverage lives in test/suites/long_ir (run under ticks across CPUs).
-suites=(smoke.sh typecheck.sh far.sh compound_assign.sh selftest.sh variadic.sh ir_coverage.sh fix16.sh arith.sh)
+#
+# Retired 2026-09-14: smoke.sh, compound_assign.sh and far.sh. They were
+# inherited from sccz80's tree — their headers still said "sccz80 regression",
+# though lib.sh has run them against 80cc for a long time. smoke.sh took over
+# ten minutes and filled the filesystem: it wrote into a FIXED /tmp directory
+# and cleared only three file extensions at start, never on exit. That is not a
+# smoke test. Their behavioural coverage lives in test/suites (long_ir, far,
+# sccz80).
+#
+# Everything here must stay FAST — the whole run is about a second. A suite
+# that grows past a few seconds belongs in test/suites, not in `make test`.
+suites=(typecheck.sh selftest.sh variadic.sh ir_coverage.sh fix16.sh arith.sh)
 fail_suites=()
 
 for s in "${suites[@]}"; do

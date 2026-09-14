@@ -1,0 +1,23 @@
+# Build output
+*.o
+*.d
+z88dk-80cc
+ir_selftest
+
+# Everything below is anchored to src/80cc itself (leading /), so the tracked
+# subdirectories — scripts/, adr/, probes-retired/, regression/ — are unaffected.
+#
+# This directory accumulates working files: analysis scripts, probe patches,
+# assembler dumps and one-off benches. They are tools, not project sources, and
+# they must not be swept into a commit by a careless `git add -A`.
+/*.py
+/*.sh
+/*.patch.txt
+/*.asm
+/*.txt
+__pycache__/
+*.pyc
+
+# Scratch C files that have been committed by accident before
+/nullbench.c
+/t1.c

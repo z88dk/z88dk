@@ -489,7 +489,7 @@ static void emit_test_zero(FILE *out, Func *f, int src)
            (there is none, by the dead check) would reload from the slot. */
         if (L.la.cur_br_value_dead && !hl_has(src) && !a_has(src)
             && !bc_has(src) && !de_has(src)
-            && f->vreg_to_phys[src] == IR_PR_SPILL && slot_off(f, src) >= 0) {
+            && ir_home_assigned(f, src) == IR_PR_SPILL && slot_off(f, src) >= 0) {
             if (fp_active(f)) {
                 int lo = slot_ix_off(f, src);
                 if (fp_offset_fits(lo) && fp_offset_fits(lo + 1)) {
@@ -1265,7 +1265,7 @@ static int bc_args_save_stack[BC_ARGS_SAVE_MAX];
 static int bc_args_saved_stack[BC_ARGS_SAVE_MAX];
 static int bc_args_save_depth;
 
-/* [IR_BCSAVE_LIVE=1] Save BC around a call only when a PR_BC tenant is LIVE
+/* [bc-save-live=1] Save BC around a call only when a PR_BC tenant is LIVE
    there, instead of whenever the function has one anywhere.
 
    func_has_pr_bc is a whole-function question and every BC save in the lowerer
@@ -1283,20 +1283,20 @@ static int bc_args_save_depth;
    conservative superset — and on that query enigma is correct while strbench
    keeps the whole win. Do not "tighten" this back to the live-in sets.
 
-   DEFAULT-ON; `IR_BCSAVE_LIVE=0` opts out. It is the necessary PARTNER of
-   IR_PREPUSH_NARROW and was flipped with it — see the note at
+   DEFAULT-ON; `IR_OFF=bc-save-live` opts out. It is the necessary PARTNER of
+   prepush-narrow and was flipped with it — see the note at
    prepushnarrow_on. */
 static int bcsave_live_on(void)
 {
     static int c = -1;
-    if (c < 0) { const char *e = getenv("IR_BCSAVE_LIVE"); c = !(e && e[0] == '0'); }
+    if (c < 0) c = !opt_disabled("bc-save-live");
     return c;
 }
 
 /* True if v is one of the plain PR_BC tenants a call must preserve. */
 static int bc_plain_tenant(const Func *f, int v)
 {
-    return f->vreg_to_phys[v] == IR_PR_BC
+    return ir_home_assigned(f, v) == IR_PR_BC
         && !(f->vregs[v].flags & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT));
 }
 
@@ -1355,7 +1355,7 @@ static int func_has_pr_bc(const Func *f)
 {
     if (!f->vreg_to_phys) return 0;
     for (int i = 0; i < f->n_vregs; i++)
-        if (f->vreg_to_phys[i] == IR_PR_BC
+        if (ir_home_assigned(f, i) == IR_PR_BC
             && !(f->vregs[i].flags & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT)))
             return 1;
     return 0;
@@ -1785,7 +1785,7 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
     if (src_w == 4 && dst_w == 2) {
         /* Long → int: just take the low half (HL of DEHL). */
         load_to_dehl(out, f, op->src[0]);
-        /* [IR_TRUNCRES] HL holds the result — say so. The old form spilled it
+        /* [trunc-res] HL holds the result — say so. The old form spilled it
            and then invalidated the cache, so the consumer one op later reloaded
            the slot that had just been written (`ld (ix-N),hl; ld de,(ix-N)`
            where `ex de,hl` would do). commit_hl_result also lets the dead-store
@@ -3910,7 +3910,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\t(de),hl");     /* both beliefs survive it */
                 return 0;
             }
-            /* [IR_HL_CARRY inc1] Base already resident in HL: load the value
+            /* [hl-carry inc1] Base already resident in HL: load the value
                STRAIGHT to DE (load_to_de preserves HL on the common fp/native
                paths) instead of load_to_hl(value)+ex de,hl (which clobbers the
                base in HL, forcing a reload). The following load_to_hl(base) then
@@ -4253,11 +4253,11 @@ static int try_index_half_word_add(FILE *out, Func *f, const Op *op)
 }
 
 
-/* [IR_ADDBC] `add hl,bc` when ONE operand is BC-resident. IR_ADDBC=0 opts out. */
+/* [add-bc] `add hl,bc` when ONE operand is BC-resident. IR_OFF=add-bc opts out. */
 static int addbc_enabled(void)
 {
     static int v = -1;
-    if (v < 0) { const char *e = getenv("IR_ADDBC"); v = (e && e[0] == '0') ? 0 : 1; }
+    if (v < 0) v = !opt_disabled("add-bc");
     return v;
 }
 
@@ -5383,49 +5383,6 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             b[3] = (uint8_t)((kk >> 24) & 0xff);
             uint8_t identity = (op->kind == IR_AND) ? 0xff : 0x00;
             static const char *regs[4] = { "l", "h", "e", "d" };
-            /* [PoC, IR_INPLACE_MASK] TASK #6 lever (a): a narrow in-place const
-               bitwise on a slot-COHERENT long — apply the immediate directly to
-               the frame-slot bytes, skipping load_to_dehl (its dead high-word load
-               + `ld bc,hl` DE:BC park) and store_dehl_finalize. Matches sdcc's
-               `ld (ix-2),0` for `x &= 0xffff`. Correctness gates: fp/ix only;
-               in-place (dst slot == src[0] slot); src[0] authoritative in its slot
-               (not register-cached, no pending lazy spill) so the direct slot read
-               is not stale; neither operand register-homed; result lives only in
-               its slot afterward (nothing cached it, so no stale belief). */
-            if (getenv("IR_INPLACE_MASK") && fp_active(f)
-                && op->src[0] >= 0 && op->dst >= 0
-                && !L.la.cur_dehl_dst_dead_safe
-                && !vreg_is_pr_dehl(f, op->src[0])
-                && !vreg_is_pr_de(f, op->src[0]) && !vreg_in_pr_bc(f, op->src[0])
-                && !vreg_is_pr_dehl(f, op->dst)
-                && !vreg_is_pr_de(f, op->dst) && !vreg_in_pr_bc(f, op->dst)
-                && slot_off(f, op->src[0]) >= 0
-                && slot_off(f, op->dst) == slot_off(f, op->src[0])
-                && L.rs.dehl != op->src[0] && L.rs.de != op->src[0]
-                && L.rs.hl != op->src[0] && L.rs.bc != op->src[0]
-                && !(L.lazy_spill_on && L.pending_spill_v == op->src[0])) {
-                require_slot(f, op->dst);
-                int ixo = slot_ix_off(f, op->dst);
-                int ok = 1;
-                for (int i = 0; i < 4; i++)
-                    if (b[i] != identity && !fp_offset_fits(ixo + i)) ok = 0;
-                if (ok) {
-                    int used_a = 0;
-                    for (int i = 0; i < 4; i++) {
-                        if (b[i] == identity) continue;
-                        if (op->kind == IR_AND && b[i] == 0) {
-                            emit(out, "ld\t(%s%+d),0", frame_reg(), ixo + i);
-                        } else {
-                            emit(out, "ld\ta,(%s%+d)", frame_reg(), ixo + i);
-                            emit(out, "%s\t%u", mnem, (unsigned)b[i]);
-                            emit(out, "ld\t(%s%+d),a", frame_reg(), ixo + i);
-                            used_a = 1;
-                        }
-                    }
-                    if (used_a) invalidate_a_cache();
-                    return 0;
-                }
-            }
             /* Fuse the op straight into the store walk: read each value
                byte, apply the immediate, store via (hl+) — skipping the
                register write-back AND the separate store_dehl walk. The

@@ -56,6 +56,38 @@ and the lowerer reads.
   re-index the IR and invalidate its own analysis). Genuine parallel-copy cycles at an edge
   are the only possible exception (vanishing on a 4-parking-register file).
 
+### Staging — the three gates in flight are this ADR's steps
+
+The work towards ranging is staged, and the gates carrying it are not three
+independent experiments. Maintainer's sequence, 2026-09-14:
+
+| Stage | Carried by | State |
+| --- | --- | --- |
+| 1. Make the intervals **truthful** — a home spans what the value is live for, not the whole function | `IR_TIGHT_HOMES`, ADR 0027 | in flight; the byte-identity premise is refuted and must be explained first |
+| 2. **Range** — a value is resident over the sub-range it is actually used in, and a register is time-shared between disjoint values | ADR 0017 (this) | blocked on stage 1 |
+| 3. **Park in the slot when the range is interrupted** — a clobber or call ends the resident window; the value returns to its slot and resumes after | `IR_RANGED`, ADR 0029 | in flight, as the fail-safe form |
+| cross-cutting. Per-CPU costs must be **right**, because a ranging decision is a cost decision | `IR_GBZ80_COST`, ADR 0032 | in flight; correct row, blocked on a ranking tie |
+
+Stage 1 is a prerequisite, not a nicety: while every interval is the whole
+function the table carries no information, nothing can be time-shared, and the
+interval verifier has nothing to check. Its refuted byte-identity claim is
+therefore the first thing to resolve — it is either an access outside the IR
+live range (which stage 2 would turn into a miscompile) or an allocation change,
+and the two need different answers.
+
+Stage 3 is what makes stage 2 safe. A ranged home is not a promise to hold a
+value forever; it is a promise over a window, and the slot remains the value's
+canonical home for everywhere outside it. `IR_RANGED` is the conservative form
+of that — the value stays slot-homed and the register holds it opportunistically
+— which is why ADR 0018 can refuse a DE *home* for the same class of value while
+ADR 0029 keeps a DE *cache* open.
+
+The cross-cutting item matters because all three stages spend the same cost
+model. See the recurring finding in `DESIGN_INDEX.md`: three separate
+corrections to that model each made the output worse, because nothing prices the
+claim a decision displaces. That term is a prerequisite for stage 2 paying off,
+not a later refinement.
+
 ### Invariants (the alloc↔lower contract)
 
 - **I1 — single source of truth for homes.** Home residency at any point is `home_at`; the

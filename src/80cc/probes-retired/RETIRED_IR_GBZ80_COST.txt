@@ -1,0 +1,45 @@
+IR_GBZ80_COST removed 2026-09-14 — redundant.
+
+It opted in to the full measured gbz80 table. The row selection is now done by
+IR_GBZ80_MASK, whose default (3 = SLOT+BC) already delivers the entire win: the
+DE and IX/IY rows are measured inert, so `IR_GBZ80_COST=1` and the default
+produce byte-identical output on every bench, on both frame modes.
+
+Verified: matrixbench default=793 = mask3 = mask15, mask1=803.
+
+=== IR_GBZ80_COST gate ===
+/* [IR_GBZ80_COST=1] Opt IN to the measured gbz80 cost row (see GBZ80[] in
+   g0_word_cost). OPT-IN, not default: the row is right — gbz80 was using the
+   Z80 numbers and its slot really is ~30 % cheaper — but making it true flips a
+   near-tie in histbench's hist_pass, where BC moves from v26 (live [28,31]) to
+   the shorter, colder v25, for -14 B across divbench+matrixbench against
+   +10 % ticks on histbench. The row needs the ranking tie broken before it can
+   be the default; until then gbz80 keeps the (wrong but tuned) Z80 row. */
+static int gbz80_cost_on(void)
+{
+    static int c = -1;
+    if (c < 0) { const char *e = getenv("IR_GBZ80_COST"); c = e && e[0] == '1'; }
+    return c;
+}
+
+
+
+=== table selection ===
+    const int (*t)[GK_N] = IS_KC160() ? KC160
+                         : IS_EZ80() ? EZ80
+                         : IS_KR580VM1() ? VM1
+                         : (IS_GBZ80() && gbz80_cost_on()) ? GBZ80
+                         : IS_RABBIT() ? RABBIT
+                         : g0measured_on() ? Z80 : Z80_EST;
+
+=== mask guard ===
+    static int gb_slot[GR_N][GK_N];
+    if (IS_GBZ80() && !gbz80_cost_on()) {
+
+=== two-corrections comment ===
+       The PAIR rows (a GP-pair deref costs 16, not 7, for want of `ld a,(bc)`
+       and `ex de,hl`) are equally true but flip a ranking near-tie in
+       histbench's hist_pass, so they stay behind `IR_GBZ80_COST=1`.
+       Bisected by row: SLOT alone is corpus -72 B and -0.005 % ticks with
+       histbench UNTOUCHED; adding the pairs buys another -32 B and costs
+       histbench +10.25 %. */

@@ -9,6 +9,7 @@
  */
 
 #include "ir_lower.h"
+#include "ir_alloc.h"
 #include "ir_analysis.h"
 
 extern char c_debug_adb_defc;   /* -debug: pin named-local slots (dedicated) */
@@ -51,47 +52,8 @@ void ir_assign_slots(Func *f)
         fputs("ir_lower: out of memory in ir_assign_slots\n", stderr);
         abort();
     }
-    for (int v = 0; v < f->n_vregs; v++) {
-        needs_slot[v] = (f->vreg_to_phys
-                         && f->vreg_to_phys[v] != IR_PR_SPILL) ? 0 : 1;
-        /* Clobberable byte homes (PR_E/PR_D — low/high of DE, hit by
-           DE-scratch ops) carry a backing slot: the lazy-spill lowerer
-           spills the home register there before a DE-clobbering op and
-           reloads after. (PR_C/PR_B stay slotless — the no-clobber
-           envelope keeps them resident for the whole function.) */
-        if (f->vreg_to_phys
-            && (f->vreg_to_phys[v] == IR_PR_E
-                || f->vreg_to_phys[v] == IR_PR_D))
-            needs_slot[v] = 1;
-        /* The word DE-home (a multi-def PR_DE accumulator) is likewise
-           slot-backed: it rides DE across its loop but the loop test / a
-           DE-scratch op clobbers DE, so the lowerer spills DE→slot and
-           reloads. Ordinary single-def PR_DE transients stay slotless. */
-        if (v == f->word_home_vreg && f->vreg_to_phys
-            && f->vreg_to_phys[v] == IR_PR_DE)
-            needs_slot[v] = 1;
-        /* [IR_CALLSPLIT] A call-bounded split value is PR_BC only inside its
-           call-free span; outside it (and to reload it on entry) it lives in a
-           frame slot, which stays its canonical home. So it needs a slot despite
-           the register-pool assignment above (same as PR_E/PR_D / the word
-           DE-home). Its span is read-only, so the slot is only ever WRITTEN by
-           an out-of-span def and READ back to reload BC — never diverges. */
-        if (f->vregs[v].flags & IR_VREG_CALL_SPLIT)
-            needs_slot[v] = 1;
-        /* Read-only param lives in the caller's pushed-arg slot;
-           slot_off returns that caller offset directly. */
-        if (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)
-            needs_slot[v] = 0;
-        /* A-only byte temp (compute_no_slot_bytes): every def is dst-dead, so
-           the value rides A and never touches a slot — reserve none. */
-        if (f->vregs[v].flags & IR_VREG_NO_SLOT)
-            needs_slot[v] = 0;
-        /* [IR_DEADSTORE] A dead-spill byte (slot written but never read): the
-           store is skipped on the re-lower and the value rides A — drop its slot
-           so the frame shrinks (and, if it empties, deadframe goes frameless). */
-        if (f->vregs[v].flags & IR_VREG_DEAD_SPILL)
-            needs_slot[v] = 0;
-    }
+    for (int v = 0; v < f->n_vregs; v++)
+        needs_slot[v] = ir_home_requires_slot(f, v);
 
     /* Spill-slot coalescing: per-op interference. Walk each BB
        backward from live_out, tracking live just AFTER each op; each
@@ -182,14 +144,14 @@ void ir_assign_slots(Func *f)
        with EVERY other slotted vreg so its backing slot is exclusive. */
     for (int v = 0; v < n_vregs; v++) {
         if (!f->vreg_to_phys) break;
-        if (f->vreg_to_phys[v] != IR_PR_E && f->vreg_to_phys[v] != IR_PR_D)
+        if (ir_home_assigned(f, v) != IR_PR_E && ir_home_assigned(f, v) != IR_PR_D)
             continue;
         for (int w = 0; w < n_vregs; w++)
             if (w != v) INTERF_SET(v, w);
     }
     /* Same exclusivity for the word DE-home's backing slot. */
     if (f->word_home_vreg >= 0 && f->word_home_vreg < n_vregs && f->vreg_to_phys
-        && f->vreg_to_phys[f->word_home_vreg] == IR_PR_DE) {
+        && ir_home_assigned(f, f->word_home_vreg) == IR_PR_DE) {
         int v = f->word_home_vreg;
         for (int w = 0; w < n_vregs; w++)
             if (w != v) INTERF_SET(v, w);

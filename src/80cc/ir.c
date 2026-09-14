@@ -462,6 +462,8 @@ void ir_dump_vreg(FILE *out, const Func *f, int vreg_id)
     const VReg *v = &f->vregs[vreg_id];
     fprintf(out, "v%d", v->id);
     /* Append the phys assignment if one exists. */
+    /* ir.c owns the Func struct and prints it raw; it is below ir_alloc and
+       does not ask it questions. This is a dump, not a residency decision. */
     if (f->vreg_to_phys && f->vreg_to_phys[vreg_id] != IR_PR_NONE) {
         fprintf(out, "[%s]", ir_phys_name(f->vreg_to_phys[vreg_id]));
     }

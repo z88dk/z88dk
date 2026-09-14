@@ -373,7 +373,7 @@ static int  clob_snap_hl, clob_snap_de, clob_snap_bc, clob_snap_a;
 
 /* Unified instruction-effects query (P0 Step 2 — decomposer consolidation).
    ONE query every consumer uses (ir_verify_op, IR_CLOB_VERIFY, the re-renderer's
-   park sweep, the IR_A_CARRY A-invalidator in vemit), COMPOSING the two
+   park sweep, the a-carry A-invalidator in vemit), COMPOSING the two
    single-responsibility kernels — lra_line_writes (whole-reg WRITE mask) and
    bc_line_effect (sub-register B/C reads/writes + park/control) — plus the
    value-change refinements. So an asm line is decomposed in one place; the
@@ -405,7 +405,7 @@ static InstrEffects instr_effects(const char *line);
    unrecognised (unknown) or A-writing line drops rs.a. An incomplete recogniser
    therefore loses BYTES, never CORRECTNESS.
 
-   DEFAULT-ON. Opt out with IR_A_CARRY=0 — that reproduces the pre-flip codegen
+   DEFAULT-ON. Opt out with IR_OFF=a-carry — that reproduces the pre-flip codegen
    byte-for-byte and is the regression-test path.
 
    ►► REVISIT / TUNE LATER: default-on costs a few bytes on cold sites with a FLAT
@@ -419,23 +419,21 @@ static int  a_carry_on = -1;
 static int  a_carry_enabled(void)
 {
     if (a_carry_on < 0) {
-        const char *e = getenv("IR_A_CARRY");
-        a_carry_on = (e && e[0] == '0') ? 0 : 1;      /* default ON; IR_A_CARRY=0 opts out */
+        a_carry_on = !opt_disabled("a-carry");      /* default ON; IR_OFF=a-carry opts out */
     }
     return a_carry_on;
 }
 
-/* IR_REMAT_LEA: rematerialise &local frame-slot addresses (see the remat table in
+/* remat-lea: rematerialise &local frame-slot addresses (see the remat table in
    ir_lower_func). Default ON after the gauntlet — full byte matrix 0-regress all 9
    CPUs sp+fp (−747B), ticks 0-slower (interpbench pure win, ez80-fp excluded as a
-   byte-for-tick), long_ir + run-matrix green, real files byte-identical. IR_REMAT_LEA=0
+   byte-for-tick), long_ir + run-matrix green, real files byte-identical. IR_OFF=remat-lea
    opts out (byte-identical to pre-flip). */
 static int  remat_lea_on = -1;
 static int  remat_lea_enabled(void)
 {
     if (remat_lea_on < 0) {
-        const char *e = getenv("IR_REMAT_LEA");
-        remat_lea_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; IR_REMAT_LEA=0 opts out */
+        remat_lea_on = !opt_disabled("remat-lea");    /* default ON; IR_OFF=remat-lea opts out */
     }
     return remat_lea_on;
 }
@@ -463,8 +461,7 @@ static int  call_bremat_on = -1;
 static int  call_bremat_enabled(void)
 {
     if (call_bremat_on < 0) {
-        const char *e = getenv("IR_CALL_BREMAT");
-        call_bremat_on = (e && e[0] == '0') ? 0 : 1;   /* default ON; =0 opts out */
+        call_bremat_on = !opt_disabled("call-bremat");
     }
     return call_bremat_on;
 }
@@ -489,13 +486,12 @@ static int  fclong_carry_on = -1;
 static int  fclong_carry_enabled(void)
 {
     if (fclong_carry_on < 0) {
-        const char *e = getenv("IR_FCLONG_CARRY");
-        fclong_carry_on = (e && e[0] == '0') ? 0 : 1;   /* default ON; =0 opts out */
+        fclong_carry_on = !opt_disabled("fclong-carry");
     }
     return fclong_carry_on;
 }
 
-/* IR_TRUNCRES: a long->int narrowing leaves its result in HL, so say so instead
+/* trunc-res: a long->int narrowing leaves its result in HL, so say so instead
    of spilling it and then invalidating the cache — which made the consumer one
    op later reload the slot that had just been written. commit_hl_result also
    lets the dead-store pass drop the spill outright, and routes a PR_DE dst into
@@ -504,7 +500,7 @@ static int  fclong_carry_enabled(void)
    Default ON. Corpus -285 B over 38 cells with ZERO larger, every CPU gaining
    (gbz80/8085 -30, z80/z80n/z180 -28, rabbit/8080 -26, kc160 -20, ez80 -17);
    emu.c -210 B sp / -247 B fp, clisp -212 / -146. Ticks follow the bytes: z80
-   corpus -0.131%, 3 cells faster and 0 slower. IR_TRUNCRES=0 opts out,
+   corpus -0.131%, 3 cells faster and 0 slower. IR_OFF=trunc-res opts out,
    byte-identical to the pre-flip compiler.
 
    NB this needed the expr.c member-offset fix first. Until then it miscompiled
@@ -517,13 +513,12 @@ static int  truncres_on = -1;
 static int  truncres_enabled(void)
 {
     if (truncres_on < 0) {
-        const char *e = getenv("IR_TRUNCRES");
-        truncres_on = (e && e[0] == '0') ? 0 : 1;   /* default ON; =0 opts out */
+        truncres_on = !opt_disabled("trunc-res");   /* default ON; =0 opts out */
     }
     return truncres_on;
 }
 
-/* IR_HL_CARRY (opt-in, WIP): the same invalidate-by-default tracker extended to
+/* hl-carry (opt-in, WIP): the same invalidate-by-default tracker extended to
    HL and DE — the vehicle for HL/DE operand-residency carry (the #2 size bucket).
    Increment 0 = the inert safety net: rs.hl/rs.de survive across raw emits and are
    dropped only when the emitted line VALUE-CHANGES the reg. Two HL-specific
@@ -534,21 +529,20 @@ static int  truncres_enabled(void)
 
    DEFAULT-ON: the full valid-tick-CPU ticks matrix is a PURE WIN — fewer bytes,
    0 byte regressions AND all tick cells faster / 0 slower (it removes reload
-   memory traffic, so bytes and ticks drop together). Opt out with IR_HL_CARRY=0 —
+   memory traffic, so bytes and ticks drop together). Opt out with IR_OFF=hl-carry —
    reproduces the pre-flip codegen byte-for-byte (the regression-test path). */
-/* [IR_SLOTADDR] The sp-mode slot-address cache (cur_hl_addr_off) existed only
+/* [slot-addr-widen] The sp-mode slot-address cache (cur_hl_addr_off) existed only
    for BYTE accesses. The WORD load/store paths recomputed `ld hl,nn;add hl,sp`
    (4 B) even when HL already pointed a byte or two away, and threw the address
    away afterwards although a two-byte walk provably leaves HL on the slot's
    high byte. This widens the cache to the word paths in both directions —
    consume an in-range belief, publish the trailing address. Opt out with
-   IR_SLOTADDR=0, which reproduces the pre-change codegen byte-for-byte. */
+   IR_OFF=slot-addr-widen, which reproduces the pre-change codegen byte-for-byte. */
 static int  slotaddr_on = -1;
 static int  slotaddr_widen(void)
 {
     if (slotaddr_on < 0) {
-        const char *e = getenv("IR_SLOTADDR");
-        slotaddr_on = (e && e[0] == '0') ? 0 : 1;   /* default ON */
+        slotaddr_on = !opt_disabled("slot-addr-widen");   /* default ON */
     }
     return slotaddr_on;
 }
@@ -557,8 +551,7 @@ static int  hl_carry_on = -1;
 static int  hl_carry_enabled(void)
 {
     if (hl_carry_on < 0) {
-        const char *e = getenv("IR_HL_CARRY");
-        hl_carry_on = (e && e[0] == '0') ? 0 : 1;   /* default ON; IR_HL_CARRY=0 opts out */
+        hl_carry_on = !opt_disabled("hl-carry");   /* default ON; IR_OFF=hl-carry opts out */
     }
     return hl_carry_on;
 }
@@ -586,7 +579,7 @@ static int  hlde_belief_droppable(int v)
        param_caller_off. It just is not a SPILL slot, so vreg_spill_slot is -1
        for it and the test above missed every one. That is not a corner case:
        params are most of what the indirect word store stores, and missing them
-       is what kept gen_st_mem's DE-direct path (IR_HL_CARRY inc1) off for
+       is what kept gen_st_mem's DE-direct path (hl-carry inc1) off for
        `p->field = param` — the store then routed the value through HL, evicted
        the base, and paid a park + restore to get it back.
        NB this is a MEMORY home, so the register-home hazard the predicate exists
@@ -751,7 +744,7 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
             }
             L.pv_expect_push = L.pv_expect_pop = 0;
         }
-        /* IR_A_CARRY partner: invalidate-by-default A tracker. Keep rs.a only if
+        /* a-carry partner: invalidate-by-default A tracker. Keep rs.a only if
            this line PROVABLY preserves A's value (recognised AND either does not
            write A or self-preserves it, e.g. `or a`/`and a` flag tests). An
            unknown or A-writing line drops the belief — the sole codegen-affecting
@@ -806,7 +799,7 @@ static void emit(FILE *out, const char *fmt, ...)
    what `ld d,h / ld e,l` does — except on Rabbit 4000/6000, where it is a
    native ONE-byte instruction while the two 8-bit moves are page-prefixed at
    2 bytes EACH. Four bytes to do what one byte does, at every HL->DE staging
-   site, is where r4k's whole IR_DS_SHARE byte regression came from.
+   site, is where r4k's whole dead-store-share byte regression came from.
    Neither form touches flags and D/E do not alias H/L, so this is a pure
    spelling change everywhere else. The copt rules that matched the pair as
    TEXT (#G4, #IR-const/sym-to-DE, #GB6 in lib/80cc_rules.1) were updated to
@@ -944,30 +937,19 @@ static int hlde_full_reload(const char *s, const char *pair)
    code-GROWING rules are call substitutions — charging the worst case keeps the
    bound valid post-copt without modelling copt.
 
-   DEFAULT-ON; `IR_JR=0` opts out. Regression: test/suites/long_ir/jrelax.c. */
+   DEFAULT-ON; `IR_OFF=jr-relax` opts out. Regression: test/suites/long_ir/jrelax.c. */
 static int relax_uc = -1;
-/* Whether to relax UNCONDITIONAL jumps is a per-CPU question, and the answer
-   follows the `jr`-vs-`jp` timing rather than the byte saving (which is always
-   1 B in our favour). An unconditional jump is taken every time it is reached,
-   so it cannot amortise a slower form:
-
-     z80 / z80n   `jr` +2 T over `jp`      -> do NOT relax (bytes cost ticks)
-     z180         8 T vs 9                 -> relax
-     gbz80        12 T vs 16               -> relax
-     rabbit       5 T (2k/3k) / 6 (4k/6k) vs `jp` 7  -> relax
-     ez80, kc160  no penalty               -> relax
-
-   Conditional branches are relaxed everywhere: `jr cc` is 12 T taken / 7 not
-   taken against `jp cc`'s flat 10, so the not-taken path pays for the rest.
-   `IR_JR_UNCOND=1` forces it on anywhere, `=0` off. */
+/* Whether to relax an UNCONDITIONAL jump is a per-CPU question: it is taken
+   every time it is reached, so it cannot amortise a slower form, and on z80 /
+   z80n `jr` is slower than `jp`. A CONDITIONAL branch can amortise it — its
+   not-taken path is cheaper — so those are relaxed everywhere.
+   Per-CPU timings and the measurement that refused a global override:
+   ADR 0033. */
 static int relax_uncond_ok(void)
 {
-    if (relax_uc < 0) {
-        const char *e = getenv("IR_JR_UNCOND");
-        if (e) relax_uc = (e[0] == '1');
-        else   relax_uc = IS_GBZ80() || IS_EZ80() || IS_KC160()
-                       || IS_RABBIT() || c_cpu == CPU_Z180;
-    }
+    if (relax_uc < 0)
+        relax_uc = IS_GBZ80() || IS_EZ80() || IS_KC160()
+                || IS_RABBIT() || c_cpu == CPU_Z180;
     return relax_uc;
 }
 
@@ -977,8 +959,7 @@ static int branch_relax_enabled(void)
     if (relax_on < 0) {
         /* 8080/8085 have no `jr` at all. Every other supported CPU has both the
            unconditional form and the nz/z/nc/c conditionals. */
-        const char *e = getenv("IR_JR");
-        relax_on = (e && e[0] == '0') ? 0 : !IS_808x();
+        relax_on = !opt_disabled("jr-relax") && (!IS_808x());
     }
     return relax_on;
 }
@@ -1363,7 +1344,7 @@ static int de_park_group(char **lines, int i, int *offp)
    reported as a VIOLATION. The opposite (forward unknown, backward dead) is the
    backward pass being more precise.
 
-   [IR_DEFLOW] The walk FOLLOWS branches, because the backward sweep now does.
+   [de-flow] The walk FOLLOWS branches, because the backward sweep now does.
    Before that it stopped at one and answered "reader" — which was the same
    conservative answer the sweep gave, so the two agreed; once the sweep started
    following branches, that stale answer produced four bogus violations on emu.c
@@ -1371,7 +1352,7 @@ static int de_park_group(char **lines, int i, int *offp)
    both arms of a conditional keeps it an independent check rather than a weaker
    one. A call and a `ret` still answer READER: both genuinely read DE (the
    __sdcccall(1) argument and the DE:HL result ABI), which is the boundary of
-   what [IR_DEFLOW] claims.
+   what [de-flow] claims.
 
    `seen` memoises (line, liveness-state) so a loop terminates; revisiting a
    state contributes nothing the in-progress visit will not already report. */
@@ -1443,108 +1424,10 @@ static int de_forward_needed(char **lines, int n, int start, int *readerp)
 
 static int xline_c_call(const char *line);
 
-/* ---- [IR_DELIVE_PROBE] inert sizing of the DE-liveness opportunity --------
-   instr_effects marks both a branch and a call as READING DE (a successor may
-   read it; __sdcccall(1) passes arguments there), so the park sweep keeps a
-   park whenever it cannot prove the old pair dead. BC and F were freed of those
-   blanket assumptions; DE has not been. This walks forward from each park and
-   records the FIRST thing that ends the walk — an upper bound on what any
-   liveness improvement could recover:
 
-     READ    real read of a live half  — needed, unrecoverable
-     CCALL   `call _sym`, no read yet  — recoverable if that convention passes
-                                         nothing in DE
-     XCALL   any other call/rst        — asm linkage, stays conservative
-     BRANCH  jp/jr/djnz to a label     — recoverable via a DE fixpoint
-     LABEL   fell into a label         — ditto
-     RET     a return                  — reads DE only for a long/float result
-     DEAD    both halves overwritten   — the sweep already drops these
-     END     ran off the buffer
 
-   Covers the 8085 slot-load park and every generic `push de`/`pop de` group, to
-   say whether the opportunity is 8085-only. IR_DELIVE_PROBE=2 lists each. */
-enum { DPB_READ, DPB_CCALL, DPB_XCALL, DPB_BRANCH, DPB_LABEL, DPB_RET,
-       DPB_DEAD, DPB_END, DPB_NCLASS };
-static const char *const dpb_name[DPB_NCLASS] =
-    { "READ", "CCALL", "XCALL", "BRANCH", "LABEL", "RET", "DEAD", "END" };
-static long dpb_slot[DPB_NCLASS], dpb_gen[DPB_NCLASS];
-static long dpb_nslot, dpb_ngen, dpb_funcs;
-static void dpb_report(void)
-{
-    if (!dpb_nslot && !dpb_ngen) return;
-    fprintf(stderr, "DELIVEPROBE funcs=%ld | 8085 slot-parks=%ld generic push/pop-de parks=%ld\n",
-            dpb_funcs, dpb_nslot, dpb_ngen);
-    fprintf(stderr, "  %-7s %8s %8s\n", "class", "slot", "generic");
-    for (int k = 0; k < DPB_NCLASS; k++)
-        fprintf(stderr, "  %-7s %8ld %8ld\n", dpb_name[k], dpb_slot[k], dpb_gen[k]);
-    fprintf(stderr, "  RECOVERABLE(CCALL+BRANCH+LABEL+RET) slot=%ld generic=%ld\n",
-            dpb_slot[DPB_CCALL] + dpb_slot[DPB_BRANCH] + dpb_slot[DPB_LABEL]
-              + dpb_slot[DPB_RET],
-            dpb_gen[DPB_CCALL] + dpb_gen[DPB_BRANCH] + dpb_gen[DPB_LABEL]
-              + dpb_gen[DPB_RET]);
-}
-static int de_probe_on(void)
-{
-    static int v = -1;
-    if (v < 0) { const char *e = getenv("IR_DELIVE_PROBE");
-                 v = e ? atoi(e) : 0;
-                 if (v) atexit(dpb_report); }
-    return v;
-}
 
-/* The forward classification. Mirrors de_forward_needed's walk -- including its
-   two hard-won corrections (a later park is transparent; a read only counts on a
-   half that is still live) -- but tests control transfer BEFORE the read, since
-   instr_effects marks a branch as a DE read and that is precisely the assumption
-   being sized. */
-static int de_probe_class(char **lines, int n, int start)
-{
-    int d_live = 1, e_live = 1;
-    for (int j = start; j < n; j++) {
-        if (lines[j][0] != '\t') return DPB_LABEL;
-        int poff2;
-        if (j + 3 < n && !strcmp(lines[j], "\tpush\tde\n")
-            && de_park_group(lines, j + 3, &poff2)) { j += 3; continue; }
-        InstrEffects e = instr_effects(lines[j]);
-        char tgt[64];
-        if (e.is_boundary) return DPB_RET;
-        if (xline_branch_target(lines[j], tgt, sizeof tgt)) return DPB_BRANCH;
-        if (e.is_call) {
-            if (!strncmp(lines[j] + 1, "ret", 3)) return DPB_RET;  /* `ret cc` */
-            return xline_c_call(lines[j]) ? DPB_CCALL : DPB_XCALL;
-        }
-        if ((e.d_read && d_live) || (e.e_read && e_live)) return DPB_READ;
-        if (e.d_write) d_live = 0;
-        if (e.e_write) e_live = 0;
-        if (!d_live && !e_live) return DPB_DEAD;
-    }
-    return DPB_END;
-}
-
-/* A GENERIC park: `pop de` at i whose matching `push de` is at the same stack
-   depth, with no label, no other stack traffic and no `pop de` in between. The
-   conservative bail-outs matter more than the coverage -- an unmatched push, an
-   `inc sp` or a label all mean the depth cannot be trusted. Returns the push
-   index, or -1. */
-static int de_generic_park(char **lines, int i)
-{
-    if (strcmp(lines[i], "\tpop\tde\n")) return -1;
-    int depth = 0;
-    for (int j = i - 1; j >= 0 && j > i - 400; j--) {
-        if (lines[j][0] != '\t') return -1;              /* label: joins */
-        const char *l = lines[j] + 1;
-        if (!strncmp(l, "push\t", 5)) {
-            if (depth == 0) return (!strcmp(l, "push\tde\n")) ? j : -1;
-            depth--;
-            continue;
-        }
-        if (!strncmp(l, "pop\t", 4)) { depth++; continue; }
-        if (strstr(l, "sp")) return -1;                  /* inc sp / ld sp,ix / … */
-    }
-    return -1;
-}
-
-/* [IR_XORA] `ld a,0` is 2 bytes and 7 T; `xor a` is 1 and 4. The only
+/* [xor-a] `ld a,0` is 2 bytes and 7 T; `xor a` is 1 and 4. The only
    difference is that `xor a` DEFINES the flags, and the lowerer cannot say
    whether that matters — it models registers, not F. The rendered text can, so
    the rewrite rides the backward park sweep below, which already walks each
@@ -1560,15 +1443,14 @@ static int de_generic_park(char **lines, int i)
    Default ON. Corpus -230 B over 132 cells with ZERO larger, every CPU smaller
    (gbz80 -40, 8080/8085 -26, z80/z80n/z180 -25, rabbit/ez80/kc160 -21); emu.c
    -38 B fp / -52 B sp. Ticks follow: 7 T becomes 4 T at every site and nothing
-   else moves. IR_XORA=0 opts out, byte-identical to the pre-flip compiler. NB
+   else moves. IR_OFF=xor-a opts out, byte-identical to the pre-flip compiler. NB
    the rewrite rides the park sweep, so --opt-disable=bc-live also turns it
    off. */
 static int  xora_on = -1;
 static int  xora_enabled(void)
 {
     if (xora_on < 0) {
-        const char *e = getenv("IR_XORA");
-        xora_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; IR_XORA=0 opts out */
+        xora_on = !opt_disabled("xor-a");    /* default ON; IR_OFF=xor-a opts out */
     }
     return xora_on;
 }
@@ -1602,19 +1484,18 @@ static int xora_line_reads_f(const char *line)
     return 1;   /* adc/sbc/rl/rr/rla/rra/daa/ccf, every branch, anything unknown */
 }
 
-/* IR_BCCALL: treat a `call _sym` as killing BC in the park sweep (see
-   xline_c_call). IR_BCCALL=0 opts out. */
+/* bc-call: treat a `call _sym` as killing BC in the park sweep (see
+   xline_c_call). IR_OFF=bc-call opts out. */
 static int  bccall_on = -1;
 static int  bccall_enabled(void)
 {
     if (bccall_on < 0) {
-        const char *e = getenv("IR_BCCALL");
-        bccall_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; =0 opts out */
+        bccall_on = !opt_disabled("bc-call");    /* default ON; =0 opts out */
     }
     return bccall_on;
 }
 
-/* [IR_BCCALL] Is this line a call to a COMPILED C function (`call _sym`)? No
+/* [bc-call] Is this line a call to a COMPILED C function (`call _sym`)? No
    z88dk calling convention passes an argument in BC — smallc and stdc stack
    theirs, fastcall uses HL/DE:HL or the memory accumulator, __sdcccall(1) uses
    A/HL and DE — so BC is dead going INTO such a call, and the `ld bc,hl` DEHL
@@ -1660,8 +1541,9 @@ static int  gwiden_on = -1;
 static int  gwiden_enabled(void)
 {
     if (gwiden_on < 0) {
-        const char *e = getenv("IR_GWIDEN");
-        gwiden_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; =0 opts out */
+        /* opt_disabled("gwiden") at the return is the switch; this private
+           one was a duplicate of it. */
+        gwiden_on = 1;
     }
     return gwiden_on && !opt_disabled("gwiden");
 }
@@ -1797,7 +1679,7 @@ static void gw_fold_byte_global_widens(char **lines, int n, char *drop)
     }
 }
 
-/* IR_BCFLOW: follow intra-function branches when deciding BC liveness in the
+/* bc-flow: follow intra-function branches when deciding BC liveness in the
    park sweep. Without it every branch is treated as "a successor may read BC",
    which keeps a stash alive that the target provably never reads — 64 of the
    151 `ld bc,hl` left on emu.c reach a branch to a LOCAL label. See
@@ -1807,20 +1689,19 @@ static void gw_fold_byte_global_widens(char **lines, int n, char *drop)
    8085 -32, z80/z80n/z180/rabbit/kc160 -24, ez80 -20, gbz80 -16); emu.c -157 B
    sp / -149 fp, clisp -381, adv_a -16. Ticks -0.0278% on the z80 corpus, 4
    cells faster and 0 slower -- it only ever deletes an instruction.
-   IR_BCFLOW=0 opts out, byte-identical to the pre-flip compiler.
+   IR_OFF=bc-flow opts out, byte-identical to the pre-flip compiler.
    IR_BCFLOW_DBG=1 reports the label count and how many have BC dead. */
 static int  bcflow_on = -1;
 static int  bcflow_enabled(void)
 {
     if (bcflow_on < 0) {
-        const char *e = getenv("IR_BCFLOW");
-        bcflow_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; =0 opts out */
+        bcflow_on = !opt_disabled("bc-flow");    /* default ON; =0 opts out */
     }
     return bcflow_on;
 }
 
-/* IR_DEFLOW: follow intra-function branches when deciding DE liveness in the
-   park sweep, exactly as [IR_BCFLOW] does for BC. Without it a branch is a black
+/* de-flow: follow intra-function branches when deciding DE liveness in the
+   park sweep, exactly as [bc-flow] does for BC. Without it a branch is a black
    box that "may read DE", which keeps an 8085 slot-load park alive whose target
    provably never reads the pair.
 
@@ -1831,18 +1712,17 @@ static int  bcflow_enabled(void)
    conservative, which is what separates this from the wider opportunity sized by
    [IR_DELIVE_PROBE].
 
-   IR_DEFLOW=0 opts out. */
+   IR_OFF=de-flow opts out. */
 static int  deflow_on = -1;
 static int  deflow_enabled(void)
 {
     if (deflow_on < 0) {
-        const char *e = getenv("IR_DEFLOW");
-        deflow_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; =0 opts out */
+        deflow_on = !opt_disabled("de-flow");
     }
     return deflow_on;
 }
 
-/* [IR_BCFLOW] Is this line a label of the form `name:` at column 0? */
+/* [bc-flow] Is this line a label of the form `name:` at column 0? */
 static int xline_label(const char *l, char *out, size_t n)
 {
     if (*l == '\t' || *l == ' ' || *l == ';' || *l == '.' || *l == '\n') return 0;
@@ -1853,7 +1733,7 @@ static int xline_label(const char *l, char *out, size_t n)
     return 1;
 }
 
-/* [IR_BCFLOW] The branch target of `l`, or NULL. Handles `jp L`, `jr cc,L` and
+/* [bc-flow] The branch target of `l`, or NULL. Handles `jp L`, `jr cc,L` and
    `djnz L`; an indirect `jp (hl)` has no static target and answers NULL, which
    the caller must treat as "unknown, assume live". */
 static int xline_branch_target(const char *l, char *out, size_t n)
@@ -1877,7 +1757,7 @@ static int xline_branch_target(const char *l, char *out, size_t n)
     return i > 0;
 }
 
-/* [IR_BCFLOW] BC liveness at every label, by iterating the backward transfer to
+/* [bc-flow] BC liveness at every label, by iterating the backward transfer to
    a fixpoint. Starts optimistic (dead everywhere) and only ever adds liveness,
    so it converges; the iteration cap is a belt-and-braces bail that answers
    "live" for anything unsettled. The transfer mirrors the sweep's own, which is
@@ -1893,7 +1773,7 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
     for (int iter = 0; iter < 8; iter++) {
         int changed = 0;
         int b_live = 0, c_live = 0, f_live = 0;
-        /* [IR_DEFLOW] DE starts DEAD like the rest, and is only tracked when
+        /* [de-flow] DE starts DEAD like the rest, and is only tracked when
            the caller asked for it (ldl/lel non-NULL). */
         int d_live = 0, e_live = 0;
         for (int i = n - 1; i >= 0; i--) {
@@ -1910,7 +1790,7 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
                     }
                 continue;
             }
-            /* [IR_DEFLOW] A park is transparent to DE -- parked, the pair is
+            /* [de-flow] A park is transparent to DE -- parked, the pair is
                restored; unparked, it was dead on both sides -- so step over the
                whole group rather than let its own push/pop decide. This mirrors
                what the sweep does with `i -= 3`, and the group carries no B/C or
@@ -2004,15 +1884,15 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            did it blind and miscompiled; see gw_fold_byte_global_widens. */
         gw_fold_byte_global_widens(lines, n, drop);
         int b_live = 0, c_live = 0, d_live = 0, e_live = 0;
-        /* [IR_XORA] F-liveness for the `ld a,0` -> `xor a` rewrite. Starts LIVE:
+        /* [xor-a] F-liveness for the `ld a,0` -> `xor a` rewrite. Starts LIVE:
            the buffer end is the end of this function's text, and the walk has
            seen nothing yet. */
         int f_live = 1;
         int do_xora = xora_enabled();
-        /* [IR_BCFLOW] Label table + BC liveness at each label, so a branch can
+        /* [bc-flow] Label table + BC liveness at each label, so a branch can
            be followed instead of assumed to read BC. */
         char **lbl = NULL; char *lb = NULL, *lc = NULL, *lf = NULL;
-        /* [IR_DEFLOW] DE liveness at each label, from the same fixpoint. */
+        /* [de-flow] DE liveness at each label, from the same fixpoint. */
         char *ldl = NULL, *lel = NULL;
         int nlbl = 0, bcflow = bcflow_enabled();
         int deflow = deflow_enabled();
@@ -2038,39 +1918,17 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 }
             }
             /* One fixpoint serves both: DE is computed only when asked for, so
-               IR_DEFLOW=0 leaves the BC/F answers bit-for-bit unchanged. */
+               IR_OFF=de-flow leaves the BC/F answers bit-for-bit unchanged. */
             if (bcflow || deflow)
                 bc_live_at_labels(lines, n, lbl, nlbl, lb, lc, lf,
                                   deflow ? ldl : NULL, deflow ? lel : NULL);
-            if (getenv("IR_BCFLOW_DBG")) {
-                int dead = 0;
-                for (int k = 0; k < nlbl; k++) if (!lb[k] && !lc[k]) dead++;
-                fprintf(stderr, "BCFLOW lines=%d labels=%d bc-dead-labels=%d\n",
-                        n, nlbl, dead);
-            }
         }
-        int de_probe   = de_probe_on();              /* IR_DELIVE_PROBE */
-        if (de_probe) dpb_funcs++;
         int de_verify  = de_sweep_on();              /* IR_DEPARK_SWEEP */
         int de_rewrite = !opt_disabled("de-park");
         int de_sweep   = (de_verify || de_rewrite);
         if (de_verify) dpk_funcs++;
         for (int i = n - 1; i >= 0; i--) {
             if (drop[i]) continue;                 /* collapsed recover: gone */
-            if (de_probe) {                        /* [IR_DELIVE_PROBE] inert */
-                int pp = 0, cls = -1, gen = 0, pj = -1;
-                if (de_park_group(lines, i, &pp)) {
-                    cls = de_probe_class(lines, n, i + 1);
-                    dpb_nslot++; dpb_slot[cls]++;
-                } else if ((pj = de_generic_park(lines, i)) >= 0) {
-                    cls = de_probe_class(lines, n, i + 1);
-                    dpb_ngen++; dpb_gen[cls]++; gen = 1;
-                }
-                if (cls >= 0 && de_probe >= 2)
-                    fprintf(stderr, "  DEPARK %s @%d %-6s span=%d\n",
-                            gen ? "generic" : "slot   ", i, dpb_name[cls],
-                            gen ? i - pj : 3);
-            }
             int poff = 0;
             if (de_sweep && de_park_group(lines, i, &poff)) {
                 int back_dead = (!d_live && !e_live);
@@ -2107,7 +1965,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             }
             char bftgt[64];
             InstrEffects e = instr_effects(lines[i]);   /* single query (composes bc_line_effect) */
-            /* [IR_XORA] f_live here is the answer for the code AFTER line i,
+            /* [xor-a] f_live here is the answer for the code AFTER line i,
                which is exactly what decides whether defining F costs anything.
                Rewrite first, then fold line i into the liveness. */
             if (do_xora && !f_live && !strcmp(lines[i], "\tld\ta,0\n")) {
@@ -2115,11 +1973,11 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 if (nl) { free(lines[i]); lines[i] = nl; }
             }
             /* A call to compiled C code neither reads the flags nor preserves
-               them — the same fact about BC that [IR_BCCALL] rests on, and the
+               them — the same fact about BC that [bc-call] rests on, and the
                same `_sym` discriminator, so an asm-linkage call stays a reader.
                Checked first: xora_line_reads_f calls every branch a reader. */
             if (xline_c_call(lines[i]) && bccall_enabled()) f_live = 0;
-            /* [IR_BCFLOW] An UNCONDITIONAL branch to a label in this function
+            /* [bc-flow] An UNCONDITIONAL branch to a label in this function
                reads no flags — take the target's. A conditional one reads F by
                definition and stays a reader. */
             else if (bcflow && !strchr(lines[i], ',')
@@ -2141,12 +1999,12 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             /* BC is dead at a return; DE is not (result ABI DE:HL) — e.d_read
                already says so, so route both through the same update below. */
             if (boundary) { b_live = c_live = 0; }
-            /* [IR_BCCALL] A branch's successor may read BC; a call to a compiled
+            /* [bc-call] A branch's successor may read BC; a call to a compiled
                C function cannot — see xline_c_call. Everything else (a jump, an
                asm-linkage call, a conditional call) stays conservative. */
             else if (call && xline_c_call(lines[i]) && bccall_enabled())
                           { b_live = c_live = 0; }
-            /* [IR_BCFLOW] A branch to a label in this function is not a black
+            /* [bc-flow] A branch to a label in this function is not a black
                box: take the liveness the fixpoint computed for its target (plus
                the fall-through for a conditional, and B for djnz). */
             else if (call && bcflow
@@ -2168,7 +2026,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 b_live = rb ? 1 : (wb ? 0 : b_live);
                 c_live = rc ? 1 : (wc ? 0 : c_live);
             }
-            /* [IR_DEFLOW] A branch to a label in this function is not a black
+            /* [de-flow] A branch to a label in this function is not a black
                box for DE either: take the liveness the fixpoint computed for its
                target, plus the fall-through for a conditional. A call and a
                `ret` are NOT covered -- both genuinely read DE (argument and
@@ -2253,7 +2111,7 @@ static int retthread_parts(const char *l, char *cc, size_t ccsz, int *bb)
    Placed after the peepholes (needs final text), before relaxation (so the
    inserted `jp` can still become a `jr`).
 
-   DEFAULT-ON; `--opt-disable=tail-merge` or `IR_TAILMERGE=0` opts out,
+   DEFAULT-ON; `--opt-disable=tail-merge` or `IR_OFF=tail-merge` opts out,
    byte-identical to the pre-flip compiler. It is a byte-for-cycle trade: the
    bytes are saved once, the ~10 T of the inserted `jp` is paid per execution.
    Regression: test/suites/long_ir/tailmerge.c. */
@@ -2261,8 +2119,7 @@ static int tm_on = -1;
 static int tail_merge_enabled(void)
 {
     if (tm_on < 0) {
-        const char *e = getenv("IR_TAILMERGE");
-        tm_on = (e && e[0] == '0') ? 0 : !opt_disabled("tail-merge");
+        tm_on = !opt_disabled("tail-merge");
     }
     return tm_on;
 }
@@ -2563,13 +2420,12 @@ verbatim:
 
    Runs after tail merging (whose labels and jumps it can then move) and before
    branch relaxation, which re-sizes the displacements the move changed.
-   DEFAULT-ON; `--opt-disable=block-layout` or `IR_BLAYOUT=0` opts out. */
+   DEFAULT-ON; `--opt-disable=block-layout` or `IR_OFF=block-layout` opts out. */
 static int bl_on = -1;
 static int block_layout_enabled(void)
 {
     if (bl_on < 0) {
-        const char *e = getenv("IR_BLAYOUT");
-        bl_on = (e && e[0] == '0') ? 0 : !opt_disabled("block-layout");
+        bl_on = !opt_disabled("block-layout");
     }
     return bl_on;
 }
@@ -2729,16 +2585,6 @@ static void filter_block_layout(FILE *out, FILE *src)
         for (long j = li; j <= end; j++) claimed[j] = 1;
     }
 
-    if (getenv("IR_BLAYOUT_LOG")) {
-        long nm = 0, njump = 0;
-        for (long i = 0; i < n; i++) {
-            const char *tp; size_t tn;
-            if (bl_uncond_jump(L[i], &tp, &tn)) njump++;
-            if (jmp_to[i] >= 0) nm++;
-        }
-        fprintf(stderr, "BLAYOUT lines=%ld uncond_jumps=%ld moves=%ld\n",
-                n, njump, nm);
-    }
     /* emit: a moved trace replaces its jump, and is skipped where it was */
     int *skip = calloc((size_t)(n > 0 ? n : 1), sizeof *skip);
     if (skip) {
@@ -3088,15 +2934,9 @@ static const BB    *cur_bb;
    Callers must pass an in-range v (the vreg_in_pr_* helpers guard before calling). */
 static PhysReg ir_home_at(const Func *f, int v)
 {
-    PhysReg pr = f->vreg_to_phys[v];
-    /* Ranged residency: the home holds v only within [home_lo, home_hi] (flat
-       op-index). Outside it — or when there is no ambient lowering point
-       (L.ss_cur_g < 0: prologue / assignment-level query) — fall back to the
-       assignment. Whole-function intervals (the default) make this a no-op. */
-    if (pr != IR_PR_SPILL && f->home_lo && L.ss_cur_g >= 0
-        && (L.ss_cur_g < f->home_lo[v] || L.ss_cur_g > f->home_hi[v]))
-        return IR_PR_SPILL;
-    return pr;
+    /* The lowerer's wrapper: supply the ambient point from LowerState and ask
+       the allocator. L.ss_cur_g < 0 means there is no point (prologue). */
+    return ir_home_at_op(f, v, L.ss_cur_g);
 }
 
 /* Framepointer mode predicates.
@@ -3197,7 +3037,7 @@ static int frame_has_saved_iy(const Func *f)
 {
     if (!f || f->is_naked || f->is_interrupt || !f->vreg_to_phys) return 0;
     for (int i = 0; i < f->n_vregs; i++) {
-        int p = f->vreg_to_phys[i];
+        int p = ir_home_assigned(f, i);
         /* ►► ANY whole-pair IY home, not just idx3. In FP MODE the idx2 spare
            IS IY (ir_idx2_reg: frame IX -> spare IY), and IY is callee-saved in
            that ABI exactly as IX is — but this predicate only ever asked about
@@ -3234,7 +3074,7 @@ static int frame_has_saved_althl(const Func *f)
     if (!f || f->is_naked || f->is_interrupt || !f->vreg_to_phys) return 0;
     if (f->idx2_reg != IR_PR_HL_ALT) return 0;
     for (int i = 0; i < f->n_vregs; i++)
-        if (f->vreg_to_phys[i] == IR_PR_HL_ALT) return 1;
+        if (ir_home_assigned(f, i) == IR_PR_HL_ALT) return 1;
     return 0;
 }
 
@@ -3300,7 +3140,7 @@ static int frame_has_saved_ix(const Func *f)
     if (func_has_indirect_call(f)) return 1;   /* fnptr dispatch via idx2 = IX */
     if (f->vreg_to_phys)
         for (int i = 0; i < f->n_vregs; i++) {
-            int p = f->vreg_to_phys[i];
+            int p = ir_home_assigned(f, i);
             if (p == IR_PR_IX || p == IR_PR_IXL || p == IR_PR_IXH) return 1;
         }
     return 0;
@@ -3344,7 +3184,7 @@ static int frameless_ok(const Func *f)
     for (int v = 0; v < f->n_vregs; v++) {
         const VReg *vr = &f->vregs[v];
         if (!(vr->flags & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))) continue;
-        int ph = f->vreg_to_phys[v];
+        int ph = ir_home_assigned(f, v);
         /* The home must be one that CANNOT send the access back to memory: a
            frameless function has no IX, and a PARAM_IN_PLACE's slot is the
            CALLER's frame at (ix+d), so any reload of it reads through a
@@ -3360,9 +3200,7 @@ static int frameless_ok(const Func *f)
            Whole-function BC is what remains. This is the SHORT-TERM narrowing;
            the real fix is to route every frame access to sp when frameless. */
         if (ph != IR_PR_BC) return 0;
-        if (f->home_lo && f->home_hi
-            && (f->home_lo[v] != INT_MIN || f->home_hi[v] != INT_MAX))
-            return 0;
+        if (ir_home_is_ranged(f, v)) return 0;
     }
     return 1;
 }
@@ -3468,7 +3306,7 @@ static int param_caller_off(const Func *f, int vreg_id)
    byte-pair sequence. PARAM_IN_PLACE vregs return their caller-pushed-arg
    offset directly. */
 static void note_slot_use(int v);   /* frame-slot use accounting: fwd (defined with rec state) */
-/* [IR_DEADSTORE] write-context depth: >0 while lowering a store function body,
+/* [dead-store] write-context depth: >0 while lowering a store function body,
    so note_slot_use attributes its slot_off calls (store + guard checks) to the
    write count. Save/restore (not set/clear) because stores nest via
    pending_spill_resolve. */
@@ -3538,9 +3376,7 @@ static void rec_note_violation(const Func *f, int v);  /* require_slot fail */
 static int hr_on = -1;
 static int home_rearb_enabled(void)
 {
-    if (hr_on < 0) { const char *e = getenv("IR_REHOME");
-                     hr_on = (e && e[0] == '0') ? 0
-                           : !opt_disabled("home-rearb"); }
+    if (hr_on < 0) hr_on = !opt_disabled("home-rearb");
     return hr_on;
 }
 
@@ -3575,7 +3411,7 @@ static void require_slot(const Func *f, int vreg_id)
             "`for(i==0; ...)` typo, or passing an uninitialised local). If the "
             "variable is definitely set before use, it is a codegen bug. "
             "Aborting rather than emit a below-frame read.\n",
-            vreg_id, f->vreg_to_phys ? f->vreg_to_phys[vreg_id] : -1,
+            vreg_id, f->vreg_to_phys ? ir_home_assigned(f, vreg_id) : -1,
             f->vregs[vreg_id].width);
     ir_lower_src();
     exit(1);
@@ -3662,13 +3498,12 @@ static void emit_slot_addr_off(FILE *out, const Func *f, int canon_off);
    rather than through hl_about_to_change. */
 static void hl_about_to_change(int v_new);
 
-/* Cross-BB HL slot-address carry (default on; IR_HLADDR_BB=0 reverts). */
+/* Cross-BB HL slot-address carry (default on; IR_OFF=hl-addr-carry reverts). */
 static int hladdr_bb_carry_on(void)
 {
     static int on = -1;
     if (on < 0) {
-        const char *e = getenv("IR_HLADDR_BB");
-        on = (e && *e == '0') ? 0 : 1;
+        on = !opt_disabled("hl-addr-carry");
     }
     return on;
 }
@@ -4073,7 +3908,7 @@ static InstrEffects instr_effects(const char *line)
 RegMask phys_regmask(const Func *f, int v)
 {
     if (v < 0 || !f->vreg_to_phys) return 0;
-    switch (f->vreg_to_phys[v]) {
+    switch (ir_home_assigned(f, v)) {
     case IR_PR_A:                 return IR_R_A;
     case IR_PR_HL:                return IR_R_HL;
     case IR_PR_DE: case IR_PR_E: case IR_PR_D: return IR_R_DE;
@@ -4245,7 +4080,7 @@ static int  *rec_remat;           /* per-vreg: uses rematerialised */
 static int   rec_nv;              /* size of the above (this function) */
 static int   rec_counting;        /* 1 while a final render is instrumented */
 
-/* Frame-slot use accounting (shared by IR_DEADSTORE and IR_DEADFRAME).
+/* Frame-slot use accounting (shared by dead-store and IR_DEADFRAME).
    rec_slotuse[v] counts genuine frame-slot accesses emitted for v (hooked in
    slot_off/slot_ix_off — the two chokepoints every frame-slot load/store passes
    through; stack transients and cache hits don't). A SPILL vreg with a slot but
@@ -4253,7 +4088,7 @@ static int   rec_counting;        /* 1 while a final render is instrumented */
    an all-dead frame is dropped frameless (IR_DEADFRAME). Sound: over-counts from
    non-emit slot_off checks → never falsely dead. */
 static int  *rec_slotuse;
-/* [IR_DEADSTORE, inert] rec_slotwrite[v] counts frame-slot WRITES of v — the
+/* [dead-store, inert] rec_slotwrite[v] counts frame-slot WRITES of v — the
    subset of rec_slotuse[v] emitted by the store functions (store_a_byte/
    store_hl, via note_slot_write). Then reads = rec_slotuse - rec_slotwrite. A
    spill vreg WRITTEN but never READ (rec_slotwrite>0, reads==0) is a dead store:
@@ -4280,7 +4115,7 @@ static char *rec_fh_seen;
 static int   frameprobe_on(void)
 { static int c = -1; if (c < 0) c = getenv("IR_FRAMEPROBE") ? 1 : 0; return c; }
 static int   dsx_on = -1;
-/* [IR_DEADSTORE] dead-spill vreg ids found by the last render's read/write split
+/* [dead-store] dead-spill vreg ids found by the last render's read/write split
    (populated in rec_end, consumed by the driver to mark IR_VREG_DEAD_SPILL and
    re-lower). Per-function; reset at the top of rec_end. */
 static int   ds_dead[512];
@@ -4295,28 +4130,27 @@ static int rec_enabled(void)
     return rec_on;
 }
 
-/* IR_DEADSTORE dead byte-spill elision (DEFAULT-ON). The render's read/write
+/* dead-store dead byte-spill elision (DEFAULT-ON). The render's read/write
    split (rec_end) lists byte spills written but never read; the driver marks
    them, drops the slots, and re-lowers (the value rides A to its readers).
    Pure win both axes (bytes and ticks fall together — dead memory traffic
-   removed). Opt out with IR_DEADSTORE=0 (reproduces pre-flip codegen);
-   IR_DEADSTORE=2 adds the per-slot report. */
-/* Width-2 half of IR_DEADSTORE (dead call-result / word slot stores).
-   Default-on; `IR_DSWORD=0` opts out, leaving the width-1 behaviour that
+   removed). Opt out with IR_OFF=dead-store (reproduces pre-flip codegen);
+   dead-store=2 adds the per-slot report. */
+/* Width-2 half of dead-store (dead call-result / word slot stores).
+   Default-on; `IR_OFF=dead-store-word` opts out, leaving the width-1 behaviour that
    shipped with #10 — the bisect handle for this bug family. */
 static int dsw_on = -1;
 static int dsw_enabled(void)
 {
     if (dsw_on < 0) {
-        const char *e = getenv("IR_DSWORD");
-        dsw_on = (e && e[0] == '0') ? 0 : 1;
+        dsw_on = !opt_disabled("dead-store-word");
     }
     return dsw_on;
 }
 
-/* [IR_DS_SHARE] Refine the coalesced-read veto: block a dead store only when a
+/* [dead-store-share] Refine the coalesced-read veto: block a dead store only when a
    byte-sharing reader never writes its own slot (the channel shape), instead of
-   on any sharing reader at all. Default ON; `IR_DS_SHARE=0` opts out and
+   on any sharing reader at all. Default ON; `IR_OFF=dead-store-share` opts out and
    restores the pre-flip codegen byte-for-byte.
 
    Flipped on after the 391-cell matrix (23 benches x 10 cpus x sp/fp): 0 cells
@@ -4337,8 +4171,7 @@ static int ds_share = -1;
 static int ds_share_on(void)
 {
     if (ds_share < 0) {
-        const char *e = getenv("IR_DS_SHARE");
-        ds_share = (e && e[0] == '0') ? 0 : 1;
+        ds_share = !opt_disabled("dead-store-share");
     }
     return ds_share;
 }
@@ -4346,20 +4179,10 @@ static int ds_share_on(void)
 static int dsx_enabled(void)
 {
     if (dsx_on < 0) {
-        const char *e = getenv("IR_DEADSTORE");
-        dsx_on = !e ? 1 : (e[0] == '0' ? 0 : (e[0] == '2' ? 2 : 1));
+        /* The old "=2" value had no consumer — a plain on/off switch. */
+        dsx_on = !opt_disabled("dead-store");
     }
     return dsx_on;
-}
-
-/* [#13] IR_FLIPCOST report gate (inert): print the frameless-via-sp cost model
-   per framed function — ds_ixaccess (ix+-d accesses = N), the ~11B IX-apparatus
-   save, and the flip verdict. ds_ixaccess==0 = IX dead overhead (zero-cost flip). */
-static int ff_on = -1;
-static int ff_enabled(void)
-{
-    if (ff_on < 0) { const char *e = getenv("IR_FLIPCOST"); ff_on = (e && e[0]) ? 1 : 0; }
-    return ff_on;
 }
 
 static void rec_reset(void)
@@ -4381,8 +4204,7 @@ static void rec_begin(const Func *f)
 {
     rec_reset();
     ds_ixaccess = 0;                  /* [#13] per-render (ix+-d)-access count */
-    if ((!rec_enabled() && !deadframe_on() && !dsx_enabled() && !home_slot_verify_enabled()
-         && !ff_enabled())
+    if ((!rec_enabled() && !deadframe_on() && !dsx_enabled() && !home_slot_verify_enabled())
         || L.ss_phase == 1 || f->n_vregs <= 0)
         return;
     rec_nv = f->n_vregs;
@@ -4455,7 +4277,7 @@ static void rec_note_violation(const Func *f, int v)
 {
     if (!rec_enabled()) return;
     PhysReg pr = (f->vreg_to_phys && v >= 0 && v < f->n_vregs)
-        ? f->vreg_to_phys[v] : IR_PR_SPILL;
+        ? ir_home_assigned(f, v) : IR_PR_SPILL;
     fprintf(stderr, "IR_REC VIOLATION: %s v%d homed in %s (w=%d) unrealizable "
             "— read with no register, no slot, no remat\n",
             f->fn ? ir_sym_name(f->fn) : "?", v, ir_phys_name(pr),
@@ -4469,7 +4291,7 @@ static void rec_note_violation(const Func *f, int v)
 static void rec_end(const Func *f)
 {
     L.frame_fully_dead = 0;
-    ds_ndead = 0;                    /* [IR_DEADSTORE] per-fn dead-spill list reset */
+    ds_ndead = 0;                    /* [dead-store] per-fn dead-spill list reset */
     ds_last_framed = frame_has_saved_fp(f);   /* [#13] */
     if (!rec_counting) { rec_reset(); return; }
     /* Stop counting BEFORE the reports: our own slot_off() calls below must not
@@ -4480,13 +4302,13 @@ static void rec_end(const Func *f)
         for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
             int total = rec_reg[v] + rec_slot[v] + rec_remat[v];
             if (!total) continue;
-            int is_homed = f->vreg_to_phys && f->vreg_to_phys[v] != IR_PR_SPILL;
+            int is_homed = ir_home_assigned(f, v) != IR_PR_SPILL;
             if (!is_homed) continue;
             homed++; ureg += rec_reg[v]; uslot += rec_slot[v]; uremat += rec_remat[v];
             if (rec_reg[v] == 0) cold++;
             if (rec_on >= 2)
                 fprintf(stderr, "IR_REC:   v%d[%s] reg=%d slot=%d remat=%d%s\n",
-                        v, ir_phys_name(f->vreg_to_phys[v]),
+                        v, ir_phys_name(ir_home_assigned(f, v)),
                         rec_reg[v], rec_slot[v], rec_remat[v],
                         rec_reg[v] == 0 ? "  COLD-HOME" : "");
         }
@@ -4535,9 +4357,7 @@ static void rec_end(const Func *f)
                    re-lower read a vreg with neither register nor slot
                    (require_slot abort). Not trustable, same as addr-taken. */
                 int ranged = (f->vregs[v].flags & IR_VREG_CALL_SPLIT)
-                          || (f->home_lo && f->home_hi
-                              && (f->home_lo[v] != INT_MIN
-                                  || f->home_hi[v] != INT_MAX));
+                          || ir_home_is_ranged(f, v);
                 int trustable = w <= 2
                              && !(f->vregs[v].flags & IR_VREG_ADDR_TAKEN)
                              && !ranged;
@@ -4595,92 +4415,7 @@ static void rec_end(const Func *f)
                     tb, trb,
                     rd[0], red[0], rd[1], red[1], rd[2], red[2], rd_w4, red_w4);
         }
-        /* [IR_PARAMRELOAD, INERT] Per-PARAM actual slot READ count from this
-           render — the honest mirage test. The allocator-side census counts raw
-           refs; this counts reloads the lowerer really emitted
-           (rec_slotuse - rec_slotwrite), so a value the belief cache serves
-           shows 0-1 and a genuinely reloaded one shows its true cost. */
-        if (getenv("IR_PARAMRELOAD")) {
-            for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
-                const VReg *vr = &f->vregs[v];
-                if (!(vr->flags & IR_VREG_PARAM)) continue;
-                if (f->vreg_to_phys && f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-                int reads = rec_slotuse[v] - (rec_slotwrite ? rec_slotwrite[v] : 0);
-                if (reads >= 2)
-                    fprintf(stderr, "PARAMRELOAD %s v%d w=%d reads=%d\n",
-                            f->fn ? ir_sym_name(f->fn) : "?", v, vr->width, reads);
-            }
-        }
-        /* [IR_PARAMHOME, INERT] Sizing probe for the param register-home lever. */
-        if (getenv("IR_PARAMHOME")) {
-            int verbose = getenv("IR_PARAMHOME")[0] == '2';
-            /* Bytes per counted read event. The two modes count DIFFERENT
-               things, so the cost has to follow suit or fp reads score double:
-                 sp — one event is a whole operand. `ld hl,N / add hl,sp` (4B)
-                      forms the address once, then the load: +4B for a word
-                      (ld a,(hl) / inc hl / ld h,(hl) / ld l,a), +1B for a byte.
-                 fp — one event is a single (ix+d) byte access, 3B, no setup;
-                      a word operand therefore counts twice and costs 3B twice.
-               Cross-check on ItemCheck: 10 sp events and 20 fp events describe
-               the same ten word loads, and 10*8 vs 20*3 put the two modes in
-               the same range instead of an artificial 2x apart. */
-            int fp = fp_active(f) && !L.cur_frameless;
-            int cost_w = fp ? 3 : 8;      /* per read event, width-2 operand */
-            int cost_b = fp ? 3 : 5;      /* per read event, width-1 operand */
-            int fn_cands = 0, fn_reads = 0, fn_save = 0;
-            for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
-                const VReg *vr = &f->vregs[v];
-                if (!(vr->flags & IR_VREG_PARAM)) continue;
-                if (f->vreg_to_phys && f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-                if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
-                int reads  = rec_slotuse[v] - (rec_slotwrite ? rec_slotwrite[v] : 0);
-                int writes = rec_slotwrite ? rec_slotwrite[v] : 0;
-                if (reads < 2) continue;
-                /* Walk the function once: linear op index, first/last reference
-                   to v, calls between them, and any use as a deref base. */
-                int idx = 0, first = -1, last = -1, deref = 0;
-                int ncall_before_first = 0, ncall_before_last = 0, ncall = 0;
-                for (int b = 0; b < f->n_bbs; b++)
-                    for (int j = 0; j < f->bbs[b].n_ops; j++, idx++) {
-                        const Op *o = &f->bbs[b].ops[j];
-                        if (o->kind == IR_CALL || o->kind == IR_HCALL) ncall++;
-                        int u[16];
-                        int nu = ir_op_uses(o, u, 16);
-                        int refs = (o->dst == v);
-                        for (int k = 0; k < nu && !refs; k++) refs = (u[k] == v);
-                        if (!refs) continue;
-                        if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
-                            && o->mem.kind == IR_MEM_VREG && o->mem.base == v)
-                            deref = 1;
-                        if (first < 0) { first = idx; ncall_before_first = ncall; }
-                        last = idx; ncall_before_last = ncall;
-                    }
-                int calls = (first < 0) ? 0
-                          : ncall_before_last - ncall_before_first;
-                int save = 0;
-                if (vr->width >= 1 && vr->width <= 2) {
-                    int rc = (vr->width == 1) ? cost_b : cost_w;
-                    save = (reads - 1) * rc - 2 * calls;
-                    if (save < 0) save = 0;
-                }
-                fn_cands++; fn_reads += reads; fn_save += save;
-                /* span = ops between first and last reference: a long span is
-                   more likely to lose the register to pressure, so it tempers
-                   `save` without changing it. */
-                fprintf(stderr,
-                        "PARAMHOME %s v%d w=%d reads=%d writes=%d calls=%d "
-                        "span=%d deref=%d save=%d\n",
-                        f->fn ? ir_sym_name(f->fn) : "?", v, vr->width,
-                        reads, writes, calls, (first < 0) ? 0 : last - first,
-                        deref, save);
-            }
-            if (fn_cands || verbose)
-                fprintf(stderr, "PARAMHOME-FN %s mode=%s cands=%d reads=%d "
-                        "save=%d\n",
-                        f->fn ? ir_sym_name(f->fn) : "?", fp ? "fp" : "sp",
-                        fn_cands, fn_reads, fn_save);
-        }
-        /* [IR_DEADSTORE, INERT] Write-only (dead-store) byte-slot report. Uses
+        /* [dead-store, INERT] Write-only (dead-store) byte-slot report. Uses
            the read/write split: reads[v] = rec_slotuse[v] - rec_slotwrite[v].
            Coalescing-aware: readb[p]=1 iff SOME spill covering byte p was read,
            so a shared slot read via a different vreg keeps the store live (the
@@ -4688,7 +4423,7 @@ static void rec_end(const Func *f)
            and NONE of its bytes read-by-others is a genuine dead store. No
            codegen change — this only prints; validates the model before elision. */
         char *readb = dsx_enabled() ? calloc((size_t)fs, 1) : NULL;
-        /* [IR_DS_SHARE] The byte a coalesced reader reads WITHOUT EVER WRITING
+        /* [dead-store-share] The byte a coalesced reader reads WITHOUT EVER WRITING
            IT. `readb` blocks on any sharing reader at all, which is a blanket
            distrust of the slot allocator: ir_slots coalesces only vregs whose
            live ranges do not interfere, so a reader that also STORES its own
@@ -4704,7 +4439,7 @@ static void rec_end(const Func *f)
         char *readb_chan = dsx_enabled() ? calloc((size_t)fs, 1) : NULL;
         if (readb && readb_chan && rec_slotwrite) {
             for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
-                int is_spill = !f->vreg_to_phys || f->vreg_to_phys[v] == IR_PR_SPILL;
+                int is_spill = ir_home_assigned(f, v) == IR_PR_SPILL;
                 int off = is_spill ? f->vreg_spill_slot[v] : -1;
                 if (off < 0 || off >= fs) continue;
                 if (rec_slotuse[v] - rec_slotwrite[v] <= 0) continue;   /* not read */
@@ -4728,7 +4463,7 @@ static void rec_end(const Func *f)
             }
             int nfn = 0;
             for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
-                if (!f->vreg_to_phys || f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                if (!f->vreg_to_phys || ir_home_assigned(f, v) != IR_PR_SPILL) continue;
                 const VReg *vr = &f->vregs[v];
                 int off = f->vreg_spill_slot[v];
                 if (off < 0 || off >= fs) continue;
@@ -4750,7 +4485,7 @@ static void rec_end(const Func *f)
                     if (blockmap[p]) { shared_read = 1; break; }
                 if (shared_read) {
                     if (dsx_on >= 2)
-                        fprintf(stderr, "IR_DEADSTORE:   v%d w=%d slot=%d write-only "
+                        fprintf(stderr, "dead-store:   v%d w=%d slot=%d write-only "
                                 "but slot COALESCED-READ — keep\n", v, w, off);
                     continue;
                 }
@@ -4758,12 +4493,12 @@ static void rec_end(const Func *f)
                 if (ds_ndead < (int)(sizeof ds_dead / sizeof ds_dead[0]))
                     ds_dead[ds_ndead++] = v;
                 if (dsx_on >= 2)
-                    fprintf(stderr, "IR_DEADSTORE:   v%d w=%d slot=%d wr=%d rd=0 "
+                    fprintf(stderr, "dead-store:   v%d w=%d slot=%d wr=%d rd=0 "
                             "DEAD-STORE\n", v, w, off, rec_slotwrite[v]);
             }
-            if (nfn && dsx_on >= 2)   /* report only at IR_DEADSTORE=2 — default-on
+            if (nfn && dsx_on >= 2)   /* report only at dead-store=2 — default-on
                                          must be SILENT (was printing every compile) */
-                fprintf(stderr, "IR_DEADSTORE: %s dead-stores=%d\n",
+                fprintf(stderr, "dead-store: %s dead-stores=%d\n",
                         f->fn ? ir_sym_name(f->fn) : "?", nfn);
         }
         free(readb);
@@ -4776,15 +4511,6 @@ static void rec_end(const Func *f)
        sp-relative (sp-parking / add hl,sp), so a genuine-sp flip is ~zero-cost.
        With ds_ixaccess>0 the flip costs ~+2B per access (sp vs ix), so flip iff
        2*N < save. Reports only; no codegen change. */
-    if (ff_enabled() && frame_has_saved_fp(f)) {
-        int N = ds_ixaccess;
-        int save = 11;                       /* push ix;ld ix,0;add ix,sp;ld sp,ix;pop ix */
-        int cost = 2 * N;
-        fprintf(stderr, "IR_FLIPCOST: %-24s ixacc=%-3d frame=%-3d save=%d cost=%d %s\n",
-                f->fn ? ir_sym_name(f->fn) : "?", N, f->frame_size, save, cost,
-                N == 0 ? "ZERO-COST-FLIP"
-                       : (cost < save ? "FLIP" : "keep"));
-    }
     rec_reset();
 }
 
@@ -4805,14 +4531,13 @@ static void home_slot_verify_mark_defs(const Func *f, const Op *op)
     for (int d = 0; d < nd; d++) {
         int v = defs[d];
         if (v < 0 || v >= home_slot_dirty_nv) continue;
-        PhysReg pr = f->vreg_to_phys[v];
+        PhysReg pr = ir_home_assigned(f, v);
         if ((pr != IR_PR_BC && pr != IR_PR_DE) || f->vreg_spill_slot[v] < 0)
             continue;
         const LiveRange *lr = ir_live_range(f, v);
         if (!lr || lr->start < 0) continue;
         int lo = lr->start, hi = lr->end;
-        if (f->home_lo && f->home_lo[v] > lo) lo = f->home_lo[v];
-        if (f->home_hi && f->home_hi[v] < hi) hi = f->home_hi[v];
+        ir_home_window(f, v, &lo, &hi);
         if (L.ss_cur_g >= lo && L.ss_cur_g <= hi) home_slot_dirty[v] = 1;
     }
 }
@@ -4824,15 +4549,14 @@ static void home_slot_verify_actual(const Func *f, const Op *op,
         || !f->vreg_to_phys || !f->vreg_spill_slot || L.ss_cur_g < 0)
         return;
     for (int v = 0; v < f->n_vregs; v++) {
-        PhysReg pr = f->vreg_to_phys[v];
+        PhysReg pr = ir_home_assigned(f, v);
         if ((pr != IR_PR_BC && pr != IR_PR_DE) || f->vreg_spill_slot[v] < 0)
             continue;
         if (v >= home_slot_dirty_nv || !home_slot_dirty[v]) continue;
         const LiveRange *lr = ir_live_range(f, v);
         if (!lr || lr->start < 0) continue;
         int lo = lr->start, hi = lr->end;
-        if (f->home_lo && f->home_lo[v] > lo) lo = f->home_lo[v];
-        if (f->home_hi && f->home_hi[v] < hi) hi = f->home_hi[v];
+        ir_home_window(f, v, &lo, &hi);
         if (L.ss_cur_g < lo || L.ss_cur_g > hi) continue;
 
         RegMask home = phys_regmask(f, v);
@@ -5785,7 +5509,7 @@ static void emit_prologue(FILE *out, Func *f)
     int prologue_v = -1;
     int prologue_first = -1;
     for (int i = 0; i < f->n_vregs; i++) {
-        if (f->vreg_to_phys[i] != IR_PR_BC) continue;
+        if (ir_home_assigned(f, i) != IR_PR_BC) continue;
         if (!(f->vregs[i].flags & IR_VREG_PARAM_IN_PLACE)) continue;
         const LiveRange *lr = ir_live_range(f, i);
         int first = lr ? lr->start : 0;
@@ -6020,7 +5744,7 @@ static void compute_no_slot_bytes(Func *f)
         if (vr->width != 1) continue;
         if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
                          | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE)) continue;
-        if (f->vreg_to_phys && f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+        if (ir_home_assigned(f, v) != IR_PR_SPILL) continue;
         int n_defs = 0, all_dead = 1;
         for (int b = 0; b < f->n_bbs && all_dead; b++) {
             const BB *bb = &f->bbs[b];
@@ -6055,180 +5779,6 @@ static int op_is_commutative(OpKind kind)
         || kind == IR_OR  || kind == IR_XOR;
 }
 
-/* Promote hot, currently-spilled SINGLE-DEF width-1 vregs to free index-register
-   halves (PR_IYL/IYH/IXL/IXH) — a slotless, clobber-free extra byte home. Purely
-   additive: only takes vregs the allocator left in a slot (IR_PR_SPILL), so it
-   never displaces a register home; a value that can't be placed simply stays in
-   its slot. Safe because:
-   - SINGLE-DEF ⇒ the def dominates every use (SSA), so the half is always valid
-     at a read (no belief/carry machinery needed);
-   - NO calls/asm in the function ⇒ the index reg is never clobbered (the operand
-     loader never stages there either);
-   - index halves only reach BASE-page ops (ld/add/sub/and/or/xor/cp a,iyl) —
-     the CB-page in-place shift paths gate on byte_home_phys, which excludes
-     index halves, so `sla iyl` (which doesn't exist) is never emitted.
-   z80/z80n/ez80 only (index-half ALU). Runs after ir_alloc, before
-   ir_assign_slots (so promoted vregs get needs_slot=0).
-
-   DEFAULT-ON, SP-MODE ONLY (--opt-disable=idxhalf opts out). Homing a byte in an index
-   half CLOBBERS the whole IX/IY, both callee-saved in the z88dk ABI — e.g.
-   l_qsort/l_bsearch hold the comparator fnptr in IY across the comparator call,
-   so a leaf that homes a byte in IYL/IYH must preserve the caller's IY. That is
-   now handled: frame_has_saved_ix / frame_has_saved_iy push/pop the index reg
-   whenever a byte-half home occupies it (sp idx2=IX, idx3=IY). SP MODE ONLY for
-   two reasons: (1) fp barely benefits (idx read ≈ cheap (ix+d) slot); (2) the
-   frame_has_saved_iy +2 param-offset compensation is sp-relative — fp params are
-   (ix+d) and would need separate handling. So we never idxhalf in fp: the value
-   isn't there AND the fp offset path never runs. NET-BYTE gate below: only home
-   when it saves code (in sp the dear `ld hl,N;add hl,sp` slot access makes byte
-   and cycle savings correlate, so net-bytes>0 ⇒ a balanced win; the gate rejects
-   break-even shapes that only pay the +4B IY-save). */
-static int idxhalf_enabled(void)
-{
-    return !opt_disabled("idxhalf");   /* default on; --opt-disable=idxhalf opts out */
-}
-static void assign_idxhalf_homes(Func *f)
-{
-    if (!idxhalf_enabled()) return;                 /* default on; --opt-disable=idxhalf opts out */
-    if (c_framepointer_is_ix != -1) return;         /* SP MODE ONLY (see above) */
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || IS_EZ80())) return;
-    if (!f || f->n_vregs <= 0 || !f->vreg_to_phys) return;
-    /* No calls/asm — else IX/IY would be trashed mid-live-range. */
-    for (int b = 0; b < f->n_bbs; b++)
-        for (int j = 0; j < f->bbs[b].n_ops; j++) {
-            OpKind k = f->bbs[b].ops[j].kind;
-            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) return;
-        }
-    /* Candidate halves — never offer halves of the FRAME register (it's used as
-       a pair by every (ix+d) access, and the frame isn't a vreg so the interval
-       check can't see it), nor of a platform-reserved index register
-       (--reserve-regs-ix/-iy). c_framepointer_is_ix == 1 → IX is the frame,
-       == -1 → sp-mode (no frame). (fp_active is per-function but unreliable here
-       — frame_size isn't set until ir_assign_slots runs after this pass; the
-       global choice is the safe, stable gate.) A non-frame index reg's own
-       tenant (an idx2 counter/param) IS a vreg, so its half availability is
-       decided per byte by live-interval overlap below. */
-    PhysReg halves[4]; int nhalves = 0;
-    if (!c_reserve_iy) {               /* IY never the frame; offer unless reserved */
-        halves[nhalves++] = IR_PR_IYL; halves[nhalves++] = IR_PR_IYH;
-    }
-    if (c_framepointer_is_ix != 1 && !c_reserve_ix) {   /* IX not the frame nor reserved */
-        halves[nhalves++] = IR_PR_IXL; halves[nhalves++] = IR_PR_IXH;
-    }
-    if (nhalves == 0) { return; }
-    /* Per-vreg def count, a DEPTH-WEIGHTED use score (a use in a loop body is
-       worth far more than a straight-line one — a byte compared each inner
-       iteration appears only ONCE statically but runs many times), and a
-       conservative live interval [first,last] in linear op order. Params are
-       live from entry (first=0). ir_op_defs is used so a self-stepped op
-       (defines src[0], not dst) is counted correctly. */
-    int nv = f->n_vregs;
-    int *ndef = calloc((size_t)nv, sizeof(int));
-    long *wuse = calloc((size_t)nv, sizeof(long));   /* depth-weighted use score (ticks) */
-    int *ruse = calloc((size_t)nv, sizeof(int));     /* RAW use count (code-size / net-byte) */
-    int *first = malloc((size_t)nv * sizeof(int));
-    int *last  = malloc((size_t)nv * sizeof(int));
-    if (!ndef || !wuse || !ruse || !first || !last) {
-        free(ndef); free(wuse); free(ruse); free(first); free(last); return;
-    }
-    for (int v = 0; v < nv; v++) { first[v] = INT_MAX; last[v] = -1; }
-    /* Cheap loop-nesting depth per BB (selection ranking only — never affects
-       correctness): count the back-edge spans [target..source] (id-based,
-       contiguous approximation) each BB falls in. f->bbs[].loop_depth is not
-       populated at this stage. */
-    int *bdep = calloc((size_t)f->n_bbs, sizeof(int));
-    if (bdep)
-        for (int i = 0; i < f->n_bbs; i++)
-            for (int s = 0; s < ir_bb_n_succ(&f->bbs[i]); s++) {
-                int t = ir_bb_succ_at(&f->bbs[i], s);
-                if (t < 0 || t > i) continue;             /* back-edge: t <= i */
-                for (int b = t; b <= i && b < f->n_bbs; b++) bdep[b]++;
-            }
-    int g = 0;
-    for (int b = 0; b < f->n_bbs; b++) {
-        int dep = bdep ? bdep[b] : 0;
-        if (dep > 4) dep = 4;
-        long w = 1L << (3 * dep);            /* depth 0→1, 1→8, 2→64, … (~8×/level) */
-        for (int j = 0; j < f->bbs[b].n_ops; j++, g++) {
-            const Op *o = &f->bbs[b].ops[j];
-            int d[8], u[16];
-            int nd = ir_op_defs(o, d, 8);
-            for (int k = 0; k < nd; k++) if (d[k] >= 0 && d[k] < nv) {
-                ndef[d[k]]++;
-                if (g < first[d[k]]) first[d[k]] = g;
-                if (g > last[d[k]])  last[d[k]]  = g;
-            }
-            int un = ir_op_uses(o, u, 16);
-            for (int k = 0; k < un; k++) if (u[k] >= 0 && u[k] < nv) {
-                wuse[u[k]] += w;
-                ruse[u[k]]++;                        /* raw (unweighted) use site count */
-                if (g < first[u[k]]) first[u[k]] = g;
-                if (g > last[u[k]])  last[u[k]]  = g;
-            }
-        }
-    }
-    for (int v = 0; v < nv; v++)
-        if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
-            first[v] = 0;                                   /* live from entry */
-    /* Greedily place the hottest eligible bytes; each into the first candidate
-       half free over its interval (no overlapping vreg on the same half or on
-       the whole pair). Multiple bytes can share a pair (IYL + IYH) or reuse a
-       half's pair across disjoint ranges. */
-    for (;;) {
-        int best = -1;
-        for (int v = 0; v < nv; v++) {
-            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;   /* additive only */
-            if (f->vregs[v].width != 1) continue;
-            /* PARAMs are live-in from the caller with NO def op that writes the
-               half — the incoming value would never reach a slotless index home
-               (and ndef counts only its in-body redefs, hiding this). Exclude. */
-            if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
-                continue;
-            if (ndef[v] != 1) continue;                        /* SSA dominance */
-            if (wuse[v] < 8) continue;                         /* hot: ≥1 loop use */
-            if (last[v] < 0) continue;                         /* dead */
-            /* NET-BYTE gate (sp): home only when the index-half saves code.
-               `save_per` (3) ≈ a dear sp slot byte access (`ld hl,N; add hl,sp;
-               ld a,(hl)` ≈ 5B) − `ld a,iyl` (2B). `ovh` (10) folds the one-time
-               push/pop index-reg save (~4B, frame_has_saved_*) PLUS the setup /
-               move slop a low-access half-home incurs (a byte needing a CB-page
-               shift or an HL transit can't stay in a half — the op-shape term
-               the model lacks). RAW (unweighted) access sites — code size is
-               static, not per-iteration. In sp the byte and cycle savings
-               correlate, so net-bytes>0 tracks the balanced win. Calibrated by
-               sweep: home iff RAW accesses ≥ 4 — keeps hot-accumulator shapes,
-               rejects break-even shapes that only pay the save. */
-            {
-                long acc = (long)ndef[v] + ruse[v];
-                if (acc * 3 - 10 <= 0) continue;
-            }
-            if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
-                continue;
-            if (best < 0 || wuse[v] > wuse[best]) best = v;
-        }
-        if (best < 0) break;
-        int placed = 0;
-        for (int h = 0; h < nhalves && !placed; h++) {
-            PhysReg H = halves[h];
-            PhysReg pair = (H == IR_PR_IYL || H == IR_PR_IYH) ? IR_PR_IY : IR_PR_IX;
-            int conflict = 0;
-            for (int u = 0; u < nv && !conflict; u++) {
-                PhysReg pu = f->vreg_to_phys[u];
-                if (pu != H && pu != pair) continue;   /* same half, or full-pair tenant */
-                int s = first[best] > first[u] ? first[best] : first[u];
-                int e = last[best]  < last[u]  ? last[best]  : last[u];
-                if (s <= e) conflict = 1;              /* intervals overlap */
-            }
-            if (!conflict) { f->vreg_to_phys[best] = H; placed = 1; }
-        }
-        if (!placed) {
-            /* No half free over its range — mark ineligible so the scan
-               advances (keep it spilled). */
-            ndef[best] = 0;
-        }
-    }
-    free(ndef); free(wuse); free(ruse); free(first); free(last); free(bdep);
-}
 
 int ir_lower_func(FILE *out, Func *f)
 {
@@ -6380,7 +5930,6 @@ int ir_lower_func(FILE *out, Func *f)
            and slot sizing (which reads the now-narrowed widths). */
         int ivnarrow = ir_opt_narrow_iv(f);
         int narrow  = ir_opt_narrow_byte(f);
-        ir_opt_cmpsign_probe(f);        /* [IR_CMPSIGN_PROBE] inert */
         ir_opt_cmp_unsign(f);           /* drop the signed-compare sign tail */
         /* narrow_byte turns promoting CONV_SX|ZX operands into
            byte-identity copies; propagate them away (else they spill to a
@@ -6430,7 +5979,6 @@ int ir_lower_func(FILE *out, Func *f)
     ir_compute_op_liveness(f);
     ir_compute_live_ranges(f);
     ir_alloc(f);
-    assign_idxhalf_homes(f);
     compute_no_slot_bytes(f);
 
     /* [IR_BYTE_REMAT] Byte-remat table: a width-1 vreg whose SINGLE def is a
@@ -6550,7 +6098,7 @@ int ir_lower_func(FILE *out, Func *f)
                     other_stack_param = 1; break;
                 }
         if (fc >= 0 && !other_stack_param
-            && f->vreg_to_phys && f->vreg_to_phys[fc] == IR_PR_SPILL) {
+            && ir_home_assigned(f, fc) == IR_PR_SPILL) {
             int w = f->vregs[fc].width;
             if (w == 1 || w == 2 || w == 4)
                 f->vregs[fc].flags |= IR_VREG_AUTOPUSH;
@@ -6600,7 +6148,7 @@ int ir_lower_func(FILE *out, Func *f)
            safe to treat as the plain symbol-address constant it is. */
         int *store_base_hard = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
                                       sizeof(int));
-        /* remat-LEA is gated to CALLLESS functions (see the [IR_REMAT_LEA] note):
+        /* remat-LEA is gated to CALLLESS functions (see the [remat-lea] note):
            recomputing a frame-slot address mid-call-argument-marshalling would need
            cur_sp_adjust to reflect the already-pushed args, and a &local passed to a
            call is the concrete failure (sortbench qsort_rec's cmp(&v[j],&pivot)). A
@@ -6658,7 +6206,7 @@ int ir_lower_func(FILE *out, Func *f)
                     else if (o->kind == IR_LD_SYM && o->mem.sym
                              && !ns_sym_bails(o->mem.sym))
                         rd = o;
-                    /* [IR_REMAT_LEA] Frame-slot address (&local) rematerialises:
+                    /* [remat-lea] Frame-slot address (&local) rematerialises:
                        recompute at each use (emit_remat_word: `ld hl,slot_off+
                        cur_sp_adjust; add hl,sp`) instead of spilling+reloading — the
                        offset is fixed per function and cur_sp_adjust is tracked, so
@@ -6680,7 +6228,7 @@ int ir_lower_func(FILE *out, Func *f)
                          ez80-SP keeps it: sp addressing is dear there, so it is a pure
                          win (−117B, −6.6% ticks).
                        Store-base LEAs keep their slot (below). Default-on;
-                       IR_REMAT_LEA=0 opts out. */
+                       IR_OFF=remat-lea opts out. */
                     else if (o->kind == IR_LEA && o->src[0] >= 0 && !func_has_call
                              && ir_home_at(f, o->dst) != IR_PR_STACK
                              && !(IS_EZ80() && fp_active(f))
@@ -6718,37 +6266,6 @@ int ir_lower_func(FILE *out, Func *f)
        (distinct from the pre-lower IR_DUMP — reflects the allocator's view). */
     if (getenv("IR_DUMP_ALLOC"))
         ir_dump_func(stderr, f);
-    /* [IR_ADDRRES_PROBE, INERT] Sizing for address-temp residency: a computed
-   address spilled to a slot and reloaded for its own deref. */
-    if (getenv("IR_ADDRRES_PROBE")) {
-        for (int v = 0; v < f->n_vregs; v++) {
-            int derefs = 0, stores = 0, minoff = 1 << 30, maxoff = -(1 << 30);
-            for (int b = 0; b < f->n_bbs; b++)
-                for (int j = 0; j < f->bbs[b].n_ops; j++) {
-                    const Op *o = &f->bbs[b].ops[j];
-                    if ((o->kind != IR_LD_MEM && o->kind != IR_ST_MEM)
-                        || o->mem.kind != IR_MEM_VREG || o->mem.base != v)
-                        continue;
-                    if (o->kind == IR_LD_MEM) derefs++; else stores++;
-                    if (o->mem.offset < minoff) minoff = o->mem.offset;
-                    if (o->mem.offset > maxoff) maxoff = o->mem.offset;
-                }
-            if (derefs + stores < 2) continue;      /* one access needs no residency */
-            const char *home = "spill";
-            switch (f->vreg_to_phys[v]) {
-            case IR_PR_BC: home = "BC"; break;
-            case IR_PR_DE: home = "DE"; break;
-            case IR_PR_HL: home = "HL"; break;
-            case IR_PR_IX: home = "IX"; break;
-            case IR_PR_IY: home = "IY"; break;
-            default: break;
-            }
-            fprintf(stderr, "ADDRRES %s v%d ld=%d st=%d span=%d home=%s%s\n",
-                    f->fn ? ir_sym_name(f->fn) : "?", v, derefs, stores,
-                    (maxoff >= minoff) ? maxoff - minoff : 0, home,
-                    (f->vregs[v].flags & IR_VREG_PARAM) ? " param" : "");
-        }
-    }
     /* Bumped once per function — both lowering passes (when lazy spill
        does two) share the same func label prefix. */
     L.func_emit_idx++;
@@ -6875,8 +6392,7 @@ int ir_lower_func(FILE *out, Func *f)
        formation needs slots + bb_alias, so it's decided here with the SAME
        compute_home_region the render uses. No region ⇒ restore the saved
        pre-pick allocation and re-slot, reverting to baseline. */
-    int *wh_prepick = ir_alloc_take_word_home_prepick();
-    if (wh_prepick) {
+    if (ir_alloc_word_home_picked()) {
         if (f->word_home_vreg >= 0) {
             int wlo = -1, whi = -1;
             g_hc.home_is_word = 1;
@@ -6889,16 +6405,12 @@ int ir_lower_func(FILE *out, Func *f)
             g_hc.home_is_word = 0;
             g_hc.func_whome = -1;
             g_hc.de_home = -1;
-            if (wlo < 0) {
-                memcpy(f->vreg_to_phys, wh_prepick,
-                       (size_t)f->n_vregs * sizeof(int));
-                f->word_home_vreg = -1;
-                f->de_home_general = 0;
-                f->de_home_is_ptr = 0;
-                ir_assign_slots(f);
-            }
+            /* No region formed: the render cannot keep the promise the pick
+               made, so reject it. The allocator reverts its own plan. */
+            if (wlo < 0)
+                ir_alloc_word_home_reject(f);
         }
-        free(wh_prepick);
+        ir_alloc_word_home_done();
     }
 
     /* === Pass driver ===
@@ -6918,7 +6430,7 @@ int ir_lower_func(FILE *out, Func *f)
     int *bb_hl_out_p1 = NULL;
     FILE *rout;
     int df_retry_done = 0;   /* dead-frame elision: at most one re-lower */
-    int ds_retry_done = 0;   /* [IR_DEADSTORE] dead byte-spill elision: one re-lower */
+    int ds_retry_done = 0;   /* [dead-store] dead byte-spill elision: one re-lower */
     int hd_retry_done = 0;   /* [home-demote] unrealizable home: one re-lower */
     /* [IR_HOMEMAP] Inert: dump every vreg's home, slot and residency window.
        hr_recoverability_verify only compares vregs that BOTH carry a pair/byte
@@ -6926,14 +6438,13 @@ int ir_lower_func(FILE *out, Func *f)
        used as SCRATCH. This shows the raw map so the two can be told apart. */
     if (getenv("IR_HOMEMAP")) {
         for (int v = 0; v < f->n_vregs; v++) {
-            PhysReg pr = f->vreg_to_phys ? f->vreg_to_phys[v] : IR_PR_SPILL;
+            PhysReg pr = ir_home_assigned(f, v);
             const LiveRange *lr = ir_live_range(f, v);
             fprintf(stderr, "HOMEMAP %-16s v%-4d phys=%-6s slot=%-5d "
                     "home=[%d,%d] live=[%d,%d] w=%d flags=%#x\n",
                     f->fn ? ir_sym_name(f->fn) : "?", v, ir_phys_name(pr),
                     f->vreg_spill_slot ? f->vreg_spill_slot[v] : -1,
-                    f->home_lo ? f->home_lo[v] : -1,
-                    f->home_hi ? f->home_hi[v] : -1,
+                    ir_home_lo_of(f, v), ir_home_hi_of(f, v),
                     lr ? lr->start : -1, lr ? lr->end : -1,
                     f->vregs[v].width, f->vregs[v].flags);
         }
@@ -7096,14 +6607,8 @@ int ir_lower_func(FILE *out, Func *f)
         int demoted = 0;
         for (int i = 0; i < hd_nbad; i++) {
             int v = hd_bad[i];
-            if (v < 0 || v >= f->n_vregs) continue;
-            if (f->vreg_to_phys) f->vreg_to_phys[v] = IR_PR_SPILL;
+            if (!ir_alloc_demote_home(f, v)) continue;
             if (home_rearb_enabled()) ir_alloc_veto_add(v);
-            /* These three all suppress a slot; the point is to get one. */
-            f->vregs[v].flags &= ~(IR_VREG_NO_SLOT | IR_VREG_DEAD_SPILL
-                                   | IR_VREG_PARAM_IN_PLACE);
-            if (f->home_lo) f->home_lo[v] = 0;
-            if (f->home_hi) f->home_hi[v] = INT_MAX;
             demoted++;
         }
         if (demoted) {
@@ -7126,7 +6631,7 @@ int ir_lower_func(FILE *out, Func *f)
             goto deadframe_retry;
         }
     }
-    /* [IR_DEADSTORE] Dead byte-spill elision: the render's read/write split
+    /* [dead-store] Dead byte-spill elision: the render's read/write split
        (rec_end) listed byte spills WRITTEN but never READ (ds_dead), coalescing-
        checked. Mark them IR_VREG_DEAD_SPILL, recompute slots (ir_assign_slots
        drops them → frame shrinks), and re-lower — the store helper skips the
@@ -7284,18 +6789,17 @@ int ir_lower_func(FILE *out, Func *f)
     return rc;
 }
 
-/* [#13 frameless-via-sp flip, opt-in IR_SPFLIP] Lower f fp for real (buffered),
+/* [#13 frameless-via-sp flip, opt-in sp-flip] Lower f fp for real (buffered),
    read ds_ixaccess/ds_last_framed; for an ix-frame-dead fn re-lower a pristine
    sp CLONE and emit that. Excludes `main` + IR_SPEXCL (bisect). */
 static int spflip_enabled(void)
 {
     static int v = -1;
     if (v < 0) {
-        const char *e = getenv("IR_SPFLIP");
-        /* DEFAULT-ON (frameless-via-sp costed flip, fp mode only). Opt out with
-           IR_SPFLIP=0 (matches the IR_DEADSTORE=0 convention). Inert unless
-           c_framepointer_is_ix==1, so default/sp builds are unaffected. */
-        v = (e && strcmp(e, "0") == 0) ? 0 : 1;
+        /* DEFAULT-ON (frameless-via-sp costed flip, fp mode only). Inert
+           unless c_framepointer_is_ix==1, so default/sp builds are
+           unaffected. Opt out with --opt-disable=sp-flip or IR_OFF=sp-flip. */
+        v = !opt_disabled("sp-flip");
     }
     return v;
 }
@@ -7321,19 +6825,6 @@ int ir_lower_func_flip(FILE *out, Func *f)
         return ir_lower_func(out, f);
     const char *nm = f->fn ? ir_sym_name(f->fn) : "";
     int excluded = (strcmp(nm, "main") == 0);
-    /* IR_SPINC (comma list): if set, flip ONLY names containing a listed token. */
-    const char *inc = getenv("IR_SPINC");
-    if (!excluded && inc && inc[0]) {
-        int hit = 0; char buf[512]; strncpy(buf, inc, sizeof buf - 1); buf[sizeof buf-1]=0;
-        for (char *t = strtok(buf, ","); t; t = strtok(NULL, ","))
-            if (strstr(nm, t)) { hit = 1; break; }
-        if (!hit) excluded = 1;
-    }
-    /* IR_SPEXCL (comma list): exclude names containing any listed token. */
-    if (!excluded) { const char *ex = getenv("IR_SPEXCL");
-        if (ex && ex[0]) { char buf[512]; strncpy(buf, ex, sizeof buf-1); buf[sizeof buf-1]=0;
-            for (char *t = strtok(buf, ","); t; t = strtok(NULL, ","))
-                if (strstr(nm, t)) { excluded = 1; break; } } }
     if (excluded) return ir_lower_func(out, f);
     Func *spc = ir_clone_func(f);
     FILE *fpbuf = tmpfile();
@@ -7485,7 +6976,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     g_hc.de_home = -1;          /* set by the orchestrator's DE-home decision */
     for (int v = 0; v < f->n_vregs; v++)
         if (f->vreg_to_phys
-            && byte_home_slotbacked(f->vreg_to_phys[v])) { L.cur_func_ehome = v; break; }
+            && byte_home_slotbacked(ir_home_assigned(f, v))) { L.cur_func_ehome = v; break; }
     /* Word DE-home (--word-resident): a width-2 loop accumulator homed in DE.
        Mutually exclusive with a byte E/D-home (allocator gives up the word home
        when DE's low half is taken), so it reuses the same residency machinery
@@ -7797,7 +7288,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            below). Skipped when the value carry took HL — the two are mutually
            exclusive, since cache_hl_slot_addr clears rs.hl and
            hl_about_to_change clears the address — and when a home exit-flush
-           already clobbered HL. IR_HLADDR_BB=0 opts out. */
+           already clobbered HL. IR_OFF=hl-addr-carry opts out. */
         if (carry < 0 && !hl_clobbered_at_entry && bb_hl_addr_out
             && hladdr_bb_carry_on()) {
             int addr_carry = -2;
@@ -7830,7 +7321,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 if (acarry == -2) acarry = v;
                 else if (acarry != v) { acarry = -1; break; }
             }
-            if (acarry >= 0 && !getenv("IR_NO_A_CARRY") && bb->live_in
+            if (acarry >= 0 && bb->live_in
                 && ir_bitset_get((const BitSet *)bb->live_in, acarry))
                 cache_a(acarry);
             else
@@ -8596,7 +8087,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 verify_buf[verify_len] = 0;
                 ir_verify_op(f, op, verify_buf);
             }
-            /* [IR_CALLSPLIT] A def of a call-split value OUTSIDE its BC span
+            /* [call-split] A def of a call-split value OUTSIDE its BC span
                writes the slot (its canonical home) but does NOT update BC, so a
                BC belief left over from the span now LIES (holds the pre-def
                value). Drop it so a later out-of-span read reloads from the

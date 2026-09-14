@@ -134,7 +134,7 @@ static option  sccz80_opts[] = {
     { 0, "dataseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the data section name", &c_data_section, NULL, 0 },
     { 0, "initseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the initialisation section name", &c_init_section, NULL, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, NULL, 0 },
-    { 0, "opt-disable", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "=<list> Disable named optimiser passes (comma-separated). AST passes: all, fold, prop, simplify, typecheck, compoundify, strength-reduce, cse, cse-synth, licm, dse, dead-code, thread-jumps, demote-poststep, loop-reverse. IR/lowering gates by name, e.g. lra, bc-pack, bc-evict, de-home, ivsr, lftr, addr-cse, label-elide, lazy-spill, remat, idx2, idx3, gpderef, declean (see opt_disabled call sites). pattern:<name> disables one IR pattern-matcher entry. `all` disables every optimisation. Useful for bisecting miscompiles.", NULL, opt_disable, 0 },
+    { 0, "opt-disable", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "=<list> Disable named optimisations (comma-separated). `all` disables every one; pattern:<name> disables one IR pattern-matcher entry. Every name is listed and described in src/80cc/OPTIONS.md; the same registry is reachable as IR_OFF=<list> in the environment, which is how the corpus scans measure it. Useful for bisecting miscompiles.", NULL, opt_disable, 0 },
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "(inert) Accepted for --math16 alias / sccz80-family CLI compatibility; no effect in the IR back end", NULL, opt_code_speed_inert, 0 },
     { 0, "ast-print", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Build the AST per function, print it to stderr, and skip code generation", &c_ast_print, NULL, 0 },
     { 0, "ast-print-types", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Decorate the AST print with type/qualifier/attribute info; implies --ast-print", &c_ast_print_types, NULL, 0 },
@@ -956,10 +956,36 @@ static char *ir_opt_disabled_names[80];
 static int   n_ir_opt_disabled;
 static int   ir_opt_disable_all;
 
+static void ir_opt_disable_add(const char *name, size_t len);
+
+/* `IR_OFF=name,name` — the same registry as --opt-disable, reachable from the
+   environment. The corpus and tick scans invoke the compiler as `env VAR=v zcc`
+   and cannot pass a flag, which is the only reason the back end grew a private
+   `IR_<FEATURE>=0` opt-out per optimisation. One registry, two front doors:
+   the flag for a user, the variable for a measurement. */
+static void ir_opt_disable_env(void)
+{
+    static int done;
+    if (done) return;
+    done = 1;
+    const char *e = getenv("IR_OFF");
+    if (!e) return;
+    while (*e) {
+        const char *c = e;
+        while (*c && *c != ',') c++;
+        if (c > e) {
+            if (c - e == 3 && strncmp(e, "all", 3) == 0) ir_opt_disable_all = 1;
+            else ir_opt_disable_add(e, (size_t)(c - e));
+        }
+        e = *c ? c + 1 : c;
+    }
+}
+
 /* Non-zero if the named IR/lowering optimisation was disabled on the command
-   line (or `--opt-disable=all`). Called from the IR passes / lowerer. */
+   line, in IR_OFF, or by `all` in either. Called from the IR passes / lowerer. */
 int opt_disabled(const char *name)
 {
+    ir_opt_disable_env();
     if (ir_opt_disable_all) return 1;
     for (int i = 0; i < n_ir_opt_disabled; i++)
         if (strcmp(ir_opt_disabled_names[i], name) == 0) return 1;

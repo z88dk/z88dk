@@ -119,3 +119,51 @@ if the frame accesses it removes outweigh the save-around-call bytes it adds
 (accesses-saved·per-access-cost > Σ save/restore cost over the window's clobbers). Ticks are
 a hard guardrail (no regression), not the objective. Self-limits ranging to the values that
 actually pay off.
+
+## Working language
+
+Terms for the state of the back end itself — what is live, who owns it, and what
+may be deleted. *Gate* was one word for four things with four different fates;
+these names separate them.
+
+**Owner** (of a piece of state):
+The single code location permitted to *write* a given fact. Home assignment has one
+owner (`ir_alloc`); a second writer elsewhere is a defect, not a shortcut. Reading is
+unrestricted; writing is not.
+_Avoid_: manager, handler (neither says who may write).
+
+**Probe**:
+An inert diagnostic that answers one stated question and emits no code. A probe names
+its question when it is added and is deleted when the question is answered; the
+measurement survives in its handover or ADR, and the code survives as a patch file.
+_Avoid_: gate, flag.
+
+**Parked feature**:
+Behaviour that is built, default-off, and not currently shipping. It is deleted unless
+it earns an index row — a status, a date, and the named next experiment it serves.
+Parking is a decision with an expiry date, not a resting state.
+_Avoid_: opt-in, experimental (neither implies the expiry).
+
+**Opt-out**:
+The off switch for a *shipped, default-on* behaviour, kept so a future regression can be
+bisected by flipping one thing. There is one opt-out mechanism for the whole back end,
+parsed once into the options snapshot — never a bespoke `getenv` per behaviour.
+_Avoid_: gate, toggle.
+
+**Verifier**:
+A permanent correctness check over internal state (home, clobber, park, interval). It is
+not a probe: it answers no question and is never swept. It may be off by default for
+compile time, but it is never deleted.
+
+**Refutation**:
+A lever that was measured and rejected, recorded durably so it is not re-attempted. It is
+neither an architecture decision nor a bench figure: it is written as a `Rejected` ADR
+stating what was tried, why it fails, and what would have to change to reopen it. The
+numbers stay in `BENCH_MATRIX.txt`.
+_Avoid_: dead end, failed experiment (neither says where it is written down).
+
+**Index row**:
+The entry in `DESIGN_INDEX.md` that keeps a probe, parked feature, or plan alive: owner
+area, status (`active` / `parked` / `refuted` / `shipped` / `historical`), date last
+checked, evidence link, and successor. No row means the thing is deleted. The index is
+the only file that states the current next action.

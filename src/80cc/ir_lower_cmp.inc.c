@@ -4,14 +4,14 @@
    etc.): plain z80, z80n, ez80. NOT z180 (undoc index-half opcodes trap), NOT
    kc160 (z80asm rejects `iyl`/`iyh` as illegal identifiers), Rabbit (no index
    halves), 808x/gbz80 (no index registers). */
-/* [IR_CMPK] Byte-wise width-2 compare against a constant: keeps HL and DE free
-   where `sbc hl,de` clobbers both. Default on; IR_CMPK=0 opts out.
+/* [cmp-k] Byte-wise width-2 compare against a constant: keeps HL and DE free
+   where `sbc hl,de` clobbers both. Default on; IR_OFF=cmp-k opts out.
    808x/gbz80 already lowered the compare byte-wise but still staged the constant
    into DE via load_binop_operands; the immediate form frees it there too. */
 static int cmpk_enabled(void)
 {
     static int v = -1;
-    if (v < 0) { const char *e = getenv("IR_CMPK"); v = (e && e[0] == '0') ? 0 : 1; }
+    if (v < 0) v = !opt_disabled("cmp-k");
     return v;
 }
 
@@ -349,7 +349,7 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
        what lets a loop-invariant stay resident (sieve's inner loop reloaded `i`
        from the stack every iteration purely because DE was the compare's).
        Reads the operand where it already lives (cmp_byte_src). The low-byte-zero
-       case above is shorter still, so it goes first. IR_CMPK. */
+       case above is shorter still, so it goes first. cmp-k. */
     if ((op->kind == IR_CMP_ULT || op->kind == IR_CMP_UGE)
         && cmpk_enabled()
         && op->src[0] >= 0 && op->src[1] == -1 && op->imm_sym == NULL
@@ -938,28 +938,6 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
             uint8_t b1 = (uint8_t)((k >> 8) & 0xff);
             uint8_t b2 = (uint8_t)((k >> 16) & 0xff);
             uint8_t b3 = (uint8_t)((k >> 24) & 0xff);
-            /* [PoC measure, IR_INPLACE_CMP] in-place slot-coherent long==const:
-               XOR each SLOT byte against the const, avoiding load_to_dehl. */
-            if (getenv("IR_INPLACE_CMP") && fp_active(f) && op->src[0] >= 0
-                && !vreg_is_pr_dehl(f, op->src[0])
-                && !vreg_is_pr_de(f, op->src[0]) && !vreg_in_pr_bc(f, op->src[0])
-                && slot_off(f, op->src[0]) >= 0
-                && L.rs.dehl != op->src[0] && L.rs.de != op->src[0]
-                && L.rs.hl != op->src[0] && L.rs.bc != op->src[0]
-                && !(L.lazy_spill_on && L.pending_spill_v == op->src[0])) {
-                int ixo = slot_ix_off(f, op->src[0]);
-                if (fp_offset_fits(ixo) && fp_offset_fits(ixo + 3)) {
-                    const uint8_t bb[4] = { b0, b1, b2, b3 };
-                    for (int i = 0; i < 4; i++) {
-                        emit(out, "ld\ta,(%s%+d)", frame_reg(), ixo + i);
-                        if (bb[i]) emit(out, "xor\t%u", (unsigned)bb[i]);
-                        if (i == 0) emit(out, "ld\tc,a");
-                        else { emit(out, "or\tc"); if (i < 3) emit(out, "ld\tc,a"); }
-                    }
-                    invalidate_a_cache();
-                    goto eqne_done;
-                }
-            }
             load_to_dehl(out, f, op->src[0]);
             emit(out, "ld\ta,l");
             if (b0) emit(out, "xor\t%u", (unsigned)b0);
@@ -1027,7 +1005,6 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
             emit(out, "xor\th");
             emit(out, "or\tc");
         }
-    eqne_done:
         invalidate_hl_bc();
         if (g_hc.branch_test_kind != 0) {
             int br_true = (g_hc.branch_test_kind == IR_BR_COND);
