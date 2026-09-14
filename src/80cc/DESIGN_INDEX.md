@@ -23,10 +23,20 @@ enforced by a script. What remains is optimisation work, and the order matters:
    and including the **opportunity cost** of the claim it displaces — see
    ADR 0035 for why two sound corrections both made the output worse without
    it. It gates ADR 0021, ADR 0028 **and** ADR 0027.
+
+   First attempt refused: ADR 0036 charged a param eviction for the
+   framelessness it costs. Its apparent −229 bytes came from firing in **sp
+   mode**, where there is no frame to save; correctly scoped it is inert. Two
+   lessons carried forward — a size claim must name the file set it covers
+   (`long_ir/leaimm` regressed 17 bytes *outside* the 720-cell matrix), and a
+   function under an **sp-flip trial** is allocated with the frame flag
+   deliberately flipped, so any "what mode is this?" test during allocation must
+   distinguish the real function from a clone.
 3. **Then `IR_TIGHT_HOMES`** (ADR 0027). Investigated 2026-09-14: its
    byte-identity failure is **not** a latent miscompile — it is the allocator
    taking newly-visible claims without pricing what they displace. It follows
-   the ledger rather than preceding it.
+   the ledger rather than preceding it. On the `md5` witness the worse code is
+   the **sp-flip clone's** allocation, not the fp one (ADR 0036) — start there.
 4. Then stages 2 and 3 of the ranging arc (ADR 0017).
 
 ### Background work, when there is time
@@ -107,7 +117,7 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | Gate | Question | Retire when |
 | --- | --- | --- |
 | `IR_GRAPH_PROBE` | is the capture gap in proposal or in selection? | the step A1 cost ledger answers it per claim |
-| `IR_LEDGER` | does the BC evict decision compare the right numbers? | **answered in part** (ADR 0035): both denominations agree and both under-price a `PARAM_IN_PLACE` incumbent, because its slot cost depends on a frame mode allocation does not know. Keep until the ledger lands |
+| `IR_LEDGER` | does the BC evict decision compare the right numbers? | **partly** (ADR 0035): both denominations agree and both under-price something — but ADR 0036 rules out the frameless term as the explanation. Keep while the ledger is built |
 
 | `IR_BCVETO_PROBE` | what does the BC veto turn away? | the veto becomes a cost term |
 | `IR_PREPUSH_PROBE` | which calls does the pre-push hazard cover? | — |
