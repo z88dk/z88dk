@@ -315,7 +315,7 @@ void ArrayRefExpr::accept(ASTVisitor& v) {
         v.visit(*this);
         // accept children
         for (auto& e : indices) {
-            e->accept(v);
+            v.walk_expr(e);
         }
         v.leave(*this);
     }
@@ -350,13 +350,9 @@ void SliceExpr::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        base->accept(v);
-        if (from) {
-            from->accept(v);
-        }
-        if (to) {
-            to->accept(v);
-        }
+        v.walk_expr(base);
+        v.walk_expr(from);
+        v.walk_expr(to);
         v.leave(*this);
     }
 }
@@ -385,7 +381,7 @@ void UnaryExpr::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        operand->accept(v);
+        v.walk_expr(operand);
         v.leave(*this);
     }
 }
@@ -416,8 +412,8 @@ void BinaryExpr::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        lhs->accept(v);
-        rhs->accept(v);
+        v.walk_expr(lhs);
+        v.walk_expr(rhs);
         v.leave(*this);
     }
 }
@@ -461,7 +457,7 @@ void BasicFuncCallExpr::accept(ASTVisitor& v) {
         v.visit(*this);
         // accept children
         for (auto& e : args) {
-            e->accept(v);
+            v.walk_expr(e);
         }
         v.leave(*this);
     }
@@ -494,7 +490,7 @@ void ProcCallExpr::accept(ASTVisitor& v) {
         v.visit(*this);
         // accept children
         for (auto& e : args) {
-            e->accept(v);
+            v.walk_expr(e);
         }
         v.leave(*this);
     }
@@ -527,7 +523,7 @@ void FnCallExpr::accept(ASTVisitor& v) {
         v.visit(*this);
         // accept children
         for (auto& e : args) {
-            e->accept(v);
+            v.walk_expr(e);
         }
         v.leave(*this);
     }
@@ -620,8 +616,8 @@ void LetStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        lhs->accept(v);
-        rhs->accept(v);
+        v.walk_expr(lhs);
+        v.walk_expr(rhs);
         v.leave(*this);
     }
 }
@@ -656,7 +652,7 @@ void DimStmt::accept(ASTVisitor& v) {
         // accept children
         for (auto& item : items) {
             for (auto& dim : item.dims) {
-                dim->accept(v);
+                v.walk_expr(dim);
             }
         }
         v.leave(*this);
@@ -705,9 +701,9 @@ void IfStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        condition->accept(v);
-        v.rewrite_stmt_list(then_stmts);
-        v.rewrite_stmt_list(else_stmts);
+        v.walk_expr(condition);
+        v.walk_stmts(then_stmts);
+        v.walk_stmts(else_stmts);
         v.leave(*this);
     }
 }
@@ -740,8 +736,8 @@ void RepeatStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        v.rewrite_stmt_list(body);
-        condition->accept(v);
+        v.walk_stmts(body);
+        v.walk_expr(condition);
         v.leave(*this);
     }
 }
@@ -775,8 +771,8 @@ void WhileStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        condition->accept(v);
-        v.rewrite_stmt_list(body);
+        v.walk_expr(condition);
+        v.walk_stmts(body);
         v.leave(*this);
     }
 }
@@ -817,10 +813,10 @@ void ForStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        start_expr->accept(v);
-        end_expr->accept(v);
-        step_expr->accept(v);
-        v.rewrite_stmt_list(body);
+        v.walk_expr(start_expr);
+        v.walk_expr(end_expr);
+        v.walk_expr(step_expr);
+        v.walk_stmts(body);
         v.leave(*this);
     }
 }
@@ -886,7 +882,7 @@ void DefProcStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        v.rewrite_stmt_list(body);
+        v.walk_stmts(body);
         v.leave(*this);
     }
 }
@@ -921,7 +917,7 @@ void ProcCallStmt::accept(ASTVisitor& v) {
         v.visit(*this);
         // accept children
         for (auto& arg : args) {
-            arg->accept(v);
+            v.walk_expr(arg);
         }
         v.leave(*this);
     }
@@ -977,7 +973,7 @@ void DefFnStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        expr->accept(v);
+        v.walk_expr(expr);
         v.leave(*this);
     }
 }
@@ -1029,7 +1025,7 @@ void GotoStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        target_expr->accept(v);
+        v.walk_expr(target_expr);
         v.leave(*this);
     }
 }
@@ -1057,7 +1053,7 @@ void GosubStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        target_expr->accept(v);
+        v.walk_expr(target_expr);
         v.leave(*this);
     }
 }
@@ -1165,18 +1161,10 @@ void PrintStmt::accept(ASTVisitor& v) {
         v.visit(*this);
         // accept children
         for (auto& item : items) {
-            if (item.expr) {
-                item.expr->accept(v);
-            }
-            if (item.line_expr) {
-                item.line_expr->accept(v);
-            }
-            if (item.col_expr) {
-                item.col_expr->accept(v);
-            }
-            if (item.tab_expr) {
-                item.tab_expr->accept(v);
-            }
+            v.walk_expr(item.expr);
+            v.walk_expr(item.line_expr);
+            v.walk_expr(item.col_expr);
+            v.walk_expr(item.tab_expr);
         }
         v.leave(*this);
     }
@@ -1239,7 +1227,7 @@ void InputStmt::accept(ASTVisitor& v) {
         v.visit(*this);
         // accept children
         for (auto& var : vars) {
-            var->accept(v);
+            v.walk_expr(var);
         }
         v.leave(*this);
     }
@@ -1296,9 +1284,7 @@ void RunStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        if (target_expr) {
-            target_expr->accept(v);
-        }
+        v.walk_expr(target_expr);
         v.leave(*this);
     }
 }
@@ -1325,9 +1311,7 @@ void ListStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        if (target_expr) {
-            target_expr->accept(v);
-        }
+        v.walk_expr(target_expr);
         v.leave(*this);
     }
 }
@@ -1399,7 +1383,7 @@ void LoadStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        filename_expr->accept(v);
+        v.walk_expr(filename_expr);
         v.leave(*this);
     }
 }
@@ -1427,7 +1411,7 @@ void SaveStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        filename_expr->accept(v);
+        v.walk_expr(filename_expr);
         v.leave(*this);
     }
 }
@@ -1458,8 +1442,8 @@ void PokeStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        address_expr->accept(v);
-        value_expr->accept(v);
+        v.walk_expr(address_expr);
+        v.walk_expr(value_expr);
         v.leave(*this);
     }
 }
@@ -1491,8 +1475,8 @@ void PokewStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        address_expr->accept(v);
-        value_expr->accept(v);
+        v.walk_expr(address_expr);
+        v.walk_expr(value_expr);
         v.leave(*this);
     }
 }
@@ -1522,8 +1506,8 @@ void PlotStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        x_expr->accept(v);
-        y_expr->accept(v);
+        v.walk_expr(x_expr);
+        v.walk_expr(y_expr);
         v.leave(*this);
     }
 }
@@ -1553,8 +1537,8 @@ void UnplotStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        x_expr->accept(v);
-        y_expr->accept(v);
+        v.walk_expr(x_expr);
+        v.walk_expr(y_expr);
         v.leave(*this);
     }
 }
@@ -1583,7 +1567,7 @@ void RandStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        seed_expr->accept(v);
+        v.walk_expr(seed_expr);
         v.leave(*this);
     }
 }
@@ -1612,7 +1596,7 @@ void PauseStmt::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        duration_expr->accept(v);
+        v.walk_expr(duration_expr);
         v.leave(*this);
     }
 }
@@ -1880,7 +1864,7 @@ void Prog::accept(ASTVisitor& v) {
     if (v.enter(*this)) {
         v.visit(*this);
         // accept children
-        v.rewrite_stmt_list(stmts);
+        v.walk_stmts(stmts);
         v.leave(*this);
     }
 }
@@ -1918,34 +1902,46 @@ void Prog::dump(DumpContext ctx) const {
 // Visitor
 //-----------------------------------------------------------------------------
 
-void ASTVisitor::rewrite_stmt_list(std::vector<std::unique_ptr<Stmt>>& list) {
+void ASTVisitor::walk_stmts(std::vector<std::unique_ptr<Stmt>>& list) {
     std::vector<std::unique_ptr<Stmt>> new_list;
 
     for (auto& stmt : list) {
         // Visit the node
+        stmt_stack.push_back(stmt.get());
         stmt->accept(*this);
+        stmt_stack.pop_back();
 
         // Prepend nodes requested by visitor
-        for (auto& n : stmt->prepend_nodes) {
+        for (auto& n : stmt->rewrite.prepend) {
             new_list.push_back(std::move(n));
         }
-        stmt->prepend_nodes.clear();
+        stmt->rewrite.prepend.clear();
 
         // if marked for removal, skip adding the node to the new list
-        if (stmt->marked_for_removal) {
-            release_assert(stmt->append_nodes.empty());
+        if (stmt->rewrite.remove) {
+            release_assert(stmt->rewrite.append.empty());
             continue;
         }
         new_list.push_back(std::move(stmt));
 
         // Append nodes requested by visitor, only if not marked for removal
-        for (auto& n : new_list.back()->append_nodes) {
+        for (auto& n : new_list.back()->rewrite.append) {
             new_list.push_back(std::move(n));
         }
-        new_list.back()->append_nodes.clear();
+        new_list.back()->rewrite.append.clear();
     }
 
     list = std::move(new_list);
+}
+
+void ASTVisitor::walk_expr(std::unique_ptr<Expr>& expr) {
+    if (expr) {
+        expr->accept(*this);
+        if (expr->rewrite.replace_expr) {
+            expr = std::move(expr->rewrite.replace_expr);
+            expr->rewrite.replace_expr = nullptr;
+        }
+    }
 }
 
 bool ASTVisitor::enter(NumberExpr&) {

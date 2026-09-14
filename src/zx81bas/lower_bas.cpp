@@ -15,11 +15,228 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "lexer.h"
+#include <unordered_map>
 
 static std::string gen_label(const std::string& prefix) {
     static int counter = 0;
     return SYMBOL_PREFIX + std::to_string(counter++) + str_toupper(prefix);;
 }
+
+// need to separate in several layers because the output of PEEKW/POKEW needs to run MOD/DIV
+
+// Replace all variables A by expression arg_values[A]
+struct ReplaceArgValuesVisitor : ASTVisitor {
+    const std::unordered_map<std::string, Expr*> arg_values;
+
+    explicit ReplaceArgValuesVisitor(
+        const std::unordered_map<std::string, Expr*>& av)
+        : arg_values(av) {}
+    virtual ~ReplaceArgValuesVisitor() = default;
+
+    void visit(VariableExpr& expr) {
+        auto it = arg_values.find(expr.name);
+        if (it != arg_values.end()) {
+            expr.rewrite.replace_expr = it->second->clone();
+        }
+    }
+};
+
+static void replace_arg_values(std::unique_ptr<Expr>& expr,
+                               const std::unordered_map<std::string, Expr*>& arg_values) {
+    ReplaceArgValuesVisitor visitor(arg_values);
+    visitor.walk_expr(expr);
+}
+
+// expand PEEKW, POKEW
+struct LowerPeekwPokewVisitor : ASTVisitor {
+    virtual ~LowerPeekwPokewVisitor() = default;
+
+    // expand PEEKW
+    void visit(BasicFuncCallExpr& expr) override {
+        if (expr.keyword == Keyword::PEEKW) {
+            // PEEKW(a) -> PEEK(a) + 256 * PEEK(a + 1)
+            release_assert(expr.args.size() == 1);
+
+            // PEEK(a)
+            auto& arg = expr.args[0];
+            auto peek_a = std::make_unique<BasicFuncCallExpr>(Keyword::PEEK, expr.loc);
+            peek_a->args.push_back(arg->clone());
+
+            // PEEK(a + 1)
+            auto arg_plus_1 = std::make_unique<BinaryExpr>(TokenType::Plus,
+                              arg->clone(),
+                              std::make_unique<NumberExpr>(1, expr.loc),
+                              expr.loc);
+            auto peek_a_plus_1 = std::make_unique<BasicFuncCallExpr>(Keyword::PEEK,
+                                 expr.loc);
+            peek_a_plus_1->args.push_back(std::move(arg_plus_1));
+
+            // 256 * PEEK(a + 1)
+            auto mult_expr = std::make_unique<BinaryExpr>(TokenType::Multiply,
+                             std::make_unique<NumberExpr>(256, expr.loc),
+                             std::move(peek_a_plus_1),
+                             expr.loc);
+
+            // PEEK(a) + 256 * PEEK(a + 1)
+            auto add_expr = std::make_unique<BinaryExpr>(TokenType::Plus,
+                            std::move(peek_a),
+                            std::move(mult_expr),
+                            expr.loc);
+
+            // replace the original expression with the new expression
+            expr.rewrite.replace_expr = std::move(add_expr);
+        }
+    }
+
+    // expand POKEW
+    void visit(PokewStmt& stmt) override {
+        // POKEW(a, v) -> POKE(a, v MOD 256) : POKE(a + 1, v DIV 256)
+
+        // POKE(a, v MOD 256)
+        auto v_mod_256 = std::make_unique<BinaryExpr>(TokenType::MOD,
+                         stmt.value_expr->clone(),
+                         std::make_unique<NumberExpr>(256, stmt.loc),
+                         stmt.loc);
+        auto poke_a = std::make_unique<PokeStmt>(stmt.address_expr->clone(),
+                      std::move(v_mod_256),
+                      stmt.loc);
+        stmt.rewrite.prepend.push_back(std::move(poke_a));
+
+        // POKE(a + 1, v DIV 256)
+        auto a_plus_1 = std::make_unique<BinaryExpr>(TokenType::Plus,
+                        stmt.address_expr->clone(),
+                        std::make_unique<NumberExpr>(1, stmt.loc),
+                        stmt.loc);
+        auto v_div_256 = std::make_unique<BinaryExpr>(TokenType::IntDivide,
+                         stmt.value_expr->clone(),
+                         std::make_unique<NumberExpr>(256, stmt.loc),
+                         stmt.loc);
+        auto poke_a_plus_1 = std::make_unique<PokeStmt>(std::move(a_plus_1),
+                             std::move(v_div_256),
+                             stmt.loc);
+        stmt.rewrite.prepend.push_back(std::move(poke_a_plus_1));
+
+        stmt.rewrite.remove = true;
+    }
+};
+
+static void lower_peekw_pokew(Prog& prog, Symtab&) {
+    LowerPeekwPokewVisitor visitor;
+    prog.accept(visitor);
+}
+
+// expand MOD/DIV
+struct LowerDivModVisitor : ASTVisitor {
+    virtual ~LowerDivModVisitor() = default;
+
+    // expand IntDivide
+    // expand MOD
+    void visit(BinaryExpr& expr) override {
+        if (expr.op == TokenType::IntDivide) {
+            // a DIV b -> INT(a / b)
+            auto div_expr = std::make_unique<BinaryExpr>(TokenType::Divide,
+                            expr.lhs->clone(),
+                            expr.rhs->clone(),
+                            expr.loc);
+            auto int_expr = std::make_unique<BasicFuncCallExpr>(Keyword::INT,
+                            expr.loc);
+            int_expr->args.push_back(std::move(div_expr));
+            expr.rewrite.replace_expr = std::move(int_expr);
+        }
+        else if (expr.op == TokenType::MOD) {
+            // a MOD b -> a - b * INT(a / b)
+            auto div_expr = std::make_unique<BinaryExpr>(TokenType::Divide,
+                            expr.lhs->clone(),
+                            expr.rhs->clone(),
+                            expr.loc);
+            auto int_expr = std::make_unique<BasicFuncCallExpr>(Keyword::INT,
+                            expr.loc);
+            int_expr->args.push_back(std::move(div_expr));
+            auto mult_expr = std::make_unique<BinaryExpr>(TokenType::Multiply,
+                             expr.rhs->clone(),
+                             std::move(int_expr),
+                             expr.loc);
+            auto sub_expr = std::make_unique<BinaryExpr>(TokenType::Minus,
+                            expr.lhs->clone(),
+                            std::move(mult_expr),
+                            expr.loc);
+            expr.rewrite.replace_expr = std::move(sub_expr);
+        }
+    }
+};
+
+static void lower_div_mod(Prog& prog, Symtab&) {
+    LowerDivModVisitor visitor;
+    prog.accept(visitor);
+}
+
+// expand DEF FN calls - replace call expression by FN defintion
+struct LowerDefFnCallVisitor : ASTVisitor {
+    Symtab& symtab;
+
+    explicit LowerDefFnCallVisitor(Symtab& s) : symtab(s) {}
+    virtual ~LowerDefFnCallVisitor() = default;
+
+    void visit(FnCallExpr& expr) override {
+        // get function definition; already checked existence in semantic phase
+        auto it = symtab.fns.find(expr.name);
+        release_assert(it != symtab.fns.end());
+        auto& deffn = it->second;
+
+        // parameter and argument count already checked in semantic phase
+        release_assert(expr.args.size() == deffn->params.size());
+
+        // define map of parameter name to replacement expression
+        // duplicate parameters already checked in semantic pass
+        std::unordered_map<std::string, Expr*> arg_values;
+        for (size_t i = 0; i < expr.args.size(); i++) {
+            std::string& param_name = deffn->params[i];
+            Expr* param_value = expr.args[i].get();
+            arg_values[param_name] = param_value;
+        }
+
+        // get deffn replacement expression
+        auto replacement = deffn->expr->clone();
+
+        // rewrite expression replacing arg_values
+        replace_arg_values(replacement, arg_values);
+
+        // replace the DEF FN call by the changed replacement expression
+        expr.rewrite.replace_expr = std::move(replacement);
+    }
+};
+
+static void lower_def_fn_calls(Prog& prog, Symtab& symtab) {
+    LowerDefFnCallVisitor visitor(symtab);
+    prog.accept(visitor);
+}
+
+// lower visitor
+struct LowerVisitor : ASTVisitor {
+    struct ControlStackEntry {
+        enum class Type {
+            Loop,
+            Proc,
+        };
+        Type type;
+        std::string end_label;      // label for the end of the control structure
+
+        ControlStackEntry(Type type_, const std::string& end_label_)
+            : type(type_), end_label(end_label_) {}
+    };
+
+    Prog& prog;
+    Symtab& symtab;
+    std::vector<std::unique_ptr<Stmt>> lowered_stmts;
+    std::vector<ControlStackEntry> control_stack;
+
+    explicit LowerVisitor(Prog& prog_, Symtab& symtab_)
+        : prog(prog_), symtab(symtab_) {}
+
+
+
+};
 
 // lower loops and EXIT statements
 struct LowerExitVisitor : ASTVisitor {
@@ -97,14 +314,15 @@ struct LowerExitVisitor : ASTVisitor {
         case ControlStackEntry::Type::Loop: {
             auto target_expr = std::make_unique<LabelLineRefExpr>(entry.end_label,
                                stmt.loc);
-            stmt.prepend_nodes.push_back(std::make_unique<GotoStmt>(std::move(target_expr),
-                                         stmt.loc));
-            stmt.marked_for_removal = true;
+            stmt.rewrite.prepend.push_back(std::make_unique<GotoStmt>(std::move(
+                                               target_expr),
+                                           stmt.loc));
+            stmt.rewrite.remove = true;
             break;
         }
         case ControlStackEntry::Type::Proc: {
-            stmt.prepend_nodes.push_back(std::make_unique<ReturnStmt>(stmt.loc));
-            stmt.marked_for_removal = true;
+            stmt.rewrite.prepend.push_back(std::make_unique<ReturnStmt>(stmt.loc));
+            stmt.rewrite.remove = true;
             break;
         }
         default:
@@ -113,15 +331,13 @@ struct LowerExitVisitor : ASTVisitor {
     }
 };
 
-static void lower_exit(Prog& prog) {
-    LowerExitVisitor visitor;
-    prog.accept(visitor);
-}
-
 bool lower_prog(Prog& prog, Symtab& symtab) {
-    lower_exit(prog);
+    lower_peekw_pokew(prog, symtab);
+    lower_div_mod(prog, symtab);
+    lower_def_fn_calls(prog, symtab);
 
-    (void)symtab;
+    LowerVisitor visitor(prog, symtab);
+    prog.accept(visitor);
     return get_error_count() == 0;
 }
 
@@ -242,55 +458,11 @@ static LoweredExpr lower_expr(Expr& expr, Symtab& symtab) {
             lowered_args.push_back(std::move(lowered_arg.rewritten));
         }
 
-        // replace PEEKW x -> PEEK x+256*PEEK(x+1)
-        if (fn_call_expr->keyword == Keyword::PEEKW) {
-            release_assert(fn_call_expr->args.size() == 1);
-            auto addr_expr = std::move(lowered_args.front());
-            auto addr2 = addr_expr->clone();
-
-            // PEEK x
-            auto peek_lo = std::make_unique<BasicFuncCallExpr>
-                           (Keyword::PEEK, fn_call_expr->loc);
-            peek_lo->args.push_back(std::move(addr_expr));
-
-            // (x+1)
-            auto _1 = std::make_unique<NumberExpr>(1, fn_call_expr->loc);
-            auto addr_plus_1 = std::make_unique<BinaryExpr>
-                               (TokenType::Plus,
-                                std::move(addr2),
-                                std::move(_1),
-                                fn_call_expr->loc);
-
-            // PEEK(x+1)
-            auto peek_hi = std::make_unique<BasicFuncCallExpr>
-                           (Keyword::PEEK, fn_call_expr->loc);
-            peek_hi->args.push_back(std::move(addr_plus_1));
-
-            // 256*PEEK(x+1)
-            auto _256 = std::make_unique<NumberExpr>(256, fn_call_expr->loc);
-            auto _256_times_peek_hi = std::make_unique<BinaryExpr>
-                                      (TokenType::Multiply,
-                                       std::move(_256),
-                                       std::move(peek_hi),
-                                       fn_call_expr->loc);
-
-            // PEEK x+256*PEEK(x+1)
-            auto result = std::make_unique<BinaryExpr>
-                          (TokenType::Plus,
-                           std::move(peek_lo),
-                           std::move(_256_times_peek_hi),
-                           fn_call_expr->loc);
-
-            lowered.rewritten = std::move(result);
-            return lowered;
-        }
-        else {
-            auto lowered_fn_call = std::make_unique<BasicFuncCallExpr>
-                                   (fn_call_expr->keyword, fn_call_expr->loc);
-            lowered_fn_call->args = std::move(lowered_args);
-            lowered.rewritten = std::move(lowered_fn_call);
-            return lowered;
-        }
+        auto lowered_fn_call = std::make_unique<BasicFuncCallExpr>
+                                (fn_call_expr->keyword, fn_call_expr->loc);
+        lowered_fn_call->args = std::move(lowered_args);
+        lowered.rewritten = std::move(lowered_fn_call);
+        return lowered;
     }
     else if (auto proc_call_expr = dynamic_cast<ProcCallExpr*>(&expr)) {
         LoweredExpr lowered;
@@ -327,35 +499,6 @@ static LoweredExpr lower_expr(Expr& expr, Symtab& symtab) {
         auto var_ref = std::make_unique<VariableExpr>(proc_call_expr->name,
                        proc_call_expr->loc);
         lowered.rewritten = std::move(var_ref);
-        return lowered;
-    }
-    else if (auto fn_call_expr = dynamic_cast<FnCallExpr*>(&expr)) {
-        LoweredExpr lowered;
-
-        // get function definition from symbol table
-        auto it = symtab.fns.find(fn_call_expr->name);
-        release_assert(it != symtab.fns.end());
-        auto def_fn = it->second;
-        release_assert(def_fn->params.size() == fn_call_expr->args.size());
-
-        // lower each argument
-        for (size_t i = 0; i < def_fn->params.size(); i++) {
-            std::string param_name = def_fn->params[i];
-            auto lowered_arg = lower_expr(*fn_call_expr->args[i], symtab);
-            append_stmts(lowered.preamble, lowered_arg.preamble);
-
-            // create LET <FN><PARAM>=lowered_arg
-            std::string arg_name = fn_call_expr->name + param_name;
-            auto assign_arg_stmt = std::make_unique<LetStmt>(
-                                       std::make_unique<VariableExpr>(arg_name, fn_call_expr->loc),
-                                       std::move(lowered_arg.rewritten), fn_call_expr->loc);
-            lowered.preamble.push_back(std::move(assign_arg_stmt));
-        }
-
-        // lower the function expression
-        auto lowered_fn_expr = lower_expr(*def_fn->expr, symtab);
-        append_stmts(lowered.preamble, lowered_fn_expr.preamble);
-        lowered.rewritten = std::move(lowered_fn_expr.rewritten);
         return lowered;
     }
     else {
@@ -847,58 +990,6 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             auto new_stmt = std::make_unique<PokeStmt>(std::move(lowered_address.rewritten),
                             std::move(lowered_value.rewritten), poke_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt));
-        }
-        else if (auto pokew_stmt = dynamic_cast<PokewStmt*>(stmt.get())) {
-            // POKE address, value-256*int(value/256) : POKE address+1, int(value/256)
-            auto lowered_address = lower_expr(*pokew_stmt->address_expr, symtab);
-            append_stmts(out_prog.stmts, lowered_address.preamble);
-
-            auto lowered_value = lower_expr(*pokew_stmt->value_expr, symtab);
-            append_stmts(out_prog.stmts, lowered_value.preamble);
-
-            // value/256
-            auto val1 = lowered_value.rewritten->clone();
-            auto _256 = std::make_unique<NumberExpr>(256, pokew_stmt->loc);
-            auto val_div_256 = std::make_unique<BinaryExpr>(TokenType::Divide,
-                               std::move(val1),
-                               std::move(_256),
-                               pokew_stmt->loc);
-
-            // INT(value/256)
-            auto int_val_div_256 = std::make_unique<BasicFuncCallExpr>(Keyword::INT,
-                                   pokew_stmt->loc);
-            int_val_div_256->args.push_back(val_div_256->clone());  // will be reused below
-
-            // 256*INT(value/256)
-            auto _256_2 = std::make_unique<NumberExpr>(256, pokew_stmt->loc);
-            auto val_mul_256 = std::make_unique<BinaryExpr>(TokenType::Multiply,
-                               std::move(_256_2),
-                               std::move(int_val_div_256),
-                               pokew_stmt->loc);
-
-            // value-256*INT(value/256)
-            auto val2 = lowered_value.rewritten->clone();
-            auto val_mod_256 = std::make_unique<BinaryExpr>(TokenType::Minus,
-                               std::move(val2),
-                               std::move(val_mul_256),
-                               pokew_stmt->loc);
-
-            // POKE address, value-256*INT(value/256)
-            auto new_stmt1 = std::make_unique<PokeStmt>(lowered_address.rewritten->clone(),
-                             std::move(val_mod_256), pokew_stmt->loc);
-            out_prog.stmts.push_back(std::move(new_stmt1));
-
-            // address+1
-            auto _1 = std::make_unique<NumberExpr>(1, pokew_stmt->loc);
-            auto addr_plus_1 = std::make_unique<BinaryExpr>(TokenType::Plus,
-                               lowered_address.rewritten->clone(),
-                               std::move(_1),
-                               pokew_stmt->loc);
-
-            // POKE address+1, INT(value/256)
-            auto new_stmt2 = std::make_unique<PokeStmt>(std::move(addr_plus_1),
-                             std::move(int_val_div_256), pokew_stmt->loc);
-            out_prog.stmts.push_back(std::move(new_stmt2));
         }
         else if (auto plot_stmt = dynamic_cast<PlotStmt*>(stmt.get())) {
             auto lowered_x = lower_expr(*plot_stmt->x_expr, symtab);

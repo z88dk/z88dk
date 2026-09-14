@@ -12,10 +12,24 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
 struct ASTVisitor;
+struct Expr;
+struct Stmt;
 
 bool is_string_variable(const std::string& name);
+
+//-----------------------------------------------------------------------------
+// Rewrite info
+//-----------------------------------------------------------------------------
+
+struct RewriteInfo {
+    std::vector<std::unique_ptr<Stmt>> prepend;
+    std::vector<std::unique_ptr<Stmt>> append;
+    bool remove = false;
+    std::unique_ptr<Expr> replace_expr;
+};
 
 //-----------------------------------------------------------------------------
 // Expression tree
@@ -29,6 +43,9 @@ enum class ExprType {
 struct Expr : TreeNode {
     ExprType type = ExprType::Number;
     SourceLoc loc;			// source location
+
+    // for AST transformations, not cloned and not dumped
+    RewriteInfo rewrite;
 
     explicit Expr(ExprType type_, const SourceLoc& loc_);
     virtual ~Expr() = default;
@@ -226,10 +243,8 @@ struct FnCallExpr : Expr {
 struct Stmt : TreeNode {
     SourceLoc loc;			// source location
 
-    // these are for AST transformations, are not cloned and not dumped
-    bool marked_for_removal = false;
-    std::vector<std::unique_ptr<Stmt>> prepend_nodes;
-    std::vector<std::unique_ptr<Stmt>> append_nodes;
+    // for AST transformations, not cloned and not dumped
+    RewriteInfo rewrite;
 
     explicit Stmt(const SourceLoc& loc_);
     virtual ~Stmt() = default;
@@ -925,7 +940,9 @@ struct Prog : TreeNode {
 struct ASTVisitor {
     virtual ~ASTVisitor() = default;
 
-    void rewrite_stmt_list(std::vector<std::unique_ptr<Stmt>>& list);
+    std::vector<Stmt*> stmt_stack;
+    void walk_stmts(std::vector<std::unique_ptr<Stmt>>& list);
+    void walk_expr(std::unique_ptr<Expr>& expr);
 
     virtual bool enter(NumberExpr&);
     virtual void visit(NumberExpr&) {}
