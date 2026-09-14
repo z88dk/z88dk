@@ -80,6 +80,11 @@ five times, and eviction looks profitable when it costs 29 bytes.
 **`ir_alloc.c` does not know about framelessness at all** — zero references. It
 is decided in the lowerer, after allocation.
 
+And the eviction does not merely make the reads dearer: it **flips the mode**.
+Measured on the witness, `frameless` goes 1 -> 0 when the param loses BC, with
+`frame_size == 0` in both cases. So the claim also costs the function its frame
+apparatus — a second term, likewise unpriced.
+
 ## The circularity, which is the real obstacle
 
 This cannot be fixed by adding a frame-mode term to the allocator's cost model,
@@ -92,10 +97,27 @@ because the frame mode is not an input to allocation — it is an *output* of it
           -> which is the number allocation needed to make the first decision.
 
 So the realised-cost ledger has a design constraint this ADR did not anticipate:
-some access costs are not knowable when the claim is scored. The options are to
-predict the frame mode before allocating, to score the claim under both modes
-and carry the uncertainty, or to re-score after the mode is known — and that
-choice should be made deliberately, not discovered halfway through building it.
+some access costs are not knowable when the claim is scored.
+
+One simplification makes this tractable. **Frameless implies `frame_size == 0`**,
+so a frameless function has no local slots at all — only its parameters live in
+memory, in the caller's frame. Therefore the two modes price *only parameter
+claims* differently; every other claim scores the same either way. The pair is
+needed for a small set, and the mode flip is detectable after the fact
+(`frameless_ok` is a pure function of the allocation).
+
+That suggests a bounded fixed point rather than a redesign: allocate, ask
+`frameless_ok` what mode resulted, and if it differs from what the parameter
+claims were scored against, re-score those claims and re-run the BC arbitration.
+`IR_SPFLIP` already establishes the precedent of lowering, measuring, and
+re-deciding, and `ir_clone_func` exists for it.
+
+The alternative is structural, and the lowerer already names it: route every
+frame access through sp when frameless, so `frameless_ok` stops requiring BC
+parameter homes and the mode becomes knowable before allocation. That removes
+the circularity at its root — and it would also close the latent frameless/fp
+landmine in ADR 0031's history — but it is roughly 70 unguarded
+`frame_reg()` sites, against 21 that carry the guard today.
 
 `IR_LEDGER` is the inert probe that produced the numbers above: it prints both
 denominations of the evict decision side by side. Keep it until the ledger
