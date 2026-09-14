@@ -1123,18 +1123,22 @@ int main(int argc, char **argv)
      * compiler argument stages, so the pragma and -Cc flag both take effect.
      * parse_option() modifies its argument in place, so it gets a writable
      * copy, never a string literal. */
-    /* Newlib z180 float is still broken upstream: the newlib m (math48)
-     * library only carries CPU:z80 objects, which z80asm refuses in -mz180
-     * links.  This Z180 default flip is CLASSIC-ONLY by design.  The newlib
-     * side needs its own follow-up (per-CPU m objects, or a math32_z180
-     * newlib bridge); re-examine this gate once that lands. */
+    /* Newlib z180 keeps the 48-bit math48 default: the newlib m (math48)
+     * library is per-CPU, and a -mz180 link only pulls CPU:z180 members
+     * (z80asm refuses z80-CPU library members in -mz180 links).  Swap the
+     * default -lm to the CPU:z180 m_z180 product so the compiler's d*
+     * 48-bit calls resolve; the fp mode is left untouched.  The classic
+     * side instead flips to the 4-byte IEEE math32_z180 below. */
     if (c_cpu == CPU_TYPE_Z180 && !c_user_fp_mode_explicit
-        && (c_clib == NULL || strstr(c_clib, "new") == NULL)
         && strcmp(c_genmathlib, "genmath@{ZCC_LIBCPU}") == 0
         && linker_linklib_first != NULL
         && strstr(linker_linklib_first, "-lm ") != NULL) {
-        c_genmathlib = muststrdup("math32_z180");
-        parse_option(muststrdup("-Cc-fp-mode=ieee -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_MATH32 -Ca-D__MATH_MATH32 -D__MATH_MATH32"));
+        if (c_clib != NULL && strstr(c_clib, "new") != NULL) {
+            linker_linklib_first = replace_str(linker_linklib_first, "-lm ", "-lm_z180 ");
+        } else {
+            c_genmathlib = muststrdup("math32_z180");
+            parse_option(muststrdup("-Cc-fp-mode=ieee -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_MATH32 -Ca-D__MATH_MATH32 -D__MATH_MATH32"));
+        }
     }
     keep_user_multi();
 

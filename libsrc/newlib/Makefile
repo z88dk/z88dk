@@ -117,6 +117,8 @@ $(1)-clean:
 	@$(RM) -r $(call target_dir,$(1))/obj
 	@$(RM) $(LIB_SCCZ80)/$(1).lib
 	@$(RM) $(LIB_SDCC_IX)/$(1).lib
+	@$(RM) $(LIB_SCCZ80)/$(1)_z180.lib
+	@$(RM) $(LIB_SDCC_IX)/$(1)_z180.lib
 endef
 
 define build_target
@@ -132,3 +134,18 @@ define build_targets
 endef
 
 $(eval $(call build_targets,$(ALLTARGETS)))
+
+# The m (math48) library only carries CPU:z80 members, which z80asm refuses
+# to pull into -mz180 links.  Build a CPU:z180 m_z180 product from the same
+# m sources so newlib z180 -lm resolves (zcc.c swaps -lm to -lm_z180 for
+# newlib z180).  The z80 m library and every other CPU delivery are
+# untouched; z80asm links only pull members whose CPU matches -m.
+$(LIB_SCCZ80)/m_z180.lib: target/m/obj/config_private.inc
+	$(Q)mkdir -p $(LIB_SCCZ80)
+	TARGET=m TYPE=z180 $(Z80ASM) -mz180 -d -m4=-Itarget/m/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/m/obj/sccz80/x/z180 -Itarget/m/obj -I.. -x$(LIB_SCCZ80)/m_z180 -I$(Z88DK_LIB) @target/m/library/m_sccz80.lst
+
+$(LIB_SDCC_IX)/m_z180.lib: target/m/obj/config_private.inc $(LIB_SCCZ80)/m_z180.lib
+	$(Q)mkdir -p $(LIB_SDCC_IX)
+	TARGET=m TYPE=z180 $(Z80ASM) -mz180 -d -m4=-Itarget/m/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/m/obj/sdcc_ix/x/z180 -Itarget/m/obj -I.. -x$(LIB_SDCC_IX)/m_z180 -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @target/m/library/m_sdcc_ix.lst
+
+m: $(LIB_SCCZ80)/m_z180.lib $(LIB_SDCC_IX)/m_z180.lib
