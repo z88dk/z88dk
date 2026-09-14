@@ -19,12 +19,21 @@ enforced by a script. What remains is optimisation work, and the order matters:
    `structbench/walk v2` ask a whole-function question through `ir_home_at` at
    flat index 0, before the value's live range starts. Harmless today, a
    miscompile under ranging. Small and independent of everything else.
-2. **Build the realised-cost ledger**, scoring each `(vreg, home, window)` claim
-   and including the **opportunity cost** of the claim it displaces — see
-   ADR 0035 for why two sound corrections both made the output worse without
-   it. It gates ADR 0021, ADR 0028 **and** ADR 0027.
+2. **Model what an eviction CAUSES, not what the accesses cost.** The
+   realised-cost ledger as ADR 0035 framed it is closed: refining the *price*
+   of the eviction has now failed twice, on the incumbent's side (ADR 0036) and
+   on both sides at once (ADR 0037). ADR 0037 has the evidence that retires the
+   framing — `matrixbench/stencil` takes the **same** eviction to −6.2 % ticks
+   on 8085 and **+12.5 % on z80 sp**, a spread no per-access price can produce.
+   What is missing is the BC **reload traffic** each freed temp brings with it,
+   which the `bc-evict` comment names but nothing counts.
 
-   First attempt refused: ADR 0036 charged a param eviction for the
+   Do it the way this project has done every risky arc that worked: **verifier
+   first.** Count emitted BC reloads per freed temp, check the count explains
+   the `stencil` spread, and only then let it near a decision. Do not schedule
+   a third attempt at a better price.
+
+   Earlier refusal for the record: ADR 0036 charged a param eviction for the
    framelessness it costs. Its apparent −229 bytes came from firing in **sp
    mode**, where there is no frame to save; correctly scoped it is inert. Two
    lessons carried forward — a size claim must name the file set it covers
@@ -117,7 +126,7 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | Gate | Question | Retire when |
 | --- | --- | --- |
 | `IR_GRAPH_PROBE` | is the capture gap in proposal or in selection? | the step A1 cost ledger answers it per claim |
-| `IR_LEDGER` | does the BC evict decision compare the right numbers? | **partly** (ADR 0035): both denominations agree and both under-price something — but ADR 0036 rules out the frameless term as the explanation. Keep while the ledger is built |
+| `IR_LEDGER` | does the BC evict decision compare the right numbers? | **answered, no** (ADR 0037): the flat unit really does misprice — 19 candidates scored as one incumbent — but correcting it is worse on size and ticks. The question was the wrong one. Keep the probe; it is how the 64 `inc=0` no-op decisions were told from the 25 real ones |
 
 | `IR_BCVETO_PROBE` | what does the BC veto turn away? | the veto becomes a cost term |
 | `IR_PREPUSH_PROBE` | which calls does the pre-push hazard cover? | — |

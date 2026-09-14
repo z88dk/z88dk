@@ -41,6 +41,7 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0029](0029-de-cache-fold-brick.md) | *Proposed* — a fail-safe DE cache fold, where 0018 refuses a DE home |
 | [0032](0032-gbz80-word-cost-row.md) | The measured gbz80 cost rows (SLOT+BC), shipped — and why the regression that held them back was a failed recovery, not a ranking tie |
 | [0034](0034-one-owner-for-the-allocation.md) | `ir_alloc` is the only writer of the plan; the render reports typed rejections (amends 0003) |
+| [0037](0037-pricing-the-eviction-in-t-states.md) | **Rejected** — pricing the BC eviction in the arbiter's own unit; worse on both axes, and the same eviction is ±12 % across CPUs |
 | [0036](0036-charging-a-param-eviction-for-framelessness.md) | **Rejected** — charging a param eviction for framelessness; the win came from applying it in sp mode |
 | [0035](0035-claims-are-priced-in-isolation.md) | Why a *more correct* cost input made things worse twice — nothing prices the displaced claim |
 | [0033](0033-relaxing-unconditional-jumps.md) | Relaxing unconditional jumps is per-CPU; `IR_JR_UNCOND` overrides it (amends 0025) |
