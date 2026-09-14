@@ -6,7 +6,7 @@ checklist. The rest of the design record:
 
 | File | Holds |
 |---|---|
-| `DESIGN_INDEX.md` | what is live, and the single next action — **start here** |
+| `DESIGN_INDEX.md` | what is live, and the single next action — **start here**. Live state only; anything durable belongs in `adr/` |
 | `adr/` | how the back end works and why, plus what was refused (`Rejected`) |
 | `CONTEXT.md` | vocabulary (residency terms, and probe/parked/opt-out/verifier) |
 | `OPTIONS.md` | every `--opt-disable` / `IR_OFF` name and what turning it off does |

@@ -40,6 +40,8 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0028](0028-trip-count-weighting.md) | *Proposed* — weight costs by derived trip counts instead of `4^depth` |
 | [0029](0029-de-cache-fold-brick.md) | *Proposed* — a fail-safe DE cache fold, where 0018 refuses a DE home |
 | [0032](0032-gbz80-word-cost-row.md) | The measured gbz80 cost rows (SLOT+BC), shipped — and why the regression that held them back was a failed recovery, not a ranking tie |
+| [0034](0034-one-owner-for-the-allocation.md) | `ir_alloc` is the only writer of the plan; the render reports typed rejections (amends 0003) |
+| [0035](0035-claims-are-priced-in-isolation.md) | Why a *more correct* cost input made things worse twice — nothing prices the displaced claim |
 | [0033](0033-relaxing-unconditional-jumps.md) | Relaxing unconditional jumps is per-CPU; `IR_JR_UNCOND` overrides it (amends 0025) |
 | [0031](0031-stepped-pointer-param-in-bc.md) | A stepped pointer parameter may live in BC (promoted after the `frameless_ok` fix) |
 | [0030](0030-debug-locals-in-frame-slots.md) | Under `-debug`, a named local is forced to a coherent frame slot (address-taken), with offsets emitted post-lowering |

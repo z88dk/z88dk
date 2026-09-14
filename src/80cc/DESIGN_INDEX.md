@@ -4,7 +4,8 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 2026-09-13, branch `80cc-simplify`.
+Last swept: 2026-09-14. Keep it short: when a section stops describing what is
+live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
@@ -15,9 +16,9 @@ enforced by a script. What remains is optimisation work, and the order matters:
    the ranging arc, and possibly a latent miscompile. `md5` in fp, +29 bytes,
    reproducing identically on every CPU.
 2. **Build the realised-cost ledger**, scoring each `(vreg, home, window)` claim
-   and including the **opportunity cost** of the claim it displaces. Two refused
-   levers (ADR 0021, ADR 0028) failed for want of that term, so it gates them
-   rather than competing with them.
+   and including the **opportunity cost** of the claim it displaces — see
+   ADR 0035 for why two sound corrections both made the output worse without
+   it. It gates ADR 0021 and ADR 0028 rather than competing with them.
 3. Then stages 2 and 3 of the ranging arc (ADR 0017).
 
 One step of the original simplification plan was deliberately not done:
@@ -28,107 +29,33 @@ The pairs are `op_de_clean` / `try_de_home_clean_store`,
 `de_home_clean_bitop_ok` with its bitop emitter. If it is picked up, do exactly
 those two families and stop; "one family at a time" has no natural end.
 
-## The four invariants
+## The standing invariants
 
-1. No code outside `ir_alloc` writes home state — **yes**
-2. One opt-out mechanism, not eighteen — **yes**, one registry, two front doors
-3. Every surviving gate has a row here — **yes**
-4. Exactly one live next action in the tree — **yes**, this file
+These held when the simplification finished, and two are enforced by a script
+rather than by care. Breaking one is a defect, not a style question.
 
-## One finding that recurs — and one that did not belong in it
-
-Two independent investigations produced the same shape: **a more correct input
-made the output worse.**
-
-| | The correction | What happened |
-| --- | --- | --- |
-| ADR 0021 | per-value spill heuristics | two identical counters have opposite optimal placements |
-| ADR 0028 | true loop trip counts instead of `4^depth` | +845 B and +0.066 % ticks; the same bench moves both ways on different CPUs |
-
-The common cause is that nothing prices **the claim a decision displaces**.
-Scores are computed per candidate in isolation, so when two are close the winner
-is settled by pass order, and a more accurate score just re-rolls it. That is why
-the realised-cost ledger — scoring each claim including the opportunity cost of
-what it displaces — is the first item of resumed optimisation work.
-
-**A third case was listed here and has been removed, because it had a different
-cause.** The gbz80 cost row (ADR 0032) looked identical from the outside: correct
-the number, get +10 % ticks on one benchmark. It was not a ranking tie. A value
-took BC, the lowerer could not realise the home, `[home-demote]` dropped it to a
-slot, and the freed register was offered to nobody because the arbiter never ran
-again. Completing that recovery (`[home-rearb]`) made the benchmark neutral and
-the correction shipped.
-
-The diagnostic point is worth more than the pattern: **"truer cost, worse
-result" has at least two causes** — an unpriced displaced claim, and a register
-left unused after a failed home. They look the same and need different fixes.
-Rule out the second first; it is cheap to check and it is a bug, not a model
-limitation.
-
-## Who owns the allocation
-
-`ir_alloc` is the only writer of `vreg_to_phys`, `home_lo` and `home_hi`.
-Everywhere else reads. Four writers used to exist outside it, and each was a
-way for the plan to be edited behind the allocator's back:
-
-| Was | Now |
+| | Checked by |
 | --- | --- |
-| the lowerer assigned index-half homes after `ir_alloc` returned | `assign_idxhalf_homes` is the last step *of* `ir_alloc` |
-| the lowerer took the word-home snapshot and memcpy'd it back | it calls `ir_alloc_word_home_reject`; the snapshot never leaves `ir_alloc.c` |
-| the lowerer demoted an unrealizable home in place | it calls `ir_alloc_demote_home` with the vreg |
-| `ir_slots.c` re-derived the backing rules | it calls `ir_home_requires_slot` |
+| 1. Only `ir_alloc` writes or indexes allocation state (ADR 0034) | `scripts/check_ownership.sh` |
+| 2. One opt-out registry, two front doors | `scripts/check_options.sh` |
+| 3. Every surviving gate has a row below | this file |
+| 4. Exactly one live next action in the tree | this file |
 
-The shape is the same in each case: **the render reports a rejection, the owner
-edits the plan.** A rejection names a vreg and a reason; it never carries a
-replacement decision.
-
-That ordering also fixed a latent defect. The re-arbitration retry re-runs
-`ir_alloc`, which rewrote `vreg_to_phys` wholesale — silently erasing the
-index-half homes the lowerer had assigned, with nothing to put them back. It
-was inert on this corpus (byte-identical before and after the move) but it was
-only ever going to be inert by luck.
-
-The reads went the same way. Nothing outside `ir_alloc.c` indexes the arrays;
-it asks one of:
-
-| Question | Accessor |
-| --- | --- |
-| where is v homed AT THIS POINT | `ir_home_at(f, v)` — lowerer wrapper over `ir_home_at_op(f, v, g)` |
-| is v EVER homed in a register | `ir_home_assigned(f, v)` |
-| does v need a frame slot | `ir_home_requires_slot(f, v)` |
-| is v's home window ranged | `ir_home_is_ranged(f, v)` |
-| what window does the home cover | `ir_home_window(f, v, &lo, &hi)` |
-
-`src/80cc/scripts/check_ownership.sh` enforces both halves and is the reason this stays
-true: it fails on a direct write, a `memcpy` over the arrays, or an indexed
-read outside `ir_alloc.c`. It was tested against a deliberate bypass. Run it
-with any change that touches residency.
-
-The point query takes its op index as an argument rather than reading lowerer
-state, so allocation, slots, the verifiers and a test can all ask exactly what
-the lowerer asks.
-
-**One question deliberately left open.** The 27 converted reads all became
-`ir_home_assigned`, which ignores the interval — exactly what they did before,
-so the conversion is byte-identical. Some of them are point decisions and
-*should* honour the window. That is not a cleanup: while homes are
-whole-function it changes nothing, and for a call-split value it would change
-emitted code. Decide it per site, with a measurement, when ranged residency is
-next worked on.
+Invariant 4 decays by default. What keeps it true: a handover is **deleted**
+when its work lands, and durable conclusions move to `adr/` — this file is not
+where history accumulates. When a section here stops describing what is live,
+promote it or delete it.
 
 ## Opt-outs
 
-One registry of 114 names, **each described in `OPTIONS.md`**, with
-`scripts/check_options.sh` failing if a name is undocumented or a documented name no
-longer exists. Two front doors, equivalent:
+One registry of 115 names, each described in `OPTIONS.md`. Two front doors:
 
     --opt-disable=name,name     a compiler flag, for a user
     IR_OFF=name,name            the same registry, for a measurement
 
-Both accept `all`. Read it as `!opt_disabled("my-opt")`. A shipped optimisation
-never gets a private `getenv` — that was the old convention and it produced four
-different idioms for one concept, which is why the compiler's own default
-configuration could not be determined by reading it.
+Read it as `!opt_disabled("my-opt")`; never add a private `getenv` for an
+opt-out. `scripts/check_options.sh` fails if a name is undocumented or a
+documented name no longer exists.
 
 ## Surviving gates
 
@@ -212,23 +139,6 @@ ruled out, because it is a latent correctness bug rather than a cost question.
 Each sets a tuning constant, so the opt-out registry cannot express them — it is
 on/off only. They are parked experiments with a dial. Decide them the same way:
 promote the tuned value into the code and delete the dial, or delete both.
-
-## Retired this sweep
-
-Twenty probes and five dead gates, about 1,800 lines. Source kept under
-`probes-retired/` so a census can be re-run without re-deriving it.
-
-`IR_LDSLOT_WHY` `IR_OPRES_WHY` `IR_OPRES_PROBE` `IR_GPHOME_PROBE`
-`IR_SPLIT_PROBE` `IR_LONGPUSH_PROBE` `IR_ADDRRES_PROBE` `IR_SPILLAUDIT`
-`IR_VRED` `IR_SHAREPROBE` `IR_PARAMHOME` `IR_PARAMRELOAD` `IR_GRAPH_PROBE`
-`IR_ALLOC_PROBE`(fn) `IR_B1_PROBE`(fn) `IR_SPILL_WHY`(fn) `IR_DEADDEF_PROBE`
-`IR_CMPSIGN_PROBE`(fn) `IR_DELIVE_PROBE` `IR_HR_CHECK` — and the gates
-`IR_OPRES` `IR_NO_A_CARRY` `IR_FLIPCOST` `IR_SPINC` `IR_SPEXCL`
-
-Deleting a probe repeatedly made a helper dead that nothing else used. Let the
-compiler find those: delete, rebuild, act on `-Wunused-function`, repeat. Two
-rounds found five helpers, one of them 57 lines, that no grep would have
-surfaced.
 
 ## Documents
 
