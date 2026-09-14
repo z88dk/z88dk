@@ -743,7 +743,7 @@ static void build_idx2_maps(const Func *f, int *is_base, int *cstep,
    it also guards building the maps. home_realizable(...,RC_IDX2,...) := this
    != 0. */
 static int idx2base_on(void)
-{ const char *e = getenv("IR_IDX2BASE"); return !(e && e[0] == '0'); }   /* default ON */
+{ return !opt_disabled("idx2-base"); }                                   /* default ON */
 
 static unsigned idx2_home_realizable(const Func *f, int v,
                                      const int *use_count, const int *write_count,
@@ -1340,8 +1340,8 @@ static int iv_home_hot_enough(const Func *f, int v, const int *use_count,
     {
         static int acc_on = -1;
         if (acc_on < 0) {
-            const char *e = getenv("IR_IVACC");
-            acc_on = (e && e[0] == '0') ? 0 : 1;
+            /* opt_disabled("iv-acc") below is the switch; this was a duplicate. */
+            acc_on = 1;
         }
         if (!acc_on || opt_disabled("iv-acc")) return 0;
     }
@@ -1971,9 +1971,10 @@ static int idx_deref_pricing(void)
     /* IR_IDXPRICE=0 keeps the RUNG but drops the OFFSET TERM — the knob that
        attributes a size move to the lowering or to the allocation it caused.
        Both are on by default; --opt-disable=idx-deref takes away both. */
-    static int on = -1;
-    if (on < 0) { const char *e = getenv("IR_IDXPRICE"); on = !(e && e[0] == '0'); }
-    return on && !opt_disabled("idx-deref");
+    /* The knob that split the cost TERM from the RUNG is gone: it existed to
+       attribute the size move to one or the other, and ADR 0026 records the
+       answer (most of it was the term). */
+    return !opt_disabled("idx-deref");
 }
 
 static int g0_deref_offset_bytes(int reg, int ofs)
@@ -3880,7 +3881,7 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
 static int g0measured_on(void)
 {
     static int on = -1;
-    if (on < 0) { const char *e = getenv("IR_G0MEASURED"); on = !(e && e[0] == '0'); }
+    if (on < 0) on = !opt_disabled("g0-measured");
     return on;
 }
 

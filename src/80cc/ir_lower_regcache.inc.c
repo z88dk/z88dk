@@ -1603,7 +1603,7 @@ static void partial_load_long_shr(FILE *out, const Func *f, int v,
 static int shrnarrow_on(void)
 {
     static int c = -1;
-    if (c < 0) { const char *e = getenv("IR_SHRNARROW"); c = !(e && e[0] == '0'); }
+    if (c < 0) c = !opt_disabled("shr-narrow");
     return c;
 }
 

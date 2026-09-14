@@ -2878,10 +2878,10 @@ static int v_is_const_shr(const Func *f, int v)
 }
 
 static int shrwide_on(void)
-{ const char *e = getenv("IR_SHRWIDE"); return !(e && e[0] == '0'); }   /* default ON */
+{ return !opt_disabled("shr-wide"); }                                   /* default ON */
 
 static int shrmask_on(void)
-{ const char *e = getenv("IR_SHRMASK"); return !(e && e[0] == '0'); }
+{ return !opt_disabled("shr-mask"); }
 
 /* A constant-count right shift narrows only when the SOURCE provably fits a
    byte. Unlike a left shift — where the low byte of `src << n` depends only on

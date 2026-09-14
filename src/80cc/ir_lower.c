@@ -2130,7 +2130,7 @@ static int tm_on = -1;
 static int tail_merge_enabled(void)
 {
     if (tm_on < 0) {
-        tm_on = !opt_disabled("tail-merge") && (!opt_disabled("tail-merge"));
+        tm_on = !opt_disabled("tail-merge");
     }
     return tm_on;
 }
@@ -2436,7 +2436,7 @@ static int bl_on = -1;
 static int block_layout_enabled(void)
 {
     if (bl_on < 0) {
-        bl_on = !opt_disabled("block-layout") && (!opt_disabled("block-layout"));
+        bl_on = !opt_disabled("block-layout");
     }
     return bl_on;
 }
