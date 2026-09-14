@@ -5383,49 +5383,6 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             b[3] = (uint8_t)((kk >> 24) & 0xff);
             uint8_t identity = (op->kind == IR_AND) ? 0xff : 0x00;
             static const char *regs[4] = { "l", "h", "e", "d" };
-            /* [PoC, IR_INPLACE_MASK] TASK #6 lever (a): a narrow in-place const
-               bitwise on a slot-COHERENT long — apply the immediate directly to
-               the frame-slot bytes, skipping load_to_dehl (its dead high-word load
-               + `ld bc,hl` DE:BC park) and store_dehl_finalize. Matches sdcc's
-               `ld (ix-2),0` for `x &= 0xffff`. Correctness gates: fp/ix only;
-               in-place (dst slot == src[0] slot); src[0] authoritative in its slot
-               (not register-cached, no pending lazy spill) so the direct slot read
-               is not stale; neither operand register-homed; result lives only in
-               its slot afterward (nothing cached it, so no stale belief). */
-            if (getenv("IR_INPLACE_MASK") && fp_active(f)
-                && op->src[0] >= 0 && op->dst >= 0
-                && !L.la.cur_dehl_dst_dead_safe
-                && !vreg_is_pr_dehl(f, op->src[0])
-                && !vreg_is_pr_de(f, op->src[0]) && !vreg_in_pr_bc(f, op->src[0])
-                && !vreg_is_pr_dehl(f, op->dst)
-                && !vreg_is_pr_de(f, op->dst) && !vreg_in_pr_bc(f, op->dst)
-                && slot_off(f, op->src[0]) >= 0
-                && slot_off(f, op->dst) == slot_off(f, op->src[0])
-                && L.rs.dehl != op->src[0] && L.rs.de != op->src[0]
-                && L.rs.hl != op->src[0] && L.rs.bc != op->src[0]
-                && !(L.lazy_spill_on && L.pending_spill_v == op->src[0])) {
-                require_slot(f, op->dst);
-                int ixo = slot_ix_off(f, op->dst);
-                int ok = 1;
-                for (int i = 0; i < 4; i++)
-                    if (b[i] != identity && !fp_offset_fits(ixo + i)) ok = 0;
-                if (ok) {
-                    int used_a = 0;
-                    for (int i = 0; i < 4; i++) {
-                        if (b[i] == identity) continue;
-                        if (op->kind == IR_AND && b[i] == 0) {
-                            emit(out, "ld\t(%s%+d),0", frame_reg(), ixo + i);
-                        } else {
-                            emit(out, "ld\ta,(%s%+d)", frame_reg(), ixo + i);
-                            emit(out, "%s\t%u", mnem, (unsigned)b[i]);
-                            emit(out, "ld\t(%s%+d),a", frame_reg(), ixo + i);
-                            used_a = 1;
-                        }
-                    }
-                    if (used_a) invalidate_a_cache();
-                    return 0;
-                }
-            }
             /* Fuse the op straight into the store walk: read each value
                byte, apply the immediate, store via (hl+) — skipping the
                register write-back AND the separate store_dehl walk. The

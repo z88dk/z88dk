@@ -1,0 +1,78 @@
+Two proof-of-concept levers, deleted 2026-09-14 after measurement.
+
+Measured across the corpus at 30 benches x 12 CPUs x sp/fp (720 cells):
+  IR_INPLACE_MASK  fires NOWHERE — 0 cells change, on any CPU, in either mode.
+  IR_INPLACE_CMP   -6 bytes total: 3 cells smaller, 3 cells larger. Noise.
+
+Both were fp-only (`fp_active(f)`) proofs of concept for TASK #6. Neither was
+developed past the PoC, and neither pays. If the idea is revisited, the shape
+to beat is load_to_dehl + compare; start from these.
+
+=== IR_INPLACE_MASK (ir_lower_ops.inc.c 5386..5428) ===
+            /* [PoC, IR_INPLACE_MASK] TASK #6 lever (a): a narrow in-place const
+               bitwise on a slot-COHERENT long — apply the immediate directly to
+               the frame-slot bytes, skipping load_to_dehl (its dead high-word load
+               + `ld bc,hl` DE:BC park) and store_dehl_finalize. Matches sdcc's
+               `ld (ix-2),0` for `x &= 0xffff`. Correctness gates: fp/ix only;
+               in-place (dst slot == src[0] slot); src[0] authoritative in its slot
+               (not register-cached, no pending lazy spill) so the direct slot read
+               is not stale; neither operand register-homed; result lives only in
+               its slot afterward (nothing cached it, so no stale belief). */
+            if (getenv("IR_INPLACE_MASK") && fp_active(f)
+                && op->src[0] >= 0 && op->dst >= 0
+                && !L.la.cur_dehl_dst_dead_safe
+                && !vreg_is_pr_dehl(f, op->src[0])
+                && !vreg_is_pr_de(f, op->src[0]) && !vreg_in_pr_bc(f, op->src[0])
+                && !vreg_is_pr_dehl(f, op->dst)
+                && !vreg_is_pr_de(f, op->dst) && !vreg_in_pr_bc(f, op->dst)
+                && slot_off(f, op->src[0]) >= 0
+                && slot_off(f, op->dst) == slot_off(f, op->src[0])
+                && L.rs.dehl != op->src[0] && L.rs.de != op->src[0]
+                && L.rs.hl != op->src[0] && L.rs.bc != op->src[0]
+                && !(L.lazy_spill_on && L.pending_spill_v == op->src[0])) {
+                require_slot(f, op->dst);
+                int ixo = slot_ix_off(f, op->dst);
+                int ok = 1;
+                for (int i = 0; i < 4; i++)
+                    if (b[i] != identity && !fp_offset_fits(ixo + i)) ok = 0;
+                if (ok) {
+                    int used_a = 0;
+                    for (int i = 0; i < 4; i++) {
+                        if (b[i] == identity) continue;
+                        if (op->kind == IR_AND && b[i] == 0) {
+                            emit(out, "ld\t(%s%+d),0", frame_reg(), ixo + i);
+                        } else {
+                            emit(out, "ld\ta,(%s%+d)", frame_reg(), ixo + i);
+                            emit(out, "%s\t%u", mnem, (unsigned)b[i]);
+                            emit(out, "ld\t(%s%+d),a", frame_reg(), ixo + i);
+                            used_a = 1;
+                        }
+                    }
+                    if (used_a) invalidate_a_cache();
+                    return 0;
+                }
+            }
+
+=== IR_INPLACE_CMP (ir_lower_cmp.inc.c 941..962) ===
+            /* [PoC measure, IR_INPLACE_CMP] in-place slot-coherent long==const:
+               XOR each SLOT byte against the const, avoiding load_to_dehl. */
+            if (getenv("IR_INPLACE_CMP") && fp_active(f) && op->src[0] >= 0
+                && !vreg_is_pr_dehl(f, op->src[0])
+                && !vreg_is_pr_de(f, op->src[0]) && !vreg_in_pr_bc(f, op->src[0])
+                && slot_off(f, op->src[0]) >= 0
+                && L.rs.dehl != op->src[0] && L.rs.de != op->src[0]
+                && L.rs.hl != op->src[0] && L.rs.bc != op->src[0]
+                && !(L.lazy_spill_on && L.pending_spill_v == op->src[0])) {
+                int ixo = slot_ix_off(f, op->src[0]);
+                if (fp_offset_fits(ixo) && fp_offset_fits(ixo + 3)) {
+                    const uint8_t bb[4] = { b0, b1, b2, b3 };
+                    for (int i = 0; i < 4; i++) {
+                        emit(out, "ld\ta,(%s%+d)", frame_reg(), ixo + i);
+                        if (bb[i]) emit(out, "xor\t%u", (unsigned)bb[i]);
+                        if (i == 0) emit(out, "ld\tc,a");
+                        else { emit(out, "or\tc"); if (i < 3) emit(out, "ld\tc,a"); }
+                    }
+                    invalidate_a_cache();
+                    goto eqne_done;
+                }
+            }

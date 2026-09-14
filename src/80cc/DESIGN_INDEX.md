@@ -129,27 +129,27 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | `IR_CMPSIGN_PROBE` | signed-compare shapes | — |
 | `IR_ALLOC_PROBE` `IR_B1_PROBE` `IR_DEADDEF_PROBE` `IR_DELIVE_PROBE` `IR_DEPARK_PROBE` `IR_FRAMEPROBE` `IR_NARROWPROBE` `IR_SHLX_PROBE` | one-line censuses inside shipped passes | on their next edit |
 
-### Parked features — what they are, and whether a record exists
+### Parked features — measured across 30 benches x 12 CPUs x sp/fp
 
-16 became 11. Each now either has an ADR or a reason it does not need one.
+6 remain. Every one now has a number, not an opinion. Baseline 820,424 bytes
+over 720 cells; the bar for promotion is **no cell larger**, then ticks.
 
-| Gate | What it is | Record |
-| --- | --- | --- |
-| `IR_TIGHT_HOMES` | narrow homes to the true live range — the substrate for time-sharing | **ADR 0027** (Proposed) |
-| `IR_TRIPW` `IR_TRIPW_DEF` | weight costs by derived trip counts instead of `4^depth` | **ADR 0028** (Proposed) |
-| `IR_RANGED` | fail-safe DE cache fold at a definition | **ADR 0029** (Proposed) |
-| `IR_BC_STEP_PARAM` | a stepped-pointer param may ride BC | worth ~1 function; fails the one-bench rule |
-| `IR_INPLACE_CMP` | in-place slot-coherent `long == const` | proof of concept, unmeasured |
-| `IR_INPLACE_MASK` | narrow in-place const mask | proof of concept, unmeasured |
-| `IR_JR_UNCOND` | force unconditional `jr` per CPU | the policy is ADR 0025; this overrides it |
-| `IR_REHOME` | home re-arbitration after a demotion | default-on behaviour, inert on the shipping config |
-| `IR_ALLOC_PROBE` `IR_BCVETO_PROBE` | census probes | kept pending the cost ledger |
-| `IR_GBZ80_MASK` | gbz80 mask lowering | gbz80 only, unmeasured |
+| Gate | What it is | Size, 720 cells | Verdict |
+| --- | --- | --- | --- |
+| `IR_BC_STEP_PARAM` | a stepped-pointer param may ride BC | **−514 B, 24 smaller, 0 larger** | **promotion candidate** — needs the tick matrix and `long_ir`, then ship |
+| `IR_JR_UNCOND` | relax unconditional `jr` on every CPU, not just where it is free | **−350 B, 114 smaller, 0 larger** | size says yes, but it is a byte-for-tick trade on z80 — ADR 0025 set the per-CPU policy for a reason. Needs ticks before promotion |
+| `IR_TIGHT_HOMES` | narrow homes to the true live range (ADR 0027) | −508 B, 73 smaller, **39 larger** | **the premise is refuted** — it was meant to be byte-identical. See ADR 0027; thedifference must be explained before it lands |
+| `IR_RANGED` | fail-safe DE cache fold (ADR 0029) | −110 B, 76 smaller, **108 larger** | mixed; fails the no-regression bar, as 0029 suspected |
+| `IR_TRIPW` `IR_TRIPW_DEF` | trip-count weighting (ADR 0028) | **+845 B**, 48 smaller, **81 larger** | a net size LOSS. Only defensible if the tick matrix pays for it — measure ticks or refuse it |
+| `IR_GBZ80_COST` | the measured gbz80 cost row | not in this matrix | a **correction** (the estimated row is wrong), but it causes a regression — pending investigation, not a parked idea |
 
-Deleted 2026-09-13: `IR_OPRES` (ADR 0018 rejects the thesis; the code was its
-residue), `IR_NO_A_CARRY` (redundant once `a-carry` joined the registry),
-`IR_FLIPCOST`, `IR_SPINC`, `IR_SPEXCL` (report and bisect scaffolding for
-`sp-flip`, which shipped).
+Deleted after measurement: `IR_INPLACE_MASK` (fires on **zero** cells, any CPU,
+either mode) and `IR_INPLACE_CMP` (−6 B: 3 smaller, 3 larger — noise). Both were
+fp-only proofs of concept; source in `probes-retired/`.
+
+Deleted earlier: `IR_OPRES` (ADR 0018 rejects the thesis), `IR_NO_A_CARRY`,
+`IR_FLIPCOST`, `IR_SPINC`, `IR_SPEXCL`, and `IR_REHOME` (a private duplicate of
+`home-rearb`).
 
 ### Numeric knobs — a category with no home
 

@@ -21,9 +21,14 @@ has no real window to check against.
 
 Narrow each home to the value's true live range.
 
-This is expected to be **byte-identical**, and that expectation is the point: a
-vreg is only accessed within its live range, where its home is unchanged. So
-the narrowing cannot alter any access that the compiler is supposed to make.
+The reasoning said this must be **byte-identical**: a vreg is only accessed
+within its live range, where its home is unchanged, so narrowing cannot alter
+any access the compiler is supposed to make.
+
+**Measured, it is not.** Across the corpus at 30 benches x 12 CPUs x both frame
+modes: 73 cells smaller, **39 cells larger**, −508 bytes net, worst regression
++29 bytes on one file. So the premise is wrong somewhere, and finding out where
+is the whole value of this step — see below.
 
 Cache-only homes (HL, DEHL) and unhomed values are skipped; they are not
 residency in the sense the table records.
@@ -42,6 +47,20 @@ interval verifier a real window instead of a tautology.
 
 ## Acceptance
 
-Byte-identical across the corpus, every CPU variant, both frame modes. Any cell
-that differs is investigated as an invisible-residency finding and explained
-before the step lands — never absorbed as noise.
+The original bar was byte-identical across the corpus, every CPU variant and
+both frame modes, with any differing cell investigated as an invisible-residency
+finding. That bar is **not met**, and thedifference is not noise — 112 cells move.
+
+So the step cannot land as written. Before it does, the differing cells have to
+be explained, and there are only two possibilities:
+
+1. the lowerer really does access a value outside its IR live range (the
+   invisible-residency hazard — a latent miscompile waiting for ranged
+   residency), or
+2. the narrowed interval changes an allocation decision downstream, in which
+   case this is not the neutral substrate step it was meant to be, and it needs
+   its own size and tick case like any optimisation.
+
+Start with the worst cell (`md5`, +29 bytes, every CPU, fp mode) — it reproduces
+identically across CPUs, which points at decision change rather than a
+CPU-specific access.

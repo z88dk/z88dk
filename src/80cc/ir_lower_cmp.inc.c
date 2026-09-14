@@ -938,28 +938,6 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
             uint8_t b1 = (uint8_t)((k >> 8) & 0xff);
             uint8_t b2 = (uint8_t)((k >> 16) & 0xff);
             uint8_t b3 = (uint8_t)((k >> 24) & 0xff);
-            /* [PoC measure, IR_INPLACE_CMP] in-place slot-coherent long==const:
-               XOR each SLOT byte against the const, avoiding load_to_dehl. */
-            if (getenv("IR_INPLACE_CMP") && fp_active(f) && op->src[0] >= 0
-                && !vreg_is_pr_dehl(f, op->src[0])
-                && !vreg_is_pr_de(f, op->src[0]) && !vreg_in_pr_bc(f, op->src[0])
-                && slot_off(f, op->src[0]) >= 0
-                && L.rs.dehl != op->src[0] && L.rs.de != op->src[0]
-                && L.rs.hl != op->src[0] && L.rs.bc != op->src[0]
-                && !(L.lazy_spill_on && L.pending_spill_v == op->src[0])) {
-                int ixo = slot_ix_off(f, op->src[0]);
-                if (fp_offset_fits(ixo) && fp_offset_fits(ixo + 3)) {
-                    const uint8_t bb[4] = { b0, b1, b2, b3 };
-                    for (int i = 0; i < 4; i++) {
-                        emit(out, "ld\ta,(%s%+d)", frame_reg(), ixo + i);
-                        if (bb[i]) emit(out, "xor\t%u", (unsigned)bb[i]);
-                        if (i == 0) emit(out, "ld\tc,a");
-                        else { emit(out, "or\tc"); if (i < 3) emit(out, "ld\tc,a"); }
-                    }
-                    invalidate_a_cache();
-                    goto eqne_done;
-                }
-            }
             load_to_dehl(out, f, op->src[0]);
             emit(out, "ld\ta,l");
             if (b0) emit(out, "xor\t%u", (unsigned)b0);
@@ -1027,7 +1005,6 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
             emit(out, "xor\th");
             emit(out, "or\tc");
         }
-    eqne_done:
         invalidate_hl_bc();
         if (g_hc.branch_test_kind != 0) {
             int br_true = (g_hc.branch_test_kind == IR_BR_COND);
