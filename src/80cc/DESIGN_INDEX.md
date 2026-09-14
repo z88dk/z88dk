@@ -83,7 +83,9 @@ next worked on.
 
 ## Opt-outs
 
-One registry of 112 names. Two front doors, equivalent:
+One registry of 114 names, **each described in `OPTIONS.md`**, with
+`check_options.sh` failing if a name is undocumented or a documented name no
+longer exists. Two front doors, equivalent:
 
     --opt-disable=name,name     a compiler flag, for a user
     IR_OFF=name,name            the same registry, for a measurement
@@ -188,11 +190,8 @@ What survives here is the durable layer: `adr/` (27 records), `CONTEXT.md`
 (vocabulary), `AGENTS.md` (working rules), this index, `DESIGN_REVIEW_PLAN.md`
 (the current work), and the retired probe sources under `probes-retired/`.
 
-One more file survives on its own terms: `DEBUG_LOCALS_PLAN.md`, status
-**shipped** — it records how `-debug` homes a named local in its frame slot
-(the mechanism is `IR_VREG_ADDR_TAKEN`, not a new flag). It is tracked and
-states no next action. Fold it into an ADR the next time debug information is
-touched.
+`DEBUG_LOCALS_PLAN.md` became **ADR 0030** and was deleted — it recorded a
+shipped decision, which is what the durable layer is for.
 
 `CONTEXT.md` is spelled in capitals. This workspace is mounted from a
 case-insensitive host filesystem, so `context.md` resolves to the same file

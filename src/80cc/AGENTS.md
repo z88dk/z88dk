@@ -1,9 +1,20 @@
 # AGENTS.md — 80cc backend working rules
 
 Backend-specific rules. Read the repo-root `AGENTS.md` first (build/copy-to-bin,
-validation, commit hygiene, copt edges). Vocabulary is in `CONTEXT.md`. This file is
-the *how to work on 80cc* checklist; the *what/why* of each arc is in the untracked
-`*_PLAN.md` + agent memory.
+validation, commit hygiene, copt edges). This file is the *how to work on 80cc*
+checklist. The rest of the design record:
+
+| File | Holds |
+|---|---|
+| `DESIGN_INDEX.md` | what is live, and the single next action — **start here** |
+| `adr/` | how the back end works and why, plus what was refused (`Rejected`) |
+| `CONTEXT.md` | vocabulary (residency terms, and probe/parked/opt-out/verifier) |
+| `OPTIONS.md` | every `--opt-disable` / `IR_OFF` name and what turning it off does |
+| `DESIGN_REVIEW_PLAN.md` | the current simplification work |
+| `probes-retired/` | source of deleted probes, so a census can be re-run |
+
+The old `*_PLAN.md` / `HANDOVER_*.md` pile is on branch `80cc-docs-archive`
+(one commit, never merged) — `git show 80cc-docs-archive:src/80cc/<file>.md`.
 
 ## Pipeline (where a change belongs)
 
@@ -15,8 +26,11 @@ frontend (ir_build.c) → IR
   → copt (lib/80cc_rules.1)  post-render peephole
 ```
 
-- **Register vs slot** is decided in `ir_alloc.c`. Which values get a frame slot is
-  `ir_slots.c` (only `IR_PR_SPILL` vregs, minus `IR_VREG_NO_SLOT`).
+- **Register vs slot** is decided in `ir_alloc.c`, and so is whether a home needs a
+  backing slot — `ir_slots.c` asks `ir_home_requires_slot()` and places the slot it
+  is told to place. `ir_alloc.c` is the ONLY writer of `vreg_to_phys` / `home_lo` /
+  `home_hi`, and the only code that reads them by index; see the ownership section
+  below and `check_ownership.sh`.
 - **The lowerer never asks for a scratch register** — it has fixed per-op register
   roles (Bus = HL/A; Parking = BC/DE/IX/IY) and reads homes from the allocator. See
   `CONTEXT.md`.
@@ -50,7 +64,11 @@ frontend (ir_build.c) → IR
     allocation-sensitive (any added printf masks them): byte-fastcall-arg widen
     (`8cd0132ae2`), call-result index-home commit across a BB (`b6320c9783`), and a
     stale scalar cache after an index-register accumulate (`cc6c6719d1`, fp-only).
-  - `emu.c` (magnetic scrolls, the endian/char-heavy real file): from
+  - `emu.c` (magnetic scrolls, the endian/char-heavy real file) — **not checked
+    in**, so a fresh clone will not have it; when it is present it is the most
+    valuable gate here, because it exercises shapes the corpus lacks entirely
+    (several opt-outs move hundreds of bytes on it and nothing on the corpus):
+    from
     `support/magnetic/zxnext_magnetic/test`, `zcc +test -clib=z80n emu.c main.c
     -compiler=80cc -o a.bin`, then `printf 'look\nquit\nq\n' | z88dk-ticks -mz80n -w 1
     a.bin | grep -a 'On The Path'` → 2 hits (intro + look). NB `grep -a` (game text has
@@ -100,21 +118,31 @@ read outside `ir_alloc.c`. A render that cannot realise a home REPORTS it
   corpus scans can only pass env vars). Both take a comma list and accept `all`.
   Read it as `!opt_disabled("my-opt")`; never add a private `getenv` for an
   opt-out. The older `IR_NO_*` and `IR_<FEATURE>=0` forms are gone: their
-  mapping is `IR_NO_FOO_BAR` → `foo-bar`, `IR_A_CARRY` → `a-carry`.
+  mapping is `IR_NO_FOO_BAR` → `foo-bar`, `IR_A_CARRY` → `a-carry`. **Every name
+  is described in `OPTIONS.md`, and `check_options.sh` fails if one is missing or
+  stale — add the row in the same commit as the gate.**
 - Opt-in (experimental default-off): an `IR_*` env checked via `getenv` (cache it in a
-  `static int = -1` so it's read once). Example live gate: `IR_LONG_DEBC`.
+  `static int = -1` so it's read once). Example live gate: `IR_LONG_DEBC`. It must
+  state the ONE decision it will answer and earn a row in `DESIGN_INDEX.md`;
+  without a row it is deleted at the next sweep. A parked feature that is kept
+  gets an ADR with status `Proposed`, not an indefinite gate.
+- A NUMERIC knob (`IR_FOO=<N>` setting a constant) cannot be expressed by the
+  on/off registry, so it stays a private `getenv` — but it is a parked experiment
+  with a dial, and the same index rule applies. When the value is settled, put it
+  in the code and delete the dial.
 - Inert probes/verifiers: env-gated, zero codegen change, default byte-identical. The
   proven pattern for a risky arc is **verifier-first** — land an inert measurement
   (e.g. `IR_REC_VERIFY`, the recoverability verifier), run the corpus, confirm the
   model holds, *then* change codegen.
 
-## Standing arcs (state — detail in the PLAN docs / memory)
+## Standing arcs (state — detail in `DESIGN_INDEX.md` and the ADRs)
 
 - **DE:BC residency** (`IR_LONG_DEBC`, opt-in) — make DE:BC the canonical 32-bit layout,
   delete the DEHL↔BC shuffle. Landed: consumer conversions, cross-BB carry, PR_DEBC
   home, B2 (slotless fastcall-long param), frameless-fastcall, gen_add/sub → DE:BC,
   destination-aware chooser. **PARKED** (maintainer decision): only ~−42B on emu.c; the
-  real gap is elsewhere. Stays gated + byte-identical-off. `LONG_DEBC_RESIDENCY_PLAN.md`.
+  real gap is elsewhere. Stays gated + byte-identical-off.
+  (`git show 80cc-docs-archive:src/80cc/LONG_DEBC_RESIDENCY_PLAN.md`.)
 - **noframe / frameless** — trivial functions were getting spurious frame slots (→ IX
   frame pointer). `no_slot_consumer_safe` / `compute_no_slot_bytes` (ir_lower.c) mark
   A-only byte temps `IR_VREG_NO_SLOT`; `frameless_ok` (Tier-B) skips the IX frame when
