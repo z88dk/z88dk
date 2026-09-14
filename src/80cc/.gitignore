@@ -4,10 +4,20 @@
 z88dk-80cc
 ir_selftest
 
-# Python byte-cache from the analysis scripts kept here while working
+# Everything below is anchored to src/80cc itself (leading /), so the tracked
+# subdirectories — scripts/, adr/, probes-retired/, regression/ — are unaffected.
+#
+# This directory accumulates working files: analysis scripts, probe patches,
+# assembler dumps and one-off benches. They are tools, not project sources, and
+# they must not be swept into a commit by a careless `git add -A`.
+/*.py
+/*.sh
+/*.patch.txt
+/*.asm
+/*.txt
 __pycache__/
 *.pyc
 
-# Assembler output — the compiler emits these next to the sources when you
-# run it by hand; three were committed by accident in June 2026.
-*.asm
+# Scratch C files that have been committed by accident before
+/nullbench.c
+/t1.c
