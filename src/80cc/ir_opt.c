@@ -3001,14 +3001,6 @@ static int v_is_sx_of_byte(const Func *f, int v)
    truth-test counts too WHEN v provably fits a byte (a byte-mask AND, e.g.
    `crc & 0x80`): then testing the low byte is testing the whole value, so
    the producer can stay 8-bit (no `ld h,0` widen for the branch). */
-/* [IR_NARROWPROBE] Census of values that COULD have been byte-width but were
-   not. Two gates reject a candidate: some def has no 8-bit lowering
-   (narrow_kind), or some use needs more than the low byte
-   (demands_low_byte_only). Knowing WHICH gate, and which op kind, is what
-   picks the next piece of narrowing work — the pass already earns 617B on
-   emu.c and the width census says roughly 4400B is still on the table. */
-static int nb_probe_on(void)
-{ static int c = -1; if (c < 0) c = getenv("IR_NARROWPROBE") ? 1 : 0; return c; }
 static int nb_block_use = -1;   /* op kind of the use that refused, or -1 */
 
 static int demands_low_byte_only(const Func *f, int v)
@@ -3396,24 +3388,6 @@ int ir_opt_narrow_byte(Func *f)
         }
     }
 
-    /* [IR_NARROWPROBE] Anything still width-2 with a def is a rejected
-       candidate — report which gate refused it and the op kind responsible.
-       Emitted per function; a consumer should aggregate by (gate, kind). */
-    if (nb_probe_on()) {
-        for (int d = 0; d < f->n_vregs; d++) {
-            if (!hasdef[d] || f->vregs[d].width != 2) continue;
-            if (bad[d]) {
-                fprintf(stderr, "NARROWPROBE %s v%d gate=def kind=%d\n",
-                        f->fn ? ir_sym_name(f->fn) : "?", d, badkind[d]);
-            } else {
-                nb_block_use = -1;
-                (void)demands_low_byte_only(f, d);
-                fprintf(stderr, "NARROWPROBE %s v%d gate=use kind=%d fits=%d\n",
-                        f->fn ? ir_sym_name(f->fn) : "?", d, nb_block_use,
-                        v_fits_byte(f, d));
-            }
-        }
-    }
     free(bad);
     free(hasdef);
     free(badkind);
