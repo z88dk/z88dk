@@ -12,7 +12,10 @@ live, it belongs in `adr/` or in git history, not here.
 **The simplification is finished.** All four invariants hold and two of them are
 enforced by a script. What remains is optimisation work, and the order matters:
 
-1. **Fix two point-query misuses** — `hashbench/hash_key v9` and
+0. ~~Fix the point-query misuses~~ — **done**: a static DE-clean proof now runs
+   with no ambient point, and window rejections across the corpus went 26 -> 0.
+
+1. ~~Fix two point-query misuses~~ — `hashbench/hash_key v9` and
    `structbench/walk v2` ask a whole-function question through `ir_home_at` at
    flat index 0, before the value's live range starts. Harmless today, a
    miscompile under ranging. Small and independent of everything else.
@@ -104,6 +107,7 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | Gate | Question | Retire when |
 | --- | --- | --- |
 | `IR_GRAPH_PROBE` | is the capture gap in proposal or in selection? | the step A1 cost ledger answers it per claim |
+| `IR_LEDGER` | does the BC evict decision compare the right numbers? | **answered in part** (ADR 0035): both denominations agree and both under-price a `PARAM_IN_PLACE` incumbent, because its slot cost depends on a frame mode allocation does not know. Keep until the ledger lands |
 
 | `IR_BCVETO_PROBE` | what does the BC veto turn away? | the veto becomes a cost term |
 | `IR_PREPUSH_PROBE` | which calls does the pre-push hazard cover? | — |

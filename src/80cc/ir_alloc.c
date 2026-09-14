@@ -3284,7 +3284,8 @@ static int bcpercand_on(void)
 static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                        const int *bb_first_op, const int *def_kind,
                        const int *write_count, const int *use_count,
-                       const long *cost_benefit, int vetoed)
+                       const long *cost_benefit, int vetoed,
+                       const int *bb_loop_depth, const int *bb_cond_shift)
 {
     if (opt_disabled("bc-pack")) return;
     if (f->n_vregs <= 0) return;
@@ -3384,6 +3385,34 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                     ben[pass] += cost_benefit[cand[i].vreg];
                     last = cand[i].fhi;
                 }
+            }
+            /* [IR_LEDGER, inert] The two sides of this decision are counted in
+               COST_*_W weights — a generic per-access unit — while the arbiter
+               ranks with interval_benefit_x, which prices an access by the g0
+               row for its CPU and category. Comparing in the generic unit is
+               what the IR_CS_EVICT note above warns about, one level up: the
+               incumbent's reads are credited as if every one cost the same,
+               so a param read six times through BC (each read `ld hl,bc`, one
+               instruction) prices the same as a temp read once.
+               Report both denominations so the gap is visible before any
+               weight is changed. */
+            if (getenv("IR_LEDGER")) {
+                long g_evict = 0, g_gain = 0;
+                for (int j = 0; j < f->n_vregs; j++)
+                    if (evictable[j])
+                        g_evict += interval_benefit_x(f, j, bb_loop_depth,
+                                                      bb_cond_shift, GR_BC, 1);
+                for (int i = 0; i < nc; i++)
+                    g_gain += interval_benefit_x(f, cand[i].vreg, bb_loop_depth,
+                                                 bb_cond_shift, GR_BC, 1);
+                fprintf(stderr,
+                        "LEDGER %-20s generic: evict=%ld gain=%ld -> %s | "
+                        "grounded: evict=%ld gain=%ld -> %s\n",
+                        f->fn ? ir_sym_name(f->fn) : "?",
+                        evict_ben, ben[1] - ben[0],
+                        (evict_ben > 0 && ben[1] - ben[0] > evict_ben) ? "EVICT" : "keep",
+                        g_evict, g_gain,
+                        (g_gain > g_evict) ? "EVICT" : "keep");
             }
             int evicted = 0;
             if (evict_ben > 0 && ben[1] - ben[0] > evict_ben)
@@ -5318,7 +5347,7 @@ void ir_alloc(Func *f)
            out-benefits, then pack the freed BC. */
         if (bc_region_ok || bcpercand_on())
         ir_bc_pack(f, first_use, last_use, bb_first_op, def_kind,
-                   write_count, use_count, cost_benefit, !bc_region_ok);
+                   write_count, use_count, cost_benefit, !bc_region_ok, bb_loop_depth, bb_cond_shift);
         /* LRA Phase 2c (default on, IR_NO_LRA opts out): home a DE-dirty
            reduction chain in IY (add iy,de), taking the spill losers BC couldn't. */
         if (iy_region_ok)
