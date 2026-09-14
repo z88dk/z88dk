@@ -659,7 +659,7 @@ void test_math32_edges()
     Assert(r.u == 0xff800000ul, "invsqrt(-0) is -Inf");
 
     r.f = exp((FLOAT)100.0);
-    Assert(r.f == (FLOAT)HUGE_POS_F32, "exp(100) overflows to HUGE_POS");
+    Assert(r.u == 0x7f800000ul, "exp(100) overflows to +Inf (IEEE-754)");
     r.f = exp((FLOAT)(-100.0));
     Assert(r.f == vz, "exp(-100) underflows to 0");
 
