@@ -3405,10 +3405,13 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                 for (int i = 0; i < nc; i++)
                     g_gain += interval_benefit_x(f, cand[i].vreg, bb_loop_depth,
                                                  bb_cond_shift, GR_BC, 1);
+                int n_ev = 0;
+                for (int j = 0; j < f->n_vregs; j++)
+                    if (evictable[j]) n_ev++;
                 fprintf(stderr,
-                        "LEDGER %-20s generic: evict=%ld gain=%ld -> %s | "
+                        "LEDGER %-20s inc=%d cand=%d | generic: evict=%ld gain=%ld -> %s | "
                         "grounded: evict=%ld gain=%ld -> %s\n",
-                        f->fn ? ir_sym_name(f->fn) : "?",
+                        f->fn ? ir_sym_name(f->fn) : "?", n_ev, nc,
                         evict_ben, ben[1] - ben[0],
                         (evict_ben > 0 && ben[1] - ben[0] > evict_ben) ? "EVICT" : "keep",
                         g_evict, g_gain,
