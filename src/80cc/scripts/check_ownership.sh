@@ -8,7 +8,7 @@
 #
 # ir.c is exempt: it owns the Func struct and dumps it raw, below ir_alloc.
 # Run from src/80cc. Exits non-zero and prints the offending lines.
-cd "$(dirname "$0")" || exit 2
+cd "$(dirname "$0")/.." || exit 2        # run against src/80cc, not scripts/
 FILES=$(ls ir_lower.c ir_slots.c ir_opt.c ir_analysis.c ir_build.c ir_match.c *.inc.c 2>/dev/null)
 rc=0
 

@@ -2,7 +2,7 @@
 # refcmp.sh <refdir> — rebuild the same set and diff against the reference.
 # Filters the per-run header (timestamp / module name) that always differs.
 SD=$(mktemp -d)
-bash /workspaces/z88dk/src/80cc/refgen.sh "$SD" >/dev/null
+bash "$(dirname "$0")/refgen.sh" "$SD" >/dev/null
 n=0; bad=0
 for f in "$1"/*.asm; do
   b=$(basename "$f"); n=$((n+1))

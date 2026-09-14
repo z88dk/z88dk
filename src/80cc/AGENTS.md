@@ -10,7 +10,6 @@ checklist. The rest of the design record:
 | `adr/` | how the back end works and why, plus what was refused (`Rejected`) |
 | `CONTEXT.md` | vocabulary (residency terms, and probe/parked/opt-out/verifier) |
 | `OPTIONS.md` | every `--opt-disable` / `IR_OFF` name and what turning it off does |
-| `DESIGN_REVIEW_PLAN.md` | the current simplification work |
 | `probes-retired/` | source of deleted probes, so a census can be re-run |
 
 The old `*_PLAN.md` / `HANDOVER_*.md` pile is on branch `80cc-docs-archive`
@@ -30,7 +29,7 @@ frontend (ir_build.c) → IR
   backing slot — `ir_slots.c` asks `ir_home_requires_slot()` and places the slot it
   is told to place. `ir_alloc.c` is the ONLY writer of `vreg_to_phys` / `home_lo` /
   `home_hi`, and the only code that reads them by index; see the ownership section
-  below and `check_ownership.sh`.
+  below and `scripts/check_ownership.sh`.
 - **The lowerer never asks for a scratch register** — it has fixed per-op register
   roles (Bus = HL/A; Parking = BC/DE/IX/IY) and reads homes from the allocator. See
   `CONTEXT.md`.
@@ -52,7 +51,18 @@ frontend (ir_build.c) → IR
 - **byte-identical gate-off** for a gated opt: compile the corpus with the gate off,
   diff vs a pre-change reference compiler (filter `C_LINE 0,|^\s*MODULE\s|Module
   compile time`). Build BOTH refs into separate dirs, then diff — don't swap `bin/`
-  mid-loop.
+  mid-loop. `scripts/refgen.sh <dir>` captures a reference, `scripts/refcmp.sh
+  <dir>` re-runs and diffs it.
+- **"byte-identical" needs a named matrix.** These files hold many gates, and a
+  refactor can preserve the default path while moving a gated one. It means: the
+  whole bench corpus, across every CPU variant, in both sp and fp, at default
+  gate settings — plus a gate-off run for each gate the change touches. A change
+  that is byte-identical only at default settings must say so.
+- A result is **ready** only when all of these hold: the opt-out is
+  byte-identical to the baseline; the requested mode has no correctness
+  regression; the size report names every larger cell; the tick report names
+  every slower valid-tick cell; and `DESIGN_INDEX.md` records the decision and
+  its evidence.
 - **Real-file behavioural gate** — char-processing real files exercise shapes the
   corpus + long_ir + emu.c don't (byte-fastcall-arg promotion, call-result index-home
   commit across a BB).
@@ -107,7 +117,7 @@ and the only code that reads them by index. Everywhere else asks:
 
 A point decision that reads the assignment directly ignores the home interval.
 That is inert while homes are whole-function and a miscompile once they are not.
-Run `src/80cc/check_ownership.sh` — it fails on a direct write or an indexed
+Run `src/80cc/scripts/check_ownership.sh` — it fails on a direct write or an indexed
 read outside `ir_alloc.c`. A render that cannot realise a home REPORTS it
 (`ir_alloc_demote_home`, `ir_alloc_word_home_reject`); it never edits the plan.
 
@@ -119,7 +129,7 @@ read outside `ir_alloc.c`. A render that cannot realise a home REPORTS it
   Read it as `!opt_disabled("my-opt")`; never add a private `getenv` for an
   opt-out. The older `IR_NO_*` and `IR_<FEATURE>=0` forms are gone: their
   mapping is `IR_NO_FOO_BAR` → `foo-bar`, `IR_A_CARRY` → `a-carry`. **Every name
-  is described in `OPTIONS.md`, and `check_options.sh` fails if one is missing or
+  is described in `OPTIONS.md`, and `scripts/check_options.sh` fails if one is missing or
   stale — add the row in the same commit as the gate.**
 - Opt-in (experimental default-off): an `IR_*` env checked via `getenv` (cache it in a
   `static int = -1` so it's read once). Example live gate: `IR_LONG_DEBC`. It must

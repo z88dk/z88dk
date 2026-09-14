@@ -176,6 +176,6 @@ exists (ADR 0010).
 
 ## Keeping this file true
 
-`check_options.sh` fails if a registry name has no row here, or a row names an
+`scripts/check_options.sh` fails if a registry name has no row here, or a row names an
 option that no longer exists. Run it with any change that adds or removes an
 `opt_disabled` call.

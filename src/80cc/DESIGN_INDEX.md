@@ -8,20 +8,25 @@ Last swept: 2026-09-13, branch `80cc-simplify`.
 
 ## Next action
 
-**Finish the gate sweep, then unify home ownership** —
-see `DESIGN_REVIEW_PLAN.md` (same directory), steps 2 to 7. In progress:
+**The simplification is finished.** All four invariants hold and two of them are
+enforced by a script. What remains is optimisation work, and the order matters:
 
-| Step | State |
-| --- | --- |
-| 1. Bounded-buffer fixes | done — `aea4c1594f`, `a25f552397` |
-| 2. Gate sweep | done — 119 gates to 58; one opt-out registry |
-| 3. This index | done |
-| 4. Document pass | done — archived on `80cc-docs-archive`, 9 new ADRs |
-| 5. Home plan (one owner) | done — no code outside `ir_alloc` writes home state |
-| 6. Query boundary | done — `check_ownership.sh` enforces it |
-| 7. Lowering facts | not started |
+1. **Resolve the `IR_TIGHT_HOMES` byte-identity failure** (ADR 0027) — stage 1 of
+   the ranging arc, and possibly a latent miscompile. `md5` in fp, +29 bytes,
+   reproducing identically on every CPU.
+2. **Build the realised-cost ledger**, scoring each `(vreg, home, window)` claim
+   and including the **opportunity cost** of the claim it displaces. Two refused
+   levers (ADR 0021, ADR 0028) failed for want of that term, so it gates them
+   rather than competing with them.
+3. Then stages 2 and 3 of the ranging arc (ADR 0017).
 
-No optimisation work starts until invariants 2 and 3 hold (see the plan).
+One step of the original simplification plan was deliberately not done:
+retiring the mirror predicate pairs — a legality proof and its emitter each
+encoding the same facts, so an emitter change can silently invalidate its proof.
+The pairs are `op_de_clean` / `try_de_home_clean_store`,
+`sp_dehome_loop_cmp_ok` / `try_sp_dehome_loop_cmp`, and
+`de_home_clean_bitop_ok` with its bitop emitter. If it is picked up, do exactly
+those two families and stop; "one family at a time" has no natural end.
 
 ## The four invariants
 
@@ -43,8 +48,8 @@ made the output worse.**
 The common cause is that nothing prices **the claim a decision displaces**.
 Scores are computed per candidate in isolation, so when two are close the winner
 is settled by pass order, and a more accurate score just re-rolls it. That is why
-`DESIGN_REVIEW_PLAN.md` step A1 — the realised-cost ledger including opportunity
-cost — is the first item of resumed optimisation work.
+the realised-cost ledger — scoring each claim including the opportunity cost of
+what it displaces — is the first item of resumed optimisation work.
 
 **A third case was listed here and has been removed, because it had a different
 cause.** The gbz80 cost row (ADR 0032) looked identical from the outside: correct
@@ -94,7 +99,7 @@ it asks one of:
 | is v's home window ranged | `ir_home_is_ranged(f, v)` |
 | what window does the home cover | `ir_home_window(f, v, &lo, &hi)` |
 
-`src/80cc/check_ownership.sh` enforces both halves and is the reason this stays
+`src/80cc/scripts/check_ownership.sh` enforces both halves and is the reason this stays
 true: it fails on a direct write, a `memcpy` over the arrays, or an indexed
 read outside `ir_alloc.c`. It was tested against a deliberate bypass. Run it
 with any change that touches residency.
@@ -114,7 +119,7 @@ next worked on.
 ## Opt-outs
 
 One registry of 114 names, **each described in `OPTIONS.md`**, with
-`check_options.sh` failing if a name is undocumented or a documented name no
+`scripts/check_options.sh` failing if a name is undocumented or a documented name no
 longer exists. Two front doors, equivalent:
 
     --opt-disable=name,name     a compiler flag, for a user
@@ -235,8 +240,8 @@ history you have to read. Recover one with:
     git checkout 80cc-docs-archive -- src/80cc/<file>.md
 
 What survives here is the durable layer: `adr/` (27 records), `CONTEXT.md`
-(vocabulary), `AGENTS.md` (working rules), this index, `DESIGN_REVIEW_PLAN.md`
-(the current work), and the retired probe sources under `probes-retired/`.
+(vocabulary), `AGENTS.md` (working rules), this index, the validation and check
+scripts under `scripts/`, and the retired probe sources under `probes-retired/`.
 
 `DEBUG_LOCALS_PLAN.md` became **ADR 0030** and was deleted — it recorded a
 shipped decision, which is what the durable layer is for.
