@@ -1,6 +1,8 @@
 # ADR 0029 — The fail-safe DE cache fold
 
-Status: Proposed (staged behind `IR_RANGED`)
+Status: Proposed, **in flight** — the conservative form of stage 3 of ADR 0017's
+ranging arc (park in the slot when the range is interrupted), staged behind
+`IR_RANGED`.
 
 Relates to ADR 0018, which **rejects** the DE *home* for the same class of
 value, and to ADR 0016 (the belief cache).

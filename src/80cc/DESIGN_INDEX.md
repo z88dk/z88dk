@@ -154,28 +154,45 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | `IR_CMPSIGN_PROBE` | signed-compare shapes | — |
 | `IR_ALLOC_PROBE` `IR_B1_PROBE` `IR_DEADDEF_PROBE` `IR_DELIVE_PROBE` `IR_DEPARK_PROBE` `IR_FRAMEPROBE` `IR_NARROWPROBE` `IR_SHLX_PROBE` | one-line censuses inside shipped passes | on their next edit |
 
-### Parked features — measured across 30 benches x 12 CPUs x sp/fp
+### In flight — the ranging arc (ADR 0017)
 
-3 remain, and **every one has an ADR and a number** — no parked feature is
-undocumented. `IR_BC_STEP_PARAM` was promoted out of this table (ADR 0031). Baseline 820,424 bytes
-over 720 cells; the bar for promotion is **no cell larger**, then ticks.
+The three remaining gates are **not** parked experiments. They are the staged
+steps of one piece of work: get to ranged residency, and park a value back in
+its slot when its range is interrupted.
 
-| Gate | What it is | Size, 720 cells | Verdict |
+| Stage | Gate | ADR | State |
 | --- | --- | --- | --- |
-| ~~`IR_BC_STEP_PARAM`~~ | a stepped-pointer param may ride BC | **−514 B / −0.06 % ticks, 0 cells larger, 0 slower** | **SHIPPED default-on** as `bc-step-param` — ADR 0031 |
-| ~~`IR_JR_UNCOND`~~ | relax unconditional `jr` on every CPU | −350 B, but **57 z80 + 57 z80n cells SLOWER, none faster** | **REFUSED and removed** — ADR 0033. Every other CPU already relaxes, so it only ever acted where the timing says no |
-| `IR_TIGHT_HOMES` | narrow homes to the true live range (ADR 0027) | −508 B, 73 smaller, **39 larger** | **the premise is refuted** — it was meant to be byte-identical. See ADR 0027; thedifference must be explained before it lands |
-| `IR_RANGED` | fail-safe DE cache fold (ADR 0029) | −110 B, 76 smaller, **108 larger** | mixed; fails the no-regression bar, as 0029 suspected |
-| ~~`IR_TRIPW` `IR_TRIPW_DEF` `IR_TRIPPROBE`~~ | trip-count weighting | **+845 B AND +0.066 % ticks** (70 cells slower, 54 faster) | **REFUSED and removed** — ADR 0028. Loses on both axes, so there is no trade |
-| `IR_GBZ80_COST` | the measured gbz80 cost row | −14 B on two benches, **+10 % ticks** on another | **ADR 0032.** A correction, not a preference — gbz80 was using Z80 numbers. Blocked on a ranking near-tie, which is the opportunity-cost term ADR 0021 also wants |
+| 1. truthful intervals | `IR_TIGHT_HOMES` | 0027 | byte-identity premise **refuted**; explain it first |
+| 2. ranging | — | 0017 | blocked on stage 1 |
+| 3. park the slot when the range breaks | `IR_RANGED` | 0029 | in flight, conservative form |
+| cost correctness | `IR_GBZ80_COST` | 0032 | correct row, blocked on a ranking tie |
 
-Deleted after measurement: `IR_INPLACE_MASK` (fires on **zero** cells, any CPU,
-either mode) and `IR_INPLACE_CMP` (−6 B: 3 smaller, 3 larger — noise). Both were
-fp-only proofs of concept; source in `probes-retired/`.
+Read their size numbers with that in mind. `IR_TIGHT_HOMES` at −508 B with 39
+cells larger, and `IR_RANGED` at −110 B with 108 cells larger, are **not**
+verdicts on whether the stages are worth doing — a stage measured alone, without
+the stage it depends on, cannot show its value. The one number that IS a verdict
+is the `IR_TIGHT_HOMES` byte-identity failure, because that claim was supposed to
+hold on its own.
 
-Deleted earlier: `IR_OPRES` (ADR 0018 rejects the thesis), `IR_NO_A_CARRY`,
-`IR_FLIPCOST`, `IR_SPINC`, `IR_SPEXCL`, and `IR_REHOME` (a private duplicate of
-`home-rearb`).
+Promoted out of this list: `IR_BC_STEP_PARAM` (ADR 0031, shipped). Refused and
+removed: `IR_JR_UNCOND` (ADR 0033, slower on the only CPUs it touched),
+`IR_TRIPW` (ADR 0028, worse on both axes), `IR_INPLACE_MASK` and `IR_INPLACE_CMP`
+(no effect / noise), `IR_OPRES` (ADR 0018), `IR_NO_A_CARRY`, `IR_FLIPCOST`,
+`IR_SPINC`, `IR_SPEXCL`, `IR_REHOME`.
+
+### The first thing to do in this arc
+
+Resolve the `IR_TIGHT_HOMES` byte-identity failure. `md5` in fp mode, +29 bytes,
+reproducing identically on every CPU. Two possible causes, needing different
+fixes:
+
+1. the lowerer accesses a value **outside its IR live range** — invisible
+   residency, which stage 2 converts from harmless into a miscompile; or
+2. the narrowed interval changes an allocation decision, in which case stage 1
+   is not the neutral substrate it is supposed to be.
+
+Identical behaviour across CPUs points at (2), but (1) is the one that must be
+ruled out, because it is a latent correctness bug rather than a cost question.
 
 ### Numeric knobs — a category with no home
 

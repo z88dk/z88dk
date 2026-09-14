@@ -1,6 +1,7 @@
 # ADR 0032 — The measured gbz80 cost row
 
-Status: Proposed (staged behind `IR_GBZ80_COST`; blocked, not undecided)
+Status: Proposed, **in flight** — the per-CPU cost correctness that ADR 0017's
+ranging arc depends on. Staged behind `IR_GBZ80_COST`; blocked, not undecided.
 
 Relates to ADR 0006 (multi-CPU retargeting) and ADR 0003 (residency).
 

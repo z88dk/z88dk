@@ -1,6 +1,8 @@
 # ADR 0027 — Truthful home intervals
 
-Status: Proposed (staged behind `IR_TIGHT_HOMES`)
+Status: Proposed, **in flight** — stage 1 of ADR 0017's ranging arc, staged
+behind `IR_TIGHT_HOMES`. Not an independent lever: stage 2 cannot begin until
+the intervals are truthful.
 
 Builds on ADR 0017 (ranged residency as a home-per-interval table). This is the
 first step of it, and the prerequisite for every later one.
