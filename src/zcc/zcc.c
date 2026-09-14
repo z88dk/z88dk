@@ -399,6 +399,7 @@ static char  *c_altmathlib = NULL;
 static char  *c_altmathflags = NULL;        /* "-math-z88 -D__NATIVE_MATH__"; */
 static char  *c_startuplib = "z80_crt0";
 static char  *c_genmathlib = "genmath@{ZCC_LIBCPU}";
+static int    c_user_fp_mode_explicit = 0;
 static int    c_stylecpp = outspecified_flag;
 static char  *c_swallow_mf = NULL;
 
@@ -1077,6 +1078,16 @@ int main(int argc, char **argv)
     }
 
     processing_user_command_line_arg = 1;
+    {
+        int i;
+        for (i = 0; i < argc; i++) {
+            if (strstr(argv[i], "fp-mode") != NULL) {
+                c_user_fp_mode_explicit = 1;
+                break;
+            }
+        }
+    }
+
     argc = option_parse(&options[0], argc, argv);
     for (gargc = 0; gargc < argc; gargc++) {
         char* aa = argv[gargc];
@@ -1103,6 +1114,21 @@ int main(int argc, char **argv)
     if (add_variant_args(c_clib, c_clib_array_num, c_clib_array) == -1) {
         fprintf(stderr, "Cannot find definition for -clib=%s\n", c_clib);
         exit(1);
+    }
+
+    /* The Z180 removed the undocumented Z80 IXH/IXL ops that genmath uses, so
+     * genmath cannot be built for it.  When the generic -lm is requested and
+     * the user chose no FP mode, default Z180 to the 4-byte IEEE math32_z180.
+     * This runs after -clib/-mz180 resolve the CPU but BEFORE the zpragma and
+     * compiler argument stages, so the pragma and -Cc flag both take effect.
+     * parse_option() modifies its argument in place, so it gets a writable
+     * copy, never a string literal. */
+    if (c_cpu == CPU_TYPE_Z180 && !c_user_fp_mode_explicit
+        && strcmp(c_genmathlib, "genmath@{ZCC_LIBCPU}") == 0
+        && linker_linklib_first != NULL
+        && strstr(linker_linklib_first, "-lm ") != NULL) {
+        c_genmathlib = muststrdup("math32_z180");
+        parse_option(muststrdup("-Cc-fp-mode=ieee -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_MATH32 -Ca-D__MATH_MATH32 -D__MATH_MATH32"));
     }
     keep_user_multi();
 
@@ -3097,14 +3123,6 @@ static void configure_maths_library(char **libstring)
             }
             parse_option(c_altmathflags);
         }
-    }
-
-    /* The Z180 removed the undocumented Z80 IXH/IXL ops that genmath uses,
-     * so genmath cannot be built for it.  Default -lm on Z180 to the 4-byte
-     * IEEE math32_z180 (math32 ships a dedicated Z180 core). */
-    if (c_cpu == CPU_TYPE_Z180 && strcmp(c_genmathlib, "genmath@{ZCC_LIBCPU}") == 0) {
-        c_genmathlib = muststrdup("math32_z180");
-        parse_option("-Cc-fp-mode=ieee -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_MATH32 -Ca-D__MATH_MATH32 -D__MATH_MATH32");
     }
 
     if (c_genmathlib) {
