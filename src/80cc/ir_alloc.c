@@ -461,8 +461,6 @@ static inline void add_cand(Cand *out, int *n, int cap, int v, long benefit,
    mixes in proposal coverage) and over nominated ones only (pure SELECTION quality).
    Set when the real pool is built, cleared at teardown. */
 
-static const long *g_bb_tripw;      /* real per-BB iteration weight; see below */
-static int         g_bb_tripw_n;
 
 /* Defined with the iteration-weight block below (trip-count term). */
 static long bb_iter_weight(const int *bb_loop_depth, int b, int depth_flat);
@@ -3444,42 +3442,10 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
     free(cand); free(itloc); free(itlo); free(ithi);
 }
 
-/* ---- ITERATION WEIGHT -------------------------------------------------------
-   Every residency decision is `SUM over accesses of weight x (slot - reg)`. The
-   cost half is micro-benchmarked; the weight half was the constant 4^loop_depth,
-   which stands in for HOW OFTEN a block runs. IR_TRIPPROBE measured that stand-in
-   against derivable trip counts over the corpus: 60 % of loops resolve, 43 of 73
-   are under-weighted by more than 10x and 12 by more than 100x, worst 512x, and
-   the error is almost entirely one-directional. That is the other factor in every
-   decision, so grounding the costs while leaving this at 4 only sharpens a
-   decision made on a fictional frequency.
-
-   `g_bb_tripw` (when set) is the real per-BB iteration weight: the product of the
-   derived trip counts of the loops containing it, with IR_TRIPW_DEF for loops
-   whose count is not derivable.
-
-   ►► THE DEFAULT IS PART OF THE FIX, NOT A DETAIL. Using a real count where known
-   and 4 elsewhere MIXES SCALES — a literal-bounded 1000-trip loop would outrank an
-   unknown loop at the same depth 250:1 for no reason but the bound being a literal.
-   So the fallback is one tuned constant on the same scale as the real counts
-   (corpus median trip is 63), not the old 4. IR_TRIPW=0 restores 4^depth. */
-static int tripw_on(void)
-{
-    static int on = -1;
-    if (on < 0) { const char *e = getenv("IR_TRIPW"); on = (e && e[0] != '0'); }
-    return on;
-}
-static long tripw_default(void)
-{
-    static long d = -1;
-    if (d < 0) { const char *e = getenv("IR_TRIPW_DEF"); d = e ? atol(e) : 64; if (d < 1) d = 1; }
-    return d;
-}
 
 /* The weight of BB b before the conditional-shift halving each caller applies. */
 static long bb_iter_weight(const int *bb_loop_depth, int b, int depth_flat)
 {
-    if (g_bb_tripw && b >= 0 && b < g_bb_tripw_n) return g_bb_tripw[b];
     int depth = bb_loop_depth[b];
     if (depth_flat && depth > 1) depth = 1;
     long w = 1;
@@ -3487,194 +3453,7 @@ static long bb_iter_weight(const int *bb_loop_depth, int b, int depth_flat)
     return w;
 }
 
-/* Trip count of the natural loop headed at h over the member set `inloop`, or 0
-   when it is not derivable. Two shapes, and the SECOND is the common one:
-     - the header compares the IV against a constant;
-     - ast_opt's countdown rewrite (`for (i=0;i<N;i++)` becomes decrement-to-zero),
-       which has NO constant compare at all — the test is BR_COND at the LATCH and
-       the counter is initialised through a MOV, so constants are propagated over
-       the preheader rather than matched on one op. Matching only the first shape
-       finds 28 % of loops; both find 60 %. */
-static long derive_loop_trip(const Func *f, int h, const int *inloop)
-{
-    if (h < 0 || h >= f->n_bbs) return 0;
-    long *cval = calloc((size_t)f->n_vregs, sizeof(long));
-    char *cset = calloc((size_t)f->n_vregs, 1);
-    long trip = 0;
-    if (!cval || !cset) { free(cval); free(cset); return 0; }
-    for (int pb = 0; pb < h; pb++)
-        for (int j = 0; j < f->bbs[pb].n_ops; j++) {
-            const Op *o = &f->bbs[pb].ops[j];
-            if (o->dst < 0 || o->dst >= f->n_vregs) continue;
-            if (o->kind == IR_LD_IMM) { cval[o->dst] = (long)o->imm; cset[o->dst] = 1; }
-            else if (o->kind == IR_MOV && o->src[0] >= 0 && o->src[0] < f->n_vregs
-                     && cset[o->src[0]]) { cval[o->dst] = cval[o->src[0]]; cset[o->dst] = 1; }
-            else cset[o->dst] = 0;
-        }
-    /* Shape 1: constant compare in the header. */
-    for (int j = 0; j < f->bbs[h].n_ops && !trip; j++) {
-        const Op *o = &f->bbs[h].ops[j];
-        if (o->kind < IR_CMP_EQ || o->kind > IR_CMP_UGE) continue;
-        if (o->src[1] != -1 || o->imm_sym) continue;
-        if (o->src[0] < 0 || o->src[0] >= f->n_vregs || !cset[o->src[0]]) continue;
-        long span = (long)o->imm - cval[o->src[0]];
-        if (span > 0) trip = span;
-    }
-    /* Shape 2: countdown — a counter DEC'd in the loop and tested by the branch
-       that closes it, with a constant init reaching it through copies. */
-    for (int b = 0; b < f->n_bbs && !trip; b++) {
-        if (!inloop[b]) continue;
-        for (int j = 0; j < f->bbs[b].n_ops && !trip; j++) {
-            const Op *o = &f->bbs[b].ops[j];
-            if (o->kind != IR_DEC || o->dst < 0 || o->dst >= f->n_vregs) continue;
-            for (int k = j + 1; k < f->bbs[b].n_ops; k++) {
-                OpKind bk = f->bbs[b].ops[k].kind;
-                if (bk != IR_BR_COND && bk != IR_BR_ZERO) continue;
-                if (f->bbs[b].ops[k].src[0] != o->dst) continue;
-                if (cset[o->dst] && cval[o->dst] > 0) trip = cval[o->dst];
-                break;
-            }
-        }
-    }
-    free(cval); free(cset);
-    if (trip > 4096) trip = 4096;            /* clamp: a weight, not a promise */
-    return trip;
-}
 
-/* [IR_TRIPPROBE] INERT — size the missing TRIP-COUNT term before building it.
-
-   The allocator weights a block by `4^loop_depth` (ir_alloc.c, interval_benefit
-   and g0_bc_call_save). That constant stands in for how often the block RUNS, and
-   it is the OTHER factor in every residency decision: benefit = SUM over accesses
-   of weight x (slot_cost - reg_cost). Grounding the cost half while the weight
-   half is a constant is why a MORE accurate cost table can make code worse —
-   histbench's inner loop is REPS 50 x STREAM 1000 = 50000 iterations and is
-   weighted 16.
-
-   This asks how much of that is RECOVERABLE at compile time: a loop whose header
-   compares the induction variable against a CONSTANT, with a constant init, has a
-   derivable trip count. No transform, no codegen change — it prints what the
-   weight would have been against what the model uses.
-
-   Reported per loop: derived trip count, loop depth, the model's 4^depth, and the
-   ratio. Aggregated, the ratio distribution says whether a real trip term is worth
-   building and which loops it would move. */
-static void ir_trip_probe(const Func *f, const int *bb_loop_depth,
-                          const int *bb_loop_lo, const int *bb_loop_hi)
-{
-    if (!getenv("IR_TRIPPROBE") || !f || f->n_bbs <= 0) return;
-    char *seen = calloc((size_t)f->n_bbs, 1);
-    if (!seen) return;
-    for (int b = 0; b < f->n_bbs; b++) {
-        if (!bb_loop_depth[b]) continue;
-        int h = bb_loop_lo[b];
-        if (h < 0 || h >= f->n_bbs || seen[h]) continue;
-        seen[h] = 1;
-
-        /* The controlling compare: in the header, against a constant RHS
-           (src[1] == -1 means the operand is the immediate). */
-        int iv = -1; long bound = 0; int have_bound = 0;
-        for (int j = 0; j < f->bbs[h].n_ops; j++) {
-            const Op *o = &f->bbs[h].ops[j];
-            if (o->kind < IR_CMP_EQ || o->kind > IR_CMP_UGE) continue;
-            if (o->src[1] != -1 || o->imm_sym) continue;
-            if (o->src[0] < 0 || o->src[0] >= f->n_vregs) continue;
-            iv = o->src[0]; bound = (long)o->imm; have_bound = 1;
-        }
-        /* COUNTDOWN SHAPE, and it is the one that actually occurs. ast_opt
-           rewrites `for (i = 0; i < N; i++)` into a decrement-to-zero loop, so
-           there is NO compare against a constant anywhere. The emitted shape is:
-
-               BB0 preheader:  LD_IMM v2 <- 1000 ; MOV v3 <- v2 ; BR_ZERO v3,exit
-               BB1 body:       ... ; BR latch
-               BB3 latch:      DEC v3 <- v3 ; BR_COND v3, body
-
-           Two things a naive probe gets wrong here, and both cost a full pass:
-           the test is BR_COND at the LATCH (not BR_ZERO in the header), and the
-           counter is initialised through a MOV, not a bare LD_IMM. So resolve
-           constants through copies rather than pattern-matching one op. */
-        if (!have_bound) {
-            /* Constant-propagate through LD_IMM/MOV over everything before the
-               loop header; last write wins, anything else poisons the entry. */
-            long *cval = calloc((size_t)f->n_vregs, sizeof(long));
-            char *cset = calloc((size_t)f->n_vregs, 1);
-            if (cval && cset) {
-                for (int pb = 0; pb < h && pb < f->n_bbs; pb++)
-                    for (int j = 0; j < f->bbs[pb].n_ops; j++) {
-                        const Op *o = &f->bbs[pb].ops[j];
-                        if (o->dst < 0 || o->dst >= f->n_vregs) continue;
-                        if (o->kind == IR_LD_IMM) { cval[o->dst] = (long)o->imm; cset[o->dst] = 1; }
-                        else if (o->kind == IR_MOV && o->src[0] >= 0
-                                 && o->src[0] < f->n_vregs && cset[o->src[0]]) {
-                            cval[o->dst] = cval[o->src[0]]; cset[o->dst] = 1;
-                        } else cset[o->dst] = 0;
-                    }
-                /* A counter DEC'd in the loop and tested by the branch that
-                   closes it. */
-                int ctr = -1;
-                for (int lb = h; lb <= bb_loop_hi[b] && lb < f->n_bbs && ctr < 0; lb++)
-                    for (int j = 0; j < f->bbs[lb].n_ops && ctr < 0; j++) {
-                        const Op *o = &f->bbs[lb].ops[j];
-                        if (o->kind != IR_DEC || o->dst < 0) continue;
-                        for (int k = j + 1; k < f->bbs[lb].n_ops; k++) {
-                            OpKind bk = f->bbs[lb].ops[k].kind;
-                            if (bk != IR_BR_COND && bk != IR_BR_ZERO) continue;
-                            if (f->bbs[lb].ops[k].src[0] == o->dst) { ctr = o->dst; break; }
-                        }
-                    }
-                if (ctr >= 0 && cset[ctr] && cval[ctr] > 0) {
-                    long w2 = 1;
-                    for (int i = 0; i < bb_loop_depth[b] && i < 8; i++) w2 *= 4;
-                    fprintf(stderr, "TRIP %s hdr=%d depth=%d trip=%ld model_w=%ld ratio=%.1f countdown\n",
-                            f->fn ? ir_sym_name(f->fn) : "?", h, bb_loop_depth[b],
-                            cval[ctr], w2, (double)cval[ctr] / (double)w2);
-                    free(cval); free(cset);
-                    continue;
-                }
-            }
-            free(cval); free(cset);
-            fprintf(stderr, "TRIP %s hdr=%d depth=%d UNKNOWN no-const-bound\n",
-                    f->fn ? ir_sym_name(f->fn) : "?", h, bb_loop_depth[b]);
-            continue;
-        }
-
-        /* Init: the last LD_IMM to iv in a block BEFORE the loop header. */
-        long init = 0; int have_init = 0;
-        for (int pb = 0; pb < h && pb < f->n_bbs; pb++)
-            for (int j = 0; j < f->bbs[pb].n_ops; j++) {
-                const Op *o = &f->bbs[pb].ops[j];
-                if (o->kind == IR_LD_IMM && o->dst == iv) { init = (long)o->imm; have_init = 1; }
-                else if (o->dst == iv) have_init = 0;      /* clobbered by something else */
-            }
-        if (!have_init) { fprintf(stderr, "TRIP %s hdr=%d depth=%d UNKNOWN no-const-init\n",
-                                  f->fn ? ir_sym_name(f->fn) : "?", h, bb_loop_depth[b]); continue; }
-
-        /* Step: a unit INC/DEC or POSTSTEP of iv anywhere in the loop body. */
-        int step = 0;
-        for (int lb = h; lb <= bb_loop_hi[b] && lb < f->n_bbs; lb++)
-            for (int j = 0; j < f->bbs[lb].n_ops; j++) {
-                const Op *o = &f->bbs[lb].ops[j];
-                if (o->kind == IR_INC && o->dst == iv) step = 1;
-                else if (o->kind == IR_DEC && o->dst == iv) step = -1;
-                else if (o->kind == IR_POSTSTEP && o->src[0] == iv)
-                    step = o->imm > 0 ? (int)o->imm : (o->imm < 0 ? (int)o->imm : 1);
-            }
-        if (step == 0) { fprintf(stderr, "TRIP %s hdr=%d depth=%d UNKNOWN no-unit-step\n",
-                                 f->fn ? ir_sym_name(f->fn) : "?", h, bb_loop_depth[b]); continue; }
-
-        long span = (step > 0) ? (bound - init) : (init - bound);
-        long trip = span / (step > 0 ? step : -step);
-        if (trip <= 0) { fprintf(stderr, "TRIP %s hdr=%d depth=%d UNKNOWN non-positive\n",
-                                 f->fn ? ir_sym_name(f->fn) : "?", h, bb_loop_depth[b]); continue; }
-
-        long w = 1;
-        for (int i = 0; i < bb_loop_depth[b] && i < 8; i++) w *= 4;
-        fprintf(stderr, "TRIP %s hdr=%d depth=%d trip=%ld model_w=%ld ratio=%.1f\n",
-                f->fn ? ir_sym_name(f->fn) : "?", h, bb_loop_depth[b], trip, w,
-                (double)trip / (double)w);
-    }
-    free(seen);
-}
 
 
 /* Ops that manipulate the stack or transfer control — forbidden between a
@@ -5037,12 +4816,6 @@ void ir_alloc(Func *f)
            so it stays all-zero — and the cost model unchanged — when that scan
            does not run. */
         int *bb_cond_shift = calloc((size_t)f->n_bbs, sizeof(int));
-        /* [IR_TRIPW] Real per-BB iteration weight: the product of the derived trip
-           counts of the loops containing it. Filled by the dominance scan below
-           (which is where loop MEMBERSHIP is known); stays all-1 and unused when
-           the gate is off or that scan does not run. */
-        long *bb_tripw = calloc((size_t)f->n_bbs, sizeof(long));
-        if (bb_tripw) for (int i = 0; i < f->n_bbs; i++) bb_tripw[i] = 1;
         if (!write_count || !use_count || !first_use || !last_use
             || !bb_in_loop || !def_kind || !bb_loop_lo || !bb_loop_hi
             || !bb_first_op || !bb_last_op || !bb_loop_depth || !bb_cond_shift
@@ -5052,15 +4825,10 @@ void ir_alloc(Func *f)
             free(bb_in_loop); free(def_kind);
             free(bb_loop_lo); free(bb_loop_hi);
             free(bb_first_op); free(bb_last_op);
-            free(bb_loop_depth); free(bb_cond_shift); free(bb_tripw);
+            free(bb_loop_depth); free(bb_cond_shift);
             free(cost_benefit); free(all_defs_ok);
             return;
         }
-        /* [IR_TRIPW] Publish for the cost model. Set AFTER the loop scan has
-           filled it and cleared at teardown, so every weighted site — the two
-           cost_benefit scans, g0_bc_call_save, interval_benefit_x and the BC
-           interval scan — reads one consistent frequency estimate. */
-        if (bb_tripw && tripw_on()) { g_bb_tripw = bb_tripw; g_bb_tripw_n = f->n_bbs; }
         for (int v = 0; v < f->n_vregs; v++) {
             first_use[v] = -1;
             last_use[v]  = -1;
@@ -5228,21 +4996,6 @@ void ir_alloc(Func *f)
                                 }
                                 for (int b = 0; b < n; b++)
                                     if (inloop[b]) bb_loop_depth[b]++;
-                                /* [IR_TRIPW] This is the one place loop MEMBERSHIP
-                                   is known, so fold this loop's trip count into
-                                   every block it contains. Unknown counts take the
-                                   tuned default so the scale stays consistent —
-                                   see the note on bb_iter_weight. */
-                                if (bb_tripw && tripw_on()) {
-                                    long t = derive_loop_trip(f, h, inloop);
-                                    if (t <= 0) t = tripw_default();
-                                    for (int b = 0; b < n; b++) {
-                                        if (!inloop[b]) continue;
-                                        long w = bb_tripw[b] * t;
-                                        if (w > 1000000L) w = 1000000L;  /* no overflow */
-                                        bb_tripw[b] = w;
-                                    }
-                                }
                                 /* Which of those blocks run on EVERY trip round
                                    the loop: the ones that dominate every latch.
                                    Every path from the header back to the header
@@ -5632,7 +5385,6 @@ void ir_alloc(Func *f)
            EVERY placement pass (arbiter, bc_pack, both IY packs, stack_spill), so
            vreg_to_phys is the final answer and the model is scored against what
            actually shipped — not against an intermediate state. */
-        ir_trip_probe(f, bb_loop_depth, bb_loop_lo, bb_loop_hi);
         /* DENSITY §4 fail-safe DE-cache fold hint (opt-in IR_RANGED). Runs after
            ALL register placement so it fires ONLY on reused deref/binop values
            that stayed IR_PR_SPILL. The lowerer reads f->de_fold_hint and leaves a
@@ -6069,8 +5821,7 @@ void ir_alloc(Func *f)
         free(bb_loop_hi);
         free(bb_first_op);
         free(bb_last_op);
-        g_bb_tripw = NULL; g_bb_tripw_n = 0;
-        free(bb_loop_depth); free(bb_cond_shift); free(bb_tripw);
+        free(bb_loop_depth); free(bb_cond_shift);
         free(cost_benefit);
         free(all_defs_ok);
     }

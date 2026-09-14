@@ -30,6 +30,31 @@ No optimisation work starts until invariants 2 and 3 hold (see the plan).
 3. Every surviving gate has a row here — **yes**
 4. Exactly one live next action in the tree — **yes**, this file
 
+## One finding that keeps recurring
+
+Three independent investigations have now produced the same shape: **a more
+correct input made the output worse.**
+
+| | The correction | What happened |
+| --- | --- | --- |
+| ADR 0021 | per-value spill heuristics | two identical counters have opposite optimal placements |
+| ADR 0032 | the true gbz80 slot-cost row | −14 B on two benches, +10 % ticks on a third |
+| ADR 0028 | true loop trip counts instead of `4^depth` | +845 B and +0.066 % ticks |
+
+In each case the number being fixed was genuinely wrong, and fixing it flipped
+near-ties rather than sharpening decisions. `hashbench` under ADR 0028 is the
+clearest tell: the same benchmark is among the worst regressions on one CPU and
+the best improvements on another.
+
+The common cause is that nothing prices **the claim a decision displaces**.
+Scores are computed per candidate in isolation, so when two candidates are close
+the winner is decided by pass order, and a more accurate score just re-rolls it.
+
+Until the resolver compares competing claims, improving any single cost input is
+as likely to hurt as to help — which is also why `DESIGN_REVIEW_PLAN.md` step A1
+(the realised-cost ledger, including opportunity cost) is the first item of the
+resumed optimisation work rather than one item among several.
+
 ## Who owns the allocation
 
 `ir_alloc` is the only writer of `vreg_to_phys`, `home_lo` and `home_hi`.
@@ -123,7 +148,7 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | Gate | Question | Retire when |
 | --- | --- | --- |
 | `IR_GRAPH_PROBE` | is the capture gap in proposal or in selection? | the step A1 cost ledger answers it per claim |
-| `IR_TRIPPROBE` | does the trip-count weight model predict real hotness? | `IR_TRIPW` is promoted or refused |
+
 | `IR_BCVETO_PROBE` | what does the BC veto turn away? | the veto becomes a cost term |
 | `IR_PREPUSH_PROBE` | which calls does the pre-push hazard cover? | — |
 | `IR_CMPSIGN_PROBE` | signed-compare shapes | — |
@@ -131,7 +156,7 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 
 ### Parked features — measured across 30 benches x 12 CPUs x sp/fp
 
-4 remain, and **every one has an ADR and a number** — no parked feature is
+3 remain, and **every one has an ADR and a number** — no parked feature is
 undocumented. `IR_BC_STEP_PARAM` was promoted out of this table (ADR 0031). Baseline 820,424 bytes
 over 720 cells; the bar for promotion is **no cell larger**, then ticks.
 
@@ -141,7 +166,7 @@ over 720 cells; the bar for promotion is **no cell larger**, then ticks.
 | ~~`IR_JR_UNCOND`~~ | relax unconditional `jr` on every CPU | −350 B, but **57 z80 + 57 z80n cells SLOWER, none faster** | **REFUSED and removed** — ADR 0033. Every other CPU already relaxes, so it only ever acted where the timing says no |
 | `IR_TIGHT_HOMES` | narrow homes to the true live range (ADR 0027) | −508 B, 73 smaller, **39 larger** | **the premise is refuted** — it was meant to be byte-identical. See ADR 0027; thedifference must be explained before it lands |
 | `IR_RANGED` | fail-safe DE cache fold (ADR 0029) | −110 B, 76 smaller, **108 larger** | mixed; fails the no-regression bar, as 0029 suspected |
-| `IR_TRIPW` `IR_TRIPW_DEF` | trip-count weighting (ADR 0028) | **+845 B**, 48 smaller, **81 larger** | a net size LOSS. Only defensible if the tick matrix pays for it — measure ticks or refuse it |
+| ~~`IR_TRIPW` `IR_TRIPW_DEF` `IR_TRIPPROBE`~~ | trip-count weighting | **+845 B AND +0.066 % ticks** (70 cells slower, 54 faster) | **REFUSED and removed** — ADR 0028. Loses on both axes, so there is no trade |
 | `IR_GBZ80_COST` | the measured gbz80 cost row | −14 B on two benches, **+10 % ticks** on another | **ADR 0032.** A correction, not a preference — gbz80 was using Z80 numbers. Blocked on a ranking near-tie, which is the opportunity-cost term ADR 0021 also wants |
 
 Deleted after measurement: `IR_INPLACE_MASK` (fires on **zero** cells, any CPU,
