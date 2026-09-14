@@ -23,6 +23,9 @@
 //////////////////////////////////
 
 // double atof(char *s);                    /* check math library for availability */
+#if defined(__MATH_MATH32)
+extern double atof(const char *s);
+#endif
 
 extern int  __LIB__   atoi(const char *s);
 #ifndef __STDC_ABI_ONLY
@@ -74,6 +77,9 @@ extern char __LIB__ *utoa_callee(uint16_t num,char *buf,int radix) __smallc __z8
 
 
 // double strtod(char *s, char **endp);     /* check math library for availability */
+#if defined(__MATH_MATH32)
+extern double strtod(const char *nptr, char **endptr);
+#endif
 
 /* 64 bit is only available with sdcc */
 extern long long atoll(char *buf) __smallc;

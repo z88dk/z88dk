@@ -318,6 +318,7 @@
 ../../../math/float/math32/lm32/z80/asm_addf.asm
 ../../../math/float/math32/lm32/z80/asm_ceilf.asm
 ../../../math/float/math32/lm32/z80/asm_dadd.asm
+../../../math/float/math32/lm32/z80/asm_dconst_1.asm
 ../../../math/float/math32/lm32/z80/asm_derror_edom_infc.asm
 ../../../math/float/math32/lm32/z80/asm_derror_edom_zc.asm
 ../../../math/float/math32/lm32/z80/asm_derror_einval_zc.asm
@@ -412,3 +413,4 @@
 ../../../math/float/math32/lm32/c/clang/__fsub.asm
 
 ../../../math/float/math32/lm32/z80/asm_sigdigf.asm
+../../../math/float/math32/init_floatpack_stub.asm

@@ -4,7 +4,7 @@ SECTION code_stdlib
 
 PUBLIC __strtod_dec_ip, __strtod_dec_ip_lz, __strtod_dec_fp_only
 
-EXTERN asm_double16u, asm_dmul10a, asm_dadd, asm_dmulpow10, l_eat_ddigits
+EXTERN asm_double16u, asm_dmul10a, asm_dadd, asm_dconst_1, asm_dmulpow10, l_eat_ddigits
 EXTERN asm_isdigit, asm_tolower, __strtod_exponent, __strtod_suffix
 EXTERN derror_einval_zc, derror_znc, derror_erange_pinfc
 
@@ -51,7 +51,7 @@ decimal_zero:
    call derror_znc             ; exx = 0.0
    
    ld bc,$00ff                 ; no exponent adjust
-   jr decimal_exponent         ; look for following exponent
+   jp decimal_exponent         ; look for following exponent
 
 __strtod_dec_ip_lz:
 
@@ -182,24 +182,58 @@ decimal_exp_adjust:
 
 decimal_consume_ip:
 
+    ; consume extra integer digits, rounding the accumulated mantissa
+    ; from the first consumed digit so the result is correctly rounded
+    ; rather than truncated (a 24-bit float library reads fewer than the
+    ; full significant digits here; math48 reads all digits and the
+    ; +1.0 is supplied by the linked library via asm_dconst_1).
+
    ld a,(hl)
-   
+
    call asm_isdigit
    jr c, decimal_consume_pt    ; if not digit
-   
+
+   cp '5'
+   jr c, decimal_consume_ip_loop   ; if first extra digit < 5
+
+   push bc
+   call asm_dconst_1           ; load +1.0 for linked math library
+   call asm_dadd               ; x = x + 1
+   pop bc
+
+decimal_consume_ip_loop:
+
    inc b                       ; multiply by 10
    inc hl
-   
-   jr decimal_consume_ip
+
+   ld a,(hl)
+   call asm_isdigit
+   jr nc, decimal_consume_ip_loop
 
 decimal_consume_pt:
 
    cp '.'
    jr nz, decimal_exponent     ; if no decimal point
-   
+
    inc hl
 
 decimal_consume_fp:
+
+   ; consume extra fraction digits, rounding from the first one
+
+   ld a,(hl)
+   call asm_isdigit
+   jr c, decimal_exponent      ; if no fraction digits
+
+   cp '5'
+   jr c, decimal_consume_fp_loop
+
+   push bc
+   call asm_dconst_1           ; load +1.0 for linked math library
+   call asm_dadd               ; x = x + 1
+   pop bc
+
+decimal_consume_fp_loop:
 
    call l_eat_ddigits          ; consume excess fraction digits
 

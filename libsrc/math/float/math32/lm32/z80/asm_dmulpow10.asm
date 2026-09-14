@@ -1,10 +1,9 @@
-
 SECTION code_clib
 SECTION code_fp_math32
 
 PUBLIC asm_dmulpow10
 
-EXTERN m32_float8, m32_fsmul_callee
+EXTERN m32_float8, m32_fsmul_callee, m32_fsdiv_callee
 EXTERN _m32_exp10f
 
    ; multiply DEHL' by a power of ten
@@ -23,21 +22,126 @@ EXTERN _m32_exp10f
    ;         DEHL'= +-inf
    ;            carry set, errno set
    ;
-   ; note  : current implementation may limit power of ten
-   ;         to max one-sided range (eg +-38)
+   ; note  : for |A| <= 7 the power of ten is an exact 24-bit float and
+   ;         the result is a single correctly-rounded multiply or divide.
+   ;         For |A| > 7 exp10f is used (the general path may limit the
+   ;         power of ten to max one-sided range, eg +-38).
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
 
 .asm_dmulpow10
+    ld l,a                  ; l = A (signed)
+
+    bit 7,l
+    jr nz, dmul10_neg       ; if A < 0
+
+    ; A >= 0
+
+    cp 8
+    jr nc, dmul10_exp10f    ; if A > 7 use exp10f
+
+    ; x * 10^A, 10^A exact
+
+    exx
+    push de
+    push hl                 ; push x for fsmul
+    exx
+
+    add a,a
+    add a,a                 ; A *= 4
+    ld e,a
+    ld d,0
+    ld hl,__dmul10_pow10
+    add hl,de
+    ld c,(hl)
+    inc hl
+    ld b,(hl)               ; bc = LSW
+    inc hl
+    ld e,(hl)
+    inc hl
+    ld d,(hl)               ; de = MSW
+    push bc
+    pop hl                  ; hl = LSW
+
+    call m32_fsmul_callee   ; DEHL = x * 10^A
+    exx
+    ret
+
+dmul10_neg:
+
+    neg                     ; a = |A|
+
+    cp 8
+    jr nc, dmul10_neg_big   ; if |A| > 7 divide by 10^|A|
+
+    ; x / 10^|A|, 10^|A| exact
+
+    exx
+    push de
+    push hl                 ; push x for fsdiv
+    exx
+
+    add a,a
+    add a,a                 ; |A| *= 4
+    ld e,a
+    ld d,0
+    ld hl,__dmul10_pow10
+    add hl,de
+    ld c,(hl)
+    inc hl
+    ld b,(hl)               ; bc = LSW
+    inc hl
+    ld e,(hl)
+    inc hl
+    ld d,(hl)               ; de = MSW
+    push bc
+    pop hl                  ; hl = LSW
+
+    call m32_fsdiv_callee   ; DEHL = x / 10^|A|
+    exx
+    ret
+
+dmul10_neg_big:
+
+    ; x / 10^|A|: 10^|A| is a representable normal float up to |A| = 38,
+    ; while 10^-|A| would flush to zero (subnormal) for |A| >= 38
+
+    exx
+    push de
+    push hl                 ; push x for fsdiv
+    exx
+
     ld l,a
+    call m32_float8         ; convert l to float in dehl
+    call _m32_exp10f        ; make 10^|A|
+    call m32_fsdiv_callee   ; DEHL = x / 10^|A|
+    exx
+    ret
+
+dmul10_exp10f:
+
+    ; l still holds the signed exponent A (the neg above changed a only)
+
     call m32_float8             ; convert l to float in dehl
     exx
-    
+
     push de                     ; preserve x, and put it on stack for fsmul
     push hl
     exx
-    
+
     call _m32_exp10f            ; make 10^A
     call m32_fsmul_callee       ; DEHL = x * 10^(A)
     exx
     ret
+
+SECTION rodata_fp_math32
+
+__dmul10_pow10:
+    defq 0x3F800000             ; 1.0
+    defq 0x41200000             ; 10.0
+    defq 0x42C80000             ; 100.0
+    defq 0x447A0000             ; 1000.0
+    defq 0x461C4000             ; 10000.0
+    defq 0x47C35000             ; 100000.0
+    defq 0x49742400             ; 1000000.0
+    defq 0x4B189680             ; 10000000.0

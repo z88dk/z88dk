@@ -8,30 +8,30 @@
 
     EXTERN  __scanf_check_suppressed
     EXTERN  __scanf_check_long
+    EXTERN  __scanf_get_bytesread
     EXTERN  __scanf_context
 
 
 
 __scanf_handle_n:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_check_suppressed
 ELSE
     bit     3,(ix-3)                ;suppressed?
 ENDIF
     jp      nz,scanf_loop
     call    __scanf_nextarg
-IF __CPU_INTEL__
-    push    hl
-    ld      hl,(__scanf_context)
-    ld      bc,-6
-    add     hl,bc
-    ld      a,(hl)
+IF __CPU_INTEL__ | __CPU_GBZ80__
+    push    de
+    call    __scanf_get_bytesread
+    ld      c,e
+    ld      b,d
+    pop     de
+    ld      a,c
     ld      (de),a
     inc     de
-    inc     hl
-    ld      a,(hl)
+    ld      a,b
     ld      (de),a
-    pop     hl
 ELSE
     ld      a,(ix-6)
     ld      (de),a
@@ -39,7 +39,7 @@ ELSE
     ld      a,(ix-5)
     ld      (de),a
 ENDIF
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_check_long
 ELSE
     bit     1,(ix-3)
@@ -52,3 +52,4 @@ ENDIF
     ld      (de),a
 scanf_handle_n_exit:
     jp      scanf_loop
+

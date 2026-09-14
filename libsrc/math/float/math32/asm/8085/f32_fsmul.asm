@@ -172,11 +172,14 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jp pk_round
 .pk_normed
     inc b
-    jp Z,m32_fsconst_pnan
+    jp Z,pk_ovl
     inc b
     jp Z,pk_ovl
     dec b
 .pk_round
+    ld a,b
+    cp 0ffh
+    jp NC,pk_ovl                ; final exponent >= 255 -> overflow
     ; Product HLDE: HLD = top 24, E = residual 8.  Form EHL mant.
     ld a,e                          ; A = residual
     ld e,h

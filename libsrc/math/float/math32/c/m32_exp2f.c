@@ -51,7 +51,7 @@
  *
  *   message         condition      value returned
  * exp underflow    x < -MAXL2_F32          0.0
- * exp overflow     x > MAXL2_F32        HUGE_POS_F32
+ * exp overflow     x > MAXL2_F32        +Infinity (IEEE-754)
  *
  * For IEEE arithmetic, MAXL2_F32 = 127.
  */
@@ -64,6 +64,14 @@ Direct inquiries to 30 Frost Street, Cambridge, MA 02140
 */
 
 #include "m32_math.h"
+
+/* IEEE-754: exp2 overflow returns +Infinity, not FLT_MAX saturation. */
+static float m32_exp2f_overflow(void)
+{
+    union float_long u;
+    u.l = 0x7F800000;           /* +Inf */
+    return u.f;
+}
 
 extern float m32_coeff_exp2f[];
 
@@ -78,11 +86,11 @@ float m32_exp2f (float x) __z88dk_fastcall
         u.f = x;
         hi = m32_ieee_hi(u);
         if( (hi & 0x7f) >= 0x43 )
-            return (hi & 0x80) ? 0.0 : HUGE_POS_F32;
+            return (hi & 0x80) ? 0.0 : m32_exp2f_overflow();
         if( (hi & 0x7f) >= 0x42 )
         {
             if( x > MAXL2_F32 )
-                return HUGE_POS_F32;
+                return m32_exp2f_overflow();
             if( x < MINL2_F32 )
                 return 0.0;
         }

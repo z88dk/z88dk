@@ -421,6 +421,30 @@ ENDIF
 ;--------------------------------------------------------
 	SECTION code_compiler
 ;	---------------------------------
+; Function m32_expf_overflow
+; ---------------------------------
+_m32_expf_overflow:
+	push	ix
+	ld	ix,	+0
+	add	ix, sp
+	push	af
+	push	af
+	ld	hl,0
+	add	hl, sp
+	xor	a, a
+	ld	(hl), a
+	inc	hl
+	ld	(hl), a
+	inc	hl
+	ld	(hl),0x80
+	inc	hl
+	ld	(hl),0x7f
+	pop	hl
+	pop	de
+	ld	sp,ix
+	pop	ix
+	ret
+;	---------------------------------
 ; Function m32_expf
 ; ---------------------------------
 _m32_expf:
@@ -457,8 +481,7 @@ _m32_expf:
 	ld	d,h
 	jr	l_m32_expf_00114
 l_m32_expf_00113:
-	ld	de,0x7f7f
-	ld	hl,0xffff
+	call	_m32_expf_overflow
 l_m32_expf_00114:
 	jp	l_m32_expf_00111
 l_m32_expf_00102:
@@ -478,8 +501,7 @@ l_m32_expf_00102:
 	ld	a, l
 	or	a, a
 	jr	z,l_m32_expf_00104
-	ld	de,0x7f7f
-	ld	hl,0xffff
+	call	_m32_expf_overflow
 	jp	l_m32_expf_00111
 l_m32_expf_00104:
 	ld	hl,0xc2ae

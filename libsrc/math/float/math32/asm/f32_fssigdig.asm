@@ -21,5 +21,5 @@ m32_fssigdig:
    ;
    ; uses  : bc
 
-   ld bc,$0607
+   ld bc,$0608
    ret

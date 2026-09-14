@@ -25,7 +25,7 @@ __scanf_get_number:
     push    hl              ;save fmt
     push    de              ;save destination
     call    scanf_atoul
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_check_suppressed
 ELSE
     and     a               ;clear carry
@@ -38,7 +38,7 @@ ENDIF
     inc     hl
     ld      (hl),d
     pop     de              ;de= most sig word of long
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_check_long
 ELSE
     bit     1,(ix-3)
@@ -49,7 +49,7 @@ ENDIF
     inc     hl
     ld      (hl),d
 scanf_getnumber_notlong:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_increment_conversions
 ELSE
     inc     (ix-1)          ;number of conversions done
@@ -103,7 +103,7 @@ scanf_atoul_exit:
     ld      a,c
     call    __scanf_ungetchar
 scanf_atoul_exit2:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_check_sign
 ELSE
     bit     0,(ix-3)        ;sign flag

@@ -10,11 +10,14 @@
     EXTERN  scanf_loop
 
     EXTERN  __scanf_get_width
+    EXTERN  __scanf_check_width
     EXTERN  __scanf_increment_conversions
 
 __scanf_handle_c:
     ld      b,1             ;width
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
+    call    __scanf_check_width
+    jr      z,c_fmt_get_buf
     call    __scanf_get_width
 ELSE
     bit     2,(ix-3)        ;is there a width specified?
@@ -30,9 +33,10 @@ c_fmt_loop:
     ld      (de),a
     inc     de
     djnz    c_fmt_loop
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_increment_conversions
 ELSE
     inc     (ix-1)          ;increment number of conversions done
 ENDIF
     jp      scanf_loop
+

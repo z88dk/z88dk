@@ -2,7 +2,6 @@
     MODULE  __scanf_handle_f
     SECTION code_clib
 
-IF ! __CPU_INTEL__
     PUBLIC  __scanf_handle_f
 
     EXTERN  __scanf_common_start
@@ -12,6 +11,8 @@ IF ! __CPU_INTEL__
     EXTERN  scanf_loop
 
     EXTERN  __scanf_check_sign
+    EXTERN  __scanf_get_width
+    EXTERN  __scanf_increment_conversions
 
     EXTERN  atof
     EXTERN  l_cmp
@@ -33,7 +34,7 @@ __scanf_handle_f:
     add     hl,sp
     ex      de,hl       ;de = our buffer for the number
     ld      c,0	       ;[000000E.]
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_check_sign
 ELSE
     bit     0,(ix-3)
@@ -43,9 +44,9 @@ ENDIF
     ld      (de),a	
     inc     de
 handle_f_fmt_check_width:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     ld      b,0
-    call    ___scanf_get_width
+    call    __scanf_get_width
     ld      a,b
 ELSE
     ld      a,(ix-4)	;width
@@ -64,19 +65,68 @@ handle_f_fmt_loop:
     cp      '.'
     jr      nz,handle_f_fmt_check_exponent
     ; It was ., have we already seen one
+IF __CPU_INTEL__ | __CPU_GBZ80__
+    push    af
+    ld      a,c
+    and     1
+    jp      nz,handle_f_fmt_error_popaf
+    ld      a,c
+    or      1
+    ld      c,a
+    pop     af
+ELSE
     bit     0,c
     jr      nz,handle_f_fmt_error
     set     0,c
+ENDIF
     jr      handle_f_fmt_store
 handle_f_fmt_check_exponent:
     cp      'e'
     jr      z,handle_f_fmt_check_exponent1
     cp      'E'
-    jr      nz,handle_f_fmt_check_digit
+    jr      nz,handle_f_fmt_check_exponent_sign
 handle_f_fmt_check_exponent1:
-    bit     1,c     ;have we seen one already?
+IF __CPU_INTEL__ | __CPU_GBZ80__
+    push    af
+    ld      a,c
+    and     2
+    jp      nz,handle_f_fmt_error_popaf
+    ld      a,c
+    or      2
+    ld      c,a
+    pop     af
+ELSE
+    bit     1,c
     jr      nz,handle_f_fmt_error
     set     1,c
+ENDIF
+    jr      handle_f_fmt_store
+handle_f_fmt_check_exponent_sign:
+    ; accept a sign only immediately after the exponent marker
+    cp      '+'
+    jr      z,handle_f_fmt_check_exponent_sign1
+    cp      '-'
+    jr      nz,handle_f_fmt_check_digit
+handle_f_fmt_check_exponent_sign1:
+IF __CPU_INTEL__ | __CPU_GBZ80__
+    push    af
+    ld      a,c
+    and     2
+    jp      z,handle_f_fmt_error_popaf
+    ld      a,c
+    and     4
+    jp      nz,handle_f_fmt_error_popaf
+    ld      a,c
+    or      4
+    ld      c,a
+    pop     af
+ELSE
+    bit     1,c
+    jr      z,handle_f_fmt_check_digit   ; sign before e: as before, reject via digit check
+    bit     2,c
+    jr      nz,handle_f_fmt_error
+    set     2,c
+ENDIF
     jr      handle_f_fmt_store
 handle_f_fmt_check_digit:
     call    asm_isdigit
@@ -97,13 +147,13 @@ handle_f_fmt_finished_reading:
     ; TODO: Check there's something there
     ld      hl,4    ;we have the destination on the stack
     add     hl,sp
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
     push    ix      ;save our framepointer - fp library will disturb it
 ENDIF
     push    hl
     call    atof
     pop     bc
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
     pop     ix      ;get our framepointer back
 ENDIF
     ld      a,CLIB_32BIT_FLOATS
@@ -124,17 +174,18 @@ store_48bit_float:
     pop     hl      ;destination
     call    dstore  ;and put it there
 store_rejoin:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_increment_conversions
 ELSE
     inc     (ix-1)  ;increase number of conversions
 ENDIF
     pop     hl      ;restore fmt
     jp      scanf_loop
+handle_f_fmt_error_popaf:
+    pop     af
 handle_f_fmt_error:
     call    __scanf_ungetchar
     pop     de  ;discard destinatino
     pop     hl      ;restore fmt
     jp      scanf_exit
 
-ENDIF

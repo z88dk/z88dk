@@ -2,6 +2,7 @@
    SECTION  code_clib
    PUBLIC   __printf_handle_f
    PUBLIC   __printf_handle_e
+   PUBLIC   __printf_handle_g
 
    EXTERN   fa
    EXTERN   l_jphl
@@ -10,6 +11,7 @@
    EXTERN   __printf_print_the_buffer
    EXTERN   ftoa
    EXTERN   ftoe
+   EXTERN   ftog
    EXTERN   asm_strlen
    EXTERN   __convert_sdccf2reg
    EXTERN   CLIB_32BIT_FLOATS
@@ -20,6 +22,19 @@
    EXTERN   __printf_set_buffer_length
    EXTERN   __printf_set_ftoe
    EXTERN   __printf_check_ftoe
+
+; %g: true %g via ftog().  On intel/gbz80 the float libraries have no
+; ftog, so %g prints fixed-point (ftoa) exactly as before.  On z80 the
+; marker bit is bit 7 of (ix-3) -- the printf upper-case switch byte is
+; always zero at converter entry (only the %x/%X handlers touch it, and
+; never for the same conversion).
+__printf_handle_g:
+IF __CPU_INTEL__ | __CPU_GBZ80__
+    jp      __printf_handle_f
+ELSE
+    set     7,(ix-3)
+    jp      __printf_handle_f
+ENDIF
 
 __printf_handle_e:
 IF __CPU_INTEL__ | __CPU_GBZ80__
@@ -194,11 +209,18 @@ set_prec:
     ld      hl,ftoa
 IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __printf_check_ftoe
-ELSE
-    bit     5,(ix-4)
-ENDIF
     jr      z,call_fp_converter
     ld      hl,ftoe
+ELSE
+    bit     5,(ix-4)
+    jr      z,check_ftog
+    ld      hl,ftoe
+    jr      call_fp_converter
+check_ftog:
+    bit     7,(ix-3)
+    jr      z,call_fp_converter
+    ld      hl,ftog
+ENDIF
 call_fp_converter:
     call    l_jphl
     pop     bc              ;the buffer
