@@ -1123,7 +1123,13 @@ int main(int argc, char **argv)
      * compiler argument stages, so the pragma and -Cc flag both take effect.
      * parse_option() modifies its argument in place, so it gets a writable
      * copy, never a string literal. */
+    /* Newlib z180 float is still broken upstream: the newlib m (math48)
+     * library only carries CPU:z80 objects, which z80asm refuses in -mz180
+     * links.  This Z180 default flip is CLASSIC-ONLY by design.  The newlib
+     * side needs its own follow-up (per-CPU m objects, or a math32_z180
+     * newlib bridge); re-examine this gate once that lands. */
     if (c_cpu == CPU_TYPE_Z180 && !c_user_fp_mode_explicit
+        && (c_clib == NULL || strstr(c_clib, "new") == NULL)
         && strcmp(c_genmathlib, "genmath@{ZCC_LIBCPU}") == 0
         && linker_linklib_first != NULL
         && strstr(linker_linklib_first, "-lm ") != NULL) {
