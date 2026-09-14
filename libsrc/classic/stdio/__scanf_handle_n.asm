@@ -22,11 +22,15 @@ ENDIF
     jp      nz,scanf_loop
     call    __scanf_nextarg
 IF __CPU_INTEL__ | __CPU_GBZ80__
+    push    de
     call    __scanf_get_bytesread
-    ld      a,e
+    ld      c,e
+    ld      b,d
+    pop     de
+    ld      a,c
     ld      (de),a
     inc     de
-    ld      a,d
+    ld      a,b
     ld      (de),a
 ELSE
     ld      a,(ix-6)
