@@ -13,7 +13,7 @@
 
 ; Common start code for number formats
 __scanf_common_start:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_check_suppressed
 ELSE
     bit     3,(ix-3)        ; suppressing assignment
@@ -30,7 +30,7 @@ consume_sign:
     ret     c
     cp      '-'
     jr      nz,notneg
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_set_signflag
 ELSE
     set     0,(ix-3)        ; set sign flag

@@ -1,7 +1,7 @@
 SECTION code_clib
 
 
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 
 PUBLIC  __scanf_increment_conversions
 PUBLIC  __scanf_increment_bytesread
@@ -19,6 +19,7 @@ PUBLIC  __scanf_set_longflag
 PUBLIC  __scanf_set_suppressed
 PUBLIC  __scanf_reset_flags
 PUBLIC  __scanf_set_caretflag
+PUBLIC  __scanf_get_bytesread
 PUBLIC  __scanf_context
 
 
@@ -136,6 +137,18 @@ __scanf_get_flags:
     dec     hl
     dec     hl
     ld      c,(hl)
+    pop     hl
+    ret
+
+; Exit: de = bytes read
+__scanf_get_bytesread:
+    push    hl
+    ld      hl,(__scanf_context)
+    ld      bc,-6
+    add     hl,bc
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
     pop     hl
     ret
 

@@ -18,13 +18,13 @@
     EXTERN  asm_isspace
 
 __scanf_handle_s:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_check_suppressed
 ELSE
     bit     3,(ix-3)
 ENDIF
     call    z,__scanf_nextarg               ;de=destination
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     ld      b,0
     call    __scanf_get_width
 ELSE
@@ -42,7 +42,7 @@ scanf_fmt_s_loop:
     call    asm_isspace
     jr      nc,scanf_fmt_s_success
 scanf_fmt_s_join:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     ld      c,a
     call    __scanf_check_suppressed
     ld      a,c
@@ -53,7 +53,7 @@ ENDIF
     ld      (de),a
     inc     de
 scanf_fmt_s_suppress:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_check_width
 ELSE
     bit     2,(ix-3)        ;if no width specifier just loop
@@ -61,7 +61,7 @@ ENDIF
     jr      z,scanf_fmt_s_loop
     djnz    scanf_fmt_s_loop
 scanf_fmt_s_done:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_check_suppressed
     ld      a,0
 ELSE
@@ -70,7 +70,7 @@ ELSE
 ENDIF
     jp      nz,scanf_loop
     ld      (de),a          ;terminating \0
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_increment_conversions
 ELSE
     inc     (ix-1)          ;increase number of conversions done

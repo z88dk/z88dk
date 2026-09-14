@@ -15,7 +15,7 @@ _vsscanf:
     ld      hl,2
     add     hl,sp    ;hl = &buf
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
     push    ix    ;save callers
 ENDIF
     ld      bc,65535        ;infinite length
@@ -52,7 +52,7 @@ ENDIF
     pop     bc
     pop     bc
     pop     bc
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
     pop     ix
 ENDIF
     ret

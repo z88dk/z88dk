@@ -21,7 +21,7 @@ STDIO_8085_AFILES := $(notdir $(wildcard classic/stdio/*.asm))  \
 		$(patsubst %,conio/%,$(notdir $(wildcard classic/stdio/conio/*.asm))) \
 		$(patsubst %,inkey/%,$(notdir $(wildcard classic/stdio/inkey/*.asm)))
 
-STDIO_GBZ80_AFILES := $(notdir $(filter-out $(wildcard classic/stdio/*scanf*.asm),$(wildcard classic/stdio/*.asm))) \
+STDIO_GBZ80_AFILES := $(notdir $(wildcard classic/stdio/*.asm)) \
 		$(patsubst %,conio/%,$(notdir $(wildcard classic/stdio/conio/*.asm))) \
 		$(patsubst %,inkey/%,$(notdir $(wildcard classic/stdio/inkey/*.asm)))
 

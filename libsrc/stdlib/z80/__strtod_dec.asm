@@ -4,7 +4,7 @@ SECTION code_stdlib
 
 PUBLIC __strtod_dec_ip, __strtod_dec_ip_lz, __strtod_dec_fp_only
 
-EXTERN asm_double16u, asm_dmul10a, asm_dadd, asm_dmulpow10, l_eat_ddigits
+EXTERN asm_double16u, asm_dmul10a, asm_dadd, asm_dconst_1, asm_dmulpow10, l_eat_ddigits
 EXTERN asm_isdigit, asm_tolower, __strtod_exponent, __strtod_suffix
 EXTERN derror_einval_zc, derror_znc, derror_erange_pinfc
 
@@ -182,11 +182,11 @@ decimal_exp_adjust:
 
 decimal_consume_ip:
 
-   ; consume extra integer digits, rounding the accumulated mantissa
-   ; from the first consumed digit so the result is correctly rounded
-   ; rather than truncated (a 24-bit float library reads fewer than the
-   ; full significant digits here; math48 reads all digits so this is
-   ; a no-op there).
+    ; consume extra integer digits, rounding the accumulated mantissa
+    ; from the first consumed digit so the result is correctly rounded
+    ; rather than truncated (a 24-bit float library reads fewer than the
+    ; full significant digits here; math48 reads all digits and the
+    ; +1.0 is supplied by the linked library via asm_dconst_1).
 
    ld a,(hl)
 
@@ -197,8 +197,7 @@ decimal_consume_ip:
    jr c, decimal_consume_ip_loop   ; if first extra digit < 5
 
    push bc
-   ld de,$3f80
-   ld hl,$0000                 ; +1.0
+   call asm_dconst_1           ; load +1.0 for linked math library
    call asm_dadd               ; x = x + 1
    pop bc
 
@@ -230,8 +229,7 @@ decimal_consume_fp:
    jr c, decimal_consume_fp_loop
 
    push bc
-   ld de,$3f80
-   ld hl,$0000                 ; +1.0
+   call asm_dconst_1           ; load +1.0 for linked math library
    call asm_dadd               ; x = x + 1
    pop bc
 

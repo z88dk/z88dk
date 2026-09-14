@@ -151,6 +151,6 @@ e_done:
 .rotation_done
     exx
     pop de                      ; e
-    ld c,7                      ; max significant digits
+    ld c,8                      ; max significant digits (matches m32_fssigdig)
     ret
 

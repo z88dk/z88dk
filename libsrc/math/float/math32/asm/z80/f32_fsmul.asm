@@ -87,11 +87,12 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     pop hl                      ; pop return address
     pop de                      ; get second operand off of the stack
-    ex (sp),hl                  ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm; ret → stack
+    ex (sp),hl                  ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm; ret -> stack
 
 .fmrejoin
-    xor a,h                     ; xor sign flags
-    ex af,af                    ; AF' = result sign (A'[7])
+    xor a,h                     ; xor sign flags -> A[7] = result sign
+    ld c,a                      ; C[7] = result sign (active register set)
+    ex af,af                    ; AF' = result sign too
 
     add hl,hl                   ; shift exponent into h
     scf                         ; set implicit bit
@@ -101,54 +102,59 @@ PUBLIC m32_fsmul, m32_fsmul_callee
                                 ;   primary h,lde  = x (left / 2nd unpacked)
                                 ;   alt     h',lde' = y (right / 1st unpacked)
 
-    ; ---- specials gate (finite×finite must stay hot) ----
+    ; ---- specials gate (finite x finite must stay hot) ----
     ; exp 0 / 255 leave here.  Bias-adjust x, then probe y.
     ; INC/DEC do not touch C, so the `sub 07fh` carry survives the y probe
     ; without push/pop af (~13 T saved on the common path).
     ;
-    ;   0 × finite → ±0     Inf × 0 → NaN     NaN × * → NaN
-    ;   Inf × finite → ±Inf  Inf × Inf → ±Inf
+    ;   0 x finite -> +-0     Inf x 0 -> NaN     NaN x * -> NaN
+    ;   Inf x finite -> +-Inf  Inf x Inf -> +-Inf
     ;
     ld a,h
     inc a
     jp Z,mul_spec_x             ; x.exp == 255
     dec a
     jp Z,mul_spec_x0            ; x.exp == 0
-    sub a,07fh                  ; A = x.exp − bias; C if x.exp < bias
+    sub a,07fh                  ; A = x.exp - bias; C if x.exp < bias
     ld b,a                      ; B = x bias-adjusted
-    exx                         ; → y; F.C kept
+    exx                         ; -> y; F.C kept
     ld a,h
     inc a
     jp Z,mul_spec_y             ; y.exp == 255, x finite nonzero
     dec a                       ; A = y.exp; F.C kept
     jr C,mul_exp_uf
-    exx                         ; → x; A = y.exp, B = x.adj
-    add a,b                     ; sum = y.exp + (x.exp − bias)
+    exx                         ; -> x; A = y.exp, B = x.adj
+    add a,b                     ; sum = y.exp + (x.exp - bias)
     jp C,mul_ovl                ; overflow only if y.exp != 0
-    cp b                        ; sum == x.adj ⇒ y.exp == 0
+    cp b                        ; sum == x.adj => y.exp == 0
     jp Z,mul_zero
     jr mul_exp_ok
 
 .mul_exp_uf
-    exx                         ; → x; A = y.exp, B = x.adj
+    exx                         ; -> x; A = y.exp, B = x.adj
     add a,b
     jp NC,mul_zero              ; underflow or y.exp == 0
 
 .mul_exp_ok
-    exx                         ; → y for 24×24 (primary = y, alt = x)
+    exx                         ; -> y for 24x24 (primary = y, alt = x)
     ld b,a
     or a
     jp Z,mul_zero               ; sum of exponents is zero
 
-    ex af,af
-    ld a,b
-    push af                     ; A = exp sum, F = xor sign
+    ex af,af                    ; AF = sign xor, AF' = (sum, flags-or-a)
+    push af                     ; save sign xor on stack
+    ex af,af                    ; AF = (sum, flags-or-a)
+    push bc                     ; save exponent sum + active-set sign
 
-                                ; y (1st): h  = exp, lde  = mant
-                                ; x (2nd): h' = exp, lde' = mant
+                                ; y (1st): h,lde  = x (left / 2nd unpacked)
+                                ; x (2nd): h',lde' = y (right / 1st unpacked)
     call m32_mulu_32h_24x24     ; HLDE = 32-bit product
 
-    pop bc                      ; B = exp sum, C[7] = sign
+    pop bc                      ; B = exp sum, C = active-set sign
+    pop af                      ; AF = sign xor
+    rlca                        ; carry = result sign
+    ld c,0
+    rr c                        ; C[7] = result sign
 
     bit 7,h                     ; need to shift result left if msb!=1
     jr NZ,mul_normed
@@ -158,22 +164,26 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jr mul_round
 
 .mul_normed
-    inc b
-    jp Z,m32_fsconst_pnan       ; exp was 255 (should not on finite path)
-    inc b
-    jp Z,mul_ovl                ; product overflow → Inf
-    dec b
+    inc b                       ; account for implicit leading 1
+    jp Z,mul_ovl                ; was 255 -> overflow to Inf
+    ld a,b
+    cp 0ffh
+    jp Z,mul_ovl                ; was 254 -> overflow to Inf
 
 .mul_round
+    ld a,b
+    cp 0ffh
+    jp NC,mul_ovl               ; final exponent >= 255 -> overflow
     ld a,e
-    ld e,h                      ; 24-bit mant HLD → EHL
+
+    ld e,h                      ; 24-bit mant HLD -> EHL
     ld h,l
     ld l,d
 
-    ; IEEE RNE: residual A → G=bit7, S=bits6..0 (via add a,a), B=L.0
+    ; IEEE RNE: residual A -> G=bit7, S=bits6..0 (via add a,a), B=L.0
     add a,a
-    jr NC,mul_pack              ; G=0 → truncate
-    jr NZ,mul_round_up          ; G=1 S≠0 → up
+    jr NC,mul_pack              ; G=0 -> truncate
+    jr NZ,mul_round_up          ; G=1 S!=0 -> up
     bit 0,l
     jr Z,mul_pack               ; tie, already even
 .mul_round_up
@@ -183,14 +193,14 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jr NZ,mul_pack
     inc e
     jr NZ,mul_pack
-    ld hl,0                     ; mant overflow → 1.0, exp++
+    ld hl,0                     ; mant overflow -> 1.0, exp++
     ld e,l
     inc b
     jr Z,mul_round_ovl
 
 .mul_pack
     sla e                       ; adjust mantissa for exponent
-    sla c                       ; put sign into C
+    sla c                       ; put sign into carry
     ld d,b                      ; put exponent in D
     rr de                       ; sign + exp into place
     ret
@@ -213,15 +223,15 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     exx
     ld a,h
     or a
-    jp Z,m32_fsconst_pnan       ; 0 × Inf
+    jp Z,m32_fsconst_pnan       ; 0 x Inf
     inc a
-    jr NZ,mul_ovl               ; finite × Inf → ±Inf
+    jr NZ,mul_ovl               ; finite x Inf -> +-Inf
     ld a,l
     and 07fh
     or d
     or e
-    jp NZ,m32_fsconst_pnan      ; NaN × Inf
-    jr mul_ovl                  ; Inf × Inf → ±Inf
+    jp NZ,m32_fsconst_pnan      ; NaN x Inf
+    jr mul_ovl                  ; Inf x Inf -> +-Inf
 
 ; y.exp == 255, x finite nonzero.  Primary = y.
 .mul_spec_y
@@ -230,25 +240,25 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     or d
     or e
     jp NZ,m32_fsconst_pnan      ; y NaN
-    jr mul_ovl                  ; Inf × finite → ±Inf
+    jr mul_ovl                  ; Inf x finite -> +-Inf
 
 ; x.exp == 0.  Primary = x; switch to y to test Inf/NaN.
 .mul_spec_x0
     exx
     ld a,h
     inc a
-    jp Z,m32_fsconst_pnan       ; Inf/NaN × 0
-    ; fall through: finite × 0 or 0 × 0 → signed zero
+    jp Z,m32_fsconst_pnan       ; Inf/NaN x 0
+    ; fall through: finite x 0 or 0 x 0 -> signed zero
 
 .mul_zero
-    ex af,af
-    rla
+    ex af,af                    ; AF = saved xor-sign (survived exx)
+    rlca                        ; carry = result sign
     jp C,m32_fsconst_nzero
     jp m32_fsconst_pzero
 
 .mul_ovl
-    ex af,af
-    rla
+    ex af,af                    ; AF = saved xor-sign (survived exx)
+    rlca                        ; carry = result sign
     jp C,m32_fsconst_ninf
     jp m32_fsconst_pinf
 

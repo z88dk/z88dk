@@ -54,12 +54,16 @@ double atof(char *s)
 		int expon ;		/* absolute value of exp */
 		int k ;			/* mask */
 
-		neg = expon = 0 ;
-		if ( *end == '-' ) {
-			/* negative exponent */
-			neg = 1 ;
-			++end ;
-		}
+	neg = expon = 0 ;
+	if ( *end == '-' ) {
+		/* negative exponent */
+		neg = 1 ;
+		++end ;
+	} else if ( *end == '+' ) {
+		/* positive exponent */
+		++end ;
+	}
+
 		while(1) {	/* read an integer */
 			if ( (c=*end++) >= '0' ) {
 				if ( c <= '9' ) {

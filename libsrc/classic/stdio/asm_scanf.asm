@@ -41,7 +41,7 @@
 
 ; int vfscanf1(FILE *fp, int sccz80, unsigned char *fmt,void *ap)
 asm_scanf:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     ld      hl,0
     add     hl,sp
     ld      (__scanf_context),hl
@@ -64,7 +64,7 @@ ENDIF
     ; -5, -6 = bytes read from stream
     ; -50->-10 = fp number buffer
     xor     a
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     ld      hl,(__scanf_context)
     dec     hl
     ld      (hl),a      ;-1
@@ -85,7 +85,7 @@ ELSE
     ld      (ix-6),a
 ENDIF
 
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     ld      hl,(__scanf_context)
     inc     hl
     inc     hl
@@ -101,7 +101,7 @@ ENDIF
 
 scanf_loop:
 __scanf_noop:            ;noop destination
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_reset_flags
 ELSE
     ld      (ix-3),0    ;reset flags for each loop
@@ -130,7 +130,7 @@ scanf_ordinary_char:
 scanf_exit:
    ; ISO C has us exit with # conversions done
    ; or -1 if no chars were read from the input stream
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     ld      hl,(__scanf_context)
     ld      de,-5
     add     hl,de
@@ -175,7 +175,7 @@ flagloop:
 nextflag0:
     cp      '*'
     jr      nz,width
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_set_suppressed
 ELSE
     set     3,(ix-3)
@@ -188,7 +188,7 @@ width:
     jr      c,formatchar
     call    asm_atoi        ;exits hl=number, de = non numeric in fmt
     ex      de,hl
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_set_width
 ELSE
     set     2,(ix-3)    ;set width flag
@@ -205,7 +205,7 @@ formatchar:
     jr      z,get_next_char
     cp      'l'
     jr      nz, not_long_specifier
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_set_longflag
 ELSE
     set     1,(ix-3)
@@ -247,7 +247,7 @@ format_nomatch:
 
 __scanf_nextarg:
     push    hl    ;hl=fmt, save it
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     ld      hl,(__scanf_context)
     inc     hl
     inc     hl
@@ -261,7 +261,7 @@ ENDIF
     ld      e,(hl)
     inc     hl
     ld      d,(hl)        ;de = buffer, hl=ap+1
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     push    hl
     push    de
     ld      hl,(__scanf_context)
@@ -277,7 +277,7 @@ ENDIF
     jr      nz,__scanf_nextarg_decrement
     inc     hl
 __scanf_nextarg_exit:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     push    de
     ex      de,hl
     ld      hl,(__scanf_context)
@@ -305,7 +305,7 @@ __scanf_getchar:
     push    bc        ;save callers
     push    de        ;save dest
     push    hl        ;fmt
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_get_fp
 ELSE
     ld      hl,(ix+8)	;fp
@@ -325,7 +325,7 @@ __scanf_getchar_return:
     and     a
     scf
     jr      z,__scanf_getchar_return1
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_increment_bytesread
     and     a
 ELSE
@@ -346,7 +346,7 @@ __scanf_ungetchar:
     push    bc
     push    de
     push    hl        ;fmt
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_decrement_bytesread
 ELSE
     ld      de,(ix-6)
@@ -357,7 +357,7 @@ __scanf_ungetchar1:
     ld      l,a        ;character to unget
     ld      h,0
     push    hl
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_get_fp
     push    hl
 ELSE

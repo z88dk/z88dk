@@ -14,6 +14,7 @@
     EXTERN  __scanf_get_flags
     EXTERN  __scanf_increment_conversions
     EXTERN  __scanf_check_suppressed
+    EXTERN  __scanf_check_width
 
 
 __scanf_handle_bkt:
@@ -30,7 +31,7 @@ __scanf_handle_bkt:
     cp      '^'                      ; is '^' a leading char?
     jr      nz, leading
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_set_caretflag
 ELSE
     set     7,(ix-3)                     ; set carat flag
@@ -147,7 +148,7 @@ ENDIF
     ; PART 2
     ; Match characters from stream to charset and write to destination buffer
     ; ***********************************************************************
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_get_width
     call    __scanf_get_flags
 ELSE
@@ -158,9 +159,8 @@ ENDIF
     ;     b = width
     ;     c = flags [^00a*WL0]
 
-IF __CPU_INTEL__
-    ld      a,c
-    and     8
+IF __CPU_INTEL__ | __CPU_GBZ80__
+    call    __scanf_check_suppressed
 ELSE
     bit     3,c                    ; suppress assignment?
 ENDIF
@@ -181,7 +181,7 @@ ENDIF
     jr      z, finished
 
     ; char is in bitset so add to string
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_check_suppressed
 ELSE
     bit     3,c
@@ -196,9 +196,8 @@ ENDIF
 
 .suppress1
 
-IF __CPU_INTEL__
-    ld      a,c
-    and     4
+IF __CPU_INTEL__ | __CPU_GBZ80__
+    call    __scanf_check_width
 ELSE
     bit     2,c                     ; without width specifier just loop back
 ENDIF
@@ -210,7 +209,7 @@ ENDIF
     pop     de                      ; de = char *s
     pop     hl                      ; hl = fmt
 
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_check_suppressed
 ELSE
     bit     3,c
@@ -219,7 +218,7 @@ ENDIF
 
     xor     a
     ld      (de),a                  ; write terminating \0 to string
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __scanf_increment_conversions
 ELSE
     inc     (ix-1)                  ;number of conversions
@@ -268,7 +267,7 @@ computebitsetaddr:
     ret     z
 
 .bitrot
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
     push    af
     ld      a,d
     rla
@@ -291,3 +290,4 @@ ENDIF
     ld      a,e
     pop     de
     ret
+

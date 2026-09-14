@@ -4,6 +4,7 @@ math/float/am9511/lam32/z80/asm_atanf
 math/float/am9511/lam32/z80/asm_ceilf
 math/float/am9511/lam32/z80/asm_cosf
 math/float/am9511/lam32/z80/asm_dadd
+math/float/am9511/lam32/z80/asm_dconst_1
 math/float/am9511/lam32/z80/asm_derror_edom_infc
 math/float/am9511/lam32/z80/asm_derror_edom_zc
 math/float/am9511/lam32/z80/asm_derror_einval_zc
