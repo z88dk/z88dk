@@ -71,8 +71,46 @@ in `bc-evict`, in two denominations, and refining it has now failed twice
 (ADR 0036 on the incumbent's side, this on both). A third attempt at a better
 *price* should not be scheduled.
 
-What would actually move it is a model of what eviction *causes* — the packed
-temps' BC reload traffic — and the way to get that is the project's own
-proven pattern: a verifier first. Count emitted BC reloads per freed temp,
-confirm the model against the `stencil` spread, and only then change a
-decision.
+What would actually move it is not a better price for an access, but a model of
+what the displaced value is **realised as**. Reading the `stencil` asm shows the
+model assumes one realisation and the lowerer picks another:
+
+* On **z80 sp**, the value the eviction displaces stops being a slot store
+  (`ex de,hl; ld hl,4; add hl,sp; ld (hl),e; inc hl; ld (hl),d; ex de,hl`) and
+  becomes a **stack park** (`push hl` / `pop de`) — 7 instructions down to 2,
+  which is why the bytes fall. The park is also *cheaper* in cycles than the
+  store it replaces (21 T against ~49 T), so the park is not itself the
+  regression.
+* On **8085**, the same eviction instead buys a genuine one-instruction register
+  home — `ld bc,hl` / `ld hl,bc` replacing `ld de,sp+6` / `ld (de),hl`, using
+  the 8085-only LDSI and LHLX/SHLX forms.
+
+`GR_SLOT` describes none of these three things. The cost model prices a
+displaced value as a frame slot; the lowerer realises it as a park, as a
+chip-specific register form, or as a slot, and those have opposite byte and
+cycle characteristics. That is the realised-cost gap ADR 0035 was reaching for,
+located properly at last.
+
+## What is NOT established
+
+The z80 sp regression is **not** explained yet. Static counts move the wrong
+way: gate-on has fewer sp-address sequences (30 against 33), barely more
+push/pop (21 against 19), and is shorter overall, yet runs 12.5 % slower — and
+only in sp mode, fp being unaffected. The cost is therefore dynamic and inside
+the innermost loop, where the evicted tenant's reads become five-instruction
+`ld hl,2; add hl,sp; ld a,(hl+); ld h,(hl); ld l,a` sequences that were register
+moves before. This was read off the asm, not off a profiler; treat the
+mechanism as probable, not proven.
+
+## A separate defect this uncovered
+
+The allocator prices **8085 as a z80** — it falls through to the default `Z80B`
+byte row, with `penc == 0`, exactly like z80. But 8085 has LDSI and LHLX/SHLX,
+which make a word slot access materially cheaper than the z80 sequence the row
+describes, and it has no index register at all, so the fp sub-row (`(ix+d)`,
+6/6/7/13) is fiction there.
+
+This is why an 8085-only gate for the eviction was **not** taken even though
+8085 is the one chip that wins on both axes (−14 B, −0.43 % ticks). The model
+cannot see what makes 8085 different, so such a gate would encode the outcome
+rather than the reason. Price the chip first; then re-ask the question.
