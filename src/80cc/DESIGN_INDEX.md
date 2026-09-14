@@ -131,14 +131,14 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 
 ### Parked features — measured across 30 benches x 12 CPUs x sp/fp
 
-5 remain, and **every one now has an ADR and a number** — no parked feature is
+4 remain, and **every one has an ADR and a number** — no parked feature is
 undocumented. `IR_BC_STEP_PARAM` was promoted out of this table (ADR 0031). Baseline 820,424 bytes
 over 720 cells; the bar for promotion is **no cell larger**, then ticks.
 
 | Gate | What it is | Size, 720 cells | Verdict |
 | --- | --- | --- | --- |
 | ~~`IR_BC_STEP_PARAM`~~ | a stepped-pointer param may ride BC | **−514 B / −0.06 % ticks, 0 cells larger, 0 slower** | **SHIPPED default-on** as `bc-step-param` — ADR 0031 |
-| `IR_JR_UNCOND` | relax unconditional `jr` on every CPU, not just where it is free | **−350 B, 114 smaller, 0 larger** | **ADR 0033.** Bytes were never in doubt; the cost is z80/z80n ticks. Needs a tick matrix with no z80 cell slower |
+| ~~`IR_JR_UNCOND`~~ | relax unconditional `jr` on every CPU | −350 B, but **57 z80 + 57 z80n cells SLOWER, none faster** | **REFUSED and removed** — ADR 0033. Every other CPU already relaxes, so it only ever acted where the timing says no |
 | `IR_TIGHT_HOMES` | narrow homes to the true live range (ADR 0027) | −508 B, 73 smaller, **39 larger** | **the premise is refuted** — it was meant to be byte-identical. See ADR 0027; thedifference must be explained before it lands |
 | `IR_RANGED` | fail-safe DE cache fold (ADR 0029) | −110 B, 76 smaller, **108 larger** | mixed; fails the no-regression bar, as 0029 suspected |
 | `IR_TRIPW` `IR_TRIPW_DEF` | trip-count weighting (ADR 0028) | **+845 B**, 48 smaller, **81 larger** | a net size LOSS. Only defensible if the tick matrix pays for it — measure ticks or refuse it |

@@ -952,15 +952,15 @@ static int relax_uc = -1;
 
    Conditional branches are relaxed everywhere: `jr cc` is 12 T taken / 7 not
    taken against `jp cc`'s flat 10, so the not-taken path pays for the rest.
-   `IR_JR_UNCOND=1` forces it on anywhere, `=0` off. */
+   The override that forced this on every CPU is gone: measured over 11 CPUs x
+   both frame modes it is 57 cells SLOWER on z80 and 57 on z80n, none faster,
+   and exactly zero change everywhere else (those CPUs already relax). See
+   ADR 0033. */
 static int relax_uncond_ok(void)
 {
-    if (relax_uc < 0) {
-        const char *e = getenv("IR_JR_UNCOND");
-        if (e) relax_uc = (e[0] == '1');
-        else   relax_uc = IS_GBZ80() || IS_EZ80() || IS_KC160()
-                       || IS_RABBIT() || c_cpu == CPU_Z180;
-    }
+    if (relax_uc < 0)
+        relax_uc = IS_GBZ80() || IS_EZ80() || IS_KC160()
+                || IS_RABBIT() || c_cpu == CPU_Z180;
     return relax_uc;
 }
 
