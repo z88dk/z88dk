@@ -195,6 +195,7 @@ IF NEED_printf
 	EXTERN	__printf_handle_p
 	EXTERN	__printf_handle_e
 	EXTERN	__printf_handle_f
+	EXTERN	__printf_handle_g
 	EXTERN	__printf_handle_s
 	EXTERN	__printf_handle_c
 	EXTERN	__printf_handle_n
@@ -271,7 +272,7 @@ IF CLIB_OPT_PRINTF  & $1000000
 ENDIF
 IF CLIB_OPT_PRINTF & $10000000
 	defb	'g'
-	defw	__printf_handle_f
+	defw	__printf_handle_g
 ENDIF
 IF (CLIB_OPT_PRINTF & $02000200) = $02000200
 	defb	'S'

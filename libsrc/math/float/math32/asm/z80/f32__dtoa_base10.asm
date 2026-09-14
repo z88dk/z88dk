@@ -12,7 +12,7 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-EXTERN m32_float8, _m32_exp10f, m32_fsmul_callee, m32_fsmul10u_fastcall
+EXTERN m32_float8, _m32_exp10f, m32_fsmul_callee, m32_fsmul10u_fastcall, m32_fsdiv_callee
 
 PUBLIC m32__dtoa_base10
 
@@ -68,16 +68,43 @@ PUBLIC m32__dtoa_base10
 
     ld a,h                      ; a = INT((77*n+5)/256)
     push af                     ; save exponent e
-    neg                         ; -e
+    ld l,a                      ; l = e
+
+    bit 7,l
+    jr nz, e_negative           ; if e < 0
+
+    ; e >= 0: b = x / 10^e  (10^e is a representable normal float up to
+    ; e = 38; multiplying by 10^-e would flush to zero for e = 38 since
+    ; 10^-38 is subnormal)
+
+    exx
+    push de                     ; push x for fsdiv
+    push hl
+    exx
+
+    ld l,a                      ; l = e
+    call m32_float8             ; convert l to float in DEHL
+    call _m32_exp10f            ; make 10^e
+    call m32_fsdiv_callee       ; x /= 10^e
+    jr e_done
+
+e_negative:
+
+    ; e < 0: b = x * 10^|e|
+
+    neg                         ; a = |e|
 
     exx
     push de                     ; push x for fsmul
     push hl
+    exx
 
-    ld l,a                      ; -e
-    call m32_float8             ; convert L to float in DEHL
-    call _m32_exp10f            ; make 10^-e
-    call m32_fsmul_callee       ; x *= 10^-e
+    ld l,a                      ; l = |e|
+    call m32_float8             ; convert l to float in DEHL
+    call _m32_exp10f            ; make 10^|e|
+    call m32_fsmul_callee       ; x *= 10^|e|
+
+e_done:
 
     ; DEHL = b
 

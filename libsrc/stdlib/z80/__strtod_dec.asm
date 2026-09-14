@@ -51,7 +51,7 @@ decimal_zero:
    call derror_znc             ; exx = 0.0
    
    ld bc,$00ff                 ; no exponent adjust
-   jr decimal_exponent         ; look for following exponent
+   jp decimal_exponent         ; look for following exponent
 
 __strtod_dec_ip_lz:
 
@@ -182,24 +182,60 @@ decimal_exp_adjust:
 
 decimal_consume_ip:
 
+   ; consume extra integer digits, rounding the accumulated mantissa
+   ; from the first consumed digit so the result is correctly rounded
+   ; rather than truncated (a 24-bit float library reads fewer than the
+   ; full significant digits here; math48 reads all digits so this is
+   ; a no-op there).
+
    ld a,(hl)
-   
+
    call asm_isdigit
    jr c, decimal_consume_pt    ; if not digit
-   
+
+   cp '5'
+   jr c, decimal_consume_ip_loop   ; if first extra digit < 5
+
+   push bc
+   ld de,$3f80
+   ld hl,$0000                 ; +1.0
+   call asm_dadd               ; x = x + 1
+   pop bc
+
+decimal_consume_ip_loop:
+
    inc b                       ; multiply by 10
    inc hl
-   
-   jr decimal_consume_ip
+
+   ld a,(hl)
+   call asm_isdigit
+   jr nc, decimal_consume_ip_loop
 
 decimal_consume_pt:
 
    cp '.'
    jr nz, decimal_exponent     ; if no decimal point
-   
+
    inc hl
 
 decimal_consume_fp:
+
+   ; consume extra fraction digits, rounding from the first one
+
+   ld a,(hl)
+   call asm_isdigit
+   jr c, decimal_exponent      ; if no fraction digits
+
+   cp '5'
+   jr c, decimal_consume_fp_loop
+
+   push bc
+   ld de,$3f80
+   ld hl,$0000                 ; +1.0
+   call asm_dadd               ; x = x + 1
+   pop bc
+
+decimal_consume_fp_loop:
 
    call l_eat_ddigits          ; consume excess fraction digits
 

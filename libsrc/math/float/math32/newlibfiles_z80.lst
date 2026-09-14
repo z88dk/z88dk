@@ -195,8 +195,8 @@
 ../../../math/float/math32/lm32/c/sccz80/div2.asm
 ../../../math/float/math32/lm32/c/sccz80/div2_fastcall.asm
 ../../../math/float/math32/lm32/c/sccz80/dload.asm
-../../../math/float/math32/lm32/c/sccz80/dloadb.asm
-../../../math/float/math32/lm32/c/sccz80/exp.asm
+ ../../../math/float/math32/lm32/c/sccz80/dloadb.asm
+ ../../../math/float/math32/lm32/c/sccz80/exp.asm
 ../../../math/float/math32/lm32/c/sccz80/exp_fastcall.asm
 ../../../math/float/math32/lm32/c/sccz80/exp10.asm
 ../../../math/float/math32/lm32/c/sccz80/exp10_fastcall.asm
@@ -213,7 +213,7 @@
 ../../../math/float/math32/lm32/c/sccz80/fmod.asm
 ../../../math/float/math32/lm32/c/sccz80/fmod_callee.asm
 ../../../math/float/math32/lm32/c/sccz80/fpclassify.asm
-../../../math/float/math32/lm32/c/sccz80/frexp.asm
+ ../../../math/float/math32/lm32/c/sccz80/frexp.asm
 ../../../math/float/math32/lm32/c/sccz80/frexp_callee.asm
 ../../../math/float/math32/lm32/c/sccz80/hypot.asm
 ../../../math/float/math32/lm32/c/sccz80/hypot_callee.asm

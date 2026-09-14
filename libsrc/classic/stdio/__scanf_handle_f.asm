@@ -72,11 +72,24 @@ handle_f_fmt_check_exponent:
     cp      'e'
     jr      z,handle_f_fmt_check_exponent1
     cp      'E'
-    jr      nz,handle_f_fmt_check_digit
+    jr      nz,handle_f_fmt_check_exponent_sign
 handle_f_fmt_check_exponent1:
     bit     1,c     ;have we seen one already?
     jr      nz,handle_f_fmt_error
     set     1,c
+    jr      handle_f_fmt_store
+handle_f_fmt_check_exponent_sign:
+    ; accept a sign only immediately after the exponent marker
+    cp      '+'
+    jr      z,handle_f_fmt_check_exponent_sign1
+    cp      '-'
+    jr      nz,handle_f_fmt_check_digit
+handle_f_fmt_check_exponent_sign1:
+    bit     1,c
+    jr      z,handle_f_fmt_check_digit   ; sign before e: as before, reject via digit check
+    bit     2,c
+    jr      nz,handle_f_fmt_error
+    set     2,c
     jr      handle_f_fmt_store
 handle_f_fmt_check_digit:
     call    asm_isdigit

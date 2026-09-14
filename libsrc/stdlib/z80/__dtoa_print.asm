@@ -34,7 +34,7 @@ __dtoa_print:
    call __stdio_printf_sign_0
    
    ex af,af'
-   jr c, special_form          ; if nan or inf
+   jr c, inf_nan_special       ; if nan or inf
    
    ;;;;; print workspace up to non-digit
    
@@ -143,7 +143,37 @@ tze_zeroes:
    
 special_form:
 
+   ; %e/%g exponent tail (fall through from tze_zeroes): copy the
+   ; remaining workspace; bc is the workspace length
+
    ex de,hl                    ; hl = workspace *, de = buf_dst *
    ldir
-   
+    
    jr zero_terminate
+
+inf_nan_special:
+
+   ; inf / nan: the workspace holds a null-terminated special-form
+   ; string (written by __dtoa_special_form) and bc, the normal-form
+   ; workspace length, is undefined -- a plain ldir would hang.  Compute
+   ; the string length into bc first.
+
+   ex de,hl                    ; hl = workspace * (string), de = buf_dst *
+
+   push hl                     ; save string start
+
+   ld bc,0                     ; bc = string length
+
+sf_len:
+
+   ld a,(hl)
+   inc hl
+   inc c
+   or a
+   jr nz, sf_len
+
+   dec c                       ; bc = string length
+
+   pop hl                      ; hl = string start
+   ex de,hl                    ; de = string start, hl = buf_dst *
+   jr special_form
