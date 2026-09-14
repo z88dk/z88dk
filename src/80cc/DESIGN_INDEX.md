@@ -12,14 +12,19 @@ live, it belongs in `adr/` or in git history, not here.
 **The simplification is finished.** All four invariants hold and two of them are
 enforced by a script. What remains is optimisation work, and the order matters:
 
-1. **Resolve the `IR_TIGHT_HOMES` byte-identity failure** (ADR 0027) — stage 1 of
-   the ranging arc, and possibly a latent miscompile. `md5` in fp, +29 bytes,
-   reproducing identically on every CPU.
+1. **Fix two point-query misuses** — `hashbench/hash_key v9` and
+   `structbench/walk v2` ask a whole-function question through `ir_home_at` at
+   flat index 0, before the value's live range starts. Harmless today, a
+   miscompile under ranging. Small and independent of everything else.
 2. **Build the realised-cost ledger**, scoring each `(vreg, home, window)` claim
    and including the **opportunity cost** of the claim it displaces — see
    ADR 0035 for why two sound corrections both made the output worse without
-   it. It gates ADR 0021 and ADR 0028 rather than competing with them.
-3. Then stages 2 and 3 of the ranging arc (ADR 0017).
+   it. It gates ADR 0021, ADR 0028 **and** ADR 0027.
+3. **Then `IR_TIGHT_HOMES`** (ADR 0027). Investigated 2026-09-14: its
+   byte-identity failure is **not** a latent miscompile — it is the allocator
+   taking newly-visible claims without pricing what they displace. It follows
+   the ledger rather than preceding it.
+4. Then stages 2 and 3 of the ranging arc (ADR 0017).
 
 ### Background work, when there is time
 
