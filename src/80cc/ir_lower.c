@@ -3387,9 +3387,7 @@ static void rec_note_violation(const Func *f, int v);  /* require_slot fail */
 static int hr_on = -1;
 static int home_rearb_enabled(void)
 {
-    if (hr_on < 0) { const char *e = getenv("IR_REHOME");
-                     hr_on = (e && e[0] == '0') ? 0
-                           : !opt_disabled("home-rearb"); }
+    if (hr_on < 0) hr_on = !opt_disabled("home-rearb");
     return hr_on;
 }
 
