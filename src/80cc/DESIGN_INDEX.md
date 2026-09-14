@@ -30,30 +30,35 @@ No optimisation work starts until invariants 2 and 3 hold (see the plan).
 3. Every surviving gate has a row here — **yes**
 4. Exactly one live next action in the tree — **yes**, this file
 
-## One finding that keeps recurring
+## One finding that recurs — and one that did not belong in it
 
-Three independent investigations have now produced the same shape: **a more
-correct input made the output worse.**
+Two independent investigations produced the same shape: **a more correct input
+made the output worse.**
 
 | | The correction | What happened |
 | --- | --- | --- |
 | ADR 0021 | per-value spill heuristics | two identical counters have opposite optimal placements |
-| ADR 0032 | the true gbz80 slot-cost row | −14 B on two benches, +10 % ticks on a third |
-| ADR 0028 | true loop trip counts instead of `4^depth` | +845 B and +0.066 % ticks |
-
-In each case the number being fixed was genuinely wrong, and fixing it flipped
-near-ties rather than sharpening decisions. `hashbench` under ADR 0028 is the
-clearest tell: the same benchmark is among the worst regressions on one CPU and
-the best improvements on another.
+| ADR 0028 | true loop trip counts instead of `4^depth` | +845 B and +0.066 % ticks; the same bench moves both ways on different CPUs |
 
 The common cause is that nothing prices **the claim a decision displaces**.
-Scores are computed per candidate in isolation, so when two candidates are close
-the winner is decided by pass order, and a more accurate score just re-rolls it.
+Scores are computed per candidate in isolation, so when two are close the winner
+is settled by pass order, and a more accurate score just re-rolls it. That is why
+`DESIGN_REVIEW_PLAN.md` step A1 — the realised-cost ledger including opportunity
+cost — is the first item of resumed optimisation work.
 
-Until the resolver compares competing claims, improving any single cost input is
-as likely to hurt as to help — which is also why `DESIGN_REVIEW_PLAN.md` step A1
-(the realised-cost ledger, including opportunity cost) is the first item of the
-resumed optimisation work rather than one item among several.
+**A third case was listed here and has been removed, because it had a different
+cause.** The gbz80 cost row (ADR 0032) looked identical from the outside: correct
+the number, get +10 % ticks on one benchmark. It was not a ranking tie. A value
+took BC, the lowerer could not realise the home, `[home-demote]` dropped it to a
+slot, and the freed register was offered to nobody because the arbiter never ran
+again. Completing that recovery (`[home-rearb]`) made the benchmark neutral and
+the correction shipped.
+
+The diagnostic point is worth more than the pattern: **"truer cost, worse
+result" has at least two causes** — an unpriced displaced claim, and a register
+left unused after a failed home. They look the same and need different fixes.
+Rule out the second first; it is cheap to check and it is a bug, not a model
+limitation.
 
 ## Who owns the allocation
 
@@ -156,7 +161,7 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 
 ### In flight — the ranging arc (ADR 0017)
 
-The three remaining gates are **not** parked experiments. They are the staged
+The remaining gates are **not** parked experiments. They are the staged
 steps of one piece of work: get to ranged residency, and park a value back in
 its slot when its range is interrupted.
 
@@ -165,7 +170,7 @@ its slot when its range is interrupted.
 | 1. truthful intervals | `IR_TIGHT_HOMES` | 0027 | byte-identity premise **refuted**; explain it first |
 | 2. ranging | — | 0017 | blocked on stage 1 |
 | 3. park the slot when the range breaks | `IR_RANGED` | 0029 | in flight, conservative form |
-| cost correctness | `IR_GBZ80_COST` | 0032 | correct row, blocked on a ranking tie |
+| cost correctness | — | 0032 | **done** — SLOT+BC rows shipped default-on; `IR_GBZ80_MASK` remains as the bisection tool for future gbz80 work |
 
 Read their size numbers with that in mind. `IR_TIGHT_HOMES` at −508 B with 39
 cells larger, and `IR_RANGED` at −110 B with 108 cells larger, are **not**

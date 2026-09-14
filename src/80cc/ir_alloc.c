@@ -1001,20 +1001,6 @@ static int callsplit_on(void) { static int c = -1; if (c < 0) c = !opt_disabled(
    candidate's live range, so the BC veto buys them nothing. */
 static int iylong_off(void) { static int c = -1; if (c < 0) c = opt_disabled("iy-long"); return c; }
 
-/* [IR_GBZ80_COST=1] Opt IN to the measured gbz80 cost row (see GBZ80[] in
-   g0_word_cost). OPT-IN, not default: the row is right — gbz80 was using the
-   Z80 numbers and its slot really is ~30 % cheaper — but making it true flips a
-   near-tie in histbench's hist_pass, where BC moves from v26 (live [28,31]) to
-   the shorter, colder v25, for -14 B across divbench+matrixbench against
-   +10 % ticks on histbench. The row needs the ranking tie broken before it can
-   be the default; until then gbz80 keeps the (wrong but tuned) Z80 row. */
-static int gbz80_cost_on(void)
-{
-    static int c = -1;
-    if (c < 0) { const char *e = getenv("IR_GBZ80_COST"); c = e && e[0] == '1'; }
-    return c;
-}
-
 /* [IR_CS_EVICT=0/1] Let a call-bounded split EVICT a picker-placed BC tenant it
    out-benefits, instead of silently losing BC to whoever the picker placed
    first. Defaults to whatever prepush-narrow is: the arbitration gap only
@@ -3714,20 +3700,16 @@ static int g0_word_cost(int reg, int kind)
     const int (*t)[GK_N] = IS_KC160() ? KC160
                          : IS_EZ80() ? EZ80
                          : IS_KR580VM1() ? VM1
-                         : (IS_GBZ80() && gbz80_cost_on()) ? GBZ80
                          : IS_RABBIT() ? RABBIT
                          : g0measured_on() ? Z80 : Z80_EST;
     /* gbz80 carries TWO independent corrections and only one of them is safe.
        The SLOT row is a plain hardware fact — `ld hl,sp+n` makes a gbz80 slot
        about 30 % cheaper than the Z80 row claims — and it is DEFAULT-ON here.
        The PAIR rows (a GP-pair deref costs 16, not 7, for want of `ld a,(bc)`
-       and `ex de,hl`) are equally true but flip a ranking near-tie in
-       histbench's hist_pass, so they stay behind `IR_GBZ80_COST=1`.
-       Bisected by row: SLOT alone is corpus -72 B and -0.005 % ticks with
-       histbench UNTOUCHED; adding the pairs buys another -32 B and costs
-       histbench +10.25 %. */
+       and `ex de,hl`) are equally true, and are now default-on too — see the
+       mask note below for why they were held back and what unblocked them. */
     static int gb_slot[GR_N][GK_N];
-    if (IS_GBZ80() && !gbz80_cost_on()) {
+    if (IS_GBZ80()) {
         /* `IR_GBZ80_MASK` selects which ROWS of the measured gbz80 table are
            used: bit0 SLOT, bit1 BC, bit2 DE, bit3 IX/IY. Default 1 = SLOT only.
 
