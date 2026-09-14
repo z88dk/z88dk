@@ -7,3 +7,7 @@ ir_selftest
 # Python byte-cache from the analysis scripts kept here while working
 __pycache__/
 *.pyc
+
+# Assembler output — the compiler emits these next to the sources when you
+# run it by hand; three were committed by accident in June 2026.
+*.asm
