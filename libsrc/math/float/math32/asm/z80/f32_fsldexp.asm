@@ -75,7 +75,10 @@ PUBLIC _m32_ldexpf
     pop af                      ; return
     pop hl                      ; (float)x in dehl
     pop de
-    pop bc                      ; pw2 maximum int8_t actually
+    pop bc                      ; pw2 is int8_t only: |pw2| <= 127.
+                                ; Wider exponents WRAP (they do not return
+                                ; +Inf / signed zero as IEEE-754 ldexp would),
+                                ; so ldexp(x, n) is defined here for |n| <= 127.
     push af                     ; return on stack
 
 .pow2

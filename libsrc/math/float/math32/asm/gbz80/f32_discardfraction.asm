@@ -95,10 +95,11 @@ PUBLIC m32_discardfraction
 
 .return_zero
     ld a,d                      ; sign from original
-    rla
+    rla                         ; C = sign bit
     ld de,0
     ld hl,de
-    rra
+    ld a,d                      ; A = 0: the exponent byte must be dropped
+    rra                         ; A = 0x00 (+0) or 0x80 (-0)
     ld d,a
     scf
     ret

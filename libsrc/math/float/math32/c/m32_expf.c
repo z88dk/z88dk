@@ -38,7 +38,7 @@
  *
  *   message           condition     value returned
  * expf underflow    x < MINLOG_F32        0.0
- * expf overflow     x > MAXLOG_F32    HUGE_POS_F32
+ * expf overflow     x > MAXLOG_F32    +Infinity (IEEE-754)
  *
  */
  
@@ -49,6 +49,15 @@
  */
 
 #include "m32_math.h"
+
+/* IEEE-754: exp overflow returns +Infinity, not the FLT_MAX saturation
+ * that HUGE_POS_F32 provides. */
+static float m32_expf_overflow(void)
+{
+    union float_long u;
+    u.l = 0x7F800000;           /* +Inf */
+    return u.f;
+}
 
 #define LOG2EF      ((float)+1.44269504088896341)
 #define C1          ((float)+0.693359375)
@@ -68,11 +77,11 @@ float m32_expf(float x) __z88dk_fastcall
         u.f = x;
         hi = m32_ieee_hi(u);
         if( (hi & 0x7f) >= 0x43 )
-            return (hi & 0x80) ? 0.0 : HUGE_POS_F32;
+            return (hi & 0x80) ? 0.0 : m32_expf_overflow();
         if( (hi & 0x7f) >= 0x42 )
         {
             if( x > MAXLOG_F32 )
-                return HUGE_POS_F32;
+                return m32_expf_overflow();
             if( x < MINLOG_F32 )
                 return 0.0;
         }

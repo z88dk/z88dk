@@ -39,7 +39,10 @@ PUBLIC _m32_ldexpf
 ; sccz80 left-to-right entry → core order (same as cam32_sccz80_ldexp_callee)
 ._m32_ldexpf
     pop hl                          ; ret
-    pop bc                          ; pw2
+    pop bc                          ; pw2 is int8_t only: |pw2| <= 127.
+                                    ; Wider exponents WRAP (they do not return
+                                    ; +Inf / signed zero as IEEE-754 ldexp would),
+                                    ; so ldexp(x, n) is defined here for |n| <= 127.
     pop de                          ; x.HL
     ; open-code ex (sp),hl — preserve BC/DE (helper is 148c)
     push de

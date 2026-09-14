@@ -3099,6 +3099,14 @@ static void configure_maths_library(char **libstring)
         }
     }
 
+    /* The Z180 removed the undocumented Z80 IXH/IXL ops that genmath uses,
+     * so genmath cannot be built for it.  Default -lm on Z180 to the 4-byte
+     * IEEE math32_z180 (math32 ships a dedicated Z180 core). */
+    if (c_cpu == CPU_TYPE_Z180 && strcmp(c_genmathlib, "genmath@{ZCC_LIBCPU}") == 0) {
+        c_genmathlib = muststrdup("math32_z180");
+        parse_option("-Cc-fp-mode=ieee -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_MATH32 -Ca-D__MATH_MATH32 -D__MATH_MATH32");
+    }
+
     if (c_genmathlib) {
         if (strstr(*libstring, "-lm ") != NULL) {
             snprintf(buf, sizeof(buf), "-l\"%s\" ", c_genmathlib);
