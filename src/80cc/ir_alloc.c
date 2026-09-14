@@ -599,11 +599,13 @@ static int bc_home_realizable(const Func *f, int v,
     if (vr->flags & IR_VREG_VOLATILE) return 0;
     if (f->vreg_to_phys[v] != IR_PR_SPILL) return 0;
     if (use_count[v] < 2) return 0;
-    /* §3a″ (opt-in IR_BC_STEP_PARAM): a stepped-pointer PARAM may ride BC only
-       in a call-free function (a call evicts BC → emit_bc_reload restores from
-       the STALE caller slot once the pointer stepped). Phase-1 `inc bc` keeps
-       BC coherent on the step. Kept opt-in until proven (checksum self-checks). */
-    int allow_step_param = getenv("IR_BC_STEP_PARAM") != NULL;
+    /* §3a″ a stepped-pointer PARAM may ride BC only in a call-free function (a
+       call evicts BC → emit_bc_reload restores from the STALE caller slot once
+       the pointer stepped). Phase-1 `inc bc` keeps BC coherent on the step.
+       DEFAULT-ON: the corpus at 30 benches x 12 CPUs x sp/fp gives -514 bytes
+       with NO cell larger, and the tick matrix over 11 CPUs gives -0.06 % with
+       NO cell slower and no new failures. Opt out with IR_OFF=bc-step-param. */
+    int allow_step_param = !opt_disabled("bc-step-param");
     int fn_has_call = allow_step_param && !func_is_call_free(f);
     int is_param  = (vr->flags & IR_VREG_PARAM) != 0;
     int is_induct = (vr->flags & IR_VREG_INDUCTION) != 0;

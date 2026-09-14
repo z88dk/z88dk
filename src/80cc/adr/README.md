@@ -39,6 +39,7 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0027](0027-truthful-home-intervals.md) | *Proposed* — narrow each home to its true live range (first step of 0017) |
 | [0028](0028-trip-count-weighting.md) | *Proposed* — weight costs by derived trip counts instead of `4^depth` |
 | [0029](0029-de-cache-fold-brick.md) | *Proposed* — a fail-safe DE cache fold, where 0018 refuses a DE home |
+| [0031](0031-stepped-pointer-param-in-bc.md) | A stepped pointer parameter may live in BC (promoted after the `frameless_ok` fix) |
 | [0030](0030-debug-locals-in-frame-slots.md) | Under `-debug`, a named local is forced to a coherent frame slot (address-taken), with offsets emitted post-lowering |
 | [0024](0024-byte-home-for-a-single-use-temp.md) | **Rejected** — relaxing the byte-home use-count gate (E is slot-backed; one byte home per function) |
 

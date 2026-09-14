@@ -141,6 +141,7 @@ exists (ADR 0010).
 | `dsub` | no `sbc hl,bc` on the CPUs that have it |
 | `bc-call` | BC is not kept live across a call |
 | `bc-save-live` | BC is saved around a call even when it holds nothing live |
+| `bc-step-param` | a stepped pointer parameter is reloaded from its slot each iteration instead of riding BC (ADR 0031) |
 | `bc-live` | no BC park sweep in the final peephole |
 | `bc-flow` | no BC liveness flow into the lowering decisions |
 | `call-bremat` | a byte is reloaded after a call instead of rematerialised |
