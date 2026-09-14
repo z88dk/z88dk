@@ -3281,17 +3281,6 @@ static int bcpercand_on(void)
     return on;
 }
 
-/* [frameless-cost] Charge a param eviction for the framelessness it costs.
-   DEFAULT-ON: 30 benches x 12 CPUs x sp/fp gives -229 bytes with NO cell
-   larger, and the tick matrix over 11 CPUs has no cell slower and no new
-   failures. Opt out with IR_OFF=frameless-cost. See ADR 0036. */
-static int framelesscost_on(void)
-{
-    static int c = -1;
-    if (c < 0) c = !opt_disabled("frameless-cost");
-    return c;
-}
-
 static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                        const int *bb_first_op, const int *def_kind,
                        const int *write_count, const int *use_count,
@@ -3345,24 +3334,6 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
         int *evictable = calloc((size_t)f->n_vregs, sizeof(int));
         if (evictable) {
             long evict_ben = 0;
-            /* [frameless-cost] Is this function frameless-eligible as allocated?
-               The lowerer's frameless_ok wants every PARAM homed in BC (it has
-               no IX, so a param that reaches memory reads the CALLER's frame
-               through a register that was never set up). We cannot call it from
-               here — it lives in the lowerer and runs later — but its parameter
-               rule is a pure function of the allocation, which is exactly the
-               part that this decision is about to change.
-               So: if every param is BC-homed now, evicting one of them costs
-               the function its frameless form, and that charge belongs on the
-               eviction. See ADR 0035. */
-            int all_params_bc = 1, any_param = 0;
-            for (int j = 0; j < f->n_vregs; j++) {
-                if (!(f->vregs[j].flags
-                      & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))) continue;
-                any_param = 1;
-                if (f->vreg_to_phys[j] != IR_PR_BC) { all_params_bc = 0; break; }
-            }
-            int frameless_at_risk = any_param && all_params_bc;
             for (int j = 0; j < f->n_vregs; j++) {
                 if (f->vreg_to_phys[j] != IR_PR_BC) continue;
                 if (f->vregs[j].flags & IR_VREG_BC_PACK) continue;  /* our own */
@@ -3388,27 +3359,7 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                    stays freely evictable. */
                 if (blocks && !itloc[j] && !hotter && write_count[j] >= 2)
                     continue;
-                if (blocks) {
-                    evictable[j] = 1;
-                    evict_ben += cost_benefit[j];
-                    /* [frameless-cost] Two terms the raw benefit omits for a
-                       param, both measured on md5/MD5Init (ADR 0035):
-                         - its slot is the CALLER's frame. Framed that is one
-                           `ld hl,(ix+d)`; frameless it is `ld hl,N; add hl,sp`
-                           plus a byte-pair walk — about five instructions. So
-                           each read costs ~4 more than the model credits.
-                         - losing the frameless form costs the frame apparatus
-                           itself (push/ld/add/ld/pop, ~11 bytes).
-                       Charged in the same COST_*_W units the comparison uses:
-                       a read is COST_READ_W, so 4x that per read, and the
-                       apparatus is priced as a handful of reads. */
-                    if (framelesscost_on() && frameless_at_risk
-                        && (f->vregs[j].flags
-                            & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))) {
-                        evict_ben += 4 * COST_READ_W * (long)use_count[j];
-                        evict_ben += 5 * COST_READ_W;   /* frame apparatus */
-                    }
-                }
+                if (blocks) { evictable[j] = 1; evict_ben += cost_benefit[j]; }
             }
             /* Greedy benefit of the placeable set with the blockers PRESENT (base)
                vs ABSENT (free) — identical flo-order greedy + clash logic as the

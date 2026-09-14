@@ -125,7 +125,6 @@ exists (ADR 0010).
 | `deadframe` | a function with no live frame keeps its frame anyway |
 | `frameless` | never drop the frame pointer, even where nothing uses it |
 | `frame-index` | no direct `(ix+d)` frame access; the address is materialised |
-| `frameless-cost` | a parameter eviction is not charged for the framelessness it costs (ADR 0036) |
 | `sp-flip` | a framed function is never re-lowered against SP (fp mode only) |
 | `home-demote` | an unrealisable home aborts instead of falling back to a slot |
 | `home-rearb` | after a demotion the freed register is not offered to the next candidate |
