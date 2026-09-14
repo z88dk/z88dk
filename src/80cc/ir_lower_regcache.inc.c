@@ -3161,7 +3161,28 @@ static int op_de_clean(const Func *f, const Op *o)
    and that branch itself — both of which lower to the A+BC-only
    `ld a,c; sub mem; ld a,b; sbc a,mem; jp` form. Everything else defers to
    the runtime op_de_clean. */
+static int op_de_clean_static_inner(const Func *f, const BB *bb, int j);
+
 static int op_de_clean_static(const Func *f, const BB *bb, int j)
+{
+    /* A STATIC proof has no ambient lowering point. It runs before the render
+       and walks ops that are not the one being lowered, so `L.ss_cur_g` holds
+       whatever the last render left there — and every point query reached from
+       here (vreg_in_pr_bc, vreg_in_idx2, and everything op_de_clean calls)
+       would answer about that stale op instead of this one.
+       Scope the point to "none" for the duration: ir_home_at_op then returns
+       the whole-function assignment, which is the honest answer to "can this op
+       take the BC form at all". Harmless while homes are whole-function;
+       without it, a narrowed home (ADR 0027) makes the proof consult a window
+       that has nothing to do with the op under test. */
+    int saved_g = L.ss_cur_g;
+    L.ss_cur_g = -1;
+    int r = op_de_clean_static_inner(f, bb, j);
+    L.ss_cur_g = saved_g;
+    return r;
+}
+
+static int op_de_clean_static_inner(const Func *f, const BB *bb, int j)
 {
     const Op *o = &bb->ops[j];
     if ((o->kind == IR_CMP_ULT || o->kind == IR_CMP_UGE)
