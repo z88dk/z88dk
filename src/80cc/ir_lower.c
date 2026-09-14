@@ -939,22 +939,11 @@ static int hlde_full_reload(const char *s, const char *pair)
 
    DEFAULT-ON; `IR_OFF=jr-relax` opts out. Regression: test/suites/long_ir/jrelax.c. */
 static int relax_uc = -1;
-/* Whether to relax UNCONDITIONAL jumps is a per-CPU question, and the answer
-   follows the `jr`-vs-`jp` timing rather than the byte saving (which is always
-   1 B in our favour). An unconditional jump is taken every time it is reached,
-   so it cannot amortise a slower form:
-
-     z80 / z80n   `jr` +2 T over `jp`      -> do NOT relax (bytes cost ticks)
-     z180         8 T vs 9                 -> relax
-     gbz80        12 T vs 16               -> relax
-     rabbit       5 T (2k/3k) / 6 (4k/6k) vs `jp` 7  -> relax
-     ez80, kc160  no penalty               -> relax
-
-   Conditional branches are relaxed everywhere: `jr cc` is 12 T taken / 7 not
-   taken against `jp cc`'s flat 10, so the not-taken path pays for the rest.
-   The override that forced this on every CPU is gone: measured over 11 CPUs x
-   both frame modes it is 57 cells SLOWER on z80 and 57 on z80n, none faster,
-   and exactly zero change everywhere else (those CPUs already relax). See
+/* Whether to relax an UNCONDITIONAL jump is a per-CPU question: it is taken
+   every time it is reached, so it cannot amortise a slower form, and on z80 /
+   z80n `jr` is slower than `jp`. A CONDITIONAL branch can amortise it — its
+   not-taken path is cheaper — so those are relaxed everywhere.
+   Per-CPU timings and the measurement that refused a global override:
    ADR 0033. */
 static int relax_uncond_ok(void)
 {

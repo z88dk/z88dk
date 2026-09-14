@@ -600,9 +600,7 @@ static int bc_home_realizable(const Func *f, int v,
     /* §3a″ a stepped-pointer PARAM may ride BC only in a call-free function (a
        call evicts BC → emit_bc_reload restores from the STALE caller slot once
        the pointer stepped). Phase-1 `inc bc` keeps BC coherent on the step.
-       DEFAULT-ON: the corpus at 30 benches x 12 CPUs x sp/fp gives -514 bytes
-       with NO cell larger, and the tick matrix over 11 CPUs gives -0.06 % with
-       NO cell slower and no new failures. Opt out with IR_OFF=bc-step-param. */
+       Default-on; ADR 0031 has the evidence and the landmine it once exposed. */
     int allow_step_param = !opt_disabled("bc-step-param");
     int fn_has_call = allow_step_param && !func_is_call_free(f);
     int is_param  = (vr->flags & IR_VREG_PARAM) != 0;
@@ -3702,31 +3700,17 @@ static int g0_word_cost(int reg, int kind)
                          : IS_KR580VM1() ? VM1
                          : IS_RABBIT() ? RABBIT
                          : g0measured_on() ? Z80 : Z80_EST;
-    /* gbz80 carries TWO independent corrections and only one of them is safe.
-       The SLOT row is a plain hardware fact — `ld hl,sp+n` makes a gbz80 slot
-       about 30 % cheaper than the Z80 row claims — and it is DEFAULT-ON here.
-       The PAIR rows (a GP-pair deref costs 16, not 7, for want of `ld a,(bc)`
-       and `ex de,hl`) are equally true, and are now default-on too — see the
-       mask note below for why they were held back and what unblocked them. */
+    /* gbz80 carries two corrections, both plain hardware facts and both now
+       default-on: `ld hl,sp+n` makes its slot cheaper than the Z80 row claims,
+       and a GP-pair deref costs more for want of `ld a,(bc)` and `ex de,hl`. */
     static int gb_slot[GR_N][GK_N];
     if (IS_GBZ80()) {
         /* `IR_GBZ80_MASK` selects which ROWS of the measured gbz80 table are
-           used: bit0 SLOT, bit1 BC, bit2 DE, bit3 IX/IY. Default 1 = SLOT only.
-
-           SWEPT over all 16 combinations, gbz80 corpus (sp+fp):
-             DE and IX/IY change NOTHING, in any combination — the whole effect
-             of the measured table is SLOT and BC.
-               mask 0 (z80 row)   72308 B
-               mask 1 (SLOT)      72276 B
-               mask 2 (BC alone)  +worse (bitfieldbench +8)
-               mask 3 (SLOT+BC)   72204 B   == mask 15, the whole win
-                                            72184 B with [home-rearb]  <- DEFAULT
-           mask 3 used to cost histbench +10.38 %, which is what kept it out.
-           That was NOT a ranking tie: v1 took BC, the lowerer could not realize
-           the home, `[home-demote]` demoted it and the register was then offered
-           to nobody. With `[home-rearb]` completing that recovery, histbench is
-           neutral and mask 3 is -92 B against mask 1 with 8 tick cells faster
-           and 0 slower. */
+           used: bit0 SLOT, bit1 BC, bit2 DE, bit3 IX/IY. Default 3 = SLOT+BC,
+           which is the whole of the effect — DE and IX/IY are measured inert.
+           The sweep, and why the BC row was held back for a long time by what
+           turned out to be a recovery bug rather than a ranking tie, are in
+           ADR 0032. */
         static int gbmask = -1;
         if (gbmask < 0) { const char *e = getenv("IR_GBZ80_MASK");
                           gbmask = e ? atoi(e) : 3; }
