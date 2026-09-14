@@ -14,7 +14,7 @@ see `DESIGN_REVIEW_PLAN.md` (same directory), steps 2 to 7. In progress:
 | Step | State |
 | --- | --- |
 | 1. Bounded-buffer fixes | done — `aea4c1594f`, `a25f552397` |
-| 2. Gate sweep | in progress — 119 gates to 78; opt-outs unified |
+| 2. Gate sweep | done — 119 gates to 58; one opt-out registry |
 | 3. This index | done |
 | 4. Document pass | done — archived on `80cc-docs-archive`, 9 new ADRs |
 | 5. Home plan (one owner) | done — no code outside `ir_alloc` writes home state |
@@ -95,7 +95,7 @@ configuration could not be determined by reading it.
 
 ## Surviving gates
 
-78 remain. A gate needs a row here or it is deleted.
+58 remain. A gate needs a row here or it is deleted.
 
 ### Verifiers — permanent, never swept
 
@@ -127,45 +127,53 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | `IR_CMPSIGN_PROBE` | signed-compare shapes | — |
 | `IR_ALLOC_PROBE` `IR_B1_PROBE` `IR_DEADDEF_PROBE` `IR_DELIVE_PROBE` `IR_DEPARK_PROBE` `IR_FRAMEPROBE` `IR_NARROWPROBE` `IR_SHLX_PROBE` | one-line censuses inside shipped passes | on their next edit |
 
-### Parked features — measured to change emitted code
+### Parked features — what they are, and whether a record exists
 
-These work and are off by default. Each needs a decision: promote after a
-gauntlet, or delete.
+16 became 11. Each now either has an ADR or a reason it does not need one.
 
-| Gate | What it does | Status |
+| Gate | What it is | Record |
 | --- | --- | --- |
-| `IR_RANGED` | single-BB ranged residency | defended by DESIGN_REVIEW_PLAN 8a — needs its own review, not a sweep |
-| `IR_TRIPW` `IR_TRIPW_DEF` | trip-count weighting in the cost model | under assessment; keep with `IR_TRIPPROBE` |
-| `IR_OPRES` | operand residency | refuted as a design — see ADR 0018; the gate is the residue |
-| `IR_JR_UNCOND` | relax unconditional jumps too | measured, unpromoted |
-| `IR_TIGHT_HOMES` | tighter home intervals | measured, unpromoted |
-| `IR_SPINC` `IR_SPEXCL` | sp-flip scope filters | debug scoping for `sp-flip` |
-| `IR_BC_STEP_PARAM` | BC home for a stepped pointer param | worth ~1 function; fails the one-bench rule |
-| `IR_NO_A_CARRY` | inverse of `a-carry` | redundant since `a-carry` joined the registry |
-| `IR_GBZ80_MASK` | gbz80 mask lowering | gbz80 only |
-| `IR_LONG_PUSHES` `IR_SPCOST` | numeric knobs, not booleans | — |
+| `IR_TIGHT_HOMES` | narrow homes to the true live range — the substrate for time-sharing | **ADR 0027** (Proposed) |
+| `IR_TRIPW` `IR_TRIPW_DEF` | weight costs by derived trip counts instead of `4^depth` | **ADR 0028** (Proposed) |
+| `IR_RANGED` | fail-safe DE cache fold at a definition | **ADR 0029** (Proposed) |
+| `IR_BC_STEP_PARAM` | a stepped-pointer param may ride BC | worth ~1 function; fails the one-bench rule |
+| `IR_INPLACE_CMP` | in-place slot-coherent `long == const` | proof of concept, unmeasured |
+| `IR_INPLACE_MASK` | narrow in-place const mask | proof of concept, unmeasured |
+| `IR_JR_UNCOND` | force unconditional `jr` per CPU | the policy is ADR 0025; this overrides it |
+| `IR_REHOME` | home re-arbitration after a demotion | default-on behaviour, inert on the shipping config |
+| `IR_ALLOC_PROBE` `IR_BCVETO_PROBE` | census probes | kept pending the cost ledger |
+| `IR_GBZ80_MASK` | gbz80 mask lowering | gbz80 only, unmeasured |
 
-### Parked features — no measured effect on 4 files x 10 CPUs
+Deleted 2026-09-13: `IR_OPRES` (ADR 0018 rejects the thesis; the code was its
+residue), `IR_NO_A_CARRY` (redundant once `a-carry` joined the registry),
+`IR_FLIPCOST`, `IR_SPINC`, `IR_SPEXCL` (report and bisect scaffolding for
+`sp-flip`, which shipped).
 
-`IR_BYTEPRESS` `IR_BYTETIE` `IR_CALL_BREMAT` `IR_CS_EVICT_MIN` `IR_DEAD`
-`IR_DEPARK_SWEEP` `IR_FCLONG_CARRY` `IR_FLIPCOST` `IR_G0MEASURED`
-`IR_GBZ80_COST` `IR_GWIDEN` `IR_IDX2BASE` `IR_IDXPRICE` `IR_INPLACE_CMP`
-`IR_INPLACE_MASK` `IR_IVACC` `IR_IVACCK` `IR_IVHOT` `IR_REHOME` `IR_SHRMASK`
-`IR_SHRNARROW` `IR_SHRWIDE` `IR_TM_MINGAIN` `IR_B1_SETUP` `IR_B1_TRIP`
-`IR_BCCALLCOST` (numeric knob half)
+### Numeric knobs — a category with no home
 
-Silence is not proof of death: the sample is four sources, and a gate can need
-a shape it does not contain. These are the next tranche to decide, each on its
-own evidence.
+`IR_BCCALLCOST` `IR_BYTETIE` `IR_CS_EVICT_MIN` `IR_DEPARK_SWEEP` `IR_GBZ80_MASK`
+`IR_IVACCK` `IR_IVHOT` `IR_LONG_PUSHES` `IR_SPCOST` `IR_TM_MINGAIN`
+
+Each sets a tuning constant, so the opt-out registry cannot express them — it is
+on/off only. They are parked experiments with a dial. Decide them the same way:
+promote the tuned value into the code and delete the dial, or delete both.
 
 ## Retired this sweep
 
-Twelve probes, about 800 lines. Source kept under `probes-retired/` so a census
-can be re-run without re-deriving it.
+Twenty probes and five dead gates, about 1,800 lines. Source kept under
+`probes-retired/` so a census can be re-run without re-deriving it.
 
 `IR_LDSLOT_WHY` `IR_OPRES_WHY` `IR_OPRES_PROBE` `IR_GPHOME_PROBE`
 `IR_SPLIT_PROBE` `IR_LONGPUSH_PROBE` `IR_ADDRRES_PROBE` `IR_SPILLAUDIT`
-`IR_VRED` `IR_SHAREPROBE` `IR_PARAMHOME` `IR_PARAMRELOAD`
+`IR_VRED` `IR_SHAREPROBE` `IR_PARAMHOME` `IR_PARAMRELOAD` `IR_GRAPH_PROBE`
+`IR_ALLOC_PROBE`(fn) `IR_B1_PROBE`(fn) `IR_SPILL_WHY`(fn) `IR_DEADDEF_PROBE`
+`IR_CMPSIGN_PROBE`(fn) `IR_DELIVE_PROBE` `IR_HR_CHECK` — and the gates
+`IR_OPRES` `IR_NO_A_CARRY` `IR_FLIPCOST` `IR_SPINC` `IR_SPEXCL`
+
+Deleting a probe repeatedly made a helper dead that nothing else used. Let the
+compiler find those: delete, rebuild, act on `-Wunused-function`, repeat. Two
+rounds found five helpers, one of them 57 lines, that no grep would have
+surfaced.
 
 ## Documents
 
