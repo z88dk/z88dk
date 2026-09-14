@@ -21,6 +21,20 @@ enforced by a script. What remains is optimisation work, and the order matters:
    it. It gates ADR 0021 and ADR 0028 rather than competing with them.
 3. Then stages 2 and 3 of the ranging arc (ADR 0017).
 
+### Background work, when there is time
+
+**Give the shipped default-on optimisations ADRs, then trim their comments.**
+Of 115 registry names only about 15 are named in an ADR. Roughly ten features —
+`remat-lea`, `dead-store-share`, `trunc-res`, `fclong-carry`, `call-bremat` and
+similar — carry their justification, including benchmark figures, in a long
+block comment and nowhere else. 26 such blocks hold ~370 lines.
+
+The order matters: **write the ADR first, then cut the comment to the rule plus
+a pointer.** Doing it the other way loses the reasoning. Figures belong in
+commit messages, `BENCH_MATRIX.txt` and the ADR's evidence link — never in a
+code comment, which is this project's own rule (`adr/README.md`) and the reason
+several comments here had gone stale.
+
 One step of the original simplification plan was deliberately not done:
 retiring the mirror predicate pairs — a legality proof and its emitter each
 encoding the same facts, so an emitter change can silently invalidate its proof.
