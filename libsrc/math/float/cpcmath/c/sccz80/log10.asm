@@ -19,9 +19,3 @@ log10:
 log10c:
     FPCALL  (CPCFP_FLO_LOG10)
     ret
-
-; floatpack init: run the CPC float-state patch at startup via code_crt_init
-    SECTION code_crt_init
-    EXTERN  init_floatpack
-    call    init_floatpack
-
