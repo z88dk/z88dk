@@ -1948,8 +1948,8 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                    (`sp + get_memory_inst(pc++)` in src/ticks/i8085_inst.c).
                Same liveness the [xor-a] rung above uses, and for the same
                reason: at line i it is the answer for the code AFTER line i.
-               Census over the corpus 8085 output: 1920 sites, all in range,
-               346 with DE dead. `--opt-disable=ldsi-addr` opts out. */
+               `--opt-disable=ldsi-addr` opts out. Census and evidence:
+               adr/0039. */
             if (IS_8085() && !opt_disabled("ldsi-addr")
                 && !d_live && !e_live && !f_live
                 && i > 0 && !strcmp(lines[i], "\tadd\thl,sp\n")
