@@ -66,13 +66,13 @@ PUBLIC m32_mulu_32h_24x24
     push bc                     ; ab on stack (again)
     push hl                     ; ef on stack
 
-    ld d,l
-    ld a,h
-    ld h,e
-    ld e,a
-    mul de                      ; b*f 2^8
-    ex de,hl
+    ld d,e                      ; c in d
+    ld a,h                      ; e in a
+    ld h,c                      ; b in h
+    ld e,a                      ; e in e
     mul de                      ; c*e 2^8
+    ex de,hl
+    mul de                      ; b*f 2^8
 
     xor a
     add hl,de
