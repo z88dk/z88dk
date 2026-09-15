@@ -215,8 +215,8 @@ void z80n_push_mn(void)
     uint8_t msb = get_memory_inst(pc++);
     uint8_t lsb = get_memory_inst(pc++);
 
-    put_memory(--sp,msb);
     put_memory(--sp,lsb);
+    put_memory(--sp,msb);
 
     st += 23;
 }
