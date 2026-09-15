@@ -80,11 +80,26 @@ enforced by a script. What remains is optimisation work, and the order matters:
    candidates the allocator would actually consider.** Same lesson
    `IR_PAIRPROBE` taught: size the reachable set, not the ideal one.
 
-5. **NEXT: stage 3's fail-safe form** (ADR 0029) — the DE cache fold. A belief,
-   not a promise, with **no park cost**, which is exactly why it may work where
-   the expensive form measured 7 of 145. ADR 0029 has asked from the start for a
-   measurement on a real char- and pointer-heavy file; that is the next thing to
-   do, and 0029 says outright to refuse it if the population is thin.
+5. ~~Stage 3's fail-safe form~~ — **REJECTED ON CORRECTNESS and DELETED**
+   (ADR 0029). `IR_RANGED` **miscompiles**: 17 corpus cells fail with it on and
+   pass with it off, and `sortbench` fails its host-verified checksums on both
+   sorts. Its "byte-safe by construction" claim was false — `de_fold_pays`
+   never required DE clean from def to use, and said so in its own comment.
+   It also did not pay: corpus 74 smaller / **110 larger**, ticks **+2.17 %**
+   (49 faster / 97 slower). Deleted: gate, `de_fold_hint`, both predicates, the
+   lowerer rung, −114 lines. `enigma` did measure −48 B sp / −21 fp, so the
+   concept reaches real code — the belief management was what was unsound.
+
+   **The ranging arc (ADR 0017) is now closed.** Stage 1 shipped; stages 2 and
+   3 are refused on evidence. Two durable lessons: *admission, not
+   time-sharing*, is the allocator's constraint; and a park costs more than a
+   born-killed temp gains. If stage 3 is revisited, the DE-clean proof belongs
+   in the lowerer, which now has the per-register D/E liveness (ADR 0047) it
+   lacked when this was written.
+
+### Next
+   Nothing in the residency arc is open. The live items are the 8085 K-flag
+   trip counter (ADR 0051, Proposed) and the 23 remaining documentation blocks.
 
 ### Background work, when there is time
 

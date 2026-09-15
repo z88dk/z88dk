@@ -1219,18 +1219,6 @@ static void commit_hl_word(FILE *out, const Func *f, int v)
        cache-hit and skip its reload → a self-copy. */
     if (v >= 0 && vreg_is_pr_stack(f, v)) { invalidate_hl_cache(); return; }
     cache_hl(v);
-    /* DENSITY §4 fail-safe DE-cache fold hint (opt-in IR_RANGED). A reused
-       deref/binop that stayed IR_PR_SPILL: leave a DE copy so a later read after
-       an intervening HL clobber prefers DE (`sbc hl,de` / e-d byte-wise) instead
-       of a slot reload. Byte-safe — store_hl already wrote the slot, so a DE
-       clobber (belief invalidated by the clobbering op) falls back to it.
-       Guards: HL must actually hold v; and skip when a word DE-home rides the
-       physical DE pair (the copy would corrupt the resident home). */
-    if (v >= 0 && f->de_fold_hint && f->de_fold_hint[v]
-        && hl_has(v) && !g_hc.home_is_word && g_hc.de_home < 0) {
-        emit_hl_to_de(out);
-        cache_de(v);
-    }
 }
 
 /* Word result is in HL, dst v is a PR_DE-pool vreg: swap into DE and advertise

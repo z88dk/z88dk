@@ -38,7 +38,7 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0026](0026-index-home-as-addressing-mode.md) | The index home is an addressing mode, not only a value carrier (amends 0011) |
 | [0027](0027-truthful-home-intervals.md) | **Accepted** — each home narrows to its true live range (stage 1 of 0017); 20 cells smaller, none larger |
 | [0028](0028-trip-count-weighting.md) | *Proposed* — weight costs by derived trip counts instead of `4^depth` |
-| [0029](0029-de-cache-fold-brick.md) | *Proposed* — a fail-safe DE cache fold, where 0018 refuses a DE home |
+| [0029](0029-de-cache-fold-brick.md) | **Rejected** — the fail-safe DE cache fold MISCOMPILES (17 cells); deleted, −114 lines |
 | [0032](0032-gbz80-word-cost-row.md) | The measured gbz80 cost rows (SLOT+BC), shipped — and why the regression that held them back was a failed recovery, not a ranking tie |
 | [0034](0034-one-owner-for-the-allocation.md) | `ir_alloc` is the only writer of the plan; the render reports typed rejections (amends 0003) |
 | [0061](0061-call-split-eviction-is-coupled-to-prepush-narrowing.md) | **Accepted** — `cs-evict` defaults to `prepush-narrow`, because its opportunity only exists once narrowing admits the candidates |

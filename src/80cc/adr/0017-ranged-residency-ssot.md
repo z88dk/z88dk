@@ -65,7 +65,7 @@ independent experiments. Maintainer's sequence, 2026-09-14:
 | --- | --- | --- |
 | 1. Make the intervals **truthful** — a home spans what the value is live for, not the whole function | `tight-homes`, ADR 0027 | **SHIPPED default-on 2026-09-15**: 20 cells smaller, 0 larger, 20 tick cells faster, 0 slower |
 | 2. **Range** — a value is resident over the sub-range it is actually used in, and a register is time-shared between disjoint values | ADR 0017 (this) | **unblocked and sized** — see below |
-| 3. **Park in the slot when the range is interrupted** — a clobber or call ends the resident window; the value returns to its slot and resumes after | `IR_RANGED`, ADR 0029 | in flight, as the fail-safe form |
+| 3. **Park in the slot when the range is interrupted** — a clobber or call ends the resident window; the value returns to its slot and resumes after | ADR 0029 | **BOTH FORMS REFUSED**: the expensive form pays at 7 of 145 sites; the fail-safe form MISCOMPILED and is deleted |
 | cross-cutting. Per-CPU costs must be **right**, because a ranging decision is a cost decision | `IR_GBZ80_COST`, ADR 0032 | in flight; correct row, blocked on a ranking tie |
 
 Stage 1 was a prerequisite, not a nicety: while every interval is the whole
@@ -203,10 +203,21 @@ future sizing here must count candidates the allocator would actually *consider*
 not values that merely fail to interfere. That is the lesson to carry, and it is
 the same one `IR_PAIRPROBE` taught: size the reachable set, not the ideal one.
 
-What remains live: **stage 3's fail-safe form** (ADR 0029) — an opportunistic
-cache with *no park cost*, which is precisely why it may work where the
-expensive form cannot. It still owes its own measurement on a real char- and
-pointer-heavy file.
+Stage 3's fail-safe form (ADR 0029) was then measured too, and **rejected on
+correctness**: it miscompiled 17 corpus cells, and its "byte-safe by
+construction" claim was false — it never proved DE clean from def to use. It is
+deleted (−114 lines).
+
+**So the whole arc is now closed.** Stage 1 shipped; stages 2 and 3 are both
+refused, on evidence rather than abandonment. The durable results are the two
+lessons above — *admission, not time-sharing* is the constraint, and a park
+costs more than a born-killed temp gains — plus the deletion of a gate that had
+been sitting in the tree documented as safe while miscompiling.
+
+If stage 3 is ever revisited, ADR 0029 records the one condition that would make
+the fail-safe form sound: the DE-clean proof belongs in the lowerer, which now
+has real per-register D/E liveness (ADR 0047) that did not exist when it was
+written.
 
 DE is effectively exhausted (31 of 78 shared, 16 left) and IX is a non-starter —
 it is the frame pointer in fp mode. Neither is worth work.

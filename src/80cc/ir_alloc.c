@@ -1007,11 +1007,6 @@ static int de_ptr_realizable(const Func *f, int v, const int *use_count,
     if (use_count[v] < 1) return 0;
     return 1;
 }
-/* IR_RANGED gate: the fail-safe DE-cache fold brick (DENSITY_HANDOVER §4). A
-   reused deref/binop that stays IR_PR_SPILL leaves a DE cache at its def so a
-   later in-range read prefers DE instead of re-materialising in HL + spilling.
-   Distinct from opres_on() (the reverting real-DE-home experiment). */
-static int ranged_on(void) { static int c = -1; if (c < 0) c = getenv("IR_RANGED") != NULL; return c; }
 /* Call-bounded live-range splitting: DEFAULT-ON after the full byte+ticks
    matrix (all 9 CPUs x candidate benches x sp/fp: 0 regressed cells, -1500B;
    z80/gbz80/8085 ticks all faster-or-neutral). Opt out with IR_OFF=call-split
@@ -1085,60 +1080,6 @@ static int mwbc_pressure_on(void)
     static int c = -1;
     if (c < 0) c = !opt_disabled("mwbc-pressure");
     return c;
-}
-static int de_operand_realizable(const Func *f, int v,
-                                 const int *use_count, const int *write_count,
-                                 const int *def_kind, const int *wd_base)
-{
-    /* Only the IR_RANGED fail-safe brick uses this now: the operand-residency
-       DE-home it was written for is refused — see ADR 0018. */
-    if (!ranged_on()) return 0;
-    const VReg *vr = &f->vregs[v];
-    if (vr->width != 2) return 0;
-    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
-        return 0;
-    if (f->vreg_to_phys[v] != IR_PR_SPILL) return 0;
-    if (wd_base[v]) return 0;                          /* not a deref base */
-    if (write_count[v] > 1) return 0;                  /* single def */
-    if (use_count[v] < 2) return 0;                    /* reused */
-    int dk = def_kind[v];
-    int is_deref = (dk == IR_LD_MEM);
-    int is_binop = (dk == IR_ADD || dk == IR_SUB || dk == IR_AND
-                    || dk == IR_OR || dk == IR_XOR);
-    return is_deref || is_binop;
-}
-/* True when a DE cache for v can PAY (DENSITY §4). The def leaves v in HL and a
-   use BEFORE any HL clobber reads HL directly — so the DE copy is dead overhead
-   UNLESS a use follows an HL-clobbering op in the same BB (then that read would
-   otherwise reload the slot; the DE fallback replaces it). Measured (2026-07-28):
-   firing unconditionally is a net +36B corpus regression — the common case has
-   no in-BB HL gap, so this gate is what makes the brick net-positive. Cross-BB
-   reuse (safe()'s ri) resets the DE cache at the BB boundary → NOT captured here
-   (that is §5, the ranged DE home). */
-static int de_fold_pays(const Func *f, int v)
-{
-    for (int b = 0; b < f->n_bbs; b++) {
-        const BB *bb = &f->bbs[b];
-        int seen_def = 0, hl_clob = 0;
-        for (int j = 0; j < bb->n_ops; j++) {
-            const Op *o = &bb->ops[j];
-            if (!seen_def) { if (o->dst == v) seen_def = 1; continue; }
-            /* A use after an in-BB HL clobber would otherwise reload the slot;
-               the DE cache serves it instead. NOTE: we deliberately do NOT also
-               require DE to be clean def→use. That condition depends on the
-               lowerer's precise DE belief, and op_clobbers (a conservative
-               superset) over-reports DE clobbers — gating on it zeroes every win.
-               Consequence: a rare false positive (an `ex de,hl` store that
-               already stages v to DE) survives. Net still a win; the accurate
-               fix lives in the lowerer, not here. */
-            if (hl_clob) {
-                int u[16]; int nu = ir_op_uses(o, u, 16);
-                for (int q = 0; q < nu; q++) if (u[q] == v) return 1;
-            }
-            if (op_clobbers(f, o) & IR_R_HL) hl_clob = 1;
-        }
-    }
-    return 0;
 }
 
 
@@ -3604,12 +3545,6 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
 }
 
 
-/* Inert measurement (IR_RANGED_PROBE): quantify the ranged-residency opportunity
-   left AFTER all pickers ran — the residual SPILL word temps, their interval
-   graph's max simultaneous overlap (= min registers to keep them all resident),
-   and the count. A function with many spill-word temps but a small overlap is a
-   ranged consumer (disjoint temps that time-share a few registers). No codegen
-   effect. */
 /* G0 (opt-in IR_GRAPH_PROBE, INERT — no codegen effect). The first stage of the
    interference/pressure-aware allocator (src/80cc/GRAPH_ALLOC_PLAN.md): build the
    grounded per-(access-kind × register × target × mode) benefit and REPORT where it
@@ -4374,13 +4309,11 @@ void ir_alloc(Func *f)
     f->vreg_to_phys = NULL;
     free(f->home_lo); f->home_lo = NULL;
     free(f->home_hi); f->home_hi = NULL;
-    free(f->de_fold_hint); f->de_fold_hint = NULL;
     if (f->n_vregs <= 0) return;
     f->vreg_to_phys = calloc((size_t)f->n_vregs, sizeof(*f->vreg_to_phys));
     f->home_lo = calloc((size_t)f->n_vregs, sizeof(*f->home_lo));
     f->home_hi = calloc((size_t)f->n_vregs, sizeof(*f->home_hi));
-    f->de_fold_hint = calloc((size_t)f->n_vregs, sizeof(*f->de_fold_hint));
-    if (!f->vreg_to_phys || !f->home_lo || !f->home_hi || !f->de_fold_hint) return;
+    if (!f->vreg_to_phys || !f->home_lo || !f->home_hi) return;
 
     /* Default: every vreg gets a slot, then narrow to the register
        pools below. Ranged-residency intervals default to whole-function
@@ -5367,30 +5300,6 @@ void ir_alloc(Func *f)
            EVERY placement pass (arbiter, bc_pack, both IY packs, stack_spill), so
            vreg_to_phys is the final answer and the model is scored against what
            actually shipped — not against an intermediate state. */
-        /* DENSITY §4 fail-safe DE-cache fold hint (opt-in IR_RANGED). Runs after
-           ALL register placement so it fires ONLY on reused deref/binop values
-           that stayed IR_PR_SPILL. The lowerer reads f->de_fold_hint and leaves a
-           DE cache at the def; the value's slot stays coherent so any DE clobber
-           falls back to it (byte-safe by construction).
-           DEAR-SLOT COST GATE: the DE cache replaces a SLOT read, so it only pays
-           where the slot is DEAR relative to DE. On cheap-slot CPUs (ez80 native
-           `ld hl,(ix+d)`=2, kc160=4, rabbit `ld hl,ix`=9) the fixed `ld d,h;ld e,l`
-           copy is dead overhead → the whole-corpus split (ez80/rabbit/kc160
-           regressed +19..+48B, z80/z180/808x/gbz80 won −5..−29B). Same `≥15`
-           dear-slot threshold the BC counter→deref-base yield uses (deref_gap). */
-        if (ranged_on() && f->de_fold_hint
-            && g0_word_cost(GR_SLOT, GK_READ) - g0_word_cost(GR_DE, GK_READ) >= 15) {
-            int *wd_base_h = calloc((size_t)f->n_vregs, sizeof(int));
-            if (wd_base_h) {
-                scan_wd_props(f, bb_in_loop, wd_base_h, NULL, NULL, NULL);
-                for (int v = 0; v < f->n_vregs; v++)
-                    if (de_operand_realizable(f, v, use_count, write_count,
-                                              def_kind, wd_base_h)
-                        && de_fold_pays(f, v))
-                        f->de_fold_hint[v] = 1;
-                free(wd_base_h);
-            }
-        }
         /* [call-split] Phase-1 call-bounded live-range splitting (opt-in).
            For a spilled reused width-2 value with a call-free span of >=3 READS
            and NO write inside that span, make it BC-resident across the span:
