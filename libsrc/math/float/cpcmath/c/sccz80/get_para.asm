@@ -20,4 +20,3 @@ get_para:
     ldir
     ld      hl, fa+1
     ret
-

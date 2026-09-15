@@ -26,4 +26,3 @@ dgec:
     jp      z, cmpfin
     xor     a
     jp      stkequcmp
-

@@ -28,5 +28,3 @@ dsubc:
     pop     bc
     pop     bc
     jp      (hl)                        ;outta here back to program
-
-

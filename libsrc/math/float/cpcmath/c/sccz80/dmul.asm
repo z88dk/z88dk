@@ -21,4 +21,3 @@ dmul:
 dmulc:
     FPCALL  (CPCFP_FLO_MUL)
     jp      stkequ
-

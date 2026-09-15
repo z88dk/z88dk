@@ -12,33 +12,6 @@
         PUBLIC        init_floatpack
 
 ; All the library routines that we have to change
-        EXTERN        atan
-        EXTERN        cos
-        EXTERN        dadd
-        EXTERN        ddiv
-        EXTERN        deg
-        EXTERN        deq
-        EXTERN        dge
-        EXTERN        dgt
-        EXTERN        dleq
-        EXTERN        dlt
-        EXTERN        dmul
-        EXTERN        dne
-        EXTERN        dsub
-        EXTERN        exp
-        EXTERN        float
-        EXTERN        floor
-        EXTERN        fprand
-        EXTERN        ifix
-        EXTERN        log10
-        EXTERN        log
-        EXTERN        minusfa
-        EXTERN        pow10
-        EXTERN        pow
-        EXTERN        rad
-        EXTERN        sin
-        EXTERN        sqrt
-        EXTERN        tan
 
 ; The actual place where we have to change things
         EXTERN        atanc
@@ -82,6 +55,13 @@ IFNDEF PORTABLE_CPC_MATH
         ret
 
 .init_cpc464float
+; run-once sentinel: if this model's ATAN vector is already patched in, done.
+        ld      hl,(atanc+3)
+        ld      de,CPCFP464_FLO_ATAN
+        or      a
+        sbc     hl,de
+        ret     z
+
         ld      hl,CPCFP464_FLO_ATAN
         ld      (atanc+3),hl
         ld      hl,CPCFP464_FLO_COS
@@ -134,6 +114,13 @@ IFNDEF PORTABLE_CPC_MATH
         ret
 
 .init_cpc664float
+; run-once sentinel: if this model's ATAN vector is already patched in, done.
+        ld      hl,(atanc+3)
+        ld      de,CPCFP664_FLO_ATAN
+        or      a
+        sbc     hl,de
+        ret     z
+
         ld      hl,CPCFP664_FLO_ATAN
         ld      (atanc+3),hl
         ld      hl,CPCFP664_FLO_COS

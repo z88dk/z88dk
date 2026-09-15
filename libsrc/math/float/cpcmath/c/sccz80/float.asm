@@ -36,5 +36,3 @@ floatc:
     pop     bc
     pop     bc
     ret
-
-
