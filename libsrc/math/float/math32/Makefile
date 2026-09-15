@@ -12,10 +12,11 @@ vpath %.c ../cimpl
 CFILES  = $(notdir $(wildcard ../../math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
 CFILES  = atof.c ftoa.c ftoe.c ftog.c tofix16.c fromfix16.c
 OBJECTS = $(CFILES:.c=.o) 
-# z80n uses the lm32/c/sccz80 ftoa/ftoe/ftog wrappers (wired in
-# newlibfiles_z80n.lst) instead of the cimpl/c-compiled ones, which are
-# corrupted by the z80n_rules.1 copt.
-OBJECTS_Z80N = atof.o tofix16.o fromfix16.o
+# z80n / z180 / ez80_z80 / r2ka / r4k / r6k / kc160 / ixiy use the
+# lm32/c/sccz80 ftoa/ftoe/ftog wrappers (wired in their newlibfiles_*.lst)
+# instead of the cimpl/c-compiled ones: the wrappers route the text through
+# the dtoa engine, which the Z80-family per-CPU copt rules must not re-map.
+OBJECTS_LM32_TEXT = atof.o tofix16.o fromfix16.o
 
 CFLAGS += -fp-mode=ieee -DFLOAT_IS_32BITS
 
@@ -37,15 +38,15 @@ $(OUTPUT_DIRECTORY)/math32.lib: $(addprefix obj/z80/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80/x/x/x  -I.. -mz80 -D__CLASSIC @newlibfiles_z80_text.lst
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math32 @math32_z80.lst
 
-$(OUTPUT_DIRECTORY)/math32_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
-	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/ixiy/x/x/x -I.. -IXIY  -D__CLASSIC @newlibfiles_z80.lst
+$(OUTPUT_DIRECTORY)/math32_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS_LM32_TEXT))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/ixiy/x/x/x -I.. -IXIY  -D__CLASSIC @newlibfiles_ixiy.lst
 	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/math32_ixiy @math32.lst
 
-$(OUTPUT_DIRECTORY)/math32_z80n.lib: $(addprefix obj/z80n/, $(OBJECTS_Z80N))
+$(OUTPUT_DIRECTORY)/math32_z80n.lib: $(addprefix obj/z80n/, $(OBJECTS_LM32_TEXT))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80n/x/x/x  -I.. -mz80n -D__CLASSIC @newlibfiles_z80n.lst
 	TYPE=z80n $(LIBLINKER) -mz80n -x$(OUTPUT_DIRECTORY)/math32_z80n @math32.lst
 
-$(OUTPUT_DIRECTORY)/math32_z180.lib: $(addprefix obj/z180/, $(OBJECTS))
+$(OUTPUT_DIRECTORY)/math32_z180.lib: $(addprefix obj/z180/, $(OBJECTS_LM32_TEXT))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z180/x/x/x -I..  -mz180 -D__CLASSIC @newlibfiles_z180.lst
 	TYPE=z180 $(LIBLINKER) -mz180 -x$(OUTPUT_DIRECTORY)/math32_z180 @math32.lst
 
@@ -54,23 +55,23 @@ $(OUTPUT_DIRECTORY)/math32_z180.lib: $(addprefix obj/z180/, $(OBJECTS))
 # __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__). Do not use the plain
 # Z80 list alone: those helpers are IF __CPU_Z80__ only and assemble empty.
 # Note: -mez80_z80 defines __CPU_EZ80_Z80__, not __CPU_EZ80__ (ADL).
-$(OUTPUT_DIRECTORY)/math32_ez80_z80.lib: $(addprefix obj/ez80_z80/, $(OBJECTS))
+$(OUTPUT_DIRECTORY)/math32_ez80_z80.lib: $(addprefix obj/ez80_z80/, $(OBJECTS_LM32_TEXT))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/ez80_z80/x/x/x -I.. -mez80_z80 -D__CLASSIC @newlibfiles_ez80_z80.lst
 	TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -x$(OUTPUT_DIRECTORY)/math32_ez80_z80 @math32.lst
 
-$(OUTPUT_DIRECTORY)/math32_r2ka.lib: $(addprefix obj/r2ka/, $(OBJECTS))
+$(OUTPUT_DIRECTORY)/math32_r2ka.lib: $(addprefix obj/r2ka/, $(OBJECTS_LM32_TEXT))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/r2ka/x/x/x -I..  -mr2ka -D__CLASSIC @newlibfiles_r2ka.lst
 	TYPE=r2ka $(LIBLINKER) -mr2ka -x$(OUTPUT_DIRECTORY)/math32_r2ka @math32.lst
 
-$(OUTPUT_DIRECTORY)/math32_r4k.lib: $(addprefix obj/r4k/, $(OBJECTS))
+$(OUTPUT_DIRECTORY)/math32_r4k.lib: $(addprefix obj/r4k/, $(OBJECTS_LM32_TEXT))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/r4k/x/x/x -I..  -mr4k -D__CLASSIC @newlibfiles_r2ka.lst
 	TYPE=r4k $(LIBLINKER) -mr4k -x$(OUTPUT_DIRECTORY)/math32_r4k @math32.lst
 
-$(OUTPUT_DIRECTORY)/math32_r6k.lib: $(addprefix obj/r6k/, $(OBJECTS))
+$(OUTPUT_DIRECTORY)/math32_r6k.lib: $(addprefix obj/r6k/, $(OBJECTS_LM32_TEXT))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/r6k/x/x/x -I..  -mr6k -D__CLASSIC @newlibfiles_r2ka.lst
 	TYPE=r6k $(LIBLINKER) -mr6k -x$(OUTPUT_DIRECTORY)/math32_r6k @math32.lst
 
-$(OUTPUT_DIRECTORY)/math32_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS))
+$(OUTPUT_DIRECTORY)/math32_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS_LM32_TEXT))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/kc160/x/x/x -I.. -mkc160 -D__CLASSIC @newlibfiles_kc160.lst
 	TYPE=kc160 $(LIBLINKER) -mkc160 -x$(OUTPUT_DIRECTORY)/math32_kc160 @math32.lst
 
@@ -87,8 +88,8 @@ $(OUTPUT_DIRECTORY)/math32_gbz80.lib: $(addprefix obj/gbz80/, $(OBJECTS))
 	TYPE=gbz80 $(LIBLINKER) -mgbz80 -x$(OUTPUT_DIRECTORY)/math32_gbz80 @math32.lst
 
 # Order-only: dirs must finish before any object compiles. See Make.config.
-$(foreach d,8080 8085 gbz80 ez80_z80 ixiy kc160 r2ka r4k r6k z180 z80,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
-$(foreach d,z80n,$(addprefix obj/$(d)/,$(OBJECTS_Z80N))): | dirs
+$(foreach d,8080 8085 gbz80 z80,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
+$(foreach d,z80n z180 ez80_z80 r2ka r4k r6k kc160 ixiy,$(addprefix obj/$(d)/,$(OBJECTS_LM32_TEXT))): | dirs
 
 dirs:
 	$(Q)mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c obj/8080/c obj/gbz80/c obj/r6k/c

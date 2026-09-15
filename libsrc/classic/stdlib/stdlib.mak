@@ -26,6 +26,7 @@ STDLIB_8080_NEWLIBGLOBS := \
         "stdlib/c/sccz80/strtol_callee.asm" \
         "stdlib/c/sccz80/strtoul.asm" \
         "stdlib/c/sccz80/strtoul_callee.asm" \
+        "stdlib/c/sccz80/ftog.asm" \
         "stdlib/z80/*rand*.asm" \
         "stdlib/z80/*abs*.asm" \
         "stdlib/z80/random/*.asm" \
@@ -43,6 +44,7 @@ STDLIB_8080_NEWLIBGLOBS_ex := \
         stdlib/c/sccz80/strtol_callee.asm \
         stdlib/c/sccz80/strtoul.asm \
         stdlib/c/sccz80/strtoul_callee.asm \
+        stdlib/c/sccz80/ftog.asm \
         $(wildcard stdlib/z80/*rand*.asm) \
         $(wildcard stdlib/z80/*abs*.asm) \
         $(wildcard stdlib/z80/random/*.asm) \
