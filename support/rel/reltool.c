@@ -33,6 +33,39 @@ typedef struct
     unsigned value;
 } SYMBOL;
 
+
+typedef struct {
+    char name[64];
+    unsigned chain;
+} EXTERNAL;
+
+static EXTERNAL extsyms[256];
+static int extcount;
+
+
+static void add_external(const char *name, unsigned chain)
+{
+    if (extcount >= 256)
+        return;
+
+    strcpy(extsyms[extcount].name, name);
+    extsyms[extcount].chain = chain;
+    extcount++;
+}
+
+static const char *lookup_external(unsigned addr)
+{
+    int i;
+
+    for (i = 0; i < extcount; i++)
+    {
+        if (extsyms[i].chain == addr)
+            return extsyms[i].name;
+    }
+
+    return NULL;
+}
+
 static SYMBOL symbols[MAX_SYMBOLS];
 static int symbol_count;
 
@@ -75,6 +108,7 @@ static const char *ctrl_name[16] =
 
 unsigned char code[65500];
 unsigned int codelen;
+unsigned int datalen;
 
 static void code_put8(unsigned v)
 {
@@ -170,21 +204,30 @@ static const char *format_addr(unsigned pc)
     RELOC *r;
     unsigned v;
 
-    v = code[pc + 1] |
-        (code[pc + 2] << 8);
+    v = code[pc] |
+        (code[pc + 1] << 8);
 
-    r = find_reloc(pc + 1);
+    r = find_reloc(pc);
 
-    if (r)
+	if (r)
+	{
+		const char *s;
+
         v = r->target;
 
-    if (r && (r->type == TOK_PRGREL))
-    {
-        const char *s = lookup_prog(v);
+		s = lookup_external(pc);
 
-        if (s)
-            return s;
-    }
+		if (s)
+			return s;
+
+		if (r->type == TOK_PRGREL)
+		{
+			s = lookup_prog(v);
+
+			if (s)
+				return s;
+		}
+	}
 
     sprintf(buf, "$%04X", v);
     return buf;
@@ -259,37 +302,37 @@ static void disasm_module(void)
                 break;
 
 			case 0x01:
-				printf("LD BC,%s\n", format_addr(pc));
+				printf("LD BC,%s\n", format_addr(pc+1));
 				pc += 3;
 				break;
 
 			case 0x11:
-				printf("LD DE,%s\n", format_addr(pc));
+				printf("LD DE,%s\n", format_addr(pc+1));
 				pc += 3;
 				break;
 
 			case 0x21:
-				printf("LD HL,%s\n", format_addr(pc));
+				printf("LD HL,%s\n", format_addr(pc+1));
 				pc += 3;
 				break;
 
 			case 0x31:
-				printf("LD SP,%s\n", format_addr(pc));
+				printf("LD SP,%s\n", format_addr(pc+1));
 				pc += 3;
 				break;
 
 			case 0xCD:
-				printf("CALL %s\n", format_addr(pc));
+				printf("CALL %s\n", format_addr(pc+1));
 				pc += 3;
 				break;
 
 			case 0xC3:
-				printf("JP %s\n", format_addr(pc));
+				printf("JP %s\n", format_addr(pc+1));
 				pc += 3;
 				break;
 
 			case 0xCA:
-				printf("JP Z,%s\n", format_addr(pc));
+				printf("JP Z,%s\n", format_addr(pc+1));
 				pc += 3;
 				break;
 
@@ -300,6 +343,7 @@ static void disasm_module(void)
         }
     }
 }
+
 
 static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
 {
@@ -320,13 +364,6 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
         if (dumpmode) {
             printf("  [%u] ", atype);
             if (atype == 0) {
-				if ((dumpmode == 2) && codelen > 0) {
-					printf("\n\n--- DISASSEMBLY ---\n");
-					disasm_module();
-					codelen = 0;
-					reloc_count = 0;
-					printf("\n--- --- --- --- ---\n\n");
-				}
 				printf (" - ");
 			}
             if (atype == 1) printf ("CODE_ADDR ");
@@ -335,6 +372,12 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
         }
 
         if ((dumpmode) || ((ctrl<=13) && (ctrl>=8))) printf("%-20s -> $%04X", ctrl_name[ctrl], value);
+		
+		// Set Code Location Counter
+		if ((atype == 1) && (ctrl == 11)) codelen =0;
+
+		// Set Data Location Counter
+		if ((atype == 2) && (ctrl == 11)) datalen =0;
 
     }
 
@@ -361,6 +404,10 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
         }
 
         printf("\"%s\"", name);
+
+		if (ctrl == 6) {
+			add_external(name, value);
+		}
 
         if (ctrl == 7) {
             add_symbol(name,atype,value);
@@ -438,6 +485,13 @@ static void do_dump(FILE *f, int dumpmode)
 
                 if (ctrl == 14)
                 {
+					printf("\n\n--- DISASSEMBLY ---\n");
+					disasm_module();
+					codelen = 0;
+					datalen = 0;
+					reloc_count = 0;
+					printf("\n--- --- --- --- ---\n\n");
+
                     mod++;
 
                     printf("\nMODULE #%02X\n", mod);
