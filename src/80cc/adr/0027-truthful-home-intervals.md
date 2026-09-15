@@ -70,21 +70,49 @@ reference 422/422, `long_ir` 739/739 both modes, enigma and clisp green.
 With that fixed, `IR_TIGHT_HOMES` now measures **58 smaller, 24 larger, −331
 net** (from 35 larger, −190).
 
-## The residual 24 cells
+## The residual cells were a LATENT MISCOMPILE (2026-09-15)
 
-Still class B — allocation identical, code larger — and now genuinely a lowering
-difference. The witness is `shiftbench` on 8085 (+14), where a word read that was
-one `ld hl,(de)` (LHLX) becomes a four-instruction byte walk:
+Tracing the worst one, `shiftbench` on 8085 (+14), the byte walks replacing LHLX
+were not a lowering preference at all. `load_to_hl_adj` was reached 46 times
+with the gate off and only 26 with it on — the caller had stopped routing
+through it, because a home query answered differently.
 
+`shift_compute v3`: `phys=BC`, window **`[12,36]`** with the gate off, live range
+`[1,75]`. With the gate on the window became **`[1,75]`**. The step **widened**
+it.
+
+`[12,36]` is a call-split home. Its window is deliberately narrow *because the
+value is slotted outside it*. Widening the window to the live range makes the
+lowerer believe BC holds `v3` over `[1,11]` and `[37,75]`, where it does not —
+a false residency belief, which is a miscompile waiting for a lowering path that
+trusts it. It surfaced as +14 bytes only because the path that ran happened to
+reload from the slot anyway.
+
+The cause is that the step **assigned** where it should have **clamped**:
+
+```c
+f->home_lo[v] = lr->start;   f->home_hi[v] = lr->end;      /* wrong */
+if (lr->start > f->home_lo[v]) f->home_lo[v] = lr->start;  /* narrow only */
+if (lr->end   < f->home_hi[v]) f->home_hi[v] = lr->end;
 ```
-ld hl,(de)        ->    ex de,hl / ld c,(hl) / inc hl / ld b,(hl)
-```
 
-`histbench` (14 cells, +1/+2 each) and `localbench` gbz80 (+3) are the rest.
-These are the cases this step exists to surface: a lowering decision keyed on a
-home query that answers differently once the window is real. Each one is a point
-query to find and scope, exactly like the static DE-clean fix that preceded
-this.
+This file always said "narrow whole-function homes"; the code never checked that
+the home *was* whole-function.
+
+## Measured after both fixes
+
+720 cells (30 benches x 12 CPUs x both frame modes): **20 smaller, ZERO larger,
+−136 bytes net.** The premise this ADR opened with — that narrowing must be
+byte-clean — now holds, and narrowing is slightly *better* than whole-function
+homes because the point queries it feeds are more accurate.
+
+Gates with `IR_TIGHT_HOMES=1`: `long_ir` 739/739 both frame modes, enigma
+`RXSEC` both modes, clisp `6`/`42`, z80 corpus ticks **+0.0000 %** with 0 cells
+slower and 60/60 `fail=0`. Default path (gate off) unchanged: reference 422/422,
+720/720 cells byte-identical.
+
+**Stage 1 is therefore complete and the gate is ready to flip default-on**,
+which unblocks stages 2 and 3 of ADR 0017.
 
 ## Why it is worth doing before anything ranged
 

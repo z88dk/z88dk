@@ -5887,8 +5887,19 @@ void ir_alloc(Func *f)
                 continue;
             const LiveRange *lr = ir_live_range(f, v);
             if (!lr || lr->start < 0) continue;
-            f->home_lo[v] = lr->start;
-            f->home_hi[v] = lr->end;
+            /* CLAMP, never assign. A home may ALREADY be ranged — a call-split
+               home carries a deliberately narrow window because the value is
+               SLOTTED outside it. Overwriting that with the live range WIDENS
+               it, and the lowerer then believes the register holds the value at
+               points where it does not: shiftbench/shift_compute v3 went from
+               home=[12,36] to home=[1,75] over a live range of [1,75], turning
+               a true window into a false one. That is a latent miscompile, not
+               a size regression — it only showed up as +14 bytes because the
+               lowerer happened to reload from the slot anyway.
+               Narrowing is the whole point of this step; widening is never
+               correct. */
+            if (lr->start > f->home_lo[v]) f->home_lo[v] = lr->start;
+            if (lr->end   < f->home_hi[v]) f->home_hi[v] = lr->end;
         }
     }
 
