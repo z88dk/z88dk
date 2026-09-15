@@ -95,6 +95,10 @@ located properly at last.
 
 ## ANSWERED 2026-09-15 by the realisation verifier (`IR_REALISE`)
 
+> The `IR_REALISE` probe described here, and the `IR_LEDGER` probe above, were
+> **removed once they had answered** (2026-09-15). Reproduce them from this file
+> if ever needed; the reusable instrumentation is `IR_REC` and `IR_HOMEMAP`.
+
 The verifier was built to test the hypothesis above. It **refuted it**, and
 found the real cause.
 

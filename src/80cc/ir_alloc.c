@@ -3386,37 +3386,6 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                     last = cand[i].fhi;
                 }
             }
-            /* [IR_LEDGER, inert] The two sides of this decision are counted in
-               COST_*_W weights — a generic per-access unit — while the arbiter
-               ranks with interval_benefit_x, which prices an access by the g0
-               row for its CPU and category. Comparing in the generic unit is
-               what the IR_CS_EVICT note above warns about, one level up: the
-               incumbent's reads are credited as if every one cost the same,
-               so a param read six times through BC (each read `ld hl,bc`, one
-               instruction) prices the same as a temp read once.
-               Report both denominations so the gap is visible before any
-               weight is changed. */
-            if (getenv("IR_LEDGER")) {
-                long g_evict = 0, g_gain = 0;
-                for (int j = 0; j < f->n_vregs; j++)
-                    if (evictable[j])
-                        g_evict += interval_benefit_x(f, j, bb_loop_depth,
-                                                      bb_cond_shift, GR_BC, 1);
-                for (int i = 0; i < nc; i++)
-                    g_gain += interval_benefit_x(f, cand[i].vreg, bb_loop_depth,
-                                                 bb_cond_shift, GR_BC, 1);
-                int n_ev = 0;
-                for (int j = 0; j < f->n_vregs; j++)
-                    if (evictable[j]) n_ev++;
-                fprintf(stderr,
-                        "LEDGER %-20s inc=%d cand=%d | generic: evict=%ld gain=%ld -> %s | "
-                        "grounded: evict=%ld gain=%ld -> %s\n",
-                        f->fn ? ir_sym_name(f->fn) : "?", n_ev, nc,
-                        evict_ben, ben[1] - ben[0],
-                        (evict_ben > 0 && ben[1] - ben[0] > evict_ben) ? "EVICT" : "keep",
-                        g_evict, g_gain,
-                        (g_gain > g_evict) ? "EVICT" : "keep");
-            }
             int evicted = 0;
             if (evict_ben > 0 && ben[1] - ben[0] > evict_ben)
                 for (int j = 0; j < f->n_vregs; j++)

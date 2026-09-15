@@ -35,6 +35,11 @@ enforced by a script. What remains is optimisation work, and the order matters:
    regressing CPU while 12 of 22 per-vreg rows differed. A coarse probe hid the
    answer. Ask for the per-item view before concluding.
 
+   Both probes that answered this (`IR_LEDGER`, `IR_REALISE`) have been
+   **removed** — the findings are in ADR 0037 and the instrumentation had no
+   remaining user. `IR_REC` (cold homes) and `IR_HOMEMAP` (the class census)
+   stay, and are what any future residency work should reach for.
+
 3. **Then `IR_TIGHT_HOMES`** (ADR 0027). Investigated 2026-09-14: its
    byte-identity failure is **not** a latent miscompile — it is the allocator
    taking newly-visible claims without pricing what they displace. It follows
@@ -148,8 +153,6 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | Gate | Question | Retire when |
 | --- | --- | --- |
 | `IR_GRAPH_PROBE` | is the capture gap in proposal or in selection? | the step A1 cost ledger answers it per claim |
-| `IR_REALISE` | is a displaced value realised as the model predicted? | **answered** (ADR 0037): realisation class is NOT the explanation — but joined with `IR_HOMEMAP` it showed `bc-evict` adds no residency at all, it swaps IY homes for BC ones. `=1` per-function summary, `=2` per vreg. Keep: the summary can hide per-vreg churn, so use `=2` |
-| `IR_LEDGER` | does the BC evict decision compare the right numbers? | **answered, no** (ADR 0037): the flat unit really does misprice — 19 candidates scored as one incumbent — but correcting it is worse on size and ticks. The question was the wrong one. Keep the probe; it is how the 64 `inc=0` no-op decisions were told from the 25 real ones |
 
 | `IR_BCVETO_PROBE` | what does the BC veto turn away? | the veto becomes a cost term |
 | `IR_PREPUSH_PROBE` | which calls does the pre-push hazard cover? | — |
