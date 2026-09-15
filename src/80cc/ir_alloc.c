@@ -5895,6 +5895,78 @@ void ir_alloc(Func *f)
         }
     }
 
+    /* [IR_RANGEPROBE, inert] Stage 2 of the ranging arc (ADR 0017) is "a
+       register time-shared between disjoint values". That is only measurable
+       now that stage 1 made the intervals truthful — while every home spanned
+       the whole function, nothing could be disjoint from anything.
+
+       The question this answers is whether to BUILD stage 2, and it is the same
+       question IR_PAIRPROBE asked before the pair allocator (which it refused,
+       correctly, on zero opportunity). For each SPILLED value, is there a
+       parking register whose every current tenant has a live range DISJOINT
+       from it? If so that register could host it over its own window and the
+       spill is avoidable; if the count is ~0 corpus-wide, stage 2 has nothing
+       to collect and should not be built.
+
+       Deliberately generous — it ignores admissibility (width, class masks,
+       cleanliness) and counts only the interference question, so it is an UPPER
+       BOUND. A small upper bound is a real answer; a large one still needs the
+       admissibility gates applied before anyone believes it. */
+    if (getenv("IR_RANGEPROBE")) {
+        static const PhysReg park[] = { IR_PR_BC, IR_PR_DE, IR_PR_IX, IR_PR_IY };
+        int n_spill = 0, n_share = 0, n_fn_share = 0;
+        for (int v = 0; v < f->n_vregs; v++) {
+            if (!f->vreg_to_phys || f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+            const LiveRange *lv = ir_live_range(f, v);
+            if (!lv || lv->start < 0) continue;
+            n_spill++;
+            for (unsigned r = 0; r < sizeof park / sizeof park[0]; r++) {
+                int occupied = 0, clash = 0;
+                for (int w = 0; w < f->n_vregs && !clash; w++) {
+                    if (w == v || f->vreg_to_phys[w] != park[r]) continue;
+                    occupied = 1;
+                    if (ir_live_ranges_overlap(f, v, w)) clash = 1;
+                }
+                /* Admissibility, without which the count above is fiction:
+                     - width <= 2 (a long needs DEHL, not a parking pair);
+                     - not address-taken (it must have a memory home);
+                     - and NOTHING in the value's live range may clobber the
+                       register. That last one is the real filter: a value whose
+                       range crosses a call cannot sit in BC or DE without a
+                       save/restore, which is stage 3's job, not stage 2's. */
+                RegMask rmask = park[r] == IR_PR_BC ? IR_R_BC
+                              : park[r] == IR_PR_DE ? IR_R_DE
+                              : park[r] == IR_PR_IX ? IR_R_IX : IR_R_IY;
+                int adm = f->vregs[v].width <= 2
+                       && !(f->vregs[v].flags & IR_VREG_ADDR_TAKEN);
+                if (adm) {
+                    int g = 0;
+                    for (int b2 = 0; b2 < f->n_bbs && adm; b2++)
+                        for (int j2 = 0; j2 < f->bbs[b2].n_ops; j2++, g++) {
+                            if (g < lv->start || g > lv->end) continue;
+                            if (op_clobbers(f, &f->bbs[b2].ops[j2]) & rmask) {
+                                adm = 0; break;
+                            }
+                        }
+                }
+                if (occupied && !clash && adm) {
+                    n_share++;
+                    if (getenv("IR_RANGEPROBE")[0] == '2')
+                        fprintf(stderr, "RANGEPROBE:   %s v%d live=[%d,%d] could "
+                                "time-share %s\n",
+                                f->fn ? ir_sym_name(f->fn) : "?", v,
+                                lv->start, lv->end, ir_phys_name(park[r]));
+                    break;
+                }
+            }
+        }
+        if (n_share) n_fn_share = 1;
+        if (n_spill)
+            fprintf(stderr, "RANGEPROBE %-20s spilled=%d  time-shareable=%d%s\n",
+                    f->fn ? ir_sym_name(f->fn) : "?", n_spill, n_share,
+                    n_fn_share ? "" : "");
+    }
+
     /* [IR_HOMEMAP] Inert: the final placement, one line per homed vreg. The
        question "who got which register, and over what range" is the first one
        any residency arc asks, and reading it back out of the asm is slow and

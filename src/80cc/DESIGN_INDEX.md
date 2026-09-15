@@ -58,8 +58,25 @@ enforced by a script. What remains is optimisation work, and the order matters:
    **−0.041 % / 20 faster / 0 slower**; `long_ir` 739/739 both modes.
    `--opt-disable=tight-homes` opts out byte-identically.
 
-4. **NEXT: stages 2 and 3 of the ranging arc (ADR 0017)** — now unblocked,
-   the intervals are truthful and the verifier has real windows to check.
+4. **NEXT: stage 2 of the ranging arc (ADR 0017)** — unblocked and **sized**.
+   `IR_RANGEPROBE` (inert): 461 of 3608 spilled values (12.8 %) across 108
+   functions could time-share a parking register, after filtering for width,
+   address-taken, and any clobber inside the value's live range. Real
+   opportunity, unlike the pair allocator's zero.
+
+   The shape is the useful part: **time-sharing already partly exists** — the BC
+   packer packs disjoint born-killed temps today (`bitfieldbench/reg_step` holds
+   two different values in BC over [1,3] and [4,7]). So stage 2 is two concrete
+   pieces, holding 444 of the 461:
+   - **deepen BC packing (323 candidates).** The greedy is first-fit by rank
+     with one `last_fhi` watermark and stops at the first overlap instead of
+     packing the interval set. Most of the win is in a mechanism that exists.
+   - **open IY time-sharing (121).** Shared in only 5 of 26 function-registers.
+   DE is exhausted (31 of 78 shared, 16 left); IX is a non-starter (frame
+   pointer in fp mode). Neither is worth work.
+
+   Expect predicate bugs of the ADR 0027 class: anything currently meaning "not
+   whole-function" needs re-reading before a register is genuinely shared.
 
 **Shipped 2026-09-15** (ADR 0039): 8085 slot addresses use LDSI —
 −366 bytes, −0.95 % ticks, nothing larger, nothing slower. It came out of the
