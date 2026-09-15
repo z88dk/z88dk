@@ -41,6 +41,9 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0029](0029-de-cache-fold-brick.md) | *Proposed* — a fail-safe DE cache fold, where 0018 refuses a DE home |
 | [0032](0032-gbz80-word-cost-row.md) | The measured gbz80 cost rows (SLOT+BC), shipped — and why the regression that held them back was a failed recovery, not a ranking tie |
 | [0034](0034-one-owner-for-the-allocation.md) | `ir_alloc` is the only writer of the plan; the render reports typed rejections (amends 0003) |
+| [0047](0047-de-liveness-follows-branches-but-not-calls.md) | **Accepted** — DE liveness follows branches; calls and `ret` stay conservative because the ABI reads DE |
+| [0046](0046-the-a-cache-invalidates-by-default.md) | **Accepted** — the A cache invalidates by default, so an incomplete recogniser loses bytes not correctness |
+| [0045](0045-xor-a-rides-the-backward-flag-sweep.md) | **Accepted** — `xor a` for `ld a,0`, decided by a backward flag sweep; −230 B, none larger |
 | [0044](0044-a-call-argument-qualifies-a-byte-remat.md) | **Accepted** — a call argument qualifies a global byte remat; emu.c −131/−272 B, invisible to the corpus |
 | [0043](0043-a-pushed-long-param-is-carried-past-the-prologue.md) | **Accepted** — a pushed long param is carried in DE:HL past the prologue; emu.c −60/−51 B |
 | [0042](0042-a-narrowing-result-stays-in-hl.md) | **Accepted** — a long→int narrowing result stays in HL; −285 B over 38 cells, none larger |

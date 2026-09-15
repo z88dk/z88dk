@@ -406,15 +406,8 @@ static InstrEffects instr_effects(const char *line);
    therefore loses BYTES, never CORRECTNESS.
 
    DEFAULT-ON. Opt out with IR_OFF=a-carry — that reproduces the pre-flip codegen
-   byte-for-byte and is the regression-test path.
-
-   ►► REVISIT / TUNE LATER: default-on costs a few bytes on cold sites with a FLAT
-   tick delta. Root: caching A holding a pointer low byte flips a `ptr+K` lowering
-   from `push de;ld de,K;add hl,de;pop de` (6 B) to an A-based
-   `add a,K;ld l,a;ld a,h;adc a,0;ld h,a` (7 B) — +1 B/−16 T per site, a cold-path
-   byte-for-tick trade the size push doesn't want. The clean fix (deferred, not
-   blocking): gate that A-based +K pointer lowering to fire only when it does NOT
-   grow bytes, then this is a pure win. */
+   byte-for-byte and is the regression-test path. It costs a few bytes on cold
+   sites; the cause and the deferred fix are in adr/0046. */
 static int  a_carry_on = -1;
 static int  a_carry_enabled(void)
 {
@@ -1420,12 +1413,8 @@ static int xline_c_call(const char *line);
    return ABI is A / HL / DE:HL), the same assumption the BC sweep already
    makes for BC.
 
-   Default ON. Corpus -230 B over 132 cells with ZERO larger, every CPU smaller
-   (gbz80 -40, 8080/8085 -26, z80/z80n/z180 -25, rabbit/ez80/kc160 -21); emu.c
-   -38 B fp / -52 B sp. Ticks follow: 7 T becomes 4 T at every site and nothing
-   else moves. IR_OFF=xor-a opts out, byte-identical to the pre-flip compiler. NB
-   the rewrite rides the park sweep, so --opt-disable=bc-live also turns it
-   off. */
+   Default ON; IR_OFF=xor-a opts out, byte-identical. NB the rewrite rides the
+   park sweep, so --opt-disable=bc-live also turns it off. Evidence: adr/0045. */
 static int  xora_on = -1;
 static int  xora_enabled(void)
 {
@@ -1692,7 +1681,7 @@ static int  bcflow_enabled(void)
    conservative, which is what separates this from the wider opportunity sized by
    [IR_DELIVE_PROBE].
 
-   IR_OFF=de-flow opts out. */
+   IR_OFF=de-flow opts out. Rationale: adr/0047. */
 static int  deflow_on = -1;
 static int  deflow_enabled(void)
 {
