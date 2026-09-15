@@ -8,9 +8,8 @@
 #include "dump_context.h"
 #include "errors.h"
 #include "symtab.h"
+#include "walker.h"
 #include <algorithm>
-#include <memory>
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>

@@ -7,240 +7,17 @@
 #include "ast.h"
 #include "errors.h"
 #include "lower_bas.h"
-#include "release_assert.h"
 #include "symtab.h"
-#include "utils.h"
-#include "zx81bas.h"
-#include <memory>
-#include <string>
-#include <utility>
 #include <vector>
-#include "lexer.h"
-#include <unordered_map>
 
+/*
 static std::string gen_label(const std::string& prefix) {
     static int counter = 0;
     return SYMBOL_PREFIX + std::to_string(counter++) + str_toupper(prefix);;
 }
 
-// need to separate in several layers because the output of PEEKW/POKEW needs to run MOD/DIV
-
-// Replace all variables A by expression arg_values[A]
-struct ReplaceArgValuesVisitor : ASTVisitor {
-    const std::unordered_map<std::string, Expr*> arg_values;
-
-    explicit ReplaceArgValuesVisitor(
-        const std::unordered_map<std::string, Expr*>& av)
-        : arg_values(av) {}
-    virtual ~ReplaceArgValuesVisitor() = default;
-
-    void visit(VariableExpr& expr) {
-        auto it = arg_values.find(expr.name);
-        if (it != arg_values.end()) {
-            expr.rewrite.replace_expr = it->second->clone();
-        }
-    }
-};
-
-static void replace_arg_values(std::unique_ptr<Expr>& expr,
-                               const std::unordered_map<std::string, Expr*>& arg_values) {
-    ReplaceArgValuesVisitor visitor(arg_values);
-    visitor.walk_expr(expr);
-}
-
-// expand PEEKW, POKEW
-struct LowerPeekwPokewVisitor : ASTVisitor {
-    virtual ~LowerPeekwPokewVisitor() = default;
-
-    // expand PEEKW
-    void visit(BasicFuncCallExpr& expr) override {
-        if (expr.keyword == Keyword::PEEKW) {
-            // PEEKW(a) -> PEEK(a) + 256 * PEEK(a + 1)
-            release_assert(expr.args.size() == 1);
-
-            // PEEK(a)
-            auto& arg = expr.args[0];
-            auto peek_a = std::make_unique<BasicFuncCallExpr>(Keyword::PEEK, expr.loc);
-            peek_a->args.push_back(arg->clone());
-
-            // PEEK(a + 1)
-            auto arg_plus_1 = std::make_unique<BinaryExpr>(TokenType::Plus,
-                              arg->clone(),
-                              std::make_unique<NumberExpr>(1, expr.loc),
-                              expr.loc);
-            auto peek_a_plus_1 = std::make_unique<BasicFuncCallExpr>(Keyword::PEEK,
-                                 expr.loc);
-            peek_a_plus_1->args.push_back(std::move(arg_plus_1));
-
-            // 256 * PEEK(a + 1)
-            auto mult_expr = std::make_unique<BinaryExpr>(TokenType::Multiply,
-                             std::make_unique<NumberExpr>(256, expr.loc),
-                             std::move(peek_a_plus_1),
-                             expr.loc);
-
-            // PEEK(a) + 256 * PEEK(a + 1)
-            auto add_expr = std::make_unique<BinaryExpr>(TokenType::Plus,
-                            std::move(peek_a),
-                            std::move(mult_expr),
-                            expr.loc);
-
-            // replace the original expression with the new expression
-            expr.rewrite.replace_expr = std::move(add_expr);
-        }
-    }
-
-    // expand POKEW
-    void visit(PokewStmt& stmt) override {
-        // POKEW(a, v) -> POKE(a, v MOD 256) : POKE(a + 1, v DIV 256)
-
-        // POKE(a, v MOD 256)
-        auto v_mod_256 = std::make_unique<BinaryExpr>(TokenType::MOD,
-                         stmt.value_expr->clone(),
-                         std::make_unique<NumberExpr>(256, stmt.loc),
-                         stmt.loc);
-        auto poke_a = std::make_unique<PokeStmt>(stmt.address_expr->clone(),
-                      std::move(v_mod_256),
-                      stmt.loc);
-        stmt.rewrite.prepend.push_back(std::move(poke_a));
-
-        // POKE(a + 1, v DIV 256)
-        auto a_plus_1 = std::make_unique<BinaryExpr>(TokenType::Plus,
-                        stmt.address_expr->clone(),
-                        std::make_unique<NumberExpr>(1, stmt.loc),
-                        stmt.loc);
-        auto v_div_256 = std::make_unique<BinaryExpr>(TokenType::IntDivide,
-                         stmt.value_expr->clone(),
-                         std::make_unique<NumberExpr>(256, stmt.loc),
-                         stmt.loc);
-        auto poke_a_plus_1 = std::make_unique<PokeStmt>(std::move(a_plus_1),
-                             std::move(v_div_256),
-                             stmt.loc);
-        stmt.rewrite.prepend.push_back(std::move(poke_a_plus_1));
-
-        stmt.rewrite.remove = true;
-    }
-};
-
-static void lower_peekw_pokew(Prog& prog, Symtab&) {
-    LowerPeekwPokewVisitor visitor;
-    prog.accept(visitor);
-}
-
-// expand MOD/DIV
-struct LowerDivModVisitor : ASTVisitor {
-    virtual ~LowerDivModVisitor() = default;
-
-    // expand IntDivide
-    // expand MOD
-    void visit(BinaryExpr& expr) override {
-        if (expr.op == TokenType::IntDivide) {
-            // a DIV b -> INT(a / b)
-            auto div_expr = std::make_unique<BinaryExpr>(TokenType::Divide,
-                            expr.lhs->clone(),
-                            expr.rhs->clone(),
-                            expr.loc);
-            auto int_expr = std::make_unique<BasicFuncCallExpr>(Keyword::INT,
-                            expr.loc);
-            int_expr->args.push_back(std::move(div_expr));
-            expr.rewrite.replace_expr = std::move(int_expr);
-        }
-        else if (expr.op == TokenType::MOD) {
-            // a MOD b -> a - b * INT(a / b)
-            auto div_expr = std::make_unique<BinaryExpr>(TokenType::Divide,
-                            expr.lhs->clone(),
-                            expr.rhs->clone(),
-                            expr.loc);
-            auto int_expr = std::make_unique<BasicFuncCallExpr>(Keyword::INT,
-                            expr.loc);
-            int_expr->args.push_back(std::move(div_expr));
-            auto mult_expr = std::make_unique<BinaryExpr>(TokenType::Multiply,
-                             expr.rhs->clone(),
-                             std::move(int_expr),
-                             expr.loc);
-            auto sub_expr = std::make_unique<BinaryExpr>(TokenType::Minus,
-                            expr.lhs->clone(),
-                            std::move(mult_expr),
-                            expr.loc);
-            expr.rewrite.replace_expr = std::move(sub_expr);
-        }
-    }
-};
-
-static void lower_div_mod(Prog& prog, Symtab&) {
-    LowerDivModVisitor visitor;
-    prog.accept(visitor);
-}
-
-// expand DEF FN calls - replace call expression by FN defintion
-struct LowerDefFnCallVisitor : ASTVisitor {
-    Symtab& symtab;
-
-    explicit LowerDefFnCallVisitor(Symtab& s) : symtab(s) {}
-    virtual ~LowerDefFnCallVisitor() = default;
-
-    void visit(FnCallExpr& expr) override {
-        // get function definition; already checked existence in semantic phase
-        auto it = symtab.fns.find(expr.name);
-        release_assert(it != symtab.fns.end());
-        auto& deffn = it->second;
-
-        // parameter and argument count already checked in semantic phase
-        release_assert(expr.args.size() == deffn->params.size());
-
-        // define map of parameter name to replacement expression
-        // duplicate parameters already checked in semantic pass
-        std::unordered_map<std::string, Expr*> arg_values;
-        for (size_t i = 0; i < expr.args.size(); i++) {
-            std::string& param_name = deffn->params[i];
-            Expr* param_value = expr.args[i].get();
-            arg_values[param_name] = param_value;
-        }
-
-        // get deffn replacement expression
-        auto replacement = deffn->expr->clone();
-
-        // rewrite expression replacing arg_values
-        replace_arg_values(replacement, arg_values);
-
-        // replace the DEF FN call by the changed replacement expression
-        expr.rewrite.replace_expr = std::move(replacement);
-    }
-};
-
-static void lower_def_fn_calls(Prog& prog, Symtab& symtab) {
-    LowerDefFnCallVisitor visitor(symtab);
-    prog.accept(visitor);
-}
-
-// lower visitor
-struct LowerVisitor : ASTVisitor {
-    struct ControlStackEntry {
-        enum class Type {
-            Loop,
-            Proc,
-        };
-        Type type;
-        std::string end_label;      // label for the end of the control structure
-
-        ControlStackEntry(Type type_, const std::string& end_label_)
-            : type(type_), end_label(end_label_) {}
-    };
-
-    Prog& prog;
-    Symtab& symtab;
-    std::vector<std::unique_ptr<Stmt>> lowered_stmts;
-    std::vector<ControlStackEntry> control_stack;
-
-    explicit LowerVisitor(Prog& prog_, Symtab& symtab_)
-        : prog(prog_), symtab(symtab_) {}
-
-
-
-};
-
 // lower loops and EXIT statements
-struct LowerExitVisitor : ASTVisitor {
-
+struct LowerLoopsVisitor : ASTVisitor {
     struct ControlStackEntry {
         enum class Type {
             Loop,
@@ -254,6 +31,14 @@ struct LowerExitVisitor : ASTVisitor {
     };
 
     std::vector<ControlStackEntry> control_stack;
+
+    virtual ~LowerLoopsVisitor() = default;
+
+    // lower REPEAT ... UNTIL condition : into:
+    // @start:
+    //     body
+    //     IF NOT condition THEN GOTO @start
+    // @end:
 
     bool enter(RepeatStmt& stmt) override {
         // enter a new block for EXIT
@@ -261,10 +46,25 @@ struct LowerExitVisitor : ASTVisitor {
         stmt.start_label = radix + "START";
         stmt.end_label = radix + "END";
         control_stack.emplace_back(ControlStackEntry::Type::Loop, stmt.end_label);
+
+        // @start:
+        auto target_stmt = std::make_unique<LabelStmt>(stmt.start_label, stmt.loc);
+        stmt.rewrite.prepend.push_back(std::move(target_stmt));
+
         return true;
     }
 
-    void leave(RepeatStmt&) override {
+    void leave(RepeatStmt& stmt) override {
+        //     IF NOT condition THEN GOTO @start
+        auto not_cond = make_unary_expr(TokenType::NOT,
+                        stmt.condition->clone(), stmt.loc);
+        auto goto_stmt = std::make_unique<GotoStmt>(make_label_line_ref_expr
+                         (stmt.start_label, stmt.loc), stmt.loc);
+        auto if_stmt = std::make_unique<IfStmt>(std::move(not_cond), stmt.loc);
+        if_stmt->then_stmts.push_back(std::move(goto_stmt));
+        stmt.rewrite.append.push_back(std::move(if_stmt));
+        stmt.rewrite.remove = true;
+
         control_stack.pop_back();
     }
 
@@ -312,10 +112,10 @@ struct LowerExitVisitor : ASTVisitor {
         const auto& entry = control_stack.back();
         switch (entry.type) {
         case ControlStackEntry::Type::Loop: {
-            auto target_expr = std::make_unique<LabelLineRefExpr>(entry.end_label,
+            auto target_expr = make_label_line_ref_expr(entry.end_label,
                                stmt.loc);
-            stmt.rewrite.prepend.push_back(std::make_unique<GotoStmt>(std::move(
-                                               target_expr),
+            stmt.rewrite.prepend.push_back(
+                std::make_unique<GotoStmt>(std::move(target_expr),
                                            stmt.loc));
             stmt.rewrite.remove = true;
             break;
@@ -331,13 +131,19 @@ struct LowerExitVisitor : ASTVisitor {
     }
 };
 
-bool lower_prog(Prog& prog, Symtab& symtab) {
-    lower_peekw_pokew(prog, symtab);
-    lower_div_mod(prog, symtab);
-    lower_def_fn_calls(prog, symtab);
-
-    LowerVisitor visitor(prog, symtab);
+static void lower_loops(Prog& prog, Symtab&) {
+    return;
+    LowerLoopsVisitor visitor;
     prog.accept(visitor);
+}
+*/
+
+bool lower_prog(Prog& prog, Symtab& symtab) {
+    /*
+    lower_loops(prog, symtab);
+    */
+    (void)prog;
+    (void)symtab;
     return get_error_count() == 0;
 }
 
@@ -346,32 +152,8 @@ bool lower_prog(Prog& prog, Symtab& symtab) {
 
 #if 0
 
-#include "ast.h"
-#include "dump_context.h"
-#include "errors.h"
-#include "lexer.h"
-#include "lower_bas.h"
-#include "options.h"
-#include "release_assert.h"
-#include "symtab.h"
-#include <algorithm>
-#include <cstdlib>
-#include <iostream>
-#include <iterator>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-
-
-struct LoweredExpr {
-    std::vector<std::unique_ptr<Stmt>> preamble;
-    std::unique_ptr<Expr> rewritten;
-};
-
-
-static void append_stmts(std::vector<std::unique_ptr<Stmt>>& dst,
-                         std::vector<std::unique_ptr<Stmt>>& src) {
+static void append_stmts(std::vector<StmtPtr>& dst,
+                         std::vector<StmtPtr>& src) {
     dst.insert(dst.end(),
                std::make_move_iterator(src.begin()),
                std::make_move_iterator(src.end()));
@@ -379,29 +161,29 @@ static void append_stmts(std::vector<std::unique_ptr<Stmt>>& dst,
 
 static LoweredExpr lower_expr(Expr& expr, Symtab& symtab) {
     if (auto num_expr = dynamic_cast<NumberExpr*>(&expr)) {
-        return { {}, std::make_unique<NumberExpr>(num_expr->value, num_expr->loc) };
+        return { {}, make_number_expr(num_expr->value, num_expr->loc) };
     }
     else if (auto label_ref = dynamic_cast<LabelLineRefExpr*>(&expr)) {
-        return { {}, std::make_unique<LabelLineRefExpr>(label_ref->name, label_ref->loc) };
+        return { {}, make_label_line_ref_expr(label_ref->name, label_ref->loc) };
     }
     else if (auto label_addr_ref = dynamic_cast<LabelAddrRefExpr*>(&expr)) {
-        return { {}, std::make_unique<LabelAddrRefExpr>(label_addr_ref->name, label_addr_ref->loc) };
+        return { {}, make_label_addr_ref_expr(label_addr_ref->name, label_addr_ref->loc) };
     }
     else if (auto str_expr = dynamic_cast<StringLiteralExpr*>(&expr)) {
-        return { {}, std::make_unique<StringLiteralExpr>(str_expr->value, str_expr->loc) };
+        return { {}, make_string_literal_expr(str_expr->value, str_expr->loc) };
     }
     else if (auto var_expr = dynamic_cast<VariableExpr*>(&expr)) {
-        return { {}, std::make_unique<VariableExpr>(var_expr->name, var_expr->loc) };
+        return { {}, make_variable_expr(var_expr->name, var_expr->loc) };
     }
     else if (auto array_ref_expr = dynamic_cast<ArrayRefExpr*>(&expr)) {
         LoweredExpr lowered;
-        std::vector<std::unique_ptr<Expr>> lowered_indices;
+        std::vector<ExprPtr> lowered_indices;
         for (auto& index_expr : array_ref_expr->indices) {
             auto lowered_index = lower_expr(*index_expr, symtab);
             append_stmts(lowered.preamble, lowered_index.preamble);
             lowered_indices.push_back(std::move(lowered_index.rewritten));
         }
-        auto lowered_array_ref = std::make_unique<ArrayRefExpr>(array_ref_expr->name,
+        auto lowered_array_ref = make_array_ref_expr(array_ref_expr->name,
                                  array_ref_expr->loc);
         lowered_array_ref->indices = std::move(lowered_indices);
         return { std::move(lowered.preamble),
@@ -412,7 +194,7 @@ static LoweredExpr lower_expr(Expr& expr, Symtab& symtab) {
         auto lowered_base = lower_expr(*slice_expr->base, symtab);
         append_stmts(lowered.preamble, lowered_base.preamble);
         auto lowered_slice =
-            std::make_unique<SliceExpr>(std::move(lowered_base.rewritten), slice_expr->loc);
+            make_slice_expr(std::move(lowered_base.rewritten), slice_expr->loc);
         if (slice_expr->from) {
             auto lowered_from = lower_expr(*slice_expr->from, symtab);
             append_stmts(lowered.preamble, lowered_from.preamble);
@@ -430,8 +212,8 @@ static LoweredExpr lower_expr(Expr& expr, Symtab& symtab) {
         LoweredExpr lowered;
         auto lowered_operand = lower_expr(*un_expr->operand, symtab);
         append_stmts(lowered.preamble, lowered_operand.preamble);
-        auto  lowered_unary = std::make_unique<UnaryExpr>(un_expr->op,
-                              std::move(lowered_operand.rewritten), un_expr->loc);
+        auto  lowered_unary = make_unary_expr(un_expr->op,
+                                              std::move(lowered_operand.rewritten), un_expr->loc);
         lowered.rewritten = std::move(lowered_unary);
         return lowered;
     }
@@ -441,25 +223,25 @@ static LoweredExpr lower_expr(Expr& expr, Symtab& symtab) {
         append_stmts(lowered.preamble, lowered_lhs.preamble);
         auto lowered_rhs = lower_expr(*bin_expr->rhs, symtab);
         append_stmts(lowered.preamble, lowered_rhs.preamble);
-        auto lowered_binary = std::make_unique<BinaryExpr>(bin_expr->op,
-                              std::move(lowered_lhs.rewritten),
-                              std::move(lowered_rhs.rewritten),
-                              bin_expr->loc);
+        auto lowered_binary = make_binary_expr(bin_expr->op,
+                                               std::move(lowered_lhs.rewritten),
+                                               std::move(lowered_rhs.rewritten),
+                                               bin_expr->loc);
         lowered.rewritten = std::move(lowered_binary);
         return lowered;
     }
     else if (auto fn_call_expr = dynamic_cast<BasicFuncCallExpr*>(&expr)) {
         LoweredExpr lowered;
 
-        std::vector<std::unique_ptr<Expr>> lowered_args;
+        std::vector<ExprPtr> lowered_args;
         for (auto& arg_expr : fn_call_expr->args) {
             auto lowered_arg = lower_expr(*arg_expr, symtab);
             append_stmts(lowered.preamble, lowered_arg.preamble);
             lowered_args.push_back(std::move(lowered_arg.rewritten));
         }
 
-        auto lowered_fn_call = std::make_unique<BasicFuncCallExpr>
-                                (fn_call_expr->keyword, fn_call_expr->loc);
+        auto lowered_fn_call = make_basic_func_call_expr
+                               (fn_call_expr->keyword, fn_call_expr->loc);
         lowered_fn_call->args = std::move(lowered_args);
         lowered.rewritten = std::move(lowered_fn_call);
         return lowered;
@@ -483,31 +265,31 @@ static LoweredExpr lower_expr(Expr& expr, Symtab& symtab) {
             // create LET <PROC><PARAM>=lowered_arg
             std::string arg_name = proc_call_expr->name + param_name;
             auto assign_arg_stmt = std::make_unique<LetStmt>(
-                                       std::make_unique<VariableExpr>(arg_name, proc_call_expr->loc),
+                                       make_variable_expr(arg_name, proc_call_expr->loc),
                                        std::move(lowered_arg.rewritten), proc_call_expr->loc);
             lowered.preamble.push_back(std::move(assign_arg_stmt));
         }
 
         // create GOSUB @<PROC>
-        auto label_ref = std::make_unique<LabelLineRefExpr>(proc_call_expr->name,
+        auto label_ref = make_label_line_ref_expr(proc_call_expr->name,
                          proc_call_expr->loc);
         auto gosub_stmt = std::make_unique<GosubStmt>(std::move(label_ref),
                           proc_call_expr->loc);
         lowered.preamble.push_back(std::move(gosub_stmt));
 
         // rewritten expression is proc name
-        auto var_ref = std::make_unique<VariableExpr>(proc_call_expr->name,
-                       proc_call_expr->loc);
+        auto var_ref = make_variable_expr(proc_call_expr->name,
+                                          proc_call_expr->loc);
         lowered.rewritten = std::move(var_ref);
         return lowered;
     }
     else {
         error (expr.loc, "Unknown expression type");
-        return { {}, std::make_unique<NumberExpr>(0, expr.loc) };
+        return { {}, make_number_expr(0, expr.loc) };
     }
 }
 
-static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
+static void lower(const std::vector<StmtPtr>& stmts,
                   Symtab& symtab,
                   std::vector<ControlStackEntry>& control_stack,
                   Prog& out_prog) {
@@ -533,7 +315,7 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
         else if (auto dim_stmt = dynamic_cast<DimStmt*>(stmt.get())) {
             // lowered has only one item per DIM
             for (auto& dim_item : dim_stmt->items) {
-                std::vector<std::unique_ptr<Expr>> lowered_dims;
+                std::vector<ExprPtr> lowered_dims;
                 for (auto& dim : dim_item.dims) {
                     auto lowered_dim = lower_expr(*dim, symtab);
                     append_stmts(out_prog.stmts, lowered_dim.preamble);
@@ -573,12 +355,12 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
                 auto lowered_condition = lower_expr(*if_stmt->condition, symtab);
                 append_stmts(out_prog.stmts, lowered_condition.preamble);
                 if (swap) {
-                    std::unique_ptr<Expr> operand =
+                    ExprPtr operand =
                         std::move(lowered_condition.rewritten);
                     SourceLoc loc = operand->loc;
                     lowered_condition.rewritten =
-                        std::make_unique<UnaryExpr>(TokenType::NOT,
-                                                    std::move(operand), loc);
+                        make_unary_expr(TokenType::NOT,
+                                        std::move(operand), loc);
                 }
 
                 auto new_stmt = std::make_unique<IfStmt>(std::move(lowered_condition.rewritten),
@@ -598,18 +380,18 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
 
                 // Add NOT unless swapped
                 if (!swap) {
-                    std::unique_ptr<Expr> operand =
+                    ExprPtr operand =
                         std::move(lowered_condition.rewritten);
                     SourceLoc loc = operand->loc;
                     lowered_condition.rewritten =
-                        std::make_unique<UnaryExpr>(TokenType::NOT,
-                                                    std::move(operand), loc);
+                        make_unary_expr(TokenType::NOT,
+                                        std::move(operand), loc);
                 }
 
                 // IF NOT cond THEN GOTO @end_label
                 auto new_if_stmt = std::make_unique<IfStmt>(std::move(
                                        lowered_condition.rewritten), if_stmt->loc);
-                auto goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+                auto goto_stmt = std::make_unique<GotoStmt>(make_label_line_ref_expr
                                  (end_label, if_stmt->loc), if_stmt->loc);
                 new_if_stmt->then_stmts.push_back(std::move(goto_stmt));
                 out_prog.stmts.push_back(std::move(new_if_stmt));
@@ -638,18 +420,18 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
 
             // Add NOT unless swapped
             if (!swap) {
-                std::unique_ptr<Expr> operand =
+                ExprPtr operand =
                     std::move(lowered_condition.rewritten);
                 SourceLoc loc = operand->loc;
                 lowered_condition.rewritten =
-                    std::make_unique<UnaryExpr>(TokenType::NOT,
-                                                std::move(operand), loc);
+                    make_unary_expr(TokenType::NOT,
+                                    std::move(operand), loc);
             }
 
             // IF NOT cond THEN GOTO @else_label
             auto new_if_stmt = std::make_unique<IfStmt>(std::move(
                                    lowered_condition.rewritten), if_stmt->loc);
-            auto goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+            auto goto_stmt = std::make_unique<GotoStmt>(make_label_line_ref_expr
                              (else_label, if_stmt->loc), if_stmt->loc);
             new_if_stmt->then_stmts.push_back(std::move(goto_stmt));
             out_prog.stmts.push_back(std::move(new_if_stmt));
@@ -658,7 +440,7 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             append_stmts(out_prog.stmts, lowered_then.stmts);
 
             //     GOTO @end_label
-            goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+            goto_stmt = std::make_unique<GotoStmt>(make_label_line_ref_expr
                                                    (end_label, if_stmt->loc), if_stmt->loc);
             out_prog.stmts.push_back(std::move(goto_stmt));
 
@@ -672,136 +454,6 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             // @end_label:
             target_stmt = std::make_unique<LabelStmt>(end_label, if_stmt->loc);
             out_prog.stmts.push_back(std::move(target_stmt));
-        }
-        else if (auto repeat_stmt = dynamic_cast<RepeatStmt*>(stmt.get())) {
-            // enter a new block for EXIT
-            std::string start_label = gen_label("start");
-            std::string end_label = gen_label("end");
-            control_stack.push_back({ ControlStackEntry::Type::Loop, end_label });
-
-            // lower into:
-            // @start:
-            //     body
-            //     IF NOT condition THEN GOTO @start
-            // @end:
-
-            // @start:
-            auto target_stmt = std::make_unique<LabelStmt>(start_label, repeat_stmt->loc);
-            out_prog.stmts.push_back(std::move(target_stmt));
-
-            // body
-            lower(repeat_stmt->body, symtab, control_stack, out_prog);
-
-            //     IF NOT condition THEN GOTO @start
-            ;
-            auto lowered_condition = lower_expr(*repeat_stmt->condition, symtab);
-            append_stmts(out_prog.stmts, lowered_condition.preamble);
-            std::unique_ptr<Expr> operand = std::move(lowered_condition.rewritten);
-            SourceLoc loc = operand->loc;
-            lowered_condition.rewritten = std::make_unique<UnaryExpr>(TokenType::NOT,
-                                          std::move(operand), loc);
-
-            auto new_if_stmt = std::make_unique<IfStmt>(std::move(
-                                   lowered_condition.rewritten), repeat_stmt->loc);
-            auto goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
-                             (start_label, repeat_stmt->loc), repeat_stmt->loc);
-            new_if_stmt->then_stmts.push_back(std::move(goto_stmt));
-            out_prog.stmts.push_back(std::move(new_if_stmt));
-
-            // @end:
-            target_stmt = std::make_unique<LabelStmt>(end_label, repeat_stmt->loc);
-            out_prog.stmts.push_back(std::move(target_stmt));
-
-            // drop the block for EXIT
-            control_stack.pop_back();
-        }
-        else if (auto while_stmt = dynamic_cast<WhileStmt*>(stmt.get())) {
-            // enter a new block for EXIT
-            std::string start_label = gen_label("start");
-            std::string end_label = gen_label("end");
-            control_stack.push_back({ ControlStackEntry::Type::Loop, end_label });
-
-            // lower into:
-            // @start:
-            //     IF NOT condition THEN GOTO @end
-            //     body
-            //     GOTO @start
-            // @end:
-
-            // @start:
-            auto target_stmt = std::make_unique<LabelStmt>(start_label, while_stmt->loc);
-            out_prog.stmts.push_back(std::move(target_stmt));
-
-            //     IF NOT condition THEN GOTO @end
-            ;
-            auto lowered_condition = lower_expr(*while_stmt->condition, symtab);
-            append_stmts(out_prog.stmts, lowered_condition.preamble);
-            std::unique_ptr<Expr> operand = std::move(lowered_condition.rewritten);
-            SourceLoc loc = operand->loc;
-            lowered_condition.rewritten = std::make_unique<UnaryExpr>(TokenType::NOT,
-                                          std::move(operand), loc);
-
-            auto new_if_stmt = std::make_unique<IfStmt>(std::move(
-                                   lowered_condition.rewritten), while_stmt->loc);
-            auto goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
-                             (end_label, while_stmt->loc), while_stmt->loc);
-            new_if_stmt->then_stmts.push_back(std::move(goto_stmt));
-            out_prog.stmts.push_back(std::move(new_if_stmt));
-
-            // body
-            lower(while_stmt->body, symtab, control_stack, out_prog);
-
-            //     GOTO @start
-            goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
-                                                   (start_label, while_stmt->loc), while_stmt->loc);
-            out_prog.stmts.push_back(std::move(goto_stmt));
-
-            // @end:
-            target_stmt = std::make_unique<LabelStmt>(end_label, while_stmt->loc);
-            out_prog.stmts.push_back(std::move(target_stmt));
-
-            // drop the block for EXIT
-            control_stack.pop_back();
-        }
-        else if (auto for_stmt = dynamic_cast<ForStmt*>(stmt.get())) {
-            // enter a new block for EXIT
-            std::string end_label = gen_label("end");
-            control_stack.push_back({ ControlStackEntry::Type::Loop, end_label });
-
-            // lower into:
-            // FOR var=start TO end STEP step
-            //     body
-            // NEXT var
-            // @end:
-
-            // FOR var=start TO end STEP step
-            auto lowered_start = lower_expr(*for_stmt->start_expr, symtab);
-            append_stmts(out_prog.stmts, lowered_start.preamble);
-            auto lowered_end = lower_expr(*for_stmt->end_expr, symtab);
-            append_stmts(out_prog.stmts, lowered_end.preamble);
-            auto lowered_step = lower_expr(*for_stmt->step_expr, symtab);
-            append_stmts(out_prog.stmts, lowered_step.preamble);
-
-            auto new_for_stmt = std::make_unique<ForStmt>(for_stmt->name,
-                                std::move(lowered_start.rewritten),
-                                std::move(lowered_end.rewritten),
-                                std::move(lowered_step.rewritten),
-                                for_stmt->loc);
-            out_prog.stmts.push_back(std::move(new_for_stmt));
-
-            // body
-            lower(for_stmt->body, symtab, control_stack, out_prog);
-
-            // NEXT var
-            auto next_stmt = std::make_unique<NextStmt>(for_stmt->name, for_stmt->loc);
-            out_prog.stmts.push_back(std::move(next_stmt));
-
-            // @end:
-            auto target_stmt = std::make_unique<LabelStmt>(end_label, for_stmt->loc);
-            out_prog.stmts.push_back(std::move(target_stmt));
-
-            // drop the block for EXIT
-            control_stack.pop_back();
         }
         else if (auto proc_call_stmt = dynamic_cast<ProcCallStmt*>(stmt.get())) {
             // get procedure definition from symbol table
@@ -820,13 +472,13 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
                 // create LET <PROC><PARAM>=lowered_arg
                 std::string arg_name = proc_call_stmt->name + param_name;
                 auto assign_arg_stmt = std::make_unique<LetStmt>(
-                                           std::make_unique<VariableExpr>(arg_name, proc_call_stmt->loc),
+                                           make_variable_expr(arg_name, proc_call_stmt->loc),
                                            std::move(lowered_arg.rewritten), proc_call_stmt->loc);
                 out_prog.stmts.push_back(std::move(assign_arg_stmt));
             }
 
             // create GOSUB @<PROC>
-            auto label_ref = std::make_unique<LabelLineRefExpr>(proc_call_stmt->name,
+            auto label_ref = make_label_line_ref_expr(proc_call_stmt->name,
                              proc_call_stmt->loc);
             auto gosub_stmt = std::make_unique<GosubStmt>(std::move(label_ref),
                               proc_call_stmt->loc);
@@ -838,7 +490,7 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             }
             else if (control_stack.back().type == ControlStackEntry::Type::Loop) {
                 // GOTO @end_label
-                auto label_ref = std::make_unique<LabelLineRefExpr>
+                auto label_ref = make_label_line_ref_expr
                                  (control_stack.back().end_label,
                                   exit_stmt->loc);
                 auto goto_stmt = std::make_unique<GotoStmt>(std::move(label_ref),
@@ -878,7 +530,7 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
         }
         else if (auto end_stmt = dynamic_cast<EndStmt*>(stmt.get())) {
             // GOTO @END_OF_PROGRAM
-            auto goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+            auto goto_stmt = std::make_unique<GotoStmt>(make_label_line_ref_expr
                              (END_OF_PROGRAM, end_stmt->loc), end_stmt->loc);
             out_prog.stmts.push_back(std::move(goto_stmt));
         }
@@ -1087,7 +739,7 @@ static void lower(Prog& prog, Symtab& symtab, std::unique_ptr<Prog>& out_prog) {
 
     if (num_procs_called > 0) {
         // if any PROCs are called, add a GOTO @END_OF_PROGRAM at the end of the program
-        auto goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+        auto goto_stmt = std::make_unique<GotoStmt>(make_label_line_ref_expr
                          (END_OF_PROGRAM, end_of_program_loc), end_of_program_loc);
         out_prog->stmts.push_back(std::move(goto_stmt));
 
@@ -1143,3 +795,345 @@ bool lower_prog(Prog& prog, Symtab& symtab) {
 }
 
 #endif
+
+LoweredExpr LoweringPass::lower_expr(Expr& expr) {
+    return expr.lower(*this);   // dispatch into the correct override
+}
+
+LoweredExpr LoweringPass::lower_number(NumberExpr& expr) {
+    LoweredExpr out;
+    out.rewritten = expr.clone();
+    return out;
+}
+
+LoweredExpr LoweringPass::lower_label_line_ref(LabelLineRefExpr& expr) {
+    LoweredExpr out;
+    out.rewritten = expr.clone();
+    return out;
+}
+
+LoweredExpr LoweringPass::lower_label_addr_ref(LabelAddrRefExpr& expr) {
+    LoweredExpr out;
+    out.rewritten = expr.clone();
+    return out;
+}
+
+LoweredExpr LoweringPass::lower_string_literal(StringLiteralExpr& expr) {
+    LoweredExpr out;
+    out.rewritten = expr.clone();
+    return out;
+}
+
+LoweredExpr LoweringPass::lower_variable(VariableExpr& expr) {
+    LoweredExpr out;
+    out.rewritten = expr.clone();
+    return out;
+}
+
+LoweredExpr LoweringPass::lower_array_ref(ArrayRefExpr& expr) {
+    LoweredExpr out;
+    out.rewritten = expr.clone();
+    return out;
+}
+
+LoweredExpr LoweringPass::lower_slice(SliceExpr& expr) {
+    LoweredExpr out;
+    out.rewritten = expr.clone();
+    return out;
+}
+
+LoweredExpr LoweringPass::lower_unary(UnaryExpr& expr) {
+    LoweredExpr out;
+    out.rewritten = expr.clone();
+    return out;
+}
+
+LoweredExpr LoweringPass::lower_binary(BinaryExpr& expr) {
+    LoweredExpr out;
+    out.rewritten = expr.clone();
+    return out;
+}
+
+LoweredExpr LoweringPass::lower_basic_func_call(BasicFuncCallExpr& expr) {
+    LoweredExpr out;
+    out.rewritten = expr.clone();
+    return out;
+}
+
+LoweredExpr LoweringPass::lower_proc_call_expr(ProcCallExpr& expr) {
+    LoweredExpr out;
+    out.rewritten = expr.clone();
+    return out;
+}
+
+LoweredExpr LoweringPass::lower_fn_call(FnCallExpr& expr) {
+    LoweredExpr out;
+    out.rewritten = expr.clone();
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_stmt(Stmt& stmt) {
+    return stmt.lower(*this);   // dispatch into the correct override
+}
+
+std::vector<StmtPtr> LoweringPass::lower_label(LabelStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_line_num(LineNumStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_let(LetStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_dim(DimStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_if(IfStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_repeat(RepeatStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_while(WhileStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_for(ForStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_next(NextStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_def_proc(DefProcStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_proc_call(ProcCallStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_local(LocalStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_def_fn(DefFnStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_exit(ExitStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_goto(GotoStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_gosub(GosubStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_return(ReturnStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_stop(StopStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_end(EndStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_print(PrintStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_input(InputStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_rem(RemStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_run(RunStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_list(ListStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_new(NewStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_cls(ClsStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_load(LoadStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_save(SaveStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_poke(PokeStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_pokew(PokewStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_plot(PlotStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_unplot(UnplotStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_rand(RandStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_pause(PauseStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_fast(FastStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_slow(SlowStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_scroll(ScrollStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_cont(ContStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_clear(ClearStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_pragma_num_var(
+    PragmaNumVarStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_pragma_str_var(
+    PragmaStrVarStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_pragma_num_var_array(
+    PragmaNumVarArrayStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower_pragma_str_var_array(
+    PragmaStrVarArrayStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}

@@ -85,7 +85,7 @@ std::vector<std::unique_ptr<Stmt>> lower_repeat(const RepeatStmt& r) {
 
     // IF NOT condition2 THEN GOTO @start
     {
-        auto neg = std::make_unique<UnaryExpr>();
+        auto neg = make_unary_expr();
         neg->op = TokenType::Not;
         neg->operand = clone_expr(r.until_condition.get());
 
@@ -118,7 +118,7 @@ std::vector<std::unique_ptr<Stmt>> lower_while(const WhileStmt& w) {
 
     // IF NOT condition1 THEN GOTO @end
     {
-        auto neg = std::make_unique<UnaryExpr>();
+        auto neg = make_unary_expr();
         neg->op = TokenType::Not;
         neg->operand = clone_expr(w.condition.get());
 
@@ -213,14 +213,14 @@ std::unique_ptr<Expr> rewrite_proc_expr(const std::string& procname, const Expr*
         return make_var_expr(procname + "_" + v->name);
     }
     else if (auto b = dynamic_cast<const BinaryExpr*>(e)) {
-        auto out = std::make_unique<BinaryExpr>();
+        auto out = make_binary_expr();
         out->op = b->op;
         out->left = rewrite_proc_expr(procname, b->left.get());
         out->right = rewrite_proc_expr(procname, b->right.get());
         return out;
     }
     else if (auto u = dynamic_cast<const UnaryExpr*>(e)) {
-        auto out = std::make_unique<UnaryExpr>();
+        auto out = make_unary_expr();
         out->op = u->op;
         out->operand = rewrite_proc_expr(procname, u->operand.get());
         return out;
@@ -267,14 +267,14 @@ std::unique_ptr<Expr> rewrite_fn_expr(const std::string& fnname, const Expr* e) 
         return make_var_expr(fnname + "_" + v->name);
     }
     else if (auto b = dynamic_cast<const BinaryExpr*>(e)) {
-        auto out = std::make_unique<BinaryExpr>();
+        auto out = make_binary_expr();
         out->op = b->op;
         out->left = rewrite_fn_expr(fnname, b->left.get());
         out->right = rewrite_fn_expr(fnname, b->right.get());
         return out;
     }
     else if (auto u = dynamic_cast<const UnaryExpr*>(e)) {
-        auto out = std::make_unique<UnaryExpr>();
+        auto out = make_unary_expr();
         out->op = u->op;
         out->operand = rewrite_fn_expr(fnname, u->operand.get());
         return out;
@@ -793,3 +793,135 @@ DFS cycle detection
 Tarjan SCC detection
 
 integrating it into your existing pipeline
+
+
+        else if (auto repeat_stmt = dynamic_cast<RepeatStmt*>(stmt.get())) {
+            // enter a new block for EXIT
+            std::string start_label = gen_label("start");
+            std::string end_label = gen_label("end");
+            control_stack.push_back({ ControlStackEntry::Type::Loop, end_label });
+
+            // lower into:
+            // @start:
+            //     body
+            //     IF NOT condition THEN GOTO @start
+            // @end:
+
+            // @start:
+            auto target_stmt = std::make_unique<LabelStmt>(start_label, repeat_stmt->loc);
+            out_prog.stmts.push_back(std::move(target_stmt));
+
+            // body
+            lower(repeat_stmt->body, symtab, control_stack, out_prog);
+
+            //     IF NOT condition THEN GOTO @start
+            ;
+            auto lowered_condition = lower_expr(*repeat_stmt->condition, symtab);
+            append_stmts(out_prog.stmts, lowered_condition.preamble);
+            std::unique_ptr<Expr> operand = std::move(lowered_condition.rewritten);
+            SourceLoc loc = operand->loc;
+            lowered_condition.rewritten = make_unary_expr(TokenType::NOT,
+                                          std::move(operand), loc);
+
+            auto new_if_stmt = std::make_unique<IfStmt>(std::move(
+                                   lowered_condition.rewritten), repeat_stmt->loc);
+            auto goto_stmt = std::make_unique<GotoStmt>(make_label_line_ref_expr
+                             (start_label, repeat_stmt->loc), repeat_stmt->loc);
+            new_if_stmt->then_stmts.push_back(std::move(goto_stmt));
+            out_prog.stmts.push_back(std::move(new_if_stmt));
+
+            // @end:
+            target_stmt = std::make_unique<LabelStmt>(end_label, repeat_stmt->loc);
+            out_prog.stmts.push_back(std::move(target_stmt));
+
+            // drop the block for EXIT
+            control_stack.pop_back();
+        }
+        else if (auto while_stmt = dynamic_cast<WhileStmt*>(stmt.get())) {
+            // enter a new block for EXIT
+            std::string start_label = gen_label("start");
+            std::string end_label = gen_label("end");
+            control_stack.push_back({ ControlStackEntry::Type::Loop, end_label });
+
+            // lower into:
+            // @start:
+            //     IF NOT condition THEN GOTO @end
+            //     body
+            //     GOTO @start
+            // @end:
+
+            // @start:
+            auto target_stmt = std::make_unique<LabelStmt>(start_label, while_stmt->loc);
+            out_prog.stmts.push_back(std::move(target_stmt));
+
+            //     IF NOT condition THEN GOTO @end
+            ;
+            auto lowered_condition = lower_expr(*while_stmt->condition, symtab);
+            append_stmts(out_prog.stmts, lowered_condition.preamble);
+            std::unique_ptr<Expr> operand = std::move(lowered_condition.rewritten);
+            SourceLoc loc = operand->loc;
+            lowered_condition.rewritten = make_unary_expr(TokenType::NOT,
+                                          std::move(operand), loc);
+
+            auto new_if_stmt = std::make_unique<IfStmt>(std::move(
+                                   lowered_condition.rewritten), while_stmt->loc);
+            auto goto_stmt = std::make_unique<GotoStmt>(make_label_line_ref_expr
+                             (end_label, while_stmt->loc), while_stmt->loc);
+            new_if_stmt->then_stmts.push_back(std::move(goto_stmt));
+            out_prog.stmts.push_back(std::move(new_if_stmt));
+
+            // body
+            lower(while_stmt->body, symtab, control_stack, out_prog);
+
+            //     GOTO @start
+            goto_stmt = std::make_unique<GotoStmt>(make_label_line_ref_expr
+                                                   (start_label, while_stmt->loc), while_stmt->loc);
+            out_prog.stmts.push_back(std::move(goto_stmt));
+
+            // @end:
+            target_stmt = std::make_unique<LabelStmt>(end_label, while_stmt->loc);
+            out_prog.stmts.push_back(std::move(target_stmt));
+
+            // drop the block for EXIT
+            control_stack.pop_back();
+        }
+        else if (auto for_stmt = dynamic_cast<ForStmt*>(stmt.get())) {
+            // enter a new block for EXIT
+            std::string end_label = gen_label("end");
+            control_stack.push_back({ ControlStackEntry::Type::Loop, end_label });
+
+            // lower into:
+            // FOR var=start TO end STEP step
+            //     body
+            // NEXT var
+            // @end:
+
+            // FOR var=start TO end STEP step
+            auto lowered_start = lower_expr(*for_stmt->start_expr, symtab);
+            append_stmts(out_prog.stmts, lowered_start.preamble);
+            auto lowered_end = lower_expr(*for_stmt->end_expr, symtab);
+            append_stmts(out_prog.stmts, lowered_end.preamble);
+            auto lowered_step = lower_expr(*for_stmt->step_expr, symtab);
+            append_stmts(out_prog.stmts, lowered_step.preamble);
+
+            auto new_for_stmt = std::make_unique<ForStmt>(for_stmt->name,
+                                std::move(lowered_start.rewritten),
+                                std::move(lowered_end.rewritten),
+                                std::move(lowered_step.rewritten),
+                                for_stmt->loc);
+            out_prog.stmts.push_back(std::move(new_for_stmt));
+
+            // body
+            lower(for_stmt->body, symtab, control_stack, out_prog);
+
+            // NEXT var
+            auto next_stmt = std::make_unique<NextStmt>(for_stmt->name, for_stmt->loc);
+            out_prog.stmts.push_back(std::move(next_stmt));
+
+            // @end:
+            auto target_stmt = std::make_unique<LabelStmt>(end_label, for_stmt->loc);
+            out_prog.stmts.push_back(std::move(target_stmt));
+
+            // drop the block for EXIT
+            control_stack.pop_back();
+        }

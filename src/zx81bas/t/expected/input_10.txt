@@ -1,0 +1,4 @@
+% z88dk-zx81bas -d 10 test_t_input_10_t.bas
+Input file:  test_t_input_10_t.bas
+Output file: test_t_input_10_t.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_10_t.i" "test_t_input_10_t.pp"

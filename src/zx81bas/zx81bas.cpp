@@ -16,6 +16,7 @@
 #include "semantic.h"
 #include "symtab.h"
 #include "utils.h"
+#include "walker.h"
 #include "z80asm.h"
 #include <cstdlib>
 #include <filesystem>
@@ -210,13 +211,28 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
+    // transform the program to lower-level constructs
+    if (!transform_prog(*prog, *symtab)) {
+        exit_error_status();
+    }
+
+#ifdef _DEBUG
+    if (g_dump_step == 8) {
+        if (get_error_count() == 0) {
+            DumpContext ctx(std::cout);
+            prog->dump(ctx);
+        }
+        exit_error_status();
+    }
+#endif
+
     // lower to standard BASIC
     if (!lower_prog(*prog, *symtab)) {
         exit_error_status();
     }
 
 #ifdef _DEBUG
-    if (g_dump_step == 8) {
+    if (g_dump_step == 9) {
         if (get_error_count() == 0) {
             DumpContext ctx(std::cout);
             prog->dump(ctx);
@@ -232,7 +248,7 @@ int main(int argc, char* argv[]) {
     }
 
 #ifdef _DEBUG
-    if (g_dump_step == 9) {
+    if (g_dump_step == 10) {
         if (get_error_count() == 0) {
             for (auto& text : asm_source) {
                 std::cout << text << std::endl;

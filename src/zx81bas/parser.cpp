@@ -163,7 +163,7 @@ const SourceLoc& Parser::loc() const {
     return tok_file.lines[cur_line].src_line.loc;
 }
 
-std::unique_ptr<Expr> Parser::parse_primary() {
+ExprPtr Parser::parse_primary() {
     const Token& t = peek();
 
     // are we at end
@@ -178,18 +178,18 @@ std::unique_ptr<Expr> Parser::parse_primary() {
 
     // Number
     if (match(TokenType::Integer)) {
-        auto number_expr = std::make_unique<NumberExpr>(t.ivalue, loc());
+        auto number_expr = make_node<NumberExpr>(t.ivalue, loc());
         return number_expr;
     }
 
     if (match(TokenType::Float)) {
-        auto number_expr = std::make_unique<NumberExpr>(t.nvalue, loc());
+        auto number_expr = make_node<NumberExpr>(t.nvalue, loc());
         return number_expr;
     }
 
     // String literal
     if (match(TokenType::StringLiteral)) {
-        auto string_expr = std::make_unique<StringLiteralExpr>(t.svalue, loc());
+        auto string_expr = make_node<StringLiteralExpr>(t.svalue, loc());
         return string_expr;
     }
 
@@ -200,7 +200,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         if (is_string_variable(name)) {
             syntax_error("Label reference cannot be a string variable");
         }
-        auto label_ref = std::make_unique<LabelLineRefExpr>(name, loc());
+        auto label_ref = make_node<LabelLineRefExpr>(name, loc());
         return label_ref;
     }
 
@@ -211,7 +211,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         if (is_string_variable(name)) {
             syntax_error("Label reference cannot be a string variable");
         }
-        auto label_ref = std::make_unique<LabelAddrRefExpr>(name, loc());
+        auto label_ref = make_node<LabelAddrRefExpr>(name, loc());
         return label_ref;
     }
 
@@ -231,7 +231,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         // 0. Procedure call: PROCname(args)
         if (str_toupper(name).compare(0, 4, "PROC") == 0 &&
                 match(TokenType::LeftParen)) {
-            std::vector<std::unique_ptr<Expr>> args;
+            std::vector<ExprPtr> args;
 
             if (!match(TokenType::RightParen)) {
                 while (true) {
@@ -253,7 +253,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         // 0b. User function call: FNname(args)
         if (str_toupper(name).compare(0, 2, "FN") == 0 &&
                 match(TokenType::LeftParen)) {
-            std::vector<std::unique_ptr<Expr>> args;
+            std::vector<ExprPtr> args;
 
             if (!match(TokenType::RightParen)) {
                 while (true) {
@@ -281,7 +281,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         // 2. One-argument function with parentheses: FUNC(expr)
         if (is_func_one_arg(t.keyword) &&
                 match(TokenType::LeftParen)) {
-            std::vector<std::unique_ptr<Expr>> args;
+            std::vector<ExprPtr> args;
 
             if (!match(TokenType::RightParen)) {
                 args.push_back(parse_expr());
@@ -306,8 +306,8 @@ std::unique_ptr<Expr> Parser::parse_primary() {
 
             // Check for slice: look for TO anywhere inside the parentheses
             // First: try to parse the "from" expression, but it may be omitted.
-            std::unique_ptr<Expr> from_expr;
-            std::unique_ptr<Expr> to_expr;
+            ExprPtr from_expr;
+            ExprPtr to_expr;
 
             // Case 1: slice starts with TO (no from-expression)
             if (match(Keyword::TO)) {
@@ -345,15 +345,15 @@ std::unique_ptr<Expr> Parser::parse_primary() {
                     to_expr = nullptr;
                 }
 
-                auto base = std::make_unique<VariableExpr>(name, loc());
-                auto slice = std::make_unique<SliceExpr>(std::move(base), loc());
+                auto base = make_node<VariableExpr>(name, loc());
+                auto slice = make_node<SliceExpr>(std::move(base), loc());
                 slice->from = std::move(from_expr);
                 slice->to = std::move(to_expr);
                 return slice;
             }
 
             // If no TO -> this is an array reference
-            std::vector<std::unique_ptr<Expr>> indices;
+            std::vector<ExprPtr> indices;
             indices.push_back(std::move(from_expr));
 
             while (match(TokenType::Comma)) {
@@ -362,13 +362,13 @@ std::unique_ptr<Expr> Parser::parse_primary() {
 
             expect(TokenType::RightParen);
 
-            auto array_ref = std::make_unique<ArrayRefExpr>(name, loc());
+            auto array_ref = make_node<ArrayRefExpr>(name, loc());
             array_ref->indices = std::move(indices);
             return array_ref;
         }
 
         // 5. Simple variable
-        auto var = std::make_unique<VariableExpr>(name, loc());
+        auto var = make_node<VariableExpr>(name, loc());
         return var;
     }
 
@@ -377,11 +377,11 @@ std::unique_ptr<Expr> Parser::parse_primary() {
                  peek().text + "' in expression");
 }
 
-std::unique_ptr<Expr> Parser::parse_unary_expr() {
+ExprPtr Parser::parse_unary_expr() {
     // Unary minus
     if (match(TokenType::Minus)) {
         auto inner = parse_unary_expr();
-        auto u = std::make_unique<UnaryExpr>(TokenType::Minus, std::move(inner), loc());
+        auto u = make_node<UnaryExpr>(TokenType::Minus, std::move(inner), loc());
         return u;
     }
 
@@ -394,7 +394,7 @@ std::unique_ptr<Expr> Parser::parse_unary_expr() {
     // NOT
     if (match(Keyword::NOT)) {
         auto inner = parse_unary_expr();
-        auto u = std::make_unique<UnaryExpr>(TokenType::NOT, std::move(inner), loc());
+        auto u = make_node<UnaryExpr>(TokenType::NOT, std::move(inner), loc());
         return u;
     }
 
@@ -402,7 +402,7 @@ std::unique_ptr<Expr> Parser::parse_unary_expr() {
     return parse_primary();
 }
 
-std::unique_ptr<Expr> Parser::parse_pow_expr() {
+ExprPtr Parser::parse_pow_expr() {
     auto left = parse_unary_expr();
 
     while (!at_end_of_stmt() &&
@@ -410,15 +410,15 @@ std::unique_ptr<Expr> Parser::parse_pow_expr() {
         TokenType op = peek().type;
         ++pos;
         auto right = parse_unary_expr();
-        auto binary = std::make_unique<BinaryExpr>(op, std::move(left),
-                      std::move(right), loc());
+        auto binary = make_node<BinaryExpr>(op, std::move(left),
+                                            std::move(right), loc());
         left = std::move(binary);
     }
 
     return left;
 }
 
-std::unique_ptr<Expr> Parser::parse_mul_expr() {
+ExprPtr Parser::parse_mul_expr() {
     auto left = parse_pow_expr();
 
     while (!at_end_of_stmt()) {
@@ -441,8 +441,8 @@ std::unique_ptr<Expr> Parser::parse_mul_expr() {
         if (binary_op != TokenType::None) {
             ++pos;
             auto right = parse_pow_expr();
-            auto binary = std::make_unique<BinaryExpr>(binary_op, std::move(left),
-                          std::move(right), loc());
+            auto binary = make_node<BinaryExpr>(binary_op, std::move(left),
+                                                std::move(right), loc());
             left = std::move(binary);
         }
         else {
@@ -453,7 +453,7 @@ std::unique_ptr<Expr> Parser::parse_mul_expr() {
     return left;
 }
 
-std::unique_ptr<Expr> Parser::parse_add_expr() {
+ExprPtr Parser::parse_add_expr() {
     auto left = parse_mul_expr();
 
     while (!at_end_of_stmt()) {
@@ -461,8 +461,8 @@ std::unique_ptr<Expr> Parser::parse_add_expr() {
         if (op == TokenType::Plus || op == TokenType::Minus) {
             ++pos;
             auto right = parse_mul_expr();
-            auto binary = std::make_unique<BinaryExpr>(op, std::move(left),
-                          std::move(right), loc());
+            auto binary = make_node<BinaryExpr>(op, std::move(left),
+                                                std::move(right), loc());
             left = std::move(binary);
         }
         else {
@@ -473,7 +473,7 @@ std::unique_ptr<Expr> Parser::parse_add_expr() {
     return left;
 }
 
-std::unique_ptr<Expr> Parser::parse_rel_expr() {
+ExprPtr Parser::parse_rel_expr() {
     auto left = parse_add_expr();
 
     while (!at_end_of_stmt()) {
@@ -483,8 +483,8 @@ std::unique_ptr<Expr> Parser::parse_rel_expr() {
                 op == TokenType::Greater || op == TokenType::GreaterEqual) {
             ++pos;
             auto right = parse_add_expr();
-            auto binary = std::make_unique<BinaryExpr>(op, std::move(left),
-                          std::move(right), loc());
+            auto binary = make_node<BinaryExpr>(op, std::move(left),
+                                                std::move(right), loc());
             left = std::move(binary);
         }
         else {
@@ -495,22 +495,22 @@ std::unique_ptr<Expr> Parser::parse_rel_expr() {
     return left;
 }
 
-std::unique_ptr<Expr> Parser::parse_and_expr() {
+ExprPtr Parser::parse_and_expr() {
     auto left = parse_rel_expr();
 
     while (!at_end_of_stmt() && peek().keyword == Keyword::AND) {
         TokenType op = TokenType::AND;
         ++pos;
         auto right = parse_rel_expr();
-        auto binary = std::make_unique<BinaryExpr>(op, std::move(left),
-                      std::move(right), loc());
+        auto binary = make_node<BinaryExpr>(op, std::move(left),
+                                            std::move(right), loc());
         left = std::move(binary);
     }
 
     return left;
 }
 
-std::unique_ptr<Expr> Parser::parse_or_expr() {
+ExprPtr Parser::parse_or_expr() {
     auto left = parse_and_expr();
 
     while (!at_end_of_stmt() &&
@@ -518,19 +518,19 @@ std::unique_ptr<Expr> Parser::parse_or_expr() {
         TokenType op = TokenType::OR;
         ++pos;
         auto right = parse_and_expr();
-        auto binary = std::make_unique<BinaryExpr>(op, std::move(left),
-                      std::move(right), loc());
+        auto binary = make_node<BinaryExpr>(op, std::move(left),
+                                            std::move(right), loc());
         left = std::move(binary);
     }
 
     return left;
 }
 
-std::unique_ptr<Expr> Parser::parse_expr() {
+ExprPtr Parser::parse_expr() {
     return parse_or_expr();
 }
 
-std::unique_ptr<Expr> Parser::parse_assignable() {
+ExprPtr Parser::parse_assignable() {
     // Must start with identifier that is not end of statement
     if (at_end()) {
         syntax_error("Expected variable name, found end of line");
@@ -546,7 +546,7 @@ std::unique_ptr<Expr> Parser::parse_assignable() {
     pos++;
 
     // First: parse base as either variable or array ref
-    std::unique_ptr<Expr> base;
+    ExprPtr base;
 
     // '(' after name -> either array ref or slice
     if (peek().type == TokenType::LeftParen &&
@@ -555,7 +555,7 @@ std::unique_ptr<Expr> Parser::parse_assignable() {
         // it's an array reference A(i, j, ...)
         pos++; // consume '('
 
-        std::vector<std::unique_ptr<Expr>> indices;
+        std::vector<ExprPtr> indices;
         while (true) {
             auto idx = parse_expr();
             indices.push_back(std::move(idx));
@@ -567,13 +567,13 @@ std::unique_ptr<Expr> Parser::parse_assignable() {
         }
         expect(TokenType::RightParen);
 
-        auto arr = std::make_unique<ArrayRefExpr>(name, loc());
+        auto arr = make_node<ArrayRefExpr>(name, loc());
         arr->indices = std::move(indices);
         base = std::move(arr);
     }
     else {
         // Simple variable A or A$
-        auto var = std::make_unique<VariableExpr>(name, loc());
+        auto var = make_node<VariableExpr>(name, loc());
         base = std::move(var);
     }
 
@@ -585,20 +585,20 @@ std::unique_ptr<Expr> Parser::parse_assignable() {
 
         pos++; // consume '('
 
-        std::unique_ptr<Expr> from = nullptr;
+        ExprPtr from = nullptr;
         if (peek().keyword != Keyword::TO) {
             from = parse_expr();
         }
 
         expect(Keyword::TO);
 
-        std::unique_ptr<Expr> to = nullptr;
+        ExprPtr to = nullptr;
         if (peek().type != TokenType::RightParen) {
             to = parse_expr();
         }
         expect(TokenType::RightParen);
 
-        auto slice = std::make_unique<SliceExpr>(std::move(base), loc());
+        auto slice = make_node<SliceExpr>(std::move(base), loc());
         slice->from = std::move(from);
         slice->to = std::move(to);
         return slice;
@@ -664,7 +664,7 @@ bool Parser::has_TO(const std::vector<Token>& tokens, size_t pos) {
 
 void Parser::parse_stmt_block(const std::unordered_set<Keyword>& stop_keywords,
                               Keyword& out_stop_keyword,
-                              std::vector<std::unique_ptr<Stmt>>& out_stmts) {
+                              std::vector<StmtPtr>& out_stmts) {
     while (cur_line < tok_file.lines.size()) {
         try {
             out_stop_keyword = Keyword::None;
@@ -684,7 +684,7 @@ void Parser::parse_stmt_block(const std::unordered_set<Keyword>& stop_keywords,
 
 void Parser::parse_stmt_line(const std::unordered_set<Keyword>& stop_keywords,
                              Keyword& out_stop_keyword,
-                             std::vector<std::unique_ptr<Stmt>>& out_stmts) {
+                             std::vector<StmtPtr>& out_stmts) {
     // if line is ASM, create and parse a RemStmt
     if (line().source_type == SourceType::ASM) {
         auto rem_stmt = create_rem_stmt();
@@ -715,7 +715,7 @@ void Parser::parse_stmt_line(const std::unordered_set<Keyword>& stop_keywords,
 
 void Parser::parse_stmt_list(const std::unordered_set<Keyword>& stop_keywords,
                              Keyword& out_stop_keyword,
-                             std::vector<std::unique_ptr<Stmt>>& out_stmts) {
+                             std::vector<StmtPtr>& out_stmts) {
     while (!at_end()) {
         if (peek().type == TokenType::Colon) {
             pos++;  // skip colons
@@ -733,15 +733,15 @@ void Parser::parse_stmt_list(const std::unordered_set<Keyword>& stop_keywords,
         }
 
         // parse a statement
-        std::unique_ptr<Stmt> stmt = parse_stmt();
+        StmtPtr stmt = parse_stmt();
         if (stmt) {
             out_stmts.push_back(std::move(stmt));
         }
     }
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt() {
-    std::unique_ptr<Stmt> stmt;
+StmtPtr Parser::parse_stmt() {
+    StmtPtr stmt;
 
     // BASIC pragma statement
     if (peek().type == TokenType::Exclamation ||
@@ -793,7 +793,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
     if (!at_end_of_stmt() &&            // UNTIL cannot be assigned to
             peek().type == TokenType::Identifier) {
         size_t save_pos = pos;
-        std::unique_ptr<Expr> assignable = parse_assignable();
+        ExprPtr assignable = parse_assignable();
         if (peek().type == TokenType::Equal) {
             pos = save_pos;                 // restore position to parse as a LET statement
             auto stmt = parse_stmt_let();   // parse as a LET statement
@@ -848,7 +848,7 @@ bool Parser::parse_label_line_num(std::string& out_label,
     return found_label || found_line_num;
 }
 
-std::unique_ptr<Stmt> Parser::create_rem_stmt() {
+StmtPtr Parser::create_rem_stmt() {
     // create virtual REM statement
     TokLine rem_line;
     rem_line.source_type = SourceType::BASIC;
@@ -886,7 +886,7 @@ void Parser::collect_asm_lines(size_t start_line,
     }
 }
 
-std::unique_ptr<Stmt> Parser::parse_pragma_autostart() {
+StmtPtr Parser::parse_pragma_autostart() {
     expect(TokenType::Equal);
 
     // #AUTOSTART = 0 or 1
@@ -895,7 +895,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_autostart() {
     return nullptr;
 }
 
-std::unique_ptr<Stmt> Parser::parse_pragma_autostart_line() {
+StmtPtr Parser::parse_pragma_autostart_line() {
     expect(TokenType::Equal);
 
     // #AUTOSTART_LINE = line_number
@@ -917,7 +917,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_autostart_line() {
     return nullptr;
 }
 
-std::unique_ptr<Stmt> Parser::parse_pragma_increment() {
+StmtPtr Parser::parse_pragma_increment() {
     // #INCREMENT = number
     expect(TokenType::Equal);
     const Token& num = expect(TokenType::Integer);
@@ -928,7 +928,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_increment() {
     return nullptr;
 }
 
-std::unique_ptr<Stmt> Parser::parse_pragma_reminvert() {
+StmtPtr Parser::parse_pragma_reminvert() {
     // #REMINVERT = 0 or 1
     expect(TokenType::Equal);
     const Token& num = expect(TokenType::Integer);
@@ -936,7 +936,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_reminvert() {
     return nullptr;
 }
 
-std::unique_ptr<Stmt> Parser::parse_pragma_fast() {
+StmtPtr Parser::parse_pragma_fast() {
     // #FAST = 0 or 1
     expect(TokenType::Equal);
     const Token& num = expect(TokenType::Integer);
@@ -944,7 +944,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_fast() {
     return nullptr;
 }
 
-std::unique_ptr<Stmt> Parser::parse_pragma_verbose() {
+StmtPtr Parser::parse_pragma_verbose() {
     // #VERBOSE = 0 or 1
     expect(TokenType::Equal);
     const Token& num = expect(TokenType::Integer);
@@ -952,7 +952,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_verbose() {
     return nullptr;
 }
 
-std::unique_ptr<Stmt> Parser::parse_pragma_vars() {
+StmtPtr Parser::parse_pragma_vars() {
     // parse var[$][(n,n...,n)]
     std::string name;
     std::vector<int> dims;
@@ -1049,7 +1049,7 @@ void Parser::parse_vars_def(std::string& out_var_name,
     // end with pos pointing at the '='
 }
 
-std::unique_ptr<Stmt> Parser::parse_pragma_dfile() {
+StmtPtr Parser::parse_pragma_dfile() {
     // #DFILE = "line 1", "line 2", ...
     expect(TokenType::Equal);
     prog.dfile_lines.clear();
@@ -1066,7 +1066,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_dfile() {
     return nullptr;
 }
 
-std::unique_ptr<Stmt> Parser::parse_pragma_dfile_colapsed() {
+StmtPtr Parser::parse_pragma_dfile_colapsed() {
     // #DFILE_COLAPSED = 0 or 1
     expect(TokenType::Equal);
     const Token& num = expect(TokenType::Integer);
@@ -1074,7 +1074,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_dfile_colapsed() {
     return nullptr;
 }
 
-std::unique_ptr<Stmt> Parser::parse_pragma_sysvars() {
+StmtPtr Parser::parse_pragma_sysvars() {
     // !SYSVARS = nn,nn,nn,...
     expect(TokenType::Equal);
     prog.sysvars_data.clear();
@@ -1095,7 +1095,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_sysvars() {
     return nullptr;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_let() {
+StmtPtr Parser::parse_stmt_let() {
     // Parse LHS assignable expression
     auto lhs = parse_assignable();
     expect(TokenType::Equal);
@@ -1108,7 +1108,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_let() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_dim() {
+StmtPtr Parser::parse_stmt_dim() {
     auto stmt = std::make_unique<DimStmt>(loc());
     while (true) {
         auto item = parse_dim_item();
@@ -1123,7 +1123,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_dim() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_rem() {
+StmtPtr Parser::parse_stmt_rem() {
     // concatenate all remaining tokens in the line into a
     // single string for the REM statement
     // include the whitespace before each token to preserve the original formatting
@@ -1147,7 +1147,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_rem() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_run() {
+StmtPtr Parser::parse_stmt_run() {
     auto stmt = std::make_unique<RunStmt>(loc());
 
     // Parse expression, if any
@@ -1158,7 +1158,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_run() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_list() {
+StmtPtr Parser::parse_stmt_list() {
     auto stmt = std::make_unique<ListStmt>(loc());
 
     // Parse expression, if any
@@ -1169,25 +1169,25 @@ std::unique_ptr<Stmt> Parser::parse_stmt_list() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_new() {
+StmtPtr Parser::parse_stmt_new() {
     return std::make_unique<NewStmt>(loc());
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_cls() {
+StmtPtr Parser::parse_stmt_cls() {
     return std::make_unique<ClsStmt>(loc());
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_load() {
+StmtPtr Parser::parse_stmt_load() {
     auto stmt = std::make_unique<LoadStmt>(parse_expr(), loc());
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_save() {
+StmtPtr Parser::parse_stmt_save() {
     auto stmt = std::make_unique<SaveStmt>(parse_expr(), loc());
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_poke() {
+StmtPtr Parser::parse_stmt_poke() {
     auto address_expr = parse_expr();
     expect(TokenType::Comma);
     auto value_expr = parse_expr();
@@ -1196,7 +1196,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_poke() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_pokew() {
+StmtPtr Parser::parse_stmt_pokew() {
     auto address_expr = parse_expr();
     expect(TokenType::Comma);
     auto value_expr = parse_expr();
@@ -1205,7 +1205,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_pokew() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_plot() {
+StmtPtr Parser::parse_stmt_plot() {
     auto x_expr = parse_expr();
     expect(TokenType::Comma);
     auto y_expr = parse_expr();
@@ -1214,7 +1214,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_plot() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_unplot() {
+StmtPtr Parser::parse_stmt_unplot() {
     auto x_expr = parse_expr();
     expect(TokenType::Comma);
     auto y_expr = parse_expr();
@@ -1223,67 +1223,67 @@ std::unique_ptr<Stmt> Parser::parse_stmt_unplot() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_rand() {
+StmtPtr Parser::parse_stmt_rand() {
     auto seed_expr = parse_expr();
     auto stmt = std::make_unique<RandStmt>(std::move(seed_expr), loc());
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_pause() {
+StmtPtr Parser::parse_stmt_pause() {
     auto duration_expr = parse_expr();
     auto stmt = std::make_unique<PauseStmt>(std::move(duration_expr), loc());
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_fast() {
+StmtPtr Parser::parse_stmt_fast() {
     auto stmt = std::make_unique<FastStmt>(loc());
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_slow() {
+StmtPtr Parser::parse_stmt_slow() {
     auto stmt = std::make_unique<SlowStmt>(loc());
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_scroll() {
+StmtPtr Parser::parse_stmt_scroll() {
     return std::make_unique<ScrollStmt>(loc());
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_cont() {
+StmtPtr Parser::parse_stmt_cont() {
     return std::make_unique<ContStmt>(loc());
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_clear() {
+StmtPtr Parser::parse_stmt_clear() {
     return std::make_unique<ClearStmt>(loc());
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_exit() {
+StmtPtr Parser::parse_stmt_exit() {
     return std::make_unique<ExitStmt>(loc());
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_goto() {
+StmtPtr Parser::parse_stmt_goto() {
     auto stmt = std::make_unique<GotoStmt>(parse_expr(), loc());
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_gosub() {
+StmtPtr Parser::parse_stmt_gosub() {
     auto stmt = std::make_unique<GosubStmt>(parse_expr(), loc());
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_return() {
+StmtPtr Parser::parse_stmt_return() {
     return std::make_unique<ReturnStmt>(loc());
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_stop() {
+StmtPtr Parser::parse_stmt_stop() {
     return std::make_unique<StopStmt>(loc());
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_end() {
+StmtPtr Parser::parse_stmt_end() {
     return std::make_unique<EndStmt>(loc());
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_print() {
+StmtPtr Parser::parse_stmt_print() {
     auto stmt = std::make_unique<PrintStmt>(loc());
     while (!at_end_of_stmt()) {
         PrintItem item;
@@ -1314,7 +1314,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_print() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_input() {
+StmtPtr Parser::parse_stmt_input() {
     auto stmt = std::make_unique<InputStmt>(loc());
     while (true) {
         auto var = parse_assignable();
@@ -1328,7 +1328,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_input() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_if() {
+StmtPtr Parser::parse_stmt_if() {
     auto condition = parse_expr();
     expect(Keyword::THEN);
 
@@ -1377,7 +1377,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_if() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_repeat() {
+StmtPtr Parser::parse_stmt_repeat() {
     auto stmt = std::make_unique<RepeatStmt>(nullptr, loc());
 
     // REPEAT at end of line -> block form:
@@ -1408,7 +1408,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_repeat() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_while() {
+StmtPtr Parser::parse_stmt_while() {
     auto stmt = std::make_unique<WhileStmt>(parse_expr(), loc());
 
     // WHILE condition at end of line -> block form:
@@ -1437,7 +1437,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_while() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_for() {
+StmtPtr Parser::parse_stmt_for() {
     if (at_end_of_stmt()) {		// guard against FOR UNTIL=...
         syntax_error("Expected variable name, found '" + peek().text + "'");
     }
@@ -1451,12 +1451,12 @@ std::unique_ptr<Stmt> Parser::parse_stmt_for() {
     expect(Keyword::TO);
     auto end_expr = parse_expr();
 
-    std::unique_ptr<Expr> step_expr;
+    ExprPtr step_expr;
     if (match(Keyword::STEP)) {
         step_expr = parse_expr();
     }
     else {
-        auto default_step = std::make_unique<NumberExpr>(1.0, loc());
+        auto default_step = make_node<NumberExpr>(1.0, loc());
         step_expr = std::move(default_step);
     }
 
@@ -1508,7 +1508,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_for() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_def() {
+StmtPtr Parser::parse_stmt_def() {
     const Token& ident = expect(TokenType::Identifier);
     if (str_toupper(ident.text).compare(0, 4, "PROC") == 0) {
         return parse_stmt_def_proc(ident.text);
@@ -1522,7 +1522,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def() {
     }
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_def_proc(const std::string& name) {
+StmtPtr Parser::parse_stmt_def_proc(const std::string& name) {
     auto stmt = std::make_unique<DefProcStmt>(name, loc());
 
     expect(TokenType::LeftParen);
@@ -1560,7 +1560,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def_proc(const std::string& name) {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_def_fn(const std::string& name) {
+StmtPtr Parser::parse_stmt_def_fn(const std::string& name) {
     auto stmt = std::make_unique<DefFnStmt>(name, loc());
 
     expect(TokenType::LeftParen);
@@ -1591,7 +1591,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def_fn(const std::string& name) {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_proc_call() {
+StmtPtr Parser::parse_stmt_proc_call() {
     const Token& ident = expect(TokenType::Identifier);
 
     auto stmt = std::make_unique<ProcCallStmt>(ident.text, loc());
@@ -1626,7 +1626,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_proc_call() {
     return stmt;
 }
 
-std::unique_ptr<Stmt> Parser::parse_stmt_local() {
+StmtPtr Parser::parse_stmt_local() {
     auto stmt = std::make_unique<LocalStmt>(loc());
     while (true) {
         const Token& ident = expect(TokenType::Identifier);

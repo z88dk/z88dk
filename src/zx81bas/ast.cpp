@@ -7,9 +7,11 @@
 #include "ast.h"
 #include "dump_context.h"
 #include "errors.h"
+#include "lower_bas.h"
 #include "release_assert.h"
 #include "utils.h"
-#include <algorithm>
+#include "walker.h"
+#include <memory>
 #include <string>
 
 bool is_string_variable(const std::string& name) {
@@ -29,7 +31,7 @@ static void dump_expr_base(const Expr* e, DumpContext ctx) {
 }
 
 static void dump_expr_list(const char* name,
-                           const std::vector<std::unique_ptr<Expr>>& list,
+                           const std::vector<ExprPtr>& list,
                            DumpContext& ctx) {
     ctx.line(std::string(name) + ": [");
     auto child_ctx = ctx.child();
@@ -58,7 +60,7 @@ static void dump_stmt_common(const Stmt& stmt, DumpContext& ctx) {
 }
 
 static void dump_stmt_list(const char* name,
-                           const std::vector<std::unique_ptr<Stmt>>& list,
+                           const std::vector<StmtPtr>& list,
                            DumpContext& ctx) {
     ctx.line(std::string(name) + ": [");
     auto child_ctx = ctx.child();
@@ -173,7 +175,7 @@ int precedence(const Expr& e) {
 NumberExpr::NumberExpr(double value_, SourceLoc loc_)
     : Expr(ExprType::Number, loc_), value(value_) {}
 
-std::unique_ptr<Expr> NumberExpr::clone() const {
+ExprPtr NumberExpr::clone() const {
     return std::make_unique<NumberExpr>(value, loc);
 }
 
@@ -183,6 +185,10 @@ void NumberExpr::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+LoweredExpr NumberExpr::lower(LoweringPass& p) {
+    return p.lower_number(*this);
 }
 
 #ifdef _DEBUG
@@ -198,7 +204,7 @@ void NumberExpr::dump(DumpContext ctx) const {
 LabelLineRefExpr::LabelLineRefExpr(const std::string& name_, SourceLoc loc_)
     : Expr(ExprType::Number, loc_), name(name_) {}
 
-std::unique_ptr<Expr> LabelLineRefExpr::clone() const {
+ExprPtr LabelLineRefExpr::clone() const {
     return std::make_unique<LabelLineRefExpr>(name, loc);
 }
 
@@ -208,6 +214,10 @@ void LabelLineRefExpr::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+LoweredExpr LabelLineRefExpr::lower(LoweringPass& p) {
+    return p.lower_label_line_ref(*this);
 }
 
 #ifdef _DEBUG
@@ -223,7 +233,7 @@ void LabelLineRefExpr::dump(DumpContext ctx) const {
 LabelAddrRefExpr::LabelAddrRefExpr(const std::string& name_, SourceLoc loc_)
     : Expr(ExprType::Number, loc_), name(name_) {}
 
-std::unique_ptr<Expr> LabelAddrRefExpr::clone() const {
+ExprPtr LabelAddrRefExpr::clone() const {
     return std::make_unique<LabelAddrRefExpr>(name, loc);
 }
 
@@ -233,6 +243,10 @@ void LabelAddrRefExpr::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+LoweredExpr LabelAddrRefExpr::lower(LoweringPass& p) {
+    return p.lower_label_addr_ref(*this);
 }
 
 #ifdef _DEBUG
@@ -248,7 +262,7 @@ void LabelAddrRefExpr::dump(DumpContext ctx) const {
 StringLiteralExpr::StringLiteralExpr(std::string val, SourceLoc loc_)
     : Expr(ExprType::String, loc_), value(std::move(val)) {}
 
-std::unique_ptr<Expr> StringLiteralExpr::clone() const {
+ExprPtr StringLiteralExpr::clone() const {
     return std::make_unique<StringLiteralExpr>(value, loc);
 }
 
@@ -258,6 +272,10 @@ void StringLiteralExpr::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+LoweredExpr StringLiteralExpr::lower(LoweringPass& p) {
+    return p.lower_string_literal(*this);
 }
 
 #ifdef _DEBUG
@@ -275,7 +293,7 @@ VariableExpr::VariableExpr(const std::string& name_, SourceLoc loc_)
            ExprType::String : ExprType::Number, loc_),
       name(name_) {}
 
-std::unique_ptr<Expr> VariableExpr::clone() const {
+ExprPtr VariableExpr::clone() const {
     return std::make_unique<VariableExpr>(name, loc);
 }
 
@@ -285,6 +303,10 @@ void VariableExpr::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+LoweredExpr VariableExpr::lower(LoweringPass& p) {
+    return p.lower_variable(*this);
 }
 
 #ifdef _DEBUG
@@ -302,7 +324,7 @@ ArrayRefExpr::ArrayRefExpr(const std::string& name_, SourceLoc loc_)
            ExprType::String : ExprType::Number, loc_),
       name(name_) {}
 
-std::unique_ptr<Expr> ArrayRefExpr::clone() const {
+ExprPtr ArrayRefExpr::clone() const {
     auto e = std::make_unique<ArrayRefExpr>(name, loc);
     for (auto& index : indices) {
         e->indices.push_back(index->clone());
@@ -321,6 +343,10 @@ void ArrayRefExpr::accept(ASTVisitor& v) {
     }
 }
 
+LoweredExpr ArrayRefExpr::lower(LoweringPass& p) {
+    return p.lower_array_ref(*this);
+}
+
 #ifdef _DEBUG
 void ArrayRefExpr::dump(DumpContext ctx) const {
     ctx.line("ArrayRefExpr {");
@@ -332,10 +358,10 @@ void ArrayRefExpr::dump(DumpContext ctx) const {
 }
 #endif
 
-SliceExpr::SliceExpr(std::unique_ptr<Expr> base_, SourceLoc loc_)
+SliceExpr::SliceExpr(ExprPtr base_, SourceLoc loc_)
     : Expr(ExprType::String, loc_), base(std::move(base_)) {}
 
-std::unique_ptr<Expr> SliceExpr::clone() const {
+ExprPtr SliceExpr::clone() const {
     auto e = std::make_unique<SliceExpr>(base->clone(), loc);
     if (from) {
         e->from = from->clone();
@@ -357,6 +383,10 @@ void SliceExpr::accept(ASTVisitor& v) {
     }
 }
 
+LoweredExpr SliceExpr::lower(LoweringPass& p) {
+    return p.lower_slice(*this);
+}
+
 #ifdef _DEBUG
 void SliceExpr::dump(DumpContext ctx) const {
     ctx.line("SliceExpr {");
@@ -369,11 +399,11 @@ void SliceExpr::dump(DumpContext ctx) const {
 }
 #endif
 
-UnaryExpr::UnaryExpr(TokenType op_, std::unique_ptr<Expr> operand_,
+UnaryExpr::UnaryExpr(TokenType op_, ExprPtr operand_,
                      SourceLoc loc_)
     : Expr(operand_->type, loc_), op(op_), operand(std::move(operand_)) {}
 
-std::unique_ptr<Expr> UnaryExpr::clone() const {
+ExprPtr UnaryExpr::clone() const {
     return std::make_unique<UnaryExpr>(op, operand->clone(), loc);
 }
 
@@ -384,6 +414,10 @@ void UnaryExpr::accept(ASTVisitor& v) {
         v.walk_expr(operand);
         v.leave(*this);
     }
+}
+
+LoweredExpr UnaryExpr::lower(LoweringPass& p) {
+    return p.lower_unary(*this);
 }
 
 #ifdef _DEBUG
@@ -398,13 +432,13 @@ void UnaryExpr::dump(DumpContext ctx) const {
 #endif
 
 BinaryExpr::BinaryExpr(TokenType op_,
-                       std::unique_ptr<Expr> lhs_,
-                       std::unique_ptr<Expr> rhs_, SourceLoc loc_)
+                       ExprPtr lhs_,
+                       ExprPtr rhs_, SourceLoc loc_)
     : Expr(lhs_->type, loc_), op(op_),
       lhs(std::move(lhs_)),
       rhs(std::move(rhs_)) {}
 
-std::unique_ptr<Expr> BinaryExpr::clone() const {
+ExprPtr BinaryExpr::clone() const {
     return std::make_unique<BinaryExpr>(op, lhs->clone(), rhs->clone(), loc);
 }
 
@@ -416,6 +450,10 @@ void BinaryExpr::accept(ASTVisitor& v) {
         v.walk_expr(rhs);
         v.leave(*this);
     }
+}
+
+LoweredExpr BinaryExpr::lower(LoweringPass& p) {
+    return p.lower_binary(*this);
 }
 
 #ifdef _DEBUG
@@ -444,7 +482,7 @@ BasicFuncCallExpr::BasicFuncCallExpr(Keyword keyword_, SourceLoc loc_)
     }
 }
 
-std::unique_ptr<Expr> BasicFuncCallExpr::clone() const {
+ExprPtr BasicFuncCallExpr::clone() const {
     auto e = std::make_unique<BasicFuncCallExpr>(keyword, loc);
     for (auto& arg : args) {
         e->args.push_back(arg->clone());
@@ -463,6 +501,10 @@ void BasicFuncCallExpr::accept(ASTVisitor& v) {
     }
 }
 
+LoweredExpr BasicFuncCallExpr::lower(LoweringPass& p) {
+    return p.lower_basic_func_call(*this);
+}
+
 #ifdef _DEBUG
 void BasicFuncCallExpr::dump(DumpContext ctx) const {
     ctx.line("BasicFuncCallExpr {");
@@ -477,7 +519,7 @@ void BasicFuncCallExpr::dump(DumpContext ctx) const {
 ProcCallExpr::ProcCallExpr(const std::string& name_, SourceLoc loc_)
     : Expr(ExprType::Number, loc_), name(name_) {}
 
-std::unique_ptr<Expr> ProcCallExpr::clone() const {
+ExprPtr ProcCallExpr::clone() const {
     auto e = std::make_unique<ProcCallExpr>(name, loc);
     for (auto& arg : args) {
         e->args.push_back(arg->clone());
@@ -496,6 +538,10 @@ void ProcCallExpr::accept(ASTVisitor& v) {
     }
 }
 
+LoweredExpr ProcCallExpr::lower(LoweringPass& p) {
+    return p.lower_proc_call_expr(*this);
+}
+
 #ifdef _DEBUG
 void ProcCallExpr::dump(DumpContext ctx) const {
     ctx.line("ProcCallExpr {");
@@ -510,7 +556,7 @@ void ProcCallExpr::dump(DumpContext ctx) const {
 FnCallExpr::FnCallExpr(const std::string& name_, SourceLoc loc_)
     : Expr(ExprType::Number, loc_), name(name_) {}
 
-std::unique_ptr<Expr> FnCallExpr::clone() const {
+ExprPtr FnCallExpr::clone() const {
     auto e = std::make_unique<FnCallExpr>(name, loc);
     for (auto& arg : args) {
         e->args.push_back(arg->clone());
@@ -527,6 +573,10 @@ void FnCallExpr::accept(ASTVisitor& v) {
         }
         v.leave(*this);
     }
+}
+
+LoweredExpr FnCallExpr::lower(LoweringPass& p) {
+    return p.lower_fn_call(*this);
 }
 
 #ifdef _DEBUG
@@ -552,7 +602,7 @@ LabelStmt::LabelStmt(const std::string& label_, const SourceLoc& loc_)
     : Stmt(loc_), label(label_) {
 }
 
-std::unique_ptr<Stmt> LabelStmt::clone() const {
+StmtPtr LabelStmt::clone() const {
     auto s = std::make_unique<LabelStmt>(label, loc);
     return s;
 }
@@ -563,6 +613,10 @@ void LabelStmt::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+std::vector<StmtPtr> LabelStmt::lower(LoweringPass& p) {
+    return p.lower_label(*this);
 }
 
 #ifdef _DEBUG
@@ -579,7 +633,7 @@ LineNumStmt::LineNumStmt(int line_num_, const SourceLoc& loc_)
     : Stmt(loc_), line_num(line_num_) {
 }
 
-std::unique_ptr<Stmt> LineNumStmt::clone() const {
+StmtPtr LineNumStmt::clone() const {
     auto s = std::make_unique<LineNumStmt>(line_num, loc);
     return s;
 }
@@ -592,6 +646,10 @@ void LineNumStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> LineNumStmt::lower(LoweringPass& p) {
+    return p.lower_line_num(*this);
+}
+
 #ifdef _DEBUG
 void LineNumStmt::dump(DumpContext ctx) const {
     ctx.line("LineNumStmt {");
@@ -602,12 +660,12 @@ void LineNumStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-LetStmt::LetStmt(std::unique_ptr<Expr> lhs_, std::unique_ptr<Expr> rhs_,
+LetStmt::LetStmt(ExprPtr lhs_, ExprPtr rhs_,
                  const SourceLoc& loc_)
     : Stmt(loc_), lhs(std::move(lhs_)), rhs(std::move(rhs_)) {
 }
 
-std::unique_ptr<Stmt> LetStmt::clone() const {
+StmtPtr LetStmt::clone() const {
     auto s = std::make_unique<LetStmt>(lhs->clone(), rhs->clone(), loc);
     return s;
 }
@@ -622,6 +680,10 @@ void LetStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> LetStmt::lower(LoweringPass& p) {
+    return p.lower_let(*this);
+}
+
 #ifdef _DEBUG
 void LetStmt::dump(DumpContext ctx) const {
     ctx.line("LetStmt {");
@@ -633,7 +695,7 @@ void LetStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> DimStmt::clone() const {
+StmtPtr DimStmt::clone() const {
     auto s = std::make_unique<DimStmt>(loc);
     for (auto& item : items) {
         DimItem new_item;
@@ -659,6 +721,10 @@ void DimStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> DimStmt::lower(LoweringPass& p) {
+    return p.lower_dim(*this);
+}
+
 #ifdef _DEBUG
 void DimItem::dump(DumpContext ctx) const {
     ctx.line("DimItem {");
@@ -682,11 +748,11 @@ void DimStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-IfStmt::IfStmt(std::unique_ptr<Expr> condition_, const SourceLoc& loc_)
+IfStmt::IfStmt(ExprPtr condition_, const SourceLoc& loc_)
     : Stmt(loc_), condition(std::move(condition_)) {
 }
 
-std::unique_ptr<Stmt> IfStmt::clone() const {
+StmtPtr IfStmt::clone() const {
     auto s = std::make_unique<IfStmt>(condition->clone(), loc);
     for (auto& stmt : then_stmts) {
         s->then_stmts.push_back(stmt->clone());
@@ -708,6 +774,10 @@ void IfStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> IfStmt::lower(LoweringPass& p) {
+    return p.lower_if(*this);
+}
+
 #ifdef _DEBUG
 void IfStmt::dump(DumpContext ctx) const {
     ctx.line("IfStmt {");
@@ -720,11 +790,11 @@ void IfStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-RepeatStmt::RepeatStmt(std::unique_ptr<Expr> condition_, const SourceLoc& loc_)
+RepeatStmt::RepeatStmt(ExprPtr condition_, const SourceLoc& loc_)
     : Stmt(loc_), condition(std::move(condition_)) {
 }
 
-std::unique_ptr<Stmt> RepeatStmt::clone() const {
+StmtPtr RepeatStmt::clone() const {
     auto s = std::make_unique<RepeatStmt>(condition->clone(), loc);
     for (auto& stmt : body) {
         s->body.push_back(stmt->clone());
@@ -742,6 +812,10 @@ void RepeatStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> RepeatStmt::lower(LoweringPass& p) {
+    return p.lower_repeat(*this);
+}
+
 #ifdef _DEBUG
 void RepeatStmt::dump(DumpContext ctx) const {
     ctx.line("RepeatStmt {");
@@ -755,11 +829,11 @@ void RepeatStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-WhileStmt::WhileStmt(std::unique_ptr<Expr> condition_, const SourceLoc& loc_)
+WhileStmt::WhileStmt(ExprPtr condition_, const SourceLoc& loc_)
     : Stmt(loc_), condition(std::move(condition_)) {
 }
 
-std::unique_ptr<Stmt> WhileStmt::clone() const {
+StmtPtr WhileStmt::clone() const {
     auto s = std::make_unique<WhileStmt>(condition->clone(), loc);
     for (auto& stmt : body) {
         s->body.push_back(stmt->clone());
@@ -777,6 +851,10 @@ void WhileStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> WhileStmt::lower(LoweringPass& p) {
+    return p.lower_while(*this);
+}
+
 #ifdef _DEBUG
 void WhileStmt::dump(DumpContext ctx) const {
     ctx.line("WhileStmt {");
@@ -790,14 +868,14 @@ void WhileStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-ForStmt::ForStmt(const std::string& name_, std::unique_ptr<Expr> start_expr_,
-                 std::unique_ptr<Expr> end_expr_, std::unique_ptr<Expr> step_expr_,
+ForStmt::ForStmt(const std::string& name_, ExprPtr start_expr_,
+                 ExprPtr end_expr_, ExprPtr step_expr_,
                  const SourceLoc& loc_)
     : Stmt(loc_), name(name_), start_expr(std::move(start_expr_)),
       end_expr(std::move(end_expr_)), step_expr(std::move(step_expr_)) {
 }
 
-std::unique_ptr<Stmt> ForStmt::clone() const {
+StmtPtr ForStmt::clone() const {
     auto s = std::make_unique<ForStmt>(name,
                                        start_expr->clone(),
                                        end_expr->clone(),
@@ -821,6 +899,10 @@ void ForStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> ForStmt::lower(LoweringPass& p) {
+    return p.lower_for(*this);
+}
+
 #ifdef _DEBUG
 void ForStmt::dump(DumpContext ctx) const {
     ctx.line("ForStmt {");
@@ -840,7 +922,7 @@ NextStmt::NextStmt(const std::string& name_, const SourceLoc& loc_)
     : Stmt(loc_), name(name_) {
 }
 
-std::unique_ptr<Stmt> NextStmt::clone() const {
+StmtPtr NextStmt::clone() const {
     auto s = std::make_unique<NextStmt>(name, loc);
     return s;
 }
@@ -851,6 +933,10 @@ void NextStmt::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+std::vector<StmtPtr> NextStmt::lower(LoweringPass& p) {
+    return p.lower_next(*this);
 }
 
 #ifdef _DEBUG
@@ -867,7 +953,7 @@ DefProcStmt::DefProcStmt(const std::string& name_, const SourceLoc& loc_)
     : Stmt(loc_), name(name_) {
 }
 
-std::unique_ptr<Stmt> DefProcStmt::clone() const {
+StmtPtr DefProcStmt::clone() const {
     auto s = std::make_unique<DefProcStmt>(name, loc);
     s->params = params;
     s->locals = locals;
@@ -887,6 +973,10 @@ void DefProcStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> DefProcStmt::lower(LoweringPass& p) {
+    return p.lower_def_proc(*this);
+}
+
 #ifdef _DEBUG
 void DefProcStmt::dump(DumpContext ctx) const {
     ctx.line("DefProcStmt {");
@@ -904,7 +994,7 @@ ProcCallStmt::ProcCallStmt(const std::string& name_, const SourceLoc& loc_)
     : Stmt(loc_), name(name_) {
 }
 
-std::unique_ptr<Stmt> ProcCallStmt::clone() const {
+StmtPtr ProcCallStmt::clone() const {
     auto s = std::make_unique<ProcCallStmt>(name, loc);
     for (auto& arg : args) {
         s->args.push_back(arg->clone());
@@ -923,6 +1013,10 @@ void ProcCallStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> ProcCallStmt::lower(LoweringPass& p) {
+    return p.lower_proc_call(*this);
+}
+
 #ifdef _DEBUG
 void ProcCallStmt::dump(DumpContext ctx) const {
     ctx.line("ProcCallStmt {");
@@ -934,7 +1028,7 @@ void ProcCallStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> LocalStmt::clone() const {
+StmtPtr LocalStmt::clone() const {
     auto s = std::make_unique<LocalStmt>(loc);
     s->locals = locals;
     return s;
@@ -946,6 +1040,10 @@ void LocalStmt::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+std::vector<StmtPtr> LocalStmt::lower(LoweringPass& p) {
+    return p.lower_local(*this);
 }
 
 #ifdef _DEBUG
@@ -962,7 +1060,7 @@ DefFnStmt::DefFnStmt(const std::string& name_, const SourceLoc& loc_)
     : Stmt(loc_), name(name_) {
 }
 
-std::unique_ptr<Stmt> DefFnStmt::clone() const {
+StmtPtr DefFnStmt::clone() const {
     auto s = std::make_unique<DefFnStmt>(name, loc);
     s->params = params;
     s->expr = expr->clone();
@@ -978,6 +1076,10 @@ void DefFnStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> DefFnStmt::lower(LoweringPass& p) {
+    return p.lower_def_fn(*this);
+}
+
 #ifdef _DEBUG
 void DefFnStmt::dump(DumpContext ctx) const {
     ctx.line("DefFnStmt {");
@@ -990,7 +1092,7 @@ void DefFnStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> ExitStmt::clone() const {
+StmtPtr ExitStmt::clone() const {
     auto s = std::make_unique<ExitStmt>(loc);
     return s;
 }
@@ -1003,6 +1105,10 @@ void ExitStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> ExitStmt::lower(LoweringPass& p) {
+    return p.lower_exit(*this);
+}
+
 #ifdef _DEBUG
 void ExitStmt::dump(DumpContext ctx) const {
     ctx.line("ExitStmt {");
@@ -1012,11 +1118,11 @@ void ExitStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-GotoStmt::GotoStmt(std::unique_ptr<Expr> target_expr_, const SourceLoc& loc_)
+GotoStmt::GotoStmt(ExprPtr target_expr_, const SourceLoc& loc_)
     : Stmt(loc_), target_expr(std::move(target_expr_)) {
 }
 
-std::unique_ptr<Stmt> GotoStmt::clone() const {
+StmtPtr GotoStmt::clone() const {
     auto s = std::make_unique<GotoStmt>(target_expr->clone(), loc);
     return s;
 }
@@ -1030,6 +1136,10 @@ void GotoStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> GotoStmt::lower(LoweringPass& p) {
+    return p.lower_goto(*this);
+}
+
 #ifdef _DEBUG
 void GotoStmt::dump(DumpContext ctx) const {
     ctx.line("GotoStmt {");
@@ -1040,11 +1150,11 @@ void GotoStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-GosubStmt::GosubStmt(std::unique_ptr<Expr> target_expr_, const SourceLoc& loc_)
+GosubStmt::GosubStmt(ExprPtr target_expr_, const SourceLoc& loc_)
     : Stmt(loc_), target_expr(std::move(target_expr_)) {
 }
 
-std::unique_ptr<Stmt> GosubStmt::clone() const {
+StmtPtr GosubStmt::clone() const {
     auto s = std::make_unique<GosubStmt>(target_expr->clone(), loc);
     return s;
 }
@@ -1058,6 +1168,10 @@ void GosubStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> GosubStmt::lower(LoweringPass& p) {
+    return p.lower_gosub(*this);
+}
+
 #ifdef _DEBUG
 void GosubStmt::dump(DumpContext ctx) const {
     ctx.line("GosubStmt {");
@@ -1068,7 +1182,7 @@ void GosubStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> ReturnStmt::clone() const {
+StmtPtr ReturnStmt::clone() const {
     auto s = std::make_unique<ReturnStmt>(loc);
     return s;
 }
@@ -1081,6 +1195,10 @@ void ReturnStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> ReturnStmt::lower(LoweringPass& p) {
+    return p.lower_return(*this);
+}
+
 #ifdef _DEBUG
 void ReturnStmt::dump(DumpContext ctx) const {
     ctx.line("ReturnStmt {");
@@ -1090,7 +1208,7 @@ void ReturnStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> StopStmt::clone() const {
+StmtPtr StopStmt::clone() const {
     auto s = std::make_unique<StopStmt>(loc);
     return s;
 }
@@ -1103,6 +1221,10 @@ void StopStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> StopStmt::lower(LoweringPass& p) {
+    return p.lower_stop(*this);
+}
+
 #ifdef _DEBUG
 void StopStmt::dump(DumpContext ctx) const {
     ctx.line("StopStmt {");
@@ -1112,7 +1234,7 @@ void StopStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> EndStmt::clone() const {
+StmtPtr EndStmt::clone() const {
     auto s = std::make_unique<EndStmt>(loc);
     return s;
 }
@@ -1125,6 +1247,10 @@ void EndStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> EndStmt::lower(LoweringPass& p) {
+    return p.lower_end(*this);
+}
+
 #ifdef _DEBUG
 void EndStmt::dump(DumpContext ctx) const {
     ctx.line("EndStmt {");
@@ -1134,7 +1260,7 @@ void EndStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> PrintStmt::clone() const {
+StmtPtr PrintStmt::clone() const {
     auto s = std::make_unique<PrintStmt>(loc);
     for (auto& item : items) {
         PrintItem new_item;
@@ -1168,6 +1294,10 @@ void PrintStmt::accept(ASTVisitor& v) {
         }
         v.leave(*this);
     }
+}
+
+std::vector<StmtPtr> PrintStmt::lower(LoweringPass& p) {
+    return p.lower_print(*this);
 }
 
 #ifdef _DEBUG
@@ -1214,7 +1344,7 @@ void PrintStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> InputStmt::clone() const {
+StmtPtr InputStmt::clone() const {
     auto s = std::make_unique<InputStmt>(loc);
     for (auto& var : vars) {
         s->vars.push_back(var->clone());
@@ -1233,6 +1363,10 @@ void InputStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> InputStmt::lower(LoweringPass& p) {
+    return p.lower_input(*this);
+}
+
 #ifdef _DEBUG
 void InputStmt::dump(DumpContext ctx) const {
     ctx.line("InputStmt {");
@@ -1247,7 +1381,7 @@ RemStmt::RemStmt(const std::string& text_, const SourceLoc& loc_)
     : Stmt(loc_), text(text_) {
 }
 
-std::unique_ptr<Stmt> RemStmt::clone() const {
+StmtPtr RemStmt::clone() const {
     auto s = std::make_unique<RemStmt>(text, loc);
     s->asm_lines = asm_lines;
     return s;
@@ -1261,6 +1395,10 @@ void RemStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> RemStmt::lower(LoweringPass& p) {
+    return p.lower_rem(*this);
+}
+
 #ifdef _DEBUG
 void RemStmt::dump(DumpContext ctx) const {
     ctx.line("RemStmt {");
@@ -1272,7 +1410,7 @@ void RemStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> RunStmt::clone() const {
+StmtPtr RunStmt::clone() const {
     auto s = std::make_unique<RunStmt>(loc);
     if (target_expr) {
         s->target_expr = target_expr->clone();
@@ -1289,6 +1427,10 @@ void RunStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> RunStmt::lower(LoweringPass& p) {
+    return p.lower_run(*this);
+}
+
 #ifdef _DEBUG
 void RunStmt::dump(DumpContext ctx) const {
     ctx.line("RunStmt {");
@@ -1299,7 +1441,7 @@ void RunStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> ListStmt::clone() const {
+StmtPtr ListStmt::clone() const {
     auto s = std::make_unique<ListStmt>(loc);
     if (target_expr) {
         s->target_expr = target_expr->clone();
@@ -1316,6 +1458,10 @@ void ListStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> ListStmt::lower(LoweringPass& p) {
+    return p.lower_list(*this);
+}
+
 #ifdef _DEBUG
 void ListStmt::dump(DumpContext ctx) const {
     ctx.line("ListStmt {");
@@ -1326,7 +1472,7 @@ void ListStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> NewStmt::clone() const {
+StmtPtr NewStmt::clone() const {
     auto s = std::make_unique<NewStmt>(loc);
     return s;
 }
@@ -1339,6 +1485,10 @@ void NewStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> NewStmt::lower(LoweringPass& p) {
+    return p.lower_new(*this);
+}
+
 #ifdef _DEBUG
 void NewStmt::dump(DumpContext ctx) const {
     ctx.line("NewStmt {");
@@ -1348,7 +1498,7 @@ void NewStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> ClsStmt::clone() const {
+StmtPtr ClsStmt::clone() const {
     auto s = std::make_unique<ClsStmt>(loc);
     return s;
 }
@@ -1361,6 +1511,10 @@ void ClsStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> ClsStmt::lower(LoweringPass& p) {
+    return p.lower_cls(*this);
+}
+
 #ifdef _DEBUG
 void ClsStmt::dump(DumpContext ctx) const {
     ctx.line("ClsStmt {");
@@ -1370,11 +1524,11 @@ void ClsStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-LoadStmt::LoadStmt(std::unique_ptr<Expr> filename_expr_, const SourceLoc& loc_)
+LoadStmt::LoadStmt(ExprPtr filename_expr_, const SourceLoc& loc_)
     : Stmt(loc_), filename_expr(std::move(filename_expr_)) {
 }
 
-std::unique_ptr<Stmt> LoadStmt::clone() const {
+StmtPtr LoadStmt::clone() const {
     auto s = std::make_unique<LoadStmt>(filename_expr->clone(), loc);
     return s;
 }
@@ -1388,6 +1542,10 @@ void LoadStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> LoadStmt::lower(LoweringPass& p) {
+    return p.lower_load(*this);
+}
+
 #ifdef _DEBUG
 void LoadStmt::dump(DumpContext ctx) const {
     ctx.line("LoadStmt {");
@@ -1398,11 +1556,11 @@ void LoadStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-SaveStmt::SaveStmt(std::unique_ptr<Expr> filename_expr_, const SourceLoc& loc_)
+SaveStmt::SaveStmt(ExprPtr filename_expr_, const SourceLoc& loc_)
     : Stmt(loc_), filename_expr(std::move(filename_expr_)) {
 }
 
-std::unique_ptr<Stmt> SaveStmt::clone() const {
+StmtPtr SaveStmt::clone() const {
     auto s = std::make_unique<SaveStmt>(filename_expr->clone(), loc);
     return s;
 }
@@ -1416,6 +1574,10 @@ void SaveStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> SaveStmt::lower(LoweringPass& p) {
+    return p.lower_save(*this);
+}
+
 #ifdef _DEBUG
 void SaveStmt::dump(DumpContext ctx) const {
     ctx.line("SaveStmt {");
@@ -1426,13 +1588,13 @@ void SaveStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-PokeStmt::PokeStmt(std::unique_ptr<Expr> address_expr_,
-                   std::unique_ptr<Expr> value_expr_, const SourceLoc& loc_)
+PokeStmt::PokeStmt(ExprPtr address_expr_,
+                   ExprPtr value_expr_, const SourceLoc& loc_)
     : Stmt(loc_), address_expr(std::move(address_expr_)),
       value_expr(std::move(value_expr_)) {
 }
 
-std::unique_ptr<Stmt> PokeStmt::clone() const {
+StmtPtr PokeStmt::clone() const {
     auto s = std::make_unique<PokeStmt>(address_expr->clone(), value_expr->clone(),
                                         loc);
     return s;
@@ -1448,6 +1610,10 @@ void PokeStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> PokeStmt::lower(LoweringPass& p) {
+    return p.lower_poke(*this);
+}
+
 #ifdef _DEBUG
 void PokeStmt::dump(DumpContext ctx) const {
     ctx.line("PokeStmt {");
@@ -1459,13 +1625,13 @@ void PokeStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-PokewStmt::PokewStmt(std::unique_ptr<Expr> address_expr_,
-                     std::unique_ptr<Expr> value_expr_, const SourceLoc& loc_)
+PokewStmt::PokewStmt(ExprPtr address_expr_,
+                     ExprPtr value_expr_, const SourceLoc& loc_)
     : Stmt(loc_), address_expr(std::move(address_expr_)),
       value_expr(std::move(value_expr_)) {
 }
 
-std::unique_ptr<Stmt> PokewStmt::clone() const {
+StmtPtr PokewStmt::clone() const {
     auto s = std::make_unique<PokewStmt>(address_expr->clone(), value_expr->clone(),
                                          loc);
     return s;
@@ -1481,6 +1647,10 @@ void PokewStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> PokewStmt::lower(LoweringPass& p) {
+    return p.lower_pokew(*this);
+}
+
 #ifdef _DEBUG
 void PokewStmt::dump(DumpContext ctx) const {
     ctx.line("PokewStmt {");
@@ -1492,12 +1662,12 @@ void PokewStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-PlotStmt::PlotStmt(std::unique_ptr<Expr> x_expr_, std::unique_ptr<Expr> y_expr_,
+PlotStmt::PlotStmt(ExprPtr x_expr_, ExprPtr y_expr_,
                    const SourceLoc& loc_)
     : Stmt(loc_), x_expr(std::move(x_expr_)), y_expr(std::move(y_expr_)) {
 }
 
-std::unique_ptr<Stmt> PlotStmt::clone() const {
+StmtPtr PlotStmt::clone() const {
     auto s = std::make_unique<PlotStmt>(x_expr->clone(), y_expr->clone(), loc);
     return s;
 }
@@ -1512,6 +1682,10 @@ void PlotStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> PlotStmt::lower(LoweringPass& p) {
+    return p.lower_plot(*this);
+}
+
 #ifdef _DEBUG
 void PlotStmt::dump(DumpContext ctx) const {
     ctx.line("PlotStmt {");
@@ -1523,12 +1697,12 @@ void PlotStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-UnplotStmt::UnplotStmt(std::unique_ptr<Expr> x_expr_,
-                       std::unique_ptr<Expr> y_expr_, const SourceLoc& loc_)
+UnplotStmt::UnplotStmt(ExprPtr x_expr_,
+                       ExprPtr y_expr_, const SourceLoc& loc_)
     : Stmt(loc_), x_expr(std::move(x_expr_)), y_expr(std::move(y_expr_)) {
 }
 
-std::unique_ptr<Stmt> UnplotStmt::clone() const {
+StmtPtr UnplotStmt::clone() const {
     auto s = std::make_unique<UnplotStmt>(x_expr->clone(), y_expr->clone(), loc);
     return s;
 }
@@ -1543,6 +1717,10 @@ void UnplotStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> UnplotStmt::lower(LoweringPass& p) {
+    return p.lower_unplot(*this);
+}
+
 #ifdef _DEBUG
 void UnplotStmt::dump(DumpContext ctx) const {
     ctx.line("UnplotStmt {");
@@ -1554,11 +1732,11 @@ void UnplotStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-RandStmt::RandStmt(std::unique_ptr<Expr> seed_expr_, const SourceLoc& loc_)
+RandStmt::RandStmt(ExprPtr seed_expr_, const SourceLoc& loc_)
     : Stmt(loc_), seed_expr(std::move(seed_expr_)) {
 }
 
-std::unique_ptr<Stmt> RandStmt::clone() const {
+StmtPtr RandStmt::clone() const {
     auto s = std::make_unique<RandStmt>(seed_expr->clone(), loc);
     return s;
 }
@@ -1572,6 +1750,10 @@ void RandStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> RandStmt::lower(LoweringPass& p) {
+    return p.lower_rand(*this);
+}
+
 #ifdef _DEBUG
 void RandStmt::dump(DumpContext ctx) const {
     ctx.line("RandStmt {");
@@ -1582,12 +1764,12 @@ void RandStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-PauseStmt::PauseStmt(std::unique_ptr<Expr> duration_expr_,
+PauseStmt::PauseStmt(ExprPtr duration_expr_,
                      const SourceLoc& loc_)
     : Stmt(loc_), duration_expr(std::move(duration_expr_)) {
 }
 
-std::unique_ptr<Stmt> PauseStmt::clone() const {
+StmtPtr PauseStmt::clone() const {
     auto s = std::make_unique<PauseStmt>(duration_expr->clone(), loc);
     return s;
 }
@@ -1601,6 +1783,10 @@ void PauseStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> PauseStmt::lower(LoweringPass& p) {
+    return p.lower_pause(*this);
+}
+
 #ifdef _DEBUG
 void PauseStmt::dump(DumpContext ctx) const {
     ctx.line("PauseStmt {");
@@ -1611,7 +1797,7 @@ void PauseStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> FastStmt::clone() const {
+StmtPtr FastStmt::clone() const {
     auto s = std::make_unique<FastStmt>(loc);
     return s;
 }
@@ -1624,6 +1810,10 @@ void FastStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> FastStmt::lower(LoweringPass& p) {
+    return p.lower_fast(*this);
+}
+
 #ifdef _DEBUG
 void FastStmt::dump(DumpContext ctx) const {
     ctx.line("FastStmt {");
@@ -1633,7 +1823,7 @@ void FastStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> SlowStmt::clone() const {
+StmtPtr SlowStmt::clone() const {
     auto s = std::make_unique<SlowStmt>(loc);
     return s;
 }
@@ -1646,6 +1836,10 @@ void SlowStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> SlowStmt::lower(LoweringPass& p) {
+    return p.lower_slow(*this);
+}
+
 #ifdef _DEBUG
 void SlowStmt::dump(DumpContext ctx) const {
     ctx.line("SlowStmt {");
@@ -1655,7 +1849,7 @@ void SlowStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> ScrollStmt::clone() const {
+StmtPtr ScrollStmt::clone() const {
     auto s = std::make_unique<ScrollStmt>(loc);
     return s;
 }
@@ -1668,6 +1862,10 @@ void ScrollStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> ScrollStmt::lower(LoweringPass& p) {
+    return p.lower_scroll(*this);
+}
+
 #ifdef _DEBUG
 void ScrollStmt::dump(DumpContext ctx) const {
     ctx.line("ScrollStmt {");
@@ -1677,7 +1875,7 @@ void ScrollStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> ContStmt::clone() const {
+StmtPtr ContStmt::clone() const {
     auto s = std::make_unique<ContStmt>(loc);
     return s;
 }
@@ -1690,6 +1888,10 @@ void ContStmt::accept(ASTVisitor& v) {
     }
 }
 
+std::vector<StmtPtr> ContStmt::lower(LoweringPass& p) {
+    return p.lower_cont(*this);
+}
+
 #ifdef _DEBUG
 void ContStmt::dump(DumpContext ctx) const {
     ctx.line("ContStmt {");
@@ -1699,7 +1901,7 @@ void ContStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-std::unique_ptr<Stmt> ClearStmt::clone() const {
+StmtPtr ClearStmt::clone() const {
     auto s = std::make_unique<ClearStmt>(loc);
     return s;
 }
@@ -1710,6 +1912,10 @@ void ClearStmt::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+std::vector<StmtPtr> ClearStmt::lower(LoweringPass& p) {
+    return p.lower_clear(*this);
 }
 
 #ifdef _DEBUG
@@ -1726,7 +1932,7 @@ PragmaNumVarStmt::PragmaNumVarStmt(std::string name_, double value_,
     : Stmt(loc_), name(std::move(name_)), value(value_) {
 }
 
-std::unique_ptr<Stmt> PragmaNumVarStmt::clone() const {
+StmtPtr PragmaNumVarStmt::clone() const {
     auto s = std::make_unique<PragmaNumVarStmt>(name, value, loc);
     return s;
 }
@@ -1737,6 +1943,10 @@ void PragmaNumVarStmt::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+std::vector<StmtPtr> PragmaNumVarStmt::lower(LoweringPass& p) {
+    return p.lower_pragma_num_var(*this);
 }
 
 #ifdef _DEBUG
@@ -1755,7 +1965,7 @@ PragmaStrVarStmt::PragmaStrVarStmt(std::string name_, std::string value_,
     : Stmt(loc_), name(std::move(name_)), value(std::move(value_)) {
 }
 
-std::unique_ptr<Stmt> PragmaStrVarStmt::clone() const {
+StmtPtr PragmaStrVarStmt::clone() const {
     auto s = std::make_unique<PragmaStrVarStmt>(name, value, loc);
     s->asm_lines = asm_lines;
     return s;
@@ -1767,6 +1977,10 @@ void PragmaStrVarStmt::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+std::vector<StmtPtr> PragmaStrVarStmt::lower(LoweringPass& p) {
+    return p.lower_pragma_str_var(*this);
 }
 
 #ifdef _DEBUG
@@ -1786,7 +2000,7 @@ PragmaNumVarArrayStmt::PragmaNumVarArrayStmt(std::string name_,
     : Stmt(loc_), name(std::move(name_)) {
 }
 
-std::unique_ptr<Stmt> PragmaNumVarArrayStmt::clone() const {
+StmtPtr PragmaNumVarArrayStmt::clone() const {
     auto s = std::make_unique<PragmaNumVarArrayStmt>(name, loc);
     s->dims = dims;
     s->values = values;
@@ -1799,6 +2013,10 @@ void PragmaNumVarArrayStmt::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+std::vector<StmtPtr> PragmaNumVarArrayStmt::lower(LoweringPass& p) {
+    return p.lower_pragma_num_var_array(*this);
 }
 
 #ifdef _DEBUG
@@ -1828,7 +2046,7 @@ PragmaStrVarArrayStmt::PragmaStrVarArrayStmt(std::string name_,
     : Stmt(loc_), name(std::move(name_)) {
 }
 
-std::unique_ptr<Stmt> PragmaStrVarArrayStmt::clone() const {
+StmtPtr PragmaStrVarArrayStmt::clone() const {
     auto s = std::make_unique<PragmaStrVarArrayStmt>(name, loc);
     s->dims = dims;
     s->values = values;
@@ -1841,6 +2059,10 @@ void PragmaStrVarArrayStmt::accept(ASTVisitor& v) {
         // accept children
         v.leave(*this);
     }
+}
+
+std::vector<StmtPtr> PragmaStrVarArrayStmt::lower(LoweringPass& p) {
+    return p.lower_pragma_str_var_array(*this);
 }
 
 #ifdef _DEBUG
@@ -1898,272 +2120,3 @@ void Prog::dump(DumpContext ctx) const {
 }
 #endif
 
-//-----------------------------------------------------------------------------
-// Visitor
-//-----------------------------------------------------------------------------
-
-void ASTVisitor::walk_stmts(std::vector<std::unique_ptr<Stmt>>& list) {
-    std::vector<std::unique_ptr<Stmt>> new_list;
-
-    for (auto& stmt : list) {
-        // Visit the node
-        stmt_stack.push_back(stmt.get());
-        stmt->accept(*this);
-        stmt_stack.pop_back();
-
-        // Prepend nodes requested by visitor
-        for (auto& n : stmt->rewrite.prepend) {
-            new_list.push_back(std::move(n));
-        }
-        stmt->rewrite.prepend.clear();
-
-        // if marked for removal, skip adding the node to the new list
-        if (stmt->rewrite.remove) {
-            release_assert(stmt->rewrite.append.empty());
-            continue;
-        }
-        new_list.push_back(std::move(stmt));
-
-        // Append nodes requested by visitor, only if not marked for removal
-        for (auto& n : new_list.back()->rewrite.append) {
-            new_list.push_back(std::move(n));
-        }
-        new_list.back()->rewrite.append.clear();
-    }
-
-    list = std::move(new_list);
-}
-
-void ASTVisitor::walk_expr(std::unique_ptr<Expr>& expr) {
-    if (expr) {
-        expr->accept(*this);
-        if (expr->rewrite.replace_expr) {
-            expr = std::move(expr->rewrite.replace_expr);
-            expr->rewrite.replace_expr = nullptr;
-        }
-    }
-}
-
-bool ASTVisitor::enter(NumberExpr&) {
-    return true;
-}
-
-bool ASTVisitor::enter(LabelLineRefExpr&) {
-    return true;
-}
-
-bool ASTVisitor::enter(LabelAddrRefExpr&) {
-    return true;
-}
-
-bool ASTVisitor::enter(StringLiteralExpr&) {
-    return true;
-}
-
-bool ASTVisitor::enter(VariableExpr&) {
-    return true;
-}
-
-bool ASTVisitor::enter(ArrayRefExpr&) {
-    return true;
-}
-
-bool ASTVisitor::enter(SliceExpr&) {
-    return true;
-}
-
-bool ASTVisitor::enter(UnaryExpr&) {
-    return true;
-}
-
-bool ASTVisitor::enter(BinaryExpr&) {
-    return true;
-}
-
-bool ASTVisitor::enter(BasicFuncCallExpr&) {
-    return true;
-}
-
-bool ASTVisitor::enter(ProcCallExpr&) {
-    return true;
-}
-
-bool ASTVisitor::enter(FnCallExpr&) {
-    return true;
-}
-
-bool ASTVisitor::enter(LabelStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(LineNumStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(LetStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(DimStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(IfStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(RepeatStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(WhileStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(ForStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(NextStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(DefProcStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(ProcCallStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(LocalStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(DefFnStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(ExitStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(GotoStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(GosubStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(ReturnStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(StopStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(EndStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(PrintStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(InputStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(RemStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(RunStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(ListStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(NewStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(ClsStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(LoadStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(SaveStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(PokeStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(PokewStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(PlotStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(UnplotStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(RandStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(PauseStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(FastStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(SlowStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(ScrollStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(ContStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(ClearStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(PragmaNumVarStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(PragmaStrVarStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(PragmaNumVarArrayStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(PragmaStrVarArrayStmt&) {
-    return true;
-}
-
-bool ASTVisitor::enter(Prog&) {
-    return true;
-}
