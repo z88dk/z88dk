@@ -261,4 +261,3 @@
 ../../../math/float/math32/lm32/z80/asm_zerof.asm
 ../../../math/float/math32/asm/f32_f2long.asm
 ../../../math/float/math32/asm/f32_l_ldexp.asm
-../../../math/float/math32/init_floatpack_stub.asm

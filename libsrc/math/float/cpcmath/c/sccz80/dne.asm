@@ -24,4 +24,3 @@ dnec:
     jp      z, stkequcmp
     xor     a
     jp      cmpfin
-

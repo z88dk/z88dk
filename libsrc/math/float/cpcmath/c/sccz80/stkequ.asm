@@ -23,5 +23,3 @@ stkequ:
     pop     bc
     pop     bc
     jp      (hl)                        ;outa here back to program
-
-

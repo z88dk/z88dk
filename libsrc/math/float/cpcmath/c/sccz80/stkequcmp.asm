@@ -23,4 +23,3 @@ stkequcmp:
     ret     z
     scf
     ret
-

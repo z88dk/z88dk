@@ -22,4 +22,3 @@ dadd:
 daddc:
     FPCALL  (CPCFP_FLO_ADD)             ; (hl)=(hl)+(de)
     jp      stkequ
-

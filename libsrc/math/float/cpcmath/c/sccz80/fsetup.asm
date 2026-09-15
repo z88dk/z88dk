@@ -18,5 +18,3 @@ fsetup:
     ld      hl, 5
     add     hl, sp                      ; hl=sp+5
     ret
-
-
