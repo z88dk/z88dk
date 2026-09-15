@@ -37,6 +37,7 @@
 ../../../math/float/math32/asm/8085/f32_fspoly.asm
 ../../../math/float/math32/asm/f32_fserror.asm
 ../../../math/float/math32/asm/8085/f32_fshypot.asm
+../../../math/float/math32/c/8085/ftoe.asm
 ../../../math/float/math32/c/8085/m32_acosf.asm
 ../../../math/float/math32/c/8085/m32_acoshf.asm
 ../../../math/float/math32/c/8085/m32_asinf.asm

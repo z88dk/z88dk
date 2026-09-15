@@ -100,8 +100,9 @@ char *str;
 
     ff = (float)x;
 
-    /* math32 flushes IEEE subnormals to zero; format as signed zero. */
-    if (ff == 0.0f) {
+    /* math32 flushes IEEE subnormals to zero; format as signed zero
+     * (including subnormal bit-pattern results of double->float casts). */
+    if (ff == 0.0f || ((bits & 0x7f800000UL) == 0 && (bits & 0x007fffffUL) != 0)) {
         expon = 0;
         *str++ = '0';
         *str++ = '.';
@@ -115,7 +116,13 @@ char *str;
      * That integer fits exactly in a 32-bit IEEE float for prec <= 7.
      */
     if (prec - expon >= 0) {
-        xx = (double)(ff * POW10F(prec - expon));
+        /* clamp the table index; for tiny inputs (expon == -38) the scale
+         * may exceed the table range, so finish the tail on xx itself (keeps
+         * every intermediate in float range) */
+        int sc = prec - expon;
+        int r = sc > 38 ? sc - 38 : 0;
+        xx = (double)(ff * POW10F(sc > 38 ? 38 : sc));
+        while (r--) xx *= 10.0;
     } else {
         xx = (double)(ff / POW10F(expon - prec));
     }
