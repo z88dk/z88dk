@@ -5,9 +5,8 @@
 
 	defc	floor_fastcall = m32_floor_fastcall
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _floor_fastcall
-defc _floor_fastcall = m32_floor_fastcall
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _floor_fastcall
+	defc _floor_fastcall = m32_floor_fastcall
 

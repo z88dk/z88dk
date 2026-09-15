@@ -5,9 +5,8 @@
 
 	defc	neg_fastcall = m32_fsneg
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _neg_fastcall
-defc _neg_fastcall = m32_fsneg
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _neg_fastcall
+	defc _neg_fastcall = m32_fsneg
 

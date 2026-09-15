@@ -6,9 +6,8 @@
 
     defc sqrt_fastcall = m32_fssqrt_fastcall
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _sqrt_fastcall
-defc _sqrt_fastcall = m32_fssqrt_fastcall
-ENDIF
+    ; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+    ; Exported for both Classic and Newlib.
+    PUBLIC _sqrt_fastcall
+    defc _sqrt_fastcall = m32_fssqrt_fastcall
 

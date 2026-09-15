@@ -5,9 +5,8 @@
 
 	defc	tanh_fastcall = _m32_tanhf
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _tanh_fastcall
-defc _tanh_fastcall = _m32_tanhf
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _tanh_fastcall
+	defc _tanh_fastcall = _m32_tanhf
 

@@ -5,8 +5,8 @@
 
     defc    fmax_callee = cm32_sccz80_fmax_callee
 
-IF __CLASSIC
-    ; SDCC bridge for Classic
+    ; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+    ; Exported for both Classic and Newlib.
     PUBLIC  _fmax_callee
     defc    _fmax_callee = fmax_callee
-ENDIF
+

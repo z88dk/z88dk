@@ -5,10 +5,8 @@
 
 	defc	fpclassify = cm32_sccz80_fpclassify
 
-
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _fpclassify
-defc _fpclassify = fpclassify
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _fpclassify
+	defc _fpclassify = fpclassify
 

@@ -5,15 +5,12 @@
 
 	defc	fmin = cm32_sccz80_fmin
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _fmin
-defc _fmin = fmin
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _fmin
+	defc _fmin = fmin
 
-; Clang bridge for Classic
-IF __CLASSIC
-PUBLIC ___fmin
-defc ___fmin = fmin
-ENDIF
+	; Clang C-linkage ABI aliases for Classic and Newlib.
+	PUBLIC ___fmin
+	defc ___fmin = fmin
 

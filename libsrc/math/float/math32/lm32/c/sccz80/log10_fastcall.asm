@@ -5,9 +5,8 @@
 
 	defc	log10_fastcall = _m32_log10f
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _log10_fastcall
-defc _log10_fastcall = _m32_log10f
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _log10_fastcall
+	defc _log10_fastcall = _m32_log10f
 

@@ -5,14 +5,12 @@
 
 	defc	hypot = cm32_sccz80_fshypot
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _hypot
-defc _hypot = hypot
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _hypot
+	defc _hypot = hypot
 
-; Clang bridge for Classic
-IF __CLASSIC
-PUBLIC ___hypot
-defc ___hypot = hypot
-ENDIF
+	; Clang C-linkage ABI aliases for Classic and Newlib.
+	PUBLIC ___hypot
+	defc ___hypot = hypot
+

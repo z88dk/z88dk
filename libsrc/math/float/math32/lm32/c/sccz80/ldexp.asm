@@ -5,15 +5,12 @@
 
 	defc	ldexp = cm32_sccz80_ldexp
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _ldexp
-defc _ldexp = ldexp
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _ldexp
+	defc _ldexp = ldexp
 
-; Clang bridge for Classic
-IF __CLASSIC
-PUBLIC ___ldexp
-defc ___ldexp = ldexp
-ENDIF
+	; Clang C-linkage ABI aliases for Classic and Newlib.
+	PUBLIC ___ldexp
+	defc ___ldexp = ldexp
 

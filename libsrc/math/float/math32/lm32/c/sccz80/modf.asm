@@ -5,16 +5,12 @@
 
 	defc	modf = cm32_sccz80_modf
 
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _modf
+	defc _modf = modf
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _modf
-defc _modf = modf
-ENDIF
-
-; Clang bridge for Classic
-IF __CLASSIC
-PUBLIC ___modf
-defc ___modf = modf
-ENDIF
+	; Clang C-linkage ABI aliases for Classic and Newlib.
+	PUBLIC ___modf
+	defc ___modf = modf
 

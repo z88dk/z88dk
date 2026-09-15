@@ -5,8 +5,8 @@
 
     defc    fmin_callee = cm32_sccz80_fmin_callee
 
-IF __CLASSIC
-    ; SDCC bridge for Classic
+    ; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+    ; Exported for both Classic and Newlib.
     PUBLIC  _fmin_callee
     defc    _fmin_callee = fmin_callee
-ENDIF
+

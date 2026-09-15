@@ -5,14 +5,12 @@
 
 	defc	fmax = cm32_sccz80_fmax
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _fmax
-defc _fmax = fmax
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _fmax
+	defc _fmax = fmax
 
-; Clang bridge for Classic
-IF __CLASSIC
-PUBLIC ___fmax
-defc ___fmax = fmax
-ENDIF
+	; Clang C-linkage ABI aliases for Classic and Newlib.
+	PUBLIC ___fmax
+	defc ___fmax = fmax
+

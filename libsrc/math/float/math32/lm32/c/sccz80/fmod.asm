@@ -5,16 +5,12 @@
 
 	defc	fmod = cm32_sccz80_fmod
 
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _fmod
+	defc _fmod = fmod
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _fmod
-defc _fmod = fmod
-ENDIF
-
-; Clang bridge for Classic
-IF __CLASSIC
-PUBLIC ___fmod
-defc ___fmod = fmod
-ENDIF
+	; Clang C-linkage ABI aliases for Classic and Newlib.
+	PUBLIC ___fmod
+	defc ___fmod = fmod
 

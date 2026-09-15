@@ -5,15 +5,12 @@
 
 	defc	frexp = cm32_sccz80_frexp
 
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _frexp
+	defc _frexp = frexp
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _frexp
-defc _frexp = frexp
-ENDIF
+	; Clang C-linkage ABI aliases for Classic and Newlib.
+	PUBLIC ___frexp
+	defc ___frexp = frexp
 
-; Clang bridge for Classic
-IF __CLASSIC
-PUBLIC ___frexp
-defc ___frexp = frexp
-ENDIF

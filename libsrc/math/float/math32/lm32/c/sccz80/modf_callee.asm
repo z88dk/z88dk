@@ -5,8 +5,8 @@
 
     defc    modf_callee = cm32_sccz80_modf_callee
 
-IF __CLASSIC
-    ; SDCC bridge for Classic
+    ; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+    ; Exported for both Classic and Newlib.
     PUBLIC  _modf_callee
     defc    _modf_callee = modf_callee
-ENDIF
+

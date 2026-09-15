@@ -5,9 +5,8 @@
 
 	defc	div2_fastcall = m32_fsdiv2_fastcall
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _div2_fastcall
-defc _div2_fastcall = m32_fsdiv2_fastcall
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _div2_fastcall
+	defc _div2_fastcall = m32_fsdiv2_fastcall
 

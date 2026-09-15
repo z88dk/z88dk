@@ -5,9 +5,8 @@
 
 	defc	cosh_fastcall = _m32_coshf
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _cosh_fastcall
-defc _cosh_fastcall = _m32_coshf
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _cosh_fastcall
+	defc _cosh_fastcall = _m32_coshf
 

@@ -5,9 +5,8 @@
 
 	defc	round_fastcall = _m32_roundf
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _round_fastcall
-defc _round_fastcall = _m32_roundf
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _round_fastcall
+	defc _round_fastcall = _m32_roundf
 

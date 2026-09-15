@@ -5,10 +5,8 @@
 
 	defc	poly_callee = cm32_sccz80_fspoly_callee
 
-
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _poly_callee
-defc _poly_callee = poly_callee
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _poly_callee
+	defc _poly_callee = poly_callee
 

@@ -5,9 +5,8 @@
 
 	defc	asinh_fastcall = _m32_asinhf
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _asinh_fastcall
-defc _asinh_fastcall = _m32_asinhf
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _asinh_fastcall
+	defc _asinh_fastcall = _m32_asinhf
 

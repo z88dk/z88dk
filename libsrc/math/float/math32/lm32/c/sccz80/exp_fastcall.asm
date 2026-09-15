@@ -5,9 +5,8 @@
 
 	defc	exp_fastcall = _m32_expf
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _exp_fastcall
-defc _exp_fastcall = _m32_expf
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _exp_fastcall
+	defc _exp_fastcall = _m32_expf
 

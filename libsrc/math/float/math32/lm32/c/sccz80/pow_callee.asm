@@ -5,10 +5,8 @@
 
 	defc	pow_callee = cm32_sccz80_pow_callee
 
-
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _pow_callee
-defc _pow_callee = pow_callee
-ENDIF
+	; Link-time C-ABI linkage aliases onto the fastcall/core implementation.
+	; Exported for both Classic and Newlib.
+	PUBLIC _pow_callee
+	defc _pow_callee = pow_callee
 
