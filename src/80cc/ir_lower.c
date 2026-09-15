@@ -442,21 +442,15 @@ static int  remat_lea_enabled(void)
    global byte load for [IR_BYTE_REMAT]. A byte argument is a TERMINAL consumer —
    the marshaller reads it once and pushes it — so re-issuing `ld a,(sym)` at the
    push site costs the same 3 bytes as the slot reload it replaces and drops the
-   def's spill store AND the slot. The witness is emu.c's `effective_string`
-   family: `return effective_ext(ptr, string_base_page, string_num_pages)` spills
-   both globals to the frame purely to read them straight back one op later.
+   def's spill store AND the slot.
    Every byte-argument read path is remat-aware (push_arg_byte_to_a for a stacked
    arg, load_to_hl_adj's width-1 path for an sc1 register arg, load_byte_to_a for a
    fastcall one); a path that is not aborts in require_slot rather than reading an
    absent slot.
 
-   Default ON. The corpus does not contain the shape at all (638 cells byte-
-   identical either way), so the evidence is emu.c: -131 B fp / -272 B sp, with
-   long_ir 650/650 sp+fp, enigma sp+fp and emu.c behavioural sp+fp green. The
-   other consumers this was measured against buy nothing and are deliberately NOT
-   in the list: IR_PUSH_ARG (0 B — pre-pushed args never carry the shape) and
-   IR_RET (0 B — a returned global is already slotless). IR_CALL_BREMAT=0 opts
-   out, byte-identical to the pre-flip compiler. */
+   Default ON; IR_CALL_BREMAT=0 opts out, byte-identical. The corpus does not
+   contain the shape — evidence, and the consumers deliberately left out of the
+   list, are in adr/0044. */
 static int  call_bremat_on = -1;
 static int  call_bremat_enabled(void)
 {
@@ -475,13 +469,8 @@ static int  call_bremat_enabled(void)
    for) and the entry_dehl seed in ir_lower_func — the entry BB clears rs.dehl
    unconditionally, so the claim has to be re-asserted there.
 
-   Default ON. Like the byte-remat call-argument extension, the bench corpus does
-   not contain the shape (638 cells byte-identical either way, as are adv_a and
-   clisp); the evidence is emu.c -60 B fp / -51 B sp, long_ir/fclong.c -32 B, and
-   ticks follow the bytes (a 4-byte (ix+d) reload for one register move). Gates:
-   long_ir 650/650 sp+fp, enigma sp+fp, emu.c behavioural sp+fp, IR_CLOB_VERIFY
-   unchanged at 4 pre-existing sites. IR_FCLONG_CARRY=0 opts out, byte-identical
-   to the pre-flip compiler. */
+   Default ON; IR_FCLONG_CARRY=0 opts out, byte-identical. The bench corpus does
+   not contain the shape — evidence is emu.c, in adr/0043. */
 static int  fclong_carry_on = -1;
 static int  fclong_carry_enabled(void)
 {
@@ -495,20 +484,11 @@ static int  fclong_carry_enabled(void)
    of spilling it and then invalidating the cache — which made the consumer one
    op later reload the slot that had just been written. commit_hl_result also
    lets the dead-store pass drop the spill outright, and routes a PR_DE dst into
-   DE. See gen_conv_trunc.
+   DE. See gen_conv_trunc. Default ON; IR_OFF=trunc-res opts out,
+   byte-identical. Evidence: adr/0042.
 
-   Default ON. Corpus -285 B over 38 cells with ZERO larger, every CPU gaining
-   (gbz80/8085 -30, z80/z80n/z180 -28, rabbit/8080 -26, kc160 -20, ez80 -17);
-   emu.c -210 B sp / -247 B fp, clisp -212 / -146. Ticks follow the bytes: z80
-   corpus -0.131%, 3 cells faster and 0 slower. IR_OFF=trunc-res opts out,
-   byte-identical to the pre-flip compiler.
-
-   NB this needed the expr.c member-offset fix first. Until then it miscompiled
-   long_ir/aggregate_init in sp mode — not through any fault of its own, but
-   because `s.arr[i]` on a local struct was reading past the end of the struct
-   and this change moved which garbage landed where, so the test's sum stopped
-   cancelling to zero. The 2->2 narrowing case is left on the old path; it was
-   never measured on its own. */
+   The 2->2 narrowing case is left on the old path; it was never measured on its
+   own. */
 static int  truncres_on = -1;
 static int  truncres_enabled(void)
 {
@@ -4181,20 +4161,10 @@ static int dsw_enabled(void)
     return dsw_on;
 }
 
-/* [dead-store-share] Refine the coalesced-read veto: block a dead store only when a
-   byte-sharing reader never writes its own slot (the channel shape), instead of
-   on any sharing reader at all. Default ON; `IR_OFF=dead-store-share` opts out and
-   restores the pre-flip codegen byte-for-byte.
-
-   Flipped on after the 391-cell matrix (23 benches x 10 cpus x sp/fp): 0 cells
-   slower on ANY cpu and 0 cells larger on any cpu, net -1200B, every cell built
-   AND run in both configurations with no failures. Bytes and cycles move
-   together here because eliding a store removes memory traffic — there was no
-   byte-for-tick trade to weigh.
-
-   The r4k byte regression the first matrix showed was NOT this pass; it was the
-   HL->DE staging copy being spelled as two page-prefixed 8-bit moves on Rabbit
-   (fixed in 1b43c3a4c7, see emit_hl_to_de).
+/* [dead-store-share] Block a dead store only when a byte-sharing reader never
+   writes its own slot (the channel shape), instead of on any sharing reader at
+   all. Default ON; `IR_OFF=dead-store-share` opts out and restores the pre-flip
+   codegen byte-for-byte. Evidence: adr/0041.
 
    Careful with the predicate: "reads a slot it never wrote" is NOT
    `rec_slotwrite == 0`. See the marking site — a MULTI-DEF reader can have one
@@ -6239,29 +6209,17 @@ int ir_lower_func(FILE *out, Func *f)
                     else if (o->kind == IR_LD_SYM && o->mem.sym
                              && !ns_sym_bails(o->mem.sym))
                         rd = o;
-                    /* [remat-lea] Frame-slot address (&local) rematerialises:
-                       recompute at each use (emit_remat_word: `ld hl,slot_off+
-                       cur_sp_adjust; add hl,sp`) instead of spilling+reloading — the
-                       offset is fixed per function and cur_sp_adjust is tracked, so
-                       fp==sp with only the target pair clobbered (no IX/DE gymnastics).
-                       EXCLUSIONS:
-                       - a PR_STACK tenant: its value is parked with push/pop, not in
-                         a frame slot, so dropping the slot orphans one half of that
-                         pair and every later sp-relative offset shifts (irgaps
-                         miscompiled). This USED to be spelled `!(IS_808x() ||
-                         IS_GBZ80())` — those CPUs park LEA values, so the CPU stood
-                         in for the fact. Measured: of the 99 LEAs the CPU test
-                         excluded, only 6 (8085) / 5 (gbz80) are actually parked, so
-                         the test cost ~93 per CPU. Asking the real question is both
-                         wider AND safer — it now also protects a parked LEA on z80
-                         and every other target, which the CPU test never covered;
-                       - ez80 in FP mode: its cheap `lea`/`ld hl,(ix+d)` addressing
-                         register-homes LEAs, so per-use recompute in a hot loop is a
-                         byte-for-tick LOSS (interpbench ez80-fp −27B but +4.6% ticks).
-                         ez80-SP keeps it: sp addressing is dear there, so it is a pure
-                         win (−117B, −6.6% ticks).
-                       Store-base LEAs keep their slot (below). Default-on;
-                       IR_OFF=remat-lea opts out. */
+                    /* [remat-lea] Recompute `&local` at each use
+                       (emit_remat_word) instead of spilling and reloading it —
+                       the slot offset is fixed per function and cur_sp_adjust
+                       is tracked. Two exclusions, both load-bearing:
+                       a PR_STACK tenant (its value is parked with push/pop, so
+                       dropping the slot orphans half the pair and shifts every
+                       later sp-relative offset — irgaps miscompiled), and ez80
+                       in FP mode (cheap lea/(ix+d) makes per-use recompute a
+                       byte-for-tick loss; ez80-SP keeps it). Store-base LEAs
+                       keep their slot. Default-on; IR_OFF=remat-lea opts out.
+                       Evidence and the CPU-test-vs-property lesson: adr/0040. */
                     else if (o->kind == IR_LEA && o->src[0] >= 0 && !func_has_call
                              && ir_home_at(f, o->dst) != IR_PR_STACK
                              && !(IS_EZ80() && fp_active(f))

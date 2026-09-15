@@ -41,6 +41,11 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0029](0029-de-cache-fold-brick.md) | *Proposed* — a fail-safe DE cache fold, where 0018 refuses a DE home |
 | [0032](0032-gbz80-word-cost-row.md) | The measured gbz80 cost rows (SLOT+BC), shipped — and why the regression that held them back was a failed recovery, not a ranking tie |
 | [0034](0034-one-owner-for-the-allocation.md) | `ir_alloc` is the only writer of the plan; the render reports typed rejections (amends 0003) |
+| [0044](0044-a-call-argument-qualifies-a-byte-remat.md) | **Accepted** — a call argument qualifies a global byte remat; emu.c −131/−272 B, invisible to the corpus |
+| [0043](0043-a-pushed-long-param-is-carried-past-the-prologue.md) | **Accepted** — a pushed long param is carried in DE:HL past the prologue; emu.c −60/−51 B |
+| [0042](0042-a-narrowing-result-stays-in-hl.md) | **Accepted** — a long→int narrowing result stays in HL; −285 B over 38 cells, none larger |
+| [0041](0041-a-dead-store-is-blocked-only-by-a-channel-reader.md) | **Accepted** — a dead store is vetoed only by a channel reader, not any sharing reader; −1200 B |
+| [0040](0040-frame-slot-addresses-rematerialise.md) | **Accepted** — frame-slot addresses rematerialise instead of spilling; the CPU test hid a property test |
 | [0039](0039-ldsi-slot-addresses-on-8085.md) | **Accepted** — 8085 slot addresses via LDSI: −366 B, −0.95 % ticks, nothing larger or slower |
 | [0038](0038-the-8085-is-not-a-z80.md) | **Rejected** — 8085 is priced as a z80 and should not be; the correct rows are recorded, and they make the output worse |
 | [0037](0037-pricing-the-eviction-in-t-states.md) | **Rejected** — pricing the BC eviction in the arbiter's own unit; worse on both axes, and the same eviction is ±12 % across CPUs |
