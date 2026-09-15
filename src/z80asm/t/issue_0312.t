@@ -60,6 +60,11 @@ add( "add de,32767", 0xED, 0x35, 0xFF, 0x7F );
 add( "add bc,32767", 0xED, 0x36, 0xFF, 0x7F );
 
 # M=6+           23T    push NNNN        ED 8A HI LO     push 16bit immediate value, note big endian order
+#   LITTLE-ENDIAN STORAGE (CONFIRMED ON SILICON): `PUSH nnnn` behaves exactly
+#   like `ld hl,nn; push hl` - the LO byte ends at the final SP and a
+#   little-endian pop returns the value unchanged (`push 0x1234; pop hl` ->
+#   HL = 0x1234, bytes at SP = 34 12).  copt may therefore use `push nn` to
+#   replace register pushes in value moves (z80n_rules.1 rules 2/3).
 add( "push 1",     0xED, 0x8A, 0x00, 0x01 );
 add( "push 256",   0xED, 0x8A, 0x01, 0x00 );
 add( "push 32767", 0xED, 0x8A, 0x7F, 0xFF );
