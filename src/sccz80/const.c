@@ -781,7 +781,21 @@ static void dofloat_ieee(double raw, unsigned char fa[])
         uint32_t fp_value = 0;
 
         decompose_float(raw, &fs);
-        
+
+        // Underflow: biased exponent <= 0 (zero/subnormal range).
+        // Our IEEE representation does not include subnormals, so a
+        // too-small constant underflows to +/-0 rather than carrying a
+        // subnormal pattern.
+        if ( fs.exponent <= 0 ) {
+            pack32bit_float( fs.sign ? 0x80000000u : 0x00000000u, fa );
+            return;
+        }
+        // Overflow: biased exponent >= 255 -> +/-Inf.
+        if ( fs.exponent >= 255 ) {
+            pack32bit_float( fs.sign ? 0xff800000u : 0x7f800000u, fa );
+            return;
+        }
+
         // Bundle up mantissa
         fp_value = ( ( (uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16))  & 0x007fffff;
 
