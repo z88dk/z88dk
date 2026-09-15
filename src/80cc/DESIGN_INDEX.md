@@ -4,102 +4,98 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 2026-09-14. Keep it short: when a section stops describing what is
+Last swept: 2026-09-15. Keep it short: when a section stops describing what is
 live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
-**The simplification is finished.** All four invariants hold and two of them are
-enforced by a script. What remains is optimisation work, and the order matters:
+**Last swept 2026-09-15.** The simplification is finished, the residency arc is
+closed, and the documentation backlog is cleared. What follows is the handover.
 
-0. ~~Fix the point-query misuses~~ — **done**: a static DE-clean proof now runs
-   with no ambient point, and window rejections across the corpus went 26 -> 0.
+### What closed, and why it will not reopen
 
-1. ~~Fix two point-query misuses~~ — `hashbench/hash_key v9` and
-   `structbench/walk v2` ask a whole-function question through `ir_home_at` at
-   flat index 0, before the value's live range starts. Harmless today, a
-   miscompile under ranging. Small and independent of everything else.
-2. ~~Model what an eviction CAUSES~~ — **answered, and it closes the seam.**
-   The realisation verifier (`IR_REALISE`, ADR 0037) shows the `bc-evict`
-   benefit **does not exist**: across six benches the pass changes total
-   register homes by +0, +1, +0, +2, +0, +0. It frees BC, packs two more values
-   into it, and loses two IY homes doing it — a swap, not a gain. Both cost
-   denominations were pricing a gain that mostly is not there, which is why
-   three attempts to price it better all failed (ADR 0036, 0037, 0038).
+The **ranging arc (ADR 0017)** is done as far as evidence takes it. Stage 1
+shipped; stages 2 and 3 are refused, each on a measurement rather than a
+judgement:
 
-   Consequence: **do not tune `bc-evict`.** If it is revisited, the question is
-   whether it should exist at all, and the measurement is total residency via
-   an `IR_HOMEMAP` class census — not BC occupancy, and not a cost term.
+| | result |
+|---|---|
+| stage 1, truthful intervals (`tight-homes`, ADR 0027) | **SHIPPED default-on**: 20 cells smaller, 0 larger, 20 tick cells faster, 0 slower. Two predicate bugs fixed on the way, one a latent miscompile |
+| stage 2, packing order (earliest-start -> earliest-end) | **inert**: same 114 values packed, 0/720 size, 0/420 ticks |
+| stage 2, clash test on the truthful window | **nothing to reclaim**: 6 of 214 BC tenants are narrower than their live range |
+| stage 2, IY "one owner per function" bail | **zero**: 10 functions, 24 candidates, 0 disjoint from the owner |
+| stage 3, expensive form (park the tenant) | **7 of 145 sites pay**, even though 74 have a completely idle tenant |
+| stage 3, fail-safe form (`IR_RANGED`, ADR 0029) | **MISCOMPILED** — 17 cells; deleted, −114 lines |
 
-   Method note worth keeping: the per-function summary showed NO change on the
-   regressing CPU while 12 of 22 per-vreg rows differed. A coarse probe hid the
-   answer. Ask for the per-item view before concluding.
+Four separate cost-model corrections were refused before those (ADR 0036, 0037,
+0038, and the ledger they served). **They share one cause**, and it is the single
+most useful thing to carry forward:
 
-   Both probes that answered this (`IR_LEDGER`, `IR_REALISE`) have been
-   **removed** — the findings are in ADR 0037 and the instrumentation had no
-   remaining user. `IR_REC` (cold homes) and `IR_HOMEMAP` (the class census)
-   stay, and are what any future residency work should reach for.
+> The allocator's model is not the constraint. Its **reachable set** is.
+> `bc-evict` adds no residency at all — it swaps homes (+0/+1/+0/+2/+0/+0 across
+> six benches). Time-sharing already works where the packers look. Where they do
+> not look, sharing is not what stands in the way — **admission** is.
 
-3. ~~`IR_TIGHT_HOMES`~~ — **SHIPPED default-on 2026-09-15** (ADR 0027), stage 1
-   of the ranging arc. Never refuted; it was queued behind a ledger that was not
-   its blocker. Two bugs had to go first, and both were the same confusion in
-   opposite directions — *narrowed* versus *narrower than*:
-   - `frameless_ok` rejected every parameter, because `ir_home_is_ranged` cannot
-     tell a home narrowed to the live range (value dead outside — harmless) from
-     one narrower than it (value slotted outside — the real hazard). Fixed with
-     `ir_home_covers_live_range`.
-   - the step **widened** an already-ranged home, assigning the live range
-     instead of clamping to it: a call-split window `[12,36]` became `[1,75]`,
-     so the lowerer believed BC held a value that was slotted. **A latent
-     miscompile**, which showed only as +14 bytes because the path that ran
-     reloaded from the slot anyway.
+So: **do not add a cost term to the allocator**, and do not size an opportunity
+by counting values that merely fail to interfere. Count what the allocator would
+actually consider. `IR_RANGEPROBE`'s 461 was an upper bound over the wrong
+population, and `IR_PAIRPROBE` taught the same lesson before it.
 
-   Result: 720 cells **20 smaller / 0 larger / −136 B**; 660 tick cells
-   **−0.041 % / 20 faster / 0 slower**; `long_ir` 739/739 both modes.
-   `--opt-disable=tight-homes` opts out byte-identically.
+### The four veins worth digging, in order
 
-4. ~~Stage 2 of the ranging arc~~ — **CLOSED on both registers** (ADR 0017),
-   and the closure is more useful than the feature would have been.
+**1. Sweep the remaining CPUs for un-mined instructions.** *Cheapest, and the
+only thing that paid outright today.* Diff each CPU's declared capabilities
+against what the lowerer actually emits. That method found LDSI on 8085 —
+**−366 B and −0.95 % ticks, nothing larger or slower** (ADR 0039) — in an
+afternoon. Only 8085 and gbz80 have been swept. **z180 (`mlt`), z80n (`mul`),
+rabbit, ez80 (`lea`) and kc160 have never been.** Start from the `CPU_HAS_*`
+macros in `define.h`: five are never consulted by the backend, four of them
+KR580VM1-only.
 
-   Four levers built and measured, all inert or zero:
-   - packer greedy earliest-START -> earliest-END (the textbook fix): same 114
-     values packed, 0 of 720 size cells, 0 of 420 tick cells;
-   - the clash test's `first_use..last_use` vs the truthful home window: only
-     6 of 214 BC tenants are narrower, so nothing to reclaim;
-   - parking a live tenant to free the register (stage 3's expensive form,
-     ADR 0029): 74 of 145 blocked candidates have a *completely idle* tenant,
-     yet only **7 of 145 pay** once park and gain are in the same cycle unit;
-   - `ir_iy_temp_pack`'s "one IY owner per function" bail: 10 functions, 24
-     candidates, **0 disjoint from the owner**.
+**2. Zero-extension.** The one *consistent* gap against ez80clang. On int and
+byte code 80cc is level or ahead; on 32-bit it loses to helper calls; and
+zero-extension is the one thing that is reliably worse everywhere. Unlike the
+residency work this is a lowering pattern with a known-better reference to diff
+against, which is exactly the shape that has been working.
 
-   ►► **The constraint is candidate ADMISSION, not time-sharing.** Sharing
-   already works where the packers look (BC 33 of 107 function-registers hold
-   >1 value, DE 31 of 78); where they do not look, sharing is not what stands in
-   the way. `IR_RANGEPROBE`'s 461 counts values that merely fail to interfere —
-   an upper bound over the wrong population. **Any future sizing here must count
-   candidates the allocator would actually consider.** Same lesson
-   `IR_PAIRPROBE` taught: size the reachable set, not the ideal one.
+**3. The HL-bus 16-bit problem.** The largest single number in the notes: 80cc
+emits ~3x sdcc's 16-bit ops and half its 8-bit, because HL is the only
+accumulator so every 16-bit op forces an evacuate-to-DE. Measured shuffle cost
+**1572 B on z80, 2830 B on gbz80**. The earlier refutation measured staging
+*rate*, not emitted shuffles, so it is **not** actually closed. Big, but the
+prize matches.
 
-5. ~~Stage 3's fail-safe form~~ — **REJECTED ON CORRECTNESS and DELETED**
-   (ADR 0029). `IR_RANGED` **miscompiles**: 17 corpus cells fail with it on and
-   pass with it off, and `sortbench` fails its host-verified checksums on both
-   sorts. Its "byte-safe by construction" claim was false — `de_fold_pays`
-   never required DE clean from def to use, and said so in its own comment.
-   It also did not pay: corpus 74 smaller / **110 larger**, ticks **+2.17 %**
-   (49 faster / 97 slower). Deleted: gate, `de_fold_hint`, both predicates, the
-   lowerer rung, −114 lines. `enigma` did measure −48 B sp / −21 fp, so the
-   concept reaches real code — the belief management was what was unsound.
+**4. The commutative swap in addition (ADR 0072).** `md5` gains **6 % of its
+cycles** and it is blocked by one modelling gap: reading a slot in pass 1 of the
+lazy spill resurrects a store pass 2 had elided (+28 B binary-trees, +75 B
+emu.c). Needs a cost model over the two-pass spill decision, not a residency
+test.
 
-   **The ranging arc (ADR 0017) is now closed.** Stage 1 shipped; stages 2 and
-   3 are refused on evidence. Two durable lessons: *admission, not
-   time-sharing*, is the allocator's constraint; and a park costs more than a
-   born-killed temp gains. If stage 3 is revisited, the DE-clean proof belongs
-   in the lowerer, which now has the per-register D/E liveness (ADR 0047) it
-   lacked when this was written.
+Still parked and still valid: **8085 K-flag trip counters** (ADR 0051,
+*Proposed*) — 236 candidate sites, 2 bytes and ~8 cycles each plus a freed A,
+emulator support already present. Not a peephole: K sets on −1 not 0, so the
+counter's init must shift by one. Measure what fraction of the 236 are pure trip
+counters before building.
 
-### Next
-   Nothing in the residency arc is open. The live items are the 8085 K-flag
-   trip counter (ADR 0051, Proposed) and the 23 remaining documentation blocks.
+### How to work here — the traps that actually bit, this session
+
+* **`make && cp && echo BUILT` lies.** It printed BUILT on a failed build and a
+  measurement then ran against a stale binary, reporting a plausible `0/0`. Use
+  the `if make ...; then ... else echo FAILED; fi` form.
+* **Check the units before believing a result.** Pricing a park with
+  `g0_word_bytes` against a gain from `interval_benefit_x` (which is
+  CYCLE-denominated) reported **145 of 145 sites paying**. In matching units it
+  was 7. *A 100 % result is a symptom, not a discovery.*
+* **A coarse summary can hide the answer.** The per-function realisation summary
+  showed *no change* on the exact CPU that regressed, while 12 of 22 per-vreg
+  rows differed. Ask for the per-item view before concluding.
+* **A corpus matrix is not the whole test set.** 720 cells said "no cell larger"
+  while a `long_ir` file was 17 bytes worse. Size claims must name their set.
+* **Attribute before you believe.** `strbench`'s −4.5 % was reported here as the
+  tight-homes flip; bisection showed it was `41d2e40dae` (BC step-param), landed
+  days earlier. If a bench moves, bisect it.
+* Building an old commit needs `src/config.h` and the `ext/uthash` submodule
+  copied into the worktree — a fresh `git worktree` gets neither.
 
 ### Background work, when there is time
 
@@ -201,45 +197,18 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | `IR_CMPSIGN_PROBE` | signed-compare shapes | — |
 | `IR_ALLOC_PROBE` `IR_B1_PROBE` `IR_DEADDEF_PROBE` `IR_DELIVE_PROBE` `IR_DEPARK_PROBE` `IR_FRAMEPROBE` `IR_NARROWPROBE` `IR_SHLX_PROBE` | one-line censuses inside shipped passes | on their next edit |
 
-### In flight — the ranging arc (ADR 0017)
+### The ranging arc (ADR 0017) — CLOSED
 
-The remaining gates are **not** parked experiments. They are the staged
-steps of one piece of work: get to ranged residency, and park a value back in
-its slot when its range is interrupted.
+Not parked: closed on evidence. The table in "What closed" above has the
+results; ADR 0017 carries the reasoning and ADR 0029 the miscompile that ended
+stage 3.
 
-| Stage | Gate | ADR | State |
-| --- | --- | --- | --- |
-| 1. truthful intervals | `IR_TIGHT_HOMES` | 0027 | byte-identity premise **refuted**; explain it first |
-| 2. ranging | — | 0017 | blocked on stage 1 |
-| 3. park the slot when the range breaks | `IR_RANGED` | 0029 | in flight, conservative form |
-| cost correctness | — | 0032 | **done** — SLOT+BC rows shipped default-on; `IR_GBZ80_MASK` remains as the bisection tool for future gbz80 work |
-
-Read their size numbers with that in mind. `IR_TIGHT_HOMES` at −508 B with 39
-cells larger, and `IR_RANGED` at −110 B with 108 cells larger, are **not**
-verdicts on whether the stages are worth doing — a stage measured alone, without
-the stage it depends on, cannot show its value. The one number that IS a verdict
-is the `IR_TIGHT_HOMES` byte-identity failure, because that claim was supposed to
-hold on its own.
-
-Promoted out of this list: `IR_BC_STEP_PARAM` (ADR 0031, shipped). Refused and
-removed: `IR_JR_UNCOND` (ADR 0033, slower on the only CPUs it touched),
-`IR_TRIPW` (ADR 0028, worse on both axes), `IR_INPLACE_MASK` and `IR_INPLACE_CMP`
-(no effect / noise), `IR_OPRES` (ADR 0018), `IR_NO_A_CARRY`, `IR_FLIPCOST`,
-`IR_SPINC`, `IR_SPEXCL`, `IR_REHOME`.
-
-### The first thing to do in this arc
-
-Resolve the `IR_TIGHT_HOMES` byte-identity failure. `md5` in fp mode, +29 bytes,
-reproducing identically on every CPU. Two possible causes, needing different
-fixes:
-
-1. the lowerer accesses a value **outside its IR live range** — invisible
-   residency, which stage 2 converts from harmless into a miscompile; or
-2. the narrowed interval changes an allocation decision, in which case stage 1
-   is not the neutral substrate it is supposed to be.
-
-Identical behaviour across CPUs points at (2), but (1) is the one that must be
-ruled out, because it is a latent correctness bug rather than a cost question.
+Promoted out: `IR_TIGHT_HOMES` -> `tight-homes`, default-on (ADR 0027);
+`IR_BC_STEP_PARAM` (ADR 0031). Refused and removed: `IR_RANGED` (ADR 0029,
+miscompiled), `IR_JR_UNCOND` (ADR 0033), `IR_TRIPW` (ADR 0028), `IR_INPLACE_MASK`
+and `IR_INPLACE_CMP`, `IR_OPRES` (ADR 0018), `IR_NO_A_CARRY`, `IR_FLIPCOST`,
+`IR_SPINC`, `IR_SPEXCL`, `IR_REHOME`. Cost correctness (ADR 0032) shipped;
+`IR_GBZ80_MASK` remains as the bisection tool for future gbz80 work.
 
 ### Numeric knobs — a category with no home
 
