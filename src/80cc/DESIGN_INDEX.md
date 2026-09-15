@@ -78,8 +78,24 @@ enforced by a script. What remains is optimisation work, and the order matters:
    function-registers. DE is exhausted (31 of 78 shared, 16 left); IX is a
    non-starter (frame pointer in fp mode).
 
-   **Do IY next, or go straight to stage 3. Do not spend more on the BC
-   packer's search.**
+   **Stage 3's expensive form is also REFUSED** (ADR 0029). Parking the tenant
+   to its slot over the window and resuming after would free those 83 — and 74
+   of 145 blocked candidates have a *completely idle* tenant, the best possible
+   shape. But priced in the same cycle unit as the gain, only **7 of 145 pay**:
+   a park is a slot store plus a slot reload, loop-weighted, and that exceeds
+   what a born-killed temp gains from BC.
+
+   So the BC half is closed from both directions. **What is live:** stage 2's
+   **IY half** (121 candidates, shared in only 5 of 26 function-registers), and
+   stage 3's **fail-safe form** (ADR 0029) — an opportunistic cache with no park
+   cost, which is why it may work where the expensive form cannot; it still owes
+   a measurement on a real char/pointer-heavy file.
+
+   ►► UNIT TRAP, recorded because it inverted the answer: pricing the park with
+   `g0_word_bytes` against a gain from `interval_benefit_x` reported **145 of
+   145 paying**. `interval_benefit_x` is CYCLE-denominated (`g0_word_cost`);
+   `g0_word_bytes` is bytes. In matching units it is 7 of 145. A 100 % result is
+   a symptom, not a discovery.
 
    Expect predicate bugs of the ADR 0027 class: anything currently meaning "not
    whole-function" needs re-reading before a register is genuinely shared.

@@ -3428,7 +3428,10 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                            cand[i].flo, cand[i].fhi, jlo, jhi)) clash = 1;
         }
         ir_liveprobe_decision_end();
-        if (clash) { rej_ten++; continue; }
+        if (clash) {
+            rej_ten++;
+continue;
+        }
         f->vreg_to_phys[v] = IR_PR_BC;
         f->vregs[v].flags |= IR_VREG_BC_PACK;
         last_fhi = cand[i].fhi;

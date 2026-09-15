@@ -160,9 +160,22 @@ stage 2.
 
 **Consequence for the staging.** This ADR says "stage 3 is what makes stage 2
 safe". That is true but understates it: for the BC half, **stage 3 is what makes
-the opportunity reachable at all**. Stage 2's remaining independent content is
-the IY half (121), where the register is barely shared today. Do IY next, or go
-straight to stage 3 — but do not spend more on the BC packer's search.
+the opportunity reachable at all**.
+
+And stage 3's *expensive* form — park the tenant to its slot over the window and
+resume after — was then measured and **refused** (ADR 0029): of the 145 blocked
+candidates, 74 have a completely idle tenant (the best possible shape), yet only
+**7 of 145 pay** once the park is priced in the same cycle unit as the gain. A
+park is a slot store plus a slot reload, loop-weighted, and that exceeds what a
+born-killed temp gains from BC.
+
+So the BC half of stage 2 is closed from both directions: no packing order
+reaches it, and paying to park the incumbent does not either. What remains live:
+
+* **stage 2's IY half (121 candidates)**, barely shared today (5 of 26);
+* **stage 3's fail-safe form** (ADR 0029) — an opportunistic cache with *no park
+  cost*, which is precisely why it may work where the expensive form cannot. It
+  still owes its own measurement on a real char- and pointer-heavy file.
 
 DE is effectively exhausted (31 of 78 shared, 16 left) and IX is a non-starter —
 it is the frame pointer in fp mode. Neither is worth work.

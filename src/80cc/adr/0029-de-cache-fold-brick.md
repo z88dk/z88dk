@@ -48,3 +48,36 @@ The risk is not correctness but **clutter**: an opportunistic fold that fires
 rarely is a permanent complication to the belief cache for little return. If a
 measurement shows a thin population, refuse it and record that here, as 0018
 records its sibling.
+
+## The EXPENSIVE form of stage 3 is refused (2026-09-15)
+
+This ADR is the *fail-safe* form — a belief, no promise, no park. The obvious
+alternative is the expensive one: when a candidate is blocked by a live tenant,
+**park the tenant to its slot over the window and resume after**. That is what
+would free the 83 BC-pack candidates ADR 0017 found blocked by live tenants.
+
+Measured, it does not pay. Of 145 blocked candidates across the corpus in both
+frame modes, **74 have a tenant that is completely idle inside the window** —
+the best possible shape, where the park costs only a store and a reload. Pricing
+that park against the candidate's `interval_benefit_x`:
+
+**7 of 145 sites pay (5 %)**, and only **6 of the 74** idle-tenant cases.
+
+A park is a slot store plus a slot reload — ~86 cycles on z80-sp — and it runs
+every time the window runs, so it is weighted by loop depth exactly as the gain
+is. That cost simply exceeds what a born-killed temp gains from BC.
+
+**So the expensive form is refused**, and this ADR's fail-safe form is the only
+live version of stage 3. It has no park cost at all — which, given the above, is
+the entire reason it might work where the other cannot. Its own measurement
+(a real char- and pointer-heavy file) is still owed.
+
+### The unit trap, recorded because it inverted the answer
+
+The first version of this measurement priced the park with `g0_word_bytes` and
+the gain with `interval_benefit_x`. Those are **different denominations** —
+`interval_benefit_x` is cycle-based (`g0_word_cost`: a z80-sp slot read is 45
+cycles against BC's 8) while `g0_word_bytes` is bytes. Comparing them reported
+**145 of 145 sites paying, by 3-7x**. In the same units it is 7 of 145.
+
+A 100 % result is not a discovery, it is a symptom. Check the units.
