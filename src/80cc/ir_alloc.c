@@ -5871,15 +5871,20 @@ void ir_alloc(Func *f)
         free(dehl_ok);
     }
 
-    /* P3.2 step 1 (opt-in IR_TIGHT_HOMES): narrow whole-function homes to the
+    /* P3.2 step 1 (DEFAULT ON; --opt-disable=tight-homes, IR_OFF=tight-homes):
+       narrow whole-function homes to the
        tight live range. A vreg is only accessed WITHIN its live range, where
        its home is unchanged, so this is byte-identical — it makes home_lo/hi
        TRUTHFUL (the substrate for disjoint sub-range time-sharing) and gives the
        range-aware verifier real residency windows. A byte-diff that is NOT clean
        reveals a lowerer access outside the IR live range (the "invisible
        residency" the plan warns about) — high-value to surface before ranging.
-       HL/DEHL (cache-only) and SPILL/NONE are skipped. */
-    if (getenv("IR_TIGHT_HOMES") && f->home_lo && f->home_hi) {
+       HL/DEHL (cache-only) and SPILL/NONE are skipped.
+       Flipped default-on 2026-09-15 once it was byte-clean: 720 cells, 20
+       smaller, ZERO larger, ticks unchanged. Evidence and the two bugs that
+       had to be fixed first (frameless_ok's ranged test, and this loop
+       WIDENING an already-ranged window) are in adr/0027. */
+    if (!opt_disabled("tight-homes") && f->home_lo && f->home_hi) {
         for (int v = 0; v < f->n_vregs; v++) {
             PhysReg pr = f->vreg_to_phys[v];
             if (pr == IR_PR_SPILL || pr == IR_PR_NONE

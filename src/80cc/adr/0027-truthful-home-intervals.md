@@ -1,8 +1,10 @@
 # ADR 0027 — Truthful home intervals
 
-Status: Proposed, **in flight** — stage 1 of ADR 0017's ranging arc, staged
-behind `IR_TIGHT_HOMES`. Not an independent lever: stage 2 cannot begin until
-the intervals are truthful.
+Status: **Accepted**, default on since 2026-09-15.
+`--opt-disable=tight-homes` (or `IR_OFF=tight-homes`) opts out, byte-identical
+to the pre-flip compiler. Stage 1 of ADR 0017's ranging arc — not an independent
+lever, but stages 2 and 3 could not begin until the intervals were truthful, and
+now they are.
 
 Builds on ADR 0017 (ranged residency as a home-per-interval table). This is the
 first step of it, and the prerequisite for every later one.
@@ -106,13 +108,22 @@ the home *was* whole-function.
 byte-clean — now holds, and narrowing is slightly *better* than whole-function
 homes because the point queries it feeds are more accurate.
 
-Gates with `IR_TIGHT_HOMES=1`: `long_ir` 739/739 both frame modes, enigma
-`RXSEC` both modes, clisp `6`/`42`, z80 corpus ticks **+0.0000 %** with 0 cells
-slower and 60/60 `fail=0`. Default path (gate off) unchanged: reference 422/422,
-720/720 cells byte-identical.
+Gates: `long_ir` 739/739 both frame modes, enigma `RXSEC` both modes, clisp
+`6`/`42`, adv_a "Planet of Death", sorter ordered.
 
-**Stage 1 is therefore complete and the gate is ready to flip default-on**,
-which unblocks stages 2 and 3 of ADR 0017.
+Ticks, 30 benches x 11 CPUs x both frame modes = **660 cells: −0.0410 %, 20
+faster, ZERO slower**, 660/660 `fail=0`. Bytes and cycles move together — the
+20 cells that shrink are the 20 that speed up, because a truthful window lets a
+point query serve a value from its register where the whole-function window had
+said "spilled".
+
+**Flipped default-on 2026-09-15.** Three checks at the flip:
+`IR_OFF=tight-homes` reproduces the pre-flip compiler exactly (reference
+422/422); the new default matches the pre-flip gate-on measurement exactly (720
+cells, 0 mismatches); the new default against the old is −136 bytes, 20 smaller,
+0 larger.
+
+Stages 2 and 3 of ADR 0017 are now unblocked.
 
 ## Why it is worth doing before anything ranged
 

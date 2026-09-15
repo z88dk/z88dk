@@ -40,23 +40,26 @@ enforced by a script. What remains is optimisation work, and the order matters:
    remaining user. `IR_REC` (cold homes) and `IR_HOMEMAP` (the class census)
    stay, and are what any future residency work should reach for.
 
-3. **`IR_TIGHT_HOMES`** (ADR 0027) — **byte-clean, ready to flip default-on.**
-   Never refuted; it was queued behind a ledger that was not its blocker. Two
-   bugs, both found 2026-09-15:
+3. ~~`IR_TIGHT_HOMES`~~ — **SHIPPED default-on 2026-09-15** (ADR 0027), stage 1
+   of the ranging arc. Never refuted; it was queued behind a ledger that was not
+   its blocker. Two bugs had to go first, and both were the same confusion in
+   opposite directions — *narrowed* versus *narrower than*:
    - `frameless_ok` rejected every parameter, because `ir_home_is_ranged` cannot
-     tell a home NARROWED to the live range (value dead outside — harmless) from
+     tell a home narrowed to the live range (value dead outside — harmless) from
      one narrower than it (value slotted outside — the real hazard). Fixed with
      `ir_home_covers_live_range`.
-   - the step **widened** an already-ranged home: it assigned the live range
-     instead of clamping to it, so a call-split window `[12,36]` became `[1,75]`
-     and the lowerer believed BC held a value that was slotted. **A latent
-     miscompile**, not a size regression. Fixed by narrowing only.
+   - the step **widened** an already-ranged home, assigning the live range
+     instead of clamping to it: a call-split window `[12,36]` became `[1,75]`,
+     so the lowerer believed BC held a value that was slotted. **A latent
+     miscompile**, which showed only as +14 bytes because the path that ran
+     reloaded from the slot anyway.
 
-   Now 720 cells: **20 smaller, 0 larger, −136 net**; `long_ir` 739/739 both
-   modes with the gate on; z80 ticks +0.0000 %, 0 slower. Flipping it default-on
-   unblocks stages 2 and 3 of the ranging arc.
+   Result: 720 cells **20 smaller / 0 larger / −136 B**; 660 tick cells
+   **−0.041 % / 20 faster / 0 slower**; `long_ir` 739/739 both modes.
+   `--opt-disable=tight-homes` opts out byte-identically.
 
-4. Then stages 2 and 3 of the ranging arc (ADR 0017).
+4. **NEXT: stages 2 and 3 of the ranging arc (ADR 0017)** — now unblocked,
+   the intervals are truthful and the verifier has real windows to check.
 
 **Shipped 2026-09-15** (ADR 0039): 8085 slot addresses use LDSI —
 −366 bytes, −0.95 % ticks, nothing larger, nothing slower. It came out of the
