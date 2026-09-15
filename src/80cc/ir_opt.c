@@ -2154,39 +2154,25 @@ int ir_opt_sym_addr_fold(Func *f)
 }
 
 /* ---- Fold a deref through a &symbol base into an absolute load ----------
-   The sibling of ir_opt_sym_addr_fold. That one folds the ADDRESS form
-   (`&g + K` -> one symbol immediate); this folds the DEREF of such an address
-   into the absolute `IR_MEM_SYM` load the same access gets when the frontend
-   sees it directly:
-
-       g.b                 ->  LD_MEM sym[&g+202]   ->  ld hl,(_g+202)     3 B
-       p = &g; ... p->b    ->  LD_MEM [v15+202]     ->  ld hl,_g+202       7 B
-                                                        ld a,(hl+)
-                                                        ld h,(hl); ld l,a
-
-   Both name the same link-time-constant address, so the second form is pure
-   loss — 4 bytes and ~20 T a site. It appears whenever the base survives as its
-   own vreg: a `&g` that LICM hoisted to a preheader, or one CSE shared between
-   several member reads. `test/framework/test.c` — linked into EVERY benchmark
-   binary — takes it 14 times for `suite.setup` / `suite.teardown` / `suite.tests`.
+   The sibling of ir_opt_sym_addr_fold: that one folds the ADDRESS form
+   (`&g + K` -> one symbol immediate), this folds the DEREF of such an address
+   into the absolute IR_MEM_SYM load the same access gets when the frontend sees
+   it directly. Both name the same link-time-constant address, so the unfolded
+   form is pure loss. Evidence: adr/0055.
 
    Rewrite `LD_MEM dst, [v + K]` to `LD_MEM dst, sym[&g + (o + K)]` when v has
-   exactly ONE def and that def is `LD_SYM &g + o`. The base vreg's use goes
-   away; when every use folds, the following DCE reclaims the LD_SYM AND the
-   allocator drops its slot.
+   exactly ONE def and that def is `LD_SYM &g + o`. Function-wide single-def,
+   because the LD_SYM has usually been hoisted out of the block that derefs it.
 
-   Function-wide single-def, for the same reason sym_addr_fold is: the LD_SYM
-   has usually been hoisted out of the block that derefs it.
-
-   EXCLUSIONS:
-   - post_step != 0: the base is `p++`-stepped after the load. The absolute form
-     has no base to step, so folding would silently drop the increment.
+   EXCLUSIONS — each of these is a miscompile, not a missed win:
+   - post_step != 0: the absolute form has no base to step, so folding would
+     silently drop the increment.
    - bank_fn, on the deref OR the symbol: an __addressmod access must call the
      page-in function, and the two mem kinds recover the namespace differently.
-   - a symbol whose ir_sym_prefix() is not "_": the IR_MEM_SYM lowering hardcodes
-     the underscore, where gen_ld_sym asks ir_sym_prefix. Only __LIB__ FUNC
-     symbols differ, and their address is not dereferenced as data — but this
-     routes NEW traffic onto that path, so do not rely on it.
+   - a symbol whose ir_sym_prefix() is not "_": the IR_MEM_SYM lowering
+     hardcodes the underscore where gen_ld_sym asks. Only __LIB__ FUNC symbols
+     differ and their address is not dereferenced as data — but this routes NEW
+     traffic onto that path, so do not rely on it.
    - a negative total offset: it addresses outside the object, and the lowering
      spells the offset `+%d` (`_g+-4`).
    `elem` and `volatile_` are preserved — the fold changes how the address is
@@ -2269,33 +2255,21 @@ int ir_opt_sym_deref_fold(Func *f)
    this is a pure rewrite, not a representation change; DCE reclaims the ADD
    once the last deref through it has folded.
 
-   ►► This pass is HALF of a change and REGRESSES ALONE. Measured on its own it
-   cost z80 +77 B (localbench +113): dropping the address temps lengthens the
-   pointer's live range, and a nonzero offset on a VREG base is re-formed with
-   `ld de,K; add hl,de` at every access — so the compiler pays for the offset
-   as many times as it saved the add. Its partner is the `idx-deref` lowering
-   rung (idx_deref_reg, ir_lower_ops.inc.c), which turns base+offset into a
-   free `(iy+d)`. The offset must be FREE for the fold to pay, and it is free
-   only when the base ends up in an index register.
+   ►► HALF of a change: it REGRESSES ALONE (z80 +77 B). Its partner is the
+   `idx-deref` lowering rung (idx_deref_reg, ir_lower_ops.inc.c) — the offset
+   must be FREE for the fold to pay, and it is free only when the base ends up
+   in an index register. See adr/0057 before touching either.
 
-   So the fold is aimed, not general: it fires only on the shape that can WIN
-   the index home, which is the one idx2_home_realizable admits —
-
+   So the fold is AIMED, not general — only the shape that can win the index
+   home, which is the one idx2_home_realizable admits:
      - a width-2 read-only POINTER PARAMETER. A param has no def in this
-       function, so `p` at the deref is provably the same value as at the ADD
-       and the rewrite needs no dominance argument at all. Anything with a def
-       could be redefined between the two (the IR is not SSA) and is rejected
-       rather than proved.
-     - never STEPPED. A walking pointer wants HL/BC and regressed strbench
-       when it was let into the index home; folding its offsets aims it at a
-       home it should not have.
-     - dereferenced at 2 or more sites, counted THROUGH the temps — before the
-       fold a struct pointer reads as one direct deref plus N address temps,
-       which is exactly the census that made the allocator pass it over.
-     - every folded displacement inside the index byte (-128..127, and d+1 for
-       a word). An offset the rung cannot spell is an offset that goes back to
-       being re-formed per access, i.e. the regression above.
-
+       function, so `p` at the deref is provably the same value as at the ADD.
+       Anything with a def could be redefined between the two (the IR is not
+       SSA) and is REJECTED rather than proved.
+     - never STEPPED. A walking pointer wants HL/BC and regressed strbench when
+       it was let into the index home.
+     - dereferenced at 2+ sites, counted THROUGH the temps.
+     - every folded displacement inside the index byte (-128..127, d+1 word).
    CPUs with no index register (808x, gbz80, and the VM1, whose idx2 is the
    RS-prefixed h'/l' pair with no displaced form) can never collect the other
    half, so the fold is skipped there outright.
@@ -3268,26 +3242,14 @@ static OpKind cs_unsigned_of(OpKind k)
    A signed 16-bit compare lowers to `and a; sbc hl,de` plus SEVEN BYTES of pure
    sign correction — `ld a,h; jp po,L; xor 0x80; L: rla` — because the carry out
    of `sbc` is the UNSIGNED answer and the signed one is S^V. When BOTH operands
-   are provably non-negative the two answers coincide, so the unsigned kind
-   branches straight off that carry and the correction disappears.
+   are provably non-negative the two answers coincide and the correction goes.
+   Evidence and the probe that shaped the predicates: adr/0056.
 
-   MEASURED with the inert IR_CMPSIGN_PROBE before this was written: 153 signed
-   16-bit compares over the corpus + the four real files, 50 of them provable =
-   350 B in fp mode (adv_a 28 B, localbench 28, predbench 28, listbench 21...).
-   Every site is a LOOP EXIT TEST, so the correction also costs ~18-25 T per
-   iteration — bytes and cycles move together here.
-
-   TWO THINGS THE PROBE CORRECTED, both load-bearing:
-     - v_fits_byte carries only 10 of the 50. The other 40 are `i = i + 1`
-       induction variables, which that helper rejects (it takes only masked
-       ANDs, small constants, zero-extends and copies). Hence v_nonneg_iv.
-     - "every def is init>=0 or += positive" is NOT a proof on its own. A value
-       that only RISES can pass 32767 and become negative:
-           int i = 0; while (other) { if (i < 5) f(); i += 1; }
-       there the signed answer is true and the unsigned rewrite says false.
-       cs_compare_bounds_loop supplies the missing condition — the compare must
-       be the test that leaves the loop the step lives in. It REJECTED 6 of the
-       56 otherwise-passing sites, 2 of them in adv_a.
+   NB "every def is init>=0 or += positive" is NOT a proof on its own: a value
+   that only RISES can pass 32767 and become negative —
+       int i = 0; while (other) { if (i < 5) f(); i += 1; }
+   cs_compare_bounds_loop supplies the missing condition (the compare must be
+   the test that leaves the loop the step lives in). Monotonic is not bounded.
 
    `IR_OFF=cmp-unsign` / `--opt-disable=cmp-unsign` opts out. */
 int ir_opt_cmp_unsign(Func *f)

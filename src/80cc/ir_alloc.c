@@ -1021,15 +1021,16 @@ static int callsplit_on(void) { static int c = -1; if (c < 0) c = !opt_disabled(
 
 /* [IR_OFF=iy-long] Opt OUT of running the IY packs in a function the BC veto
    excludes. They self-guard with a per-op op_clobbers IR_R_IY check over the
-   candidate's live range, so the BC veto buys them nothing. */
+   candidate's live range, so the BC veto buys them nothing — it names another
+   register's restriction. adr/0060. */
 static int iylong_off(void) { static int c = -1; if (c < 0) c = opt_disabled("iy-long"); return c; }
 
 /* [IR_CS_EVICT=0/1] Let a call-bounded split EVICT a picker-placed BC tenant it
    out-benefits, instead of silently losing BC to whoever the picker placed
-   first. Defaults to whatever prepush-narrow is: the arbitration gap only
+   first. Defaults to whatever prepush-narrow is — the arbitration gap only
    becomes reachable once the narrowing admits whole-function BC candidates into
-   functions with pre-pushed calls, so the default build stays byte-identical and
-   the opt-in configuration is self-contained. Force either way to isolate it. */
+   functions with pre-pushed calls, so the default build stays byte-identical.
+   Force either way to isolate it. adr/0061. */
 static int prepushnarrow_on(void);
 static int cs_evict_on(void)
 {
@@ -2517,7 +2518,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
        skipped as already-placed — the register is sitting EMPTY and the param
        is in a slot. Give it the register. Only when idx2 is genuinely still
        free and the param is still unplaced, so the yield is preserved whenever
-       the counter DID collect it. `--opt-disable=idx2-revisit` opts out. */
+       the counter DID collect it. adr/0059. `--opt-disable=idx2-revisit`. */
     if (idx2_defer >= 0 && !idx2_taken && f->idx2_reg != IR_PR_NONE
         && !opt_disabled("idx2-revisit")
         && f->vreg_to_phys[pool[idx2_defer].vreg] == IR_PR_SPILL) {
@@ -2525,28 +2526,14 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
         idx2_taken = 1;
     }
     /* ---- PAIRWISE SWAP: BC <-> the index home ----------------------------
-       The loop above is ISOLATION-PRICED GREEDY. It walks candidates in rank
-       order and gives each its own best class; whatever is left takes what
-       remains. It never prices the PAIRING, and for BC against an index home
-       the pairing is what matters, because the two registers are not
-       interchangeable in the same direction:
-
-         a VALUE  in BC is `ld a,c`            (1 B,  4 T)
-         a VALUE  in IX/IY is `push iy;pop hl` (4 B, 25 T) — it cannot feed the ALU
-         a BASE   in IX/IY is `(iy+d)`         (3 B, 19 T) at ANY offset
-         a BASE   in BC is `ld a,(bc)`         (1 B,  7 T) at offset 0 ONLY
-
-       So a pointer prefers BC only narrowly, while a value prefers it hugely —
-       and the greedy order hands BC to the pointer. bitfieldbench reg_set,
-       z80 fp, by the arbiter's OWN benefit numbers:
-
-           v0 pointer   BC 226   IX 217
-           v1 value     BC 150   IX  65
-           greedy  v0->BC + v1->IY = 291
-           swapped v0->IY + v1->BC = 367     <- better by 76
-
-       xcc makes the swapped choice and needs 73 instructions for reg_set where
-       80cc needs 136. This pass asks the question the loop never does.
+       The loop above is ISOLATION-PRICED GREEDY: it gives each candidate its
+       own best class and never prices the PAIRING. For BC against an index
+       home the pairing is what matters, because the two are not
+       interchangeable in the same direction — a VALUE strongly prefers BC
+       (`ld a,c` against `push iy;pop hl`, which cannot feed the ALU) while a
+       BASE prefers it only narrowly (`ld a,(bc)` is offset-0 only, `(iy+d)` is
+       any offset). The greedy order hands BC to the pointer. Worked numbers:
+       adr/0058.
 
        Deliberately narrow: ONE BC tenant and ONE index tenant, both already
        placed, each admissible in the other's class, and the swap must WIN on

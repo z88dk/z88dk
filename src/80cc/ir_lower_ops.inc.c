@@ -3232,12 +3232,9 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             }
         }
         int dst_w = f->vregs[op->dst].width;
-        /* 8085 word deref: LHLX reads the word in one instruction, through DE.
-           `ld de,hl+n` (LDHI) folds the field offset in for free, so the whole
-           access is 3B/20c against the offset chain plus byte walk's 6B/36c;
-           at offset 0 getting the address into DE costs 2B/14c against 4B/24c.
-           It also leaves A alone, where the walk clobbers it, and reads the
-           word with ONE bus access rather than two.
+        /* 8085 word deref: LHLX reads the word in one instruction, through DE,
+           and `ld de,hl+n` (LDHI) folds the field offset in for free. It also
+           leaves A alone, where the walk clobbers it. Evidence: adr/0054.
            DE is the price. A small-offset word deref is one of the shapes
            op_de_clean promises is DE-clean, which is how a DE home survives
            across it — so this is gated on the function keeping no DE home

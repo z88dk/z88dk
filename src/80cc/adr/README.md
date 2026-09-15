@@ -41,6 +41,16 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0029](0029-de-cache-fold-brick.md) | *Proposed* — a fail-safe DE cache fold, where 0018 refuses a DE home |
 | [0032](0032-gbz80-word-cost-row.md) | The measured gbz80 cost rows (SLOT+BC), shipped — and why the regression that held them back was a failed recovery, not a ranking tie |
 | [0034](0034-one-owner-for-the-allocation.md) | `ir_alloc` is the only writer of the plan; the render reports typed rejections (amends 0003) |
+| [0061](0061-call-split-eviction-is-coupled-to-prepush-narrowing.md) | **Accepted** — `cs-evict` defaults to `prepush-narrow`, because its opportunity only exists once narrowing admits the candidates |
+| [0060](0060-the-iy-packs-do-not-need-the-bc-veto.md) | **Accepted** — the IY packs self-guard, so the BC veto never applied to them |
+| [0059](0059-revisit-a-yielded-index-home.md) | **Accepted** — a param that yielded the index home takes it back if the counter never collected it |
+| [0058](0058-bc-and-the-index-home-can-be-swapped.md) | **Accepted** — the greedy never prices the PAIRING; swapping BC and the index home wins 76 on reg_set |
+| [0057](0057-the-offset-fold-is-half-a-change.md) | **Accepted** — the deref-offset fold REGRESSES ALONE (+77 B) and only pays with the idx-deref rung |
+| [0056](0056-signed-compares-that-need-no-sign-correction.md) | **Accepted** — 50 of 153 signed compares need no sign correction; monotonic is not bounded |
+| [0055](0055-a-deref-through-a-symbol-base-becomes-absolute.md) | **Accepted** — a deref through a `&symbol` base folds to an absolute load; 4 B and ~20 T a site |
+| [0054](0054-the-8085-reads-a-word-deref-with-lhlx.md) | **Accepted** — the 8085 reads a word deref with LHLX/LDHI — 3 B/20 c against 6 B/36 c |
+| [0053](0053-narrow-a-constant-shift-to-the-bytes-that-survive.md) | **Accepted** — narrow a width-4 constant shift to the bytes a CONV_TRUNC keeps; −257 B, none larger |
+| [0052](0052-fold-an-offset-into-a-rematerialised-symbol.md) | **Accepted** — fold a field offset into a rematerialised `&symbol`; 7 B becomes 3 |
 | [0051](0051-8085-k-flag-trip-counters.md) | *Proposed* — 8085 `jp k`/`jp nk` for 16-bit trip counters; 236 candidate sites, needs an IV shift not a peephole |
 | [0050](0050-stack-transient-spill-is-an-sp-mode-trade.md) | **Accepted** — stack-transient spill is sp-mode only, and the CPU test genuinely is the question |
 | [0049](0049-bc-liveness-follows-branches.md) | **Accepted** — BC liveness follows intra-function branches; −248 B, none larger, nothing slower |

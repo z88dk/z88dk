@@ -683,28 +683,14 @@ static int hl_load_takes_remat(const Func *f, int v)
 /* [SYMADDR_DEREF] Load `base` into HL for a deref at constant offset `off`,
    folding the offset into the symbol where the base is a rematerialisable
    `&symbol`. Returns the offset the CALLER still has to add: 0 when it folded,
-   `off` unchanged otherwise.
+   `off` unchanged otherwise. The address is a link-time constant, so folding a
+   constant into it is free (`ld hl,_suite+206` for the add chain).
 
-   `gen_ld_sym` already folds its own offset, so `&g.field` is one `ld hl,_g+K`.
-   The DEREF of a struct-member address did not: the base materialised bare and
-   the field offset became a separate add —
-
-       ld hl,_suite / ld de,206 / add hl,de     7 bytes
-       ld hl,_suite+206                         3 bytes
-
-   Same fold, same rematerialisation licence: the address is a link-time
-   constant, so folding a constant into it is free. Only fires where the base
-   would otherwise be rematerialised (hl_load_takes_remat) — a base already
-   sitting in a register is cheaper to copy than to re-emit, and folding there
-   would trade 2 bytes for 3.
-
-   LD_IMM bases are deliberately NOT folded here: a NO_SLOT immediate had its
-   own miscompile (see the remat marking in ir_lower.c) and the address-of case
-   is where the offsets are.
-
-   Negative and zero totals fall through to the plain load — `_sym+-4` is a
-   formatting question, not a codegen one, and the small-offset case is already
-   an inc/dec chain. */
+   Only fires where the base would otherwise be rematerialised
+   (hl_load_takes_remat) — a base already in a register is cheaper to copy.
+   LD_IMM bases are deliberately NOT folded: a NO_SLOT immediate had its own
+   miscompile (see the remat marking in ir_lower.c). Negative and zero totals
+   fall through to the plain load. Rationale: adr/0052. */
 static int load_to_hl_fold_off(FILE *out, const Func *f, int base, int off)
 {
     if (off <= 0 || !g_hc.remat_def) goto plain;
@@ -1592,14 +1578,9 @@ static void partial_load_long_shr(FILE *out, const Func *f, int v,
 }
 
 /* [IR_SHRNARROW=0] Opt OUT of narrowing a width-4 constant shift to the bytes a
-   following CONV_TRUNC keeps.
-
-   DEFAULT-ON. Corpus -257 B over 660 cells, 18 smaller and NONE larger, every
-   CPU improving (gbz80 -38, z80/z80n/z180 -32, kc160 -30, ez80 -29, rabbit
-   -24/-20); widthbench -6.4 % z80 sp / -7.1 % fp, -11.2 % ez80 fp, -11.1 %
-   kc160 fp. long_ir 673/673 sp AND fp; every shift count 0..31 x 8 values x
-   both result widths checked against a reference on 6 CPUs x both frame modes.
-   `IR_SHRNARROW=0` reverts, byte-identical to the pre-change compiler. */
+   following CONV_TRUNC keeps. DEFAULT-ON; IR_SHRNARROW=0 reverts,
+   byte-identical. Evidence, and the exhaustive validation sweep it needed:
+   adr/0053. */
 static int shrnarrow_on(void)
 {
     static int c = -1;
