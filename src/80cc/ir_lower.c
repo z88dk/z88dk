@@ -3194,7 +3194,10 @@ static int frameless_ok(const Func *f)
            Whole-function BC is what remains. This is the SHORT-TERM narrowing;
            the real fix is to route every frame access to sp when frameless. */
         if (ph != IR_PR_BC) return 0;
-        if (ir_home_is_ranged(f, v)) return 0;
+        /* A home NARROWED to the live range is fine — outside it the value is
+           dead. Only a home narrower than the live range sends the access back
+           to the caller's frame. */
+        if (!ir_home_covers_live_range(f, v)) return 0;
     }
     return 1;
 }
@@ -4341,7 +4344,7 @@ static void rec_end(const Func *f)
                    re-lower read a vreg with neither register nor slot
                    (require_slot abort). Not trustable, same as addr-taken. */
                 int ranged = (f->vregs[v].flags & IR_VREG_CALL_SPLIT)
-                          || ir_home_is_ranged(f, v);
+                          || !ir_home_covers_live_range(f, v);
                 int trustable = w <= 2
                              && !(f->vregs[v].flags & IR_VREG_ADDR_TAKEN)
                              && !ranged;

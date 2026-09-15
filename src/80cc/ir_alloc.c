@@ -226,6 +226,31 @@ int ir_home_is_ranged(const Func *f, int v)
     return f->home_lo[v] != INT_MIN || f->home_hi[v] != INT_MAX;
 }
 
+/* Does v's home window COVER its whole live range?
+   `ir_home_is_ranged` answers a narrower question than most of its callers
+   want: it is true for any window that is not literally whole-function. Two
+   very different things satisfy that, and only one is a hazard:
+     - the window is NARROWER than the live range — the allocator split the
+       range, so outside the window the value is SLOTTED and an access there
+       reaches memory. This is what frameless_ok and the dead-frame verdict
+       must reject.
+     - the window merely equals the live range (what IR_TIGHT_HOMES does) —
+       outside it the value is DEAD, not slotted, so no access exists to
+       reach memory at all. Harmless.
+   Conflating them made IR_TIGHT_HOMES look like a regression: narrowing every
+   home to its live range made every PARAM "ranged", frameless_ok rejected them
+   all, and functions that were frameless grew a frame (`push ix; ld ix,0;
+   add ix,sp`). See ADR 0027. */
+int ir_home_covers_live_range(const Func *f, int v)
+{
+    if (!f || v < 0 || v >= f->n_vregs) return 0;
+    if (!f->home_lo || !f->home_hi) return 1;       /* no windows: whole-function */
+    if (f->home_lo[v] == INT_MIN && f->home_hi[v] == INT_MAX) return 1;
+    const LiveRange *lr = ir_live_range(f, v);
+    if (!lr || lr->start < 0) return 0;             /* no range: cannot prove it */
+    return f->home_lo[v] <= lr->start && f->home_hi[v] >= lr->end;
+}
+
 /* v's home window as a flat op-index range, clamped into [*lo,*hi]. Callers
    pass the live range and get back the part of it the home actually covers. */
 void ir_home_window(const Func *f, int v, int *lo, int *hi)

@@ -40,11 +40,22 @@ enforced by a script. What remains is optimisation work, and the order matters:
    remaining user. `IR_REC` (cold homes) and `IR_HOMEMAP` (the class census)
    stay, and are what any future residency work should reach for.
 
-3. **Then `IR_TIGHT_HOMES`** (ADR 0027). Investigated 2026-09-14: its
-   byte-identity failure is **not** a latent miscompile — it is the allocator
-   taking newly-visible claims without pricing what they displace. It follows
-   the ledger rather than preceding it. On the `md5` witness the worse code is
-   the **sp-flip clone's** allocation, not the fp one (ADR 0036) — start there.
+3. **`IR_TIGHT_HOMES`** (ADR 0027) — **unblocked, and half-fixed 2026-09-15.**
+   It was never refuted; it was queued behind the ledger, which turned out not
+   to be its blocker. An `IR_HOMEMAP` census splits its byte-identity failure in
+   two: cells where the allocator takes new claims (`md5` z80-fp, homes
+   221->226) and cells where the allocation is IDENTICAL and the code still
+   grows. Most of the second class was `frameless_ok` rejecting every parameter,
+   because `ir_home_is_ranged` cannot tell a home NARROWED to the live range
+   (value dead outside — harmless) from one narrower than it (value slotted
+   outside — the real hazard). Fixed with `ir_home_covers_live_range`;
+   35 cells larger -> 24, −190 -> −331 net, default path 720/720 unchanged.
+
+   Next: the residual 24 are genuine lowering point queries. Witness is
+   `shiftbench` on 8085 (+14), where `ld hl,(de)` (LHLX) becomes a four-
+   instruction byte walk; `histbench` (14 cells, +1/+2) and `localbench` gbz80
+   (+3) are the rest. Scope each like the static DE-clean fix.
+
 4. Then stages 2 and 3 of the ranging arc (ADR 0017).
 
 **Shipped 2026-09-15** (ADR 0039): 8085 slot addresses use LDSI —

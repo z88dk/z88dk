@@ -27,13 +27,64 @@ The reasoning said this must be **byte-identical**: a vreg is only accessed
 within its live range, where its home is unchanged, so narrowing cannot alter
 any access the compiler is supposed to make.
 
-**Measured, it is not.** Across the corpus at 30 benches x 12 CPUs x both frame
-modes: 73 cells smaller, **39 cells larger**, −508 bytes net, worst regression
-+29 bytes on one file. So the premise is wrong somewhere, and finding out where
-is the whole value of this step — see below.
+**Measured, it is not** — and re-measured on 2026-09-15, after the static
+DE-clean point fix, the corpus at 30 benches x 12 CPUs x both frame modes gave
+58 cells smaller, **35 larger**, −190 bytes net, worst +29.
 
-Cache-only homes (HL, DEHL) and unhomed values are skipped; they are not
-residency in the sense the table records.
+## The failure has TWO causes, not one (2026-09-15)
+
+An `IR_HOMEMAP` register-class census separates them, and only the first matches
+the diagnosis this file previously carried:
+
+**A. The allocator takes newly-visible claims.** `md5` z80-fp (+29): register
+homes 221 → 226, five ALLOCMAP rows differ.
+
+**B. The allocation is bit-for-bit identical and the code still grows.**
+`shiftbench` 8085 (+14), `callbench` z80-fp (+7): zero ALLOCMAP rows differ.
+
+Class B was assumed to be the "invisible residency" hazard below — a lowerer
+access outside the IR live range. **Most of it was not.** It was a predicate
+that cannot tell narrowing from splitting:
+
+```c
+int ir_home_is_ranged(...)  /* true for ANY window that is not whole-function */
+frameless_ok():  if (ir_home_is_ranged(f, v)) return 0;   /* ...so: every param */
+```
+
+`IR_TIGHT_HOMES` narrows every home to its live range, so every home became
+"ranged", `frameless_ok` rejected every parameter, and frameless functions grew
+a frame — visible in the asm as `push ix; ld ix,0; add ix,sp` replacing
+sp-relative addressing. On `callbench`, 0 of 67 ALLOCMAP rows had a
+non-whole-function window before, 11 of 67 after.
+
+The rejection is **false**. A ranged home is dangerous because outside its span
+the value is *slotted*, so an access there reaches memory. Under tight homes the
+span IS the live range — outside it the value is *dead*, and there is no access.
+
+**Fixed** by `ir_home_covers_live_range()`, which asks whether the window covers
+the live range rather than whether it is literally whole-function, at the two
+callers that wanted the narrower question (`frameless_ok` and the dead-frame
+trustability test). Default path unchanged: **720 of 720 cells byte-identical**,
+reference 422/422, `long_ir` 739/739 both modes, enigma and clisp green.
+
+With that fixed, `IR_TIGHT_HOMES` now measures **58 smaller, 24 larger, −331
+net** (from 35 larger, −190).
+
+## The residual 24 cells
+
+Still class B — allocation identical, code larger — and now genuinely a lowering
+difference. The witness is `shiftbench` on 8085 (+14), where a word read that was
+one `ld hl,(de)` (LHLX) becomes a four-instruction byte walk:
+
+```
+ld hl,(de)        ->    ex de,hl / ld c,(hl) / inc hl / ld b,(hl)
+```
+
+`histbench` (14 cells, +1/+2 each) and `localbench` gbz80 (+3) are the rest.
+These are the cases this step exists to surface: a lowering decision keyed on a
+home query that answers differently once the window is real. Each one is a point
+query to find and scope, exactly like the static DE-clean fix that preceded
+this.
 
 ## Why it is worth doing before anything ranged
 
