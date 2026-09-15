@@ -57,15 +57,17 @@ PUBLIC m32_discardfraction
     dec d
     jp NZ,shift_right
 
-    pop bc                      ; orig HL
+    pop bc                      ; B=orig_H, C=orig_L
     ld a,c
     and l
-    ld l,a
-    cp c
-    jp NZ,frac_pop_de
+    ld l,a                      ; mask L
     ld a,b
     and h
-    ld h,a
+    ld h,a                      ; mask H (before compare)
+    ld a,l
+    cp c
+    jp NZ,frac_pop_de
+    ld a,h
     cp b
     jp NZ,frac_pop_de
 
