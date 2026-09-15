@@ -29,9 +29,9 @@ int main(void)
     unsigned int pp = probe_pair();
 
     unsigned int pop1 = p1 & 0xffff,  pop2 = p2 & 0xffff,  popp = pp & 0xffff;
-    unsigned int b01 = (p1 >> 8) & 0xff, b11 = p1 & 0xff;      /* b0 = byte@SP, b1 = byte@SP+1 */
-    unsigned int b02 = (p2 >> 8) & 0xff, b12 = p2 & 0xff;
-    unsigned int b0p = (pp >> 8) & 0xff, b1p = pp & 0xff;
+    unsigned int b01 = (p1 >> 24) & 0xff, b11 = (p1 >> 16) & 0xff;      /* b0 = byte@SP, b1 = byte@SP+1 */
+    unsigned int b02 = (p2 >> 24) & 0xff, b12 = (p2 >> 16) &  & 0xff;
+    unsigned int b0p = (pp >> 24) & 0xff, b1p = (pp >> 16) &  & 0xff;
 
     printf("push 0x1234 : pop=0x%04x  bytes@SP=%02x %02x\n", pop1, b01, b11);
     printf("push 0x0100 : pop=0x%04x  bytes@SP=%02x %02x\n", pop2, b02, b12);
