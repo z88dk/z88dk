@@ -1972,6 +1972,39 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 char *nl = strdup("\txor\ta\n");
                 if (nl) { free(lines[i]); lines[i] = nl; }
             }
+            /* [ldsi-addr] 8085 only. Forming a slot address costs
+               `ld hl,N; add hl,sp` — 4 bytes, 20 cycles. The 8085 has LDSI,
+               `ld de,sp+N`, which does it in 2 bytes and 10, so the pair
+               becomes `ld de,sp+N; ex de,hl` — 3 bytes and 14.
+               Three things must hold, and each is a real hazard:
+                 - D and E dead AFTER the pair. `ex de,hl` is a SWAP, so DE
+                   comes back holding the old HL. HL is being overwritten by
+                   this very sequence, so losing it is free; DE is not.
+                 - F dead. `add hl,sp` (DAD SP) WRITES CARRY and the LDSI pair
+                   does not, so a consumer of that carry would silently read a
+                   stale flag.
+                 - N in 0..255. LDSI's operand is one unsigned byte
+                   (`sp + get_memory_inst(pc++)` in src/ticks/i8085_inst.c).
+               Same liveness the [xor-a] rung above uses, and for the same
+               reason: at line i it is the answer for the code AFTER line i.
+               Census over the corpus 8085 output: 1920 sites, all in range,
+               346 with DE dead. `--opt-disable=ldsi-addr` opts out. */
+            if (IS_8085() && !opt_disabled("ldsi-addr")
+                && !d_live && !e_live && !f_live
+                && i > 0 && !strcmp(lines[i], "\tadd\thl,sp\n")
+                && !drop[i] && !drop[i - 1]) {
+                int n = -1;
+                if (sscanf(lines[i - 1], "\tld\thl,%d\n", &n) == 1
+                    && n >= 0 && n <= 255) {
+                    char buf[48];
+                    snprintf(buf, sizeof buf, "\tld\tde,sp+%d\n", n);
+                    char *a = strdup(buf), *b = strdup("\tex\tde,hl\n");
+                    if (a && b) {
+                        free(lines[i - 1]); lines[i - 1] = a;
+                        free(lines[i]);     lines[i]     = b;
+                    } else { free(a); free(b); }
+                }
+            }
             /* A call to compiled C code neither reads the flags nor preserves
                them — the same fact about BC that [bc-call] rests on, and the
                same `_sym` discriminator, so an asm-linkage call stays a reader.

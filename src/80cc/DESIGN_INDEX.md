@@ -52,6 +52,12 @@ enforced by a script. What remains is optimisation work, and the order matters:
    the **sp-flip clone's** allocation, not the fp one (ADR 0036) — start there.
 4. Then stages 2 and 3 of the ranging arc (ADR 0017).
 
+**Shipped 2026-09-15** (ADR 0039): 8085 slot addresses use LDSI —
+−366 bytes, −0.95 % ticks, nothing larger, nothing slower. It came out of the
+*failed* 8085 pricing work (ADR 0038): the cost model could not use the chip's
+cheaper slot, but the lowerer could. When a cost-model correction refuses,
+check whether the fact it uncovered is actionable one stage further down.
+
 ### Background work, when there is time
 
 **Give the shipped default-on optimisations ADRs, then trim their comments.**

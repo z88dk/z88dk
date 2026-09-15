@@ -75,6 +75,7 @@ exists (ADR 0010).
 | Name | Turning it off means |
 | --- | --- |
 | `bc-pack` | no tight BC packing pass after region selection |
+| `ldsi-addr` | 8085 slot addresses use `ld hl,N; add hl,sp` instead of the shorter LDSI pair |
 | `bc-evict` | a BC tenant is never displaced by a better candidate |
 | `bc-per-cand` | BC cost is scored per class, not per candidate |
 | `bc-call-cost` | the arbiter does not charge a BC home for call preservation **(measure: `=<N>` sets the margin)** |
