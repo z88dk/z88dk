@@ -154,6 +154,43 @@ static int read16(FILE *f, unsigned *v)
 }
 
 
+static RELOC *find_reloc(unsigned addr){
+    int i;
+    for (i = 0; i < reloc_count; i++)
+	{
+        if (relocs[i].addr == addr)
+			return &relocs[i];
+	}
+		return NULL;
+}
+
+static const char *format_addr(unsigned pc)
+{
+    static char buf[64];
+    RELOC *r;
+    unsigned v;
+
+    v = code[pc + 1] |
+        (code[pc + 2] << 8);
+
+    r = find_reloc(pc + 1);
+
+    if (r)
+        v = r->target;
+
+    if (r && (r->type == TOK_PRGREL))
+    {
+        const char *s = lookup_prog(v);
+
+        if (s)
+            return s;
+    }
+
+    sprintf(buf, "$%04X", v);
+    return buf;
+}
+
+
 static void disasm_module(void)
 {
     unsigned pc = 0;
@@ -221,119 +258,40 @@ static void disasm_module(void)
                 pc++;
                 break;
 
-            case 0x01:      /* LD BC,nn */
-            {
-                unsigned v =
-                    code[pc + 1] |
-                    (code[pc + 2] << 8);
+			case 0x01:
+				printf("LD BC,%s\n", format_addr(pc));
+				pc += 3;
+				break;
 
-                const char *s = lookup_prog(v);
+			case 0x11:
+				printf("LD DE,%s\n", format_addr(pc));
+				pc += 3;
+				break;
 
-                if (s)
-                    printf("LD BC,%s\n", s);
-                else
-                    printf("LD BC,$%04X\n", v);
+			case 0x21:
+				printf("LD HL,%s\n", format_addr(pc));
+				pc += 3;
+				break;
 
-                pc += 3;
-                break;
-            }
+			case 0x31:
+				printf("LD SP,%s\n", format_addr(pc));
+				pc += 3;
+				break;
 
-            case 0x11:      /* LD DE,nn */
-            {
-                unsigned v =
-                    code[pc + 1] |
-                    (code[pc + 2] << 8);
+			case 0xCD:
+				printf("CALL %s\n", format_addr(pc));
+				pc += 3;
+				break;
 
-                const char *s = lookup_prog(v);
+			case 0xC3:
+				printf("JP %s\n", format_addr(pc));
+				pc += 3;
+				break;
 
-                if (s)
-                    printf("LD DE,%s\n", s);
-                else
-                    printf("LD DE,$%04X\n", v);
-
-                pc += 3;
-                break;
-            }
-
-            case 0x21:      /* LD HL,nn */
-            {
-                unsigned v =
-                    code[pc + 1] |
-                    (code[pc + 2] << 8);
-
-                const char *s = lookup_prog(v);
-
-                if (s)
-                    printf("LD HL,%s\n", s);
-                else
-                    printf("LD HL,$%04X\n", v);
-
-                pc += 3;
-                break;
-            }
-
-            case 0x31:      /* LD SP,nn */
-            {
-                unsigned v =
-                    code[pc + 1] |
-                    (code[pc + 2] << 8);
-
-                printf("LD SP,$%04X\n", v);
-
-                pc += 3;
-                break;
-            }
-
-            case 0xCD:      /* CALL nn */
-            {
-                unsigned v =
-                    code[pc + 1] |
-                    (code[pc + 2] << 8);
-
-                const char *s = lookup_prog(v);
-
-                if (s)
-                    printf("CALL %s\n", s);
-                else
-                    printf("CALL $%04X\n", v);
-
-                pc += 3;
-                break;
-            }
-
-            case 0xC3:      /* JP nn */
-            {
-                unsigned v =
-                    code[pc + 1] |
-                    (code[pc + 2] << 8);
-
-                const char *s = lookup_prog(v);
-
-                if (s)
-                    printf("JP %s\n", s);
-                else
-                    printf("JP $%04X\n", v);
-
-                pc += 3;
-                break;
-            }
-
-            case 0xCA:      /* JP Z,nn */
-            {
-                unsigned v =
-                    code[pc + 1] |
-                    (code[pc + 2] << 8);
-
-                const char *s = lookup_prog(v);
-
-                if (s)
-                    printf("JP Z,%s\n", s);
-                else
-                    printf("JP Z,$%04X\n", v);
-
-                pc += 3;
-                break;
-            }
+			case 0xCA:
+				printf("JP Z,%s\n", format_addr(pc));
+				pc += 3;
+				break;
 
             default:
                 printf("DB $%02X\n", code[pc]);
@@ -404,8 +362,9 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
 
         printf("\"%s\"", name);
 
-        if (ctrl == 7)
+        if (ctrl == 7) {
             add_symbol(name,atype,value);
+		}
     }
 
     if ((!dumpmode) && ctrl == 2)
