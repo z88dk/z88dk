@@ -31,7 +31,11 @@ enforced by a script. What remains is optimisation work, and the order matters:
    Do it the way this project has done every risky arc that worked: **verifier
    first.** Count emitted BC reloads per freed temp, check the count explains
    the `stencil` spread, and only then let it near a decision. Do not schedule
-   a third attempt at a better price.
+   a third attempt at a better price — ADR 0038 is the third failure and the
+   clearest: the 8085 cost rows really are wrong (a word slot is 33 cycles, not
+   the z80's 45), and **correcting them makes the output worse on both axes**,
+   because a cheaper slot shrinks every register home's modelled value by 32 %.
+   Accuracy in the per-access price is not what is missing.
 
    Earlier refusal for the record: ADR 0036 charged a param eviction for the
    framelessness it costs. Its apparent −229 bytes came from firing in **sp
