@@ -58,53 +58,33 @@ enforced by a script. What remains is optimisation work, and the order matters:
    **−0.041 % / 20 faster / 0 slower**; `long_ir` 739/739 both modes.
    `--opt-disable=tight-homes` opts out byte-identically.
 
-4. **NEXT: stage 2 of the ranging arc (ADR 0017)** — unblocked and **sized**.
-   `IR_RANGEPROBE` (inert): 461 of 3608 spilled values (12.8 %) across 108
-   functions could time-share a parking register, after filtering for width,
-   address-taken, and any clobber inside the value's live range. Real
-   opportunity, unlike the pair allocator's zero.
+4. ~~Stage 2 of the ranging arc~~ — **CLOSED on both registers** (ADR 0017),
+   and the closure is more useful than the feature would have been.
 
-   **The BC half (323) is REFUTED** — two levers built and measured, both inert:
-   switching the packer's greedy from earliest-START to earliest-END (the
-   textbook fix) packs the same 114 values, 0 size cells, 0 tick cells; and the
-   clash test's use of `first_use..last_use` instead of the truthful home window
-   reclaims nothing (only 6 of 214 BC tenants are narrower). Instrumented, the
-   246 candidates split 114 packed / 49 blocked by a packed sibling / **83
-   blocked by a live BC tenant** — genuine interference no ordering can fix.
-   Freeing those needs the tenant to yield BC over a sub-range and resume, which
-   is **stage 3**, not stage 2.
+   Four levers built and measured, all inert or zero:
+   - packer greedy earliest-START -> earliest-END (the textbook fix): same 114
+     values packed, 0 of 720 size cells, 0 of 420 tick cells;
+   - the clash test's `first_use..last_use` vs the truthful home window: only
+     6 of 214 BC tenants are narrower, so nothing to reclaim;
+   - parking a live tenant to free the register (stage 3's expensive form,
+     ADR 0029): 74 of 145 blocked candidates have a *completely idle* tenant,
+     yet only **7 of 145 pay** once park and gain are in the same cycle unit;
+   - `ir_iy_temp_pack`'s "one IY owner per function" bail: 10 functions, 24
+     candidates, **0 disjoint from the owner**.
 
-   So what is left of stage 2 is the **IY half (121)**, shared in only 5 of 26
-   function-registers. DE is exhausted (31 of 78 shared, 16 left); IX is a
-   non-starter (frame pointer in fp mode).
+   ►► **The constraint is candidate ADMISSION, not time-sharing.** Sharing
+   already works where the packers look (BC 33 of 107 function-registers hold
+   >1 value, DE 31 of 78); where they do not look, sharing is not what stands in
+   the way. `IR_RANGEPROBE`'s 461 counts values that merely fail to interfere —
+   an upper bound over the wrong population. **Any future sizing here must count
+   candidates the allocator would actually consider.** Same lesson
+   `IR_PAIRPROBE` taught: size the reachable set, not the ideal one.
 
-   **Stage 3's expensive form is also REFUSED** (ADR 0029). Parking the tenant
-   to its slot over the window and resuming after would free those 83 — and 74
-   of 145 blocked candidates have a *completely idle* tenant, the best possible
-   shape. But priced in the same cycle unit as the gain, only **7 of 145 pay**:
-   a park is a slot store plus a slot reload, loop-weighted, and that exceeds
-   what a born-killed temp gains from BC.
-
-   So the BC half is closed from both directions. **What is live:** stage 2's
-   **IY half** (121 candidates, shared in only 5 of 26 function-registers), and
-   stage 3's **fail-safe form** (ADR 0029) — an opportunistic cache with no park
-   cost, which is why it may work where the expensive form cannot; it still owes
-   a measurement on a real char/pointer-heavy file.
-
-   ►► UNIT TRAP, recorded because it inverted the answer: pricing the park with
-   `g0_word_bytes` against a gain from `interval_benefit_x` reported **145 of
-   145 paying**. `interval_benefit_x` is CYCLE-denominated (`g0_word_cost`);
-   `g0_word_bytes` is bytes. In matching units it is 7 of 145. A 100 % result is
-   a symptom, not a discovery.
-
-   Expect predicate bugs of the ADR 0027 class: anything currently meaning "not
-   whole-function" needs re-reading before a register is genuinely shared.
-
-**Shipped 2026-09-15** (ADR 0039): 8085 slot addresses use LDSI —
-−366 bytes, −0.95 % ticks, nothing larger, nothing slower. It came out of the
-*failed* 8085 pricing work (ADR 0038): the cost model could not use the chip's
-cheaper slot, but the lowerer could. When a cost-model correction refuses,
-check whether the fact it uncovered is actionable one stage further down.
+5. **NEXT: stage 3's fail-safe form** (ADR 0029) — the DE cache fold. A belief,
+   not a promise, with **no park cost**, which is exactly why it may work where
+   the expensive form measured 7 of 145. ADR 0029 has asked from the start for a
+   measurement on a real char- and pointer-heavy file; that is the next thing to
+   do, and 0029 says outright to refuse it if the population is thin.
 
 ### Background work, when there is time
 

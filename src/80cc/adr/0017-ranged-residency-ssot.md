@@ -170,12 +170,43 @@ park is a slot store plus a slot reload, loop-weighted, and that exceeds what a
 born-killed temp gains from BC.
 
 So the BC half of stage 2 is closed from both directions: no packing order
-reaches it, and paying to park the incumbent does not either. What remains live:
+reaches it, and paying to park the incumbent does not either.
 
-* **stage 2's IY half (121 candidates)**, barely shared today (5 of 26);
-* **stage 3's fail-safe form** (ADR 0029) — an opportunistic cache with *no park
-  cost*, which is precisely why it may work where the expensive form cannot. It
-  still owes its own measurement on a real char- and pointer-heavy file.
+### The IY half is closed too, and it exposes what the sizing missed
+
+`ir_iy_temp_pack` **bails entirely** when IY already has an owner — "one IY
+owner per function" — where `ir_bc_pack` instead tests each candidate against
+existing tenants. That looked like the IY time-sharing lever: stop bailing, test
+per candidate.
+
+Measured, the bail costs **nothing**. Across the corpus in both frame modes only
+**10 functions** bail with an IY owner *and* have spilled candidates — 24
+candidates in total — and **0 of the 24** have a live range disjoint from the
+owner. Every one genuinely overlaps.
+
+**Which means the 121 were never reachable this way.** `IR_RANGEPROBE` counts
+any spilled value whose live range is disjoint from a register's tenants. The
+packer's candidate set is far narrower: born-killed temps, in-loop, cost-gated
+(`collect_bc_temp_cands`). The 121 are values the IY packer **never considers**
+— not values it declines to share.
+
+### What the arc actually learned
+
+Stage 2 is closed on both registers, and the same sentence covers both: **the
+constraint is candidate ADMISSION, not time-sharing.** Sharing already works
+where the packers look (BC: 33 of 107 function-registers hold more than one
+value; DE: 31 of 78), and where they do not look, sharing is not the thing
+standing in the way.
+
+`IR_RANGEPROBE`'s 461 is therefore an upper bound over the wrong population. Any
+future sizing here must count candidates the allocator would actually *consider*,
+not values that merely fail to interfere. That is the lesson to carry, and it is
+the same one `IR_PAIRPROBE` taught: size the reachable set, not the ideal one.
+
+What remains live: **stage 3's fail-safe form** (ADR 0029) — an opportunistic
+cache with *no park cost*, which is precisely why it may work where the
+expensive form cannot. It still owes its own measurement on a real char- and
+pointer-heavy file.
 
 DE is effectively exhausted (31 of 78 shared, 16 left) and IX is a non-starter —
 it is the frame pointer in fp mode. Neither is worth work.
