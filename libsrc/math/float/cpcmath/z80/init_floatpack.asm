@@ -55,6 +55,13 @@ IFNDEF PORTABLE_CPC_MATH
         ret
 
 .init_cpc464float
+; run-once sentinel: if this model's ATAN vector is already patched in, done.
+        ld      hl,(atanc+3)
+        ld      de,CPCFP464_FLO_ATAN
+        or      a
+        sbc     hl,de
+        ret     z
+
         ld      hl,CPCFP464_FLO_ATAN
         ld      (atanc+3),hl
         ld      hl,CPCFP464_FLO_COS
@@ -107,6 +114,13 @@ IFNDEF PORTABLE_CPC_MATH
         ret
 
 .init_cpc664float
+; run-once sentinel: if this model's ATAN vector is already patched in, done.
+        ld      hl,(atanc+3)
+        ld      de,CPCFP664_FLO_ATAN
+        or      a
+        sbc     hl,de
+        ret     z
+
         ld      hl,CPCFP664_FLO_ATAN
         ld      (atanc+3),hl
         ld      hl,CPCFP664_FLO_COS
