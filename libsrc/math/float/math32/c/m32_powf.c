@@ -47,6 +47,36 @@ float m32_powf (float x, float y)
         if(y == -0.5) return m32_invsqrtf(x);
         if(y == 2.0) return m32_sqrf(x);
         if(y == -2.0) return 1.0/m32_sqrf(x);
+        /* Integer-exponent fast path: exp(y ln x) is inherently
+         * inexact for integer exponents (~0.5|y| ulp loss), so small
+         * integer powers use exact exponentiation by squaring instead. */
+        {
+            float yi2, yf2, r2;
+            int32_t e, n;
+
+            yf2 = m32_modff(y, &yi2);
+            if (yf2 == 0.0f)
+            {
+                n = (int32_t)yi2;
+                if (n < 0) n = -n;
+                if (n <= 65536)         /* 2^16: bounded 16 squarings */
+                {
+                    r2 = 1.0f;
+                    {
+                        float p = x;
+                        e = n;
+                        while (e > 0)
+                        {
+                            if (e & 1) r2 *= p;
+                            e >>= 1;
+                            if (e) p *= p;
+                        }
+                    }
+                    return (yi2 < 0.0f) ? 1.0f/r2 : r2;
+                }
+            }
+        }
+
         return m32_expf( m32_logf(x) * y);
     }
 
