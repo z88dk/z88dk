@@ -119,13 +119,50 @@ one value:
 | IY | 5 of 26 | **121** |
 | IX | 0 of 23 | 1 |
 
-So stage 2 is really two pieces, and 444 of the 461 are in them:
+So stage 2 looked like two pieces, and 444 of the 461 were in them:
 
-* **Deepen BC packing (323).** The packer already time-shares but its greedy is
-  first-fit by rank with a single `last_fhi` watermark — it stops at the first
-  overlap rather than packing the interval set. Most of the opportunity is here,
-  in a mechanism that already exists.
+* **Deepen BC packing (323).**
 * **Open IY time-sharing (121).** Barely shared today (5 of 26).
+
+### The BC half is REFUTED, and it re-aims the arc (2026-09-15)
+
+Two levers were built and measured against the BC packer. Both are inert, and
+between them they rule out "pack better" as the route to those 323.
+
+**Packing order — refuted.** The packer sorts candidates by `flo` (earliest
+START) and walks them against a single `last_fhi` watermark. That is the
+textbook-suboptimal interval greedy: one long early interval swallows the
+watermark and shuts out the short ones behind it, where earliest-END is optimal
+for the count. Switching the sort to `fhi` ascending (watermark stays sound —
+candidates arrive with non-decreasing `fhi`, so clearing the last packed clears
+them all) measured: **same 114 values packed, 0 of 720 size cells changed, 0 of
+420 tick cells changed.** It packs *different* values, not more. Reverted.
+
+**The tenant blocking window — refuted.** The clash test blocks a candidate over
+the tenant's `first_use..last_use`, not over the truthful home window stage 1
+now provides, which looked like reclaimable conservatism. It is not: only **6 of
+214** BC tenants have a home window narrower than their live range.
+
+**So the rejections are genuine interference.** Instrumented at the two exits
+(with a verified binary — the first attempt measured a stale one and reported a
+plausible 0/0):
+
+```
+BC packer: 114 packed of 246 candidates
+  rejected by a packed SIBLING:       49
+  rejected by an existing BC TENANT:  83
+```
+
+A candidate blocked by a live tenant cannot be packed by any ordering, because
+the register genuinely holds another value there. Freeing it requires the tenant
+to **give up BC over a sub-range and resume after** — which is stage 3, not
+stage 2.
+
+**Consequence for the staging.** This ADR says "stage 3 is what makes stage 2
+safe". That is true but understates it: for the BC half, **stage 3 is what makes
+the opportunity reachable at all**. Stage 2's remaining independent content is
+the IY half (121), where the register is barely shared today. Do IY next, or go
+straight to stage 3 — but do not spend more on the BC packer's search.
 
 DE is effectively exhausted (31 of 78 shared, 16 left) and IX is a non-starter —
 it is the frame pointer in fp mode. Neither is worth work.

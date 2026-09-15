@@ -3413,10 +3413,10 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
        assigned one ends AND doesn't overlap an existing PR_BC tenant. A genuine
        loop-home tenant (not itloc) blocks over its EXTENDED interval; an itloc
        tenant only over its TIGHT span (it releases BC when dead). */
-    int packed = 0, last_fhi = -1;
+    int packed = 0, last_fhi = -1; int rej_sib = 0, rej_ten = 0;
     for (int i = 0; i < nc; i++) {
         int v = cand[i].vreg;
-        if (cand[i].flo <= last_fhi) continue;   /* overlaps a packed sibling */
+        if (cand[i].flo <= last_fhi) { rej_sib++; continue; }   /* packed sibling */
         int clash = 0;
         ir_liveprobe_decision_begin_site(3);
         for (int j = 0; j < f->n_vregs && !clash; j++) {
@@ -3428,14 +3428,15 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                            cand[i].flo, cand[i].fhi, jlo, jhi)) clash = 1;
         }
         ir_liveprobe_decision_end();
-        if (clash) continue;
+        if (clash) { rej_ten++; continue; }
         f->vreg_to_phys[v] = IR_PR_BC;
         f->vregs[v].flags |= IR_VREG_BC_PACK;
         last_fhi = cand[i].fhi;
         packed++;
     }
     if (getenv("IR_ALLOC_PROBE"))
-        fprintf(stderr, "BC_PACK packed=%d of candidates=%d\n", packed, nc);
+        fprintf(stderr, "BC_PACK packed=%d of candidates=%d rejsib=%d rejten=%d\n",
+                packed, nc, rej_sib, rej_ten);
     free(cand); free(itloc); free(itlo); free(ithi);
 }
 

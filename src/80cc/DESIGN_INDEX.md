@@ -64,16 +64,22 @@ enforced by a script. What remains is optimisation work, and the order matters:
    address-taken, and any clobber inside the value's live range. Real
    opportunity, unlike the pair allocator's zero.
 
-   The shape is the useful part: **time-sharing already partly exists** — the BC
-   packer packs disjoint born-killed temps today (`bitfieldbench/reg_step` holds
-   two different values in BC over [1,3] and [4,7]). So stage 2 is two concrete
-   pieces, holding 444 of the 461:
-   - **deepen BC packing (323 candidates).** The greedy is first-fit by rank
-     with one `last_fhi` watermark and stops at the first overlap instead of
-     packing the interval set. Most of the win is in a mechanism that exists.
-   - **open IY time-sharing (121).** Shared in only 5 of 26 function-registers.
-   DE is exhausted (31 of 78 shared, 16 left); IX is a non-starter (frame
-   pointer in fp mode). Neither is worth work.
+   **The BC half (323) is REFUTED** — two levers built and measured, both inert:
+   switching the packer's greedy from earliest-START to earliest-END (the
+   textbook fix) packs the same 114 values, 0 size cells, 0 tick cells; and the
+   clash test's use of `first_use..last_use` instead of the truthful home window
+   reclaims nothing (only 6 of 214 BC tenants are narrower). Instrumented, the
+   246 candidates split 114 packed / 49 blocked by a packed sibling / **83
+   blocked by a live BC tenant** — genuine interference no ordering can fix.
+   Freeing those needs the tenant to yield BC over a sub-range and resume, which
+   is **stage 3**, not stage 2.
+
+   So what is left of stage 2 is the **IY half (121)**, shared in only 5 of 26
+   function-registers. DE is exhausted (31 of 78 shared, 16 left); IX is a
+   non-starter (frame pointer in fp mode).
+
+   **Do IY next, or go straight to stage 3. Do not spend more on the BC
+   packer's search.**
 
    Expect predicate bugs of the ADR 0027 class: anything currently meaning "not
    whole-function" needs re-reading before a register is genuinely shared.
