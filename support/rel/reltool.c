@@ -5,8 +5,9 @@
  *
  * Tools for RELEXPAND format:
  *
- *   reltool -list  file.relx
- *   reltool -dump  file.relx
+ *   reltool -list   file.relx
+ *   reltool -dump   file.relx
+ *   reltool -disasm file.relx
  *   reltool -split  file.relx
  *
  */
@@ -23,6 +24,27 @@
 #define TOK_PAD      0xFE
 
 #define MAX_MODULE_NAME 64
+#define MAX_SYMBOLS 1024
+
+typedef struct
+{
+    char name[64];
+    unsigned type;
+    unsigned value;
+} SYMBOL;
+
+static SYMBOL symbols[MAX_SYMBOLS];
+static int symbol_count;
+
+typedef struct {
+    unsigned addr;
+    unsigned target;
+    unsigned type;
+} RELOC;
+
+RELOC relocs[2048];
+int reloc_count;
+
 
 typedef struct
 {
@@ -51,6 +73,61 @@ static const char *ctrl_name[16] =
     "END_FILE"
 };
 
+unsigned char code[65500];
+unsigned int codelen;
+
+static void code_put8(unsigned v)
+{
+    if (codelen < sizeof(code))
+        code[codelen++] = (unsigned char)v;
+}
+
+static void code_put16(unsigned v, unsigned tok)
+{
+	relocs[reloc_count].addr   = codelen;
+	relocs[reloc_count].target = v;
+	relocs[reloc_count].type   = tok;
+	reloc_count++;
+    code_put8(v & 0xff);
+    code_put8((v >> 8) & 0xff);
+}
+
+static void add_symbol(const char *name,
+                       unsigned type,
+                       unsigned value)
+{
+    if (symbol_count >= MAX_SYMBOLS)
+        return;
+
+    strcpy(symbols[symbol_count].name, name);
+    symbols[symbol_count].type  = type;
+    symbols[symbol_count].value = value;
+
+    symbol_count++;
+}
+
+static const char *lookup_symbol(unsigned type,
+                                 unsigned value)
+{
+    int i;
+
+    for (i=0; i<symbol_count; i++)
+    {
+        if (symbols[i].type == type &&
+            symbols[i].value == value)
+            return symbols[i].name;
+    }
+
+    return NULL;
+}
+
+static const char *lookup_prog(unsigned value)
+{
+    return lookup_symbol(1,value);
+}
+
+
+
 static int read8(FILE *f, unsigned *v)
 {
     int c = fgetc(f);
@@ -77,6 +154,195 @@ static int read16(FILE *f, unsigned *v)
 }
 
 
+static void disasm_module(void)
+{
+    unsigned pc = 0;
+
+    while (pc < codelen)
+    {
+        int i;
+
+        /* print labels */
+        for (i = 0; i < symbol_count; i++)
+        {
+            if (symbols[i].type == 1 &&
+                symbols[i].value == pc)
+            {
+                printf("\n%s:\n", symbols[i].name);
+            }
+        }
+
+        printf("%04X  ", pc);
+
+        switch (code[pc])
+        {
+            case 0x00:
+                printf("NOP\n");
+                pc++;
+                break;
+
+            case 0x0C:
+                printf("INC C\n");
+                pc++;
+                break;
+
+            case 0x12:
+                printf("LD (DE),A\n");
+                pc++;
+                break;
+
+            case 0x39:
+                printf("ADD HL,SP\n");
+                pc++;
+                break;
+
+            case 0xB7:
+                printf("OR A\n");
+                pc++;
+                break;
+
+            case 0xC9:
+                printf("RET\n");
+                pc++;
+                break;
+
+            case 0xEB:
+                printf("EX DE,HL\n");
+                pc++;
+                break;
+
+            case 0xF1:
+                printf("POP AF\n");
+                pc++;
+                break;
+
+            case 0xF5:
+                printf("PUSH AF\n");
+                pc++;
+                break;
+
+            case 0x01:      /* LD BC,nn */
+            {
+                unsigned v =
+                    code[pc + 1] |
+                    (code[pc + 2] << 8);
+
+                const char *s = lookup_prog(v);
+
+                if (s)
+                    printf("LD BC,%s\n", s);
+                else
+                    printf("LD BC,$%04X\n", v);
+
+                pc += 3;
+                break;
+            }
+
+            case 0x11:      /* LD DE,nn */
+            {
+                unsigned v =
+                    code[pc + 1] |
+                    (code[pc + 2] << 8);
+
+                const char *s = lookup_prog(v);
+
+                if (s)
+                    printf("LD DE,%s\n", s);
+                else
+                    printf("LD DE,$%04X\n", v);
+
+                pc += 3;
+                break;
+            }
+
+            case 0x21:      /* LD HL,nn */
+            {
+                unsigned v =
+                    code[pc + 1] |
+                    (code[pc + 2] << 8);
+
+                const char *s = lookup_prog(v);
+
+                if (s)
+                    printf("LD HL,%s\n", s);
+                else
+                    printf("LD HL,$%04X\n", v);
+
+                pc += 3;
+                break;
+            }
+
+            case 0x31:      /* LD SP,nn */
+            {
+                unsigned v =
+                    code[pc + 1] |
+                    (code[pc + 2] << 8);
+
+                printf("LD SP,$%04X\n", v);
+
+                pc += 3;
+                break;
+            }
+
+            case 0xCD:      /* CALL nn */
+            {
+                unsigned v =
+                    code[pc + 1] |
+                    (code[pc + 2] << 8);
+
+                const char *s = lookup_prog(v);
+
+                if (s)
+                    printf("CALL %s\n", s);
+                else
+                    printf("CALL $%04X\n", v);
+
+                pc += 3;
+                break;
+            }
+
+            case 0xC3:      /* JP nn */
+            {
+                unsigned v =
+                    code[pc + 1] |
+                    (code[pc + 2] << 8);
+
+                const char *s = lookup_prog(v);
+
+                if (s)
+                    printf("JP %s\n", s);
+                else
+                    printf("JP $%04X\n", v);
+
+                pc += 3;
+                break;
+            }
+
+            case 0xCA:      /* JP Z,nn */
+            {
+                unsigned v =
+                    code[pc + 1] |
+                    (code[pc + 2] << 8);
+
+                const char *s = lookup_prog(v);
+
+                if (s)
+                    printf("JP Z,%s\n", s);
+                else
+                    printf("JP Z,$%04X\n", v);
+
+                pc += 3;
+                break;
+            }
+
+            default:
+                printf("DB $%02X\n", code[pc]);
+                pc++;
+                break;
+        }
+    }
+}
+
 static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
 {
     unsigned len;
@@ -93,11 +359,24 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
         read8(f, &atype);
         read16(f, &value);
 
-        if (dumpmode) printf("  type=%u value=%04X",
-               atype,
-               value);
+        if (dumpmode) {
+            printf("  [%u] ", atype);
+            if (atype == 0) {
+				if ((dumpmode == 2) && codelen > 0) {
+					printf("\n\n--- DISASSEMBLY ---\n");
+					disasm_module();
+					codelen = 0;
+					reloc_count = 0;
+					printf("\n--- --- --- --- ---\n\n");
+				}
+				printf (" - ");
+			}
+            if (atype == 1) printf ("CODE_ADDR ");
+            if (atype == 2) printf ("DATA_ADDR ");
+            //printf("  type=%u value=", atype);
+        }
 
-        if ((dumpmode) || ((ctrl<=13) && (ctrl>=8))) printf("$%04X", value);
+        if ((dumpmode) || ((ctrl<=13) && (ctrl>=8))) printf("%-20s -> $%04X", ctrl_name[ctrl], value);
 
     }
 
@@ -124,6 +403,9 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
         }
 
         printf("\"%s\"", name);
+
+        if (ctrl == 7)
+            add_symbol(name,atype,value);
     }
 
     if ((!dumpmode) && ctrl == 2)
@@ -154,6 +436,7 @@ static void do_dump(FILE *f, int dumpmode)
                 unsigned v;
 
                 read8(f, &v);
+                code_put8(v);
                 if (dumpmode) printf("ABS %02X\n", v);
                 break;
             }
@@ -165,12 +448,13 @@ static void do_dump(FILE *f, int dumpmode)
                 unsigned v;
 
                 read16(f, &v);
+                code_put16(v, tok);
 
                 if (tok == TOK_PRGREL)
                     if (dumpmode) printf("PROGREL %04X\n", v);
-                else if (tok == TOK_DATAREL)
+                if (tok == TOK_DATAREL)
                     if (dumpmode) printf("DATAREL %04X\n", v);
-                else
+                if (tok == TOK_COMREL)
                     if (dumpmode) printf("COMREL %04X\n", v);
 
                 break;
@@ -191,7 +475,6 @@ static void do_dump(FILE *f, int dumpmode)
             case TOK_SPECIAL:
             {
                 read8(f, &ctrl);
-
                 dump_special(f, ctrl, dumpmode);
 
                 if (ctrl == 14)
@@ -275,9 +558,10 @@ int main(int argc, char *argv[])
     if (argc != 3)
     {
         printf("Usage:\n");
-        printf("  reltool -list  file.relx\n");
-        printf("  reltool -dump  file.relx\n");
-        printf("  reltool -split file.relx\n");
+        printf("  reltool -list   file.relx\n");
+        printf("  reltool -dump   file.relx\n");
+        printf("  reltool -disasm file.relx\n");
+        printf("  reltool -split  file.relx\n");
         return 1;
     }
 
@@ -295,6 +579,9 @@ int main(int argc, char *argv[])
 
     else if (!strcmp(argv[1], "-list"))
         do_dump(f,0);
+
+    else if (!strcmp(argv[1], "-disasm"))
+        do_dump(f,2);
 
     else if (!strcmp(argv[1], "-split"))
         do_split(f, argv[2]);
