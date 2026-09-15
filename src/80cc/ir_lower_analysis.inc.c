@@ -342,12 +342,9 @@ static void cache_hl_slot_addr(const Func *f, int v)
    discarded by the pop — HL now holds the pushed value again — and nothing
    restores the belief that was live before the push. Clearing is the safe
    approximation: it can only cost a recompute, never read a bogus pointer.
-
-   This is what the vm1 maskbench/queenbench/searchbench WRONGs were. A word
-   load into DE published "HL = &slot+1" INSIDE a caller's push/pop preserve
-   region; the pop put a data value back in HL; the stale belief then rode the
-   cross-BB carry into a branch target and became `dec hl` on garbage. Callers
-   that genuinely keep an address in HL re-establish it right after. */
+   This was the vm1 maskbench/queenbench/searchbench WRONG-ANSWER class; the
+   story is in adr/0069. Callers that genuinely keep an address in HL
+   re-establish it right after. */
 static void emit_pop_hl(FILE *out)
 {
     emit(out, "pop\thl");

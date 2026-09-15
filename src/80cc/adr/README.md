@@ -51,6 +51,19 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0054](0054-the-8085-reads-a-word-deref-with-lhlx.md) | **Accepted** — the 8085 reads a word deref with LHLX/LDHI — 3 B/20 c against 6 B/36 c |
 | [0053](0053-narrow-a-constant-shift-to-the-bytes-that-survive.md) | **Accepted** — narrow a width-4 constant shift to the bytes a CONV_TRUNC keeps; −257 B, none larger |
 | [0052](0052-fold-an-offset-into-a-rematerialised-symbol.md) | **Accepted** — fold a field offset into a rematerialised `&symbol`; 7 B becomes 3 |
+| [0074](0074-the-gameboy-has-no-ex-de-hl.md) | **Accepted** — the in-place rewrite is excluded on gbz80: no `ex de,hl`, and both firing benches are better without it |
+| [0073](0073-ask-slot-off-not-the-spill-slot.md) | **Accepted** — ask `slot_off`, not `vreg_spill_slot`; the wrong query cost structbench +10.5 % |
+| [0072](0072-the-commutative-swap-is-refused.md) | **Rejected** — the commutative swap in addition resurrects an elided store; md5 −6 % against emu.c +75 B |
+| [0071](0071-the-call-split-eviction-floor.md) | **Accepted** — the eviction floor is magnitude, not ratio; below it the model is inside its own error |
+| [0070](0070-a-carried-span-needs-the-loop-extended-interval.md) | **Accepted** — flat op order is not control-flow order; a carried span needs the loop-extended interval |
+| [0069](0069-a-bare-pop-hl-clears-the-address-belief.md) | **Accepted** — a bare `pop hl` clears the address belief; this was the vm1 wrong-answer class |
+| [0068](0068-the-index-half-home-is-gated-on-net-bytes.md) | **Accepted** — the index-half home is gated on RAW net bytes, threshold 4 by sweep |
+| [0067](0067-opening-an-index-home-costs-every-exit.md) | **Accepted** — opening an IY home costs every exit; the cycle model is structurally blind to it |
+| [0066](0066-a-home-dear-to-fill-cannot-take-a-parameter.md) | **Accepted** — a home dear to FILL cannot take a parameter; idx_ben prices accesses, not filling |
+| [0065](0065-the-deref-offset-term.md) | **Accepted** — the deref-offset term is what tells an index home from a GP pair |
+| [0064](0064-the-accumulator-margin-is-three.md) | **Accepted** — the accumulator's contention margin is 3x, and a modelled zero means blind, not free |
+| [0063](0063-the-prepush-narrowing-is-a-pair.md) | **Accepted** — pre-push narrowing is a PAIR with `bc-save-live`; alone it regresses |
+| [0062](0062-a-deref-base-may-take-the-index-home.md) | **Accepted** — a deref base may take the index home, and the win is the EVICTED value getting cheaper |
 | [0051](0051-8085-k-flag-trip-counters.md) | *Proposed* — 8085 `jp k`/`jp nk` for 16-bit trip counters; 236 candidate sites, needs an IV shift not a peephole |
 | [0050](0050-stack-transient-spill-is-an-sp-mode-trade.md) | **Accepted** — stack-transient spill is sp-mode only, and the CPU test genuinely is the question |
 | [0049](0049-bc-liveness-follows-branches.md) | **Accepted** — BC liveness follows intra-function branches; −248 B, none larger, nothing slower |

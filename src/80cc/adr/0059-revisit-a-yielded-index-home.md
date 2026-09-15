@@ -21,6 +21,12 @@ Both conditions are load-bearing: the yield is preserved whenever the counter
 **did** collect the index, and the revisit only fires in the case where the
 yield was wasted.
 
+## Evidence
+
+`recordbench/churn` on kc160: the struct pointer was the **top IDX2 candidate**
+(benefit 288) and ended up **spilled**, costing **−67 B and −24.6 % ticks**
+against simply letting it have the register.
+
 ## Note
 
 This is a second instance of the pattern ADR 0058 records — a sequenced

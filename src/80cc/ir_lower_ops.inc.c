@@ -4468,16 +4468,11 @@ static int gen_add(FILE *out, Func *f, const Op *op)
            and B/C (LOW, the DEHL-cache mirror). Only fires when RHS
            is sp-rel and not in the DEHL cache. */
         /* NB no commutative swap here, though gen_bitop has one and addition is
-           equally commutative. Swapping so the DEHL-resident operand stays put
-           and the other is read from its slot LOOKS free — md5 gained 6% of its
-           cycles — but reading a slot in pass 1 of the lazy spill makes that
-           slot's store LIVE in pass 2, resurrecting a store the previous op had
-           elided. Where the memory operand really is in memory (md5's x[]) that
-           costs nothing; where it is a fresh value that would never otherwise
-           reach memory (binary-trees' ItemCheck, whose operand is a call result)
-           it adds a store AND a reload: measured +0.39% ticks and +28 bytes on
-           binary-trees, +75 bytes on emu.c, against md5's -6%. Gating it needs a
-           cost model over the two-pass spill decision, not a residency test. */
+           equally commutative. It LOOKS free and md5 gains 6% of its cycles, but
+           reading a slot in pass 1 of the lazy spill makes that slot's store LIVE
+           in pass 2, resurrecting a store the previous op had elided — +28 B on
+           binary-trees, +75 B on emu.c. Gating it needs a cost model over the
+           two-pass spill decision, not a residency test. adr/0072. */
         int asrc0 = op->src[0], asrc1 = op->src[1];
         if (!fp_active(f) && !dehl_has(asrc1)) {
             if (!dehl_has(asrc0))

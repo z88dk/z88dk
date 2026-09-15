@@ -3825,11 +3825,9 @@ int ir_opt_reduce_coalesce(Func *f)
     /* The in-place form this builds is only worth building where the DE home
        can step it in `add hl,de; ex de,hl`. The gameboy has no `ex de,hl`, so
        each step becomes `add hl,de` plus two byte moves and the rewrite creates
-       a shape it cannot pay for. Measured over 16 gbz80 benches: the transform
-       fires on two of them and BOTH are better without it — lexbench -27 B
-       -1.74 %, divbench -21 B -1.58 % — with the other fourteen byte-identical.
-       Nothing else on the CPU regresses, so this is a plain exclusion, not a
-       cost gate. */
+       a shape it cannot pay for. A plain exclusion, not a cost gate — the
+       transform fires on two of 16 gbz80 benches and both are better without
+       it. adr/0074. */
     if (IS_GBZ80()) return 0;
     int nv = f->n_vregs;
     if (nv <= 0) return 0;

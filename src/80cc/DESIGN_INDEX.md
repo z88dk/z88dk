@@ -116,28 +116,20 @@ the other four are KR580VM1-only. gbz80 was checked at the same time and is
 `ld a,(hl+)` 1633x, `add sp,N` 890x). Sweeping the remaining CPUs the same way
 is cheap and is how ADR 0039 was found.
 
-**Give the shipped default-on optimisations ADRs, then trim their comments.**
-**21 features done** (ADR 0039-0061): `remat-lea`, `dead-store-share`,
-`trunc-res`, `fclong-carry`, `call-bremat`, `xor-a`, `a-carry`, `de-flow`,
-`de-park`, `bc-flow`, `stack-spill`, `symaddr-deref`, `shr-narrow`,
-`lhlx-deref`, `sym-deref-fold`, `cmp-unsign`, `deref-offset`, `home-swap`,
-`idx2-revisit`, `iy-long`, `cs-evict`. ADR first each time; the comment then
-keeps the rule, the gate spelling and any correctness landmine, and loses the
-figures. ~150 lines of comment removed, output byte-identical throughout.
+**Give the shipped optimisations ADRs, then trim their comments — DONE.**
+34 features documented (ADR 0039-0074), ~240 lines of comment removed, output
+byte-identical throughout. Each comment keeps the rule, the gate spelling and any
+correctness landmine; the figures live in the ADR.
 
-**23 figure-carrying blocks remain**, and a few must KEEP their figures because
-there the numbers are the content, not the justification — the measured
-`g0_word_cost` / `g0_word_bytes` cost rows (`ir_alloc.c` ~3647 and ~3685, see
-ADR 0038) and the C standard citation in `ast_codegen2.c`. Judge per block.
-The richest of the rest: the BC contention model (`ir_alloc.c:1392`), the deref
-OFFSET term (`:1946`), the dear-to-fill param gate (`:2293`), the IY-open cost
-(`:3864`), and the call-free carry rule (`:5563`).
+**Five figure-carrying blocks remain and SHOULD**, because there the numbers are
+the content rather than the justification: the two measured `g0_word_cost` /
+`g0_word_bytes` cost rows in `ir_alloc.c` (ADR 0038), the C standard citation in
+`ast_codegen2.c`, and two where the figures are instruction sizes being compared
+(`ir_lower.c`'s pass-0c lookahead, `ir_lower_ops.inc.c`'s inc/dec break-even).
 
-Order matters and does not change: **write the ADR first, then cut the comment
-to the rule plus a pointer.** Doing it the other way loses the reasoning.
-Figures belong in commit messages, `BENCH_MATRIX.txt` and the ADR — never in a
-code comment, which is this project's own rule (`adr/README.md`) and the reason
-several comments here had gone stale.
+The rule that produced this, for anything added later: **write the ADR first,
+then cut the comment to the rule plus a pointer.** Figures belong in commit
+messages, `BENCH_MATRIX.txt` and the ADR — never in a code comment.
 
 One step of the original simplification plan was deliberately not done:
 retiring the mirror predicate pairs — a legality proof and its emitter each

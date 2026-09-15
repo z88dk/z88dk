@@ -597,9 +597,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
            it dies. That is what sank the belief-only version of this test
            (rle/bitfieldbench: `ld a,(hl); ld e,a` then a store through E): the
            evidence has to come from the control flow, not from the cache.
-           20c/3B against the parked 42c/5B; the
-           offset loses its +2 with the push gone. IR_DEPARK_PROBE sizes it: 5% of
-           corpus park sites, 23% of binary-trees'. `--opt-disable=depark` opts out.
+           `--opt-disable=depark` opts out; the park decision itself is adr/0048.
 
            NB there is deliberately no general "DE looks unused" shortcut here:
            the register cache tracks only whole pairs (rs.a/bc/de/hl), so a value
@@ -2857,16 +2855,12 @@ static int sp_cmp_slot(const Func *f, int v)
     if (!vreg_is_spilled(f, v)) return 0;
     /* Spilled is not the same as HAVING AN ADDRESS. A rematerialisable constant
        (LD_IMM / LD_SYM / remat LEA) is IR_PR_SPILL but NO_SLOT, so slot_off
-       returns -1 and the caller emits `ld hl,-1; add hl,sp` — an address below
-       sp that the byte-walk then compares against.
+       returns -1 and a caller that assumed otherwise emits `ld hl,-1; add hl,sp`.
 
        Ask slot_off, which is what the caller actually emits from. Asking
-       vreg_spill_slot instead ALSO rejects every PARAMETER: a param is homed in
-       the caller's frame, so it has no spill slot (-1) while slot_off returns a
-       perfectly good offset. That cost structbench's `i < n` its byte-walk
-       compare, which forced the bound into DE, which evicted the running sum to
-       a stack-transient home -- three pop/push pairs per iteration, +10.5% on
-       z80 sp for 117 B. */
+       vreg_spill_slot instead ALSO rejects every PARAMETER (homed in the
+       caller's frame, so no spill slot) — which cost structbench +10.5 %
+       on z80 sp for 117 B. adr/0073. */
     if (g_hc.remat_def && g_hc.remat_def[v]) return 0;
     if (slot_off(f, v) < 0) return 0;
     if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
