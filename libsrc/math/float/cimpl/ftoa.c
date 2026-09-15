@@ -18,6 +18,19 @@ char *str;      /* output string */
         double scale;           /* scale factor */
         int i,                  /* copy of f, and # digits before decimal point */
             d;                  /* a digit */
+        {
+            union { float f; unsigned long u; } v;
+            v.f = (float)x;
+            if (v.u == 0x7f800000UL || v.u == 0xff800000UL) {
+                if (v.u == 0xff800000UL) *str++ = '-';
+                *str++ = 'i'; *str++ = 'n'; *str++ = 'f'; *str = 0;
+                return;
+            }
+            if ((v.u & 0x7f800000UL) == 0x7f800000UL && (v.u & 0x007fffffUL)) {
+                *str++ = 'n'; *str++ = 'a'; *str++ = 'n'; *str = 0;
+                return;
+            }
+        }
 
         if( x < 0.0 ) {
                 *str++ = '-' ;

@@ -29,6 +29,8 @@ PUBLIC __printf_check_pad_right
 PUBLIC __printf_set_buffer_length
 PUBLIC __printf_set_ftoe
 PUBLIC __printf_check_ftoe
+PUBLIC __printf_set_ftog
+PUBLIC __printf_check_ftog
 
 ; Increment the number of characters written
 ;
@@ -633,7 +635,45 @@ ENDIF
     pop     hl
     ret
 
+; Set the ftog flag
+__printf_set_ftog:
+    push    hl
+IF __CPU_GBZ80__
+    ld      hl,__printf_context
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
+ELSE
+    ld      hl,(__printf_context)
+ENDIF
+    dec     hl
+    dec     hl
+    dec     hl
+    ld      a,(hl)
+    or      @10000000
+    ld      (hl),a
+    pop     hl
+    ret
 
+; Check the ftog flag
+; Exit: nz = use ftog, z=ftoa/ftoe
+__printf_check_ftog:
+    push    hl
+IF __CPU_GBZ80__
+    ld      hl,__printf_context
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
+ELSE
+    ld      hl,(__printf_context)
+ENDIF
+    dec     hl
+    dec     hl
+    dec     hl
+    ld      a,(hl)
+    and     @10000000
+    pop     hl
+    ret
 
 
 

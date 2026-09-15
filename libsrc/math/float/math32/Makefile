@@ -10,7 +10,7 @@ vpath %.c ../cimpl
 # 8085 higher funcs: sccz80 via `make -C c 8085` → c/8085/*.asm in newlibfiles_8085.lst
 # Z80 higher funcs: SDCC via `make -C c` → c/z80/*.asm in newlibfiles_z80.lst
 CFILES  = $(notdir $(wildcard ../../math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
-CFILES  = atof.c ftoa.c ftoe.c tofix16.c fromfix16.c
+CFILES  = atof.c ftoa.c ftoe.c ftog.c tofix16.c fromfix16.c
 OBJECTS = $(CFILES:.c=.o) 
 # z80n uses the lm32/c/sccz80 ftoa/ftoe/ftog wrappers (wired in
 # newlibfiles_z80n.lst) instead of the cimpl/c-compiled ones, which are

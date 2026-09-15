@@ -13,6 +13,10 @@
    EXTERN   ftoe
    EXTERN   ftog
    EXTERN   asm_strlen
+IF __CPU_INTEL__ | __CPU_GBZ80__
+   EXTERN   __printf_set_ftog
+   EXTERN   __printf_check_ftog
+ENDIF
    EXTERN   __convert_sdccf2reg
    EXTERN   CLIB_32BIT_FLOATS
    EXTERN   CLIB_64BIT_FLOATS
@@ -30,11 +34,11 @@
 ; never for the same conversion).
 __printf_handle_g:
 IF __CPU_INTEL__ | __CPU_GBZ80__
-    jp      __printf_handle_f
+    call    __printf_set_ftog
 ELSE
     set     7,(ix-3)
-    jp      __printf_handle_f
 ENDIF
+    jp      __printf_handle_f
 
 __printf_handle_e:
 IF __CPU_INTEL__ | __CPU_GBZ80__
@@ -209,14 +213,19 @@ set_prec:
     ld      hl,ftoa
 IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __printf_check_ftoe
-    jr      z,call_fp_converter
+    jr      z,check_ftog_intel
     ld      hl,ftoe
+    jr      call_fp_converter
+ check_ftog_intel:
+    call    __printf_check_ftog
+    jr      z,call_fp_converter
+    ld      hl,ftog
 ELSE
     bit     5,(ix-4)
     jr      z,check_ftog
     ld      hl,ftoe
     jr      call_fp_converter
-check_ftog:
+ check_ftog:
     bit     7,(ix-3)
     jr      z,call_fp_converter
     ld      hl,ftog

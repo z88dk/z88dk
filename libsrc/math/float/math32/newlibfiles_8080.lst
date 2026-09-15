@@ -38,6 +38,7 @@
 ../../../math/float/math32/asm/f32_fserror.asm
 ../../../math/float/math32/asm/8080/f32_fshypot.asm
 ../../../math/float/math32/c/8080/ftoe.asm
+../../../math/float/math32/c/8080/ftog.asm
 ../../../math/float/math32/c/8080/m32_acosf.asm
 ../../../math/float/math32/c/8080/m32_acoshf.asm
 ../../../math/float/math32/c/8080/m32_asinf.asm

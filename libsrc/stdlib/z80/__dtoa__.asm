@@ -199,5 +199,5 @@ precision_less:
 
    ; fraction part all zeroes
    
-   ld (ix-4),e                 ; number of zeroes to insert after .
+   ld (ix-3),e                 ; number of trailing zeroes after .
    jr __dtoa_prune

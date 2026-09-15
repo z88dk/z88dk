@@ -24,7 +24,7 @@ typedef struct elem_s {
 } elem_t;
 
 struct fp_decomposed {
-    uint8_t   exponent;
+    int       exponent;
     uint8_t   sign;
     uint8_t   mantissa[MAX_MANTISSA_SIZE + 1];
 };
@@ -833,14 +833,23 @@ static void dofloat_ieee16(double raw, unsigned char fa[])
 
         c_fp_exponent_bias = saved_exp;
         c_fp_mantissa_bytes = saved_mant;
-        
 
+        if ( fs.exponent <= 0 ) {
+            fa[0] = 0x00;
+            fa[1] = fs.sign ? 0x80 : 0x00;
+            return;
+        }
+        if ( fs.exponent >= 31 ) {
+            fa[0] = 0x00;
+            fa[1] = fs.sign ? 0xfc : 0x7c;
+            return;
+        }
 
         // Bundle up mantissa - it's only 10 bits
         fp_value = ((((uint32_t)fs.mantissa[6]) << 3) |  ((((uint32_t)fs.mantissa[5]) >> 5 ) & 0x07) ) & 0x3ff  ;
 
         // And now the exponent
-        fp_value |= (((uint32_t)fs.exponent) << 10) & 0x7fc0;
+        fp_value |= (((uint32_t)fs.exponent) << 10) & 0x7c00;
 
         // And the sign bit
         fp_value |= fs.sign ? 0x8000 : 0x0000;
@@ -855,6 +864,12 @@ static void dofloat_mbfs(double raw, unsigned char fa[])
     uint32_t fp_value = 0;
 
     decompose_float(raw, &fs);
+
+    if ( fs.exponent <= 0 ) {
+        pack32bit_float( fs.sign ? 0x00800000u : 0x00000000u, fa );
+        return;
+    }
+    if ( fs.exponent > 255 ) fs.exponent = 255;
 
     // Bundle up mantissa
     fp_value = ( ( (uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16))  & 0x007fffff;
@@ -875,6 +890,12 @@ static void dofloat_am9511(double raw, unsigned char fa[])
     if ( raw != 0.0 ) {
         decompose_float(raw, &fs);
 
+        if ( fs.exponent < -64 ) {
+            pack32bit_float(0, fa);
+            return;
+        }
+        if ( fs.exponent > 63 ) fs.exponent = 0x3f;
+
         // Bundle up mantissa
         fp_value = (((uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16)) | 0x00800000;
 
@@ -894,6 +915,13 @@ static void dofloat_mbf64(double raw, unsigned char fa[])
 
     decompose_float(raw, &fs);
 
+    if ( fs.exponent <= 0 ) {
+        memset(fa, 0, 8);
+        if ( fs.sign ) fa[6] |= 0x80;
+        return;
+    }
+    if ( fs.exponent > 255 ) fs.exponent = 255;
+
     memcpy(fa, fs.mantissa, 7);
     fa[6] |= fs.sign ? 0x80 : 00;
     fa[7] = fs.exponent;
@@ -905,6 +933,13 @@ static void dofloat_mbf40(double raw, unsigned char fa[])
     struct fp_decomposed fs = {0};
 
     decompose_float(raw, &fs);
+
+    if ( fs.exponent <= 0 ) {
+        memset(fa, 0, 5);
+        if ( fs.sign ) fa[3] |= 0x80;
+        return;
+    }
+    if ( fs.exponent > 255 ) fs.exponent = 255;
 
     memcpy(fa, fs.mantissa + 3, 4);
     fa[3] |= fs.sign ? 0x80 : 00;
@@ -919,6 +954,11 @@ static void dofloat_z80(double raw, unsigned char fa[])
 
     decompose_float(raw, &fs);
 
+    if ( fs.exponent <= 0 ) {
+        memset(fa, 0, MAX_MANTISSA_SIZE + 1);
+        return;
+    }
+    if ( fs.exponent > 255 ) fs.exponent = 255;
 
     for ( i = offs; i < MAX_MANTISSA_SIZE ; i++ ) {
         fa[i - offs + c_fp_fudge_offset] = fs.mantissa[i];

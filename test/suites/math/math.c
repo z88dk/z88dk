@@ -3,6 +3,7 @@
 #include "test.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <math.h>
 
@@ -642,6 +643,38 @@ void test_math16_edges()
 #endif
 
 #ifdef MATH32
+/* Classic printf %f/%e/%g formatting: %g selection, tiny %.2f precision,
+ * overflow multiply to Inf, and subnormal/overflow literal clamps. */
+void test_math32_printf()
+{
+    char buf[64];
+    union { FLOAT f; unsigned long u; } r;
+
+    sprintf(buf, "%g", (double)(FLOAT)1.234e-37f);
+    Assert(strcmp(buf, "1.234e-37") == 0, "%g of 1.234e-37");
+
+    sprintf(buf, "%g", (double)(FLOAT)(-2.5e-5f));
+    Assert(strcmp(buf, "-2.5e-05") == 0, "%g of -2.5e-5");
+
+    sprintf(buf, "%g", (double)(FLOAT)314.159f);
+    Assert(strcmp(buf, "314.159") == 0, "%g of 314.159");
+
+    sprintf(buf, "%.2f", (double)(FLOAT)1.234e-37f);
+    Assert(strcmp(buf, "0.00") == 0, "%.2f of 1.234e-37");
+
+    r.f = (FLOAT)(1e30f * 1e10f);
+    Assert(r.u == 0x7f800000ul, "1e30*1e10 overflows to +Inf");
+
+    r.f = (FLOAT)((-1e30f) * 1e10f);
+    Assert(r.u == 0xff800000ul, "-1e30*1e10 overflows to -Inf");
+
+    r.f = (FLOAT)1.4e-45f;
+    Assert(r.u == 0x00000000ul, "subnormal literal clamps to +0");
+
+    r.f = (FLOAT)1e39f;
+    Assert(r.u == 0x7f800000ul, "overflow literal clamps to +Inf");
+}
+
 /* IEEE edges that the math32 cores document: FTZ/specials, exp overflow,
  * signed zero sqrt, packed qNaN divide, dissimilar-magnitude add (align). */
 void test_math32_edges()
@@ -776,6 +809,7 @@ int suite_math()
     suite_add_test(test_specials_sqrt);
 #endif
 #ifdef MATH32
+    suite_add_test(test_math32_printf);
     suite_add_test(test_math32_edges);
 #endif
 #ifdef MATH16
