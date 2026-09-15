@@ -12,6 +12,10 @@ vpath %.c ../cimpl
 CFILES  = $(notdir $(wildcard ../../math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
 CFILES  = atof.c ftoa.c ftoe.c tofix16.c fromfix16.c
 OBJECTS = $(CFILES:.c=.o) 
+# z80n uses the lm32/c/sccz80 ftoa/ftoe/ftog wrappers (wired in
+# newlibfiles_z80n.lst) instead of the cimpl/c-compiled ones, which are
+# corrupted by the z80n_rules.1 copt.
+OBJECTS_Z80N = atof.o tofix16.o fromfix16.o
 
 CFLAGS += -fp-mode=ieee -DFLOAT_IS_32BITS
 
@@ -37,7 +41,7 @@ $(OUTPUT_DIRECTORY)/math32_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/ixiy/x/x/x -I.. -IXIY  -D__CLASSIC @newlibfiles_z80.lst
 	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/math32_ixiy @math32.lst
 
-$(OUTPUT_DIRECTORY)/math32_z80n.lib: $(addprefix obj/z80n/, $(OBJECTS))
+$(OUTPUT_DIRECTORY)/math32_z80n.lib: $(addprefix obj/z80n/, $(OBJECTS_Z80N))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80n/x/x/x  -I.. -mz80n -D__CLASSIC @newlibfiles_z80n.lst
 	TYPE=z80n $(LIBLINKER) -mz80n -x$(OUTPUT_DIRECTORY)/math32_z80n @math32.lst
 
@@ -83,7 +87,8 @@ $(OUTPUT_DIRECTORY)/math32_gbz80.lib: $(addprefix obj/gbz80/, $(OBJECTS))
 	TYPE=gbz80 $(LIBLINKER) -mgbz80 -x$(OUTPUT_DIRECTORY)/math32_gbz80 @math32.lst
 
 # Order-only: dirs must finish before any object compiles. See Make.config.
-$(foreach d,8080 8085 gbz80 ez80_z80 ixiy kc160 r2ka r4k r6k z180 z80 z80n,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
+$(foreach d,8080 8085 gbz80 ez80_z80 ixiy kc160 r2ka r4k r6k z180 z80,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
+$(foreach d,z80n,$(addprefix obj/$(d)/,$(OBJECTS_Z80N))): | dirs
 
 dirs:
 	$(Q)mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c obj/8080/c obj/gbz80/c obj/r6k/c
