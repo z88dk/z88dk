@@ -60,6 +60,19 @@ check whether the fact it uncovered is actionable one stage further down.
 
 ### Background work, when there is time
 
+**8085 K-flag trip counters (ADR 0051).** The last declared-but-unused CPU
+capability: `CPU_HAS_JP_K()` exists and no backend file consults it. 236
+candidate sites in the corpus, each worth 2 bytes, ~8 cycles and a freed A, and
+the emulator already models the flag. NOT a peephole — K sets on −1, not 0, so
+the counter's initial value has to shift by one. Scope it to pure trip counters
+and **measure what fraction of the 236 qualify before building**.
+
+A survey of all 14 `CPU_HAS_*` macros found five the backend never consults;
+the other four are KR580VM1-only. gbz80 was checked at the same time and is
+**not** a candidate — it already emits its specials heavily (`ld hl,sp+N` 2897x,
+`ld a,(hl+)` 1633x, `add sp,N` 890x). Sweeping the remaining CPUs the same way
+is cheap and is how ADR 0039 was found.
+
 **Give the shipped default-on optimisations ADRs, then trim their comments.**
 **Started 2026-09-15 — 11 features done** (ADR 0040-0050): `remat-lea`,
 `dead-store-share`, `trunc-res`, `fclong-carry`, `call-bremat`, `xor-a`,
