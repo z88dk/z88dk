@@ -7,7 +7,7 @@
  */
 
 #ifdef __Z88DK
-#pragma output CLIB_OPT_PRINTF = 0x15000201
+#pragma output CLIB_OPT_PRINTF = 0x55000201   ; classic builds need the flags-parsing bit (0x40000000)
 #endif
 
 #include <stdio.h>
