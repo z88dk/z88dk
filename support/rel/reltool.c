@@ -33,7 +33,6 @@ typedef struct
     unsigned value;
 } SYMBOL;
 
-
 typedef struct {
     char name[64];
     unsigned chain;
@@ -43,40 +42,125 @@ static EXTERNAL extsyms[256];
 static int extcount;
 
 
-static void add_external(const char *name, unsigned chain)
+typedef enum {
+    REL_NONE     = 0,
+    REL_PROG     = TOK_PRGREL,
+    REL_DATA     = TOK_DATAREL,
+    REL_COM      = TOK_COMREL,
+    REL_EXTERNAL = 0x100
+} RELOC_TYPE;
+
+typedef struct {
+    unsigned addr;
+    unsigned target;
+    RELOC_TYPE type;
+    const char *symbol;
+} RELOC;
+
+RELOC relocs[2048];
+int reloc_count;
+
+
+
+#ifdef DEBUG
+static void dump_chain(unsigned char *code, unsigned p)
 {
+    while (p)
+    {
+        unsigned next =
+            code[p] |
+            (code[p+1] << 8);
+
+        printf(" -> %04X", p);
+
+        p = next;
+    }
+
+    printf(" -> 0000\n");
+}
+#endif
+
+static RELOC *find_reloc(unsigned addr){
+    int i;
+    for (i = 0; i < reloc_count; i++)
+	{
+        if (relocs[i].addr == addr)
+			return &relocs[i];
+	}
+		return NULL;
+}
+
+
+static void add_external(unsigned char *code, const char *name, unsigned chain)
+{
+    unsigned p;
+
     if (extcount >= 256)
         return;
 
     strcpy(extsyms[extcount].name, name);
     extsyms[extcount].chain = chain;
+
+    p = chain;
+
+    while (p)
+    {
+        RELOC *r = find_reloc(p);
+
+        if (!r)
+        {
+            relocs[reloc_count].addr   = p;
+            relocs[reloc_count].target = 0;
+            relocs[reloc_count].type   = REL_EXTERNAL;
+            relocs[reloc_count].symbol = extsyms[extcount].name;
+            reloc_count++;
+        }
+        else
+        {
+            r->type   = REL_EXTERNAL;
+            r->symbol = extsyms[extcount].name;
+        }
+
+        p = code[p] | (code[p+1] << 8);
+    }
+
     extcount++;
 }
 
-static const char *lookup_external(unsigned addr)
-{
-    int i;
 
-    for (i = 0; i < extcount; i++)
-    {
-        if (extsyms[i].chain == addr)
-            return extsyms[i].name;
-    }
+//static const char *lookup_external(unsigned char *code, unsigned addr)
+//{
+//    int i;
+//	
+//#ifdef DEBUG
+//	printf("lookup_external(%04X)\n", addr);
+//#endif
+//
+//    for (i = 0; i < extcount; i++)
+//    {
+//        unsigned p = extsyms[i].chain;
+//
+//        while (p)
+//        {
+//            unsigned next;
+//
+//            if (p == addr)
+//                return extsyms[i].name;
+//
+//            next = code[p] |
+//                  (code[p + 1] << 8);
+//
+//            p = next;
+//        }
+//    }
+//
+//    return NULL;
+//}
 
-    return NULL;
-}
 
 static SYMBOL symbols[MAX_SYMBOLS];
 static int symbol_count;
 
-typedef struct {
-    unsigned addr;
-    unsigned target;
-    unsigned type;
-} RELOC;
-
-RELOC relocs[2048];
-int reloc_count;
 
 
 typedef struct
@@ -110,21 +194,26 @@ unsigned char code[65500];
 unsigned int codelen;
 unsigned int datalen;
 
+
 static void code_put8(unsigned v)
 {
     if (codelen < sizeof(code))
         code[codelen++] = (unsigned char)v;
 }
 
+
 static void code_put16(unsigned v, unsigned tok)
 {
-	relocs[reloc_count].addr   = codelen;
-	relocs[reloc_count].target = v;
-	relocs[reloc_count].type   = tok;
-	reloc_count++;
+    relocs[reloc_count].addr   = codelen;
+    relocs[reloc_count].target = v;
+    relocs[reloc_count].type   = tok;
+    relocs[reloc_count].symbol = NULL;
+    reloc_count++;
+
     code_put8(v & 0xff);
     code_put8((v >> 8) & 0xff);
 }
+
 
 static void add_symbol(const char *name,
                        unsigned type,
@@ -188,15 +277,19 @@ static int read16(FILE *f, unsigned *v)
 }
 
 
-static RELOC *find_reloc(unsigned addr){
+static const char *lookup_any_symbol(unsigned value)
+{
     int i;
-    for (i = 0; i < reloc_count; i++)
-	{
-        if (relocs[i].addr == addr)
-			return &relocs[i];
-	}
-		return NULL;
+
+    for (i = 0; i < symbol_count; i++)
+    {
+        if (symbols[i].value == value)
+            return symbols[i].name;
+    }
+
+    return NULL;
 }
+
 
 static const char *format_addr(unsigned pc)
 {
@@ -207,26 +300,26 @@ static const char *format_addr(unsigned pc)
     v = code[pc] |
         (code[pc + 1] << 8);
 
-    r = find_reloc(pc);
+
+	r = find_reloc(pc);
 
 	if (r)
 	{
-		const char *s;
+		if (r->type == REL_EXTERNAL)
+			return r->symbol;
 
-        v = r->target;
+		v = r->target;
 
-		s = lookup_external(pc);
-
+		//if (r->type == REL_PROG)
+		//{
+		//	const char *s = lookup_prog(v);
+        //
+		//	if (s)
+		//		return s;
+		//}
+		const char *s = lookup_any_symbol(v);
 		if (s)
 			return s;
-
-		if (r->type == TOK_PRGREL)
-		{
-			s = lookup_prog(v);
-
-			if (s)
-				return s;
-		}
 	}
 
     sprintf(buf, "$%04X", v);
@@ -485,6 +578,48 @@ static void disasm_module(void)
 				pc += 3;
 				break;
 
+			case 0x18:
+			{
+				signed char disp = (signed char)code[pc+1];
+				unsigned target = pc + 2 + disp;
+
+				printf("JR $%04X\n", target);
+
+				pc += 2;
+				break;
+			}
+
+			case 0x10:
+			{
+				signed char disp = (signed char)code[pc+1];
+				unsigned target = pc + 2 + disp;
+
+				printf("DJNZ $%04X\n", target);
+
+				pc += 2;
+				break;
+			}
+
+			case 0x20:
+			case 0x28:
+			case 0x30:
+			case 0x38:
+			{
+				static const char *cc[4] = {
+					"NZ", "Z", "NC", "C"
+				};
+
+				signed char disp = (signed char)code[pc+1];
+				unsigned target = pc + 2 + disp;
+
+				printf("JR %s,$%04X\n",
+					   cc[(code[pc] - 0x20) >> 3],
+					   target);
+
+				pc += 2;
+				break;
+			}
+
 			case 0xC2:
 			case 0xCA:
 			case 0xD2:
@@ -560,6 +695,31 @@ static void disasm_module(void)
 			case 0xC3:
 				printf("JP %s\n", format_addr(pc+1));
 				pc += 3;
+				break;
+
+			case 0xE9:
+				printf("JP (HL)\n");
+				pc++;
+				break;
+
+			case 0xD9:
+				printf("EXX\n");
+				pc++;
+				break;
+
+			case 0xE3:
+				printf("EX (SP),HL\n");
+				pc++;
+				break;
+
+			case 0xF3:
+				printf("DI\n");
+				pc++;
+				break;
+
+			case 0xFB:
+				printf("EI\n");
+				pc++;
 				break;
 
 			case 0x2F:
@@ -735,7 +895,11 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
         printf("\"%s\"", name);
 
 		if (ctrl == 6) {
-			add_external(name, value);
+#ifdef DEBUG
+			printf(" chain:");
+			dump_chain(code, value);
+#endif
+			add_external(code, name, value);
 		}
 
         if (ctrl == 7) {
@@ -819,6 +983,8 @@ static void do_dump(FILE *f, int dumpmode)
 					codelen = 0;
 					datalen = 0;
 					reloc_count = 0;
+					extcount = 0;
+					symbol_count = 0;
 					printf("\n--- --- --- --- ---\n\n");
 
                     mod++;
