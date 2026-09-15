@@ -41,6 +41,9 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0029](0029-de-cache-fold-brick.md) | *Proposed* — a fail-safe DE cache fold, where 0018 refuses a DE home |
 | [0032](0032-gbz80-word-cost-row.md) | The measured gbz80 cost rows (SLOT+BC), shipped — and why the regression that held them back was a failed recovery, not a ranking tie |
 | [0034](0034-one-owner-for-the-allocation.md) | `ir_alloc` is the only writer of the plan; the render reports typed rejections (amends 0003) |
+| [0050](0050-stack-transient-spill-is-an-sp-mode-trade.md) | **Accepted** — stack-transient spill is sp-mode only, and the CPU test genuinely is the question |
+| [0049](0049-bc-liveness-follows-branches.md) | **Accepted** — BC liveness follows intra-function branches; −248 B, none larger, nothing slower |
+| [0048](0048-the-8085-de-park-is-decided-on-rendered-text.md) | **Accepted** — the 8085 DE park is decided on rendered text — the residency cache cannot see the future |
 | [0047](0047-de-liveness-follows-branches-but-not-calls.md) | **Accepted** — DE liveness follows branches; calls and `ret` stay conservative because the ABI reads DE |
 | [0046](0046-the-a-cache-invalidates-by-default.md) | **Accepted** — the A cache invalidates by default, so an incomplete recogniser loses bytes not correctness |
 | [0045](0045-xor-a-rides-the-backward-flag-sweep.md) | **Accepted** — `xor a` for `ld a,0`, decided by a backward flag sweep; −230 B, none larger |

@@ -5365,13 +5365,12 @@ void ir_alloc(Func *f)
            word transient with no register free goes on the stack (push/pop)
            rather than a slot.
 
-           SP MODE ONLY, and that is a cost decision, not a safety one. A park
-           trades a slot access for a push/pop; in fp mode the slot is `(ix+d)`,
-           cheap enough to invert the trade (switchbench sp -40 B / -2.07 %
-           ticks, fp -15 B but +0.72 %). 8080/8085/gbz80 have no index register,
-           so -fframe-pointer is a no-op there and they want the SP answer in
-           BOTH modes — hence the CPU test below rather than a bare
-           `c_framepointer_is_ix` one.
+           SP MODE ONLY, and that is a cost decision, not a safety one: in fp
+           mode the slot is `(ix+d)`, cheap enough to invert the trade.
+           8080/8085/gbz80 have no index register, so -fframe-pointer is a no-op
+           there and they want the SP answer in BOTH modes — hence the CPU test
+           below rather than a bare `c_framepointer_is_ix` one. Figures and the
+           contrast with the remat-lea CPU test: adr/0050.
 
            `IR_PARK_VERIFY` checks the park's TOS invariant against the emitted
            text; run it before widening stack_spill_span_hazard. */

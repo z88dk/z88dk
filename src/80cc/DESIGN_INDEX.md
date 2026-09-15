@@ -61,14 +61,23 @@ check whether the fact it uncovered is actionable one stage further down.
 ### Background work, when there is time
 
 **Give the shipped default-on optimisations ADRs, then trim their comments.**
-Of 115 registry names only about 15 are named in an ADR. Roughly ten features —
-`remat-lea`, `dead-store-share`, `trunc-res`, `fclong-carry`, `call-bremat` and
-similar — carry their justification, including benchmark figures, in a long
-block comment and nowhere else. 26 such blocks hold ~370 lines.
+**Started 2026-09-15 — 11 features done** (ADR 0040-0050): `remat-lea`,
+`dead-store-share`, `trunc-res`, `fclong-carry`, `call-bremat`, `xor-a`,
+`a-carry`, `de-flow`, `de-park`, `bc-flow`, `stack-spill`. Each got an ADR
+first; the comment then kept the rule, the gate spelling and any correctness
+landmine, and lost the figures. 11 blocks, ~90 lines of comment removed.
 
-The order matters: **write the ADR first, then cut the comment to the rule plus
-a pointer.** Doing it the other way loses the reasoning. Figures belong in
-commit messages, `BENCH_MATRIX.txt` and the ADR's evidence link — never in a
+Of 121 registry names, 96 had no ADR at the start. Do NOT read that as 96 ADRs
+owed: most are small gates whose comment is already the right size. The real
+backlog is the **figure-carrying justification blocks** — 33 of them at the
+start, ~22 left. Some of those must KEEP their figures, because there the
+numbers are the content and not the justification: the measured `g0_word_cost`
+and `g0_word_bytes` cost rows (see ADR 0038), and the C standard citation in
+`ast_codegen2.c`. Judge per block.
+
+Order matters and does not change: **write the ADR first, then cut the comment
+to the rule plus a pointer.** Doing it the other way loses the reasoning.
+Figures belong in commit messages, `BENCH_MATRIX.txt` and the ADR — never in a
 code comment, which is this project's own rule (`adr/README.md`) and the reason
 several comments here had gone stale.
 

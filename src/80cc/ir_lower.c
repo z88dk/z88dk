@@ -1252,12 +1252,7 @@ static int bc_tok(const char *ops, const char *reg)
 
    Unparked that is `ld de,sp+N / ld hl,(de)`, 3B/20c. Whether the park is needed
    is a question about the FUTURE (is the old DE read before it is overwritten?),
-   which is why every attempt to answer it from the residency cache failed: the
-   cache is a record of the past, it tracks whole pairs so a byte staged in E is
-   invisible to it, and the producing idiom does not distinguish the two cases —
-   measured on the corpus, `ld de,sp+N` and `pop de` each precede roughly as many
-   needed parks as dead ones, because the nearest preceding DE write is usually
-   the PREVIOUS park's own code.
+   which the residency cache cannot answer — adr/0048 records the three reasons.
 
    So it is decided here instead, on the rendered function, by the same backward
    liveness sweep that drops dead `ld bc,hl` parks — which already has the two
@@ -1654,12 +1649,9 @@ static void gw_fold_byte_global_widens(char **lines, int n, char *drop)
    151 `ld bc,hl` left on emu.c reach a branch to a LOCAL label. See
    bc_live_at_labels().
 
-   Corpus -248 B over 47 cells with ZERO larger, every CPU smaller (8080 -36,
-   8085 -32, z80/z80n/z180/rabbit/kc160 -24, ez80 -20, gbz80 -16); emu.c -157 B
-   sp / -149 fp, clisp -381, adv_a -16. Ticks -0.0278% on the z80 corpus, 4
-   cells faster and 0 slower -- it only ever deletes an instruction.
    IR_OFF=bc-flow opts out, byte-identical to the pre-flip compiler.
-   IR_BCFLOW_DBG=1 reports the label count and how many have BC dead. */
+   IR_BCFLOW_DBG=1 reports the label count and how many have BC dead.
+   Evidence: adr/0049. */
 static int  bcflow_on = -1;
 static int  bcflow_enabled(void)
 {
