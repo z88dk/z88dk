@@ -19,32 +19,22 @@ enforced by a script. What remains is optimisation work, and the order matters:
    `structbench/walk v2` ask a whole-function question through `ir_home_at` at
    flat index 0, before the value's live range starts. Harmless today, a
    miscompile under ranging. Small and independent of everything else.
-2. **Model what an eviction CAUSES, not what the accesses cost.** The
-   realised-cost ledger as ADR 0035 framed it is closed: refining the *price*
-   of the eviction has now failed twice, on the incumbent's side (ADR 0036) and
-   on both sides at once (ADR 0037). ADR 0037 has the evidence that retires the
-   framing — `matrixbench/stencil` takes the **same** eviction to −6.2 % ticks
-   on 8085 and **+12.5 % on z80 sp**, a spread no per-access price can produce.
-   What is missing is the BC **reload traffic** each freed temp brings with it,
-   which the `bc-evict` comment names but nothing counts.
+2. ~~Model what an eviction CAUSES~~ — **answered, and it closes the seam.**
+   The realisation verifier (`IR_REALISE`, ADR 0037) shows the `bc-evict`
+   benefit **does not exist**: across six benches the pass changes total
+   register homes by +0, +1, +0, +2, +0, +0. It frees BC, packs two more values
+   into it, and loses two IY homes doing it — a swap, not a gain. Both cost
+   denominations were pricing a gain that mostly is not there, which is why
+   three attempts to price it better all failed (ADR 0036, 0037, 0038).
 
-   Do it the way this project has done every risky arc that worked: **verifier
-   first.** Count emitted BC reloads per freed temp, check the count explains
-   the `stencil` spread, and only then let it near a decision. Do not schedule
-   a third attempt at a better price — ADR 0038 is the third failure and the
-   clearest: the 8085 cost rows really are wrong (a word slot is 33 cycles, not
-   the z80's 45), and **correcting them makes the output worse on both axes**,
-   because a cheaper slot shrinks every register home's modelled value by 32 %.
-   Accuracy in the per-access price is not what is missing.
+   Consequence: **do not tune `bc-evict`.** If it is revisited, the question is
+   whether it should exist at all, and the measurement is total residency via
+   an `IR_HOMEMAP` class census — not BC occupancy, and not a cost term.
 
-   Earlier refusal for the record: ADR 0036 charged a param eviction for the
-   framelessness it costs. Its apparent −229 bytes came from firing in **sp
-   mode**, where there is no frame to save; correctly scoped it is inert. Two
-   lessons carried forward — a size claim must name the file set it covers
-   (`long_ir/leaimm` regressed 17 bytes *outside* the 720-cell matrix), and a
-   function under an **sp-flip trial** is allocated with the frame flag
-   deliberately flipped, so any "what mode is this?" test during allocation must
-   distinguish the real function from a clone.
+   Method note worth keeping: the per-function summary showed NO change on the
+   regressing CPU while 12 of 22 per-vreg rows differed. A coarse probe hid the
+   answer. Ask for the per-item view before concluding.
+
 3. **Then `IR_TIGHT_HOMES`** (ADR 0027). Investigated 2026-09-14: its
    byte-identity failure is **not** a latent miscompile — it is the allocator
    taking newly-visible claims without pricing what they displace. It follows
@@ -158,6 +148,7 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | Gate | Question | Retire when |
 | --- | --- | --- |
 | `IR_GRAPH_PROBE` | is the capture gap in proposal or in selection? | the step A1 cost ledger answers it per claim |
+| `IR_REALISE` | is a displaced value realised as the model predicted? | **answered** (ADR 0037): realisation class is NOT the explanation — but joined with `IR_HOMEMAP` it showed `bc-evict` adds no residency at all, it swaps IY homes for BC ones. `=1` per-function summary, `=2` per vreg. Keep: the summary can hide per-vreg churn, so use `=2` |
 | `IR_LEDGER` | does the BC evict decision compare the right numbers? | **answered, no** (ADR 0037): the flat unit really does misprice — 19 candidates scored as one incumbent — but correcting it is worse on size and ticks. The question was the wrong one. Keep the probe; it is how the 64 `inc=0` no-op decisions were told from the 25 real ones |
 
 | `IR_BCVETO_PROBE` | what does the BC veto turn away? | the veto becomes a cost term |

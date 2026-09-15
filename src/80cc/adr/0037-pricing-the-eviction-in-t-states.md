@@ -71,8 +71,10 @@ in `bc-evict`, in two denominations, and refining it has now failed twice
 (ADR 0036 on the incumbent's side, this on both). A third attempt at a better
 *price* should not be scheduled.
 
-What would actually move it is not a better price for an access, but a model of
-what the displaced value is **realised as**. Reading the `stencil` asm shows the
+What would move it is not a better price for an access. The first guess was a
+model of what the displaced value is **realised as** — see the section above,
+which built that and refuted it. The realisation picture is still worth having,
+and is recorded here because it is true and was measured: Reading the `stencil` asm shows the
 model assumes one realisation and the lowerer picks another:
 
 * On **z80 sp**, the value the eviction displaces stops being a slot store
@@ -90,6 +92,43 @@ displaced value as a frame slot; the lowerer realises it as a park, as a
 chip-specific register form, or as a slot, and those have opposite byte and
 cycle characteristics. That is the realised-cost gap ADR 0035 was reaching for,
 located properly at last.
+
+## ANSWERED 2026-09-15 by the realisation verifier (`IR_REALISE`)
+
+The verifier was built to test the hypothesis above. It **refuted it**, and
+found the real cause.
+
+Realisation *class* is not the explanation. On `matrixbench/stencil` the mix is
+much the same everywhere — z80-sp 22 displaced (11 slot, 5 park, 6 unused),
+8085-sp 27 (15, 6, 6) — and on z80-sp, where the eviction costs +12.5 % ticks,
+the class **summary does not change at all** when the eviction fires.
+
+The per-vreg rows do, though: **12 of 22 differ** behind an identical summary.
+Joined against `IR_HOMEMAP`, they say what actually happened on z80-sp:
+
+| | evict off | evict on |
+|---|---|---|
+| BC homes | 1 | **3** |
+| IY homes | 4 | **2** |
+| **total register homes** | **19** | **19** |
+
+The eviction **freed BC, packed two more values into it, and lost two IY homes
+doing it.** Residency did not increase. It was a swap.
+
+That generalises. Total register homes before and after the eviction, z80-sp:
+`matrixbench` 53→53, `localbench` 102→103, `structbench` 19→19,
+`bitfieldbench` 94→96, `recordbench` 27→27, `md5` 219→219.
+
+So the modelled benefit — free BC, pack more candidates, gain residency —
+**does not materialise**. The pass reshuffles which value holds which register
+and leaves the count where it was. Both denominations were pricing a gain that
+mostly is not there, which is why the outcome scattered by CPU with no pattern
+the model could explain.
+
+`bc-evict` reasons only about BC, but its effect is a whole-allocation
+reshuffle. Any future work here must measure **total residency**, not BC
+occupancy — and the cheap way to do that is the `IR_HOMEMAP` class census above,
+which took minutes once the question was right.
 
 ## What is NOT established
 

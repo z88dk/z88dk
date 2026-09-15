@@ -4115,6 +4115,28 @@ static int   dsx_on = -1;
 static int   ds_dead[512];
 static int   ds_ndead;
 
+/* [IR_REALISE, inert] The realisation verifier. The allocator prices a value it
+   declines to home as GR_SLOT x accesses — a PREDICTION about what the lowerer
+   will do with it. The lowerer actually realises a displaced value one of four
+   ways, and their byte/cycle characters are not interchangeable: a frame slot
+   (the prediction, 8 B / 45 cyc on z80-sp), a stack park (push/pop, ~1 B but
+   ~21 cyc — byte-cheap and cycle-dear, the OPPOSITE trade), a remat (no storage
+   at all), or straight out of a register.
+   The existing IR_REC report walks the same counters but filters to HOMED
+   vregs; this is its complement, over the displaced ones. See adr/0037 for why
+   the question matters: one eviction in matrixbench/stencil is -6.2% ticks on
+   8085 and +12.5% on z80-sp, a spread no per-access price can produce.
+   IR_REALISE=1 prints the per-function class summary, =2 adds a row per vreg. */
+static int  realise_on_v = -1;
+static int realise_on(void)
+{
+    if (realise_on_v < 0) {
+        const char *e = getenv("IR_REALISE");
+        realise_on_v = e ? (e[0] == '2' ? 2 : (e[0] ? 1 : 0)) : 0;
+    }
+    return realise_on_v;
+}
+
 static int rec_enabled(void)
 {
     if (rec_on < 0) {
@@ -4188,7 +4210,8 @@ static void rec_begin(const Func *f)
 {
     rec_reset();
     ds_ixaccess = 0;                  /* [#13] per-render (ix+-d)-access count */
-    if ((!rec_enabled() && !deadframe_on() && !dsx_enabled() && !home_slot_verify_enabled())
+    if ((!rec_enabled() && !deadframe_on() && !dsx_enabled()
+         && !home_slot_verify_enabled() && !realise_on())
         || L.ss_phase == 1 || f->n_vregs <= 0)
         return;
     rec_nv = f->n_vregs;
@@ -4302,6 +4325,47 @@ static void rec_end(const Func *f)
                     f->fn ? ir_sym_name(f->fn) : "?", homed, ureg, uslot, uremat,
                     cold);
     }
+    /* [IR_REALISE] The displaced values — the complement of the IR_REC report
+       above, which skips them. For each value the allocator did NOT give a
+       register home, say what the lowerer actually realised it as, and how much
+       frame traffic it really cost (rec_fh_bytes, the emit-site byte model).
+       CAVEAT, and it must stay in the output: rec_slotuse counts non-emitting
+       slot_off guard calls too, so it OVER-states slot traffic by a ratio that
+       varies per function (IR_FRAMEPROBE measured 1.5x-3.6x). rec_fh_bytes is
+       the emit-site number and does not have that problem; prefer it. The class
+       is taken from rec_slot/rec_remat/rec_reg, which count realised USES. */
+    if (realise_on()) {
+        int n_slot = 0, n_park = 0, n_remat = 0, n_reg = 0, n_unused = 0;
+        long b_slot = 0;
+        for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
+            PhysReg pr = ir_home_assigned(f, v);
+            if (pr != IR_PR_SPILL && pr != IR_PR_STACK) continue;  /* homed */
+            int uses = rec_reg[v] + rec_slot[v] + rec_remat[v];
+            const char *cls;
+            if (pr == IR_PR_STACK)     { cls = "PARK";   n_park++; }
+            else if (!uses)            { cls = "UNUSED"; n_unused++; }
+            else if (rec_slot[v] > 0)  { cls = "SLOT";   n_slot++;
+                                         b_slot += rec_fh_bytes ? rec_fh_bytes[v] : 0; }
+            else if (rec_remat[v] > 0) { cls = "REMAT";  n_remat++; }
+            else                       { cls = "REG";    n_reg++; }
+            if (realise_on() >= 2)
+                fprintf(stderr,
+                        "IR_REALISE:   %s v%d[%s] %-6s uses reg=%d slot=%d remat=%d "
+                        "slotuse=%d fh_bytes=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", v, ir_phys_name(pr), cls,
+                        rec_reg[v], rec_slot[v], rec_remat[v],
+                        rec_slotuse ? rec_slotuse[v] : -1,
+                        rec_fh_bytes ? rec_fh_bytes[v] : -1);
+        }
+        int tot = n_slot + n_park + n_remat + n_reg + n_unused;
+        if (tot)
+            fprintf(stderr,
+                    "IR_REALISE %-22s displaced=%d  as-predicted(SLOT)=%d "
+                    "PARK=%d REMAT=%d REG=%d UNUSED=%d  slot_bytes=%ld\n",
+                    f->fn ? ir_sym_name(f->fn) : "?", tot, n_slot,
+                    n_park, n_remat, n_reg, n_unused, b_slot);
+    }
+
     /* Dead frame-slot report, per-BYTE and coalescing-aware. Slots are shared
        across non-interfering vregs, so a frame byte is DEAD only if every vreg
        covering it had no genuine frame-slot access (rec_slotuse over-counts
