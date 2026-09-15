@@ -3,23 +3,6 @@
 =
 	add	hl,+(%1)
 
-	ld	hl,%1	;const
-	push	hl
-	ld	hl,%2
-=
-	push	%1	;const
-	ld	hl,%2
-
-	ld	hl,%1	;const
-	ld	de,%2
-	push	de
-	push	hl
-	ld	hl,%3
-=
-	push	%1
-	push	%2
-	ld	hl,%3
-
 %check 0 <= %2 <= 65535
 	ld	hl,_%1
 	add	hl,%2

@@ -125,8 +125,10 @@
 
 
 ._longcall
-	push	10000
-	push	0
+	ld	hl,10000	;const
+	ld	de,0
+	push	de
+	push	hl
 	ld	hl,10	;const
 	push	hl
 	call	_longfunc

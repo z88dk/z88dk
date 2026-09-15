@@ -60,6 +60,12 @@ add( "add de,32767", 0xED, 0x35, 0xFF, 0x7F );
 add( "add bc,32767", 0xED, 0x36, 0xFF, 0x7F );
 
 # M=6+           23T    push NNNN        ED 8A HI LO     push 16bit immediate value, note big endian order
+#   BIG-ENDIAN STORAGE: the operand bytes are pushed in fetch order, so the HI
+#   byte ends at the final SP.  A little-endian pop (L=[SP], H=[SP+1]) therefore
+#   returns the BYTE-SWAPPED word: `push 0x1234; pop hl` -> HL = 0x3412.
+#   Consequently copt must never synthesise `push nn` to replace register pushes
+#   (it does not round-trip like `ld hl,nn; push hl`); the z80n_rules.1 push-pair
+#   rules were removed on that basis.
 add( "push 1",     0xED, 0x8A, 0x00, 0x01 );
 add( "push 256",   0xED, 0x8A, 0x01, 0x00 );
 add( "push 32767", 0xED, 0x8A, 0x7F, 0xFF );
