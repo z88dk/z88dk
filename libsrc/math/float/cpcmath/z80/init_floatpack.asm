@@ -12,33 +12,6 @@
         PUBLIC        init_floatpack
 
 ; All the library routines that we have to change
-        EXTERN        atan
-        EXTERN        cos
-        EXTERN        dadd
-        EXTERN        ddiv
-        EXTERN        deg
-        EXTERN        deq
-        EXTERN        dge
-        EXTERN        dgt
-        EXTERN        dleq
-        EXTERN        dlt
-        EXTERN        dmul
-        EXTERN        dne
-        EXTERN        dsub
-        EXTERN        exp
-        EXTERN        float
-        EXTERN        floor
-        EXTERN        fprand
-        EXTERN        ifix
-        EXTERN        log10
-        EXTERN        log
-        EXTERN        minusfa
-        EXTERN        pow10
-        EXTERN        pow
-        EXTERN        rad
-        EXTERN        sin
-        EXTERN        sqrt
-        EXTERN        tan
 
 ; The actual place where we have to change things
         EXTERN        atanc

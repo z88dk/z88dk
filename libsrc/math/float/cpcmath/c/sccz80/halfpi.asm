@@ -24,3 +24,9 @@ halfpi:
 
 halfpi_value:
     defb    0xa2, 0xda, 0x0f, 0x49, 0x81
+
+; floatpack init: run the CPC float-state patch at startup via code_crt_init
+    SECTION code_crt_init
+    EXTERN  init_floatpack
+    call    init_floatpack
+
