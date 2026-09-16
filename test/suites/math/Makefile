@@ -11,7 +11,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 # ---------------------------------------------------------------------------
 # IEEE specials harness (-DMATH_SPECIALS in math.c): light Inf/NaN checks
 # (div, mul/add, sqrt).  Enabled on products that pass:
-#   math32, math32_ez80_z80, math32_8085, math32_8080, math32_gbz80,
+#   math32, math32_ez80_z80, math32_8085, math32_8080, math32_gbz80, math32_vm1,
 #   math16, math16_ez80_z80, math16_8085, math16_8080, math16_gbz80,
 #   math16_z180, math16_z80n, math16_r2ka, math16_r4k, math16_r6k,
 #   math16_kc160, am9511, am9511_8085
@@ -33,7 +33,7 @@ all: test_genmath.bin test_daimath32.bin test_bbcmath.bin test_math16.bin \
 	test_math16_8085.bin test_math16_8080.bin test_math16_gbz80.bin \
 	test_math32.bin test_math32_z180.bin test_math32_ez80_z80.bin test_math32_z80n.bin \
 	test_math32_r2ka.bin test_math32_r4k.bin test_math32_r6k.bin test_math32_kc160.bin \
-	test_math32_8085.bin test_math32_8080.bin test_math32_gbz80.bin \
+	test_math32_8085.bin test_math32_8080.bin test_math32_gbz80.bin test_math32_vm1.bin \
 	test_math48.bin test_math48_rc2014_CODE.bin test_am9511_rc2014_CODE.bin test_cpcmath.bin \
 	test_mbf32.bin test_mbf32_8080.bin test_mbf32_8085.bin test_mbf32_vm1.bin test_mbf32_gbz80.bin \
 	test_mbf32_r2ka.bin test_mbf32_r4k.bin test_mbf32_r6k.bin test_mbf32_ez80_z80.bin test_mbf32_kc160.bin \
@@ -72,9 +72,8 @@ test_am9511.bin: $(FPSOURCES)
 	$(call compile, -DAM9511 --math-am9511 -DMATH_SPECIALS -DMATH_LIBRARY="\"\\\"AM9511-z80\\\"\"")
 	$(runtest)
 
-# vm1 gets the mbf32 row only: math32/math16 have no _vm1 product (their 8085
-# cores use LDSI and RDEL, which the KR580VM1 spends on the RS prefix and
-# DSUB D), and there is no am9511_vm1 either. Same shape as the 8080 row.
+# vm1 has math32_vm1 (IEEE, --math32) plus the mbf32 row. math16 and am9511
+# still have no _vm1 product.
 test_mbf32_vm1.bin: $(FPSOURCES)
 	$(call compile_vm1, -DMBF32 --math-mbf32 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
 	$(runtest_vm1)
@@ -154,6 +153,10 @@ test_math32_8080.bin: $(FPSOURCES)
 test_math32_gbz80.bin: $(FPSOURCES)
 	$(call compile_gbz80, -DMATH32 -D__MATH_MATH32 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32-gbz80\\\"\"", -lmath32_gbz80)
 	$(runtest_gbz80)
+
+test_math32_vm1.bin: $(FPSOURCES)
+	$(call compile_vm1, -DMATH32 -D__MATH_MATH32 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32-vm1\\\"\"", -lmath32_vm1)
+	$(runtest_vm1)
 
 test_math48_rc2014_CODE.bin: $(FPSOURCES)
 	$(call compile_rc2014, -DMATH48 -DMATH_LIBRARY="\"\\\"Math48\\\"\"", -lm)

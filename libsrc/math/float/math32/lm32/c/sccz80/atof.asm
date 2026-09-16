@@ -13,10 +13,10 @@ atof:
    ; double atof(const char *nptr) __smallc
    ; enter: sp+2 = char *nptr (caller cleans up)
 
-   pop af                  ; return address
+   pop bc                  ; return address
    pop hl                  ; hl = nptr
    push hl                 ; restore stack for caller's cleanup
-   push af
+   push bc
 
    ld de,0                 ; no endptr
    call asm_strtod

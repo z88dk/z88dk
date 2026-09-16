@@ -13,7 +13,7 @@ Soviet 8080 extension of the KR580VM80A. **Binary compatible with the 8080.** Ev
 
 z88dk writes **Zilog** mnemonics. The Russian document uses Intel-style names (DSUB, LHLX, ANX). Translate on the way in.
 
-Classic path `libsrc/l/sccz80/7-vm1/`, products `vm1_crt0.lib` / `testvm1_clib.lib` / `vm1_clib.lib`. Assemble `-mvm1`. `zcc +test -clib=vm1` or `+z80 -clib=vm1`. Float: **`--math-mbf32`** (`mbf32_vm1.lib`). **No** `math32` / `math16` vm1 product — those 8085 cores use `ld de,sp+*` and `rl de`, which are **prefixes** on this CPU.
+Classic path `libsrc/l/sccz80/7-vm1/`, products `vm1_crt0.lib` / `testvm1_clib.lib` / `vm1_clib.lib`. Assemble `-mvm1`. `zcc +test -clib=vm1` or `+z80 -clib=vm1`. Float: default **`--math-mbf32`** (`mbf32_vm1.lib`). IEEE: **`--math32`** → `math32_vm1.lib` (`asm/vm1/`). No math16 vm1 product — those 8085 cores use `ld de,sp+*` and `rl de`, which are **prefixes** on this CPU.
 
 **This skill is complete for vm1 work.** Load `cpu-8080` only when the binary must also run on a plain 8080. Do not load `cpu-8085` for this CPU.
 
@@ -308,7 +308,7 @@ Do not use helper `call __z80asm__*` as the core of a hot hand-written routine. 
 8. **`rla` / `rra` / `rlca` / `rrca` do not set Z.**
 9. **16-bit `dec rr` does not set Z** (8080). No `dec bc; jp nz` as a count test. Test through A.
 10. **No copt on library asm.** Scan dead moves yourself. `tool-copt`, `methodology-measure`.
-11. **`--math32` / `--math16` are not vm1 products.** Use `--math-mbf32`.
+11. **`--math32`** links `math32_vm1`. **`--math16`** is not a vm1 product. Default float remains mbf32.
 
 ## Preference order (vm1-only code)
 

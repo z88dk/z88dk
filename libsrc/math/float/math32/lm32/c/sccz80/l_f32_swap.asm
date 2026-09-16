@@ -7,13 +7,27 @@
 ;        defw left hand LSW
 ;        defw left hand MSW
 .l_f32_swap
-        pop     af      ; Return
-        pop     bc      ; left-LSW
-        ex      de,hl   ; de = right-LSW, hl = right-MSW
-        ex      (sp),hl ; hl = left-MSW, (sp) = right-MSW
-        push    de      ; Push right-LSW
-        push    af      ; Return address
-        ex      de,hl   ; de = left-MSW
-        ld      l,c
-        ld      h,b     ; hl = left-LSW
+        pop     bc      ; Return
+        push    de
+        push    hl      ; SP: right(4), left(4)
+        push    bc      ; SP: ret, right, left
+        ld      hl,2
+        add     hl,sp   ; &right
+        ex      de,hl
+        ld      hl,6
+        add     hl,sp   ; &left
+        ld      b,4
+.swloop
+        ld      a,(de)
+        ld      c,a     ; right byte (ld (de),r is A-only)
+        ld      a,(hl)  ; left byte
+        ld      (de),a  ; left → right
+        inc     de
+        ld      (hl),c  ; right → left
+        inc     hl
+        djnz    swloop
+        pop     bc      ; BC = ret
+        pop     hl      ; left LSW
+        pop     de      ; left MSW → DEHL = left
+        push    bc      ; ret
         ret
