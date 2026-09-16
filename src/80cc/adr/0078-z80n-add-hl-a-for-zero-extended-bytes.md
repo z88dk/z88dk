@@ -75,4 +75,7 @@ Two more z80n instructions were sized and **refused**:
   size-neutral and 2 cycles **slower** on z80n. Its only merit is preserving
   HL, and the corpus does not want that: of 239 sites, 196 are immediately
   preceded by another `push hl`, HL is pure argument staging, and the number of
-  HL park brackets around a constant push is **zero**.
+  HL park brackets around a constant push is **zero**. (The refusal rests on
+  size and cycles only, so it is unaffected by `z80n_push_mn`'s operand order,
+  which was the other way round in `src/ticks` when this was measured and has
+  since been corrected upstream to match `opcodes.dat`'s big-endian `%M`.)
