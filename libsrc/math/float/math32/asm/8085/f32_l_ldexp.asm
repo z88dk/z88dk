@@ -6,14 +6,15 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_ldexp — apply signed exponent adjustment
+; 8085 l_f32_ldexp — apply signed exponent adjustment
 ;-------------------------------------------------------------------------
 ;
-; 8080-compatible (shared: 8080 / 8085 / gbz80)
-; Per-CPU copy of the 8080-compatible core.
-; Flagged for later per-CPU optimisation; behaviour unchanged in this pass.
 ; Entry: DEHL = float, A = signed exponent adjustment
 ; Exit:  DEHL = adjusted float
+;
+; Unpack with rl de (incoming C lands in E[0]). rl de does not write Z —
+; test exp with inc d / dec d (sign in C survives). Parking the sign with
+; rra shifts that E[0] bit out; no need to or a first.
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -22,20 +23,15 @@ PUBLIC l_f32_ldexp
 
 
 .l_f32_ldexp
-    ld b,a                          ; B = delta
-    ld a,e
-    add a,a
-    ld e,a                          ; sla e
-    ld a,d
-    rla
-    ld d,a                          ; D = exp, C = sign
+    rl de                           ; D = exp, C = sign; E[0] = incoming C
     inc d
-    dec d                           ; Z iff exp==0; keep C (sign)
+    dec d                           ; Z iff exp==0; C (sign) kept
     jp Z,zero_legal
 
+    ld b,a                          ; B = delta (A unused by unpack)
     ld a,e
-    rra
-    ld e,a                          ; put sign in E[7]
+    rra                             ; sign → E[7]; incoming C bit leaves E[0]
+    ld e,a
 
     ld a,d
     add a,b                         ; exp + delta
@@ -43,7 +39,6 @@ PUBLIC l_f32_ldexp
     or a
     jp Z,underflow
 
-    ; pack: sign from E[7]
     ld a,e
     add a,a                         ; sign → C
     ld e,a
@@ -63,7 +58,7 @@ PUBLIC l_f32_ldexp
     ret
 
 .zero_legal
-    ; D=0 after unpack; C = sign
+    ; D = 0 after unpack; C = sign
     ld hl,0
     ld e,0
     ld a,0

@@ -6,13 +6,10 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_f2long — IEEE single to long
+; gbz80 m32_f2long — IEEE single to long
 ;-------------------------------------------------------------------------
 ;
-; 8080-compatible (shared: 8080 / 8085 / gbz80)
-; Per-CPU copy of the 8080-compatible core.
-; Flagged for later per-CPU optimisation; behaviour unchanged in this pass.
-; Mirror Z80 f32_f2long. Exp lives in C (shifts via A clobber A).
+; CB srl/rr on D,E,H,L. Shift count = (0x7e+32) − exp.
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -33,50 +30,35 @@ PUBLIC l_f32_f2slong, l_f32_f2ulong, l_f32_f2sint, l_f32_f2uint
 .l_f32_f2uint
 .l_f32_f2slong
 .l_f32_f2ulong
-    ld b,d                          ; B = sign | exp[7:1] (for sign later)
-    ld c,d
-    ld a,e
-    rla                             ; rl e via A
-    ld e,a
-    ld a,c
-    rla                             ; A = full exponent
+    ld b,d                          ; B = sign | exp[7:1]
+    ld a,d
+    rl e
+    rla                             ; A = exponent (rla forces Z=0)
     or a
     jp Z,l_f32_zero
     cp 07eh+32
     jp NC,l_f32_zero
-    ld c,a                          ; C = exp (must survive A-clobbering shifts)
 
-    ; scf; rr e — hidden 1 into E
+    ld c,a
+    ld a,07eh+32
+    sub c
+    ld c,a                          ; C = shift count (>= 1)
+
     scf
-    ld a,e
-    rra
-    ld e,a
+    rr e                            ; hidden 1
     ld d,e
     ld e,h
     ld h,l
     ld l,0                          ; DEHL = mant << 8
 
 .f2_loop
-    ; srl d; rr e; rr h; rr l
-    or a
-    ld a,d
-    rra
-    ld d,a
-    ld a,e
-    rra
-    ld e,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    inc c
-    ld a,c
-    cp 07eh+32
-    jp NZ,f2_loop
+    srl d
+    rr e
+    rr h
+    rr l
+    dec c
+    jr NZ,f2_loop
 
-    ld a,b
-    rla                             ; sign → CF
+    rl b                            ; sign → CF
     call C,l_long_neg
     ret

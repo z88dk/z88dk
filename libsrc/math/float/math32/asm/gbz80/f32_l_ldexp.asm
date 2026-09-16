@@ -6,14 +6,13 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_ldexp — apply signed exponent adjustment
+; gbz80 l_f32_ldexp — apply signed exponent adjustment
 ;-------------------------------------------------------------------------
 ;
-; 8080-compatible (shared: 8080 / 8085 / gbz80)
-; Per-CPU copy of the 8080-compatible core.
-; Flagged for later per-CPU optimisation; behaviour unchanged in this pass.
 ; Entry: DEHL = float, A = signed exponent adjustment
 ; Exit:  DEHL = adjusted float
+;
+; sla e / rl d are native CB ops. rl d writes Z (unlike 8085 rl de).
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -22,37 +21,22 @@ PUBLIC l_f32_ldexp
 
 
 .l_f32_ldexp
-    ld b,a                          ; B = delta
-    ld a,e
-    add a,a
-    ld e,a                          ; sla e
-    ld a,d
-    rla
-    ld d,a                          ; D = exp, C = sign
-    inc d
-    dec d                           ; Z iff exp==0; keep C (sign)
-    jp Z,zero_legal
+    sla e                           ; C = exp[0]
+    rl d                            ; D = exp, C = sign; Z iff exp==0
+    jr Z,zero_legal
 
-    ld a,e
-    rra
-    ld e,a                          ; put sign in E[7]
+    ld b,a                          ; B = delta (A unused by unpack)
+    rr e                            ; sign in E[7]
 
     ld a,d
     add a,b                         ; exp + delta
     ld d,a
     or a
-    jp Z,underflow
+    jr Z,underflow
 
-    ; pack: sign from E[7]
-    ld a,e
-    add a,a                         ; sign → C
-    ld e,a
-    ld a,d
-    rra
-    ld d,a
-    ld a,e
-    rra
-    ld e,a
+    sla e                           ; sign → C
+    rr d
+    rr e
     or a
     ret
 
@@ -63,10 +47,10 @@ PUBLIC l_f32_ldexp
     ret
 
 .zero_legal
-    ; D=0 after unpack; C = sign
+    ; D = 0 after unpack; C = sign
     ld hl,0
     ld e,0
     ld a,0
-    rra                             ; sign into D (must keep CF; not xor a)
+    rra                             ; sign into D (must keep CF; rra forces Z=0)
     ld d,a
     ret
