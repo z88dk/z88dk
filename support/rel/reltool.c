@@ -83,11 +83,11 @@ static void dump_chain(unsigned char *code, unsigned p)
 static RELOC *find_reloc(unsigned addr){
     int i;
     for (i = 0; i < reloc_count; i++)
-	{
+    {
         if (relocs[i].addr == addr)
-			return &relocs[i];
-	}
-		return NULL;
+            return &relocs[i];
+    }
+        return NULL;
 }
 
 
@@ -131,9 +131,9 @@ static void add_external(unsigned char *code, const char *name, unsigned chain)
 //static const char *lookup_external(unsigned char *code, unsigned addr)
 //{
 //    int i;
-//	
+//  
 //#ifdef DEBUG
-//	printf("lookup_external(%04X)\n", addr);
+//  printf("lookup_external(%04X)\n", addr);
 //#endif
 //
 //    for (i = 0; i < extcount; i++)
@@ -301,31 +301,43 @@ static const char *format_addr(unsigned pc)
         (code[pc + 1] << 8);
 
 
-	r = find_reloc(pc);
+    r = find_reloc(pc);
 
-	if (r)
-	{
-		if (r->type == REL_EXTERNAL)
-			return r->symbol;
+    if (r)
+    {
+        if (r->type == REL_EXTERNAL)
+            return r->symbol;
 
-		v = r->target;
+        v = r->target;
 
-		//if (r->type == REL_PROG)
-		//{
-		//	const char *s = lookup_prog(v);
+        //if (r->type == REL_PROG)
+        //{
+        //  const char *s = lookup_prog(v);
         //
-		//	if (s)
-		//		return s;
-		//}
-		const char *s = lookup_any_symbol(v);
-		if (s)
-			return s;
-	}
+        //  if (s)
+        //      return s;
+        //}
+        const char *s = lookup_any_symbol(v);
+        if (s)
+            return s;
+    }
 
     sprintf(buf, "$%04X", v);
     return buf;
 }
 
+
+static const char *rp[4] = {
+    "BC",
+    "DE",
+    "HL",
+    "SP"
+};
+
+static const char *rp2[2] = {
+    "BC",
+    "DE"
+};
 
 static void disasm_module(void)
 {
@@ -354,74 +366,93 @@ static void disasm_module(void)
                 pc++;
                 break;
 
-			case 0x04:
-			case 0x0C:
-			case 0x14:
-			case 0x1C:
-			case 0x24:
-			case 0x2C:
-			case 0x34:
-			case 0x3C:
-			{
-				static const char *reg[8] =
-				{
-					"B","C","D","E",
-					"H","L","(HL)","A"
-				};
+            case 0xC7: printf("RST 0\n");  pc++; break;
+            case 0xCF: printf("RST 8\n");  pc++; break;
+            case 0xD7: printf("RST 10H\n"); pc++; break;
+            case 0xDF: printf("RST 18H\n"); pc++; break;
+            case 0xE7: printf("RST 20H\n"); pc++; break;
+            case 0xEF: printf("RST 28H\n"); pc++; break;
+            case 0xF7: printf("RST 30H\n"); pc++; break;
+            case 0xFF: printf("RST 38H\n"); pc++; break;
 
-				printf("INC %s\n",
-					   reg[(code[pc] >> 3) & 7]);
+            case 0x04:
+            case 0x0C:
+            case 0x14:
+            case 0x1C:
+            case 0x24:
+            case 0x2C:
+            case 0x34:
+            case 0x3C:
+            {
+                static const char *reg[8] =
+                {
+                    "B","C","D","E",
+                    "H","L","(HL)","A"
+                };
 
-				pc++;
-				break;
-			}
+                printf("INC %s\n",
+                       reg[(code[pc] >> 3) & 7]);
 
-			case 0x06:
-			case 0x0E:
-			case 0x16:
-			case 0x1E:
-			case 0x26:
-			case 0x2E:
-			case 0x36:
-			case 0x3E:
-			{
-				static const char *reg[8] = {
-					"B", "C", "D", "E",
-					"H", "L", "(HL)", "A"
-				};
-
-				printf("LD %s,$%02X\n",
-					   reg[(code[pc] >> 3) & 7],
-					   code[pc+1]);
-
-				pc += 2;
-				break;
-			}
-
-            case 0x12:
-                printf("LD (DE),A\n");
                 pc++;
                 break;
+            }
 
-			case 0x09:
-				printf("ADD HL,BC\n");
-				pc++;
-				break;
+            case 0x06:
+            case 0x0E:
+            case 0x16:
+            case 0x1E:
+            case 0x26:
+            case 0x2E:
+            case 0x36:
+            case 0x3E:
+            {
+                static const char *reg[8] = {
+                    "B", "C", "D", "E",
+                    "H", "L", "(HL)", "A"
+                };
 
-			case 0x19:
-				printf("ADD HL,DE\n");
-				pc++;
-				break;
+                printf("LD %s,$%02X\n",
+                       reg[(code[pc] >> 3) & 7],
+                       code[pc+1]);
 
-			case 0x29:
-				printf("ADD HL,HL\n");
-				pc++;
-				break;
+                pc += 2;
+                break;
+            }
 
-			case 0x39:
-				printf("ADD HL,SP\n");
-				pc++;
-				break;
+            case 0x09:
+            case 0x19:
+            case 0x29:
+            case 0x39:
+            {
+                unsigned rr = (code[pc] >> 4) & 3;
+
+                printf("ADD HL,%s\n", rp[rr]);
+
+                pc++;
+                break;
+            }
+
+            case 0x02:
+            case 0x12:
+            {
+                unsigned rr = (code[pc] >> 4) & 1;
+
+                printf("LD (%s),A\n", rp2[rr]);
+
+                pc++;
+                break;
+            }
+
+            case 0x0A:
+            case 0x1A:
+            {
+                unsigned rr = (code[pc] >> 4) & 1;
+
+                printf("LD A,(%s)\n", rp2[rr]);
+
+                pc++;
+                break;
+            }
 
             case 0xC9:
                 printf("RET\n");
@@ -433,35 +464,35 @@ static void disasm_module(void)
                 pc++;
                 break;
 
-			case 0xC5:
-				printf("PUSH BC\n");
-				pc++;
-				break;
+            case 0xC5:
+                printf("PUSH BC\n");
+                pc++;
+                break;
 
             case 0xC1:
                 printf("POP BC\n");
                 pc++;
                 break;
 
-			case 0xD5:
-				printf("PUSH DE\n");
-				pc++;
-				break;
+            case 0xD5:
+                printf("PUSH DE\n");
+                pc++;
+                break;
 
-			case 0xD1:
-				printf("POP DE\n");
-				pc++;
-				break;
+            case 0xD1:
+                printf("POP DE\n");
+                pc++;
+                break;
 
-			case 0xE5:
-				printf("PUSH HL\n");
-				pc++;
-				break;
+            case 0xE5:
+                printf("PUSH HL\n");
+                pc++;
+                break;
 
-			case 0xE1:
-				printf("POP HL\n");
-				pc++;
-				break;
+            case 0xE1:
+                printf("POP HL\n");
+                pc++;
+                break;
 
             case 0xF5:
                 printf("PUSH AF\n");
@@ -473,356 +504,350 @@ static void disasm_module(void)
                 pc++;
                 break;
 
-			case 0x0A:
-				printf("LD A,(BC)\n");
-				pc++;
-				break;
-
-			case 0x1A:
-				printf("LD A,(DE)\n");
-				pc++;
-				break;
-
-			case 0xC6:
-			case 0xCE:
-			case 0xD6:
-			case 0xDE:
-			case 0xE6:
-			case 0xEE:
-			case 0xF6:
-			case 0xFE:
-			{
-				static const char *op[8] = {
-					"ADD A",
-					"ADC A",
-					"SUB",
-					"SBC A",
-					"AND",
-					"XOR",
-					"OR",
-					"CP"
-				};
-
-				unsigned idx = (code[pc] - 0xC6) >> 3;
-
-				printf("%s $%02X\n",
-					   op[idx],
-					   code[pc+1]);
-
-				pc += 2;
-				break;
-			}
-
-
-			case 0x05:
-				printf("DEC B\n");
-				pc++;
-				break;
-
-			case 0x40 ... 0x7F:
-			{
-				static const char *reg[8] = {
-					"B", "C", "D", "E",
-					"H", "L", "(HL)", "A"
-				};
-
-				if (code[pc] == 0x76)
-				{
-					printf("HALT\n");
-				}
-				else
-				{
-					unsigned dst = (code[pc] >> 3) & 7;
-					unsigned src = code[pc] & 7;
-
-					printf("LD %s,%s\n",
-						   reg[dst],
-						   reg[src]);
-				}
-
-				pc++;
-				break;
-			}
-
-			case 0x80 ... 0xBF:
-			{
-				static const char *alu[8] = {
-					"ADD A",
-					"ADC A",
-					"SUB",
-					"SBC A",
-					"AND",
-					"XOR",
-					"OR",
-					"CP"
-				};
-
-				static const char *reg[8] = {
-					"B", "C", "D", "E",
-					"H", "L", "(HL)", "A"
-				};
-
-				unsigned op  = (code[pc] - 0x80) >> 3;
-				unsigned src = code[pc] & 7;
-
-				printf("%s,%s\n",
-					   alu[op],
-					   reg[src]);
-
-				pc++;
-				break;
-			}
-
-			case 0x3A:
-				printf("LD A,(%s)\n", format_addr(pc+1));
-				pc += 3;
-				break;
-
-			case 0x18:
-			{
-				signed char disp = (signed char)code[pc+1];
-				unsigned target = pc + 2 + disp;
-
-				printf("JR $%04X\n", target);
-
-				pc += 2;
-				break;
-			}
-
-			case 0x10:
-			{
-				signed char disp = (signed char)code[pc+1];
-				unsigned target = pc + 2 + disp;
-
-				printf("DJNZ $%04X\n", target);
-
-				pc += 2;
-				break;
-			}
-
-			case 0x20:
-			case 0x28:
-			case 0x30:
-			case 0x38:
-			{
-				static const char *cc[4] = {
-					"NZ", "Z", "NC", "C"
-				};
-
-				signed char disp = (signed char)code[pc+1];
-				unsigned target = pc + 2 + disp;
-
-				printf("JR %s,$%04X\n",
-					   cc[(code[pc] - 0x20) >> 3],
-					   target);
-
-				pc += 2;
-				break;
-			}
-
-			case 0xC2:
-			case 0xCA:
-			case 0xD2:
-			case 0xDA:
-			case 0xE2:
-			case 0xEA:
-			case 0xF2:
-			case 0xFA:
-			{
-				static const char *cc[8] = {
-					"NZ", "Z", "NC", "C",
-					"PO", "PE", "P", "M"
-				};
-
-				unsigned idx = (code[pc] - 0xC2) >> 3;
-
-				printf("JP %s,%s\n",
-					   cc[idx],
-					   format_addr(pc+1));
-
-				pc += 3;
-				break;
-			}
-
-			case 0xC4:
-			case 0xCC:
-			case 0xD4:
-			case 0xDC:
-			case 0xE4:
-			case 0xEC:
-			case 0xF4:
-			case 0xFC:
-			{
-				static const char *cc[8] = {
-					"NZ", "Z", "NC", "C",
-					"PO", "PE", "P", "M"
-				};
-
-				printf("CALL %s,%s\n",
-					   cc[(code[pc] - 0xC4) >> 3],
-					   format_addr(pc+1));
-
-				pc += 3;
-				break;
-			}
-
-
-			case 0x01:
-				printf("LD BC,%s\n", format_addr(pc+1));
-				pc += 3;
-				break;
-
-			case 0x11:
-				printf("LD DE,%s\n", format_addr(pc+1));
-				pc += 3;
-				break;
-
-			case 0x21:
-				printf("LD HL,%s\n", format_addr(pc+1));
-				pc += 3;
-				break;
-
-			case 0x31:
-				printf("LD SP,%s\n", format_addr(pc+1));
-				pc += 3;
-				break;
-
-			case 0xCD:
-				printf("CALL %s\n", format_addr(pc+1));
-				pc += 3;
-				break;
-
-			case 0xC3:
-				printf("JP %s\n", format_addr(pc+1));
-				pc += 3;
-				break;
-
-			case 0xE9:
-				printf("JP (HL)\n");
-				pc++;
-				break;
-
-			case 0xD9:
-				printf("EXX\n");
-				pc++;
-				break;
-
-			case 0xE3:
-				printf("EX (SP),HL\n");
-				pc++;
-				break;
-
-			case 0xF3:
-				printf("DI\n");
-				pc++;
-				break;
-
-			case 0xFB:
-				printf("EI\n");
-				pc++;
-				break;
-
-			case 0x2F:
-				printf("CPL\n");
-				pc++;
-				break;
-
-			case 0xC0:
-			case 0xC8:
-			case 0xD0:
-			case 0xD8:
-			case 0xE0:
-			case 0xE8:
-			case 0xF0:
-			case 0xF8:
-			{
-				static const char *cc[8] = {
-					"NZ", "Z", "NC", "C",
-					"PO", "PE", "P", "M"
-				};
-
-				printf("RET %s\n",
-					   cc[(code[pc] - 0xC0) >> 3]);
-
-				pc++;
-				break;
-			}
-
-			case 0x37:
-				printf("SCF\n");
-				pc++;
-				break;
-
-			case 0x3F:
-				printf("CCF\n");
-				pc++;
-				break;
-
-			case 0x35:
-				printf("DEC (HL)\n");
-				pc++;
-				break;
-
-
-			case 0x32:
-				printf("LD (%s),A\n", format_addr(pc+1));
-				pc += 3;
-				break;
-
-			case 0x22:
-				printf("LD (%s),HL\n", format_addr(pc+1));
-				pc += 3;
-				break;
-
-			case 0x2A:
-				printf("LD HL,(%s)\n", format_addr(pc+1));
-				pc += 3;
-				break;
-
-			case 0x03:
-				printf("INC BC\n");
-				pc++;
-				break;
-
-			case 0x13:
-				printf("INC DE\n");
-				pc++;
-				break;
-
-			case 0x23:
-				printf("INC HL\n");
-				pc++;
-				break;
-
-			case 0x33:
-				printf("INC SP\n");
-				pc++;
-				break;
-
-			case 0x0B:
-				printf("DEC BC\n");
-				pc++;
-				break;
-
-			case 0x1B:
-				printf("DEC DE\n");
-				pc++;
-				break;
-
-			case 0x2B:
-				printf("DEC HL\n");
-				pc++;
-				break;
-
-			case 0x3B:
-				printf("DEC SP\n");
-				pc++;
-				break;				
-
-			case 0xF9:
-				printf("LD SP,HL\n");
-				pc++;
-				break;
+            case 0xC6:
+            case 0xCE:
+            case 0xD6:
+            case 0xDE:
+            case 0xE6:
+            case 0xEE:
+            case 0xF6:
+            case 0xFE:
+            {
+                static const char *op[8] = {
+                    "ADD A",
+                    "ADC A",
+                    "SUB",
+                    "SBC A",
+                    "AND",
+                    "XOR",
+                    "OR",
+                    "CP"
+                };
+
+                unsigned idx = (code[pc] - 0xC6) >> 3;
+
+                printf("%s $%02X\n",
+                       op[idx],
+                       code[pc+1]);
+
+                pc += 2;
+                break;
+            }
+
+
+            case 0x05: printf("DEC B\n"); pc++; break;
+            case 0x0D: printf("DEC C\n"); pc++; break;
+            case 0x15: printf("DEC D\n"); pc++; break;
+            case 0x1D: printf("DEC E\n"); pc++; break;
+            case 0x25: printf("DEC H\n"); pc++; break;
+            case 0x2D: printf("DEC L\n"); pc++; break;
+            case 0x3D: printf("DEC A\n"); pc++; break;
+
+            case 0x40 ... 0x7F:
+            {
+                static const char *reg[8] = {
+                    "B", "C", "D", "E",
+                    "H", "L", "(HL)", "A"
+                };
+
+                if (code[pc] == 0x76)
+                {
+                    printf("HALT\n");
+                }
+                else
+                {
+                    unsigned dst = (code[pc] >> 3) & 7;
+                    unsigned src = code[pc] & 7;
+
+                    printf("LD %s,%s\n",
+                           reg[dst],
+                           reg[src]);
+                }
+
+                pc++;
+                break;
+            }
+
+            case 0x17:
+                printf("RLA\n");
+                pc++;
+                break;
+
+            case 0x07:
+                printf("RLCA\n");
+                pc++;
+                break;
+
+            case 0x0F:
+                printf("RRCA\n");
+                pc++;
+                break;
+
+            case 0x1F:
+                printf("RRA\n");
+                pc++;
+                break;
+                
+            case 0x80 ... 0xBF:
+            {
+                static const char *alu[8] = {
+                    "ADD A,",
+                    "ADC A,",
+                    "SUB ",
+                    "SBC A,",
+                    "AND ",
+                    "XOR ",
+                    "OR ",
+                    "CP "
+                };
+
+                static const char *reg[8] = {
+                    "B", "C", "D", "E",
+                    "H", "L", "(HL)", "A"
+                };
+
+                unsigned op  = (code[pc] - 0x80) >> 3;
+                unsigned src = code[pc] & 7;
+
+                printf("%s%s\n",
+                       alu[op],
+                       reg[src]);
+
+                pc++;
+                break;
+            }
+
+            case 0x3A:
+                printf("LD A,(%s)\n", format_addr(pc+1));
+                pc += 3;
+                break;
+
+            case 0x18:
+            {
+                signed char disp = (signed char)code[pc+1];
+                unsigned target = pc + 2 + disp;
+
+                printf("JR $%04X\n", target);
+
+                pc += 2;
+                break;
+            }
+
+            case 0x10:
+            {
+                signed char disp = (signed char)code[pc+1];
+                unsigned target = pc + 2 + disp;
+
+                printf("DJNZ $%04X\n", target);
+
+                pc += 2;
+                break;
+            }
+
+            case 0x20:
+            case 0x28:
+            case 0x30:
+            case 0x38:
+            {
+                static const char *cc[4] = {
+                    "NZ", "Z", "NC", "C"
+                };
+
+                signed char disp = (signed char)code[pc+1];
+                unsigned target = pc + 2 + disp;
+
+                printf("JR %s,$%04X\n",
+                       cc[(code[pc] - 0x20) >> 3],
+                       target);
+
+                pc += 2;
+                break;
+            }
+
+            case 0xC2:
+            case 0xCA:
+            case 0xD2:
+            case 0xDA:
+            case 0xE2:
+            case 0xEA:
+            case 0xF2:
+            case 0xFA:
+            {
+                static const char *cc[8] = {
+                    "NZ", "Z", "NC", "C",
+                    "PO", "PE", "P", "M"
+                };
+
+                unsigned idx = (code[pc] - 0xC2) >> 3;
+
+                printf("JP %s,%s\n",
+                       cc[idx],
+                       format_addr(pc+1));
+
+                pc += 3;
+                break;
+            }
+
+            case 0xC4:
+            case 0xCC:
+            case 0xD4:
+            case 0xDC:
+            case 0xE4:
+            case 0xEC:
+            case 0xF4:
+            case 0xFC:
+            {
+                static const char *cc[8] = {
+                    "NZ", "Z", "NC", "C",
+                    "PO", "PE", "P", "M"
+                };
+
+                printf("CALL %s,%s\n",
+                       cc[(code[pc] - 0xC4) >> 3],
+                       format_addr(pc+1));
+
+                pc += 3;
+                break;
+            }
+
+
+            case 0x01:
+            case 0x11:
+            case 0x21:
+            case 0x31:
+            {
+                unsigned rr = (code[pc] >> 4) & 3;
+
+                printf("LD %s,%s\n",
+                       rp[rr],
+                       format_addr(pc+1));
+
+                pc += 3;
+                break;
+            }
+
+            case 0xCD:
+                printf("CALL %s\n", format_addr(pc+1));
+                pc += 3;
+                break;
+
+            case 0xC3:
+                printf("JP %s\n", format_addr(pc+1));
+                pc += 3;
+                break;
+
+            case 0xE9:
+                printf("JP (HL)\n");
+                pc++;
+                break;
+
+            case 0xD9:
+                printf("EXX\n");
+                pc++;
+                break;
+
+            case 0xE3:
+                printf("EX (SP),HL\n");
+                pc++;
+                break;
+
+            case 0xF3:
+                printf("DI\n");
+                pc++;
+                break;
+
+            case 0xFB:
+                printf("EI\n");
+                pc++;
+                break;
+
+            case 0x2F:
+                printf("CPL\n");
+                pc++;
+                break;
+
+            case 0xC0:
+            case 0xC8:
+            case 0xD0:
+            case 0xD8:
+            case 0xE0:
+            case 0xE8:
+            case 0xF0:
+            case 0xF8:
+            {
+                static const char *cc[8] = {
+                    "NZ", "Z", "NC", "C",
+                    "PO", "PE", "P", "M"
+                };
+
+                printf("RET %s\n",
+                       cc[(code[pc] - 0xC0) >> 3]);
+
+                pc++;
+                break;
+            }
+
+            case 0x37:
+                printf("SCF\n");
+                pc++;
+                break;
+
+            case 0x3F:
+                printf("CCF\n");
+                pc++;
+                break;
+
+            case 0x35:
+                printf("DEC (HL)\n");
+                pc++;
+                break;
+
+
+            case 0x32:
+                printf("LD (%s),A\n", format_addr(pc+1));
+                pc += 3;
+                break;
+
+            case 0x22:
+                printf("LD (%s),HL\n", format_addr(pc+1));
+                pc += 3;
+                break;
+
+            case 0x2A:
+                printf("LD HL,(%s)\n", format_addr(pc+1));
+                pc += 3;
+                break;
+
+            case 0x03:
+            case 0x13:
+            case 0x23:
+            case 0x33:
+            {
+                unsigned rr = (code[pc] >> 4) & 3;
+
+                printf("INC %s\n", rp[rr]);
+
+                pc++;
+                break;
+            }
+
+            case 0x0B:
+            case 0x1B:
+            case 0x2B:
+            case 0x3B:
+            {
+                unsigned rr = (code[pc] >> 4) & 3;
+
+                printf("DEC %s\n", rp[rr]);
+
+                pc++;
+                break;
+            }
+
+            case 0xF9:
+                printf("LD SP,HL\n");
+                pc++;
+                break;
 
 
             default:
@@ -853,20 +878,20 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
         if (dumpmode) {
             printf("  [%u] ", atype);
             if (atype == 0) {
-				printf (" - ");
-			}
+                printf (" - ");
+            }
             if (atype == 1) printf ("CODE_ADDR ");
             if (atype == 2) printf ("DATA_ADDR ");
             //printf("  type=%u value=", atype);
         }
 
         if ((dumpmode) || ((ctrl<=13) && (ctrl>=8))) printf("%-20s -> $%04X", ctrl_name[ctrl], value);
-		
-		// Set Code Location Counter
-		if ((atype == 1) && (ctrl == 11)) codelen =0;
+        
+        // Set Code Location Counter
+        if ((atype == 1) && (ctrl == 11)) codelen =0;
 
-		// Set Data Location Counter
-		if ((atype == 2) && (ctrl == 11)) datalen =0;
+        // Set Data Location Counter
+        if ((atype == 2) && (ctrl == 11)) datalen =0;
 
     }
 
@@ -894,17 +919,17 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
 
         printf("\"%s\"", name);
 
-		if (ctrl == 6) {
+        if (ctrl == 6) {
 #ifdef DEBUG
-			printf(" chain:");
-			dump_chain(code, value);
+            printf(" chain:");
+            dump_chain(code, value);
 #endif
-			add_external(code, name, value);
-		}
+            add_external(code, name, value);
+        }
 
         if (ctrl == 7) {
             add_symbol(name,atype,value);
-		}
+        }
     }
 
     if ((!dumpmode) && ctrl == 2)
@@ -978,14 +1003,14 @@ static void do_dump(FILE *f, int dumpmode)
 
                 if (ctrl == 14)
                 {
-					printf("\n\n--- DISASSEMBLY ---\n");
-					disasm_module();
-					codelen = 0;
-					datalen = 0;
-					reloc_count = 0;
-					extcount = 0;
-					symbol_count = 0;
-					printf("\n--- --- --- --- ---\n\n");
+                    printf("\n\n--- DISASSEMBLY ---\n");
+                    disasm_module();
+                    codelen = 0;
+                    datalen = 0;
+                    reloc_count = 0;
+                    extcount = 0;
+                    symbol_count = 0;
+                    printf("\n--- --- --- --- ---\n\n");
 
                     mod++;
 
