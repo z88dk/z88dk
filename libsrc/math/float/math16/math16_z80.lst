@@ -1,0 +1,3 @@
+obj/${TYPE}/**/*.o
+obj/${TYPE}/fromfix16.o
+obj/${TYPE}/tofix16.o
