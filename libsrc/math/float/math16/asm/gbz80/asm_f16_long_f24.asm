@@ -6,7 +6,11 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-;  asm_f16_long_f24 - long to f24
+;  asm_f16_long_f24 - gbz80 long to f24
+;-------------------------------------------------------------------------
+;
+; Native srl e / rr hl, inlined like the z80 core (no call per bit).
+;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -62,50 +66,45 @@ PUBLIC asm_f24_u32
     jp asm_f24_normalize
 
 .S16R
-    call shr1_ehl
+    srl e
+    rr hl
     inc c
-    call shr1_ehl
+    srl e
+    rr hl
     inc c
-    call shr1_ehl
+    srl e
+    rr hl
     inc c
-    call shr1_ehl
+    srl e
+    rr hl
     inc c
     ld a,e
     or a
     jr Z,packup
 
 .S12R
-    call shr1_ehl
+    srl e
+    rr hl
     inc c
     ld a,e
     or a
     jr Z,packup
-    call shr1_ehl
+    srl e
+    rr hl
     inc c
     ld a,e
     or a
     jr Z,packup
-    call shr1_ehl
+    srl e
+    rr hl
     inc c
     ld a,e
     or a
     jr Z,packup
-    call shr1_ehl
+    srl e
+    rr hl
     inc c
 .packup
     ld e,b
     ld d,c
-    ret
-
-.shr1_ehl
-    or a
-    ld a,e
-    rra
-    ld e,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
     ret

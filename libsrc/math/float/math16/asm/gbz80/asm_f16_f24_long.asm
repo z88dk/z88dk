@@ -6,7 +6,11 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-;  asm_f24_i32 - f24 to long
+;  asm_f24_i32 - gbz80 f24 to long
+;-------------------------------------------------------------------------
+;
+; Native CB srl d / rr e / rr h / rr l. Count down like math32 f2long.
+;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -23,26 +27,18 @@ PUBLIC asm_u32_f24
     jr Z,lzero
     cp $7e + 32
     jp NC,lmax
+    ld c,a
+    ld a,$7e + 32
+    sub c
+    ld c,a                      ; C = shift count (>= 1)
     ld de,hl
     ld hl,0
-    ld c,a                      ; exp counter
 .lloop
-    or a
-    ld a,d
-    rra
-    ld d,a
-    ld a,e
-    rra
-    ld e,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    inc c
-    ld a,c
-    cp $7e + 32
+    srl d
+    rr e
+    rr h
+    rr l
+    dec c
     jr NZ,lloop
     ld a,b
     rla

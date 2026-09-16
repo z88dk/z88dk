@@ -10,6 +10,11 @@
 ;  Exit: DEHL = f24 without fractional part
 ;        NC = already integer; C = fraction discarded
 ;-------------------------------------------------------------------------
+;
+; Mask in BC with native rr b / rr c. Orig mantissa popped to BC after
+; the AND. DE (exp/sign) stays put. Do not ex de,hl (56c synthetic).
+;
+;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math16
@@ -31,32 +36,22 @@ PUBLIC asm_f24_discardfraction
     ret
 
 .do_mask
-    push de                     ; exp/sign
-    ld b,a                      ; bits to keep
     push hl                     ; orig mant
-    ld hl,0                     ; mask
-
+    ld bc,0                     ; mask
 .mk
     scf
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    dec b
+    rr b
+    rr c
+    dec a
     jr NZ,mk
 
-    ex de,hl                    ; DE = mask
-    pop hl                      ; orig mant
-    ld bc,hl                    ; BC = orig
-    ld a,d
+    ld a,b
     and h
     ld h,a
-    ld a,e
+    ld a,c
     and l
     ld l,a                      ; HL = truncated
-    pop de                      ; exp/sign
+    pop bc                      ; orig mant
 
     ld a,l
     cp c

@@ -1,5 +1,5 @@
 ;
-;  feilipu, 2020 July / 2026 August (8085)
+;  feilipu, 2020 July / 2026 September (8085)
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,6 +9,11 @@
 ;  asm_f24_discardfraction
 ;  Exit: DEHL = f24 without fractional part
 ;        NC = already integer; C = fraction discarded
+;-------------------------------------------------------------------------
+;
+; Mask built in HL (scf + rra through A). Orig mantissa popped to BC.
+; DE (exp/sign) stays put — no stacked DE, no ex de,hl.
+;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -31,11 +36,9 @@ PUBLIC asm_f24_discardfraction
     ret
 
 .do_mask
-    push de                     ; exp/sign
-    ld b,a                      ; bits to keep
     push hl                     ; orig mant
+    ld b,a                      ; bits to keep (A used by rra)
     ld hl,0                     ; mask
-
 .mk
     scf
     ld a,h
@@ -47,16 +50,13 @@ PUBLIC asm_f24_discardfraction
     dec b
     jr NZ,mk
 
-    ex de,hl                    ; DE = mask
-    pop hl                      ; orig mant
-    ld bc,hl                    ; BC = orig
-    ld a,d
-    and h
+    pop bc                      ; orig mant
+    ld a,h
+    and b
     ld h,a
-    ld a,e
-    and l
+    ld a,l
+    and c
     ld l,a                      ; HL = truncated
-    pop de                      ; exp/sign
 
     ld a,l
     cp c

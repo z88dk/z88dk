@@ -8,6 +8,10 @@
 ;-------------------------------------------------------------------------
 ;  asm_f16_mul10 - gbz80 floating point multiply by 10 positive
 ;-------------------------------------------------------------------------
+;
+; Native srl b / rr c. Overflow rr h / rr l keeps C from add hl,bc.
+;
+;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math16
@@ -33,37 +37,19 @@ PUBLIC asm_f16_mul10
     and a
     jp Z,asm_f16_zero
 
-    ld bc,hl                    ; 10*a = 2*(4*a + a)  →  (a + a>>2) << 1
+    ld bc,hl                    ; 10*a = (a + a>>2) << 3
 
-    ; logical srl b; rr c twice
-    or a
-    ld a,b
-    rra
-    ld b,a
-    ld a,c
-    rra
-    ld c,a
-    or a
-    ld a,b
-    rra
-    ld b,a
-    ld a,c
-    rra
-    ld c,a
+    srl b
+    rr c
+    srl b
+    rr c
 
     add hl,bc
     ld a,3
     jr NC,no_carry
 
-    ; rr hl
-    ld b,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    ld a,b
+    rr h                        ; C from add
+    rr l
     inc a
 
 .no_carry

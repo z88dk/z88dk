@@ -1,12 +1,18 @@
 ;
-;  feilipu, 2020 May / 2026 August (8085)
+;  feilipu, 2020 May / 2026 September (8085)
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-;  asm_f24_i16 - f24 to int
+;  asm_f24_i16 - 8085 f24 to int
+;-------------------------------------------------------------------------
+;
+; Logical >> HL. First step through A (explicit H7 is 1). Remainder uses
+; sra hl (H7 is then 0, so == srl). Count down like math32 f2long.
+; sra hl does not write Z — loop on dec b.
+;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -22,19 +28,24 @@ PUBLIC asm_u16_f24
     jr Z,izero
     cp $7e + 16
     jp NC,imax
-.iloop
-    or a                        ; clear C for logical shr
-    ld b,a                      ; save exp counter
+    ld b,a
+    ld a,$7e + 16
+    sub b
+    ld b,a                      ; B = shift count (>= 1)
+    or a                        ; logical first step
     ld a,h
     rra
     ld h,a
     ld a,l
     rra
     ld l,a
-    ld a,b
-    inc a
-    cp $7e + 16
+    dec b
+    jr Z,isign
+.iloop
+    sra hl                      ; H7 is 0; Z unchanged
+    dec b
     jr NZ,iloop
+.isign
     ld a,e
     rla
     jr NC,idone

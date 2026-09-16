@@ -6,7 +6,12 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-;  asm_f24_i16 - f24 to int
+;  asm_f24_i16 - gbz80 f24 to int
+;-------------------------------------------------------------------------
+;
+; Native CB srl h / rr l. Count down like math32 f2long. srl/rr write Z
+; of the byte — loop on dec b.
+;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -22,18 +27,14 @@ PUBLIC asm_u16_f24
     jr Z,izero
     cp $7e + 16
     jp NC,imax
+    ld b,a
+    ld a,$7e + 16
+    sub b
+    ld b,a                      ; B = shift count (>= 1)
 .iloop
-    or a                        ; clear C for logical shr
-    ld b,a                      ; save exp counter
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    ld a,b
-    inc a
-    cp $7e + 16
+    srl h
+    rr l
+    dec b
     jr NZ,iloop
     ld a,e
     rla

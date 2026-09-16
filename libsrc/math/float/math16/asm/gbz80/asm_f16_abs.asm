@@ -23,13 +23,9 @@ PUBLIC asm_f24_fabs
 PUBLIC asm_f16_fabs
 
 .asm_f24_fabs
-    ld a,e
-    and 07fh
-    ld e,a
+    res 7,e
     ret
 
 .asm_f16_fabs
-    ld a,h
-    and 07fh
-    ld h,a
+    res 7,h
     ret

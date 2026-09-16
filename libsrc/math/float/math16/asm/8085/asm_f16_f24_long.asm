@@ -1,12 +1,17 @@
 ;
-;  feilipu, 2020 May / 2026 August (8085)
+;  feilipu, 2020 May / 2026 September (8085)
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-;  asm_f24_i32 - f24 to long
+;  asm_f24_i32 - 8085 f24 to long
+;-------------------------------------------------------------------------
+;
+; 32-bit logical >> DEHL through A (no srl d / rr e). Count down like
+; math32 f2long. sra hl cannot join the chain (does not take C in).
+;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -23,9 +28,12 @@ PUBLIC asm_u32_f24
     jr Z,lzero
     cp $7e + 32
     jp NC,lmax
+    ld c,a
+    ld a,$7e + 32
+    sub c
+    ld c,a                      ; C = shift count (>= 1)
     ld de,hl
     ld hl,0
-    ld c,a                      ; exp counter
 .lloop
     or a
     ld a,d
@@ -40,9 +48,7 @@ PUBLIC asm_u32_f24
     ld a,l
     rra
     ld l,a
-    inc c
-    ld a,c
-    cp $7e + 32
+    dec c
     jr NZ,lloop
     ld a,b
     rla

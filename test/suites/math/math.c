@@ -582,9 +582,11 @@ void test_math16_mul()
     }
 }
 
-/* Half-float edges: 10-bit mantissa, MAXLOG ~11.  Dissimilar add, exp
- * overflow, and a modest trig argument (j fits in uint16).  One relational
- * per Assert (sccz80 && of two float compares can fail Assert_real). */
+/* Half-float edges: 10-bit mantissa, MAXLOG ~11.  Mirrors test_math32_edges
+ * (dissimilar add, exp overflow, trig, log(0)) plus conversion probes for
+ * f24_int / f24_long / long_f24 / discardfraction / mul10 / ldexp.
+ * One relational per Assert (sccz80 && of two float compares can fail
+ * Assert_real). */
 void test_math16_edges()
 {
     union { FLOAT f; unsigned u; } a, b, r;
@@ -639,6 +641,89 @@ void test_math16_edges()
     a.u = 0x7bffu; /* max finite */
     r.f = a.f + a.f;
     Assert(((r.u & 0x7c00u) == 0x7c00u) && ((r.u & 0x03ffu) == 0), "half max+max is Inf");
+
+    /* math32_edges analogues that fit in binary16. */
+    a.u = 0x8000u; /* -0 */
+    r.f = SQRT(a.f);
+    Assert(r.u == 0x8000u, "sqrt(-0) is -0");
+    r.f = invsqrtf16(a.f);
+    Assert(r.u == 0xfc00u, "invsqrt(-0) is -Inf");
+    Assert((int)a.f == 0, "(int)-0 is 0");
+    Assert((long)a.f == 0L, "(long)-0 is 0");
+
+    a.u = 0x7e00u; /* qNaN, quiet bit only */
+    b.f = (FLOAT)2.0;
+    r.f = a.f / b.f;
+    Assert(((r.u & 0x7c00u) == 0x7c00u) && (r.u & 0x03ffu), "qNaN/2 is NaN");
+
+    a.u = 0x3c00u; /* 1.0 */
+    b.u = 0x3c01u; /* 1.0 + ulp */
+    Assert(a.f < b.f, "1.0 < 1.0+ulp");
+    Assert(b.f > a.f, "1.0+ulp > 1.0");
+    Assert(a.f <= b.f, "1.0 <= 1.0+ulp");
+    Assert(b.f >= a.f, "1.0+ulp >= 1.0");
+    Assert(!(a.f > b.f), "!(1.0 > 1.0+ulp)");
+    Assert(!(b.f < a.f), "!(1.0+ulp < 1.0)");
+
+    Assert(approx_equal(atanf16((FLOAT)1.0), (FLOAT)M_PI_4, EPSILON), "atan(1) is pi/4");
+
+    /* f24_int / f24_long / long_f24. Exact integers in binary16 to ±2048. */
+    a.f = (FLOAT)1.0;
+    Assert((int)a.f == 1, "(int)1.0");
+    a.f = (FLOAT)(-7.0);
+    Assert((int)a.f == -7, "(int)-7.0");
+    a.f = (FLOAT)256.0;
+    Assert((int)a.f == 256, "(int)256.0");
+    a.f = (FLOAT)0.9;
+    Assert((int)a.f == 0, "(int)0.9 truncates toward 0");
+    a.f = (FLOAT)(-0.9);
+    Assert((int)a.f == 0, "(int)-0.9 truncates toward 0");
+    a.f = (FLOAT)2048.0;
+    Assert((int)a.f == 2048, "(int)2048.0");
+    a.f = (FLOAT)32768.0;
+    Assert((long)a.f == 32768L, "(long)32768");
+    a.f = (FLOAT)(-32768.0);
+    Assert((long)a.f == -32768L, "(long)-32768");
+    {
+        static long lv;
+        lv = 1000L;
+        a.f = (FLOAT)lv;
+        Assert(a.f == (FLOAT)1000.0, "(half)1000L");
+        lv = -7L;
+        a.f = (FLOAT)lv;
+        Assert(a.f == (FLOAT)(-7.0), "(half)-7L");
+    }
+
+    /* discardfraction via ceil/floor. */
+    a.f = (FLOAT)1.5;
+    Assert(ceilf16(a.f) == (FLOAT)2.0, "ceil(1.5)");
+    Assert(floorf16(a.f) == (FLOAT)1.0, "floor(1.5)");
+    a.f = (FLOAT)(-1.5);
+    Assert(ceilf16(a.f) == (FLOAT)(-1.0), "ceil(-1.5)");
+    Assert(floorf16(a.f) == (FLOAT)(-2.0), "floor(-1.5)");
+    a.f = (FLOAT)2.0;
+    Assert(floorf16(a.f) == (FLOAT)2.0, "floor(2) already integer");
+    a.f = (FLOAT)0.5;
+    Assert(floorf16(a.f) == (FLOAT)0.0, "floor(0.5)");
+    Assert(ceilf16(a.f) == (FLOAT)1.0, "ceil(0.5)");
+
+    a.f = (FLOAT)1.5;
+    Assert(mul10f16(a.f) == (FLOAT)15.0, "mul10(1.5)");
+    a.f = (FLOAT)0.25;
+    Assert(mul10f16(a.f) == (FLOAT)2.5, "mul10(0.25)");
+
+    a.f = (FLOAT)1.0;
+    Assert(ldexpf16(a.f, 4) == (FLOAT)16.0, "ldexp(1,4)");
+    a.f = (FLOAT)8.0;
+    Assert(ldexpf16(a.f, -3) == (FLOAT)1.0, "ldexp(8,-3)");
+    {
+        /* Classic header is int8_t*; the core writes a 16-bit exp. */
+        int e;
+        a.f = (FLOAT)8.0;
+        r.f = frexpf16(a.f, (int8_t *)&e);
+        Assert(r.f == (FLOAT)0.5, "frexp(8) mant 0.5");
+        Assert(e == 4, "frexp(8) exp 4");
+    }
 }
 #endif
 
@@ -777,6 +862,60 @@ void test_math32_edges()
     a.f = (FLOAT)0.0;
     r.f = log(a.f);
     Assert(r.u == 0xff800000ul, "log(0) is -Inf");
+
+    /* Conversion / discardfraction / ldexp / mul10. 8085 and gbz80 f2long
+     * and floor/ceil cores. Runtime-written so the cast cannot const-fold.
+     * (int)-0 must be 0, not INT_MIN (same trap as cos(-0) above). */
+    a.u = 0x80000000ul;
+    Assert((int)a.f == 0, "(int)-0 is 0 not INT_MIN");
+    Assert((long)a.f == 0L, "(long)-0 is 0");
+    a.f = (FLOAT)1.0;
+    Assert((int)a.f == 1, "(int)1.0");
+    a.f = (FLOAT)(-7.0);
+    Assert((int)a.f == -7, "(int)-7.0");
+    a.f = (FLOAT)256.0;
+    Assert((int)a.f == 256, "(int)256.0");
+    a.f = (FLOAT)0.9;
+    Assert((int)a.f == 0, "(int)0.9 truncates toward 0");
+    a.f = (FLOAT)(-0.9);
+    Assert((int)a.f == 0, "(int)-0.9 truncates toward 0");
+    a.f = (FLOAT)65536.0;
+    Assert((long)a.f == 65536L, "(long)65536");
+    a.f = (FLOAT)(-65536.0);
+    Assert((long)a.f == -65536L, "(long)-65536");
+    {
+        static long lv;
+        lv = 1000000L;
+        a.f = (FLOAT)lv;
+        Assert(a.f == (FLOAT)1000000.0, "(float)1000000L");
+        lv = -7L;
+        a.f = (FLOAT)lv;
+        Assert(a.f == (FLOAT)(-7.0), "(float)-7L");
+    }
+    a.f = (FLOAT)1.5;
+    Assert(ceil(a.f) == (FLOAT)2.0, "ceil(1.5)");
+    Assert(floor(a.f) == (FLOAT)1.0, "floor(1.5)");
+    a.f = (FLOAT)(-1.5);
+    Assert(ceil(a.f) == (FLOAT)(-1.0), "ceil(-1.5)");
+    Assert(floor(a.f) == (FLOAT)(-2.0), "floor(-1.5)");
+    a.f = (FLOAT)2.0;
+    Assert(floor(a.f) == (FLOAT)2.0, "floor(2) already integer");
+    a.f = (FLOAT)0.5;
+    Assert(floor(a.f) == (FLOAT)0.0, "floor(0.5)");
+    Assert(ceil(a.f) == (FLOAT)1.0, "ceil(0.5)");
+    a.f = (FLOAT)1.5;
+    Assert(mul10u(a.f) == (FLOAT)15.0, "mul10u(1.5)");
+    a.f = (FLOAT)1.0;
+    Assert(ldexp(a.f, 4) == (FLOAT)16.0, "ldexp(1,4)");
+    a.f = (FLOAT)8.0;
+    Assert(ldexp(a.f, -3) == (FLOAT)1.0, "ldexp(8,-3)");
+    {
+        int e;
+        a.f = (FLOAT)8.0;
+        r.f = frexp(a.f, &e);
+        Assert(r.f == (FLOAT)0.5, "frexp(8) mant 0.5");
+        Assert(e == 4, "frexp(8) exp 4");
+    }
 }
 #endif
 

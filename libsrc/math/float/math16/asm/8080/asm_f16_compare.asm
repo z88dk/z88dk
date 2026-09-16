@@ -63,9 +63,6 @@ PUBLIC asm_f16_compare_callee
     ld a,d
     rra
     ld d,a
-    ld a,e
-    and 0feh
-    ld e,a
 
     ld a,$7c
     and h
@@ -86,9 +83,6 @@ PUBLIC asm_f16_compare_callee
     ld a,h
     rra
     ld h,a
-    ld a,l
-    and 0feh
-    ld l,a
 
     ld bc,de
     or a

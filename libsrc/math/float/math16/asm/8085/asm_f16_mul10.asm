@@ -1,5 +1,5 @@
 ;
-;  feilipu, 2020 June / 2026 August (8085)
+;  feilipu, 2020 June / 2026 September (8085)
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,6 +7,11 @@
 ;
 ;-------------------------------------------------------------------------
 ;  asm_f16_mul10 - 8085 floating point multiply by 10 positive
+;-------------------------------------------------------------------------
+;
+; 10*a = (a + a>>2) << 3. Orig in BC; a>>2 in HL via one logical >>
+; through A then sra hl (H7 is 0). Overflow rr still through A (C from add).
+;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -33,31 +38,21 @@ PUBLIC asm_f16_mul10
     and a
     jp Z,asm_f16_zero
 
-    ld bc,hl                    ; 10*a = 2*(4*a + a)  →  (a + a>>2) << 1
-
-    ; logical srl b; rr c twice
+    ld bc,hl                    ; orig mantissa
     or a
-    ld a,b
+    ld a,h
     rra
-    ld b,a
-    ld a,c
+    ld h,a
+    ld a,l
     rra
-    ld c,a
-    or a
-    ld a,b
-    rra
-    ld b,a
-    ld a,c
-    rra
-    ld c,a
-
+    ld l,a
+    sra hl                      ; second logical >> (H7 is 0)
     add hl,bc
     ld a,3
     jr NC,no_carry
 
-    ; rr hl
     ld b,a
-    ld a,h
+    ld a,h                      ; rr hl through C from add
     rra
     ld h,a
     ld a,l

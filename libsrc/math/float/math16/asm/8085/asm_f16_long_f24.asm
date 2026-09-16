@@ -1,12 +1,17 @@
 ;
-;  feilipu, May 2020 / 2026 August (8085)
+;  feilipu, May 2020 / 2026 September (8085)
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-;  asm_f16_long_f24 - long to f24
+;  asm_f16_long_f24 - 8085 long to f24
+;-------------------------------------------------------------------------
+;
+; 24-bit logical >> EHL through A, inlined (no call/ret per bit). D is
+; free after the int24 fold and is the S16R count.
+;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -62,42 +67,8 @@ PUBLIC asm_f24_u32
     jp asm_f24_normalize
 
 .S16R
-    call shr1_ehl
-    inc c
-    call shr1_ehl
-    inc c
-    call shr1_ehl
-    inc c
-    call shr1_ehl
-    inc c
-    ld a,e
-    or a
-    jr Z,packup
-
-.S12R
-    call shr1_ehl
-    inc c
-    ld a,e
-    or a
-    jr Z,packup
-    call shr1_ehl
-    inc c
-    ld a,e
-    or a
-    jr Z,packup
-    call shr1_ehl
-    inc c
-    ld a,e
-    or a
-    jr Z,packup
-    call shr1_ehl
-    inc c
-.packup
-    ld e,b
-    ld d,c
-    ret
-
-.shr1_ehl
+    ld d,4
+.s16
     or a
     ld a,e
     rra
@@ -108,4 +79,68 @@ PUBLIC asm_f24_u32
     ld a,l
     rra
     ld l,a
+    inc c
+    dec d
+    jr NZ,s16
+    ld a,e
+    or a
+    jr Z,packup
+
+.S12R
+    or a
+    ld a,e
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    inc c
+    ld a,e
+    or a
+    jr Z,packup
+    or a
+    ld a,e
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    inc c
+    ld a,e
+    or a
+    jr Z,packup
+    or a
+    ld a,e
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    inc c
+    ld a,e
+    or a
+    jr Z,packup
+    or a
+    ld a,e
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    inc c
+.packup
+    ld e,b
+    ld d,c
     ret

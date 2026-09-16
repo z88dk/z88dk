@@ -6,7 +6,11 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-;  asm_f16_int_f24 - int to f24
+;  asm_f16_int_f24 - gbz80 int to f24
+;-------------------------------------------------------------------------
+;
+; bit 7,h / res 7,e — no S flag, so not rla / jp NC for the sign test.
+;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -28,9 +32,8 @@ PUBLIC asm_f24_u16
 .asm_f24_i16
     ld d,142
     ld e,h
-    ld a,h
-    rla
-    jp NC,asm_f24_normalize
+    bit 7,h
+    jp Z,asm_f24_normalize
     xor a
     sub a,l
     ld l,a
@@ -44,7 +47,5 @@ PUBLIC asm_f24_u16
 
 .asm_f24_u16
     ld d,142
-    ld a,e
-    and 07fh
-    ld e,a
+    res 7,e
     jp asm_f24_normalize
