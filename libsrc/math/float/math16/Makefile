@@ -23,6 +23,9 @@ all: $(OUTPUT_DIRECTORY)/math16.lib \
 	$(OUTPUT_DIRECTORY)/math16_8080.lib \
 	$(OUTPUT_DIRECTORY)/math16_gbz80.lib
 
+# Z80-family products share @newlibfiles_z80.lst. Packed/f24 mul is
+# IF __CPU_Z80__ unroll vs l_mulu_32_16x16 — no per-CPU helper files
+# (unlike math32 newlibfiles_z80n.lst / _z180.lst / …).
 $(OUTPUT_DIRECTORY)/math16.lib: $(addprefix obj/z80/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80/x/x/x -I.. -mz80 -D__CLASSIC @newlibfiles_z80.lst
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math16 @math16.lst
@@ -59,9 +62,9 @@ $(OUTPUT_DIRECTORY)/math16_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/kc160/x/x/x -I.. -mkc160 -D__CLASSIC @newlibfiles_z80.lst
 	TYPE=kc160 $(LIBLINKER) -mkc160 -x$(OUTPUT_DIRECTORY)/math16_kc160 @math16.lst
 
-# 8085 adjunct half-float (asm/8085 cores; higher C in WP4)
-# Note: OBJECTS still list Z80 sccz80 bridges for other CPUs; 8085 assembly
-# is driven solely by newlibfiles_8085.lst (like math32_8085).
+# Assembly is driven by newlibfiles_<cpu>.lst. fromfix16/tofix16 stay on
+# Z80-family products only: the Q8.8 fix16 library has no 8080/8085/gbz80
+# build (classic z80/z180/ez80_z80/rabbit lists).
 $(OUTPUT_DIRECTORY)/math16_8085.lib:
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/8085/x/x/x -I.. -m8085 -D__CLASSIC @newlibfiles_8085.lst
 	TYPE=8085 $(LIBLINKER) -m8085 -x$(OUTPUT_DIRECTORY)/math16_8085 @math16.lst

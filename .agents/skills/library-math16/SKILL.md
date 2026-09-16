@@ -8,8 +8,26 @@ description: >
 
 # Library — math16
 
-Home under classic/newlib float trees (see `libsrc/math/float/` math16 paths and
-`--math16` on `zcc`). Policy mirrors math32:
+Home: `libsrc/math/float/math16/`. Docs of record: `libsrc/math/float/math16/README.md`.
+Link via **`--math16`** (`-lmath16@{ZCC_LIBCPU}`). Adjunct: no conflict with
+math32 / math48 / am9511. **No** printf / scanf / dtoa on the math16 product.
+
+Classic products match math32’s CPU set: `math16.lib` plus
+`math16_{ixiy,z80n,z180,ez80_z80,r2ka,r4k,r6k,kc160,8085,8080,gbz80}.lib`.
+8080 / 8085 / gbz80 higher via **sccz80 only**.
+
+### Layout
+
+| Tree | Role |
+|------|------|
+| `asm/` | 8080-compatible shared files (specials, coeff). Classic: `newlibfiles_common_asm.lst` |
+| `asm/z80/` | Z80-family cores; z80n/z180/ez80_z80/r2ka/kc160 assemble this list. Unrolled 11×11 / 16×16 is `IF __CPU_Z80__` only; others call `l_mulu_32_16x16`. `asm_f16_f48` is Z80-only |
+| `asm/8085/`, `asm/8080/`, `asm/gbz80/` | Stack-only CPU cores (same one-op-per-file map) |
+| `c/z80/`, `c/8085/`, `c/8080/`, `c/gbz80/` | Higher functions. 8080/8085/gbz80 via **sccz80 only**. Binary-op bridges that use EXX live in `c/sccz80` (z80) or `c/<cpu>` (8080/8085/gbz80). No 8085 `fma` |
+| `newlibfiles_*.lst` | Classic products. All Z80-family CPUs use `@newlibfiles_z80.lst` (no per-CPU mul-helper lists) |
+| `math16_z80_asm.lst` + `math16_{sccz80,sdcc,c_asm}.lst` | Newlib clib embed only. No 8085/8080/gbz80 newlib math16 list |
+
+Policy mirrors math32:
 
 | Op | Algorithm |
 |----|-----------|
@@ -38,7 +56,7 @@ In **C higher functions** (`c/*.c`):
 7. Cores: `asm/{z80,8085,8080,gbz80}/`. Packed `*` / `sqrf16` = 11×11 (`asm_f16_mul_callee` / `asm_f16_sqr`). Poly, inv, sqrt NR, hypot, fma = f24 16×16 (`asm_f24_mul_f24`).
 8. Unrolled 11×11 / 16×16 mulu is **`IF __CPU_Z80__` only**. z80n / z180 / ez80 / kc160 / rabbit call **`l_mulu_32_16x16`** (HW integer). Do not assemble the unrolled body into those products.
 9. `--math16` is **adjunct** (no conflict with math32/math48). Classic: `math16.lib` + `math16_{8085,8080,gbz80,…}.lib`. Newlib sccz80 **bakes math16 into `lib/clibs/sccz80/z80.lib`**. After core edits: delete `*math16*` `.o` under `libsrc/newlib/target/{math16,z80}/obj`, then `make -C libsrc/newlib math16 z80`. Prove `cm16_sccz80_mul_callee` is `G =` onto `asm_f16_mul_callee` (stale is `G A` at a later line).
-10. Classic 8085/8080/gbz80 Makefile targets have **no OBJECTS deps**. `rm` `obj/<cpu>/…/asm_f16_*.o` and `libsrc/math16*.lib`, then `make -C libsrc math16.lib` and `cp` into `lib/clibs/`.
+10. Classic 8085/8080/gbz80 Makefile targets have **no OBJECTS deps**. `rm` `obj/<cpu>/…/asm_f16_*.o` and `libsrc/math16*.lib`, then `make -C libsrc math16.lib` and `cp` into `lib/clibs/`. `fromfix16` / `tofix16` are Z80-family only (no fix16 product for 8080/8085/gbz80).
 11. Specials stay off the finite path. Classify Inf/NaN on overflow / zero / equal-exp 255 (packed exp 31) only. `inc r` / `jp Z` tests exp==255 (8-bit inc sets Z, not C). Pack underflow is unsigned `jp C` after `sub 112` (not `jp M`: d=255 → 143 looks minus). Packed Inf × tiny finite (sum−15 < 31) may not be Inf.
 12. gbz80: no cheap `ex (sp),hl` (148c helper). Open-code: park DE, `ld hl,sp+n`, swap through `(hl)`, restore DE; **BC is often the return**. No `jp P` / `ret m` (no S): `bit 7,h`.
 13. MPL v2 panel on **`asm/`** cores only — not `c/` glue, lm16 aliases, or C (some C is GPL).

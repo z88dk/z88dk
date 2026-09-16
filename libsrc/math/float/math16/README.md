@@ -212,6 +212,18 @@ Glue that connects the compilers and standard assembly interface to the `math16`
 
 An alias is provided to simplify usage of the library. `--math16` provides all the required linkages and definitions, as a simple command line alternative to `-lmath16 -Cc-D__MATH_MATH16 -D__MATH_MATH16`.
 
+### List files
+
+Two families, same split as math32. There is **no** printf / scanf / dtoa path on math16.
+
+| List | Role |
+|------|------|
+| `newlibfiles_*.lst` | Classic products (`make` in this directory). `newlibfiles_common_asm.lst`, `newlibfiles_sccz80.lst`, and `newlibfiles_lm16_sccz80.lst` are shared. 8080 / 8085 / gbz80 are sccz80 only (no SDCC). |
+| `newlibfiles_z80.lst` | All Z80-family classic products (z80, ixiy, z80n, z180, ez80_z80, r2ka, r4k, r6k, kc160). Also pulls `newlibfiles_sdcc.lst` and `newlibfiles_lm16_sdcc.lst`. |
+| `math16_z80_asm.lst`, `math16_c_asm.lst`, `math16_sccz80.lst`, `math16_sdcc.lst` | Newlib clib embed (`math_float_sccz80*.lst` / `math_float_sdcc_ix*.lst` and `libsrc/newlib/target/math16`). Newlib math16 is z80-family only. There is no 8085 / 8080 / gbz80 newlib math16 clib. |
+
+`fma` glue in `c/sccz80` uses the alternate register set. Classic 8080 / 8085 / gbz80 do not list it (no CPU copy). `asm_f16_f48` is Z80-only (math48 convert). `fromfix16` / `tofix16` are compiled on Z80-family products only: the Q8.8 fix16 library has no 8080 / 8085 / gbz80 build.
+
 ## CPU implementation strategies
 
 Half and f24 **semantics** (bias, rounding sticky rules, specials at pack/expand) are shared. **Code paths are CPU-specific** — there is no single cross-CPU source for hot cores.
