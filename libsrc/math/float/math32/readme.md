@@ -58,7 +58,7 @@ Classic `%f` / `%e` / `%g` call `ftoa` / `ftoe` / `ftog`. math32 no longer ships
 | Z80 family | `lm32/c/sccz80/{ftoa,ftoe,ftog}.asm` → stdlib `asm_dtoa` / `asm_dtoe` / `asm_dtog` (EXX + IX). Newlib `__stdio_printf_f` calls `__dtoa__` directly. |
 | 8080 / 8085 / vm1 / gbz80 | `asm/<cpu>/f32_ftoa.asm`, `f32_ftoe.asm`, `f32_ftog.asm` plus `f32__dtoa_*` helpers. The float lives in DEHL. The workspace is 32 bytes on the stack. There is no IX and no EXX. |
 
-The stack-only engine matches the Z80 C11 contract used by `test/suites/math` (`test_math32_printf`): `%g` of `1.234e-37` is `1.234e-37`, `%g` of `-2.5e-5` is `-2.5e-05`, `%g` of `314.159` is `314.159`, `%.2f` of a tiny value is `0.00`.
+The stack-only engine matches the Z80 C11 contract used by `test/suites/math` (`test_math32_printf`): `%g` of `1.234e-37` is `1.234e-37`, `%g` of `-2.5e-5` is `-2.5e-05`, `%g` of `314.159` is `314.159`, `%.2f` of a tiny value is `0.00`. Classic `sprintf` also: `test/suites/stdio` `test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80}.bin` (`--math32`; `%e` of `1.2345` is `1.234500e+00`). Integer `sscanf` is `test_scanf*.bin` (no `%f`). `test/suites/string` is `str*` only.
 
 ISA notes for the stack-only files:
 

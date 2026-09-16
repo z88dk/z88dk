@@ -27,8 +27,7 @@ ENDIF
    EXTERN   __printf_set_ftoe
    EXTERN   __printf_check_ftoe
 
-; %g: true %g via ftog().  On intel/gbz80 the float libraries have no
-; ftog, so %g prints fixed-point (ftoa) exactly as before.  On z80 the
+; %g: true %g via ftog() (math32 stack-only cores included). On z80 the
 ; marker bit is bit 7 of (ix-3) -- the printf upper-case switch byte is
 ; always zero at converter entry (only the %x/%X handlers touch it, and
 ; never for the same conversion).

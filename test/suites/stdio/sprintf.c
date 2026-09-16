@@ -5,10 +5,11 @@
 #include "test.h"
 
 
-#if __EZ80_Z80 | __Z180 | __KC160_Z80
-#pragma output CLIB_OPT_PRINTF=0x7dffffff
-#elif __RCMX000__ | __GBZ80 | __8080
+#if __RCMX000__
 #pragma output CLIB_OPT_PRINTF=0x40ffffff
+#elif __EZ80_Z80 | __Z180 | __KC160_Z80 | __GBZ80 | __8080
+/* %f/%e/%g without far %S (no __printf_handle_far_s on these clibs). */
+#pragma output CLIB_OPT_PRINTF=0x7dffffff
 #else
 #pragma output CLIB_OPT_PRINTF=0x7fffffff
 #endif
@@ -129,13 +130,17 @@ void test_sprintf_long_positive()
        ++test;
     }
 }
-#if __RCMX000__ | __GBZ80 | __8080
+#if __RCMX000__
 #else
 struct sprintf_test double_tests[] = {
     { "%f", "1.234500" },
     { "% f", "1.234500" }, // This is wrong, should have leading space
     { "%0f", "1.234500" },
+#ifdef __MATH_MATH32
+    { "%e", "1.234500e+00" },
+#else
     { "%e", "1.234500e0" },
+#endif
     { "%.3f", "1.235" },
     { "%10.3f",  "     1.235" },
     { "%-10.3f", "1.235     " },
@@ -215,7 +220,7 @@ int test_scanf()
     suite_add_test(test_sprintf_int_negative);
     suite_add_test(test_sprintf_long_positive);
     suite_add_test(test_sprintf_long_negative);
-#if __RCMX000__ | __GBZ80 | __8080
+#if __RCMX000__
 #else
     suite_add_test(test_sprintf_double);
 #endif
