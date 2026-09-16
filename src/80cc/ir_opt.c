@@ -3739,7 +3739,20 @@ int ir_opt_const_fold(Func *f)
             /* Update constant tracking for the (possibly rewritten) op. */
             if (op->kind == IR_POSTSTEP && s0 >= 0 && s0 < nv)
                 known[s0] = 0;          /* steps src[0] in place */
-            if (d >= 0 && d < nv) {
+            /* An ADDRESS-TAKEN local is never a known constant. Its memory can
+               be written through the escaped pointer by anything this pass does
+               not model — a call above all — and `known[]` is only cleared by a
+               REDEFINITION, so the belief would survive the write:
+
+                   unsigned int a = 0; bump(&a); return a + x;
+
+               folded to `x`, a silent wrong answer in both frame modes (gcc and
+               sccz80 both say a + x). Refusing to track them is the
+               conservative side and costs little: IR_VREG_ADDR_TAKEN means the
+               value lives in a frame slot anyway. adr/0082. */
+            if (d >= 0 && d < nv && (f->vregs[d].flags & IR_VREG_ADDR_TAKEN))
+                known[d] = 0;
+            else if (d >= 0 && d < nv) {
                 if (op->kind == IR_LD_IMM) {
                     known[d] = 1;
                     val[d] = have_mask ? (op->imm & mask) : op->imm;
