@@ -9,70 +9,67 @@ live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
-**Last swept 2026-09-16.** The simplification is finished, the residency arc is
-closed, and the documentation backlog is cleared. Vein 1 below paid again — a
-Rabbit store-reload fold (ADR 0075): **−139 B over 240 cells, 64 smaller, 0
-larger; ticks −0.093 %, 63 faster, 3 slower.** The three slower cells are
-`callbench` fp, and are the copt gate described in ADR 0075 being deliberately
-kept.
+**Last swept 2026-09-16.** Vein 1 — the CPU sweep — is **finished**. Four
+rungs shipped, and the index's own `lea` row turned out to be wrong and is now
+shipped as well: **−774 bytes over the 720-cell matrix, 208 cells smaller, 0
+larger**, every gate off reproducing the pre-sweep compiler byte-for-byte, and
+`long_ir` **802/802 in both frame modes**.
 
-**The next action is vein 1 — finish the CPU sweep.** The list of what is left,
-already sized, is below. Everything else here is context.
+| shipped | | |
+|---|---|---|
+| ADR 0080 `[inc-mem]` | −606 B, 167 cells, **every CPU** | `ld a,MEM; inc a; ld MEM,a` → `inc MEM` |
+| ADR 0081 `[lea-frame-addr]` | −92 B, 29 cells, ez80 | an fp-mode frame address is IX-relative; the `#SP2L` copt fold had to move with it |
+| ADR 0077 `[ldhi-addr]` | −66 B, 14 cells, 8085 | `ld de,N; add hl,de` → `ld de,hl+N; ex de,hl` |
+| ADR 0078 `[z80n-add-a]` | −10 B, 5 cells, z80n | `ld e,a; ld d,0; add hl,de` → `add hl,a` |
+| ADR 0082 const-fold escape | **+0 B**, correctness | an address-escaped local is not a constant |
 
-### Closed: the Rabbit inline multiply (ADR 0075, ADR 0076)
+**ADR 0082 is the one to read first, and it names the next job.**
+`int a = 0; bump(&a); return a + x;` returned **`x`** — a long-standing silent
+miscompile in both frame modes on every CPU, found because that shape was
+written as a codegen test for ADR 0081 and failed on the *baseline* compiler.
+`ir_opt_const_fold` cleared its `known[]` beliefs only on a **redefinition**,
+so a call handed the local's address invalidated nothing. **The same hole may
+exist in other passes.** The search term is "a belief about a local's value
+that only a redefinition clears"; `ast_opt`'s DSE (`dse_collect_escaped`) is
+the shape to copy. Auditing `prop`, CSE and the lowerer's register beliefs for
+it comes **before** any density lever.
 
-Inlining Rabbit's multiply instead of calling `l_mult` measured **−721 B and
-−1.568 %** and is **removed**, not parked. It cost `listbench` **+10..13 %** on
-every Rabbit in both frame modes; three fixes for that were built and all three
-refused, **two of them only after measuring as large size wins** (ADR 0076).
+**Then the DE conservatism**, the sweep's most valuable density by-product.
+`instr_effects` treats **every `call`** as reading DE (the `__sdcccall(1)`
+argument ABI) and **every `ret`** as reading DE (the DE:HL result ABI). Both
+are true only sometimes, and that one fact throttles **four** rungs at once —
+`[de-park]`, `[ldsi-addr]`, `[ldhi-addr]`, `[z80n-add-a]`. It is measurable
+today: `[z80n-add-a]` reaches 5 of its 20 candidate sites and **15 are refused
+on a DE that is not live** — `divbench`'s `udiv` ends `add hl,de; pop af; ret`
+in an *int*-returning function. The precedent is in the same file:
+`xline_c_call` already tells `[bc-call]` that a call to compiled C code cannot
+read BC. Do that for DE.
 
-It was removed rather than left opt-in because the copt gate protecting its
-`push bc` / `pop bc` bracket costs the **default** build 88000 ticks on
-`callbench` — a real price on every build, to guard a feature nobody could
-switch on. That gate is still in `lib/arch/rabbit/rabbit_rules.1` and still
-earns its keep: 80cc emits **288** `push bc … pop bc` restore brackets on Rabbit
-in this corpus, and the rule it guards reads `pop bc` as sccz80's discard-TOS
-idiom — a property of that producer, not of the input.
+Two smaller things the sweep left on the table, both sized: the ez80
+**prologue's own** `ld hl,-F; add hl,sp; ld sp,hl` (66 sites, 1 byte each — but
+IX there has only just been loaded from SP, so the rule is `lea hl,ix-F` with
+no frame-size term, and an auto-pushed parameter can sit between the two), and
+the remaining hand-rolled `add hl,sp` emit sites that carry a push offset of
+their own, which has no IX analogue.
 
-**To re-derive the inline** (about an hour): ADR 0075 records the lowering, the
-`mul` semantics and its two hazards. **The prerequisite is in ADR 0076 and has
-not changed** — the IY reduction pack's gain has no number comparable to the
-idx2 pool's `idx_ben`, and a late pass cannot keep its home across the word-home
-revert.
+### The veins worth digging, in order
 
-### The four veins worth digging, in order
+**1. The CPU sweep — CLOSED. See ADR 0079 (and 0081 for the row it got
+wrong).** The method,
+for whoever repeats it on a new CPU: take the mnemonics `opcodes.dat` declares
+REAL (`_`, not a synthetic `X`) for that CPU, take the mnemonics a full-corpus
+asm dump for that CPU actually emits in both frame modes, subtract — and then
+**read the operands**, because the mnemonic diff is blind in both directions.
+`add` is emitted as `add hl,de` while `add hl,a` never was; `inc` is emitted as
+`inc hl` while `inc (hl)` never was, and that one was worth 606 bytes. Also ask
+whether the shipped **code path** uses the instruction, not whether the
+**compiler** emits it: `mlt` on z180, `mul` on z80n and `div` on kc160 are all
+already inside library helpers.
 
-**1. Finish the CPU sweep. It has now paid twice, and it is still the cheapest
-thing here.** Diff each CPU's declared instruction set against what the lowerer
-emits. Do it from `src/z80asm/dev/cpu/opcodes.dat` — the authoritative
-asm/CPU/synth table — against a full-corpus asm dump per CPU, *not* from the
-`CPU_HAS_*` macros, which cover only a fraction of each ISA. Beware the Intel
-spellings in that table: `ldsi` and `ld de,sp+n` are separate rows for the same
-opcode, so a mnemonic-level diff reports shipped instructions as un-mined.
-
-Found so far: **LDSI on 8085** (ADR 0039, −366 B / −0.95 %) and a **Rabbit
-store-reload fold** (ADR 0075, −138 B / −0.105 %, 0 larger).
-
-**Size a find before believing it.** The second started as "Rabbit never emits
-its `mul`", which was false — `l_mult` on Rabbit *is* `ld bc,hl; mul; ld hl,bc;
-ret`, and the comment that looked like a bug was correct. **Read the helper the
-call actually reaches, on that CPU, before concluding an instruction is
-unused.** What was really wrong was cheaper and more general: the call is an
-opaque clobber, so the product went through a frame slot and was read straight
-back, and the `#R2`/`#G1`/`#S1` fold family had no member matching Rabbit's
-one-instruction `ld (sp+N),hl`. **Check that family for other gaps** — it is
-per-addressing-form, so every CPU with its own slot spelling needs its own.
-
-Swept and clean: **vm1** (all four `CPU_HAS_*` consulted), **gbz80** (already
-emits its specials heavily), **rabbit**. Left, with corpus sizings:
-
-| | |
-|---|---|
-| ez80 `lea hl,ix+d` | 196 fp-mode `ld hl,N; add hl,sp` pairs remain; 3 bytes against 4. Already used at the two `emit_*_slot_addr` sites *only* |
-| 8085 `ld de,hl+n` (LDHI) | 64 `ld de,N; add hl,de` sites; 2 bytes against 4 — LDSI's sibling, same shape as ADR 0039 |
-| z80n `add hl,a` / `add de,a` / `add bc,a` | 48 byte-widen-then-add pairs; 2 bytes against 5. Also `add hl,nn` (4 bytes, and it preserves DE) |
-| z180 / ez80 `tst` | a flag-only `and` that preserves A — not yet sized |
-| kc160 `div hl,a` / `div dehl,bc` / `divs` | hardware divide, never emitted; only 6 helper-call sites in this corpus, so size it on a real file before building |
+Swept and settled: **vm1**, **gbz80**, **rabbit**, **8085**, **8080**, **z80**,
+**z80n**, **z180**, **ez80**, **kc160**. The two remainders (the ez80 prologue,
+and the emit sites carrying their own push offset) are named in the next action
+above.
 
 **2. Zero-extension.** The one *consistent* gap against ez80clang. On int and
 byte code 80cc is level or ahead; on 32-bit it loses to helper calls; and

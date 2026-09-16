@@ -54,6 +54,12 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0074](0074-the-gameboy-has-no-ex-de-hl.md) | **Accepted** — the in-place rewrite is excluded on gbz80: no `ex de,hl`, and both firing benches are better without it |
 | [0075](0075-the-rabbit-multiply-is-a-call-not-a-loop.md) | **Accepted** (copt fold) — Rabbit's `l_mult` IS already `mul`; the cost is the CALL. A store-reload fold ships; inlining the multiply was measured and **withdrawn** |
 | [0076](0076-the-iy-pack-cannot-be-arbitrated-against-the-pools.md) | **Refused** ×3 — `RC_DE_ACC`/`RC_IDX2` vs `ir_iy_reduction_pack`: `idx_ben` is the same unit but a different model, and a late home cannot survive the word-home revert |
+| [0077](0077-ldhi-pointer-plus-constant-on-8085.md) | **Accepted**, default on — LDSI's sibling: `ld de,N; add hl,de` → `ld de,hl+N; ex de,hl` on the 8085, with the same three hazards |
+| [0078](0078-z80n-add-hl-a-for-zero-extended-bytes.md) | **Accepted**, default on — z80n `add hl,a` for a zero-extended byte; also records `add hl,nn` and `push nn` **refused** as size-neutral |
+| [0079](0079-the-cpu-sweep-is-finished.md) | **Accepted** — closes the CPU sweep: `tst`, kc160 divide and the z80n immediate forms **refused** with numbers; the ez80 `lea` row **re-aimed** and still open |
+| [0080](0080-a-memory-increment-is-one-instruction.md) | **Accepted**, default on — `ld a,MEM; inc a; ld MEM,a` → `inc MEM` on every CPU; the win needs a branch-FOLLOWING A-liveness walk |
+| [0081](0081-ez80-frame-addresses-are-ix-relative.md) | **Accepted**, default on — supersedes 0079 item 1: in fp mode the address IS IX-relative and the offset is known, so `lea hl,ix+d` replaces `ld hl,N; add hl,sp`. Needed the `#SP2L` copt fold to move with it |
+| [0082](0082-an-escaped-local-is-not-a-constant.md) | **Accepted**, not gated — CORRECTNESS: `ir_opt_const_fold` kept a local's constant belief across a call that took its address (`int a=0; bump(&a); return a+x;` → `x`). Long-standing, silent, both frame modes |
 | [0073](0073-ask-slot-off-not-the-spill-slot.md) | **Accepted** — ask `slot_off`, not `vreg_spill_slot`; the wrong query cost structbench +10.5 % |
 | [0072](0072-the-commutative-swap-is-refused.md) | **Rejected** — the commutative swap in addition resurrects an elided store; md5 −6 % against emu.c +75 B |
 | [0071](0071-the-call-split-eviction-floor.md) | **Accepted** — the eviction floor is magnitude, not ratio; below it the model is inside its own error |
