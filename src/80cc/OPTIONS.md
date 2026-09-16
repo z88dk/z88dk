@@ -76,6 +76,10 @@ exists (ADR 0010).
 | --- | --- |
 | `bc-pack` | no tight BC packing pass after region selection |
 | `ldsi-addr` | 8085 slot addresses use `ld hl,N; add hl,sp` instead of the shorter LDSI pair |
+| `ldhi-addr` | 8085 pointer-plus-constant uses `ld de,N; add hl,de` instead of the shorter LDHI pair |
+| `z80n-add-a` | z80n zero-extended byte adds go via DE instead of `add hl,a` |
+| `inc-mem` | a memory increment stays `ld a,MEM; inc a; ld MEM,a` instead of `inc MEM` |
+| `lea-frame-addr` | ez80 fp-mode frame addresses go through `add hl,sp` instead of `lea hl,ix+d` |
 | `bc-evict` | a BC tenant is never displaced by a better candidate |
 | `bc-per-cand` | BC cost is scored per class, not per candidate |
 | `bc-call-cost` | the arbiter does not charge a BC home for call preservation **(measure: `=<N>` sets the margin)** |

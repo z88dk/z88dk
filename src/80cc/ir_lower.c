@@ -1604,6 +1604,112 @@ static int gw_a_dead_after(char **lines, int n, int start)
     return 0;                                      /* ran out of rope: assume live */
 }
 
+/* [inc-mem] Is A dead from line `start` on EVERY path? Non-zero means live or
+   unknown, which is the conservative answer.
+
+   `gw_a_dead_after` answers the same question but stops at the first branch,
+   and that loses the sites worth having: a counter incremented in a loop body
+   is followed by the back-edge `jp L_head`, so the straight-line walk always
+   answers "live" there. This walk follows branches instead, exactly as
+   `de_fwd_walk` does for DE, memoising visited lines so a loop terminates —
+   revisiting a line contributes nothing the in-progress visit will not report.
+
+   A `ret`, a `call` and a branch out of this buffer all answer LIVE: A is a
+   return register and a fastcall byte-argument register, so the value may be
+   read where this walk cannot see. This is deliberately a separate walker
+   rather than a widening of `gw_a_dead_after` — that one is shared with the
+   [gwiden] fold, and changing a shared helper would change a second rung's
+   output for reasons that have nothing to do with this one. */
+static int im_a_live_walk(char **lines, int n, int start,
+                          unsigned char *seen, int depth)
+{
+    if (depth > 32) return 1;
+    for (int j = start; j < n; j++) {
+        if (seen[j]) return 0;                     /* already explored: no read */
+        seen[j] = 1;
+        if (lines[j][0] != '\t') continue;         /* label: falls through */
+        if (gw_kills_a(lines[j])) return 0;        /* overwritten unread */
+        char tgt[64];
+        if (xline_branch_target(lines[j], tgt, sizeof tgt)) {
+            int t = de_label_line(lines, n, tgt);
+            if (t < 0) return 1;                   /* a call, or out of buffer */
+            if (im_a_live_walk(lines, n, t, seen, depth + 1)) return 1;
+            /* `djnz` carries no comma but IS conditional — it falls through
+               when B reaches zero — so only a comma-less jp/jr ends the path. */
+            if (!strchr(lines[j], ',') && strncmp(lines[j] + 1, "djnz", 4))
+                return 0;                          /* unconditional: no fall-through */
+            continue;                              /* conditional: also fall through */
+        }
+        if (!gw_no_a_read(lines[j])) return 1;     /* reads A, or unrecognised */
+    }
+    return 1;                                      /* ran off the end: assume live */
+}
+
+/* [inc-mem] `ld a,MEM; inc a; ld MEM,a` is a read-modify-write the whole
+   z80 family does in ONE instruction: `inc MEM`. Returns the increment
+   mnemonic ("inc" / "dec") and fills `mem` with the operand text, or NULL.
+
+   Only the indirect forms qualify — `(hl)`, `(ix±d)`, `(iy±d)`. There is no
+   `inc (nn)`, so a symbol RMW is not a candidate however much it looks like
+   one. Flags need no guard: `inc a` and `inc (hl)` are the same 8-bit INC and
+   set the same bits (carry untouched on every CPU in the table), so the only
+   thing the rewrite takes away is the copy of the value left in A. */
+static const char *im_rmw_triple(char **lines, int at, const char *drop,
+                                 char *mem, size_t memsz)
+{
+    if (at < 2 || drop[at] || drop[at - 1] || drop[at - 2]) return NULL;
+    const char *op;
+    if (!strcmp(lines[at - 1], "\tinc\ta\n"))      op = "inc";
+    else if (!strcmp(lines[at - 1], "\tdec\ta\n")) op = "dec";
+    else return NULL;
+    /* load: `\tld\ta,(...)\n` — capture the parenthesised operand */
+    if (strncmp(lines[at - 2], "\tld\ta,(", 7)) return NULL;
+    const char *p = lines[at - 2] + 6;                    /* at '(' */
+    const char *e = strchr(p, ')');
+    if (!e || e[1] != '\n') return NULL;                  /* volatile stamp etc. */
+    size_t len = (size_t)(e - p) + 1;
+    if (len + 1 > memsz) return NULL;
+    memcpy(mem, p, len); mem[len] = '\0';
+    if (strcmp(mem, "(hl)") && strncmp(mem, "(ix", 3) && strncmp(mem, "(iy", 3))
+        return NULL;
+    /* store: the SAME operand, and nothing else on the line */
+    char want[64];
+    if ((size_t)snprintf(want, sizeof want, "\tld\t%s,a\n", mem) >= sizeof want)
+        return NULL;
+    if (strcmp(lines[at], want)) return NULL;
+    return op;
+}
+
+/* [z80n-add-a] Find the zero-extend pair that feeds `add hl,de` at line `at`,
+   so the pair can be dropped and the add become `add hl,a`. Returns the index
+   of the FIRST line of the pair, or -1.
+
+   The pair is `ld e,a` + `ld d,0` in either order, and it is usually NOT
+   adjacent to the add: the base arrives in between (`ld e,a; ld d,0; pop hl;
+   add hl,de` is 14 of the corpus's 19 sites). So a bounded forward window is
+   walked, and every line in it must
+     - preserve A, which is the whole value the rewrite depends on, and
+     - not read D or E, whose zero-extended value is about to stop existing.
+   A label or any branch/call ends the window: this is a straight-line claim,
+   and instr_effects marks a branch as reading DE anyway. An unrecognised line
+   also ends it — the recogniser is incomplete by design, and losing a site
+   costs bytes where guessing costs correctness. */
+static int zn_widen_pair_for(char **lines, int at, const char *drop)
+{
+    for (int i = at - 1, budget = 10; i >= 1 && budget-- > 0; i--) {
+        if (drop[i] || drop[i - 1]) return -1;
+        if (lines[i][0] != '\t') return -1;                   /* label */
+        if ((!strcmp(lines[i], "\tld\te,a\n") && !strcmp(lines[i - 1], "\tld\td,0\n"))
+         || (!strcmp(lines[i], "\tld\td,0\n") && !strcmp(lines[i - 1], "\tld\te,a\n")))
+            return i - 1;
+        InstrEffects e = instr_effects(lines[i]);
+        if (e.unknown || e.is_call || e.is_boundary) return -1;
+        if (e.d_read || e.e_read) return -1;
+        if ((e.writes & IR_R_A) && !(e.self_pres & IR_R_A)) return -1;
+    }
+    return -1;
+}
+
 /* `\tld\ta,(_sym)\n` — the symbol form only. A register or index indirect
    (`ld a,(hl)`, `ld a,(ix-2)`) has no `ld hl,(...)` counterpart, and a volatile
    access carries a trailing `;volatile` stamp so it fails the exact-shape test
@@ -1965,6 +2071,84 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                         free(lines[i - 1]); lines[i - 1] = a;
                         free(lines[i]);     lines[i]     = b;
                     } else { free(a); free(b); }
+                }
+            }
+            /* [ldhi-addr] LDSI's sibling, and the same three hazards. Adding a
+               small constant to a pointer already in HL costs
+               `ld de,N; add hl,de` — 4 bytes, 20 cycles. The 8085 has LDHI,
+               `ld de,hl+N` (opcode 28, 2 bytes, 10 cycles,
+               `(hl) + get_memory_inst(pc++)` in src/ticks/i8085_inst.c), so the
+               pair becomes `ld de,hl+N; ex de,hl` — 3 bytes and 14.
+                 - D and E dead AFTER the pair. Here it is not `ex de,hl`'s swap
+                   that needs it: the ORIGINAL pair leaves DE holding N, and the
+                   rewrite leaves it holding the OLD HL, so a reader of either
+                   would see the wrong value.
+                 - F dead. `add hl,de` (DAD D) WRITES CARRY, LDHI does not.
+                 - N in 0..255, LDHI's operand being one unsigned byte. Out of
+                   range is common here, unlike LDSI: the corpus immediates
+                   include bench magic constants such as 13849.
+               `--opt-disable=ldhi-addr` opts out. adr/0077. */
+            if (IS_8085() && !opt_disabled("ldhi-addr")
+                && !d_live && !e_live && !f_live
+                && i > 0 && !strcmp(lines[i], "\tadd\thl,de\n")
+                && !drop[i] && !drop[i - 1]) {
+                int n = -1;
+                if (sscanf(lines[i - 1], "\tld\tde,%d\n", &n) == 1
+                    && n >= 0 && n <= 255) {
+                    char buf[48];
+                    snprintf(buf, sizeof buf, "\tld\tde,hl+%d\n", n);
+                    char *a = strdup(buf), *b = strdup("\tex\tde,hl\n");
+                    if (a && b) {
+                        free(lines[i - 1]); lines[i - 1] = a;
+                        free(lines[i]);     lines[i]     = b;
+                    } else { free(a); free(b); }
+                }
+            }
+            /* [z80n-add-a] Adding a zero-extended byte to HL costs
+               `ld e,a; ld d,0; add hl,de` — 4 bytes, 22 cycles, and it spends
+               DE. The z80n has `add hl,a` (ED 31, 2 bytes, 8 cycles,
+               `z80n_add_hl_a` in src/ticks/z80n_inst.c), which adds A
+               zero-extended and leaves DE alone: 2 bytes and 8.
+                 - D and E dead AFTER the add. The pair's zero-extended value
+                   stops existing, and DE reverts to whatever it held before.
+                 - F dead. `add hl,de` WRITES CARRY and `add hl,a` writes no
+                   flags at all, so a consumer would read a stale one.
+                 - A preserved between the pair and the add, and D/E unread
+                   there — see zn_widen_pair_for, which walks that window.
+               `--opt-disable=z80n-add-a` opts out. adr/0078. */
+            if (IS_Z80N() && !opt_disabled("z80n-add-a")
+                && !d_live && !e_live && !f_live
+                && !drop[i] && !strcmp(lines[i], "\tadd\thl,de\n")) {
+                int p = zn_widen_pair_for(lines, i, drop);
+                if (p >= 0) {
+                    char *nl = strdup("\tadd\thl,a\n");
+                    if (nl) {
+                        free(lines[i]); lines[i] = nl;
+                        drop[p] = drop[p + 1] = 1;
+                    }
+                }
+            }
+            /* [inc-mem] `ld a,(hl); inc a; ld (hl),a` becomes `inc (hl)` —
+               3 bytes and 18 cycles down to 1 and 11 — and the `(ix+d)` form
+               goes from 7 bytes and 42 cycles to 3 and 23. One condition: A
+               must be DEAD after, because the rewrite no longer leaves the new
+               value there. Flags are NOT a condition — the two are the same
+               8-bit INC and set the same bits, carry included (untouched).
+               `--opt-disable=inc-mem` opts out. adr/0080. */
+            if (!opt_disabled("inc-mem")) {
+                char mem[64];
+                const char *op = im_rmw_triple(lines, i, drop, mem, sizeof mem);
+                unsigned char *seen = op ? calloc((size_t)(n > 0 ? n : 1), 1) : NULL;
+                int a_dead = seen && !im_a_live_walk(lines, n, i + 1, seen, 0);
+                free(seen);
+                if (op && a_dead) {
+                    char buf[80];
+                    snprintf(buf, sizeof buf, "\t%s\t%s\n", op, mem);
+                    char *nl = strdup(buf);
+                    if (nl) {
+                        free(lines[i]); lines[i] = nl;
+                        drop[i - 1] = drop[i - 2] = 1;
+                    }
                 }
             }
             /* A call to compiled C code neither reads the flags nor preserves
@@ -3721,6 +3905,40 @@ static void store_byte_adv(FILE *out, const char *reg, int last)
     }
 }
 
+/* [lea-frame-addr] Put a frame address into HL, choosing the shorter form.
+   `canon_off` is the slot_off-basis offset — WITHOUT `cur_sp_adjust`, which
+   this adds for the sp form and must NOT add for the IX form.
+
+   On ez80 in fp mode the same address is IX-relative and the compiler knows
+   the offset: `slot_ix_off` is `slot_off - f->frame_size`, and IX does not
+   move, so the push shift is irrelevant. `lea hl,ix+d` is 3 bytes against 4
+   and writes no flags, where `add hl,sp` writes carry.
+
+   `!L.cur_frameless` is load-bearing: `fp_active` is TRUE for a frameless
+   function (it keeps fp-mode residency) and there is NO IX frame there, so an
+   `(ix+d)` address would be taken off the caller's frame pointer. The vote
+   through ds_ixaccess is deliberate and mirrors slot_ix_off — emitting an
+   IX-relative address is a reason to keep IX, which is what that counter
+   decides. Callers own their own cache invalidation, exactly as before.
+
+   Sites that hand-roll the sp pair with an offset of their own (a push they
+   just made) must NOT be routed here: that shift has no IX analogue.
+   `--opt-disable=lea-frame-addr` opts out. adr/0081. */
+static void emit_frame_addr_hl(FILE *out, const Func *f, int canon_off)
+{
+    if (IS_EZ80() && fp_active(f) && !L.cur_frameless
+        && !opt_disabled("lea-frame-addr")) {
+        int ixoff = canon_off - f->frame_size;
+        if (fp_offset_fits(ixoff)) {
+            if (rec_counting) ds_ixaccess++;       /* mirrors slot_ix_off */
+            emit(out, "lea\thl,%s%+d", frame_reg(), ixoff);
+            return;
+        }
+    }
+    emit(out, "ld\thl,%d", canon_off + L.cur_sp_adjust);
+    emit(out, "add\thl,sp");
+}
+
 #include "ir_lower_regcache.inc.c"
 #include "ir_lower_analysis.inc.c"
 #include "ir_lower_ops.inc.c"
@@ -3785,8 +4003,11 @@ static InstrEffects instr_effects(const char *line)
 
     /* ---- (A) whole-reg WRITE mask (was lra_line_writes) ---- */
     RegMask w = 0;
-    if (strstr(line,"hl+") || strstr(line,"hl-")) w |= IR_R_HL;   /* gbz80 auto-step */
-    if (strstr(line,"de+") || strstr(line,"de-")) w |= IR_R_DE;
+    /* The auto-step forms are PARENTHESISED — `ld a,(hl+)`. Matching bare
+       "hl+" would also claim 8085 LDHI (`ld de,hl+N`) writes HL, which it does
+       not: there HL is a source. */
+    if (strstr(line,"(hl+)") || strstr(line,"(hl-)")) w |= IR_R_HL;  /* gbz80 auto-step */
+    if (strstr(line,"(de+)") || strstr(line,"(de-)")) w |= IR_R_DE;
     if (!strcmp(m,"ld"))                                 w |= lra_reg_of(o0);
     else if (!strcmp(m,"add")||!strcmp(m,"adc")||!strcmp(m,"sbc")) w |= lra_reg_of(o0)|IR_R_F;
     else if (!strcmp(m,"sub")) w |= (!strcmp(o0,"hl") ? (IR_R_HL|IR_R_F) : (IR_R_A|IR_R_F));

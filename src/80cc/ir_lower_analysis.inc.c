@@ -1270,7 +1270,8 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
         invalidate_de_cache();
         return;
     }
-    int off = slot_off(f, vreg) + L.cur_sp_adjust;
+    int canon = slot_off(f, vreg);           /* slot_off has side effects: once */
+    int off = canon + L.cur_sp_adjust;
     /* Deepest slot at TOS: discard the old word, push the value from DE, then
        ex de,hl for the HL=value contract. Discard via `pop hl` (1B/10T) not
        `inc sp; inc sp` (2B/12T): the trailing ex de,hl overwrites HL, so the
@@ -1284,8 +1285,7 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
         invalidate_de_cache();
         return;
     }
-    emit(out, "ld\thl,%d", off);
-    emit(out, "add\thl,sp");
+    emit_frame_addr_hl(out, f, canon);       /* [lea-frame-addr] on ez80 fp */
     emit(out, "ld\t(hl),e");
     emit(out, "inc\thl");
     emit(out, "ld\t(hl),d");

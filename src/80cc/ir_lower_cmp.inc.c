@@ -1342,9 +1342,8 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             && !L.la.cur_dst_dead
             && !vreg_in_pr_bc(f, op->dst)
             && vreg_is_spilled(f, op->dst)) {
-            int off = slot_off(f, op->dst) + L.cur_sp_adjust;
-            emit(out, "ld\thl,%d", off + 3);
-            emit(out, "add\thl,sp");        /* HL = &slot[3] (MSB) */
+            /* HL = &slot[3] (MSB). [lea-frame-addr] takes the ez80 fp form. */
+            emit_frame_addr_hl(out, f, slot_off(f, op->dst) + 3);
             emit(out, "srl\t(hl)");          /* byte3: high=0, low→C */
             emit(out, "dec\thl");
             emit(out, "rr\t(hl)");           /* byte2: C→high, low→C */
