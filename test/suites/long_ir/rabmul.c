@@ -1,39 +1,28 @@
-/* [rabbit-mul / the Rabbit store-reload fold] Rabbit's 16x16 multiply.
+/* Rabbit's 16x16 multiply, on the path that actually ships.
  *
- * NOTE WHAT THIS IS NOT ABOUT. `l_mult` on Rabbit is already the hardware
- * instruction — `ld bc,hl; mul; ld hl,bc; ret` — so the default build here is
- * NOT a bit-serial loop. What costs is the CALL: it is an opaque clobber, so
- * the product goes through a frame slot and is read straight back. The copt
- * rule in lib/arch/rabbit/rabbit_rules.1 elides that reload, and that is what
- * ships. Inlining the three instructions (IR_RABBIT_MUL=1) removes the call
- * entirely and is opt-in — see adr/0075 for why.
+ * `l_mult` on Rabbit IS the hardware instruction — `ld bc,hl; mul; ld hl,bc;
+ * ret` — so this is NOT a bit-serial helper. What used to cost was the CALL:
+ * an opaque clobber that sent the product through a frame slot and read it
+ * straight back. The copt rule in lib/arch/rabbit/rabbit_rules.1 elides that
+ * reload, and that is what ships (adr/0075).
  *
- * Six of this file's seven targets therefore exercise the HELPER path, on
- * Rabbit and on z80/8080 as controls, and pin that the answers are the same
- * either way. `rabmul_r2ka_mul` is the one that turns the inline on, and it is
- * the only thing that reaches the two hazards the inline carries:
+ * Inlining the three instructions instead was built, measured and WITHDRAWN —
+ * it exposed an allocator re-pick worth +10..13 % on listbench that has no
+ * sound fix (three were tried). So what remains here is a multiply regression
+ * test across z80, the three Rabbits and 8080-as-control, pinning that the
+ * answers agree everywhere:
  *
- *  - bc_live      a value homed in BC across the multiply. BC is the
- *                 multiplicand, so the rung brackets itself with push/pop bc.
- *                 Without that the home dies; it fails LOUDLY (the
- *                 require_slot abort), which is the only luck in this file.
- *  - enigma       the product feeds a stack-transient spill, so the rung emits
- *                 `pop bc; push hl` back to back. The Rabbit copt rule that
- *                 folds that pair into `ld (sp+0),hl` reads the pop as sccz80's
- *                 discard-TOS idiom; applied here it drops the restore AND
- *                 scribbles on the parked word. That shape needs real register
- *                 pressure, which is why this case is a condensed
- *                 examples/console/enigma.c and not something smaller — five
- *                 simpler shapes were tried first and every one left an
- *                 instruction between the pop and the push, so the rule never
- *                 fired and the test proved nothing. Verified to fail with the
- *                 copt gate removed.
- *  - byte_ops     operands narrowed to width 1. Rabbit has no 8x8 multiply, so
- *                 the inline's 16x16 arm must take these too — dispatching on
- *                 width first emitted `mlt hl`, which Rabbit cannot assemble.
+ *  - bc_live      a value homed in BC held across a multiply and read after.
+ *  - enigma       a condensed examples/console/enigma.c — real register
+ *                 pressure around the multiply, which is what makes it worth
+ *                 keeping: it is the shape that caught a copt fold applying
+ *                 `pop bc; push hl` to a LIVE BC restore.
+ *  - byte_ops     operands narrowed to width 1.
  *  - const_mul    x * K. Rabbit is excluded from constant-multiply strength
- *                 reduction because `mul` is cheaper than a shift chain; these
- *                 pin that the exclusion still lands somewhere that works.
+ *                 reduction because `mul` behind the call is still cheaper
+ *                 than a shift chain; these pin that the exclusion lands
+ *                 somewhere that works.
+ *  - signed_mul   the low 16 bits of a product are sign-agnostic.
  *
  * Self-verifying against constants computed under the same 16-bit arithmetic,
  * and no printf (it perturbs allocation and can mask exactly this class of

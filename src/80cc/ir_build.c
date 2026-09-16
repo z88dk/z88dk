@@ -6260,15 +6260,6 @@ static int build_cast(Builder *b, Node *n)
     return build_fail("OP_CAST %d→%d not yet supported", src_w, dst_w);
 }
 
-/* [rabbit-mul] Opt-in: inline Rabbit's `mul` rather than calling l_mult.
-   Default OFF — see the call site for why. */
-static int rabbit_mul_enabled(void)
-{
-    static int v = -1;
-    if (v < 0) v = getenv("IR_RABBIT_MUL") ? 1 : 0;
-    return v;
-}
-
 /* Emit a native hardware multiply op: dst(width) = l * r. imm carries the
    unsigned flag (1=unsigned, 0=signed); the lowerer selects 8x8 vs 16x16 from
    the operand vreg width. Only called under the CPU/width guards below. */
@@ -6454,23 +6445,6 @@ static int build_muldiv_integer(Builder *b, Node *n)
        on `1.5h * 1.5h` (math16 80cc kc160 suite). */
     if (n->ast_type == OP_MULT && IS_KC160() && width == 2
         && !is_flt && !is_fix16)
-        return emit_ir_mul(b, l, r, 2, 1);
-    /* [rabbit-mul, OPT-IN `IR_RABBIT_MUL=1`] Inline Rabbit's 16x16 multiply as
-       the one-byte `mul` (HL:BC = BC * DE) instead of calling l_mult. Note what
-       this is NOT: l_mult on Rabbit is ALREADY `ld bc,hl; mul; ld hl,bc; ret`
-       (libsrc/l/sccz80/4-r2ka), so the instruction was never unused and the
-       !IS_RABBIT() gate on the strength reducer above is correct. What inlining
-       buys is removing the CALL — the opaque clobber that sent the product
-       through a frame slot.
-
-       Opt-in, not default: it wins −721 B / −1.57 % on the Rabbit corpus but
-       costs listbench +10..13 %, because dropping the call makes the function
-       call-free and the allocator then re-picks and loses an IY index home. The
-       same 23 spill sites are fixed with no regression by the copt rule in
-       lib/arch/rabbit/rabbit_rules.1, which is what ships by default. Flip this
-       on once that re-pick is understood. adr/0075. */
-    if (n->ast_type == OP_MULT && IS_RABBIT() && width == 2
-        && !is_flt && !is_fix16 && rabbit_mul_enabled())
         return emit_ir_mul(b, l, r, 2, 1);
     const char *helper;
     int n_stacked = 0;

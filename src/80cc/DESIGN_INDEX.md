@@ -14,32 +14,25 @@ closed, and the documentation backlog is cleared. Vein 1 below paid again —
 a Rabbit store-reload fold, ADR 0075, **−138 B / −0.105 %, nothing larger** —
 and left **one live question**, below. What follows is the handover.
 
-### The live question: listbench, and the three cures that failed
+### Closed: the Rabbit inline multiply, and why it is gone
 
-Inlining Rabbit's multiply (ADR 0075, opt-in `IR_RABBIT_MUL=1`) measures
-**−721 B and −1.568 %** and would ship but for listbench, which loses
-**+10..13 %** on every Rabbit in both frame modes.
+Inlining Rabbit's multiply instead of calling `l_mult` measured **−721 B and
+−1.568 %** and is **removed**, not parked. It cost listbench **+10..13 %** on
+every Rabbit in both frame modes, and three separate fixes for that failed —
+two of them only *after* measuring as large size wins. `BENCH_MATRIX.txt`
+16/9 has the detail; ADR 0075 has the reasoning.
 
-**The diagnosis is solid and the cures are all refuted — do not re-run them.**
-Removing the call makes the function call-free, `idx2_home_available()` then
-admits the `RC_DE_ACC` pool, and that pool takes the best IY candidate
-(`idxben=251`) before `ir_iy_reduction_pack` runs; the pack skips it and settles
-for `idxben=46`. DE cannot hold a whole-function value, so it spills anyway.
-`IR_OFF=word-resident` restores the original pick, which is the proof.
+It was removed rather than left opt-in because the copt gate protecting its
+`push bc` / `pop bc` bracket cost the **default** build 88000 ticks on
+callbench (+0.32 % sp, +0.29 % fp) — a real price on every build, to guard a
+feature nobody could switch on.
 
-Three fixes were built and measured. All three failed, and **two of them only
-after measuring as large size wins** — see the 16/9 sections of
-`BENCH_MATRIX.txt`:
-
-| | why it failed |
-|---|---|
-| `iy-yield-idx2` (fp: idx2 *is* IY) | **size**: −1415 B against −1807 B without it, `recordbench fp` +80..98 on five CPUs. `idx_ben` is the same UNIT for both candidates but a different MODEL — plain index home vs `add iy,de` accumulation |
-| `iy-late-home` (let the pack's home survive the word-home revert) | **correctness**: `long_ir` sp 718/727. The pre-pick snapshot can already hold an IY home for another vreg, so the revert restores two owners of IY. The whole-array memcpy restores a *consistent* plan — that is its purpose |
-| `de-yield-iy` alone | **correctness**: `long_ir` sp 772/774, and it does not fix listbench without the one above |
-
-**The prerequisite for any future attempt**: the IY reduction pack's gain has no
-number comparable to `idx_ben`. Produce one first. And treat "a late pass keeps
-its decision across the word-home revert" as unsound by construction.
+**To re-derive it** (an hour, if the allocator question below is ever answered):
+ADR 0075 records the lowering, the `mul` semantics and the two hazards it
+carries. **The prerequisite has not changed**: the IY reduction pack's gain has
+no number comparable to the idx2 pool's `idx_ben`, and "a late pass keeps its
+decision across the word-home revert" is unsound by construction — the
+pre-pick snapshot can already name another IY owner.
 
 ### The four veins worth digging, in order
 
@@ -200,7 +193,7 @@ documented name no longer exists.
 
 ## Surviving gates
 
-59 remain. A gate needs a row here or it is deleted.
+58 remain. A gate needs a row here or it is deleted.
 
 ### Verifiers — permanent, never swept
 
@@ -244,12 +237,6 @@ miscompiled), `IR_JR_UNCOND` (ADR 0033), `IR_TRIPW` (ADR 0028), `IR_INPLACE_MASK
 and `IR_INPLACE_CMP`, `IR_OPRES` (ADR 0018), `IR_NO_A_CARRY`, `IR_FLIPCOST`,
 `IR_SPINC`, `IR_SPEXCL`, `IR_REHOME`. Cost correctness (ADR 0032) shipped;
 `IR_GBZ80_MASK` remains as the bisection tool for future gbz80 work.
-
-### Parked, measured, waiting on one answer
-
-| Gate | What it does | Flip it on when |
-| --- | --- | --- |
-| `IR_RABBIT_MUL` | inlines Rabbit's `mul` instead of calling `l_mult`: −721 B, −1.568 %, but listbench +10..13 % (ADR 0075) | the call-free IY re-pick above is understood |
 
 ### Numeric knobs — a category with no home
 

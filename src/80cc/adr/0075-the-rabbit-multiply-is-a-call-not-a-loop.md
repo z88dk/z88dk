@@ -1,7 +1,8 @@
 # ADR 0075 — The Rabbit multiply costs a call, not a loop
 
-Status: **Accepted**. The copt fold ships default-on; inlining the multiply is
-**opt-in** (`IR_RABBIT_MUL=1`) pending an allocator question.
+Status: **Accepted** for the copt fold, which ships default-on. Inlining the
+multiply is **REMOVED** — built, measured at −721 B / −1.568 %, and withdrawn.
+This record keeps enough to re-derive it.
 
 ## Context, and the claim that was wrong
 
@@ -88,46 +89,37 @@ spilled after). That is the allocator capture gap of ADR 0036-0038 reacting to a
 changed IR shape, not something this rung can price, and the index's standing
 conclusion forbids answering it with a cost term.
 
-So the inline stays behind `IR_RABBIT_MUL=1`, the precedent being `IR_SPFLIP`
-and `IR_BC_STEP_PARAM`: measured, available, and default-off until the one bench
-it loses is understood.
+### The inline was removed, not parked
 
-### And it is now understood — it is an ORDERING bug, not a cost-model one
+It cost listbench **+10..13 %** on every Rabbit in both frame modes. The cause
+was traced precisely — removing the call makes the function **call-free**, which
+admits the `RC_DE_ACC` pool; that pool takes the best IY candidate
+(`idxben=251`) before `ir_iy_reduction_pack` runs, the pack settles for
+`idxben=46`, and DE cannot hold a whole-function value so it spills anyway.
+`IR_OFF=word-resident` restores the original pick, which is the proof.
 
-Traced with `IR_RANKDUMP` and `IR_ALLOC_PROBE`. The IY pick is the loop-carried
-accumulator pack, and it changes winner:
+**Three fixes were built. All three failed, two only after measuring as large
+size wins** — the full account is in `BENCH_MATRIX.txt` 16/9:
 
-    default (helper)      IY_ACC v0 bb22 score=17
-    inline  (call-free)   IY_ACC v3 bb3  score=16
+| | why |
+|---|---|
+| `iy-yield-idx2` | **size**: −1415 B against −1807 B without it; `recordbench fp` +80..98 on five CPUs. `idx_ben` is the same UNIT for both candidates but a different MODEL — plain index home vs `add iy,de` accumulation |
+| `iy-late-home` | **correctness**: `long_ir` sp 718/727. The word-home pre-pick snapshot can already hold an IY home for another vreg, so the revert restores two owners of IY |
+| `de-yield-iy` | **correctness**: sp 772/774 — and it does not fix listbench without the one above |
 
-A **lower**-scoring candidate wins once more candidates become eligible, and the
-selection is a plain `use_count` maximum — so v0 is not losing, it is **absent**.
-The reason is upstream. `idx2_home_available` returns 1 as soon as the function
-is call-free, which admits the `RC_DE_ACC` pool, and that pool takes v0 first:
+Left opt-in, the inline would still have charged the **default** build for the
+copt gate below: **88000 ticks on callbench** (+0.32 % sp, +0.29 % fp), to guard
+a bracket only the inline emits. Paying that for an unusable feature is the
+wrong trade, so the rung came out and the gate with it.
 
-    ALLOCMAP default   v0 phys=IY   home=[0,101]
-    ALLOCMAP inline    v0 phys=DE   home=[0,101]   <- claimed by DE
-                       v3 phys=IY                   <- IY pack's consolation
-
-The IY pack skips v0 (`if (v == exclude) continue;`) and settles for v3.
-
-**And DE does not keep it.** v0 is live `[0,101]` — the whole function — and DE
-is the binop staging register, so it is spilled anyway. The pool took the best
-IY candidate in the function (`idxben=251`, against v3's 46 and v40's 79), could
-not hold it, and denied it to the register that could.
-
-Confirmed by construction: with the DE pool off, the call-free build makes the
-**same** pick as the helper build —
-
-    IR_RABBIT_MUL=1 IR_OFF=word-resident  ->  IY_ACC v0 bb22 score=17
-
-This is in bounds. It is not a missing cost term — it is one pool admitting a
-candidate it cannot realise, ahead of a pool that could. The two never compare.
-**Next step: make `RC_DE_ACC` decline a candidate whose `idxben` beats its own
-realisable benefit, or arbitrate the two pools together rather than in sequence;
-then re-run the 180-cell Rabbit matrix with `IR_RABBIT_MUL=1` and expect
-listbench's +10..13 % to go.** `interval_benefit(..., GR_IX)` already supplies
-the number to compare against — it is what `IR_RANKDUMP` prints as `idxben`.
+**To re-derive**: `mul` is `F7`, `HL:BC = BC * DE`, signed 16x16 into 32, one
+byte. The lowering is `ld bc,hl; mul; ld hl,bc`, placed BEFORE the width
+dispatch in `gen_mul` (Rabbit has no 8x8, so narrowed byte operands must take
+the 16x16 arm or the 8x8 path emits `mlt hl`, which Rabbit cannot assemble), and
+bracketed with `push bc`/`pop bc` when a BC tenant is resident. **The
+prerequisite is unchanged**: produce a benefit number for the IY reduction pack
+comparable to `idx_ben`, and treat preserving a late home across the word-home
+revert as unsound by construction.
 
 ## The copt rule this exposed
 
@@ -141,12 +133,12 @@ a genuine restore, and when the product then went to a stack transient the two
 landed adjacent; the fold dropped the restore *and* scribbled on the parked
 word. `examples/console/enigma.c` on r2ka printed nothing instead of RXSEC.
 
-Gated `%notcompiler 80cc`. The gate is kept even though the default build no
-longer emits that shape: the rule is unsound for 80cc generally — 80cc emits
-real `pop bc` restores elsewhere (the z80n barrel-shift bracket) and only luck
-keeps them apart on Rabbit today — and correctness must not depend on
-remembering to edit a rules file when flipping an env gate. It costs **0 bytes**
-and ~0.3 % on callbench's three fp cells, where the one folded site has BC dead.
+It was gated `%notcompiler 80cc` while the inline existed. **With the inline
+removed the gate is removed too**: it costs 88000 ticks on callbench and the
+only 80cc Rabbit shape that needs it was the inline's bracket. The one folded
+site in the corpus is argument cleanup with BC genuinely dead. A comment at the
+rule records what to do if a future lowering emits a real Rabbit `pop bc`
+restore.
 
 The same rule appears twice in `lib/arch/kc160/kc160_rules.1`, already gated off
 sdcc. **Left alone**: gating it there costs a byte on `callbench`, where the
@@ -163,11 +155,10 @@ through copt — showed the `pop bc` gone. Diff `z88dk-80cc` direct output again
 * `long_ir` 774/774 in both frame modes, serial. **`make -j` garbles the log**
   and under-counts nondeterministically (712 and 728 on two runs of an identical
   376-target set against a true 739); take pass counts from a serial run.
-* Regression test `test/suites/long_ir/rabmul.c`, seven targets. Six run the
-  default helper path across z80/Rabbit/8080 as controls; `rabmul_r2ka_mul`
-  turns the inline on and is **the only thing that exercises the shape the copt
-  gate exists for** — verified to fail with the gate removed, and to fail to
-  compile with the inline's BC bracket removed.
+* Regression test `test/suites/long_ir/rabmul.c`, six targets across z80, the
+  three Rabbits and 8080-as-control. It outlived the inline it was written for:
+  its condensed-`enigma` case carries real register pressure around a multiply,
+  which is the shape that caught the copt fold applying to a live BC restore.
 * Its `enigma` case is a condensed `examples/console/enigma.c` because five
   smaller shapes were tried first and none reproduced the fold; each left an
   instruction between the `pop` and the `push`.

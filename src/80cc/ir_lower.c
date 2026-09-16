@@ -3810,10 +3810,6 @@ static InstrEffects instr_effects(const char *line)
     }
     else if (!strcmp(m,"djnz"))                          w |= IR_R_BC|IR_R_F;
     else if (!strcmp(m,"mlt"))                           w |= lra_reg_of(o0);
-    /* Rabbit's operandless `mul` is HL:BC = BC * DE — it writes BOTH pairs and
-       leaves DE alone. The operand forms (z80n `mul de`, kc160 `mul de,hl` /
-       `mul hl`) name their destination. */
-    else if (!strcmp(m,"mul") && !*o0)                    w |= IR_R_HL|IR_R_BC;
     else if (!strcmp(m,"mul")||!strcmp(m,"muls"))        w |= lra_reg_of(o0)|IR_R_F;
     else if (!strcmp(m,"div")||!strcmp(m,"divu")||!strcmp(m,"divs")) w |= lra_reg_of(o0)|IR_R_A|IR_R_F;
     else if (!strcmp(m,"ldi")||!strcmp(m,"ldd")||!strcmp(m,"ldir")||!strcmp(m,"lddr"))
