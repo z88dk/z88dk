@@ -14,60 +14,32 @@ closed, and the documentation backlog is cleared. Vein 1 below paid again —
 a Rabbit store-reload fold, ADR 0075, **−138 B / −0.105 %, nothing larger** —
 and left **one live question**, below. What follows is the handover.
 
-### The live question: why does call-free cost listbench an IY home?
+### The live question: listbench, and the three cures that failed
 
 Inlining Rabbit's multiply (ADR 0075, opt-in `IR_RABBIT_MUL=1`) measures
-**−721 B and −1.568 %** and would ship today but for one bench: listbench loses
-**+10..13 %** on every Rabbit in both frame modes. The cause is identified, not
-guessed. Removing the call makes the function **call-free**, a different set of
-proposers runs, and `IR_HOMEMAP` shows `v0 phys=IY home=[0,101]` before and
-spilled after.
+**−721 B and −1.568 %** and would ship but for listbench, which loses
+**+10..13 %** on every Rabbit in both frame modes.
 
-**Traced, and it is an ordering bug.** `idx2_home_available` returns 1 as soon
-as the function is call-free, which admits the `RC_DE_ACC` pool; that pool takes
-v0 (`idxben=251`, the best IY candidate in the function) before the IY
-accumulator pack runs, so the pack skips it and settles for v3 (`idxben=46`).
-DE cannot hold a value live across the whole function, so v0 is spilled anyway —
-the pool took what it could not realise and denied it to the register that
-could. `IR_RABBIT_MUL=1 IR_OFF=word-resident` restores the helper build's pick
-exactly, which is the proof.
+**The diagnosis is solid and the cures are all refuted — do not re-run them.**
+Removing the call makes the function call-free, `idx2_home_available()` then
+admits the `RC_DE_ACC` pool, and that pool takes the best IY candidate
+(`idxben=251`) before `ir_iy_reduction_pack` runs; the pack skips it and settles
+for `idxben=46`. DE cannot hold a whole-function value, so it spills anyway.
+`IR_OFF=word-resident` restores the original pick, which is the proof.
 
-**The next action is that fix**: make `RC_DE_ACC` decline a candidate whose
-`idxben` beats its own realisable benefit, or arbitrate the two pools together
-instead of in sequence. `interval_benefit(..., GR_IX)` already supplies the
-comparison — it is what `IR_RANKDUMP` prints as `idxben`. Not a cost term: two
-pools that never compare. Then re-run the 180-cell Rabbit matrix with
-`IR_RABBIT_MUL=1` and expect listbench's +10..13 % to go, flipping a measured
-−1.568 % on by changing one default. ADR 0075.
+Three fixes were built and measured. All three failed, and **two of them only
+after measuring as large size wins** — see the 16/9 sections of
+`BENCH_MATRIX.txt`:
 
-### What closed, and why it will not reopen
-
-The **ranging arc (ADR 0017)** is done as far as evidence takes it. Stage 1
-shipped; stages 2 and 3 are refused, each on a measurement rather than a
-judgement:
-
-| | result |
+| | why it failed |
 |---|---|
-| stage 1, truthful intervals (`tight-homes`, ADR 0027) | **SHIPPED default-on**: 20 cells smaller, 0 larger, 20 tick cells faster, 0 slower. Two predicate bugs fixed on the way, one a latent miscompile |
-| stage 2, packing order (earliest-start -> earliest-end) | **inert**: same 114 values packed, 0/720 size, 0/420 ticks |
-| stage 2, clash test on the truthful window | **nothing to reclaim**: 6 of 214 BC tenants are narrower than their live range |
-| stage 2, IY "one owner per function" bail | **zero**: 10 functions, 24 candidates, 0 disjoint from the owner |
-| stage 3, expensive form (park the tenant) | **7 of 145 sites pay**, even though 74 have a completely idle tenant |
-| stage 3, fail-safe form (`IR_RANGED`, ADR 0029) | **MISCOMPILED** — 17 cells; deleted, −114 lines |
+| `iy-yield-idx2` (fp: idx2 *is* IY) | **size**: −1415 B against −1807 B without it, `recordbench fp` +80..98 on five CPUs. `idx_ben` is the same UNIT for both candidates but a different MODEL — plain index home vs `add iy,de` accumulation |
+| `iy-late-home` (let the pack's home survive the word-home revert) | **correctness**: `long_ir` sp 718/727. The pre-pick snapshot can already hold an IY home for another vreg, so the revert restores two owners of IY. The whole-array memcpy restores a *consistent* plan — that is its purpose |
+| `de-yield-iy` alone | **correctness**: `long_ir` sp 772/774, and it does not fix listbench without the one above |
 
-Four separate cost-model corrections were refused before those (ADR 0036, 0037,
-0038, and the ledger they served). **They share one cause**, and it is the single
-most useful thing to carry forward:
-
-> The allocator's model is not the constraint. Its **reachable set** is.
-> `bc-evict` adds no residency at all — it swaps homes (+0/+1/+0/+2/+0/+0 across
-> six benches). Time-sharing already works where the packers look. Where they do
-> not look, sharing is not what stands in the way — **admission** is.
-
-So: **do not add a cost term to the allocator**, and do not size an opportunity
-by counting values that merely fail to interfere. Count what the allocator would
-actually consider. `IR_RANGEPROBE`'s 461 was an upper bound over the wrong
-population, and `IR_PAIRPROBE` taught the same lesson before it.
+**The prerequisite for any future attempt**: the IY reduction pack's gain has no
+number comparable to `idx_ben`. Produce one first. And treat "a late pass keeps
+its decision across the word-home revert" as unsound by construction.
 
 ### The four veins worth digging, in order
 
