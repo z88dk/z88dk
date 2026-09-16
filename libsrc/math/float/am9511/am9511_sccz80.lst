@@ -1,3 +1,6 @@
+math/float/am9511/c/sccz80/cam32_sccz80_dload
+math/float/am9511/c/sccz80/cam32_sccz80_dloadb
+
 math/float/am9511/c/sccz80/cam32_sccz80_acos
 math/float/am9511/c/sccz80/cam32_sccz80_acosh
 math/float/am9511/c/sccz80/cam32_sccz80_asin
@@ -8,11 +11,9 @@ math/float/am9511/c/sccz80/cam32_sccz80_atanh
 math/float/am9511/c/sccz80/cam32_sccz80_ceil
 math/float/am9511/c/sccz80/cam32_sccz80_cos
 math/float/am9511/c/sccz80/cam32_sccz80_cosh
-math/float/am9511/c/sccz80/cam32_sccz80_dload
-math/float/am9511/c/sccz80/cam32_sccz80_dloadb
 math/float/am9511/c/sccz80/cam32_sccz80_exp
-math/float/am9511/c/sccz80/cam32_sccz80_exp2
 math/float/am9511/c/sccz80/cam32_sccz80_exp10
+math/float/am9511/c/sccz80/cam32_sccz80_exp2
 math/float/am9511/c/sccz80/cam32_sccz80_fabs
 math/float/am9511/c/sccz80/cam32_sccz80_fadd
 math/float/am9511/c/sccz80/cam32_sccz80_fadd_callee
@@ -27,8 +28,8 @@ math/float/am9511/c/sccz80/cam32_sccz80_fmin
 math/float/am9511/c/sccz80/cam32_sccz80_fmin_callee
 math/float/am9511/c/sccz80/cam32_sccz80_fmod
 math/float/am9511/c/sccz80/cam32_sccz80_fmul
-math/float/am9511/c/sccz80/cam32_sccz80_fmul2
 math/float/am9511/c/sccz80/cam32_sccz80_fmul10u
+math/float/am9511/c/sccz80/cam32_sccz80_fmul2
 math/float/am9511/c/sccz80/cam32_sccz80_fmul_callee
 math/float/am9511/c/sccz80/cam32_sccz80_fpclassify
 math/float/am9511/c/sccz80/cam32_sccz80_frexp
@@ -45,8 +46,8 @@ math/float/am9511/c/sccz80/cam32_sccz80_lmod_callee
 math/float/am9511/c/sccz80/cam32_sccz80_lmod_u_callee
 math/float/am9511/c/sccz80/cam32_sccz80_lmul_callee
 math/float/am9511/c/sccz80/cam32_sccz80_log
-math/float/am9511/c/sccz80/cam32_sccz80_log2
 math/float/am9511/c/sccz80/cam32_sccz80_log10
+math/float/am9511/c/sccz80/cam32_sccz80_log2
 math/float/am9511/c/sccz80/cam32_sccz80_modf
 math/float/am9511/c/sccz80/cam32_sccz80_neg
 math/float/am9511/c/sccz80/cam32_sccz80_pow

@@ -45,8 +45,10 @@ PUBLIC asm_am9511_popi
     rlca                        ; busy? and __IO_APU_STATUS_BUSY
     jr C,am9511_popi_wait
 
+IFNDEF __AM9511_HELPER_FUNC
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
-    in h,(c)                    ; load LSW from APU
-    in l,(c)
+ENDIF
+    AM9511_INI h                ; load LSW from APU
+    AM9511_INI l
     ret
 

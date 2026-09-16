@@ -34,7 +34,7 @@ $(OUTPUT_DIRECTORY)/am9511_8085.lib: $(addprefix obj/8085/, $(OBJECTS))
 	TYPE=8085 $(LIBLINKER) -m8085 -x$(OUTPUT_DIRECTORY)/am9511_8085 @am9511.lst
 
 $(OUTPUT_DIRECTORY)/am9511h.lib: $(addprefix obj/z80h/, $(OBJECTS))
-	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80h/x/x/x  -I.. -mz80 -D__CLASSIC -D__AM9511_HELPER_FUNC @newlibfiles_z80h.lst
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80h/x/x/x  -I.. -mz80 -D__CLASSIC -D__AM9511_HELPER_FUNC @newlibfiles_z80.lst
 	TYPE=z80h $(LIBLINKER) -mz80 -x$(OUTPUT_DIRECTORY)/am9511h @am9511.lst
 
 
@@ -46,7 +46,7 @@ obj/z80h/%.o: %.c
 
 
 dirs:
-	$(Q)mkdir -p obj/z80/c obj/ixiy/c  obj/8085/c obj/z180 obj/z80h obj/8080
+	$(Q)mkdir -p obj/z80/c obj/ixiy/c obj/8085/c obj/z180 obj/z80h
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt config_private.inc

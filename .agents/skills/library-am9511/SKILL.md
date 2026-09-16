@@ -107,11 +107,15 @@ unless writing a multi-APU `am32_stack/*` clone.
 | `AM9511_IN_APU_DATA` | `in a,(__IO_APU_DATA)` | `call __am9511_in_data` |
 | `AM9511_OUT_APU_CONTROL` | `out (__IO_APU_STATUS),a` | `call __am9511_out_control` |
 | `AM9511_OUT_APU_DATA` | `out (__IO_APU_DATA),a` | `call __am9511_out_data` |
+| `AM9511_OUTI` | `outi` (needs `BC = data`) | `ld a,(hl)` / `inc hl` / `call __am9511_out_data` |
+| `AM9511_OUTC REG` | `out (c),REG` | `ld a,REG` / `call __am9511_out_data` |
+| `AM9511_INI REG` | `in REG,(c)` | `call __am9511_in_data` / `ld REG,a` |
 
-**z80** hot push/pop often use **`in r,(c)` / `outi` / `out (c),…`** with
-`BC = __IO_APU_DATA` for speed — those paths **bypass** the data macros (status
-still uses `AM9511_IN_APU_STATUS`). **8085** push/pop use the macros throughout.
-Helper product: `am9511_io.asm` + `-D__AM9511_HELPER_FUNC`.
+**z80** and **8085** push/pop both go through these macros. z80 keeps `outi` /
+`in r,(c)` on the normal path. Helper `am9511h.lib` is the same z80 sources with
+`-D__AM9511_HELPER_FUNC`. `am9511_io.asm` is an example stub only — **do not
+link it**. The app supplies `__am9511_in_status` / `_in_data` / `_out_control` /
+`_out_data`.
 
 ### Status register (must know for popf)
 

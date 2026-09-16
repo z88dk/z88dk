@@ -50,9 +50,11 @@ PUBLIC asm_am9511_pushf_fastcall
     ld hl,4
     add hl,sp
 
+IFNDEF __AM9511_HELPER_FUNC
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
-    outi                        ; load LSW into APU
-    outi
+ENDIF
+    AM9511_OUTI                 ; load LSW into APU
+    AM9511_OUTI
 
     ld a,(hl)                   ; get mantissa MSB
     rla                         ; get exponent least significant bit to carry
@@ -68,40 +70,40 @@ PUBLIC asm_am9511_pushf_fastcall
 
     dec hl
     set 7,(hl)                  ; set mantissa MSB
-    outi                        ; load mantissa MSB into APU
+    AM9511_OUTI                 ; load mantissa MSB into APU
 
     rla                         ; position 7-bit exponent for sign
     rl (hl)                     ; get sign
     rra
-    out (c),a                   ; load exponent into APU
+    AM9511_OUT_APU_DATA         ; load exponent into APU
 
     exx
     ret
 
 .asm_am9511_max
-    in a,(c)
-    in a,(c)
+    AM9511_IN_APU_DATA
+    AM9511_IN_APU_DATA
     ld a,0ffh                    ; confirm we have maximum
-    out (c),a                    ; load mantissa into APU
-    out (c),a
-    out (c),a
+    AM9511_OUT_APU_DATA          ; load mantissa into APU
+    AM9511_OUT_APU_DATA
+    AM9511_OUT_APU_DATA
 
     ld a,0feh                   ; position exponent for sign
     rl (hl)                     ; get sign
     rra
-    out (c),a                   ; load maximum exponent into APU
+    AM9511_OUT_APU_DATA         ; load maximum exponent into APU
 
     exx
     ret
 
 .asm_am9511_zero
-    in a,(c)
-    in a,(c)
+    AM9511_IN_APU_DATA
+    AM9511_IN_APU_DATA
     xor a                       ; confirm we have a zero
-    out (c),a                   ; load zero mantissa into APU
-    out (c),a
-    out (c),a
-    out (c),a                   ; load zero exponent into APU
+    AM9511_OUT_APU_DATA         ; load zero mantissa into APU
+    AM9511_OUT_APU_DATA
+    AM9511_OUT_APU_DATA
+    AM9511_OUT_APU_DATA         ; load zero exponent into APU
 
     exx
     ret
@@ -144,11 +146,13 @@ PUBLIC asm_am9511_pushf_fastcall
 ;   rlca                        ; busy? and __IO_APU_STATUS_BUSY
 ;   jr C,pushf_fastcall
 
+IFNDEF __AM9511_HELPER_FUNC
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
-    out (c),l                   ; load LSW into APU
-    out (c),h
-    out (c),e                   ; load MSW into APU
-    out (c),d
+ENDIF
+    AM9511_OUTC l               ; load LSW into APU
+    AM9511_OUTC h
+    AM9511_OUTC e               ; load MSW into APU
+    AM9511_OUTC d
     ret
 
 .asm_am9511_zero_fastcall

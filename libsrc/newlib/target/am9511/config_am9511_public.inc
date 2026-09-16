@@ -66,6 +66,35 @@ MACRO AM9511_OUT_APU_DATA
  ENDIF
 ENDM
 
+; Z80 (c)-port / outi forms. Helper path goes through A and the call stubs.
+MACRO AM9511_OUTI
+ IF __AM9511_HELPER_FUNC
+    ld a,(hl)
+    inc hl
+    call __am9511_out_data
+ ELSE
+    outi
+ ENDIF
+ENDM
+
+MACRO AM9511_OUTC REG
+ IF __AM9511_HELPER_FUNC
+    ld a,REG
+    call __am9511_out_data
+ ELSE
+    out (c),REG
+ ENDIF
+ENDM
+
+MACRO AM9511_INI REG
+ IF __AM9511_HELPER_FUNC
+    call __am9511_in_data
+    ld REG,a
+ ELSE
+    in REG,(c)
+ ENDIF
+ENDM
+
 defc __IO_APU_PORT_BASE = 0x42
 
 defc __IO_APU0_PORT_BASE = 0x42

@@ -47,11 +47,13 @@ PUBLIC asm_am9511_pushl_fastcall
     ld hl,4
     add hl,sp
 
+IFNDEF __AM9511_HELPER_FUNC
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
-    outi                        ; load LSW into APU
-    outi
-    outi                        ; load MSW into APU
-    outi
+ENDIF
+    AM9511_OUTI                 ; load LSW into APU
+    AM9511_OUTI
+    AM9511_OUTI                 ; load MSW into APU
+    AM9511_OUTI
 
     exx
     ret
@@ -73,10 +75,12 @@ PUBLIC asm_am9511_pushl_fastcall
 ;   rlca                        ; busy? __IO_APU_STATUS_BUSY
 ;   jr C,asm_am9511_pushl_fastcall
 
+IFNDEF __AM9511_HELPER_FUNC
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
-    out (c),l                   ; load LSW into APU
-    out (c),h
-    out (c),e                   ; load MSW into APU
-    out (c),d
+ENDIF
+    AM9511_OUTC l               ; load LSW into APU
+    AM9511_OUTC h
+    AM9511_OUTC e               ; load MSW into APU
+    AM9511_OUTC d
     ret
 
