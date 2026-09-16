@@ -24,12 +24,14 @@ separate `--math32_8085` flag).
 
 | Tree | Role |
 |------|------|
+| `asm/` | 8080-compatible shared files (const, coeff, load, classify). Classic: `newlibfiles_common_asm.lst` |
 | `asm/z80/` | Z80-family cores; shared by z80n/z180/ez80_z80/r2ka/… when the lst points here |
-| `asm/8085/` | Stack-only 8085 cores (no EXX / IX / IY); extended opcodes + synthetics. After `rl de`, test exp with `inc d`/`dec d` — RDEL does not write Z |
-| `asm/8080/` | Stack-only 8080 cores (original ISA; no 8085 extras). `ld hl,sp+n`; park HL |
-| `asm/gbz80/` | Stack-only Game Boy cores (`ld hl,sp+*`, `bit 7` leading-one; no cheap `ex`) |
+| `asm/8085/` | Stack-only 8085 cores (no EXX / IX / IY); extended opcodes + synthetics. After `rl de`, test exp with `inc d`/`dec d` — RDEL does not write Z. CPU-specific `f32_f2long` / `f32_l_ldexp` |
+| `asm/8080/` | Stack-only 8080 cores (original ISA; no 8085 extras). `ld hl,sp+n`; park HL. `f32_f2long` / `f32_l_ldexp` still portable copies |
+| `asm/gbz80/` | Stack-only Game Boy cores (`ld hl,sp+*`, `bit 7` leading-one; no cheap `ex`). CPU-specific `f32_f2long` / `f32_l_ldexp` |
 | `c/z80/`, `c/8085/`, `c/8080/`, `c/gbz80/` | Higher functions (C → precompiled asm); 8080/8085/gbz80 higher via **sccz80 only** |
-| `newlibfiles_*.lst` | Which modules land in each product (`newlibfiles_ez80_z80.lst`, `newlibfiles_gbz80.lst`, …) |
+| `newlibfiles_*.lst` | Classic products (`newlibfiles_ez80_z80.lst`, `newlibfiles_gbz80.lst`, …) |
+| `math32_z80_common_asm.lst` + `math32_{z80,z80n,z180}_asm.lst` | Newlib clib embed only. No 8085/8080/gbz80 newlib math32 list |
 
 **CPU-specific** = same *operation* name, different ISA file (same one-op-per-file
 map as §0). Do not invent a second taxonomy for 8085 / gbz80.
@@ -173,7 +175,8 @@ for cpu in z80 z80n z180 ez80_z80 r2ka kc160; do
   esac
   rm -f obj/$cpu/math/float/math32/asm/z80/d32_fsadd.o ../../../$lib.lib
   z88dk-z80asm -d -I"$ZCCCFG/.." -O=obj/$cpu/x/x/x -I.. -m$masm -D__CLASSIC @$lst
-  TYPE=$cpu z88dk-z80asm -d -I"$ZCCCFG/.." -I.. -m$masm -x../../../$lib @math32.lst
+  if [ "$cpu" = z80 ]; then linklst=math32_z80.lst; else linklst=math32.lst; fi
+  TYPE=$cpu z88dk-z80asm -d -I"$ZCCCFG/.." -I.. -m$masm -x../../../$lib @$linklst
   cp -f ../../../$lib.lib ../../../lib/clibs/
 done
 ```

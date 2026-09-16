@@ -82,7 +82,7 @@ Do not link bare `-lm` ahead of `--math-am9511` if you need the APU `sqrt`.
 
   *  All the code is re-entrant.
 
-  *  Register use is limited to the z80 main and alternate set. NO index registers were abused in the process.
+  *  Register use on the Z80 cores is limited to the main and alternate set. No index registers. The 8085 cores use the main register set and the stack only.
 
   *  The APU instructions are used to full advantage to accelerate all floating point and long calculations.
 
@@ -172,19 +172,19 @@ Contains the assembly language implementation of the maths library. This include
 
 ### c
 
-Contains the remaining hyperbolic, logarithmic, power and other functions implemented in C. Currently, compiled versions of these functions are prepared and saved in `c/asm` to be assembled and built as required.
+Contains the remaining hyperbolic, logarithmic, power and other functions implemented in C. Precompiled copies live in `c/z80/` (SDCC) and `c/8085/` (sccz80).
 
 ### c/sdcc and c/sccz80
 
-Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the z80 directory. Calling convention conversion between the am9511 library and the format expected by the compilers occurs here.
+Compiler bridges. sccz80 bridges are shared. SDCC bridges are Z80-only (the 8085 product does not list them). `dload` / `dloadb` are Z80 (`exx`) and are not on the 8085 list.
 
 ### lam32
 
 Glue that connects the compilers and standard assembly interface to the `am9511` library. The purpose is to define aliases that connect the standard names to the am9511 specific names. These functions make up the complete z88dk `am9511` maths library that is linked against on the compile line as `-lam9511`.
 
-An alias is provided to simplify usage of the library. `--am9511` provides all the required linkages and definitions, as a simple alternative to `-Cc-fp-mode=ieee -Cc-D__MATH_AM9511 -D__MATH_AM9511 -lam9511 -pragma-define:CLIB_32BIT_FLOATS=1`.
+`--math-am9511` and `--am9511` expand to `-lam9511@{ZCC_LIBCPU}` plus the IEEE float defines. With `-clib=8085` that selects `am9511_8085`. There is no separate `--math-am9511_8085` alias.
 
-For 8085 support using the classic library an alternative alias is provided to simplify usage of the library. `--math-am9511_8085` provides all the required linkages and definitions. This format aligns with common practice for classic maths library aliases.
+`--am9511h` links `am9511h.lib`: the same Z80 sources assembled with `-D__AM9511_HELPER_FUNC` so APU I/O goes through app-supplied call stubs. `am9511_io.asm` is an example only and is not linked.
 
 ## Function Discussion
 
@@ -298,7 +298,7 @@ zsdcc / newlib / **am9511 - 30 seconds**
 
 **8085** / sccz80 / classic / **am9511 - 30 seconds**
 
-`zcc +cpm -clib=8085 -O2 -DSTATIC -DPRINTOUT whetstone.c -o whetstone --math-am9511_8085 -lndos -create-app`
+`zcc +cpm -clib=8085 -O2 -DSTATIC -DPRINTOUT whetstone.c -o whetstone --math-am9511 -lndos -create-app`
 
 
 #### spectral-norm
@@ -334,7 +334,7 @@ sccz80 / classic c library
 **8085** / sccz80 / classic / **am9511 - 5 min 48 seconds**<br>
 1.2742147
 
-`zcc +cpm -clib=8085 -DSTATIC -DPRINTF -O2 spectral-norm.c -o spectral-norm --math-am9511_8085 -lndos -create-app`
+`zcc +cpm -clib=8085 -DSTATIC -DPRINTF -O2 spectral-norm.c -o spectral-norm --math-am9511 -lndos -create-app`
 
 
 #### fasta
@@ -395,7 +395,7 @@ sccz80 / classic c library
 -0.169075100<br>
 -0.169080500
 
-`zcc +cpm -clib=8085 -DSTATIC -DPRINTF -O2 n-body.c -o n-body --math-am9511_8085 -lndos -create-app`
+`zcc +cpm -clib=8085 -DSTATIC -DPRINTF -O2 n-body.c -o n-body --math-am9511 -lndos -create-app`
 
 
 #### mandelbrot

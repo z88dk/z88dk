@@ -34,6 +34,7 @@ Intel 8080, 8085, and gbz80 have separate stack-based cores (`math32_8080.lib`, 
 | Library | CPU | Mantissa multiply |
 |---------|-----|-------------------|
 | `math32.lib` | Z80 | software `32_24×8` |
+| `math32_ixiy.lib` | Z80 with `-IXIY` | software `32_24×8` |
 | `math32_z80n.lib` | ZX Spectrum Next (z80n) | hardware `mul de` |
 | `math32_z180.lib` | Z180 | hardware `mlt` |
 | `math32_ez80_z80.lib` | eZ80 (Z80 mode) | hardware `mlt` |
@@ -327,17 +328,18 @@ The library is laid out as shared assembly, CPU-specific cores, C sources, and c
 
 | Path | Role |
 |------|------|
-| `asm/` | Shared **8080-compatible** assembly: coefficient tables, float constants, util/load/error, and cores identical on 8080 / 8085 / gbz80 (and on Z80 when the encoding matches). No Z80-only or 8085-only instructions. Listed by `math32_common_asm.lst` / `newlibfiles_common_asm.lst`. |
+| `asm/` | Shared **8080-compatible** assembly: coefficient tables, float constants, util/load/error, and cores identical on 8080 / 8085 / gbz80 (and on Z80 when the encoding matches). No Z80-only or 8085-only instructions. Listed by `newlibfiles_common_asm.lst`. |
 | `asm/z80/` | Z80-family intrinsic cores. Uses the alternate register set. Also holds CPU mantissa helpers (`f32_z80_*`, `f32_z80n_*`, `f32_z180_*`, `f32_r2ka_*`, `f32_kc160_*`). |
-| `asm/8085/` | 8085 cores (extended opcodes, stack locals, no alternate registers). Includes per-CPU copies of `f32_f2long` and `f32_l_ldexp` (flagged for later optimisation). |
-| `asm/8080/` | 8080 cores (original ISA, stack locals, `ld hl,sp+n`, cheap synthetics only). Same per-CPU `f32_f2long` / `f32_l_ldexp` copies. |
-| `asm/gbz80/` | Game Boy cores. Same stack-only contract. Prefer `ld hl,sp+*`, `ld a,(hl+)`, CB shifts, and `jr`. Leading-one tests use `bit 7`. Same per-CPU `f32_f2long` / `f32_l_ldexp` copies. |
+| `asm/8085/` | 8085 cores (extended opcodes, stack locals, no alternate registers). Includes CPU-specific `f32_f2long` and `f32_l_ldexp`. |
+| `asm/8080/` | 8080 cores (original ISA, stack locals, `ld hl,sp+n`, cheap synthetics only). `f32_f2long` / `f32_l_ldexp` are still the portable copies. |
+| `asm/gbz80/` | Game Boy cores. Same stack-only contract. Prefer `ld hl,sp+*`, `ld a,(hl+)`, CB shifts, and `jr`. Leading-one tests use `bit 7`. Includes CPU-specific `f32_f2long` and `f32_l_ldexp`. |
 | `c/` | Higher-function C sources. |
 | `c/z80/` | Precompiled Z80-family higher functions (SDCC). |
 | `c/8085/`, `c/8080/`, `c/gbz80/` | Precompiled with **sccz80** (`make -C c 8085` / `8080` / `gbz80`). |
 | `c/sdcc/`, `c/sccz80/` | Compiler bridges and float conversions. |
 | `lm32/` | Standard-name aliases into math32 (`-lmath32` / `--math32`). |
-| `newlibfiles_*.lst` | Module lists per product. |
+| `newlibfiles_*.lst` | Classic product assemble lists (`make` in this directory). |
+| `math32_z80_common_asm.lst`, `math32_z80_asm.lst`, `math32_z80n_asm.lst`, `math32_z180_asm.lst` | Newlib clib embed (`math_float_sccz80*.lst` / `math_float_sdcc_ix*.lst`). There is no 8085/8080/gbz80 newlib math32 clib. |
 
 One major operation per assembly file. Rebuild with `make -C libsrc/math/float/math32`, then install the `math32*.lib` products into `lib/clibs/`.
 
