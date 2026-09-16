@@ -10,6 +10,8 @@
 ;-------------------------------------------------------------------------
 ;
 ; 8080-compatible (shared: 8080 / 8085 / gbz80)
+; Per-CPU copy of the 8080-compatible core.
+; Flagged for later per-CPU optimisation; behaviour unchanged in this pass.
 ; Mirror Z80 f32_f2long. Exp lives in C (shifts via A clobber A).
 
 SECTION code_clib

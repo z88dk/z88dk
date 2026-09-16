@@ -1,0 +1,17 @@
+../../../math/float/math32/asm/f32_fsconst.asm
+../../../math/float/math32/asm/f32_fssigdig.asm
+../../../math/float/math32/asm/h32_coeff_atanf.asm
+../../../math/float/math32/asm/h32_coeff_exp10f.asm
+../../../math/float/math32/asm/h32_coeff_exp2f.asm
+../../../math/float/math32/asm/h32_coeff_expf.asm
+../../../math/float/math32/asm/h32_coeff_logf.asm
+../../../math/float/math32/asm/h32_coeff_sinf.asm
+
+../../../math/float/math32/asm/f32_fserror.asm
+../../../math/float/math32/asm/f32_fsload.asm
+../../../math/float/math32/asm/f32_fsutil.asm
+
+../../../math/float/math32/asm/f32_fabs.asm
+../../../math/float/math32/asm/f32_floor.asm
+../../../math/float/math32/asm/f32_fpclassify.asm
+../../../math/float/math32/asm/f32_fsceil.asm

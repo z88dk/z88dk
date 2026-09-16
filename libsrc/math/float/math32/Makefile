@@ -12,10 +12,10 @@ vpath %.c ../cimpl
 CFILES  = $(notdir $(wildcard ../../math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
 CFILES  = atof.c ftoa.c ftoe.c ftog.c tofix16.c fromfix16.c
 OBJECTS = $(CFILES:.c=.o) 
-# z80n / z180 / ez80_z80 / r2ka / r4k / r6k / kc160 / ixiy use the
-# lm32/c/sccz80 ftoa/ftoe/ftog wrappers (wired in their newlibfiles_*.lst)
-# instead of the cimpl/c-compiled ones: the wrappers route the text through
-# the dtoa engine, which the Z80-family per-CPU copt rules must not re-map.
+# Z80-family products use the lm32/c/sccz80 ftoa/ftoe/ftog wrappers
+# (in newlibfiles_z80.lst / lm32/c/m32_sccz80.lst) instead of the
+# cimpl/c-compiled ones: the wrappers route the text through the dtoa
+# engine, which the Z80-family per-CPU copt rules must not re-map.
 OBJECTS_LM32_TEXT = atof.o tofix16.o fromfix16.o
 
 CFLAGS += -fp-mode=ieee -DFLOAT_IS_32BITS
@@ -33,13 +33,13 @@ all: $(OUTPUT_DIRECTORY)/math32.lib \
 	$(OUTPUT_DIRECTORY)/math32_8080.lib \
 	$(OUTPUT_DIRECTORY)/math32_gbz80.lib
 
-$(OUTPUT_DIRECTORY)/math32.lib: $(addprefix obj/z80/, $(OBJECTS)) 
+$(OUTPUT_DIRECTORY)/math32.lib: $(addprefix obj/z80/, $(OBJECTS_LM32_TEXT))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80/x/x/x  -I.. -mz80 -D__CLASSIC @newlibfiles_z80.lst
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80/x/x/x  -I.. -mz80 -D__CLASSIC @newlibfiles_z80_text.lst
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math32 @math32_z80.lst
 
 $(OUTPUT_DIRECTORY)/math32_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS_LM32_TEXT))
-	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/ixiy/x/x/x -I.. -IXIY  -D__CLASSIC @newlibfiles_ixiy.lst
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/ixiy/x/x/x -I.. -IXIY  -D__CLASSIC @newlibfiles_z80.lst
 	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/math32_ixiy @math32.lst
 
 $(OUTPUT_DIRECTORY)/math32_z80n.lib: $(addprefix obj/z80n/, $(OBJECTS_LM32_TEXT))
@@ -88,8 +88,8 @@ $(OUTPUT_DIRECTORY)/math32_gbz80.lib: $(addprefix obj/gbz80/, $(OBJECTS))
 	TYPE=gbz80 $(LIBLINKER) -mgbz80 -x$(OUTPUT_DIRECTORY)/math32_gbz80 @math32.lst
 
 # Order-only: dirs must finish before any object compiles. See Make.config.
-$(foreach d,8080 8085 gbz80 z80,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
-$(foreach d,z80n z180 ez80_z80 r2ka r4k r6k kc160 ixiy,$(addprefix obj/$(d)/,$(OBJECTS_LM32_TEXT))): | dirs
+$(foreach d,8080 8085 gbz80,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
+$(foreach d,z80 z80n z180 ez80_z80 r2ka r4k r6k kc160 ixiy,$(addprefix obj/$(d)/,$(OBJECTS_LM32_TEXT))): | dirs
 
 dirs:
 	$(Q)mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c obj/8080/c obj/gbz80/c obj/r6k/c

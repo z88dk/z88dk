@@ -10,6 +10,8 @@
 ;-------------------------------------------------------------------------
 ;
 ; 8080-compatible (shared: 8080 / 8085 / gbz80)
+; Per-CPU copy of the 8080-compatible core.
+; Flagged for later per-CPU optimisation; behaviour unchanged in this pass.
 ; Entry: DEHL = float, A = signed exponent adjustment
 ; Exit:  DEHL = adjusted float
 

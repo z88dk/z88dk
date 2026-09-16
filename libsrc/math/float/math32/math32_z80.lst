@@ -1,5 +1,4 @@
 obj/z80/atof.o
 obj/z80/math/**/*.o
-obj/z80/ftoa.o
 obj/z80/tofix16.o
 obj/z80/fromfix16.o

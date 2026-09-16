@@ -41,6 +41,9 @@ math/float/math32/lm32/c/sccz80/fmod_callee
 math/float/math32/lm32/c/sccz80/fpclassify
 math/float/math32/lm32/c/sccz80/frexp
 math/float/math32/lm32/c/sccz80/frexp_callee
+math/float/math32/lm32/c/sccz80/ftoa
+math/float/math32/lm32/c/sccz80/ftoe
+math/float/math32/lm32/c/sccz80/ftog
 math/float/math32/lm32/c/sccz80/hypot
 math/float/math32/lm32/c/sccz80/hypot_callee
 math/float/math32/lm32/c/sccz80/inv

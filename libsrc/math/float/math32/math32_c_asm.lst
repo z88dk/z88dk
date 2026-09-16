@@ -1,4 +1,3 @@
-
 math/float/math32/c/z80/m32_acosf
 math/float/math32/c/z80/m32_acoshf
 math/float/math32/c/z80/m32_asinf
@@ -8,13 +7,13 @@ math/float/math32/c/z80/m32_atanf
 math/float/math32/c/z80/m32_atanhf
 math/float/math32/c/z80/m32_cosf
 math/float/math32/c/z80/m32_coshf
-math/float/math32/c/z80/m32_expf
-math/float/math32/c/z80/m32_exp2f
 math/float/math32/c/z80/m32_exp10f
+math/float/math32/c/z80/m32_exp2f
+math/float/math32/c/z80/m32_expf
 math/float/math32/c/z80/m32_fmodf
-math/float/math32/c/z80/m32_logf
-math/float/math32/c/z80/m32_log2f
 math/float/math32/c/z80/m32_log10f
+math/float/math32/c/z80/m32_log2f
+math/float/math32/c/z80/m32_logf
 math/float/math32/c/z80/m32_modff
 math/float/math32/c/z80/m32_powf
 math/float/math32/c/z80/m32_roundf
