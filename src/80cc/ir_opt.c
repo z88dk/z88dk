@@ -1406,6 +1406,31 @@ int ir_opt_ivsr(Func *f)
     return reduced;
 }
 
+/* An expression is only re-usable if its operands — and the vreg holding the
+   result — still say what they said when the entry was recorded. An
+   IR_VREG_ADDR_TAKEN vreg lives in a frame slot that a call or an indirect
+   store can write behind this pass's back, and the table is invalidated only
+   by a REDEFINITION of a vreg, which neither of those is. So
+   `t1 = a + x; bump(&a); t2 = a + x;` collapsed t2 into a MOV of t1 and read
+   the PRE-call value. Same hole as adr/0082, one pass along. A VOLATILE vreg
+   must be re-read for the same reason. Not recording them is what adr/0082
+   chose for const-fold: escaped locals are spilled anyway, so what the
+   precise cure would recover is small next to the cost of enumerating every
+   op that can write through a pointer. */
+static int cse_vreg_stable(const Func *f, int v)
+{
+    if (v < 0) return 1;                 /* absent operand (imm rhs / unary) */
+    if (v >= f->n_vregs) return 0;
+    return !(f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE));
+}
+
+static int cse_op_recordable(const Func *f, const Op *op)
+{
+    return cse_vreg_stable(f, op->dst)
+        && cse_vreg_stable(f, op->src[0])
+        && cse_vreg_stable(f, op->src[1]);
+}
+
 int ir_opt_cse(Func *f)
 {
     if (!f) return 0;
@@ -1464,7 +1489,8 @@ int ir_opt_cse(Func *f)
                     cse_invalidate_for_write(tbl, &n, op->dst);
                     if (n < MAX_CSE
                         && op->src[0] != op->dst
-                        && op->src[1] != op->dst) {
+                        && op->src[1] != op->dst
+                        && cse_op_recordable(f, op)) {
                         tbl[n].kind    = op->kind;
                         tbl[n].src0    = op->src[0];
                         tbl[n].src1    = op->src[1];

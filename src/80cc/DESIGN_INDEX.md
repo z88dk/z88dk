@@ -9,43 +9,39 @@ live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
-**Last swept 2026-09-16.** Vein 1 — the CPU sweep — is **finished**. Four
-rungs shipped, and the index's own `lea` row turned out to be wrong and is now
-shipped as well: **−774 bytes over the 720-cell matrix, 208 cells smaller, 0
-larger**, every gate off reproducing the pre-sweep compiler byte-for-byte, and
-`long_ir` **802/802 in both frame modes**.
+**Last swept 2026-09-16.** The escape audit ADR 0082 asked for is **done**,
+and it found four more instances — two of them wrong on plain C with no
+address of a local in sight. See **ADR 0083**, which is the one to read first.
 
-| shipped | | |
-|---|---|---|
-| ADR 0080 `[inc-mem]` | −606 B, 167 cells, **every CPU** | `ld a,MEM; inc a; ld MEM,a` → `inc MEM` |
-| ADR 0081 `[lea-frame-addr]` | −92 B, 29 cells, ez80 | an fp-mode frame address is IX-relative; the `#SP2L` copt fold had to move with it |
-| ADR 0077 `[ldhi-addr]` | −66 B, 14 cells, 8085 | `ld de,N; add hl,de` → `ld de,hl+N; ex de,hl` |
-| ADR 0078 `[z80n-add-a]` | −10 B, 5 cells, z80n | `ld e,a; ld d,0; add hl,de` → `add hl,a` |
-| ADR 0082 const-fold escape | **+0 B**, correctness | an address-escaped local is not a constant |
+| fixed | |
+|---|---|
+| `ast_cse` record | `*p = a + x; t = a + x;` handed `t` **the pointer**. `OP_ASSIGN`'s left is an ADDRESS, so `(deref (lv=p))` there is an INDIRECT store — but a COMPOUND assignment's left is an LVALUE, where the same spelling means `p` itself. One reader served both |
+| `ast_cse` env | the same misreading left every belief about what `p` POINTS AT standing |
+| `ir_opt_cse` | its table is cleared by a vreg write; a call handed a local's address writes the local's SLOT and defines no vreg |
+| `ast_cse_synthesize`, `ast_licm` | both asked only whether a statement DIRECTLY writes a symbol the candidate reads. An indirect store writes none |
 
-**ADR 0082 is the one to read first, and it names the next job.**
-`int a = 0; bump(&a); return a + x;` returned **`x`** — a long-standing silent
-miscompile in both frame modes on every CPU, found because that shape was
-written as a codegen test for ADR 0081 and failed on the *baseline* compiler.
-`ir_opt_const_fold` cleared its `known[]` beliefs only on a **redefinition**,
-so a call handed the local's address invalidated nothing. **The same hole may
-exist in other passes.** The search term is "a belief about a local's value
-that only a redefinition clears"; `ast_opt`'s DSE (`dse_collect_escaped`) is
-the shape to copy. Auditing `prop`, CSE and the lowerer's register beliefs for
-it comes **before** any density lever.
+Cost: **+497 bytes over 720 cells, 24 larger (all `md5`), 24 smaller (all
+`sortbench`)**; `long_ir` **809/809 both frame modes**; `enigma` and `emu.c`
+green in both. Regression test `long_ir/aliaswr.c` — it fails on the
+pre-change compiler.
 
-**Then the DE conservatism**, the sweep's most valuable density by-product.
-`instr_effects` treats **every `call`** as reading DE (the `__sdcccall(1)`
-argument ABI) and **every `ret`** as reading DE (the DE:HL result ABI). Both
-are true only sometimes, and that one fact throttles **four** rungs at once —
-`[de-park]`, `[ldsi-addr]`, `[ldhi-addr]`, `[z80n-add-a]`. It is measurable
-today: `[z80n-add-a]` reaches 5 of its 20 candidate sites and **15 are refused
-on a DE that is not live** — `divbench`'s `udiv` ends `add hl,de; pop af; ret`
-in an *int*-returning function. The precedent is in the same file:
-`xline_c_call` already tells `[bc-call]` that a call to compiled C code cannot
-read BC. Do that for DE.
+The audit is **closed**: `prop`, `dse`, `addr-cse`, `coalesce-copies`, the
+`ivsr`/`lftr`/`narrow-byte`/`reassoc` family and the lowerer's register
+beliefs were all probed and are clean. ADR 0083 lists what was covered so the
+sweep is not repeated.
 
-Two smaller things the sweep left on the table, both sized: the ez80
+**So the next job is the DE conservatism**, the CPU sweep's most valuable
+density by-product. `instr_effects` treats **every `call`** as reading DE (the
+`__sdcccall(1)` argument ABI) and **every `ret`** as reading DE (the DE:HL
+result ABI). Both are true only sometimes, and that one fact throttles **four**
+rungs at once — `[de-park]`, `[ldsi-addr]`, `[ldhi-addr]`, `[z80n-add-a]`. It
+is measurable today: `[z80n-add-a]` reaches 5 of its 20 candidate sites and
+**15 are refused on a DE that is not live** — `divbench`'s `udiv` ends
+`add hl,de; pop af; ret` in an *int*-returning function. The precedent is in
+the same file: `xline_c_call` already tells `[bc-call]` that a call to
+compiled C code cannot read BC. Do that for DE.
+
+Two smaller things the CPU sweep left on the table, both sized: the ez80
 **prologue's own** `ld hl,-F; add hl,sp; ld sp,hl` (66 sites, 1 byte each — but
 IX there has only just been loaded from SP, so the rule is `lea hl,ix-F` with
 no frame-size term, and an auto-pushed parameter can sit between the two), and
