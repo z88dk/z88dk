@@ -297,7 +297,7 @@ math32 **and** math16 suites on the CPUs that ship the object. After **newlib
 math.h** / `__MATH_MATH32` remaps: always run **`test_math32_rc2014_CODE.bin`**
 (and a newlib math16 link if half API changed). After classic `ftoa`/`ftoe`/`ftog`
 or printf `%f`/`%e`/`%g`: `test/suites/stdio` (`test_sprintf.bin` is genmath `-lm`;
-`test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80}.bin` are `--math32`).
+`test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` are `--math32`).
 Integer `sscanf` is `test_scanf*.bin` (no `%f`). `test/suites/string` is `str*` only.
 
 ### Small probes

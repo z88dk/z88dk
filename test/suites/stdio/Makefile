@@ -71,15 +71,15 @@ test_sprintf_ez80_z80.bin: sprintf.c $(SOURCES)
 	$(runtest_ez80_z80)
 
 test_sprintf_r2ka.bin: sprintf.c $(SOURCES)
-	$(call compile_r2ka)
+	$(call compile_r2ka,--math32)
 	$(runtest_r2ka)
 
 test_sprintf_r4k.bin: sprintf.c $(SOURCES)
-	$(call compile_r4k)
+	$(call compile_r4k,--math32)
 	$(runtest_r4k)
 
 test_sprintf_r6k.bin: sprintf.c $(SOURCES)
-	$(call compile_r6k)
+	$(call compile_r6k,--math32)
 	$(runtest_r6k)
 
 
