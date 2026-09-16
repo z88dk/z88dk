@@ -1087,10 +1087,13 @@
 	push	bc
 	ld	hl,%1
 
-;; #GB5: #GB3 across an intervening `ld de,%1`. TWO guards: on ez80 either
+;; #GB5: #GB3 across an intervening `ld de,%1`. THREE guards: on ez80 either
 ;; `ld de,(hl)` (%1) or `ld hl,(hl)` (%2) reads HL, keeping the copy live.
+;; 8085 LDHI `ld de,hl+n` also reads HL — dropping the copy leaves DE = old_HL+n
+;; (scanf %ld: ns->fmt became str+2).
 %title #GB5 drop dead ld hl,de before ld de,X;ld hl,Y (-2b)
 %not %1 (hl)
+%not %1 "hl[+][0-9]+"
 %not %2 (hl)
 	ld	hl,de
 	ld	de,%1

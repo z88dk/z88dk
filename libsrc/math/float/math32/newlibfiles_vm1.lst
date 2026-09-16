@@ -34,8 +34,16 @@
 ../../../math/float/math32/asm/vm1/f32_f2long.asm
 ../../../math/float/math32/asm/vm1/f32_l_ldexp.asm
 
-../../../math/float/math32/c/vm1/ftoe.asm
-../../../math/float/math32/c/vm1/ftog.asm
+../../../math/float/math32/asm/vm1/f32__dtoa_sgnabs.asm
+../../../math/float/math32/asm/vm1/f32__dtoa_digits.asm
+../../../math/float/math32/asm/vm1/f32__dtoa_base10.asm
+../../../math/float/math32/asm/vm1/f32__dtoa_base16.asm
+../../../math/float/math32/asm/vm1/f32__dtoa_round.asm
+../../../math/float/math32/asm/vm1/f32__dtoa_special.asm
+../../../math/float/math32/asm/vm1/f32__dtoa_emit.asm
+../../../math/float/math32/asm/vm1/f32_ftoa.asm
+../../../math/float/math32/asm/vm1/f32_ftoe.asm
+../../../math/float/math32/asm/vm1/f32_ftog.asm
 
 ../../../math/float/math32/c/vm1/m32_acosf.asm
 ../../../math/float/math32/c/vm1/m32_acoshf.asm
