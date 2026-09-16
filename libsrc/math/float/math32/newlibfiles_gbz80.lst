@@ -67,7 +67,4 @@
 
 @newlibfiles_lm32_sccz80.lst
 
-../../../math/float/math32/lm32/c/sccz80/neg.asm
-../../../math/float/math32/lm32/c/sccz80/neg_fastcall.asm
-
 @newlibfiles_lm32_z80.lst

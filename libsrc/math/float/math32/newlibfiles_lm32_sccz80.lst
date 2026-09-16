@@ -46,6 +46,8 @@
 ../../../math/float/math32/lm32/c/sccz80/fpclassify.asm
 ../../../math/float/math32/lm32/c/sccz80/modf.asm
 ../../../math/float/math32/lm32/c/sccz80/modf_callee.asm
+../../../math/float/math32/lm32/c/sccz80/neg.asm
+../../../math/float/math32/lm32/c/sccz80/neg_fastcall.asm
 ../../../math/float/math32/lm32/c/sccz80/round.asm
 ../../../math/float/math32/lm32/c/sccz80/round_fastcall.asm
 
