@@ -5077,6 +5077,33 @@ static int gen_mul(FILE *out, Func *f, const Op *op)
 {
     int uns = (op->imm != 0);
 
+    /* Rabbit has NO 8x8 multiply, so every IR_MUL here is the 16x16 form
+       whatever the operand vregs' widths — the test must come BEFORE the
+       width dispatch below, or a narrowed byte operand falls into the 8x8
+       packing path and emits `mlt hl`, which Rabbit cannot assemble.
+       `mul` is HL:BC = BC * DE, so src0 moves HL->BC first and the low half
+       comes back BC->HL. DE is READ, not written, so its cache survives; HL
+       and BC do not. `ld bc,hl` is one byte on r4k/r6k, the two-move
+       synthetic on r2ka/r3k. load_binop_operands widens a byte operand to a
+       word on the way in, which is what makes the 16x16 form correct for it. */
+    if (IS_RABBIT()) {
+        load_binop_operands(out, f, op);        /* HL = src0, DE = src1 */
+        /* BC is the multiplicand register, so a resident BC tenant has to be
+           saved across the op — the same bracket the z80n barrel shifts use for
+           their B counter. Without it a BC word home is silently destroyed and
+           its next read hits the require_slot abort. */
+        int bc_live = (L.rs.bc >= 0);
+        if (bc_live) emit(out, "push\tbc");
+        emit_hl_to_bc(out);
+        emit(out, "mul");
+        emit_bc_to_hl(out);
+        if (bc_live) emit(out, "pop\tbc");
+        else invalidate_bc_cache();
+        invalidate_hl_keep_de();                /* mul READS DE, never writes it */
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
+
     if (f->vregs[op->src[0]].width == 2) {
         /* kc160 16x16 -> low 16. */
         load_binop_operands(out, f, op);        /* HL = src0, DE = src1 */

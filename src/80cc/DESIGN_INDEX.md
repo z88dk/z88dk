@@ -4,13 +4,41 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 2026-09-15. Keep it short: when a section stops describing what is
+Last swept: 2026-09-16. Keep it short: when a section stops describing what is
 live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
-**Last swept 2026-09-15.** The simplification is finished, the residency arc is
-closed, and the documentation backlog is cleared. What follows is the handover.
+**Last swept 2026-09-16.** The simplification is finished, the residency arc is
+closed, and the documentation backlog is cleared. Vein 1 below paid again —
+a Rabbit store-reload fold, ADR 0075, **−138 B / −0.105 %, nothing larger** —
+and left **one live question**, below. What follows is the handover.
+
+### The live question: why does call-free cost listbench an IY home?
+
+Inlining Rabbit's multiply (ADR 0075, opt-in `IR_RABBIT_MUL=1`) measures
+**−721 B and −1.568 %** and would ship today but for one bench: listbench loses
+**+10..13 %** on every Rabbit in both frame modes. The cause is identified, not
+guessed. Removing the call makes the function **call-free**, a different set of
+proposers runs, and `IR_HOMEMAP` shows `v0 phys=IY home=[0,101]` before and
+spilled after.
+
+**Traced, and it is an ordering bug.** `idx2_home_available` returns 1 as soon
+as the function is call-free, which admits the `RC_DE_ACC` pool; that pool takes
+v0 (`idxben=251`, the best IY candidate in the function) before the IY
+accumulator pack runs, so the pack skips it and settles for v3 (`idxben=46`).
+DE cannot hold a value live across the whole function, so v0 is spilled anyway —
+the pool took what it could not realise and denied it to the register that
+could. `IR_RABBIT_MUL=1 IR_OFF=word-resident` restores the helper build's pick
+exactly, which is the proof.
+
+**The next action is that fix**: make `RC_DE_ACC` decline a candidate whose
+`idxben` beats its own realisable benefit, or arbitrate the two pools together
+instead of in sequence. `interval_benefit(..., GR_IX)` already supplies the
+comparison — it is what `IR_RANKDUMP` prints as `idxben`. Not a cost term: two
+pools that never compare. Then re-run the 180-cell Rabbit matrix with
+`IR_RABBIT_MUL=1` and expect listbench's +10..13 % to go, flipping a measured
+−1.568 % on by changing one default. ADR 0075.
 
 ### What closed, and why it will not reopen
 
@@ -43,14 +71,37 @@ population, and `IR_PAIRPROBE` taught the same lesson before it.
 
 ### The four veins worth digging, in order
 
-**1. Sweep the remaining CPUs for un-mined instructions.** *Cheapest, and the
-only thing that paid outright today.* Diff each CPU's declared capabilities
-against what the lowerer actually emits. That method found LDSI on 8085 —
-**−366 B and −0.95 % ticks, nothing larger or slower** (ADR 0039) — in an
-afternoon. Only 8085 and gbz80 have been swept. **z180 (`mlt`), z80n (`mul`),
-rabbit, ez80 (`lea`) and kc160 have never been.** Start from the `CPU_HAS_*`
-macros in `define.h`: five are never consulted by the backend, four of them
-KR580VM1-only.
+**1. Finish the CPU sweep. It has now paid twice, and it is still the cheapest
+thing here.** Diff each CPU's declared instruction set against what the lowerer
+emits. Do it from `src/z80asm/dev/cpu/opcodes.dat` — the authoritative
+asm/CPU/synth table — against a full-corpus asm dump per CPU, *not* from the
+`CPU_HAS_*` macros, which cover only a fraction of each ISA. Beware the Intel
+spellings in that table: `ldsi` and `ld de,sp+n` are separate rows for the same
+opcode, so a mnemonic-level diff reports shipped instructions as un-mined.
+
+Found so far: **LDSI on 8085** (ADR 0039, −366 B / −0.95 %) and a **Rabbit
+store-reload fold** (ADR 0075, −138 B / −0.105 %, 0 larger).
+
+**Size a find before believing it.** The second started as "Rabbit never emits
+its `mul`", which was false — `l_mult` on Rabbit *is* `ld bc,hl; mul; ld hl,bc;
+ret`, and the comment that looked like a bug was correct. **Read the helper the
+call actually reaches, on that CPU, before concluding an instruction is
+unused.** What was really wrong was cheaper and more general: the call is an
+opaque clobber, so the product went through a frame slot and was read straight
+back, and the `#R2`/`#G1`/`#S1` fold family had no member matching Rabbit's
+one-instruction `ld (sp+N),hl`. **Check that family for other gaps** — it is
+per-addressing-form, so every CPU with its own slot spelling needs its own.
+
+Swept and clean: **vm1** (all four `CPU_HAS_*` consulted), **gbz80** (already
+emits its specials heavily), **rabbit**. Left, with corpus sizings:
+
+| | |
+|---|---|
+| ez80 `lea hl,ix+d` | 196 fp-mode `ld hl,N; add hl,sp` pairs remain; 3 bytes against 4. Already used at the two `emit_*_slot_addr` sites *only* |
+| 8085 `ld de,hl+n` (LDHI) | 64 `ld de,N; add hl,de` sites; 2 bytes against 4 — LDSI's sibling, same shape as ADR 0039 |
+| z80n `add hl,a` / `add de,a` / `add bc,a` | 48 byte-widen-then-add pairs; 2 bytes against 5. Also `add hl,nn` (4 bytes, and it preserves DE) |
+| z180 / ez80 `tst` | a flag-only `and` that preserves A — not yet sized |
+| kc160 `div hl,a` / `div dehl,bc` / `divs` | hardware divide, never emitted; only 6 helper-call sites in this corpus, so size it on a real file before building |
 
 **2. Zero-extension.** The one *consistent* gap against ez80clang. On int and
 byte code 80cc is level or ahead; on 32-bit it loses to helper calls; and
@@ -94,6 +145,19 @@ counters before building.
 * **Attribute before you believe.** `strbench`'s −4.5 % was reported here as the
   tight-homes flip; bisection showed it was `41d2e40dae` (BC step-param), landed
   days earlier. If a bench moves, bisect it.
+* **`make -j` on `long_ir` garbles the log.** Concurrent writes interleave
+  mid-line, so the summed run count is nondeterministic and *under*-counts: 712
+  and 728 on two runs of an identical 376-target binary set, against a true 739
+  serially. Take the pass count from a **serial** run or it is fiction.
+* **A failed compile in the size scan reports its neighbour's size.** The scan
+  writes every object to one `/tmp` path, so a compile that fails leaves the
+  previous file's `.o` in place. That is what "structbench 375 -> 750" was: not a
+  regression, a stale object. A doubled figure is a symptom, not a discovery.
+* **copt is invisible to every dump you have.** The compiler's own asm can be
+  correct at every stage and `zcc -a` still be wrong — that is how ADR 0075's
+  `pop bc` went missing. Diff `z88dk-80cc` direct output against `zcc -a` before
+  opening a backend pass. This trap was already written down and still cost an
+  hour.
 * Building an old commit needs `src/config.h` and the `ext/uthash` submodule
   copied into the worktree — a fresh `git worktree` gets neither.
 
@@ -107,10 +171,9 @@ the counter's initial value has to shift by one. Scope it to pure trip counters
 and **measure what fraction of the 236 qualify before building**.
 
 A survey of all 14 `CPU_HAS_*` macros found five the backend never consults;
-the other four are KR580VM1-only. gbz80 was checked at the same time and is
-**not** a candidate — it already emits its specials heavily (`ld hl,sp+N` 2897x,
-`ld a,(hl+)` 1633x, `add sp,N` 890x). Sweeping the remaining CPUs the same way
-is cheap and is how ADR 0039 was found.
+the other four are KR580VM1-only. That survey is **not** the sweep — the macros
+cover a fraction of each ISA, and ADR 0075's `mul` was not among them. The sweep
+is vein 1 above: `opcodes.dat` against a corpus asm dump.
 
 **Give the shipped optimisations ADRs, then trim their comments — DONE.**
 34 features documented (ADR 0039-0074), ~240 lines of comment removed, output
@@ -154,7 +217,7 @@ promote it or delete it.
 
 ## Opt-outs
 
-One registry of 115 names, each described in `OPTIONS.md`. Two front doors:
+One registry of 118 names, each described in `OPTIONS.md`. Two front doors:
 
     --opt-disable=name,name     a compiler flag, for a user
     IR_OFF=name,name            the same registry, for a measurement
@@ -165,7 +228,7 @@ documented name no longer exists.
 
 ## Surviving gates
 
-58 remain. A gate needs a row here or it is deleted.
+59 remain. A gate needs a row here or it is deleted.
 
 ### Verifiers — permanent, never swept
 
@@ -209,6 +272,12 @@ miscompiled), `IR_JR_UNCOND` (ADR 0033), `IR_TRIPW` (ADR 0028), `IR_INPLACE_MASK
 and `IR_INPLACE_CMP`, `IR_OPRES` (ADR 0018), `IR_NO_A_CARRY`, `IR_FLIPCOST`,
 `IR_SPINC`, `IR_SPEXCL`, `IR_REHOME`. Cost correctness (ADR 0032) shipped;
 `IR_GBZ80_MASK` remains as the bisection tool for future gbz80 work.
+
+### Parked, measured, waiting on one answer
+
+| Gate | What it does | Flip it on when |
+| --- | --- | --- |
+| `IR_RABBIT_MUL` | inlines Rabbit's `mul` instead of calling `l_mult`: −721 B, −1.568 %, but listbench +10..13 % (ADR 0075) | the call-free IY re-pick above is understood |
 
 ### Numeric knobs — a category with no home
 

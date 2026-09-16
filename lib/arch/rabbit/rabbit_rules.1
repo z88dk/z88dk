@@ -163,6 +163,25 @@
 =
 	and	hl,de
 
+;; A word stored to a frame slot and read straight back: HL already holds the
+;; value, so the reload is dead (-3b, -9t). The Rabbit analogue of #R2/#G1/#S1 in
+;; 80cc_rules.1 — those match the multi-instruction sp-relative address forms
+;; (`ld hl,N; add hl,sp` / gbz80's `ld hl,sp+N`) and cannot see Rabbit's
+;; one-instruction `ld (sp+N),hl`. sp mode only; fp mode uses (ix+d) and is
+;; already covered by #R4. A volatile store/load carries a ;volatile stamp and
+;; so does not match this literal text.
+%notcompiler sccz80
+	ld	(sp+%1),hl
+	ld	hl,(sp+%1)
+=
+	ld	(sp+%1),hl
+
+;; Replace TOS with HL. Sound only when the popped BC is DEAD — the rule reads
+;; `pop bc` as sccz80's discard-TOS idiom, not as a restore. 80cc emits a real
+;; `push bc` / `pop bc` bracket around Rabbit's `mul` (BC is the multiplicand),
+;; and there the pop restores a LIVE register home; folding it away corrupts the
+;; saved value and the stack slot both. See adr/0075.
+%notcompiler 80cc
 	pop	bc
 	push	hl
 =

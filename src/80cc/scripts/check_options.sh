@@ -2,7 +2,7 @@
 # OPTIONS.md must describe every --opt-disable / IR_OFF name, and no others.
 # The AST names are a separate bitmask in main.c, listed there.
 cd "$(dirname "$0")/.." || exit 2        # run against src/80cc, not scripts/
-code=$(grep -rhoE 'opt_disabled\("[a-z0-9-]+"\)' ir_alloc.c ir_lower.c ir_opt.c ir_slots.c \
+code=$(grep -rhoE 'opt_disabled\("[a-z0-9-]+"\)' ir_alloc.c ir_build.c ir_lower.c ir_opt.c ir_slots.c \
         ast_opt.c ./*.inc.c 2>/dev/null | sed 's/.*("//;s/").*//' | LC_ALL=C sort -u)
 doc=$(grep -oE '^\| `[a-z0-9-]+`' OPTIONS.md | tr -d '|` ' | LC_ALL=C sort -u)
 rc=0

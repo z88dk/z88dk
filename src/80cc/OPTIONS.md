@@ -163,6 +163,7 @@ exists (ADR 0010).
 | `idx-fill` | an index home is filled with a load pair rather than one ez80 instruction |
 | `fclong-carry` | a long fastcall result is not carried in registers |
 | `f32-stack-arg` | a float argument is not passed on the stack |
+| `narrow-mul` | `(unsigned long)u16 * u16` widens both operands to 32 bits instead of taking the 16x16->32 helper |
 | `autopush-param` | a param is stashed across frame allocation instead of becoming a top-of-frame slot |
 | `depark` | no unparking of a value held in E or D alone |
 
