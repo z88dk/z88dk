@@ -21,8 +21,8 @@ diff is blind in both directions — `add` is emitted as `add hl,de` while
 
 ## Decision — three refusals and one re-aim
 
-**1. ez80 `lea hl,ix+d`. NOT refused — re-aimed, and it is the one item of
-this vein still open.** The first reading here was that `lea` cannot help,
+**1. ez80 `lea hl,ix+d`. NOT refused — re-aimed, and SHIPPED in ADR 0081,
+which supersedes this row.** The first reading here was that `lea` cannot help,
 because every `lea` form in `opcodes.dat` bases on **IX or IY** (ED 22 /
 ED 23 …) and there is no SP-relative `lea`. That much is true, and so is the
 observation that the IX-based formations are already done — the corpus holds
@@ -50,7 +50,7 @@ Classifying all 196 fp-mode sites on ez80 says how much is there:
 in-place long shift (`srl (hl)`; `ir_lower_cmp.inc.c`) and the rest scattered.
 
 The attempt made here **failed and was removed**, and the reason is the useful
-part: the lea path was added to `emit_slot_addr_off`, the *general* slot-address
+part — ADR 0081 is the one that worked: the lea path was added to `emit_slot_addr_off`, the *general* slot-address
 materialiser in `ir_lower_analysis.inc.c`, where it fired **zero** times.
 Those 101 sites do not go through it. They are **hand-rolled** `emit(out,
 "ld\thl,%d", slot_off(...) + L.cur_sp_adjust); emit(out, "add\thl,sp")` pairs
@@ -94,11 +94,12 @@ preservation they offer is unwanted (4 park deletions, all in one function, for
 
 ## Consequences
 
-Vein 1 is closed **except for item 1**, the ez80 fp-mode address formation,
-which is sized (~167 bytes), located (one helper plus a handful of hand-rolled
-emit sites) and left as a discrete piece of work. What the vein produced across
-its lifetime: five shipped optimisations (ADR 0039, 0075, 0077, 0078, 0080) and
-three documented refusals, against a method that costs about an hour per CPU.
+Vein 1 is **closed**. Item 1 shipped as ADR 0081 (−92 B on ez80, and it needed
+a copt rule to move with it). What the vein produced across its lifetime: six
+shipped optimisations (ADR 0039, 0075, 0077, 0078, 0080, 0081), three
+documented refusals and — via ADR 0081's regression test — one long-standing
+silent miscompile (ADR 0082), against a method that costs about an hour per
+CPU.
 
 Still un-emitted after the sweep, and deliberately: `pea` (ez80), `neg`, `rlc`
 / `rrc` and `set` (the corpus has no memory bit-set site; `res` and `bit` are
