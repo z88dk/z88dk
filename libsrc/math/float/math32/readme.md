@@ -8,7 +8,7 @@ This library is designed for z180 (eZ80), z80n, and Rabbit 2000 / 3000 processor
 
 The library is also designed to be as fast as possible on plain Z80, using a `32_24×8` basis multiply.
 
-Intel 8080, 8085, and gbz80 have separate stack-based cores (`math32_8080.lib`, `math32_8085.lib`, `math32_gbz80.lib`). Those builds do not use the alternate register set or index registers. Higher-level C helpers for 8080, 8085, and gbz80 are built with **sccz80 only** (zsdcc is Z80-only).
+Intel 8080, 8085, KR580VM1, and gbz80 have separate stack-based cores (`math32_8080.lib`, `math32_8085.lib`, `math32_vm1.lib`, `math32_gbz80.lib`). Those builds do not use the alternate register set or index registers. Higher-level C helpers for 8080, 8085, vm1, and gbz80 are built with **sccz80 only** (zsdcc is Z80-only).
 
 *@feilipu, May 2019 – September 2026*
 
@@ -18,8 +18,8 @@ Intel 8080, 8085, and gbz80 have separate stack-based cores (`math32_8080.lib`, 
 
 - All intrinsic functions are written in assembly.
 - All the code is re-entrant.
-- Register use on the Z80-family cores is limited to the main and alternate set (including `af'`). No index registers. The 8080, 8085, and gbz80 cores use the main register set and the stack only.
-- Made for the Spectrum Next (z80n) and Agon Lite (eZ80). The z80n `mul de`, the z180 (eZ80) `mlt`, and the Rabbit `mul` instructions accelerate floating-point calculation. Full support also covers Zilog Z80 and variants, Digi Rabbit processors, Intel 8080 and 8085, and the Nintendo Game Boy CPU (gbz80).
+- Register use on the Z80-family cores is limited to the main and alternate set (including `af'`). No index registers. The 8080, 8085, vm1, and gbz80 cores use the main register set and the stack only. vm1 never `pop af` of unknown contents (MF selects the data RAM bank).
+- Made for the Spectrum Next (z80n) and Agon Lite (eZ80). The z80n `mul de`, the z180 (eZ80) `mlt`, and the Rabbit `mul` instructions accelerate floating-point calculation. Full support also covers Zilog Z80 and variants, Digi Rabbit processors, Intel 8080 and 8085, the KR580VM1, and the Nintendo Game Boy CPU (gbz80).
 - Mantissa work uses 24 bits plus 8 bits for rounding. Product paths (mul, sqr, div, poly, invsqrt / sqrt) use IEEE-754 round-to-nearest-even (RNE) on the residual byte. Addition / subtraction use jam-sticky on lost bits, which gives better accuracy on repeated additions.
 - Derived functions use a full 32-bit internal mantissa path, without mid-path rounding, for maximum accuracy when many multiplies and adds are required (Horner / Newton–Raphson). That is equivalent to a fused 32-bit multiply-add process, with the rounded IEEE-754 mantissa produced as the final result.
 - Where no hardware multiply is available, software multiply uses a `32_24×8` unrolled algorithm. The dedicated square kernel is separate: five `16_8×8` products, matching the z80n / z180 square layout.
@@ -42,6 +42,7 @@ Intel 8080, 8085, and gbz80 have separate stack-based cores (`math32_8080.lib`, 
 | `math32_kc160.lib` | KC160 | KC160 multiply helpers |
 | `math32_8085.lib` | 8085 | stack-only software |
 | `math32_8080.lib` | 8080 | stack-only software |
+| `math32_vm1.lib` | KR580VM1 | stack-only software (LHLX/SHLX/DSUB/DCMP) |
 | `math32_gbz80.lib` | Game Boy (gbz80) | stack-only software |
 
 **eZ80 note.** eZ80 Z80-mode has the same `mlt` encodings as Z180 (`ED 4C/5C/6C/7C`). `math32_ez80_z80.lib` is built from `newlibfiles_ez80_z80.lst`, which selects the Z180 mantissa helpers. Those helpers are gated `IF __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__` (`-mez80_z80` defines `__CPU_EZ80_Z80__`, not `__CPU_EZ80__`).
@@ -170,7 +171,7 @@ LHS STACK - RHS DEHL -> RETURN DEHL
 ; uses  : af, bc, de, hl, af', bc', de', hl'   (Z80-family)
 ```
 
-On 8080 / 8085 / gbz80 the same DEHL / stack contract applies, but the cores do not use the alternate set. Multi-arg sccz80 callee bridges that must not `pop af` a float word use `IF __CPU_INTEL__ | __CPU_GBZ80__` (AF-safe left-rotate).
+On 8080 / 8085 / vm1 / gbz80 the same DEHL / stack contract applies, but the cores do not use the alternate set. Multi-arg sccz80 callee bridges that must not `pop af` a float word use `IF __CPU_INTEL__ | __CPU_GBZ80__` (AF-safe left-rotate). vm1 is `__CPU_INTEL__` and additionally forbids unknown `pop af` because F bit 3 loads MF.
 
 ---
 
@@ -180,7 +181,7 @@ Where not written for z88dk, functions were sourced from Digi International, Cep
 
 Although some Digi algorithms remain visible in the intrinsic path, the cores have been rewritten to exploit z180 and z80n 8-bit multiply hardware, rather than the 16-bit multiply of Rabbit processors. The relationship is one of descent only — like West Side Story and Romeo and Juliet.
 
-**Normalisation** is now a separate design on every CPU. The path is byte alignment first, then a residual bit loop, then pack into `DEHL`. Z80-family and 8080 / 8085 / gbz80 share that strategy with ISA-specific shifts.
+**Normalisation** is now a separate design on every CPU. The path is byte alignment first, then a residual bit loop, then pack into `DEHL`. Z80-family and 8080 / 8085 / vm1 / gbz80 share that strategy with ISA-specific shifts.
 
 **Addition / subtraction** still use a nybble / byte shift tree in Digi spirit. As add and subtract rely heavily on bit shifting across the mantissa, the functions establish a tree of byte and nybble shifting for performance. Nybble shifting is native on Rabbit, and the same plan works well on Z80 with little overhead. Lost bits use **jam-sticky**: any bit shifted out sets the kept mantissa LSB. Pack does not apply residual RNE on add / sub.
 
@@ -255,7 +256,7 @@ float inv (float x);
 | `div` / `m32_fsdiv` | Restoring 24-bit mantissa divide, RNE on the guard |
 | `inv` / `m32_fsinv` | Newton–Raphson with wide multiplies |
 
-The z80-family, 8085, 8080, and gbz80 divide cores share the same control structure. The z80 core keeps rem and divisor across the main and alternate sets. The 8080 / 8085 / gbz80 cores keep rem in `DEHL`, the bit count in `B`, and the 3-byte divisor on a short stack frame.
+The z80-family, 8085, 8080, vm1, and gbz80 divide cores share the same control structure. The z80 core keeps rem and divisor across the main and alternate sets. The 8080 / 8085 / vm1 / gbz80 cores keep rem in `DEHL`, the bit count in `B`, and the 3-byte divisor on a short stack frame.
 
 For plain `1/n`, restoring `div` is the faster path on the measured CPUs. Explicit `inv(x)` calls the NR inverse. sccz80 does not rewrite IEEE `1.0f/x` into `inv`.
 
@@ -328,18 +329,19 @@ The library is laid out as shared assembly, CPU-specific cores, C sources, and c
 
 | Path | Role |
 |------|------|
-| `asm/` | Shared **8080-compatible** assembly: coefficient tables, float constants, util/load/error, and cores identical on 8080 / 8085 / gbz80 (and on Z80 when the encoding matches). No Z80-only or 8085-only instructions. Listed by `newlibfiles_common_asm.lst`. |
+| `asm/` | Shared **8080-compatible** assembly: coefficient tables, float constants, util/load/error, and cores identical on 8080 / 8085 / vm1 / gbz80 (and on Z80 when the encoding matches). No Z80-only or 8085-only instructions. Listed by `newlibfiles_common_asm.lst`. |
 | `asm/z80/` | Z80-family intrinsic cores. Uses the alternate register set. Also holds CPU mantissa helpers (`f32_z80_*`, `f32_z80n_*`, `f32_z180_*`, `f32_r2ka_*`, `f32_kc160_*`). |
 | `asm/8085/` | 8085 cores (extended opcodes, stack locals, no alternate registers). Includes CPU-specific `f32_f2long` and `f32_l_ldexp`. |
 | `asm/8080/` | 8080 cores (original ISA, stack locals, `ld hl,sp+n`, cheap synthetics only). `f32_f2long` / `f32_l_ldexp` are still the portable copies. |
+| `asm/vm1/` | KR580VM1 cores (8080 frame, no unknown `pop af`, no 8085 LDSI/RDEL). Opt uses `ld hl,(de)` / `ld (de),hl` / `sub hl,de` / `cp hl,de`. |
 | `asm/gbz80/` | Game Boy cores. Same stack-only contract. Prefer `ld hl,sp+*`, `ld a,(hl+)`, CB shifts, and `jr`. Leading-one tests use `bit 7`. Includes CPU-specific `f32_f2long` and `f32_l_ldexp`. |
 | `c/` | Higher-function C sources. |
 | `c/z80/` | Precompiled Z80-family higher functions (SDCC). |
-| `c/8085/`, `c/8080/`, `c/gbz80/` | Precompiled with **sccz80** (`make -C c 8085` / `8080` / `gbz80`). |
+| `c/8085/`, `c/8080/`, `c/gbz80/`, `c/vm1/` | Precompiled with **sccz80** (`make -C c 8085` / `8080` / `gbz80` / `vm1`). |
 | `c/sdcc/`, `c/sccz80/` | Compiler bridges and float conversions. |
 | `lm32/` | Standard-name aliases into math32 (`-lmath32` / `--math32`). |
 | `newlibfiles_*.lst` | Classic product assemble lists (`make` in this directory). |
-| `math32_z80_common_asm.lst`, `math32_z80_asm.lst`, `math32_z80n_asm.lst`, `math32_z180_asm.lst` | Newlib clib embed (`math_float_sccz80*.lst` / `math_float_sdcc_ix*.lst`). There is no 8085/8080/gbz80 newlib math32 clib. |
+| `math32_z80_common_asm.lst`, `math32_z80_asm.lst`, `math32_z80n_asm.lst`, `math32_z180_asm.lst` | Newlib clib embed (`math_float_sccz80*.lst` / `math_float_sdcc_ix*.lst`). There is no 8085/8080/gbz80/vm1 newlib math32 clib. |
 
 One major operation per assembly file. Rebuild with `make -C libsrc/math/float/math32`, then install the `math32*.lib` products into `lib/clibs/`.
 

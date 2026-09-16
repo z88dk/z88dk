@@ -4,12 +4,13 @@
 # 8085: sccz80 only → 8085/  (listed by newlibfiles_8085.lst)
 #       Same pattern as am9511/c/Makefile — do not use zsdcc/SDCC for 8085.
 # 8080: sccz80 only → 8080/
+# vm1:  sccz80 only → vm1/
 
 CFILES = $(wildcard *.c)
 AFILES = $(CFILES:.c=.asm)
 CFLAGS += -I.
 
-.PHONY: all z80 8085 8080 gbz80 clean
+.PHONY: all z80 8085 8080 gbz80 vm1 clean
 
 all: $(addprefix z80/,$(AFILES))
 
@@ -50,8 +51,22 @@ gbz80/%.asm: %.c
 	zcc +test -clib=gbz80 -compiler=sccz80 -fp-mode=ieee -D__MATH_MATH32 \
 	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
 
+# vm1 higher functions: sccz80 only (zsdcc is Z80-only)
+# ftog.asm is the PUBLIC ftog = _ftog alias (same as 8080/8085/gbz80);
+# do not overwrite it with sccz80 -a of ftog.c.
+CFILESVM1 = $(filter-out ftog.c,$(wildcard *.c))
+AFILESVM1 = $(CFILESVM1:.c=.asm)
+
+vm1: $(addprefix vm1/,$(AFILESVM1))
+
+vm1/%.asm: %.c
+	@mkdir -p vm1
+	zcc +test -clib=vm1 -compiler=sccz80 -fp-mode=ieee -D__MATH_MATH32 \
+	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
+
 clean:
 	$(RM) z80/*.asm z80/*.err zcc_opt.def
 	$(RM) $(addprefix 8085/,$(AFILES8085)) 8085/*.err
 	$(RM) $(addprefix 8080/,$(AFILES8080)) 8080/*.err
 	$(RM) $(addprefix gbz80/,$(AFILESGBZ80)) gbz80/*.err
+	$(RM) $(addprefix vm1/,$(AFILESVM1)) vm1/*.err

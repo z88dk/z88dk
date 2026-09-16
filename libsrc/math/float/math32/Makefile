@@ -8,6 +8,7 @@ vpath %.c ../cimpl
 
 # Shared dtoa helpers only (same idea as am9511).
 # 8085 higher funcs: sccz80 via `make -C c 8085` → c/8085/*.asm in newlibfiles_8085.lst
+# vm1 higher funcs: sccz80 via `make -C c vm1` → c/vm1/*.asm in newlibfiles_vm1.lst
 # Z80 higher funcs: SDCC via `make -C c` → c/z80/*.asm in newlibfiles_z80.lst
 CFILES  = $(notdir $(wildcard ../../math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
 CFILES  = atof.c ftoa.c ftoe.c ftog.c tofix16.c fromfix16.c
@@ -31,7 +32,8 @@ all: $(OUTPUT_DIRECTORY)/math32.lib \
 	$(OUTPUT_DIRECTORY)/math32_kc160.lib \
 	$(OUTPUT_DIRECTORY)/math32_8085.lib \
 	$(OUTPUT_DIRECTORY)/math32_8080.lib \
-	$(OUTPUT_DIRECTORY)/math32_gbz80.lib
+	$(OUTPUT_DIRECTORY)/math32_gbz80.lib \
+	$(OUTPUT_DIRECTORY)/math32_vm1.lib
 
 $(OUTPUT_DIRECTORY)/math32.lib: $(addprefix obj/z80/, $(OBJECTS_LM32_TEXT))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80/x/x/x  -I.. -mz80 -D__CLASSIC @newlibfiles_z80.lst
@@ -87,12 +89,16 @@ $(OUTPUT_DIRECTORY)/math32_gbz80.lib: $(addprefix obj/gbz80/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/gbz80/x/x/x -I.. -mgbz80 -D__CLASSIC @newlibfiles_gbz80.lst
 	TYPE=gbz80 $(LIBLINKER) -mgbz80 -x$(OUTPUT_DIRECTORY)/math32_gbz80 @math32.lst
 
+$(OUTPUT_DIRECTORY)/math32_vm1.lib: $(addprefix obj/vm1/, $(OBJECTS))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/vm1/x/x/x -I.. -mvm1 -D__CLASSIC @newlibfiles_vm1.lst
+	TYPE=vm1 $(LIBLINKER) -mvm1 -x$(OUTPUT_DIRECTORY)/math32_vm1 @math32.lst
+
 # Order-only: dirs must finish before any object compiles. See Make.config.
-$(foreach d,8080 8085 gbz80,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
+$(foreach d,8080 8085 gbz80 vm1,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 $(foreach d,z80 z80n z180 ez80_z80 r2ka r4k r6k kc160 ixiy,$(addprefix obj/$(d)/,$(OBJECTS_LM32_TEXT))): | dirs
 
 dirs:
-	$(Q)mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c obj/8080/c obj/gbz80/c obj/r6k/c
+	$(Q)mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c obj/8080/c obj/gbz80/c obj/vm1/c obj/r6k/c
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt config_private.inc

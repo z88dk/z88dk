@@ -2,9 +2,9 @@
 name: library-math32
 description: >
   math32 IEEE single float library: multi-CPU layout (asm/z80, asm/8085,
-  asm/8080, asm/gbz80), products math32*.lib including ez80_z80 / gbz80,
-  rounding policy, div=restoring / inv=NR, force rebuild. Use when editing
-  libsrc/math/float/math32 or A/B float divide/mul.
+  asm/8080, asm/vm1, asm/gbz80), products math32*.lib including ez80_z80 /
+  gbz80 / vm1, rounding policy, div=restoring / inv=NR, force rebuild. Use
+  when editing libsrc/math/float/math32 or A/B float divide/mul.
 ---
 
 # Library — math32
@@ -15,10 +15,10 @@ Link via **`--math32`** (`-lmath32@{ZCC_LIBCPU}`).
 ## 0b. Math32 multi-CPU float library (layout + policy)
 
 Home: `libsrc/math/float/math32/`. Products: `math32.lib` (plain z80) plus
-`math32_{z80n,z180,ez80_z80,r2ka,kc160,8085,8080,gbz80,…}.lib`. Link via
+`math32_{z80n,z180,ez80_z80,r2ka,kc160,8085,8080,vm1,gbz80,…}.lib`. Link via
 **`--math32`** (`-lmath32@{ZCC_LIBCPU}` — e.g. 8085 → `math32_8085`, 8080 →
-`math32_8080`, gbz80 → `math32_gbz80`, ez80_z80 → `math32_ez80_z80`; no
-separate `--math32_8085` flag).
+`math32_8080`, vm1 → `math32_vm1`, gbz80 → `math32_gbz80`, ez80_z80 →
+`math32_ez80_z80`; no separate `--math32_8085` flag).
 
 ### Layout
 
@@ -28,10 +28,11 @@ separate `--math32_8085` flag).
 | `asm/z80/` | Z80-family cores; shared by z80n/z180/ez80_z80/r2ka/… when the lst points here |
 | `asm/8085/` | Stack-only 8085 cores (no EXX / IX / IY); extended opcodes + synthetics. After `rl de`, test exp with `inc d`/`dec d` — RDEL does not write Z. CPU-specific `f32_f2long` / `f32_l_ldexp` |
 | `asm/8080/` | Stack-only 8080 cores (original ISA; no 8085 extras). `ld hl,sp+n`; park HL. `f32_f2long` / `f32_l_ldexp` still portable copies |
+| `asm/vm1/` | Stack-only KR580VM1 cores (8080 frame; no unknown `pop af`; no 8085 LDSI/RDEL). `math32_vm1.lib` |
 | `asm/gbz80/` | Stack-only Game Boy cores (`ld hl,sp+*`, `bit 7` leading-one; no cheap `ex`). CPU-specific `f32_f2long` / `f32_l_ldexp` |
-| `c/z80/`, `c/8085/`, `c/8080/`, `c/gbz80/` | Higher functions (C → precompiled asm); 8080/8085/gbz80 higher via **sccz80 only** |
+| `c/z80/`, `c/8085/`, `c/8080/`, `c/gbz80/`, `c/vm1/` | Higher functions (C → precompiled asm); 8080/8085/gbz80/vm1 higher via **sccz80 only** |
 | `newlibfiles_*.lst` | Classic products (`newlibfiles_ez80_z80.lst`, `newlibfiles_gbz80.lst`, …) |
-| `math32_z80_common_asm.lst` + `math32_{z80,z80n,z180}_asm.lst` | Newlib clib embed only. No 8085/8080/gbz80 newlib math32 list |
+| `math32_z80_common_asm.lst` + `math32_{z80,z80n,z180}_asm.lst` | Newlib clib embed only. No 8085/8080/gbz80/vm1 newlib math32 list |
 
 **CPU-specific** = same *operation* name, different ISA file (same one-op-per-file
 map as §0). Do not invent a second taxonomy for 8085 / gbz80.
@@ -135,6 +136,7 @@ remeasure both products after header fixes.
 Z80 higher funcs: `make -C libsrc/math/float/math32/c` → `c/z80/*.asm` (SDCC).
 8085: `make -C …/c 8085` → `c/8085/*.asm` (sccz80 only).
 8080: `make -C …/c 8080` → `c/8080/*.asm` (sccz80 only).
+vm1: `make -C …/c vm1` → `c/vm1/*.asm` (sccz80 only).
 gbz80: `make -C …/c gbz80` → `c/gbz80/*.asm` (sccz80 only). **`make clean`** must
 only remove C-derived objects — never wipe hand-written peers in the same dir
 (math16: keep `cm16_sccz80_*.asm` under `c/8085/`).
@@ -194,7 +196,7 @@ For eZ80: `z88dk-z80nm lib/clibs/math32_ez80_z80.lib | rg 'm32_mulu_32h|f32_z180
 - Half float: `library-math16`
 - Measure / A/B: `methodology-measure`
 - Newlib headers (math remaps): `library-newlib` · edit **proto** then regenerate
-- 8085 cores: `cpu-8085` · 8080: `cpu-8080` · gbz80: `cpu-gbz80`
+- 8085 cores: `cpu-8085` · 8080: `cpu-8080` · vm1: `cpu-vm1` · gbz80: `cpu-gbz80`
 - Z180 / eZ80 Z80-mode `mlt`: `cpu-z180`
 - Issue class: z88dk **#3061** (classic vs newlib Whetstone)
-- Suite: `test/suites/math` (`test_math32*.bin`, including `test_math32_ez80_z80.bin`)
+- Suite: `test/suites/math` (`test_math32*.bin`, including `test_math32_ez80_z80.bin`, `test_math32_vm1.bin`)
