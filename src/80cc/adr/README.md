@@ -52,6 +52,8 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0053](0053-narrow-a-constant-shift-to-the-bytes-that-survive.md) | **Accepted** — narrow a width-4 constant shift to the bytes a CONV_TRUNC keeps; −257 B, none larger |
 | [0052](0052-fold-an-offset-into-a-rematerialised-symbol.md) | **Accepted** — fold a field offset into a rematerialised `&symbol`; 7 B becomes 3 |
 | [0074](0074-the-gameboy-has-no-ex-de-hl.md) | **Accepted** — the in-place rewrite is excluded on gbz80: no `ex de,hl`, and both firing benches are better without it |
+| [0075](0075-the-rabbit-multiply-is-a-call-not-a-loop.md) | **Accepted** (copt fold) — Rabbit's `l_mult` IS already `mul`; the cost is the CALL. A store-reload fold ships; inlining the multiply was measured and **withdrawn** |
+| [0076](0076-the-iy-pack-cannot-be-arbitrated-against-the-pools.md) | **Refused** ×3 — `RC_DE_ACC`/`RC_IDX2` vs `ir_iy_reduction_pack`: `idx_ben` is the same unit but a different model, and a late home cannot survive the word-home revert |
 | [0073](0073-ask-slot-off-not-the-spill-slot.md) | **Accepted** — ask `slot_off`, not `vreg_spill_slot`; the wrong query cost structbench +10.5 % |
 | [0072](0072-the-commutative-swap-is-refused.md) | **Rejected** — the commutative swap in addition resurrects an elided store; md5 −6 % against emu.c +75 B |
 | [0071](0071-the-call-split-eviction-floor.md) | **Accepted** — the eviction floor is magnitude, not ratio; below it the model is inside its own error |

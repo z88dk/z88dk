@@ -10,29 +10,35 @@ live, it belongs in `adr/` or in git history, not here.
 ## Next action
 
 **Last swept 2026-09-16.** The simplification is finished, the residency arc is
-closed, and the documentation backlog is cleared. Vein 1 below paid again —
-a Rabbit store-reload fold, ADR 0075, **−138 B / −0.105 %, nothing larger** —
-and left **one live question**, below. What follows is the handover.
+closed, and the documentation backlog is cleared. Vein 1 below paid again — a
+Rabbit store-reload fold (ADR 0075): **−139 B over 240 cells, 64 smaller, 0
+larger; ticks −0.093 %, 63 faster, 3 slower.** The three slower cells are
+`callbench` fp, and are the copt gate described in ADR 0075 being deliberately
+kept.
 
-### Closed: the Rabbit inline multiply, and why it is gone
+**The next action is vein 1 — finish the CPU sweep.** The list of what is left,
+already sized, is below. Everything else here is context.
+
+### Closed: the Rabbit inline multiply (ADR 0075, ADR 0076)
 
 Inlining Rabbit's multiply instead of calling `l_mult` measured **−721 B and
-−1.568 %** and is **removed**, not parked. It cost listbench **+10..13 %** on
-every Rabbit in both frame modes, and three separate fixes for that failed —
-two of them only *after* measuring as large size wins. `BENCH_MATRIX.txt`
-16/9 has the detail; ADR 0075 has the reasoning.
+−1.568 %** and is **removed**, not parked. It cost `listbench` **+10..13 %** on
+every Rabbit in both frame modes; three fixes for that were built and all three
+refused, **two of them only after measuring as large size wins** (ADR 0076).
 
 It was removed rather than left opt-in because the copt gate protecting its
-`push bc` / `pop bc` bracket cost the **default** build 88000 ticks on
-callbench (+0.32 % sp, +0.29 % fp) — a real price on every build, to guard a
-feature nobody could switch on.
+`push bc` / `pop bc` bracket costs the **default** build 88000 ticks on
+`callbench` — a real price on every build, to guard a feature nobody could
+switch on. That gate is still in `lib/arch/rabbit/rabbit_rules.1` and still
+earns its keep: 80cc emits **288** `push bc … pop bc` restore brackets on Rabbit
+in this corpus, and the rule it guards reads `pop bc` as sccz80's discard-TOS
+idiom — a property of that producer, not of the input.
 
-**To re-derive it** (an hour, if the allocator question below is ever answered):
-ADR 0075 records the lowering, the `mul` semantics and the two hazards it
-carries. **The prerequisite has not changed**: the IY reduction pack's gain has
-no number comparable to the idx2 pool's `idx_ben`, and "a late pass keeps its
-decision across the word-home revert" is unsound by construction — the
-pre-pick snapshot can already name another IY owner.
+**To re-derive the inline** (about an hour): ADR 0075 records the lowering, the
+`mul` semantics and its two hazards. **The prerequisite is in ADR 0076 and has
+not changed** — the IY reduction pack's gain has no number comparable to the
+idx2 pool's `idx_ben`, and a late pass cannot keep its home across the word-home
+revert.
 
 ### The four veins worth digging, in order
 
@@ -93,11 +99,29 @@ emulator support already present. Not a peephole: K sets on −1 not 0, so the
 counter's init must shift by one. Measure what fraction of the 236 are pure trip
 counters before building.
 
-### How to work here — the traps that actually bit, this session
+### How to work here — the traps that actually bit
 
-* **`make && cp && echo BUILT` lies.** It printed BUILT on a failed build and a
-  measurement then ran against a stale binary, reporting a plausible `0/0`. Use
-  the `if make ...; then ... else echo FAILED; fi` form.
+* **`long_ir` FIRST, size second.** −1807 B over 720 cells was reported as a 13x
+  improvement on the day's shipped work; `long_ir` then came back 718/727. A
+  size scan on a compiler that miscompiles is not a weak measurement, it is
+  **noise that looks like a result**, and it persuades precisely because it is
+  large. Never quote a corpus delta before the correctness gate is green in both
+  frame modes.
+* **`make && cp && echo BUILT` lies**, and it is worse than it looks. It printed
+  BUILT on a failed build and a measurement then ran against a stale binary,
+  reporting a plausible `0/0`. Use `if make ...; then ... else echo FAILED; fi`
+  — **and run it from the repo root**: `PREFIX=$(pwd)` makes the working
+  directory load-bearing, so `make -C src/80cc PREFIX=$(pwd)` from `test/suites`
+  fails silently and leaves the old compiler installed. Two rounds of figures
+  came from that. **`md5sum bin/z88dk-80cc` before a scan** and compare it to
+  the build you think you are measuring; two scans of "identical" configurations
+  differing in 59 cells is not scan nondeterminism (the compiler is
+  deterministic — 8 runs, identical md5), it is the wrong binary.
+* **Gate the call sites, not a shared helper.** `opt_disabled()` placed inside
+  `alloc_note_late_home` also disabled the call-split's pre-existing use, so the
+  opt-out did not restore any previous compiler — it broke a working fix,
+  visible as `histbench` 385 -> 431, *the wrong direction*. An opt-out that does
+  not reproduce the old compiler is worse than none, because it is trusted.
 * **Check the units before believing a result.** Pricing a park with
   `g0_word_bytes` against a gain from `interval_benefit_x` (which is
   CYCLE-denominated) reported **145 of 145 sites paying**. In matching units it
@@ -172,7 +196,7 @@ rather than by care. Breaking one is a defect, not a style question.
 | --- | --- |
 | 1. Only `ir_alloc` writes or indexes allocation state (ADR 0034) | `scripts/check_ownership.sh` |
 | 2. One opt-out registry, two front doors | `scripts/check_options.sh` |
-| 3. Every surviving gate has a row below | this file |
+| 3. Every surviving gate has a row below, and every row a gate | `scripts/check_gates.sh` |
 | 4. Exactly one live next action in the tree | this file |
 
 Invariant 4 decays by default. What keeps it true: a handover is **deleted**
@@ -193,13 +217,18 @@ documented name no longer exists.
 
 ## Surviving gates
 
-58 remain. A gate needs a row here or it is deleted.
+43 remain. A gate needs a row here **and** a row needs a gate. The second
+direction had rotted: **14 rows named gates deleted in earlier sweeps**, whose
+explanatory comments survived in the source while the `getenv` did not, so the
+index promised debugging tools that could not be switched on. Nine real gates
+had no row at all. Both are fixed, and `scripts/check_gates.sh` now enforces it
+so the drift cannot return silently.
 
 ### Verifiers — permanent, never swept
 
 `IR_CLOB_VERIFY` `IR_HOME_VERIFY` `IR_HOME_VERIFY_ABORT` `IR_HOME_SLOT_VERIFY`
 `IR_HOME_SLOT_VERIFY_ABORT` `IR_IX_VERIFY` `IR_PARK_VERIFY` `IR_REC_VERIFY`
-`IR_VERIFY` `IR_VERIFY_ABORT` `IR_VERIFY_I2` `IR_HR_CHECK`
+`IR_VERIFY` `IR_VERIFY_ABORT` `IR_VERIFY_I2`
 
 They answer no question and have no expiry. Run the relevant one for what you
 touched and report the count before and after.
@@ -207,8 +236,8 @@ touched and report the count before and after.
 ### Debug output — permanent developer tools
 
 `IR_HOMEMAP` `IR_RANKDUMP` `IR_DUMP_ALLOC` `IR_EMIT_TRACE` `IR_OPT_VERBOSE`
-`IR_SPILL_STATS` `IR_SPILL_WHY` `IR_TRANSIENT_WHY` `IR_IVWHY` `IR_BCFLOW_DBG`
-`IR_BLAYOUT_LOG` `IR_DEADDEF_LOG` `IR_SPFLIP_LOG` `IR_CALLSPLIT_LOG`
+`IR_SPILL_STATS` `IR_IVWHY`
+`IR_DEADDEF_LOG` `IR_SPFLIP_LOG` `IR_CALLSPLIT_LOG`
 
 These print; they never change emitted code. Each is one to six lines inside a
 shipped feature, so they cost nothing to keep and answer "why did it do that".
@@ -218,12 +247,27 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 
 | Gate | Question | Retire when |
 | --- | --- | --- |
-| `IR_GRAPH_PROBE` | is the capture gap in proposal or in selection? | the step A1 cost ledger answers it per claim |
+| `IR_ALLOC_PROBE` `IR_FRAMEPROBE` `IR_SHLX_PROBE` | one-line censuses inside shipped passes | on their next edit |
+| `IR_BYTEPRESS` `IR_RANGEPROBE` | inert sizings: the byte-pair opportunity by pressure, and the ranging population | they are quoted in an ADR |
+| `IR_LIVEPROBE` | liveness census; `=2` gives the verbose form | — |
 
-| `IR_BCVETO_PROBE` | what does the BC veto turn away? | the veto becomes a cost term |
-| `IR_PREPUSH_PROBE` | which calls does the pre-push hazard cover? | — |
-| `IR_CMPSIGN_PROBE` | signed-compare shapes | — |
-| `IR_ALLOC_PROBE` `IR_B1_PROBE` `IR_DEADDEF_PROBE` `IR_DELIVE_PROBE` `IR_DEPARK_PROBE` `IR_FRAMEPROBE` `IR_NARROWPROBE` `IR_SHLX_PROBE` | one-line censuses inside shipped passes | on their next edit |
+`IR_RANGEPROBE` carries a warning, not just a number: its 461 was an upper bound
+over the **wrong population** — see "do not size an opportunity by counting
+values that merely fail to interfere" above.
+
+### Developer switches, not optimisations
+
+| Gate | What it does |
+| --- | --- |
+| `IR_DUMP` | dump the IR through the compiler-glue bridge |
+| `IR_DEAD` | report orphan vregs removed by `ir_compact_vregs` |
+| `IR_CLONE_TEST` | lower a pristine deep CLONE instead of `f` — the `ir_clone_func` self-test. Output must stay byte-identical |
+| `IR_STORDER` | `=0` restores the previous store-dispatch order (default on) |
+| `IR_NO_BOOL_RET_BRANCH` | keep `return <a && b>` as a value rather than a branch |
+| `IR_NO_NOTNOT_FOLD` | keep `!!x` as two coercions instead of folding to `x != 0` |
+
+`IR_OFF` is deliberately absent from these tables: it is the opt-out registry's
+front door, documented under **Opt-outs** below.
 
 ### The ranging arc (ADR 0017) — CLOSED
 
@@ -256,7 +300,7 @@ history you have to read. Recover one with:
     git show 80cc-docs-archive:src/80cc/WIDTH_HANDOVER.md
     git checkout 80cc-docs-archive -- src/80cc/<file>.md
 
-What survives here is the durable layer: `adr/` (27 records), `CONTEXT.md`
+What survives here is the durable layer: `adr/` (76 records), `CONTEXT.md`
 (vocabulary), `AGENTS.md` (working rules), this index, the validation and check
 scripts under `scripts/`, and the retired probe sources under `probes-retired/`.
 
