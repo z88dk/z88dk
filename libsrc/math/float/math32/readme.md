@@ -49,6 +49,28 @@ Intel 8080, 8085, KR580VM1, and gbz80 have separate stack-based cores (`math32_8
 
 ---
 
+## Classic float text (`ftoa` / `ftoe` / `ftog`)
+
+Classic `%f` / `%e` / `%g` call `ftoa` / `ftoe` / `ftog`. math32 no longer ships a C text layer (`c/ftoe.c` and `pow10f_tab[77]` are gone). Shared `libsrc/math/float/cimpl/ftoe.c` stays for mbf32, am9511, mbf64, daimath32, and cpcmath.
+
+| CPU | Path |
+|-----|------|
+| Z80 family | `lm32/c/sccz80/{ftoa,ftoe,ftog}.asm` → stdlib `asm_dtoa` / `asm_dtoe` / `asm_dtog` (EXX + IX). Newlib `__stdio_printf_f` calls `__dtoa__` directly. |
+| 8080 / 8085 / vm1 / gbz80 | `asm/<cpu>/f32_ftoa.asm`, `f32_ftoe.asm`, `f32_ftog.asm` plus `f32__dtoa_*` helpers. The float lives in DEHL. The workspace is 32 bytes on the stack. There is no IX and no EXX. |
+
+The stack-only engine matches the Z80 C11 contract used by `test/suites/math` (`test_math32_printf`): `%g` of `1.234e-37` is `1.234e-37`, `%g` of `-2.5e-5` is `-2.5e-05`, `%g` of `314.159` is `314.159`, `%.2f` of a tiny value is `0.00`.
+
+ISA notes for the stack-only files:
+
+- 8085 uses `rl de`, `ld de,sp+n`, `ld hl,(de)`, and `ld (de),hl`. Do not write `ld hl,sp+n` here. z80asm expands that with LDSI and `ex de,hl`, and a negative offset is not a safe frame open.
+- vm1 uses LHLX / SHLX (`ld hl,(de)` / `ld (de),hl`). It never `pop af` of unknown contents. There is no `rl de` (`$18` is `sub hl,de`).
+- gbz80 uses native `ld hl,sp+*`, `ld a,(hl+)` / `ld (hl+),a`, CB `rl` / `srl` / `rr`, and `add sp,4` to drop a stacked float. It has no cheap `ex de,hl`.
+- 8080 keeps `ld hl,nn` / `add hl,sp` (`ld hl,sp+n` sugar) and pair copies. `putc` keeps DEHL.
+
+This closes #3104 item 4 (route B dtoa rewrite).
+
+---
+
 ## IEEE-754 floating-point format
 
 The z88dk floating-point format (compatible with Intel / IEEE) is:

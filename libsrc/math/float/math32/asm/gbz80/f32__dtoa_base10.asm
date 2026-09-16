@@ -87,10 +87,7 @@ PUBLIC m32__dtoa_base10
     call m32_float8
     call _m32_exp10f                ; DEHL = 10^e = b
     call m32_fsdiv                  ; DEHL = a/b, a remains
-    inc sp
-    inc sp
-    inc sp
-    inc sp                          ; drop a (AF-safe)
+    add sp,4                        ; drop a
     jp e_done
 
 .e_negative
@@ -101,10 +98,7 @@ PUBLIC m32__dtoa_base10
     call m32_float8
     call _m32_exp10f
     call m32_fsmul
-    inc sp
-    inc sp
-    inc sp
-    inc sp
+    add sp,4
 
 .e_done
     ; DEHL = b
@@ -123,12 +117,8 @@ PUBLIC m32__dtoa_base10
 
 .aligned_digit
     ; 1 <= b < 10.  Align the leading decimal nibble into D[7:4].
-    ld a,e
-    add a,a
-    ld e,a
-    ld a,d
-    rla
-    ld d,a                          ; rl de, D = exp
+    rl e
+    rl d                            ; D = exp
     scf
     ld a,e
     rra
@@ -145,19 +135,10 @@ PUBLIC m32__dtoa_base10
     jp Z,rotation_done
 
 .digit_loop
-    or a
-    ld a,d
-    rra
-    ld d,a
-    ld a,e
-    rra
-    ld e,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
+    srl d
+    rr e
+    rr h
+    rr l
     dec b
     jp NZ,digit_loop
 

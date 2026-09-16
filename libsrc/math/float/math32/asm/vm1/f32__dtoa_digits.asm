@@ -6,15 +6,11 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32__dtoa_digits — generate decimal digits (stack-only)
+; m32__dtoa_digits — generate decimal digits (vm1)
 ;-------------------------------------------------------------------------
 ;
-; DEHL = mantissa (top 4 bits of D = next decimal digit).
-; B = digits to generate, C = remaining significant digits.
-; Buffer pointer at workspace+30.
-;
-; Carry set if all requested digits were written.  Carry reset if C
-; ran out first (B leftover).
+; Cursor via LHLX/SHLX.  No rl de (that encoding is sub hl,de).
+; Never pop af of unknown contents.
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -35,29 +31,24 @@ PUBLIC m32__dtoa_digits
     and 00fh
     add a,'0'
 
-    push bc                         ; counts
+    push bc
     push de
     push hl                         ; CALL+3 pushes: work at SP+8
-    ld e,a
-    ld hl,sp+38                     ; work+30
-    ld a,(hl+)
-    ld d,(hl)
-    ld l,a
-    ld h,d
-    ld (hl),e
+    ld c,a
+    ld hl,38
+    add hl,sp
+    ex de,hl
+    ld hl,(de)
+    ld (hl),c
     inc hl
-    ld bc,hl
-    ld hl,sp+38
-    ld (hl+),c
-    ld (hl),b
+    ld (de),hl
     pop hl
-    pop de                          ; DEHL = mantissa; counts still stacked
+    pop de                          ; counts remain stacked
 
     ld a,d
     and 00fh
     ld d,a
 
-    ; 10*x = 2*(4*x + x).  Counts remain under this orig snapshot.
     push de
     push hl
     add hl,hl
@@ -75,12 +66,7 @@ PUBLIC m32__dtoa_digits
     rla
     ld d,a
     pop bc
-    ld a,c
-    add a,l
-    ld l,a
-    ld a,b
-    adc a,h
-    ld h,a
+    add hl,bc
     pop bc
     ld a,c
     adc a,e
@@ -94,9 +80,9 @@ PUBLIC m32__dtoa_digits
     ld e,a
     ld a,d
     rla
-    ld d,a                          ; DEHL = 10x
+    ld d,a
 
-    pop bc                          ; counts
+    pop bc
     dec c
     dec b
     jp NZ,m32__dtoa_digits

@@ -42,21 +42,19 @@ EXTERN m32__dtoa_emit
 
 .ftoa
 ._ftoa
-    ld hl,2
-    add hl,sp
-    ld c,(hl+)
-    ld b,(hl)
-    push bc
-    ld hl,6
-    add hl,sp
-    ld a,(hl)
-    ld hl,8
-    add hl,sp
-    ld c,(hl+)
-    ld b,(hl+)
-    ld e,(hl+)
-    ld d,(hl)
-    ld hl,bc
+    ld de,sp+2
+    ld hl,(de)
+    push hl
+    ld de,sp+6
+    ld a,(de)
+    ld de,sp+8
+    ld hl,(de)
+    inc de
+    inc de
+    push hl
+    ld hl,(de)
+    ex de,hl
+    pop hl
     ld b,0
     call m32__dtoa_f_core
     ret
@@ -73,11 +71,10 @@ EXTERN m32__dtoa_emit
     add hl,sp
     ld sp,hl
 
-    ld hl,32
-
-    add hl,sp
-    ld c,(hl+)                      ; flags (push bc stored C first)
-    ld b,(hl)                       ; prec
+    ld de,sp+32
+    ld hl,(de)                      ; L=flags, H=prec
+    ld c,l
+    ld b,h
     xor a
     ld hl,0
     add hl,sp
@@ -98,22 +95,18 @@ EXTERN m32__dtoa_emit
     jp NZ,zdig
 
     ld hl,6
-
     add hl,sp
-    ld bc,hl
-    ld hl,30
-    add hl,sp
-    ld (hl+),c
-    ld (hl),b
+    ld de,sp+30
+    ld (de),hl                      ; dst = digits
 
-    ld hl,34
-
-    add hl,sp
-    ld c,(hl+)
-    ld b,(hl+)
-    ld e,(hl+)
-    ld d,(hl)
-    ld hl,bc
+    ld de,sp+34
+    ld hl,(de)
+    inc de
+    inc de
+    push hl
+    ld hl,(de)
+    ex de,hl
+    pop hl
 
     call m32__dtoa_sgnabs
     or a
@@ -147,11 +140,8 @@ EXTERN m32__dtoa_emit
     jp m32__dtoa_prune
 
 .spec_done
-    ld bc,hl
-    ld hl,30
-    add hl,sp
-    ld (hl+),c
-    ld (hl),b
+    ld de,sp+30
+    ld (de),hl
     scf
     jp m32__dtoa_finish
 
@@ -202,12 +192,8 @@ EXTERN m32__dtoa_emit
 
 .do_round
     call m32__dtoa_getdst
-    call m32__dtoa_round            ; HL at extra rounding digit
-    ld bc,hl
-    ld hl,30
-    add hl,sp
-    ld (hl+),c
-    ld (hl),b                       ; exclude extra digit
+    call m32__dtoa_round            ; HL at extra rounding digit; DE = slot
+    ld (de),hl                       ; exclude extra digit
     jp m32__dtoa_prune
 
 .fraction_only
@@ -291,12 +277,9 @@ EXTERN m32__dtoa_emit
 ; digit (or one past the last kept digit).  Walk back; if the
 ; remainder is "n." drop the decimal point too.
 .m32__dtoa_g_strip
-    ; CALL: work at SP+2, cursor at SP+32
-    ld hl,32
-    add hl,sp
-    ld a,(hl+)
-    ld h,(hl)
-    ld l,a
+    ; CALL: work at SP+2, cursor at SP+32.  DE = slot, kept across the walk.
+    ld de,sp+32
+    ld hl,(de)
     dec hl
     ld a,'0'
 
@@ -321,11 +304,7 @@ EXTERN m32__dtoa_emit
 .z_keep
     inc hl                          ; keep last non-zero
 .zstore
-    ld bc,hl
-    ld hl,32
-    add hl,sp
-    ld (hl+),c
-    ld (hl),b
+    ld (de),hl
     ret
 
 .m32__dtoa_finish
@@ -359,12 +338,15 @@ EXTERN m32__dtoa_emit
     ld d,a                          ; DE = &carry or &digits
     ld hl,0
     add hl,sp
-    ld bc,hl                        ; BC = work
+    ld bc,hl                        ; BC = work; DE = digit *
     ld hl,40
     add hl,sp
-    ld a,(hl+)
-    ld h,(hl)
-    ld l,a                          ; HL = dest (under ret-to-wrapper)
+    push de
+    ld e,(hl)
+    inc hl
+    ld d,(hl)
+    ex de,hl                        ; HL = dest
+    pop de
     call m32__dtoa_emit
 
     ld hl,42
@@ -375,38 +357,24 @@ EXTERN m32__dtoa_emit
 
 
 .m32__dtoa_putc
-    ; CALL + 4 pushes: work at SP+10, cursor at SP+40
-    ; Keep AF/BC/DE/HL: DEHL is the live mantissa, BC holds counters.
-    push af
+    ; CALL + 3 pushes: work at SP+8, cursor at SP+38
+    ; A is the char and is kept.  DEHL is the live mantissa.
     push bc
     push de
     push hl
-    ld e,a
-    ld hl,40
-    add hl,sp
-    ld a,(hl+)
-    ld d,(hl)
-    ld l,a
-    ld h,d
-    ld (hl),e
+    ld de,sp+38
+    ld hl,(de)
+    ld (hl),a
     inc hl
-    ld bc,hl
-    ld hl,40
-    add hl,sp
-    ld (hl+),c
-    ld (hl),b
+    ld (de),hl
     pop hl
     pop de
     pop bc
-    pop af
     ret
 
 
 .m32__dtoa_getdst
-    ; CALL pushed ret: cursor at SP+32
-    ld hl,32
-    add hl,sp
-    ld a,(hl+)
-    ld h,(hl)
-    ld l,a
+    ; CALL: cursor at SP+32.  Uses DE.
+    ld de,sp+32
+    ld hl,(de)
     ret

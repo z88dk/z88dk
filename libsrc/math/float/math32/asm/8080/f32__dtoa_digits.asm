@@ -75,12 +75,7 @@ PUBLIC m32__dtoa_digits
     rla
     ld d,a
     pop bc
-    ld a,c
-    add a,l
-    ld l,a
-    ld a,b
-    adc a,h
-    ld h,a
+    add hl,bc
     pop bc
     ld a,c
     adc a,e

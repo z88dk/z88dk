@@ -6,15 +6,14 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32__dtoa_digits — generate decimal digits (stack-only)
+; m32__dtoa_digits — generate decimal digits (8085)
 ;-------------------------------------------------------------------------
 ;
 ; DEHL = mantissa (top 4 bits of D = next decimal digit).
 ; B = digits to generate, C = remaining significant digits.
 ; Buffer pointer at workspace+30.
 ;
-; Carry set if all requested digits were written.  Carry reset if C
-; ran out first (B leftover).
+; 10*x uses add hl,hl / rl de.  Cursor via ld de,sp+n / ld hl,(de).
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -35,68 +34,39 @@ PUBLIC m32__dtoa_digits
     and 00fh
     add a,'0'
 
-    push bc                         ; counts
+    push bc
     push de
     push hl                         ; CALL+3 pushes: work at SP+8
-    ld e,a
-    ld hl,38
-    add hl,sp                     ; work+30
-    ld a,(hl+)
-    ld d,(hl)
-    ld l,a
-    ld h,d
-    ld (hl),e
+    ld c,a
+    ld de,sp+38                     ; work+30
+    ld hl,(de)
+    ld (hl),c
     inc hl
-    ld bc,hl
-    ld hl,38
-    add hl,sp
-    ld (hl+),c
-    ld (hl),b
+    ld (de),hl
     pop hl
-    pop de                          ; DEHL = mantissa; counts still stacked
+    pop de                          ; counts remain stacked
 
     ld a,d
     and 00fh
     ld d,a
 
-    ; 10*x = 2*(4*x + x).  Counts remain under this orig snapshot.
     push de
     push hl
     add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    ld a,d
-    rla
-    ld d,a
+    rl de                           ; 2x
     add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    ld a,d
-    rla
-    ld d,a
+    rl de                           ; 4x
     pop bc
-    ld a,c
-    add a,l
-    ld l,a
-    ld a,b
-    adc a,h
-    ld h,a
+    add hl,bc
     pop bc
     ld a,c
     adc a,e
     ld e,a
     ld a,b
     adc a,d
-    ld d,a
+    ld d,a                          ; 5x
     add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    ld a,d
-    rla
-    ld d,a                          ; DEHL = 10x
+    rl de                           ; 10x
 
     pop bc                          ; counts
     dec c

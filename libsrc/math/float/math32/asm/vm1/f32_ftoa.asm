@@ -259,11 +259,11 @@ EXTERN m32__dtoa_emit
 ; digit (or one past the last kept digit).  Walk back; if the
 ; remainder is "n." drop the decimal point too.
 .m32__dtoa_g_strip
-    ; CALL: work at SP+2, cursor at SP+32
-    ld hl,sp+32
-    ld a,(hl+)
-    ld h,(hl)
-    ld l,a
+    ; CALL: work at SP+2, cursor at SP+32.  DE = slot.
+    ld hl,32
+    add hl,sp
+    ex de,hl
+    ld hl,(de)
     dec hl
     ld a,'0'
 
@@ -279,7 +279,8 @@ EXTERN m32__dtoa_emit
     jp NZ,z_keep
     push hl
     xor a
-    ld hl,sp+6
+    ld hl,6
+    add hl,sp
     ld (hl),a                       ; fz = work+2
     pop hl
     jp zstore                       ; NUL at '.'
@@ -287,10 +288,7 @@ EXTERN m32__dtoa_emit
 .z_keep
     inc hl                          ; keep last non-zero
 .zstore
-    ld bc,hl
-    ld hl,sp+32
-    ld (hl+),c
-    ld (hl),b
+    ld (de),hl
     ret
 
 .m32__dtoa_finish
@@ -332,35 +330,26 @@ EXTERN m32__dtoa_emit
 
 
 .m32__dtoa_putc
-    ; CALL + 4 pushes: work at SP+10, cursor at SP+40
-    ; Keep AF/BC/DE/HL: DEHL is the live mantissa, BC holds counters.
-    push af
+    ; CALL + 3 pushes: work at SP+8, cursor at SP+38
     push bc
     push de
     push hl
-    ld e,a
-    ld hl,sp+40
-    ld a,(hl+)
-    ld d,(hl)
-    ld l,a
-    ld h,d
-    ld (hl),e
+    ld hl,38
+    add hl,sp
+    ex de,hl
+    ld hl,(de)
+    ld (hl),a
     inc hl
-    ld bc,hl
-    ld hl,sp+40
-    ld (hl+),c
-    ld (hl),b
+    ld (de),hl
     pop hl
     pop de
     pop bc
-    pop af
     ret
 
 
 .m32__dtoa_getdst
-    ; CALL pushed ret: cursor at SP+32
-    ld hl,sp+32
-    ld a,(hl+)
-    ld h,(hl)
-    ld l,a
+    ld hl,32
+    add hl,sp
+    ex de,hl
+    ld hl,(de)
     ret

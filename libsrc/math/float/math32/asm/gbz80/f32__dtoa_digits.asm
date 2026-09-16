@@ -61,40 +61,23 @@ PUBLIC m32__dtoa_digits
     push de
     push hl
     add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    ld a,d
-    rla
-    ld d,a
+    rl e
+    rl d                            ; 2x
     add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    ld a,d
-    rla
-    ld d,a
+    rl e
+    rl d                            ; 4x
     pop bc
-    ld a,c
-    add a,l
-    ld l,a
-    ld a,b
-    adc a,h
-    ld h,a
+    add hl,bc
     pop bc
     ld a,c
     adc a,e
     ld e,a
     ld a,b
     adc a,d
-    ld d,a
+    ld d,a                          ; 5x
     add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    ld a,d
-    rla
-    ld d,a                          ; DEHL = 10x
+    rl e
+    rl d                            ; 10x
 
     pop bc                          ; counts
     dec c

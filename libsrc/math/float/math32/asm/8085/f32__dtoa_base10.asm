@@ -116,12 +116,7 @@ PUBLIC m32__dtoa_base10
 
 .aligned_digit
     ; 1 <= b < 10.  Align the leading decimal nibble into D[7:4].
-    ld a,e
-    add a,a
-    ld e,a
-    ld a,d
-    rla
-    ld d,a                          ; rl de, D = exp
+    rl de                           ; D = exp
     scf
     ld a,e
     rra

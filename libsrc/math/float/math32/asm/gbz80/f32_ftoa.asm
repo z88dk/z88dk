@@ -332,28 +332,28 @@ EXTERN m32__dtoa_emit
 
 
 .m32__dtoa_putc
-    ; CALL + 4 pushes: work at SP+10, cursor at SP+40
-    ; Keep AF/BC/DE/HL: DEHL is the live mantissa, BC holds counters.
-    push af
+    ; CALL + 3 pushes: work at SP+8, cursor at SP+38
+    ; ld hl,sp+n clobbers C (saved).  Native (hl+) for the char.
     push bc
     push de
     push hl
-    ld e,a
-    ld hl,sp+40
-    ld a,(hl+)
+    ld c,a
+    ld hl,sp+38
+    ld e,(hl+)
     ld d,(hl)
-    ld l,a
+    ld l,e
     ld h,d
+    ld a,c
+    ld (hl+),a
+    ld d,h
+    ld e,l
+    ld hl,sp+38
     ld (hl),e
     inc hl
-    ld bc,hl
-    ld hl,sp+40
-    ld (hl+),c
-    ld (hl),b
+    ld (hl),d
     pop hl
     pop de
     pop bc
-    pop af
     ret
 
 
