@@ -612,7 +612,12 @@ typedef struct {
        ir_compute_op_liveness runs. op-k's live_out is derivable:
        live_in_per_op[k+1], or bb->live_out for the last op. */
     void **live_in_per_op;
-    int    loop_depth;      /* 0 = not in any loop */
+    /* DEAD FIELD — ir.c zeroes it and NOTHING ever assigns it, so a reader
+       silently gets 0 and every "am I in a loop?" test answers no. The
+       allocator builds its own private bb_loop_depth[]; the lowerer derives
+       loop membership from succ[] back edges (bb_in_loop). Do not read this
+       until something populates it. */
+    int    loop_depth;      /* 0 = not in any loop -- SEE ABOVE, never set */
     int    loop_header;     /* 1 if this BB heads a loop */
 } BB;
 

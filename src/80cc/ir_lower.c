@@ -1187,6 +1187,42 @@ static int hlde_dead_at_jump(char **lines, int n, int at)
     return 0;
 }
 
+/* [shr-dead-l] The A-through-CB constant word right shift (ADR 0090) is reached
+   with the word load's `ld l,a` in front of it, and the chain opens by loading
+   the low byte back with `ld a,l`. A already holds that byte, so the pair is a
+   round trip: L is written and read straight back. Neither `srl h` nor `rra`
+   reads L, and the chain ends by writing L again, so both lines are dead and
+   this drops them together — 2 bytes and 8 T-states a site.
+
+   Dropping the pair is what makes it sound. Dropping only the store would leave
+   `ld a,l` reading a register nothing wrote; dropping only the load is what
+   copt already does downstream, which strands the store. Taken together A is
+   untouched and L is dead until the closing `ld l,a`.
+
+   Narrow by construction: the only lines allowed between the pair and that
+   closing store are the chain's own two mnemonics, so there is no label to
+   enter at, no branch to leave by, and no other reader of L. The `ld a,l` is
+   optional in the match so an emitter that elides it still gets the store
+   dropped. Returns the number of lines to drop, 0 for no match.
+
+   NB this runs BEFORE copt, which is where the `ld a,l` would otherwise die:
+   at this stage both lines are still present. Confirming that took an emitted
+   trace — the final asm shows only one of them, which misreads as the other
+   having never been emitted. */
+static int shr_dead_l_store(char **lines, int n, int at)
+{
+    if (opt_disabled("shr-dead-l")) return 0;
+    if (strcmp(lines[at], "\tld\tl,a\n")) return 0;
+    int j = at + 1, drop = 1;
+    if (j < n && !strcmp(lines[j], "\tld\ta,l\n")) { j++; drop = 2; }
+    int chain = 0;
+    while (j < n && (!strcmp(lines[j], "\tsrl\th\n")
+                     || !strcmp(lines[j], "\trra\n"))) { chain++; j++; }
+    if (chain < 2) return 0;              /* at least one srl/rra pair */
+    if (j >= n || strcmp(lines[j], "\tld\tl,a\n")) return 0;
+    return drop;
+}
+
 /* Post-render peephole: drop a dead one-way register copy `ld hl,de` (HL:=DE)
    or `ld de,hl` (DE:=HL) when the destination pair is FULLY reloaded before any
    use. The ordinary case checks the next real instruction (skipping labels,
@@ -1224,6 +1260,9 @@ static void filter_dead_reg_copies(FILE *out, FILE *src)
     if (drop) {
         for (int i = 0; i < n; i++) {
             const char *pair; int len;
+            int sdl = shr_dead_l_store(lines, n, i);
+            if (sdl) { for (int k = 0; k < sdl; k++) drop[i + k] = 1;
+                       i += sdl - 1; continue; }
             if (strcmp(lines[i], "\tld\thl,de\n") == 0)      { pair = "hl"; len = 1; }
             else if (strcmp(lines[i], "\tld\tde,hl\n") == 0) { pair = "de"; len = 1; }
             else if (i + 1 < n && strcmp(lines[i], "\tld\th,d\n") == 0
