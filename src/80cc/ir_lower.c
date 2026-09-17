@@ -5702,8 +5702,16 @@ static void emit_prologue(FILE *out, Func *f)
             while (n >= 2) { emit(out, "push\taf"); n -= 2; }
             if (n) emit(out, "dec\tsp");
         } else {
-            emit(out, "ld\thl,-%d", alloc_size);
-            emit(out, "add\thl,sp");
+            /* The frame register was set before any auto-pushed param. The
+               full frame size, not alloc_size, is its displacement. */
+            if (IS_EZ80() && fp_active(f) && !L.cur_frameless
+                && fp_offset_fits(-f->frame_size)
+                && !opt_disabled("lea-frame-prologue")) {
+                emit(out, "lea\thl,%s-%d", frame_reg(), f->frame_size);
+            } else {
+                emit(out, "ld\thl,-%d", alloc_size);
+                emit(out, "add\thl,sp");
+            }
             emit(out, "ld\tsp,hl");
         }
     }

@@ -9,29 +9,13 @@ live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
-**Last swept 2026-09-17 (third session).** The first HL-bus census found one
-recoverable Game Boy rung. Read ADR 0086 for the proof and the
-[measurement note](../../test/suites/80cc-regcopy-flow-2026-09-17.md)
-for results. `[regcopy-flow]` drops a dead
-`ld hl,de` after a slot store when only BC changes before an unconditional
-local jump, and the target reloads HL before reading it. The 720-cell scan
-saves **232 bytes, 46 cells smaller, 0 larger**; the Game Boy tick scan has
-**46 faster, 0 slower**, all correct. Gate-off reproduces the pre-change Game
-Boy assembly in all 30 corpus sources. `long_ir` and console gates pass.
-
-**Next:** finish the use census of the Game Boy `ld hl,de` restores left after
-this rung. The initial final-assembly dump had 270 such copies over 30 sources
-(one frame mode), but that count includes copies needed for return values,
-arithmetic, and memory access. Classify readers before proposing a wider
-branch-aware liveness pass. Size *deletable* copies, not the raw shuffle bytes;
-if no substantial class remains, take the already sized eZ80 prologue rule
-(66 sites at one byte each; ADR 0079) next.
-
-The Z80 dump had 660 `ex de,hl` instructions, 373 in `md5`. Its common
-`ex de,hl; adc hl,bc; ex de,hl` is the 32-bit carry path: the high half must
-visit HL for the instruction Z80 provides. This is why the old **1572 B Z80 /
-2830 B Game Boy** shuffle totals are ceilings, not estimated savings. The
-HL-bus vein remains open only for a measured, recoverable shape.
+**Size the indexed read-modify-write address restore.** Count final-assembly
+sites across the corpus and the available real files where HL holds the word
+address after the low-byte read. Classify the readers and count only sites
+where `dec hl` can replace the BC copy and HL rebuild. Report the deletable
+bytes by CPU and frame mode before changing the emitter. `histbench` is a
+useful witness, but its `arr[i]++` loop was written for this shape and cannot
+stand in for a corpus count.
 
 Still open from ADR 0084: `[bc-call]` decides BC liveness at a direct call
 from the argument ABI alone; it has not checked `__preserves_regs(b,c)`. No
@@ -52,9 +36,8 @@ whether the shipped **code path** uses the instruction, not whether the
 already inside library helpers.
 
 Swept and settled: **vm1**, **gbz80**, **rabbit**, **8085**, **8080**, **z80**,
-**z80n**, **z180**, **ez80**, **kc160**. The two remainders (the ez80 prologue,
-and the emit sites carrying their own push offset) are named in the next action
-above.
+**z80n**, **z180**, **ez80**, **kc160**. Emit sites with their own push offset
+remain a separate question.
 
 **2. Zero-extension — CLOSED. See ADR 0085.** It was carried here for months as
 "the one *consistent* gap against ez80clang", on a per-1000-instruction ratio.
@@ -62,23 +45,47 @@ The census that ratio never justified: **166 sites** in bench + real, 442-499
 over the whole dump, and the count barely moves with the CPU — so there is no
 target where it is the disease. Most sites are already at the z80 encoding
 floor: a zero-extended byte pushed as a word argument is `ld l,a; ld h,0;
-push hl` and nothing shorter exists. One rung shipped (`[de-widen]`, above);
+push hl` and nothing shorter exists. One rung shipped (ADR 0085);
 five shapes were sized and refused. **The lesson for the next vein: a
 per-instruction ratio against another compiler sizes a DIFFERENCE, not a
 RECOVERABLE one.** Count the bytes a rung could actually delete before calling
 something the next job.
 
-**3. The HL-bus 16-bit problem — ACTIVE.** Final-assembly census and the
-first recoverable Game Boy restore are in ADR 0086. The old **1572 B Z80 /
-2830 B Game Boy** shuffle totals include required 32-bit carry exchanges;
-they are not savings estimates. Continue only from a counted, deletable shape,
-as the next action states.
-
-**4. The commutative swap in addition (ADR 0072).** `md5` gains **6 % of its
+**3. The commutative swap in addition (ADR 0072).** `md5` gains **6 % of its
 cycles** and it is blocked by one modelling gap: reading a slot in pass 1 of the
 lazy spill resurrects a store pass 2 had elided (+28 B binary-trees, +75 B
 emu.c). Needs a cost model over the two-pass spill decision, not a residency
 test.
+
+**4. Two instruction-selection rungs in the indexed read-modify-write —
+UNSIZED.** `histbench` on Z80 is 32.01 M ticks against xcc `-Of`'s 28.46 M, and
+80 % of either run is one basic block. Per iteration 80cc spends **518 cycles
+where xcc spends 471**. What looks expensive is not the gap: the x25173
+shift/add expansion is identical in both (14 `add hl,hl` + 6 `add hl,rr`), and
+**both compilers reload `seed` from its frame slot every iteration** — residency
+is not the difference here, so do not open the allocator for this. The 47 cycles
+split three ways and one is already had: frame addressing is worth 11, and fp
+mode collects it (the same block measures 504 cycles per iteration in fp, which
+is the 31.01 M column). The other two are rungs nothing in the tree does yet.
+
+* **A constant right shift of a word, Z80 only — 15 cycles/iteration here.**
+  `(seed>>3)&63` is lowered as five `add hl,hl` then a read of H. That is the
+  8080 shape and it is correct there: 8080, 8085 and vm1 have no `srl`. On Z80
+  `srl h; rra` repeated n times costs 12n against the left-shift route's
+  11*(8-n); they cross at n = 3.8, so a shift of 1..3 wants `srl`/`rra` and 4..7
+  wants the form already emitted. Gate on the shift count **and** on the CPU
+  having `srl` — this rung must not reach the 8080 family.
+* **The base address of the read-modify-write — 18 cycles and 5 bytes a site.**
+  80cc copies the computed address into BC, rebuilds HL from it after the word
+  load, and routes the incremented value back through `ex de,hl`: 13 bytes. HL
+  only advanced by one, so a single `dec hl` restores it and the increment can
+  stay in DE — `ld e,(hl); inc hl; ld d,(hl); dec hl; inc de; ld (hl),e;
+  inc hl; ld (hl),d`, 8 bytes, which is what xcc emits.
+
+The address-restoration census is the next action. `histbench` was written
+to probe `arr[i]++`, so it is the best case by construction. Count the sites
+over the corpus and size the deletable bytes first. The shift rung is a later
+cycle question. Its break-even boundary needs a tick scan, not a size scan.
 
 Still parked and still valid: **8085 K-flag trip counters** (ADR 0051,
 *Proposed*) — 236 candidate sites, 2 bytes and ~8 cycles each plus a freed A,
