@@ -9,14 +9,14 @@ live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
-**Measure the 8085 K-flag trip-counter candidates.** ADR 0051 lists 236
-sites, but the counter initialisation must shift by one because K sets on -1,
-not zero. Classify the candidates before changing the emitter. Keep the 8080,
-VM1, and non-counter loops out of the experiment.
+**Check BC liveness at direct calls against `__preserves_regs(b,c)`.** The
+argument ABI alone currently decides `[bc-call]` liveness. No in-tree callee
+honours that modifier yet; establish the rule and its negative cases before
+changing the allocator.
 
-The masked word right-shift rung is complete and refused. See ADR 0090. Its
-Z80 route had no slower tick cell, but four cells grew by 26 bytes. The emitter
-remains unchanged.
+The masked word right-shift rung is accepted for plain Z80. See ADR 0090. The
+A-through-CB route is faster in all 10 affected sp/fp cells and has no
+compile-only corpus size change; other CB-shift CPUs remain out of scope.
 
 Still open from ADR 0084: `[bc-call]` decides BC liveness at a direct call
 from the argument ABI alone; it has not checked `__preserves_regs(b,c)`. No
@@ -77,10 +77,11 @@ mode collects it (the same block measures 504 cycles per iteration in fp, which
 is the 31.01 M column). The other two are rungs nothing in the tree does yet.
 
 * **A constant right shift of a word, Z80 only — CLOSED. See ADR 0090.**
-  The candidate `srl h; rr l` route for masked counts 1..3 improved four Z80
-  cells by 1,038,800 ticks and had no slower tick cell, but grew four cells by
-  26 bytes. The size regressions refuse a default-on emitter change. The 8080,
-  8085, and VM1 paths remain untouched.
+  The A-through-CB route (`ld a,l; (srl h; rra) × count; ld l,a`) for constant
+  counts 2..7 is accepted on plain Z80. It improved all 10 affected sp/fp cells
+  in the 60-cell corpus, with no slower cell and 2,140,848 fewer ticks total.
+  The full compile-only corpus size was unchanged; other CB-shift CPUs remain
+  out of scope until measured.
 * **The base address of the read-modify-write — 18 cycles and 5 bytes a site.**
   80cc copies the computed address into BC, rebuilds HL from it after the word
   load, and routes the incremented value back through `ex de,hl`: 13 bytes. HL
@@ -89,14 +90,8 @@ is the 31.01 M column). The other two are rungs nothing in the tree does yet.
   inc hl; ld (hl),d`, 8 bytes, which is what xcc emits.
 
 The addition model, address-restoration census, and masked word right-shift
-rung are recorded in ADRs 0088-0090. The 8085 K-flag census is now the next
-question.
-
-Still parked and still valid: **8085 K-flag trip counters** (ADR 0051,
-*Proposed*) — 236 candidate sites, 2 bytes and ~8 cycles each plus a freed A,
-emulator support already present. Not a peephole: K sets on −1 not 0, so the
-counter's init must shift by one. Measure what fraction of the 236 are pure trip
-counters before building.
+rung are recorded in ADRs 0088-0090. The 8085 K-flag measurement is recorded in
+ADR 0051; it is not a live index task.
 
 ### How to work here — the traps that actually bit
 
@@ -150,13 +145,6 @@ counters before building.
   copied into the worktree — a fresh `git worktree` gets neither.
 
 ### Background work, when there is time
-
-**8085 K-flag trip counters (ADR 0051).** The last declared-but-unused CPU
-capability: `CPU_HAS_JP_K()` exists and no backend file consults it. 236
-candidate sites in the corpus, each worth 2 bytes, ~8 cycles and a freed A, and
-the emulator already models the flag. NOT a peephole — K sets on −1, not 0, so
-the counter's initial value has to shift by one. Scope it to pure trip counters
-and **measure what fraction of the 236 qualify before building**.
 
 A survey of all 14 `CPU_HAS_*` macros found five the backend never consults;
 the other four are KR580VM1-only. That survey is **not** the sweep — the macros

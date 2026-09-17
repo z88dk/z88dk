@@ -1598,13 +1598,30 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                     emit(out, "srl\tl");
             }
         } else {
-            for (int k = 0; k < count; k++) {
-                if (IS_RABBIT()) {
-                    emit(out, "or\ta");      /* clear carry → logical >>1 */
-                    emit(out, "rr\thl");
-                } else {
+            /* A-through-CB word shift: `ld a,l; srl h; rra` carries the
+               low byte through A.  Keep the final `ld l,a` because this
+               width-2 path still promises HL to its result consumer.  It is
+               a net size win from count 2 onward and faster on Z80; count 1
+               remains on the existing route. Keep this scoped to plain Z80
+               until the other CB-shift targets have their own A/B measurements. */
+            int use_a_chain = (c_cpu == CPU_Z80) && count >= 2 && count < 8;
+            if (use_a_chain) {
+                emit(out, "ld\ta,l");
+                for (int k = 0; k < count; k++) {
                     emit(out, "srl\th");
-                    emit(out, "rr\tl");
+                    emit(out, "rra");
+                }
+                emit(out, "ld\tl,a");
+                invalidate_a_cache();
+            } else {
+                for (int k = 0; k < count; k++) {
+                    if (IS_RABBIT()) {
+                        emit(out, "or\ta");      /* clear carry → logical >>1 */
+                        emit(out, "rr\thl");
+                    } else {
+                        emit(out, "srl\th");
+                        emit(out, "rr\tl");
+                    }
                 }
             }
         }

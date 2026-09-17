@@ -65,7 +65,7 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0085](0085-the-widen-belongs-in-the-register-the-consumer-wants.md) | **Accepted** — a zero-extended byte is widened in the register its consumer needs; the census refuses five smaller zero-extension shapes |
 | [0086](0086-a-dead-gameboy-hl-restore-does-not-cross-a-loop-backedge.md) | **Accepted** — Game Boy omits an HL restore before a local loop jump whose target replaces HL |
 | [0087](0087-the-ez80-prologue-uses-the-full-ix-frame-offset.md) | **Accepted**, default on — a framed eZ80 prologue allocates from IX with the full frame size, including any auto-pushed parameter |
-| [0090](0090-the-short-word-right-shift-is-a-size-regression.md) | **Rejected** — `srl h; rr l` wins ticks for masked counts 1..3 but grows four Z80 cells by 26 bytes |
+| [0090](0090-the-short-word-right-shift-is-a-size-regression.md) | **Accepted**, Z80-only — `ld a,l; (srl h; rra) × count; ld l,a` improves the measured Z80 cells with no compile-only corpus size change |
 | [0089](0089-addition-swap-has-no-scalar-two-pass-gate.md) | **Rejected** — a sound addition swap gate needs a second pass-1 render; md5 −6 % but binary-trees +28 B and emu.c +75 B |
 | [0088](0088-indexed-word-rmw-address-restoration-is-a-small-rung.md) | **Sized** — one histbench site in 8 CPU/frame cells, 40 B total; no emitter change |
 | [0073](0073-ask-slot-off-not-the-spill-slot.md) | **Accepted** — ask `slot_off`, not `vreg_spill_slot`; the wrong query cost structbench +10.5 % |
@@ -80,7 +80,7 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0064](0064-the-accumulator-margin-is-three.md) | **Accepted** — the accumulator's contention margin is 3x, and a modelled zero means blind, not free |
 | [0063](0063-the-prepush-narrowing-is-a-pair.md) | **Accepted** — pre-push narrowing is a PAIR with `bc-save-live`; alone it regresses |
 | [0062](0062-a-deref-base-may-take-the-index-home.md) | **Accepted** — a deref base may take the index home, and the win is the EVICTED value getting cheaper |
-| [0051](0051-8085-k-flag-trip-counters.md) | *Proposed* — 8085 `jp k`/`jp nk` for 16-bit trip counters; 236 candidate sites, needs an IV shift not a peephole |
+| [0051](0051-8085-k-flag-trip-counters.md) | *Proposed* — 8085 `jp k`/`jp nk`; 33/59 logical zero-tests are pure trip counters; needs an IV shift, not a peephole |
 | [0050](0050-stack-transient-spill-is-an-sp-mode-trade.md) | **Accepted** — stack-transient spill is sp-mode only, and the CPU test genuinely is the question |
 | [0049](0049-bc-liveness-follows-branches.md) | **Accepted** — BC liveness follows intra-function branches; −248 B, none larger, nothing slower |
 | [0048](0048-the-8085-de-park-is-decided-on-rendered-text.md) | **Accepted** — the 8085 DE park is decided on rendered text, because the residency cache cannot see the future; its DE-liveness question is re-answered by 0084 |
