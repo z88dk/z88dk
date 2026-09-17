@@ -1789,6 +1789,34 @@ static const char *im_rmw_triple(char **lines, int at, const char *drop,
     return op;
 }
 
+/* [de-widen] Is `ld e,<op>` safe to respell as `ld l,<op>`? Not every operand
+   is: `ld e,ixh` assembles and `ld l,ixh` does NOT exist — an index half cannot
+   share an instruction with H or L — and `opcodes.dat` carries 49 such
+   asymmetries (`ld e,ixh`/`ld e,iyl` on every index-half CPU, `ld e,(hl')` and
+   `ld e,h'` on the KR580VM1). So this is an ALLOWLIST, not a rejection list:
+   a plain 8-bit register, `(hl)`, an `(ix+d)`/`(iy+d)` displacement, or a
+   decimal immediate. For each of those `ld l,<op>` is real on exactly the same
+   CPUs and is a synthetic on none. The line arrives with its newline. */
+static int dw_operand_ok(const char *op)
+{
+    size_t n = strlen(op);
+    while (n && (op[n - 1] == '\n' || op[n - 1] == '\r')) n--;
+    if (!n) return 0;
+    if (n == 1 && strchr("abcdehl", op[0])) return 1;
+    if (n == 4 && !strncmp(op, "(hl)", 4)) return 1;
+    if (n >= 6 && op[0] == '(' && op[n - 1] == ')'
+        && (!strncmp(op + 1, "ix", 2) || !strncmp(op + 1, "iy", 2))
+        && (op[3] == '+' || op[3] == '-')) {
+        for (size_t k = 4; k < n - 1; k++)
+            if (op[k] < '0' || op[k] > '9') return 0;
+        return n > 5;
+    }
+    { size_t k = (op[0] == '-') ? 1 : 0;
+      if (k == n) return 0;
+      for (; k < n; k++) if (op[k] < '0' || op[k] > '9') return 0;
+      return 1; }
+}
+
 /* [z80n-add-a] Find the zero-extend pair that feeds `add hl,de` at line `at`,
    so the pair can be dropped and the add become `add hl,a`. Returns the index
    of the FIRST line of the pair, or -1.
@@ -2262,6 +2290,49 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                         free(lines[i]); lines[i] = nl;
                         drop[i - 1] = drop[i - 2] = 1;
                     }
+                }
+            }
+            /* [de-widen] A byte zero-extended into DE and then copied to HL
+               — `ld e,S; ld d,0; ld hl,de` — is the widen done in the wrong
+               register: `ld l,S; ld h,0` leaves HL identical in 2 bytes fewer
+               and 8 cycles fewer. It happens because the widen and the
+               consumer are chosen by different passes: load_to_de stages the
+               byte, then gen_add takes its `add hl,bc` arm, which wants the
+               value in HL and finds only the DE cache.
+                 - D and E dead AFTER the copy. That is the whole proof: the
+                   rewrite stops defining DE, so a later reader would see
+                   whatever DE held before. Same `!d_live && !e_live` the
+                   [de-park] and [z80n-add-a] rungs rest on.
+                 - No flag condition. All four spellings are register moves and
+                   an immediate load; none of them touches F.
+               S may name H or L (`ld e,h`) — `ld l,h; ld h,0` reads H before
+               overwriting it, exactly as the original did — or be `(hl)` or
+               `(ix+d)`, where the single instruction keeps its own operand. It
+               is an ALLOWLIST, not an anything: see dw_operand_ok, because
+               `ld e,ixh` has no `ld l,ixh`.
+               `--opt-disable=de-widen` opts out. adr/0085. */
+            if (!opt_disabled("de-widen") && !d_live && !e_live
+                && i >= 2 && !drop[i] && !drop[i - 1] && !drop[i - 2]
+                && !strcmp(lines[i], "\tld\thl,de\n")
+                && !strcmp(lines[i - 1], "\tld\td,0\n")
+                && !strncmp(lines[i - 2], "\tld\te,", 6)
+                && dw_operand_ok(lines[i - 2] + 6)) {
+                char buf[80];
+                const char *src = lines[i - 2] + 6;
+                if (strlen(src) < sizeof buf - 8) {
+                    snprintf(buf, sizeof buf, "\tld\tl,%s", src);
+                    char *a = strdup(buf), *b = strdup("\tld\th,0\n");
+                    if (a && b) {
+                        free(lines[i - 2]); lines[i - 2] = a;
+                        free(lines[i - 1]); lines[i - 1] = b;
+                        drop[i] = 1;
+                        /* The copy is gone, so its read of DE must not be
+                           folded into the liveness above it — the two rewritten
+                           lines carry their own effects when the walk reaches
+                           them. */
+                        continue;
+                    }
+                    free(a); free(b);
                 }
             }
             /* A call to compiled C code neither reads the flags nor preserves

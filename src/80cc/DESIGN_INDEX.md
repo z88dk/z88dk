@@ -9,46 +9,54 @@ live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
-**Last swept 2026-09-17.** The **DE conservatism is CLOSED**. `instr_effects`
-no longer treats every `ret` and every `call` as reading DE. Read **ADR 0084**
-first; it also records what the change could NOT be made to pin.
+**Last swept 2026-09-17 (second session).** The **zero-extension vein is
+CLOSED**, and not the way the index expected: a census of it produced one rung
+worth shipping and **five refusals**. Read **ADR 0085** first — the refusals are
+the more valuable half, and they are what stops this being reopened.
 
-| | |
-|---|---|
-| `[de-ret]` | a `ret` reads DE only where the FUNCTION returns in DE — a 4-byte DE:HL result, or a `__sdcccall(1)` 2-byte one. Latched per function in `ir_lower_func`; conservative for `__interrupt`/`__naked`, for a raw `__asm{}` body, and for the indirect-fastcall `ret` DISPATCH, which is a jump to a callee with its argument in DE |
-| `[de-call]` | a `call` reads DE only where the EMITTER placed an argument there. The text cannot answer this — `_foo` may be `__z88dk_fastcall` with a `long` — so the call site records the answer per symbol, prove-clean. Dirty: `__sdcccall(1)`, a 4-byte fastcall argument, and `__preserves_regs(d,e)` |
+`[de-widen]` A byte zero-extended into DE and then copied to HL —
+`ld e,S; ld d,0; ld hl,de` — becomes `ld l,S; ld h,0`. The widen and its
+consumer are picked by different passes: `load_to_de` stages the byte, then
+`gen_add` takes its `add hl,bc` arm, wants the value in HL and finds only the DE
+cache. One condition, D and E dead after; no flag condition, because every
+spelling involved is a move or an immediate load. The operand is an
+**allowlist** (`dw_operand_ok`) — `ld e,ixh` assembles and `ld l,ixh` does not
+exist, since the DD prefix turns a named L into IXL.
 
-Result: **−98 bytes over 720 cells, 32 smaller, 0 larger**; **ticks −0.1217 %,
-64 cells faster and 0 slower** (bytes and cycles move together — the rungs
-delete instructions). Of 5256 asm files only **162 change**, all of them 8085
-(150) or z80n (12), so there is no leak. Gate-off is byte-identical across all
-5256. `long_ir` **428/428 both frame modes**; `enigma` `RXSEC` in both; `emu.c`
-2 hits in both; `IR_DEPARK_SWEEP=1` reports the independent forward walk
-agreeing on every park, 0 violations. Regression test `long_ir/delive.c`.
+Result: **−358 bytes over 720 cells, 43 smaller, 0 larger**; ticks **0 cells
+slower** (z80 60 cells 3 faster; 66 cells across all 11 tick CPUs on the
+affected benches, 41 faster). Gate-off is **byte-identical to the parent commit**
+— 0 of 720 cells differ against a `git worktree` build, not merely against the
+same binary with the gate off. `long_ir` **823/823 both frame modes**; console
+gates clean in both; `IR_CLOB_VERIFY` zero new sites. Regression test
+`long_ir/dewiden.c`, seven targets, and the rung fires in every one.
 
-The **full matrix is regenerated** in the same section of
-`../../test/suites/BENCH_MATRIX.txt` (17/9/2026, `gen_bench_matrix3.py`,
-330 rows). It had been stale since 15/9, so it also carries the two 16/9
-sessions — every LARGER cell in it is `md5` and belongs to ADR 0082-0083.
-Its reference columns (sccz80 / xcc / sdcc) were re-measured in the same
-run and **0 of 1320 moved**, which is the harness's own sanity check.
+**Read the distribution before reusing this number.** divbench −252,
+shiftbench −90, widthbench −16, **every other bench zero**, and all three real
+files byte-identical in both modes. It is a three-bench win. It ships default-on
+anyway because there is **no trade to be concentrated against** — 0 cells larger
+and 0 slower — which is exactly what distinguishes it from ADR 0078's refused
+`add hl,nn`, where concentration mattered because the rule was size-neutral.
 
-**One thing ADR 0084 leaves open, and it is not this rule's bug.**
-`[bc-call]` kills BC at a `call _sym` on the argument ABI alone and never asks
-about `__preserves_regs(b,c)` — the same hazard `[de-call]` had to handle. No
-in-tree callee honours the modifier, so it is a latent question rather than a
-known defect, but it is the one asymmetry left between the two rules.
+**So what is the next job?** Not another zero-extension rung. ADR 0085 sizes the
+five that were refused at roughly **110 bytes spread over five separate rungs**,
+each wanting its own liveness proof, gate and regression test, against
+`[de-park]`'s single rung for 98. Zero-extension is not one lever; it is five
+fifteen-byte ones. The ratio against ez80clang is real, but what produces it is
+that clang keeps byte values in **8-bit registers** while 80cc's HL bus forces a
+16-bit accumulator — which is **vein 3 below**, and that is where to go next.
 
-**So the next job is zero-extension** (vein 2 below): the one *consistent* gap
-against ez80clang, a lowering pattern with a known-better reference to diff
-against, which is the shape that has been working.
+Still on the table from the CPU sweep, both sized: the ez80 **prologue's own**
+`ld hl,-F; add hl,sp; ld sp,hl` (66 sites, 1 byte each — IX there has only just
+been loaded from SP, so the rule is `lea hl,ix-F` with no frame-size term, and
+an auto-pushed parameter can sit between the two), and the remaining hand-rolled
+`add hl,sp` emit sites that carry a push offset of their own.
 
-Two smaller things the CPU sweep left on the table, both sized: the ez80
-**prologue's own** `ld hl,-F; add hl,sp; ld sp,hl` (66 sites, 1 byte each — but
-IX there has only just been loaded from SP, so the rule is `lea hl,ix-F` with
-no frame-size term, and an auto-pushed parameter can sit between the two), and
-the remaining hand-rolled `add hl,sp` emit sites that carry a push offset of
-their own, which has no IX analogue.
+**One thing ADR 0084 left open, and it is still open.** `[bc-call]` kills BC at
+a `call _sym` on the argument ABI alone and never asks about
+`__preserves_regs(b,c)` — the hazard `[de-call]` had to handle. No in-tree
+callee honours the modifier, so it is a latent question rather than a known
+defect, but it is the one asymmetry left between the two rules.
 
 ### The veins worth digging, in order
 
@@ -69,11 +77,17 @@ Swept and settled: **vm1**, **gbz80**, **rabbit**, **8085**, **8080**, **z80**,
 and the emit sites carrying their own push offset) are named in the next action
 above.
 
-**2. Zero-extension.** The one *consistent* gap against ez80clang. On int and
-byte code 80cc is level or ahead; on 32-bit it loses to helper calls; and
-zero-extension is the one thing that is reliably worse everywhere. Unlike the
-residency work this is a lowering pattern with a known-better reference to diff
-against, which is exactly the shape that has been working.
+**2. Zero-extension — CLOSED. See ADR 0085.** It was carried here for months as
+"the one *consistent* gap against ez80clang", on a per-1000-instruction ratio.
+The census that ratio never justified: **166 sites** in bench + real, 442-499
+over the whole dump, and the count barely moves with the CPU — so there is no
+target where it is the disease. Most sites are already at the z80 encoding
+floor: a zero-extended byte pushed as a word argument is `ld l,a; ld h,0;
+push hl` and nothing shorter exists. One rung shipped (`[de-widen]`, above);
+five shapes were sized and refused. **The lesson for the next vein: a
+per-instruction ratio against another compiler sizes a DIFFERENCE, not a
+RECOVERABLE one.** Count the bytes a rung could actually delete before calling
+something the next job.
 
 **3. The HL-bus 16-bit problem.** The largest single number in the notes: 80cc
 emits ~3x sdcc's 16-bit ops and half its 8-bit, because HL is the only
