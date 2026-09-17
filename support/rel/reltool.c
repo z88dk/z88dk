@@ -61,106 +61,8 @@ RELOC relocs[2048];
 int reloc_count;
 
 
-
-#ifdef DEBUG
-static void dump_chain(unsigned char *code, unsigned p)
-{
-    while (p)
-    {
-        unsigned next =
-            code[p] |
-            (code[p+1] << 8);
-
-        printf(" -> %04X", p);
-
-        p = next;
-    }
-
-    printf(" -> 0000\n");
-}
-#endif
-
-static RELOC *find_reloc(unsigned addr){
-    int i;
-    for (i = 0; i < reloc_count; i++)
-    {
-        if (relocs[i].addr == addr)
-            return &relocs[i];
-    }
-        return NULL;
-}
-
-
-static void add_external(unsigned char *code, const char *name, unsigned chain)
-{
-    unsigned p;
-
-    if (extcount >= 256)
-        return;
-
-    strcpy(extsyms[extcount].name, name);
-    extsyms[extcount].chain = chain;
-
-    p = chain;
-
-    while (p)
-    {
-        RELOC *r = find_reloc(p);
-
-        if (!r)
-        {
-            relocs[reloc_count].addr   = p;
-            relocs[reloc_count].target = 0;
-            relocs[reloc_count].type   = REL_EXTERNAL;
-            relocs[reloc_count].symbol = extsyms[extcount].name;
-            reloc_count++;
-        }
-        else
-        {
-            r->type   = REL_EXTERNAL;
-            r->symbol = extsyms[extcount].name;
-        }
-
-        p = code[p] | (code[p+1] << 8);
-    }
-
-    extcount++;
-}
-
-
-//static const char *lookup_external(unsigned char *code, unsigned addr)
-//{
-//    int i;
-//  
-//#ifdef DEBUG
-//  printf("lookup_external(%04X)\n", addr);
-//#endif
-//
-//    for (i = 0; i < extcount; i++)
-//    {
-//        unsigned p = extsyms[i].chain;
-//
-//        while (p)
-//        {
-//            unsigned next;
-//
-//            if (p == addr)
-//                return extsyms[i].name;
-//
-//            next = code[p] |
-//                  (code[p + 1] << 8);
-//
-//            p = next;
-//        }
-//    }
-//
-//    return NULL;
-//}
-
-
 static SYMBOL symbols[MAX_SYMBOLS];
 static int symbol_count;
-
 
 
 typedef struct
@@ -190,21 +92,147 @@ static const char *ctrl_name[16] =
     "END_FILE"
 };
 
-unsigned char code[65500];
-unsigned int codelen;
-unsigned int datalen;
+enum {
+    ENTRY_SYMBOL,
+    SELECT_COMMON,
+    PROGRAM_NAME,
+    REQUEST_LIBRARY,
+    RESERVED,
+    DEFINE_COMMON_SIZE,
+    CHAIN_EXTERNAL,
+    DEFINE_ENTRY_POINT,
+    EXTERNAL_OFFSET,
+    EXTERNAL_PLUS_OFFSET,
+    DEFINE_DATA_SIZE,
+    SET_LOCATION_COUNTER,
+    CHAIN_ADDRESS,
+    DEFINE_PROGRAM_SIZE,
+    END_PROGRAM,
+    END_FILE
+};
+
+enum {
+    SEG_ABSOLUTE = 0,
+    SEG_PROGRAM  = 1,
+    SEG_DATA     = 2,
+    SEG_COMMON  = 3
+};
+
+unsigned char prog[65536];
+unsigned proglen;
+unsigned char data[65536];
+unsigned datalen;
+
+static int current_segment = 0;
+
+
+
+#ifdef DEBUG
+static void dump_chain(unsigned char *prog, unsigned p)
+{
+    while (p)
+    {
+        unsigned next =
+            prog[p] |
+            (prog[p+1] << 8);
+
+        printf(" -> %04X", p);
+
+        p = next;
+    }
+
+    printf(" -> 0000\n");
+}
+#endif
+
+static RELOC *find_reloc(unsigned addr){
+    int i;
+    for (i = 0; i < reloc_count; i++)
+    {
+        if (relocs[i].addr == addr)
+            return &relocs[i];
+    }
+        return NULL;
+}
+
+
+static void add_external(unsigned char *prog, const char *name, unsigned chain)
+{
+    unsigned p;
+
+    if (extcount >= 256)
+        return;
+
+    strcpy(extsyms[extcount].name, name);
+    extsyms[extcount].chain = chain;
+
+    p = chain;
+
+    while (p)
+    {
+        RELOC *r = find_reloc(p);
+
+        if (!r)
+        {
+            relocs[reloc_count].addr   = p;
+            relocs[reloc_count].target = 0;
+            relocs[reloc_count].type   = REL_EXTERNAL;
+            relocs[reloc_count].symbol = extsyms[extcount].name;
+            reloc_count++;
+        }
+        else
+        {
+            r->type   = REL_EXTERNAL;
+            r->symbol = extsyms[extcount].name;
+        }
+
+        p = prog[p] | (prog[p+1] << 8);
+    }
+
+    extcount++;
+}
+
+
+//static const char *lookup_external(unsigned char *prog, unsigned addr)
+//{
+//    int i;
+//  
+//#ifdef DEBUG
+//  printf("lookup_external(%04X)\n", addr);
+//#endif
+//
+//    for (i = 0; i < extcount; i++)
+//    {
+//        unsigned p = extsyms[i].chain;
+//
+//        while (p)
+//        {
+//            unsigned next;
+//
+//            if (p == addr)
+//                return extsyms[i].name;
+//
+//            next = prog[p] |
+//                  (prog[p + 1] << 8);
+//
+//            p = next;
+//        }
+//    }
+//
+//    return NULL;
+//}
 
 
 static void code_put8(unsigned v)
 {
-    if (codelen < sizeof(code))
-        code[codelen++] = (unsigned char)v;
+    if (proglen < sizeof(prog))
+        prog[proglen++] = (unsigned char)v;
 }
 
 
 static void code_put16(unsigned v, unsigned tok)
 {
-    relocs[reloc_count].addr   = codelen;
+    relocs[reloc_count].addr   = proglen;
     relocs[reloc_count].target = v;
     relocs[reloc_count].type   = tok;
     relocs[reloc_count].symbol = NULL;
@@ -297,8 +325,8 @@ static const char *format_addr(unsigned pc)
     RELOC *r;
     unsigned v;
 
-    v = code[pc] |
-        (code[pc + 1] << 8);
+    v = prog[pc] |
+        (prog[pc + 1] << 8);
 
 
     r = find_reloc(pc);
@@ -343,7 +371,7 @@ static void disasm_module(void)
 {
     unsigned pc = 0;
 
-    while (pc < codelen)
+    while (pc < proglen)
     {
         int i;
 
@@ -359,7 +387,7 @@ static void disasm_module(void)
 
         printf("%04X  ", pc);
 
-        switch (code[pc])
+        switch (prog[pc])
         {
             case 0x00:
                 printf("NOP\n");
@@ -391,7 +419,7 @@ static void disasm_module(void)
                 };
 
                 printf("INC %s\n",
-                       reg[(code[pc] >> 3) & 7]);
+                       reg[(prog[pc] >> 3) & 7]);
 
                 pc++;
                 break;
@@ -412,8 +440,8 @@ static void disasm_module(void)
                 };
 
                 printf("LD %s,$%02X\n",
-                       reg[(code[pc] >> 3) & 7],
-                       code[pc+1]);
+                       reg[(prog[pc] >> 3) & 7],
+                       prog[pc+1]);
 
                 pc += 2;
                 break;
@@ -424,7 +452,7 @@ static void disasm_module(void)
             case 0x29:
             case 0x39:
             {
-                unsigned rr = (code[pc] >> 4) & 3;
+                unsigned rr = (prog[pc] >> 4) & 3;
 
                 printf("ADD HL,%s\n", rp[rr]);
 
@@ -435,7 +463,7 @@ static void disasm_module(void)
             case 0x02:
             case 0x12:
             {
-                unsigned rr = (code[pc] >> 4) & 1;
+                unsigned rr = (prog[pc] >> 4) & 1;
 
                 printf("LD (%s),A\n", rp2[rr]);
 
@@ -446,7 +474,7 @@ static void disasm_module(void)
             case 0x0A:
             case 0x1A:
             {
-                unsigned rr = (code[pc] >> 4) & 1;
+                unsigned rr = (prog[pc] >> 4) & 1;
 
                 printf("LD A,(%s)\n", rp2[rr]);
 
@@ -524,11 +552,11 @@ static void disasm_module(void)
                     "CP"
                 };
 
-                unsigned idx = (code[pc] - 0xC6) >> 3;
+                unsigned idx = (prog[pc] - 0xC6) >> 3;
 
                 printf("%s $%02X\n",
                        op[idx],
-                       code[pc+1]);
+                       prog[pc+1]);
 
                 pc += 2;
                 break;
@@ -550,14 +578,14 @@ static void disasm_module(void)
                     "H", "L", "(HL)", "A"
                 };
 
-                if (code[pc] == 0x76)
+                if (prog[pc] == 0x76)
                 {
                     printf("HALT\n");
                 }
                 else
                 {
-                    unsigned dst = (code[pc] >> 3) & 7;
-                    unsigned src = code[pc] & 7;
+                    unsigned dst = (prog[pc] >> 3) & 7;
+                    unsigned src = prog[pc] & 7;
 
                     printf("LD %s,%s\n",
                            reg[dst],
@@ -606,8 +634,8 @@ static void disasm_module(void)
                     "H", "L", "(HL)", "A"
                 };
 
-                unsigned op  = (code[pc] - 0x80) >> 3;
-                unsigned src = code[pc] & 7;
+                unsigned op  = (prog[pc] - 0x80) >> 3;
+                unsigned src = prog[pc] & 7;
 
                 printf("%s%s\n",
                        alu[op],
@@ -624,7 +652,7 @@ static void disasm_module(void)
 
             case 0x18:
             {
-                signed char disp = (signed char)code[pc+1];
+                signed char disp = (signed char)prog[pc+1];
                 unsigned target = pc + 2 + disp;
 
                 printf("JR $%04X\n", target);
@@ -635,7 +663,7 @@ static void disasm_module(void)
 
             case 0x10:
             {
-                signed char disp = (signed char)code[pc+1];
+                signed char disp = (signed char)prog[pc+1];
                 unsigned target = pc + 2 + disp;
 
                 printf("DJNZ $%04X\n", target);
@@ -653,11 +681,11 @@ static void disasm_module(void)
                     "NZ", "Z", "NC", "C"
                 };
 
-                signed char disp = (signed char)code[pc+1];
+                signed char disp = (signed char)prog[pc+1];
                 unsigned target = pc + 2 + disp;
 
                 printf("JR %s,$%04X\n",
-                       cc[(code[pc] - 0x20) >> 3],
+                       cc[(prog[pc] - 0x20) >> 3],
                        target);
 
                 pc += 2;
@@ -678,7 +706,7 @@ static void disasm_module(void)
                     "PO", "PE", "P", "M"
                 };
 
-                unsigned idx = (code[pc] - 0xC2) >> 3;
+                unsigned idx = (prog[pc] - 0xC2) >> 3;
 
                 printf("JP %s,%s\n",
                        cc[idx],
@@ -703,7 +731,7 @@ static void disasm_module(void)
                 };
 
                 printf("CALL %s,%s\n",
-                       cc[(code[pc] - 0xC4) >> 3],
+                       cc[(prog[pc] - 0xC4) >> 3],
                        format_addr(pc+1));
 
                 pc += 3;
@@ -716,7 +744,7 @@ static void disasm_module(void)
             case 0x21:
             case 0x31:
             {
-                unsigned rr = (code[pc] >> 4) & 3;
+                unsigned rr = (prog[pc] >> 4) & 3;
 
                 printf("LD %s,%s\n",
                        rp[rr],
@@ -781,7 +809,7 @@ static void disasm_module(void)
                 };
 
                 printf("RET %s\n",
-                       cc[(code[pc] - 0xC0) >> 3]);
+                       cc[(prog[pc] - 0xC0) >> 3]);
 
                 pc++;
                 break;
@@ -823,7 +851,7 @@ static void disasm_module(void)
             case 0x23:
             case 0x33:
             {
-                unsigned rr = (code[pc] >> 4) & 3;
+                unsigned rr = (prog[pc] >> 4) & 3;
 
                 printf("INC %s\n", rp[rr]);
 
@@ -836,7 +864,7 @@ static void disasm_module(void)
             case 0x2B:
             case 0x3B:
             {
-                unsigned rr = (code[pc] >> 4) & 3;
+                unsigned rr = (prog[pc] >> 4) & 3;
 
                 printf("DEC %s\n", rp[rr]);
 
@@ -851,7 +879,7 @@ static void disasm_module(void)
 
 
             default:
-                printf("DB $%02X\n", code[pc]);
+                printf("DB $%02X\n", prog[pc]);
                 pc++;
                 break;
         }
@@ -877,25 +905,25 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
 
         if (dumpmode) {
             printf("  [%u] ", atype);
-            if (atype == 0) {
+            if (atype == SEG_ABSOLUTE) {
                 printf (" - ");
             }
-            if (atype == 1) printf ("CODE_ADDR ");
-            if (atype == 2) printf ("DATA_ADDR ");
+            if (atype == SEG_PROGRAM) printf ("CODE_ADDR ");
+            if (atype == SEG_DATA) printf ("DATA_ADDR ");
             //printf("  type=%u value=", atype);
         }
 
         if ((dumpmode) || ((ctrl<=13) && (ctrl>=8))) printf("%-20s -> $%04X", ctrl_name[ctrl], value);
         
         // Set Code Location Counter
-        if ((atype == 1) && (ctrl == 11)) codelen =0;
+        if ((atype == SEG_PROGRAM) && (ctrl == SET_LOCATION_COUNTER)) proglen =0;
 
         // Set Data Location Counter
-        if ((atype == 2) && (ctrl == 11)) datalen =0;
+        if ((atype == SEG_DATA) && (ctrl == SET_LOCATION_COUNTER)) datalen =0;
 
     }
 
-    if (ctrl <= 8)
+    if (ctrl < EXTERNAL_OFFSET)
     {
         char name[64];
 
@@ -919,15 +947,15 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
 
         printf("\"%s\"", name);
 
-        if (ctrl == 6) {
+        if (ctrl == CHAIN_EXTERNAL) {
 #ifdef DEBUG
             printf(" chain:");
-            dump_chain(code, value);
+            dump_chain(prog, value);
 #endif
-            add_external(code, name, value);
+            add_external(prog, name, value);
         }
 
-        if (ctrl == 7) {
+        if (ctrl == DEFINE_ENTRY_POINT) {
             add_symbol(name,atype,value);
         }
     }
@@ -1005,7 +1033,7 @@ static void do_dump(FILE *f, int dumpmode)
                 {
                     printf("\n\n--- DISASSEMBLY ---\n");
                     disasm_module();
-                    codelen = 0;
+                    proglen = 0;
                     datalen = 0;
                     reloc_count = 0;
                     extcount = 0;
