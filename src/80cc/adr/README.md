@@ -110,9 +110,16 @@ REORG, the `*_BUG` post-mortems) stay as plans, not ADRs.
   decision about how the compiler works, so it never changes the architecture
   the other ADRs describe. Keep it short, and link the evidence rather than
   quoting it.
-- Performance figures live in commit messages, `BENCH_MATRIX.txt` and plan docs,
-  **never in ADRs or code comments** (they go stale; the mechanism/rationale is
-  what endures). This applies to a Rejected ADR too: state the conclusion, link
-  the numbers.
+- Performance figures for an **Accepted** decision live in commit messages,
+  `BENCH_MATRIX.txt` and plan docs, **not in the ADR or in code comments** —
+  they go stale, and the mechanism is what endures. State the shape of the
+  result and point at the dated log section.
+- **A refusal is the exception: keep the number that refused it.** In a
+  **Rejected** ADR, and in a "refused in the same family" section of an
+  accepted one, the regression IS the decision — `+1789 bytes` (ADR 0020),
+  `+307 bytes` with four times as many cells larger as smaller (ADR 0024) —
+  and a refutation whose number has been moved elsewhere is the one that gets
+  re-attempted. Write the figure inline, with its matrix and both frame modes
+  named, and say what would have to change to reopen it.
 - Each residency feature is gated so the compiler is **byte-identical with it
   off** — see ADR 0004. New residency work should preserve that property.
