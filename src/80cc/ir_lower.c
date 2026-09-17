@@ -1153,10 +1153,44 @@ static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
     free(lines); free(size);
 }
 
+/* [regcopy-flow] A GBZ80 store often restores HL from DE just before a loop
+   back-edge. If only BC is stepped before an unconditional local jump, and the
+   target's first instruction replaces HL, the restore has no reader. Keep this
+   deliberately narrow: other instructions may read either half of HL, and a
+   conditional jump has a second successor. */
+static int hlde_dead_at_jump(char **lines, int n, int at)
+{
+    if (!IS_GBZ80() || opt_disabled("regcopy-flow")) return 0;
+    int j = at;
+    while (j < n && (hlde_skippable_between(lines[j])
+                     || !strcmp(lines[j], "\tinc\tbc\n")
+                     || !strcmp(lines[j], "\tdec\tbc\n"))) j++;
+    if (j == n) return 0;
+    const char *p = lines[j];
+    if (!strncmp(p, "\tjp\t", 4) || !strncmp(p, "\tjr\t", 4)) p += 4;
+    else return 0;
+    if (strncmp(p, "L_f", 3)) return 0; /* intra-function labels only */
+    char target[64]; size_t k = 0;
+    while (p[k] && p[k] != '\n' && p[k] != '\r' && k + 1 < sizeof target) {
+        if (p[k] == ',' || p[k] == ' ' || p[k] == '\t' || p[k] == ';') return 0;
+        target[k] = p[k]; k++;
+    }
+    if (!k || (p[k] != '\n' && p[k] != '\r' && p[k] != '\0')) return 0;
+    target[k] = '\0';
+    for (int t = 0; t < n; t++) {
+        char name[64];
+        if (!relax_label_name(lines[t], name, sizeof name)
+            || strcmp(name, target)) continue;
+        do { t++; } while (t < n && hlde_skippable_between(lines[t]));
+        return t < n && hlde_full_reload(lines[t], "hl");
+    }
+    return 0;
+}
+
 /* Post-render peephole: drop a dead one-way register copy `ld hl,de` (HL:=DE)
    or `ld de,hl` (DE:=HL) when the destination pair is FULLY reloaded before any
-   use — the next real instruction (skipping labels / blank / comment / C_LINE
-   lines) overwrites the whole pair without reading it.
+   use. The ordinary case checks the next real instruction (skipping labels,
+   blank lines, comments and C_LINE); [regcopy-flow] proves one GBZ80 back-edge.
 
    The two-line spellings `ld h,d; ld l,e` / `ld d,h; ld e,l` are still matched:
    this filter runs on rendered text, and it is cheaper to keep both forms here
@@ -1199,7 +1233,9 @@ static void filter_dead_reg_copies(FILE *out, FILE *src)
             else continue;
             int j = i + len;
             while (j < n && hlde_skippable_between(lines[j])) j++;
-            if (j < n && hlde_full_reload(lines[j], pair)) {
+            if ((j < n && hlde_full_reload(lines[j], pair))
+                || (len == 1 && !strcmp(pair, "hl")
+                    && hlde_dead_at_jump(lines, n, j))) {
                 for (int k = 0; k < len; k++) drop[i + k] = 1;
                 i += len - 1;                        /* consume the copy */
             }

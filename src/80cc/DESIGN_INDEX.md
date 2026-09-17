@@ -9,54 +9,33 @@ live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
-**Last swept 2026-09-17 (second session).** The **zero-extension vein is
-CLOSED**, and not the way the index expected: a census of it produced one rung
-worth shipping and **five refusals**. Read **ADR 0085** first — the refusals are
-the more valuable half, and they are what stops this being reopened.
+**Last swept 2026-09-17 (third session).** The first HL-bus census found one
+recoverable Game Boy rung. Read ADR 0086 for the proof and the
+[measurement note](../../test/suites/80cc-regcopy-flow-2026-09-17.md)
+for results. `[regcopy-flow]` drops a dead
+`ld hl,de` after a slot store when only BC changes before an unconditional
+local jump, and the target reloads HL before reading it. The 720-cell scan
+saves **232 bytes, 46 cells smaller, 0 larger**; the Game Boy tick scan has
+**46 faster, 0 slower**, all correct. Gate-off reproduces the pre-change Game
+Boy assembly in all 30 corpus sources. `long_ir` and console gates pass.
 
-`[de-widen]` A byte zero-extended into DE and then copied to HL —
-`ld e,S; ld d,0; ld hl,de` — becomes `ld l,S; ld h,0`. The widen and its
-consumer are picked by different passes: `load_to_de` stages the byte, then
-`gen_add` takes its `add hl,bc` arm, wants the value in HL and finds only the DE
-cache. One condition, D and E dead after; no flag condition, because every
-spelling involved is a move or an immediate load. The operand is an
-**allowlist** (`dw_operand_ok`) — `ld e,ixh` assembles and `ld l,ixh` does not
-exist, since the DD prefix turns a named L into IXL.
+**Next:** finish the use census of the Game Boy `ld hl,de` restores left after
+this rung. The initial final-assembly dump had 270 such copies over 30 sources
+(one frame mode), but that count includes copies needed for return values,
+arithmetic, and memory access. Classify readers before proposing a wider
+branch-aware liveness pass. Size *deletable* copies, not the raw shuffle bytes;
+if no substantial class remains, take the already sized eZ80 prologue rule
+(66 sites at one byte each; ADR 0079) next.
 
-Result: **−358 bytes over 720 cells, 43 smaller, 0 larger**; ticks **0 cells
-slower** (z80 60 cells 3 faster; 66 cells across all 11 tick CPUs on the
-affected benches, 41 faster). Gate-off is **byte-identical to the parent commit**
-— 0 of 720 cells differ against a `git worktree` build, not merely against the
-same binary with the gate off. `long_ir` **823/823 both frame modes**; console
-gates clean in both; `IR_CLOB_VERIFY` zero new sites. Regression test
-`long_ir/dewiden.c`, seven targets, and the rung fires in every one.
+The Z80 dump had 660 `ex de,hl` instructions, 373 in `md5`. Its common
+`ex de,hl; adc hl,bc; ex de,hl` is the 32-bit carry path: the high half must
+visit HL for the instruction Z80 provides. This is why the old **1572 B Z80 /
+2830 B Game Boy** shuffle totals are ceilings, not estimated savings. The
+HL-bus vein remains open only for a measured, recoverable shape.
 
-**Read the distribution before reusing this number.** divbench −252,
-shiftbench −90, widthbench −16, **every other bench zero**, and all three real
-files byte-identical in both modes. It is a three-bench win. It ships default-on
-anyway because there is **no trade to be concentrated against** — 0 cells larger
-and 0 slower — which is exactly what distinguishes it from ADR 0078's refused
-`add hl,nn`, where concentration mattered because the rule was size-neutral.
-
-**So what is the next job?** Not another zero-extension rung. ADR 0085 sizes the
-five that were refused at roughly **110 bytes spread over five separate rungs**,
-each wanting its own liveness proof, gate and regression test, against
-`[de-park]`'s single rung for 98. Zero-extension is not one lever; it is five
-fifteen-byte ones. The ratio against ez80clang is real, but what produces it is
-that clang keeps byte values in **8-bit registers** while 80cc's HL bus forces a
-16-bit accumulator — which is **vein 3 below**, and that is where to go next.
-
-Still on the table from the CPU sweep, both sized: the ez80 **prologue's own**
-`ld hl,-F; add hl,sp; ld sp,hl` (66 sites, 1 byte each — IX there has only just
-been loaded from SP, so the rule is `lea hl,ix-F` with no frame-size term, and
-an auto-pushed parameter can sit between the two), and the remaining hand-rolled
-`add hl,sp` emit sites that carry a push offset of their own.
-
-**One thing ADR 0084 left open, and it is still open.** `[bc-call]` kills BC at
-a `call _sym` on the argument ABI alone and never asks about
-`__preserves_regs(b,c)` — the hazard `[de-call]` had to handle. No in-tree
-callee honours the modifier, so it is a latent question rather than a known
-defect, but it is the one asymmetry left between the two rules.
+Still open from ADR 0084: `[bc-call]` decides BC liveness at a direct call
+from the argument ABI alone; it has not checked `__preserves_regs(b,c)`. No
+in-tree callee currently honours that modifier.
 
 ### The veins worth digging, in order
 
@@ -89,12 +68,11 @@ per-instruction ratio against another compiler sizes a DIFFERENCE, not a
 RECOVERABLE one.** Count the bytes a rung could actually delete before calling
 something the next job.
 
-**3. The HL-bus 16-bit problem.** The largest single number in the notes: 80cc
-emits ~3x sdcc's 16-bit ops and half its 8-bit, because HL is the only
-accumulator so every 16-bit op forces an evacuate-to-DE. Measured shuffle cost
-**1572 B on z80, 2830 B on gbz80**. The earlier refutation measured staging
-*rate*, not emitted shuffles, so it is **not** actually closed. Big, but the
-prize matches.
+**3. The HL-bus 16-bit problem — ACTIVE.** Final-assembly census and the
+first recoverable Game Boy restore are in ADR 0086. The old **1572 B Z80 /
+2830 B Game Boy** shuffle totals include required 32-bit carry exchanges;
+they are not savings estimates. Continue only from a counted, deletable shape,
+as the next action states.
 
 **4. The commutative swap in addition (ADR 0072).** `md5` gains **6 % of its
 cycles** and it is blocked by one modelling gap: reading a slot in pass 1 of the

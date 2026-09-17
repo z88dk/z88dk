@@ -131,6 +131,7 @@ exists (ADR 0010).
 | `dead-store-word` | the same for a word spill |
 | `dead-store-share` | dead-store analysis ignores slot sharing |
 | `dead-regcopy` | keep a register copy the final peephole would delete |
+| `regcopy-flow` | keep a GBZ80 HL restore before a local jump whose target immediately reloads HL |
 | `deadframe` | a function with no live frame keeps its frame anyway |
 | `frameless` | never drop the frame pointer, even where nothing uses it |
 | `frame-index` | no direct `(ix+d)` frame access; the address is materialised |
