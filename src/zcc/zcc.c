@@ -1767,6 +1767,37 @@ int main(int argc, char **argv)
         linklibs = tmp;
     }
 
+    /* Newlib strips @{ZCC_LIBCPU}, so --math32 is -lmath32.
+     * Map it to the math32_<cpu> product (same names as classic). */
+    if (c_clib != NULL && (strstr(c_clib, "new") != NULL || strstr(c_clib, "sdcc") != NULL)
+        && linklibs != NULL && strstr(linklibs, "-lmath32") != NULL
+        && strstr(linklibs, "-lmath32_") == NULL) {
+        const char *suf = select_cpu(CPU_MAP_TOOL_LIBNAME);
+        if (c_cpu == CPU_TYPE_R6K)
+            suf = "_r6k";
+        if (suf != NULL && suf[0] == '\0')
+            suf = NULL;
+        switch (c_cpu) {
+        case CPU_TYPE_Z80N:
+        case CPU_TYPE_R2KA:
+        case CPU_TYPE_R3K:
+        case CPU_TYPE_R4K:
+        case CPU_TYPE_R6K:
+            break;
+        default:
+            suf = NULL;
+            break;
+        }
+        if (suf != NULL) {
+            char to[24];
+            char *tmp;
+            snprintf(to, sizeof(to), "-lmath32%s", suf);
+            tmp = replace_str(linklibs, "-lmath32", to);
+            free(linklibs);
+            linklibs = tmp;
+        }
+    }
+
     if (compileonly) {
         if ((nfiles > 1) && (outputfile != NULL)) {
             /* consolidated object file */
