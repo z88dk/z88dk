@@ -105,6 +105,10 @@ sign  exponent     mantissa
 
 The package is loosely based on IEEE-754. It keeps the packed format. Product results pack with round-to-nearest-even on a residual byte. Add / sub use jam-sticky alignment. Denormal numbers are not supported. math32 treats any number with a zero exponent as signed zero, including a normalize result whose biased exponent is exactly 0. Quiet NaN is `0x7FFFFFFF` (payload is not propagated). `sqrt(-0)` returns `-0`. `invsqrt(-0)` returns `-Inf`.
 
+Finite × finite overflow returns signed Inf. The sign is the XOR of the operand signs. This includes products just above `FLT_MAX` (for example `1e38*3.5` and `1e38*4`), not only exponent-add carry. Overflow does not return NaN. NaN is for NaN operands and for `0 × Inf`.
+
+The 48-bit genmath / math48 formats stop at about `1.7e38`. 80cc rejects a larger literal in that mode. IEEE math32 accepts up to about `3.4e38` and turns a larger literal into Inf.
+
 ```text
 IEEE floating point format:  seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
 

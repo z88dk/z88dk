@@ -23,6 +23,8 @@ enforced by a script. What remains is optimisation work, and the order matters:
 
 ### Background work, when there is time
 
+**48-bit literal range.** `3.0e38` errors in genmath/math48 (`max_exp` 127, about `1.7e38`). sccz80 accepts and wraps. IEEE `--math32` accepts `3.0e38` and saturates larger values to Inf. Do not loosen the 48-bit check.
+
 **Give the shipped default-on optimisations ADRs, then trim their comments.**
 Of 115 registry names only about 15 are named in an ADR. Roughly ten features —
 `remat-lea`, `dead-store-share`, `trunc-res`, `fclong-carry`, `call-bremat` and

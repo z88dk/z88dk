@@ -551,6 +551,9 @@ static void fp_format_limits(enum maths_mode mode, int *min_exp, int *max_exp,
     case MATHS_AM9511:                     /* 7-bit two's-complement exp, bias 0 */
         *min_exp = -64;  *max_exp = 63;  *has_specials = 0; break;
     default:                               /* MBF32/40/64 and z80: bias 128 */
+        /* 3.0e38 has frexp exp 128, so it errors here (~1.7e38 max).
+           sccz80 accepts and wraps. IEEE max_exp 128 accepts 3.0e38
+           and saturates a larger value to Inf. Do not loosen this. */
         *min_exp = -127; *max_exp = 127; *has_specials = 0; break;
     }
 }

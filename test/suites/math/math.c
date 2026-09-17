@@ -770,6 +770,32 @@ void test_math32_edges()
     vz = (FLOAT)0.0;
     vo = (FLOAT)1.0;
 
+    /* Near FLT_MAX: exp-sum 254 then inc (*3.5), and 255 with no 8-bit
+     * carry (*4). Volatile operands stop the compiler folding the product. */
+    {
+        volatile FLOAT vx, vy;
+        a.u = 0x7e967699ul; /* 1e38 */
+        b.u = 0x40600000ul; /* 3.5 */
+        vx = a.f;
+        vy = b.f;
+        r.f = vx * vy;
+        Assert(r.u == 0x7f800000ul, "1e38*3.5 is +Inf");
+        b.u = 0x40800000ul; /* 4.0 */
+        vy = b.f;
+        r.f = vx * vy;
+        Assert(r.u == 0x7f800000ul, "1e38*4 is +Inf");
+        a.u = 0xfe967699ul; /* -1e38 */
+        vx = a.f;
+        b.u = 0x40600000ul;
+        vy = b.f;
+        r.f = vx * vy;
+        Assert(r.u == 0xff800000ul, "-1e38*3.5 is -Inf");
+        b.u = 0x40800000ul;
+        vy = b.f;
+        r.f = vx * vy;
+        Assert(r.u == 0xff800000ul, "-1e38*4 is -Inf");
+    }
+
     a.u = 0x80000000ul; /* -0 */
     r.f = SQRT(a.f);
     Assert(r.u == 0x80000000ul, "sqrt(-0) is -0");

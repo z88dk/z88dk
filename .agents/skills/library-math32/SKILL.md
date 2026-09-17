@@ -64,6 +64,7 @@ are `IF __CPU_Z80__` only and assemble **empty** on `-mez80_z80`. Suite gate:
 | Class | Policy (current math32) |
 |-------|-------------------------|
 | **mul / sqr / div / poly / sqrt pack** | **IEEE RNE** on residual below the kept mantissa |
+| **mul overflow** | **Signed Inf** (XOR of operand signs). Not NaN. Includes the near-`FLT_MAX` band (exp sum 254/255), not only add-carry. z80 `f32_fsmul32` late overflow must not reload `AF'` after `mulu` (z80n/z180 clobber it) |
 | **add / sub** | **Digi jam-sticky**: lost align/overflow bits → OR **1** into mant LSB; pack has no RNE residual |
 
 Long add chains (e.g. n-body energy) are sensitive to add rounding: jam keeps
