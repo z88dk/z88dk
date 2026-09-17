@@ -181,6 +181,10 @@ bool ASTVisitor::enter(PrintStmt&) {
     return true;
 }
 
+bool ASTVisitor::enter(LPrintStmt&) {
+    return true;
+}
+
 bool ASTVisitor::enter(InputStmt&) {
     return true;
 }
@@ -194,6 +198,10 @@ bool ASTVisitor::enter(RunStmt&) {
 }
 
 bool ASTVisitor::enter(ListStmt&) {
+    return true;
+}
+
+bool ASTVisitor::enter(LListStmt&) {
     return true;
 }
 
@@ -255,6 +263,10 @@ bool ASTVisitor::enter(ContStmt&) {
 
 bool ASTVisitor::enter(ClearStmt&) {
     return true;
+}
+
+bool ASTVisitor::enter(CopyStmt&) {
+    return false;
 }
 
 bool ASTVisitor::enter(PragmaNumVarStmt&) {

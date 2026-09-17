@@ -29,7 +29,7 @@ Symtab {
             location: test_t_input_06_t.bas:328
         }
         "I1" {
-            location: test_t_input_06_t.bas:453
+            location: test_t_input_06_t.bas:465
         }
         "J" {
             location: test_t_input_06_t.bas:330
@@ -80,7 +80,7 @@ Symtab {
             location: test_t_input_06_t.bas:227
         }
         "Y" {
-            location: test_t_input_06_t.bas:551
+            location: test_t_input_06_t.bas:572
         }
         "Z$" {
             location: test_t_input_06_t.bas:77
@@ -106,7 +106,7 @@ Symtab {
             location: test_t_input_06_t.bas:250
         }
         "I" {
-            location: test_t_input_06_t.bas:453
+            location: test_t_input_06_t.bas:465
         }
     ]
     procs: [

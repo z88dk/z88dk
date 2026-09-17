@@ -146,6 +146,10 @@ struct ASTVisitor {
     virtual void visit(PrintStmt&) {}
     virtual void leave(PrintStmt&) {}
 
+    virtual bool enter(LPrintStmt&);
+    virtual void visit(LPrintStmt&) {}
+    virtual void leave(LPrintStmt&) {}
+
     virtual bool enter(InputStmt&);
     virtual void visit(InputStmt&) {}
     virtual void leave(InputStmt&) {}
@@ -161,6 +165,10 @@ struct ASTVisitor {
     virtual bool enter(ListStmt&);
     virtual void visit(ListStmt&) {}
     virtual void leave(ListStmt&) {}
+
+    virtual bool enter(LListStmt&);
+    virtual void visit(LListStmt&) {}
+    virtual void leave(LListStmt&) {}
 
     virtual bool enter(NewStmt&);
     virtual void visit(NewStmt&) {}
@@ -221,6 +229,10 @@ struct ASTVisitor {
     virtual bool enter(ClearStmt&);
     virtual void visit(ClearStmt&) {}
     virtual void leave(ClearStmt&) {}
+
+    virtual bool enter(CopyStmt&);
+    virtual void visit(CopyStmt&) {}
+    virtual void leave(CopyStmt&) {}
 
     virtual bool enter(PragmaNumVarStmt&);
     virtual void visit(PragmaNumVarStmt&) {}

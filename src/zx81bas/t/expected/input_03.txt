@@ -230,52 +230,65 @@ test_t_input_03_t.bas:435: 	PRINT 2*3
 test_t_input_03_t.bas:436: 	PRINT TAB 8;
 test_t_input_03_t.bas:437: 	PRINT AT 10,10;
 test_t_input_03_t.bas:438: 	PRINT AT 10,10;"HELLO";TAB 10;"WORLD";
-test_t_input_03_t.bas:444: 	INPUT A, ABC
-test_t_input_03_t.bas:445: 	INPUT A(1,2)
-test_t_input_03_t.bas:446: 	INPUT A$
-test_t_input_03_t.bas:447: 	INPUT A$(1,2)
-test_t_input_03_t.bas:448: 	INPUT A$(1 TO 2)
-test_t_input_03_t.bas:449: 	INPUT A$(1,2)(3 TO 4)
-test_t_input_03_t.bas:450: 	INPUT A$(TO 3)
-test_t_input_03_t.bas:451: 	INPUT A$(2 TO)
-test_t_input_03_t.bas:452: 	INPUT A,A$
-test_t_input_03_t.bas:453: 	INPUT I1,I(10)
-test_t_input_03_t.bas:459: 	REM
-test_t_input_03_t.bas:460: 	REM COMMENT TEXT : COLONS ARE PART OF COMMENT
-test_t_input_03_t.bas:461: !ASM
-test_t_input_03_t.bas:462: 	start_rem:
-test_t_input_03_t.bas:463: !ENDASM
-test_t_input_03_t.bas:465: !ASM
-test_t_input_03_t.bas:466: 		ret
-test_t_input_03_t.bas:467: !ENDASM
-test_t_input_03_t.bas:473: 	RUN 
-test_t_input_03_t.bas:474: 	RUN 1000
-test_t_input_03_t.bas:475: 	RUN 1000+20*A
-test_t_input_03_t.bas:476: 	RUN @label1
-test_t_input_03_t.bas:482: 	NEW
-test_t_input_03_t.bas:488: 	CLS
-test_t_input_03_t.bas:494: 	LOAD "file"
-test_t_input_03_t.bas:500: 	SAVE "file"
-test_t_input_03_t.bas:506: 	POKE 16384,0xff
-test_t_input_03_t.bas:512: 	POKEW 16384,$0102
-test_t_input_03_t.bas:518: 	RAND USR 16514
-test_t_input_03_t.bas:524: 	PAUSE 50
-test_t_input_03_t.bas:530: 	FAST
-test_t_input_03_t.bas:536: 	SLOW
-test_t_input_03_t.bas:542: 	LIST
-test_t_input_03_t.bas:543: 	LIST 10
-test_t_input_03_t.bas:544: 	LIST 10*4
-test_t_input_03_t.bas:545: 	LIST @label1
-test_t_input_03_t.bas:546: 	
-test_t_input_03_t.bas:551: 	X=0:Y=0
-test_t_input_03_t.bas:552: 	PLOT 0,1
-test_t_input_03_t.bas:553: 	PLOT X,Y
-test_t_input_03_t.bas:559: 	UNPLOT 0,1
-test_t_input_03_t.bas:560: 	UNPLOT X,Y
-test_t_input_03_t.bas:566: 	SCROLL
-test_t_input_03_t.bas:572: 	CONT
-test_t_input_03_t.bas:578: 	CLEAR
-test_t_input_03_t.bas:584: 	PRINT "HELLO"
-test_t_input_03_t.bas:586: !ASM
-test_t_input_03_t.bas:587: end:		ld a, 1
-test_t_input_03_t.bas:588: !ENDASM
+test_t_input_03_t.bas:444: 	LPRINT
+test_t_input_03_t.bas:445: 	LPRINT ,
+test_t_input_03_t.bas:446: 	LPRINT ;
+test_t_input_03_t.bas:447: 	LPRINT 2*3
+test_t_input_03_t.bas:448: 	LPRINT TAB 8;
+test_t_input_03_t.bas:449: 	LPRINT AT 10,10;
+test_t_input_03_t.bas:450: 	LPRINT AT 10,10;"HELLO";TAB 10;"WORLD";
+test_t_input_03_t.bas:456: 	INPUT A, ABC
+test_t_input_03_t.bas:457: 	INPUT A(1,2)
+test_t_input_03_t.bas:458: 	INPUT A$
+test_t_input_03_t.bas:459: 	INPUT A$(1,2)
+test_t_input_03_t.bas:460: 	INPUT A$(1 TO 2)
+test_t_input_03_t.bas:461: 	INPUT A$(1,2)(3 TO 4)
+test_t_input_03_t.bas:462: 	INPUT A$(TO 3)
+test_t_input_03_t.bas:463: 	INPUT A$(2 TO)
+test_t_input_03_t.bas:464: 	INPUT A,A$
+test_t_input_03_t.bas:465: 	INPUT I1,I(10)
+test_t_input_03_t.bas:471: 	REM
+test_t_input_03_t.bas:472: 	REM COMMENT TEXT : COLONS ARE PART OF COMMENT
+test_t_input_03_t.bas:473: !ASM
+test_t_input_03_t.bas:474: 	start_rem:
+test_t_input_03_t.bas:475: !ENDASM
+test_t_input_03_t.bas:477: !ASM
+test_t_input_03_t.bas:478: 		ret
+test_t_input_03_t.bas:479: !ENDASM
+test_t_input_03_t.bas:485: 	RUN 
+test_t_input_03_t.bas:486: 	RUN 1000
+test_t_input_03_t.bas:487: 	RUN 1000+20*A
+test_t_input_03_t.bas:488: 	RUN @label1
+test_t_input_03_t.bas:494: 	NEW
+test_t_input_03_t.bas:500: 	CLS
+test_t_input_03_t.bas:506: 	LOAD "file"
+test_t_input_03_t.bas:512: 	SAVE "file"
+test_t_input_03_t.bas:518: 	POKE 16384,0xff
+test_t_input_03_t.bas:524: 	POKEW 16384,$0102
+test_t_input_03_t.bas:530: 	RAND USR 16514
+test_t_input_03_t.bas:536: 	PAUSE 50
+test_t_input_03_t.bas:542: 	FAST
+test_t_input_03_t.bas:548: 	SLOW
+test_t_input_03_t.bas:554: 	LIST
+test_t_input_03_t.bas:555: 	LIST 10
+test_t_input_03_t.bas:556: 	LIST 10*4
+test_t_input_03_t.bas:557: 	LIST @label1
+test_t_input_03_t.bas:558: 	
+test_t_input_03_t.bas:563: 	LLIST
+test_t_input_03_t.bas:564: 	LLIST 10
+test_t_input_03_t.bas:565: 	LLIST 10*4
+test_t_input_03_t.bas:566: 	LLIST @label1
+test_t_input_03_t.bas:567: 	
+test_t_input_03_t.bas:572: 	X=0:Y=0
+test_t_input_03_t.bas:573: 	PLOT 0,1
+test_t_input_03_t.bas:574: 	PLOT X,Y
+test_t_input_03_t.bas:580: 	UNPLOT 0,1
+test_t_input_03_t.bas:581: 	UNPLOT X,Y
+test_t_input_03_t.bas:587: 	SCROLL
+test_t_input_03_t.bas:593: 	CONT
+test_t_input_03_t.bas:599: 	CLEAR
+test_t_input_03_t.bas:605: 	COPY
+test_t_input_03_t.bas:611: 	PRINT "HELLO"
+test_t_input_03_t.bas:613: !ASM
+test_t_input_03_t.bas:614: end:		ld a, 1
+test_t_input_03_t.bas:615: !ENDASM

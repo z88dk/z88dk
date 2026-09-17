@@ -453,6 +453,18 @@ label4:			nop
 
 
 
+	LPRINT
+	LPRINT ,
+	LPRINT ;
+	LPRINT 2*3
+	LPRINT TAB 8;
+	LPRINT AT 10,10;
+	LPRINT AT 10,10;"HELLO";TAB 10;"WORLD";
+
+
+
+
+
 	INPUT A, ABC
 	INPUT A(1,2)
 	INPUT A$
@@ -560,6 +572,15 @@ label4:			nop
 
 
 
+	LLIST
+	LLIST 10
+	LLIST 10*4
+	LLIST @label1
+	
+
+
+
+
 	X=0:Y=0
 	PLOT 0,1
 	PLOT X,Y
@@ -588,6 +609,12 @@ label4:			nop
 
 
 	CLEAR
+
+
+
+
+
+	COPY
 
 
 

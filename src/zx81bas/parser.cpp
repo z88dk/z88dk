@@ -51,6 +51,7 @@ std::unordered_map<Keyword, Parser::StmtParser> Parser::stmt_parsers_lut = {
     { Keyword::STOP,            &Parser::parse_stmt_stop },
     { Keyword::END,             &Parser::parse_stmt_end },
     { Keyword::PRINT,           &Parser::parse_stmt_print },
+    { Keyword::LPRINT,          &Parser::parse_stmt_lprint },
     { Keyword::INPUT,           &Parser::parse_stmt_input },
     { Keyword::REM,             &Parser::parse_stmt_rem },
     { Keyword::RUN,             &Parser::parse_stmt_run },
@@ -65,11 +66,13 @@ std::unordered_map<Keyword, Parser::StmtParser> Parser::stmt_parsers_lut = {
     { Keyword::FAST,            &Parser::parse_stmt_fast },
     { Keyword::SLOW,            &Parser::parse_stmt_slow },
     { Keyword::LIST,            &Parser::parse_stmt_list },
+    { Keyword::LLIST,           &Parser::parse_stmt_llist },
     { Keyword::PLOT,            &Parser::parse_stmt_plot },
     { Keyword::UNPLOT,          &Parser::parse_stmt_unplot },
     { Keyword::SCROLL,          &Parser::parse_stmt_scroll },
     { Keyword::CONT,            &Parser::parse_stmt_cont },
     { Keyword::CLEAR,           &Parser::parse_stmt_clear },
+    { Keyword::COPY,            &Parser::parse_stmt_copy },
 };
 
 bool Parser::at_end() const {
@@ -1169,6 +1172,17 @@ StmtPtr Parser::parse_stmt_list() {
     return stmt;
 }
 
+StmtPtr Parser::parse_stmt_llist() {
+    auto stmt = std::make_unique<LListStmt>(loc());
+
+    // Parse expression, if any
+    if (!at_end_of_stmt()) {
+        stmt->target_expr = parse_expr();
+    }
+
+    return stmt;
+}
+
 StmtPtr Parser::parse_stmt_new() {
     return std::make_unique<NewStmt>(loc());
 }
@@ -1285,6 +1299,37 @@ StmtPtr Parser::parse_stmt_end() {
 
 StmtPtr Parser::parse_stmt_print() {
     auto stmt = std::make_unique<PrintStmt>(loc());
+    while (!at_end_of_stmt()) {
+        PrintItem item;
+
+        if (match(TokenType::Comma)) {
+            item.type = PrintItem::Type::Comma;
+        }
+        else if (match(TokenType::Semicolon)) {
+            item.type = PrintItem::Type::Semicolon;
+        }
+        else if (match(Keyword::AT)) {
+            item.type = PrintItem::Type::At;
+            item.line_expr = parse_expr();
+            expect(TokenType::Comma);
+            item.col_expr = parse_expr();
+        }
+        else if (match(Keyword::TAB)) {
+            item.type = PrintItem::Type::Tab;
+            item.tab_expr = parse_expr();
+        }
+        else {
+            item.type = PrintItem::Type::Expr;
+            item.expr = parse_expr();
+        }
+
+        stmt->items.push_back(std::move(item));
+    }
+    return stmt;
+}
+
+StmtPtr Parser::parse_stmt_lprint() {
+    auto stmt = std::make_unique<LPrintStmt>(loc());
     while (!at_end_of_stmt()) {
         PrintItem item;
 
@@ -1641,6 +1686,10 @@ StmtPtr Parser::parse_stmt_local() {
         break;
     }
     return stmt;
+}
+
+StmtPtr Parser::parse_stmt_copy() {
+    return std::make_unique<CopyStmt>(loc());
 }
 
 std::unique_ptr<DimItem> Parser::parse_dim_item() {

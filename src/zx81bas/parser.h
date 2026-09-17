@@ -118,6 +118,7 @@ private:
     StmtPtr parse_stmt_stop();
     StmtPtr parse_stmt_end();
     StmtPtr parse_stmt_print();
+    StmtPtr parse_stmt_lprint();
     StmtPtr parse_stmt_input();
     StmtPtr parse_stmt_rem();
     StmtPtr parse_stmt_run();
@@ -132,11 +133,13 @@ private:
     StmtPtr parse_stmt_fast();
     StmtPtr parse_stmt_slow();
     StmtPtr parse_stmt_list();
+    StmtPtr parse_stmt_llist();
     StmtPtr parse_stmt_plot();
     StmtPtr parse_stmt_unplot();
     StmtPtr parse_stmt_scroll();
     StmtPtr parse_stmt_cont();
     StmtPtr parse_stmt_clear();
+    StmtPtr parse_stmt_copy();
 
     std::unique_ptr<DimItem> parse_dim_item();
 };

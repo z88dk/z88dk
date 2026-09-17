@@ -2,7 +2,6 @@
 
 - remove unused labels
 - generate output file
-- add printer commands LPRINT, LLIST, COPY
 - lower VARS section
 - Assign ZX81 line numbers
 - Convert ASCII strings to ZX81 character set.
@@ -116,7 +115,7 @@ lower_prog()
 - Produce flat ZX81 BASIC IR
 No constant folding here
 
-cfg_optimize()
+optimize()
 - Fold constant conditions
 - Simplify IF diamonds
 - Remove redundant GOTOs
