@@ -403,6 +403,8 @@ Careful use of the intrinsic functions can give a further improvement. For examp
 
 Classic `+test`, sccz80, TIMER-bounded region only (no `PRINTF`). Measured with `z88dk-ticks` and the matching CPU flag **before** the binary.
 
+The z180 column uses `-clib=z180` and `-mz180`. The eZ80 column uses `-clib=ez80_z80` and `-mez80_z80`. Copy z180 ticks from the z180 model only.
+
 | Bench | Compile extras |
 |-------|----------------|
 | n-body | `-O2 -DSTATIC -DTIMER` |
@@ -457,7 +459,7 @@ genmath has no Z180 or kc160 product (undocumented `ixh` / `ixl`). Those cells a
 | math48 | 2_379_690_672 | 2_370_841_872 | 2_091_459_593 | 666_739_415 | 656_023_478 |
 | bbcmath | 1_643_590_720 | 1_634_741_920 | 1_399_252_452 | 491_344_563 | 429_332_350 |
 | mbf32 | 1_835_079_611 | 1_826_230_811 | 1_663_652_473 | 522_036_603 | 457_635_342 |
-| math32 | 808_246_253 | 489_494_160 | 458_365_103 | 132_576_945 | 157_258_791 |
+| math32 | 808_246_253 | 490_004_160 | 458_755_103 | 132_576_945 | 157_258_791 |
 | math32 (opt) | 719_364_405 | 398_658_288 | 378_976_548 | 110_770_844 | 135_923_452 |
 
 ### n-body — 8080 / gbz80 / 8085 (ticks)
@@ -495,7 +497,7 @@ genmath has no Z180 or kc160 product (undocumented `ixh` / `ixl`). Those cells a
 | math48 | 4.10 | 4.13 | 4.67 | 14.71 | 15.06 |
 | bbcmath | 7.15 | 7.23 | 8.58 | 23.89 | 27.87 |
 | mbf32 | 7.35 | 7.44 | 8.15 | 25.87 | 29.25 |
-| math32 | 11.22 | 15.59 | 17.20 | 59.58 | 56.47 |
+| math32 | 11.22 | 15.59 | 17.19 | 59.58 | 56.47 |
 
 ### whetstone — 8080 / gbz80 / 8085 (KWIPS @ 4 MHz)
 
@@ -510,7 +512,7 @@ Classic `+test` PRINTF for n-body N=1000 prints `-0.1690752` / `-0.1690861` on s
 
 - On the Z80 family, math32 is the fastest library in these three benches. Hardware multiply on kc160 / z80n / z180 / eZ80 cuts mul-heavy work further. The opt rows show what `invsqrt` / `sqr` buy when you write for the library.
 - On 8080 / gbz80 / 8085, math32 wins **n-body**. The other libraries stay ahead on **whetstone** and on base **mandelbrot**. The mandelbrot opt row recovers most of that gap with `sqr()`.
-- kc160 and eZ80 T-state counts are not comparable one-for-one with plain Z80. Use them for library order on that model.
+- kc160 and eZ80 T-state counts are not comparable one-for-one with plain Z80. Use them for library order on that model. z180 is not eZ80.
 - Full recipes and archive RESULT blocks live under `support/benchmarks/`. Suite gate: `test/suites/math` (`test_math32*.bin`).
 
 ---

@@ -473,6 +473,7 @@ those numbers.
 | What to refresh | **Numbers, sizes, dates**, and **bold** cells only |
 | Bold (speed) | Best **z80** and best **8085** separately (lowest ticks; **highest KWIPS** for whetstone) |
 | Not bold for speed | **math16**, **z180**, **z80n** (and similar) — listed for comparison only |
+| z180 vs eZ80 | **z180** ticks: `+test -clib=z180` and `z88dk-ticks -mz180`. Do **not** paste **ez80_z80** ticks into a z180 row |
 | Prose | Do **not** write “winner” / “winning bold” in notes; bold is enough |
 | Clone | `git clone https://github.com/z88dk/z88dk.wiki.git` — pages `Benchmarks.md`, `Classic--Maths-Libraries.md` |
 

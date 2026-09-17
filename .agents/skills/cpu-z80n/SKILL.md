@@ -190,6 +190,7 @@ If **c** is written **unchanged** from the previous value, only **I** is updated
 |------|--------|
 | Target | `+zxn` — `lib/config/zxn.cfg` |
 | CPU flag | `-mz80n` / ticks `-mz80n` |
+| classic TIMER | `+test -clib=z80n` then `z88dk-ticks -mz80n` |
 | Float | `math32_z80n.lib` when measuring HW-mul-sensitive code |
 | Headers | `include/arch/zxn.h` |
 | Config symbols | `libsrc/newlib/target/zxn/config_zxn.h` (`__USE_Z80N_OPCODES_NEXTREG`, copper regs) |
