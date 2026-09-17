@@ -103,33 +103,33 @@ cycle count  = 165734164
 time @ 4MHz  = 165734164 / 4*10^6 = 41.43 sec
 
 
-Z88DK August 19, 2026
+Z88DK September 17, 2026
 classic/sccz80/math32
-4367 bytes less page zero
+4382 bytes less page zero
 
-cycle count  = 123137988
-time @ 4MHz  = 123137988 / 4*10^6 =   30.8 sec
+cycle count  = 123869965
+time @ 4MHz  = 123869965 / 4*10^6 =   31.0 sec
 
 
-Z88DK August 19, 2026
+Z88DK September 17, 2026
 classic/sccz80/8085/math32
-5267 bytes less page zero
+5274 bytes less page zero
 
-cycle count  = 185981358
-time @ 4MHz  = 185981358 / 4*10^6 =   46.5 sec
+cycle count  = 185509368
+time @ 4MHz  = 185509368 / 4*10^6 =   46.4 sec
 
 
-Z88DK August 19, 2026
+Z88DK September 17, 2026
 classic/80cc/math32
-5524 bytes less page zero
+5513 bytes less page zero
 
-cycle count  = 159261134
-time @ 4MHz  = 159261134 / 4*10^6 =   39.8 sec
+cycle count  = 158140442
+time @ 4MHz  = 158140442 / 4*10^6 =   39.5 sec
 
 
-Z88DK August 19, 2026
+Z88DK September 17, 2026
 classic/80cc/8085/math32
-6169 bytes less page zero
+6116 bytes less page zero
 
-cycle count  = 260580754
-time @ 4MHz  = 260580754 / 4*10^6 =  1 min  5 sec
+cycle count  = 256113963
+time @ 4MHz  = 256113963 / 4*10^6 =  1 min  4 sec

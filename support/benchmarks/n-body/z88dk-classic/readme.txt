@@ -142,47 +142,48 @@ cycle count  = 1835079611
 time @ 4MHz  = 1835079611 / 4*10^6 =  7 min 39 sec
 
 
-Z88DK August 15, 2026
+Z88DK September 17, 2026
 sccz80 / classic / math32
-5876 bytes less page zero
+5897 bytes less page zero
 
-first number error : 1 * 10^(-7)
-second number error: 1 * 10^(-4)
+first number error : 5 * 10^(-8)
+second number error: 2 * 10^(-6)
 
-cycle count  = 797460656
-time @ 4MHz  = 797460656 / 4*10^6 =  3 min 19 sec
+cycle count  = 808246253
+time @ 4MHz  = 808246253 / 4*10^6 =  3 min 22 sec
 
 
-Z88DK August 15, 2026
+Energy: -0.1690752 / -0.1690861 (N=1000).
+Z88DK September 17, 2026
 sccz80 / classic / 8085 / math32
-6887 bytes less page zero
+6836 bytes less page zero
 
-first number error : 1 * 10^(-7)
-second number error: 7 * 10^(-6)
+first number error : 5 * 10^(-8)
+second number error: 2 * 10^(-6)
 
-cycle count  = 1526138871
-time @ 4MHz  = 1526138871 / 4*10^6 =  6 min 22 sec
+cycle count  = 1488228803
+time @ 4MHz  = 1488228803 / 4*10^6 =  6 min 12 sec
 
-Energy: -0.1690752 / -0.1690808 (N=1000).
+Energy: -0.1690752 / -0.1690861 (N=1000).
 
 
-Z88DK August 19, 2026
+Z88DK September 17, 2026
 80cc / classic / math32
-9381 bytes less page zero
+9385 bytes less page zero
 
-cycle count  = 871168465
-time @ 4MHz  = 871168465 / 4*10^6 =  3 min 38 sec
+cycle count  = 881844523
+time @ 4MHz  = 881844523 / 4*10^6 =  3 min 40 sec
 
 
-Z88DK August 19, 2026
+Z88DK September 17, 2026
 80cc / classic / 8085 / math32
-8832 bytes less page zero
+8593 bytes less page zero
 
-cycle count  = 1492016293
-time @ 4MHz  = 1492016293 / 4*10^6 =  6 min 13 sec
+cycle count  = 1476931107
+time @ 4MHz  = 1476931107 / 4*10^6 =  6 min  9 sec
 
 
-Z88DK September 9, 2026
+Z88DK September 17, 2026
 sccz80 / classic / math16
 4124 bytes less page zero
 
@@ -192,11 +193,11 @@ time @ 4MHz  = 295229389 / 4*10^6 =  1 min 14 sec
 IEEE 16-bit half-float (math16). DT=1e-1 for half range.
 
 
-Z88DK September 9, 2026
+Z88DK September 17, 2026
 sccz80 / classic / 8085 / math16
-4170 bytes less page zero
+4174 bytes less page zero
 
-cycle count  = 344855174
-time @ 4MHz  = 344855174 / 4*10^6 =  1 min 26 sec
+cycle count  = 348032655
+time @ 4MHz  = 348032655 / 4*10^6 =  1 min 27 sec
 
 IEEE 16-bit half-float (math16_8085). DT=1e-1 for half range.

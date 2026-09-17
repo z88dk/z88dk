@@ -70,13 +70,13 @@ z88dk-classic/readme.txt. w=h=60.
 
 Compiler | CPU  | Library | Ticks
 ---------|------|---------|----------------
-sccz80   | z80  | math16  |   788_675_466 (Sep 9, 2026)
-sccz80   | 8085 | math16  | 955_053_921 (Sep 9, 2026)
-sccz80   | z80  | math32  | 1_031_176_011 (Aug 15, 2026)
-zsdcc    | z80  | math32  | 1_301_251_782 (Aug 16, 2026)
-sccz80   | 8085 | math32  | 2_041_768_834 (Aug 15, 2026)
-80cc     | z80  | math32  | 1_314_554_468 (Aug 19, 2026)
-80cc     | 8085 | math32  | 1_988_563_544 (Aug 19, 2026)
+sccz80   | z80  | math16  |   787_101_626 (Sep 17, 2026)
+sccz80   | 8085 | math16  | 961_145_497 (Sep 17, 2026)
+sccz80   | z80  | math32  | 1_052_817_722 (Sep 17, 2026)
+zsdcc    | z80  | math32  | 1_328_855_671 (Sep 17, 2026)
+sccz80   | 8085 | math32  | 1_952_471_924 (Sep 17, 2026)
+80cc     | z80  | math32  | 1_335_270_909 (Sep 17, 2026)
+80cc     | 8085 | math32  | 1_967_526_067 (Sep 17, 2026)
 sccz80   | 8085 | mbf32   | 1_805_825_674  (Jul 2026)
 
 
@@ -118,32 +118,32 @@ time @ 4MHz  = 3727334560 / 4*10^6 =  15 min 32 sec
 Internal 48-bit float implementation causes relative slowdown.
 
 5.
-Z88DK August 16, 2026
+Z88DK September 17, 2026
 zsdcc 4.6.0 #16639 / classic c library / math32
-3857 bytes less page zero
+3842 bytes less page zero
 
-cycle count  = 1301251782
-time @ 4MHz  = 1301251782 / 4*10^6 =  5 min 25 sec
+cycle count  = 1328855671
+time @ 4MHz  = 1328855671 / 4*10^6 =  5 min 32 sec
 
 IEEE 32-bit float implementation (truncated high-half 32×32).
 
 6.
-Z88DK August 16, 2026
+Z88DK September 17, 2026
 zsdcc 4.6.0 #16639 / new c library / math32
-3007 bytes less page zero
+3001 bytes less page zero
 
-cycle count  = 1324037732
-time @ 4MHz  = 1324037732 / 4*10^6 =  5 min 31 sec
+cycle count  = 1333411029
+time @ 4MHz  = 1333411029 / 4*10^6 =  5 min 33 sec
 
 IEEE 32-bit float implementation.
 
 6b.
-Z88DK August 15, 2026
+Z88DK September 17, 2026
 sccz80 / new c library / math32
-2940 bytes less page zero
+2934 bytes less page zero
 
-cycle count  = 1049525678
-time @ 4MHz  = 1049525678 / 4*10^6 =  4 min 22 sec
+cycle count  = 1052817722
+time @ 4MHz  = 1052817722 / 4*10^6 =  4 min 23 sec
 
 IEEE 32-bit float implementation.
 
@@ -177,54 +177,54 @@ time @ 4MHz  = 7175307472 / 4*10^6 = 29 min 54 sec
 Slow speed largely due to float implementation in C.
 
 10.
-Z88DK August 15, 2026
+Z88DK September 17, 2026
 sccz80 / classic c library / math32
-3780 bytes less page zero
+3765 bytes less page zero
 
-cycle count  = 1031176011
-time @ 4MHz  = 1031176011 / 4*10^6 =  4 min 18 sec
+cycle count  = 1052817722
+time @ 4MHz  = 1052817722 / 4*10^6 =  4 min 23 sec
 
 IEEE 32-bit float implementation.
 (Truncated high-half 32×32 mantissa mul.)
 
 11.
-Z88DK August 15, 2026
+Z88DK September 17, 2026
 sccz80 / classic c library / 8085 / math32
-4494 bytes less page zero
+4451 bytes less page zero
 
-cycle count  = 2041768834
-time @ 4MHz  = 2041768834 / 4*10^6 =  8 min 30 sec
+cycle count  = 1952471924
+time @ 4MHz  = 1952471924 / 4*10^6 =  8 min  8 sec
 
 IEEE 32-bit float implementation (math32_8085).
 (opt with sqr(): 899712336 ticks, 4660 bytes.)
 
 12.
-Z88DK August 19, 2026
+Z88DK September 17, 2026
 80cc / classic c library / math32
-4764 bytes less page zero
+4769 bytes less page zero
 
-cycle count  = 1314554468
-time @ 4MHz  = 1314554468 / 4*10^6 =  5 min 29 sec
+cycle count  = 1335270909
+time @ 4MHz  = 1335270909 / 4*10^6 =  5 min 34 sec
 
 IEEE 32-bit float implementation.
 
 13.
-Z88DK August 19, 2026
+Z88DK September 17, 2026
 80cc / classic c library / 8085 / math32
-4842 bytes less page zero
+4784 bytes less page zero
 
-cycle count  = 1988563544
-time @ 4MHz  = 1988563544 / 4*10^6 =  8 min 17 sec
+cycle count  = 1967526067
+time @ 4MHz  = 1967526067 / 4*10^6 =  8 min 12 sec
 
 IEEE 32-bit float implementation (math32_8085).
 
 14.
-Z88DK September 9, 2026
+Z88DK September 17, 2026
 sccz80 / new c library / math16
-2260 bytes less page zero
+2256 bytes less page zero
 
-cycle count  =  788675466
-time @ 4MHz  = 788675466 / 4*10^6 =  3 min 17 sec
+cycle count  =  787101626
+time @ 4MHz  = 787101626 / 4*10^6 =  3 min 17 sec
 
 IEEE 16-bit float implementation.
 

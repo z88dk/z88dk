@@ -63,23 +63,23 @@ error: 2 * 10^(-9)
 cycle count  = 8624203411
 time @ 4MHz  = 8624203411 / 4*10^6 =  35 min 56 sec
 
-Z88DK August 16, 2026
+Z88DK September 17, 2026
 zsdcc 4.6.0 #16639 / new c library / math32
-5293 bytes less page zero
+5296 bytes less page zero
 
-error: 2 * 10^(-7)
+error: 9 * 10^(-7)
 
-cycle count  = 4471074620
-time @ 4MHz  = 4471074620 / 4*10^6 =  18 min 38 sec
+cycle count  = 4462041368
+time @ 4MHz  = 4462041368 / 4*10^6 =  18 min 36 sec
 
-Z88DK August 15, 2026
+Z88DK September 17, 2026
 sccz80 / new c library / math32
-5161 bytes less page zero
+5164 bytes less page zero
 
-error: 2 * 10^(-7)
+error: 9 * 10^(-7)
 
-cycle count  = 4247660135
-time @ 4MHz  = 4247660135 / 4*10^6 =  17 min 42 sec
+cycle count  = 4238626883
+time @ 4MHz  = 4238626883 / 4*10^6 =  17 min 40 sec
 
 Z88DK April 20, 2020
 sccz80 / new c library

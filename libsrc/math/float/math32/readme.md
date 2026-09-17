@@ -451,7 +451,7 @@ genmath has no Z180 or kc160 product (undocumented `ixh` / `ixl`). Those cells a
 | math48 | 2_379_690_672 | 2_370_841_872 | 2_091_459_593 | 666_739_415 | 656_023_478 |
 | bbcmath | 1_643_590_720 | 1_634_741_920 | 1_399_252_452 | 491_344_563 | 429_332_350 |
 | mbf32 | 1_835_079_611 | 1_826_230_811 | 1_663_652_473 | 522_036_603 | 457_635_342 |
-| math32 | 797_522_480 | 478_764_090 | 448_716_652 | 129_603_332 | 153_562_673 |
+| math32 | 808_246_253 | 489_494_160 | 458_365_103 | 132_576_945 | 157_258_791 |
 | math32 (opt) | 719_364_405 | 398_658_288 | 378_976_548 | 110_770_844 | 135_923_452 |
 
 ### n-body — 8080 / gbz80 / 8085 (ticks)
@@ -459,7 +459,7 @@ genmath has no Z180 or kc160 product (undocumented `ixh` / `ixl`). Those cells a
 | Library | 8080 | gbz80 | 8085 |
 |---------|------|-------|------|
 | mbf32 | 1_977_568_668 | 2_532_327_012 | 1_849_800_062 |
-| math32 | 1_696_440_576 | 1_663_519_444 | 1_485_952_681 |
+| math32 | 1_699_173_196 | 1_666_425_956 | 1_488_228_803 |
 | math32 (opt) | 1_470_242_071 | 1_460_721_244 | 1_291_080_960 |
 
 ### mandelbrot — Z80 family (ticks)
@@ -470,7 +470,7 @@ genmath has no Z180 or kc160 product (undocumented `ixh` / `ixl`). Those cells a
 | math48 | 3_266_218_225 | 3_266_218_225 | 2_883_529_545 | 915_300_242 | 905_375_630 |
 | bbcmath | 3_002_926_692 | 3_002_926_692 | 2_566_695_334 | 974_172_744 | 813_033_907 |
 | mbf32 | 1_798_158_288 | 1_798_158_288 | 1_641_336_382 | 522_151_491 | 459_272_316 |
-| math32 | 1_030_978_885 | 743_299_493 | 685_695_345 | 203_176_898 | 237_765_028 |
+| math32 | 1_052_817_722 | 766_710_792 | 706_328_057 | 209_670_888 | 245_118_629 |
 | math32 (opt) | 1_006_280_717 | 638_651_951 | 583_354_883 | 172_234_961 | 225_014_815 |
 
 ### mandelbrot — 8080 / gbz80 / 8085 (ticks)
@@ -478,7 +478,7 @@ genmath has no Z180 or kc160 product (undocumented `ixh` / `ixl`). Those cells a
 | Library | 8080 | gbz80 | 8085 |
 |---------|------|-------|------|
 | mbf32 | 1_918_663_977 | 2_486_836_444 | 1_805_825_914 |
-| math32 | 2_190_129_878 | 2_219_968_340 | 1_947_071_129 |
+| math32 | 2_198_385_678 | 2_225_063_632 | 1_952_471_924 |
 | math32 (opt) | 1_795_730_302 | 1_939_789_300 | 1_616_570_709 |
 
 ### whetstone — Z80 family (KWIPS @ 4 MHz)
@@ -489,16 +489,18 @@ genmath has no Z180 or kc160 product (undocumented `ixh` / `ixl`). Those cells a
 | math48 | 4.10 | 4.13 | 4.67 | 14.71 | 15.06 |
 | bbcmath | 7.15 | 7.23 | 8.58 | 23.89 | 27.87 |
 | mbf32 | 7.35 | 7.44 | 8.15 | 25.87 | 29.25 |
-| math32 | 11.05 | 15.52 | 17.08 | 59.26 | 56.12 |
+| math32 | 11.22 | 15.59 | 17.20 | 59.58 | 56.47 |
 
 ### whetstone — 8080 / gbz80 / 8085 (KWIPS @ 4 MHz)
 
 | Library | 8080 | gbz80 | 8085 |
 |---------|------|-------|------|
 | mbf32 | 6.86 | 5.46 | 7.30 |
-| math32 | 5.20 | 5.03 | 6.08 |
+| math32 | 5.32 | 5.18 | 6.23 |
 
 ### How to read the tables
+
+Classic `+test` PRINTF for n-body N=1000 prints `-0.1690752` / `-0.1690861` on sccz80 math32. That result is the same on z80 and 8085. First-energy error is `5 * 10^(-8)`. Second-energy error is `2 * 10^(-6)`.
 
 - On the Z80 family, math32 is the fastest library in these three benches. Hardware multiply on kc160 / z80n / z180 / eZ80 cuts mul-heavy work further. The opt rows show what `invsqrt` / `sqr` buy when you write for the library.
 - On 8080 / gbz80 / 8085, math32 wins **n-body**. The other libraries stay ahead on **whetstone** and on base **mandelbrot**. The mandelbrot opt row recovers most of that gap with `sqr()`.

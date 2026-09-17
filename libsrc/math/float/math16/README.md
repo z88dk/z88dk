@@ -371,20 +371,20 @@ half_t log10f16 (half_t x);
 half_t powf16 (half_t x, half_t y);
 ```
 
-## TIMER (sccz80, Sep 9 2026)
+## TIMER (sccz80, Sep 17 2026)
 
 Classic `+test` recipes in `support/benchmarks/*/z88dk-classic/`. Newlib `+z80 -clib=new`. Pure `--math16` (8085 TIMER also `-lmath32_8085` as a helper side-link). Map: `__code_fp_math32_size = $0000`.
 
 | Bench | Clib | CPU | Bytes | Ticks |
 |-------|------|-----|------:|------:|
 | n-body N=1000, DT=1e-1 | classic | z80 | 4124 | 295,229,389 |
-| n-body N=1000, DT=1e-1 | classic | 8085 | 4170 | 344,855,174 |
+| n-body N=1000, DT=1e-1 | classic | 8085 | 4174 | 348,032,655 |
 | n-body N=1000, DT=1e-1 | newlib | z80 | 3306 | 295,229,389 |
-| mandelbrot w=h=60 | classic | z80 | 3091 | 788,675,466 |
-| mandelbrot w=h=60 | classic | 8085 | 3301 | 955,053,921 |
-| mandelbrot w=h=60 | newlib | z80 | 2260 | 788,675,466 |
+| mandelbrot w=h=60 | classic | z80 | 3087 | 787,101,626 |
+| mandelbrot w=h=60 | classic | 8085 | 3303 | 961,145,497 |
+| mandelbrot w=h=60 | newlib | z80 | 2256 | 787,101,626 |
 | spectral-norm N=100 | classic | z80 | 3709 | 2,536,762,681 |
-| spectral-norm N=100 | classic | 8085 | 3948 | 2,465,495,200 |
+| spectral-norm N=100 | classic | 8085 | 3958 | 2,469,077,571 |
 
 No published newlib spectral math16 row. Full RESULT blocks: those `readme.txt` files.
 
