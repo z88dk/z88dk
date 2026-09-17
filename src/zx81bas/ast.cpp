@@ -1339,6 +1339,90 @@ void PrintStmt::dump(DumpContext ctx) const {
 }
 #endif
 
+StmtPtr LPrintStmt::clone() const {
+    auto s = std::make_unique<LPrintStmt>(loc);
+    for (auto& item : items) {
+        PrintItem new_item;
+        new_item.type = item.type;
+        if (item.expr) {
+            new_item.expr = item.expr->clone();
+        }
+        if (item.line_expr) {
+            new_item.line_expr = item.line_expr->clone();
+        }
+        if (item.col_expr) {
+            new_item.col_expr = item.col_expr->clone();
+        }
+        if (item.tab_expr) {
+            new_item.tab_expr = item.tab_expr->clone();
+        }
+        s->items.push_back(std::move(new_item));
+    }
+    return s;
+}
+
+void LPrintStmt::accept(ASTVisitor& v) {
+    if (v.enter(*this)) {
+        v.visit(*this);
+        // accept children
+        for (auto& item : items) {
+            v.walk_expr(item.expr);
+            v.walk_expr(item.line_expr);
+            v.walk_expr(item.col_expr);
+            v.walk_expr(item.tab_expr);
+        }
+        v.leave(*this);
+    }
+}
+
+std::vector<StmtPtr> LPrintStmt::lower(LoweringPass& pass) {
+    return pass.lower(*this);
+}
+
+#ifdef _DEBUG
+void LPrintStmt::dump(DumpContext ctx) const {
+    ctx.line("LPrintStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    child_ctx.line("items: [");
+    auto items_ctx = child_ctx.child();
+    for (const auto& item : items) {
+        switch (item.type) {
+        case PrintItem::Type::Expr:
+            items_ctx.line("Expr:");
+            if (item.expr) {
+                auto e_ctx = items_ctx.child();
+                item.expr->dump(e_ctx);
+            }
+            break;
+        case PrintItem::Type::Comma:
+            items_ctx.line("Comma");
+            break;
+        case PrintItem::Type::Semicolon:
+            items_ctx.line("Semicolon");
+            break;
+        case PrintItem::Type::At:
+            items_ctx.line("At:");
+            {
+                auto e_ctx = items_ctx.child();
+                dump_child_expr("line_expr", item.line_expr.get(), e_ctx);
+                dump_child_expr("col_expr", item.col_expr.get(), e_ctx);
+            }
+            break;
+        case PrintItem::Type::Tab:
+            items_ctx.line("Tab:");
+            if (item.tab_expr) {
+                auto e_ctx = items_ctx.child();
+                item.tab_expr->dump(e_ctx);
+            }
+            break;
+        }
+    }
+    child_ctx.line("]");
+    ctx.line("}");
+}
+#endif
+
 StmtPtr InputStmt::clone() const {
     auto s = std::make_unique<InputStmt>(loc);
     for (auto& var : vars) {
@@ -1460,6 +1544,37 @@ std::vector<StmtPtr> ListStmt::lower(LoweringPass& pass) {
 #ifdef _DEBUG
 void ListStmt::dump(DumpContext ctx) const {
     ctx.line("ListStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    dump_child_expr("target_expr", target_expr.get(), child_ctx);
+    ctx.line("}");
+}
+#endif
+
+StmtPtr LListStmt::clone() const {
+    auto s = std::make_unique<LListStmt>(loc);
+    if (target_expr) {
+        s->target_expr = target_expr->clone();
+    }
+    return s;
+}
+
+void LListStmt::accept(ASTVisitor& v) {
+    if (v.enter(*this)) {
+        v.visit(*this);
+        // accept children
+        v.walk_expr(target_expr);
+        v.leave(*this);
+    }
+}
+
+std::vector<StmtPtr> LListStmt::lower(LoweringPass& pass) {
+    return pass.lower(*this);
+}
+
+#ifdef _DEBUG
+void LListStmt::dump(DumpContext ctx) const {
+    ctx.line("LListStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
     dump_child_expr("target_expr", target_expr.get(), child_ctx);
@@ -1916,6 +2031,32 @@ std::vector<StmtPtr> ClearStmt::lower(LoweringPass& pass) {
 #ifdef _DEBUG
 void ClearStmt::dump(DumpContext ctx) const {
     ctx.line("ClearStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    ctx.line("}");
+}
+#endif
+
+StmtPtr CopyStmt::clone() const {
+    auto s = std::make_unique<CopyStmt>(loc);
+    return s;
+}
+
+void CopyStmt::accept(ASTVisitor& v) {
+    if (v.enter(*this)) {
+        v.visit(*this);
+        // accept children
+        v.leave(*this);
+    }
+}
+
+std::vector<StmtPtr> CopyStmt::lower(LoweringPass& pass) {
+    return pass.lower(*this);
+}
+
+#ifdef _DEBUG
+void CopyStmt::dump(DumpContext ctx) const {
+    ctx.line("CopyStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
     ctx.line("}");

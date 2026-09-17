@@ -626,6 +626,21 @@ struct PrintStmt : Stmt {
 #endif
 };
 
+struct LPrintStmt : Stmt {
+    std::vector<PrintItem> items;
+
+    using Stmt::Stmt;
+    virtual ~LPrintStmt() = default;
+
+    StmtPtr clone() const override;
+    void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
 struct InputStmt : Stmt {
     std::vector<ExprPtr> vars;      // variables, array refs, slices
 
@@ -677,6 +692,21 @@ struct ListStmt : Stmt {
 
     using Stmt::Stmt;
     virtual ~ListStmt() = default;
+
+    StmtPtr clone() const override;
+    void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
+struct LListStmt : Stmt {
+    ExprPtr target_expr;   // optional expression
+
+    using Stmt::Stmt;
+    virtual ~LListStmt() = default;
 
     StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;
@@ -896,6 +926,19 @@ struct ContStmt : Stmt {
 struct ClearStmt : Stmt {
     using Stmt::Stmt;
     virtual ~ClearStmt() = default;
+
+    StmtPtr clone() const override;
+    void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
+struct CopyStmt : Stmt {
+    using Stmt::Stmt;
+    virtual ~CopyStmt() = default;
 
     StmtPtr clone() const override;
     void accept(ASTVisitor& v) override;

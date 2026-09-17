@@ -11595,8 +11595,276 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "	INPUT A, ABC"
+                text: "	LPRINT"
                 location: test_t_input_04_t.bas:444
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LPRINT
+                text: "LPRINT"
+                ws_before: "	"
+                location: test_t_input_04_t.bas:444
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LPRINT ,"
+                location: test_t_input_04_t.bas:445
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LPRINT
+                text: "LPRINT"
+                ws_before: "	"
+                location: test_t_input_04_t.bas:445
+            }
+            Token {
+                type: ,
+                text: ","
+                ws_before: " "
+                location: test_t_input_04_t.bas:445
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LPRINT ;"
+                location: test_t_input_04_t.bas:446
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LPRINT
+                text: "LPRINT"
+                ws_before: "	"
+                location: test_t_input_04_t.bas:446
+            }
+            Token {
+                type: ;
+                text: ";"
+                ws_before: " "
+                location: test_t_input_04_t.bas:446
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LPRINT 2*3"
+                location: test_t_input_04_t.bas:447
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LPRINT
+                text: "LPRINT"
+                ws_before: "	"
+                location: test_t_input_04_t.bas:447
+            }
+            Token {
+                type: Integer
+                text: "2"
+                ivalue: 2
+                ws_before: " "
+                location: test_t_input_04_t.bas:447
+            }
+            Token {
+                type: *
+                text: "*"
+                location: test_t_input_04_t.bas:447
+            }
+            Token {
+                type: Integer
+                text: "3"
+                ivalue: 3
+                location: test_t_input_04_t.bas:447
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LPRINT TAB 8;"
+                location: test_t_input_04_t.bas:448
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LPRINT
+                text: "LPRINT"
+                ws_before: "	"
+                location: test_t_input_04_t.bas:448
+            }
+            Token {
+                type: Identifier
+                keyword: TAB
+                text: "TAB"
+                ws_before: " "
+                location: test_t_input_04_t.bas:448
+            }
+            Token {
+                type: Integer
+                text: "8"
+                ivalue: 8
+                ws_before: " "
+                location: test_t_input_04_t.bas:448
+            }
+            Token {
+                type: ;
+                text: ";"
+                location: test_t_input_04_t.bas:448
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LPRINT AT 10,10;"
+                location: test_t_input_04_t.bas:449
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LPRINT
+                text: "LPRINT"
+                ws_before: "	"
+                location: test_t_input_04_t.bas:449
+            }
+            Token {
+                type: Identifier
+                keyword: AT
+                text: "AT"
+                ws_before: " "
+                location: test_t_input_04_t.bas:449
+            }
+            Token {
+                type: Integer
+                text: "10"
+                ivalue: 10
+                ws_before: " "
+                location: test_t_input_04_t.bas:449
+            }
+            Token {
+                type: ,
+                text: ","
+                location: test_t_input_04_t.bas:449
+            }
+            Token {
+                type: Integer
+                text: "10"
+                ivalue: 10
+                location: test_t_input_04_t.bas:449
+            }
+            Token {
+                type: ;
+                text: ";"
+                location: test_t_input_04_t.bas:449
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LPRINT AT 10,10;"HELLO";TAB 10;"WORLD";"
+                location: test_t_input_04_t.bas:450
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LPRINT
+                text: "LPRINT"
+                ws_before: "	"
+                location: test_t_input_04_t.bas:450
+            }
+            Token {
+                type: Identifier
+                keyword: AT
+                text: "AT"
+                ws_before: " "
+                location: test_t_input_04_t.bas:450
+            }
+            Token {
+                type: Integer
+                text: "10"
+                ivalue: 10
+                ws_before: " "
+                location: test_t_input_04_t.bas:450
+            }
+            Token {
+                type: ,
+                text: ","
+                location: test_t_input_04_t.bas:450
+            }
+            Token {
+                type: Integer
+                text: "10"
+                ivalue: 10
+                location: test_t_input_04_t.bas:450
+            }
+            Token {
+                type: ;
+                text: ";"
+                location: test_t_input_04_t.bas:450
+            }
+            Token {
+                type: StringLiteral
+                text: ""HELLO""
+                svalue: "HELLO"
+                location: test_t_input_04_t.bas:450
+            }
+            Token {
+                type: ;
+                text: ";"
+                location: test_t_input_04_t.bas:450
+            }
+            Token {
+                type: Identifier
+                keyword: TAB
+                text: "TAB"
+                location: test_t_input_04_t.bas:450
+            }
+            Token {
+                type: Integer
+                text: "10"
+                ivalue: 10
+                ws_before: " "
+                location: test_t_input_04_t.bas:450
+            }
+            Token {
+                type: ;
+                text: ";"
+                location: test_t_input_04_t.bas:450
+            }
+            Token {
+                type: StringLiteral
+                text: ""WORLD""
+                svalue: "WORLD"
+                location: test_t_input_04_t.bas:450
+            }
+            Token {
+                type: ;
+                text: ";"
+                location: test_t_input_04_t.bas:450
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	INPUT A, ABC"
+                location: test_t_input_04_t.bas:456
             }
         tokens: [
             Token {
@@ -11604,24 +11872,24 @@ TokFile {
                 keyword: INPUT
                 text: "INPUT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:444
+                location: test_t_input_04_t.bas:456
             }
             Token {
                 type: Identifier
                 text: "A"
                 ws_before: " "
-                location: test_t_input_04_t.bas:444
+                location: test_t_input_04_t.bas:456
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:444
+                location: test_t_input_04_t.bas:456
             }
             Token {
                 type: Identifier
                 text: "ABC"
                 ws_before: " "
-                location: test_t_input_04_t.bas:444
+                location: test_t_input_04_t.bas:456
             }
         ]
     }
@@ -11630,7 +11898,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	INPUT A(1,2)"
-                location: test_t_input_04_t.bas:445
+                location: test_t_input_04_t.bas:457
             }
         tokens: [
             Token {
@@ -11638,40 +11906,40 @@ TokFile {
                 keyword: INPUT
                 text: "INPUT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:445
+                location: test_t_input_04_t.bas:457
             }
             Token {
                 type: Identifier
                 text: "A"
                 ws_before: " "
-                location: test_t_input_04_t.bas:445
+                location: test_t_input_04_t.bas:457
             }
             Token {
                 type: (
                 text: "("
-                location: test_t_input_04_t.bas:445
+                location: test_t_input_04_t.bas:457
             }
             Token {
                 type: Integer
                 text: "1"
                 ivalue: 1
-                location: test_t_input_04_t.bas:445
+                location: test_t_input_04_t.bas:457
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:445
+                location: test_t_input_04_t.bas:457
             }
             Token {
                 type: Integer
                 text: "2"
                 ivalue: 2
-                location: test_t_input_04_t.bas:445
+                location: test_t_input_04_t.bas:457
             }
             Token {
                 type: )
                 text: ")"
-                location: test_t_input_04_t.bas:445
+                location: test_t_input_04_t.bas:457
             }
         ]
     }
@@ -11680,7 +11948,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	INPUT A$"
-                location: test_t_input_04_t.bas:446
+                location: test_t_input_04_t.bas:458
             }
         tokens: [
             Token {
@@ -11688,13 +11956,13 @@ TokFile {
                 keyword: INPUT
                 text: "INPUT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:446
+                location: test_t_input_04_t.bas:458
             }
             Token {
                 type: Identifier
                 text: "A$"
                 ws_before: " "
-                location: test_t_input_04_t.bas:446
+                location: test_t_input_04_t.bas:458
             }
         ]
     }
@@ -11703,7 +11971,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	INPUT A$(1,2)"
-                location: test_t_input_04_t.bas:447
+                location: test_t_input_04_t.bas:459
             }
         tokens: [
             Token {
@@ -11711,40 +11979,40 @@ TokFile {
                 keyword: INPUT
                 text: "INPUT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:447
+                location: test_t_input_04_t.bas:459
             }
             Token {
                 type: Identifier
                 text: "A$"
                 ws_before: " "
-                location: test_t_input_04_t.bas:447
+                location: test_t_input_04_t.bas:459
             }
             Token {
                 type: (
                 text: "("
-                location: test_t_input_04_t.bas:447
+                location: test_t_input_04_t.bas:459
             }
             Token {
                 type: Integer
                 text: "1"
                 ivalue: 1
-                location: test_t_input_04_t.bas:447
+                location: test_t_input_04_t.bas:459
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:447
+                location: test_t_input_04_t.bas:459
             }
             Token {
                 type: Integer
                 text: "2"
                 ivalue: 2
-                location: test_t_input_04_t.bas:447
+                location: test_t_input_04_t.bas:459
             }
             Token {
                 type: )
                 text: ")"
-                location: test_t_input_04_t.bas:447
+                location: test_t_input_04_t.bas:459
             }
         ]
     }
@@ -11753,7 +12021,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	INPUT A$(1 TO 2)"
-                location: test_t_input_04_t.bas:448
+                location: test_t_input_04_t.bas:460
             }
         tokens: [
             Token {
@@ -11761,43 +12029,43 @@ TokFile {
                 keyword: INPUT
                 text: "INPUT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:448
+                location: test_t_input_04_t.bas:460
             }
             Token {
                 type: Identifier
                 text: "A$"
                 ws_before: " "
-                location: test_t_input_04_t.bas:448
+                location: test_t_input_04_t.bas:460
             }
             Token {
                 type: (
                 text: "("
-                location: test_t_input_04_t.bas:448
+                location: test_t_input_04_t.bas:460
             }
             Token {
                 type: Integer
                 text: "1"
                 ivalue: 1
-                location: test_t_input_04_t.bas:448
+                location: test_t_input_04_t.bas:460
             }
             Token {
                 type: Identifier
                 keyword: TO
                 text: "TO"
                 ws_before: " "
-                location: test_t_input_04_t.bas:448
+                location: test_t_input_04_t.bas:460
             }
             Token {
                 type: Integer
                 text: "2"
                 ivalue: 2
                 ws_before: " "
-                location: test_t_input_04_t.bas:448
+                location: test_t_input_04_t.bas:460
             }
             Token {
                 type: )
                 text: ")"
-                location: test_t_input_04_t.bas:448
+                location: test_t_input_04_t.bas:460
             }
         ]
     }
@@ -11806,7 +12074,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	INPUT A$(1,2)(3 TO 4)"
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
         tokens: [
             Token {
@@ -11814,70 +12082,70 @@ TokFile {
                 keyword: INPUT
                 text: "INPUT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
             Token {
                 type: Identifier
                 text: "A$"
                 ws_before: " "
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
             Token {
                 type: (
                 text: "("
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
             Token {
                 type: Integer
                 text: "1"
                 ivalue: 1
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
             Token {
                 type: Integer
                 text: "2"
                 ivalue: 2
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
             Token {
                 type: )
                 text: ")"
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
             Token {
                 type: (
                 text: "("
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
             Token {
                 type: Integer
                 text: "3"
                 ivalue: 3
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
             Token {
                 type: Identifier
                 keyword: TO
                 text: "TO"
                 ws_before: " "
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
             Token {
                 type: Integer
                 text: "4"
                 ivalue: 4
                 ws_before: " "
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
             Token {
                 type: )
                 text: ")"
-                location: test_t_input_04_t.bas:449
+                location: test_t_input_04_t.bas:461
             }
         ]
     }
@@ -11886,7 +12154,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	INPUT A$(TO 3)"
-                location: test_t_input_04_t.bas:450
+                location: test_t_input_04_t.bas:462
             }
         tokens: [
             Token {
@@ -11894,36 +12162,36 @@ TokFile {
                 keyword: INPUT
                 text: "INPUT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:450
+                location: test_t_input_04_t.bas:462
             }
             Token {
                 type: Identifier
                 text: "A$"
                 ws_before: " "
-                location: test_t_input_04_t.bas:450
+                location: test_t_input_04_t.bas:462
             }
             Token {
                 type: (
                 text: "("
-                location: test_t_input_04_t.bas:450
+                location: test_t_input_04_t.bas:462
             }
             Token {
                 type: Identifier
                 keyword: TO
                 text: "TO"
-                location: test_t_input_04_t.bas:450
+                location: test_t_input_04_t.bas:462
             }
             Token {
                 type: Integer
                 text: "3"
                 ivalue: 3
                 ws_before: " "
-                location: test_t_input_04_t.bas:450
+                location: test_t_input_04_t.bas:462
             }
             Token {
                 type: )
                 text: ")"
-                location: test_t_input_04_t.bas:450
+                location: test_t_input_04_t.bas:462
             }
         ]
     }
@@ -11932,7 +12200,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	INPUT A$(2 TO)"
-                location: test_t_input_04_t.bas:451
+                location: test_t_input_04_t.bas:463
             }
         tokens: [
             Token {
@@ -11940,36 +12208,36 @@ TokFile {
                 keyword: INPUT
                 text: "INPUT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:451
+                location: test_t_input_04_t.bas:463
             }
             Token {
                 type: Identifier
                 text: "A$"
                 ws_before: " "
-                location: test_t_input_04_t.bas:451
+                location: test_t_input_04_t.bas:463
             }
             Token {
                 type: (
                 text: "("
-                location: test_t_input_04_t.bas:451
+                location: test_t_input_04_t.bas:463
             }
             Token {
                 type: Integer
                 text: "2"
                 ivalue: 2
-                location: test_t_input_04_t.bas:451
+                location: test_t_input_04_t.bas:463
             }
             Token {
                 type: Identifier
                 keyword: TO
                 text: "TO"
                 ws_before: " "
-                location: test_t_input_04_t.bas:451
+                location: test_t_input_04_t.bas:463
             }
             Token {
                 type: )
                 text: ")"
-                location: test_t_input_04_t.bas:451
+                location: test_t_input_04_t.bas:463
             }
         ]
     }
@@ -11978,7 +12246,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	INPUT A,A$"
-                location: test_t_input_04_t.bas:452
+                location: test_t_input_04_t.bas:464
             }
         tokens: [
             Token {
@@ -11986,23 +12254,23 @@ TokFile {
                 keyword: INPUT
                 text: "INPUT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:452
+                location: test_t_input_04_t.bas:464
             }
             Token {
                 type: Identifier
                 text: "A"
                 ws_before: " "
-                location: test_t_input_04_t.bas:452
+                location: test_t_input_04_t.bas:464
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:452
+                location: test_t_input_04_t.bas:464
             }
             Token {
                 type: Identifier
                 text: "A$"
-                location: test_t_input_04_t.bas:452
+                location: test_t_input_04_t.bas:464
             }
         ]
     }
@@ -12011,7 +12279,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	INPUT I1,I(10)"
-                location: test_t_input_04_t.bas:453
+                location: test_t_input_04_t.bas:465
             }
         tokens: [
             Token {
@@ -12019,39 +12287,39 @@ TokFile {
                 keyword: INPUT
                 text: "INPUT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:453
+                location: test_t_input_04_t.bas:465
             }
             Token {
                 type: Identifier
                 text: "I1"
                 ws_before: " "
-                location: test_t_input_04_t.bas:453
+                location: test_t_input_04_t.bas:465
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:453
+                location: test_t_input_04_t.bas:465
             }
             Token {
                 type: Identifier
                 text: "I"
-                location: test_t_input_04_t.bas:453
+                location: test_t_input_04_t.bas:465
             }
             Token {
                 type: (
                 text: "("
-                location: test_t_input_04_t.bas:453
+                location: test_t_input_04_t.bas:465
             }
             Token {
                 type: Integer
                 text: "10"
                 ivalue: 10
-                location: test_t_input_04_t.bas:453
+                location: test_t_input_04_t.bas:465
             }
             Token {
                 type: )
                 text: ")"
-                location: test_t_input_04_t.bas:453
+                location: test_t_input_04_t.bas:465
             }
         ]
     }
@@ -12060,7 +12328,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	REM"
-                location: test_t_input_04_t.bas:459
+                location: test_t_input_04_t.bas:471
             }
         tokens: [
             Token {
@@ -12068,7 +12336,7 @@ TokFile {
                 keyword: REM
                 text: "REM"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:459
+                location: test_t_input_04_t.bas:471
             }
         ]
     }
@@ -12077,7 +12345,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	REM COMMENT TEXT : COLONS ARE PART OF COMMENT"
-                location: test_t_input_04_t.bas:460
+                location: test_t_input_04_t.bas:472
             }
         tokens: [
             Token {
@@ -12085,55 +12353,55 @@ TokFile {
                 keyword: REM
                 text: "REM"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:460
+                location: test_t_input_04_t.bas:472
             }
             Token {
                 type: Identifier
                 text: "COMMENT"
                 ws_before: " "
-                location: test_t_input_04_t.bas:460
+                location: test_t_input_04_t.bas:472
             }
             Token {
                 type: Identifier
                 text: "TEXT"
                 ws_before: " "
-                location: test_t_input_04_t.bas:460
+                location: test_t_input_04_t.bas:472
             }
             Token {
                 type: :
                 text: ":"
                 ws_before: " "
-                location: test_t_input_04_t.bas:460
+                location: test_t_input_04_t.bas:472
             }
             Token {
                 type: Identifier
                 text: "COLONS"
                 ws_before: " "
-                location: test_t_input_04_t.bas:460
+                location: test_t_input_04_t.bas:472
             }
             Token {
                 type: Identifier
                 text: "ARE"
                 ws_before: " "
-                location: test_t_input_04_t.bas:460
+                location: test_t_input_04_t.bas:472
             }
             Token {
                 type: Identifier
                 text: "PART"
                 ws_before: " "
-                location: test_t_input_04_t.bas:460
+                location: test_t_input_04_t.bas:472
             }
             Token {
                 type: Identifier
                 text: "OF"
                 ws_before: " "
-                location: test_t_input_04_t.bas:460
+                location: test_t_input_04_t.bas:472
             }
             Token {
                 type: Identifier
                 text: "COMMENT"
                 ws_before: " "
-                location: test_t_input_04_t.bas:460
+                location: test_t_input_04_t.bas:472
             }
         ]
     }
@@ -12142,19 +12410,19 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	start_rem:"
-                location: test_t_input_04_t.bas:462
+                location: test_t_input_04_t.bas:474
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "START_REM"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:462
+                location: test_t_input_04_t.bas:474
             }
             Token {
                 type: :
                 text: ":"
-                location: test_t_input_04_t.bas:462
+                location: test_t_input_04_t.bas:474
             }
         ]
     }
@@ -12163,14 +12431,14 @@ TokFile {
         src_line:
             SrcLine {
                 text: "		ret"
-                location: test_t_input_04_t.bas:466
+                location: test_t_input_04_t.bas:478
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "RET"
                 ws_before: "		"
-                location: test_t_input_04_t.bas:466
+                location: test_t_input_04_t.bas:478
             }
         ]
     }
@@ -12179,7 +12447,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	RUN "
-                location: test_t_input_04_t.bas:473
+                location: test_t_input_04_t.bas:485
             }
         tokens: [
             Token {
@@ -12187,7 +12455,7 @@ TokFile {
                 keyword: RUN
                 text: "RUN"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:473
+                location: test_t_input_04_t.bas:485
             }
         ]
     }
@@ -12196,7 +12464,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	RUN 1000"
-                location: test_t_input_04_t.bas:474
+                location: test_t_input_04_t.bas:486
             }
         tokens: [
             Token {
@@ -12204,14 +12472,14 @@ TokFile {
                 keyword: RUN
                 text: "RUN"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:474
+                location: test_t_input_04_t.bas:486
             }
             Token {
                 type: Integer
                 text: "1000"
                 ivalue: 1000
                 ws_before: " "
-                location: test_t_input_04_t.bas:474
+                location: test_t_input_04_t.bas:486
             }
         ]
     }
@@ -12220,7 +12488,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	RUN 1000+20*A"
-                location: test_t_input_04_t.bas:475
+                location: test_t_input_04_t.bas:487
             }
         tokens: [
             Token {
@@ -12228,35 +12496,35 @@ TokFile {
                 keyword: RUN
                 text: "RUN"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:475
+                location: test_t_input_04_t.bas:487
             }
             Token {
                 type: Integer
                 text: "1000"
                 ivalue: 1000
                 ws_before: " "
-                location: test_t_input_04_t.bas:475
+                location: test_t_input_04_t.bas:487
             }
             Token {
                 type: +
                 text: "+"
-                location: test_t_input_04_t.bas:475
+                location: test_t_input_04_t.bas:487
             }
             Token {
                 type: Integer
                 text: "20"
                 ivalue: 20
-                location: test_t_input_04_t.bas:475
+                location: test_t_input_04_t.bas:487
             }
             Token {
                 type: *
                 text: "*"
-                location: test_t_input_04_t.bas:475
+                location: test_t_input_04_t.bas:487
             }
             Token {
                 type: Identifier
                 text: "A"
-                location: test_t_input_04_t.bas:475
+                location: test_t_input_04_t.bas:487
             }
         ]
     }
@@ -12265,7 +12533,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	RUN @label1"
-                location: test_t_input_04_t.bas:476
+                location: test_t_input_04_t.bas:488
             }
         tokens: [
             Token {
@@ -12273,18 +12541,18 @@ TokFile {
                 keyword: RUN
                 text: "RUN"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:476
+                location: test_t_input_04_t.bas:488
             }
             Token {
                 type: @
                 text: "@"
                 ws_before: " "
-                location: test_t_input_04_t.bas:476
+                location: test_t_input_04_t.bas:488
             }
             Token {
                 type: Identifier
                 text: "LABEL1"
-                location: test_t_input_04_t.bas:476
+                location: test_t_input_04_t.bas:488
             }
         ]
     }
@@ -12293,7 +12561,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	NEW"
-                location: test_t_input_04_t.bas:482
+                location: test_t_input_04_t.bas:494
             }
         tokens: [
             Token {
@@ -12301,7 +12569,7 @@ TokFile {
                 keyword: NEW
                 text: "NEW"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:482
+                location: test_t_input_04_t.bas:494
             }
         ]
     }
@@ -12310,7 +12578,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	CLS"
-                location: test_t_input_04_t.bas:488
+                location: test_t_input_04_t.bas:500
             }
         tokens: [
             Token {
@@ -12318,7 +12586,7 @@ TokFile {
                 keyword: CLS
                 text: "CLS"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:488
+                location: test_t_input_04_t.bas:500
             }
         ]
     }
@@ -12327,7 +12595,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	LOAD "file""
-                location: test_t_input_04_t.bas:494
+                location: test_t_input_04_t.bas:506
             }
         tokens: [
             Token {
@@ -12335,14 +12603,14 @@ TokFile {
                 keyword: LOAD
                 text: "LOAD"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:494
+                location: test_t_input_04_t.bas:506
             }
             Token {
                 type: StringLiteral
                 text: ""file""
                 svalue: "file"
                 ws_before: " "
-                location: test_t_input_04_t.bas:494
+                location: test_t_input_04_t.bas:506
             }
         ]
     }
@@ -12351,7 +12619,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	SAVE "file""
-                location: test_t_input_04_t.bas:500
+                location: test_t_input_04_t.bas:512
             }
         tokens: [
             Token {
@@ -12359,14 +12627,14 @@ TokFile {
                 keyword: SAVE
                 text: "SAVE"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:500
+                location: test_t_input_04_t.bas:512
             }
             Token {
                 type: StringLiteral
                 text: ""file""
                 svalue: "file"
                 ws_before: " "
-                location: test_t_input_04_t.bas:500
+                location: test_t_input_04_t.bas:512
             }
         ]
     }
@@ -12375,7 +12643,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	POKE 16384,0xff"
-                location: test_t_input_04_t.bas:506
+                location: test_t_input_04_t.bas:518
             }
         tokens: [
             Token {
@@ -12383,25 +12651,25 @@ TokFile {
                 keyword: POKE
                 text: "POKE"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:506
+                location: test_t_input_04_t.bas:518
             }
             Token {
                 type: Integer
                 text: "16384"
                 ivalue: 16384
                 ws_before: " "
-                location: test_t_input_04_t.bas:506
+                location: test_t_input_04_t.bas:518
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:506
+                location: test_t_input_04_t.bas:518
             }
             Token {
                 type: Integer
                 text: "0xff"
                 ivalue: 255
-                location: test_t_input_04_t.bas:506
+                location: test_t_input_04_t.bas:518
             }
         ]
     }
@@ -12410,7 +12678,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	POKEW 16384,$0102"
-                location: test_t_input_04_t.bas:512
+                location: test_t_input_04_t.bas:524
             }
         tokens: [
             Token {
@@ -12418,25 +12686,25 @@ TokFile {
                 keyword: POKEW
                 text: "POKEW"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:512
+                location: test_t_input_04_t.bas:524
             }
             Token {
                 type: Integer
                 text: "16384"
                 ivalue: 16384
                 ws_before: " "
-                location: test_t_input_04_t.bas:512
+                location: test_t_input_04_t.bas:524
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:512
+                location: test_t_input_04_t.bas:524
             }
             Token {
                 type: Integer
                 text: "$0102"
                 ivalue: 258
-                location: test_t_input_04_t.bas:512
+                location: test_t_input_04_t.bas:524
             }
         ]
     }
@@ -12445,7 +12713,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	RAND USR 16514"
-                location: test_t_input_04_t.bas:518
+                location: test_t_input_04_t.bas:530
             }
         tokens: [
             Token {
@@ -12453,21 +12721,21 @@ TokFile {
                 keyword: RAND
                 text: "RAND"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:518
+                location: test_t_input_04_t.bas:530
             }
             Token {
                 type: Identifier
                 keyword: USR
                 text: "USR"
                 ws_before: " "
-                location: test_t_input_04_t.bas:518
+                location: test_t_input_04_t.bas:530
             }
             Token {
                 type: Integer
                 text: "16514"
                 ivalue: 16514
                 ws_before: " "
-                location: test_t_input_04_t.bas:518
+                location: test_t_input_04_t.bas:530
             }
         ]
     }
@@ -12476,7 +12744,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PAUSE 50"
-                location: test_t_input_04_t.bas:524
+                location: test_t_input_04_t.bas:536
             }
         tokens: [
             Token {
@@ -12484,14 +12752,14 @@ TokFile {
                 keyword: PAUSE
                 text: "PAUSE"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:524
+                location: test_t_input_04_t.bas:536
             }
             Token {
                 type: Integer
                 text: "50"
                 ivalue: 50
                 ws_before: " "
-                location: test_t_input_04_t.bas:524
+                location: test_t_input_04_t.bas:536
             }
         ]
     }
@@ -12500,7 +12768,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	FAST"
-                location: test_t_input_04_t.bas:530
+                location: test_t_input_04_t.bas:542
             }
         tokens: [
             Token {
@@ -12508,7 +12776,7 @@ TokFile {
                 keyword: FAST
                 text: "FAST"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:530
+                location: test_t_input_04_t.bas:542
             }
         ]
     }
@@ -12517,7 +12785,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	SLOW"
-                location: test_t_input_04_t.bas:536
+                location: test_t_input_04_t.bas:548
             }
         tokens: [
             Token {
@@ -12525,7 +12793,7 @@ TokFile {
                 keyword: SLOW
                 text: "SLOW"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:536
+                location: test_t_input_04_t.bas:548
             }
         ]
     }
@@ -12534,7 +12802,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	LIST"
-                location: test_t_input_04_t.bas:542
+                location: test_t_input_04_t.bas:554
             }
         tokens: [
             Token {
@@ -12542,7 +12810,7 @@ TokFile {
                 keyword: LIST
                 text: "LIST"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:542
+                location: test_t_input_04_t.bas:554
             }
         ]
     }
@@ -12551,7 +12819,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	LIST 10"
-                location: test_t_input_04_t.bas:543
+                location: test_t_input_04_t.bas:555
             }
         tokens: [
             Token {
@@ -12559,14 +12827,14 @@ TokFile {
                 keyword: LIST
                 text: "LIST"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:543
+                location: test_t_input_04_t.bas:555
             }
             Token {
                 type: Integer
                 text: "10"
                 ivalue: 10
                 ws_before: " "
-                location: test_t_input_04_t.bas:543
+                location: test_t_input_04_t.bas:555
             }
         ]
     }
@@ -12575,7 +12843,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	LIST 10*4"
-                location: test_t_input_04_t.bas:544
+                location: test_t_input_04_t.bas:556
             }
         tokens: [
             Token {
@@ -12583,25 +12851,25 @@ TokFile {
                 keyword: LIST
                 text: "LIST"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:544
+                location: test_t_input_04_t.bas:556
             }
             Token {
                 type: Integer
                 text: "10"
                 ivalue: 10
                 ws_before: " "
-                location: test_t_input_04_t.bas:544
+                location: test_t_input_04_t.bas:556
             }
             Token {
                 type: *
                 text: "*"
-                location: test_t_input_04_t.bas:544
+                location: test_t_input_04_t.bas:556
             }
             Token {
                 type: Integer
                 text: "4"
                 ivalue: 4
-                location: test_t_input_04_t.bas:544
+                location: test_t_input_04_t.bas:556
             }
         ]
     }
@@ -12610,7 +12878,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	LIST @label1"
-                location: test_t_input_04_t.bas:545
+                location: test_t_input_04_t.bas:557
             }
         tokens: [
             Token {
@@ -12618,18 +12886,18 @@ TokFile {
                 keyword: LIST
                 text: "LIST"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:545
+                location: test_t_input_04_t.bas:557
             }
             Token {
                 type: @
                 text: "@"
                 ws_before: " "
-                location: test_t_input_04_t.bas:545
+                location: test_t_input_04_t.bas:557
             }
             Token {
                 type: Identifier
                 text: "LABEL1"
-                location: test_t_input_04_t.bas:545
+                location: test_t_input_04_t.bas:557
             }
         ]
     }
@@ -12638,7 +12906,121 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	"
-                location: test_t_input_04_t.bas:546
+                location: test_t_input_04_t.bas:558
+            }
+        tokens: [
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LLIST"
+                location: test_t_input_04_t.bas:563
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LLIST
+                text: "LLIST"
+                ws_before: "	"
+                location: test_t_input_04_t.bas:563
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LLIST 10"
+                location: test_t_input_04_t.bas:564
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LLIST
+                text: "LLIST"
+                ws_before: "	"
+                location: test_t_input_04_t.bas:564
+            }
+            Token {
+                type: Integer
+                text: "10"
+                ivalue: 10
+                ws_before: " "
+                location: test_t_input_04_t.bas:564
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LLIST 10*4"
+                location: test_t_input_04_t.bas:565
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LLIST
+                text: "LLIST"
+                ws_before: "	"
+                location: test_t_input_04_t.bas:565
+            }
+            Token {
+                type: Integer
+                text: "10"
+                ivalue: 10
+                ws_before: " "
+                location: test_t_input_04_t.bas:565
+            }
+            Token {
+                type: *
+                text: "*"
+                location: test_t_input_04_t.bas:565
+            }
+            Token {
+                type: Integer
+                text: "4"
+                ivalue: 4
+                location: test_t_input_04_t.bas:565
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LLIST @label1"
+                location: test_t_input_04_t.bas:566
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LLIST
+                text: "LLIST"
+                ws_before: "	"
+                location: test_t_input_04_t.bas:566
+            }
+            Token {
+                type: @
+                text: "@"
+                ws_before: " "
+                location: test_t_input_04_t.bas:566
+            }
+            Token {
+                type: Identifier
+                text: "LABEL1"
+                location: test_t_input_04_t.bas:566
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	"
+                location: test_t_input_04_t.bas:567
             }
         tokens: [
         ]
@@ -12648,46 +13030,46 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	X=0:Y=0"
-                location: test_t_input_04_t.bas:551
+                location: test_t_input_04_t.bas:572
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "X"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:551
+                location: test_t_input_04_t.bas:572
             }
             Token {
                 type: =
                 text: "="
-                location: test_t_input_04_t.bas:551
+                location: test_t_input_04_t.bas:572
             }
             Token {
                 type: Integer
                 text: "0"
                 ivalue: 0
-                location: test_t_input_04_t.bas:551
+                location: test_t_input_04_t.bas:572
             }
             Token {
                 type: :
                 text: ":"
-                location: test_t_input_04_t.bas:551
+                location: test_t_input_04_t.bas:572
             }
             Token {
                 type: Identifier
                 text: "Y"
-                location: test_t_input_04_t.bas:551
+                location: test_t_input_04_t.bas:572
             }
             Token {
                 type: =
                 text: "="
-                location: test_t_input_04_t.bas:551
+                location: test_t_input_04_t.bas:572
             }
             Token {
                 type: Integer
                 text: "0"
                 ivalue: 0
-                location: test_t_input_04_t.bas:551
+                location: test_t_input_04_t.bas:572
             }
         ]
     }
@@ -12696,7 +13078,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PLOT 0,1"
-                location: test_t_input_04_t.bas:552
+                location: test_t_input_04_t.bas:573
             }
         tokens: [
             Token {
@@ -12704,25 +13086,25 @@ TokFile {
                 keyword: PLOT
                 text: "PLOT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:552
+                location: test_t_input_04_t.bas:573
             }
             Token {
                 type: Integer
                 text: "0"
                 ivalue: 0
                 ws_before: " "
-                location: test_t_input_04_t.bas:552
+                location: test_t_input_04_t.bas:573
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:552
+                location: test_t_input_04_t.bas:573
             }
             Token {
                 type: Integer
                 text: "1"
                 ivalue: 1
-                location: test_t_input_04_t.bas:552
+                location: test_t_input_04_t.bas:573
             }
         ]
     }
@@ -12731,7 +13113,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PLOT X,Y"
-                location: test_t_input_04_t.bas:553
+                location: test_t_input_04_t.bas:574
             }
         tokens: [
             Token {
@@ -12739,23 +13121,23 @@ TokFile {
                 keyword: PLOT
                 text: "PLOT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:553
+                location: test_t_input_04_t.bas:574
             }
             Token {
                 type: Identifier
                 text: "X"
                 ws_before: " "
-                location: test_t_input_04_t.bas:553
+                location: test_t_input_04_t.bas:574
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:553
+                location: test_t_input_04_t.bas:574
             }
             Token {
                 type: Identifier
                 text: "Y"
-                location: test_t_input_04_t.bas:553
+                location: test_t_input_04_t.bas:574
             }
         ]
     }
@@ -12764,7 +13146,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	UNPLOT 0,1"
-                location: test_t_input_04_t.bas:559
+                location: test_t_input_04_t.bas:580
             }
         tokens: [
             Token {
@@ -12772,25 +13154,25 @@ TokFile {
                 keyword: UNPLOT
                 text: "UNPLOT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:559
+                location: test_t_input_04_t.bas:580
             }
             Token {
                 type: Integer
                 text: "0"
                 ivalue: 0
                 ws_before: " "
-                location: test_t_input_04_t.bas:559
+                location: test_t_input_04_t.bas:580
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:559
+                location: test_t_input_04_t.bas:580
             }
             Token {
                 type: Integer
                 text: "1"
                 ivalue: 1
-                location: test_t_input_04_t.bas:559
+                location: test_t_input_04_t.bas:580
             }
         ]
     }
@@ -12799,7 +13181,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	UNPLOT X,Y"
-                location: test_t_input_04_t.bas:560
+                location: test_t_input_04_t.bas:581
             }
         tokens: [
             Token {
@@ -12807,23 +13189,23 @@ TokFile {
                 keyword: UNPLOT
                 text: "UNPLOT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:560
+                location: test_t_input_04_t.bas:581
             }
             Token {
                 type: Identifier
                 text: "X"
                 ws_before: " "
-                location: test_t_input_04_t.bas:560
+                location: test_t_input_04_t.bas:581
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:560
+                location: test_t_input_04_t.bas:581
             }
             Token {
                 type: Identifier
                 text: "Y"
-                location: test_t_input_04_t.bas:560
+                location: test_t_input_04_t.bas:581
             }
         ]
     }
@@ -12832,7 +13214,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	SCROLL"
-                location: test_t_input_04_t.bas:566
+                location: test_t_input_04_t.bas:587
             }
         tokens: [
             Token {
@@ -12840,7 +13222,7 @@ TokFile {
                 keyword: SCROLL
                 text: "SCROLL"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:566
+                location: test_t_input_04_t.bas:587
             }
         ]
     }
@@ -12849,7 +13231,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	CONT"
-                location: test_t_input_04_t.bas:572
+                location: test_t_input_04_t.bas:593
             }
         tokens: [
             Token {
@@ -12857,7 +13239,7 @@ TokFile {
                 keyword: CONT
                 text: "CONT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:572
+                location: test_t_input_04_t.bas:593
             }
         ]
     }
@@ -12866,7 +13248,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	CLEAR"
-                location: test_t_input_04_t.bas:578
+                location: test_t_input_04_t.bas:599
             }
         tokens: [
             Token {
@@ -12874,7 +13256,24 @@ TokFile {
                 keyword: CLEAR
                 text: "CLEAR"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:578
+                location: test_t_input_04_t.bas:599
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	COPY"
+                location: test_t_input_04_t.bas:605
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: COPY
+                text: "COPY"
+                ws_before: "	"
+                location: test_t_input_04_t.bas:605
             }
         ]
     }
@@ -12883,7 +13282,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT "HELLO""
-                location: test_t_input_04_t.bas:584
+                location: test_t_input_04_t.bas:611
             }
         tokens: [
             Token {
@@ -12891,14 +13290,14 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                location: test_t_input_04_t.bas:584
+                location: test_t_input_04_t.bas:611
             }
             Token {
                 type: StringLiteral
                 text: ""HELLO""
                 svalue: "HELLO"
                 ws_before: " "
-                location: test_t_input_04_t.bas:584
+                location: test_t_input_04_t.bas:611
             }
         ]
     }
@@ -12907,43 +13306,43 @@ TokFile {
         src_line:
             SrcLine {
                 text: "end:		ld a, 1"
-                location: test_t_input_04_t.bas:587
+                location: test_t_input_04_t.bas:614
             }
         tokens: [
             Token {
                 type: Identifier
                 keyword: END
                 text: "END"
-                location: test_t_input_04_t.bas:587
+                location: test_t_input_04_t.bas:614
             }
             Token {
                 type: :
                 text: ":"
-                location: test_t_input_04_t.bas:587
+                location: test_t_input_04_t.bas:614
             }
             Token {
                 type: Identifier
                 text: "LD"
                 ws_before: "		"
-                location: test_t_input_04_t.bas:587
+                location: test_t_input_04_t.bas:614
             }
             Token {
                 type: Identifier
                 text: "A"
                 ws_before: " "
-                location: test_t_input_04_t.bas:587
+                location: test_t_input_04_t.bas:614
             }
             Token {
                 type: ,
                 text: ","
-                location: test_t_input_04_t.bas:587
+                location: test_t_input_04_t.bas:614
             }
             Token {
                 type: Integer
                 text: "1"
                 ivalue: 1
                 ws_before: " "
-                location: test_t_input_04_t.bas:587
+                location: test_t_input_04_t.bas:614
             }
         ]
     }

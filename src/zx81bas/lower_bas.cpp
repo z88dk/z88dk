@@ -642,6 +642,54 @@ std::vector<StmtPtr> LoweringPass::lower(PrintStmt& stmt) {
     return out;
 }
 
+std::vector<StmtPtr> LoweringPass::lower(LPrintStmt& stmt) {
+    std::vector<StmtPtr> out;
+
+    auto new_stmt = std::make_unique<LPrintStmt>(stmt.loc);
+    for (auto& item : stmt.items) {
+        switch (item.type) {
+        case PrintItem::Type::Expr: {
+            auto lowered_expr = item.expr->lower(*this);
+            append_stmts(out, lowered_expr.preamble);
+            PrintItem new_item;
+            new_item.type = item.type;
+            new_item.expr = std::move(lowered_expr.rewritten);
+            new_stmt->items.push_back(std::move(new_item));
+            break;
+        }
+        case PrintItem::Type::Comma:
+        case PrintItem::Type::Semicolon:
+            new_stmt->items.push_back(std::move(item));
+            break;
+        case PrintItem::Type::At: {
+            auto lowered_line = item.line_expr->lower(*this);
+            append_stmts(out, lowered_line.preamble);
+            auto lowered_col = item.col_expr->lower(*this);
+            append_stmts(out, lowered_col.preamble);
+            PrintItem new_item;
+            new_item.type = item.type;
+            new_item.line_expr = std::move(lowered_line.rewritten);
+            new_item.col_expr = std::move(lowered_col.rewritten);
+            new_stmt->items.push_back(std::move(new_item));
+            break;
+        }
+        case PrintItem::Type::Tab: {
+            auto lowered_tab = item.tab_expr->lower(*this);
+            append_stmts(out, lowered_tab.preamble);
+            PrintItem new_item;
+            new_item.type = item.type;
+            new_item.tab_expr = std::move(lowered_tab.rewritten);
+            new_stmt->items.push_back(std::move(new_item));
+            break;
+        }
+        default:
+            release_assert(0);
+        }
+    }
+    out.push_back(std::move(new_stmt));
+    return out;
+}
+
 std::vector<StmtPtr> LoweringPass::lower(InputStmt& stmt) {
     std::vector<StmtPtr> out;
 
@@ -678,6 +726,20 @@ std::vector<StmtPtr> LoweringPass::lower(RunStmt& stmt) {
 }
 
 std::vector<StmtPtr> LoweringPass::lower(ListStmt& stmt) {
+    std::vector<StmtPtr> out;
+
+    auto new_stmt = std::make_unique<ListStmt>(stmt.loc);
+    if (stmt.target_expr) {
+        auto lowered_target = stmt.target_expr->lower(*this);
+        append_stmts(out, lowered_target.preamble);
+        new_stmt->target_expr = std::move(lowered_target.rewritten);
+    }
+    out.push_back(std::move(new_stmt));
+
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower(LListStmt& stmt) {
     std::vector<StmtPtr> out;
 
     auto new_stmt = std::make_unique<ListStmt>(stmt.loc);
@@ -823,6 +885,12 @@ std::vector<StmtPtr> LoweringPass::lower(ContStmt& stmt) {
 }
 
 std::vector<StmtPtr> LoweringPass::lower(ClearStmt& stmt) {
+    std::vector<StmtPtr> out;
+    out.push_back(stmt.clone());
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower(CopyStmt& stmt) {
     std::vector<StmtPtr> out;
     out.push_back(stmt.clone());
     return out;

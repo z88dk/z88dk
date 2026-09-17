@@ -78,10 +78,12 @@ struct LoweringPass {
     std::vector<StmtPtr> lower(StopStmt& stmt);
     std::vector<StmtPtr> lower(EndStmt& stmt);
     std::vector<StmtPtr> lower(PrintStmt& stmt);
+    std::vector<StmtPtr> lower(LPrintStmt& stmt);
     std::vector<StmtPtr> lower(InputStmt& stmt);
     std::vector<StmtPtr> lower(RemStmt& stmt);
     std::vector<StmtPtr> lower(RunStmt& stmt);
     std::vector<StmtPtr> lower(ListStmt& stmt);
+    std::vector<StmtPtr> lower(LListStmt& stmt);
     std::vector<StmtPtr> lower(NewStmt& stmt);
     std::vector<StmtPtr> lower(ClsStmt& stmt);
     std::vector<StmtPtr> lower(LoadStmt& stmt);
@@ -97,6 +99,7 @@ struct LoweringPass {
     std::vector<StmtPtr> lower(ScrollStmt& stmt);
     std::vector<StmtPtr> lower(ContStmt& stmt);
     std::vector<StmtPtr> lower(ClearStmt& stmt);
+    std::vector<StmtPtr> lower(CopyStmt& stmt);
     std::vector<StmtPtr> lower(PragmaNumVarStmt& stmt);
     std::vector<StmtPtr> lower(PragmaStrVarStmt& stmt);
     std::vector<StmtPtr> lower(PragmaNumVarArrayStmt& stmt);
