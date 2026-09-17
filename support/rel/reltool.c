@@ -93,22 +93,22 @@ static const char *ctrl_name[16] =
 };
 
 enum {
-    ENTRY_SYMBOL,
-    SELECT_COMMON,
-    PROGRAM_NAME,
-    REQUEST_LIBRARY,
-    RESERVED,
-    DEFINE_COMMON_SIZE,
-    CHAIN_EXTERNAL,
-    DEFINE_ENTRY_POINT,
-    EXTERNAL_OFFSET,
-    EXTERNAL_PLUS_OFFSET,
-    DEFINE_DATA_SIZE,
-    SET_LOCATION_COUNTER,
-    CHAIN_ADDRESS,
-    DEFINE_PROGRAM_SIZE,
-    END_PROGRAM,
-    END_FILE
+    ENTRY_SYMBOL,          // 0
+    SELECT_COMMON,         // 1
+    PROGRAM_NAME,          // 2
+    REQUEST_LIBRARY,       // 3
+    RESERVED,              // 4
+    DEFINE_COMMON_SIZE,    // 5
+    CHAIN_EXTERNAL,        // 6
+    DEFINE_ENTRY_POINT,    // 7
+    EXTERNAL_OFFSET,       // 8
+    EXTERNAL_PLUS_OFFSET,  // 9
+    DEFINE_DATA_SIZE,      // 10
+    SET_LOCATION_COUNTER,  // 11
+    CHAIN_ADDRESS,         // 12
+    DEFINE_PROGRAM_SIZE,   // 13
+    END_PROGRAM,           // 14
+    END_FILE               // 15
 };
 
 enum {
@@ -120,8 +120,9 @@ enum {
 
 unsigned char prog[65536];
 unsigned proglen;
-unsigned char data[65536];
 unsigned datalen;
+unsigned progsize;
+unsigned datasize;
 
 static int current_segment = 0;
 
@@ -354,6 +355,31 @@ static const char *format_addr(unsigned pc)
     return buf;
 }
 
+
+static void dump_data_module(void)
+{
+    unsigned i;
+
+    printf("\n--- DATA SEGMENT ---\n");
+
+    if (datasize == 0)
+    {
+        printf("(empty)\n");
+        return;
+    }
+
+    for (i = 0; i < datasize; i++)
+    {
+        unsigned addr = progsize + i;
+
+        if (addr >= proglen)
+            break;
+
+        printf("%04X : %02X\n",
+               i,
+               prog[addr]);
+    }
+}
 
 static const char *rp[4] = {
     "BC",
@@ -898,10 +924,16 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
     if ((!dumpmode) || ctrl < 3)
         printf("SPECIAL %-20s  ", ctrl_name[ctrl]);
 
-    if (ctrl >= 5 && ctrl <= 14)
+    if (ctrl >= DEFINE_COMMON_SIZE && ctrl <= END_PROGRAM)
     {
         read8(f, &atype);
         read16(f, &value);
+
+        if (ctrl == DEFINE_PROGRAM_SIZE)
+            progsize = value;
+
+        if (ctrl == DEFINE_DATA_SIZE)
+            datasize = value;
 
         if (dumpmode) {
             printf("  [%u] ", atype);
@@ -913,7 +945,7 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
             //printf("  type=%u value=", atype);
         }
 
-        if ((dumpmode) || ((ctrl<=13) && (ctrl>=8))) printf("%-20s -> $%04X", ctrl_name[ctrl], value);
+        if ((dumpmode) || ((ctrl>=EXTERNAL_OFFSET) && (ctrl<=DEFINE_PROGRAM_SIZE))) printf("%-20s -> $%04X", ctrl_name[ctrl], value);
         
         // Set Code Location Counter
         if ((atype == SEG_PROGRAM) && (ctrl == SET_LOCATION_COUNTER)) proglen =0;
@@ -960,7 +992,7 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
         }
     }
 
-    if ((!dumpmode) && ctrl == 2)
+    if ((!dumpmode) && ctrl == PROGRAM_NAME)
         printf("\n");
 
     printf("\n");
@@ -1029,16 +1061,26 @@ static void do_dump(FILE *f, int dumpmode)
                 read8(f, &ctrl);
                 dump_special(f, ctrl, dumpmode);
 
-                if (ctrl == 14)
+                if (ctrl == END_PROGRAM)
                 {
+#ifdef DEBUG
+                    printf("\n--- SIZES ---\n");
+                    printf("PROGRAM SIZE : %04X\n", progsize);
+                    printf("DATA SIZE    : %04X\n", datasize);
+                    printf("PROGRAM LEN  : %04X\n", proglen);
+                    printf("DATA LEN     : %04X\n", datalen);
+#endif
+                    if (progsize == 0) progsize = proglen;
                     printf("\n\n--- DISASSEMBLY ---\n");
                     disasm_module();
-                    proglen = 0;
-                    datalen = 0;
+                    dump_data_module();
+                    printf("\n--- --- --- --- ---\n\n");
+
+                    proglen = progsize = 0;
+                    datalen = datasize = 0;
                     reloc_count = 0;
                     extcount = 0;
                     symbol_count = 0;
-                    printf("\n--- --- --- --- ---\n\n");
 
                     mod++;
 
@@ -1048,7 +1090,7 @@ static void do_dump(FILE *f, int dumpmode)
                            ftell(f));
                 }
 
-                if (ctrl == 15)
+                if (ctrl == END_FILE)
                     return;
 
                 break;
@@ -1087,7 +1129,7 @@ static void do_split(FILE *f, const char *srcname)
 
             fputc(ctrl, out);
 
-            if (ctrl == 14)
+            if (ctrl == END_PROGRAM)
             {
                 fclose(out);
 
@@ -1100,7 +1142,7 @@ static void do_split(FILE *f, const char *srcname)
 
                 out = fopen(name, "wb");
             }
-            else if (ctrl == 15)
+            else if (ctrl == END_FILE)
             {
                 break;
             }
