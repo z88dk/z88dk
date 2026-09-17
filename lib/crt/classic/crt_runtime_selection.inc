@@ -170,11 +170,19 @@ ELSE
         ELSE
 	    ; Default configurations to match old behaviour
 	    ; The built in one is roughly the old ministdio
-	    IF DEFINED_complexstdio
-                defc CLIB_OPT_PRINTF = 0x851BF7BF
-            ELSE
-	        defc CLIB_OPT_PRINTF = 0x801BF7BF
-            ENDIF
+	    ; zsdcc does not emit CRT_printf_format, so the prebuilt
+	    ; integer table in __printf_format_table.asm is used unless
+	    ; NEED_printf is set here. 32-bit float links need %e/%f/%g.
+	    IF CLIB_32BIT_FLOATS
+	        defc CLIB_OPT_PRINTF = 0x951BF7BF
+	        DEFINE NEED_printf
+	    ELSE
+	        IF DEFINED_complexstdio
+                    defc CLIB_OPT_PRINTF = 0x851BF7BF
+                ELSE
+	            defc CLIB_OPT_PRINTF = 0x801BF7BF
+                ENDIF
+	    ENDIF
         ENDIF
 ENDIF
 
