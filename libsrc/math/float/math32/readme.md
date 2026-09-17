@@ -60,6 +60,8 @@ Classic `%f` / `%e` / `%g` call `ftoa` / `ftoe` / `ftog`. math32 no longer ships
 
 The stack-only engine matches the Z80 C11 contract used by `test/suites/math` (`test_math32_printf`): `%g` of `1.234e-37` is `1.234e-37`, `%g` of `-2.5e-5` is `-2.5e-05`, `%g` of `314.159` is `314.159`, `%.2f` of a tiny value is `0.00`. Classic `sprintf` also: `test/suites/stdio` `test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` (`--math32`; `%e` of `1.2345` is `1.234500e+00`). Integer `sscanf` is `test_scanf*.bin` (no `%f`). `test/suites/string` is `str*` only.
 
+Classic zsdcc does not scan printf formats. `--math32` does not enable `%f` / `%e` / `%g`. Add `#pragma printf = "%f %e %g"` or `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF`. Without that, printf writes the letter `f`, `e`, or `g`. sccz80 and 80cc scan the format string and do not need this. Do not set `NEED_printf` from `CLIB_32BIT_FLOATS` alone.
+
 ISA notes for the stack-only files:
 
 - 8085 uses `rl de`, `ld de,sp+n`, `ld hl,(de)`, and `ld (de),hl`. Do not write `ld hl,sp+n` here. z80asm expands that with LDSI and `ex de,hl`, and a negative offset is not a safe frame open.

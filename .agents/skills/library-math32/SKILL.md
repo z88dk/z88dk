@@ -201,3 +201,4 @@ For eZ80: `z88dk-z80nm lib/clibs/math32_ez80_z80.lib | rg 'm32_mulu_32h|f32_z180
 - Z180 / eZ80 Z80-mode `mlt`: `cpu-z180`
 - Issue class: z88dk **#3061** (classic vs newlib Whetstone); **#3104** item 4 (stack-only dtoa rewrite) is done
 - Suite: `test/suites/math` (`test_math32*.bin`, including `test_math32_ez80_z80.bin`, `test_math32_vm1.bin`). Classic `%f`/`%e`/`%g` also: `test/suites/stdio` `test_sprintf_math32.bin` plus `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` (`--math32`). `test/suites/string` is `str*` only.
+- Classic zsdcc does not scan printf formats. `--math32` does not enable `%f`/`%e`/`%g`. Use `#pragma printf = "%f %e %g"` or `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF`. Do not `DEFINE NEED_printf` from `CLIB_32BIT_FLOATS`.
