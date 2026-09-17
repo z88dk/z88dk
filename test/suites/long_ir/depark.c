@@ -40,14 +40,18 @@
  *   caught here  — declaring every park dead; ignoring reads of E (the pk_*
  *                  bitfield shape, and the reason char-typed fields are not
  *                  enough: they never leave a byte in E across a pointer load).
- *   caught by    — treating a CALL as not reading DE (long_ir's own test_8085
- *   a wider gate   catches it; __sdcccall(1) and fastcall pass arguments there).
- *   not pinned   — ignoring reads of D alone, and treating `ret` as not reading
- *                  DE. Both mutants drop extra parks that turn out to be harmless
- *                  on every input in the tree, so no test here fails; the
- *                  conservatism is kept on the ABI argument (a long or float
- *                  result IS returned in DE:HL, and `ld a,d` alone appears 529
- *                  times in the 8085 corpus) rather than on evidence.
+ *   caught by    — treating a CALL as not reading DE AT ALL (long_ir's own
+ *   a wider gate   test_8085 catches it). Since ADR 0084 a call is read as
+ *                  DE-clean only where the EMITTER proved this target takes no
+ *                  argument there, which fcmix's fastcall long is not — but
+ *                  mutating THAT arm away is caught by nothing in the tree, and
+ *                  ADR 0084 says so and why.
+ *   not pinned   — ignoring reads of D alone.
+ *   SUPERSEDED   — "treating `ret` as not reading DE" was listed here as an
+ *                  unpinned mutant. It is no longer a mutant: ADR 0084 made it
+ *                  the RULE for a function that does not return in DE, and
+ *                  delive.c pins the conservative half (a long return really is
+ *                  DE:HL). The call half went the same way, per target.
  *
  * [IR_DEFLOW] The branch-following rule was mutation-tested the same way, and
  * the split is worth knowing before trusting this file alone:
@@ -65,9 +69,10 @@
  *                  allocation-sensitive, like the other bugs in AGENTS.md's
  *                  real-file list. RUN THE VERIFIER on this rule, do not trust
  *                  the suite alone.
- *   not pinned   — the fixpoint's own `ret` and call conservatism: making either
- *                  optimistic changes not one park decision in the whole 8085
- *                  corpus. Kept on the ABI argument, as above.
+ *   SUPERSEDED   — "the fixpoint's own `ret` and call conservatism" was listed
+ *                  here as changing not one park decision. That was measured
+ *                  against a blanket optimism; ADR 0084's targeted version moves
+ *                  150 8085 asm files and 28 8085 size cells.
  * brkeep, brkeep2 and loopcarry pin no mutant that satband does not. They are
  * kept as cheap coverage of DE live across a forward branch, a fall-through and
  * a loop back-edge — the three edges the fixpoint has to get right — and run on

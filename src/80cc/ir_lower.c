@@ -1375,6 +1375,13 @@ static int de_fwd_walk(char **lines, int n, int start, int d_live, int e_live,
         if ((e.d_read && d_live) || (e.e_read && e_live)) {
             if (readerp) *readerp = j; return 1;
         }
+        /* [de-ret] A return that does not read DE ends this path with the
+           value unread — the walk must agree with the backward sweep, or it
+           reports a violation on every site the sweep legitimately wins.
+           [de-call] The same for a call the emitter proved DE-clean: it takes
+           no argument there and clobbers the pair, so the parked value is
+           gone unread either way. */
+        if ((e.is_boundary || e.is_call) && !e.d_read && !e.e_read) return 0;
         if (e.is_call || e.is_boundary) return 2;
         if (e.d_write) d_live = 0;
         if (e.e_write) e_live = 0;
@@ -1392,6 +1399,108 @@ static int de_forward_needed(char **lines, int n, int start, int *readerp)
 }
 
 static int xline_c_call(const char *line);
+
+/* [de-ret] Does a `ret` in the function now being lowered READ DE?
+
+   instr_effects has always answered YES, on the DE:HL result ABI. That ABI
+   applies only to a function whose declared return type is 4 bytes wide; an
+   int-, char- or void-returning function leaves DE as dead at its exit as BC
+   is. The difference is not academic: it is what refuses 15 of
+   [z80n-add-a]'s 20 candidate sites, `divbench`'s `udiv` ending
+   `add hl,de; pop af; ret` in an int-returning function.
+
+   The claim is per FUNCTION, so it is latched at the top of ir_lower_func and
+   read by the rendered-text passes that run inside it. The answer stays the
+   old conservative YES for:
+     - a 3-or-more-byte return, delivered in DE:HL (or possibly so);
+     - a __sdcccall(1) function, whose 2-byte return is in DE;
+     - __interrupt / __naked, whose `ret` is not a C return at all;
+     - a raw __asm{} block, which may carry a `ret` of its own convention;
+     - a function containing the indirect-fastcall `ret` DISPATCH, where the
+       `ret` is a JUMP to a callee whose argument is sitting in DE. That one
+       is latched by the emitter (xf_ret_dispatch) because the condition that
+       produces it lives in ir_lower_call.inc.c.
+
+   `--opt-disable=de-ret` opts out, byte for byte. Evidence: adr/0084. */
+static int xf_ret_de_static = 1;    /* per-function, read off the Func */
+static int xf_ret_dispatch  = 0;    /* set by the fc_ret dispatch emitter */
+
+static int xline_ret_reads_de(void)
+{
+    return xf_ret_de_static || xf_ret_dispatch;
+}
+
+/* [de-call] Does a `call _sym` READ DE?
+
+   instr_effects has always answered YES, on the `__sdcccall(1)` argument ABI.
+   That is the same shape of over-claim [bc-call] retired for BC, but it cannot
+   be settled from the text alone: whether DE carries an argument depends on
+   the CALLEE's declared convention, and `_foo` says nothing about it. So the
+   EMITTER answers, at the one site that renders a direct call, and the answer
+   is keyed by symbol for the rendered-text pass to read back.
+
+   The polarity is PROVE-CLEAN, like [gwiden]: a symbol is DE-clean only if
+   every direct call to it emitted in this function placed nothing in DE — a
+   stacked ABI (smallc / stdc / callee), or a fastcall whose last argument is
+   1-2 bytes (HL) or wider than 4 (the memory accumulator). A `__sdcccall(1)`
+   target, or a 4-byte fastcall argument (DE:HL), marks it dirty; so does a
+   full table. Anything the emitter never recorded reads DE, exactly as before.
+
+   `--opt-disable=de-call` opts out, byte for byte. Evidence: adr/0084. */
+#define DECALL_MAX 96
+static struct { char name[56]; unsigned char dirty; } xf_decall[DECALL_MAX];
+static int xf_decall_n;
+static int xf_decall_full;
+
+static void decall_note(const char *sym, int clean)
+{
+    if (!sym || !*sym) return;
+    for (int i = 0; i < xf_decall_n; i++)
+        if (!strcmp(xf_decall[i].name, sym)) {
+            if (!clean) xf_decall[i].dirty = 1;
+            return;
+        }
+    if (xf_decall_n >= DECALL_MAX || strlen(sym) + 1 > sizeof xf_decall[0].name) {
+        xf_decall_full = 1;              /* unrecorded targets exist: give up */
+        return;
+    }
+    strcpy(xf_decall[xf_decall_n].name, sym);
+    xf_decall[xf_decall_n].dirty = (unsigned char)!clean;
+    xf_decall_n++;
+}
+
+/* The rendered-text question: is THIS line a direct call whose target the
+   emitter proved DE-clean? Shares xline_c_call's `_sym` discriminator, so an
+   asm-linkage or double-underscored target is never even looked up. */
+static int xline_call_de_clean(const char *line)
+{
+    if (xf_decall_full || opt_disabled("de-call")) return 0;
+    if (!xline_c_call(line)) return 0;
+    const char *p = line;
+    while (*p == ' ' || *p == '\t') p++;
+    p += 4;                                     /* past "call" */
+    while (*p == ' ' || *p == '\t') p++;
+    char sym[56]; size_t k = 0;
+    while (p[k] && p[k] != '\n' && p[k] != '\r' && p[k] != ' ' && p[k] != '\t'
+           && p[k] != ';' && k + 1 < sizeof sym) { sym[k] = p[k]; k++; }
+    if (p[k] && p[k] != '\n' && p[k] != '\r') return 0;   /* operand too long */
+    sym[k] = '\0';
+    for (int i = 0; i < xf_decall_n; i++)
+        if (!strcmp(xf_decall[i].name, sym)) return !xf_decall[i].dirty;
+    return 0;
+}
+
+static int func_ret_reads_de(const Func *f)
+{
+    if (!f || opt_disabled("de-ret")) return 1;
+    if (f->ret_width > 2)             return 1;   /* DE:HL, or unmodelled */
+    if (f->flags & SDCCCALL1)         return 1;   /* 2-byte return is in DE */
+    if (f->is_interrupt || f->is_naked) return 1;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int o = 0; o < f->bbs[b].n_ops; o++)
+            if (f->bbs[b].ops[o].kind == IR_ASM) return 1;
+    return 0;
+}
 
 
 
@@ -1869,7 +1978,9 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
             char tgt[64];
             int has_tgt = xline_branch_target(lines[i], tgt, sizeof tgt);
             if (e.is_boundary) { b_live = c_live = f_live = 0;
-                                 d_live = e_live = 1;      /* result ABI DE:HL */
+                                 /* [de-ret] DE is live at a return only when
+                                    the result rides it. */
+                                 d_live = e_live = e.d_read;
                                  continue; }
             if (has_tgt) {
                 int tb = 1, tc = 1, tf = 1, td = 1, te = 1, found = 0;
@@ -1895,7 +2006,9 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
                 if (xline_c_call(lines[i]) && bccall_enabled())
                      { b_live = c_live = f_live = 0; }
                 else { b_live = c_live = f_live = 1; }
-                d_live = e_live = 1;    /* __sdcccall(1) passes args in DE */
+                /* [de-call] DE is live into a call only where the argument ABI
+                   put something there — e.d_read carries the emitter's answer. */
+                d_live = e_live = e.d_read;
                 continue;
             }
             if (xora_line_reads_f(lines[i]))   f_live = 1;
@@ -4060,17 +4173,25 @@ static InstrEffects instr_effects(const char *line)
        path stays in the function, so BC liveness must survive it. is_call is the
        conservative "successor may read BC"; treating it as a boundary would let
        filter_dead_bc_parks drop a park the fall-through still consumes. */
-    if (!strcmp(m,"ret") && o0[0]) { e.is_call = 1; e.d_read = e.e_read = 1; return e; }
+    if (!strcmp(m,"ret") && o0[0]) { e.is_call = 1;
+                                     e.d_read = e.e_read = xline_ret_reads_de();
+                                     return e; }
     if (!strcmp(m,"ret")||!strcmp(m,"reti")||!strcmp(m,"retn")) {
-        /* is_boundary says BC is dead at exit. DE is NOT: the long and float
-           result ABI is DE:HL, so a return READS DE. The flag stays BC-only and
-           D/E are marked live here, so no consumer can inherit the BC rule. */
-        e.is_boundary = 1; e.d_read = e.e_read = 1; return e;
+        /* is_boundary says BC is dead at exit. DE is dead there too UNLESS
+           this function returns in DE — the DE:HL long/float ABI, or a
+           __sdcccall(1) 2-byte return. The flag stays BC-only and D/E are
+           answered separately, so no consumer can inherit the BC rule.
+           [de-ret]: xline_ret_reads_de() is the per-function answer. */
+        e.is_boundary = 1; e.d_read = e.e_read = xline_ret_reads_de(); return e;
     }
     if (!strcmp(m,"jp")||!strcmp(m,"jr")||!strcmp(m,"djnz")||!strcmp(m,"call")||!strcmp(m,"rst")) {
-        /* A successor may read DE, and __sdcccall(1) passes arguments in it, so a
-           call READS DE even though the callee also clobbers it. */
-        e.is_call = 1; e.d_read = e.e_read = 1; return e;
+        /* A successor may read DE, and an argument ABI can pass one in it, so a
+           call READS DE even though the callee also clobbers it — UNLESS the
+           emitter proved this target takes nothing there ([de-call]). A branch
+           stays a reader here; [de-flow] answers those from its fixpoint. */
+        e.is_call = 1;
+        e.d_read = e.e_read = !xline_call_de_clean(line);
+        return e;
     }
     if (!strcmp(m,"exx")) { e.b_read = e.c_read = 1; e.d_read = e.e_read = 1; return e; }
     if (!strcmp(m,"ldir")||!strcmp(m,"lddr")||!strcmp(m,"ldi")||!strcmp(m,"ldd")
@@ -5996,6 +6117,14 @@ int ir_lower_func(FILE *out, Func *f)
         return -1;
     }
     L.spill_ix = L.spill_sp = 0;   /* IR_SPILL_STATS: per-function reset */
+
+    /* [de-ret] Latch this function's answer to "does a `ret` read DE?" before
+       anything is emitted: the rendered-text passes at the end of this call
+       read it, and the emitter may raise xf_ret_dispatch in between. */
+    xf_ret_de_static = func_ret_reads_de(f);
+    xf_ret_dispatch  = 0;
+    /* [de-call] the proved-clean call targets are per function too. */
+    xf_decall_n = 0; xf_decall_full = 0;
 
     /* __naked: emit the body verbatim — no prologue, no epilogue, no frame,
        no BB labels, no trailing `ret`. ir_build has already restricted the

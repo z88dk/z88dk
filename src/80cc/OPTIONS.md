@@ -123,6 +123,8 @@ exists (ADR 0010).
 | `hl-addr-carry` | a slot address held in HL is not carried across an edge |
 | `de-flow` | no DE liveness flow into the lowering decisions (8085) |
 | `de-park` | no rewriting of a `push de`/`pop de` park |
+| `de-ret` | every `ret` is read as reading DE, not only one that returns in DE |
+| `de-call` | every `call` is read as reading DE, not only one that passes an argument there |
 | `declean` | a DE home is not proven clean across a bitop |
 | `dead-store` | a byte spill written but never read is still stored |
 | `dead-store-word` | the same for a word spill |

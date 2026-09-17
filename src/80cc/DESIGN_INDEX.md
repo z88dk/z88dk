@@ -4,42 +4,44 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 2026-09-16. Keep it short: when a section stops describing what is
+Last swept: 2026-09-17. Keep it short: when a section stops describing what is
 live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
-**Last swept 2026-09-16.** The escape audit ADR 0082 asked for is **done**,
-and it found four more instances — two of them wrong on plain C with no
-address of a local in sight. See **ADR 0083**, which is the one to read first.
+**Last swept 2026-09-17.** The **DE conservatism is CLOSED**. `instr_effects`
+no longer treats every `ret` and every `call` as reading DE. Read **ADR 0084**
+first; it also records what the change could NOT be made to pin.
 
-| fixed | |
+| | |
 |---|---|
-| `ast_cse` record | `*p = a + x; t = a + x;` handed `t` **the pointer**. `OP_ASSIGN`'s left is an ADDRESS, so `(deref (lv=p))` there is an INDIRECT store — but a COMPOUND assignment's left is an LVALUE, where the same spelling means `p` itself. One reader served both |
-| `ast_cse` env | the same misreading left every belief about what `p` POINTS AT standing |
-| `ir_opt_cse` | its table is cleared by a vreg write; a call handed a local's address writes the local's SLOT and defines no vreg |
-| `ast_cse_synthesize`, `ast_licm` | both asked only whether a statement DIRECTLY writes a symbol the candidate reads. An indirect store writes none |
+| `[de-ret]` | a `ret` reads DE only where the FUNCTION returns in DE — a 4-byte DE:HL result, or a `__sdcccall(1)` 2-byte one. Latched per function in `ir_lower_func`; conservative for `__interrupt`/`__naked`, for a raw `__asm{}` body, and for the indirect-fastcall `ret` DISPATCH, which is a jump to a callee with its argument in DE |
+| `[de-call]` | a `call` reads DE only where the EMITTER placed an argument there. The text cannot answer this — `_foo` may be `__z88dk_fastcall` with a `long` — so the call site records the answer per symbol, prove-clean. Dirty: `__sdcccall(1)`, a 4-byte fastcall argument, and `__preserves_regs(d,e)` |
 
-Cost: **+497 bytes over 720 cells, 24 larger (all `md5`), 24 smaller (all
-`sortbench`)**; `long_ir` **809/809 both frame modes**; `enigma` and `emu.c`
-green in both. Regression test `long_ir/aliaswr.c` — it fails on the
-pre-change compiler.
+Result: **−98 bytes over 720 cells, 32 smaller, 0 larger**; **ticks −0.1217 %,
+64 cells faster and 0 slower** (bytes and cycles move together — the rungs
+delete instructions). Of 5256 asm files only **162 change**, all of them 8085
+(150) or z80n (12), so there is no leak. Gate-off is byte-identical across all
+5256. `long_ir` **428/428 both frame modes**; `enigma` `RXSEC` in both; `emu.c`
+2 hits in both; `IR_DEPARK_SWEEP=1` reports the independent forward walk
+agreeing on every park, 0 violations. Regression test `long_ir/delive.c`.
 
-The audit is **closed**: `prop`, `dse`, `addr-cse`, `coalesce-copies`, the
-`ivsr`/`lftr`/`narrow-byte`/`reassoc` family and the lowerer's register
-beliefs were all probed and are clean. ADR 0083 lists what was covered so the
-sweep is not repeated.
+The **full matrix is regenerated** in the same section of
+`../../test/suites/BENCH_MATRIX.txt` (17/9/2026, `gen_bench_matrix3.py`,
+330 rows). It had been stale since 15/9, so it also carries the two 16/9
+sessions — every LARGER cell in it is `md5` and belongs to ADR 0082-0083.
+Its reference columns (sccz80 / xcc / sdcc) were re-measured in the same
+run and **0 of 1320 moved**, which is the harness's own sanity check.
 
-**So the next job is the DE conservatism**, the CPU sweep's most valuable
-density by-product. `instr_effects` treats **every `call`** as reading DE (the
-`__sdcccall(1)` argument ABI) and **every `ret`** as reading DE (the DE:HL
-result ABI). Both are true only sometimes, and that one fact throttles **four**
-rungs at once — `[de-park]`, `[ldsi-addr]`, `[ldhi-addr]`, `[z80n-add-a]`. It
-is measurable today: `[z80n-add-a]` reaches 5 of its 20 candidate sites and
-**15 are refused on a DE that is not live** — `divbench`'s `udiv` ends
-`add hl,de; pop af; ret` in an *int*-returning function. The precedent is in
-the same file: `xline_c_call` already tells `[bc-call]` that a call to
-compiled C code cannot read BC. Do that for DE.
+**One thing ADR 0084 leaves open, and it is not this rule's bug.**
+`[bc-call]` kills BC at a `call _sym` on the argument ABI alone and never asks
+about `__preserves_regs(b,c)` — the same hazard `[de-call]` had to handle. No
+in-tree callee honours the modifier, so it is a latent question rather than a
+known defect, but it is the one asymmetry left between the two rules.
+
+**So the next job is zero-extension** (vein 2 below): the one *consistent* gap
+against ez80clang, a lowering pattern with a known-better reference to diff
+against, which is the shape that has been working.
 
 Two smaller things the CPU sweep left on the table, both sized: the ez80
 **prologue's own** `ld hl,-F; add hl,sp; ld sp,hl` (66 sites, 1 byte each — but

@@ -2,6 +2,12 @@
 
 Status: **Accepted**, default on. `IR_OFF=de-flow` opts out.
 
+> **Superseded in part by ADR 0084.** The "calls and returns stay conservative"
+> half below is no longer the standing position: a `ret` reads DE only where
+> the function returns in DE, and a `call` only where the emitter placed an
+> argument there. The branch-following rule this ADR decided is unchanged, and
+> so is the reason it could not simply ride the BC rules.
+
 ## Context
 
 In the park sweep, a branch was a black box that "may read DE". That keeps an
