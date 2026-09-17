@@ -9,13 +9,14 @@ live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
-**Size the indexed read-modify-write address restore.** Count final-assembly
-sites across the corpus and the available real files where HL holds the word
-address after the low-byte read. Classify the readers and count only sites
-where `dec hl` can replace the BC copy and HL rebuild. Report the deletable
-bytes by CPU and frame mode before changing the emitter. `histbench` is a
-useful witness, but its `arr[i]++` loop was written for this shape and cannot
-stand in for a corpus count.
+**Measure the 8085 K-flag trip-counter candidates.** ADR 0051 lists 236
+sites, but the counter initialisation must shift by one because K sets on -1,
+not zero. Classify the candidates before changing the emitter. Keep the 8080,
+VM1, and non-counter loops out of the experiment.
+
+The masked word right-shift rung is complete and refused. See ADR 0090. Its
+Z80 route had no slower tick cell, but four cells grew by 26 bytes. The emitter
+remains unchanged.
 
 Still open from ADR 0084: `[bc-call]` decides BC liveness at a direct call
 from the argument ABI alone; it has not checked `__preserves_regs(b,c)`. No
@@ -51,14 +52,21 @@ per-instruction ratio against another compiler sizes a DIFFERENCE, not a
 RECOVERABLE one.** Count the bytes a rung could actually delete before calling
 something the next job.
 
-**3. The commutative swap in addition (ADR 0072).** `md5` gains **6 % of its
-cycles** and it is blocked by one modelling gap: reading a slot in pass 1 of the
-lazy spill resurrects a store pass 2 had elided (+28 B binary-trees, +75 B
-emu.c). Needs a cost model over the two-pass spill decision, not a residency
-test.
+**3. The commutative swap in addition — CLOSED. See ADR 0089 (and ADR 0072
+for the A/B result).** A sound answer is pass-order-dependent: changing the
+operand roles changes pass-1 slot reads and therefore the pass-2 store-dead
+solution. A dual render is not a useful scalar gate. The emitter remains
+unchanged; the measured effects remain −6 % ticks in `md5`, +28 B in
+`binary-trees`, and +75 B in `emu.c`.
 
-**4. Two instruction-selection rungs in the indexed read-modify-write —
-UNSIZED.** `histbench` on Z80 is 32.01 M ticks against xcc `-Of`'s 28.46 M, and
+**4. The indexed read-modify-write address restoration — CLOSED. See ADR 0088.**
+The 720-cell final-assembly census found one complete `histbench` site in 8
+CPU/frame cells, 5 bytes per site and 40 bytes total. `adv_a.c` and `clisp.c`
+had no eligible sites. The broad reader matches were pointer copies or
+temporaries, so the emitter remains unchanged.
+
+The remaining instruction-selection rungs are not the current action.
+`histbench` on Z80 is 32.01 M ticks against xcc `-Of`'s 28.46 M, and
 80 % of either run is one basic block. Per iteration 80cc spends **518 cycles
 where xcc spends 471**. What looks expensive is not the gap: the x25173
 shift/add expansion is identical in both (14 `add hl,hl` + 6 `add hl,rr`), and
@@ -68,13 +76,11 @@ split three ways and one is already had: frame addressing is worth 11, and fp
 mode collects it (the same block measures 504 cycles per iteration in fp, which
 is the 31.01 M column). The other two are rungs nothing in the tree does yet.
 
-* **A constant right shift of a word, Z80 only — 15 cycles/iteration here.**
-  `(seed>>3)&63` is lowered as five `add hl,hl` then a read of H. That is the
-  8080 shape and it is correct there: 8080, 8085 and vm1 have no `srl`. On Z80
-  `srl h; rra` repeated n times costs 12n against the left-shift route's
-  11*(8-n); they cross at n = 3.8, so a shift of 1..3 wants `srl`/`rra` and 4..7
-  wants the form already emitted. Gate on the shift count **and** on the CPU
-  having `srl` — this rung must not reach the 8080 family.
+* **A constant right shift of a word, Z80 only — CLOSED. See ADR 0090.**
+  The candidate `srl h; rr l` route for masked counts 1..3 improved four Z80
+  cells by 1,038,800 ticks and had no slower tick cell, but grew four cells by
+  26 bytes. The size regressions refuse a default-on emitter change. The 8080,
+  8085, and VM1 paths remain untouched.
 * **The base address of the read-modify-write — 18 cycles and 5 bytes a site.**
   80cc copies the computed address into BC, rebuilds HL from it after the word
   load, and routes the incremented value back through `ex de,hl`: 13 bytes. HL
@@ -82,10 +88,9 @@ is the 31.01 M column). The other two are rungs nothing in the tree does yet.
   stay in DE — `ld e,(hl); inc hl; ld d,(hl); dec hl; inc de; ld (hl),e;
   inc hl; ld (hl),d`, 8 bytes, which is what xcc emits.
 
-The address-restoration census is the next action. `histbench` was written
-to probe `arr[i]++`, so it is the best case by construction. Count the sites
-over the corpus and size the deletable bytes first. The shift rung is a later
-cycle question. Its break-even boundary needs a tick scan, not a size scan.
+The addition model, address-restoration census, and masked word right-shift
+rung are recorded in ADRs 0088-0090. The 8085 K-flag census is now the next
+question.
 
 Still parked and still valid: **8085 K-flag trip counters** (ADR 0051,
 *Proposed*) — 236 candidate sites, 2 bytes and ~8 cycles each plus a freed A,

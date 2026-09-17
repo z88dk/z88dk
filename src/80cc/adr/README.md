@@ -65,6 +65,9 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0085](0085-the-widen-belongs-in-the-register-the-consumer-wants.md) | **Accepted** — a zero-extended byte is widened in the register its consumer needs; the census refuses five smaller zero-extension shapes |
 | [0086](0086-a-dead-gameboy-hl-restore-does-not-cross-a-loop-backedge.md) | **Accepted** — Game Boy omits an HL restore before a local loop jump whose target replaces HL |
 | [0087](0087-the-ez80-prologue-uses-the-full-ix-frame-offset.md) | **Accepted**, default on — a framed eZ80 prologue allocates from IX with the full frame size, including any auto-pushed parameter |
+| [0090](0090-the-short-word-right-shift-is-a-size-regression.md) | **Rejected** — `srl h; rr l` wins ticks for masked counts 1..3 but grows four Z80 cells by 26 bytes |
+| [0089](0089-addition-swap-has-no-scalar-two-pass-gate.md) | **Rejected** — a sound addition swap gate needs a second pass-1 render; md5 −6 % but binary-trees +28 B and emu.c +75 B |
+| [0088](0088-indexed-word-rmw-address-restoration-is-a-small-rung.md) | **Sized** — one histbench site in 8 CPU/frame cells, 40 B total; no emitter change |
 | [0073](0073-ask-slot-off-not-the-spill-slot.md) | **Accepted** — ask `slot_off`, not `vreg_spill_slot`; the wrong query cost structbench +10.5 % |
 | [0072](0072-the-commutative-swap-is-refused.md) | **Rejected** — the commutative swap in addition resurrects an elided store; md5 −6 % against emu.c +75 B |
 | [0071](0071-the-call-split-eviction-floor.md) | **Accepted** — the eviction floor is magnitude, not ratio; below it the model is inside its own error |
