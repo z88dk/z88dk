@@ -21,7 +21,7 @@
 #define ITERS  6000
 #define CHK    4389u        /* host-verified */
 
-struct st { int a, b, c, d, e; };
+struct st { unsigned int a, b, c, d, e; };
 static struct st S;
 
 static unsigned int churn(struct st *p, int it)
@@ -34,7 +34,7 @@ static unsigned int churn(struct st *p, int it)
         if (p->c & 1) p->d = (p->d + p->e) & 0x7fff;
         else          p->e = (p->e + p->a) & 0x7fff;
         p->b = (p->b + p->c) & 0x7fff;
-        chk = (chk + (unsigned int)p->a + (unsigned int)p->d) & 0xffffu;
+        chk = (chk + p->a + p->d) & 0xffffu;
     }
     return chk;
 }
