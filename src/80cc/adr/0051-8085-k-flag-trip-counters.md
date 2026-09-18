@@ -126,3 +126,48 @@ IX, so frame mode does not affect this site). `long_ir` 846/846 in both frame
 modes (up from 842 — the four new `test_8085_k_trip` targets), the one
 pre-existing `longshl_vm1` gap unchanged. `check_options.sh` 132 names OK
 (`k-trip` added); `check_gates.sh` 43 listed live OK.
+
+## Follow-on fix: the counter was homed in BC, and DEC didn't know it
+
+When the allocator homes the private counter in BC (the common case — a
+call-free trip counter has nothing else competing for the pair), the latch
+compiled to `ld hl,bc; dec hl; ld bc,hl` before this fix: `gen_inc`
+(`ir_lower_ops.inc.c`) already had an in-place fast path for a BC/DE-homed
+`++` (`inc bc`/`inc de` directly, no HL round trip), but `gen_dec` never got
+the mirror, so every BC/DE-homed `--` — this K-trip latch included — paid the
+copy-out-and-back regardless of CPU. `ticks.c`'s `DECW(b,c)`/`DECW(d,e)` set
+the 8085 K flag identically to `DECW(h,l)`, so `dec bc` is not just shorter,
+it is the more direct source of the flag `jp nk` reads.
+
+Added the missing case to `gen_dec`, verbatim mirror of `gen_inc`'s (same
+`gpderef` opt-out, same `IR_VREG_CALL_SPLIT` exclusion — a call-split value's
+frame slot must stay coherent, and a bare `dec bc` would update BC without
+it). `ktrip_word`'s latch is now `dec bc; jp nk,L` — 1 byte instead of 5, and
+K comes straight from the register that decremented instead of a shuffled
+copy. Full corpus×CPU×frame-mode scan (`corpus_sizescan.sh`, 11 CPUs, 720
+cells): 0 changed — no bench source happens to carry a BC/DE-homed in-place
+decrement, so the win is real but unexercised by the standard corpus.
+Gate-off (`IR_OFF=gpderef`) is byte-identical to the pre-fix compiler across
+all 720 cells. `long_ir` 846/846 in both frame modes, same one pre-existing
+`longshl_vm1` gap.
+
+## Second follow-on: the zero-test after it still went through HL
+
+Even with the decrement fixed to `dec bc`, the loop-back zero-test on any
+non-8085, non-Rabbit4K CPU (the K-trip counter has no `jp nk` to skip it with)
+still read `ld hl,bc; ld a,h; or l` — `emit_test_zero` (`ir_lower_ops.inc.c`)
+only special-cased Rabbit4K's one-op `test bc`/`test hl` and a frame-slot
+value read straight from memory; a BC/DE-resident value on every other CPU
+was ferried through HL first regardless.
+
+Added the missing case: when the tested value is BC- or DE-resident and HL
+does not already hold it, test the two halves directly (`ld a,b; or c` /
+`ld a,d; or e`) instead of copying through HL. Touches only A, so every other
+cache stays exactly as valid as before. `ktrip_word`'s z80 loop back-edge is
+now `dec bc; ld a,b; or c; jr nz,L` (4 bytes) instead of `dec bc; ld hl,bc;
+ld a,h; or l; jr nz,L` (7 bytes).
+
+Same gauntlet, combined with the decrement fix above: full corpus×CPU×frame
+scan (720 cells) — 0 changed (the standard corpus's reversed-to-zero loops
+don't currently land their counter in BC/DE either); `long_ir` 846/846 both
+frame modes, same one pre-existing `longshl_vm1` gap.
