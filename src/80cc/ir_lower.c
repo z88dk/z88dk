@@ -2344,6 +2344,63 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                     }
                 }
             }
+            /* [idx-rmw-de] Indexed word RMW: `ld bc,hl; ld a,(hl+); ld h,(hl);
+               ld l,a; inc hl; ex de,hl; ld hl,bc; ld (hl),e; inc hl; ld (hl),d`
+               parks the address in BC because the word load walks the value
+               through HL itself (the A→HL reader), stranding the address —
+               then rebuilds HL from BC to store back. Once the address is in
+               HL and NOT consumed by the load, `dec hl` recovers it directly:
+               `ld e,(hl); inc hl; ld d,(hl); dec hl; inc de;
+                ld (hl),e; inc hl; ld (hl),d` — 8 bytes against 14, and it
+               never touches BC at all. ADR 0088 sized this reader shape and
+               declined to change the emitter from the census alone; this is
+               that census's site, hit as an exact 10-line match rather than a
+               general lowering change.
+                 - B, C, D and E all dead after (`ld bc,hl` clobbered BC to
+                   the address either way, so a later BC read was already
+                   broken by the ORIGINAL code; DE held the incremented value
+                   post-store in the old form and holds whatever it held
+                   before the sequence in the new one — a consumer expecting
+                   the former needs the dead-check).
+                 - No flag condition: both forms are register loads, INC/DEC
+                   on HL, and byte stores; none of the four reads F and `inc
+                   hl`/`dec hl` do not touch it either.
+               `--opt-disable=idx-rmw-de` opts out. adr/0088. */
+            if (!opt_disabled("idx-rmw-de") && !b_live && !c_live
+                && !d_live && !e_live
+                && i >= 9 && !drop[i] && !drop[i-1] && !drop[i-2] && !drop[i-3]
+                && !drop[i-4] && !drop[i-5] && !drop[i-6] && !drop[i-7]
+                && !drop[i-8] && !drop[i-9]
+                && !strcmp(lines[i],   "\tld\t(hl),d\n")
+                && !strcmp(lines[i-1], "\tinc\thl\n")
+                && !strcmp(lines[i-2], "\tld\t(hl),e\n")
+                && !strcmp(lines[i-3], "\tld\thl,bc\n")
+                && !strcmp(lines[i-4], "\tex\tde,hl\n")
+                && !strcmp(lines[i-5], "\tinc\thl\n")
+                && !strcmp(lines[i-6], "\tld\tl,a\n")
+                && !strcmp(lines[i-7], "\tld\th,(hl)\n")
+                && !strcmp(lines[i-8], "\tld\ta,(hl+)\n")
+                && !strcmp(lines[i-9], "\tld\tbc,hl\n")) {
+                static const char *repl[8] = {
+                    "\tld\te,(hl)\n", "\tinc\thl\n", "\tld\td,(hl)\n",
+                    "\tdec\thl\n",    "\tinc\tde\n", "\tld\t(hl),e\n",
+                    "\tinc\thl\n",    "\tld\t(hl),d\n",
+                };
+                char *nl[8];
+                int ok = 1;
+                for (int k = 0; k < 8; k++) {
+                    nl[k] = strdup(repl[k]);
+                    if (!nl[k]) ok = 0;
+                }
+                if (ok) {
+                    for (int k = 0; k < 8; k++) {
+                        free(lines[i - 9 + k]); lines[i - 9 + k] = nl[k];
+                    }
+                    drop[i] = drop[i - 1] = 1;
+                } else {
+                    for (int k = 0; k < 8; k++) free(nl[k]);
+                }
+            }
             /* [inc-mem] `ld a,(hl); inc a; ld (hl),a` becomes `inc (hl)` —
                3 bytes and 18 cycles down to 1 and 11 — and the `(ix+d)` form
                goes from 7 bytes and 42 cycles to 3 and 23. One condition: A

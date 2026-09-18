@@ -80,6 +80,7 @@ exists (ADR 0010).
 | `z80n-add-a` | z80n zero-extended byte adds go via DE instead of `add hl,a` |
 | `de-widen` | a byte widened into DE and copied to HL keeps `ld e,S; ld d,0; ld hl,de` |
 | `inc-mem` | a memory increment stays `ld a,MEM; inc a; ld MEM,a` instead of `inc MEM` |
+| `idx-rmw-de` | an indexed word RMW keeps the BC address park instead of the `dec hl`-restored DE route |
 | `shr-a-chain` | a constant word right shift stays `srl h; rr l` instead of the A-through-CB chain |
 | `shr-dead-l` | the dead `ld l,a` before an A-through-CB shift chain is kept |
 | `shr-tbac` | a masked `(x >> n) & M` in a loop keeps the top-byte `add hl,hl` route instead of the A-chain |

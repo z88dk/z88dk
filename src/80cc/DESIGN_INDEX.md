@@ -4,7 +4,7 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 2026-09-17. Keep it short: when a section stops describing what is
+Last swept: 2026-09-18. Keep it short: when a section stops describing what is
 live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
@@ -13,6 +13,51 @@ live, it belongs in `adr/` or in git history, not here.
 argument ABI alone currently decides `[bc-call]` liveness. No in-tree callee
 honours that modifier yet; establish the rule and its negative cases before
 changing the allocator.
+
+**Sizeable, not urgent: embed copt's matching ENGINE inside 80cc, extended
+with a liveness precondition fed by 80cc's own backward pass.** `ir_lower.c`'s
+backward pass (`b_live`/`c_live`/`d_live`/`e_live`/`f_live`, `drop[]`) now
+carries a growing family of small, individually-ADR'd rewrites written as
+hand-rolled C blocks matching an exact adjacent-line sequence and a liveness
+precondition — `inc-mem`, `de-widen`, `z80n-add-a`, `idx-rmw-de` (ADR 0088)
+and others. They read alike: pattern, liveness gate, replacement, opt-out
+name — exactly copt's rule shape (pattern → replacement, `%cpu`/`%notcpu`,
+`%check`/`%eval`/`%is`/`%not` preconditions) minus a liveness primitive.
+
+Do NOT do this by calling the external `z88dk-copt` binary as a blind post-pass
+on assembled text — that was tried once, for the same shape of rewrite
+(`gwiden`, ir_lower.c:2167): copt applied it blind (no liveness) and
+miscompiled, and it only became safe once it moved into this pass, "the only
+place in the pipeline with real per-line liveness." copt runs after 80cc on
+raw text shared across sccz80/80cc/sdcc, with no view of frame mode, CPU
+dispatch, or 80cc's register-cache state.
+
+The idea worth sizing is narrower and avoids that trap: link `src/copt/copt.c`'s
+engine INTO 80cc as a library, not as an external post-pass. `main()`
+(copt.c:915-967) is thin CLI glue — argv parsing, `init()` loading rule files
+into a global rule list, `getlst()` reading stdin into a `struct lnode`
+doubly-linked line list, `opt()` run per node to quiescence, then print. The
+engine itself (`match`/`subst`/`check`/`check_eval`/`opt`) is already
+self-contained around that `lnode`/rule-list state — swapping the stdin/argv
+glue for an API (`copt_run(rules, lines) -> lines`) is a moderate refactor,
+not a rewrite. `struct lnode` (`l_text`, `l_len`, `l_prev`, `l_next`) has no
+spare field; add one (e.g. `l_live`, a register-bitmask) — trivial.
+The precondition system (`%cpu`/`%notcpu`/`%check`/`%eval`/`%is`/`%not`/
+`%notSame`) is already a general per-rule-firing hook; a new `%dead <reg>`
+primitive fits that shape directly. 80cc still runs its existing backward
+walk exactly once, stamps `l_live` on each line from ITS OWN liveness state
+(same source of truth as today, never re-derived by copt), then hands the
+annotated buffer to the embedded engine with rules written in copt's real DSL
+instead of one-off C blocks per rung.
+
+Two real limits, both already true of the current hand-written rungs: (1) it
+only covers the straight-line matches — `bc-flow`/`de-flow` branch-target
+fixpoint rungs need CFG dataflow copt's linear multi-pass model doesn't do,
+so those stay hand-written regardless; (2) this is a genuine mid-size project
+(engine extraction + annotation plumbing + DSL extension for `%dead`), not a
+quick win — prototype it on 2-3 existing rungs (`idx-rmw-de`, `inc-mem`,
+`de-widen`) before committing further, and gate the prototype through the full
+gauntlet the same as any codegen change.
 
 The masked word right-shift rung is accepted for plain Z80. See ADR 0090. The
 A-through-CB route is faster in all 10 affected sp/fp cells and has no
@@ -59,11 +104,18 @@ solution. A dual render is not a useful scalar gate. The emitter remains
 unchanged; the measured effects remain −6 % ticks in `md5`, +28 B in
 `binary-trees`, and +75 B in `emu.c`.
 
-**4. The indexed read-modify-write address restoration — CLOSED. See ADR 0088.**
-The 720-cell final-assembly census found one complete `histbench` site in 8
-CPU/frame cells, 5 bytes per site and 40 bytes total. `adv_a.c` and `clisp.c`
-had no eligible sites. The broad reader matches were pointer copies or
-temporaries, so the emitter remains unchanged.
+**4. The indexed read-modify-write address restoration — SHIPPED. See ADR 0093
+(supersedes ADR 0088's "no emitter change" call).** The 720-cell final-assembly
+census found one complete `histbench` site in 8 CPU/frame cells, 5 bytes per
+site; `adv_a.c` and `clisp.c` had no eligible sites, and the broad reader
+matches elsewhere were pointer copies or temporaries. ADR 0088 declined to
+ship from the census alone; shipped 2026-09-18 as `[idx-rmw-de]`, a 10-line
+text match in `ir_lower.c`'s existing backward-liveness pass, gated on B/C/D/E
+all dead after. z80/z180/8080 fire (-5 B/site, matching the census); z80n
+text-matches the same pattern but the live liveness check correctly declines
+(DE proven live after on z80n, dead elsewhere) — the census had counted z80n
+as affected, the per-line liveness check is the one that gets believed. See
+`BENCH_MATRIX.txt` s7 (2026-09-18) for the dated numbers.
 
 The remaining instruction-selection rungs are not the current action.
 `histbench` on Z80 is 32.01 M ticks against xcc `-Of`'s 28.46 M, and
