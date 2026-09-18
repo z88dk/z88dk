@@ -1,0 +1,8 @@
+% z88dk-zx81bas -d 11 t//input/45_line_number_basic.bas
+Input file:  t/input/45_line_number_basic.bas
+Output file: t/input/45_line_number_basic.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/45_line_number_basic.i" "t/input/45_line_number_basic.pp"
+     10 PRINT"HELLO"
+     20 PRINT"WORLD"
+     30 REM
+   #ASM:		RET

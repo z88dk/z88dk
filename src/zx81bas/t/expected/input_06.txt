@@ -155,10 +155,10 @@ Symtab {
         10 {
             location: test_t_input_06_t.bas:87
         }
-        11 {
+        20 {
             location: test_t_input_06_t.bas:88
         }
-        12 {
+        30 {
             location: test_t_input_06_t.bas:89
         }
         1000 {

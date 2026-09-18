@@ -54,10 +54,10 @@
     <ClInclude Include="..\..\src\zx81bas\symtab.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\zx81bas\lower_asm.h">
+    <ClInclude Include="..\..\src\zx81bas\emit_asm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\zx81bas\lower_bas.h">
+    <ClInclude Include="..\..\src\zx81bas\lower.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\zx81bas\z80asm.h">
@@ -67,6 +67,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\zx81bas\walker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\zx81bas\optimize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\zx81bas\emit_basic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -110,16 +116,22 @@
     <ClCompile Include="..\..\src\zx81bas\symtab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\zx81bas\lower_asm.cpp">
+    <ClCompile Include="..\..\src\zx81bas\emit_asm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\zx81bas\lower_bas.cpp">
+    <ClCompile Include="..\..\src\zx81bas\lower.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\zx81bas\z80asm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\zx81bas\walker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zx81bas\optimize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zx81bas\emit_basic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -136,5 +148,6 @@
     <None Include="..\..\src\zx81bas\scan.re">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

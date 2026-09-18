@@ -85,8 +85,8 @@ z_code:	ld a, 255
 
 @label1:		LET A = 1
 10				LET A = 1
-11 @label2:		LET A = 1
-@label3: 12		LET A = 1
+20 @label2:		LET A = 1
+@label3: 30		LET A = 1
 
 //------------------------------------------------------------------------------
 // check labels in ASM
@@ -169,7 +169,7 @@ label4:			nop
 // lowering of expressions
 //------------------------------------------------------------------------------
 
-	DEF FNid(A) = A+0
+	DEF FNid(A) = A*1
 
 	LET A=10*FNid(42)+FNid(1+3)
 	LET A(FNid(42)) = 25

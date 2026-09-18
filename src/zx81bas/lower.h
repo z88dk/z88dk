@@ -120,6 +120,7 @@ struct LoweringPass {
     void add_if_not_cond_goto_stmt(std::vector<StmtPtr>& stmts,
                                    ExprPtr cond_expr, const std::string& target_label,
                                    const SourceLoc& loc);
+    void add_stop_stmt(std::vector<StmtPtr>& stmts, const SourceLoc& loc);
 };
 
 bool lower_prog(Prog& prog, Symtab& symtab);

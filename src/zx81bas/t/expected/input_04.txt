@@ -2420,14 +2420,14 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "11 @label2:		LET A = 1"
+                text: "20 @label2:		LET A = 1"
                 location: test_t_input_04_t.bas:88
             }
         tokens: [
             Token {
                 type: Integer
-                text: "11"
-                ivalue: 11
+                text: "20"
+                ivalue: 20
                 location: test_t_input_04_t.bas:88
             }
             Token {
@@ -2478,7 +2478,7 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "@label3: 12		LET A = 1"
+                text: "@label3: 30		LET A = 1"
                 location: test_t_input_04_t.bas:89
             }
         tokens: [
@@ -2499,8 +2499,8 @@ TokFile {
             }
             Token {
                 type: Integer
-                text: "12"
-                ivalue: 12
+                text: "30"
+                ivalue: 30
                 ws_before: " "
                 location: test_t_input_04_t.bas:89
             }
@@ -3921,7 +3921,7 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "	DEF FNid(A) = A+0"
+                text: "	DEF FNid(A) = A*1"
                 location: test_t_input_04_t.bas:172
             }
         tokens: [
@@ -3966,14 +3966,14 @@ TokFile {
                 location: test_t_input_04_t.bas:172
             }
             Token {
-                type: +
-                text: "+"
+                type: *
+                text: "*"
                 location: test_t_input_04_t.bas:172
             }
             Token {
                 type: Integer
-                text: "0"
-                ivalue: 0
+                text: "1"
+                ivalue: 1
                 location: test_t_input_04_t.bas:172
             }
         ]

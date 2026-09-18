@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -65,8 +66,6 @@ struct Expr : TreeNode {
     virtual void accept(ASTVisitor& v) = 0;
     virtual LoweredExpr lower(LoweringPass& pass) = 0;
 };
-
-int precedence(const Expr& e);
 
 struct NumberExpr : Expr {
     double value = 0.0;
@@ -403,7 +402,7 @@ struct WhileStmt : Stmt {
 };
 
 struct ForStmt : Stmt {
-    std::string name;               // loop variable
+    std::string name;           // loop variable
     ExprPtr start_expr;
     ExprPtr end_expr;
     ExprPtr step_expr;
@@ -1018,6 +1017,21 @@ struct PragmaStrVarArrayStmt : Stmt {
 #endif
 };
 
+struct BasicLine {
+    enum class Type {
+        BASIC,
+        ASM,
+        DFILE,
+        VARS,
+    };
+    Type type = Type::BASIC;
+    int line_num = -1;             // assigned later
+    std::vector<Token> tokens;     // BASIC/ASM tokens
+    std::vector<std::string> labels; // BASIC labels, if any
+
+    std::string to_string() const;
+};
+
 struct Prog : TreeNode {
     bool auto_start = false;        // true if program starts on load
     int auto_start_line = 0;        // line number to start on load
@@ -1029,8 +1043,14 @@ struct Prog : TreeNode {
     bool dfile_colapsed = false;    // true if display file is collapsed
     std::vector<uint8_t> sysvars_data;   // raw SYSVAR data
 
+    // result of parsing, before lowering
     std::vector<StmtPtr> stmts;
     std::vector<StmtPtr> pragma_vars;
+
+    // result of lowering, after lowering
+    std::vector<BasicLine> basic_lines;     // output BASIC lines
+    std::unordered_map<std::string, int> label_line;    // label -> line number
+    std::unordered_map<std::string, int> label_addr;    // label -> code address
 
     void accept(ASTVisitor& v);
 

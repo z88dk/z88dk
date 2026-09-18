@@ -28,8 +28,8 @@ test_t_input_03_t.bas:79: z_code:	ld a, 255
 test_t_input_03_t.bas:80: !ENDASM
 test_t_input_03_t.bas:86: @label1:		LET A = 1
 test_t_input_03_t.bas:87: 10				LET A = 1
-test_t_input_03_t.bas:88: 11 @label2:		LET A = 1
-test_t_input_03_t.bas:89: @label3: 12		LET A = 1
+test_t_input_03_t.bas:88: 20 @label2:		LET A = 1
+test_t_input_03_t.bas:89: @label3: 30		LET A = 1
 test_t_input_03_t.bas:95: !ASM
 test_t_input_03_t.bas:96: label4:			nop
 test_t_input_03_t.bas:97: !ENDASM
@@ -68,7 +68,7 @@ test_t_input_03_t.bas:163: 	A$(1 TO 2)="AB"
 test_t_input_03_t.bas:164: 	A$(1,2)(3 TO 4)="AB"
 test_t_input_03_t.bas:165: 	A$(TO 3)="ABC"
 test_t_input_03_t.bas:166: 	A$(2 TO)="BCD"
-test_t_input_03_t.bas:172: 	DEF FNid(A) = A+0
+test_t_input_03_t.bas:172: 	DEF FNid(A) = A*1
 test_t_input_03_t.bas:174: 	LET A=10*FNid(42)+FNid(1+3)
 test_t_input_03_t.bas:175: 	LET A(FNid(42)) = 25
 test_t_input_03_t.bas:177: 	DEF PROCid(A) : PROCid = A+0 : ENDPROC

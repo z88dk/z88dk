@@ -141,10 +141,12 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\zx81bas\ast.h" />
     <ClInclude Include="..\..\src\zx81bas\dump_context.h" />
+    <ClInclude Include="..\..\src\zx81bas\emit_basic.h" />
     <ClInclude Include="..\..\src\zx81bas\errors.h" />
     <ClInclude Include="..\..\src\zx81bas\lexer.h" />
-    <ClInclude Include="..\..\src\zx81bas\lower_asm.h" />
-    <ClInclude Include="..\..\src\zx81bas\lower_bas.h" />
+    <ClInclude Include="..\..\src\zx81bas\emit_asm.h" />
+    <ClInclude Include="..\..\src\zx81bas\lower.h" />
+    <ClInclude Include="..\..\src\zx81bas\optimize.h" />
     <ClInclude Include="..\..\src\zx81bas\options.h" />
     <ClInclude Include="..\..\src\zx81bas\parser.h" />
     <ClInclude Include="..\..\src\zx81bas\preproc.h" />
@@ -161,10 +163,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\zx81bas\ast.cpp" />
     <ClCompile Include="..\..\src\zx81bas\dump_context.cpp" />
+    <ClCompile Include="..\..\src\zx81bas\emit_basic.cpp" />
     <ClCompile Include="..\..\src\zx81bas\errors.cpp" />
     <ClCompile Include="..\..\src\zx81bas\lexer.cpp" />
-    <ClCompile Include="..\..\src\zx81bas\lower_asm.cpp" />
-    <ClCompile Include="..\..\src\zx81bas\lower_bas.cpp" />
+    <ClCompile Include="..\..\src\zx81bas\emit_asm.cpp" />
+    <ClCompile Include="..\..\src\zx81bas\lower.cpp" />
+    <ClCompile Include="..\..\src\zx81bas\optimize.cpp" />
     <ClCompile Include="..\..\src\zx81bas\options.cpp" />
     <ClCompile Include="..\..\src\zx81bas\parser.cpp" />
     <ClCompile Include="..\..\src\zx81bas\preproc.cpp" />
@@ -182,6 +186,7 @@
     <None Include="..\..\src\zx81bas\scan.re" />
     <None Include="..\..\src\zx81bas\tokens.def" />
     <None Include="..\..\src\zx81bas\zx81chars.def" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

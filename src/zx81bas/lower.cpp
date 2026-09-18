@@ -7,7 +7,7 @@
 #include "ast.h"
 #include "errors.h"
 #include "lexer.h"
-#include "lower_bas.h"
+#include "lower.h"
 #include "release_assert.h"
 #include "symtab.h"
 #include "utils.h"
@@ -46,18 +46,18 @@ void LoweringPass::lower_prog() {
         }
     }
 
-    // GOTO end of program
-    add_goto_stmt(out, END_OF_PROGRAM, end_of_program_loc);
-
     // lower proc definitions
     auto lowered_procs = lower_procs();
-    append_stmts(out, lowered_procs);
+    if (!lowered_procs.empty()) {
+        // STOP
+        add_stop_stmt(out, end_of_program_loc);
+
+        // DEF PROC bodies
+        append_stmts(out, lowered_procs);
+    }
 
     // add footer statements
     append_stmts(out, footer);
-
-    // add end of program label
-    add_label_stmt(out, END_OF_PROGRAM, end_of_program_loc);
 
     prog.stmts = std::move(out);
 }
@@ -237,9 +237,6 @@ LoweredExpr LoweringPass::lower(ProcCallExpr& expr) {
     release_assert(it != symtab.procs.end());
     auto def_proc = it->second;
     release_assert(def_proc->params.size() == expr.args.size());
-
-    // mark as CALLED to dump body at the end
-    def_proc->called = true;
 
     for (size_t i = 0; i < def_proc->params.size(); i++) {
         // lower each argument
@@ -471,6 +468,9 @@ std::vector<StmtPtr> LoweringPass::lower(ForStmt& stmt) {
     auto new_next_stmt = make_node<NextStmt>(stmt.name, stmt.loc);
     out.push_back(std::move(new_next_stmt));
 
+    // @end:
+    add_label_stmt(out, end_label, stmt.loc);
+
     // remove entry from control stack
     control_stack.pop_back();
 
@@ -495,9 +495,6 @@ std::vector<StmtPtr> LoweringPass::lower(ProcCallStmt& stmt) {
     release_assert(it != symtab.procs.end());
     auto def_proc = it->second;
     release_assert(def_proc->params.size() == stmt.args.size());
-
-    // mark as CALLED to dump body at the end
-    def_proc->called = true;
 
     for (size_t i = 0; i < def_proc->params.size(); i++) {
         // lower each argument
@@ -588,9 +585,7 @@ std::vector<StmtPtr> LoweringPass::lower(StopStmt& stmt) {
 
 std::vector<StmtPtr> LoweringPass::lower(EndStmt& stmt) {
     std::vector<StmtPtr> out;
-
-    add_goto_stmt(out, END_OF_PROGRAM, stmt.loc);
-
+    add_stop_stmt(out, stmt.loc);
     return out;
 }
 
@@ -742,7 +737,7 @@ std::vector<StmtPtr> LoweringPass::lower(ListStmt& stmt) {
 std::vector<StmtPtr> LoweringPass::lower(LListStmt& stmt) {
     std::vector<StmtPtr> out;
 
-    auto new_stmt = std::make_unique<ListStmt>(stmt.loc);
+    auto new_stmt = std::make_unique<LListStmt>(stmt.loc);
     if (stmt.target_expr) {
         auto lowered_target = stmt.target_expr->lower(*this);
         append_stmts(out, lowered_target.preamble);
@@ -969,6 +964,12 @@ void LoweringPass::add_if_not_cond_goto_stmt(std::vector<StmtPtr>& stmts,
     auto new_if_stmt = make_node<IfStmt>(std::move(not_cond_expr), loc);
     add_goto_stmt(new_if_stmt->then_stmts, target_label, loc);
     stmts.push_back(std::move(new_if_stmt));
+}
+
+void LoweringPass::add_stop_stmt(std::vector<StmtPtr>& stmts,
+                                 const SourceLoc& loc) {
+    auto stop_stmt = make_node<StopStmt>(loc);
+    stmts.push_back(std::move(stop_stmt));
 }
 
 bool lower_prog(Prog& prog, Symtab& symtab) {
