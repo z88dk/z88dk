@@ -6,7 +6,9 @@
 
 #pragma once
 
+#include "ast.h"
+#include "lexer.h"
 #include <string>
+#include <vector>
 
-static inline const std::string SYMBOL_PREFIX = "ZX81BAS";
-static inline const std::string CPP_DEFINE = "__" + SYMBOL_PREFIX + "__";
+bool emit_basic(Prog& prog);

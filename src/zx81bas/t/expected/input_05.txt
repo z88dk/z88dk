@@ -256,7 +256,7 @@ Prog {
         }
         LineNumStmt {
             location: test_t_input_05_t.bas:88
-            line_num: 11
+            line_num: 20
         }
         LabelStmt {
             location: test_t_input_05_t.bas:88
@@ -279,7 +279,7 @@ Prog {
         }
         LineNumStmt {
             location: test_t_input_05_t.bas:89
-            line_num: 12
+            line_num: 30
         }
         LabelStmt {
             location: test_t_input_05_t.bas:89
@@ -892,7 +892,7 @@ Prog {
                 BinaryExpr {
                     type: Number
                     location: test_t_input_05_t.bas:172
-                    op: +
+                    op: *
                     lhs: 
                         VariableExpr {
                             type: Number
@@ -903,7 +903,7 @@ Prog {
                         NumberExpr {
                             type: Number
                             location: test_t_input_05_t.bas:172
-                            value: 0.000000
+                            value: 1.000000
                         }
                 }
         }

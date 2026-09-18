@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <string>
+#include "ast.h"
+#include "symtab.h"
 
-static inline const std::string SYMBOL_PREFIX = "ZX81BAS";
-static inline const std::string CPP_DEFINE = "__" + SYMBOL_PREFIX + "__";
+bool optimize(Prog& prog, Symtab& symtab);

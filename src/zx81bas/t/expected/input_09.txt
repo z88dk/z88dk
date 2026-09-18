@@ -203,7 +203,7 @@ Prog {
         }
         LineNumStmt {
             location: test_t_input_09_t.bas:88
-            line_num: 11
+            line_num: 20
         }
         LabelStmt {
             location: test_t_input_09_t.bas:88
@@ -226,7 +226,7 @@ Prog {
         }
         LineNumStmt {
             location: test_t_input_09_t.bas:89
-            line_num: 12
+            line_num: 30
         }
         LabelStmt {
             location: test_t_input_09_t.bas:89
@@ -857,7 +857,7 @@ Prog {
                                 BinaryExpr {
                                     type: Number
                                     location: test_t_input_09_t.bas:172
-                                    op: +
+                                    op: *
                                     lhs: 
                                         NumberExpr {
                                             type: Number
@@ -868,7 +868,7 @@ Prog {
                                         NumberExpr {
                                             type: Number
                                             location: test_t_input_09_t.bas:172
-                                            value: 0.000000
+                                            value: 1.000000
                                         }
                                 }
                         }
@@ -876,7 +876,7 @@ Prog {
                         BinaryExpr {
                             type: Number
                             location: test_t_input_09_t.bas:172
-                            op: +
+                            op: *
                             lhs: 
                                 BinaryExpr {
                                     type: Number
@@ -899,7 +899,7 @@ Prog {
                                 NumberExpr {
                                     type: Number
                                     location: test_t_input_09_t.bas:172
-                                    value: 0.000000
+                                    value: 1.000000
                                 }
                         }
                 }
@@ -915,7 +915,7 @@ Prog {
                         BinaryExpr {
                             type: Number
                             location: test_t_input_09_t.bas:172
-                            op: +
+                            op: *
                             lhs: 
                                 NumberExpr {
                                     type: Number
@@ -926,7 +926,7 @@ Prog {
                                 NumberExpr {
                                     type: Number
                                     location: test_t_input_09_t.bas:172
-                                    value: 0.000000
+                                    value: 1.000000
                                 }
                         }
                     ]
@@ -1854,7 +1854,7 @@ Prog {
                         BinaryExpr {
                             type: Number
                             location: test_t_input_09_t.bas:172
-                            op: +
+                            op: *
                             lhs: 
                                 UnaryExpr {
                                     type: Number
@@ -1871,7 +1871,7 @@ Prog {
                                 NumberExpr {
                                     type: Number
                                     location: test_t_input_09_t.bas:172
-                                    value: 0.000000
+                                    value: 1.000000
                                 }
                         }
                     ]
@@ -1894,7 +1894,7 @@ Prog {
                         BinaryExpr {
                             type: Number
                             location: test_t_input_09_t.bas:172
-                            op: +
+                            op: *
                             lhs: 
                                 NumberExpr {
                                     type: Number
@@ -1905,14 +1905,14 @@ Prog {
                                 NumberExpr {
                                     type: Number
                                     location: test_t_input_09_t.bas:172
-                                    value: 0.000000
+                                    value: 1.000000
                                 }
                         }
                     rhs: 
                         BinaryExpr {
                             type: Number
                             location: test_t_input_09_t.bas:172
-                            op: +
+                            op: *
                             lhs: 
                                 NumberExpr {
                                     type: Number
@@ -1923,7 +1923,7 @@ Prog {
                                 NumberExpr {
                                     type: Number
                                     location: test_t_input_09_t.bas:172
-                                    value: 0.000000
+                                    value: 1.000000
                                 }
                         }
                 }
@@ -4680,6 +4680,10 @@ Prog {
             location: test_t_input_09_t.bas:328
             name: "I"
         }
+        LabelStmt {
+            location: test_t_input_09_t.bas:328
+            label: "ZX81BAS29FOREND"
+        }
         ForStmt {
             location: test_t_input_09_t.bas:330
             name: "I"
@@ -4759,9 +4763,17 @@ Prog {
             location: test_t_input_09_t.bas:330
             name: "J"
         }
+        LabelStmt {
+            location: test_t_input_09_t.bas:330
+            label: "ZX81BAS31FOREND"
+        }
         NextStmt {
             location: test_t_input_09_t.bas:330
             name: "I"
+        }
+        LabelStmt {
+            location: test_t_input_09_t.bas:330
+            label: "ZX81BAS30FOREND"
         }
         ForStmt {
             location: test_t_input_09_t.bas:332
@@ -4935,9 +4947,17 @@ Prog {
             location: test_t_input_09_t.bas:335
             name: "J"
         }
+        LabelStmt {
+            location: test_t_input_09_t.bas:335
+            label: "ZX81BAS34FOREND"
+        }
         NextStmt {
             location: test_t_input_09_t.bas:332
             name: "I"
+        }
+        LabelStmt {
+            location: test_t_input_09_t.bas:332
+            label: "ZX81BAS32FOREND"
         }
         ForStmt {
             location: test_t_input_09_t.bas:340
@@ -5018,9 +5038,17 @@ Prog {
             location: test_t_input_09_t.bas:340
             name: "J"
         }
+        LabelStmt {
+            location: test_t_input_09_t.bas:340
+            label: "ZX81BAS36FOREND"
+        }
         NextStmt {
             location: test_t_input_09_t.bas:340
             name: "I"
+        }
+        LabelStmt {
+            location: test_t_input_09_t.bas:340
+            label: "ZX81BAS35FOREND"
         }
         ForStmt {
             location: test_t_input_09_t.bas:342
@@ -5101,9 +5129,17 @@ Prog {
             location: test_t_input_09_t.bas:343
             name: "J"
         }
+        LabelStmt {
+            location: test_t_input_09_t.bas:343
+            label: "ZX81BAS38FOREND"
+        }
         NextStmt {
             location: test_t_input_09_t.bas:342
             name: "I"
+        }
+        LabelStmt {
+            location: test_t_input_09_t.bas:342
+            label: "ZX81BAS37FOREND"
         }
         LetStmt {
             location: test_t_input_09_t.bas:362
@@ -5627,14 +5663,8 @@ Prog {
         StopStmt {
             location: test_t_input_09_t.bas:420
         }
-        GotoStmt {
+        StopStmt {
             location: test_t_input_09_t.bas:426
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:426
-                    name: "ZX81BASENDOFPROGRAM"
-                }
         }
         PrintStmt {
             location: test_t_input_09_t.bas:432
@@ -6379,12 +6409,12 @@ Prog {
                     name: "LABEL1"
                 }
         }
-        ListStmt {
+        LListStmt {
             location: test_t_input_09_t.bas:563
             target_expr: 
                 null
         }
-        ListStmt {
+        LListStmt {
             location: test_t_input_09_t.bas:564
             target_expr: 
                 NumberExpr {
@@ -6393,7 +6423,7 @@ Prog {
                     value: 10.000000
                 }
         }
-        ListStmt {
+        LListStmt {
             location: test_t_input_09_t.bas:565
             target_expr: 
                 BinaryExpr {
@@ -6414,7 +6444,7 @@ Prog {
                         }
                 }
         }
-        ListStmt {
+        LListStmt {
             location: test_t_input_09_t.bas:566
             target_expr: 
                 LabelLineRefExpr {
@@ -6536,14 +6566,8 @@ Prog {
                     }
             ]
         }
-        GotoStmt {
+        StopStmt {
             location: test_t_input_09_t.bas:614
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:614
-                    name: "ZX81BASENDOFPROGRAM"
-                }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:177
@@ -6812,10 +6836,6 @@ Prog {
             asm: [
                 END:		LD A, 1
             ]
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:614
-            label: "ZX81BASENDOFPROGRAM"
         }
     ]
     pragma_vars: [

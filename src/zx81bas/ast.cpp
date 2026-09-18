@@ -7,12 +7,16 @@
 #include "ast.h"
 #include "dump_context.h"
 #include "errors.h"
-#include "lower_bas.h"
-#include "release_assert.h"
+#include "lower.h"
 #include "utils.h"
 #include "walker.h"
+#include <iomanip>
+#include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
+
+static inline constexpr int LINE_NUM_WIDTH = 8;
 
 bool is_string_variable(const std::string& name) {
     return !name.empty() && name.back() == '$';
@@ -104,73 +108,6 @@ static void dump_asm_lines(const std::vector<TokLine>& asm_lines,
 
 Expr::Expr(ExprType type_, const SourceLoc& loc_)
     : type(type_), loc(loc_) {}
-
-int precedence(const Expr& e) {
-    if (dynamic_cast<const NumberExpr*>(&e)) {
-        return 1;
-    }
-    if (dynamic_cast<const StringLiteralExpr*>(&e)) {
-        return 1;
-    }
-    if (dynamic_cast<const LabelLineRefExpr*>(&e)) {
-        return 1;
-    }
-    if (dynamic_cast<const LabelAddrRefExpr*>(&e)) {
-        return 1;
-    }
-    if (dynamic_cast<const VariableExpr*>(&e)) {
-        return 1;
-    }
-    if (dynamic_cast<const ArrayRefExpr*>(&e)) {
-        return 1;
-    }
-    if (dynamic_cast<const SliceExpr*>(&e)) {
-        return 1;
-    }
-    if (dynamic_cast<const BasicFuncCallExpr*>(&e)) {
-        return 1;
-    }
-
-    if (auto u = dynamic_cast<const UnaryExpr*>(&e)) {
-        switch (u->op) {
-        case TokenType::Minus:
-            return 2;
-        default:
-            release_assert(0);
-        }
-    }
-
-    if (auto b = dynamic_cast<const BinaryExpr*>(&e)) {
-        switch (b->op) {
-        case TokenType::Power:
-            return 3;
-        case TokenType::Multiply:
-        case TokenType::Divide:
-        case TokenType::IntDivide:
-        case TokenType::MOD:
-            return 4;
-        case TokenType::Plus:
-        case TokenType::Minus:
-            return 5;
-        case TokenType::Equal:
-        case TokenType::Less:
-        case TokenType::Greater:
-        case TokenType::LessEqual:
-        case TokenType::GreaterEqual:
-        case TokenType::NotEqual:
-            return 6;
-        case TokenType::AND:
-        case TokenType::OR:
-        case TokenType::NOT:
-            return 7;
-        default:
-            release_assert(0);
-        }
-    }
-
-    release_assert(0);
-    return 99; // not reached
-}
 
 NumberExpr::NumberExpr(double value_, SourceLoc loc_)
     : Expr(ExprType::Number, loc_), value(value_) {}
@@ -2217,6 +2154,42 @@ void PragmaStrVarArrayStmt::dump(DumpContext ctx) const {
     ctx.line("}");
 }
 #endif
+
+std::string BasicLine::to_string() const {
+    std::ostringstream oss;
+
+    for (auto& label : labels) {
+        oss << "@" << label << ":" << std::endl;
+    }
+
+    switch (type) {
+    case Type::BASIC:
+        if (line_num >= 0) {
+            oss << std::setw(LINE_NUM_WIDTH - 1) << line_num << " ";
+        }
+        else {
+            oss << std::setw(LINE_NUM_WIDTH) << " ";
+        }
+        break;
+    case Type::ASM:
+        oss << std::setw(LINE_NUM_WIDTH) << "#ASM:";
+        break;
+    case Type::DFILE:
+        oss << std::setw(LINE_NUM_WIDTH) << "#DFILE:";
+        break;
+    case Type::VARS:
+        oss << std::setw(LINE_NUM_WIDTH) << "#VARS:";
+        break;
+    }
+
+    for (auto& token : tokens) {
+        oss << token.ws_before << token.text;
+    }
+
+    oss << std::endl;
+
+    return oss.str();
+}
 
 void Prog::accept(ASTVisitor& v) {
     if (v.enter(*this)) {

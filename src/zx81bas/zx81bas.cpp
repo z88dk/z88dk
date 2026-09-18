@@ -9,9 +9,11 @@
 #include "dump_context.h"
 #include "errors.h"
 #include "lexer.h"
-#include "lower_asm.h"
-#include "lower_bas.h"
+#include "emit_asm.h"
+#include "lower.h"
+#include "optimize.h"
 #include "options.h"
+#include "emit_basic.h"
 #include "parser.h"
 #include "preproc.h"
 #include "semantic.h"
@@ -87,11 +89,20 @@ static void dump_symtab_exit(const Symtab& symtab) {
 }
 
 [[noreturn]]
+static void dump_basic_exit(const Prog& prog) {
+    if (get_error_count() == 0) {
+        for (const auto& line : prog.basic_lines) {
+            std::cout << line.to_string();
+        }
+    }
+    exit_error_status();
+}
+
+[[noreturn]]
 static void dump_asm_source_exit(const std::vector<std::string>& asm_source) {
     if (get_error_count() == 0) {
-        DumpContext ctx(std::cout);
         for (const auto& line : asm_source) {
-            ctx.line(line);
+            std::cout << line << std::endl;
         }
     }
     exit_error_status();
@@ -255,14 +266,36 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
-    // build assembly source
-    std::vector<std::string> asm_source;
-    if (!build_asm_source(*prog, *symtab, asm_source)) {
+    // optimize basic
+    if (!optimize(*prog, *symtab)) {
         exit_error_status();
     }
 
 #ifdef _DEBUG
     if (g_dump_step == 10) {
+        dump_prog_exit(*prog);
+    }
+#endif
+
+    // emit basic
+    if (!emit_basic(*prog)) {
+        exit_error_status();
+    }
+
+#ifdef _DEBUG
+    if (g_dump_step == 11) {
+        dump_basic_exit(*prog);
+    }
+#endif
+
+    // build assembly source
+    std::vector<std::string> asm_source;
+    if (!emit_asm(*prog, asm_source)) {
+        exit_error_status();
+    }
+
+#ifdef _DEBUG
+    if (g_dump_step == 12) {
         dump_asm_source_exit(asm_source);
     }
 #endif

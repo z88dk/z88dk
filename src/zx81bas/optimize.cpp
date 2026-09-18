@@ -4,9 +4,10 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#pragma once
+#include "optimize.h"
 
-#include <string>
-
-static inline const std::string SYMBOL_PREFIX = "ZX81BAS";
-static inline const std::string CPP_DEFINE = "__" + SYMBOL_PREFIX + "__";
+bool optimize(Prog& prog, Symtab& symtab) {
+    (void)prog;
+    (void)symtab;
+    return true;
+}
