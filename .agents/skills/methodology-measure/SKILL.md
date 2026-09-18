@@ -295,7 +295,10 @@ Expect `N run, N passed, 0 failed` plus a suite tick count. Use after **any**
 change to integer long helpers or float cores. After `fsdiv` / `f16_div` edits:
 math32 **and** math16 suites on the CPUs that ship the object. After **newlib
 math.h** / `__MATH_MATH32` remaps: always run **`test_math32_rc2014_CODE.bin`**
-(and a newlib math16 link if half API changed).
+(and a newlib math16 link if half API changed). After classic `ftoa`/`ftoe`/`ftog`
+or printf `%f`/`%e`/`%g`: `test/suites/stdio` (`test_sprintf.bin` is genmath `-lm`;
+`test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` are `--math32`).
+Integer `sscanf` is `test_scanf*.bin` (no `%f`). `test/suites/string` is `str*` only.
 
 ### Small probes
 
@@ -470,6 +473,7 @@ those numbers.
 | What to refresh | **Numbers, sizes, dates**, and **bold** cells only |
 | Bold (speed) | Best **z80** and best **8085** separately (lowest ticks; **highest KWIPS** for whetstone) |
 | Not bold for speed | **math16**, **z180**, **z80n** (and similar) — listed for comparison only |
+| z180 vs eZ80 | **z180** ticks: `+test -clib=z180` and `z88dk-ticks -mz180`. Do **not** paste **ez80_z80** ticks into a z180 row |
 | Prose | Do **not** write “winner” / “winning bold” in notes; bold is enough |
 | Clone | `git clone https://github.com/z88dk/z88dk.wiki.git` — pages `Benchmarks.md`, `Classic--Maths-Libraries.md` |
 

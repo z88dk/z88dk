@@ -10,6 +10,11 @@ ZX0 = z88dk-zx0
 ALLTARGETS = am9511 cpm hbios m math16 math32 rc2014 scz180 sms yaz180 z180 z80 zx zxn
 TARGET = $(ALLTARGETS)
 
+# math32 newlib products, same CPUs as classic math32.lib / math32_<cpu>.lib
+# for the Z80-family cores that share the newlib math32 lists. z80 is
+# math32.lib. The others are math32_<cpu>.lib. z80asm -m tags the members.
+MATH32_CPUS = z80n r2ka r4k r6k
+
 # Targets whose sources live under libsrc/target/ (classic-aligned), not newlib/target/
 MIGRATED_TARGETS = hbios scz180 yaz180 rc2014 cpm
 
@@ -119,6 +124,7 @@ $(1)-clean:
 	@$(RM) $(LIB_SDCC_IX)/$(1).lib
 	@$(RM) $(LIB_SCCZ80)/$(1)_z180.lib
 	@$(RM) $(LIB_SDCC_IX)/$(1)_z180.lib
+	$(if $(filter math32,$(1)),@$(RM) $(foreach cpu,$(MATH32_CPUS),$(LIB_SCCZ80)/math32_$(cpu).lib $(LIB_SDCC_IX)/math32_$(cpu).lib))
 endef
 
 define build_target
@@ -149,3 +155,18 @@ $(LIB_SDCC_IX)/m_z180.lib: target/m/obj/config_private.inc $(LIB_SCCZ80)/m_z180.
 	TARGET=m TYPE=z180 $(Z80ASM) -mz180 -d -m4=-Itarget/m/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/m/obj/sdcc_ix/x/z180 -Itarget/m/obj -I.. -x$(LIB_SDCC_IX)/m_z180 -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @target/m/library/m_sdcc_ix.lst
 
 m: $(LIB_SCCZ80)/m_z180.lib $(LIB_SDCC_IX)/m_z180.lib
+
+# math32.<cpu>.lib — same lists as math32.lib, assembled -m<cpu>.
+define build_math32_cpu
+$(LIB_SCCZ80)/math32_$(1).lib: target/math32/obj/config_private.inc
+	$(Q)mkdir -p $(LIB_SCCZ80)
+	TARGET=math32 TYPE=$(1) $(Z80ASM) -m$(1) -d -m4=-Itarget/math32/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/math32/obj/sccz80/$(1)/x -Itarget/math32/obj -I.. -x$(LIB_SCCZ80)/math32_$(1) -I$(Z88DK_LIB) @target/math32/library/math32_sccz80.lst
+
+$(LIB_SDCC_IX)/math32_$(1).lib: target/math32/obj/config_private.inc $(LIB_SCCZ80)/math32_$(1).lib
+	$(Q)mkdir -p $(LIB_SDCC_IX)
+	TARGET=math32 TYPE=$(1) $(Z80ASM) -m$(1) -d -m4=-Itarget/math32/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/math32/obj/sdcc_ix/$(1)/x -Itarget/math32/obj -I.. -x$(LIB_SDCC_IX)/math32_$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @target/math32/library/math32_sdcc_ix.lst
+endef
+
+$(foreach cpu,$(MATH32_CPUS),$(eval $(call build_math32_cpu,$(cpu))))
+
+math32: $(foreach cpu,$(MATH32_CPUS),$(LIB_SCCZ80)/math32_$(cpu).lib $(LIB_SDCC_IX)/math32_$(cpu).lib)

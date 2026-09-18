@@ -93,6 +93,8 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 
     add a,b
     jp C,mulovl
+    cp 0ffh
+    jp Z,mulovl                 ; sum 255, no 8-bit carry (near FLT_MAX)
     ; fall through to fmnouf (common finite path)
 
 .fmnouf
@@ -122,11 +124,14 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 .fm0
     inc b
     ret NZ                      ; return BC DEHL
-                                ; otherwise overflow → mulovl
+    ld b,0ffh                   ; wrapped: Inf. C already has xor sign
+    jr mulovl_mant              ; do not reload AF' (mulu clobbers it on z80n/z180)
+
 .mulovl
-    ex af,af                    ; get sign
+    ex af,af                    ; xor sign still in AF' (before mulu)
     ld c,a
     ld b,0ffh                   ; set Infinity
+.mulovl_mant
     ld d,0
     ld e,d
     ld h,d

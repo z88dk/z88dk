@@ -207,6 +207,13 @@ is vein 1 above: `opcodes.dat` against a corpus asm dump.
 34 features documented (ADR 0039-0074), ~240 lines of comment removed, output
 byte-identical throughout. Each comment keeps the rule, the gate spelling and any
 correctness landmine; the figures live in the ADR.
+**48-bit literal range.** `3.0e38` errors in genmath/math48 (`max_exp` 127, about `1.7e38`). sccz80 accepts and wraps. IEEE `--math32` accepts `3.0e38` and saturates larger values to Inf. Do not loosen the 48-bit check.
+
+**Give the shipped default-on optimisations ADRs, then trim their comments.**
+Of 115 registry names only about 15 are named in an ADR. Roughly ten features —
+`remat-lea`, `dead-store-share`, `trunc-res`, `fclong-carry`, `call-bremat` and
+similar — carry their justification, including benchmark figures, in a long
+block comment and nowhere else. 26 such blocks hold ~370 lines.
 
 **Five figure-carrying blocks remain and SHOULD**, because there the numbers are
 the content rather than the justification: the two measured `g0_word_cost` /

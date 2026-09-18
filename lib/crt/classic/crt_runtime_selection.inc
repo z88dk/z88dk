@@ -170,6 +170,10 @@ ELSE
         ELSE
 	    ; Default configurations to match old behaviour
 	    ; The built in one is roughly the old ministdio
+	    ; zsdcc does not emit CRT_printf_format. For %e/%f/%g set
+	    ; CLIB_OPT_PRINTF (for example 0x951BF7BF). Do not DEFINE
+	    ; NEED_printf from CLIB_32BIT_FLOATS: that pulls dtoa into
+	    ; IEEE programs that do not print (z80asm t/FLOAT.t).
 	    IF DEFINED_complexstdio
                 defc CLIB_OPT_PRINTF = 0x851BF7BF
             ELSE

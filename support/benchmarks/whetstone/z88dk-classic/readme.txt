@@ -148,45 +148,45 @@ MWIPS        = 7.2288 / 1000 = 0.0072288
 8085+AM9511 ->30.4 Seconds. (historical host measurement)
 
 
-Z88DK August 15, 2026
+Z88DK September 17, 2026
 classic/sccz80/math32
 IEEE 32-bit float 24 bit mantissa + 8 bit exponent
-9978 bytes less page zero
+10266 bytes less page zero
 
-cycle count  = 361935794
-time @ 4MHz  = 361935794 / 4x10^6 = 90.4839 seconds
-KWIPS        = 100*10*1 / 90.4839 = 11.0517
-MWIPS        = 11.0517 / 1000 = 0.0110517
+cycle count  = 356479503
+time @ 4MHz  = 356479503 / 4x10^6 = 89.1199 seconds
+KWIPS        = 100*10*1 / 89.1199 = 11.2208
+MWIPS        = 11.2208 / 1000 = 0.0112208
 
 
-Z88DK August 15, 2026
+Z88DK September 17, 2026
 classic/sccz80/8085/math32
 IEEE 32-bit float (math32_8085)
-11581 bytes less page zero
+11764 bytes less page zero
 
-cycle count  = 663627145
-time @ 4MHz  = 663627145 / 4x10^6 = 165.9068 seconds
-KWIPS        = 100*10*1 / 165.9068 = 6.0275
-MWIPS        = 6.0275 / 1000 = 0.0060275
+cycle count  = 642569364
+time @ 4MHz  = 642569364 / 4x10^6 = 160.6423 seconds
+KWIPS        = 100*10*1 / 160.6423 = 6.2250
+MWIPS        = 6.2250 / 1000 = 0.0062250
 
 
-Z88DK August 19, 2026
+Z88DK September 17, 2026
 classic/80cc/math32
 IEEE 32-bit float 24 bit mantissa + 8 bit exponent
-14111 bytes less page zero
+14251 bytes less page zero
 
-cycle count  = 383323980
-time @ 4MHz  = 383323980 / 4x10^6 = 95.8310 seconds
-KWIPS        = 100*10*1 / 95.8310 = 10.4350
-MWIPS        = 10.4350 / 1000 = 0.0104350
+cycle count  = 375270916
+time @ 4MHz  = 375270916 / 4x10^6 = 93.8177 seconds
+KWIPS        = 100*10*1 / 93.8177 = 10.6590
+MWIPS        = 10.6590 / 1000 = 0.0106590
 
 
-Z88DK August 19, 2026
+Z88DK September 17, 2026
 classic/80cc/8085/math32
 IEEE 32-bit float (math32_8085)
-13944 bytes less page zero
+13751 bytes less page zero
 
-cycle count  = 656225936
-time @ 4MHz  = 656225936 / 4x10^6 = 164.0565 seconds
-KWIPS        = 100*10*1 / 164.0565 = 6.0955
-MWIPS        = 6.0955 / 1000 = 0.0060955
+cycle count  = 643286803
+time @ 4MHz  = 643286803 / 4x10^6 = 160.8217 seconds
+KWIPS        = 100*10*1 / 160.8217 = 6.2181
+MWIPS        = 6.2181 / 1000 = 0.0062181

@@ -69,12 +69,12 @@ cycle count  = 3731890506
 time @ 4MHz  = 3731890506 / 4*10^6 =  15 min 33 sec
 
 
-Z88DK August 16, 2026
+Z88DK September 17, 2026
 zsdcc 4.6.0 #16639 / new / math32
-3007 bytes less page zero
+3001 bytes less page zero
 
-cycle count  = 1324037732
-time @ 4MHz  = 1324037732 / 4*10^6 =  5 min 31 sec
+cycle count  = 1333411029
+time @ 4MHz  = 1333411029 / 4*10^6 =  5 min 33 sec
 
 
 Z88DK April 28, 2021
@@ -85,17 +85,17 @@ cycle count  = 3266168305
 time @ 4MHz  = 3266168305 / 4*10^6 = 13 min 36 sec
 
 
-Z88DK August 15, 2026
+Z88DK September 17, 2026
 sccz80 / new / math32
-2940 bytes less page zero
+2934 bytes less page zero
 
-cycle count  = 1049525678
-time @ 4MHz  = 1049525678 / 4*10^6 =  4 min 22 sec
+cycle count  = 1052817722
+time @ 4MHz  = 1052817722 / 4*10^6 =  4 min 23 sec
 
 
-Z88DK September 9, 2026
+Z88DK September 17, 2026
 sccz80 / new / math16
-2260 bytes less page zero
+2256 bytes less page zero
 
-cycle count  =  788675466
-time @ 4MHz  = 788675466 / 4*10^6 =  3 min 17 sec
+cycle count  =  787101626
+time @ 4MHz  = 787101626 / 4*10^6 =  3 min 17 sec

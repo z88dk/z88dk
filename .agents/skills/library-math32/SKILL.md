@@ -26,10 +26,10 @@ Home: `libsrc/math/float/math32/`. Products: `math32.lib` (plain z80) plus
 |------|------|
 | `asm/` | 8080-compatible shared files (const, coeff, load, classify). Classic: `newlibfiles_common_asm.lst` |
 | `asm/z80/` | Z80-family cores; shared by z80n/z180/ez80_z80/r2ka/… when the lst points here |
-| `asm/8085/` | Stack-only 8085 cores (no EXX / IX / IY); extended opcodes + synthetics. After `rl de`, test exp with `inc d`/`dec d` — RDEL does not write Z. CPU-specific `f32_f2long` / `f32_l_ldexp` |
-| `asm/8080/` | Stack-only 8080 cores (original ISA; no 8085 extras). `ld hl,sp+n`; park HL. `f32_f2long` / `f32_l_ldexp` still portable copies |
-| `asm/vm1/` | Stack-only KR580VM1 cores (8080 frame; no unknown `pop af`; no 8085 LDSI/RDEL). `math32_vm1.lib` |
-| `asm/gbz80/` | Stack-only Game Boy cores (`ld hl,sp+*`, `bit 7` leading-one; no cheap `ex`). CPU-specific `f32_f2long` / `f32_l_ldexp` |
+| `asm/8085/` | Stack-only 8085 cores (no EXX / IX / IY); extended opcodes + synthetics. After `rl de`, test exp with `inc d`/`dec d` — RDEL does not write Z. CPU-specific `f32_f2long` / `f32_l_ldexp`. Classic `ftoa`/`ftoe`/`ftog` in this dir (`ld de,sp+n`, LHLX/SHLX, `rl de`). Do **not** write `ld hl,sp+n` (LDSI+`ex`; bad for `sp-32`) |
+| `asm/8080/` | Stack-only 8080 cores (original ISA; no 8085 extras). `ld hl,sp+n`; park HL. `f32_f2long` / `f32_l_ldexp` still portable copies. Classic dtoa: `f32_ftoa.asm` + `f32__dtoa_*` |
+| `asm/vm1/` | Stack-only KR580VM1 cores (8080 frame; no unknown `pop af`; no 8085 LDSI/RDEL). `math32_vm1.lib`. Dtoa uses LHLX/SHLX; no `rl de` |
+| `asm/gbz80/` | Stack-only Game Boy cores (`ld hl,sp+*`, `bit 7` leading-one; no cheap `ex`). CPU-specific `f32_f2long` / `f32_l_ldexp`. Dtoa: native `(hl+)`, CB `rl`/`srl`, `add sp,4` |
 | `c/z80/`, `c/8085/`, `c/8080/`, `c/gbz80/`, `c/vm1/` | Higher functions (C → precompiled asm); 8080/8085/gbz80/vm1 higher via **sccz80 only** |
 | `newlibfiles_*.lst` | Classic products (`newlibfiles_ez80_z80.lst`, `newlibfiles_gbz80.lst`, …) |
 | `math32_z80_common_asm.lst` + `math32_{z80,z80n,z180}_asm.lst` | Newlib clib embed only. No 8085/8080/gbz80/vm1 newlib math32 list |
@@ -64,6 +64,7 @@ are `IF __CPU_Z80__` only and assemble **empty** on `-mez80_z80`. Suite gate:
 | Class | Policy (current math32) |
 |-------|-------------------------|
 | **mul / sqr / div / poly / sqrt pack** | **IEEE RNE** on residual below the kept mantissa |
+| **mul overflow** | **Signed Inf** (XOR of operand signs). Not NaN. Includes the near-`FLT_MAX` band (exp sum 254/255), not only add-carry. z80 `f32_fsmul32` late overflow must not reload `AF'` after `mulu` (z80n/z180 clobber it) |
 | **add / sub** | **Digi jam-sticky**: lost align/overflow bits → OR **1** into mant LSB; pack has no RNE residual |
 
 Long add chains (e.g. n-body energy) are sensitive to add rounding: jam keeps
@@ -198,5 +199,6 @@ For eZ80: `z88dk-z80nm lib/clibs/math32_ez80_z80.lib | rg 'm32_mulu_32h|f32_z180
 - Newlib headers (math remaps): `library-newlib` · edit **proto** then regenerate
 - 8085 cores: `cpu-8085` · 8080: `cpu-8080` · vm1: `cpu-vm1` · gbz80: `cpu-gbz80`
 - Z180 / eZ80 Z80-mode `mlt`: `cpu-z180`
-- Issue class: z88dk **#3061** (classic vs newlib Whetstone)
-- Suite: `test/suites/math` (`test_math32*.bin`, including `test_math32_ez80_z80.bin`, `test_math32_vm1.bin`)
+- Issue class: z88dk **#3061** (classic vs newlib Whetstone); **#3104** item 4 (stack-only dtoa rewrite) is done
+- Suite: `test/suites/math` (`test_math32*.bin`, including `test_math32_ez80_z80.bin`, `test_math32_vm1.bin`). Classic `%f`/`%e`/`%g` also: `test/suites/stdio` `test_sprintf_math32.bin` plus `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` (`--math32`). `test/suites/string` is `str*` only.
+- Classic zsdcc does not scan printf formats. `--math32` does not enable `%f`/`%e`/`%g`. Use `#pragma printf = "%f %e %g"` or `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF`. Do not `DEFINE NEED_printf` from `CLIB_32BIT_FLOATS`.

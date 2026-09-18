@@ -10,13 +10,11 @@ vpath %.c ../cimpl
 # 8085 higher funcs: sccz80 via `make -C c 8085` → c/8085/*.asm in newlibfiles_8085.lst
 # vm1 higher funcs: sccz80 via `make -C c vm1` → c/vm1/*.asm in newlibfiles_vm1.lst
 # Z80 higher funcs: SDCC via `make -C c` → c/z80/*.asm in newlibfiles_z80.lst
-CFILES  = $(notdir $(wildcard ../../math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
-CFILES  = atof.c ftoa.c ftoe.c ftog.c tofix16.c fromfix16.c
-OBJECTS = $(CFILES:.c=.o) 
-# Z80-family products use the lm32/c/sccz80 ftoa/ftoe/ftog wrappers
-# (in newlibfiles_z80.lst / lm32/c/m32_sccz80.lst) instead of the
-# cimpl/c-compiled ones: the wrappers route the text through the dtoa
-# engine, which the Z80-family per-CPU copt rules must not re-map.
+# Stack-only products keep cimpl atof / fix16 only.  ftoa/ftoe/ftog are
+# the asm dtoa engine (asm/*/f32_fto*.asm).  Z80-family uses the lm32
+# sccz80 wrappers onto stdlib asm_dtoa.
+CFILES  = atof.c tofix16.c fromfix16.c
+OBJECTS = $(CFILES:.c=.o)
 OBJECTS_LM32_TEXT = atof.o tofix16.o fromfix16.o
 
 CFLAGS += -fp-mode=ieee -DFLOAT_IS_32BITS

@@ -70,15 +70,15 @@ KWIPS        = 100*10*1 / 243.2248 = 4.1114
 MWIPS        = 4.1114 / 1000 = 0.0041114
 
 
-Z88DK August 15, 2026
+Z88DK September 17, 2026
 sccz80 / new c library / math32
 24 bit mantissa + 8 bit exponent
-9151 bytes less page zero
+9435 bytes less page zero
 
-cycle count  = 366266299
-time @ 4MHz  = 366266299 / 4x10^6 = 91.5666 seconds
-KWIPS        = 100*10*1 / 91.5666 = 10.9210
-MWIPS        = 10.9210 / 1000 = 0.0109210
+cycle count  = 356445903
+time @ 4MHz  = 356445903 / 4x10^6 = 89.1115 seconds
+KWIPS        = 100*10*1 / 89.1115 = 11.2219
+MWIPS        = 11.2219 / 1000 = 0.0112219
 
 
 Z88DK August 16, 2026
@@ -92,12 +92,12 @@ KWIPS        = 100*10*1 / 228.1401 = 4.3833
 MWIPS        = 4.3833 / 1000 = 0.0043833
 
 
-Z88DK August 16, 2026
+Z88DK September 17, 2026
 zsdcc 4.6.0 #16639 / new c library / math32
 24 bit mantissa + 8 bit exponent
-9939 bytes less page zero
+10217 bytes less page zero
 
-cycle count  = 370428446
-time @ 4MHz  = 370428446 / 4x10^6 = 92.6071 seconds
-KWIPS        = 100*10*1 / 92.6071 = 10.7983
-MWIPS        = 10.7983 / 1000 = 0.0107983
+cycle count  = 360608050
+time @ 4MHz  = 360608050 / 4x10^6 = 90.1520 seconds
+KWIPS        = 100*10*1 / 90.1520 = 11.0924
+MWIPS        = 11.0924 / 1000 = 0.0110924

@@ -15,6 +15,7 @@ Z80-compatible with extras (e.g. **`mlt`**). Used by `+z180`, `+yaz180`, `+scz18
 | Topic | Detail |
 |-------|--------|
 | ticks | `z88dk-ticks -mz180` (eZ80 Z80-mode: `-mez80_z80`) |
+| classic TIMER | `+test -clib=z180` then `-mz180`. Do not paste **ez80_z80** ticks into a z180 row |
 | HW mul | `mlt bc/de/hl/sp` = `ED 4C/5C/6C/7C` — same encodings on **eZ80 Z80-mode**. Helps mul/inv-heavy float; restoring div does not use it |
 | math32 | `math32_z180.lib`; eZ80 Z80-mode product is **`math32_ez80_z80.lib`** (`newlibfiles_ez80_z80.lst` → same Z180 `mlt` helpers) |
 | CPU define | `-mz180` → `__CPU_Z180__`. `-mez80_z80` → **`__CPU_EZ80_Z80__`** (not `__CPU_EZ80__`; that is ADL `-mez80`) |

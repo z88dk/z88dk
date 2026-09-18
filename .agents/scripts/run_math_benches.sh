@@ -54,7 +54,7 @@ add_job nb_c_sccz80_8085_m16 n-body classic sccz80 8085 math16 z88dk-classic/n-b
 # 80cc n-body math32: TIMER valid — do not skip. +test PRINTF needs -counter > 1e8
 # (default cap prints 10000000x, which is not energy).
 add_job nb_c_80cc_z80_m32 n-body classic 80cc z80 math32 z88dk-classic/n-body.c \
-  +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --math32 -m -lndos
+  +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O2 --math32 -m -lndos
 add_job nb_c_80cc_8085_m32 n-body classic 80cc 8085 math32 z88dk-classic/n-body.c \
   +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --math32 -m -lndos
 
@@ -66,7 +66,7 @@ add_job sn_c_sccz80_8085_m32 spectral-norm classic sccz80 8085 math32 z88dk-clas
 add_job sn_c_zsdcc_z80_m32 spectral-norm classic zsdcc z80 math32 z88dk-classic/spectral-norm.c \
   +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 --math32 -lndos -m
 add_job sn_c_80cc_z80_m32 spectral-norm classic 80cc z80 math32 z88dk-classic/spectral-norm.c \
-  +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints --math32 -lndos -m
+  +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints --math32 -lndos -m
 add_job sn_c_80cc_8085_m32 spectral-norm classic 80cc 8085 math32 z88dk-classic/spectral-norm.c \
   +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints --math32 -lndos -m
 # math16 TIMER: never --math16 --math32 (pollutes hot path with fsdiv).
@@ -84,7 +84,7 @@ add_job md_c_sccz80_8085_m32 mandelbrot classic sccz80 8085 math32 z88dk-classic
 add_job md_c_zsdcc_z80_m32 mandelbrot classic zsdcc z80 math32 z88dk-classic/mandelbrot.c \
   +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 --math32 -lndos -m
 add_job md_c_80cc_z80_m32 mandelbrot classic 80cc z80 math32 z88dk-classic/mandelbrot.c \
-  +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints --math32 -lndos -m
+  +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints --math32 -lndos -m
 add_job md_c_80cc_8085_m32 mandelbrot classic 80cc 8085 math32 z88dk-classic/mandelbrot.c \
   +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints --math32 -lndos -m
 add_job md_c_sccz80_z80_m16 mandelbrot classic sccz80 z80 math16 z88dk-classic/mandelbrot.c \
@@ -100,7 +100,7 @@ add_job fa_c_sccz80_8085_m32 fasta classic sccz80 8085 math32 z88dk-classic/fast
 add_job fa_c_zsdcc_z80_m32 fasta classic zsdcc z80 math32 z88dk-classic/fasta.c \
   +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 --fsigned-char --math32 -m -lndos -pragma-define:CRT_HEAP_AMALLOC=1
 add_job fa_c_80cc_z80_m32 fasta classic 80cc z80 math32 z88dk-classic/fasta.c \
-  +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --math32 -m -lndos -pragma-define:CRT_HEAP_AMALLOC=1
+  +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O2 --math32 -m -lndos -pragma-define:CRT_HEAP_AMALLOC=1
 add_job fa_c_80cc_8085_m32 fasta classic 80cc 8085 math32 z88dk-classic/fasta.c \
   +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --math32 -m -lndos -pragma-define:CRT_HEAP_AMALLOC=1
 
@@ -112,9 +112,19 @@ add_job wh_c_sccz80_8085_m32 whetstone classic sccz80 8085 math32 z88dk-classic/
 add_job wh_c_zsdcc_z80_m32 whetstone classic zsdcc z80 math32 z88dk-classic/whetstone.c \
   +test -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -D__Z88DK --math32 -lndos -m
 add_job wh_c_80cc_z80_m32 whetstone classic 80cc z80 math32 z88dk-classic/whetstone.c \
-  +test -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK --math32 -lndos -m
+  +test -compiler=80cc -vn -fframe-pointer -O2 -DSTATIC -DTIMER -D__Z88DK --math32 -lndos -m
 add_job wh_c_80cc_8085_m32 whetstone classic 80cc 8085 math32 z88dk-classic/whetstone.c \
   +test -clib=8085 -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK --math32 -lndos -m
+
+# Extra CPUs published in math32/readme.md (not new support/benchmarks SUMMARY rows)
+for _cpu in 8080 gbz80 z80n z180 ez80_z80 kc160; do
+  add_job "nb_c_sccz80_${_cpu}_m32" n-body classic sccz80 "$_cpu" math32 z88dk-classic/n-body.c \
+    +test -clib="$_cpu" -vn -DSTATIC -DTIMER -D__Z88DK -O2 --math32 -m -lndos
+  add_job "md_c_sccz80_${_cpu}_m32" mandelbrot classic sccz80 "$_cpu" math32 z88dk-classic/mandelbrot.c \
+    +test -clib="$_cpu" -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints --math32 -lndos -m
+  add_job "wh_c_sccz80_${_cpu}_m32" whetstone classic sccz80 "$_cpu" math32 z88dk-classic/whetstone.c \
+    +test -clib="$_cpu" -vn -O2 -DSTATIC -DTIMER -D__Z88DK --math32 -lndos -m
+done
 
 # ---------- newlib math32 / math16 ----------
 # n-body
@@ -243,9 +253,16 @@ run_one() {
         ls -la "$jdir" || true
       else
         size=$(wc -c <"$bin_path" | tr -d ' ')
-        if [[ "$cpu" == "8085" ]]; then
-          ticks_cpu="-m8085"
-        fi
+        case "$cpu" in
+          8085) ticks_cpu="-m8085" ;;
+          8080) ticks_cpu="-m8080" ;;
+          gbz80) ticks_cpu="-mgbz80" ;;
+          z80n) ticks_cpu="-mz80n" ;;
+          z180) ticks_cpu="-mz180" ;;
+          ez80_z80) ticks_cpu="-mez80_z80" ;;
+          kc160) ticks_cpu="-mkc160" ;;
+          vm1) ticks_cpu="-mvm1" ;;
+        esac
         if [[ -n "${map_path:-}" && -f "$map_path" ]]; then
           # shellcheck disable=SC2086
           ticks=$(z88dk-ticks $ticks_cpu "$bin_path" -x "$map_path" \

@@ -6,7 +6,10 @@
 # 8080: sccz80 only → 8080/
 # vm1:  sccz80 only → vm1/
 
-CFILES = $(wildcard *.c)
+# ftoe.c / ftog.c are not compiled: Z80 uses lm32 → asm_dtoa/dtoe/dtog;
+# 8080/8085/vm1/gbz80 use asm/*/f32_fto*.asm.  Shared cimpl/ftoe.c stays
+# for mbf32/am9511/mbf64/daimath32/cpcmath.
+CFILES = $(filter-out ftoe.c ftog.c,$(wildcard *.c))
 AFILES = $(CFILES:.c=.asm)
 CFLAGS += -I.
 
@@ -19,7 +22,7 @@ z80/%.asm: %.c
 	zcc +z80 -clib=sdcc_ix --reserve-regs-iy --allow-unsafe-read --max-allocs-per-node400000 -D__MATH_MATH32 -SO3 $(CFLAGS) -a $^ -o $@
 
 # 8085 higher functions: sccz80 only (zsdcc is Z80-only)
-CFILES8085 = $(wildcard *.c)
+CFILES8085 = $(filter-out ftoe.c ftog.c,$(wildcard *.c))
 AFILES8085 = $(CFILES8085:.c=.asm)
 
 8085: $(addprefix 8085/,$(AFILES8085))
@@ -30,7 +33,7 @@ AFILES8085 = $(CFILES8085:.c=.asm)
 	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
 
 # 8080 higher functions: sccz80 only (zsdcc is Z80-only)
-CFILES8080 = $(wildcard *.c)
+CFILES8080 = $(filter-out ftoe.c ftog.c,$(wildcard *.c))
 AFILES8080 = $(CFILES8080:.c=.asm)
 
 8080: $(addprefix 8080/,$(AFILES8080))
@@ -41,7 +44,7 @@ AFILES8080 = $(CFILES8080:.c=.asm)
 	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
 
 # gbz80 higher functions: sccz80 only (zsdcc is Z80-only)
-CFILESGBZ80 = $(wildcard *.c)
+CFILESGBZ80 = $(filter-out ftoe.c ftog.c,$(wildcard *.c))
 AFILESGBZ80 = $(CFILESGBZ80:.c=.asm)
 
 gbz80: $(addprefix gbz80/,$(AFILESGBZ80))
@@ -52,9 +55,7 @@ gbz80/%.asm: %.c
 	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
 
 # vm1 higher functions: sccz80 only (zsdcc is Z80-only)
-# ftog.asm is the PUBLIC ftog = _ftog alias (same as 8080/8085/gbz80);
-# do not overwrite it with sccz80 -a of ftog.c.
-CFILESVM1 = $(filter-out ftog.c,$(wildcard *.c))
+CFILESVM1 = $(filter-out ftoe.c ftog.c,$(wildcard *.c))
 AFILESVM1 = $(CFILESVM1:.c=.asm)
 
 vm1: $(addprefix vm1/,$(AFILESVM1))
