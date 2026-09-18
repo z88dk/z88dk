@@ -342,12 +342,9 @@ static void cache_hl_slot_addr(const Func *f, int v)
    discarded by the pop — HL now holds the pushed value again — and nothing
    restores the belief that was live before the push. Clearing is the safe
    approximation: it can only cost a recompute, never read a bogus pointer.
-
-   This is what the vm1 maskbench/queenbench/searchbench WRONGs were. A word
-   load into DE published "HL = &slot+1" INSIDE a caller's push/pop preserve
-   region; the pop put a data value back in HL; the stale belief then rode the
-   cross-BB carry into a branch target and became `dec hl` on garbage. Callers
-   that genuinely keep an address in HL re-establish it right after. */
+   This was the vm1 maskbench/queenbench/searchbench WRONG-ANSWER class; the
+   story is in adr/0069. Callers that genuinely keep an address in HL
+   re-establish it right after. */
 static void emit_pop_hl(FILE *out)
 {
     emit(out, "pop\thl");
@@ -1219,18 +1216,6 @@ static void commit_hl_word(FILE *out, const Func *f, int v)
        cache-hit and skip its reload → a self-copy. */
     if (v >= 0 && vreg_is_pr_stack(f, v)) { invalidate_hl_cache(); return; }
     cache_hl(v);
-    /* DENSITY §4 fail-safe DE-cache fold hint (opt-in IR_RANGED). A reused
-       deref/binop that stayed IR_PR_SPILL: leave a DE copy so a later read after
-       an intervening HL clobber prefers DE (`sbc hl,de` / e-d byte-wise) instead
-       of a slot reload. Byte-safe — store_hl already wrote the slot, so a DE
-       clobber (belief invalidated by the clobbering op) falls back to it.
-       Guards: HL must actually hold v; and skip when a word DE-home rides the
-       physical DE pair (the copy would corrupt the resident home). */
-    if (v >= 0 && f->de_fold_hint && f->de_fold_hint[v]
-        && hl_has(v) && !g_hc.home_is_word && g_hc.de_home < 0) {
-        emit_hl_to_de(out);
-        cache_de(v);
-    }
 }
 
 /* Word result is in HL, dst v is a PR_DE-pool vreg: swap into DE and advertise
@@ -1285,7 +1270,8 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
         invalidate_de_cache();
         return;
     }
-    int off = slot_off(f, vreg) + L.cur_sp_adjust;
+    int canon = slot_off(f, vreg);           /* slot_off has side effects: once */
+    int off = canon + L.cur_sp_adjust;
     /* Deepest slot at TOS: discard the old word, push the value from DE, then
        ex de,hl for the HL=value contract. Discard via `pop hl` (1B/10T) not
        `inc sp; inc sp` (2B/12T): the trailing ex de,hl overwrites HL, so the
@@ -1299,8 +1285,7 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
         invalidate_de_cache();
         return;
     }
-    emit(out, "ld\thl,%d", off);
-    emit(out, "add\thl,sp");
+    emit_frame_addr_hl(out, f, canon);       /* [lea-frame-addr] on ez80 fp */
     emit(out, "ld\t(hl),e");
     emit(out, "inc\thl");
     emit(out, "ld\t(hl),d");

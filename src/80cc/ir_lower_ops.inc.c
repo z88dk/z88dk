@@ -3232,12 +3232,9 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             }
         }
         int dst_w = f->vregs[op->dst].width;
-        /* 8085 word deref: LHLX reads the word in one instruction, through DE.
-           `ld de,hl+n` (LDHI) folds the field offset in for free, so the whole
-           access is 3B/20c against the offset chain plus byte walk's 6B/36c;
-           at offset 0 getting the address into DE costs 2B/14c against 4B/24c.
-           It also leaves A alone, where the walk clobbers it, and reads the
-           word with ONE bus access rather than two.
+        /* 8085 word deref: LHLX reads the word in one instruction, through DE,
+           and `ld de,hl+n` (LDHI) folds the field offset in for free. It also
+           leaves A alone, where the walk clobbers it. Evidence: adr/0054.
            DE is the price. A small-offset word deref is one of the shapes
            op_de_clean promises is DE-clean, which is how a DE home survives
            across it — so this is gated on the function keeping no DE home
@@ -4471,16 +4468,11 @@ static int gen_add(FILE *out, Func *f, const Op *op)
            and B/C (LOW, the DEHL-cache mirror). Only fires when RHS
            is sp-rel and not in the DEHL cache. */
         /* NB no commutative swap here, though gen_bitop has one and addition is
-           equally commutative. Swapping so the DEHL-resident operand stays put
-           and the other is read from its slot LOOKS free — md5 gained 6% of its
-           cycles — but reading a slot in pass 1 of the lazy spill makes that
-           slot's store LIVE in pass 2, resurrecting a store the previous op had
-           elided. Where the memory operand really is in memory (md5's x[]) that
-           costs nothing; where it is a fresh value that would never otherwise
-           reach memory (binary-trees' ItemCheck, whose operand is a call result)
-           it adds a store AND a reload: measured +0.39% ticks and +28 bytes on
-           binary-trees, +75 bytes on emu.c, against md5's -6%. Gating it needs a
-           cost model over the two-pass spill decision, not a residency test. */
+           equally commutative. It LOOKS free and md5 gains 6% of its cycles, but
+           reading a slot in pass 1 of the lazy spill makes that slot's store LIVE
+           in pass 2, resurrecting a store the previous op had elided — +28 B on
+           binary-trees, +75 B on emu.c. Gating it needs a cost model over the
+           two-pass spill decision, not a residency test. adr/0072. */
         int asrc0 = op->src[0], asrc1 = op->src[1];
         if (!fp_active(f) && !dehl_has(asrc1)) {
             if (!dehl_has(asrc0))

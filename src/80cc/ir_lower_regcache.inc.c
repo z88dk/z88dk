@@ -597,9 +597,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
            it dies. That is what sank the belief-only version of this test
            (rle/bitfieldbench: `ld a,(hl); ld e,a` then a store through E): the
            evidence has to come from the control flow, not from the cache.
-           20c/3B against the parked 42c/5B; the
-           offset loses its +2 with the push gone. IR_DEPARK_PROBE sizes it: 5% of
-           corpus park sites, 23% of binary-trees'. `--opt-disable=depark` opts out.
+           `--opt-disable=depark` opts out; the park decision itself is adr/0048.
 
            NB there is deliberately no general "DE looks unused" shortcut here:
            the register cache tracks only whole pairs (rs.a/bc/de/hl), so a value
@@ -683,28 +681,14 @@ static int hl_load_takes_remat(const Func *f, int v)
 /* [SYMADDR_DEREF] Load `base` into HL for a deref at constant offset `off`,
    folding the offset into the symbol where the base is a rematerialisable
    `&symbol`. Returns the offset the CALLER still has to add: 0 when it folded,
-   `off` unchanged otherwise.
+   `off` unchanged otherwise. The address is a link-time constant, so folding a
+   constant into it is free (`ld hl,_suite+206` for the add chain).
 
-   `gen_ld_sym` already folds its own offset, so `&g.field` is one `ld hl,_g+K`.
-   The DEREF of a struct-member address did not: the base materialised bare and
-   the field offset became a separate add —
-
-       ld hl,_suite / ld de,206 / add hl,de     7 bytes
-       ld hl,_suite+206                         3 bytes
-
-   Same fold, same rematerialisation licence: the address is a link-time
-   constant, so folding a constant into it is free. Only fires where the base
-   would otherwise be rematerialised (hl_load_takes_remat) — a base already
-   sitting in a register is cheaper to copy than to re-emit, and folding there
-   would trade 2 bytes for 3.
-
-   LD_IMM bases are deliberately NOT folded here: a NO_SLOT immediate had its
-   own miscompile (see the remat marking in ir_lower.c) and the address-of case
-   is where the offsets are.
-
-   Negative and zero totals fall through to the plain load — `_sym+-4` is a
-   formatting question, not a codegen one, and the small-offset case is already
-   an inc/dec chain. */
+   Only fires where the base would otherwise be rematerialised
+   (hl_load_takes_remat) — a base already in a register is cheaper to copy.
+   LD_IMM bases are deliberately NOT folded: a NO_SLOT immediate had its own
+   miscompile (see the remat marking in ir_lower.c). Negative and zero totals
+   fall through to the plain load. Rationale: adr/0052. */
 static int load_to_hl_fold_off(FILE *out, const Func *f, int base, int off)
 {
     if (off <= 0 || !g_hc.remat_def) goto plain;
@@ -1592,14 +1576,9 @@ static void partial_load_long_shr(FILE *out, const Func *f, int v,
 }
 
 /* [IR_SHRNARROW=0] Opt OUT of narrowing a width-4 constant shift to the bytes a
-   following CONV_TRUNC keeps.
-
-   DEFAULT-ON. Corpus -257 B over 660 cells, 18 smaller and NONE larger, every
-   CPU improving (gbz80 -38, z80/z80n/z180 -32, kc160 -30, ez80 -29, rabbit
-   -24/-20); widthbench -6.4 % z80 sp / -7.1 % fp, -11.2 % ez80 fp, -11.1 %
-   kc160 fp. long_ir 673/673 sp AND fp; every shift count 0..31 x 8 values x
-   both result widths checked against a reference on 6 CPUs x both frame modes.
-   `IR_SHRNARROW=0` reverts, byte-identical to the pre-change compiler. */
+   following CONV_TRUNC keeps. DEFAULT-ON; IR_SHRNARROW=0 reverts,
+   byte-identical. Evidence, and the exhaustive validation sweep it needed:
+   adr/0053. */
 static int shrnarrow_on(void)
 {
     static int c = -1;
@@ -2876,16 +2855,12 @@ static int sp_cmp_slot(const Func *f, int v)
     if (!vreg_is_spilled(f, v)) return 0;
     /* Spilled is not the same as HAVING AN ADDRESS. A rematerialisable constant
        (LD_IMM / LD_SYM / remat LEA) is IR_PR_SPILL but NO_SLOT, so slot_off
-       returns -1 and the caller emits `ld hl,-1; add hl,sp` — an address below
-       sp that the byte-walk then compares against.
+       returns -1 and a caller that assumed otherwise emits `ld hl,-1; add hl,sp`.
 
        Ask slot_off, which is what the caller actually emits from. Asking
-       vreg_spill_slot instead ALSO rejects every PARAMETER: a param is homed in
-       the caller's frame, so it has no spill slot (-1) while slot_off returns a
-       perfectly good offset. That cost structbench's `i < n` its byte-walk
-       compare, which forced the bound into DE, which evicted the running sum to
-       a stack-transient home -- three pop/push pairs per iteration, +10.5% on
-       z80 sp for 117 B. */
+       vreg_spill_slot instead ALSO rejects every PARAMETER (homed in the
+       caller's frame, so no spill slot) — which cost structbench +10.5 %
+       on z80 sp for 117 B. adr/0073. */
     if (g_hc.remat_def && g_hc.remat_def[v]) return 0;
     if (slot_off(f, v) < 0) return 0;
     if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
@@ -3161,7 +3136,28 @@ static int op_de_clean(const Func *f, const Op *o)
    and that branch itself — both of which lower to the A+BC-only
    `ld a,c; sub mem; ld a,b; sbc a,mem; jp` form. Everything else defers to
    the runtime op_de_clean. */
+static int op_de_clean_static_inner(const Func *f, const BB *bb, int j);
+
 static int op_de_clean_static(const Func *f, const BB *bb, int j)
+{
+    /* A STATIC proof has no ambient lowering point. It runs before the render
+       and walks ops that are not the one being lowered, so `L.ss_cur_g` holds
+       whatever the last render left there — and every point query reached from
+       here (vreg_in_pr_bc, vreg_in_idx2, and everything op_de_clean calls)
+       would answer about that stale op instead of this one.
+       Scope the point to "none" for the duration: ir_home_at_op then returns
+       the whole-function assignment, which is the honest answer to "can this op
+       take the BC form at all". Harmless while homes are whole-function;
+       without it, a narrowed home (ADR 0027) makes the proof consult a window
+       that has nothing to do with the op under test. */
+    int saved_g = L.ss_cur_g;
+    L.ss_cur_g = -1;
+    int r = op_de_clean_static_inner(f, bb, j);
+    L.ss_cur_g = saved_g;
+    return r;
+}
+
+static int op_de_clean_static_inner(const Func *f, const BB *bb, int j)
 {
     const Op *o = &bb->ops[j];
     if ((o->kind == IR_CMP_ULT || o->kind == IR_CMP_UGE)

@@ -75,6 +75,17 @@ exists (ADR 0010).
 | Name | Turning it off means |
 | --- | --- |
 | `bc-pack` | no tight BC packing pass after region selection |
+| `ldsi-addr` | 8085 slot addresses use `ld hl,N; add hl,sp` instead of the shorter LDSI pair |
+| `ldhi-addr` | 8085 pointer-plus-constant uses `ld de,N; add hl,de` instead of the shorter LDHI pair |
+| `z80n-add-a` | z80n zero-extended byte adds go via DE instead of `add hl,a` |
+| `de-widen` | a byte widened into DE and copied to HL keeps `ld e,S; ld d,0; ld hl,de` |
+| `inc-mem` | a memory increment stays `ld a,MEM; inc a; ld MEM,a` instead of `inc MEM` |
+| `idx-rmw-de` | an indexed word RMW keeps the BC address park instead of the `dec hl`-restored DE route |
+| `shr-a-chain` | a constant word right shift stays `srl h; rr l` instead of the A-through-CB chain |
+| `shr-dead-l` | the dead `ld l,a` before an A-through-CB shift chain is kept |
+| `shr-tbac` | a masked `(x >> n) & M` in a loop keeps the top-byte `add hl,hl` route instead of the A-chain |
+| `lea-frame-addr` | ez80 fp-mode frame addresses go through `add hl,sp` instead of `lea hl,ix+d` |
+| `lea-frame-prologue` | ez80 fp-mode frame allocation uses `ld hl,-N; add hl,sp` instead of an IX-relative `lea` |
 | `bc-evict` | a BC tenant is never displaced by a better candidate |
 | `bc-per-cand` | BC cost is scored per class, not per candidate |
 | `bc-call-cost` | the arbiter does not charge a BC home for call preservation **(measure: `=<N>` sets the margin)** |
@@ -95,6 +106,7 @@ exists (ADR 0010).
 | `graph-alloc` | no interference-graph-driven index benefit |
 | `home-swap` | two placed homes are never exchanged even when the swap wins |
 | `stack-spill` | no parking of a value on the data stack instead of a frame slot |
+| `tight-homes` | home intervals stay whole-function instead of narrowing to the live range (stage 1 of the ranging arc, ADR 0027) |
 | `call-split` | no call-bounded live-range splitting |
 | `cs-evict` | a call-split tenant never displaces an incumbent |
 | `mwbc` | no multi-write BC home |
@@ -117,11 +129,14 @@ exists (ADR 0010).
 | `hl-addr-carry` | a slot address held in HL is not carried across an edge |
 | `de-flow` | no DE liveness flow into the lowering decisions (8085) |
 | `de-park` | no rewriting of a `push de`/`pop de` park |
+| `de-ret` | every `ret` is read as reading DE, not only one that returns in DE |
+| `de-call` | every `call` is read as reading DE, not only one that passes an argument there |
 | `declean` | a DE home is not proven clean across a bitop |
 | `dead-store` | a byte spill written but never read is still stored |
 | `dead-store-word` | the same for a word spill |
 | `dead-store-share` | dead-store analysis ignores slot sharing |
 | `dead-regcopy` | keep a register copy the final peephole would delete |
+| `regcopy-flow` | keep a GBZ80 HL restore before a local jump whose target immediately reloads HL |
 | `deadframe` | a function with no live frame keeps its frame anyway |
 | `frameless` | never drop the frame pointer, even where nothing uses it |
 | `frame-index` | no direct `(ix+d)` frame access; the address is materialised |
@@ -161,6 +176,7 @@ exists (ADR 0010).
 | `idx-fill` | an index home is filled with a load pair rather than one ez80 instruction |
 | `fclong-carry` | a long fastcall result is not carried in registers |
 | `f32-stack-arg` | a float argument is not passed on the stack |
+| `narrow-mul` | `(unsigned long)u16 * u16` widens both operands to 32 bits instead of taking the 16x16->32 helper |
 | `autopush-param` | a param is stashed across frame allocation instead of becoming a top-of-frame slot |
 | `depark` | no unparking of a value held in E or D alone |
 

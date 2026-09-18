@@ -406,15 +406,8 @@ static InstrEffects instr_effects(const char *line);
    therefore loses BYTES, never CORRECTNESS.
 
    DEFAULT-ON. Opt out with IR_OFF=a-carry — that reproduces the pre-flip codegen
-   byte-for-byte and is the regression-test path.
-
-   ►► REVISIT / TUNE LATER: default-on costs a few bytes on cold sites with a FLAT
-   tick delta. Root: caching A holding a pointer low byte flips a `ptr+K` lowering
-   from `push de;ld de,K;add hl,de;pop de` (6 B) to an A-based
-   `add a,K;ld l,a;ld a,h;adc a,0;ld h,a` (7 B) — +1 B/−16 T per site, a cold-path
-   byte-for-tick trade the size push doesn't want. The clean fix (deferred, not
-   blocking): gate that A-based +K pointer lowering to fire only when it does NOT
-   grow bytes, then this is a pure win. */
+   byte-for-byte and is the regression-test path. It costs a few bytes on cold
+   sites; the cause and the deferred fix are in adr/0046. */
 static int  a_carry_on = -1;
 static int  a_carry_enabled(void)
 {
@@ -442,21 +435,15 @@ static int  remat_lea_enabled(void)
    global byte load for [IR_BYTE_REMAT]. A byte argument is a TERMINAL consumer —
    the marshaller reads it once and pushes it — so re-issuing `ld a,(sym)` at the
    push site costs the same 3 bytes as the slot reload it replaces and drops the
-   def's spill store AND the slot. The witness is emu.c's `effective_string`
-   family: `return effective_ext(ptr, string_base_page, string_num_pages)` spills
-   both globals to the frame purely to read them straight back one op later.
+   def's spill store AND the slot.
    Every byte-argument read path is remat-aware (push_arg_byte_to_a for a stacked
    arg, load_to_hl_adj's width-1 path for an sc1 register arg, load_byte_to_a for a
    fastcall one); a path that is not aborts in require_slot rather than reading an
    absent slot.
 
-   Default ON. The corpus does not contain the shape at all (638 cells byte-
-   identical either way), so the evidence is emu.c: -131 B fp / -272 B sp, with
-   long_ir 650/650 sp+fp, enigma sp+fp and emu.c behavioural sp+fp green. The
-   other consumers this was measured against buy nothing and are deliberately NOT
-   in the list: IR_PUSH_ARG (0 B — pre-pushed args never carry the shape) and
-   IR_RET (0 B — a returned global is already slotless). IR_CALL_BREMAT=0 opts
-   out, byte-identical to the pre-flip compiler. */
+   Default ON; IR_CALL_BREMAT=0 opts out, byte-identical. The corpus does not
+   contain the shape — evidence, and the consumers deliberately left out of the
+   list, are in adr/0044. */
 static int  call_bremat_on = -1;
 static int  call_bremat_enabled(void)
 {
@@ -475,13 +462,8 @@ static int  call_bremat_enabled(void)
    for) and the entry_dehl seed in ir_lower_func — the entry BB clears rs.dehl
    unconditionally, so the claim has to be re-asserted there.
 
-   Default ON. Like the byte-remat call-argument extension, the bench corpus does
-   not contain the shape (638 cells byte-identical either way, as are adv_a and
-   clisp); the evidence is emu.c -60 B fp / -51 B sp, long_ir/fclong.c -32 B, and
-   ticks follow the bytes (a 4-byte (ix+d) reload for one register move). Gates:
-   long_ir 650/650 sp+fp, enigma sp+fp, emu.c behavioural sp+fp, IR_CLOB_VERIFY
-   unchanged at 4 pre-existing sites. IR_FCLONG_CARRY=0 opts out, byte-identical
-   to the pre-flip compiler. */
+   Default ON; IR_FCLONG_CARRY=0 opts out, byte-identical. The bench corpus does
+   not contain the shape — evidence is emu.c, in adr/0043. */
 static int  fclong_carry_on = -1;
 static int  fclong_carry_enabled(void)
 {
@@ -495,20 +477,11 @@ static int  fclong_carry_enabled(void)
    of spilling it and then invalidating the cache — which made the consumer one
    op later reload the slot that had just been written. commit_hl_result also
    lets the dead-store pass drop the spill outright, and routes a PR_DE dst into
-   DE. See gen_conv_trunc.
+   DE. See gen_conv_trunc. Default ON; IR_OFF=trunc-res opts out,
+   byte-identical. Evidence: adr/0042.
 
-   Default ON. Corpus -285 B over 38 cells with ZERO larger, every CPU gaining
-   (gbz80/8085 -30, z80/z80n/z180 -28, rabbit/8080 -26, kc160 -20, ez80 -17);
-   emu.c -210 B sp / -247 B fp, clisp -212 / -146. Ticks follow the bytes: z80
-   corpus -0.131%, 3 cells faster and 0 slower. IR_OFF=trunc-res opts out,
-   byte-identical to the pre-flip compiler.
-
-   NB this needed the expr.c member-offset fix first. Until then it miscompiled
-   long_ir/aggregate_init in sp mode — not through any fault of its own, but
-   because `s.arr[i]` on a local struct was reading past the end of the struct
-   and this change moved which garbage landed where, so the test's sum stopped
-   cancelling to zero. The 2->2 narrowing case is left on the old path; it was
-   never measured on its own. */
+   The 2->2 narrowing case is left on the old path; it was never measured on its
+   own. */
 static int  truncres_on = -1;
 static int  truncres_enabled(void)
 {
@@ -1022,6 +995,7 @@ static int relax_line_size(const char *l)
         || MN("sla") || MN("sra") || MN("srl") || MN("rl") || MN("rr")
         || MN("rlc") || MN("rrc") || MN("bit") || MN("set") || MN("res")
         || MN("in") || MN("out") || MN("lea") || MN("mlt") || MN("bool")
+        || MN("mul") || MN("muls")
         || MN("ldi") || MN("ldir") || MN("ldd") || MN("lddr") || MN("swap")
         || MN("daa") || MN("slp"))
         return 4;
@@ -1179,10 +1153,80 @@ static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
     free(lines); free(size);
 }
 
+/* [regcopy-flow] A GBZ80 store often restores HL from DE just before a loop
+   back-edge. If only BC is stepped before an unconditional local jump, and the
+   target's first instruction replaces HL, the restore has no reader. Keep this
+   deliberately narrow: other instructions may read either half of HL, and a
+   conditional jump has a second successor. */
+static int hlde_dead_at_jump(char **lines, int n, int at)
+{
+    if (!IS_GBZ80() || opt_disabled("regcopy-flow")) return 0;
+    int j = at;
+    while (j < n && (hlde_skippable_between(lines[j])
+                     || !strcmp(lines[j], "\tinc\tbc\n")
+                     || !strcmp(lines[j], "\tdec\tbc\n"))) j++;
+    if (j == n) return 0;
+    const char *p = lines[j];
+    if (!strncmp(p, "\tjp\t", 4) || !strncmp(p, "\tjr\t", 4)) p += 4;
+    else return 0;
+    if (strncmp(p, "L_f", 3)) return 0; /* intra-function labels only */
+    char target[64]; size_t k = 0;
+    while (p[k] && p[k] != '\n' && p[k] != '\r' && k + 1 < sizeof target) {
+        if (p[k] == ',' || p[k] == ' ' || p[k] == '\t' || p[k] == ';') return 0;
+        target[k] = p[k]; k++;
+    }
+    if (!k || (p[k] != '\n' && p[k] != '\r' && p[k] != '\0')) return 0;
+    target[k] = '\0';
+    for (int t = 0; t < n; t++) {
+        char name[64];
+        if (!relax_label_name(lines[t], name, sizeof name)
+            || strcmp(name, target)) continue;
+        do { t++; } while (t < n && hlde_skippable_between(lines[t]));
+        return t < n && hlde_full_reload(lines[t], "hl");
+    }
+    return 0;
+}
+
+/* [shr-dead-l] The A-through-CB constant word right shift (ADR 0090) is reached
+   with the word load's `ld l,a` in front of it, and the chain opens by loading
+   the low byte back with `ld a,l`. A already holds that byte, so the pair is a
+   round trip: L is written and read straight back. Neither `srl h` nor `rra`
+   reads L, and the chain ends by writing L again, so both lines are dead and
+   this drops them together — 2 bytes and 8 T-states a site.
+
+   Dropping the pair is what makes it sound. Dropping only the store would leave
+   `ld a,l` reading a register nothing wrote; dropping only the load is what
+   copt already does downstream, which strands the store. Taken together A is
+   untouched and L is dead until the closing `ld l,a`.
+
+   Narrow by construction: the only lines allowed between the pair and that
+   closing store are the chain's own two mnemonics, so there is no label to
+   enter at, no branch to leave by, and no other reader of L. The `ld a,l` is
+   optional in the match so an emitter that elides it still gets the store
+   dropped. Returns the number of lines to drop, 0 for no match.
+
+   NB this runs BEFORE copt, which is where the `ld a,l` would otherwise die:
+   at this stage both lines are still present. Confirming that took an emitted
+   trace — the final asm shows only one of them, which misreads as the other
+   having never been emitted. */
+static int shr_dead_l_store(char **lines, int n, int at)
+{
+    if (opt_disabled("shr-dead-l")) return 0;
+    if (strcmp(lines[at], "\tld\tl,a\n")) return 0;
+    int j = at + 1, drop = 1;
+    if (j < n && !strcmp(lines[j], "\tld\ta,l\n")) { j++; drop = 2; }
+    int chain = 0;
+    while (j < n && (!strcmp(lines[j], "\tsrl\th\n")
+                     || !strcmp(lines[j], "\trra\n"))) { chain++; j++; }
+    if (chain < 2) return 0;              /* at least one srl/rra pair */
+    if (j >= n || strcmp(lines[j], "\tld\tl,a\n")) return 0;
+    return drop;
+}
+
 /* Post-render peephole: drop a dead one-way register copy `ld hl,de` (HL:=DE)
    or `ld de,hl` (DE:=HL) when the destination pair is FULLY reloaded before any
-   use — the next real instruction (skipping labels / blank / comment / C_LINE
-   lines) overwrites the whole pair without reading it.
+   use. The ordinary case checks the next real instruction (skipping labels,
+   blank lines, comments and C_LINE); [regcopy-flow] proves one GBZ80 back-edge.
 
    The two-line spellings `ld h,d; ld l,e` / `ld d,h; ld e,l` are still matched:
    this filter runs on rendered text, and it is cheaper to keep both forms here
@@ -1216,6 +1260,9 @@ static void filter_dead_reg_copies(FILE *out, FILE *src)
     if (drop) {
         for (int i = 0; i < n; i++) {
             const char *pair; int len;
+            int sdl = shr_dead_l_store(lines, n, i);
+            if (sdl) { for (int k = 0; k < sdl; k++) drop[i + k] = 1;
+                       i += sdl - 1; continue; }
             if (strcmp(lines[i], "\tld\thl,de\n") == 0)      { pair = "hl"; len = 1; }
             else if (strcmp(lines[i], "\tld\tde,hl\n") == 0) { pair = "de"; len = 1; }
             else if (i + 1 < n && strcmp(lines[i], "\tld\th,d\n") == 0
@@ -1225,7 +1272,9 @@ static void filter_dead_reg_copies(FILE *out, FILE *src)
             else continue;
             int j = i + len;
             while (j < n && hlde_skippable_between(lines[j])) j++;
-            if (j < n && hlde_full_reload(lines[j], pair)) {
+            if ((j < n && hlde_full_reload(lines[j], pair))
+                || (len == 1 && !strcmp(pair, "hl")
+                    && hlde_dead_at_jump(lines, n, j))) {
                 for (int k = 0; k < len; k++) drop[i + k] = 1;
                 i += len - 1;                        /* consume the copy */
             }
@@ -1279,12 +1328,7 @@ static int bc_tok(const char *ops, const char *reg)
 
    Unparked that is `ld de,sp+N / ld hl,(de)`, 3B/20c. Whether the park is needed
    is a question about the FUTURE (is the old DE read before it is overwritten?),
-   which is why every attempt to answer it from the residency cache failed: the
-   cache is a record of the past, it tracks whole pairs so a byte staged in E is
-   invisible to it, and the producing idiom does not distinguish the two cases —
-   measured on the corpus, `ld de,sp+N` and `pop de` each precede roughly as many
-   needed parks as dead ones, because the nearest preceding DE write is usually
-   the PREVIOUS park's own code.
+   which the residency cache cannot answer — adr/0048 records the three reasons.
 
    So it is decided here instead, on the rendered function, by the same backward
    liveness sweep that drops dead `ld bc,hl` parks — which already has the two
@@ -1406,6 +1450,13 @@ static int de_fwd_walk(char **lines, int n, int start, int d_live, int e_live,
         if ((e.d_read && d_live) || (e.e_read && e_live)) {
             if (readerp) *readerp = j; return 1;
         }
+        /* [de-ret] A return that does not read DE ends this path with the
+           value unread — the walk must agree with the backward sweep, or it
+           reports a violation on every site the sweep legitimately wins.
+           [de-call] The same for a call the emitter proved DE-clean: it takes
+           no argument there and clobbers the pair, so the parked value is
+           gone unread either way. */
+        if ((e.is_boundary || e.is_call) && !e.d_read && !e.e_read) return 0;
         if (e.is_call || e.is_boundary) return 2;
         if (e.d_write) d_live = 0;
         if (e.e_write) e_live = 0;
@@ -1424,6 +1475,108 @@ static int de_forward_needed(char **lines, int n, int start, int *readerp)
 
 static int xline_c_call(const char *line);
 
+/* [de-ret] Does a `ret` in the function now being lowered READ DE?
+
+   instr_effects has always answered YES, on the DE:HL result ABI. That ABI
+   applies only to a function whose declared return type is 4 bytes wide; an
+   int-, char- or void-returning function leaves DE as dead at its exit as BC
+   is. The difference is not academic: it is what refuses 15 of
+   [z80n-add-a]'s 20 candidate sites, `divbench`'s `udiv` ending
+   `add hl,de; pop af; ret` in an int-returning function.
+
+   The claim is per FUNCTION, so it is latched at the top of ir_lower_func and
+   read by the rendered-text passes that run inside it. The answer stays the
+   old conservative YES for:
+     - a 3-or-more-byte return, delivered in DE:HL (or possibly so);
+     - a __sdcccall(1) function, whose 2-byte return is in DE;
+     - __interrupt / __naked, whose `ret` is not a C return at all;
+     - a raw __asm{} block, which may carry a `ret` of its own convention;
+     - a function containing the indirect-fastcall `ret` DISPATCH, where the
+       `ret` is a JUMP to a callee whose argument is sitting in DE. That one
+       is latched by the emitter (xf_ret_dispatch) because the condition that
+       produces it lives in ir_lower_call.inc.c.
+
+   `--opt-disable=de-ret` opts out, byte for byte. Evidence: adr/0084. */
+static int xf_ret_de_static = 1;    /* per-function, read off the Func */
+static int xf_ret_dispatch  = 0;    /* set by the fc_ret dispatch emitter */
+
+static int xline_ret_reads_de(void)
+{
+    return xf_ret_de_static || xf_ret_dispatch;
+}
+
+/* [de-call] Does a `call _sym` READ DE?
+
+   instr_effects has always answered YES, on the `__sdcccall(1)` argument ABI.
+   That is the same shape of over-claim [bc-call] retired for BC, but it cannot
+   be settled from the text alone: whether DE carries an argument depends on
+   the CALLEE's declared convention, and `_foo` says nothing about it. So the
+   EMITTER answers, at the one site that renders a direct call, and the answer
+   is keyed by symbol for the rendered-text pass to read back.
+
+   The polarity is PROVE-CLEAN, like [gwiden]: a symbol is DE-clean only if
+   every direct call to it emitted in this function placed nothing in DE — a
+   stacked ABI (smallc / stdc / callee), or a fastcall whose last argument is
+   1-2 bytes (HL) or wider than 4 (the memory accumulator). A `__sdcccall(1)`
+   target, or a 4-byte fastcall argument (DE:HL), marks it dirty; so does a
+   full table. Anything the emitter never recorded reads DE, exactly as before.
+
+   `--opt-disable=de-call` opts out, byte for byte. Evidence: adr/0084. */
+#define DECALL_MAX 96
+static struct { char name[56]; unsigned char dirty; } xf_decall[DECALL_MAX];
+static int xf_decall_n;
+static int xf_decall_full;
+
+static void decall_note(const char *sym, int clean)
+{
+    if (!sym || !*sym) return;
+    for (int i = 0; i < xf_decall_n; i++)
+        if (!strcmp(xf_decall[i].name, sym)) {
+            if (!clean) xf_decall[i].dirty = 1;
+            return;
+        }
+    if (xf_decall_n >= DECALL_MAX || strlen(sym) + 1 > sizeof xf_decall[0].name) {
+        xf_decall_full = 1;              /* unrecorded targets exist: give up */
+        return;
+    }
+    strcpy(xf_decall[xf_decall_n].name, sym);
+    xf_decall[xf_decall_n].dirty = (unsigned char)!clean;
+    xf_decall_n++;
+}
+
+/* The rendered-text question: is THIS line a direct call whose target the
+   emitter proved DE-clean? Shares xline_c_call's `_sym` discriminator, so an
+   asm-linkage or double-underscored target is never even looked up. */
+static int xline_call_de_clean(const char *line)
+{
+    if (xf_decall_full || opt_disabled("de-call")) return 0;
+    if (!xline_c_call(line)) return 0;
+    const char *p = line;
+    while (*p == ' ' || *p == '\t') p++;
+    p += 4;                                     /* past "call" */
+    while (*p == ' ' || *p == '\t') p++;
+    char sym[56]; size_t k = 0;
+    while (p[k] && p[k] != '\n' && p[k] != '\r' && p[k] != ' ' && p[k] != '\t'
+           && p[k] != ';' && k + 1 < sizeof sym) { sym[k] = p[k]; k++; }
+    if (p[k] && p[k] != '\n' && p[k] != '\r') return 0;   /* operand too long */
+    sym[k] = '\0';
+    for (int i = 0; i < xf_decall_n; i++)
+        if (!strcmp(xf_decall[i].name, sym)) return !xf_decall[i].dirty;
+    return 0;
+}
+
+static int func_ret_reads_de(const Func *f)
+{
+    if (!f || opt_disabled("de-ret")) return 1;
+    if (f->ret_width > 2)             return 1;   /* DE:HL, or unmodelled */
+    if (f->flags & SDCCCALL1)         return 1;   /* 2-byte return is in DE */
+    if (f->is_interrupt || f->is_naked) return 1;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int o = 0; o < f->bbs[b].n_ops; o++)
+            if (f->bbs[b].ops[o].kind == IR_ASM) return 1;
+    return 0;
+}
+
 
 
 
@@ -1440,12 +1593,8 @@ static int xline_c_call(const char *line);
    return ABI is A / HL / DE:HL), the same assumption the BC sweep already
    makes for BC.
 
-   Default ON. Corpus -230 B over 132 cells with ZERO larger, every CPU smaller
-   (gbz80 -40, 8080/8085 -26, z80/z80n/z180 -25, rabbit/ez80/kc160 -21); emu.c
-   -38 B fp / -52 B sp. Ticks follow: 7 T becomes 4 T at every site and nothing
-   else moves. IR_OFF=xor-a opts out, byte-identical to the pre-flip compiler. NB
-   the rewrite rides the park sweep, so --opt-disable=bc-live also turns it
-   off. */
+   Default ON; IR_OFF=xor-a opts out, byte-identical. NB the rewrite rides the
+   park sweep, so --opt-disable=bc-live also turns it off. Evidence: adr/0045. */
 static int  xora_on = -1;
 static int  xora_enabled(void)
 {
@@ -1639,6 +1788,140 @@ static int gw_a_dead_after(char **lines, int n, int start)
     return 0;                                      /* ran out of rope: assume live */
 }
 
+/* [inc-mem] Is A dead from line `start` on EVERY path? Non-zero means live or
+   unknown, which is the conservative answer.
+
+   `gw_a_dead_after` answers the same question but stops at the first branch,
+   and that loses the sites worth having: a counter incremented in a loop body
+   is followed by the back-edge `jp L_head`, so the straight-line walk always
+   answers "live" there. This walk follows branches instead, exactly as
+   `de_fwd_walk` does for DE, memoising visited lines so a loop terminates —
+   revisiting a line contributes nothing the in-progress visit will not report.
+
+   A `ret`, a `call` and a branch out of this buffer all answer LIVE: A is a
+   return register and a fastcall byte-argument register, so the value may be
+   read where this walk cannot see. This is deliberately a separate walker
+   rather than a widening of `gw_a_dead_after` — that one is shared with the
+   [gwiden] fold, and changing a shared helper would change a second rung's
+   output for reasons that have nothing to do with this one. */
+static int im_a_live_walk(char **lines, int n, int start,
+                          unsigned char *seen, int depth)
+{
+    if (depth > 32) return 1;
+    for (int j = start; j < n; j++) {
+        if (seen[j]) return 0;                     /* already explored: no read */
+        seen[j] = 1;
+        if (lines[j][0] != '\t') continue;         /* label: falls through */
+        if (gw_kills_a(lines[j])) return 0;        /* overwritten unread */
+        char tgt[64];
+        if (xline_branch_target(lines[j], tgt, sizeof tgt)) {
+            int t = de_label_line(lines, n, tgt);
+            if (t < 0) return 1;                   /* a call, or out of buffer */
+            if (im_a_live_walk(lines, n, t, seen, depth + 1)) return 1;
+            /* `djnz` carries no comma but IS conditional — it falls through
+               when B reaches zero — so only a comma-less jp/jr ends the path. */
+            if (!strchr(lines[j], ',') && strncmp(lines[j] + 1, "djnz", 4))
+                return 0;                          /* unconditional: no fall-through */
+            continue;                              /* conditional: also fall through */
+        }
+        if (!gw_no_a_read(lines[j])) return 1;     /* reads A, or unrecognised */
+    }
+    return 1;                                      /* ran off the end: assume live */
+}
+
+/* [inc-mem] `ld a,MEM; inc a; ld MEM,a` is a read-modify-write the whole
+   z80 family does in ONE instruction: `inc MEM`. Returns the increment
+   mnemonic ("inc" / "dec") and fills `mem` with the operand text, or NULL.
+
+   Only the indirect forms qualify — `(hl)`, `(ix±d)`, `(iy±d)`. There is no
+   `inc (nn)`, so a symbol RMW is not a candidate however much it looks like
+   one. Flags need no guard: `inc a` and `inc (hl)` are the same 8-bit INC and
+   set the same bits (carry untouched on every CPU in the table), so the only
+   thing the rewrite takes away is the copy of the value left in A. */
+static const char *im_rmw_triple(char **lines, int at, const char *drop,
+                                 char *mem, size_t memsz)
+{
+    if (at < 2 || drop[at] || drop[at - 1] || drop[at - 2]) return NULL;
+    const char *op;
+    if (!strcmp(lines[at - 1], "\tinc\ta\n"))      op = "inc";
+    else if (!strcmp(lines[at - 1], "\tdec\ta\n")) op = "dec";
+    else return NULL;
+    /* load: `\tld\ta,(...)\n` — capture the parenthesised operand */
+    if (strncmp(lines[at - 2], "\tld\ta,(", 7)) return NULL;
+    const char *p = lines[at - 2] + 6;                    /* at '(' */
+    const char *e = strchr(p, ')');
+    if (!e || e[1] != '\n') return NULL;                  /* volatile stamp etc. */
+    size_t len = (size_t)(e - p) + 1;
+    if (len + 1 > memsz) return NULL;
+    memcpy(mem, p, len); mem[len] = '\0';
+    if (strcmp(mem, "(hl)") && strncmp(mem, "(ix", 3) && strncmp(mem, "(iy", 3))
+        return NULL;
+    /* store: the SAME operand, and nothing else on the line */
+    char want[64];
+    if ((size_t)snprintf(want, sizeof want, "\tld\t%s,a\n", mem) >= sizeof want)
+        return NULL;
+    if (strcmp(lines[at], want)) return NULL;
+    return op;
+}
+
+/* [de-widen] Is `ld e,<op>` safe to respell as `ld l,<op>`? Not every operand
+   is: `ld e,ixh` assembles and `ld l,ixh` does NOT exist — an index half cannot
+   share an instruction with H or L — and `opcodes.dat` carries 49 such
+   asymmetries (`ld e,ixh`/`ld e,iyl` on every index-half CPU, `ld e,(hl')` and
+   `ld e,h'` on the KR580VM1). So this is an ALLOWLIST, not a rejection list:
+   a plain 8-bit register, `(hl)`, an `(ix+d)`/`(iy+d)` displacement, or a
+   decimal immediate. For each of those `ld l,<op>` is real on exactly the same
+   CPUs and is a synthetic on none. The line arrives with its newline. */
+static int dw_operand_ok(const char *op)
+{
+    size_t n = strlen(op);
+    while (n && (op[n - 1] == '\n' || op[n - 1] == '\r')) n--;
+    if (!n) return 0;
+    if (n == 1 && strchr("abcdehl", op[0])) return 1;
+    if (n == 4 && !strncmp(op, "(hl)", 4)) return 1;
+    if (n >= 6 && op[0] == '(' && op[n - 1] == ')'
+        && (!strncmp(op + 1, "ix", 2) || !strncmp(op + 1, "iy", 2))
+        && (op[3] == '+' || op[3] == '-')) {
+        for (size_t k = 4; k < n - 1; k++)
+            if (op[k] < '0' || op[k] > '9') return 0;
+        return n > 5;
+    }
+    { size_t k = (op[0] == '-') ? 1 : 0;
+      if (k == n) return 0;
+      for (; k < n; k++) if (op[k] < '0' || op[k] > '9') return 0;
+      return 1; }
+}
+
+/* [z80n-add-a] Find the zero-extend pair that feeds `add hl,de` at line `at`,
+   so the pair can be dropped and the add become `add hl,a`. Returns the index
+   of the FIRST line of the pair, or -1.
+
+   The pair is `ld e,a` + `ld d,0` in either order, and it is usually NOT
+   adjacent to the add: the base arrives in between (`ld e,a; ld d,0; pop hl;
+   add hl,de` is 14 of the corpus's 19 sites). So a bounded forward window is
+   walked, and every line in it must
+     - preserve A, which is the whole value the rewrite depends on, and
+     - not read D or E, whose zero-extended value is about to stop existing.
+   A label or any branch/call ends the window: this is a straight-line claim,
+   and instr_effects marks a branch as reading DE anyway. An unrecognised line
+   also ends it — the recogniser is incomplete by design, and losing a site
+   costs bytes where guessing costs correctness. */
+static int zn_widen_pair_for(char **lines, int at, const char *drop)
+{
+    for (int i = at - 1, budget = 10; i >= 1 && budget-- > 0; i--) {
+        if (drop[i] || drop[i - 1]) return -1;
+        if (lines[i][0] != '\t') return -1;                   /* label */
+        if ((!strcmp(lines[i], "\tld\te,a\n") && !strcmp(lines[i - 1], "\tld\td,0\n"))
+         || (!strcmp(lines[i], "\tld\td,0\n") && !strcmp(lines[i - 1], "\tld\te,a\n")))
+            return i - 1;
+        InstrEffects e = instr_effects(lines[i]);
+        if (e.unknown || e.is_call || e.is_boundary) return -1;
+        if (e.d_read || e.e_read) return -1;
+        if ((e.writes & IR_R_A) && !(e.self_pres & IR_R_A)) return -1;
+    }
+    return -1;
+}
+
 /* `\tld\ta,(_sym)\n` — the symbol form only. A register or index indirect
    (`ld a,(hl)`, `ld a,(ix-2)`) has no `ld hl,(...)` counterpart, and a volatile
    access carries a trailing `;volatile` stamp so it fails the exact-shape test
@@ -1685,12 +1968,9 @@ static void gw_fold_byte_global_widens(char **lines, int n, char *drop)
    151 `ld bc,hl` left on emu.c reach a branch to a LOCAL label. See
    bc_live_at_labels().
 
-   Corpus -248 B over 47 cells with ZERO larger, every CPU smaller (8080 -36,
-   8085 -32, z80/z80n/z180/rabbit/kc160 -24, ez80 -20, gbz80 -16); emu.c -157 B
-   sp / -149 fp, clisp -381, adv_a -16. Ticks -0.0278% on the z80 corpus, 4
-   cells faster and 0 slower -- it only ever deletes an instruction.
    IR_OFF=bc-flow opts out, byte-identical to the pre-flip compiler.
-   IR_BCFLOW_DBG=1 reports the label count and how many have BC dead. */
+   IR_BCFLOW_DBG=1 reports the label count and how many have BC dead.
+   Evidence: adr/0049. */
 static int  bcflow_on = -1;
 static int  bcflow_enabled(void)
 {
@@ -1712,7 +1992,7 @@ static int  bcflow_enabled(void)
    conservative, which is what separates this from the wider opportunity sized by
    [IR_DELIVE_PROBE].
 
-   IR_OFF=de-flow opts out. */
+   IR_OFF=de-flow opts out. Rationale: adr/0047. */
 static int  deflow_on = -1;
 static int  deflow_enabled(void)
 {
@@ -1801,7 +2081,9 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
             char tgt[64];
             int has_tgt = xline_branch_target(lines[i], tgt, sizeof tgt);
             if (e.is_boundary) { b_live = c_live = f_live = 0;
-                                 d_live = e_live = 1;      /* result ABI DE:HL */
+                                 /* [de-ret] DE is live at a return only when
+                                    the result rides it. */
+                                 d_live = e_live = e.d_read;
                                  continue; }
             if (has_tgt) {
                 int tb = 1, tc = 1, tf = 1, td = 1, te = 1, found = 0;
@@ -1827,7 +2109,9 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
                 if (xline_c_call(lines[i]) && bccall_enabled())
                      { b_live = c_live = f_live = 0; }
                 else { b_live = c_live = f_live = 1; }
-                d_live = e_live = 1;    /* __sdcccall(1) passes args in DE */
+                /* [de-call] DE is live into a call only where the argument ABI
+                   put something there — e.d_read carries the emitter's answer. */
+                d_live = e_live = e.d_read;
                 continue;
             }
             if (xora_line_reads_f(lines[i]))   f_live = 1;
@@ -1971,6 +2255,217 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             if (do_xora && !f_live && !strcmp(lines[i], "\tld\ta,0\n")) {
                 char *nl = strdup("\txor\ta\n");
                 if (nl) { free(lines[i]); lines[i] = nl; }
+            }
+            /* [ldsi-addr] 8085 only. Forming a slot address costs
+               `ld hl,N; add hl,sp` — 4 bytes, 20 cycles. The 8085 has LDSI,
+               `ld de,sp+N`, which does it in 2 bytes and 10, so the pair
+               becomes `ld de,sp+N; ex de,hl` — 3 bytes and 14.
+               Three things must hold, and each is a real hazard:
+                 - D and E dead AFTER the pair. `ex de,hl` is a SWAP, so DE
+                   comes back holding the old HL. HL is being overwritten by
+                   this very sequence, so losing it is free; DE is not.
+                 - F dead. `add hl,sp` (DAD SP) WRITES CARRY and the LDSI pair
+                   does not, so a consumer of that carry would silently read a
+                   stale flag.
+                 - N in 0..255. LDSI's operand is one unsigned byte
+                   (`sp + get_memory_inst(pc++)` in src/ticks/i8085_inst.c).
+               Same liveness the [xor-a] rung above uses, and for the same
+               reason: at line i it is the answer for the code AFTER line i.
+               `--opt-disable=ldsi-addr` opts out. Census and evidence:
+               adr/0039. */
+            if (IS_8085() && !opt_disabled("ldsi-addr")
+                && !d_live && !e_live && !f_live
+                && i > 0 && !strcmp(lines[i], "\tadd\thl,sp\n")
+                && !drop[i] && !drop[i - 1]) {
+                int n = -1;
+                if (sscanf(lines[i - 1], "\tld\thl,%d\n", &n) == 1
+                    && n >= 0 && n <= 255) {
+                    char buf[48];
+                    snprintf(buf, sizeof buf, "\tld\tde,sp+%d\n", n);
+                    char *a = strdup(buf), *b = strdup("\tex\tde,hl\n");
+                    if (a && b) {
+                        free(lines[i - 1]); lines[i - 1] = a;
+                        free(lines[i]);     lines[i]     = b;
+                    } else { free(a); free(b); }
+                }
+            }
+            /* [ldhi-addr] LDSI's sibling, and the same three hazards. Adding a
+               small constant to a pointer already in HL costs
+               `ld de,N; add hl,de` — 4 bytes, 20 cycles. The 8085 has LDHI,
+               `ld de,hl+N` (opcode 28, 2 bytes, 10 cycles,
+               `(hl) + get_memory_inst(pc++)` in src/ticks/i8085_inst.c), so the
+               pair becomes `ld de,hl+N; ex de,hl` — 3 bytes and 14.
+                 - D and E dead AFTER the pair. Here it is not `ex de,hl`'s swap
+                   that needs it: the ORIGINAL pair leaves DE holding N, and the
+                   rewrite leaves it holding the OLD HL, so a reader of either
+                   would see the wrong value.
+                 - F dead. `add hl,de` (DAD D) WRITES CARRY, LDHI does not.
+                 - N in 0..255, LDHI's operand being one unsigned byte. Out of
+                   range is common here, unlike LDSI: the corpus immediates
+                   include bench magic constants such as 13849.
+               `--opt-disable=ldhi-addr` opts out. adr/0077. */
+            if (IS_8085() && !opt_disabled("ldhi-addr")
+                && !d_live && !e_live && !f_live
+                && i > 0 && !strcmp(lines[i], "\tadd\thl,de\n")
+                && !drop[i] && !drop[i - 1]) {
+                int n = -1;
+                if (sscanf(lines[i - 1], "\tld\tde,%d\n", &n) == 1
+                    && n >= 0 && n <= 255) {
+                    char buf[48];
+                    snprintf(buf, sizeof buf, "\tld\tde,hl+%d\n", n);
+                    char *a = strdup(buf), *b = strdup("\tex\tde,hl\n");
+                    if (a && b) {
+                        free(lines[i - 1]); lines[i - 1] = a;
+                        free(lines[i]);     lines[i]     = b;
+                    } else { free(a); free(b); }
+                }
+            }
+            /* [z80n-add-a] Adding a zero-extended byte to HL costs
+               `ld e,a; ld d,0; add hl,de` — 4 bytes, 22 cycles, and it spends
+               DE. The z80n has `add hl,a` (ED 31, 2 bytes, 8 cycles,
+               `z80n_add_hl_a` in src/ticks/z80n_inst.c), which adds A
+               zero-extended and leaves DE alone: 2 bytes and 8.
+                 - D and E dead AFTER the add. The pair's zero-extended value
+                   stops existing, and DE reverts to whatever it held before.
+                 - F dead. `add hl,de` WRITES CARRY and `add hl,a` writes no
+                   flags at all, so a consumer would read a stale one.
+                 - A preserved between the pair and the add, and D/E unread
+                   there — see zn_widen_pair_for, which walks that window.
+               `--opt-disable=z80n-add-a` opts out. adr/0078. */
+            if (IS_Z80N() && !opt_disabled("z80n-add-a")
+                && !d_live && !e_live && !f_live
+                && !drop[i] && !strcmp(lines[i], "\tadd\thl,de\n")) {
+                int p = zn_widen_pair_for(lines, i, drop);
+                if (p >= 0) {
+                    char *nl = strdup("\tadd\thl,a\n");
+                    if (nl) {
+                        free(lines[i]); lines[i] = nl;
+                        drop[p] = drop[p + 1] = 1;
+                    }
+                }
+            }
+            /* [idx-rmw-de] Indexed word RMW: `ld bc,hl; ld a,(hl+); ld h,(hl);
+               ld l,a; inc hl; ex de,hl; ld hl,bc; ld (hl),e; inc hl; ld (hl),d`
+               parks the address in BC because the word load walks the value
+               through HL itself (the A→HL reader), stranding the address —
+               then rebuilds HL from BC to store back. Once the address is in
+               HL and NOT consumed by the load, `dec hl` recovers it directly:
+               `ld e,(hl); inc hl; ld d,(hl); dec hl; inc de;
+                ld (hl),e; inc hl; ld (hl),d` — 8 bytes against 14, and it
+               never touches BC at all. ADR 0088 sized this reader shape and
+               declined to change the emitter from the census alone; this is
+               that census's site, hit as an exact 10-line match rather than a
+               general lowering change.
+                 - B, C, D and E all dead after (`ld bc,hl` clobbered BC to
+                   the address either way, so a later BC read was already
+                   broken by the ORIGINAL code; DE held the incremented value
+                   post-store in the old form and holds whatever it held
+                   before the sequence in the new one — a consumer expecting
+                   the former needs the dead-check).
+                 - No flag condition: both forms are register loads, INC/DEC
+                   on HL, and byte stores; none of the four reads F and `inc
+                   hl`/`dec hl` do not touch it either.
+               `--opt-disable=idx-rmw-de` opts out. adr/0088. */
+            if (!opt_disabled("idx-rmw-de") && !b_live && !c_live
+                && !d_live && !e_live
+                && i >= 9 && !drop[i] && !drop[i-1] && !drop[i-2] && !drop[i-3]
+                && !drop[i-4] && !drop[i-5] && !drop[i-6] && !drop[i-7]
+                && !drop[i-8] && !drop[i-9]
+                && !strcmp(lines[i],   "\tld\t(hl),d\n")
+                && !strcmp(lines[i-1], "\tinc\thl\n")
+                && !strcmp(lines[i-2], "\tld\t(hl),e\n")
+                && !strcmp(lines[i-3], "\tld\thl,bc\n")
+                && !strcmp(lines[i-4], "\tex\tde,hl\n")
+                && !strcmp(lines[i-5], "\tinc\thl\n")
+                && !strcmp(lines[i-6], "\tld\tl,a\n")
+                && !strcmp(lines[i-7], "\tld\th,(hl)\n")
+                && !strcmp(lines[i-8], "\tld\ta,(hl+)\n")
+                && !strcmp(lines[i-9], "\tld\tbc,hl\n")) {
+                static const char *repl[8] = {
+                    "\tld\te,(hl)\n", "\tinc\thl\n", "\tld\td,(hl)\n",
+                    "\tdec\thl\n",    "\tinc\tde\n", "\tld\t(hl),e\n",
+                    "\tinc\thl\n",    "\tld\t(hl),d\n",
+                };
+                char *nl[8];
+                int ok = 1;
+                for (int k = 0; k < 8; k++) {
+                    nl[k] = strdup(repl[k]);
+                    if (!nl[k]) ok = 0;
+                }
+                if (ok) {
+                    for (int k = 0; k < 8; k++) {
+                        free(lines[i - 9 + k]); lines[i - 9 + k] = nl[k];
+                    }
+                    drop[i] = drop[i - 1] = 1;
+                } else {
+                    for (int k = 0; k < 8; k++) free(nl[k]);
+                }
+            }
+            /* [inc-mem] `ld a,(hl); inc a; ld (hl),a` becomes `inc (hl)` —
+               3 bytes and 18 cycles down to 1 and 11 — and the `(ix+d)` form
+               goes from 7 bytes and 42 cycles to 3 and 23. One condition: A
+               must be DEAD after, because the rewrite no longer leaves the new
+               value there. Flags are NOT a condition — the two are the same
+               8-bit INC and set the same bits, carry included (untouched).
+               `--opt-disable=inc-mem` opts out. adr/0080. */
+            if (!opt_disabled("inc-mem")) {
+                char mem[64];
+                const char *op = im_rmw_triple(lines, i, drop, mem, sizeof mem);
+                unsigned char *seen = op ? calloc((size_t)(n > 0 ? n : 1), 1) : NULL;
+                int a_dead = seen && !im_a_live_walk(lines, n, i + 1, seen, 0);
+                free(seen);
+                if (op && a_dead) {
+                    char buf[80];
+                    snprintf(buf, sizeof buf, "\t%s\t%s\n", op, mem);
+                    char *nl = strdup(buf);
+                    if (nl) {
+                        free(lines[i]); lines[i] = nl;
+                        drop[i - 1] = drop[i - 2] = 1;
+                    }
+                }
+            }
+            /* [de-widen] A byte zero-extended into DE and then copied to HL
+               — `ld e,S; ld d,0; ld hl,de` — is the widen done in the wrong
+               register: `ld l,S; ld h,0` leaves HL identical in 2 bytes fewer
+               and 8 cycles fewer. It happens because the widen and the
+               consumer are chosen by different passes: load_to_de stages the
+               byte, then gen_add takes its `add hl,bc` arm, which wants the
+               value in HL and finds only the DE cache.
+                 - D and E dead AFTER the copy. That is the whole proof: the
+                   rewrite stops defining DE, so a later reader would see
+                   whatever DE held before. Same `!d_live && !e_live` the
+                   [de-park] and [z80n-add-a] rungs rest on.
+                 - No flag condition. All four spellings are register moves and
+                   an immediate load; none of them touches F.
+               S may name H or L (`ld e,h`) — `ld l,h; ld h,0` reads H before
+               overwriting it, exactly as the original did — or be `(hl)` or
+               `(ix+d)`, where the single instruction keeps its own operand. It
+               is an ALLOWLIST, not an anything: see dw_operand_ok, because
+               `ld e,ixh` has no `ld l,ixh`.
+               `--opt-disable=de-widen` opts out. adr/0085. */
+            if (!opt_disabled("de-widen") && !d_live && !e_live
+                && i >= 2 && !drop[i] && !drop[i - 1] && !drop[i - 2]
+                && !strcmp(lines[i], "\tld\thl,de\n")
+                && !strcmp(lines[i - 1], "\tld\td,0\n")
+                && !strncmp(lines[i - 2], "\tld\te,", 6)
+                && dw_operand_ok(lines[i - 2] + 6)) {
+                char buf[80];
+                const char *src = lines[i - 2] + 6;
+                if (strlen(src) < sizeof buf - 8) {
+                    snprintf(buf, sizeof buf, "\tld\tl,%s", src);
+                    char *a = strdup(buf), *b = strdup("\tld\th,0\n");
+                    if (a && b) {
+                        free(lines[i - 2]); lines[i - 2] = a;
+                        free(lines[i - 1]); lines[i - 1] = b;
+                        drop[i] = 1;
+                        /* The copy is gone, so its read of DE must not be
+                           folded into the liveness above it — the two rewritten
+                           lines carry their own effects when the walk reaches
+                           them. */
+                        continue;
+                    }
+                    free(a); free(b);
+                }
             }
             /* A call to compiled C code neither reads the flags nor preserves
                them — the same fact about BC that [bc-call] rests on, and the
@@ -3200,7 +3695,10 @@ static int frameless_ok(const Func *f)
            Whole-function BC is what remains. This is the SHORT-TERM narrowing;
            the real fix is to route every frame access to sp when frameless. */
         if (ph != IR_PR_BC) return 0;
-        if (ir_home_is_ranged(f, v)) return 0;
+        /* A home NARROWED to the live range is fine — outside it the value is
+           dead. Only a home narrower than the live range sends the access back
+           to the caller's frame. */
+        if (!ir_home_covers_live_range(f, v)) return 0;
     }
     return 1;
 }
@@ -3723,6 +4221,40 @@ static void store_byte_adv(FILE *out, const char *reg, int last)
     }
 }
 
+/* [lea-frame-addr] Put a frame address into HL, choosing the shorter form.
+   `canon_off` is the slot_off-basis offset — WITHOUT `cur_sp_adjust`, which
+   this adds for the sp form and must NOT add for the IX form.
+
+   On ez80 in fp mode the same address is IX-relative and the compiler knows
+   the offset: `slot_ix_off` is `slot_off - f->frame_size`, and IX does not
+   move, so the push shift is irrelevant. `lea hl,ix+d` is 3 bytes against 4
+   and writes no flags, where `add hl,sp` writes carry.
+
+   `!L.cur_frameless` is load-bearing: `fp_active` is TRUE for a frameless
+   function (it keeps fp-mode residency) and there is NO IX frame there, so an
+   `(ix+d)` address would be taken off the caller's frame pointer. The vote
+   through ds_ixaccess is deliberate and mirrors slot_ix_off — emitting an
+   IX-relative address is a reason to keep IX, which is what that counter
+   decides. Callers own their own cache invalidation, exactly as before.
+
+   Sites that hand-roll the sp pair with an offset of their own (a push they
+   just made) must NOT be routed here: that shift has no IX analogue.
+   `--opt-disable=lea-frame-addr` opts out. adr/0081. */
+static void emit_frame_addr_hl(FILE *out, const Func *f, int canon_off)
+{
+    if (IS_EZ80() && fp_active(f) && !L.cur_frameless
+        && !opt_disabled("lea-frame-addr")) {
+        int ixoff = canon_off - f->frame_size;
+        if (fp_offset_fits(ixoff)) {
+            if (rec_counting) ds_ixaccess++;       /* mirrors slot_ix_off */
+            emit(out, "lea\thl,%s%+d", frame_reg(), ixoff);
+            return;
+        }
+    }
+    emit(out, "ld\thl,%d", canon_off + L.cur_sp_adjust);
+    emit(out, "add\thl,sp");
+}
+
 #include "ir_lower_regcache.inc.c"
 #include "ir_lower_analysis.inc.c"
 #include "ir_lower_ops.inc.c"
@@ -3787,8 +4319,11 @@ static InstrEffects instr_effects(const char *line)
 
     /* ---- (A) whole-reg WRITE mask (was lra_line_writes) ---- */
     RegMask w = 0;
-    if (strstr(line,"hl+") || strstr(line,"hl-")) w |= IR_R_HL;   /* gbz80 auto-step */
-    if (strstr(line,"de+") || strstr(line,"de-")) w |= IR_R_DE;
+    /* The auto-step forms are PARENTHESISED — `ld a,(hl+)`. Matching bare
+       "hl+" would also claim 8085 LDHI (`ld de,hl+N`) writes HL, which it does
+       not: there HL is a source. */
+    if (strstr(line,"(hl+)") || strstr(line,"(hl-)")) w |= IR_R_HL;  /* gbz80 auto-step */
+    if (strstr(line,"(de+)") || strstr(line,"(de-)")) w |= IR_R_DE;
     if (!strcmp(m,"ld"))                                 w |= lra_reg_of(o0);
     else if (!strcmp(m,"add")||!strcmp(m,"adc")||!strcmp(m,"sbc")) w |= lra_reg_of(o0)|IR_R_F;
     else if (!strcmp(m,"sub")) w |= (!strcmp(o0,"hl") ? (IR_R_HL|IR_R_F) : (IR_R_A|IR_R_F));
@@ -3841,17 +4376,25 @@ static InstrEffects instr_effects(const char *line)
        path stays in the function, so BC liveness must survive it. is_call is the
        conservative "successor may read BC"; treating it as a boundary would let
        filter_dead_bc_parks drop a park the fall-through still consumes. */
-    if (!strcmp(m,"ret") && o0[0]) { e.is_call = 1; e.d_read = e.e_read = 1; return e; }
+    if (!strcmp(m,"ret") && o0[0]) { e.is_call = 1;
+                                     e.d_read = e.e_read = xline_ret_reads_de();
+                                     return e; }
     if (!strcmp(m,"ret")||!strcmp(m,"reti")||!strcmp(m,"retn")) {
-        /* is_boundary says BC is dead at exit. DE is NOT: the long and float
-           result ABI is DE:HL, so a return READS DE. The flag stays BC-only and
-           D/E are marked live here, so no consumer can inherit the BC rule. */
-        e.is_boundary = 1; e.d_read = e.e_read = 1; return e;
+        /* is_boundary says BC is dead at exit. DE is dead there too UNLESS
+           this function returns in DE — the DE:HL long/float ABI, or a
+           __sdcccall(1) 2-byte return. The flag stays BC-only and D/E are
+           answered separately, so no consumer can inherit the BC rule.
+           [de-ret]: xline_ret_reads_de() is the per-function answer. */
+        e.is_boundary = 1; e.d_read = e.e_read = xline_ret_reads_de(); return e;
     }
     if (!strcmp(m,"jp")||!strcmp(m,"jr")||!strcmp(m,"djnz")||!strcmp(m,"call")||!strcmp(m,"rst")) {
-        /* A successor may read DE, and __sdcccall(1) passes arguments in it, so a
-           call READS DE even though the callee also clobbers it. */
-        e.is_call = 1; e.d_read = e.e_read = 1; return e;
+        /* A successor may read DE, and an argument ABI can pass one in it, so a
+           call READS DE even though the callee also clobbers it — UNLESS the
+           emitter proved this target takes nothing there ([de-call]). A branch
+           stays a reader here; [de-flow] answers those from its fixpoint. */
+        e.is_call = 1;
+        e.d_read = e.e_read = !xline_call_de_clean(line);
+        return e;
     }
     if (!strcmp(m,"exx")) { e.b_read = e.c_read = 1; e.d_read = e.e_read = 1; return e; }
     if (!strcmp(m,"ldir")||!strcmp(m,"lddr")||!strcmp(m,"ldi")||!strcmp(m,"ldd")
@@ -4148,20 +4691,10 @@ static int dsw_enabled(void)
     return dsw_on;
 }
 
-/* [dead-store-share] Refine the coalesced-read veto: block a dead store only when a
-   byte-sharing reader never writes its own slot (the channel shape), instead of
-   on any sharing reader at all. Default ON; `IR_OFF=dead-store-share` opts out and
-   restores the pre-flip codegen byte-for-byte.
-
-   Flipped on after the 391-cell matrix (23 benches x 10 cpus x sp/fp): 0 cells
-   slower on ANY cpu and 0 cells larger on any cpu, net -1200B, every cell built
-   AND run in both configurations with no failures. Bytes and cycles move
-   together here because eliding a store removes memory traffic — there was no
-   byte-for-tick trade to weigh.
-
-   The r4k byte regression the first matrix showed was NOT this pass; it was the
-   HL->DE staging copy being spelled as two page-prefixed 8-bit moves on Rabbit
-   (fixed in 1b43c3a4c7, see emit_hl_to_de).
+/* [dead-store-share] Block a dead store only when a byte-sharing reader never
+   writes its own slot (the channel shape), instead of on any sharing reader at
+   all. Default ON; `IR_OFF=dead-store-share` opts out and restores the pre-flip
+   codegen byte-for-byte. Evidence: adr/0041.
 
    Careful with the predicate: "reads a slot it never wrote" is NOT
    `rec_slotwrite == 0`. See the marking site — a MULTI-DEF reader can have one
@@ -4357,7 +4890,7 @@ static void rec_end(const Func *f)
                    re-lower read a vreg with neither register nor slot
                    (require_slot abort). Not trustable, same as addr-taken. */
                 int ranged = (f->vregs[v].flags & IR_VREG_CALL_SPLIT)
-                          || ir_home_is_ranged(f, v);
+                          || !ir_home_covers_live_range(f, v);
                 int trustable = w <= 2
                              && !(f->vregs[v].flags & IR_VREG_ADDR_TAKEN)
                              && !ranged;
@@ -5265,8 +5798,16 @@ static void emit_prologue(FILE *out, Func *f)
             while (n >= 2) { emit(out, "push\taf"); n -= 2; }
             if (n) emit(out, "dec\tsp");
         } else {
-            emit(out, "ld\thl,-%d", alloc_size);
-            emit(out, "add\thl,sp");
+            /* The frame register was set before any auto-pushed param. The
+               full frame size, not alloc_size, is its displacement. */
+            if (IS_EZ80() && fp_active(f) && !L.cur_frameless
+                && fp_offset_fits(-f->frame_size)
+                && !opt_disabled("lea-frame-prologue")) {
+                emit(out, "lea\thl,%s-%d", frame_reg(), f->frame_size);
+            } else {
+                emit(out, "ld\thl,-%d", alloc_size);
+                emit(out, "add\thl,sp");
+            }
             emit(out, "ld\tsp,hl");
         }
     }
@@ -5788,6 +6329,14 @@ int ir_lower_func(FILE *out, Func *f)
     }
     L.spill_ix = L.spill_sp = 0;   /* IR_SPILL_STATS: per-function reset */
 
+    /* [de-ret] Latch this function's answer to "does a `ret` read DE?" before
+       anything is emitted: the rendered-text passes at the end of this call
+       read it, and the emitter may raise xf_ret_dispatch in between. */
+    xf_ret_de_static = func_ret_reads_de(f);
+    xf_ret_dispatch  = 0;
+    /* [de-call] the proved-clean call targets are per function too. */
+    xf_decall_n = 0; xf_decall_full = 0;
+
     /* __naked: emit the body verbatim — no prologue, no epilogue, no frame,
        no BB labels, no trailing `ret`. ir_build has already restricted the
        body to asm blocks and argument-free calls.
@@ -6206,29 +6755,17 @@ int ir_lower_func(FILE *out, Func *f)
                     else if (o->kind == IR_LD_SYM && o->mem.sym
                              && !ns_sym_bails(o->mem.sym))
                         rd = o;
-                    /* [remat-lea] Frame-slot address (&local) rematerialises:
-                       recompute at each use (emit_remat_word: `ld hl,slot_off+
-                       cur_sp_adjust; add hl,sp`) instead of spilling+reloading — the
-                       offset is fixed per function and cur_sp_adjust is tracked, so
-                       fp==sp with only the target pair clobbered (no IX/DE gymnastics).
-                       EXCLUSIONS:
-                       - a PR_STACK tenant: its value is parked with push/pop, not in
-                         a frame slot, so dropping the slot orphans one half of that
-                         pair and every later sp-relative offset shifts (irgaps
-                         miscompiled). This USED to be spelled `!(IS_808x() ||
-                         IS_GBZ80())` — those CPUs park LEA values, so the CPU stood
-                         in for the fact. Measured: of the 99 LEAs the CPU test
-                         excluded, only 6 (8085) / 5 (gbz80) are actually parked, so
-                         the test cost ~93 per CPU. Asking the real question is both
-                         wider AND safer — it now also protects a parked LEA on z80
-                         and every other target, which the CPU test never covered;
-                       - ez80 in FP mode: its cheap `lea`/`ld hl,(ix+d)` addressing
-                         register-homes LEAs, so per-use recompute in a hot loop is a
-                         byte-for-tick LOSS (interpbench ez80-fp −27B but +4.6% ticks).
-                         ez80-SP keeps it: sp addressing is dear there, so it is a pure
-                         win (−117B, −6.6% ticks).
-                       Store-base LEAs keep their slot (below). Default-on;
-                       IR_OFF=remat-lea opts out. */
+                    /* [remat-lea] Recompute `&local` at each use
+                       (emit_remat_word) instead of spilling and reloading it —
+                       the slot offset is fixed per function and cur_sp_adjust
+                       is tracked. Two exclusions, both load-bearing:
+                       a PR_STACK tenant (its value is parked with push/pop, so
+                       dropping the slot orphans half the pair and shifts every
+                       later sp-relative offset — irgaps miscompiled), and ez80
+                       in FP mode (cheap lea/(ix+d) makes per-use recompute a
+                       byte-for-tick loss; ez80-SP keeps it). Store-base LEAs
+                       keep their slot. Default-on; IR_OFF=remat-lea opts out.
+                       Evidence and the CPU-test-vs-property lesson: adr/0040. */
                     else if (o->kind == IR_LEA && o->src[0] >= 0 && !func_has_call
                              && ir_home_at(f, o->dst) != IR_PR_STACK
                              && !(IS_EZ80() && fp_active(f))

@@ -1825,6 +1825,175 @@ Node *ast_thread_jumps(Node *root)
     return root;
 }
 
+typedef struct sym_set {
+    SYMBOL **items;
+    int n, cap;
+} sym_set;
+
+static void sym_set_init(sym_set *s)  { s->items = NULL; s->n = 0; s->cap = 0; }
+static void sym_set_free(sym_set *s)  { free(s->items); s->items = NULL; s->n = 0; s->cap = 0; }
+
+static int sym_set_contains(sym_set *s, SYMBOL *sym)
+{
+    for (int i = 0; i < s->n; i++) if (s->items[i] == sym) return 1;
+    return 0;
+}
+
+static void sym_set_add(sym_set *s, SYMBOL *sym)
+{
+    if (!sym || sym_set_contains(s, sym)) return;
+    if (s->n == s->cap) {
+        s->cap = s->cap ? s->cap * 2 : 4;
+        s->items = realloc(s->items, sizeof(SYMBOL *) * s->cap);
+    }
+    s->items[s->n++] = sym;
+}
+
+static void sym_set_remove(sym_set *s, SYMBOL *sym)
+{
+    if (!sym) return;
+    int w = 0;
+    for (int i = 0; i < s->n; i++) {
+        if (s->items[i] == sym) continue;
+        if (w != i) s->items[w] = s->items[i];
+        w++;
+    }
+    s->n = w;
+}
+
+
+/* ----- What a write can reach (shared by CSE / synthesis / LICM) ------
+ *
+ * All three passes hold a belief about a value and clear it on a
+ * REDEFINITION of the named symbol. Two writes redefine nothing by name
+ * and so cleared nothing:
+ *
+ *   - a call, which can write any local whose address escaped to it, and
+ *   - an INDIRECT store, `*p = v`, which can write whatever p points at.
+ *
+ * adr/0082 is the same hole in `ir_opt_const_fold`. The facts here are
+ * function-wide and deliberately blunt: the address-taken set is collected
+ * once per function, and a region holding either kind of write refuses any
+ * candidate that reads a global or an escaped local. Precision would mean
+ * enumerating what each pointer can point at, and getting that list wrong
+ * is a silent wrong answer.
+ */
+
+/* Every local whose address is taken ANYWHERE in the function — an escape
+   that happened in an earlier statement still aliases this one. Filled at
+   ast_opt_run entry, freed at exit. */
+static sym_set aopt_escaped;
+
+static void aopt_collect_escaped(Node *n);
+
+static void aopt_escaped_visit(const AstSlot *slot, void *ctx)
+{
+    (void)ctx;
+    Node *n = ast_slot_get(slot);
+    if (n) aopt_collect_escaped(n);
+}
+
+static void aopt_collect_escaped(Node *n)
+{
+    if (!n) return;
+    if ((n->ast_type == OP_ADDR || n->ast_type == AST_ADDR)
+        && n->operand && n->operand->ast_type == AST_LOCAL_VAR
+        && n->operand->sym)
+        sym_set_add(&aopt_escaped, n->operand->sym);
+    ast_for_each_child(n, aopt_escaped_visit, NULL);
+}
+
+static int aopt_sym_aliased(SYMBOL *sym)
+{
+    return sym && sym_set_contains(&aopt_escaped, sym);
+}
+
+/* A bare `(gv=g)` / `(lv=a)` node is an ADDRESS, and no store can change an
+   address. What a store can change is what a DEREF of one reads. So a
+   candidate is at risk from an opaque write only if it dereferences
+   something other than a non-escaped local's own lvalue: a global's value,
+   an escaped local's value, or anything through a pointer. */
+static int aopt_reads_aliased_mem(Node *e);
+
+static void aopt_ram_visit(const AstSlot *slot, void *ctx)
+{
+    int *found = (int *)ctx;
+    if (*found) return;
+    Node *n = ast_slot_get(slot);
+    if (n && aopt_reads_aliased_mem(n)) *found = 1;
+}
+
+static int aopt_reads_aliased_mem(Node *e)
+{
+    if (!e) return 0;
+    if (e->ast_type == OP_DEREF || e->ast_type == AST_DEREF) {
+        Node *o = e->operand;
+        int own_local = o && o->ast_type == AST_LOCAL_VAR
+                          && !aopt_sym_aliased(o->sym);
+        if (!own_local) return 1;
+        return 0;                       /* an unaliased local's own value */
+    }
+    int found = 0;
+    ast_for_each_child(e, aopt_ram_visit, &found);
+    return found;
+}
+
+static int aopt_has_indirect_write(Node *n);
+
+static void aopt_indirect_visit(const AstSlot *slot, void *ctx)
+{
+    int *found = (int *)ctx;
+    if (*found) return;
+    Node *n = ast_slot_get(slot);
+    if (n && aopt_has_indirect_write(n)) *found = 1;
+}
+
+/* The destination of a write NAMES a symbol only in these spellings:
+
+     a = v       (= (lv=a) v)                  OP_ASSIGN's left is an ADDRESS
+     a += v      (+= (deref (lv=a)) v)         a compound's left is an LVALUE
+     a++         (++ (deref (lv=a)))
+
+   Anything else — `*p = v`, `q[i] = v`, `s->f = v` — writes through a
+   computed address and can land on a global or an escaped local. */
+static int aopt_write_is_indirect(Node *lhs, int addr_form)
+{
+    if (!lhs) return 0;
+    if (lhs->ast_type == AST_LOCAL_VAR || lhs->ast_type == AST_GLOBAL_VAR)
+        return 0;
+    if (!addr_form && lhs->ast_type == OP_DEREF && lhs->operand
+        && (lhs->operand->ast_type == AST_LOCAL_VAR
+            || lhs->operand->ast_type == AST_GLOBAL_VAR))
+        return 0;
+    return 1;
+}
+
+/* True if the subtree writes through a computed address anywhere. */
+static int aopt_has_indirect_write(Node *n)
+{
+    if (!n) return 0;
+    switch (n->ast_type) {
+    case OP_ASSIGN:
+        if (aopt_write_is_indirect(n->left, 1)) return 1;
+        break;
+    case OP_AADD: case OP_ASUB: case OP_AMULT:
+    case OP_ADIV: case OP_AMOD:
+    case OP_AAND: case OP_AOR:  case OP_AXOR:
+    case OP_ASSHR: case OP_ASSHL:
+        if (aopt_write_is_indirect(n->left, 0)) return 1;
+        break;
+    case OP_PRE_INC: case OP_POST_INC:
+    case OP_PRE_DEC: case OP_POST_DEC:
+        if (aopt_write_is_indirect(n->operand, 0)) return 1;
+        break;
+    default:
+        break;
+    }
+    int found = 0;
+    ast_for_each_child(n, aopt_indirect_visit, &found);
+    return found;
+}
+
 /* ----- Common subexpression elimination via value numbering ---------- */
 
 /*
@@ -1931,6 +2100,25 @@ static void cse_env_invalidate_sym(cse_env *e, SYMBOL *sym)
     for (int i = 0; i < e->n; i++) {
         if (subtree_mentions(e->entries[i].expr, sym)) continue;
         if (e->entries[i].sym == sym) continue;     /* drop self-binding too */
+        if (w != i) e->entries[w] = e->entries[i];
+        w++;
+    }
+    e->n = w;
+}
+
+/* Drop exactly what a store through a computed address can have changed:
+   an entry whose expression reads a global or an address-escaped local, and
+   an entry BOUND to such a symbol (its value lives in memory the store may
+   have reached). Everything else — an expression over locals whose address
+   is never taken — is provably unaliased and survives. */
+static void cse_env_invalidate_aliased(cse_env *e)
+{
+    int w = 0;
+    for (int i = 0; i < e->n; i++) {
+        SYMBOL *bound = e->entries[i].sym;
+        int drop = aopt_reads_aliased_mem(e->entries[i].expr)
+                || (bound && (bound->storage != STKLOC || aopt_sym_aliased(bound)));
+        if (drop) continue;
         if (w != i) e->entries[w] = e->entries[i];
         w++;
     }
@@ -2099,29 +2287,38 @@ static Node *cse_try_substitute(Node *node, cse_env *env)
    lvalue (for `OP_DEREF(LOCAL_VAR sym)`), or NULL if the lvalue is
    compound (array index, pointer deref) and we should treat it as
    "unknown — clear env"). */
-static Node *cse_walk_lvalue(Node *lhs, cse_env *env, SYMBOL **lhs_local, int *unknown)
+/* What the destination of a write NAMES depends on which operator owns it,
+   and the two spellings collide on OP_DEREF(LV x):
+
+     a = 5;      (= (lv=a) 5)                   OP_ASSIGN's left is an ADDRESS
+     *p = 5;     (= (deref (lv=p)) 5)           ...so one deref is INDIRECT
+     a += 5;     (+= (deref (lv=a)) 5)          a compound's left is an LVALUE
+     *p += 5;    (+= (deref (deref (lv=p))) 5)  ...so one deref is DIRECT
+
+   `addr_form` is 1 for OP_ASSIGN and 0 for the compound ops. Reading
+   OP_DEREF(LV p) under OP_ASSIGN as "a write of p" was wrong in both
+   directions: it invalidated p, which the store does not touch, and it left
+   every entry reading what p POINTS AT — a local whose address escaped there
+   — believed. Worse, the caller then RECORDED the stored expression against
+   p, so `*p = a + x; t = a + x;` handed t the POINTER. Same family as
+   adr/0082: a belief that only a redefinition clears. */
+static Node *cse_walk_lvalue(Node *lhs, cse_env *env, SYMBOL **lhs_local,
+                             int *unknown, int addr_form, int *indirect)
 {
     *lhs_local = NULL;
     *unknown = 0;
+    if (indirect) *indirect = 0;
     if (!lhs) return lhs;
-    /* Simple local lvalue: in sccz80 the assignment target appears
-       either as bare AST_LOCAL_VAR (`a = ...`) or as OP_DEREF(LV) for
-       compound forms. Either way the invalidation target is the
-       contained sym. */
-    if (lhs->ast_type == AST_LOCAL_VAR) {
+    /* A bare var is the destination itself under either spelling. */
+    if (lhs->ast_type == AST_LOCAL_VAR || lhs->ast_type == AST_GLOBAL_VAR) {
         *lhs_local = lhs->sym;
         return lhs;
     }
-    if (lhs->ast_type == OP_DEREF
-        && lhs->operand && lhs->operand->ast_type == AST_LOCAL_VAR) {
+    if (!addr_form
+        && lhs->ast_type == OP_DEREF
+        && lhs->operand && (lhs->operand->ast_type == AST_LOCAL_VAR
+                            || lhs->operand->ast_type == AST_GLOBAL_VAR)) {
         *lhs_local = lhs->operand->sym;
-        return lhs;
-    }
-    /* Globals: bare AST_GLOBAL_VAR is a simple global write — we don't
-       CSE-track globals on the LHS but invalidating the (matching) sym
-       still matters because env may carry (g+1, somelocal) entries. */
-    if (lhs->ast_type == AST_GLOBAL_VAR) {
-        *lhs_local = lhs->sym;
         return lhs;
     }
     /* A call as an lvalue base (e.g. `*foo()`-shaped targets the frontend
@@ -2147,14 +2344,15 @@ static Node *cse_walk_lvalue(Node *lhs, cse_env *env, SYMBOL **lhs_local, int *u
         return lhs;
     default: break;
     }
-    /* Compound lvalue — array index, deref of pointer. Walk for CSE
-       substitution within the sub-expression but flag the env for
-       conservative clear (we don't know what was modified). */
+    /* A store through a computed address — `*p = v`, `q[i] = v`, `s->f = v`.
+       Walk it for substitution, then tell the caller it reached memory: the
+       aliased half of the env goes, the unaliased half stays. */
     int dummy = 0;
     if (lhs->left)    lhs->left    = cse_walk(lhs->left, env, &dummy);
     if (lhs->right)   lhs->right   = cse_walk(lhs->right, env, &dummy);
     if (lhs->operand) lhs->operand = cse_walk(lhs->operand, env, &dummy);
-    *unknown = 1;
+    if (indirect) *indirect = 1;
+    else          *unknown  = 1;
     return lhs;
 }
 
@@ -2306,9 +2504,12 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
            comes last. */
         if (node->right) node->right = cse_walk(node->right, env, had_break);
         SYMBOL *lhs_sym = NULL;
-        int unknown = 0;
-        if (node->left) node->left = cse_walk_lvalue(node->left, env, &lhs_sym, &unknown);
-        if (unknown) {
+        int unknown = 0, indirect = 0;
+        if (node->left) node->left = cse_walk_lvalue(node->left, env, &lhs_sym,
+                                                     &unknown, 1, &indirect);
+        if (indirect) {
+            cse_env_invalidate_aliased(env);
+        } else if (unknown) {
             cse_env_clear(env);
         } else if (lhs_sym) {
             cse_env_invalidate_sym(env, lhs_sym);
@@ -2336,7 +2537,8 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
         if (node->right) node->right = cse_walk(node->right, env, had_break);
         SYMBOL *lhs_sym = NULL;
         int unknown = 0;
-        if (node->left) node->left = cse_walk_lvalue(node->left, env, &lhs_sym, &unknown);
+        if (node->left) node->left = cse_walk_lvalue(node->left, env, &lhs_sym,
+                                                     &unknown, 0, NULL);
         if (unknown)         cse_env_clear(env);
         else if (lhs_sym)    cse_env_invalidate_sym(env, lhs_sym);
         return node;
@@ -2591,28 +2793,6 @@ static void collect_sef_subtrees(Node *node, array *bag)
     }
 }
 
-static int cand_reads_global(Node *expr);
-
-static void cand_reads_global_visit(const AstSlot *slot, void *ctx)
-{
-    int *found = (int *)ctx;
-    if (*found) return;
-    Node *n = ast_slot_get(slot);
-    if (n && cand_reads_global(n)) *found = 1;
-}
-
-/* True if the SEF candidate reads any global. Used to gate
-   synthesis when the containing stmt also contains a call (calls
-   can modify globals; locals are assumed not to alias). */
-static int cand_reads_global(Node *expr)
-{
-    if (!expr) return 0;
-    if (expr->ast_type == AST_GLOBAL_VAR) return 1;
-    int found = 0;
-    ast_for_each_child(expr, cand_reads_global_visit, &found);
-    return found;
-}
-
 static int stmt_has_call_or_asm(Node *stmt);
 
 static void hca_visit(const AstSlot *slot, void *ctx)
@@ -2776,12 +2956,15 @@ static int pick_synth_target(array *bag, Node *stmt)
             size[cluster[k]] = subtree_size(array_get_byindex(bag, k));
         }
     }
-    int call_in_stmt = stmt_has_call_or_asm(stmt);
+    /* A call or an indirect store in the stmt can write a global or an
+       address-escaped local without naming either — see the aliasing
+       facts above and adr/0082. */
+    int opaque_write = stmt_has_call_or_asm(stmt) || aopt_has_indirect_write(stmt);
     for (int cid = 0; cid < next_id; cid++) {
         if (count[cid] < 2) continue;
         Node *cand = array_get_byindex(bag, first_idx[cid]);
         if (stmt_directly_mutates_cand_sym(stmt, cand)) continue;
-        if (call_in_stmt && cand_reads_global(cand)) continue;
+        if (opaque_write && aopt_reads_aliased_mem(cand)) continue;
         /* #261: only hoist if cycle-cost model says it pays. Reject
            candidates where the recompute_total <= hoist_total
            (compute-once + store + N loads from a synth-temp slot
@@ -2855,10 +3038,13 @@ static int pick_synth_target_segment(array *bag, array *stmts,
             size[cluster[k]] = subtree_size(array_get_byindex(bag, k));
         }
     }
-    /* Pre-compute segment-wide call/asm presence. */
+    /* Pre-compute segment-wide opaque-write presence: a call/asm, or an
+       indirect store. Either can write a global or an address-escaped
+       local without naming it (adr/0082). */
     int seg_has_call = 0;
     for (int k = seg_start; k < seg_end_excl; k++) {
-        if (stmt_has_call_or_asm(array_get_byindex(stmts, k))) {
+        Node *sk = array_get_byindex(stmts, k);
+        if (stmt_has_call_or_asm(sk) || aopt_has_indirect_write(sk)) {
             seg_has_call = 1;
             break;
         }
@@ -2878,9 +3064,10 @@ static int pick_synth_target_segment(array *bag, array *stmts,
             }
         }
         if (mutated) continue;
-        /* (2) calls/asm in segment may modify globals — only invalidate
-              if the cand reads a global (locals assumed not aliased). */
-        if (seg_has_call && cand_reads_global(cand)) continue;
+        /* (2) an opaque write in the segment may modify a global or an
+              address-escaped local — only those; a local whose address is
+              never taken cannot be aliased. */
+        if (seg_has_call && aopt_reads_aliased_mem(cand)) continue;
         /* #261: cycle-cost gate, same logic as pick_synth_target. */
         if (!cse_hoist_profitable(cand, count[cid])) continue;
         if (size[cid] > best_size) {
@@ -3059,42 +3246,6 @@ Node *ast_cse_synthesize(Node *root)
  * decls). Capped at 16 rounds.
  */
 
-typedef struct sym_set {
-    SYMBOL **items;
-    int n, cap;
-} sym_set;
-
-static void sym_set_init(sym_set *s)  { s->items = NULL; s->n = 0; s->cap = 0; }
-static void sym_set_free(sym_set *s)  { free(s->items); s->items = NULL; s->n = 0; s->cap = 0; }
-
-static int sym_set_contains(sym_set *s, SYMBOL *sym)
-{
-    for (int i = 0; i < s->n; i++) if (s->items[i] == sym) return 1;
-    return 0;
-}
-
-static void sym_set_add(sym_set *s, SYMBOL *sym)
-{
-    if (!sym || sym_set_contains(s, sym)) return;
-    if (s->n == s->cap) {
-        s->cap = s->cap ? s->cap * 2 : 4;
-        s->items = realloc(s->items, sizeof(SYMBOL *) * s->cap);
-    }
-    s->items[s->n++] = sym;
-}
-
-static void sym_set_remove(sym_set *s, SYMBOL *sym)
-{
-    if (!sym) return;
-    int w = 0;
-    for (int i = 0; i < s->n; i++) {
-        if (s->items[i] == sym) continue;
-        if (w != i) s->items[w] = s->items[i];
-        w++;
-    }
-    s->n = w;
-}
-
 /* True if `n` is safe to evaluate even when the loop body would not
    have executed. Excludes division, modulo, and pointer derefs that
    could fault. Plain LV/GV reads are fine. */
@@ -3167,6 +3318,10 @@ static void licm_compute_modified(Node *node, sym_set *modified, int *has_call)
     case OP_ADIV: case OP_AMOD:
     case OP_AAND: case OP_AOR:  case OP_AXOR:
     case OP_ASSHR: case OP_ASSHL:
+        /* A store through a computed address names no symbol to add to
+           `modified`, so it has to be as opaque as a call. */
+        if (aopt_write_is_indirect(node->left, node->ast_type == OP_ASSIGN))
+            *has_call = 1;
         if (node->left) {
             Node *l = node->left;
             SYMBOL *t = NULL;
@@ -3179,6 +3334,8 @@ static void licm_compute_modified(Node *node, sym_set *modified, int *has_call)
         break;
     case OP_PRE_INC: case OP_POST_INC:
     case OP_PRE_DEC: case OP_POST_DEC:
+        if (aopt_write_is_indirect(node->operand, 0))
+            *has_call = 1;
         if (node->operand) {
             Node *o = node->operand;
             SYMBOL *t = NULL;
@@ -3225,7 +3382,8 @@ static int subtree_reads_modified(Node *expr, sym_set *modified, int has_call)
 {
     if (!expr) return 0;
     if (expr->ast_type == AST_LOCAL_VAR)
-        return sym_set_contains(modified, expr->sym);
+        return sym_set_contains(modified, expr->sym)
+            || (has_call && aopt_sym_aliased(expr->sym));
     if (expr->ast_type == AST_GLOBAL_VAR)
         return has_call || sym_set_contains(modified, expr->sym);
     srm_ctx sc = { modified, has_call, 0 };
@@ -4475,6 +4633,10 @@ Node *ast_opt_run(Node *root)
        (only for unsigned). The normaliser is not gated — downstream
        code (and the walker itself) relies on node->type being set. */
     ast_normalize_types(root);
+    /* Function-wide address-taken set: CSE synthesis and LICM ask it whether
+       a candidate reads something a call or an indirect store can reach. */
+    sym_set_init(&aopt_escaped);
+    aopt_collect_escaped(root);
     if (!(c_opt_disable & OPT_DISABLE_FOLD)) root = ast_fold_constants(root);
     if (!(c_opt_disable & OPT_DISABLE_PROP)) root = ast_const_propagate(root);
     /* Re-fold: propagation may have created new fully-literal sub-trees
@@ -4531,6 +4693,7 @@ Node *ast_opt_run(Node *root)
     /* Loop reversal runs last so the original LABEL/JUMP loop shape is
        intact for threading, dead-code, demote etc. above. */
     if (!(c_opt_disable & OPT_DISABLE_LOOP_REVERSE)) root = ast_loop_reverse(root);
+    sym_set_free(&aopt_escaped);
     return root;
 }
 

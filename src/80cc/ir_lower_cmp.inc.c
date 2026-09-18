@@ -1189,6 +1189,62 @@ static void emit_byte_lsr_a(FILE *out, int r, int mask_redundant)
         emit(out, "and\t%d", 0xff >> r);
 }
 
+/* CPUs with CB shifts AND `rra`, where a word right-shift step is 3 bytes
+   (`srl h; rra`) instead of 4 (`srl h; rr l`). Those encodings are identical
+   across the family, so the SIZE argument is CPU-independent; timings are not.
+   Excluded because something better already wins: z80n has the Next barrel
+   shifter, Rabbit a native 1-byte 16-bit `rr hl`, and 808x/vm1 have no CB
+   shifts at all. */
+static int cb_shift_cpu(void)
+{
+    return (c_cpu == CPU_Z80) || (c_cpu == CPU_Z180)
+        || IS_EZ80() || IS_GBZ80() || IS_KC160();
+}
+
+/* Is this BB inside a loop? `BB.loop_depth` looks like the field for this but
+   is DEAD — ir.c zeroes it and nothing ever assigns it; the allocator builds
+   its own private bb_loop_depth[]. So derive it from back edges: bb is in a
+   loop when some header h <= bb has a predecessor p >= bb, i.e. a back edge
+   spans it. Cheap enough at one call per candidate shift. */
+static int bb_in_loop(const Func *f, const BB *bb)
+{
+    if (!f || !bb) return 0;
+    /* Read back edges off succ[], not pred[]: the predecessor arrays are not
+       populated at lowering time. A back edge from b to t with t <= bb->id
+       <= b spans bb, so bb is inside that loop. */
+    for (int b = bb->id; b < f->n_bbs; b++) {
+        const BB *sb = &f->bbs[b];
+        for (int k = 0; k < 2; k++) {
+            int t = sb->succ[k];
+            if (t >= 0 && t <= bb->id) return 1;
+        }
+    }
+    return 0;
+}
+
+/* Which CPUs the top-byte trade actually pays on. NOT cb_shift_cpu(): the
+   chain being cheaper in BYTES is CPU-independent, but this rung SPENDS bytes
+   to buy ticks, so it needs the tick side to hold — and on ez80 and kc160 it
+   does not. There `add hl,hl` is about a cycle while the CB ops carry prefix
+   cost, so five shifts beat three `srl h; rra` pairs and the trade inverts:
+   histbench +2.438 % (ez80) and +4.632 % (kc160), predbench +0.644 % and
+   +0.900 %, for the same +4 bytes. Measured, not reasoned — an aggregate over
+   the five CPUs would have hidden it behind z80 and z180. */
+static int tbac_cpu(void)
+{
+    return (c_cpu == CPU_Z80) || (c_cpu == CPU_Z180) || IS_GBZ80();
+}
+
+/* Default ON; `--opt-disable=shr-tbac` opts out. This is a deliberate
+   bytes-for-ticks trade at count 3 (+4 B to buy -19 T per execution), taken
+   because it is loop-gated: it only fires where the cost is paid back every
+   iteration. Measured over 15 likely benches it moves two — histbench
+   -2.968 % and predbench -0.692 % — for +4 bytes each. */
+static int tbac_on(void)
+{
+    return !opt_disabled("shr-tbac");
+}
+
 static int gen_shr(FILE *out, Func *f, const Op *op)
 {
     /* Arithmetic (signed) right shift — ir_build sets IR_SHR_ARITH on a `>>`
@@ -1213,6 +1269,38 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             load_byte_to_a(out, f, op->src[0]);
             emit(out, "add\ta,a");          /* CY = sign bit */
             emit(out, "sbc\ta,a");          /* 0x00 / 0xFF */
+            return finalize_byte_result(out, f, op, 0);
+        }
+        /* [shr-topbyte-achain] PROTOTYPE, opt-in `IR_SHR_TBAC=1`.
+           Counted from a common start (value in a frame slot, so the load's
+           `ld l,a` is live for the top-byte route but dies to [shr-dead-l]
+           in front of the chain):
+
+             n | top-byte B/T | A-chain B/T | delta
+             2 |     8 / 74   |    6 / 24   | -2 B, -50 T   both axes
+             3 |     7 / 63   |    9 / 36   | +2 B, -27 T   a TRADE
+             4 |     6 / 52   |   12 / 48   | +6 B,  -4 T   not worth it
+           5..7|    5..3      |  15..21     | worse on both
+
+           So n==2 is a free win and n==3 is a bytes-for-ticks trade worth
+           taking only under loop pressure. n>=4 is left alone: `add hl,hl`
+           gets CHEAPER as n grows while the chain gets dearer, so the two
+           curves cross and never come back.
+
+           The saving depends on the source arriving through A from a slot. A
+           source already in HL has no `ld l,a` to cancel, which costs the
+           chain 2 B and turns n==3 into +4 B for -19 T. */
+        if (tbac_on() && !arith && (op->imm & IR_SHR_TOPBYTE)
+            && tbac_cpu()
+            && (count == 2 || (count == 3 && bb_in_loop(f, cur_bb)))) {
+            load_to_hl(out, f, op->src[0]);
+            emit(out, "ld\ta,l");
+            for (int k = 0; k < count; k++) {
+                emit(out, "srl\th");
+                emit(out, "rra");
+            }
+            hl_about_to_change(-1);      /* HL is the shifted value, not src */
+            cache_a(-1);
             return finalize_byte_result(out, f, op, 0);
         }
         /* [IR_SHRMASK top-byte] The field straddles the byte boundary, so no
@@ -1342,9 +1430,8 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             && !L.la.cur_dst_dead
             && !vreg_in_pr_bc(f, op->dst)
             && vreg_is_spilled(f, op->dst)) {
-            int off = slot_off(f, op->dst) + L.cur_sp_adjust;
-            emit(out, "ld\thl,%d", off + 3);
-            emit(out, "add\thl,sp");        /* HL = &slot[3] (MSB) */
+            /* HL = &slot[3] (MSB). [lea-frame-addr] takes the ez80 fp form. */
+            emit_frame_addr_hl(out, f, slot_off(f, op->dst) + 3);
             emit(out, "srl\t(hl)");          /* byte3: high=0, low→C */
             emit(out, "dec\thl");
             emit(out, "rr\t(hl)");           /* byte2: C→high, low→C */
@@ -1599,13 +1686,43 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                     emit(out, "srl\tl");
             }
         } else {
-            for (int k = 0; k < count; k++) {
-                if (IS_RABBIT()) {
-                    emit(out, "or\ta");      /* clear carry → logical >>1 */
-                    emit(out, "rr\thl");
-                } else {
+            /* A-through-CB word shift: `ld a,l; srl h; rra` carries the
+               low byte through A.  Keep the final `ld l,a` because this
+               width-2 path still promises HL to its result consumer.  It is
+               a net size win from count 2 onward; count 1 remains on the
+               existing route.
+
+               The step goes 4 bytes (`srl h; rr l`) to 3 (`srl h; rra`), and
+               those encodings are the same on every CB-shift target, so the
+               SIZE win does not depend on the CPU. Ticks do — the CB and `rra`
+               timings differ per core — so this is justified on bytes and the
+               tick effect is reported per CPU, not aggregated.
+
+               Excluded, each because something better already wins: z80n has
+               the Next barrel shifter (`bsrl de,b`), Rabbit has a native
+               one-byte 16-bit `rr hl`, and the 808x/vm1 cores have no CB
+               shifts at all and take a helper. gbz80 is in: its `rra` clears Z
+               where the Z80's does not, which is harmless here because the
+               chain's flags are dead at the closing `ld l,a`. */
+            int use_a_chain = cb_shift_cpu() && count >= 2 && count < 8
+                              && !opt_disabled("shr-a-chain");
+            if (use_a_chain) {
+                emit(out, "ld\ta,l");
+                for (int k = 0; k < count; k++) {
                     emit(out, "srl\th");
-                    emit(out, "rr\tl");
+                    emit(out, "rra");
+                }
+                emit(out, "ld\tl,a");
+                invalidate_a_cache();
+            } else {
+                for (int k = 0; k < count; k++) {
+                    if (IS_RABBIT()) {
+                        emit(out, "or\ta");      /* clear carry → logical >>1 */
+                        emit(out, "rr\thl");
+                    } else {
+                        emit(out, "srl\th");
+                        emit(out, "rr\tl");
+                    }
                 }
             }
         }

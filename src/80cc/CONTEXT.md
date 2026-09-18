@@ -157,9 +157,10 @@ compile time, but it is never deleted.
 
 **Refutation**:
 A lever that was measured and rejected, recorded durably so it is not re-attempted. It is
-neither an architecture decision nor a bench figure: it is written as a `Rejected` ADR
-stating what was tried, why it fails, and what would have to change to reopen it. The
-numbers stay in `BENCH_MATRIX.txt`.
+written as a `Rejected` ADR stating what was tried, why it fails, and what would have to
+change to reopen it — **and it keeps the number that refused it**, inline, unlike an
+accepted decision whose figures live in `BENCH_MATRIX.txt`. The regression is the
+decision here, so moving it out is how a refuted lever gets tried again.
 _Avoid_: dead end, failed experiment (neither says where it is written down).
 
 **Index row**:

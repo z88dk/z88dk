@@ -1047,6 +1047,36 @@
 	ld	de,%2
 	inc	hl
 
+;; #SP2L: the ez80 fp analogue of #SP2, for the `lea hl,ix+d` spelling the
+;; lowerer now uses for a frame address ([lea-frame-addr]). Same defect, same
+;; shape, different addressing form — the per-addressing-form gap the #G1/#S1/#S2
+;; family keeps having (adr/0075, adr/0081).
+;;
+;; After `lea hl,ix+d; ld (hl),e; inc hl; ld (hl),d` HL = ix+d+1 and DE still
+;; holds the value, so the NEXT store's address is one `inc hl` away when its
+;; slot is d+2 — which %eval asserts.
+;;
+;; Dropping the intervening `ex de,hl` is sound and is the other half of the
+;; win: the ex would leave HL = value and DE = ix+d+1, and the two lines that
+;; follow overwrite BOTH (`ld de,%2` kills DE, the address reuse kills HL)
+;; without reading either.
+%title #SP2L chained ix-rel word store: reuse HL via inc, not a second lea (-4b)
+%eval 0 = %3 %1 2 + -
+	lea	hl,ix%1
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ex	de,hl
+	ld	de,%2
+	lea	hl,ix%3
+=
+	lea	hl,ix%1
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ld	de,%2
+	inc	hl
+
 ;; #GB1: `ld bc,hl` immediately after `ld hl,bc` is a no-op — the first sets
 ;; HL=BC, so ld bc,hl writes BC=HL=BC (unchanged). From the DEHL/long-value
 ;; staging. Consecutive-only: a label before ld bc,hl breaks the 2-line match.

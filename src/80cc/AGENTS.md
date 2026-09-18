@@ -121,8 +121,25 @@ Run `src/80cc/scripts/check_ownership.sh` — it fails on a direct write or an i
 read outside `ir_alloc.c`. A render that cannot realise a home REPORTS it
 (`ir_alloc_demote_home`, `ir_alloc_word_home_reject`); it never edits the plan.
 
+- **`BB.loop_depth` is a dead field.** `ir.c` zeroes it and nothing assigns it,
+  so any loop-pressure test written against it silently answers "not in a loop"
+  and the feature never fires — with no warning, no crash, and a clean build.
+  The allocator keeps its own `bb_loop_depth[]`; the lowerer uses `bb_in_loop`,
+  which reads back edges off `succ[]`. Note `pred[]` is also unpopulated by
+  lowering time, so a back-edge test must go through `succ[]`.
+
 ## Gate mechanisms
 
+- **Every rung that changes emitted code ships an opt-out, in the same commit.**
+  A new lowering, peephole or cost change is not complete until it has a name in
+  the registry, a row in `OPTIONS.md`, and a regression target under
+  `test/suites/long_ir`. This is not paperwork: the opt-out IS the A/B mechanism
+  the corpus scans use (`IR_OFF=<name>` as the baseline), so a rung without one
+  cannot be measured by the standard scan, cannot be bisected when a later
+  regression appears, and cannot be turned off by a user it hurts. Comparing two
+  built compiler binaries is not a substitute — it does not survive the commit.
+  `scripts/check_options.sh` only catches a name that is missing or stale, so it
+  cannot see a rung that never had a gate; that check is on the author.
 - Opt-out (default-on, escape hatch): one registry, two front doors —
   `--opt-disable=<name>` for a user and `IR_OFF=<name>` for a measurement (the
   corpus scans can only pass env vars). Both take a comma list and accept `all`.

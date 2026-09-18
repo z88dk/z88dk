@@ -57,6 +57,7 @@ PhysReg ir_home_assigned(const Func *f, int v);
 
 /* Is v's home window narrower than the whole function? */
 int  ir_home_is_ranged(const Func *f, int v);
+int  ir_home_covers_live_range(const Func *f, int v);
 /* Clamp [*lo,*hi] to the part of it v's home window covers. */
 void ir_home_window(const Func *f, int v, int *lo, int *hi);
 /* The raw window bounds, for a diagnostic that prints them. -1 when absent. */

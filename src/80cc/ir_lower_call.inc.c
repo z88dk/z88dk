@@ -358,6 +358,10 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         /* [&__i64_acc?][retlabel][fnptr] already pushed above (before the
            args); just `ret` into the fnptr — its own `ret` returns to our
            label. */
+        /* [de-ret] This `ret` is a JUMP to the callee, whose argument is in
+           HL/DEHL/A right now — it is not a function return, so the function
+           containing it keeps the conservative "a ret reads DE". */
+        xf_ret_dispatch = 1;
         emit(out, "ret");
         fprintf(out, "L_f%d_fcret_%d:\n", L.func_emit_idx, fcret_lbl);
     } else if (is_indirect) {
@@ -411,9 +415,29 @@ static int gen_call(FILE *out, Func *f, const Op *op)
              ir_sym_prefix(ci->target),
              ci->target_name ? ci->target_name : ir_sym_name(ci->target));
     } else {
-        emit(out, "call\t%s%s",
-             ir_sym_prefix(ci->target),
-             ci->target_name ? ci->target_name : ir_sym_name(ci->target));
+        const char *pfx = ir_sym_prefix(ci->target);
+        const char *nm  = ci->target_name ? ci->target_name
+                                          : ir_sym_name(ci->target);
+        /* [de-call] Record whether THIS call left an argument in DE, so the
+           rendered-text DE-liveness sweep can stop treating every call as a
+           reader. sc1 passes its 2nd argument (or a 4-byte sole one) in DE; a
+           fastcall argument of exactly 4 bytes rides DE:HL. Everything else —
+           the stacked ABIs, a 1/2-byte fastcall argument in HL, a >4-byte one
+           in the memory accumulator — leaves DE dead into the call. */
+        int de_arg = sc1;
+        if (is_fastcall && ci->n_args > 0
+            && f->vregs[ci->args[ci->n_args - 1]].width == 4)
+            de_arg = 1;
+        /* __preserves_regs(d,e) is the other way a call can make DE matter:
+           the pair survives it, so a value in DE may be read AFTER the call
+           and the sweep must not call it dead BEFORE one. */
+        if (ci->preserved & IR_R_DE) de_arg = 1;
+        {
+            char sym[64];
+            snprintf(sym, sizeof sym, "%s%s", pfx ? pfx : "", nm ? nm : "");
+            decall_note(sym, !de_arg);
+        }
+        emit(out, "call\t%s%s", pfx, nm);
     }
 
     /* Caller-cleanup for SMALLC and STDC (CALLEE cleans its own).

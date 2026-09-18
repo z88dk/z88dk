@@ -63,17 +63,21 @@ independent experiments. Maintainer's sequence, 2026-09-14:
 
 | Stage | Carried by | State |
 | --- | --- | --- |
-| 1. Make the intervals **truthful** — a home spans what the value is live for, not the whole function | `IR_TIGHT_HOMES`, ADR 0027 | in flight; the byte-identity premise is refuted and must be explained first |
-| 2. **Range** — a value is resident over the sub-range it is actually used in, and a register is time-shared between disjoint values | ADR 0017 (this) | blocked on stage 1 |
-| 3. **Park in the slot when the range is interrupted** — a clobber or call ends the resident window; the value returns to its slot and resumes after | `IR_RANGED`, ADR 0029 | in flight, as the fail-safe form |
+| 1. Make the intervals **truthful** — a home spans what the value is live for, not the whole function | `tight-homes`, ADR 0027 | **SHIPPED default-on 2026-09-15**: 20 cells smaller, 0 larger, 20 tick cells faster, 0 slower |
+| 2. **Range** — a value is resident over the sub-range it is actually used in, and a register is time-shared between disjoint values | ADR 0017 (this) | **unblocked and sized** — see below |
+| 3. **Park in the slot when the range is interrupted** — a clobber or call ends the resident window; the value returns to its slot and resumes after | ADR 0029 | **BOTH FORMS REFUSED**: the expensive form pays at 7 of 145 sites; the fail-safe form MISCOMPILED and is deleted |
 | cross-cutting. Per-CPU costs must be **right**, because a ranging decision is a cost decision | `IR_GBZ80_COST`, ADR 0032 | in flight; correct row, blocked on a ranking tie |
 
-Stage 1 is a prerequisite, not a nicety: while every interval is the whole
+Stage 1 was a prerequisite, not a nicety: while every interval is the whole
 function the table carries no information, nothing can be time-shared, and the
-interval verifier has nothing to check. Its refuted byte-identity claim is
-therefore the first thing to resolve — it is either an access outside the IR
-live range (which stage 2 would turn into a miscompile) or an allocation change,
-and the two need different answers.
+interval verifier has nothing to check. Its byte-identity claim WAS refuted, and
+resolving that (ADR 0027) turned out to be the whole job — two predicates that
+could not tell a home *narrowed* to the live range from one *narrower than* it.
+One of them silently WIDENED a call-split window, which is precisely the "access
+outside the live range that stage 2 turns into a miscompile" this paragraph
+warned about. Expect more of that class as stage 2 lands: every predicate
+currently meaning "not whole-function" wants re-reading before a register is
+genuinely time-shared.
 
 Stage 3 is what makes stage 2 safe. A ranged home is not a promise to hold a
 value forever; it is a promise over a window, and the slot remains the value's
@@ -83,10 +87,140 @@ of that — the value stays slot-homed and the register holds it opportunistical
 ADR 0029 keeps a DE *cache* open.
 
 The cross-cutting item matters because all three stages spend the same cost
-model. See the recurring finding in `DESIGN_INDEX.md`: three separate
-corrections to that model each made the output worse, because nothing prices the
-claim a decision displaces. That term is a prerequisite for stage 2 paying off,
-not a later refinement.
+model — but the "price the displaced claim" prerequisite this ADR used to assert
+has been **withdrawn**. Three corrections to that model each made the output
+worse (ADR 0036, 0037, 0038), and ADR 0037 explains why: the `bc-evict` benefit
+they were refining **does not exist** — across six benches the pass changes
+total register homes by +0, +1, +0, +2, +0, +0. It swaps homes rather than
+adding them. So stage 2 is not gated on a better price. Do not schedule one.
+
+### Stage 2, sized (2026-09-15)
+
+`IR_RANGEPROBE` counts, per spilled value, whether some parking register's every
+current tenant has a live range disjoint from it — then filters by real
+admissibility (width <= 2, not address-taken, and **nothing in the value's live
+range clobbers that register**, since a range crossing a call is stage 3's
+problem, not stage 2's).
+
+Corpus, both frame modes: **461 of 3608 spilled values (12.8 %) across 108
+functions**. Unlike the pair allocator, which `IR_PAIRPROBE` correctly refused on
+zero opportunity, stage 2 has something to collect.
+
+But the shape is not what "time-sharing does not exist yet" would suggest,
+**because some of it already does**. `bitfieldbench/reg_step` already holds v2 in
+BC over [1,3] and v5 in BC over [4,7] — the BC packer's greedy packs disjoint
+born-killed temps today. Counting function-registers that already hold more than
+one value:
+
+| register | already time-shared | remaining admissible candidates |
+|---|---|---|
+| BC | 33 of 107 | **323** |
+| DE | 31 of 78 | 16 |
+| IY | 5 of 26 | **121** |
+| IX | 0 of 23 | 1 |
+
+So stage 2 looked like two pieces, and 444 of the 461 were in them:
+
+* **Deepen BC packing (323).**
+* **Open IY time-sharing (121).** Barely shared today (5 of 26).
+
+### The BC half is REFUTED, and it re-aims the arc (2026-09-15)
+
+Two levers were built and measured against the BC packer. Both are inert, and
+between them they rule out "pack better" as the route to those 323.
+
+**Packing order — refuted.** The packer sorts candidates by `flo` (earliest
+START) and walks them against a single `last_fhi` watermark. That is the
+textbook-suboptimal interval greedy: one long early interval swallows the
+watermark and shuts out the short ones behind it, where earliest-END is optimal
+for the count. Switching the sort to `fhi` ascending (watermark stays sound —
+candidates arrive with non-decreasing `fhi`, so clearing the last packed clears
+them all) measured: **same 114 values packed, 0 of 720 size cells changed, 0 of
+420 tick cells changed.** It packs *different* values, not more. Reverted.
+
+**The tenant blocking window — refuted.** The clash test blocks a candidate over
+the tenant's `first_use..last_use`, not over the truthful home window stage 1
+now provides, which looked like reclaimable conservatism. It is not: only **6 of
+214** BC tenants have a home window narrower than their live range.
+
+**So the rejections are genuine interference.** Instrumented at the two exits
+(with a verified binary — the first attempt measured a stale one and reported a
+plausible 0/0):
+
+```
+BC packer: 114 packed of 246 candidates
+  rejected by a packed SIBLING:       49
+  rejected by an existing BC TENANT:  83
+```
+
+A candidate blocked by a live tenant cannot be packed by any ordering, because
+the register genuinely holds another value there. Freeing it requires the tenant
+to **give up BC over a sub-range and resume after** — which is stage 3, not
+stage 2.
+
+**Consequence for the staging.** This ADR says "stage 3 is what makes stage 2
+safe". That is true but understates it: for the BC half, **stage 3 is what makes
+the opportunity reachable at all**.
+
+And stage 3's *expensive* form — park the tenant to its slot over the window and
+resume after — was then measured and **refused** (ADR 0029): of the 145 blocked
+candidates, 74 have a completely idle tenant (the best possible shape), yet only
+**7 of 145 pay** once the park is priced in the same cycle unit as the gain. A
+park is a slot store plus a slot reload, loop-weighted, and that exceeds what a
+born-killed temp gains from BC.
+
+So the BC half of stage 2 is closed from both directions: no packing order
+reaches it, and paying to park the incumbent does not either.
+
+### The IY half is closed too, and it exposes what the sizing missed
+
+`ir_iy_temp_pack` **bails entirely** when IY already has an owner — "one IY
+owner per function" — where `ir_bc_pack` instead tests each candidate against
+existing tenants. That looked like the IY time-sharing lever: stop bailing, test
+per candidate.
+
+Measured, the bail costs **nothing**. Across the corpus in both frame modes only
+**10 functions** bail with an IY owner *and* have spilled candidates — 24
+candidates in total — and **0 of the 24** have a live range disjoint from the
+owner. Every one genuinely overlaps.
+
+**Which means the 121 were never reachable this way.** `IR_RANGEPROBE` counts
+any spilled value whose live range is disjoint from a register's tenants. The
+packer's candidate set is far narrower: born-killed temps, in-loop, cost-gated
+(`collect_bc_temp_cands`). The 121 are values the IY packer **never considers**
+— not values it declines to share.
+
+### What the arc actually learned
+
+Stage 2 is closed on both registers, and the same sentence covers both: **the
+constraint is candidate ADMISSION, not time-sharing.** Sharing already works
+where the packers look (BC: 33 of 107 function-registers hold more than one
+value; DE: 31 of 78), and where they do not look, sharing is not the thing
+standing in the way.
+
+`IR_RANGEPROBE`'s 461 is therefore an upper bound over the wrong population. Any
+future sizing here must count candidates the allocator would actually *consider*,
+not values that merely fail to interfere. That is the lesson to carry, and it is
+the same one `IR_PAIRPROBE` taught: size the reachable set, not the ideal one.
+
+Stage 3's fail-safe form (ADR 0029) was then measured too, and **rejected on
+correctness**: it miscompiled 17 corpus cells, and its "byte-safe by
+construction" claim was false — it never proved DE clean from def to use. It is
+deleted (−114 lines).
+
+**So the whole arc is now closed.** Stage 1 shipped; stages 2 and 3 are both
+refused, on evidence rather than abandonment. The durable results are the two
+lessons above — *admission, not time-sharing* is the constraint, and a park
+costs more than a born-killed temp gains — plus the deletion of a gate that had
+been sitting in the tree documented as safe while miscompiling.
+
+If stage 3 is ever revisited, ADR 0029 records the one condition that would make
+the fail-safe form sound: the DE-clean proof belongs in the lowerer, which now
+has real per-register D/E liveness (ADR 0047) that did not exist when it was
+written.
+
+DE is effectively exhausted (31 of 78 shared, 16 left) and IX is a non-starter —
+it is the frame pointer in fp mode. Neither is worth work.
 
 ### Invariants (the alloc↔lower contract)
 

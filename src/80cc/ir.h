@@ -612,7 +612,12 @@ typedef struct {
        ir_compute_op_liveness runs. op-k's live_out is derivable:
        live_in_per_op[k+1], or bb->live_out for the last op. */
     void **live_in_per_op;
-    int    loop_depth;      /* 0 = not in any loop */
+    /* DEAD FIELD — ir.c zeroes it and NOTHING ever assigns it, so a reader
+       silently gets 0 and every "am I in a loop?" test answers no. The
+       allocator builds its own private bb_loop_depth[]; the lowerer derives
+       loop membership from succ[] back edges (bb_in_loop). Do not read this
+       until something populates it. */
+    int    loop_depth;      /* 0 = not in any loop -- SEE ABOVE, never set */
     int    loop_header;     /* 1 if this BB heads a loop */
 } BB;
 
@@ -697,15 +702,6 @@ typedef struct {
        no DE-clean region forms. See LOOP_REGALLOC_PLAN.md. */
     int        de_home_is_ptr;
 
-    /* Operand-residency fold hint (opt-in IR_RANGED, DENSITY_HANDOVER §4):
-       a per-vreg flag on a reused deref/binop RESULT that stayed IR_PR_SPILL.
-       Its def path leaves a DE CACHE copy (`ld d,h; ld e,l` + cache_de) so a
-       later in-range read prefers DE (sbc hl,de / e-d byte-wise, DE-clean)
-       instead of re-materialising in HL and spilling. The value stays SPILL
-       (slot always coherent) → a DE clobber falls back to the slot; the hint
-       is byte-safe by construction (worst case = a wasted `ld d,h; ld e,l`).
-       NULL if not built. */
-    unsigned char *de_fold_hint;   /* by vreg id */
 
     /* Home residency region (ADR 0017 step 3b): the validated BB-id span
        [home_region_lo, home_region_hi] over which the DE/byte home stays

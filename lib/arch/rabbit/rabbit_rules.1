@@ -163,6 +163,37 @@
 =
 	and	hl,de
 
+;; A word stored to a frame slot and read straight back: HL already holds the
+;; value, so the reload is dead (-3b, -9t). The Rabbit analogue of #R2/#G1/#S1 in
+;; 80cc_rules.1 — those match the multi-instruction sp-relative address forms
+;; (`ld hl,N; add hl,sp` / gbz80's `ld hl,sp+N`) and cannot see Rabbit's
+;; one-instruction `ld (sp+N),hl`. sp mode only; fp mode uses (ix+d) and is
+;; already covered by #R4. A volatile store/load carries a ;volatile stamp and
+;; so does not match this literal text.
+%notcompiler sccz80
+	ld	(sp+%1),hl
+	ld	hl,(sp+%1)
+=
+	ld	(sp+%1),hl
+
+;; Replace TOS with HL. Sound ONLY when the popped BC is DEAD — the rule reads
+;; `pop bc` as sccz80's discard-TOS idiom, which is a property of THAT producer,
+;; not of the input. 80cc does not honour it: it emits `push bc` / `pop bc`
+;; brackets around BC-clobbering ops where the pop is a REAL RESTORE, and there
+;; are 288 of them on Rabbit in the bench corpus alone.
+;;
+;; Today none of those 288 lands immediately before a `push hl`, and the single
+;; corpus site that does match (callbench `apply`) has BC overwritten two
+;; instructions later, so it is safe. That is an ENUMERATION OF WHAT WE COMPILE
+;; TODAY, not a guarantee — and the one counter-example we did produce (an
+;; inlined Rabbit `mul`, adr/0075) miscompiled silently: enigma printed nothing
+;; instead of RXSEC, with the compiler's own asm correct at every stage and only
+;; the post-copt output wrong.
+;;
+;; So this stays gated off 80cc. It costs 88000 ticks on callbench r2ka (+0.32%
+;; sp, +0.29% fp, 0 bytes) at that one provably-safe site — against a silent
+;; miscompile class that has already fired once. Wrong trade to take.
+%notcompiler 80cc
 	pop	bc
 	push	hl
 =
