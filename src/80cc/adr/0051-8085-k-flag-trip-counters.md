@@ -1,6 +1,6 @@
 # ADR 0051 — 8085 K-flag trip counters
 
-Status: **Proposed** (2026-09-15). Surveyed and sized, not built.
+Status: **Accepted** (2026-09-18). Opt out with `k-trip`.
 
 Same family as ADR 0039 (LDSI slot addresses): a CPU capability the backend
 declares and never uses.
@@ -25,8 +25,13 @@ UART and SPI drivers.
 
 ## The opportunity
 
-**236** `ld a,<hi>; or <lo>` 16-bit zero-tests in the corpus 8085 output. The
-recurring shape has a `dec rr` three lines above the test, separated only by
+The originating corpus report counted **236 raw instruction lines** for
+`ld a,<hi>; or <lo>` 16-bit zero-tests. Normalised to logical tests (the two
+instructions in each test, emitted in both 8085 frame modes), that is **59
+tests**. The 8085 frame modes are identical, so frame duplication does not
+create new candidates.
+
+The recurring shape has a `dec rr` three lines above the test, separated only by
 LDSI and SHLX — and **neither writes flags** (`i8085_ld_de_spn` and
 `i8085_ld_ide_hl` in `src/ticks/i8085_inst.c` only touch registers and `st`), so
 K survives from the decrement to the test.
@@ -53,9 +58,30 @@ Apply only to a **pure trip counter**: decremented in the loop, never read for
 its value, dead after the loop. Shifting the init is then invisible, and no
 other use needs a compensating `+1`. Anything else is out of scope.
 
-Unknown, and the first thing to measure: **what fraction of the 236 sites are
-pure trip counters.** Size that before building — the 236 is an upper bound on
-sites, not on takeable ones.
+## Measurement result
+
+The 30-benchmark corpus was rebuilt at the originating revision and scanned in
+8085 output. The classification was deliberately conservative:
+
+| class | logical tests | raw line/frame units |
+| --- | ---: | ---: |
+| pure trip counter | **33** | **132** |
+| decrement-linked, but value/pointer/index is used | 8 | 32 |
+| no qualifying decrement nearby | 18 | 72 |
+| total | **59** | **236** |
+
+The takeable fraction is therefore **33/59 = 55.9%** of logical tests (or
+132/236 of the historical raw count). Pure counters include repetition loops
+and finite loops whose induction variable is only a bound. Rejected examples
+include array/list walkers, the N-queens row scan, the hash-table clear index,
+and the VM's value-bearing countdown. No 8080, VM1, or non-counter loop was
+included.
+
+This answers the sizing question, but does not justify building the transform:
+33 sites are enough to prototype, and every rewrite still needs a proof that
+the initial value can shift without changing an observable value. The proposed
+next step is a small IR loop prototype with negative tests for the eight
+rejected decrement-linked shapes.
 
 ## Effort
 
@@ -64,3 +90,39 @@ post-pass already computed. This needs a loop-shape analysis and an IV edit, so
 it wants the full gauntlet plus a `long_ir` case whose valuable half is the
 counters that must **not** be rewritten — one read inside the body, one live
 after the loop, one incrementing rather than decrementing.
+
+## Shipped
+
+The shape analysis this ADR called for turned out to already exist:
+`AST_LOOP_COUNTDOWN` is only created by the loop-reversal pass (`ast_opt.c`),
+and its own preconditions — `iv` not mentioned anywhere in `BODY`, no `break`
+— already guarantee the private counter it builds is a **pure trip counter**
+(decremented, never read, dead after the loop) by construction. Every negative
+shape from the "Proposed scoping" section above (a value read, a pointer/index
+use, an incrementing loop) simply never reaches `AST_LOOP_COUNTDOWN` in the
+first place, so no separate `k-trip` shape analysis was needed beyond the
+literal-positive-trip-count check.
+
+`ir_build.c`'s `AST_LOOP_COUNTDOWN` handler seeds the counter at **N-1**
+instead of N when the trip count is a compile-time positive literal
+(`CPU_HAS_JP_K() && !opt_disabled("k-trip")`), and tags the latch's
+`IR_BR_COND` with `IR_BRCOND_KTRIP`. `gen_br_cond` (`ir_lower_ops.inc.c`)
+emits `jp nk,L` instead of rebuilding the `ld a,h; or l; jp nz,L` zero test
+when it sees that tag. The initial skip-if-zero check ahead of the loop stays
+`IR_BRZ_PHANTOM` (elided entirely) regardless of the shift, since a positive
+literal trip count already proves the loop runs at least once.
+
+K reaching -1 exactly after N bodies (not after 0) is confirmed against the
+project's own 8085 model, not just the datasheet: `DECW`/`INCW` in
+`src/ticks/ticks.c` set `fk = (a&b)==0xff` after a 16-bit decrement — K fires
+only on the pair reaching -1 — which is the authority `z88dk-ticks` gates
+against.
+
+**Result**: 8085-only compile-only corpus scan (`corpus_sizescan.sh`,
+`CPUS=8085`, 30 benches x 2 frame modes = 60 cells, baseline vs this change,
+same installed binary otherwise) — **-156 B over 52/60 cells, 0 larger, 0
+build failures** (sp and fp identical throughout, as expected: the 8085 has no
+IX, so frame mode does not affect this site). `long_ir` 846/846 in both frame
+modes (up from 842 — the four new `test_8085_k_trip` targets), the one
+pre-existing `longshl_vm1` gap unchanged. `check_options.sh` 132 names OK
+(`k-trip` added); `check_gates.sh` 43 listed live OK.

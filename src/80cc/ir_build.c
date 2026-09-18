@@ -7351,11 +7351,21 @@ static int build_stmt(Builder *b, Node *n)
            a 16-bit counter vreg regardless. */
         if (!n->loop_init || !n->loop_body)
             return build_fail("AST_LOOP_COUNTDOWN missing init/body");
-        int init_v = build_expr(b, n->loop_init);
-        if (init_v < 0) return -1;
-
         int counter = new_temp(b, 2);
-        ir_emit_mov(cur_bb(b), counter, init_v);
+        /* 8085 DEC rr sets K only for -1, not zero. A reversed loop has a
+           fresh positive literal trip counter, so seed it at N-1 and make its
+           latch branch on NK. The shift is not observable by the source IV. */
+        int ktrip = CPU_HAS_JP_K() && !opt_disabled("k-trip")
+                 && n->loop_init->ast_type == AST_LITERAL
+                 && n->loop_init->zval > 0;
+        if (ktrip) {
+            ir_emit_ld_imm(cur_bb(b), counter,
+                           (int64_t)n->loop_init->zval - 1);
+        } else {
+            int init_v = build_expr(b, n->loop_init);
+            if (init_v < 0) return -1;
+            ir_emit_mov(cur_bb(b), counter, init_v);
+        }
 
         int header_bb = ir_bb_new(b->f);
         int exit_bb   = get_or_create_label_bb(b, n->loop_exit_label);
@@ -7372,8 +7382,8 @@ static int build_stmt(Builder *b, Node *n)
            with zero allocation change. */
         {
             Op *g = ir_emit_br_zero(cur_bb(b), counter, exit_bb);
-            if (g && n->loop_init->ast_type == AST_LITERAL
-                && n->loop_init->zval != 0)
+            if (g && (ktrip || (n->loop_init->ast_type == AST_LITERAL
+                                && n->loop_init->zval != 0)))
                 g->imm = IR_BRZ_PHANTOM;
         }
         ir_emit_br(cur_bb(b), header_bb);
@@ -7384,7 +7394,10 @@ static int build_stmt(Builder *b, Node *n)
 
         b->cur_bb_id = step_bb;
         ir_emit_unop(cur_bb(b), IR_DEC, counter, counter);
-        ir_emit_br_cond(cur_bb(b), counter, header_bb);
+        {
+            Op *latch = ir_emit_br_cond(cur_bb(b), counter, header_bb);
+            if (latch && ktrip) latch->imm = IR_BRCOND_KTRIP;
+        }
         ir_emit_br(cur_bb(b), exit_bb);
 
         b->cur_bb_id = exit_bb;

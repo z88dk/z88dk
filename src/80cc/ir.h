@@ -592,6 +592,12 @@ typedef struct {
    dropping the dead `ld a,h; or l; jp z`. Set in AST_LOOP_COUNTDOWN. */
 #define IR_BRZ_PHANTOM 1
 
+/* A BR_COND at the latch of an AST_LOOP_COUNTDOWN with a positive literal
+   trip count. On the 8085 the builder initialises that private counter to
+   N-1, so DEC reaches -1 precisely after N bodies; gen_br_cond may therefore
+   branch on the K flag instead of rebuilding a word zero test. */
+#define IR_BRCOND_KTRIP 2
+
 /* ----- Basic block ------------------------------------------------------ */
 
 typedef struct {

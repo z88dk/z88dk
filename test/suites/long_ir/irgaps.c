@@ -521,6 +521,27 @@ static void test_dowhile_byte_counter(void)
     Assert(dowhile_byte_cmp(dwb_a, dwb_b) == 4, "do-while byte counter: mismatch at 4");
 }
 
+/* A private, positive 16-bit literal trip counter. On 8085 it starts at N-1
+   and the latch uses `dec rr; jp nk`: N=1 proves initial zero executes once,
+   while 300 forces the word-counter route. */
+static int ktrip_once(void)
+{
+    int i, sum = 0;
+    for (i = 0; i < 1; i++) sum += 7;
+    return sum;
+}
+static int ktrip_word(void)
+{
+    int i, sum = 0;
+    for (i = 0; i < 300; i++) sum += 3;
+    return sum;
+}
+static void test_8085_k_trip(void)
+{
+    Assert(ktrip_once() == 7, "8085 K-trip counter: one body from initial zero");
+    Assert(ktrip_word() == 900, "8085 K-trip counter: 300 word-counter bodies");
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
@@ -548,5 +569,6 @@ int main(int argc, char *argv[])
     suite_add_test(test_byte_cmp);
     suite_add_test(test_xbb_byte_counter);
     suite_add_test(test_dowhile_byte_counter);
+    suite_add_test(test_8085_k_trip);
     return suite_run();
 }

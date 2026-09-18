@@ -142,8 +142,16 @@ is the 31.01 M column). The other two are rungs nothing in the tree does yet.
   inc hl; ld (hl),d`, 8 bytes, which is what xcc emits.
 
 The addition model, address-restoration census, and masked word right-shift
-rung are recorded in ADRs 0088-0090. The 8085 K-flag measurement is recorded in
-ADR 0051; it is not a live index task.
+rung are recorded in ADRs 0088-0090.
+
+**5. The 8085 K-flag trip counter — SHIPPED. See ADR 0051.** A private,
+positive-literal loop counter (`AST_LOOP_COUNTDOWN`, only ever built by the
+loop-reversal pass, which already proves it unread and dead after the loop —
+no separate shape analysis needed) seeds at N-1 instead of N and its latch
+branches on the 8085's K flag (`jp nk`) instead of rebuilding `ld a,h; or l;
+jp nz`. `k-trip` opt-out. 8085-only compile-only corpus scan: -156 B over
+52/60 cells, 0 larger, 0 build failures, sp and fp identical (8085 has no IX).
+`long_ir` 846/846 both frame modes.
 
 ### How to work here — the traps that actually bit
 

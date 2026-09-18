@@ -547,6 +547,14 @@ static int gen_br_zero(FILE *out, Func *f, const Op *op)
 
 static int gen_br_cond(FILE *out, Func *f, const Op *op)
 {
+    /* AST_LOOP_COUNTDOWN marked this exact DEC->BR_COND pair after shifting its
+       private positive literal counter from N to N-1. DEC rr's 8085 K flag is
+       set only for -1, exactly after N loop bodies. The 8085 write-back paths
+       here preserve flags; do not generalise this to arbitrary BR_COND ops. */
+    if (op->imm == IR_BRCOND_KTRIP && CPU_HAS_JP_K()) {
+        emit(out, "jp\tnk,L_f%d_bb_%d", L.func_emit_idx, op->label);
+        return 0;
+    }
     emit_test_zero(out, f, op->src[0]);
     emit(out, "jp\tnz,L_f%d_bb_%d", L.func_emit_idx, op->label);
     return 0;
