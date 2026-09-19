@@ -161,6 +161,7 @@ exists (ADR 0010).
 | `bc-live` | no BC park sweep in the final peephole |
 | `bc-flow` | no BC liveness flow into the lowering decisions |
 | `call-bremat` | a byte is reloaded after a call instead of rematerialised |
+| `sdccdecl-byte-const` | a constant byte argument to `__z88dk_sdccdecl` is stored in a frame slot instead of rematerialised at the push |
 | `acc-drop` | a wide accumulator result is stored even when dead in the accumulator |
 | `alu-fold` | no `(ix+d)` ALU fold for AND/OR/XOR |
 | `ixd-fold` | no `(ix+d)` fold for the word accumulator |

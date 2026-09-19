@@ -248,6 +248,11 @@ static void byte_remat_symstr(char *buf, size_t n, const Op *o)
     else               snprintf(buf, n, "%s%s", pfx, nm);
 }
 
+static int sdccdecl_byte_const_enabled(void);
+static void emit_byte_remat_to_a(FILE *out, const Op *o);
+static int byte_call_only_sdccdecl(const Func *f, int v);
+static const Op *byte_imm_origin(const Func *f, int v, int depth);
+
 static LowerState L = {
     .rs = { .fa = -1, .i64_acc = -1 },
     .cur_hl_addr_off = -1, .cur_func_uses_params = 1,
@@ -1223,6 +1228,45 @@ static int shr_dead_l_store(char **lines, int n, int at)
     return drop;
 }
 
+/* Read a function's rendered assembly for the whole-function text filters.
+   On allocation failure, rewind so the caller can copy the input verbatim. */
+static int slurp_lower_lines(FILE *src, char ***lines_out, int *count_out)
+{
+    char buf[1024];
+    char **lines = NULL;
+    int n = 0, cap = 0;
+    while (fgets(buf, sizeof buf, src)) {
+        if (n == cap) {
+            cap = cap ? cap * 2 : 256;
+            char **nl = realloc(lines, (size_t)cap * sizeof *lines);
+            if (!nl) {
+                for (int i = 0; i < n; i++) free(lines[i]);
+                free(lines);
+                rewind(src);
+                return 0;
+            }
+            lines = nl;
+        }
+        char *line = strdup(buf);
+        if (!line) {
+            for (int i = 0; i < n; i++) free(lines[i]);
+            free(lines);
+            rewind(src);
+            return 0;
+        }
+        lines[n++] = line;
+    }
+    *lines_out = lines;
+    *count_out = n;
+    return 1;
+}
+
+static void copy_lower_stream(FILE *out, FILE *src)
+{
+    char buf[1024];
+    while (fgets(buf, sizeof buf, src)) fputs(buf, out);
+}
+
 /* Post-render peephole: drop a dead one-way register copy `ld hl,de` (HL:=DE)
    or `ld de,hl` (DE:=HL) when the destination pair is FULLY reloaded before any
    use. The ordinary case checks the next real instruction (skipping labels,
@@ -1243,18 +1287,11 @@ static int shr_dead_l_store(char **lines, int n, int at)
    lookahead is a simple index scan. */
 static void filter_dead_reg_copies(FILE *out, FILE *src)
 {
-    char buf[1024];
-    char **lines = NULL; int n = 0, cap = 0;
-    while (fgets(buf, sizeof buf, src)) {
-        if (n == cap) { cap = cap ? cap * 2 : 256;
-            char **nl = realloc(lines, (size_t)cap * sizeof *lines);
-            if (!nl) { free(lines); rewind(src);            /* OOM: verbatim */
-                while (fgets(buf, sizeof buf, src)) fputs(buf, out); return; }
-            lines = nl; }
-        lines[n++] = strdup(buf);
-        if (!lines[n - 1]) { for (int i = 0; i < n - 1; i++) free(lines[i]);
-            free(lines); rewind(src);
-            while (fgets(buf, sizeof buf, src)) fputs(buf, out); return; }
+    char **lines;
+    int n;
+    if (!slurp_lower_lines(src, &lines, &n)) {
+        copy_lower_stream(out, src);
+        return;
     }
     char *drop = calloc((size_t)(n > 0 ? n : 1), 1);
     if (drop) {
@@ -2129,24 +2166,36 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
                                      if (lel) lel[k] = 1; }   /* unsettled */
 }
 
+static void try_fold_8085_addr_pair(char **lines, char *drop, int i,
+                                    int d_live, int e_live, int f_live,
+                                    const char *opt, const char *add_line,
+                                    const char *load_fmt,
+                                    const char *replacement_fmt)
+{
+    if (!IS_8085() || opt_disabled(opt) || d_live || e_live || f_live
+        || i <= 0 || strcmp(lines[i], add_line) || drop[i] || drop[i - 1])
+        return;
+    int n = -1;
+    if (sscanf(lines[i - 1], load_fmt, &n) != 1 || n < 0 || n > 255)
+        return;
+    char buf[48];
+    snprintf(buf, sizeof buf, replacement_fmt, n);
+    char *a = strdup(buf), *b = strdup("\tex\tde,hl\n");
+    if (a && b) {
+        free(lines[i - 1]); lines[i - 1] = a;
+        free(lines[i]);     lines[i]     = b;
+    } else { free(a); free(b); }
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
 {
-    char buf[1024];
-    char **lines = NULL; int n = 0, cap = 0;
-    while (fgets(buf, sizeof buf, src)) {
-        if (n == cap) { cap = cap ? cap * 2 : 256;
-            char **nl = realloc(lines, (size_t)cap * sizeof *lines);
-            if (!nl) { free(lines); rewind(src);
-                while (fgets(buf, sizeof buf, src)) fputs(buf, out);
-                return; }
-            lines = nl; }
-        lines[n++] = strdup(buf);
-        if (!lines[n - 1]) { for (int i = 0; i < n - 1; i++) free(lines[i]);
-            free(lines); rewind(src);
-            while (fgets(buf, sizeof buf, src)) fputs(buf, out);
-            return; }
+    char **lines;
+    int n;
+    if (!slurp_lower_lines(src, &lines, &n)) {
+        copy_lower_stream(out, src);
+        return;
     }
     char *drop = calloc((size_t)(n > 0 ? n : 1), 1);
     if (drop) {
@@ -2273,22 +2322,9 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                reason: at line i it is the answer for the code AFTER line i.
                `--opt-disable=ldsi-addr` opts out. Census and evidence:
                adr/0039. */
-            if (IS_8085() && !opt_disabled("ldsi-addr")
-                && !d_live && !e_live && !f_live
-                && i > 0 && !strcmp(lines[i], "\tadd\thl,sp\n")
-                && !drop[i] && !drop[i - 1]) {
-                int n = -1;
-                if (sscanf(lines[i - 1], "\tld\thl,%d\n", &n) == 1
-                    && n >= 0 && n <= 255) {
-                    char buf[48];
-                    snprintf(buf, sizeof buf, "\tld\tde,sp+%d\n", n);
-                    char *a = strdup(buf), *b = strdup("\tex\tde,hl\n");
-                    if (a && b) {
-                        free(lines[i - 1]); lines[i - 1] = a;
-                        free(lines[i]);     lines[i]     = b;
-                    } else { free(a); free(b); }
-                }
-            }
+            try_fold_8085_addr_pair(lines, drop, i, d_live, e_live, f_live,
+                                    "ldsi-addr", "\tadd\thl,sp\n",
+                                    "\tld\thl,%d\n", "\tld\tde,sp+%d\n");
             /* [ldhi-addr] LDSI's sibling, and the same three hazards. Adding a
                small constant to a pointer already in HL costs
                `ld de,N; add hl,de` — 4 bytes, 20 cycles. The 8085 has LDHI,
@@ -2304,22 +2340,9 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                    range is common here, unlike LDSI: the corpus immediates
                    include bench magic constants such as 13849.
                `--opt-disable=ldhi-addr` opts out. adr/0077. */
-            if (IS_8085() && !opt_disabled("ldhi-addr")
-                && !d_live && !e_live && !f_live
-                && i > 0 && !strcmp(lines[i], "\tadd\thl,de\n")
-                && !drop[i] && !drop[i - 1]) {
-                int n = -1;
-                if (sscanf(lines[i - 1], "\tld\tde,%d\n", &n) == 1
-                    && n >= 0 && n <= 255) {
-                    char buf[48];
-                    snprintf(buf, sizeof buf, "\tld\tde,hl+%d\n", n);
-                    char *a = strdup(buf), *b = strdup("\tex\tde,hl\n");
-                    if (a && b) {
-                        free(lines[i - 1]); lines[i - 1] = a;
-                        free(lines[i]);     lines[i]     = b;
-                    } else { free(a); free(b); }
-                }
-            }
+            try_fold_8085_addr_pair(lines, drop, i, d_live, e_live, f_live,
+                                    "ldhi-addr", "\tadd\thl,de\n",
+                                    "\tld\tde,%d\n", "\tld\tde,hl+%d\n");
             /* [z80n-add-a] Adding a zero-extended byte to HL costs
                `ld e,a; ld d,0; add hl,de` — 4 bytes, 22 cycles, and it spends
                DE. The z80n has `add hl,a` (ED 31, 2 bytes, 8 cycles,
@@ -5271,8 +5294,8 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_LD_SYM:            return gen_ld_sym(out, f, op);
     case IR_LD_STR:            return gen_ld_str(out, f, op);
     case IR_LEA:               return gen_lea(out, f, op);
-    case IR_INC:               return gen_inc(out, f, op);
-    case IR_DEC:               return gen_dec(out, f, op);
+    case IR_INC:               return gen_step(out, f, op, 1);
+    case IR_DEC:               return gen_step(out, f, op, -1);
     case IR_POSTSTEP:          return gen_poststep(out, f, op);
     case IR_ROTL:              return gen_rotl(out, f, op);
     case IR_EXTRACT_BYTE:      return gen_extract_byte(out, f, op);
@@ -6540,14 +6563,13 @@ int ir_lower_func(FILE *out, Func *f)
     ir_alloc(f);
     compute_no_slot_bytes(f);
 
-    /* [IR_BYTE_REMAT] Byte-remat table: a width-1 vreg whose SINGLE def is a
-       global byte load (LD_MEM IR_MEM_SYM, non-volatile, non-banked) and whose
-       SINGLE use sits in the same BB with NO memory-writing op between — so the
-       global is provably unchanged and `ld a,(sym)` can be re-issued at the use
-       instead of a frame-slot store+reload (a global load is rematerialisable).
-       Kills the daft `ld a,(g);ld (ix-n),a; … ld a,(ix-n)` spill of a value that
-       is just a memory read. DEFAULT ON; --opt-disable=byte-remat opts out
-       (byte-identical to the pre-remat pickers). */
+    /* [IR_BYTE_REMAT] Byte-remat table has two proved slotless cases: a
+       single-use, unchanged global byte load rematerialised at a supported
+       byte read site; and, under sdccdecl-byte-const, a call-only byte traced
+       through pure conversions/copies to a unique immediate and rematerialised
+       by stacked-call marshalling. Each entry maps its vreg to the remat source.
+       Both are default on; byte-remat disables the whole table and
+       sdccdecl-byte-const disables only the immediate-call case. */
     g_hc.byte_remat = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
                              sizeof(const Op *));
     if (g_hc.byte_remat && !opt_disabled("byte-remat")) {
@@ -6557,10 +6579,19 @@ int ir_lower_func(FILE *out, Func *f)
                 const Op *o = &bb->ops[j];
                 int d = o->dst;
                 if (d < 0 || d >= f->n_vregs) continue;
-                if (o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_SYM) continue;
                 if (f->vregs[d].width != 1) continue;
                 if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
                     continue;
+                const Op *const_origin = NULL;
+                if (sdccdecl_byte_const_enabled()
+                    && byte_call_only_sdccdecl(f, d))
+                    const_origin = byte_imm_origin(f, d, 0);
+                if (const_origin) {
+                    g_hc.byte_remat[d] = const_origin;
+                    f->vregs[d].flags |= IR_VREG_NO_SLOT;
+                    continue;
+                }
+                if (o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_SYM) continue;
                 if (o->mem.volatile_ || !o->mem.sym || ns_sym_bails(o->mem.sym))
                     continue;
                 /* exactly one def + one use, use in this BB after j */
@@ -8702,4 +8733,88 @@ cleanup_err:
     free(bb_hl_addr_out);
     rec_reset();
     return -1;
+}
+
+/* Rematerialise compile-time byte values at __z88dk_sdccdecl argument pushes
+   instead of assigning them a frame slot. The values are terminal call-only
+   uses; dynamic bytes and ordinary smallc arguments are deliberately excluded.
+   Default ON; IR_OFF=sdccdecl-byte-const opts out, byte-identically. */
+static int sdccdecl_byte_const_on = -1;
+static int sdccdecl_byte_const_enabled(void)
+{
+    if (sdccdecl_byte_const_on < 0)
+        sdccdecl_byte_const_on = !opt_disabled("sdccdecl-byte-const");
+    return sdccdecl_byte_const_on;
+}
+
+/* Materialise a byte-remat source in A. Global byte loads re-issue the
+   absolute memory read; constants load their low byte directly. */
+static void emit_byte_remat_to_a(FILE *out, const Op *o)
+{
+    if (o->kind == IR_LD_IMM) {
+        emit(out, "ld\ta,%d", (int)(o->imm & 0xff));
+    } else {
+        char s[80];
+        byte_remat_symstr(s, sizeof s, o);
+        emit(out, "ld\ta,(%s)", s);
+    }
+}
+/* Return true only when every observed use of v is as a width-1 argument to a
+   __z88dk_sdccdecl call. The byte rematerialisation below has no slot to fall
+   back to, so even one non-call consumer must keep the normal definition. */
+static int byte_call_only_sdccdecl(const Func *f, int v)
+{
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            int uses[128];
+            int nu = ir_op_uses(op, uses, 128), has_v = 0;
+            for (int k = 0; k < nu; k++)
+                if (uses[k] == v) { has_v = 1; break; }
+            if (!has_v) continue;
+            if (op->kind != IR_CALL || !op->call
+                || !(op->call->flags & SDCCDECL))
+                return 0;
+            int is_byte_arg = 0;
+            for (int i = 0; i < op->call->n_args; i++)
+                if (op->call->args[i] == v && f->vregs[v].width == 1) {
+                    is_byte_arg = 1;
+                    break;
+                }
+            if (!is_byte_arg) return 0;
+            seen = 1;
+        }
+    return seen;
+}
+
+/* Find a constant immediate whose low byte is unchanged by this vreg's
+   single-def conversion/copy chain. Only pure width conversions and MOVs are
+   transparent; any computed or multiply-defined value stays slot-backed. */
+static const Op *byte_imm_origin(const Func *f, int v, int depth)
+{
+    if (v < 0 || v >= f->n_vregs || depth >= 8) return NULL;
+    /* Every link must be an ordinary value. In particular, do not bypass an
+       address-taken local whose slot may have been changed through an alias,
+       or a volatile value whose read must remain observable. Checking only
+       the final call-argument vreg misses these flags on copy/conversion
+       intermediates. */
+    if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+        return NULL;
+    const Op *def = NULL;
+    int ndef = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            int defs[8];
+            int nd = ir_op_defs(op, defs, 8);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] == v) { def = op; ndef++; }
+        }
+    if (ndef != 1 || !def || def->dst != v) return NULL;
+    if (def->kind == IR_LD_IMM) return def;
+    if (def->kind == IR_MOV || def->kind == IR_CONV_TRUNC
+        || def->kind == IR_CONV_ZX || def->kind == IR_CONV_SX)
+        return byte_imm_origin(f, def->src[0], depth + 1);
+    return NULL;
 }

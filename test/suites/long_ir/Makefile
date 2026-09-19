@@ -91,6 +91,11 @@ fixed.bin: $(SOURCES) fixed.c
 sdcccall.bin: $(SOURCES) sdcccall.c $(JPTH)
 	$(compile)
 	$(runtest)
+sdcccall.bin: | sdcccall_fp.bin
+
+sdcccall_fp.bin: $(SOURCES) sdcccall.c $(JPTH)
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
 
 sdcccall_kc160.bin: $(SOURCES) sdcccall.c $(JPTH)
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m

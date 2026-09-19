@@ -9,10 +9,17 @@ live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
-**Check BC liveness at direct calls against `__preserves_regs(b,c)`.** The
-argument ABI alone currently decides `[bc-call]` liveness. No in-tree callee
-honours that modifier yet; establish the rule and its negative cases before
-changing the allocator.
+**`[bc-call]` vs `__preserves_regs(b,c)` — CLOSED. See ADR 0094.** Unlike DE's
+`__preserves_regs(d,e)` (ADR 0084, inert — no in-tree callee uses it),
+`__preserves_regs(b,c)` is real: `ctype.h`'s `CTYPE_PRESERVE` puts it on every
+`is*`/`to*` fastcall variant, and the allocator already honours it (`gen_call`'s
+`bc_preserved` skips the push/pop guard). But the only two rewrites `[bc-call]`'s
+BC-liveness-at-calls feeds that can delete code are the `ld bc,hl` park drop
+(gated on the exact paired-register write, never a PR_BC vreg's single-register
+home writes) and `[idx-rmw-de]` (an exact 10-line adjacent match a call would
+break by construction) — and no `ld bc,hl` park in the tree today sits before a
+`call _sym` with its read after. Real rule gap, inert bug, same shape as ADR
+0084. No allocator change earns anything here; nothing to pick up.
 
 **Sizeable, not urgent: embed copt's matching ENGINE inside 80cc, extended
 with a liveness precondition fed by 80cc's own backward pass.** `ir_lower.c`'s
@@ -62,10 +69,6 @@ gauntlet the same as any codegen change.
 The masked word right-shift rung is accepted for plain Z80. See ADR 0090. The
 A-through-CB route is faster in all 10 affected sp/fp cells and has no
 compile-only corpus size change; other CB-shift CPUs remain out of scope.
-
-Still open from ADR 0084: `[bc-call]` decides BC liveness at a direct call
-from the argument ABI alone; it has not checked `__preserves_regs(b,c)`. No
-in-tree callee currently honours that modifier.
 
 ### The veins worth digging, in order
 
@@ -205,6 +208,99 @@ jp nz`. `k-trip` opt-out. 8085-only compile-only corpus scan: -156 B over
   copied into the worktree — a fresh `git worktree` gets neither.
 
 ### Background work, when there is time
+
+**Constant byte arguments to `__z88dk_sdccdecl` — CLOSED. See ADR 0095.**
+`read_reg` in the Magnetic emulator is the motivating real-file case. On a
+temporary annotated copy, Z80N-fp `code_compiler` falls 21,998→20,571 B
+(1,427 B); direct adjacent-pair packing saves a further 242 B over the
+rematerialisation-only intermediate. The lowerer traces a call-only byte value
+through pure conversions/copies to a unique immediate definition and removes
+its slot. Adjacent constant byte args now use `ld de,nn; push de`; every link
+in the trace is checked for address-taken and volatile flags, stopping the
+rewrite when aliasing or observable reads are possible. `long_ir` passes
+851/851 in each frame mode (the existing `longshl_vm1` assembler gap remains).
+The standard corpus has no size changes in 660 CPU/frame cells and no Z80 tick
+changes in 60 cells; the annotated real-file case is where this helps.
+
+**Local copy-paste housekeeping — COMPLETE (2026-09-19).**
+The six behavior-neutral refactors below are implemented; emitted assembly is
+unchanged.
+
+1. [x] `gen_step` replaces `gen_inc` / `gen_dec`; it selects `inc` / `dec`
+   with `+1` / `-1`.
+2. [x] `emit_dsub_jp(cc)` shares the 8085 DSUB-plus-branch sequence.
+3. [x] `emit_z80n_barrel_shift` shares the variable shift body
+   (`bsrl` / `bsra`).
+4. [x] Far-call BC save, restore, and cache invalidation use shared helpers.
+5. [x] `filter_dead_reg_copies` and `filter_dead_bc_parks` share
+   OOM-safe line buffering.
+6. [x] `try_fold_8085_addr_pair` shares the LDSI / LDHI rewrite skeleton.
+
+Validation against the exact pre-cleanup HEAD:
+
+- `long_ir`: 851/851 passed in sp and fp; only the existing
+  `longshl_vm1` assembler gap remains.
+- Reference assembly: 452 files identical; size: 720/720 cells identical;
+  Z80 ticks: 60/60 cells identical.
+- CLOB / PARK / REC / IX verifier logs match for z80, 8085, and z80n in
+  both frame modes; PARK reports zero steals and depth mismatches.
+- Console gates pass both modes for enigma, clisp, adv_a, sorter,
+  fmemopen, and fib. `today.c` fails identically before and after at
+  `time(tvec)`.
+
+Do not merge `load_to_hl` with `load_to_de`. Do not merge `gen_add` with
+`gen_sub`. Do not merge the whole of `gen_cmp_lt_ge` with `gen_cmp_gt_le`.
+`load_binop_operands` and `load_cmp_swap_operands` share a shape. The first
+has remat and commutative cases the swap path does not. memset,
+`emit_block_copy` and strcpy already share part of the BC save. Leave the
+backward-liveness rungs hand-written until the copt-embed prototype.
+
+Untracked junk in this directory (not compiled): `*.bak`, `*.orig`,
+`md5_fp_push.map`, `sp_ungated.map`. Delete when convenient.
+
+**Parked task — size a byte-scratch packer, using `bitfieldbench` as
+the witness.** This is not the next action; first settle the direct-call
+`__preserves_regs(b,c)` rule above. The latest full matrix (17/9 s4; later
+entries amend only `histbench` and `predbench`) leaves `bitfieldbench` at
+4474 B / 38.34 M ticks (80cc-fp) and 4483 B / 37.95 M (80cc-sp), against XCC
+at 3991 B / 30.42 M (`-Os`) and 4103 B / 27.02 M (`-Of`) on z80. The
+previous per-function read found the remaining `reg_set` gap in short-lived
+byte values: 80cc repeatedly uses frame slots (`ld (ix+d),a` / `or (ix+d)`)
+where XCC keeps a byte in E. `home-swap`, `idx-deref`, and the duplicate-mask
+copt rule already address the pointer/index and adjacent-mask portions; do not
+reopen them. Relaxing `byte_home_realizable` is also refuted: its single-use
+candidates add a slot-backed home rather than remove the slot (+307 B, 49
+larger corpus cells at use-count 1).
+
+`IR_BYTEPRESS=2` now gives the first ceiling: with two generic call-free byte
+lanes and interval overlap only, `reg_set` can retain 28/36 accesses,
+`reg_step` 14/16, and `reg_get` 4/4 — 46 accesses, an impossible-but-useful
+92-byte z80 upper bound at 2 bytes per frame-byte access. It is **not a B/D
+forecast**. `reg_set`'s input and `reg_step`'s pointer are each `IR_PR_BC`
+throughout their hot bodies, so B cannot be a concurrent scratch lane there;
+and `IR_PR_D` is deliberately lazy-spill, slot-backed today. A slotless B
+home and a traffic-only D cache therefore need separate sizing.
+
+First add a verifier that reports a candidate's B availability against BC-pair
+tenants and its D availability against DE clobbers, then calculate each lane
+separately over disjoint ranges. Only a positive result earns an experimental,
+gated prototype and long_ir positive and negative cases. A default-on decision
+needs the full gauntlet, corpus size and tick scans, and no slower valid-tick
+cell; retain it only if it improves beyond this one benchmark.
+
+**Binop route note.** This does not reopen ADR 0018's rejected policy of
+keeping a second operand resident in DE: its evacuation/restoration cost more
+than the reload it avoided, and its cross-BB carry duplicated HL's existing
+carry. The distinct question is local instruction selection. A width-2 binop
+has three operand routes: a pair operation with its RHS in DE or BC; a
+byte-direct carry chain through A reading an eligible frame operand in place;
+or an already-resident byte-half operand. The byte-direct route already exists
+in `try_binop_ixd_fold` for ADD/SUB/AND/OR/XOR, and in the compare folds. It
+declines when both operands are cheap gp pairs; that is correct. Size an
+extension as a per-binop, per-CPU choice — never as a new permanent DE home:
+sp-mode address formation and CPUs with cheap word slot loads can reverse the
+price, while a chosen byte-direct route can leave DE available for a separate
+short-lived cache.
 
 A survey of all 14 `CPU_HAS_*` macros found five the backend never consults;
 the other four are KR580VM1-only. That survey is **not** the sweep — the macros
@@ -382,3 +478,34 @@ Known remaining hazard: about 40 untracked `.py` and `.sh` analysis scripts are
 still here and still untracked. They are not documents, so the sweep left them
 alone; a `git clean -fd` would remove them. The five scripts the gauntlet
 depends on are now tracked.
+
+
+### r6k instruction utilisation (18 Sep 2026, corrected 19 Sep 2026)
+
+Correction: the "identical to r4k" claim below was wrong. `try_binop_r6k_ixd`
+(`ir_lower_ops.inc.c`, shipped `71b66a9977`, mid-August) already emits
+`add hl,(ix+d)` / `and hl,(ix+d)` etc. in fp mode — confirmed by direct
+instrumentation: it fires 30 times across 8 of the 30 corpus benches
+(intbench, recordbench, maskbench, hashbench, bitfieldbench, widthbench,
+localbench, callbench), and the emitted asm was checked by hand for
+intbench.c. `r6k` is not in `gen_bench_matrix3.py`'s `CPUS` list at all — the
+18/9 "new r6k rows" came from an ad-hoc script variant, and whatever produced
+the "identical to r4k" reading did not exercise this fold (most likely an
+sp-only run: the fold is fp-only by construction, and sp mode is genuinely
+identical to r4k there since neither CPU has an sp-relative memory-ALU form).
+
+The missing r6k instruction selection is therefore narrower than first
+thought: word ALU against `(ix+d)` is done. Remaining candidates are word ALU
+against `(sp+n)`, the complete byte ALU family against `(sp+n)`, and
+`mul hl,de`/`mulu hl,de`.
+
+A first word-memory-ALU prototype for the `(sp+n)` form was tested and
+rejected: across the 30 r6k benches in both frame modes, direct stack/indexed
+substitutions reduced total size by 97 B but increased aggregate ticks by
+1,429,886 (26 cells faster, 34 slower). Isolating either route also increased
+ticks; a conservative DE-home guard was effectively neutral but still
+slightly worse (+2,520 ticks, with one slower cell). The long_ir probe passed
+in both frame modes, confirming the emitted forms, but that does not offset
+the corpus timing regression. No new selector or test is retained. Revisit
+only with a profitability condition that passes both corpus size and tick
+gates.
