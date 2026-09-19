@@ -5340,6 +5340,16 @@ static int param_stack_width(const Func *f);   /* defined below */
 
 static int lower_ret(FILE *out, Func *f, const Op *op)
 {
+    /* lower_op sets these for every other op kind; IR_RET is dispatched here
+       instead (never through lower_op), so without this it stays stale from
+       whatever op last went through lower_op -- possibly in an already-freed
+       prior function's IR, once this op's callees (load_to_hl_adj's depark
+       gate) read lower_cur_op->kind. Harmless-looking on glibc, which keeps
+       freed chunks readable; a real use-after-free that crashes where the
+       allocator is less forgiving. */
+    lower_cur_file = op->file;
+    lower_cur_line = op->line;
+    lower_cur_op   = op;
     int width = 0;
     int is_acc = 0;
     if (op->src[0] >= 0) {
