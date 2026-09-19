@@ -122,6 +122,11 @@ REORG, the `*_BUG` post-mortems) stay as plans, not ADRs.
   `BENCH_MATRIX.txt` and plan docs, **not in the ADR or in code comments** —
   they go stale, and the mechanism is what endures. State the shape of the
   result and point at the dated log section.
+- `test/suites/BENCH_MATRIX.txt` is a single latest-snapshot table, not an
+  append-only journal. Keep prior run notes in the local, untracked
+  `test/suites/BENCH_MATRIX.history.txt` archive; do not stage it. Git history
+  retains earlier committed snapshots. A matrix refresh replaces the committed
+  table with one complete current result.
 - **A refusal is the exception: keep the number that refused it.** In a
   **Rejected** ADR, and in a "refused in the same family" section of an
   accepted one, the regression IS the decision — `+1789 bytes` (ADR 0020),
