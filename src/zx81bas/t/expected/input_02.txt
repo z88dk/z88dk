@@ -37,7 +37,7 @@ Contents of test_t_input_02_t.i:
 
 
 !AUTOSTART =  1 
-!AUTOSTART_LINE = 10
+!AUTOSTART_LINE = @label3
 !INCREMENT = 2
 !REMINVERT =  0 
 !FAST =  0 
@@ -93,16 +93,18 @@ Contents of test_t_input_02_t.i:
 !VARS Z$ = ""
 !ASM
 z_code:	ld a, 255
+		ld hl, @label1
+		ld hl, &label1
 !ENDASM
 
 
 
 
 
-@label1:		LET A = 1
-10				LET A = 1
-20 @label2:		LET A = 1
-@label3: 30		LET A = 1
+@label1:		LET A = @label1
+10				LET A = &label1
+20 @label2:		LET A = @label2
+@label3: 30		LET A = &label3
 
 
 

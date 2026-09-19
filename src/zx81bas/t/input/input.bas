@@ -21,7 +21,7 @@
 //------------------------------------------------------------------------------
 
 #AUTOSTART = TRUE
-#AUTOSTART_LINE = 10
+#AUTOSTART_LINE = @label3
 #INCREMENT = 2
 #REMINVERT = FALSE
 #FAST = FALSE
@@ -77,16 +77,18 @@
 #VARS Z$ = ""
 #ASM
 z_code:	ld a, 255
+		ld hl, @label1
+		ld hl, &label1
 #ENDASM
 
 //------------------------------------------------------------------------------
 // check labels and line numbers in BASIC
 //------------------------------------------------------------------------------
 
-@label1:		LET A = 1
-10				LET A = 1
-20 @label2:		LET A = 1
-@label3: 30		LET A = 1
+@label1:		LET A = @label1
+10				LET A = &label1
+20 @label2:		LET A = @label2
+@label3: 30		LET A = &label3
 
 //------------------------------------------------------------------------------
 // check labels in ASM

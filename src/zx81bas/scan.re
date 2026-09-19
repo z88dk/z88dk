@@ -258,6 +258,20 @@ collect_token:
             goto push_token;
         }
 
+        '@' ident {
+            token.type = TokenType::LabelRefLine;
+            token.text = str_toupper(std::string(start, p));    // BASIC is case insensitive
+            token.svalue = str_toupper(std::string(start + 1, p));
+            goto push_token;
+        }
+
+        '&' ident {
+            token.type = TokenType::LabelRefAddr;
+            token.text = str_toupper(std::string(start, p));    // BASIC is case insensitive
+            token.svalue = str_toupper(std::string(start + 1, p));
+            goto push_token;
+        }
+
         */
 push_token:
         tokens.push_back(token);

@@ -9,5 +9,5 @@ t/input/20_parser_autostart_line_error.bas:4: error: Expected '= number|@label' 
 t/input/20_parser_autostart_line_error.bas:5: error: Expected '=', found '10'
 t/input/20_parser_autostart_line_error.bas:6: error: Expected end of statement, found 'EXTRA'
 t/input/20_parser_autostart_line_error.bas:7: error: Expected '= number|@label' after '#AUTOSTART_LINE'
-t/input/20_parser_autostart_line_error.bas:8: error: Expected 'Identifier', found '123'
+t/input/20_parser_autostart_line_error.bas:8: error: Expected '= number|@label' after '#AUTOSTART_LINE'
 8 errors found

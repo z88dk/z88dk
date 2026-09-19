@@ -2,7 +2,7 @@
 Input file:  t/input/20_parser_label_error.bas
 Output file: t/input/20_parser_label_error.p
 % z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_label_error.i" "t/input/20_parser_label_error.pp"
-t/input/20_parser_label_error.bas:1: error: Expected 'Identifier', found end of line
+t/input/20_parser_label_error.bas:1: error: Expected a BASIC language statement, found '@'
 t/input/20_parser_label_error.bas:2: error: Expected ':', found end of line
 t/input/20_parser_label_error.bas:3: error: Unrecognized statement 'LABEL'
 t/input/20_parser_label_error.bas:4: error: Multiple line numbers in the same line

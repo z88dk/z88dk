@@ -6,12 +6,12 @@ Output file: test_t_input_11_t.p
    #ASM:		EX AF, AF
    #ASM:		RET
 @LABEL1:
-      2 LET A=1
-     10 LET A=1
+      2 LET A= 2
+     10 LET A= &LABEL1
 @LABEL2:
-     20 LET A=1
+     20 LET A= 20
 @LABEL3:
-     30 LET A=1
+     30 LET A= &LABEL3
      32 REM
    #ASM:LABEL4:			NOP
      34 LET A=1
@@ -445,3 +445,5 @@ Output file: test_t_input_11_t.p
   #VARS:B$(2,3,3)="1.1","1.2","1.3","2.1","2.2","2.3"
   #VARS:Z$=""
    #ASM:Z_CODE:	LD A, 255
+   #ASM:		LD HL, 2
+   #ASM:		LD HL, &LABEL1

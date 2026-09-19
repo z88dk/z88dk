@@ -10,8 +10,8 @@ X("Integer", Integer)
 X("StringLiteral", StringLiteral)
 X("CharConstant", CharConstant)
 X("AsmOperator", AsmOperator)
-X("LabelRefLine", LabelRefLine) // after emit basic
-X("LabelRefAddr", LabelRefAddr) // after emit basic
+X("LabelRefLine", LabelRefLine)
+X("LabelRefAddr", LabelRefAddr)
 X("!", Exclamation)
 X("#", Hash)
 X("$", Dollar)
