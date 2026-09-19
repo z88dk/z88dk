@@ -1,4 +1,51 @@
 ================================================================================
+18/9/2026 (s8) — [k-trip] 8085 K-flag trip counters. ADR 0051 (Proposed →
+            Accepted). 8085-only compile-only corpus scan, NOT a full matrix
+            regeneration.
+================================================================================
+ADR 0051 sized this in two prior sessions (236 raw lines -> 59 logical tests
+-> 33 pure-trip-counter candidates) and stopped at "sizing answered, transform
+not justified." Shipped now: the shape analysis it called for turned out to
+already exist — `AST_LOOP_COUNTDOWN` is only built by the loop-reversal pass,
+whose own preconditions (iv unmentioned in BODY, no break) already prove the
+private counter is a pure trip counter, so every rejected shape from the ADR's
+census (value read, pointer/index use, incrementing loop) never reaches this
+code path at all. `ir_build.c` seeds the counter at N-1 instead of N for a
+compile-time positive literal trip count; `gen_br_cond` emits `jp nk,L`
+instead of rebuilding `ld a,h; or l; jp nz,L` when tagged `IR_BRCOND_KTRIP`.
+
+K reaching -1 exactly after N bodies checked against the project's own 8085
+model (not just the datasheet): `DECW`/`INCW` in src/ticks/ticks.c set
+`fk = (a&b)==0xff` after a 16-bit decrement, the same authority z88dk-ticks
+gates against.
+
+SIZE — `corpus_sizescan.sh`, CPUS=8085 only, 30 benches x 2 frame modes = 60
+       cells, baseline vs this change, same installed binary otherwise
+       (md5 42a755b6687040d6588a071c3704577a).
+
+    -156 B over 52/60 cells, 0 larger, 0 build failures.
+    sp and fp identical throughout — the 8085 has no IX, so frame mode does
+    not affect this site (26 of 30 benches moved; 4 did not compile
+    standalone under -c, a pre-existing corpus_sizescan gap unrelated to
+    k-trip).
+
+    Per-bench deltas: -2 B on 21 benches (one site each), -4 B on 9 benches
+    (two sites: charbench, histbench, localbench, predbench, divbench,
+    shiftbench, callbench, bitfieldbench, widthbench), -10 B on ptrbench
+    (five sites).
+
+RUNTIME — spot-checked histbench and divbench end-to-end under z88dk-ticks
+          -m8085: both 0 failed, ticks lower than the pre-change baseline
+          (histbench 27,279,334; divbench 59,891,687).
+
+GATES — long_ir 846/846 in both frame modes (up from 842 — the four new
+        test_8085_k_trip targets: irgaps.bin/_gbz80/_8080/_8085, each
+        asserting the N=1 initial-zero-skip case and the N=300
+        word-counter case). The one pre-existing build error in either log
+        is longshl_vm1.bin (unrelated VM1 float gap). check_options.sh 132
+        names OK (`k-trip` added); check_gates.sh 43 listed live OK.
+
+================================================================================
 18/9/2026 (s7) — [idx-rmw-de] Indexed word RMW drops the BC address park.
             ADR 0093 (supersedes ADR 0088's "no emitter change" call).
             histbench/predbench rows only, NOT a full matrix regeneration.

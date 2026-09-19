@@ -430,6 +430,19 @@ static int gen_dec(FILE *out, Func *f, const Op *op)
         if (de_has(op->dst)) invalidate_de_cache();
         return 0;
     }
+    /* Walking pointer (or K-trip counter) homed in BC/DE: step it in place
+       with `dec bc`/`dec de` instead of the ld hl,bc / dec hl / ld bc,hl
+       copy-out-and-back. Mirror of gen_inc's gpderef case above — see there
+       for the call-split exclusion rationale (a bare `dec bc` would update
+       BC but not a call-split value's coherent frame slot). */
+    if (op->dst == op->src[0] && !opt_disabled("gpderef")
+        && !(f->vregs[op->dst].flags & IR_VREG_CALL_SPLIT)
+        && (vreg_in_pr_bc(f, op->dst) || vreg_in_pr_de(f, op->dst))) {
+        emit(out, vreg_in_pr_bc(f, op->dst) ? "dec\tbc" : "dec\tde");
+        if (hl_has(op->dst)) invalidate_hl_cache();
+        if (vreg_in_pr_bc(f, op->dst)) cache_bc(op->dst); else cache_de(op->dst);
+        return 0;
+    }
     if (try_tos_step_inplace(out, f, op, -1)) return 0;  /* -- */
     if (!hl_has(op->src[0]))
         load_to_hl(out, f, op->src[0]);
@@ -480,6 +493,17 @@ static void emit_test_zero(FILE *out, Func *f, int src)
             if (!hl_has(src)) load_to_hl(out, f, src);
             emit(out, "test\thl");
             return;
+        }
+        /* BC/DE-resident word zero-test: read the two halves directly rather
+           than ferrying the value through HL first — `ld hl,bc; ld a,h; or l`
+           becomes `ld a,b; or c`, the same saving r4k's `test bc` above takes
+           for free. Only when HL does not already hold it: if it does, the
+           fallback's `load_to_hl` below is already a no-op, and this would
+           just spend two different bytes on the same job. Touches only A, so
+           every other cache (HL, BC, DE) stays exactly as valid as before. */
+        if (!hl_has(src)) {
+            if (bc_has(src)) { emit(out, "ld\ta,b"); emit(out, "or\tc"); return; }
+            if (de_has(src)) { emit(out, "ld\ta,d"); emit(out, "or\te"); return; }
         }
         /* In-place slot word zero-test: when the tested value is dead after the
            branch (the fall-through won't reuse it — L.la.cur_br_value_dead) and
@@ -547,6 +571,14 @@ static int gen_br_zero(FILE *out, Func *f, const Op *op)
 
 static int gen_br_cond(FILE *out, Func *f, const Op *op)
 {
+    /* AST_LOOP_COUNTDOWN marked this exact DEC->BR_COND pair after shifting its
+       private positive literal counter from N to N-1. DEC rr's 8085 K flag is
+       set only for -1, exactly after N loop bodies. The 8085 write-back paths
+       here preserve flags; do not generalise this to arbitrary BR_COND ops. */
+    if (op->imm == IR_BRCOND_KTRIP && CPU_HAS_JP_K()) {
+        emit(out, "jp\tnk,L_f%d_bb_%d", L.func_emit_idx, op->label);
+        return 0;
+    }
     emit_test_zero(out, f, op->src[0]);
     emit(out, "jp\tnz,L_f%d_bb_%d", L.func_emit_idx, op->label);
     return 0;

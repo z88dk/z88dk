@@ -37,6 +37,7 @@ exists (ADR 0010).
 | `thread-jumps` | no jump threading across conditionals |
 | `demote-poststep` | keep `p++` as a post-step instead of demoting it |
 | `loop-reverse` | never reverse a counted loop to count down to zero |
+| `k-trip` | 8085 literal 16-bit countdown loops keep the regular zero-test rather than using a shifted counter and `jp nk` |
 
 ## IR optimiser (`ir_opt.c`)
 
