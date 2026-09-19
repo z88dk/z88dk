@@ -266,6 +266,21 @@ static int try_sp_dehome_loop_cmp(FILE *out, Func *f, const Op *op)
     return 1;
 }
 
+static void emit_dsub_jp(FILE *out, const char *cc)
+{
+    int bc_live = (L.rs.bc >= 0);
+    if (bc_live) emit(out, "push\tbc");
+    emit(out, "ld\tc,e");
+    emit(out, "ld\tb,d");
+    emit(out, "sub\thl,bc");
+    if (bc_live) emit(out, "pop\tbc");
+    emit(out, "jp\t%s,L_f%d_bb_%d", cc, L.func_emit_idx,
+         L.la.cur_branch_test_label);
+    invalidate_hl_keep_de();
+    if (!bc_live) invalidate_bc_cache();
+    L.la.cur_skip_next_op = 1;
+}
+
 static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
 {
     if (try_sp_dehome_loop_cmp(out, f, op)) return 0;
@@ -674,17 +689,7 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         int br_true = (g_hc.branch_test_kind == IR_BR_COND);
         int want = (cf_true_long == br_true);
         const char *cc = want ? "k" : "nk";
-        int bc_live = (L.rs.bc >= 0);
-        if (bc_live) emit(out, "push\tbc");
-        emit(out, "ld\tc,e");
-        emit(out, "ld\tb,d");          /* BC = src1 */
-        emit(out, "sub\thl,bc");       /* HL-BC: K=signed LT, CF=uns borrow */
-        if (bc_live) emit(out, "pop\tbc"); /* restores BC; flags survive */
-        emit(out, "jp\t%s,L_f%d_bb_%d", cc, L.func_emit_idx,
-             L.la.cur_branch_test_label);
-        invalidate_hl_keep_de();       /* DSUB clobbers HL, preserves DE/BC */
-        if (!bc_live) invalidate_bc_cache();
-        L.la.cur_skip_next_op = 1;
+        emit_dsub_jp(out, cc);
         return 0;
     }
     int sflip_lt = signed_cmp_signflip(out, f, is_signed);
@@ -877,17 +882,7 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
         int br_true = (g_hc.branch_test_kind == IR_BR_COND);
         int want = (cf_true_gt == br_true);
         const char *cc = want ? "k" : "nk";
-        int bc_live = (L.rs.bc >= 0);
-        if (bc_live) emit(out, "push\tbc");
-        emit(out, "ld\tc,e");
-        emit(out, "ld\tb,d");          /* BC = src0 */
-        emit(out, "sub\thl,bc");       /* HL-BC = src1-src0 */
-        if (bc_live) emit(out, "pop\tbc"); /* restores BC; flags survive */
-        emit(out, "jp\t%s,L_f%d_bb_%d", cc, L.func_emit_idx,
-             L.la.cur_branch_test_label);
-        invalidate_hl_keep_de();       /* DSUB clobbers HL, preserves DE/BC */
-        if (!bc_live) invalidate_bc_cache();
-        L.la.cur_skip_next_op = 1;
+        emit_dsub_jp(out, cc);
         return 0;
     }
     int sflip_gt = signed_cmp_signflip(out, f, is_signed);
@@ -1243,6 +1238,28 @@ static int tbac_cpu(void)
 static int tbac_on(void)
 {
     return !opt_disabled("shr-tbac");
+}
+
+/* Common Z80N variable-count 16-bit barrel shift. */
+static void emit_z80n_barrel_shift(FILE *out, Func *f, const Op *op,
+                                   const char *mnem)
+{
+    load_binop_operands(out, f, op);         /* HL=value, DE=count */
+    int bc_live = (L.rs.bc >= 0);
+    if (bc_live) emit(out, "push\tbc");
+    emit(out, "ld\tb,e");
+    emit_ex_de_hl(out);                      /* DE=value */
+    emit(out, "%s\tde,b", mnem);
+    if (bc_live) emit(out, "pop\tbc");
+    invalidate_hl_cache();
+    invalidate_de_cache();
+    if (!bc_live) invalidate_bc_cache();
+    if (vreg_is_pr_de(f, op->dst)) {
+        cache_de(op->dst);
+        return;
+    }
+    emit_ex_de_hl(out);                      /* HL=result */
+    commit_hl_word(out, f, op->dst);
 }
 
 static int gen_shr(FILE *out, Func *f, const Op *op)
@@ -1732,22 +1749,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
     /* z80n: variable 16-bit logical `>>` as flat `bsrl de,b`. Sets no
        flags; result is a value, not a branch condition. */
     if (IS_Z80N()) {
-        load_binop_operands(out, f, op);   /* HL=value(src0), DE=count(src1) */
-        int bc_live = (L.rs.bc >= 0);  /* `ld b,e` clobbers B — preserve */
-        if (bc_live) emit(out, "push\tbc");
-        emit(out, "ld\tb,e");              /* B = count low byte */
-        emit_ex_de_hl(out);            /* DE = value */
-        emit(out, "bsrl\tde,b");           /* DE = value >> B (logical) */
-        if (bc_live) emit(out, "pop\tbc");
-        invalidate_hl_cache();
-        invalidate_de_cache();
-        if (!bc_live) invalidate_bc_cache();
-        if (vreg_is_pr_de(f, op->dst)) {
-            cache_de(op->dst);
-            return 0;
-        }
-        emit_ex_de_hl(out);            /* HL = result */
-        commit_hl_word(out, f, op->dst);
+        emit_z80n_barrel_shift(out, f, op, "bsrl");
         return 0;
     }
     int n = L.cmp_label_counter++;
@@ -1858,19 +1860,7 @@ static int gen_sar16(FILE *out, Func *f, const Op *op)
 
     /* variable count */
     if (IS_Z80N()) {                             /* arithmetic barrel */
-        load_binop_operands(out, f, op);         /* HL=value, DE=count */
-        int bc_live = (L.rs.bc >= 0);
-        if (bc_live) emit(out, "push\tbc");
-        emit(out, "ld\tb,e");
-        emit_ex_de_hl(out);                  /* DE=value */
-        emit(out, "bsra\tde,b");
-        if (bc_live) emit(out, "pop\tbc");
-        invalidate_hl_cache();
-        invalidate_de_cache();
-        if (!bc_live) invalidate_bc_cache();
-        if (vreg_is_pr_de(f, op->dst)) { cache_de(op->dst); return 0; }
-        emit_ex_de_hl(out);
-        commit_hl_word(out, f, op->dst);
+        emit_z80n_barrel_shift(out, f, op, "bsra");
         return 0;
     }
     if (has_sra) {                               /* inline sra/rr loop (incl 8085) */

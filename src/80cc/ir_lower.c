@@ -1228,6 +1228,45 @@ static int shr_dead_l_store(char **lines, int n, int at)
     return drop;
 }
 
+/* Read a function's rendered assembly for the whole-function text filters.
+   On allocation failure, rewind so the caller can copy the input verbatim. */
+static int slurp_lower_lines(FILE *src, char ***lines_out, int *count_out)
+{
+    char buf[1024];
+    char **lines = NULL;
+    int n = 0, cap = 0;
+    while (fgets(buf, sizeof buf, src)) {
+        if (n == cap) {
+            cap = cap ? cap * 2 : 256;
+            char **nl = realloc(lines, (size_t)cap * sizeof *lines);
+            if (!nl) {
+                for (int i = 0; i < n; i++) free(lines[i]);
+                free(lines);
+                rewind(src);
+                return 0;
+            }
+            lines = nl;
+        }
+        char *line = strdup(buf);
+        if (!line) {
+            for (int i = 0; i < n; i++) free(lines[i]);
+            free(lines);
+            rewind(src);
+            return 0;
+        }
+        lines[n++] = line;
+    }
+    *lines_out = lines;
+    *count_out = n;
+    return 1;
+}
+
+static void copy_lower_stream(FILE *out, FILE *src)
+{
+    char buf[1024];
+    while (fgets(buf, sizeof buf, src)) fputs(buf, out);
+}
+
 /* Post-render peephole: drop a dead one-way register copy `ld hl,de` (HL:=DE)
    or `ld de,hl` (DE:=HL) when the destination pair is FULLY reloaded before any
    use. The ordinary case checks the next real instruction (skipping labels,
@@ -1248,18 +1287,11 @@ static int shr_dead_l_store(char **lines, int n, int at)
    lookahead is a simple index scan. */
 static void filter_dead_reg_copies(FILE *out, FILE *src)
 {
-    char buf[1024];
-    char **lines = NULL; int n = 0, cap = 0;
-    while (fgets(buf, sizeof buf, src)) {
-        if (n == cap) { cap = cap ? cap * 2 : 256;
-            char **nl = realloc(lines, (size_t)cap * sizeof *lines);
-            if (!nl) { free(lines); rewind(src);            /* OOM: verbatim */
-                while (fgets(buf, sizeof buf, src)) fputs(buf, out); return; }
-            lines = nl; }
-        lines[n++] = strdup(buf);
-        if (!lines[n - 1]) { for (int i = 0; i < n - 1; i++) free(lines[i]);
-            free(lines); rewind(src);
-            while (fgets(buf, sizeof buf, src)) fputs(buf, out); return; }
+    char **lines;
+    int n;
+    if (!slurp_lower_lines(src, &lines, &n)) {
+        copy_lower_stream(out, src);
+        return;
     }
     char *drop = calloc((size_t)(n > 0 ? n : 1), 1);
     if (drop) {
@@ -2134,24 +2166,36 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
                                      if (lel) lel[k] = 1; }   /* unsettled */
 }
 
+static void try_fold_8085_addr_pair(char **lines, char *drop, int i,
+                                    int d_live, int e_live, int f_live,
+                                    const char *opt, const char *add_line,
+                                    const char *load_fmt,
+                                    const char *replacement_fmt)
+{
+    if (!IS_8085() || opt_disabled(opt) || d_live || e_live || f_live
+        || i <= 0 || strcmp(lines[i], add_line) || drop[i] || drop[i - 1])
+        return;
+    int n = -1;
+    if (sscanf(lines[i - 1], load_fmt, &n) != 1 || n < 0 || n > 255)
+        return;
+    char buf[48];
+    snprintf(buf, sizeof buf, replacement_fmt, n);
+    char *a = strdup(buf), *b = strdup("\tex\tde,hl\n");
+    if (a && b) {
+        free(lines[i - 1]); lines[i - 1] = a;
+        free(lines[i]);     lines[i]     = b;
+    } else { free(a); free(b); }
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
 {
-    char buf[1024];
-    char **lines = NULL; int n = 0, cap = 0;
-    while (fgets(buf, sizeof buf, src)) {
-        if (n == cap) { cap = cap ? cap * 2 : 256;
-            char **nl = realloc(lines, (size_t)cap * sizeof *lines);
-            if (!nl) { free(lines); rewind(src);
-                while (fgets(buf, sizeof buf, src)) fputs(buf, out);
-                return; }
-            lines = nl; }
-        lines[n++] = strdup(buf);
-        if (!lines[n - 1]) { for (int i = 0; i < n - 1; i++) free(lines[i]);
-            free(lines); rewind(src);
-            while (fgets(buf, sizeof buf, src)) fputs(buf, out);
-            return; }
+    char **lines;
+    int n;
+    if (!slurp_lower_lines(src, &lines, &n)) {
+        copy_lower_stream(out, src);
+        return;
     }
     char *drop = calloc((size_t)(n > 0 ? n : 1), 1);
     if (drop) {
@@ -2278,22 +2322,9 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                reason: at line i it is the answer for the code AFTER line i.
                `--opt-disable=ldsi-addr` opts out. Census and evidence:
                adr/0039. */
-            if (IS_8085() && !opt_disabled("ldsi-addr")
-                && !d_live && !e_live && !f_live
-                && i > 0 && !strcmp(lines[i], "\tadd\thl,sp\n")
-                && !drop[i] && !drop[i - 1]) {
-                int n = -1;
-                if (sscanf(lines[i - 1], "\tld\thl,%d\n", &n) == 1
-                    && n >= 0 && n <= 255) {
-                    char buf[48];
-                    snprintf(buf, sizeof buf, "\tld\tde,sp+%d\n", n);
-                    char *a = strdup(buf), *b = strdup("\tex\tde,hl\n");
-                    if (a && b) {
-                        free(lines[i - 1]); lines[i - 1] = a;
-                        free(lines[i]);     lines[i]     = b;
-                    } else { free(a); free(b); }
-                }
-            }
+            try_fold_8085_addr_pair(lines, drop, i, d_live, e_live, f_live,
+                                    "ldsi-addr", "\tadd\thl,sp\n",
+                                    "\tld\thl,%d\n", "\tld\tde,sp+%d\n");
             /* [ldhi-addr] LDSI's sibling, and the same three hazards. Adding a
                small constant to a pointer already in HL costs
                `ld de,N; add hl,de` — 4 bytes, 20 cycles. The 8085 has LDHI,
@@ -2309,22 +2340,9 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                    range is common here, unlike LDSI: the corpus immediates
                    include bench magic constants such as 13849.
                `--opt-disable=ldhi-addr` opts out. adr/0077. */
-            if (IS_8085() && !opt_disabled("ldhi-addr")
-                && !d_live && !e_live && !f_live
-                && i > 0 && !strcmp(lines[i], "\tadd\thl,de\n")
-                && !drop[i] && !drop[i - 1]) {
-                int n = -1;
-                if (sscanf(lines[i - 1], "\tld\tde,%d\n", &n) == 1
-                    && n >= 0 && n <= 255) {
-                    char buf[48];
-                    snprintf(buf, sizeof buf, "\tld\tde,hl+%d\n", n);
-                    char *a = strdup(buf), *b = strdup("\tex\tde,hl\n");
-                    if (a && b) {
-                        free(lines[i - 1]); lines[i - 1] = a;
-                        free(lines[i]);     lines[i]     = b;
-                    } else { free(a); free(b); }
-                }
-            }
+            try_fold_8085_addr_pair(lines, drop, i, d_live, e_live, f_live,
+                                    "ldhi-addr", "\tadd\thl,de\n",
+                                    "\tld\tde,%d\n", "\tld\tde,hl+%d\n");
             /* [z80n-add-a] Adding a zero-extended byte to HL costs
                `ld e,a; ld d,0; add hl,de` — 4 bytes, 22 cycles, and it spends
                DE. The z80n has `add hl,a` (ED 31, 2 bytes, 8 cycles,
@@ -5276,8 +5294,8 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_LD_SYM:            return gen_ld_sym(out, f, op);
     case IR_LD_STR:            return gen_ld_str(out, f, op);
     case IR_LEA:               return gen_lea(out, f, op);
-    case IR_INC:               return gen_inc(out, f, op);
-    case IR_DEC:               return gen_dec(out, f, op);
+    case IR_INC:               return gen_step(out, f, op, 1);
+    case IR_DEC:               return gen_step(out, f, op, -1);
     case IR_POSTSTEP:          return gen_poststep(out, f, op);
     case IR_ROTL:              return gen_rotl(out, f, op);
     case IR_EXTRACT_BYTE:      return gen_extract_byte(out, f, op);

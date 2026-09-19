@@ -5353,7 +5353,7 @@ void ir_alloc(Func *f)
                                compare — it was the in-place `inc bc` (gpderef p++)
                                skipping the write-both slot store, so the slot went
                                stale and the out-of-span compare read it; fixed in
-                               gen_inc (exclude CALL_SPLIT from the in-place bump).
+                               gen_step (exclude CALL_SPLIT from the in-place bump).
                                Still excluded: deref/step/branch/fused kinds that
                                read BC INLINE with no slot fallback. */
                             switch (o->kind) {

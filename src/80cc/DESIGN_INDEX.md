@@ -222,27 +222,31 @@ rewrite when aliasing or observable reads are possible. `long_ir` passes
 The standard corpus has no size changes in 660 CPU/frame cells and no Z80 tick
 changes in 60 cells; the annotated real-file case is where this helps.
 
-**Parked housekeeping — local copy-paste, not density (2026-09-19).**
-Not the next action. Does not reopen the copt-embed project above. A correct
-merge does not change emitted code. Each still needs the gauntlet. The sites
-sit in the lowerer.
+**Local copy-paste housekeeping — COMPLETE (2026-09-19).**
+The six behavior-neutral refactors below are implemented; emitted assembly is
+unchanged.
 
-Do these, in this order:
+1. [x] `gen_step` replaces `gen_inc` / `gen_dec`; it selects `inc` / `dec`
+   with `+1` / `-1`.
+2. [x] `emit_dsub_jp(cc)` shares the 8085 DSUB-plus-branch sequence.
+3. [x] `emit_z80n_barrel_shift` shares the variable shift body
+   (`bsrl` / `bsra`).
+4. [x] Far-call BC save, restore, and cache invalidation use shared helpers.
+5. [x] `filter_dead_reg_copies` and `filter_dead_bc_parks` share
+   OOM-safe line buffering.
+6. [x] `try_fold_8085_addr_pair` shares the LDSI / LDHI rewrite skeleton.
 
-1. `gen_inc` / `gen_dec` (`ir_lower_ops.inc.c:375-454`). Same control flow.
-   `try_inplace_home_unop` already takes the mnemonic. One `gen_step` with
-   `"inc"` / `"dec"` and `+1` / `-1`.
-2. 8085 DSUB BC-guard (`ir_lower_cmp.inc.c:672-688` and `:875-891`). The same
-   `push bc; ld bc,de; sub hl,bc; pop; jp k/nk`. Extract `emit_dsub_jp(cc)`.
-3. z80n barrel (`gen_shr` `:1734-1751` / `gen_sar16` `:1860-1874`). The same
-   except `bsrl` vs `bsra`.
-4. Far-call BC save (`ir_lower_call.inc.c` `gen_ld_far` / `gen_st_far` /
-   `gen_ld_farsym`). The same `func_has_pr_bc && bc_tenant_live_here`
-   push/pop and invalidate.
-5. Line slurp in `filter_dead_reg_copies` and `filter_dead_bc_parks`
-   (`ir_lower.c`). The same OOM-safe `fgets` / `strdup` buffer.
-6. `[ldsi-addr]` / `[ldhi-addr]` (`ir_lower.c:2281-2326`). The same rewrite.
-   Different `sscanf` and `ld de,sp+N` vs `ld de,hl+N`.
+Validation against the exact pre-cleanup HEAD:
+
+- `long_ir`: 851/851 passed in sp and fp; only the existing
+  `longshl_vm1` assembler gap remains.
+- Reference assembly: 452 files identical; size: 720/720 cells identical;
+  Z80 ticks: 60/60 cells identical.
+- CLOB / PARK / REC / IX verifier logs match for z80, 8085, and z80n in
+  both frame modes; PARK reports zero steals and depth mismatches.
+- Console gates pass both modes for enigma, clisp, adv_a, sorter,
+  fmemopen, and fib. `today.c` fails identically before and after at
+  `time(tvec)`.
 
 Do not merge `load_to_hl` with `load_to_de`. Do not merge `gen_add` with
 `gen_sub`. Do not merge the whole of `gen_cmp_lt_ge` with `gen_cmp_gt_le`.
