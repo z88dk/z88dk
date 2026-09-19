@@ -1,7 +1,12 @@
 ---
 name: cpu-8085
 description: >
-Intel 8085 assembly for z88dk: Zilog mnemonics, full opcode map (flags K/V, timings), and extended-instruction usage. Strong rule: stack-only locals and intermediates; do not invent BSS scratch (C static / file-scope stay BSS). Prefer when writing or reviewing 8085 library asm, mapping Intel↔Zilog, choosing stack frames, K-flag loops, restoring float/integer divide, legal (de) stores, jr-as-jp synthetics, or /cpu-8085.
+  Intel 8085 assembly for z88dk: Zilog mnemonics, full opcode map (flags K/V,
+  timings), and extended-instruction usage. Strong rule: stack-only locals and
+  intermediates; do not invent BSS scratch (C static / file-scope stay BSS).
+  Prefer when writing or reviewing 8085 library asm, mapping Intel↔Zilog,
+  choosing stack frames, K-flag loops, restoring float/integer divide, legal
+  (de) stores, jr-as-jp synthetics, or /cpu-8085.
 ---
 
 # CPU — 8085
