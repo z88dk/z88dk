@@ -1,12 +1,7 @@
 ---
 name: cpu-8085
 description: >
-  Intel 8085 assembly for z88dk: Zilog mnemonics, full opcode map (flags K/V,
-  timings), and extended-instruction usage. Strong rule: stack-only locals and
-  intermediates; static/BSS only for cross-call state. Prefer when writing or
-  reviewing 8085 library asm, mapping Intel↔Zilog, choosing stack frames,
-  K-flag loops, restoring float/integer divide, legal (de) stores,
-  jr-as-jp synthetics, or /cpu-8085.
+Intel 8085 assembly for z88dk: Zilog mnemonics, full opcode map (flags K/V, timings), and extended-instruction usage. Strong rule: stack-only locals and intermediates; do not invent BSS scratch (C static / file-scope stay BSS). Prefer when writing or reviewing 8085 library asm, mapping Intel↔Zilog, choosing stack frames, K-flag loops, restoring float/integer divide, legal (de) stores, jr-as-jp synthetics, or /cpu-8085.
 ---
 
 # CPU — 8085
@@ -189,7 +184,7 @@ Pastraiser T-states (8085 clocks). Not 8080 (many documented ops differ by 1T).
 1. Emit **Zilog** mnemonics only (`ld a,b` not `MOV A,B`; `jp nz,label` not `JNZ`).
 2. Register pairs: `bc`, `de`, `hl`, `af`, `sp` — never Intel `B`, `D`, `H`, `PSW` in new code.
 3. Use `(hl)`, `(bc)`, `(de)`, `(**)` for memory; never `M`.
-4. Prefer undocumented ops when they clearly win (e.g. `sub hl,bc`, `ld hl,(de)`, `ld (de),hl`, `ld de,hl+*`) **and** the target assembler/CPU path supports them.
+4. Prefer undocumented ops when they clearly win (e.g. `sub hl,bc`, `ld hl,(de)`, `ld (de),hl`, `ld de,hl+*`) **and** the target assembler/CPU path supports them. Prefer **saccharine** (§10) over the two-insn spelling of the same bytes.
 5. Never assume Z80 instruction timings or prefix opcodes exist on 8085. **`jr` / `jr cc` are allowed** in normal mode (synthetics on): z80asm emits `jp` / `jp cc` (3 bytes; cond `jp` is 10/7). Same source then assembles for Z80, where `jr` is native. **Strict** / `-no-synth` rejects `jr`. Do not expect a 2-byte relative branch (`18` is `rl de`).
 6. When optimizing, consult [references/opcodes.md](references/opcodes.md) for exact size/cycle/flag data.
 7. **Assembler support last resort:** fixtures `src/z80asm/dev/cpu/cpu_test_8085_{ok,err}.asm` (and `*_strict_*`). **ok** = z80asm accepts that source form (native, synthetic, or `call __z80asm__*`). **err** = rejected. **`_strict_`** = **synthetics forbidden**. Fixtures may include **Intel** spellings for external-compat testing; **z88dk always writes Zilog**. Full decode: **`tool-z80asm`**. `rg` only; do not bulk-read.
@@ -204,7 +199,7 @@ Full 16×16 opcode grid, Intel cross-ref, and macro helpers:
 
 # Extended instruction usage
 
-When and how to use the ten 8085 extended instructions. **Encodings, timings, and flags** are in **this skill** + [references/opcodes.md](references/opcodes.md) and `references/opcodes.md`.
+When and how to use the ten 8085 extended instructions. **Encodings, timings, and flags** are in **this skill** and [references/opcodes.md](references/opcodes.md).
 
 Background: [8085 Software — Extended Instructions](https://feilipu.me/2021/09/27/8085-software/) (feilipu, 2021). Present on every 8085 (also Tundra CA80C85B).
 
@@ -212,17 +207,17 @@ Background: [8085 Software — Extended Instructions](https://feilipu.me/2021/09
 
 ## Hard rule: stack variables, not static/BSS
 
-**Static memory (BSS / `label: ds n` / fixed absolute cells) must only hold state that must survive across function calls.** Never use it for intermediate variable storage.
+**Do not invent BSS for temps.** Locals, intermediates, and spills live on the stack. BSS/data holds only state that already must outlive the call.
 
 | Allowed in static/BSS | Forbidden in static/BSS |
 |-----------------------|-------------------------|
-| Values that **must outlive** the current call (true globals, module state, buffers callers re-enter later) | Locals, temps, intermediate results, scratch across a few instructions |
-| MMIO, interrupt vectors, ROM constants | “Scratch” cells to avoid a push or stack frame |
+| C **`static`** and **file-scope** objects (honor the C — do not move them to the stack “for 8085 style”) | Locals, temps, intermediate results, compiler scratch |
+| True module state, MMIO, interrupt vectors, ROM constants | “Scratch” cells to avoid a push or stack frame |
 | | Anything justified only by fewer cycles or easier coding |
 
 - Function **locals, temporaries, and intermediate results** live **only on the stack** (arguments, return slots, pushes, explicit frames).
 - Access with **`ld de,sp+*`**, **`ld hl,(de)`**, **`ld (de),hl`**, **`ld a,(de)`**, push/pop, **`ex (sp),hl`**.
-- Prefer **pointers passed on the stack** over new static cells, even for long-lived data when the caller already owns the buffer.
+- Prefer **pointers passed on the stack** over **new** static cells when the caller already owns the buffer. Do **not** rewrite a C `static` / file-scope object to the stack.
 - “Slightly fewer cycles” or “easier to write” is **not** enough justification for static/BSS scratch.
 
 ## Instruction preferences
@@ -232,7 +227,7 @@ Background: [8085 Software — Extended Instructions](https://feilipu.me/2021/09
 | `ld de,sp+*` | SP-relative address of a byte/word on the stack | `*` is **unsigned** 8-bit |
 | `ld de,hl+*` | DE ← HL + unsigned offset (struct/buffer) | Same unsigned rule |
 | `ld hl,(de)` / `ld (de),hl` | 16-bit load/store through DE | Not Z80 prefix encodings |
-| `sub hl,bc` | 16-bit subtract; **== / !=**; signed compares with K | **No borrow-in**; not multi-word subtract chains |
+| `sub hl,bc` | 16-bit subtract; **== / !=**; signed order **K**; unsigned order **C** | **No borrow-in**; not multi-word subtract chains. Use K/C **immediately**; do not mix |
 | `sra hl` | Signed 16-bit arithmetic right shift | V←0; C ← old bit 0; **Z unchanged** — never `sra hl; jp z` |
 | `rl de` | Rotate DE left through C; ×2 on DE; 32-bit with HL | **Z unchanged** — never `rl de; jp z`. Pair with `add hl,hl` |
 | `jp k,**` / `jp nk,**` | After 16-bit `dec`; signed compare outcomes | K after `dec rp` sets on **−1**, not on **0** |
@@ -297,7 +292,7 @@ Temporary use then restore previous HL (DE ends as SP+n, not original DE):
     ld  sp,hl
 ```
 
-Document every slot. Drop consumed args in one epilogue:
+Document every slot. On each function, state purpose, inputs, outputs, and used registers. Drop consumed args in one epilogue:
 
 ```asm
     pop bc             ; return address — never pop af for this
@@ -333,13 +328,15 @@ Without alternate registers, a second long value lives **on the stack**, not in 
     jp  z,equal        ; or jp nz,not_equal
 ```
 
-Signed order (illustrative — tune K/Z/C to the relation):
+Signed order (**K**, immediately). `<=` is K **or** Z; `>` is NK and NZ:
 
 ```asm
     ld  bc,de
     sub hl,bc
-    jp  k,...          ; use K together with Z/S/C as required
+    jp  k,less         ; signed HL < BC
 ```
+
+Unsigned order (**C** / borrow, immediately). `<=` is C **or** Z; `>` is NC and NZ. Do not use `jp k` for unsigned `<`.
 
 For multi-word subtract **with borrow**, use **`sub` / `sbc` through A**, not `sub hl,bc`.
 
@@ -357,7 +354,7 @@ loop:
     jp  nk,loop        ; adjust sense to match your initial count
 ```
 
-Do not copy Z80 `dec bc; jp nz` semantics.
+Do not copy Z80 `dec bc; jp nz` semantics. **C `n--` / `--i == 0` is not `jp k` / `jp nk`** (K is −1, and 16-bit `dec` does not write Z). Those C loops: test Z (`ld a,h` / `or l`) or the `dec bc` / `inc b` / `inc c` structure below.
 
 #### Alternative 16-bit counted loop structure.
 
@@ -399,12 +396,13 @@ Partial **unroll** when the body is small. Entry style: public DE/HL form → **
 
 #### `(de)` stores — only legal forms
 
-On 8085, **`ld (de),r` / `ld (de),n` are illegal**. Valid: **`ld a,(de)`**, **`ld (de),a`**, **`ld hl,(de)`**, **`ld (de),hl`**, post-inc synthetics (`ld a,(de+)`). Prefer **`ld (de),hl`** for word stores; never invent Z80-style `(de),l`.
+On 8085, **`ld (de),r` / `ld (de),n` are illegal as chip ops** for r ≠ A. Valid chip: **`ld a,(de)`**, **`ld (de),a`**, **`ld hl,(de)`**, **`ld (de),hl`**. Saccharine **`ld a,(de+)` / `ld (de-),a`** (and `+`) is the chip op plus `inc`/`dec de` — use it. **`ld (de),l`** / **`ld b,(de+)`** insert `ex de,hl` — not saccharine; prefer `ld (de),hl` or move through A.
 
-#### Style (math32/math16 library asm)
+#### Style (listings)
 
-- Four-space indent; blank line **only** after unconditional `jr`/`jp` (not after every label).
-- Prefer synthetics: `ld de,hl`, `ld bc,hl`, …; if DE is dead after a transfer, **`ex de,hl`** over `ld h,d` / `ld l,e`.
+- Four-space indent. Prefer **saccharine** (§10): `ld de,hl`, `ld b,(hl+)`, `ld (de-),a`. If DE is dead after a transfer, **`ex de,hl`** over `ld h,d` / `ld l,e`.
+- **New 8085-only listings:** blank line after `jp` / `jp cc` / `jp (hl)` / `ret` / `ret cc`. **Not** after `call` / `call cc`. Write `jp`, not `jr`.
+- **Existing libsrc:** match that file. math32/math16 cores often blank only after unconditional `jr`/`jp`. Dual-CPU library may write `jr` (assembler → `jp` on 8085).
 
 ### 7. Shifts
 
@@ -460,45 +458,47 @@ Push a scratch word; **`ex (sp),hl`** swaps with it when AF/BC/DE/HL are full (1
 
 Assembler must be **8085-aware** (these encodings are not Z80 prefixes).
 
-### 10. Synthetic opcodes
+### 10. Saccharine (zero-cost assembler sugar)
 
-**z80asm** expands many **synthetic** source forms into short real-op sequences (no harmful flag/side effects for the forms below). They keep library code readable and portable across CPUs without `#if CPU` for the same transfer.
+**Saccharine** is a z80asm synthetic whose expansion is exactly the bytes (and flags) you would write by hand. Use it in listings — it is **free** and more readable. Normal mode (`-m8085`); **strict** / `-no-synth` rejects it. Ground truth: `cpu_test_8085_ok.asm` (`tool-z80asm`).
 
-#### 16-bit register-pair copies (full set)
+**Use (zero cost):**
 
-Synthetics of the form **`ld dst,src`** where **dst** and **src** are word register pairs. Each expands to **two 8-bit `ld`s** (high then low, or as the assembler tables define — e.g. `ld de,hl` → `ld d,h` / `ld e,l`).
-
-| Allowed pairs | Forbidden as word-copy synthetics |
-|---------------|-------------------------------------|
-| **`bc`**, **`de`**, **`hl`** — **any → any** (including “same” pair) | **`af`**, **`sp`** (not part of this word-copy set) |
+| Form | Expansion | Notes |
+|------|-----------|--------|
+| `ld bc,de` / `ld de,hl` / `ld hl,bc` / … | two 8-bit `ld`s | **`bc`/`de`/`hl` any → any.** Not `af`, not `sp` |
+| `ld r,(hl+)` / `ld r,(hl-)` | `ld r,(hl)` / `inc` or `dec hl` | r is A,B,C,D,E,H,L |
+| `ld (hl+),r` / `ld (hl-),r` | `ld (hl),r` / `inc` or `dec hl` | |
+| `ld a,(de+)` / `ld a,(de-)` | `ld a,(de)` / `inc` or `dec de` | |
+| `ld (de+),a` / `ld (de-),a` | `ld (de),a` / `inc` or `dec de` | |
+| `add a,(hl+)` / `cp (hl+)` / `inc (hl+)` / … | `(hl)` ALU / `inc hl` | Same family |
 
 ```asm
-    ld  bc,de          ; B←D, C←E
-    ld  bc,hl
-    ld  de,bc
-    ld  de,hl
-    ld  hl,bc
-    ld  hl,de
+    ld  bc,de          ; park DE in BC
+    ld  a,(hl+)        ; *p++
+    ld  (de-),a        ; *--q = a
 ```
 
-**Prefer these over hand-rolled two-byte moves** (`ld b,d` / `ld c,e`, …) and over swap dances when you only need to **park one pair**:
+**Prefer these over** `ld b,d` / `ld c,e` and over `ld a,(hl)` / `inc hl` as two source lines.
 
 ```asm
-    ; Hold DEHL; need HL free for SP adjust — park lo only:
     ld  bc,hl          ; park lo; DE (hi) stays
     ld  hl,14
     add hl,sp
     ld  sp,hl
-    ld  hl,bc          ; restore lo
+    ld  hl,bc
 ```
 
-Do **not** invent `ld bc,de` + `ex de,hl` + SP math + reverse swaps when `ld bc,hl` / `ld hl,bc` is enough.
+**Not saccharine** (assembler accepts; extra `ex` / `push` / helper — do not use for legibility):
 
-Other common synthetics (not pair-copy): e.g. `ld a,(hl+)` (load + inc index).
+| Form | Why it costs |
+|------|----------------|
+| `ld (de),l` / `ld (de+),b` / `ld b,(de+)` / `ld (de+),n` | `ex de,hl` around `(hl)` |
+| `ld (hl+),hl` | push/pop AF |
+| `sub hl,de` as a source form | helper `call`, not DSUB |
+| `jr` / `jr cc` | 3-byte `jp` on 8085 (allowed in dual-CPU library) |
 
-**`jr` / `jr cc`:** allowed in **normal** mode as `jp` / `jp cc`. Use them when the same source may also build for Z80. **Strict** / `-no-synth` rejects `jr`. Cost as a 3-byte `jp` (cond 10/7), not as Z80’s 2-byte `jr`. `18` is native `rl de`, not `jr`.
-
-**Strict** assemble (`*_strict_*` / `-no-synth`) **forbids** free synthetics — fixtures under `src/z80asm/dev/cpu/` (see **`tool-z80asm`**).
+**`jr` / `jr cc`:** allowed in **normal** mode as `jp` / `jp cc`. Use them when the same source may also build for Z80. 8085-only listings write `jp`. **Strict** / `-no-synth` rejects `jr` and all saccharine. Cost `jr` as a 3-byte `jp` (cond 10/7). `18` is native `rl de`, not `jr`.
 
 ## Pitfalls
 
@@ -511,19 +511,20 @@ Other common synthetics (not pair-copy): e.g. `ld a,(hl+)` (load + inc index).
 7. **No `exx`, IX, IY, native `djnz` / native `jr`.** `jr` **is allowed** in normal mode (→ `jp`; shared Z80 source). Strict: write `jp`. Second long operand on stack; counted loops via `dec b`/`jr nz` or K pre-dec (§5).
 8. **Forward overlapping stack copy corrupts** — see multi-word frame rebuild above.
 9. **No copt pass on library asm** — hand-written `libsrc/**` is assembled as-is. Remove copy-backs (`ld r,a` then `ld a,r`) and other dead moves yourself. Match the **target file’s** whitespace (spaces vs tabs); do not reformat to sccz80/copt tab style. **Before finalising** any hand-coded math16/math32 (or similar) edit: scan for copt-equivalent wins (`ex de,hl` / `ld bc,hl` instead of push/pop transfers; drop `ld a,e` after `ld e,a`; pair zeros → `ld hl,0`; etc.) and run the matching suite. Do **not** use `xor a` for `ld a,0` when CF must survive. Full checklist: **`tool-copt`** and **`methodology-measure`** (“Before finalising hand-coded library work”).
-10. **Illegal `(de)` stores** — only `a` / `hl` / post-inc forms (§6). A “working” assemble that used faked `ld (de),l` means the toolchain or listing was not 8085-checked.
-11. **`__CPU_INTEL__` is set for 8085.** 9-common `IF __CPU_INTEL__` takes the 8080-portable path and will not emit `rl de` / `sra hl`. Do not “fix” those files with `#if __CPU_8085__`. Fork into `7-8085/` and list the module first (`l/util/8085.lst`, `l/sccz80/8085.lst`). Existing forks: `l_lsl_dehl`, `l_asr_dehl`, `l_long_asr`, `l_small_atoul` / `htoul` / `otoul` / `utoa`, `l_gint1sp`…`l_gint8sp`.
+10. **Illegal chip `(de)` stores** — only `a` / `hl`. Saccharine `ld (de+),a` is fine. `ld (de),l` assembling is a **paid** `ex de,hl` expansion, not a chip op.
+11. **`__CPU_INTEL__` is set for 8085.** 9-common `IF __CPU_INTEL__` takes the 8080-portable path and will not emit `rl de` / `sra hl`. Do not “fix” those files with `#if __CPU_8085__`. Fork into `7-8085/` and list the module first (`l/util/8085.lst`, `l/sccz80/8085.lst`). Existing forks: `l_lsl_dehl`, `l_asr_dehl`, `l_long_asr`, `l_small_atoul` / `htoul` / `otoul` / `utoa`, `l_gint1sp`…`l_gint8sp`. **New 8085-only code** does not `call l_gint*sp` — open-code `ld de,sp+*` / `ld hl,(de)`.
 
 ## Preference order (when writing 8085-only code)
 
-1. Stack-only locals/temps/intermediates; **static/BSS only for state that must survive across calls** — never intermediate storage.
+1. Stack-only locals/temps/intermediates. **Do not invent BSS scratch.** C `static` / file-scope and true module state stay in BSS/data.
 2. **`ld de,sp+*`** for stack pointers; **`ex de,hl`** forms for HL←SP+n (see §2) over `ld hl,nn`/`add hl,sp` when offset is u8.
 3. **`ld hl,(de)` / `ld (de),hl` / `ld a,(de)`** for stack traffic through DE.
-4. **`sub hl,bc`** for 16-bit ==, !=, and signed compares with **K**.
-5. **K + pre-dec** for 16-bit counted loops.
+4. **`sub hl,bc`** for 16-bit == / != (Z); signed order **K**; unsigned order **C**.
+5. **K + pre-dec** only for the −1 trip identity. C counted loops: Z or `inc b`/`inc c` — not `n--` → `jp nk`.
 6. **`rl de`** for ×2, mul/div shifts, 32-bit with HL.
 7. **`sra hl`** for signed 16-bit >>; logical multi-byte >> via A.
 8. Fall back to 8080-portable sequences only when the binary must run without 8085 extended ops.
+9. Write **saccharine** (`ld bc,de`, `ld b,(hl+)`, `ld (de-),a`) instead of the two-insn spelling.
 
 ## Related
 
