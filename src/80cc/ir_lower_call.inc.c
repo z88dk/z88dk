@@ -157,13 +157,30 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                keeps that D/E mapping valid. */
             int j   = start + (k + 1) * push_step;
             int sda = pushed_bytes + sp_adj_extra;
-            push_arg_byte_to_a(out, f, ci->args[i], sda); /* current i (higher) */
-            emit(out, "ld\td,a");
-            push_arg_byte_to_a(out, f, ci->args[j], sda); /* next (lower) */
-            emit(out, "ld\te,a");
+            const Op *hi = byte_remat_of(f, ci->args[i]);
+            const Op *lo = byte_remat_of(f, ci->args[j]);
+            int direct_pair = hi && lo && hi->kind == IR_LD_IMM
+                            && lo->kind == IR_LD_IMM;
+            if (direct_pair) {
+                /* Both call-only byte arguments are constants. Build the
+                   packed word directly instead of loading A twice and
+                   copying each byte into D/E. The high-index arg is D and
+                   the low-index arg is E, as in the general path below. */
+                unsigned pair = ((unsigned)(hi->imm & 0xff) << 8)
+                              | (unsigned)(lo->imm & 0xff);
+                emit(out, "ld\tde,%u", pair);
+            } else {
+                push_arg_byte_to_a(out, f, ci->args[i], sda); /* higher */
+                emit(out, "ld\td,a");
+                push_arg_byte_to_a(out, f, ci->args[j], sda); /* lower */
+                emit(out, "ld\te,a");
+            }
             emit(out, "push\tde");
             pushed_bytes += 2;
-            invalidate_hl_cache();   /* sp path clobbered HL; both clobber DE */
+            if (direct_pair)
+                invalidate_de_cache(); /* ld de,nn only changed DE */
+            else
+                invalidate_hl_cache(); /* fallback may use HL */
             k++;   /* the paired char is consumed here */
         } else if (width == 1 && (ci->flags & (SDCCDECL | SDCCCALL1))) {
             /* sc1/sdccdecl char arg: push ONE byte. `push af; inc sp` leaves
@@ -1005,6 +1022,27 @@ static const char *far_helper_name(Kind elem, int width, int is_unsigned, int lo
     return NULL;
 }
 
+static int far_call_save_bc(FILE *out, Func *f)
+{
+    int saved = func_has_pr_bc(f) && bc_tenant_live_here(f);
+    if (saved) { emit(out, "push\tbc"); L.cur_sp_adjust += 2; }
+    return saved;
+}
+
+static void far_call_restore_bc(FILE *out, int saved)
+{
+    if (saved) { emit(out, "pop\tbc"); L.cur_sp_adjust -= 2; }
+}
+
+static void far_call_invalidate_caches(int bc_saved)
+{
+    invalidate_hl_cache();
+    if (!bc_saved) invalidate_bc_cache();
+    invalidate_de_cache();
+    invalidate_a_cache();
+    cur_bank_fn = NULL;
+}
+
 /* IR_LD_FAR: dst ← *src[0], src[0] a __far pointer (KIND_CPTR) in DEHL (D=0,
    E=bank, HL=offset). Routes through an lp_g* helper that pages the bank
    in/out. A far helper is a CALL: clobbers AF/BC/DE + the alt register set, so
@@ -1019,17 +1057,12 @@ static int gen_ld_far(FILE *out, Func *f, const Op *op)
                 "unsupported\n", (int)op->mem.elem, dst_w);
         return -1;
     }
-    int bc_saved = func_has_pr_bc(f) && bc_tenant_live_here(f);
-    if (bc_saved) { emit(out, "push\tbc"); L.cur_sp_adjust += 2; }
+    int bc_saved = far_call_save_bc(out, f);
     /* Materialize the far pointer into DEHL = EHL far address (D=0). */
     load_to_dehl(out, f, op->src[0]);
     emit(out, "call\t%s", h);
-    if (bc_saved) { emit(out, "pop\tbc"); L.cur_sp_adjust -= 2; }
-    invalidate_hl_cache();
-    if (!bc_saved) invalidate_bc_cache();
-    invalidate_de_cache();
-    invalidate_a_cache();
-    cur_bank_fn = NULL;   /* the helper paged a bank; re-page on next access */
+    far_call_restore_bc(out, bc_saved);
+    far_call_invalidate_caches(bc_saved);
     if (op->dst >= 0) {
         if (dst_w > 4) {
             /* Wide: lp_gdoub left the value in FA, lp_glonglong in
@@ -1069,8 +1102,7 @@ static int gen_st_far(FILE *out, Func *f, const Op *op)
                 "unsupported\n", (int)op->mem.elem, val_w);
         return -1;
     }
-    int bc_saved = func_has_pr_bc(f) && bc_tenant_live_here(f);
-    if (bc_saved) { emit(out, "push\tbc"); L.cur_sp_adjust += 2; }
+    int bc_saved = far_call_save_bc(out, f);
     /* 1. Address → primary DEHL, then onto the stack. */
     load_to_dehl(out, f, op->src[0]);
     emit(out, "push\tde");
@@ -1100,13 +1132,9 @@ static int gen_st_far(FILE *out, Func *f, const Op *op)
     L.cur_sp_adjust -= 4;
     emit(out, "exx");
     emit(out, "call\t%s", h);
-    if (bc_saved) { emit(out, "pop\tbc"); L.cur_sp_adjust -= 2; }
-    invalidate_hl_cache();
-    if (!bc_saved) invalidate_bc_cache();
-    invalidate_de_cache();
-    invalidate_a_cache();
+    far_call_restore_bc(out, bc_saved);
+    far_call_invalidate_caches(bc_saved);
     if (val_w > 4) *wide_acc_cell(f, val) = -1;   /* helper clobbered the accumulator */
-    cur_bank_fn = NULL;
     return 0;
 }
 
@@ -1119,17 +1147,12 @@ static int gen_st_far(FILE *out, Func *f, const Op *op)
 static int gen_ld_farsym(FILE *out, Func *f, const Op *op)
 {
     const char *nm = ir_sym_name(op->mem.sym);
-    int bc_saved = func_has_pr_bc(f) && bc_tenant_live_here(f);
-    if (bc_saved) { emit(out, "push\tbc"); L.cur_sp_adjust += 2; }
+    int bc_saved = far_call_save_bc(out, f);
     emit(out, "ld\thl,+(_%s %% 65536)", nm);
     emit(out, "ld\tde,+(_%s / 65536)", nm);
     emit(out, "call\tl_far_mapaddr");
-    if (bc_saved) { emit(out, "pop\tbc"); L.cur_sp_adjust -= 2; }
-    invalidate_hl_cache();
-    if (!bc_saved) invalidate_bc_cache();
-    invalidate_de_cache();
-    invalidate_a_cache();
-    cur_bank_fn = NULL;
+    far_call_restore_bc(out, bc_saved);
+    far_call_invalidate_caches(bc_saved);
     if (op->dst >= 0)
         store_dehl_finalize(out, f, op->dst);   /* EHL far ptr → DEHL */
     return 0;

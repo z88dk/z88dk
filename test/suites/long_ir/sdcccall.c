@@ -51,6 +51,20 @@ int  sd_iicc(int a, int b, char c, char d)         __z88dk_sdccdecl;
 int  sd_iicc(int a, int b, char c, char d)         __z88dk_sdccdecl { return a + b + c*2 + d; }
 int  sd_ccc (char a, char b, char c)               __z88dk_sdccdecl;
 int  sd_ccc (char a, char b, char c)               __z88dk_sdccdecl { return a*4 + b*2 + c; }
+int  sd_byte_pair(unsigned char hi, unsigned char lo) __z88dk_sdccdecl;
+int  sd_byte_pair(unsigned char hi, unsigned char lo) __z88dk_sdccdecl
+    { return hi * 256 + lo; }
+
+static int sd_dynamic_pair(int value) { return sd_byte_pair(0x1234, value); }
+
+static void sd_store_word(unsigned int *p) { *p = 0x5678; }
+
+static int sd_addr_taken_pair(void)
+{
+    unsigned int value = 0x1234;
+    sd_store_word(&value);
+    return sd_byte_pair(value, 0x9a);
+}
 
 static void test_sdcccall1(void)
 {
@@ -83,6 +97,16 @@ static void test_sdcccall1(void)
     Assert(sd_ccc(1, 2, 3)       == 11,    "sdccdecl three stacked chars (pair + 1)");
 }
 
+static void test_sdccdecl_byte_args(void)
+{
+    Assert(sd_byte_pair(0x1234, 0x5678) == 0x3478,
+           "sdccdecl packs literal bytes in ABI order");
+    Assert(sd_dynamic_pair(0x5678) == 0x3478,
+           "sdccdecl mixed literal and dynamic byte args");
+    Assert(sd_addr_taken_pair() == 0x789a,
+           "sdccdecl byte remat follows address-taken local through alias");
+}
+
 /* __sdcccall(1) through a function pointer: dispatched via the fastcall
    fc_idx (fnptr in ix/iy, args in A/HL/DE, `call l_jpix`) or fc_ret (push
    [retlabel][fnptr] then `ret`) machinery. Reuses the direct-call functions
@@ -110,6 +134,7 @@ int main(int argc, char *argv[])
     (void)argc; (void)argv;
     suite_setup("sdcccall1");
     suite_add_test(test_sdcccall1);
+    suite_add_test(test_sdccdecl_byte_args);
     suite_add_test(test_sdcccall1_fnptr);
     return suite_run();
 }

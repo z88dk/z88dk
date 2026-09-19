@@ -482,8 +482,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     if (width == 1) {
         const Op *br = byte_remat_of(f, vreg_id);
         if (br) {
-            char s[80]; byte_remat_symstr(s, sizeof s, br);
-            emit(out, "ld\ta,(%s)", s);
+            emit_byte_remat_to_a(out, br);
             cache_a(vreg_id);
             emit(out, "ld\tl,a");
             emit(out, "ld\th,0");
@@ -1338,8 +1337,7 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
     {
         const Op *br = byte_remat_of(f, vreg_id);
         if (br) {
-            char s[80]; byte_remat_symstr(s, sizeof s, br);
-            emit(out, "ld\ta,(%s)", s);
+            emit_byte_remat_to_a(out, br);
             cache_a(vreg_id);
             return;
         }

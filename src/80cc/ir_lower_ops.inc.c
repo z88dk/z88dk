@@ -38,6 +38,8 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (dst_w == 1) {
+        const Op *br = byte_remat_of(f, op->dst);
+        if (br && br->kind == IR_LD_IMM) return 0;
         /* Byte literal: load A and spill byte-sized. The generic path
            below writes TWO bytes into a 1-byte slot (overrun). Consumers
            hit the A-cache via load_byte_to_a / load_to_hl's width-1 path. */
@@ -335,7 +337,7 @@ static int try_word_step_imm(FILE *out, Func *f, const Op *op, int is_sub)
     if (op->dst < 0 || f->vregs[op->dst].width != 2) return 0;
     if (op->src[0] < 0 || op->src[1] >= 0) return 0;   /* src0 vreg + const imm */
     if (op->dst == op->src[0]) return 0;               /* in-place: cheaper via
-        inc bc/de/<idx> (gpderef), gen_inc/dec, or B.1's TOS step — do NOT
+        inc/dec bc/de/<idx> (gpderef), gen_step, or B.1's TOS step — do NOT
         load-to-HL + commit-back (the `inc bc` -> ld hl,bc;inc hl;ld bc,hl
         regression). This fires for a FRESH dst (`x = y +/- K`). */
     if (g_hc.branch_test_kind != 0) return 0;          /* inc/dec set no flags */
@@ -370,86 +372,53 @@ static int try_inplace_home_unop(FILE *out, const Func *f, const Op *op,
     return 1;
 }
 
-static int gen_inc(FILE *out, Func *f, const Op *op)
+static int gen_step(FILE *out, Func *f, const Op *op, int step)
 {
-    /* width-1: increment in A and store ONE byte. store_hl writes TWO
+    const char *mnem = step > 0 ? "inc" : "dec";
+    /* width-1: step in A and store ONE byte. store_hl writes TWO
        bytes — clobbering the adjacent packed char slot. */
     if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
-        if (try_inplace_home_unop(out, f, op, "inc", 0)) return 0;
+        if (try_inplace_home_unop(out, f, op, mnem, 0)) return 0;
         load_byte_to_a(out, f, op->src[0]);
-        emit(out, "inc\ta");
+        emit(out, "%s\ta", mnem);
         commit_a_byte(out, f, op->dst);
         return 0;
     }
     /* idx2 stepping counter (register residency): the counter lives in the
-       spare index register — step in place with `inc <idx>` (2 bytes, no
-       memory) instead of the TOS ex(sp) dance. */
+       spare index register — step in place with `inc`/`dec <idx>` (2 bytes,
+       no memory) instead of the TOS ex(sp) dance. */
     if (op->dst == op->src[0] && vreg_in_idx2(f, op->dst)) {
-        emit(out, "inc\t%s", vreg_idx_name(f, op->dst));
+        emit(out, "%s\t%s", mnem, vreg_idx_name(f, op->dst));
         if (hl_has(op->dst)) invalidate_hl_cache();
         if (de_has(op->dst)) invalidate_de_cache();
         return 0;
     }
     /* Walking pointer homed in BC/DE (e.g. a char* stepped `p++`): bump it
-       in place with `inc bc`/`inc de` instead of the ld hl,bc / inc hl /
+       in place with `inc`/`dec` BC/DE forms instead of the ld hl,bc / inc hl /
        ld bc,hl copy-out-and-back. Mirror of the idx2 counter case above.
        IR_NO_GPDEREF opts out (paired with the (bc)/(de) deref).
        EXCLUDE a call-split value: it is BC-resident only inside its span and
-       its frame slot must stay coherent (write-both) — a bare `inc bc` updates
+       its frame slot must stay coherent (write-both) — a bare step updates
        BC but NOT the slot, so a later out-of-span read (or a compare that reads
-       the slot on a cold belief) sees the stale pre-increment value. Falling
-       through to load_to_hl; inc hl; commit_hl_word does the write-both store. */
+       the slot on a cold belief) sees a stale value. Falling through to load_to_hl,
+       step HL, then commit_hl_word does the write-both store. */
     if (op->dst == op->src[0] && !opt_disabled("gpderef")
         && !(f->vregs[op->dst].flags & IR_VREG_CALL_SPLIT)
         && (vreg_in_pr_bc(f, op->dst) || vreg_in_pr_de(f, op->dst))) {
-        emit(out, vreg_in_pr_bc(f, op->dst) ? "inc\tbc" : "inc\tde");
+        emit(out, "%s\t%s", mnem,
+             vreg_in_pr_bc(f, op->dst) ? "bc" : "de");
         if (hl_has(op->dst)) invalidate_hl_cache();
         if (vreg_in_pr_bc(f, op->dst)) cache_bc(op->dst); else cache_de(op->dst);
         return 0;
     }
-    if (try_tos_step_inplace(out, f, op, 1)) return 0;   /* ++ */
+    if (try_tos_step_inplace(out, f, op, step)) return 0;
     if (!hl_has(op->src[0]))
         load_to_hl(out, f, op->src[0]);
-    emit(out, "inc\thl");
+    emit(out, "%s\thl", mnem);
     commit_hl_word(out, f, op->dst);
     return 0;
 }
 
-static int gen_dec(FILE *out, Func *f, const Op *op)
-{
-    if (op->dst >= 0 && f->vregs[op->dst].width == 1) {   /* see gen_inc */
-        if (try_inplace_home_unop(out, f, op, "dec", 0)) return 0;
-        load_byte_to_a(out, f, op->src[0]);
-        emit(out, "dec\ta");
-        commit_a_byte(out, f, op->dst);
-        return 0;
-    }
-    if (op->dst == op->src[0] && vreg_in_idx2(f, op->dst)) {
-        emit(out, "dec\t%s", vreg_idx_name(f, op->dst));
-        if (hl_has(op->dst)) invalidate_hl_cache();
-        if (de_has(op->dst)) invalidate_de_cache();
-        return 0;
-    }
-    /* Walking pointer (or K-trip counter) homed in BC/DE: step it in place
-       with `dec bc`/`dec de` instead of the ld hl,bc / dec hl / ld bc,hl
-       copy-out-and-back. Mirror of gen_inc's gpderef case above — see there
-       for the call-split exclusion rationale (a bare `dec bc` would update
-       BC but not a call-split value's coherent frame slot). */
-    if (op->dst == op->src[0] && !opt_disabled("gpderef")
-        && !(f->vregs[op->dst].flags & IR_VREG_CALL_SPLIT)
-        && (vreg_in_pr_bc(f, op->dst) || vreg_in_pr_de(f, op->dst))) {
-        emit(out, vreg_in_pr_bc(f, op->dst) ? "dec\tbc" : "dec\tde");
-        if (hl_has(op->dst)) invalidate_hl_cache();
-        if (vreg_in_pr_bc(f, op->dst)) cache_bc(op->dst); else cache_de(op->dst);
-        return 0;
-    }
-    if (try_tos_step_inplace(out, f, op, -1)) return 0;  /* -- */
-    if (!hl_has(op->src[0]))
-        load_to_hl(out, f, op->src[0]);
-    emit(out, "dec\thl");
-    commit_hl_word(out, f, op->dst);
-    return 0;
-}
 
 static int gen_br(FILE *out, Func *f, const Op *op)
 {
@@ -1789,6 +1758,8 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
 {
     int src_w = f->vregs[op->src[0]].width;
     int dst_w = f->vregs[op->dst].width;
+    const Op *br = byte_remat_of(f, op->dst);
+    if (dst_w == 1 && br && br->kind == IR_LD_IMM) return 0;
     if ((src_w == 1 || src_w == 2) && dst_w == 1) {
         /* 2→1 narrow, or 1→1 no-op trunc (e.g. `(signed char)(char_expr)`
            where the expr was already evaluated at byte width, or a
@@ -5955,14 +5926,13 @@ static void push_arg_byte_to_a(FILE *out, const Func *f, int vreg, int sp_adj)
        is dropped on any real A change): skip the reload. Mirrors load_byte_to_a's
        a_has fast path, which this helper otherwise reimplements without. */
     if (a_has(vreg)) return;
-    /* [IR_CALL_BREMAT] The byte is a single-use global load with no memory write
-       between it and this call — re-issue the load instead of reading a slot the
-       byte-remat table already dropped. */
+    /* The byte-remat table may map this to a global load or a constant
+       immediate used only by SDCCDECL calls. Re-materialise it instead of
+       reading the slot the table dropped. */
     {
         const Op *br = byte_remat_of(f, vreg);
         if (br) {
-            char s[80]; byte_remat_symstr(s, sizeof s, br);
-            emit(out, "ld\ta,(%s)", s);
+            emit_byte_remat_to_a(out, br);
             cache_a(vreg);
             return;
         }
