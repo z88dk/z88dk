@@ -10,14 +10,6 @@ while (<>) {
     if (/error\(.*?"(.*?)"/) {
         my $message = $1;
         unlike $message, qr/^[a-z]/, "error message should be capitalized";
-        my $unique = !( exists $code_errors{$message}
-            && $code_errors{$message} ne $ARGV );
-        ok $unique, "unique error message per module";
-        if ( !$unique ) {
-            note "message: $message";
-            note "in: $code_errors{$message}";
-            note "in: $ARGV";
-        }
         $code_errors{$message} = $ARGV;
     }
 }

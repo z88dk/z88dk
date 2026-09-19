@@ -168,7 +168,7 @@ static bool read_source_file(const std::string& filename,
     // open file
     std::ifstream infile(filename);
     if (!infile) {
-        error("Failed to open input file: " + filename);
+        error("Failed to open file: " + filename);
         return false;
     }
 
@@ -548,7 +548,7 @@ static bool preproc_with_cpp(const std::string& input_file,
 static bool prepare_input(const std::string& input_file,
                           const std::string& output_file) {
     // open output file for writing
-    std::ofstream outfile(output_file);
+    std::ofstream outfile(output_file, std::ios::binary);
     if (!outfile) {
         fatal("Failed to open file: " + output_file);
     }

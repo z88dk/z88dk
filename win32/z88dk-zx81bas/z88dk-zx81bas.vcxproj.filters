@@ -60,7 +60,7 @@
     <ClInclude Include="..\..\src\zx81bas\lower.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\zx81bas\z80asm.h">
+    <ClInclude Include="..\..\src\zx81bas\assemble.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\zx81bas\zx81bas.h">
@@ -122,7 +122,7 @@
     <ClCompile Include="..\..\src\zx81bas\lower.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\zx81bas\z80asm.cpp">
+    <ClCompile Include="..\..\src\zx81bas\assemble.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\zx81bas\walker.cpp">

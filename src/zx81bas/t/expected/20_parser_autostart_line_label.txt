@@ -15,6 +15,32 @@ Prog {
     sysvars_data: [
     ]
     stmts: [
+        PrintStmt {
+            location: t/input/20_parser_autostart_line_label.bas:2
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/input/20_parser_autostart_line_label.bas:2
+                        value: "HELLO"
+                    }
+            ]
+        }
+        LabelStmt {
+            location: t/input/20_parser_autostart_line_label.bas:3
+            label: "START"
+        }
+        PrintStmt {
+            location: t/input/20_parser_autostart_line_label.bas:4
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/input/20_parser_autostart_line_label.bas:4
+                        value: "WORLD"
+                    }
+            ]
+        }
     ]
     pragma_vars: [
     ]

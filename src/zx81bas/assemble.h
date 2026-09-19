@@ -4,11 +4,12 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "z80asm.h"
+#pragma once
+
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 bool assemble_link(const std::vector<std::string>& asm_source,
-                   const std::string& input_basename) {
-    (void)asm_source;
-    (void)input_basename;
-    return true;
-}
+                   const std::string& input_basename,
+                   std::unordered_map<std::string, int>& label_addr);

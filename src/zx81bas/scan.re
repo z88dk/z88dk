@@ -143,6 +143,7 @@ collect_token:
             '**'    { token.type = TokenType::Power; token.text = std::string(start, p); goto push_token; }
             '^'     { token.type = TokenType::Power; token.text = std::string(start, p); goto push_token; }
             '+'     { token.type = TokenType::Plus; token.text = std::string(start, p); goto push_token; }
+            '.'     { token.type = TokenType::Dot; token.text = std::string(start, p); goto push_token; }
             ','     { token.type = TokenType::Comma; token.text = std::string(start, p); goto push_token; }
             '-'     { token.type = TokenType::Minus; token.text = std::string(start, p); goto push_token; }
             '/'     { token.type = TokenType::Divide; token.text = std::string(start, p); goto push_token; }
@@ -255,6 +256,20 @@ collect_token:
             token.type = TokenType::Identifier;
             token.text = str_toupper(std::string(start, p));    // BASIC is case insensitive
             token.keyword = lookup_keyword(token.text);
+            goto push_token;
+        }
+
+        '@' ident {
+            token.type = TokenType::LabelRefLine;
+            token.text = str_toupper(std::string(start, p));    // BASIC is case insensitive
+            token.svalue = str_toupper(std::string(start + 1, p));
+            goto push_token;
+        }
+
+        '&' ident {
+            token.type = TokenType::LabelRefAddr;
+            token.text = str_toupper(std::string(start, p));    // BASIC is case insensitive
+            token.svalue = str_toupper(std::string(start + 1, p));
             goto push_token;
         }
 

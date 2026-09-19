@@ -11,5 +11,5 @@
 #include <string>
 #include <vector>
 
-bool emit_asm(Prog& prog, std::vector<std::string>& out_asm_source);
+bool emit_asm(Prog& prog, int pass, std::vector<std::string>& out_asm_source);
 

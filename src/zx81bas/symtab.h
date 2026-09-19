@@ -11,6 +11,7 @@
 #include "errors.h"
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 struct Symtab : TreeNode {
     std::unordered_map<std::string, SourceLoc> vars;        // variables
@@ -19,6 +20,19 @@ struct Symtab : TreeNode {
     std::unordered_map<std::string, DefFnStmt*> fns;        // functions
     std::unordered_map<std::string, LabelStmt*> labels;     // target labels
     std::unordered_map<int, LineNumStmt*> line_nums;        // target line numbers
+
+    // asm_label_stmts owned by symtab, not by AST,
+    // so we need to delete them in the destructor
+    std::vector<LabelStmt*> asm_label_stmts;
+
+    explicit Symtab() = default;
+    explicit Symtab(const Symtab&) = delete;
+    Symtab& operator=(const Symtab&) = delete;
+    virtual ~Symtab() {
+        for (auto& stmt : asm_label_stmts) {
+            delete stmt;
+        }
+    }
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;

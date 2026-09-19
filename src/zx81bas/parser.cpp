@@ -197,23 +197,19 @@ ExprPtr Parser::parse_primary() {
     }
 
     // @label reference
-    if (match(TokenType::At)) {
-        const Token& ident = expect(TokenType::Identifier);
-        std::string name = ident.text;
-        if (is_string_variable(name)) {
-            syntax_error("Label reference cannot be a string variable");
-        }
+    if (t.type == TokenType::LabelRefLine) {
+        std::string name = t.svalue;
+        ++pos;
+        release_assert(!is_string_variable(name));
         auto label_ref = make_node<LabelLineRefExpr>(name, loc());
         return label_ref;
     }
 
     // &label reference
-    if (match(TokenType::Ampersand)) {
-        const Token& ident = expect(TokenType::Identifier);
-        std::string name = ident.text;
-        if (is_string_variable(name)) {
-            syntax_error("Label reference cannot be a string variable");
-        }
+    if (t.type == TokenType::LabelRefAddr) {
+        std::string name = t.svalue;
+        ++pos;
+        release_assert(!is_string_variable(name));
         auto label_ref = make_node<LabelAddrRefExpr>(name, loc());
         return label_ref;
     }
@@ -825,15 +821,13 @@ bool Parser::parse_label_line_num(std::string& out_label,
     while (found_any) {
         found_any = false;
 
-        if (peek().type == TokenType::At) {
-            pos++;
-            const Token& label_token = expect(TokenType::Identifier);
-            expect(TokenType::Colon);
-
+        if (peek().type == TokenType::LabelRefLine) {
             if (found_label) {
                 syntax_error("Multiple labels in the same line");
             }
-            out_label = label_token.text;
+            out_label = peek().svalue;
+            pos++;
+            expect(TokenType::Colon);
             found_label = true;
             found_any = true;
         }
@@ -909,10 +903,9 @@ StmtPtr Parser::parse_pragma_autostart_line() {
     }
 
     // #AUTOSTART_LINE = label_name
-    if (peek().type == TokenType::At) {
+    if (peek().type == TokenType::LabelRefLine) {
+        prog.auto_start_label = peek().svalue;
         pos++;
-        const Token& ident = expect(TokenType::Identifier);
-        prog.auto_start_label = ident.text;
         return nullptr;
     }
 

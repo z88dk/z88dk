@@ -1,11 +1,6 @@
 ## TODO
 
 - remove unused labels
-- generate output file
-- lower VARS section
-- Assign ZX81 line numbers
-- Convert ASCII strings to ZX81 character set.
-- Write .P
 - Constant folding
 - Dead code elimination
 - PROC inlining
@@ -22,6 +17,7 @@
 - fix NOT(A=1)
 		214 IF NOT(A=1)THEN GOTO 220
 - fix PEEK(16384+1) after lowering of PEEKW
+- add FOR-NEXT variable to #VARS
 
 The clean architecture
 semantic_transform()

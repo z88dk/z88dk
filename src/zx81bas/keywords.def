@@ -97,3 +97,6 @@ X("LOCAL", LOCAL)
 X("DEF", DEF)
 X("ENDPROC", ENDPROC)
 X("END", END)
+
+// ASM keywords we need to parse
+X("EQU", EQU)

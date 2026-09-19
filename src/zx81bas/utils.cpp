@@ -83,7 +83,12 @@ std::string str_toupper(std::string str) {
     return str;
 }
 
-std::string int_to_hex(uint8_t value) {
+std::string str_trim(const std::string& str) {
+    size_t last = str.find_last_not_of(" \t\n\r");
+    return str.substr(0, last + 1);
+}
+
+std::string int8_to_hex(uint8_t value) {
     std::ostringstream oss;
     oss << "0x" << std::uppercase << std::hex
         << std::setfill('0') << std::setw(2)
@@ -91,3 +96,10 @@ std::string int_to_hex(uint8_t value) {
     return oss.str();
 }
 
+std::string int16_to_hex(uint16_t value) {
+    std::ostringstream oss;
+    oss << "0x" << std::uppercase << std::hex
+        << std::setfill('0') << std::setw(4)
+        << static_cast<unsigned>(value);
+    return oss.str();
+}

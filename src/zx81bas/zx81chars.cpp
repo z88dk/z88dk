@@ -23,7 +23,7 @@ bool encode_zx81_char(const char*& p, bool check_keywords,
     static std::vector<std::unordered_map<std::string, uint8_t>> zx81_char_map =
     []() {
         std::vector<std::unordered_map<std::string, uint8_t>> map;
-#define X(str, code) \
+#define X(str, code, name) \
             { size_t len = strlen(str); \
               while (map.size() <= len) { map.emplace_back(); } \
               map[len][str] = code; }
@@ -83,4 +83,21 @@ bool encode_zx81_string(const char*& p, char delimiter,
     }
 
     return true;
+}
+
+std::string zx81_char_name(uint8_t code) {
+    static std::vector<std::string> zx81_char_names =
+    []() {
+        std::vector<std::string> names(256);
+        for (size_t i = 0; i < 256; ++i) {
+            names[i] = int8_to_hex(static_cast<uint8_t>(i));
+        }
+        names[0x7E] = "_NUMBER";
+#define X(str, code, name) names[code] = #name;
+#include "zx81chars.def"
+#undef X
+        return names;
+    }
+    ();
+    return zx81_char_names[code];
 }

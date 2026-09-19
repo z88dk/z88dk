@@ -1,0 +1,8 @@
+% z88dk-zx81bas t//input/input.bas
+Input file:  t/input/input.bas
+Output file: t/input/input.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/input.i" "t/input/input.pp"
+% z88dk-z80asm -b -m -o"t/input/input.p" "t/input/input.asm"
+% z88dk-z80asm -b -m -o"t/input/input.p" "t/input/input.asm"
+% z88dk-z80asm -b -m -o"t/input/input.p" "t/input/input.asm"
+% z88dk-z80asm -b -m -o"t/input/input.p" "t/input/input.asm"

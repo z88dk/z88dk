@@ -156,7 +156,7 @@
     <ClInclude Include="..\..\src\zx81bas\symtab.h" />
     <ClInclude Include="..\..\src\zx81bas\utils.h" />
     <ClInclude Include="..\..\src\zx81bas\walker.h" />
-    <ClInclude Include="..\..\src\zx81bas\z80asm.h" />
+    <ClInclude Include="..\..\src\zx81bas\assemble.h" />
     <ClInclude Include="..\..\src\zx81bas\zx81bas.h" />
     <ClInclude Include="..\..\src\zx81bas\zx81chars.h" />
   </ItemGroup>
@@ -177,7 +177,7 @@
     <ClCompile Include="..\..\src\zx81bas\symtab.cpp" />
     <ClCompile Include="..\..\src\zx81bas\utils.cpp" />
     <ClCompile Include="..\..\src\zx81bas\walker.cpp" />
-    <ClCompile Include="..\..\src\zx81bas\z80asm.cpp" />
+    <ClCompile Include="..\..\src\zx81bas\assemble.cpp" />
     <ClCompile Include="..\..\src\zx81bas\zx81bas.cpp" />
     <ClCompile Include="..\..\src\zx81bas\zx81chars.cpp" />
   </ItemGroup>

@@ -75,7 +75,8 @@ void Token::dump(DumpContext ctx) const {
         child_ctx.line("keyword: " + keyword_name(keyword));
     }
     child_ctx.line("text: \"" + text + "\"");
-    if (type == TokenType::StringLiteral || type == TokenType::CharConstant) {
+    if (type == TokenType::StringLiteral || type == TokenType::CharConstant ||
+            type == TokenType::LabelRefAddr || type == TokenType::LabelRefLine) {
         child_ctx.line("svalue: \"" + svalue + "\"");
     }
     if (type == TokenType::Integer) {

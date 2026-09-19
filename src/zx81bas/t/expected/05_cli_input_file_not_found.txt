@@ -1,5 +1,5 @@
 % z88dk-zx81bas t//input/05_cli_input_file_not_found.bas
 Input file:  t/input/05_cli_input_file_not_found.bas
 Output file: t/input/05_cli_input_file_not_found.p
-error: Failed to open input file: t/input/05_cli_input_file_not_found.bas
+error: Failed to open file: t/input/05_cli_input_file_not_found.bas
 1 error found

@@ -453,7 +453,7 @@ TokFile {
                 location: t/input/15_lexer_ok.bas:14
             }
             Token {
-                type: AsmOperator
+                type: .
                 text: "."
                 location: t/input/15_lexer_ok.bas:14
             }
@@ -948,7 +948,7 @@ TokFile {
                 location: t/input/15_lexer_ok.bas:27
             }
             Token {
-                type: AsmOperator
+                type: .
                 text: "."
                 location: t/input/15_lexer_ok.bas:27
             }

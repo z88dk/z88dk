@@ -7,6 +7,7 @@
 #include "ast.h"
 #include "dump_context.h"
 #include "errors.h"
+#include "lexer.h"
 #include "symtab.h"
 #include "walker.h"
 #include <algorithm>
@@ -260,6 +261,55 @@ struct SymbolCollector : ASTVisitor {
         }
     }
 
+    void load_asm_label(const std::string& label, const SourceLoc& loc) {
+        if (symtab.labels.find(label) != symtab.labels.end()) {
+            error(loc, "Duplicate label: '" + label + "'");
+        }
+        else {
+            // create a LabelStmt to store the location
+            auto label_stmt = new LabelStmt(label, loc);
+            symtab.labels[label] = label_stmt;
+            symtab.asm_label_stmts.push_back(label_stmt);
+        }
+    }
+
+    void load_asm_labels(const std::vector<TokLine>& asm_lines) {
+        for (const auto& line : asm_lines) {
+            if (line.tokens.size() >= 2) {
+                const auto& first_token = line.tokens[0];
+                const auto& second_token = line.tokens[1];
+                if (first_token.type == TokenType::Identifier &&
+                        second_token.type == TokenType::Colon) {
+                    // label definition
+                    const std::string& label = first_token.text;
+                    load_asm_label(label, line.src_line.loc);
+                }
+                else if (first_token.type == TokenType::Identifier &&
+                         second_token.keyword == Keyword::EQU) {
+                    // label definition
+                    const std::string& label = first_token.text;
+                    load_asm_label(label, line.src_line.loc);
+                }
+                else if (first_token.type == TokenType::Identifier &&
+                         second_token.type == TokenType::Equal) {
+                    // label definition
+                    const std::string& label = first_token.text;
+                    load_asm_label(label, line.src_line.loc);
+                }
+                else if (first_token.type == TokenType::Dot &&
+                         second_token.type == TokenType::Identifier) {
+                    // label definition
+                    const std::string& label = second_token.text;
+                    load_asm_label(label, line.src_line.loc);
+                }
+            }
+        }
+    }
+
+    void visit(RemStmt& stmt) override {
+        load_asm_labels(stmt.asm_lines);
+    }
+
     void visit(PragmaNumVarStmt& stmt) override {
         update_vars(stmt.name, stmt.loc);
 
@@ -270,6 +320,7 @@ struct SymbolCollector : ASTVisitor {
 
     void visit(PragmaStrVarStmt& stmt) override {
         update_vars(stmt.name, stmt.loc);
+        load_asm_labels(stmt.asm_lines);
 
         // move to pragma_vars section
         prog.pragma_vars.push_back(stmt.clone());

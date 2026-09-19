@@ -17,3 +17,4 @@ bool encode_zx81_char(const char*& p, bool check_keywords,
 bool encode_zx81_string(const char*& p, char delimiter,
                         std::vector<uint8_t>& bytes,
                         const SourceLoc& loc);
+std::string zx81_char_name(uint8_t code);

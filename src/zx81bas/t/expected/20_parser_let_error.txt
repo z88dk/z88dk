@@ -5,10 +5,10 @@ Output file: t/input/20_parser_let_error.p
 t/input/20_parser_let_error.bas:1: error: Expected expression term, found end of line
 t/input/20_parser_let_error.bas:2: error: Expected expression term, found ':'
 t/input/20_parser_let_error.bas:3: error: Expected expression term, found end of line
-t/input/20_parser_let_error.bas:4: error: Expected 'Identifier', found '42'
-t/input/20_parser_let_error.bas:5: error: Label reference cannot be a string variable
-t/input/20_parser_let_error.bas:6: error: Expected 'Identifier', found '42'
-t/input/20_parser_let_error.bas:7: error: Label reference cannot be a string variable
+t/input/20_parser_let_error.bas:4: error: Unexpected token '@' in expression
+t/input/20_parser_let_error.bas:5: error: Expected end of statement, found '$'
+t/input/20_parser_let_error.bas:6: error: Unexpected token '&' in expression
+t/input/20_parser_let_error.bas:7: error: Expected end of statement, found '$'
 t/input/20_parser_let_error.bas:8: error: Expected ')', found end of line
 t/input/20_parser_let_error.bas:9: error: Expected ')', found ':'
 t/input/20_parser_let_error.bas:10: error: Expected ')', found '!'
@@ -51,10 +51,10 @@ t/input/20_parser_let_error.bas:46: error: Expected '=', found end of line
 t/input/20_parser_let_error.bas:47: error: Expected expression term, found end of line
 t/input/20_parser_let_error.bas:48: error: Expected expression term, found ':'
 t/input/20_parser_let_error.bas:49: error: Expected expression term, found end of line
-t/input/20_parser_let_error.bas:50: error: Expected 'Identifier', found '42'
-t/input/20_parser_let_error.bas:51: error: Label reference cannot be a string variable
-t/input/20_parser_let_error.bas:52: error: Expected 'Identifier', found '42'
-t/input/20_parser_let_error.bas:53: error: Label reference cannot be a string variable
+t/input/20_parser_let_error.bas:50: error: Unexpected token '@' in expression
+t/input/20_parser_let_error.bas:51: error: Expected end of statement, found '$'
+t/input/20_parser_let_error.bas:52: error: Unexpected token '&' in expression
+t/input/20_parser_let_error.bas:53: error: Expected end of statement, found '$'
 t/input/20_parser_let_error.bas:54: error: Expected ')', found end of line
 t/input/20_parser_let_error.bas:55: error: Expected ')', found ':'
 t/input/20_parser_let_error.bas:56: error: Expected ')', found '!'

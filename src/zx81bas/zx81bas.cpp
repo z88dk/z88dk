@@ -5,22 +5,22 @@
 //-----------------------------------------------------------------------------
 
 #include "../config.h"
+#include "assemble.h"
 #include "ast.h"
 #include "dump_context.h"
+#include "emit_asm.h"
+#include "emit_basic.h"
 #include "errors.h"
 #include "lexer.h"
-#include "emit_asm.h"
 #include "lower.h"
 #include "optimize.h"
 #include "options.h"
-#include "emit_basic.h"
 #include "parser.h"
 #include "preproc.h"
 #include "semantic.h"
 #include "symtab.h"
 #include "utils.h"
 #include "walker.h"
-#include "z80asm.h"
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
@@ -288,21 +288,40 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
-    // build assembly source
-    std::vector<std::string> asm_source;
-    if (!emit_asm(*prog, asm_source)) {
-        exit_error_status();
-    }
+    // pass 1: assemble and link to produce map file
+    // pass 2: use map file to replace &labels with
+    // addresses and produce final .p and .sym file
+    // repeat until output stable
+    int tail_addr = 0;
+    for (int pass = 1; pass <= 2; ++pass) {
+        // build assembly source
+        std::vector<std::string> asm_source;
+        if (!emit_asm(*prog, pass, asm_source)) {
+            exit_error_status();
+        }
 
 #ifdef _DEBUG
-    if (g_dump_step == 12) {
-        dump_asm_source_exit(asm_source);
-    }
+        if (g_dump_step == 12 && pass == 1) {
+            dump_asm_source_exit(asm_source);
+        }
+        if (g_dump_step == 13 && pass == 2) {
+            dump_asm_source_exit(asm_source);
+        }
 #endif
 
-    // call the assembler and linker to produce .P and .sym file
-    if (!assemble_link(asm_source, input_basename)) {
-        exit_error_status();
+        // call the assembler and linker to produce .P and .sym file
+        if (!assemble_link(asm_source, input_basename, prog->label_addr)) {
+            exit_error_status();
+        }
+
+        auto it = prog->label_addr.find("__tail");
+        if (it != prog->label_addr.end()) {
+            if (it->second != tail_addr) {
+                // redo pass 1
+                pass = 0;
+                tail_addr = it->second;
+            }
+        }
     }
 
     // exit with error status

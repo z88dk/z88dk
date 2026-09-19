@@ -1,9 +1,12 @@
-% z88dk-zx81bas -d 12 test_t_input_12_t.bas
-Input file:  test_t_input_12_t.bas
-Output file: test_t_input_12_t.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_12_t.i" "test_t_input_12_t.pp"
+% z88dk-zx81bas -d 13 test_t_input_13_t.bas
+Input file:  test_t_input_13_t.bas
+Output file: test_t_input_13_t.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_13_t.i" "test_t_input_13_t.pp"
+% z88dk-z80asm -b -m -o"test_t_input_13_t.p" "test_t_input_13_t.asm"
+% z88dk-z80asm -b -m -o"test_t_input_13_t.p" "test_t_input_13_t.asm"
+% z88dk-z80asm -b -m -o"test_t_input_13_t.p" "test_t_input_13_t.asm"
 ; ZX81BAS generated assembly code
-; Pass: 1
+; Pass: 2
 
         ORG     0x4009          ; Start of .p file
 
@@ -302,9 +305,9 @@ L0010_START:
         DEFB    _LET
         DEFB    _A
         DEFB    _EQ
-        DEFB    0
+        DEFB    _1,_6,_5,_1,_7
         DEFB    _NUMBER
-        FLOAT   0
+        FLOAT   16517
         DEFB    _NL
 
 L0010_END:
@@ -332,9 +335,9 @@ L0030_START:
         DEFB    _LET
         DEFB    _A
         DEFB    _EQ
-        DEFB    0
+        DEFB    _1,_6,_5,_6,_7
         DEFB    _NUMBER
-        FLOAT   0
+        FLOAT   16567
         DEFB    _NL
 
 L0030_END:
@@ -5240,7 +5243,7 @@ SHOW_BC:
 MESSAGE:	DEFM _H,_E,_L,_L,_O
 MOVE_MESSAGE:
 	LD HL, MESSAGE
-	LD DE, 0+6
+	LD DE, 0x5871+6
 	LD BC, 5
 	LDIR
 	RET
@@ -5250,7 +5253,7 @@ LINE_NUMBER:
 	RET
 
 START_ADDRESS:
-	LD BC, 0
+	LD BC, 0x5821
 	RET
 
 
@@ -5267,14 +5270,14 @@ START:
 L1144_START:
         DEFB    _PRINT
         DEFB    _USR
-        DEFB    0
+        DEFB    _2,_2,_5,_8,_3
         DEFB    _NUMBER
-        FLOAT   0
+        FLOAT   22583
         DEFB    _COMMA
         DEFB    _USR
-        DEFB    0
+        DEFB    _2,_2,_5,_8,_7
         DEFB    _NUMBER
-        FLOAT   0
+        FLOAT   22587
         DEFB    _NL
 
 L1144_END:
@@ -5285,9 +5288,9 @@ L1144_END:
 L1146_START:
         DEFB    _PRINT
         DEFB    _USR
-        DEFB    0
+        DEFB    _2,_2,_5,_7,_1
         DEFB    _NUMBER
-        FLOAT   0
+        FLOAT   22571
         DEFB    _NL
 
 L1146_END:
@@ -5311,9 +5314,9 @@ L1148_END:
 L1150_START:
         DEFB    _PRINT
         DEFB    _USR
-        DEFB    0
+        DEFB    _2,_2,_5,_6,_1
         DEFB    _NUMBER
-        FLOAT   0
+        FLOAT   22561
         DEFB    _NL
 
 L1150_END:
@@ -5323,9 +5326,9 @@ L1150_END:
         DEFW    L1152_END-L1152_START
 L1152_START:
         DEFB    _POKE
-        DEFB    0
+        DEFB    _2,_2,_5,_6,_2
         DEFB    _NUMBER
-        FLOAT   0
+        FLOAT   22562
         DEFB    _PLUS
         DEFB    _1
         DEFB    _NUMBER
@@ -5358,9 +5361,9 @@ L1152_END:
         DEFW    L1154_END-L1154_START
 L1154_START:
         DEFB    _POKE
-        DEFB    0
+        DEFB    _2,_2,_5,_6,_2
         DEFB    _NUMBER
-        FLOAT   0
+        FLOAT   22562
         DEFB    _PLUS
         DEFB    _1
         DEFB    _NUMBER
@@ -5390,9 +5393,9 @@ L1154_END:
 L1156_START:
         DEFB    _PRINT
         DEFB    _USR
-        DEFB    0
+        DEFB    _2,_2,_5,_6,_2
         DEFB    _NUMBER
-        FLOAT   0
+        FLOAT   22562
         DEFB    _NL
 
 L1156_END:
@@ -5402,13 +5405,13 @@ L1156_END:
         DEFW    L1158_END-L1158_START
 L1158_START:
         DEFB    _PRINT
-        DEFB    0
+        DEFB    _1,_2
         DEFB    _NUMBER
-        FLOAT   0
+        FLOAT   12
         DEFB    _COMMA
-        DEFB    0
+        DEFB    _1,_3
         DEFB    _NUMBER
-        FLOAT   0
+        FLOAT   13
         DEFB    _NL
 
 L1158_END:
@@ -5644,7 +5647,7 @@ L1194_START:
 END:
 	LD A, _H
 	DEFM _H,_E,_L,_L,_O
-	LD HL,0
+	LD HL,0x4085
 
 ; End of ASM block
 
@@ -5792,7 +5795,7 @@ VAR_Z_START:
 
 Z_CODE:	LD A, 255
 		LD HL, 2
-		LD HL, 0
+		LD HL, 0x4085
 
 ; End of ASM block
 

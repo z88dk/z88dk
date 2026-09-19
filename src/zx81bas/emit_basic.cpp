@@ -13,6 +13,7 @@
 #include <cmath>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -412,8 +413,7 @@ static void emit_stmt(std::vector<Token>& tokens, const Stmt& stmt) {
     if (auto s = dynamic_cast<const RemStmt*>(&stmt)) {
         append_token(tokens, TokenType::Identifier, "REM", s->loc);
         if (!s->text.empty()) {
-            append_token(tokens, TokenType::StringLiteral, s->text, s->loc);
-            tokens.back().svalue = s->text;
+            append_token(tokens, TokenType::RemComment, s->text, s->loc);
             tokens.back().ws_before = " ";
         }
         return;
@@ -768,6 +768,28 @@ static void replace_labels(std::vector<BasicLine>& lines,
     }
 }
 
+static void replace_labels(std::vector<StmtPtr>& stmts,
+                           const std::unordered_map<std::string, int>& label_line) {
+    for (auto& stmt : stmts) {
+        if (auto s = dynamic_cast<PragmaStrVarStmt*>(stmt.get())) {
+            for (auto& asm_line : s->asm_lines) {
+                for (auto& token : asm_line.tokens) {
+                    if (token.type == TokenType::LabelRefLine) {
+                        auto it = label_line.find(token.svalue);
+                        if (it == label_line.end()) {
+                            error(token.loc, "Undefined label: '" + token.svalue + "'");
+                            continue;
+                        }
+                        token.type = TokenType::Integer;
+                        token.ivalue = it->second;
+                        token.text = std::to_string(it->second);
+                    }
+                }
+            }
+        }
+    }
+}
+
 bool emit_basic(Prog& prog) {
     // emit BASIC lines from the AST
     std::vector<BasicLine> lines;
@@ -779,6 +801,7 @@ bool emit_basic(Prog& prog) {
     // renumber lines and replace label references with line numbers
     number_lines(prog.basic_lines, prog.increment);
     replace_labels(prog.basic_lines, prog.label_line);
+    replace_labels(prog.pragma_vars, prog.label_line);
 
     return get_error_count() == 0;
 }

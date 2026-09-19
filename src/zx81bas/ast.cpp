@@ -2220,7 +2220,7 @@ void Prog::dump(DumpContext ctx) const {
                    "false"));
     child_ctx.line("sysvars_data: [");
     for (const auto& byte : sysvars_data) {
-        grandchild_ctx.line(int_to_hex(byte));
+        grandchild_ctx.line(int8_to_hex(byte));
     }
     child_ctx.line("]");
     dump_stmt_list("stmts", stmts, child_ctx);
