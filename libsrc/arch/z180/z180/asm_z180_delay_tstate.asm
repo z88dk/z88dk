@@ -6,8 +6,9 @@
 ;
 ; void z180_delay_tstate(uint tstates)
 ;
-; Busy wait exactly the number of tstates, which includes the
-; time needed for an unconditional call and the ret.
+; Z180 inner loop is 19T (add hl,bc 11 + jr c taken 8), not
+; Z80's 23T. Same Bobrowski structure, retuned subtracts.
+; Remainder 0..18T (jr 8/6 is only 2T, not Z80's 5T tail).
 ;
 ; ===============================================================
 
@@ -20,50 +21,18 @@ PUBLIC asm_cpu_delay_tstate
 asm_z180_delay_tstate:
 asm_cpu_delay_tstate:
 
-   ; enter : hl = tstates >= 141
+   ; enter : hl = tstates
    ;
    ; uses  : af, bc, hl
 
-   ld bc,-141
+   ld bc,-70
    add hl,bc
    
-   ld bc,-23
+   ld bc,-19
 
 loop:
 
    add hl,bc
    jr c, loop
-   
-   ld a,l
-   add a,15
-   jr nc, g0
-   
-   cp 8
-   jr c, g1
 
-   or 0
-
-g0:
-
-   inc hl
-
-g1:
-
-   rra
-   jr c, b0
-   
-   nop
-
-b0:
-
-   rra
-   jr nc, b1
-   
-   or 0
-
-b1:
-
-   rra
-   ret nc
-   
    ret

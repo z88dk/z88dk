@@ -5,8 +5,8 @@
 ;
 ; void z180_delay_ms(uint ms)
 ;
-; Busy wait exactly the number of milliseconds, which includes the
-; time needed for an unconditional call and the ret.
+; Z180 ms-loop overhead around delay_tstate (jr 8/6, ld hl,nn 9,
+; call 16, ret 9) is not the Z80 43/54 pair.
 ;
 ; ===============================================================
 
@@ -38,14 +38,12 @@ ms_loop:
    or e
    jr z, last_ms
 
-   ld hl,+(__CPU_CLOCK / 1000) - 43
+   ld hl,+(__CPU_CLOCK / 1000) - 35
    call asm_z180_delay_tstate
 
    jr ms_loop
 
 last_ms:
 
-   ; we will be exact
-   
-   ld hl,+(__CPU_CLOCK / 1000) - 54
+   ld hl,+(__CPU_CLOCK / 1000) - 38
    jp asm_z180_delay_tstate

@@ -5,8 +5,10 @@
 ;
 ; void z80_delay_ms(uint ms)
 ;
-; Busy wait exactly the number of milliseconds, which includes the
-; time needed for an unconditional call and the ret.
+; Busy wait the number of milliseconds, including an
+; unconditional call and the ret. Overhead subtracted from
+; __CPU_CLOCK/1000 is the ms-loop cost around delay_tstate
+; (call/ret of tstate is inside tstate).
 ;
 ; ===============================================================
 
@@ -36,6 +38,37 @@ ms_loop:
    
    ld a,d
    or e
+
+IF __CPU_INTEL__
+
+   jp z, last_ms
+
+   ld hl,+(__CPU_CLOCK / 1000) - 43
+   call asm_z80_delay_tstate
+
+   jp ms_loop
+
+last_ms:
+
+   ld hl,+(__CPU_CLOCK / 1000) - 42
+   jp asm_z80_delay_tstate
+
+ELIF __CPU_GBZ80__
+
+   jr z, last_ms
+
+   ld hl,+(__CPU_CLOCK / 1000) - 44
+   call asm_z80_delay_tstate
+
+   jr ms_loop
+
+last_ms:
+
+   ld hl,+(__CPU_CLOCK / 1000) - 46
+   jp asm_z80_delay_tstate
+
+ELSE
+
    jr z, last_ms
 
    ld hl,+(__CPU_CLOCK / 1000) - 43
@@ -45,7 +78,7 @@ ms_loop:
 
 last_ms:
 
-   ; we will be exact
-   
    ld hl,+(__CPU_CLOCK / 1000) - 54
    jp asm_z80_delay_tstate
+
+ENDIF
