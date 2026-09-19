@@ -157,13 +157,30 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                keeps that D/E mapping valid. */
             int j   = start + (k + 1) * push_step;
             int sda = pushed_bytes + sp_adj_extra;
-            push_arg_byte_to_a(out, f, ci->args[i], sda); /* current i (higher) */
-            emit(out, "ld\td,a");
-            push_arg_byte_to_a(out, f, ci->args[j], sda); /* next (lower) */
-            emit(out, "ld\te,a");
+            const Op *hi = byte_remat_of(f, ci->args[i]);
+            const Op *lo = byte_remat_of(f, ci->args[j]);
+            int direct_pair = hi && lo && hi->kind == IR_LD_IMM
+                            && lo->kind == IR_LD_IMM;
+            if (direct_pair) {
+                /* Both call-only byte arguments are constants. Build the
+                   packed word directly instead of loading A twice and
+                   copying each byte into D/E. The high-index arg is D and
+                   the low-index arg is E, as in the general path below. */
+                unsigned pair = ((unsigned)(hi->imm & 0xff) << 8)
+                              | (unsigned)(lo->imm & 0xff);
+                emit(out, "ld\tde,%u", pair);
+            } else {
+                push_arg_byte_to_a(out, f, ci->args[i], sda); /* higher */
+                emit(out, "ld\td,a");
+                push_arg_byte_to_a(out, f, ci->args[j], sda); /* lower */
+                emit(out, "ld\te,a");
+            }
             emit(out, "push\tde");
             pushed_bytes += 2;
-            invalidate_hl_cache();   /* sp path clobbered HL; both clobber DE */
+            if (direct_pair)
+                invalidate_de_cache(); /* ld de,nn only changed DE */
+            else
+                invalidate_hl_cache(); /* fallback may use HL */
             k++;   /* the paired char is consumed here */
         } else if (width == 1 && (ci->flags & (SDCCDECL | SDCCCALL1))) {
             /* sc1/sdccdecl char arg: push ONE byte. `push af; inc sp` leaves

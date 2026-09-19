@@ -38,6 +38,8 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (dst_w == 1) {
+        const Op *br = byte_remat_of(f, op->dst);
+        if (br && br->kind == IR_LD_IMM) return 0;
         /* Byte literal: load A and spill byte-sized. The generic path
            below writes TWO bytes into a 1-byte slot (overrun). Consumers
            hit the A-cache via load_byte_to_a / load_to_hl's width-1 path. */
@@ -1789,6 +1791,8 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
 {
     int src_w = f->vregs[op->src[0]].width;
     int dst_w = f->vregs[op->dst].width;
+    const Op *br = byte_remat_of(f, op->dst);
+    if (dst_w == 1 && br && br->kind == IR_LD_IMM) return 0;
     if ((src_w == 1 || src_w == 2) && dst_w == 1) {
         /* 2→1 narrow, or 1→1 no-op trunc (e.g. `(signed char)(char_expr)`
            where the expr was already evaluated at byte width, or a
@@ -5955,14 +5959,13 @@ static void push_arg_byte_to_a(FILE *out, const Func *f, int vreg, int sp_adj)
        is dropped on any real A change): skip the reload. Mirrors load_byte_to_a's
        a_has fast path, which this helper otherwise reimplements without. */
     if (a_has(vreg)) return;
-    /* [IR_CALL_BREMAT] The byte is a single-use global load with no memory write
-       between it and this call — re-issue the load instead of reading a slot the
-       byte-remat table already dropped. */
+    /* The byte-remat table may map this to a global load or a constant
+       immediate used only by SDCCDECL calls. Re-materialise it instead of
+       reading the slot the table dropped. */
     {
         const Op *br = byte_remat_of(f, vreg);
         if (br) {
-            char s[80]; byte_remat_symstr(s, sizeof s, br);
-            emit(out, "ld\ta,(%s)", s);
+            emit_byte_remat_to_a(out, br);
             cache_a(vreg);
             return;
         }

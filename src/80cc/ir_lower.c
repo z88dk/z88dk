@@ -248,6 +248,11 @@ static void byte_remat_symstr(char *buf, size_t n, const Op *o)
     else               snprintf(buf, n, "%s%s", pfx, nm);
 }
 
+static int sdccdecl_byte_const_enabled(void);
+static void emit_byte_remat_to_a(FILE *out, const Op *o);
+static int byte_call_only_sdccdecl(const Func *f, int v);
+static const Op *byte_imm_origin(const Func *f, int v, int depth);
+
 static LowerState L = {
     .rs = { .fa = -1, .i64_acc = -1 },
     .cur_hl_addr_off = -1, .cur_func_uses_params = 1,
@@ -6540,14 +6545,13 @@ int ir_lower_func(FILE *out, Func *f)
     ir_alloc(f);
     compute_no_slot_bytes(f);
 
-    /* [IR_BYTE_REMAT] Byte-remat table: a width-1 vreg whose SINGLE def is a
-       global byte load (LD_MEM IR_MEM_SYM, non-volatile, non-banked) and whose
-       SINGLE use sits in the same BB with NO memory-writing op between — so the
-       global is provably unchanged and `ld a,(sym)` can be re-issued at the use
-       instead of a frame-slot store+reload (a global load is rematerialisable).
-       Kills the daft `ld a,(g);ld (ix-n),a; … ld a,(ix-n)` spill of a value that
-       is just a memory read. DEFAULT ON; --opt-disable=byte-remat opts out
-       (byte-identical to the pre-remat pickers). */
+    /* [IR_BYTE_REMAT] Byte-remat table has two proved slotless cases: a
+       single-use, unchanged global byte load rematerialised at a supported
+       byte read site; and, under sdccdecl-byte-const, a call-only byte traced
+       through pure conversions/copies to a unique immediate and rematerialised
+       by stacked-call marshalling. Each entry maps its vreg to the remat source.
+       Both are default on; byte-remat disables the whole table and
+       sdccdecl-byte-const disables only the immediate-call case. */
     g_hc.byte_remat = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
                              sizeof(const Op *));
     if (g_hc.byte_remat && !opt_disabled("byte-remat")) {
@@ -6557,10 +6561,19 @@ int ir_lower_func(FILE *out, Func *f)
                 const Op *o = &bb->ops[j];
                 int d = o->dst;
                 if (d < 0 || d >= f->n_vregs) continue;
-                if (o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_SYM) continue;
                 if (f->vregs[d].width != 1) continue;
                 if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
                     continue;
+                const Op *const_origin = NULL;
+                if (sdccdecl_byte_const_enabled()
+                    && byte_call_only_sdccdecl(f, d))
+                    const_origin = byte_imm_origin(f, d, 0);
+                if (const_origin) {
+                    g_hc.byte_remat[d] = const_origin;
+                    f->vregs[d].flags |= IR_VREG_NO_SLOT;
+                    continue;
+                }
+                if (o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_SYM) continue;
                 if (o->mem.volatile_ || !o->mem.sym || ns_sym_bails(o->mem.sym))
                     continue;
                 /* exactly one def + one use, use in this BB after j */
@@ -8702,4 +8715,88 @@ cleanup_err:
     free(bb_hl_addr_out);
     rec_reset();
     return -1;
+}
+
+/* Rematerialise compile-time byte values at __z88dk_sdccdecl argument pushes
+   instead of assigning them a frame slot. The values are terminal call-only
+   uses; dynamic bytes and ordinary smallc arguments are deliberately excluded.
+   Default ON; IR_OFF=sdccdecl-byte-const opts out, byte-identically. */
+static int sdccdecl_byte_const_on = -1;
+static int sdccdecl_byte_const_enabled(void)
+{
+    if (sdccdecl_byte_const_on < 0)
+        sdccdecl_byte_const_on = !opt_disabled("sdccdecl-byte-const");
+    return sdccdecl_byte_const_on;
+}
+
+/* Materialise a byte-remat source in A. Global byte loads re-issue the
+   absolute memory read; constants load their low byte directly. */
+static void emit_byte_remat_to_a(FILE *out, const Op *o)
+{
+    if (o->kind == IR_LD_IMM) {
+        emit(out, "ld\ta,%d", (int)(o->imm & 0xff));
+    } else {
+        char s[80];
+        byte_remat_symstr(s, sizeof s, o);
+        emit(out, "ld\ta,(%s)", s);
+    }
+}
+/* Return true only when every observed use of v is as a width-1 argument to a
+   __z88dk_sdccdecl call. The byte rematerialisation below has no slot to fall
+   back to, so even one non-call consumer must keep the normal definition. */
+static int byte_call_only_sdccdecl(const Func *f, int v)
+{
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            int uses[128];
+            int nu = ir_op_uses(op, uses, 128), has_v = 0;
+            for (int k = 0; k < nu; k++)
+                if (uses[k] == v) { has_v = 1; break; }
+            if (!has_v) continue;
+            if (op->kind != IR_CALL || !op->call
+                || !(op->call->flags & SDCCDECL))
+                return 0;
+            int is_byte_arg = 0;
+            for (int i = 0; i < op->call->n_args; i++)
+                if (op->call->args[i] == v && f->vregs[v].width == 1) {
+                    is_byte_arg = 1;
+                    break;
+                }
+            if (!is_byte_arg) return 0;
+            seen = 1;
+        }
+    return seen;
+}
+
+/* Find a constant immediate whose low byte is unchanged by this vreg's
+   single-def conversion/copy chain. Only pure width conversions and MOVs are
+   transparent; any computed or multiply-defined value stays slot-backed. */
+static const Op *byte_imm_origin(const Func *f, int v, int depth)
+{
+    if (v < 0 || v >= f->n_vregs || depth >= 8) return NULL;
+    /* Every link must be an ordinary value. In particular, do not bypass an
+       address-taken local whose slot may have been changed through an alias,
+       or a volatile value whose read must remain observable. Checking only
+       the final call-argument vreg misses these flags on copy/conversion
+       intermediates. */
+    if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+        return NULL;
+    const Op *def = NULL;
+    int ndef = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            int defs[8];
+            int nd = ir_op_defs(op, defs, 8);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] == v) { def = op; ndef++; }
+        }
+    if (ndef != 1 || !def || def->dst != v) return NULL;
+    if (def->kind == IR_LD_IMM) return def;
+    if (def->kind == IR_MOV || def->kind == IR_CONV_TRUNC
+        || def->kind == IR_CONV_ZX || def->kind == IR_CONV_SX)
+        return byte_imm_origin(f, def->src[0], depth + 1);
+    return NULL;
 }

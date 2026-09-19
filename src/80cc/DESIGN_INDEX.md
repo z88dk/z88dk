@@ -206,6 +206,19 @@ jp nz`. `k-trip` opt-out. 8085-only compile-only corpus scan: -156 B over
 
 ### Background work, when there is time
 
+**Constant byte arguments to `__z88dk_sdccdecl` — CLOSED. See ADR 0095.**
+`read_reg` in the Magnetic emulator is the motivating real-file case. On a
+temporary annotated copy, Z80N-fp `code_compiler` falls 21,998→20,571 B
+(1,427 B); direct adjacent-pair packing saves a further 242 B over the
+rematerialisation-only intermediate. The lowerer traces a call-only byte value
+through pure conversions/copies to a unique immediate definition and removes
+its slot. Adjacent constant byte args now use `ld de,nn; push de`; every link
+in the trace is checked for address-taken and volatile flags, stopping the
+rewrite when aliasing or observable reads are possible. `long_ir` passes
+851/851 in each frame mode (the existing `longshl_vm1` assembler gap remains).
+The standard corpus has no size changes in 660 CPU/frame cells and no Z80 tick
+changes in 60 cells; the annotated real-file case is where this helps.
+
 A survey of all 14 `CPU_HAS_*` macros found five the backend never consults;
 the other four are KR580VM1-only. That survey is **not** the sweep — the macros
 cover a fraction of each ISA, and ADR 0075's `mul` was not among them. The sweep
