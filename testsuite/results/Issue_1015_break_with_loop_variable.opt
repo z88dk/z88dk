@@ -33,7 +33,9 @@
 	ld	de,5
 	ex	de,hl
 	call	l_ge
-	jp	nc,i_5	;
+	ld	a,h
+	or	l
+	jp	z,i_5	;
 	pop	bc
 	pop	bc
 	jp	i_3	;EOS

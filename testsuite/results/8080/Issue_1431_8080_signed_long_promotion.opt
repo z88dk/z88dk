@@ -30,7 +30,7 @@
 	ex	(sp),hl
 	ld	a,h
 	rlca
-	jr	nc,i_3
+	jp	nc,i_3
 	ex	(sp),hl
 	dec	hl
 	ex	(sp),hl

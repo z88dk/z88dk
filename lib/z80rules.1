@@ -1277,12 +1277,12 @@
 	ld	(hl),%eval(%1 256 /)
 	jp	%2	;EOS
 
-;; 8080/8085/gbz80/vm1: do not fold JR 0/1 sandwiches (z80asm maps JR to JP
-;; and those folds alias labels). 808x jumpr emits JP; JP clones follow.
+;; 8080/8085/vm1 have no JR. z80asm maps compiler JR to JP, so do not
+;; fold JR 0/1 sandwiches on those CPUs. 808x jumpr emits JP; JP clones
+;; follow. GBZ80 has JR; z80asm does not remap it, so JR folds stay.
 %notcpu 8080
 %notcpu vm1
 %notcpu 8085
-%notcpu gbz80
 	ld	hl,0	;const
 	jr	%1
 .%2
@@ -1310,7 +1310,6 @@
 %notcpu 8080
 %notcpu vm1
 %notcpu 8085
-%notcpu gbz80
 	ld	hl,1	;const
 	jr	%1
 .%2
@@ -1342,7 +1341,6 @@
 %notcpu 8080
 %notcpu vm1
 %notcpu 8085
-%notcpu gbz80
 	jp	n%0,%1	;%4
 	jr	%2
 .%1
@@ -1746,7 +1744,6 @@
 %notcpu 8080
 %notcpu vm1
 %notcpu 8085
-%notcpu gbz80
 	jp	z,%1	;%7
 	jr	%2
 .%1
@@ -1792,7 +1789,6 @@
 %notcpu 8080
 %notcpu vm1
 %notcpu 8085
-%notcpu gbz80
 	jp	nc,%1	;%7
 	ld	hl,1	;const
 	jr	%2
@@ -1838,7 +1834,6 @@
 %notcpu 8080
 %notcpu vm1
 %notcpu 8085
-%notcpu gbz80
 	jp	%1,%2	;%5
 .%3
 	jp	%4	;%6
@@ -4693,7 +4688,6 @@
 %notcpu 8080
 %notcpu vm1
 %notcpu 8085
-%notcpu gbz80
 	ld	a,h
 	or	l
 	jp	nz,%1	;%5
@@ -5068,7 +5062,6 @@
 %notcpu 8080
 %notcpu vm1
 %notcpu 8085
-%notcpu gbz80
 	ld	hl,(%1)
 	ld	de,(%1+2)
 	push	de
@@ -6441,7 +6434,6 @@
 %notcpu 8080
 %notcpu vm1
 %notcpu 8085
-%notcpu gbz80
 	jp	nz,%1
 	jr	%2
 .%1
@@ -6507,7 +6499,6 @@
 %notcpu 8080
 %notcpu vm1
 %notcpu 8085
-%notcpu gbz80
 	ld	hl,1	;const
 	jr	%2
 .%3
@@ -7557,7 +7548,6 @@
 %notcpu 8080
 %notcpu vm1
 %notcpu 8085
-%notcpu gbz80
 	ld	hl,1	;const
 	jr	%1
 .%2

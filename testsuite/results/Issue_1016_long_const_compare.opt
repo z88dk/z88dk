@@ -19,7 +19,9 @@
 	ld	bc,4
 	push	bc
 	call	l_long_lt
-	jp	nc,i_2	;
+	ld	a,h
+	or	l
+	jp	z,i_2	;
 	ld	hl,i_1+0
 	push	hl
 	ld	a,1
@@ -39,7 +41,9 @@
 	ld	hl,4	;const
 	ld	de,0
 	call	l_long_gt
-	jp	nc,i_4	;
+	ld	a,h
+	or	l
+	jp	z,i_4	;
 	ld	hl,i_1+0
 	push	hl
 	ld	a,1

@@ -18,7 +18,9 @@
 	ld	de,2
 	ex	de,hl
 	call	l_gt
-	jp	nc,i_5	;
+	ld	a,h
+	or	l
+	jp	z,i_5	;
 	ld	hl,0	;const
 	add	hl,sp
 	ld	(hl),15
