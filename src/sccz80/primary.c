@@ -946,15 +946,26 @@ int ulvalue(LVALUE* lval)
  * of the actual function
  *
  * Returns 1 if we should testjump i.e. ld a,h or l jp z, or 0 for carry conds
+ *
+ * Trust carry when codegen left KIND_CARRY (set_carry), or when a
+ * comparison only set flags and kept the original val_type (signed
+ * char const compare). After set_int(), HL is 0/1 and carry may be
+ * stale — using jumpc then folding &&/|| labels merged true/false
+ * paths on 8085 (while (p && i < n), sp == dp && ...).
  */
 
 int check_lastop_was_testjump(LVALUE* lval)
 {
     void (*fn)(LVALUE *lval);
-    fn = lval->binop;
 
-    if (fn == zeq || fn == zne || fn == zge || fn == zle || fn == zgt || fn == zlt || fn == zle || fn == lneg || fn == dummy)
+    if (lval->val_type == KIND_CARRY)
         return (0);
+    fn = lval->binop;
+    if (fn == zeq || fn == zne || fn == zge || fn == zle || fn == zgt || fn == zlt) {
+        if (lval->val_type == KIND_INT)
+            return (1);
+        return (0);
+    }
     return (1);
 }
 

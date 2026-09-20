@@ -1277,6 +1277,12 @@
 	ld	(hl),%eval(%1 256 /)
 	jp	%2	;EOS
 
+;; 8080/8085/gbz80/vm1: do not fold JR 0/1 sandwiches (z80asm maps JR to JP
+;; and those folds alias labels). 808x jumpr emits JP; JP clones follow.
+%notcpu 8080
+%notcpu vm1
+%notcpu 8085
+%notcpu gbz80
 	ld	hl,0	;const
 	jr	%1
 .%2
@@ -1289,6 +1295,22 @@
 	jp	%3	;%4
 .%2
 
+	ld	hl,0	;const
+	jp	%1
+.%2
+	ld	hl,1	;const
+.%1
+	ld	a,h
+	or	l
+	jp	z,%3	;%4
+=
+	jp	%3	;%4
+.%2
+
+%notcpu 8080
+%notcpu vm1
+%notcpu 8085
+%notcpu gbz80
 	ld	hl,1	;const
 	jr	%1
 .%2
@@ -1303,6 +1325,24 @@
 	jp	%3	;%4
 .%1_%2
 
+	ld	hl,1	;const
+	jp	%1
+.%2
+	ld	hl,0	;const
+.%1
+	ld	a,h
+	or	l
+	jp	z,%3	;%4
+=
+	jp	%1_%2
+.%2
+	jp	%3	;%4
+.%1_%2
+
+%notcpu 8080
+%notcpu vm1
+%notcpu 8085
+%notcpu gbz80
 	jp	n%0,%1	;%4
 	jr	%2
 .%1
@@ -1310,6 +1350,17 @@
 .%2
 =
 	jr	%0,%2
+.%1
+	jp	%3	;%5
+.%2
+
+	jp	n%0,%1	;%4
+	jp	%2
+.%1
+	jp	%3	;%5
+.%2
+=
+	jp	%0,%2
 .%1
 	jp	%3	;%5
 .%2
@@ -1692,6 +1743,10 @@
 	ld	(de),a
 	ld	hl,%2
 
+%notcpu 8080
+%notcpu vm1
+%notcpu 8085
+%notcpu gbz80
 	jp	z,%1	;%7
 	jr	%2
 .%1
@@ -1703,6 +1758,17 @@
 	jp	%3	;%8
 .%2
 
+	jp	z,%1	;%7
+	jp	%2
+.%1
+	jp	%3	;%8
+.%2
+=
+	jp	nz,%2
+.%1
+	jp	%3	;%8
+.%2
+
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gint	;%9
@@ -1723,6 +1789,10 @@
 	jp	%3	;%8
 	cp	%4
 
+%notcpu 8080
+%notcpu vm1
+%notcpu 8085
+%notcpu gbz80
 	jp	nc,%1	;%7
 	ld	hl,1	;const
 	jr	%2
@@ -1744,6 +1814,31 @@
 .%1_%2
 	ld	hl,%4
 
+	jp	nc,%1	;%7
+	ld	hl,1	;const
+	jp	%2
+.%1
+	ld	hl,0	;const
+.%2
+	ld	a,h
+	or	l
+	jp	nz,%3	;%8
+	ld	hl,%4
+=
+	jp	c,%3	;%8
+.%1
+	jp	%1_%2
+.%2
+	ld	a,h
+	or	l
+	jp	nz,%3	;%8
+.%1_%2
+	ld	hl,%4
+
+%notcpu 8080
+%notcpu vm1
+%notcpu 8085
+%notcpu gbz80
 	jp	%1,%2	;%5
 .%3
 	jp	%4	;%6
@@ -4595,6 +4690,10 @@
 .%1
 	ld	hl,%2
 
+%notcpu 8080
+%notcpu vm1
+%notcpu 8085
+%notcpu gbz80
 	ld	a,h
 	or	l
 	jp	nz,%1	;%5
@@ -4608,6 +4707,25 @@
 	ld	a,h
 	or	l
 	jr	z,%2
+.%1
+	ld	hl,1	;const
+.%2
+	ld	a,h
+	or	l
+
+	ld	a,h
+	or	l
+	jp	nz,%1	;%5
+	jp	%2
+.%1
+	ld	hl,1	;const
+.%2
+	ld	a,h
+	or	l
+=
+	ld	a,h
+	or	l
+	jp	z,%2
 .%1
 	ld	hl,1	;const
 .%2
@@ -6320,11 +6438,22 @@
 	ld	hl,%5
 
 %title Remove jump over
+%notcpu 8080
+%notcpu vm1
+%notcpu 8085
+%notcpu gbz80
 	jp	nz,%1
 	jr	%2
 .%1
 =
 	jr	z,%2
+.%1
+
+	jp	nz,%1
+	jp	%2
+.%1
+=
+	jp	z,%2
 .%1
 
 	ld	a,(_%1)
@@ -6375,6 +6504,10 @@
 	jp	%2	;EOS
 
 %title Tidy up logic
+%notcpu 8080
+%notcpu vm1
+%notcpu 8085
+%notcpu gbz80
 	ld	hl,1	;const
 	jr	%2
 .%3
@@ -6390,6 +6523,26 @@
 .%6
 	ld	hl,1	;const
 	jr	%5
+.%3
+	ld	hl,0	;const
+.%5
+
+%title Tidy up logic (808x jumpr is jp)
+	ld	hl,1	;const
+	jp	%2
+.%3
+	ld	hl,0	;const
+.%2
+	ld	a,h
+	or	l
+	jp	z,%5	;%7
+.%6
+	ld	hl,1	;const
+.%5
+=
+.%6
+	ld	hl,1	;const
+	jp	%5
 .%3
 	ld	hl,0	;const
 .%5
@@ -7401,8 +7554,26 @@
 	ld	(hl),a
 
 %title Cleanup boolean (introduced via 2958)
+%notcpu 8080
+%notcpu vm1
+%notcpu 8085
+%notcpu gbz80
 	ld	hl,1	;const
 	jr	%1
+.%2
+	ld	hl,0	;const
+.%1
+	jp	nc,%4	;
+=
+	ld	hl,1	;const
+	jp	%2_%1
+.%2
+	ld	hl,0
+	jp	%4
+.%2_%1
+
+	ld	hl,1	;const
+	jp	%1
 .%2
 	ld	hl,0	;const
 .%1

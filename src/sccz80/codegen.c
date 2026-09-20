@@ -1414,7 +1414,14 @@ void opjump(char* cc, int label, int end_of_scope)
 
 void opjumpr(char* cc, int label)
 {
-    ot("jr\t");
+    /* 8080/8085/VM1 have no JR. Emit JP (no trailing comment, unlike
+     * opjump) so copt can fold &&/|| 0/1 sandwiches on the real insn.
+     * z80asm would map a compiler JR to JP later; JR-sized folds then
+     * alias labels. GBZ80 has JR, so it keeps jr. */
+    if (IS_808x())
+        ot("jp\t");
+    else
+        ot("jr\t");
     outstr(cc);
     printlabel(label);
     nl();
@@ -1456,12 +1463,15 @@ void testjump(LVALUE* lval, int label)
     ol("ld\ta,h");
     ol("or\tl");
 
-    if (type == KIND_LONG && check_lastop_was_comparison(lval)) {
+    /* A long/CPTR/i64 in DEHL (or the alt set) is false only if every
+     * word is zero. Do not wait for a comparison: `if (uint32_t)` and
+     * `a && ulong` are rvalues, and 0x00010000 has HL==0. */
+    if (type == KIND_LONG) {
         ol("or\td");
         ol("or\te");
-    } else if (type == KIND_CPTR && check_lastop_was_comparison(lval)) {
+    } else if (type == KIND_CPTR) {
         ol("or\te");
-    } else if ( type == KIND_LONGLONG && check_lastop_was_comparison(lval)) {
+    } else if (type == KIND_LONGLONG) {
         ol("or\td");
         ol("or\te");
         ol("exx");
@@ -5091,13 +5101,13 @@ void zge_const(LVALUE *lval, int64_t value64)
             ol("ld\ta,l");
             outfmt("\tsub\t%d\n", (value % 256));
             ol("ccf");
-            set_carry(lval);
         } else {
             ol("ld\ta,l");
             ol("xor\t128");
             outfmt("\tsub\t%d\n", 128 | ( value % 256));
             ol("ccf");
         }
+        set_carry(lval);
     } else if ( lval->val_type == KIND_LONGLONG) {
         llpush();
         vllongconst(value64);
