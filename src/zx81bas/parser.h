@@ -36,13 +36,6 @@ struct Parser {
     // returns false if any syntax errors were encountered.
     bool parse();
 
-private:
-    using StmtParser = StmtPtr (Parser::*)();
-    static std::unordered_map<Keyword, StmtParser> pragma_parsers_lut;
-    static std::unordered_map<Keyword, StmtParser> stmt_parsers_lut;
-
-    [[noreturn]] void syntax_error(const std::string& msg) const;
-
     bool at_end() const;
     bool at_end_of_stmt() const;
     void check_end_of_stmt();
@@ -53,6 +46,16 @@ private:
     const Token& peek(size_t offset = 0) const;
     const TokLine& line() const;
     const SourceLoc& loc() const;
+
+    ExprPtr parse_expr();
+    ExprPtr parse_assignable();
+
+private:
+    using StmtParser = StmtPtr (Parser::*)();
+    static std::unordered_map<Keyword, StmtParser> pragma_parsers_lut;
+    static std::unordered_map<Keyword, StmtParser> stmt_parsers_lut;
+
+    [[noreturn]] void syntax_error(const std::string& msg) const;
 
     static bool is_func_one_arg(Keyword keyword);
     static bool is_func_zero_arg(Keyword keyword);
@@ -67,8 +70,6 @@ private:
     ExprPtr parse_rel_expr();
     ExprPtr parse_and_expr();
     ExprPtr parse_or_expr();
-    ExprPtr parse_expr();
-    ExprPtr parse_assignable();
 
     // statement parsers
     void parse_stmt_block(const std::unordered_set<Keyword>& stop_keywords,

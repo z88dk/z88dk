@@ -8,7 +8,7 @@
 #include "emit_asm.h"
 #include "errors.h"
 #include "lexer.h"
-#include "release_assert.h"
+#include "simplify_expr.h"
 #include "utils.h"
 #include "zx81chars.h"
 #include <algorithm>
@@ -252,14 +252,43 @@ static void emit_prog(Prog& prog, int pass,
         std::string line_label = "L" + oss.str();
 
         emit(asm_source, "", "DDB", std::to_string(line.line_num));
-        emit(asm_source, "", "DEFW", line_label + "_END-" + line_label + "_START");
+        emit(asm_source, "", "DEFW", line_label + "_END - " + line_label + "_START");
         emit(asm_source, line_label + "_START:");
 
         // line tokens as DEFB
         bool is_rem = !line.tokens.empty() && line.tokens[0].keyword == Keyword::REM;
         bool do_invert = is_rem && prog.rem_invert;
 
-        for (auto& token : line.tokens) {
+        // copy tokens and replace label references with addresses
+        std::vector<Token> copy_tokens;
+        copy_tokens.reserve(line.tokens.size());
+        for (const auto& token : line.tokens) {
+            Token copy_token = token;
+            if (token.type == TokenType::LabelRefAddr) {
+                auto it = prog.label_addr.find(token.svalue);
+                if (it == prog.label_addr.end()) {
+                    if (pass == 2) {
+                        error(token.loc, "Undefined label: '" + token.svalue + "'");
+                    }
+                    copy_token.type = TokenType::Integer;
+                    copy_token.ivalue = 0;
+                    copy_token.text = "0";
+                }
+                else {
+                    int addr = it->second;
+                    copy_token.type = TokenType::Integer;
+                    copy_token.ivalue = addr;
+                    copy_token.text = std::to_string(addr);
+                }
+            }
+            copy_tokens.push_back(copy_token);
+        }
+
+        // simplify expressions in tokens
+        simplify_exprs(copy_tokens);
+
+        // output tokens as DEFB
+        for (auto& token : copy_tokens) {
             switch (token.type) {
             case TokenType::Float:
             case TokenType::Integer:
@@ -268,25 +297,6 @@ static void emit_prog(Prog& prog, int pass,
                 emit(asm_source, "", "DEFB", "_NUMBER");
                 emit(asm_source, "", "FLOAT", token.text);
                 break;
-            case TokenType::LabelRefAddr: {
-                auto it = prog.label_addr.find(token.svalue);
-                if (it == prog.label_addr.end()) {
-                    if (pass == 2) {
-                        error(token.loc, "Undefined label: '" + token.svalue + "'");
-                    }
-                    emit(asm_source, "", "DEFB", "0");
-                    emit(asm_source, "", "DEFB", "_NUMBER");
-                    emit(asm_source, "", "FLOAT", "0");
-                }
-                else {
-                    int addr = it->second;
-                    emit(asm_source, "", "DEFB",
-                         string_to_zx81(std::to_string(addr), /*check_keywords=*/false, token.loc));
-                    emit(asm_source, "", "DEFB", "_NUMBER");
-                    emit(asm_source, "", "FLOAT", std::to_string(addr));
-                }
-                break;
-            }
             case TokenType::StringLiteral:
                 emit(asm_source, "", "DEFB", "_QUOTE");
                 emit(asm_source, "", "DEFB",

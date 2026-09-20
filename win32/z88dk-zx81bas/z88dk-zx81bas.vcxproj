@@ -153,6 +153,7 @@
     <ClInclude Include="..\..\src\zx81bas\release_assert.h" />
     <ClInclude Include="..\..\src\zx81bas\scan.h" />
     <ClInclude Include="..\..\src\zx81bas\semantic.h" />
+    <ClInclude Include="..\..\src\zx81bas\simplify_expr.h" />
     <ClInclude Include="..\..\src\zx81bas\symtab.h" />
     <ClInclude Include="..\..\src\zx81bas\utils.h" />
     <ClInclude Include="..\..\src\zx81bas\walker.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="..\..\src\zx81bas\preproc.cpp" />
     <ClCompile Include="..\..\src\zx81bas\scan.cpp" />
     <ClCompile Include="..\..\src\zx81bas\semantic.cpp" />
+    <ClCompile Include="..\..\src\zx81bas\simplify_expr.cpp" />
     <ClCompile Include="..\..\src\zx81bas\symtab.cpp" />
     <ClCompile Include="..\..\src\zx81bas\utils.cpp" />
     <ClCompile Include="..\..\src\zx81bas\walker.cpp" />

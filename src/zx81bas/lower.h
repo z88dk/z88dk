@@ -7,11 +7,10 @@
 #pragma once
 
 #include "ast.h"
+#include "errors.h"
 #include "symtab.h"
-#include <memory>
 #include <string>
 #include <vector>
-#include "errors.h"
 
 struct LoweredExpr {
     std::vector<StmtPtr> preamble;  // stmts to compute the expression

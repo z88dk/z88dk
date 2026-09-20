@@ -131,7 +131,10 @@ static bool make_sym_file(const std::string& sym_filename,
                                           label_addr.end());
     std::sort(sorted_labels.begin(), sorted_labels.end(),
     [](const auto & a, const auto & b) {
-        return a.second < b.second;
+        if (a.second != b.second) {
+            return a.second < b.second;
+        }
+        return a.first < b.first;
     });
 
     // output labels in range __head to __tail
