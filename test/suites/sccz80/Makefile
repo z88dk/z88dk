@@ -43,6 +43,18 @@ test_compare.bin: $(SOURCES) compare.c
 	$(runtest)
 
 
+test_ifchar.bin: $(SOURCES) ifchar.c ifchar_ret.asm
+	$(compile)
+	$(runtest)
+
+test_8080_ifchar.bin: $(SOURCES) ifchar.c ifchar_ret.asm
+	$(compile_8080)
+	$(runtest_8080)
+
+test_8085_ifchar.bin: $(SOURCES) ifchar.c ifchar_ret.asm
+	$(compile_8085)
+	$(runtest_8085)
+
 test_%.bin: $(SOURCES) %.c
 	$(compile)
 	$(runtest)
