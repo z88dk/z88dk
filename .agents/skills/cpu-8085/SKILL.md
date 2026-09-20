@@ -343,6 +343,19 @@ Signed order (**K**, immediately). `<=` is K **or** Z; `>` is NK and NZ:
 
 Unsigned order (**C** / borrow, immediately). `<=` is C **or** Z; `>` is NC and NZ. Do not use `jp k` for unsigned `<`.
 
+**Polarity.** C sets when **HL < BC** (borrow). For `i < n` tested as
+`n−i` (HL=n, BC=i): continue only on **no-borrow AND NZ**:
+
+```asm
+    sub hl,bc           ; C => n < i; Z => n == i
+    jp  c,done
+    jp  z,done
+    ; body
+```
+
+`jp c,body` here is inverted. `lo<=hi` with a possibly negative `hi`
+is **signed** (K or Z), not C.
+
 For multi-word subtract **with borrow**, use **`sub` / `sbc` through A**, not `sub hl,bc`.
 
 ### 5. Counted loops — K and pre-decrement
@@ -417,7 +430,7 @@ On 8085, **`ld (de),r` / `ld (de),n` are illegal as chip ops** for r ≠ A. Vali
     sra hl
 ```
 
-**Logical 16-bit >>** (no `srl hl`):
+**Logical 16-bit >>** (no `srl hl` — **`srl` is Z80 CB, not 8085**):
 
 ```asm
     sra hl
@@ -426,7 +439,19 @@ On 8085, **`ld (de),r` / `ld (de),n` are illegal as chip ops** for r ≠ A. Vali
     ld  h,a            ; force bit 15 clear
 ```
 
-**Logical multi-byte >>** (24/32-bit etc.): chain **`rra` through A** across bytes — not Z80 `srl`.
+**`rra`×n is not a logical `>> n`.** `rra` is rotate-through-carry
+(Intel `RAR`). After the first `rra`, C holds the old bit 0, so the
+next `rra` injects that bit into bit 7. `c=0x91` then four bare `rra`
+yields `0x29`, not `0x09`.
+
+8-bit logical `>> n` (n≤4): `rlca`×n then `and ((1<<(8-n))-1)`; or
+`and a` **before each** `rra`. 16-bit logical: `sra hl` with H=0, or
+the `$7f` form above.
+
+**Logical multi-byte >>** (24/32-bit etc.): chain **`rra` through A**
+across bytes — **first** byte with C cleared (`xor a` / `or a` on the
+MSB), later bytes consume the previous C. Not Z80 `srl`. Not a bare
+`rra`×n on one register.
 
 **32-bit <<** (value in DEHL):
 
@@ -459,6 +484,9 @@ Push a scratch word; **`ex (sp),hl`** swaps with it when AF/BC/DE/HL are full (1
 | `dec b` / `jr nz` (→ `jp nz`) | native `djnz` (`10` is `sra hl`) |
 | Stack + DE for second long | `exx`, IX/IY as default temps |
 | `sub hl,bc` | Assuming `sbc hl,de` exists |
+| `and a` / `rra`, `sra hl` + clear H7, `rlca`×n + mask | Z80 `srl r` / `srl hl` / `bit n,r` (CB prefix; `CB` on 8085 is `rst v`) |
+| `ld de,sp+*` | `ld bc,sp+*` / `ld hl,sp+*` (LDSI is DE only) |
+| `ld hl,(de)` / `ld (de),hl` | `ld bc,(de)` / `ld (de),bc` |
 | Open-coded extended-op sequences | Assuming Z80 library mul/div cores |
 
 Assembler must be **8085-aware** (these encodings are not Z80 prefixes).
@@ -512,12 +540,13 @@ Assembler must be **8085-aware** (these encodings are not Z80 prefixes).
 3. **K ≠ Z on 16-bit dec** — pre-dec + `jp k`/`jp nk`.
 4. **Offsets on `ld de,sp+*` / `ld de,hl+*` are unsigned.**
 5. **`rst v`** only if **0040h** is defined.
-6. **Rotates do not write Z** (pastraiser). `rla` / `rlca` / `rl de` = `-----VC`. `rra` / `rrca` / `sra hl` = `-----0C`. Never `rl de; jp z` or `sra hl; jp z`. Z80 CB `RL` / `SRA` do write Z. Test with `or a` / `and a`, or `inc r` / `dec r` / `jp z` (C kept).
+6. **Rotates do not write Z** (pastraiser). `rla` / `rlca` / `rl de` = `-----VC`. `rra` / `rrca` / `sra hl` = `-----0C`. Never `rl de; jp z` or `sra hl; jp z`. Z80 CB `RL` / `SRA` do write Z. Test with `or a` / `and a`, or `inc r` / `dec r` / `jp z` (C kept). **`rra`×n is not logical `>> n`** (rotate-through-carry; §7).
 7. **No `exx`, IX, IY, native `djnz` / native `jr`.** `jr` **is allowed** in normal mode (→ `jp`; shared Z80 source). Strict: write `jp`. Second long operand on stack; counted loops via `dec b`/`jr nz` or K pre-dec (§5).
 8. **Forward overlapping stack copy corrupts** — see multi-word frame rebuild above.
 9. **No copt pass on library asm** — hand-written `libsrc/**` is assembled as-is. Remove copy-backs (`ld r,a` then `ld a,r`) and other dead moves yourself. Match the **target file’s** whitespace (spaces vs tabs); do not reformat to sccz80/copt tab style. **Before finalising** any hand-coded math16/math32 (or similar) edit: scan for copt-equivalent wins (`ex de,hl` / `ld bc,hl` instead of push/pop transfers; drop `ld a,e` after `ld e,a`; pair zeros → `ld hl,0`; etc.) and run the matching suite. Do **not** use `xor a` for `ld a,0` when CF must survive. Full checklist: **`tool-copt`** and **`methodology-measure`** (“Before finalising hand-coded library work”).
 10. **Illegal chip `(de)` stores** — only `a` / `hl`. Saccharine `ld (de+),a` is fine. `ld (de),l` assembling is a **paid** `ex de,hl` expansion, not a chip op.
 11. **`__CPU_INTEL__` is set for 8085.** 9-common `IF __CPU_INTEL__` takes the 8080-portable path and will not emit `rl de` / `sra hl`. Do not “fix” those files with `#if __CPU_8085__`. Fork into `7-8085/` and list the module first (`l/util/8085.lst`, `l/sccz80/8085.lst`). Existing forks: `l_lsl_dehl`, `l_asr_dehl`, `l_long_asr`, `l_small_atoul` / `htoul` / `otoul` / `utoa`, `l_gint1sp`…`l_gint8sp`. **New 8085-only code** does not `call l_gint*sp` — open-code `ld de,sp+*` / `ld hl,(de)`.
+12. **No `srl`, no `bit n,r`, no `ld bc,sp+*`, no `ld bc,(de)`.** `CB` is `rst v`. LDSI is **DE** only. Word through DE is HL. `inc`/`dec` on a pair are **±1 byte**, not ±element.
 
 ## Preference order (when writing 8085-only code)
 

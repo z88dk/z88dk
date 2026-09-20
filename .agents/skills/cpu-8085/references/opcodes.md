@@ -50,7 +50,7 @@ Flags column: **SZKAPVC**.
 | 05 | dec b | DCR B | 1 | 4 | SZKAPV- | |
 | 06 | ld b,* | MVI B,d8 | 2 | 7 | ------- | |
 | 07 | rlca | RLC | 1 | 4 | -----VC | |
-| 08 | sub hl,bc | DSUB | 1 | 10 | SZKAPVC | undoc; HL←HL−BC |
+| 08 | sub hl,bc | DSUB | 1 | 10 | SZKAPVC | undoc; HL←HL−BC. **C** = unsigned borrow (HL<BC). **K** = signed HL<BC. No `srl`/`sbc hl,*` |
 | 09 | add hl,bc | DAD B | 1 | 10 | -----VC | |
 | 0A | ld a,(bc) | LDAX B | 1 | 7 | ------- | |
 | 0B | dec bc | DCX B | 1 | 6 | --K---- | |
@@ -78,7 +78,7 @@ Flags column: **SZKAPVC**.
 | 1C | inc e | INR E | 1 | 4 | SZKAPV- | |
 | 1D | dec e | DCR E | 1 | 4 | SZKAPV- | |
 | 1E | ld e,* | MVI E,d8 | 2 | 7 | ------- | |
-| 1F | rra | RAR | 1 | 4 | -----0C | V←0 |
+| 1F | rra | RAR | 1 | 4 | -----0C | V←0. Rotate **through C**, not logical `>>`. `rra`×n is not `>>n`. No `srl` |
 
 ### 2x
 
@@ -286,6 +286,8 @@ These are **not** single opcodes; assemblers may expand them:
 | `ld (**),de` / `ld de,(**)` | | 5 | 24 |
 
 Prefer real single ops where available (`ld (de),hl`, `ld hl,(de)`, `ex de,hl`, etc.).
+
+**Not on 8085** (Z80 CB / illegal pair forms — do not emit): `srl r` / `srl hl`, `bit n,r`, `ld bc,sp+*`, `ld bc,(de)` / `ld (de),bc`. `CB` is `rst v`. LDSI is `ld de,sp+*` only.
 
 ---
 

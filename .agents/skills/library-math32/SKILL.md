@@ -82,7 +82,7 @@ engines are not bit-identical.
 | math16 | Same split: restoring `asm_f16_div`, NR `asm_f16_inv` | |
 
 Do **not** reintroduce NR trampoline `fsdiv` = `fsinv`+`fsmul` without A/B proof.
-Docs: `math32/readme.md` § div/inv; measurement: **z88dk-tooling** § A/B.
+Docs: `math32/readme.md` § div/inv; measurement: **`methodology-measure`** § A/B.
 
 In **C higher functions** (`c/m32_*.c`):
 
