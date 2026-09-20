@@ -993,10 +993,16 @@ static void test_ivsr(void)
    -10 local lands at the deepest (TOS) frame slot. */
 static void lr_clobber(void) { }
 static int lr_long_cmp_tos(void) { long a = -10, b = 20; lr_clobber(); return a < b; }
+/* Values live across a call are reloaded from their frame slots; runtime
+   arguments prevent constant propagation from hiding the TOS word-read path. */
+static int lr_word_cmp_tos(int a, int b) { int left = a, right = b; lr_clobber(); return left < right; }
+static int lr_volatile_word_cmp_tos(int a, int b) { volatile int left = a, right = b; lr_clobber(); return left < right; }
 
 static void test_long_cmp_tos(void)
 {
     Assert(lr_long_cmp_tos() == 1, "long compare reads TOS-slot operand past a stack push");
+    Assert(lr_word_cmp_tos(-10, 20) == 1, "word compare reads TOS-slot operand");
+    Assert(lr_volatile_word_cmp_tos(-10, 20) == 1, "volatile word read avoids the write-back TOS path");
 }
 
 /* Address-taken local must keep its frame slot for the whole escape

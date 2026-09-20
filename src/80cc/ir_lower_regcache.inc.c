@@ -241,6 +241,19 @@ int tos_pushpop_ok(const Func *f)
     (void)f;
     return !(IS_RABBIT() || IS_GBZ80() || IS_KC160());
 }
+/* A GBZ80 word READ at sp+0 is cheaper with pop/push (28T/2B) than with
+   `ld hl,sp+0` plus the two-byte (hl) walk (32T/5B). Require non-volatile
+   values on every CPU using this shared load path: push writes the word back,
+   so this is not a valid load for a volatile local. The shared TOS predicate
+   also gates stores, in-place updates, slot ordering and epilogues, which need
+   separate checks. */
+static int tos_pushpop_load_ok(const Func *f)
+{
+    (void)f;
+    return !(IS_RABBIT()
+             || IS_KC160()
+             || (IS_GBZ80() && opt_disabled("gbz80-tos-read")));
+}
 
 /* Same sp+0 trick for the LONG (32-bit) ex-free paths — additionally allowed on
    gbz80. gbz80's push/pop are dear (16T/12T), so for a 16-bit slot the pop/push
@@ -534,7 +547,9 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     }
     /* Top-of-stack fast path: a slot at sp+0 read whole with `pop hl;
        push hl` — 2 ops vs ~6, no address compute. sp-mode only. */
-    if (width == 2 && off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
+    if (width == 2 && off == 0 && !fp_active(f)
+        && !(f->vregs[vreg_id].flags & IR_VREG_VOLATILE)
+        && tos_pushpop_load_ok(f)) {
         emit_pop_hl(out);
         emit(out, "push\thl");
         hl_about_to_change(vreg_id);
