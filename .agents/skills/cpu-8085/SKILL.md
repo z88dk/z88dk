@@ -4,14 +4,15 @@ description: >
   Intel 8085 assembly for z88dk: Zilog mnemonics, full opcode map (flags K/V,
   timings), and extended-instruction usage. Strong rule: stack-only locals and
   intermediates; do not invent BSS scratch (C static / file-scope stay BSS).
-  Prefer when writing or reviewing 8085 library asm, mapping Intel↔Zilog,
-  choosing stack frames, K-flag loops, restoring float/integer divide, legal
-  (de) stores, jr-as-jp synthetics, or /cpu-8085.
+  Prefer when writing or
+  reviewing 8085 library asm, mapping Intel↔Zilog, choosing stack frames,
+  K-flag loops, restoring float/integer divide, legal (de) stores,
+  jr-as-jp synthetics, or /cpu-8085.
 ---
 
 # CPU — 8085
 
-Compatible extension of the Intel 8080 (April 1974). Same documented 8080 ops; ten extra ops in 8080 unused cells. **This skill is complete for 8085 work.** Load `cpu-8080` only when the binary must also run on 8080.
+Compatible extension of the Intel 8080 (April 1974). Same documented 8080 ops; ten extra ops in 8080 unused cells. **This skill is complete for opcodes, flags, timings, and extended-op usage.** 8080-only jobs (no extras) use `cpu-8080` in the z88dk tree — this pack does not ship it.
 
 z88dk uses **Zilog mnemonics** for 8085 sources. Extended opcodes are first-class on every 8085. Design notes: https://feilipu.me/2021/09/27/8085-software/
 
@@ -193,6 +194,7 @@ Pastraiser T-states (8085 clocks). Not 8080 (many documented ops differ by 1T).
 5. Never assume Z80 instruction timings or prefix opcodes exist on 8085. **`jr` / `jr cc` are allowed** in normal mode (synthetics on): z80asm emits `jp` / `jp cc` (3 bytes; cond `jp` is 10/7). Same source then assembles for Z80, where `jr` is native. **Strict** / `-no-synth` rejects `jr`. Do not expect a 2-byte relative branch (`18` is `rl de`).
 6. When optimizing, consult [references/opcodes.md](references/opcodes.md) for exact size/cycle/flag data.
 7. **Assembler support last resort:** fixtures `src/z80asm/dev/cpu/cpu_test_8085_{ok,err}.asm` (and `*_strict_*`). **ok** = z80asm accepts that source form (native, synthetic, or `call __z80asm__*`). **err** = rejected. **`_strict_`** = **synthetics forbidden**. Fixtures may include **Intel** spellings for external-compat testing; **z88dk always writes Zilog**. Full decode: **`tool-z80asm`**. `rg` only; do not bulk-read.
+8. **C90 shapes even without C.** When writing 8085 assembly directly, use the shapes documented in this skill (pointer walk vs `a[i]`, word cursor DE, dual cursors, DSUB signed/unsigned, stack-only automatics). Those shapes produce better 8085 than a naïve statement-by-statement lowering.
 
 ## Quick lookup
 
@@ -224,6 +226,7 @@ Background: [8085 Software — Extended Instructions](https://feilipu.me/2021/09
 - Access with **`ld de,sp+*`**, **`ld hl,(de)`**, **`ld (de),hl`**, **`ld a,(de)`**, push/pop, **`ex (sp),hl`**.
 - Prefer **pointers passed on the stack** over **new** static cells when the caller already owns the buffer. Do **not** rewrite a C `static` / file-scope object to the stack.
 - “Slightly fewer cycles” or “easier to write” is **not** enough justification for static/BSS scratch.
+- Function header (purpose, inputs, outputs, uses), including hand-written routines.
 
 ## Instruction preferences
 
@@ -297,7 +300,7 @@ Temporary use then restore previous HL (DE ends as SP+n, not original DE):
     ld  sp,hl
 ```
 
-Document every slot. On each function, state purpose, inputs, outputs, and used registers. Drop consumed args in one epilogue:
+Document every slot. Drop consumed args in one epilogue:
 
 ```asm
     pop bc             ; return address — never pop af for this
@@ -451,7 +454,8 @@ the `$7f` form above.
 **Logical multi-byte >>** (24/32-bit etc.): chain **`rra` through A**
 across bytes — **first** byte with C cleared (`xor a` / `or a` on the
 MSB), later bytes consume the previous C. Not Z80 `srl`. Not a bare
-`rra`×n on one register.
+`rra`×n on one register. There is **no** `rra d` / `rra e` — `rra` is A
+only (`ld a,d` / `rra` / `ld d,a`).
 
 **32-bit <<** (value in DEHL):
 
@@ -485,6 +489,8 @@ Push a scratch word; **`ex (sp),hl`** swaps with it when AF/BC/DE/HL are full (1
 | Stack + DE for second long | `exx`, IX/IY as default temps |
 | `sub hl,bc` | Assuming `sbc hl,de` exists |
 | `and a` / `rra`, `sra hl` + clear H7, `rlca`×n + mask | Z80 `srl r` / `srl hl` / `bit n,r` (CB prefix; `CB` on 8085 is `rst v`) |
+| `ld a,r` / `rra` / `ld r,a` | `rra r` (r ≠ A). `rra` is A only |
+| `cpl` / `inc a` (8-bit) or `cpl` both / `inc hl` (16-bit) | Z80 `neg` (`ED 44`) — not 8085 |
 | `ld de,sp+*` | `ld bc,sp+*` / `ld hl,sp+*` (LDSI is DE only) |
 | `ld hl,(de)` / `ld (de),hl` | `ld bc,(de)` / `ld (de),bc` |
 | Open-coded extended-op sequences | Assuming Z80 library mul/div cores |
@@ -558,13 +564,15 @@ Assembler must be **8085-aware** (these encodings are not Z80 prefixes).
 6. **`rl de`** for ×2, mul/div shifts, 32-bit with HL.
 7. **`sra hl`** for signed 16-bit >>; logical multi-byte >> via A.
 8. Fall back to 8080-portable sequences only when the binary must run without 8085 extended ops.
-9. Write **saccharine** (`ld bc,de`, `ld b,(hl+)`, `ld (de-),a`) instead of the two-insn spelling.
+9. Name the shape (kernel) before emitting opcodes, even for hand-written asm.
+10. Write **saccharine** (`ld bc,de`, `ld b,(hl+)`, `ld (de-),a`) instead of the two-insn spelling.
 
 ## Related
 
 - Full opcode grid: [references/opcodes.md](references/opcodes.md)
-- 8080-only jobs (no extras): `cpu-8080` — do not load both for one CPU
-- How to read z80asm ok/err fixtures: `.agents/skills/tool-z80asm/SKILL.md` (`src/z80asm/dev/cpu/`)
-- Measurement / A/B: `.agents/skills/methodology-measure/SKILL.md`
-- copt vs library asm: `.agents/skills/tool-copt/SKILL.md`
+- 8080-only jobs (no extras): `cpu-8080` in the z88dk tree — this pack does not ship it
+- How to read z80asm ok/err fixtures: `tool-z80asm` (`src/z80asm/dev/cpu/` in the z88dk tree)
+- C90 shapes for better 8085 asm (hand-written or from C): see this skill's shape rules
+- Measurement / A/B: `methodology-measure`
+- copt vs library asm: `tool-copt`
 - Design notes: https://feilipu.me/2021/09/27/8085-software/

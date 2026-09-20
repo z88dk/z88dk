@@ -153,6 +153,16 @@ z88dk-ticks -m8085 prog.bin
 Use for correctness (`printf` / test harness). Prefer TIMER bounds for
 performance so CRT and I/O do not dominate.
 
+### Metric taxonomy (do not mix)
+
+| Name | What it is | Use |
+|------|------------|-----|
+| multi TSV `ticks selected` / `bytes selected` | Static per-function sum of the `-compiler=multi` winner (80cc-sp or sccz80). Instruction-weighted T-states with literal loop trips | Fair kernel bar vs 80cc / sccz80. **Not** whole-image |
+| TIMER | `z88dk-ticks -m8085 bin -x map -start TIMER_START -end TIMER_STOP -counter …` | Support benches (`sieve`, …). CRT/printf out of the number |
+| whole-program `Ticks:` | `z88dk-ticks -m8085 bin` (suite harness, often `-b msx`) | Correctness + end-to-end. Includes CRT and `printf` |
+
+Hybrid vs multi: compare **the same class** (TIMER vs TIMER, whole-program vs whole-program). Do not quote TSV `ticks selected` against a whole-program `Ticks:` line. **Assemble gate** before any ticks claim: `z88dk-z80asm -m8085 -l` clean. CPU flag **before** the binary.
+
 **Default `-counter` is 100000000.** A whole-program `+test` run with no
 `-counter` stops there and used to print a bare `100000000` (now
 `Ticks: … (counter limit)`). That is **not** program output. n-body
@@ -309,6 +319,11 @@ Integer `sscanf` is `test_scanf*.bin` (no `%f`). `test/suites/string` is `str*` 
 
 If a ticks run **never hits `TIMER_STOP`**, suspect infinite loops (classic:
   clobbering the loop counter register that is also used as `B` in `BC`).
+If PC sits on **`rim` (opcode `0x20`)** in a `+test` image: `Assert`
+failed and longjmp hit SYSCALL. That is a **wrong checksum**, not a
+loop clobber. Host-compute the expected value before claiming ticks.
+A stub hot function, or whole-program ticks ≪ multi by >10× **and**
+Assert fail, is not a result.
 
 ---
 
@@ -369,7 +384,7 @@ rg '__code_fp_math32_size|__code_fp_math16_size|fsdiv|divf16' prog.map
 
 ### Full math16/math32 matrix remeasure (scripts)
 
-Agent tooling lives under **`.agents/scripts/`** (documented by this skill):
+Helper tooling lives under **`.agents/scripts/`** (documented by this skill):
 
 | Script | Role |
 |--------|------|
@@ -514,6 +529,28 @@ tree; they are **not** part of the product PR.
 | sccz80 newlib “correct” TIMER but wrong KWIPS | Remeasure **after** header regen (`make -C include/_DEVELOPMENT common/math.h`). Stale numbers from pre-#3061 trees are invalid for product claims |
 | `+test` n-body second `%.9f` prints `10000000x` | Not `ftoa`. Default ticks `-counter` is 1e8; n=200 is ~161M. First energy prints, then the cap. Same on sccz80 and 80cc. Fix: `-counter 999999999999` |
 | Newlib math16 TIMER still on the old specials-tax ticks | `sccz80/z80.lib` still has Sep-vintage math16 objects. `cm16_sccz80_mul_callee` is `G A` not `G =`. Rebuild `math16` **and** `z80` |
+
+### Hand-written C90 asm vs 80cc / sccz80
+
+When 8085 asm is written by hand for these benches, compare quality here. ABI, residency, and C→ISA lowering stay in the 8085 CPU skill. Invoke flags stay in **`compiler-80cc`** / **`compiler-sccz80`**.
+
+**8085-support skip probe.** Before emit or a multi score, try `zcc +test -clib=8085` on the C. Skip — do not invent libc — if the link fails on `qsort`, `_heap`, `pow`, `malloc`, or float helpers. Always skip unless a proven 8085 classic TIMER/`+test` path exists: **n-body, spectral-norm, fasta, binary-trees, sorting, dhrystone, coremark, mandelbrot, whetstone, paranoia**. `coremark10` / `sprintf` / `sscanf` / `gamer_benchmark` have no in-tree +test 8085 recipe.
+
+**zcc-multi float:** `-compiler=multi` does not forward `--math32` / `--math-mbf32` to the per-variant compiles (`src/zcc/zcc.c` `multi_compiler_args`). Those benches build as f48/genmath and fail (`cpcmath.inc` / `dmul`). The multi “winner” for `mandelbrot`, `n-body`, `whetstone`, `spectral-norm`, `fasta`, `pi` is unstable. Exclude them from numeric comparison; this is a zcc-multi limitation, not an agent or 80cc issue.
+
+1. Copy the bench **`z88dk-classic/readme.txt` `zcc` line**. 8085: never `-fframe-pointer`. Fannkuch 8085 adds `--opt-code-speed`; sieve does not. 80cc 8085 **qsort does not link** — skip that row.
+2. Remeasure **both** sides on the **same** toolchain revision. Readme ticks age.
+3. Mix C and asm **per bench** (`zcc` will not drop a C `PUBLIC` because an `.asm` also defines it):
+
+| Timed region | Agent `.asm` | C on the `zcc` line |
+|--------------|--------------|---------------------|
+| `main()` (sieve) | Whole TU: `PUBLIC _main`; `PUBLIC TIMER_START` / `TIMER_STOP` at the **source** TIMER sites (after `memset`, around the nested loops — not CRT) | **Do not** also compile that `.c` |
+| Named function (fannkuch) | Replace **`_fannkuchredux` only**. No `_main` / `TIMER_*` | C copy with that function omitted (`#if 0` / renamed) plus the asm module |
+| Other | Whole TU if TIMER is in `main`; else replace the hot function and strip it from C | |
+
+4. Bind libc from the **preprocessed prototype**. `__z88dk_callee` → `call _foo_callee`. C may see `__builtin_memset`; asm uses `_memset` / `memset`. Never `EXTERN __builtin_memset`.
+5. `z88dk-ticks -m8085` **before** the binary. `-m` map. TIMER labels at the C source points.
+6. If the agent binary is slower or larger: hotspot the timed region; name the C construct and the ISA miss (HL kept as a local, unused `ld de,sp+*`, `call __z80asm__*` on the hot path, `n--` → `jp nk`, …). Patch the 8085 CPU/compiler skill (C→8085 table, residency, or do-not-emit). Do not keep those rules in this skill.
 
 ### Float library A/B (math32 / math16)
 
