@@ -393,22 +393,22 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
         if (de_has(op->dst)) invalidate_de_cache();
         return 0;
     }
-    /* Walking pointer homed in BC/DE (e.g. a char* stepped `p++`): bump it
-       in place with `inc`/`dec` BC/DE forms instead of the ld hl,bc / inc hl /
-       ld bc,hl copy-out-and-back. Mirror of the idx2 counter case above.
-       IR_NO_GPDEREF opts out (paired with the (bc)/(de) deref).
+    /* Step a BC/DE-homed walking pointer in place instead of copying through HL.
+       Require live residency, not only the assigned home. A loop body can
+       borrow BC/DE, so the home does not prove that the register still has the
+       value. IR_NO_GPDEREF opts out (paired with the (bc)/(de) deref).
        EXCLUDE a call-split value: it is BC-resident only inside its span and
        its frame slot must stay coherent (write-both) — a bare step updates
-       BC but NOT the slot, so a later out-of-span read (or a compare that reads
-       the slot on a cold belief) sees a stale value. Falling through to load_to_hl,
-       step HL, then commit_hl_word does the write-both store. */
+       BC but NOT the slot, so a later out-of-span read can see a stale value.
+       Falling through to load_to_hl, step HL, then commit_hl_word writes both. */
+    int bc_resident = vreg_in_pr_bc(f, op->dst) && bc_has(op->dst);
+    int de_resident = vreg_in_pr_de(f, op->dst) && de_has(op->dst);
     if (op->dst == op->src[0] && !opt_disabled("gpderef")
         && !(f->vregs[op->dst].flags & IR_VREG_CALL_SPLIT)
-        && (vreg_in_pr_bc(f, op->dst) || vreg_in_pr_de(f, op->dst))) {
-        emit(out, "%s\t%s", mnem,
-             vreg_in_pr_bc(f, op->dst) ? "bc" : "de");
+        && (bc_resident || de_resident)) {
+        emit(out, "%s\t%s", mnem, bc_resident ? "bc" : "de");
         if (hl_has(op->dst)) invalidate_hl_cache();
-        if (vreg_in_pr_bc(f, op->dst)) cache_bc(op->dst); else cache_de(op->dst);
+        if (bc_resident) cache_bc(op->dst); else cache_de(op->dst);
         return 0;
     }
     if (try_tos_step_inplace(out, f, op, step)) return 0;

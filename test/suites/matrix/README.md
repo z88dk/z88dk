@@ -1,10 +1,13 @@
 # test/suites/matrix — tooling for BENCH_MATRIX.txt
 
-The scripts that regenerate the columns of `../BENCH_MATRIX.txt` and the
-measurements behind `src/80cc/HANDOVER_2026-08-31.md`. They exist so none of this
-has to be re-derived.
+Use `../gen_bench_matrix3.py` to generate the complete matrix. It measures
+30 benchmarks on 12 CPUs and prints all compiler columns to standard output.
 
-All of them:
+The shell helpers below support partial measurements and analysis. They also
+support the measurements behind `src/80cc/HANDOVER_2026-08-31.md`. They are not
+required to generate a full snapshot.
+
+The shell helpers:
 
 - find the repo from their own location, so they work from any cwd;
 - put intermediates and results in `$WORK`, default
@@ -23,10 +26,11 @@ done
 make -C libsrc -j8 && make -C libsrc install
 ```
 
-## The scripts
+## The tools
 
-| script | what it produces |
+| tool | what it produces |
 |---|---|
+| `../gen_bench_matrix3.py` | the complete `../BENCH_MATRIX.txt` table. It covers 30 benchmarks on 12 CPUs. It prints the box table to standard output. Set `MX_TMP` to choose its temporary build directory. |
 | `allcpu.sh` | the **80cc-fp / 80cc-sp** columns, all 12 CPUs. Row: `bench\|cpu\|fp_size\|fp_ticks\|sp_size\|sp_ticks`, with `SAMESP` for the fp field on CPUs with no index register |
 | `xcccpu.sh` | the **xcc -Os / xcc -Of** columns. Row: `bench\|cpu\|os_size\|os_ticks\|of_size\|of_ticks`. Edit `CPUS=` to pick CPUs — z180 and kc160 are in the list but will fail on benchmarks where xcc emits undocumented IY halves |
 | `sizedec.sh` | section-level size decomposition, xcc vs 80cc. Row: `bench\|compiler\|section\|bytes`. This is what showed 93% of the size gap is `code_compiler` |
