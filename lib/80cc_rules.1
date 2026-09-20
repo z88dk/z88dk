@@ -646,6 +646,45 @@
 	ld	de,hl
 	ld	hl,%1
 
+;; On GBZ80 the generic word-slot read is `pop hl; push hl`. A preceding
+;; DE commit must not stay as `ex de,hl` here: z80asm expands that swap to
+;; four stack operations (56T), while `ld de,hl` is an 8T pair copy. The
+;; popped word immediately replaces HL, so the exchange's HL result is dead.
+%title #G5 IR gbz80 drop dead exchange before a TOS word read (-48T)
+%cpu gbz80
+	ex	de,hl
+	pop	hl
+	push	hl
+=
+	ld	de,hl
+	pop	hl
+	push	hl
+
+;; The DE->HL pair copy is dead when a TOS read immediately overwrites HL.
+;; Keep the GBZ80 pop/push read but remove the extra synthetic copy (-8T).
+%title #G7 IR gbz80 drop dead DE-to-HL copy before a TOS word read (-8T)
+%cpu gbz80
+	ld	hl,de
+	pop	hl
+	push	hl
+=
+	pop	hl
+	push	hl
+
+;; A TOS word that is copied from HL to DE and followed by an HL reload can
+;; be read directly into DE. This avoids the pair copy before the HL reload.
+%title #G8 IR gbz80 read TOS word directly into DE before an HL reload (-8T)
+%cpu gbz80
+%not %1 (hl)
+	pop	hl
+	push	hl
+	ld	de,hl
+	ld	hl,%1
+=
+	pop	de
+	push	de
+	ld	hl,%1
+
 %title #IR drop dead ld a,l after a byte widen (ld l,a makes A==L, ld h,0 keeps it)
 	ld	l,a
 	ld	h,0
