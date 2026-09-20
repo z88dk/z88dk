@@ -1269,6 +1269,57 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
        logical srl/l_lsr zero-fills. */
     int arith = (op->imm & IR_SHR_ARITH) != 0;
 
+    /* Variable-count byte >> on CB-shift CPUs. The promoted source reaches
+       width 1 only when narrow_shr_kind proved it is zero-extended (logical)
+       or sign-extended (arithmetic) from a byte. Keep 808x on its established
+       16-bit/helper path: it has no `srl a` / `sra a`. */
+    /* Z80N and Rabbit also retain the word path: measured tick rows regressed. */
+    if (op->dst >= 0 && f->vregs[op->dst].width == 1
+        && op->src[1] >= 0 && CPU_HAS_CB_SHIFTS()
+        && !IS_Z80N() && !IS_RABBIT() && !opt_disabled("var-byte-shift")) {
+        int n = L.cmp_label_counter++;
+        int bc_live = (L.rs.bc >= 0);
+        int byte_home = L.cur_byte_home_vreg;
+        int e_home = byte_home >= 0
+                  && byte_home_phys(f, byte_home) == IR_PR_E;
+        int use_e = bc_live && L.rs.de < 0 && !e_home;
+        int source_b_home = !use_e && byte_home == op->src[0]
+                         && byte_home >= 0
+                         && byte_home_phys(f, byte_home) == IR_PR_B;
+        int save_a = source_b_home
+                  || (a_has(op->src[0])
+                      && !(hl_has(op->src[1]) || bc_has(op->src[1])
+                           || de_has(op->src[1])));
+        const char *counter = use_e ? "e" : "b";
+        if (!use_e && byte_home >= 0
+            && byte_home_phys(f, byte_home) == IR_PR_B)
+            bc_live = 1;           /* B is also a persistent byte home */
+        if (!use_e && bc_live) emit_sp(out, 2, "push\tbc");
+        if (save_a) {
+            load_byte_to_a(out, f, op->src[0]);
+            emit_sp(out, 2, "push\taf");
+        }
+        if (!hl_has(op->src[1]))
+            load_to_hl(out, f, op->src[1]);
+        emit(out, "ld\t%s,l", counter);
+        if (save_a) emit_sp(out, -2, "pop\taf");
+        else         load_byte_to_a(out, f, op->src[0]);
+        cache_a(op->src[0]);
+        emit(out, "inc\t%s", counter);
+        emit(out, "dec\t%s", counter);
+        emit(out, "jr\tz,L_f%d_bshr_end_%d", L.func_emit_idx, n);
+        fprintf(out, "L_f%d_bshr_loop_%d:\n", L.func_emit_idx, n);
+        emit(out, arith ? "sra\ta" : "srl\ta");
+        emit(out, "dec\t%s", counter);
+        emit(out, "jr\tnz,L_f%d_bshr_loop_%d", L.func_emit_idx, n);
+        fprintf(out, "L_f%d_bshr_end_%d:\n", L.func_emit_idx, n);
+        if (!use_e) {
+            if (bc_live) emit_sp(out, -2, "pop\tbc");
+            else         invalidate_bc_cache();
+        }
+        return finalize_byte_result(out, f, op, 0);
+    }
+
     /* Byte >> const, in A — the mirror of gen_shl's byte path. Only reached
        when ir_opt_narrow_byte proved the shifted value fits a byte (an int
        source would pull bits down out of its high byte), and only on CPUs

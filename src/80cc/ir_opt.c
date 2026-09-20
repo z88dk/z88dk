@@ -2740,7 +2740,11 @@ static int narrow_kind(const Op *op)
     case IR_MOV:
         return 1;
     case IR_SHL:
-        return op->src[1] == -1;   /* imm count only (byte path) */
+        /* Low byte is independent of source width. The variable route is
+           enabled only where its size and tick scans both won. */
+        return op->src[1] == -1
+            || (!IS_808x() && !IS_Z80N() && !IS_RABBIT()
+                && !opt_disabled("var-byte-shift"));
     /* A constant in [0,255] has an 8-bit lowering (`ld a,n` / a byte home)
        and its high byte is zero, so narrowing is exact. This was the single
        largest def-gate rejection on emu.c (409 of 1258, IR_NARROWPROBE) and
@@ -2889,10 +2893,24 @@ static int shrmask_on(void)
    narrowing `0x0100 >> 1` to a byte shift would give 0 instead of 0x80.
    Logical needs an unsigned byte source; arithmetic needs a sign-extended one,
    so the sign bit being tested is bit 7 rather than bit 15. */
+static int v_is_literal_imm(const Func *f, int v);
 static int narrow_shr_kind(const Func *f, const Op *op)
 {
-    if (op->kind != IR_SHR || op->src[1] != -1) return 0;
+    /* Defined below, with the def-side narrowing helpers. */
+    if (op->kind != IR_SHR) return 0;
     if (op->src[0] < 0 || op->src[0] >= f->n_vregs) return 0;
+    /* A variable-count byte loop exists on CB-shift CPUs. Narrow only when
+       the promoted source is known to fit in one byte; unlike a constant
+       masked extract there is no result-mask proof to use here. */
+    if (op->src[1] >= 0) {
+        if (IS_808x() || IS_Z80N() || IS_RABBIT()
+            || opt_disabled("var-byte-shift")
+            || v_is_literal_imm(f, op->src[1])) return 0;
+        if (op->imm & IR_SHR_ARITH)
+            return v_is_sx_of_byte(f, op->src[0]);
+        return v_fits_byte(f, op->src[0]);
+    }
+    if (op->src[1] != -1) return 0;
     /* 8080 AND 8085 have no CB prefix, so neither `srl a` nor `sra a` exists
        (8085's undocumented ARHL is the 16-bit `sra hl` only). That rules out the
        fits-a-byte route, whose lowering is a run of `srl a`.
@@ -2910,9 +2928,34 @@ static int narrow_shr_kind(const Func *f, const Op *op)
     return shr_result_masked_below(f, op) || shr_result_byte_wide(f, op);
 }
 
+/* True when every definition of v is the same immediate. Compound bitfield
+   shifts materialise their literal count as an IR_LD_IMM vreg; those are not
+   genuinely variable shifts, and narrowing them can strand a DE stack park
+   in the read-modify-write sequence. */
+static int v_is_literal_imm(const Func *f, int v)
+{
+    int seen = 0;
+    int64_t value = 0;
+    if (v < 0 || v >= f->n_vregs) return 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            if (op->dst != v) continue;
+            if (op->kind != IR_LD_IMM || (seen && op->imm != value)) return 0;
+            value = op->imm;
+            seen = 1;
+        }
+    }
+    return seen;
+}
+
 /* Def-side gate: does this op have an 8-bit lowering for its dst? */
 static int narrow_def_kind(const Func *f, const Op *op)
 {
+    if (op->kind == IR_SHL && op->src[1] >= 0
+        && v_is_literal_imm(f, op->src[1]))
+        return 0;
     return narrow_kind(op) || cmp_result_kind(op) || ldmem_narrowable(op)
         || narrow_shr_kind(f, op);
 }
@@ -3044,6 +3087,17 @@ static int demands_low_byte_only(const Func *f, int v)
             if (shrwide_on() && u->kind == IR_AND && u->src[1] == -1
                 && (u->imm & ~0xFFLL) == 0 && v_is_const_shr(f, v))
                 continue;
+            /* A variable-count right shift can narrow its SOURCE only when
+               that source proof made the high byte dead. Do not narrow a
+               vreg that is also the count operand. */
+            if (u->kind == IR_SHR && u->src[0] == v && u->src[1] >= 0
+                && u->src[1] != v && !IS_808x() && !IS_Z80N() && !IS_RABBIT()
+                && !opt_disabled("var-byte-shift") && u->dst >= 0
+                && f->vregs[u->dst].width == 1) {
+                int arith = (u->imm & IR_SHR_ARITH) != 0;
+                if (arith ? v_is_sx_of_byte(f, v) : v_fits_byte(f, v))
+                    continue;
+            }
             /* A constant-count right shift that itself narrowed to a byte.
                An immediate-count SHR has no vreg count operand, so v can only
                be the shifted VALUE — and the shift only narrowed because

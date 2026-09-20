@@ -4,7 +4,7 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 2026-09-18. Keep it short: when a section stops describing what is
+Last swept: 2026-09-20. Keep it short: when a section stops describing what is
 live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
@@ -69,6 +69,25 @@ gauntlet the same as any codegen change.
 The masked word right-shift rung is accepted for plain Z80. See ADR 0090. The
 A-through-CB route is faster in all 10 affected sp/fp cells and has no
 compile-only corpus size change; other CB-shift CPUs remain out of scope.
+
+
+Variable-count promoted byte shifts are accepted on z80, z180, ez80_z80, gbz80,
+and kc160. See ADR 0095: left shifts need only a low-byte result; right shifts
+require a zero-/sign-extended byte proof. The A-byte loop uses E when BC is live
+and DE is free. Full corpus: −65 B, 10 smaller cells, none larger; shiftbench
+ticks improve on all enabled CPUs. z80n and Rabbit retain the word path after
+measured tick regressions.
+
+Follow-ups considered but not queued: do not enable the generic byte loop on
+z80n or Rabbit based only on ISA support; both regressed in ticks. A
+Z80N-specific byte lowering could try the DE barrel shifts (`bsla`/`bsrl`/
+`bsra de,b`), and a Rabbit-specific one could try its pair rotates (`rr hl`;
+native `rl hl` only from R4K), but each needs a complete staging-cost analysis
+and a fresh per-CPU tick scan before becoming work. Do not add an 8085 byte
+loop: it has no accumulator shifts, so the word/helper path remains appropriate;
+that path already uses the extended `sra hl` (ARHL) where useful. Keep
+materialized literal counts on the established path; narrowing them stranded a
+DE park in compound bitfield updates.
 
 ### The veins worth digging, in order
 

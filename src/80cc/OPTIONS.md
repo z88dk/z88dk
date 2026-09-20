@@ -54,6 +54,7 @@ exists (ADR 0010).
 | `deref-offset` | keep a field offset as a separate address temporary rather than folding it into the access — the other half of `idx-deref` |
 | `lea-offset` | no folding of a constant offset into an address computation |
 | `narrow-byte` | keep a word value wide when every use fits a byte |
+| `var-byte-shift` | keep a promoted variable-count byte shift on the established word-width path |
 | `shr-wide` | a constant-count right shift is not narrowed to a byte |
 | `shr-mask` | no folding of the mask a narrowed right shift implies |
 | `iv-narrow` | no narrowing of an induction variable |

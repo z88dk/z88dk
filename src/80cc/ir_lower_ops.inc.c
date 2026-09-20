@@ -2157,27 +2157,59 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             return 0;
         }
         /* Variable-count byte <<. The imm path below uses op->imm as
-           the count (0 here) and would emit <<0. Count in B, value in
+           the count (0 here) and would emit <<0. Count in B or E, value in
            A, `add a,a` loop — same portable body as const, no djnz. */
         if (op->src[1] >= 0) {
             int n = L.cmp_label_counter++;
+            int stage_value = !IS_808x() && !IS_Z80N() && !IS_RABBIT()
+                            && !opt_disabled("var-byte-shift");
+            int byte_home = L.cur_byte_home_vreg;
+            int e_home = byte_home >= 0
+                      && byte_home_phys(f, byte_home) == IR_PR_E;
+            int use_e = stage_value && L.rs.bc >= 0 && L.rs.de < 0 && !e_home;
             int bc_live = (L.rs.bc >= 0);
-            if (!hl_has(op->src[1]))
-                load_to_hl(out, f, op->src[1]);
-            /* emit_sp: load_byte_to_a uses cur_sp_adjust for slot/TOS reads. */
-            if (bc_live) emit_sp(out, 2, "push\tbc");
-            emit(out, "ld\tb,l");
-            load_byte_to_a(out, f, op->src[0]);
-            emit(out, "inc\tb");
-            emit(out, "dec\tb");
+            int source_b_home = !use_e && byte_home == op->src[0]
+                             && byte_home >= 0
+                             && byte_home_phys(f, byte_home) == IR_PR_B;
+            int save_a = source_b_home
+                      || (a_has(op->src[0])
+                          && !(hl_has(op->src[1]) || bc_has(op->src[1])
+                               || de_has(op->src[1])));
+            const char *counter = use_e ? "e" : "b";
+            if (stage_value) {
+                if (!use_e && byte_home >= 0
+                    && byte_home_phys(f, byte_home) == IR_PR_B)
+                    bc_live = 1;   /* B is also a persistent byte home */
+                if (!use_e && bc_live) emit_sp(out, 2, "push\tbc");
+                if (save_a) {
+                    load_byte_to_a(out, f, op->src[0]);
+                    emit_sp(out, 2, "push\taf");
+                }
+                if (!hl_has(op->src[1]))
+                    load_to_hl(out, f, op->src[1]);
+                emit(out, "ld\t%s,l", counter);
+                if (save_a) emit_sp(out, -2, "pop\taf");
+                else         load_byte_to_a(out, f, op->src[0]);
+                cache_a(op->src[0]);
+            } else {
+                if (!hl_has(op->src[1]))
+                    load_to_hl(out, f, op->src[1]);
+                if (bc_live) emit_sp(out, 2, "push\tbc");
+                emit(out, "ld\tb,l");
+                load_byte_to_a(out, f, op->src[0]);
+            }
+            emit(out, "inc\t%s", counter);
+            emit(out, "dec\t%s", counter);
             emit(out, "jr\tz,L_f%d_bshl_end_%d", L.func_emit_idx, n);
             fprintf(out, "L_f%d_bshl_loop_%d:\n", L.func_emit_idx, n);
             emit(out, "add\ta,a");
-            emit(out, "dec\tb");
+            emit(out, "dec\t%s", counter);
             emit(out, "jr\tnz,L_f%d_bshl_loop_%d", L.func_emit_idx, n);
             fprintf(out, "L_f%d_bshl_end_%d:\n", L.func_emit_idx, n);
-            if (bc_live) emit_sp(out, -2, "pop\tbc");
-            else         invalidate_bc_cache();
+            if (!use_e) {
+                if (bc_live) emit_sp(out, -2, "pop\tbc");
+                else         invalidate_bc_cache();
+            }
             return finalize_byte_result(out, f, op, 0);
         }
         /* Byte << const, in A (ir_opt_narrow_byte only narrows the
