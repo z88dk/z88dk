@@ -947,11 +947,11 @@ int ulvalue(LVALUE* lval)
  *
  * Returns 1 if we should testjump i.e. ld a,h or l jp z, or 0 for carry conds
  *
- * Trust carry when codegen left KIND_CARRY (set_carry), or when a
- * comparison only set flags and kept the original val_type (signed
- * char const compare). After set_int(), HL is 0/1 and carry may be
- * stale — using jumpc then folding &&/|| labels merged true/false
- * paths on 8085 (while (p && i < n), sp == dp && ...).
+ * Comparisons (l_ge, l_long_eq, …) finish in l_compare_result:
+ * carry set and HL=1 for true, carry clear and HL=0 for false.
+ * Jump on carry. Do not testjump H (it is 0) and do not or D/E
+ * (those still hold the operands). KIND_CARRY is the same (set_carry).
+ * dummy is handled at the call site (&&/|| sandwich is HL 0/1).
  */
 
 int check_lastop_was_testjump(LVALUE* lval)
@@ -961,11 +961,8 @@ int check_lastop_was_testjump(LVALUE* lval)
     if (lval->val_type == KIND_CARRY)
         return (0);
     fn = lval->binop;
-    if (fn == zeq || fn == zne || fn == zge || fn == zle || fn == zgt || fn == zlt) {
-        if (lval->val_type == KIND_INT)
-            return (1);
+    if (fn == zeq || fn == zne || fn == zge || fn == zle || fn == zgt || fn == zlt || fn == lneg || fn == dummy)
         return (0);
-    }
     return (1);
 }
 

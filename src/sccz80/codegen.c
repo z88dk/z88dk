@@ -1463,15 +1463,15 @@ void testjump(LVALUE* lval, int label)
     ol("ld\ta,h");
     ol("or\tl");
 
-    /* A long/CPTR/i64 in DEHL (or the alt set) is false only if every
-     * word is zero. Do not wait for a comparison: `if (uint32_t)` and
-     * `a && ulong` are rvalues, and 0x00010000 has HL==0. */
-    if (type == KIND_LONG) {
+    /* Long/CPTR/i64 rvalue: false only if every word is zero.
+     * 0x00010000 has HL==0. After a comparison, check_lastop uses
+     * carry instead: l_compare_result already left HL=0/1. */
+    if (type == KIND_LONG && check_lastop_was_comparison(lval)) {
         ol("or\td");
         ol("or\te");
-    } else if (type == KIND_CPTR) {
+    } else if (type == KIND_CPTR && check_lastop_was_comparison(lval)) {
         ol("or\te");
-    } else if (type == KIND_LONGLONG) {
+    } else if (type == KIND_LONGLONG && check_lastop_was_comparison(lval)) {
         ol("or\td");
         ol("or\te");
         ol("exx");
