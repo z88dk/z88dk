@@ -4647,10 +4647,17 @@ Prog {
                     value: 10.000000
                 }
             step_expr: 
-                NumberExpr {
+                BasicFuncCallExpr {
                     type: Number
                     location: test_t_input_09_t.bas:339
-                    value: 1.000000
+                    keyword: "SGN"
+                    args: [
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_09_t.bas:339
+                            value: 1.000000
+                        }
+                    ]
                 }
             body: [
             ]
@@ -4706,11 +4713,7 @@ Prog {
                     value: 10.000000
                 }
             step_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:341
-                    value: 1.000000
-                }
+                null
             body: [
             ]
         }
@@ -4730,11 +4733,7 @@ Prog {
                     value: 10.000000
                 }
             step_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:341
-                    value: 1.000000
-                }
+                null
             body: [
             ]
         }
@@ -4981,11 +4980,7 @@ Prog {
                     value: 10.000000
                 }
             step_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:351
-                    value: 1.000000
-                }
+                null
             body: [
             ]
         }
@@ -5005,11 +5000,7 @@ Prog {
                     value: 10.000000
                 }
             step_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:351
-                    value: 1.000000
-                }
+                null
             body: [
             ]
         }

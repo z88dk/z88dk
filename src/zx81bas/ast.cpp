@@ -801,19 +801,22 @@ void WhileStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-ForStmt::ForStmt(const std::string& name_, ExprPtr start_expr_,
-                 ExprPtr end_expr_, ExprPtr step_expr_,
+ForStmt::ForStmt(const std::string& name_,
+                 ExprPtr start_expr_, ExprPtr end_expr_,
                  const SourceLoc& loc_)
     : Stmt(loc_), name(name_), start_expr(std::move(start_expr_)),
-      end_expr(std::move(end_expr_)), step_expr(std::move(step_expr_)) {
+      end_expr(std::move(end_expr_)) {
 }
 
 StmtPtr ForStmt::clone() const {
     auto s = std::make_unique<ForStmt>(name,
                                        start_expr->clone(),
                                        end_expr->clone(),
-                                       step_expr->clone(),
                                        loc);
+    if (step_expr) {
+        s->step_expr = step_expr->clone();
+    }
+
     for (auto& stmt : body) {
         s->body.push_back(stmt->clone());
     }

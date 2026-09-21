@@ -351,8 +351,10 @@ struct ExprTypeChecker : ASTVisitor {
         if (stmt.end_expr->type != ExprType::Number) {
             error(stmt.end_expr->loc, "FOR end expression must be a number");
         }
-        if (stmt.step_expr->type != ExprType::Number) {
-            error(stmt.step_expr->loc, "FOR step expression must be a number");
+        if (stmt.step_expr) {
+            if (stmt.step_expr->type != ExprType::Number) {
+                error(stmt.step_expr->loc, "FOR step expression must be a number");
+            }
         }
     }
 

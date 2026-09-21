@@ -450,14 +450,17 @@ std::vector<StmtPtr> LoweringPass::lower(ForStmt& stmt) {
     append_stmts(out, lowered_start.preamble);
     auto lowered_end = stmt.end_expr->lower(*this);
     append_stmts(out, lowered_end.preamble);
-    auto lowered_step = stmt.step_expr->lower(*this);
-    append_stmts(out, lowered_step.preamble);
 
     auto new_for_stmt = make_node<ForStmt>(stmt.name,
                                            std::move(lowered_start.rewritten),
                                            std::move(lowered_end.rewritten),
-                                           std::move(lowered_step.rewritten),
                                            stmt.loc);
+    if (stmt.step_expr) {
+        auto lowered_step = stmt.step_expr->lower(*this);
+        append_stmts(out, lowered_step.preamble);
+        new_for_stmt->step_expr = std::move(lowered_step.rewritten);
+    }
+
     out.push_back(std::move(new_for_stmt));
 
     // body

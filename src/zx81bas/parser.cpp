@@ -1489,20 +1489,18 @@ StmtPtr Parser::parse_stmt_for() {
     expect(Keyword::TO);
     auto end_expr = parse_expr();
 
-    ExprPtr step_expr;
+    ExprPtr step_expr = nullptr;
     if (match(Keyword::STEP)) {
         step_expr = parse_expr();
-    }
-    else {
-        auto default_step = make_node<NumberExpr>(1.0, loc());
-        step_expr = std::move(default_step);
     }
 
     auto stmt = std::make_unique<ForStmt>(name,
                                           std::move(start_expr),
                                           std::move(end_expr),
-                                          std::move(step_expr),
                                           loc());
+    if (step_expr) {
+        stmt->step_expr = std::move(step_expr);
+    }
 
     // FOR ... at end of line -> block form:
     // FOR var=start TO end [STEP step]

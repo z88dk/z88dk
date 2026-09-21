@@ -9345,7 +9345,7 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "	FOR I=1 TO 10:LET S=S+I:NEXT I"
+                text: "	FOR I=1 TO 10 STEP SGN 1:LET S=S+I:NEXT I"
                 location: test_t_input_04_t.bas:339
             }
         tokens: [
@@ -9384,6 +9384,27 @@ TokFile {
                 type: Integer
                 text: "10"
                 ivalue: 10
+                ws_before: " "
+                location: test_t_input_04_t.bas:339
+            }
+            Token {
+                type: Identifier
+                keyword: STEP
+                text: "STEP"
+                ws_before: " "
+                location: test_t_input_04_t.bas:339
+            }
+            Token {
+                type: Identifier
+                keyword: SGN
+                text: "SGN"
+                ws_before: " "
+                location: test_t_input_04_t.bas:339
+            }
+            Token {
+                type: Integer
+                text: "1"
+                ivalue: 1
                 ws_before: " "
                 location: test_t_input_04_t.bas:339
             }

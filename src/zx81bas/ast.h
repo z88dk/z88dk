@@ -405,13 +405,12 @@ struct ForStmt : Stmt {
     std::string name;           // loop variable
     ExprPtr start_expr;
     ExprPtr end_expr;
-    ExprPtr step_expr;
+    ExprPtr step_expr;          // optional
     std::vector<StmtPtr> body;
 
     explicit ForStmt(const std::string& name_,
                      ExprPtr start_expr_,
                      ExprPtr end_expr_,
-                     ExprPtr step_expr_,
                      const SourceLoc& loc_);
     virtual ~ForStmt() = default;
 

@@ -3866,10 +3866,17 @@ Prog {
                     value: 10.000000
                 }
             step_expr: 
-                NumberExpr {
+                BasicFuncCallExpr {
                     type: Number
                     location: test_t_input_08_t.bas:339
-                    value: 1.000000
+                    keyword: "SGN"
+                    args: [
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_08_t.bas:339
+                            value: 1.000000
+                        }
+                    ]
                 }
             body: [
                 LetStmt {
@@ -3917,11 +3924,7 @@ Prog {
                     value: 10.000000
                 }
             step_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_08_t.bas:341
-                    value: 1.000000
-                }
+                null
             body: [
                 ForStmt {
                     location: test_t_input_08_t.bas:341
@@ -3939,11 +3942,7 @@ Prog {
                             value: 10.000000
                         }
                     step_expr: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_08_t.bas:341
-                            value: 1.000000
-                        }
+                        null
                     body: [
                         LetStmt {
                             location: test_t_input_08_t.bas:341
@@ -4122,11 +4121,7 @@ Prog {
                     value: 10.000000
                 }
             step_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_08_t.bas:351
-                    value: 1.000000
-                }
+                null
             body: [
                 ForStmt {
                     location: test_t_input_08_t.bas:351
@@ -4144,11 +4139,7 @@ Prog {
                             value: 10.000000
                         }
                     step_expr: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_08_t.bas:351
-                            value: 1.000000
-                        }
+                        null
                     body: [
                         LetStmt {
                             location: test_t_input_08_t.bas:351
