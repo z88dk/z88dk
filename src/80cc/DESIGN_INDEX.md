@@ -4,7 +4,7 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 2026-09-20. Keep it short: when a section stops describing what is
+Last swept: 2026-09-21. Keep it short: when a section stops describing what is
 live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
@@ -77,6 +77,16 @@ require a zero-/sign-extended byte proof. The A-byte loop uses E when BC is live
 and DE is free. Full corpus: −65 B, 10 smaller cells, none larger; shiftbench
 ticks improve on all enabled CPUs. z80n and Rabbit retain the word path after
 measured tick regressions.
+
+The frame-local word-array RMW stack route is accepted on GBZ80, Z80, Z80N,
+Z180, eZ80 Z80-mode, 8080, VM1, Rabbit 2000A/4000/6000, and KC160. See ADR
+0098. Exact pre-copt shapes select three routes: HL/BC with temporary stack
+homes, Rabbit's IY accumulator, and KC160's stack-relative accumulator slot.
+A and F must be dead after each rewritten sequence. 8085 stays disabled because
+the measured version grew by 3 B. `local-rmw` disables all routes;
+`gbz80-rmw` remains an alias. Full corpus scans changed only localbench:
+14/720 size cells shrank (−155 B total) and 14/720 valid tick cells improved
+(−81,382,400 ticks total); no cells grew or slowed.
 
 Follow-ups considered but not queued: do not enable the generic byte loop on
 z80n or Rabbit based only on ISA support; both regressed in ticks. A
