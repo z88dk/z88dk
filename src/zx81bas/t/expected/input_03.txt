@@ -128,12 +128,12 @@ test_t_input_03_t.bas:254: 	LET A=1+2*3**4
 test_t_input_03_t.bas:260: 	DIM A(2), B(2,3), C(2,3,4)
 test_t_input_03_t.bas:261: 	DIM A$(2), B$(2,3), C$(2,3,4)
 test_t_input_03_t.bas:267: 	IF A=1 THEN B=2
-test_t_input_03_t.bas:268: 	IF A=1 THEN :ELSE B=2
-test_t_input_03_t.bas:269: 	IF A=1 THEN B=2:C=3
-test_t_input_03_t.bas:270: 	IF A=1 THEN B=2:C=3 ELSE
-test_t_input_03_t.bas:271: 	IF A=1 THEN B=2:C=3 ELSE D=4
-test_t_input_03_t.bas:272: 	IF A=1 THEN B=2:C=3 ELSE D=4:E=5
-test_t_input_03_t.bas:273: 	IF A=1 THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3
+test_t_input_03_t.bas:268: 	IF A<>1 THEN :ELSE B=2
+test_t_input_03_t.bas:269: 	IF A<1 THEN B=2:C=3
+test_t_input_03_t.bas:270: 	IF A<=1 THEN B=2:C=3 ELSE
+test_t_input_03_t.bas:271: 	IF A>1 THEN B=2:C=3 ELSE D=4
+test_t_input_03_t.bas:272: 	IF A>=1 THEN B=2:C=3 ELSE D=4:E=5
+test_t_input_03_t.bas:273: 	IF NOT (A=1) THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3
 test_t_input_03_t.bas:275: 	IF A=1 THEN
 test_t_input_03_t.bas:276: 		B=1
 test_t_input_03_t.bas:277: 		C=1

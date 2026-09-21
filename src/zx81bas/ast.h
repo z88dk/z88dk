@@ -193,7 +193,7 @@ struct UnaryExpr : Expr {
 };
 
 struct BinaryExpr : Expr {
-    TokenType op;        // + - * / ** AND OR NOT = < > <= >= <>
+    TokenType op;        // + - * / ** AND OR = < > <= >= <>
     ExprPtr lhs;
     ExprPtr rhs;
 

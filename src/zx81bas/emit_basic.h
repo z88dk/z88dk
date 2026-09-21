@@ -12,3 +12,5 @@
 #include <vector>
 
 bool emit_basic(Prog& prog);
+void emit_expr(std::vector<Token>& tokens, const Expr& e,
+               const SourceLoc& loc);

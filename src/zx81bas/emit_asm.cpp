@@ -10,6 +10,7 @@
 #include "lexer.h"
 #include "simplify_expr.h"
 #include "utils.h"
+#include "zx81bas.h"
 #include "zx81chars.h"
 #include <algorithm>
 #include <cctype>
@@ -463,9 +464,7 @@ static void emit_var(const PragmaNumVarStmt& stmt,
     }
 
     // put value
-    oss.str("");
-    oss << stmt.value;
-    emit(asm_source, "", "FLOAT", oss.str());
+    emit(asm_source, "", "FLOAT", double_to_string(stmt.value));
     emit(asm_source, "");
 }
 
@@ -606,9 +605,7 @@ static void emit_var(const PragmaNumVarArrayStmt& stmt,
 
     for (size_t i = 0; i < num_values; ++i) {
         double value = (i < stmt.values.size()) ? stmt.values[i] : 0.0;
-        oss.str("");
-        oss << value;
-        emit(asm_source, "", "FLOAT", oss.str());
+        emit(asm_source, "", "FLOAT", double_to_string(value));
     }
 
     emit(asm_source, "");

@@ -2457,7 +2457,7 @@ Prog {
                 BinaryExpr {
                     type: Number
                     location: test_t_input_05_t.bas:268
-                    op: =
+                    op: <>
                     lhs: 
                         VariableExpr {
                             type: Number
@@ -2497,7 +2497,7 @@ Prog {
                 BinaryExpr {
                     type: Number
                     location: test_t_input_05_t.bas:269
-                    op: =
+                    op: <
                     lhs: 
                         VariableExpr {
                             type: Number
@@ -2552,7 +2552,7 @@ Prog {
                 BinaryExpr {
                     type: Number
                     location: test_t_input_05_t.bas:270
-                    op: =
+                    op: <=
                     lhs: 
                         VariableExpr {
                             type: Number
@@ -2607,7 +2607,7 @@ Prog {
                 BinaryExpr {
                     type: Number
                     location: test_t_input_05_t.bas:271
-                    op: =
+                    op: >
                     lhs: 
                         VariableExpr {
                             type: Number
@@ -2677,7 +2677,7 @@ Prog {
                 BinaryExpr {
                     type: Number
                     location: test_t_input_05_t.bas:272
-                    op: =
+                    op: >=
                     lhs: 
                         VariableExpr {
                             type: Number
@@ -2759,21 +2759,27 @@ Prog {
         IfStmt {
             location: test_t_input_05_t.bas:273
             condition: 
-                BinaryExpr {
+                UnaryExpr {
                     type: Number
                     location: test_t_input_05_t.bas:273
-                    op: =
-                    lhs: 
-                        VariableExpr {
+                    op: NOT
+                    operand: 
+                        BinaryExpr {
                             type: Number
                             location: test_t_input_05_t.bas:273
-                            name: "A"
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_05_t.bas:273
-                            value: 1.000000
+                            op: =
+                            lhs: 
+                                VariableExpr {
+                                    type: Number
+                                    location: test_t_input_05_t.bas:273
+                                    name: "A"
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_05_t.bas:273
+                                    value: 1.000000
+                                }
                         }
                 }
             then_stmts: [

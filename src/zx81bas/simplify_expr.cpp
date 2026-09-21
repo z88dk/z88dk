@@ -5,20 +5,93 @@
 //-----------------------------------------------------------------------------
 
 #include "ast.h"
+#include "emit_basic.h"
 #include "errors.h"
 #include "lexer.h"
 #include "parser.h"
 #include "preproc.h"
 #include "release_assert.h"
 #include "simplify_expr.h"
+#include <cmath>
 #include <vector>
 
+// recursively fold constants in the expression tree
 static ExprPtr fold_constants(ExprPtr expr) {
-    // TODO: implement constant folding for expressions
     if (!expr) {
         return nullptr;
     }
-    // recursively fold constants in the expression tree
+
+    if (auto array_ref_expr = dynamic_cast<ArrayRefExpr*>(expr.get())) {
+        for (auto& index : array_ref_expr->indices) {
+            index = fold_constants(std::move(index));
+        }
+        return expr;
+    }
+
+    if (auto slice_expr = dynamic_cast<SliceExpr*>(expr.get())) {
+        slice_expr->base = fold_constants(std::move(slice_expr->base));
+        if (slice_expr->from) {
+            slice_expr->from = fold_constants(std::move(slice_expr->from));
+        }
+        if (slice_expr->to) {
+            slice_expr->to = fold_constants(std::move(slice_expr->to));
+        }
+        return expr;
+    }
+
+    if (auto unary_expr = dynamic_cast<UnaryExpr*>(expr.get())) {
+        unary_expr->operand = fold_constants(std::move(unary_expr->operand));
+        // if the operand is a number, we can evaluate the expression
+        if (auto operand_num = dynamic_cast<NumberExpr*>(unary_expr->operand.get())) {
+            double result = 0.0;
+            switch (unary_expr->op) {
+            case TokenType::Minus:
+                result = -operand_num->value;
+                break;
+            case TokenType::NOT:
+                result = !operand_num->value;
+                break;
+            default:
+                return expr;  // unsupported operation
+            }
+            return make_node<NumberExpr>(result, expr->loc);
+        }
+        // if the operator is NOT and operand is a comparison, invert the comparison
+        if (auto operand_binary_expr = dynamic_cast<BinaryExpr*>
+                                       (unary_expr->operand.get())) {
+            if (unary_expr->op == TokenType::NOT) {
+                TokenType not_op;
+                switch (operand_binary_expr->op) {
+                case TokenType::Equal:
+                    not_op = TokenType::NotEqual;
+                    break;
+                case TokenType::NotEqual:
+                    not_op = TokenType::Equal;
+                    break;
+                case TokenType::Less:
+                    not_op = TokenType::GreaterEqual;
+                    break;
+                case TokenType::LessEqual:
+                    not_op = TokenType::Greater;
+                    break;
+                case TokenType::Greater:
+                    not_op = TokenType::LessEqual;
+                    break;
+                case TokenType::GreaterEqual:
+                    not_op = TokenType::Less;
+                    break;
+                default:
+                    return expr;
+                }
+                return make_node<BinaryExpr>(not_op,
+                                             std::move(operand_binary_expr->lhs),
+                                             std::move(operand_binary_expr->rhs),
+                                             expr->loc);
+            }
+        }
+        return expr;    // unsuported
+    }
+
     if (auto binary_expr = dynamic_cast<BinaryExpr*>(expr.get())) {
         binary_expr->lhs = fold_constants(std::move(binary_expr->lhs));
         binary_expr->rhs = fold_constants(std::move(binary_expr->rhs));
@@ -39,6 +112,33 @@ static ExprPtr fold_constants(ExprPtr expr) {
                 case TokenType::Divide:
                     result = lhs_num->value / rhs_num->value;
                     break;
+                case TokenType::Power:
+                    result = pow(lhs_num->value, rhs_num->value);
+                    break;
+                case TokenType::AND:
+                    result = lhs_num->value && rhs_num->value;
+                    break;
+                case TokenType::OR:
+                    result = lhs_num->value || rhs_num->value;
+                    break;
+                case TokenType::Equal:
+                    result = lhs_num->value == rhs_num->value;
+                    break;
+                case TokenType::NotEqual:
+                    result = lhs_num->value != rhs_num->value;
+                    break;
+                case TokenType::Less:
+                    result = lhs_num->value < rhs_num->value;
+                    break;
+                case TokenType::LessEqual:
+                    result = lhs_num->value <= rhs_num->value;
+                    break;
+                case TokenType::Greater:
+                    result = lhs_num->value > rhs_num->value;
+                    break;
+                case TokenType::GreaterEqual:
+                    result = lhs_num->value >= rhs_num->value;
+                    break;
                 default:
                     return expr;  // unsupported operation
                 }
@@ -46,33 +146,72 @@ static ExprPtr fold_constants(ExprPtr expr) {
             }
         }
     }
-    else if (auto unary_expr = dynamic_cast<UnaryExpr*>(expr.get())) {
-        unary_expr->operand = fold_constants(std::move(unary_expr->operand));
-        // if the operand is a number, we can evaluate the expression
-        if (auto operand_num = dynamic_cast<NumberExpr*>(unary_expr->operand.get())) {
-            double result = 0.0;
-            switch (unary_expr->op) {
-            case TokenType::Minus:
-                result = -operand_num->value;
-                break;
+
+    if (auto func_call_expr = dynamic_cast<BasicFuncCallExpr*>(expr.get())) {
+        for (auto& arg : func_call_expr->args) {
+            arg = fold_constants(std::move(arg));
+        }
+
+        if (func_call_expr->args.size() == 0) {
+            switch (func_call_expr->keyword) {
+            case Keyword::PI:
+                return make_node<NumberExpr>(M_PI, expr->loc);
             default:
-                return expr;  // unsupported operation
+                return expr;
             }
-            return std::make_unique<NumberExpr>(result, expr->loc);
+        }
+
+        if (func_call_expr->args.size() == 1) {
+            // if the operand is a number, we can evaluate the expression
+            if (auto operand_num = dynamic_cast<NumberExpr*>
+                                   (func_call_expr->args[0].get())) {
+                double result = 0.0;
+                switch (func_call_expr->keyword) {
+                case Keyword::SIN:
+                    result = sin(operand_num->value);
+                    break;
+                case Keyword::COS:
+                    result = cos(operand_num->value);
+                    break;
+                case Keyword::TAN:
+                    result = tan(operand_num->value);
+                    break;
+                case Keyword::ASN:
+                    result = asin(operand_num->value);
+                    break;
+                case Keyword::ACS:
+                    result = acos(operand_num->value);
+                    break;
+                case Keyword::ATN:
+                    result = atan(operand_num->value);
+                    break;
+                case Keyword::LN:
+                    result = log(operand_num->value);
+                    break;
+                case Keyword::EXP:
+                    result = exp(operand_num->value);
+                    break;
+                case Keyword::INT:
+                    result = floor(operand_num->value);
+                    break;
+                case Keyword::SQR:
+                    result = sqrt(operand_num->value);
+                    break;
+                case Keyword::SGN:
+                    result = (operand_num->value > 0) - (operand_num->value < 0);
+                    break;
+                case Keyword::ABS:
+                    result = fabs(operand_num->value);
+                    break;
+                default:
+                    return expr;
+                }
+                return make_node<NumberExpr>(result, expr->loc);
+            }
         }
     }
-    return expr;  // return the original expression if no folding was done
-}
 
-static void emit_expr(std::vector<Token>& out_tokens, const Expr& expr,
-                      const SourceLoc& loc) {
-    // TODO: implement this function to emit tokens for the given expression
-    // For now, we will just emit a placeholder token
-    Token t;
-    t.type = TokenType::Identifier;
-    t.text = "EXPR";
-    t.loc = loc;
-    out_tokens.push_back(t);
+    return expr;  // return the original expression if no folding was done
 }
 
 // simplify the simpler language resuly of lowering the AST

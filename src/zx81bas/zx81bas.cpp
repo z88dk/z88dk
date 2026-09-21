@@ -21,8 +21,11 @@
 #include "symtab.h"
 #include "utils.h"
 #include "walker.h"
+#include "zx81bas.h"
+#include <cmath>
 #include <cstdlib>
 #include <filesystem>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -326,4 +329,15 @@ int main(int argc, char* argv[]) {
 
     // exit with error status
     exit_error_status();
+}
+
+std::string double_to_string(double value) {
+    std::ostringstream oss;
+    if (floor(value) == value) {
+        oss << value;
+    }
+    else {
+        oss << std::setprecision(10) << value;
+    }
+    return oss.str();
 }

@@ -9,6 +9,7 @@
 #include "errors.h"
 #include "lexer.h"
 #include "release_assert.h"
+#include "zx81bas.h"
 #include <cctype>
 #include <cmath>
 #include <sstream>
@@ -16,17 +17,6 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-
-static std::string number_to_string(double value) {
-    if (std::floor(value) == value) {
-        return std::to_string(static_cast<int>(value));     // integer
-    }
-    else {
-        std::ostringstream oss;
-        oss << value;               // double
-        return oss.str();
-    }
-}
 
 static std::string string_literal_to_string(const std::string& text) {
     std::string escaped_value = text;
@@ -38,9 +28,6 @@ static std::string string_literal_to_string(const std::string& text) {
     }
     return "\"" + escaped_value + "\"";
 }
-
-static void emit_expr(std::vector<Token>& tokens, const Expr& e,
-                      const SourceLoc& loc);
 
 static int precedence(const Expr& e) {
     if (dynamic_cast<const NumberExpr*>(&e)) {
@@ -143,12 +130,19 @@ static void emit_child(std::vector<Token>& tokens, const Expr& child,
     }
 }
 
-static void emit_expr(std::vector<Token>& tokens, const Expr& e,
-                      const SourceLoc& loc) {
+void emit_expr(std::vector<Token>& tokens, const Expr& e,
+               const SourceLoc& loc) {
     // Number
     if (auto n = dynamic_cast<const NumberExpr*>(&e)) {
-        append_token(tokens, TokenType::Float, number_to_string(n->value), loc);
-        tokens.back().nvalue = n->value;
+        if (n->value < 0) {
+            append_token(tokens, TokenType::Minus, "-", loc);
+            append_token(tokens, TokenType::Float, double_to_string(- n->value), loc);
+            tokens.back().nvalue = n->value;
+        }
+        else {
+            append_token(tokens, TokenType::Float, double_to_string(n->value), loc);
+            tokens.back().nvalue = n->value;
+        }
         return;
     }
 
@@ -553,7 +547,7 @@ static void emit_stmt(std::vector<Token>& tokens, const Stmt& stmt) {
     if (auto s = dynamic_cast<const PragmaNumVarStmt*>(&stmt)) {
         append_token(tokens, TokenType::Identifier, s->name, s->loc);
         append_token(tokens, TokenType::Equal, "=", s->loc);
-        append_token(tokens, TokenType::Float, number_to_string(s->value), s->loc);
+        append_token(tokens, TokenType::Float, double_to_string(s->value), s->loc);
         tokens.back().nvalue = s->value;
         return;
     }
@@ -587,7 +581,7 @@ static void emit_stmt(std::vector<Token>& tokens, const Stmt& stmt) {
             if (i > 0) {
                 append_token(tokens, TokenType::Comma, ",", s->loc);
             }
-            append_token(tokens, TokenType::Float, number_to_string(value), s->loc);
+            append_token(tokens, TokenType::Float, double_to_string(value), s->loc);
             tokens.back().nvalue = value;
         }
         return;

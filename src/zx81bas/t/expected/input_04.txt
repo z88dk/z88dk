@@ -7092,7 +7092,7 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "	IF A=1 THEN :ELSE B=2"
+                text: "	IF A<>1 THEN :ELSE B=2"
                 location: test_t_input_04_t.bas:268
             }
         tokens: [
@@ -7110,8 +7110,8 @@ TokFile {
                 location: test_t_input_04_t.bas:268
             }
             Token {
-                type: =
-                text: "="
+                type: <>
+                text: "<>"
                 location: test_t_input_04_t.bas:268
             }
             Token {
@@ -7162,7 +7162,7 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "	IF A=1 THEN B=2:C=3"
+                text: "	IF A<1 THEN B=2:C=3"
                 location: test_t_input_04_t.bas:269
             }
         tokens: [
@@ -7180,8 +7180,8 @@ TokFile {
                 location: test_t_input_04_t.bas:269
             }
             Token {
-                type: =
-                text: "="
+                type: <
+                text: "<"
                 location: test_t_input_04_t.bas:269
             }
             Token {
@@ -7241,7 +7241,7 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "	IF A=1 THEN B=2:C=3 ELSE"
+                text: "	IF A<=1 THEN B=2:C=3 ELSE"
                 location: test_t_input_04_t.bas:270
             }
         tokens: [
@@ -7259,8 +7259,8 @@ TokFile {
                 location: test_t_input_04_t.bas:270
             }
             Token {
-                type: =
-                text: "="
+                type: <=
+                text: "<="
                 location: test_t_input_04_t.bas:270
             }
             Token {
@@ -7327,7 +7327,7 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "	IF A=1 THEN B=2:C=3 ELSE D=4"
+                text: "	IF A>1 THEN B=2:C=3 ELSE D=4"
                 location: test_t_input_04_t.bas:271
             }
         tokens: [
@@ -7345,8 +7345,8 @@ TokFile {
                 location: test_t_input_04_t.bas:271
             }
             Token {
-                type: =
-                text: "="
+                type: >
+                text: ">"
                 location: test_t_input_04_t.bas:271
             }
             Token {
@@ -7430,7 +7430,7 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "	IF A=1 THEN B=2:C=3 ELSE D=4:E=5"
+                text: "	IF A>=1 THEN B=2:C=3 ELSE D=4:E=5"
                 location: test_t_input_04_t.bas:272
             }
         tokens: [
@@ -7448,8 +7448,8 @@ TokFile {
                 location: test_t_input_04_t.bas:272
             }
             Token {
-                type: =
-                text: "="
+                type: >=
+                text: ">="
                 location: test_t_input_04_t.bas:272
             }
             Token {
@@ -7554,7 +7554,7 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "	IF A=1 THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3"
+                text: "	IF NOT (A=1) THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3"
                 location: test_t_input_04_t.bas:273
             }
         tokens: [
@@ -7567,8 +7567,20 @@ TokFile {
             }
             Token {
                 type: Identifier
-                text: "A"
+                keyword: NOT
+                text: "NOT"
                 ws_before: " "
+                location: test_t_input_04_t.bas:273
+            }
+            Token {
+                type: (
+                text: "("
+                ws_before: " "
+                location: test_t_input_04_t.bas:273
+            }
+            Token {
+                type: Identifier
+                text: "A"
                 location: test_t_input_04_t.bas:273
             }
             Token {
@@ -7580,6 +7592,11 @@ TokFile {
                 type: Integer
                 text: "1"
                 ivalue: 1
+                location: test_t_input_04_t.bas:273
+            }
+            Token {
+                type: )
+                text: ")"
                 location: test_t_input_04_t.bas:273
             }
             Token {

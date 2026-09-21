@@ -10,3 +10,6 @@
 
 static inline const std::string SYMBOL_PREFIX = "ZX81BAS";
 static inline const std::string CPP_DEFINE = "__" + SYMBOL_PREFIX + "__";
+
+// 10-digit precision to match 32-bit mantissa
+std::string double_to_string(double value);

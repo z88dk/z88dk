@@ -265,12 +265,12 @@ label4:			nop
 //------------------------------------------------------------------------------
 
 	IF A=1 THEN B=2
-	IF A=1 THEN :ELSE B=2
-	IF A=1 THEN B=2:C=3
-	IF A=1 THEN B=2:C=3 ELSE
-	IF A=1 THEN B=2:C=3 ELSE D=4
-	IF A=1 THEN B=2:C=3 ELSE D=4:E=5
-	IF A=1 THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3
+	IF A<>1 THEN :ELSE B=2
+	IF A<1 THEN B=2:C=3
+	IF A<=1 THEN B=2:C=3 ELSE
+	IF A>1 THEN B=2:C=3 ELSE D=4
+	IF A>=1 THEN B=2:C=3 ELSE D=4:E=5
+	IF NOT (A=1) THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3
 
 	IF A=1 THEN
 		B=1
