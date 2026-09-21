@@ -14,7 +14,6 @@
 struct ASTVisitor {
     virtual ~ASTVisitor() = default;
 
-    std::vector<Stmt*> stmt_stack;
     void walk_stmts(std::vector<StmtPtr>& list);
     void walk_expr(ExprPtr& expr);
 

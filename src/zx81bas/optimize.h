@@ -7,6 +7,5 @@
 #pragma once
 
 #include "ast.h"
-#include "symtab.h"
 
-bool optimize(Prog& prog, Symtab& symtab);
+bool optimize(Prog& prog);

@@ -7,8 +7,8 @@
 #pragma once
 
 #include "ast.h"
+#include "errors.h"
 #include "lexer.h"
-#include <string>
 #include <vector>
 
 bool emit_basic(Prog& prog);

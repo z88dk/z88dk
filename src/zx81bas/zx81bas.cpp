@@ -270,7 +270,7 @@ int main(int argc, char* argv[]) {
 #endif
 
     // optimize basic
-    if (!optimize(*prog, *symtab)) {
+    if (!optimize(*prog)) {
         exit_error_status();
     }
 

@@ -1,0 +1,7 @@
+% z88dk-zx81bas t//input/empty_stmts.bas
+Input file:  t/input/empty_stmts.bas
+Output file: t/input/empty_stmts.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/empty_stmts.i" "t/input/empty_stmts.pp"
+% z88dk-z80asm -b -m -o"t/input/empty_stmts.p" "t/input/empty_stmts.asm"
+% z88dk-z80asm -b -m -o"t/input/empty_stmts.p" "t/input/empty_stmts.asm"
+% z88dk-z80asm -b -m -o"t/input/empty_stmts.p" "t/input/empty_stmts.asm"

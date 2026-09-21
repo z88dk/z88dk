@@ -6,7 +6,12 @@
 
 #pragma once
 
+#include "ast.h"
 #include "lexer.h"
 #include <vector>
 
+// simplify the AST by folding constant expressions
+void simplify_exprs(Prog& prog);
+
+// simplify the simpler language result of lowering the AST
 void simplify_exprs(std::vector<Token>& tokens);

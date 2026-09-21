@@ -12,8 +12,11 @@
 #include "preproc.h"
 #include "release_assert.h"
 #include "simplify_expr.h"
+#include "walker.h"
 #include <cmath>
 #include <vector>
+
+static constexpr double kPi = 3.14159265358979323846;
 
 // recursively fold constants in the expression tree
 static ExprPtr fold_constants(ExprPtr expr) {
@@ -30,12 +33,8 @@ static ExprPtr fold_constants(ExprPtr expr) {
 
     if (auto slice_expr = dynamic_cast<SliceExpr*>(expr.get())) {
         slice_expr->base = fold_constants(std::move(slice_expr->base));
-        if (slice_expr->from) {
-            slice_expr->from = fold_constants(std::move(slice_expr->from));
-        }
-        if (slice_expr->to) {
-            slice_expr->to = fold_constants(std::move(slice_expr->to));
-        }
+        slice_expr->from = fold_constants(std::move(slice_expr->from));
+        slice_expr->to = fold_constants(std::move(slice_expr->to));
         return expr;
     }
 
@@ -155,7 +154,7 @@ static ExprPtr fold_constants(ExprPtr expr) {
         if (func_call_expr->args.size() == 0) {
             switch (func_call_expr->keyword) {
             case Keyword::PI:
-                return make_node<NumberExpr>(M_PI, expr->loc);
+                return make_node<NumberExpr>(kPi, expr->loc);
             default:
                 return expr;
             }
@@ -211,10 +210,23 @@ static ExprPtr fold_constants(ExprPtr expr) {
         }
     }
 
+    if (auto proc_call_expr = dynamic_cast<ProcCallExpr*>(expr.get())) {
+        for (auto& arg : proc_call_expr->args) {
+            arg = fold_constants(std::move(arg));
+        }
+        return expr;
+    }
+
+    if (auto fn_call_expr = dynamic_cast<FnCallExpr*>(expr.get())) {
+        for (auto& arg : fn_call_expr->args) {
+            arg = fold_constants(std::move(arg));
+        }
+        return expr;
+    }
+
     return expr;  // return the original expression if no folding was done
 }
 
-// simplify the simpler language resuly of lowering the AST
 static void simplify_stmt(Parser& parser, std::vector<Token>& out_tokens) {
     auto& tok = parser.peek();
     switch (tok.keyword) {
@@ -488,6 +500,136 @@ static void simplify_stmt(Parser& parser, std::vector<Token>& out_tokens) {
                           parser.line().tokens.end());
         break;
     }
+}
+
+struct ConstantFoldingWalker : ASTVisitor {
+    virtual ~ConstantFoldingWalker() = default;
+
+    void visit(LetStmt& stmt) override {
+        stmt.lhs = fold_constants(std::move(stmt.lhs));
+        stmt.rhs = fold_constants(std::move(stmt.rhs));
+    }
+
+    void visit(DimStmt& stmt) override {
+        for (auto& item : stmt.items) {
+            for (auto& dim_expr : item.dims) {
+                dim_expr = fold_constants(std::move(dim_expr));
+            }
+        }
+    }
+
+    void visit(IfStmt& stmt) override {
+        stmt.condition = fold_constants(std::move(stmt.condition));
+    }
+
+    void visit(RepeatStmt& stmt) override {
+        stmt.condition = fold_constants(std::move(stmt.condition));
+    }
+
+    void visit(WhileStmt& stmt) override {
+        stmt.condition = fold_constants(std::move(stmt.condition));
+    }
+
+    void visit(ForStmt& stmt) override {
+        stmt.start_expr = fold_constants(std::move(stmt.start_expr));
+        stmt.end_expr = fold_constants(std::move(stmt.end_expr));
+        stmt.step_expr = fold_constants(std::move(stmt.step_expr));
+    }
+
+    void visit(ProcCallStmt& stmt) override {
+        for (auto& arg : stmt.args) {
+            arg = fold_constants(std::move(arg));
+        }
+    }
+
+    void visit(DefFnStmt& stmt) override {
+        stmt.expr = fold_constants(std::move(stmt.expr));
+    }
+
+    void visit(GotoStmt& stmt) override {
+        stmt.target_expr = fold_constants(std::move(stmt.target_expr));
+    }
+
+    void visit(GosubStmt& stmt) override {
+        stmt.target_expr = fold_constants(std::move(stmt.target_expr));
+    }
+
+    void visit(PrintStmt& stmt) override {
+        for (auto& item : stmt.items) {
+            item.expr = fold_constants(std::move(item.expr));
+            item.line_expr = fold_constants(std::move(item.line_expr));
+            item.col_expr = fold_constants(std::move(item.col_expr));
+            item.tab_expr = fold_constants(std::move(item.tab_expr));
+        }
+    }
+
+    void visit(LPrintStmt& stmt) override {
+        for (auto& item : stmt.items) {
+            item.expr = fold_constants(std::move(item.expr));
+            item.line_expr = fold_constants(std::move(item.line_expr));
+            item.col_expr = fold_constants(std::move(item.col_expr));
+            item.tab_expr = fold_constants(std::move(item.tab_expr));
+        }
+    }
+
+    void visit(InputStmt& stmt) override {
+        for (auto& var : stmt.vars) {
+            var = fold_constants(std::move(var));
+        }
+    }
+
+    void visit(RunStmt& stmt) override {
+        stmt.target_expr = fold_constants(std::move(stmt.target_expr));
+    }
+
+    void visit(ListStmt& stmt) override {
+        stmt.target_expr = fold_constants(std::move(stmt.target_expr));
+    }
+
+    void visit(LListStmt& stmt) override {
+        stmt.target_expr = fold_constants(std::move(stmt.target_expr));
+    }
+
+    void visit(LoadStmt& stmt) override {
+        stmt.filename_expr = fold_constants(std::move(stmt.filename_expr));
+    }
+
+    void visit(SaveStmt& stmt) override {
+        stmt.filename_expr = fold_constants(std::move(stmt.filename_expr));
+    }
+
+    void visit(PokeStmt& stmt) override {
+        stmt.address_expr = fold_constants(std::move(stmt.address_expr));
+        stmt.value_expr = fold_constants(std::move(stmt.value_expr));
+    }
+
+    void visit(PokewStmt& stmt) override {
+        stmt.address_expr = fold_constants(std::move(stmt.address_expr));
+        stmt.value_expr = fold_constants(std::move(stmt.value_expr));
+    }
+
+    void visit(PlotStmt& stmt) override {
+        stmt.x_expr = fold_constants(std::move(stmt.x_expr));
+        stmt.y_expr = fold_constants(std::move(stmt.y_expr));
+    }
+
+    void visit(UnplotStmt& stmt) override {
+        stmt.x_expr = fold_constants(std::move(stmt.x_expr));
+        stmt.y_expr = fold_constants(std::move(stmt.y_expr));
+    }
+
+    void visit(RandStmt& stmt) override {
+        stmt.seed_expr = fold_constants(std::move(stmt.seed_expr));
+    }
+
+    void visit(PauseStmt& stmt) override {
+        stmt.duration_expr = fold_constants(std::move(stmt.duration_expr));
+    }
+};
+
+void simplify_exprs(Prog& prog) {
+    ConstantFoldingWalker walker;
+    prog.accept(walker);
 }
 
 void simplify_exprs(std::vector<Token>& tokens) {

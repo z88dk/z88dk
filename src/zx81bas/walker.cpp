@@ -16,9 +16,7 @@ void ASTVisitor::walk_stmts(std::vector<StmtPtr>& list) {
 
     for (auto& stmt : list) {
         // Visit the node
-        stmt_stack.push_back(stmt.get());
         stmt->accept(*this);
-        stmt_stack.pop_back();
 
         // Prepend nodes requested by visitor
         for (auto& n : stmt->rewrite.prepend) {

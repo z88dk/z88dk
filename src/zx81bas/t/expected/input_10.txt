@@ -838,70 +838,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:185
-                    op: +
-                    lhs: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:185
-                            op: *
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:185
-                                    value: 10.000000
-                                }
-                            rhs: 
-                                BinaryExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:183
-                                    op: *
-                                    lhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:185
-                                            value: 42.000000
-                                        }
-                                    rhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:183
-                                            value: 1.000000
-                                        }
-                                }
-                        }
-                    rhs: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:183
-                            op: *
-                            lhs: 
-                                BinaryExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:185
-                                    op: +
-                                    lhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:185
-                                            value: 1.000000
-                                        }
-                                    rhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:185
-                                            value: 3.000000
-                                        }
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:183
-                                    value: 1.000000
-                                }
-                        }
+                    value: 424.000000
                 }
         }
         LetStmt {
@@ -912,22 +852,10 @@ Prog {
                     location: test_t_input_10_t.bas:186
                     name: "A"
                     indices: [
-                        BinaryExpr {
+                        NumberExpr {
                             type: Number
                             location: test_t_input_10_t.bas:183
-                            op: *
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:186
-                                    value: 42.000000
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:183
-                                    value: 1.000000
-                                }
+                            value: 42.000000
                         }
                     ]
                 }
@@ -986,22 +914,10 @@ Prog {
                     name: "PROCIDA"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:190
-                    op: +
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:190
-                            value: 1.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:190
-                            value: 3.000000
-                        }
+                    value: 4.000000
                 }
         }
         GosubStmt {
@@ -1171,12 +1087,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:199
-                    keyword: "PI"
-                    args: [
-                    ]
+                    value: 3.141593
                 }
         }
         LetStmt {
@@ -1320,17 +1234,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:211
-                    keyword: "SIN"
-                    args: [
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:211
-                            value: 0.000000
-                        }
-                    ]
+                    value: 0.000000
                 }
         }
         LetStmt {
@@ -1342,17 +1249,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:212
-                    keyword: "COS"
-                    args: [
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:212
-                            value: 0.000000
-                        }
-                    ]
+                    value: 1.000000
                 }
         }
         LetStmt {
@@ -1364,17 +1264,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:213
-                    keyword: "TAN"
-                    args: [
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:213
-                            value: 0.000000
-                        }
-                    ]
+                    value: 0.000000
                 }
         }
         LetStmt {
@@ -1386,17 +1279,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:214
-                    keyword: "ASN"
-                    args: [
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:214
-                            value: 0.000000
-                        }
-                    ]
+                    value: 0.000000
                 }
         }
         LetStmt {
@@ -1408,17 +1294,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:215
-                    keyword: "ACS"
-                    args: [
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:215
-                            value: 0.000000
-                        }
-                    ]
+                    value: 1.570796
                 }
         }
         LetStmt {
@@ -1430,17 +1309,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:216
-                    keyword: "ATN"
-                    args: [
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:216
-                            value: 0.000000
-                        }
-                    ]
+                    value: 0.000000
                 }
         }
         LetStmt {
@@ -1452,17 +1324,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:217
-                    keyword: "LN"
-                    args: [
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:217
-                            value: 1.000000
-                        }
-                    ]
+                    value: 0.000000
                 }
         }
         LetStmt {
@@ -1474,17 +1339,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:218
-                    keyword: "EXP"
-                    args: [
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:218
-                            value: 1.000000
-                        }
-                    ]
+                    value: 2.718282
                 }
         }
         LetStmt {
@@ -1496,17 +1354,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:219
-                    keyword: "SQR"
-                    args: [
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:219
-                            value: 2.000000
-                        }
-                    ]
+                    value: 1.414214
                 }
         }
         LetStmt {
@@ -1518,17 +1369,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:220
-                    keyword: "SGN"
-                    args: [
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:220
-                            value: 1.000000
-                        }
-                    ]
+                    value: 1.000000
                 }
         }
         LetStmt {
@@ -1540,23 +1384,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:221
-                    keyword: "SGN"
-                    args: [
-                        UnaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:221
-                            op: -
-                            operand: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:221
-                                    value: 1.000000
-                                }
-                        }
-                    ]
+                    value: -1.000000
                 }
         }
         LetStmt {
@@ -1568,17 +1399,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:222
-                    keyword: "ABS"
-                    args: [
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:222
-                            value: 1.000000
-                        }
-                    ]
+                    value: 1.000000
                 }
         }
         LetStmt {
@@ -1590,23 +1414,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:223
-                    keyword: "ABS"
-                    args: [
-                        UnaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:223
-                            op: -
-                            operand: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:223
-                                    value: 1.000000
-                                }
-                        }
-                    ]
+                    value: 1.000000
                 }
         }
         LetStmt {
@@ -1674,22 +1485,10 @@ Prog {
                                     location: test_t_input_10_t.bas:225
                                     keyword: "PEEK"
                                     args: [
-                                        BinaryExpr {
+                                        NumberExpr {
                                             type: Number
                                             location: test_t_input_10_t.bas:225
-                                            op: +
-                                            lhs: 
-                                                NumberExpr {
-                                                    type: Number
-                                                    location: test_t_input_10_t.bas:225
-                                                    value: 0.000000
-                                                }
-                                            rhs: 
-                                                NumberExpr {
-                                                    type: Number
-                                                    location: test_t_input_10_t.bas:225
-                                                    value: 1.000000
-                                                }
+                                            value: 1.000000
                                         }
                                     ]
                                 }
@@ -1771,16 +1570,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                UnaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:229
-                    op: NOT
-                    operand: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:229
-                            value: 0.000000
-                        }
+                    value: 1.000000
                 }
         }
         LetStmt {
@@ -1792,22 +1585,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:230
-                    op: AND
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:230
-                            value: 1.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:230
-                            value: 1.000000
-                        }
+                    value: 1.000000
                 }
         }
         LetStmt {
@@ -1819,22 +1600,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:231
-                    op: OR
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:231
-                            value: 0.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:231
-                            value: 0.000000
-                        }
+                    value: 0.000000
                 }
         }
         LetStmt {
@@ -1846,35 +1615,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:233
-                    keyword: "ABS"
-                    args: [
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:183
-                            op: *
-                            lhs: 
-                                UnaryExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:233
-                                    op: -
-                                    operand: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:233
-                                            value: 3.000000
-                                        }
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:183
-                                    value: 1.000000
-                                }
-                        }
-                    ]
+                    value: 3.000000
                 }
         }
         LetStmt {
@@ -1886,46 +1630,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:234
-                    op: +
-                    lhs: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:183
-                            op: *
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:234
-                                    value: 5.000000
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:183
-                                    value: 1.000000
-                                }
-                        }
-                    rhs: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:183
-                            op: *
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:234
-                                    value: 7.000000
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:183
-                                    value: 1.000000
-                                }
-                        }
+                    value: 12.000000
                 }
         }
         LetStmt {
@@ -1937,58 +1645,10 @@ Prog {
                     name: "X"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:237
-                    op: +
-                    lhs: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:236
-                            op: *
-                            lhs: 
-                                BinaryExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:237
-                                    op: +
-                                    lhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:238
-                                            value: 10.000000
-                                        }
-                                    rhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:237
-                                            value: 1.000000
-                                        }
-                                }
-                            rhs: 
-                                BinaryExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:237
-                                    op: +
-                                    lhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:238
-                                            value: 10.000000
-                                        }
-                                    rhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:237
-                                            value: 1.000000
-                                        }
-                                }
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:237
-                            value: 3.000000
-                        }
+                    value: 124.000000
                 }
         }
         LetStmt {
@@ -2000,22 +1660,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:244
-                    op: +
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:244
-                            value: 1.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:244
-                            value: 2.000000
-                        }
+                    value: 3.000000
                 }
         }
         LetStmt {
@@ -2027,28 +1675,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:245
-                    op: +
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:245
-                            value: 1.000000
-                        }
-                    rhs: 
-                        UnaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:245
-                            op: -
-                            operand: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:245
-                                    value: 2.000000
-                                }
-                        }
+                    value: -1.000000
                 }
         }
         LetStmt {
@@ -2060,22 +1690,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:246
-                    op: -
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:246
-                            value: 1.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:246
-                            value: 2.000000
-                        }
+                    value: -1.000000
                 }
         }
         LetStmt {
@@ -2087,22 +1705,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:247
-                    op: *
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:247
-                            value: 2.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:247
-                            value: 3.000000
-                        }
+                    value: 6.000000
                 }
         }
         LetStmt {
@@ -2114,22 +1720,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:248
-                    op: /
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:248
-                            value: 2.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:248
-                            value: 3.000000
-                        }
+                    value: 0.666667
                 }
         }
         LetStmt {
@@ -2141,29 +1735,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:249
-                    keyword: "INT"
-                    args: [
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:249
-                            op: /
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:249
-                                    value: 10.000000
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:249
-                                    value: 3.000000
-                                }
-                        }
-                    ]
+                    value: 3.000000
                 }
         }
         LetStmt {
@@ -2175,29 +1750,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:250
-                    keyword: "INT"
-                    args: [
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:250
-                            op: /
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:250
-                                    value: 10.000000
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:250
-                                    value: 3.000000
-                                }
-                        }
-                    ]
+                    value: 3.000000
                 }
         }
         LetStmt {
@@ -2209,53 +1765,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:251
-                    op: -
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:251
-                            value: 10.000000
-                        }
-                    rhs: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:251
-                            op: *
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:251
-                                    value: 3.000000
-                                }
-                            rhs: 
-                                BasicFuncCallExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:251
-                                    keyword: "INT"
-                                    args: [
-                                        BinaryExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:251
-                                            op: /
-                                            lhs: 
-                                                NumberExpr {
-                                                    type: Number
-                                                    location: test_t_input_10_t.bas:251
-                                                    value: 10.000000
-                                                }
-                                            rhs: 
-                                                NumberExpr {
-                                                    type: Number
-                                                    location: test_t_input_10_t.bas:251
-                                                    value: 3.000000
-                                                }
-                                        }
-                                    ]
-                                }
-                        }
+                    value: 1.000000
                 }
         }
         LetStmt {
@@ -2267,22 +1780,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:252
-                    op: **
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:252
-                            value: 2.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:252
-                            value: 3.000000
-                        }
+                    value: 8.000000
                 }
         }
         LetStmt {
@@ -2294,28 +1795,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:253
-                    op: **
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:253
-                            value: 2.000000
-                        }
-                    rhs: 
-                        UnaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:253
-                            op: -
-                            operand: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:253
-                                    value: 3.000000
-                                }
-                        }
+                    value: 0.125000
                 }
         }
         LetStmt {
@@ -2327,46 +1810,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:254
-                    op: +
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:254
-                            value: 1.000000
-                        }
-                    rhs: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:254
-                            op: *
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:254
-                                    value: 2.000000
-                                }
-                            rhs: 
-                                BinaryExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:254
-                                    op: **
-                                    lhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:254
-                                            value: 3.000000
-                                        }
-                                    rhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:254
-                                            value: 4.000000
-                                        }
-                                }
-                        }
+                    value: 163.000000
                 }
         }
         DimStmt {
@@ -2492,27 +1939,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:267
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:267
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:267
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:267
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:267
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:267
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -2564,27 +2005,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:268
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:268
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: =
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:268
-                            op: <>
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:268
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:268
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:268
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -2636,27 +2071,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:269
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:269
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: >=
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:269
-                            op: <
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:269
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:269
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:269
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -2723,27 +2152,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:270
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:270
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: >
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:270
-                            op: <=
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:270
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:270
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:270
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -2810,27 +2233,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:271
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:271
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <=
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:271
-                            op: >
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:271
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:271
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:271
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -2912,27 +2329,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:272
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:272
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:272
-                            op: >=
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:272
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:272
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:272
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -3029,33 +2440,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:273
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:273
-                    op: NOT
-                    operand: 
-                        UnaryExpr {
+                    op: =
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:273
-                            op: NOT
-                            operand: 
-                                BinaryExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:273
-                                    op: =
-                                    lhs: 
-                                        VariableExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:273
-                                            name: "A"
-                                        }
-                                    rhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:273
-                                            value: 1.000000
-                                        }
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:273
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -3103,27 +2502,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:273
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:273
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:273
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:273
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:273
-                                    value: 2.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:273
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -3194,27 +2587,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:275
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:275
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:275
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:275
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:275
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:275
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -3281,27 +2668,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:280
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:280
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:280
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:280
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:280
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:280
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -3379,27 +2760,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:285
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:285
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:285
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:285
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:285
-                                    value: 2.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:285
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -3470,27 +2845,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:292
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:292
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:292
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:292
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:292
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:292
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -3591,27 +2960,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:299
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:299
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:299
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:299
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:299
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:299
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -3673,27 +3036,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:300
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:300
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:300
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:300
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:300
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:300
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -3717,27 +3074,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:300
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:300
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:300
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:300
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:300
-                                    value: 2.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:300
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -3795,27 +3146,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:305
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:305
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:305
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:305
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:305
-                                    value: 2.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:305
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -3880,27 +3225,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:306
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:306
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:308
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:308
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:308
-                                    value: 2.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:308
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -3924,27 +3263,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:302
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:302
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:309
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:309
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:309
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:309
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -4002,27 +3335,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:311
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:311
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:312
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:312
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:312
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:312
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -4065,27 +3392,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:318
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:318
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: =
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:318
-                            op: <>
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:318
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:318
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:318
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -4167,27 +3488,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:320
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:320
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:320
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:320
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:320
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:320
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -4226,27 +3541,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:320
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:320
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:320
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:320
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:320
-                                    value: 2.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:320
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -4311,27 +3620,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:322
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:322
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: =
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:322
-                            op: <>
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:322
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:322
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:322
+                            value: 1.000000
                         }
                 }
             then_stmts: [
@@ -4381,27 +3684,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:325
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:325
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:325
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:325
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:325
-                                    value: 2.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:325
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -4451,27 +3748,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:326
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:326
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: =
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:326
-                            op: <>
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:326
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:326
-                                    value: 2.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:326
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -4536,27 +3827,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:331
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:331
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: =
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:331
-                            op: <>
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:331
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:331
-                                    value: 2.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:331
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -4647,17 +3932,10 @@ Prog {
                     value: 10.000000
                 }
             step_expr: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:339
-                    keyword: "SGN"
-                    args: [
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:339
-                            value: 1.000000
-                        }
-                    ]
+                    value: 1.000000
                 }
             body: [
             ]
@@ -4834,27 +4112,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:345
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:345
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:345
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:345
-                                    name: "I"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:345
-                                    value: 2.000000
-                                }
+                            name: "I"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:345
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -5375,22 +4647,10 @@ Prog {
                     name: "PROCJA"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:390
-                    op: +
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:390
-                            value: 5.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:390
-                            value: 5.000000
-                        }
+                    value: 10.000000
                 }
         }
         GosubStmt {
@@ -5453,70 +4713,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:398
-                    op: +
-                    lhs: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:396
-                            op: *
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:398
-                                    value: 10.000000
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:398
-                                    value: 20.000000
-                                }
-                        }
-                    rhs: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:396
-                            op: *
-                            lhs: 
-                                BinaryExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:398
-                                    op: +
-                                    lhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:398
-                                            value: 1.000000
-                                        }
-                                    rhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:398
-                                            value: 2.000000
-                                        }
-                                }
-                            rhs: 
-                                BinaryExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:398
-                                    op: +
-                                    lhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:398
-                                            value: 3.000000
-                                        }
-                                    rhs: 
-                                        NumberExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:398
-                                            value: 4.000000
-                                        }
-                                }
-                        }
+                    value: 221.000000
                 }
         }
         LetStmt {
@@ -5528,24 +4728,10 @@ Prog {
                     name: "A"
                 }
             rhs: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:402
-                    op: *
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:402
-                            value: 2.000000
-                        }
-                    rhs: 
-                        BasicFuncCallExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:400
-                            keyword: "PI"
-                            args: [
-                            ]
-                        }
+                    value: 6.283185
                 }
         }
         LineNumStmt {
@@ -5684,22 +4870,10 @@ Prog {
             location: test_t_input_10_t.bas:446
             items: [
                 Expr:
-                    BinaryExpr {
+                    NumberExpr {
                         type: Number
                         location: test_t_input_10_t.bas:446
-                        op: *
-                        lhs: 
-                            NumberExpr {
-                                type: Number
-                                location: test_t_input_10_t.bas:446
-                                value: 2.000000
-                            }
-                        rhs: 
-                            NumberExpr {
-                                type: Number
-                                location: test_t_input_10_t.bas:446
-                                value: 3.000000
-                            }
+                        value: 6.000000
                     }
             ]
         }
@@ -5795,22 +4969,10 @@ Prog {
             location: test_t_input_10_t.bas:458
             items: [
                 Expr:
-                    BinaryExpr {
+                    NumberExpr {
                         type: Number
                         location: test_t_input_10_t.bas:458
-                        op: *
-                        lhs: 
-                            NumberExpr {
-                                type: Number
-                                location: test_t_input_10_t.bas:458
-                                value: 2.000000
-                            }
-                        rhs: 
-                            NumberExpr {
-                                type: Number
-                                location: test_t_input_10_t.bas:458
-                                value: 3.000000
-                            }
+                        value: 6.000000
                     }
             ]
         }
@@ -6236,99 +5398,25 @@ Prog {
                     value: 16384.000000
                 }
             value: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:535
-                    op: -
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:535
-                            value: 258.000000
-                        }
-                    rhs: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:535
-                            op: *
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:535
-                                    value: 256.000000
-                                }
-                            rhs: 
-                                BasicFuncCallExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:535
-                                    keyword: "INT"
-                                    args: [
-                                        BinaryExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:535
-                                            op: /
-                                            lhs: 
-                                                NumberExpr {
-                                                    type: Number
-                                                    location: test_t_input_10_t.bas:535
-                                                    value: 258.000000
-                                                }
-                                            rhs: 
-                                                NumberExpr {
-                                                    type: Number
-                                                    location: test_t_input_10_t.bas:535
-                                                    value: 256.000000
-                                                }
-                                        }
-                                    ]
-                                }
-                        }
+                    value: 2.000000
                 }
         }
         PokeStmt {
             location: test_t_input_10_t.bas:535
             address: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:535
-                    op: +
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:535
-                            value: 16384.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:535
-                            value: 1.000000
-                        }
+                    value: 16385.000000
                 }
             value: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:535
-                    keyword: "INT"
-                    args: [
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:535
-                            op: /
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:535
-                                    value: 258.000000
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:535
-                                    value: 256.000000
-                                }
-                        }
-                    ]
+                    value: 1.000000
                 }
         }
         RandStmt {
@@ -6379,22 +5467,10 @@ Prog {
         ListStmt {
             location: test_t_input_10_t.bas:567
             target_expr: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:567
-                    op: *
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:567
-                            value: 10.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:567
-                            value: 4.000000
-                        }
+                    value: 40.000000
                 }
         }
         ListStmt {
@@ -6423,22 +5499,10 @@ Prog {
         LListStmt {
             location: test_t_input_10_t.bas:576
             target_expr: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:576
-                    op: *
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:576
-                            value: 10.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:576
-                            value: 4.000000
-                        }
+                    value: 40.000000
                 }
         }
         LListStmt {
@@ -6691,53 +5755,10 @@ Prog {
                         }
                 }
             value: 
-                BinaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:664
-                    op: -
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:664
-                            value: 12345.000000
-                        }
-                    rhs: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:664
-                            op: *
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:664
-                                    value: 256.000000
-                                }
-                            rhs: 
-                                BasicFuncCallExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:664
-                                    keyword: "INT"
-                                    args: [
-                                        BinaryExpr {
-                                            type: Number
-                                            location: test_t_input_10_t.bas:664
-                                            op: /
-                                            lhs: 
-                                                NumberExpr {
-                                                    type: Number
-                                                    location: test_t_input_10_t.bas:664
-                                                    value: 12345.000000
-                                                }
-                                            rhs: 
-                                                NumberExpr {
-                                                    type: Number
-                                                    location: test_t_input_10_t.bas:664
-                                                    value: 256.000000
-                                                }
-                                        }
-                                    ]
-                                }
-                        }
+                    value: 57.000000
                 }
         }
         PokeStmt {
@@ -6773,29 +5794,10 @@ Prog {
                         }
                 }
             value: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:664
-                    keyword: "INT"
-                    args: [
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:664
-                            op: /
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:664
-                                    value: 12345.000000
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:664
-                                    value: 256.000000
-                                }
-                        }
-                    ]
+                    value: 48.000000
                 }
         }
         PrintStmt {
@@ -6889,16 +5891,10 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:364
             condition: 
-                UnaryExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:364
-                    op: NOT
-                    operand: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:364
-                            value: 1.000000
-                        }
+                    value: 0.000000
                 }
             then_stmts: [
                 GotoStmt {
@@ -6961,27 +5957,21 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:368
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:368
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: <>
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:368
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:368
-                                    name: "PROCNAMEA"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:368
-                                    value: 2.000000
-                                }
+                            name: "PROCNAMEA"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:368
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -7064,12 +6054,10 @@ Prog {
                     name: "PROCEMPTY"
                 }
             rhs: 
-                BasicFuncCallExpr {
+                NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:379
-                    keyword: "PI"
-                    args: [
-                    ]
+                    value: 3.141593
                 }
         }
         ReturnStmt {

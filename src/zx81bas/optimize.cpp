@@ -5,9 +5,11 @@
 //-----------------------------------------------------------------------------
 
 #include "optimize.h"
+#include "ast.h"
+#include "simplify_expr.h"
 
-bool optimize(Prog& prog, Symtab& symtab) {
-    (void)prog;
-    (void)symtab;
-    return true;
+bool optimize(Prog& prog) {
+    simplify_exprs(prog);
+
+    return get_error_count() == 0;
 }

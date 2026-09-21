@@ -137,7 +137,7 @@ void emit_expr(std::vector<Token>& tokens, const Expr& e,
         if (n->value < 0) {
             append_token(tokens, TokenType::Minus, "-", loc);
             append_token(tokens, TokenType::Float, double_to_string(- n->value), loc);
-            tokens.back().nvalue = n->value;
+            tokens.back().nvalue = - n->value;
         }
         else {
             append_token(tokens, TokenType::Float, double_to_string(n->value), loc);

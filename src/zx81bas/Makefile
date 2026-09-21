@@ -88,7 +88,7 @@ tidy:
 cloc:
 	perl -S cloc --fullpath .
 
-CLEAN_PATTERNS = *.o *.gcov *.exe *.orig *.core *.bak *.new *~ *.pp *.i *.p
+CLEAN_PATTERNS = *.o *.gcov *.exe *.orig *.core *.bak *.new *~ *.pp *.i
 CLEAN_DIRS = . t t/*
 CLEAN_FILES = \
   $(foreach d,$(CLEAN_DIRS), \
