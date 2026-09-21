@@ -1450,18 +1450,10 @@ void testjump(LVALUE* lval, int label)
 {
     Kind type;
 
-    type = lval->val_type;
-
-    /* Char/uchar return in L; H is not part of the value (asm leaves H dirty). */
-    if (type == KIND_CHAR) {
-        ol("ld\ta,l");
-        ol("or\ta");
-        opjump("z,", label, 0);
-        return;
-    }
-
     ol("ld\ta,h");
     ol("or\tl");
+
+    type = lval->val_type;
 
     /* Long/CPTR/i64 rvalue: false only if every word is zero.
      * 0x00010000 has HL==0. After a comparison, check_lastop uses
@@ -4055,20 +4047,6 @@ void lneg(LVALUE* lval)
         set_carry(lval);
         ol("ccf");
         break;
-    case KIND_CHAR:
-        /* !L; H is not part of a char return. */
-        ol("ld\ta,l");
-        ol("or\ta");
-        ol("ld\thl,0");
-        if (IS_808x()) {
-            ol("jp\tnz,ASMPC+5");
-        } else {
-            ol("jr\tnz,ASMPC+4");
-        }
-        ol("scf");
-        ol("inc\tl");
-        set_int(lval);
-        break;
     case KIND_DOUBLE:
     case KIND_FLOAT16:
         zconvert_from_decimal(lval->val_type,KIND_INT, 0);
@@ -4253,10 +4231,12 @@ void eq0(LVALUE* lval, int label)
 {
     check_lastop_was_comparison(lval);
     switch (lval->val_type) {
+#ifdef CHARCOMP0
     case KIND_CHAR:
         ol("ld\ta,l");
-        ol("or\ta");
+        ol("and\ta");
         break;
+#endif
     case KIND_LONGLONG:
         callrts("l_i64_eq0");
         break;
