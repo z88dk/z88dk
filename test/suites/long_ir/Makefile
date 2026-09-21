@@ -2070,3 +2070,23 @@ delive_z80n.bin: $(SOURCES) delive.c
 delive_8080.bin: $(SOURCES) delive.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# Local aggregate field promotion: positive scalar replacement plus escaping
+# and overlapping views that must retain their memory representation.
+all: aggpromote.bin aggpromote_fp.bin aggpromote_8080.bin aggpromote_gbz80.bin
+
+aggpromote.bin: $(SOURCES) aggpromote.c
+	$(compile)
+	$(runtest)
+
+aggpromote_fp.bin: $(SOURCES) aggpromote.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+aggpromote_8080.bin: $(SOURCES) aggpromote.c
+	$(compile_8080)
+	$(runtest_8080)
+
+aggpromote_gbz80.bin: $(SOURCES) aggpromote.c
+	$(compile_gbz80)
+	$(runtest_gbz80)

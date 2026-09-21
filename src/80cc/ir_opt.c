@@ -39,6 +39,313 @@ typedef struct {
 
 #define MAX_SHADOW 16
 
+/* Local aggregate scalar replacement. Opt out with
+   --opt-disable=aggregate-promote or IR_OFF=aggregate-promote. */
+static int agg_promote_enabled(void)
+{
+    static int enabled = -1;
+    if (enabled < 0) enabled = !opt_disabled("aggregate-promote");
+    return enabled;
+}
+
+typedef struct {
+    int root;
+    int offset;
+    int width;
+    Kind kind;
+    int promoted_vreg;
+} AggField;
+
+static int agg_scalar_shape(Kind kind, int width)
+{
+    switch (kind) {
+    case KIND_CHAR: return width == 1;
+    case KIND_SHORT: case KIND_INT: case KIND_PTR: case KIND_ENUM:
+        return width == 2;
+    case KIND_LONG: return width == 4;
+    default: return 0;
+    }
+}
+
+static void agg_clear_mem(Op *op)
+{
+    op->mem.kind = IR_MEM_FRAME;
+    op->mem.slot = -1;
+    op->mem.sym = NULL;
+    op->mem.offset = 0;
+    op->mem.base = -1;
+    op->mem.elem = KIND_NONE;
+    op->mem.volatile_ = 0;
+    op->mem.post_step = 0;
+    op->mem.bank_fn = NULL;
+    op->mem.port = NULL;
+}
+
+/* Replace fixed-offset scalar fields of a non-escaping local struct with
+   ordinary mutable vregs. Every address is traced from IR_LEA through only
+   constant pointer copies/adds/subtracts. Any other use is an escape and
+   rejects the whole object. Run before address folding, while derivations are
+   still explicit. */
+int ir_opt_promote_aggregate_fields(Func *f)
+{
+    if (!f || f->n_vregs <= 0 || !agg_promote_enabled()) return 0;
+    const int nv = f->n_vregs;
+    int have_candidate = 0;
+    for (int v = 0; v < nv; v++) {
+        VReg *vr = &f->vregs[v];
+        if (vr->kind == KIND_STRUCT && vr->width > 0
+            && !(vr->flags & (IR_VREG_VOLATILE | IR_VREG_NO_SLOT
+                              | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+            && !(c_debug_adb_defc && vr->sym)) {
+            have_candidate = 1;
+            break;
+        }
+    }
+    if (!have_candidate) return 0;
+    Op **defop = calloc((size_t)nv, sizeof(*defop));
+    int *defcnt = calloc((size_t)nv, sizeof(*defcnt));
+    int *root = malloc((size_t)nv * sizeof(*root));
+    int64_t *offset = calloc((size_t)nv, sizeof(*offset));
+    unsigned char *offset_known = calloc((size_t)nv, 1);
+    unsigned char *bad = calloc((size_t)nv, 1);
+    AggField *fields = NULL;
+    int nfields = 0, capfields = 0;
+    if (!defop || !defcnt || !root || !offset || !offset_known || !bad) {
+        free(defop); free(defcnt); free(root); free(offset);
+        free(offset_known); free(bad);
+        return 0;
+    }
+    for (int v = 0; v < nv; v++) root[v] = -1;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int defs[8];
+            int nd = ir_op_defs(&bb->ops[j], defs, 8);
+            for (int k = 0; k < nd; k++) {
+                int d = defs[k];
+                if (d < 0 || d >= nv) continue;
+                defcnt[d]++;
+                if (defcnt[d] == 1) defop[d] = &bb->ops[j];
+                else defop[d] = NULL;
+            }
+        }
+    }
+
+    /* Candidate roots are automatic struct objects with bounded frame size.
+       Volatile aggregates retain every requested memory access. */
+    for (int v = 0; v < nv; v++) {
+        VReg *vr = &f->vregs[v];
+        bad[v] = !(vr->kind == KIND_STRUCT && vr->width > 0
+                   && !(vr->flags & (IR_VREG_VOLATILE | IR_VREG_NO_SLOT
+                                     | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+                   && !(c_debug_adb_defc && vr->sym));
+    }
+    /* A duplicated address definition cannot be tracked precisely. Reject
+       its source aggregate even if another use happens to look promotable. */
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind == IR_LEA && op->src[0] >= 0 && op->src[0] < nv
+                && f->vregs[op->src[0]].kind == KIND_STRUCT
+                && op->dst >= 0 && op->dst < nv && defcnt[op->dst] != 1)
+                bad[op->src[0]] = 1;
+        }
+    }
+
+    /* Resolve pointer provenance by following unique local definitions.
+       Unsupported consumers are rejected in the full use scan below. */
+    for (int iteration = 0; iteration < nv; iteration++) {
+        int progress = 0;
+        for (int v = 0; v < nv; v++) {
+            if (root[v] >= 0 || defcnt[v] != 1 || !defop[v]) continue;
+            Op *d = defop[v];
+            if (d->kind == IR_LEA && d->src[0] >= 0 && d->src[0] < nv
+                && f->vregs[d->src[0]].kind == KIND_STRUCT
+                && !bad[d->src[0]]) {
+                root[v] = d->src[0];
+                offset[v] = d->imm;
+                offset_known[v] = d->imm >= INT_MIN && d->imm <= INT_MAX;
+                progress = 1;
+            } else if ((d->kind == IR_MOV || d->kind == IR_ADD
+                        || d->kind == IR_SUB)
+                       && d->src[0] >= 0 && d->src[0] < nv
+                       && root[d->src[0]] >= 0) {
+                root[v] = root[d->src[0]];
+                if (offset_known[d->src[0]] && d->src[1] < 0) {
+                    int delta_ok = 1;
+                    int64_t delta = d->imm;
+                    if (d->kind == IR_SUB) {
+                        if (d->imm == INT64_MIN) delta_ok = 0;
+                        else delta = -d->imm;
+                    } else if (d->kind == IR_MOV) {
+                        delta = 0;
+                    }
+                    if (delta_ok && delta >= INT_MIN && delta <= INT_MAX) {
+                        offset[v] = offset[d->src[0]] + delta;
+                        offset_known[v] = 1;
+                    }
+                }
+                progress = 1;
+            }
+        }
+        if (!progress) break;
+    }
+
+    /* Validate every use of a derived address and collect exact scalar field
+       accesses. Calls, helper arguments, variable indexing, post-step accesses,
+       and any other address use reject that object's promotion. */
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            int nu = ir_op_uses_count(op);
+            int small[16];
+            int *uses = nu <= 16 ? small : malloc((size_t)nu * sizeof(int));
+            if (!uses) {
+                free(fields); free(defop); free(defcnt); free(root);
+                free(offset); free(offset_known); free(bad);
+                return 0;
+            }
+            nu = ir_op_uses(op, uses, nu);
+            for (int k = 0; k < nu; k++) {
+                int u = uses[k];
+                if (u < 0 || u >= nv) continue;
+                /* The aggregate value itself may only be the source of LEA. */
+                if (!bad[u] && f->vregs[u].kind == KIND_STRUCT) {
+                    if (op->kind == IR_LEA && op->src[0] == u
+                        && op->dst >= 0 && op->dst < nv
+                        && defcnt[op->dst] == 1)
+                        continue;
+                    bad[u] = 1;
+                    continue;
+                }
+                if (root[u] < 0) continue;
+                int r = root[u];
+                int as_base = (op->kind == IR_LD_MEM || op->kind == IR_ST_MEM)
+                           && op->mem.kind == IR_MEM_VREG
+                           && op->mem.base == u;
+                if (as_base) {
+                    int value_v = op->kind == IR_LD_MEM
+                                ? op->dst : op->src[0];
+                    int width = value_v >= 0 && value_v < nv
+                              ? f->vregs[value_v].width : 0;
+                    int64_t field_off = offset_known[u]
+                                      ? offset[u] + op->mem.offset : -1;
+                    Kind kind = op->mem.elem;
+                    if (op->mem.volatile_ || op->mem.post_step
+                        || op->mem.bank_fn || !offset_known[u]
+                        || !agg_scalar_shape(kind, width)
+                        || field_off < 0
+                        || field_off + width > f->vregs[r].width
+                        || (op->kind == IR_LD_MEM && op->dst < 0)
+                        || (op->kind == IR_ST_MEM && op->src[0] < 0)) {
+                        bad[r] = 1;
+                    } else {
+                        int found = -1;
+                        for (int q = 0; q < nfields; q++)
+                            if (fields[q].root == r
+                                && fields[q].offset == field_off
+                                && fields[q].width == width) {
+                                found = q; break;
+                            }
+                        if (found >= 0) {
+                            if (fields[found].kind != kind) bad[r] = 1;
+                        } else {
+                            if (nfields == capfields) {
+                                int cap = capfields ? capfields * 2 : 16;
+                                AggField *p = realloc(fields,
+                                    (size_t)cap * sizeof(*fields));
+                                if (!p) { bad[r] = 1; continue; }
+                                fields = p; capfields = cap;
+                            }
+                            fields[nfields++] = (AggField){
+                                r, (int)field_off, width, kind, -1
+                            };
+                        }
+                    }
+                    /* Storing the derived pointer as a value is an escape. */
+                    if (op->kind == IR_ST_MEM && op->src[0] == u)
+                        bad[r] = 1;
+                    continue;
+                }
+                int single_step = (op->kind == IR_MOV && op->src[0] == u
+                                   && op->src[1] < 0)
+                               || ((op->kind == IR_ADD || op->kind == IR_SUB)
+                                   && op->src[0] == u && op->src[1] < 0);
+                if (!single_step || op->dst < 0 || op->dst >= nv
+                    || defcnt[op->dst] != 1)
+                    bad[r] = 1;
+            }
+            if (uses != small) free(uses);
+        }
+    }
+
+    /* Distinct overlapping views are unions/bitfields/partial accesses. Keep
+       the complete object in memory instead of inventing alias semantics. */
+    for (int i = 0; i < nfields; i++) {
+        for (int j = i + 1; j < nfields; j++) {
+            if (fields[i].root != fields[j].root) continue;
+            int iend = fields[i].offset + fields[i].width;
+            int jend = fields[j].offset + fields[j].width;
+            if (fields[i].offset < jend && fields[j].offset < iend
+                && (fields[i].offset != fields[j].offset
+                    || fields[i].width != fields[j].width))
+                bad[fields[i].root] = 1;
+        }
+    }
+
+    int promoted = 0;
+    for (int i = 0; i < nfields; i++) {
+        AggField *field = &fields[i];
+        if (bad[field->root]) continue;
+        int v = ir_vreg_new(f, field->kind, NULL, 0);
+        f->vregs[v].width = (int16_t)field->width;
+        field->promoted_vreg = v;
+        promoted++;
+    }
+    if (promoted) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                if (op->kind != IR_LD_MEM && op->kind != IR_ST_MEM) continue;
+                if (op->mem.kind != IR_MEM_VREG || op->mem.base < 0
+                    || op->mem.base >= nv || root[op->mem.base] < 0
+                    || bad[root[op->mem.base]]) continue;
+                int r = root[op->mem.base];
+                int field_off = offset_known[op->mem.base]
+                              ? (int)(offset[op->mem.base] + op->mem.offset)
+                              : -1;
+                int value_v = op->kind == IR_LD_MEM ? op->dst : op->src[0];
+                int width = value_v >= 0 && value_v < nv
+                          ? f->vregs[value_v].width : 0;
+                for (int q = 0; q < nfields; q++) {
+                    AggField *field = &fields[q];
+                    if (field->root != r || field->promoted_vreg < 0
+                        || field->offset != field_off || field->width != width
+                        || field->kind != op->mem.elem) continue;
+                    int value = field->promoted_vreg;
+                    if (op->kind == IR_LD_MEM) {
+                        op->kind = IR_MOV;
+                        op->src[0] = value;
+                        op->src[1] = -1;
+                    } else {
+                        op->kind = IR_MOV;
+                        op->dst = value;
+                        op->src[1] = -1;
+                    }
+                    agg_clear_mem(op);
+                    break;
+                }
+            }
+        }
+    }
+    free(fields); free(defop); free(defcnt); free(root); free(offset);
+    free(offset_known); free(bad);
+    return promoted;
+}
+
 static int addr_matches(const ShadowEntry *e, const MemOp *m)
 {
     if (e->kind != m->kind) return 0;

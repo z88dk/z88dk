@@ -11,6 +11,12 @@
 
 #include "ir.h"
 
+/* Replace fixed-offset scalar fields of a non-escaping automatic struct with
+ * mutable vregs. An escape, volatile access, unsupported width, or overlapping
+ * view keeps that object in memory. --opt-disable=aggregate-promote opts out.
+ * Returns the number of promoted fields. */
+int ir_opt_promote_aggregate_fields(Func *f);
+
 /* Store-to-load forwarding + redundant-load elimination + dead-store
  * elimination — the three sub-passes share one shadow table.
  *

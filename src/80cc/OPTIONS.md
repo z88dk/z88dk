@@ -49,6 +49,7 @@ exists (ADR 0010).
 | `dead-def` | keep a definition whose destination is never read |
 | `dead-def-live` | `dead-def` decides without per-edge liveness (more conservative) |
 | `prune` | keep unreachable basic blocks |
+| `aggregate-promote` | keep fixed-offset fields of non-escaping local structs in memory |
 | `coalesce-copies` | keep `IR_MOV` copies that could be coalesced away |
 | `addr-cse` | recompute an address expression instead of reusing it |
 | `deref-offset` | keep a field offset as a separate address temporary rather than folding it into the access — the other half of `idx-deref` |
