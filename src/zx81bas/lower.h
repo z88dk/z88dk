@@ -103,6 +103,7 @@ struct LoweringPass {
     std::vector<StmtPtr> lower(PragmaStrVarStmt& stmt);
     std::vector<StmtPtr> lower(PragmaNumVarArrayStmt& stmt);
     std::vector<StmtPtr> lower(PragmaStrVarArrayStmt& stmt);
+    std::vector<StmtPtr> lower(PragmaLoopVarStmt& stmt);
 
     void append_stmts(std::vector<StmtPtr>& stmts,
                       std::vector<StmtPtr>& move_from);

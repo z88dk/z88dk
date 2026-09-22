@@ -279,7 +279,6 @@ L0000_START:
 
 L0000_END:
 
-AUTOSTART_ADDR:
 LABEL1:
 ;       2 LET A= 2
         DDB     2
@@ -324,6 +323,7 @@ L0020_START:
 
 L0020_END:
 
+AUTOSTART_ADDR:
 LABEL3:
 ;      30 LET A= &LABEL3
         DDB     30
@@ -5403,6 +5403,13 @@ VAR_A_END:
         DEFB    _2,_DOT,_1
         DEFB    _2,_DOT,_2
         DEFB    _2,_DOT,_3
+
+; Variable: I = 1 TO 10 STEP 1 GOTO 10
+        DEFB    (_I & 0x3F) | 0xE0
+        FLOAT   1
+        FLOAT   10
+        FLOAT   1
+        DEFW    10
 
 ; Variable: Z$ = ""
         DEFB    (_Z & 0x1F) | 0x40

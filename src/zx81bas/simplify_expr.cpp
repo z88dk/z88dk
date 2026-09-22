@@ -141,7 +141,7 @@ static ExprPtr fold_constants(ExprPtr expr) {
                 default:
                     return expr;  // unsupported operation
                 }
-                return std::make_unique<NumberExpr>(result, expr->loc);
+                return make_node<NumberExpr>(result, expr->loc);
             }
         }
     }

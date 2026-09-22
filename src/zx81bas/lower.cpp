@@ -289,8 +289,8 @@ std::vector<StmtPtr> LoweringPass::lower(LetStmt& stmt) {
     auto lowered_rhs = stmt.rhs->lower(*this);
     append_stmts(out, lowered_rhs.preamble);
 
-    auto new_stmt = std::make_unique<LetStmt>(std::move(lowered_lhs.rewritten),
-                    std::move(lowered_rhs.rewritten), stmt.loc);
+    auto new_stmt = make_node<LetStmt>(std::move(lowered_lhs.rewritten),
+                                       std::move(lowered_rhs.rewritten), stmt.loc);
     out.push_back(std::move(new_stmt));
 
     return out;
@@ -313,7 +313,7 @@ std::vector<StmtPtr> LoweringPass::lower(DimStmt& stmt) {
         new_item.name = dim_item.name;
         new_item.dims = std::move(lowered_dims);
 
-        auto new_stmt = std::make_unique<DimStmt>(stmt.loc);
+        auto new_stmt = make_node<DimStmt>(stmt.loc);
         new_stmt->items.push_back(std::move(new_item));
 
         out.push_back(std::move(new_stmt));
@@ -554,8 +554,8 @@ std::vector<StmtPtr> LoweringPass::lower(GotoStmt& stmt) {
 
     auto lowered_target = stmt.target_expr->lower(*this);
     append_stmts(out, lowered_target.preamble);
-    auto goto_stmt = std::make_unique<GotoStmt>(std::move(lowered_target.rewritten),
-                     stmt.loc);
+    auto goto_stmt = make_node<GotoStmt>(std::move(lowered_target.rewritten),
+                                         stmt.loc);
     out.push_back(std::move(goto_stmt));
 
     return out;
@@ -566,9 +566,9 @@ std::vector<StmtPtr> LoweringPass::lower(GosubStmt& stmt) {
 
     auto lowered_target = stmt.target_expr->lower(*this);
     append_stmts(out, lowered_target.preamble);
-    auto gosub_stmt = std::make_unique<GosubStmt>(std::move(
-                          lowered_target.rewritten),
-                      stmt.loc);
+    auto gosub_stmt = make_node<GosubStmt>(std::move(
+            lowered_target.rewritten),
+                                           stmt.loc);
     out.push_back(std::move(gosub_stmt));
 
     return out;
@@ -595,7 +595,7 @@ std::vector<StmtPtr> LoweringPass::lower(EndStmt& stmt) {
 std::vector<StmtPtr> LoweringPass::lower(PrintStmt& stmt) {
     std::vector<StmtPtr> out;
 
-    auto new_stmt = std::make_unique<PrintStmt>(stmt.loc);
+    auto new_stmt = make_node<PrintStmt>(stmt.loc);
     for (auto& item : stmt.items) {
         switch (item.type) {
         case PrintItem::Type::Expr: {
@@ -643,7 +643,7 @@ std::vector<StmtPtr> LoweringPass::lower(PrintStmt& stmt) {
 std::vector<StmtPtr> LoweringPass::lower(LPrintStmt& stmt) {
     std::vector<StmtPtr> out;
 
-    auto new_stmt = std::make_unique<LPrintStmt>(stmt.loc);
+    auto new_stmt = make_node<LPrintStmt>(stmt.loc);
     for (auto& item : stmt.items) {
         switch (item.type) {
         case PrintItem::Type::Expr: {
@@ -693,7 +693,7 @@ std::vector<StmtPtr> LoweringPass::lower(InputStmt& stmt) {
 
     // each INPUT statement is lowered into one INPUT statement per variable
     for (auto& var : stmt.vars) {
-        auto new_stmt = std::make_unique<InputStmt>(stmt.loc);
+        auto new_stmt = make_node<InputStmt>(stmt.loc);
         auto lowered_var = var->lower(*this);
         append_stmts(out, lowered_var.preamble);
         new_stmt->vars.push_back(std::move(lowered_var.rewritten));
@@ -712,7 +712,7 @@ std::vector<StmtPtr> LoweringPass::lower(RemStmt& stmt) {
 std::vector<StmtPtr> LoweringPass::lower(RunStmt& stmt) {
     std::vector<StmtPtr> out;
 
-    auto new_stmt = std::make_unique<RunStmt>(stmt.loc);
+    auto new_stmt = make_node<RunStmt>(stmt.loc);
     if (stmt.target_expr) {
         auto lowered_target = stmt.target_expr->lower(*this);
         append_stmts(out, lowered_target.preamble);
@@ -726,7 +726,7 @@ std::vector<StmtPtr> LoweringPass::lower(RunStmt& stmt) {
 std::vector<StmtPtr> LoweringPass::lower(ListStmt& stmt) {
     std::vector<StmtPtr> out;
 
-    auto new_stmt = std::make_unique<ListStmt>(stmt.loc);
+    auto new_stmt = make_node<ListStmt>(stmt.loc);
     if (stmt.target_expr) {
         auto lowered_target = stmt.target_expr->lower(*this);
         append_stmts(out, lowered_target.preamble);
@@ -740,7 +740,7 @@ std::vector<StmtPtr> LoweringPass::lower(ListStmt& stmt) {
 std::vector<StmtPtr> LoweringPass::lower(LListStmt& stmt) {
     std::vector<StmtPtr> out;
 
-    auto new_stmt = std::make_unique<LListStmt>(stmt.loc);
+    auto new_stmt = make_node<LListStmt>(stmt.loc);
     if (stmt.target_expr) {
         auto lowered_target = stmt.target_expr->lower(*this);
         append_stmts(out, lowered_target.preamble);
@@ -768,8 +768,8 @@ std::vector<StmtPtr> LoweringPass::lower(LoadStmt& stmt) {
 
     auto lowered_filename = stmt.filename_expr->lower(*this);
     append_stmts(out, lowered_filename.preamble);
-    auto new_stmt = std::make_unique<LoadStmt>(std::move(
-                        lowered_filename.rewritten), stmt.loc);
+    auto new_stmt = make_node<LoadStmt>(std::move(
+                                            lowered_filename.rewritten), stmt.loc);
     out.push_back(std::move(new_stmt));
 
     return out;
@@ -780,8 +780,8 @@ std::vector<StmtPtr> LoweringPass::lower(SaveStmt& stmt) {
 
     auto lowered_filename = stmt.filename_expr->lower(*this);
     append_stmts(out, lowered_filename.preamble);
-    auto new_stmt = std::make_unique<SaveStmt>(std::move(
-                        lowered_filename.rewritten), stmt.loc);
+    auto new_stmt = make_node<SaveStmt>(std::move(
+                                            lowered_filename.rewritten), stmt.loc);
     out.push_back(std::move(new_stmt));
 
     return out;
@@ -794,8 +794,8 @@ std::vector<StmtPtr> LoweringPass::lower(PokeStmt& stmt) {
     append_stmts(out, lowered_address.preamble);
     auto lowered_value = stmt.value_expr->lower(*this);
     append_stmts(out, lowered_value.preamble);
-    auto new_stmt = std::make_unique<PokeStmt>(std::move(lowered_address.rewritten),
-                    std::move(lowered_value.rewritten), stmt.loc);
+    auto new_stmt = make_node<PokeStmt>(std::move(lowered_address.rewritten),
+                                        std::move(lowered_value.rewritten), stmt.loc);
     out.push_back(std::move(new_stmt));
 
     return out;
@@ -813,8 +813,8 @@ std::vector<StmtPtr> LoweringPass::lower(PlotStmt& stmt) {
     append_stmts(out, lowered_x.preamble);
     auto lowered_y = stmt.y_expr->lower(*this);
     append_stmts(out, lowered_y.preamble);
-    auto new_stmt = std::make_unique<PlotStmt>(std::move(lowered_x.rewritten),
-                    std::move(lowered_y.rewritten), stmt.loc);
+    auto new_stmt = make_node<PlotStmt>(std::move(lowered_x.rewritten),
+                                        std::move(lowered_y.rewritten), stmt.loc);
     out.push_back(std::move(new_stmt));
 
     return out;
@@ -827,8 +827,8 @@ std::vector<StmtPtr> LoweringPass::lower(UnplotStmt& stmt) {
     append_stmts(out, lowered_x.preamble);
     auto lowered_y = stmt.y_expr->lower(*this);
     append_stmts(out, lowered_y.preamble);
-    auto new_stmt = std::make_unique<UnplotStmt>(std::move(lowered_x.rewritten),
-                    std::move(lowered_y.rewritten), stmt.loc);
+    auto new_stmt = make_node<UnplotStmt>(std::move(lowered_x.rewritten),
+                                          std::move(lowered_y.rewritten), stmt.loc);
     out.push_back(std::move(new_stmt));
 
     return out;
@@ -839,8 +839,8 @@ std::vector<StmtPtr> LoweringPass::lower(RandStmt& stmt) {
 
     auto lowered_seed = stmt.seed_expr->lower(*this);
     append_stmts(out, lowered_seed.preamble);
-    auto new_stmt = std::make_unique<RandStmt>(std::move(lowered_seed.rewritten),
-                    stmt.loc);
+    auto new_stmt = make_node<RandStmt>(std::move(lowered_seed.rewritten),
+                                        stmt.loc);
     out.push_back(std::move(new_stmt));
 
     return out;
@@ -851,8 +851,8 @@ std::vector<StmtPtr> LoweringPass::lower(PauseStmt& stmt) {
 
     auto lowered_duration = stmt.duration_expr->lower(*this);
     append_stmts(out, lowered_duration.preamble);
-    auto new_stmt = std::make_unique<PauseStmt>(std::move(
-                        lowered_duration.rewritten), stmt.loc);
+    auto new_stmt = make_node<PauseStmt>(std::move(
+            lowered_duration.rewritten), stmt.loc);
     out.push_back(std::move(new_stmt));
 
     return out;
@@ -910,6 +910,11 @@ std::vector<StmtPtr> LoweringPass::lower(PragmaNumVarArrayStmt&) {
 }
 
 std::vector<StmtPtr> LoweringPass::lower(PragmaStrVarArrayStmt&) {
+    std::vector<StmtPtr> out;
+    return out;
+}
+
+std::vector<StmtPtr> LoweringPass::lower(PragmaLoopVarStmt&) {
     std::vector<StmtPtr> out;
     return out;
 }

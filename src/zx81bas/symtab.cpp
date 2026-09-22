@@ -342,6 +342,14 @@ struct SymbolCollector : ASTVisitor {
         prog.pragma_vars.push_back(stmt.clone());
         stmt.rewrite.remove = true;
     }
+
+    void visit(PragmaLoopVarStmt& stmt) override {
+        update_vars(stmt.name, stmt.loc);
+
+        // move to pragma_vars section
+        prog.pragma_vars.push_back(stmt.clone());
+        stmt.rewrite.remove = true;
+    }
 };
 
 // collect undefined symbols
@@ -472,7 +480,7 @@ struct UndefinedCollector : ASTVisitor {
 };
 
 bool create_symtab(Prog& prog, std::unique_ptr<Symtab>& out_symtab) {
-    out_symtab = std::make_unique<Symtab>();
+    out_symtab = make_node<Symtab>();
 
     // rewrite PROC parameters and locals, detect nested PROCs
     ProcRewriter rewriter;

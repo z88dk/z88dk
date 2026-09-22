@@ -230,7 +230,7 @@ static void emit_prog(Prog& prog, int pass,
                     did_auto_start_addr = true;
                 }
             }
-            else if (line.line_num == prog.auto_start_line) {
+            else if (line.line_num >= prog.auto_start_line) {
                 emit(asm_source, "AUTOSTART_ADDR:");
                 did_auto_start_addr = true;
             }
@@ -373,11 +373,11 @@ static void emit_prog(Prog& prog, int pass,
         emit(asm_source, "");
         emit(asm_source, line_label + "_END:");
         emit(asm_source, "");
+    }
 
-        if (!did_auto_start_addr) {
-            emit(asm_source, "AUTOSTART_ADDR:");
-            did_auto_start_addr = true;
-        }
+    if (!did_auto_start_addr) {
+        emit(asm_source, "AUTOSTART_ADDR:");
+        did_auto_start_addr = true;
     }
 }
 
@@ -680,6 +680,35 @@ static void emit_var(const PragmaStrVarArrayStmt& stmt,
     emit(asm_source, "");
 }
 
+static void emit_var(const PragmaLoopVarStmt& stmt,
+                     std::vector<std::string>& asm_source) {
+    // header
+    std::ostringstream oss;
+    oss << "; Variable: " << stmt.name << " = " << stmt.value << " TO " <<
+        stmt.limit << " STEP " << stmt.step << " GOTO " << stmt.target_line;
+    emit(asm_source, oss.str());
+
+    // convert variable name to ZX81 bytes
+    const char* p = stmt.name.c_str();
+    uint8_t code = 0;
+    std::string encoded;
+
+    // 111-letter
+    if (!encode_zx81_char(p, /*check_keywords=*/false, code, stmt.loc)) {
+        error(stmt.loc, "Invalid variable name: '" + stmt.name + "'");
+        return;
+    }
+    encoded = zx81_char_name(code);
+    emit(asm_source, "", "DEFB", "(" + encoded + " & 0x3F) | 0xE0");
+
+    // put values
+    emit(asm_source, "", "FLOAT", double_to_string(stmt.value));
+    emit(asm_source, "", "FLOAT", double_to_string(stmt.limit));
+    emit(asm_source, "", "FLOAT", double_to_string(stmt.step));
+    emit(asm_source, "", "DEFW", std::to_string(stmt.target_line));
+    emit(asm_source, "");
+}
+
 static void emit_vars(Prog& prog, int pass,
                       std::vector<std::string>& asm_source) {
     emit(asm_source, "");
@@ -702,6 +731,10 @@ static void emit_vars(Prog& prog, int pass,
             continue;
         }
         if (auto var_stmt = dynamic_cast<const PragmaStrVarArrayStmt*>(stmt.get())) {
+            emit_var(*var_stmt, asm_source);
+            continue;
+        }
+        if (auto var_stmt = dynamic_cast<const PragmaLoopVarStmt*>(stmt.get())) {
             emit_var(*var_stmt, asm_source);
             continue;
         }

@@ -61,6 +61,9 @@ private:
     static bool is_func_zero_arg(Keyword keyword);
     static bool has_TO(const std::vector<Token>& tokens, size_t pos);
 
+    // numbers
+    double expect_int_or_float();
+
     // expression parsers
     ExprPtr parse_primary();
     ExprPtr parse_unary_expr();

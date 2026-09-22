@@ -21,319 +21,320 @@ test_t_input_03_t.bas:31: !VARS ABC=123
 test_t_input_03_t.bas:32: !VARS A(2,3)= 	1.1,1.2,1.3, 	2.1,2.2,2.3
 test_t_input_03_t.bas:35: !VARS A$ = "HELLO"
 test_t_input_03_t.bas:36: !VARS B$(2,3,3)= 	"1.1","1.2","1.3", 	"2.1","2.2","2.3"
-test_t_input_03_t.bas:39: !DFILE =  	"LINE 1",  	"LINE 2",  	"LINE 3",  	"LINE 4",  	"LINE 5",  	"LINE 6",  	"LINE 7",  	"LINE 8",  	"LINE 9",  	"LINE 10",  	"LINE 11",  	"LINE 12",  	"LINE 13",  	"LINE 14",  	"LINE 15",  	"LINE 16",  	"LINE 17",  	"LINE 18",  	"LINE 19",  	"LINE 20",  	"LINE 21",  	"LINE 22",  	"LINE 23",  	"LINE 24"
-test_t_input_03_t.bas:64: !DFILE_COLAPSED =  0 
-test_t_input_03_t.bas:65: !SYSVARS =  	0x00, 0x00, 0x00, 0x7d, 0x40, 0x7e, 0x40, 0x96,  	0x43, 0x00, 0x00, 0x97, 0x43, 0x9e, 0x43, 0x00,  	0x00, 0x9f, 0x43, 0x9f, 0x43, 0x00, 0x5d, 0x40,  	0xff, 0x02, 0x00, 0x00, 0xff, 0xff, 0x00, 0x37,  	0x7d, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8d,  	0x0c, 0x00, 0x00, 0x2f, 0xfd, 0x00, 0x00, 0x00,  	0x21, 0x18, 0x40, 0x00, 0x00, 0x09, 0x40, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00
-test_t_input_03_t.bas:86: !VARS Z$ = ""
-test_t_input_03_t.bas:87: !ASM
-test_t_input_03_t.bas:88: z_code:	ld a, 255
-test_t_input_03_t.bas:89: 		ld hl, @label1
-test_t_input_03_t.bas:90: 		ld hl, &label1
-test_t_input_03_t.bas:91: !ENDASM
-test_t_input_03_t.bas:97: @label1:		LET A = @label1
-test_t_input_03_t.bas:98: 10				LET A = &label1
-test_t_input_03_t.bas:99: 20 @label2:		LET A = @label2
-test_t_input_03_t.bas:100: @label3: 30		LET A = &label3
-test_t_input_03_t.bas:106: !ASM
-test_t_input_03_t.bas:107: label4:			nop
-test_t_input_03_t.bas:108: !ENDASM
-test_t_input_03_t.bas:115: 	LET A =   1	
-test_t_input_03_t.bas:118: !ASM			
-test_t_input_03_t.bas:119: 	ld a,   1	
-test_t_input_03_t.bas:122: !ENDASM			 
-test_t_input_03_t.bas:125: 	LET A =   1	
-test_t_input_03_t.bas:128: !ASM			
-test_t_input_03_t.bas:129: 	ld a,   1	
-test_t_input_03_t.bas:132: !ENDASM			 
-test_t_input_03_t.bas:138: !ASM
-test_t_input_03_t.bas:139: 	
-test_t_input_03_t.bas:140:  	ex af, aF				
-test_t_input_03_t.bas:141: !ENDASM
-test_t_input_03_t.bas:142: 	LET A$ =   "HELLO WORLD"		
-test_t_input_03_t.bas:150: 	LET A=1:LET B=2::LET C=3:::
-test_t_input_03_t.bas:151: !ASM
-test_t_input_03_t.bas:152: 	ld a,1:ld a,2::ld a,3:::
-test_t_input_03_t.bas:153: !ENDASM
-test_t_input_03_t.bas:159: 	LET A=1
-test_t_input_03_t.bas:160: 	LET ABC=1
-test_t_input_03_t.bas:161: 	LET A(1,2)=1
-test_t_input_03_t.bas:162: 	LET A$="HELLO"
-test_t_input_03_t.bas:163: 	LET A$(1,2)="A"
-test_t_input_03_t.bas:164: 	LET A$(1 TO 2)="AB"
-test_t_input_03_t.bas:165: 	LET A$(1,2)(3 TO 4)="AB"
-test_t_input_03_t.bas:166: 	LET A$(TO 3)="ABC"
-test_t_input_03_t.bas:167: 	LET A$(2 TO)="BCD"
-test_t_input_03_t.bas:169: 	A=1
-test_t_input_03_t.bas:170: 	ABC=1
-test_t_input_03_t.bas:171: 	A(1,2)=1
-test_t_input_03_t.bas:172: 	A$="HELLO"
-test_t_input_03_t.bas:173: 	A$(1,2)="A"
-test_t_input_03_t.bas:174: 	A$(1 TO 2)="AB"
-test_t_input_03_t.bas:175: 	A$(1,2)(3 TO 4)="AB"
-test_t_input_03_t.bas:176: 	A$(TO 3)="ABC"
-test_t_input_03_t.bas:177: 	A$(2 TO)="BCD"
-test_t_input_03_t.bas:183: 	DEF FNid(A) = A*1
-test_t_input_03_t.bas:185: 	LET A=10*FNid(42)+FNid(1+3)
-test_t_input_03_t.bas:186: 	LET A(FNid(42)) = 25
-test_t_input_03_t.bas:188: 	DEF PROCid(A) : PROCid = A+0 : ENDPROC
-test_t_input_03_t.bas:189: 	
-test_t_input_03_t.bas:190: 	LET A=10*PROCid(42)+PROCid(1+3)
-test_t_input_03_t.bas:191: 	LET A(PROCid(42)) = 25
-test_t_input_03_t.bas:197: 	LET A=RND
-test_t_input_03_t.bas:198: 	LET A$=INKEY$
-test_t_input_03_t.bas:199: 	LET A=PI
-test_t_input_03_t.bas:205: 	LET A=CODE"A"
-test_t_input_03_t.bas:206: 	LET A=CODE("A")
-test_t_input_03_t.bas:207: 	LET A=VAL"1"
-test_t_input_03_t.bas:208: 	LET A=VAL("1")
-test_t_input_03_t.bas:209: 	LET A=LEN"HELLO"
-test_t_input_03_t.bas:210: 	LET A=LEN("HELLO")
-test_t_input_03_t.bas:211: 	LET A=SIN 0
-test_t_input_03_t.bas:212: 	LET A=COS 0
-test_t_input_03_t.bas:213: 	LET A=TAN 0
-test_t_input_03_t.bas:214: 	LET A=ASN 0
-test_t_input_03_t.bas:215: 	LET A=ACS 0
-test_t_input_03_t.bas:216: 	LET A=ATN 0
-test_t_input_03_t.bas:217: 	LET A=LN 1
-test_t_input_03_t.bas:218: 	LET A=EXP 1
-test_t_input_03_t.bas:219: 	LET A=SQR 2
-test_t_input_03_t.bas:220: 	LET A=SGN +1
-test_t_input_03_t.bas:221: 	LET A=SGN -1
-test_t_input_03_t.bas:222: 	LET A=ABS +1
-test_t_input_03_t.bas:223: 	LET A=ABS -1
-test_t_input_03_t.bas:224: 	LET A=PEEK 0
-test_t_input_03_t.bas:225: 	LET A=PEEKW 0
-test_t_input_03_t.bas:226: 	LET A=USR 0
-test_t_input_03_t.bas:227: 	LET A$=STR$2
-test_t_input_03_t.bas:228: 	LET A$=CHR$0
-test_t_input_03_t.bas:229: 	LET A=NOT 0
-test_t_input_03_t.bas:230: 	LET A=1 AND 1
-test_t_input_03_t.bas:231: 	LET A=0 OR 0
-test_t_input_03_t.bas:233: 	LET A=ABS FNid(-3)
-test_t_input_03_t.bas:234: 	LET A=FNid(5) + FNid(7)
-test_t_input_03_t.bas:236: 	DEF FNf(A) = A*A
-test_t_input_03_t.bas:237: 	DEF FNg(B) = FNf(B+1) + 3
-test_t_input_03_t.bas:238: 	LET X = FNg(10)
-test_t_input_03_t.bas:244: 	LET A=1+2
-test_t_input_03_t.bas:245: 	LET A=1+-2
-test_t_input_03_t.bas:246: 	LET A=1-2
-test_t_input_03_t.bas:247: 	LET A=2*3
-test_t_input_03_t.bas:248: 	LET A=2/3
-test_t_input_03_t.bas:249: 	LET A=10\3
-test_t_input_03_t.bas:250: 	LET A=10 DIV 3
-test_t_input_03_t.bas:251: 	LET A=10 MOD 3
-test_t_input_03_t.bas:252: 	LET A=2**3
-test_t_input_03_t.bas:253: 	LET A=2**-3
-test_t_input_03_t.bas:254: 	LET A=1+2*3**4
-test_t_input_03_t.bas:260: 	DIM A(2), B(2,3), C(2,3,4)
-test_t_input_03_t.bas:261: 	DIM A$(2), B$(2,3), C$(2,3,4)
-test_t_input_03_t.bas:267: 	IF A=1 THEN B=2
-test_t_input_03_t.bas:268: 	IF A<>1 THEN :ELSE B=2
-test_t_input_03_t.bas:269: 	IF A<1 THEN B=2:C=3
-test_t_input_03_t.bas:270: 	IF A<=1 THEN B=2:C=3 ELSE
-test_t_input_03_t.bas:271: 	IF A>1 THEN B=2:C=3 ELSE D=4
-test_t_input_03_t.bas:272: 	IF A>=1 THEN B=2:C=3 ELSE D=4:E=5
-test_t_input_03_t.bas:273: 	IF NOT (A=1) THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3
-test_t_input_03_t.bas:275: 	IF A=1 THEN
-test_t_input_03_t.bas:276: 		B=1
-test_t_input_03_t.bas:277: 		C=1
-test_t_input_03_t.bas:278: 	ENDIF
-test_t_input_03_t.bas:280: 	IF A=1 THEN
-test_t_input_03_t.bas:281: 		B=1
-test_t_input_03_t.bas:282: 		C=1
-test_t_input_03_t.bas:283: 	ELSE
-test_t_input_03_t.bas:284: 		B=2
-test_t_input_03_t.bas:285: 		IF A=2 THEN
-test_t_input_03_t.bas:286: 			C=2
-test_t_input_03_t.bas:287: 		ELSE
-test_t_input_03_t.bas:288: 			C=3
-test_t_input_03_t.bas:289: 		ENDIF
-test_t_input_03_t.bas:290: 	ENDIF
-test_t_input_03_t.bas:292: 	IF A=1 THEN
-test_t_input_03_t.bas:293: 		B=1 : C=1 : ENDIF : D=1
-test_t_input_03_t.bas:299: 	REPEAT A=1 UNTIL A=1
-test_t_input_03_t.bas:300: 	REPEAT B=1: REPEAT C=1 UNTIL A=1 UNTIL A=2
-test_t_input_03_t.bas:302: 	REPEAT
-test_t_input_03_t.bas:303: 		A=1
-test_t_input_03_t.bas:304: 		B=2
-test_t_input_03_t.bas:305: 		IF A=2 THEN EXIT
-test_t_input_03_t.bas:306: 		REPEAT
-test_t_input_03_t.bas:307: 			C=3
-test_t_input_03_t.bas:308: 		UNTIL A=2
-test_t_input_03_t.bas:309: 	UNTIL A=1
-test_t_input_03_t.bas:311: 	REPEAT
-test_t_input_03_t.bas:312: 		A=1 : B=2 : UNTIL A=1 : C=1
-test_t_input_03_t.bas:318: 	WHILE A<>1: A=1:B=2:C=3 WEND
-test_t_input_03_t.bas:320: 	WHILE A=1:B=1:WHILE A=2:C=1:WEND:WEND
-test_t_input_03_t.bas:322: 	WHILE A<>1
-test_t_input_03_t.bas:323: 		A=1
-test_t_input_03_t.bas:324: 		B=2
-test_t_input_03_t.bas:325: 		IF A=2 THEN EXIT
-test_t_input_03_t.bas:326: 		WHILE A<>2
-test_t_input_03_t.bas:327: 			C=3
-test_t_input_03_t.bas:328: 		WEND
-test_t_input_03_t.bas:329: 	WEND
-test_t_input_03_t.bas:331: 	WHILE A<>2
-test_t_input_03_t.bas:332: 		C=3 : WEND : C=4
-test_t_input_03_t.bas:338: 	LET S=0
-test_t_input_03_t.bas:339: 	FOR I=1 TO 10 STEP SGN 1:LET S=S+I:NEXT I
-test_t_input_03_t.bas:341: 	FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT J:NEXT I
-test_t_input_03_t.bas:343: 	FOR I=1 TO 10 STEP 2
-test_t_input_03_t.bas:344: 		S=S+I
-test_t_input_03_t.bas:345: 		IF I=2 THEN EXIT
-test_t_input_03_t.bas:346: 		FOR J=1 TO 10 STEP 2
-test_t_input_03_t.bas:347: 			A=I*J
-test_t_input_03_t.bas:348: 		NEXT J
-test_t_input_03_t.bas:349: 	NEXT I
-test_t_input_03_t.bas:351: 	FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT:NEXT
-test_t_input_03_t.bas:353: 	FOR I=1 TO 10 STEP 2
-test_t_input_03_t.bas:354: 		FOR J=1 TO 10 STEP 2
-test_t_input_03_t.bas:355: 			A=I*J:NEXT:NEXT
-test_t_input_03_t.bas:361: 	DEF PROCname(A, B)
-test_t_input_03_t.bas:362: 		LOCAL L
-test_t_input_03_t.bas:363: 		LOCAL L1, L2
-test_t_input_03_t.bas:364: 		IF 1 THEN
-test_t_input_03_t.bas:365: 			LOCAL L3
-test_t_input_03_t.bas:366: 		ENDIF
-test_t_input_03_t.bas:367: 		L = A + B
-test_t_input_03_t.bas:368: 		IF A = 2 THEN EXIT
-test_t_input_03_t.bas:369: 		RESULT = L
-test_t_input_03_t.bas:370: 		PROCname = L
-test_t_input_03_t.bas:371: 	ENDPROC
-test_t_input_03_t.bas:373: 	PROCname 10, 20
-test_t_input_03_t.bas:374: 	PROCname(30, 40)
-test_t_input_03_t.bas:376: 	A = 1 + PROCname(50, 60)
-test_t_input_03_t.bas:378: 	DEF procempty()
-test_t_input_03_t.bas:379: 		procempty = PI
-test_t_input_03_t.bas:380: 	ENDPROC
-test_t_input_03_t.bas:382: 	procempty
-test_t_input_03_t.bas:383: 	procempty()
-test_t_input_03_t.bas:384: 	A = 1 + procempty()
-test_t_input_03_t.bas:386: 	DEF PROCj(A)
-test_t_input_03_t.bas:387: 		PROCj=10*A
-test_t_input_03_t.bas:388: 	ENDPROC
-test_t_input_03_t.bas:390: 	LET A=10*PROCj(5+5)
-test_t_input_03_t.bas:396: 	DEF FNname(A,B) = A * B
-test_t_input_03_t.bas:398: 	A = FNname(10,20) + FNname(1+2,3+4)
-test_t_input_03_t.bas:400: 	DEF fnempty() = PI
-test_t_input_03_t.bas:402: 	A = 2 * fnempty()
-test_t_input_03_t.bas:408: 1000
-test_t_input_03_t.bas:409: 	GOTO 1000
-test_t_input_03_t.bas:410: 	GOTO 1000+20*A
-test_t_input_03_t.bas:411: 	GOTO @label1
-test_t_input_03_t.bas:417: 	GOSUB 1000
-test_t_input_03_t.bas:418: 	GOSUB 1000+20*A
-test_t_input_03_t.bas:419: 	GOSUB @label1
-test_t_input_03_t.bas:425: 	RETURN
-test_t_input_03_t.bas:431: 	STOP
-test_t_input_03_t.bas:437: 	END
-test_t_input_03_t.bas:443: 	PRINT
-test_t_input_03_t.bas:444: 	PRINT ,
-test_t_input_03_t.bas:445: 	PRINT ;
-test_t_input_03_t.bas:446: 	PRINT 2*3
-test_t_input_03_t.bas:447: 	PRINT TAB 8;
-test_t_input_03_t.bas:448: 	PRINT AT 10,10;
-test_t_input_03_t.bas:449: 	PRINT AT 10,10;"HELLO";TAB 10;"WORLD";
-test_t_input_03_t.bas:455: 	LPRINT
-test_t_input_03_t.bas:456: 	LPRINT ,
-test_t_input_03_t.bas:457: 	LPRINT ;
-test_t_input_03_t.bas:458: 	LPRINT 2*3
-test_t_input_03_t.bas:459: 	LPRINT TAB 8;
-test_t_input_03_t.bas:460: 	LPRINT AT 10,10;
-test_t_input_03_t.bas:461: 	LPRINT AT 10,10;"HELLO";TAB 10;"WORLD";
-test_t_input_03_t.bas:467: 	INPUT A, ABC
-test_t_input_03_t.bas:468: 	INPUT A(1,2)
-test_t_input_03_t.bas:469: 	INPUT A$
-test_t_input_03_t.bas:470: 	INPUT A$(1,2)
-test_t_input_03_t.bas:471: 	INPUT A$(1 TO 2)
-test_t_input_03_t.bas:472: 	INPUT A$(1,2)(3 TO 4)
-test_t_input_03_t.bas:473: 	INPUT A$(TO 3)
-test_t_input_03_t.bas:474: 	INPUT A$(2 TO)
-test_t_input_03_t.bas:475: 	INPUT A,A$
-test_t_input_03_t.bas:476: 	INPUT I1,I(10)
-test_t_input_03_t.bas:482: 	REM
-test_t_input_03_t.bas:483: 	REM COMMENT TEXT : COLONS ARE PART OF COMMENT
-test_t_input_03_t.bas:484: !ASM
-test_t_input_03_t.bas:485: 	start_rem:
-test_t_input_03_t.bas:486: !ENDASM
-test_t_input_03_t.bas:488: !ASM
-test_t_input_03_t.bas:489: 		ret
-test_t_input_03_t.bas:490: !ENDASM
-test_t_input_03_t.bas:496: 	RUN 
-test_t_input_03_t.bas:497: 	RUN 1000
-test_t_input_03_t.bas:498: 	RUN 1000+20*A
-test_t_input_03_t.bas:499: 	RUN @label1
-test_t_input_03_t.bas:505: 	NEW
-test_t_input_03_t.bas:511: 	CLS
-test_t_input_03_t.bas:517: 	LOAD "file"
-test_t_input_03_t.bas:523: 	SAVE "file"
-test_t_input_03_t.bas:529: 	POKE 16384,0xff
-test_t_input_03_t.bas:535: 	POKEW 16384,$0102
-test_t_input_03_t.bas:541: 	RAND USR 16514
-test_t_input_03_t.bas:547: 	PAUSE 50
-test_t_input_03_t.bas:553: 	FAST
-test_t_input_03_t.bas:559: 	SLOW
-test_t_input_03_t.bas:565: 	LIST
-test_t_input_03_t.bas:566: 	LIST 10
-test_t_input_03_t.bas:567: 	LIST 10*4
-test_t_input_03_t.bas:568: 	LIST @label1
-test_t_input_03_t.bas:569: 	
-test_t_input_03_t.bas:574: 	LLIST
-test_t_input_03_t.bas:575: 	LLIST 10
-test_t_input_03_t.bas:576: 	LLIST 10*4
-test_t_input_03_t.bas:577: 	LLIST @label1
-test_t_input_03_t.bas:578: 	
-test_t_input_03_t.bas:583: 	X=0:Y=0
-test_t_input_03_t.bas:584: 	PLOT 0,1
-test_t_input_03_t.bas:585: 	PLOT X,Y
-test_t_input_03_t.bas:591: 	UNPLOT 0,1
-test_t_input_03_t.bas:592: 	UNPLOT X,Y
-test_t_input_03_t.bas:598: 	SCROLL
-test_t_input_03_t.bas:604: 	CONT
-test_t_input_03_t.bas:610: 	CLEAR
-test_t_input_03_t.bas:616: 	COPY
-test_t_input_03_t.bas:622: !ASM
-test_t_input_03_t.bas:625: 	public value1, value2
-test_t_input_03_t.bas:627: value1 = 12
-test_t_input_03_t.bas:628: value2 equ 13
-test_t_input_03_t.bas:630: show_bc:
-test_t_input_03_t.bas:631: 	ret
-test_t_input_03_t.bas:632: 	
-test_t_input_03_t.bas:633: .set_bc
-test_t_input_03_t.bas:634: 	ld bc, 0
-test_t_input_03_t.bas:635: 	ret
-test_t_input_03_t.bas:637: message:	DEFM "HELLO"
-test_t_input_03_t.bas:639: move_message:
-test_t_input_03_t.bas:640: 	ld hl, message
-test_t_input_03_t.bas:641: 	ld de, &message_target+6
-test_t_input_03_t.bas:642: 	ld bc, 5
-test_t_input_03_t.bas:643: 	ldir
-test_t_input_03_t.bas:644: 	ret
-test_t_input_03_t.bas:645: 	
-test_t_input_03_t.bas:646: line_number:
-test_t_input_03_t.bas:647: 	ld bc, @start
-test_t_input_03_t.bas:648: 	ret
-test_t_input_03_t.bas:649: 	
-test_t_input_03_t.bas:650: start_address:
-test_t_input_03_t.bas:651: 	ld bc, &show_bc
-test_t_input_03_t.bas:652: 	ret
-test_t_input_03_t.bas:653: 	
-test_t_input_03_t.bas:654: !ENDASM
-test_t_input_03_t.bas:656: @start:
-test_t_input_03_t.bas:657: 	PRINT USR &line_number, USR &start_address
-test_t_input_03_t.bas:658: 	PRINT USR &move_message
-test_t_input_03_t.bas:659: 	
-test_t_input_03_t.bas:660: @message_target:
-test_t_input_03_t.bas:661: 	PRINT "12345" 
-test_t_input_03_t.bas:662: 	PRINT USR &show_bc
-test_t_input_03_t.bas:663: 	
-test_t_input_03_t.bas:664: 	POKEW &set_bc+1,12345
-test_t_input_03_t.bas:665: 	PRINT USR &set_bc
-test_t_input_03_t.bas:667: 	PRINT &value1, &value2
-test_t_input_03_t.bas:673: 	PRINT "HELLO"
-test_t_input_03_t.bas:675: !ASM
-test_t_input_03_t.bas:676: end:		
-test_t_input_03_t.bas:677: 	ld a, 'H'
-test_t_input_03_t.bas:678: 	DEFM "HELLO"
-test_t_input_03_t.bas:679: 	ld hl,&label1
-test_t_input_03_t.bas:680: !ENDASM
+test_t_input_03_t.bas:39: !VARS I=1,10,1,10
+test_t_input_03_t.bas:40: !DFILE =  	"LINE 1",  	"LINE 2",  	"LINE 3",  	"LINE 4",  	"LINE 5",  	"LINE 6",  	"LINE 7",  	"LINE 8",  	"LINE 9",  	"LINE 10",  	"LINE 11",  	"LINE 12",  	"LINE 13",  	"LINE 14",  	"LINE 15",  	"LINE 16",  	"LINE 17",  	"LINE 18",  	"LINE 19",  	"LINE 20",  	"LINE 21",  	"LINE 22",  	"LINE 23",  	"LINE 24"
+test_t_input_03_t.bas:65: !DFILE_COLAPSED =  0 
+test_t_input_03_t.bas:66: !SYSVARS =  	0x00, 0x00, 0x00, 0x7d, 0x40, 0x7e, 0x40, 0x96,  	0x43, 0x00, 0x00, 0x97, 0x43, 0x9e, 0x43, 0x00,  	0x00, 0x9f, 0x43, 0x9f, 0x43, 0x00, 0x5d, 0x40,  	0xff, 0x02, 0x00, 0x00, 0xff, 0xff, 0x00, 0x37,  	0x7d, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8d,  	0x0c, 0x00, 0x00, 0x2f, 0xfd, 0x00, 0x00, 0x00,  	0x21, 0x18, 0x40, 0x00, 0x00, 0x09, 0x40, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00
+test_t_input_03_t.bas:87: !VARS Z$ = ""
+test_t_input_03_t.bas:88: !ASM
+test_t_input_03_t.bas:89: z_code:	ld a, 255
+test_t_input_03_t.bas:90: 		ld hl, @label1
+test_t_input_03_t.bas:91: 		ld hl, &label1
+test_t_input_03_t.bas:92: !ENDASM
+test_t_input_03_t.bas:98: @label1:		LET A = @label1
+test_t_input_03_t.bas:99: 10				LET A = &label1
+test_t_input_03_t.bas:100: 20 @label2:		LET A = @label2
+test_t_input_03_t.bas:101: @label3: 30		LET A = &label3
+test_t_input_03_t.bas:107: !ASM
+test_t_input_03_t.bas:108: label4:			nop
+test_t_input_03_t.bas:109: !ENDASM
+test_t_input_03_t.bas:116: 	LET A =   1	
+test_t_input_03_t.bas:119: !ASM			
+test_t_input_03_t.bas:120: 	ld a,   1	
+test_t_input_03_t.bas:123: !ENDASM			 
+test_t_input_03_t.bas:126: 	LET A =   1	
+test_t_input_03_t.bas:129: !ASM			
+test_t_input_03_t.bas:130: 	ld a,   1	
+test_t_input_03_t.bas:133: !ENDASM			 
+test_t_input_03_t.bas:139: !ASM
+test_t_input_03_t.bas:140: 	
+test_t_input_03_t.bas:141:  	ex af, aF				
+test_t_input_03_t.bas:142: !ENDASM
+test_t_input_03_t.bas:143: 	LET A$ =   "HELLO WORLD"		
+test_t_input_03_t.bas:151: 	LET A=1:LET B=2::LET C=3:::
+test_t_input_03_t.bas:152: !ASM
+test_t_input_03_t.bas:153: 	ld a,1:ld a,2::ld a,3:::
+test_t_input_03_t.bas:154: !ENDASM
+test_t_input_03_t.bas:160: 	LET A=1
+test_t_input_03_t.bas:161: 	LET ABC=1
+test_t_input_03_t.bas:162: 	LET A(1,2)=1
+test_t_input_03_t.bas:163: 	LET A$="HELLO"
+test_t_input_03_t.bas:164: 	LET A$(1,2)="A"
+test_t_input_03_t.bas:165: 	LET A$(1 TO 2)="AB"
+test_t_input_03_t.bas:166: 	LET A$(1,2)(3 TO 4)="AB"
+test_t_input_03_t.bas:167: 	LET A$(TO 3)="ABC"
+test_t_input_03_t.bas:168: 	LET A$(2 TO)="BCD"
+test_t_input_03_t.bas:170: 	A=1
+test_t_input_03_t.bas:171: 	ABC=1
+test_t_input_03_t.bas:172: 	A(1,2)=1
+test_t_input_03_t.bas:173: 	A$="HELLO"
+test_t_input_03_t.bas:174: 	A$(1,2)="A"
+test_t_input_03_t.bas:175: 	A$(1 TO 2)="AB"
+test_t_input_03_t.bas:176: 	A$(1,2)(3 TO 4)="AB"
+test_t_input_03_t.bas:177: 	A$(TO 3)="ABC"
+test_t_input_03_t.bas:178: 	A$(2 TO)="BCD"
+test_t_input_03_t.bas:184: 	DEF FNid(A) = A*1
+test_t_input_03_t.bas:186: 	LET A=10*FNid(42)+FNid(1+3)
+test_t_input_03_t.bas:187: 	LET A(FNid(42)) = 25
+test_t_input_03_t.bas:189: 	DEF PROCid(A) : PROCid = A+0 : ENDPROC
+test_t_input_03_t.bas:190: 	
+test_t_input_03_t.bas:191: 	LET A=10*PROCid(42)+PROCid(1+3)
+test_t_input_03_t.bas:192: 	LET A(PROCid(42)) = 25
+test_t_input_03_t.bas:198: 	LET A=RND
+test_t_input_03_t.bas:199: 	LET A$=INKEY$
+test_t_input_03_t.bas:200: 	LET A=PI
+test_t_input_03_t.bas:206: 	LET A=CODE"A"
+test_t_input_03_t.bas:207: 	LET A=CODE("A")
+test_t_input_03_t.bas:208: 	LET A=VAL"1"
+test_t_input_03_t.bas:209: 	LET A=VAL("1")
+test_t_input_03_t.bas:210: 	LET A=LEN"HELLO"
+test_t_input_03_t.bas:211: 	LET A=LEN("HELLO")
+test_t_input_03_t.bas:212: 	LET A=SIN 0
+test_t_input_03_t.bas:213: 	LET A=COS 0
+test_t_input_03_t.bas:214: 	LET A=TAN 0
+test_t_input_03_t.bas:215: 	LET A=ASN 0
+test_t_input_03_t.bas:216: 	LET A=ACS 0
+test_t_input_03_t.bas:217: 	LET A=ATN 0
+test_t_input_03_t.bas:218: 	LET A=LN 1
+test_t_input_03_t.bas:219: 	LET A=EXP 1
+test_t_input_03_t.bas:220: 	LET A=SQR 2
+test_t_input_03_t.bas:221: 	LET A=SGN +1
+test_t_input_03_t.bas:222: 	LET A=SGN -1
+test_t_input_03_t.bas:223: 	LET A=ABS +1
+test_t_input_03_t.bas:224: 	LET A=ABS -1
+test_t_input_03_t.bas:225: 	LET A=PEEK 0
+test_t_input_03_t.bas:226: 	LET A=PEEKW 0
+test_t_input_03_t.bas:227: 	LET A=USR 0
+test_t_input_03_t.bas:228: 	LET A$=STR$2
+test_t_input_03_t.bas:229: 	LET A$=CHR$0
+test_t_input_03_t.bas:230: 	LET A=NOT 0
+test_t_input_03_t.bas:231: 	LET A=1 AND 1
+test_t_input_03_t.bas:232: 	LET A=0 OR 0
+test_t_input_03_t.bas:234: 	LET A=ABS FNid(-3)
+test_t_input_03_t.bas:235: 	LET A=FNid(5) + FNid(7)
+test_t_input_03_t.bas:237: 	DEF FNf(A) = A*A
+test_t_input_03_t.bas:238: 	DEF FNg(B) = FNf(B+1) + 3
+test_t_input_03_t.bas:239: 	LET X = FNg(10)
+test_t_input_03_t.bas:245: 	LET A=1+2
+test_t_input_03_t.bas:246: 	LET A=1+-2
+test_t_input_03_t.bas:247: 	LET A=1-2
+test_t_input_03_t.bas:248: 	LET A=2*3
+test_t_input_03_t.bas:249: 	LET A=2/3
+test_t_input_03_t.bas:250: 	LET A=10\3
+test_t_input_03_t.bas:251: 	LET A=10 DIV 3
+test_t_input_03_t.bas:252: 	LET A=10 MOD 3
+test_t_input_03_t.bas:253: 	LET A=2**3
+test_t_input_03_t.bas:254: 	LET A=2**-3
+test_t_input_03_t.bas:255: 	LET A=1+2*3**4
+test_t_input_03_t.bas:261: 	DIM A(2), B(2,3), C(2,3,4)
+test_t_input_03_t.bas:262: 	DIM A$(2), B$(2,3), C$(2,3,4)
+test_t_input_03_t.bas:268: 	IF A=1 THEN B=2
+test_t_input_03_t.bas:269: 	IF A<>1 THEN :ELSE B=2
+test_t_input_03_t.bas:270: 	IF A<1 THEN B=2:C=3
+test_t_input_03_t.bas:271: 	IF A<=1 THEN B=2:C=3 ELSE
+test_t_input_03_t.bas:272: 	IF A>1 THEN B=2:C=3 ELSE D=4
+test_t_input_03_t.bas:273: 	IF A>=1 THEN B=2:C=3 ELSE D=4:E=5
+test_t_input_03_t.bas:274: 	IF NOT (A=1) THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3
+test_t_input_03_t.bas:276: 	IF A=1 THEN
+test_t_input_03_t.bas:277: 		B=1
+test_t_input_03_t.bas:278: 		C=1
+test_t_input_03_t.bas:279: 	ENDIF
+test_t_input_03_t.bas:281: 	IF A=1 THEN
+test_t_input_03_t.bas:282: 		B=1
+test_t_input_03_t.bas:283: 		C=1
+test_t_input_03_t.bas:284: 	ELSE
+test_t_input_03_t.bas:285: 		B=2
+test_t_input_03_t.bas:286: 		IF A=2 THEN
+test_t_input_03_t.bas:287: 			C=2
+test_t_input_03_t.bas:288: 		ELSE
+test_t_input_03_t.bas:289: 			C=3
+test_t_input_03_t.bas:290: 		ENDIF
+test_t_input_03_t.bas:291: 	ENDIF
+test_t_input_03_t.bas:293: 	IF A=1 THEN
+test_t_input_03_t.bas:294: 		B=1 : C=1 : ENDIF : D=1
+test_t_input_03_t.bas:300: 	REPEAT A=1 UNTIL A=1
+test_t_input_03_t.bas:301: 	REPEAT B=1: REPEAT C=1 UNTIL A=1 UNTIL A=2
+test_t_input_03_t.bas:303: 	REPEAT
+test_t_input_03_t.bas:304: 		A=1
+test_t_input_03_t.bas:305: 		B=2
+test_t_input_03_t.bas:306: 		IF A=2 THEN EXIT
+test_t_input_03_t.bas:307: 		REPEAT
+test_t_input_03_t.bas:308: 			C=3
+test_t_input_03_t.bas:309: 		UNTIL A=2
+test_t_input_03_t.bas:310: 	UNTIL A=1
+test_t_input_03_t.bas:312: 	REPEAT
+test_t_input_03_t.bas:313: 		A=1 : B=2 : UNTIL A=1 : C=1
+test_t_input_03_t.bas:319: 	WHILE A<>1: A=1:B=2:C=3 WEND
+test_t_input_03_t.bas:321: 	WHILE A=1:B=1:WHILE A=2:C=1:WEND:WEND
+test_t_input_03_t.bas:323: 	WHILE A<>1
+test_t_input_03_t.bas:324: 		A=1
+test_t_input_03_t.bas:325: 		B=2
+test_t_input_03_t.bas:326: 		IF A=2 THEN EXIT
+test_t_input_03_t.bas:327: 		WHILE A<>2
+test_t_input_03_t.bas:328: 			C=3
+test_t_input_03_t.bas:329: 		WEND
+test_t_input_03_t.bas:330: 	WEND
+test_t_input_03_t.bas:332: 	WHILE A<>2
+test_t_input_03_t.bas:333: 		C=3 : WEND : C=4
+test_t_input_03_t.bas:339: 	LET S=0
+test_t_input_03_t.bas:340: 	FOR I=1 TO 10 STEP SGN 1:LET S=S+I:NEXT I
+test_t_input_03_t.bas:342: 	FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT J:NEXT I
+test_t_input_03_t.bas:344: 	FOR I=1 TO 10 STEP 2
+test_t_input_03_t.bas:345: 		S=S+I
+test_t_input_03_t.bas:346: 		IF I=2 THEN EXIT
+test_t_input_03_t.bas:347: 		FOR J=1 TO 10 STEP 2
+test_t_input_03_t.bas:348: 			A=I*J
+test_t_input_03_t.bas:349: 		NEXT J
+test_t_input_03_t.bas:350: 	NEXT I
+test_t_input_03_t.bas:352: 	FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT:NEXT
+test_t_input_03_t.bas:354: 	FOR I=1 TO 10 STEP 2
+test_t_input_03_t.bas:355: 		FOR J=1 TO 10 STEP 2
+test_t_input_03_t.bas:356: 			A=I*J:NEXT:NEXT
+test_t_input_03_t.bas:362: 	DEF PROCname(A, B)
+test_t_input_03_t.bas:363: 		LOCAL L
+test_t_input_03_t.bas:364: 		LOCAL L1, L2
+test_t_input_03_t.bas:365: 		IF 1 THEN
+test_t_input_03_t.bas:366: 			LOCAL L3
+test_t_input_03_t.bas:367: 		ENDIF
+test_t_input_03_t.bas:368: 		L = A + B
+test_t_input_03_t.bas:369: 		IF A = 2 THEN EXIT
+test_t_input_03_t.bas:370: 		RESULT = L
+test_t_input_03_t.bas:371: 		PROCname = L
+test_t_input_03_t.bas:372: 	ENDPROC
+test_t_input_03_t.bas:374: 	PROCname 10, 20
+test_t_input_03_t.bas:375: 	PROCname(30, 40)
+test_t_input_03_t.bas:377: 	A = 1 + PROCname(50, 60)
+test_t_input_03_t.bas:379: 	DEF procempty()
+test_t_input_03_t.bas:380: 		procempty = PI
+test_t_input_03_t.bas:381: 	ENDPROC
+test_t_input_03_t.bas:383: 	procempty
+test_t_input_03_t.bas:384: 	procempty()
+test_t_input_03_t.bas:385: 	A = 1 + procempty()
+test_t_input_03_t.bas:387: 	DEF PROCj(A)
+test_t_input_03_t.bas:388: 		PROCj=10*A
+test_t_input_03_t.bas:389: 	ENDPROC
+test_t_input_03_t.bas:391: 	LET A=10*PROCj(5+5)
+test_t_input_03_t.bas:397: 	DEF FNname(A,B) = A * B
+test_t_input_03_t.bas:399: 	A = FNname(10,20) + FNname(1+2,3+4)
+test_t_input_03_t.bas:401: 	DEF fnempty() = PI
+test_t_input_03_t.bas:403: 	A = 2 * fnempty()
+test_t_input_03_t.bas:409: 1000
+test_t_input_03_t.bas:410: 	GOTO 1000
+test_t_input_03_t.bas:411: 	GOTO 1000+20*A
+test_t_input_03_t.bas:412: 	GOTO @label1
+test_t_input_03_t.bas:418: 	GOSUB 1000
+test_t_input_03_t.bas:419: 	GOSUB 1000+20*A
+test_t_input_03_t.bas:420: 	GOSUB @label1
+test_t_input_03_t.bas:426: 	RETURN
+test_t_input_03_t.bas:432: 	STOP
+test_t_input_03_t.bas:438: 	END
+test_t_input_03_t.bas:444: 	PRINT
+test_t_input_03_t.bas:445: 	PRINT ,
+test_t_input_03_t.bas:446: 	PRINT ;
+test_t_input_03_t.bas:447: 	PRINT 2*3
+test_t_input_03_t.bas:448: 	PRINT TAB 8;
+test_t_input_03_t.bas:449: 	PRINT AT 10,10;
+test_t_input_03_t.bas:450: 	PRINT AT 10,10;"HELLO";TAB 10;"WORLD";
+test_t_input_03_t.bas:456: 	LPRINT
+test_t_input_03_t.bas:457: 	LPRINT ,
+test_t_input_03_t.bas:458: 	LPRINT ;
+test_t_input_03_t.bas:459: 	LPRINT 2*3
+test_t_input_03_t.bas:460: 	LPRINT TAB 8;
+test_t_input_03_t.bas:461: 	LPRINT AT 10,10;
+test_t_input_03_t.bas:462: 	LPRINT AT 10,10;"HELLO";TAB 10;"WORLD";
+test_t_input_03_t.bas:468: 	INPUT A, ABC
+test_t_input_03_t.bas:469: 	INPUT A(1,2)
+test_t_input_03_t.bas:470: 	INPUT A$
+test_t_input_03_t.bas:471: 	INPUT A$(1,2)
+test_t_input_03_t.bas:472: 	INPUT A$(1 TO 2)
+test_t_input_03_t.bas:473: 	INPUT A$(1,2)(3 TO 4)
+test_t_input_03_t.bas:474: 	INPUT A$(TO 3)
+test_t_input_03_t.bas:475: 	INPUT A$(2 TO)
+test_t_input_03_t.bas:476: 	INPUT A,A$
+test_t_input_03_t.bas:477: 	INPUT I1,I(10)
+test_t_input_03_t.bas:483: 	REM
+test_t_input_03_t.bas:484: 	REM COMMENT TEXT : COLONS ARE PART OF COMMENT
+test_t_input_03_t.bas:485: !ASM
+test_t_input_03_t.bas:486: 	start_rem:
+test_t_input_03_t.bas:487: !ENDASM
+test_t_input_03_t.bas:489: !ASM
+test_t_input_03_t.bas:490: 		ret
+test_t_input_03_t.bas:491: !ENDASM
+test_t_input_03_t.bas:497: 	RUN 
+test_t_input_03_t.bas:498: 	RUN 1000
+test_t_input_03_t.bas:499: 	RUN 1000+20*A
+test_t_input_03_t.bas:500: 	RUN @label1
+test_t_input_03_t.bas:506: 	NEW
+test_t_input_03_t.bas:512: 	CLS
+test_t_input_03_t.bas:518: 	LOAD "file"
+test_t_input_03_t.bas:524: 	SAVE "file"
+test_t_input_03_t.bas:530: 	POKE 16384,0xff
+test_t_input_03_t.bas:536: 	POKEW 16384,$0102
+test_t_input_03_t.bas:542: 	RAND USR 16514
+test_t_input_03_t.bas:548: 	PAUSE 50
+test_t_input_03_t.bas:554: 	FAST
+test_t_input_03_t.bas:560: 	SLOW
+test_t_input_03_t.bas:566: 	LIST
+test_t_input_03_t.bas:567: 	LIST 10
+test_t_input_03_t.bas:568: 	LIST 10*4
+test_t_input_03_t.bas:569: 	LIST @label1
+test_t_input_03_t.bas:570: 	
+test_t_input_03_t.bas:575: 	LLIST
+test_t_input_03_t.bas:576: 	LLIST 10
+test_t_input_03_t.bas:577: 	LLIST 10*4
+test_t_input_03_t.bas:578: 	LLIST @label1
+test_t_input_03_t.bas:579: 	
+test_t_input_03_t.bas:584: 	X=0:Y=0
+test_t_input_03_t.bas:585: 	PLOT 0,1
+test_t_input_03_t.bas:586: 	PLOT X,Y
+test_t_input_03_t.bas:592: 	UNPLOT 0,1
+test_t_input_03_t.bas:593: 	UNPLOT X,Y
+test_t_input_03_t.bas:599: 	SCROLL
+test_t_input_03_t.bas:605: 	CONT
+test_t_input_03_t.bas:611: 	CLEAR
+test_t_input_03_t.bas:617: 	COPY
+test_t_input_03_t.bas:623: !ASM
+test_t_input_03_t.bas:626: 	public value1, value2
+test_t_input_03_t.bas:628: value1 = 12
+test_t_input_03_t.bas:629: value2 equ 13
+test_t_input_03_t.bas:631: show_bc:
+test_t_input_03_t.bas:632: 	ret
+test_t_input_03_t.bas:633: 	
+test_t_input_03_t.bas:634: .set_bc
+test_t_input_03_t.bas:635: 	ld bc, 0
+test_t_input_03_t.bas:636: 	ret
+test_t_input_03_t.bas:638: message:	DEFM "HELLO"
+test_t_input_03_t.bas:640: move_message:
+test_t_input_03_t.bas:641: 	ld hl, message
+test_t_input_03_t.bas:642: 	ld de, &message_target+6
+test_t_input_03_t.bas:643: 	ld bc, 5
+test_t_input_03_t.bas:644: 	ldir
+test_t_input_03_t.bas:645: 	ret
+test_t_input_03_t.bas:646: 	
+test_t_input_03_t.bas:647: line_number:
+test_t_input_03_t.bas:648: 	ld bc, @start
+test_t_input_03_t.bas:649: 	ret
+test_t_input_03_t.bas:650: 	
+test_t_input_03_t.bas:651: start_address:
+test_t_input_03_t.bas:652: 	ld bc, &show_bc
+test_t_input_03_t.bas:653: 	ret
+test_t_input_03_t.bas:654: 	
+test_t_input_03_t.bas:655: !ENDASM
+test_t_input_03_t.bas:657: @start:
+test_t_input_03_t.bas:658: 	PRINT USR &line_number, USR &start_address
+test_t_input_03_t.bas:659: 	PRINT USR &move_message
+test_t_input_03_t.bas:660: 	
+test_t_input_03_t.bas:661: @message_target:
+test_t_input_03_t.bas:662: 	PRINT "12345" 
+test_t_input_03_t.bas:663: 	PRINT USR &show_bc
+test_t_input_03_t.bas:664: 	
+test_t_input_03_t.bas:665: 	POKEW &set_bc+1,12345
+test_t_input_03_t.bas:666: 	PRINT USR &set_bc
+test_t_input_03_t.bas:668: 	PRINT &value1, &value2
+test_t_input_03_t.bas:674: 	PRINT "HELLO"
+test_t_input_03_t.bas:676: !ASM
+test_t_input_03_t.bas:677: end:		
+test_t_input_03_t.bas:678: 	ld a, 'H'
+test_t_input_03_t.bas:679: 	DEFM "HELLO"
+test_t_input_03_t.bas:680: 	ld hl,&label1
+test_t_input_03_t.bas:681: !ENDASM

@@ -28,6 +28,7 @@
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -331,6 +332,7 @@ int main(int argc, char* argv[]) {
     exit_error_status();
 }
 
+// 10-digit precision to match 32-bit mantissa
 std::string double_to_string(double value) {
     std::ostringstream oss;
     if (floor(value) == value) {

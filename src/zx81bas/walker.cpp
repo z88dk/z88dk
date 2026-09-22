@@ -283,6 +283,10 @@ bool ASTVisitor::enter(PragmaStrVarArrayStmt&) {
     return true;
 }
 
+bool ASTVisitor::enter(PragmaLoopVarStmt&) {
+    return true;
+}
+
 bool ASTVisitor::enter(Prog&) {
     return true;
 }
@@ -360,9 +364,9 @@ struct LowerPeekwPokewVisitor : ASTVisitor {
                                                stmt.value_expr->clone(),
                                                make_node<NumberExpr>(256, stmt.loc),
                                                stmt.loc);
-        auto poke_a = std::make_unique<PokeStmt>(stmt.address_expr->clone(),
-                      std::move(v_mod_256),
-                      stmt.loc);
+        auto poke_a = make_node<PokeStmt>(stmt.address_expr->clone(),
+                                          std::move(v_mod_256),
+                                          stmt.loc);
         stmt.rewrite.prepend.push_back(std::move(poke_a));
 
         // POKE(a + 1, v DIV 256)
@@ -374,7 +378,7 @@ struct LowerPeekwPokewVisitor : ASTVisitor {
                                                stmt.value_expr->clone(),
                                                make_node<NumberExpr>(256, stmt.loc),
                                                stmt.loc);
-        auto poke_a_plus_1 = std::make_unique<PokeStmt>(std::move(a_plus_1),
+        auto poke_a_plus_1 = make_node<PokeStmt>(std::move(a_plus_1),
                              std::move(v_div_256),
                              stmt.loc);
         stmt.rewrite.prepend.push_back(std::move(poke_a_plus_1));

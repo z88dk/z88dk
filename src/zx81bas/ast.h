@@ -1016,6 +1016,26 @@ struct PragmaStrVarArrayStmt : Stmt {
 #endif
 };
 
+struct PragmaLoopVarStmt : Stmt {
+    std::string name;
+    double value = 0.0;
+    double limit = 0.0;
+    double step = 1.0;
+    int target_line = 0;
+
+    explicit PragmaLoopVarStmt(std::string name_, double value_, double limit_,
+                               double step_, int target_line_, const SourceLoc& loc_);
+    virtual ~PragmaLoopVarStmt() = default;
+
+    StmtPtr clone() const override;
+    void accept(ASTVisitor& v) override;
+    std::vector<StmtPtr> lower(LoweringPass& pass) override;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
 struct BasicLine {
     enum class Type {
         BASIC,

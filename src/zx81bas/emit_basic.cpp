@@ -613,6 +613,23 @@ static void emit_stmt(std::vector<Token>& tokens, const Stmt& stmt) {
         return;
     }
 
+    // Pragma LOOP variable
+    if (auto s = dynamic_cast<const PragmaLoopVarStmt*>(&stmt)) {
+        append_token(tokens, TokenType::Identifier, s->name, s->loc);
+        append_token(tokens, TokenType::Equal, "=", s->loc);
+        append_token(tokens, TokenType::Float, double_to_string(s->value), s->loc);
+        append_token(tokens, TokenType::Identifier, "TO", s->loc);
+        append_token(tokens, TokenType::Float, double_to_string(s->limit), s->loc);
+        append_token(tokens, TokenType::Identifier, "STEP", s->loc);
+        append_token(tokens, TokenType::Float, double_to_string(s->step), s->loc);
+        append_token(tokens, TokenType::Identifier, "GOTO", s->loc);
+        append_token(tokens, TokenType::Integer, std::to_string(s->target_line),
+                     s->loc);
+        tokens.back().ivalue = s->target_line;
+        return;
+    }
+
+
     // Other statement types should not be present
     release_assert(0);
 }

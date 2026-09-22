@@ -484,6 +484,7 @@ Output file: test_t_input_11_t.p
   #VARS:A(2,3)=1.1,1.2,1.3,2.1,2.2,2.3
   #VARS:A$="HELLO"
   #VARS:B$(2,3,3)="1.1","1.2","1.3","2.1","2.2","2.3"
+  #VARS:I=1 TO 10 STEP 1 GOTO 10
   #VARS:Z$=""
    #ASM:Z_CODE:	LD A, 255
    #ASM:		LD HL, 2

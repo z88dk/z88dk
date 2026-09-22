@@ -249,6 +249,10 @@ struct ASTVisitor {
     virtual void visit(PragmaStrVarArrayStmt&) {}
     virtual void leave(PragmaStrVarArrayStmt&) {}
 
+    virtual bool enter(PragmaLoopVarStmt&);
+    virtual void visit(PragmaLoopVarStmt&) {}
+    virtual void leave(PragmaLoopVarStmt&) {}
+
     virtual bool enter(Prog&);
     virtual void visit(Prog&) {}
     virtual void leave(Prog&) {}

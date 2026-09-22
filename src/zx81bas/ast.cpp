@@ -113,7 +113,7 @@ NumberExpr::NumberExpr(double value_, SourceLoc loc_)
     : Expr(ExprType::Number, loc_), value(value_) {}
 
 ExprPtr NumberExpr::clone() const {
-    return std::make_unique<NumberExpr>(value, loc);
+    return make_node<NumberExpr>(value, loc);
 }
 
 void NumberExpr::accept(ASTVisitor& v) {
@@ -142,7 +142,7 @@ LabelLineRefExpr::LabelLineRefExpr(const std::string& name_, SourceLoc loc_)
     : Expr(ExprType::Number, loc_), name(name_) {}
 
 ExprPtr LabelLineRefExpr::clone() const {
-    return std::make_unique<LabelLineRefExpr>(name, loc);
+    return make_node<LabelLineRefExpr>(name, loc);
 }
 
 void LabelLineRefExpr::accept(ASTVisitor& v) {
@@ -171,7 +171,7 @@ LabelAddrRefExpr::LabelAddrRefExpr(const std::string& name_, SourceLoc loc_)
     : Expr(ExprType::Number, loc_), name(name_) {}
 
 ExprPtr LabelAddrRefExpr::clone() const {
-    return std::make_unique<LabelAddrRefExpr>(name, loc);
+    return make_node<LabelAddrRefExpr>(name, loc);
 }
 
 void LabelAddrRefExpr::accept(ASTVisitor& v) {
@@ -200,7 +200,7 @@ StringLiteralExpr::StringLiteralExpr(std::string val, SourceLoc loc_)
     : Expr(ExprType::String, loc_), value(std::move(val)) {}
 
 ExprPtr StringLiteralExpr::clone() const {
-    return std::make_unique<StringLiteralExpr>(value, loc);
+    return make_node<StringLiteralExpr>(value, loc);
 }
 
 void StringLiteralExpr::accept(ASTVisitor& v) {
@@ -231,7 +231,7 @@ VariableExpr::VariableExpr(const std::string& name_, SourceLoc loc_)
       name(name_) {}
 
 ExprPtr VariableExpr::clone() const {
-    return std::make_unique<VariableExpr>(name, loc);
+    return make_node<VariableExpr>(name, loc);
 }
 
 void VariableExpr::accept(ASTVisitor& v) {
@@ -262,7 +262,7 @@ ArrayRefExpr::ArrayRefExpr(const std::string& name_, SourceLoc loc_)
       name(name_) {}
 
 ExprPtr ArrayRefExpr::clone() const {
-    auto e = std::make_unique<ArrayRefExpr>(name, loc);
+    auto e = make_node<ArrayRefExpr>(name, loc);
     for (auto& index : indices) {
         e->indices.push_back(index->clone());
     }
@@ -299,7 +299,7 @@ SliceExpr::SliceExpr(ExprPtr base_, SourceLoc loc_)
     : Expr(ExprType::String, loc_), base(std::move(base_)) {}
 
 ExprPtr SliceExpr::clone() const {
-    auto e = std::make_unique<SliceExpr>(base->clone(), loc);
+    auto e = make_node<SliceExpr>(base->clone(), loc);
     if (from) {
         e->from = from->clone();
     }
@@ -341,7 +341,7 @@ UnaryExpr::UnaryExpr(TokenType op_, ExprPtr operand_,
     : Expr(operand_->type, loc_), op(op_), operand(std::move(operand_)) {}
 
 ExprPtr UnaryExpr::clone() const {
-    return std::make_unique<UnaryExpr>(op, operand->clone(), loc);
+    return make_node<UnaryExpr>(op, operand->clone(), loc);
 }
 
 void UnaryExpr::accept(ASTVisitor& v) {
@@ -376,7 +376,7 @@ BinaryExpr::BinaryExpr(TokenType op_,
       rhs(std::move(rhs_)) {}
 
 ExprPtr BinaryExpr::clone() const {
-    return std::make_unique<BinaryExpr>(op, lhs->clone(), rhs->clone(), loc);
+    return make_node<BinaryExpr>(op, lhs->clone(), rhs->clone(), loc);
 }
 
 void BinaryExpr::accept(ASTVisitor& v) {
@@ -420,7 +420,7 @@ BasicFuncCallExpr::BasicFuncCallExpr(Keyword keyword_, SourceLoc loc_)
 }
 
 ExprPtr BasicFuncCallExpr::clone() const {
-    auto e = std::make_unique<BasicFuncCallExpr>(keyword, loc);
+    auto e = make_node<BasicFuncCallExpr>(keyword, loc);
     for (auto& arg : args) {
         e->args.push_back(arg->clone());
     }
@@ -457,7 +457,7 @@ ProcCallExpr::ProcCallExpr(const std::string& name_, SourceLoc loc_)
     : Expr(ExprType::Number, loc_), name(name_) {}
 
 ExprPtr ProcCallExpr::clone() const {
-    auto e = std::make_unique<ProcCallExpr>(name, loc);
+    auto e = make_node<ProcCallExpr>(name, loc);
     for (auto& arg : args) {
         e->args.push_back(arg->clone());
     }
@@ -494,7 +494,7 @@ FnCallExpr::FnCallExpr(const std::string& name_, SourceLoc loc_)
     : Expr(ExprType::Number, loc_), name(name_) {}
 
 ExprPtr FnCallExpr::clone() const {
-    auto e = std::make_unique<FnCallExpr>(name, loc);
+    auto e = make_node<FnCallExpr>(name, loc);
     for (auto& arg : args) {
         e->args.push_back(arg->clone());
     }
@@ -540,7 +540,7 @@ LabelStmt::LabelStmt(const std::string& label_, const SourceLoc& loc_)
 }
 
 StmtPtr LabelStmt::clone() const {
-    auto s = std::make_unique<LabelStmt>(label, loc);
+    auto s = make_node<LabelStmt>(label, loc);
     return s;
 }
 
@@ -571,7 +571,7 @@ LineNumStmt::LineNumStmt(int line_num_, const SourceLoc& loc_)
 }
 
 StmtPtr LineNumStmt::clone() const {
-    auto s = std::make_unique<LineNumStmt>(line_num, loc);
+    auto s = make_node<LineNumStmt>(line_num, loc);
     return s;
 }
 
@@ -603,7 +603,7 @@ LetStmt::LetStmt(ExprPtr lhs_, ExprPtr rhs_,
 }
 
 StmtPtr LetStmt::clone() const {
-    auto s = std::make_unique<LetStmt>(lhs->clone(), rhs->clone(), loc);
+    auto s = make_node<LetStmt>(lhs->clone(), rhs->clone(), loc);
     return s;
 }
 
@@ -633,7 +633,7 @@ void LetStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr DimStmt::clone() const {
-    auto s = std::make_unique<DimStmt>(loc);
+    auto s = make_node<DimStmt>(loc);
     for (auto& item : items) {
         DimItem new_item;
         new_item.name = item.name;
@@ -690,7 +690,7 @@ IfStmt::IfStmt(ExprPtr condition_, const SourceLoc& loc_)
 }
 
 StmtPtr IfStmt::clone() const {
-    auto s = std::make_unique<IfStmt>(condition->clone(), loc);
+    auto s = make_node<IfStmt>(condition->clone(), loc);
     for (auto& stmt : then_stmts) {
         s->then_stmts.push_back(stmt->clone());
     }
@@ -732,7 +732,7 @@ RepeatStmt::RepeatStmt(ExprPtr condition_, const SourceLoc& loc_)
 }
 
 StmtPtr RepeatStmt::clone() const {
-    auto s = std::make_unique<RepeatStmt>(condition->clone(), loc);
+    auto s = make_node<RepeatStmt>(condition->clone(), loc);
     for (auto& stmt : body) {
         s->body.push_back(stmt->clone());
     }
@@ -769,7 +769,7 @@ WhileStmt::WhileStmt(ExprPtr condition_, const SourceLoc& loc_)
 }
 
 StmtPtr WhileStmt::clone() const {
-    auto s = std::make_unique<WhileStmt>(condition->clone(), loc);
+    auto s = make_node<WhileStmt>(condition->clone(), loc);
     for (auto& stmt : body) {
         s->body.push_back(stmt->clone());
     }
@@ -809,10 +809,10 @@ ForStmt::ForStmt(const std::string& name_,
 }
 
 StmtPtr ForStmt::clone() const {
-    auto s = std::make_unique<ForStmt>(name,
-                                       start_expr->clone(),
-                                       end_expr->clone(),
-                                       loc);
+    auto s = make_node<ForStmt>(name,
+                                start_expr->clone(),
+                                end_expr->clone(),
+                                loc);
     if (step_expr) {
         s->step_expr = step_expr->clone();
     }
@@ -858,7 +858,7 @@ NextStmt::NextStmt(const std::string& name_, const SourceLoc& loc_)
 }
 
 StmtPtr NextStmt::clone() const {
-    auto s = std::make_unique<NextStmt>(name, loc);
+    auto s = make_node<NextStmt>(name, loc);
     return s;
 }
 
@@ -889,7 +889,7 @@ DefProcStmt::DefProcStmt(const std::string& name_, const SourceLoc& loc_)
 }
 
 StmtPtr DefProcStmt::clone() const {
-    auto s = std::make_unique<DefProcStmt>(name, loc);
+    auto s = make_node<DefProcStmt>(name, loc);
     s->params = params;
     s->locals = locals;
     s->called = called;
@@ -930,7 +930,7 @@ ProcCallStmt::ProcCallStmt(const std::string& name_, const SourceLoc& loc_)
 }
 
 StmtPtr ProcCallStmt::clone() const {
-    auto s = std::make_unique<ProcCallStmt>(name, loc);
+    auto s = make_node<ProcCallStmt>(name, loc);
     for (auto& arg : args) {
         s->args.push_back(arg->clone());
     }
@@ -964,7 +964,7 @@ void ProcCallStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr LocalStmt::clone() const {
-    auto s = std::make_unique<LocalStmt>(loc);
+    auto s = make_node<LocalStmt>(loc);
     s->locals = locals;
     return s;
 }
@@ -996,7 +996,7 @@ DefFnStmt::DefFnStmt(const std::string& name_, const SourceLoc& loc_)
 }
 
 StmtPtr DefFnStmt::clone() const {
-    auto s = std::make_unique<DefFnStmt>(name, loc);
+    auto s = make_node<DefFnStmt>(name, loc);
     s->params = params;
     s->expr = expr->clone();
     return s;
@@ -1028,7 +1028,7 @@ void DefFnStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr ExitStmt::clone() const {
-    auto s = std::make_unique<ExitStmt>(loc);
+    auto s = make_node<ExitStmt>(loc);
     return s;
 }
 
@@ -1058,7 +1058,7 @@ GotoStmt::GotoStmt(ExprPtr target_expr_, const SourceLoc& loc_)
 }
 
 StmtPtr GotoStmt::clone() const {
-    auto s = std::make_unique<GotoStmt>(target_expr->clone(), loc);
+    auto s = make_node<GotoStmt>(target_expr->clone(), loc);
     return s;
 }
 
@@ -1090,7 +1090,7 @@ GosubStmt::GosubStmt(ExprPtr target_expr_, const SourceLoc& loc_)
 }
 
 StmtPtr GosubStmt::clone() const {
-    auto s = std::make_unique<GosubStmt>(target_expr->clone(), loc);
+    auto s = make_node<GosubStmt>(target_expr->clone(), loc);
     return s;
 }
 
@@ -1118,7 +1118,7 @@ void GosubStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr ReturnStmt::clone() const {
-    auto s = std::make_unique<ReturnStmt>(loc);
+    auto s = make_node<ReturnStmt>(loc);
     return s;
 }
 
@@ -1144,7 +1144,7 @@ void ReturnStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr StopStmt::clone() const {
-    auto s = std::make_unique<StopStmt>(loc);
+    auto s = make_node<StopStmt>(loc);
     return s;
 }
 
@@ -1170,7 +1170,7 @@ void StopStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr EndStmt::clone() const {
-    auto s = std::make_unique<EndStmt>(loc);
+    auto s = make_node<EndStmt>(loc);
     return s;
 }
 
@@ -1196,7 +1196,7 @@ void EndStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr PrintStmt::clone() const {
-    auto s = std::make_unique<PrintStmt>(loc);
+    auto s = make_node<PrintStmt>(loc);
     for (auto& item : items) {
         PrintItem new_item;
         new_item.type = item.type;
@@ -1280,7 +1280,7 @@ void PrintStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr LPrintStmt::clone() const {
-    auto s = std::make_unique<LPrintStmt>(loc);
+    auto s = make_node<LPrintStmt>(loc);
     for (auto& item : items) {
         PrintItem new_item;
         new_item.type = item.type;
@@ -1364,7 +1364,7 @@ void LPrintStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr InputStmt::clone() const {
-    auto s = std::make_unique<InputStmt>(loc);
+    auto s = make_node<InputStmt>(loc);
     for (auto& var : vars) {
         s->vars.push_back(var->clone());
     }
@@ -1401,7 +1401,7 @@ RemStmt::RemStmt(const std::string& text_, const SourceLoc& loc_)
 }
 
 StmtPtr RemStmt::clone() const {
-    auto s = std::make_unique<RemStmt>(text, loc);
+    auto s = make_node<RemStmt>(text, loc);
     s->asm_lines = asm_lines;
     return s;
 }
@@ -1430,7 +1430,7 @@ void RemStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr RunStmt::clone() const {
-    auto s = std::make_unique<RunStmt>(loc);
+    auto s = make_node<RunStmt>(loc);
     if (target_expr) {
         s->target_expr = target_expr->clone();
     }
@@ -1461,7 +1461,7 @@ void RunStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr ListStmt::clone() const {
-    auto s = std::make_unique<ListStmt>(loc);
+    auto s = make_node<ListStmt>(loc);
     if (target_expr) {
         s->target_expr = target_expr->clone();
     }
@@ -1492,7 +1492,7 @@ void ListStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr LListStmt::clone() const {
-    auto s = std::make_unique<LListStmt>(loc);
+    auto s = make_node<LListStmt>(loc);
     if (target_expr) {
         s->target_expr = target_expr->clone();
     }
@@ -1523,7 +1523,7 @@ void LListStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr NewStmt::clone() const {
-    auto s = std::make_unique<NewStmt>(loc);
+    auto s = make_node<NewStmt>(loc);
     return s;
 }
 
@@ -1549,7 +1549,7 @@ void NewStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr ClsStmt::clone() const {
-    auto s = std::make_unique<ClsStmt>(loc);
+    auto s = make_node<ClsStmt>(loc);
     return s;
 }
 
@@ -1579,7 +1579,7 @@ LoadStmt::LoadStmt(ExprPtr filename_expr_, const SourceLoc& loc_)
 }
 
 StmtPtr LoadStmt::clone() const {
-    auto s = std::make_unique<LoadStmt>(filename_expr->clone(), loc);
+    auto s = make_node<LoadStmt>(filename_expr->clone(), loc);
     return s;
 }
 
@@ -1611,7 +1611,7 @@ SaveStmt::SaveStmt(ExprPtr filename_expr_, const SourceLoc& loc_)
 }
 
 StmtPtr SaveStmt::clone() const {
-    auto s = std::make_unique<SaveStmt>(filename_expr->clone(), loc);
+    auto s = make_node<SaveStmt>(filename_expr->clone(), loc);
     return s;
 }
 
@@ -1645,8 +1645,8 @@ PokeStmt::PokeStmt(ExprPtr address_expr_,
 }
 
 StmtPtr PokeStmt::clone() const {
-    auto s = std::make_unique<PokeStmt>(address_expr->clone(), value_expr->clone(),
-                                        loc);
+    auto s = make_node<PokeStmt>(address_expr->clone(), value_expr->clone(),
+                                 loc);
     return s;
 }
 
@@ -1682,8 +1682,8 @@ PokewStmt::PokewStmt(ExprPtr address_expr_,
 }
 
 StmtPtr PokewStmt::clone() const {
-    auto s = std::make_unique<PokewStmt>(address_expr->clone(), value_expr->clone(),
-                                         loc);
+    auto s = make_node<PokewStmt>(address_expr->clone(), value_expr->clone(),
+                                  loc);
     return s;
 }
 
@@ -1718,7 +1718,7 @@ PlotStmt::PlotStmt(ExprPtr x_expr_, ExprPtr y_expr_,
 }
 
 StmtPtr PlotStmt::clone() const {
-    auto s = std::make_unique<PlotStmt>(x_expr->clone(), y_expr->clone(), loc);
+    auto s = make_node<PlotStmt>(x_expr->clone(), y_expr->clone(), loc);
     return s;
 }
 
@@ -1753,7 +1753,7 @@ UnplotStmt::UnplotStmt(ExprPtr x_expr_,
 }
 
 StmtPtr UnplotStmt::clone() const {
-    auto s = std::make_unique<UnplotStmt>(x_expr->clone(), y_expr->clone(), loc);
+    auto s = make_node<UnplotStmt>(x_expr->clone(), y_expr->clone(), loc);
     return s;
 }
 
@@ -1787,7 +1787,7 @@ RandStmt::RandStmt(ExprPtr seed_expr_, const SourceLoc& loc_)
 }
 
 StmtPtr RandStmt::clone() const {
-    auto s = std::make_unique<RandStmt>(seed_expr->clone(), loc);
+    auto s = make_node<RandStmt>(seed_expr->clone(), loc);
     return s;
 }
 
@@ -1820,7 +1820,7 @@ PauseStmt::PauseStmt(ExprPtr duration_expr_,
 }
 
 StmtPtr PauseStmt::clone() const {
-    auto s = std::make_unique<PauseStmt>(duration_expr->clone(), loc);
+    auto s = make_node<PauseStmt>(duration_expr->clone(), loc);
     return s;
 }
 
@@ -1848,7 +1848,7 @@ void PauseStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr FastStmt::clone() const {
-    auto s = std::make_unique<FastStmt>(loc);
+    auto s = make_node<FastStmt>(loc);
     return s;
 }
 
@@ -1874,7 +1874,7 @@ void FastStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr SlowStmt::clone() const {
-    auto s = std::make_unique<SlowStmt>(loc);
+    auto s = make_node<SlowStmt>(loc);
     return s;
 }
 
@@ -1900,7 +1900,7 @@ void SlowStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr ScrollStmt::clone() const {
-    auto s = std::make_unique<ScrollStmt>(loc);
+    auto s = make_node<ScrollStmt>(loc);
     return s;
 }
 
@@ -1926,7 +1926,7 @@ void ScrollStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr ContStmt::clone() const {
-    auto s = std::make_unique<ContStmt>(loc);
+    auto s = make_node<ContStmt>(loc);
     return s;
 }
 
@@ -1952,7 +1952,7 @@ void ContStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr ClearStmt::clone() const {
-    auto s = std::make_unique<ClearStmt>(loc);
+    auto s = make_node<ClearStmt>(loc);
     return s;
 }
 
@@ -1978,7 +1978,7 @@ void ClearStmt::dump(DumpContext ctx) const {
 #endif
 
 StmtPtr CopyStmt::clone() const {
-    auto s = std::make_unique<CopyStmt>(loc);
+    auto s = make_node<CopyStmt>(loc);
     return s;
 }
 
@@ -2009,7 +2009,7 @@ PragmaNumVarStmt::PragmaNumVarStmt(std::string name_, double value_,
 }
 
 StmtPtr PragmaNumVarStmt::clone() const {
-    auto s = std::make_unique<PragmaNumVarStmt>(name, value, loc);
+    auto s = make_node<PragmaNumVarStmt>(name, value, loc);
     return s;
 }
 
@@ -2042,7 +2042,7 @@ PragmaStrVarStmt::PragmaStrVarStmt(std::string name_, std::string value_,
 }
 
 StmtPtr PragmaStrVarStmt::clone() const {
-    auto s = std::make_unique<PragmaStrVarStmt>(name, value, loc);
+    auto s = make_node<PragmaStrVarStmt>(name, value, loc);
     s->asm_lines = asm_lines;
     return s;
 }
@@ -2077,7 +2077,7 @@ PragmaNumVarArrayStmt::PragmaNumVarArrayStmt(std::string name_,
 }
 
 StmtPtr PragmaNumVarArrayStmt::clone() const {
-    auto s = std::make_unique<PragmaNumVarArrayStmt>(name, loc);
+    auto s = make_node<PragmaNumVarArrayStmt>(name, loc);
     s->dims = dims;
     s->values = values;
     return s;
@@ -2123,7 +2123,7 @@ PragmaStrVarArrayStmt::PragmaStrVarArrayStmt(std::string name_,
 }
 
 StmtPtr PragmaStrVarArrayStmt::clone() const {
-    auto s = std::make_unique<PragmaStrVarArrayStmt>(name, loc);
+    auto s = make_node<PragmaStrVarArrayStmt>(name, loc);
     s->dims = dims;
     s->values = values;
     return s;
@@ -2154,6 +2154,45 @@ void PragmaStrVarArrayStmt::dump(DumpContext ctx) const {
     }
     child_ctx.line("]");
     dump_string_list("values", values, child_ctx);
+    ctx.line("}");
+}
+#endif
+
+PragmaLoopVarStmt::PragmaLoopVarStmt(std::string name_,
+                                     double value_, double limit_, double step_,
+                                     int target_line_, const SourceLoc& loc_)
+    : Stmt(loc_), name(std::move(name_)), value(value_), limit(limit_), step(step_),
+      target_line(target_line_) {
+}
+
+StmtPtr PragmaLoopVarStmt::clone() const {
+    auto s = make_node<PragmaLoopVarStmt>(name, value, limit, step, target_line,
+                                          loc);
+    return s;
+}
+
+void PragmaLoopVarStmt::accept(ASTVisitor& v) {
+    if (v.enter(*this)) {
+        v.visit(*this);
+        // accept children
+        v.leave(*this);
+    }
+}
+
+std::vector<StmtPtr> PragmaLoopVarStmt::lower(LoweringPass& pass) {
+    return pass.lower(*this);
+}
+
+#ifdef _DEBUG
+void PragmaLoopVarStmt::dump(DumpContext ctx) const {
+    ctx.line("PragmaLoopVarStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    child_ctx.line("name: " + name);
+    child_ctx.line("value: " + std::to_string(value));
+    child_ctx.line("limit: " + std::to_string(limit));
+    child_ctx.line("step: " + std::to_string(step));
+    child_ctx.line("target_line: " + std::to_string(target_line));
     ctx.line("}");
 }
 #endif
