@@ -115,7 +115,7 @@ struct LabelAddrRefExpr : Expr {
 struct StringLiteralExpr : Expr {
     std::string value;      // ASCII string literal
 
-    explicit StringLiteralExpr(std::string val, SourceLoc loc_);
+    explicit StringLiteralExpr(const std::string& val, SourceLoc loc_);
     virtual ~StringLiteralExpr() = default;
 
     virtual ExprPtr clone() const override;
@@ -951,7 +951,7 @@ struct PragmaNumVarStmt : Stmt {
     std::string name;
     double value;
 
-    explicit PragmaNumVarStmt(std::string name_, double value_,
+    explicit PragmaNumVarStmt(const std::string& name_, double value_,
                               const SourceLoc& loc_);
     virtual ~PragmaNumVarStmt() = default;
 
@@ -969,7 +969,7 @@ struct PragmaStrVarStmt : Stmt {
     std::string value;
     std::vector<TokLine> asm_lines;	// ASM statements
 
-    explicit PragmaStrVarStmt(std::string name_, std::string value_,
+    explicit PragmaStrVarStmt(const std::string& name_, const std::string& value_,
                               const SourceLoc& loc_);
     virtual ~PragmaStrVarStmt() = default;
 
@@ -987,7 +987,7 @@ struct PragmaNumVarArrayStmt : Stmt {
     std::vector<int> dims;			// dimensions
     std::vector<double> values;
 
-    explicit PragmaNumVarArrayStmt(std::string name_, const SourceLoc& loc_);
+    explicit PragmaNumVarArrayStmt(const std::string& name_, const SourceLoc& loc_);
     virtual ~PragmaNumVarArrayStmt() = default;
 
     StmtPtr clone() const override;
@@ -1004,7 +1004,7 @@ struct PragmaStrVarArrayStmt : Stmt {
     std::vector<int> dims;			// dimensions
     std::vector<std::string> values;
 
-    explicit PragmaStrVarArrayStmt(std::string name_, const SourceLoc& loc_);
+    explicit PragmaStrVarArrayStmt(const std::string& name_, const SourceLoc& loc_);
     virtual ~PragmaStrVarArrayStmt() = default;
 
     StmtPtr clone() const override;
@@ -1023,7 +1023,8 @@ struct PragmaLoopVarStmt : Stmt {
     double step = 1.0;
     int target_line = 0;
 
-    explicit PragmaLoopVarStmt(std::string name_, double value_, double limit_,
+    explicit PragmaLoopVarStmt(const std::string& name_, double value_,
+                               double limit_,
                                double step_, int target_line_, const SourceLoc& loc_);
     virtual ~PragmaLoopVarStmt() = default;
 

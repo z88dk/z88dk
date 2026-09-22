@@ -17,7 +17,8 @@ struct SrcLine : TreeNode {
     SourceLoc loc;          // source location
 
     explicit SrcLine() = default;
-    explicit SrcLine(const std::string& text_, std::string filename_, int line_num_)
+    explicit SrcLine(const std::string& text_, const std::string& filename_,
+                     int line_num_)
         : text(text_), loc(filename_, line_num_) {}
 
 #ifdef _DEBUG

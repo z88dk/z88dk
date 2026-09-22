@@ -22,4 +22,3 @@ optimize:
 - add ZX-Spectrum BASIC commands
 - Fix: emitted code contains empty lines
 - Fix: Remove IF 0 THEN ...
-- replace by value std::string by by reference const std::string&

@@ -196,8 +196,8 @@ void LabelAddrRefExpr::dump(DumpContext ctx) const {
 }
 #endif
 
-StringLiteralExpr::StringLiteralExpr(std::string val, SourceLoc loc_)
-    : Expr(ExprType::String, loc_), value(std::move(val)) {}
+StringLiteralExpr::StringLiteralExpr(const std::string& val, SourceLoc loc_)
+    : Expr(ExprType::String, loc_), value(val) {}
 
 ExprPtr StringLiteralExpr::clone() const {
     return make_node<StringLiteralExpr>(value, loc);
@@ -2003,9 +2003,9 @@ void CopyStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-PragmaNumVarStmt::PragmaNumVarStmt(std::string name_, double value_,
+PragmaNumVarStmt::PragmaNumVarStmt(const std::string& name_, double value_,
                                    const SourceLoc& loc_)
-    : Stmt(loc_), name(std::move(name_)), value(value_) {
+    : Stmt(loc_), name(name_), value(value_) {
 }
 
 StmtPtr PragmaNumVarStmt::clone() const {
@@ -2036,9 +2036,10 @@ void PragmaNumVarStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-PragmaStrVarStmt::PragmaStrVarStmt(std::string name_, std::string value_,
+PragmaStrVarStmt::PragmaStrVarStmt(const std::string& name_,
+                                   const std::string& value_,
                                    const SourceLoc& loc_)
-    : Stmt(loc_), name(std::move(name_)), value(std::move(value_)) {
+    : Stmt(loc_), name(name_), value(value_) {
 }
 
 StmtPtr PragmaStrVarStmt::clone() const {
@@ -2071,9 +2072,9 @@ void PragmaStrVarStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-PragmaNumVarArrayStmt::PragmaNumVarArrayStmt(std::string name_,
+PragmaNumVarArrayStmt::PragmaNumVarArrayStmt(const std::string& name_,
         const SourceLoc& loc_)
-    : Stmt(loc_), name(std::move(name_)) {
+    : Stmt(loc_), name(name_) {
 }
 
 StmtPtr PragmaNumVarArrayStmt::clone() const {
@@ -2117,9 +2118,9 @@ void PragmaNumVarArrayStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-PragmaStrVarArrayStmt::PragmaStrVarArrayStmt(std::string name_,
+PragmaStrVarArrayStmt::PragmaStrVarArrayStmt(const std::string& name_,
         const SourceLoc& loc_)
-    : Stmt(loc_), name(std::move(name_)) {
+    : Stmt(loc_), name(name_) {
 }
 
 StmtPtr PragmaStrVarArrayStmt::clone() const {
@@ -2158,10 +2159,10 @@ void PragmaStrVarArrayStmt::dump(DumpContext ctx) const {
 }
 #endif
 
-PragmaLoopVarStmt::PragmaLoopVarStmt(std::string name_,
+PragmaLoopVarStmt::PragmaLoopVarStmt(const std::string& name_,
                                      double value_, double limit_, double step_,
                                      int target_line_, const SourceLoc& loc_)
-    : Stmt(loc_), name(std::move(name_)), value(value_), limit(limit_), step(step_),
+    : Stmt(loc_), name(name_), value(value_), limit(limit_), step(step_),
       target_line(target_line_) {
 }
 
