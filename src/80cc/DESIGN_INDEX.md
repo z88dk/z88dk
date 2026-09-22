@@ -185,6 +185,18 @@ jp nz`. `k-trip` opt-out. 8085-only compile-only corpus scan: -156 B over
 52/60 cells, 0 larger, 0 build failures, sp and fp identical (8085 has no IX).
 `long_ir` 846/846 both frame modes.
 
+**6. Byte scratch packing — SHIPPED.** The verifier found a broad upper bound for
+short byte values, but only born-and-killed, single-definition, single-BB values
+with a real A-clobber and no call-argument use are admitted. Their exact live
+windows time-share B, with existing BC/C tenants and BC clobbers treated as
+interference. D/DE remains verifier-only until its lazy-spill state can represent
+ranged tenants. The default-on `byte-pack` pass is −323 B over 720 corpus cells
+(51 smaller, none larger) and −15,560,216 ticks over the 72 numeric cells in
+`hashbench`, `shiftbench`, and `bitfieldbench`; all tested long_ir CPU/frame
+builds are 48/48 and the exercised console gates show no byte-pack regression
+(`today` SP remains a pre-existing baseline build failure). `byte-pack` disables the pass;
+`IR_BYTEPACK_VERIFY=1/2` keeps the sizing report available.
+
 ### How to work here — the traps that actually bit
 
 * **`long_ir` FIRST, size second.** −1807 B over 720 cells was reported as a 13x

@@ -614,6 +614,21 @@ static int dc_andv(int a, int b) { int r = (a && b); return r * 10 + 5; }
 static int dc_sw(int k) { int r = 100; switch (k) { case 1: r = 1; break;
                           case 2: r = 2; break; default: r = 9; } return r + 1000; }
 
+/* Byte scratch packing: keep a byte temporary in B while a second byte
+ * operation overwrites A.  The value is returned directly, so this exercises
+ * the ranged B home without passing it through the call-argument path. */
+static unsigned char bp_safe(unsigned char *p)
+{
+    unsigned char t = *p;
+    unsigned char u = (unsigned char)(*p + 1);
+    return t ^ u;
+}
+static void test_byte_pack(void)
+{
+    unsigned char x = 0x5a;
+    Assert(bp_safe(&x) == 1, "byte scratch B home across byte op");
+}
+
 static void test_diamond_carry(void)
 {
     Assert(dc_sel(1) == 1 && dc_sel(0) == 2,        "if/else merge both edges");
@@ -2038,6 +2053,7 @@ int suite_long_ir(void)
     suite_add_test(test_cse_array);
     suite_add_test(test_byte_overrun);
     suite_add_test(test_byte_narrow);
+    suite_add_test(test_byte_pack);
     suite_add_test(test_diamond_carry);
     suite_add_test(test_ptr_stride);
     suite_add_test(test_licm_join);
