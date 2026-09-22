@@ -4367,8 +4367,9 @@ static void bytepack_verify(const Func *f)
    B is slotless.  A packed value therefore gets an exact home window and can
    be replaced by the next disjoint value at its definition.  The lowerer's
    existing byte-home paths already write/read B and treat it as a BC-clobber
-   dependency.  DE/D is intentionally left for a later step: its lazy-spill
-   state is function-wide and cannot yet represent several ranged tenants. */
+   dependency.  D is a single slot-backed tenant per function: its lazy-spill
+   state can flush and reload around DE-clobbering gaps, but it is not mixed
+   with B/C homes until the lowerer has separate residency latches. */
 static int bytepack_on(void)
 {
     static int on = -1;
@@ -4379,14 +4380,28 @@ static int bytepack_on(void)
 static void bytepack_pack(Func *f)
 {
     typedef struct { int v, lo, hi, refs; } Cand;
-    Cand *cand;
-    int nc = 0;
+    Cand *cand, *dcand;
+    int nc = 0, ndc = 0;
+    int de_probe = 0, d_home_blocked = 0;
 
+    if (!opt_disabled("byte-pack-de")) de_probe = 1;
     if (!bytepack_on() || !f || f->n_vregs <= 0 || !f->vreg_to_phys
         || !f->home_lo || !f->home_hi)
         return;
     cand = calloc((size_t)f->n_vregs, sizeof(*cand));
-    if (!cand) return;
+    dcand = de_probe ? calloc((size_t)f->n_vregs, sizeof(*dcand)) : NULL;
+    if (!cand || (de_probe && !dcand)) {
+        free(cand); free(dcand);
+        return;
+    }
+    if (de_probe)
+        for (int w = 0; w < f->n_vregs; w++) {
+            PhysReg pw = f->vreg_to_phys[w];
+            if (pw == IR_PR_E || pw == IR_PR_D) {
+                d_home_blocked = 1;
+                break;
+            }
+        }
 
     /* Build the tight, born-and-killed candidate set.  The explicit dst count
        keeps POSTSTEP and multi-def values out until their home protocol is
@@ -4446,8 +4461,8 @@ static void bytepack_pack(Func *f)
            between accesses is a real interference; the def and final use may
            themselves write BC after establishing/consuming the byte. */
         {
-            int clean = 1, a_gap = 0, gg = 0;
-            for (int b = 0; b < f->n_bbs && clean; b++)
+            int bc_clean = 1, de_clean = 1, a_gap = 0, gg = 0;
+            for (int b = 0; b < f->n_bbs && (bc_clean || de_clean); b++)
                 for (int j = 0; j < f->bbs[b].n_ops; j++, gg++) {
                     RegMask cm;
                     if (gg <= lo || gg >= hi) continue;
@@ -4460,15 +4475,22 @@ static void bytepack_pack(Func *f)
                             && f->vregs[gap->src[sk]].width == 1)
                             byte_op = 1;
                     cm = op_clobbers(f, gap);
-                    if (cm & IR_R_BC) { clean = 0; break; }
+                    if (cm & IR_R_BC) bc_clean = 0;
+                    if (cm & IR_R_DE) de_clean = 0;
                     if (byte_op && (cm & IR_R_A)) a_gap = 1;
                 }
             /* If A survives from the definition to every use, the lowerer can
-               already consume the value without a reload; writing B would be
-               pure overhead. Require a real A-clobber in the gap. */
-            if (!clean || !a_gap) continue;
+               already consume the value without a reload; writing a scratch
+               home would be pure overhead. Require a real A-clobber in the
+               gap. BC and DE are evaluated independently for their lanes. */
+            if ((!bc_clean && !de_clean) || !a_gap) continue;
+            if (bc_clean) cand[nc++] = (Cand){ v, lo, hi, refs };
+            /* D is slot-backed, so the existing lowerer can flush/reload it
+               around DE-clobbering gaps. Keep the A-clobber requirement, but
+               do not reject a DE gap as the verifier-only B lane does. */
+            if (de_probe && !d_home_blocked)
+                dcand[ndc++] = (Cand){ v, lo, hi, refs };
         }
-        cand[nc++] = (Cand){ v, lo, hi, refs };
     }
 
     /* Earliest finishing intervals first gives a deterministic interval
@@ -4510,7 +4532,56 @@ static void bytepack_pack(Func *f)
                     f->fn ? ir_sym_name(f->fn) : "?", c->v,
                     c->lo, c->hi, c->refs);
     }
+    /* D is a slot-backed home. The lowerer currently tracks only one such
+       home per function, and the same latch is also used by slotless B/C
+       homes. Do not mix those byte-home classes until the lowerer has separate
+       D and B/C residency state. */
+    if (de_probe)
+        for (int w = 0; w < f->n_vregs; w++) {
+            PhysReg pw = f->vreg_to_phys[w];
+            if (pw == IR_PR_B || pw == IR_PR_C) {
+                d_home_blocked = 1;
+                break;
+            }
+        }
+    if (de_probe && !d_home_blocked) {
+        for (int i = 1; i < ndc; i++) {
+            Cand c = dcand[i];
+            int j = i;
+            while (j > 0 && (dcand[j - 1].hi > c.hi
+                             || (dcand[j - 1].hi == c.hi
+                                 && dcand[j - 1].lo > c.lo))) {
+                dcand[j] = dcand[j - 1];
+                j--;
+            }
+            dcand[j] = c;
+        }
+        for (int i = 0; i < ndc; i++) {
+            Cand *c = &dcand[i];
+            int clash = 0;
+            if (f->vreg_to_phys[c->v] != IR_PR_SPILL) continue;
+            for (int w = 0; w < f->n_vregs && !clash; w++) {
+                PhysReg pw = f->vreg_to_phys[w];
+                int wlo, whi;
+                if (w == c->v || (pw != IR_PR_DE && pw != IR_PR_DEHL
+                                  && pw != IR_PR_E && pw != IR_PR_D))
+                    continue;
+                if (!hr_residency_window(f, w, &wlo, &whi)) continue;
+                if (wlo <= c->hi && whi >= c->lo) clash = 1;
+            }
+            if (clash) continue;
+            alloc_note_late_home(f, c->v, IR_PR_D);
+            f->home_lo[c->v] = c->lo;
+            f->home_hi[c->v] = c->hi;
+            if (getenv("IR_BYTEPACK") && getenv("IR_BYTEPACK")[0] >= '2')
+                fprintf(stderr, "BYTEPACK: %s v%d -> D [%d,%d] refs=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", c->v,
+                        c->lo, c->hi, c->refs);
+            break;
+        }
+    }
     free(cand);
+    free(dcand);
 }
 
 void ir_alloc(Func *f)

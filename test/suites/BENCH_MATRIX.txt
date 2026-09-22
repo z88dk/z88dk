@@ -1,7 +1,7 @@
 22/9/2026 — byte-scratch packing; refreshed the affected 80cc cells.
 Generator: test/suites/gen_bench_matrix3.py cell() (30 benchmarks × 12 CPUs; only 80cc measurements).
 Compiler: bin/z88dk-80cc, built from the current worktree.
-Each cell is final binary bytes and ticks in millions. Refreshed 60 80cc cells; 42 changed, all in hashbench, shiftbench, and bitfieldbench. sccz80, xcc, and sdcc columns are unchanged from the outgoing snapshot.
+Each cell is final binary bytes and ticks in millions. Refreshed 60 80cc cells; the D lane changed 5 final cells in bitfieldbench (8080 sp, 8085 sp, gbz80 sp, vm1 sp, z180 fp). The pre-link B+D versus all-off scan was 52/720 smaller; hashbench and shiftbench final binaries were unchanged after the D lane. sccz80, xcc, and sdcc columns are unchanged from the outgoing snapshot.
 ================================================================================
 ┌───────────────┬───────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┐
 │ benchmark     │ cpu   │ sccz80          │ xcc -Os         │ xcc -Of         │ sdcc            │ 80cc-fp         │ 80cc-sp         │
@@ -538,7 +538,7 @@ Each cell is final binary bytes and ticks in millions. Refreshed 60 80cc cells; 
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ bitfieldbench │ z80n  │ 4146B / 44.60M  │ —               │ —               │ 4723B / WRONG   │ 4462B / 37.90M  │ 4472B / 36.81M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
-│ bitfieldbench │ z180  │ 4128B / 47.45M  │ —               │ —               │ 4726B / WRONG   │ 4449B / 34.23M  │ 4449B / 33.95M  │
+│ bitfieldbench │ z180  │ 4128B / 47.45M  │ —               │ —               │ 4726B / WRONG   │ 4445B / 34.06M  │ 4449B / 33.95M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ bitfieldbench │ ez80  │ 4072B / 12.47M  │ —               │ —               │ BUILD           │ 4198B / 5.95M   │ 4402B / 8.15M   │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
@@ -550,13 +550,13 @@ Each cell is final binary bytes and ticks in millions. Refreshed 60 80cc cells; 
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ bitfieldbench │ kc160 │ 3963B / 8.69M   │ —               │ —               │ —               │ 4045B / 6.37M   │ 4028B / 6.18M   │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
-│ bitfieldbench │ 8080  │ 4736B / 65.22M  │ —               │ —               │ —               │ = sp (no IX)    │ 5172B / 42.62M  │
+│ bitfieldbench │ 8080  │ 4736B / 65.22M  │ —               │ —               │ —               │ = sp (no IX)    │ 5165B / 42.38M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
-│ bitfieldbench │ 8085  │ 4481B / 41.83M  │ —               │ —               │ —               │ = sp (no IX)    │ 4662B / 35.47M  │
+│ bitfieldbench │ 8085  │ 4481B / 41.83M  │ —               │ —               │ —               │ = sp (no IX)    │ 4655B / 35.23M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
-│ bitfieldbench │ gbz80 │ 4742B / 52.00M  │ —               │ —               │ 4803B / WRONG   │ = sp (no IX)    │ 5060B / 38.18M  │
+│ bitfieldbench │ gbz80 │ 4742B / 52.00M  │ —               │ —               │ 4803B / WRONG   │ = sp (no IX)    │ 5055B / 37.91M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
-│ bitfieldbench │ vm1   │ 4876B / 64.71M  │ —               │ —               │ —               │ = sp (no IX)    │ 5136B / 41.54M  │
+│ bitfieldbench │ vm1   │ 4876B / 64.71M  │ —               │ —               │ —               │ = sp (no IX)    │ 5129B / 41.30M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ widthbench    │ z80   │ 4567B / 91.66M  │ 4432B / 80.68M  │ 4796B / 60.71M  │ 4941B / 35.00M  │ 4580B / 46.92M  │ 4699B / 52.70M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤

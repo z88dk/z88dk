@@ -479,6 +479,20 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
             hl_about_to_change(vreg_id);
             return;
         }
+        /* A byte home is slotless for C/B and may be resident in E/D for
+           the current lowerer window.  Do not fall through to the frame
+           slot: B/C homes deliberately have no slot, and the D/E slot is
+           stale while its lazy home is dirty. */
+        PhysReg bh = byte_home_phys(f, vreg_id);
+        if (bh != IR_PR_NONE && byte_home_holds(vreg_id)) {
+            ss_note_cache_read(f, vreg_id);
+            /* Keep A intact: IR_MUL stages its first byte in A while the
+               second byte is widened into HL. */
+            emit(out, "ld\tl,%s", byte_home_reg(bh));
+            emit(out, "ld\th,0");
+            hl_about_to_change(vreg_id);
+            return;
+        }
     }
     /* A-cache hit for byte vregs: a dead-skipped byte producer left the
        value ONLY in A (no slot store), so the slot read below would return

@@ -189,13 +189,15 @@ jp nz`. `k-trip` opt-out. 8085-only compile-only corpus scan: -156 B over
 short byte values, but only born-and-killed, single-definition, single-BB values
 with a real A-clobber and no call-argument use are admitted. Their exact live
 windows time-share B, with existing BC/C tenants and BC clobbers treated as
-interference. D/DE remains verifier-only until its lazy-spill state can represent
-ranged tenants. The default-on `byte-pack` pass is −323 B over 720 corpus cells
-(51 smaller, none larger) and −15,560,216 ticks over the 72 numeric cells in
-`hashbench`, `shiftbench`, and `bitfieldbench`; all tested long_ir CPU/frame
-builds are 48/48 and the exercised console gates show no byte-pack regression
-(`today` SP remains a pre-existing baseline build failure). `byte-pack` disables the pass;
-`IR_BYTEPACK_VERIFY=1/2` keeps the sizing report available.
+interference. A second lane now admits one slot-backed D tenant per function;
+DE-clobbering gaps use the lowerer's existing lazy flush/reload protocol, and D
+is kept separate from B/C because they share one residency latch. The pre-link B+D scan saves
+−379 code bytes over 720 corpus cells (52 smaller, none larger); D contributes
+−56 bytes in nine cells relative to B-only. The full tick scan saves
+−17,686,184 ticks (52 faster, none slower); all tested long_ir CPU/frame builds
+pass 882/882 and the console gates show no regression (`today` SP remains a
+pre-existing baseline build failure). `byte-pack` disables both lanes;
+`byte-pack-de` disables only D; `IR_BYTEPACK_VERIFY=1/2` keeps the sizing report.
 
 ### How to work here — the traps that actually bit
 

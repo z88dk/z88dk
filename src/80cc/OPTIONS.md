@@ -79,6 +79,7 @@ exists (ADR 0010).
 | --- | --- |
 | `bc-pack` | no tight BC packing pass after region selection |
 | `byte-pack` | no ranged packing of born-and-killed byte temporaries into B |
+| `byte-pack-de` | no single slot-backed D home for a born-and-killed byte temporary |
 | `z80n-add-a` | z80n zero-extended byte adds go via DE instead of `add hl,a` |
 | `de-widen` | a byte widened into DE and copied to HL keeps `ld e,S; ld d,0; ld hl,de` |
 | `inc-mem` | a memory increment stays `ld a,MEM; inc a; ld MEM,a` instead of `inc MEM` |
