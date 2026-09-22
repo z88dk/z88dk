@@ -148,6 +148,7 @@ exists (ADR 0010).
 | `home-rearb` | after a demotion the freed register is not offered to the next candidate |
 | `home-resident` | no home-residency backstop during the render |
 | `wh-exit-hoist` | a byte home is not flushed at the region exit |
+| `home-exit-dead` | flush a DE home at a loop exit even when it is dead there |
 | `remat-lea` | an address is reloaded rather than recomputed |
 | `symaddr-deref` | a symbol address is not folded into its dereference |
 | `slot-addr-widen` | a cached slot address is not reused for a wider access |

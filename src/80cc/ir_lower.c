@@ -8512,8 +8512,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            flush the home to its slot at entry so an out-of-region consumer
            that reloads sees a coherent value. compute_home_region guarantees
            such a BB does not redefine the home, so the entry value is the
-           exit value. */
-        int region_exit_here = 0;
+           exit value. If every leaving target proves the home dead, the
+           store is unnecessary and would only recreate a loop-header spill. */
+        int region_exit_here = 0, region_exit_needs_flush = 0;
         if (in_home_region) {
             int ns = ir_bb_n_succ(bb);
             for (int s = 0; s < ns; s++) {
@@ -8521,13 +8522,20 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 if (sid < 0 || sid >= f->n_bbs) continue;
                 if (bb_alias && bb_alias[sid] >= 0) sid = bb_alias[sid];
                 if (sid < L.cur_home_region_lo || sid > L.cur_home_region_hi) {
-                    region_exit_here = 1; break;
+                    region_exit_here = 1;
+                    const BB *tb = &f->bbs[sid];
+                    if (!tb->live_in
+                        || ir_bitset_get((const BitSet *)tb->live_in,
+                                         L.cur_func_ehome))
+                        region_exit_needs_flush = 1;
                 }
             }
         }
         /* The exit-flush is hoisted to the dedicated exit block's entry (once),
            so suppress the per-iteration header flush when that hoist is active. */
-        if (region_exit_here && L.cur_byte_home_vreg == L.cur_func_ehome
+        if (region_exit_here
+            && (opt_disabled("home-exit-dead") || region_exit_needs_flush)
+            && L.cur_byte_home_vreg == L.cur_func_ehome
             && L.cur_byte_home_dirty
             && home_is_slotbacked(f, L.cur_func_ehome)
             && L.cur_home_exit_flush_bb < 0)
