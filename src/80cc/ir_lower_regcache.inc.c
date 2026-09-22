@@ -479,6 +479,20 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
             hl_about_to_change(vreg_id);
             return;
         }
+        /* A byte home is slotless for C/B and may be resident in E/D for
+           the current lowerer window.  Do not fall through to the frame
+           slot: B/C homes deliberately have no slot, and the D/E slot is
+           stale while its lazy home is dirty. */
+        PhysReg bh = byte_home_phys(f, vreg_id);
+        if (bh != IR_PR_NONE && byte_home_holds(vreg_id)) {
+            ss_note_cache_read(f, vreg_id);
+            /* Keep A intact: IR_MUL stages its first byte in A while the
+               second byte is widened into HL. */
+            emit(out, "ld\tl,%s", byte_home_reg(bh));
+            emit(out, "ld\th,0");
+            hl_about_to_change(vreg_id);
+            return;
+        }
     }
     /* A-cache hit for byte vregs: a dead-skipped byte producer left the
        value ONLY in A (no slot store), so the slot read below would return
@@ -1140,6 +1154,18 @@ static int store_hl_keep_hl(FILE *out, const Func *f, int vreg_id)
     slot_write_ctx = save;
     return r;
 }
+/* A cached register tenant that is dead after this store may be discarded; a
+   live tenant should use another free register or the INC SP rung. Missing
+   liveness is conservative, including across a block boundary. */
+static int tos_store_vreg_live_after(const Func *f, int vreg)
+{
+    if (vreg < 0) return 0;
+    if (!f || vreg >= f->n_vregs || !cur_bb) return 1;
+    const BitSet *live = cur_op_idx + 1 < cur_bb->n_ops
+        ? ir_op_live_in(cur_bb, cur_op_idx + 1) : cur_bb->live_out;
+    if (!live) return 1;
+    return ir_bitset_get(live, vreg);
+}
 static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
 {
     /* [dead-store word] Slot written but never read (read/write split,
@@ -1205,9 +1231,74 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
         emit(out, "ld\t(sp+%d),hl%s", off, vol_stamp(f, vreg_id));  /* HL preserved */
         return 1;
     }
-    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f) && f->frame_size >= 2) {
-        emit(out, "pop\tde");                   /* discard old TOS (DE dead) */
-        emit(out, "push\thl");                  /* store; HL preserved */
+    /* Stack-relative store alternative for CPUs without a native
+       `ld (sp+n),hl`. `pop de; push hl` is the cheapest rung when DE is free;
+       POP AF is the same cost when only A is free; otherwise discard the old
+       word with two `inc sp` instructions and push HL. The latter is 2T slower
+       than POP/PUSH on Z80 (and 4T slower on GBZ80), but preserves registers,
+       flags, and write-only volatile semantics. Rabbit and KC160 have a native
+       store and took the direct-address path above. */
+    int tos_store_ok = !IS_RABBIT() && !IS_KC160();
+    int ktrip_pending = 0;
+    if (IS_8085() && cur_bb && cur_op_idx >= 0
+        && cur_op_idx < cur_bb->n_ops
+        && cur_bb->ops[cur_op_idx].kind == IR_DEC) {
+        int j = cur_op_idx + 1;
+        while (j < cur_bb->n_ops && cur_bb->ops[j].kind == IR_NOP) j++;
+        ktrip_pending = j < cur_bb->n_ops
+            && cur_bb->ops[j].kind == IR_BR_COND
+            && cur_bb->ops[j].imm == IR_BRCOND_KTRIP;
+    }
+    /* Keep the optional selector default-on only for the CPU with no losing
+       corpus cells. Volatile write-only handling above is unconditional. */
+    int tos_store_selector_on = IS_GBZ80() && !opt_disabled("tos-store");
+    if (off == 0 && !fp_active(f) && tos_store_ok && f->frame_size >= 2
+        && vreg_id >= 0) {
+        int is_volatile = (f->vregs[vreg_id].flags & IR_VREG_VOLATILE) != 0;
+        if (is_volatile) {
+            if (!ktrip_pending) {
+                emit_sp(out, -1, "inc\tsp");
+                emit_sp(out, -1, "inc\tsp");
+                emit_sp(out,  2, "push\thl%s", vol_stamp(f, vreg_id));
+                return 1;
+            }
+        } else if (tos_store_selector_on) {
+            int de_live = (L.rs.de >= 0 && L.rs.de != vreg_id
+                           && tos_store_vreg_live_after(f, L.rs.de))
+                       || (L.rs.dehl >= 0 && L.rs.dehl != vreg_id
+                           && tos_store_vreg_live_after(f, L.rs.dehl));
+            int de_free = !de_live && L.cur_byte_home_vreg < 0;
+            if (!is_volatile && de_free) {
+                emit(out, "pop\tde");
+                emit(out, "push\thl");
+                invalidate_de_cache();
+                return 1;
+            }
+            int a_free = L.rs.a < 0
+                      || !tos_store_vreg_live_after(f, L.rs.a);
+            if (!is_volatile && !ktrip_pending && CPU_POP_AF_IS_SAFE()
+                && a_free) {
+                emit(out, "pop\taf");
+                emit(out, "push\thl");
+                invalidate_a_cache();
+                return 1;
+            }
+            if (!ktrip_pending) {
+                emit_sp(out, -1, "inc\tsp");
+                emit_sp(out, -1, "inc\tsp");
+                emit_sp(out,  2, "push\thl%s", vol_stamp(f, vreg_id));
+                return 1;
+            }
+        }
+    }
+    /* Keep the legacy non-volatile sequence when the selector is disabled.
+       Volatile stores always use the write-only route above. */
+    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f) && f->frame_size >= 2
+        && vreg_id >= 0
+        && !(f->vregs[vreg_id].flags & IR_VREG_VOLATILE)
+        && !tos_store_selector_on) {
+        emit(out, "pop\tde");
+        emit(out, "push\thl");
         invalidate_de_cache();
         return 1;
     }

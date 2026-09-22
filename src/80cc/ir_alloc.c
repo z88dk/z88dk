@@ -4226,6 +4226,364 @@ static void assign_idxhalf_homes(Func *f)
     free(ndef); free(wuse); free(ruse); free(first); free(last); free(bdep);
 }
 
+/* [IR_BYTEPACK_VERIFY] Inert sizing for the next byte-scratch step.  A
+   spilled, single-byte value can share the high byte of BC (B) or DE (D) only
+   when the whole pair is free over its live range and the pair is not clobbered
+   there.  The existing allocator already has C/E byte homes; this report asks
+   whether the unused B/D halves have real room for a multi-tenant packer.
+
+   The report deliberately separates pair occupancy from clobbers.  A value
+   blocked by a current BC/DE tenant needs interval packing; a value crossing a
+   pair clobber needs a different lowering path and must not be counted as a
+   simple scratch candidate.  It is a verifier only: no placement or codegen
+   decision depends on it.  IR_BYTEPACK_VERIFY=2 adds one line per candidate. */
+static void bytepack_verify(const Func *f)
+{
+    const char *env = getenv("IR_BYTEPACK_VERIFY");
+    if (!env || !f || f->n_vregs <= 0 || !f->vreg_to_phys) return;
+    int verbose = env[0] >= '2';
+    int candidates = 0, bc_ready = 0, de_ready = 0;
+    int bc_pair_blocked = 0, de_pair_blocked = 0;
+    int bc_clobbered = 0, de_clobbered = 0;
+    long refs = 0, bc_refs = 0, de_refs = 0;
+    const char *fn = f->fn ? ir_sym_name(f->fn) : "?";
+
+    for (int v = 0; v < f->n_vregs; v++) {
+        const VReg *vr = &f->vregs[v];
+        const LiveRange *lr;
+        int lo, hi, nref = 0;
+        int first_access = INT_MAX, last_access = -1;
+        int bc_tenant = 0, de_tenant = 0;
+        int bc_clobber = 0, de_clobber = 0;
+
+        if (vr->width != 1 || f->vreg_to_phys[v] != IR_PR_SPILL)
+            continue;
+        if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                         | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+            continue;
+        lr = ir_live_range(f, v);
+        if (!lr || lr->start < 0 || lr->end < lr->start) continue;
+        {
+            DefUseIdx du = vreg_def_first(f, v);
+            if (du.first_def >= du.first_read) continue;  /* def-first */
+        }
+        lo = lr->start;
+        hi = lr->end;
+
+        /* Count actual defs/uses in the live interval, not just the interval
+           length; holes are common in the short-lived values this probe seeks. */
+        {
+            int g = 0;
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++, g++) {
+                    const Op *o = &f->bbs[b].ops[j];
+                    int d[8], u[16], nd, nu, k;
+                    if (g < lo || g > hi) continue;
+                    nd = ir_op_defs(o, d, 8);
+                    nu = ir_op_uses(o, u, 16);
+                    for (k = 0; k < nd; k++) if (d[k] == v) {
+                        nref++;
+                        if (g < first_access) first_access = g;
+                        if (g > last_access) last_access = g;
+                    }
+                    for (k = 0; k < nu; k++) if (u[k] == v) {
+                        nref++;
+                        if (g < first_access) first_access = g;
+                        if (g > last_access) last_access = g;
+                    }
+                }
+        }
+        if (nref < 2 || first_access >= last_access) continue;
+        candidates++;
+        refs += nref;
+
+        /* A pair tenant occupies both bytes.  Half homes are included so this
+           remains correct if B/D packing is added beside today's C/E homes. */
+        for (int w = 0; w < f->n_vregs; w++) {
+            PhysReg pw;
+            int wlo, whi;
+            if (w == v) continue;
+            pw = f->vreg_to_phys[w];
+            if (pw != IR_PR_BC && pw != IR_PR_B && pw != IR_PR_C
+                && pw != IR_PR_DE && pw != IR_PR_D && pw != IR_PR_E)
+                continue;
+            if (!hr_residency_window(f, w, &wlo, &whi)) continue;
+            if (wlo > hi || whi < lo) continue;
+            if (pw == IR_PR_BC || pw == IR_PR_B || pw == IR_PR_C)
+                bc_tenant = 1;
+            else
+                de_tenant = 1;
+        }
+
+        {
+            int g = 0;
+            for (int b = 0; b < f->n_bbs && !(bc_clobber && de_clobber); b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++, g++) {
+                    const Op *o = &f->bbs[b].ops[j];
+                    RegMask cm;
+                    /* The defining op writes the candidate, and the final
+                       access no longer needs it afterward. Only clobbers in
+                       the gaps between accesses block a scratch home. */
+                    if (g <= first_access || g >= last_access) continue;
+                    cm = op_clobbers(f, o);
+                    if (cm & IR_R_BC) bc_clobber = 1;
+                    if (cm & IR_R_DE) de_clobber = 1;
+                }
+        }
+        if (bc_tenant) bc_pair_blocked++;
+        if (de_tenant) de_pair_blocked++;
+        if (bc_clobber) bc_clobbered++;
+        if (de_clobber) de_clobbered++;
+        if (!bc_tenant && !bc_clobber) { bc_ready++; bc_refs += nref; }
+        if (!de_tenant && !de_clobber) { de_ready++; de_refs += nref; }
+        if (verbose)
+            fprintf(stderr,
+                    "BYTEPACK: %s v%d live=[%d,%d] refs=%d "
+                    "BC=%s%s DE=%s%s\n", fn, v, lo, hi, nref,
+                    bc_tenant ? "tenant" : "free",
+                    bc_clobber ? "+gap" : "",
+                    de_tenant ? "tenant" : "free",
+                    de_clobber ? "+gap" : "");
+    }
+    if (candidates)
+        fprintf(stderr,
+                "BYTEPACK %-20s cands=%d refs=%ld "
+                "bc_ready=%d/%ld bc_tenant=%d bc_gap=%d "
+                "de_ready=%d/%ld de_tenant=%d de_gap=%d\n",
+                fn, candidates, refs, bc_ready, bc_refs, bc_pair_blocked,
+                bc_clobbered, de_ready, de_refs, de_pair_blocked, de_clobbered);
+}
+
+
+/* [IR_BYTEPACK] Time-share the high byte of BC between born-and-killed byte
+   temporaries.  This is the first executable step after the verifier, so it is
+   deliberately narrower than the sizing probe:
+
+   - one explicit definition, all refs in one BB, and not live-in/live-out;
+   - def-first, with a live spill store that the home can remove;
+   - no BC-clobbering op between the definition and final use;
+   - no overlap with an existing BC/C/B tenant or an earlier packed tenant.
+
+   B is slotless.  A packed value therefore gets an exact home window and can
+   be replaced by the next disjoint value at its definition.  The lowerer's
+   existing byte-home paths already write/read B and treat it as a BC-clobber
+   dependency.  D is a single slot-backed tenant per function: its lazy-spill
+   state can flush and reload around DE-clobbering gaps, but it is not mixed
+   with B/C homes until the lowerer has separate residency latches. */
+static int bytepack_on(void)
+{
+    static int on = -1;
+    if (on < 0) on = !opt_disabled("byte-pack");
+    return on;
+}
+
+static void bytepack_pack(Func *f)
+{
+    typedef struct { int v, lo, hi, refs; } Cand;
+    Cand *cand, *dcand;
+    int nc = 0, ndc = 0;
+    int de_probe = 0, d_home_blocked = 0;
+
+    if (!opt_disabled("byte-pack-de")) de_probe = 1;
+    if (!bytepack_on() || !f || f->n_vregs <= 0 || !f->vreg_to_phys
+        || !f->home_lo || !f->home_hi)
+        return;
+    cand = calloc((size_t)f->n_vregs, sizeof(*cand));
+    dcand = de_probe ? calloc((size_t)f->n_vregs, sizeof(*dcand)) : NULL;
+    if (!cand || (de_probe && !dcand)) {
+        free(cand); free(dcand);
+        return;
+    }
+    if (de_probe)
+        for (int w = 0; w < f->n_vregs; w++) {
+            PhysReg pw = f->vreg_to_phys[w];
+            if (pw == IR_PR_E || pw == IR_PR_D) {
+                d_home_blocked = 1;
+                break;
+            }
+        }
+
+    /* Build the tight, born-and-killed candidate set.  The explicit dst count
+       keeps POSTSTEP and multi-def values out until their home protocol is
+       proven separately. */
+    for (int v = 0; v < f->n_vregs; v++) {
+        const VReg *vr = &f->vregs[v];
+        int bb_of = -1, nbb = 0, defs = 0, refs = 0;
+        int lo = INT_MAX, hi = -1, first_def = 0, call_use = 0;
+        int g = 0;
+
+        if (vr->width != 1 || f->vreg_to_phys[v] != IR_PR_SPILL)
+            continue;
+        if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                         | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE
+                         | IR_VREG_NO_SLOT))
+            continue;
+        for (int b = 0; b < f->n_bbs; b++) {
+            int seen_bb = 0;
+            for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                const Op *o = &f->bbs[b].ops[j];
+                int is_def = o->dst == v;
+                int u[16], nu = ir_op_uses(o, u, 16), is_use = 0;
+                for (int k = 0; k < nu; k++)
+                    if (u[k] == v) { is_use = 1; break; }
+                if (!is_def && !is_use) continue;
+                if (is_use && (o->kind == IR_CALL || o->kind == IR_HCALL))
+                    call_use = 1;
+                if (!seen_bb) { seen_bb = 1; bb_of = b; nbb++; }
+                if (is_def) defs++;
+                if (is_def || is_use) refs++;
+                int pos = g + j;
+                if (pos < lo) { lo = pos; first_def = is_def; }
+                if (pos > hi) hi = pos;
+            }
+            g += f->bbs[b].n_ops;
+        }
+        if (nbb != 1 || defs != 1 || refs < 2 || !first_def || hi < lo
+            || call_use)
+            continue;
+        {
+            const BB *bb = &f->bbs[bb_of];
+            if ((bb->live_in && ir_bitset_get((const BitSet *)bb->live_in, v))
+                || (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, v)))
+                continue;
+        }
+        /* Re-scan the BB to find the definition and reject a dead spill. */
+        {
+            int bb_first = 0;
+            for (int b = 0; b < bb_of; b++) bb_first += f->bbs[b].n_ops;
+            int def_j = -1;
+            for (int j = 0; j < f->bbs[bb_of].n_ops; j++)
+                if (f->bbs[bb_of].ops[j].dst == v) { def_j = j; break; }
+            if (def_j < 0 || op_dst_spill_is_dead(&f->bbs[bb_of], def_j)) continue;
+            lo = bb_first + def_j;
+        }
+        /* The first definition is the home's entry.  Any BC clobber strictly
+           between accesses is a real interference; the def and final use may
+           themselves write BC after establishing/consuming the byte. */
+        {
+            int bc_clean = 1, de_clean = 1, a_gap = 0, gg = 0;
+            for (int b = 0; b < f->n_bbs && (bc_clean || de_clean); b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++, gg++) {
+                    RegMask cm;
+                    if (gg <= lo || gg >= hi) continue;
+                    const Op *gap = &f->bbs[b].ops[j];
+                    int dw = (gap->dst >= 0 && gap->dst < f->n_vregs)
+                           ? f->vregs[gap->dst].width : 0;
+                    int byte_op = dw == 1;
+                    for (int sk = 0; sk < 2; sk++)
+                        if (gap->src[sk] >= 0 && gap->src[sk] < f->n_vregs
+                            && f->vregs[gap->src[sk]].width == 1)
+                            byte_op = 1;
+                    cm = op_clobbers(f, gap);
+                    if (cm & IR_R_BC) bc_clean = 0;
+                    if (cm & IR_R_DE) de_clean = 0;
+                    if (byte_op && (cm & IR_R_A)) a_gap = 1;
+                }
+            /* If A survives from the definition to every use, the lowerer can
+               already consume the value without a reload; writing a scratch
+               home would be pure overhead. Require a real A-clobber in the
+               gap. BC and DE are evaluated independently for their lanes. */
+            if ((!bc_clean && !de_clean) || !a_gap) continue;
+            if (bc_clean) cand[nc++] = (Cand){ v, lo, hi, refs };
+            /* D is slot-backed, so the existing lowerer can flush/reload it
+               around DE-clobbering gaps. Keep the A-clobber requirement, but
+               do not reject a DE gap as the verifier-only B lane does. */
+            if (de_probe && !d_home_blocked)
+                dcand[ndc++] = (Cand){ v, lo, hi, refs };
+        }
+    }
+
+    /* Earliest finishing intervals first gives a deterministic interval
+       schedule and leaves the existing pair homes untouched. */
+    for (int i = 1; i < nc; i++) {
+        Cand c = cand[i];
+        int j = i;
+        while (j > 0 && (cand[j - 1].hi > c.hi
+                         || (cand[j - 1].hi == c.hi && cand[j - 1].lo > c.lo))) {
+            cand[j] = cand[j - 1];
+            j--;
+        }
+        cand[j] = c;
+    }
+    for (int i = 0; i < nc; i++) {
+        Cand *c = &cand[i];
+        int clash = 0;
+        for (int w = 0; w < f->n_vregs && !clash; w++) {
+            PhysReg pw = f->vreg_to_phys[w];
+            int wlo, whi;
+            if (w == c->v || (pw != IR_PR_BC && pw != IR_PR_B && pw != IR_PR_C))
+                continue;
+            if (!hr_residency_window(f, w, &wlo, &whi)) continue;
+            if (wlo <= c->hi && whi >= c->lo) clash = 1;
+        }
+        if (clash) continue;
+        for (int j = 0; j < i && !clash; j++) {
+            Cand *p = &cand[j];
+            if (f->vreg_to_phys[p->v] == IR_PR_B
+                && p->lo <= c->hi && p->hi >= c->lo)
+                clash = 1;
+        }
+        if (clash) continue;
+        alloc_note_late_home(f, c->v, IR_PR_B);
+        f->home_lo[c->v] = c->lo;
+        f->home_hi[c->v] = c->hi;
+        if (getenv("IR_BYTEPACK") && getenv("IR_BYTEPACK")[0] >= '2')
+            fprintf(stderr, "BYTEPACK: %s v%d -> B [%d,%d] refs=%d\n",
+                    f->fn ? ir_sym_name(f->fn) : "?", c->v,
+                    c->lo, c->hi, c->refs);
+    }
+    /* D is a slot-backed home. The lowerer currently tracks only one such
+       home per function, and the same latch is also used by slotless B/C
+       homes. Do not mix those byte-home classes until the lowerer has separate
+       D and B/C residency state. */
+    if (de_probe)
+        for (int w = 0; w < f->n_vregs; w++) {
+            PhysReg pw = f->vreg_to_phys[w];
+            if (pw == IR_PR_B || pw == IR_PR_C) {
+                d_home_blocked = 1;
+                break;
+            }
+        }
+    if (de_probe && !d_home_blocked) {
+        for (int i = 1; i < ndc; i++) {
+            Cand c = dcand[i];
+            int j = i;
+            while (j > 0 && (dcand[j - 1].hi > c.hi
+                             || (dcand[j - 1].hi == c.hi
+                                 && dcand[j - 1].lo > c.lo))) {
+                dcand[j] = dcand[j - 1];
+                j--;
+            }
+            dcand[j] = c;
+        }
+        for (int i = 0; i < ndc; i++) {
+            Cand *c = &dcand[i];
+            int clash = 0;
+            if (f->vreg_to_phys[c->v] != IR_PR_SPILL) continue;
+            for (int w = 0; w < f->n_vregs && !clash; w++) {
+                PhysReg pw = f->vreg_to_phys[w];
+                int wlo, whi;
+                if (w == c->v || (pw != IR_PR_DE && pw != IR_PR_DEHL
+                                  && pw != IR_PR_E && pw != IR_PR_D))
+                    continue;
+                if (!hr_residency_window(f, w, &wlo, &whi)) continue;
+                if (wlo <= c->hi && whi >= c->lo) clash = 1;
+            }
+            if (clash) continue;
+            alloc_note_late_home(f, c->v, IR_PR_D);
+            f->home_lo[c->v] = c->lo;
+            f->home_hi[c->v] = c->hi;
+            if (getenv("IR_BYTEPACK") && getenv("IR_BYTEPACK")[0] >= '2')
+                fprintf(stderr, "BYTEPACK: %s v%d -> D [%d,%d] refs=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", c->v,
+                        c->lo, c->hi, c->refs);
+            break;
+        }
+    }
+    free(cand);
+    free(dcand);
+}
+
 void ir_alloc(Func *f)
 {
     if (!f) return;
@@ -5804,6 +6162,8 @@ void ir_alloc(Func *f)
                     lr ? lr->start : -1, lr ? lr->end : -1, f->vregs[v].flags);
         }
     assign_idxhalf_homes(f);
+    bytepack_verify(f);   /* size the spill candidates before placement */
+    bytepack_pack(f);
     hr_recoverability_verify(f);
     ir_liveprobe_flush(f->fn ? ir_sym_name(f->fn) : "?");
 }

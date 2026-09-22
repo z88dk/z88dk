@@ -49,6 +49,7 @@ exists (ADR 0010).
 | `dead-def` | keep a definition whose destination is never read |
 | `dead-def-live` | `dead-def` decides without per-edge liveness (more conservative) |
 | `prune` | keep unreachable basic blocks |
+| `aggregate-promote` | keep fixed-offset fields of non-escaping local structs in memory |
 | `coalesce-copies` | keep `IR_MOV` copies that could be coalesced away |
 | `addr-cse` | recompute an address expression instead of reusing it |
 | `deref-offset` | keep a field offset as a separate address temporary rather than folding it into the access — the other half of `idx-deref` |
@@ -77,8 +78,8 @@ exists (ADR 0010).
 | Name | Turning it off means |
 | --- | --- |
 | `bc-pack` | no tight BC packing pass after region selection |
-| `ldsi-addr` | 8085 slot addresses use `ld hl,N; add hl,sp` instead of the shorter LDSI pair |
-| `ldhi-addr` | 8085 pointer-plus-constant uses `ld de,N; add hl,de` instead of the shorter LDHI pair |
+| `byte-pack` | no ranged packing of born-and-killed byte temporaries into B |
+| `byte-pack-de` | no single slot-backed D home for a born-and-killed byte temporary |
 | `z80n-add-a` | z80n zero-extended byte adds go via DE instead of `add hl,a` |
 | `de-widen` | a byte widened into DE and copied to HL keeps `ld e,S; ld d,0; ld hl,de` |
 | `inc-mem` | a memory increment stays `ld a,MEM; inc a; ld MEM,a` instead of `inc MEM` |
@@ -130,6 +131,8 @@ exists (ADR 0010).
 | `hl-carry` | the HL belief is not carried across a basic-block edge |
 | `hl-addr-carry` | a slot address held in HL is not carried across an edge |
 | `de-flow` | no DE liveness flow into the lowering decisions (8085) |
+| `ldsi-addr` | 8085 slot addresses use `ld hl,N; add hl,sp` instead of the LDSI form |
+| `ldhi-addr` | 8085 pointer-plus-constant uses `ld de,N; add hl,de` instead of the LDHI form |
 | `de-park` | no rewriting of a `push de`/`pop de` park |
 | `de-ret` | every `ret` is read as reading DE, not only one that returns in DE |
 | `de-call` | every `call` is read as reading DE, not only one that passes an argument there |
@@ -147,6 +150,7 @@ exists (ADR 0010).
 | `home-rearb` | after a demotion the freed register is not offered to the next candidate |
 | `home-resident` | no home-residency backstop during the render |
 | `wh-exit-hoist` | a byte home is not flushed at the region exit |
+| `home-exit-dead` | flush a DE home at a loop exit even when it is dead there |
 | `remat-lea` | an address is reloaded rather than recomputed |
 | `symaddr-deref` | a symbol address is not folded into its dereference |
 | `slot-addr-widen` | a cached slot address is not reused for a wider access |
@@ -182,6 +186,10 @@ exists (ADR 0010).
 | `narrow-mul` | `(unsigned long)u16 * u16` widens both operands to 32 bits instead of taking the 16x16->32 helper |
 | `autopush-param` | a param is stashed across frame allocation instead of becoming a top-of-frame slot |
 | `depark` | no unparking of a value held in E or D alone |
+| `gbz80-tos-read` | GBZ80 word reads at the top frame slot use direct SP-relative loads instead of the POP/PUSH path |
+| `tos-store` | GBZ80 eligible nonvolatile top-of-stack word stores keep the register-preserving path instead of using the POP/PUSH selector |
+| `local-rmw` | the measured frame-local word RMW keeps its address and updated value on the stack instead of repeatedly spilling them to frame slots |
+| `gbz80-rmw` | compatibility opt-out alias for `local-rmw` |
 
 ## Text layer (ADR 0013, ADR 0025)
 

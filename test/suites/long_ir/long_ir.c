@@ -614,6 +614,21 @@ static int dc_andv(int a, int b) { int r = (a && b); return r * 10 + 5; }
 static int dc_sw(int k) { int r = 100; switch (k) { case 1: r = 1; break;
                           case 2: r = 2; break; default: r = 9; } return r + 1000; }
 
+/* Byte scratch packing: keep a byte temporary in B while a second byte
+ * operation overwrites A.  The value is returned directly, so this exercises
+ * the ranged B home without passing it through the call-argument path. */
+static unsigned char bp_safe(unsigned char *p)
+{
+    unsigned char t = *p;
+    unsigned char u = (unsigned char)(*p + 1);
+    return t ^ u;
+}
+static void test_byte_pack(void)
+{
+    unsigned char x = 0x5a;
+    Assert(bp_safe(&x) == 1, "byte scratch B home across byte op");
+}
+
 static void test_diamond_carry(void)
 {
     Assert(dc_sel(1) == 1 && dc_sel(0) == 2,        "if/else merge both edges");
@@ -997,12 +1012,18 @@ static int lr_long_cmp_tos(void) { long a = -10, b = 20; lr_clobber(); return a 
    arguments prevent constant propagation from hiding the TOS word-read path. */
 static int lr_word_cmp_tos(int a, int b) { int left = a, right = b; lr_clobber(); return left < right; }
 static int lr_volatile_word_cmp_tos(int a, int b) { volatile int left = a, right = b; lr_clobber(); return left < right; }
+static int lr_call_word(int x) { return x + 7; }
+/* The non-volatile call result reaches sp+0; the volatile sibling must use a write-only store. */
+static int lr_word_store_tos(int x) { int value = lr_call_word(x); lr_clobber(); return value + 2; }
+static int lr_volatile_word_store_tos(int x) { volatile int value = lr_call_word(x); lr_clobber(); return value + 2; }
 
 static void test_long_cmp_tos(void)
 {
     Assert(lr_long_cmp_tos() == 1, "long compare reads TOS-slot operand past a stack push");
     Assert(lr_word_cmp_tos(-10, 20) == 1, "word compare reads TOS-slot operand");
     Assert(lr_volatile_word_cmp_tos(-10, 20) == 1, "volatile word read avoids the write-back TOS path");
+    Assert(lr_word_store_tos(3) == 12, "word call result survives a TOS slot store");
+    Assert(lr_volatile_word_store_tos(3) == 12, "volatile word TOS store writes without reading the old slot");
 }
 
 /* Address-taken local must keep its frame slot for the whole escape
@@ -2032,6 +2053,7 @@ int suite_long_ir(void)
     suite_add_test(test_cse_array);
     suite_add_test(test_byte_overrun);
     suite_add_test(test_byte_narrow);
+    suite_add_test(test_byte_pack);
     suite_add_test(test_diamond_carry);
     suite_add_test(test_ptr_stride);
     suite_add_test(test_licm_join);
