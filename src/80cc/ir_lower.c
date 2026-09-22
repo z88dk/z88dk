@@ -146,7 +146,11 @@ typedef struct {
     int spill_ix, spill_sp;
     int cur_func_uses_params;
     int cur_frameless;   /* fp-eligible but no IX frame (params read off sp) */
-    int cur_byte_home_vreg, cur_byte_home_dirty, cur_func_ehome;
+    /* B/C and D/E byte homes have independent residency. B/C homes are
+       slotless and never dirty; D/E homes are slot-backed and may be dirty
+       while lazy-spill keeps the value in the byte register. */
+    int cur_byte_home_vreg, cur_de_byte_home_vreg;
+    int cur_de_byte_home_dirty, cur_func_ehome;
     /* DE-home co-design (cur_de_home): the general (non-accumulate) width-2 vreg
        the orchestrator elected to keep in DE across a loop — MOVED to g_hc.de_home
        (step 3a). cur_home_region_lo/hi is the proven BB span it stays resident. */
@@ -256,7 +260,8 @@ static const Op *byte_imm_origin(const Func *f, int v, int depth);
 static LowerState L = {
     .rs = { .fa = -1, .i64_acc = -1 },
     .cur_hl_addr_off = -1, .cur_func_uses_params = 1,
-    .cur_byte_home_vreg = -1, .cur_func_ehome = -1,
+    .cur_byte_home_vreg = -1, .cur_de_byte_home_vreg = -1,
+    .cur_func_ehome = -1,
     .cur_home_region_lo = -1, .cur_home_region_hi = -1,
     .cur_home_exit_flush_bb = -1, .pending_spill_v = -1,
     .cur_stack_resident = -1,
@@ -7976,7 +7981,7 @@ static void lower_verify_op_entry(int bb_id, int op_idx)
     /* Rejected (empirically false-positive on correct code, kept as a record):
        - `cur_sp_adjust == 0`: sp is legitimately nonzero across ops beyond the
          inline-push mechanisms (832 hits).
-       - `cur_byte_home_dirty ⇒ vreg>=0`: dirty can harmlessly persist with no
+       - `cur_de_byte_home_dirty ⇒ vreg>=0`: dirty can harmlessly persist with no
          vreg (a no-op flush; 8 hits).
        - residency ("register-homed live vreg must be in some rs cache"): the
          emission cache legitimately diverges from the allocator's homing
@@ -8018,8 +8023,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     cur_op_idx = 0;
     rec_begin(f);   /* B4 recoverability verifier — final render only */
     invalidate_hl_bc();
-    L.cur_byte_home_vreg = -1;   /* byte home: no resident at function entry */
-    L.cur_byte_home_dirty = 0;
+    L.cur_byte_home_vreg = -1;      /* B/C home: no resident at function entry */
+    L.cur_de_byte_home_vreg = -1;   /* D/E home: no resident at function entry */
+    L.cur_de_byte_home_dirty = 0;
     L.cur_func_ehome = -1;
     g_hc.home_is_word = 0;
     g_hc.func_whome = -1;
@@ -8273,8 +8279,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                    address carry below must not re-assert their belief. */
                 hl_clobbered_at_entry = 1;
             }
-            L.cur_byte_home_dirty = 0;
-            L.cur_byte_home_vreg = -1;
+            L.cur_de_byte_home_dirty = 0;
+            L.cur_de_byte_home_vreg = -1;
         }
         /* Carry the HL cache across the BB boundary when ALL
            predecessors have already been lowered AND agree on
@@ -8412,14 +8418,14 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             }
             if (bcarry >= 0 && bb->live_in
                 && ir_bitset_get((const BitSet *)bb->live_in, bcarry)) {
-                L.cur_byte_home_vreg = bcarry;
-                L.cur_byte_home_dirty = bdirty;
+                L.cur_de_byte_home_vreg = bcarry;
+                L.cur_de_byte_home_dirty = bdirty;
             } else {
-                L.cur_byte_home_vreg = -1;
+                L.cur_de_byte_home_vreg = -1;
             }
         } else if (L.cur_func_ehome >= 0) {
             /* In-region: the region assertion (below) re-establishes the belief. */
-            L.cur_byte_home_vreg = -1;
+            L.cur_de_byte_home_vreg = -1;
         }
         /* A preheader of the resident region: outside it, but with an edge
            (alias-resolved) into the header. Its exit re-homes the slot-backed
@@ -8449,7 +8455,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         if (L.cur_func_ehome >= 0 && L.cur_home_region_lo >= 0
             && bb->id >= L.cur_home_region_lo
             && bb->id <= L.cur_home_region_hi
-            && L.cur_byte_home_vreg < 0
+            && L.cur_de_byte_home_vreg < 0
             && bb->live_in
             && ir_bitset_get((const BitSet *)bb->live_in, L.cur_func_ehome)) {
             int ok = 1, saw_lowered = 0;
@@ -8460,7 +8466,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 if (L.bb_byte_out[pid] != L.cur_func_ehome) { ok = 0; break; }
             }
             if (ok && saw_lowered)
-                L.cur_byte_home_vreg = L.cur_func_ehome;
+                L.cur_de_byte_home_vreg = L.cur_func_ehome;
         }
         /* Correctness backstop: the resident region suppresses in-loop spills
            ONLY because the home is proven to ride E throughout. If residency
@@ -8469,15 +8475,15 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            render so the body uses the normal flush rules — else the body
            would update only E while in-loop reloads read a stale slot. */
         if (bb->id == L.cur_home_region_lo && L.cur_home_region_lo >= 0
-            && L.cur_byte_home_vreg != L.cur_func_ehome) {
+            && L.cur_de_byte_home_vreg != L.cur_func_ehome) {
             L.cur_home_region_lo = L.cur_home_region_hi = -1;
             in_home_region = 0;
         }
         /* Inside the resident region the home rides E with no per-iteration
            spill, so the slot is stale: mark dirty so the one flush on the
            region-exit edge fires (a leaving consumer may reload it). */
-        if (in_home_region && L.cur_byte_home_vreg == L.cur_func_ehome)
-            L.cur_byte_home_dirty = 1;
+        if (in_home_region && L.cur_de_byte_home_vreg == L.cur_func_ehome)
+            L.cur_de_byte_home_dirty = 1;
         /* Does this BB need to spill a dirty home before exiting? Inside the
            resident region: only when an edge LEAVES the region (the out-of-
            region target may reload from the slot); all in-region edges keep
@@ -8535,8 +8541,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            so suppress the per-iteration header flush when that hoist is active. */
         if (region_exit_here
             && (opt_disabled("home-exit-dead") || region_exit_needs_flush)
-            && L.cur_byte_home_vreg == L.cur_func_ehome
-            && L.cur_byte_home_dirty
+            && L.cur_de_byte_home_vreg == L.cur_func_ehome
+            && L.cur_de_byte_home_dirty
             && home_is_slotbacked(f, L.cur_func_ehome)
             && L.cur_home_exit_flush_bb < 0)
             home_flush(out, f);   /* keep belief; slot now coherent */
@@ -9066,8 +9072,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                        the belief) so the merge/back-edge successor can reload
                        a coherent slot if it doesn't carry. */
                     if (L.cur_func_ehome >= 0 && bb_exit_flush_needed
-                        && L.cur_byte_home_dirty && L.cur_byte_home_vreg >= 0
-                        && home_is_slotbacked(f, L.cur_byte_home_vreg))
+                        && L.cur_de_byte_home_dirty && L.cur_de_byte_home_vreg >= 0
+                        && home_is_slotbacked(f, L.cur_de_byte_home_vreg))
                         home_flush(out, f);
                     continue;
                 }
@@ -9116,11 +9122,11 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 && (op->kind == IR_BR || op->kind == IR_BR_COND
                     || op->kind == IR_BR_ZERO))
                 home_rehome(out, f);
-            if (L.cur_byte_home_vreg >= 0
-                && home_is_slotbacked(f, L.cur_byte_home_vreg)) {
+            if (L.cur_de_byte_home_vreg >= 0
+                && home_is_slotbacked(f, L.cur_de_byte_home_vreg)) {
                 if (!op_de_clean(f, op)) {
                     home_clobber(out, f);
-                } else if (L.cur_byte_home_dirty && bb_exit_flush_needed
+                } else if (L.cur_de_byte_home_dirty && bb_exit_flush_needed
                            && (op->kind == IR_BR || op->kind == IR_BR_COND
                                || op->kind == IR_BR_ZERO)) {
                     home_flush(out, f);   /* keep belief */
@@ -9173,9 +9179,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            and the home is dirty, spill it now (after the last op, before the
            implicit edge). Branch-ending BBs already flushed before the
            branch in the dispatch above. */
-        if (L.cur_func_ehome >= 0 && bb_exit_flush_needed && L.cur_byte_home_dirty
-            && L.cur_byte_home_vreg >= 0
-            && home_is_slotbacked(f, L.cur_byte_home_vreg)) {
+        if (L.cur_func_ehome >= 0 && bb_exit_flush_needed && L.cur_de_byte_home_dirty
+            && L.cur_de_byte_home_vreg >= 0
+            && home_is_slotbacked(f, L.cur_de_byte_home_vreg)) {
             int lastk = bb->n_ops ? bb->ops[bb->n_ops - 1].kind : IR_NOP;
             if (lastk != IR_BR && lastk != IR_BR_COND
                 && lastk != IR_BR_ZERO && lastk != IR_RET
@@ -9186,11 +9192,11 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            the slot-backed home is in E/D here iff the belief still holds it,
            plus whether its slot is stale (dirty) so successors inherit it. */
         L.bb_byte_out[bb->id] =
-            (L.cur_func_ehome >= 0 && L.cur_byte_home_vreg == L.cur_func_ehome)
-            ? L.cur_byte_home_vreg : -1;
+            (L.cur_func_ehome >= 0 && L.cur_de_byte_home_vreg == L.cur_func_ehome)
+            ? L.cur_de_byte_home_vreg : -1;
         if (L.bb_byte_out_dirty)
             L.bb_byte_out_dirty[bb->id] =
-                (L.bb_byte_out[bb->id] >= 0 && L.cur_byte_home_dirty) ? 1 : 0;
+                (L.bb_byte_out[bb->id] >= 0 && L.cur_de_byte_home_dirty) ? 1 : 0;
         bb_hl_out[bb->id] = L.rs.hl;
         if (bb_bc_out) bb_bc_out[bb->id] = L.rs.bc;
         if (bb_hl_addr_out) bb_hl_addr_out[bb->id] = L.cur_hl_addr_off;

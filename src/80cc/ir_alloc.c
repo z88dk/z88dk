@@ -4379,11 +4379,15 @@ static int bytepack_on(void)
 
 static void bytepack_pack(Func *f)
 {
-    typedef struct { int v, lo, hi, refs; } Cand;
+    typedef struct { int v, lo, hi, refs, shift; } Cand;
     Cand *cand, *dcand;
     int nc = 0, ndc = 0;
+    int bc_packed = 0;
     int de_probe = 0, d_home_blocked = 0;
 
+    /* The 8085 stack-only path has no cheap D/E byte-home traffic: a
+       slot-backed byte home is formed through HL/LDSI and costs more than the
+       spill it replaces. Keep the independent D lane for the other CPUs. */
     if (!opt_disabled("byte-pack-de")) de_probe = 1;
     if (!bytepack_on() || !f || f->n_vregs <= 0 || !f->vreg_to_phys
         || !f->home_lo || !f->home_hi)
@@ -4410,6 +4414,7 @@ static void bytepack_pack(Func *f)
         const VReg *vr = &f->vregs[v];
         int bb_of = -1, nbb = 0, defs = 0, refs = 0;
         int lo = INT_MAX, hi = -1, first_def = 0, call_use = 0;
+        int shift_shape = 0;
         int g = 0;
 
         if (vr->width != 1 || f->vreg_to_phys[v] != IR_PR_SPILL)
@@ -4429,6 +4434,9 @@ static void bytepack_pack(Func *f)
                 if (!is_def && !is_use) continue;
                 if (is_use && (o->kind == IR_CALL || o->kind == IR_HCALL))
                     call_use = 1;
+                if (o->kind == IR_SHL || o->kind == IR_SHR
+                    || o->kind == IR_ROTL || o->kind == IR_ROTR)
+                    shift_shape = 1;
                 if (!seen_bb) { seen_bb = 1; bb_of = b; nbb++; }
                 if (is_def) defs++;
                 if (is_def || is_use) refs++;
@@ -4457,6 +4465,23 @@ static void bytepack_pack(Func *f)
             if (def_j < 0 || op_dst_spill_is_dead(&f->bbs[bb_of], def_j)) continue;
             lo = bb_first + def_j;
         }
+        /* Include the producer window when classifying a mixed D candidate.
+           In kbshift the packed value is an ADD fed by immediately preceding
+           shifts, so the shift is just before the candidate's home interval;
+           a plain bit mask has no such producer. */
+        if (!shift_shape) {
+            int bb_first = 0;
+            for (int b = 0; b < bb_of; b++) bb_first += f->bbs[b].n_ops;
+            for (int j = 0; j < f->bbs[bb_of].n_ops; j++) {
+                int pos = bb_first + j;
+                if (pos < lo - 2 || pos >= lo) continue;
+                OpKind k = f->bbs[bb_of].ops[j].kind;
+                if (k == IR_SHL || k == IR_SHR || k == IR_ROTL || k == IR_ROTR) {
+                    shift_shape = 1;
+                    break;
+                }
+            }
+        }
         /* The first definition is the home's entry.  Any BC clobber strictly
            between accesses is a real interference; the def and final use may
            themselves write BC after establishing/consuming the byte. */
@@ -4484,12 +4509,12 @@ static void bytepack_pack(Func *f)
                home would be pure overhead. Require a real A-clobber in the
                gap. BC and DE are evaluated independently for their lanes. */
             if ((!bc_clean && !de_clean) || !a_gap) continue;
-            if (bc_clean) cand[nc++] = (Cand){ v, lo, hi, refs };
+            if (bc_clean) cand[nc++] = (Cand){ v, lo, hi, refs, shift_shape };
             /* D is slot-backed, so the existing lowerer can flush/reload it
                around DE-clobbering gaps. Keep the A-clobber requirement, but
                do not reject a DE gap as the verifier-only B lane does. */
             if (de_probe && !d_home_blocked)
-                dcand[ndc++] = (Cand){ v, lo, hi, refs };
+                dcand[ndc++] = (Cand){ v, lo, hi, refs, shift_shape };
         }
     }
 
@@ -4525,6 +4550,7 @@ static void bytepack_pack(Func *f)
         }
         if (clash) continue;
         alloc_note_late_home(f, c->v, IR_PR_B);
+        bc_packed++;
         f->home_lo[c->v] = c->lo;
         f->home_hi[c->v] = c->hi;
         if (getenv("IR_BYTEPACK") && getenv("IR_BYTEPACK")[0] >= '2')
@@ -4532,18 +4558,13 @@ static void bytepack_pack(Func *f)
                     f->fn ? ir_sym_name(f->fn) : "?", c->v,
                     c->lo, c->hi, c->refs);
     }
-    /* D is a slot-backed home. The lowerer currently tracks only one such
-       home per function, and the same latch is also used by slotless B/C
-       homes. Do not mix those byte-home classes until the lowerer has separate
-       D and B/C residency state. */
-    if (de_probe)
-        for (int w = 0; w < f->n_vregs; w++) {
-            PhysReg pw = f->vreg_to_phys[w];
-            if (pw == IR_PR_B || pw == IR_PR_C) {
-                d_home_blocked = 1;
-                break;
-            }
-        }
+    /* D is a slot-backed home. B/C and D/E have independent lowerer
+       residency, so a disjoint B/C home does not suppress this lane. The
+       8085 stack-only byte path is the exception: its HL/LDSI slot traffic
+       makes a mixed B+C plus D/E function lose, so retain the old isolation
+       there while still allowing D/E packing in B/C-free functions. */
+    if (IS_8085() && bc_packed)
+        d_home_blocked = 1;
     if (de_probe && !d_home_blocked) {
         for (int i = 1; i < ndc; i++) {
             Cand c = dcand[i];
@@ -4559,6 +4580,11 @@ static void bytepack_pack(Func *f)
         for (int i = 0; i < ndc; i++) {
             Cand *c = &dcand[i];
             int clash = 0;
+            /* On mixed B/D functions the D lane must pay for its slot-backed
+               traffic. Shift-shaped values do: their widened shift path
+               otherwise reloads through A. Plain mask/merge temporaries do
+               not, and are better left in their ordinary spill slot. */
+            if (bc_packed && !c->shift) continue;
             if (f->vreg_to_phys[c->v] != IR_PR_SPILL) continue;
             for (int w = 0; w < f->n_vregs && !clash; w++) {
                 PhysReg pw = f->vreg_to_phys[w];

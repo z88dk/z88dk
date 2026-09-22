@@ -62,7 +62,7 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
            it (else a later reload reads garbage). */
         if (g_hc.home_is_word && op->dst == g_hc.func_whome) {
             byte_home_note(op->dst);
-            L.cur_byte_home_dirty = 1;
+            L.cur_de_byte_home_dirty = 1;
         }
         return 0;
     }
@@ -367,7 +367,7 @@ static int try_inplace_home_unop(FILE *out, const Func *f, const Op *op,
     PhysReg pr = byte_home_phys(f, op->dst);
     if (pr == IR_PR_NONE) return 0;
     emit(out, "%s\t%s", mnem, byte_home_reg(pr));
-    if (byte_home_slotbacked(pr)) L.cur_byte_home_dirty = 1;
+    if (byte_home_slotbacked(pr)) L.cur_de_byte_home_dirty = 1;
     invalidate_a_cache();   /* result is in the home reg, not A */
     return 1;
 }
@@ -2164,8 +2164,9 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             int stage_value = !IS_808x() && !IS_Z80N() && !IS_RABBIT()
                             && !opt_disabled("var-byte-shift");
             int byte_home = L.cur_byte_home_vreg;
-            int e_home = byte_home >= 0
-                      && byte_home_phys(f, byte_home) == IR_PR_E;
+            int de_home = L.cur_de_byte_home_vreg;
+            int e_home = de_home >= 0
+                      && byte_home_phys(f, de_home) == IR_PR_E;
             int use_e = stage_value && L.rs.bc >= 0 && L.rs.de < 0 && !e_home;
             int bc_live = (L.rs.bc >= 0);
             int source_b_home = !use_e && byte_home == op->src[0]
@@ -4015,7 +4016,7 @@ static int try_word_accumulate(FILE *out, Func *f, const Op *op)
     invalidate_hl_cache();             /* drops HL/DE/A beliefs */
     cache_de(home);                    /* DE now holds the new home */
     byte_home_note(home);              /* residency (re)established */
-    L.cur_byte_home_dirty = 1;           /* slot stale → flush before clobber/exit */
+    L.cur_de_byte_home_dirty = 1;        /* slot stale → flush before clobber/exit */
     return 1;                          /* handled */
 }
 
@@ -4242,7 +4243,7 @@ static int try_de_home_def(FILE *out, Func *f, const Op *op)
     invalidate_hl_cache();
     cache_de(op->dst);
     byte_home_note(op->dst);
-    L.cur_byte_home_dirty = 1;
+    L.cur_de_byte_home_dirty = 1;
     return 1;
 }
 
@@ -5228,7 +5229,7 @@ static int try_byte_shift_test_fuse(FILE *out, const Func *f, const Op *op)
     } else {
         emit(out, "sla\t%s", byte_home_reg(pr));
     }
-    if (byte_home_slotbacked(pr)) L.cur_byte_home_dirty = 1;
+    if (byte_home_slotbacked(pr)) L.cur_de_byte_home_dirty = 1;
     invalidate_a_cache();
     const char *cc = (g_hc.branch_test_kind == IR_BR_ZERO) ? "nc" : "c";
     emit(out, "jp\t%s,L_f%d_bb_%d", cc, L.func_emit_idx, skip_id);
@@ -5980,4 +5981,3 @@ static void push_arg_byte_to_a(FILE *out, const Func *f, int vreg, int sp_adj)
     emit(out, "add\thl,sp");
     emit(out, "ld\ta,(hl)");
 }
-

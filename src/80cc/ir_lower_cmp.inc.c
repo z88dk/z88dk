@@ -1280,8 +1280,9 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         int n = L.cmp_label_counter++;
         int bc_live = (L.rs.bc >= 0);
         int byte_home = L.cur_byte_home_vreg;
-        int e_home = byte_home >= 0
-                  && byte_home_phys(f, byte_home) == IR_PR_E;
+        int de_home = L.cur_de_byte_home_vreg;
+        int e_home = de_home >= 0
+                  && byte_home_phys(f, de_home) == IR_PR_E;
         int use_e = bc_live && L.rs.de < 0 && !e_home;
         int source_b_home = !use_e && byte_home == op->src[0]
                          && byte_home >= 0
@@ -1941,4 +1942,3 @@ static int gen_sar16(FILE *out, Func *f, const Op *op)
     commit_hl_word(out, f, op->dst);
     return 0;
 }
-

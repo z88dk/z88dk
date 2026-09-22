@@ -283,7 +283,7 @@ static int fp_tos_slot(const Func *f, int vreg_id)
 }
 
 /* Word DE-home: a width-2 loop-carried accumulator homed in DE reuses the
-   byte home-residency machinery (cur_byte_home_vreg/_dirty, bb_byte_out,
+   byte home-residency machinery (the B/C and D/E latches, bb_byte_out,
    cur_func_ehome, the region span, the BB-loop carry/flush) with
    cur_home_is_word=1 and cur_func_whome set to that vreg. A byte E/D-home and
    a word DE-home never coexist (the allocator gives up the word home when a
@@ -1267,7 +1267,7 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
                            && tos_store_vreg_live_after(f, L.rs.de))
                        || (L.rs.dehl >= 0 && L.rs.dehl != vreg_id
                            && tos_store_vreg_live_after(f, L.rs.dehl));
-            int de_free = !de_live && L.cur_byte_home_vreg < 0;
+            int de_free = !de_live && L.cur_de_byte_home_vreg < 0;
             if (!is_volatile && de_free) {
                 emit(out, "pop\tde");
                 emit(out, "push\thl");
@@ -1528,7 +1528,7 @@ static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id)
     if (bh != IR_PR_NONE) {
         emit(out, "ld\t%s,a", byte_home_reg(bh));
         byte_home_note(vreg_id);
-        if (byte_home_slotbacked(bh)) L.cur_byte_home_dirty = 1;
+        if (byte_home_slotbacked(bh)) L.cur_de_byte_home_dirty = 1;
         cache_a(vreg_id);   /* A still holds the value — next read elides */
         return;
     }
@@ -2416,8 +2416,8 @@ static void cache_a(int v) { L.rs.a = v; }
 static void invalidate_a_cache(void) { L.rs.a = -1; }
 
 /* Byte-register residency. A width-1 vreg pinned to a byte register keeps
-   its value there across a loop. `cur_byte_home_vreg` is which home vreg
-   currently lives in its register. PR_C/PR_B (no-call BC-clean envelope)
+   its value there across a loop. `cur_byte_home_vreg` tracks the slotless B/C home;
+   `cur_de_byte_home_vreg` tracks the slot-backed D/E home. PR_C/PR_B (no-call BC-clean envelope)
    are slotless and never clobbered, so the value rides for the whole
    function (never dirty). Slot-backed homes (PR_E/PR_D — low/high of DE)
    are clobbered by DE-scratch ops, so the lowerer lazy-spills: a home write
@@ -2448,8 +2448,24 @@ static const char *byte_home_reg(PhysReg pr)
     default:      return NULL;
     }
 }
-static int  byte_home_holds(int v) { return v >= 0 && L.cur_byte_home_vreg == v; }
-static void byte_home_note(int v)  { L.cur_byte_home_vreg = v; }
+static int byte_home_is_de_lane(int v)
+{
+    if (v < 0) return 0;
+    if (g_hc.home_is_word && v == g_hc.func_whome) return 1;
+    return byte_home_slotbacked(byte_home_phys(cur_lazy_func, v));
+}
+static int byte_home_holds(int v)
+{
+    if (v < 0) return 0;
+    return byte_home_is_de_lane(v)
+        ? L.cur_de_byte_home_vreg == v
+        : L.cur_byte_home_vreg == v;
+}
+static void byte_home_note(int v)
+{
+    if (byte_home_is_de_lane(v)) L.cur_de_byte_home_vreg = v;
+    else                        L.cur_byte_home_vreg = v;
+}
 
 /* Index-half byte home (PR_IXL/IXH/IYL/IYH): a SEPARATE, simpler mechanism from
    the E/D/C/B home above. Slotless and clobber-free in the no-call region the
