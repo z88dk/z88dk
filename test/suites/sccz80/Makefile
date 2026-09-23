@@ -30,8 +30,9 @@ endif
 
 
 
+# double_t is 6 bytes here (four values, 24 bytes). --genmath keeps that width.
 test_autoinit.bin: $(SOURCES) autoinit.c
-	$(call compile, -DGENMATH -DMATH_LIBRARY="\"\\\"Genmath\\\"\"", -lm )
+	$(call compile, -DGENMATH -DMATH_LIBRARY="\"\\\"Genmath\\\"\"", --genmath )
 	$(runtest)
 
 test_callee.bin: $(SOURCES) callee.c
