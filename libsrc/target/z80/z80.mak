@@ -83,6 +83,12 @@ fastmath.lib: kc160_clib.lib
 	@echo ''
 	$(MAKE) -C math/integer/fastmath
 
+r800_opt.lib: kc160_clib.lib
+	@echo ''
+	@echo '--- Building r800 hardware-multiply library ---'
+	@echo ''
+	$(MAKE) -C math/integer/r800
+
 target-z80: $(Z80_TARGETS)
 
 .PHONY: target-z80 target-z80-clean

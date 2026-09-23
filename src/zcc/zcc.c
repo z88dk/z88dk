@@ -86,6 +86,7 @@ enum {
     CPU_TYPE_GBZ80,
     CPU_TYPE_EZ80,
     CPU_TYPE_KC160,
+    CPU_TYPE_R800,
     CPU_TYPE_KR580VM1,
     CPU_TYPE_IXIY,
     CPU_TYPE_STRICT,
@@ -509,6 +510,7 @@ static option options[] = {
     { 0, "mgbz80", OPT_ASSIGN|OPT_INT, "Generate output for the gbz80", &c_cpu, NULL, CPU_TYPE_GBZ80 },
     { 0, "mez80_z80", OPT_ASSIGN|OPT_INT, "Generate output for the ez80 (z80 mode)", &c_cpu, NULL, CPU_TYPE_EZ80 },
     { 0, "mkc160", OPT_ASSIGN|OPT_INT, "Generate output for the KC160 (z80 mode)", &c_cpu, NULL, CPU_TYPE_KC160 },
+    { 0, "mr800", OPT_ASSIGN|OPT_INT, "Generate output for the R800 (z80-linkable object)", &c_cpu, NULL, CPU_TYPE_R800 },
     { 0, "mvm1", OPT_ASSIGN|OPT_INT, "Generate output for the KR580VM1", &c_cpu, NULL, CPU_TYPE_KR580VM1 },
 
     { 0, "", OPT_HEADER, "Target options:", NULL, NULL, 0 },
@@ -639,6 +641,7 @@ cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     {{ "-mgbz80" , "-mgbz80" , "-msm83" , "-mgbz80", "DESTDIR/lib/arch/gbz80/gbz80_rules.1", "_gbz80", NULL }},       /* CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mez80_z80"   , "-mez80_z80" ,  "-mez80_z80" ,   "-mez80", "DESTDIR/lib/arch/ez80/ez80_rules.1", "_ez80_z80",  "-triple z80" }},           /* CPU_TYPE_EZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mkc160" , "-mkc160" ,  "-mz80" , "-mkc160", "DESTDIR/lib/arch/kc160/kc160_rules.1", "_kc160",  "-triple z180" }},           /* CPU_TYPE_KC160   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mz80"   , "-mr800"  ,  "-mr800" , "-mz80", "DESTDIR/lib/arch/r800/r800_rules.1", "",  NULL }},           /* CPU_TYPE_R800    : object stays z80-stamped (links unmodified z80/MSX libs); SCCZ80/80cc/ZSDCC see -mr800 - sdcc has a real r800 port */
     {{ "-mvm1", "-mvm1", NULL, "-mvm1", "DESTDIR/lib/arch/vm1/vm1_rules.1", "_vm1", NULL }},  /* CPU_TYPE_KR580VM1 : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mz80 -IXIY"   , "-mz80"   , "-mz80"   , "-mz80", "DESTDIR/lib/arch/z80/z80_rules.1", "_ixiy",  "-triple z80"   }},          /* CPU_TYPE_IXIY     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT, CPU_TOOL_LIBNAME */
     {{ "-mz80_strict",  "-mz80"   , "-mz80"   , "-mz80", "DESTDIR/lib/arch/z80/z80_rules.1", "_strict",  "-triple z80"   }},          /* CPU_TYPE_STRICT  : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT, CPU_TOOL_LIBNAME */
@@ -1765,6 +1768,22 @@ int main(int argc, char **argv)
 
         free(linklibs);
         linklibs = tmp;
+
+        /* r800 objects stay z80-stamped (no CPU_MAP_TOOL_LIBNAME suffix, see
+           the cpu_map comment), so -mr800 alone never routes through a
+           dedicated clib and the __CPU_R800__ dispatch other CPUs' 32x32
+           multiply helpers use (l_mulu_32_32x32.asm) can never fire. sccz80
+           reaches l_mulu_32_32x32/l_muls_32_32x32 through a real jp/call
+           (unlike int*int, which codegen.c inlines directly - see
+           mult_const/multreg), so this needs a genuine helper override:
+           link -lr800_opt first so its l_mulu_32_32x32/l_muls_32_32x32
+           win the archive search ahead of the software-loop default. */
+        if (cpu_libs && c_cpu == CPU_TYPE_R800) {
+            char *tmp2 = mustmalloc(strlen(linklibs) + strlen("-lr800_opt ") + 1);
+            sprintf(tmp2, "-lr800_opt %s", linklibs);
+            free(linklibs);
+            linklibs = tmp2;
+        }
     }
 
     /* Newlib strips @{ZCC_LIBCPU}, so --math32 is -lmath32.

@@ -62,7 +62,7 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
            it (else a later reload reads garbage). */
         if (g_hc.home_is_word && op->dst == g_hc.func_whome) {
             byte_home_note(op->dst);
-            L.cur_byte_home_dirty = 1;
+            L.cur_de_byte_home_dirty = 1;
         }
         return 0;
     }
@@ -367,7 +367,7 @@ static int try_inplace_home_unop(FILE *out, const Func *f, const Op *op,
     PhysReg pr = byte_home_phys(f, op->dst);
     if (pr == IR_PR_NONE) return 0;
     emit(out, "%s\t%s", mnem, byte_home_reg(pr));
-    if (byte_home_slotbacked(pr)) L.cur_byte_home_dirty = 1;
+    if (byte_home_slotbacked(pr)) L.cur_de_byte_home_dirty = 1;
     invalidate_a_cache();   /* result is in the home reg, not A */
     return 1;
 }
@@ -665,7 +665,7 @@ static int gen_extract_byte(FILE *out, Func *f, const Op *op)
            Byte 0 = low, byte 1 = high. z80/z80n read the index half directly;
            the rest (ez80/kc160/rabbit/z180 — no usable index-half byte access)
            recover the word into HL (push/pop) and take the byte. */
-        if (c_cpu == CPU_Z80 || IS_Z80N()) {
+        if ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N()) {
             emit(out, "ld\ta,%s%s", vreg_idx_name(f, x), k == 0 ? "l" : "h");
         } else {
             emit_idx_word_to_reg(out, f, x, "hl");
@@ -2164,8 +2164,9 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             int stage_value = !IS_808x() && !IS_Z80N() && !IS_RABBIT()
                             && !opt_disabled("var-byte-shift");
             int byte_home = L.cur_byte_home_vreg;
-            int e_home = byte_home >= 0
-                      && byte_home_phys(f, byte_home) == IR_PR_E;
+            int de_home = L.cur_de_byte_home_vreg;
+            int e_home = de_home >= 0
+                      && byte_home_phys(f, de_home) == IR_PR_E;
             int use_e = stage_value && L.rs.bc >= 0 && L.rs.de < 0 && !e_home;
             int bc_live = (L.rs.bc >= 0);
             int source_b_home = !use_e && byte_home == op->src[0]
@@ -4015,7 +4016,7 @@ static int try_word_accumulate(FILE *out, Func *f, const Op *op)
     invalidate_hl_cache();             /* drops HL/DE/A beliefs */
     cache_de(home);                    /* DE now holds the new home */
     byte_home_note(home);              /* residency (re)established */
-    L.cur_byte_home_dirty = 1;           /* slot stale → flush before clobber/exit */
+    L.cur_de_byte_home_dirty = 1;        /* slot stale → flush before clobber/exit */
     return 1;                          /* handled */
 }
 
@@ -4147,14 +4148,14 @@ static int try_binop_ixd_fold(FILE *out, Func *f, const Op *op,
     if (opt_disabled("alu-fold")) return 0;
     if (g_hc.de_home < 0) return 0;           /* only inside a DE-home region */
     if (!fp_active(f)) return 0;
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
     if (op->dst < 0 || f->vregs[op->dst].width != 2) return 0;
     int s0 = op->src[0], s1 = op->src[1];
     if (s0 < 0 || s1 < 0) return 0;
     if (s0 >= f->n_vregs || s1 >= f->n_vregs) return 0;
     if (f->vregs[s0].width != 2 || f->vregs[s1].width != 2) return 0;
     if (L.pending_spill_v >= 0) return 0;      /* byte ops clobber HL; see cmp fold */
-    int idxhalf_ok = (c_cpu == CPU_Z80 || IS_Z80N());
+    int idxhalf_ok = ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N());
     char s0lo[16], s0hi[16], s1lo[16], s1hi[16];
     int c0 = cmp_byte_src(f, s0, idxhalf_ok, s0lo, s0hi, sizeof s0lo);
     int c1 = cmp_byte_src(f, s1, idxhalf_ok, s1lo, s1hi, sizeof s1lo);
@@ -4242,7 +4243,7 @@ static int try_de_home_def(FILE *out, Func *f, const Op *op)
     invalidate_hl_cache();
     cache_de(op->dst);
     byte_home_note(op->dst);
-    L.cur_byte_home_dirty = 1;
+    L.cur_de_byte_home_dirty = 1;
     return 1;
 }
 
@@ -4256,7 +4257,7 @@ static int try_de_home_def(FILE *out, Func *f, const Op *op)
 static int try_index_half_word_add(FILE *out, Func *f, const Op *op)
 {
     if (opt_disabled("ixd-fold")) return 0;
-    if (!(c_cpu == CPU_Z80 || IS_Z80N())) return 0;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N())) return 0;
     /* Co-design helper for the sp-mode idx3/exx layout (writable loop words in
        index regs). Off in fp mode and in default sp builds so codegen there is
        unchanged (fp's idx2=IY invariant must not be folded — broke word_resident-fp). */
@@ -5113,9 +5114,22 @@ static int gen_mul(FILE *out, Func *f, const Op *op)
     int uns = (op->imm != 0);
 
     if (f->vregs[op->src[0]].width == 2) {
-        /* kc160 16x16 -> low 16. */
+        /* kc160/r800 16x16 -> low 16, or (r800 only) the full 32-bit widening
+           product straight from the instruction - dst width tells them
+           apart (emit_ir_mul's width-4 caller is the narrow-mul widening
+           path in ir_build.c). */
         load_binop_operands(out, f, op);        /* HL = src0, DE = src1 */
-        emit(out, "mul\tde,hl");
+        if (IS_R800()) {
+            emit(out, "muluw\thl,de");
+        } else {
+            emit(out, "mul\tde,hl");
+        }
+        if (IS_R800() && f->vregs[op->dst].width == 4) {
+            invalidate_hl_cache();
+            invalidate_de_cache();
+            store_dehl_finalize(out, f, op->dst);
+            return 0;
+        }
         invalidate_de_cache();                  /* DE now holds the high 16 */
         commit_hl_result(out, f, op->dst);
         return 0;
@@ -5228,7 +5242,7 @@ static int try_byte_shift_test_fuse(FILE *out, const Func *f, const Op *op)
     } else {
         emit(out, "sla\t%s", byte_home_reg(pr));
     }
-    if (byte_home_slotbacked(pr)) L.cur_byte_home_dirty = 1;
+    if (byte_home_slotbacked(pr)) L.cur_de_byte_home_dirty = 1;
     invalidate_a_cache();
     const char *cc = (g_hc.branch_test_kind == IR_BR_ZERO) ? "nc" : "c";
     emit(out, "jp\t%s,L_f%d_bb_%d", cc, L.func_emit_idx, skip_id);
@@ -5980,4 +5994,3 @@ static void push_arg_byte_to_a(FILE *out, const Func *f, int vreg, int sp_adj)
     emit(out, "add\thl,sp");
     emit(out, "ld\ta,(hl)");
 }
-

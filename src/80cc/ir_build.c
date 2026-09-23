@@ -6333,6 +6333,12 @@ static int build_muldiv_integer(Builder *b, Node *n)
             if (rv < 0) return -1;
             lv = widen_u16_to_int(b, lv);         /* u8 -> u16 for HL/DE */
             rv = widen_u16_to_int(b, rv);
+            /* r800: `muluw hl,de` produces the full DEHL = HL*DE product
+               directly - no call needed, unlike every other CPU here (their
+               l_mulu_32_16x16 either loops in software or itself calls out
+               to a hardware op that only gives a 16-bit result). */
+            if (IS_R800())
+                return emit_ir_mul(b, lv, rv, 4, 1);
             int dst = new_temp(b, 4);
             b->f->vregs[dst].width = 4;
             Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
@@ -6444,6 +6450,13 @@ static int build_muldiv_integer(Builder *b, Node *n)
        l_fix16_*. Width 2 matches half, so the integer HW mul used to fire
        on `1.5h * 1.5h` (math16 80cc kc160 suite). */
     if (n->ast_type == OP_MULT && IS_KC160() && width == 2
+        && !is_flt && !is_fix16)
+        return emit_ir_mul(b, l, r, 2, 1);
+    /* r800: 16x16 int multiply is `muluw hl,bc` (DEHL = HL*BC, unsigned
+       hardware only) - same low-16-bits-are-sign-agnostic reasoning as
+       kc160 above, so the unsigned form serves signed and unsigned int*int
+       alike for a width-2 (truncated) result. */
+    if (n->ast_type == OP_MULT && IS_R800() && width == 2
         && !is_flt && !is_fix16)
         return emit_ir_mul(b, l, r, 2, 1);
     const char *helper;
