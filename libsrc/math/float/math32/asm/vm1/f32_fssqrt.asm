@@ -246,17 +246,12 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
 
 
 .load_expanded
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
+    ld e,(hl+)                  ; *p++
+    ld d,(hl+)                  ; *p++
     push de
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
-    ld c,(hl)
-    inc hl
+    ld e,(hl+)                  ; *p++
+    ld d,(hl+)                  ; *p++
+    ld c,(hl+)                  ; *p++
     ld b,(hl)
     pop hl
     ret

@@ -130,8 +130,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     push hl                         ; product high lives in HL
     ld hl,10                ; sign/exp at +6/+7 +4
     add hl,sp
-    ld c,(hl)
-    inc hl
+    ld c,(hl+)                      ; *p++
     ld b,(hl)
     pop hl
     pop de                          ; BC = sign/exp, HLDE = product
@@ -146,13 +145,11 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     pop hl
     pop de                      ; A=flag DEHL=result
 
-    ld b,h
-    ld c,l
+    ld bc,hl
     ld hl,14
     add hl,sp
     ld sp,hl
-    ld h,b                  ; DEHL restored; A=flag
-    ld l,c
+    ld hl,bc                        ; DEHL restored; A=flag
 
     or a
     jp Z,fm_done
@@ -390,13 +387,9 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .load_ieee_dehl
     ; HL = pointer to IEEE float
-    ld c,(hl)
-    inc hl
-    ld b,(hl)
-    inc hl
-    ld e,(hl)
-    inc hl
+    ld c,(hl+)                      ; *p++
+    ld b,(hl+)                      ; *p++
+    ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld h,b
-    ld l,c
+    ld hl,bc
     ret

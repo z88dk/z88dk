@@ -32,8 +32,7 @@ EXTERN m32_fsnormalize
 ; convert integer in hl to float in dehl
 .m32_float16
     push hl                        ; integer in de
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld a,d
     rla                             ; sign → C
@@ -41,15 +40,13 @@ EXTERN m32_fsnormalize
     ld h,a
     ld l,a                          ; hl = sign extension
     push hl                        ; dehl = sign-extended long
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
 
 ; convert long in dehl to float in dehl
 .m32_float32
     push hl                        ; hlde
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld a,h
     ld b,a                          ; B holds sign in bit 7
@@ -89,8 +86,7 @@ EXTERN m32_fsnormalize
 .m32_float32u
     ld b,0                          ; force positive sign
     push hl
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
 
 .dldf0
@@ -151,8 +147,7 @@ EXTERN m32_fsnormalize
     rra
     ld l,a
     push hl                        ; result DEHL
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ret
 

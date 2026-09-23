@@ -59,8 +59,7 @@ PUBLIC _m32_invf
 
 .inv_finite
     push hl
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     add hl,hl
     ld h,0bfh
@@ -69,8 +68,7 @@ PUBLIC _m32_invf
     rra
     ld l,a
     push hl
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
 
     push de
@@ -195,8 +193,7 @@ PUBLIC _m32_invf
     ld h,(hl)
     ld l,a
     push hl
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     pop hl
     call unpack

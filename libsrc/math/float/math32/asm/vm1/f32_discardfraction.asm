@@ -99,8 +99,7 @@ PUBLIC m32_discardfraction
     ld a,d                      ; sign from original
     rla                         ; C = sign bit
     ld de,0
-    ld h,d
-    ld l,e
+    ld hl,de
     ld a,d                      ; A = 0: the exponent byte must be dropped
     rra                         ; A = 0x00 (+0) or 0x80 (-0)
     ld d,a
@@ -111,8 +110,7 @@ PUBLIC m32_discardfraction
     ld a,d
     rla
     ld de,0
-    ld h,d
-    ld l,e
+    ld hl,de
     rra
     ld d,a
     or a                        ; NC: already integer zero

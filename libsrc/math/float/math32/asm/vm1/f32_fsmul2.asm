@@ -56,8 +56,7 @@ PUBLIC _m32_mul2f
 
 .zero_legal
     ld e,d
-    ld h,d
-    ld l,e
+    ld hl,de
     ld a,d
     rra
     ld d,a

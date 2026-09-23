@@ -40,8 +40,7 @@ PUBLIC m32__dtoa_digits
     ld c,a
     ld de,sp+38                     ; work+30
     ld hl,(de)
-    ld (hl),c
-    inc hl
+    ld (hl+),c                      ; *p++
     ld (de),hl
     pop hl
     pop de                          ; counts remain stacked

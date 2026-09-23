@@ -225,8 +225,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     pop de                          ; low
     ; open-code ex (sp),hl — preserve BC/DE (helper is 148c)
     push de
-    ld d,h
-    ld e,l                          ; DE = ret
+    ld de,hl                        ; DE = ret
     ld hl,sp+2                      ; &high
     ld a,(hl)
     ld (hl),e
@@ -238,8 +237,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld l,e                          ; HL = high; (sp+2) = ret
     pop de                          ; DE = low
     push hl                         ; DE=high, HL=low
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ret
 
@@ -281,8 +279,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld h,(hl)
     ld l,a
     push hl
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     pop hl                          ; BC DEHL = X
 
@@ -338,8 +335,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld h,(hl)
     ld l,a
     push hl
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld hl,bc                        ; DEHL = small
     pop bc                          ; B = count
@@ -404,8 +400,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 .a32_al_store
     ld bc,de                        ; park small.de
     push hl                        ; DE = small.hl
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld hl,sp+10
     ld (hl+),e

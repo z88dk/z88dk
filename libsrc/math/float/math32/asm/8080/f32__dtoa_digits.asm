@@ -44,8 +44,7 @@ PUBLIC m32__dtoa_digits
     ld d,(hl)
     ld l,a
     ld h,d
-    ld (hl),e
-    inc hl
+    ld (hl+),e                      ; *p++
     ld bc,hl
     ld hl,sp+38
     ld (hl+),c

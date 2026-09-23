@@ -107,8 +107,7 @@ PUBLIC _m32_mul10uf
 .zero_legal
     pop af                          ; C = sign
     ld e,d
-    ld h,d
-    ld l,e
+    ld hl,de
     ld a,d
     rra
     ld d,a

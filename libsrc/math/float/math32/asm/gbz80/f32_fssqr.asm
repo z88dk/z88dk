@@ -33,8 +33,7 @@ PUBLIC _m32_sqrf
 .m32_fssqr_fastcall
     ; DEHL = y
     push hl                        ; HLDE = IEEE
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     add hl,hl                       ; exp→H, ignore sign
     ld a,h

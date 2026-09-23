@@ -73,8 +73,7 @@ EXTERN m32__dtoa_emit
 
     ld de,sp+32
     ld hl,(de)                      ; L=flags, H=prec
-    ld c,l
-    ld b,h
+    ld bc,hl
     xor a
     ld hl,0
     add hl,sp
@@ -342,8 +341,7 @@ EXTERN m32__dtoa_emit
     ld hl,40
     add hl,sp
     push de
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)                      ; *p++
     ld d,(hl)
     ex de,hl                        ; HL = dest
     pop de
@@ -364,8 +362,7 @@ EXTERN m32__dtoa_emit
     push hl
     ld de,sp+38
     ld hl,(de)
-    ld (hl),a
-    inc hl
+    ld (hl+),a                      ; *p++
     ld (de),hl
     pop hl
     pop de

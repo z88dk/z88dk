@@ -53,8 +53,7 @@ PUBLIC m32_fsnormalize32
 
 .need16
     push hl
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld a,b
     sub 16

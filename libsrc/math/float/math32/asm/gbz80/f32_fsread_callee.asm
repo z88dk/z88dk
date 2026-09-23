@@ -20,13 +20,11 @@ PUBLIC cm32_sccz80_fsread1_callee
     pop de                      ; ret1
     pop hl                      ; LSW
     push hl                     ; park LSW; HL↔DE without ex (56c)
-    ld h,d
-    ld l,e                      ; HL = ret1
+    ld hl,de                    ; HL = ret1
     pop de                      ; DE = LSW
     ; open-code ex (sp),hl — preserve BC/DE (helper is 148c)
     push de
-    ld d,h
-    ld e,l                      ; DE = ret1
+    ld de,hl                    ; DE = ret1
     ld hl,sp+2                  ; &MSW
     ld a,(hl)
     ld (hl),e
@@ -38,8 +36,7 @@ PUBLIC cm32_sccz80_fsread1_callee
     ld l,e                      ; HL = MSW; (sp+2) = ret1
     pop de                      ; DE = LSW
     push hl                     ; DE=MSW, HL=LSW
-    ld h,d
-    ld l,e
+    ld hl,de
     pop de
     push bc
     ret

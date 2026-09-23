@@ -281,8 +281,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     pop de                          ; ml
     ; open-code ex (sp),hl — preserve BC/DE (helper is 148c)
     push de
-    ld d,h
-    ld e,l                          ; DE = ret
+    ld de,hl                        ; DE = ret
     ld hl,sp+2                      ; &mh
     ld a,(hl)
     ld (hl),e
@@ -294,7 +293,6 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ld l,e                          ; HL = mh; (sp+2) = ret
     pop de                          ; DE = ml
     push hl                         ; DE=mh, HL=ml
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ret

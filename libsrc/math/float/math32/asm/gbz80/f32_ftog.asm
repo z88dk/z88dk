@@ -43,10 +43,8 @@ EXTERN m32__dtoa_finish
 .g_prec
     ld hl,sp+8
     ld c,(hl+)
-    ld b,(hl)
-    inc hl
-    ld e,(hl)
-    inc hl
+    ld b,(hl+)                      ; *p++
+    ld e,(hl+)                      ; *p++
     ld d,(hl)
     ld hl,bc
     ld b,002h                       ; flags bit 1 = %g
@@ -68,16 +66,11 @@ EXTERN m32__dtoa_finish
     ld b,(hl)
     xor a
     ld hl,sp+0
-    ld (hl),c
-    inc hl
-    ld (hl),a
-    inc hl
-    ld (hl),a
-    inc hl
-    ld (hl),a
-    inc hl
-    ld (hl),b
-    inc hl
+    ld (hl+),c                      ; *p++
+    ld (hl+),a                      ; *p++
+    ld (hl+),a                      ; *p++
+    ld (hl+),a                      ; *p++
+    ld (hl+),b                      ; *p++
     ld (hl),'0'
 
     ld hl,sp+6
@@ -88,10 +81,8 @@ EXTERN m32__dtoa_finish
 
     ld hl,sp+34
     ld c,(hl+)
-    ld b,(hl)
-    inc hl
-    ld e,(hl)
-    inc hl
+    ld b,(hl+)                      ; *p++
+    ld e,(hl+)                      ; *p++
     ld d,(hl)
     ld hl,bc
 

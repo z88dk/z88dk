@@ -328,8 +328,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .unpack_dehl
     push hl
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld c,h                          ; C = sign byte
     add hl,hl

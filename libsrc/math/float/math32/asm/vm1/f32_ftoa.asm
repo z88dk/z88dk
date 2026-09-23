@@ -338,8 +338,7 @@ EXTERN m32__dtoa_emit
     add hl,sp
     ex de,hl
     ld hl,(de)
-    ld (hl),a
-    inc hl
+    ld (hl+),a                      ; *p++
     ld (de),hl
     pop hl
     pop de

@@ -8,7 +8,7 @@ This library is designed for z180 (eZ80), z80n, and Rabbit 2000 / 3000 processor
 
 The library is also designed to be as fast as possible on plain Z80, using a `32_24×8` basis multiply.
 
-Intel 8080, 8085, KR580VM1, and gbz80 have separate stack-based cores (`math32_8080.lib`, `math32_8085.lib`, `math32_vm1.lib`, `math32_gbz80.lib`). Those builds do not use the alternate register set or index registers. Higher-level C helpers for 8080, 8085, vm1, and gbz80 are built with **sccz80 only** (zsdcc is Z80-only).
+Intel 8080, 8085, KR580VM1, and Nintendo Gameboy gbz80 have separate stack-based cores (`math32_8080.lib`, `math32_8085.lib`, `math32_vm1.lib`, `math32_gbz80.lib`). Those builds do not use the alternate register set or index registers. Higher-level C helpers for 8080, 8085, vm1, and gbz80 are built with **sccz80 only** (zsdcc is Z80-only).
 
 *@feilipu, May 2019 – September 2026*
 
@@ -18,14 +18,14 @@ Intel 8080, 8085, KR580VM1, and gbz80 have separate stack-based cores (`math32_8
 
 - All intrinsic functions are written in assembly.
 - All the code is re-entrant.
-- Register use on the Z80-family cores is limited to the main and alternate set (including `af'`). No index registers. The 8080, 8085, vm1, and gbz80 cores use the main register set and the stack only. vm1 never `pop af` of unknown contents (MF selects the data RAM bank).
-- Made for the Spectrum Next (z80n) and Agon Lite (eZ80). The z80n `mul de`, the z180 (eZ80) `mlt`, and the Rabbit `mul` instructions accelerate floating-point calculation. Full support also covers Zilog Z80 and variants, Digi Rabbit processors, Intel 8080 and 8085, the KR580VM1, and the Nintendo Game Boy CPU (gbz80).
+- Register use on the Z80-family cores is limited to the main and alternate set (including `af'`). No index registers. The 8080, 8085, vm1, and gbz80 cores use the main register set and the stack only.
+- Made for the Spectrum Next (z80n) and Agon Lite (eZ80). The z80n `mul de`, the z180 (eZ80) `mlt`, and the Rabbit `mul` instructions accelerate floating-point calculation. Full support also covers Zilog Z80 and variants, Digi Rabbit processors, Intel 8080 and 8085, the KR580VM1, and the Nintendo Game Boy CPU (gbz80), using ISA extensions wherever appropriate.
 - Mantissa work uses 24 bits plus 8 bits for rounding. Product paths (mul, sqr, div, poly, invsqrt / sqrt) use IEEE-754 round-to-nearest-even (RNE) on the residual byte. Addition / subtraction use jam-sticky on lost bits, which gives better accuracy on repeated additions.
 - Derived functions use a full 32-bit internal mantissa path, without mid-path rounding, for maximum accuracy when many multiplies and adds are required (Horner / Newton–Raphson). That is equivalent to a fused 32-bit multiply-add process, with the rounded IEEE-754 mantissa produced as the final result.
 - Where no hardware multiply is available, software multiply uses a `32_24×8` unrolled algorithm. The dedicated square kernel is separate: five `16_8×8` products, matching the z80n / z180 square layout.
 - Higher functions are written in C for maintainability. They draw on the intrinsic square root, square, polynomial evaluation, and the four arithmetic functions.
-- Power and trigonometric accuracy and speed can be traded by changing polynomial coefficient tables and iteration counts. More coefficients give higher accuracy at the expense of performance. Cephes and Hi-Tech coefficient tables are the default. Alternative tables can be used without changing the evaluator code.
-- Square root (through inverse square root) is seeded with the Quake magic-number method, then three Newton–Raphson iterations. Accuracy and speed can be traded by removing one or two iterations, for example for games.
+- Power and trigonometric accuracy and speed can be traded by changing polynomial coefficient tables and iteration counts. More coefficients give higher accuracy at the expense of performance. The original Cephes and Hi-Tech coefficient tables have been optimised and immproved. Alternative tables can be used without changing the evaluator code.
+- Square root (through inverse square root) is seeded with the Quake magic-number method, then three Newton–Raphson iterations. Accuracy and speed can be traded by removing one or two N-R iterations, for example for games.
 
 ---
 
@@ -42,7 +42,7 @@ Intel 8080, 8085, KR580VM1, and gbz80 have separate stack-based cores (`math32_8
 | `math32_kc160.lib` | KC160 | KC160 multiply helpers |
 | `math32_8085.lib` | 8085 | stack-only software |
 | `math32_8080.lib` | 8080 | stack-only software |
-| `math32_vm1.lib` | KR580VM1 | stack-only software (LHLX/SHLX/DSUB/DCMP) |
+| `math32_vm1.lib` | KR580VM1 | stack-only software |
 | `math32_gbz80.lib` | Game Boy (gbz80) | stack-only software |
 
 **eZ80 note.** eZ80 Z80-mode has the same `mlt` encodings as Z180 (`ED 4C/5C/6C/7C`). `math32_ez80_z80.lib` is built from `newlibfiles_ez80_z80.lst`, which selects the Z180 mantissa helpers. Those helpers are gated `IF __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__` (`-mez80_z80` defines `__CPU_EZ80_Z80__`, not `__CPU_EZ80__`).
@@ -50,8 +50,6 @@ Intel 8080, 8085, KR580VM1, and gbz80 have separate stack-based cores (`math32_8
 ---
 
 ## Classic float text (`ftoa` / `ftoe` / `ftog`)
-
-Classic `%f` / `%e` / `%g` call `ftoa` / `ftoe` / `ftog`. math32 no longer ships a C text layer (`c/ftoe.c` and `pow10f_tab[77]` are gone). Shared `libsrc/math/float/cimpl/ftoe.c` stays for mbf32, am9511, mbf64, daimath32, and cpcmath.
 
 | CPU | Path |
 |-----|------|
@@ -61,15 +59,6 @@ Classic `%f` / `%e` / `%g` call `ftoa` / `ftoe` / `ftog`. math32 no longer ships
 The stack-only engine matches the Z80 C11 contract used by `test/suites/math` (`test_math32_printf`): `%g` of `1.234e-37` is `1.234e-37`, `%g` of `-2.5e-5` is `-2.5e-05`, `%g` of `314.159` is `314.159`, `%.2f` of a tiny value is `0.00`. Classic `sprintf` also: `test/suites/stdio` `test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` (`--math32`; `%e` of `1.2345` is `1.234500e+00`). Integer `sscanf` is `test_scanf*.bin` (no `%f`). `test/suites/string` is `str*` only.
 
 Classic zsdcc does not scan printf formats. `--math32` does not enable `%f` / `%e` / `%g`. Add `#pragma printf = "%f %e %g"` or `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF`. Without that, printf writes the letter `f`, `e`, or `g`. sccz80 and 80cc scan the format string and do not need this. Do not set `NEED_printf` from `CLIB_32BIT_FLOATS` alone.
-
-ISA notes for the stack-only files:
-
-- 8085 uses `rl de`, `ld de,sp+n`, `ld hl,(de)`, and `ld (de),hl`. Do not write `ld hl,sp+n` here. z80asm expands that with LDSI and `ex de,hl`, and a negative offset is not a safe frame open.
-- vm1 uses LHLX / SHLX (`ld hl,(de)` / `ld (de),hl`). It never `pop af` of unknown contents. There is no `rl de` (`$18` is `sub hl,de`).
-- gbz80 uses native `ld hl,sp+*`, `ld a,(hl+)` / `ld (hl+),a`, CB `rl` / `srl` / `rr`, and `add sp,4` to drop a stacked float. It has no cheap `ex de,hl`.
-- 8080 keeps `ld hl,nn` / `add hl,sp` (`ld hl,sp+n` sugar) and pair copies. `putc` keeps DEHL.
-
-This closes #3104 item 4 (route B dtoa rewrite).
 
 ---
 
@@ -213,7 +202,7 @@ Although some Digi algorithms remain visible in the intrinsic path, the cores ha
 
 **Addition / subtraction** still use a nybble / byte shift tree in Digi spirit. As add and subtract rely heavily on bit shifting across the mantissa, the functions establish a tree of byte and nybble shifting for performance. Nybble shifting is native on Rabbit, and the same plan works well on Z80 with little overhead. Lost bits use **jam-sticky**: any bit shifted out sets the kept mantissa LSB. Pack does not apply residual RNE on add / sub.
 
-**Multiply** was rewritten around `16_8×8` terms. Z180 `mlt`, z80n `mul de`, and Rabbit / KC160 helpers accelerate the mantissa. Plain Z80 uses a `32_24×8` construction. The Digi Rabbit `32_16×16` path is not the current hot path.
+**Multiply** was rewritten around `16_8×8` terms. Z180 `mlt`, z80n `mul de`, and Rabbit / KC160 hardware multiply operations accelerate the mantissa. Plain Z80 uses a `32_24×8` construction.
 
 ---
 
@@ -288,7 +277,7 @@ The z80-family, 8085, 8080, vm1, and gbz80 divide cores share the same control s
 
 For plain `1/n`, restoring `div` is the faster path on the measured CPUs. Explicit `inv(x)` calls the NR inverse. sccz80 does not rewrite IEEE `1.0f/x` into `inv`.
 
-Inputs with `exp == 0` are ±0. Result underflow flushes to signed zero. There is no gradual underflow.
+Inputs with `exp == 0` are ±0. Result underflow flushes to signed zero. There is no gradual underflow from normalised representations.
 
 #### Square root and inverse square root
 
@@ -299,7 +288,7 @@ float invsqrt (float x);
 
 `invsqrt()` seeds Newton–Raphson with the Quake-class constant `0x5f375a86` (see [Lomont 2003](http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf)), then three unrolled Newton–Raphson iterations on the expanded 32-bit helpers. `sqrt(x)` is `x * invsqrt(x)`. The IEEE `sqr()` intrinsic (24-bit `sqr_32h_24x24`) is a separate function for user code and is not a subroutine of those iterations.
 
-Two NR iterations give about 5 or 6 significant digits. Three iterations (the default) approach 7 significant digits for this library. One iteration is often enough for 3D games and is substantially faster.
+Two N-R iterations give about 5 or 6 significant digits. Three iterations (the default) approach 7 significant digits for this library. One iteration is often enough for 3D games and is substantially faster.
 
 #### Special helpers
 
@@ -370,8 +359,6 @@ The library is laid out as shared assembly, CPU-specific cores, C sources, and c
 | `lm32/` | Standard-name aliases into math32 (`-lmath32` / `--math32`). |
 | `newlibfiles_*.lst` | Classic product assemble lists (`make` in this directory). |
 | `math32_z80_common_asm.lst`, `math32_z80_asm.lst`, `math32_z80n_asm.lst`, `math32_z180_asm.lst` | Newlib clib embed (`math_float_sccz80*.lst` / `math_float_sdcc_ix*.lst`). There is no 8085/8080/gbz80/vm1 newlib math32 clib. |
-
-One major operation per assembly file. Rebuild with `make -C libsrc/math/float/math32`, then install the `math32*.lib` products into `lib/clibs/`.
 
 ---
 

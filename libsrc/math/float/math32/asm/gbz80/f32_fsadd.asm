@@ -169,8 +169,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .fa_pack_regs
     ld a,l
     push hl                        ; HL = mid:lsb
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     add a,a                         ; drop hidden 1
     ld e,a
@@ -269,8 +268,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .unpack_regs
     ld b,d                          ; sign byte
     push hl
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     add hl,hl
     ld c,h                          ; exp
@@ -446,8 +444,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld l,c
     ld h,0
     push hl                        ; DE = MSB word
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld hl,sp+10                     ; X.MSB at +8 +2
     ld (hl+),e
@@ -483,8 +480,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,d
     adc a,e                         ; MSB sum; C = bit24
     push hl                        ; DE = low sum
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld l,a
     ld a,0
@@ -519,8 +515,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,c
     sbc a,b                         ; Y.MSB − X.MSB − borrow
     push hl                        ; DE = low diff
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld l,a
     ld h,0

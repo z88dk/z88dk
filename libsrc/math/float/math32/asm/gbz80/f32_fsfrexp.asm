@@ -32,8 +32,7 @@ PUBLIC _m32_frexpf
     pop de                          ; x.HL
     ; open-code ex (sp),hl — preserve BC/DE (helper is 148c)
     push de
-    ld d,h
-    ld e,l                          ; DE = ret
+    ld de,hl                        ; DE = ret
     ld hl,sp+2                      ; &x.DE
     ld a,(hl)
     ld (hl),e
@@ -70,15 +69,13 @@ PUBLIC _m32_frexpf
 
 .frexp_zero
     push hl                        ; DE = work
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld hl,sp+6                      ; ptr slot
     ld c,(hl+)
     ld b,(hl)
     push hl                        ; HL = work again
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
 
     ld (bc),a

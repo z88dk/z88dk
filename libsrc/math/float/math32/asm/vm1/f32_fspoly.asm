@@ -109,13 +109,10 @@ PUBLIC _m32_polyf
     ld e,a
     ld d,0
     add hl,de                       ; &d[n]
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
+    ld e,(hl+)                      ; *p++
+    ld d,(hl+)                      ; *p++
     push de                         ; LSW
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)                      ; *p++
     ld d,(hl)
     pop hl
     push de                         ; X.DE

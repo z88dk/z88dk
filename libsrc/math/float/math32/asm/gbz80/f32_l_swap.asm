@@ -25,8 +25,7 @@ PUBLIC l_f32_swap
     push bc                         ; SP: ret, right, left
     ld hl,sp+2                      ; &right
     push hl
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld hl,sp+6                      ; &left
     ld b,4

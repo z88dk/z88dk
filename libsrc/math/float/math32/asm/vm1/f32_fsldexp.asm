@@ -32,8 +32,7 @@ PUBLIC _m32_ldexpf
 
 ; HL = signed power; DEHL = float x
 .m32_dmulpow2
-    ld b,h
-    ld c,l
+    ld bc,hl
     jp pow2
 
 
@@ -60,8 +59,7 @@ PUBLIC _m32_ldexpf
     ; SP+0 ret, SP+2 x.HL, SP+4 x.DE, SP+6 pw2
     ld hl,4
     add hl,sp
-    ld a,(hl)
-    inc hl
+    ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a                      ; HL = x.DE
 

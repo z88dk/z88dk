@@ -81,8 +81,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     add hl,sp
     ex de,hl
     ld hl,(de)
-    ld b,h
-    ld c,l                          ; Y.bc
+    ld bc,hl                        ; Y.bc
     ld hl,6
     add hl,sp
     ex de,hl
@@ -261,13 +260,11 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 .fa_epi
     ; DEHL = result.  SP: X(6) Y(6) flag ret IEEE.
-    ld b,h                  ; park result low
-    ld c,l
+    ld bc,hl                        ; park result low
     ld hl,12
     add hl,sp
     ld sp,hl                        ; drop X + Y park
-    ld h,b                  ; DEHL = result
-    ld l,c
+    ld hl,bc                        ; DEHL = result
     pop bc                          ; drop flag
     ld a,c
     or a
@@ -303,8 +300,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     pop hl                          ; ret
     push bc
     push de
-    ld b,h
-    ld c,l
+    ld bc,hl
     ld l,a
     ld h,0
     push hl
@@ -314,15 +310,11 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 .load_ieee
     ; HL = pointer to IEEE float
-    ld c,(hl)
-    inc hl
-    ld b,(hl)
-    inc hl
-    ld e,(hl)
-    inc hl
+    ld c,(hl+)                      ; *p++
+    ld b,(hl+)                      ; *p++
+    ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld h,b
-    ld l,c
+    ld hl,bc
     ret
 
 
@@ -342,8 +334,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     add hl,sp
     ex de,hl
     ld hl,(de)
-    ld b,h
-    ld c,l                          ; X.bc
+    ld bc,hl                        ; X.bc
     ld hl,10
     add hl,sp
     ex de,hl
@@ -415,8 +406,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
     ld hl,10
     add hl,sp
-    ld c,(hl)               ; LSB
-    inc hl
+    ld c,(hl+)                      ; LSB
     ld e,(hl)                       ; E = mid (Y parked)
     ld hl,8
     add hl,sp
@@ -487,14 +477,12 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ex de,hl                        ; DE = MSB word
     ld hl,10                        ; X.MSB at +8 +2
     add hl,sp
-    ld (hl),e
-    inc hl
+    ld (hl+),e                      ; *p++
     ld (hl),d
     pop de                          ; LSB:mid
     ld hl,10                        ; X.LSB:mid
     add hl,sp
-    ld (hl),e
-    inc hl
+    ld (hl+),e                      ; *p++
     ld (hl),d
     pop hl
     pop de
@@ -511,15 +499,12 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ; Walk from X.MSB so add hl,bc Carry is not lost to add hl,sp.
     push bc                         ; +0 se +2 ret +4 X.MSB +6 X.low
     ld a,l                          ; Y.MSB
-    ld b,d
-    ld c,e                          ; BC = Y.low
+    ld bc,de                        ; BC = Y.low
     ld hl,4
     add hl,sp
-    ld d,(hl)                       ; D = X.MSB
-    inc hl
+    ld d,(hl+)                      ; D = X.MSB
     inc hl                          ; skip pad
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)                      ; *p++
     ld h,(hl)
     ld l,e                          ; HL = X.low
     add hl,bc                       ; C → MSB
@@ -546,11 +531,9 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,l                          ; Y.MSB
     ld hl,4
     add hl,sp
-    ld b,(hl)                       ; B = X.MSB
-    inc hl
+    ld b,(hl+)                      ; B = X.MSB
     inc hl                          ; skip pad
-    ld c,(hl)
-    inc hl
+    ld c,(hl+)                      ; *p++
     ld h,(hl)
     ld l,c                          ; HL = X.low
     ld c,a                          ; C = Y.MSB

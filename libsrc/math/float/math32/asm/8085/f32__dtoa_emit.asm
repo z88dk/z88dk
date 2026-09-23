@@ -56,8 +56,7 @@ PUBLIC m32__dtoa_emit
     jp Z,do_tze
     or a
     jp Z,finish
-    ld (hl),a
-    inc hl
+    ld (hl+),a                      ; *p++
     inc de
     jp copy_int
 
@@ -78,8 +77,7 @@ PUBLIC m32__dtoa_emit
     jp Z,do_tze_from_fz
     or a
     jp Z,do_tz_from_fz
-    ld (hl),a
-    inc hl
+    ld (hl+),a                      ; *p++
     inc de
     jp copy_frac
 
@@ -104,16 +102,14 @@ PUBLIC m32__dtoa_emit
     ld a,(bc)
     call put_zeroes
     pop af
-    ld (hl),a
-    inc hl
+    ld (hl+),a                      ; *p++
     inc de
 
 .rest
     ld a,(de)
     or a
     jp Z,finish
-    ld (hl),a
-    inc hl
+    ld (hl+),a                      ; *p++
     inc de
     jp rest
 

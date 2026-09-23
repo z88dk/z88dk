@@ -460,8 +460,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 .div_done
     ; Pack form H|L|D|E → IEEE DEHL, then shared unwind.
     push de
-    ld d,h
-    ld e,l
+    ld de,hl
     pop hl                      ; DEHL = IEEE result
     call div_unwind
     ret

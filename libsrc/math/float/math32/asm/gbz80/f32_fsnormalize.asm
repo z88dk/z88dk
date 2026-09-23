@@ -23,8 +23,7 @@ PUBLIC m32_fsnormalize
 
 .m32_fsnormalize
     push hl                    ; E = high, HL = mid:low
-    ld h,d
-    ld l,e                          ; HL↔DE without ex (56c)
+    ld hl,de                    ; HL↔DE without ex (56c)
     pop de
     ; D = shift count + 1.  sub D then sets C for both underflow and
     ; FTZ exp==0 (signed zero), so one jr c covers both; inc a restores exp.

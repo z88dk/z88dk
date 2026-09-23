@@ -39,8 +39,7 @@ PUBLIC m32__dtoa_digits
     add hl,sp
     ex de,hl
     ld hl,(de)
-    ld (hl),c
-    inc hl
+    ld (hl+),c                      ; *p++
     ld (de),hl
     pop hl
     pop de                          ; counts remain stacked

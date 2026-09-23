@@ -65,12 +65,10 @@ PUBLIC _m32_mul10uf
 
     ; HL = h|l_sh, DE = d|e (D untouched by >>=2). Swap to match 8080 ex de,hl.
     push hl
-    ld h,d
-    ld l,e                          ; HL = d|e_sh
+    ld hl,de                        ; HL = d|e_sh
     pop de                          ; DE = h|l_sh
     ; HL=d|e_sh, DE=h|l_sh, stack: orig_hl, orig_de — no ex (sp),hl
-    ld b,h
-    ld c,l                          ; BC = d|e_sh
+    ld bc,hl                        ; BC = d|e_sh
     pop hl                          ; HL = orig_hl
     add hl,de                       ; HL = sum of mantissa lows
     pop de                          ; DE = orig_de

@@ -34,8 +34,7 @@ PUBLIC m32__dtoa_special
 
 .string
     ld a,(de)
-    ld (hl),a
-    inc hl
+    ld (hl+),a                      ; *p++
     inc de
     or a
     jp NZ,string

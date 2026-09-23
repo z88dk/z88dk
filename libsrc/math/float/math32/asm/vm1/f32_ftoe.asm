@@ -42,10 +42,8 @@ EXTERN m32__dtoa_special
     ld a,(hl)
     ld hl,sp+8
     ld c,(hl+)
-    ld b,(hl)
-    inc hl
-    ld e,(hl)
-    inc hl
+    ld b,(hl+)                      ; *p++
+    ld e,(hl+)                      ; *p++
     ld d,(hl)
     ld hl,bc
     ld b,0
@@ -67,16 +65,11 @@ EXTERN m32__dtoa_special
     ld b,(hl)
     xor a
     ld hl,sp+0
-    ld (hl),c
-    inc hl
-    ld (hl),a
-    inc hl
-    ld (hl),a
-    inc hl
-    ld (hl),a
-    inc hl
-    ld (hl),b
-    inc hl
+    ld (hl+),c                      ; *p++
+    ld (hl+),a                      ; *p++
+    ld (hl+),a                      ; *p++
+    ld (hl+),a                      ; *p++
+    ld (hl+),b                      ; *p++
     ld (hl),'0'
 
     ld hl,sp+6
@@ -87,10 +80,8 @@ EXTERN m32__dtoa_special
 
     ld hl,sp+34
     ld c,(hl+)
-    ld b,(hl)
-    inc hl
-    ld e,(hl)
-    inc hl
+    ld b,(hl+)                      ; *p++
+    ld e,(hl+)                      ; *p++
     ld d,(hl)
     ld hl,bc
 
@@ -175,10 +166,8 @@ EXTERN m32__dtoa_special
 
     ; 9.99.. rounded to 10.0 → carry '1', then '.'
     inc hl
-    ld a,(hl)                       ; old first digit
-    inc hl
-    ld (hl),a                       ; overwrite '.'
-    dec hl
+    ld a,(hl+)                      ; old first digit
+    ld (hl-),a                      ; overwrite '.'
     ld (hl),'.'
     ld hl,sp+26
     inc (hl)                        ; e++

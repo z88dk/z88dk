@@ -45,8 +45,7 @@ PUBLIC _m32_frexpf
     ; SP+0 ret, SP+2 x.HL, SP+4 x.DE, SP+6 ptr
     ld hl,4
     add hl,sp
-    ld a,(hl)
-    inc hl
+    ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a                      ; HL = x.DE
 
@@ -61,8 +60,7 @@ PUBLIC _m32_frexpf
     ex de,hl                        ; DE = work
     ld hl,6                 ; ptr slot
     add hl,sp
-    ld c,(hl)
-    inc hl
+    ld c,(hl+)                      ; *p++
     ld b,(hl)
     ex de,hl                        ; HL = work again
 

@@ -132,10 +132,8 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld e,h                      ; E = mid
     ld hl,4                 ; &div (work at +4 under rem)
     add hl,sp
-    ld (hl),a
-    inc hl
-    ld (hl),e
-    inc hl
+    ld (hl+),a                  ; *p++
+    ld (hl+),e                  ; *p++
     ld (hl),c                   ; div hi
 
     ld hl,7
@@ -169,10 +167,8 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     xor a
     ld hl,8                 ; quot at +4 +4
     add hl,sp
-    ld (hl),a
-    inc hl
-    ld (hl),a
-    inc hl
+    ld (hl+),a                  ; *p++
+    ld (hl+),a                  ; *p++
     ld (hl),a                   ; quot = 0
     pop hl
     pop de                      ; rem
@@ -223,12 +219,10 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     rla                         ; C restored
     ld a,(hl)
     rla
-    ld (hl),a
-    inc hl
+    ld (hl+),a                  ; *p++
     ld a,(hl)
     rla
-    ld (hl),a
-    inc hl
+    ld (hl+),a                  ; *p++
     ld a,(hl)
     rla
     ld (hl),a
@@ -264,13 +258,11 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     add hl,sp
     ld a,(hl)
     inc a
-    ld (hl),a               ; NZ from inc a (ld/inc hl keep flags)
-    inc hl
+    ld (hl+),a                  ; NZ from inc a (ld/inc hl keep flags)
     jp NZ,div_guard_done
     ld a,(hl)
     inc a
-    ld (hl),a               ; NZ from inc a
-    inc hl
+    ld (hl+),a                  ; NZ from inc a
     jp NZ,div_guard_done
     ld a,(hl)
     inc a
@@ -294,8 +286,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld b,(hl)                   ; B = quot.hi
     ld hl,4
     add hl,sp
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)                  ; *p++
     ld d,(hl)
     ex de,hl                    ; HL = quot.lo:mid
 
@@ -347,15 +338,13 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld e,b
     pop hl                      ; DEHL = packed IEEE
 
-    ld b,h
-    ld c,l
+    ld bc,hl
     ld hl,18
     add hl,sp
     ld sp,hl
     pop hl                      ; flag
     ld a,l
-    ld h,b
-    ld l,c
+    ld hl,bc
     or a
     jp Z,div_done
     pop bc                      ; cret
@@ -384,8 +373,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 
 .rem_sub
     push de                     ; rem high
-    ld d,h                  ; DE = rem mid:lo
-    ld e,l
+    ld de,hl                    ; DE = rem mid:lo
     ld hl,4                 ; &div
     add hl,sp
     ld a,e
@@ -410,8 +398,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 
 .rem_add
     push de                     ; rem high
-    ld d,h                  ; DE = rem mid:lo
-    ld e,l
+    ld de,hl                    ; DE = rem mid:lo
     ld hl,4                 ; &div
     add hl,sp
     ld a,e
@@ -544,15 +531,11 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ret
 
 .load4
-    ld c,(hl)
-    inc hl
-    ld b,(hl)
-    inc hl
-    ld e,(hl)
-    inc hl
+    ld c,(hl+)                  ; *p++
+    ld b,(hl+)                  ; *p++
+    ld e,(hl+)                  ; *p++
     ld d,(hl)
-    ld h,b
-    ld l,c
+    ld hl,bc
     ret
 
 .ieee_unpack

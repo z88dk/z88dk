@@ -156,8 +156,7 @@ PUBLIC m32_l0_mulu_32h_24x24
     jp Z,m24_zero
 
     ld b,a                      ; B = multiplier
-    ld h,d                  ; HL = xl (product low init)
-    ld l,e
+    ld hl,de                    ; HL = xl (product low init)
 
     ; leading-zero scan on multiplier; product mid restored from C at entry
     ld a,b

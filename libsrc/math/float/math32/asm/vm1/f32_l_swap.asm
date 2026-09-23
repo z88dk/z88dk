@@ -31,8 +31,7 @@ PUBLIC l_f32_swap
     add hl,sp
     ex de,hl
     ld hl,(de)
-    ld b,h
-    ld c,l                          ; BC = right LSW
+    ld bc,hl                        ; BC = right LSW
     ld hl,6
     add hl,sp
     ex de,hl
@@ -42,8 +41,7 @@ PUBLIC l_f32_swap
     add hl,sp
     ex de,hl
     ld (de),hl                      ; right LSW := left LSW
-    ld h,b
-    ld l,c
+    ld hl,bc
     ex de,hl
     ld hl,6
     add hl,sp
@@ -55,8 +53,7 @@ PUBLIC l_f32_swap
     add hl,sp
     ex de,hl
     ld hl,(de)
-    ld b,h
-    ld c,l
+    ld bc,hl
     ld hl,8
     add hl,sp
     ex de,hl
@@ -66,8 +63,7 @@ PUBLIC l_f32_swap
     add hl,sp
     ex de,hl
     ld (de),hl
-    ld h,b
-    ld l,c
+    ld hl,bc
     ex de,hl
     ld hl,8
     add hl,sp

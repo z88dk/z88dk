@@ -35,15 +35,13 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 
     ld hl,8
     add hl,sp
-    ld a,(hl)
-    inc hl
+    ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     push hl
     ld hl,12
     add hl,sp
-    ld a,(hl)
-    inc hl
+    ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     ex de,hl
@@ -90,8 +88,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     add hl,sp
     ex de,hl
     ld hl,(de)
-    ld b,h
-    ld c,l                          ; BC = old w0 (X.bc)
+    ld bc,hl                        ; BC = old w0 (X.bc)
 
     ld hl,2
     add hl,sp
@@ -153,8 +150,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ex de,hl
     ld (de),hl                      ; w5 = X.de
 
-    ld h,b
-    ld l,c
+    ld hl,bc
     ex de,hl
     ld hl,12
     add hl,sp
@@ -216,15 +212,13 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ; mulu: DEHL=X, push y.DE, push y.HL
     ld hl,10
     add hl,sp
-    ld a,(hl)
-    inc hl
+    ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a                          ; X.hl
     push hl
     ld hl,14
     add hl,sp
-    ld a,(hl)
-    inc hl
+    ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a                          ; X.de
     ex de,hl
@@ -236,15 +230,13 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ; y.DE @ SP+8, y.HL @ SP+6
     ld hl,8
     add hl,sp
-    ld a,(hl)
-    inc hl
+    ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     push hl                         ; y.DE
     ld hl,8
     add hl,sp
-    ld a,(hl)
-    inc hl
+    ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     push hl                         ; y.HL
@@ -252,15 +244,13 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ; restore X to DEHL
     ld hl,4
     add hl,sp
-    ld a,(hl)
-    inc hl
+    ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     push hl
     ld hl,8
     add hl,sp
-    ld a,(hl)
-    inc hl
+    ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     ex de,hl
@@ -315,8 +305,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 
     ld hl,0
     add hl,sp
-    ld d,h                  ; DE = src
-    ld e,l
+    ld de,hl                        ; DE = src
     ld hl,14
     add hl,sp                       ; HL = dest X slot
     ld b,6
