@@ -1,14 +1,14 @@
 # math32 — IEEE-754 single-precision floating point
 
-This is the z88dk 32-bit IEEE-754 (mostly) floating-point maths package. It works with the sccz80 and zsdcc IEEE-754 (mostly) 32-bit interfaces.
+This is the z88dk 32-bit IEEE-754 single-precision floating-point maths package. It works with the sccz80 and zsdcc IEEE-754 32-bit interfaces.
 
 Link it with **`--math32`**. That alias selects the product for the active CPU through `@{ZCC_LIBCPU}`. Example: `math32_8085` with `-clib=8085`. It expands to the IEEE float mode, the math32 define set, `CLIB_32BIT_FLOATS=1`, and `-lmath32@{ZCC_LIBCPU}`.
 
-This library is designed for z180 (eZ80), z80n, and Rabbit 2000 / 3000 processors. It is optimised for the z180 (eZ80) and [ZX Spectrum Next](https://www.specnext.com/) z80n, because those CPUs have a hardware `16_8×8` multiply that accelerates the floating-point mantissa. The Rabbit `32_16×16` signed multiply is also implemented for r2ka / r3k machines and provides the fastest Rabbit path.
+This library is designed for z180 (eZ80), z80n, and Rabbit 2000 / 3000 processors. It is optimised for the z180 (eZ80) and [ZX Spectrum Next](https://www.specnext.com/) z80n, because those CPUs have a hardware `16_8×8` multiply operation that accelerates the floating-point mantissa. The Rabbit `32_16×16` signed multiply is also implemented for r2ka / r3k machines and provides the fastest Rabbit path.
 
-The library is also designed to be as fast as possible on plain Z80, using a `32_24×8` basis multiply.
+The library is also designed to be as fast as possible on plain Z80, using a software `32_24×8` basis multiply.
 
-Intel 8080, 8085, KR580VM1, and Nintendo Gameboy gbz80 have separate stack-based cores (`math32_8080.lib`, `math32_8085.lib`, `math32_vm1.lib`, `math32_gbz80.lib`). Those builds do not use the alternate register set or index registers. Higher-level C helpers for 8080, 8085, vm1, and gbz80 are built with **sccz80 only** (zsdcc is Z80-only).
+Intel 8080, 8085, KR580VM1, and Nintendo Gameboy gbz80 have separate stack-based software cores (`math32_8080.lib`, `math32_8085.lib`, `math32_vm1.lib`, `math32_gbz80.lib`). Those builds do not use the alternate register set or index registers. Higher-level C helpers for 8080, 8085, vm1, and gbz80 are built with sccz80 (zsdcc is Z80-only).
 
 *@feilipu, May 2019 – September 2026*
 
@@ -19,12 +19,12 @@ Intel 8080, 8085, KR580VM1, and Nintendo Gameboy gbz80 have separate stack-based
 - All intrinsic functions are written in assembly.
 - All the code is re-entrant.
 - Register use on the Z80-family cores is limited to the main and alternate set (including `af'`). No index registers. The 8080, 8085, vm1, and gbz80 cores use the main register set and the stack only.
-- Made for the Spectrum Next (z80n) and Agon Lite (eZ80). The z80n `mul de`, the z180 (eZ80) `mlt`, and the Rabbit `mul` instructions accelerate floating-point calculation. Full support also covers Zilog Z80 and variants, Digi Rabbit processors, Intel 8080 and 8085, the KR580VM1, and the Nintendo Game Boy CPU (gbz80), using ISA extensions wherever appropriate.
-- Mantissa work uses 24 bits plus 8 bits for rounding. Product paths (mul, sqr, div, poly, invsqrt / sqrt) use IEEE-754 round-to-nearest-even (RNE) on the residual byte. Addition / subtraction use jam-sticky on lost bits, which gives better accuracy on repeated additions.
+- Made for the Spectrum Next (z80n) and Agon Lite (eZ80). The z80n `mul de`, the z180 (eZ80) `mlt`, and the Rabbit `mul` instructions accelerate floating-point calculation. Full support also covers Zilog Z80 and variants, Digi Rabbit processors, Intel 8080 and 8085, the KR580VM1, and the Nintendo Game Boy CPU (gbz80), using CPU ISA extensions wherever appropriate.
+- The mantissa uses 24 bits plus 8 bits for rounding. Product paths (mul, sqr, div, poly, invsqrt / sqrt) use IEEE-754 round-to-nearest-even (RNE) on the residual byte. Addition / subtraction use jam-sticky on lost bits, which gives better accuracy on repeated additions.
 - Derived functions use a full 32-bit internal mantissa path, without mid-path rounding, for maximum accuracy when many multiplies and adds are required (Horner / Newton–Raphson). That is equivalent to a fused 32-bit multiply-add process, with the rounded IEEE-754 mantissa produced as the final result.
-- Where no hardware multiply is available, software multiply uses a `32_24×8` unrolled algorithm. The dedicated square kernel is separate: five `16_8×8` products, matching the z80n / z180 square layout.
+- Where no hardware multiply is available, software multiply uses a `32_24×8` unrolled algorithm. The dedicated square multiply kernel is separate: five `16_8×8` products, matching the z80n / z180 square layout.
 - Higher functions are written in C for maintainability. They draw on the intrinsic square root, square, polynomial evaluation, and the four arithmetic functions.
-- Power and trigonometric accuracy and speed can be traded by changing polynomial coefficient tables and iteration counts. More coefficients give higher accuracy at the expense of performance. The original Cephes and Hi-Tech coefficient tables have been optimised and immproved. Alternative tables can be used without changing the evaluator code.
+- Power and trigonometric accuracy and speed can be traded by changing polynomial coefficient tables and iteration counts. More coefficients give higher accuracy at the expense of performance. The original Cephes and Hi-Tech coefficient tables have been optimised and improved. Alternative tables can be used without changing the evaluator code.
 - Square root (through inverse square root) is seeded with the Quake magic-number method, then three Newton–Raphson iterations. Accuracy and speed can be traded by removing one or two N-R iterations, for example for games.
 
 ---
@@ -46,19 +46,6 @@ Intel 8080, 8085, KR580VM1, and Nintendo Gameboy gbz80 have separate stack-based
 | `math32_gbz80.lib` | Game Boy (gbz80) | stack-only software |
 
 **eZ80 note.** eZ80 Z80-mode has the same `mlt` encodings as Z180 (`ED 4C/5C/6C/7C`). `math32_ez80_z80.lib` is built from `newlibfiles_ez80_z80.lst`, which selects the Z180 mantissa helpers. Those helpers are gated `IF __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__` (`-mez80_z80` defines `__CPU_EZ80_Z80__`, not `__CPU_EZ80__`).
-
----
-
-## Classic float text (`ftoa` / `ftoe` / `ftog`)
-
-| CPU | Path |
-|-----|------|
-| Z80 family | `lm32/c/sccz80/{ftoa,ftoe,ftog}.asm` → stdlib `asm_dtoa` / `asm_dtoe` / `asm_dtog` (EXX + IX). Newlib `__stdio_printf_f` calls `__dtoa__` directly. |
-| 8080 / 8085 / vm1 / gbz80 | `asm/<cpu>/f32_ftoa.asm`, `f32_ftoe.asm`, `f32_ftog.asm` plus `f32__dtoa_*` helpers. The float lives in DEHL. The workspace is 32 bytes on the stack. There is no IX and no EXX. |
-
-The stack-only engine matches the Z80 C11 contract used by `test/suites/math` (`test_math32_printf`): `%g` of `1.234e-37` is `1.234e-37`, `%g` of `-2.5e-5` is `-2.5e-05`, `%g` of `314.159` is `314.159`, `%.2f` of a tiny value is `0.00`. Classic `sprintf` also: `test/suites/stdio` `test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` (`--math32`; `%e` of `1.2345` is `1.234500e+00`). Integer `sscanf` is `test_scanf*.bin` (no `%f`). `test/suites/string` is `str*` only.
-
-Classic zsdcc does not scan printf formats. `--math32` does not enable `%f` / `%e` / `%g`. Add `#pragma printf = "%f %e %g"` or `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF`. Without that, printf writes the letter `f`, `e`, or `g`. sccz80 and 80cc scan the format string and do not need this. Do not set `NEED_printf` from `CLIB_32BIT_FLOATS` alone.
 
 ---
 
@@ -337,6 +324,17 @@ float pow (float x, float y);
 float ceil (float x);  float floor (float x);
 float modf (float x, float *y);  float fmod (float x, float y);
 ```
+
+### Classic float text (`ftoa` / `ftoe` / `ftog`)
+
+| CPU | Path |
+|-----|------|
+| Z80 family | `lm32/c/sccz80/{ftoa,ftoe,ftog}.asm` → stdlib `asm_dtoa` / `asm_dtoe` / `asm_dtog` (EXX + IX). Newlib `__stdio_printf_f` calls `__dtoa__` directly. |
+| 8080 / 8085 / vm1 / gbz80 | `asm/<cpu>/f32_ftoa.asm`, `f32_ftoe.asm`, `f32_ftog.asm` plus `f32__dtoa_*` helpers. The float lives in DEHL. The workspace is 32 bytes on the stack. There is no IX and no EXX. |
+
+The stack-only engine matches the Z80 C11 contract used by `test/suites/math` (`test_math32_printf`): `%g` of `1.234e-37` is `1.234e-37`, `%g` of `-2.5e-5` is `-2.5e-05`, `%g` of `314.159` is `314.159`, `%.2f` of a tiny value is `0.00`. Classic `sprintf` also: `test/suites/stdio` `test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` (`--math32`; `%e` of `1.2345` is `1.234500e+00`). Integer `sscanf` is `test_scanf*.bin` (no `%f`). `test/suites/string` is `str*` only.
+
+Classic zsdcc does not scan printf formats. `--math32` does not enable `%f` / `%e` / `%g`. Add `#pragma printf = "%f %e %g"` or `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF`. Without that, printf writes the letter `f`, `e`, or `g`. sccz80 and 80cc scan the format string and do not need this. Do not set `NEED_printf` from `CLIB_32BIT_FLOATS` alone.
 
 ---
 
