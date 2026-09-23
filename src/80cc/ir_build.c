@@ -6446,6 +6446,13 @@ static int build_muldiv_integer(Builder *b, Node *n)
     if (n->ast_type == OP_MULT && IS_KC160() && width == 2
         && !is_flt && !is_fix16)
         return emit_ir_mul(b, l, r, 2, 1);
+    /* r800: 16x16 int multiply is `muluw hl,bc` (DEHL = HL*BC, unsigned
+       hardware only) - same low-16-bits-are-sign-agnostic reasoning as
+       kc160 above, so the unsigned form serves signed and unsigned int*int
+       alike for a width-2 (truncated) result. */
+    if (n->ast_type == OP_MULT && IS_R800() && width == 2
+        && !is_flt && !is_fix16)
+        return emit_ir_mul(b, l, r, 2, 1);
     const char *helper;
     int n_stacked = 0;
     int ret_in_de = 0;

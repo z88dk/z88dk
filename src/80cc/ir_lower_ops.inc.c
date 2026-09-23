@@ -5114,9 +5114,14 @@ static int gen_mul(FILE *out, Func *f, const Op *op)
     int uns = (op->imm != 0);
 
     if (f->vregs[op->src[0]].width == 2) {
-        /* kc160 16x16 -> low 16. */
+        /* kc160/r800 16x16 -> low 16 (DEHL = product; DE = high, unused by
+           the width-2 truncated result but cached for whoever reads it). */
         load_binop_operands(out, f, op);        /* HL = src0, DE = src1 */
-        emit(out, "mul\tde,hl");
+        if (IS_R800()) {
+            emit(out, "muluw\thl,de");
+        } else {
+            emit(out, "mul\tde,hl");
+        }
         invalidate_de_cache();                  /* DE now holds the high 16 */
         commit_hl_result(out, f, op->dst);
         return 0;
