@@ -6333,6 +6333,12 @@ static int build_muldiv_integer(Builder *b, Node *n)
             if (rv < 0) return -1;
             lv = widen_u16_to_int(b, lv);         /* u8 -> u16 for HL/DE */
             rv = widen_u16_to_int(b, rv);
+            /* r800: `muluw hl,de` produces the full DEHL = HL*DE product
+               directly - no call needed, unlike every other CPU here (their
+               l_mulu_32_16x16 either loops in software or itself calls out
+               to a hardware op that only gives a 16-bit result). */
+            if (IS_R800())
+                return emit_ir_mul(b, lv, rv, 4, 1);
             int dst = new_temp(b, 4);
             b->f->vregs[dst].width = 4;
             Op *op = ir_op_emit(cur_bb(b), IR_HCALL);

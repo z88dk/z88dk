@@ -5114,13 +5114,21 @@ static int gen_mul(FILE *out, Func *f, const Op *op)
     int uns = (op->imm != 0);
 
     if (f->vregs[op->src[0]].width == 2) {
-        /* kc160/r800 16x16 -> low 16 (DEHL = product; DE = high, unused by
-           the width-2 truncated result but cached for whoever reads it). */
+        /* kc160/r800 16x16 -> low 16, or (r800 only) the full 32-bit widening
+           product straight from the instruction - dst width tells them
+           apart (emit_ir_mul's width-4 caller is the narrow-mul widening
+           path in ir_build.c). */
         load_binop_operands(out, f, op);        /* HL = src0, DE = src1 */
         if (IS_R800()) {
             emit(out, "muluw\thl,de");
         } else {
             emit(out, "mul\tde,hl");
+        }
+        if (IS_R800() && f->vregs[op->dst].width == 4) {
+            invalidate_hl_cache();
+            invalidate_de_cache();
+            store_dehl_finalize(out, f, op->dst);
+            return 0;
         }
         invalidate_de_cache();                  /* DE now holds the high 16 */
         commit_hl_result(out, f, op->dst);
