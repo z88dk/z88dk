@@ -59,6 +59,11 @@ Assume a built tree (`bin/` tools present) unless the task is to build the toolc
 3. Rationale, measurements and validation belong in the code comments, the
    `*_PLAN.md` / handover notes, or the PR description — not the commit message.
 4. Commit only when asked, and never push unasked.
+5. **Never stage Apple junk.** Do not `git add` it, including when adding a
+   directory. Do not stage or commit these names:
+   `.DS_Store`, `._*` (AppleDouble), `.fseventsd`, `.Spotlight-V100`,
+   `.Trashes`, `.TemporaryItems`.
+   If one is already staged, unstage it and leave the file on disk.
 
 ## Skill index
 
