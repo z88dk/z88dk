@@ -11,16 +11,28 @@ More detailed, but still incomplete changelist:
 - [classic] Reset escape code for gencon vt100 bridge now resets colours
 - [classic] +alphatp2 target working
 - [classic] +gal faster plotting
+- [classic] +hdos fcntl available
+- [classic] +phc25 New target
+- [classic] +p2000 Inkey keyboard driver available
 - [classic] +sms now has access to newlib libraries
+- [classic] +test Support for KR580VM1 (vm1) processor
 - [classic] +x07 Support much improved
 - [classic] +z88 Support for 512z64 graphics
+- [classic] +zxn Thin sprite wrapper available
+- [classic] +zxn Plotting now support on layer 2 screen
+- [classic] +zxn Hardware headers available
 - [classic] targets +hbios, +scz180, +yaz180, +rc2014 migrated
 - [newlib] library products install under lib/clibs/{sccz80,sdcc_ix,sdcc_iy}/ (classic clibs layout)
-- [all] math32 floating point support for Intel 8080, 8085, and Nintendo gbz80
+- [all] The toolchain now supports the KR580VM1 (vm1) processor
+- [all] math32 floating point support for Intel 8080, 8085, VM1 and Nintendo gbz80
 - [all] math16 half-precision floating point support for Intel 8080, 8085, and Nintendo gbz80
 - [all] AI agent support via AGENTS.md and .agents/skills (Grok/Claude discovery symlinks)
+- [copt] Additional conditions for compiler and pattern formats
+- [80cc] New optimising compiler, compatible with sccz0
+- [ticks] 8085, kc160, r4k, r6k fixes
 - [ucpp] Big fixes for #line handling
 - [z88dk-dis] Support for decoding rst calls
+- [z80asm] Bug fixes
 - [z80asm] #define now supported as alias for defc
 - [zcc] add multi compiler selection tool (sccz80, 80cc-sp, 80cc-fp)
 - [zsdcc] Upgraded to SDCC 4.6.0 r16639
