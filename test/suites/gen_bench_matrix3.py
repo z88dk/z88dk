@@ -32,6 +32,9 @@ CPUS = [
     ("r4k",   "test_r4k.bin",      "-clib=rabbit4k","-mr4k"),
     ("r6k",   "test_r6k.bin",      "-clib=rabbit6k","-mr6k"),
     ("kc160", "test_kc160.bin",    "-clib=kc160",   "-mkc160"),
+    # No separate clib (see src/80cc/R800_TARGET_PLAN.md): the object stays
+    # z80-stamped and links the plain z80/test clib unmodified.
+    ("r800",  "test.bin",          "-mr800",        "-mr800"),
     ("8080",  "test_8080.bin",     "-clib=8080",    "-m8080"),
     ("8085",  "test_8085.bin",     "-clib=8085",    "-m8085"),
     ("gbz80", "test_gbz80.bin",    "-clib=gbz80",   "-mgbz80"),
@@ -44,7 +47,7 @@ NO_IX = {"gbz80", "8080", "8085", "vm1"}
 # sdcc only has ports for these. r2ka needs the sdcc_opt.1 section rules
 # (_XABS/_IIVT/.equ) plus the ioi/ioe prefix rule to get through z80asm;
 # without them every Rabbit cell is a BUILD. r4k/r6k are not sdcc ports at all.
-SDCC_CPUS = {"z80", "z80n", "z180", "ez80", "r2ka", "gbz80"}
+SDCC_CPUS = {"z80", "z80n", "z180", "ez80", "r2ka", "gbz80", "r800"}
 
 TMP = os.environ.get("MX_TMP", "/tmp/80cc_mx")
 os.makedirs(TMP, exist_ok=True)
