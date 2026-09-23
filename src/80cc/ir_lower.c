@@ -1619,6 +1619,28 @@ static int func_ret_reads_de(const Func *f)
     return 0;
 }
 
+/* A cached DE value can help a compare immediately, while a word arithmetic
+   operation may need DE as the slot-load scratch register. The carry therefore
+   starts at compare-first consumers; IR_OFF=de-carry restores the old boundary
+   invalidation for A/B and regression testing. */
+static int bb_de_carry_compare_first(const BB *bb, int v)
+{
+    for (int i = 0; i < bb->n_ops; i++) {
+        const Op *op = &bb->ops[i];
+        int uses = op->src[0] == v || op->src[1] == v || op->src[2] == v;
+        if (!uses) continue;
+        switch (op->kind) {
+        case IR_CMP_EQ: case IR_CMP_NE:
+        case IR_CMP_LT: case IR_CMP_LE: case IR_CMP_GT: case IR_CMP_GE:
+        case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+            return 1;
+        default:
+            return 0;
+        }
+    }
+    return 0;
+}
+
 
 
 
@@ -8002,12 +8024,18 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                              const int *bb_pred_cnt, int *const *bb_preds,
                              const int *bb_alias)
 {
+    const int de_carry_on = !opt_disabled("de-carry");
     /* Per-render BC-tenant map, the mirror of bb_hl_out. Local to one render:
        the carry is only consulted within a pass. NULL (OOM) degrades to "never
        carry", which is the safe direction. */
     int *bb_bc_out = malloc((size_t)(f->n_bbs > 0 ? f->n_bbs : 1) * sizeof(int));
     if (bb_bc_out)
         for (int i = 0; i < f->n_bbs; i++) bb_bc_out[i] = -1;
+    /* Per-render DE-tenant map. The carry is consulted only when every
+       predecessor agrees on the same recoverable DE value. */
+    int *bb_de_out = malloc((size_t)(f->n_bbs > 0 ? f->n_bbs : 1) * sizeof(int));
+    if (bb_de_out)
+        for (int i = 0; i < f->n_bbs; i++) bb_de_out[i] = -1;
     /* Per-render HL slot-ADDRESS out map, the address analogue of bb_hl_out:
        the canonical slot offset HL points at when this BB ends, -1 = none. */
     int *bb_hl_addr_out = malloc((size_t)(f->n_bbs > 0 ? f->n_bbs : 1) * sizeof(int));
@@ -8153,6 +8181,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
        entry BB has no predecessors, so its HL-carry below would reset it — seed
        it in so the first use reads HL instead of reloading the pushed slot. */
     int entry_hl = L.rs.hl;
+    int entry_de = L.rs.de;
     /* [IR_FCLONG_CARRY] Same for a width-4 autopush param: the prologue left the
        long in DE:BC (+ HL when the alloc spared it), so seed the DEHL cache past
        the entry BB's unconditional invalidate_de_cache. */
@@ -8182,6 +8211,21 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 bb_hl_out[bb->id] = acarry;
             else
                 bb_hl_out[bb->id] = -1;
+            if (de_carry_on && bb_de_out) {
+                int dcarry = -2;
+                for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
+                    int pid = bb_preds[bb->id][p];
+                    if (!bb_lowered[pid]) { dcarry = -1; break; }
+                    int v = bb_de_out[pid];
+                    if (v < 0) { dcarry = -1; break; }
+                    if (dcarry == -2) dcarry = v;
+                    else if (dcarry != v) { dcarry = -1; break; }
+                }
+                bb_de_out[bb->id] =
+                    (dcarry >= 0 && bb->live_in
+                     && ir_bitset_get((const BitSet *)bb->live_in, dcarry))
+                    ? dcarry : -1;
+            }
             /* Word DE-home: pass the home-residency carry through the trampoline
                too (mirror of bb_hl_out) — else a region body reached via an
                alias (index_walk's bb2→bb3) loses the carry and needlessly
@@ -8301,10 +8345,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             && bb->live_in
             && ir_bitset_get((const BitSet *)bb->live_in, carry)) {
             hl_about_to_change(carry);
-            /* DE / DEHL caches don't survive BB boundaries yet (no
-               bb_de_out tracking). Reset them here even when HL
-               carries — invalidate_hl_cache would clear rs.hl
-               which we just set. */
+            /* DEHL still does not carry through this boundary map. Reset
+               the pair here even when HL carries; ordinary DE is reasserted
+               by the carry check below. */
             invalidate_de_cache();
         } else if (bb_pred_cnt[bb->id] == 0 && entry_hl >= 0
                    && bb->live_in
@@ -8317,6 +8360,29 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         } else {
             invalidate_hl_cache();
         }
+        /* DE cache carry: exact predecessor agreement is the only proof used
+           here. A predecessor records -1 after any operation that invalidates
+           DE, including calls and inline assembly. */
+        int dcarry = -2;
+        if (de_carry_on && bb_de_out) {
+            for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
+                int pid = bb_preds[bb->id][p];
+                if (!bb_lowered[pid]) { dcarry = -1; break; }
+                int v = bb_de_out[pid];
+                if (v < 0) { dcarry = -1; break; }
+                if (dcarry == -2) dcarry = v;
+                else if (dcarry != v) { dcarry = -1; break; }
+            }
+        } else {
+            dcarry = -1;
+        }
+        if (dcarry >= 0 && bb->live_in
+            && ir_bitset_get((const BitSet *)bb->live_in, dcarry)
+            && bb_de_carry_compare_first(bb, dcarry))
+            cache_de(dcarry);
+        else if (de_carry_on && bb_pred_cnt[bb->id] == 0 && entry_de >= 0 && bb->live_in
+                 && ir_bitset_get((const BitSet *)bb->live_in, entry_de))
+            cache_de(entry_de);
         /* [IR_FCLONG_CARRY] Re-assert the entry DEHL residency the branches above
            just cleared (every one of them ends in invalidate_de_cache /
            invalidate_hl_cache, both of which drop rs.dehl). Entry BB only, and
@@ -8325,6 +8391,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             && ir_bitset_get((const BitSet *)bb->live_in, entry_dehl))
             cache_dehl(entry_dehl);
         entry_hl = -1;   /* consumed at the first BB; never re-seed */
+        entry_de = -1;   /* consumed at the first BB; never re-seed */
         entry_dehl = -1;
         /* Cross-BB HL slot-ADDRESS carry — the address analogue of the value
            carry above, and the reason a slot accessed in two blocks used to
@@ -9199,6 +9266,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 (L.bb_byte_out[bb->id] >= 0 && L.cur_de_byte_home_dirty) ? 1 : 0;
         bb_hl_out[bb->id] = L.rs.hl;
         if (bb_bc_out) bb_bc_out[bb->id] = L.rs.bc;
+        if (bb_de_out) bb_de_out[bb->id] = de_carry_on ? L.rs.de : -1;
         if (bb_hl_addr_out) bb_hl_addr_out[bb->id] = L.cur_hl_addr_off;
         /* A holds a known byte here only if a byte compare (cp/or a) left it —
            word compares and calls clear rs.a. So rs.a captures A-preservation
@@ -9210,12 +9278,14 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
 
     rec_end(f);
     free(bb_bc_out);
+    free(bb_de_out);
     free(bb_hl_addr_out);
     return 0;
 
 cleanup_err:
     /* Caller (ir_lower_func) owns the bb_* arrays and ir_free_liveness. */
     free(bb_bc_out);
+    free(bb_de_out);
     free(bb_hl_addr_out);
     rec_reset();
     return -1;

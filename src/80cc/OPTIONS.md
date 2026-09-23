@@ -129,6 +129,7 @@ exists (ADR 0010).
 | `lazy-spill` | spill at the definition instead of deferring to the clobber |
 | `a-carry` | the A-register belief is dropped at each basic-block boundary |
 | `hl-carry` | the HL belief is not carried across a basic-block edge |
+| `de-carry` | the DE belief is not carried into a compare across a basic-block edge |
 | `hl-addr-carry` | a slot address held in HL is not carried across an edge |
 | `de-flow` | no DE liveness flow into the lowering decisions (8085) |
 | `ldsi-addr` | 8085 slot addresses use `ld hl,N; add hl,sp` instead of the LDSI form |
