@@ -55,7 +55,7 @@ ex7.cas: ex7.c
 
 
 showlib3d.cas: showlib3d.c
-	$(CC) $(CFLAGS) -oshowlib3d.bin showlib3d.c -lmsxbios
+	$(CC) +msx -vn --genmath -lndos -create-app -DAMALLOC -oshowlib3d.bin showlib3d.c -lmsxbios
 
 ex11.cas: ex11.c
 	$(CC) $(CFLAGS) -oex11.bin ex11.c 

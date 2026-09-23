@@ -45,7 +45,7 @@ Assume a built tree (`bin/` tools present) unless the task is to build the toolc
 4. **Mnemonics:** **Zilog everywhere** in the z88dk tree. z80asm may accept **Intel** forms on 8080/8085 for **external-code compatibility only** — do not write Intel mnemonics in z88dk sources (`cpu-8085`, `tool-z80asm`).
 5. **8085:** extended ops and **stack-only** locals (`cpu-8085`).
 6. **Measure** with `z88dk-ticks`; put **CPU flag before the binary** (`tool-ticks`, `methodology-measure`).
-7. **math32 / math16**: `div` = restoring; `inv` = Newton–Raphson (`library-math32`, `library-math16`).
+7. **math32 / math16**: `div` = restoring; `inv` = Newton–Raphson (`library-math32`, `library-math16`). From **v2.5**, `-lm` is math32 (same defines as `--math32`) on classic and newlib. Before v2.5, classic `-lm` was genmath and newlib `-lm` was math48. ROM maths stays `-lmz`. 6-byte reruns are `--genmath` or `--math48` (sccz80 or 80cc). 8-byte is `--mbf64` (either compiler). Pre-v2.5 8080-family notes that call mbf32 the default mean `--math-mbf32`, not this `-lm`.
 8. **CPU opcode capability (last resort):** fixtures in `src/z80asm/dev/cpu/` (`cpu_test_<cpu>_ok.asm` / `_err.asm`) answer “does **z80asm** accept this **source line** for `-m<cpu>`, and what does it emit?” **ok** may be native, multi-byte synthetic, or `call __z80asm__*`. **`_strict_`** = strict mode (**synthetics forbidden**). Fixtures may list Intel spellings for compat tests; emit **Zilog** in tree work. How to read lines: skill **`tool-z80asm`**. `rg` one mnemonic; never bulk-load huge `*_err.asm` files.
 
 ## Commit hygiene

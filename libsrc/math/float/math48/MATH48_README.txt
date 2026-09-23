@@ -39,7 +39,7 @@ Contains sccz80's C compiler interface and is implemented using the assembly lan
 
 * lm
 
-Glue that connects the compilers and standard assembly interface to the math48 library.  The purpose is to define aliases that connect the standard names to the math48 specific names.  These functions make up the math library that is linked against on the compile line (as in "-lm").
+Glue that connects the compilers and standard assembly interface to the math48 library.  The purpose is to define aliases that connect the standard names to the math48 specific names.  Before z88dk v2.5, newlib `-lm` linked this library.  From v2.5, `-lm` is math32.  Link math48 with `--math48` (`-lmath48@{ZCC_LIBCPU}` on classic; newlib `m` / `m_z180`).  sccz80 and 80cc keep the 6-byte value.  zsdcc stores 4-byte IEEE.
 
 ===============================================================
 

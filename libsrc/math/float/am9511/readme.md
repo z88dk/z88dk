@@ -72,7 +72,7 @@ FDIV note (datasheet FDIV): if the divisor (TOS) is zero, **R is set equal to NO
 
 IEEE specials algebra (`0/0`, `Inf−Inf`, `0*Inf`, `sqrt(−x)`, …) is covered by
 `test/suites/math` (`test_am9511.bin` / `test_am9511_8085.bin` with `-DMATH_SPECIALS`).
-Do not link bare `-lm` ahead of `--math-am9511` if you need the APU `sqrt`.
+From z88dk v2.5, `-lm` is math32. Do not link bare `-lm` ahead of `--math-am9511` if you need the APU `sqrt`.
 
 ---
 
@@ -278,6 +278,8 @@ If the value of the function depends on the value of the difference of 2 floatin
 Some benchmarking has been completed using the RC2014 APU Module and, as expected, the results show substantial improvements over other floating point libraries.
 
 To compare to the [standardised benchmark results](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) (Z80 @ 4MHz), the times below must be multiplied by 1.8432.
+
+The March 2022 lines below were run before v2.5. Newlib `-lm` in those commands was math48. From v2.5, `-lm` is math32. A 6-byte rerun is `--math48` with sccz80 or 80cc. zsdcc still stores a 4-byte IEEE value. 8-byte Microsoft format is `--mbf64` with either compiler.
 
 #### whetstone
 
