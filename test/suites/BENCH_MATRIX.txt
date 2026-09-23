@@ -1,25 +1,10 @@
-24/9/2026 (s2) — R800 80cc columns refreshed: the r800-specific cost-model row
-in ir_alloc.c is GONE. It never mattered — r800/80cc regressions vs z80/80cc
-(vecbench worst, +151B/+3% ticks) traced to 28 CPU-eligibility gates across
-7 files (`c_cpu == CPU_Z80 || IS_Z80N() || ...`) that hard-excluded r800 from
-IX/IY homing and other optimizations regardless of any cost table. Widened
-every gate to include IS_R800(); r800 now inherits z80's own (already-tuned)
-g0_word_cost table. Re-adding an r800-specific table on top of the fixed
-gates was then A/B tested and found net harmful (6/30 benches worse,
-histbench ticks +65%) — removed for good. See src/80cc/R800_TARGET_PLAN.md.
+24/9/2026 (s2) — R800 80cc columns refreshed: removed the r800-specific
+g0_word_cost row in ir_alloc.c, widened 28 CPU-eligibility gates across 7
+files (ir_alloc.c, ir_lower.c, ir_lower_cmp.inc.c, ir_lower_ops.inc.c,
+ir_lower_regcache.inc.c, ir_opt.c, ir_compiler_glue.c) to include IS_R800().
+r800 now inherits z80's g0_word_cost table. Details: src/80cc/R800_TARGET_PLAN.md.
 Generator: test/suites/gen_bench_matrix3.py cell() (30 benchmarks × 13 CPUs; all compiler columns measured).
 Compiler: bin/z88dk-80cc, built from the current worktree.
-Each cell is final binary bytes and ticks in millions. r800/80cc now matches
-z80-codegen-timed-as-r800 on 28/30 benches byte-for-byte (r800 is opcode-
-identical to z80, no mul yet, so that's the correct ceiling absent a hardware
-mul path) — the other 2 are within a couple bytes. Ticks are 3.3-4x lower
-than z80 everywhere, R800 hardware speed rather than codegen change. r800/sdcc
-BUILD-failed on 5 benches (sortbench, switchbench, vecbench, fixedbench,
-histbench): SDCC's r800 backend emits real muluw/multuw unconditionally, and
-z80asm is deliberately held at -mz80 for this CPU (object stays z80-linkable)
-so it rejected the mnemonic. Fixed same day (prior refresh): lib/arch/r800/
-r800_rules.1 converts both z88dk's and sdcc's mul mnemonic spellings to raw
-defb bytes; all 5 build clean and pass.
 ================================================================================
 ┌───────────────┬───────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┐
 │ benchmark     │ cpu   │ sccz80          │ xcc -Os         │ xcc -Of         │ sdcc            │ 80cc-fp         │ 80cc-sp         │
