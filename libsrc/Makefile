@@ -21,7 +21,7 @@ check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(
 # Recursive wildcard expansion for portable source discovery.
 rwildcard = $(foreach entry,$(wildcard $(1)/*),$(call rwildcard,$(entry),$(2)) $(filter $(subst *,%,$(2)),$(entry)))
 
-GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib 8085_crt0.lib vm1_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib fastmath.lib preempt.lib sp1-all
+GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib 8085_crt0.lib vm1_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib fastmath.lib r800_opt.lib preempt.lib sp1-all
 GENLIBS += gfxtek.lib gfxregis.lib
 
 
