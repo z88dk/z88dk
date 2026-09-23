@@ -2682,7 +2682,7 @@ static int cmp_fold_static_class(const Func *f, int v)
     int phys = ir_home_at(f, v);
     if (phys == IR_PR_BC || phys == IR_PR_DE || phys == IR_PR_HL) return 1;
     if (op_is_ixd_slot(f, v)) return 2;
-    if ((c_cpu == CPU_Z80 || IS_Z80N()) && vreg_in_idx2(f, v)) return 2;
+    if (((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N()) && vreg_in_idx2(f, v)) return 2;
     return 0;
 }
 
@@ -2702,7 +2702,7 @@ static int cmp_ixd_fold_de_clean_ok(const Func *f, const Op *o)
     if (g_hc.de_home < 0 && !word_acc) return 0;
     if (opt_disabled("ixd-fold")) return 0;
     if (!fp_active(f)) return 0;
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
     switch (o->kind) {
     case IR_CMP_LT: case IR_CMP_LE: case IR_CMP_GT: case IR_CMP_GE:
     case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
@@ -2732,7 +2732,7 @@ static int binop_ixd_fold_de_clean_ok(const Func *f, const Op *o)
     if (opt_disabled("alu-fold")) return 0;
     if (g_hc.de_home < 0 || opt_disabled("ixd-fold")) return 0;
     if (!fp_active(f)) return 0;
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
     switch (o->kind) {
     case IR_ADD: case IR_SUB: case IR_AND: case IR_OR: case IR_XOR: break;
     default: return 0;
@@ -2796,7 +2796,7 @@ static int de_home_clean_bitop_ok(const Func *f, const Op *o)
     if (opt_disabled("declean")) return 0;
     if (!g_hc.home_is_word || g_hc.func_whome < 0) return 0;
     if (!fp_active(f)) return 0;
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
     if (o->kind != IR_AND && o->kind != IR_OR && o->kind != IR_XOR) return 0;
     if (o->src[1] >= 0) return 0;                      /* const RHS only */
     if (o->dst < 0 || o->dst >= f->n_vregs || f->vregs[o->dst].width != 2) return 0;
@@ -2844,7 +2844,7 @@ static int de_home_clean_store_ok(const Func *f, const Op *o)
     /* sp only for the reduction ACCUMULATOR home (general DE-home's sp block);
        the value class further restricts sp to the home value (E/D). */
     if (!fp_active(f) && g_hc.de_home >= 0) return 0;
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())) return 0;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())) return 0;
     if (o->kind != IR_ST_MEM) return 0;
     if (o->mem.kind != IR_MEM_VREG) return 0;
     if (o->mem.post_step != 0) return 0;
@@ -2873,7 +2873,7 @@ static const Op *fused_mask_store_mask(const Func *f, const Op *store_op)
     /* sp only for the reduction accumulator home (reads home E/D, masks via A,
        address ld hl,bc / remat — all DE-clean in sp). */
     if (!fp_active(f) && g_hc.de_home >= 0) return NULL;
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())) return NULL;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())) return NULL;
     if (store_op->kind != IR_ST_MEM || store_op->mem.kind != IR_MEM_VREG) return NULL;
     if (store_op->mem.post_step != 0 || mem_bank_fn(&store_op->mem) != NULL) return NULL;
     int val = store_op->src[0];
@@ -2930,7 +2930,7 @@ static int sp_accum_deref_hl_carried(const Func *f, const Op *o)
        compare exists) — else this partial clean-rule perturbs codegen on CPUs
        that never complete the region (a Rabbit regression). Matches
        sp_dehome_loop_cmp_ok's CPU set. */
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())) return 0;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())) return 0;
     if (g_hc.de_home >= 0) return 0;               /* accumulator home only */
     if (o->kind != IR_LD_MEM || o->dst < 0 || o->dst >= f->n_vregs) return 0;
     if (f->vregs[o->dst].width != 2) return 0;
@@ -2959,7 +2959,7 @@ static int sp_accum_deref_hl_carried(const Func *f, const Op *o)
 static int sp_cmp_reghalf(const Func *f, int v, char *lo, char *hi, size_t n)
 {
     if (v < 0 || v >= f->n_vregs || f->vregs[v].width != 2) return 0;
-    if ((c_cpu == CPU_Z80 || IS_Z80N()) && vreg_in_idx2(f, v)) {
+    if (((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N()) && vreg_in_idx2(f, v)) {
         const char *r = vreg_idx_name(f, v);
         snprintf(lo, n, "%sl", r); snprintf(hi, n, "%sh", r); return 1;
     }
@@ -3004,7 +3004,7 @@ static int sp_dehome_loop_cmp_ok(const Func *f, const Op *o)
        byte compare (`ld a,c; sub (hl); …`; JPO/RAL for the signed test) is valid
        on all of these. Rabbit is EXCLUDED: it dropped the P/V parity flag, so the
        `jp po` signed-compare form is unavailable (and it regressed there). */
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())) return 0;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())) return 0;
     switch (o->kind) {
     case IR_CMP_LT: case IR_CMP_LE: case IR_CMP_GT: case IR_CMP_GE:
     case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE: break;
@@ -3058,7 +3058,7 @@ static int op_de_clean(const Func *f, const Op *o)
             && o->dst != g_hc.func_whome
             && (fp_active(f)
                 || (!opt_disabled("declean") && g_hc.de_home < 0 && f->vreg_to_phys
-                    && (c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())
+                    && ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())
                     && (vreg_in_pr_bc(f, o->dst)
                         || vreg_in_idx2(f, o->dst)))))
             return 1;
@@ -3213,7 +3213,7 @@ static int op_de_clean(const Func *f, const Op *o)
            accumulate's `ex de,hl` (`xchg` on 808x) isn't available on gbz80.
            fp keeps such counter ops in (ix+d) (HL-only), so DE survives. */
         return sw == 2 && fp_active(f)
-            && (c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
+            && ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180
                 || IS_EZ80() || IS_808x());
     }
     case IR_AND: case IR_OR: case IR_XOR: case IR_ADD: case IR_SUB:

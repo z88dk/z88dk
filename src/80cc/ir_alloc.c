@@ -682,7 +682,7 @@ static int bc_home_realizable(const Func *f, int v,
    z80/z80n/z180 only. */
 static int idx2_counter_hostile_use(const Func *f, int v)
 {
-    int halves_ok = (c_cpu == CPU_Z80 || IS_Z80N());   /* NOT z180 */
+    int halves_ok = ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N());   /* NOT z180 */
     if (!(halves_ok || c_cpu == CPU_Z180)) return 0;
     int hostile = 0;
     for (int i = 0; i < f->n_bbs; i++)
@@ -2605,7 +2605,7 @@ static int lra_iy_available(const Func *f)
     if (c_reserve_iy) return 0;                 /* IY reserved by the platform */
     /* CPU must have IY + `add iy,de` (excludes gbz80/8080/8085). z180/ez80/rabbit
        support the full-word add iy,rr (only the index-HALF ops trap on z180). */
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180
           || IS_EZ80() || IS_RABBIT())) return 0;
     /* fp soundness: the fp epilogue frame fix + IY-occupancy arbitration (below)
        + the FULL-live-range IY-clean check (rejects an accumulator live across an
@@ -3399,7 +3399,7 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
        skips the balancing pop → sp-1 write / stack leak; 8085's LD_IMM `ld de,K`
        fastpath via spill_de_unless_dead was the crash). EXCLUDED: ez80/kc160/
        rabbit (cheap native sp-relative slots — parking doesn't pay). */
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180
           || IS_808x() || IS_GBZ80())) return;
 
     typedef struct { int vreg, flo, fhi; } SCand;
@@ -3581,20 +3581,26 @@ static int g0_word_cost(int reg, int kind)
     static const int VM1[GR_N][GK_N] = {
         /*SLOT*/{44,39,44,68}, /*BC*/{10,10,7,6}, /*DE*/{10,10,7,6},
         /*IX*/{25,25,11,9}, /*IY*/{25,25,11,9} };
-    /* R800 emits the same instructions as z80 (no mul yet), so this is the
-       z80 row's sequences re-priced from opcode_data.dat's r800 column, not a
-       fresh measurement. BC/DE/IX/IY are exact (push/pop, ld a,(bc)/(ix+0),
-       inc). SLOT and its fp counterpart below are not decomposed - they use
-       the ~0.22 z80 ratio the exact rows converge on, pending an
-       r800_cost_bench.py measurement. */
-    static const int R800[GR_N][GK_N] = {
-        /*SLOT*/{10,9,11,20}, /*BC*/{2,2,2,1}, /*DE*/{2,2,2,1},
-        /*IX*/{8,8,5,2}, /*IY*/{8,8,5,2} };
+    /* R800 deliberately has NO row here. Its instruction set and byte costs
+       are identical to z80's (no mul yet). Two rounds of A/B measurement
+       across the full 30-bench corpus: (1) z80's own cost table produces
+       smaller AND faster r800 code on average than a from-scratch r800 table,
+       even one priced exactly from opcode_data.dat, because R800's speedup
+       over z80 is close enough to uniform across instruction classes that
+       the RELATIVE costs driving register-home decisions barely change - z80's
+       already-tuned tradeoffs transfer better than a fresh derivation. (2)
+       The real fix for the corpus's r800 regressions turned out to be the
+       CPU-eligibility gates (`c_cpu == CPU_Z80 || IS_Z80N() || ...` scattered
+       across ir_alloc.c/ir_lower*.c/ir_opt.c/ir_compiler_glue.c, all widened
+       to include IS_R800()) that were blocking IX/IY homing for r800 outright,
+       regardless of any cost table. With those fixed, re-adding an r800 table
+       on top made 6/30 benches WORSE (histbench ticks +65%) and improved none
+       - the table has nothing left to contribute once the gates are open. See
+       src/80cc/R800_TARGET_PLAN.md. */
     const int (*t)[GK_N] = IS_KC160() ? KC160
                          : IS_EZ80() ? EZ80
                          : IS_KR580VM1() ? VM1
                          : IS_RABBIT() ? RABBIT
-                         : IS_R800() ? R800
                          : g0measured_on() ? Z80 : Z80_EST;
     /* gbz80 carries two corrections, both plain hardware facts and both now
        default-on: `ld hl,sp+n` makes its slot cheaper than the Z80 row claims,
@@ -3632,14 +3638,6 @@ static int g0_word_cost(int reg, int kind)
             } else if (t == Z80_EST && kind <= GK_WRITE) c = 39;
             else if (t == RABBIT && kind <= GK_WRITE) c = 11; /* slightly dearer than sp */
             else if (t == EZ80) c = (kind == GK_STEP) ? 4 : 2; /* native ld hl,(ix+d): cheap */
-            else if (t == R800) {
-                /* No native ld hl,(ix+d) (that's ez80-only) - R800 fp read/write
-                   is still two `ld r,(ix+d)` ops, just at r800 speed: 5+5=10
-                   (exact, from opcode_data.dat). DEREF/STEP use the same ~0.22
-                   z80-ratio as the SLOT row above pending measurement. */
-                static const int R800_FP[GK_N] = {10,10,10,18};
-                c = R800_FP[kind];
-            }
         }
     }
     return c;
@@ -4110,7 +4108,7 @@ static void assign_idxhalf_homes(Func *f)
 {
     if (!idxhalf_enabled()) return;                 /* default on; --opt-disable=idxhalf opts out */
     if (c_framepointer_is_ix != -1) return;         /* SP MODE ONLY (see above) */
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || IS_EZ80())) return;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || IS_EZ80())) return;
     if (!f || f->n_vregs <= 0 || !f->vreg_to_phys) return;
     /* No calls/asm — else IX/IY would be trashed mid-live-range. */
     for (int b = 0; b < f->n_bbs; b++)

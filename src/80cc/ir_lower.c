@@ -2448,7 +2448,7 @@ static int local_rmw_other_match(char **lines, int n, const char *drop,
 {
     const char **shape = NULL;
     int len = 0;
-    if (c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180) {
+    if ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180) {
         shape = local_rmw_shape_z80;
         len = (int)(sizeof local_rmw_shape_z80 / sizeof local_rmw_shape_z80[0]);
     } else if (IS_EZ80()) {

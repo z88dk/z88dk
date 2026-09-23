@@ -665,7 +665,7 @@ static int gen_extract_byte(FILE *out, Func *f, const Op *op)
            Byte 0 = low, byte 1 = high. z80/z80n read the index half directly;
            the rest (ez80/kc160/rabbit/z180 — no usable index-half byte access)
            recover the word into HL (push/pop) and take the byte. */
-        if (c_cpu == CPU_Z80 || IS_Z80N()) {
+        if ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N()) {
             emit(out, "ld\ta,%s%s", vreg_idx_name(f, x), k == 0 ? "l" : "h");
         } else {
             emit_idx_word_to_reg(out, f, x, "hl");
@@ -4148,14 +4148,14 @@ static int try_binop_ixd_fold(FILE *out, Func *f, const Op *op,
     if (opt_disabled("alu-fold")) return 0;
     if (g_hc.de_home < 0) return 0;           /* only inside a DE-home region */
     if (!fp_active(f)) return 0;
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
     if (op->dst < 0 || f->vregs[op->dst].width != 2) return 0;
     int s0 = op->src[0], s1 = op->src[1];
     if (s0 < 0 || s1 < 0) return 0;
     if (s0 >= f->n_vregs || s1 >= f->n_vregs) return 0;
     if (f->vregs[s0].width != 2 || f->vregs[s1].width != 2) return 0;
     if (L.pending_spill_v >= 0) return 0;      /* byte ops clobber HL; see cmp fold */
-    int idxhalf_ok = (c_cpu == CPU_Z80 || IS_Z80N());
+    int idxhalf_ok = ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N());
     char s0lo[16], s0hi[16], s1lo[16], s1hi[16];
     int c0 = cmp_byte_src(f, s0, idxhalf_ok, s0lo, s0hi, sizeof s0lo);
     int c1 = cmp_byte_src(f, s1, idxhalf_ok, s1lo, s1hi, sizeof s1lo);
@@ -4257,7 +4257,7 @@ static int try_de_home_def(FILE *out, Func *f, const Op *op)
 static int try_index_half_word_add(FILE *out, Func *f, const Op *op)
 {
     if (opt_disabled("ixd-fold")) return 0;
-    if (!(c_cpu == CPU_Z80 || IS_Z80N())) return 0;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N())) return 0;
     /* Co-design helper for the sp-mode idx3/exx layout (writable loop words in
        index regs). Off in fp mode and in default sp builds so codegen there is
        unchanged (fp's idx2=IY invariant must not be folded — broke word_resident-fp). */
