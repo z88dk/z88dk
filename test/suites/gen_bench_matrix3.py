@@ -20,7 +20,7 @@ BENCHES = ("charbench crcbench intbench ptrbench sieve rle sortbench queenbench 
            "searchbench switchbench structbench vecbench recordbench maskbench "
            "strbench listbench interpbench matrixbench hashbench fixedbench "
            "histbench lexbench bitfieldbench widthbench predbench shiftbench "
-           "localbench divbench callbench md5").split()
+           "localbench divbench callbench md5 charmulbench").split()
 
 # cpu -> (make target, zcc clib flag, ticks machine flag)
 CPUS = [
