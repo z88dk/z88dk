@@ -3581,10 +3581,20 @@ static int g0_word_cost(int reg, int kind)
     static const int VM1[GR_N][GK_N] = {
         /*SLOT*/{44,39,44,68}, /*BC*/{10,10,7,6}, /*DE*/{10,10,7,6},
         /*IX*/{25,25,11,9}, /*IY*/{25,25,11,9} };
+    /* R800 emits the same instructions as z80 (no mul yet), so this is the
+       z80 row's sequences re-priced from opcode_data.dat's r800 column, not a
+       fresh measurement. BC/DE/IX/IY are exact (push/pop, ld a,(bc)/(ix+0),
+       inc). SLOT and its fp counterpart below are not decomposed - they use
+       the ~0.22 z80 ratio the exact rows converge on, pending an
+       r800_cost_bench.py measurement. */
+    static const int R800[GR_N][GK_N] = {
+        /*SLOT*/{10,9,11,20}, /*BC*/{2,2,2,1}, /*DE*/{2,2,2,1},
+        /*IX*/{8,8,5,2}, /*IY*/{8,8,5,2} };
     const int (*t)[GK_N] = IS_KC160() ? KC160
                          : IS_EZ80() ? EZ80
                          : IS_KR580VM1() ? VM1
                          : IS_RABBIT() ? RABBIT
+                         : IS_R800() ? R800
                          : g0measured_on() ? Z80 : Z80_EST;
     /* gbz80 carries two corrections, both plain hardware facts and both now
        default-on: `ld hl,sp+n` makes its slot cheaper than the Z80 row claims,
@@ -3622,6 +3632,14 @@ static int g0_word_cost(int reg, int kind)
             } else if (t == Z80_EST && kind <= GK_WRITE) c = 39;
             else if (t == RABBIT && kind <= GK_WRITE) c = 11; /* slightly dearer than sp */
             else if (t == EZ80) c = (kind == GK_STEP) ? 4 : 2; /* native ld hl,(ix+d): cheap */
+            else if (t == R800) {
+                /* No native ld hl,(ix+d) (that's ez80-only) - R800 fp read/write
+                   is still two `ld r,(ix+d)` ops, just at r800 speed: 5+5=10
+                   (exact, from opcode_data.dat). DEREF/STEP use the same ~0.22
+                   z80-ratio as the SLOT row above pending measurement. */
+                static const int R800_FP[GK_N] = {10,10,10,18};
+                c = R800_FP[kind];
+            }
         }
     }
     return c;
