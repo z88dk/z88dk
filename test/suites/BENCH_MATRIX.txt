@@ -1,7 +1,8 @@
-24/9/2026 (s3) — sortbench/vecbench/histbench r800 80cc columns refreshed:
-16x16 int multiply now lowers to `muluw hl,de` (ir_build.c, ir_lower_ops.inc.c,
-ir_lower.c) instead of the l_mult call, gated IS_R800() && width==2. 8x8 char
-multiply (mulub) not yet done. Details: src/80cc/R800_TARGET_PLAN.md.
+24/9/2026 (s4) — fixedbench r800 80cc column refreshed: the widening 16x16->32
+unsigned multiply (`unsigned long = uint*uint`, ir_build.c's narrow-mul path)
+now inlines `muluw hl,de` for the full DEHL result instead of calling
+l_mulu_32_16x16, gated IS_R800(). 8x8 char multiply (mulub) still not done.
+Details: src/80cc/R800_TARGET_PLAN.md.
 Generator: test/suites/gen_bench_matrix3.py cell() (30 benchmarks × 13 CPUs; all compiler columns measured).
 Compiler: bin/z88dk-80cc, built from the current worktree.
 ================================================================================
@@ -518,7 +519,7 @@ Compiler: bin/z88dk-80cc, built from the current worktree.
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ fixedbench    │ kc160 │ 3970B / 6.73M   │ —               │ —               │ —               │ 3924B / 2.69M   │ 3912B / 2.69M   │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
-│ fixedbench    │ r800  │ 4243B / 12.54M  │ —               │ —               │ 4796B / 3.87M   │ 4265B / 9.79M   │ 4273B / 9.62M   │
+│ fixedbench    │ r800  │ 4243B / 12.54M  │ —               │ —               │ 4796B / 3.87M   │ 4238B / 3.89M   │ 4246B / 3.73M   │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ fixedbench    │ 8080  │ 4788B / 59.40M  │ —               │ —               │ —               │ = sp (no IX)    │ 5072B / 55.38M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
