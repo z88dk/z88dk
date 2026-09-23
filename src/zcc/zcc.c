@@ -1768,6 +1768,22 @@ int main(int argc, char **argv)
 
         free(linklibs);
         linklibs = tmp;
+
+        /* r800 objects stay z80-stamped (no CPU_MAP_TOOL_LIBNAME suffix, see
+           the cpu_map comment), so -mr800 alone never routes through a
+           dedicated clib and the __CPU_R800__ dispatch other CPUs' 32x32
+           multiply helpers use (l_mulu_32_32x32.asm) can never fire. sccz80
+           reaches l_mulu_32_32x32/l_muls_32_32x32 through a real jp/call
+           (unlike int*int, which codegen.c inlines directly - see
+           mult_const/multreg), so this needs a genuine helper override:
+           link -lr800_opt first so its l_mulu_32_32x32/l_muls_32_32x32
+           win the archive search ahead of the software-loop default. */
+        if (cpu_libs && c_cpu == CPU_TYPE_R800) {
+            char *tmp2 = mustmalloc(strlen(linklibs) + strlen("-lr800_opt ") + 1);
+            sprintf(tmp2, "-lr800_opt %s", linklibs);
+            free(linklibs);
+            linklibs = tmp2;
+        }
     }
 
     /* Newlib strips @{ZCC_LIBCPU}, so --math32 is -lmath32.
