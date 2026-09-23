@@ -4325,6 +4325,8 @@ static int param_caller_off(const Func *f, int vreg_id)
    byte-pair sequence. PARAM_IN_PLACE vregs return their caller-pushed-arg
    offset directly. */
 static void note_slot_use(int v);   /* frame-slot use accounting: fwd (defined with rec state) */
+static void note_wide_def(int v);      /* IR_WIDENOSLOT probe: fwd (defined with rec state) */
+static void note_wide_noslot(int v);   /* IR_WIDENOSLOT probe: fwd (defined with rec state) */
 /* [dead-store] write-context depth: >0 while lowering a store function body,
    so note_slot_use attributes its slot_off calls (store + guard checks) to the
    write count. Save/restore (not set/clear) because stores nest via
@@ -5170,6 +5172,17 @@ static int  *rec_slotwrite;
    destructive home clobber while this bit is set. */
 static char *home_slot_dirty;
 static int   home_slot_dirty_nv;
+/* [IR_WIDENOSLOT, inert probe] Per-vreg def accounting for width-4 SPILL
+   vregs whose DEHL result never goes through slot_off at all: cache_dehl_no_spill
+   (dead-dst chain) and emit_dehl_stack_push (data-stack transient) both finalize
+   a def without writing the frame slot, so rec_slotuse stays 0 for reasons
+   rec_end's width<=2 trust gate can't distinguish from "some other untracked
+   path". rec_wide_defs[v] counts every store_dehl_finalize call for v;
+   rec_wide_noslot[v] counts the subset that took one of the two no-slot paths.
+   defs==noslot (every def accounted for) is the trustable case rec_end's gate
+   currently refuses for ANY width>2 vreg. */
+static int  *rec_wide_defs;
+static int  *rec_wide_noslot;
 /* [IR_FRAMEPROBE, inert] Frame-traffic census. rec_fh_red[v] counts REDUNDANT
    slot reads of v: a read in the same call-free region as an earlier read of v
    with no intervening write. That is the residency opportunity — a value the
@@ -5248,10 +5261,12 @@ static void rec_reset(void)
     free(rec_slotwrite); free(rec_fh_red); free(rec_fh_seen);
     free(rec_fh_bytes); free(rec_fh_redbytes);
     free(home_slot_dirty);
+    free(rec_wide_defs); free(rec_wide_noslot);
     rec_fh_bytes = rec_fh_redbytes = NULL; fh_cur_v = -1; fh_cur_red = 0; fh_nv = 0;
     rec_reg = rec_slot = rec_remat = rec_slotuse = rec_slotwrite = NULL;
     rec_fh_red = NULL; rec_fh_seen = NULL;
     home_slot_dirty = NULL; home_slot_dirty_nv = 0;
+    rec_wide_defs = rec_wide_noslot = NULL;
     rec_nv = 0; rec_counting = 0;
 }
 
@@ -5277,10 +5292,30 @@ static void rec_begin(const Func *f)
     home_slot_dirty  = calloc((size_t)rec_nv, 1);
     home_slot_dirty_nv = rec_nv;
     fh_nv = rec_nv;
+    rec_wide_defs   = calloc((size_t)rec_nv, sizeof(int));
+    rec_wide_noslot = calloc((size_t)rec_nv, sizeof(int));
     if (!rec_reg || !rec_slot || !rec_remat || !rec_slotuse || !rec_slotwrite
-        || !home_slot_dirty) {
+        || !home_slot_dirty || !rec_wide_defs || !rec_wide_noslot) {
         rec_reset(); return; }
     rec_counting = 1;
+}
+
+/* [IR_WIDENOSLOT probe] v just had a width-4 DEHL result finalized via
+   store_dehl_finalize, regardless of which of its three paths fired. */
+static void note_wide_def(int v)
+{
+    if (!rec_counting || v < 0 || v >= rec_nv || !rec_wide_defs) return;
+    rec_wide_defs[v]++;
+}
+
+/* [IR_WIDENOSLOT probe] v's DEHL result was finalized via one of the two
+   paths that never call slot_off (cache_dehl_no_spill / emit_dehl_stack_push),
+   including the lazy-spill fast path inside store_dehl_cached that also
+   routes through cache_dehl_no_spill. */
+static void note_wide_noslot(int v)
+{
+    if (!rec_counting || v < 0 || v >= rec_nv || !rec_wide_noslot) return;
+    rec_wide_noslot[v]++;
 }
 
 /* Record a genuine frame-slot access emitted for v (called from slot_off /
@@ -5375,6 +5410,29 @@ static void rec_end(const Func *f)
                     f->fn ? ir_sym_name(f->fn) : "?", homed, ureg, uslot, uremat,
                     cold);
     }
+    /* [IR_WIDENOSLOT, inert probe] For every width>2 SPILL vreg with a slot,
+       report whether EVERY def went through a no-slot path (rec_wide_defs ==
+       rec_wide_noslot > 0) — the narrow, auditable trust condition that could
+       replace rec_end's blanket "w<=2" distrust below. Prints regardless of
+       rec_slotuse, so TRUST=yes rows where rec_slotuse[v]>0 mean some OTHER
+       (untracked) path also touched the slot — a real counterexample to the
+       "every def is no-slot ⇒ slot is dead" hypothesis, and worth knowing
+       about before trusting this class. */
+    if (getenv("IR_WIDENOSLOT") && f->vreg_spill_slot && rec_wide_defs)
+        for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
+            int off = f->vreg_spill_slot[v];
+            if (off < 0) continue;
+            int w = f->vregs[v].width;
+            if (w <= 2) continue;
+            if (!rec_wide_defs[v] && !rec_slotuse[v]) continue;  /* v never defined/used here */
+            int trust = rec_wide_defs[v] > 0 && rec_wide_defs[v] == rec_wide_noslot[v];
+            fprintf(stderr, "WIDENOSLOT %-16s v%-4d width=%d off=%d wide_defs=%d "
+                    "wide_noslot=%d slotuse=%d TRUST=%s%s\n",
+                    f->fn ? ir_sym_name(f->fn) : "?", v, w, off,
+                    rec_wide_defs[v], rec_wide_noslot[v], rec_slotuse[v],
+                    trust ? "yes" : "no",
+                    (trust && rec_slotuse[v] > 0) ? " CONTRADICTION" : "");
+        }
     /* Dead frame-slot report, per-BYTE and coalescing-aware. Slots are shared
        across non-interfering vregs, so a frame byte is DEAD only if every vreg
        covering it had no genuine frame-slot access (rec_slotuse over-counts
