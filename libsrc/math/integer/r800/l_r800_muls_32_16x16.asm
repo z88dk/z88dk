@@ -30,7 +30,7 @@ l_r800_muls_32_16x16:
     call NZ,l_neg_hl            ; take absolute value of multiplier
 
     ld bc,de                    ; do unsigned multiplication
-    muluw hl,bc
+    defb $ED,$C3       ; muluw hl,bc
 
     pop bc                      ; recover sign info from multiplicand and multiplier
     ld a,b

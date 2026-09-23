@@ -2247,6 +2247,8 @@ static void quikmult(int type, int32_t size, char preserve)
             const2(size);
             if ( c_cpu & CPU_KC160) {
                 ol("mul\tde,hl");
+            } else if (IS_R800()) {
+                ol("defb\t$ED,$D3\t; muluw hl,de");
             } else {
                 callrts("l_mult"); /* WATCH OUT!! */
             }
@@ -2696,6 +2698,8 @@ void mult(LVALUE* lval)
     default:
         if (c_cpu & CPU_KC160 ) {
             ol( ulvalue(lval) ? "mul\tde,hl" : "muls\tde,hl");
+        } else if (IS_R800()) {
+            ol("defb\t$ED,$D3\t; muluw hl,de");
         } else {
             callrts( ulvalue(lval) ? "l_mult_u" : "l_mult");
         }
