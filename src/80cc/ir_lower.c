@@ -2738,6 +2738,118 @@ static void fold_de_pool_remat_add(char **lines, char *drop, int i,
     drop[i - 1] = 1;
 }
 
+/* [IR_DEADDE_FOLD] Bounded forward scan from each `ex de,hl`/`ld de,hl` def,
+   deleting a dead-reload bracket further ahead in the SAME straight-line
+   span (see GBZ80_DE_RELOAD_PLAN.md, "The pattern"; verified as a probe
+   before this was written — 5 real hits on examples/gb/paint.c, 0 offset
+   mismatches, 0 hits on z80/8080/8085 corpus benches):
+
+     ex de,hl / ld de,hl      <- def, i (either spelling of the copy)
+     ld hl,N                 <- store to slot N — CPU-generic 2-line
+     add hl,sp                  addressing (pre-copt: gbz80's `ld hl,sp+N`
+                                 fusion, lib/arch/gbz80/gbz80_rules.1, hasn't
+                                 run yet at this stage — matching only the
+                                 fused form finds nothing, ever)
+     ld (hl),e
+     inc hl
+     ld (hl),d
+     ...                      <- HL-only ops, no label/branch/call/mem-write
+     push hl                  <- start of the reload bracket
+     ld hl,M                 <- M == N+2 (the one intervening push)
+     add hl,sp
+     ld a,(hl+)  |  ld a,(hl) / inc hl   <- gbz80 auto-step vs the generic
+                                             two-line read; both spellings
+                                             accepted
+     ld e,a
+     ld d,(hl)                <- reload — but DE already holds this
+     pop hl
+
+   Bails (does not count) on: a label, a branch/call/ret, any write to D or
+   E, or any memory write other than the recognized store's own two lines
+   (conservative: cannot prove non-aliasing at the text level, so refuse
+   rather than guess). Bounded window (40 lines) — this shape is always
+   local to one expression's codegen, never spans control flow in practice.
+   CPU-generic by construction (the 2-line `ld hl,N`/`add hl,sp` addressing
+   and the `ex de,hl`/`ld de,hl` copy are not gbz80-specific spellings), so
+   this can fire on any CPU that lacks a native word-load-from-slot-into-DE,
+   not just gbz80 — worth checking 8080/8085 too, per
+   GBZ80_DE_RELOAD_PLAN.md's cross-CPU note on the sibling `gen_ld_sym` lead.
+
+   Denial-only: any bail just leaves the bracket in place, never a
+   miscompile risk. --opt-disable=dead-de-reload opts out. */
+static int deadde_match_def(const char *l)
+{
+    return !strcmp(l, "\tex\tde,hl\n") || !strcmp(l, "\tld\tde,hl\n");
+}
+
+static void fold_dead_de_reload(char **lines, char *drop, int n)
+{
+    if (opt_disabled("dead-de-reload")) return;
+    for (int i = 0; i < n; i++) {
+        if (drop[i] || !deadde_match_def(lines[i])) continue;
+        int seen_store = 0, store_off = 0, sp_adj = 0;
+        int j = i + 1, limit = i + 40;
+        for (; j < n && j < limit; j++) {
+            if (drop[j]) break;
+            const char *l = lines[j];
+            char lbl[64], tgt[64];
+            if (xline_label(l, lbl, sizeof lbl)) break;
+            InstrEffects e = instr_effects(l);
+            if (e.is_call || e.is_boundary
+                || xline_branch_target(l, tgt, sizeof tgt))
+                break;
+            int off;
+            if (!seen_store && sscanf(l, "\tld\thl,%d\n", &off) == 1
+                && j + 4 < n
+                && !strcmp(lines[j + 1], "\tadd\thl,sp\n")
+                && !strcmp(lines[j + 2], "\tld\t(hl),e\n")
+                && !strcmp(lines[j + 3], "\tinc\thl\n")
+                && !strcmp(lines[j + 4], "\tld\t(hl),d\n")) {
+                store_off = off + sp_adj;
+                seen_store = 1;
+                j += 4;
+                continue;
+            }
+            if (seen_store && !strcmp(l, "\tpush\thl\n") && j + 5 < n) {
+                int m;
+                int k = j + 1;
+                int ok = sscanf(lines[k], "\tld\thl,%d\n", &m) == 1
+                    && k + 1 < n && !strcmp(lines[k + 1], "\tadd\thl,sp\n");
+                if (ok) {
+                    k += 2;
+                    int step2 = (k + 1 < n
+                        && !strcmp(lines[k], "\tld\ta,(hl)\n")
+                        && !strcmp(lines[k + 1], "\tinc\thl\n"));
+                    int step1 = (k < n && !strcmp(lines[k], "\tld\ta,(hl+)\n"));
+                    if (step2) k += 2; else if (step1) k += 1; else ok = 0;
+                    if (ok && k + 2 < n
+                        && !strcmp(lines[k], "\tld\te,a\n")
+                        && !strcmp(lines[k + 1], "\tld\td,(hl)\n")
+                        && !strcmp(lines[k + 2], "\tpop\thl\n")) {
+                        int canon = m - (sp_adj + 2);
+                        if (canon == store_off)
+                            for (int q = j; q <= k + 2; q++) drop[q] = 1;
+                        break;
+                    }
+                }
+            }
+            if (!strcmp(l, "\tpush\tbc\n") || !strcmp(l, "\tpush\tde\n")
+                || !strcmp(l, "\tpush\thl\n") || !strcmp(l, "\tpush\taf\n")) {
+                sp_adj += 2;
+                continue;
+            }
+            if (!strcmp(l, "\tpop\tbc\n") || !strcmp(l, "\tpop\tde\n")
+                || !strcmp(l, "\tpop\thl\n") || !strcmp(l, "\tpop\taf\n")) {
+                if (!strcmp(l, "\tpop\tde\n")) break;
+                sp_adj -= 2;
+                continue;
+            }
+            if ((e.writes & IR_R_DE) || e.d_write || e.e_write) break;
+            if (e.writes & IR_R_MEM) break;
+        }
+    }
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
@@ -2767,6 +2879,11 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            is the only place in the pipeline with real per-line liveness. copt
            did it blind and miscompiled; see gw_fold_byte_global_widens. */
         gw_fold_byte_global_widens(lines, n, drop);
+        /* [IR_DEADDE_FOLD] Delete a store-then-dead-reload bracket where DE
+           was never touched in between — see the function comment above.
+           Bounded forward scan, self-contained (no liveness state needed
+           from the backward sweep below), so it runs as a pre-pass here. */
+        fold_dead_de_reload(lines, drop, n);
         int b_live = 0, c_live = 0, d_live = 0, e_live = 0;
         /* [xor-a] F-liveness for the `ld a,0` -> `xor a` rewrite. Starts LIVE:
            the buffer end is the end of this function's text, and the walk has
