@@ -1,24 +1,25 @@
-24/9/2026 — post-render const-operand sign-flip fold (ir_lower.c
-fold_const_xorflip, `xorflip-const`, default-on): the signed-comparison
-sign-flip trick (`ld a,d; xor 0x80; ld d,a`, or the h/h mirror), used on
-CPUs without `sbc hl,de` (gbz80, 8080, vm1 — z80 never needs this, it uses
-`sbc hl,de` + an overflow-flag check), recomputed the flipped sign bit at
-runtime even when the operand was a compile-time constant. Folds the
-flip into the constant's own immediate load and deletes the 3-line
-runtime flip. Found mining examples/console/*.c (+test -clib=gbz80):
-216 real hits (probe-verified) across 28 files, 19 on the bench corpus
-too (not corpus-only). vm1 does have sub/sbc hl,de, but its OF/MF flags
-don't match what the lowering's overflow-flag check expects, so it still
-falls back to this path (separate, bigger lever, not pursued here).
-This snapshot: 21 sp cells smaller, -228B, 0 regressions; sizescan.sh's
-wider 720-cell/11-CPU corpus (not all represented here) measured
--456B/42 cells smaller/0 regressions. long_ir case: xorflipconst.c
-(cmp_lt_const fires, cmp_lt_var — register vs register — correctly does
-not). Third gbz80-family fix this session; see also the DE-pool/remat-add
-fold and the dead-DE-reload deletion. Details:
-src/80cc/GBZ80_XORFLIP_PLAN.md, src/80cc/GBZ80_DE_RELOAD_PLAN.md.
+24/9/2026 — post-render chained sign-flip fold (ir_lower.c
+fold_xorflip_chain, `xorflip-chain`, default-on), following the
+const-operand sign-flip fold above: a chained signed-comparison range
+check (`if (v < LOW || v >= HIGH) ...`) re-derives the sign-flipped
+value from scratch at each step instead of keeping it — the value right
+before a conditional branch already equals the flipped constant; on the
+fall-through path, reloading it from memory and re-flipping is a pure
+round trip. Found sweeping examples/othello.c (a different real file
+than the earlier three fixes, confirming generalization) — 3 hits there
+(-9B), 1 more in the console corpus (tic.c), 0 hits anywhere in the
+synthetic bench corpus (confirmed real, not a matching gap — this
+snapshot's sp/fp columns are byte-identical to the last one). Also
+needed broadening from `jp` to `jp`/`jr` for the same reason as the
+const-operand fold's `ld de,hl`/`ex de,hl` lesson — a synthetic test
+using a short branch (`jr`) didn't fire until both spellings were
+accepted. long_ir case: xorflipchain.c (the valuable structural note: an
+`if(v<A) return; if(v<B) return;` shape does NOT reproduce this — it
+inserts a label the fold correctly declines to cross; needs the
+`v<LOW || v>=HIGH` short-circuit shape instead). Fourth gbz80-family fix
+this session. Details: src/80cc/GBZ80_XORFLIP_PLAN.md.
 Generator: test/suites/gen_bench_matrix3.py cell() (35 benchmarks × 13 CPUs; all compiler columns measured).
-Compiler: bin/z88dk-80cc, built from the current worktree (24/9/2026, includes all three fixes above).
+Compiler: bin/z88dk-80cc, built from the current worktree (24/9/2026, includes all four fixes above).
 ================================================================================
 ┌───────────────┬───────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┐
 │ benchmark     │ cpu   │ sccz80          │ xcc -Os         │ xcc -Of         │ sdcc            │ 80cc-fp         │ 80cc-sp         │
