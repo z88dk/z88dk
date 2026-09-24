@@ -2850,6 +2850,112 @@ static void fold_dead_de_reload(char **lines, char *drop, int n)
     }
 }
 
+/* True if `line`'s operand list mentions the register pair `pairname` (e.g.
+   "de") or either of its half-letters (`a`/`b`, e.g. 'd'/'e') as a whole
+   token — a READ, not just the whole-reg WRITE mask `instr_effects` already
+   tracks. Needed because a token like `ld a,e` or `push de` or `add hl,de`
+   reads the pair without writing it, and `InstrEffects` has no generic
+   "reads" mask for D/E or H/L (only the whole-reg WRITE mask, plus B/C and
+   D/E sub-byte fields the park-liveness sweep needs — not what this check
+   needs). Delimits on `,`, `(`, `)`, `+`, matching how operands are spelled
+   in this codebase's emitted text. */
+static int line_reads_pair(const char *line, const char *pairname,
+                           char half_a, char half_b)
+{
+    const char *p = line;
+    while (*p == ' ' || *p == '\t') p++;
+    while (*p && *p != ' ' && *p != '\t') p++;    /* skip mnemonic */
+    char tok[8]; int ti = 0;
+    for (;; p++) {
+        char c = (*p == '\n' || *p == '\r') ? 0 : *p;
+        if (c == ',' || c == '(' || c == ')' || c == '+' || c == 0) {
+            tok[ti] = 0;
+            if (ti && (!strcmp(tok, pairname)
+                       || (ti == 1 && (tok[0] == half_a || tok[0] == half_b))))
+                return 1;
+            ti = 0;
+            if (!*p) break;
+            continue;
+        }
+        if (ti < 7) tok[ti++] = c;
+    }
+    return 0;
+}
+
+/* [IR_XORFLIP_FOLD] The signed-comparison sign-flip trick (`ld a,d / xor
+   0x80 / ld d,a`, or the `h`/`h` mirror) used on CPUs without `sbc hl,de`
+   (gbz80, 8080, vm1 — confirmed by corpus scan; 8085 barely, z80 never: it
+   uses `sbc hl,de` + an overflow-flag check instead) recomputes the flipped
+   sign bit at runtime even when the operand being flipped is a compile-time
+   constant (`ld de,2` — d is PROVABLY 0, so d^0x80 is PROVABLY 0x80, always,
+   for this def). Sized on examples/console/*.c (+test -clib=gbz80): 216 real
+   hits (probe-verified, not the informal 102 a quick script first
+   estimated) across 28 files, plus 19 on the bench corpus (not corpus-only —
+   real files just have far more signed-comparison-against-a-constant code).
+
+   Bounded backward scan (30 lines) from each flip site, for either register
+   pair (`de` or `hl`) the flip targets: bails on a label, branch/call/ret,
+   any OTHER write to the pair, or — `line_reads_pair` — any READ of the pair
+   that isn't the flip's own three lines (a write-only bail would miss e.g.
+   `ld a,e` or `push de` legitimately reading the UNFLIPPED constant for some
+   other purpose between the def and this flip; rewriting the def's immediate
+   would then silently corrupt that other read). Every real hit found so far
+   has a clean gap (only the sibling operand's own flip, which never
+   mentions this pair's tokens), so this guard costs nothing observed and
+   closes a real hazard for shapes not yet seen.
+
+   The fix rewrites the def's immediate to already carry the flipped high
+   byte, and deletes the flip's three lines — the flip's own write becomes a
+   no-op once the constant already IS the flipped value. Denial-only:
+   `--opt-disable=xorflip-const` opts out; any bail just leaves both the
+   flip and the def alone. */
+static void fold_const_xorflip(char **lines, char *drop, int n)
+{
+    if (opt_disabled("xorflip-const")) return;
+    for (int i = 0; i + 2 < n; i++) {
+        if (drop[i]) continue;
+        int is_d = !strcmp(lines[i], "\tld\ta,d\n")
+                && !strcmp(lines[i + 1], "\txor\t0x80\n")
+                && !strcmp(lines[i + 2], "\tld\td,a\n");
+        int is_h = !strcmp(lines[i], "\tld\ta,h\n")
+                && !strcmp(lines[i + 1], "\txor\t0x80\n")
+                && !strcmp(lines[i + 2], "\tld\th,a\n");
+        if (!is_d && !is_h) continue;
+        RegMask pairmask = is_d ? IR_R_DE : IR_R_HL;
+        const char *pairname = is_d ? "de" : "hl";
+        char half_a = is_d ? 'd' : 'h', half_b = is_d ? 'e' : 'l';
+        int limit = i - 30; if (limit < 0) limit = 0;
+        for (int j = i - 1; j >= limit; j--) {
+            if (drop[j]) break;
+            const char *l = lines[j];
+            char lbl[64], tgt[64];
+            if (xline_label(l, lbl, sizeof lbl)) break;
+            InstrEffects e = instr_effects(l);
+            if (e.is_call || e.is_boundary
+                || xline_branch_target(l, tgt, sizeof tgt))
+                break;
+            int val;
+            char fmt[16];
+            snprintf(fmt, sizeof fmt, "\tld\t%s,%%d\n", pairname);
+            if (sscanf(l, fmt, &val) == 1) {
+                unsigned newu = ((unsigned)val ^ 0x8000u) & 0xffffu;
+                char nl[32];
+                snprintf(nl, sizeof nl, "\tld\t%s,%u\n", pairname, newu);
+                char *newline = strdup(nl);
+                if (newline) {
+                    free(lines[j]);
+                    lines[j] = newline;
+                    drop[i] = drop[i + 1] = drop[i + 2] = 1;
+                }
+                break;
+            }
+            if ((e.writes & pairmask)
+                || line_reads_pair(l, pairname, half_a, half_b))
+                break;
+        }
+    }
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
@@ -2884,6 +2990,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            Bounded forward scan, self-contained (no liveness state needed
            from the backward sweep below), so it runs as a pre-pass here. */
         fold_dead_de_reload(lines, drop, n);
+        fold_const_xorflip(lines, drop, n);
         int b_live = 0, c_live = 0, d_live = 0, e_live = 0;
         /* [xor-a] F-liveness for the `ld a,0` -> `xor a` rewrite. Starts LIVE:
            the buffer end is the end of this function's text, and the walk has
