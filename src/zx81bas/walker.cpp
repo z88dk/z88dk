@@ -9,6 +9,7 @@
 #include "release_assert.h"
 #include "walker.h"
 #include <memory>
+#include <utility>
 #include <vector>
 
 void ASTVisitor::walk_stmts(std::vector<StmtPtr>& list) {

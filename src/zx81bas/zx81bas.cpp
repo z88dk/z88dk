@@ -47,6 +47,7 @@ static void show_usage(const char* prog_name) {
     std::cout <<
               "  -o <file>    Specify output file (default: input with .p extension)" <<
               std::endl;
+    std::cout << "  -O           Optimize generated code" << std::endl;
     std::cout << "  -k           Keep temporary files (for debugging)" << std::endl;
     std::cout << "  -h           Show this help message" << std::endl;
     std::cout << "  -v           Verbose mode" << std::endl;
@@ -140,10 +141,13 @@ int main(int argc, char* argv[]) {
     }
 
     // parse options
-    while ((opt = simple_getopt(argc, argv, "o:khvd:?")) != -1) {
+    while ((opt = simple_getopt(argc, argv, "o:Okhvd:?")) != -1) {
         switch (opt) {
         case 'o':
             output_file = normalize_path(g_optarg);
+            break;
+        case 'O':
+            g_optimize = true;
             break;
         case 'h':
             show_usage(argv[0]);
@@ -271,8 +275,10 @@ int main(int argc, char* argv[]) {
 #endif
 
     // optimize basic
-    if (!optimize(*prog)) {
-        exit_error_status();
+    if (g_optimize) {
+        if (!optimize(*prog)) {
+            exit_error_status();
+        }
     }
 
 #ifdef _DEBUG

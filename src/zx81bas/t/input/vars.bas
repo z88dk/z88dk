@@ -3,8 +3,8 @@
 #AUTOSTART_LINE = 0
 
 #ASM
-hello:	defm "HELLO", 0
-world:	defm "WORLD", 0
+hello:	defm "HELL",'O'+$80
+world:	defm "WORL",'D'+$80
 #ENDASM
 
 #VARS A = 1.23
@@ -53,9 +53,11 @@ prcont:	call prmsg
 		defb -1
 		
 prmsg:	ld a,(hl)
-		and a
-		ret z
+		and $3f
 		rst $10
+		ld a,(hl)
+		rla
+		ret c
 		inc hl
 		jr prmsg
 #ENDASM

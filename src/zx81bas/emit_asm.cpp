@@ -8,6 +8,7 @@
 #include "emit_asm.h"
 #include "errors.h"
 #include "lexer.h"
+#include "options.h"
 #include "simplify_expr.h"
 #include "utils.h"
 #include "zx81bas.h"
@@ -286,7 +287,10 @@ static void emit_prog(Prog& prog, int pass,
         }
 
         // simplify expressions in tokens
-        simplify_exprs(copy_tokens);
+        if (g_optimize) {
+            simplify_exprs(copy_tokens);
+        }
+
 
         // output tokens as DEFB
         for (auto& token : copy_tokens) {

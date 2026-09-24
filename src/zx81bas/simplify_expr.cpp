@@ -55,6 +55,16 @@ static ExprPtr fold_constants(ExprPtr expr) {
             }
             return make_node<NumberExpr>(result, expr->loc);
         }
+
+        // fold double negation: - - A -> A, NOT NOT A -> A
+        if (auto operand_unary_expr = dynamic_cast<UnaryExpr*>
+                                      (unary_expr->operand.get())) {
+            if (unary_expr->op == operand_unary_expr->op &&
+                    (unary_expr->op == TokenType::Minus || unary_expr->op == TokenType::NOT)) {
+                return std::move(operand_unary_expr->operand);
+            }
+        }
+
         // if the operator is NOT and operand is a comparison, invert the comparison
         if (auto operand_binary_expr = dynamic_cast<BinaryExpr*>
                                        (unary_expr->operand.get())) {
@@ -94,6 +104,7 @@ static ExprPtr fold_constants(ExprPtr expr) {
     if (auto binary_expr = dynamic_cast<BinaryExpr*>(expr.get())) {
         binary_expr->lhs = fold_constants(std::move(binary_expr->lhs));
         binary_expr->rhs = fold_constants(std::move(binary_expr->rhs));
+
         // if both sides are numbers, we can evaluate the expression
         if (auto lhs_num = dynamic_cast<NumberExpr*>(binary_expr->lhs.get())) {
             if (auto rhs_num = dynamic_cast<NumberExpr*>(binary_expr->rhs.get())) {
@@ -142,6 +153,25 @@ static ExprPtr fold_constants(ExprPtr expr) {
                     return expr;  // unsupported operation
                 }
                 return make_node<NumberExpr>(result, expr->loc);
+            }
+        }
+
+        // fold identity operations: 0+A, A+0, 1*A, A*1 -> A
+        if (auto lhs_num = dynamic_cast<NumberExpr*>(binary_expr->lhs.get())) {
+            if (binary_expr->op == TokenType::Plus && lhs_num->value == 0.0) {
+                return std::move(binary_expr->rhs);
+            }
+            if (binary_expr->op == TokenType::Multiply && lhs_num->value == 1.0) {
+                return std::move(binary_expr->rhs);
+            }
+        }
+        if (auto rhs_num = dynamic_cast<NumberExpr*>(binary_expr->rhs.get())) {
+            if ((binary_expr->op == TokenType::Plus || binary_expr->op == TokenType::Minus)
+                    && rhs_num->value == 0.0) {
+                return std::move(binary_expr->lhs);
+            }
+            if (binary_expr->op == TokenType::Multiply && rhs_num->value == 1.0) {
+                return std::move(binary_expr->lhs);
             }
         }
     }

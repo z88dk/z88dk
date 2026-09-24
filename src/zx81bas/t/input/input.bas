@@ -253,6 +253,13 @@ label4:			nop
 	LET A=2**3
 	LET A=2**-3
 	LET A=1+2*3**4
+	LET A=A
+	LET B=0+A
+	LET B=A+0
+	LET B=1*A
+	LET B=A*1
+	LET B=--A
+	LET B=NOT NOT A
 
 //------------------------------------------------------------------------------
 // check DIM statements
@@ -666,6 +673,24 @@ start_address:
 	PRINT USR &set_bc
 
 	PRINT &value1, &value2
+
+//------------------------------------------------------------------------------
+// Constant condition IF elimination
+//------------------------------------------------------------------------------
+
+IF 0 THEN PRINT "HELLO"
+IF 1 THEN PRINT "WORLD"
+
+//------------------------------------------------------------------------------
+// Remove jump to next statement
+//------------------------------------------------------------------------------
+
+	GOTO @next1
+@next1:
+	PRINT "A"
+	
+	GOTO 2000
+2000 PRINT "B"
 
 //------------------------------------------------------------------------------
 // End with some ASM to check that a final REM line is created
