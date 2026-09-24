@@ -1,16 +1,4 @@
 //------------------------------------------------------------------------------
-// Start with some ASM to check that a REM line is created
-//------------------------------------------------------------------------------
-
-#ASM
-		ex af, af'			; tick is removed in preprocessing
-#ENDASM
-
-#ASM
-		ret
-#ENDASM
-
-//------------------------------------------------------------------------------
 // Include constants
 //------------------------------------------------------------------------------
 
@@ -26,17 +14,6 @@
 #REMINVERT = TRUE
 #FAST = FALSE
 #VERBOSE = TRUE
-#VARS A=1.23
-#VARS AB=12.3
-#VARS ABC=123
-#VARS A(2,3)=\
-	1.1,1.2,1.3,\
-	2.1,2.2,2.3
-#VARS A$ = "HELLO"
-#VARS B$(2,3,3)=\
-	"1.1","1.2","1.3",\
-	"2.1","2.2","2.3"
-#VARS I=1,10,1,10
 #DFILE = \
 	"LINE 1", \
 	"LINE 2", \
@@ -81,17 +58,6 @@
 	0x00, 0x00, 0x00, 0x00
 
 //------------------------------------------------------------------------------
-// ASM in the VARS area is always last
-//------------------------------------------------------------------------------
-
-#VARS Z$ = ""
-#ASM
-z_code:	ld a, 255
-		ld hl, @label1
-		ld hl, &label1
-#ENDASM
-
-//------------------------------------------------------------------------------
 // check labels and line numbers in BASIC
 //------------------------------------------------------------------------------
 
@@ -99,14 +65,6 @@ z_code:	ld a, 255
 10				LET A = &label1
 20 @label2:		LET A = @label2
 @label3: 30		LET A = &label3
-
-//------------------------------------------------------------------------------
-// check labels in ASM
-//------------------------------------------------------------------------------
-
-#ASM
-label4:			nop
-#ENDASM
 
 //------------------------------------------------------------------------------
 // check comments
@@ -181,85 +139,10 @@ label4:			nop
 // lowering of expressions
 //------------------------------------------------------------------------------
 
-	DEF FNid(A) = A*1
-
-	LET A=10*FNid(42)+FNid(1+3)
-	LET A(FNid(42)) = 25
-
 	DEF PROCid(A) : PROCid = A+0 : ENDPROC
 	
 	LET A=10*PROCid(42)+PROCid(1+3)
 	LET A(PROCid(42)) = 25
-
-//------------------------------------------------------------------------------
-// check usage of functions without arguments
-//------------------------------------------------------------------------------
-
-	LET A=RND
-	LET A$=INKEY$
-	LET A=PI
-
-//------------------------------------------------------------------------------
-// check usage of functions with one argument
-//------------------------------------------------------------------------------
-
-	LET A=CODE"A"
-	LET A=CODE("A")
-	LET A=VAL"1"
-	LET A=VAL("1")
-	LET A=LEN"HELLO"
-	LET A=LEN("HELLO")
-	LET A=SIN 0
-	LET A=COS 0
-	LET A=TAN 0
-	LET A=ASN 0
-	LET A=ACS 0
-	LET A=ATN 0
-	LET A=LN 1
-	LET A=EXP 1
-	LET A=SQR 2
-	LET A=SGN +1
-	LET A=SGN -1
-	LET A=ABS +1
-	LET A=ABS -1
-	LET A=PEEK 0
-	LET A=PEEKW 0
-	LET A=USR 0
-	LET A$=STR$2
-	LET A$=CHR$0
-	LET A=NOT 0
-	LET A=1 AND 1
-	LET A=0 OR 0
-
-	LET A=ABS FNid(-3)
-	LET A=FNid(5) + FNid(7)
-
-	DEF FNf(A) = A*A
-	DEF FNg(B) = FNf(B+1) + 3
-	LET X = FNg(10)
-
-//------------------------------------------------------------------------------
-// check operators
-//------------------------------------------------------------------------------
-
-	LET A=1+2
-	LET A=1+-2
-	LET A=1-2
-	LET A=2*3
-	LET A=2/3
-	LET A=10\3
-	LET A=10 DIV 3
-	LET A=10 MOD 3
-	LET A=2**3
-	LET A=2**-3
-	LET A=1+2*3**4
-	LET A=A
-	LET B=0+A
-	LET B=A+0
-	LET B=1*A
-	LET B=A*1
-	LET B=--A
-	LET B=NOT NOT A
 
 //------------------------------------------------------------------------------
 // check DIM statements
@@ -396,18 +279,6 @@ label4:			nop
 	ENDPROC
 
 	LET A=10*PROCj(5+5)
-
-//------------------------------------------------------------------------------
-// check functions
-//------------------------------------------------------------------------------
-
-	DEF FNname(A,B) = A * B
-
-	A = FNname(10,20) + FNname(1+2,3+4)
-
-	DEF fnempty() = PI
-
-	A = 2 * fnempty()
 
 //------------------------------------------------------------------------------
 // check GOTO
@@ -624,57 +495,6 @@ label4:			nop
 	COPY
 
 //------------------------------------------------------------------------------
-// CHeck usage of labels
-//------------------------------------------------------------------------------
-
-#ASM
-
-; make value1 and value2 survive to map file
-	public value1, value2
-
-value1 = 12
-value2 equ 13
-
-show_bc:
-	ret
-	
-.set_bc
-	ld bc, 0
-	ret
-
-message:	DEFM "HELLO"
-
-move_message:
-	ld hl, message
-	ld de, &message_target+6
-	ld bc, 5
-	ldir
-	ret
-	
-line_number:
-	ld bc, @start
-	ret
-	
-start_address:
-	ld bc, &show_bc
-	ret
-	
-#ENDASM
-
-@start:
-	PRINT USR &line_number, USR &start_address
-	PRINT USR &move_message
-	
-@message_target:
-	PRINT "12345" ' replaced by message
-	PRINT USR &show_bc
-	
-	POKEW &set_bc+1,12345
-	PRINT USR &set_bc
-
-	PRINT &value1, &value2
-
-//------------------------------------------------------------------------------
 // Constant condition IF elimination
 //------------------------------------------------------------------------------
 
@@ -691,16 +511,3 @@ IF 1 THEN PRINT "WORLD"
 	
 	GOTO 2000
 2000 PRINT "B"
-
-//------------------------------------------------------------------------------
-// End with some ASM to check that a final REM line is created
-//------------------------------------------------------------------------------
-
-	PRINT "HELLO"
-
-#ASM
-end:		
-	ld a, 'H'
-	DEFM "HELLO"
-	ld hl,&label1
-#ENDASM

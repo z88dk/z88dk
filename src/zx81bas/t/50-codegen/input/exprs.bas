@@ -1,0 +1,61 @@
+// simplify expressions
+#AUTOSTART = 1
+
+#ASM
+show_bc:
+	ld bc, 1234
+	ret
+#ENDASM
+
+	LET A=1
+	RAND 1
+	PRINT ".0022735596", RND
+	PRINT "KEY"; INKEY$, "KEY"
+	PRINT "3.1415927", PI
+	PRINT "38", CODE"A"
+	PRINT "38", CODE("A")
+	PRINT "1", VAL"1"
+	PRINT "1", VAL("1")
+	PRINT "5", LEN"HELLO"
+	PRINT "5", LEN("HELLO")
+	PRINT "1234", USR &show_bc
+	PRINT "2", STR$2
+	PRINT "Z", CHR$63
+	PRINT "0", SIN 0
+	PRINT "1", COS 0
+	PRINT "0", TAN 0
+	PRINT "0", ASN 0
+	PRINT "1.5707963", ACS 0
+	PRINT "0", ATN 0
+	PRINT "0", LN 1
+	PRINT "2.7182818", EXP 1
+	PRINT "1.4142136", SQR 2
+	PRINT "1", SGN +1
+	PRINT "-1", SGN -1
+	PRINT "1", ABS +1
+	PRINT "1", ABS -1
+	PRINT "1", PEEK &show_bc
+	PRINT "1234", PEEKW(&show_bc+1)
+	POKEW &show_bc+1, 4321
+	PRINT "4321", PEEKW(&show_bc+1)
+	PRINT "1", NOT 0
+	PRINT "1", 1 AND 1
+	PRINT "0", 0 OR 0
+	PRINT "3", 1+2
+	PRINT "-1", 1+-2
+	PRINT "-1", 1-2
+	PRINT "6", 2*3
+	PRINT "0.66666667", 2/3
+	PRINT "3", 10\3
+	PRINT "3", 10 DIV 3
+	PRINT "1", 10 MOD 3
+	PRINT "8", 2**3
+	PRINT "0.125", 2**-3
+	PRINT "163", 1+2*3**4
+	PRINT "1", A
+	PRINT "1", 0+A
+	PRINT "1", A+0
+	PRINT "1", 1*A
+	PRINT "1", A*1
+	PRINT "1", --A
+	PRINT "1", NOT NOT A

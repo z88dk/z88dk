@@ -175,9 +175,12 @@ bool assemble_link(const std::vector<std::string>& asm_source,
     // run assembler and linker
     std::string o_filename = input_basename + ".o";
     g_temp_files.push_back(o_filename);
-    std::string map_filename = input_basename + ".map";
     std::string lis_filename = input_basename + ".lis";
     g_temp_files.push_back(lis_filename);
+    std::string bin_filename = input_basename + ".bin";
+    g_temp_files.push_back(bin_filename);
+
+    std::string map_filename = input_basename + ".map";
     std::string p_filename = input_basename + ".p";
 
     if (!assemble(asm_filename, p_filename)) {

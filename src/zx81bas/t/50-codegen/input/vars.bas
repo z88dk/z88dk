@@ -2,15 +2,21 @@
 #AUTOSTART = 1
 #AUTOSTART_LINE = 0
 
+// ASM in the first line
 #ASM
 hello:	defm "HELL",'O'+$80
+#ENDASM
+
+#ASM
 world:	defm "WORL",'D'+$80
 #ENDASM
 
 #VARS A = 1.23
+#VARS AB = 12.3
 #VARS ABC = 4.56
 
 	PRINT "1.23", A
+	PRINT "12.3", AB
 	PRINT "4.56", ABC
 
 #VARS H$ = "HELLO"
@@ -41,6 +47,7 @@ world:	defm "WORL",'D'+$80
 	STOP
 1000 PRINT "3", I ' I was incremented by STEP
 
+// ASM in the vars area
 #VARS Z$ = ""
 #ASM
 prhello:ld hl, hello
@@ -51,7 +58,13 @@ prworld:ld hl, world
 prcont:	call prmsg
 		rst $08
 		defb -1
-		
+#ENDASM
+
+	PRINT "HELLO", USR &prhello:PRINT
+	PRINT "WORLD", USR &prworld:PRINT
+
+// ASM as the last REM line
+#ASM
 prmsg:	ld a,(hl)
 		and $3f
 		rst $10
@@ -61,6 +74,3 @@ prmsg:	ld a,(hl)
 		inc hl
 		jr prmsg
 #ENDASM
-
-	PRINT "HELLO", USR &prhello:PRINT
-	PRINT "WORLD", USR &prworld:PRINT

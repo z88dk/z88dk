@@ -1,0 +1,44 @@
+% z88dk-zx81bas -d 11 -O t/50-codegen//input/labels.bas
+Input file:  t/50-codegen/input/labels.bas
+Output file: t/50-codegen/input/labels.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/50-codegen/input/labels.i" "t/50-codegen/input/labels.pp"
+      0 REM
+   #ASM:	PUBLIC VALUE1, VALUE2
+   #ASM:VALUE1 = 12
+   #ASM:VALUE2 EQU 13
+   #ASM:SHOW_BC:
+   #ASM:	RET
+   #ASM:
+   #ASM:.SET_BC
+   #ASM:	LD BC, 0
+   #ASM:	RET
+   #ASM:MESSAGE:	DEFM "HELLO"
+   #ASM:MOVE_MESSAGE:
+   #ASM:	LD HL, MESSAGE
+   #ASM:	LD DE, &MESSAGE_TARGET+6
+   #ASM:	LD BC, 5
+   #ASM:	LDIR
+   #ASM:	RET
+   #ASM:
+   #ASM:LINE_NUMBER:
+   #ASM:	LD BC, 10
+   #ASM:	RET
+   #ASM:
+   #ASM:START_ADDRESS:
+   #ASM:	LD BC, &SHOW_BC
+   #ASM:	RET
+   #ASM:
+@START:
+     10 PRINT"16509", &START
+     20 PRINT"10",USR &LINE_NUMBER
+     30 PRINT"16514",USR &START_ADDRESS
+     40 LET A=USR &MOVE_MESSAGE
+     50 PRINT"HELLO",
+@MESSAGE_TARGET:
+     60 PRINT"12345"
+     70 PRINT"16514",USR &SHOW_BC
+     80 POKE &SET_BC+1,57
+     90 POKE &SET_BC+1+1,48
+    100 PRINT"12345",USR &SET_BC
+    110 PRINT"12", &VALUE1
+    120 PRINT"13", &VALUE2

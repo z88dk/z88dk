@@ -75,7 +75,7 @@ scan.cpp: scan.re Makefile
 
 # test
 test: $(DEBUG_EXE) $(RELEASE_EXE)
-	perl -S prove -j9 --state=slow,save t/*.t
+	perl -S prove -j9 --state=slow,save t/*.t t/*/*.t
 
 tidy:
 	@[ -f $(TIDY_STAMP) ] || touch -t 197001010000 $(TIDY_STAMP)

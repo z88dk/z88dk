@@ -142,25 +142,36 @@ sub normalize_command {
 #------------------------------------------------------------------------------
 # run zx81bas with several -d options
 sub test_zx81bas {
-    my ( $min_dump, $max_dump, $options, $optimize ) = @_;
+    my ( $options, $start_dump, $end_dump ) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    for my $dump ( $start_dump .. $end_dump ) {
+
+        # <= 10: no -O
+        # >= 10: with -O
+        # == 10: both
+        if ( $dump <= 10 ) {
+            test_zx81bas_run( $options, $dump, 0 );
+        }
+        if ( $dump >= 10 ) {
+            test_zx81bas_run( $options, $dump, 1 );
+        }
+    }
+}
+
+sub test_zx81bas_run {
+    my ( $options, $dump, $opt ) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my $dir  = path($0)->dirname;
     my $self = path($0)->basename(".t");
-    my @opt  = $optimize ? ( 0 .. 1 ) : (0);
 
-    for my $opt (@opt) {
-        for my $dump ( $min_dump .. $max_dump ) {
-            my $dump00   = sprintf( "%02d", $dump );
-            my $input    = "$dir/input/$self.bas";
-            my $expected = "$dir/expected/$self.$dump00.$opt.txt";
-            my $cmd =
-                  "build/Debug/z88dk-zx81bas -d $dump "
-                . ( $opt ? "-O " : "" )
-                . $input;
-            capture_ok( $cmd, $expected );
-        }
-    }
+    my $dump00   = sprintf( "%02d", $dump );
+    my $input    = "$dir/input/$self.bas";
+    my $expected = "$dir/expected/$self.$dump00.$opt.txt";
+    my $cmd =
+        "build/Debug/z88dk-zx81bas -d $dump " . ( $opt ? "-O " : "" ) . $input;
+    capture_ok( $cmd, $expected );
 }
 
 1;

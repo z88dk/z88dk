@@ -1,8 +1,0 @@
-% z88dk-zx81bas t//input/vars.bas
-Input file:  t/input/vars.bas
-Output file: t/input/vars.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/vars.i" "t/input/vars.pp"
-% z88dk-z80asm -b -m -o"t/input/vars.p" "t/input/vars.asm"
-% z88dk-z80asm -b -m -o"t/input/vars.p" "t/input/vars.asm"
-% z88dk-z80asm -b -m -o"t/input/vars.p" "t/input/vars.asm"
-% z88dk-z80asm -b -m -o"t/input/vars.p" "t/input/vars.asm"

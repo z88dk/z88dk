@@ -1,0 +1,61 @@
+% z88dk-zx81bas -d 11 -O t/50-codegen//input/exprs.bas
+Input file:  t/50-codegen/input/exprs.bas
+Output file: t/50-codegen/input/exprs.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/50-codegen/input/exprs.i" "t/50-codegen/input/exprs.pp"
+      0 REM
+   #ASM:SHOW_BC:
+   #ASM:	LD BC, 1234
+   #ASM:	RET
+     10 LET A=1
+     20 RAND 1
+     30 PRINT".0022735596",RND
+     40 PRINT"KEY";INKEY$,"KEY"
+     50 PRINT"3.1415927",3.141592654
+     60 PRINT"38",CODE"A"
+     70 PRINT"38",CODE"A"
+     80 PRINT"1",VAL"1"
+     90 PRINT"1",VAL"1"
+    100 PRINT"5",LEN"HELLO"
+    110 PRINT"5",LEN"HELLO"
+    120 PRINT"1234",USR &SHOW_BC
+    130 PRINT"2",STR$2
+    140 PRINT"Z",CHR$63
+    150 PRINT"0",0
+    160 PRINT"1",1
+    170 PRINT"0",0
+    180 PRINT"0",0
+    190 PRINT"1.5707963",1.570796327
+    200 PRINT"0",0
+    210 PRINT"0",0
+    220 PRINT"2.7182818",2.718281828
+    230 PRINT"1.4142136",1.414213562
+    240 PRINT"1",1
+    250 PRINT"-1",-1
+    260 PRINT"1",1
+    270 PRINT"1",1
+    280 PRINT"1",PEEK &SHOW_BC
+    290 PRINT"1234",PEEK( &SHOW_BC+1)+256*PEEK( &SHOW_BC+1+1)
+    300 POKE &SHOW_BC+1,225
+    310 POKE &SHOW_BC+1+1,16
+    320 PRINT"4321",PEEK( &SHOW_BC+1)+256*PEEK( &SHOW_BC+1+1)
+    330 PRINT"1",1
+    340 PRINT"1",1
+    350 PRINT"0",0
+    360 PRINT"3",3
+    370 PRINT"-1",-1
+    380 PRINT"-1",-1
+    390 PRINT"6",6
+    400 PRINT"0.66666667",0.6666666667
+    410 PRINT"3",3
+    420 PRINT"3",3
+    430 PRINT"1",1
+    440 PRINT"8",8
+    450 PRINT"0.125",0.125
+    460 PRINT"163",163
+    470 PRINT"1",A
+    480 PRINT"1",A
+    490 PRINT"1",A
+    500 PRINT"1",A
+    510 PRINT"1",A
+    520 PRINT"1",A
+    530 PRINT"1",A

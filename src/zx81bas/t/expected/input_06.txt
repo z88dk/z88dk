@@ -5,215 +5,155 @@ Output file: test_t_input_06_t.p
 Symtab {
     vars: [
         "A" {
-            location: test_t_input_06_t.bas:29
+            location: test_t_input_06_t.bas:64
         }
         "A$" {
-            location: test_t_input_06_t.bas:35
-        }
-        "AB" {
-            location: test_t_input_06_t.bas:30
+            location: test_t_input_06_t.bas:101
         }
         "ABC" {
-            location: test_t_input_06_t.bas:31
+            location: test_t_input_06_t.bas:119
         }
         "B" {
-            location: test_t_input_06_t.bas:151
+            location: test_t_input_06_t.bas:109
         }
         "C" {
-            location: test_t_input_06_t.bas:151
+            location: test_t_input_06_t.bas:109
         }
         "D" {
-            location: test_t_input_06_t.bas:279
+            location: test_t_input_06_t.bas:162
         }
         "E" {
-            location: test_t_input_06_t.bas:280
+            location: test_t_input_06_t.bas:163
         }
         "I" {
-            location: test_t_input_06_t.bas:39
+            location: test_t_input_06_t.bas:230
         }
         "I1" {
-            location: test_t_input_06_t.bas:484
+            location: test_t_input_06_t.bas:355
         }
         "J" {
-            location: test_t_input_06_t.bas:349
+            location: test_t_input_06_t.bas:232
         }
         "PROCEMPTY" {
-            location: test_t_input_06_t.bas:387
+            location: test_t_input_06_t.bas:270
         }
         "PROCID" {
-            location: test_t_input_06_t.bas:189
+            location: test_t_input_06_t.bas:142
         }
         "PROCIDA" {
-            location: test_t_input_06_t.bas:189
+            location: test_t_input_06_t.bas:142
         }
         "PROCJ" {
-            location: test_t_input_06_t.bas:395
+            location: test_t_input_06_t.bas:278
         }
         "PROCJA" {
-            location: test_t_input_06_t.bas:394
+            location: test_t_input_06_t.bas:277
         }
         "PROCNAME" {
-            location: test_t_input_06_t.bas:378
+            location: test_t_input_06_t.bas:261
         }
         "PROCNAMEA" {
-            location: test_t_input_06_t.bas:369
+            location: test_t_input_06_t.bas:252
         }
         "PROCNAMEB" {
-            location: test_t_input_06_t.bas:369
+            location: test_t_input_06_t.bas:252
         }
         "PROCNAMEL" {
-            location: test_t_input_06_t.bas:369
+            location: test_t_input_06_t.bas:252
         }
         "PROCNAMEL1" {
-            location: test_t_input_06_t.bas:369
+            location: test_t_input_06_t.bas:252
         }
         "PROCNAMEL2" {
-            location: test_t_input_06_t.bas:369
+            location: test_t_input_06_t.bas:252
         }
         "PROCNAMEL3" {
-            location: test_t_input_06_t.bas:369
+            location: test_t_input_06_t.bas:252
         }
         "RESULT" {
-            location: test_t_input_06_t.bas:377
+            location: test_t_input_06_t.bas:260
         }
         "S" {
-            location: test_t_input_06_t.bas:346
+            location: test_t_input_06_t.bas:229
         }
         "X" {
-            location: test_t_input_06_t.bas:239
+            location: test_t_input_06_t.bas:462
         }
         "Y" {
-            location: test_t_input_06_t.bas:591
-        }
-        "Z$" {
-            location: test_t_input_06_t.bas:87
+            location: test_t_input_06_t.bas:462
         }
     ]
     arrays: [
         "A" {
-            location: test_t_input_06_t.bas:32
+            location: test_t_input_06_t.bas:120
         }
         "A$" {
-            location: test_t_input_06_t.bas:164
+            location: test_t_input_06_t.bas:122
         }
         "B" {
-            location: test_t_input_06_t.bas:268
+            location: test_t_input_06_t.bas:151
         }
         "B$" {
-            location: test_t_input_06_t.bas:36
+            location: test_t_input_06_t.bas:152
         }
         "C" {
-            location: test_t_input_06_t.bas:268
+            location: test_t_input_06_t.bas:151
         }
         "C$" {
-            location: test_t_input_06_t.bas:269
+            location: test_t_input_06_t.bas:152
         }
         "I" {
-            location: test_t_input_06_t.bas:484
+            location: test_t_input_06_t.bas:355
         }
     ]
     procs: [
         "PROCEMPTY" {
-            location: test_t_input_06_t.bas:386
+            location: test_t_input_06_t.bas:269
         }
         "PROCID" {
-            location: test_t_input_06_t.bas:189
+            location: test_t_input_06_t.bas:142
         }
         "PROCJ" {
-            location: test_t_input_06_t.bas:394
+            location: test_t_input_06_t.bas:277
         }
         "PROCNAME" {
-            location: test_t_input_06_t.bas:369
+            location: test_t_input_06_t.bas:252
         }
     ]
     fns: [
-        "FNEMPTY" {
-            location: test_t_input_06_t.bas:408
-        }
-        "FNF" {
-            location: test_t_input_06_t.bas:237
-        }
-        "FNG" {
-            location: test_t_input_06_t.bas:238
-        }
-        "FNID" {
-            location: test_t_input_06_t.bas:184
-        }
-        "FNNAME" {
-            location: test_t_input_06_t.bas:404
-        }
     ]
     labels: [
-        "END" {
-            location: test_t_input_06_t.bas:702
-        }
         "LABEL1" {
-            location: test_t_input_06_t.bas:98
+            location: test_t_input_06_t.bas:64
         }
         "LABEL2" {
-            location: test_t_input_06_t.bas:100
+            location: test_t_input_06_t.bas:66
         }
         "LABEL3" {
-            location: test_t_input_06_t.bas:101
-        }
-        "LABEL4" {
-            location: test_t_input_06_t.bas:108
-        }
-        "LINE_NUMBER" {
-            location: test_t_input_06_t.bas:654
-        }
-        "MESSAGE" {
-            location: test_t_input_06_t.bas:645
-        }
-        "MESSAGE_TARGET" {
-            location: test_t_input_06_t.bas:668
-        }
-        "MOVE_MESSAGE" {
-            location: test_t_input_06_t.bas:647
+            location: test_t_input_06_t.bas:67
         }
         "NEXT1" {
-            location: test_t_input_06_t.bas:689
-        }
-        "SET_BC" {
-            location: test_t_input_06_t.bas:641
-        }
-        "SHOW_BC" {
-            location: test_t_input_06_t.bas:638
-        }
-        "START" {
-            location: test_t_input_06_t.bas:664
-        }
-        "START_ADDRESS" {
-            location: test_t_input_06_t.bas:658
+            location: test_t_input_06_t.bas:509
         }
         "START_REM" {
-            location: test_t_input_06_t.bas:493
-        }
-        "VALUE1" {
-            location: test_t_input_06_t.bas:635
-        }
-        "VALUE2" {
-            location: test_t_input_06_t.bas:636
-        }
-        "Z_CODE" {
-            location: test_t_input_06_t.bas:89
+            location: test_t_input_06_t.bas:364
         }
     ]
     line_nums: [
         10 {
-            location: test_t_input_06_t.bas:99
+            location: test_t_input_06_t.bas:65
         }
         20 {
-            location: test_t_input_06_t.bas:100
+            location: test_t_input_06_t.bas:66
         }
         30 {
-            location: test_t_input_06_t.bas:101
+            location: test_t_input_06_t.bas:67
         }
         1000 {
-            location: test_t_input_06_t.bas:416
+            location: test_t_input_06_t.bas:287
         }
         2000 {
-            location: test_t_input_06_t.bas:693
+            location: test_t_input_06_t.bas:513
         }
     ]
 }

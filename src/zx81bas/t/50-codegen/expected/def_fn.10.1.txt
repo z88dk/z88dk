@@ -1,0 +1,238 @@
+% z88dk-zx81bas -d 10 -O t/50-codegen//input/def_fn.bas
+Input file:  t/50-codegen/input/def_fn.bas
+Output file: t/50-codegen/input/def_fn.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/50-codegen/input/def_fn.i" "t/50-codegen/input/def_fn.pp"
+Prog {
+    auto_start: true
+    auto_start_line: 0
+    auto_start_label: ""
+    increment: 10
+    rem_invert: false
+    fast_mode: false
+    dfile_lines: [
+    ]
+    dfile_colapsed: false
+    sysvars_data: [
+    ]
+    stmts: [
+        DimStmt {
+            location: t/50-codegen/input/def_fn.bas:4
+            items: [
+                DimItem {
+                    name: "A"
+                    dims: [
+                        NumberExpr {
+                            type: Number
+                            location: t/50-codegen/input/def_fn.bas:4
+                            value: 2.000000
+                        }
+                    ]
+                }
+            ]
+        }
+        PrintStmt {
+            location: t/50-codegen/input/def_fn.bas:8
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/def_fn.bas:8
+                        value: "424"
+                    }
+                Comma
+                Expr:
+                    NumberExpr {
+                        type: Number
+                        location: t/50-codegen/input/def_fn.bas:8
+                        value: 424.000000
+                    }
+            ]
+        }
+        LetStmt {
+            location: t/50-codegen/input/def_fn.bas:10
+            lhs: 
+                ArrayRefExpr {
+                    type: Number
+                    location: t/50-codegen/input/def_fn.bas:10
+                    name: "A"
+                    indices: [
+                        NumberExpr {
+                            type: Number
+                            location: t/50-codegen/input/def_fn.bas:6
+                            value: 1.000000
+                        }
+                    ]
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: t/50-codegen/input/def_fn.bas:10
+                    value: 11.000000
+                }
+        }
+        LetStmt {
+            location: t/50-codegen/input/def_fn.bas:11
+            lhs: 
+                ArrayRefExpr {
+                    type: Number
+                    location: t/50-codegen/input/def_fn.bas:11
+                    name: "A"
+                    indices: [
+                        NumberExpr {
+                            type: Number
+                            location: t/50-codegen/input/def_fn.bas:6
+                            value: 2.000000
+                        }
+                    ]
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: t/50-codegen/input/def_fn.bas:11
+                    value: 22.000000
+                }
+        }
+        PrintStmt {
+            location: t/50-codegen/input/def_fn.bas:12
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/def_fn.bas:12
+                        value: "11"
+                    }
+                Comma
+                Expr:
+                    ArrayRefExpr {
+                        type: Number
+                        location: t/50-codegen/input/def_fn.bas:12
+                        name: "A"
+                        indices: [
+                            NumberExpr {
+                                type: Number
+                                location: t/50-codegen/input/def_fn.bas:12
+                                value: 1.000000
+                            }
+                        ]
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/50-codegen/input/def_fn.bas:13
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/def_fn.bas:13
+                        value: "22"
+                    }
+                Comma
+                Expr:
+                    ArrayRefExpr {
+                        type: Number
+                        location: t/50-codegen/input/def_fn.bas:13
+                        name: "A"
+                        indices: [
+                            NumberExpr {
+                                type: Number
+                                location: t/50-codegen/input/def_fn.bas:13
+                                value: 2.000000
+                            }
+                        ]
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/50-codegen/input/def_fn.bas:15
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/def_fn.bas:15
+                        value: "3"
+                    }
+                Comma
+                Expr:
+                    NumberExpr {
+                        type: Number
+                        location: t/50-codegen/input/def_fn.bas:15
+                        value: 3.000000
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/50-codegen/input/def_fn.bas:16
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/def_fn.bas:16
+                        value: "12"
+                    }
+                Comma
+                Expr:
+                    NumberExpr {
+                        type: Number
+                        location: t/50-codegen/input/def_fn.bas:16
+                        value: 12.000000
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/50-codegen/input/def_fn.bas:20
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/def_fn.bas:20
+                        value: "130"
+                    }
+                Comma
+                Expr:
+                    NumberExpr {
+                        type: Number
+                        location: t/50-codegen/input/def_fn.bas:19
+                        value: 130.000000
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/50-codegen/input/def_fn.bas:23
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/def_fn.bas:23
+                        value: "221"
+                    }
+                Comma
+                Expr:
+                    NumberExpr {
+                        type: Number
+                        location: t/50-codegen/input/def_fn.bas:23
+                        value: 221.000000
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/50-codegen/input/def_fn.bas:26
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/def_fn.bas:26
+                        value: "6.2831853"
+                    }
+                Comma
+                Expr:
+                    NumberExpr {
+                        type: Number
+                        location: t/50-codegen/input/def_fn.bas:26
+                        value: 6.283185
+                    }
+            ]
+        }
+    ]
+    pragma_vars: [
+    ]
+}

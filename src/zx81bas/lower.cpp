@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <iterator>
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -30,7 +31,7 @@ void LoweringPass::lower_prog() {
     auto lowered_main = lower_main();
     append_stmts(out, lowered_main);
 
-    // end of program location, used for GOTO @END_OF_PROGRAM
+    // end of program location, used for STOP
     SourceLoc end_of_program_loc = out.empty() ? SourceLoc{} :
                                    out.back()->loc;
 

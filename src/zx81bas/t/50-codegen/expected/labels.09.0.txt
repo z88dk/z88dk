@@ -1,0 +1,387 @@
+% z88dk-zx81bas -d 9 t/50-codegen//input/labels.bas
+Input file:  t/50-codegen/input/labels.bas
+Output file: t/50-codegen/input/labels.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/50-codegen/input/labels.i" "t/50-codegen/input/labels.pp"
+Prog {
+    auto_start: true
+    auto_start_line: 0
+    auto_start_label: ""
+    increment: 10
+    rem_invert: false
+    fast_mode: false
+    dfile_lines: [
+    ]
+    dfile_colapsed: false
+    sysvars_data: [
+    ]
+    stmts: [
+        RemStmt {
+            location: t/50-codegen/input/labels.bas:4
+            text: ""
+            asm: [
+                	PUBLIC VALUE1, VALUE2
+                VALUE1 = 12
+                VALUE2 EQU 13
+                SHOW_BC:
+                	RET
+                
+                .SET_BC
+                	LD BC, 0
+                	RET
+                MESSAGE:	DEFM "HELLO"
+                MOVE_MESSAGE:
+                	LD HL, MESSAGE
+                	LD DE, &MESSAGE_TARGET+6
+                	LD BC, 5
+                	LDIR
+                	RET
+                
+                LINE_NUMBER:
+                	LD BC, @START
+                	RET
+                
+                START_ADDRESS:
+                	LD BC, &SHOW_BC
+                	RET
+                
+            ]
+        }
+        LabelStmt {
+            location: t/50-codegen/input/labels.bas:35
+            label: "START"
+        }
+        PrintStmt {
+            location: t/50-codegen/input/labels.bas:36
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/labels.bas:36
+                        value: "16509"
+                    }
+                Comma
+                Expr:
+                    LabelAddrRefExpr {
+                        type: Number
+                        location: t/50-codegen/input/labels.bas:36
+                        name: "START"
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/50-codegen/input/labels.bas:37
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/labels.bas:37
+                        value: "10"
+                    }
+                Comma
+                Expr:
+                    BasicFuncCallExpr {
+                        type: Number
+                        location: t/50-codegen/input/labels.bas:37
+                        keyword: "USR"
+                        args: [
+                            LabelAddrRefExpr {
+                                type: Number
+                                location: t/50-codegen/input/labels.bas:37
+                                name: "LINE_NUMBER"
+                            }
+                        ]
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/50-codegen/input/labels.bas:38
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/labels.bas:38
+                        value: "16514"
+                    }
+                Comma
+                Expr:
+                    BasicFuncCallExpr {
+                        type: Number
+                        location: t/50-codegen/input/labels.bas:38
+                        keyword: "USR"
+                        args: [
+                            LabelAddrRefExpr {
+                                type: Number
+                                location: t/50-codegen/input/labels.bas:38
+                                name: "START_ADDRESS"
+                            }
+                        ]
+                    }
+            ]
+        }
+        LetStmt {
+            location: t/50-codegen/input/labels.bas:39
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: t/50-codegen/input/labels.bas:39
+                    name: "A"
+                }
+            rhs: 
+                BasicFuncCallExpr {
+                    type: Number
+                    location: t/50-codegen/input/labels.bas:39
+                    keyword: "USR"
+                    args: [
+                        LabelAddrRefExpr {
+                            type: Number
+                            location: t/50-codegen/input/labels.bas:39
+                            name: "MOVE_MESSAGE"
+                        }
+                    ]
+                }
+        }
+        PrintStmt {
+            location: t/50-codegen/input/labels.bas:40
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/labels.bas:40
+                        value: "HELLO"
+                    }
+                Comma
+            ]
+        }
+        LabelStmt {
+            location: t/50-codegen/input/labels.bas:41
+            label: "MESSAGE_TARGET"
+        }
+        PrintStmt {
+            location: t/50-codegen/input/labels.bas:42
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/labels.bas:42
+                        value: "12345"
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/50-codegen/input/labels.bas:43
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/labels.bas:43
+                        value: "16514"
+                    }
+                Comma
+                Expr:
+                    BasicFuncCallExpr {
+                        type: Number
+                        location: t/50-codegen/input/labels.bas:43
+                        keyword: "USR"
+                        args: [
+                            LabelAddrRefExpr {
+                                type: Number
+                                location: t/50-codegen/input/labels.bas:43
+                                name: "SHOW_BC"
+                            }
+                        ]
+                    }
+            ]
+        }
+        PokeStmt {
+            location: t/50-codegen/input/labels.bas:45
+            address: 
+                BinaryExpr {
+                    type: Number
+                    location: t/50-codegen/input/labels.bas:45
+                    op: +
+                    lhs: 
+                        LabelAddrRefExpr {
+                            type: Number
+                            location: t/50-codegen/input/labels.bas:45
+                            name: "SET_BC"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/50-codegen/input/labels.bas:45
+                            value: 1.000000
+                        }
+                }
+            value: 
+                BinaryExpr {
+                    type: Number
+                    location: t/50-codegen/input/labels.bas:45
+                    op: -
+                    lhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/50-codegen/input/labels.bas:45
+                            value: 12345.000000
+                        }
+                    rhs: 
+                        BinaryExpr {
+                            type: Number
+                            location: t/50-codegen/input/labels.bas:45
+                            op: *
+                            lhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: t/50-codegen/input/labels.bas:45
+                                    value: 256.000000
+                                }
+                            rhs: 
+                                BasicFuncCallExpr {
+                                    type: Number
+                                    location: t/50-codegen/input/labels.bas:45
+                                    keyword: "INT"
+                                    args: [
+                                        BinaryExpr {
+                                            type: Number
+                                            location: t/50-codegen/input/labels.bas:45
+                                            op: /
+                                            lhs: 
+                                                NumberExpr {
+                                                    type: Number
+                                                    location: t/50-codegen/input/labels.bas:45
+                                                    value: 12345.000000
+                                                }
+                                            rhs: 
+                                                NumberExpr {
+                                                    type: Number
+                                                    location: t/50-codegen/input/labels.bas:45
+                                                    value: 256.000000
+                                                }
+                                        }
+                                    ]
+                                }
+                        }
+                }
+        }
+        PokeStmt {
+            location: t/50-codegen/input/labels.bas:45
+            address: 
+                BinaryExpr {
+                    type: Number
+                    location: t/50-codegen/input/labels.bas:45
+                    op: +
+                    lhs: 
+                        BinaryExpr {
+                            type: Number
+                            location: t/50-codegen/input/labels.bas:45
+                            op: +
+                            lhs: 
+                                LabelAddrRefExpr {
+                                    type: Number
+                                    location: t/50-codegen/input/labels.bas:45
+                                    name: "SET_BC"
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: t/50-codegen/input/labels.bas:45
+                                    value: 1.000000
+                                }
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/50-codegen/input/labels.bas:45
+                            value: 1.000000
+                        }
+                }
+            value: 
+                BasicFuncCallExpr {
+                    type: Number
+                    location: t/50-codegen/input/labels.bas:45
+                    keyword: "INT"
+                    args: [
+                        BinaryExpr {
+                            type: Number
+                            location: t/50-codegen/input/labels.bas:45
+                            op: /
+                            lhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: t/50-codegen/input/labels.bas:45
+                                    value: 12345.000000
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: t/50-codegen/input/labels.bas:45
+                                    value: 256.000000
+                                }
+                        }
+                    ]
+                }
+        }
+        PrintStmt {
+            location: t/50-codegen/input/labels.bas:46
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/labels.bas:46
+                        value: "12345"
+                    }
+                Comma
+                Expr:
+                    BasicFuncCallExpr {
+                        type: Number
+                        location: t/50-codegen/input/labels.bas:46
+                        keyword: "USR"
+                        args: [
+                            LabelAddrRefExpr {
+                                type: Number
+                                location: t/50-codegen/input/labels.bas:46
+                                name: "SET_BC"
+                            }
+                        ]
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/50-codegen/input/labels.bas:48
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/labels.bas:48
+                        value: "12"
+                    }
+                Comma
+                Expr:
+                    LabelAddrRefExpr {
+                        type: Number
+                        location: t/50-codegen/input/labels.bas:48
+                        name: "VALUE1"
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/50-codegen/input/labels.bas:49
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/50-codegen/input/labels.bas:49
+                        value: "13"
+                    }
+                Comma
+                Expr:
+                    LabelAddrRefExpr {
+                        type: Number
+                        location: t/50-codegen/input/labels.bas:49
+                        name: "VALUE2"
+                    }
+            ]
+        }
+    ]
+    pragma_vars: [
+    ]
+}

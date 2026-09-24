@@ -1,0 +1,8 @@
+% z88dk-zx81bas -d 14 test_t_input_14_t.bas
+Input file:  test_t_input_14_t.bas
+Output file: test_t_input_14_t.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_14_t.i" "test_t_input_14_t.pp"
+% z88dk-z80asm -b -m -o"test_t_input_14_t.p" "test_t_input_14_t.asm"
+% z88dk-z80asm -b -m -o"test_t_input_14_t.p" "test_t_input_14_t.asm"
+% z88dk-z80asm -b -m -o"test_t_input_14_t.p" "test_t_input_14_t.asm"
+% z88dk-z80asm -b -m -o"test_t_input_14_t.p" "test_t_input_14_t.asm"

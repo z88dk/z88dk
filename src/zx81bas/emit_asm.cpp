@@ -304,8 +304,10 @@ static void emit_prog(Prog& prog, int pass,
                 break;
             case TokenType::StringLiteral:
                 emit(asm_source, "", "DEFB", "_QUOTE");
-                emit(asm_source, "", "DEFB",
-                     string_to_zx81(token.svalue, /*check_keywords=*/false, token.loc, false));
+                if (!token.svalue.empty()) {
+                    emit(asm_source, "", "DEFB",
+                         string_to_zx81(token.svalue, /*check_keywords=*/false, token.loc));
+                }
                 emit(asm_source, "", "DEFB", "_QUOTE");
                 break;
             case TokenType::RemComment:  // REM argument is a RemComment token

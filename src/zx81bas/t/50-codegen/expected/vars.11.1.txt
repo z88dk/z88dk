@@ -1,0 +1,55 @@
+% z88dk-zx81bas -d 11 -O t/50-codegen//input/vars.bas
+Input file:  t/50-codegen/input/vars.bas
+Output file: t/50-codegen/input/vars.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/50-codegen/input/vars.i" "t/50-codegen/input/vars.pp"
+      0 REM
+   #ASM:HELLO:	DEFM "HELL",'O'+$80
+   #ASM:WORLD:	DEFM "WORL",'D'+$80
+     10 PRINT"1.23",A
+     20 PRINT"12.3",AB
+     30 PRINT"4.56",ABC
+     40 PRINT"HELLO",H$
+     50 PRINT"1",N(1,1)
+     60 PRINT"2",N(1,2)
+     70 PRINT"3",N(2,1)
+     80 PRINT"4",N(2,2)
+     90 PRINT"A",S$(1,1)
+    100 PRINT"B",S$(1,2)
+    110 PRINT"C",S$(2,1)
+    120 PRINT"D",S$(2,2)
+    130 GOTO 150
+    140 FOR I=0 TO 1
+@SKIP:
+    150 PRINT"1",I
+    160 NEXT I
+@ZX81BAS0FOREND:
+    170 STOP
+   1000 PRINT"3",I
+   1010 PRINT"HELLO",USR &PRHELLO
+   1020 PRINT
+   1030 PRINT"WORLD",USR &PRWORLD
+   1040 PRINT
+   1050 REM
+   #ASM:PRMSG:	LD A,(HL)
+   #ASM:		AND $3f
+   #ASM:		RST $10
+   #ASM:		LD A,(HL)
+   #ASM:		RLA
+   #ASM:		RET C
+   #ASM:		INC HL
+   #ASM:		JR PRMSG
+  #VARS:A=1.23
+  #VARS:AB=12.3
+  #VARS:ABC=4.56
+  #VARS:H$="HELLO"
+  #VARS:N(2,2)=1,2,3,4
+  #VARS:S$(2,2,1)="AA","BB","CC","DD"
+  #VARS:I=1 TO 20 STEP 2 GOTO 1000
+  #VARS:Z$=""
+   #ASM:PRHELLO:LD HL, HELLO
+   #ASM:		JR PRCONT
+   #ASM:
+   #ASM:PRWORLD:LD HL, WORLD
+   #ASM:PRCONT:	CALL PRMSG
+   #ASM:		RST $08
+   #ASM:		DEFB -1

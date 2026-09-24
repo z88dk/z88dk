@@ -1,8 +1,0 @@
-% z88dk-zx81bas t//input/labels.bas
-Input file:  t/input/labels.bas
-Output file: t/input/labels.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/labels.i" "t/input/labels.pp"
-% z88dk-z80asm -b -m -o"t/input/labels.p" "t/input/labels.asm"
-% z88dk-z80asm -b -m -o"t/input/labels.p" "t/input/labels.asm"
-% z88dk-z80asm -b -m -o"t/input/labels.p" "t/input/labels.asm"
-% z88dk-z80asm -b -m -o"t/input/labels.p" "t/input/labels.asm"
