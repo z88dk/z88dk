@@ -1,32 +1,5 @@
-24/9/2026 — post-render DE-pool/remat-add fold (ir_lower.c
-fold_de_pool_remat_add, `pool-remat-add-fold`, default-on): `ld de,hl` /
-`ex de,hl` + `ld hl,<const-or-sym>` + `add hl,de` -> `ld de,<const-or-sym>` +
-`add hl,de`, whenever real branch-aware DE liveness (the same fixpoint the
-DE-park sweep already computes) proves DE dead after the add. Found chasing
-gbz80's ~2x `ld`-count gap vs sdcc on examples/gb/paint.c (-34B there,
--395B/128 cells smaller/0 regressions on the sizescan.sh corpus, -0.06%
-ticks/0 cells slower on z80+gbz80). This snapshot: 64 sp cells / 42 fp cells
-smaller, -246B / -222B, 0 regressions anywhere. long_ir case:
-poolremat.c (fire + a must-not-fire case pulled from a real bench,
-searchbench.c, after confirming via instrumentation it hits the liveness
-veto). Two earlier attempts (allocator-side pool denial, render-time op
-fusion) regressed or miscompiled and were reverted — this is the third,
-safe approach. Details: src/80cc/GBZ80_DE_RELOAD_PLAN.md.
+24/9/2026 — post-render dead-DE-reload deletion
 
-23/9/2026 (s7) — sccz80/r800 column refreshed again: added
-l_r800_mulu_32_32x32/l_r800_muls_32_32x32 (r800_opt.lib, three muluw
-partials, kc160-analogue for the ONE case sccz80 genuinely calls a
-helper for rather than inlining - int*int stays the codegen.c inline
-from s6). fixedbench -122B/-24% ticks vs the pre-s6 baseline; other
-benches match s6. 0 regressions. Details: src/80cc/R800_TARGET_PLAN.md.
-
-24/9/2026 (s5) — new benchmark: charmulbench (char*char multiply, both
-signednesses). Added to give the r800 8x8 mulub lowering (still not done) a
-real corpus number: kc160 (mul/muls hl) is already smaller and faster than
-r800 (no 8x8 hardware mul yet) on it - 3949B/0.47M vs 4217B/0.63M 80cc-sp.
-Details: src/80cc/R800_TARGET_PLAN.md.
-Generator: test/suites/gen_bench_matrix3.py cell() (35 benchmarks × 13 CPUs; all compiler columns measured).
-Compiler: bin/z88dk-80cc, built from the current worktree (24/9/2026, includes the DE-pool/remat-add fold above).
 ================================================================================
 ┌───────────────┬───────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┐
 │ benchmark     │ cpu   │ sccz80          │ xcc -Os         │ xcc -Of         │ sdcc            │ 80cc-fp         │ 80cc-sp         │
@@ -625,7 +598,7 @@ Compiler: bin/z88dk-80cc, built from the current worktree (24/9/2026, includes t
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ bitfieldbench │ 8085  │ 4481B / 41.83M  │ —               │ —               │ —               │ = sp (no IX)    │ 4652B / 35.13M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
-│ bitfieldbench │ gbz80 │ 4742B / 52.00M  │ —               │ —               │ 4803B / WRONG   │ = sp (no IX)    │ 5051B / 37.85M  │
+│ bitfieldbench │ gbz80 │ 4742B / 52.00M  │ —               │ —               │ 4803B / WRONG   │ = sp (no IX)    │ 5037B / 36.90M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ bitfieldbench │ vm1   │ 4876B / 64.71M  │ —               │ —               │ —               │ = sp (no IX)    │ 5126B / 41.21M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
