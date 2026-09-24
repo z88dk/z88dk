@@ -4,7 +4,7 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 2026-09-21. Keep it short: when a section stops describing what is
+Last swept: 2026-09-24. Keep it short: when a section stops describing what is
 live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
@@ -198,6 +198,29 @@ is kept separate from B/C because they share one residency latch. The pre-link B
 pass 882/882 and the console gates show no regression (`today` SP remains a
 pre-existing baseline build failure). `byte-pack` disables both lanes;
 `byte-pack-de` disables only D; `IR_BYTEPACK_VERIFY=1/2` keeps the sizing report.
+
+**7. R800 CPU target + hardware multiply — SHIPPED.** New CPU end-to-end:
+`zcc`/`sccz80`/`80cc` all accept `-mr800`, object stays z80-stamped (`Z80ASM`
+column `-mz80`, empty `LIBNAME` — no separate library build), `lib/arch/
+r800/r800_rules.1` converts the plain `muluw`/`mulub` mnemonics (both z88dk's
+and sdcc's own spelling) to raw `defb` bytes at the copt layer, uniformly for
+every producer. No r800-specific `g0_word_cost` row: A/B measurement showed
+z80's own table (already tuned) produces smaller AND faster r800 code than a
+fresh table derived exactly from `opcode_data.dat` — the actual bug was 28
+CPU-eligibility gates (`c_cpu == CPU_Z80 || IS_Z80N() || ...`) across
+`ir_alloc.c`/`ir_lower.c`/`ir_lower_cmp.inc.c`/`ir_lower_ops.inc.c`/
+`ir_lower_regcache.inc.c`/`ir_opt.c`/`ir_compiler_glue.c` hard-excluding r800
+from `IX`/`IY` homing regardless of any cost table; widened to include
+`IS_R800()`. 16x16 int multiply lowers to `muluw hl,de` (`IS_R800() &&
+width==2`, `ir_build.c`/`ir_lower_ops.inc.c`); the widening 16x16→32 case
+(`unsigned long = uint*uint`) reuses the same instruction but commits the
+full `DEHL` product via `store_dehl_finalize` instead of truncating. `long_ir`
+passes clean (461, then 456 targets, all CPUs) at each step. See
+`BENCH_MATRIX.txt` s2-s4 (24/9/2026) for the dated numbers and
+`src/80cc/R800_TARGET_PLAN.md` for the full arc, including a widthbench
+byte-store optimisation that was tried and reverted (measured regression,
+not a correctness bug — the fast path perturbed the allocator's PR_STACK
+vs PR_SPILL choice elsewhere in the same function).
 
 ### How to work here — the traps that actually bit
 

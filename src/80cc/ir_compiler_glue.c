@@ -88,7 +88,7 @@ int ir_idx3_reg(void)
     if (c_reserve_iy) return IR_PR_NONE;               /* IY reserved by platform */
     if (ir_idx2_reg() != IR_PR_IX) return IR_PR_NONE;  /* need IX as idx2 */
     if (c_framepointer_is_ix != -1) return IR_PR_NONE; /* IY is the frame */
-    if (!(c_cpu == CPU_Z80 || IS_Z80N())) return IR_PR_NONE;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N())) return IR_PR_NONE;
     return IR_PR_IY;
 }
 
@@ -103,7 +103,7 @@ int ir_exx_reg(void)
     if (!c_exx_residency) return IR_PR_NONE;
     if (opt_disabled("exx")) return IR_PR_NONE;
     if (c_framepointer_is_ix != -1) return IR_PR_NONE;   /* sp-mode only */
-    if (!(c_cpu == CPU_Z80 || IS_Z80N())) return IR_PR_NONE;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N())) return IR_PR_NONE;
     return IR_PR_BC_ALT;
 }
 

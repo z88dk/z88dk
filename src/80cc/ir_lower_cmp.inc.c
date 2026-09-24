@@ -17,7 +17,7 @@ static int cmpk_enabled(void)
 
 static int cpu_has_index_halves(void)
 {
-    return c_cpu == CPU_Z80 || IS_Z80N() || IS_EZ80();
+    return (c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || IS_EZ80();
 }
 
 /* Byte-wise operand fold for an int compare (branch-fused). Reads BOTH operands
@@ -33,7 +33,7 @@ static int try_cmp_ixd_fold(FILE *out, const Func *f, const Op *op)
 {
     if (opt_disabled("ixd-fold")) return 0;
     if (g_hc.branch_test_kind == 0) return 0;
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
     /* Fires in BOTH fp and sp mode. In sp there are no (ix+d) slot operands
        (op_is_ixd_slot is fp-gated → cmp_byte_src yields only reg-half / idx-half /
        none), so the fold applies to a compare whose operands are the value/counter
@@ -50,7 +50,7 @@ static int try_cmp_ixd_fold(FILE *out, const Func *f, const Op *op)
         int hs0 = op->src[0], hs1 = op->src[1];
         if (hs0 == g_hc.func_whome || hs1 == g_hc.func_whome) return 0;
     }
-    int idxhalf_ok = (c_cpu == CPU_Z80 || IS_Z80N());   /* z180 traps index halves */
+    int idxhalf_ok = ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N());   /* z180 traps index halves */
     OpKind k = op->kind;
     int s0 = op->src[0], s1 = op->src[1];
     if (s0 < 0 || s1 < 0 || s0 == s1) return 0;
@@ -1192,7 +1192,7 @@ static void emit_byte_lsr_a(FILE *out, int r, int mask_redundant)
    shifts at all. */
 static int cb_shift_cpu(void)
 {
-    return (c_cpu == CPU_Z80) || (c_cpu == CPU_Z180)
+    return ((c_cpu == CPU_Z80 || IS_R800())) || (c_cpu == CPU_Z180)
         || IS_EZ80() || IS_GBZ80() || IS_KC160();
 }
 
@@ -1227,7 +1227,7 @@ static int bb_in_loop(const Func *f, const BB *bb)
    the five CPUs would have hidden it behind z80 and z180. */
 static int tbac_cpu(void)
 {
-    return (c_cpu == CPU_Z80) || (c_cpu == CPU_Z180) || IS_GBZ80();
+    return ((c_cpu == CPU_Z80 || IS_R800())) || (c_cpu == CPU_Z180) || IS_GBZ80();
 }
 
 /* Default ON; `--opt-disable=shr-tbac` opts out. This is a deliberate
@@ -1280,8 +1280,9 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         int n = L.cmp_label_counter++;
         int bc_live = (L.rs.bc >= 0);
         int byte_home = L.cur_byte_home_vreg;
-        int e_home = byte_home >= 0
-                  && byte_home_phys(f, byte_home) == IR_PR_E;
+        int de_home = L.cur_de_byte_home_vreg;
+        int e_home = de_home >= 0
+                  && byte_home_phys(f, de_home) == IR_PR_E;
         int use_e = bc_live && L.rs.de < 0 && !e_home;
         int source_b_home = !use_e && byte_home == op->src[0]
                          && byte_home >= 0
@@ -1941,4 +1942,3 @@ static int gen_sar16(FILE *out, Func *f, const Op *op)
     commit_hl_word(out, f, op->dst);
     return 0;
 }
-

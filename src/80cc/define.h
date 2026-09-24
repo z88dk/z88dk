@@ -371,6 +371,7 @@ struct gototab_s {
 #define CPU_R6K      1024
 #define CPU_KC160    2048
 #define CPU_KR580VM1 4096
+#define CPU_R800     8192
 
 #define CPU_RABBIT (CPU_R2KA|CPU_R3K|CPU_R4K|CPU_R6K)
 
@@ -386,6 +387,9 @@ struct gototab_s {
 #define IS_Z80N() (c_cpu == CPU_Z80N)
 #define IS_EZ80() (c_cpu == CPU_EZ80_Z80)
 #define IS_KC160() (c_cpu == CPU_KC160)
+/* Same opcode map as z80 (no mul yet - see R800_TARGET_PLAN.md), just a
+   different cost model: g0_word_cost's R800 row in ir_alloc.c. */
+#define IS_R800() (c_cpu == CPU_R800)
 #define IS_RABBIT()   (c_cpu & CPU_RABBIT)            /* any Rabbit (r2k/r3k/r4k/r6k) */
 #define IS_RABBIT4K() (c_cpu & (CPU_R4K | CPU_R6K))   /* Rabbit 4000+ */
 /* Rabbit 6000 ONLY. `-mr6k` sets c_cpu to CPU_R4K|CPU_R6K (main.c), so testing

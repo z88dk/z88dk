@@ -1555,7 +1555,7 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
                    load (+ native indexing), so the walking pointer stays cheaper
                    there — leave IVSR on. */
                 if (!opt_disabled("ivsr-suppress")
-                    && (c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)
+                    && ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180)
                     && (scale & (scale - 1)) == 0    /* power-of-2 scale only */
                     && ivsr_base_is_const_sym(f, base, lo, hi)) {
                     /* Power-of-2 scale: recomputing `base + iv*2^k` from the

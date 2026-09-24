@@ -682,7 +682,7 @@ static int bc_home_realizable(const Func *f, int v,
    z80/z80n/z180 only. */
 static int idx2_counter_hostile_use(const Func *f, int v)
 {
-    int halves_ok = (c_cpu == CPU_Z80 || IS_Z80N());   /* NOT z180 */
+    int halves_ok = ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N());   /* NOT z180 */
     if (!(halves_ok || c_cpu == CPU_Z180)) return 0;
     int hostile = 0;
     for (int i = 0; i < f->n_bbs; i++)
@@ -2605,7 +2605,7 @@ static int lra_iy_available(const Func *f)
     if (c_reserve_iy) return 0;                 /* IY reserved by the platform */
     /* CPU must have IY + `add iy,de` (excludes gbz80/8080/8085). z180/ez80/rabbit
        support the full-word add iy,rr (only the index-HALF ops trap on z180). */
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180
           || IS_EZ80() || IS_RABBIT())) return 0;
     /* fp soundness: the fp epilogue frame fix + IY-occupancy arbitration (below)
        + the FULL-live-range IY-clean check (rejects an accumulator live across an
@@ -3399,7 +3399,7 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
        skips the balancing pop → sp-1 write / stack leak; 8085's LD_IMM `ld de,K`
        fastpath via spill_de_unless_dead was the crash). EXCLUDED: ez80/kc160/
        rabbit (cheap native sp-relative slots — parking doesn't pay). */
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180
           || IS_808x() || IS_GBZ80())) return;
 
     typedef struct { int vreg, flo, fhi; } SCand;
@@ -3581,6 +3581,22 @@ static int g0_word_cost(int reg, int kind)
     static const int VM1[GR_N][GK_N] = {
         /*SLOT*/{44,39,44,68}, /*BC*/{10,10,7,6}, /*DE*/{10,10,7,6},
         /*IX*/{25,25,11,9}, /*IY*/{25,25,11,9} };
+    /* R800 deliberately has NO row here. Its instruction set and byte costs
+       are identical to z80's (no mul yet). Two rounds of A/B measurement
+       across the full 30-bench corpus: (1) z80's own cost table produces
+       smaller AND faster r800 code on average than a from-scratch r800 table,
+       even one priced exactly from opcode_data.dat, because R800's speedup
+       over z80 is close enough to uniform across instruction classes that
+       the RELATIVE costs driving register-home decisions barely change - z80's
+       already-tuned tradeoffs transfer better than a fresh derivation. (2)
+       The real fix for the corpus's r800 regressions turned out to be the
+       CPU-eligibility gates (`c_cpu == CPU_Z80 || IS_Z80N() || ...` scattered
+       across ir_alloc.c/ir_lower*.c/ir_opt.c/ir_compiler_glue.c, all widened
+       to include IS_R800()) that were blocking IX/IY homing for r800 outright,
+       regardless of any cost table. With those fixed, re-adding an r800 table
+       on top made 6/30 benches WORSE (histbench ticks +65%) and improved none
+       - the table has nothing left to contribute once the gates are open. See
+       src/80cc/R800_TARGET_PLAN.md. */
     const int (*t)[GK_N] = IS_KC160() ? KC160
                          : IS_EZ80() ? EZ80
                          : IS_KR580VM1() ? VM1
@@ -4092,7 +4108,7 @@ static void assign_idxhalf_homes(Func *f)
 {
     if (!idxhalf_enabled()) return;                 /* default on; --opt-disable=idxhalf opts out */
     if (c_framepointer_is_ix != -1) return;         /* SP MODE ONLY (see above) */
-    if (!(c_cpu == CPU_Z80 || IS_Z80N() || IS_EZ80())) return;
+    if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || IS_EZ80())) return;
     if (!f || f->n_vregs <= 0 || !f->vreg_to_phys) return;
     /* No calls/asm — else IX/IY would be trashed mid-live-range. */
     for (int b = 0; b < f->n_bbs; b++)
@@ -4379,11 +4395,15 @@ static int bytepack_on(void)
 
 static void bytepack_pack(Func *f)
 {
-    typedef struct { int v, lo, hi, refs; } Cand;
+    typedef struct { int v, lo, hi, refs, shift; } Cand;
     Cand *cand, *dcand;
     int nc = 0, ndc = 0;
+    int bc_packed = 0;
     int de_probe = 0, d_home_blocked = 0;
 
+    /* The 8085 stack-only path has no cheap D/E byte-home traffic: a
+       slot-backed byte home is formed through HL/LDSI and costs more than the
+       spill it replaces. Keep the independent D lane for the other CPUs. */
     if (!opt_disabled("byte-pack-de")) de_probe = 1;
     if (!bytepack_on() || !f || f->n_vregs <= 0 || !f->vreg_to_phys
         || !f->home_lo || !f->home_hi)
@@ -4410,6 +4430,7 @@ static void bytepack_pack(Func *f)
         const VReg *vr = &f->vregs[v];
         int bb_of = -1, nbb = 0, defs = 0, refs = 0;
         int lo = INT_MAX, hi = -1, first_def = 0, call_use = 0;
+        int shift_shape = 0;
         int g = 0;
 
         if (vr->width != 1 || f->vreg_to_phys[v] != IR_PR_SPILL)
@@ -4429,6 +4450,9 @@ static void bytepack_pack(Func *f)
                 if (!is_def && !is_use) continue;
                 if (is_use && (o->kind == IR_CALL || o->kind == IR_HCALL))
                     call_use = 1;
+                if (o->kind == IR_SHL || o->kind == IR_SHR
+                    || o->kind == IR_ROTL || o->kind == IR_ROTR)
+                    shift_shape = 1;
                 if (!seen_bb) { seen_bb = 1; bb_of = b; nbb++; }
                 if (is_def) defs++;
                 if (is_def || is_use) refs++;
@@ -4457,6 +4481,23 @@ static void bytepack_pack(Func *f)
             if (def_j < 0 || op_dst_spill_is_dead(&f->bbs[bb_of], def_j)) continue;
             lo = bb_first + def_j;
         }
+        /* Include the producer window when classifying a mixed D candidate.
+           In kbshift the packed value is an ADD fed by immediately preceding
+           shifts, so the shift is just before the candidate's home interval;
+           a plain bit mask has no such producer. */
+        if (!shift_shape) {
+            int bb_first = 0;
+            for (int b = 0; b < bb_of; b++) bb_first += f->bbs[b].n_ops;
+            for (int j = 0; j < f->bbs[bb_of].n_ops; j++) {
+                int pos = bb_first + j;
+                if (pos < lo - 2 || pos >= lo) continue;
+                OpKind k = f->bbs[bb_of].ops[j].kind;
+                if (k == IR_SHL || k == IR_SHR || k == IR_ROTL || k == IR_ROTR) {
+                    shift_shape = 1;
+                    break;
+                }
+            }
+        }
         /* The first definition is the home's entry.  Any BC clobber strictly
            between accesses is a real interference; the def and final use may
            themselves write BC after establishing/consuming the byte. */
@@ -4484,12 +4525,12 @@ static void bytepack_pack(Func *f)
                home would be pure overhead. Require a real A-clobber in the
                gap. BC and DE are evaluated independently for their lanes. */
             if ((!bc_clean && !de_clean) || !a_gap) continue;
-            if (bc_clean) cand[nc++] = (Cand){ v, lo, hi, refs };
+            if (bc_clean) cand[nc++] = (Cand){ v, lo, hi, refs, shift_shape };
             /* D is slot-backed, so the existing lowerer can flush/reload it
                around DE-clobbering gaps. Keep the A-clobber requirement, but
                do not reject a DE gap as the verifier-only B lane does. */
             if (de_probe && !d_home_blocked)
-                dcand[ndc++] = (Cand){ v, lo, hi, refs };
+                dcand[ndc++] = (Cand){ v, lo, hi, refs, shift_shape };
         }
     }
 
@@ -4525,6 +4566,7 @@ static void bytepack_pack(Func *f)
         }
         if (clash) continue;
         alloc_note_late_home(f, c->v, IR_PR_B);
+        bc_packed++;
         f->home_lo[c->v] = c->lo;
         f->home_hi[c->v] = c->hi;
         if (getenv("IR_BYTEPACK") && getenv("IR_BYTEPACK")[0] >= '2')
@@ -4532,18 +4574,13 @@ static void bytepack_pack(Func *f)
                     f->fn ? ir_sym_name(f->fn) : "?", c->v,
                     c->lo, c->hi, c->refs);
     }
-    /* D is a slot-backed home. The lowerer currently tracks only one such
-       home per function, and the same latch is also used by slotless B/C
-       homes. Do not mix those byte-home classes until the lowerer has separate
-       D and B/C residency state. */
-    if (de_probe)
-        for (int w = 0; w < f->n_vregs; w++) {
-            PhysReg pw = f->vreg_to_phys[w];
-            if (pw == IR_PR_B || pw == IR_PR_C) {
-                d_home_blocked = 1;
-                break;
-            }
-        }
+    /* D is a slot-backed home. B/C and D/E have independent lowerer
+       residency, so a disjoint B/C home does not suppress this lane. The
+       8085 stack-only byte path is the exception: its HL/LDSI slot traffic
+       makes a mixed B+C plus D/E function lose, so retain the old isolation
+       there while still allowing D/E packing in B/C-free functions. */
+    if (IS_8085() && bc_packed)
+        d_home_blocked = 1;
     if (de_probe && !d_home_blocked) {
         for (int i = 1; i < ndc; i++) {
             Cand c = dcand[i];
@@ -4559,6 +4596,11 @@ static void bytepack_pack(Func *f)
         for (int i = 0; i < ndc; i++) {
             Cand *c = &dcand[i];
             int clash = 0;
+            /* On mixed B/D functions the D lane must pay for its slot-backed
+               traffic. Shift-shaped values do: their widened shift path
+               otherwise reloads through A. Plain mask/merge temporaries do
+               not, and are better left in their ordinary spill slot. */
+            if (bc_packed && !c->shift) continue;
             if (f->vreg_to_phys[c->v] != IR_PR_SPILL) continue;
             for (int w = 0; w < f->n_vregs && !clash; w++) {
                 PhysReg pw = f->vreg_to_phys[w];

@@ -146,7 +146,11 @@ typedef struct {
     int spill_ix, spill_sp;
     int cur_func_uses_params;
     int cur_frameless;   /* fp-eligible but no IX frame (params read off sp) */
-    int cur_byte_home_vreg, cur_byte_home_dirty, cur_func_ehome;
+    /* B/C and D/E byte homes have independent residency. B/C homes are
+       slotless and never dirty; D/E homes are slot-backed and may be dirty
+       while lazy-spill keeps the value in the byte register. */
+    int cur_byte_home_vreg, cur_de_byte_home_vreg;
+    int cur_de_byte_home_dirty, cur_func_ehome;
     /* DE-home co-design (cur_de_home): the general (non-accumulate) width-2 vreg
        the orchestrator elected to keep in DE across a loop — MOVED to g_hc.de_home
        (step 3a). cur_home_region_lo/hi is the proven BB span it stays resident. */
@@ -256,7 +260,8 @@ static const Op *byte_imm_origin(const Func *f, int v, int depth);
 static LowerState L = {
     .rs = { .fa = -1, .i64_acc = -1 },
     .cur_hl_addr_off = -1, .cur_func_uses_params = 1,
-    .cur_byte_home_vreg = -1, .cur_func_ehome = -1,
+    .cur_byte_home_vreg = -1, .cur_de_byte_home_vreg = -1,
+    .cur_func_ehome = -1,
     .cur_home_region_lo = -1, .cur_home_region_hi = -1,
     .cur_home_exit_flush_bb = -1, .pending_spill_v = -1,
     .cur_stack_resident = -1,
@@ -1000,7 +1005,7 @@ static int relax_line_size(const char *l)
         || MN("sla") || MN("sra") || MN("srl") || MN("rl") || MN("rr")
         || MN("rlc") || MN("rrc") || MN("bit") || MN("set") || MN("res")
         || MN("in") || MN("out") || MN("lea") || MN("mlt") || MN("bool")
-        || MN("mul") || MN("muls")
+        || MN("mul") || MN("muls") || MN("muluw")
         || MN("ldi") || MN("ldir") || MN("ldd") || MN("lddr") || MN("swap")
         || MN("daa") || MN("slp"))
         return 4;
@@ -1611,6 +1616,28 @@ static int func_ret_reads_de(const Func *f)
     for (int b = 0; b < f->n_bbs; b++)
         for (int o = 0; o < f->bbs[b].n_ops; o++)
             if (f->bbs[b].ops[o].kind == IR_ASM) return 1;
+    return 0;
+}
+
+/* A cached DE value can help a compare immediately, while a word arithmetic
+   operation may need DE as the slot-load scratch register. The carry therefore
+   starts at compare-first consumers; IR_OFF=de-carry restores the old boundary
+   invalidation for A/B and regression testing. */
+static int bb_de_carry_compare_first(const BB *bb, int v)
+{
+    for (int i = 0; i < bb->n_ops; i++) {
+        const Op *op = &bb->ops[i];
+        int uses = op->src[0] == v || op->src[1] == v || op->src[2] == v;
+        if (!uses) continue;
+        switch (op->kind) {
+        case IR_CMP_EQ: case IR_CMP_NE:
+        case IR_CMP_LT: case IR_CMP_LE: case IR_CMP_GT: case IR_CMP_GE:
+        case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+            return 1;
+        default:
+            return 0;
+        }
+    }
     return 0;
 }
 
@@ -2421,7 +2448,7 @@ static int local_rmw_other_match(char **lines, int n, const char *drop,
 {
     const char **shape = NULL;
     int len = 0;
-    if (c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180) {
+    if ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180) {
         shape = local_rmw_shape_z80;
         len = (int)(sizeof local_rmw_shape_z80 / sizeof local_rmw_shape_z80[0]);
     } else if (IS_EZ80()) {
@@ -4842,6 +4869,9 @@ static InstrEffects instr_effects(const char *line)
     else if (!strcmp(m,"djnz"))                          w |= IR_R_BC|IR_R_F;
     else if (!strcmp(m,"mlt"))                           w |= lra_reg_of(o0);
     else if (!strcmp(m,"mul")||!strcmp(m,"muls"))        w |= lra_reg_of(o0)|IR_R_F;
+    /* r800 `muluw hl,de`: DEHL = HL*DE - writes HL (low) and DE (high),
+       reads HL and DE. */
+    else if (!strcmp(m,"muluw"))                         w |= IR_R_HL|IR_R_DE|IR_R_F;
     else if (!strcmp(m,"div")||!strcmp(m,"divu")||!strcmp(m,"divs")) w |= lra_reg_of(o0)|IR_R_A|IR_R_F;
     else if (!strcmp(m,"ldi")||!strcmp(m,"ldd")||!strcmp(m,"ldir")||!strcmp(m,"lddr"))
                                                          w |= IR_R_HL|IR_R_DE|IR_R_BC|IR_R_MEM|IR_R_F;
@@ -7976,7 +8006,7 @@ static void lower_verify_op_entry(int bb_id, int op_idx)
     /* Rejected (empirically false-positive on correct code, kept as a record):
        - `cur_sp_adjust == 0`: sp is legitimately nonzero across ops beyond the
          inline-push mechanisms (832 hits).
-       - `cur_byte_home_dirty ⇒ vreg>=0`: dirty can harmlessly persist with no
+       - `cur_de_byte_home_dirty ⇒ vreg>=0`: dirty can harmlessly persist with no
          vreg (a no-op flush; 8 hits).
        - residency ("register-homed live vreg must be in some rs cache"): the
          emission cache legitimately diverges from the allocator's homing
@@ -7997,12 +8027,18 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                              const int *bb_pred_cnt, int *const *bb_preds,
                              const int *bb_alias)
 {
+    const int de_carry_on = !opt_disabled("de-carry");
     /* Per-render BC-tenant map, the mirror of bb_hl_out. Local to one render:
        the carry is only consulted within a pass. NULL (OOM) degrades to "never
        carry", which is the safe direction. */
     int *bb_bc_out = malloc((size_t)(f->n_bbs > 0 ? f->n_bbs : 1) * sizeof(int));
     if (bb_bc_out)
         for (int i = 0; i < f->n_bbs; i++) bb_bc_out[i] = -1;
+    /* Per-render DE-tenant map. The carry is consulted only when every
+       predecessor agrees on the same recoverable DE value. */
+    int *bb_de_out = malloc((size_t)(f->n_bbs > 0 ? f->n_bbs : 1) * sizeof(int));
+    if (bb_de_out)
+        for (int i = 0; i < f->n_bbs; i++) bb_de_out[i] = -1;
     /* Per-render HL slot-ADDRESS out map, the address analogue of bb_hl_out:
        the canonical slot offset HL points at when this BB ends, -1 = none. */
     int *bb_hl_addr_out = malloc((size_t)(f->n_bbs > 0 ? f->n_bbs : 1) * sizeof(int));
@@ -8018,8 +8054,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     cur_op_idx = 0;
     rec_begin(f);   /* B4 recoverability verifier — final render only */
     invalidate_hl_bc();
-    L.cur_byte_home_vreg = -1;   /* byte home: no resident at function entry */
-    L.cur_byte_home_dirty = 0;
+    L.cur_byte_home_vreg = -1;      /* B/C home: no resident at function entry */
+    L.cur_de_byte_home_vreg = -1;   /* D/E home: no resident at function entry */
+    L.cur_de_byte_home_dirty = 0;
     L.cur_func_ehome = -1;
     g_hc.home_is_word = 0;
     g_hc.func_whome = -1;
@@ -8147,6 +8184,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
        entry BB has no predecessors, so its HL-carry below would reset it — seed
        it in so the first use reads HL instead of reloading the pushed slot. */
     int entry_hl = L.rs.hl;
+    int entry_de = L.rs.de;
     /* [IR_FCLONG_CARRY] Same for a width-4 autopush param: the prologue left the
        long in DE:BC (+ HL when the alloc spared it), so seed the DEHL cache past
        the entry BB's unconditional invalidate_de_cache. */
@@ -8176,6 +8214,21 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 bb_hl_out[bb->id] = acarry;
             else
                 bb_hl_out[bb->id] = -1;
+            if (de_carry_on && bb_de_out) {
+                int dcarry = -2;
+                for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
+                    int pid = bb_preds[bb->id][p];
+                    if (!bb_lowered[pid]) { dcarry = -1; break; }
+                    int v = bb_de_out[pid];
+                    if (v < 0) { dcarry = -1; break; }
+                    if (dcarry == -2) dcarry = v;
+                    else if (dcarry != v) { dcarry = -1; break; }
+                }
+                bb_de_out[bb->id] =
+                    (dcarry >= 0 && bb->live_in
+                     && ir_bitset_get((const BitSet *)bb->live_in, dcarry))
+                    ? dcarry : -1;
+            }
             /* Word DE-home: pass the home-residency carry through the trampoline
                too (mirror of bb_hl_out) — else a region body reached via an
                alias (index_walk's bb2→bb3) loses the carry and needlessly
@@ -8273,8 +8326,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                    address carry below must not re-assert their belief. */
                 hl_clobbered_at_entry = 1;
             }
-            L.cur_byte_home_dirty = 0;
-            L.cur_byte_home_vreg = -1;
+            L.cur_de_byte_home_dirty = 0;
+            L.cur_de_byte_home_vreg = -1;
         }
         /* Carry the HL cache across the BB boundary when ALL
            predecessors have already been lowered AND agree on
@@ -8295,10 +8348,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             && bb->live_in
             && ir_bitset_get((const BitSet *)bb->live_in, carry)) {
             hl_about_to_change(carry);
-            /* DE / DEHL caches don't survive BB boundaries yet (no
-               bb_de_out tracking). Reset them here even when HL
-               carries — invalidate_hl_cache would clear rs.hl
-               which we just set. */
+            /* DEHL still does not carry through this boundary map. Reset
+               the pair here even when HL carries; ordinary DE is reasserted
+               by the carry check below. */
             invalidate_de_cache();
         } else if (bb_pred_cnt[bb->id] == 0 && entry_hl >= 0
                    && bb->live_in
@@ -8311,6 +8363,29 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         } else {
             invalidate_hl_cache();
         }
+        /* DE cache carry: exact predecessor agreement is the only proof used
+           here. A predecessor records -1 after any operation that invalidates
+           DE, including calls and inline assembly. */
+        int dcarry = -2;
+        if (de_carry_on && bb_de_out) {
+            for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
+                int pid = bb_preds[bb->id][p];
+                if (!bb_lowered[pid]) { dcarry = -1; break; }
+                int v = bb_de_out[pid];
+                if (v < 0) { dcarry = -1; break; }
+                if (dcarry == -2) dcarry = v;
+                else if (dcarry != v) { dcarry = -1; break; }
+            }
+        } else {
+            dcarry = -1;
+        }
+        if (dcarry >= 0 && bb->live_in
+            && ir_bitset_get((const BitSet *)bb->live_in, dcarry)
+            && bb_de_carry_compare_first(bb, dcarry))
+            cache_de(dcarry);
+        else if (de_carry_on && bb_pred_cnt[bb->id] == 0 && entry_de >= 0 && bb->live_in
+                 && ir_bitset_get((const BitSet *)bb->live_in, entry_de))
+            cache_de(entry_de);
         /* [IR_FCLONG_CARRY] Re-assert the entry DEHL residency the branches above
            just cleared (every one of them ends in invalidate_de_cache /
            invalidate_hl_cache, both of which drop rs.dehl). Entry BB only, and
@@ -8319,6 +8394,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             && ir_bitset_get((const BitSet *)bb->live_in, entry_dehl))
             cache_dehl(entry_dehl);
         entry_hl = -1;   /* consumed at the first BB; never re-seed */
+        entry_de = -1;   /* consumed at the first BB; never re-seed */
         entry_dehl = -1;
         /* Cross-BB HL slot-ADDRESS carry — the address analogue of the value
            carry above, and the reason a slot accessed in two blocks used to
@@ -8412,14 +8488,14 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             }
             if (bcarry >= 0 && bb->live_in
                 && ir_bitset_get((const BitSet *)bb->live_in, bcarry)) {
-                L.cur_byte_home_vreg = bcarry;
-                L.cur_byte_home_dirty = bdirty;
+                L.cur_de_byte_home_vreg = bcarry;
+                L.cur_de_byte_home_dirty = bdirty;
             } else {
-                L.cur_byte_home_vreg = -1;
+                L.cur_de_byte_home_vreg = -1;
             }
         } else if (L.cur_func_ehome >= 0) {
             /* In-region: the region assertion (below) re-establishes the belief. */
-            L.cur_byte_home_vreg = -1;
+            L.cur_de_byte_home_vreg = -1;
         }
         /* A preheader of the resident region: outside it, but with an edge
            (alias-resolved) into the header. Its exit re-homes the slot-backed
@@ -8449,7 +8525,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         if (L.cur_func_ehome >= 0 && L.cur_home_region_lo >= 0
             && bb->id >= L.cur_home_region_lo
             && bb->id <= L.cur_home_region_hi
-            && L.cur_byte_home_vreg < 0
+            && L.cur_de_byte_home_vreg < 0
             && bb->live_in
             && ir_bitset_get((const BitSet *)bb->live_in, L.cur_func_ehome)) {
             int ok = 1, saw_lowered = 0;
@@ -8460,7 +8536,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 if (L.bb_byte_out[pid] != L.cur_func_ehome) { ok = 0; break; }
             }
             if (ok && saw_lowered)
-                L.cur_byte_home_vreg = L.cur_func_ehome;
+                L.cur_de_byte_home_vreg = L.cur_func_ehome;
         }
         /* Correctness backstop: the resident region suppresses in-loop spills
            ONLY because the home is proven to ride E throughout. If residency
@@ -8469,15 +8545,15 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            render so the body uses the normal flush rules — else the body
            would update only E while in-loop reloads read a stale slot. */
         if (bb->id == L.cur_home_region_lo && L.cur_home_region_lo >= 0
-            && L.cur_byte_home_vreg != L.cur_func_ehome) {
+            && L.cur_de_byte_home_vreg != L.cur_func_ehome) {
             L.cur_home_region_lo = L.cur_home_region_hi = -1;
             in_home_region = 0;
         }
         /* Inside the resident region the home rides E with no per-iteration
            spill, so the slot is stale: mark dirty so the one flush on the
            region-exit edge fires (a leaving consumer may reload it). */
-        if (in_home_region && L.cur_byte_home_vreg == L.cur_func_ehome)
-            L.cur_byte_home_dirty = 1;
+        if (in_home_region && L.cur_de_byte_home_vreg == L.cur_func_ehome)
+            L.cur_de_byte_home_dirty = 1;
         /* Does this BB need to spill a dirty home before exiting? Inside the
            resident region: only when an edge LEAVES the region (the out-of-
            region target may reload from the slot); all in-region edges keep
@@ -8535,8 +8611,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            so suppress the per-iteration header flush when that hoist is active. */
         if (region_exit_here
             && (opt_disabled("home-exit-dead") || region_exit_needs_flush)
-            && L.cur_byte_home_vreg == L.cur_func_ehome
-            && L.cur_byte_home_dirty
+            && L.cur_de_byte_home_vreg == L.cur_func_ehome
+            && L.cur_de_byte_home_dirty
             && home_is_slotbacked(f, L.cur_func_ehome)
             && L.cur_home_exit_flush_bb < 0)
             home_flush(out, f);   /* keep belief; slot now coherent */
@@ -9066,8 +9142,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                        the belief) so the merge/back-edge successor can reload
                        a coherent slot if it doesn't carry. */
                     if (L.cur_func_ehome >= 0 && bb_exit_flush_needed
-                        && L.cur_byte_home_dirty && L.cur_byte_home_vreg >= 0
-                        && home_is_slotbacked(f, L.cur_byte_home_vreg))
+                        && L.cur_de_byte_home_dirty && L.cur_de_byte_home_vreg >= 0
+                        && home_is_slotbacked(f, L.cur_de_byte_home_vreg))
                         home_flush(out, f);
                     continue;
                 }
@@ -9116,11 +9192,11 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 && (op->kind == IR_BR || op->kind == IR_BR_COND
                     || op->kind == IR_BR_ZERO))
                 home_rehome(out, f);
-            if (L.cur_byte_home_vreg >= 0
-                && home_is_slotbacked(f, L.cur_byte_home_vreg)) {
+            if (L.cur_de_byte_home_vreg >= 0
+                && home_is_slotbacked(f, L.cur_de_byte_home_vreg)) {
                 if (!op_de_clean(f, op)) {
                     home_clobber(out, f);
-                } else if (L.cur_byte_home_dirty && bb_exit_flush_needed
+                } else if (L.cur_de_byte_home_dirty && bb_exit_flush_needed
                            && (op->kind == IR_BR || op->kind == IR_BR_COND
                                || op->kind == IR_BR_ZERO)) {
                     home_flush(out, f);   /* keep belief */
@@ -9173,9 +9249,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            and the home is dirty, spill it now (after the last op, before the
            implicit edge). Branch-ending BBs already flushed before the
            branch in the dispatch above. */
-        if (L.cur_func_ehome >= 0 && bb_exit_flush_needed && L.cur_byte_home_dirty
-            && L.cur_byte_home_vreg >= 0
-            && home_is_slotbacked(f, L.cur_byte_home_vreg)) {
+        if (L.cur_func_ehome >= 0 && bb_exit_flush_needed && L.cur_de_byte_home_dirty
+            && L.cur_de_byte_home_vreg >= 0
+            && home_is_slotbacked(f, L.cur_de_byte_home_vreg)) {
             int lastk = bb->n_ops ? bb->ops[bb->n_ops - 1].kind : IR_NOP;
             if (lastk != IR_BR && lastk != IR_BR_COND
                 && lastk != IR_BR_ZERO && lastk != IR_RET
@@ -9186,13 +9262,14 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            the slot-backed home is in E/D here iff the belief still holds it,
            plus whether its slot is stale (dirty) so successors inherit it. */
         L.bb_byte_out[bb->id] =
-            (L.cur_func_ehome >= 0 && L.cur_byte_home_vreg == L.cur_func_ehome)
-            ? L.cur_byte_home_vreg : -1;
+            (L.cur_func_ehome >= 0 && L.cur_de_byte_home_vreg == L.cur_func_ehome)
+            ? L.cur_de_byte_home_vreg : -1;
         if (L.bb_byte_out_dirty)
             L.bb_byte_out_dirty[bb->id] =
-                (L.bb_byte_out[bb->id] >= 0 && L.cur_byte_home_dirty) ? 1 : 0;
+                (L.bb_byte_out[bb->id] >= 0 && L.cur_de_byte_home_dirty) ? 1 : 0;
         bb_hl_out[bb->id] = L.rs.hl;
         if (bb_bc_out) bb_bc_out[bb->id] = L.rs.bc;
+        if (bb_de_out) bb_de_out[bb->id] = de_carry_on ? L.rs.de : -1;
         if (bb_hl_addr_out) bb_hl_addr_out[bb->id] = L.cur_hl_addr_off;
         /* A holds a known byte here only if a byte compare (cp/or a) left it —
            word compares and calls clear rs.a. So rs.a captures A-preservation
@@ -9204,12 +9281,14 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
 
     rec_end(f);
     free(bb_bc_out);
+    free(bb_de_out);
     free(bb_hl_addr_out);
     return 0;
 
 cleanup_err:
     /* Caller (ir_lower_func) owns the bb_* arrays and ir_free_liveness. */
     free(bb_bc_out);
+    free(bb_de_out);
     free(bb_hl_addr_out);
     rec_reset();
     return -1;

@@ -425,8 +425,8 @@ static void emit_byte_slot_addr(FILE *out, const Func *f, int v)
    every BB end so the slot is coherent. */
 static void byte_home_flush(FILE *out, const Func *f)
 {
-    int v = L.cur_byte_home_vreg;
-    if (v < 0 || !L.cur_byte_home_dirty) return;
+    int v = L.cur_de_byte_home_vreg;
+    if (v < 0 || !L.cur_de_byte_home_dirty) return;
     PhysReg pr = byte_home_phys(f, v);
     if (!byte_home_slotbacked(pr)) return;
     const char *r = byte_home_reg(pr);
@@ -434,7 +434,7 @@ static void byte_home_flush(FILE *out, const Func *f)
         int ix_off = slot_ix_off(f, v);
         if (fp_offset_fits(ix_off)) {
             emit(out, "ld\t(%s%+d),%s", frame_reg(), ix_off, r);
-            L.cur_byte_home_dirty = 0;
+            L.cur_de_byte_home_dirty = 0;
             return;
         }
     }
@@ -446,7 +446,7 @@ static void byte_home_flush(FILE *out, const Func *f)
     invalidate_hl_keep_a();
     emit_byte_slot_addr(out, f, v);
     emit(out, "ld\t(hl),%s", r);
-    L.cur_byte_home_dirty = 0;
+    L.cur_de_byte_home_dirty = 0;
 }
 
 
@@ -462,7 +462,7 @@ static int rehome_byte_home(FILE *out, const Func *f)
     if (v < 0 || v >= f->n_vregs) return 0;
     PhysReg bh = byte_home_phys(f, v);
     if (!byte_home_slotbacked(bh)) return 0;
-    if (L.cur_byte_home_vreg == v) return 1;          /* already resident */
+    if (L.cur_de_byte_home_vreg == v) return 1;          /* already resident */
     const char *r = byte_home_reg(bh);
     if (fp_active(f)) {
         int off = slot_ix_off(f, v);
@@ -479,7 +479,7 @@ static int rehome_byte_home(FILE *out, const Func *f)
         emit_pop_hl(out);
     }
     byte_home_note(v);
-    L.cur_byte_home_dirty = 0;                         /* loaded from coherent slot */
+    L.cur_de_byte_home_dirty = 0;                         /* loaded from coherent slot */
     return 1;
 }
 
@@ -488,14 +488,14 @@ static int rehome_byte_home(FILE *out, const Func *f)
    byte_home_flush, but writes both bytes (E=low, D=high). DE is preserved. */
 static void word_home_flush(FILE *out, const Func *f)
 {
-    int v = L.cur_byte_home_vreg;
-    if (v < 0 || v != g_hc.func_whome || !L.cur_byte_home_dirty) return;
+    int v = L.cur_de_byte_home_vreg;
+    if (v < 0 || v != g_hc.func_whome || !L.cur_de_byte_home_dirty) return;
     if (fp_active(f)) {
         int ix_off = slot_ix_off(f, v);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
             emit(out, "ld\t(%s%+d),e", frame_reg(), ix_off);
             emit(out, "ld\t(%s%+d),d", frame_reg(), ix_off + 1);
-            L.cur_byte_home_dirty = 0;
+            L.cur_de_byte_home_dirty = 0;
             return;
         }
     }
@@ -509,7 +509,7 @@ static void word_home_flush(FILE *out, const Func *f)
     emit(out, "ld\t(hl),e");
     emit(out, "inc\thl");
     emit(out, "ld\t(hl),d");
-    L.cur_byte_home_dirty = 0;
+    L.cur_de_byte_home_dirty = 0;
 }
 
 /* Word DE-home region-exit flush — emitted ONCE at a dedicated loop-exit
@@ -575,7 +575,7 @@ static int rehome_word_home(FILE *out, const Func *f)
 {
     int v = g_hc.func_whome;
     if (v < 0 || v >= f->n_vregs) return 0;
-    if (L.cur_byte_home_vreg == v) return 1;          /* already resident */
+    if (L.cur_de_byte_home_vreg == v) return 1;          /* already resident */
     if (fp_active(f) && !L.cur_frameless) {
         int off = slot_ix_off(f, v);
         if (!fp_offset_fits(off) || !fp_offset_fits(off + 1)) return 0;
@@ -592,7 +592,7 @@ static int rehome_word_home(FILE *out, const Func *f)
     }
     byte_home_note(v);
     cache_de(v);                                    /* DE physically = home */
-    L.cur_byte_home_dirty = 0;                        /* loaded from coherent slot */
+    L.cur_de_byte_home_dirty = 0;                        /* loaded from coherent slot */
     return 1;
 }
 
@@ -613,10 +613,10 @@ static void home_flush(FILE *out, const Func *f)
    value after the op. A later read reloads from the (now coherent) slot. */
 static void home_clobber(FILE *out, const Func *f)
 {
-    if (L.cur_byte_home_vreg < 0) return;
-    if (!home_is_slotbacked(f, L.cur_byte_home_vreg)) return;
+    if (L.cur_de_byte_home_vreg < 0) return;
+    if (!home_is_slotbacked(f, L.cur_de_byte_home_vreg)) return;
     home_flush(out, f);
-    L.cur_byte_home_vreg = -1;
+    L.cur_de_byte_home_vreg = -1;
 }
 static int home_rehome(FILE *out, const Func *f)
 {

@@ -18,6 +18,6 @@ PUBLIC l_r800_mulu_32_16x16
 l_r800_mulu_32_16x16:
     ; Use the guaranteed to be working instruction
     ld bc,de
-    muluw hl,bc    ;Returns dehl = product
+    defb $ED,$C3       ; muluw hl,bc
     and a
     ret
