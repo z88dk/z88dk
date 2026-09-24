@@ -3359,6 +3359,15 @@ static int stack_spill_span_hazard(OpKind k)
     case IR_PUSH_DEHL_LONG: case IR_POP_DEHL_LONG:
     case IR_SWITCH:
     case IR_BR: case IR_BR_COND: case IR_BR_ZERO: case IR_RET:
+    /* gen_deref_cmp_br's "neither pointer BC/DE-resident" case does its
+       own internal `push hl` / `pop hl` to hold one address while the
+       other loads through HL — an implicit stack op invisible to this
+       static scan otherwise. A stack-parked candidate whose span
+       includes this op (as an intervening op OR as the consuming op
+       itself, both covered by the `j <= hi` scan in ir_stack_spill)
+       would have that push/pop land between its own park-push and
+       park-pop, desyncing the single-deep TOS assumption. */
+    case IR_DEREF_CMP_BR:
         return 1;
     default:
         return 0;

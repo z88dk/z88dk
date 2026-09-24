@@ -608,7 +608,11 @@ static int gen_deref_cmp_br(FILE *out, Func *f, const Op *op)
        load walks the value through A: `ld a,(hl+); ld h,(hl); ld l,a`), so *pa
        must be read into A AFTER every address load — never before.  Equality is
        symmetric, so we are free to read whichever pointer is register-resident
-       via (bc)/(de) and put the other in HL. */
+       via (bc)/(de) and put the other in HL — and if NEITHER is BC/DE-resident
+       but one is ALREADY the live HL cache (its producer left it there),
+       that must be preserved (pushed) before the other one's load_to_hl
+       clobbers it, not discarded on the assumption that "neither resident"
+       means HL is free to overwrite. */
     if (vreg_in_pr_bc(f, pa) || vreg_in_pr_de(f, pa)) {
         /* pa resident: HL = pb first (address load clobbers A harmlessly),
            then read *pa via its register last. */
@@ -622,6 +626,26 @@ static int gen_deref_cmp_br(FILE *out, Func *f, const Op *op)
         load_to_hl(out, f, pa);
         emit(out, "ld\ta,(%s)", reg);   /* A = *pb */
         emit(out, "cp\t(hl)");          /* vs *pa */
+    } else if (hl_has(pa)) {
+        /* pa is ALREADY the live HL cache (its producer, e.g. an address
+           ADD, left it there and nothing has evicted it yet) — the first
+           load_to_hl below would silently clobber it before it's ever
+           read, since load_to_hl only guarantees ITS OWN target ends up
+           in HL, not that anything already there survives. Mirror of the
+           BC/DE-resident cases above: push the value HL already holds
+           FIRST, load the other pointer, then pop it back. */
+        emit_sp(out, 2, "push\thl");
+        load_to_hl(out, f, pb);
+        emit(out, "ld\ta,(hl)");        /* A = *pb */
+        emit_sp(out, -2, "pop\thl");           /* HL = pa */
+        emit(out, "cp\t(hl)");          /* vs *pa */
+    } else if (hl_has(pb)) {
+        /* Symmetric: pb already lives in HL. */
+        emit_sp(out, 2, "push\thl");
+        load_to_hl(out, f, pa);
+        emit(out, "ld\ta,(hl)");        /* A = *pa */
+        emit_sp(out, -2, "pop\thl");           /* HL = pb */
+        emit(out, "cp\t(hl)");          /* vs *pb */
     } else {
         /* Neither resident: both addresses come via HL, so load pb, stack it,
            load pa, read *pa, restore pb.  Uses only HL/A/stack — BC and DE (which
