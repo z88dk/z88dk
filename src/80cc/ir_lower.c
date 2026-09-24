@@ -2956,6 +2956,54 @@ static void fold_const_xorflip(char **lines, char *drop, int n)
     }
 }
 
+/* [IR_XORFLIP_CHAIN_FOLD] A chained signed-comparison range check (`if (v <
+   X) ... else if (v < Y) ...`) re-derives the sign-flipped value from
+   scratch at each step instead of keeping it. Found next to the
+   const-operand fold above, in examples/othello.c's board-bounds checks:
+
+     xor 0x80        <- A already flipped from an earlier `xor 0x80`
+     cp N1
+     jp cc,LABEL     <- taken path: untouched by this fold
+     ld a,(hl)        \  fall-through: reload the ORIGINAL value...
+     xor 0x80          | ...then flip it AGAIN
+     cp N2
+
+   Algebraically: right before the `jp`, A == V^0x80 for whatever V the
+   earlier flip started from. On the fall-through path nothing has touched A
+   (`cp` reads, doesn't write) or the memory at `(hl)` (same reasoning), so
+   `(hl) == V` still holds by whatever invariant put it there. The reload +
+   re-flip therefore computes `(V^0x80 reload) -> V -> V^0x80` — the EXACT
+   value already sitting in A. The reload and re-flip are a pure round trip;
+   deleting them leaves A correctly holding `V^0x80` for `cp N2`.
+
+   Deliberately a FIXED 5-line match, no scanning window: the two
+   instructions between the leading `xor 0x80` and the trailing reload
+   (`cp`, `jp`) cannot write A or HL by construction (per `instr_effects`),
+   so requiring exact adjacency makes the whole proof local — no liveness
+   state, no bail conditions needed beyond the literal shape match itself.
+   `jp`/`jr` must be CONDITIONAL (a comma present): an unconditional jump makes
+   the reload dead code by a different, unrelated argument this fold
+   doesn't make.
+
+   Denial-only: `--opt-disable=xorflip-chain` opts out; a non-match just
+   leaves the reload in place. */
+static void fold_xorflip_chain(char **lines, char *drop, int n)
+{
+    if (opt_disabled("xorflip-chain")) return;
+    for (int i = 0; i + 4 < n; i++) {
+        if (drop[i]) continue;
+        if (strcmp(lines[i], "\txor\t0x80\n") != 0) continue;
+        if (strncmp(lines[i + 1], "\tcp\t", 4) != 0) continue;
+        if ((strncmp(lines[i + 2], "\tjp\t", 4) != 0
+             && strncmp(lines[i + 2], "\tjr\t", 4) != 0)
+            || !strchr(lines[i + 2], ','))
+            continue;
+        if (strcmp(lines[i + 3], "\tld\ta,(hl)\n") != 0) continue;
+        if (strcmp(lines[i + 4], "\txor\t0x80\n") != 0) continue;
+        drop[i + 3] = drop[i + 4] = 1;
+    }
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
@@ -2991,6 +3039,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            from the backward sweep below), so it runs as a pre-pass here. */
         fold_dead_de_reload(lines, drop, n);
         fold_const_xorflip(lines, drop, n);
+        fold_xorflip_chain(lines, drop, n);
         int b_live = 0, c_live = 0, d_live = 0, e_live = 0;
         /* [xor-a] F-liveness for the `ld a,0` -> `xor a` rewrite. Starts LIVE:
            the buffer end is the end of this function's text, and the walk has
