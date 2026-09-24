@@ -29,7 +29,7 @@ More detailed, but still incomplete changelist:
 - [all] AI agent support via AGENTS.md and .agents/skills (Grok/Claude discovery symlinks)
 - [copt] Additional conditions for compiler and pattern formats
 - [80cc] New optimising compiler, compatible with sccz0
-- [ticks] 8085, kc160, r4k, r6k fixes
+- [ticks] 8085, z80n, kc160, r4k, r6k fixes
 - [ucpp] Big fixes for #line handling
 - [z88dk-dis] Support for decoding rst calls
 - [z80asm] Bug fixes
