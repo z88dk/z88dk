@@ -2662,6 +2662,82 @@ static void try_fold_8085_addr_pair(char **lines, char *drop, int i,
     } else { free(a); free(b); }
 }
 
+/* True if `op` (the text right of the comma in a `ld hl,<op>` line) is a
+   PLAIN constant or symbol-address operand — safe to re-target into another
+   register with no semantic change (no register read, no memory access, no
+   stack-relative address form). Rejects register names/pairs, `(...)`
+   memory forms, and `sp+`/`sp-` (an address-of-slot, which is only valid
+   relative to HL's own encoding on gbz80 — `ld de,sp+N` is a DIFFERENT,
+   legal instruction, but this helper is deliberately conservative and only
+   claims the pure-constant/symbol shape `[pool-remat-add-fold]` needs). */
+static int is_plain_const_or_sym_operand(const char *op)
+{
+    static const char *regs[] = {
+        "hl","de","bc","sp","ix","iy","a","b","c","d","e","h","l",
+        "ixl","ixh","iyl","iyh","af","af'", NULL
+    };
+    if (!op || !*op) return 0;
+    if (strchr(op, '(')) return 0;
+    if (!strncmp(op, "sp+", 3) || !strncmp(op, "sp-", 3)) return 0;
+    for (int i = 0; regs[i]; i++)
+        if (!strcmp(op, regs[i])) return 0;
+    return 1;
+}
+
+/* [pool-remat-add-fold] `ld de,hl` / `ld hl,<const-or-sym>` / `add hl,de` ->
+   `ld de,<const-or-sym>` / `add hl,de`, when DE is dead after the add (the
+   SAME d_live/e_live fixpoint this sweep already computes for the DE-park
+   rewrite above — real, branch-aware liveness, not a def/use-count guess).
+   The middle line's value is a pure constant/symbol load (no register read,
+   no memory access), so the two forms are arithmetically identical: HL ends
+   at old_hl + K either way, and `add hl,de` sets the same flags from the
+   same operands regardless of how DE got loaded. The only observable
+   difference is DE's final content (old_hl vs K) — provably safe exactly
+   when DE is dead afterward.
+
+   Why here, not at IR-render time: two earlier attempts (see
+   GBZ80_DE_RELOAD_PLAN.md) tried this via ir_alloc.c pool-eligibility denial
+   and via a render-time op-fusion using L.la.cur_skip_next_op — the first
+   exposed the vreg to a SIBLING allocator pool with the same blind spot, the
+   second reused another op's L.la.* lookahead state incorrectly and caused a
+   silent infinite loop. Both hazards are specific to reasoning about vregs
+   and render-loop state DURING lowering. Here, after rendering, there is no
+   vreg, no L.la state, no allocator pool to reason about — just three lines
+   of finished text and the real liveness this sweep already trusts for its
+   own (long-established) DE-park elimination. `--opt-disable=pool-remat-add-fold`
+   opts out. */
+static void fold_de_pool_remat_add(char **lines, char *drop, int i,
+                                   int d_live, int e_live)
+{
+    if (opt_disabled("pool-remat-add-fold")) return;
+    if (strcmp(lines[i], "\tadd\thl,de\n") != 0) return;
+    if (i < 2 || drop[i] || drop[i - 1] || drop[i - 2]) return;
+    /* `ex de,hl` is an equally valid predecessor here: either spelling ends
+       with DE = old HL and discards whatever DE held before (the swap's old
+       DE lands in HL, which line i-1 immediately overwrites) — net effect
+       through this 3-line window is identical either way. */
+    if (strcmp(lines[i - 2], "\tld\tde,hl\n") != 0
+        && strcmp(lines[i - 2], "\tex\tde,hl\n") != 0)
+        return;
+    const char *l1 = lines[i - 1];
+    if (strncmp(l1, "\tld\thl,", 7) != 0) return;
+    if (d_live || e_live) return;
+    const char *op = l1 + 7;
+    size_t oplen = strlen(op);
+    if (oplen && op[oplen - 1] == '\n') oplen--;
+    char opbuf[56];
+    if (oplen == 0 || oplen >= sizeof opbuf) return;
+    memcpy(opbuf, op, oplen); opbuf[oplen] = 0;
+    if (!is_plain_const_or_sym_operand(opbuf)) return;
+    char nl[64];
+    snprintf(nl, sizeof nl, "\tld\tde,%s\n", opbuf);
+    char *newline = strdup(nl);
+    if (!newline) return;
+    free(lines[i - 2]);
+    lines[i - 2] = newline;
+    drop[i - 1] = 1;
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
@@ -2865,6 +2941,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                     }
                 }
             }
+            fold_de_pool_remat_add(lines, drop, i, d_live, e_live);
             /* [idx-rmw-de] Indexed word RMW: `ld bc,hl; ld a,(hl+); ld h,(hl);
                ld l,a; inc hl; ex de,hl; ld hl,bc; ld (hl),e; inc hl; ld (hl),d`
                parks the address in BC because the word load walks the value
