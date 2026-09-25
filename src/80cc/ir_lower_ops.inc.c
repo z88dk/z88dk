@@ -3361,10 +3361,12 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
            where going through HL would be `ld hl,bc; ex de,hl; ld hl,(de)`
            (4B/22c). Only when HL does not already hold the base, which is the
            cheapest case of all. */
+        /* Each LHLX exit commits through commit_hl_result: a DE-homed dst takes
+           the word with one `ex de,hl` where its readers look for it. */
         if (lhlx_deref && op->mem.offset == 0 && !hl_has(op->mem.base)) {
             if (de_has(op->mem.base)) {
                 emit(out, "ld\thl,(de)");           /* DE already the address */
-                commit_hl_word(out, f, op->dst);
+                commit_hl_result(out, f, op->dst);
                 return 0;
             }
             if (bc_has(op->mem.base)) {
@@ -3374,7 +3376,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                    belief so a second field read off the same pointer inside this
                    block is a bare `ld hl,(de)`. */
                 cache_de(op->mem.base);
-                commit_hl_word(out, f, op->dst);
+                commit_hl_result(out, f, op->dst);
                 return 0;
             }
         }
@@ -3403,7 +3405,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\thl,(de)");           /* HL = the word */
                 invalidate_de_cache();              /* DE = base+n, not a vreg */
             }
-            commit_hl_word(out, f, op->dst);
+            commit_hl_result(out, f, op->dst);
             return 0;
         }
         /* Word DE-home active: reach the field offset DE-clean (DE = home
