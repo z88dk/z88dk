@@ -1009,21 +1009,32 @@ static const PatternDef ir_patterns_vregoff[] = {
       .check = vregoff_idx_check, .apply = vregoff_idx_apply },
 };
 
-/* incmhl — long (*p)++ fuse (migrated from ir_opt_long_inc_mhl):
+/* incmhl — discarded-result long ++/-- in memory:
 
-     LD_MEM v_old <- [v_p, 0]      (width 4, MEM_VREG)
-     ADD    v_new <- v_old (imm=1)
-     ST_MEM [v_p, 0], v_new
+     LD_MEM v_old <- [v_p, 0] | [sym+K]   (width 4)
+     INC/DEC v_new <- v_old               (or ADD/SUB imm 1)
+     ST_MEM same address, v_new
 
-   with v_old/v_new used nowhere outside the triple (the
-   discarded-result `(*p)++;` / `c->i[k]++;` statement shape) becomes
-   one IR_HCALL l_long_inc_mhl(v_p) — the helper increments the long
-   at *HL in place (IX-clean: F + HL only). One slot load + call (~5
-   inst) replaces the inline ~30-inst long LD/ADD/ST chain. Offset
-   restricted to 0: the helper expects HL = pointer. POST/PRE shapes
-   where the value IS used fall through to the inline path. */
+   with v_old/v_new used nowhere else (the `(*p)++;` / `g--;` statement
+   shape) becomes one IR_HCALL l_long_inc_mhl / l_long_dec_mhl on the
+   address — the helper steps the long at (HL) in place (F + HL, and A for
+   dec). Pointer form: offset 0 only, the helper expects HL = pointer.
+   Symbol form: the address is an IR_LD_SYM. A banked access (bank_fn /
+   namespaced symbol) stays on the inline path, which pages it in. */
 
 enum { LV_OLD = 1, LV_NEW };   /* incmhl binding vars */
+
+/* +1 / -1 for a unit step, 0 otherwise. */
+static int incmhl_step(const Op *s)
+{
+    switch (s->kind) {
+    case IR_INC: return  1;
+    case IR_DEC: return -1;
+    case IR_ADD: return (s->src[1] < 0 && s->imm == 1) ?  1 : 0;
+    case IR_SUB: return (s->src[1] < 0 && s->imm == 1) ? -1 : 0;
+    default:     return 0;
+    }
+}
 
 static int incmhl_check(Func *f, BB *bb, const int idx[],
                         const int64_t imm[], const int bind[],
@@ -1032,29 +1043,31 @@ static int incmhl_check(Func *f, BB *bb, const int idx[],
     (void)f; (void)imm; (void)bind; (void)uc;
     const Op *ld = &bb->ops[idx[0]];
     const Op *st = &bb->ops[idx[2]];
+    if (!incmhl_step(&bb->ops[idx[1]])) return 0;
     if (ld->mem.kind != IR_MEM_VREG || ld->mem.volatile_) return 0;
     if (st->mem.kind != IR_MEM_VREG || st->mem.volatile_) return 0;
+    if (ld->mem.bank_fn || st->mem.bank_fn) return 0;
     if (st->mem.base != ld->mem.base) return 0;
     if (st->mem.offset != ld->mem.offset) return 0;
-    /* Helper expects HL = pointer — offset 0 only (covers shapes
-       where the address ADD already folded into the base vreg). */
     return ld->mem.offset == 0;
 }
 
-static void incmhl_apply(Func *f, BB *bb, const int idx[],
-                         const int64_t imm[], const int bind[])
+static HelperInfo *incmhl_helper(int step, int addr_v)
 {
-    (void)f; (void)imm; (void)bind;
-    Op *ld = &bb->ops[idx[0]];
-    int ptr_v = ld->mem.base;
     HelperInfo *hi = calloc(1, sizeof(HelperInfo));
     int *args = calloc(1, sizeof(int));
-    if (!hi || !args) { free(hi); free(args); return; }
-    hi->name     = "l_long_inc_mhl";
-    args[0]      = ptr_v;
+    if (!hi || !args) { free(hi); free(args); return NULL; }
+    hi->name     = step > 0 ? "l_long_inc_mhl" : "l_long_dec_mhl";
+    args[0]      = addr_v;
     hi->args     = args;
     hi->n_args   = 1;
     hi->ret_vreg = -1;
+    return hi;
+}
+
+/* Overwrite `o` with IR_HCALL hi (no result). */
+static void incmhl_to_hcall(Op *o, HelperInfo *hi, const Op *loc)
+{
     Op n;
     memset(&n, 0, sizeof(n));
     n.kind     = IR_HCALL;
@@ -1064,20 +1077,83 @@ static void incmhl_apply(Func *f, BB *bb, const int idx[],
     n.mem.base = -1;
     n.label    = -1;
     n.hcall    = hi;
-    n.file     = ld->file;
-    n.line     = ld->line;
-    *ld = n;
+    n.file     = loc->file;
+    n.line     = loc->line;
+    *o = n;
+}
+
+static void incmhl_apply(Func *f, BB *bb, const int idx[],
+                         const int64_t imm[], const int bind[])
+{
+    (void)f; (void)imm; (void)bind;
+    Op *ld = &bb->ops[idx[0]];
+    HelperInfo *hi = incmhl_helper(incmhl_step(&bb->ops[idx[1]]),
+                                   ld->mem.base);
+    if (!hi) return;
+    incmhl_to_hcall(ld, hi, ld);
+}
+
+static int incmhl_sym_check(Func *f, BB *bb, const int idx[],
+                            const int64_t imm[], const int bind[],
+                            const int uc[])
+{
+    (void)f; (void)imm; (void)bind;
+    const Op *ld = &bb->ops[idx[0]];
+    const Op *sp = &bb->ops[idx[1]];
+    const Op *st = &bb->ops[idx[2]];
+    if (!incmhl_step(sp)) return 0;
+    /* The load template is .keep, so the single-use condition is ours. */
+    if (uc[ld->dst] != 1 || uc[sp->dst] != 1) return 0;
+    if (ld->mem.kind != IR_MEM_SYM || ld->mem.volatile_ || !ld->mem.sym)
+        return 0;
+    if (st->mem.kind != IR_MEM_SYM || st->mem.volatile_) return 0;
+    if (st->mem.sym != ld->mem.sym || st->mem.offset != ld->mem.offset)
+        return 0;
+    if (ld->mem.bank_fn || st->mem.bank_fn || ir_sym_bank_fn(ld->mem.sym))
+        return 0;
+    if (ld->mem.sym->ctype && (ld->mem.sym->ctype->flags & FARACC))
+        return 0;
+    return 1;
+}
+
+static void incmhl_sym_apply(Func *f, BB *bb, const int idx[],
+                             const int64_t imm[], const int bind[])
+{
+    (void)imm; (void)bind;
+    int addr = ir_vreg_new(f, KIND_INT, NULL, 0);
+    f->vregs[addr].width = 2;
+    Op *ld = &bb->ops[idx[0]];
+    Op *sp = &bb->ops[idx[1]];
+    HelperInfo *hi = incmhl_helper(incmhl_step(sp), addr);
+    if (!hi) return;
+    ld->kind   = IR_LD_SYM;              /* keeps mem.sym / mem.offset */
+    ld->dst    = addr;
+    ld->src[0] = -1;
+    ld->src[1] = -1;
+    incmhl_to_hcall(sp, hi, sp);
 }
 
 static const PatternDef ir_patterns_incmhl[] = {
     { .name = "incmhl", .n_ops = 3, .anchor = 1,
       .ops = {
           { .kind = IR_LD_MEM, .dst = LV_OLD, .width = 4 },
-          { .kind = IR_ADD, .dst = LV_NEW, .src0 = LV_OLD,
-            .imm_pred = IR_IMM_EQ, .imm_val = 1, .width = 4 },
+          { .kind = IR_INC, .kind_alt = 1 + IR_DEC,
+            .kind_alt2 = 1 + IR_ADD, .kind_alt3 = 1 + IR_SUB,
+            .dst = LV_NEW, .src0 = LV_OLD,
+            .imm_pred = IR_IMM_ANY, .width = 4 },
           { .kind = IR_ST_MEM, .src0 = LV_NEW },
       },
       .check = incmhl_check, .apply = incmhl_apply },
+    { .name = "incmhl-sym", .n_ops = 3, .anchor = 2,
+      .ops = {
+          { .kind = IR_LD_MEM, .dst = LV_OLD, .width = 4, .keep = 1 },
+          { .kind = IR_INC, .kind_alt = 1 + IR_DEC,
+            .kind_alt2 = 1 + IR_ADD, .kind_alt3 = 1 + IR_SUB,
+            .dst = LV_NEW, .src0 = LV_OLD,
+            .imm_pred = IR_IMM_ANY, .width = 4 },
+          { .kind = IR_ST_MEM, .src0 = LV_NEW },
+      },
+      .check = incmhl_sym_check, .apply = incmhl_sym_apply },
 };
 
 int ir_match_run(Func *f)
@@ -1093,7 +1169,9 @@ int ir_match_run(Func *f)
                           (int)(sizeof ir_patterns_vregoff
                                 / sizeof ir_patterns_vregoff[0]),
                           IR_MATCH_MAX_ROUNDS);
-    n += run_table_rounds(f, ir_patterns_incmhl, 1, 1);
+    n += run_table_rounds(f, ir_patterns_incmhl,
+                          (int)(sizeof ir_patterns_incmhl
+                                / sizeof ir_patterns_incmhl[0]), 1);
     return n;
 }
 

@@ -384,6 +384,43 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
         commit_a_byte(out, f, op->dst);
         return 0;
     }
+    /* width-4: step DEHL via the library helper (carries across all four
+       bytes). Long long never reaches here: ir_build routes it through the
+       __i64_acc helpers. */
+    if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
+        /* In-place step of a slot-resident long the next op does not read:
+           step the slot itself with HL = &slot (l_long_inc_mhl /
+           l_long_dec_mhl) instead of load + step + store. The slot is the
+           live copy exactly when DEHL does not hold the value (load_to_dehl
+           would read the slot). A next-op reader keeps the DEHL path, which
+           leaves the value cached for it. */
+        int v = op->dst;
+        const Op *nx = (cur_bb && cur_op_idx + 1 < cur_bb->n_ops)
+                     ? &cur_bb->ops[cur_op_idx + 1] : NULL;
+        int nx_reads = 0;
+        if (nx) {
+            int uses[16];
+            int nu = ir_op_uses(nx, uses, (int)(sizeof uses / sizeof uses[0]));
+            for (int u = 0; u < nu; u++) if (uses[u] == v) nx_reads = 1;
+        }
+        if (v == op->src[0] && !nx_reads && !dehl_has(v)
+            && !opt_disabled("long-step-mhl")
+            && ir_home_at(f, v) == IR_PR_SPILL && !vreg_is_pr_dehl(f, v)
+            && slot_off(f, v) >= 0
+            && !L.la.cur_dehl_dst_dead_safe && !L.la.cur_dehl_push_to_stack) {
+            pending_spill_resolve();          /* HL is about to be spent */
+            ss_note_reload(f, v);             /* the helper reads the slot */
+            emit_acc_slot_addr(out, f, v, 0); /* HL = &slot */
+            emit(out, "call\t%s", step > 0 ? "l_long_inc_mhl" : "l_long_dec_mhl");
+            invalidate_hl_cache();
+            invalidate_a_cache();
+            return 0;
+        }
+        load_to_dehl(out, f, op->src[0]);
+        emit(out, "call\t%s", step > 0 ? "l_inc_dehl" : "l_dec_dehl");
+        store_dehl_finalize(out, f, op->dst);
+        return 0;
+    }
     /* idx2 stepping counter (register residency): the counter lives in the
        spare index register — step in place with `inc`/`dec <idx>` (2 bytes,
        no memory) instead of the TOS ex(sp) dance. */

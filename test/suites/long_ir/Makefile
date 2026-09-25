@@ -20,6 +20,7 @@ all:	localrmw_gbz80.bin localrmw_gbz80_keep.bin
 all:	localrmw_z80.bin localrmw_z80n.bin localrmw_z180.bin localrmw_ez80_z80.bin localrmw_8080.bin localrmw_vm1.bin localrmw_r2ka.bin localrmw_r4k.bin localrmw_r6k.bin localrmw_kc160.bin localrmw_r800.bin localrmw_z80_keep.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
 all:	derefcmp_bcstep.bin derefcmp_bcstep_8080.bin
+all:	widestep.bin widestep_fp.bin widestep_8080.bin widestep_8085.bin widestep_gbz80.bin widestep_r2ka.bin widestep_calls.bin
 all:	poolremat.bin poolremat_fp.bin poolremat_gbz80.bin poolremat_8080.bin poolremat_8085.bin
 all:	deaddereload.bin deaddereload_fp.bin deaddereload_gbz80.bin
 all:	xorflipconst.bin xorflipconst_fp.bin xorflipconst_gbz80.bin xorflipconst_8080.bin xorflipconst_vm1.bin
@@ -183,6 +184,40 @@ homeexitdead_gbz80_keep.bin: $(SOURCES) homeexitdead.c
 derefcmp.bin: $(SOURCES) derefcmp.c
 	$(compile)
 	$(runtest)
+
+widestep.bin: $(SOURCES) widestep.c
+	$(compile)
+	$(runtest)
+
+widestep_fp.bin: $(SOURCES) widestep.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+widestep_8080.bin: $(SOURCES) widestep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) $(FPFLAG) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+widestep_8085.bin: $(SOURCES) widestep.c
+	$(compile_8085)
+	$(runtest_8085)
+
+widestep_gbz80.bin: $(SOURCES) widestep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) $(FPFLAG) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+widestep_r2ka.bin: $(SOURCES) widestep.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+# l_i64_dec is wrong in the library, so widestep.c does not assert 64-bit
+# decrement results: check here that all four ll_*dec* sites call it, and
+# that the discarded-result steps use the in-memory helpers.
+widestep_calls.bin: widestep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) $(FPFLAG) -I$(FRAMEWORK_DIR) -S $< -o widestep_calls.asm
+	@test `grep -c 'call[[:space:]]*l_i64_dec' widestep_calls.asm` -ge 4 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: l_i64_dec not called $(RESET)" ; exit 1; }
+	@test `grep -c 'call[[:space:]]*l_long_inc_mhl' widestep_calls.asm` -ge 3 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: l_long_inc_mhl not called $(RESET)" ; exit 1; }
+	@test `grep -c 'call[[:space:]]*l_long_dec_mhl' widestep_calls.asm` -ge 3 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: l_long_dec_mhl not called $(RESET)" ; exit 1; }
+	@touch $@
 
 # IR_BC_STEP_CALL re-arbitrates dc_streq after a home demotion; the rerun's
 # rejected DE pick restores a BC tenant over a B byte pack made meanwhile.

@@ -182,6 +182,8 @@
 	EXTERN	l_plong
 	EXTERN	l_inclong	;Increment long
 	EXTERN	l_declong	;Decrement long
+	EXTERN	l_inc_dehl	;Increment dehl
+	EXTERN	l_dec_dehl	;Decrement dehl
 	EXTERN	l_long_div
 	EXTERN	l_long_div_u
 	EXTERN	l_long_mod
@@ -193,6 +195,7 @@
 	EXTERN	l_long_asr_uo	;Long unsigned >> shift in c
 	EXTERN	l_long_case
 	EXTERN	l_long_inc_mhl
+	EXTERN	l_long_dec_mhl
 
 ;--------------------------------------------------------------
 ; Floating point support routines, mostly in library
