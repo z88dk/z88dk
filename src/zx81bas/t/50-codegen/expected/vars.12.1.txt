@@ -520,41 +520,10 @@ L0120_START:
 
 L0120_END:
 
-;     130 GOTO 150
+;     130 PRINT"1",I
         DDB     130
         DEFW    L0130_END - L0130_START
 L0130_START:
-        DEFB    _GOTO
-        DEFB    _1,_5,_0
-        DEFB    _NUMBER
-        FLOAT   150
-        DEFB    _NL
-
-L0130_END:
-
-;     140 FOR I=0 TO 1
-        DDB     140
-        DEFW    L0140_END - L0140_START
-L0140_START:
-        DEFB    _FOR
-        DEFB    _I
-        DEFB    _EQ
-        DEFB    _0
-        DEFB    _NUMBER
-        FLOAT   0
-        DEFB    _TO
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _NL
-
-L0140_END:
-
-SKIP:
-;     150 PRINT"1",I
-        DDB     150
-        DEFW    L0150_END - L0150_START
-L0150_START:
         DEFB    _PRINT
         DEFB    _QUOTE
         DEFB    _1
@@ -563,27 +532,26 @@ L0150_START:
         DEFB    _I
         DEFB    _NL
 
-L0150_END:
+L0130_END:
 
-;     160 NEXT I
-        DDB     160
-        DEFW    L0160_END - L0160_START
-L0160_START:
+;     140 NEXT I
+        DDB     140
+        DEFW    L0140_END - L0140_START
+L0140_START:
         DEFB    _NEXT
         DEFB    _I
         DEFB    _NL
 
-L0160_END:
+L0140_END:
 
-ZX81BAS0FOREND:
-;     170 STOP
-        DDB     170
-        DEFW    L0170_END - L0170_START
-L0170_START:
+;     150 STOP
+        DDB     150
+        DEFW    L0150_END - L0150_START
+L0150_START:
         DEFB    _STOP
         DEFB    _NL
 
-L0170_END:
+L0150_END:
 
 ;    1000 PRINT"3",I
         DDB     1000

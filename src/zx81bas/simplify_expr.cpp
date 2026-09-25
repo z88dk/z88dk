@@ -528,6 +528,7 @@ static void simplify_stmt(Parser& parser, std::vector<Token>& out_tokens) {
         out_tokens.insert(out_tokens.end(),
                           parser.line().tokens.begin() + parser.pos,
                           parser.line().tokens.end());
+        parser.pos = parser.line().tokens.size();
         break;
     }
 }

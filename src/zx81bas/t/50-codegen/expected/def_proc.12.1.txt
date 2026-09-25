@@ -1,12 +1,9 @@
-% z88dk-zx81bas -d 13 -O t/50-codegen//input/vars.bas
-Input file:  t/50-codegen/input/vars.bas
-Output file: t/50-codegen/input/vars.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/50-codegen/input/vars.i" "t/50-codegen/input/vars.pp"
-% z88dk-z80asm -b -m -o"t/50-codegen/input/vars.p" "t/50-codegen/input/vars.asm"
-% z88dk-z80asm -b -m -o"t/50-codegen/input/vars.p" "t/50-codegen/input/vars.asm"
-% z88dk-z80asm -b -m -o"t/50-codegen/input/vars.p" "t/50-codegen/input/vars.asm"
+% z88dk-zx81bas -d 12 -O t/50-codegen//input/def_proc.bas
+Input file:  t/50-codegen/input/def_proc.bas
+Output file: t/50-codegen/input/def_proc.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/50-codegen/input/def_proc.i" "t/50-codegen/input/def_proc.pp"
 ; ZX81BAS generated assembly code
-; Pass: 2
+; Pass: 1
 
         ORG     0x4009          ; Start of .p file
 
@@ -266,384 +263,883 @@ FREE2:  DEFW    0x0000
 PROG:
 
 AUTOSTART_ADDR:
-;       0 REM
-        DDB     0
-        DEFW    L0000_END - L0000_START
-L0000_START:
-        DEFB    _REM
-
-; ASM block
-
-HELLO:	DEFM _H,_E,_L,_L,_O+$80
-WORLD:	DEFM _W,_O,_R,_L,_D+$80
-
-; End of ASM block
-
-        DEFB    _NL
-
-L0000_END:
-
-;      10 PRINT"1.23",A
+;      10 DIM A(2)
         DDB     10
         DEFW    L0010_END - L0010_START
 L0010_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _1,_DOT,_2,_3
-        DEFB    _QUOTE
-        DEFB    _COMMA
+        DEFB    _DIM
         DEFB    _A
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
         DEFB    _NL
 
 L0010_END:
 
-;      20 PRINT"12.3",AB
+;      20 LET PROCIDA=1
         DDB     20
         DEFW    L0020_END - L0020_START
 L0020_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _1,_2,_DOT,_3
-        DEFB    _QUOTE
-        DEFB    _COMMA
-        DEFB    _A,_B
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_I,_D,_A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
         DEFB    _NL
 
 L0020_END:
 
-;      30 PRINT"4.56",ABC
+;      30 GOSUB 550
         DDB     30
         DEFW    L0030_END - L0030_START
 L0030_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _4,_DOT,_5,_6
-        DEFB    _QUOTE
-        DEFB    _COMMA
-        DEFB    _A,_B,_C
+        DEFB    _GOSUB
+        DEFB    _5,_5,_0
+        DEFB    _NUMBER
+        FLOAT   550
         DEFB    _NL
 
 L0030_END:
 
-;      40 PRINT"HELLO",H$
+;      40 LET ZX81BAS0TEMP=PROCID
         DDB     40
         DEFW    L0040_END - L0040_START
 L0040_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _H,_E,_L,_L,_O
-        DEFB    _QUOTE
-        DEFB    _COMMA
-        DEFB    _H,_DOLLAR
+        DEFB    _LET
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_0,_T,_E,_M,_P
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_I,_D
         DEFB    _NL
 
 L0040_END:
 
-;      50 PRINT"1",N(1,1)
+;      50 LET PROCIDA=11
         DDB     50
         DEFW    L0050_END - L0050_START
 L0050_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _1
-        DEFB    _QUOTE
-        DEFB    _COMMA
-        DEFB    _N
-        DEFB    _LPAREN
-        DEFB    _1
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_I,_D,_A
+        DEFB    _EQ
+        DEFB    _1,_1
         DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _COMMA
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _RPAREN
+        FLOAT   11
         DEFB    _NL
 
 L0050_END:
 
-;      60 PRINT"2",N(1,2)
+;      60 GOSUB 550
         DDB     60
         DEFW    L0060_END - L0060_START
 L0060_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _2
-        DEFB    _QUOTE
-        DEFB    _COMMA
-        DEFB    _N
-        DEFB    _LPAREN
-        DEFB    _1
+        DEFB    _GOSUB
+        DEFB    _5,_5,_0
         DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _COMMA
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
-        DEFB    _RPAREN
+        FLOAT   550
         DEFB    _NL
 
 L0060_END:
 
-;      70 PRINT"3",N(2,1)
+;      70 LET ZX81BAS1TEMP=PROCID
         DDB     70
         DEFW    L0070_END - L0070_START
 L0070_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _3
-        DEFB    _QUOTE
-        DEFB    _COMMA
-        DEFB    _N
-        DEFB    _LPAREN
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
-        DEFB    _COMMA
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _RPAREN
+        DEFB    _LET
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_1,_T,_E,_M,_P
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_I,_D
         DEFB    _NL
 
 L0070_END:
 
-;      80 PRINT"4",N(2,2)
+;      80 LET A(ZX81BAS0TEMP)=ZX81BAS1TEMP
         DDB     80
         DEFW    L0080_END - L0080_START
 L0080_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _4
-        DEFB    _QUOTE
-        DEFB    _COMMA
-        DEFB    _N
+        DEFB    _LET
+        DEFB    _A
         DEFB    _LPAREN
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
-        DEFB    _COMMA
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_0,_T,_E,_M,_P
         DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_1,_T,_E,_M,_P
         DEFB    _NL
 
 L0080_END:
 
-;      90 PRINT"A",S$(1,1)
+;      90 LET PROCIDA=2
         DDB     90
         DEFW    L0090_END - L0090_START
 L0090_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _A
-        DEFB    _QUOTE
-        DEFB    _COMMA
-        DEFB    _S,_DOLLAR
-        DEFB    _LPAREN
-        DEFB    _1
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_I,_D,_A
+        DEFB    _EQ
+        DEFB    _2
         DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _COMMA
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _RPAREN
+        FLOAT   2
         DEFB    _NL
 
 L0090_END:
 
-;     100 PRINT"B",S$(1,2)
+;     100 GOSUB 550
         DDB     100
         DEFW    L0100_END - L0100_START
 L0100_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _B
-        DEFB    _QUOTE
-        DEFB    _COMMA
-        DEFB    _S,_DOLLAR
-        DEFB    _LPAREN
-        DEFB    _1
+        DEFB    _GOSUB
+        DEFB    _5,_5,_0
         DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _COMMA
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
-        DEFB    _RPAREN
+        FLOAT   550
         DEFB    _NL
 
 L0100_END:
 
-;     110 PRINT"C",S$(2,1)
+;     110 LET ZX81BAS2TEMP=PROCID
         DDB     110
         DEFW    L0110_END - L0110_START
 L0110_START:
+        DEFB    _LET
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_2,_T,_E,_M,_P
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_I,_D
+        DEFB    _NL
+
+L0110_END:
+
+;     120 LET PROCIDA=22
+        DDB     120
+        DEFW    L0120_END - L0120_START
+L0120_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_I,_D,_A
+        DEFB    _EQ
+        DEFB    _2,_2
+        DEFB    _NUMBER
+        FLOAT   22
+        DEFB    _NL
+
+L0120_END:
+
+;     130 GOSUB 550
+        DDB     130
+        DEFW    L0130_END - L0130_START
+L0130_START:
+        DEFB    _GOSUB
+        DEFB    _5,_5,_0
+        DEFB    _NUMBER
+        FLOAT   550
+        DEFB    _NL
+
+L0130_END:
+
+;     140 LET ZX81BAS3TEMP=PROCID
+        DDB     140
+        DEFW    L0140_END - L0140_START
+L0140_START:
+        DEFB    _LET
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_3,_T,_E,_M,_P
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_I,_D
+        DEFB    _NL
+
+L0140_END:
+
+;     150 LET A(ZX81BAS2TEMP)=ZX81BAS3TEMP
+        DDB     150
+        DEFW    L0150_END - L0150_START
+L0150_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _LPAREN
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_2,_T,_E,_M,_P
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_3,_T,_E,_M,_P
+        DEFB    _NL
+
+L0150_END:
+
+;     160 LET PROCIDA=42
+        DDB     160
+        DEFW    L0160_END - L0160_START
+L0160_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_I,_D,_A
+        DEFB    _EQ
+        DEFB    _4,_2
+        DEFB    _NUMBER
+        FLOAT   42
+        DEFB    _NL
+
+L0160_END:
+
+;     170 GOSUB 550
+        DDB     170
+        DEFW    L0170_END - L0170_START
+L0170_START:
+        DEFB    _GOSUB
+        DEFB    _5,_5,_0
+        DEFB    _NUMBER
+        FLOAT   550
+        DEFB    _NL
+
+L0170_END:
+
+;     180 LET ZX81BAS4TEMP=PROCID
+        DDB     180
+        DEFW    L0180_END - L0180_START
+L0180_START:
+        DEFB    _LET
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_4,_T,_E,_M,_P
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_I,_D
+        DEFB    _NL
+
+L0180_END:
+
+;     190 LET PROCIDA=4
+        DDB     190
+        DEFW    L0190_END - L0190_START
+L0190_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_I,_D,_A
+        DEFB    _EQ
+        DEFB    _4
+        DEFB    _NUMBER
+        FLOAT   4
+        DEFB    _NL
+
+L0190_END:
+
+;     200 GOSUB 550
+        DDB     200
+        DEFW    L0200_END - L0200_START
+L0200_START:
+        DEFB    _GOSUB
+        DEFB    _5,_5,_0
+        DEFB    _NUMBER
+        FLOAT   550
+        DEFB    _NL
+
+L0200_END:
+
+;     210 LET ZX81BAS5TEMP=PROCID
+        DDB     210
+        DEFW    L0210_END - L0210_START
+L0210_START:
+        DEFB    _LET
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_5,_T,_E,_M,_P
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_I,_D
+        DEFB    _NL
+
+L0210_END:
+
+;     220 PRINT"424",10*ZX81BAS4TEMP+ZX81BAS5TEMP
+        DDB     220
+        DEFW    L0220_END - L0220_START
+L0220_START:
         DEFB    _PRINT
         DEFB    _QUOTE
-        DEFB    _C
+        DEFB    _4,_2,_4
         DEFB    _QUOTE
         DEFB    _COMMA
-        DEFB    _S,_DOLLAR
-        DEFB    _LPAREN
-        DEFB    _2
+        DEFB    _1,_0
         DEFB    _NUMBER
-        FLOAT   2
+        FLOAT   10
+        DEFB    _MULT
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_4,_T,_E,_M,_P
+        DEFB    _PLUS
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_5,_T,_E,_M,_P
+        DEFB    _NL
+
+L0220_END:
+
+;     230 PRINT"11",A(1)
+        DDB     230
+        DEFW    L0230_END - L0230_START
+L0230_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _1,_1
+        DEFB    _QUOTE
         DEFB    _COMMA
+        DEFB    _A
+        DEFB    _LPAREN
         DEFB    _1
         DEFB    _NUMBER
         FLOAT   1
         DEFB    _RPAREN
         DEFB    _NL
 
-L0110_END:
+L0230_END:
 
-;     120 PRINT"D",S$(2,2)
-        DDB     120
-        DEFW    L0120_END - L0120_START
-L0120_START:
+;     240 PRINT"22",A(2)
+        DDB     240
+        DEFW    L0240_END - L0240_START
+L0240_START:
         DEFB    _PRINT
         DEFB    _QUOTE
-        DEFB    _D
+        DEFB    _2,_2
         DEFB    _QUOTE
         DEFB    _COMMA
-        DEFB    _S,_DOLLAR
+        DEFB    _A
         DEFB    _LPAREN
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
-        DEFB    _COMMA
         DEFB    _2
         DEFB    _NUMBER
         FLOAT   2
         DEFB    _RPAREN
         DEFB    _NL
 
-L0120_END:
+L0240_END:
 
-;     130 PRINT"1",I
-        DDB     130
-        DEFW    L0130_END - L0130_START
-L0130_START:
+;     250 LET PROC1A=10
+        DDB     250
+        DEFW    L0250_END - L0250_START
+L0250_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_1,_A
+        DEFB    _EQ
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _NL
+
+L0250_END:
+
+;     260 LET PROC1B=20
+        DDB     260
+        DEFW    L0260_END - L0260_START
+L0260_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_1,_B
+        DEFB    _EQ
+        DEFB    _2,_0
+        DEFB    _NUMBER
+        FLOAT   20
+        DEFB    _NL
+
+L0260_END:
+
+;     270 GOSUB 570
+        DDB     270
+        DEFW    L0270_END - L0270_START
+L0270_START:
+        DEFB    _GOSUB
+        DEFB    _5,_7,_0
+        DEFB    _NUMBER
+        FLOAT   570
+        DEFB    _NL
+
+L0270_END:
+
+;     280 PRINT"30",RESULT
+        DDB     280
+        DEFW    L0280_END - L0280_START
+L0280_START:
         DEFB    _PRINT
         DEFB    _QUOTE
-        DEFB    _1
+        DEFB    _3,_0
         DEFB    _QUOTE
         DEFB    _COMMA
-        DEFB    _I
+        DEFB    _R,_E,_S,_U,_L,_T
         DEFB    _NL
 
-L0130_END:
+L0280_END:
 
-;     140 NEXT I
-        DDB     140
-        DEFW    L0140_END - L0140_START
-L0140_START:
-        DEFB    _NEXT
-        DEFB    _I
+;     290 LET PROC1A=30
+        DDB     290
+        DEFW    L0290_END - L0290_START
+L0290_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_1,_A
+        DEFB    _EQ
+        DEFB    _3,_0
+        DEFB    _NUMBER
+        FLOAT   30
         DEFB    _NL
 
-L0140_END:
+L0290_END:
 
-;     150 STOP
-        DDB     150
-        DEFW    L0150_END - L0150_START
-L0150_START:
+;     300 LET PROC1B=40
+        DDB     300
+        DEFW    L0300_END - L0300_START
+L0300_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_1,_B
+        DEFB    _EQ
+        DEFB    _4,_0
+        DEFB    _NUMBER
+        FLOAT   40
+        DEFB    _NL
+
+L0300_END:
+
+;     310 GOSUB 570
+        DDB     310
+        DEFW    L0310_END - L0310_START
+L0310_START:
+        DEFB    _GOSUB
+        DEFB    _5,_7,_0
+        DEFB    _NUMBER
+        FLOAT   570
+        DEFB    _NL
+
+L0310_END:
+
+;     320 PRINT"70",RESULT
+        DDB     320
+        DEFW    L0320_END - L0320_START
+L0320_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _7,_0
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _R,_E,_S,_U,_L,_T
+        DEFB    _NL
+
+L0320_END:
+
+;     330 LET PROC1A=50
+        DDB     330
+        DEFW    L0330_END - L0330_START
+L0330_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_1,_A
+        DEFB    _EQ
+        DEFB    _5,_0
+        DEFB    _NUMBER
+        FLOAT   50
+        DEFB    _NL
+
+L0330_END:
+
+;     340 LET PROC1B=60
+        DDB     340
+        DEFW    L0340_END - L0340_START
+L0340_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_1,_B
+        DEFB    _EQ
+        DEFB    _6,_0
+        DEFB    _NUMBER
+        FLOAT   60
+        DEFB    _NL
+
+L0340_END:
+
+;     350 GOSUB 570
+        DDB     350
+        DEFW    L0350_END - L0350_START
+L0350_START:
+        DEFB    _GOSUB
+        DEFB    _5,_7,_0
+        DEFB    _NUMBER
+        FLOAT   570
+        DEFB    _NL
+
+L0350_END:
+
+;     360 LET ZX81BAS6TEMP=PROC1
+        DDB     360
+        DEFW    L0360_END - L0360_START
+L0360_START:
+        DEFB    _LET
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_6,_T,_E,_M,_P
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_1
+        DEFB    _NL
+
+L0360_END:
+
+;     370 PRINT"111",1+ZX81BAS6TEMP
+        DDB     370
+        DEFW    L0370_END - L0370_START
+L0370_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _1,_1,_1
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _PLUS
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_6,_T,_E,_M,_P
+        DEFB    _NL
+
+L0370_END:
+
+;     380 LET PROC1A=2
+        DDB     380
+        DEFW    L0380_END - L0380_START
+L0380_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_1,_A
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0380_END:
+
+;     390 LET PROC1B=4
+        DDB     390
+        DEFW    L0390_END - L0390_START
+L0390_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_1,_B
+        DEFB    _EQ
+        DEFB    _4
+        DEFB    _NUMBER
+        FLOAT   4
+        DEFB    _NL
+
+L0390_END:
+
+;     400 GOSUB 570
+        DDB     400
+        DEFW    L0400_END - L0400_START
+L0400_START:
+        DEFB    _GOSUB
+        DEFB    _5,_7,_0
+        DEFB    _NUMBER
+        FLOAT   570
+        DEFB    _NL
+
+L0400_END:
+
+;     410 LET ZX81BAS7TEMP=PROC1
+        DDB     410
+        DEFW    L0410_END - L0410_START
+L0410_START:
+        DEFB    _LET
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_7,_T,_E,_M,_P
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_1
+        DEFB    _NL
+
+L0410_END:
+
+;     420 PRINT"111",1+ZX81BAS7TEMP
+        DDB     420
+        DEFW    L0420_END - L0420_START
+L0420_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _1,_1,_1
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _PLUS
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_7,_T,_E,_M,_P
+        DEFB    _NL
+
+L0420_END:
+
+;     430 GOSUB 620
+        DDB     430
+        DEFW    L0430_END - L0430_START
+L0430_START:
+        DEFB    _GOSUB
+        DEFB    _6,_2,_0
+        DEFB    _NUMBER
+        FLOAT   620
+        DEFB    _NL
+
+L0430_END:
+
+;     440 PRINT"3.1415927",PROCEMPTY
+        DDB     440
+        DEFW    L0440_END - L0440_START
+L0440_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _3,_DOT,_1,_4,_1,_5,_9,_2,_7
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _P,_R,_O,_C,_E,_M,_P,_T,_Y
+        DEFB    _NL
+
+L0440_END:
+
+;     450 GOSUB 620
+        DDB     450
+        DEFW    L0450_END - L0450_START
+L0450_START:
+        DEFB    _GOSUB
+        DEFB    _6,_2,_0
+        DEFB    _NUMBER
+        FLOAT   620
+        DEFB    _NL
+
+L0450_END:
+
+;     460 PRINT"3.1415927",PROCEMPTY
+        DDB     460
+        DEFW    L0460_END - L0460_START
+L0460_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _3,_DOT,_1,_4,_1,_5,_9,_2,_7
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _P,_R,_O,_C,_E,_M,_P,_T,_Y
+        DEFB    _NL
+
+L0460_END:
+
+;     470 GOSUB 620
+        DDB     470
+        DEFW    L0470_END - L0470_START
+L0470_START:
+        DEFB    _GOSUB
+        DEFB    _6,_2,_0
+        DEFB    _NUMBER
+        FLOAT   620
+        DEFB    _NL
+
+L0470_END:
+
+;     480 LET ZX81BAS8TEMP=PROCEMPTY
+        DDB     480
+        DEFW    L0480_END - L0480_START
+L0480_START:
+        DEFB    _LET
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_8,_T,_E,_M,_P
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_E,_M,_P,_T,_Y
+        DEFB    _NL
+
+L0480_END:
+
+;     490 PRINT"4.1415927",1+ZX81BAS8TEMP
+        DDB     490
+        DEFW    L0490_END - L0490_START
+L0490_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _4,_DOT,_1,_4,_1,_5,_9,_2,_7
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _PLUS
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_8,_T,_E,_M,_P
+        DEFB    _NL
+
+L0490_END:
+
+;     500 LET PROC2A=10
+        DDB     500
+        DEFW    L0500_END - L0500_START
+L0500_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_2,_A
+        DEFB    _EQ
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _NL
+
+L0500_END:
+
+;     510 GOSUB 640
+        DDB     510
+        DEFW    L0510_END - L0510_START
+L0510_START:
+        DEFB    _GOSUB
+        DEFB    _6,_4,_0
+        DEFB    _NUMBER
+        FLOAT   640
+        DEFB    _NL
+
+L0510_END:
+
+;     520 LET ZX81BAS9TEMP=PROC2
+        DDB     520
+        DEFW    L0520_END - L0520_START
+L0520_START:
+        DEFB    _LET
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_9,_T,_E,_M,_P
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_2
+        DEFB    _NL
+
+L0520_END:
+
+;     530 PRINT"1000",10*ZX81BAS9TEMP
+        DDB     530
+        DEFW    L0530_END - L0530_START
+L0530_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _1,_0,_0,_0
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _MULT
+        DEFB    _Z,_X,_8,_1,_B,_A,_S,_9,_T,_E,_M,_P
+        DEFB    _NL
+
+L0530_END:
+
+;     540 STOP
+        DDB     540
+        DEFW    L0540_END - L0540_START
+L0540_START:
         DEFB    _STOP
         DEFB    _NL
 
-L0150_END:
+L0540_END:
 
-;    1000 PRINT"3",I
-        DDB     1000
-        DEFW    L1000_END - L1000_START
-L1000_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _3
-        DEFB    _QUOTE
-        DEFB    _COMMA
-        DEFB    _I
+PROCID:
+;     550 LET PROCID=PROCIDA*PROCIDA/PROCIDA
+        DDB     550
+        DEFW    L0550_END - L0550_START
+L0550_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_I,_D
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_I,_D,_A
+        DEFB    _MULT
+        DEFB    _P,_R,_O,_C,_I,_D,_A
+        DEFB    _DIV
+        DEFB    _P,_R,_O,_C,_I,_D,_A
         DEFB    _NL
 
-L1000_END:
+L0550_END:
 
-;    1010 PRINT"HELLO",USR &PRHELLO
-        DDB     1010
-        DEFW    L1010_END - L1010_START
-L1010_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _H,_E,_L,_L,_O
-        DEFB    _QUOTE
-        DEFB    _COMMA
-        DEFB    _USR
-        DEFB    _1,_7,_8,_1,_4
+;     560 RETURN
+        DDB     560
+        DEFW    L0560_END - L0560_START
+L0560_START:
+        DEFB    _RETURN
+        DEFB    _NL
+
+L0560_END:
+
+PROC1:
+;     570 LET PROC1L=PROC1A+PROC1B
+        DDB     570
+        DEFW    L0570_END - L0570_START
+L0570_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_1,_L
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_1,_A
+        DEFB    _PLUS
+        DEFB    _P,_R,_O,_C,_1,_B
+        DEFB    _NL
+
+L0570_END:
+
+;     580 IF PROC1A=2 THEN RETURN
+        DDB     580
+        DEFW    L0580_END - L0580_START
+L0580_START:
+        DEFB    _IF
+        DEFB    _P,_R,_O,_C,_1,_A
+        DEFB    _EQ
+        DEFB    _2
         DEFB    _NUMBER
-        FLOAT   17814
+        FLOAT   2
+        DEFB    _THEN
+        DEFB    _RETURN
         DEFB    _NL
 
-L1010_END:
+L0580_END:
 
-;    1020 PRINT
-        DDB     1020
-        DEFW    L1020_END - L1020_START
-L1020_START:
-        DEFB    _PRINT
+;     590 LET RESULT=PROC1L
+        DDB     590
+        DEFW    L0590_END - L0590_START
+L0590_START:
+        DEFB    _LET
+        DEFB    _R,_E,_S,_U,_L,_T
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_1,_L
         DEFB    _NL
 
-L1020_END:
+L0590_END:
 
-;    1030 PRINT"WORLD",USR &PRWORLD
-        DDB     1030
-        DEFW    L1030_END - L1030_START
-L1030_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _W,_O,_R,_L,_D
-        DEFB    _QUOTE
-        DEFB    _COMMA
-        DEFB    _USR
-        DEFB    _1,_7,_8,_1,_9
+;     600 LET PROC1=PROC1L
+        DDB     600
+        DEFW    L0600_END - L0600_START
+L0600_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_1
+        DEFB    _EQ
+        DEFB    _P,_R,_O,_C,_1,_L
+        DEFB    _NL
+
+L0600_END:
+
+;     610 RETURN
+        DDB     610
+        DEFW    L0610_END - L0610_START
+L0610_START:
+        DEFB    _RETURN
+        DEFB    _NL
+
+L0610_END:
+
+PROCEMPTY:
+;     620 LET PROCEMPTY=3.141592654
+        DDB     620
+        DEFW    L0620_END - L0620_START
+L0620_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_E,_M,_P,_T,_Y
+        DEFB    _EQ
+        DEFB    _3,_DOT,_1,_4,_1,_5,_9,_2,_6,_5,_4
         DEFB    _NUMBER
-        FLOAT   17819
+        FLOAT   3.141592654
         DEFB    _NL
 
-L1030_END:
+L0620_END:
 
-;    1040 PRINT
-        DDB     1040
-        DEFW    L1040_END - L1040_START
-L1040_START:
-        DEFB    _PRINT
+;     630 RETURN
+        DDB     630
+        DEFW    L0630_END - L0630_START
+L0630_START:
+        DEFB    _RETURN
         DEFB    _NL
 
-L1040_END:
+L0630_END:
 
-;    1050 REM
-        DDB     1050
-        DEFW    L1050_END - L1050_START
-L1050_START:
-        DEFB    _REM
-
-; ASM block
-
-PRMSG:	LD A,(HL)
-		AND $3f
-		RST $10
-		LD A,(HL)
-		RLA
-		RET C
-		INC HL
-		JR PRMSG
-
-; End of ASM block
-
+PROC2:
+;     640 LET PROC2=10*PROC2A
+        DDB     640
+        DEFW    L0640_END - L0640_START
+L0640_START:
+        DEFB    _LET
+        DEFB    _P,_R,_O,_C,_2
+        DEFB    _EQ
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _MULT
+        DEFB    _P,_R,_O,_C,_2,_A
         DEFB    _NL
 
-L1050_END:
+L0640_END:
+
+;     650 RETURN
+        DDB     650
+        DEFW    L0650_END - L0650_START
+L0650_START:
+        DEFB    _RETURN
+        DEFB    _NL
+
+L0650_END:
 
 
 ; Display file
@@ -750,77 +1246,6 @@ DSPLY23:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
 ; Variable definitions
 
 VARIABLES:
-
-; Variable: A = 1.23
-        DEFB    (_A & 0x3F) | 0x60
-        FLOAT   1.23
-
-; Variable: AB = 12.3
-        DEFB    (_A & 0x3F) | 0xA0
-        DEFB    (_B & 0x3F) | 0x80
-        FLOAT   12.3
-
-; Variable: ABC = 4.56
-        DEFB    (_A & 0x3F) | 0xA0
-        DEFB    (_B & 0x3F)
-        DEFB    (_C & 0x3F) | 0x80
-        FLOAT   4.56
-
-; Variable: H$ = "HELLO"
-        DEFB    (_H & 0x1F) | 0x40
-        DEFW    VAR_H_END - VAR_H_START
-VAR_H_START:
-        DEFB    _H,_E,_L,_L,_O
-VAR_H_END:
-
-; Array: N(2,2) = (1,2,3,4)
-        DEFB    (_N & 0x1F) | 0x80
-        DEFW    1 + 2 * 2 + 5 * 4
-        DEFB    2
-        DEFW    2
-        DEFW    2
-        FLOAT   1
-        FLOAT   2
-        FLOAT   3
-        FLOAT   4
-
-; Array: S$(2,2,1) = ("A","B","C","D")
-        DEFB    (_S & 0x1F) | 0xC0
-        DEFW    1 + 2 * 3 + 1 * 4
-        DEFB    3
-        DEFW    2
-        DEFW    2
-        DEFW    1
-        DEFB    _A
-        DEFB    _B
-        DEFB    _C
-        DEFB    _D
-
-; Variable: I = 1 TO 20 STEP 2 GOTO 1000
-        DEFB    (_I & 0x3F) | 0xE0
-        FLOAT   1
-        FLOAT   20
-        FLOAT   2
-        DEFW    1000
-
-; Variable: Z$ = ""
-        DEFB    (_Z & 0x1F) | 0x40
-        DEFW    VAR_Z_END - VAR_Z_START
-VAR_Z_START:
-
-; ASM block
-
-PRHELLO:LD HL, HELLO
-		JR PRCONT
-
-PRWORLD:LD HL, WORLD
-PRCONT:	CALL PRMSG
-		RST $08
-		DEFB -1
-
-; End of ASM block
-
-VAR_Z_END:
 
         DEFB    0x80
 WORKSPACE:

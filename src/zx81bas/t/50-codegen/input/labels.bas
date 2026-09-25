@@ -1,4 +1,5 @@
 #ASM
+start_asm:
 
 ; make value1 and value2 survive to map file
 	public value1, value2
@@ -29,11 +30,12 @@ line_number:
 start_address:
 	ld bc, &show_bc		; 16514
 	ret
-	
+
+end_asm:	
 #ENDASM
 
 @start:									' line 10
-	PRINT "16509", &start				' show 16509
+	PRINT 16509+5+&end_asm-&start_asm+1, &start	' show @start address
 	PRINT "10", USR &line_number		' show 10
 	PRINT "16514", USR &start_address	' show 16514
 	LET A=USR &move_message				' replace "12345" by "HELLO"

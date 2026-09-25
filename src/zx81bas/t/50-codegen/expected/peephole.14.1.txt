@@ -1,0 +1,8 @@
+% z88dk-zx81bas -d 14 -O t/50-codegen//input/peephole.bas
+Input file:  t/50-codegen/input/peephole.bas
+Output file: t/50-codegen/input/peephole.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/50-codegen/input/peephole.i" "t/50-codegen/input/peephole.pp"
+% z88dk-z80asm -b -m -o"t/50-codegen/input/peephole.p" "t/50-codegen/input/peephole.asm"
+% z88dk-z80asm -b -m -o"t/50-codegen/input/peephole.p" "t/50-codegen/input/peephole.asm"
+% z88dk-z80asm -b -m -o"t/50-codegen/input/peephole.p" "t/50-codegen/input/peephole.asm"
+% z88dk-z80asm -b -m -o"t/50-codegen/input/peephole.p" "t/50-codegen/input/peephole.asm"

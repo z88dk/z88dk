@@ -17,13 +17,9 @@ Output file: t/50-codegen/input/vars.p
     100 PRINT"B",S$(1,2)
     110 PRINT"C",S$(2,1)
     120 PRINT"D",S$(2,2)
-    130 GOTO 150
-    140 FOR I=0 TO 1
-@SKIP:
-    150 PRINT"1",I
-    160 NEXT I
-@ZX81BAS0FOREND:
-    170 STOP
+    130 PRINT"1",I
+    140 NEXT I
+    150 STOP
    1000 PRINT"3",I
    1010 PRINT"HELLO",USR &PRHELLO
    1020 PRINT

@@ -271,6 +271,7 @@ L0000_START:
 
 ; ASM block
 
+START_ASM:
 	PUBLIC VALUE1, VALUE2
 VALUE1 = 12
 VALUE2 EQU 13
@@ -295,7 +296,7 @@ LINE_NUMBER:
 START_ADDRESS:
 	LD BC, 0
 	RET
-
+END_ASM:
 
 ; End of ASM block
 
@@ -304,14 +305,14 @@ START_ADDRESS:
 L0000_END:
 
 START:
-;      10 PRINT"16509", &START
+;      10 PRINT 16514+ &END_ASM- &START_ASM+1, &START
         DDB     10
         DEFW    L0010_END - L0010_START
 L0010_START:
         DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _1,_6,_5,_0,_9
-        DEFB    _QUOTE
+        DEFB    _1,_6,_5,_1,_5
+        DEFB    _NUMBER
+        FLOAT   16515
         DEFB    _COMMA
         DEFB    _0
         DEFB    _NUMBER

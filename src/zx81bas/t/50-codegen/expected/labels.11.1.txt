@@ -3,6 +3,7 @@ Input file:  t/50-codegen/input/labels.bas
 Output file: t/50-codegen/input/labels.p
 % z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/50-codegen/input/labels.i" "t/50-codegen/input/labels.pp"
       0 REM
+   #ASM:START_ASM:
    #ASM:	PUBLIC VALUE1, VALUE2
    #ASM:VALUE1 = 12
    #ASM:VALUE2 EQU 13
@@ -27,9 +28,9 @@ Output file: t/50-codegen/input/labels.p
    #ASM:START_ADDRESS:
    #ASM:	LD BC, &SHOW_BC
    #ASM:	RET
-   #ASM:
+   #ASM:END_ASM:
 @START:
-     10 PRINT"16509", &START
+     10 PRINT 16514+ &END_ASM- &START_ASM+1, &START
      20 PRINT"10",USR &LINE_NUMBER
      30 PRINT"16514",USR &START_ADDRESS
      40 LET A=USR &MOVE_MESSAGE

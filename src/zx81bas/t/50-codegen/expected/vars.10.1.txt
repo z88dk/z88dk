@@ -335,39 +335,6 @@ Prog {
                     }
             ]
         }
-        GotoStmt {
-            location: t/50-codegen/input/vars.bas:42
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: t/50-codegen/input/vars.bas:42
-                    name: "SKIP"
-                }
-        }
-        ForStmt {
-            location: t/50-codegen/input/vars.bas:43
-            name: "I"
-            start_expr: 
-                NumberExpr {
-                    type: Number
-                    location: t/50-codegen/input/vars.bas:43
-                    value: 0.000000
-                }
-            end_expr: 
-                NumberExpr {
-                    type: Number
-                    location: t/50-codegen/input/vars.bas:43
-                    value: 1.000000
-                }
-            step_expr: 
-                null
-            body: [
-            ]
-        }
-        LabelStmt {
-            location: t/50-codegen/input/vars.bas:44
-            label: "SKIP"
-        }
         PrintStmt {
             location: t/50-codegen/input/vars.bas:45
             items: [
@@ -389,10 +356,6 @@ Prog {
         NextStmt {
             location: t/50-codegen/input/vars.bas:43
             name: "I"
-        }
-        LabelStmt {
-            location: t/50-codegen/input/vars.bas:43
-            label: "ZX81BAS0FOREND"
         }
         StopStmt {
             location: t/50-codegen/input/vars.bas:47

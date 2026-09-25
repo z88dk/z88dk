@@ -136,15 +136,6 @@
 	A$(2 TO)="BCD"
 
 //------------------------------------------------------------------------------
-// lowering of expressions
-//------------------------------------------------------------------------------
-
-	DEF PROCid(A) : PROCid = A+0 : ENDPROC
-	
-	LET A=10*PROCid(42)+PROCid(1+3)
-	LET A(PROCid(42)) = 25
-
-//------------------------------------------------------------------------------
 // check DIM statements
 //------------------------------------------------------------------------------
 
@@ -244,41 +235,6 @@
 	FOR I=1 TO 10 STEP 2
 		FOR J=1 TO 10 STEP 2
 			A=I*J:NEXT:NEXT
-
-//------------------------------------------------------------------------------
-// check procedures
-//------------------------------------------------------------------------------
-
-	DEF PROCname(A, B)
-		LOCAL L
-		LOCAL L1, L2
-		IF 1 THEN
-			LOCAL L3
-		ENDIF
-		L = A + B
-		IF A = 2 THEN EXIT
-		RESULT = L
-		PROCname = L
-	ENDPROC
-
-	PROCname 10, 20
-	PROCname(30, 40)
-
-	A = 1 + PROCname(50, 60)
-
-	DEF procempty()
-		procempty = PI
-	ENDPROC
-
-	procempty
-	procempty()
-	A = 1 + procempty()
-
-	DEF PROCj(A)
-		PROCj=10*A
-	ENDPROC
-
-	LET A=10*PROCj(5+5)
 
 //------------------------------------------------------------------------------
 // check GOTO
