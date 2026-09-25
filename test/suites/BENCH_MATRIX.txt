@@ -1,25 +1,12 @@
-24/9/2026 — post-render chained sign-flip fold (ir_lower.c
-fold_xorflip_chain, `xorflip-chain`, default-on), following the
-const-operand sign-flip fold above: a chained signed-comparison range
-check (`if (v < LOW || v >= HIGH) ...`) re-derives the sign-flipped
-value from scratch at each step instead of keeping it — the value right
-before a conditional branch already equals the flipped constant; on the
-fall-through path, reloading it from memory and re-flipping is a pure
-round trip. Found sweeping examples/othello.c (a different real file
-than the earlier three fixes, confirming generalization) — 3 hits there
-(-9B), 1 more in the console corpus (tic.c), 0 hits anywhere in the
-synthetic bench corpus (confirmed real, not a matching gap — this
-snapshot's sp/fp columns are byte-identical to the last one). Also
-needed broadening from `jp` to `jp`/`jr` for the same reason as the
-const-operand fold's `ld de,hl`/`ex de,hl` lesson — a synthetic test
-using a short branch (`jr`) didn't fire until both spellings were
-accepted. long_ir case: xorflipchain.c (the valuable structural note: an
-`if(v<A) return; if(v<B) return;` shape does NOT reproduce this — it
-inserts a label the fold correctly declines to cross; needs the
-`v<LOW || v>=HIGH` short-circuit shape instead). Fourth gbz80-family fix
-this session. Details: src/80cc/GBZ80_XORFLIP_PLAN.md.
-Generator: test/suites/gen_bench_matrix3.py cell() (35 benchmarks × 13 CPUs; all compiler columns measured).
-Compiler: bin/z88dk-80cc, built from the current worktree (24/9/2026, includes all four fixes above).
+25/9/2026 — three allocator fixes on the home-demote retry path (33d969b6ed),
+32/64-bit ++/-- through the long / i64 helpers with in-memory steps when the
+value is unused (f851b3bbe2), LHLX word derefs committed through the DE-aware
+dispatcher (c3c7a7a8bc). Against the previous snapshot: 401/403 rows
+byte- and tick-identical; the corpus has no long ++/--. Larger and slower:
+localbench 8085 sp 4574B / 268.97M -> 4580B / 269.18M, localbench vm1 sp
+5030B / 301.99M -> 5036B / 302.24M (the PR_DE write the first fix restores).
+Generator: test/suites/refresh_80cc_matrix.py (80cc-fp/80cc-sp re-measured with gen_bench_matrix3.py cell(); sccz80/xcc/sdcc reused from the previous snapshot). 8085/vm1 rows re-measured after c3c7a7a8bc.
+Compiler: bin/z88dk-80cc = c3c7a7a8bc plus the inert IR_PROBE_XBB call (asm byte-identical to a clean HEAD build on 54 file/CPU cases).
 ================================================================================
 ┌───────────────┬───────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┐
 │ benchmark     │ cpu   │ sccz80          │ xcc -Os         │ xcc -Of         │ sdcc            │ 80cc-fp         │ 80cc-sp         │
@@ -720,11 +707,11 @@ Compiler: bin/z88dk-80cc, built from the current worktree (24/9/2026, includes a
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ localbench    │ 8080  │ 4877B / 580.03M │ —               │ —               │ —               │ = sp (no IX)    │ 5074B / 307.22M │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
-│ localbench    │ 8085  │ 4551B / 426.75M │ —               │ —               │ —               │ = sp (no IX)    │ 4574B / 268.97M │
+│ localbench    │ 8085  │ 4551B / 426.75M │ —               │ —               │ —               │ = sp (no IX)    │ 4580B / 269.18M │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ localbench    │ gbz80 │ 4817B / 530.84M │ —               │ —               │ 4850B / 263.32M │ = sp (no IX)    │ 4985B / 291.58M │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
-│ localbench    │ vm1   │ 5008B / 552.41M │ —               │ —               │ —               │ = sp (no IX)    │ 5030B / 301.99M │
+│ localbench    │ vm1   │ 5008B / 552.41M │ —               │ —               │ —               │ = sp (no IX)    │ 5036B / 302.24M │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ divbench      │ z80   │ 4164B / 186.84M │ 4121B / 230.09M │ 4278B / 220.36M │ 4870B / 118.10M │ 4216B / 64.80M  │ 4296B / 66.90M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
