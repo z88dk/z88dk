@@ -32,6 +32,9 @@ static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
         cache_bc(vreg_id);
         return;
     }
+    /* [IR_BC_STEP_CALL] Past this point the reload reads v's SLOT — the
+       exact staleness risk bc_step_note_reload watches for. */
+    bc_step_note_reload(f, vreg_id);
     if (fp_active(f) && !L.cur_frameless) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {

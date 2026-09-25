@@ -1150,6 +1150,19 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
                by the idx3 loop-carried word update (e.g. `lo = mid + 1`). */
             emit_hl_to_idx_word(out, f, vreg);
             return;
+        } else if (ir_home_assigned(f, vreg) == IR_PR_DE) {
+            /* Word result → a PR_DE home (e.g. a word DE-home vreg whose
+               resident region wasn't yet confirmed when this producer's
+               generic caller — commit_hl_word rather than commit_hl_result —
+               was chosen): copy HL into DE non-destructively, mirroring the
+               PR_BC branch above, so HL still holds v for the caller's
+               trailing cache_hl. This case fell into the bare `else return`
+               below and silently dropped the write — a PR_DE dst has no
+               slot, so nothing else here would have stored it either. */
+            emit(out, "ld\td,h");
+            emit(out, "ld\te,l");
+            cache_de(vreg);
+            return;
         } else {
             return;
         }

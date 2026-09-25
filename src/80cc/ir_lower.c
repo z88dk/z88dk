@@ -4770,6 +4770,34 @@ static int hd_record(const Func *f, int v)
     return 1;
 }
 
+/* [IR_BC_STEP_CALL] Runtime verifier for the stepped-scalar/call-containing
+   BC-home gate (bc_home_realizable in ir_alloc.c). That gate admits a
+   WRITTEN whole-function-BC param in a function that calls — the shape
+   ADR 0031 only proved for a call-free function. gen_call already
+   push/pop-preserves a PR_BC vreg across a call (bc_saved), so that part is
+   sound; what is NOT statically proven is that no OTHER invalidate_bc_cache
+   site (branch merges, BC used as scratch elsewhere) forces a reload from
+   v's slot after it has been stepped, which would read a stale value.
+   Rather than auditing every invalidate site, read the render's own
+   behaviour: the prologue's one legitimate emit_bc_reload aside, a SECOND
+   reload of a watched vreg means the cache went cold and the promise broke.
+   Feeds the existing [home-demote] retry (hd_record) — same recovery an
+   unrealizable register home already uses. */
+static int bcstep_watch[32];
+static int bcstep_reload_count[32];
+static int bcstep_nwatch;
+
+static int bcstepcall_on(void) { return getenv("IR_BC_STEP_CALL") != NULL; }
+
+static void bc_step_note_reload(const Func *f, int v)
+{
+    for (int i = 0; i < bcstep_nwatch; i++) {
+        if (bcstep_watch[i] != v) continue;
+        if (++bcstep_reload_count[i] > 1) hd_record(f, v);
+        return;
+    }
+}
+
 static void require_slot(const Func *f, int vreg_id)
 {
     if (slot_off(f, vreg_id) >= 0) return;
@@ -7262,6 +7290,48 @@ static int op_is_commutative(OpKind kind)
         || kind == IR_OR  || kind == IR_XOR;
 }
 
+/* Word DE-home tentative-pick gate. ir_alloc() gives the home exclusive DE
+   (evicting other PR_DE tenants) speculatively — a net loss if no resident
+   region actually forms (the home would only churn per-iter flush+rehome).
+   Region formation needs slots + bb_alias, so it's decided here with the
+   SAME compute_home_region the render uses. No region -> restore the saved
+   pre-pick allocation and re-slot, reverting to baseline.
+
+   MUST be re-run after every ir_alloc(f) call, not just the first: a
+   [home-demote] retry's [home-rearb] step re-runs ir_alloc from scratch,
+   which can tentatively re-pick a DIFFERENT (or the same) word-home
+   candidate with no memory that an earlier pick already failed this exact
+   validation. Left unchecked, the fresh pick ships straight to the
+   renderer unconfirmed — vreg_to_phys silently reverts from a validated
+   spill/slot-0 home back to PR_DE, and the render, believing DE is live
+   across a span the body actually clobbers (e.g. for an unrelated
+   multiply/array computation), never reloads it: the write lands in DE,
+   nothing ever reads it back, and a loop-carried value that should have
+   counted down never does. Caught via countborrow.c hanging under
+   IR_BC_STEP_CALL once a [home-demote] retry became reachable from a new
+   call site — the underlying gap is general, not specific to that gate. */
+static void confirm_word_home_pick(Func *f, const int *bb_alias)
+{
+    if (!ir_alloc_word_home_picked()) return;
+    if (f->word_home_vreg >= 0) {
+        int wlo = -1, whi = -1;
+        g_hc.home_is_word = 1;
+        g_hc.func_whome = f->word_home_vreg;
+        g_hc.branch_test_kind = 0;
+        /* Same DE-home fold arming as the render, so op_de_clean's region
+           proof here matches what the render will actually emit. */
+        if (f->de_home_general) g_hc.de_home = f->word_home_vreg;
+        compute_home_region(f, f->word_home_vreg, bb_alias, &wlo, &whi);
+        g_hc.home_is_word = 0;
+        g_hc.func_whome = -1;
+        g_hc.de_home = -1;
+        /* No region formed: the render cannot keep the promise the pick
+           made, so reject it. The allocator reverts its own plan. */
+        if (wlo < 0)
+            ir_alloc_word_home_reject(f);
+    }
+    ir_alloc_word_home_done();
+}
 
 int ir_lower_func(FILE *out, Func *f)
 {
@@ -7874,32 +7944,8 @@ int ir_lower_func(FILE *out, Func *f)
         }
     }
 
-    /* Word DE-home tentative-pick gate. The allocator gave the home exclusive
-       DE (evicting other PR_DE tenants) — a net loss if no resident region
-       forms (the home would only churn per-iter flush+rehome). Region
-       formation needs slots + bb_alias, so it's decided here with the SAME
-       compute_home_region the render uses. No region ⇒ restore the saved
-       pre-pick allocation and re-slot, reverting to baseline. */
-    if (ir_alloc_word_home_picked()) {
-        if (f->word_home_vreg >= 0) {
-            int wlo = -1, whi = -1;
-            g_hc.home_is_word = 1;
-            g_hc.func_whome = f->word_home_vreg;
-            g_hc.branch_test_kind = 0;
-            /* Same DE-home fold arming as the render, so op_de_clean's region
-               proof here matches what the render will actually emit. */
-            if (f->de_home_general) g_hc.de_home = f->word_home_vreg;
-            compute_home_region(f, f->word_home_vreg, bb_alias, &wlo, &whi);
-            g_hc.home_is_word = 0;
-            g_hc.func_whome = -1;
-            g_hc.de_home = -1;
-            /* No region formed: the render cannot keep the promise the pick
-               made, so reject it. The allocator reverts its own plan. */
-            if (wlo < 0)
-                ir_alloc_word_home_reject(f);
-        }
-        ir_alloc_word_home_done();
-    }
+    /* Word DE-home tentative-pick gate — see confirm_word_home_pick below. */
+    confirm_word_home_pick(f, bb_alias);
 
     /* === Pass driver ===
        Flag-off: a single render with deferral off. Flag-on: pass 1 renders
@@ -7953,6 +7999,28 @@ int ir_lower_func(FILE *out, Func *f)
     /* [home-demote] Recovery needs a discardable render and one attempt only. */
     hd_nbad = 0;
     hd_retry_ok = (rout != out) && !hd_retry_done;
+    /* [IR_BC_STEP_CALL] Rebuild the watch list each attempt — a home-demote
+       retry re-runs ir_alloc, which can change who holds PR_BC. Only a
+       WRITTEN PARAM_IN_PLACE vreg is at risk (a read-only one is always
+       correct to re-derive from its slot); write_count is a cheap static
+       scan, not allocator state, so this is independent of ir_alloc's own
+       bookkeeping which is already out of scope by this point. */
+    bcstep_nwatch = 0;
+    if (bcstepcall_on())
+        for (int v = 0; v < f->n_vregs; v++) {
+            if (ir_home_assigned(f, v) != IR_PR_BC) continue;
+            if (!(f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)) continue;
+            int wc = 0;
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++)
+                    if (f->bbs[b].ops[j].dst == v) wc++;
+            if (wc == 0) continue;
+            if (bcstep_nwatch < (int)(sizeof bcstep_watch / sizeof bcstep_watch[0])) {
+                bcstep_watch[bcstep_nwatch] = v;
+                bcstep_reload_count[bcstep_nwatch] = 0;
+                bcstep_nwatch++;
+            }
+        }
     /* Static lazy-spill state — off unless the two-pass path arms it. */
     L.ss_phase = 0;
     L.ss_op_base = NULL;
@@ -8111,6 +8179,12 @@ int ir_lower_func(FILE *out, Func *f)
             if (home_rearb_enabled()) {
                 ir_alloc(f);
                 ir_alloc_veto_reset();
+                /* ir_alloc() can tentatively re-pick a word-DE-home candidate
+                   from scratch, with no memory that an earlier pick already
+                   failed this exact validation — re-run the confirm/reject
+                   gate or the fresh pick ships unconfirmed. See
+                   confirm_word_home_pick. */
+                confirm_word_home_pick(f, bb_alias);
             }
             ir_assign_slots(f);
             L.cur_frameless = frameless_ok(f);

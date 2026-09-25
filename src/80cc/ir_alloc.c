@@ -41,6 +41,7 @@ extern int c_reserve_iy;
    pre-pick allocation here; the lowerer checks the region and, if none forms,
    restores this and re-slots — reverting the function to baseline. */
 static int *word_home_prepick;
+static int hr_residency_window(const Func *f, int v, int *lo, int *hi);
 
 /* Richest span for a ranged BC home: the longest run of reads of v containing
    no call (BC is caller-clobbered) and, when `read_only`, no write of v either.
@@ -117,6 +118,29 @@ void ir_alloc_word_home_reject(Func *f)
     if (!f || !word_home_prepick || !f->vreg_to_phys) return;
     memcpy(f->vreg_to_phys, word_home_prepick,
            (size_t)f->n_vregs * sizeof(int));
+    /* A byte pack made after the pick saw the pair the pick vacated (BC it
+       promoted from, DE it evicted) as free, and was mirrored into the
+       snapshot. The restore brings the pair tenant back, so a pack whose
+       window overlaps it now shares the register: demote the pack. */
+    for (int v = 0; v < f->n_vregs; v++) {
+        PhysReg pv = f->vreg_to_phys[v];
+        PhysReg pair = (pv == IR_PR_B || pv == IR_PR_C) ? IR_PR_BC
+                     : (pv == IR_PR_D || pv == IR_PR_E) ? IR_PR_DE : IR_PR_SPILL;
+        int vlo, vhi;
+        if (pair == IR_PR_SPILL || !hr_residency_window(f, v, &vlo, &vhi))
+            continue;
+        for (int w = 0; w < f->n_vregs; w++) {
+            int wlo, whi;
+            if (f->vreg_to_phys[w] != pair) continue;
+            if (!hr_residency_window(f, w, &wlo, &whi)) continue;
+            if (wlo <= vhi && whi >= vlo) {
+                f->vreg_to_phys[v] = IR_PR_SPILL;
+                if (f->home_lo) f->home_lo[v] = 0;
+                if (f->home_hi) f->home_hi[v] = INT_MAX;
+                break;
+            }
+        }
+    }
     f->word_home_vreg = -1;
     f->de_home_general = 0;
     f->de_home_is_ptr = 0;
@@ -637,10 +661,47 @@ static int bc_home_realizable(const Func *f, int v,
             /* Stepped pointer param (walking char ptr): single in-place
                INC/DEC step, call-free, gated. Any other written param is
                rejected (BC would go stale). */
-            int step_ok = allow_step_param && !fn_has_call
-                && write_count[v] == 1
-                && (def_kind[v] == IR_INC || def_kind[v] == IR_DEC)
+            int step_shape = write_count[v] == 1
+                && (def_kind[v] == IR_INC || def_kind[v] == IR_DEC);
+            int step_ok = allow_step_param && !fn_has_call && step_shape
                 && (vr->kind == KIND_PTR || vr->kind == KIND_CPTR);
+            /* [IR_BC_STEP_SCALAR] Sizing probe, opt-in only: the identical
+               call-free/single-step shape ADR 0031 proved safe for a stepped
+               pointer, widened to a plain width-2 scalar (a `while (n--)`
+               loop counter). Deliberately keeps !fn_has_call — the
+               call-containing case (the shape that actually motivated this)
+               is a separate, unaudited question; see DESIGN_INDEX.md. Not
+               validated beyond long_ir yet. */
+            if (!step_ok && step_shape && !fn_has_call && getenv("IR_BC_STEP_SCALAR")
+                && (vr->kind == KIND_INT || vr->kind == KIND_SHORT
+                    || vr->kind == KIND_CHAR || vr->kind == KIND_ENUM))
+                step_ok = 1;
+            /* [IR_BC_STEP_CALL] The shape that actually motivated this: a
+               written whole-function-BC scalar in a function that DOES call
+               (`while (n--) f(...)`, the common idiom). gen_call already
+               push/pop-preserves any PR_BC vreg around a call (bc_saved in
+               ir_lower_call.inc.c) — that part is proven by the read-only
+               PARAM case, which already survives calls this way. The
+               unproven part is every OTHER invalidate_bc_cache() site
+               (branch merges, BC-scratch ops elsewhere) reloading from the
+               vreg's slot, which would be stale once stepped — auditing
+               every site is the alternative to this gate.
+               Deliberately NOT trusted by static reasoning alone: the
+               lowerer runtime-verifies its own promise. Watch every PR_BC
+               PARAM_IN_PLACE vreg that reaches this path; more than one
+               emit_bc_reload for it (the prologue load is the only
+               legitimate one) means the cache went cold and would read a
+               stale slot — ir_lower demotes it to a plain spill home and
+               re-lowers (the existing [home-demote] retry), same as an
+               unrealizable-home render failure. A function where the promise
+               never breaks pays nothing extra; one where it does just loses
+               the optimisation, not correctness. Opt-in, unmeasured beyond
+               long_ir yet. */
+            if (!step_ok && step_shape && getenv("IR_BC_STEP_CALL")
+                && (vr->kind == KIND_INT || vr->kind == KIND_SHORT
+                    || vr->kind == KIND_CHAR || vr->kind == KIND_ENUM
+                    || vr->kind == KIND_PTR || vr->kind == KIND_CPTR))
+                step_ok = 1;
             if (!step_ok) return 0;
         }
     } else if (is_induct) {

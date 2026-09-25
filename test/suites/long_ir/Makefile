@@ -19,6 +19,7 @@ all:	countborrow.bin countborrow_gbz80.bin
 all:	localrmw_gbz80.bin localrmw_gbz80_keep.bin
 all:	localrmw_z80.bin localrmw_z80n.bin localrmw_z180.bin localrmw_ez80_z80.bin localrmw_8080.bin localrmw_vm1.bin localrmw_r2ka.bin localrmw_r4k.bin localrmw_r6k.bin localrmw_kc160.bin localrmw_r800.bin localrmw_z80_keep.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
+all:	derefcmp_bcstep.bin derefcmp_bcstep_8080.bin
 all:	poolremat.bin poolremat_fp.bin poolremat_gbz80.bin poolremat_8080.bin poolremat_8085.bin
 all:	deaddereload.bin deaddereload_fp.bin deaddereload_gbz80.bin
 all:	xorflipconst.bin xorflipconst_fp.bin xorflipconst_gbz80.bin xorflipconst_8080.bin xorflipconst_vm1.bin
@@ -182,6 +183,16 @@ homeexitdead_gbz80_keep.bin: $(SOURCES) homeexitdead.c
 derefcmp.bin: $(SOURCES) derefcmp.c
 	$(compile)
 	$(runtest)
+
+# IR_BC_STEP_CALL re-arbitrates dc_streq after a home demotion; the rerun's
+# rejected DE pick restores a BC tenant over a B byte pack made meanwhile.
+derefcmp_bcstep.bin: $(SOURCES) derefcmp.c
+	IR_BC_STEP_CALL=1 $(compile)
+	$(runtest)
+
+derefcmp_bcstep_8080.bin: $(SOURCES) derefcmp.c
+	IR_BC_STEP_CALL=1 zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) $(FPFLAG) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 derefcmp_fp.bin: $(SOURCES) derefcmp.c
 	$(call compile,-Cc-fframe-pointer)
