@@ -3848,7 +3848,7 @@ static void configure_compiler(void)
         c_compiler = c_sccz80_exe;
         compiler_style = outspecified_flag;
     } else if (strcmp(c_compiler_type,"llvmz80") == 0 ) {
-        preprocarg = " -E -D__CLANG -D__LLVMZ80";
+        preprocarg = " -E -D__CLANG -D__LLVMZ80 --target=z80 -std=gnu23";
         BuildOptions(&cpparg, preprocarg);
         BuildOptions(&asmargs, "-D__LLVMZ80");
         BuildOptions(&linkargs, "-D__LLVMZ80");
