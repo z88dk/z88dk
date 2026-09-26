@@ -27979,6 +27979,30 @@ replace restart {
 	; peephole 149 removed unused label %1.
 } if labelRefCount(%1 0)
 
+// Remove orphan jp instructions after an unconditional flow exit
+// (peephole 149a / 149b).  Iterates with peep 149 so a chain of
+// orphans produced by case-tail-call collapse (ravn/z88dk#8) is
+// cleared one at a time:
+//   ret             ret
+//   jp _a    --->   (gone)
+//   jp _b           (next iter sees ret; jp _b again)
+//   ...
+replace restart {
+	ret
+	jp	%1
+} by {
+	ret
+	; peephole 149a removed unreachable jp after ret.
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jp	%2
+	jp	%1
+} by {
+	jp	%2
+	; peephole 149b removed unreachable jp after unconditional jp.
+} if labelRefCountChange(%1 -1)
+
 // Ensure that all rules above see only jp, not jr.
 barrier
 
