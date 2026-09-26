@@ -202,6 +202,7 @@ static void            apply_copt_rules(int filenumber, int num, char **rules, c
 static int             fill_sccz80_copt_rules(char **rules);
 static int             fill_80cc_copt_rules(char **rules);
 static void            zsdcc_asm_filter_comments(int filenumber, char *ext);
+static void            ez80clang_fix_db_strings(int filenumber, char *ext);
 static void            zsdcc_asm_filter_sections(int filenumber, char* ext);
 static void            zsdcc_embed_adb(int filenumber);
 static void            remove_temporary_files(void);
@@ -1558,7 +1559,11 @@ int main(int argc, char **argv)
 
                 rules[num_rules++] = c_ez80clang_opt;
 
-                apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
+                /* ravn/z88dk#19: repair ez80-clang's unescaped `db "..."`
+                 * string directives before copt (and z80asm) ever see them. */
+                ez80clang_fix_db_strings(i, ".op1");
+
+                apply_copt_rules(i, num_rules, rules, ".op1", ".op2", ".asm");
             } else if (compiler_type == CC_XCC) {
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
@@ -2038,6 +2043,116 @@ static void zsdcc_embed_adb(int filenumber)
         fclose(fcdb);
     }
     free(cdbfile);
+}
+
+
+/* -compiler=ez80clang workaround for a CE-Programming/llvm-project asm-printer
+ * bug (ravn/z88dk#19): ez80-clang's `db "..."` string directives for byte
+ * arrays/string literals emit the RAW bytes of the string between the quotes,
+ * with no escaping at all -- e.g. `char msg[] = "hi\n"` prints literally as
+ *   db      "hi
+ *  "
+ * (an actual 0x0A byte sitting inside the quoted token).  z80asm's assembler
+ * is line-oriented, so the embedded raw newline ends the "line" before the
+ * closing quote is reached, and the whole directive fails to parse ("missing
+ * quote").  Any other raw control byte (tab, NUL, ...) would be similarly
+ * malformed even where it doesn't visibly break the line.
+ *
+ * This is confirmed (2026-07, root-caused via a libc-free repro run directly
+ * through `ez80-clang -Xclang -triple -Xclang z80 -S`, bypassing z88dk's
+ * bridge entirely) to originate in ez80-clang's own output -- z88dk's
+ * clang_rules.1 has no string/db-related copt rules at all, so it neither
+ * causes nor could plausibly fix this on its own.  ez80-clang is a prebuilt
+ * third-party (CE-Programming) binary we do not build from source, so the
+ * fix has to live here: re-scan every `db "..."` directive byte-for-byte and
+ * re-emit it as an alternating sequence of quoted printable runs and numeric
+ * byte values, e.g. `db "hi",10` instead of the broken raw form above. This
+ * assumes (as ez80-clang's own output does) that the string content itself
+ * never contains a literal '"' byte -- if it did, ez80-clang's own emission
+ * would already be ambiguous, not just ours.
+ */
+static void ez80clang_fix_db_strings(int filenumber, char *ext)
+{
+    FILE   *fin;
+    FILE   *fout;
+    char   *outname;
+    char   *buf;
+    long    size;
+    long    pos;
+
+    outname = changesuffix(temporary_filenames[filenumber], ext);
+
+    if ((fin = fopen(filelist[filenumber], "rb")) == NULL) {
+        fprintf(stderr, "Error: Cannot read %s\n", filelist[filenumber]);
+        exit(1);
+    }
+    fseek(fin, 0, SEEK_END);
+    size = ftell(fin);
+    fseek(fin, 0, SEEK_SET);
+    buf = malloc(size + 1);
+    if (buf == NULL || (long)fread(buf, 1, size, fin) != size) {
+        fprintf(stderr, "Error: Cannot read %s\n", filelist[filenumber]);
+        exit(1);
+    }
+    buf[size] = '\0';
+    fclose(fin);
+
+    if ((fout = fopen(outname, "wb")) == NULL) {
+        fprintf(stderr, "Error: Cannot write %s\n", outname);
+        exit(1);
+    }
+
+    pos = 0;
+    while (pos < size) {
+        /* look for the exact opening token ez80-clang emits: "\tdb\t\"" */
+        if (pos + 4 <= size && buf[pos] == '\t' && buf[pos+1] == 'd' &&
+            buf[pos+2] == 'b' && buf[pos+3] == '\t' && pos + 4 < size && buf[pos+4] == '"') {
+            long content_start = pos + 5;
+            long q = content_start;
+
+            /* find the next raw '"' byte -- see the assumption noted above */
+            while (q < size && buf[q] != '"') q++;
+
+            if (q < size) {
+                long   k;
+                int    run_open = 0;
+                int    emitted_anything = 0;
+
+                fputs("\tdb\t", fout);
+                for (k = content_start; k < q; k++) {
+                    unsigned char c = (unsigned char)buf[k];
+                    if (c >= 0x20 && c <= 0x7E && c != '"') {
+                        if (!run_open) {
+                            if (emitted_anything) fputc(',', fout);
+                            fputc('"', fout);
+                            run_open = 1;
+                        }
+                        fputc(c, fout);
+                    } else {
+                        if (run_open) { fputc('"', fout); run_open = 0; }
+                        if (emitted_anything) fputc(',', fout);
+                        fprintf(fout, "%u", c);
+                    }
+                    emitted_anything = 1;
+                }
+                if (run_open) fputc('"', fout);
+                if (!emitted_anything) fputs("\"\"", fout); /* empty string literal */
+
+                pos = q + 1;
+                continue;
+            }
+            /* no closing quote found at all (shouldn't happen) -- fall through
+             * and copy this byte through unmodified so we don't hang/truncate */
+        }
+        fputc(buf[pos], fout);
+        pos++;
+    }
+
+    free(buf);
+    fclose(fout);
+
+    free(filelist[filenumber]);
+    filelist[filenumber] = outname;
 }
 
 
