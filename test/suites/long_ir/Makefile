@@ -209,9 +209,8 @@ widestep_r2ka.bin: $(SOURCES) widestep.c
 	$(compile_r2ka)
 	$(runtest_r2ka)
 
-# l_i64_dec is wrong in the library, so widestep.c does not assert 64-bit
-# decrement results: check here that all four ll_*dec* sites call it, and
-# that the discarded-result steps use the in-memory helpers.
+# Check that all four ll_*dec* sites call l_i64_dec and that the
+# discarded-result steps use the in-memory helpers.
 widestep_calls.bin: widestep.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) $(FPFLAG) -I$(FRAMEWORK_DIR) -S $< -o widestep_calls.asm
 	@test `grep -c 'call[[:space:]]*l_i64_dec' widestep_calls.asm` -ge 4 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: l_i64_dec not called $(RESET)" ; exit 1; }

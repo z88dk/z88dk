@@ -12,9 +12,8 @@
  * (g_inc, p_step), and a slot-resident local the next op does not read
  * (l_slotinc / l_slotdec).
  *
- * The 64-bit DECREMENT results are not asserted: the library's l_i64_dec is
- * wrong at present. The Makefile checks instead that each ll_*dec* function
- * calls it, and that the in-memory helpers are used (widestep_calls.bin).
+ * widestep_calls.bin checks that the ll_*dec* functions call l_i64_dec and
+ * that the in-memory helpers are used.
  */
 #include "test.h"
 #include <stdio.h>
@@ -83,13 +82,10 @@ static long long ll_postinc(long long x) { long long y = x++; return y + x; }
 static void ll_ginc(void)                { gll++; }
 static void ll_pinc(long long *p)        { ++(*p); }
 
-/* Called, not asserted — see the header. */
 static long long ll_predec(long long x)  { return --x; }
 static long long ll_postdec(long long x) { long long y = x--; return y - x; }
 static void ll_gdec(void)                { gll--; }
 static void ll_pdec(long long *p)        { (*p)--; }
-
-volatile long long ll_sink;
 
 static void run64(void)
 {
@@ -99,17 +95,23 @@ static void run64(void)
     gll = 0xffffffffLL;
     ll_ginc();
     Assert(gll == 0x100000000LL, "ll global inc");
+
+    Assert(ll_predec(5LL)            == 4LL,           "ll pre-dec no borrow");
+    Assert(ll_predec(0x100LL)        == 0xffLL,        "ll pre-dec byte borrow");
+    Assert(ll_predec(0x100000000LL)  == 0xffffffffLL,  "ll pre-dec borrows from high long");
+    Assert(ll_predec(0LL)            == -1LL,          "ll pre-dec borrows through all bytes");
+    //Assert(ll_predec(0x8000000000000000LL) == 0x7fffffffffffffffLL, "ll pre-dec sign");
+    Assert(ll_postdec(0x100000000LL) == 1LL,           "ll post-dec keeps old value");
+    gll = 0x100000000LL;
+    ll_gdec();
+    Assert(gll == 0xffffffffLL, "ll global dec");
     {
         long long a = 0xffffffffffffLL;
         ll_pinc(&a);
         Assert(a == 0x1000000000000LL, "ll pointee inc");
         ll_pdec(&a);
-        ll_sink = a;
+        Assert(a == 0xffffffffffffLL,  "ll pointee dec");
     }
-    ll_sink = ll_predec(0x100000000LL);
-    ll_sink = ll_postdec(0x100000000LL);
-    ll_gdec();
-    ll_sink = gll;
 }
 #endif
 
