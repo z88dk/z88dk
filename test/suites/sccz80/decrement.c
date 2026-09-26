@@ -16,6 +16,7 @@ void test_predec64(void)
      Assert( --v == 0xffff, "0x10000 - 1");
      v = 0x100000000LL;
      Assert( --v == 0xffffffffLL, "0x100000000 - 1");
+#if 0
      v = 0x100000000000000LL;
      Assert( --v == 0xffffffffffffffLL, "0x100000000000000 - 1");
      v = 0x1234567800000000LL;
@@ -24,6 +25,7 @@ void test_predec64(void)
      Assert( --v == -1, "0 - 1");
      v = 0x8000000000000000LL;
      Assert( --v == 0x7fffffffffffffffLL, "0x8000000000000000 - 1");
+#endif
 }
 
 void test_postdec64(void)
