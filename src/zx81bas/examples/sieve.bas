@@ -1,21 +1,15 @@
 #AUTOSTART = 1
 
 	' Sieve of Eratosthenes
-	DEF FNrow(n) = ((n-1) DIV 10)+1
+	DEF FNrow(n) = ((n-1) DIV 10)
 	DEF FNcol(n) = ((n-1) MOD 10)*3 + (n<10) + (n<100)
 	
-	LET max=200
+	LET max=220
 	DIM p(max)
 	
 	' show number table
 	FOR n=1 TO max
-		n$ = STR$(n)
-		IF n MOD 2 = 0 THEN	' invert even numbers
-			FOR i=1 to LEN(n$)
-				n$(i) = CHR$(CODE(n$(i))+128)
-			NEXT i
-		ENDIF
-		PRINT AT FNrow(n), FNcol(n); n$;
+		PRINT AT FNrow(n), FNcol(n); n;
 		LET p(n) = 1
 	NEXT n
 
