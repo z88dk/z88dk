@@ -10,15 +10,19 @@ description: >
 # Library — math32
 
 Home: `libsrc/math/float/math32/`. Docs of record: `libsrc/math/float/math32/readme.md`.
-Link via **`--math32`** (`-lmath32@{ZCC_LIBCPU}`).
+From **v2.5**, link via **`-lm`** or **`--math32`** (same IEEE flags, `-lmath32@{ZCC_LIBCPU}`). Before v2.5, classic `-lm` was genmath and newlib `-lm` was math48.
 
 ## 0b. Math32 multi-CPU float library (layout + policy)
 
 Home: `libsrc/math/float/math32/`. Products: `math32.lib` (plain z80) plus
-`math32_{z80n,z180,ez80_z80,r2ka,kc160,8085,8080,vm1,gbz80,…}.lib`. Link via
-**`--math32`** (`-lmath32@{ZCC_LIBCPU}` — e.g. 8085 → `math32_8085`, 8080 →
+`math32_{z80n,z180,ez80_z80,r2ka,kc160,8085,8080,vm1,gbz80,…}.lib`.
+From **v2.5**, **`-lm` and `--math32`** are the same selection
+(`-lmath32@{ZCC_LIBCPU}` — e.g. 8085 → `math32_8085`, 8080 →
 `math32_8080`, vm1 → `math32_vm1`, gbz80 → `math32_gbz80`, ez80_z80 →
-`math32_ez80_z80`; no separate `--math32_8085` flag).
+`math32_ez80_z80`; no separate `--math32_8085` flag). Before v2.5,
+classic `-lm` linked genmath and newlib `-lm` linked math48. 6-byte
+reruns: `--genmath` or `--math48` (sccz80 or 80cc; zsdcc still stores
+4-byte IEEE). 8-byte: `--mbf64` with either compiler. ROM stays `-lmz`.
 
 ### Layout
 
@@ -119,7 +123,7 @@ names; the **DEHL** entry is `*_fastcall` (`defc sin_fastcall = _m32_sinf`).
 | **Classic** `include/math/math_math32.h` | `#define sin(x) sin_fastcall(x)` (and peers) — already correct |
 | **Newlib** sccz80 + `--math32` | Same remaps under `__MATH_MATH32` in **`include/_DEVELOPMENT/proto/math.h`**, then `make -C include/_DEVELOPMENT common/math.h` |
 | **SDCC** | Single-arg `__DPROTO` already emits `#define sin(a) sin_fastcall(a)` — OK without the sccz80 block |
-| **math48** default newlib | Plain `sin` is true DEHL (`cm48_sccz80_sin`) — do **not** force math32 remaps off math48 |
+| **math48** (`--math48`; newlib `-lm` only before v2.5) | Plain `sin` is true DEHL (`cm48_sccz80_sin`) — do **not** force math32 remaps off math48 |
 
 Without the newlib remaps, sccz80 marks plain `sin` as `__z88dk_fastcall` and
 emits `call sin` with DEHL, but the linked object is the **stack bridge** (ignores

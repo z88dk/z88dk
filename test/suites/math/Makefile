@@ -43,8 +43,9 @@ test_fixmath.bin: $(FIXSOURCES)
 	$(call compile, -DFIX16 -DMATH_LIBRARY="\"\\\"fix16\\\"\"", -lm)
 	$(runtest)
 
+# -lm is math32. This row is the 6-byte genmath library.
 test_genmath.bin: $(FPSOURCES)
-	$(call compile, -DGENMATH -DMATH_LIBRARY="\"\\\"Genmath\\\"\"", -lm)
+	$(call compile, -DGENMATH -DMATH_LIBRARY="\"\\\"Genmath\\\"\"", --genmath)
 	$(runtest)
 
 test_bbcmath.bin: $(FPSOURCES)
@@ -158,8 +159,9 @@ test_math32_vm1.bin: $(FPSOURCES)
 	$(call compile_vm1, -DMATH32 -D__MATH_MATH32 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32-vm1\\\"\"", -lmath32_vm1)
 	$(runtest_vm1)
 
+# +rc2014 is newlib. --math48 selects m. -lm selects math32.
 test_math48_rc2014_CODE.bin: $(FPSOURCES)
-	$(call compile_rc2014, -DMATH48 -DMATH_LIBRARY="\"\\\"Math48\\\"\"", -lm)
+	$(call compile_rc2014, -DMATH48 -DMATH_LIBRARY="\"\\\"Math48\\\"\"", --math48)
 	$(runtest_rc2014)
 
 test_am9511_rc2014_CODE.bin: $(FPSOURCES)

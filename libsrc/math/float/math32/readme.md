@@ -2,7 +2,9 @@
 
 This is the z88dk 32-bit IEEE-754 single-precision floating-point maths package. It works with the sccz80 and zsdcc IEEE-754 32-bit interfaces.
 
-Link it with **`--math32`**. That alias selects the product for the active CPU through `@{ZCC_LIBCPU}`. Example: `math32_8085` with `-clib=8085`. It expands to the IEEE float mode, the math32 define set, `CLIB_32BIT_FLOATS=1`, and `-lmath32@{ZCC_LIBCPU}`.
+From **z88dk v2.5**, **`-lm` is this library**, on classic and on newlib. `--math32` is the same selection. Both expand to IEEE float mode, the math32 define set, `CLIB_32BIT_FLOATS=1`, and `-lmath32@{ZCC_LIBCPU}` (for example `math32_8085` with `-clib=8085`). ROM maths stays on `-lmz`. Before v2.5, classic `-lm` was genmath and newlib `-lm` was math48.
+
+A wider mantissa is still available. sccz80 and 80cc can use a 6-byte library: `--genmath` or `--math48` (8-bit exponent, 40-bit mantissa). zsdcc keeps a 4-byte IEEE value, so those extra bits are not kept. An 8-byte Microsoft format is `--mbf64` (same as `--math-mbf64`) with sccz80 or 80cc (`-fp-mode=mbf64`).
 
 This library is designed for z180 (eZ80), z80n, and Rabbit 2000 / 3000 processors. It is optimised for the z180 (eZ80) and [ZX Spectrum Next](https://www.specnext.com/) z80n, because those CPUs have a hardware `16_8×8` multiply operation that accelerates the floating-point mantissa. The Rabbit `32_16×16` signed multiply is also implemented for r2ka / r3k machines and provides the fastest Rabbit path.
 
@@ -396,7 +398,7 @@ The z180 column uses `-clib=z180` and `-mz180`. The eZ80 column uses `-clib=ez80
 | mandelbrot | `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER` |
 | whetstone | `-O2 -DSTATIC -DTIMER` |
 
-Library flags: `-lm` (genmath), `-lmath48@{ZCC_LIBCPU}`, `--math-bbc`, `--math-mbf32`, `--math32`.
+Library flags for these rows, as measured: `-lm` was classic genmath before v2.5, `--math48` / `-lmath48@{ZCC_LIBCPU}`, `--math-bbc`, `--math-mbf32`, `--math32`. From v2.5, `-lm` is math32. A 6-byte rerun is `--genmath` or `--math48` with sccz80 or 80cc. An 8-byte rerun is `--mbf64` with either compiler.
 
 **math32 (opt)** uses the intrinsic helpers as a guide for advanced code:
 

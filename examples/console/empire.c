@@ -19,7 +19,7 @@
  *
  */
 
-#pragma printf = "%s %d %f"
+#pragma printf = "%s %d %.2f %10.0f %.1f %.0f"
 #pragma scanf  = "%s %d %["
 
 #pragma output CLIB_EXIT_STACK_SIZE  = 0

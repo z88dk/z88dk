@@ -1,3 +1,5 @@
+Before z88dk v2.5, classic `-lm` in these recipes linked genmath (6-byte, sccz80). From v2.5, `-lm` links math32. A 6-byte rerun is `--genmath` or `--math48` with sccz80 or 80cc. zsdcc stores a 4-byte IEEE value. 8-byte Microsoft format is `--mbf64` with either compiler.
+
 CHANGES TO SOURCE CODE
 ======================
 
@@ -23,7 +25,7 @@ classic/sccz80/8085/math32
 zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 n-body.c -o n-body --math32 -lndos -create-app
 
 classic/sccz80/math16
-zcc +zx -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints n-body.c -o n-body --math16 -lndos -create-app
+zcc +zx -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints n-body.c -o n-body --math16 -lm -lndos -create-app
 
 classic/sccz80/8085/math16
 zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints n-body.c -o n-body --math16 -lmath32_8085 -lndos -create-app

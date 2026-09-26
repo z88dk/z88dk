@@ -18,6 +18,11 @@ ALIAS   --math-dai32            -Cc-fp-mode=am9511  -ldaimath32@{ZCC_LIBCPU} -pr
 ALIAS   --math-am9511           -Cc-fp-mode=ieee    -lam9511@{ZCC_LIBCPU} -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_AM9511 -Ca-D__MATH_AM9511 -D__MATH_AM9511
 ALIAS   --math-cpc              -Cc-fp-exponent-bias=128 -Cc-fp-mantissa-size=5     -lcpcz80_math -D__MATH_CPC
 ALIAS   --fastmath              -lfastmath@{ZCC_LIBCPU}
+ALIAS   --genmath               -Cc-fp-mode=z80 -lgenmath@{ZCC_LIBCPU}
+ALIAS   --math48                -Cc-fp-mode=z80 -lmath48@{ZCC_LIBCPU}
+ALIAS   --mbf32                 -Cc-fp-mode=mbf32   -lmbf32@{ZCC_LIBCPU} -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_MBF32 -Ca-D__MATH_MBF32 -D__MATH_MBF32
+ALIAS   --mbf64                 -Cc-fp-mode=mbf64   -pragma-define:CLIB_64BIT_FLOATS=1   -lmbf64
+ALIAS   --daimath               -Cc-fp-mode=am9511  -ldaimath32@{ZCC_LIBCPU} -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_DAI32 -Ca-D__MATH_DAI32 -D__MATH_DAI32
 
 
 
