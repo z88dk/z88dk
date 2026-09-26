@@ -123,9 +123,26 @@ extern void __LIB__ *z80_indr_callee(void *dst,uint8_t port,uint8_t num) __small
 #define z80_indr(a,b,c) z80_indr_callee(a,b,c)
 
 
+#if defined(__LLVMZ80)
+/* z80_outp_callee.asm pops "af = data" (topmost slot) then "hl = port" (deeper)
+ * and reads a full 2-byte slot per argument.  Under z80_smallc (ravn/llvm-z80
+ * #279) __smallc pushes args LEFT-TO-RIGHT, so a NATURAL (port, data)
+ * declaration already puts port deepest and data topmost -- matching the
+ * worker, so NO parameter reversal is needed (that was only required before
+ * #279, when __smallc meant sdcccall(0) = right-to-left).
+ *
+ * One mismatch remains: clang still narrows a uint8_t arg to a 1-byte push
+ * (`ld a,x; push af; inc sp`) under z80_smallc, so `data` must be WIDENED to
+ * uint16_t to emit a full 2-byte slot matching the worker's `pop bc`.
+ * Verified with `clang --target=z80 -S`: uint16_t data -> `ld hl,x; push hl`. */
+extern void __LIB__ z80_outp(uint16_t port,uint16_t data) __smallc;
+extern void __LIB__ z80_outp_callee(uint16_t port,uint16_t data) __smallc __z88dk_callee;
+#define z80_outp(a,b) z80_outp_callee(a,b)
+#else
 extern void __LIB__ z80_outp(uint16_t port,uint8_t data) __smallc;
 extern void __LIB__ z80_outp_callee(uint16_t port,uint8_t data) __smallc __z88dk_callee;
 #define z80_outp(a,b) z80_outp_callee(a,b)
+#endif
 
 
 extern void __LIB__ *z80_otir(void *src,uint8_t port,uint8_t num) __smallc;
