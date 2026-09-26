@@ -326,13 +326,28 @@ std::vector<StmtPtr> LoweringPass::lower(DimStmt& stmt) {
 std::vector<StmtPtr> LoweringPass::lower(IfStmt& stmt) {
     std::vector<StmtPtr> out;
 
+    // lower THEN statements to check if it's a simple IF form
+    auto lowered_then_stmts = lower_stmts(stmt.then_stmts);
+
+    // Simple IF form:
+    //      IF cond THEN stmt
+    if (lowered_then_stmts.size() == 1 && stmt.else_stmts.empty()) {
+        auto lowered_cond = stmt.condition->lower(*this);
+        append_stmts(out, lowered_cond.preamble);
+        auto new_if_stmt = make_node<IfStmt>(std::move(lowered_cond.rewritten),
+                                             stmt.loc);
+        new_if_stmt->then_stmts.push_back(std::move(lowered_then_stmts[0]));
+        out.push_back(std::move(new_if_stmt));
+        return out;
+    }
+
     // generic IF form:
-    // IF NOT cond THEN GOTO @else_label
-    //     then_stmts
-    //     GOTO @end_label
-    // @else_label:
-    //     else_stmts
-    // @end_label:
+    //      IF NOT cond THEN GOTO @else_label
+    //          then_stmts
+    //          GOTO @end_label
+    //      @else_label:
+    //          else_stmts
+    //      @end_label:
     std::string label_radix = gen_label("IF");
     std::string else_label = label_radix + "ELSE";
     std::string end_label = label_radix + "END";
@@ -341,7 +356,6 @@ std::vector<StmtPtr> LoweringPass::lower(IfStmt& stmt) {
     add_if_not_cond_goto_stmt(out, stmt.condition->clone(), else_label, stmt.loc);
 
     // then statements
-    auto lowered_then_stmts = lower_stmts(stmt.then_stmts);
     append_stmts(out, lowered_then_stmts);
 
     // GOTO @end_label

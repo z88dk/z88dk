@@ -190,11 +190,3 @@ test_t_input_03_t.bas:433: 	SCROLL
 test_t_input_03_t.bas:439: 	CONT
 test_t_input_03_t.bas:445: 	CLEAR
 test_t_input_03_t.bas:451: 	COPY
-test_t_input_03_t.bas:457: IF 0 THEN PRINT "HELLO"
-test_t_input_03_t.bas:458: IF 1 THEN PRINT "WORLD"
-test_t_input_03_t.bas:464: 	GOTO @next1
-test_t_input_03_t.bas:465: @next1:
-test_t_input_03_t.bas:466: 	PRINT "A"
-test_t_input_03_t.bas:467: 	
-test_t_input_03_t.bas:468: 	GOTO 2000
-test_t_input_03_t.bas:469: 2000 PRINT "B"

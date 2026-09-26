@@ -461,21 +461,3 @@ Contents of test_t_input_01_t.pp:
 
 
 	COPY
-
-
-
-
-
-IF 0 THEN PRINT "HELLO"
-IF 1 THEN PRINT "WORLD"
-
-
-
-
-
-	GOTO @next1
-@next1:
-	PRINT "A"
-	
-	GOTO 2000
-2000 PRINT "B"

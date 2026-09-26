@@ -6,15 +6,7 @@ optimize:
 - PROC inlining
 - Control Flow Graph, eliminate empty branches simplify IFs with only one THEN
   statement
-- fix goto next line:
-		214 IF NOT(A=1)THEN GOTO 220
-		216 LET B=2
-		218 GOTO 220
-	@ZX81BAS3IFELSE:
-	@ZX81BAS3IFEND:
-		220 ...
 - reduce number of temp variables by reusing no longer needed ones
-- Fix: emitted code contains empty lines
 - Fix: preprocessor fails for single-quoted strings
 - Fix: preprocessor strings must contain only zx81 chars; fails for '%X'
   see preproc_tic.t, lexer_error.t

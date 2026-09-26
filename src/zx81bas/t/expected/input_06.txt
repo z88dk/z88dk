@@ -81,9 +81,6 @@ Symtab {
         "LABEL3" {
             location: test_t_input_06_t.bas:67
         }
-        "NEXT1" {
-            location: test_t_input_06_t.bas:465
-        }
         "START_REM" {
             location: test_t_input_06_t.bas:320
         }
@@ -100,9 +97,6 @@ Symtab {
         }
         1000 {
             location: test_t_input_06_t.bas:243
-        }
-        2000 {
-            location: test_t_input_06_t.bas:469
         }
     ]
 }

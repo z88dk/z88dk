@@ -936,32 +936,17 @@ L0096_START:
 
 L0096_END:
 
-;      98 IF NOT(A=1)THEN GOTO 104
+;      98 IF A=1 THEN LET B=2
         DDB     98
         DEFW    L0098_END - L0098_START
 L0098_START:
         DEFB    _IF
-        DEFB    _NOT
-        DEFB    _LPAREN
         DEFB    _A
         DEFB    _EQ
         DEFB    _1
         DEFB    _NUMBER
         FLOAT   1
-        DEFB    _RPAREN
         DEFB    _THEN
-        DEFB    _GOTO
-        DEFB    _1,_0,_4
-        DEFB    _NUMBER
-        FLOAT   104
-        DEFB    _NL
-
-L0098_END:
-
-;     100 LET B=2
-        DDB     100
-        DEFW    L0100_END - L0100_START
-L0100_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -970,26 +955,12 @@ L0100_START:
         FLOAT   2
         DEFB    _NL
 
-L0100_END:
+L0098_END:
 
-;     102 GOTO 104
-        DDB     102
-        DEFW    L0102_END - L0102_START
-L0102_START:
-        DEFB    _GOTO
-        DEFB    _1,_0,_4
-        DEFB    _NUMBER
-        FLOAT   104
-        DEFB    _NL
-
-L0102_END:
-
-ZX81BAS0IFELSE:
-ZX81BAS0IFEND:
-;     104 IF NOT(A<>1)THEN GOTO 108
-        DDB     104
-        DEFW    L0104_END - L0104_START
-L0104_START:
+;     100 IF NOT(A<>1)THEN GOTO 104
+        DDB     100
+        DEFW    L0100_END - L0100_START
+L0100_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -1001,26 +972,63 @@ L0104_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _1,_0,_8
+        DEFB    _1,_0,_4
         DEFB    _NUMBER
-        FLOAT   108
+        FLOAT   104
+        DEFB    _NL
+
+L0100_END:
+
+;     102 GOTO 106
+        DDB     102
+        DEFW    L0102_END - L0102_START
+L0102_START:
+        DEFB    _GOTO
+        DEFB    _1,_0,_6
+        DEFB    _NUMBER
+        FLOAT   106
+        DEFB    _NL
+
+L0102_END:
+
+ZX81BAS0IFELSE:
+;     104 LET B=2
+        DDB     104
+        DEFW    L0104_END - L0104_START
+L0104_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
         DEFB    _NL
 
 L0104_END:
 
-;     106 GOTO 110
+ZX81BAS0IFEND:
+;     106 IF NOT(A<1)THEN GOTO 114
         DDB     106
         DEFW    L0106_END - L0106_START
 L0106_START:
-        DEFB    _GOTO
-        DEFB    _1,_1,_0
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _LT
+        DEFB    _1
         DEFB    _NUMBER
-        FLOAT   110
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_1,_4
+        DEFB    _NUMBER
+        FLOAT   114
         DEFB    _NL
 
 L0106_END:
 
-ZX81BAS1IFELSE:
 ;     108 LET B=2
         DDB     108
         DEFW    L0108_END - L0108_START
@@ -1035,47 +1043,10 @@ L0108_START:
 
 L0108_END:
 
-ZX81BAS1IFEND:
-;     110 IF NOT(A<1)THEN GOTO 118
+;     110 LET C=3
         DDB     110
         DEFW    L0110_END - L0110_START
 L0110_START:
-        DEFB    _IF
-        DEFB    _NOT
-        DEFB    _LPAREN
-        DEFB    _A
-        DEFB    _LT
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _RPAREN
-        DEFB    _THEN
-        DEFB    _GOTO
-        DEFB    _1,_1,_8
-        DEFB    _NUMBER
-        FLOAT   118
-        DEFB    _NL
-
-L0110_END:
-
-;     112 LET B=2
-        DDB     112
-        DEFW    L0112_END - L0112_START
-L0112_START:
-        DEFB    _LET
-        DEFB    _B
-        DEFB    _EQ
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
-        DEFB    _NL
-
-L0112_END:
-
-;     114 LET C=3
-        DDB     114
-        DEFW    L0114_END - L0114_START
-L0114_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -1084,26 +1055,26 @@ L0114_START:
         FLOAT   3
         DEFB    _NL
 
-L0114_END:
+L0110_END:
 
-;     116 GOTO 118
-        DDB     116
-        DEFW    L0116_END - L0116_START
-L0116_START:
+;     112 GOTO 114
+        DDB     112
+        DEFW    L0112_END - L0112_START
+L0112_START:
         DEFB    _GOTO
-        DEFB    _1,_1,_8
+        DEFB    _1,_1,_4
         DEFB    _NUMBER
-        FLOAT   118
+        FLOAT   114
         DEFB    _NL
 
-L0116_END:
+L0112_END:
 
-ZX81BAS2IFELSE:
-ZX81BAS2IFEND:
-;     118 IF NOT(A<=1)THEN GOTO 126
-        DDB     118
-        DEFW    L0118_END - L0118_START
-L0118_START:
+ZX81BAS1IFELSE:
+ZX81BAS1IFEND:
+;     114 IF NOT(A<=1)THEN GOTO 122
+        DDB     114
+        DEFW    L0114_END - L0114_START
+L0114_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -1115,17 +1086,17 @@ L0118_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _1,_2,_6
+        DEFB    _1,_2,_2
         DEFB    _NUMBER
-        FLOAT   126
+        FLOAT   122
         DEFB    _NL
 
-L0118_END:
+L0114_END:
 
-;     120 LET B=2
-        DDB     120
-        DEFW    L0120_END - L0120_START
-L0120_START:
+;     116 LET B=2
+        DDB     116
+        DEFW    L0116_END - L0116_START
+L0116_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -1134,12 +1105,12 @@ L0120_START:
         FLOAT   2
         DEFB    _NL
 
-L0120_END:
+L0116_END:
 
-;     122 LET C=3
-        DDB     122
-        DEFW    L0122_END - L0122_START
-L0122_START:
+;     118 LET C=3
+        DDB     118
+        DEFW    L0118_END - L0118_START
+L0118_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -1148,26 +1119,26 @@ L0122_START:
         FLOAT   3
         DEFB    _NL
 
-L0122_END:
+L0118_END:
 
-;     124 GOTO 126
-        DDB     124
-        DEFW    L0124_END - L0124_START
-L0124_START:
+;     120 GOTO 122
+        DDB     120
+        DEFW    L0120_END - L0120_START
+L0120_START:
         DEFB    _GOTO
-        DEFB    _1,_2,_6
+        DEFB    _1,_2,_2
         DEFB    _NUMBER
-        FLOAT   126
+        FLOAT   122
         DEFB    _NL
 
-L0124_END:
+L0120_END:
 
-ZX81BAS3IFELSE:
-ZX81BAS3IFEND:
-;     126 IF NOT(A>1)THEN GOTO 134
-        DDB     126
-        DEFW    L0126_END - L0126_START
-L0126_START:
+ZX81BAS2IFELSE:
+ZX81BAS2IFEND:
+;     122 IF NOT(A>1)THEN GOTO 130
+        DDB     122
+        DEFW    L0122_END - L0122_START
+L0122_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -1179,17 +1150,17 @@ L0126_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _1,_3,_4
+        DEFB    _1,_3,_0
         DEFB    _NUMBER
-        FLOAT   134
+        FLOAT   130
         DEFB    _NL
 
-L0126_END:
+L0122_END:
 
-;     128 LET B=2
-        DDB     128
-        DEFW    L0128_END - L0128_START
-L0128_START:
+;     124 LET B=2
+        DDB     124
+        DEFW    L0124_END - L0124_START
+L0124_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -1198,12 +1169,12 @@ L0128_START:
         FLOAT   2
         DEFB    _NL
 
-L0128_END:
+L0124_END:
 
-;     130 LET C=3
-        DDB     130
-        DEFW    L0130_END - L0130_START
-L0130_START:
+;     126 LET C=3
+        DDB     126
+        DEFW    L0126_END - L0126_START
+L0126_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -1212,25 +1183,25 @@ L0130_START:
         FLOAT   3
         DEFB    _NL
 
-L0130_END:
+L0126_END:
 
-;     132 GOTO 136
-        DDB     132
-        DEFW    L0132_END - L0132_START
-L0132_START:
+;     128 GOTO 132
+        DDB     128
+        DEFW    L0128_END - L0128_START
+L0128_START:
         DEFB    _GOTO
-        DEFB    _1,_3,_6
+        DEFB    _1,_3,_2
         DEFB    _NUMBER
-        FLOAT   136
+        FLOAT   132
         DEFB    _NL
 
-L0132_END:
+L0128_END:
 
-ZX81BAS4IFELSE:
-;     134 LET D=4
-        DDB     134
-        DEFW    L0134_END - L0134_START
-L0134_START:
+ZX81BAS3IFELSE:
+;     130 LET D=4
+        DDB     130
+        DEFW    L0130_END - L0130_START
+L0130_START:
         DEFB    _LET
         DEFB    _D
         DEFB    _EQ
@@ -1239,13 +1210,13 @@ L0134_START:
         FLOAT   4
         DEFB    _NL
 
-L0134_END:
+L0130_END:
 
-ZX81BAS4IFEND:
-;     136 IF NOT(A>=1)THEN GOTO 144
-        DDB     136
-        DEFW    L0136_END - L0136_START
-L0136_START:
+ZX81BAS3IFEND:
+;     132 IF NOT(A>=1)THEN GOTO 140
+        DDB     132
+        DEFW    L0132_END - L0132_START
+L0132_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -1257,17 +1228,17 @@ L0136_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _1,_4,_4
+        DEFB    _1,_4,_0
         DEFB    _NUMBER
-        FLOAT   144
+        FLOAT   140
         DEFB    _NL
 
-L0136_END:
+L0132_END:
 
-;     138 LET B=2
-        DDB     138
-        DEFW    L0138_END - L0138_START
-L0138_START:
+;     134 LET B=2
+        DDB     134
+        DEFW    L0134_END - L0134_START
+L0134_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -1276,12 +1247,12 @@ L0138_START:
         FLOAT   2
         DEFB    _NL
 
-L0138_END:
+L0134_END:
 
-;     140 LET C=3
-        DDB     140
-        DEFW    L0140_END - L0140_START
-L0140_START:
+;     136 LET C=3
+        DDB     136
+        DEFW    L0136_END - L0136_START
+L0136_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -1290,25 +1261,25 @@ L0140_START:
         FLOAT   3
         DEFB    _NL
 
-L0140_END:
+L0136_END:
 
-;     142 GOTO 148
-        DDB     142
-        DEFW    L0142_END - L0142_START
-L0142_START:
+;     138 GOTO 144
+        DDB     138
+        DEFW    L0138_END - L0138_START
+L0138_START:
         DEFB    _GOTO
-        DEFB    _1,_4,_8
+        DEFB    _1,_4,_4
         DEFB    _NUMBER
-        FLOAT   148
+        FLOAT   144
         DEFB    _NL
 
-L0142_END:
+L0138_END:
 
-ZX81BAS5IFELSE:
-;     144 LET D=4
-        DDB     144
-        DEFW    L0144_END - L0144_START
-L0144_START:
+ZX81BAS4IFELSE:
+;     140 LET D=4
+        DDB     140
+        DEFW    L0140_END - L0140_START
+L0140_START:
         DEFB    _LET
         DEFB    _D
         DEFB    _EQ
@@ -1317,12 +1288,12 @@ L0144_START:
         FLOAT   4
         DEFB    _NL
 
-L0144_END:
+L0140_END:
 
-;     146 LET E=5
-        DDB     146
-        DEFW    L0146_END - L0146_START
-L0146_START:
+;     142 LET E=5
+        DDB     142
+        DEFW    L0142_END - L0142_START
+L0142_START:
         DEFB    _LET
         DEFB    _E
         DEFB    _EQ
@@ -1331,13 +1302,13 @@ L0146_START:
         FLOAT   5
         DEFB    _NL
 
-L0146_END:
+L0142_END:
 
-ZX81BAS5IFEND:
-;     148 IF NOT NOT(A=1)THEN GOTO 154
-        DDB     148
-        DEFW    L0148_END - L0148_START
-L0148_START:
+ZX81BAS4IFEND:
+;     144 IF NOT NOT(A=1)THEN GOTO 150
+        DDB     144
+        DEFW    L0144_END - L0144_START
+L0144_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _NOT
@@ -1350,17 +1321,17 @@ L0148_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _1,_5,_4
+        DEFB    _1,_5,_0
         DEFB    _NUMBER
-        FLOAT   154
+        FLOAT   150
         DEFB    _NL
 
-L0148_END:
+L0144_END:
 
-;     150 LET B=2
-        DDB     150
-        DEFW    L0150_END - L0150_START
-L0150_START:
+;     146 LET B=2
+        DDB     146
+        DEFW    L0146_END - L0146_START
+L0146_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -1369,25 +1340,25 @@ L0150_START:
         FLOAT   2
         DEFB    _NL
 
-L0150_END:
+L0146_END:
 
-;     152 GOTO 162
-        DDB     152
-        DEFW    L0152_END - L0152_START
-L0152_START:
+;     148 GOTO 158
+        DDB     148
+        DEFW    L0148_END - L0148_START
+L0148_START:
         DEFB    _GOTO
-        DEFB    _1,_6,_2
+        DEFB    _1,_5,_8
         DEFB    _NUMBER
-        FLOAT   162
+        FLOAT   158
         DEFB    _NL
 
-L0152_END:
+L0148_END:
 
-ZX81BAS6IFELSE:
-;     154 IF NOT(A=2)THEN GOTO 160
-        DDB     154
-        DEFW    L0154_END - L0154_START
-L0154_START:
+ZX81BAS5IFELSE:
+;     150 IF NOT(A=2)THEN GOTO 156
+        DDB     150
+        DEFW    L0150_END - L0150_START
+L0150_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -1399,17 +1370,17 @@ L0154_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _1,_6,_0
+        DEFB    _1,_5,_6
         DEFB    _NUMBER
-        FLOAT   160
+        FLOAT   156
         DEFB    _NL
 
-L0154_END:
+L0150_END:
 
-;     156 LET B=2
-        DDB     156
-        DEFW    L0156_END - L0156_START
-L0156_START:
+;     152 LET B=2
+        DDB     152
+        DEFW    L0152_END - L0152_START
+L0152_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -1418,25 +1389,25 @@ L0156_START:
         FLOAT   2
         DEFB    _NL
 
-L0156_END:
+L0152_END:
 
-;     158 GOTO 162
-        DDB     158
-        DEFW    L0158_END - L0158_START
-L0158_START:
+;     154 GOTO 158
+        DDB     154
+        DEFW    L0154_END - L0154_START
+L0154_START:
         DEFB    _GOTO
-        DEFB    _1,_6,_2
+        DEFB    _1,_5,_8
         DEFB    _NUMBER
-        FLOAT   162
+        FLOAT   158
         DEFB    _NL
 
-L0158_END:
+L0154_END:
 
-ZX81BAS7IFELSE:
-;     160 LET B=3
-        DDB     160
-        DEFW    L0160_END - L0160_START
-L0160_START:
+ZX81BAS6IFELSE:
+;     156 LET B=3
+        DDB     156
+        DEFW    L0156_END - L0156_START
+L0156_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -1445,14 +1416,14 @@ L0160_START:
         FLOAT   3
         DEFB    _NL
 
-L0160_END:
+L0156_END:
 
-ZX81BAS7IFEND:
 ZX81BAS6IFEND:
-;     162 IF NOT(A=1)THEN GOTO 170
-        DDB     162
-        DEFW    L0162_END - L0162_START
-L0162_START:
+ZX81BAS5IFEND:
+;     158 IF NOT(A=1)THEN GOTO 166
+        DDB     158
+        DEFW    L0158_END - L0158_START
+L0158_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -1464,59 +1435,59 @@ L0162_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _1,_7,_0
+        DEFB    _1,_6,_6
         DEFB    _NUMBER
-        FLOAT   170
+        FLOAT   166
+        DEFB    _NL
+
+L0158_END:
+
+;     160 LET B=1
+        DDB     160
+        DEFW    L0160_END - L0160_START
+L0160_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0160_END:
+
+;     162 LET C=1
+        DDB     162
+        DEFW    L0162_END - L0162_START
+L0162_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
         DEFB    _NL
 
 L0162_END:
 
-;     164 LET B=1
+;     164 GOTO 166
         DDB     164
         DEFW    L0164_END - L0164_START
 L0164_START:
-        DEFB    _LET
-        DEFB    _B
-        DEFB    _EQ
-        DEFB    _1
+        DEFB    _GOTO
+        DEFB    _1,_6,_6
         DEFB    _NUMBER
-        FLOAT   1
+        FLOAT   166
         DEFB    _NL
 
 L0164_END:
 
-;     166 LET C=1
+ZX81BAS7IFELSE:
+ZX81BAS7IFEND:
+;     166 IF NOT(A=1)THEN GOTO 174
         DDB     166
         DEFW    L0166_END - L0166_START
 L0166_START:
-        DEFB    _LET
-        DEFB    _C
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _NL
-
-L0166_END:
-
-;     168 GOTO 170
-        DDB     168
-        DEFW    L0168_END - L0168_START
-L0168_START:
-        DEFB    _GOTO
-        DEFB    _1,_7,_0
-        DEFB    _NUMBER
-        FLOAT   170
-        DEFB    _NL
-
-L0168_END:
-
-ZX81BAS8IFELSE:
-ZX81BAS8IFEND:
-;     170 IF NOT(A=1)THEN GOTO 178
-        DDB     170
-        DEFW    L0170_END - L0170_START
-L0170_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -1528,17 +1499,17 @@ L0170_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _1,_7,_8
+        DEFB    _1,_7,_4
         DEFB    _NUMBER
-        FLOAT   178
+        FLOAT   174
         DEFB    _NL
 
-L0170_END:
+L0166_END:
 
-;     172 LET B=1
-        DDB     172
-        DEFW    L0172_END - L0172_START
-L0172_START:
+;     168 LET B=1
+        DDB     168
+        DEFW    L0168_END - L0168_START
+L0168_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -1547,12 +1518,12 @@ L0172_START:
         FLOAT   1
         DEFB    _NL
 
-L0172_END:
+L0168_END:
 
-;     174 LET C=1
-        DDB     174
-        DEFW    L0174_END - L0174_START
-L0174_START:
+;     170 LET C=1
+        DDB     170
+        DEFW    L0170_END - L0170_START
+L0170_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -1561,27 +1532,63 @@ L0174_START:
         FLOAT   1
         DEFB    _NL
 
+L0170_END:
+
+;     172 GOTO 184
+        DDB     172
+        DEFW    L0172_END - L0172_START
+L0172_START:
+        DEFB    _GOTO
+        DEFB    _1,_8,_4
+        DEFB    _NUMBER
+        FLOAT   184
+        DEFB    _NL
+
+L0172_END:
+
+ZX81BAS8IFELSE:
+;     174 LET B=2
+        DDB     174
+        DEFW    L0174_END - L0174_START
+L0174_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
 L0174_END:
 
-;     176 GOTO 188
+;     176 IF NOT(A=2)THEN GOTO 182
         DDB     176
         DEFW    L0176_END - L0176_START
 L0176_START:
-        DEFB    _GOTO
-        DEFB    _1,_8,_8
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _2
         DEFB    _NUMBER
-        FLOAT   188
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_8,_2
+        DEFB    _NUMBER
+        FLOAT   182
         DEFB    _NL
 
 L0176_END:
 
-ZX81BAS9IFELSE:
-;     178 LET B=2
+;     178 LET C=2
         DDB     178
         DEFW    L0178_END - L0178_START
 L0178_START:
         DEFB    _LET
-        DEFB    _B
+        DEFB    _C
         DEFB    _EQ
         DEFB    _2
         DEFB    _NUMBER
@@ -1590,59 +1597,23 @@ L0178_START:
 
 L0178_END:
 
-;     180 IF NOT(A=2)THEN GOTO 186
+;     180 GOTO 184
         DDB     180
         DEFW    L0180_END - L0180_START
 L0180_START:
-        DEFB    _IF
-        DEFB    _NOT
-        DEFB    _LPAREN
-        DEFB    _A
-        DEFB    _EQ
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
-        DEFB    _RPAREN
-        DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _1,_8,_6
+        DEFB    _1,_8,_4
         DEFB    _NUMBER
-        FLOAT   186
+        FLOAT   184
         DEFB    _NL
 
 L0180_END:
 
-;     182 LET C=2
+ZX81BAS9IFELSE:
+;     182 LET C=3
         DDB     182
         DEFW    L0182_END - L0182_START
 L0182_START:
-        DEFB    _LET
-        DEFB    _C
-        DEFB    _EQ
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
-        DEFB    _NL
-
-L0182_END:
-
-;     184 GOTO 188
-        DDB     184
-        DEFW    L0184_END - L0184_START
-L0184_START:
-        DEFB    _GOTO
-        DEFB    _1,_8,_8
-        DEFB    _NUMBER
-        FLOAT   188
-        DEFB    _NL
-
-L0184_END:
-
-ZX81BAS10IFELSE:
-;     186 LET C=3
-        DDB     186
-        DEFW    L0186_END - L0186_START
-L0186_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -1651,14 +1622,14 @@ L0186_START:
         FLOAT   3
         DEFB    _NL
 
-L0186_END:
+L0182_END:
 
-ZX81BAS10IFEND:
 ZX81BAS9IFEND:
-;     188 IF NOT(A=1)THEN GOTO 196
-        DDB     188
-        DEFW    L0188_END - L0188_START
-L0188_START:
+ZX81BAS8IFEND:
+;     184 IF NOT(A=1)THEN GOTO 192
+        DDB     184
+        DEFW    L0184_END - L0184_START
+L0184_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -1670,17 +1641,17 @@ L0188_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _1,_9,_6
+        DEFB    _1,_9,_2
         DEFB    _NUMBER
-        FLOAT   196
+        FLOAT   192
         DEFB    _NL
 
-L0188_END:
+L0184_END:
 
-;     190 LET B=1
-        DDB     190
-        DEFW    L0190_END - L0190_START
-L0190_START:
+;     186 LET B=1
+        DDB     186
+        DEFW    L0186_END - L0186_START
+L0186_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -1689,12 +1660,12 @@ L0190_START:
         FLOAT   1
         DEFB    _NL
 
-L0190_END:
+L0186_END:
 
-;     192 LET C=1
-        DDB     192
-        DEFW    L0192_END - L0192_START
-L0192_START:
+;     188 LET C=1
+        DDB     188
+        DEFW    L0188_END - L0188_START
+L0188_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -1703,26 +1674,26 @@ L0192_START:
         FLOAT   1
         DEFB    _NL
 
-L0192_END:
+L0188_END:
 
-;     194 GOTO 196
-        DDB     194
-        DEFW    L0194_END - L0194_START
-L0194_START:
+;     190 GOTO 192
+        DDB     190
+        DEFW    L0190_END - L0190_START
+L0190_START:
         DEFB    _GOTO
-        DEFB    _1,_9,_6
+        DEFB    _1,_9,_2
         DEFB    _NUMBER
-        FLOAT   196
+        FLOAT   192
         DEFB    _NL
 
-L0194_END:
+L0190_END:
 
-ZX81BAS11IFELSE:
-ZX81BAS11IFEND:
-;     196 LET D=1
-        DDB     196
-        DEFW    L0196_END - L0196_START
-L0196_START:
+ZX81BAS10IFELSE:
+ZX81BAS10IFEND:
+;     192 LET D=1
+        DDB     192
+        DEFW    L0192_END - L0192_START
+L0192_START:
         DEFB    _LET
         DEFB    _D
         DEFB    _EQ
@@ -1731,15 +1702,53 @@ L0196_START:
         FLOAT   1
         DEFB    _NL
 
+L0192_END:
+
+ZX81BAS11REPEATSTART:
+;     194 LET A=1
+        DDB     194
+        DEFW    L0194_END - L0194_START
+L0194_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0194_END:
+
+;     196 IF NOT(A=1)THEN GOTO 194
+        DDB     196
+        DEFW    L0196_END - L0196_START
+L0196_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_9,_4
+        DEFB    _NUMBER
+        FLOAT   194
+        DEFB    _NL
+
 L0196_END:
 
+ZX81BAS11REPEATEND:
 ZX81BAS12REPEATSTART:
-;     198 LET A=1
+;     198 LET B=1
         DDB     198
         DEFW    L0198_END - L0198_START
 L0198_START:
         DEFB    _LET
-        DEFB    _A
+        DEFB    _B
         DEFB    _EQ
         DEFB    _1
         DEFB    _NUMBER
@@ -1748,49 +1757,11 @@ L0198_START:
 
 L0198_END:
 
-;     200 IF NOT(A=1)THEN GOTO 198
+ZX81BAS13REPEATSTART:
+;     200 LET C=1
         DDB     200
         DEFW    L0200_END - L0200_START
 L0200_START:
-        DEFB    _IF
-        DEFB    _NOT
-        DEFB    _LPAREN
-        DEFB    _A
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _RPAREN
-        DEFB    _THEN
-        DEFB    _GOTO
-        DEFB    _1,_9,_8
-        DEFB    _NUMBER
-        FLOAT   198
-        DEFB    _NL
-
-L0200_END:
-
-ZX81BAS12REPEATEND:
-ZX81BAS13REPEATSTART:
-;     202 LET B=1
-        DDB     202
-        DEFW    L0202_END - L0202_START
-L0202_START:
-        DEFB    _LET
-        DEFB    _B
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _NL
-
-L0202_END:
-
-ZX81BAS14REPEATSTART:
-;     204 LET C=1
-        DDB     204
-        DEFW    L0204_END - L0204_START
-L0204_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -1799,12 +1770,12 @@ L0204_START:
         FLOAT   1
         DEFB    _NL
 
-L0204_END:
+L0200_END:
 
-;     206 IF NOT(A=1)THEN GOTO 204
-        DDB     206
-        DEFW    L0206_END - L0206_START
-L0206_START:
+;     202 IF NOT(A=1)THEN GOTO 200
+        DDB     202
+        DEFW    L0202_END - L0202_START
+L0202_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -1816,18 +1787,18 @@ L0206_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _2,_0,_4
+        DEFB    _2,_0,_0
         DEFB    _NUMBER
-        FLOAT   204
+        FLOAT   200
         DEFB    _NL
 
-L0206_END:
+L0202_END:
 
-ZX81BAS14REPEATEND:
-;     208 IF NOT(A=2)THEN GOTO 202
-        DDB     208
-        DEFW    L0208_END - L0208_START
-L0208_START:
+ZX81BAS13REPEATEND:
+;     204 IF NOT(A=2)THEN GOTO 198
+        DDB     204
+        DEFW    L0204_END - L0204_START
+L0204_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -1839,19 +1810,19 @@ L0208_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _2,_0,_2
+        DEFB    _1,_9,_8
         DEFB    _NUMBER
-        FLOAT   202
+        FLOAT   198
         DEFB    _NL
 
-L0208_END:
+L0204_END:
 
-ZX81BAS13REPEATEND:
-ZX81BAS15REPEATSTART:
-;     210 LET A=1
-        DDB     210
-        DEFW    L0210_END - L0210_START
-L0210_START:
+ZX81BAS12REPEATEND:
+ZX81BAS14REPEATSTART:
+;     206 LET A=1
+        DDB     206
+        DEFW    L0206_END - L0206_START
+L0206_START:
         DEFB    _LET
         DEFB    _A
         DEFB    _EQ
@@ -1860,12 +1831,12 @@ L0210_START:
         FLOAT   1
         DEFB    _NL
 
-L0210_END:
+L0206_END:
 
-;     212 LET B=2
-        DDB     212
-        DEFW    L0212_END - L0212_START
-L0212_START:
+;     208 LET B=2
+        DDB     208
+        DEFW    L0208_END - L0208_START
+L0208_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -1874,9 +1845,43 @@ L0212_START:
         FLOAT   2
         DEFB    _NL
 
+L0208_END:
+
+;     210 IF A=2 THEN GOTO 218
+        DDB     210
+        DEFW    L0210_END - L0210_START
+L0210_START:
+        DEFB    _IF
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_1,_8
+        DEFB    _NUMBER
+        FLOAT   218
+        DEFB    _NL
+
+L0210_END:
+
+ZX81BAS15REPEATSTART:
+;     212 LET C=3
+        DDB     212
+        DEFW    L0212_END - L0212_START
+L0212_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
 L0212_END:
 
-;     214 IF NOT(A=2)THEN GOTO 220
+;     214 IF NOT(A=2)THEN GOTO 212
         DDB     214
         DEFW    L0214_END - L0214_START
 L0214_START:
@@ -1891,55 +1896,67 @@ L0214_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _2,_2,_0
+        DEFB    _2,_1,_2
         DEFB    _NUMBER
-        FLOAT   220
+        FLOAT   212
         DEFB    _NL
 
 L0214_END:
 
-;     216 GOTO 226
+ZX81BAS15REPEATEND:
+;     216 IF NOT(A=1)THEN GOTO 206
         DDB     216
         DEFW    L0216_END - L0216_START
 L0216_START:
-        DEFB    _GOTO
-        DEFB    _2,_2,_6
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
         DEFB    _NUMBER
-        FLOAT   226
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_0,_6
+        DEFB    _NUMBER
+        FLOAT   206
         DEFB    _NL
 
 L0216_END:
 
-;     218 GOTO 220
+ZX81BAS14REPEATEND:
+ZX81BAS16REPEATSTART:
+;     218 LET A=1
         DDB     218
         DEFW    L0218_END - L0218_START
 L0218_START:
-        DEFB    _GOTO
-        DEFB    _2,_2,_0
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
         DEFB    _NUMBER
-        FLOAT   220
+        FLOAT   1
         DEFB    _NL
 
 L0218_END:
 
-ZX81BAS16IFELSE:
-ZX81BAS16IFEND:
-ZX81BAS17REPEATSTART:
-;     220 LET C=3
+;     220 LET B=2
         DDB     220
         DEFW    L0220_END - L0220_START
 L0220_START:
         DEFB    _LET
-        DEFB    _C
+        DEFB    _B
         DEFB    _EQ
-        DEFB    _3
+        DEFB    _2
         DEFB    _NUMBER
-        FLOAT   3
+        FLOAT   2
         DEFB    _NL
 
 L0220_END:
 
-;     222 IF NOT(A=2)THEN GOTO 220
+;     222 IF NOT(A=1)THEN GOTO 218
         DDB     222
         DEFW    L0222_END - L0222_START
 L0222_START:
@@ -1948,99 +1965,24 @@ L0222_START:
         DEFB    _LPAREN
         DEFB    _A
         DEFB    _EQ
-        DEFB    _2
+        DEFB    _1
         DEFB    _NUMBER
-        FLOAT   2
+        FLOAT   1
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _2,_2,_0
+        DEFB    _2,_1,_8
         DEFB    _NUMBER
-        FLOAT   220
+        FLOAT   218
         DEFB    _NL
 
 L0222_END:
 
-ZX81BAS17REPEATEND:
-;     224 IF NOT(A=1)THEN GOTO 210
+ZX81BAS16REPEATEND:
+;     224 LET C=1
         DDB     224
         DEFW    L0224_END - L0224_START
 L0224_START:
-        DEFB    _IF
-        DEFB    _NOT
-        DEFB    _LPAREN
-        DEFB    _A
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _RPAREN
-        DEFB    _THEN
-        DEFB    _GOTO
-        DEFB    _2,_1,_0
-        DEFB    _NUMBER
-        FLOAT   210
-        DEFB    _NL
-
-L0224_END:
-
-ZX81BAS15REPEATEND:
-ZX81BAS18REPEATSTART:
-;     226 LET A=1
-        DDB     226
-        DEFW    L0226_END - L0226_START
-L0226_START:
-        DEFB    _LET
-        DEFB    _A
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _NL
-
-L0226_END:
-
-;     228 LET B=2
-        DDB     228
-        DEFW    L0228_END - L0228_START
-L0228_START:
-        DEFB    _LET
-        DEFB    _B
-        DEFB    _EQ
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
-        DEFB    _NL
-
-L0228_END:
-
-;     230 IF NOT(A=1)THEN GOTO 226
-        DDB     230
-        DEFW    L0230_END - L0230_START
-L0230_START:
-        DEFB    _IF
-        DEFB    _NOT
-        DEFB    _LPAREN
-        DEFB    _A
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _RPAREN
-        DEFB    _THEN
-        DEFB    _GOTO
-        DEFB    _2,_2,_6
-        DEFB    _NUMBER
-        FLOAT   226
-        DEFB    _NL
-
-L0230_END:
-
-ZX81BAS18REPEATEND:
-;     232 LET C=1
-        DDB     232
-        DEFW    L0232_END - L0232_START
-L0232_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -2049,13 +1991,13 @@ L0232_START:
         FLOAT   1
         DEFB    _NL
 
-L0232_END:
+L0224_END:
 
-ZX81BAS19WHILESTART:
-;     234 IF NOT(A<>1)THEN GOTO 244
-        DDB     234
-        DEFW    L0234_END - L0234_START
-L0234_START:
+ZX81BAS17WHILESTART:
+;     226 IF NOT(A<>1)THEN GOTO 236
+        DDB     226
+        DEFW    L0226_END - L0226_START
+L0226_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -2067,17 +2009,17 @@ L0234_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _2,_4,_4
+        DEFB    _2,_3,_6
         DEFB    _NUMBER
-        FLOAT   244
+        FLOAT   236
         DEFB    _NL
 
-L0234_END:
+L0226_END:
 
-;     236 LET A=1
-        DDB     236
-        DEFW    L0236_END - L0236_START
-L0236_START:
+;     228 LET A=1
+        DDB     228
+        DEFW    L0228_END - L0228_START
+L0228_START:
         DEFB    _LET
         DEFB    _A
         DEFB    _EQ
@@ -2086,12 +2028,12 @@ L0236_START:
         FLOAT   1
         DEFB    _NL
 
-L0236_END:
+L0228_END:
 
-;     238 LET B=2
-        DDB     238
-        DEFW    L0238_END - L0238_START
-L0238_START:
+;     230 LET B=2
+        DDB     230
+        DEFW    L0230_END - L0230_START
+L0230_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -2100,12 +2042,12 @@ L0238_START:
         FLOAT   2
         DEFB    _NL
 
-L0238_END:
+L0230_END:
 
-;     240 LET C=3
-        DDB     240
-        DEFW    L0240_END - L0240_START
-L0240_START:
+;     232 LET C=3
+        DDB     232
+        DEFW    L0232_END - L0232_START
+L0232_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -2114,26 +2056,26 @@ L0240_START:
         FLOAT   3
         DEFB    _NL
 
-L0240_END:
+L0232_END:
 
-;     242 GOTO 234
-        DDB     242
-        DEFW    L0242_END - L0242_START
-L0242_START:
+;     234 GOTO 226
+        DDB     234
+        DEFW    L0234_END - L0234_START
+L0234_START:
         DEFB    _GOTO
-        DEFB    _2,_3,_4
+        DEFB    _2,_2,_6
         DEFB    _NUMBER
-        FLOAT   234
+        FLOAT   226
         DEFB    _NL
 
-L0242_END:
+L0234_END:
 
-ZX81BAS19WHILEEND:
-ZX81BAS20WHILESTART:
-;     244 IF NOT(A=1)THEN GOTO 256
-        DDB     244
-        DEFW    L0244_END - L0244_START
-L0244_START:
+ZX81BAS17WHILEEND:
+ZX81BAS18WHILESTART:
+;     236 IF NOT(A=1)THEN GOTO 248
+        DDB     236
+        DEFW    L0236_END - L0236_START
+L0236_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -2145,17 +2087,17 @@ L0244_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _2,_5,_6
+        DEFB    _2,_4,_8
         DEFB    _NUMBER
-        FLOAT   256
+        FLOAT   248
         DEFB    _NL
 
-L0244_END:
+L0236_END:
 
-;     246 LET B=1
-        DDB     246
-        DEFW    L0246_END - L0246_START
-L0246_START:
+;     238 LET B=1
+        DDB     238
+        DEFW    L0238_END - L0238_START
+L0238_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -2164,13 +2106,13 @@ L0246_START:
         FLOAT   1
         DEFB    _NL
 
-L0246_END:
+L0238_END:
 
-ZX81BAS21WHILESTART:
-;     248 IF NOT(A=2)THEN GOTO 254
-        DDB     248
-        DEFW    L0248_END - L0248_START
-L0248_START:
+ZX81BAS19WHILESTART:
+;     240 IF NOT(A=2)THEN GOTO 246
+        DDB     240
+        DEFW    L0240_END - L0240_START
+L0240_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -2182,19 +2124,82 @@ L0248_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _2,_5,_4
+        DEFB    _2,_4,_6
         DEFB    _NUMBER
-        FLOAT   254
+        FLOAT   246
+        DEFB    _NL
+
+L0240_END:
+
+;     242 LET C=1
+        DDB     242
+        DEFW    L0242_END - L0242_START
+L0242_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0242_END:
+
+;     244 GOTO 240
+        DDB     244
+        DEFW    L0244_END - L0244_START
+L0244_START:
+        DEFB    _GOTO
+        DEFB    _2,_4,_0
+        DEFB    _NUMBER
+        FLOAT   240
+        DEFB    _NL
+
+L0244_END:
+
+ZX81BAS19WHILEEND:
+;     246 GOTO 236
+        DDB     246
+        DEFW    L0246_END - L0246_START
+L0246_START:
+        DEFB    _GOTO
+        DEFB    _2,_3,_6
+        DEFB    _NUMBER
+        FLOAT   236
+        DEFB    _NL
+
+L0246_END:
+
+ZX81BAS18WHILEEND:
+ZX81BAS20WHILESTART:
+;     248 IF NOT(A<>1)THEN GOTO 264
+        DDB     248
+        DEFW    L0248_END - L0248_START
+L0248_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _NE
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_6,_4
+        DEFB    _NUMBER
+        FLOAT   264
         DEFB    _NL
 
 L0248_END:
 
-;     250 LET C=1
+;     250 LET A=1
         DDB     250
         DEFW    L0250_END - L0250_START
 L0250_START:
         DEFB    _LET
-        DEFB    _C
+        DEFB    _A
         DEFB    _EQ
         DEFB    _1
         DEFB    _NUMBER
@@ -2203,73 +2208,10 @@ L0250_START:
 
 L0250_END:
 
-;     252 GOTO 248
+;     252 LET B=2
         DDB     252
         DEFW    L0252_END - L0252_START
 L0252_START:
-        DEFB    _GOTO
-        DEFB    _2,_4,_8
-        DEFB    _NUMBER
-        FLOAT   248
-        DEFB    _NL
-
-L0252_END:
-
-ZX81BAS21WHILEEND:
-;     254 GOTO 244
-        DDB     254
-        DEFW    L0254_END - L0254_START
-L0254_START:
-        DEFB    _GOTO
-        DEFB    _2,_4,_4
-        DEFB    _NUMBER
-        FLOAT   244
-        DEFB    _NL
-
-L0254_END:
-
-ZX81BAS20WHILEEND:
-ZX81BAS22WHILESTART:
-;     256 IF NOT(A<>1)THEN GOTO 276
-        DDB     256
-        DEFW    L0256_END - L0256_START
-L0256_START:
-        DEFB    _IF
-        DEFB    _NOT
-        DEFB    _LPAREN
-        DEFB    _A
-        DEFB    _NE
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _RPAREN
-        DEFB    _THEN
-        DEFB    _GOTO
-        DEFB    _2,_7,_6
-        DEFB    _NUMBER
-        FLOAT   276
-        DEFB    _NL
-
-L0256_END:
-
-;     258 LET A=1
-        DDB     258
-        DEFW    L0258_END - L0258_START
-L0258_START:
-        DEFB    _LET
-        DEFB    _A
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _NL
-
-L0258_END:
-
-;     260 LET B=2
-        DDB     260
-        DEFW    L0260_END - L0260_START
-L0260_START:
         DEFB    _LET
         DEFB    _B
         DEFB    _EQ
@@ -2278,61 +2220,32 @@ L0260_START:
         FLOAT   2
         DEFB    _NL
 
-L0260_END:
+L0252_END:
 
-;     262 IF NOT(A=2)THEN GOTO 268
-        DDB     262
-        DEFW    L0262_END - L0262_START
-L0262_START:
+;     254 IF A=2 THEN GOTO 264
+        DDB     254
+        DEFW    L0254_END - L0254_START
+L0254_START:
         DEFB    _IF
-        DEFB    _NOT
-        DEFB    _LPAREN
         DEFB    _A
         DEFB    _EQ
         DEFB    _2
         DEFB    _NUMBER
         FLOAT   2
-        DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _2,_6,_8
+        DEFB    _2,_6,_4
         DEFB    _NUMBER
-        FLOAT   268
+        FLOAT   264
         DEFB    _NL
 
-L0262_END:
+L0254_END:
 
-;     264 GOTO 276
-        DDB     264
-        DEFW    L0264_END - L0264_START
-L0264_START:
-        DEFB    _GOTO
-        DEFB    _2,_7,_6
-        DEFB    _NUMBER
-        FLOAT   276
-        DEFB    _NL
-
-L0264_END:
-
-;     266 GOTO 268
-        DDB     266
-        DEFW    L0266_END - L0266_START
-L0266_START:
-        DEFB    _GOTO
-        DEFB    _2,_6,_8
-        DEFB    _NUMBER
-        FLOAT   268
-        DEFB    _NL
-
-L0266_END:
-
-ZX81BAS23IFELSE:
-ZX81BAS23IFEND:
-ZX81BAS24WHILESTART:
-;     268 IF NOT(A<>2)THEN GOTO 274
-        DDB     268
-        DEFW    L0268_END - L0268_START
-L0268_START:
+ZX81BAS21WHILESTART:
+;     256 IF NOT(A<>2)THEN GOTO 262
+        DDB     256
+        DEFW    L0256_END - L0256_START
+L0256_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -2344,17 +2257,17 @@ L0268_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _2,_7,_4
+        DEFB    _2,_6,_2
         DEFB    _NUMBER
-        FLOAT   274
+        FLOAT   262
         DEFB    _NL
 
-L0268_END:
+L0256_END:
 
-;     270 LET C=3
-        DDB     270
-        DEFW    L0270_END - L0270_START
-L0270_START:
+;     258 LET C=3
+        DDB     258
+        DEFW    L0258_END - L0258_START
+L0258_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -2363,39 +2276,39 @@ L0270_START:
         FLOAT   3
         DEFB    _NL
 
-L0270_END:
+L0258_END:
 
-;     272 GOTO 268
-        DDB     272
-        DEFW    L0272_END - L0272_START
-L0272_START:
-        DEFB    _GOTO
-        DEFB    _2,_6,_8
-        DEFB    _NUMBER
-        FLOAT   268
-        DEFB    _NL
-
-L0272_END:
-
-ZX81BAS24WHILEEND:
-;     274 GOTO 256
-        DDB     274
-        DEFW    L0274_END - L0274_START
-L0274_START:
+;     260 GOTO 256
+        DDB     260
+        DEFW    L0260_END - L0260_START
+L0260_START:
         DEFB    _GOTO
         DEFB    _2,_5,_6
         DEFB    _NUMBER
         FLOAT   256
         DEFB    _NL
 
-L0274_END:
+L0260_END:
 
-ZX81BAS22WHILEEND:
-ZX81BAS25WHILESTART:
-;     276 IF NOT(A<>2)THEN GOTO 282
-        DDB     276
-        DEFW    L0276_END - L0276_START
-L0276_START:
+ZX81BAS21WHILEEND:
+;     262 GOTO 248
+        DDB     262
+        DEFW    L0262_END - L0262_START
+L0262_START:
+        DEFB    _GOTO
+        DEFB    _2,_4,_8
+        DEFB    _NUMBER
+        FLOAT   248
+        DEFB    _NL
+
+L0262_END:
+
+ZX81BAS20WHILEEND:
+ZX81BAS22WHILESTART:
+;     264 IF NOT(A<>2)THEN GOTO 270
+        DDB     264
+        DEFW    L0264_END - L0264_START
+L0264_START:
         DEFB    _IF
         DEFB    _NOT
         DEFB    _LPAREN
@@ -2407,17 +2320,17 @@ L0276_START:
         DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _2,_8,_2
+        DEFB    _2,_7,_0
         DEFB    _NUMBER
-        FLOAT   282
+        FLOAT   270
         DEFB    _NL
 
-L0276_END:
+L0264_END:
 
-;     278 LET C=3
-        DDB     278
-        DEFW    L0278_END - L0278_START
-L0278_START:
+;     266 LET C=3
+        DDB     266
+        DEFW    L0266_END - L0266_START
+L0266_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -2426,25 +2339,25 @@ L0278_START:
         FLOAT   3
         DEFB    _NL
 
-L0278_END:
+L0266_END:
 
-;     280 GOTO 276
-        DDB     280
-        DEFW    L0280_END - L0280_START
-L0280_START:
+;     268 GOTO 264
+        DDB     268
+        DEFW    L0268_END - L0268_START
+L0268_START:
         DEFB    _GOTO
-        DEFB    _2,_7,_6
+        DEFB    _2,_6,_4
         DEFB    _NUMBER
-        FLOAT   276
+        FLOAT   264
         DEFB    _NL
 
-L0280_END:
+L0268_END:
 
-ZX81BAS25WHILEEND:
-;     282 LET C=4
-        DDB     282
-        DEFW    L0282_END - L0282_START
-L0282_START:
+ZX81BAS22WHILEEND:
+;     270 LET C=4
+        DDB     270
+        DEFW    L0270_END - L0270_START
+L0270_START:
         DEFB    _LET
         DEFB    _C
         DEFB    _EQ
@@ -2453,12 +2366,12 @@ L0282_START:
         FLOAT   4
         DEFB    _NL
 
-L0282_END:
+L0270_END:
 
-;     284 LET S=0
-        DDB     284
-        DEFW    L0284_END - L0284_START
-L0284_START:
+;     272 LET S=0
+        DDB     272
+        DEFW    L0272_END - L0272_START
+L0272_START:
         DEFB    _LET
         DEFB    _S
         DEFB    _EQ
@@ -2467,12 +2380,12 @@ L0284_START:
         FLOAT   0
         DEFB    _NL
 
-L0284_END:
+L0272_END:
 
-;     286 FOR I=1 TO 10 STEP SGN 1
-        DDB     286
-        DEFW    L0286_END - L0286_START
-L0286_START:
+;     274 FOR I=1 TO 10 STEP SGN 1
+        DDB     274
+        DEFW    L0274_END - L0274_START
+L0274_START:
         DEFB    _FOR
         DEFB    _I
         DEFB    _EQ
@@ -2490,109 +2403,109 @@ L0286_START:
         FLOAT   1
         DEFB    _NL
 
-L0286_END:
+L0274_END:
 
-;     288 LET S=S+I
-        DDB     288
-        DEFW    L0288_END - L0288_START
-L0288_START:
+;     276 LET S=S+I
+        DDB     276
+        DEFW    L0276_END - L0276_START
+L0276_START:
         DEFB    _LET
         DEFB    _S
         DEFB    _EQ
         DEFB    _S
         DEFB    _PLUS
+        DEFB    _I
+        DEFB    _NL
+
+L0276_END:
+
+;     278 NEXT I
+        DDB     278
+        DEFW    L0278_END - L0278_START
+L0278_START:
+        DEFB    _NEXT
+        DEFB    _I
+        DEFB    _NL
+
+L0278_END:
+
+ZX81BAS23FOREND:
+;     280 FOR I=1 TO 10
+        DDB     280
+        DEFW    L0280_END - L0280_START
+L0280_START:
+        DEFB    _FOR
+        DEFB    _I
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _NL
+
+L0280_END:
+
+;     282 FOR J=1 TO 10
+        DDB     282
+        DEFW    L0282_END - L0282_START
+L0282_START:
+        DEFB    _FOR
+        DEFB    _J
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _NL
+
+L0282_END:
+
+;     284 LET A=I*J
+        DDB     284
+        DEFW    L0284_END - L0284_START
+L0284_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _I
+        DEFB    _MULT
+        DEFB    _J
+        DEFB    _NL
+
+L0284_END:
+
+;     286 NEXT J
+        DDB     286
+        DEFW    L0286_END - L0286_START
+L0286_START:
+        DEFB    _NEXT
+        DEFB    _J
+        DEFB    _NL
+
+L0286_END:
+
+ZX81BAS25FOREND:
+;     288 NEXT I
+        DDB     288
+        DEFW    L0288_END - L0288_START
+L0288_START:
+        DEFB    _NEXT
         DEFB    _I
         DEFB    _NL
 
 L0288_END:
 
-;     290 NEXT I
+ZX81BAS24FOREND:
+;     290 FOR I=1 TO 10 STEP 2
         DDB     290
         DEFW    L0290_END - L0290_START
 L0290_START:
-        DEFB    _NEXT
-        DEFB    _I
-        DEFB    _NL
-
-L0290_END:
-
-ZX81BAS26FOREND:
-;     292 FOR I=1 TO 10
-        DDB     292
-        DEFW    L0292_END - L0292_START
-L0292_START:
-        DEFB    _FOR
-        DEFB    _I
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _TO
-        DEFB    _1,_0
-        DEFB    _NUMBER
-        FLOAT   10
-        DEFB    _NL
-
-L0292_END:
-
-;     294 FOR J=1 TO 10
-        DDB     294
-        DEFW    L0294_END - L0294_START
-L0294_START:
-        DEFB    _FOR
-        DEFB    _J
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _TO
-        DEFB    _1,_0
-        DEFB    _NUMBER
-        FLOAT   10
-        DEFB    _NL
-
-L0294_END:
-
-;     296 LET A=I*J
-        DDB     296
-        DEFW    L0296_END - L0296_START
-L0296_START:
-        DEFB    _LET
-        DEFB    _A
-        DEFB    _EQ
-        DEFB    _I
-        DEFB    _MULT
-        DEFB    _J
-        DEFB    _NL
-
-L0296_END:
-
-;     298 NEXT J
-        DDB     298
-        DEFW    L0298_END - L0298_START
-L0298_START:
-        DEFB    _NEXT
-        DEFB    _J
-        DEFB    _NL
-
-L0298_END:
-
-ZX81BAS28FOREND:
-;     300 NEXT I
-        DDB     300
-        DEFW    L0300_END - L0300_START
-L0300_START:
-        DEFB    _NEXT
-        DEFB    _I
-        DEFB    _NL
-
-L0300_END:
-
-ZX81BAS27FOREND:
-;     302 FOR I=1 TO 10 STEP 2
-        DDB     302
-        DEFW    L0302_END - L0302_START
-L0302_START:
         DEFB    _FOR
         DEFB    _I
         DEFB    _EQ
@@ -2609,12 +2522,12 @@ L0302_START:
         FLOAT   2
         DEFB    _NL
 
-L0302_END:
+L0290_END:
 
-;     304 LET S=S+I
-        DDB     304
-        DEFW    L0304_END - L0304_START
-L0304_START:
+;     292 LET S=S+I
+        DDB     292
+        DEFW    L0292_END - L0292_START
+L0292_START:
         DEFB    _LET
         DEFB    _S
         DEFB    _EQ
@@ -2623,266 +2536,237 @@ L0304_START:
         DEFB    _I
         DEFB    _NL
 
-L0304_END:
+L0292_END:
 
-;     306 IF NOT(I=2)THEN GOTO 312
-        DDB     306
-        DEFW    L0306_END - L0306_START
-L0306_START:
+;     294 IF I=2 THEN GOTO 304
+        DDB     294
+        DEFW    L0294_END - L0294_START
+L0294_START:
         DEFB    _IF
-        DEFB    _NOT
-        DEFB    _LPAREN
         DEFB    _I
         DEFB    _EQ
         DEFB    _2
         DEFB    _NUMBER
         FLOAT   2
-        DEFB    _RPAREN
         DEFB    _THEN
         DEFB    _GOTO
-        DEFB    _3,_1,_2
+        DEFB    _3,_0,_4
         DEFB    _NUMBER
-        FLOAT   312
+        FLOAT   304
+        DEFB    _NL
+
+L0294_END:
+
+;     296 FOR J=1 TO 10 STEP 2
+        DDB     296
+        DEFW    L0296_END - L0296_START
+L0296_START:
+        DEFB    _FOR
+        DEFB    _J
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _STEP
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0296_END:
+
+;     298 LET A=I*J
+        DDB     298
+        DEFW    L0298_END - L0298_START
+L0298_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _I
+        DEFB    _MULT
+        DEFB    _J
+        DEFB    _NL
+
+L0298_END:
+
+;     300 NEXT J
+        DDB     300
+        DEFW    L0300_END - L0300_START
+L0300_START:
+        DEFB    _NEXT
+        DEFB    _J
+        DEFB    _NL
+
+L0300_END:
+
+ZX81BAS27FOREND:
+;     302 NEXT I
+        DDB     302
+        DEFW    L0302_END - L0302_START
+L0302_START:
+        DEFB    _NEXT
+        DEFB    _I
+        DEFB    _NL
+
+L0302_END:
+
+ZX81BAS26FOREND:
+;     304 FOR I=1 TO 10
+        DDB     304
+        DEFW    L0304_END - L0304_START
+L0304_START:
+        DEFB    _FOR
+        DEFB    _I
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _NL
+
+L0304_END:
+
+;     306 FOR J=1 TO 10
+        DDB     306
+        DEFW    L0306_END - L0306_START
+L0306_START:
+        DEFB    _FOR
+        DEFB    _J
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
         DEFB    _NL
 
 L0306_END:
 
-;     308 GOTO 320
+;     308 LET A=I*J
         DDB     308
         DEFW    L0308_END - L0308_START
 L0308_START:
-        DEFB    _GOTO
-        DEFB    _3,_2,_0
-        DEFB    _NUMBER
-        FLOAT   320
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _I
+        DEFB    _MULT
+        DEFB    _J
         DEFB    _NL
 
 L0308_END:
 
-;     310 GOTO 312
+;     310 NEXT J
         DDB     310
         DEFW    L0310_END - L0310_START
 L0310_START:
-        DEFB    _GOTO
-        DEFB    _3,_1,_2
-        DEFB    _NUMBER
-        FLOAT   312
+        DEFB    _NEXT
+        DEFB    _J
         DEFB    _NL
 
 L0310_END:
 
-ZX81BAS30IFELSE:
-ZX81BAS30IFEND:
-;     312 FOR J=1 TO 10 STEP 2
+ZX81BAS29FOREND:
+;     312 NEXT I
         DDB     312
         DEFW    L0312_END - L0312_START
 L0312_START:
-        DEFB    _FOR
-        DEFB    _J
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _TO
-        DEFB    _1,_0
-        DEFB    _NUMBER
-        FLOAT   10
-        DEFB    _STEP
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
+        DEFB    _NEXT
+        DEFB    _I
         DEFB    _NL
 
 L0312_END:
 
-;     314 LET A=I*J
+ZX81BAS28FOREND:
+;     314 FOR I=1 TO 10 STEP 2
         DDB     314
         DEFW    L0314_END - L0314_START
 L0314_START:
-        DEFB    _LET
-        DEFB    _A
-        DEFB    _EQ
+        DEFB    _FOR
         DEFB    _I
-        DEFB    _MULT
-        DEFB    _J
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _STEP
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
         DEFB    _NL
 
 L0314_END:
 
-;     316 NEXT J
+;     316 FOR J=1 TO 10 STEP 2
         DDB     316
         DEFW    L0316_END - L0316_START
 L0316_START:
-        DEFB    _NEXT
+        DEFB    _FOR
         DEFB    _J
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _STEP
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
         DEFB    _NL
 
 L0316_END:
 
-ZX81BAS31FOREND:
-;     318 NEXT I
+;     318 LET A=I*J
         DDB     318
         DEFW    L0318_END - L0318_START
 L0318_START:
-        DEFB    _NEXT
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
         DEFB    _I
+        DEFB    _MULT
+        DEFB    _J
         DEFB    _NL
 
 L0318_END:
 
-ZX81BAS29FOREND:
-;     320 FOR I=1 TO 10
+;     320 NEXT J
         DDB     320
         DEFW    L0320_END - L0320_START
 L0320_START:
-        DEFB    _FOR
-        DEFB    _I
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _TO
-        DEFB    _1,_0
-        DEFB    _NUMBER
-        FLOAT   10
+        DEFB    _NEXT
+        DEFB    _J
         DEFB    _NL
 
 L0320_END:
 
-;     322 FOR J=1 TO 10
+ZX81BAS31FOREND:
+;     322 NEXT I
         DDB     322
         DEFW    L0322_END - L0322_START
 L0322_START:
-        DEFB    _FOR
-        DEFB    _J
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _TO
-        DEFB    _1,_0
-        DEFB    _NUMBER
-        FLOAT   10
+        DEFB    _NEXT
+        DEFB    _I
         DEFB    _NL
 
 L0322_END:
 
-;     324 LET A=I*J
-        DDB     324
-        DEFW    L0324_END - L0324_START
-L0324_START:
-        DEFB    _LET
-        DEFB    _A
-        DEFB    _EQ
-        DEFB    _I
-        DEFB    _MULT
-        DEFB    _J
-        DEFB    _NL
-
-L0324_END:
-
-;     326 NEXT J
-        DDB     326
-        DEFW    L0326_END - L0326_START
-L0326_START:
-        DEFB    _NEXT
-        DEFB    _J
-        DEFB    _NL
-
-L0326_END:
-
-ZX81BAS33FOREND:
-;     328 NEXT I
-        DDB     328
-        DEFW    L0328_END - L0328_START
-L0328_START:
-        DEFB    _NEXT
-        DEFB    _I
-        DEFB    _NL
-
-L0328_END:
-
-ZX81BAS32FOREND:
-;     330 FOR I=1 TO 10 STEP 2
-        DDB     330
-        DEFW    L0330_END - L0330_START
-L0330_START:
-        DEFB    _FOR
-        DEFB    _I
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _TO
-        DEFB    _1,_0
-        DEFB    _NUMBER
-        FLOAT   10
-        DEFB    _STEP
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
-        DEFB    _NL
-
-L0330_END:
-
-;     332 FOR J=1 TO 10 STEP 2
-        DDB     332
-        DEFW    L0332_END - L0332_START
-L0332_START:
-        DEFB    _FOR
-        DEFB    _J
-        DEFB    _EQ
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _TO
-        DEFB    _1,_0
-        DEFB    _NUMBER
-        FLOAT   10
-        DEFB    _STEP
-        DEFB    _2
-        DEFB    _NUMBER
-        FLOAT   2
-        DEFB    _NL
-
-L0332_END:
-
-;     334 LET A=I*J
-        DDB     334
-        DEFW    L0334_END - L0334_START
-L0334_START:
-        DEFB    _LET
-        DEFB    _A
-        DEFB    _EQ
-        DEFB    _I
-        DEFB    _MULT
-        DEFB    _J
-        DEFB    _NL
-
-L0334_END:
-
-;     336 NEXT J
-        DDB     336
-        DEFW    L0336_END - L0336_START
-L0336_START:
-        DEFB    _NEXT
-        DEFB    _J
-        DEFB    _NL
-
-L0336_END:
-
-ZX81BAS35FOREND:
-;     338 NEXT I
-        DDB     338
-        DEFW    L0338_END - L0338_START
-L0338_START:
-        DEFB    _NEXT
-        DEFB    _I
-        DEFB    _NL
-
-L0338_END:
-
-ZX81BAS34FOREND:
+ZX81BAS30FOREND:
 ;    1000 GOTO 1000
         DDB     1000
         DEFW    L1000_END - L1000_START
@@ -3861,143 +3745,6 @@ L1140_START:
         DEFB    _NL
 
 L1140_END:
-
-;    1142 IF NOT 0 THEN GOTO 1148
-        DDB     1142
-        DEFW    L1142_END - L1142_START
-L1142_START:
-        DEFB    _IF
-        DEFB    _NOT
-        DEFB    _0
-        DEFB    _NUMBER
-        FLOAT   0
-        DEFB    _THEN
-        DEFB    _GOTO
-        DEFB    _1,_1,_4,_8
-        DEFB    _NUMBER
-        FLOAT   1148
-        DEFB    _NL
-
-L1142_END:
-
-;    1144 PRINT"HELLO"
-        DDB     1144
-        DEFW    L1144_END - L1144_START
-L1144_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _H,_E,_L,_L,_O
-        DEFB    _QUOTE
-        DEFB    _NL
-
-L1144_END:
-
-;    1146 GOTO 1148
-        DDB     1146
-        DEFW    L1146_END - L1146_START
-L1146_START:
-        DEFB    _GOTO
-        DEFB    _1,_1,_4,_8
-        DEFB    _NUMBER
-        FLOAT   1148
-        DEFB    _NL
-
-L1146_END:
-
-ZX81BAS36IFELSE:
-ZX81BAS36IFEND:
-;    1148 IF NOT 1 THEN GOTO 1154
-        DDB     1148
-        DEFW    L1148_END - L1148_START
-L1148_START:
-        DEFB    _IF
-        DEFB    _NOT
-        DEFB    _1
-        DEFB    _NUMBER
-        FLOAT   1
-        DEFB    _THEN
-        DEFB    _GOTO
-        DEFB    _1,_1,_5,_4
-        DEFB    _NUMBER
-        FLOAT   1154
-        DEFB    _NL
-
-L1148_END:
-
-;    1150 PRINT"WORLD"
-        DDB     1150
-        DEFW    L1150_END - L1150_START
-L1150_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _W,_O,_R,_L,_D
-        DEFB    _QUOTE
-        DEFB    _NL
-
-L1150_END:
-
-;    1152 GOTO 1154
-        DDB     1152
-        DEFW    L1152_END - L1152_START
-L1152_START:
-        DEFB    _GOTO
-        DEFB    _1,_1,_5,_4
-        DEFB    _NUMBER
-        FLOAT   1154
-        DEFB    _NL
-
-L1152_END:
-
-ZX81BAS37IFELSE:
-ZX81BAS37IFEND:
-;    1154 GOTO 1156
-        DDB     1154
-        DEFW    L1154_END - L1154_START
-L1154_START:
-        DEFB    _GOTO
-        DEFB    _1,_1,_5,_6
-        DEFB    _NUMBER
-        FLOAT   1156
-        DEFB    _NL
-
-L1154_END:
-
-NEXT1:
-;    1156 PRINT"A"
-        DDB     1156
-        DEFW    L1156_END - L1156_START
-L1156_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _A
-        DEFB    _QUOTE
-        DEFB    _NL
-
-L1156_END:
-
-;    1158 GOTO 2000
-        DDB     1158
-        DEFW    L1158_END - L1158_START
-L1158_START:
-        DEFB    _GOTO
-        DEFB    _2,_0,_0,_0
-        DEFB    _NUMBER
-        FLOAT   2000
-        DEFB    _NL
-
-L1158_END:
-
-;    2000 PRINT"B"
-        DDB     2000
-        DEFW    L2000_END - L2000_START
-L2000_START:
-        DEFB    _PRINT
-        DEFB    _QUOTE
-        DEFB    _B
-        DEFB    _QUOTE
-        DEFB    _NL
-
-L2000_END:
 
 
 ; Display file

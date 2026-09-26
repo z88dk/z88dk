@@ -1059,62 +1059,30 @@ Prog {
         IfStmt {
             location: t/50-codegen/input/def_proc.bas:23
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: t/50-codegen/input/def_proc.bas:23
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: =
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: t/50-codegen/input/def_proc.bas:23
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: t/50-codegen/input/def_proc.bas:23
-                                    name: "PROC1A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: t/50-codegen/input/def_proc.bas:23
-                                    value: 2.000000
-                                }
+                            name: "PROC1A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/50-codegen/input/def_proc.bas:23
+                            value: 2.000000
                         }
                 }
             then_stmts: [
-                GotoStmt {
+                ReturnStmt {
                     location: t/50-codegen/input/def_proc.bas:23
-                    target_expr: 
-                        LabelLineRefExpr {
-                            type: Number
-                            location: t/50-codegen/input/def_proc.bas:23
-                            name: "ZX81BAS11IFELSE"
-                        }
                 }
             ]
             else_stmts: [
             ]
-        }
-        ReturnStmt {
-            location: t/50-codegen/input/def_proc.bas:23
-        }
-        GotoStmt {
-            location: t/50-codegen/input/def_proc.bas:23
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: t/50-codegen/input/def_proc.bas:23
-                    name: "ZX81BAS11IFEND"
-                }
-        }
-        LabelStmt {
-            location: t/50-codegen/input/def_proc.bas:23
-            label: "ZX81BAS11IFELSE"
-        }
-        LabelStmt {
-            location: t/50-codegen/input/def_proc.bas:23
-            label: "ZX81BAS11IFEND"
         }
         LetStmt {
             location: t/50-codegen/input/def_proc.bas:24

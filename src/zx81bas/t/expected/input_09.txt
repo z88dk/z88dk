@@ -937,74 +937,42 @@ Prog {
         IfStmt {
             location: test_t_input_09_t.bas:149
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_09_t.bas:149
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: =
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_09_t.bas:149
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_09_t.bas:149
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_09_t.bas:149
-                                    value: 1.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_09_t.bas:149
+                            value: 1.000000
                         }
                 }
             then_stmts: [
-                GotoStmt {
+                LetStmt {
                     location: test_t_input_09_t.bas:149
-                    target_expr: 
-                        LabelLineRefExpr {
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_09_t.bas:149
-                            name: "ZX81BAS0IFELSE"
+                            name: "B"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_09_t.bas:149
+                            value: 2.000000
                         }
                 }
             ]
             else_stmts: [
             ]
-        }
-        LetStmt {
-            location: test_t_input_09_t.bas:149
-            lhs: 
-                VariableExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:149
-                    name: "B"
-                }
-            rhs: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:149
-                    value: 2.000000
-                }
-        }
-        GotoStmt {
-            location: test_t_input_09_t.bas:149
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:149
-                    name: "ZX81BAS0IFEND"
-                }
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:149
-            label: "ZX81BAS0IFELSE"
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:149
-            label: "ZX81BAS0IFEND"
         }
         IfStmt {
             location: test_t_input_09_t.bas:150
@@ -1039,7 +1007,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:150
-                            name: "ZX81BAS1IFELSE"
+                            name: "ZX81BAS0IFELSE"
                         }
                 }
             ]
@@ -1052,12 +1020,12 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:150
-                    name: "ZX81BAS1IFEND"
+                    name: "ZX81BAS0IFEND"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:150
-            label: "ZX81BAS1IFELSE"
+            label: "ZX81BAS0IFELSE"
         }
         LetStmt {
             location: test_t_input_09_t.bas:150
@@ -1076,7 +1044,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:150
-            label: "ZX81BAS1IFEND"
+            label: "ZX81BAS0IFEND"
         }
         IfStmt {
             location: test_t_input_09_t.bas:151
@@ -1111,7 +1079,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:151
-                            name: "ZX81BAS2IFELSE"
+                            name: "ZX81BAS1IFELSE"
                         }
                 }
             ]
@@ -1154,16 +1122,16 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:151
-                    name: "ZX81BAS2IFEND"
+                    name: "ZX81BAS1IFEND"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:151
-            label: "ZX81BAS2IFELSE"
+            label: "ZX81BAS1IFELSE"
         }
         LabelStmt {
             location: test_t_input_09_t.bas:151
-            label: "ZX81BAS2IFEND"
+            label: "ZX81BAS1IFEND"
         }
         IfStmt {
             location: test_t_input_09_t.bas:152
@@ -1198,7 +1166,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:152
-                            name: "ZX81BAS3IFELSE"
+                            name: "ZX81BAS2IFELSE"
                         }
                 }
             ]
@@ -1241,16 +1209,16 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:152
-                    name: "ZX81BAS3IFEND"
+                    name: "ZX81BAS2IFEND"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:152
-            label: "ZX81BAS3IFELSE"
+            label: "ZX81BAS2IFELSE"
         }
         LabelStmt {
             location: test_t_input_09_t.bas:152
-            label: "ZX81BAS3IFEND"
+            label: "ZX81BAS2IFEND"
         }
         IfStmt {
             location: test_t_input_09_t.bas:153
@@ -1285,7 +1253,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:153
-                            name: "ZX81BAS4IFELSE"
+                            name: "ZX81BAS3IFELSE"
                         }
                 }
             ]
@@ -1328,12 +1296,12 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:153
-                    name: "ZX81BAS4IFEND"
+                    name: "ZX81BAS3IFEND"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:153
-            label: "ZX81BAS4IFELSE"
+            label: "ZX81BAS3IFELSE"
         }
         LetStmt {
             location: test_t_input_09_t.bas:153
@@ -1352,7 +1320,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:153
-            label: "ZX81BAS4IFEND"
+            label: "ZX81BAS3IFEND"
         }
         IfStmt {
             location: test_t_input_09_t.bas:154
@@ -1387,7 +1355,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:154
-                            name: "ZX81BAS5IFELSE"
+                            name: "ZX81BAS4IFELSE"
                         }
                 }
             ]
@@ -1430,12 +1398,12 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:154
-                    name: "ZX81BAS5IFEND"
+                    name: "ZX81BAS4IFEND"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:154
-            label: "ZX81BAS5IFELSE"
+            label: "ZX81BAS4IFELSE"
         }
         LetStmt {
             location: test_t_input_09_t.bas:154
@@ -1469,7 +1437,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:154
-            label: "ZX81BAS5IFEND"
+            label: "ZX81BAS4IFEND"
         }
         IfStmt {
             location: test_t_input_09_t.bas:155
@@ -1500,6 +1468,74 @@ Prog {
                                             location: test_t_input_09_t.bas:155
                                             value: 1.000000
                                         }
+                                }
+                        }
+                }
+            then_stmts: [
+                GotoStmt {
+                    location: test_t_input_09_t.bas:155
+                    target_expr: 
+                        LabelLineRefExpr {
+                            type: Number
+                            location: test_t_input_09_t.bas:155
+                            name: "ZX81BAS5IFELSE"
+                        }
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        LetStmt {
+            location: test_t_input_09_t.bas:155
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: test_t_input_09_t.bas:155
+                    name: "B"
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_09_t.bas:155
+                    value: 2.000000
+                }
+        }
+        GotoStmt {
+            location: test_t_input_09_t.bas:155
+            target_expr: 
+                LabelLineRefExpr {
+                    type: Number
+                    location: test_t_input_09_t.bas:155
+                    name: "ZX81BAS5IFEND"
+                }
+        }
+        LabelStmt {
+            location: test_t_input_09_t.bas:155
+            label: "ZX81BAS5IFELSE"
+        }
+        IfStmt {
+            location: test_t_input_09_t.bas:155
+            condition: 
+                UnaryExpr {
+                    type: Number
+                    location: test_t_input_09_t.bas:155
+                    op: NOT
+                    operand: 
+                        BinaryExpr {
+                            type: Number
+                            location: test_t_input_09_t.bas:155
+                            op: =
+                            lhs: 
+                                VariableExpr {
+                                    type: Number
+                                    location: test_t_input_09_t.bas:155
+                                    name: "A"
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_09_t.bas:155
+                                    value: 2.000000
                                 }
                         }
                 }
@@ -1545,74 +1581,6 @@ Prog {
             location: test_t_input_09_t.bas:155
             label: "ZX81BAS6IFELSE"
         }
-        IfStmt {
-            location: test_t_input_09_t.bas:155
-            condition: 
-                UnaryExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:155
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_09_t.bas:155
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_09_t.bas:155
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_09_t.bas:155
-                                    value: 2.000000
-                                }
-                        }
-                }
-            then_stmts: [
-                GotoStmt {
-                    location: test_t_input_09_t.bas:155
-                    target_expr: 
-                        LabelLineRefExpr {
-                            type: Number
-                            location: test_t_input_09_t.bas:155
-                            name: "ZX81BAS7IFELSE"
-                        }
-                }
-            ]
-            else_stmts: [
-            ]
-        }
-        LetStmt {
-            location: test_t_input_09_t.bas:155
-            lhs: 
-                VariableExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:155
-                    name: "B"
-                }
-            rhs: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:155
-                    value: 2.000000
-                }
-        }
-        GotoStmt {
-            location: test_t_input_09_t.bas:155
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:155
-                    name: "ZX81BAS7IFEND"
-                }
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:155
-            label: "ZX81BAS7IFELSE"
-        }
         LetStmt {
             location: test_t_input_09_t.bas:155
             lhs: 
@@ -1630,11 +1598,11 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:155
-            label: "ZX81BAS7IFEND"
+            label: "ZX81BAS6IFEND"
         }
         LabelStmt {
             location: test_t_input_09_t.bas:155
-            label: "ZX81BAS6IFEND"
+            label: "ZX81BAS5IFEND"
         }
         IfStmt {
             location: test_t_input_09_t.bas:157
@@ -1669,7 +1637,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:157
-                            name: "ZX81BAS8IFELSE"
+                            name: "ZX81BAS7IFELSE"
                         }
                 }
             ]
@@ -1712,16 +1680,16 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:157
-                    name: "ZX81BAS8IFEND"
+                    name: "ZX81BAS7IFEND"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:157
-            label: "ZX81BAS8IFELSE"
+            label: "ZX81BAS7IFELSE"
         }
         LabelStmt {
             location: test_t_input_09_t.bas:157
-            label: "ZX81BAS8IFEND"
+            label: "ZX81BAS7IFEND"
         }
         IfStmt {
             location: test_t_input_09_t.bas:162
@@ -1756,7 +1724,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:162
-                            name: "ZX81BAS9IFELSE"
+                            name: "ZX81BAS8IFELSE"
                         }
                 }
             ]
@@ -1799,12 +1767,12 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:162
-                    name: "ZX81BAS9IFEND"
+                    name: "ZX81BAS8IFEND"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:162
-            label: "ZX81BAS9IFELSE"
+            label: "ZX81BAS8IFELSE"
         }
         LetStmt {
             location: test_t_input_09_t.bas:166
@@ -1854,7 +1822,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:167
-                            name: "ZX81BAS10IFELSE"
+                            name: "ZX81BAS9IFELSE"
                         }
                 }
             ]
@@ -1882,12 +1850,12 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:167
-                    name: "ZX81BAS10IFEND"
+                    name: "ZX81BAS9IFEND"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:167
-            label: "ZX81BAS10IFELSE"
+            label: "ZX81BAS9IFELSE"
         }
         LetStmt {
             location: test_t_input_09_t.bas:170
@@ -1906,11 +1874,11 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:167
-            label: "ZX81BAS10IFEND"
+            label: "ZX81BAS9IFEND"
         }
         LabelStmt {
             location: test_t_input_09_t.bas:162
-            label: "ZX81BAS9IFEND"
+            label: "ZX81BAS8IFEND"
         }
         IfStmt {
             location: test_t_input_09_t.bas:174
@@ -1945,7 +1913,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:174
-                            name: "ZX81BAS11IFELSE"
+                            name: "ZX81BAS10IFELSE"
                         }
                 }
             ]
@@ -1988,16 +1956,16 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:174
-                    name: "ZX81BAS11IFEND"
+                    name: "ZX81BAS10IFEND"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:174
-            label: "ZX81BAS11IFELSE"
+            label: "ZX81BAS10IFELSE"
         }
         LabelStmt {
             location: test_t_input_09_t.bas:174
-            label: "ZX81BAS11IFEND"
+            label: "ZX81BAS10IFEND"
         }
         LetStmt {
             location: test_t_input_09_t.bas:175
@@ -2016,7 +1984,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:181
-            label: "ZX81BAS12REPEATSTART"
+            label: "ZX81BAS11REPEATSTART"
         }
         LetStmt {
             location: test_t_input_09_t.bas:181
@@ -2066,7 +2034,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:181
-                            name: "ZX81BAS12REPEATSTART"
+                            name: "ZX81BAS11REPEATSTART"
                         }
                 }
             ]
@@ -2075,11 +2043,11 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:181
-            label: "ZX81BAS12REPEATEND"
+            label: "ZX81BAS11REPEATEND"
         }
         LabelStmt {
             location: test_t_input_09_t.bas:182
-            label: "ZX81BAS13REPEATSTART"
+            label: "ZX81BAS12REPEATSTART"
         }
         LetStmt {
             location: test_t_input_09_t.bas:182
@@ -2098,7 +2066,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:182
-            label: "ZX81BAS14REPEATSTART"
+            label: "ZX81BAS13REPEATSTART"
         }
         LetStmt {
             location: test_t_input_09_t.bas:182
@@ -2148,7 +2116,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:182
-                            name: "ZX81BAS14REPEATSTART"
+                            name: "ZX81BAS13REPEATSTART"
                         }
                 }
             ]
@@ -2157,7 +2125,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:182
-            label: "ZX81BAS14REPEATEND"
+            label: "ZX81BAS13REPEATEND"
         }
         IfStmt {
             location: test_t_input_09_t.bas:182
@@ -2192,7 +2160,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:182
-                            name: "ZX81BAS13REPEATSTART"
+                            name: "ZX81BAS12REPEATSTART"
                         }
                 }
             ]
@@ -2201,11 +2169,11 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:182
-            label: "ZX81BAS13REPEATEND"
+            label: "ZX81BAS12REPEATEND"
         }
         LabelStmt {
             location: test_t_input_09_t.bas:184
-            label: "ZX81BAS15REPEATSTART"
+            label: "ZX81BAS14REPEATSTART"
         }
         LetStmt {
             location: test_t_input_09_t.bas:185
@@ -2240,27 +2208,21 @@ Prog {
         IfStmt {
             location: test_t_input_09_t.bas:187
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_09_t.bas:187
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: =
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_09_t.bas:187
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_09_t.bas:187
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_09_t.bas:187
-                                    value: 2.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_09_t.bas:187
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -2270,42 +2232,16 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:187
-                            name: "ZX81BAS16IFELSE"
+                            name: "ZX81BAS14REPEATEND"
                         }
                 }
             ]
             else_stmts: [
             ]
         }
-        GotoStmt {
-            location: test_t_input_09_t.bas:187
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:187
-                    name: "ZX81BAS15REPEATEND"
-                }
-        }
-        GotoStmt {
-            location: test_t_input_09_t.bas:187
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:187
-                    name: "ZX81BAS16IFEND"
-                }
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:187
-            label: "ZX81BAS16IFELSE"
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:187
-            label: "ZX81BAS16IFEND"
-        }
         LabelStmt {
             location: test_t_input_09_t.bas:188
-            label: "ZX81BAS17REPEATSTART"
+            label: "ZX81BAS15REPEATSTART"
         }
         LetStmt {
             location: test_t_input_09_t.bas:189
@@ -2355,7 +2291,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:188
-                            name: "ZX81BAS17REPEATSTART"
+                            name: "ZX81BAS15REPEATSTART"
                         }
                 }
             ]
@@ -2364,7 +2300,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:188
-            label: "ZX81BAS17REPEATEND"
+            label: "ZX81BAS15REPEATEND"
         }
         IfStmt {
             location: test_t_input_09_t.bas:184
@@ -2399,7 +2335,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:184
-                            name: "ZX81BAS15REPEATSTART"
+                            name: "ZX81BAS14REPEATSTART"
                         }
                 }
             ]
@@ -2408,11 +2344,11 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:184
-            label: "ZX81BAS15REPEATEND"
+            label: "ZX81BAS14REPEATEND"
         }
         LabelStmt {
             location: test_t_input_09_t.bas:193
-            label: "ZX81BAS18REPEATSTART"
+            label: "ZX81BAS16REPEATSTART"
         }
         LetStmt {
             location: test_t_input_09_t.bas:194
@@ -2477,7 +2413,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:193
-                            name: "ZX81BAS18REPEATSTART"
+                            name: "ZX81BAS16REPEATSTART"
                         }
                 }
             ]
@@ -2486,7 +2422,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:193
-            label: "ZX81BAS18REPEATEND"
+            label: "ZX81BAS16REPEATEND"
         }
         LetStmt {
             location: test_t_input_09_t.bas:194
@@ -2505,7 +2441,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:200
-            label: "ZX81BAS19WHILESTART"
+            label: "ZX81BAS17WHILESTART"
         }
         IfStmt {
             location: test_t_input_09_t.bas:200
@@ -2540,7 +2476,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:200
-                            name: "ZX81BAS19WHILEEND"
+                            name: "ZX81BAS17WHILEEND"
                         }
                 }
             ]
@@ -2598,16 +2534,16 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:200
-                    name: "ZX81BAS19WHILESTART"
+                    name: "ZX81BAS17WHILESTART"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:200
-            label: "ZX81BAS19WHILEEND"
+            label: "ZX81BAS17WHILEEND"
         }
         LabelStmt {
             location: test_t_input_09_t.bas:202
-            label: "ZX81BAS20WHILESTART"
+            label: "ZX81BAS18WHILESTART"
         }
         IfStmt {
             location: test_t_input_09_t.bas:202
@@ -2642,7 +2578,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:202
-                            name: "ZX81BAS20WHILEEND"
+                            name: "ZX81BAS18WHILEEND"
                         }
                 }
             ]
@@ -2666,7 +2602,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:202
-            label: "ZX81BAS21WHILESTART"
+            label: "ZX81BAS19WHILESTART"
         }
         IfStmt {
             location: test_t_input_09_t.bas:202
@@ -2701,7 +2637,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:202
-                            name: "ZX81BAS21WHILEEND"
+                            name: "ZX81BAS19WHILEEND"
                         }
                 }
             ]
@@ -2729,12 +2665,12 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:202
-                    name: "ZX81BAS21WHILESTART"
+                    name: "ZX81BAS19WHILESTART"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:202
-            label: "ZX81BAS21WHILEEND"
+            label: "ZX81BAS19WHILEEND"
         }
         GotoStmt {
             location: test_t_input_09_t.bas:202
@@ -2742,16 +2678,16 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:202
-                    name: "ZX81BAS20WHILESTART"
+                    name: "ZX81BAS18WHILESTART"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:202
-            label: "ZX81BAS20WHILEEND"
+            label: "ZX81BAS18WHILEEND"
         }
         LabelStmt {
             location: test_t_input_09_t.bas:204
-            label: "ZX81BAS22WHILESTART"
+            label: "ZX81BAS20WHILESTART"
         }
         IfStmt {
             location: test_t_input_09_t.bas:204
@@ -2786,7 +2722,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:204
-                            name: "ZX81BAS22WHILEEND"
+                            name: "ZX81BAS20WHILEEND"
                         }
                 }
             ]
@@ -2826,27 +2762,21 @@ Prog {
         IfStmt {
             location: test_t_input_09_t.bas:207
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_09_t.bas:207
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: =
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_09_t.bas:207
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_09_t.bas:207
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_09_t.bas:207
-                                    value: 2.000000
-                                }
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_09_t.bas:207
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -2856,42 +2786,16 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:207
-                            name: "ZX81BAS23IFELSE"
+                            name: "ZX81BAS20WHILEEND"
                         }
                 }
             ]
             else_stmts: [
             ]
         }
-        GotoStmt {
-            location: test_t_input_09_t.bas:207
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:207
-                    name: "ZX81BAS22WHILEEND"
-                }
-        }
-        GotoStmt {
-            location: test_t_input_09_t.bas:207
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:207
-                    name: "ZX81BAS23IFEND"
-                }
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:207
-            label: "ZX81BAS23IFELSE"
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:207
-            label: "ZX81BAS23IFEND"
-        }
         LabelStmt {
             location: test_t_input_09_t.bas:208
-            label: "ZX81BAS24WHILESTART"
+            label: "ZX81BAS21WHILESTART"
         }
         IfStmt {
             location: test_t_input_09_t.bas:208
@@ -2926,7 +2830,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:208
-                            name: "ZX81BAS24WHILEEND"
+                            name: "ZX81BAS21WHILEEND"
                         }
                 }
             ]
@@ -2954,12 +2858,12 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:208
-                    name: "ZX81BAS24WHILESTART"
+                    name: "ZX81BAS21WHILESTART"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:208
-            label: "ZX81BAS24WHILEEND"
+            label: "ZX81BAS21WHILEEND"
         }
         GotoStmt {
             location: test_t_input_09_t.bas:204
@@ -2967,16 +2871,16 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:204
-                    name: "ZX81BAS22WHILESTART"
+                    name: "ZX81BAS20WHILESTART"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:204
-            label: "ZX81BAS22WHILEEND"
+            label: "ZX81BAS20WHILEEND"
         }
         LabelStmt {
             location: test_t_input_09_t.bas:213
-            label: "ZX81BAS25WHILESTART"
+            label: "ZX81BAS22WHILESTART"
         }
         IfStmt {
             location: test_t_input_09_t.bas:213
@@ -3011,7 +2915,7 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:213
-                            name: "ZX81BAS25WHILEEND"
+                            name: "ZX81BAS22WHILEEND"
                         }
                 }
             ]
@@ -3039,12 +2943,12 @@ Prog {
                 LabelLineRefExpr {
                     type: Number
                     location: test_t_input_09_t.bas:213
-                    name: "ZX81BAS25WHILESTART"
+                    name: "ZX81BAS22WHILESTART"
                 }
         }
         LabelStmt {
             location: test_t_input_09_t.bas:213
-            label: "ZX81BAS25WHILEEND"
+            label: "ZX81BAS22WHILEEND"
         }
         LetStmt {
             location: test_t_input_09_t.bas:214
@@ -3140,7 +3044,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:221
-            label: "ZX81BAS26FOREND"
+            label: "ZX81BAS23FOREND"
         }
         ForStmt {
             location: test_t_input_09_t.bas:223
@@ -3215,7 +3119,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:223
-            label: "ZX81BAS28FOREND"
+            label: "ZX81BAS25FOREND"
         }
         NextStmt {
             location: test_t_input_09_t.bas:223
@@ -3223,7 +3127,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:223
-            label: "ZX81BAS27FOREND"
+            label: "ZX81BAS24FOREND"
         }
         ForStmt {
             location: test_t_input_09_t.bas:225
@@ -3279,27 +3183,21 @@ Prog {
         IfStmt {
             location: test_t_input_09_t.bas:227
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_09_t.bas:227
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
+                    op: =
+                    lhs: 
+                        VariableExpr {
                             type: Number
                             location: test_t_input_09_t.bas:227
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_09_t.bas:227
-                                    name: "I"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_09_t.bas:227
-                                    value: 2.000000
-                                }
+                            name: "I"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_09_t.bas:227
+                            value: 2.000000
                         }
                 }
             then_stmts: [
@@ -3309,38 +3207,12 @@ Prog {
                         LabelLineRefExpr {
                             type: Number
                             location: test_t_input_09_t.bas:227
-                            name: "ZX81BAS30IFELSE"
+                            name: "ZX81BAS26FOREND"
                         }
                 }
             ]
             else_stmts: [
             ]
-        }
-        GotoStmt {
-            location: test_t_input_09_t.bas:227
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:227
-                    name: "ZX81BAS29FOREND"
-                }
-        }
-        GotoStmt {
-            location: test_t_input_09_t.bas:227
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:227
-                    name: "ZX81BAS30IFEND"
-                }
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:227
-            label: "ZX81BAS30IFELSE"
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:227
-            label: "ZX81BAS30IFEND"
         }
         ForStmt {
             location: test_t_input_09_t.bas:228
@@ -3399,7 +3271,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:228
-            label: "ZX81BAS31FOREND"
+            label: "ZX81BAS27FOREND"
         }
         NextStmt {
             location: test_t_input_09_t.bas:225
@@ -3407,7 +3279,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:225
-            label: "ZX81BAS29FOREND"
+            label: "ZX81BAS26FOREND"
         }
         ForStmt {
             location: test_t_input_09_t.bas:233
@@ -3482,7 +3354,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:233
-            label: "ZX81BAS33FOREND"
+            label: "ZX81BAS29FOREND"
         }
         NextStmt {
             location: test_t_input_09_t.bas:233
@@ -3490,7 +3362,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:233
-            label: "ZX81BAS32FOREND"
+            label: "ZX81BAS28FOREND"
         }
         ForStmt {
             location: test_t_input_09_t.bas:235
@@ -3573,7 +3445,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:236
-            label: "ZX81BAS35FOREND"
+            label: "ZX81BAS31FOREND"
         }
         NextStmt {
             location: test_t_input_09_t.bas:235
@@ -3581,7 +3453,7 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_09_t.bas:235
-            label: "ZX81BAS34FOREND"
+            label: "ZX81BAS30FOREND"
         }
         LineNumStmt {
             location: test_t_input_09_t.bas:243
@@ -4586,166 +4458,6 @@ Prog {
         }
         CopyStmt {
             location: test_t_input_09_t.bas:451
-        }
-        IfStmt {
-            location: test_t_input_09_t.bas:457
-            condition: 
-                UnaryExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:457
-                    op: NOT
-                    operand: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_09_t.bas:457
-                            value: 0.000000
-                        }
-                }
-            then_stmts: [
-                GotoStmt {
-                    location: test_t_input_09_t.bas:457
-                    target_expr: 
-                        LabelLineRefExpr {
-                            type: Number
-                            location: test_t_input_09_t.bas:457
-                            name: "ZX81BAS36IFELSE"
-                        }
-                }
-            ]
-            else_stmts: [
-            ]
-        }
-        PrintStmt {
-            location: test_t_input_09_t.bas:457
-            items: [
-                Expr:
-                    StringLiteralExpr {
-                        type: String
-                        location: test_t_input_09_t.bas:457
-                        value: "HELLO"
-                    }
-            ]
-        }
-        GotoStmt {
-            location: test_t_input_09_t.bas:457
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:457
-                    name: "ZX81BAS36IFEND"
-                }
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:457
-            label: "ZX81BAS36IFELSE"
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:457
-            label: "ZX81BAS36IFEND"
-        }
-        IfStmt {
-            location: test_t_input_09_t.bas:458
-            condition: 
-                UnaryExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:458
-                    op: NOT
-                    operand: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_09_t.bas:458
-                            value: 1.000000
-                        }
-                }
-            then_stmts: [
-                GotoStmt {
-                    location: test_t_input_09_t.bas:458
-                    target_expr: 
-                        LabelLineRefExpr {
-                            type: Number
-                            location: test_t_input_09_t.bas:458
-                            name: "ZX81BAS37IFELSE"
-                        }
-                }
-            ]
-            else_stmts: [
-            ]
-        }
-        PrintStmt {
-            location: test_t_input_09_t.bas:458
-            items: [
-                Expr:
-                    StringLiteralExpr {
-                        type: String
-                        location: test_t_input_09_t.bas:458
-                        value: "WORLD"
-                    }
-            ]
-        }
-        GotoStmt {
-            location: test_t_input_09_t.bas:458
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:458
-                    name: "ZX81BAS37IFEND"
-                }
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:458
-            label: "ZX81BAS37IFELSE"
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:458
-            label: "ZX81BAS37IFEND"
-        }
-        GotoStmt {
-            location: test_t_input_09_t.bas:464
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:464
-                    name: "NEXT1"
-                }
-        }
-        LabelStmt {
-            location: test_t_input_09_t.bas:465
-            label: "NEXT1"
-        }
-        PrintStmt {
-            location: test_t_input_09_t.bas:466
-            items: [
-                Expr:
-                    StringLiteralExpr {
-                        type: String
-                        location: test_t_input_09_t.bas:466
-                        value: "A"
-                    }
-            ]
-        }
-        GotoStmt {
-            location: test_t_input_09_t.bas:468
-            target_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_09_t.bas:468
-                    value: 2000.000000
-                }
-        }
-        LineNumStmt {
-            location: test_t_input_09_t.bas:469
-            line_num: 2000
-        }
-        PrintStmt {
-            location: test_t_input_09_t.bas:469
-            items: [
-                Expr:
-                    StringLiteralExpr {
-                        type: String
-                        location: test_t_input_09_t.bas:469
-                        value: "B"
-                    }
-            ]
         }
     ]
     pragma_vars: [
