@@ -11,6 +11,7 @@
 # silence for the two safe shapes:
 #   - pure-literal TU  (nothing runtime -> no note)
 #   - pure-runtime TU  (no mask emitted, CRT keeps the broad default -> no note)
+#   - explicit-pragma TU (user already chose the converter set -> no note)
 #
 # Compile-only (-c): the note is emitted by zpragma during compilation, so no
 # linker/emulator is needed. Skips if zcc/clang backend is unavailable.
@@ -65,4 +66,22 @@ LOG=$(build_log "$WORK/run.c")
 echo "$LOG" | grep -q "not a string literal" \
     && { echo "--- log ---"; echo "$LOG"; fail "pure-runtime TU: unexpected note"; } || true
 
-echo "PASS: #59 non-literal note fires for mixed TU, silent for pure-literal/pure-runtime"
+# 4. MIXED TU WITH AN EXPLICIT PRAGMA: same shape as #1, but the user has
+#    already committed to a converter set via '#pragma printf' (which wins over
+#    the auto-detected channel) -> NO note (advising a pragma they already have
+#    would be pure noise).
+cat > "$WORK/expl.c" <<'EOF'
+#include <stdio.h>
+#pragma printf = "%s %f %d %x"
+int main(int argc, char **argv) {
+    const char *fmt = (argc > 1) ? argv[1] : "%x";
+    printf("count=%d\n", argc);
+    printf(fmt, argc);
+    return 0;
+}
+EOF
+LOG=$(build_log "$WORK/expl.c")
+echo "$LOG" | grep -q "not a string literal" \
+    && { echo "--- log ---"; echo "$LOG"; fail "explicit-pragma TU: unexpected note"; } || true
+
+echo "PASS: #59 non-literal note fires for mixed TU, silent for pure-literal/pure-runtime/explicit-pragma"
