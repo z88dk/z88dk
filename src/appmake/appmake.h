@@ -257,13 +257,14 @@ extern option_t  svi_options[];
 extern int       tixx_exec(char *target);
 extern option_t  tixx_options[];
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(NO_GMP)
 extern int       ti8xk_exec(char *target);
 extern option_t  ti8xk_options[];
 #else
-// GMP can't be used in msbuild (see PR #2433)
+// GMP can't be used in msbuild (see PR #2433); also disabled when
+// NO_GMP is defined (e.g. macOS without brew/MacPorts).
 static int ti8xk_exec(char *target){
-  fprintf(stderr, "TI8xk disabled for msbuild!");
+  fprintf(stderr, "TI8xk disabled (no GMP available)!");
   return 0;
 }
 #define ti8xk_options tixx_options
