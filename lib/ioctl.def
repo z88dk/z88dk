@@ -9,6 +9,11 @@ defc IOCTL_GENCON_SET_UDGS     = 5  ; Set the 32 columns udgs (int *)
 defc IOCTL_GENCON_SET_MODE     = 6  ; Set the mode (int *) 
 defc IOCTL_GENCON_GET_CAPS     = 7  ; Get the capabilities (int *) 
 defc IOCTL_GENCON_SET_FONT_H   = 8  ; Set the font height in gfx modes (int *)
+defc IOCTL_GENCON_CURSOR_XY    = 9  ; Position + show hw cursor (int *) = (row<<8|col)
+defc IOCTL_GENCON_CURSOR_ON    = 10 ; Show hw cursor at current console position
+defc IOCTL_GENCON_CURSOR_OFF   = 11 ; Hide the hw cursor
+defc IOCTL_GENCON_CRT_RESET    = 12 ; Reprogram CRTC (unsigned char par[N])
+
 
 ; Capabilities for gencon 
 defc CAP_GENCON_CUSTOM_FONT = 1

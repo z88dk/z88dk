@@ -14,9 +14,14 @@ WORLD_TARGETS = abc80 abc800 ace adam alphatp2 alphatro altair8800 aquarius aqpl
 	super80 super80_vduem svi svi_rom svi_rom318 test ti82 ti83 ti85 ti86 ti83p \
 	trs80 ts2068 vector06c vector06c_disk vg5k vz x07 x1 z1013 z9001 z88 zx zx80 zx81 zxn
 
+# NOTE: cpm_rc700 is intentionally excluded here. Since 9f0af60acc, the rc700
+# SUBTYPE no longer wires an implicit -Cz+cpmdisk call (disk-image creation is
+# explicit, caller picks a format: rc700-jbox/rc700-5dd/rc700-8dd/rc700-8sd),
+# so the generic `-create-app` step this Makefile relies on has nothing to
+# invoke and fails (`Building application code failed`).
 WORLD_TARGETS += cpm_px8 cpm_px4 cpm_einstein cpm_einstein256 cpm_attache cpm_osborne1 cpm_kaypro83 cpm_kaypro84 \
 	cpm_mz2500 cpm_microbee cpm_qc10 cpm_nascom cpm_tiki100 cpm_svi cpm_dmv cpm_adam \
-	cpm_smc777 cpm_rc700 cpm_fp1100 cpm_x1 cpm_lynx cpm_bic cpm_excali64 cpm_vector06c \
+	cpm_smc777 cpm_fp1100 cpm_x1 cpm_lynx cpm_bic cpm_excali64 cpm_vector06c \
 	cpm_zxplus3 cpm_bondwell cpm_bondwell2 cpm_8080 cpm_corvette cpm_nabu cpm_x820 cpm_v1050
 
 LDFLAGS_world = -lndos -pragma-define:CLIB_OPT_PRINTF=0x00000001

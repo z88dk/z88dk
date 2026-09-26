@@ -48,6 +48,12 @@ struct disc_handle_s {
 
     uint8_t      *image;
 
+    // Sector-level boot region (mixed-density boot tracks, e.g. RC702 Track 0).
+    // Holds the boot_zero_tracks region's bytes in physical (track, side, sector-ID)
+    // emission order; the IMD writer emits these instead of zeros where present.
+    uint8_t      *bootimage;
+    size_t        bootimage_len;
+
     // CP/M information
     uint8_t      *extents;
     int           num_extents;
@@ -104,6 +110,44 @@ void disc_write_file(disc_handle* h, char *filename, void* data, size_t len)
 void disc_write_boot_track(disc_handle* h, void* data, size_t len)
 {
     memcpy(h->image, data, len);
+}
+
+// Size (in bytes) of the leading boot_zero_tracks region, walked in the same
+// (track, side) order the IMD writer emits, honouring the mixed-density Track 0
+// geometry.  Returns 0 when the format has no zero-filled boot region.
+size_t disc_boot_region_size(disc_spec* spec)
+{
+    size_t total = 0;
+    int t, s;
+
+    for ( t = 0; t < spec->boot_zero_tracks; t++ ) {
+        for ( s = 0; s < spec->sides; s++ ) {
+            if ( spec->mixed_density_track0 && t == 0 )
+                total += (s == 0)
+                    ? (size_t)spec->t0s0_sectors * spec->t0s0_sector_size
+                    : (size_t)spec->t0s1_sectors * spec->t0s1_sector_size;
+            else
+                total += (size_t)spec->sectors_per_track * spec->sector_size;
+        }
+    }
+    return total;
+}
+
+// Store a sector-level boot payload for the zero-filled boot region.  The bytes
+// are physical sectors in (track, side, sector-ID) emission order; the IMD writer
+// splices them in with each track/side's native density.  A short payload leaves
+// the remaining boot sectors zero-filled.
+void disc_write_boot_region(disc_handle* h, void* data, size_t len)
+{
+    size_t region = disc_boot_region_size(&h->spec);
+    if ( region == 0 )
+        return;
+    if ( len > region )
+        len = region;
+    free(h->bootimage);
+    h->bootimage = calloc(region, 1);
+    memcpy(h->bootimage, data, len);
+    h->bootimage_len = len;
 }
 
 void disc_write_sector_lba(disc_handle *h, int sector_nr, int count, const void *data)
@@ -191,6 +235,7 @@ int disc_get_sector_count(disc_handle *h)
 void disc_free(disc_handle* h)
 {
     free(h->image);
+    free(h->bootimage);
     free(h->extents);
     free(h);
 }
@@ -731,6 +776,7 @@ int disc_write_imd(disc_handle* h, const char* filename)
     uint8_t *ptr;
     time_t tim;
     struct tm *tm;
+    size_t bootpos = 0;   // running offset into h->bootimage, in emission order
 
 
     if ((fp = fopen(filename, "wb")) == NULL) {
@@ -753,17 +799,42 @@ int disc_write_imd(disc_handle* h, const char* filename)
 
     for (i = 0; i < h->spec.tracks; i++) {
         for (s = 0; s < h->spec.sides; s++) {
+            // Effective per-track/side geometry.  Almost every format is uniform, so these
+            // default to the spec-wide values; the RC702 mixed-density Track 0 overrides them.
+            int      eff_mode        = h->spec.disk_mode;
+            int      eff_sectors     = h->spec.sectors_per_track;
+            int      eff_sector_size = h->spec.sector_size;
+            int      eff_sizecode    = sector_size;
+            // Zero-fill this track's sector data (data-diskette boot tracks) rather than
+            // dumping the uniform image, whose geometry does not match a mixed-density track.
+            int      zero_fill       = (i < h->spec.boot_zero_tracks);
+
+            if (h->spec.mixed_density_track0 && i == 0) {
+                if (s == 0) {
+                    eff_mode        = h->spec.t0s0_mode;
+                    eff_sectors     = h->spec.t0s0_sectors;
+                    eff_sector_size = h->spec.t0s0_sector_size;
+                } else {
+                    eff_mode        = h->spec.t0s1_mode;
+                    eff_sectors     = h->spec.t0s1_sectors;
+                    eff_sector_size = h->spec.t0s1_sector_size;
+                }
+                eff_sizecode = 0;
+                for (int z = eff_sector_size; z > 128; z /= 2)
+                    eff_sizecode++;
+            }
+
             ptr = buffer;
 
-            if (h->spec.disk_mode)
-                *ptr++ = h->spec.disk_mode-1; // Mode + transfer rate
+            if (eff_mode)
+                *ptr++ = eff_mode-1; // Mode + transfer rate
             else 
                 *ptr++ = 3; // 500 kbps MFM
             
             *ptr++ = i; // track
             *ptr++ = s; // head
-            *ptr++ = h->spec.sectors_per_track; // Sectors per track
-            *ptr++ = sector_size; // Size of sector
+            *ptr++ = eff_sectors; // Sectors per track
+            *ptr++ = eff_sizecode; // Size of sector
 
             // Write sector map
             // "If ImageDisk is unable to obtain all sector numbers in a single revolution of the disk, it will report 
@@ -772,15 +843,20 @@ int disc_write_imd(disc_handle* h, const char* filename)
             // currently the only case with the disk sides swapped.
             // At the moment we use "spec.inverted_sides" to trigger an accurete skew map.
 
-            if (h->spec.inverted_sides) {
-                for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
+            if (h->spec.mixed_density_track0 && i == 0) {
+                // Mixed-density Track 0 carries zero-filled data, so interleave is moot; emit a
+                // plain sequential ID list at this side's own sector count.
+                for ( j = 0; j < eff_sectors; j++ )
+                    *ptr++ = j + h->spec.first_sector_offset;
+            } else if (h->spec.inverted_sides) {
+                for ( j = 0; j < eff_sectors; j++ ) {
                     if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) )
                         *ptr++ = skew_sector(h, j, 99)  +  h->spec.first_sector_offset;
                     else
                         *ptr++ = skew_sector(h, j, 99)  +  h->spec.first_sector_offset + h->spec.sectors_per_track;
                 }
             } else {
-                for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
+                for ( j = 0; j < eff_sectors; j++ ) {
                     if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) )
                         *ptr++ = j  +  h->spec.first_sector_offset;
                     else
@@ -790,6 +866,25 @@ int disc_write_imd(disc_handle* h, const char* filename)
 
             // And write the header
             fwrite(buffer, ptr - buffer, 1, fp);
+
+            if (zero_fill) {
+                // Boot region.  Splice a sector-level boot payload (-s bootfile) where the
+                // caller supplied one, so a mixed-density Track 0 (FM 128 / MFM 256) can be
+                // injected verbatim; otherwise emit 0x00-filled sectors so RC702 autoload
+                // sees no boot signature and treats the disk as a data diskette.
+                // IMD type 0x01 = uncompressed data; type 0x02 = all bytes equal the next byte.
+                for (j = 0; j < eff_sectors; j++) {
+                    if (h->bootimage && bootpos + eff_sector_size <= h->bootimage_len) {
+                        fputc(1, fp);
+                        fwrite(h->bootimage + bootpos, eff_sector_size, 1, fp);
+                    } else {
+                        fputc(2, fp);
+                        fputc(0, fp);
+                    }
+                    bootpos += eff_sector_size;   // advance in lockstep with the boot region
+                }
+                continue;
+            }
 
             // And now write each sector - we don't do compression and all sectors are good
             offs = track_offset(h, i, s);

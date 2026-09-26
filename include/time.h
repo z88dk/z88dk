@@ -55,6 +55,11 @@
 #define CLOCKS_PER_SEC 1000
 #endif
 
+#ifdef __RC700__
+/* RC700: 0xFFFC counter incremented by the 50 Hz CRT (8275) frame ISR. */
+#define CLOCKS_PER_SEC 50
+#endif
+
 #ifdef __CPM__
 #ifndef CLOCKS_PER_SEC
 #define CLOCKS_PER_SEC 1
