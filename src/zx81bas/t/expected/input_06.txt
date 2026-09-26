@@ -1,0 +1,102 @@
+% z88dk-zx81bas -d 6 test_t_input_06_t.bas
+Input file:  test_t_input_06_t.bas
+Output file: test_t_input_06_t.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_06_t.i" "test_t_input_06_t.pp"
+Symtab {
+    vars: [
+        "A" {
+            location: test_t_input_06_t.bas:64
+        }
+        "A$" {
+            location: test_t_input_06_t.bas:85
+        }
+        "ABC" {
+            location: test_t_input_06_t.bas:83
+        }
+        "B" {
+            location: test_t_input_06_t.bas:73
+        }
+        "C" {
+            location: test_t_input_06_t.bas:73
+        }
+        "D" {
+            location: test_t_input_06_t.bas:117
+        }
+        "E" {
+            location: test_t_input_06_t.bas:118
+        }
+        "I" {
+            location: test_t_input_06_t.bas:185
+        }
+        "I1" {
+            location: test_t_input_06_t.bas:275
+        }
+        "J" {
+            location: test_t_input_06_t.bas:187
+        }
+        "S" {
+            location: test_t_input_06_t.bas:184
+        }
+        "X" {
+            location: test_t_input_06_t.bas:382
+        }
+        "Y" {
+            location: test_t_input_06_t.bas:382
+        }
+    ]
+    arrays: [
+        "A" {
+            location: test_t_input_06_t.bas:84
+        }
+        "A$" {
+            location: test_t_input_06_t.bas:86
+        }
+        "B" {
+            location: test_t_input_06_t.bas:106
+        }
+        "B$" {
+            location: test_t_input_06_t.bas:107
+        }
+        "C" {
+            location: test_t_input_06_t.bas:106
+        }
+        "C$" {
+            location: test_t_input_06_t.bas:107
+        }
+        "I" {
+            location: test_t_input_06_t.bas:275
+        }
+    ]
+    procs: [
+    ]
+    fns: [
+    ]
+    labels: [
+        "LABEL1" {
+            location: test_t_input_06_t.bas:64
+        }
+        "LABEL2" {
+            location: test_t_input_06_t.bas:66
+        }
+        "LABEL3" {
+            location: test_t_input_06_t.bas:67
+        }
+        "START_REM" {
+            location: test_t_input_06_t.bas:284
+        }
+    ]
+    line_nums: [
+        10 {
+            location: test_t_input_06_t.bas:65
+        }
+        20 {
+            location: test_t_input_06_t.bas:66
+        }
+        30 {
+            location: test_t_input_06_t.bas:67
+        }
+        1000 {
+            location: test_t_input_06_t.bas:207
+        }
+    ]
+}

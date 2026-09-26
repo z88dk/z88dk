@@ -1,0 +1,1026 @@
+% z88dk-zx81bas -d 10 -O t/80-codegen//input/peephole.bas
+Input file:  t/80-codegen/input/peephole.bas
+Output file: t/80-codegen/input/peephole.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/80-codegen/input/peephole.i" "t/80-codegen/input/peephole.pp"
+Prog {
+    auto_start: true
+    auto_start_line: 0
+    auto_start_label: ""
+    increment: 10
+    rem_invert: false
+    fast_mode: false
+    dfile_lines: [
+    ]
+    dfile_colapsed: false
+    sysvars_data: [
+    ]
+    stmts: [
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:5
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:5
+                        value: "1"
+                    }
+                Comma
+            ]
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:7
+            items: [
+                Expr:
+                    NumberExpr {
+                        type: Number
+                        location: t/80-codegen/input/peephole.bas:7
+                        value: 1.000000
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:10
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:10
+                        value: "2"
+                    }
+                Comma
+            ]
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:11
+            items: [
+                Expr:
+                    NumberExpr {
+                        type: Number
+                        location: t/80-codegen/input/peephole.bas:11
+                        value: 2.000000
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:14
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:14
+                        value: "3"
+                    }
+                Comma
+            ]
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:17
+            items: [
+                Expr:
+                    NumberExpr {
+                        type: Number
+                        location: t/80-codegen/input/peephole.bas:17
+                        value: 3.000000
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:19
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:19
+                        value: "4"
+                    }
+                Comma
+            ]
+        }
+        LineNumStmt {
+            location: t/80-codegen/input/peephole.bas:21
+            line_num: 200
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:21
+            items: [
+                Expr:
+                    NumberExpr {
+                        type: Number
+                        location: t/80-codegen/input/peephole.bas:21
+                        value: 4.000000
+                    }
+            ]
+        }
+        LetStmt {
+            location: t/80-codegen/input/peephole.bas:24
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:24
+                    name: "X"
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:24
+                    value: 5.000000
+                }
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:25
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:25
+                        value: "5"
+                    }
+                Comma
+            ]
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:27
+            items: [
+                Expr:
+                    VariableExpr {
+                        type: Number
+                        location: t/80-codegen/input/peephole.bas:27
+                        name: "X"
+                    }
+            ]
+        }
+        IfStmt {
+            location: t/80-codegen/input/peephole.bas:30
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:30
+                    op: =
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:30
+                            name: "X"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:30
+                            value: 5.000000
+                        }
+                }
+            then_stmts: [
+                PrintStmt {
+                    location: t/80-codegen/input/peephole.bas:30
+                    items: [
+                        Expr:
+                            StringLiteralExpr {
+                                type: String
+                                location: t/80-codegen/input/peephole.bas:30
+                                value: "6"
+                            }
+                        Comma
+                        Expr:
+                            NumberExpr {
+                                type: Number
+                                location: t/80-codegen/input/peephole.bas:30
+                                value: 6.000000
+                            }
+                    ]
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        IfStmt {
+            location: t/80-codegen/input/peephole.bas:31
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:31
+                    op: <>
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:31
+                            name: "X"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:31
+                            value: 0.000000
+                        }
+                }
+            then_stmts: [
+                PrintStmt {
+                    location: t/80-codegen/input/peephole.bas:31
+                    items: [
+                        Expr:
+                            StringLiteralExpr {
+                                type: String
+                                location: t/80-codegen/input/peephole.bas:31
+                                value: "7"
+                            }
+                        Comma
+                        Expr:
+                            NumberExpr {
+                                type: Number
+                                location: t/80-codegen/input/peephole.bas:31
+                                value: 7.000000
+                            }
+                    ]
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        IfStmt {
+            location: t/80-codegen/input/peephole.bas:32
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:32
+                    op: >
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:32
+                            name: "X"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:32
+                            value: 4.000000
+                        }
+                }
+            then_stmts: [
+                PrintStmt {
+                    location: t/80-codegen/input/peephole.bas:32
+                    items: [
+                        Expr:
+                            StringLiteralExpr {
+                                type: String
+                                location: t/80-codegen/input/peephole.bas:32
+                                value: "8"
+                            }
+                        Comma
+                        Expr:
+                            NumberExpr {
+                                type: Number
+                                location: t/80-codegen/input/peephole.bas:32
+                                value: 8.000000
+                            }
+                    ]
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        IfStmt {
+            location: t/80-codegen/input/peephole.bas:33
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:33
+                    op: >=
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:33
+                            name: "X"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:33
+                            value: 5.000000
+                        }
+                }
+            then_stmts: [
+                PrintStmt {
+                    location: t/80-codegen/input/peephole.bas:33
+                    items: [
+                        Expr:
+                            StringLiteralExpr {
+                                type: String
+                                location: t/80-codegen/input/peephole.bas:33
+                                value: "9"
+                            }
+                        Comma
+                        Expr:
+                            NumberExpr {
+                                type: Number
+                                location: t/80-codegen/input/peephole.bas:33
+                                value: 9.000000
+                            }
+                    ]
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        IfStmt {
+            location: t/80-codegen/input/peephole.bas:34
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:34
+                    op: <
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:34
+                            name: "X"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:34
+                            value: 6.000000
+                        }
+                }
+            then_stmts: [
+                PrintStmt {
+                    location: t/80-codegen/input/peephole.bas:34
+                    items: [
+                        Expr:
+                            StringLiteralExpr {
+                                type: String
+                                location: t/80-codegen/input/peephole.bas:34
+                                value: "10"
+                            }
+                        Comma
+                        Expr:
+                            NumberExpr {
+                                type: Number
+                                location: t/80-codegen/input/peephole.bas:34
+                                value: 10.000000
+                            }
+                    ]
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        IfStmt {
+            location: t/80-codegen/input/peephole.bas:35
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:35
+                    op: <=
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:35
+                            name: "X"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:35
+                            value: 5.000000
+                        }
+                }
+            then_stmts: [
+                PrintStmt {
+                    location: t/80-codegen/input/peephole.bas:35
+                    items: [
+                        Expr:
+                            StringLiteralExpr {
+                                type: String
+                                location: t/80-codegen/input/peephole.bas:35
+                                value: "11"
+                            }
+                        Comma
+                        Expr:
+                            NumberExpr {
+                                type: Number
+                                location: t/80-codegen/input/peephole.bas:35
+                                value: 11.000000
+                            }
+                    ]
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:39
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:39
+                        value: "12"
+                    }
+                Comma
+                Expr:
+                    NumberExpr {
+                        type: Number
+                        location: t/80-codegen/input/peephole.bas:39
+                        value: 12.000000
+                    }
+            ]
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:42
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:42
+                        value: "13"
+                    }
+                Comma
+                Expr:
+                    NumberExpr {
+                        type: Number
+                        location: t/80-codegen/input/peephole.bas:42
+                        value: 13.000000
+                    }
+            ]
+        }
+        LetStmt {
+            location: t/80-codegen/input/peephole.bas:46
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:46
+                    name: "X"
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:46
+                    value: 14.000000
+                }
+        }
+        GosubStmt {
+            location: t/80-codegen/input/peephole.bas:46
+            target_expr: 
+                LabelLineRefExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:46
+                    name: "LABEL5"
+                }
+        }
+        LetStmt {
+            location: t/80-codegen/input/peephole.bas:47
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:47
+                    name: "X"
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:47
+                    value: 15.000000
+                }
+        }
+        GosubStmt {
+            location: t/80-codegen/input/peephole.bas:47
+            target_expr: 
+                LabelLineRefExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:47
+                    name: "LABEL5"
+                }
+        }
+        LetStmt {
+            location: t/80-codegen/input/peephole.bas:48
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:48
+                    name: "X"
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:48
+                    value: 17.000000
+                }
+        }
+        GosubStmt {
+            location: t/80-codegen/input/peephole.bas:48
+            target_expr: 
+                LabelLineRefExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:48
+                    name: "LABEL5"
+                }
+        }
+        GotoStmt {
+            location: t/80-codegen/input/peephole.bas:49
+            target_expr: 
+                LabelLineRefExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:49
+                    name: "CONT1"
+                }
+        }
+        LabelStmt {
+            location: t/80-codegen/input/peephole.bas:51
+            label: "LABEL5"
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:54
+            items: [
+                Expr:
+                    VariableExpr {
+                        type: Number
+                        location: t/80-codegen/input/peephole.bas:54
+                        name: "X"
+                    }
+                Comma
+                Expr:
+                    VariableExpr {
+                        type: Number
+                        location: t/80-codegen/input/peephole.bas:54
+                        name: "X"
+                    }
+            ]
+        }
+        ReturnStmt {
+            location: t/80-codegen/input/peephole.bas:55
+        }
+        LabelStmt {
+            location: t/80-codegen/input/peephole.bas:57
+            label: "CONT1"
+        }
+        PokeStmt {
+            location: t/80-codegen/input/peephole.bas:58
+            address: 
+                BinaryExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:58
+                    op: +
+                    lhs: 
+                        BinaryExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:58
+                            op: +
+                            lhs: 
+                                LabelAddrRefExpr {
+                                    type: Number
+                                    location: t/80-codegen/input/peephole.bas:58
+                                    name: "HELLO0"
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: t/80-codegen/input/peephole.bas:58
+                                    value: 4.000000
+                                }
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:58
+                            value: 5.000000
+                        }
+                }
+            value: 
+                BasicFuncCallExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:58
+                    keyword: "CODE"
+                    args: [
+                        StringLiteralExpr {
+                            type: String
+                            location: t/80-codegen/input/peephole.bas:58
+                            value: "H"
+                        }
+                    ]
+                }
+        }
+        PokeStmt {
+            location: t/80-codegen/input/peephole.bas:59
+            address: 
+                BinaryExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:59
+                    op: +
+                    lhs: 
+                        BinaryExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:59
+                            op: +
+                            lhs: 
+                                BinaryExpr {
+                                    type: Number
+                                    location: t/80-codegen/input/peephole.bas:59
+                                    op: +
+                                    lhs: 
+                                        LabelAddrRefExpr {
+                                            type: Number
+                                            location: t/80-codegen/input/peephole.bas:59
+                                            name: "HELLO0"
+                                        }
+                                    rhs: 
+                                        NumberExpr {
+                                            type: Number
+                                            location: t/80-codegen/input/peephole.bas:59
+                                            value: 4.000000
+                                        }
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: t/80-codegen/input/peephole.bas:59
+                                    value: 5.000000
+                                }
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:59
+                            value: 1.000000
+                        }
+                }
+            value: 
+                BasicFuncCallExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:59
+                    keyword: "CODE"
+                    args: [
+                        StringLiteralExpr {
+                            type: String
+                            location: t/80-codegen/input/peephole.bas:59
+                            value: "E"
+                        }
+                    ]
+                }
+        }
+        PokeStmt {
+            location: t/80-codegen/input/peephole.bas:60
+            address: 
+                BinaryExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:60
+                    op: +
+                    lhs: 
+                        BinaryExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:60
+                            op: +
+                            lhs: 
+                                BinaryExpr {
+                                    type: Number
+                                    location: t/80-codegen/input/peephole.bas:60
+                                    op: +
+                                    lhs: 
+                                        LabelAddrRefExpr {
+                                            type: Number
+                                            location: t/80-codegen/input/peephole.bas:60
+                                            name: "HELLO0"
+                                        }
+                                    rhs: 
+                                        NumberExpr {
+                                            type: Number
+                                            location: t/80-codegen/input/peephole.bas:60
+                                            value: 4.000000
+                                        }
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: t/80-codegen/input/peephole.bas:60
+                                    value: 5.000000
+                                }
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:60
+                            value: 2.000000
+                        }
+                }
+            value: 
+                BasicFuncCallExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:60
+                    keyword: "CODE"
+                    args: [
+                        StringLiteralExpr {
+                            type: String
+                            location: t/80-codegen/input/peephole.bas:60
+                            value: "L"
+                        }
+                    ]
+                }
+        }
+        PokeStmt {
+            location: t/80-codegen/input/peephole.bas:61
+            address: 
+                BinaryExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:61
+                    op: +
+                    lhs: 
+                        BinaryExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:61
+                            op: +
+                            lhs: 
+                                BinaryExpr {
+                                    type: Number
+                                    location: t/80-codegen/input/peephole.bas:61
+                                    op: +
+                                    lhs: 
+                                        LabelAddrRefExpr {
+                                            type: Number
+                                            location: t/80-codegen/input/peephole.bas:61
+                                            name: "HELLO0"
+                                        }
+                                    rhs: 
+                                        NumberExpr {
+                                            type: Number
+                                            location: t/80-codegen/input/peephole.bas:61
+                                            value: 4.000000
+                                        }
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: t/80-codegen/input/peephole.bas:61
+                                    value: 5.000000
+                                }
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:61
+                            value: 3.000000
+                        }
+                }
+            value: 
+                BasicFuncCallExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:61
+                    keyword: "CODE"
+                    args: [
+                        StringLiteralExpr {
+                            type: String
+                            location: t/80-codegen/input/peephole.bas:61
+                            value: "L"
+                        }
+                    ]
+                }
+        }
+        PokeStmt {
+            location: t/80-codegen/input/peephole.bas:62
+            address: 
+                BinaryExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:62
+                    op: +
+                    lhs: 
+                        BinaryExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:62
+                            op: +
+                            lhs: 
+                                BinaryExpr {
+                                    type: Number
+                                    location: t/80-codegen/input/peephole.bas:62
+                                    op: +
+                                    lhs: 
+                                        LabelAddrRefExpr {
+                                            type: Number
+                                            location: t/80-codegen/input/peephole.bas:62
+                                            name: "HELLO0"
+                                        }
+                                    rhs: 
+                                        NumberExpr {
+                                            type: Number
+                                            location: t/80-codegen/input/peephole.bas:62
+                                            value: 4.000000
+                                        }
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: t/80-codegen/input/peephole.bas:62
+                                    value: 5.000000
+                                }
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:62
+                            value: 4.000000
+                        }
+                }
+            value: 
+                BasicFuncCallExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:62
+                    keyword: "CODE"
+                    args: [
+                        StringLiteralExpr {
+                            type: String
+                            location: t/80-codegen/input/peephole.bas:62
+                            value: "O"
+                        }
+                    ]
+                }
+        }
+        LabelStmt {
+            location: t/80-codegen/input/peephole.bas:63
+            label: "HELLO0"
+        }
+        LetStmt {
+            location: t/80-codegen/input/peephole.bas:68
+            lhs: 
+                VariableExpr {
+                    type: String
+                    location: t/80-codegen/input/peephole.bas:68
+                    name: "H$"
+                }
+            rhs: 
+                StringLiteralExpr {
+                    type: String
+                    location: t/80-codegen/input/peephole.bas:68
+                    value: "12345"
+                }
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:69
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:69
+                        value: "HELLO"
+                    }
+                Comma
+                Expr:
+                    VariableExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:69
+                        name: "H$"
+                    }
+            ]
+        }
+        RemStmt {
+            location: t/80-codegen/input/peephole.bas:72
+            text: ""
+            asm: [
+                POKE_WORLD:
+                	LD HL, &WORLD0+4+5+0 : LD (HL), 'W'
+                	LD HL, &WORLD1+4+5+1 : LD (HL), 'O'
+                	LD HL, &WORLD2+4+5+2 : LD (HL), 'R'
+                	LD HL, &WORLD3+4+5+3 : LD (HL), 'L'
+                	LD HL, &WORLD4+4+5+4 : LD (HL), 'D'
+                	RET
+            ]
+        }
+        RandStmt {
+            location: t/80-codegen/input/peephole.bas:80
+            seed: 
+                BasicFuncCallExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:80
+                    keyword: "USR"
+                    args: [
+                        LabelAddrRefExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:80
+                            name: "POKE_WORLD"
+                        }
+                    ]
+                }
+        }
+        LabelStmt {
+            location: t/80-codegen/input/peephole.bas:81
+            label: "WORLD0"
+        }
+        LetStmt {
+            location: t/80-codegen/input/peephole.bas:86
+            lhs: 
+                VariableExpr {
+                    type: String
+                    location: t/80-codegen/input/peephole.bas:86
+                    name: "W$"
+                }
+            rhs: 
+                StringLiteralExpr {
+                    type: String
+                    location: t/80-codegen/input/peephole.bas:86
+                    value: "12345"
+                }
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:87
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:87
+                        value: "WORLD"
+                    }
+                Comma
+                Expr:
+                    VariableExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:87
+                        name: "W$"
+                    }
+            ]
+        }
+        RandStmt {
+            location: t/80-codegen/input/peephole.bas:100
+            seed: 
+                BasicFuncCallExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:100
+                    keyword: "USR"
+                    args: [
+                        LabelAddrRefExpr {
+                            type: Number
+                            location: t/80-codegen/input/peephole.bas:100
+                            name: "POKE_EARTH"
+                        }
+                    ]
+                }
+        }
+        LabelStmt {
+            location: t/80-codegen/input/peephole.bas:101
+            label: "EARTH0"
+        }
+        LetStmt {
+            location: t/80-codegen/input/peephole.bas:106
+            lhs: 
+                VariableExpr {
+                    type: String
+                    location: t/80-codegen/input/peephole.bas:106
+                    name: "E$"
+                }
+            rhs: 
+                StringLiteralExpr {
+                    type: String
+                    location: t/80-codegen/input/peephole.bas:106
+                    value: "12345"
+                }
+        }
+        PrintStmt {
+            location: t/80-codegen/input/peephole.bas:107
+            items: [
+                Expr:
+                    StringLiteralExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:107
+                        value: "EARTH"
+                    }
+                Comma
+                Expr:
+                    VariableExpr {
+                        type: String
+                        location: t/80-codegen/input/peephole.bas:107
+                        name: "E$"
+                    }
+            ]
+        }
+        GosubStmt {
+            location: t/80-codegen/input/peephole.bas:114
+            target_expr: 
+                LabelLineRefExpr {
+                    type: Number
+                    location: t/80-codegen/input/peephole.bas:114
+                    name: "EMPTY"
+                }
+        }
+        StopStmt {
+            location: t/80-codegen/input/peephole.bas:115
+        }
+        LabelStmt {
+            location: t/80-codegen/input/peephole.bas:118
+            label: "EMPTY"
+        }
+        ReturnStmt {
+            location: t/80-codegen/input/peephole.bas:119
+        }
+    ]
+    pragma_vars: [
+        PragmaStrVarStmt {
+            location: t/80-codegen/input/peephole.bas:89
+            name: Z$
+            value: ""
+            asm: [
+                POKE_EARTH:
+                	LD HL, &EARTH0+4+5+0 : LD (HL), 'E'
+                	LD HL, &EARTH1+4+5+1 : LD (HL), 'A'
+                	LD HL, &EARTH2+4+5+2 : LD (HL), 'R'
+                	LD HL, &EARTH3+4+5+3 : LD (HL), 'T'
+                	LD HL, &EARTH4+4+5+4 : LD (HL), 'H'
+                	RET
+            ]
+        }
+    ]
+}

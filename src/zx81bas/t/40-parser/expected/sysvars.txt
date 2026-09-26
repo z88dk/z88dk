@@ -1,0 +1,24 @@
+% z88dk-zx81bas -d 5 t/40-parser//input/sysvars.bas
+Input file:  t/40-parser/input/sysvars.bas
+Output file: t/40-parser/input/sysvars.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/40-parser/input/sysvars.i" "t/40-parser/input/sysvars.pp"
+Prog {
+    auto_start: false
+    auto_start_line: 0
+    auto_start_label: ""
+    increment: 10
+    rem_invert: false
+    fast_mode: false
+    dfile_lines: [
+    ]
+    dfile_colapsed: false
+    sysvars_data: [
+        0x01
+        0x02
+        0x03
+    ]
+    stmts: [
+    ]
+    pragma_vars: [
+    ]
+}

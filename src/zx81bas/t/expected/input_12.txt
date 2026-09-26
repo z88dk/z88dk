@@ -1,0 +1,3756 @@
+% z88dk-zx81bas -d 12 test_t_input_12_t.bas
+Input file:  test_t_input_12_t.bas
+Output file: test_t_input_12_t.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_12_t.i" "test_t_input_12_t.pp"
+; ZX81BAS generated assembly code
+; Pass: 1
+
+        ORG     0x4009          ; Start of .p file
+
+        SETFLOAT zx81
+
+        DEFC    SLOW_FLAG       = 0x40
+        DEFC    FAST_FLAG       = 0x00
+
+; zx81 character set
+
+        DEFC    _SP             = 0x00
+        DEFC    _BWWW           = 0x01
+        DEFC    _WBWW           = 0x02
+        DEFC    _BBWW           = 0x03
+        DEFC    _WWBW           = 0x04
+        DEFC    _BWBW           = 0x05
+        DEFC    _WBBW           = 0x06
+        DEFC    _BBBW           = 0x07
+        DEFC    _GGGG           = 0x08
+        DEFC    _WWGG           = 0x09
+        DEFC    _GGWW           = 0x0A
+        DEFC    _QUOTE          = 0x0B
+        DEFC    _DOLLAR         = 0x0D
+        DEFC    _COLON          = 0x0E
+        DEFC    _QUESTION       = 0x0F
+        DEFC    _LPAREN         = 0x10
+        DEFC    _RPAREN         = 0x11
+        DEFC    _GT             = 0x12
+        DEFC    _LT             = 0x13
+        DEFC    _EQ             = 0x14
+        DEFC    _PLUS           = 0x15
+        DEFC    _MINUS          = 0x16
+        DEFC    _MULT           = 0x17
+        DEFC    _DIV            = 0x18
+        DEFC    _SEMICOLON      = 0x19
+        DEFC    _COMMA          = 0x1A
+        DEFC    _DOT            = 0x1B
+        DEFC    _0              = 0x1C
+        DEFC    _1              = 0x1D
+        DEFC    _2              = 0x1E
+        DEFC    _3              = 0x1F
+        DEFC    _4              = 0x20
+        DEFC    _5              = 0x21
+        DEFC    _6              = 0x22
+        DEFC    _7              = 0x23
+        DEFC    _8              = 0x24
+        DEFC    _9              = 0x25
+        DEFC    _A              = 0x26
+        DEFC    _B              = 0x27
+        DEFC    _C              = 0x28
+        DEFC    _D              = 0x29
+        DEFC    _E              = 0x2A
+        DEFC    _F              = 0x2B
+        DEFC    _G              = 0x2C
+        DEFC    _H              = 0x2D
+        DEFC    _I              = 0x2E
+        DEFC    _J              = 0x2F
+        DEFC    _K              = 0x30
+        DEFC    _L              = 0x31
+        DEFC    _M              = 0x32
+        DEFC    _N              = 0x33
+        DEFC    _O              = 0x34
+        DEFC    _P              = 0x35
+        DEFC    _Q              = 0x36
+        DEFC    _R              = 0x37
+        DEFC    _S              = 0x38
+        DEFC    _T              = 0x39
+        DEFC    _U              = 0x3A
+        DEFC    _V              = 0x3B
+        DEFC    _W              = 0x3C
+        DEFC    _X              = 0x3D
+        DEFC    _Y              = 0x3E
+        DEFC    _Z              = 0x3F
+        DEFC    _RND            = 0x40
+        DEFC    _INKEY_DOLLAR   = 0x41
+        DEFC    _PI             = 0x42
+        DEFC    _NL             = 0x76
+        DEFC    _NUMBER         = 0x7E
+        DEFC    _INV_SP         = 0x80
+        DEFC    _WBBB           = 0x81
+        DEFC    _BWBB           = 0x82
+        DEFC    _WWBB           = 0x83
+        DEFC    _BBWB           = 0x84
+        DEFC    _WBWB           = 0x85
+        DEFC    _BWWB           = 0x86
+        DEFC    _WWWB           = 0x87
+        DEFC    _INV_GGGG       = 0x88
+        DEFC    _BBGG           = 0x89
+        DEFC    _GGBB           = 0x8A
+        DEFC    _INV_QUOTE      = 0x8B
+        DEFC    _INV_DOLLAR     = 0x8D
+        DEFC    _INV_COLON      = 0x8E
+        DEFC    _INV_QUESTION   = 0x8F
+        DEFC    _INV_LPAREN     = 0x90
+        DEFC    _INV_RPAREN     = 0x91
+        DEFC    _INV_GT         = 0x92
+        DEFC    _INV_LT         = 0x93
+        DEFC    _INV_EQ         = 0x94
+        DEFC    _INV_PLUS       = 0x95
+        DEFC    _INV_MINUS      = 0x96
+        DEFC    _INV_MULT       = 0x97
+        DEFC    _INV_DIV        = 0x98
+        DEFC    _INV_SEMICOLON  = 0x99
+        DEFC    _INV_COMMA      = 0x9A
+        DEFC    _INV_DOT        = 0x9B
+        DEFC    _INV_0          = 0x9C
+        DEFC    _INV_1          = 0x9D
+        DEFC    _INV_2          = 0x9E
+        DEFC    _INV_3          = 0x9F
+        DEFC    _INV_4          = 0xA0
+        DEFC    _INV_5          = 0xA1
+        DEFC    _INV_6          = 0xA2
+        DEFC    _INV_7          = 0xA3
+        DEFC    _INV_8          = 0xA4
+        DEFC    _INV_9          = 0xA5
+        DEFC    _INV_A          = 0xA6
+        DEFC    _INV_B          = 0xA7
+        DEFC    _INV_C          = 0xA8
+        DEFC    _INV_D          = 0xA9
+        DEFC    _INV_E          = 0xAA
+        DEFC    _INV_F          = 0xAB
+        DEFC    _INV_G          = 0xAC
+        DEFC    _INV_H          = 0xAD
+        DEFC    _INV_I          = 0xAE
+        DEFC    _INV_J          = 0xAF
+        DEFC    _INV_K          = 0xB0
+        DEFC    _INV_L          = 0xB1
+        DEFC    _INV_M          = 0xB2
+        DEFC    _INV_N          = 0xB3
+        DEFC    _INV_O          = 0xB4
+        DEFC    _INV_P          = 0xB5
+        DEFC    _INV_Q          = 0xB6
+        DEFC    _INV_R          = 0xB7
+        DEFC    _INV_S          = 0xB8
+        DEFC    _INV_T          = 0xB9
+        DEFC    _INV_U          = 0xBA
+        DEFC    _INV_V          = 0xBB
+        DEFC    _INV_W          = 0xBC
+        DEFC    _INV_X          = 0xBD
+        DEFC    _INV_Y          = 0xBE
+        DEFC    _INV_Z          = 0xBF
+        DEFC    _DOUBLE_QUOTE   = 0xC0
+        DEFC    _AT             = 0xC1
+        DEFC    _TAB            = 0xC2
+        DEFC    _CODE           = 0xC4
+        DEFC    _VAL            = 0xC5
+        DEFC    _LEN            = 0xC6
+        DEFC    _SIN            = 0xC7
+        DEFC    _COS            = 0xC8
+        DEFC    _TAN            = 0xC9
+        DEFC    _ASN            = 0xCA
+        DEFC    _ACS            = 0xCB
+        DEFC    _ATN            = 0xCC
+        DEFC    _LN             = 0xCD
+        DEFC    _EXP            = 0xCE
+        DEFC    _INT            = 0xCF
+        DEFC    _SQR            = 0xD0
+        DEFC    _SGN            = 0xD1
+        DEFC    _ABS            = 0xD2
+        DEFC    _PEEK           = 0xD3
+        DEFC    _USR            = 0xD4
+        DEFC    _STR_DOLLAR     = 0xD5
+        DEFC    _CHR_DOLLAR     = 0xD6
+        DEFC    _NOT            = 0xD7
+        DEFC    _POWER          = 0xD8
+        DEFC    _OR             = 0xD9
+        DEFC    _AND            = 0xDA
+        DEFC    _LE             = 0xDB
+        DEFC    _GE             = 0xDC
+        DEFC    _NE             = 0xDD
+        DEFC    _THEN           = 0xDE
+        DEFC    _TO             = 0xDF
+        DEFC    _STEP           = 0xE0
+        DEFC    _LPRINT         = 0xE1
+        DEFC    _LLIST          = 0xE2
+        DEFC    _STOP           = 0xE3
+        DEFC    _SLOW           = 0xE4
+        DEFC    _FAST           = 0xE5
+        DEFC    _NEW            = 0xE6
+        DEFC    _SCROLL         = 0xE7
+        DEFC    _CONT           = 0xE8
+        DEFC    _DIM            = 0xE9
+        DEFC    _REM            = 0xEA
+        DEFC    _FOR            = 0xEB
+        DEFC    _GOTO           = 0xEC
+        DEFC    _GOSUB          = 0xED
+        DEFC    _INPUT          = 0xEE
+        DEFC    _LOAD           = 0xEF
+        DEFC    _LIST           = 0xF0
+        DEFC    _LET            = 0xF1
+        DEFC    _PAUSE          = 0xF2
+        DEFC    _NEXT           = 0xF3
+        DEFC    _POKE           = 0xF4
+        DEFC    _PRINT          = 0xF5
+        DEFC    _PLOT           = 0xF6
+        DEFC    _RUN            = 0xF7
+        DEFC    _SAVE           = 0xF8
+        DEFC    _RAND           = 0xF9
+        DEFC    _IF             = 0xFA
+        DEFC    _CLS            = 0xFB
+        DEFC    _UNPLOT         = 0xFC
+        DEFC    _CLEAR          = 0xFD
+        DEFC    _RETURN         = 0xFE
+        DEFC    _COPY           = 0xFF
+
+; System variables
+
+VERSN:  DEFB    0
+E_PPC:  DEFW    0
+D_FILE: DEFW    DISPLAY
+DF_CC:  DEFW    DISPLAY+1
+VARS:   DEFW    VARIABLES
+DEST:   DEFW    0
+E_LINE: DEFW    WORKSPACE
+CH_ADD: DEFW    WORKSPACE
+X_PTR:  DEFW    0
+STKBOT: DEFW    WORKSPACE
+STKEND: DEFW    WORKSPACE
+BREG:   DEFB    0
+MEM:    DEFW    MEMBOT
+FREE1:  DEFB    255
+DF_SZ:  DEFB    2
+S_TOP:  DEFW    0
+LAST_K: DEFW    0xFFFF
+DBOUNCE:DEFB    0x00
+MARGIN: DEFB    55
+NXTLIN: DEFW    AUTOSTART_ADDR
+OLDPPC: DEFW    0
+FLAGX:  DEFB    0x00
+STRLEN: DEFW    0
+T_ADDR: DEFW    0x0C8D
+SEED:   DEFW    0x0000
+FRAMES: DEFW    0xFD2F
+COORDS:
+COORDX: DEFB    0
+COORDY: DEFB    0
+PR_CC:  DEFB    PRBUFF & 0xFF
+S_POSN:
+S_POSNC:DEFB    33
+S_POSNL:DEFB    24
+CDFLAG: DEFB    SLOW_FLAG
+PRBUFF: DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_NL
+MEMBOT:
+MEM0:   DEFB    0,0,0,0,0
+MEM1:   DEFB    0,0,0,0,0
+MEM2:   DEFB    0,0,0,0,0
+MEM3:   DEFB    0,0,0,0,0
+MEM4:   DEFB    0,0,0,0,0
+MEM5:   DEFB    0,0,0,0,0
+FREE2:  DEFW    0x0000
+
+; BASIC program lines
+
+PROG:
+
+LABEL1:
+;       2 LET A= 2
+        DDB     2
+        DEFW    L0002_END - L0002_START
+L0002_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0002_END:
+
+;      10 LET A= &LABEL1
+        DDB     10
+        DEFW    L0010_END - L0010_START
+L0010_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _0
+        DEFB    _NUMBER
+        FLOAT   0
+        DEFB    _NL
+
+L0010_END:
+
+LABEL2:
+;      20 LET A= 20
+        DDB     20
+        DEFW    L0020_END - L0020_START
+L0020_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _2,_0
+        DEFB    _NUMBER
+        FLOAT   20
+        DEFB    _NL
+
+L0020_END:
+
+AUTOSTART_ADDR:
+LABEL3:
+;      30 LET A= &LABEL3
+        DDB     30
+        DEFW    L0030_END - L0030_START
+L0030_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _0
+        DEFB    _NUMBER
+        FLOAT   0
+        DEFB    _NL
+
+L0030_END:
+
+;      32 LET A=1
+        DDB     32
+        DEFW    L0032_END - L0032_START
+L0032_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0032_END:
+
+;      34 LET B=2
+        DDB     34
+        DEFW    L0034_END - L0034_START
+L0034_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0034_END:
+
+;      36 LET C=3
+        DDB     36
+        DEFW    L0036_END - L0036_START
+L0036_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L0036_END:
+
+;      38 REM
+        DDB     38
+        DEFW    L0038_END - L0038_START
+L0038_START:
+        DEFB    _REM
+
+; ASM block
+
+	LD A,1:LD A,2::LD A,3:::
+
+; End of ASM block
+
+        DEFB    _NL
+
+L0038_END:
+
+;      40 LET A=1
+        DDB     40
+        DEFW    L0040_END - L0040_START
+L0040_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0040_END:
+
+;      42 LET ABC=1
+        DDB     42
+        DEFW    L0042_END - L0042_START
+L0042_START:
+        DEFB    _LET
+        DEFB    _A,_B,_C
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0042_END:
+
+;      44 LET A(1,2)=1
+        DDB     44
+        DEFW    L0044_END - L0044_START
+L0044_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0044_END:
+
+;      46 LET A$="HELLO"
+        DDB     46
+        DEFW    L0046_END - L0046_START
+L0046_START:
+        DEFB    _LET
+        DEFB    _A,_DOLLAR
+        DEFB    _EQ
+        DEFB    _QUOTE
+        DEFB    _H,_E,_L,_L,_O
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L0046_END:
+
+;      48 LET A$(1,2)="A"
+        DDB     48
+        DEFW    L0048_END - L0048_START
+L0048_START:
+        DEFB    _LET
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _QUOTE
+        DEFB    _A
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L0048_END:
+
+;      50 LET A$(1 TO 2)="AB"
+        DDB     50
+        DEFW    L0050_END - L0050_START
+L0050_START:
+        DEFB    _LET
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _QUOTE
+        DEFB    _A,_B
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L0050_END:
+
+;      52 LET A$(1,2)(3 TO 4)="AB"
+        DDB     52
+        DEFW    L0052_END - L0052_START
+L0052_START:
+        DEFB    _LET
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _LPAREN
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _TO
+        DEFB    _4
+        DEFB    _NUMBER
+        FLOAT   4
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _QUOTE
+        DEFB    _A,_B
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L0052_END:
+
+;      54 LET A$(TO 3)="ABC"
+        DDB     54
+        DEFW    L0054_END - L0054_START
+L0054_START:
+        DEFB    _LET
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _TO
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _QUOTE
+        DEFB    _A,_B,_C
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L0054_END:
+
+;      56 LET A$(2 TO)="BCD"
+        DDB     56
+        DEFW    L0056_END - L0056_START
+L0056_START:
+        DEFB    _LET
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _TO
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _QUOTE
+        DEFB    _B,_C,_D
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L0056_END:
+
+;      58 LET A=1
+        DDB     58
+        DEFW    L0058_END - L0058_START
+L0058_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0058_END:
+
+;      60 LET ABC=1
+        DDB     60
+        DEFW    L0060_END - L0060_START
+L0060_START:
+        DEFB    _LET
+        DEFB    _A,_B,_C
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0060_END:
+
+;      62 LET A(1,2)=1
+        DDB     62
+        DEFW    L0062_END - L0062_START
+L0062_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0062_END:
+
+;      64 LET A$="HELLO"
+        DDB     64
+        DEFW    L0064_END - L0064_START
+L0064_START:
+        DEFB    _LET
+        DEFB    _A,_DOLLAR
+        DEFB    _EQ
+        DEFB    _QUOTE
+        DEFB    _H,_E,_L,_L,_O
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L0064_END:
+
+;      66 LET A$(1,2)="A"
+        DDB     66
+        DEFW    L0066_END - L0066_START
+L0066_START:
+        DEFB    _LET
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _QUOTE
+        DEFB    _A
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L0066_END:
+
+;      68 LET A$(1 TO 2)="AB"
+        DDB     68
+        DEFW    L0068_END - L0068_START
+L0068_START:
+        DEFB    _LET
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _QUOTE
+        DEFB    _A,_B
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L0068_END:
+
+;      70 LET A$(1,2)(3 TO 4)="AB"
+        DDB     70
+        DEFW    L0070_END - L0070_START
+L0070_START:
+        DEFB    _LET
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _LPAREN
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _TO
+        DEFB    _4
+        DEFB    _NUMBER
+        FLOAT   4
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _QUOTE
+        DEFB    _A,_B
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L0070_END:
+
+;      72 LET A$(TO 3)="ABC"
+        DDB     72
+        DEFW    L0072_END - L0072_START
+L0072_START:
+        DEFB    _LET
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _TO
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _QUOTE
+        DEFB    _A,_B,_C
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L0072_END:
+
+;      74 LET A$(2 TO)="BCD"
+        DDB     74
+        DEFW    L0074_END - L0074_START
+L0074_START:
+        DEFB    _LET
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _TO
+        DEFB    _RPAREN
+        DEFB    _EQ
+        DEFB    _QUOTE
+        DEFB    _B,_C,_D
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L0074_END:
+
+;      76 DIM A(2)
+        DDB     76
+        DEFW    L0076_END - L0076_START
+L0076_START:
+        DEFB    _DIM
+        DEFB    _A
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0076_END:
+
+;      78 DIM B(2,3)
+        DDB     78
+        DEFW    L0078_END - L0078_START
+L0078_START:
+        DEFB    _DIM
+        DEFB    _B
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _COMMA
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0078_END:
+
+;      80 DIM C(2,3,4)
+        DDB     80
+        DEFW    L0080_END - L0080_START
+L0080_START:
+        DEFB    _DIM
+        DEFB    _C
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _COMMA
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _COMMA
+        DEFB    _4
+        DEFB    _NUMBER
+        FLOAT   4
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0080_END:
+
+;      82 DIM A$(2)
+        DDB     82
+        DEFW    L0082_END - L0082_START
+L0082_START:
+        DEFB    _DIM
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0082_END:
+
+;      84 DIM B$(2,3)
+        DDB     84
+        DEFW    L0084_END - L0084_START
+L0084_START:
+        DEFB    _DIM
+        DEFB    _B,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _COMMA
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0084_END:
+
+;      86 DIM C$(2,3,4)
+        DDB     86
+        DEFW    L0086_END - L0086_START
+L0086_START:
+        DEFB    _DIM
+        DEFB    _C,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _COMMA
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _COMMA
+        DEFB    _4
+        DEFB    _NUMBER
+        FLOAT   4
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0086_END:
+
+;      88 IF A=1 THEN LET B=2
+        DDB     88
+        DEFW    L0088_END - L0088_START
+L0088_START:
+        DEFB    _IF
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _THEN
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0088_END:
+
+;      90 IF NOT(A<>1)THEN GOTO 94
+        DDB     90
+        DEFW    L0090_END - L0090_START
+L0090_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _NE
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _9,_4
+        DEFB    _NUMBER
+        FLOAT   94
+        DEFB    _NL
+
+L0090_END:
+
+;      92 GOTO 96
+        DDB     92
+        DEFW    L0092_END - L0092_START
+L0092_START:
+        DEFB    _GOTO
+        DEFB    _9,_6
+        DEFB    _NUMBER
+        FLOAT   96
+        DEFB    _NL
+
+L0092_END:
+
+ZX81BAS0IFELSE:
+;      94 LET B=2
+        DDB     94
+        DEFW    L0094_END - L0094_START
+L0094_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0094_END:
+
+ZX81BAS0IFEND:
+;      96 IF NOT(A<1)THEN GOTO 104
+        DDB     96
+        DEFW    L0096_END - L0096_START
+L0096_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _LT
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_0,_4
+        DEFB    _NUMBER
+        FLOAT   104
+        DEFB    _NL
+
+L0096_END:
+
+;      98 LET B=2
+        DDB     98
+        DEFW    L0098_END - L0098_START
+L0098_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0098_END:
+
+;     100 LET C=3
+        DDB     100
+        DEFW    L0100_END - L0100_START
+L0100_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L0100_END:
+
+;     102 GOTO 104
+        DDB     102
+        DEFW    L0102_END - L0102_START
+L0102_START:
+        DEFB    _GOTO
+        DEFB    _1,_0,_4
+        DEFB    _NUMBER
+        FLOAT   104
+        DEFB    _NL
+
+L0102_END:
+
+ZX81BAS1IFELSE:
+ZX81BAS1IFEND:
+;     104 IF NOT(A<=1)THEN GOTO 112
+        DDB     104
+        DEFW    L0104_END - L0104_START
+L0104_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _LE
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_1,_2
+        DEFB    _NUMBER
+        FLOAT   112
+        DEFB    _NL
+
+L0104_END:
+
+;     106 LET B=2
+        DDB     106
+        DEFW    L0106_END - L0106_START
+L0106_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0106_END:
+
+;     108 LET C=3
+        DDB     108
+        DEFW    L0108_END - L0108_START
+L0108_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L0108_END:
+
+;     110 GOTO 112
+        DDB     110
+        DEFW    L0110_END - L0110_START
+L0110_START:
+        DEFB    _GOTO
+        DEFB    _1,_1,_2
+        DEFB    _NUMBER
+        FLOAT   112
+        DEFB    _NL
+
+L0110_END:
+
+ZX81BAS2IFELSE:
+ZX81BAS2IFEND:
+;     112 IF NOT(A>1)THEN GOTO 120
+        DDB     112
+        DEFW    L0112_END - L0112_START
+L0112_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _GT
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_2,_0
+        DEFB    _NUMBER
+        FLOAT   120
+        DEFB    _NL
+
+L0112_END:
+
+;     114 LET B=2
+        DDB     114
+        DEFW    L0114_END - L0114_START
+L0114_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0114_END:
+
+;     116 LET C=3
+        DDB     116
+        DEFW    L0116_END - L0116_START
+L0116_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L0116_END:
+
+;     118 GOTO 122
+        DDB     118
+        DEFW    L0118_END - L0118_START
+L0118_START:
+        DEFB    _GOTO
+        DEFB    _1,_2,_2
+        DEFB    _NUMBER
+        FLOAT   122
+        DEFB    _NL
+
+L0118_END:
+
+ZX81BAS3IFELSE:
+;     120 LET D=4
+        DDB     120
+        DEFW    L0120_END - L0120_START
+L0120_START:
+        DEFB    _LET
+        DEFB    _D
+        DEFB    _EQ
+        DEFB    _4
+        DEFB    _NUMBER
+        FLOAT   4
+        DEFB    _NL
+
+L0120_END:
+
+ZX81BAS3IFEND:
+;     122 IF NOT(A>=1)THEN GOTO 130
+        DDB     122
+        DEFW    L0122_END - L0122_START
+L0122_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _GE
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_3,_0
+        DEFB    _NUMBER
+        FLOAT   130
+        DEFB    _NL
+
+L0122_END:
+
+;     124 LET B=2
+        DDB     124
+        DEFW    L0124_END - L0124_START
+L0124_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0124_END:
+
+;     126 LET C=3
+        DDB     126
+        DEFW    L0126_END - L0126_START
+L0126_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L0126_END:
+
+;     128 GOTO 134
+        DDB     128
+        DEFW    L0128_END - L0128_START
+L0128_START:
+        DEFB    _GOTO
+        DEFB    _1,_3,_4
+        DEFB    _NUMBER
+        FLOAT   134
+        DEFB    _NL
+
+L0128_END:
+
+ZX81BAS4IFELSE:
+;     130 LET D=4
+        DDB     130
+        DEFW    L0130_END - L0130_START
+L0130_START:
+        DEFB    _LET
+        DEFB    _D
+        DEFB    _EQ
+        DEFB    _4
+        DEFB    _NUMBER
+        FLOAT   4
+        DEFB    _NL
+
+L0130_END:
+
+;     132 LET E=5
+        DDB     132
+        DEFW    L0132_END - L0132_START
+L0132_START:
+        DEFB    _LET
+        DEFB    _E
+        DEFB    _EQ
+        DEFB    _5
+        DEFB    _NUMBER
+        FLOAT   5
+        DEFB    _NL
+
+L0132_END:
+
+ZX81BAS4IFEND:
+;     134 IF NOT NOT(A=1)THEN GOTO 140
+        DDB     134
+        DEFW    L0134_END - L0134_START
+L0134_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_4,_0
+        DEFB    _NUMBER
+        FLOAT   140
+        DEFB    _NL
+
+L0134_END:
+
+;     136 LET B=2
+        DDB     136
+        DEFW    L0136_END - L0136_START
+L0136_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0136_END:
+
+;     138 GOTO 148
+        DDB     138
+        DEFW    L0138_END - L0138_START
+L0138_START:
+        DEFB    _GOTO
+        DEFB    _1,_4,_8
+        DEFB    _NUMBER
+        FLOAT   148
+        DEFB    _NL
+
+L0138_END:
+
+ZX81BAS5IFELSE:
+;     140 IF NOT(A=2)THEN GOTO 146
+        DDB     140
+        DEFW    L0140_END - L0140_START
+L0140_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_4,_6
+        DEFB    _NUMBER
+        FLOAT   146
+        DEFB    _NL
+
+L0140_END:
+
+;     142 LET B=2
+        DDB     142
+        DEFW    L0142_END - L0142_START
+L0142_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0142_END:
+
+;     144 GOTO 148
+        DDB     144
+        DEFW    L0144_END - L0144_START
+L0144_START:
+        DEFB    _GOTO
+        DEFB    _1,_4,_8
+        DEFB    _NUMBER
+        FLOAT   148
+        DEFB    _NL
+
+L0144_END:
+
+ZX81BAS6IFELSE:
+;     146 LET B=3
+        DDB     146
+        DEFW    L0146_END - L0146_START
+L0146_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L0146_END:
+
+ZX81BAS6IFEND:
+ZX81BAS5IFEND:
+;     148 IF NOT(A=1)THEN GOTO 156
+        DDB     148
+        DEFW    L0148_END - L0148_START
+L0148_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_5,_6
+        DEFB    _NUMBER
+        FLOAT   156
+        DEFB    _NL
+
+L0148_END:
+
+;     150 LET B=1
+        DDB     150
+        DEFW    L0150_END - L0150_START
+L0150_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0150_END:
+
+;     152 LET C=1
+        DDB     152
+        DEFW    L0152_END - L0152_START
+L0152_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0152_END:
+
+;     154 GOTO 156
+        DDB     154
+        DEFW    L0154_END - L0154_START
+L0154_START:
+        DEFB    _GOTO
+        DEFB    _1,_5,_6
+        DEFB    _NUMBER
+        FLOAT   156
+        DEFB    _NL
+
+L0154_END:
+
+ZX81BAS7IFELSE:
+ZX81BAS7IFEND:
+;     156 IF NOT(A=1)THEN GOTO 164
+        DDB     156
+        DEFW    L0156_END - L0156_START
+L0156_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_6,_4
+        DEFB    _NUMBER
+        FLOAT   164
+        DEFB    _NL
+
+L0156_END:
+
+;     158 LET B=1
+        DDB     158
+        DEFW    L0158_END - L0158_START
+L0158_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0158_END:
+
+;     160 LET C=1
+        DDB     160
+        DEFW    L0160_END - L0160_START
+L0160_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0160_END:
+
+;     162 GOTO 174
+        DDB     162
+        DEFW    L0162_END - L0162_START
+L0162_START:
+        DEFB    _GOTO
+        DEFB    _1,_7,_4
+        DEFB    _NUMBER
+        FLOAT   174
+        DEFB    _NL
+
+L0162_END:
+
+ZX81BAS8IFELSE:
+;     164 LET B=2
+        DDB     164
+        DEFW    L0164_END - L0164_START
+L0164_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0164_END:
+
+;     166 IF NOT(A=2)THEN GOTO 172
+        DDB     166
+        DEFW    L0166_END - L0166_START
+L0166_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_7,_2
+        DEFB    _NUMBER
+        FLOAT   172
+        DEFB    _NL
+
+L0166_END:
+
+;     168 LET C=2
+        DDB     168
+        DEFW    L0168_END - L0168_START
+L0168_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0168_END:
+
+;     170 GOTO 174
+        DDB     170
+        DEFW    L0170_END - L0170_START
+L0170_START:
+        DEFB    _GOTO
+        DEFB    _1,_7,_4
+        DEFB    _NUMBER
+        FLOAT   174
+        DEFB    _NL
+
+L0170_END:
+
+ZX81BAS9IFELSE:
+;     172 LET C=3
+        DDB     172
+        DEFW    L0172_END - L0172_START
+L0172_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L0172_END:
+
+ZX81BAS9IFEND:
+ZX81BAS8IFEND:
+;     174 IF NOT(A=1)THEN GOTO 182
+        DDB     174
+        DEFW    L0174_END - L0174_START
+L0174_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_8,_2
+        DEFB    _NUMBER
+        FLOAT   182
+        DEFB    _NL
+
+L0174_END:
+
+;     176 LET B=1
+        DDB     176
+        DEFW    L0176_END - L0176_START
+L0176_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0176_END:
+
+;     178 LET C=1
+        DDB     178
+        DEFW    L0178_END - L0178_START
+L0178_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0178_END:
+
+;     180 GOTO 182
+        DDB     180
+        DEFW    L0180_END - L0180_START
+L0180_START:
+        DEFB    _GOTO
+        DEFB    _1,_8,_2
+        DEFB    _NUMBER
+        FLOAT   182
+        DEFB    _NL
+
+L0180_END:
+
+ZX81BAS10IFELSE:
+ZX81BAS10IFEND:
+;     182 LET D=1
+        DDB     182
+        DEFW    L0182_END - L0182_START
+L0182_START:
+        DEFB    _LET
+        DEFB    _D
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0182_END:
+
+ZX81BAS11REPEATSTART:
+;     184 LET A=1
+        DDB     184
+        DEFW    L0184_END - L0184_START
+L0184_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0184_END:
+
+;     186 IF NOT(A=1)THEN GOTO 184
+        DDB     186
+        DEFW    L0186_END - L0186_START
+L0186_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_8,_4
+        DEFB    _NUMBER
+        FLOAT   184
+        DEFB    _NL
+
+L0186_END:
+
+ZX81BAS11REPEATEND:
+ZX81BAS12REPEATSTART:
+;     188 LET B=1
+        DDB     188
+        DEFW    L0188_END - L0188_START
+L0188_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0188_END:
+
+ZX81BAS13REPEATSTART:
+;     190 LET C=1
+        DDB     190
+        DEFW    L0190_END - L0190_START
+L0190_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0190_END:
+
+;     192 IF NOT(A=1)THEN GOTO 190
+        DDB     192
+        DEFW    L0192_END - L0192_START
+L0192_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_9,_0
+        DEFB    _NUMBER
+        FLOAT   190
+        DEFB    _NL
+
+L0192_END:
+
+ZX81BAS13REPEATEND:
+;     194 IF NOT(A=2)THEN GOTO 188
+        DDB     194
+        DEFW    L0194_END - L0194_START
+L0194_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_8,_8
+        DEFB    _NUMBER
+        FLOAT   188
+        DEFB    _NL
+
+L0194_END:
+
+ZX81BAS12REPEATEND:
+ZX81BAS14REPEATSTART:
+;     196 LET A=1
+        DDB     196
+        DEFW    L0196_END - L0196_START
+L0196_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0196_END:
+
+;     198 LET B=2
+        DDB     198
+        DEFW    L0198_END - L0198_START
+L0198_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0198_END:
+
+;     200 IF A=2 THEN GOTO 208
+        DDB     200
+        DEFW    L0200_END - L0200_START
+L0200_START:
+        DEFB    _IF
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_0,_8
+        DEFB    _NUMBER
+        FLOAT   208
+        DEFB    _NL
+
+L0200_END:
+
+ZX81BAS15REPEATSTART:
+;     202 LET C=3
+        DDB     202
+        DEFW    L0202_END - L0202_START
+L0202_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L0202_END:
+
+;     204 IF NOT(A=2)THEN GOTO 202
+        DDB     204
+        DEFW    L0204_END - L0204_START
+L0204_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_0,_2
+        DEFB    _NUMBER
+        FLOAT   202
+        DEFB    _NL
+
+L0204_END:
+
+ZX81BAS15REPEATEND:
+;     206 IF NOT(A=1)THEN GOTO 196
+        DDB     206
+        DEFW    L0206_END - L0206_START
+L0206_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _1,_9,_6
+        DEFB    _NUMBER
+        FLOAT   196
+        DEFB    _NL
+
+L0206_END:
+
+ZX81BAS14REPEATEND:
+ZX81BAS16REPEATSTART:
+;     208 LET A=1
+        DDB     208
+        DEFW    L0208_END - L0208_START
+L0208_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0208_END:
+
+;     210 LET B=2
+        DDB     210
+        DEFW    L0210_END - L0210_START
+L0210_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0210_END:
+
+;     212 IF NOT(A=1)THEN GOTO 208
+        DDB     212
+        DEFW    L0212_END - L0212_START
+L0212_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_0,_8
+        DEFB    _NUMBER
+        FLOAT   208
+        DEFB    _NL
+
+L0212_END:
+
+ZX81BAS16REPEATEND:
+;     214 LET C=1
+        DDB     214
+        DEFW    L0214_END - L0214_START
+L0214_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0214_END:
+
+ZX81BAS17WHILESTART:
+;     216 IF NOT(A<>1)THEN GOTO 226
+        DDB     216
+        DEFW    L0216_END - L0216_START
+L0216_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _NE
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_2,_6
+        DEFB    _NUMBER
+        FLOAT   226
+        DEFB    _NL
+
+L0216_END:
+
+;     218 LET A=1
+        DDB     218
+        DEFW    L0218_END - L0218_START
+L0218_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0218_END:
+
+;     220 LET B=2
+        DDB     220
+        DEFW    L0220_END - L0220_START
+L0220_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0220_END:
+
+;     222 LET C=3
+        DDB     222
+        DEFW    L0222_END - L0222_START
+L0222_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L0222_END:
+
+;     224 GOTO 216
+        DDB     224
+        DEFW    L0224_END - L0224_START
+L0224_START:
+        DEFB    _GOTO
+        DEFB    _2,_1,_6
+        DEFB    _NUMBER
+        FLOAT   216
+        DEFB    _NL
+
+L0224_END:
+
+ZX81BAS17WHILEEND:
+ZX81BAS18WHILESTART:
+;     226 IF NOT(A=1)THEN GOTO 238
+        DDB     226
+        DEFW    L0226_END - L0226_START
+L0226_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_3,_8
+        DEFB    _NUMBER
+        FLOAT   238
+        DEFB    _NL
+
+L0226_END:
+
+;     228 LET B=1
+        DDB     228
+        DEFW    L0228_END - L0228_START
+L0228_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0228_END:
+
+ZX81BAS19WHILESTART:
+;     230 IF NOT(A=2)THEN GOTO 236
+        DDB     230
+        DEFW    L0230_END - L0230_START
+L0230_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_3,_6
+        DEFB    _NUMBER
+        FLOAT   236
+        DEFB    _NL
+
+L0230_END:
+
+;     232 LET C=1
+        DDB     232
+        DEFW    L0232_END - L0232_START
+L0232_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0232_END:
+
+;     234 GOTO 230
+        DDB     234
+        DEFW    L0234_END - L0234_START
+L0234_START:
+        DEFB    _GOTO
+        DEFB    _2,_3,_0
+        DEFB    _NUMBER
+        FLOAT   230
+        DEFB    _NL
+
+L0234_END:
+
+ZX81BAS19WHILEEND:
+;     236 GOTO 226
+        DDB     236
+        DEFW    L0236_END - L0236_START
+L0236_START:
+        DEFB    _GOTO
+        DEFB    _2,_2,_6
+        DEFB    _NUMBER
+        FLOAT   226
+        DEFB    _NL
+
+L0236_END:
+
+ZX81BAS18WHILEEND:
+ZX81BAS20WHILESTART:
+;     238 IF NOT(A<>1)THEN GOTO 254
+        DDB     238
+        DEFW    L0238_END - L0238_START
+L0238_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _NE
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_5,_4
+        DEFB    _NUMBER
+        FLOAT   254
+        DEFB    _NL
+
+L0238_END:
+
+;     240 LET A=1
+        DDB     240
+        DEFW    L0240_END - L0240_START
+L0240_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0240_END:
+
+;     242 LET B=2
+        DDB     242
+        DEFW    L0242_END - L0242_START
+L0242_START:
+        DEFB    _LET
+        DEFB    _B
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0242_END:
+
+;     244 IF A=2 THEN GOTO 254
+        DDB     244
+        DEFW    L0244_END - L0244_START
+L0244_START:
+        DEFB    _IF
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_5,_4
+        DEFB    _NUMBER
+        FLOAT   254
+        DEFB    _NL
+
+L0244_END:
+
+ZX81BAS21WHILESTART:
+;     246 IF NOT(A<>2)THEN GOTO 252
+        DDB     246
+        DEFW    L0246_END - L0246_START
+L0246_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _NE
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_5,_2
+        DEFB    _NUMBER
+        FLOAT   252
+        DEFB    _NL
+
+L0246_END:
+
+;     248 LET C=3
+        DDB     248
+        DEFW    L0248_END - L0248_START
+L0248_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L0248_END:
+
+;     250 GOTO 246
+        DDB     250
+        DEFW    L0250_END - L0250_START
+L0250_START:
+        DEFB    _GOTO
+        DEFB    _2,_4,_6
+        DEFB    _NUMBER
+        FLOAT   246
+        DEFB    _NL
+
+L0250_END:
+
+ZX81BAS21WHILEEND:
+;     252 GOTO 238
+        DDB     252
+        DEFW    L0252_END - L0252_START
+L0252_START:
+        DEFB    _GOTO
+        DEFB    _2,_3,_8
+        DEFB    _NUMBER
+        FLOAT   238
+        DEFB    _NL
+
+L0252_END:
+
+ZX81BAS20WHILEEND:
+ZX81BAS22WHILESTART:
+;     254 IF NOT(A<>2)THEN GOTO 260
+        DDB     254
+        DEFW    L0254_END - L0254_START
+L0254_START:
+        DEFB    _IF
+        DEFB    _NOT
+        DEFB    _LPAREN
+        DEFB    _A
+        DEFB    _NE
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_6,_0
+        DEFB    _NUMBER
+        FLOAT   260
+        DEFB    _NL
+
+L0254_END:
+
+;     256 LET C=3
+        DDB     256
+        DEFW    L0256_END - L0256_START
+L0256_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L0256_END:
+
+;     258 GOTO 254
+        DDB     258
+        DEFW    L0258_END - L0258_START
+L0258_START:
+        DEFB    _GOTO
+        DEFB    _2,_5,_4
+        DEFB    _NUMBER
+        FLOAT   254
+        DEFB    _NL
+
+L0258_END:
+
+ZX81BAS22WHILEEND:
+;     260 LET C=4
+        DDB     260
+        DEFW    L0260_END - L0260_START
+L0260_START:
+        DEFB    _LET
+        DEFB    _C
+        DEFB    _EQ
+        DEFB    _4
+        DEFB    _NUMBER
+        FLOAT   4
+        DEFB    _NL
+
+L0260_END:
+
+;     262 LET S=0
+        DDB     262
+        DEFW    L0262_END - L0262_START
+L0262_START:
+        DEFB    _LET
+        DEFB    _S
+        DEFB    _EQ
+        DEFB    _0
+        DEFB    _NUMBER
+        FLOAT   0
+        DEFB    _NL
+
+L0262_END:
+
+;     264 FOR I=1 TO 10 STEP SGN 1
+        DDB     264
+        DEFW    L0264_END - L0264_START
+L0264_START:
+        DEFB    _FOR
+        DEFB    _I
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _STEP
+        DEFB    _SGN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L0264_END:
+
+;     266 LET S=S+I
+        DDB     266
+        DEFW    L0266_END - L0266_START
+L0266_START:
+        DEFB    _LET
+        DEFB    _S
+        DEFB    _EQ
+        DEFB    _S
+        DEFB    _PLUS
+        DEFB    _I
+        DEFB    _NL
+
+L0266_END:
+
+;     268 NEXT I
+        DDB     268
+        DEFW    L0268_END - L0268_START
+L0268_START:
+        DEFB    _NEXT
+        DEFB    _I
+        DEFB    _NL
+
+L0268_END:
+
+ZX81BAS23FOREND:
+;     270 FOR I=1 TO 10
+        DDB     270
+        DEFW    L0270_END - L0270_START
+L0270_START:
+        DEFB    _FOR
+        DEFB    _I
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _NL
+
+L0270_END:
+
+;     272 FOR J=1 TO 10
+        DDB     272
+        DEFW    L0272_END - L0272_START
+L0272_START:
+        DEFB    _FOR
+        DEFB    _J
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _NL
+
+L0272_END:
+
+;     274 LET A=I*J
+        DDB     274
+        DEFW    L0274_END - L0274_START
+L0274_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _I
+        DEFB    _MULT
+        DEFB    _J
+        DEFB    _NL
+
+L0274_END:
+
+;     276 NEXT J
+        DDB     276
+        DEFW    L0276_END - L0276_START
+L0276_START:
+        DEFB    _NEXT
+        DEFB    _J
+        DEFB    _NL
+
+L0276_END:
+
+ZX81BAS25FOREND:
+;     278 NEXT I
+        DDB     278
+        DEFW    L0278_END - L0278_START
+L0278_START:
+        DEFB    _NEXT
+        DEFB    _I
+        DEFB    _NL
+
+L0278_END:
+
+ZX81BAS24FOREND:
+;     280 FOR I=1 TO 10 STEP 2
+        DDB     280
+        DEFW    L0280_END - L0280_START
+L0280_START:
+        DEFB    _FOR
+        DEFB    _I
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _STEP
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0280_END:
+
+;     282 LET S=S+I
+        DDB     282
+        DEFW    L0282_END - L0282_START
+L0282_START:
+        DEFB    _LET
+        DEFB    _S
+        DEFB    _EQ
+        DEFB    _S
+        DEFB    _PLUS
+        DEFB    _I
+        DEFB    _NL
+
+L0282_END:
+
+;     284 IF I=2 THEN GOTO 294
+        DDB     284
+        DEFW    L0284_END - L0284_START
+L0284_START:
+        DEFB    _IF
+        DEFB    _I
+        DEFB    _EQ
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _THEN
+        DEFB    _GOTO
+        DEFB    _2,_9,_4
+        DEFB    _NUMBER
+        FLOAT   294
+        DEFB    _NL
+
+L0284_END:
+
+;     286 FOR J=1 TO 10 STEP 2
+        DDB     286
+        DEFW    L0286_END - L0286_START
+L0286_START:
+        DEFB    _FOR
+        DEFB    _J
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _STEP
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0286_END:
+
+;     288 LET A=I*J
+        DDB     288
+        DEFW    L0288_END - L0288_START
+L0288_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _I
+        DEFB    _MULT
+        DEFB    _J
+        DEFB    _NL
+
+L0288_END:
+
+;     290 NEXT J
+        DDB     290
+        DEFW    L0290_END - L0290_START
+L0290_START:
+        DEFB    _NEXT
+        DEFB    _J
+        DEFB    _NL
+
+L0290_END:
+
+ZX81BAS27FOREND:
+;     292 NEXT I
+        DDB     292
+        DEFW    L0292_END - L0292_START
+L0292_START:
+        DEFB    _NEXT
+        DEFB    _I
+        DEFB    _NL
+
+L0292_END:
+
+ZX81BAS26FOREND:
+;     294 FOR I=1 TO 10
+        DDB     294
+        DEFW    L0294_END - L0294_START
+L0294_START:
+        DEFB    _FOR
+        DEFB    _I
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _NL
+
+L0294_END:
+
+;     296 FOR J=1 TO 10
+        DDB     296
+        DEFW    L0296_END - L0296_START
+L0296_START:
+        DEFB    _FOR
+        DEFB    _J
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _NL
+
+L0296_END:
+
+;     298 LET A=I*J
+        DDB     298
+        DEFW    L0298_END - L0298_START
+L0298_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _I
+        DEFB    _MULT
+        DEFB    _J
+        DEFB    _NL
+
+L0298_END:
+
+;     300 NEXT J
+        DDB     300
+        DEFW    L0300_END - L0300_START
+L0300_START:
+        DEFB    _NEXT
+        DEFB    _J
+        DEFB    _NL
+
+L0300_END:
+
+ZX81BAS29FOREND:
+;     302 NEXT I
+        DDB     302
+        DEFW    L0302_END - L0302_START
+L0302_START:
+        DEFB    _NEXT
+        DEFB    _I
+        DEFB    _NL
+
+L0302_END:
+
+ZX81BAS28FOREND:
+;     304 FOR I=1 TO 10 STEP 2
+        DDB     304
+        DEFW    L0304_END - L0304_START
+L0304_START:
+        DEFB    _FOR
+        DEFB    _I
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _STEP
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0304_END:
+
+;     306 FOR J=1 TO 10 STEP 2
+        DDB     306
+        DEFW    L0306_END - L0306_START
+L0306_START:
+        DEFB    _FOR
+        DEFB    _J
+        DEFB    _EQ
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _STEP
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L0306_END:
+
+;     308 LET A=I*J
+        DDB     308
+        DEFW    L0308_END - L0308_START
+L0308_START:
+        DEFB    _LET
+        DEFB    _A
+        DEFB    _EQ
+        DEFB    _I
+        DEFB    _MULT
+        DEFB    _J
+        DEFB    _NL
+
+L0308_END:
+
+;     310 NEXT J
+        DDB     310
+        DEFW    L0310_END - L0310_START
+L0310_START:
+        DEFB    _NEXT
+        DEFB    _J
+        DEFB    _NL
+
+L0310_END:
+
+ZX81BAS31FOREND:
+;     312 NEXT I
+        DDB     312
+        DEFW    L0312_END - L0312_START
+L0312_START:
+        DEFB    _NEXT
+        DEFB    _I
+        DEFB    _NL
+
+L0312_END:
+
+ZX81BAS30FOREND:
+;    1000 GOTO 1000
+        DDB     1000
+        DEFW    L1000_END - L1000_START
+L1000_START:
+        DEFB    _GOTO
+        DEFB    _1,_0,_0,_0
+        DEFB    _NUMBER
+        FLOAT   1000
+        DEFB    _NL
+
+L1000_END:
+
+;    1002 GOTO 1000+20*A
+        DDB     1002
+        DEFW    L1002_END - L1002_START
+L1002_START:
+        DEFB    _GOTO
+        DEFB    _1,_0,_0,_0
+        DEFB    _NUMBER
+        FLOAT   1000
+        DEFB    _PLUS
+        DEFB    _2,_0
+        DEFB    _NUMBER
+        FLOAT   20
+        DEFB    _MULT
+        DEFB    _A
+        DEFB    _NL
+
+L1002_END:
+
+;    1004 GOTO 2
+        DDB     1004
+        DEFW    L1004_END - L1004_START
+L1004_START:
+        DEFB    _GOTO
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L1004_END:
+
+;    1006 GOSUB 1000
+        DDB     1006
+        DEFW    L1006_END - L1006_START
+L1006_START:
+        DEFB    _GOSUB
+        DEFB    _1,_0,_0,_0
+        DEFB    _NUMBER
+        FLOAT   1000
+        DEFB    _NL
+
+L1006_END:
+
+;    1008 GOSUB 1000+20*A
+        DDB     1008
+        DEFW    L1008_END - L1008_START
+L1008_START:
+        DEFB    _GOSUB
+        DEFB    _1,_0,_0,_0
+        DEFB    _NUMBER
+        FLOAT   1000
+        DEFB    _PLUS
+        DEFB    _2,_0
+        DEFB    _NUMBER
+        FLOAT   20
+        DEFB    _MULT
+        DEFB    _A
+        DEFB    _NL
+
+L1008_END:
+
+;    1010 GOSUB 2
+        DDB     1010
+        DEFW    L1010_END - L1010_START
+L1010_START:
+        DEFB    _GOSUB
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L1010_END:
+
+;    1012 RETURN
+        DDB     1012
+        DEFW    L1012_END - L1012_START
+L1012_START:
+        DEFB    _RETURN
+        DEFB    _NL
+
+L1012_END:
+
+;    1014 STOP
+        DDB     1014
+        DEFW    L1014_END - L1014_START
+L1014_START:
+        DEFB    _STOP
+        DEFB    _NL
+
+L1014_END:
+
+;    1016 STOP
+        DDB     1016
+        DEFW    L1016_END - L1016_START
+L1016_START:
+        DEFB    _STOP
+        DEFB    _NL
+
+L1016_END:
+
+;    1018 PRINT
+        DDB     1018
+        DEFW    L1018_END - L1018_START
+L1018_START:
+        DEFB    _PRINT
+        DEFB    _NL
+
+L1018_END:
+
+;    1020 PRINT,
+        DDB     1020
+        DEFW    L1020_END - L1020_START
+L1020_START:
+        DEFB    _PRINT
+        DEFB    _COMMA
+        DEFB    _NL
+
+L1020_END:
+
+;    1022 PRINT;
+        DDB     1022
+        DEFW    L1022_END - L1022_START
+L1022_START:
+        DEFB    _PRINT
+        DEFB    _SEMICOLON
+        DEFB    _NL
+
+L1022_END:
+
+;    1024 PRINT 2*3
+        DDB     1024
+        DEFW    L1024_END - L1024_START
+L1024_START:
+        DEFB    _PRINT
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _MULT
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L1024_END:
+
+;    1026 PRINT TAB 8;
+        DDB     1026
+        DEFW    L1026_END - L1026_START
+L1026_START:
+        DEFB    _PRINT
+        DEFB    _TAB
+        DEFB    _8
+        DEFB    _NUMBER
+        FLOAT   8
+        DEFB    _SEMICOLON
+        DEFB    _NL
+
+L1026_END:
+
+;    1028 PRINT AT 10,10;
+        DDB     1028
+        DEFW    L1028_END - L1028_START
+L1028_START:
+        DEFB    _PRINT
+        DEFB    _AT
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _COMMA
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _SEMICOLON
+        DEFB    _NL
+
+L1028_END:
+
+;    1030 PRINT AT 10,10;"HELLO";TAB 10;"WORLD";
+        DDB     1030
+        DEFW    L1030_END - L1030_START
+L1030_START:
+        DEFB    _PRINT
+        DEFB    _AT
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _COMMA
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _SEMICOLON
+        DEFB    _QUOTE
+        DEFB    _H,_E,_L,_L,_O
+        DEFB    _QUOTE
+        DEFB    _SEMICOLON
+        DEFB    _TAB
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _SEMICOLON
+        DEFB    _QUOTE
+        DEFB    _W,_O,_R,_L,_D
+        DEFB    _QUOTE
+        DEFB    _SEMICOLON
+        DEFB    _NL
+
+L1030_END:
+
+;    1032 LPRINT
+        DDB     1032
+        DEFW    L1032_END - L1032_START
+L1032_START:
+        DEFB    _LPRINT
+        DEFB    _NL
+
+L1032_END:
+
+;    1034 LPRINT,
+        DDB     1034
+        DEFW    L1034_END - L1034_START
+L1034_START:
+        DEFB    _LPRINT
+        DEFB    _COMMA
+        DEFB    _NL
+
+L1034_END:
+
+;    1036 LPRINT;
+        DDB     1036
+        DEFW    L1036_END - L1036_START
+L1036_START:
+        DEFB    _LPRINT
+        DEFB    _SEMICOLON
+        DEFB    _NL
+
+L1036_END:
+
+;    1038 LPRINT 2*3
+        DDB     1038
+        DEFW    L1038_END - L1038_START
+L1038_START:
+        DEFB    _LPRINT
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _MULT
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _NL
+
+L1038_END:
+
+;    1040 LPRINT TAB 8;
+        DDB     1040
+        DEFW    L1040_END - L1040_START
+L1040_START:
+        DEFB    _LPRINT
+        DEFB    _TAB
+        DEFB    _8
+        DEFB    _NUMBER
+        FLOAT   8
+        DEFB    _SEMICOLON
+        DEFB    _NL
+
+L1040_END:
+
+;    1042 LPRINT AT 10,10;
+        DDB     1042
+        DEFW    L1042_END - L1042_START
+L1042_START:
+        DEFB    _LPRINT
+        DEFB    _AT
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _COMMA
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _SEMICOLON
+        DEFB    _NL
+
+L1042_END:
+
+;    1044 LPRINT AT 10,10;"HELLO";TAB 10;"WORLD";
+        DDB     1044
+        DEFW    L1044_END - L1044_START
+L1044_START:
+        DEFB    _LPRINT
+        DEFB    _AT
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _COMMA
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _SEMICOLON
+        DEFB    _QUOTE
+        DEFB    _H,_E,_L,_L,_O
+        DEFB    _QUOTE
+        DEFB    _SEMICOLON
+        DEFB    _TAB
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _SEMICOLON
+        DEFB    _QUOTE
+        DEFB    _W,_O,_R,_L,_D
+        DEFB    _QUOTE
+        DEFB    _SEMICOLON
+        DEFB    _NL
+
+L1044_END:
+
+;    1046 INPUT A
+        DDB     1046
+        DEFW    L1046_END - L1046_START
+L1046_START:
+        DEFB    _INPUT
+        DEFB    _A
+        DEFB    _NL
+
+L1046_END:
+
+;    1048 INPUT ABC
+        DDB     1048
+        DEFW    L1048_END - L1048_START
+L1048_START:
+        DEFB    _INPUT
+        DEFB    _A,_B,_C
+        DEFB    _NL
+
+L1048_END:
+
+;    1050 INPUT A(1,2)
+        DDB     1050
+        DEFW    L1050_END - L1050_START
+L1050_START:
+        DEFB    _INPUT
+        DEFB    _A
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L1050_END:
+
+;    1052 INPUT A$
+        DDB     1052
+        DEFW    L1052_END - L1052_START
+L1052_START:
+        DEFB    _INPUT
+        DEFB    _A,_DOLLAR
+        DEFB    _NL
+
+L1052_END:
+
+;    1054 INPUT A$(1,2)
+        DDB     1054
+        DEFW    L1054_END - L1054_START
+L1054_START:
+        DEFB    _INPUT
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L1054_END:
+
+;    1056 INPUT A$(1 TO 2)
+        DDB     1056
+        DEFW    L1056_END - L1056_START
+L1056_START:
+        DEFB    _INPUT
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _TO
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L1056_END:
+
+;    1058 INPUT A$(1,2)(3 TO 4)
+        DDB     1058
+        DEFW    L1058_END - L1058_START
+L1058_START:
+        DEFB    _INPUT
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _LPAREN
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _TO
+        DEFB    _4
+        DEFB    _NUMBER
+        FLOAT   4
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L1058_END:
+
+;    1060 INPUT A$(TO 3)
+        DDB     1060
+        DEFW    L1060_END - L1060_START
+L1060_START:
+        DEFB    _INPUT
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _TO
+        DEFB    _3
+        DEFB    _NUMBER
+        FLOAT   3
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L1060_END:
+
+;    1062 INPUT A$(2 TO)
+        DDB     1062
+        DEFW    L1062_END - L1062_START
+L1062_START:
+        DEFB    _INPUT
+        DEFB    _A,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _TO
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L1062_END:
+
+;    1064 INPUT A
+        DDB     1064
+        DEFW    L1064_END - L1064_START
+L1064_START:
+        DEFB    _INPUT
+        DEFB    _A
+        DEFB    _NL
+
+L1064_END:
+
+;    1066 INPUT A$
+        DDB     1066
+        DEFW    L1066_END - L1066_START
+L1066_START:
+        DEFB    _INPUT
+        DEFB    _A,_DOLLAR
+        DEFB    _NL
+
+L1066_END:
+
+;    1068 INPUT I1
+        DDB     1068
+        DEFW    L1068_END - L1068_START
+L1068_START:
+        DEFB    _INPUT
+        DEFB    _I,_1
+        DEFB    _NL
+
+L1068_END:
+
+;    1070 INPUT I(10)
+        DDB     1070
+        DEFW    L1070_END - L1070_START
+L1070_START:
+        DEFB    _INPUT
+        DEFB    _I
+        DEFB    _LPAREN
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L1070_END:
+
+;    1072 REM
+        DDB     1072
+        DEFW    L1072_END - L1072_START
+L1072_START:
+        DEFB    _REM
+        DEFB    _NL
+
+L1072_END:
+
+;    1074 REM COMMENT TEXT : COLONS ARE PART OF COMMENT
+        DDB     1074
+        DEFW    L1074_END - L1074_START
+L1074_START:
+        DEFB    _REM
+        DEFB    _INV_C,_INV_O,_INV_M,_INV_M,_INV_E,_INV_N,_INV_T,_INV_SP, \
+                _INV_T,_INV_E,_INV_X,_INV_T,_INV_SP,_INV_COLON,_INV_SP,_INV_C, \
+                _INV_O,_INV_L,_INV_O,_INV_N,_INV_S,_INV_SP,_INV_A,_INV_R, \
+                _INV_E,_INV_SP,_INV_P,_INV_A,_INV_R,_INV_T,_INV_SP,_INV_O, \
+                _INV_F,_INV_SP,_INV_C,_INV_O,_INV_M,_INV_M,_INV_E,_INV_N, \
+                _INV_T
+
+; ASM block
+
+	START_REM:
+		RET
+
+; End of ASM block
+
+        DEFB    _NL
+
+L1074_END:
+
+;    1076 RUN
+        DDB     1076
+        DEFW    L1076_END - L1076_START
+L1076_START:
+        DEFB    _RUN
+        DEFB    _NL
+
+L1076_END:
+
+;    1078 RUN 1000
+        DDB     1078
+        DEFW    L1078_END - L1078_START
+L1078_START:
+        DEFB    _RUN
+        DEFB    _1,_0,_0,_0
+        DEFB    _NUMBER
+        FLOAT   1000
+        DEFB    _NL
+
+L1078_END:
+
+;    1080 RUN 1000+20*A
+        DDB     1080
+        DEFW    L1080_END - L1080_START
+L1080_START:
+        DEFB    _RUN
+        DEFB    _1,_0,_0,_0
+        DEFB    _NUMBER
+        FLOAT   1000
+        DEFB    _PLUS
+        DEFB    _2,_0
+        DEFB    _NUMBER
+        FLOAT   20
+        DEFB    _MULT
+        DEFB    _A
+        DEFB    _NL
+
+L1080_END:
+
+;    1082 RUN 2
+        DDB     1082
+        DEFW    L1082_END - L1082_START
+L1082_START:
+        DEFB    _RUN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L1082_END:
+
+;    1084 NEW
+        DDB     1084
+        DEFW    L1084_END - L1084_START
+L1084_START:
+        DEFB    _NEW
+        DEFB    _NL
+
+L1084_END:
+
+;    1086 CLS
+        DDB     1086
+        DEFW    L1086_END - L1086_START
+L1086_START:
+        DEFB    _CLS
+        DEFB    _NL
+
+L1086_END:
+
+;    1088 LOAD"file"
+        DDB     1088
+        DEFW    L1088_END - L1088_START
+L1088_START:
+        DEFB    _LOAD
+        DEFB    _QUOTE
+        DEFB    _F,_I,_L,_E
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L1088_END:
+
+;    1090 SAVE"file"
+        DDB     1090
+        DEFW    L1090_END - L1090_START
+L1090_START:
+        DEFB    _SAVE
+        DEFB    _QUOTE
+        DEFB    _F,_I,_L,_E
+        DEFB    _QUOTE
+        DEFB    _NL
+
+L1090_END:
+
+;    1092 POKE 16384,255
+        DDB     1092
+        DEFW    L1092_END - L1092_START
+L1092_START:
+        DEFB    _POKE
+        DEFB    _1,_6,_3,_8,_4
+        DEFB    _NUMBER
+        FLOAT   16384
+        DEFB    _COMMA
+        DEFB    _2,_5,_5
+        DEFB    _NUMBER
+        FLOAT   255
+        DEFB    _NL
+
+L1092_END:
+
+;    1094 POKE 16384,258-256*INT(258/256)
+        DDB     1094
+        DEFW    L1094_END - L1094_START
+L1094_START:
+        DEFB    _POKE
+        DEFB    _1,_6,_3,_8,_4
+        DEFB    _NUMBER
+        FLOAT   16384
+        DEFB    _COMMA
+        DEFB    _2,_5,_8
+        DEFB    _NUMBER
+        FLOAT   258
+        DEFB    _MINUS
+        DEFB    _2,_5,_6
+        DEFB    _NUMBER
+        FLOAT   256
+        DEFB    _MULT
+        DEFB    _INT
+        DEFB    _LPAREN
+        DEFB    _2,_5,_8
+        DEFB    _NUMBER
+        FLOAT   258
+        DEFB    _DIV
+        DEFB    _2,_5,_6
+        DEFB    _NUMBER
+        FLOAT   256
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L1094_END:
+
+;    1096 POKE 16384+1,INT(258/256)
+        DDB     1096
+        DEFW    L1096_END - L1096_START
+L1096_START:
+        DEFB    _POKE
+        DEFB    _1,_6,_3,_8,_4
+        DEFB    _NUMBER
+        FLOAT   16384
+        DEFB    _PLUS
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _INT
+        DEFB    _LPAREN
+        DEFB    _2,_5,_8
+        DEFB    _NUMBER
+        FLOAT   258
+        DEFB    _DIV
+        DEFB    _2,_5,_6
+        DEFB    _NUMBER
+        FLOAT   256
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L1096_END:
+
+;    1098 RAND USR 16514
+        DDB     1098
+        DEFW    L1098_END - L1098_START
+L1098_START:
+        DEFB    _RAND
+        DEFB    _USR
+        DEFB    _1,_6,_5,_1,_4
+        DEFB    _NUMBER
+        FLOAT   16514
+        DEFB    _NL
+
+L1098_END:
+
+;    1100 PAUSE 50
+        DDB     1100
+        DEFW    L1100_END - L1100_START
+L1100_START:
+        DEFB    _PAUSE
+        DEFB    _5,_0
+        DEFB    _NUMBER
+        FLOAT   50
+        DEFB    _NL
+
+L1100_END:
+
+;    1102 FAST
+        DDB     1102
+        DEFW    L1102_END - L1102_START
+L1102_START:
+        DEFB    _FAST
+        DEFB    _NL
+
+L1102_END:
+
+;    1104 SLOW
+        DDB     1104
+        DEFW    L1104_END - L1104_START
+L1104_START:
+        DEFB    _SLOW
+        DEFB    _NL
+
+L1104_END:
+
+;    1106 LIST
+        DDB     1106
+        DEFW    L1106_END - L1106_START
+L1106_START:
+        DEFB    _LIST
+        DEFB    _NL
+
+L1106_END:
+
+;    1108 LIST 10
+        DDB     1108
+        DEFW    L1108_END - L1108_START
+L1108_START:
+        DEFB    _LIST
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _NL
+
+L1108_END:
+
+;    1110 LIST 10*4
+        DDB     1110
+        DEFW    L1110_END - L1110_START
+L1110_START:
+        DEFB    _LIST
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _MULT
+        DEFB    _4
+        DEFB    _NUMBER
+        FLOAT   4
+        DEFB    _NL
+
+L1110_END:
+
+;    1112 LIST 2
+        DDB     1112
+        DEFW    L1112_END - L1112_START
+L1112_START:
+        DEFB    _LIST
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L1112_END:
+
+;    1114 LLIST
+        DDB     1114
+        DEFW    L1114_END - L1114_START
+L1114_START:
+        DEFB    _LLIST
+        DEFB    _NL
+
+L1114_END:
+
+;    1116 LLIST 10
+        DDB     1116
+        DEFW    L1116_END - L1116_START
+L1116_START:
+        DEFB    _LLIST
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _NL
+
+L1116_END:
+
+;    1118 LLIST 10*4
+        DDB     1118
+        DEFW    L1118_END - L1118_START
+L1118_START:
+        DEFB    _LLIST
+        DEFB    _1,_0
+        DEFB    _NUMBER
+        FLOAT   10
+        DEFB    _MULT
+        DEFB    _4
+        DEFB    _NUMBER
+        FLOAT   4
+        DEFB    _NL
+
+L1118_END:
+
+;    1120 LLIST 2
+        DDB     1120
+        DEFW    L1120_END - L1120_START
+L1120_START:
+        DEFB    _LLIST
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _NL
+
+L1120_END:
+
+;    1122 LET X=0
+        DDB     1122
+        DEFW    L1122_END - L1122_START
+L1122_START:
+        DEFB    _LET
+        DEFB    _X
+        DEFB    _EQ
+        DEFB    _0
+        DEFB    _NUMBER
+        FLOAT   0
+        DEFB    _NL
+
+L1122_END:
+
+;    1124 LET Y=0
+        DDB     1124
+        DEFW    L1124_END - L1124_START
+L1124_START:
+        DEFB    _LET
+        DEFB    _Y
+        DEFB    _EQ
+        DEFB    _0
+        DEFB    _NUMBER
+        FLOAT   0
+        DEFB    _NL
+
+L1124_END:
+
+;    1126 PLOT 0,1
+        DDB     1126
+        DEFW    L1126_END - L1126_START
+L1126_START:
+        DEFB    _PLOT
+        DEFB    _0
+        DEFB    _NUMBER
+        FLOAT   0
+        DEFB    _COMMA
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L1126_END:
+
+;    1128 PLOT X,Y
+        DDB     1128
+        DEFW    L1128_END - L1128_START
+L1128_START:
+        DEFB    _PLOT
+        DEFB    _X
+        DEFB    _COMMA
+        DEFB    _Y
+        DEFB    _NL
+
+L1128_END:
+
+;    1130 UNPLOT 0,1
+        DDB     1130
+        DEFW    L1130_END - L1130_START
+L1130_START:
+        DEFB    _UNPLOT
+        DEFB    _0
+        DEFB    _NUMBER
+        FLOAT   0
+        DEFB    _COMMA
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _NL
+
+L1130_END:
+
+;    1132 UNPLOT X,Y
+        DDB     1132
+        DEFW    L1132_END - L1132_START
+L1132_START:
+        DEFB    _UNPLOT
+        DEFB    _X
+        DEFB    _COMMA
+        DEFB    _Y
+        DEFB    _NL
+
+L1132_END:
+
+;    1134 SCROLL
+        DDB     1134
+        DEFW    L1134_END - L1134_START
+L1134_START:
+        DEFB    _SCROLL
+        DEFB    _NL
+
+L1134_END:
+
+;    1136 CONT
+        DDB     1136
+        DEFW    L1136_END - L1136_START
+L1136_START:
+        DEFB    _CONT
+        DEFB    _NL
+
+L1136_END:
+
+;    1138 CLEAR
+        DDB     1138
+        DEFW    L1138_END - L1138_START
+L1138_START:
+        DEFB    _CLEAR
+        DEFB    _NL
+
+L1138_END:
+
+;    1140 COPY
+        DDB     1140
+        DEFW    L1140_END - L1140_START
+L1140_START:
+        DEFB    _COPY
+        DEFB    _NL
+
+L1140_END:
+
+
+; Display file
+
+DISPLAY:DEFB    _NL
+DSPLY00:DEFB    _L,_I,_N,_E,_SP,_1,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY01:DEFB    _L,_I,_N,_E,_SP,_2,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY02:DEFB    _L,_I,_N,_E,_SP,_3,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY03:DEFB    _L,_I,_N,_E,_SP,_4,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY04:DEFB    _L,_I,_N,_E,_SP,_5,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY05:DEFB    _L,_I,_N,_E,_SP,_6,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY06:DEFB    _L,_I,_N,_E,_SP,_7,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY07:DEFB    _L,_I,_N,_E,_SP,_8,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY08:DEFB    _L,_I,_N,_E,_SP,_9,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY09:DEFB    _L,_I,_N,_E,_SP,_1,_0,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY10:DEFB    _L,_I,_N,_E,_SP,_1,_1,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY11:DEFB    _L,_I,_N,_E,_SP,_1,_2,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY12:DEFB    _L,_I,_N,_E,_SP,_1,_3,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY13:DEFB    _L,_I,_N,_E,_SP,_1,_4,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY14:DEFB    _L,_I,_N,_E,_SP,_1,_5,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY15:DEFB    _L,_I,_N,_E,_SP,_1,_6,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY16:DEFB    _L,_I,_N,_E,_SP,_1,_7,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY17:DEFB    _L,_I,_N,_E,_SP,_1,_8,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY18:DEFB    _L,_I,_N,_E,_SP,_1,_9,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY19:DEFB    _L,_I,_N,_E,_SP,_2,_0,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY20:DEFB    _L,_I,_N,_E,_SP,_2,_1,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY21:DEFB    _L,_I,_N,_E,_SP,_2,_2,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY22:DEFB    _L,_I,_N,_E,_SP,_2,_3,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+DSPLY23:DEFB    _L,_I,_N,_E,_SP,_2,_4,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _NL
+
+
+; Variable definitions
+
+VARIABLES:
+
+        DEFB    0x80
+WORKSPACE:

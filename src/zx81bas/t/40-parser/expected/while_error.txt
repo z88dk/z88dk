@@ -1,0 +1,7 @@
+% z88dk-zx81bas -d 5 t/40-parser//input/while_error.bas
+Input file:  t/40-parser/input/while_error.bas
+Output file: t/40-parser/input/while_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/40-parser/input/while_error.i" "t/40-parser/input/while_error.pp"
+t/40-parser/input/while_error.bas:1: error: Expected end of statement, found 'X'
+t/40-parser/input/while_error.bas:3: error: Expected 'WEND'
+2 errors found

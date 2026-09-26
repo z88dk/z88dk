@@ -1,0 +1,27 @@
+#AUTOSTART = 1
+
+	' Sieve of Eratosthenes
+	DEF FNrow(n) = ((n-1) DIV 10)
+	DEF FNcol(n) = ((n-1) MOD 10)*3 + (n<10) + (n<100)
+	
+	LET max=220
+	DIM p(max)
+	
+	' show number table
+	FOR n=1 TO max
+		PRINT AT FNrow(n), FNcol(n); n;
+		LET p(n) = 1
+	NEXT n
+
+	' remove primes
+	PRINT AT FNrow(1), FNcol(1); "   ";
+	LET p(1) = 0
+	
+	FOR n=2 TO max
+		IF p(n) = 1 THEN
+			FOR m = 2*n TO max STEP n
+				PRINT AT FNrow(m), FNcol(m); "   ";
+				LET p(m) = 0
+			NEXT m
+		ENDIF
+	NEXT n

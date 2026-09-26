@@ -1,0 +1,12 @@
+% z88dk-zx81bas -d 1 t/30-preproc//input/cont_lines.bas
+Input file:  t/30-preproc/input/cont_lines.bas
+Output file: t/30-preproc/input/cont_lines.p
+Contents of t/30-preproc/input/cont_lines.pp:
+#line 1 "t/30-preproc/input/cont_lines.bas"
+line 1
+line 2  continuation line 2  end line 2
+
+
+line 5  
+
+line 7  

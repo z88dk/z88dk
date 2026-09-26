@@ -1,0 +1,6 @@
+% z88dk-zx81bas -d 4 t/20-lexer//input/error_03.bas
+Input file:  t/20-lexer/input/error_03.bas
+Output file: t/20-lexer/input/error_03.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/20-lexer/input/error_03.i" "t/20-lexer/input/error_03.pp"
+error: Unexpected character: '`'
+1 error found

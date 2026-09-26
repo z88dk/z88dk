@@ -1,0 +1,11 @@
+% z88dk-zx81bas -d 5 t/40-parser//input/label_error.bas
+Input file:  t/40-parser/input/label_error.bas
+Output file: t/40-parser/input/label_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/40-parser/input/label_error.i" "t/40-parser/input/label_error.pp"
+t/40-parser/input/label_error.bas:1: error: Expected a BASIC language statement, found '@'
+t/40-parser/input/label_error.bas:2: error: Expected ':', found end of line
+t/40-parser/input/label_error.bas:3: error: Unrecognized statement 'LABEL'
+t/40-parser/input/label_error.bas:4: error: Multiple line numbers in the same line
+t/40-parser/input/label_error.bas:5: error: Multiple labels in the same line
+t/40-parser/input/label_error.bas:6: error: Multiple line numbers in the same line
+6 errors found

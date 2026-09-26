@@ -1,0 +1,21 @@
+% z88dk-zx81bas -d 5 t/40-parser//input/verbose_1.bas
+Input file:  t/40-parser/input/verbose_1.bas
+Output file: t/40-parser/input/verbose_1.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/40-parser/input/verbose_1.i" "t/40-parser/input/verbose_1.pp"
+Prog {
+    auto_start: false
+    auto_start_line: 0
+    auto_start_label: ""
+    increment: 10
+    rem_invert: false
+    fast_mode: false
+    dfile_lines: [
+    ]
+    dfile_colapsed: false
+    sysvars_data: [
+    ]
+    stmts: [
+    ]
+    pragma_vars: [
+    ]
+}

@@ -1,0 +1,15 @@
+% z88dk-zx81bas -d 11 -O t/80-codegen//input/def_fn.bas
+Input file:  t/80-codegen/input/def_fn.bas
+Output file: t/80-codegen/input/def_fn.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/80-codegen/input/def_fn.i" "t/80-codegen/input/def_fn.pp"
+     10 DIM A(2)
+     20 PRINT"424",424
+     30 LET A(1)=11
+     40 LET A(2)=22
+     50 PRINT"11",A(1)
+     60 PRINT"22",A(2)
+     70 PRINT"3",3
+     80 PRINT"12",12
+     90 PRINT"130",130
+    100 PRINT"221",221
+    110 PRINT"6.2831853",6.283185307

@@ -1,0 +1,2 @@
+WHILE 1 WEND x
+WHILE 1

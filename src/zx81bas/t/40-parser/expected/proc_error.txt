@@ -1,0 +1,7 @@
+% z88dk-zx81bas -d 5 t/40-parser//input/proc_error.bas
+Input file:  t/40-parser/input/proc_error.bas
+Output file: t/40-parser/input/proc_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/40-parser/input/proc_error.i" "t/40-parser/input/proc_error.pp"
+t/40-parser/input/proc_error.bas:1: error: Unexpected token ',' in expression
+t/40-parser/input/proc_error.bas:2: error: Expected expression term, found end of line
+2 errors found

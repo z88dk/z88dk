@@ -1,0 +1,427 @@
+% z88dk-zx81bas -d 1 test_t_input_01_t.bas
+Input file:  test_t_input_01_t.bas
+Output file: test_t_input_01_t.p
+Contents of test_t_input_01_t.pp:
+#line 1 "test_t_input_01_t.bas"
+
+
+
+
+#line 1 "t/input/const.inc"
+
+
+
+
+#define FALSE 0
+#define TRUE 1
+#line 6 "test_t_input_01_t.bas"
+
+
+
+
+
+!AUTOSTART = TRUE
+!AUTOSTART_LINE = @label3
+!INCREMENT = 2
+!REMINVERT = TRUE
+!FAST = FALSE
+!VERBOSE = TRUE
+!DFILE =  	"LINE 1",  	"LINE 2",  	"LINE 3",  	"LINE 4",  	"LINE 5",  	"LINE 6",  	"LINE 7",  	"LINE 8",  	"LINE 9",  	"LINE 10",  	"LINE 11",  	"LINE 12",  	"LINE 13",  	"LINE 14",  	"LINE 15",  	"LINE 16",  	"LINE 17",  	"LINE 18",  	"LINE 19",  	"LINE 20",  	"LINE 21",  	"LINE 22",  	"LINE 23",  	"LINE 24"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+!DFILE_COLAPSED = FALSE
+!SYSVARS =  	0x00, 0x00, 0x00, 0x7d, 0x40, 0x7e, 0x40, 0x96,  	0x43, 0x00, 0x00, 0x97, 0x43, 0x9e, 0x43, 0x00,  	0x00, 0x9f, 0x43, 0x9f, 0x43, 0x00, 0x5d, 0x40,  	0xff, 0x02, 0x00, 0x00, 0xff, 0xff, 0x00, 0x37,  	0x7d, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8d,  	0x0c, 0x00, 0x00, 0x2f, 0xfd, 0x00, 0x00, 0x00,  	0x21, 0x18, 0x40, 0x00, 0x00, 0x09, 0x40, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  	0x00, 0x00, 0x00, 0x00
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@label1:		LET A = @label1
+10				LET A = &label1
+20 @label2:		LET A = @label2
+@label3: 30		LET A = &label3
+
+
+
+
+
+	LET A=1:LET B=2::LET C=3:::
+!ASM
+	ld a,1:ld a,2::ld a,3:::
+!ENDASM
+
+
+
+
+
+	LET A=1
+	LET ABC=1
+	LET A(1,2)=1
+	LET A$="HELLO"
+	LET A$(1,2)="A"
+	LET A$(1 TO 2)="AB"
+	LET A$(1,2)(3 TO 4)="AB"
+	LET A$(TO 3)="ABC"
+	LET A$(2 TO)="BCD"
+
+	A=1
+	ABC=1
+	A(1,2)=1
+	A$="HELLO"
+	A$(1,2)="A"
+	A$(1 TO 2)="AB"
+	A$(1,2)(3 TO 4)="AB"
+	A$(TO 3)="ABC"
+	A$(2 TO)="BCD"
+
+
+
+
+
+	DIM A(2), B(2,3), C(2,3,4)
+	DIM A$(2), B$(2,3), C$(2,3,4)
+
+
+
+
+
+	IF A=1 THEN B=2
+	IF A<>1 THEN :ELSE B=2
+	IF A<1 THEN B=2:C=3
+	IF A<=1 THEN B=2:C=3 ELSE
+	IF A>1 THEN B=2:C=3 ELSE D=4
+	IF A>=1 THEN B=2:C=3 ELSE D=4:E=5
+	IF NOT (A=1) THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3
+
+	IF A=1 THEN
+		B=1
+		C=1
+	ENDIF
+
+	IF A=1 THEN
+		B=1
+		C=1
+	ELSE
+		B=2
+		IF A=2 THEN
+			C=2
+		ELSE
+			C=3
+		ENDIF
+	ENDIF
+
+	IF A=1 THEN
+		B=1 : C=1 : ENDIF : D=1
+
+
+
+
+
+	REPEAT A=1 UNTIL A=1
+	REPEAT B=1: REPEAT C=1 UNTIL A=1 UNTIL A=2
+
+	REPEAT
+		A=1
+		B=2
+		IF A=2 THEN EXIT
+		REPEAT
+			C=3
+		UNTIL A=2
+	UNTIL A=1
+
+	REPEAT
+		A=1 : B=2 : UNTIL A=1 : C=1
+
+
+
+
+
+	WHILE A<>1: A=1:B=2:C=3 WEND
+
+	WHILE A=1:B=1:WHILE A=2:C=1:WEND:WEND
+
+	WHILE A<>1
+		A=1
+		B=2
+		IF A=2 THEN EXIT
+		WHILE A<>2
+			C=3
+		WEND
+	WEND
+
+	WHILE A<>2
+		C=3 : WEND : C=4
+
+
+
+
+
+	LET S=0
+	FOR I=1 TO 10 STEP SGN 1:LET S=S+I:NEXT I
+
+	FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT J:NEXT I
+
+	FOR I=1 TO 10 STEP 2
+		S=S+I
+		IF I=2 THEN EXIT
+		FOR J=1 TO 10 STEP 2
+			A=I*J
+		NEXT J
+	NEXT I
+
+	FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT:NEXT
+
+	FOR I=1 TO 10 STEP 2
+		FOR J=1 TO 10 STEP 2
+			A=I*J:NEXT:NEXT
+
+
+
+
+
+1000
+	GOTO 1000
+	GOTO 1000+20*A
+	GOTO @label1
+
+
+
+
+
+	GOSUB 1000
+	GOSUB 1000+20*A
+	GOSUB @label1
+
+
+
+
+
+	RETURN
+
+
+
+
+
+	STOP
+
+
+
+
+
+	END
+
+
+
+
+
+	PRINT
+	PRINT ,
+	PRINT ;
+	PRINT 2*3
+	PRINT TAB 8;
+	PRINT AT 10,10;
+	PRINT AT 10,10;"HELLO";TAB 10;"WORLD";
+
+
+
+
+
+	LPRINT
+	LPRINT ,
+	LPRINT ;
+	LPRINT 2*3
+	LPRINT TAB 8;
+	LPRINT AT 10,10;
+	LPRINT AT 10,10;"HELLO";TAB 10;"WORLD";
+
+
+
+
+
+	INPUT A, ABC
+	INPUT A(1,2)
+	INPUT A$
+	INPUT A$(1,2)
+	INPUT A$(1 TO 2)
+	INPUT A$(1,2)(3 TO 4)
+	INPUT A$(TO 3)
+	INPUT A$(2 TO)
+	INPUT A,A$
+	INPUT I1,I(10)
+
+
+
+
+
+	REM
+	REM COMMENT TEXT : COLONS ARE PART OF COMMENT
+!ASM
+	start_rem:
+!ENDASM
+
+!ASM
+		ret
+!ENDASM
+
+
+
+
+
+	RUN 
+	RUN 1000
+	RUN 1000+20*A
+	RUN @label1
+
+
+
+
+
+	NEW
+
+
+
+
+
+	CLS
+
+
+
+
+
+	LOAD "file"
+
+
+
+
+
+	SAVE "file"
+
+
+
+
+
+	POKE 16384,0xff
+
+
+
+
+
+	POKEW 16384,$0102
+
+
+
+
+
+	RAND USR 16514
+
+
+
+
+
+	PAUSE 50
+
+
+
+
+
+	FAST
+
+
+
+
+
+	SLOW
+
+
+
+
+
+	LIST
+	LIST 10
+	LIST 10*4
+	LIST @label1
+	
+
+
+
+
+	LLIST
+	LLIST 10
+	LLIST 10*4
+	LLIST @label1
+	
+
+
+
+
+	X=0:Y=0
+	PLOT 0,1
+	PLOT X,Y
+
+
+
+
+
+	UNPLOT 0,1
+	UNPLOT X,Y
+
+
+
+
+
+	SCROLL
+
+
+
+
+
+	CONT
+
+
+
+
+
+	CLEAR
+
+
+
+
+
+	COPY

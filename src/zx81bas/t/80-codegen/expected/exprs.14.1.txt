@@ -1,0 +1,8 @@
+% z88dk-zx81bas -d 14 -O t/80-codegen//input/exprs.bas
+Input file:  t/80-codegen/input/exprs.bas
+Output file: t/80-codegen/input/exprs.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/80-codegen/input/exprs.i" "t/80-codegen/input/exprs.pp"
+% z88dk-z80asm -b -m -o"t/80-codegen/input/exprs.p" "t/80-codegen/input/exprs.asm"
+% z88dk-z80asm -b -m -o"t/80-codegen/input/exprs.p" "t/80-codegen/input/exprs.asm"
+% z88dk-z80asm -b -m -o"t/80-codegen/input/exprs.p" "t/80-codegen/input/exprs.asm"
+% z88dk-z80asm -b -m -o"t/80-codegen/input/exprs.p" "t/80-codegen/input/exprs.asm"
