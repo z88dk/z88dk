@@ -7,22 +7,21 @@
 ;        sp+2 = RHS
 ; Exit:  acc = LHS & RHS
 l_i64_and:
-	ld	hl,2
-	add	hl,sp
-	ex	de,hl
-	ld	hl,__i64_acc
-	ld	b,8
-	and	a
+    ld      hl,2
+    add     hl,sp
+    ex      de,hl
+    ld      hl,__i64_acc
+    ld      b,8
 loop:
-	ld	a,(de)
-	and	(hl)
-	ld	(hl),a
-	inc	hl
-	inc	de
-	djnz	loop
-	pop	de
-        ld      hl,8
-        add     hl,sp
-        ld      sp,hl
-        push    de
-        ret
+    ld      a,(de)
+    and     (hl)
+    ld      (hl),a
+    inc     hl
+    inc     de
+    djnz    loop
+    pop     de
+    ld      hl,8
+    add     hl,sp
+    ld      sp,hl
+    ex      de,hl
+    jp      (hl)

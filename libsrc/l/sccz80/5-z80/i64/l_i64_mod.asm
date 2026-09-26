@@ -10,21 +10,21 @@
 ;        sp+2 = LHS (dividend)
 ; Exit:  acc = LHS % RHS
 l_i64_mod:
-	ld	hl,2
-	add	hl,sp
-	ld	de,__i64_extra
-	ld	bc,8
-	ldir
-	push	ix
-	ld	ix,__i64_extra
-	call	l_divs_64_64x64
-	;dehl'dehl = remainder, copy it into fac
-	ld	bc,__i64_acc
-	call	l_store_64_dehldehl_mbc
-	pop	ix
-	pop	de
-        ld      hl,8
-        add     hl,sp
-        ld      sp,hl
-        push    de
-        ret
+    ld      hl,2
+    add     hl,sp
+    ld      de,__i64_extra
+    ld      bc,8
+    ldir
+    push    ix
+    ld      ix,__i64_extra
+    call	l_divs_64_64x64
+    ;dehl'dehl = remainder, copy it into fac
+    ld      bc,__i64_acc
+    call    l_store_64_dehldehl_mbc
+    pop     ix
+    pop     de
+    ld      hl,8
+    add     hl,sp
+    ld      sp,hl
+    ex      de,hl
+    jp      (hl)

@@ -25,6 +25,7 @@
 #include "ast_iter.h"
 
 extern Node *ast_literal(Type *type, zdouble value);
+extern Node *ast_literal_int(Type *type, uint64_t value);
 
 static int try_fold_unop(int kind, int64_t v, int64_t *out)
 {
@@ -207,10 +208,10 @@ Node *ast_fold_constants(Node *node)
                     return ast_literal(type_int, (zdouble)(fv == 0));
                 return node;
             }
-            int64_t v = (int64_t)node->operand->zval, r;
+            int64_t v = node_int_value(node->operand), r;
             if (try_fold_unop(node->ast_type, v, &r)) {
                 Type *t = node->type ? node->type : node->operand->type;
-                return ast_literal(t ? t : type_int, (zdouble)r);
+                return ast_literal_int(t ? t : type_int, (uint64_t)r);
             }
         }
         return node;
@@ -239,7 +240,7 @@ Node *ast_fold_constants(Node *node)
                 || node->type->kind == KIND_CPTR)
             && node->operand->type
             && kind_is_integer(node->operand->type->kind)) {
-            int64_t v = (int64_t)node->operand->zval;
+            int64_t v = node_int_value(node->operand);
             int64_t narrowed = v;
             Kind dst = node->type->kind;
             Kind src = node->operand->type->kind;
@@ -280,7 +281,7 @@ Node *ast_fold_constants(Node *node)
                     }
                 }
             }
-            return ast_literal(node->type, (zdouble)narrowed);
+            return ast_literal_int(node->type, (uint64_t)narrowed);
         }
         return node;
 
@@ -330,7 +331,7 @@ Node *ast_fold_constants(Node *node)
                   || k == KIND_INT)      width = 16;
             else if (k == KIND_LONG || k == KIND_CPTR) width = 32;
             else if (k == KIND_LONGLONG) width = 64;
-            int64_t shamt = (int64_t)R->zval;
+            int64_t shamt = node_int_value(R);
             if (width && (shamt < 0 || shamt >= width)) {
                 const char *dir = (node->ast_type == OP_SSHL
                                 || node->ast_type == OP_USHL)
@@ -339,7 +340,7 @@ Node *ast_fold_constants(Node *node)
                     node->filename, node->line,
                     "%s shifting by more than size of object, changed to zero",
                     dir);
-                return ast_literal(L->type, (zdouble)0);
+                return ast_literal_int(L->type, 0);
             }
         }
         if (L && R && L->ast_type == AST_LITERAL && R->ast_type == AST_LITERAL) {
@@ -360,8 +361,8 @@ Node *ast_fold_constants(Node *node)
                     return ast_literal(t ? t : type_int, dv);
                 }
             } else {
-                int64_t l = (int64_t)L->zval;
-                int64_t r = (int64_t)R->zval;
+                int64_t l = node_int_value(L);
+                int64_t r = node_int_value(R);
                 int64_t v;
                 int fold_op = node->ast_type;
                 /* `>>` is parsed OP_SSHR unconditionally; for an unsigned
@@ -376,10 +377,10 @@ Node *ast_fold_constants(Node *node)
                    int at the 0x8000 boundary). Result type is always int. */
                 if (is_compare_op(fold_op)) {
                     if (try_fold_compare(fold_op, l, r, L->type, R->type, &v))
-                        return ast_literal(type_int, (zdouble)v);
+                        return ast_literal_int(type_int, (uint64_t)v);
                 } else if (try_fold_binop(fold_op, l, r, &v)) {
                     Type *t = node->type ? node->type : L->type;
-                    return ast_literal(t ? t : type_int, (zdouble)v);
+                    return ast_literal_int(t ? t : type_int, (uint64_t)v);
                 }
             }
         }
@@ -426,7 +427,7 @@ static int is_int_literal(Node *node, int64_t target)
         if (k != KIND_INT && k != KIND_CHAR && k != KIND_SHORT &&
             k != KIND_LONG && k != KIND_LONGLONG) return 0;
     }
-    return (int64_t)node->zval == target;
+    return node_int_value(node) == target;
 }
 
 /* True if `op` is a relational/equality comparison, i.e. produces 0/1. */
@@ -585,7 +586,7 @@ static int nodes_equivalent(Node *a, Node *b)
         if ((a->type && kind_is_floating(a->type->kind))
             || (b->type && kind_is_floating(b->type->kind)))
             return a->zval == b->zval;
-        return (int64_t)a->zval == (int64_t)b->zval;
+        return node_int_bits(a) == node_int_bits(b);
     case AST_LOCAL_VAR:
     case AST_GLOBAL_VAR:
         return a->sym == b->sym;
@@ -817,7 +818,7 @@ static Node *try_simplify_binop(Node *node)
        would clip the sign-extended high byte and change the value. */
     if (r && r->ast_type == AST_LITERAL && l && l->type
         && (op == OP_AND || op == OP_OR)) {
-        int64_t v = (int64_t)r->zval;
+        int64_t v = node_int_value(r);
         Kind k = l->type->kind;
         int64_t all_bits = 0;
         int known = 0;
@@ -835,10 +836,10 @@ static Node *try_simplify_binop(Node *node)
     /* Negative-literal flip: `e + (-N)` → `e - N` and `e - (-N)` → `e + N`.
        Cosmetic — easier to read and matches what a programmer would
        write. Doesn't affect codegen semantics. */
-    if (r && r->ast_type == AST_LITERAL && (int64_t)r->zval < 0
+    if (r && r->ast_type == AST_LITERAL && node_int_value(r) < 0
         && (op == OP_ADD || op == OP_SUB)) {
-        Node *neg_lit = ast_literal(r->type ? r->type : type_int,
-                                    (zdouble)(-(int64_t)r->zval));
+        Node *neg_lit = ast_literal_int(r->type ? r->type : type_int,
+                                        (uint64_t)(-node_int_value(r)));
         Node *flipped = calloc(1, sizeof(Node));
         flipped->ast_type = (op == OP_ADD) ? OP_SUB : OP_ADD;
         flipped->left = l;
@@ -877,9 +878,9 @@ static Node *try_simplify_binop(Node *node)
         int64_t lit = 0;
         int cmp_op = op;
         if (r && r->ast_type == AST_LITERAL && l && l->ast_type != AST_LITERAL) {
-            typed = l;  lit = (int64_t)r->zval;
+            typed = l;  lit = node_int_value(r);
         } else if (l && l->ast_type == AST_LITERAL && r && r->ast_type != AST_LITERAL) {
-            typed = r;  lit = (int64_t)l->zval;
+            typed = r;  lit = node_int_value(l);
             cmp_op = reflect_comparison_op(op);
         }
         if (typed && typed->type) {
@@ -904,8 +905,8 @@ static Node *try_simplify_binop(Node *node)
                  || l->ast_type == OP_MULT)
         && l->right && l->right->ast_type == AST_LITERAL) {
         int  inner_op = l->ast_type;
-        int64_t IC = (int64_t)l->right->zval;
-        int64_t OC = (int64_t)r->zval;
+        int64_t IC = node_int_value(l->right);
+        int64_t OC = node_int_value(r);
         Node *e   = l->left;
         Node *new_op_node = NULL;
         int64_t new_const = 0;
@@ -927,8 +928,8 @@ static Node *try_simplify_binop(Node *node)
             new_op_node = calloc(1, sizeof(Node));
             new_op_node->ast_type = new_op;
             new_op_node->left = e;
-            new_op_node->right = ast_literal(node->type ? node->type : type_int,
-                                             (zdouble)new_const);
+            new_op_node->right = ast_literal_int(node->type ? node->type : type_int,
+                                                 (uint64_t)new_const);
             new_op_node->type = node->type;
             new_op_node->filename = node->filename;
             new_op_node->line = node->line;
@@ -998,7 +999,7 @@ static Node *try_strength_reduce(Node *node)
     int is_long = (l->type->kind == KIND_LONG);
 
     int shift;
-    int64_t v = (int64_t)r->zval;
+    int64_t v = node_int_value(r);
     if (!extract_pow2(v, &shift)) return node;
     if (shift == 0) return node;     /* x*1, x/1, x%1 — already in simplify */
     int shift_limit = is_long ? 31 : 15;
@@ -1043,7 +1044,7 @@ static Node *try_strength_reduce(Node *node)
             /* Mask literal type tracks the LHS width so the IR
                builder picks the right binop kind (long vs int). */
             Type *mask_type = is_long ? type_ulong : type_int;
-            and_node->right = ast_literal(mask_type, (zdouble)(v - 1));
+            and_node->right = ast_literal_int(mask_type, (uint64_t)(v - 1));
             and_node->type = node->type;
             and_node->filename = node->filename;
             and_node->line = node->line;
@@ -1289,11 +1290,11 @@ Node *ast_simplify_algebraic(Node *node)
 static int literal_truthy(Node *n)
 {
     if (!n || n->ast_type != AST_LITERAL) return -1;
-    if (!n->type) return ((int64_t)n->zval != 0);
+    if (!n->type) return (node_int_value(n) != 0);
     Kind k = n->type->kind;
     if (k == KIND_INT || k == KIND_CHAR || k == KIND_SHORT ||
         k == KIND_LONG || k == KIND_LONGLONG) {
-        return ((int64_t)n->zval != 0);
+        return node_int_value(n) != 0;
     }
     return -1;
 }
@@ -2211,7 +2212,7 @@ static int cse_est_cost(Node *n)
     case OP_SSHL: case OP_USHL: case OP_SSHR: case OP_USHR: {
         int base = 100;
         if (n->right && n->right->ast_type == AST_LITERAL) {
-            int amt = (int)n->right->zval;
+            int amt = (int)node_int_value(n->right);
             if (amt < 0) amt = -amt;
             if (amt > 16) amt = 16;
             base = 12 + 5 * amt;

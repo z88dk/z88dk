@@ -555,7 +555,7 @@ struct nodepair *test(int label, int parens)
    long long > 2^53 (caller must want the wide value, e.g. a long long
    initialiser). NB: long double == double on macOS/ARM, so even this is
    limited there; on x86 it carries the full int64. */
-int constexpr_z(zdouble *val, Kind *type, int flag)
+int constexpr_z_exact(zdouble *val, uint64_t *ival, Kind *type, int flag)
 {
     zdouble valtemp;
     int con;
@@ -572,14 +572,23 @@ int constexpr_z(zdouble *val, Kind *type, int flag)
     Node *folded = ast_fold_constants(pair->node);
     if (folded && folded->ast_type == AST_LITERAL) {
         *val  = folded->zval;
+        if (ival)
+            *ival = node_int_bits(folded);
         *type = folded->type ? folded->type->kind : KIND_INT;
         return 1;
     }
     if (flag)
         errorfmt("Expecting constant expression", 0);
     *val = 0;
+    if (ival)
+        *ival = 0;
     *type = KIND_INT;
     return 0;
+}
+
+int constexpr_z(zdouble *val, Kind *type, int flag)
+{
+    return constexpr_z_exact(val, NULL, type, flag);
 }
 
 int constexpr(double *val, Kind *type, int flag)
@@ -649,4 +658,3 @@ int ulvalue(LVALUE* lval)
 {
     return isutype(lval->ltype);
 }
-

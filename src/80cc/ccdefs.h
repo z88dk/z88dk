@@ -18,7 +18,13 @@
 #include <ctype.h>
 #include <math.h>
 
+#if defined(Z88DK_TEST_ZDOUBLE_FLOAT)
+typedef float zdouble;
+#elif defined(Z88DK_TEST_ZDOUBLE_DOUBLE)
+typedef double zdouble;
+#else
 typedef long double zdouble;
+#endif
 
 #include "define.h"
 #include "tokeniser.h"
@@ -98,6 +104,7 @@ extern void       offset_of(LVALUE *lval);
 extern void       write_constant_queue(void);
 extern void       indicate_constant_written(int litlab);
 extern int        ir_pool_litlab_llong(zdouble dval);
+extern int        ir_pool_litlab_llong_exact(uint64_t value);
 extern int        ir_pool_litlab_double(zdouble value);
 
 extern void       dofloat(enum maths_mode mode, double raw, unsigned char fa[]);
@@ -240,6 +247,7 @@ extern Node    *ast_compound(array *nodes);
 extern Node    *ast_label(int label, const char *slabel);
 extern Node    *ast_jump(int label, const char *slabel);
 extern Node    *ast_literal(Type *type, zdouble value);
+extern Node    *ast_literal_int(Type *type, uint64_t value);
 extern Node    *ast_str_lit(int offs);
 extern Node    *ast_critical(Node *node);
 extern Node    *ast_loop_countdown(Node *init, Node *body, int exit_label, int step_label, int width8);
@@ -285,6 +293,7 @@ extern void     rvalue(LVALUE *lval);
 extern struct nodepair *test(int label, int parens);
 extern int      constexpr(double *val, Kind *valtype, int flag);
 extern int      constexpr_z(zdouble *val, Kind *valtype, int flag);
+extern int      constexpr_z_exact(zdouble *val, uint64_t *ival, Kind *valtype, int flag);
 extern void     cscale(Type *type, int *val);
 extern int      docast(LVALUE *lval,LVALUE *dest_lval);
 extern int      ulvalue(LVALUE *lval);

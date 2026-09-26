@@ -25,7 +25,8 @@ static int        heirb(LVALUE *lval);
 static SYMBOL    *deref(LVALUE *lval, char isaddr);
 
 
-Kind expression(int  *con, zdouble *val, Type **type)
+Kind expression_exact(int  *con, zdouble *val, uint64_t *ival,
+                      int *ival_valid, Type **type)
 {
     LVALUE lval={0};
 
@@ -34,8 +35,17 @@ Kind expression(int  *con, zdouble *val, Type **type)
     }
     *con = lval.is_const;
     *val = lval.const_val;
+    if (ival)
+        *ival = lval.int_const_val;
+    if (ival_valid)
+        *ival_valid = lval.int_const_valid;
     *type = lval.ltype;
     return lval.ltype ? lval.ltype->kind : KIND_NONE;
+}
+
+Kind expression(int *con, zdouble *val, Type **type)
+{
+    return expression_exact(con, val, NULL, NULL, type);
 }
 
 int heir1(LVALUE* lval)
@@ -175,6 +185,8 @@ int heir1(LVALUE* lval)
     lval3.base_offset = lval->base_offset;
     lval3.const_val = lval->const_val;
     lval3.is_const = lval->is_const;
+    lval3.int_const_val = lval->int_const_val;
+    lval3.int_const_valid = lval->int_const_valid;
     /* don't clear address calc we need it on rhs */
     if (lval->indirect_kind)
         smartpush(lval, 0);
@@ -550,6 +562,8 @@ int heira(LVALUE *lval)
             errorfmt("Unary ~ operator is not valid for fixed point",1);
         com(lval);
         lval->const_val = (int64_t)~(uint64_t)lval->const_val;
+        if (lval->int_const_valid)
+            lval->int_const_val = ~lval->int_const_val;
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('!')) {
@@ -558,6 +572,8 @@ int heira(LVALUE *lval)
         lneg(lval);
         lval->binop = lneg;
         lval->const_val = !lval->const_val;
+        if (lval->int_const_valid)
+            lval->int_const_val = lval->int_const_val ? 0 : 1;
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('-')) {
@@ -565,6 +581,8 @@ int heira(LVALUE *lval)
             rvalue(lval);
         neg(lval);
         lval->const_val = -lval->const_val;
+        if (lval->int_const_valid)
+            lval->int_const_val = (uint64_t)(0 - lval->int_const_val);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('*')) { /* unary * */
