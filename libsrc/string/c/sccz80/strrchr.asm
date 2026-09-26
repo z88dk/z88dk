@@ -33,9 +33,16 @@ defc _strrchr = strrchr
 ENDIF
 
 
-; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 register ABI).
+; __ZPROTO2(strrchr, s, c) -> ___strrchr(c, s): HL=c (int), DE=s.
+; asm_strrchr enter: C=c, HL=s.
 IF __CLASSIC
 PUBLIC ___strrchr
-defc ___strrchr = strrchr
+___strrchr:
+   ld c,l                   ; C = c (char, low byte)
+   ex de,hl                 ; HL = s
+   call asm_strrchr         ; enter C=c, HL=s; exit HL=ptr or 0
+   ex de,hl                 ; DE = result (C return value)
+   ret
 ENDIF
 

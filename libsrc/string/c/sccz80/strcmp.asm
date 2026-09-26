@@ -33,9 +33,13 @@ defc _strcmp = strcmp
 ENDIF
 
 
-; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 reversed-arg register ABI).
+; __strcmp(const char *s2, const char *s1): HL=s2, DE=s1; int return in DE.
 IF __CLASSIC
 PUBLIC ___strcmp
-defc ___strcmp = strcmp
+___strcmp:
+   call asm_strcmp          ; enter HL=s2, DE=s1; exit HL=signed result
+   ex de,hl                 ; DE = result (C return value)
+   ret
 ENDIF
 

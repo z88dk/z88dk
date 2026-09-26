@@ -48,8 +48,20 @@ ENDIF
 
 
 ; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 register ABI).
+; __ZPROTO3(strlcat, dst, src, n) -> ___strlcat(n, src, dst): HL=n, DE=src, [SP]=dst.
+; asm_strlcat enter: HL=dst, DE=src, BC=n.
+; Stack on entry: [SP] = return addr, [SP+2] = dst (callee-cleaned by ret).
 IF __CLASSIC
 PUBLIC ___strlcat
-defc ___strlcat = strlcat
+___strlcat:
+   ld c,l
+   ld b,h                   ; BC = n
+   pop hl                   ; HL = return address
+   ex (sp),hl               ; HL = dst, [SP] = return address
+   ; DE = src unchanged
+   call asm_strlcat         ; enter HL=dst, DE=src, BC=n; exit HL=strlen result
+   ex de,hl                 ; DE = result (C return value)
+   ret
 ENDIF
 

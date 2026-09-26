@@ -34,8 +34,14 @@ ENDIF
 
 
 ; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 register ABI).
+; __ZPROTO2(strcasecmp, s1, s2) -> ___strcasecmp(s2, s1): HL=s2, DE=s1.
+; asm_strcasecmp enter: HL=s2, DE=s1 -- already correct, no swap needed.
 IF __CLASSIC
 PUBLIC ___strcasecmp
-defc ___strcasecmp = strcasecmp
+___strcasecmp:
+   call asm_strcasecmp      ; enter HL=s2, DE=s1; exit A=diff
+   ex de,hl                 ; DE = result (C return value, sign-extends in A)
+   ret
 ENDIF
 

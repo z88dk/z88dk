@@ -34,9 +34,15 @@ defc _strchr = strchr
 ENDIF
 
 
-; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 reversed-arg register ABI).
+; __strchr(int c, const char *s): HL=c, DE=s; return ptr (or 0) in DE.
 IF __CLASSIC
 PUBLIC ___strchr
-defc ___strchr = strchr
+___strchr:
+   ld c,l                   ; C = char c (low byte)
+   ex de,hl                 ; HL = s
+   call asm_strchr          ; enter C=c, HL=s; exit HL=ptr to c or 0
+   ex de,hl                 ; DE = ptr (C return value)
+   ret
 ENDIF
 

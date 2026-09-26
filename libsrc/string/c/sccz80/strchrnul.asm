@@ -34,8 +34,16 @@ ENDIF
 
 
 ; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 register ABI).
+; __ZPROTO2(strchrnul, s, c) -> ___strchrnul(c, s): HL=c (int), DE=s.
+; asm_strchrnul enter: C=c, HL=s.
 IF __CLASSIC
 PUBLIC ___strchrnul
-defc ___strchrnul = strchrnul
+___strchrnul:
+   ld c,l                   ; C = c (char, low byte)
+   ex de,hl                 ; HL = s
+   call asm_strchrnul       ; enter C=c, HL=s; exit HL=ptr (never NULL)
+   ex de,hl                 ; DE = result (C return value)
+   ret
 ENDIF
 

@@ -7,6 +7,7 @@ SECTION code_string
 PUBLIC memchr
 
 EXTERN l0_memchr_callee
+EXTERN asm_memchr
 
 memchr:
 IF __CPU_GBZ80__ | __CPU_INTEL__
@@ -48,9 +49,19 @@ defc _memchr = memchr
 ENDIF
 
 
-; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 reversed-arg register ABI).
+; __memchr(size_t n, int c, const void *s): HL=n, DE=c (E=char),
+; s on the stack above the return address, callee-cleaned; ptr in DE.
 IF __CLASSIC
 PUBLIC ___memchr
-defc ___memchr = memchr
+___memchr:
+   ld c,l
+   ld b,h                   ; BC = n
+   ld a,e                   ; A = char c
+   pop hl                   ; HL = return address
+   ex (sp),hl               ; HL = s; [SP] = return address
+   call asm_memchr          ; enter A=c, HL=s, BC=n; exit HL=ptr or 0
+   ex de,hl                 ; DE = ptr (C return value)
+   ret
 ENDIF
 
