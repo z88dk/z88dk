@@ -33,11 +33,20 @@
 
 typedef int mode_t;
 
+/* clang/llvmz80: __smallc now maps to z80_smallc (left-to-right push), so the
+ * natural-order __ZPROTO3 declaration lands name at [sp+6] (deepest), flags at
+ * [sp+4], mode at [sp+2] -- exactly the frame sccz80's __smallc produces and the
+ * plain stack workers read.  The earlier reversed-arg + `!__CPM` idiom (needed
+ * only because __smallc was sdcccall(0)) is obsolete for both the +test and the
+ * +cpm workers.  See ravn/z88dk#22/#41, ravn/llvm-z80#279. */
 __ZPROTO3(int,,open,const char *,name, int, flags, mode_t, mode)
 __ZPROTO2(int,,creat,const char *,name,mode_t, mode)
 
 extern int __LIB__ close(int fd);
 
+/* Same as open() above: natural-order __ZPROTO3 under z80_smallc lands the args
+ * left-to-right (fd deepest) for the plain stack workers -- no reversed-arg
+ * idiom needed. */
 __ZPROTO3(ssize_t,,read,int,fd,void *,ptr,size_t,len)
 __ZPROTO3(ssize_t,,write,int,fd,void *,ptr,size_t,len)
 

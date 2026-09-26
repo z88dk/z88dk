@@ -213,11 +213,22 @@ extern char __LIB__  *strdup(const char *s);
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__  *strdup_fastcall(const char *s)  __z88dk_fastcall;
 #define strdup(x) strdup_fastcall(x)
+#elif defined(__LLVMZ80)  /* llvmz80 register ABI: see strlen */
+extern char __LIB__  *strdup_fastcall(const char *s)  __z88dk_fastcall;
+#define strdup(x) strdup_fastcall(x)
 #endif
 
 
 extern char __LIB__  *strerror(char *s);
-#ifndef __STDC_ABI_ONLY
+#if defined(__LLVMZ80)
+/* llvmz80: strerror takes int errnum per POSIX; fastcall reads arg from HL
+ * (where llvmz80 places any single register arg regardless of declared type).
+ * Declare with int to avoid -Wint-conversion when called as strerror(errno).
+ * This must win over the plain #ifndef branch below regardless of whether
+ * __STDC_ABI_ONLY is defined, so dropping the gate keeps the correct signature. */
+extern char __LIB__  *strerror_fastcall(int errnum)  __z88dk_fastcall;
+#define strerror(x) strerror_fastcall(x)
+#elif !defined(__STDC_ABI_ONLY)
 extern char __LIB__  *strerror_fastcall(char *s)  __z88dk_fastcall;
 #define strerror(x) strerror_fastcall(x)
 #endif
@@ -246,12 +257,24 @@ extern size_t __LIB__  strlen(const char *s);
 #ifndef __STDC_ABI_ONLY
 extern size_t __LIB__  strlen_fastcall(const char *s) __z88dk_fastcall;
 #define strlen(x) strlen_fastcall(x)
+#elif defined(__LLVMZ80)
+/* ravn/llvm-z80: __STDC_ABI_ONLY disables the fastcall routing above, but the
+ * classic clib's plain _strlen is __smallc (stack ABI) while clang calls the
+ * unattributed strlen with the pointer in HL -> mismatch (reads stack garbage,
+ * e.g. strlen("Hello") returned 1200).  strlen has no __ZPROTO reversed-arg
+ * form to bridge, so route it to strlen_fastcall (z80_fastcall = HL in/out,
+ * aliases asm_strlen in the lib) to match llvmz80's register ABI. */
+extern size_t __LIB__  strlen_fastcall(const char *s) __z88dk_fastcall;
+#define strlen(x) strlen_fastcall(x)
 #endif
 
 
 
 extern char __LIB__  *strlwr(char *s);
 #ifndef __STDC_ABI_ONLY
+extern char __LIB__  *strlwr_fastcall(char *s) __z88dk_fastcall;
+#define strlwr(x) strlwr_fastcall(x)
+#elif defined(__LLVMZ80)  /* llvmz80 register ABI: see strlen */
 extern char __LIB__  *strlwr_fastcall(char *s) __z88dk_fastcall;
 #define strlwr(x) strlwr_fastcall(x)
 #endif
@@ -262,7 +285,7 @@ extern int __LIB__ strncasecmp_callee(const char *s1,const char *s2,size_t n) __
 #define strncasecmp(a,b,c) strncasecmp_callee(a,b,c)
 #endif
 
-__ZPROTO3(int,,strncat,char *,dst,const char *,src,size_t,n)
+__ZPROTO3(char,*,strncat,char *,dst,const char *,src,size_t,n)
 #if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *strncat_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strncat(a,b,c) strncat_callee(a,b,c)
@@ -272,6 +295,15 @@ __ZPROTO3(char,*,strnchar,const char *,s,size_t,n,int,c)
 #if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *strnchr_callee(const char *s,size_t n,int c) __smallc __z88dk_callee;
 #define strnchr(a,b,c) strnchr_callee(a,b,c)
+#elif defined(__LLVMZ80)
+// llvmz80/clang: expose the standard name strnchr, routed to the register-ABI
+// bridge that the strnchar ZPROTO3 declares (asm ___strnchar).  The plain
+// ___strnchr alias is a stack-ABI entry and would be miscalled by clang, so we
+// forward to strnchar rather than declaring strnchr via __ZPROTO3 directly.
+// A real (inline) function -- not a macro -- so a later `#undef strnchr` in
+// portable test code leaves the name callable, matching sccz80/sdcc.
+__attribute__((always_inline)) static inline
+char *strnchr(const char *s, size_t n, int c) { return strnchar(s, n, c); }
 #endif
 
 
@@ -329,6 +361,9 @@ extern char __LIB__  *strrev(char *s);
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__  *strrev_fastcall(char *s) __z88dk_fastcall;
 #define strrev(x) strrev_fastcall(x)
+#elif defined(__LLVMZ80)  /* llvmz80 register ABI: see strlen */
+extern char __LIB__  *strrev_fastcall(char *s) __z88dk_fastcall;
+#define strrev(x) strrev_fastcall(x)
 #endif
 
 
@@ -342,6 +377,9 @@ extern size_t __LIB__ strrspn_callee(const char *s,const char *set) __smallc __z
 
 extern char __LIB__  *strrstrip(char *s);
 #ifndef __STDC_ABI_ONLY
+extern char __LIB__  *strrstrip_fastcall(char *s)  __z88dk_fastcall;
+#define strrstrip(x) strrstrip_fastcall(x)
+#elif defined(__LLVMZ80)  /* llvmz80 register ABI: see strlen */
 extern char __LIB__  *strrstrip_fastcall(char *s)  __z88dk_fastcall;
 #define strrstrip(x) strrstrip_fastcall(x)
 #endif
@@ -370,6 +408,9 @@ extern char __LIB__  *strstrip(char *s);
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__  *strstrip_fastcall(char *s)  __z88dk_fastcall;
 #define strstrip(x) strstrip_fastcall(x)
+#elif defined(__LLVMZ80)  /* llvmz80 register ABI: see strlen */
+extern char __LIB__  *strstrip_fastcall(char *s)  __z88dk_fastcall;
+#define strstrip(x) strstrip_fastcall(x)
 #endif
 
 __ZPROTO2(char,*,strtok,char *,s,const char *,delim)
@@ -386,6 +427,9 @@ extern char __LIB__ *strtok_r_callee(char *s,const char *delim,char **last_s) __
 
 extern char __LIB__  *strupr(char *s);
 #ifndef __STDC_ABI_ONLY
+extern char __LIB__  *strupr_fastcall(char *s) __z88dk_fastcall;
+#define strupr(x) strupr_fastcall(x)
+#elif defined(__LLVMZ80)  /* llvmz80 register ABI: see strlen */
 extern char __LIB__  *strupr_fastcall(char *s) __z88dk_fastcall;
 #define strupr(x) strupr_fastcall(x)
 #endif

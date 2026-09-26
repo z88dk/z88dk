@@ -23,7 +23,28 @@ char *error(char *fmt, ...)
 
 #include <sys/compiler.h>
 
-#ifdef __Z88DK_R2L_CALLING_CONVENTION
+#if defined(__LLVMZ80)
+
+/* llvm-z80 (clang): the classic z88dk va_start below locates varargs via
+ * (va_list)&last + sizeof(last), i.e. the address of the last named parameter.
+ * That assumes the named params sit contiguously in front of the pushed
+ * varargs on the stack (true for sccz80/sdcc, which keep params in place).
+ * clang-z80 instead copies each parameter into a local spill slot, so &last is
+ * a local (e.g. IX-2), NOT the incoming argument area (IX+6) -- the classic
+ * macro then reads saved-IX / return-address bytes and every va_arg is
+ * garbage.  clang has a correct, ABI-aware __builtin_va_start; defer to it.
+ * (Same header/ABI-divergence pattern as <float.h>; see ravn/z88dk#28.) */
+typedef __builtin_va_list va_list;
+#define va_start(ap, last)  __builtin_va_start(ap, last)
+#define va_arg(ap, type)    __builtin_va_arg(ap, type)
+#define va_copy(dest, src)  __builtin_va_copy(dest, src)
+#define va_end(ap)          __builtin_va_end(ap)
+/* va_ptr is a z88dk extension used by the __smallc/l2r path; under the r2l
+ * builtin ABI the last named arg is reachable directly, so va_ptr degenerates
+ * to reading just below the current cursor. */
+#define va_ptr(ap, type)    (*(type *)(ap))
+
+#elif defined(__Z88DK_R2L_CALLING_CONVENTION)
 
 /* sdcc/sccz80 in r2l mode is a lot more standard */
 typedef unsigned char * va_list;
