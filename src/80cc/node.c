@@ -174,6 +174,14 @@ Node *ast_literal(Type *type, zdouble value)
     return ret;
 }
 
+Node *ast_literal_int(Type *type, uint64_t value)
+{
+    Node *ret = ast_literal(type, (zdouble)(int64_t)value);
+    ret->ival = value;
+    ret->int_literal = 1;
+    return ret;
+}
+
 Node *ast_str_lit(int offs)
 {
     Node *ret = calloc(1,sizeof(*ret));

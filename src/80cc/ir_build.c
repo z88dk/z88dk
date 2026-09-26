@@ -2230,7 +2230,7 @@ static int build_ll_compound(Builder *b, Node *n, const char *stem)
        other ops promote the rhs to long long (`x += 3`). */
     Node *cn = n->right;
     int count_is_imm = is_shift && cn && cn->ast_type == AST_LITERAL;
-    int64_t count_imm = count_is_imm ? (int64_t)cn->zval : 0;
+    int64_t count_imm = count_is_imm ? node_int_value(cn) : 0;
     int rv = -1;
     if (!count_is_imm) {
         rv = build_expr(b, n->right);
@@ -2659,7 +2659,7 @@ static int build_binop_i64(Builder *b, Node *n)
         Node *cn = n->right;
         int dst;
         if (cn && cn->ast_type == AST_LITERAL) {
-            dst = emit_acc_int_shift(b, stem, l, -1, (int64_t)cn->zval, 1, is_uns);
+            dst = emit_acc_int_shift(b, stem, l, -1, node_int_value(cn), 1, is_uns);
         } else {
             int r = build_expr(b, n->right);
             if (r < 0) return -1;
@@ -2682,7 +2682,9 @@ static int build_binop_i64(Builder *b, Node *n)
        loads directly (no vreg), keeping the computed left operand adjacent to
        its producer so the producer's store drops out. */
     int r_pool = (n->right && n->right->ast_type == AST_LITERAL)
-               ? ir_pool_litlab_llong((int64_t)n->right->zval) : -1;
+               ? (n->right->int_literal
+                  ? ir_pool_litlab_llong_exact(node_int_bits(n->right))
+                  : ir_pool_litlab_llong(node_int_value(n->right))) : -1;
     int r = (r_pool >= 0) ? -1 : build_expr(b, n->right);
     if (r_pool < 0 && r < 0) return -1;
     l = promote_to_acc_int(b, l, lvt && lvt->isunsigned);
@@ -2898,7 +2900,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
             if (n->right && n->right->ast_type == AST_LITERAL) {
                 Op *op = ir_op_emit(cur_bb(b), k);
                 op->dst = tmp; op->src[0] = lhs_v;
-                op->src[1] = -1; op->imm = (int64_t)n->right->zval | shr_arith_bit;
+                op->src[1] = -1; op->imm = node_int_value(n->right) | shr_arith_bit;
             } else {
                 int rhs_v = build_expr(b, n->right);
                 if (rhs_v < 0) return -1;
@@ -2914,7 +2916,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
             op->dst    = lhs_v;
             op->src[0] = lhs_v;
             op->src[1] = -1;
-            op->imm    = (int64_t)n->right->zval | shr_arith_bit;
+            op->imm    = node_int_value(n->right) | shr_arith_bit;
             return lhs_v;
         }
         int rhs_v = build_expr(b, n->right);
@@ -2967,7 +2969,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
         if (n->right && n->right->ast_type == AST_LITERAL) {
             Op *op = ir_op_emit(cur_bb(b), k);
             op->dst = dst_g; op->src[0] = loaded_g;
-            op->src[1] = -1; op->imm = (int64_t)n->right->zval | shr_arith_bit;
+                op->src[1] = -1; op->imm = node_int_value(n->right) | shr_arith_bit;
         } else {
             int rhs_v = build_expr(b, n->right);
             if (rhs_v < 0) return -1;
@@ -3029,7 +3031,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
         op->dst    = dst;
         op->src[0] = loaded;
         op->src[1] = -1;
-        op->imm    = (int64_t)n->right->zval | shr_arith_bit;
+        op->imm    = node_int_value(n->right) | shr_arith_bit;
     } else {
         int rhs_v = build_expr(b, n->right);
         if (rhs_v < 0) return -1;
@@ -3253,10 +3255,13 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            constants come from the literal pool (l_i64_load). */
         if ((n->type && n->type->kind == KIND_LONGLONG)
             || lit_target == KIND_LONGLONG) {
-            if (n->zval < -2147483648.0L || n->zval > 4294967295.0L)
-                return emit_pool_load(b, ir_pool_litlab_llong(n->zval),
+                uint64_t raw = node_int_bits(n);
+            int64_t val = (int64_t)raw;
+            if (val < INT32_MIN || raw > UINT32_MAX)
+                return emit_pool_load(b, n->int_literal
+                                      ? ir_pool_litlab_llong_exact(raw)
+                                      : ir_pool_litlab_llong(n->zval),
                                       8, KIND_LONGLONG);
-            int64_t val = (int64_t)n->zval;
             /* Extend by the VALUE, not the declared signedness: a negative
                (or signed-32-fitting) value sign-extends; a value in
                (2^31, 2^32) zero-extends. (Keying off the type's isunsigned
@@ -3995,7 +4000,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             int c_v = -1, c_imm = 0, c_is_literal = 0;
             if (c_node && c_node->ast_type == AST_LITERAL) {
                 c_is_literal = 1;
-                c_imm = (int)c_node->zval;   /* literal search char */
+                c_imm = (int)node_int_value(c_node);   /* literal search char */
             } else {
                 c_v = build_expr(b, c_node);
                 if (c_v < 0) return -1;
@@ -6427,7 +6432,7 @@ static int build_muldiv_integer(Builder *b, Node *n)
                    : NULL;
         if (litn) {
             int vv = (litn == n->right) ? l : r;  /* non-constant operand */
-            int srd = emit_const_mult_sr(b, vv, (int64_t)litn->zval, width);
+            int srd = emit_const_mult_sr(b, vv, node_int_value(litn), width);
             if (srd >= 0) return srd;
         }
     }
@@ -6445,7 +6450,7 @@ static int build_muldiv_integer(Builder *b, Node *n)
         && (width == 2 || width == 4)
         && n->right && n->right->ast_type == AST_LITERAL) {
         int shift;
-        if (extract_pow2((int64_t)n->right->zval, &shift)) {
+        if (extract_pow2(node_int_value(n->right), &shift)) {
             int srd = emit_const_sdiv_sr(b, l, shift, width,
                                          n->ast_type == OP_MOD);
             if (srd >= 0) return srd;
@@ -6607,7 +6612,7 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
         && rhs->type && is_register_int_kind(rhs->type->kind)
         && (int)type_width(rhs->type) <= 2
         && (!n->type || (int)type_width(n->type) <= 2)
-        && (int64_t)lhs->zval >= -32768 && (int64_t)lhs->zval <= 65535) {
+        && node_int_value(lhs) >= -32768 && node_int_value(lhs) <= 65535) {
         int rv = build_expr(b, rhs);
         if (rv < 0) return -1;
         if (b->f->vregs[rv].width == 1) {
@@ -6620,7 +6625,7 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
         int dst = get_dest_vreg(b, hint, 2);
         Op *op = ir_op_emit(cur_bb(b), IR_RSUB);
         op->dst = dst; op->src[0] = rv; op->src[1] = -1;
-        op->imm = (int64_t)lhs->zval;
+        op->imm = node_int_value(lhs);
         b->f->vregs[dst].width = 2;
         return dst;
     }
@@ -6637,7 +6642,7 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
          || k == IR_SHL || k == IR_SHR)) {
         int uns = !lhs->type || lhs->type->isunsigned;
         if (k == IR_SHL && rhs && rhs->ast_type == AST_LITERAL
-            && (int64_t)rhs->zval == 8) {
+            && node_int_value(rhs) == 8) {
             int dst = new_temp_kind(b, KIND_INT);
             Op *bh = ir_op_emit(cur_bb(b), IR_CONV_BYTE_TO_HIGH);
             bh->dst = dst;
@@ -6695,7 +6700,7 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
     int keep_byte_cmp = 0;
     if (is_cmp && width == 1 && rhs && rhs->ast_type == AST_LITERAL
         && lhs->type) {
-        int64_t C = (int64_t)rhs->zval;
+        int64_t C = node_int_value(rhs);
         if (lhs->type->isunsigned
             && C >= 0 && C <= 255
             && (k == IR_CMP_EQ  || k == IR_CMP_NE
@@ -6766,7 +6771,7 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
         Kind rk = rhs->type ? rhs->type->kind : KIND_NONE;
         int64_t imm = (rk == KIND_ACCUM16 || rk == KIND_ACCUM32)
                     ? scale_literal_for_kind(rhs, rk)
-                    : (int64_t)rhs->zval;
+                    : node_int_value(rhs);
         /* GT/LE with a const RHS has no correct direct lowering at any
            width — the const-RHS handlers only exist for LT/GE, and the
            GT/LE paths read an uninitialised slot for the constant
@@ -7377,10 +7382,10 @@ static int build_stmt(Builder *b, Node *n)
            latch branch on NK. The shift is not observable by the source IV. */
         int ktrip = CPU_HAS_JP_K() && !opt_disabled("k-trip")
                  && n->loop_init->ast_type == AST_LITERAL
-                 && n->loop_init->zval > 0;
+                 && node_int_value(n->loop_init) > 0;
         if (ktrip) {
             ir_emit_ld_imm(cur_bb(b), counter,
-                           (int64_t)n->loop_init->zval - 1);
+                           node_int_value(n->loop_init) - 1);
         } else {
             int init_v = build_expr(b, n->loop_init);
             if (init_v < 0) return -1;
@@ -7481,7 +7486,7 @@ static int build_stmt(Builder *b, Node *n)
             for (int i = 0; i < n_cases; i++) {
                 Node *c = array_get_byindex(n->sw_cases, i);
                 if (!c || c->ast_type != AST_SWITCH_CASE) continue;
-                vals[nc] = c->sw_value ? (int64_t)c->sw_value->zval : 0;
+                vals[nc] = c->sw_value ? node_int_value(c->sw_value) : 0;
                 tgts[nc] = get_or_create_label_bb(b, c->sw_label);
                 nc++;
             }

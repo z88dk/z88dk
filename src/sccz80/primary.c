@@ -850,7 +850,8 @@ int test(int label, int parens)
  * evaluate constant expression
  * return TRUE if it is a constant expression
  */
-int constexpr(double *val, Kind *type, int flag)
+int constexpr_exact(double *val, uint64_t *ival, int *ival_valid,
+                    Kind *type, int flag)
 {
     char *before, *start;
     zdouble valtemp;
@@ -860,7 +861,7 @@ int constexpr(double *val, Kind *type, int flag)
     Type   *type_ptr;
     
     setstage(&before, &start);
-    valtype = expression(&con, &valtemp, &type_ptr);
+    valtype = expression_exact(&con, &valtemp, ival, ival_valid, &type_ptr);
     *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
     *type = valtype;
@@ -868,6 +869,11 @@ int constexpr(double *val, Kind *type, int flag)
     if (flag && con == 0)
         errorfmt("Expecting constant expression", 0 );
     return con;
+}
+
+int constexpr(double *val, Kind *type, int flag)
+{
+    return constexpr_exact(val, NULL, NULL, type, flag);
 }
 
 /*
@@ -975,4 +981,3 @@ int check_lastop_was_comparison(LVALUE* lval)
     }
     return (1);
 }
-

@@ -389,6 +389,7 @@ static int init(Type *type, int dump, Node **out_node)
     zdouble zvalue = 0; /* full-precision mirror of `value` for the constdecl
                            path — a long long literal > 2^53 loses its low
                            bits as a plain double (see constexpr_z). */
+    uint64_t ivalue = 0;
     Kind   valtype;
     int sz = 0; /* number of chars in queue */
     int klptr, parencount;
@@ -523,7 +524,7 @@ again:
              || strcmp(sname, "__builtin_offsetof") == 0) {
                 lptr = klptr;
                 parencount = 0;
-                if ( constexpr_z(&zvalue, &valtype, 1) ) {
+                if ( constexpr_z_exact(&zvalue, &ivalue, &valtype, 1) ) {
                     value = (double)zvalue;
                     goto constdecl;
                 }
@@ -634,7 +635,7 @@ again:
 #endif
             lptr = klptr;
             return 0;
-        } else if ( lptr= klptr, constexpr_z(&zvalue, &valtype, 1)) {
+        } else if ( lptr= klptr, constexpr_z_exact(&zvalue, &ivalue, &valtype, 1)) {
             value = (double)zvalue;
 constdecl:
             check_assign_range(type, value);
@@ -643,7 +644,9 @@ constdecl:
                64-bit long long literal unclipped on x86; `value` (double)
                would drop its low bits. (long double == double on macOS.) */
             if (out_node) {
-                *out_node = ast_literal(type, zvalue);
+                *out_node = (valtype == KIND_LONGLONG || type->kind == KIND_LONGLONG)
+                          ? ast_literal_int(type, ivalue)
+                          : ast_literal(type, zvalue);
             }
             if (dump) {
                 /* struct member or array of pointer to char */
@@ -750,5 +753,4 @@ constdecl:
     } 
     return type->size;
 }
-
 

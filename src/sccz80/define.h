@@ -437,6 +437,8 @@ struct lvalue_s {
         Kind ptr_type ;                 /* type of pointer or array, 0 for other idents */
         int is_const ;                  /* true if constant expression */
         zdouble const_val ;             /* value of constant expression (& other uses) */
+        uint64_t int_const_val;         /* exact integer constant bits */
+        unsigned char int_const_valid;  /* const_val was parsed as integer */
         void (*binop)(LVALUE *lval) ;   /* function address of highest/last binary operator */
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
         Type *stage_add_ltype;          /* Type at stage_add being set */

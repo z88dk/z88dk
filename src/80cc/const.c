@@ -63,7 +63,9 @@ int constant(LVALUE* lval)
         lval->node = ast_literal(lval->ltype, lval->const_val);
         return (1);
     } else if (number(lval) || pstr(lval)) {
-        lval->node = ast_literal(lval->ltype, lval->const_val);
+        lval->node = lval->int_const_valid
+                   ? ast_literal_int(lval->ltype, lval->int_const_val)
+                   : ast_literal(lval->ltype, lval->const_val);
         return (1);
     } else if (tstr(&val)) {
         lval->const_val = val;
@@ -164,14 +166,18 @@ int number(LVALUE *lval)
 
     if (minus < 0) value = -value;
     lval->const_val = value;
+    lval->int_const_val = (uint64_t)value;
+    lval->int_const_valid = 1;
 
-    /* Magnitude-based typing, matches legacy behaviour. */
+    /* Magnitude-based typing, matches legacy behaviour.  Use the token's
+       exact integer value here: const_val is a zdouble and may not represent
+       every 64-bit integer on hosts where long double is double. */
     lval->val_type = KIND_CHAR;
-    if (lval->const_val >= 256 || lval->const_val < -127)
+    if (value >= 256 || value < -127)
         lval->val_type = KIND_INT;
-    if (lval->const_val >= 65536 || lval->const_val < -32767)
+    if (value >= 65536 || value < -32767)
         lval->val_type = KIND_LONG;
-    if (lval->const_val > UINT32_MAX || lval->const_val < INT32_MIN) {
+    if (value > UINT32_MAX || value < INT32_MIN) {
         lval->val_type = KIND_LONGLONG;
         if (sizeof(long double) == sizeof(double))
             warningfmt("limited-range", "On this host, 64 bit constants may not be correct");
@@ -952,14 +958,12 @@ void write_constant_queue(void)
    mark it written (the IR fwrites its asm directly, bypassing outstr's
    `ld hl,i_N` auto-marking), and return the litlab. The IR emits the
    `ld hl,i_<lab>` + wide-load itself (IR_MEM_POOL). */
-int ir_pool_litlab_llong(zdouble dval)
+static int ir_pool_litlab_llong_bits(uint64_t v)
 {
-    uint64_t v, l;
+    uint64_t l;
     char     buf[8];
     elem_t  *elem;
 
-    if ( dval < 0 ) v = (uint64_t)(int64_t)dval;
-    else            v = (uint64_t)dval;
     l = v & 0xffffffff;
     buf[0] = (l % 65536) % 256; buf[1] = (l % 65536) / 256;
     buf[2] = (l / 65536) % 256; buf[3] = (l / 65536) / 256;
@@ -969,6 +973,17 @@ int ir_pool_litlab_llong(zdouble dval)
     elem = get_elem_for_llong(buf);
     indicate_constant_written(elem->litlab);
     return elem->litlab;
+}
+
+int ir_pool_litlab_llong(zdouble dval)
+{
+    uint64_t v = dval < 0 ? (uint64_t)(int64_t)dval : (uint64_t)dval;
+    return ir_pool_litlab_llong_bits(v);
+}
+
+int ir_pool_litlab_llong_exact(uint64_t value)
+{
+    return ir_pool_litlab_llong_bits(value);
 }
 
 int ir_pool_litlab_double(zdouble value)

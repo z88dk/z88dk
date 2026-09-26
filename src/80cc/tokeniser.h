@@ -20,7 +20,13 @@
    carries float-literal payloads in zdouble so suffix-driven kind
    resolution (FLOAT16, DOUBLE, ACCUM16/32) keeps full precision
    until the parser decides the binding. */
+#if defined(Z88DK_TEST_ZDOUBLE_FLOAT)
+typedef float zdouble;
+#elif defined(Z88DK_TEST_ZDOUBLE_DOUBLE)
+typedef double zdouble;
+#else
 typedef long double zdouble;
+#endif
 
 #define TK_NAME_MAX 127     /* matches NAMESIZE-1 */
 #define TK_STRING_MAX 4096  /* per-token; longer strings are an error */
