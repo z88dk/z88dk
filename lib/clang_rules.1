@@ -1,31 +1,63 @@
-	%3section%2.text,%1
+;; --- CEdev v15.0 ez80-clang (clang 19) GNU-as directive variants ---
+;; The CE-Programming/llvm-project asm printer emits `.section`/`.ident`/
+;; `.note.GNU-stack` with a leading dot; the no-dot rules below (kept for
+;; older CEdev output) don't fire on them.  These dotted variants map the
+;; dotted form to z88dk-z80asm SECTION directives / drop the noise. Must
+;; precede the no-dot rules. (ravn: added for compiler-comparison-corpus
+;; ez80clang oracle, CEdev v15.0.)
+;; BSS align-to-even idiom: CE clang emits `rb ($$ - $) and 1` before an
+;; aligned variable, but z88dk-z80asm rejects both `$$` and the word
+;; operator `and`.  Map it to the z80asm ALIGN directive. (Must precede
+;; the generic `rb %1 = defs %1` rule below.)
+	rb	($$ - $) and 1
+=
+	ALIGN 2
+
+	.section	.text,%1
 =
 	SECTION	code_compiler
 
-	%3section%2.rodata,%1
+	.section	.rodata,%1
 =
 	SECTION rodata_compiler
 
-	%3section%2.bss,%1
+	.section	.bss,%1
 =
 	SECTION bss_compiler
 
-	%3section%2.data,%1
+	.section	.data,%1
 =
 	SECTION data_compiler
 
-	%3section%2.data.%2,%1
+	.section	.data.%2,%1
 =
 	SECTION data_compiler
 
-	.ident%1
+	.section	%1
 =
-;	.ident%1
 
-	.section%2
+	.ident	%1
 =
-;	.section%2
-	SECTION UNASSIGNED
+
+	section	.text,%1
+=
+	SECTION	code_compiler
+
+	section	.rodata,%1
+=
+	SECTION rodata_compiler
+
+	section	.bss,%1
+=
+	SECTION bss_compiler
+
+	section	.data,%1
+=
+	SECTION data_compiler
+
+	section	.data.%2,%1
+=
+	SECTION data_compiler
 
 	assume	adl = 1
 =
