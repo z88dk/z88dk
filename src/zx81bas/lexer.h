@@ -41,6 +41,14 @@ struct Token : TreeNode {
     std::string ws_before;  // white space before token
     SourceLoc loc;
 
+    explicit Token() = default;
+    explicit Token(TokenType type_, const std::string& text_, const SourceLoc& loc_)
+        : type(type_), keyword(lookup_keyword(text_)), text(text_), loc(loc_) {}
+    explicit Token(TokenType type_, int value_, const SourceLoc& loc_)
+        : type(type_), ivalue(value_), loc(loc_) {}
+    explicit Token(TokenType type_, double value_, const SourceLoc& loc_)
+        : type(type_), nvalue(value_), loc(loc_) {}
+
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
 #endif

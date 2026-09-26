@@ -1,0 +1,8 @@
+% z88dk-zx81bas -d 5 t/40-parser//input/input_error.bas
+Input file:  t/40-parser/input/input_error.bas
+Output file: t/40-parser/input/input_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/40-parser/input/input_error.i" "t/40-parser/input/input_error.pp"
+t/40-parser/input/input_error.bas:1: error: Expected variable name, found end of line
+t/40-parser/input/input_error.bas:2: error: Expected variable name, found end of line
+t/40-parser/input/input_error.bas:3: error: Expected end of statement, found 'X'
+3 errors found

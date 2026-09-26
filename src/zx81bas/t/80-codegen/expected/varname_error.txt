@@ -1,0 +1,7 @@
+% z88dk-zx81bas t/80-codegen//input/varname_error.bas
+Input file:  t/80-codegen/input/varname_error.bas
+Output file: t/80-codegen/input/varname_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/80-codegen/input/varname_error.i" "t/80-codegen/input/varname_error.pp"
+t/80-codegen/input/varname_error.bas:1: error: Unknown ZX81 encoding: '_'
+t/80-codegen/input/varname_error.bas:1: error: Invalid variable name: 'A_BC'
+2 errors found

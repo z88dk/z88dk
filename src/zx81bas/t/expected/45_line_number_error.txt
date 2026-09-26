@@ -1,6 +1,0 @@
-% z88dk-zx81bas -d 11 t//input/45_line_number_error.bas
-Input file:  t/input/45_line_number_error.bas
-Output file: t/input/45_line_number_error.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/45_line_number_error.i" "t/input/45_line_number_error.pp"
-t/input/45_line_number_error.bas:2: error: Line numbers out of sequence
-1 error found

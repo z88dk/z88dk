@@ -1,0 +1,10 @@
+% z88dk-zx81bas -d 5 t/40-parser//input/verbose_error.bas
+Input file:  t/40-parser/input/verbose_error.bas
+Output file: t/40-parser/input/verbose_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/40-parser/input/verbose_error.i" "t/40-parser/input/verbose_error.pp"
+t/40-parser/input/verbose_error.bas:1: error: Unrecognized pragma statement 'NOT_VERBOSE'
+t/40-parser/input/verbose_error.bas:2: error: Expected '=', found end of line
+t/40-parser/input/verbose_error.bas:3: error: Expected '=', found '10'
+t/40-parser/input/verbose_error.bas:4: error: Expected 'Integer', found end of line
+t/40-parser/input/verbose_error.bas:5: error: Expected end of statement, found 'EXTRA'
+5 errors found

@@ -1,0 +1,826 @@
+% z88dk-zx81bas -d 13 -O t/80-codegen//input/vars.bas
+Input file:  t/80-codegen/input/vars.bas
+Output file: t/80-codegen/input/vars.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/80-codegen/input/vars.i" "t/80-codegen/input/vars.pp"
+% z88dk-z80asm -b -m -o"t/80-codegen/input/vars.p" "t/80-codegen/input/vars.asm"
+% z88dk-z80asm -b -m -o"t/80-codegen/input/vars.p" "t/80-codegen/input/vars.asm"
+% z88dk-z80asm -b -m -o"t/80-codegen/input/vars.p" "t/80-codegen/input/vars.asm"
+; ZX81BAS generated assembly code
+; Pass: 2
+
+        ORG     0x4009          ; Start of .p file
+
+        SETFLOAT zx81
+
+        DEFC    SLOW_FLAG       = 0x40
+        DEFC    FAST_FLAG       = 0x00
+
+; zx81 character set
+
+        DEFC    _SP             = 0x00
+        DEFC    _BWWW           = 0x01
+        DEFC    _WBWW           = 0x02
+        DEFC    _BBWW           = 0x03
+        DEFC    _WWBW           = 0x04
+        DEFC    _BWBW           = 0x05
+        DEFC    _WBBW           = 0x06
+        DEFC    _BBBW           = 0x07
+        DEFC    _GGGG           = 0x08
+        DEFC    _WWGG           = 0x09
+        DEFC    _GGWW           = 0x0A
+        DEFC    _QUOTE          = 0x0B
+        DEFC    _DOLLAR         = 0x0D
+        DEFC    _COLON          = 0x0E
+        DEFC    _QUESTION       = 0x0F
+        DEFC    _LPAREN         = 0x10
+        DEFC    _RPAREN         = 0x11
+        DEFC    _GT             = 0x12
+        DEFC    _LT             = 0x13
+        DEFC    _EQ             = 0x14
+        DEFC    _PLUS           = 0x15
+        DEFC    _MINUS          = 0x16
+        DEFC    _MULT           = 0x17
+        DEFC    _DIV            = 0x18
+        DEFC    _SEMICOLON      = 0x19
+        DEFC    _COMMA          = 0x1A
+        DEFC    _DOT            = 0x1B
+        DEFC    _0              = 0x1C
+        DEFC    _1              = 0x1D
+        DEFC    _2              = 0x1E
+        DEFC    _3              = 0x1F
+        DEFC    _4              = 0x20
+        DEFC    _5              = 0x21
+        DEFC    _6              = 0x22
+        DEFC    _7              = 0x23
+        DEFC    _8              = 0x24
+        DEFC    _9              = 0x25
+        DEFC    _A              = 0x26
+        DEFC    _B              = 0x27
+        DEFC    _C              = 0x28
+        DEFC    _D              = 0x29
+        DEFC    _E              = 0x2A
+        DEFC    _F              = 0x2B
+        DEFC    _G              = 0x2C
+        DEFC    _H              = 0x2D
+        DEFC    _I              = 0x2E
+        DEFC    _J              = 0x2F
+        DEFC    _K              = 0x30
+        DEFC    _L              = 0x31
+        DEFC    _M              = 0x32
+        DEFC    _N              = 0x33
+        DEFC    _O              = 0x34
+        DEFC    _P              = 0x35
+        DEFC    _Q              = 0x36
+        DEFC    _R              = 0x37
+        DEFC    _S              = 0x38
+        DEFC    _T              = 0x39
+        DEFC    _U              = 0x3A
+        DEFC    _V              = 0x3B
+        DEFC    _W              = 0x3C
+        DEFC    _X              = 0x3D
+        DEFC    _Y              = 0x3E
+        DEFC    _Z              = 0x3F
+        DEFC    _RND            = 0x40
+        DEFC    _INKEY_DOLLAR   = 0x41
+        DEFC    _PI             = 0x42
+        DEFC    _NL             = 0x76
+        DEFC    _NUMBER         = 0x7E
+        DEFC    _INV_SP         = 0x80
+        DEFC    _WBBB           = 0x81
+        DEFC    _BWBB           = 0x82
+        DEFC    _WWBB           = 0x83
+        DEFC    _BBWB           = 0x84
+        DEFC    _WBWB           = 0x85
+        DEFC    _BWWB           = 0x86
+        DEFC    _WWWB           = 0x87
+        DEFC    _INV_GGGG       = 0x88
+        DEFC    _BBGG           = 0x89
+        DEFC    _GGBB           = 0x8A
+        DEFC    _INV_QUOTE      = 0x8B
+        DEFC    _INV_DOLLAR     = 0x8D
+        DEFC    _INV_COLON      = 0x8E
+        DEFC    _INV_QUESTION   = 0x8F
+        DEFC    _INV_LPAREN     = 0x90
+        DEFC    _INV_RPAREN     = 0x91
+        DEFC    _INV_GT         = 0x92
+        DEFC    _INV_LT         = 0x93
+        DEFC    _INV_EQ         = 0x94
+        DEFC    _INV_PLUS       = 0x95
+        DEFC    _INV_MINUS      = 0x96
+        DEFC    _INV_MULT       = 0x97
+        DEFC    _INV_DIV        = 0x98
+        DEFC    _INV_SEMICOLON  = 0x99
+        DEFC    _INV_COMMA      = 0x9A
+        DEFC    _INV_DOT        = 0x9B
+        DEFC    _INV_0          = 0x9C
+        DEFC    _INV_1          = 0x9D
+        DEFC    _INV_2          = 0x9E
+        DEFC    _INV_3          = 0x9F
+        DEFC    _INV_4          = 0xA0
+        DEFC    _INV_5          = 0xA1
+        DEFC    _INV_6          = 0xA2
+        DEFC    _INV_7          = 0xA3
+        DEFC    _INV_8          = 0xA4
+        DEFC    _INV_9          = 0xA5
+        DEFC    _INV_A          = 0xA6
+        DEFC    _INV_B          = 0xA7
+        DEFC    _INV_C          = 0xA8
+        DEFC    _INV_D          = 0xA9
+        DEFC    _INV_E          = 0xAA
+        DEFC    _INV_F          = 0xAB
+        DEFC    _INV_G          = 0xAC
+        DEFC    _INV_H          = 0xAD
+        DEFC    _INV_I          = 0xAE
+        DEFC    _INV_J          = 0xAF
+        DEFC    _INV_K          = 0xB0
+        DEFC    _INV_L          = 0xB1
+        DEFC    _INV_M          = 0xB2
+        DEFC    _INV_N          = 0xB3
+        DEFC    _INV_O          = 0xB4
+        DEFC    _INV_P          = 0xB5
+        DEFC    _INV_Q          = 0xB6
+        DEFC    _INV_R          = 0xB7
+        DEFC    _INV_S          = 0xB8
+        DEFC    _INV_T          = 0xB9
+        DEFC    _INV_U          = 0xBA
+        DEFC    _INV_V          = 0xBB
+        DEFC    _INV_W          = 0xBC
+        DEFC    _INV_X          = 0xBD
+        DEFC    _INV_Y          = 0xBE
+        DEFC    _INV_Z          = 0xBF
+        DEFC    _DOUBLE_QUOTE   = 0xC0
+        DEFC    _AT             = 0xC1
+        DEFC    _TAB            = 0xC2
+        DEFC    _CODE           = 0xC4
+        DEFC    _VAL            = 0xC5
+        DEFC    _LEN            = 0xC6
+        DEFC    _SIN            = 0xC7
+        DEFC    _COS            = 0xC8
+        DEFC    _TAN            = 0xC9
+        DEFC    _ASN            = 0xCA
+        DEFC    _ACS            = 0xCB
+        DEFC    _ATN            = 0xCC
+        DEFC    _LN             = 0xCD
+        DEFC    _EXP            = 0xCE
+        DEFC    _INT            = 0xCF
+        DEFC    _SQR            = 0xD0
+        DEFC    _SGN            = 0xD1
+        DEFC    _ABS            = 0xD2
+        DEFC    _PEEK           = 0xD3
+        DEFC    _USR            = 0xD4
+        DEFC    _STR_DOLLAR     = 0xD5
+        DEFC    _CHR_DOLLAR     = 0xD6
+        DEFC    _NOT            = 0xD7
+        DEFC    _POWER          = 0xD8
+        DEFC    _OR             = 0xD9
+        DEFC    _AND            = 0xDA
+        DEFC    _LE             = 0xDB
+        DEFC    _GE             = 0xDC
+        DEFC    _NE             = 0xDD
+        DEFC    _THEN           = 0xDE
+        DEFC    _TO             = 0xDF
+        DEFC    _STEP           = 0xE0
+        DEFC    _LPRINT         = 0xE1
+        DEFC    _LLIST          = 0xE2
+        DEFC    _STOP           = 0xE3
+        DEFC    _SLOW           = 0xE4
+        DEFC    _FAST           = 0xE5
+        DEFC    _NEW            = 0xE6
+        DEFC    _SCROLL         = 0xE7
+        DEFC    _CONT           = 0xE8
+        DEFC    _DIM            = 0xE9
+        DEFC    _REM            = 0xEA
+        DEFC    _FOR            = 0xEB
+        DEFC    _GOTO           = 0xEC
+        DEFC    _GOSUB          = 0xED
+        DEFC    _INPUT          = 0xEE
+        DEFC    _LOAD           = 0xEF
+        DEFC    _LIST           = 0xF0
+        DEFC    _LET            = 0xF1
+        DEFC    _PAUSE          = 0xF2
+        DEFC    _NEXT           = 0xF3
+        DEFC    _POKE           = 0xF4
+        DEFC    _PRINT          = 0xF5
+        DEFC    _PLOT           = 0xF6
+        DEFC    _RUN            = 0xF7
+        DEFC    _SAVE           = 0xF8
+        DEFC    _RAND           = 0xF9
+        DEFC    _IF             = 0xFA
+        DEFC    _CLS            = 0xFB
+        DEFC    _UNPLOT         = 0xFC
+        DEFC    _CLEAR          = 0xFD
+        DEFC    _RETURN         = 0xFE
+        DEFC    _COPY           = 0xFF
+
+; System variables
+
+VERSN:  DEFB    0
+E_PPC:  DEFW    0
+D_FILE: DEFW    DISPLAY
+DF_CC:  DEFW    DISPLAY+1
+VARS:   DEFW    VARIABLES
+DEST:   DEFW    0
+E_LINE: DEFW    WORKSPACE
+CH_ADD: DEFW    WORKSPACE
+X_PTR:  DEFW    0
+STKBOT: DEFW    WORKSPACE
+STKEND: DEFW    WORKSPACE
+BREG:   DEFB    0
+MEM:    DEFW    MEMBOT
+FREE1:  DEFB    0
+DF_SZ:  DEFB    2
+S_TOP:  DEFW    0
+LAST_K: DEFW    0xFFFF
+DBOUNCE:DEFB    0x00
+MARGIN: DEFB    55
+NXTLIN: DEFW    AUTOSTART_ADDR
+OLDPPC: DEFW    0
+FLAGX:  DEFB    0x00
+STRLEN: DEFW    0
+T_ADDR: DEFW    0x0000
+SEED:   DEFW    0x0000
+FRAMES: DEFW    0xFFFF
+COORDS:
+COORDX: DEFB    0
+COORDY: DEFB    0
+PR_CC:  DEFB    PRBUFF & 0xFF
+S_POSN:
+S_POSNC:DEFB    33
+S_POSNL:DEFB    24
+CDFLAG: DEFB    SLOW_FLAG
+PRBUFF: DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP
+        DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_NL
+MEMBOT:
+MEM0:   DEFB    0,0,0,0,0
+MEM1:   DEFB    0,0,0,0,0
+MEM2:   DEFB    0,0,0,0,0
+MEM3:   DEFB    0,0,0,0,0
+MEM4:   DEFB    0,0,0,0,0
+MEM5:   DEFB    0,0,0,0,0
+FREE2:  DEFW    0x0000
+
+; BASIC program lines
+
+PROG:
+
+AUTOSTART_ADDR:
+;       0 REM
+        DDB     0
+        DEFW    L0000_END - L0000_START
+L0000_START:
+        DEFB    _REM
+
+; ASM block
+
+HELLO:	DEFM _H,_E,_L,_L,_O+$80
+WORLD:	DEFM _W,_O,_R,_L,_D+$80
+
+; End of ASM block
+
+        DEFB    _NL
+
+L0000_END:
+
+;      10 PRINT"1.23",A
+        DDB     10
+        DEFW    L0010_END - L0010_START
+L0010_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _1,_DOT,_2,_3
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _A
+        DEFB    _NL
+
+L0010_END:
+
+;      20 PRINT"12.3",AB
+        DDB     20
+        DEFW    L0020_END - L0020_START
+L0020_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _1,_2,_DOT,_3
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _A,_B
+        DEFB    _NL
+
+L0020_END:
+
+;      30 PRINT"4.56",ABC
+        DDB     30
+        DEFW    L0030_END - L0030_START
+L0030_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _4,_DOT,_5,_6
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _A,_B,_C
+        DEFB    _NL
+
+L0030_END:
+
+;      40 PRINT"HELLO",H$
+        DDB     40
+        DEFW    L0040_END - L0040_START
+L0040_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _H,_E,_L,_L,_O
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _H,_DOLLAR
+        DEFB    _NL
+
+L0040_END:
+
+;      50 PRINT"1",N(1,1)
+        DDB     50
+        DEFW    L0050_END - L0050_START
+L0050_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _1
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _N
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0050_END:
+
+;      60 PRINT"2",N(1,2)
+        DDB     60
+        DEFW    L0060_END - L0060_START
+L0060_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _2
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _N
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0060_END:
+
+;      70 PRINT"3",N(2,1)
+        DDB     70
+        DEFW    L0070_END - L0070_START
+L0070_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _3
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _N
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _COMMA
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0070_END:
+
+;      80 PRINT"4",N(2,2)
+        DDB     80
+        DEFW    L0080_END - L0080_START
+L0080_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _4
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _N
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0080_END:
+
+;      90 PRINT"A",S$(1,1)
+        DDB     90
+        DEFW    L0090_END - L0090_START
+L0090_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _A
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _S,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0090_END:
+
+;     100 PRINT"B",S$(1,2)
+        DDB     100
+        DEFW    L0100_END - L0100_START
+L0100_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _B
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _S,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0100_END:
+
+;     110 PRINT"C",S$(2,1)
+        DDB     110
+        DEFW    L0110_END - L0110_START
+L0110_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _C
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _S,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _COMMA
+        DEFB    _1
+        DEFB    _NUMBER
+        FLOAT   1
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0110_END:
+
+;     120 PRINT"D",S$(2,2)
+        DDB     120
+        DEFW    L0120_END - L0120_START
+L0120_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _D
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _S,_DOLLAR
+        DEFB    _LPAREN
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _COMMA
+        DEFB    _2
+        DEFB    _NUMBER
+        FLOAT   2
+        DEFB    _RPAREN
+        DEFB    _NL
+
+L0120_END:
+
+;     130 PRINT"1",I
+        DDB     130
+        DEFW    L0130_END - L0130_START
+L0130_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _1
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _I
+        DEFB    _NL
+
+L0130_END:
+
+;     140 NEXT I
+        DDB     140
+        DEFW    L0140_END - L0140_START
+L0140_START:
+        DEFB    _NEXT
+        DEFB    _I
+        DEFB    _NL
+
+L0140_END:
+
+;     150 STOP
+        DDB     150
+        DEFW    L0150_END - L0150_START
+L0150_START:
+        DEFB    _STOP
+        DEFB    _NL
+
+L0150_END:
+
+;    1000 PRINT"3",I
+        DDB     1000
+        DEFW    L1000_END - L1000_START
+L1000_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _3
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _I
+        DEFB    _NL
+
+L1000_END:
+
+;    1010 PRINT"HELLO",USR &PRHELLO
+        DDB     1010
+        DEFW    L1010_END - L1010_START
+L1010_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _H,_E,_L,_L,_O
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _USR
+        DEFB    _1,_7,_8,_1,_4
+        DEFB    _NUMBER
+        FLOAT   17814
+        DEFB    _NL
+
+L1010_END:
+
+;    1020 PRINT
+        DDB     1020
+        DEFW    L1020_END - L1020_START
+L1020_START:
+        DEFB    _PRINT
+        DEFB    _NL
+
+L1020_END:
+
+;    1030 PRINT"WORLD",USR &PRWORLD
+        DDB     1030
+        DEFW    L1030_END - L1030_START
+L1030_START:
+        DEFB    _PRINT
+        DEFB    _QUOTE
+        DEFB    _W,_O,_R,_L,_D
+        DEFB    _QUOTE
+        DEFB    _COMMA
+        DEFB    _USR
+        DEFB    _1,_7,_8,_1,_9
+        DEFB    _NUMBER
+        FLOAT   17819
+        DEFB    _NL
+
+L1030_END:
+
+;    1040 PRINT
+        DDB     1040
+        DEFW    L1040_END - L1040_START
+L1040_START:
+        DEFB    _PRINT
+        DEFB    _NL
+
+L1040_END:
+
+;    1050 REM
+        DDB     1050
+        DEFW    L1050_END - L1050_START
+L1050_START:
+        DEFB    _REM
+
+; ASM block
+
+PRMSG:	LD A,(HL)
+		AND $3f
+		RST $10
+		LD A,(HL)
+		RLA
+		RET C
+		INC HL
+		JR PRMSG
+
+; End of ASM block
+
+        DEFB    _NL
+
+L1050_END:
+
+
+; Display file
+
+DISPLAY:DEFB    _NL
+DSPLY00:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY01:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY02:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY03:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY04:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY05:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY06:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY07:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY08:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY09:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY10:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY11:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY12:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY13:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY14:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY15:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY16:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY17:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY18:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY19:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY20:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY21:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY22:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+DSPLY23:DEFB    _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP,_SP, \
+                _SP,_SP
+        DEFB    _NL
+
+
+; Variable definitions
+
+VARIABLES:
+
+; Variable: A = 1.23
+        DEFB    (_A & 0x3F) | 0x60
+        FLOAT   1.23
+
+; Variable: AB = 12.3
+        DEFB    (_A & 0x3F) | 0xA0
+        DEFB    (_B & 0x3F) | 0x80
+        FLOAT   12.3
+
+; Variable: ABC = 4.56
+        DEFB    (_A & 0x3F) | 0xA0
+        DEFB    (_B & 0x3F)
+        DEFB    (_C & 0x3F) | 0x80
+        FLOAT   4.56
+
+; Variable: H$ = "HELLO"
+        DEFB    (_H & 0x1F) | 0x40
+        DEFW    VAR_H_END - VAR_H_START
+VAR_H_START:
+        DEFB    _H,_E,_L,_L,_O
+VAR_H_END:
+
+; Array: N(2,2) = (1,2,3,4)
+        DEFB    (_N & 0x1F) | 0x80
+        DEFW    1 + 2 * 2 + 5 * 4
+        DEFB    2
+        DEFW    2
+        DEFW    2
+        FLOAT   1
+        FLOAT   2
+        FLOAT   3
+        FLOAT   4
+
+; Array: S$(2,2,1) = ("A","B","C","D")
+        DEFB    (_S & 0x1F) | 0xC0
+        DEFW    1 + 2 * 3 + 1 * 4
+        DEFB    3
+        DEFW    2
+        DEFW    2
+        DEFW    1
+        DEFB    _A
+        DEFB    _B
+        DEFB    _C
+        DEFB    _D
+
+; Variable: I = 1 TO 20 STEP 2 GOTO 1000
+        DEFB    (_I & 0x3F) | 0xE0
+        FLOAT   1
+        FLOAT   20
+        FLOAT   2
+        DEFW    1000
+
+; Variable: Z$ = ""
+        DEFB    (_Z & 0x1F) | 0x40
+        DEFW    VAR_Z_END - VAR_Z_START
+VAR_Z_START:
+
+; ASM block
+
+PRHELLO:LD HL, HELLO
+		JR PRCONT
+
+PRWORLD:LD HL, WORLD
+PRCONT:	CALL PRMSG
+		RST $08
+		DEFB -1
+
+; End of ASM block
+
+VAR_Z_END:
+
+        DEFB    0x80
+WORKSPACE:

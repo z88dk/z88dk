@@ -67,42 +67,6 @@
 @label3: 30		LET A = &label3
 
 //------------------------------------------------------------------------------
-// check comments
-//------------------------------------------------------------------------------
-
-// comment		// comment
-	LET A = /*
-	
-		*/ 1	'  comment
-#ASM			// comment
-	ld a, /*
-
-		*/ 1	;  comment
-#ENDASM			/* comment */
-
-// comment		// comment
-	LET A = /*
-	
-		*/ 1	'  comment
-#ASM			// comment
-	ld a, /*
-
-		*/ 1	;  comment
-#ENDASM			/* comment */
-
-//------------------------------------------------------------------------------
-// check ticks
-//------------------------------------------------------------------------------
-
-#ASM
-	; Test cpp with ticks
- 	ex af, aF'				; ASM comment
-#ENDASM
-	LET A$ = /* multi-
- 			    -line-
- 			    -comment */ "HELLO WORLD"		' BASIC comment
-
-//------------------------------------------------------------------------------
 // check colon as statment separator
 //------------------------------------------------------------------------------
 

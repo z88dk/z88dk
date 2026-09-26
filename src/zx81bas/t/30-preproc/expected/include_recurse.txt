@@ -1,0 +1,5 @@
+% z88dk-zx81bas -d 1 t/30-preproc//input/include_recurse.bas
+Input file:  t/30-preproc/input/include_recurse.bas
+Output file: t/30-preproc/input/include_recurse.p
+error: Recursive include detected: t/30-preproc/input/include_recurse.inc
+1 error found

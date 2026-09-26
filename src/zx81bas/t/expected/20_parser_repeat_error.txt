@@ -1,8 +1,0 @@
-% z88dk-zx81bas -d 5 t//input/20_parser_repeat_error.bas
-Input file:  t/input/20_parser_repeat_error.bas
-Output file: t/input/20_parser_repeat_error.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_repeat_error.i" "t/input/20_parser_repeat_error.pp"
-t/input/20_parser_repeat_error.bas:1: error: Expected expression term, found end of line
-t/input/20_parser_repeat_error.bas:2: error: Expected end of statement, found 'X'
-t/input/20_parser_repeat_error.bas:4: error: Expected 'UNTIL'
-3 errors found

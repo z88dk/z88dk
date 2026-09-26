@@ -1,7 +1,0 @@
-% z88dk-zx81bas -d 14 -O t/50-codegen//input/def_proc.bas
-Input file:  t/50-codegen/input/def_proc.bas
-Output file: t/50-codegen/input/def_proc.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/50-codegen/input/def_proc.i" "t/50-codegen/input/def_proc.pp"
-% z88dk-z80asm -b -m -o"t/50-codegen/input/def_proc.p" "t/50-codegen/input/def_proc.asm"
-% z88dk-z80asm -b -m -o"t/50-codegen/input/def_proc.p" "t/50-codegen/input/def_proc.asm"
-% z88dk-z80asm -b -m -o"t/50-codegen/input/def_proc.p" "t/50-codegen/input/def_proc.asm"

@@ -1,0 +1,16 @@
+% z88dk-zx81bas -d 4 t/20-lexer//input/error_01.bas
+Input file:  t/20-lexer/input/error_01.bas
+Output file: t/20-lexer/input/error_01.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/20-lexer/input/error_01.i" "t/20-lexer/input/error_01.pp"
+t/20-lexer/input/error_01.bas:2: error: Unknown ZX81 encoding: '''
+t/20-lexer/input/error_01.bas:3: error: Unknown ZX81 encoding: '^'
+t/20-lexer/input/error_01.bas:4: error: Char constant must be a single character
+t/20-lexer/input/error_01.bas:5: error: Invalid character 'h'
+t/20-lexer/input/error_01.bas:6: error: Unknown ZX81 encoding: '#'
+t/20-lexer/input/error_01.bas:8: error: Unknown ZX81 encoding: '''
+t/20-lexer/input/error_01.bas:9: error: Unknown ZX81 encoding: '^'
+t/20-lexer/input/error_01.bas:10: error: Invalid character 'h'
+t/20-lexer/input/error_01.bas:11: error: Unknown ZX81 encoding: '#'
+t/20-lexer/input/error_01.bas:12: error: End of line expected, found 'extra'
+t/20-lexer/input/error_01.bas:13: error: End of line expected, found 'extra'
+11 errors found

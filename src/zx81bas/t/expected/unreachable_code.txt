@@ -1,7 +1,0 @@
-% z88dk-zx81bas t//input/unreachable_code.bas
-Input file:  t/input/unreachable_code.bas
-Output file: t/input/unreachable_code.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/unreachable_code.i" "t/input/unreachable_code.pp"
-% z88dk-z80asm -b -m -o"t/input/unreachable_code.p" "t/input/unreachable_code.asm"
-% z88dk-z80asm -b -m -o"t/input/unreachable_code.p" "t/input/unreachable_code.asm"
-% z88dk-z80asm -b -m -o"t/input/unreachable_code.p" "t/input/unreachable_code.asm"

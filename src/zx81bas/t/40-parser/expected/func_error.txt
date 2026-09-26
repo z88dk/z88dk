@@ -1,0 +1,32 @@
+% z88dk-zx81bas -d 5 t/40-parser//input/func_error.bas
+Input file:  t/40-parser/input/func_error.bas
+Output file: t/40-parser/input/func_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/40-parser/input/func_error.i" "t/40-parser/input/func_error.pp"
+t/40-parser/input/func_error.bas:2: error: Expected end of statement, found '('
+t/40-parser/input/func_error.bas:3: error: Expected end of statement, found '('
+t/40-parser/input/func_error.bas:4: error: Expected end of statement, found '('
+t/40-parser/input/func_error.bas:5: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:6: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:7: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:8: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:9: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:10: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:11: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:12: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:13: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:14: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:15: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:16: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:17: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:18: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:19: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:20: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:21: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:22: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:23: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:24: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:25: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:26: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:27: error: Expected ')', found ','
+t/40-parser/input/func_error.bas:28: error: Expected ')', found ','
+27 errors found

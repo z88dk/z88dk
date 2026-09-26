@@ -1,0 +1,31 @@
+% z88dk-zx81bas -d 5 t/40-parser//input/vars_num.bas
+Input file:  t/40-parser/input/vars_num.bas
+Output file: t/40-parser/input/vars_num.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/40-parser/input/vars_num.i" "t/40-parser/input/vars_num.pp"
+Prog {
+    auto_start: false
+    auto_start_line: 0
+    auto_start_label: ""
+    increment: 10
+    rem_invert: false
+    fast_mode: false
+    dfile_lines: [
+    ]
+    dfile_colapsed: false
+    sysvars_data: [
+    ]
+    stmts: [
+        PragmaNumVarStmt {
+            location: t/40-parser/input/vars_num.bas:1
+            name: A
+            value: 123.000000
+        }
+        PragmaNumVarStmt {
+            location: t/40-parser/input/vars_num.bas:2
+            name: B
+            value: 1.230000
+        }
+    ]
+    pragma_vars: [
+    ]
+}

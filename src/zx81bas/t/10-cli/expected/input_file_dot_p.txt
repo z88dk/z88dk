@@ -1,0 +1,2 @@
+% z88dk-zx81bas t/10-cli//input/input_file_dot_p.p
+error: Input file cannot have .p extension: t/10-cli/input/input_file_dot_p.p

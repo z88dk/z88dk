@@ -1,8 +1,0 @@
-% z88dk-zx81bas -d 14 -O t/50-codegen//input/vars.bas
-Input file:  t/50-codegen/input/vars.bas
-Output file: t/50-codegen/input/vars.p
-% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/50-codegen/input/vars.i" "t/50-codegen/input/vars.pp"
-% z88dk-z80asm -b -m -o"t/50-codegen/input/vars.p" "t/50-codegen/input/vars.asm"
-% z88dk-z80asm -b -m -o"t/50-codegen/input/vars.p" "t/50-codegen/input/vars.asm"
-% z88dk-z80asm -b -m -o"t/50-codegen/input/vars.p" "t/50-codegen/input/vars.asm"
-% z88dk-z80asm -b -m -o"t/50-codegen/input/vars.p" "t/50-codegen/input/vars.asm"
