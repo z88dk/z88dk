@@ -10,6 +10,7 @@
 #define POPEN  _popen
 #define PCLOSE _pclose
 #else
+#include <sys/wait.h>
 #include <unistd.h>
 #define POPEN  popen
 #define PCLOSE pclose
