@@ -1523,7 +1523,7 @@ int main(int argc, char **argv)
         case OPTFILE:
             if (m4only || preprocessonly || dependencyonly) continue;
             if (compiler_type == CC_LLVMZ80)
-                continue;
+                goto CASE_ASMFILE;
             if (compiler_type == CC_SDCC) {
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
