@@ -5,7 +5,7 @@ the constant names z88dk defines for the `zxn` target.
 
 - Register reference: <https://gitlab.com/SpectrumNext/ZX_Spectrum_Next_FPGA/-/blob/master/cores/zxnext/nextreg.txt>
 - z88dk constants: `libsrc/newlib/target/zxn/config/`, reachable from C and assembler through `<arch/zxn.h>`
-- Generated: 2026-09-23
+- Generated: 2026-09-26
 
 In C the constants are used as written here. In assembler the same names carry a
 `__` prefix, so `REG_TILEMAP_CONTROL` is `__REG_TILEMAP_CONTROL`.
@@ -28,7 +28,7 @@ hardware reference but z88dk has no name for them yet.
 | `0x08` (8) | Peripheral 3 Setting | `REG_PERIPHERAL_3` |
 | `0x09` (9) | Peripheral 4 Setting | `REG_PERIPHERAL_4` |
 | `0x0A` (10) | Peripheral 5 Setting | `REG_PERIPHERAL_5` |
-| `0x0B` (11) | Joystick I/O Mode | _(none)_ |
+| `0x0B` (11) | Joystick I/O Mode | `REG_JOYSTICK_IO_MODE` |
 | `0x0E` (14) | Core Version | `REG_SUB_VERSION` |
 | `0x0F` (15) | Board ID | `REG_VIDEO_PARAM` |
 | `0x10` (16) | Core Boot | `REG_ANTI_BRICK` |
@@ -46,12 +46,12 @@ hardware reference but z88dk has no name for them yet.
 | `0x1C` (28) | Clip Window Control | `REG_CLIP_WINDOW_CONTROL` |
 | `0x1E` (30) | Active Video Line (MSB) | `REG_ACTIVE_VIDEO_LINE_H` |
 | `0x1F` (31) | Active Video Line (LSB) | `REG_ACTIVE_VIDEO_LINE_L` |
-| `0x20` (32) | Generate Maskable Interrupt | _(none)_ |
+| `0x20` (32) | Generate Maskable Interrupt | `REG_GENERATE_MASKABLE_INTERRUPT` |
 | `0x22` (34) | Line Interrupt control | `REG_LINE_INTERRUPT_CONTROL` |
 | `0x23` (35) | Line Interrupt Value LSB | `REG_LINE_INTERRUPT_VALUE_L` |
 | `0x24` (36) | Reserved | _(none)_ |
-| `0x26` (38) | ULA X Scroll | _(none)_ |
-| `0x27` (39) | ULA Y Scroll | _(none)_ |
+| `0x26` (38) | ULA X Scroll | `REG_ULA_OFFSET_X` |
+| `0x27` (39) | ULA Y Scroll | `REG_ULA_OFFSET_Y` |
 | `0x28` (40) | PS/2 Keymap Address MSB | `REG_KEYMAP_ADDRESS_H` |
 | `0x29` (41) | PS/2 Keymap Address LSB | `REG_KEYMAP_ADDRESS_L` |
 | `0x2A` (42) | PS/2 Keymap Data MSB | `REG_KEYMAP_DATA_H` |
@@ -94,11 +94,11 @@ hardware reference but z88dk has no name for them yet.
 | `0x60` (96) | Copper Data 8-bit Write | `REG_COPPER_DATA` |
 | `0x61` (97) | Copper Address LSB | `REG_COPPER_CONTROL_L` |
 | `0x62` (98) | Copper Control | `REG_COPPER_CONTROL_H` |
-| `0x63` (99) | Copper Data 16-bit Write | _(none)_ |
+| `0x63` (99) | Copper Data 16-bit Write | `REG_COPPER_DATA_16` |
 | `0x64` (100) | Vertical Line Count Offset | `REG_LINE_INTERRUPT_OFFSET` |
 | `0x68` (104) | ULA Control | `REG_ULA_CONTROL` |
 | `0x69` (105) | Display Control 1 | `REG_DISPLAY_CONTROL` |
-| `0x6A` (106) | LoRes Control | _(none)_ |
+| `0x6A` (106) | LoRes Control | `REG_LORES_CONTROL` |
 | `0x6B` (107) | Tilemap Control | `REG_TILEMAP_CONTROL` |
 | `0x6C` (108) | Default Tilemap Attribute | `REG_DEFAULT_TILEMAP_ATTRIBUTE` |
 | `0x6E` (110) | Tilemap Base Address | `REG_TILEMAP_BASE_ADDRESS` |
@@ -110,27 +110,31 @@ hardware reference but z88dk has no name for them yet.
 | `0x77` (119) | Sprite Attribute 2 with automatic post increment of Sprite Number | `REG_SPRITE_ATTR2_INCREMENT` |
 | `0x78` (120) | Sprite Attribute 3 with automatic post increment of Sprite Number | `REG_SPRITE_ATTR3_INCREMENT` |
 | `0x79` (121) | Sprite Attribute 4 with automatic post increment of Sprite Number | `REG_SPRITE_ATTR4_INCREMENT` |
-| `0x7F` (127) | User Register 0 | _(none)_ |
-| `0x80` (128) | Expansion Bus Enable | _(none)_ |
-| `0x81` (129) | Expansion Bus Control | _(none)_ |
-| `0x8A` (138) | Expansion Bus IO Propagate | _(none)_ |
-| `0x8C` (140) | Alternate ROM | _(none)_ |
-| `0x8E` (142) | Spectrum 128K Memory Mapping | _(none)_ |
-| `0x8F` (143) | Memory Mapping Mode | _(none)_ |
-| `0xA0` (160) | PI Peripheral Enable | _(none)_ |
-| `0xA2` (162) | PI I2S Audio Control | _(none)_ |
-| `0xA8` (168) | ESP Wifi GPIO Output Enable | _(none)_ |
-| `0xA9` (169) | ESP Wifi GPIO | _(none)_ |
+| `0x7F` (127) | User Register 0 | `REG_USER_0` |
+| `0x80` (128) | Expansion Bus Enable | `REG_EXPANSION_BUS_ENABLE` |
+| `0x81` (129) | Expansion Bus Control | `REG_EXPANSION_BUS_CONTROL` |
+| `0x82`–`0x85` (130–133) | Internal Port Decoding Enables (0x85 is MSB) (soft reset if bit 31 = 1, hard reset if bit 31 = 0 : all 1) | `REG_INTERNAL_PORT_DECODING_0`<br>`REG_INTERNAL_PORT_DECODING_1`<br>`REG_INTERNAL_PORT_DECODING_2`<br>`REG_INTERNAL_PORT_DECODING_3` |
+| `0x86`–`0x89` (134–137) | Expansion Bus Decoding Enables (0x89 is MSB) (soft reset if bit 31 = 0, hard reset if bit 31 = 1 : all 1) | `REG_EXPANSION_BUS_DECODING_0`<br>`REG_EXPANSION_BUS_DECODING_1`<br>`REG_EXPANSION_BUS_DECODING_2`<br>`REG_EXPANSION_BUS_DECODING_3` |
+| `0x8A` (138) | Expansion Bus IO Propagate | `REG_EXPANSION_BUS_IO_PROPAGATE` |
+| `0x8C` (140) | Alternate ROM | `REG_ALTERNATE_ROM` |
+| `0x8E` (142) | Spectrum 128K Memory Mapping | `REG_SPECTRUM_128K_MAPPING` |
+| `0x8F` (143) | Memory Mapping Mode | `REG_MEMORY_MAPPING_MODE` |
+| `0x90`–`0x93` (144–147) | PI GPIO Output Enable (0x93 is MSB) | `REG_PI_GPIO_OUTPUT_ENABLE_0`<br>`REG_PI_GPIO_OUTPUT_ENABLE_1`<br>`REG_PI_GPIO_OUTPUT_ENABLE_2`<br>`REG_PI_GPIO_OUTPUT_ENABLE_3` |
+| `0x98`–`0x9B` (152–155) | PI GPIO (0x9B is MSB) | `REG_PI_GPIO_0`<br>`REG_PI_GPIO_1`<br>`REG_PI_GPIO_2`<br>`REG_PI_GPIO_3` |
+| `0xA0` (160) | PI Peripheral Enable | `REG_PI_PERIPHERAL_ENABLE` |
+| `0xA2` (162) | PI I2S Audio Control | `REG_PI_I2S_AUDIO_CONTROL` |
+| `0xA8` (168) | ESP Wifi GPIO Output Enable | `REG_ESP_GPIO_OUTPUT_ENABLE` |
+| `0xA9` (169) | ESP Wifi GPIO | `REG_ESP_GPIO` |
 | `0xB0` (176) | Extended Keys 0 | `REG_EXTENDED_KEYS_0` |
 | `0xB1` (177) | Extended Keys 1 | `REG_EXTENDED_KEYS_1` |
-| `0xB2` (178) | Extended MD Pad Buttons | _(none)_ |
-| `0xB8` (184) | Divmmc Entry Points 0 | _(none)_ |
-| `0xB9` (185) | Divmmc Entry Points Valid 0 | _(none)_ |
-| `0xBA` (186) | Divmmc Entry Points Timing 0 | _(none)_ |
-| `0xBB` (187) | Divmmc Entry Points 1 | _(none)_ |
+| `0xB2` (178) | Extended MD Pad Buttons | `REG_EXTENDED_MD_PAD_BUTTONS` |
+| `0xB8` (184) | Divmmc Entry Points 0 | `REG_DIVMMC_ENTRY_POINTS_0` |
+| `0xB9` (185) | Divmmc Entry Points Valid 0 | `REG_DIVMMC_ENTRY_POINTS_VALID_0` |
+| `0xBA` (186) | Divmmc Entry Points Timing 0 | `REG_DIVMMC_ENTRY_POINTS_TIMING_0` |
+| `0xBB` (187) | Divmmc Entry Points 1 | `REG_DIVMMC_ENTRY_POINTS_1` |
 | `0xC0` (192) | Interrupt Control | `REG_INTERRUPT_CONTROL` |
-| `0xC2` (194) | NMI Return Address LSB | _(none)_ |
-| `0xC3` (195) | NMI Return Address MSB | _(none)_ |
+| `0xC2` (194) | NMI Return Address LSB | `REG_NMI_RETURN_ADDRESS_L` |
+| `0xC3` (195) | NMI Return Address MSB | `REG_NMI_RETURN_ADDRESS_H` |
 | `0xC4` (196) | INT EN 0 | `REG_INTERRUPT_ENABLE_0` |
 | `0xC5` (197) | INT EN 1 | `REG_INTERRUPT_ENABLE_1` |
 | `0xC6` (198) | INT EN 2 | `REG_INTERRUPT_ENABLE_2` |
@@ -143,13 +147,13 @@ hardware reference but z88dk has no name for them yet.
 | `0xCD` (205) | DMA INT EN 1 | `REG_DMA_INTERRUPT_ENABLE_1` |
 | `0xCE` (206) | DMA INT EN 2 | `REG_DMA_INTERRUPT_ENABLE_2` |
 | `0xCF` (207) | Reserved, write 0 | _(none)_ |
-| `0xD8` (216) | I/O Traps (experimental) | _(none)_ |
-| `0xD9` (217) | I/O Trap Write (experimental) | _(none)_ |
-| `0xDA` (218) | I/O Trap Cause (experimental) | _(none)_ |
-| `0xF0` (240) | XDEV CMD | _(none)_ |
-| `0xF8` (248) | XADC REG | _(none)_ |
-| `0xF9` (249) | XADC D0 | _(none)_ |
-| `0xFA` (250) | XADC D1 | _(none)_ |
+| `0xD8` (216) | I/O Traps (experimental) | `REG_IO_TRAPS` |
+| `0xD9` (217) | I/O Trap Write (experimental) | `REG_IO_TRAP_WRITE` |
+| `0xDA` (218) | I/O Trap Cause (experimental) | `REG_IO_TRAP_CAUSE` |
+| `0xF0` (240) | XDEV CMD | `REG_XDEV_COMMAND` |
+| `0xF8` (248) | XADC REG | `REG_XADC_REGISTER` |
+| `0xF9` (249) | XADC D0 | `REG_XADC_DATA_L` |
+| `0xFA` (250) | XADC D1 | `REG_XADC_DATA_H` |
 | `0xFF` (255) | Reserved for internal use | `REG_DEBUG` |
 
 ## Registers in detail
@@ -525,7 +529,7 @@ Value constants:
 
 ### `0x0B` (11) — Joystick I/O Mode
 
-_No z88dk constant._
+**`REG_JOYSTICK_IO_MODE`**
 
 ```
 (R/W) (soft reset = 0x01)
@@ -550,6 +554,17 @@ _No z88dk constant._
   * CTC channel 3 is currently used to drive pin 7 in clock mode.  Freq = Fctc3 / 2.
   ** CTS_n is only active if the seleced uart is in hw flow control mode.
 ```
+
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RJIM_ENABLE_IO_MODE` | `0x80` |
+| `RJIM_MODE_BIT_BANG` | `0x00` |
+| `RJIM_MODE_CLOCK` | `0x10` |
+| `RJIM_MODE_UART_LEFT_PORT` | `0x20` |
+| `RJIM_MODE_UART_RIGHT_PORT` | `0x30` |
+| `RJIM_PARAMETER` | `0x01` |
 
 ### `0x0E` (14) — Core Version
 
@@ -828,7 +843,7 @@ Value constants:
 
 ### `0x20` (32) — Generate Maskable Interrupt
 
-_No z88dk constant._
+**`REG_GENERATE_MASKABLE_INTERRUPT`**
 
 ```
 (R/W)
@@ -839,6 +854,17 @@ _No z88dk constant._
   * Set bits on R indicate whether an interrupt occurred or is pending (alias of bits in NR 0xC8 - 0xCA)
   * Set bits on W always generate a maskable interrupt ignoring enables (NR 0xC4 - 0xC6)
 ```
+
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RGMI_CTC_CHANNEL_0` | `0x01` |
+| `RGMI_CTC_CHANNEL_1` | `0x02` |
+| `RGMI_CTC_CHANNEL_2` | `0x04` |
+| `RGMI_CTC_CHANNEL_3` | `0x08` |
+| `RGMI_LINE` | `0x80` |
+| `RGMI_ULA` | `0x40` |
 
 ### `0x22` (34) — Line Interrupt control
 
@@ -883,7 +909,7 @@ _No z88dk constant._
 
 ### `0x26` (38) — ULA X Scroll
 
-_No z88dk constant._
+**`REG_ULA_OFFSET_X`**
 
 ```
 (R/W)
@@ -892,7 +918,7 @@ _No z88dk constant._
 
 ### `0x27` (39) — ULA Y Scroll
 
-_No z88dk constant._
+**`REG_ULA_OFFSET_Y`**
 
 ```
 (R/W)
@@ -1426,7 +1452,7 @@ Value constants:
 
 ### `0x63` (99) — Copper Data 16-bit Write
 
-_No z88dk constant._
+**`REG_COPPER_DATA_16`**
 
 ```
 (W)
@@ -1507,7 +1533,7 @@ Value constants:
 
 ### `0x6A` (106) — LoRes Control
 
-_No z88dk constant._
+**`REG_LORES_CONTROL`**
 
 ```
 (R/W)
@@ -1516,6 +1542,14 @@ _No z88dk constant._
   bit 4 = LoRes Radastan timex display file xor (soft reset = 0)
   bits 3:0 = LoRes palette offset (bits 1:0 apply in ula+ mode) (soft reset = 0)
 ```
+
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RLC_PALETTE_OFFSET_MASK` | `0x0F` |
+| `RLC_RADASTAN_MODE` | `0x20` |
+| `RLC_RADASTAN_TIMEX_XOR` | `0x10` |
 
 ### `0x6B` (107) — Tilemap Control
 
@@ -1698,7 +1732,7 @@ Value constants:
 
 ### `0x7F` (127) — User Register 0
 
-_No z88dk constant._
+**`REG_USER_0`**
 
 ```
 (R/W)
@@ -1709,7 +1743,7 @@ _No z88dk constant._
 
 ### `0x80` (128) — Expansion Bus Enable
 
-_No z88dk constant._
+**`REG_EXPANSION_BUS_ENABLE`**
 
 ```
 (R/W) (hard reset = 0)
@@ -1725,9 +1759,22 @@ _No z88dk constant._
   bit 0 = 1 to disable memory cycles & ignore romcs
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `REBE_DISABLE_IO_CYCLES` | `0x20` |
+| `REBE_DISABLE_IO_CYCLES_ON_SOFT_RESET` | `0x02` |
+| `REBE_DISABLE_MEMORY_CYCLES` | `0x10` |
+| `REBE_DISABLE_MEMORY_CYCLES_ON_SOFT_RESET` | `0x01` |
+| `REBE_ENABLE` | `0x80` |
+| `REBE_ENABLE_ON_SOFT_RESET` | `0x08` |
+| `REBE_ENABLE_ROMCS_REPLACEMENT` | `0x40` |
+| `REBE_ENABLE_ROMCS_REPLACEMENT_ON_SOFT_RESET` | `0x04` |
+
 ### `0x81` (129) — Expansion Bus Control
 
-_No z88dk constant._
+**`REG_EXPANSION_BUS_CONTROL`**
 
 ```
 (R/W) (hard reset = 0)
@@ -1737,9 +1784,75 @@ _No z88dk constant._
   bit 4 = 1 to propagate the max cpu clock at all times including when the expansion bus is off
   bit 3 = 1 to enable +3 fdc signals on expansion bus (issue 5 only)
   bits 1-0 = max cpu speed when the expansion bus is on (currently fixed at 00 = 3.5MHz)
+```
 
-0x85,0x84,0x83,0x82 (133-130) => Internal Port Decoding Enables (0x85 is MSB) (soft reset if bit 31 = 1, hard reset if bit 31 = 0 : all 1)
-0x89,0x88,0x87,0x86 (137-134) => Expansion Bus Decoding Enables (0x89 is MSB) (soft reset if bit 31 = 0, hard reset if bit 31 = 1 : all 1)
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `REBC_ALLOW_ULA_OVERRIDE` | `0x40` |
+| `REBC_DISABLE_NMI_DEBOUNCE` | `0x20` |
+| `REBC_ENABLE_P3_FDC_SIGNALS` | `0x08` |
+| `REBC_MAX_CPU_SPEED_3MHZ` | `0x00` |
+| `REBC_MAX_CPU_SPEED_MASK` | `0x03` |
+| `REBC_PROPAGATE_MAX_CPU_CLOCK` | `0x10` |
+| `REBC_ROMCS_ASSERTED` | `0x80` |
+
+### `0x82`–`0x85` (130–133) — Internal Port Decoding Enables (0x85 is MSB) (soft reset if bit 31 = 1, hard reset if bit 31 = 0 : all 1)
+
+**`REG_INTERNAL_PORT_DECODING_0`**
+
+**`REG_INTERNAL_PORT_DECODING_1`**
+
+**`REG_INTERNAL_PORT_DECODING_2`**
+
+**`REG_INTERNAL_PORT_DECODING_3`**
+
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RPD0_KEMPSTON_1` | `0x40` |
+| `RPD0_KEMPSTON_2` | `0x80` |
+| `RPD0_P3_FLOATING_BUS` | `0x10` |
+| `RPD0_PORT_1FFD` | `0x08` |
+| `RPD0_PORT_7FFD` | `0x02` |
+| `RPD0_PORT_DFFD` | `0x04` |
+| `RPD0_PORT_FF` | `0x01` |
+| `RPD0_ZXN_DMA` | `0x20` |
+| `RPD1_DIVMMC` | `0x01` |
+| `RPD1_I2C` | `0x04` |
+| `RPD1_LAYER_2` | `0x80` |
+| `RPD1_MOUSE` | `0x20` |
+| `RPD1_MULTIFACE` | `0x02` |
+| `RPD1_SPI` | `0x08` |
+| `RPD1_SPRITES` | `0x40` |
+| `RPD1_UART` | `0x10` |
+| `RPD2_AY` | `0x01` |
+| `RPD2_DAC_MONO_GS_COVOX` | `0x40` |
+| `RPD2_DAC_MONO_PENTAGON_ATM` | `0x20` |
+| `RPD2_DAC_MONO_SPECDRUM` | `0x80` |
+| `RPD2_DAC_SOUNDRIVE_1` | `0x02` |
+| `RPD2_DAC_SOUNDRIVE_2` | `0x04` |
+| `RPD2_DAC_STEREO_COVOX` | `0x10` |
+| `RPD2_DAC_STEREO_PROFI_COVOX` | `0x08` |
+| `RPD3_CTC` | `0x08` |
+| `RPD3_PENTAGON_1024` | `0x04` |
+| `RPD3_REGISTER_RESET_MODE` | `0x80` |
+| `RPD3_ULA_PLUS` | `0x01` |
+| `RPD3_Z80_DMA` | `0x02` |
+
+### `0x86`–`0x89` (134–137) — Expansion Bus Decoding Enables (0x89 is MSB) (soft reset if bit 31 = 0, hard reset if bit 31 = 1 : all 1)
+
+**`REG_EXPANSION_BUS_DECODING_0`**
+
+**`REG_EXPANSION_BUS_DECODING_1`**
+
+**`REG_EXPANSION_BUS_DECODING_2`**
+
+**`REG_EXPANSION_BUS_DECODING_3`**
+
+```
 (R/W)
   bit 0 = port ff
   bit 1 = port 7ffd
@@ -1782,9 +1895,43 @@ _No z88dk constant._
   disabled ports to propagate to the expansion bus, otherwise corresponding io cycles to the expansion bus are filtered.
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RPD0_KEMPSTON_1` | `0x40` |
+| `RPD0_KEMPSTON_2` | `0x80` |
+| `RPD0_P3_FLOATING_BUS` | `0x10` |
+| `RPD0_PORT_1FFD` | `0x08` |
+| `RPD0_PORT_7FFD` | `0x02` |
+| `RPD0_PORT_DFFD` | `0x04` |
+| `RPD0_PORT_FF` | `0x01` |
+| `RPD0_ZXN_DMA` | `0x20` |
+| `RPD1_DIVMMC` | `0x01` |
+| `RPD1_I2C` | `0x04` |
+| `RPD1_LAYER_2` | `0x80` |
+| `RPD1_MOUSE` | `0x20` |
+| `RPD1_MULTIFACE` | `0x02` |
+| `RPD1_SPI` | `0x08` |
+| `RPD1_SPRITES` | `0x40` |
+| `RPD1_UART` | `0x10` |
+| `RPD2_AY` | `0x01` |
+| `RPD2_DAC_MONO_GS_COVOX` | `0x40` |
+| `RPD2_DAC_MONO_PENTAGON_ATM` | `0x20` |
+| `RPD2_DAC_MONO_SPECDRUM` | `0x80` |
+| `RPD2_DAC_SOUNDRIVE_1` | `0x02` |
+| `RPD2_DAC_SOUNDRIVE_2` | `0x04` |
+| `RPD2_DAC_STEREO_COVOX` | `0x10` |
+| `RPD2_DAC_STEREO_PROFI_COVOX` | `0x08` |
+| `RPD3_CTC` | `0x08` |
+| `RPD3_PENTAGON_1024` | `0x04` |
+| `RPD3_REGISTER_RESET_MODE` | `0x80` |
+| `RPD3_ULA_PLUS` | `0x01` |
+| `RPD3_Z80_DMA` | `0x02` |
+
 ### `0x8A` (138) — Expansion Bus IO Propagate
 
-_No z88dk constant._
+**`REG_EXPANSION_BUS_IO_PROPAGATE`**
 
 ```
 (R/W)
@@ -1803,9 +1950,20 @@ _No z88dk constant._
   the value read from the bus will be mixed into keyboard reads on port 0xfe.
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `REBIP_PORT_1FFD` | `0x08` |
+| `REBIP_PORT_7FFD` | `0x02` |
+| `REBIP_PORT_DFFD` | `0x04` |
+| `REBIP_PORT_EFF7` | `0x20` |
+| `REBIP_PORT_FE` | `0x01` |
+| `REBIP_PORT_FF` | `0x10` |
+
 ### `0x8C` (140) — Alternate ROM
 
-_No z88dk constant._
+**`REG_ALTERNATE_ROM`**
 
 ```
 (R/W) (hard reset = 0)
@@ -1824,9 +1982,22 @@ _No z88dk constant._
   48K rom or the 128K rom.
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RAR_ENABLE` | `0x80` |
+| `RAR_ENABLE_ON_SOFT_RESET` | `0x08` |
+| `RAR_LOCK_ROM0` | `0x10` |
+| `RAR_LOCK_ROM0_ON_SOFT_RESET` | `0x01` |
+| `RAR_LOCK_ROM1` | `0x20` |
+| `RAR_LOCK_ROM1_ON_SOFT_RESET` | `0x02` |
+| `RAR_WRITE_ONLY` | `0x40` |
+| `RAR_WRITE_ONLY_ON_SOFT_RESET` | `0x04` |
+
 ### `0x8E` (142) — Spectrum 128K Memory Mapping
 
-_No z88dk constant._
+**`REG_SPECTRUM_128K_MAPPING`**
 
 ```
 (R/W)
@@ -1846,9 +2017,19 @@ _No z88dk constant._
   Writes immediately change the current mmu mapping as if by port write
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RSM_ALL_RAM` | `0x04` |
+| `RSM_ALL_RAM_MASK` | `0x03` |
+| `RSM_CHANGE_RAM_BANK` | `0x08` |
+| `RSM_RAM_BANK_MASK` | `0xF0` |
+| `RSM_ROM_MASK` | `0x03` |
+
 ### `0x8F` (143) — Memory Mapping Mode
 
-_No z88dk constant._
+**`REG_MEMORY_MAPPING_MODE`**
 
 ```
 (R/W) (hard reset = 0)
@@ -1862,13 +2043,43 @@ _No z88dk constant._
   * Pentagon 512K = principally port 0x7ffd
   * Pentagon 1024K = principally ports 0x7ffd, 0xeff7
   ** The mapping modes affect how ports 0x7ffd, 0xdffd, 0x1ffd and 0xeff7 carry out memory paging, see ports.txt
+```
 
-0x93,0x92,0x91,0x90 (147-144) => PI GPIO Output Enable (0x93 is MSB)
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RMMM_PENTAGON_1024K` | `0x03` |
+| `RMMM_PENTAGON_512K` | `0x02` |
+| `RMMM_ZX_128K_P3` | `0x00` |
+
+### `0x90`–`0x93` (144–147) — PI GPIO Output Enable (0x93 is MSB)
+
+**`REG_PI_GPIO_OUTPUT_ENABLE_0`**
+
+**`REG_PI_GPIO_OUTPUT_ENABLE_1`**
+
+**`REG_PI_GPIO_OUTPUT_ENABLE_2`**
+
+**`REG_PI_GPIO_OUTPUT_ENABLE_3`**
+
+```
 (R/W)
   bits 27:0 Set bits enable GPIO output on the corresponding GPIO pin (soft reset = all 0)
   (GPIO pins 1:0 cannot be enabled)
+```
 
-0x9B,0x9A,0x99,0x98 (155-152) => PI GPIO (0x9B is MSB)
+### `0x98`–`0x9B` (152–155) — PI GPIO (0x9B is MSB)
+
+**`REG_PI_GPIO_0`**
+
+**`REG_PI_GPIO_1`**
+
+**`REG_PI_GPIO_2`**
+
+**`REG_PI_GPIO_3`**
+
+```
 (R/W)
   bits 27:0 Read / Write the GPIO pin state (soft reset = 0x00001ff)
   (writes only propagate when the corresponding pin has its output enabled)
@@ -1876,7 +2087,7 @@ _No z88dk constant._
 
 ### `0xA0` (160) — PI Peripheral Enable
 
-_No z88dk constant._
+**`REG_PI_PERIPHERAL_ENABLE`**
 
 ```
 (R/W)
@@ -1890,9 +2101,18 @@ _No z88dk constant._
   * GPIO 16,17 will function as rtr_n and cts_n if the uart is in hw flow control mode
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RPPE_ENABLE_I2C` | `0x08` |
+| `RPPE_ENABLE_SPI` | `0x01` |
+| `RPPE_ENABLE_UART` | `0x20` |
+| `RPPE_UART_RX_ON_GPIO_14` | `0x10` |
+
 ### `0xA2` (162) — PI I2S Audio Control
 
-_No z88dk constant._
+**`REG_PI_I2S_AUDIO_CONTROL`**
 
 ```
 (R/W)
@@ -1916,9 +2136,23 @@ _No z88dk constant._
 //     clock divider = 538461 / SampleRateHz - 1
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RPIAC_I2S_MONO_LEFT` | `0x80` |
+| `RPIAC_I2S_MONO_RIGHT` | `0x40` |
+| `RPIAC_I2S_OFF` | `0x00` |
+| `RPIAC_I2S_STEREO` | `0xC0` |
+| `RPIAC_I2S_TO_EAR` | `0x01` |
+| `RPIAC_MUTE_LEFT` | `0x08` |
+| `RPIAC_MUTE_RIGHT` | `0x04` |
+| `RPIAC_PCM_DOUT_FROM_PI` | `0x10` |
+| `RPIAC_RESERVED_SET` | `0x02` |
+
 ### `0xA8` (168) — ESP Wifi GPIO Output Enable
 
-_No z88dk constant._
+**`REG_ESP_GPIO_OUTPUT_ENABLE`**
 
 ```
 (R/W) (soft reset = 0)
@@ -1926,15 +2160,29 @@ _No z88dk constant._
   bit 0 = GPIO0 output enable
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RESPG_GPIO0` | `0x01` |
+| `RESPG_GPIO2` | `0x04` |
+
 ### `0xA9` (169) — ESP Wifi GPIO
 
-_No z88dk constant._
+**`REG_ESP_GPIO`**
 
 ```
 (R/W)
   bit 2 = Read / Write ESP GPIO2 (soft reset = 1)
   bit 0 = Read / Write ESP GPIO0 (soft reset = 1)
 ```
+
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RESPG_GPIO0` | `0x01` |
+| `RESPG_GPIO2` | `0x04` |
 
 ### `0xB0` (176) — Extended Keys 0
 
@@ -1998,7 +2246,7 @@ Value constants:
 
 ### `0xB2` (178) — Extended MD Pad Buttons
 
-_No z88dk constant._
+**`REG_EXTENDED_MD_PAD_BUTTONS`**
 
 ```
 (R)
@@ -2012,9 +2260,22 @@ _No z88dk constant._
   bit 0 = 1 if Left Pad MODE pressed
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `REMPB_LEFT_MODE` | `0x01` |
+| `REMPB_LEFT_X` | `0x08` |
+| `REMPB_LEFT_Y` | `0x02` |
+| `REMPB_LEFT_Z` | `0x04` |
+| `REMPB_RIGHT_MODE` | `0x10` |
+| `REMPB_RIGHT_X` | `0x80` |
+| `REMPB_RIGHT_Y` | `0x20` |
+| `REMPB_RIGHT_Z` | `0x40` |
+
 ### `0xB8` (184) — Divmmc Entry Points 0
 
-_No z88dk constant._
+**`REG_DIVMMC_ENTRY_POINTS_0`**
 
 ```
 (R/W) (soft reset = 0x83)
@@ -2028,9 +2289,22 @@ _No z88dk constant._
   bit 0 = 1 to enable automap on address 0x0000 (instruction fetch)
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RDEP0_ADDRESS_0000` | `0x01` |
+| `RDEP0_ADDRESS_0008` | `0x02` |
+| `RDEP0_ADDRESS_0010` | `0x04` |
+| `RDEP0_ADDRESS_0018` | `0x08` |
+| `RDEP0_ADDRESS_0020` | `0x10` |
+| `RDEP0_ADDRESS_0028` | `0x20` |
+| `RDEP0_ADDRESS_0030` | `0x40` |
+| `RDEP0_ADDRESS_0038` | `0x80` |
+
 ### `0xB9` (185) — Divmmc Entry Points Valid 0
 
-_No z88dk constant._
+**`REG_DIVMMC_ENTRY_POINTS_VALID_0`**
 
 ```
 (R/W) (soft reset = 0x01)
@@ -2044,9 +2318,22 @@ _No z88dk constant._
   bit 0 = 1 for always else only when rom3 is present (0x0000)
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RDEP0_ADDRESS_0000` | `0x01` |
+| `RDEP0_ADDRESS_0008` | `0x02` |
+| `RDEP0_ADDRESS_0010` | `0x04` |
+| `RDEP0_ADDRESS_0018` | `0x08` |
+| `RDEP0_ADDRESS_0020` | `0x10` |
+| `RDEP0_ADDRESS_0028` | `0x20` |
+| `RDEP0_ADDRESS_0030` | `0x40` |
+| `RDEP0_ADDRESS_0038` | `0x80` |
+
 ### `0xBA` (186) — Divmmc Entry Points Timing 0
 
-_No z88dk constant._
+**`REG_DIVMMC_ENTRY_POINTS_TIMING_0`**
 
 ```
 (R/W) (soft reset = 0x00)
@@ -2060,9 +2347,22 @@ _No z88dk constant._
   bit 0 = 1 for instant mapping else delayed (0x0000)
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RDEP0_ADDRESS_0000` | `0x01` |
+| `RDEP0_ADDRESS_0008` | `0x02` |
+| `RDEP0_ADDRESS_0010` | `0x04` |
+| `RDEP0_ADDRESS_0018` | `0x08` |
+| `RDEP0_ADDRESS_0020` | `0x10` |
+| `RDEP0_ADDRESS_0028` | `0x20` |
+| `RDEP0_ADDRESS_0030` | `0x40` |
+| `RDEP0_ADDRESS_0038` | `0x80` |
+
 ### `0xBB` (187) — Divmmc Entry Points 1
 
-_No z88dk constant._
+**`REG_DIVMMC_ENTRY_POINTS_1`**
 
 ```
 (R/W) (soft reset = 0xCD)
@@ -2077,6 +2377,19 @@ _No z88dk constant._
 
 // INTERRUPTS
 ```
+
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RDEP1_DISABLE_1FF8` | `0x40` |
+| `RDEP1_ESXDOS_TAPE_04C6` | `0x04` |
+| `RDEP1_ESXDOS_TAPE_0562` | `0x08` |
+| `RDEP1_NEXTZXOS_TAPE_04D7` | `0x10` |
+| `RDEP1_NEXTZXOS_TAPE_056A` | `0x20` |
+| `RDEP1_NMI_0066_DELAYED` | `0x01` |
+| `RDEP1_NMI_0066_INSTANT` | `0x02` |
+| `RDEP1_TRDOS_3DXX` | `0x80` |
 
 ### `0xC0` (192) — Interrupt Control
 
@@ -2121,7 +2434,7 @@ Value constants:
 
 ### `0xC2` (194) — NMI Return Address LSB
 
-_No z88dk constant._
+**`REG_NMI_RETURN_ADDRESS_L`**
 
 ```
 (R/W) (soft reset = 0)
@@ -2129,7 +2442,7 @@ _No z88dk constant._
 
 ### `0xC3` (195) — NMI Return Address MSB
 
-_No z88dk constant._
+**`REG_NMI_RETURN_ADDRESS_H`**
 
 ```
 (R/W) (soft reset = 0)
@@ -2418,7 +2731,7 @@ progress is made in the main program.
 
 ### `0xD8` (216) — I/O Traps (experimental)
 
-_No z88dk constant._
+**`REG_IO_TRAPS`**
 
 ```
 (R/W) (soft reset = 0)
@@ -2428,9 +2741,15 @@ _No z88dk constant._
   * Traps cannot be triggered by the dma or while the multiface, divmmc or external nmi is active
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RIT_ENABLE_P3_FDC_TRAPS` | `0x01` |
+
 ### `0xD9` (217) — I/O Trap Write (experimental)
 
-_No z88dk constant._
+**`REG_IO_TRAP_WRITE`**
 
 ```
 (R/W)
@@ -2439,7 +2758,7 @@ _No z88dk constant._
 
 ### `0xDA` (218) — I/O Trap Cause (experimental)
 
-_No z88dk constant._
+**`REG_IO_TRAP_CAUSE`**
 
 ```
    0 = none (zero at the same time nextreg 0x02 bit 4 is 0)
@@ -2451,9 +2770,18 @@ _No z88dk constant._
 --
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RITC_NONE` | `0x00` |
+| `RITC_PORT_2FFD_READ` | `0x01` |
+| `RITC_PORT_3FFD_READ` | `0x02` |
+| `RITC_PORT_3FFD_WRITE` | `0x03` |
+
 ### `0xF0` (240) — XDEV CMD
 
-_No z88dk constant._
+**`REG_XDEV_COMMAND`**
 
 ```
 R/W Issues 4 and 5 Only - (soft reset = 0x80)
@@ -2492,9 +2820,26 @@ R/W Issues 4 and 5 Only - (soft reset = 0x80)
   *** Exit select mode by writing zero to bit 7; thereafter the particular device is attached to the nextreg
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RXC_CHANGE_DEVICE` | `0x40` |
+| `RXC_DEVICE_DNA` | `0x01` |
+| `RXC_DEVICE_MASK` | `0x03` |
+| `RXC_DEVICE_NONE` | `0x00` |
+| `RXC_DEVICE_XADC` | `0x02` |
+| `RXC_DNA_BIT` | `0x01` |
+| `RXC_SELECT_MODE` | `0x80` |
+| `RXC_XADC_BUSY` | `0x40` |
+| `RXC_XADC_CONVST` | `0x01` |
+| `RXC_XADC_EOC` | `0x02` |
+| `RXC_XADC_EOS` | `0x01` |
+| `RXC_XADC_RESET` | `0x40` |
+
 ### `0xF8` (248) — XADC REG
 
-_No z88dk constant._
+**`REG_XADC_REGISTER`**
 
 ```
 (R/W Issues 4 and 5 Only) (hard reset = 0)
@@ -2505,9 +2850,16 @@ _No z88dk constant._
   ** Reads as 0
 ```
 
+Value constants:
+
+| Constant | Value |
+| --- | --- |
+| `RXR_ADDRESS_MASK` | `0x7F` |
+| `RXR_WRITE` | `0x80` |
+
 ### `0xF9` (249) — XADC D0
 
-_No z88dk constant._
+**`REG_XADC_DATA_L`**
 
 ```
 (R/W Issues 4 and 5 Only) (hard reset = 0)
@@ -2517,7 +2869,7 @@ _No z88dk constant._
 
 ### `0xFA` (250) — XADC D1
 
-_No z88dk constant._
+**`REG_XADC_DATA_H`**
 
 ```
 (R/W Issues 4 and 5 Only) (hard reset = 0)

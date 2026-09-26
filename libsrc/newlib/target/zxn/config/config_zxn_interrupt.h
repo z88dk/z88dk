@@ -90,3 +90,27 @@
 // Offset added to the vertical line counter. It affects the copper the line
 // interrupt and the active line count. A change takes up to one frame to occur
 #define REG_LINE_INTERRUPT_OFFSET 0x64
+
+// --------------------------------------------------------
+// Generate maskable interrupt
+// --------------------------------------------------------
+// Reading a set bit means the interrupt occurred or is pending (alias of bits
+// in REG_INTERRUPT_STATUS_0 to REG_INTERRUPT_STATUS_2). Writing a set bit
+// always generates a maskable interrupt regardless of the enables
+
+#define REG_GENERATE_MASKABLE_INTERRUPT 0x20
+
+#define RGMI_LINE 0x80
+#define RGMI_ULA 0x40
+#define RGMI_CTC_CHANNEL_0 0x01
+#define RGMI_CTC_CHANNEL_1 0x02
+#define RGMI_CTC_CHANNEL_2 0x04
+#define RGMI_CTC_CHANNEL_3 0x08
+
+// --------------------------------------------------------
+// NMI return address
+// --------------------------------------------------------
+// The return address written during an nmi acknowledge cycle is always stored here
+
+#define REG_NMI_RETURN_ADDRESS_L 0xC2
+#define REG_NMI_RETURN_ADDRESS_H 0xC3

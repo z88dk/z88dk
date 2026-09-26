@@ -27,3 +27,19 @@
 #define REK1_GRAPH 0x04
 #define REK1_CAPS_LOCK 0x02
 #define REK1_EXTEND 0x01
+
+// ------------------------------------------
+// Extended MD pad buttons
+// ------------------------------------------
+// Read only. A set bit means the button is pressed
+
+#define REG_EXTENDED_MD_PAD_BUTTONS 0xB2
+
+#define REMPB_RIGHT_X 0x80
+#define REMPB_RIGHT_Z 0x40
+#define REMPB_RIGHT_Y 0x20
+#define REMPB_RIGHT_MODE 0x10
+#define REMPB_LEFT_X 0x08
+#define REMPB_LEFT_Z 0x04
+#define REMPB_LEFT_Y 0x02
+#define REMPB_LEFT_MODE 0x01

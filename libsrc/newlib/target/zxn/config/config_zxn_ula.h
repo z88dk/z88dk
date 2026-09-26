@@ -41,3 +41,28 @@
 
 // Timex display mode bits (alias of port 0xFF bits 5:0)
 #define RDC_TIMEX_DISPLAY_MODE_MASK 0x3F
+
+// ------------------------------------------
+// ULA scroll
+// ------------------------------------------
+
+// ULA X offset (0-255)
+#define REG_ULA_OFFSET_X 0x26
+
+// ULA Y offset (0-191)
+#define REG_ULA_OFFSET_Y 0x27
+
+// ------------------------------------------
+// LoRes control
+// ------------------------------------------
+
+#define REG_LORES_CONTROL 0x6A
+
+// LoRes is Radastan mode: 128x96x4 in 6144 bytes
+#define RLC_RADASTAN_MODE 0x20
+
+// Radastan Timex display file xor
+#define RLC_RADASTAN_TIMEX_XOR 0x10
+
+// Palette offset occupies the four low bits (only bits 1:0 apply in ULA+ mode)
+#define RLC_PALETTE_OFFSET_MASK 0x0F

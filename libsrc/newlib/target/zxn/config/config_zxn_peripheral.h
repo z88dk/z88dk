@@ -25,3 +25,25 @@
 #define RP5_MOUSE_DEFAULT_DPI 0x01
 #define RP5_MOUSE_MEDIUM_DPI 0x02
 #define RP5_MOUSE_HIGH_DPI 0x03
+
+// ------------------------------------------
+// Joystick I/O mode
+// ------------------------------------------
+// While in i/o mode the joystick ports are driven as general purpose pins.
+// Keyboard joystick types produce no readings but the pins can still be read
+// via the Kempston ports
+
+#define REG_JOYSTICK_IO_MODE 0x0B
+
+// Enable i/o mode
+#define RJIM_ENABLE_IO_MODE 0x80
+
+// I/O mode (bits 5:4)
+#define RJIM_MODE_BIT_BANG 0x00
+#define RJIM_MODE_CLOCK 0x10
+#define RJIM_MODE_UART_LEFT_PORT 0x20
+#define RJIM_MODE_UART_RIGHT_PORT 0x30
+
+// Mode parameter. Bit bang mode: pin 7 state. Clock mode: run the clock.
+// Uart mode: redirect the pi uart1 (1) instead of the esp uart0 (0)
+#define RJIM_PARAMETER 0x01

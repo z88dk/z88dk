@@ -46,19 +46,30 @@ def load_z88dk(cfgdir):
     return consts
 
 def parse_nextreg(path):
-    """[(number, title, [body lines])] in file order."""
+    """[([numbers], title, [body lines])] in file order.
+
+    Multi-byte registers share one entry, e.g. "0x85,0x84,0x83,0x82 (133-130)";
+    their numbers are returned in ascending order."""
     lines = open(path, encoding='utf-8', errors='replace').read().split('\n')
     heads = []
     for i, l in enumerate(lines):
-        m = re.match(r"^(0x[0-9A-Fa-f]{2})\s*\((\d+)\)\s*=>\s*(.+?)\s*$", l)
-        if m: heads.append((i, int(m.group(1), 16), m.group(3)))
+        m = re.match(r"^((?:0x[0-9A-Fa-f]{2}\s*,\s*)*0x[0-9A-Fa-f]{2})\s*\([\d-]+\)\s*=>\s*(.+?)\s*$", l)
+        if m:
+            nums = sorted(int(x, 16) for x in re.findall(r"0x[0-9A-Fa-f]{2}", m.group(1)))
+            heads.append((i, nums, m.group(2)))
     out = []
-    for idx, (i, num, title) in enumerate(heads):
+    for idx, (i, nums, title) in enumerate(heads):
         end = heads[idx+1][0] if idx+1 < len(heads) else len(lines)
         body = lines[i+1:end]
         while body and not body[-1].strip(): body.pop()
-        out.append((num, title, body))
+        out.append((nums, title, body))
     return out
+
+def reg_label(nums):
+    """`0x82`-`0x85` (130-133) for a multi-byte register, `0x0B` (11) otherwise."""
+    if len(nums) == 1:
+        return "`0x%02X` (%d)" % (nums[0], nums[0])
+    return "`0x%02X`–`0x%02X` (%d–%d)" % (nums[0], nums[-1], nums[0], nums[-1])
 
 def prefixes_for(regname):
     """Flag prefixes z88dk would derive from a REG_ constant name."""
@@ -81,6 +92,13 @@ PREFIX_REGISTERS = {
     'RI2':  [0xC6, 0xCA, 0xCE],
     'RTBA': [0x6E],
     'RTDBA':[0x6F],
+    'RPD0': [0x82, 0x86],
+    'RPD1': [0x83, 0x87],
+    'RPD2': [0x84, 0x88],
+    'RPD3': [0x85, 0x89],
+    'RSM':  [0x8E],
+    'RESPG':[0xA8, 0xA9],
+    'RDEP0':[0xB8, 0xB9, 0xBA],
 }
 
 # Prefixes that are not nextreg bit values at all.
@@ -128,17 +146,17 @@ def main():
     W("## Register summary\n")
     W("| Register | Name | z88dk constant |")
     W("| --- | --- | --- |")
-    for num, title, body in regs:
-        names = bynum.get(num, [])
+    for nums, title, body in regs:
+        names = [n for num in nums for n in bynum.get(num, [])]
         cell = '<br>'.join('`%s`' % n for n in names) if names else '_(none)_'
-        W("| `0x%02X` (%d) | %s | %s |" % (num, num, title, cell))
+        W("| %s | %s | %s |" % (reg_label(nums), title, cell))
     W("")
 
     # ---- per register detail
     W("## Registers in detail\n")
-    for num, title, body in regs:
-        names = bynum.get(num, [])
-        W("### `0x%02X` (%d) — %s\n" % (num, num, title))
+    for nums, title, body in regs:
+        names = [n for num in nums for n in bynum.get(num, [])]
+        W("### %s — %s\n" % (reg_label(nums), title))
         if names:
             for n in names: W("**`%s`**\n" % n)
         else:
@@ -149,8 +167,8 @@ def main():
             W("```\n")
         # flags belonging to this register
         flags = []
-        for p, nums in PREFIX_REGISTERS.items():
-            if num in nums and p in byprefix:
+        for p, pnums in PREFIX_REGISTERS.items():
+            if set(nums) & set(pnums) and p in byprefix:
                 used_prefixes.add(p)
                 flags.extend(byprefix[p])
         for rn in names:
