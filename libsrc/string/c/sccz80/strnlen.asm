@@ -33,9 +33,17 @@ defc _strnlen = strnlen
 ENDIF
 
 
-; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 register ABI).
+; __ZPROTO2(strnlen, s, max_len) -> ___strnlen(max_len, s): HL=max, DE=s.
+; asm_strnlen enter: HL=s, BC=maxlen.
 IF __CLASSIC
 PUBLIC ___strnlen
-defc ___strnlen = strnlen
+___strnlen:
+   ld c,l
+   ld b,h                   ; BC = maxlen
+   ex de,hl                 ; HL = s
+   call asm_strnlen         ; enter HL=s, BC=maxlen; exit HL=length
+   ex de,hl                 ; DE = length (C return value)
+   ret
 ENDIF
 

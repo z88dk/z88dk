@@ -33,9 +33,16 @@ defc _strcpy = strcpy
 ENDIF
 
 
-; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 reversed-arg register ABI).
+; sys/proto.h declares __strcpy(const char *s2, char *s1) (reversed).
+; llvmz80 passes both args in registers: HL=s2 (src), DE=s1 (dst); the
+; 16-bit return (dst) goes in DE.  The old `defc ___strcpy = strcpy`
+; aliased the sccz80 stack-ABI routine (pops s1,s2) -> wrong -> crash.
 IF __CLASSIC
 PUBLIC ___strcpy
-defc ___strcpy = strcpy
+___strcpy:
+   call asm_strcpy          ; enter HL=src, DE=dst; exit HL=dst
+   ex de,hl                 ; DE = dst (C return value)
+   ret
 ENDIF
 

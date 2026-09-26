@@ -39,3 +39,20 @@ PUBLIC ___strpbrk
 defc ___strpbrk = strpbrk
 ENDIF
 
+
+; strpkbrk(s, set) is a z88dk-extension alias for strpbrk(s1, s2).
+; __ZPROTO2 generates ___strpkbrk(set, s) -- reversed register ABI:
+;   HL = set, DE = s
+; asm_strpbrk wants: HL = s, DE = set
+IF __CLASSIC
+PUBLIC _strpkbrk               ; sccz80/sdcc: same stack layout as strpbrk
+defc _strpkbrk = strpbrk
+
+PUBLIC ___strpkbrk             ; llvmz80 clang: register-ABI bridge
+___strpkbrk:
+   ex de,hl                   ; HL = s, DE = set
+   call asm_strpbrk
+   ex de,hl                   ; DE = result (clang reads return in DE)
+   ret
+ENDIF
+

@@ -34,8 +34,15 @@ ENDIF
 
 
 ; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 register ABI).
+; __ZPROTO2(strtok, s, delim) -> ___strtok(delim, s): HL=delim, DE=s.
+; asm_strtok enter: DE=delimiters, HL=string -> swap needed.
 IF __CLASSIC
 PUBLIC ___strtok
-defc ___strtok = strtok
+___strtok:
+   ex de,hl                 ; HL = s, DE = delim
+   call asm_strtok          ; enter DE=delim, HL=s; exit carry+HL=token or HL=0
+   ex de,hl                 ; DE = result ptr (C return value)
+   ret
 ENDIF
 

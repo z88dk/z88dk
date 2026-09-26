@@ -34,7 +34,6 @@
 ../../math/integer/small/l_small_divs_32_32x32
 ../../math/integer/small/l_small_divs_64_64x64
 ../../math/integer/small/l_small_divu_16_16x16
-../../math/integer/small/l_small_divu_32_32x16
 ../../math/integer/small/l_small_divu_32_32x32
 ../../math/integer/small/l_small_divu_64_64x8
 ../../math/integer/small/l_small_divu_64_64x64
@@ -72,6 +71,9 @@
 ../../math/integer/l_mulu_64_64x64
 ../../math/integer/l_mulu_72_64x8
 ../../math/integer/l_mulu_de
+../../l/util/5-z80/longlong/l_lsr_dehldehl
+../../l/util/5-z80/longlong/small/l_small_lsr_dehldehl
+../../l/util/5-z80/longlong/fast/l_fast_lsr_dehldehl
 ../../math/float/math32/asm/z80/f32_z80_mulu_32h_24x24
 ../../math/float/math32/asm/z80/f32_z80_mulu_32h_32x32
 ../../math/float/math32/asm/z80/f32_z80_sqr_32h_24x24
@@ -79,3 +81,5 @@
 ../../arch/z80/z80/asm_z80_delay_tstate
 
 @../../l/clang.lst
+
+@../../l/llvmz80.lst

@@ -52,9 +52,20 @@ defc _strncpy = strncpy
 ENDIF
 
 
-; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 reversed-arg register ABI).
+; __strncpy(size_t n, const char *s2, char *s1): HL=n, DE=s2 (src),
+; s1 (dst) on the stack above the return address, callee-cleaned;
+; return dst in DE.
 IF __CLASSIC
 PUBLIC ___strncpy
-defc ___strncpy = strncpy
+___strncpy:
+   ld c,l
+   ld b,h                   ; BC = n
+   pop hl                   ; HL = return address
+   ex (sp),hl               ; HL = s1 (dst); [SP] = return address
+   ex de,hl                 ; DE = dst, HL = src (s2)
+   call asm_strncpy         ; enter DE=dst, HL=src, BC=n; exit HL=dst
+   ex de,hl                 ; DE = dst (C return value)
+   ret
 ENDIF
 

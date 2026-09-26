@@ -54,9 +54,26 @@ defc _memmove = memmove
 ENDIF
 
 
-; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 / ez80-clang reversed-arg ABI).
+;
+; sys/proto.h declares, under the clang path, reversed positional args:
+;   void *__memmove(size_t n, const void *s2, void *s1)
+; so memmove(dst,src,n) lowers to __memmove(n,src,dst): HL = n,
+; DE = src (s2), dst (s1) on the stack above the return address, callee
+; cleans the stack arg, 16-bit return in DE.  Same shape as __memcpy.
+;
+; The old `defc ___memmove = memmove` aliased to the sccz80 memmove
+; (pops s1,s2,n off the stack) — wrong ABI -> garbage -> crash.
 IF __CLASSIC
 PUBLIC ___memmove
-defc ___memmove = memmove
+___memmove:
+   ld c,l
+   ld b,h                   ; BC = n (count)
+   pop hl                   ; HL = return address
+   ex (sp),hl               ; HL = s1 (dst); [SP] = return address
+   ex de,hl                 ; DE = dst, HL = src (s2)
+   call asm_memmove         ; enter BC=n, HL=src, DE=dst; exit HL=dst
+   ex de,hl                 ; DE = dst (C return value)
+   ret
 ENDIF
 

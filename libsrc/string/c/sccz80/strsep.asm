@@ -34,8 +34,17 @@ ENDIF
 
 
 ; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 register ABI).
+; __ZPROTO2(strsep, stringp, delim) -> ___strsep(delim, stringp): HL=delim, DE=stringp.
+; asm_strsep enter: DE=delim, BC=stringp (char**).
 IF __CLASSIC
 PUBLIC ___strsep
-defc ___strsep = strsep
+___strsep:
+   ld c,e
+   ld b,d                   ; BC = stringp (char **)
+   ex de,hl                 ; DE = delim
+   call asm_strsep          ; enter DE=delim, BC=stringp; exit HL=token or 0
+   ex de,hl                 ; DE = result ptr (C return value)
+   ret
 ENDIF
 

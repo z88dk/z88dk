@@ -33,9 +33,14 @@ defc _strstr = strstr
 ENDIF
 
 
-; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 register ABI).
+; __ZPROTO2(strstr, s, subs) -> ___strstr(subs, s): HL=subs, DE=s.
+; asm_strstr enter: DE=s (haystack), HL=subs (needle) -- already correct.
 IF __CLASSIC
 PUBLIC ___strstr
-defc ___strstr = strstr
+___strstr:
+   call asm_strstr          ; enter HL=subs, DE=s; exit HL=ptr or 0
+   ex de,hl                 ; DE = result (C return value)
+   ret
 ENDIF
 

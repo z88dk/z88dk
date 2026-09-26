@@ -55,9 +55,19 @@ defc _memcmp = memcmp
 ENDIF
 
 
-; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 reversed-arg register ABI).
+; __memcmp(size_t n, const void *s2, const void *s1): HL=n, DE=s2,
+; s1 on the stack above the return address, callee-cleaned; int in DE.
 IF __CLASSIC
 PUBLIC ___memcmp
-defc ___memcmp = memcmp
+___memcmp:
+   ld c,l
+   ld b,h                   ; BC = n
+   pop hl                   ; HL = return address
+   ex (sp),hl               ; HL = s1; [SP] = return address
+   ex de,hl                 ; DE = s1, HL = s2
+   call asm_memcmp          ; enter BC=n, HL=s2, DE=s1; exit HL=signed result
+   ex de,hl                 ; DE = result (C return value)
+   ret
 ENDIF
 

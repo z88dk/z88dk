@@ -33,9 +33,15 @@ defc _strrspn = strrspn
 ENDIF
 
 
-; Clang bridge for Classic
+; Clang bridge for Classic (llvmz80 register ABI).
+; __ZPROTO2(strrspn, s, set) -> ___strrspn(set, s): HL=set, DE=s.
+; asm_strrspn enter: HL=str, DE=cset -- swap needed.
 IF __CLASSIC
 PUBLIC ___strrspn
-defc ___strrspn = strrspn
+___strrspn:
+   ex de,hl                 ; HL=str, DE=cset
+   call asm_strrspn         ; exit HL=position (size_t)
+   ex de,hl                 ; DE = result (C return value)
+   ret
 ENDIF
 
