@@ -324,6 +324,7 @@ static enum iostyle    compiler_style = outimplied;
 #define CC_80CC      3
 #define CC_XCC       4
 #define CC_MULTI     5
+#define CC_LLVMZ80   6
 
 static char           *c_compiler_type = "sccz80";
 static int             c_want_multi = 0;
@@ -351,6 +352,17 @@ static char  *c_options = NULL;
 static char  *c_z80asm_exe = "z88dk-z80asm";
 
 static char  *c_ez80clang_exe = "ez80-clang";
+/* -compiler=llvmz80 : ravn/llvm-z80 GlobalISel clang.
+ * Default binary name "llvmz80-clang" is looked up on PATH; override with
+ * LLVMZ80EXE in the z88dk config file or the LLVMZ80EXE environment variable
+ * (env wins -- see the -compiler=llvmz80 branch).
+ * Install llvm-z80 and create a "llvmz80-clang" symlink (or rename) in a
+ * PATH directory, e.g.:
+ *   ln -s /opt/llvm-z80/bin/clang /usr/local/bin/llvmz80-clang */
+static char  *c_llvmz80_exe = "llvmz80-clang";
+static char  *c_llvmz80_opt = NULL;
+static char  *c_llvmz80_postproc = NULL;
+static char  *c_llvmz80_fmath = NULL;
 static char  *c_sdcc_exe = "z88dk-zsdcc";
 static char  *c_sccz80_exe = "z88dk-sccz80";
 static char  *c_80cc_exe = "z88dk-80cc";
@@ -459,6 +471,10 @@ static arg_t  config[] = {
     { "COPTRULESINLINE", 0, SetStringConfig, &c_coptrules_sccz80, NULL, "Optimisation file for inlining sccz80 ops", "\"DESTDIR/lib/z80rules.8\"" },
     { "COPTRULESTARGET", 0, SetStringConfig, &c_coptrules_target, NULL, "Optimisation file for target specific operations",NULL },
     { "EZ80CLANGRULES", 0, SetStringConfig, &c_ez80clang_opt, NULL, "Rules for ez80 clang", "DESTDIR/lib/clang_rules.1"},
+    { "LLVMZ80EXE", 0, SetStringConfig, &c_llvmz80_exe, NULL, "Path to the ravn/llvm-z80 clang binary" },
+    { "LLVMZ80RULES", AF_DEPRECATED, SetStringConfig, &c_llvmz80_opt, NULL, "copt rules for ravn/llvm-z80 clang (obsolete)", NULL },
+    { "LLVMZ80POSTPROC", AF_DEPRECATED, SetStringConfig, &c_llvmz80_postproc, NULL, "postprocess script for ravn/llvm-z80 clang (obsolete)", NULL },
+    { "LLVMZ80FMATH", 0, SetStringConfig, &c_llvmz80_fmath, NULL, "llvmz80 float32 math32 bridge library archive", "DESTDIR/lib/clibs/llvmz80_fmath.lib" },
     { "80CCRULES", 0, SetStringConfig, &c_80cc_opt, NULL, "Options for 80cc", "DESTDIR/lib/80cc_rules.1"},
     { "XCCRULES", 0, SetStringConfig, &c_xcc_opt, NULL, "Options for xcc", "DESTDIR/lib/xcc_rules.1"},
     { "SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "\"DESTDIR/lib/sdcc/sdcc_opt.1\"" },
@@ -1277,6 +1293,18 @@ int main(int argc, char **argv)
     if (linker_linklib_first)
         BuildOptions_start(&linklibs, linker_linklib_first);
 
+    /* -compiler=llvmz80: auto-link the f32 math32 bridge archive so float/double
+     * programs resolve __addsf3/__cmpsf2/__fixsfsi/... against math32 with no
+     * explicit -lllvmz80_fmath. */
+    if (compiler_type == CC_LLVMZ80 && !compileonly && !makelib &&
+        c_llvmz80_fmath && *c_llvmz80_fmath) {
+        char *fmarg;
+        if (zcc_asprintf(&fmarg, " -l\"%s\" ", c_llvmz80_fmath) > 0) {
+            BuildOptions(&linklibs, fmarg);
+            free(fmarg);
+        }
+    }
+
     if (printmacros)
     {
         BuildOptions(&cpparg, "-d");
@@ -1451,9 +1479,11 @@ int main(int argc, char **argv)
                 goto CASE_ASMFILE;
             }
             /* past clang+llvm related pre-processing */
-            if (compiler_type == CC_SDCC || compiler_type == CC_EZ80CLANG) {
+            if (compiler_type == CC_SDCC || compiler_type == CC_EZ80CLANG || compiler_type == CC_LLVMZ80) {
                 char zpragma_args[1024];
-                snprintf(zpragma_args, sizeof(zpragma_args),"-zcc-opt=\"%s\"", zcc_opt_def);
+                snprintf(zpragma_args, sizeof(zpragma_args),"-zcc-opt=\"%s\"%s",
+                         zcc_opt_def,
+                         (compiler_type == CC_LLVMZ80 || compiler_type == CC_SDCC) ? " -autoformat" : "");
                 if (process(ft == CXXFILE ? ".cpp" : ".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
@@ -1484,13 +1514,15 @@ int main(int argc, char **argv)
                     compiler_arg = strdup(comparg);
                 }
 
-                if (process(".i", ".opt", c_compiler, compiler_arg, compiler_style, i, YES, NO)) {
+                if (process(".i", (compiler_type == CC_LLVMZ80) ? ".asm" : ".opt", c_compiler, compiler_arg, compiler_style, i, YES, NO)) {
                     exit(1);
                 }
                 free(compiler_arg);
             }
         case OPTFILE:
             if (m4only || preprocessonly || dependencyonly) continue;
+            if (compiler_type == CC_LLVMZ80)
+                goto CASE_ASMFILE;
             if (compiler_type == CC_SDCC) {
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
@@ -2698,6 +2730,41 @@ void AddLinkSearchPath(option *argument, char *arg)
 }
 
 
+/* Strip any flag whose prefix matches <prefix> (and its arguments up to the
+ * next whitespace) from an option string in-place.  Used for flags that a
+ * specific compiler backend cannot consume -- e.g. clang-z80 unconditionally
+ * uses IEEE-754 soft-float, so `-fp-mode=ieee` is a no-op for it and the flag
+ * is simply dropped.  A match only counts at a token boundary (start of the
+ * string or after whitespace) so an embedded substring in a path is left
+ * alone.  Example: comparg " -DMATH32 -fp-mode=ieee -lmath32 " becomes
+ * " -DMATH32 -lmath32 ". */
+static void strip_flag_prefix(char **argstr, const char *prefix)
+{
+    char   *s, *p;
+    size_t  plen;
+
+    if (argstr == NULL || *argstr == NULL || prefix == NULL)
+        return;
+    plen = strlen(prefix);
+    s = *argstr;
+    while ((p = strstr(s, prefix)) != NULL) {
+        char *end;
+        /* Only a real token if at string start or preceded by whitespace. */
+        if (p != *argstr && !isspace((unsigned char)p[-1])) {
+            s = p + plen;   /* substring match, not a token -- skip past it */
+            continue;
+        }
+        end = p + plen;
+        while (*end && !isspace((unsigned char)*end))   /* rest of the token */
+            end++;
+        while (*end && isspace((unsigned char)*end))    /* one run of trailing ws */
+            end++;
+        memmove(p, end, strlen(end) + 1);
+        s = p;              /* keep scanning from the splice point */
+    }
+}
+
+
 /** \brief Append arg to *list
 */
 void BuildOptions(char **list, const char *arg)
@@ -3665,6 +3732,54 @@ static void configure_compiler(void)
         BuildOptions(&linkargs, "-D__COMPILER_MULTI");
         c_compiler = c_sccz80_exe;
         compiler_style = outspecified_flag;
+    } else if (strcmp(c_compiler_type,"llvmz80") == 0 ) {
+        preprocarg = " -E -D__CLANG -D__LLVMZ80 --target=z80 -std=gnu23";
+        BuildOptions(&cpparg, preprocarg);
+        BuildOptions(&asmargs, "-D__LLVMZ80");
+        BuildOptions(&linkargs, "-D__LLVMZ80");
+
+        {
+            char optflag[8];
+            if (opt_code_size) {
+                strcpy(optflag, "-Oz");
+            } else {
+                int lvl = peepholeopt;
+                if (lvl < 0) lvl = 0;
+                if (lvl > 3) lvl = 3;
+                snprintf(optflag, sizeof(optflag), "-O%d", lvl);
+            }
+            snprintf(buf, sizeof(buf),
+                     "--target=z80 -S -mdouble=32 -std=gnu23 -o - %s",
+                     optflag);
+        }
+        add_option_to_compiler(buf);
+
+        add_option_to_compiler("-mllvm -z80-float-sdcccall0");
+        add_option_to_compiler("-mllvm -z80-classic-libc-cc");
+        add_option_to_compiler("-mllvm -z80-asm-format=z80asm");
+
+        if (clangarg) {
+            add_option_to_compiler(clangarg);
+        }
+
+        {
+            char *env_llvmz80 = getenv("LLVMZ80EXE");
+            if (env_llvmz80 && *env_llvmz80)
+                c_llvmz80_exe = env_llvmz80;
+        }
+        {
+            char *env_fmath = getenv("LLVMZ80FMATH");
+            if (env_fmath && *env_fmath)
+                c_llvmz80_fmath = env_fmath;
+        }
+
+        compiler_type = CC_LLVMZ80;
+        c_compiler = c_llvmz80_exe;
+        c_cpp_exe = c_llvmz80_exe;
+        compiler_style = filter_out;
+        c_stylecpp = filter_out;
+
+        strip_flag_prefix(&comparg, "-fp-mode");
     } else {
         printf("Unknown compiler type: %s\n",c_compiler_type);
         exit(1);
