@@ -2662,6 +2662,348 @@ static void try_fold_8085_addr_pair(char **lines, char *drop, int i,
     } else { free(a); free(b); }
 }
 
+/* True if `op` (the text right of the comma in a `ld hl,<op>` line) is a
+   PLAIN constant or symbol-address operand — safe to re-target into another
+   register with no semantic change (no register read, no memory access, no
+   stack-relative address form). Rejects register names/pairs, `(...)`
+   memory forms, and `sp+`/`sp-` (an address-of-slot, which is only valid
+   relative to HL's own encoding on gbz80 — `ld de,sp+N` is a DIFFERENT,
+   legal instruction, but this helper is deliberately conservative and only
+   claims the pure-constant/symbol shape `[pool-remat-add-fold]` needs). */
+static int is_plain_const_or_sym_operand(const char *op)
+{
+    static const char *regs[] = {
+        "hl","de","bc","sp","ix","iy","a","b","c","d","e","h","l",
+        "ixl","ixh","iyl","iyh","af","af'", NULL
+    };
+    if (!op || !*op) return 0;
+    if (strchr(op, '(')) return 0;
+    if (!strncmp(op, "sp+", 3) || !strncmp(op, "sp-", 3)) return 0;
+    for (int i = 0; regs[i]; i++)
+        if (!strcmp(op, regs[i])) return 0;
+    return 1;
+}
+
+/* [pool-remat-add-fold] `ld de,hl` / `ld hl,<const-or-sym>` / `add hl,de` ->
+   `ld de,<const-or-sym>` / `add hl,de`, when DE is dead after the add (the
+   SAME d_live/e_live fixpoint this sweep already computes for the DE-park
+   rewrite above — real, branch-aware liveness, not a def/use-count guess).
+   The middle line's value is a pure constant/symbol load (no register read,
+   no memory access), so the two forms are arithmetically identical: HL ends
+   at old_hl + K either way, and `add hl,de` sets the same flags from the
+   same operands regardless of how DE got loaded. The only observable
+   difference is DE's final content (old_hl vs K) — provably safe exactly
+   when DE is dead afterward.
+
+   Why here, not at IR-render time: two earlier attempts (see
+   GBZ80_DE_RELOAD_PLAN.md) tried this via ir_alloc.c pool-eligibility denial
+   and via a render-time op-fusion using L.la.cur_skip_next_op — the first
+   exposed the vreg to a SIBLING allocator pool with the same blind spot, the
+   second reused another op's L.la.* lookahead state incorrectly and caused a
+   silent infinite loop. Both hazards are specific to reasoning about vregs
+   and render-loop state DURING lowering. Here, after rendering, there is no
+   vreg, no L.la state, no allocator pool to reason about — just three lines
+   of finished text and the real liveness this sweep already trusts for its
+   own (long-established) DE-park elimination. `--opt-disable=pool-remat-add-fold`
+   opts out. */
+static void fold_de_pool_remat_add(char **lines, char *drop, int i,
+                                   int d_live, int e_live)
+{
+    if (opt_disabled("pool-remat-add-fold")) return;
+    if (strcmp(lines[i], "\tadd\thl,de\n") != 0) return;
+    if (i < 2 || drop[i] || drop[i - 1] || drop[i - 2]) return;
+    /* `ex de,hl` is an equally valid predecessor here: either spelling ends
+       with DE = old HL and discards whatever DE held before (the swap's old
+       DE lands in HL, which line i-1 immediately overwrites) — net effect
+       through this 3-line window is identical either way. */
+    if (strcmp(lines[i - 2], "\tld\tde,hl\n") != 0
+        && strcmp(lines[i - 2], "\tex\tde,hl\n") != 0)
+        return;
+    const char *l1 = lines[i - 1];
+    if (strncmp(l1, "\tld\thl,", 7) != 0) return;
+    if (d_live || e_live) return;
+    const char *op = l1 + 7;
+    size_t oplen = strlen(op);
+    if (oplen && op[oplen - 1] == '\n') oplen--;
+    char opbuf[56];
+    if (oplen == 0 || oplen >= sizeof opbuf) return;
+    memcpy(opbuf, op, oplen); opbuf[oplen] = 0;
+    if (!is_plain_const_or_sym_operand(opbuf)) return;
+    char nl[64];
+    snprintf(nl, sizeof nl, "\tld\tde,%s\n", opbuf);
+    char *newline = strdup(nl);
+    if (!newline) return;
+    free(lines[i - 2]);
+    lines[i - 2] = newline;
+    drop[i - 1] = 1;
+}
+
+/* [IR_DEADDE_FOLD] Bounded forward scan from each `ex de,hl`/`ld de,hl` def,
+   deleting a dead-reload bracket further ahead in the SAME straight-line
+   span (see GBZ80_DE_RELOAD_PLAN.md, "The pattern"; verified as a probe
+   before this was written — 5 real hits on examples/gb/paint.c, 0 offset
+   mismatches, 0 hits on z80/8080/8085 corpus benches):
+
+     ex de,hl / ld de,hl      <- def, i (either spelling of the copy)
+     ld hl,N                 <- store to slot N — CPU-generic 2-line
+     add hl,sp                  addressing (pre-copt: gbz80's `ld hl,sp+N`
+                                 fusion, lib/arch/gbz80/gbz80_rules.1, hasn't
+                                 run yet at this stage — matching only the
+                                 fused form finds nothing, ever)
+     ld (hl),e
+     inc hl
+     ld (hl),d
+     ...                      <- HL-only ops, no label/branch/call/mem-write
+     push hl                  <- start of the reload bracket
+     ld hl,M                 <- M == N+2 (the one intervening push)
+     add hl,sp
+     ld a,(hl+)  |  ld a,(hl) / inc hl   <- gbz80 auto-step vs the generic
+                                             two-line read; both spellings
+                                             accepted
+     ld e,a
+     ld d,(hl)                <- reload — but DE already holds this
+     pop hl
+
+   Bails (does not count) on: a label, a branch/call/ret, any write to D or
+   E, or any memory write other than the recognized store's own two lines
+   (conservative: cannot prove non-aliasing at the text level, so refuse
+   rather than guess). Bounded window (40 lines) — this shape is always
+   local to one expression's codegen, never spans control flow in practice.
+   CPU-generic by construction (the 2-line `ld hl,N`/`add hl,sp` addressing
+   and the `ex de,hl`/`ld de,hl` copy are not gbz80-specific spellings), so
+   this can fire on any CPU that lacks a native word-load-from-slot-into-DE,
+   not just gbz80 — worth checking 8080/8085 too, per
+   GBZ80_DE_RELOAD_PLAN.md's cross-CPU note on the sibling `gen_ld_sym` lead.
+
+   Denial-only: any bail just leaves the bracket in place, never a
+   miscompile risk. --opt-disable=dead-de-reload opts out. */
+static int deadde_match_def(const char *l)
+{
+    return !strcmp(l, "\tex\tde,hl\n") || !strcmp(l, "\tld\tde,hl\n");
+}
+
+static void fold_dead_de_reload(char **lines, char *drop, int n)
+{
+    if (opt_disabled("dead-de-reload")) return;
+    for (int i = 0; i < n; i++) {
+        if (drop[i] || !deadde_match_def(lines[i])) continue;
+        int seen_store = 0, store_off = 0, sp_adj = 0;
+        int j = i + 1, limit = i + 40;
+        for (; j < n && j < limit; j++) {
+            if (drop[j]) break;
+            const char *l = lines[j];
+            char lbl[64], tgt[64];
+            if (xline_label(l, lbl, sizeof lbl)) break;
+            InstrEffects e = instr_effects(l);
+            if (e.is_call || e.is_boundary
+                || xline_branch_target(l, tgt, sizeof tgt))
+                break;
+            int off;
+            if (!seen_store && sscanf(l, "\tld\thl,%d\n", &off) == 1
+                && j + 4 < n
+                && !strcmp(lines[j + 1], "\tadd\thl,sp\n")
+                && !strcmp(lines[j + 2], "\tld\t(hl),e\n")
+                && !strcmp(lines[j + 3], "\tinc\thl\n")
+                && !strcmp(lines[j + 4], "\tld\t(hl),d\n")) {
+                store_off = off + sp_adj;
+                seen_store = 1;
+                j += 4;
+                continue;
+            }
+            if (seen_store && !strcmp(l, "\tpush\thl\n") && j + 5 < n) {
+                int m;
+                int k = j + 1;
+                int ok = sscanf(lines[k], "\tld\thl,%d\n", &m) == 1
+                    && k + 1 < n && !strcmp(lines[k + 1], "\tadd\thl,sp\n");
+                if (ok) {
+                    k += 2;
+                    int step2 = (k + 1 < n
+                        && !strcmp(lines[k], "\tld\ta,(hl)\n")
+                        && !strcmp(lines[k + 1], "\tinc\thl\n"));
+                    int step1 = (k < n && !strcmp(lines[k], "\tld\ta,(hl+)\n"));
+                    if (step2) k += 2; else if (step1) k += 1; else ok = 0;
+                    if (ok && k + 2 < n
+                        && !strcmp(lines[k], "\tld\te,a\n")
+                        && !strcmp(lines[k + 1], "\tld\td,(hl)\n")
+                        && !strcmp(lines[k + 2], "\tpop\thl\n")) {
+                        int canon = m - (sp_adj + 2);
+                        if (canon == store_off)
+                            for (int q = j; q <= k + 2; q++) drop[q] = 1;
+                        break;
+                    }
+                }
+            }
+            if (!strcmp(l, "\tpush\tbc\n") || !strcmp(l, "\tpush\tde\n")
+                || !strcmp(l, "\tpush\thl\n") || !strcmp(l, "\tpush\taf\n")) {
+                sp_adj += 2;
+                continue;
+            }
+            if (!strcmp(l, "\tpop\tbc\n") || !strcmp(l, "\tpop\tde\n")
+                || !strcmp(l, "\tpop\thl\n") || !strcmp(l, "\tpop\taf\n")) {
+                if (!strcmp(l, "\tpop\tde\n")) break;
+                sp_adj -= 2;
+                continue;
+            }
+            if ((e.writes & IR_R_DE) || e.d_write || e.e_write) break;
+            if (e.writes & IR_R_MEM) break;
+        }
+    }
+}
+
+/* True if `line`'s operand list mentions the register pair `pairname` (e.g.
+   "de") or either of its half-letters (`a`/`b`, e.g. 'd'/'e') as a whole
+   token — a READ, not just the whole-reg WRITE mask `instr_effects` already
+   tracks. Needed because a token like `ld a,e` or `push de` or `add hl,de`
+   reads the pair without writing it, and `InstrEffects` has no generic
+   "reads" mask for D/E or H/L (only the whole-reg WRITE mask, plus B/C and
+   D/E sub-byte fields the park-liveness sweep needs — not what this check
+   needs). Delimits on `,`, `(`, `)`, `+`, matching how operands are spelled
+   in this codebase's emitted text. */
+static int line_reads_pair(const char *line, const char *pairname,
+                           char half_a, char half_b)
+{
+    const char *p = line;
+    while (*p == ' ' || *p == '\t') p++;
+    while (*p && *p != ' ' && *p != '\t') p++;    /* skip mnemonic */
+    char tok[8]; int ti = 0;
+    for (;; p++) {
+        char c = (*p == '\n' || *p == '\r') ? 0 : *p;
+        if (c == ',' || c == '(' || c == ')' || c == '+' || c == 0) {
+            tok[ti] = 0;
+            if (ti && (!strcmp(tok, pairname)
+                       || (ti == 1 && (tok[0] == half_a || tok[0] == half_b))))
+                return 1;
+            ti = 0;
+            if (!*p) break;
+            continue;
+        }
+        if (ti < 7) tok[ti++] = c;
+    }
+    return 0;
+}
+
+/* [IR_XORFLIP_FOLD] The signed-comparison sign-flip trick (`ld a,d / xor
+   0x80 / ld d,a`, or the `h`/`h` mirror) used on CPUs without `sbc hl,de`
+   (gbz80, 8080, vm1 — confirmed by corpus scan; 8085 barely, z80 never: it
+   uses `sbc hl,de` + an overflow-flag check instead) recomputes the flipped
+   sign bit at runtime even when the operand being flipped is a compile-time
+   constant (`ld de,2` — d is PROVABLY 0, so d^0x80 is PROVABLY 0x80, always,
+   for this def). Sized on examples/console/*.c (+test -clib=gbz80): 216 real
+   hits (probe-verified, not the informal 102 a quick script first
+   estimated) across 28 files, plus 19 on the bench corpus (not corpus-only —
+   real files just have far more signed-comparison-against-a-constant code).
+
+   Bounded backward scan (30 lines) from each flip site, for either register
+   pair (`de` or `hl`) the flip targets: bails on a label, branch/call/ret,
+   any OTHER write to the pair, or — `line_reads_pair` — any READ of the pair
+   that isn't the flip's own three lines (a write-only bail would miss e.g.
+   `ld a,e` or `push de` legitimately reading the UNFLIPPED constant for some
+   other purpose between the def and this flip; rewriting the def's immediate
+   would then silently corrupt that other read). Every real hit found so far
+   has a clean gap (only the sibling operand's own flip, which never
+   mentions this pair's tokens), so this guard costs nothing observed and
+   closes a real hazard for shapes not yet seen.
+
+   The fix rewrites the def's immediate to already carry the flipped high
+   byte, and deletes the flip's three lines — the flip's own write becomes a
+   no-op once the constant already IS the flipped value. Denial-only:
+   `--opt-disable=xorflip-const` opts out; any bail just leaves both the
+   flip and the def alone. */
+static void fold_const_xorflip(char **lines, char *drop, int n)
+{
+    if (opt_disabled("xorflip-const")) return;
+    for (int i = 0; i + 2 < n; i++) {
+        if (drop[i]) continue;
+        int is_d = !strcmp(lines[i], "\tld\ta,d\n")
+                && !strcmp(lines[i + 1], "\txor\t0x80\n")
+                && !strcmp(lines[i + 2], "\tld\td,a\n");
+        int is_h = !strcmp(lines[i], "\tld\ta,h\n")
+                && !strcmp(lines[i + 1], "\txor\t0x80\n")
+                && !strcmp(lines[i + 2], "\tld\th,a\n");
+        if (!is_d && !is_h) continue;
+        RegMask pairmask = is_d ? IR_R_DE : IR_R_HL;
+        const char *pairname = is_d ? "de" : "hl";
+        char half_a = is_d ? 'd' : 'h', half_b = is_d ? 'e' : 'l';
+        int limit = i - 30; if (limit < 0) limit = 0;
+        for (int j = i - 1; j >= limit; j--) {
+            if (drop[j]) break;
+            const char *l = lines[j];
+            char lbl[64], tgt[64];
+            if (xline_label(l, lbl, sizeof lbl)) break;
+            InstrEffects e = instr_effects(l);
+            if (e.is_call || e.is_boundary
+                || xline_branch_target(l, tgt, sizeof tgt))
+                break;
+            int val;
+            char fmt[16];
+            snprintf(fmt, sizeof fmt, "\tld\t%s,%%d\n", pairname);
+            if (sscanf(l, fmt, &val) == 1) {
+                unsigned newu = ((unsigned)val ^ 0x8000u) & 0xffffu;
+                char nl[32];
+                snprintf(nl, sizeof nl, "\tld\t%s,%u\n", pairname, newu);
+                char *newline = strdup(nl);
+                if (newline) {
+                    free(lines[j]);
+                    lines[j] = newline;
+                    drop[i] = drop[i + 1] = drop[i + 2] = 1;
+                }
+                break;
+            }
+            if ((e.writes & pairmask)
+                || line_reads_pair(l, pairname, half_a, half_b))
+                break;
+        }
+    }
+}
+
+/* [IR_XORFLIP_CHAIN_FOLD] A chained signed-comparison range check (`if (v <
+   X) ... else if (v < Y) ...`) re-derives the sign-flipped value from
+   scratch at each step instead of keeping it. Found next to the
+   const-operand fold above, in examples/othello.c's board-bounds checks:
+
+     xor 0x80        <- A already flipped from an earlier `xor 0x80`
+     cp N1
+     jp cc,LABEL     <- taken path: untouched by this fold
+     ld a,(hl)        \  fall-through: reload the ORIGINAL value...
+     xor 0x80          | ...then flip it AGAIN
+     cp N2
+
+   Algebraically: right before the `jp`, A == V^0x80 for whatever V the
+   earlier flip started from. On the fall-through path nothing has touched A
+   (`cp` reads, doesn't write) or the memory at `(hl)` (same reasoning), so
+   `(hl) == V` still holds by whatever invariant put it there. The reload +
+   re-flip therefore computes `(V^0x80 reload) -> V -> V^0x80` — the EXACT
+   value already sitting in A. The reload and re-flip are a pure round trip;
+   deleting them leaves A correctly holding `V^0x80` for `cp N2`.
+
+   Deliberately a FIXED 5-line match, no scanning window: the two
+   instructions between the leading `xor 0x80` and the trailing reload
+   (`cp`, `jp`) cannot write A or HL by construction (per `instr_effects`),
+   so requiring exact adjacency makes the whole proof local — no liveness
+   state, no bail conditions needed beyond the literal shape match itself.
+   `jp`/`jr` must be CONDITIONAL (a comma present): an unconditional jump makes
+   the reload dead code by a different, unrelated argument this fold
+   doesn't make.
+
+   Denial-only: `--opt-disable=xorflip-chain` opts out; a non-match just
+   leaves the reload in place. */
+static void fold_xorflip_chain(char **lines, char *drop, int n)
+{
+    if (opt_disabled("xorflip-chain")) return;
+    for (int i = 0; i + 4 < n; i++) {
+        if (drop[i]) continue;
+        if (strcmp(lines[i], "\txor\t0x80\n") != 0) continue;
+        if (strncmp(lines[i + 1], "\tcp\t", 4) != 0) continue;
+        if ((strncmp(lines[i + 2], "\tjp\t", 4) != 0
+             && strncmp(lines[i + 2], "\tjr\t", 4) != 0)
+            || !strchr(lines[i + 2], ','))
+            continue;
+        if (strcmp(lines[i + 3], "\tld\ta,(hl)\n") != 0) continue;
+        if (strcmp(lines[i + 4], "\txor\t0x80\n") != 0) continue;
+        drop[i + 3] = drop[i + 4] = 1;
+    }
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
@@ -2691,6 +3033,13 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            is the only place in the pipeline with real per-line liveness. copt
            did it blind and miscompiled; see gw_fold_byte_global_widens. */
         gw_fold_byte_global_widens(lines, n, drop);
+        /* [IR_DEADDE_FOLD] Delete a store-then-dead-reload bracket where DE
+           was never touched in between — see the function comment above.
+           Bounded forward scan, self-contained (no liveness state needed
+           from the backward sweep below), so it runs as a pre-pass here. */
+        fold_dead_de_reload(lines, drop, n);
+        fold_const_xorflip(lines, drop, n);
+        fold_xorflip_chain(lines, drop, n);
         int b_live = 0, c_live = 0, d_live = 0, e_live = 0;
         /* [xor-a] F-liveness for the `ld a,0` -> `xor a` rewrite. Starts LIVE:
            the buffer end is the end of this function's text, and the walk has
@@ -2865,6 +3214,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                     }
                 }
             }
+            fold_de_pool_remat_add(lines, drop, i, d_live, e_live);
             /* [idx-rmw-de] Indexed word RMW: `ld bc,hl; ld a,(hl+); ld h,(hl);
                ld l,a; inc hl; ex de,hl; ld hl,bc; ld (hl),e; inc hl; ld (hl),d`
                parks the address in BC because the word load walks the value
@@ -4325,6 +4675,8 @@ static int param_caller_off(const Func *f, int vreg_id)
    byte-pair sequence. PARAM_IN_PLACE vregs return their caller-pushed-arg
    offset directly. */
 static void note_slot_use(int v);   /* frame-slot use accounting: fwd (defined with rec state) */
+static void note_wide_def(int v);      /* IR_WIDENOSLOT probe: fwd (defined with rec state) */
+static void note_wide_noslot(int v);   /* IR_WIDENOSLOT probe: fwd (defined with rec state) */
 /* [dead-store] write-context depth: >0 while lowering a store function body,
    so note_slot_use attributes its slot_off calls (store + guard checks) to the
    write count. Save/restore (not set/clear) because stores nest via
@@ -4416,6 +4768,34 @@ static int hd_record(const Func *f, int v)
        retry, so the value written here is never observed. */
     if (f->vreg_spill_slot) ((Func *)f)->vreg_spill_slot[v] = 0;
     return 1;
+}
+
+/* [IR_BC_STEP_CALL] Runtime verifier for the stepped-scalar/call-containing
+   BC-home gate (bc_home_realizable in ir_alloc.c). That gate admits a
+   WRITTEN whole-function-BC param in a function that calls — the shape
+   ADR 0031 only proved for a call-free function. gen_call already
+   push/pop-preserves a PR_BC vreg across a call (bc_saved), so that part is
+   sound; what is NOT statically proven is that no OTHER invalidate_bc_cache
+   site (branch merges, BC used as scratch elsewhere) forces a reload from
+   v's slot after it has been stepped, which would read a stale value.
+   Rather than auditing every invalidate site, read the render's own
+   behaviour: the prologue's one legitimate emit_bc_reload aside, a SECOND
+   reload of a watched vreg means the cache went cold and the promise broke.
+   Feeds the existing [home-demote] retry (hd_record) — same recovery an
+   unrealizable register home already uses. */
+static int bcstep_watch[32];
+static int bcstep_reload_count[32];
+static int bcstep_nwatch;
+
+static int bcstepcall_on(void) { return getenv("IR_BC_STEP_CALL") != NULL; }
+
+static void bc_step_note_reload(const Func *f, int v)
+{
+    for (int i = 0; i < bcstep_nwatch; i++) {
+        if (bcstep_watch[i] != v) continue;
+        if (++bcstep_reload_count[i] > 1) hd_record(f, v);
+        return;
+    }
 }
 
 static void require_slot(const Func *f, int vreg_id)
@@ -5170,6 +5550,17 @@ static int  *rec_slotwrite;
    destructive home clobber while this bit is set. */
 static char *home_slot_dirty;
 static int   home_slot_dirty_nv;
+/* [IR_WIDENOSLOT, inert probe] Per-vreg def accounting for width-4 SPILL
+   vregs whose DEHL result never goes through slot_off at all: cache_dehl_no_spill
+   (dead-dst chain) and emit_dehl_stack_push (data-stack transient) both finalize
+   a def without writing the frame slot, so rec_slotuse stays 0 for reasons
+   rec_end's width<=2 trust gate can't distinguish from "some other untracked
+   path". rec_wide_defs[v] counts every store_dehl_finalize call for v;
+   rec_wide_noslot[v] counts the subset that took one of the two no-slot paths.
+   defs==noslot (every def accounted for) is the trustable case rec_end's gate
+   currently refuses for ANY width>2 vreg. */
+static int  *rec_wide_defs;
+static int  *rec_wide_noslot;
 /* [IR_FRAMEPROBE, inert] Frame-traffic census. rec_fh_red[v] counts REDUNDANT
    slot reads of v: a read in the same call-free region as an earlier read of v
    with no intervening write. That is the residency opportunity — a value the
@@ -5248,10 +5639,12 @@ static void rec_reset(void)
     free(rec_slotwrite); free(rec_fh_red); free(rec_fh_seen);
     free(rec_fh_bytes); free(rec_fh_redbytes);
     free(home_slot_dirty);
+    free(rec_wide_defs); free(rec_wide_noslot);
     rec_fh_bytes = rec_fh_redbytes = NULL; fh_cur_v = -1; fh_cur_red = 0; fh_nv = 0;
     rec_reg = rec_slot = rec_remat = rec_slotuse = rec_slotwrite = NULL;
     rec_fh_red = NULL; rec_fh_seen = NULL;
     home_slot_dirty = NULL; home_slot_dirty_nv = 0;
+    rec_wide_defs = rec_wide_noslot = NULL;
     rec_nv = 0; rec_counting = 0;
 }
 
@@ -5277,10 +5670,30 @@ static void rec_begin(const Func *f)
     home_slot_dirty  = calloc((size_t)rec_nv, 1);
     home_slot_dirty_nv = rec_nv;
     fh_nv = rec_nv;
+    rec_wide_defs   = calloc((size_t)rec_nv, sizeof(int));
+    rec_wide_noslot = calloc((size_t)rec_nv, sizeof(int));
     if (!rec_reg || !rec_slot || !rec_remat || !rec_slotuse || !rec_slotwrite
-        || !home_slot_dirty) {
+        || !home_slot_dirty || !rec_wide_defs || !rec_wide_noslot) {
         rec_reset(); return; }
     rec_counting = 1;
+}
+
+/* [IR_WIDENOSLOT probe] v just had a width-4 DEHL result finalized via
+   store_dehl_finalize, regardless of which of its three paths fired. */
+static void note_wide_def(int v)
+{
+    if (!rec_counting || v < 0 || v >= rec_nv || !rec_wide_defs) return;
+    rec_wide_defs[v]++;
+}
+
+/* [IR_WIDENOSLOT probe] v's DEHL result was finalized via one of the two
+   paths that never call slot_off (cache_dehl_no_spill / emit_dehl_stack_push),
+   including the lazy-spill fast path inside store_dehl_cached that also
+   routes through cache_dehl_no_spill. */
+static void note_wide_noslot(int v)
+{
+    if (!rec_counting || v < 0 || v >= rec_nv || !rec_wide_noslot) return;
+    rec_wide_noslot[v]++;
 }
 
 /* Record a genuine frame-slot access emitted for v (called from slot_off /
@@ -5375,6 +5788,29 @@ static void rec_end(const Func *f)
                     f->fn ? ir_sym_name(f->fn) : "?", homed, ureg, uslot, uremat,
                     cold);
     }
+    /* [IR_WIDENOSLOT, inert probe] For every width>2 SPILL vreg with a slot,
+       report whether EVERY def went through a no-slot path (rec_wide_defs ==
+       rec_wide_noslot > 0) — the narrow, auditable trust condition that could
+       replace rec_end's blanket "w<=2" distrust below. Prints regardless of
+       rec_slotuse, so TRUST=yes rows where rec_slotuse[v]>0 mean some OTHER
+       (untracked) path also touched the slot — a real counterexample to the
+       "every def is no-slot ⇒ slot is dead" hypothesis, and worth knowing
+       about before trusting this class. */
+    if (getenv("IR_WIDENOSLOT") && f->vreg_spill_slot && rec_wide_defs)
+        for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
+            int off = f->vreg_spill_slot[v];
+            if (off < 0) continue;
+            int w = f->vregs[v].width;
+            if (w <= 2) continue;
+            if (!rec_wide_defs[v] && !rec_slotuse[v]) continue;  /* v never defined/used here */
+            int trust = rec_wide_defs[v] > 0 && rec_wide_defs[v] == rec_wide_noslot[v];
+            fprintf(stderr, "WIDENOSLOT %-16s v%-4d width=%d off=%d wide_defs=%d "
+                    "wide_noslot=%d slotuse=%d TRUST=%s%s\n",
+                    f->fn ? ir_sym_name(f->fn) : "?", v, w, off,
+                    rec_wide_defs[v], rec_wide_noslot[v], rec_slotuse[v],
+                    trust ? "yes" : "no",
+                    (trust && rec_slotuse[v] > 0) ? " CONTRADICTION" : "");
+        }
     /* Dead frame-slot report, per-BYTE and coalescing-aware. Slots are shared
        across non-interfering vregs, so a frame byte is DEAD only if every vreg
        covering it had no genuine frame-slot access (rec_slotuse over-counts
@@ -6854,6 +7290,48 @@ static int op_is_commutative(OpKind kind)
         || kind == IR_OR  || kind == IR_XOR;
 }
 
+/* Word DE-home tentative-pick gate. ir_alloc() gives the home exclusive DE
+   (evicting other PR_DE tenants) speculatively — a net loss if no resident
+   region actually forms (the home would only churn per-iter flush+rehome).
+   Region formation needs slots + bb_alias, so it's decided here with the
+   SAME compute_home_region the render uses. No region -> restore the saved
+   pre-pick allocation and re-slot, reverting to baseline.
+
+   MUST be re-run after every ir_alloc(f) call, not just the first: a
+   [home-demote] retry's [home-rearb] step re-runs ir_alloc from scratch,
+   which can tentatively re-pick a DIFFERENT (or the same) word-home
+   candidate with no memory that an earlier pick already failed this exact
+   validation. Left unchecked, the fresh pick ships straight to the
+   renderer unconfirmed — vreg_to_phys silently reverts from a validated
+   spill/slot-0 home back to PR_DE, and the render, believing DE is live
+   across a span the body actually clobbers (e.g. for an unrelated
+   multiply/array computation), never reloads it: the write lands in DE,
+   nothing ever reads it back, and a loop-carried value that should have
+   counted down never does. Caught via countborrow.c hanging under
+   IR_BC_STEP_CALL once a [home-demote] retry became reachable from a new
+   call site — the underlying gap is general, not specific to that gate. */
+static void confirm_word_home_pick(Func *f, const int *bb_alias)
+{
+    if (!ir_alloc_word_home_picked()) return;
+    if (f->word_home_vreg >= 0) {
+        int wlo = -1, whi = -1;
+        g_hc.home_is_word = 1;
+        g_hc.func_whome = f->word_home_vreg;
+        g_hc.branch_test_kind = 0;
+        /* Same DE-home fold arming as the render, so op_de_clean's region
+           proof here matches what the render will actually emit. */
+        if (f->de_home_general) g_hc.de_home = f->word_home_vreg;
+        compute_home_region(f, f->word_home_vreg, bb_alias, &wlo, &whi);
+        g_hc.home_is_word = 0;
+        g_hc.func_whome = -1;
+        g_hc.de_home = -1;
+        /* No region formed: the render cannot keep the promise the pick
+           made, so reject it. The allocator reverts its own plan. */
+        if (wlo < 0)
+            ir_alloc_word_home_reject(f);
+    }
+    ir_alloc_word_home_done();
+}
 
 int ir_lower_func(FILE *out, Func *f)
 {
@@ -7466,32 +7944,8 @@ int ir_lower_func(FILE *out, Func *f)
         }
     }
 
-    /* Word DE-home tentative-pick gate. The allocator gave the home exclusive
-       DE (evicting other PR_DE tenants) — a net loss if no resident region
-       forms (the home would only churn per-iter flush+rehome). Region
-       formation needs slots + bb_alias, so it's decided here with the SAME
-       compute_home_region the render uses. No region ⇒ restore the saved
-       pre-pick allocation and re-slot, reverting to baseline. */
-    if (ir_alloc_word_home_picked()) {
-        if (f->word_home_vreg >= 0) {
-            int wlo = -1, whi = -1;
-            g_hc.home_is_word = 1;
-            g_hc.func_whome = f->word_home_vreg;
-            g_hc.branch_test_kind = 0;
-            /* Same DE-home fold arming as the render, so op_de_clean's region
-               proof here matches what the render will actually emit. */
-            if (f->de_home_general) g_hc.de_home = f->word_home_vreg;
-            compute_home_region(f, f->word_home_vreg, bb_alias, &wlo, &whi);
-            g_hc.home_is_word = 0;
-            g_hc.func_whome = -1;
-            g_hc.de_home = -1;
-            /* No region formed: the render cannot keep the promise the pick
-               made, so reject it. The allocator reverts its own plan. */
-            if (wlo < 0)
-                ir_alloc_word_home_reject(f);
-        }
-        ir_alloc_word_home_done();
-    }
+    /* Word DE-home tentative-pick gate — see confirm_word_home_pick below. */
+    confirm_word_home_pick(f, bb_alias);
 
     /* === Pass driver ===
        Flag-off: a single render with deferral off. Flag-on: pass 1 renders
@@ -7545,6 +7999,28 @@ int ir_lower_func(FILE *out, Func *f)
     /* [home-demote] Recovery needs a discardable render and one attempt only. */
     hd_nbad = 0;
     hd_retry_ok = (rout != out) && !hd_retry_done;
+    /* [IR_BC_STEP_CALL] Rebuild the watch list each attempt — a home-demote
+       retry re-runs ir_alloc, which can change who holds PR_BC. Only a
+       WRITTEN PARAM_IN_PLACE vreg is at risk (a read-only one is always
+       correct to re-derive from its slot); write_count is a cheap static
+       scan, not allocator state, so this is independent of ir_alloc's own
+       bookkeeping which is already out of scope by this point. */
+    bcstep_nwatch = 0;
+    if (bcstepcall_on())
+        for (int v = 0; v < f->n_vregs; v++) {
+            if (ir_home_assigned(f, v) != IR_PR_BC) continue;
+            if (!(f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)) continue;
+            int wc = 0;
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++)
+                    if (f->bbs[b].ops[j].dst == v) wc++;
+            if (wc == 0) continue;
+            if (bcstep_nwatch < (int)(sizeof bcstep_watch / sizeof bcstep_watch[0])) {
+                bcstep_watch[bcstep_nwatch] = v;
+                bcstep_reload_count[bcstep_nwatch] = 0;
+                bcstep_nwatch++;
+            }
+        }
     /* Static lazy-spill state — off unless the two-pass path arms it. */
     L.ss_phase = 0;
     L.ss_op_base = NULL;
@@ -7703,6 +8179,12 @@ int ir_lower_func(FILE *out, Func *f)
             if (home_rearb_enabled()) {
                 ir_alloc(f);
                 ir_alloc_veto_reset();
+                /* ir_alloc() can tentatively re-pick a word-DE-home candidate
+                   from scratch, with no memory that an earlier pick already
+                   failed this exact validation — re-run the confirm/reject
+                   gate or the fresh pick ships unconfirmed. See
+                   confirm_word_home_pick. */
+                confirm_word_home_pick(f, bb_alias);
             }
             ir_assign_slots(f);
             L.cur_frameless = frameless_ok(f);

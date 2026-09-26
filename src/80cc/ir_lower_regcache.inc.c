@@ -32,6 +32,9 @@ static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
         cache_bc(vreg_id);
         return;
     }
+    /* [IR_BC_STEP_CALL] Past this point the reload reads v's SLOT — the
+       exact staleness risk bc_step_note_reload watches for. */
+    bc_step_note_reload(f, vreg_id);
     if (fp_active(f) && !L.cur_frameless) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
@@ -2215,6 +2218,7 @@ static void store_dehl_cached(FILE *out, const Func *f, int vreg_id)
    advertised — its content is half of a long, not an int-class value. */
 static void cache_dehl_no_spill(FILE *out, int vreg_id)
 {
+    note_wide_noslot(vreg_id);
     /* Arrived straight off a fused byte chain: BC already holds the low half and
        HL holds junk, so the stash is not merely wasted but would read the wrong
        register. Publish the DEHL cache without it and leave HL unclaimed — a
@@ -2252,6 +2256,7 @@ static int vreg_is_pr_dehl(const Func *f, int v);
    stacked-arg skip). */
 static void emit_dehl_stack_push(FILE *out, int vreg_id)
 {
+    note_wide_noslot(vreg_id);
     /* BC already the low half (fused byte chain) — the stash would read a junk
        HL. The pushed image is the same either way. */
     if (L.la.cur_dehl_bc_is_low) L.la.cur_dehl_bc_is_low = 0;
@@ -2270,6 +2275,7 @@ static void emit_dehl_stack_push(FILE *out, int vreg_id)
 
 static void store_dehl_finalize(FILE *out, const Func *f, int vreg_id)
 {
+    note_wide_def(vreg_id);
     if (L.la.cur_dehl_dst_dead_safe || vreg_is_pr_dehl(f, vreg_id)) {
         cache_dehl_no_spill(out, vreg_id);
     } else if (L.la.cur_dehl_push_to_stack

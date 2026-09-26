@@ -16,8 +16,50 @@
  *      slot-address computation must add the +2 sp adjustment or it reads the
  *      wrong slot.  dc_streq's two params (both walking pointers, neither a
  *      loop-resident register in a leaf) drive exactly this path.
- * Checksums are host-verified and width-independent. */
+ *   3. Blind spot in TWO allocator static-prediction tables:
+ *      op_dst_spill_is_dead (ir_alloc.c) predicts a producer's dst is safely
+ *      HL-cache-served, and stack_spill_span_hazard predicts a 1-deep stack
+ *      park is safe, by pattern-matching the CONSUMING op — but neither
+ *      table listed IR_DEREF_CMP_BR, whose own lowering (trap 1's "neither
+ *      resident" branch) is free to read its two pointers in EITHER order
+ *      and pushes one to the stack while loading the other. When the
+ *      COMPUTED ADDRESS of one compared byte (not a walking pointer param,
+ *      a fresh `&arr[i]`/`&s->field` this op computed) was the STATIC
+ *      prediction's cache/park candidate, and neither pointer ends up
+ *      BC/DE-resident (both fall through to the "neither resident"
+ *      branch), the implicit push/pop or the reordered read silently
+ *      invalidated it before its real use — an "unrealizable home" abort,
+ *      not a silent wrong answer, but real correct code that shouldn't
+ *      abort. dc_struct_walk below is the closest natural shape found (a
+ *      global loop index into an array, compared against a struct pointer
+ *      field, storing back into that field) — it doesn't reliably land in
+ *      the exact vulnerable register configuration under every allocator
+ *      state, so this is validating output correctness for the shape,
+ *      not a guaranteed abort repro. The two table fixes are the real
+ *      guard; see op_dst_spill_is_dead / stack_spill_span_hazard. */
 #include "test.h"
+
+struct dc_pt { char x, y, direction; };
+static char dc_corners[24] = {
+    1, 10, 20, 99,   /* direction, x, y, new-direction */
+    2, 11, 21, 98,
+    3, 12, 22, 97,
+};
+static int dc_gi;
+
+/* Global loop index walks BOTH an array lookup and a struct pointer field
+   compare/store in the same iteration — the shape that exposed trap 3 in
+   examples/collider.c's player_step (a computed &dc_corners[dc_gi] byte
+   consumed by the fused compare-and-branch, competing for BC/DE against
+   the struct pointer field's own address computation). */
+static void dc_struct_walk(struct dc_pt *p)
+{
+    for (dc_gi = 0; dc_gi <= 8; dc_gi += 4) {
+        if (dc_corners[dc_gi] == p->direction) {
+            p->direction = dc_corners[dc_gi + 3];
+        }
+    }
+}
 
 /* Both params walking pointers, neither loop-resident -> push/pop sp-adjust
    path (trap 2), and the CMP_EQ->BR_ZERO fire-on-equal polarity. */
@@ -67,6 +109,17 @@ static void dc_run(void)
     Assert(dc_cnt_eq("hello", "help", 5) == 3, "cnt matches");
     Assert(dc_cnt_eq("abcd",  "abcd", 4) == 4, "cnt all");
     Assert(dc_cnt_eq("abcd",  "wxyz", 4) == 0, "cnt none");
+
+    {
+        struct dc_pt p;
+        p.direction = 2;
+        dc_struct_walk(&p);
+        Assert(p.direction == 98, "struct_walk match at row 1");
+
+        p.direction = 5;
+        dc_struct_walk(&p);
+        Assert(p.direction == 5, "struct_walk no match unchanged");
+    }
 }
 
 int main(int argc, char *argv[])

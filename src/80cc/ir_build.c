@@ -4445,6 +4445,20 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                                       "unknown type (sym=%s)",
                                       lsym ? lsym->name : "?");
             }
+            int lw = b->f->vregs[v].width;
+            /* long long: no width-8 IR_INC/IR_DEC lowering — step via
+               __i64_acc, then write back to the local. */
+            if (lw == 8 && (int)b->f->vregs[v].kind == KIND_LONGLONG) {
+                int old = -1;
+                if (is_post) {
+                    old = new_temp(b, 8);
+                    ir_emit_mov(cur_bb(b), old, v);
+                }
+                int stepped = emit_acc_int_unary(b, v,
+                                  is_inc ? "l_i64_inc" : "l_i64_dec");
+                ir_emit_mov(cur_bb(b), v, stepped);
+                return is_post ? old : v;
+            }
             #define EMIT_STEP_LOCAL() do { \
                 if (stride == 1) { \
                     ir_emit_unop(cur_bb(b), is_inc ? IR_INC : IR_DEC, v, v); \
@@ -4455,7 +4469,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 } \
             } while (0)
             if (is_post) {
-                int old = new_temp(b, 2);
+                int old = new_temp(b, lw == 4 ? 4 : 2);
                 ir_emit_mov(cur_bb(b), old, v);
                 EMIT_STEP_LOCAL();
                 return old;
@@ -4474,7 +4488,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             SYMBOL *gsym = n->operand->sym;
             int w = type_width(n->type);
             if (w <= 0) w = 2;
-            if (w != 1 && w != 2 && w != 4)
+            int is_ll = n->type && n->type->kind == KIND_LONGLONG;
+            if (w != 1 && w != 2 && w != 4 && !(w == 8 && is_ll))
                 return build_fail("step on global width %d not supported",
                                   w);
             int old_v = new_temp(b, w);
@@ -4484,20 +4499,14 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             ld->mem.kind  = IR_MEM_SYM;
             ld->mem.sym   = gsym;
 
-            int new_v = new_temp(b, w);
-            b->f->vregs[new_v].width = (int16_t)w;
-            if (w == 1 || w == 2) {
+            int new_v;
+            if (w == 8) {
+                new_v = emit_acc_int_unary(b, old_v,
+                            is_inc ? "l_i64_inc" : "l_i64_dec");
+            } else {
+                new_v = new_temp(b, w);
                 ir_emit_unop(cur_bb(b), is_inc ? IR_INC : IR_DEC,
                              new_v, old_v);
-            } else {
-                /* Long step: ADD/SUB with imm=1. */
-                Op *bop = ir_op_emit(cur_bb(b),
-                                     is_inc ? IR_ADD : IR_SUB);
-                bop->dst    = new_v;
-                bop->src[0] = old_v;
-                bop->src[1] = -1;
-                bop->imm    = 1;
-                b->f->vregs[new_v].width = (int16_t)w;
             }
 
             Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
@@ -4532,12 +4541,14 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             || (n->type->kind != KIND_CHAR
              && n->type->kind != KIND_INT
              && n->type->kind != KIND_SHORT
-             && n->type->kind != KIND_LONG))
+             && n->type->kind != KIND_LONG
+             && n->type->kind != KIND_LONGLONG))
             return build_fail("post/pre step on non-LV kind=%d not "
                               "yet supported",
                               n->type ? n->type->kind : -1);
         int elem_w = type_width(n->type);
-        if (elem_w != 1 && elem_w != 2 && elem_w != 4)
+        if (elem_w != 1 && elem_w != 2 && elem_w != 4
+            && !(elem_w == 8 && n->type->kind == KIND_LONGLONG))
             return build_fail("post/pre step elem width %d not "
                               "yet supported (non-LV)", elem_w);
 
@@ -4565,21 +4576,17 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         ld->mem.kind  = IR_MEM_VREG;
         ld->mem.base  = ptr_v;
         ld->mem.elem  = (elem_w == 1) ? KIND_CHAR
-                      : (elem_w == 2) ? KIND_INT : KIND_LONG;
+                      : (elem_w == 2) ? KIND_INT
+                      : (elem_w == 4) ? KIND_LONG : KIND_LONGLONG;
 
-        int new_v = new_temp(b, elem_w);
-        b->f->vregs[new_v].width = (int16_t)elem_w;
-        if (elem_w == 1 || elem_w == 2) {
+        int new_v;
+        if (elem_w == 8) {
+            new_v = emit_acc_int_unary(b, old_v,
+                        is_inc ? "l_i64_inc" : "l_i64_dec");
+        } else {
+            new_v = new_temp(b, elem_w);
             ir_emit_unop(cur_bb(b), is_inc ? IR_INC : IR_DEC,
                          new_v, old_v);
-        } else {
-            /* Long step: IR_ADD/SUB with imm=1 takes the long
-               const-RHS path in the lowerer (no helper call). */
-            Op *step = ir_op_emit(cur_bb(b), is_inc ? IR_ADD : IR_SUB);
-            step->dst    = new_v;
-            step->src[0] = old_v;
-            step->src[1] = -1;
-            step->imm    = 1;
         }
 
         Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);

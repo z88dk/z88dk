@@ -54,6 +54,14 @@ void ir_assign_slots(Func *f)
     }
     for (int v = 0; v < f->n_vregs; v++)
         needs_slot[v] = ir_home_requires_slot(f, v);
+    if (getenv("IR_SLOTWHY"))
+        for (int v = 0; v < f->n_vregs; v++)
+            if (needs_slot[v])
+                fprintf(stderr, "SLOTWHY %s v%d width=%d phys=%d flags=%#x\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", v,
+                        f->vregs[v].width,
+                        f->vreg_to_phys ? f->vreg_to_phys[v] : -1,
+                        f->vregs[v].flags);
 
     /* Spill-slot coalescing: per-op interference. Walk each BB
        backward from live_out, tracking live just AFTER each op; each

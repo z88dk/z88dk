@@ -384,6 +384,43 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
         commit_a_byte(out, f, op->dst);
         return 0;
     }
+    /* width-4: step DEHL via the library helper (carries across all four
+       bytes). Long long never reaches here: ir_build routes it through the
+       __i64_acc helpers. */
+    if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
+        /* In-place step of a slot-resident long the next op does not read:
+           step the slot itself with HL = &slot (l_long_inc_mhl /
+           l_long_dec_mhl) instead of load + step + store. The slot is the
+           live copy exactly when DEHL does not hold the value (load_to_dehl
+           would read the slot). A next-op reader keeps the DEHL path, which
+           leaves the value cached for it. */
+        int v = op->dst;
+        const Op *nx = (cur_bb && cur_op_idx + 1 < cur_bb->n_ops)
+                     ? &cur_bb->ops[cur_op_idx + 1] : NULL;
+        int nx_reads = 0;
+        if (nx) {
+            int uses[16];
+            int nu = ir_op_uses(nx, uses, (int)(sizeof uses / sizeof uses[0]));
+            for (int u = 0; u < nu; u++) if (uses[u] == v) nx_reads = 1;
+        }
+        if (v == op->src[0] && !nx_reads && !dehl_has(v)
+            && !opt_disabled("long-step-mhl")
+            && ir_home_at(f, v) == IR_PR_SPILL && !vreg_is_pr_dehl(f, v)
+            && slot_off(f, v) >= 0
+            && !L.la.cur_dehl_dst_dead_safe && !L.la.cur_dehl_push_to_stack) {
+            pending_spill_resolve();          /* HL is about to be spent */
+            ss_note_reload(f, v);             /* the helper reads the slot */
+            emit_acc_slot_addr(out, f, v, 0); /* HL = &slot */
+            emit(out, "call\t%s", step > 0 ? "l_long_inc_mhl" : "l_long_dec_mhl");
+            invalidate_hl_cache();
+            invalidate_a_cache();
+            return 0;
+        }
+        load_to_dehl(out, f, op->src[0]);
+        emit(out, "call\t%s", step > 0 ? "l_inc_dehl" : "l_dec_dehl");
+        store_dehl_finalize(out, f, op->dst);
+        return 0;
+    }
     /* idx2 stepping counter (register residency): the counter lives in the
        spare index register — step in place with `inc`/`dec <idx>` (2 bytes,
        no memory) instead of the TOS ex(sp) dance. */
@@ -608,7 +645,11 @@ static int gen_deref_cmp_br(FILE *out, Func *f, const Op *op)
        load walks the value through A: `ld a,(hl+); ld h,(hl); ld l,a`), so *pa
        must be read into A AFTER every address load — never before.  Equality is
        symmetric, so we are free to read whichever pointer is register-resident
-       via (bc)/(de) and put the other in HL. */
+       via (bc)/(de) and put the other in HL — and if NEITHER is BC/DE-resident
+       but one is ALREADY the live HL cache (its producer left it there),
+       that must be preserved (pushed) before the other one's load_to_hl
+       clobbers it, not discarded on the assumption that "neither resident"
+       means HL is free to overwrite. */
     if (vreg_in_pr_bc(f, pa) || vreg_in_pr_de(f, pa)) {
         /* pa resident: HL = pb first (address load clobbers A harmlessly),
            then read *pa via its register last. */
@@ -622,6 +663,26 @@ static int gen_deref_cmp_br(FILE *out, Func *f, const Op *op)
         load_to_hl(out, f, pa);
         emit(out, "ld\ta,(%s)", reg);   /* A = *pb */
         emit(out, "cp\t(hl)");          /* vs *pa */
+    } else if (hl_has(pa)) {
+        /* pa is ALREADY the live HL cache (its producer, e.g. an address
+           ADD, left it there and nothing has evicted it yet) — the first
+           load_to_hl below would silently clobber it before it's ever
+           read, since load_to_hl only guarantees ITS OWN target ends up
+           in HL, not that anything already there survives. Mirror of the
+           BC/DE-resident cases above: push the value HL already holds
+           FIRST, load the other pointer, then pop it back. */
+        emit_sp(out, 2, "push\thl");
+        load_to_hl(out, f, pb);
+        emit(out, "ld\ta,(hl)");        /* A = *pb */
+        emit_sp(out, -2, "pop\thl");           /* HL = pa */
+        emit(out, "cp\t(hl)");          /* vs *pa */
+    } else if (hl_has(pb)) {
+        /* Symmetric: pb already lives in HL. */
+        emit_sp(out, 2, "push\thl");
+        load_to_hl(out, f, pa);
+        emit(out, "ld\ta,(hl)");        /* A = *pa */
+        emit_sp(out, -2, "pop\thl");           /* HL = pb */
+        emit(out, "cp\t(hl)");          /* vs *pb */
     } else {
         /* Neither resident: both addresses come via HL, so load pb, stack it,
            load pa, read *pa, restore pb.  Uses only HL/A/stack — BC and DE (which
@@ -3300,10 +3361,12 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
            where going through HL would be `ld hl,bc; ex de,hl; ld hl,(de)`
            (4B/22c). Only when HL does not already hold the base, which is the
            cheapest case of all. */
+        /* Each LHLX exit commits through commit_hl_result: a DE-homed dst takes
+           the word with one `ex de,hl` where its readers look for it. */
         if (lhlx_deref && op->mem.offset == 0 && !hl_has(op->mem.base)) {
             if (de_has(op->mem.base)) {
                 emit(out, "ld\thl,(de)");           /* DE already the address */
-                commit_hl_word(out, f, op->dst);
+                commit_hl_result(out, f, op->dst);
                 return 0;
             }
             if (bc_has(op->mem.base)) {
@@ -3313,7 +3376,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                    belief so a second field read off the same pointer inside this
                    block is a bare `ld hl,(de)`. */
                 cache_de(op->mem.base);
-                commit_hl_word(out, f, op->dst);
+                commit_hl_result(out, f, op->dst);
                 return 0;
             }
         }
@@ -3342,7 +3405,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\thl,(de)");           /* HL = the word */
                 invalidate_de_cache();              /* DE = base+n, not a vreg */
             }
-            commit_hl_word(out, f, op->dst);
+            commit_hl_result(out, f, op->dst);
             return 0;
         }
         /* Word DE-home active: reach the field offset DE-clean (DE = home
