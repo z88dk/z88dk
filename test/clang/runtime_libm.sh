@@ -18,6 +18,7 @@
 # Skips (exit 0) if neither the compiler nor the emulator is available.
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_libm.c"
 L="$DIR/../../libsrc/l/llvmz80"
 MATH32_DIR="$DIR/../../libsrc"
@@ -30,9 +31,7 @@ WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 fail() { echo "FAIL: $1"; exit 1; }
 
-if ! zcc +cpm -compiler=llvmz80 ${ZCC_CLIB:-} -O3 -create-app \
-	-mllvm -z80-float-sdcccall0 -Cg-mdouble=32 --math32 -L"$MATH32_DIR" \
-	"$L/__addsf3.asm" "$L/__cmpsf2.asm" "$L/__floatsisf.asm" \
+if ! zcc +cpm -compiler=llvmz80 ${ZCC_CLIB:-} -O3 -create-app -lm \
 	-o "$WORK/rt" "$SRC" >"$WORK/build.log" 2>&1; then
 	echo "--- build log ---"; cat "$WORK/build.log"
 	fail "zcc build failed"

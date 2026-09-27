@@ -7,6 +7,7 @@
 # Fix: ravn/z88dk bb914a18 defers to __builtin_va_start under __LLVMZ80.
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_vaarg.c"
 
 command -v zcc >/dev/null 2>&1 || { echo "SKIP: zcc not on PATH"; exit 0; }

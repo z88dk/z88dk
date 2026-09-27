@@ -7,6 +7,7 @@
 # XFAIL (classic, llvmz80): if output differs from oracle, gap is noted
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_file.c"
 
 command -v zcc >/dev/null 2>&1 || { echo "SKIP: zcc not on PATH"; exit 0; }

@@ -37,6 +37,7 @@
 set -e
 export LC_NUMERIC=C LC_ALL=C
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 BRIDGE_DIR="$DIR/../../libsrc/l/llvmz80"
 MATH32_DIR="$DIR/../../libsrc"
 

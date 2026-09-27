@@ -21,6 +21,7 @@
 # Skips (exit 0) if neither the compiler nor the emulator is available.
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_fcmp_fast.c"
 BRIDGE="$DIR/../../libsrc/l/llvmz80/__cmpsf2.asm"
 MATH32_DIR="$DIR/../../libsrc"
@@ -34,10 +35,8 @@ trap 'rm -rf "$WORK"' EXIT
 
 fail() { echo "FAIL: $1"; exit 1; }
 
-if ! zcc +cpm -compiler=llvmz80 ${ZCC_CLIB:-} -O2 -ffast-math -create-app \
-	-mllvm -z80-float-sdcccall0 \
-	-L"$MATH32_DIR" -lmath32 \
-	-o "$WORK/rt" "$BRIDGE" "$SRC" >"$WORK/build.log" 2>&1; then
+if ! zcc +cpm -compiler=llvmz80 ${ZCC_CLIB:-} -O2 -ffast-math -create-app -lm \
+	-o "$WORK/rt" "$SRC" >"$WORK/build.log" 2>&1; then
 	echo "--- build log ---"; cat "$WORK/build.log"
 	fail "zcc build failed (expected if ___cmpsf2_fast is missing from the bridge)"
 fi

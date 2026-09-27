@@ -11,6 +11,7 @@
 # Uses --math32 (clang double == binary32). Skips if zcc/ntvcm unavailable.
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_printf_autoformat.c"
 
 command -v zcc >/dev/null 2>&1 || { echo "SKIP: zcc not on PATH"; exit 0; }
@@ -24,7 +25,7 @@ fail() { echo "FAIL: $1"; exit 1; }
 
 # NOTE: deliberately NO -Dpragma and NO manual converter selection -- this
 # proves the -autoformat pass picks the classic %f/%e/%g converters by itself.
-if ! zcc +cpm -compiler=llvmz80 --math32 -O2 \
+if ! zcc +cpm -compiler=llvmz80 -O2 -lm \
         -create-app -o "$WORK/rt" "$SRC" >"$WORK/build.log" 2>&1; then
     echo "--- build log ---"; cat "$WORK/build.log"
     fail "zcc build failed"

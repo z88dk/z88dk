@@ -8,6 +8,7 @@
 # Fix: libsrc/l/llvmz80/__strerror_table.asm (ravn/z88dk 2026-07-21)
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_strerror.c"
 
 command -v zcc >/dev/null 2>&1 || { echo "SKIP: zcc not on PATH"; exit 0; }

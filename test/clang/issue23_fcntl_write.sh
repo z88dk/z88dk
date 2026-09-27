@@ -6,6 +6,7 @@
 # returns the byte count (3).  See ravn/llvm-z80#279, ravn/z88dk#41.
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/issue23_fcntl_write.c"
 EXPECT_FIXED=1        # ravn/z88dk#23 FIXED by z80_smallc (ravn/llvm-z80#279)
 

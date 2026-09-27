@@ -9,6 +9,7 @@
 # comparator via l_cmp_sdcc (ravn/z88dk 2026-07-24; upstream _bsearch merge).
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_bsearch.c"
 
 command -v zcc >/dev/null 2>&1 || { echo "SKIP: zcc not on PATH"; exit 0; }

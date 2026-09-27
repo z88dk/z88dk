@@ -7,6 +7,7 @@
 # Portable across the classic clib and newlib (only long long + printf).
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_quadinit.c"
 command -v zcc >/dev/null 2>&1 || { echo "SKIP: zcc not on PATH"; exit 0; }
 NTVCM=${NTVCM:-ntvcm}

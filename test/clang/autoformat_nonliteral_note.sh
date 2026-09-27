@@ -17,6 +17,7 @@
 # linker/emulator is needed. Skips if zcc/clang backend is unavailable.
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 
 command -v zcc >/dev/null 2>&1 || { echo "SKIP: zcc not on PATH"; exit 0; }
 
@@ -27,7 +28,7 @@ fail() { echo "FAIL: $1"; exit 1; }
 
 # Compile SRC with -compiler=llvmz80 and return zpragma's stderr (the notes).
 build_log() {
-    zcc +cpm -compiler=llvmz80 --math32 -O2 -c -o "$WORK/out.o" "$1" 2>&1 || true
+    zcc +cpm -compiler=llvmz80 -O2 -c -o "$WORK/out.o" "$1" 2>&1 || true
 }
 
 # 1. MIXED TU: a literal "%d" (prunes the table) + a runtime format -> NOTE.

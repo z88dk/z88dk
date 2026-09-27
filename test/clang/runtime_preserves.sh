@@ -2,6 +2,7 @@
 # Runtime test: see runtime_preserves.c.  Portable across classic clib and newlib.
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_preserves.c"
 command -v zcc >/dev/null 2>&1 || { echo "SKIP: zcc not on PATH"; exit 0; }
 NTVCM=${NTVCM:-ntvcm}

@@ -11,59 +11,24 @@
 set -e
 
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SELF=$(basename "$0")
 
-# ---- locate LLVMZ80EXE ----
-if [ -z "$LLVMZ80EXE" ]; then
-    for candidate in \
-        "/Users/ravn/z80/llvm-z80/build-macos/bin/clang" \
-        "/home/ravn/z80/llvm-z80/build/bin/clang" \
-        "$(command -v clang 2>/dev/null)"; do
-        if [ -x "$candidate" ] && "$candidate" --version 2>&1 | grep -q "z80\|Z80"; then
-            LLVMZ80EXE="$candidate"
-            break
-        fi
-    done
-fi
-if [ -z "$LLVMZ80EXE" ]; then
+# ---- locate environment via test_env.sh ----
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
+
+if [ -z "$LLVMZ80EXE" ] || ! [ -x "$LLVMZ80EXE" ]; then
     echo "ERROR: cannot find ravn/llvm-z80 clang; set LLVMZ80EXE"
     exit 1
 fi
 export LLVMZ80EXE
 
-# ---- locate zcc (z88dk) ----
-if [ -z "$ZCCCFG" ]; then
-    # Derive from LLVMZ80EXE path: go up from bin/ to find lib/config/
-    Z88DK_ROOT=$(dirname "$LLVMZ80EXE")
-    Z88DK_ROOT=$(cd "$Z88DK_ROOT/.." 2>/dev/null && pwd)
-    # Try parent directories
-    for d in "$Z88DK_ROOT" "$(dirname "$Z88DK_ROOT")" "/Users/ravn/z80/z88dk" "/home/ravn/z80/z88dk"; do
-        if [ -f "$d/lib/config/cpm.cfg" ]; then
-            ZCCCFG="$d/lib/config/"
-            PATH="$d/bin:$PATH"
-            break
-        fi
-    done
-fi
-if [ -z "$ZCCCFG" ]; then
+if [ -z "$ZCCCFG" ] || ! [ -d "$ZCCCFG" ]; then
     echo "ERROR: cannot find z88dk; set ZCCCFG"
     exit 1
 fi
 export ZCCCFG
 export PATH
-
-# ---- locate NTVCM ----
-if [ -z "$NTVCM" ]; then
-    for candidate in \
-        "/Users/ravn/z80/ntvcm/ntvcm" \
-        "/home/ravn/z80/ntvcm/ntvcm" \
-        "$(command -v ntvcm 2>/dev/null)"; do
-        if [ -x "$candidate" ]; then
-            NTVCM="$candidate"
-            break
-        fi
-    done
-fi
 export NTVCM
 
 # ---- select the C library the suite builds against ----
@@ -205,7 +170,7 @@ newlib_skip_reason() {
 TOTAL=0
 for script in "$DIR"/*.sh; do
     _n=$(basename "$script")
-    case "$_n" in "$SELF"|run_all.sh|run_matrix.sh) continue ;; esac
+    case "$_n" in "$SELF"|run_all.sh|run_matrix.sh|test_env.sh) continue ;; esac
     TOTAL=$((TOTAL + 1))
 done
 DONE=0
@@ -220,7 +185,7 @@ for script in "$DIR"/*.sh; do
     # Skip harness scripts, not just this file: run_matrix.sh calls run_all.sh,
     # so treating it as a test would recurse infinitely (a fork bomb).
     case "$name" in
-        "$SELF"|run_all.sh|run_matrix.sh) continue ;;
+        "$SELF"|run_all.sh|run_matrix.sh|test_env.sh) continue ;;
     esac
 
     if [ "$TEST_CLIB" != "classic" ]; then

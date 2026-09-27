@@ -13,6 +13,7 @@
 # unconditional (stdio.h).  See runtime_fileio_ferror_feof.c for the full writeup.
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_fileio_ferror_feof.c"
 ORACLE="ff f_fresh=0 r_fresh=0 f_mid=0 r_mid=0 f_eof=1 r_eof=0 f_clr=1 r_clr=0"
 

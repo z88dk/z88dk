@@ -12,6 +12,7 @@
 # Usage: LLVMZ80EXE=/path/to/clang ./fastcall_abi_16.sh
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 CLANG=${LLVMZ80EXE:?set LLVMZ80EXE to the ravn/llvm-z80 clang binary}
 SRC="$DIR/fastcall_abi_16.c"
 

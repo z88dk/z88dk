@@ -30,6 +30,7 @@
 # Skips (exit 0) if the required tools aren't available.
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 BRIDGE_DIR="$DIR/../../libsrc/l/llvmz80"
 MATH32_DIR="$DIR/../../libsrc"
 

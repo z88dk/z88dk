@@ -10,6 +10,7 @@
 # XFAIL (newlib):  fails to link -- ravn/z88dk#34 (WONTFIX).
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_fileio_rbplus.c"
 WANT="rbplus=128 rplusb=128"
 

@@ -1,5 +1,4 @@
 ${NEWLIB_ROOT}l/llvmz80/__call_iy.asm
-${NEWLIB_ROOT}l/llvmz80/__fflush.asm
 ${NEWLIB_ROOT}l/llvmz80/__divhi3.asm
 ${NEWLIB_ROOT}l/llvmz80/__divsi3.asm
 ${NEWLIB_ROOT}l/llvmz80/__mulsi3.asm
@@ -9,3 +8,6 @@ ${NEWLIB_ROOT}l/llvmz80/__memset_builtin.asm
 ${NEWLIB_ROOT}l/llvmz80/__udivqi3.asm
 ${NEWLIB_ROOT}l/llvmz80/__itoa.asm
 ${NEWLIB_ROOT}l/llvmz80/__strerror_table.asm
+${NEWLIB_ROOT}l/llvmz80/__addsf3.asm
+${NEWLIB_ROOT}l/llvmz80/__cmpsf2.asm
+${NEWLIB_ROOT}l/llvmz80/__floatsisf.asm

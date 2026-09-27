@@ -263,18 +263,16 @@ order-sensitive sub/div cases), `runtime_fcmp.c`/`.sh` (all six
 ordered/unordered predicates, several NaN cases), `runtime_fconv.c`/`.sh`
 (boundary values incl. 0, negative, INT16_MIN/MAX).
 
-### 4a. Packaging + auto-link (`llvmz80_fmath.lib`, ravn/z88dk#44)
+### 4a. Packaging: native inclusion in `llvmz80.lst`
 
-The three bridge sources are assembled into an archive `llvmz80_fmath.lib`
-(reproducible via `build_fmath_lib.sh`, committed with `git add -f` like the
-sibling `newlib/*.lib`). `zcc` **auto-links** it for every `-compiler=llvmz80`
-program — config var `LLVMZ80FMATH`, default
-`DESTDIR/libsrc/l/llvmz80/llvmz80_fmath` (env override respected). Because it is
-an ARCHIVE the linker discards every unreferenced module, so an integer-only
-program pays zero bytes, and the math32 cores (`cm32_`, `m32_compare`) are only
-pulled when a float libcall is actually referenced — i.e. only when the user
-also passed `--math32`. So a user needs nothing beyond `--math32`; no manual
-`-lllvmz80_fmath`.
+The three bridge sources are included directly in `libsrc/l/llvmz80.lst`,
+so they are compiled natively into `z80_crt0.lib` during the standard z88dk
+library build (no standalone archive or separate build script needed).
+Because `z80_crt0.lib` is a `.lib` archive, the linker discards every
+unreferenced module, so an integer-only program pays zero bytes, and the
+math32 cores (`cm32_`, `m32_compare`) are only pulled when a float libcall is
+actually referenced — i.e. when the user passed `--math32` (or `-lm`).
+So a user needs nothing beyond `--math32` (or `-lm`); no extra flags or bridges.
 
 This closes the ravn/z88dk#44 **blocker** (the fmath bridge was previously an
 incomplete stub — only `__addsf3`/`__cmpsf2`/`__floatsisf` were built into the

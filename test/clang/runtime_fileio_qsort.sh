@@ -16,6 +16,7 @@
 #                   z88dk 2.4 (unfixed getfcb) will FAIL here -- that is correct.
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_fileio_qsort.c"
 EXPECT_FIXED=1        # ravn/z88dk#54 fixed upstream (getfcb.c cc22967e21)
 

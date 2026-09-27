@@ -330,49 +330,24 @@ static uint64_t parse_format_string(char *arg, CONVSPEC *specifiers)
     return format_option;
 }
 
-/* -autoformat: replicate, for the external frontends (llvmz80/zsdcc), the
- * printf/scanf converter auto-selection that sccz80 does internally.  Without
- * it, a stock `printf("%f")` under -compiler=llvmz80 silently prints a literal
- * 'f' because the default converter table omits float (ravn/z88dk#42): only
- * sccz80 scans the format-string literals at compile time and emits the
- * CRT_printf_format bitmask.  zpragma already has the converter tables and
- * runs on every external-frontend translation unit, and -- unlike the clang
- * frontend, which is invoked `-ffreestanding` and emits no converter mask in
- * any case -- it is frontend-agnostic, so the scan belongs here. */
+/* -autoformat: auto-detect printf/scanf converters from call-site literals
+ * and emit CRT_printf_format / CRT_scanf_format into zcc_opt.def.
+ * Mirrors sccz80's compile-time scan for external compilers (llvmz80/sdcc). */
 static int      auto_format = 0;
 static uint32_t auto_printf_mask = 0;
 static uint32_t auto_scanf_mask = 0;
 
-/* ravn/z88dk#59: a recognised printf/scanf call whose format argument is NOT a
- * string literal (a variable, a call result, a ?: built at runtime) is
- * invisible to the literal-only scan below.  That is harmless in a PURE-runtime
- * TU -- no mask is emitted, so the CRT keeps its broad default converter table
- * -- but in a MIXED TU, where other call sites DID use literals and therefore
- * prune CLIB_OPT_PRINTF down to just the literal-detected converters, a runtime
- * format may need a converter that no literal mentioned; it then silently
- * mis-renders, the exact footgun #42 set out to kill, relocated to the
- * non-literal path.  Record the first such site per family so emit_auto_format()
- * can prompt for an explicit '#pragma printf' EXACTLY when pruning is active for
- * that family (auto_*_mask != 0), staying silent otherwise to avoid noise. */
+/* First non-literal format call per family (to warn if pruning is active). */
 static int  auto_printf_nonlit_line = 0;
 static char auto_printf_nonlit_file[FILENAME_MAX+1];
 static int  auto_scanf_nonlit_line = 0;
 static char auto_scanf_nonlit_file[FILENAME_MAX+1];
 
-/* #59: set when the user wrote an explicit '#pragma printf'/'#pragma scanf' in
- * this TU.  That pragma sets CLIB_OPT_PRINTF directly and wins over the
- * auto-detected CRT_printf_format channel, so the user has already committed to
- * a converter set -- the non-literal note (which only advises adding such a
- * pragma) would be pure noise, so it is suppressed for that family. */
+/* User specified explicit #pragma printf / scanf (suppresses warning). */
 static int  user_printf_pragma = 0;
 static int  user_scanf_pragma = 0;
 
-/* True if word `w` occurs as a whole token anywhere in [s,e).  Used to tell a
- * printf/scanf *prototype* ("int printf(const char *fmt,...)") from a real
- * call: every such prototype declares its format parameter as some form of
- * `char *`, so a format-argument region containing the token `char` is a
- * declaration, not a call -- and must not trigger the #59 non-literal note.
- * Whole-token match avoids false hits on identifiers like `charge`/`character`. */
+/* True if word `w` is a whole token in [s,e); distinguishes prototypes from calls. */
 static int region_has_word(const char *s, const char *e, const char *w)
 {
     size_t wl = strlen(w);
@@ -391,11 +366,7 @@ static int region_has_word(const char *s, const char *e, const char *w)
     return 0;
 }
 
-/* Which call argument holds the format string, per printf/scanf-family
- * function (mirrors sccz80's SetWatch, src/sccz80/callfunc.c:395).  Returns 0
- * if `name` is not a recognised format function; otherwise the 1-based index
- * of the format argument, and sets *is_scanf.  Example: fprintf -> 2 (the
- * format follows the FILE*), snprintf -> 3 (buf, size, format). */
+/* 1-based format argument index for known printf/scanf functions (0 = none). */
 static int format_arg_index(const char *name, int *is_scanf)
 {
     *is_scanf = 0;
@@ -415,25 +386,7 @@ static int format_arg_index(const char *name, int *is_scanf)
     return 0;
 }
 
-/* Scan a REAL format-string literal (with intervening literal text) for the
- * conversions it uses and OR the corresponding converter bits into a 32-bit
- * mask.  This mirrors sccz80's SetMiniFunc (src/sccz80/callfunc.c:521), NOT
- * the pragma-oriented parse_format_string above: parse_format_string treats
- * every non-`%` token as a conversion (correct for the `#pragma printf =
- * "%f %d"` token list) and would mis-read literal text like "v=%6.1f" ('v',
- * 'a', ... as bogus specifiers).  Here we react ONLY to text right after a
- * `%`, skip `%%`, then flags/width/precision/length before the conversion
- * char -- e.g. "v=%6.1f|d=%d" -> 0x04000000 (f) | 0x00000001 (d).
- *
- * `arg` points at the opening quote of the literal; scanning stops at the
- * matching closing quote (with C adjacent-string-literal concatenation:
- * "a" "b" is one string), so text after the format string on the same source
- * line -- e.g. a later puts("...printf(%f)...") -- is NOT mis-scanned.
- *
- * The `ll` (long long) converters live in the separate CLIB_OPT_PRINTF_2
- * channel that the CRT_printf_format bitmask does not carry, so a doubled
- * length modifier folds to the long (lval) bit here -- the same reach sccz80's
- * 32-bit path has; a program needing %lld must still use an explicit pragma. */
+/* Scan format string literal for conversion specifiers and return bitmask. */
 static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
 {
     uint32_t mask = 0;
@@ -502,20 +455,7 @@ static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
     return mask;
 }
 
-/* Auto-detect printf/scanf converters actually used at call sites in one line
- * of preprocessed source and OR their bits into the running masks.  Heuristic
- * (matching sccz80's literal-only reach): find a format-function identifier
- * followed by '(', walk to its format argument, and if that argument is a
- * string literal, scan it.  Destination/stream/size arguments are never string
- * literals, so using the correct format-argument index keeps e.g. the input
- * string of `sscanf("3.14", "%f", &x)` from being mistaken for the format.
- *
- * Scan is line-scoped: a format literal on the same line as the call name is
- * seen (the overwhelmingly common shape post-preprocessing), a format passed
- * via a variable or split onto a later line is not -- exactly as invisible to
- * sccz80, and the user then falls back to an explicit `#pragma printf`.
- * String/char literals are skipped when hunting the call identifier so the
- * word "printf" inside a string is never taken for a call. */
+/* Scan preprocessed line for printf/scanf calls and collect format masks. */
 static void scan_line_for_formats(const char *line)
 {
     const char *p = line;
@@ -595,13 +535,7 @@ static void scan_line_for_formats(const char *line)
                     if (is_scanf) auto_scanf_mask |= m;
                     else          auto_printf_mask |= m;
                 } else if (*f != 0 && *f != ')' && !region_has_word(f, a, "char")) {
-                    /* recognised format call with a non-literal format (#59):
-                     * remember the first occurrence per family + its location.
-                     * The `char` guard skips function prototypes/declarations
-                     * (`int printf(const char *fmt,...)`) whose format "argument"
-                     * is a parameter declaration, not a runtime value -- these
-                     * appear inlined from headers and would otherwise be flagged
-                     * (and, being first in preprocessed order, mis-locate the note). */
+                    /* Non-literal format call; record first occurrence for warning. */
                     if (is_scanf) {
                         if (auto_scanf_nonlit_line == 0) {
                             auto_scanf_nonlit_line = lineno;
@@ -619,12 +553,7 @@ static void scan_line_for_formats(const char *line)
     }
 }
 
-/* #59: emit a one-line, actionable compile-time note when converter pruning is
- * active for a family yet a format at a recognised call site was not a string
- * literal.  Preprocessor line markers store the source name with surrounding
- * quotes (sscanf "%s" keeps them), so strip a leading/trailing quote for a
- * clean `file:line:` prefix.  This is a note, not an error -- it never fails
- * the build; the fix is an explicit pragma listing the runtime conversions. */
+/* Warn if a non-literal format was used while literal pruning is active. */
 static void warn_nonliteral_format(const char *fam, const char *file, int line)
 {
     char clean[FILENAME_MAX + 1];
@@ -648,14 +577,8 @@ static void warn_nonliteral_format(const char *fam, const char *file, int line)
         clean[0] ? clean : "<stdin>", line, fam, fam, fam);
 }
 
-/* Emit the accumulated converter masks into zcc_opt.def using the exact
- * OR-combining idiom sccz80 uses (src/sccz80/main.c:555): CRT_printf_format /
- * CRT_scanf_format is the compiler-auto-detected channel, which the CRT
- * (lib/crt/classic/crt_runtime_selection.inc) copies into CLIB_OPT_PRINTF
- * only when the user has NOT set an explicit `#pragma printf` (CLIB_OPT_PRINTF)
- * -- so an explicit pragma still wins.  The IF/ELSE/UNDEFINE dance OR-combines
- * masks across translation units, since each unit's zpragma run appends its
- * own block to the shared zcc_opt.def. */
+/* Emit CRT_printf_format / CRT_scanf_format masks into zcc_opt.def.
+ * Values are OR-combined across translation units. */
 static void emit_auto_format(void)
 {
     FILE *fp;
@@ -663,13 +586,7 @@ static void emit_auto_format(void)
     if (auto_printf_mask == 0 && auto_scanf_mask == 0)
         return;
 
-    /* #59: prompt for an explicit pragma only in the MIXED-TU footgun -- the
-     * family's converter table is being pruned (auto_*_mask != 0) AND a
-     * non-literal format call the scan could not see exists in this TU.  A
-     * pure-runtime TU (mask == 0) is skipped: nothing is emitted, so the CRT
-     * keeps the broad default table and the runtime format is safe.  An
-     * explicit '#pragma printf'/'#pragma scanf' also suppresses it: the user
-     * already chose the converter set, so advising them to add one is noise. */
+    /* Warn if non-literal formats were seen while pruning this family. */
     if (auto_printf_mask && auto_printf_nonlit_line && !user_printf_pragma)
         warn_nonliteral_format("printf", auto_printf_nonlit_file, auto_printf_nonlit_line);
     if (auto_scanf_mask && auto_scanf_nonlit_line && !user_scanf_pragma)
@@ -729,9 +646,7 @@ int main(int argc, char **argv)
 
     while ( fgets(buf, sizeof(buf) - 1, stdin) != NULL ) {
         lineno++;
-        /* Scan the pristine line for printf/scanf call-site converters before
-         * any handler below rewrites buf (ravn/z88dk#42).  A `#pragma printf`
-         * line has `printf =` not `printf(` so it never matches here. */
+        /* Scan line for format call sites before pragma rewriting. */
         if ( auto_format )
             scan_line_for_formats(buf);
         ptr = skip_ws(buf);
@@ -853,8 +768,7 @@ int main(int argc, char **argv)
         }
     }
 
-    /* Flush the auto-detected converter masks (if any) into zcc_opt.def so the
-     * CRT links exactly the printf/scanf converters this unit actually used. */
+    /* Flush auto-detected converter masks into zcc_opt.def. */
     if ( auto_format )
         emit_auto_format();
 

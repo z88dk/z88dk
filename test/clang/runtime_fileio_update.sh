@@ -17,6 +17,7 @@
 #                   correct: it flags the released-lib regression.
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 SRC="$DIR/runtime_fileio_update.c"
 EXPECT_FIXED=1        # ravn/z88dk#54 fixed upstream (getfcb.c cc22967e21)
 

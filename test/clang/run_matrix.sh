@@ -11,6 +11,7 @@
 #   default clibs: classic newlib_iy
 set -e
 DIR=$(cd "$(dirname "$0")" && pwd)
+[ -f "$DIR/test_env.sh" ] && . "$DIR/test_env.sh"
 
 CLIBS="${*:-classic newlib_iy}"
 rc=0

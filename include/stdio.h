@@ -221,23 +221,8 @@ extern FILE __LIB__ *funopen(const void     *cookie, int (*readfn)(void *, char 
                     fpos_t (*seekfn)(void *, fpos_t, int), int (*closefn)(void *)) __smallc;
 #endif
 
-#if defined(__LLVMZ80)
-/* ravn/llvm-z80: _fclose is a __smallc stack worker; clang would pass fp in HL.
- * __smallc makes clang push fp so the stack read matches.  sccz80/sdcc keep
- * the plain declaration below. */
 extern int __LIB__  fclose(FILE *fp) __smallc;
-#else
-extern int __LIB__  fclose(FILE *fp);
-#endif
-extern int __LIB__  fflush(FILE *);
-#if defined(__LLVMZ80)
-/* ravn/llvm-z80: the classic clib's _fflush is __smallc (fetches its FILE*
- * off the stack), but clang passes it in HL -> the worker reads stack garbage
- * and corrupts SP, making the program restart in a loop at exit.  Route to a
- * register-ABI wrapper (libsrc/l/llvmz80/__fflush.asm).  sccz80/sdcc unaffected. */
-extern int __LIB__  fflush_fastcall(FILE *) __z88dk_fastcall;
-#define fflush(a) fflush_fastcall(a)
-#endif
+extern int __LIB__  fflush(FILE *fp) __smallc;
 
 extern void __LIB__ closeall(void);
 
@@ -295,11 +280,7 @@ extern int __LIB__ puts(const char *) __smallc;
 
 
 /* Routines for file positioning */
-#if defined(__LLVMZ80)
 extern fpos_t __LIB__ ftell(FILE *fp) __smallc;
-#else
-extern fpos_t __LIB__ ftell(FILE *fp);
-#endif
 __ZPROTO2(int,,fgetpos,FILE *,fp,fpos_t *, pos)
 
 
@@ -323,27 +304,15 @@ extern int __LIB__ printf(const char *fmt,...) __vasmallc;
 extern int __LIB__ fprintf(FILE *f,const char *fmt,...) __vasmallc;
 extern int __LIB__ sprintf(char *s,const char *fmt,...) __vasmallc;
 extern int __LIB__ snprintf(char *s,size_t n,const char *fmt,...) __vasmallc;
-#if defined(__LLVMZ80)
-/* ravn/llvm-z80: _vfprintf/_vsnprintf are va-style workers -- the fixed args are
- * nearest the return address (right-to-left layout) and the count is returned in
- * HL, exactly like the __vasmallc printf family.  That is sdcccall(0), NOT
- * __smallc: now that __smallc means z80_smallc (left-to-right) these must pin
- * sdcccall(0) explicitly to keep the fixed args reachable.  Verified GREEN: a
- * va_start/vsnprintf/va_end wrapper formats strings/ints/chars correctly with
- * the right return count. */
-extern int __LIB__ vfprintf(FILE *f,const char *fmt,void *ap) __attribute__((sdcccall(0)));
-extern int __LIB__ vsnprintf(char *str, size_t n,const char *fmt,void *ap) __attribute__((sdcccall(0)));
-#else
-extern int __LIB__ vfprintf(FILE *f,const char *fmt,void *ap);
-extern int __LIB__ vsnprintf(char *str, size_t n,const char *fmt,void *ap);
-#endif
+extern int __LIB__ vfprintf(FILE *f,const char *fmt,void *ap) __vasmallc;
+extern int __LIB__ vsnprintf(char *str, size_t n,const char *fmt,void *ap) __vasmallc;
 
 #define vprintf(ctl,arg) vfprintf(stdout,ctl,arg)
 #define vsprintf(buf,ctl,arg) vsnprintf(buf,65535,ctl,arg)
 
 /* llvmz80: no printf shim needed -- `double`/`float` are 32-bit IEEE-754 and
- * stock printf("%f") works via the auto-linked llvmz80_fmath.lib math32 bridge
- * with --math32; no opt-in shim or environment/config variable (ravn/z88dk#43/#44). */
+ * stock printf("%f") works via the math32 bridge in llvmz80.lst with --math32
+ * (or -lm); no opt-in shim or environment/config variable. */
 
 
 // Some far variants of functions
@@ -366,17 +335,8 @@ extern void __LIB__ printn(int number, int radix,FILE *file) __smallc;
 extern int __LIB__ scanf(const char *fmt,...) __vasmallc;
 extern int __LIB__ fscanf(FILE *,const char *fmt,...) __vasmallc;
 extern int __LIB__ sscanf(char *,const char *fmt,...) __vasmallc;
-#if defined(__LLVMZ80)
-/* ravn/llvm-z80: same sdcccall(0) va-style layout as the vfprintf family above
- * (fixed args nearest the return address, count in HL).  Verified GREEN: a
- * va_start/vsscanf/va_end wrapper parses "%d %d" into the caller's variables
- * with the right conversion count. */
-extern int __LIB__ vfscanf(FILE *, const char *fmt, void *ap) __attribute__((sdcccall(0)));
-extern int __LIB__ vsscanf(char *str, const char *fmt, void *ap) __attribute__((sdcccall(0)));
-#else
-extern int __LIB__ vfscanf(FILE *, const char *fmt, void *ap); 
-extern int __LIB__ vsscanf(char *str, const char *fmt, void *ap);
-#endif
+extern int __LIB__ vfscanf(FILE *, const char *fmt, void *ap) __vasmallc;
+extern int __LIB__ vsscanf(char *str, const char *fmt, void *ap) __vasmallc;
 #define vscanf(ctl,arg) vfscanf(stdin,ctl,arg)
 
 
@@ -417,11 +377,7 @@ __ZPROTO2(int,,fdgetpos,int,fd,fpos_t *,pos)
 /* Rename a file */
 __ZPROTO2(int,,rename,const char *,s,const char *,d)
 /* Remove a file */
-#if defined(__LLVMZ80)
 extern int __LIB__ remove(const char *name) __smallc;
-#else
-extern int __LIB__ remove(const char *name);
-#endif
 
 
 /* Scan for a keypress using the default keyboard driver */

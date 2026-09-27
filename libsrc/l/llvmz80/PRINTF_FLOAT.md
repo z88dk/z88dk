@@ -23,26 +23,26 @@ it is how z88dk's *modular* classic `printf` selects converters:
 - **Both now auto-scan as of ravn/z88dk#42**: for `-compiler=llvmz80` *and*
   `-compiler=sdcc` (zsdcc) the driver runs `zpragma -autoformat`, which scans the
   call sites and selects the classic converters exactly like sccz80 — so the trap
-  above no longer bites on either lane (only `--math32` is still required for
-  float). The explicit-pragma route below stays valid (use it to prune the set by
-  hand, or on the ez80clang lane, which is not wired).
+  above no longer bites on either lane. The explicit-pragma route below stays
+  valid (use it to prune the set by hand, or on the ez80clang lane, which is not
+  wired).
 
 The wiki documents the underlying mechanism for zsdcc ("if you use incremental
 builds or zsdcc then you will need to configure the list of converters"); see
 ravn/z88dk#25 (dhrystone) and #42 (llvmz80 + zsdcc auto-selection, now
 implemented).
 
-## Route 1 (stock z88dk printf) — just `--math32` (pragma optional since #42)
+## Route 1 (stock z88dk printf) — zero extra flags (pragma and math flags optional)
 
-On the llvmz80 lane the converters are auto-selected, so a stock program needs
-**only** `--math32`; no `#pragma printf` is required:
+On the llvmz80 lane the converters are auto-selected and math32 is auto-linked,
+so a stock program needs no extra flags and no `#pragma printf`:
 
 ```c
 #include <stdio.h>
 int main(void){ printf("v=%6.1f|d=%d\n", 3.5, 42); return 0; }
 ```
 ```sh
-zcc +cpm -compiler=llvmz80 --math32 -O2 prog.c -o prog.com -create-app
+zcc +cpm -compiler=llvmz80 -O2 prog.c -o prog.com -create-app
 # v=   3.5|d=42   (byte-identical to sccz80)
 ```
 
