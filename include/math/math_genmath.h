@@ -19,12 +19,8 @@
 #define HUGE_VAL     9.990e37
 #define INFINITY     9.999e37
 
-/* A clang-based backend (-compiler=llvmz80) uses real IEEE-754 float/double, so
-   the finite ~9.99e37 stand-ins above are wrong for it: an "infinity" that is a
-   normal finite number defeats isinf(), overflow checks, and printf %f (which
-   renders 99989999...000000 instead of "inf").  When the compiler exposes the
-   IEEE builtins, use true infinities/NaN; sccz80/sdcc (48-bit genmath, no such
-   builtins) keep the finite stand-ins.  See ravn/z88dk#28. */
+/* Use compiler builtins for INFINITY/HUGE_VAL/NAN when available,
+ * leaving the finite ~9.99e37 stand-ins for classic 48-bit math compilers. */
 #if defined(__DBL_MANT_DIG__)
 #undef  MAXFLOAT
 #undef  HUGE_VAL
