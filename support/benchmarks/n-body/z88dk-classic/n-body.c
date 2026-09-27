@@ -34,9 +34,8 @@
 #ifdef __Z88DK
    #include <intrinsic.h>
    #ifdef PRINTF
-      // enable printf %f
-      #pragma output CLIB_OPT_PRINTF = 0xffffffff
-      //#pragma output CLIB_OPT_PRINTF = 0x04000000
+      /* %.9f: converter and field width. No far %S (absent on 8085). */
+      #pragma output CLIB_OPT_PRINTF = 0x44000000
    #endif
 #endif
 

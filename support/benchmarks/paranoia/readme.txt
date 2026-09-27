@@ -1,3 +1,5 @@
+Before z88dk v2.5, newlib `-lm` in these recipes linked math48 (6-byte). From v2.5, `-lm` links math32. A 6-byte rerun is `--math48` with sccz80 or 80cc (zsdcc still stores 4-byte IEEE). 8-byte Microsoft format is `--mbf64` with either compiler.
+
 PARANOIA
 ========
 

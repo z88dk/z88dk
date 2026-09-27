@@ -22,7 +22,7 @@ description: >
 | Map for ticks | `-m` |
 | App image | `-create-app` |
 | Compiler | `-compiler=sccz80\|sdcc\|80cc\|multi\|…` or target default |
-| Float | `--math32` / `--math16` / `--math-mbf32` … |
+| Float | From v2.5, `-lm` is math32 (same as `--math32`). Before v2.5, classic `-lm` was genmath and newlib `-lm` was math48. `--math16` / `--math-mbf32` / `--genmath` / `--math48` / `--mbf64` stay explicit |
 | CPU | often via `-clib=8085` etc.; also `-m8085` where applicable |
 
 Env: `PATH` includes `bin/`, `ZCCCFG=lib/config`.
@@ -69,7 +69,7 @@ Always pass a **target** (`+name` or `-target=name`). Full learning path: [Getti
 | Map for ticks / hotspots | Add **`-m`** (or `-gen-map-file`); pass the `.map` to ticks with `-x` |
 | See every tool step | **`-v`** (not `-vn`) |
 | Bound performance work | Classic `+test` + `-DTIMER` labels; see [ticks](Tool---ticks) |
-| Float libraries | `--math32` (full IEEE main) / `--math16` (half **adjunct**; pair with a main lib for stdio); CPU-specific `.lib` via `ZCC_LIBCPU` |
+| Float libraries | From v2.5, `-lm` / `--math32` (full IEEE main). Before v2.5, classic `-lm` was genmath and newlib `-lm` was math48. `--math16` is a half **adjunct** (pair with a main lib for stdio). 6-byte: `--genmath` or `--math48` (sccz80 or 80cc). 8-byte: `--mbf64`. CPU-specific `.lib` via `ZCC_LIBCPU` |
 | Quiet day-to-day | `-vn` |
 
 Same compile line on both sides of an A/B library patch. Delete stale `.bin`/`.map` after installing a new library.

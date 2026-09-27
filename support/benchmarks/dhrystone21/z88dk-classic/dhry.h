@@ -422,7 +422,7 @@
 #ifdef __Z88DK
    #include <intrinsic.h>
    #ifdef PRINTF
-      #pragma output CLIB_OPT_PRINTF = 0x04000601
+      #pragma output CLIB_OPT_PRINTF = 0x44000601
       #pragma output CLIB_OPT_SCANF  = 0x01
    #endif
 #endif

@@ -144,7 +144,7 @@ clock.tap: ../graphics/clock.c
 	zcc +zx -vn ../graphics/clock.c -I../graphics -lndos -lm  -DDETAILED -create-app -oclock.bin
 
 showlib3d.tap: ../graphics/showlib3d.c
-	zcc +zx -vn ../graphics/showlib3d.c -lndos -lm  -create-app -oshowlib3d.bin
+	zcc +zx -vn ../graphics/showlib3d.c -lndos --genmath -create-app -oshowlib3d.bin
 
 marilyn.tap: ../graphics/marilyn.c
 	zcc +zx -vn ../graphics/marilyn.c -lndos -create-app -omarilyn.bin
@@ -201,7 +201,7 @@ fx.tap: ../sound/fx.c
 	zcc +zx -vn ../sound/fx.c -lndos -create-app -ofx.bin
 
 sndtest.tap: ../sound/sndtest.c
-	zcc +zx -vn ../sound/sndtest.c -lndos -lm -create-app -osndtest.bin
+	zcc +zx -vn ../sound/sndtest.c -lndos --genmath -create-app -osndtest.bin
 
 synthdemo.tap: ../sound/synthdemo.c
 	zcc +zx -vn ../sound/synthdemo.c -lndos -create-app -osynthdemo.bin

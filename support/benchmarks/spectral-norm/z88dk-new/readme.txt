@@ -1,3 +1,5 @@
+Before z88dk v2.5, newlib `-lm` in these recipes linked math48 (6-byte). From v2.5, `-lm` links math32. A 6-byte rerun is `--math48` with sccz80 or 80cc (zsdcc still stores 4-byte IEEE). 8-byte Microsoft format is `--mbf64` with either compiler.
+
 CHANGES TO SOURCE CODE
 ======================
 
@@ -10,11 +12,11 @@ To verify the correct result compile for the zx spectrum target
 and run in an emulator.
 
 sccz80/new
-zcc +zx -vn -DSTATIC -DPRINTF -O2 -clib=new spectral-norm.c -o spectral-norm -lm -create-app
+zcc +zx -vn -startup=0 -DSTATIC -DPRINTF -O2 -clib=new spectral-norm.c -o spectral-norm -lm -create-app
 error: 2 * 10^(-9)
 
 zsdcc/new
-zcc +zx -vn -DSTATIC -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm -lm -create-app
+zcc +zx -vn -startup=0 -DSTATIC -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm -lm -create-app
 error: 2 * 10^(-9)
 
 zcc +rc2014 -subtype=cpm -vn -startup=0 -DSTATIC -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm --math32 -m -create-app

@@ -226,8 +226,7 @@ Prove link: `z88dk-z80nm lib/clibs/am9511.lib | rg 'spec_|popf|fdiv|ftoa'`.
 
 - Suite: `test/suites/math` → `test_am9511.bin`, `test_am9511_8085.bin` with
   **`-DMATH_SPECIALS`** (finite + Inf/NaN algebra via `am32_fspecial` + `popf`).
-- Do **not** add bare `-lm`/`-lgenmath` ahead of `--math-am9511`: genmath’s
-  `sqrt` can win the link and bypass the APU path.
+- Do **not** add bare `-lm` ahead of `--math-am9511`. From **v2.5**, `-lm` is math32 and its `sqrt` can win the link. Before v2.5 the same trap was classic genmath (`-lm` / `-lgenmath`).
 - TIMER benches: classic recipes with `--math-am9511` (add `-clib=8085` for the
   8085 product); see `am9511/readme.md` and **`methodology-measure`**.
 - Ticks APU: `src/ticks/am9511.c` (approximate model — not bit-exact silicon).

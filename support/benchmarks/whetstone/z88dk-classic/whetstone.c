@@ -110,6 +110,10 @@ C**********************************************************************
 
 #ifdef __Z88DK
    #include <intrinsic.h>
+   #ifdef PRINTOUT
+      /* %.1f and %12.4e: converters, long %ld, and field width */
+      #pragma output CLIB_OPT_PRINTF = 0x45001001
+   #endif
 #endif
 
 /* map the FORTRAN math functions, etc. to the C versions */
