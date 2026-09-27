@@ -13,7 +13,7 @@ ENV Z88DK_PATH="/opt/z88dk"
 
 RUN apk add --no-cache build-base libxml2 m4 gmp \
         bison flex libxml2-dev git subversion boost-dev texinfo \
-        perl-template-toolkit perl-app-cpanminus curl gmp-dev \
+        perl-template-toolkit perl-app-cpanminus curl gmp-dev re2c \
     && cpanm -l $HOME/perl5 --no-wget local::lib Template::Plugin::YAML
 
 COPY . ${Z88DK_PATH}
