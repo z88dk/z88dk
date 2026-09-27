@@ -1546,172 +1546,342 @@ Prog {
         IfStmt {
             location: test_t_input_10_t.bas:121
             condition: 
-                UnaryExpr {
+                BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:121
+                    op: =
+                    lhs: 
+                        BasicFuncCallExpr {
+                            type: String
+                            location: test_t_input_10_t.bas:121
+                            keyword: "INKEY$"
+                            args: [
+                            ]
+                        }
+                    rhs: 
+                        StringLiteralExpr {
+                            type: String
+                            location: test_t_input_10_t.bas:121
+                            value: ""
+                        }
+                }
+            then_stmts: [
+                LetStmt {
+                    location: test_t_input_10_t.bas:121
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:121
+                            name: "B"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:121
+                            value: 2.000000
+                        }
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        IfStmt {
+            location: test_t_input_10_t.bas:122
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:122
+                    op: <>
+                    lhs: 
+                        BasicFuncCallExpr {
+                            type: String
+                            location: test_t_input_10_t.bas:122
+                            keyword: "INKEY$"
+                            args: [
+                            ]
+                        }
+                    rhs: 
+                        StringLiteralExpr {
+                            type: String
+                            location: test_t_input_10_t.bas:122
+                            value: ""
+                        }
+                }
+            then_stmts: [
+                LetStmt {
+                    location: test_t_input_10_t.bas:122
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:122
+                            name: "B"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:122
+                            value: 2.000000
+                        }
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        IfStmt {
+            location: test_t_input_10_t.bas:123
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:123
+                    op: <
+                    lhs: 
+                        BasicFuncCallExpr {
+                            type: String
+                            location: test_t_input_10_t.bas:123
+                            keyword: "INKEY$"
+                            args: [
+                            ]
+                        }
+                    rhs: 
+                        StringLiteralExpr {
+                            type: String
+                            location: test_t_input_10_t.bas:123
+                            value: ""
+                        }
+                }
+            then_stmts: [
+                LetStmt {
+                    location: test_t_input_10_t.bas:123
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:123
+                            name: "B"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:123
+                            value: 2.000000
+                        }
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        IfStmt {
+            location: test_t_input_10_t.bas:124
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:124
+                    op: <=
+                    lhs: 
+                        BasicFuncCallExpr {
+                            type: String
+                            location: test_t_input_10_t.bas:124
+                            keyword: "INKEY$"
+                            args: [
+                            ]
+                        }
+                    rhs: 
+                        StringLiteralExpr {
+                            type: String
+                            location: test_t_input_10_t.bas:124
+                            value: ""
+                        }
+                }
+            then_stmts: [
+                LetStmt {
+                    location: test_t_input_10_t.bas:124
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:124
+                            name: "B"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:124
+                            value: 2.000000
+                        }
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        IfStmt {
+            location: test_t_input_10_t.bas:125
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:125
+                    op: >
+                    lhs: 
+                        BasicFuncCallExpr {
+                            type: String
+                            location: test_t_input_10_t.bas:125
+                            keyword: "INKEY$"
+                            args: [
+                            ]
+                        }
+                    rhs: 
+                        StringLiteralExpr {
+                            type: String
+                            location: test_t_input_10_t.bas:125
+                            value: ""
+                        }
+                }
+            then_stmts: [
+                LetStmt {
+                    location: test_t_input_10_t.bas:125
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:125
+                            name: "B"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:125
+                            value: 2.000000
+                        }
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        IfStmt {
+            location: test_t_input_10_t.bas:126
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:126
+                    op: >=
+                    lhs: 
+                        BasicFuncCallExpr {
+                            type: String
+                            location: test_t_input_10_t.bas:126
+                            keyword: "INKEY$"
+                            args: [
+                            ]
+                        }
+                    rhs: 
+                        StringLiteralExpr {
+                            type: String
+                            location: test_t_input_10_t.bas:126
+                            value: ""
+                        }
+                }
+            then_stmts: [
+                LetStmt {
+                    location: test_t_input_10_t.bas:126
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:126
+                            name: "B"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:126
+                            value: 2.000000
+                        }
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        IfStmt {
+            location: test_t_input_10_t.bas:127
+            condition: 
+                UnaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:127
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:121
+                            location: test_t_input_10_t.bas:127
+                            op: =
+                            lhs: 
+                                BasicFuncCallExpr {
+                                    type: String
+                                    location: test_t_input_10_t.bas:127
+                                    keyword: "INKEY$"
+                                    args: [
+                                    ]
+                                }
+                            rhs: 
+                                StringLiteralExpr {
+                                    type: String
+                                    location: test_t_input_10_t.bas:127
+                                    value: ""
+                                }
+                        }
+                }
+            then_stmts: [
+                LetStmt {
+                    location: test_t_input_10_t.bas:127
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:127
+                            name: "B"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:127
+                            value: 2.000000
+                        }
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        IfStmt {
+            location: test_t_input_10_t.bas:129
+            condition: 
+                UnaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:129
+                    op: NOT
+                    operand: 
+                        BinaryExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:129
                             op: =
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:121
+                                    location: test_t_input_10_t.bas:129
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:121
+                                    location: test_t_input_10_t.bas:129
                                     value: 1.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:121
+                    location: test_t_input_10_t.bas:129
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:121
+                            location: test_t_input_10_t.bas:129
                             name: "ZX81BAS7IFELSE"
                         }
                 }
             ]
             else_stmts: [
             ]
-        }
-        LetStmt {
-            location: test_t_input_10_t.bas:122
-            lhs: 
-                VariableExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:122
-                    name: "B"
-                }
-            rhs: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:122
-                    value: 1.000000
-                }
-        }
-        LetStmt {
-            location: test_t_input_10_t.bas:123
-            lhs: 
-                VariableExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:123
-                    name: "C"
-                }
-            rhs: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:123
-                    value: 1.000000
-                }
-        }
-        GotoStmt {
-            location: test_t_input_10_t.bas:121
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:121
-                    name: "ZX81BAS7IFEND"
-                }
-        }
-        LabelStmt {
-            location: test_t_input_10_t.bas:121
-            label: "ZX81BAS7IFELSE"
-        }
-        LabelStmt {
-            location: test_t_input_10_t.bas:121
-            label: "ZX81BAS7IFEND"
-        }
-        IfStmt {
-            location: test_t_input_10_t.bas:126
-            condition: 
-                UnaryExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:126
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:126
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:126
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:126
-                                    value: 1.000000
-                                }
-                        }
-                }
-            then_stmts: [
-                GotoStmt {
-                    location: test_t_input_10_t.bas:126
-                    target_expr: 
-                        LabelLineRefExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:126
-                            name: "ZX81BAS8IFELSE"
-                        }
-                }
-            ]
-            else_stmts: [
-            ]
-        }
-        LetStmt {
-            location: test_t_input_10_t.bas:127
-            lhs: 
-                VariableExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:127
-                    name: "B"
-                }
-            rhs: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:127
-                    value: 1.000000
-                }
-        }
-        LetStmt {
-            location: test_t_input_10_t.bas:128
-            lhs: 
-                VariableExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:128
-                    name: "C"
-                }
-            rhs: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:128
-                    value: 1.000000
-                }
-        }
-        GotoStmt {
-            location: test_t_input_10_t.bas:126
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:126
-                    name: "ZX81BAS8IFEND"
-                }
-        }
-        LabelStmt {
-            location: test_t_input_10_t.bas:126
-            label: "ZX81BAS8IFELSE"
         }
         LetStmt {
             location: test_t_input_10_t.bas:130
@@ -1725,42 +1895,172 @@ Prog {
                 NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:130
-                    value: 2.000000
+                    value: 1.000000
                 }
         }
-        IfStmt {
+        LetStmt {
             location: test_t_input_10_t.bas:131
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:131
+                    name: "C"
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:131
+                    value: 1.000000
+                }
+        }
+        GotoStmt {
+            location: test_t_input_10_t.bas:129
+            target_expr: 
+                LabelLineRefExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:129
+                    name: "ZX81BAS7IFEND"
+                }
+        }
+        LabelStmt {
+            location: test_t_input_10_t.bas:129
+            label: "ZX81BAS7IFELSE"
+        }
+        LabelStmt {
+            location: test_t_input_10_t.bas:129
+            label: "ZX81BAS7IFEND"
+        }
+        IfStmt {
+            location: test_t_input_10_t.bas:134
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:131
+                    location: test_t_input_10_t.bas:134
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:131
+                            location: test_t_input_10_t.bas:134
                             op: =
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:131
+                                    location: test_t_input_10_t.bas:134
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:131
+                                    location: test_t_input_10_t.bas:134
+                                    value: 1.000000
+                                }
+                        }
+                }
+            then_stmts: [
+                GotoStmt {
+                    location: test_t_input_10_t.bas:134
+                    target_expr: 
+                        LabelLineRefExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:134
+                            name: "ZX81BAS8IFELSE"
+                        }
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        LetStmt {
+            location: test_t_input_10_t.bas:135
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:135
+                    name: "B"
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:135
+                    value: 1.000000
+                }
+        }
+        LetStmt {
+            location: test_t_input_10_t.bas:136
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:136
+                    name: "C"
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:136
+                    value: 1.000000
+                }
+        }
+        GotoStmt {
+            location: test_t_input_10_t.bas:134
+            target_expr: 
+                LabelLineRefExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:134
+                    name: "ZX81BAS8IFEND"
+                }
+        }
+        LabelStmt {
+            location: test_t_input_10_t.bas:134
+            label: "ZX81BAS8IFELSE"
+        }
+        LetStmt {
+            location: test_t_input_10_t.bas:138
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:138
+                    name: "B"
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:138
+                    value: 2.000000
+                }
+        }
+        IfStmt {
+            location: test_t_input_10_t.bas:139
+            condition: 
+                UnaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:139
+                    op: NOT
+                    operand: 
+                        BinaryExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:139
+                            op: =
+                            lhs: 
+                                VariableExpr {
+                                    type: Number
+                                    location: test_t_input_10_t.bas:139
+                                    name: "A"
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_10_t.bas:139
                                     value: 2.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:131
+                    location: test_t_input_10_t.bas:139
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:131
+                            location: test_t_input_10_t.bas:139
                             name: "ZX81BAS9IFELSE"
                         }
                 }
@@ -1769,89 +2069,89 @@ Prog {
             ]
         }
         LetStmt {
-            location: test_t_input_10_t.bas:132
+            location: test_t_input_10_t.bas:140
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:132
+                    location: test_t_input_10_t.bas:140
                     name: "C"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:132
+                    location: test_t_input_10_t.bas:140
                     value: 2.000000
                 }
         }
         GotoStmt {
-            location: test_t_input_10_t.bas:131
+            location: test_t_input_10_t.bas:139
             target_expr: 
                 LabelLineRefExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:131
+                    location: test_t_input_10_t.bas:139
                     name: "ZX81BAS9IFEND"
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:131
+            location: test_t_input_10_t.bas:139
             label: "ZX81BAS9IFELSE"
         }
         LetStmt {
-            location: test_t_input_10_t.bas:134
+            location: test_t_input_10_t.bas:142
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:134
+                    location: test_t_input_10_t.bas:142
                     name: "C"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:134
+                    location: test_t_input_10_t.bas:142
                     value: 3.000000
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:131
+            location: test_t_input_10_t.bas:139
             label: "ZX81BAS9IFEND"
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:126
+            location: test_t_input_10_t.bas:134
             label: "ZX81BAS8IFEND"
         }
         IfStmt {
-            location: test_t_input_10_t.bas:138
+            location: test_t_input_10_t.bas:146
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:138
+                    location: test_t_input_10_t.bas:146
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:138
+                            location: test_t_input_10_t.bas:146
                             op: =
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:138
+                                    location: test_t_input_10_t.bas:146
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:138
+                                    location: test_t_input_10_t.bas:146
                                     value: 1.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:138
+                    location: test_t_input_10_t.bas:146
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:138
+                            location: test_t_input_10_t.bas:146
                             name: "ZX81BAS10IFELSE"
                         }
                 }
@@ -1860,119 +2160,119 @@ Prog {
             ]
         }
         LetStmt {
-            location: test_t_input_10_t.bas:139
+            location: test_t_input_10_t.bas:147
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:139
+                    location: test_t_input_10_t.bas:147
                     name: "B"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:139
+                    location: test_t_input_10_t.bas:147
                     value: 1.000000
                 }
         }
         LetStmt {
-            location: test_t_input_10_t.bas:139
+            location: test_t_input_10_t.bas:147
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:139
+                    location: test_t_input_10_t.bas:147
                     name: "C"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:139
+                    location: test_t_input_10_t.bas:147
                     value: 1.000000
                 }
         }
         GotoStmt {
-            location: test_t_input_10_t.bas:138
+            location: test_t_input_10_t.bas:146
             target_expr: 
                 LabelLineRefExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:138
+                    location: test_t_input_10_t.bas:146
                     name: "ZX81BAS10IFEND"
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:138
+            location: test_t_input_10_t.bas:146
             label: "ZX81BAS10IFELSE"
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:138
+            location: test_t_input_10_t.bas:146
             label: "ZX81BAS10IFEND"
         }
         LetStmt {
-            location: test_t_input_10_t.bas:139
+            location: test_t_input_10_t.bas:147
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:139
+                    location: test_t_input_10_t.bas:147
                     name: "D"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:139
+                    location: test_t_input_10_t.bas:147
                     value: 1.000000
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:145
+            location: test_t_input_10_t.bas:153
             label: "ZX81BAS11REPEATSTART"
         }
         LetStmt {
-            location: test_t_input_10_t.bas:145
+            location: test_t_input_10_t.bas:153
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:145
+                    location: test_t_input_10_t.bas:153
                     name: "A"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:145
+                    location: test_t_input_10_t.bas:153
                     value: 1.000000
                 }
         }
         IfStmt {
-            location: test_t_input_10_t.bas:145
+            location: test_t_input_10_t.bas:153
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:145
+                    location: test_t_input_10_t.bas:153
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:145
+                            location: test_t_input_10_t.bas:153
                             op: =
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:145
+                                    location: test_t_input_10_t.bas:153
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:145
+                                    location: test_t_input_10_t.bas:153
                                     value: 1.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:145
+                    location: test_t_input_10_t.bas:153
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:145
+                            location: test_t_input_10_t.bas:153
                             name: "ZX81BAS11REPEATSTART"
                         }
                 }
@@ -1981,80 +2281,80 @@ Prog {
             ]
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:145
+            location: test_t_input_10_t.bas:153
             label: "ZX81BAS11REPEATEND"
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:146
+            location: test_t_input_10_t.bas:154
             label: "ZX81BAS12REPEATSTART"
         }
         LetStmt {
-            location: test_t_input_10_t.bas:146
+            location: test_t_input_10_t.bas:154
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:146
+                    location: test_t_input_10_t.bas:154
                     name: "B"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:146
+                    location: test_t_input_10_t.bas:154
                     value: 1.000000
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:146
+            location: test_t_input_10_t.bas:154
             label: "ZX81BAS13REPEATSTART"
         }
         LetStmt {
-            location: test_t_input_10_t.bas:146
+            location: test_t_input_10_t.bas:154
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:146
+                    location: test_t_input_10_t.bas:154
                     name: "C"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:146
+                    location: test_t_input_10_t.bas:154
                     value: 1.000000
                 }
         }
         IfStmt {
-            location: test_t_input_10_t.bas:146
+            location: test_t_input_10_t.bas:154
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:146
+                    location: test_t_input_10_t.bas:154
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:146
+                            location: test_t_input_10_t.bas:154
                             op: =
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:146
+                                    location: test_t_input_10_t.bas:154
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:146
+                                    location: test_t_input_10_t.bas:154
                                     value: 1.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:146
+                    location: test_t_input_10_t.bas:154
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:146
+                            location: test_t_input_10_t.bas:154
                             name: "ZX81BAS13REPEATSTART"
                         }
                 }
@@ -2063,146 +2363,15 @@ Prog {
             ]
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:146
+            location: test_t_input_10_t.bas:154
             label: "ZX81BAS13REPEATEND"
         }
         IfStmt {
-            location: test_t_input_10_t.bas:146
+            location: test_t_input_10_t.bas:154
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:146
-                    op: NOT
-                    operand: 
-                        BinaryExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:146
-                            op: =
-                            lhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:146
-                                    name: "A"
-                                }
-                            rhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:146
-                                    value: 2.000000
-                                }
-                        }
-                }
-            then_stmts: [
-                GotoStmt {
-                    location: test_t_input_10_t.bas:146
-                    target_expr: 
-                        LabelLineRefExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:146
-                            name: "ZX81BAS12REPEATSTART"
-                        }
-                }
-            ]
-            else_stmts: [
-            ]
-        }
-        LabelStmt {
-            location: test_t_input_10_t.bas:146
-            label: "ZX81BAS12REPEATEND"
-        }
-        LabelStmt {
-            location: test_t_input_10_t.bas:148
-            label: "ZX81BAS14REPEATSTART"
-        }
-        LetStmt {
-            location: test_t_input_10_t.bas:149
-            lhs: 
-                VariableExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:149
-                    name: "A"
-                }
-            rhs: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:149
-                    value: 1.000000
-                }
-        }
-        LetStmt {
-            location: test_t_input_10_t.bas:150
-            lhs: 
-                VariableExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:150
-                    name: "B"
-                }
-            rhs: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:150
-                    value: 2.000000
-                }
-        }
-        IfStmt {
-            location: test_t_input_10_t.bas:151
-            condition: 
-                BinaryExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:151
-                    op: =
-                    lhs: 
-                        VariableExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:151
-                            name: "A"
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:151
-                            value: 2.000000
-                        }
-                }
-            then_stmts: [
-                GotoStmt {
-                    location: test_t_input_10_t.bas:151
-                    target_expr: 
-                        LabelLineRefExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:151
-                            name: "ZX81BAS14REPEATEND"
-                        }
-                }
-            ]
-            else_stmts: [
-            ]
-        }
-        LabelStmt {
-            location: test_t_input_10_t.bas:152
-            label: "ZX81BAS15REPEATSTART"
-        }
-        LetStmt {
-            location: test_t_input_10_t.bas:153
-            lhs: 
-                VariableExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:153
-                    name: "C"
-                }
-            rhs: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:153
-                    value: 3.000000
-                }
-        }
-        IfStmt {
-            location: test_t_input_10_t.bas:152
-            condition: 
-                UnaryExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:152
+                    location: test_t_input_10_t.bas:154
                     op: NOT
                     operand: 
                         BinaryExpr {
@@ -2225,11 +2394,142 @@ Prog {
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:152
+                    location: test_t_input_10_t.bas:154
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:152
+                            location: test_t_input_10_t.bas:154
+                            name: "ZX81BAS12REPEATSTART"
+                        }
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        LabelStmt {
+            location: test_t_input_10_t.bas:154
+            label: "ZX81BAS12REPEATEND"
+        }
+        LabelStmt {
+            location: test_t_input_10_t.bas:156
+            label: "ZX81BAS14REPEATSTART"
+        }
+        LetStmt {
+            location: test_t_input_10_t.bas:157
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:157
+                    name: "A"
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:157
+                    value: 1.000000
+                }
+        }
+        LetStmt {
+            location: test_t_input_10_t.bas:158
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:158
+                    name: "B"
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:158
+                    value: 2.000000
+                }
+        }
+        IfStmt {
+            location: test_t_input_10_t.bas:159
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:159
+                    op: =
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:159
+                            name: "A"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:159
+                            value: 2.000000
+                        }
+                }
+            then_stmts: [
+                GotoStmt {
+                    location: test_t_input_10_t.bas:159
+                    target_expr: 
+                        LabelLineRefExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:159
+                            name: "ZX81BAS14REPEATEND"
+                        }
+                }
+            ]
+            else_stmts: [
+            ]
+        }
+        LabelStmt {
+            location: test_t_input_10_t.bas:160
+            label: "ZX81BAS15REPEATSTART"
+        }
+        LetStmt {
+            location: test_t_input_10_t.bas:161
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:161
+                    name: "C"
+                }
+            rhs: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:161
+                    value: 3.000000
+                }
+        }
+        IfStmt {
+            location: test_t_input_10_t.bas:160
+            condition: 
+                UnaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:160
+                    op: NOT
+                    operand: 
+                        BinaryExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:162
+                            op: =
+                            lhs: 
+                                VariableExpr {
+                                    type: Number
+                                    location: test_t_input_10_t.bas:162
+                                    name: "A"
+                                }
+                            rhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_10_t.bas:162
+                                    value: 2.000000
+                                }
+                        }
+                }
+            then_stmts: [
+                GotoStmt {
+                    location: test_t_input_10_t.bas:160
+                    target_expr: 
+                        LabelLineRefExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:160
                             name: "ZX81BAS15REPEATSTART"
                         }
                 }
@@ -2238,42 +2538,42 @@ Prog {
             ]
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:152
+            location: test_t_input_10_t.bas:160
             label: "ZX81BAS15REPEATEND"
         }
         IfStmt {
-            location: test_t_input_10_t.bas:148
+            location: test_t_input_10_t.bas:156
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:148
+                    location: test_t_input_10_t.bas:156
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:155
+                            location: test_t_input_10_t.bas:163
                             op: =
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:155
+                                    location: test_t_input_10_t.bas:163
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:155
+                                    location: test_t_input_10_t.bas:163
                                     value: 1.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:148
+                    location: test_t_input_10_t.bas:156
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:148
+                            location: test_t_input_10_t.bas:156
                             name: "ZX81BAS14REPEATSTART"
                         }
                 }
@@ -2282,76 +2582,76 @@ Prog {
             ]
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:148
+            location: test_t_input_10_t.bas:156
             label: "ZX81BAS14REPEATEND"
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:157
+            location: test_t_input_10_t.bas:165
             label: "ZX81BAS16REPEATSTART"
         }
         LetStmt {
-            location: test_t_input_10_t.bas:158
+            location: test_t_input_10_t.bas:166
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:158
+                    location: test_t_input_10_t.bas:166
                     name: "A"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:158
+                    location: test_t_input_10_t.bas:166
                     value: 1.000000
                 }
         }
         LetStmt {
-            location: test_t_input_10_t.bas:158
+            location: test_t_input_10_t.bas:166
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:158
+                    location: test_t_input_10_t.bas:166
                     name: "B"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:158
+                    location: test_t_input_10_t.bas:166
                     value: 2.000000
                 }
         }
         IfStmt {
-            location: test_t_input_10_t.bas:157
+            location: test_t_input_10_t.bas:165
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:157
+                    location: test_t_input_10_t.bas:165
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:158
+                            location: test_t_input_10_t.bas:166
                             op: =
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:158
+                                    location: test_t_input_10_t.bas:166
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:158
+                                    location: test_t_input_10_t.bas:166
                                     value: 1.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:157
+                    location: test_t_input_10_t.bas:165
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:157
+                            location: test_t_input_10_t.bas:165
                             name: "ZX81BAS16REPEATSTART"
                         }
                 }
@@ -2360,61 +2660,61 @@ Prog {
             ]
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:157
+            location: test_t_input_10_t.bas:165
             label: "ZX81BAS16REPEATEND"
         }
         LetStmt {
-            location: test_t_input_10_t.bas:158
+            location: test_t_input_10_t.bas:166
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:158
+                    location: test_t_input_10_t.bas:166
                     name: "C"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:158
+                    location: test_t_input_10_t.bas:166
                     value: 1.000000
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:164
+            location: test_t_input_10_t.bas:172
             label: "ZX81BAS17WHILESTART"
         }
         IfStmt {
-            location: test_t_input_10_t.bas:164
+            location: test_t_input_10_t.bas:172
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:164
+                    location: test_t_input_10_t.bas:172
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:164
+                            location: test_t_input_10_t.bas:172
                             op: <>
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:164
+                                    location: test_t_input_10_t.bas:172
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:164
+                                    location: test_t_input_10_t.bas:172
                                     value: 1.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:164
+                    location: test_t_input_10_t.bas:172
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:164
+                            location: test_t_input_10_t.bas:172
                             name: "ZX81BAS17WHILEEND"
                         }
                 }
@@ -2423,100 +2723,100 @@ Prog {
             ]
         }
         LetStmt {
-            location: test_t_input_10_t.bas:164
+            location: test_t_input_10_t.bas:172
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:164
+                    location: test_t_input_10_t.bas:172
                     name: "A"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:164
+                    location: test_t_input_10_t.bas:172
                     value: 1.000000
                 }
         }
         LetStmt {
-            location: test_t_input_10_t.bas:164
+            location: test_t_input_10_t.bas:172
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:164
+                    location: test_t_input_10_t.bas:172
                     name: "B"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:164
+                    location: test_t_input_10_t.bas:172
                     value: 2.000000
                 }
         }
         LetStmt {
-            location: test_t_input_10_t.bas:164
+            location: test_t_input_10_t.bas:172
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:164
+                    location: test_t_input_10_t.bas:172
                     name: "C"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:164
+                    location: test_t_input_10_t.bas:172
                     value: 3.000000
                 }
         }
         GotoStmt {
-            location: test_t_input_10_t.bas:164
+            location: test_t_input_10_t.bas:172
             target_expr: 
                 LabelLineRefExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:164
+                    location: test_t_input_10_t.bas:172
                     name: "ZX81BAS17WHILESTART"
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:164
+            location: test_t_input_10_t.bas:172
             label: "ZX81BAS17WHILEEND"
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:166
+            location: test_t_input_10_t.bas:174
             label: "ZX81BAS18WHILESTART"
         }
         IfStmt {
-            location: test_t_input_10_t.bas:166
+            location: test_t_input_10_t.bas:174
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:166
+                    location: test_t_input_10_t.bas:174
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:166
+                            location: test_t_input_10_t.bas:174
                             op: =
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:166
+                                    location: test_t_input_10_t.bas:174
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:166
+                                    location: test_t_input_10_t.bas:174
                                     value: 1.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:166
+                    location: test_t_input_10_t.bas:174
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:166
+                            location: test_t_input_10_t.bas:174
                             name: "ZX81BAS18WHILEEND"
                         }
                 }
@@ -2525,57 +2825,57 @@ Prog {
             ]
         }
         LetStmt {
-            location: test_t_input_10_t.bas:166
+            location: test_t_input_10_t.bas:174
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:166
+                    location: test_t_input_10_t.bas:174
                     name: "B"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:166
+                    location: test_t_input_10_t.bas:174
                     value: 1.000000
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:166
+            location: test_t_input_10_t.bas:174
             label: "ZX81BAS19WHILESTART"
         }
         IfStmt {
-            location: test_t_input_10_t.bas:166
+            location: test_t_input_10_t.bas:174
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:166
+                    location: test_t_input_10_t.bas:174
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:166
+                            location: test_t_input_10_t.bas:174
                             op: =
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:166
+                                    location: test_t_input_10_t.bas:174
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:166
+                                    location: test_t_input_10_t.bas:174
                                     value: 2.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:166
+                    location: test_t_input_10_t.bas:174
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:166
+                            location: test_t_input_10_t.bas:174
                             name: "ZX81BAS19WHILEEND"
                         }
                 }
@@ -2584,83 +2884,83 @@ Prog {
             ]
         }
         LetStmt {
-            location: test_t_input_10_t.bas:166
+            location: test_t_input_10_t.bas:174
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:166
+                    location: test_t_input_10_t.bas:174
                     name: "C"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:166
+                    location: test_t_input_10_t.bas:174
                     value: 1.000000
                 }
         }
         GotoStmt {
-            location: test_t_input_10_t.bas:166
+            location: test_t_input_10_t.bas:174
             target_expr: 
                 LabelLineRefExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:166
+                    location: test_t_input_10_t.bas:174
                     name: "ZX81BAS19WHILESTART"
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:166
+            location: test_t_input_10_t.bas:174
             label: "ZX81BAS19WHILEEND"
         }
         GotoStmt {
-            location: test_t_input_10_t.bas:166
+            location: test_t_input_10_t.bas:174
             target_expr: 
                 LabelLineRefExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:166
+                    location: test_t_input_10_t.bas:174
                     name: "ZX81BAS18WHILESTART"
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:166
+            location: test_t_input_10_t.bas:174
             label: "ZX81BAS18WHILEEND"
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:168
+            location: test_t_input_10_t.bas:176
             label: "ZX81BAS20WHILESTART"
         }
         IfStmt {
-            location: test_t_input_10_t.bas:168
+            location: test_t_input_10_t.bas:176
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:168
+                    location: test_t_input_10_t.bas:176
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:168
+                            location: test_t_input_10_t.bas:176
                             op: <>
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:168
+                                    location: test_t_input_10_t.bas:176
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:168
+                                    location: test_t_input_10_t.bas:176
                                     value: 1.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:168
+                    location: test_t_input_10_t.bas:176
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:168
+                            location: test_t_input_10_t.bas:176
                             name: "ZX81BAS20WHILEEND"
                         }
                 }
@@ -2669,62 +2969,62 @@ Prog {
             ]
         }
         LetStmt {
-            location: test_t_input_10_t.bas:169
+            location: test_t_input_10_t.bas:177
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:169
+                    location: test_t_input_10_t.bas:177
                     name: "A"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:169
+                    location: test_t_input_10_t.bas:177
                     value: 1.000000
                 }
         }
         LetStmt {
-            location: test_t_input_10_t.bas:170
+            location: test_t_input_10_t.bas:178
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:170
+                    location: test_t_input_10_t.bas:178
                     name: "B"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:170
+                    location: test_t_input_10_t.bas:178
                     value: 2.000000
                 }
         }
         IfStmt {
-            location: test_t_input_10_t.bas:171
+            location: test_t_input_10_t.bas:179
             condition: 
                 BinaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:171
+                    location: test_t_input_10_t.bas:179
                     op: =
                     lhs: 
                         VariableExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:171
+                            location: test_t_input_10_t.bas:179
                             name: "A"
                         }
                     rhs: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:171
+                            location: test_t_input_10_t.bas:179
                             value: 2.000000
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:171
+                    location: test_t_input_10_t.bas:179
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:171
+                            location: test_t_input_10_t.bas:179
                             name: "ZX81BAS20WHILEEND"
                         }
                 }
@@ -2733,42 +3033,42 @@ Prog {
             ]
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:172
+            location: test_t_input_10_t.bas:180
             label: "ZX81BAS21WHILESTART"
         }
         IfStmt {
-            location: test_t_input_10_t.bas:172
+            location: test_t_input_10_t.bas:180
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:172
+                    location: test_t_input_10_t.bas:180
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:172
+                            location: test_t_input_10_t.bas:180
                             op: <>
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:172
+                                    location: test_t_input_10_t.bas:180
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:172
+                                    location: test_t_input_10_t.bas:180
                                     value: 2.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:172
+                    location: test_t_input_10_t.bas:180
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:172
+                            location: test_t_input_10_t.bas:180
                             name: "ZX81BAS21WHILEEND"
                         }
                 }
@@ -2777,83 +3077,83 @@ Prog {
             ]
         }
         LetStmt {
-            location: test_t_input_10_t.bas:173
+            location: test_t_input_10_t.bas:181
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:173
+                    location: test_t_input_10_t.bas:181
                     name: "C"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:173
+                    location: test_t_input_10_t.bas:181
                     value: 3.000000
                 }
         }
         GotoStmt {
-            location: test_t_input_10_t.bas:172
+            location: test_t_input_10_t.bas:180
             target_expr: 
                 LabelLineRefExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:172
+                    location: test_t_input_10_t.bas:180
                     name: "ZX81BAS21WHILESTART"
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:172
+            location: test_t_input_10_t.bas:180
             label: "ZX81BAS21WHILEEND"
         }
         GotoStmt {
-            location: test_t_input_10_t.bas:168
+            location: test_t_input_10_t.bas:176
             target_expr: 
                 LabelLineRefExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:168
+                    location: test_t_input_10_t.bas:176
                     name: "ZX81BAS20WHILESTART"
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:168
+            location: test_t_input_10_t.bas:176
             label: "ZX81BAS20WHILEEND"
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:177
+            location: test_t_input_10_t.bas:185
             label: "ZX81BAS22WHILESTART"
         }
         IfStmt {
-            location: test_t_input_10_t.bas:177
+            location: test_t_input_10_t.bas:185
             condition: 
                 UnaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:177
+                    location: test_t_input_10_t.bas:185
                     op: NOT
                     operand: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:177
+                            location: test_t_input_10_t.bas:185
                             op: <>
                             lhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:177
+                                    location: test_t_input_10_t.bas:185
                                     name: "A"
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:177
+                                    location: test_t_input_10_t.bas:185
                                     value: 2.000000
                                 }
                         }
                 }
             then_stmts: [
                 GotoStmt {
-                    location: test_t_input_10_t.bas:177
+                    location: test_t_input_10_t.bas:185
                     target_expr: 
                         LabelLineRefExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:177
+                            location: test_t_input_10_t.bas:185
                             name: "ZX81BAS22WHILEEND"
                         }
                 }
@@ -2862,317 +3162,90 @@ Prog {
             ]
         }
         LetStmt {
-            location: test_t_input_10_t.bas:178
+            location: test_t_input_10_t.bas:186
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:178
+                    location: test_t_input_10_t.bas:186
                     name: "C"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:178
+                    location: test_t_input_10_t.bas:186
                     value: 3.000000
                 }
         }
         GotoStmt {
-            location: test_t_input_10_t.bas:177
+            location: test_t_input_10_t.bas:185
             target_expr: 
                 LabelLineRefExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:177
+                    location: test_t_input_10_t.bas:185
                     name: "ZX81BAS22WHILESTART"
                 }
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:177
+            location: test_t_input_10_t.bas:185
             label: "ZX81BAS22WHILEEND"
         }
         LetStmt {
-            location: test_t_input_10_t.bas:178
+            location: test_t_input_10_t.bas:186
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:178
+                    location: test_t_input_10_t.bas:186
                     name: "C"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:178
+                    location: test_t_input_10_t.bas:186
                     value: 4.000000
                 }
         }
         LetStmt {
-            location: test_t_input_10_t.bas:184
+            location: test_t_input_10_t.bas:192
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:184
+                    location: test_t_input_10_t.bas:192
                     name: "S"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:184
+                    location: test_t_input_10_t.bas:192
                     value: 0.000000
                 }
         }
         ForStmt {
-            location: test_t_input_10_t.bas:185
+            location: test_t_input_10_t.bas:193
             name: "I"
             start_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:185
+                    location: test_t_input_10_t.bas:193
                     value: 1.000000
                 }
             end_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:185
+                    location: test_t_input_10_t.bas:193
                     value: 10.000000
                 }
             step_expr: 
                 BasicFuncCallExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:185
+                    location: test_t_input_10_t.bas:193
                     keyword: "SGN"
                     args: [
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:185
+                            location: test_t_input_10_t.bas:193
                             value: 1.000000
                         }
                     ]
-                }
-            body: [
-            ]
-        }
-        LetStmt {
-            location: test_t_input_10_t.bas:185
-            lhs: 
-                VariableExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:185
-                    name: "S"
-                }
-            rhs: 
-                BinaryExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:185
-                    op: +
-                    lhs: 
-                        VariableExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:185
-                            name: "S"
-                        }
-                    rhs: 
-                        VariableExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:185
-                            name: "I"
-                        }
-                }
-        }
-        NextStmt {
-            location: test_t_input_10_t.bas:185
-            name: "I"
-        }
-        LabelStmt {
-            location: test_t_input_10_t.bas:185
-            label: "ZX81BAS23FOREND"
-        }
-        ForStmt {
-            location: test_t_input_10_t.bas:187
-            name: "I"
-            start_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:187
-                    value: 1.000000
-                }
-            end_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:187
-                    value: 10.000000
-                }
-            step_expr: 
-                null
-            body: [
-            ]
-        }
-        ForStmt {
-            location: test_t_input_10_t.bas:187
-            name: "J"
-            start_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:187
-                    value: 1.000000
-                }
-            end_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:187
-                    value: 10.000000
-                }
-            step_expr: 
-                null
-            body: [
-            ]
-        }
-        LetStmt {
-            location: test_t_input_10_t.bas:187
-            lhs: 
-                VariableExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:187
-                    name: "A"
-                }
-            rhs: 
-                BinaryExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:187
-                    op: *
-                    lhs: 
-                        VariableExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:187
-                            name: "I"
-                        }
-                    rhs: 
-                        VariableExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:187
-                            name: "J"
-                        }
-                }
-        }
-        NextStmt {
-            location: test_t_input_10_t.bas:187
-            name: "J"
-        }
-        LabelStmt {
-            location: test_t_input_10_t.bas:187
-            label: "ZX81BAS25FOREND"
-        }
-        NextStmt {
-            location: test_t_input_10_t.bas:187
-            name: "I"
-        }
-        LabelStmt {
-            location: test_t_input_10_t.bas:187
-            label: "ZX81BAS24FOREND"
-        }
-        ForStmt {
-            location: test_t_input_10_t.bas:189
-            name: "I"
-            start_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:189
-                    value: 1.000000
-                }
-            end_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:189
-                    value: 10.000000
-                }
-            step_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:189
-                    value: 2.000000
-                }
-            body: [
-            ]
-        }
-        LetStmt {
-            location: test_t_input_10_t.bas:190
-            lhs: 
-                VariableExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:190
-                    name: "S"
-                }
-            rhs: 
-                BinaryExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:190
-                    op: +
-                    lhs: 
-                        VariableExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:190
-                            name: "S"
-                        }
-                    rhs: 
-                        VariableExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:190
-                            name: "I"
-                        }
-                }
-        }
-        IfStmt {
-            location: test_t_input_10_t.bas:191
-            condition: 
-                BinaryExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:191
-                    op: =
-                    lhs: 
-                        VariableExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:191
-                            name: "I"
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:191
-                            value: 2.000000
-                        }
-                }
-            then_stmts: [
-                GotoStmt {
-                    location: test_t_input_10_t.bas:191
-                    target_expr: 
-                        LabelLineRefExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:191
-                            name: "ZX81BAS26FOREND"
-                        }
-                }
-            ]
-            else_stmts: [
-            ]
-        }
-        ForStmt {
-            location: test_t_input_10_t.bas:192
-            name: "J"
-            start_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:192
-                    value: 1.000000
-                }
-            end_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:192
-                    value: 10.000000
-                }
-            step_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:192
-                    value: 2.000000
                 }
             body: [
             ]
@@ -3183,56 +3256,48 @@ Prog {
                 VariableExpr {
                     type: Number
                     location: test_t_input_10_t.bas:193
-                    name: "A"
+                    name: "S"
                 }
             rhs: 
                 BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:193
-                    op: *
+                    op: +
                     lhs: 
                         VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:193
-                            name: "I"
+                            name: "S"
                         }
                     rhs: 
                         VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:193
-                            name: "J"
+                            name: "I"
                         }
                 }
         }
         NextStmt {
-            location: test_t_input_10_t.bas:192
-            name: "J"
-        }
-        LabelStmt {
-            location: test_t_input_10_t.bas:192
-            label: "ZX81BAS27FOREND"
-        }
-        NextStmt {
-            location: test_t_input_10_t.bas:189
+            location: test_t_input_10_t.bas:193
             name: "I"
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:189
-            label: "ZX81BAS26FOREND"
+            location: test_t_input_10_t.bas:193
+            label: "ZX81BAS23FOREND"
         }
         ForStmt {
-            location: test_t_input_10_t.bas:197
+            location: test_t_input_10_t.bas:195
             name: "I"
             start_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:197
+                    location: test_t_input_10_t.bas:195
                     value: 1.000000
                 }
             end_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:197
+                    location: test_t_input_10_t.bas:195
                     value: 10.000000
                 }
             step_expr: 
@@ -3241,18 +3306,18 @@ Prog {
             ]
         }
         ForStmt {
-            location: test_t_input_10_t.bas:197
+            location: test_t_input_10_t.bas:195
             name: "J"
             start_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:197
+                    location: test_t_input_10_t.bas:195
                     value: 1.000000
                 }
             end_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:197
+                    location: test_t_input_10_t.bas:195
                     value: 10.000000
                 }
             step_expr: 
@@ -3261,70 +3326,131 @@ Prog {
             ]
         }
         LetStmt {
-            location: test_t_input_10_t.bas:197
+            location: test_t_input_10_t.bas:195
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:197
+                    location: test_t_input_10_t.bas:195
                     name: "A"
                 }
             rhs: 
                 BinaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:197
+                    location: test_t_input_10_t.bas:195
                     op: *
                     lhs: 
                         VariableExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:197
+                            location: test_t_input_10_t.bas:195
                             name: "I"
                         }
                     rhs: 
                         VariableExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:197
+                            location: test_t_input_10_t.bas:195
                             name: "J"
                         }
                 }
         }
         NextStmt {
-            location: test_t_input_10_t.bas:197
+            location: test_t_input_10_t.bas:195
             name: "J"
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:197
-            label: "ZX81BAS29FOREND"
+            location: test_t_input_10_t.bas:195
+            label: "ZX81BAS25FOREND"
         }
         NextStmt {
-            location: test_t_input_10_t.bas:197
+            location: test_t_input_10_t.bas:195
             name: "I"
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:197
-            label: "ZX81BAS28FOREND"
+            location: test_t_input_10_t.bas:195
+            label: "ZX81BAS24FOREND"
         }
         ForStmt {
-            location: test_t_input_10_t.bas:199
+            location: test_t_input_10_t.bas:197
             name: "I"
             start_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:199
+                    location: test_t_input_10_t.bas:197
                     value: 1.000000
                 }
             end_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:199
+                    location: test_t_input_10_t.bas:197
                     value: 10.000000
                 }
             step_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:199
+                    location: test_t_input_10_t.bas:197
                     value: 2.000000
                 }
             body: [
+            ]
+        }
+        LetStmt {
+            location: test_t_input_10_t.bas:198
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:198
+                    name: "S"
+                }
+            rhs: 
+                BinaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:198
+                    op: +
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:198
+                            name: "S"
+                        }
+                    rhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:198
+                            name: "I"
+                        }
+                }
+        }
+        IfStmt {
+            location: test_t_input_10_t.bas:199
+            condition: 
+                BinaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:199
+                    op: =
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:199
+                            name: "I"
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:199
+                            value: 2.000000
+                        }
+                }
+            then_stmts: [
+                GotoStmt {
+                    location: test_t_input_10_t.bas:199
+                    target_expr: 
+                        LabelLineRefExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:199
+                            name: "ZX81BAS26FOREND"
+                        }
+                }
+            ]
+            else_stmts: [
             ]
         }
         ForStmt {
@@ -3384,72 +3510,195 @@ Prog {
         }
         LabelStmt {
             location: test_t_input_10_t.bas:200
-            label: "ZX81BAS31FOREND"
+            label: "ZX81BAS27FOREND"
         }
         NextStmt {
-            location: test_t_input_10_t.bas:199
+            location: test_t_input_10_t.bas:197
             name: "I"
         }
         LabelStmt {
-            location: test_t_input_10_t.bas:199
-            label: "ZX81BAS30FOREND"
+            location: test_t_input_10_t.bas:197
+            label: "ZX81BAS26FOREND"
         }
-        LineNumStmt {
+        ForStmt {
+            location: test_t_input_10_t.bas:205
+            name: "I"
+            start_expr: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:205
+                    value: 1.000000
+                }
+            end_expr: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:205
+                    value: 10.000000
+                }
+            step_expr: 
+                null
+            body: [
+            ]
+        }
+        ForStmt {
+            location: test_t_input_10_t.bas:205
+            name: "J"
+            start_expr: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:205
+                    value: 1.000000
+                }
+            end_expr: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:205
+                    value: 10.000000
+                }
+            step_expr: 
+                null
+            body: [
+            ]
+        }
+        LetStmt {
+            location: test_t_input_10_t.bas:205
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:205
+                    name: "A"
+                }
+            rhs: 
+                BinaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:205
+                    op: *
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:205
+                            name: "I"
+                        }
+                    rhs: 
+                        VariableExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:205
+                            name: "J"
+                        }
+                }
+        }
+        NextStmt {
+            location: test_t_input_10_t.bas:205
+            name: "J"
+        }
+        LabelStmt {
+            location: test_t_input_10_t.bas:205
+            label: "ZX81BAS29FOREND"
+        }
+        NextStmt {
+            location: test_t_input_10_t.bas:205
+            name: "I"
+        }
+        LabelStmt {
+            location: test_t_input_10_t.bas:205
+            label: "ZX81BAS28FOREND"
+        }
+        ForStmt {
             location: test_t_input_10_t.bas:207
-            line_num: 1000
+            name: "I"
+            start_expr: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:207
+                    value: 1.000000
+                }
+            end_expr: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:207
+                    value: 10.000000
+                }
+            step_expr: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:207
+                    value: 2.000000
+                }
+            body: [
+            ]
         }
-        GotoStmt {
+        ForStmt {
             location: test_t_input_10_t.bas:208
-            target_expr: 
+            name: "J"
+            start_expr: 
                 NumberExpr {
                     type: Number
                     location: test_t_input_10_t.bas:208
-                    value: 1000.000000
+                    value: 1.000000
                 }
+            end_expr: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:208
+                    value: 10.000000
+                }
+            step_expr: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:208
+                    value: 2.000000
+                }
+            body: [
+            ]
         }
-        GotoStmt {
+        LetStmt {
             location: test_t_input_10_t.bas:209
-            target_expr: 
+            lhs: 
+                VariableExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:209
+                    name: "A"
+                }
+            rhs: 
                 BinaryExpr {
                     type: Number
                     location: test_t_input_10_t.bas:209
-                    op: +
+                    op: *
                     lhs: 
-                        NumberExpr {
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:209
-                            value: 1000.000000
+                            name: "I"
                         }
                     rhs: 
-                        BinaryExpr {
+                        VariableExpr {
                             type: Number
                             location: test_t_input_10_t.bas:209
-                            op: *
-                            lhs: 
-                                NumberExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:209
-                                    value: 20.000000
-                                }
-                            rhs: 
-                                VariableExpr {
-                                    type: Number
-                                    location: test_t_input_10_t.bas:209
-                                    name: "A"
-                                }
+                            name: "J"
                         }
                 }
         }
-        GotoStmt {
-            location: test_t_input_10_t.bas:210
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:210
-                    name: "LABEL1"
-                }
+        NextStmt {
+            location: test_t_input_10_t.bas:208
+            name: "J"
         }
-        GosubStmt {
+        LabelStmt {
+            location: test_t_input_10_t.bas:208
+            label: "ZX81BAS31FOREND"
+        }
+        NextStmt {
+            location: test_t_input_10_t.bas:207
+            name: "I"
+        }
+        LabelStmt {
+            location: test_t_input_10_t.bas:207
+            label: "ZX81BAS30FOREND"
+        }
+        LineNumStmt {
+            location: test_t_input_10_t.bas:215
+            line_num: 1000
+        }
+        GotoStmt {
             location: test_t_input_10_t.bas:216
             target_expr: 
                 NumberExpr {
@@ -3458,7 +3707,7 @@ Prog {
                     value: 1000.000000
                 }
         }
-        GosubStmt {
+        GotoStmt {
             location: test_t_input_10_t.bas:217
             target_expr: 
                 BinaryExpr {
@@ -3491,7 +3740,7 @@ Prog {
                         }
                 }
         }
-        GosubStmt {
+        GotoStmt {
             location: test_t_input_10_t.bas:218
             target_expr: 
                 LabelLineRefExpr {
@@ -3500,273 +3749,324 @@ Prog {
                     name: "LABEL1"
                 }
         }
-        ReturnStmt {
+        GosubStmt {
             location: test_t_input_10_t.bas:224
+            target_expr: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:224
+                    value: 1000.000000
+                }
+        }
+        GosubStmt {
+            location: test_t_input_10_t.bas:225
+            target_expr: 
+                BinaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:225
+                    op: +
+                    lhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:225
+                            value: 1000.000000
+                        }
+                    rhs: 
+                        BinaryExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:225
+                            op: *
+                            lhs: 
+                                NumberExpr {
+                                    type: Number
+                                    location: test_t_input_10_t.bas:225
+                                    value: 20.000000
+                                }
+                            rhs: 
+                                VariableExpr {
+                                    type: Number
+                                    location: test_t_input_10_t.bas:225
+                                    name: "A"
+                                }
+                        }
+                }
+        }
+        GosubStmt {
+            location: test_t_input_10_t.bas:226
+            target_expr: 
+                LabelLineRefExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:226
+                    name: "LABEL1"
+                }
+        }
+        ReturnStmt {
+            location: test_t_input_10_t.bas:232
         }
         StopStmt {
-            location: test_t_input_10_t.bas:230
+            location: test_t_input_10_t.bas:238
         }
         StopStmt {
-            location: test_t_input_10_t.bas:236
+            location: test_t_input_10_t.bas:244
         }
         PrintStmt {
-            location: test_t_input_10_t.bas:242
+            location: test_t_input_10_t.bas:250
             items: [
             ]
         }
         PrintStmt {
-            location: test_t_input_10_t.bas:243
+            location: test_t_input_10_t.bas:251
             items: [
                 Comma
             ]
         }
         PrintStmt {
-            location: test_t_input_10_t.bas:244
+            location: test_t_input_10_t.bas:252
             items: [
                 Semicolon
             ]
         }
         PrintStmt {
-            location: test_t_input_10_t.bas:245
+            location: test_t_input_10_t.bas:253
             items: [
                 Expr:
                     BinaryExpr {
                         type: Number
-                        location: test_t_input_10_t.bas:245
+                        location: test_t_input_10_t.bas:253
                         op: *
                         lhs: 
                             NumberExpr {
                                 type: Number
-                                location: test_t_input_10_t.bas:245
+                                location: test_t_input_10_t.bas:253
                                 value: 2.000000
                             }
                         rhs: 
                             NumberExpr {
                                 type: Number
-                                location: test_t_input_10_t.bas:245
+                                location: test_t_input_10_t.bas:253
                                 value: 3.000000
                             }
                     }
             ]
         }
         PrintStmt {
-            location: test_t_input_10_t.bas:246
+            location: test_t_input_10_t.bas:254
             items: [
                 Tab:
                     NumberExpr {
                         type: Number
-                        location: test_t_input_10_t.bas:246
+                        location: test_t_input_10_t.bas:254
                         value: 8.000000
                     }
                 Semicolon
             ]
         }
         PrintStmt {
-            location: test_t_input_10_t.bas:247
+            location: test_t_input_10_t.bas:255
             items: [
                 At:
                     line_expr: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:247
+                            location: test_t_input_10_t.bas:255
                             value: 10.000000
                         }
                     col_expr: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:247
+                            location: test_t_input_10_t.bas:255
                             value: 10.000000
                         }
                 Semicolon
             ]
         }
         PrintStmt {
-            location: test_t_input_10_t.bas:248
+            location: test_t_input_10_t.bas:256
             items: [
                 At:
                     line_expr: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:248
+                            location: test_t_input_10_t.bas:256
                             value: 10.000000
                         }
                     col_expr: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:248
+                            location: test_t_input_10_t.bas:256
                             value: 10.000000
                         }
                 Semicolon
                 Expr:
                     StringLiteralExpr {
                         type: String
-                        location: test_t_input_10_t.bas:248
+                        location: test_t_input_10_t.bas:256
                         value: "HELLO"
                     }
                 Semicolon
                 Tab:
                     NumberExpr {
                         type: Number
-                        location: test_t_input_10_t.bas:248
+                        location: test_t_input_10_t.bas:256
                         value: 10.000000
                     }
                 Semicolon
                 Expr:
                     StringLiteralExpr {
                         type: String
-                        location: test_t_input_10_t.bas:248
+                        location: test_t_input_10_t.bas:256
                         value: "WORLD"
                     }
                 Semicolon
             ]
         }
         LPrintStmt {
-            location: test_t_input_10_t.bas:254
+            location: test_t_input_10_t.bas:262
             items: [
             ]
         }
         LPrintStmt {
-            location: test_t_input_10_t.bas:255
+            location: test_t_input_10_t.bas:263
             items: [
                 Comma
             ]
         }
         LPrintStmt {
-            location: test_t_input_10_t.bas:256
+            location: test_t_input_10_t.bas:264
             items: [
                 Semicolon
             ]
         }
         LPrintStmt {
-            location: test_t_input_10_t.bas:257
+            location: test_t_input_10_t.bas:265
             items: [
                 Expr:
                     BinaryExpr {
                         type: Number
-                        location: test_t_input_10_t.bas:257
+                        location: test_t_input_10_t.bas:265
                         op: *
                         lhs: 
                             NumberExpr {
                                 type: Number
-                                location: test_t_input_10_t.bas:257
+                                location: test_t_input_10_t.bas:265
                                 value: 2.000000
                             }
                         rhs: 
                             NumberExpr {
                                 type: Number
-                                location: test_t_input_10_t.bas:257
+                                location: test_t_input_10_t.bas:265
                                 value: 3.000000
                             }
                     }
             ]
         }
         LPrintStmt {
-            location: test_t_input_10_t.bas:258
+            location: test_t_input_10_t.bas:266
             items: [
                 Tab:
                     NumberExpr {
                         type: Number
-                        location: test_t_input_10_t.bas:258
+                        location: test_t_input_10_t.bas:266
                         value: 8.000000
                     }
                 Semicolon
             ]
         }
         LPrintStmt {
-            location: test_t_input_10_t.bas:259
+            location: test_t_input_10_t.bas:267
             items: [
                 At:
                     line_expr: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:259
+                            location: test_t_input_10_t.bas:267
                             value: 10.000000
                         }
                     col_expr: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:259
+                            location: test_t_input_10_t.bas:267
                             value: 10.000000
                         }
                 Semicolon
             ]
         }
         LPrintStmt {
-            location: test_t_input_10_t.bas:260
+            location: test_t_input_10_t.bas:268
             items: [
                 At:
                     line_expr: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:260
+                            location: test_t_input_10_t.bas:268
                             value: 10.000000
                         }
                     col_expr: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:260
+                            location: test_t_input_10_t.bas:268
                             value: 10.000000
                         }
                 Semicolon
                 Expr:
                     StringLiteralExpr {
                         type: String
-                        location: test_t_input_10_t.bas:260
+                        location: test_t_input_10_t.bas:268
                         value: "HELLO"
                     }
                 Semicolon
                 Tab:
                     NumberExpr {
                         type: Number
-                        location: test_t_input_10_t.bas:260
+                        location: test_t_input_10_t.bas:268
                         value: 10.000000
                     }
                 Semicolon
                 Expr:
                     StringLiteralExpr {
                         type: String
-                        location: test_t_input_10_t.bas:260
+                        location: test_t_input_10_t.bas:268
                         value: "WORLD"
                     }
                 Semicolon
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:266
+            location: test_t_input_10_t.bas:274
             vars: [
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:266
+                    location: test_t_input_10_t.bas:274
                     name: "A"
                 }
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:266
+            location: test_t_input_10_t.bas:274
             vars: [
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:266
+                    location: test_t_input_10_t.bas:274
                     name: "ABC"
                 }
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:267
+            location: test_t_input_10_t.bas:275
             vars: [
                 ArrayRefExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:267
+                    location: test_t_input_10_t.bas:275
                     name: "A"
                     indices: [
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:267
+                            location: test_t_input_10_t.bas:275
                             value: 1.000000
                         }
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:267
+                            location: test_t_input_10_t.bas:275
                             value: 2.000000
                         }
                     ]
@@ -3774,31 +4074,31 @@ Prog {
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:268
+            location: test_t_input_10_t.bas:276
             vars: [
                 VariableExpr {
                     type: String
-                    location: test_t_input_10_t.bas:268
+                    location: test_t_input_10_t.bas:276
                     name: "A$"
                 }
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:269
+            location: test_t_input_10_t.bas:277
             vars: [
                 ArrayRefExpr {
                     type: String
-                    location: test_t_input_10_t.bas:269
+                    location: test_t_input_10_t.bas:277
                     name: "A$"
                     indices: [
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:269
+                            location: test_t_input_10_t.bas:277
                             value: 1.000000
                         }
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:269
+                            location: test_t_input_10_t.bas:277
                             value: 2.000000
                         }
                     ]
@@ -3806,52 +4106,52 @@ Prog {
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:270
+            location: test_t_input_10_t.bas:278
             vars: [
                 SliceExpr {
                     type: String
-                    location: test_t_input_10_t.bas:270
+                    location: test_t_input_10_t.bas:278
                     base: 
                         VariableExpr {
                             type: String
-                            location: test_t_input_10_t.bas:270
+                            location: test_t_input_10_t.bas:278
                             name: "A$"
                         }
                     from: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:270
+                            location: test_t_input_10_t.bas:278
                             value: 1.000000
                         }
                     to: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:270
+                            location: test_t_input_10_t.bas:278
                             value: 2.000000
                         }
                 }
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:271
+            location: test_t_input_10_t.bas:279
             vars: [
                 SliceExpr {
                     type: String
-                    location: test_t_input_10_t.bas:271
+                    location: test_t_input_10_t.bas:279
                     base: 
                         ArrayRefExpr {
                             type: String
-                            location: test_t_input_10_t.bas:271
+                            location: test_t_input_10_t.bas:279
                             name: "A$"
                             indices: [
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:271
+                                    location: test_t_input_10_t.bas:279
                                     value: 1.000000
                                 }
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:271
+                                    location: test_t_input_10_t.bas:279
                                     value: 2.000000
                                 }
                             ]
@@ -3859,28 +4159,28 @@ Prog {
                     from: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:271
+                            location: test_t_input_10_t.bas:279
                             value: 3.000000
                         }
                     to: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:271
+                            location: test_t_input_10_t.bas:279
                             value: 4.000000
                         }
                 }
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:272
+            location: test_t_input_10_t.bas:280
             vars: [
                 SliceExpr {
                     type: String
-                    location: test_t_input_10_t.bas:272
+                    location: test_t_input_10_t.bas:280
                     base: 
                         VariableExpr {
                             type: String
-                            location: test_t_input_10_t.bas:272
+                            location: test_t_input_10_t.bas:280
                             name: "A$"
                         }
                     from: 
@@ -3888,28 +4188,28 @@ Prog {
                     to: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:272
+                            location: test_t_input_10_t.bas:280
                             value: 3.000000
                         }
                 }
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:273
+            location: test_t_input_10_t.bas:281
             vars: [
                 SliceExpr {
                     type: String
-                    location: test_t_input_10_t.bas:273
+                    location: test_t_input_10_t.bas:281
                     base: 
                         VariableExpr {
                             type: String
-                            location: test_t_input_10_t.bas:273
+                            location: test_t_input_10_t.bas:281
                             name: "A$"
                         }
                     from: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:273
+                            location: test_t_input_10_t.bas:281
                             value: 2.000000
                         }
                     to: 
@@ -3918,46 +4218,46 @@ Prog {
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:274
+            location: test_t_input_10_t.bas:282
             vars: [
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:274
+                    location: test_t_input_10_t.bas:282
                     name: "A"
                 }
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:274
+            location: test_t_input_10_t.bas:282
             vars: [
                 VariableExpr {
                     type: String
-                    location: test_t_input_10_t.bas:274
+                    location: test_t_input_10_t.bas:282
                     name: "A$"
                 }
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:275
+            location: test_t_input_10_t.bas:283
             vars: [
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:275
+                    location: test_t_input_10_t.bas:283
                     name: "I1"
                 }
             ]
         }
         InputStmt {
-            location: test_t_input_10_t.bas:275
+            location: test_t_input_10_t.bas:283
             vars: [
                 ArrayRefExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:275
+                    location: test_t_input_10_t.bas:283
                     name: "I"
                     indices: [
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:275
+                            location: test_t_input_10_t.bas:283
                             value: 10.000000
                         }
                     ]
@@ -3965,13 +4265,13 @@ Prog {
             ]
         }
         RemStmt {
-            location: test_t_input_10_t.bas:281
+            location: test_t_input_10_t.bas:289
             text: ""
             asm: [
             ]
         }
         RemStmt {
-            location: test_t_input_10_t.bas:282
+            location: test_t_input_10_t.bas:290
             text: "COMMENT TEXT : COLONS ARE PART OF COMMENT"
             asm: [
                 	START_REM:
@@ -3979,150 +4279,150 @@ Prog {
             ]
         }
         RunStmt {
-            location: test_t_input_10_t.bas:295
+            location: test_t_input_10_t.bas:303
             target_expr: 
                 null
         }
         RunStmt {
-            location: test_t_input_10_t.bas:296
+            location: test_t_input_10_t.bas:304
             target_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:296
+                    location: test_t_input_10_t.bas:304
                     value: 1000.000000
                 }
         }
         RunStmt {
-            location: test_t_input_10_t.bas:297
+            location: test_t_input_10_t.bas:305
             target_expr: 
                 BinaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:297
+                    location: test_t_input_10_t.bas:305
                     op: +
                     lhs: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:297
+                            location: test_t_input_10_t.bas:305
                             value: 1000.000000
                         }
                     rhs: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:297
+                            location: test_t_input_10_t.bas:305
                             op: *
                             lhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:297
+                                    location: test_t_input_10_t.bas:305
                                     value: 20.000000
                                 }
                             rhs: 
                                 VariableExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:297
+                                    location: test_t_input_10_t.bas:305
                                     name: "A"
                                 }
                         }
                 }
         }
         RunStmt {
-            location: test_t_input_10_t.bas:298
+            location: test_t_input_10_t.bas:306
             target_expr: 
                 LabelLineRefExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:298
+                    location: test_t_input_10_t.bas:306
                     name: "LABEL1"
                 }
         }
         NewStmt {
-            location: test_t_input_10_t.bas:304
+            location: test_t_input_10_t.bas:312
         }
         ClsStmt {
-            location: test_t_input_10_t.bas:310
+            location: test_t_input_10_t.bas:318
         }
         LoadStmt {
-            location: test_t_input_10_t.bas:316
+            location: test_t_input_10_t.bas:324
             filename_expr: 
                 StringLiteralExpr {
                     type: String
-                    location: test_t_input_10_t.bas:316
+                    location: test_t_input_10_t.bas:324
                     value: "file"
                 }
         }
         SaveStmt {
-            location: test_t_input_10_t.bas:322
+            location: test_t_input_10_t.bas:330
             filename_expr: 
                 StringLiteralExpr {
                     type: String
-                    location: test_t_input_10_t.bas:322
+                    location: test_t_input_10_t.bas:330
                     value: "file"
                 }
         }
         PokeStmt {
-            location: test_t_input_10_t.bas:328
+            location: test_t_input_10_t.bas:336
             address: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:328
+                    location: test_t_input_10_t.bas:336
                     value: 16384.000000
                 }
             value: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:328
+                    location: test_t_input_10_t.bas:336
                     value: 255.000000
                 }
         }
         PokeStmt {
-            location: test_t_input_10_t.bas:334
+            location: test_t_input_10_t.bas:342
             address: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:334
+                    location: test_t_input_10_t.bas:342
                     value: 16384.000000
                 }
             value: 
                 BinaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:334
+                    location: test_t_input_10_t.bas:342
                     op: -
                     lhs: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:334
+                            location: test_t_input_10_t.bas:342
                             value: 258.000000
                         }
                     rhs: 
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:334
+                            location: test_t_input_10_t.bas:342
                             op: *
                             lhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:334
+                                    location: test_t_input_10_t.bas:342
                                     value: 256.000000
                                 }
                             rhs: 
                                 BasicFuncCallExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:334
+                                    location: test_t_input_10_t.bas:342
                                     keyword: "INT"
                                     args: [
                                         BinaryExpr {
                                             type: Number
-                                            location: test_t_input_10_t.bas:334
+                                            location: test_t_input_10_t.bas:342
                                             op: /
                                             lhs: 
                                                 NumberExpr {
                                                     type: Number
-                                                    location: test_t_input_10_t.bas:334
+                                                    location: test_t_input_10_t.bas:342
                                                     value: 258.000000
                                                 }
                                             rhs: 
                                                 NumberExpr {
                                                     type: Number
-                                                    location: test_t_input_10_t.bas:334
+                                                    location: test_t_input_10_t.bas:342
                                                     value: 256.000000
                                                 }
                                         }
@@ -4132,45 +4432,45 @@ Prog {
                 }
         }
         PokeStmt {
-            location: test_t_input_10_t.bas:334
+            location: test_t_input_10_t.bas:342
             address: 
                 BinaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:334
+                    location: test_t_input_10_t.bas:342
                     op: +
                     lhs: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:334
+                            location: test_t_input_10_t.bas:342
                             value: 16384.000000
                         }
                     rhs: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:334
+                            location: test_t_input_10_t.bas:342
                             value: 1.000000
                         }
                 }
             value: 
                 BasicFuncCallExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:334
+                    location: test_t_input_10_t.bas:342
                     keyword: "INT"
                     args: [
                         BinaryExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:334
+                            location: test_t_input_10_t.bas:342
                             op: /
                             lhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:334
+                                    location: test_t_input_10_t.bas:342
                                     value: 258.000000
                                 }
                             rhs: 
                                 NumberExpr {
                                     type: Number
-                                    location: test_t_input_10_t.bas:334
+                                    location: test_t_input_10_t.bas:342
                                     value: 256.000000
                                 }
                         }
@@ -4178,225 +4478,225 @@ Prog {
                 }
         }
         RandStmt {
-            location: test_t_input_10_t.bas:340
+            location: test_t_input_10_t.bas:348
             seed: 
                 BasicFuncCallExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:340
+                    location: test_t_input_10_t.bas:348
                     keyword: "USR"
                     args: [
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:340
+                            location: test_t_input_10_t.bas:348
                             value: 16514.000000
                         }
                     ]
                 }
         }
         PauseStmt {
-            location: test_t_input_10_t.bas:346
+            location: test_t_input_10_t.bas:354
             duration: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:346
+                    location: test_t_input_10_t.bas:354
                     value: 50.000000
                 }
         }
         FastStmt {
-            location: test_t_input_10_t.bas:352
+            location: test_t_input_10_t.bas:360
         }
         SlowStmt {
-            location: test_t_input_10_t.bas:358
+            location: test_t_input_10_t.bas:366
         }
         ListStmt {
-            location: test_t_input_10_t.bas:364
+            location: test_t_input_10_t.bas:372
             target_expr: 
                 null
         }
         ListStmt {
-            location: test_t_input_10_t.bas:365
-            target_expr: 
-                NumberExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:365
-                    value: 10.000000
-                }
-        }
-        ListStmt {
-            location: test_t_input_10_t.bas:366
-            target_expr: 
-                BinaryExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:366
-                    op: *
-                    lhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:366
-                            value: 10.000000
-                        }
-                    rhs: 
-                        NumberExpr {
-                            type: Number
-                            location: test_t_input_10_t.bas:366
-                            value: 4.000000
-                        }
-                }
-        }
-        ListStmt {
-            location: test_t_input_10_t.bas:367
-            target_expr: 
-                LabelLineRefExpr {
-                    type: Number
-                    location: test_t_input_10_t.bas:367
-                    name: "LABEL1"
-                }
-        }
-        LListStmt {
             location: test_t_input_10_t.bas:373
             target_expr: 
-                null
-        }
-        LListStmt {
-            location: test_t_input_10_t.bas:374
-            target_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:374
+                    location: test_t_input_10_t.bas:373
                     value: 10.000000
                 }
         }
-        LListStmt {
-            location: test_t_input_10_t.bas:375
+        ListStmt {
+            location: test_t_input_10_t.bas:374
             target_expr: 
                 BinaryExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:375
+                    location: test_t_input_10_t.bas:374
                     op: *
                     lhs: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:375
+                            location: test_t_input_10_t.bas:374
                             value: 10.000000
                         }
                     rhs: 
                         NumberExpr {
                             type: Number
-                            location: test_t_input_10_t.bas:375
+                            location: test_t_input_10_t.bas:374
+                            value: 4.000000
+                        }
+                }
+        }
+        ListStmt {
+            location: test_t_input_10_t.bas:375
+            target_expr: 
+                LabelLineRefExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:375
+                    name: "LABEL1"
+                }
+        }
+        LListStmt {
+            location: test_t_input_10_t.bas:381
+            target_expr: 
+                null
+        }
+        LListStmt {
+            location: test_t_input_10_t.bas:382
+            target_expr: 
+                NumberExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:382
+                    value: 10.000000
+                }
+        }
+        LListStmt {
+            location: test_t_input_10_t.bas:383
+            target_expr: 
+                BinaryExpr {
+                    type: Number
+                    location: test_t_input_10_t.bas:383
+                    op: *
+                    lhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:383
+                            value: 10.000000
+                        }
+                    rhs: 
+                        NumberExpr {
+                            type: Number
+                            location: test_t_input_10_t.bas:383
                             value: 4.000000
                         }
                 }
         }
         LListStmt {
-            location: test_t_input_10_t.bas:376
+            location: test_t_input_10_t.bas:384
             target_expr: 
                 LabelLineRefExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:376
+                    location: test_t_input_10_t.bas:384
                     name: "LABEL1"
                 }
         }
         LetStmt {
-            location: test_t_input_10_t.bas:382
+            location: test_t_input_10_t.bas:390
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:382
+                    location: test_t_input_10_t.bas:390
                     name: "X"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:382
+                    location: test_t_input_10_t.bas:390
                     value: 0.000000
                 }
         }
         LetStmt {
-            location: test_t_input_10_t.bas:382
+            location: test_t_input_10_t.bas:390
             lhs: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:382
+                    location: test_t_input_10_t.bas:390
                     name: "Y"
                 }
             rhs: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:382
+                    location: test_t_input_10_t.bas:390
                     value: 0.000000
                 }
         }
         PlotStmt {
-            location: test_t_input_10_t.bas:383
+            location: test_t_input_10_t.bas:391
             x_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:383
+                    location: test_t_input_10_t.bas:391
                     value: 0.000000
                 }
             y_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:383
+                    location: test_t_input_10_t.bas:391
                     value: 1.000000
                 }
         }
         PlotStmt {
-            location: test_t_input_10_t.bas:384
+            location: test_t_input_10_t.bas:392
             x_expr: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:384
+                    location: test_t_input_10_t.bas:392
                     name: "X"
                 }
             y_expr: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:384
+                    location: test_t_input_10_t.bas:392
                     name: "Y"
                 }
         }
         UnplotStmt {
-            location: test_t_input_10_t.bas:390
+            location: test_t_input_10_t.bas:398
             x_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:390
+                    location: test_t_input_10_t.bas:398
                     value: 0.000000
                 }
             y_expr: 
                 NumberExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:390
+                    location: test_t_input_10_t.bas:398
                     value: 1.000000
                 }
         }
         UnplotStmt {
-            location: test_t_input_10_t.bas:391
+            location: test_t_input_10_t.bas:399
             x_expr: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:391
+                    location: test_t_input_10_t.bas:399
                     name: "X"
                 }
             y_expr: 
                 VariableExpr {
                     type: Number
-                    location: test_t_input_10_t.bas:391
+                    location: test_t_input_10_t.bas:399
                     name: "Y"
                 }
         }
         ScrollStmt {
-            location: test_t_input_10_t.bas:397
+            location: test_t_input_10_t.bas:405
         }
         ContStmt {
-            location: test_t_input_10_t.bas:403
+            location: test_t_input_10_t.bas:411
         }
         ClearStmt {
-            location: test_t_input_10_t.bas:409
+            location: test_t_input_10_t.bas:417
         }
         CopyStmt {
-            location: test_t_input_10_t.bas:415
+            location: test_t_input_10_t.bas:423
         }
     ]
     pragma_vars: [

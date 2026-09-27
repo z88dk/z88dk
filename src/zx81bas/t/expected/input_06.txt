@@ -26,22 +26,22 @@ Symtab {
             location: test_t_input_06_t.bas:118
         }
         "I" {
-            location: test_t_input_06_t.bas:185
+            location: test_t_input_06_t.bas:193
         }
         "I1" {
-            location: test_t_input_06_t.bas:275
+            location: test_t_input_06_t.bas:283
         }
         "J" {
-            location: test_t_input_06_t.bas:187
+            location: test_t_input_06_t.bas:195
         }
         "S" {
-            location: test_t_input_06_t.bas:184
+            location: test_t_input_06_t.bas:192
         }
         "X" {
-            location: test_t_input_06_t.bas:382
+            location: test_t_input_06_t.bas:390
         }
         "Y" {
-            location: test_t_input_06_t.bas:382
+            location: test_t_input_06_t.bas:390
         }
     ]
     arrays: [
@@ -64,7 +64,7 @@ Symtab {
             location: test_t_input_06_t.bas:107
         }
         "I" {
-            location: test_t_input_06_t.bas:275
+            location: test_t_input_06_t.bas:283
         }
     ]
     procs: [
@@ -82,7 +82,7 @@ Symtab {
             location: test_t_input_06_t.bas:67
         }
         "START_REM" {
-            location: test_t_input_06_t.bas:284
+            location: test_t_input_06_t.bas:292
         }
     ]
     line_nums: [
@@ -96,7 +96,7 @@ Symtab {
             location: test_t_input_06_t.bas:67
         }
         1000 {
-            location: test_t_input_06_t.bas:207
+            location: test_t_input_06_t.bas:215
         }
     ]
 }

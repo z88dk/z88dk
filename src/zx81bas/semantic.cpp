@@ -191,6 +191,7 @@ struct ExprTypeChecker : ASTVisitor {
         switch (expr.op) {
         case TokenType::Plus:
             // Plus operator can be used for both numbers and strings
+            expr.type = expr.lhs->type;
             break;
         case TokenType::Minus:
         case TokenType::Multiply:
@@ -201,12 +202,14 @@ struct ExprTypeChecker : ASTVisitor {
             if (expr.lhs->type != ExprType::Number) {
                 error(expr.loc, "Binary arithmetic operators require number operands");
             }
+            expr.type = ExprType::Number;
             break;
         case TokenType::AND:
         case TokenType::OR:
             if (expr.lhs->type != ExprType::Number) {
                 error(expr.loc, "Binary logical operators require number operands");
             }
+            expr.type = ExprType::Number;
             break;
         case TokenType::Equal:
         case TokenType::NotEqual:
@@ -215,12 +218,12 @@ struct ExprTypeChecker : ASTVisitor {
         case TokenType::Greater:
         case TokenType::GreaterEqual:
             // Comparison operators can be used for both numbers and strings
+            expr.type = ExprType::Number;  // comparison operators return a number (0 or 1)
             break;
         default:
             release_assert(0);  // error already reported in parser
             break;
         }
-        expr.type = expr.lhs->type;
     }
 
     void leave(BasicFuncCallExpr& expr) override {

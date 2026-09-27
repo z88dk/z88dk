@@ -373,7 +373,14 @@ BinaryExpr::BinaryExpr(TokenType op_,
                        ExprPtr rhs_, SourceLoc loc_)
     : Expr(lhs_->type, loc_), op(op_),
       lhs(std::move(lhs_)),
-      rhs(std::move(rhs_)) {}
+      rhs(std::move(rhs_)) {
+    // normally type is same as lhs, except for comparisons
+    if (op == TokenType::Equal || op == TokenType::NotEqual ||
+            op == TokenType::Less || op == TokenType::LessEqual ||
+            op == TokenType::Greater || op == TokenType::GreaterEqual) {
+        type = ExprType::Number;
+    }
+}
 
 ExprPtr BinaryExpr::clone() const {
     return make_node<BinaryExpr>(op, lhs->clone(), rhs->clone(), loc);

@@ -134,6 +134,14 @@ Contents of test_t_input_02_t.i:
 	IF A>=1 THEN B=2:C=3 ELSE D=4:E=5
 	IF NOT (A=1) THEN B=2 ELSE IF A=2 THEN B=2 ELSE B=3
 
+	IF INKEY$="" THEN B=2
+	IF INKEY$<>"" THEN B=2
+	IF INKEY$<"" THEN B=2
+	IF INKEY$<="" THEN B=2
+	IF INKEY$>"" THEN B=2
+	IF INKEY$>="" THEN B=2
+	IF NOT (INKEY$="") THEN B=2
+
 	IF A=1 THEN
 		B=1
 		C=1
