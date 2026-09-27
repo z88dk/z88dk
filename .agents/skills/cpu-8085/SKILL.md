@@ -151,7 +151,7 @@ These are **not** standard Z80 opcodes at those encodings (Z80 uses `CB`/`DD`/`E
 
 | Group | Flags | Notes |
 |-------|-------|-------|
-| `inc`/`dec` **16-bit** (`inc bc` … `dec sp`) | `--K----` | Only **K** changes |
+| `inc`/`dec` **16-bit** (`inc bc` … `dec sp`) | `--K----` | Only **K** changes. K sets on the rollover from 0 to `$FFFF`, not when the result is 0. Z is not written |
 | `inc`/`dec` **8-bit** (incl. `(hl)`) | `SZKAPV-` | All but **C** |
 | `rlca` / `rla` | `-----VC` | V and C |
 | `rrca` / `rra` | `-----0C` | **V forced 0** |
@@ -238,7 +238,7 @@ Background: [8085 Software — Extended Instructions](https://feilipu.me/2021/09
 | `sub hl,bc` | 16-bit subtract; **== / !=**; signed order **K**; unsigned order **C** | **No borrow-in**; not multi-word subtract chains. Use K/C **immediately**; do not mix |
 | `sra hl` | Signed 16-bit arithmetic right shift | V←0; C ← old bit 0; **Z unchanged** — never `sra hl; jp z` |
 | `rl de` | Rotate DE left through C; ×2 on DE; 32-bit with HL | **Z unchanged** — never `rl de; jp z`. Pair with `add hl,hl` |
-| `jp k,**` / `jp nk,**` | After 16-bit `dec`; signed compare outcomes | K after `dec rp` sets on **−1**, not on **0** |
+| `jp k,**` / `jp nk,**` | After 16-bit `dec`; signed compare outcomes | K after `dec rp` sets on rollover 0→`$FFFF`, not on **0** |
 | `rst v` | Branch to handler if V set | Vector **0040h** must exist |
 
 ## Core formulations
@@ -361,25 +361,21 @@ is **signed** (K or Z), not C.
 
 For multi-word subtract **with borrow**, use **`sub` / `sbc` through A**, not `sub hl,bc`.
 
-### 5. Counted loops — K and pre-decrement
+### 5. Counted loops — two forms, both valid
 
-16-bit **`dec bc` / `dec de` / `dec hl` / `dec sp`** update **K** (not Z as the loop signal).
+16-bit **`dec bc` / `dec de` / `dec hl` / `dec sp`** update **K** only. K sets when the pair rolls from **0 to `$FFFF`**. It is not a zero flag, and this `dec` does not write Z. Do not copy Z80 `dec bc; jp nz`. **C `n--` / `--i == 0` is not `jp k` / `jp nk`.** Those C loops test Z (`ld a,h` / `or l`) or use the nested form below.
 
-- K sets when the pair underflows to **−1**, **not** when it hits **0**
-- **Pre-decrement** the counter; branch with **`jp k` / `jp nk`**
+**Flat form.** `ld bc,N-1`, body, `dec bc`, `jp nk`. The body runs **N** times, because the trip is the rollover to `$FFFF`, not the arrival at 0. `jp k` / `jp nk` have no `jr` form.
 
 ```asm
+    ld  bc,N-1
 loop:
-    ; body
+    ; body, N times
     dec bc
-    jp  nk,loop        ; adjust sense to match your initial count
+    jp  nk,loop
 ```
 
-Do not copy Z80 `dec bc; jp nz` semantics. **C `n--` / `--i == 0` is not `jp k` / `jp nk`** (K is −1, and 16-bit `dec` does not write Z). Those C loops: test Z (`ld a,h` / `or l`) or the `dec bc` / `inc b` / `inc c` structure below.
-
-#### Alternative 16-bit counted loop structure.
-
-Alternatively 16-bit loops can be created using the **`dec bc / inc b / inc c`** set up to create inner and outer loops, using any 16 bit register pair. Typically **`bc`** would be used, as **`hl`** and **`de`** have other priority uses.
+**Nested form.** `dec bc` / `inc b` / `inc c`, then an inner `dec c` / `jp nz` and an outer `dec b` / `jp nz`. Any pair works; **`bc`** is the usual one because HL and DE have other jobs. The inner step is faster than `dec bc` / `jp nk`. The loop is larger: on 8085, `jr` is a 3-byte `jp`. The body runs **BC** times, including a count of 0 (256×256).
 
 ```asm
     dec bc
@@ -393,7 +389,9 @@ loop:
     jr  nz,loop
 ```
 
-**`jr nz` is allowed** in normal mode. Use it when the same source may also build for Z80. Strict mode: write `jp nz`. `jp k` / `jp nk` have no `jr` form (Z80 has no K).
+**`jr nz` is allowed** in normal mode when the same source may also build for Z80. Strict mode: write `jp nz`.
+
+Do not mix the setups. `inc b` / `inc c` belongs to the nested form. Putting that pair in front of a flat `jp nk` loop overcounts by 256. Dropping the `-1` on the flat form copies one byte past the range.
 
 ### 6. Multiply / divide building blocks — `rl de` + `sub hl,bc`
 
@@ -543,7 +541,7 @@ Assembler must be **8085-aware** (these encodings are not Z80 prefixes).
 
 1. **`pop af` never for function return** — F bit 3 is hardwired 0, so AF cannot hold a correct return address. Use BC/DE/HL for the return word. **`pop af` is OK only to discard** intermediate stack values when the popped data is unused. AF is also not a clean 16-bit temp (`$FFFF` → `$FFF7`).
 2. **`sub hl,bc` has no borrow-in** — multi-precision use A + `sbc`.
-3. **K ≠ Z on 16-bit dec** — pre-dec + `jp k`/`jp nk`.
+3. **K ≠ Z on 16-bit dec** — K sets on rollover 0→`$FFFF`. Flat and nested loops are both valid (§5). Do not mix their setups.
 4. **Offsets on `ld de,sp+*` / `ld de,hl+*` are unsigned.**
 5. **`rst v`** only if **0040h** is defined.
 6. **Rotates do not write Z** (pastraiser). `rla` / `rlca` / `rl de` = `-----VC`. `rra` / `rrca` / `sra hl` = `-----0C`. Never `rl de; jp z` or `sra hl; jp z`. Z80 CB `RL` / `SRA` do write Z. Test with `or a` / `and a`, or `inc r` / `dec r` / `jp z` (C kept). **`rra`×n is not logical `>> n`** (rotate-through-carry; §7).
@@ -560,7 +558,7 @@ Assembler must be **8085-aware** (these encodings are not Z80 prefixes).
 2. **`ld de,sp+*`** for stack pointers; **`ex de,hl`** forms for HL←SP+n (see §2) over `ld hl,nn`/`add hl,sp` when offset is u8.
 3. **`ld hl,(de)` / `ld (de),hl` / `ld a,(de)`** for stack traffic through DE.
 4. **`sub hl,bc`** for 16-bit == / != (Z); signed order **K**; unsigned order **C**.
-5. **K + pre-dec** only for the −1 trip identity. C counted loops: Z or `inc b`/`inc c` — not `n--` → `jp nk`.
+5. Counted loops (§5): flat `ld bc,N-1` / `jp nk`, or nested `inc b` / `inc c`. Do not mix them. Not `n--` → `jp nk`.
 6. **`rl de`** for ×2, mul/div shifts, 32-bit with HL.
 7. **`sra hl`** for signed 16-bit >>; logical multi-byte >> via A.
 8. Fall back to 8080-portable sequences only when the binary must run without 8085 extended ops.
