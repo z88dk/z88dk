@@ -4,26 +4,18 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 2026-09-25. Keep it short: when a section stops describing what is
+Last swept: 2026-09-27. Keep it short: when a section stops describing what is
 live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
 
-**START HERE: `src/80cc/HANDOVER_2026-09-25_s2.md`.** Mid-flight: pushing
-`IR_BC_STEP_CALL` (session 1's item 2 below, the call-containing case) turned
-into a bug hunt. Two real, general, pre-existing allocator bugs found AND
-FIXED this session (`spill_and_swap_unless_dead`'s missing `PR_DE` case;
-the word-DE-home confirm/reject gate not re-running after a `[home-rearb]`
-retry's fresh `ir_alloc()`), both validated clean on `long_ir` 902/902 both
-modes at default settings. A THIRD bug is precisely located but NOT fixed:
-`bytepack_pack` collides with a BC-resident pointer whose home window was
-wrongly narrowed by "tight-homes" — root cause traced to `ir_live_range()`
-or block-layout trampoline blocks, not yet which. `IR_BC_STEP_CALL` and
-`IR_BC_STEP_SCALAR` both stay opt-in/off-by-default meanwhile — the tree
-is safe, this is not a release blocker. Full trace, debug-print recipes,
-and exact next steps are in the handover — do not re-derive from git blame,
-the debug instrumentation that found all three bugs was added and removed
-within the session and won't show up in a diff.
+**START HERE: byte-scratch packing.** The remaining concrete density lead is
+the short-lived byte value that spills to a frame slot while B or D might be
+available. First add the verifier described in the task below: report B
+availability against BC tenants and D availability against DE clobbers, then
+size the lanes separately. Only a positive, pressure-aware result earns an
+opt-in prototype and the full gauntlet. Copt-engine embedding remains larger
+background work, not the next density experiment.
 
 Session 1 today (`HANDOVER_2026-09-25.md`) closed two threads cleanly:
 
@@ -42,17 +34,12 @@ Session 1 today (`HANDOVER_2026-09-25.md`) closed two threads cleanly:
    is the only piece that stays — still a fair sizing tool if a genuinely
    different angle ever shows up. Full detail + the exact byte arithmetic:
    memory `xbb-phi-gbz80-only`.
-2. **NEW, SIZED not built: a loop-carried scalar (e.g. a `while (n--)`
-   counter) round-trips through its frame slot every iteration while a
-   loop-INVARIANT value keeps the register instead** — backwards priority,
-   10 B/5 instr per iteration (`examples/console/vtstone.c`'s `rpt()`) vs.
-   sdcc's 1-byte `dec bc`. Textual probe found 23 occurrences across 7 of 28
-   real files (~230 B ceiling), but the false-positive rate (does the
-   pattern always mean a real priority mistake, or sometimes an unrelated
-   pointer-walk RMW?) and the register-pressure discount (was a register
-   actually free?) aren't checked yet — that's the session's first job, see
-   the handover for the exact next steps. Likely fix site if it sizes real:
-   `ir_alloc.c`'s proposer/arbiter cost model, not the lowerer.
+2. **Loop-carried scalar residency — REFUTED. See ADR 0100.** The two
+   diagnostic widenings, `IR_BC_STEP_SCALAR` and `IR_BC_STEP_CALL`, were
+   tested. The call-containing case required three general allocator fixes,
+   then measured −7 B net over 504 cells, with one +4 B regression. Keep the
+   gates only for diagnosis; do not reopen without a different, pressure-aware
+   cost model.
 
 **`[bc-call]` vs `__preserves_regs(b,c)` — CLOSED. See ADR 0094.** Unlike DE's
 `__preserves_regs(d,e)` (ADR 0084, inert — no in-tree callee uses it),
@@ -369,9 +356,8 @@ backward-liveness rungs hand-written until the copt-embed prototype.
 Untracked junk in this directory (not compiled): `*.bak`, `*.orig`,
 `md5_fp_push.map`, `sp_ungated.map`. Delete when convenient.
 
-**Parked task — size a byte-scratch packer, using `bitfieldbench` as
-the witness.** This is not the next action; first settle the direct-call
-`__preserves_regs(b,c)` rule above. The latest full matrix (17/9 s4; later
+**Next task — size a byte-scratch packer, using `bitfieldbench` as
+the witness.** The latest full matrix (17/9 s4; later
 entries amend only `histbench` and `predbench`) leaves `bitfieldbench` at
 4474 B / 38.34 M ticks (80cc-fp) and 4483 B / 37.95 M (80cc-sp), against XCC
 at 3991 B / 30.42 M (`-Os`) and 4103 B / 27.02 M (`-Of`) on z80. The
@@ -511,7 +497,8 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | `IR_ALLOC_PROBE` `IR_FRAMEPROBE` `IR_SHLX_PROBE` | one-line censuses inside shipped passes | on their next edit |
 | `IR_BYTEPRESS` `IR_RANGEPROBE` | inert sizings: the byte-pair opportunity by pressure, and the ranging population | they are quoted in an ADR |
 | `IR_LIVEPROBE` | liveness census; `=2` gives the verbose form | — |
-| `IR_BC_STEP_CALL` `IR_BC_STEP_SCALAR` `IR_BYTEPACK` `IR_BYTEPACK_VERIFY` `IR_SLOTWHY` `IR_WIDENOSLOT` | opt-in allocator/lowering diagnostics and sizing probes | when the associated investigation is closed |
+| `IR_BYTEPACK` `IR_BYTEPACK_VERIFY` `IR_SLOTWHY` `IR_WIDENOSLOT` | opt-in allocator/lowering diagnostics and sizing probes | when the associated investigation is closed |
+| `IR_BC_STEP_CALL` `IR_BC_STEP_SCALAR` | retained diagnostic probes for the rejected ADR 0100 experiment; not optimisation options | if the probe code is removed |
 
 `IR_RANGEPROBE` carries a warning, not just a number: its 461 was an upper bound
 over the **wrong population** — see "do not size an opportunity by counting
@@ -580,7 +567,8 @@ archive branch, and are worth promoting if anyone proposes them again:
 
 - the long/swap thesis (the gap was byte widening, not long handling)
 - the in-place `(ix±d)` byte-ALU lever — no transient load feeds an in-place ALU
-- counter-step cost discounts — refuted seven times over, in several forms
+- counter-step cost discounts — refuted seven times over, in several forms;
+  the call-containing residency attempt is now durable in ADR 0100
 - `ex de,hl` as the gbz80 gap — sized and mostly refuted
 - HL-staging as a density lever
 - ordered byte-vs-byte compares
