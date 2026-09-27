@@ -19,8 +19,6 @@ l_i64_sub:
     ld      bc,8
     ldir
     pop     de
-    ld      hl,8
-    add     hl,sp
     ld      sp,hl
-    ex      de,hl   
+    ex      de,hl
     jp      (hl)

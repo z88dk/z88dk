@@ -13,8 +13,6 @@ l_i64_add:
     ld      de,__i64_acc
     call	l_add_64_mde_mhl
     pop     de
-    ld      hl,8
-    add     hl,sp
     ld      sp,hl
     ex      de,hl
     jp      (hl)

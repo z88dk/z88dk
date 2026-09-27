@@ -9,19 +9,16 @@
 l_i64_or:
     ld      hl,2
     add     hl,sp
-    ex      de,hl
-    ld      hl,__i64_acc
+    ld      de,__i64_acc
     ld      b,8
 loop:
     ld      a,(de)
     or      (hl)
-    ld      (hl),a
+    ld      (de),a
     inc     hl
     inc     de
     djnz    loop
     pop     de
-    ld      hl,8
-    add     hl,sp
     ld      sp,hl
     ex      de,hl
     jp      (hl)
