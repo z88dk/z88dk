@@ -57,7 +57,10 @@ void load_constant(LVALUE *lval)
         else
             vllongconst(lval->const_val);
     } else if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
-        vlongconst(lval->const_val);
+        if (lval->int_const_valid)
+            vlongconst_exact((uint32_t)lval->int_const_val);
+        else
+            vlongconst(lval->const_val);
     } else if (kind_is_floating(lval->val_type) ){
         gen_load_constant_as_float(lval->const_val, lval->val_type, 0);
     } else if (kind_is_fixed(lval->val_type) ) {
@@ -201,9 +204,16 @@ static int fold_integer_exact(LVALUE *left, LVALUE *right,
 
 static void set_exact_integer_result(LVALUE *left, uint64_t value)
 {
+    unsigned bits = left->ltype && left->ltype->size > 0
+                  ? (unsigned)left->ltype->size * 8 : 64;
+    if (bits < 64)
+        value &= (UINT64_C(1) << bits) - 1;
     left->int_const_val = value;
     left->int_const_valid = 1;
-    left->const_val = (int64_t)value;
+    left->const_val = left->ltype && left->ltype->isunsigned
+                    ? (int64_t)value
+                    : (int64_t)(bits < 64 && (value & (UINT64_C(1) << (bits - 1)))
+                                ? value | (UINT64_MAX << bits) : value);
 }
 
 
@@ -295,7 +305,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             widenintegers(lval, lval2); 
             lval2->val_type = KIND_LONG;
             lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;
-            vlongconst_tostack(lval->const_val);
+            if (lval->int_const_valid)
+                vlongconst_tostack_exact((uint32_t)lval->int_const_val);
+            else
+                vlongconst_tostack(lval->const_val);
         } else {
             if ( lval2->val_type == KIND_LONGLONG ) {
                 if (lval2->int_const_valid)
@@ -305,7 +318,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 lval->val_type = KIND_LONGLONG;  
                 lval->ltype = lval->ltype->isunsigned ? type_ulonglong : type_longlong;    
             } else if ( lval2->val_type == KIND_LONG ) {
-                vlongconst_tostack(lval->const_val); 
+                if (lval2->int_const_valid)
+                    vlongconst_tostack_exact((uint32_t)lval2->int_const_val);
+                else
+                    vlongconst_tostack(lval->const_val);
                 lval->val_type = KIND_LONG;  
                 lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             } else if ( lval2->val_type == KIND_CPTR ) {
@@ -422,8 +438,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if (lval->int_const_valid && lval2->int_const_valid
                 && !kind_is_decimal(lhs_val_type)
                 && !kind_is_decimal(rhs_val_type)
-                && (integer_constant_needs_exact(lval)
-                    || integer_constant_needs_exact(lval2))
                 && fold_integer_exact(lval, lval2, oper, &exact_value)) {
                 set_exact_integer_result(lval, exact_value);
             } else if (lval->ltype->isunsigned || lval2->ltype->isunsigned ) {
@@ -593,6 +607,27 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
         rhs_val_type = lval2->val_type;
 
+        /* Fold a constant mixed integer/decimal addition before the integer
+           staging path emits a conversion.  That path used to leave an
+           unsigned long conversion in the output for a negative constant.
+           Do not use this shortcut when an integer would lose bits in the
+           host floating type; the exact value must then reach lowering. */
+        if (lval2->is_const
+            && (kind_is_decimal(lval->val_type)
+                || kind_is_decimal(lval2->val_type))
+            && (!lval->int_const_valid
+                || !integer_constant_needs_exact(lval))) {
+            if (oper == zadd)
+                lval->const_val += lval2->const_val;
+            else
+                lval->const_val -= lval2->const_val;
+            lval->val_type = KIND_DOUBLE;
+            lval->ltype = type_double;
+            clearstage(before, 0);
+            Zsp = oldsp;
+            return;
+        }
+
         if (lval->ptr_type != KIND_NONE ) {
             // LHS is a constant pointer, primary is loaded with RHS, need to scale it
             scale(lval->ptr_type, NULL);
@@ -652,7 +687,10 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long; 
             }
             if ( doconst_oper == 0 ) {
-                vlongconst_tostack(lval->const_val); 
+                if (lval->int_const_valid)
+                    vlongconst_tostack_exact((uint32_t)lval->int_const_val);
+                else
+                    vlongconst_tostack(lval->const_val);
             }
         } else {
             // LHS = integer constant, RHS = lvalue?
@@ -666,7 +704,10 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 }
             } else if ( lval2->val_type == KIND_LONG ) {
                 if ( doconst_oper == 0 ) {
-                    vlongconst_tostack(lval->const_val); 
+                    if (lval->int_const_valid)
+                        vlongconst_tostack_exact((uint32_t)lval->int_const_val);
+                    else
+                        vlongconst_tostack(lval->const_val);
                 }
                 if (!ispointer(lval->ltype)) {
                     lval->val_type = KIND_LONG;
@@ -786,8 +827,8 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     if (lval->is_const && lval2->is_const) {
         // Both operators are constant fold them
         if (lval->int_const_valid && lval2->int_const_valid
-            && (integer_constant_needs_exact(lval)
-                || integer_constant_needs_exact(lval2))) {
+            && !kind_is_decimal(lval->val_type)
+            && !kind_is_decimal(lval2->val_type)) {
             uint64_t exact_value;
             if (fold_integer_exact(lval, lval2, oper, &exact_value))
                 set_exact_integer_result(lval, exact_value);

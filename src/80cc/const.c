@@ -179,8 +179,6 @@ int number(LVALUE *lval)
         lval->val_type = KIND_LONG;
     if (value > UINT32_MAX || value < INT32_MIN) {
         lval->val_type = KIND_LONGLONG;
-        if (sizeof(long double) == sizeof(double))
-            warningfmt("limited-range", "On this host, 64 bit constants may not be correct");
     }
     /* Explicit-suffix override: `5L` keeps KIND_LONG even though
        magnitude says CHAR. */

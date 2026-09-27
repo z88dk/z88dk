@@ -188,6 +188,7 @@ int number(LVALUE *lval)
     int minus;
     int64_t k;
     int isunsigned = 0;
+    int base = 10;
 
     k = minus = 1;
     while (k) {
@@ -200,6 +201,7 @@ int number(LVALUE *lval)
         }
     }
     if (ch() == '0' && toupper(nch()) == 'X') {
+        base = 16;
         gch();
         gch();
         if (hex(ch()) == 0)
@@ -218,6 +220,7 @@ int number(LVALUE *lval)
     }
     if (ch() == '0' && toupper(nch()) == 'B') {
         int c;
+        base = 2;
         gch();
         gch();
         if (ch() != '0' && ch() != '1')
@@ -232,6 +235,7 @@ int number(LVALUE *lval)
         goto typecheck;
     }
     if (ch() == '0') {
+        base = 8;
         gch();
         while (numeric(ch())) {
             c = inbyte();
@@ -249,12 +253,17 @@ int number(LVALUE *lval)
         c = inbyte();
         k = k * 10 + (c - '0');
     }
-    if (minus < 0)
-        k = (-k);
     lval->const_val = k;
     lval->int_const_val = (uint64_t)k;
     lval->int_const_valid = 1;
 typecheck:
+    /* Apply a leading sign consistently to every integer base.  The
+       hexadecimal, binary and octal paths used to consume '-' but leave k
+       positive, turning e.g. -0x12345678L into an unsigned bit pattern. */
+    if (minus < 0)
+        k = (-k);
+    lval->const_val = k;
+    lval->int_const_val = (uint64_t)k;
     lval->val_type = KIND_CHAR;
     /* Keep type selection independent of zdouble.  The latter may have only
        53 bits of precision on the build host, while k is the exact parsed
@@ -267,6 +276,19 @@ typecheck:
     }
     if ( (uint64_t)k > UINT32_MAX || k < INT32_MIN ) {
         lval->val_type = KIND_LONGLONG;
+    }
+
+    /* C integer constants written in a non-decimal base may use the
+       unsigned type of their size class when they do not fit its signed
+       range.  Keep the decision based on the exact integer parse: const_val
+       is a zdouble and cannot safely represent every 32/64-bit value on
+       hosts where long double is only double.  The explicit sign path stays
+       signed, matching the legacy treatment of -0x... literals. */
+    if (!isunsigned && base != 10 && minus >= 0
+        && lval->val_type != KIND_LONGLONG) {
+        int64_t smax = lval->val_type == KIND_INT ? 32767 : INT32_MAX;
+        if (k > smax)
+            isunsigned = 1;
     }
     lval->is_const = 1;
 

@@ -293,7 +293,9 @@ extern void     rvalue(LVALUE *lval);
 extern struct nodepair *test(int label, int parens);
 extern int      constexpr(double *val, Kind *valtype, int flag);
 extern int      constexpr_z(zdouble *val, Kind *valtype, int flag);
-extern int      constexpr_z_exact(zdouble *val, uint64_t *ival, Kind *valtype, int flag);
+extern int      constexpr_z_exact(zdouble *val, uint64_t *ival, Kind *valtype,
+                                  int flag, long double *exactval);
+extern int      ast_eval_decimal_exact(Node *node, long double *value);
 extern void     cscale(Type *type, int *val);
 extern int      docast(LVALUE *lval,LVALUE *dest_lval);
 extern int      ulvalue(LVALUE *lval);

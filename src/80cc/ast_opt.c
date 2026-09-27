@@ -105,6 +105,49 @@ static int64_t fold_sext(int64_t v, int width)
     return (int64_t)((uint64_t)v << sh) >> sh;
 }
 
+static int64_t fold_integer_result(int64_t value, const Type *type)
+{
+    int width;
+    int is_unsigned;
+
+    if (!type || !kind_is_integer(type->kind)) return value;
+    if (type->kind == KIND_CHAR) width = 8;
+    else if (type->kind == KIND_INT || type->kind == KIND_SHORT) width = 16;
+    else if (type->kind == KIND_LONG) width = 32;
+    else width = 64;
+    is_unsigned = type->isunsigned;
+    if (width == 64) return value;
+    if (is_unsigned)
+        return (int64_t)((uint64_t)value & (((uint64_t)1 << width) - 1));
+    return fold_sext(value, width);
+}
+
+/* The parser can hand ast_fold_constants a binary node before the type
+   normalisation pass has stamped node->type. Derive the usual arithmetic
+   conversion type from the literal operands in that case; falling back to
+   the left operand would incorrectly fold `3 * 0x2aaaaaab` as a 16-bit int
+   when the common type is a 32-bit long. */
+static Type *fold_common_integer_type(const Type *a, const Type *b)
+{
+    int wa, ua, wb, ub;
+    fold_promoted_int_type(a, &wa, &ua);
+    fold_promoted_int_type(b, &wb, &ub);
+    int width, uns;
+    if (wa == wb) {
+        width = wa;
+        uns = ua || ub;
+    } else if (wa > wb) {
+        width = wa;
+        uns = ua;
+    } else {
+        width = wb;
+        uns = ub;
+    }
+    if (width >= 64) return uns ? type_ulonglong : type_longlong;
+    if (width >= 32) return uns ? type_ulong : type_long;
+    return uns ? type_uint : type_int;
+}
+
 /* Fold an integer comparison honouring C's usual arithmetic conversions:
    normalise both operands to their common type's width and signedness before
    comparing. Without this the operands are compared as raw signed int64, so
@@ -161,6 +204,106 @@ static int try_fold_binop_decimal(int kind, zdouble l, zdouble r, zdouble *out)
     case OP_GE:   *out = (zdouble)(l >= r); return 1;
     }
     return 0;
+}
+
+/* Evaluate an all-constant decimal expression without routing integer leaves
+   through zdouble.  zdouble is deliberately configurable for host-precision
+   testing and may be only binary32; using it for a 32-bit integer before a
+   later cancellation can therefore change the value (305419896 becomes
+   305419904).  Keep the intermediate in long double and only materialise the
+   result as zdouble when that final result is representable there. */
+static int eval_decimal_exact(Node *node, long double *out)
+{
+    long double l, r;
+
+    if (!node) return 0;
+    if (node->ast_type == AST_LITERAL) {
+        if (!node->type) return 0;
+        if (kind_is_integer(node->type->kind)) {
+            *out = node->type->isunsigned
+                 ? (long double)node_int_bits(node)
+                 : (long double)node_int_value(node);
+            return 1;
+        }
+        if (kind_is_decimal(node->type->kind)) {
+            *out = (long double)node->zval;
+            return 1;
+        }
+        return 0;
+    }
+    if (node->ast_type == OP_NEG) {
+        return eval_decimal_exact(node->operand, out) ? (*out = -*out, 1) : 0;
+    }
+    switch (node->ast_type) {
+    case OP_ADD: case OP_SUB: case OP_MULT: case OP_DIV:
+    case OP_EQ: case OP_NE: case OP_LT: case OP_LE:
+    case OP_GT: case OP_GE:
+        break;
+    default:
+        return 0;
+    }
+    if (!eval_decimal_exact(node->left, &l)
+        || !eval_decimal_exact(node->right, &r))
+        return 0;
+
+    switch (node->ast_type) {
+    case OP_ADD:  *out = l + r; return 1;
+    case OP_SUB:  *out = l - r; return 1;
+    case OP_MULT: *out = l * r; return 1;
+    case OP_DIV:  if (r == 0) return 0; *out = l / r; return 1;
+    case OP_EQ:   *out = (l == r); return 1;
+    case OP_NE:   *out = (l != r); return 1;
+    case OP_LT:   *out = (l <  r); return 1;
+    case OP_LE:   *out = (l <= r); return 1;
+    case OP_GT:   *out = (l >  r); return 1;
+    case OP_GE:   *out = (l >= r); return 1;
+    default:      return 0;
+    }
+}
+
+static int contains_decimal_literal(Node *node)
+{
+    if (!node) return 0;
+    if (node->ast_type == AST_LITERAL)
+        return node->type && kind_is_decimal(node->type->kind);
+    if (node->ast_type == OP_NEG)
+        return contains_decimal_literal(node->operand);
+    switch (node->ast_type) {
+    case OP_ADD: case OP_SUB: case OP_MULT: case OP_DIV:
+    case OP_EQ: case OP_NE: case OP_LT: case OP_LE:
+    case OP_GT: case OP_GE:
+        return contains_decimal_literal(node->left)
+            || contains_decimal_literal(node->right);
+    default:
+        return 0;
+    }
+}
+
+int ast_eval_decimal_exact(Node *node, long double *out)
+{
+    if (!contains_decimal_literal(node)) return 0;
+    return eval_decimal_exact(node, out);
+}
+
+/* Decimal folding may only consume an integer literal through zdouble when
+   that conversion is lossless.  Otherwise leave the mixed expression for
+   lowering: the integer literal retains its exact bits until it is converted
+   to the target floating representation. */
+static int integer_literal_fits_zdouble(const Node *node)
+{
+    if (!node || !node->int_literal || !node->type
+        || !kind_is_integer(node->type->kind))
+        return 1;
+
+    if (node->type->isunsigned) {
+        uint64_t value = node_int_bits(node);
+        if (value > (uint64_t)INT64_MAX)
+            return 0;
+        return (uint64_t)(int64_t)(zdouble)value == value;
+    }
+
+    int64_t value = node_int_value(node);
+    return (int64_t)(zdouble)value == value;
 }
 
 /*
@@ -314,6 +457,21 @@ Node *ast_fold_constants(Node *node)
                     : (L && L->type ? L->type : type_int);
             return ast_literal(t, (zdouble)0);
         }
+        /* A mixed expression can have an unrepresentable integer
+           intermediate below the current node (for example
+           `(long + 0.0) - long`).  The ordinary literal-pair path cannot see
+           through that subtree, so evaluate the complete constant tree with
+           exact integer leaves before materialising the final result. */
+        if (contains_decimal_literal(node)) {
+            long double exact;
+            if (eval_decimal_exact(node, &exact)
+                && (is_compare_op(node->ast_type)
+                    || (long double)(zdouble)exact == exact)) {
+                Type *t = is_compare_op(node->ast_type) ? type_int
+                        : (node->type ? node->type : type_double);
+                return ast_literal(t, (zdouble)exact);
+            }
+        }
         /* Shift count out of range. C leaves over-width shifts as
            undefined behaviour; legacy folded to zero to match user
            intent. Width comes from the LHS operand's type. */
@@ -351,6 +509,22 @@ Node *ast_fold_constants(Node *node)
             int decimal = (L->type && kind_is_decimal(L->type->kind))
                        || (R->type && kind_is_decimal(R->type->kind));
             if (decimal) {
+                if (!integer_literal_fits_zdouble(L)
+                    || !integer_literal_fits_zdouble(R))
+                {
+                    long double exact;
+                    /* An intermediate may be unrepresentable in zdouble
+                       while the complete expression is representable after
+                       cancellation.  This is particularly important for a
+                       static initializer under Z88DK_TEST_ZDOUBLE_FLOAT. */
+                    if (!eval_decimal_exact(node, &exact)
+                        || (!is_compare_op(node->ast_type)
+                            && (long double)(zdouble)exact != exact))
+                        return node;
+                    Type *t = is_compare_op(node->ast_type) ? type_int
+                            : (node->type ? node->type : L->type);
+                    return ast_literal(t ? t : type_int, (zdouble)exact);
+                }
                 zdouble lv = L->zval, rv = R->zval, dv;
                 if (try_fold_binop_decimal(node->ast_type, lv, rv, &dv)) {
                     /* A comparison yields int (0/1) — force int so the
@@ -379,7 +553,9 @@ Node *ast_fold_constants(Node *node)
                     if (try_fold_compare(fold_op, l, r, L->type, R->type, &v))
                         return ast_literal_int(type_int, (uint64_t)v);
                 } else if (try_fold_binop(fold_op, l, r, &v)) {
-                    Type *t = node->type ? node->type : L->type;
+                    Type *t = node->type ? node->type
+                                         : fold_common_integer_type(L->type, R->type);
+                    v = fold_integer_result(v, t);
                     return ast_literal_int(t ? t : type_int, (uint64_t)v);
                 }
             }
@@ -995,6 +1171,12 @@ static Node *try_strength_reduce(Node *node)
     }
 
     if (!r || r->ast_type != AST_LITERAL) return node;
+    /* The integer rewrite is valid only when the operation itself still
+       produces an integer.  After the usual arithmetic conversions an
+       integer operand multiplied or divided by a floating literal has a
+       floating result, even if the integer side happens to be a power of
+       two. */
+    if (!is_int_class_32(node)) return node;
     if (!is_int_class_32(l)) return node;
     int is_long = (l->type->kind == KIND_LONG);
 
@@ -2387,10 +2569,12 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
 
     case AST_FUNC_CALL:
     case AST_FUNCPTR_CALL:
-        for (int i = 0; i < (int)array_len(node->args); i++) {
-            Node *a = array_get_byindex(node->args, i);
-            Node *r = cse_walk(a, env, had_break);
-            if (r != a) array_set_byindex(node->args, i, r);
+        if (node->args) {
+            for (int i = 0; i < (int)array_len(node->args); i++) {
+                Node *a = array_get_byindex(node->args, i);
+                Node *r = cse_walk(a, env, had_break);
+                if (r != a) array_set_byindex(node->args, i, r);
+            }
         }
         if (node->callee) node->callee = cse_walk(node->callee, env, had_break);
         cse_env_clear(env);
@@ -2401,6 +2585,8 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
         return node;
 
     case AST_COMPOUND_STMT: {
+        if (!node->stmts)
+            return node;
         int n = (int)array_len(node->stmts);
         for (int i = 0; i < n; i++) {
             Node *s = array_get_byindex(node->stmts, i);
@@ -2411,6 +2597,8 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
     }
 
     case AST_INIT_LIST:
+        if (!node->stmts)
+            return node;
         for (int i = 0; i < (int)array_len(node->stmts); i++) {
             Node *e = array_get_byindex(node->stmts, i);
             Node *r = cse_walk(e, env, had_break);
@@ -2724,8 +2912,9 @@ static void collect_sef_subtrees(Node *node, array *bag)
         return;
     case AST_FUNC_CALL:
     case AST_FUNCPTR_CALL:
-        for (int i = 0; i < (int)array_len(node->args); i++)
-            collect_sef_subtrees(array_get_byindex(node->args, i), bag);
+        if (node->args)
+            for (int i = 0; i < (int)array_len(node->args); i++)
+                collect_sef_subtrees(array_get_byindex(node->args, i), bag);
         if (node->callee) collect_sef_subtrees(node->callee, bag);
         return;
     case AST_RETURN:
@@ -2733,8 +2922,9 @@ static void collect_sef_subtrees(Node *node, array *bag)
         return;
     case AST_COMPOUND_STMT:
     case AST_INIT_LIST:
-        for (int i = 0; i < (int)array_len(node->stmts); i++)
-            collect_sef_subtrees(array_get_byindex(node->stmts, i), bag);
+        if (node->stmts)
+            for (int i = 0; i < (int)array_len(node->stmts); i++)
+                collect_sef_subtrees(array_get_byindex(node->stmts, i), bag);
         return;
     case AST_IF:
     case AST_TERNARY:
@@ -3125,6 +3315,8 @@ static int synthesize_segment(array *stmts, int start, int end_excl)
    remain (e.g. inside a control-flow stmt that broke the segment). */
 static void synthesize_in_compound(array *stmts)
 {
+    if (!stmts) return;
+
     /* Phase 1: cross-stmt segment synthesis. */
     int i = 0;
     while (i < (int)array_len(stmts)) {
@@ -4828,6 +5020,8 @@ static Node *clone_literal(Node *lit)
     c->ast_type = AST_LITERAL;
     c->type = lit->type;
     c->zval = lit->zval;
+    c->ival = lit->ival;
+    c->int_literal = lit->int_literal;
     c->filename = lit->filename;
     c->line = lit->line;
     return c;
@@ -4911,10 +5105,12 @@ static Node *prop_walk(Node *node, prop_env *env, int *had_call_or_escape)
         /* Function call invalidates all tracked vars — but only AFTER
            the call's args/callee have had substitution applied. Mark
            the flag; the caller (statement walker) clears the env. */
-        for (int i = 0; i < (int)array_len(node->args); i++) {
-            Node *a = array_get_byindex(node->args, i);
-            Node *r = prop_walk(a, env, had_call_or_escape);
-            if (r != a) array_set_byindex(node->args, i, r);
+        if (node->args) {
+            for (int i = 0; i < (int)array_len(node->args); i++) {
+                Node *a = array_get_byindex(node->args, i);
+                Node *r = prop_walk(a, env, had_call_or_escape);
+                if (r != a) array_set_byindex(node->args, i, r);
+            }
         }
         if (node->callee) node->callee = prop_walk(node->callee, env, had_call_or_escape);
         if (had_call_or_escape) *had_call_or_escape = 1;
@@ -4929,6 +5125,8 @@ static Node *prop_walk(Node *node, prop_env *env, int *had_call_or_escape)
            have pre-populated for outer scope; we modify in place but
            don't undo on exit. The caller wraps with a clone if it
            wants outer scope preserved. */
+        if (!node->stmts)
+            return node;
         int n = (int)array_len(node->stmts);
         for (int i = 0; i < n; i++) {
             Node *s = array_get_byindex(node->stmts, i);

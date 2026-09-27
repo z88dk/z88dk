@@ -60,7 +60,7 @@ void ir_assign_slots(Func *f)
                 fprintf(stderr, "SLOTWHY %s v%d width=%d phys=%d flags=%#x\n",
                         f->fn ? ir_sym_name(f->fn) : "?", v,
                         f->vregs[v].width,
-                        f->vreg_to_phys ? f->vreg_to_phys[v] : -1,
+                        f->vreg_to_phys ? ir_home_assigned(f, v) : -1,
                         f->vregs[v].flags);
 
     /* Spill-slot coalescing: per-op interference. Walk each BB

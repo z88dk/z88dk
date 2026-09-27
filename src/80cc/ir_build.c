@@ -690,6 +690,8 @@ static int width_for_kind(Kind k)
    to int64_t. */
 static int64_t scale_literal_for_kind(const Node *lit, Kind k)
 {
+    if (kind_is_integer(k) && lit->int_literal)
+        return (int64_t)node_int_bits(lit);
     double v = (double)lit->zval;
     if (k == KIND_ACCUM16) return (int64_t)(v * 256.0   + (v >= 0 ? 0.5 : -0.5));
     if (k == KIND_ACCUM32) return (int64_t)(v * 65536.0 + (v >= 0 ? 0.5 : -0.5));
@@ -2797,7 +2799,8 @@ static int build_muldiv_float(Builder *b, Node *n, int *handled)
         return dst;
     }
     /* Mixed `int OP double` (result acc-double): promote the int to double. */
-    if (is_acc_float_kind(n->type ? n->type->kind : KIND_NONE)) {
+    if (is_acc_float_kind(lk) || is_acc_float_kind(rk)
+        || is_acc_float_kind(n->type ? n->type->kind : KIND_NONE)) {
         int l = build_operand_as_acc(b, n->left);
         if (l < 0) return build_fail("float mul/div: lhs not promotable");
         int r = build_operand_as_acc(b, n->right);
@@ -3308,7 +3311,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         b->f->vregs[v].width = (int16_t)w;
         if (accum_k == KIND_ACCUM16 || accum_k == KIND_ACCUM32)
             b->f->vregs[v].kind = accum_k;
-        ir_emit_ld_imm(cur_bb(b), v, scale_literal_for_kind(n, accum_k));
+        Kind scale_k = accum_k != KIND_NONE
+                     ? accum_k
+                     : (n->type ? n->type->kind : KIND_INT);
+        ir_emit_ld_imm(cur_bb(b), v, scale_literal_for_kind(n, scale_k));
         return v;
     }
 

@@ -5258,6 +5258,12 @@ void vlongconst(zdouble val)
     const2(l / 65536);
 }
 
+void vlongconst_exact(uint32_t val)
+{
+    vconst(val & 0xffff);
+    const2(val >> 16);
+}
+
 void vllongconst(zdouble val)
 {
     load_llong_into_acc(val);
@@ -5275,6 +5281,15 @@ void vlongconst_tostack(zdouble val)
     constbc(l / 65536);
     ol("push\tbc");
     constbc(l % 65536);
+    ol("push\tbc");
+    Zsp -= 4;
+}
+
+void vlongconst_tostack_exact(uint32_t val)
+{
+    constbc(val >> 16);
+    ol("push\tbc");
+    constbc(val & 0xffff);
     ol("push\tbc");
     Zsp -= 4;
 }
