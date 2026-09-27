@@ -1443,7 +1443,9 @@ int main(int argc, char **argv)
             /* past clang+llvm related pre-processing */
             if (compiler_type == CC_SDCC || compiler_type == CC_EZ80CLANG) {
                 char zpragma_args[1024];
-                snprintf(zpragma_args, sizeof(zpragma_args),"-zcc-opt=\"%s\"", zcc_opt_def);
+                snprintf(zpragma_args, sizeof(zpragma_args),"-zcc-opt=\"%s\"%s",
+                         zcc_opt_def,
+                         (compiler_type == CC_SDCC) ? " -autoformat" : "");
                 if (process(ft == CXXFILE ? ".cpp" : ".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
