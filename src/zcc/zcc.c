@@ -3817,7 +3817,12 @@ static void configure_compiler(void)
         c_compiler = c_sccz80_exe;
         compiler_style = outspecified_flag;
     } else if (strcmp(c_compiler_type,"llvmz80") == 0 ) {
-        preprocarg = " -E -D__CLANG -D__LLVMZ80 --target=z80 -std=gnu23";
+        /* z80-unknown-none-z88dk (ravn/llvm-z80 #389) bundles the classic
+         * clib defaults -- z80asm output, sdcccall(0) float libcalls,
+         * __smallc synthesized libcalls, and 32-bit double -- that used to
+         * need four separate manual flags (-mdouble=32 plus three
+         * -mllvm options). */
+        preprocarg = " -E -D__CLANG -D__LLVMZ80 --target=z80-unknown-none-z88dk -std=gnu23";
         BuildOptions(&cpparg, preprocarg);
         BuildOptions(&asmargs, "-D__LLVMZ80");
         BuildOptions(&linkargs, "-D__LLVMZ80");
@@ -3833,14 +3838,10 @@ static void configure_compiler(void)
                 snprintf(optflag, sizeof(optflag), "-O%d", lvl);
             }
             snprintf(buf, sizeof(buf),
-                     "--target=z80 -S -mdouble=32 -std=gnu23 -o - %s",
+                     "--target=z80-unknown-none-z88dk -S -std=gnu23 -o - %s",
                      optflag);
         }
         add_option_to_compiler(buf);
-
-        add_option_to_compiler("-mllvm -z80-float-sdcccall0");
-        add_option_to_compiler("-mllvm -z80-classic-libc-cc");
-        add_option_to_compiler("-mllvm -z80-asm-format=z80asm");
 
         if (clangarg) {
             add_option_to_compiler(clangarg);
