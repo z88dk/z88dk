@@ -121,6 +121,11 @@ exists (ADR 0010).
 | `byte-remat` | a byte loaded from a global is spilled instead of re-loaded at the use |
 | `remat` | no rematerialisation of constants and symbol addresses |
 | `slot-prune` | keep a frame slot for a byte that only ever rides A |
+| `dead-de-reload` | keep a dead DE reload before a later use |
+| `long-step-mhl` | keep the long-step MHL lowering disabled |
+| `pool-remat-add-fold` | keep a post-render pool/rematerialisation add |
+| `xorflip-chain` | keep chained sign-flip folding disabled |
+| `xorflip-const` | keep constant sign-flip folding disabled |
 
 ## Lowering (`ir_lower*.c`)
 

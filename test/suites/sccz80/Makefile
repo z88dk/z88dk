@@ -43,6 +43,10 @@ test_compare.bin: $(SOURCES) compare.c
 	$(call compile, $(OPT_CODE_SPEED),)
 	$(runtest)
 
+test_literal.bin: $(SOURCES) literal.c
+	$(call compile,,-lmath48)
+	$(runtest)
+
 
 test_%.bin: $(SOURCES) %.c
 	$(compile)

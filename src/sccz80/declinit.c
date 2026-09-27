@@ -288,6 +288,8 @@ int agg_init(Type *type, int isflexible)
 static int init(Type *type, int dump)
 {
     double value;
+    uint64_t int_value = 0;
+    int int_value_valid = 0;
     Kind   valtype;
     int sz = 0; /* number of chars in queue */
     int klptr, parencount;
@@ -338,7 +340,8 @@ static int init(Type *type, int dump)
         int   gotref;
 
         if ( rmatch2("sizeof") || rmatch2("__builtin_offsetof")) {
-            if ( constexpr(&value, &valtype, 1) ) {
+            if ( constexpr_exact(&value, &int_value, &int_value_valid,
+                                 &valtype, 1) ) {
                 goto constdecl;
             }
             errorfmt("Expecting a constant expression for static initialisation\n",1);
@@ -449,7 +452,9 @@ again:
 #endif
             lptr = klptr;
             return 0;
-        } else if ( lptr= klptr, constexpr(&value, &valtype, 1)) {
+        } else if ( lptr= klptr,
+                    constexpr_exact(&value, &int_value, &int_value_valid,
+                                    &valtype, 1)) {
 constdecl:
             check_assign_range(type, value);
             if (dump) {
@@ -474,7 +479,8 @@ constdecl:
                     defword();
                     outdec(fa[1] << 8 | fa[0]);
                 } else if (type->kind == KIND_LONGLONG ){
-                    uint32_t val = (uint32_t)((int64_t)value & 0xffffffff);
+                    uint64_t raw = int_value_valid ? int_value : (uint64_t)(int64_t)value;
+                    uint32_t val = (uint32_t)(raw & 0xffffffff);
                     /* there appears to be a bug in z80asm regarding defq */
                     defbyte();
                     outdec(((uint32_t)val % 65536UL) % 256);
@@ -485,7 +491,7 @@ constdecl:
                     outbyte(',');
                     outdec(((uint32_t)val / 65536UL) / 256);
                     nl();
-                    val = (uint32_t)(((int64_t)value >> 32) & 0xffffffff);
+                    val = (uint32_t)(raw >> 32);
                     defbyte();
                     outdec(((uint32_t)val % 65536UL) % 256);
                     outbyte(',');

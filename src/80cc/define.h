@@ -495,6 +495,8 @@ struct lvalue_s {
         Kind ptr_type ;                 /* type of pointer or array, 0 for other idents */
         int is_const ;                  /* true if constant expression */
         zdouble const_val ;             /* value of constant expression (& other uses) */
+        uint64_t int_const_val;         /* exact integer constant bits */
+        unsigned char int_const_valid;  /* const_val was parsed as integer */
         Kind val_type ;                 /* type of value calculated */
         enum symbol_flags flags;        /* As per symbol */
         Type *cast_type;
@@ -710,7 +712,19 @@ struct node_s {
          Node *retval;   // Return value
          array *stmts;          // Compound statements
     };
+    uint64_t ival;              /* exact integer literal bits */
+    unsigned char int_literal;  /* zval is backed by ival */
 };
+
+static inline uint64_t node_int_bits(const Node *node)
+{
+    return node->int_literal ? node->ival : (uint64_t)(int64_t)node->zval;
+}
+
+static inline int64_t node_int_value(const Node *node)
+{
+    return (int64_t)node_int_bits(node);
+}
 
 struct nodepair {
     Node *node;

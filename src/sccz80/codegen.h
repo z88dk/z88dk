@@ -32,9 +32,13 @@ extern void scale(Kind type, Type *tag);
 
 
 extern void vlongconst(zdouble val);
+extern void vlongconst_exact(uint32_t val);
 extern void vlongconst_tostack(zdouble val);
+extern void vlongconst_tostack_exact(uint32_t val);
 extern void vllongconst_tostack(zdouble val);
 extern void vllongconst(zdouble val);
+extern void vllongconst_exact(uint64_t val);
+extern void vllongconst_tostack_exact(uint64_t val);
 extern void vconst(int64_t val);
 extern void const2(int32_t val);
 extern void GlobalPrefix(void);
