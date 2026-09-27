@@ -943,6 +943,27 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
             cache_de(vreg_id);
             return;
         }
+        /* Z80-family index-half home: these are real DD/FD register moves,
+           so widen directly without the A→HL→DE detour. */
+        PhysReg ih = idxhalf_phys(f, vreg_id);
+        if (ih != IR_PR_NONE) {
+            ss_note_cache_read(f, vreg_id);
+            emit(out, "ld\te,%s", idxhalf_reg(ih));
+            emit(out, "ld\td,0");
+            cache_de(vreg_id);
+            return;
+        }
+        /* C/B byte home: widen directly without routing through HL.  The
+           home is the low half of BC and survives this DE write; E/D homes
+           are deliberately excluded because DE is their backing register. */
+        PhysReg bh = byte_home_phys(f, vreg_id);
+        if (bh == IR_PR_C || bh == IR_PR_B) {
+            ss_note_cache_read(f, vreg_id);
+            emit(out, "ld\te,%s", byte_home_reg(bh));
+            emit(out, "ld\td,0");
+            cache_de(vreg_id);
+            return;
+        }
         if (fp_active(f) && slot_off(f, vreg_id) >= 0) {
             int ix_off = slot_ix_off(f, vreg_id);
             if (fp_offset_fits(ix_off)) {         /* (ix+d) → E, D=0; HL untouched */
@@ -1024,6 +1045,7 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
        touching HL (see load_to_de's width-1 path) — no push/pop needed. */
     if (f->vregs[vreg_id].width == 1
         && (a_has(vreg_id)
+            || idxhalf_phys(f, vreg_id) != IR_PR_NONE
             || (fp_active(f) && slot_off(f, vreg_id) >= 0
                 && fp_offset_fits(slot_ix_off(f, vreg_id))))) {
         load_to_de(out, f, vreg_id);
@@ -3414,4 +3436,3 @@ static int home_span_valid(const Func *f, int home, int lo, int hi)
     }
     return 1;
 }
-

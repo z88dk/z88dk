@@ -20,6 +20,7 @@ all:	localrmw_gbz80.bin localrmw_gbz80_keep.bin
 all:	localrmw_z80.bin localrmw_z80n.bin localrmw_z180.bin localrmw_ez80_z80.bin localrmw_8080.bin localrmw_vm1.bin localrmw_r2ka.bin localrmw_r4k.bin localrmw_r6k.bin localrmw_kc160.bin localrmw_r800.bin localrmw_z80_keep.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
 all:	derefcmp_bcstep.bin derefcmp_bcstep_8080.bin
+all:	directwiden.bin directwiden_z80n.bin directwiden_ez80_z80.bin directwiden_r800.bin
 all:	widestep.bin widestep_fp.bin widestep_8080.bin widestep_8085.bin widestep_gbz80.bin widestep_r2ka.bin widestep_calls.bin
 all:	poolremat.bin poolremat_fp.bin poolremat_gbz80.bin poolremat_8080.bin poolremat_8085.bin
 all:	deaddereload.bin deaddereload_fp.bin deaddereload_gbz80.bin
@@ -584,6 +585,24 @@ idxhome.bin: $(SOURCES) idxhome.c
 idxhome_fp.bin: $(SOURCES) idxhome.c
 	$(call compile,-Cc-fframe-pointer)
 	$(runtest)
+
+# Direct byte-to-DE widening. Keep this on the index-half-capable CPUs as
+# well as plain Z80 so the shared lowering is exercised in each enabled path.
+directwiden.bin: $(SOURCES) directwiden.c
+	$(compile)
+	$(runtest)
+
+directwiden_z80n.bin: $(SOURCES) directwiden.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+directwiden_ez80_z80.bin: $(SOURCES) directwiden.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+directwiden_r800.bin: $(SOURCES) directwiden.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=r800 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr800 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 # Same test in FRAME-POINTER mode: the index-half signed compare
 # (ld a,iyl; sub (ix+d); ...) is fp-only + index-half-CPU-only, so the sp build
