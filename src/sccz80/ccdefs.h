@@ -18,7 +18,13 @@
 #include <ctype.h>
 #include <math.h>
 
+#if defined(Z88DK_TEST_ZDOUBLE_FLOAT)
+typedef float zdouble;
+#elif defined(Z88DK_TEST_ZDOUBLE_DOUBLE)
+typedef double zdouble;
+#else
 typedef long double zdouble;
+#endif
 
 #include "define.h"
 
@@ -176,6 +182,7 @@ extern void       offset_of(LVALUE *lval);
 extern void       load_fixed(LVALUE *lval);
 extern void       load_double_into_fa(LVALUE *lval);
 extern void       load_llong_into_acc(zdouble val);
+extern void       load_llong_bits_into_acc_exact(uint64_t val);
 extern void       write_constant_queue(void);
 extern void       indicate_constant_written(int litlab);
 
@@ -223,6 +230,8 @@ extern void       parse_warning_option(const char *value);
 
 /* expr.c */
 extern Kind       expression(int *con, zdouble *val, Type **type);
+extern Kind       expression_exact(int *con, zdouble *val, uint64_t *ival,
+                                   int *ival_valid, Type **type);
 extern int        heir1(LVALUE *lval);
 extern int        heira(LVALUE *lval);
 
@@ -316,6 +325,8 @@ extern void     rvaluest(LVALUE *lval);
 extern void     rvalue(LVALUE *lval);
 extern int      test(int label, int parens);
 extern int      constexpr(double *val, Kind *valtype, int flag);
+extern int      constexpr_exact(double *val, uint64_t *ival, int *ival_valid,
+                                Kind *valtype, int flag);
 extern void     cscale(Type *type, int *val);
 extern int      docast(LVALUE *lval,LVALUE *dest_lval);
 extern void     convert_int_to_double(char type, char zunsign);

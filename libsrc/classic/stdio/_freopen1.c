@@ -33,8 +33,15 @@ FILE *_freopen1(const char* name, int fd, const char* mode, FILE* fp)
         return NULL;
     }
 
-    /* Scan remaining mode characters for '+' (update) and 'b' (binary) in any
-     * order. Apply '+' before 'b' so binary flags are not clobbered. */
+    /* Scan the remaining mode characters for '+' (update) and 'b' (binary)
+       in any order.  C treats "rb+" and "r+b" as equivalent, but the old
+       code only looked at the single slot right after the primary letter,
+       so "rb+" (b before +) never applied O_RDWR and silently stayed
+       read-only -- ravn/z88dk#53.  Worked example, mode="rb+": mode[0]='r'
+       consumed above (access=O_RDONLY), then this loop sees 'b' (plus stays
+       0, binary=1) and '+' (plus=1) -> access upgraded to O_RDWR AND binary
+       applied.  '+' is applied before 'b' so the O_RDWR branch's flags
+       assignment (which re-sets _IOTEXT) does not clobber the binary toggle. */
     {
         const unsigned char *m = (const unsigned char *)mode;
         unsigned char c;

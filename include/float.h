@@ -5,8 +5,19 @@
 #include <sys/types.h>
 #include <math.h>
 
-/* Use compiler builtins for IEEE-754 float parameters when available
- * (__DBL_MANT_DIG__ defined), leaving classic 48-bit constants for sccz80/sdcc. */
+/* z88dk's classic <math.h> (math_genmath.h) hardcodes the parameters of the
+   classic 48-bit software float (FLT/DBL_MANT_DIG=39, DBL_MAX_EXP=37, ...).
+   That is correct for sccz80/sdcc, whose double really is that 48-bit format.
+   A clang-based backend (e.g. -compiler=llvmz80), however, generates real
+   IEEE-754 float/double (binary32/binary64), for which those constants are
+   wrong -- code that reads <float.h> to decode a float's bit layout then
+   mis-scales every value (see ravn/z88dk#28: printf %f prints 1.0 as 0.000000,
+   1.0/3.0 as 715827882.666016 == (1/3)*2^31).
+
+   Such compilers expose the standard __FLT_*__/__DBL_*__ builtins, which always
+   match the ABI they actually emit; sccz80/sdcc do NOT define them (verified),
+   so this override is inert for the genmath compilers and they keep their 39/37
+   values untouched. When the builtins are present, trust them. */
 #if defined(__DBL_MANT_DIG__)
 
 #undef FLT_RADIX

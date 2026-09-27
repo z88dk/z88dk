@@ -188,6 +188,7 @@ int number(LVALUE *lval)
     int minus;
     int64_t k;
     int isunsigned = 0;
+    int base = 10;
 
     k = minus = 1;
     while (k) {
@@ -200,6 +201,7 @@ int number(LVALUE *lval)
         }
     }
     if (ch() == '0' && toupper(nch()) == 'X') {
+        base = 16;
         gch();
         gch();
         if (hex(ch()) == 0)
@@ -212,10 +214,13 @@ int number(LVALUE *lval)
                 k = (k << 4) + ((c & 95) - '7');
         }
         lval->const_val = k;
+        lval->int_const_val = (uint64_t)k;
+        lval->int_const_valid = 1;
         goto typecheck;
     }
     if (ch() == '0' && toupper(nch()) == 'B') {
         int c;
+        base = 2;
         gch();
         gch();
         if (ch() != '0' && ch() != '1')
@@ -225,9 +230,12 @@ int number(LVALUE *lval)
             k = (k << 1) + (c - '0');
         }
         lval->const_val = k;
+        lval->int_const_val = (uint64_t)k;
+        lval->int_const_valid = 1;
         goto typecheck;
     }
     if (ch() == '0') {
+        base = 8;
         gch();
         while (numeric(ch())) {
             c = inbyte();
@@ -235,6 +243,8 @@ int number(LVALUE *lval)
                 k = k * 8 + (c - '0');
         }
         lval->const_val = k;
+        lval->int_const_val = (uint64_t)k;
+        lval->int_const_valid = 1;
         goto typecheck;
     }
     if (numeric(ch()) == 0)
@@ -243,22 +253,42 @@ int number(LVALUE *lval)
         c = inbyte();
         k = k * 10 + (c - '0');
     }
+    lval->const_val = k;
+    lval->int_const_val = (uint64_t)k;
+    lval->int_const_valid = 1;
+typecheck:
+    /* Apply a leading sign consistently to every integer base.  The
+       hexadecimal, binary and octal paths used to consume '-' but leave k
+       positive, turning e.g. -0x12345678L into an unsigned bit pattern. */
     if (minus < 0)
         k = (-k);
     lval->const_val = k;
-typecheck:
+    lval->int_const_val = (uint64_t)k;
     lval->val_type = KIND_CHAR;
-    if ( lval->const_val >= 256 || lval->const_val < -127 ) {
+    /* Keep type selection independent of zdouble.  The latter may have only
+       53 bits of precision on the build host, while k is the exact parsed
+       integer value. */
+    if ( k >= 256 || k < -127 ) {
         lval->val_type = KIND_INT;
     }
-    if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
+    if ( k >= 65536 || k < -32767 ) {
         lval->val_type = KIND_LONG;
     }
-    if ( lval->const_val > UINT32_MAX || lval->const_val < INT32_MIN ) {
+    if ( (uint64_t)k > UINT32_MAX || k < INT32_MIN ) {
         lval->val_type = KIND_LONGLONG;
-        if ( sizeof(long double) == sizeof(double)) {
-            warningfmt("limited-range", "On this host, 64 bit constants may not be correct");
-        }
+    }
+
+    /* C integer constants written in a non-decimal base may use the
+       unsigned type of their size class when they do not fit its signed
+       range.  Keep the decision based on the exact integer parse: const_val
+       is a zdouble and cannot safely represent every 32/64-bit value on
+       hosts where long double is only double.  The explicit sign path stays
+       signed, matching the legacy treatment of -0x... literals. */
+    if (!isunsigned && base != 10 && minus >= 0
+        && lval->val_type != KIND_LONGLONG) {
+        int64_t smax = lval->val_type == KIND_INT ? 32767 : INT32_MAX;
+        if (k > smax)
+            isunsigned = 1;
     }
     lval->is_const = 1;
 
@@ -1143,15 +1173,11 @@ void write_constant_queue(void)
     nl();
 }
 
-void load_llong_into_acc(zdouble val)
+static void load_llong_bits_into_acc(uint64_t v)
 {
-    uint64_t v,l;
+    uint64_t l;
     char    buf[8];
     elem_t *elem;
-
-    if ( val < 0 ) v = (uint64_t)(int64_t)val;
-    else v = val;
-
 
     l = v & 0xffffffff;
     buf[0] = (l % 65536) % 256;
@@ -1165,9 +1191,27 @@ void load_llong_into_acc(zdouble val)
     buf[7] =  (l / 65536) / 256;
 
     elem = get_elem_for_llong(buf);
+    elem->written = 1;
     immedlit(elem->litlab,0);
     nl();
     callrts("l_i64_load");
+}
+
+void load_llong_into_acc(zdouble val)
+{
+    uint64_t v;
+
+    if (val < 0)
+        v = (uint64_t)(int64_t)val;
+    else
+        v = (uint64_t)val;
+
+    load_llong_bits_into_acc(v);
+}
+
+void load_llong_bits_into_acc_exact(uint64_t val)
+{
+    load_llong_bits_into_acc(val);
 }
 
 

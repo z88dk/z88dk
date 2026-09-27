@@ -4,10 +4,55 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 2026-09-24. Keep it short: when a section stops describing what is
+Last swept: 2026-09-25. Keep it short: when a section stops describing what is
 live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
+
+**START HERE: `src/80cc/HANDOVER_2026-09-25_s2.md`.** Mid-flight: pushing
+`IR_BC_STEP_CALL` (session 1's item 2 below, the call-containing case) turned
+into a bug hunt. Two real, general, pre-existing allocator bugs found AND
+FIXED this session (`spill_and_swap_unless_dead`'s missing `PR_DE` case;
+the word-DE-home confirm/reject gate not re-running after a `[home-rearb]`
+retry's fresh `ir_alloc()`), both validated clean on `long_ir` 902/902 both
+modes at default settings. A THIRD bug is precisely located but NOT fixed:
+`bytepack_pack` collides with a BC-resident pointer whose home window was
+wrongly narrowed by "tight-homes" — root cause traced to `ir_live_range()`
+or block-layout trampoline blocks, not yet which. `IR_BC_STEP_CALL` and
+`IR_BC_STEP_SCALAR` both stay opt-in/off-by-default meanwhile — the tree
+is safe, this is not a release blocker. Full trace, debug-print recipes,
+and exact next steps are in the handover — do not re-derive from git blame,
+the debug instrumentation that found all three bugs was added and removed
+within the session and won't show up in a diff.
+
+Session 1 today (`HANDOVER_2026-09-25.md`) closed two threads cleanly:
+
+1. **Cross-BB redundant-global-load elimination via merge-point phi
+   (`IR_XBB_PHI`) — CLOSED, do not re-attempt a third time.** Built a
+   revert-on-spill redesign (decide keep-vs-revert AFTER `ir_alloc` via
+   `ir_home_requires_slot()`, not the deleted unconditional-carrier shape),
+   measured, reverted. Two independent reasons it doesn't pay: the
+   opportunity is gbz80-only (every other 80cc target has a native wide
+   absolute load; gbz80's LR35902 core doesn't), and even there the real
+   per-read ceiling is exactly ONE byte once you account for the value-walk
+   both a reload and a spilled-reread share — a real merge's per-edge copy
+   cost doesn't survive that margin. Measured net -45 B on gbz80's real
+   corpus, but one file carried the whole result and 4 of 7 affected files
+   got WORSE even there. `ir_opt_probe_xbb_reload` (`IR_PROBE_XBB=1`, inert)
+   is the only piece that stays — still a fair sizing tool if a genuinely
+   different angle ever shows up. Full detail + the exact byte arithmetic:
+   memory `xbb-phi-gbz80-only`.
+2. **NEW, SIZED not built: a loop-carried scalar (e.g. a `while (n--)`
+   counter) round-trips through its frame slot every iteration while a
+   loop-INVARIANT value keeps the register instead** — backwards priority,
+   10 B/5 instr per iteration (`examples/console/vtstone.c`'s `rpt()`) vs.
+   sdcc's 1-byte `dec bc`. Textual probe found 23 occurrences across 7 of 28
+   real files (~230 B ceiling), but the false-positive rate (does the
+   pattern always mean a real priority mistake, or sometimes an unrelated
+   pointer-walk RMW?) and the register-pressure discount (was a register
+   actually free?) aren't checked yet — that's the session's first job, see
+   the handover for the exact next steps. Likely fix site if it sizes real:
+   `ir_alloc.c`'s proposer/arbiter cost model, not the lowerer.
 
 **`[bc-call]` vs `__preserves_regs(b,c)` — CLOSED. See ADR 0094.** Unlike DE's
 `__preserves_regs(d,e)` (ADR 0084, inert — no in-tree callee uses it),
@@ -466,6 +511,7 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | `IR_ALLOC_PROBE` `IR_FRAMEPROBE` `IR_SHLX_PROBE` | one-line censuses inside shipped passes | on their next edit |
 | `IR_BYTEPRESS` `IR_RANGEPROBE` | inert sizings: the byte-pair opportunity by pressure, and the ranging population | they are quoted in an ADR |
 | `IR_LIVEPROBE` | liveness census; `=2` gives the verbose form | — |
+| `IR_BC_STEP_CALL` `IR_BC_STEP_SCALAR` `IR_BYTEPACK` `IR_BYTEPACK_VERIFY` `IR_SLOTWHY` `IR_WIDENOSLOT` | opt-in allocator/lowering diagnostics and sizing probes | when the associated investigation is closed |
 
 `IR_RANGEPROBE` carries a warning, not just a number: its 461 was an upper bound
 over the **wrong population** — see "do not size an opportunity by counting
