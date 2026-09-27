@@ -3015,6 +3015,22 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             int off = op->mem.offset;
             if (IS_GBZ80()) {
                 emit_gb_long_load(out, ir_sym_name(op->mem.sym), off);
+            } else if (IS_808x()) {
+                /* 8080-family z80asm has no native absolute `ld de,(nn)`;
+                   it expands that form to ex/ld hl/ex. Load the high half
+                   into HL first, move it to DE once, then load the low half
+                   directly into HL: 7 bytes instead of 8. */
+                if (off)
+                    emit(out, "ld\thl,(_%s+%d)",
+                         ir_sym_name(op->mem.sym), off + 2);
+                else
+                    emit(out, "ld\thl,(_%s+2)", ir_sym_name(op->mem.sym));
+                emit_ex_de_hl(out);
+                if (off)
+                    emit(out, "ld\thl,(_%s+%d)",
+                         ir_sym_name(op->mem.sym), off);
+                else
+                    emit(out, "ld\thl,(_%s)", ir_sym_name(op->mem.sym));
             } else {
             if (off)
                 emit(out, "ld\thl,(_%s+%d)",
