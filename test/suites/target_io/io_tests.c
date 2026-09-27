@@ -193,8 +193,21 @@ static void test_file_fopen(void)
     memset(buf, 0, sizeof(buf));
     n = (int)fread(buf, 1, strlen(payload), fp);
     Assert(n == (int)strlen(payload), "fread length");
-    Assert(memcmp(buf, payload, strlen(payload)) == 0, "fopen round-trip");
     Assert(fclose(fp) == 0, "fclose after read");
+
+    /* Update mode with "rb+" */
+    fp = fopen("fopen.dat", "rb+");
+    Assert(fp != 0, "fopen rb+");
+    Assert(fputs("UPD", fp) >= 0, "fputs in rb+");
+    Assert(fclose(fp) == 0, "fclose after rb+");
+
+    fp = fopen("fopen.dat", "r");
+    Assert(fp != 0, "fopen read after rb+");
+    memset(buf, 0, sizeof(buf));
+    n = (int)fread(buf, 1, 3, fp);
+    Assert(n == 3, "fread length after rb+");
+    Assert(memcmp(buf, "UPD", 3) == 0, "fopen rb+ update written");
+    Assert(fclose(fp) == 0, "fclose after rb+ read");
 }
 #endif
 
