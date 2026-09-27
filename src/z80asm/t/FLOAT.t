@@ -223,8 +223,8 @@ check_asm(
 #-------------------------------------------------------------------------------
 # compare C and ASM representations
 #-------------------------------------------------------------------------------
-check_c( "-lm",             "",               "float",    \@fdata );
-check_c( "-lm",             "-float=genmath", "float",    \@fdata );
+check_c( "-lm",             "-float=ieee32",  "float",    \@fdata );
+check_c( "--genmath",       "-float=genmath", "float",    \@fdata );
 check_c( "-lmath48",        "",               "float",    \@fdata );
 check_c( "-fp-mode=z80",    "",               "float",    \@fdata );
 check_c( "--math32",        "-float=ieee32",  "float",    \@fdata );

@@ -44,6 +44,12 @@ snakes.vz: ../graphics/csnakes.c
 %.vz: ../%.c
 	zcc +vz -vn $^ -O3 -o $@
 
+showlib3d.vz: ../graphics/showlib3d.c
+	zcc +vz -I../graphics -vn $^ -O3 -o $@ --genmath
+
+sndtest.vz: ../sound/sndtest.c
+	zcc +vz -vn $^ -O3 -o $@ --genmath
+
 %.vz: ../graphics/%.c
 	zcc +vz -I../graphics -vn $^ -O3 -o $@ -lm 
 

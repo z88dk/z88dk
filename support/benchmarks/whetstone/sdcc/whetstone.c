@@ -109,7 +109,7 @@ typedef float float_t;
 #ifdef __Z88DK
    #include <intrinsic.h>
    #ifdef PRINTOUT
-      #pragma output CLIB_OPT_PRINTF = 0x05001001
+      #pragma output CLIB_OPT_PRINTF = 0x45001001
    #endif
 #endif
 

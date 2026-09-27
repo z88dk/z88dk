@@ -13,7 +13,7 @@ TARGET = $(ALLTARGETS)
 # math32 newlib products, same CPUs as classic math32.lib / math32_<cpu>.lib
 # for the Z80-family cores that share the newlib math32 lists. z80 is
 # math32.lib. The others are math32_<cpu>.lib. z80asm -m tags the members.
-MATH32_CPUS = z80n r2ka r4k r6k
+MATH32_CPUS = z80n z180 r2ka r4k r6k
 
 # Targets whose sources live under libsrc/target/ (classic-aligned), not newlib/target/
 MIGRATED_TARGETS = hbios scz180 yaz180 rc2014 cpm
@@ -142,10 +142,8 @@ endef
 $(eval $(call build_targets,$(ALLTARGETS)))
 
 # The m (math48) library only carries CPU:z80 members, which z80asm refuses
-# to pull into -mz180 links.  Build a CPU:z180 m_z180 product from the same
-# m sources so newlib z180 -lm resolves (zcc.c swaps -lm to -lm_z180 for
-# newlib z180).  The z80 m library and every other CPU delivery are
-# untouched; z80asm links only pull members whose CPU matches -m.
+# to pull into -mz180 links.  m_z180 is the --math48 opt-in for newlib z180.
+# -lm on newlib z180 is math32_z180 (MATH32_CPUS), not m_z180.
 $(LIB_SCCZ80)/m_z180.lib: target/m/obj/config_private.inc
 	$(Q)mkdir -p $(LIB_SCCZ80)
 	TARGET=m TYPE=z180 $(Z80ASM) -mz180 -d -m4=-Itarget/m/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/m/obj/sccz80/x/z180 -Itarget/m/obj -I.. -x$(LIB_SCCZ80)/m_z180 -I$(Z88DK_LIB) @target/m/library/m_sccz80.lst

@@ -306,8 +306,7 @@ change to integer long helpers or float cores. After `fsdiv` / `f16_div` edits:
 math32 **and** math16 suites on the CPUs that ship the object. After **newlib
 math.h** / `__MATH_MATH32` remaps: always run **`test_math32_rc2014_CODE.bin`**
 (and a newlib math16 link if half API changed). After classic `ftoa`/`ftoe`/`ftog`
-or printf `%f`/`%e`/`%g`: `test/suites/stdio` (`test_sprintf.bin` is genmath `-lm`;
-`test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` are `--math32`).
+or printf `%f`/`%e`/`%g`: `test/suites/stdio`. From **v2.5**, a recipe that passes `-lm` links math32 (same as `--math32`). Before v2.5, `test_sprintf.bin`’s `-lm` was genmath. `test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` pass `--math32` explicitly.
 Integer `sscanf` is `test_scanf*.bin` (no `%f`). `test/suites/string` is `str*` only.
 
 ### Small probes
@@ -343,7 +342,7 @@ z88dk-ticks -m8085 bench.bin -x bench.map \
 |---------------|------|
 | `-DSTATIC -DTIMER -D__Z88DK` | Locals + TIMER labels (classic benches); **no** `-DPRINTF` |
 | `-DPRINTF` | Accuracy / print path only — **not** for published TIMER ticks |
-| `--math32` / `--math-mbf32` | Float library (`@{ZCC_LIBCPU}` picks `math32_8085` with `-clib=8085`) |
+| `-lm` / `--math32` / `--math-mbf32` | From v2.5, `-lm` is math32 (`@{ZCC_LIBCPU}` picks `math32_8085` with `-clib=8085`). Before v2.5, classic `-lm` was genmath and newlib `-lm` was math48. `--math-mbf32` is still explicit |
 | `--math16` | Half float TIMER; use **`z88dk-classic/*.c`** (parent sources lack `_Float16` / `DT=1e-1`) |
 | 8085 math16 | TIMER: `--math16` and, when the readme says so, **`-lmath32_8085` only** (helper side-link). That is **not** `--math32` |
 | Size | “bytes less page zero” ≈ **binary size** of the TIMER build (`.bin`) |

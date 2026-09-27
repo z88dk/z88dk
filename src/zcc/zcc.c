@@ -399,7 +399,7 @@ static char  *c_asmopts = NULL;
 static char  *c_altmathlib = NULL;
 static char  *c_altmathflags = NULL;        /* "-math-z88 -D__NATIVE_MATH__"; */
 static char  *c_startuplib = "z80_crt0";
-static char  *c_genmathlib = "genmath@{ZCC_LIBCPU}";
+static char  *c_genmathlib = "math32@{ZCC_LIBCPU}";
 static int    c_user_fp_mode_explicit = 0;
 static int    c_stylecpp = outspecified_flag;
 static char  *c_swallow_mf = NULL;
@@ -1119,29 +1119,19 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    /* The Z180 removed the undocumented Z80 IXH/IXL ops that genmath uses, so
-     * genmath cannot be built for it.  When the generic -lm is requested and
-     * the user chose no FP mode, default Z180 to the 4-byte IEEE math32_z180.
-     * This runs after -clib/-mz180 resolve the CPU but BEFORE the zpragma and
-     * compiler argument stages, so the pragma and -Cc flag both take effect.
-     * parse_option() modifies its argument in place, so it gets a writable
-     * copy, never a string literal. */
-    /* Newlib z180 keeps the 48-bit math48 default: the newlib m (math48)
-     * library is per-CPU, and a -mz180 link only pulls CPU:z180 members
-     * (z80asm refuses z80-CPU library members in -mz180 links).  Swap the
-     * default -lm to the CPU:z180 m_z180 product so the compiler's d*
-     * 48-bit calls resolve; the fp mode is left untouched.  The classic
-     * side instead flips to the 4-byte IEEE math32_z180 below. */
-    if (c_cpu == CPU_TYPE_Z180 && !c_user_fp_mode_explicit
-        && strcmp(c_genmathlib, "genmath@{ZCC_LIBCPU}") == 0
-        && linker_linklib_first != NULL
-        && strstr(linker_linklib_first, "-lm ") != NULL) {
-        if (c_clib != NULL && strstr(c_clib, "new") != NULL) {
-            linker_linklib_first = replace_str(linker_linklib_first, "-lm ", "-lm_z180 ");
-        } else {
-            c_genmathlib = muststrdup("math32_z180");
-            parse_option(muststrdup("-Cc-fp-mode=ieee -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_MATH32 -Ca-D__MATH_MATH32 -D__MATH_MATH32"));
-        }
+    /* -lm is math32 on every target.  The library rename happens later in
+     * configure_maths_library(); the IEEE width has to be chosen here, before
+     * configure_compiler().  An explicit fp-mode (command line or an alias
+     * such as --math-mbf32 / --genmath / --math48) wins.  parse_option()
+     * edits its argument, so the flags are a writable copy.
+     * ROM maths stays on -lmz (Z88MATHLIB / ALTMATHLIB), not on -lm. */
+    if (linker_linklib_first != NULL
+        && strstr(linker_linklib_first, "-lm ") != NULL
+        && c_genmathlib != NULL
+        && strcmp(c_genmathlib, "math32@{ZCC_LIBCPU}") == 0
+        && !c_user_fp_mode_explicit
+        && (sccz80arg == NULL || strstr(sccz80arg, "fp-mode") == NULL)) {
+        parse_option(muststrdup("-Cc-fp-mode=ieee -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_MATH32 -Ca-D__MATH_MATH32 -D__MATH_MATH32"));
     }
     keep_user_multi();
 
@@ -1251,9 +1241,9 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    /* Mangle math lib name but only for classic compiles */
-    if ((c_clib == NULL) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc")))
-        if (linker_linklib_first) configure_maths_library(&linker_linklib_first);   /* -lm appears here */
+    /* -lm → GENMATHLIB (math32@{ZCC_LIBCPU} unless a cfg overrides it).
+     * Classic and newlib both.  -lmz stays the ROM library. */
+    if (linker_linklib_first) configure_maths_library(&linker_linklib_first);
 
     /* Options that must be sequenced in specific order */
     if (compiler_type == CC_SDCC)
@@ -1786,11 +1776,14 @@ int main(int argc, char **argv)
         }
     }
 
-    /* Newlib strips @{ZCC_LIBCPU}, so --math32 is -lmath32.
-     * Map it to the math32_<cpu> product (same names as classic). */
+    /* Newlib strips @{ZCC_LIBCPU}, so --math32 / -lm is -lmath32.
+     * Map it to the math32_<cpu> product installed for that clib.
+     * --math48 is -lmath48 here; newlib's 48-bit library is m / m_z180. */
     if (c_clib != NULL && (strstr(c_clib, "new") != NULL || strstr(c_clib, "sdcc") != NULL)
-        && linklibs != NULL && strstr(linklibs, "-lmath32") != NULL
-        && strstr(linklibs, "-lmath32_") == NULL) {
+        && linklibs != NULL
+        && ((strstr(linklibs, "-l\"math32\"") != NULL)
+            || (strstr(linklibs, "-lmath32") != NULL
+                && strstr(linklibs, "-lmath32_") == NULL))) {
         const char *suf = select_cpu(CPU_MAP_TOOL_LIBNAME);
         if (c_cpu == CPU_TYPE_R6K)
             suf = "_r6k";
@@ -1798,6 +1791,7 @@ int main(int argc, char **argv)
             suf = NULL;
         switch (c_cpu) {
         case CPU_TYPE_Z80N:
+        case CPU_TYPE_Z180:
         case CPU_TYPE_R2KA:
         case CPU_TYPE_R3K:
         case CPU_TYPE_R4K:
@@ -1808,13 +1802,38 @@ int main(int argc, char **argv)
             break;
         }
         if (suf != NULL) {
-            char to[24];
+            char to[32];
             char *tmp;
-            snprintf(to, sizeof(to), "-lmath32%s", suf);
-            tmp = replace_str(linklibs, "-lmath32", to);
+            /* -lm is quoted by configure_maths_library(); --math32 is not. */
+            if (strstr(linklibs, "-l\"math32\"") != NULL) {
+                snprintf(to, sizeof(to), "-l\"math32%s\"", suf);
+                tmp = replace_str(linklibs, "-l\"math32\"", to);
+            } else {
+                snprintf(to, sizeof(to), "-lmath32%s", suf);
+                tmp = replace_str(linklibs, "-lmath32", to);
+            }
             free(linklibs);
             linklibs = tmp;
         }
+    }
+
+    /* Newlib 48-bit opt-in.  Classic keeps math48@{ZCC_LIBCPU}.
+     * configure_maths_library() quotes the name (-l"math48"). */
+    if (c_clib != NULL && (strstr(c_clib, "new") != NULL || strstr(c_clib, "sdcc") != NULL)
+        && linklibs != NULL && strstr(linklibs, "-l\"math48\"") != NULL) {
+        const char *to = (c_cpu == CPU_TYPE_Z180) ? "-l\"m_z180\"" : "-l\"m\"";
+        char *tmp = replace_str(linklibs, "-l\"math48\"", to);
+        free(linklibs);
+        linklibs = tmp;
+    }
+    if (c_clib != NULL && (strstr(c_clib, "new") != NULL || strstr(c_clib, "sdcc") != NULL)
+        && linklibs != NULL && strstr(linklibs, "-lmath48") != NULL
+        && strstr(linklibs, "-lmath48_") == NULL
+        && strstr(linklibs, "-l\"math48\"") == NULL) {
+        const char *to = (c_cpu == CPU_TYPE_Z180) ? "-lm_z180" : "-lm";
+        char *tmp = replace_str(linklibs, "-lmath48", to);
+        free(linklibs);
+        linklibs = tmp;
     }
 
     if (compileonly) {
@@ -3172,7 +3191,7 @@ static void configure_maths_library(char **libstring)
 {
     char   buf[1024];
 
-    /* By convention, -lm refers to GENMATH, -lmz to Z88MATHLIB/ALTMATHLIB */
+    /* -lm is GENMATHLIB (math32 by default).  -lmz is Z88MATHLIB/ALTMATHLIB. */
 
     if (c_altmathlib) {
         if (strstr(*libstring, "-lmz ") != NULL) {

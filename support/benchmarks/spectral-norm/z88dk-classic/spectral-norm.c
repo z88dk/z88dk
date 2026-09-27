@@ -32,6 +32,10 @@
 
 #ifdef __Z88DK
    #include <intrinsic.h>
+   #ifdef PRINTF
+      /* %0.9f: converter and field width */
+      #pragma output CLIB_OPT_PRINTF = 0x44000000
+   #endif
 #endif
 
 #ifdef __MATH_MATH16

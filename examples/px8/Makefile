@@ -75,7 +75,7 @@ clock.rom: ../graphics/clock.c
 	zcc +cpm -subtype=px8 -vn ../graphics/clock.c -I../graphics -lndos -lm  -create-app -oclock
 
 showlib3d.rom: ../graphics/showlib3d.c
-	zcc +cpm -subtype=px8 -vn ../graphics/showlib3d.c -lndos -lm  -create-app -oshowlib3d
+	zcc +cpm -subtype=px8 -vn ../graphics/showlib3d.c -lndos --genmath -create-app -oshowlib3d
 
 smallgfx2.rom: ../graphics/smallgfx2.c
 	zcc +cpm -subtype=px8 -vn ../graphics/smallgfx2.c -lndos -lm -create-app -osmallgfx2

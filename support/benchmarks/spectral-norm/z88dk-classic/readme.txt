@@ -1,3 +1,5 @@
+Before z88dk v2.5, classic `-lm` in these recipes linked genmath (6-byte, sccz80). From v2.5, `-lm` links math32. A 6-byte rerun is `--genmath` or `--math48` with sccz80 or 80cc. zsdcc stores a 4-byte IEEE value. 8-byte Microsoft format is `--mbf64` with either compiler.
+
 CHANGES TO SOURCE CODE
 ======================
 

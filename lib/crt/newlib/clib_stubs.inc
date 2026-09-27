@@ -47,11 +47,11 @@
       IF __SDCC_IY
       
          ; path from lib/crt/newlib → libsrc/newlib/stdio (post-#2814 layout)
-         INCLUDE "../../../libsrc/newlib/stdio/z80/asm_vfprintf_unlocked_iy.asm"
+         INCLUDE "../libsrc/newlib/stdio/z80/asm_vfprintf_unlocked_iy.asm"
       
       ELSE
       
-         INCLUDE "../../../libsrc/newlib/stdio/z80/asm_vfprintf_unlocked.asm"
+         INCLUDE "../libsrc/newlib/stdio/z80/asm_vfprintf_unlocked.asm"
    
       ENDIF
       
@@ -75,11 +75,11 @@
       
       IF __SDCC_IY
       
-         INCLUDE "../../../libsrc/newlib/stdio/z80/asm_vfscanf_unlocked_iy.asm"
+         INCLUDE "../libsrc/newlib/stdio/z80/asm_vfscanf_unlocked_iy.asm"
       
       ELSE
       
-         INCLUDE "../../../libsrc/newlib/stdio/z80/asm_vfscanf_unlocked.asm"
+         INCLUDE "../libsrc/newlib/stdio/z80/asm_vfscanf_unlocked.asm"
    
       ENDIF
    
