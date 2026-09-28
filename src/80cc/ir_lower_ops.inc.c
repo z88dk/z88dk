@@ -69,6 +69,21 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
     /* PR_BC dst: `ld bc,K` and stamp the cache. Downstream readers
        hit the `ld l,c; ld h,b` short-circuit in load_to_hl/de. */
     if (vreg_in_pr_bc(f, op->dst)) {
+        if (f->vregs[op->dst].flags & IR_VREG_CALL_SPLIT) {
+            /* [call-split] A call-split value is BC-resident only inside its
+               span; its frame slot is the canonical home. A fresh in-span
+               redefinition (e.g. a loop counter reset) must keep the slot
+               coherent too, or an out-of-span/cold-belief read after this
+               point serves the stale pre-reset value. Route through HL and
+               commit_hl_word so this reuses the SAME write-both machinery
+               spill_and_swap_unless_dead already gives every other PR_BC
+               producer (its call-split fall-through writes both the `ld
+               bc,hl` copy and the slot), instead of a second hand-written
+               copy of that contract here. */
+            emit(out, "ld\thl,%lld", (long long)op->imm);
+            commit_hl_word(out, f, op->dst);
+            return 0;
+        }
         emit(out, "ld\tbc,%lld", (long long)op->imm);
         cache_bc(op->dst);
         return 0;
