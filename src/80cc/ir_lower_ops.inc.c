@@ -4897,13 +4897,22 @@ static int sub_hl_de_ok(void)
    clobbered (see op_clobbers — declaring it costs more in evicted BC homes
    than the staging saves), so the only sound licence to write BC is a
    function that keeps nothing there. Paired with an rs.bc check at the site,
-   which covers the lowerer's own transient parks. */
+   which covers the lowerer's own transient parks.
+   ir_home_at() reports a call-split value's CANONICAL home, which is the
+   spill slot, not its ranged BC occupancy — so the ir_home_at scan below
+   misses it. A call-split value spends part of its live range genuinely
+   resident in BC (IR_VREG_CALL_SPLIT), and this SUB's declared clobber set
+   (not including BC) is exactly what licenses the allocator to plan that
+   residency across a SUB op. The DSUB stage-and-clobber trick would silently
+   break that plan. Confirmed via IR_VERIFY ("SUB writes ... not in clobbers")
+   on fannkuch's `count[r]-1` / `k-i` subtracts on 8085. */
 static int func_has_bc_home(const Func *f)
 {
     if (!f || !f->vreg_to_phys) return 1;          /* unknown: assume it does */
     for (int v = 0; v < f->n_vregs; v++) {
         int p = ir_home_at(f, v);
         if (p == IR_PR_BC || p == IR_PR_B || p == IR_PR_C) return 1;
+        if (f->vregs[v].flags & IR_VREG_CALL_SPLIT) return 1;
     }
     return 0;
 }
