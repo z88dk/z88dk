@@ -4768,9 +4768,17 @@ static int gen_add(FILE *out, Func *f, const Op *op)
        `inc bc` chain steps it in place — no HL staging, no `ld bc,hl`
        writeback. The value stays advertised in BC for the next
        iteration's deref. HL is left stale (it may have mirrored the
-       pre-step pointer), so drop its cache. */
+       pre-step pointer), so drop its cache.
+       EXCLUDE a call-split value: it is BC-resident only inside its span and
+       its frame slot must stay coherent (write-both) — a bare step updates
+       BC but NOT the slot, so a later out-of-span (or next-iteration) read
+       can see a stale value. Same reasoning as gen_step's CALL_SPLIT guard;
+       this is the `i += k` compound-assignment shape, which gen_step never
+       sees. Falling through reaches load_to_hl + commit_hl_result, which
+       writes both. */
     if (op->src[1] < 0 && op->dst == op->src[0]
         && vreg_in_pr_bc(f, op->dst) && bc_has(op->dst)
+        && !(f->vregs[op->dst].flags & IR_VREG_CALL_SPLIT)
         && op->imm >= 1
         && (g_hc.home_is_word || op->imm <= 4)) {
         /* Normally an inc-bc chain only up to 4 (past that `ld de,k; add hl,de`
