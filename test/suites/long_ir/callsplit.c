@@ -112,6 +112,24 @@ static long recursive_long_add(long x, unsigned int n)
     return base + recursive_long_add(x + 1, n - 1);
 }
 
+/* A call-bounded long used as SUB's minuend must be consumed in place from
+ * the data stack; this is the non-commutative counterpart to the ADD fusion. */
+long parked_lhs_sub(long x)
+{
+    long lhs = x + 3;
+    sink((unsigned int)x);
+    return lhs - x;
+}
+
+/* The reverse operand order must also preserve SUB's direction: the parked
+ * value is the subtrahend, so the live operand is reduced by it. */
+long parked_rhs_sub(long x)
+{
+    long rhs = x + 3;
+    sink((unsigned int)x);
+    return x - rhs;
+}
+
 /* Consecutive fixed-offset stores through one heap pointer must retain their
  * source order while the lowerer walks the destination address. */
 typedef struct {
@@ -158,6 +176,8 @@ static void test_callsplit(void)
     assertEqual(primes_nested(), 25u);         /* flat-inverted inner-loop BC clobber */
     assertEqual(bool_steps(), 0x0303u);        /* +=/-= !cond both fire */
     assertEqual(recursive_long_add(5, 3), 38L); /* long survives recursive call */
+    assertEqual(parked_lhs_sub(7), 3L);          /* parked long is SUB's LHS */
+    assertEqual(parked_rhs_sub(7), -3L);         /* parked long is SUB's RHS */
     assertEqual(chain_stores(3, 4, 5), 12L);   /* aggregate store chain */
     {
         static const unsigned int data[3] = { 7u, 11u, 13u };

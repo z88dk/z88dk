@@ -4727,7 +4727,7 @@ int ir_opt_insert_long_pushes(Func *f, int allow_regular)
         if (bb->n_ops < 3) continue;
 
         /* `absorbs` means the consumer is a long-binop (OR/AND/XOR/
-           ADD/SUB) whose src[0] is the pushed vreg — its ir_lower
+                       ADD/SUB) whose operand is the pushed vreg — its ir_lower
            fastpath consumes the stack value directly via byte-wise
            (hl), so we emit PUSH but NO POP. For all other consumers
            (ST_MEM, NOT/NEG, SHL/SHR, nested PUSH) we emit both. */
@@ -4797,14 +4797,12 @@ int ir_opt_insert_long_pushes(Func *f, int allow_regular)
                     /* Long-binop consumers with the stacked vreg as
                        src[0] absorb it directly via the option-B
                        fastpath. SHL/SHR/NOT/NEG/MOV are single-source
-                       and need the POP to materialize DEHL. SUB has
-                       NO option-B block in the lowerer (only ADD and
-                       the AND/OR/XOR family do) — marking it absorbing
-                       left the value orphaned on the stack and the
-                       consumer reading the stale slot. */
+                       and need the POP to materialize DEHL. SUB now has
+                       a bytewise stack consumer for either operand order. */
                     if (use_op->kind == IR_ADD
                      || use_op->kind == IR_AND || use_op->kind == IR_OR
-                     || use_op->kind == IR_XOR)
+                     || use_op->kind == IR_XOR
+                     || use_op->kind == IR_SUB)
                         absorbs = 1;
                 }
                 else if ((use_op->kind == IR_ADD || use_op->kind == IR_AND
@@ -4812,6 +4810,10 @@ int ir_opt_insert_long_pushes(Func *f, int allow_regular)
                        && use_op->src[1] == dst)
                     matches = 1;   /* no absorb — option B's fastpath
                                       only handles src[0]==dst today */
+                else if (use_op->kind == IR_SUB && use_op->src[1] == dst) {
+                    matches = 1;
+                    absorbs = 1;
+                }
             }
             if (!matches) continue;
 

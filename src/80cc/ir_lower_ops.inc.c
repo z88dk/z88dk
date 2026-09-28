@@ -5006,6 +5006,66 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
             store_dehl_finalize(out, f, op->dst);
             return 0;
         }
+        /* A parked long can be the operand of SUB without first popping it.
+           Keep the parked four bytes in place, load the other operand into
+           DEHL, and overwrite the parked bytes with the bytewise result.
+           This handles both operand orders and avoids XTHL, which is not
+           available on 8080/8085/VM1/GBZ80. */
+        if (L.la.cur_stack_long_top >= 0
+            && (L.la.cur_stack_long_top == op->src[0]
+                || L.la.cur_stack_long_top == op->src[1])
+            && op->src[0] >= 0 && op->src[1] >= 0
+            && op->src[0] != op->src[1]) {
+            int stacked = L.la.cur_stack_long_top;
+            int other = (stacked == op->src[0]) ? op->src[1] : op->src[0];
+
+            load_to_dehl_adj(out, f, other, 0);
+            emit(out, "ld\tbc,hl");       /* preserve other low half */
+            emit(out, "ld\thl,0");
+            emit(out, "add\thl,sp");      /* HL = parked low half */
+            if (stacked == op->src[0]) {
+                emit(out, "ld\ta,(hl)");
+                emit(out, "sub\tc");
+                emit(out, "ld\t(hl),a");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,(hl)");
+                emit(out, "sbc\ta,b");
+                emit(out, "ld\t(hl),a");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,(hl)");
+                emit(out, "sbc\ta,e");
+                emit(out, "ld\t(hl),a");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,(hl)");
+                emit(out, "sbc\ta,d");
+                emit(out, "ld\t(hl),a");
+            } else {
+                emit(out, "ld\ta,c");
+                emit(out, "sub\t(hl)");
+                emit(out, "ld\t(hl),a");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,b");
+                emit(out, "sbc\ta,(hl)");
+                emit(out, "ld\t(hl),a");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,e");
+                emit(out, "sbc\ta,(hl)");
+                emit(out, "ld\t(hl),a");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,d");
+                emit(out, "sbc\ta,(hl)");
+                emit(out, "ld\t(hl),a");
+            }
+            emit_pop_hl(out);               /* result low */
+            emit(out, "pop\tde");           /* result high */
+            L.cur_sp_adjust -= 4;
+            L.la.cur_stack_long_top = -1;
+            invalidate_hl_cache();
+            invalidate_de_cache();
+            invalidate_bc_cache();
+            store_dehl_finalize(out, f, op->dst);
+            return 0;
+        }
         /* FP-mode byte-direct long SUB fastpath. SUB is NOT
            commutative; we need src[0] - src[1]. Two sub-cases:
              a) src[0] in DEHL, src[1] in slot →
