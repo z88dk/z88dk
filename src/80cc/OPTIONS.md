@@ -37,6 +37,7 @@ exists (ADR 0010).
 | `thread-jumps` | no jump threading across conditionals |
 | `demote-poststep` | keep `p++` as a post-step instead of demoting it |
 | `loop-reverse` | never reverse a counted loop to count down to zero |
+| `bool-step` | keep statement `x +=/-= !cond` as a materialised boolean update |
 | `k-trip` | 8085 literal 16-bit countdown loops keep the regular zero-test rather than using a shifted counter and `jp nk` |
 
 ## IR optimiser (`ir_opt.c`)
@@ -53,6 +54,7 @@ exists (ADR 0010).
 | `coalesce-copies` | keep `IR_MOV` copies that could be coalesced away |
 | `addr-cse` | recompute an address expression instead of reusing it |
 | `deref-offset` | keep a field offset as a separate address temporary rather than folding it into the access — the other half of `idx-deref` |
+| `store-chain` | lower adjacent fixed-offset stores through one pointer as an address-walking chain |
 | `lea-offset` | no folding of a constant offset into an address computation |
 | `narrow-byte` | keep a word value wide when every use fits a byte |
 | `var-byte-shift` | keep a promoted variable-count byte shift on the established word-width path |

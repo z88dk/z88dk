@@ -88,6 +88,59 @@ static unsigned int primes_nested(void)
     return count;
 }
 
+/* Statement-context boolean compound updates: both directions must preserve
+ * their independent results when lowered as conditional pre-steps. */
+static unsigned int bool_steps(void)
+{
+    unsigned char b[6] = { 0, 1, 0, 1, 0, 1 };
+    unsigned int plus = 0, minus = 6, i;
+    for (i = 0; i < 6; ++i) {
+        plus  += !b[i];
+        minus -= !b[i];
+    }
+    return (plus << 8) | minus;
+}
+
+/* A long expression result must survive the recursive call while its argument
+ * is built.  This is the IR form that used to spill the left operand to a
+ * frame slot on SP-mode targets, even though it can be parked below the call's
+ * arguments with the same stack-preservation operation used in FP mode. */
+static long recursive_long_add(long x, unsigned int n)
+{
+    long base = x + 3;
+    if (n == 0) return base;
+    return base + recursive_long_add(x + 1, n - 1);
+}
+
+/* Consecutive fixed-offset stores through one heap pointer must retain their
+ * source order while the lowerer walks the destination address. */
+typedef struct {
+    unsigned int left, right;
+    long item;
+} chain_node;
+
+static long chain_stores(unsigned int left, unsigned int right, long item)
+{
+    chain_node node;
+    chain_node *p = &node;
+    long result;
+    p->left = left;
+    p->right = right;
+    p->item = item;
+    result = (long)p->left + (long)p->right + p->item;
+    return result;
+}
+
+/* A constant pointer displacement should be folded into the dereference, even
+ * on CPUs without indexed addressing.  This keeps the address as one IR_MEM
+ * base+offset operation instead of materialising q and then loading through q.
+ */
+static unsigned int deref_offset_loads(const unsigned int *p)
+{
+    const unsigned int *q = p + 1;
+    return q[0] + q[1];
+}
+
 static void test_callsplit(void)
 {
     g_acc = 0;
@@ -103,6 +156,13 @@ static void test_callsplit(void)
     assertEqual(churn_readonly(10), 57909u);
 
     assertEqual(primes_nested(), 25u);         /* flat-inverted inner-loop BC clobber */
+    assertEqual(bool_steps(), 0x0303u);        /* +=/-= !cond both fire */
+    assertEqual(recursive_long_add(5, 3), 38L); /* long survives recursive call */
+    assertEqual(chain_stores(3, 4, 5), 12L);   /* aggregate store chain */
+    {
+        static const unsigned int data[3] = { 7u, 11u, 13u };
+        assertEqual(deref_offset_loads(data), 24u);
+    }
 }
 
 int main(int argc, char *argv[])

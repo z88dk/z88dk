@@ -3631,8 +3631,123 @@ static int try_de_home_mask_store(FILE *out, Func *f, const Op *op)
     return 1;
 }
 
+/* Lower one member of an IR-marked aggregate-store chain.  The first member
+   establishes HL from the base; later members retain the address while the
+   value is loaded, then advance HL from the previous field.  This is the IR
+   equivalent of the spill/fusion shape copt obtains for sccz80, but it keeps
+   the operation widths and legal stores in the normal CPU-specific lowerer. */
+static int try_store_chain(FILE *out, Func *f, const Op *op)
+{
+    if (op->mem.chain == 1) {
+        if (!cur_bb || cur_op_idx + 1 >= cur_bb->n_ops
+            || cur_bb->ops[cur_op_idx + 1].kind != IR_ST_MEM
+            || cur_bb->ops[cur_op_idx + 1].mem.chain != 2)
+            return 0;
+        if (f->vregs[op->src[0]].width != 2
+            || op->mem.kind != IR_MEM_VREG)
+            return 0;
+        if (IS_8085() && op->mem.offset == 0) {
+            load_to_de(out, f, op->mem.base);
+            emit_sp(out, 2, "push\tde");
+            load_to_hl(out, f, op->src[0]);
+            emit_sp(out, -2, "pop\tde");
+            emit(out, "ld\t(de),hl");
+            emit(out, "inc\tde");
+            emit(out, "inc\tde");
+            invalidate_hl_cache();
+            invalidate_de_cache();
+            store_chain_base = op->mem.base;
+            store_chain_hl_off = op->mem.offset + 2;
+            store_chain_in_de = 1;
+            return 1;
+        }
+        load_to_hl(out, f, op->src[0]);
+        emit_ex_de_hl(out);
+        load_to_hl(out, f, op->mem.base);
+        emit_hl_add_offset(out, op->mem.offset, 1, 1);
+        emit(out, "ld\t(hl),e");
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),d");
+        invalidate_hl_cache();
+        store_chain_base = op->mem.base;
+        store_chain_hl_off = op->mem.offset + 1;
+        store_chain_in_de = 0;
+        return 1;
+    }
+
+    if (op->mem.chain != 2 || store_chain_base != op->mem.base
+        || op->mem.kind != IR_MEM_VREG)
+        return 0;
+
+    if (!store_chain_in_de)
+        emit_hl_add_offset(out, op->mem.offset - store_chain_hl_off, 0, 0);
+    if (f->vregs[op->src[0]].width == 2) {
+        if (store_chain_in_de) {
+            emit_sp(out, 2, "push\tde");
+            load_to_hl(out, f, op->src[0]);
+            emit_sp(out, -2, "pop\tde");
+            emit(out, "ld\t(de),hl");
+            emit(out, "inc\tde");
+            emit(out, "inc\tde");
+        } else {
+            emit_sp(out, 2, "push\thl");
+            load_to_hl(out, f, op->src[0]);
+            emit_ex_de_hl(out);
+            emit_sp(out, -2, "pop\thl");
+            emit(out, "ld\t(hl),e");
+            emit(out, "inc\thl");
+            emit(out, "ld\t(hl),d");
+        }
+    } else if (f->vregs[op->src[0]].width == 4) {
+        if (store_chain_in_de) {
+            emit_sp(out, 2, "push\tde");
+            load_to_dehl(out, f, op->src[0]);
+            emit_sp(out, 2, "push\tde");
+            emit_sp(out, 2, "push\thl");
+            emit_sp(out, -2, "pop\thl");
+            emit_sp(out, -2, "pop\tbc");
+            emit_sp(out, -2, "pop\tde");
+            emit(out, "ld\t(de),hl");
+            emit(out, "inc\tde"); emit(out, "inc\tde");
+            emit(out, "ld\thl,bc");
+            emit(out, "ld\t(de),hl");
+            emit(out, "inc\tde"); emit(out, "inc\tde");
+        } else {
+            emit_sp(out, 2, "push\thl");
+            load_to_dehl(out, f, op->src[0]);
+            emit_sp(out, 2, "push\tde");
+            emit_sp(out, 2, "push\thl");
+            emit_sp(out, -2, "pop\tbc");
+            emit_sp(out, -2, "pop\tde");
+            emit_sp(out, -2, "pop\thl");
+            store_byte_adv(out, "c", 0);
+            store_byte_adv(out, "b", 0);
+            store_byte_adv(out, "e", 0);
+            store_byte_adv(out, "d", 1);
+        }
+    } else {
+        store_chain_base = -1;
+        store_chain_hl_off = -1;
+        return 0;
+    }
+    invalidate_hl_cache();
+    if (store_chain_in_de)
+        store_chain_hl_off = op->mem.offset + f->vregs[op->src[0]].width;
+    else
+        store_chain_hl_off = op->mem.offset + f->vregs[op->src[0]].width - 1;
+    if (cur_op_idx + 1 >= cur_bb->n_ops
+        || cur_bb->ops[cur_op_idx + 1].mem.chain != 2) {
+        store_chain_base = -1;
+        store_chain_hl_off = -1;
+        store_chain_in_de = 0;
+    }
+    return 1;
+}
+
 static int gen_st_mem(FILE *out, Func *f, const Op *op)
 {
+    if (op->mem.chain && try_store_chain(out, f, op))
+        return 0;
     /* Port write. Must come before every fold below: those all assume the
        destination is memory, and a port is not addressable. */
     if (op->mem.kind == IR_MEM_PORT) {

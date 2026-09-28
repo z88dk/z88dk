@@ -188,6 +188,8 @@ typedef struct {
     int      post_step; /* IR_MEM_VREG only: ±N applied to base after the
                            load, so the lowerer can fuse the step into
                            the addressing (the *p++ pattern). 0 = none. */
+    int      chain;     /* IR_ST_MEM store chain: 1 = first, 2 = continuation;
+                           zero for an ordinary memory operation. */
     SYMBOL  *bank_fn;   /* __addressmod: page-in fn to call before an
                            indirect (IR_MEM_VREG) namespaced access; the
                            namespace is recovered from the pointer/array

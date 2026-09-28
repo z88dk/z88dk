@@ -4287,6 +4287,12 @@ static int          cur_op_idx;
    shift-test peephole to inspect successor BBs' first ops, and by the windowed
    A-carry safety scan in the register-cache helpers. */
 static const BB    *cur_bb;
+/* Consecutive aggregate stores may keep the destination address in HL and
+   advance it between fields.  -1 means no active chain; the offset is the
+   byte position currently held in HL relative to the chain base. */
+static int store_chain_base = -1;
+static int store_chain_hl_off = -1;
+static int store_chain_in_de;
 
 /* ir_home_at — the single I1 read path (ADR 0017): where is value `v` homed?
    Today homes are whole-function (a degenerate one-interval-per-vreg table), so
@@ -7498,6 +7504,10 @@ int ir_lower_func(FILE *out, Func *f)
            slot) and DCE the now-dead copies. */
         int cprop   = ir_opt_copy_prop(f);
         if (cprop) dce += ir_opt_dce(f);
+        /* Mark consecutive fixed-offset aggregate stores so the lowerer can
+           walk one destination pointer across the chain. Run after DCE and
+           copy propagation, when the final base/offset form is visible. */
+        int store_chain = ir_opt_store_chain(f);
         /* Fold single-use byte update-chain temps into their copy dst (the
            byte-home accumulator) so the char ternary's arms write the home
            directly — kills the per-arm widen + merge copy and lets the
@@ -7515,11 +7525,16 @@ int ir_lower_func(FILE *out, Func *f)
             const char *lp = getenv("IR_LONG_PUSHES");
             if (lp) want_pushes = (atoi(lp) != 0);
         }
-        int pushes  = want_pushes ? ir_opt_insert_long_pushes(f) : 0;
+        /* Run the pass in both frame modes.  SP mode admits only the
+           call-crossing fusion; the broader same-BB push/pop set remains
+           gated by want_pushes because its staging cost is not generally
+           profitable there. */
+        int pushes  = ir_opt_insert_long_pushes(f, want_pushes);
         if ((hoisted > 0 || ivsr > 0 || fwd > 0 || cfold > 0
              || packs > 0 || dce > 0 || early > 0
              || late > 0 || match > 0 || narrow > 0 || ivnarrow > 0
-             || cse > 0 || addrcse > 0 || leaofs > 0 || pushes > 0 || deadret > 0 || reassoc > 0
+             || cse > 0 || addrcse > 0 || leaofs > 0 || store_chain > 0
+             || pushes > 0 || deadret > 0 || reassoc > 0
              || rcoal > 0 || pruned > 0 || symcmp > 0 || aggpromoted > 0)
             && getenv("IR_OPT_VERBOSE"))
             fprintf(stderr,
