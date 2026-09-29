@@ -458,8 +458,7 @@ static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
     return mask;
 }
 
-/* Advance *pp past a quoted string or character literal (single or double
- * quote).  Handles backslash escapes.  *pp must point at the opening quote. */
+/* Skip *pp past a quoted string or char literal; handles backslash escapes. */
 static void skip_quoted(const char **pp)
 {
     char q = *(*pp)++;
@@ -467,35 +466,28 @@ static void skip_quoted(const char **pp)
         if (**pp == '\\' && (*pp)[1]) (*pp)++;
         (*pp)++;
     }
-    if (**pp) (*pp)++;                             /* step past closing quote */
+    if (**pp) (*pp)++;
 }
 
-/* Return a pointer to the start of the argidx-th top-level argument within
- * the call whose opening '(' is at `open`.  Returns NULL if the argument
- * list ends before that index is reached.  On success *end_out points one
- * past the argument (at ',' or ')'). */
+/* Return start of argidx-th top-level argument of the call at `open`;
+ * sets *end_out to the following ',' or ')'.  Returns NULL if not found. */
 static const char *find_format_arg(const char *open, int argidx,
                                    const char **end_out)
 {
-    const char *a       = open + 1;               /* step past '(' */
+    const char *a        = open + 1;
     const char *argstart = a;
-    int         depth   = 1;
-    int         curarg  = 1;
+    int         depth    = 1;
+    int         curarg   = 1;
 
     while (*a && depth > 0) {
-        if (*a == '"' || *a == '\'') {
-            skip_quoted(&a);
-            continue;
-        }
-        if (*a == '(' || *a == '[' || *a == '{') {
-            depth++;
-        } else if (*a == ')' || *a == ']' || *a == '}') {
-            depth--;
-            if (depth == 0) break;
-        } else if (*a == ',' && depth == 1) {
+        if (*a == '"' || *a == '\'') { skip_quoted(&a); continue; }
+        if      (*a == '(' || *a == '[' || *a == '{') depth++;
+        else if (*a == ')' || *a == ']' || *a == '}') { if (--depth == 0) break; }
+        else if (*a == ',' && depth == 1) {
             if (curarg == argidx) break;
+            argstart = ++a;
             curarg++;
-            argstart = a + 1;
+            continue;
         }
         a++;
     }
@@ -505,77 +497,53 @@ static const char *find_format_arg(const char *open, int argidx,
     return argstart;
 }
 
-/* Scan one preprocessed source line for printf/scanf calls and accumulate
- * the format-converter bitmasks into auto_printf_mask / auto_scanf_mask.
- *
- * Three phases per token:
- *   1. Skip quoted literals so we never mistake their contents for identifiers.
- *   2. Identify a word token; skip if it is not a known printf/scanf name.
- *   3. Locate the format argument and hand it to scan_format_literal. */
+/* Scan preprocessed line for printf/scanf calls; accumulate converter masks. */
 static void scan_line_for_formats(const char *line)
 {
     const char *p = line;
 
     while (*p) {
-        /* Phase 1: skip quoted string/char literals. */
-        if (*p == '"' || *p == '\'') {
-            skip_quoted(&p);
-            continue;
-        }
+        if (*p == '"' || *p == '\'') { skip_quoted(&p); continue; }
 
-        /* Phase 2: find the start of a word token. */
-        if (!(isalpha((unsigned char)*p) || *p == '_')) {
-            p++;
-            continue;
-        }
+        if (!(isalpha((unsigned char)*p) || *p == '_')) { p++; continue; }
         if (p != line && (isalnum((unsigned char)p[-1]) || p[-1] == '_')) {
-            while (isalnum((unsigned char)*p) || *p == '_') p++;   /* mid-identifier */
+            while (isalnum((unsigned char)*p) || *p == '_') p++;
             continue;
         }
 
-        /* Collect the identifier name and check it is followed by '('. */
-        char        name[NAMESIZE + 1];
-        int         n = 0;
+        char name[NAMESIZE + 1]; int n = 0;
         while ((isalnum((unsigned char)*p) || *p == '_') && n < NAMESIZE)
             name[n++] = *p++;
         name[n] = '\0';
 
         const char *after_name = p;
         while (isspace((unsigned char)*after_name)) after_name++;
-        if (*after_name != '(') continue;          /* not a function call */
+        if (*after_name != '(') continue;
 
         int is_scanf, argidx;
         argidx = format_arg_index(name, &is_scanf);
-        if (argidx == 0) continue;                 /* not a printf/scanf family */
+        if (argidx == 0) continue;
 
-        /* Phase 3: locate the format argument and process it. */
-        const char *end;
-        const char *argstart = find_format_arg(after_name, argidx, &end);
+        const char *end, *argstart = find_format_arg(after_name, argidx, &end);
         if (!argstart) continue;
 
         const char *f = argstart;
         while (isspace((unsigned char)*f) || *f == '(') f++;      /* tolerate ("...") */
 
         if (*f == '"') {
-            /* Static literal: scan it and accumulate the converter bits. */
-            uint32_t m = scan_format_literal(f, is_scanf ? scanf_formats
-                                                         : printf_formats);
+            uint32_t m = scan_format_literal(f, is_scanf ? scanf_formats : printf_formats);
             if (is_scanf) auto_scanf_mask |= m;
             else          auto_printf_mask |= m;
         } else if (*f != '\0' && *f != ')' && !region_has_word(f, end, "char")) {
-            /* Non-literal (variable/expression): record for warning.
-             * Only the first occurrence per family is stored. */
             if (is_scanf) {
                 if (auto_scanf_nonlit_line == 0) {
                     auto_scanf_nonlit_line = lineno;
-                    strncpy(auto_scanf_nonlit_file, filename,
-                            sizeof(auto_scanf_nonlit_file) - 1);
+                    strncpy(auto_scanf_nonlit_file, filename, sizeof(auto_scanf_nonlit_file) - 1);
                 }
             } else {
                 if (auto_printf_nonlit_line == 0) {
                     auto_printf_nonlit_line = lineno;
-                    strncpy(auto_printf_nonlit_file, filename,
-                            sizeof(auto_printf_nonlit_file) - 1);
+                    strncpy(auto_printf_nonlit_file, filename, sizeof(auto_printf_nonlit_file) - 1);
                 }
             }
         }
