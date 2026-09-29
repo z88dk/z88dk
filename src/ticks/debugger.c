@@ -1691,33 +1691,57 @@ static int cmd_watch(int argc, char **argv)
         int value = parse_address(argv[2], &corrected_source);
 
         if ( value != -1 ) {
-            elem = add_watchpoint(breakwrite ? BREAK_WRITE : BREAK_READ, value);
-            bk.console("Adding %s watchpoint at '%s' $%04x (%s)\n",
-                breakwrite ? "write" : "read", corrected_source, value,  resolve_to_label(value));
+            breakpoint_ret_t result;
+            elem = add_watchpoint(breakwrite ? BREAK_WRITE : BREAK_READ, value, &result);
+            if (elem) {
+                bk.console("Adding %s watchpoint at '%s' $%04x (%s)\n",
+                    breakwrite ? "write" : "read", corrected_source, value,  resolve_to_label(value));
+            } else {
+                switch (result) {
+                    case BREAKPOINT_ERROR_NOT_CONNECTED:
+                        bk.console("Could not add watchpoint: not connected\n");
+                        break;
+                    case BREAKPOINT_ERROR_RUNNING:
+                        bk.console("Could not add watchpoint: target is running\n");
+                        break;
+                    default:
+                        bk.console("Could not add watchpoint: target refused it\n");
+                        break;
+                }
+            }
         } else {
             bk.console("Cannot set watchpoint on '%s'\n", corrected_source);
         }
     } else if ( argc == 3 && strcmp(argv[1],"delete") == 0 ) {
         breakpoint *elem = find_watchpoint(atoi(argv[2]));
         if (elem) {
-            bk.console("Deleting watchpoint %d \n", atoi(argv[2]));
-            delete_watchpoint(elem);
+            if (delete_watchpoint(elem) == BREAKPOINT_ERROR_OK) {
+                bk.console("Deleting watchpoint %d \n", atoi(argv[2]));
+            } else {
+                bk.console("Error: target did not remove watchpoint %d\n", atoi(argv[2]));
+            }
         } else {
             bk.console("Unknown watchpoint\n");
         }
     } else if ( argc == 3 && strcmp(argv[1],"disable") == 0 ) {
         breakpoint *elem = find_watchpoint(atoi(argv[2]));
         if (elem) {
-            bk.console("Disabling watchpoint %d\n", atoi(argv[2]));
-            elem->enabled = 0;
+            if (set_watchpoint_enabled(elem, 0) == BREAKPOINT_ERROR_OK) {
+                bk.console("Disabling watchpoint %d\n", atoi(argv[2]));
+            } else {
+                bk.console("Error: target did not disable watchpoint %d\n", atoi(argv[2]));
+            }
         } else {
             bk.console("Unknown watchpoint\n");
         }
     } else if ( argc == 3 && strcmp(argv[1],"enable") == 0 ) {
         breakpoint *elem = find_watchpoint(atoi(argv[2]));
         if (elem) {
-            bk.console("Enabling watchpoint %d\n",atoi(argv[2]));
-            elem->enabled = 1;
+            if (set_watchpoint_enabled(elem, 1) == BREAKPOINT_ERROR_OK) {
+                bk.console("Enabling watchpoint %d\n", atoi(argv[2]));
+            } else {
+                bk.console("Error: target did not enable watchpoint %d\n", atoi(argv[2]));
+            }
         } else {
             bk.console("Unknown watchpoint\n");
         }
@@ -2175,9 +2199,10 @@ static int cmd_quit(int argc, char **argv)
 {
     if (bk.confirm_detach_w_breakpoints) {
         breakpoint* elem;
-        int count;
+        int count, watch_count;
         LL_COUNT(breakpoints, elem, count);
-        if (count > 0) {
+        LL_COUNT(watchpoints, elem, watch_count);
+        if (count + watch_count > 0) {
             if (confirm("You have breakpoint(s) set. Would you like to remove them before you detach?")) {
                 delete_all_breakpoints();
             }

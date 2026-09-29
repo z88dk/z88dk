@@ -656,6 +656,37 @@ breakpoint_ret_t gdb_remove_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
     return BREAKPOINT_ERROR_OK;
 }
 
+static breakpoint_ret_t gdb_send_watchpoint_request(const char command, const uint8_t type, const uint16_t at, const uint8_t sz)
+{
+    if (connection_socket == 0) {
+        return BREAKPOINT_ERROR_NOT_CONNECTED;
+    }
+
+    if (debugger_active == 0) {
+        return BREAKPOINT_ERROR_RUNNING;
+    }
+
+    char req[64];
+    sprintf(req, "%c%zx,%zx,%zx", command, (size_t)type, (size_t)at, (size_t)sz);
+    const char* const resp = send_request(req);
+    if (strcmp(resp, "OK") != 0)
+    {
+        return BREAKPOINT_ERROR_FAILURE;
+    }
+
+    return BREAKPOINT_ERROR_OK;
+}
+
+static breakpoint_ret_t gdb_add_watchpoint(const uint8_t type, const uint16_t at, const uint8_t sz)
+{
+    return gdb_send_watchpoint_request('Z', type, at, sz);
+}
+
+static breakpoint_ret_t gdb_remove_watchpoint(const uint8_t type, const uint16_t at, const uint8_t sz)
+{
+    return gdb_send_watchpoint_request('z', type, at, sz);
+}
+
 breakpoint_ret_t gdb_disable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
     return BREAKPOINT_ERROR_FAILURE;
@@ -1512,6 +1543,8 @@ static backend_t gdb_backend = {
     .restore = &debugger_restore,
     .add_breakpoint = &gdb_add_breakpoint,
     .remove_breakpoint = &gdb_remove_breakpoint,
+    .add_watchpoint = &gdb_add_watchpoint,
+    .remove_watchpoint = &gdb_remove_watchpoint,
     .disable_breakpoint = &gdb_disable_breakpoint,
     .enable_breakpoint = &gdb_enable_breakpoint,
     .breakpoints_check = &breakpoints_check,
