@@ -7561,6 +7561,19 @@ static int build_stmt(Builder *b, Node *n)
         int exit_bb = ir_bb_new(b->f);
         int els_bb  = n->els ? ir_bb_new(b->f) : exit_bb;
 
+        /* ast_conditional() (node.c) builds this AST_IF/AST_TERNARY node
+           from already-parsed cond/then/els subtrees, and stamps ITS OWN
+           filename/line from the parser's `lineno` at that point — i.e.
+           wherever parsing landed AFTER the whole if/else, not the `if`
+           keyword. n->cond was built earlier, while `lineno` still tracked
+           the condition's own line, so re-stamp from it before emitting
+           the test — otherwise every op the test builds (through
+           build_cond, including any short-circuit &&/|| test ops) carries
+           the tail line of a multi-line if/else instead of the line the
+           condition actually reads from. */
+        if (n->cond->filename && n->cond->line > 0)
+            ir_set_emit_loc(n->cond->filename, n->cond->line);
+
         /* Short-circuit control-context lowering: compound `&&`/`||` become
            direct branches to then_bb/els_bb (targets pre-created so their ids
            stay above the test block). build_cond creates no BBs. */
