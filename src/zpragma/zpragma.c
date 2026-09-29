@@ -424,9 +424,10 @@ static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
                 arg++;                                     /* width / precision */
             while (*arg == 'l' || *arg == 'h' || *arg == 'z' || *arg == 'j' || *arg == 't')
                 arg++;                                     /* length modifiers */
+            
             if (*arg == 0 || *arg == '"')                  /* truncated format string */
                 break;
-            arg++;                                         /* conversion letter: d/f/s/x/… */
+                arg++;                                         /* conversion letter: d/f/s/x/… */
             /* Copy before..arg into a null-terminated buffer and delegate to
              * parse_format_string so the CONVSPEC lookup lives in one place. */
             char spec[32];
