@@ -416,7 +416,7 @@ static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
             }
             /* Advance arg past flags, width/precision, length modifiers and the
              * conversion letter, then pass before..arg to parse_format_string.
-             * Example: C literal "%-6.1f" → before.."f"+1 = "6.1f\0". */
+             * Example: C literal "%-6.1f" → spec="6.1f". */
             const char *before = arg;
             while (*arg == '-' || *arg == '+' || *arg == ' ' || *arg == '#' || *arg == '0')
                 arg++;                                     /* flags */
@@ -424,10 +424,11 @@ static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
                 arg++;                                     /* width / precision */
             while (*arg == 'l' || *arg == 'h' || *arg == 'z' || *arg == 'j' || *arg == 't')
                 arg++;                                     /* length modifiers */
-            
             if (*arg == 0 || *arg == '"')                  /* truncated format string */
                 break;
-                arg++;                                         /* conversion letter: d/f/s/x/… */
+            if (!isalpha((unsigned char)*arg) && *arg != '[')
+                break;                                     /* not a valid conversion letter */
+            arg++;                                         /* step past conversion letter */
             /* Copy before..arg into a null-terminated buffer and delegate to
              * parse_format_string so the CONVSPEC lookup lives in one place. */
             char spec[32];
