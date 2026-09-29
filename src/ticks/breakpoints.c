@@ -15,8 +15,14 @@ breakpoint *watchpoints;
 temporary_breakpoint_t* temporary_breakpoints = NULL;
 int next_breakpoint_number = 1;
 
-breakpoint* add_watchpoint(breakpoint_type operation, int value) {
+breakpoint* add_watchpoint(breakpoint_type operation, int value, breakpoint_ret_t* result) {
+    *result = BREAKPOINT_ERROR_OK;
+
     breakpoint* w = calloc(1, sizeof(breakpoint));
+    if (w == NULL) {
+        *result = BREAKPOINT_ERROR_FAILURE;
+        return NULL;
+    }
 
     // TODO: tie up watchpoints to a backend (e.g. gdb)
 
@@ -59,7 +65,7 @@ breakpoint* add_breakpoint(breakpoint_type type, enum bk_breakpoint_type bk_type
     return elem;
 }
 
-void delete_watchpoint(breakpoint* w) {
+breakpoint_ret_t delete_watchpoint(breakpoint* w) {
     LL_DELETE(watchpoints, w);
 
     if (w->text) {
@@ -67,6 +73,12 @@ void delete_watchpoint(breakpoint* w) {
         w->text = NULL;
     }
     free(w);
+    return BREAKPOINT_ERROR_OK;
+}
+
+breakpoint_ret_t set_watchpoint_enabled(breakpoint* w, uint8_t enabled) {
+    w->enabled = enabled;
+    return BREAKPOINT_ERROR_OK;
 }
 
 void delete_breakpoint(breakpoint* b) {

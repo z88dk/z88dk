@@ -28,14 +28,6 @@ typedef void (*log_cb)(const char *fmt, ...);
 typedef void (*console_raw_cb)(const char *str, size_t len);
 typedef uint8_t (*breakpoints_check_cb)();
 
-typedef enum
-{
-    BREAKPOINT_ERROR_OK = 0,
-    BREAKPOINT_ERROR_NOT_CONNECTED,
-    BREAKPOINT_ERROR_RUNNING,
-    BREAKPOINT_ERROR_FAILURE,
-} breakpoint_ret_t;
-
 typedef breakpoint_ret_t (*breakpoint_cb)(uint8_t type, uint16_t at, uint8_t sz);
 typedef uint8_t (*connect_cb)(const char* address);
 typedef void (*send_remote_command_cb)(const char* cmd);
