@@ -334,8 +334,8 @@ static uint64_t parse_format_string(char *arg, CONVSPEC *specifiers)
  * and emit CRT_printf_format / CRT_scanf_format into zcc_opt.def.
  * Mirrors sccz80's compile-time scan for external compilers (llvmz80/sdcc). */
 static int      auto_format = 0;
-static uint32_t auto_printf_mask = 0;
-static uint32_t auto_scanf_mask = 0;
+static uint64_t auto_printf_mask = 0;
+static uint64_t auto_scanf_mask = 0;
 
 /* First non-literal format call per family (to warn if pruning is active). */
 static int  auto_printf_nonlit_line = 0;
@@ -387,9 +387,9 @@ static int format_arg_index(const char *name, int *is_scanf)
 }
 
 /* Scan format string literal for conversion specifiers and return bitmask. */
-static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
+static uint64_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
 {
-    uint32_t mask = 0;
+    uint64_t mask = 0;
 
     for (;;) {
         char c;
@@ -441,7 +441,7 @@ static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
              * Only set when flags or width were present, not for length modifier alone. */
             if (after_width != before)
                 mask |= 0x40000000;
-            mask |= (uint32_t)parse_format_string(spec, specifiers);
+            mask |= parse_format_string(spec, specifiers);
             arg--;                                         /* back to conversion letter */
             if (*arg == '[') {   /* scanf %[...] set: skip to ']' */
                 while (arg[1] && *arg != ']') arg++;
@@ -531,7 +531,7 @@ static void scan_line_for_formats(const char *line)
         while (isspace((unsigned char)*f) || *f == '(') f++;      /* tolerate ("...") */
 
         if (*f == '"') {
-            uint32_t m = scan_format_literal(f, is_scanf ? scanf_formats : printf_formats);
+            uint64_t m = scan_format_literal(f, is_scanf ? scanf_formats : printf_formats);
             if (is_scanf) auto_scanf_mask |= m;
             else          auto_printf_mask |= m;
         } else if (*f != '\0' && *f != ')' && !region_has_word(f, end, "char")) {
@@ -597,12 +597,12 @@ static void emit_auto_format(void)
     if (auto_printf_mask) {
         fprintf(fp, "\nIF !DEFINED_CRT_printf_format\n");
         fprintf(fp, "\tdefc\tDEFINED_CRT_printf_format = 1\n");
-        fprintf(fp, "\tdefc CRT_printf_format = 0x%08x\n", auto_printf_mask);
+        fprintf(fp, "\tdefc CRT_printf_format = 0x%016" PRIx64 "\n", auto_printf_mask);
         fprintf(fp, "ELSE\n");
         fprintf(fp, "\tUNDEFINE temp_printf_format\n");
         fprintf(fp, "\tdefc temp_printf_format = CRT_printf_format\n");
         fprintf(fp, "\tUNDEFINE CRT_printf_format\n");
-        fprintf(fp, "\tdefc CRT_printf_format = temp_printf_format | 0x%08x\n", auto_printf_mask);
+        fprintf(fp, "\tdefc CRT_printf_format = temp_printf_format | 0x%016" PRIx64 "\n", auto_printf_mask);
         fprintf(fp, "ENDIF\n\n");
         fprintf(fp, "\nIF !NEED_printf\n\tDEFINE\tNEED_printf\nENDIF\n\n");
     }
@@ -610,12 +610,12 @@ static void emit_auto_format(void)
     if (auto_scanf_mask) {
         fprintf(fp, "\nIF !DEFINED_CRT_scanf_format\n");
         fprintf(fp, "\tdefc\tDEFINED_CRT_scanf_format = 1\n");
-        fprintf(fp, "\tdefc CRT_scanf_format = 0x%08x\n", auto_scanf_mask);
+        fprintf(fp, "\tdefc CRT_scanf_format = 0x%016" PRIx64 "\n", auto_scanf_mask);
         fprintf(fp, "ELSE\n");
         fprintf(fp, "\tUNDEFINE temp_scanf_format\n");
         fprintf(fp, "\tdefc temp_scanf_format = CRT_scanf_format\n");
         fprintf(fp, "\tUNDEFINE CRT_scanf_format\n");
-        fprintf(fp, "\tdefc CRT_scanf_format = temp_scanf_format | 0x%08x\n", auto_scanf_mask);
+        fprintf(fp, "\tdefc CRT_scanf_format = temp_scanf_format | 0x%016" PRIx64 "\n", auto_scanf_mask);
         fprintf(fp, "ENDIF\n\n");
         fprintf(fp, "\nIF !NEED_scanf\n\tDEFINE\tNEED_scanf\nENDIF\n\n");
     }
@@ -720,10 +720,8 @@ int main(void)
     /* unknown specifier — must not crash, returns 0 */
     check("unknown %q", SFL("\"%q\""), 0x00);
 
-    /* %lld: llval is 64-bit; scan_format_literal returns uint32_t so high
-     * word is truncated — result is 0 for specifiers where llval fits only
-     * above bit 31 (this is a known limitation, not a bug to fix here) */
-    check("%lld trunc", SFL("\"%lld\""), 0x00);
+    /* %lld: llval shifted to upper 32 bits; now preserved in uint64_t */
+    check("%lld", SFL("\"%lld\""), (uint64_t)0x01 << 32);
 
     /* parse_format_string (pragma notation: space-separated, no %/quotes needed) */
     check("pfs d",    PFS("d"),    0x01);
