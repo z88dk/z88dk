@@ -458,21 +458,72 @@ static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
     return mask;
 }
 
-/* Scan preprocessed line for printf/scanf calls and collect format masks. */
+/* Advance *pp past a quoted string or character literal (single or double
+ * quote).  Handles backslash escapes.  *pp must point at the opening quote. */
+static void skip_quoted(const char **pp)
+{
+    char q = *(*pp)++;
+    while (**pp && **pp != q) {
+        if (**pp == '\\' && (*pp)[1]) (*pp)++;
+        (*pp)++;
+    }
+    if (**pp) (*pp)++;                             /* step past closing quote */
+}
+
+/* Return a pointer to the start of the argidx-th top-level argument within
+ * the call whose opening '(' is at `open`.  Returns NULL if the argument
+ * list ends before that index is reached.  On success *end_out points one
+ * past the argument (at ',' or ')'). */
+static const char *find_format_arg(const char *open, int argidx,
+                                   const char **end_out)
+{
+    const char *a       = open + 1;               /* step past '(' */
+    const char *argstart = a;
+    int         depth   = 1;
+    int         curarg  = 1;
+
+    while (*a && depth > 0) {
+        if (*a == '"' || *a == '\'') {
+            skip_quoted(&a);
+            continue;
+        }
+        if (*a == '(' || *a == '[' || *a == '{') {
+            depth++;
+        } else if (*a == ')' || *a == ']' || *a == '}') {
+            depth--;
+            if (depth == 0) break;
+        } else if (*a == ',' && depth == 1) {
+            if (curarg == argidx) break;
+            curarg++;
+            argstart = a + 1;
+        }
+        a++;
+    }
+
+    if (curarg != argidx) return NULL;
+    *end_out = a;
+    return argstart;
+}
+
+/* Scan one preprocessed source line for printf/scanf calls and accumulate
+ * the format-converter bitmasks into auto_printf_mask / auto_scanf_mask.
+ *
+ * Three phases per token:
+ *   1. Skip quoted literals so we never mistake their contents for identifiers.
+ *   2. Identify a word token; skip if it is not a known printf/scanf name.
+ *   3. Locate the format argument and hand it to scan_format_literal. */
 static void scan_line_for_formats(const char *line)
 {
     const char *p = line;
 
     while (*p) {
-        if (*p == '"' || *p == '\'') {          /* skip over a literal */
-            char q = *p++;
-            while (*p && *p != q) {
-                if (*p == '\\' && p[1]) p++;
-                p++;
-            }
-            if (*p) p++;
+        /* Phase 1: skip quoted string/char literals. */
+        if (*p == '"' || *p == '\'') {
+            skip_quoted(&p);
             continue;
         }
+
+        /* Phase 2: find the start of a word token. */
         if (!(isalpha((unsigned char)*p) || *p == '_')) {
             p++;
             continue;
@@ -481,75 +532,50 @@ static void scan_line_for_formats(const char *line)
             while (isalnum((unsigned char)*p) || *p == '_') p++;   /* mid-identifier */
             continue;
         }
-        {
-            char        name[NAMESIZE + 1];
-            int         n = 0;
-            const char *q;
-            int         is_scanf, argidx;
-            const char *a, *argstart;
-            int         depth, curarg;
 
-            while ((isalnum((unsigned char)*p) || *p == '_') && n < NAMESIZE)
-                name[n++] = *p++;
-            name[n] = 0;
+        /* Collect the identifier name and check it is followed by '('. */
+        char        name[NAMESIZE + 1];
+        int         n = 0;
+        while ((isalnum((unsigned char)*p) || *p == '_') && n < NAMESIZE)
+            name[n++] = *p++;
+        name[n] = '\0';
 
-            q = p;
-            while (isspace((unsigned char)*q)) q++;
-            if (*q != '(')                       /* not a call */
-                continue;
+        const char *after_name = p;
+        while (isspace((unsigned char)*after_name)) after_name++;
+        if (*after_name != '(') continue;          /* not a function call */
 
-            argidx = format_arg_index(name, &is_scanf);
-            if (argidx == 0)
-                continue;
+        int is_scanf, argidx;
+        argidx = format_arg_index(name, &is_scanf);
+        if (argidx == 0) continue;                 /* not a printf/scanf family */
 
-            /* walk to the argidx-th top-level argument of the call */
-            a = q + 1;
-            argstart = a;
-            depth = 1;
-            curarg = 1;
-            while (*a && depth > 0) {
-                if (*a == '"' || *a == '\'') {
-                    char qq = *a++;
-                    while (*a && *a != qq) {
-                        if (*a == '\\' && a[1]) a++;
-                        a++;
-                    }
-                    if (*a) a++;
-                    continue;
+        /* Phase 3: locate the format argument and process it. */
+        const char *end;
+        const char *argstart = find_format_arg(after_name, argidx, &end);
+        if (!argstart) continue;
+
+        const char *f = argstart;
+        while (isspace((unsigned char)*f) || *f == '(') f++;      /* tolerate ("...") */
+
+        if (*f == '"') {
+            /* Static literal: scan it and accumulate the converter bits. */
+            uint32_t m = scan_format_literal(f, is_scanf ? scanf_formats
+                                                         : printf_formats);
+            if (is_scanf) auto_scanf_mask |= m;
+            else          auto_printf_mask |= m;
+        } else if (*f != '\0' && *f != ')' && !region_has_word(f, end, "char")) {
+            /* Non-literal (variable/expression): record for warning.
+             * Only the first occurrence per family is stored. */
+            if (is_scanf) {
+                if (auto_scanf_nonlit_line == 0) {
+                    auto_scanf_nonlit_line = lineno;
+                    strncpy(auto_scanf_nonlit_file, filename,
+                            sizeof(auto_scanf_nonlit_file) - 1);
                 }
-                if (*a == '(' || *a == '[' || *a == '{') {
-                    depth++;
-                } else if (*a == ')' || *a == ']' || *a == '}') {
-                    depth--;
-                    if (depth == 0) break;
-                } else if (*a == ',' && depth == 1) {
-                    if (curarg == argidx) break;
-                    curarg++;
-                    argstart = a + 1;
-                }
-                a++;
-            }
-
-            if (curarg == argidx) {
-                const char *f = argstart;
-                while (isspace((unsigned char)*f) || *f == '(') f++;   /* tolerate ("...") */
-                if (*f == '"') {
-                    uint32_t m = scan_format_literal(f, is_scanf ? scanf_formats : printf_formats);
-                    if (is_scanf) auto_scanf_mask |= m;
-                    else          auto_printf_mask |= m;
-                } else if (*f != 0 && *f != ')' && !region_has_word(f, a, "char")) {
-                    /* Non-literal format call; record first occurrence for warning. */
-                    if (is_scanf) {
-                        if (auto_scanf_nonlit_line == 0) {
-                            auto_scanf_nonlit_line = lineno;
-                            strncpy(auto_scanf_nonlit_file, filename, sizeof(auto_scanf_nonlit_file) - 1);
-                        }
-                    } else {
-                        if (auto_printf_nonlit_line == 0) {
-                            auto_printf_nonlit_line = lineno;
-                            strncpy(auto_printf_nonlit_file, filename, sizeof(auto_printf_nonlit_file) - 1);
-                        }
-                    }
+            } else {
+                if (auto_printf_nonlit_line == 0) {
+                    auto_printf_nonlit_line = lineno;
+                    strncpy(auto_printf_nonlit_file, filename,
+                            sizeof(auto_printf_nonlit_file) - 1);
                 }
             }
         }
