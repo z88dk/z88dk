@@ -735,6 +735,56 @@ int main(void)
     check("pfs o",    PFS("o"),    0x10);
     check("pfs X",    PFS("X"),    0x08);
 
+    /* ---- scan_line_for_formats ---- */
+#define SLF_RESET() \
+    (auto_printf_mask = auto_scanf_mask = \
+     auto_printf_nonlit_line = auto_scanf_nonlit_line = 0)
+#define SLF(line) (SLF_RESET(), scan_line_for_formats(line))
+
+    SLF("printf(\"%d\", x);");
+    check("slf printf %d",    auto_printf_mask, 0x01);
+    SLF("printf(\"%f\", x);");
+    check("slf printf %f",    auto_printf_mask, 0x4000000);
+    SLF("printf(\"%d %s\", x, y);");
+    check("slf printf %d %s", auto_printf_mask, 0x201);
+    SLF("fprintf(fp, \"%x\", x);");
+    check("slf fprintf %x",   auto_printf_mask, 0x04);
+    SLF("sprintf(buf, \"%d\", x);");
+    check("slf sprintf %d",   auto_printf_mask, 0x01);
+    SLF("snprintf(buf, 10, \"%d\", x);");
+    check("slf snprintf %d",  auto_printf_mask, 0x01);
+
+    SLF("scanf(\"%d\", &x);");
+    check("slf scanf %d",  auto_scanf_mask, 0x01);
+    SLF("sscanf(s, \"%s\", buf);");
+    check("slf sscanf %s", auto_scanf_mask, 0x200);
+
+    SLF("myprintf(\"%d\", x);");           /* unknown function — no effect */
+    check("slf unknown fn", auto_printf_mask, 0x00);
+    SLF("int myprintf = 0;");              /* mid-identifier, not a call */
+    check("slf mid-id",     auto_printf_mask, 0x00);
+    SLF("char *s = \"printf(\\\"%d\\\")\";"); /* format inside a string literal */
+    check("slf in string",  auto_printf_mask, 0x00);
+
+    SLF("printf(\"%d\", a); printf(\"%s\", b);"); /* two calls on one line */
+    check("slf two calls",  auto_printf_mask, 0x201);
+    SLF("printf(\"%d\", strlen(s));");     /* nested call as argument */
+    check("slf nested",     auto_printf_mask, 0x01);
+
+    lineno = 42;
+    SLF("printf(fmt, x);");               /* non-literal: mask stays 0, nonlit set */
+    check("slf nonlit mask",     auto_printf_mask,           0x00);
+    check("slf nonlit line set", auto_printf_nonlit_line,    42);
+
+    lineno = 42;
+    SLF("printf(\"%d\", x); printf(fmt, y);"); /* literal + non-literal */
+    check("slf mixed mask",  auto_printf_mask,           0x01);
+    check("slf mixed nonlit", auto_printf_nonlit_line,   42);
+    lineno = 0;
+
+#undef SLF_RESET
+#undef SLF
+
     if (tests_failed == 0)
         printf("PASS: %d tests\n", tests_run);
     else
