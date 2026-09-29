@@ -1,7 +1,6 @@
 # z88dk — agent instructions
 
 Project rules for AI agents (Grok, Claude, Cursor, and similar) working in this tree.
-Seeded from [feilipu/8085-skills](https://github.com/feilipu/8085-skills); reorganized for z88dk.
 
 ## Canonical skill root (do not double-read)
 
@@ -158,4 +157,4 @@ When wiki and tree disagree, **the tree wins**.
 
 ## Provenance
 
-Initial content imported from local `8085-skills` (`.grok/skills/*`), then split and expanded with `wiki/tools`, `wiki/platforms`, tool READMEs, and `lib/config`.
+Initial content imported from [feilipu/8085-skills](https://github.com/feilipu/8085-skills); reorganized for z88dk., then split and expanded with `wiki/tools`, `wiki/platforms`, tool READMEs, and `lib/config`.
