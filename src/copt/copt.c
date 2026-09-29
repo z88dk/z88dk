@@ -52,6 +52,35 @@ int labnum[LASTLAB - FIRSTLAB + 1]; /* unique label numbers */
 int c_options_num = 0;
 char **c_options = NULL;
 
+/* Return whether the current CPU occurs in a whitespace-separated list.
+   A CPU precondition is deliberately a list rather than a single string:
+   %cpu is an OR across the names and %notcpu is the complement of that
+   list (therefore an AND across the individual exclusions). */
+static int cpu_in_list(const char *list)
+{
+    const char *p = list;
+    size_t cpu_len = strlen(c_cpu);
+
+    while (*p) {
+        const char *start;
+        size_t len;
+
+        while (*p && isspace((unsigned char)*p))
+            ++p;
+        if (!*p)
+            break;
+
+        start = p;
+        while (*p && !isspace((unsigned char)*p))
+            ++p;
+        len = (size_t)(p - start);
+        if (len == cpu_len && strncmp(start, c_cpu, len) == 0)
+            return 1;
+    }
+
+    return 0;
+}
+
 struct lnode {
     char* l_text;
     int   l_len; /* byte length of l_text (may contain embedded NULs) */
@@ -790,14 +819,10 @@ static struct lnode* opt(struct lnode* r)
                 if ( strcmp(tbuf, c_compiler) )
                     break;
             } else if ( strncmp(p->l_text, "%notcpu", 7) == 0 ) {
-                char  tbuf[1024];
-                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 8)-1,p->l_text + 8);
-                if ( strcmp(tbuf, c_cpu) == 0 )
+                if ( cpu_in_list(p->l_text + 7) )
                     break;
             } else if ( strncmp(p->l_text, "%cpu", 4) == 0 ) {
-                char  tbuf[1024];
-                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 5)-1,p->l_text + 5);
-                if ( strcmp(tbuf, c_cpu) )
+                if ( !cpu_in_list(p->l_text + 4) )
                     break;
             } else if ( strncmp(p->l_text, "%eval", 5) == 0 ) {
                 if (!check_eval(p->l_text + 5, vars))

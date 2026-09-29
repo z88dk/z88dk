@@ -189,7 +189,9 @@ active if the text of variable %\fIn\fP equals none of the listed tokens
 active if the two variables have different text.
 .TP
 .B %cpu \fInames\fP / %notcpu \fInames\fP
-active if (respectively is not) the target cpu.
+active if the target cpu is one of the names / is none of the names,
+respectively.  Thus, multiple names have OR logic for %cpu and AND logic
+for %notcpu.
 .LP
 \fIcopt\fP compares each run of input patterns
 with the current input instruction and its predecessors.
@@ -214,4 +216,3 @@ Added out of memory checking and ANSI prototyping
 .B \^Zrin Ziborski 2002
 Added comment lines, %L-%N variables, %activate,
 regexp capability and %check
-
