@@ -69,6 +69,21 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
     /* PR_BC dst: `ld bc,K` and stamp the cache. Downstream readers
        hit the `ld l,c; ld h,b` short-circuit in load_to_hl/de. */
     if (vreg_in_pr_bc(f, op->dst)) {
+        if (f->vregs[op->dst].flags & IR_VREG_CALL_SPLIT) {
+            /* [call-split] A call-split value is BC-resident only inside its
+               span; its frame slot is the canonical home. A fresh in-span
+               redefinition (e.g. a loop counter reset) must keep the slot
+               coherent too, or an out-of-span/cold-belief read after this
+               point serves the stale pre-reset value. Route through HL and
+               commit_hl_word so this reuses the SAME write-both machinery
+               spill_and_swap_unless_dead already gives every other PR_BC
+               producer (its call-split fall-through writes both the `ld
+               bc,hl` copy and the slot), instead of a second hand-written
+               copy of that contract here. */
+            emit(out, "ld\thl,%lld", (long long)op->imm);
+            commit_hl_word(out, f, op->dst);
+            return 0;
+        }
         emit(out, "ld\tbc,%lld", (long long)op->imm);
         cache_bc(op->dst);
         return 0;
@@ -3015,6 +3030,22 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             int off = op->mem.offset;
             if (IS_GBZ80()) {
                 emit_gb_long_load(out, ir_sym_name(op->mem.sym), off);
+            } else if (IS_808x()) {
+                /* 8080-family z80asm has no native absolute `ld de,(nn)`;
+                   it expands that form to ex/ld hl/ex. Load the high half
+                   into HL first, move it to DE once, then load the low half
+                   directly into HL: 7 bytes instead of 8. */
+                if (off)
+                    emit(out, "ld\thl,(_%s+%d)",
+                         ir_sym_name(op->mem.sym), off + 2);
+                else
+                    emit(out, "ld\thl,(_%s+2)", ir_sym_name(op->mem.sym));
+                emit_ex_de_hl(out);
+                if (off)
+                    emit(out, "ld\thl,(_%s+%d)",
+                         ir_sym_name(op->mem.sym), off);
+                else
+                    emit(out, "ld\thl,(_%s)", ir_sym_name(op->mem.sym));
             } else {
             if (off)
                 emit(out, "ld\thl,(_%s+%d)",
@@ -3615,8 +3646,123 @@ static int try_de_home_mask_store(FILE *out, Func *f, const Op *op)
     return 1;
 }
 
+/* Lower one member of an IR-marked aggregate-store chain.  The first member
+   establishes HL from the base; later members retain the address while the
+   value is loaded, then advance HL from the previous field.  This is the IR
+   equivalent of the spill/fusion shape copt obtains for sccz80, but it keeps
+   the operation widths and legal stores in the normal CPU-specific lowerer. */
+static int try_store_chain(FILE *out, Func *f, const Op *op)
+{
+    if (op->mem.chain == 1) {
+        if (!cur_bb || cur_op_idx + 1 >= cur_bb->n_ops
+            || cur_bb->ops[cur_op_idx + 1].kind != IR_ST_MEM
+            || cur_bb->ops[cur_op_idx + 1].mem.chain != 2)
+            return 0;
+        if (f->vregs[op->src[0]].width != 2
+            || op->mem.kind != IR_MEM_VREG)
+            return 0;
+        if (IS_8085() && op->mem.offset == 0) {
+            load_to_de(out, f, op->mem.base);
+            emit_sp(out, 2, "push\tde");
+            load_to_hl(out, f, op->src[0]);
+            emit_sp(out, -2, "pop\tde");
+            emit(out, "ld\t(de),hl");
+            emit(out, "inc\tde");
+            emit(out, "inc\tde");
+            invalidate_hl_cache();
+            invalidate_de_cache();
+            store_chain_base = op->mem.base;
+            store_chain_hl_off = op->mem.offset + 2;
+            store_chain_in_de = 1;
+            return 1;
+        }
+        load_to_hl(out, f, op->src[0]);
+        emit_ex_de_hl(out);
+        load_to_hl(out, f, op->mem.base);
+        emit_hl_add_offset(out, op->mem.offset, 1, 1);
+        emit(out, "ld\t(hl),e");
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),d");
+        invalidate_hl_cache();
+        store_chain_base = op->mem.base;
+        store_chain_hl_off = op->mem.offset + 1;
+        store_chain_in_de = 0;
+        return 1;
+    }
+
+    if (op->mem.chain != 2 || store_chain_base != op->mem.base
+        || op->mem.kind != IR_MEM_VREG)
+        return 0;
+
+    if (!store_chain_in_de)
+        emit_hl_add_offset(out, op->mem.offset - store_chain_hl_off, 0, 0);
+    if (f->vregs[op->src[0]].width == 2) {
+        if (store_chain_in_de) {
+            emit_sp(out, 2, "push\tde");
+            load_to_hl(out, f, op->src[0]);
+            emit_sp(out, -2, "pop\tde");
+            emit(out, "ld\t(de),hl");
+            emit(out, "inc\tde");
+            emit(out, "inc\tde");
+        } else {
+            emit_sp(out, 2, "push\thl");
+            load_to_hl(out, f, op->src[0]);
+            emit_ex_de_hl(out);
+            emit_sp(out, -2, "pop\thl");
+            emit(out, "ld\t(hl),e");
+            emit(out, "inc\thl");
+            emit(out, "ld\t(hl),d");
+        }
+    } else if (f->vregs[op->src[0]].width == 4) {
+        if (store_chain_in_de) {
+            emit_sp(out, 2, "push\tde");
+            load_to_dehl(out, f, op->src[0]);
+            emit_sp(out, 2, "push\tde");
+            emit_sp(out, 2, "push\thl");
+            emit_sp(out, -2, "pop\thl");
+            emit_sp(out, -2, "pop\tbc");
+            emit_sp(out, -2, "pop\tde");
+            emit(out, "ld\t(de),hl");
+            emit(out, "inc\tde"); emit(out, "inc\tde");
+            emit(out, "ld\thl,bc");
+            emit(out, "ld\t(de),hl");
+            emit(out, "inc\tde"); emit(out, "inc\tde");
+        } else {
+            emit_sp(out, 2, "push\thl");
+            load_to_dehl(out, f, op->src[0]);
+            emit_sp(out, 2, "push\tde");
+            emit_sp(out, 2, "push\thl");
+            emit_sp(out, -2, "pop\tbc");
+            emit_sp(out, -2, "pop\tde");
+            emit_sp(out, -2, "pop\thl");
+            store_byte_adv(out, "c", 0);
+            store_byte_adv(out, "b", 0);
+            store_byte_adv(out, "e", 0);
+            store_byte_adv(out, "d", 1);
+        }
+    } else {
+        store_chain_base = -1;
+        store_chain_hl_off = -1;
+        return 0;
+    }
+    invalidate_hl_cache();
+    if (store_chain_in_de)
+        store_chain_hl_off = op->mem.offset + f->vregs[op->src[0]].width;
+    else
+        store_chain_hl_off = op->mem.offset + f->vregs[op->src[0]].width - 1;
+    if (cur_op_idx + 1 >= cur_bb->n_ops
+        || cur_bb->ops[cur_op_idx + 1].mem.chain != 2) {
+        store_chain_base = -1;
+        store_chain_hl_off = -1;
+        store_chain_in_de = 0;
+    }
+    return 1;
+}
+
 static int gen_st_mem(FILE *out, Func *f, const Op *op)
 {
+    if (op->mem.chain && try_store_chain(out, f, op))
+        return 0;
     /* Port write. Must come before every fold below: those all assume the
        destination is memory, and a port is not addressable. */
     if (op->mem.kind == IR_MEM_PORT) {
@@ -4637,9 +4783,17 @@ static int gen_add(FILE *out, Func *f, const Op *op)
        `inc bc` chain steps it in place — no HL staging, no `ld bc,hl`
        writeback. The value stays advertised in BC for the next
        iteration's deref. HL is left stale (it may have mirrored the
-       pre-step pointer), so drop its cache. */
+       pre-step pointer), so drop its cache.
+       EXCLUDE a call-split value: it is BC-resident only inside its span and
+       its frame slot must stay coherent (write-both) — a bare step updates
+       BC but NOT the slot, so a later out-of-span (or next-iteration) read
+       can see a stale value. Same reasoning as gen_step's CALL_SPLIT guard;
+       this is the `i += k` compound-assignment shape, which gen_step never
+       sees. Falling through reaches load_to_hl + commit_hl_result, which
+       writes both. */
     if (op->src[1] < 0 && op->dst == op->src[0]
         && vreg_in_pr_bc(f, op->dst) && bc_has(op->dst)
+        && !(f->vregs[op->dst].flags & IR_VREG_CALL_SPLIT)
         && op->imm >= 1
         && (g_hc.home_is_word || op->imm <= 4)) {
         /* Normally an inc-bc chain only up to 4 (past that `ld de,k; add hl,de`
@@ -4758,13 +4912,22 @@ static int sub_hl_de_ok(void)
    clobbered (see op_clobbers — declaring it costs more in evicted BC homes
    than the staging saves), so the only sound licence to write BC is a
    function that keeps nothing there. Paired with an rs.bc check at the site,
-   which covers the lowerer's own transient parks. */
+   which covers the lowerer's own transient parks.
+   ir_home_at() reports a call-split value's CANONICAL home, which is the
+   spill slot, not its ranged BC occupancy — so the ir_home_at scan below
+   misses it. A call-split value spends part of its live range genuinely
+   resident in BC (IR_VREG_CALL_SPLIT), and this SUB's declared clobber set
+   (not including BC) is exactly what licenses the allocator to plan that
+   residency across a SUB op. The DSUB stage-and-clobber trick would silently
+   break that plan. Confirmed via IR_VERIFY ("SUB writes ... not in clobbers")
+   on fannkuch's `count[r]-1` / `k-i` subtracts on 8085. */
 static int func_has_bc_home(const Func *f)
 {
     if (!f || !f->vreg_to_phys) return 1;          /* unknown: assume it does */
     for (int v = 0; v < f->n_vregs; v++) {
         int p = ir_home_at(f, v);
         if (p == IR_PR_BC || p == IR_PR_B || p == IR_PR_C) return 1;
+        if (f->vregs[v].flags & IR_VREG_CALL_SPLIT) return 1;
     }
     return 0;
 }
@@ -4872,6 +5035,66 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
                 emit(out, "sbc\thl,bc");                /* HL = LHS_HIGH - K_HIGH - borrow */
                 emit_ex_de_hl(out);                 /* DEHL = result */
             }
+            store_dehl_finalize(out, f, op->dst);
+            return 0;
+        }
+        /* A parked long can be the operand of SUB without first popping it.
+           Keep the parked four bytes in place, load the other operand into
+           DEHL, and overwrite the parked bytes with the bytewise result.
+           This handles both operand orders and avoids XTHL, which is not
+           available on 8080/8085/VM1/GBZ80. */
+        if (L.la.cur_stack_long_top >= 0
+            && (L.la.cur_stack_long_top == op->src[0]
+                || L.la.cur_stack_long_top == op->src[1])
+            && op->src[0] >= 0 && op->src[1] >= 0
+            && op->src[0] != op->src[1]) {
+            int stacked = L.la.cur_stack_long_top;
+            int other = (stacked == op->src[0]) ? op->src[1] : op->src[0];
+
+            load_to_dehl_adj(out, f, other, 0);
+            emit(out, "ld\tbc,hl");       /* preserve other low half */
+            emit(out, "ld\thl,0");
+            emit(out, "add\thl,sp");      /* HL = parked low half */
+            if (stacked == op->src[0]) {
+                emit(out, "ld\ta,(hl)");
+                emit(out, "sub\tc");
+                emit(out, "ld\t(hl),a");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,(hl)");
+                emit(out, "sbc\ta,b");
+                emit(out, "ld\t(hl),a");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,(hl)");
+                emit(out, "sbc\ta,e");
+                emit(out, "ld\t(hl),a");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,(hl)");
+                emit(out, "sbc\ta,d");
+                emit(out, "ld\t(hl),a");
+            } else {
+                emit(out, "ld\ta,c");
+                emit(out, "sub\t(hl)");
+                emit(out, "ld\t(hl),a");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,b");
+                emit(out, "sbc\ta,(hl)");
+                emit(out, "ld\t(hl),a");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,e");
+                emit(out, "sbc\ta,(hl)");
+                emit(out, "ld\t(hl),a");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,d");
+                emit(out, "sbc\ta,(hl)");
+                emit(out, "ld\t(hl),a");
+            }
+            emit_pop_hl(out);               /* result low */
+            emit(out, "pop\tde");           /* result high */
+            L.cur_sp_adjust -= 4;
+            L.la.cur_stack_long_top = -1;
+            invalidate_hl_cache();
+            invalidate_de_cache();
+            invalidate_bc_cache();
             store_dehl_finalize(out, f, op->dst);
             return 0;
         }

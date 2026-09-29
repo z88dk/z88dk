@@ -1575,6 +1575,112 @@ Node *ast_compoundify_assign(Node *node)
     return node;
 }
 
+/* Rewrite an unused unit boolean compound update into control flow:
+ *
+ *     x -= !cond;  ->  if (!cond) --x;
+ *     x += !cond;  ->  if (!cond) ++x;
+ *
+ * This is only valid in statement context.  Restrict the lvalue to a
+ * non-volatile bare local/global so moving its evaluation under the branch
+ * cannot change observable accesses or complex-lvalue evaluation order.  The
+ * result of the compound assignment is then genuinely unused, and the
+ * pre-step has exactly the same stored value as the original update. */
+static Node *bool_step_rewrite(Node *node)
+{
+    if (!node || (node->ast_type != OP_AADD && node->ast_type != OP_ASUB)
+        || !node->left || !node->right
+        || node->right->ast_type != OP_LNEG
+        || !node->right->operand)
+        return node;
+
+    Node *lhs = node->left;
+    if (lhs->ast_type != OP_DEREF || !lhs->operand
+        || (lhs->operand->ast_type != AST_LOCAL_VAR
+            && lhs->operand->ast_type != AST_GLOBAL_VAR)
+        || !lhs->operand->sym || !lhs->type
+        || !kind_is_integer(lhs->type->kind) || lhs->type->isvolatile)
+        return node;
+
+    /* The compound LHS is OP_DEREF(bare-lvalue), but pre/post-step lowering
+       expects the bare local/global as its operand and performs the load/store
+       itself. */
+    Node *step = ast_uop(node->ast_type == OP_AADD ? OP_PRE_INC : OP_PRE_DEC,
+                         lhs->operand);
+    step->type = lhs->type;
+    Node *replacement = ast_conditional(node->right, step, NULL);
+    replacement->filename = node->filename;
+    replacement->line = node->line;
+    return replacement;
+}
+
+static void bool_step_walk(Node *node, int stmt_ctx);
+
+static void bool_step_visit(const AstSlot *slot, void *ctx)
+{
+    (void)ctx;
+    Node *n = ast_slot_get(slot);
+    if (n) bool_step_walk(n, 0);
+}
+
+static void bool_step_walk(Node *node, int stmt_ctx)
+{
+    if (!node) return;
+    switch (node->ast_type) {
+    case AST_COMPOUND_STMT:
+        for (int i = 0; i < (int)array_len(node->stmts); i++) {
+            Node *s = array_get_byindex(node->stmts, i);
+            if (!s) continue;
+            Node *r = bool_step_rewrite(s);
+            if (r != s) {
+                array_set_byindex(node->stmts, i, r);
+                s = r;
+            }
+            bool_step_walk(s, 1);
+        }
+        return;
+    case AST_TERNARY:
+        bool_step_walk(node->cond, 0);
+        if (stmt_ctx) {
+            node->then = bool_step_rewrite(node->then);
+            node->els  = bool_step_rewrite(node->els);
+        }
+        bool_step_walk(node->then, stmt_ctx);
+        bool_step_walk(node->els,  stmt_ctx);
+        return;
+    case AST_IF:
+        bool_step_walk(node->cond, 0);
+        node->then = bool_step_rewrite(node->then);
+        node->els  = bool_step_rewrite(node->els);
+        bool_step_walk(node->then, 1);
+        bool_step_walk(node->els,  1);
+        return;
+    case AST_SWITCH:
+        bool_step_walk(node->sw_expr, 0);
+        bool_step_walk(node->sw_body, 1);
+        return;
+    case AST_RETURN:
+        bool_step_walk(node->retval, 0);
+        return;
+    case AST_DECL:
+        bool_step_walk(node->declvar, 0);
+        return;
+    case AST_CRITICAL:
+        bool_step_walk(node->operand, 1);
+        return;
+    default:
+        /* Only statement containers can expose an unused compound assign;
+           expressions and their children are value context. */
+        if (!stmt_ctx) ast_for_each_child(node, bool_step_visit, NULL);
+        return;
+    }
+}
+
+static Node *ast_bool_step(Node *root)
+{
+    if (root) bool_step_walk(root, 1);
+    return root;
+}
+
 static void ca_visit(const AstSlot *slot, void *ctx)
 {
     (void)ctx;
@@ -4852,6 +4958,7 @@ Node *ast_opt_run(Node *root)
        before strength_reduce so the compound form gets the same
        const-RHS treatment via cg2_compound_assign's *_const helpers. */
     if (!(c_opt_disable & OPT_DISABLE_COMPOUNDIFY)) root = ast_compoundify_assign(root);
+    if (!opt_disabled("bool-step")) root = ast_bool_step(root);
     if (!(c_opt_disable & OPT_DISABLE_STRENGTH_REDUCE)) root = ast_strength_reduce(root);
     /* CSE runs after const-prop / fold / simplify so it operates on
        the maximally-reduced tree. Pure-literal expressions are gone

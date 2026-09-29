@@ -67,4 +67,5 @@ removes costs more on the CPUs with dearer slot access.
 The shape stays narrow by construction: pointer parameter, exactly one in-place
 step, call-free function. Widening any of those three conditions re-opens the
 stale-slot reload this ADR's conditions exist to prevent, and would need its own
-regression run — a real-file spot check will not catch it.
+regression run — a real-file spot check will not catch it. The attempted scalar
+and call-containing widenings are rejected separately in ADR 0100.

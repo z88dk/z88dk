@@ -151,6 +151,7 @@ int ir_opt_sym_cmp_fold(Func *f);
 int ir_opt_sym_addr_fold(Func *f);
 int ir_opt_sym_deref_fold(Func *f);
 int ir_opt_deref_offset(Func *f);
+int ir_opt_store_chain(Func *f);
 /* Rewrite AND(CONV_SX(x), full-source-mask) → CONV_ZX(x): the mask clears the
  * sign-extended bits, so the sign-extend is dead. Run before DCE. */
 int ir_opt_conv_mask_fold(Func *f);
@@ -255,7 +256,10 @@ int ir_opt_drop_dead_ret(Func *f);
  *
  * Returns the number of (def, use) pairs annotated.
  */
-int ir_opt_insert_long_pushes(Func *f);
+/* allow_regular is false in SP mode: retain only the call-crossing fusion,
+   whose stack save is profitable even where the broader long-push pass is
+   not. */
+int ir_opt_insert_long_pushes(Func *f, int allow_regular);
 
 /* fold_imm_conv lived here until it became the ir_match table's
    `immconv` pattern (LD_IMM + CONV_* → re-width'd LD_IMM); disable

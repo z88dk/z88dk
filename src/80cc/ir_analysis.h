@@ -32,6 +32,17 @@ void    ir_bitset_for_each(const BitSet *bs,
    Idempotent — calling twice replaces the previous result. */
 void ir_compute_liveness(Func *f);
 
+/* [IR_DEFASSIGN_VERIFY] Definite-assignment check: flags a read of a
+   local that is not defined on every path from function entry (the
+   source-level bug class behind `time_t t; time(t);` — read before
+   assigned). Env-gated, no-op unless IR_DEFASSIGN_VERIFY is set;
+   "1" warns to stderr, "2" also aborts. Meant to run once per function,
+   right after ir_build finishes it and before ir_alloc/ir_lower ever
+   see it, so the result does not depend on frame mode (unlike
+   ir_lower.c's require_slot backstop, whose trigger is an accident of
+   how each mode happens to home a never-written value). */
+void ir_verify_definite_assignment(const Func *f);
+
 /* Compute per-op live-in sets within each BB. Requires
    ir_compute_liveness to have run first (per-op iteration starts from
    bb->live_out). After this call, bb->live_in_per_op[k] is a `BitSet *`

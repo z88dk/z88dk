@@ -77,6 +77,7 @@ static void agg_clear_mem(Op *op)
     op->mem.elem = KIND_NONE;
     op->mem.volatile_ = 0;
     op->mem.post_step = 0;
+    op->mem.chain = 0;
     op->mem.bank_fn = NULL;
     op->mem.port = NULL;
 }
@@ -2728,6 +2729,55 @@ int ir_opt_deref_offset(Func *f)
     return changed;
 }
 
+/* Mark adjacent fixed-offset stores through one pointer as a chain.  The
+   operations remain ordinary IR_ST_MEM for analysis and allocation; the
+   marker tells the lowerer that it may walk the already-materialised address
+   instead of reloading the pointer for every field.  Keep this narrow: no
+   volatile, post-step, banked, or mixed-base stores, and preserve source order. */
+int ir_opt_store_chain(Func *f)
+{
+    if (!f || opt_disabled("store-chain") || IS_GBZ80()) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int i = 0; i < bb->n_ops; i++) {
+            Op *first = &bb->ops[i];
+            first->mem.chain = 0;
+            if (first->kind != IR_ST_MEM || first->mem.kind != IR_MEM_VREG
+                || first->mem.base < 0 || first->mem.volatile_
+                || first->mem.post_step || first->mem.bank_fn
+                || first->src[0] < 0)
+                continue;
+            int sw = f->vregs[first->src[0]].width;
+            if (sw != 2 && sw != 4) continue;
+
+            int end = i + 1;
+            int next_off = first->mem.offset + sw;
+            while (end < bb->n_ops) {
+                Op *o = &bb->ops[end];
+                if (o->kind != IR_ST_MEM || o->mem.kind != IR_MEM_VREG
+                    || o->mem.base != first->mem.base
+                    || o->mem.offset != next_off
+                    || o->mem.volatile_ || o->mem.post_step || o->mem.bank_fn
+                    || o->src[0] < 0)
+                    break;
+                int w = f->vregs[o->src[0]].width;
+                if (w != 2 && w != 4) break;
+                next_off += w;
+                end++;
+            }
+            if (end == i + 1) continue;
+            first->mem.chain = 1;
+            for (int k = i + 1; k < end; k++) {
+                bb->ops[k].mem.chain = 2;
+                changed++;
+            }
+            i = end - 1;
+        }
+    }
+    return changed;
+}
+
 /* ---- Fold a &symbol RHS of an EQ/NE compare into a symbol immediate ------
    A symbol address is a link-time constant, so `if (p == &g)` should lower to
    `ld hl,(p); ld de,g; sbc hl,de` exactly like `if (p == 5)` folds `5` into the
@@ -3752,10 +3802,11 @@ int ir_opt_narrow_byte(Func *f)
    sign-extend kept the value flowing through registers — a net loss.
    Propagating the copy away and DCE-ing it recovers that.
 
-   Surgical + safe: rewrites only src[0]/src[1] (every arithmetic /
-   compare / conv / mov / branch consumer carries its inputs there; uses
-   in mem.base / call args are left alone, keeping the copy live and
-   correct — just unpropagated). Invalidation is by redefinition
+   Surgical + safe: rewrites src[0]/src[1] (every arithmetic / compare /
+   conv / mov / branch consumer carries its inputs there) and indirect memory
+   bases, which are pointer-value uses with the same identity semantics. Call
+   args are left alone, keeping ABI argument shapes stable — just
+   unpropagated. Invalidation is by redefinition
    (ir_op_defs), so multiply-defined vregs are handled. Per-BB only — the
    copy map resets at each BB boundary. DCE then removes copies whose dst
    became unused. */
@@ -3778,6 +3829,13 @@ int ir_opt_copy_prop(Func *f)
                     changed++;
                 }
             }
+            if ((op->kind == IR_LD_MEM || op->kind == IR_ST_MEM)
+                && op->mem.kind == IR_MEM_VREG
+                && op->mem.base >= 0 && op->mem.base < f->n_vregs
+                && copy_of[op->mem.base] >= 0) {
+                op->mem.base = copy_of[op->mem.base];
+                changed++;
+            }
             /* Invalidate any copy whose source (or dst) this op redefines. */
             int defs[8];
             int nd = ir_op_defs(op, defs, 8);
@@ -3798,7 +3856,14 @@ int ir_opt_copy_prop(Func *f)
             if (vd < 0 || vd >= f->n_vregs || vs < 0 || vs >= f->n_vregs
                 || vs == vd)
                 continue;
-            if (f->vregs[vd].width != 1 || f->vregs[vs].width != 1)
+            int pointer_copy = op->kind == IR_MOV
+                && f->vregs[vd].width == 2 && f->vregs[vs].width == 2
+                && (f->vregs[vd].kind == KIND_PTR
+                    || f->vregs[vd].kind == KIND_CPTR)
+                && (f->vregs[vs].kind == KIND_PTR
+                    || f->vregs[vs].kind == KIND_CPTR);
+            if (!pointer_copy
+                && (f->vregs[vd].width != 1 || f->vregs[vs].width != 1))
                 continue;
             /* width1<-width1 CONV_TRUNC is a byte-identity copy too — it
                only arises once narrow_byte shrinks the source (e.g. the
@@ -3809,6 +3874,8 @@ int ir_opt_copy_prop(Func *f)
                            || op->kind == IR_CONV_SX
                            || op->kind == IR_CONV_ZX
                            || op->kind == IR_CONV_TRUNC);
+            if (pointer_copy)
+                is_copy = 1;
             if (!is_copy) continue;
             if ((f->vregs[vd].flags & IR_VREG_VOLATILE)
                 || (f->vregs[vs].flags & IR_VREG_VOLATILE))
@@ -4567,7 +4634,14 @@ int ir_opt_drop_dead_ret(Func *f)
      - the single use is in the same BB as the def.
      - use is at op[k_use], k_use > j_def + 1 (the immediately-
        adjacent case is already handled by cur_dehl_dst_dead_safe).
-     - no branches/calls in [j_def+1, k_use-1].
+     - no branches in [j_def+1, k_use-1].  A single call is allowed when it
+       is the final intermediate op before the consumer; this is the common
+       recursive-expression shape `a + f(...)`, where the value of `a` must
+       survive while the argument for `f` is built.  The push is below the
+       call's arguments, so normal caller cleanup leaves it on top for the
+       matching POP.  Restricting the call to the final intermediate op keeps
+       the stack interval simple and avoids treating arbitrary call result
+       plumbing as part of this pass.
      - producer op kind ends with store_dehl_finalize.
      - consumer op consumes the vreg via load_to_dehl as its first
        DEHL load.
@@ -4601,7 +4675,34 @@ static int op_is_branch_or_call_d(OpKind k)
         || k == IR_RET || k == IR_CALL || k == IR_HCALL;
 }
 
-int ir_opt_insert_long_pushes(Func *f)
+/* A long can cross one call when the call is immediately followed by the
+   consuming operation.  Argument construction may contain arbitrary pure
+   IR, but branches, nested calls and explicit stack preservation are not
+   part of this small cross-call shape. */
+static int long_push_call_window_d(const BB *bb, int def_idx, int use_idx)
+{
+    int calls = 0;
+    int call_idx = -1;
+
+    for (int x = def_idx + 1; x < use_idx; x++) {
+        OpKind k = bb->ops[x].kind;
+        if (k == IR_CALL || k == IR_HCALL) {
+            calls++;
+            call_idx = x;
+            continue;
+        }
+        if (k == IR_PUSH_ARG)
+            continue;
+        if (k == IR_BR || k == IR_BR_COND || k == IR_BR_ZERO
+         || k == IR_SWITCH || k == IR_RET
+         || k == IR_PUSH_DEHL_LONG || k == IR_POP_DEHL_LONG)
+            return 0;
+    }
+
+    return calls == 1 && call_idx == use_idx - 1;
+}
+
+int ir_opt_insert_long_pushes(Func *f, int allow_regular)
 {
     if (!f) return 0;
     int changed = 0;
@@ -4626,7 +4727,7 @@ int ir_opt_insert_long_pushes(Func *f)
         if (bb->n_ops < 3) continue;
 
         /* `absorbs` means the consumer is a long-binop (OR/AND/XOR/
-           ADD/SUB) whose src[0] is the pushed vreg — its ir_lower
+                       ADD/SUB) whose operand is the pushed vreg — its ir_lower
            fastpath consumes the stack value directly via byte-wise
            (hl), so we emit PUSH but NO POP. For all other consumers
            (ST_MEM, NOT/NEG, SHL/SHR, nested PUSH) we emit both. */
@@ -4663,11 +4764,25 @@ int ir_opt_insert_long_pushes(Func *f)
             if (!long_consumer_kind_d(use_op->kind)) continue;
 
             int safe = 1;
+            int has_call = 0;
+            int has_arg = 0;
             for (int x = j + 1; x < k && safe; x++) {
-                if (op_is_branch_or_call_d(bb->ops[x].kind)) safe = 0;
-                if (bb->ops[x].kind == IR_PUSH_DEHL_LONG
-                 || bb->ops[x].kind == IR_POP_DEHL_LONG) safe = 0;
+                OpKind xk = bb->ops[x].kind;
+                if (xk == IR_CALL || xk == IR_HCALL) {
+                    has_call = 1;
+                    continue;
+                }
+                if (xk == IR_PUSH_ARG) {
+                    has_arg = 1;
+                    continue;
+                }
+                if (op_is_branch_or_call_d(xk)) safe = 0;
+                if (xk == IR_PUSH_DEHL_LONG || xk == IR_POP_DEHL_LONG)
+                    safe = 0;
             }
+            if (has_arg && !has_call) safe = 0;
+            if (has_call && !long_push_call_window_d(bb, j, k)) safe = 0;
+            if (!allow_regular && !has_call) safe = 0;
             if (!safe) continue;
 
             int matches = 0;
@@ -4682,14 +4797,12 @@ int ir_opt_insert_long_pushes(Func *f)
                     /* Long-binop consumers with the stacked vreg as
                        src[0] absorb it directly via the option-B
                        fastpath. SHL/SHR/NOT/NEG/MOV are single-source
-                       and need the POP to materialize DEHL. SUB has
-                       NO option-B block in the lowerer (only ADD and
-                       the AND/OR/XOR family do) — marking it absorbing
-                       left the value orphaned on the stack and the
-                       consumer reading the stale slot. */
+                       and need the POP to materialize DEHL. SUB now has
+                       a bytewise stack consumer for either operand order. */
                     if (use_op->kind == IR_ADD
                      || use_op->kind == IR_AND || use_op->kind == IR_OR
-                     || use_op->kind == IR_XOR)
+                     || use_op->kind == IR_XOR
+                     || use_op->kind == IR_SUB)
                         absorbs = 1;
                 }
                 else if ((use_op->kind == IR_ADD || use_op->kind == IR_AND
@@ -4697,6 +4810,10 @@ int ir_opt_insert_long_pushes(Func *f)
                        && use_op->src[1] == dst)
                     matches = 1;   /* no absorb — option B's fastpath
                                       only handles src[0]==dst today */
+                else if (use_op->kind == IR_SUB && use_op->src[1] == dst) {
+                    matches = 1;
+                    absorbs = 1;
+                }
             }
             if (!matches) continue;
 

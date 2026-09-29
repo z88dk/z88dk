@@ -101,7 +101,7 @@ ELIF DEFINED_CRT_HEAP_AMALLOC
     and     h
     ld      h,a
     ex      de,hl
-   ELIF __CPU_8080__ || __CPU_GBZ80__
+   ELIF __CPU_8080__ || __CPU_GBZ80__ || __CPU_VM1__
     and     a
     ld      a,d
     rra

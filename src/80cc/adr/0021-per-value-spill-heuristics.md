@@ -34,6 +34,13 @@ was built and reverted twice. Its failure case is a loop temporary that is live
 across a dereference and its compares, where three push/pop pairs around the
 home cost more than the reloads the home avoids.
 
+The later call-containing loop-counter experiment is the same warning in a
+more specific form. `IR_BC_STEP_CALL` tried to keep a mutable `while (n--)`
+scalar in BC while a call-safe invariant value occupied the competing home;
+after the safety fixes it measured **−7 B net over 504 cells**, with one cell
+larger. It is recorded as rejected ADR 0100 rather than as a new per-value
+exception.
+
 ## Reopening
 
 Not as a heuristic. The replacement is the realised-cost ledger: score each

@@ -12,6 +12,7 @@
 
 #include "ccdefs.h"
 #include "ir.h"
+#include "ir_analysis.h"
 #include "ir_build.h"
 #include "ir_lower.h"
 
@@ -2815,6 +2816,24 @@ static int build_muldiv_float(Builder *b, Node *n, int *handled)
         Kind fk = is_register_float_kind(lk) ? lk : rk;
         int l = build_operand_as_float_reg(b, n->left, fk);
         if (l < 0) return build_fail("float mul/div: lhs not promotable");
+
+        /* A constant denominator is cheaper as a reciprocal multiply.  This
+           is particularly important for math32 on the small CPUs: restoring
+           f32 division is much more expensive than f32 multiplication.  Keep
+           this to the IEEE-32 register tier and mirror sccz80's existing
+           constant-divisor rewrite; _Float16 retains its normal division
+           path until its rounding policy is covered separately. */
+        if (n->ast_type == OP_DIV && fk == KIND_DOUBLE
+            && n->right && n->right->ast_type == AST_LITERAL
+            && n->right->zval != 0) {
+            double reciprocal = 1.0 / (double)n->right->zval;
+            int r = emit_float_const(b, reciprocal, fk);
+            if (r < 0) return build_fail("float reciprocal constant emit failed");
+            int dst = emit_float_arith(b, fk, "mul", l, r);
+            if (dst < 0) return build_fail("float reciprocal multiply emit failed");
+            return dst;
+        }
+
         int r = build_operand_as_float_reg(b, n->right, fk);
         if (r < 0) return build_fail("float mul/div: rhs not promotable");
         int dst = emit_float_arith(b, fk, (n->ast_type == OP_MULT) ? "mul" : "div", l, r);
@@ -7542,6 +7561,19 @@ static int build_stmt(Builder *b, Node *n)
         int exit_bb = ir_bb_new(b->f);
         int els_bb  = n->els ? ir_bb_new(b->f) : exit_bb;
 
+        /* ast_conditional() (node.c) builds this AST_IF/AST_TERNARY node
+           from already-parsed cond/then/els subtrees, and stamps ITS OWN
+           filename/line from the parser's `lineno` at that point — i.e.
+           wherever parsing landed AFTER the whole if/else, not the `if`
+           keyword. n->cond was built earlier, while `lineno` still tracked
+           the condition's own line, so re-stamp from it before emitting
+           the test — otherwise every op the test builds (through
+           build_cond, including any short-circuit &&/|| test ops) carries
+           the tail line of a multi-line if/else instead of the line the
+           condition actually reads from. */
+        if (n->cond->filename && n->cond->line > 0)
+            ir_set_emit_loc(n->cond->filename, n->cond->line);
+
         /* Short-circuit control-context lowering: compound `&&`/`||` become
            direct branches to then_bb/els_bb (targets pre-created so their ids
            stay above the test block). build_cond creates no BBs. */
@@ -7826,6 +7858,11 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
         return build_fail("ir_validate failed for %s",
                           fn->name[0] ? fn->name : "?");
     }
+
+    /* IR_DEFASSIGN_VERIFY: run before ir_alloc/ir_lower ever see f, so the
+       result is frame-mode independent (see ir_analysis.h). No-op unless
+       the env var is set. */
+    ir_verify_definite_assignment(f);
 
     /* Flag a function that uses an IX-clobbering maths helper so the
        lowerer keeps it off the IX frame under -frameix. The only such
