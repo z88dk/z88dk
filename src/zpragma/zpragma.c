@@ -418,14 +418,14 @@ static uint64_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
             const char *before = arg;
             while (*arg == '-' || *arg == '+' || *arg == ' ' || *arg == '#' || *arg == '0')
                 arg++;                                     /* flags */
-            while (isdigit((unsigned char)*arg) || *arg == '.' || *arg == '*')
+            while (isdigit(*arg) || *arg == '.' || *arg == '*')
                 arg++;                                     /* width / precision */
             const char *after_width = arg;                 /* save: flags/width end here */
             while (*arg == 'l' || *arg == 'h' || *arg == 'z' || *arg == 'j' || *arg == 't')
                 arg++;                                     /* length modifiers */
             if (*arg == 0 || *arg == '"')                  /* truncated format string */
                 break;
-            if (!isalpha((unsigned char)*arg) && *arg != '[')
+            if (!isalpha(*arg) && *arg != '[')
                 break;                                     /* not a valid conversion letter */
             arg++;                                         /* step past conversion letter */
 
@@ -451,7 +451,7 @@ static uint64_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
         if (c == '"') arg++;            /* step over the closing quote */
 
         /* C adjacent string-literal concatenation: "a" "b" is one format */
-        while (isspace((unsigned char)*arg)) arg++;
+        while (isspace(*arg)) arg++;
         if (*arg != '"')
             break;
     }
@@ -505,19 +505,19 @@ static void scan_line_for_formats(const char *line)
     while (*p) {
         if (*p == '"' || *p == '\'') { skip_quoted(&p); continue; }
 
-        if (!(isalpha((unsigned char)*p) || *p == '_')) { p++; continue; }
-        if (p != line && (isalnum((unsigned char)p[-1]) || p[-1] == '_')) {
-            while (isalnum((unsigned char)*p) || *p == '_') p++;
+        if (!(isalpha(*p) || *p == '_')) { p++; continue; }
+        if (p != line && (isalnum(p[-1]) || p[-1] == '_')) {
+            while (isalnum(*p) || *p == '_') p++;
             continue;
         }
 
         char name[NAMESIZE + 1]; int n = 0;
-        while ((isalnum((unsigned char)*p) || *p == '_') && n < NAMESIZE)
+        while ((isalnum(*p) || *p == '_') && n < NAMESIZE)
             name[n++] = *p++;
         name[n] = '\0';
 
         const char *after_name = p;
-        while (isspace((unsigned char)*after_name)) after_name++;
+        while (isspace(*after_name)) after_name++;
         if (*after_name != '(') continue;
 
         int is_scanf, argidx;
@@ -528,7 +528,7 @@ static void scan_line_for_formats(const char *line)
         if (!argstart) continue;
 
         const char *f = argstart;
-        while (isspace((unsigned char)*f) || *f == '(') f++;      /* tolerate ("...") */
+        while (isspace(*f) || *f == '(') f++;                      /* tolerate ("...") */
 
         if (*f == '"') {
             uint64_t m = scan_format_literal(f, is_scanf ? scanf_formats : printf_formats);
