@@ -4,7 +4,7 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 2026-09-27. Keep it short: when a section stops describing what is
+Last swept: 2026-09-29. Keep it short: when a section stops describing what is
 live, it belongs in `adr/` or in git history, not here.
 
 ## Next action
