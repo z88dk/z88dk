@@ -51,8 +51,14 @@ $(eval $(call MAKE_EXE,$(PROJ),$(OBJS_ALL),0))
 
 
 #------------------------------------------------------------------------------
+test:: test_scan_format$(EXESUFFIX)
+	./test_scan_format$(EXESUFFIX)
+
+test_scan_format$(EXESUFFIX): zpragma.c
+	$(CC) $(CFLAGS) -DZPRAGMA_TEST -o test_scan_format$(EXESUFFIX) zpragma.c
+
 clean::
-	$(RM) $(OBJS) $(DEPENDS) 
+	$(RM) $(OBJS) $(DEPENDS) test_scan_format$(EXESUFFIX)
 
 #------------------------------------------------------------------------------
 install: $(PROJ)$(EXESUFFIX)
