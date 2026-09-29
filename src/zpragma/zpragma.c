@@ -414,32 +414,32 @@ static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
                 arg++;
                 continue;
             }
-            /* Reconstruct the specifier in pragma notation so we can delegate
-             * to parse_format_string for the CONVSPEC lookup.  Example: the
-             * C literal "%-6.1f" becomes spec="6.1f"; "%ld" becomes spec="ld".
-             * parse_format_string already understands flags, width, l/ll, h/z. */
-            char spec[32];
-            int  si = 0;
+            /* Advance arg past flags, width/precision, length modifiers and the
+             * conversion letter, then pass before..arg to parse_format_string.
+             * Example: C literal "%-6.1f" → before.."f"+1 = "6.1f\0". */
             const char *before = arg;
-#define SPEC_APPEND(ch) do { if (si < (int)sizeof(spec)-2) spec[si++] = (ch); } while(0)
             while (*arg == '-' || *arg == '+' || *arg == ' ' || *arg == '#' || *arg == '0')
-                SPEC_APPEND(*arg++);                       /* printf flags */
+                arg++;                                     /* flags */
             while (isdigit((unsigned char)*arg) || *arg == '.' || *arg == '*')
-                SPEC_APPEND(*arg++);                       /* width / precision */
+                arg++;                                     /* width / precision */
             while (*arg == 'l' || *arg == 'h' || *arg == 'z' || *arg == 'j' || *arg == 't')
-                SPEC_APPEND(*arg++);                       /* length modifiers */
+                arg++;                                     /* length modifiers */
             if (*arg == 0 || *arg == '"')                  /* truncated format string */
                 break;
-            SPEC_APPEND(*arg);                             /* conversion letter: d/f/s/x/… */
-            spec[si]   = '\0';
-#undef SPEC_APPEND
+            arg++;                                         /* conversion letter: d/f/s/x/… */
+            /* Copy before..arg into a null-terminated buffer and delegate to
+             * parse_format_string so the CONVSPEC lookup lives in one place. */
+            char spec[32];
+            size_t len = (size_t)(arg - before);
+            if (len >= sizeof(spec)) len = sizeof(spec) - 1;
+            memcpy(spec, before, len);
+            spec[len] = '\0';
             /* bit 30 (0x40000000) = enable flags handling; see CLIB_OPT_PRINTF
-             * in lib/crt/classic/crt_runtime_selection.inc:48.
-             * parse_format_string sets this for pragma input; here we detect
-             * it from the C literal before delegating. */
-            if (arg != before)
+             * in lib/crt/classic/crt_runtime_selection.inc:48. */
+            if (arg - 1 != before)
                 mask |= 0x40000000;
             mask |= (uint32_t)parse_format_string(spec, specifiers);
+            arg--;                                         /* back to conversion letter */
             if (*arg == '[') {   /* scanf %[...] set: skip to ']' */
                 while (arg[1] && *arg != ']') arg++;
             }
