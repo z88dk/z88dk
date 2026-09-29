@@ -721,7 +721,7 @@ int main(void)
     check("unknown %q", SFL("\"%q\""), 0x00);
 
     /* %lld: llval shifted to upper 32 bits; now preserved in uint64_t */
-    check("%lld", SFL("\"%lld\""), UINT64_C(0x100000000));
+    check("%lld", SFL("\"%lld\""), 0x100000000);
 
     /* parse_format_string (pragma notation: space-separated, no %/quotes needed) */
     check("pfs d",    PFS("d"),    0x01);
