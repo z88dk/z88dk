@@ -433,9 +433,10 @@ static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
             SPEC_APPEND(*arg);                             /* conversion letter: d/f/s/x/… */
             spec[si]   = '\0';
 #undef SPEC_APPEND
-            /* 0x40000000 = "standard" printf needed (flags or width present).
-             * parse_format_string sets this itself for pragma input, but here
-             * we detect it from the C literal before calling it. */
+            /* bit 30 (0x40000000) = enable flags handling; see CLIB_OPT_PRINTF
+             * in lib/crt/classic/crt_runtime_selection.inc:48.
+             * parse_format_string sets this for pragma input; here we detect
+             * it from the C literal before delegating. */
             if (arg != before)
                 mask |= 0x40000000;
             mask |= (uint32_t)parse_format_string(spec, specifiers);
