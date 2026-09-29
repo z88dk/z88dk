@@ -414,23 +414,28 @@ static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
                 arg++;
                 continue;
             }
-            /* Build a small spec string (flags+width+modifier+letter) and
-             * pass it to parse_format_string so CONVSPEC lookup is in one place. */
+            /* Reconstruct the specifier in pragma notation so we can delegate
+             * to parse_format_string for the CONVSPEC lookup.  Example: the
+             * C literal "%-6.1f" becomes spec="6.1f"; "%ld" becomes spec="ld".
+             * parse_format_string already understands flags, width, l/ll, h/z. */
             char spec[16];
             int  si = 0;
             const char *before = arg;
             while (*arg == '-' || *arg == '+' || *arg == ' ' || *arg == '#' || *arg == '0')
-                spec[si++] = *arg++;                       /* flags */
+                spec[si++] = *arg++;                       /* printf flags */
             while (isdigit((unsigned char)*arg) || *arg == '.' || *arg == '*')
                 spec[si++] = *arg++;                       /* width / precision */
             while (*arg == 'l' || *arg == 'h' || *arg == 'z' || *arg == 'j' || *arg == 't')
                 spec[si++] = *arg++;                       /* length modifiers */
-            if (*arg == 0 || *arg == '"')
+            if (*arg == 0 || *arg == '"')                  /* truncated format string */
                 break;
-            spec[si++] = *arg;                             /* conversion char */
+            spec[si++] = *arg;                             /* conversion letter: d/f/s/x/… */
             spec[si]   = '\0';
+            /* 0x40000000 = "standard" printf needed (flags or width present).
+             * parse_format_string sets this itself for pragma input, but here
+             * we detect it from the C literal before calling it. */
             if (arg != before)
-                mask |= 0x40000000;                        /* flags/width seen */
+                mask |= 0x40000000;
             mask |= (uint32_t)parse_format_string(spec, specifiers);
             if (*arg == '[') {   /* scanf %[...] set: skip to ']' */
                 while (arg[1] && *arg != ']') arg++;
