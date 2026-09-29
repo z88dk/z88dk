@@ -690,6 +690,47 @@ int main(void)
     check("scanf %s", SFLSC("\"%s\""),     0x200);
     check("scanf %[", SFLSC("\"%[a-z]\""), 0x200000);
 
+    /* untested specifiers from the printf table */
+    check("%o",  SFL("\"%o\""),  0x10);
+    check("%X",  SFL("\"%X\""),  0x08);
+    check("%i",  SFL("\"%i\""),  0x40);
+    check("%p",  SFL("\"%p\""),  0x80);
+    check("%e",  SFL("\"%e\""),  0x1000000);
+    check("%g",  SFL("\"%g\""),  0x10000000);
+    check("%n",  SFL("\"%n\""),  0x20);
+
+    /* z88dk-specific specifiers */
+    check("%B",  SFL("\"%B\""),  0x100);
+    check("%S",  SFL("\"%S\""),  0x2000200);
+
+    /* more flags — all must set bit 30 */
+    check("%0d",   SFL("\"%0d\""),   0x40000001);
+    check("%+d",   SFL("\"%+d\""),   0x40000001);
+    check("%#x",   SFL("\"%#x\""),   0x40000004);
+    check("% d",   SFL("\"% d\""),   0x40000001);
+    check("%-06.2f", SFL("\"%-06.2f\""), 0x44000000);
+
+    /* short length modifier: h and hh give the base (non-long) bitmask */
+    check("%hd",  SFL("\"%hd\""),  0x01);
+    check("%hhd", SFL("\"%hhd\""), 0x01);
+
+    /* three adjacent string literals */
+    check("adj 3", SFL("\"%d\" \"%f\" \"%s\""), 0x4000201);
+
+    /* backslash escape before next specifier must not swallow it */
+    check("\\n between", SFL("\"%d\\n%f\""), 0x4000001);
+
+    /* truncated % at end of string — must not crash, returns 0 */
+    check("truncated %", SFL("\"%\""),  0x00);
+
+    /* unknown specifier — must not crash, returns 0 */
+    check("unknown %q", SFL("\"%q\""), 0x00);
+
+    /* %lld: llval is 64-bit; scan_format_literal returns uint32_t so high
+     * word is truncated — result is 0 for specifiers where llval fits only
+     * above bit 31 (this is a known limitation, not a bug to fix here) */
+    check("%lld trunc", SFL("\"%lld\""), 0x00);
+
     /* parse_format_string (pragma notation: space-separated, no %/quotes needed) */
     check("pfs d",    PFS("d"),    0x01);
     check("pfs f",    PFS("f"),    0x4000000);
@@ -697,6 +738,8 @@ int main(void)
     check("pfs ld",   PFS("ld"),   0x1000);
     check("pfs d s",  PFS("d s"),  0x201);
     check("pfs 6.1f", PFS("6.1f"), 0x44000000);
+    check("pfs o",    PFS("o"),    0x10);
+    check("pfs X",    PFS("X"),    0x08);
 
     if (tests_failed == 0)
         printf("PASS: %d tests\n", tests_run);
