@@ -2199,9 +2199,10 @@ static int cmd_quit(int argc, char **argv)
 {
     if (bk.confirm_detach_w_breakpoints) {
         breakpoint* elem;
-        int count;
+        int count, watch_count;
         LL_COUNT(breakpoints, elem, count);
-        if (count > 0) {
+        LL_COUNT(watchpoints, elem, watch_count);
+        if (count + watch_count > 0) {
             if (confirm("You have breakpoint(s) set. Would you like to remove them before you detach?")) {
                 delete_all_breakpoints();
             }

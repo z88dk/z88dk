@@ -57,6 +57,8 @@ typedef struct {
     restore_cb restore;
     breakpoint_cb add_breakpoint;
     breakpoint_cb remove_breakpoint;
+    breakpoint_cb add_watchpoint;
+    breakpoint_cb remove_watchpoint;
     breakpoint_cb disable_breakpoint;
     breakpoint_cb enable_breakpoint;
     breakpoints_check_cb breakpoints_check;
