@@ -418,19 +418,21 @@ static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
              * to parse_format_string for the CONVSPEC lookup.  Example: the
              * C literal "%-6.1f" becomes spec="6.1f"; "%ld" becomes spec="ld".
              * parse_format_string already understands flags, width, l/ll, h/z. */
-            char spec[16];
+            char spec[32];
             int  si = 0;
             const char *before = arg;
+#define SPEC_APPEND(ch) do { if (si < (int)sizeof(spec)-2) spec[si++] = (ch); } while(0)
             while (*arg == '-' || *arg == '+' || *arg == ' ' || *arg == '#' || *arg == '0')
-                spec[si++] = *arg++;                       /* printf flags */
+                SPEC_APPEND(*arg++);                       /* printf flags */
             while (isdigit((unsigned char)*arg) || *arg == '.' || *arg == '*')
-                spec[si++] = *arg++;                       /* width / precision */
+                SPEC_APPEND(*arg++);                       /* width / precision */
             while (*arg == 'l' || *arg == 'h' || *arg == 'z' || *arg == 'j' || *arg == 't')
-                spec[si++] = *arg++;                       /* length modifiers */
+                SPEC_APPEND(*arg++);                       /* length modifiers */
             if (*arg == 0 || *arg == '"')                  /* truncated format string */
                 break;
-            spec[si++] = *arg;                             /* conversion letter: d/f/s/x/… */
+            SPEC_APPEND(*arg);                             /* conversion letter: d/f/s/x/… */
             spec[si]   = '\0';
+#undef SPEC_APPEND
             /* 0x40000000 = "standard" printf needed (flags or width present).
              * parse_format_string sets this itself for pragma input, but here
              * we detect it from the C literal before calling it. */
