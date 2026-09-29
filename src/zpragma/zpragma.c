@@ -386,7 +386,9 @@ static int format_arg_index(const char *name, int *is_scanf)
     return 0;
 }
 
-/* Scan format string literal for conversion specifiers and return bitmask. */
+/* Scan format string literal for conversion specifiers and return bitmask.
+ * Delegates to parse_format_string for the CONVSPEC lookup so both paths
+ * share the same table logic. */
 static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
 {
     uint32_t mask = 0;
@@ -412,36 +414,26 @@ static uint32_t scan_format_literal(const char *arg, CONVSPEC *specifiers)
                 arg++;
                 continue;
             }
-            int islong = 0;
+            /* Build a small spec string (flags+width+modifier+letter) and
+             * pass it to parse_format_string so CONVSPEC lookup is in one place. */
+            char spec[16];
+            int  si = 0;
             const char *before = arg;
             while (*arg == '-' || *arg == '+' || *arg == ' ' || *arg == '#' || *arg == '0')
-                arg++;                   /* flags */
+                spec[si++] = *arg++;                       /* flags */
             while (isdigit((unsigned char)*arg) || *arg == '.' || *arg == '*')
-                arg++;                   /* width / precision (incl. * and .) */
-            if (arg != before)           /* any flag/width/precision seen */
-                mask |= 0x40000000;      /* -> enable printf flags handling */
-            if (*arg == 'l') {           /* length modifiers */
-                arg++;
-                islong = 1;
-                if (*arg == 'l') arg++;  /* ll -> folds to long on this channel */
-            } else if (*arg == 'h') {
-                arg++;
-                if (*arg == 'h') arg++;
-            } else if (*arg == 'z' || *arg == 'j' || *arg == 't') {
-                arg++;
-            }
+                spec[si++] = *arg++;                       /* width / precision */
+            while (*arg == 'l' || *arg == 'h' || *arg == 'z' || *arg == 'j' || *arg == 't')
+                spec[si++] = *arg++;                       /* length modifiers */
             if (*arg == 0 || *arg == '"')
                 break;
-            CONVSPEC *fmt = specifiers;
-            while (fmt->fmt) {
-                if (fmt->fmt == *arg) {
-                    mask |= islong ? fmt->lval : fmt->val;
-                    if (*arg == '[') {   /* scanf %[...] set: skip to ']' */
-                        while (arg[1] && *arg != ']') arg++;
-                    }
-                    break;
-                }
-                fmt++;
+            spec[si++] = *arg;                             /* conversion char */
+            spec[si]   = '\0';
+            if (arg != before)
+                mask |= 0x40000000;                        /* flags/width seen */
+            mask |= (uint32_t)parse_format_string(spec, specifiers);
+            if (*arg == '[') {   /* scanf %[...] set: skip to ']' */
+                while (arg[1] && *arg != ']') arg++;
             }
             if (*arg) arg++;             /* step past the conversion char */
         }
