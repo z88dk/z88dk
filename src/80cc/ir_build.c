@@ -12,6 +12,7 @@
 
 #include "ccdefs.h"
 #include "ir.h"
+#include "ir_analysis.h"
 #include "ir_build.h"
 #include "ir_lower.h"
 
@@ -7844,6 +7845,11 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
         return build_fail("ir_validate failed for %s",
                           fn->name[0] ? fn->name : "?");
     }
+
+    /* IR_DEFASSIGN_VERIFY: run before ir_alloc/ir_lower ever see f, so the
+       result is frame-mode independent (see ir_analysis.h). No-op unless
+       the env var is set. */
+    ir_verify_definite_assignment(f);
 
     /* Flag a function that uses an IX-clobbering maths helper so the
        lowerer keeps it off the IX frame under -frameix. The only such

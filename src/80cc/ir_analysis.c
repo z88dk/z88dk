@@ -438,6 +438,130 @@ void ir_compute_liveness(Func *f)
     ir_bitset_free(tmp);
 }
 
+/* ----- Definite-assignment verifier (IR_DEFASSIGN_VERIFY) -------------- */
+
+static int defassign_verify_level(void)
+{
+    const char *v = getenv("IR_DEFASSIGN_VERIFY");
+    if (!v || !v[0]) return 0;
+    return (v[0] == '2') ? 2 : 1;
+}
+
+/* Forward "must be defined" dataflow at BB granularity: MEET = intersection
+   over predecessors, GEN[bb] = every vreg defined anywhere in bb (valid
+   because a BB runs straight-line to its terminator — if bb defines v at
+   all, v is defined by the time control leaves bb). Predecessors aren't
+   used directly (bb->pred is never populated by ir_build — see ir_build.c);
+   instead this propagates forward along successors, AND-ing each bb's
+   computed OUT into every successor's IN, same shape ir_compute_liveness
+   uses for live_out but MUST/intersect instead of MAY/union and forward
+   instead of backward. Monotone (sets only shrink), so it terminates. */
+void ir_verify_definite_assignment(const Func *f)
+{
+    int level = defassign_verify_level();
+    if (!level || !f || f->n_bbs == 0 || f->n_vregs == 0) return;
+
+    int n = f->n_vregs;
+    char *in_set = malloc((size_t)f->n_bbs * (size_t)n);
+    char *out    = malloc((size_t)n);
+    char *seen   = malloc((size_t)n);
+    char *reported = calloc((size_t)n, 1);
+    if (!in_set || !out || !seen || !reported) {
+        free(in_set); free(out); free(seen); free(reported);
+        return;
+    }
+
+    /* Optimistic start: every BB "fully defined" on entry except BB 0
+       (the function entry), which starts empty save for params. An
+       address-taken local may be written through an escaped pointer —
+       invisible to this pass (same under-approximation ir_slots.c's
+       interference model already accepts) — so treat it as always
+       defined rather than false-positive on it. */
+    memset(in_set, 1, (size_t)f->n_bbs * (size_t)n);
+    memset(in_set, 0, (size_t)n);
+    for (int v = 0; v < n; v++)
+        if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN))
+            in_set[v] = 1;
+
+    int changed;
+    do {
+        changed = 0;
+        for (int b = 0; b < f->n_bbs; b++) {
+            const BB *bb = &f->bbs[b];
+            char *bin = in_set + (size_t)b * n;
+            memcpy(out, bin, (size_t)n);
+            int defs[2];
+            for (int j = 0; j < bb->n_ops; j++) {
+                const Op *op = &bb->ops[j];
+                int nd = ir_op_defs(op, defs, 2);
+                for (int k = 0; k < nd; k++)
+                    if (defs[k] >= 0 && defs[k] < n) out[defs[k]] = 1;
+                /* `x = asm("...")` (AST_ASM as an expression value, ir_build.c)
+                   sets op->dst but ir_op_defs deliberately excludes IR_ASM —
+                   a general asm block is opaque, so the shared def/use table
+                   can't trust it defines anything. This narrower form does:
+                   dst is only ever set on the expression-value variant, never
+                   the opaque statement form. */
+                if (op->kind == IR_ASM && op->dst >= 0 && op->dst < n)
+                    out[op->dst] = 1;
+            }
+            int ns = ir_bb_n_succ(bb);
+            for (int s = 0; s < ns; s++) {
+                int suc = ir_bb_succ_at(bb, s);
+                if (suc <= 0 || suc >= f->n_bbs) continue;   /* keep BB0 pinned */
+                char *sin = in_set + (size_t)suc * n;
+                for (int v = 0; v < n; v++)
+                    if (sin[v] && !out[v]) { sin[v] = 0; changed = 1; }
+            }
+        }
+    } while (changed);
+
+    /* Report: replay each BB from its converged IN set, tracking defs
+       seen so far in program order; a use not yet in that set is a read
+       with no guaranteed prior write on some path reaching it. One
+       report per vreg per function. */
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        memcpy(seen, in_set + (size_t)b * n, (size_t)n);
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            int uses[16]; int *ubuf = uses; int *ubig = NULL;
+            int nu = ir_op_uses_count(op);
+            if (nu > 16) { ubig = malloc((size_t)nu * sizeof(int)); ubuf = ubig; }
+            nu = ir_op_uses(op, ubuf, nu > 0 ? nu : 16);
+            for (int k = 0; k < nu; k++) {
+                int vr = ubuf[k];
+                if (vr < 0 || vr >= n || seen[vr] || reported[vr]) continue;
+                reported[vr] = 1;
+                fprintf(stderr,
+                    "IR_DEFASSIGN_VERIFY: %s: '%s' (v%d, width %d) read "
+                    "before any write, at %s:%d — undefined behaviour in "
+                    "the source unless it is genuinely set on every path "
+                    "reaching this read (a codegen bug if so)\n",
+                    ir_sym_name(f->fn), ir_sym_name(f->vregs[vr].sym),
+                    vr, f->vregs[vr].width,
+                    op->file ? op->file : "?", op->line);
+            }
+            free(ubig);
+            int defs[2]; int nd = ir_op_defs(op, defs, 2);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] >= 0 && defs[k] < n) seen[defs[k]] = 1;
+            if (op->kind == IR_ASM && op->dst >= 0 && op->dst < n)
+                seen[op->dst] = 1;
+        }
+    }
+
+    int any = 0;
+    for (int v = 0; v < n; v++) any |= reported[v];
+    free(in_set); free(out); free(seen);
+    if (any && level >= 2) {
+        fprintf(stderr, "IR_DEFASSIGN_VERIFY: aborting (level 2)\n");
+        free(reported);
+        exit(1);
+    }
+    free(reported);
+}
+
 void ir_compute_op_liveness(Func *f)
 {
     if (!f || f->n_bbs == 0) return;
