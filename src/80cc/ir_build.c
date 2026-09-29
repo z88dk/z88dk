@@ -2815,6 +2815,24 @@ static int build_muldiv_float(Builder *b, Node *n, int *handled)
         Kind fk = is_register_float_kind(lk) ? lk : rk;
         int l = build_operand_as_float_reg(b, n->left, fk);
         if (l < 0) return build_fail("float mul/div: lhs not promotable");
+
+        /* A constant denominator is cheaper as a reciprocal multiply.  This
+           is particularly important for math32 on the small CPUs: restoring
+           f32 division is much more expensive than f32 multiplication.  Keep
+           this to the IEEE-32 register tier and mirror sccz80's existing
+           constant-divisor rewrite; _Float16 retains its normal division
+           path until its rounding policy is covered separately. */
+        if (n->ast_type == OP_DIV && fk == KIND_DOUBLE
+            && n->right && n->right->ast_type == AST_LITERAL
+            && n->right->zval != 0) {
+            double reciprocal = 1.0 / (double)n->right->zval;
+            int r = emit_float_const(b, reciprocal, fk);
+            if (r < 0) return build_fail("float reciprocal constant emit failed");
+            int dst = emit_float_arith(b, fk, "mul", l, r);
+            if (dst < 0) return build_fail("float reciprocal multiply emit failed");
+            return dst;
+        }
+
         int r = build_operand_as_float_reg(b, n->right, fk);
         if (r < 0) return build_fail("float mul/div: rhs not promotable");
         int dst = emit_float_arith(b, fk, (n->ast_type == OP_MULT) ? "mul" : "div", l, r);

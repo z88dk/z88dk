@@ -22,6 +22,7 @@ static int f16_inc(void){ _Float16 f = 5; f++; ++f; --f; return (int)f; }       
 
 /* --- f32 (double under ieee) --- */
 static int f32_mul(void){ double d = 4; return (int)(3 * d) + (int)(d / 2); }     /* 12+2 */
+static int f32_const_div(void){ double d = 123.5; return (int)(d / 7); }           /* 17 */
 static int f32_long(void){ long l = 100; double d = 4; return (int)(l * d); }     /* 400 */
 static int f32_cmp(void){ double d = 4; return (d > 3) + (d == 4); }              /* 2 */
 static int f32_glob(int i){ g32 = i; return (int)g32; }
@@ -49,7 +50,8 @@ static void test_f16(void)
 }
 static void test_f32(void)
 {
-    assertEqual(f32_mul(), 14); assertEqual(f32_long(), 400);
+    assertEqual(f32_mul(), 14); assertEqual(f32_const_div(), 17);
+    assertEqual(f32_long(), 400);
     assertEqual(f32_cmp(), 2);
     assertEqual(f32_glob(9), 9); assertEqual((int)f32_ret(11), 11);
     assertEqual(f32_caddmul(), 30); assertEqual(f32_inc(), 6);
