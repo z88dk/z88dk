@@ -1855,9 +1855,15 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
            where the expr was already evaluated at byte width, or a
            narrowed binop feeding `c = c<op>x`). Either way the low byte
            is the result; copy it through A. A width-1 src stays in A
-           (no HL widening) and hits the producer's A-cache. */
+           (no HL widening) and hits the producer's A-cache.
+           IR_CONV_TRUNC_HI means the shr8trunc ir_match pattern fused a
+           dead `(x>>8)` into this op — op->src[0] is the PRE-shift value
+           and the result is its HIGH byte, not its low one. */
         if (src_w == 1) {
             load_byte_to_a(out, f, op->src[0]);
+        } else if (op->kind == IR_CONV_TRUNC_HI) {
+            load_to_hl(out, f, op->src[0]);
+            emit(out, "ld\ta,h");
         } else {
             load_to_hl(out, f, op->src[0]);
             emit(out, "ld\ta,l");

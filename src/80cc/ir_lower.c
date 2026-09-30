@@ -6268,6 +6268,7 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_CONV_ZX:           return gen_conv_zx(out, f, op);
     case IR_CONV_SX:           return gen_conv_sx(out, f, op);
     case IR_CONV_TRUNC:        return gen_conv_trunc(out, f, op);
+    case IR_CONV_TRUNC_HI:     return gen_conv_trunc(out, f, op);
     case IR_CONV_BYTE_TO_HIGH: return gen_conv_byte_to_high(out, f, op);
     case IR_SHL:               return gen_shl(out, f, op);
     case IR_SHR:               return gen_shr(out, f, op);

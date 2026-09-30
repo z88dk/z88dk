@@ -1569,9 +1569,41 @@ static const PatternDef pat_movfuse = {
     .check = movfuse_check, .apply = movfuse_apply,
 };
 
+/* shr8trunc — `(byte)(x >> 8)`, the standard C high-byte-extract idiom,
+   builds as IR_SHR(x,8) feeding IR_CONV_TRUNC. Lowered separately, SHR
+   materialises the whole shifted word first (`ld l,h; ld h,0` on plain
+   z80) and TRUNC then reads its low byte back out (`ld a,l`): 3
+   instructions to read a register (H) that already held the answer.
+   Fusing this needs real per-vreg use-count/def info to know the shifted
+   word is otherwise unused — precisely what a copt post-pass (running on
+   shared text after lowering, no view of 80cc's register-cache state)
+   cannot prove; the DESIGN_INDEX note on `gwiden` is the same lesson
+   learned the hard way once already. The IR pattern matcher has that
+   info for free via its standard single-use internal-temp condition, so
+   no custom check() is needed here — the SHR's dst is auto-verified as
+   this TRUNC's only reader. Anchors on the TRUNC (generic apply):
+   src[0] becomes x (the pre-shift value) and the kind becomes the
+   distinct IR_CONV_TRUNC_HI (see ir.h) rather than reusing IR_CONV_TRUNC
+   with a repurposed imm — CSE and a const-fold pass both assumed a plain
+   TRUNC's value never depends on imm (true until this pattern existed),
+   and overloading it silently miscompiled via CSE before this was given
+   its own kind instead. */
+enum { HB_T = 1, HB_X };   /* shr8trunc binding vars */
+
+static const PatternDef pat_shr8trunc = {
+    .name = "shr8trunc", .n_ops = 2, .anchor = 2,
+    .ops = {
+        { .kind = IR_SHR, .dst = HB_T, .src0 = HB_X,
+          .imm_pred = IR_IMM_EQ, .imm_val = 8, .width = 2 },
+        { .kind = IR_CONV_TRUNC, .dst = IR_MS_ANY, .src0 = HB_T, .width = 1 },
+    },
+    .new_kind = IR_CONV_TRUNC_HI, .new_src0 = HB_X,
+};
+
 int ir_match_run_early(Func *f)
 {
     int n = ir_match_run_table(f, &pat_poststep, 1);
+    n += ir_match_run_table(f, &pat_shr8trunc, 1);
     n += ir_match_run_table(f, &pat_derefpp, 1);
     /* stpp needs the POSTSTEP that poststep just produced. Default-on with
        the loop register allocator (IR_NO_LOOP_RA opts out) — it feeds the

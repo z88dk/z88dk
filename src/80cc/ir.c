@@ -55,6 +55,7 @@ static const OpInfo op_table[] = {
     [IR_CONV_ZX]            = { "CONV_ZX",              0, 0 },
     [IR_CONV_SX]            = { "CONV_SX",              0, 0 },
     [IR_CONV_TRUNC]         = { "CONV_TRUNC",           0, 0 },
+    [IR_CONV_TRUNC_HI]      = { "CONV_TRUNC_HI",        0, 0 },
     [IR_CONV_BYTE_TO_HIGH]  = { "CONV_BYTE_TO_HIGH",    0, 0 },
 
     /* rotates */

@@ -1757,6 +1757,34 @@ int ir_opt_cse(Func *f)
 
             if (cse_eligible(op->kind) && op->dst >= 0) {
                 int has_imm = op_has_imm_identity(op->kind);
+                /* Tripwire, not a diagnostic to dig for: a kind CSE treats as
+                   imm-independent (has_imm==0) but which actually carries a
+                   non-zero imm would collide two DIFFERENT values below (the
+                   `has_imm && ...` guard on the next loop skips comparing
+                   imm entirely) — silently, with no warning, discoverable
+                   only by IR_DUMP-ing a miscompiled function after the fact.
+                   This is exactly how the shr8trunc ir_match pattern (see
+                   IR_CONV_TRUNC_HI in ir.h) first shipped: it overloaded
+                   IR_CONV_TRUNC's imm to mean "take the high byte", and CSE
+                   — which had every reason to believe CONV_TRUNC's imm was
+                   always 0, true for the entire rest of the compiler's
+                   history — folded a high-byte read into an unrelated
+                   low-byte read of the same source. Catch the NEXT one here,
+                   loudly, at the point of introduction, instead of via a
+                   failing bitfieldbench test three passes later. If this
+                   fires: either register the kind in op_has_imm_identity (if
+                   imm really is part of its identity), or — safer, and what
+                   IR_CONV_TRUNC_HI did — give the new meaning its own kind
+                   instead of overloading an existing one's imm. */
+                if (!has_imm && op->imm != 0) {
+                    fprintf(stderr,
+                        "ir_opt_cse: %s has non-zero imm (%lld) but is not "
+                        "in op_has_imm_identity() — CSE would silently ignore "
+                        "it and can collide two non-equivalent values. See "
+                        "the comment here (ir_opt.c) before fixing.\n",
+                        ir_op_name(op->kind), (long long)op->imm);
+                    abort();
+                }
                 int dst_w = (op->dst < f->n_vregs)
                           ? f->vregs[op->dst].width : 0;
                 int hit = -1;
