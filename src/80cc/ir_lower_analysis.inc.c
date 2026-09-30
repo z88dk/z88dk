@@ -229,13 +229,19 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
                  && g_hc.remat_def[op->src[1]])
             cst = op->src[1];
         if (cst >= 0) {
+            /* The other operand is being served straight out of HL with no
+               slot read — same as any other cache hit, this must be recorded
+               or the dead-store pass conservatively assumes a reload and
+               keeps an unneeded spill/park alive for it (missed in both
+               branches below: neither used to call this). */
+            int other = (cst == op->src[0]) ? op->src[1] : op->src[0];
+            ss_note_cache_read(f, other);
             /* A frame-address remat recomputes through HL, so it cannot be sent
                to DE while HL still holds the other operand — doing so left both
                registers holding the address (`&loc[i]` became `&loc + &loc`).
                The op is commutative, so swap the roles instead: park the HL
                operand in DE and rematerialise into HL. */
             if (remat_word_clobbers_hl(f, cst)) {
-                int other = (cst == op->src[0]) ? op->src[1] : op->src[0];
                 emit_ex_de_hl(out);
                 swap_hl_de_caches();
                 hl_about_to_change(cst);

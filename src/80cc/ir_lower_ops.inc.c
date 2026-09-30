@@ -466,6 +466,8 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
     if (try_tos_step_inplace(out, f, op, step)) return 0;
     if (!hl_has(op->src[0]))
         load_to_hl(out, f, op->src[0]);
+    else
+        ss_note_cache_read(f, op->src[0]);
     emit(out, "%s\thl", mnem);
     commit_hl_word(out, f, op->dst);
     return 0;
@@ -508,10 +510,12 @@ static void emit_test_zero(FILE *out, Func *f, int src)
            HL/A caches stay valid (test modifies no register). */
         if (IS_RABBIT4K()) {
             if (!hl_has(src) && L.rs.bc == src) {
+                ss_note_cache_read(f, src);
                 emit(out, "test\tbc");
                 return;
             }
             if (!hl_has(src)) load_to_hl(out, f, src);
+            else              ss_note_cache_read(f, src);
             emit(out, "test\thl");
             return;
         }
@@ -523,8 +527,8 @@ static void emit_test_zero(FILE *out, Func *f, int src)
            just spend two different bytes on the same job. Touches only A, so
            every other cache (HL, BC, DE) stays exactly as valid as before. */
         if (!hl_has(src)) {
-            if (bc_has(src)) { emit(out, "ld\ta,b"); emit(out, "or\tc"); return; }
-            if (de_has(src)) { emit(out, "ld\ta,d"); emit(out, "or\te"); return; }
+            if (bc_has(src)) { ss_note_cache_read(f, src); emit(out, "ld\ta,b"); emit(out, "or\tc"); return; }
+            if (de_has(src)) { ss_note_cache_read(f, src); emit(out, "ld\ta,d"); emit(out, "or\te"); return; }
         }
         /* In-place slot word zero-test: when the tested value is dead after the
            branch (the fall-through won't reuse it — L.la.cur_br_value_dead) and
@@ -553,6 +557,7 @@ static void emit_test_zero(FILE *out, Func *f, int src)
             }
         }
         if (!hl_has(src)) load_to_hl(out, f, src);
+        else              ss_note_cache_read(f, src);
         emit(out, "ld\ta,h");
         emit(out, "or\tl");
         return;
@@ -686,6 +691,7 @@ static int gen_deref_cmp_br(FILE *out, Func *f, const Op *op)
            in HL, not that anything already there survives. Mirror of the
            BC/DE-resident cases above: push the value HL already holds
            FIRST, load the other pointer, then pop it back. */
+        ss_note_cache_read(f, pa);
         emit_sp(out, 2, "push\thl");
         load_to_hl(out, f, pb);
         emit(out, "ld\ta,(hl)");        /* A = *pb */
@@ -693,6 +699,7 @@ static int gen_deref_cmp_br(FILE *out, Func *f, const Op *op)
         emit(out, "cp\t(hl)");          /* vs *pa */
     } else if (hl_has(pb)) {
         /* Symmetric: pb already lives in HL. */
+        ss_note_cache_read(f, pb);
         emit_sp(out, 2, "push\thl");
         load_to_hl(out, f, pa);
         emit(out, "ld\ta,(hl)");        /* A = *pa */
@@ -1091,6 +1098,8 @@ static int gen_poststep(FILE *out, Func *f, const Op *op)
             ss_note_reload(f, x);
             emit(out, "ld\tl,(%s%+d)", frame_reg(), d);
             emit(out, "ld\th,(%s%+d)", frame_reg(), d + 1);
+        } else {
+            ss_note_cache_read(f, x);
         }
         emit(out, up ? "inc\thl" : "dec\thl");
         emit(out, "ld\t(%s%+d),l", frame_reg(), d);
@@ -1476,6 +1485,7 @@ static int gen_push_arg(FILE *out, Func *f, const Op *op)
         L.cur_sp_adjust += 4;
     } else {
         if (!hl_has(v)) load_to_hl(out, f, v);
+        else            ss_note_cache_read(f, v);
         emit_sp(out, 2, "push\thl");
     }
     return 0;
@@ -1621,6 +1631,8 @@ static int gen_neg(FILE *out, Func *f, const Op *op)
     if (IS_RABBIT4K()) {
         if (!hl_has(op->src[0]))
             load_to_hl(out, f, op->src[0]);
+        else
+            ss_note_cache_read(f, op->src[0]);
         emit(out, "neg\thl");
     } else if (!CPU_HAS_SBC_HL()) {
         /* No `sbc hl,de` here, and z80asm substitutes `call
@@ -1692,6 +1704,8 @@ static int gen_not(FILE *out, Func *f, const Op *op)
     /* Bitwise complement: HL = ~src[0]. */
     if (!hl_has(op->src[0]))
         load_to_hl(out, f, op->src[0]);
+    else
+        ss_note_cache_read(f, op->src[0]);
     emit(out, "ld\ta,h");
     emit(out, "cpl");
     emit(out, "ld\th,a");
@@ -2264,6 +2278,8 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
                 }
                 if (!hl_has(op->src[1]))
                     load_to_hl(out, f, op->src[1]);
+                else
+                    ss_note_cache_read(f, op->src[1]);
                 emit(out, "ld\t%s,l", counter);
                 if (save_a) emit_sp(out, -2, "pop\taf");
                 else         load_byte_to_a(out, f, op->src[0]);
@@ -2271,6 +2287,8 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             } else {
                 if (!hl_has(op->src[1]))
                     load_to_hl(out, f, op->src[1]);
+                else
+                    ss_note_cache_read(f, op->src[1]);
                 if (bc_live) emit_sp(out, 2, "push\tbc");
                 emit(out, "ld\tb,l");
                 load_byte_to_a(out, f, op->src[0]);
@@ -2316,6 +2334,8 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
                after (helper clobbers A). */
             if (!hl_has(op->src[1]))
                 load_to_hl(out, f, op->src[1]);
+            else
+                ss_note_cache_read(f, op->src[1]);
             emit(out, "ld\ta,l");
             cache_a(op->src[1]);
             load_to_dehl(out, f, op->src[0]);
@@ -3260,6 +3280,8 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             }
             if (!hl_has(base))
                 load_to_hl(out, f, base);              /* HL = p */
+            else
+                ss_note_cache_read(f, base);
             emit(out, "ld\ta,(hl)");                   /* A = *p */
             emit(out, op->mem.post_step > 0 ? "inc\thl" : "dec\thl");
             if (vreg_in_pr_bc(f, base)) {
@@ -3291,6 +3313,8 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             int base = op->mem.base;
             if (!hl_has(base))
                 load_to_hl(out, f, base);              /* HL = p */
+            else
+                ss_note_cache_read(f, base);
             emit(out, "ld\te,(hl)");
             emit(out, "inc\thl");
             emit(out, "ld\td,(hl)");                   /* DE = *p, HL = p+1 */
@@ -3425,6 +3449,8 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 load_to_hl(out, f, op->mem.base);
             else
                 mem_off = load_to_hl_fold_off(out, f, op->mem.base, mem_off);
+        } else {
+            ss_note_cache_read(f, op->mem.base);
         }
         if (lhlx_deref) {
             if (op->mem.offset == 0) {
@@ -4036,6 +4062,8 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                    would clobber DE or BC.) */
                 if (!hl_has(op->mem.base))
                     load_to_hl(out, f, op->mem.base);
+                else
+                    ss_note_cache_read(f, op->mem.base);
                 emit_hl_add_offset(out, op->mem.offset, 0, 0); /* inc/dec only */
                 store_byte_adv(out, "c", 0);
                 store_byte_adv(out, "b", 0);
@@ -4148,6 +4176,8 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                     if (shlx_bc) emit(out, "ld\tde,bc");
                     else         emit_remat_word(out, f, op->mem.base, "de");
                     cache_de(op->mem.base);
+                } else {
+                    ss_note_cache_read(f, op->mem.base);
                 }
                 emit(out, "ld\t(de),hl");     /* both beliefs survive it */
                 return 0;
@@ -4845,6 +4875,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         && !g_hc.home_is_word && !IS_GBZ80() && !IS_RABBIT() && !IS_KC160()
         && !de_has(op->src[1]) && !bc_has(op->src[1])
         && !(vreg_in_pr_bc(f, op->src[1]) && fp_active(f))) {
+        ss_note_cache_read(f, op->src[0]);
         emit_ex_de_hl(out);            /* DE = src0 (running value) */
         swap_hl_de_caches();
         load_to_hl(out, f, op->src[1]);    /* HL = src1 (preserves DE) */
@@ -4868,6 +4899,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
            the DE path and cost `ld e,c; ld d,b` plus DE itself. */
         int bcv   = bc_has(op->src[1]) ? op->src[1] : op->src[0];
         int other = (bcv == op->src[1]) ? op->src[0] : op->src[1];
+        ss_note_cache_read(f, bcv);
         load_to_hl(out, f, other);
         emit(out, "add\thl,bc");
         commit_hl_result(out, f, op->dst);
@@ -5288,6 +5320,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
        below). Rabbit has native `sub hl,de` but no BC form → falls through. */
     if (op->src[1] >= 0 && bc_has(op->src[1]) && !IS_RABBIT()
         && L.pending_spill_v < 0) {
+        ss_note_cache_read(f, op->src[1]);
         load_to_hl(out, f, op->src[0]);       /* minuend → HL (preserves BC) */
         if (IS_808x() || IS_GBZ80()) {
             if (dsub_ok()) {
@@ -6052,6 +6085,8 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             /* Single-byte mask. Load src[0] into HL if not cached. */
             if (!hl_has(op->src[0]))
                 load_to_hl(out, f, op->src[0]);
+            else
+                ss_note_cache_read(f, op->src[0]);
             const char *reg = (hi != 0) ? "h" : "l";
             uint8_t mask  = (hi != 0) ? hi : lo;
             emit(out, "ld\ta,%s", reg);
@@ -6104,6 +6139,8 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
         }
         if (!hl_has(op->src[0]))
             load_to_hl(out, f, op->src[0]);
+        else
+            ss_note_cache_read(f, op->src[0]);
         /* PR_DE dst: route the byte writes into E/D instead of
            L/H. HL preserves src[0] (we never touch it during the
            op-with-A dance), so rs.hl = src[0] stays valid. */

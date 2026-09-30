@@ -996,9 +996,13 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
         cache_de(vreg_id);
         return;
     }
-    if (L.rs.de == vreg_id && vreg_id >= 0) return;
+    if (L.rs.de == vreg_id && vreg_id >= 0) {
+        ss_note_cache_read(f, vreg_id);
+        return;
+    }
     /* PR_BC hit: BC→DE doesn't touch HL, so the push/pop is pointless. */
     if (bc_has(vreg_id) && f->vregs[vreg_id].width == 2) {
+        ss_note_cache_read(f, vreg_id);
         emit(out, "ld\te,c");
         emit(out, "ld\td,b");
         cache_de(vreg_id);
