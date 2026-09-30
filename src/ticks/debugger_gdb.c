@@ -288,7 +288,7 @@ static struct debugger_regs_t* fetch_registers()
         }
 
         uint16_t rr[32];
-        hex2mem(regs, (void*)rr, register_mappings_count * 4);
+        hex2mem(regs, (void*)rr, register_mappings_count * 2);
 
         for (int i = 0; i < register_mappings_count; i++) {
             enum register_mapping_t reg = register_mappings[i];
