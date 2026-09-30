@@ -4,7 +4,7 @@ include ../make.config
 # stitch_z80 / stitch_8085 / stitch_vm1 (and helpers/mul) race under MAKE_CONCURRENCY=-j.
 .NOTPARALLEL:
 
-all: stitch_z80.ok stitch_8085.ok stitch_vm1.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok mixfb.ok only.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok srahl.ok r2ka.ok ixword.ok iy.ok ext8085.ok extvm1.ok extgbz80.ok gbz80ex.ok extz180.ok extz80n.ok sdcc_abi.ok
+all: stitch_z80.ok stitch_8085.ok stitch_vm1.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok strings.ok fallback.ok mixfb.ok only.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok srahl.ok r2ka.ok ixword.ok iy.ok ext8085.ok extvm1.ok extgbz80.ok gbz80ex.ok extz180.ok extz80n.ok sdcc_abi.ok
 
 stitch_z80.ok: twofuncs.c
 	zcc +test -vn -a -compiler=multi --multi-compiler-report=z80.tsv twofuncs.c
@@ -69,6 +69,42 @@ optimiser.ok: $(OPT_SCCZ80) $(OPT_80CC) $(OPT_USED)
 	  --variant=sccz80:$(OPT_USED) --variant=80cc-sp:$(OPT_80CC)
 	grep -q 'i_10_sccz80' opt_used.asm
 	z88dk-z80asm -mz80 -oopt_used.bin opt_used.asm
+	touch $@
+
+# One litq image. Matching variants share the data-variant label.
+# A swapped image is merged by C string, not copied.
+STR_SCC = ../../../src/zcc-multi/t/str_same_scc.asm
+STR_SP = ../../../src/zcc-multi/t/str_same_sp.asm
+STR_FP = ../../../src/zcc-multi/t/str_same_fp.asm
+STR_DIFF_SCC = ../../../src/zcc-multi/t/str_diff_scc.asm
+STR_DIFF_SP = ../../../src/zcc-multi/t/str_diff_sp.asm
+
+strings.ok: $(STR_SCC) $(STR_SP) $(STR_FP) $(STR_DIFF_SCC) $(STR_DIFF_SP) strings.c
+	z88dk-zcc-multi --cpu=z80 --metric=size --data-variant=sccz80 \
+	  --output=str_same.asm --report=str_same.tsv \
+	  --variant=sccz80:$(STR_SCC) --variant=80cc-sp:$(STR_SP) \
+	  --variant=80cc-fp:$(STR_FP)
+	test `grep -c '^\.i_1_sccz80$$' str_same.asm` -eq 1
+	test `grep -c 'i_1_80cc' str_same.asm` -eq 0
+	test `grep -c 'Hello' str_same.asm` -eq 1
+	test `grep -c 'World' str_same.asm` -eq 1
+	grep -q '^_foo.80cc-fp' str_same.tsv
+	grep -q '^_bar.80cc-sp' str_same.tsv
+	grep -q '^_baz.sccz80' str_same.tsv
+	z88dk-z80asm -mz80 -ostr_same.bin str_same.asm
+	z88dk-zcc-multi --cpu=z80 --metric=size --data-variant=sccz80 \
+	  --output=str_diff.asm --report=str_diff.tsv \
+	  --variant=sccz80:$(STR_DIFF_SCC) --variant=80cc-sp:$(STR_DIFF_SP)
+	test `grep -c '^\.i_1_sccz80$$' str_diff.asm` -eq 1
+	test `grep -c 'i_1_80cc' str_diff.asm` -eq 0
+	grep -q 'i_1_sccz80+6' str_diff.asm
+	test `grep -c 'Hello' str_diff.asm` -eq 1
+	test `grep -c 'World' str_diff.asm` -eq 1
+	z88dk-z80asm -mz80 -ostr_diff.bin str_diff.asm
+	zcc +test -vn -a -compiler=multi strings.c
+	test `grep -c 'alpha-unique' strings.c.asm` -eq 1
+	test `grep -c 'beta-unique' strings.c.asm` -eq 1
+	test `grep -c '^\.i_1_80cc' strings.c.asm` -eq 0
 	touch $@
 
 # jp (hl) must not win on ticks; reason is fallback.

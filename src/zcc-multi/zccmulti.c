@@ -1848,30 +1848,374 @@ static void resolve_ix_mix(void)
     }
 }
 
-/* Suffix i_N / L_* with the variant name so two bodies cannot share a label. */
-static void rewrite_locals(const char *variant, const char *in, char *out, size_t outsz)
+/* dumplits writes one file image after the optimiser banner, before any
+ * per-constant label. Selection does not own those bytes: every function
+ * in the variant addresses the same image. One image is kept. */
+typedef struct {
+    int label_num;
+    int start;
+    int end;
+    unsigned char *bytes;
+    int nbytes;
+    int shared;
+} StrPool;
+
+static StrPool pools[MAX_VARIANTS];
+static unsigned char *canon_bytes;
+static int canon_nbytes;
+static int canon_orig_nbytes;
+static int canon_label_num;
+static const char *canon_variant_name;
+
+typedef struct {
+    int v;
+    int old_off;
+    int new_off;
+} PoolRemap;
+
+static PoolRemap *pool_remaps;
+static int npool_remaps;
+static int pool_remaps_cap;
+
+static Variant *data_variant(void);
+
+static void variant_ident(const char *variant, char *safe, size_t n)
+{
+    size_t i = 0;
+
+    if (!variant)
+        variant = "data";
+    for (; *variant && i + 1 < n; variant++)
+        safe[i++] = (*variant == '-') ? '_' : *variant;
+    safe[i] = 0;
+}
+
+static int variant_index(const Variant *v)
+{
+    return (int)(v - variants);
+}
+
+/* Definition line: optional '.', i_<num>, optional ':', end or comment. */
+static int def_i_num(const char *s, int *num)
+{
+    const char *p = skip_ws(s);
+    int n = 0;
+
+    if (*p == '.')
+        p++;
+    if (p[0] != 'i' || p[1] != '_')
+        return 0;
+    p += 2;
+    if (!isdigit((unsigned char)*p))
+        return 0;
+    while (isdigit((unsigned char)*p)) {
+        n = n * 10 + (*p - '0');
+        p++;
+    }
+    p = skip_ws(p);
+    if (*p == ':')
+        p = skip_ws(p + 1);
+    if (*p != 0 && *p != ';')
+        return 0;
+    *num = n;
+    return 1;
+}
+
+static int line_op(const char *s, const char *op)
+{
+    size_t n = strlen(op);
+
+    s = skip_ws(s);
+    return strncasecmp(s, op, n) == 0 && isspace((unsigned char)s[n]);
+}
+
+static void bytes_add(unsigned char **b, int *n, int *cap, unsigned char c)
+{
+    if (*n >= *cap) {
+        *cap = *cap ? *cap * 2 : 64;
+        *b = xrealloc(*b, (size_t)*cap);
+    }
+    (*b)[(*n)++] = c;
+}
+
+static int decode_pool_line(const char *s, unsigned char **b, int *n, int *cap)
+{
+    s = skip_ws(s);
+    if (line_op(s, "defm")) {
+        const char *q;
+        const char *e;
+
+        s = skip_ws(s + 4);
+        if (*s != '"')
+            return 0;
+        q = s + 1;
+        e = strrchr(q, '"');
+        if (!e)
+            return 0;
+        while (q < e)
+            bytes_add(b, n, cap, (unsigned char)*q++);
+        return 1;
+    }
+    if (line_op(s, "defb")) {
+        s = skip_ws(s + 4);
+        while (*s && *s != ';') {
+            char *end = NULL;
+            long v;
+
+            while (*s == ' ' || *s == '\t' || *s == ',')
+                s++;
+            if (*s == 0 || *s == ';')
+                break;
+            v = strtol(s, &end, 0);
+            if (end == s)
+                break;
+            bytes_add(b, n, cap, (unsigned char)v);
+            s = end;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+static void pool_region(const Variant *v, int *from, int *to)
+{
+    if (v->optimiser < 0) {
+        *from = 0;
+        *to = 0;
+        return;
+    }
+    *from = v->optimiser + 1;
+    *to = v->statics >= 0 ? v->statics :
+          (v->scope >= 0 ? v->scope : v->nlines);
+}
+
+/* First defm object in the optimiser region is the litq dumplits image.
+ * Later labels are the constant queue and stay with their variant. */
+static void parse_string_pool(Variant *v, StrPool *p)
+{
+    int from, to, i;
+
+    memset(p, 0, sizeof(*p));
+    p->label_num = -1;
+    p->start = -1;
+    p->end = -1;
+    pool_region(v, &from, &to);
+    for (i = from; i < to && i < v->nlines; i++) {
+        int j, num, dummy, has_defm = 0, cap = 0;
+
+        if (!def_i_num(v->lines[i], &num))
+            continue;
+        for (j = i + 1; j < to && j < v->nlines; j++) {
+            if (def_i_num(v->lines[j], &dummy))
+                break;
+            if (line_op(v->lines[j], "defm"))
+                has_defm = 1;
+        }
+        if (!has_defm)
+            continue;
+        p->label_num = num;
+        p->start = i;
+        p->end = j;
+        for (j = p->start + 1; j < p->end; j++)
+            decode_pool_line(v->lines[j], &p->bytes, &p->nbytes, &cap);
+        return;
+    }
+}
+
+static int pool_same(const StrPool *a, const StrPool *b)
+{
+    if (a->nbytes != b->nbytes)
+        return 0;
+    if (a->nbytes == 0)
+        return 1;
+    return memcmp(a->bytes, b->bytes, (size_t)a->nbytes) == 0;
+}
+
+static int canon_find(const unsigned char *s, int n)
+{
+    int i;
+
+    if (n <= 0)
+        return 0;
+    for (i = 0; i + n <= canon_nbytes; i++) {
+        if (memcmp(canon_bytes + i, s, (size_t)n) == 0)
+            return i;
+    }
+    return -1;
+}
+
+static int canon_append(const unsigned char *s, int n)
+{
+    int at = canon_nbytes;
+
+    canon_bytes = xrealloc(canon_bytes, (size_t)canon_nbytes + (size_t)n);
+    memcpy(canon_bytes + at, s, (size_t)n);
+    canon_nbytes += n;
+    return at;
+}
+
+static int cstr_at(const StrPool *p, int off, int *len)
+{
+    int k;
+
+    if (off < 0 || off > p->nbytes)
+        return 0;
+    k = off;
+    while (k < p->nbytes && p->bytes[k] != 0)
+        k++;
+    if (k < p->nbytes)
+        k++;
+    *len = k - off;
+    return *len > 0;
+}
+
+static int remap_off(int vi, int old)
+{
+    int i, len, at;
+
+    for (i = 0; i < npool_remaps; i++) {
+        if (pool_remaps[i].v == vi && pool_remaps[i].old_off == old)
+            return pool_remaps[i].new_off;
+    }
+    if (!cstr_at(&pools[vi], old, &len))
+        die("string pool offset %d is outside variant %s", old, variants[vi].name);
+    at = canon_find(pools[vi].bytes + old, len);
+    if (at < 0)
+        at = canon_append(pools[vi].bytes + old, len);
+    if (npool_remaps >= pool_remaps_cap) {
+        pool_remaps_cap = pool_remaps_cap ? pool_remaps_cap * 2 : 32;
+        pool_remaps = xrealloc(pool_remaps, (size_t)pool_remaps_cap * sizeof(*pool_remaps));
+    }
+    pool_remaps[npool_remaps].v = vi;
+    pool_remaps[npool_remaps].old_off = old;
+    pool_remaps[npool_remaps].new_off = at;
+    npool_remaps++;
+    return at;
+}
+
+static void prepare_string_pools(void)
+{
+    Variant *d = data_variant();
+    int di = variant_index(d);
+    int v;
+
+    free(canon_bytes);
+    canon_bytes = NULL;
+    canon_nbytes = 0;
+    canon_orig_nbytes = 0;
+    canon_label_num = -1;
+    canon_variant_name = d->name;
+    npool_remaps = 0;
+
+    for (v = 0; v < nvariants; v++)
+        parse_string_pool(&variants[v], &pools[v]);
+    if (pools[di].nbytes > 0) {
+        canon_bytes = xmalloc((size_t)pools[di].nbytes);
+        memcpy(canon_bytes, pools[di].bytes, (size_t)pools[di].nbytes);
+        canon_nbytes = pools[di].nbytes;
+        canon_orig_nbytes = pools[di].nbytes;
+        canon_label_num = pools[di].label_num;
+    }
+    for (v = 0; v < nvariants; v++) {
+        pools[v].shared = 1;
+        if (pools[v].label_num < 0)
+            continue;
+        if (canon_label_num < 0)
+            canon_label_num = pools[v].label_num;
+        if (v != di && !pool_same(&pools[v], &pools[di]))
+            pools[v].shared = 0;
+    }
+}
+
+static int take_plus_off(const char **pp, int *off)
+{
+    const char *s = skip_ws(*pp);
+    int n = 0;
+
+    if (*s != '+')
+        return 0;
+    s = skip_ws(s + 1);
+    if (!isdigit((unsigned char)*s))
+        return 0;
+    while (isdigit((unsigned char)*s)) {
+        n = n * 10 + (*s - '0');
+        s++;
+    }
+    *off = n;
+    *pp = s;
+    return 1;
+}
+
+static int i_num_token(const char *t, size_t n, int *num)
+{
+    size_t i;
+    int v = 0;
+
+    if (n < 3 || t[0] != 'i' || t[1] != '_')
+        return 0;
+    for (i = 2; i < n; i++) {
+        if (!isdigit((unsigned char)t[i]))
+            return 0;
+        v = v * 10 + (t[i] - '0');
+    }
+    *num = v;
+    return 1;
+}
+
+/* Suffix i_N / L_* with the variant name so two bodies cannot share a label.
+ * The litq label is the data-variant label. A matching image keeps its
+ * offset. A different image is rewritten onto the one kept image. */
+static void rewrite_locals(const Variant *v, const char *in, char *out, size_t outsz)
 {
     const char *p = in;
     size_t o = 0;
     char safe[64];
-    const char *s;
-    int i;
+    int vi = variant_index(v);
 
-    /* variant name to identifier: 80cc-sp -> 80cc_sp */
-    for (i = 0, s = variant; *s && i < (int)sizeof(safe) - 1; s++)
-        safe[i++] = (*s == '-') ? '_' : *s;
-    safe[i] = 0;
+    variant_ident(v->name, safe, sizeof(safe));
 
     while (*p && o + 1 < outsz) {
         if (p == in || !is_ident((unsigned char)p[-1])) {
             const char *t = (*p == '.') ? p + 1 : p;
             const char *u = t;
             size_t n;
+            int dot = (*p == '.');
+
             while (is_ident((unsigned char)*u))
                 u++;
             n = (size_t)(u - t);
             if (is_local_label_token(t, n)) {
-                if (*p == '.')
+                int num = 0;
+
+                if (pools[vi].label_num >= 0 && i_num_token(t, n, &num) &&
+                    num == pools[vi].label_num && canon_label_num >= 0) {
+                    int old = 0;
+                    int neu;
+                    int has;
+                    const char *q = u;
+                    char csaf[64];
+
+                    has = take_plus_off(&q, &old);
+                    neu = pools[vi].shared ? old : remap_off(vi, old);
+                    variant_ident(canon_variant_name, csaf, sizeof(csaf));
+                    if (has || neu != 0) {
+                        if (dot)
+                            o += (size_t)snprintf(out + o, outsz - o, ".i_%d_%s+%d",
+                                                  canon_label_num, csaf, neu);
+                        else
+                            o += (size_t)snprintf(out + o, outsz - o, "i_%d_%s+%d",
+                                                  canon_label_num, csaf, neu);
+                    } else if (dot) {
+                        o += (size_t)snprintf(out + o, outsz - o, ".i_%d_%s",
+                                              canon_label_num, csaf);
+                    } else {
+                        o += (size_t)snprintf(out + o, outsz - o, "i_%d_%s",
+                                              canon_label_num, csaf);
+                    }
+                    p = q;
+                    continue;
+                }
+                if (dot)
                     o += (size_t)snprintf(out + o, outsz - o, ".%.*s_%s", (int)n, t, safe);
                 else
                     o += (size_t)snprintf(out + o, outsz - o, "%.*s_%s", (int)n, t, safe);
@@ -1889,10 +2233,32 @@ static void emit_range(FILE *out, Variant *v, int start, int end)
     int i;
     char buf[MAX_LINE * 2];
     for (i = start; i < end && i < v->nlines; i++) {
-        rewrite_locals(v->name, v->lines[i], buf, sizeof(buf));
+        rewrite_locals(v, v->lines[i], buf, sizeof(buf));
         fputs(buf, out);
         fputc('\n', out);
     }
+}
+
+static void emit_string_pool(FILE *out)
+{
+    Variant *d = data_variant();
+    int di = variant_index(d);
+    char safe[64];
+    int i;
+
+    if (canon_label_num < 0 || canon_nbytes <= 0)
+        return;
+    variant_ident(canon_variant_name, safe, sizeof(safe));
+    if (pools[di].start >= 0) {
+        emit_range(out, d, pools[di].start, pools[di].end);
+        for (i = canon_orig_nbytes; i < canon_nbytes; i++)
+            fprintf(out, "\tdefb\t%d\n", canon_bytes[i]);
+        return;
+    }
+    fprintf(out, "\tSECTION\trodata_compiler\n");
+    fprintf(out, ".i_%d_%s\n", canon_label_num, safe);
+    for (i = 0; i < canon_nbytes; i++)
+        fprintf(out, "\tdefb\t%d\n", canon_bytes[i]);
 }
 
 static int local_label_on_line(const char *s, const char *lab)
@@ -2054,7 +2420,11 @@ static void emit_optimiser_pool(FILE *out, Variant *v)
         }
         if (skip)
             continue;
-        rewrite_locals(v->name, v->lines[i], buf, sizeof(buf));
+        if (pools[variant_index(v)].start >= 0 &&
+            i >= pools[variant_index(v)].start &&
+            i < pools[variant_index(v)].end)
+            continue;
+        rewrite_locals(v, v->lines[i], buf, sizeof(buf));
         fputs(buf, out);
         fputc('\n', out);
     }
@@ -2142,8 +2512,9 @@ static int data_has_func(Variant *d, const char *name)
     return 0;
 }
 
-/* One assembly file: data-variant header, selected bodies, optimiser pools
- * from variants that contributed a function, then named data from sccz80. */
+/* One assembly file: data-variant header, selected bodies, copt defc
+ * lines from variants that contributed a function, one literal pool,
+ * then named data from the data variant. */
 static void write_stitch(void)
 {
     FILE *out;
@@ -2151,6 +2522,7 @@ static void write_stitch(void)
     int c, v, i;
     int used[MAX_VARIANTS];
 
+    prepare_string_pools();
     memset(used, 0, sizeof(used));
     out = fopen(opt_output, "w");
     if (!out)
@@ -2170,12 +2542,13 @@ static void write_stitch(void)
         emit_choice(out, c, used);
     }
 
-    /* Literal pools only from variants that contributed a function.
-     * Named data and GLOBAL always come from the data variant. */
+    /* defc aliases from variants that contributed a function.
+     * The litq image is emitted once, after those aliases. */
     for (v = 0; v < nvariants; v++) {
         if (used[v])
             emit_optimiser_pool(out, &variants[v]);
     }
+    emit_string_pool(out);
     {
         int from = d->statics >= 0 ? d->statics :
                    (d->scope >= 0 ? d->scope : d->nlines);

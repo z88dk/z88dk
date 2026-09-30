@@ -27,6 +27,7 @@ Many tools have a `z88dk-` prefix to avoid clashing with packages that ship tool
 * `zcc` is the toolchain front end. See [Tool — zcc](https://github.com/z88dk/z88dk/wiki/Tool---zcc).
 * `z88dk-sccz80` is z88dk's native C compiler (Small-C lineage; near C90 with extensions). Default for many classic and newlib recipes.
 * `z88dk-80cc` is an alternate small-C front end (`-compiler=80cc`). It shares classic-compatible library linkage with sccz80 and appears in some float benchmarks under `support/benchmarks`.
+* `z88dk-zcc-multi` builds the assembly file for `-compiler=multi`. zcc compiles each C file with sccz80 and with 80cc. The stitch keeps one function body per name and one string pool (the sccz80 image). An 80cc pool with the same bytes uses that label and the same offsets. A different pool is merged by C string: the bytes from `i_N+off` through the next NUL. The spec is `src/zcc-multi/zcc-compiler-multi.md`.
 * `z88dk-zsdcc` is z88dk's patched [sdcc](https://sdcc.sourceforge.net/). [Our patch](https://github.com/z88dk/z88dk/tree/master/src/zsdcc) integrates sdcc with z88dk libraries and CRTs. Select with `-clib=sdcc_iy` (preferred) or `-clib=sdcc_ix` on targets that define those CLIBs. See [Compilers](https://github.com/z88dk/z88dk/wiki/Compilers).
 * `z88dk-z80asm` is the assembler / linker / librarian (sections, macros, multi-CPU). Not the same project as other tools named “z80asm”. See [Tool — z80asm](https://github.com/z88dk/z88dk/wiki/Tool---z80asm).
 * `z88dk-z80nm` lists symbols in object and library files. See [Tool — z80nm](https://github.com/z88dk/z88dk/wiki/Tool---z80nm).
@@ -76,7 +77,7 @@ Load a skill only when the task matches its topic. Do not bulk-read every skill.
 Important facts:
 
 * There are **two C library worlds**: **classic** and **newlib** (headers and CRTs differ). See [Headers: classic and newlib](https://github.com/z88dk/z88dk/wiki/Headers-Classic-vs-Newlib).
-* There are **several C compilers**: **sccz80** (default many recipes), **zsdcc**, **80cc**, and experimental **ez80-clang**. Classic projects can mix sccz80 and zsdcc objects more freely; newlib projects should use one compiler for the whole link. See [Compilers](https://github.com/z88dk/z88dk/wiki/Compilers).
+* There are **several C compilers**: **sccz80** (default many recipes), **zsdcc**, **80cc**, and experimental **ez80-clang**. `-compiler=multi` mixes sccz80 and 80cc function bodies in one file and keeps one string pool. Classic projects can mix sccz80 and zsdcc objects more freely; newlib projects should use one compiler for the whole link. See [Compilers](https://github.com/z88dk/z88dk/wiki/Compilers).
 
 When you form a compile line you choose a **target** (`+name`), a **compiler**, and a **library** (`-clib=`). That choice depends on the machine and features you need.
 

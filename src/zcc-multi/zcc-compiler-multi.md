@@ -985,7 +985,7 @@ The stitch file MUST be valid input for `z88dk-z80asm`.
 3. `INCLUDE "z80_crt0.hdr"`.
 4. File-level `C_LINE` include trace from the data variant. Optional.
 5. Selected function units, each with a winner comment.
-6. Literal pools from every variant that contributed a function.
+6. copt `defc` lines from every variant that contributed a function, then one file literal pool.
 7. File-scope data, bss, and named rodata from the data variant.
 8. `GLOBAL` and `EXTERN` union from the data variant trailer.
 
@@ -1018,9 +1018,13 @@ If a name exists in one variant trailer and not another, the tool MUST fail.
 
 `#ifdef __80CC` that changes a global layout makes the file invalid for multi.
 
-Unnamed literal pools MAY differ.
+The file literal pool is one image per variant. `dumplits` writes it before any function is chosen. Function selection does not choose strings.
 
-Each contributing variant keeps its own pool under rewritten labels.
+Keep the data-variant image once. A variant whose bytes match that image uses the data-variant label. Offsets stay as they are.
+
+A variant whose bytes differ is merged by C string. A reference `i_N+off` is the bytes from `off` through the next NUL. Those bytes are found in the kept image, or appended once. The reference uses the new offset.
+
+Named rodata from the data variant already points into that image. Discarded function bodies do not drop those strings.
 
 ### Local label rewrite
 
@@ -1032,9 +1036,14 @@ The stitch pass MUST rewrite local labels so they are unique in the file.
 
 Hyphens in the variant name become underscores.
 
+The file literal pool label does not take a per-variant suffix. Every reference to that label uses the data-variant label (`i_1_sccz80` when the data variant is sccz80). When the pool bytes match, `+off` stays. When they differ, `+off` is the offset in the kept image. A reference with no plus and a new offset of 0 stays a bare label.
+
+Other `i_N` labels and `L_*` labels still take the variant suffix.
+
 | Original | Rewrite |
 |----------|---------|
-| `i_N` | `i_N_sccz80` / `i_N_80cc_sp` / `i_N_80cc_fp` |
+| `i_N` that is the file literal pool | data-variant label, for example `i_1_sccz80` |
+| other `i_N` | `i_N_sccz80` / `i_N_80cc_sp` / `i_N_80cc_fp` |
 | `L_fA_bb_B` | `L_fA_bb_B_80cc_sp` |
 
 References in operands MUST change with the definitions.
@@ -1578,6 +1587,7 @@ MSYS2 `mingw32-make` cannot run `! grep`. Use `test \`grep -c\` -eq 0` instead.
 19. `ldir` with `ld bc,4` scores more than 70. Unknown BC scores `21 × 2` plus the other opcodes (`ret` makes 52 on Z80 and 58 on gbz80). `ld bc,0` is 65536 repeats. Fixtures: `t/ldir_bc.asm`, `t/ldir_unk.asm`, `t/ldir_bc0.asm`.
 20. CPU extras MUST score documented T-states with `reason` `metric`. A larger-but-faster body MUST beat a smaller slower body on ticks. Bundle sums: 8085 97, vm1 135, gbz80 144, z180 94, z80n 175. Fixtures: `t/8085_ext.asm`, `t/vm1_ext.asm`, `t/gbz80_ext.asm`, `t/z180_ext.asm`, `t/z80n_ext.asm` and the matching `*_slow.asm` / `*_fast.asm` pairs. `t/loop_8085_k.asm` covers backward `jp nk`. `t/loop_vm1_of.asm` covers vm1 `jp of`. A stand-alone `L_*` label MUST NOT set fallback. A Z80 word shift `sra hl` MUST score 16 T. Fixture: `t/srahl.asm` versus `t/nops.asm`. Rabbit `rr hl` MUST score 2 T, `ld de,hl` MUST score 4 T, `bool hl` MUST score 2 T, `add sp,n` MUST score 4 T, `ld hl,(ix+0)` MUST score 11 T. Fixtures: `t/r2ka_rrhl.asm`, `t/r2ka_ldrr.asm`, `t/r2ka_bool.asm`, `t/r2ka_addsp.asm`, `t/r2ka_ldix.asm`. Z80 `ld hl,(ix+0)` MUST score 38 T plus `ret` (48 T) with `reason` `metric`. Fixture: `t/ixword.asm`. IY matches IX. Z80 `ld iy,hl` MUST score 25 T plus `ret` (35 T). Z80 `ld iy,bc` MUST score 16 T plus `ret` (26 T). Z80 `ld hl,(iy+0)` MUST score 38 T plus `ret` (48 T). Z180 `ld iy,bc` MUST score 25 T plus `ret` (35 T). Rabbit `ld iy,hl` MUST score 4 T plus `ret` (14 T). Fixtures: `t/iyld.asm`, `t/iybc.asm`, `t/iyword.asm`. gbz80 `ex de,hl` MUST score 56 T. Fixtures: `t/gbz80_ex.asm` versus `t/gbz80_ex_slow.asm`.
 21. A command-line `-compiler=multi` with an sdcc clib recipe MUST print `-compiler=multi does not support the sdcc ABI` and MUST NOT invoke zsdcc. Suite: `sdcc_abi.ok`.
+22. The stitch MUST emit one file literal pool. Identical variant images MUST produce one `.i_1_sccz80` and no `i_1_80cc` label. A swapped image MUST rewrite the selected offset (for example `i_1_sccz80+6`). Each C string MUST appear once. Suite: `strings.ok`. Fixtures: `t/str_same_scc.asm`, `t/str_same_sp.asm`, `t/str_same_fp.asm`, `t/str_diff_scc.asm`, `t/str_diff_sp.asm`, and `test/suites/zcc-multi/strings.c`.
 
 ### Fixture sketch
 

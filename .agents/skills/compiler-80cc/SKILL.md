@@ -12,7 +12,7 @@ Binary: `z88dk-80cc`. Source: `src/80cc/`. Rules file: `lib/80cc_rules.1`.
 ## Agent facts
 
 1. Select via `zcc -compiler=80cc` when the target allows it.
-2. `-compiler=multi` also runs 80cc. It always compiles `80cc-sp`. It compiles `80cc-fp` when 80cc treats the CPU as having IX. Spec: `src/zcc-multi/zcc-compiler-multi.md`.
+2. `-compiler=multi` also runs 80cc. It always compiles `80cc-sp`. It compiles `80cc-fp` when 80cc treats the CPU as having IX. The stitch keeps one string pool (the sccz80 `dumplits` image), not one pool per variant that won a function. Matching 80cc bytes keep the sccz80 label and offsets. A different pool is merged by C string. Spec: `src/zcc-multi/zcc-compiler-multi.md`.
 3. Do not assume sccz80 or sdcc runtime helpers match 80cc output.
 4. Prefer reading `src/80cc` notes for current status before large work.
 5. Rebuild: `make -C src/80cc PREFIX=$(pwd)` from the z88dk root, then `make -C src/80cc PREFIX=$(pwd) install`.
