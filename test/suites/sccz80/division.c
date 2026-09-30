@@ -38,6 +38,15 @@ void test_ulong_division()
      Assert( 0x80000000UL / 512 == 0x00400000, "0x80000000 / 512");
 }
 
+void test_ulong_mod()
+{
+     unsigned long val = 162240UL;
+
+     Assert( val % 7   == 1,  "162240UL % 7");
+     Assert( val % 10  == 0,  "162240UL % 10");
+     Assert( val % 100 == 40, "162240UL % 100");
+}
+
 void test_long_division()
 {
      int32_t val = -256;
@@ -121,6 +130,7 @@ int suite_division()
 
     suite_add_test(test_char_division);
     suite_add_test(test_ulong_division);
+    suite_add_test(test_ulong_mod);
     suite_add_test(test_long_division);
     suite_add_test(test_long_mod);
     suite_add_test(test_signed_division);

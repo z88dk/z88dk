@@ -3046,8 +3046,8 @@ void zmod_const(LVALUE *lval, int64_t value64)
     }
 
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_ACCUM32 ) {
-        if ( value <= 256 && value > 0 ) {
-            // Fall through to the logical and operation
+        if ( value <= 256 && value > 0 && (value & (value-1)) == 0 ) {
+            // Fall through to the logical and operation for powers of 2
         } else if ( value == 65536 && ulvalue(lval) ) {
             const2(0);
             return;
