@@ -73,6 +73,7 @@ static uint8_t mem_fetch[MEM_FETCH_SIZE] = {0};
 static uint16_t mem_requested_at = 0;
 static uint16_t mem_requested_amount = 0;
 static int connection_socket = 0;
+static volatile int detach_requested = 0;
 static struct network_op* last_network_op = NULL;
 
 const char* register_mapping_names[] = {
@@ -596,6 +597,7 @@ void debugger_gdb_break(uint8_t temporary)
 
 void debugger_detach()
 {
+    detach_requested = 1;
     send_request("D");
     shutdown(connection_socket, 0);
     connection_socket = 0;
@@ -1483,6 +1485,9 @@ static void ctrl_c() {
 }
 
 static void gdb_remote_closed() {
+    if (detach_requested) {
+        exit(0);
+    }
     bk.console("Connection to remote closed.\n");
     exit(1);
 }
