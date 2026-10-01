@@ -2232,6 +2232,10 @@ delive_8080.bin: $(SOURCES) delive.c
 # and overlapping views that must retain their memory representation.
 all: aggpromote.bin aggpromote_fp.bin aggpromote_8080.bin aggpromote_gbz80.bin
 
+# idx2 live-range reuse: a non-overlapping param/counter pair sharing the
+# slot, and an overlapping pair that must NOT share it.
+all: idx2reuse.bin idx2reuse_fp.bin idx2reuse_keep.bin idx2reuse_fp_keep.bin idx2reuse_ez80.bin idx2reuse_ez80_fp.bin idx2reuse_ez80_fp_keep.bin idx2reuse_8080.bin idx2reuse_gbz80.bin
+
 aggpromote.bin: $(SOURCES) aggpromote.c
 	$(compile)
 	$(runtest)
@@ -2245,5 +2249,41 @@ aggpromote_8080.bin: $(SOURCES) aggpromote.c
 	$(runtest_8080)
 
 aggpromote_gbz80.bin: $(SOURCES) aggpromote.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+idx2reuse.bin: $(SOURCES) idx2reuse.c
+	$(compile)
+	$(runtest)
+
+idx2reuse_fp.bin: $(SOURCES) idx2reuse.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+idx2reuse_keep.bin: $(SOURCES) idx2reuse.c
+	$(call compile,-Cc--opt-disable=idx2-reuse)
+	$(runtest)
+
+idx2reuse_fp_keep.bin: $(SOURCES) idx2reuse.c
+	$(call compile,-Cc-fframe-pointer -Cc--opt-disable=idx2-reuse)
+	$(runtest)
+
+idx2reuse_ez80.bin: $(SOURCES) idx2reuse.c
+	$(call compile_ez80_z80,)
+	$(runtest_ez80_z80)
+
+idx2reuse_ez80_fp.bin: $(SOURCES) idx2reuse.c
+	$(call compile_ez80_z80,-Cc-fframe-pointer)
+	$(runtest_ez80_z80)
+
+idx2reuse_ez80_fp_keep.bin: $(SOURCES) idx2reuse.c
+	$(call compile_ez80_z80,-Cc-fframe-pointer -Cc--opt-disable=idx2-reuse)
+	$(runtest_ez80_z80)
+
+idx2reuse_8080.bin: $(SOURCES) idx2reuse.c
+	$(compile_8080)
+	$(runtest_8080)
+
+idx2reuse_gbz80.bin: $(SOURCES) idx2reuse.c
 	$(compile_gbz80)
 	$(runtest_gbz80)

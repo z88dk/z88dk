@@ -73,6 +73,7 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0097](0097-sp0-word-stores-use-three-routes.md) | **Accepted**, default-on only for GBZ80 — SP+0 word stores choose among dead DE, safe AF, and register-preserving write-only routes; other CPUs retain baseline until no-regression |
 | [0099](0099-local-aggregate-fields-stay-in-registers.md) | **Accepted**, default on — promote fixed-offset scalar fields of private local structs; 24 localbench cells faster and smaller, none of 720 size/tick cells regressed |
 | [0100](0100-loop-carried-scalars-do-not-displace-call-safe-values.md) | **Rejected** — `IR_BC_STEP_SCALAR` and `IR_BC_STEP_CALL` do not justify a loop-counter residency rule; the call-containing probe was −7 B net over 504 cells, with one +4 B cell |
+| [0101](0101-idx2-live-range-reuse.md) | **Accepted** — the idx2 slot hosts non-overlapping live ranges instead of one whole-function owner; measures zero today (BC's own multi-occupant check already claims every real case first), kept for future shapes |
 | [0089](0089-addition-swap-has-no-scalar-two-pass-gate.md) | **Rejected** — a sound addition swap gate needs a second pass-1 render; md5 −6 % but binary-trees +28 B and emu.c +75 B |
 | [0088](0088-indexed-word-rmw-address-restoration-is-a-small-rung.md) | **Sized** — one histbench site in 8 CPU/frame cells, 40 B total; no emitter change |
 | [0073](0073-ask-slot-off-not-the-spill-slot.md) | **Accepted** — ask `slot_off`, not `vreg_spill_slot`; the wrong query cost structbench +10.5 % |
