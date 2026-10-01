@@ -388,6 +388,7 @@ enum {
     CF_DE_GENERAL     = 1u << 4,   /* DE-home: a general (non-accumulate) home */
     CF_DE_PTR         = 1u << 5,   /* DE-home: a walking byte pointer (loop regalloc) */
     CF_DE_OPERAND     = 1u << 6,   /* DE-fold hint: reused deref/binop (DENSITY §4) */
+    CF_IDX2_INDUCTION = 1u << 7,   /* idx2: an IVSR second induction pointer */
 };
 /* Cost-model per-access weights (relative T-state savings of reg vs slot; the
    orchestrator's benefit = Σ depth-weighted access weights). A DEREF of a base
@@ -812,7 +813,20 @@ static void build_idx2_maps(const Func *f, int *is_base, int *cstep,
             if (d < 0 || d >= f->n_vregs) continue;
             if ((o->kind == IR_INC || o->kind == IR_DEC) && o->src[0] == d)
                 cstep[d]++;
+            /* An induction pointer steps by an arbitrary constant, not just
+               ±1 — gated to IR_VREG_INDUCTION so an unrelated self-add
+               elsewhere doesn't also qualify as a counter. */
+            else if ((o->kind == IR_ADD || o->kind == IR_SUB)
+                     && o->src[0] == d && o->src[1] == -1
+                     && (f->vregs[d].flags & IR_VREG_INDUCTION))
+                cstep[d]++;
             else if (o->kind == IR_LD_IMM) cinit[d]++;
+            /* An induction vreg has exactly 2 defs: the self-step above, and
+               one init. Catch-all rather than matching init kinds, since
+               rematerialization can fold a trivial copy-of-base into a
+               direct copy of base's own producer. */
+            else if (f->vregs[d].flags & IR_VREG_INDUCTION)
+                cinit[d]++;
             else cother[d]++;
         }
 }
@@ -843,6 +857,25 @@ static unsigned idx2_home_realizable(const Func *f, int v,
        it is the EVICTED scalar getting cheaper. adr/0062. Admit only the shape
        that measured positive; the assignment site's grounded idx_ben gate then
        prices it as usual. IR_IDX2BASE=0 opts out. */
+    /* Every induction vreg resolves HERE, unconditionally, before the
+       is_base[v]/counter dispatch below — a non-deref companion vreg (e.g.
+       LFTR's loop-bound pointer) is step-shaped like a counter but must not
+       fall through to the general-purpose counter path, which has no CPU
+       restriction. ez80/kc160/rabbit only: cheap native indexed addressing;
+       z80/z80n/z180/r800 already suppress a second induction pointer
+       upstream (ir_opt_ivsr assumes BC is the only home there), and r800's
+       faster clock doesn't change the indexed-vs-HL ratio. Only a
+       deref-base induction vreg (not a stepped/post-step companion) can
+       actually be homed — a pointer read only via whole-word compares has
+       no `(idx+d)` to fold into. */
+    if (vr->flags & IR_VREG_INDUCTION) {
+        if (!is_base[v] || (is_base[v] & IDX2_BASE_STEPPED)) return 0;
+        if (!idx2base_on()) return 0;
+        if (!(IS_EZ80() || IS_KC160() || IS_RABBIT())) return 0;
+        if (cstep[v] == 1 && cinit[v] == 1 && cother[v] == 0)
+            return CF_IDX2_INDUCTION;
+        return 0;
+    }
     if (is_base[v]) {
         if (!idx2base_on()) return 0;
         if (is_base[v] & IDX2_BASE_STEPPED) return 0;   /* walking ptr: wants HL/BC */

@@ -71,6 +71,10 @@ Size across the corpus before implementing.
   live ranges instead of one whole-function owner. Measures zero today (BC's
   own multi-occupant check already claims every real disjoint-pair case
   first); kept for shapes outside the sampled corpus.
+- **IVSR induction pointer in idx2 — ADR 0102.** ez80/kc160/rabbit only:
+  −495 B/−9.94M ticks over 44 cells. One disclosed regression
+  (`interpbench`/ez80/sp), root-caused to that feature's own cost pricing,
+  not contention — recosting attempted and reverted, see the ADR.
 - **switchbench vs xcc — not a lever.** `vm_run`'s dense switch is a linear
   scan (sccz80-style) vs xcc's jump table, but the full z80 row shows
   80cc-sp already beating xcc `-Of`. No measured deficiency.
