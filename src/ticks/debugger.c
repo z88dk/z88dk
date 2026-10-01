@@ -1782,6 +1782,9 @@ static int cmd_finish(int argc, char **argv)
 }
 
 static uint8_t confirm(const char* message) {
+    if (!isatty(fileno(stdin))) {
+        return 1;
+    }
     while (1) {
         bk.console("%s (y/n)", message);
         fflush(stdout);
