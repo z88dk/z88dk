@@ -838,6 +838,12 @@ void debugger()
 
 		debugger_print_prompt(prompt, sizeof(prompt), buf, sizeof(buf));
     }
+
+    if ( line == NULL ) {
+        delete_all_breakpoints();
+        bk.detach();
+        exit(0);
+    }
 }
 
 
@@ -1785,10 +1791,13 @@ static uint8_t confirm(const char* message) {
     while (1) {
         bk.console("%s (y/n)", message);
         fflush(stdout);
-        char c;
+        int c;
         do {
-            scanf("%c", &c);
-        } while (!isalpha(c));
+            c = getchar();
+        } while (c != EOF && !isalpha(c));
+        if (c == EOF) {
+            return 0;
+        }
         if (c == 'y' || c == 'Y') {
             return 1;
         }
