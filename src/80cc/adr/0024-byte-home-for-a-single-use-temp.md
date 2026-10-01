@@ -28,14 +28,13 @@ Two independent reasons, and both constrain any future design:
    candidate and refuses every later one. Even where the home pays, only one
    temporary in a function can have it.
 
-So the gate is not what stands between byte temporaries and their slots. The
-binding constraints are the backing requirement of the chosen register and the
-one-home-per-function arbitration.
+The chosen register must either need a slot or be slotless, and the arbiter
+allows only one byte home per function. Those constraints prevent a lower use
+count from removing the slots.
 
 ## Reopening
 
-The route is not the threshold. It is either a slotless register (C or B) for
-this class of value, or lifting the one-byte-home-per-function restriction so
-that several temporaries can be homed at once. Either is a real change to
-arbitration, and needs its own measurement — re-running the threshold probe will
-only reproduce the +307.
+Future work would need to use a slotless register (C or B) for this class of
+value, or allow several temporaries to have byte homes in one function. Either
+change affects arbitration and needs its own measurement. Re-running the
+threshold probe will only reproduce the +307.

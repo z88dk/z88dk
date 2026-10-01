@@ -19,7 +19,7 @@ plus the four real files, **50** of them provable = **350 B** in fp mode (adv_a
 test**, so the correction also costs ~18–25 T per iteration — bytes and cycles
 move together.
 
-## Two things the probe corrected, both load-bearing
+## Two corrections from the probe
 
 **`v_fits_byte` carries only 10 of the 50.** The other 40 are `i = i + 1`
 induction variables, which that helper rejects (it takes only masked ANDs, small

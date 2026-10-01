@@ -1,19 +1,16 @@
-# ADR 0102 — the IVSR induction pointer can home in idx2 on ez80/kc160/rabbit
+# ADR 0102 — The IVSR induction pointer can use idx2 on ez80/kc160/rabbit
 
 Status: **Accepted**, CPU-gated (ez80/kc160/rabbit only). `idx2-base` opts out
 (shared with the pre-existing deref-base idx2 gate).
 
 ## Context
 
-80cc already has induction-variable strength reduction (`ir_opt_ivsr`,
-`ir_opt.c`), turning `base + i*scale` recomputed every iteration into a
-walking pointer. It did not fire on loops where the loop index `i` has other
-uses beyond the one derived address (`ir_opt.c`'s redundant-pointer gate) —
-correct for the common case, since a second stepped pointer would just
-compete with `i` for the one BC home and lose. That gate's own assumption —
-a walking pointer can only go in BC — is false: `idx2_home_realizable`
-already has IX/IY-homing machinery for a stepped pointer (ADR 0062), just
-explicitly refused for one.
+80cc already has induction-variable strength reduction (`ir_opt_ivsr` in
+`ir_opt.c`). It changes `base + i*scale`, recomputed on each iteration, into a
+walking pointer. The pass skipped loops where `i` had other uses because a
+second stepped pointer would compete for the BC home. That assumption is too
+strong. `idx2_home_realizable` already supports stepped pointers in IX/IY
+(ADR 0062), but it rejected this case.
 
 ## Decision
 
@@ -30,21 +27,20 @@ plain z80/z80n/z180/r800 measured a wash or a regression on the same
 isolated test case (indexed addressing itself costs more there than the
 recompute it replaces).
 
-Three bugs surfaced during development, all fixed before shipping: (1)
-`f->idx2_reg != IR_PR_NONE` only proves the register exists architecturally,
-not that it's free — a param already resident there loses the contention and
-the new candidate spills, worse than the recompute it replaced; (2) the
-induction path wrongly called `idx2_counter_hostile_use`, written for a
-scalar read via index-register halves, the opposite shape from a pointer
-meant to be dereferenced; (3) a later rematerialization pass can turn the
-preheader's `p = MOV base` into a direct copy of base's own producer, so
-`cinit`'s kind matching needed to be a catch-all, not an enumerated list. A
-fourth, CPU-gate-escaping bug was caught via corpus diff after those three:
-the induction branch was originally nested inside the `is_base[v]` block, so
-a non-deref-base companion fell through to the CPU-unrestricted counter
-check and picked up this patch's reclassification with no gate at all —
-`vm1` moved when it must not. Fixed by moving the induction check to run
-first, unconditionally, for every induction vreg.
+Three bugs surfaced during development. All were fixed before shipping.
+
+1. `f->idx2_reg != IR_PR_NONE` only proves that the register exists. It does
+   not prove that the register is free. A parameter already resident there can
+   lose the contention, causing the new candidate to spill.
+2. The induction path called `idx2_counter_hostile_use`. That helper handles a
+   scalar read through index-register halves, not a pointer dereference.
+3. A later rematerialisation pass can turn the preheader's `p = MOV base` into
+   a direct copy of base's producer. Therefore, `cinit` matching must accept
+   the catch-all case.
+4. A CPU-gate bug was found by a corpus diff. The induction branch was nested
+   inside `is_base[v]`, so a non-deref-base companion reached the unrestricted
+   counter check. `vm1` then changed when it must not. Move the induction check
+   before the general counter check and run it for every induction vreg.
 
 ## Disclosed regression
 

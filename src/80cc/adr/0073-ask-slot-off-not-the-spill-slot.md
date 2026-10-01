@@ -14,7 +14,7 @@ compares against.
 
 So ask **`slot_off`**, which is what the caller actually emits from.
 
-## The trap on the other side
+## The other incorrect test
 
 Asking `vreg_spill_slot` instead **also rejects every PARAMETER**: a param is
 homed in the caller's frame, so it has no spill slot (−1) while `slot_off`

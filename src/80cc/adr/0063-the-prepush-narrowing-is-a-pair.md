@@ -8,16 +8,15 @@ Status: **Accepted**, default on. `IR_OFF=prepush-narrow` opts out, and takes
 Narrow the whole-function pre-pushed-call veto to the calls that can really lose
 BC (`prepush_bc_hazard`), instead of vetoing the whole function.
 
-## It is a PAIR with `bc-save-live` — do not separate them
+## It works with `bc-save-live`
 
-Alone, the narrowing **regresses `divbench` and `shiftbench` badly**: it admits
-BC homes into functions with pre-pushed calls, which adds `push bc` / `pop bc`
-pairs around those calls. `bc-save-live` removes the pairs whose tenant is not
-live there, and together the regressions go to **exactly zero**.
+Alone, the narrowing **regresses `divbench` and `shiftbench`**: it admits BC
+homes into functions with pre-pushed calls. This adds `push bc` / `pop bc` pairs.
+`bc-save-live` removes pairs whose tenant is not live there. Together, the
+regressions reach **zero**.
 
-Flipping this one on its own reinstates them. That is the single most important
-fact about this gate, and the reason it is recorded here rather than left to be
-rediscovered by someone bisecting a regression.
+Enabling the narrowing without `bc-save-live` restores the regressions. Keep the
+two options coupled.
 
 ## Refuted en route
 

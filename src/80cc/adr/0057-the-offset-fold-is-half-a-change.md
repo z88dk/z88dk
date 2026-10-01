@@ -8,7 +8,7 @@ Status: **Accepted**, default on. `--opt-disable=deref-offset` opts out.
 so this is a pure rewrite rather than a representation change, and DCE reclaims
 the `ADD` once the last deref through it has folded.
 
-## It REGRESSES ALONE
+## It regresses alone
 
 Measured on its own it cost **z80 +77 B** (localbench +113). Dropping the
 address temps lengthens the pointer's live range, and a nonzero offset on a
@@ -19,9 +19,8 @@ Its partner is the `idx-deref` lowering rung (`idx_deref_reg`), which turns
 base+offset into a free `(iy+d)`. **The offset must be free for the fold to
 pay, and it is free only when the base ends up in an index register.**
 
-This is the clearest instance in the backend of a transform that is correct,
-obviously beneficial in isolation, and negative until its partner exists.
-Measure the pair.
+This transform is useful only with its lowering partner. Measure the two changes
+together.
 
 ## So the fold is aimed, not general
 

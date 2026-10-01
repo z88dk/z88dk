@@ -14,7 +14,7 @@ only the target pair, with no IX or DE gymnastics.
 ## Decision
 
 Rematerialise the address at each use (`emit_remat_word`) instead of giving it a
-slot. Two exclusions, both load-bearing:
+slot. Two exclusions are required:
 
 **A `PR_STACK` tenant.** Its value is parked with push/pop, not in a frame slot,
 so dropping the slot orphans one half of the pair and shifts every later

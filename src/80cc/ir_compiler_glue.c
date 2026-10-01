@@ -124,7 +124,7 @@ int ir_lower_to_output(Func *f)
     if (!mem)
         return ir_lower_func(output, f);   /* degraded: direct emit */
     /* [clone self-test, IR_CLONE_TEST] Lower a pristine deep CLONE instead of f.
-       If ir_clone_func is faithful the emitted asm is byte-identical to lowering
+       If ir_clone_func is correct, the emitted asm is byte-identical to lowering
        f directly (proven over the corpus) — the verifier gate before the clone
        drives the frameless-via-sp flip. Skips f's own lowering, so f's backend
        fields stay unset (the -debug cdb block below then emits nothing; run the

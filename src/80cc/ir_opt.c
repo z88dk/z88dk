@@ -361,7 +361,6 @@ static int trackable_kind(MemKind k)
     return k == IR_MEM_SYM || k == IR_MEM_VREG;
 }
 
-/* Drop an entry by swapping with the tail. */
 static void drop(ShadowEntry *sh, int *n, int i)
 {
     if (i < *n - 1) sh[i] = sh[*n - 1];
@@ -981,7 +980,7 @@ int ir_opt_licm(Func *f)
     for (int b = 0; b < f->n_bbs; b++) {
         if (loop_header[b] < 0) continue;
         int h = loop_header[b];
-        if (pre_header[h] != -1) continue;  /* already computed */
+        if (pre_header[h] != -1) continue;
         pre_header[h] = licm_pre_header(f, in_loop, h);
     }
 
@@ -2448,11 +2447,8 @@ int ir_opt_sym_addr_fold(Func *f)
         for (int j = 0; j < f->bbs[b].n_ops; j++) {
             const Op *op = &f->bbs[b].ops[j];
             if (op->dst < 0 || op->dst >= nv || ndef[op->dst] != 1) continue;
-            /* ►► A PARAMETER'S INCOMING VALUE IS AN INVISIBLE DEF — ndef counts
-               only the defs in this function, so a parameter assigned once under
-               a condition is not the single-def constant it looks like. Same
-               hole that made remat load `ld hl,0` for a parameter and made
-               sym_deref_fold read the wrong array (long_ir/parremat.c). */
+            /* A parameter's incoming value is not counted by ndef. A conditional
+               assignment must not make it appear to be a constant. */
             if (f->vregs[op->dst].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
                                            | IR_VREG_VOLATILE))
                 continue;
@@ -2570,14 +2566,8 @@ int ir_opt_sym_deref_fold(Func *f)
             const Op *op = &f->bbs[b].ops[j];
             if (op->kind != IR_LD_SYM || op->dst < 0 || op->dst >= nv) continue;
             if (ndef[op->dst] != 1) continue;
-            /* ►► A PARAMETER'S INCOMING VALUE IS AN INVISIBLE DEF. ndef counts
-               the defs in THIS function; the caller's pointer arrives without
-               one, so a pointer parameter assigned once under a condition looks
-               single-def and is not:
-                   int pick(int *p, int flag) { if (flag) p = tbl; return p[1]; }
-               every `p[i]` folded to the absolute `tbl+i`, so pick(other,0) read
-               tbl instead of the caller's array. Same family as the post-step
-               defect noted above, and the same hole remat had.
+            /* A pointer parameter's incoming value is not counted by ndef. Do not
+               fold a conditional assignment as a single-definition constant.
                See test/suites/long_ir/parremat.c. */
             if (f->vregs[op->dst].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
                                            | IR_VREG_VOLATILE))
@@ -2617,10 +2607,8 @@ int ir_opt_sym_deref_fold(Func *f)
    this is a pure rewrite, not a representation change; DCE reclaims the ADD
    once the last deref through it has folded.
 
-   ►► HALF of a change: it REGRESSES ALONE (z80 +77 B). Its partner is the
-   `idx-deref` lowering rung (idx_deref_reg, ir_lower_ops.inc.c) — the offset
-   must be FREE for the fold to pay, and it is free only when the base ends up
-   in an index register. See adr/0057 before touching either.
+   This fold depends on the `idx-deref` lowering rung. The offset is profitable
+   only when the base uses an index register. See adr/0057. */
 
    So the fold is AIMED, not general — only the shape that can win the index
    home, which is the one idx2_home_realizable admits:
@@ -3662,19 +3650,9 @@ static int cs_operand_safe(const Func *f, int cb, int x, long imm, long bound,
 {
     if (x < 0) { if (why) *why = "imm"; return imm >= 0; }
     if (x >= f->n_vregs) return 0;
-    /* ►► THE INVISIBLE DEF. Both provers below reason over the defs they can
-       SEE in this function, so a value that can arrive from somewhere else is
-       outside their reach:
-         - a PARAMETER carries the caller's value, which has no def op at all;
-         - an ADDRESS-TAKEN or VOLATILE vreg can be written through a pointer.
-       depark.c's `satband(int v)` is the shape: `if (v > 255) v = 255;
-       if (v < 0) v = 0;` — the only visible defs are two non-negative
-       constants, so v_fits_byte says "[0,255]" and `v < 0` folds to
-       always-false. satband(-5) then returns the wrong answer. The long_ir
-       suite caught it; nothing else did.
-       (This is a hazard in the PROVERS, not in narrow_byte's use of them —
-       truncating to a byte is correct whatever the sign, so the hole does not
-       bite there. A SIGNEDNESS proof is what makes it fatal.) */
+    /* The provers see only definitions in this function. Parameters have an
+       incoming value without a local definition, and address-taken or volatile
+       values can change through memory. */
     if (f->vregs[x].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
                              | IR_VREG_VOLATILE))
         return 0;
@@ -4400,8 +4378,8 @@ int ir_opt_reduce_coalesce(Func *f)
             for (int i = 1; i < sn; i++) {
                 Op *sp = &bb->ops[spine[i]];
                 int t = sp->dst;
-                sp->dst = acc;                       /* def now writes acc */
-                Op *parent = &bb->ops[spine[i - 1]]; /* consumes t as src[0] */
+                sp->dst = acc;
+                Op *parent = &bb->ops[spine[i - 1]];
                 if (parent->src[0] == t) parent->src[0] = acc;
                 else if (parent->src[1] == t) parent->src[1] = acc;
             }

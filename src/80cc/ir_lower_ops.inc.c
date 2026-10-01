@@ -2421,7 +2421,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
            `byte_shift`, the lowest `byte_shift` bytes become zero. */
         switch (byte_shift) {
         case 0: break;
-        case 1: /* D=E E=H H=L L=0 */
+        case 1:
             emit(out, "ld\td,e");
             emit(out, "ld\te,h");
             emit(out, "ld\th,l");
@@ -3170,8 +3170,8 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                we would have written by hand — verified byte-identical on z80
                and r4k, for the load, the store and the DE form. So it needs no
                CPU test.
-               ►► Do NOT read that as licence for the index pair as a
-               DESTINATION (`ld iy,(ix+d)`, see emit_idx_word_from_frame):
+               Do not apply this to an index pair as a destination
+               (`ld iy,(ix+d)`, see emit_idx_word_from_frame):
                there the z80 synthetic is 12 bytes against a 9-byte hand-written
                sequence, so THAT family must stay gated. The difference is which
                side the index register is on. */

@@ -1575,7 +1575,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
            `byte_shift` bytes zero. One 4-instruction sequence per case. */
         switch (byte_shift) {
         case 0: break;
-        case 1: /* L=H H=E E=D D=0 */
+        case 1:
             emit(out, "ld\tl,h");
             emit(out, "ld\th,e");
             emit(out, "ld\te,d");

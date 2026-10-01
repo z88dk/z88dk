@@ -166,7 +166,7 @@ the swap.
 
 **What that decline proves, and no more.** Built with the `!d_live && !e_live`
 test deleted, this file still **passes** — the decline is conservative here, not
-load-bearing. So `kmix` proves the guard is REACHED, which is what a regression
+required for the result. So `kmix` proves the guard is REACHED, which is what a regression
 test can honestly hold; whether the guard is ever the only thing between the
 corpus and a wrong answer is settled by `long_ir` and the corpus. Claiming
 otherwise is what went wrong in ADR 0039 and again in ADR 0077.

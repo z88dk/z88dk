@@ -59,7 +59,7 @@ re-emitted on a cache miss instead of reloaded from its slot (`--opt-disable=rem
 - The register cache must stay **honest through every emit and every BB
   boundary**; its invariants (pending ⇒ HL holds it; carry only when all lowered
   preds agree and the vreg is live-in; inherited dirtiness for a slot-backed
-  home) are load-bearing — a stale belief miscompiles, not just deoptimises.
+  home) are required for correctness. A stale belief miscompiles the output.
   Historically this is where the subtle residency bugs lived, so new lowering
   paths must maintain the cache and the carry maps, not just emit instructions.
 - This mechanism is what lets ADR 0003's residency *policy* actually pay off

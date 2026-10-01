@@ -3971,7 +3971,6 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
     }
 
     case OP_COMP: {
-        /* ~x — bitwise complement. */
         if (!n->operand) return build_fail("OP_COMP with no operand");
         int v = build_expr(b, n->operand);
         if (v < 0) return -1;
@@ -6360,7 +6359,6 @@ static int build_cast(Builder *b, Node *n)
         return dst;
     }
     if (src_w == 2 && dst_w == 4) {
-        /* Int → long widening. */
         int unsigned_src = n->operand->type &&
                            n->operand->type->isunsigned;
         int dst = new_temp_kind(b, KIND_LONG);
@@ -7734,7 +7732,6 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
     f->acc_push     = acc_name("push");
     f->acc_loadpush = acc_name("loadpush");
 
-    /* Entry BB. */
     int entry = ir_bb_new(f);
     Builder b;
     builder_init(&b, f);

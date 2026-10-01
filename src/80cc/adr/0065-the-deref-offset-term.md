@@ -24,12 +24,12 @@ off the existing rows, so a new CPU inherits them.
 
 ## Why the term is necessary
 
-Without it the model rates a BC home and an index home **alike** for a struct
+Without it, the model rates a BC home and an index home **alike** for a struct
 pointer read at four different field offsets. BC ranks first, takes the pointer,
 and the index home falls to a scalar that must be pushed and popped at every
 read — the exact inversion `bitfieldbench/reg_set` showed
 (`ALLOCMAP v1 phys=IX` being the *value*, `v0` the *pointer*, in BC).
 
 **The asymmetry is the whole point**: an index register cannot feed the ALU, so
-a value homed there pays at every read, while a pointer homed there pays nothing
-at all. See ADR 0058, which fixes the same inversion from the search side.
+a value homed there pays at every read, while a pointer homed there pays nothing.
+See ADR 0058, which fixes the same inversion in the search phase.

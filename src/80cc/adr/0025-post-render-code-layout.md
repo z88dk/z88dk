@@ -15,8 +15,8 @@ sized.
 
 ## Decision
 
-Run them as an ordered pipeline in the text layer. The order is load-bearing and
-must not be rearranged:
+Run them as an ordered pipeline in the text layer. Keep this order because each
+stage prepares the input for the next one:
 
 1. **Tail merging.** Where several paths end in the same instruction run, keep
    one copy and turn the others into a jump to it. Per function only, and the

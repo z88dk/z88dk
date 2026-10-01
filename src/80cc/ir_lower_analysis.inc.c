@@ -1338,10 +1338,10 @@ static void emit_skip(FILE *out, const Func *f, const char *cc, int skip_bytes)
    and `xor a` destroys them, while `ld` leaves them alone. Both increments are
    one byte, so the skip distance is the same either way.
 
-   The byte form leaves HL ALONE, and that is the trap: the callers reach here
+   The byte form leaves HL unchanged. The callers reach here
    after arithmetic that destroyed HL (`sbc hl,de`, the sign-flip's `ld h,a`),
    and every one of them relied on the `ld hl,0` above to make the belief
-   false. So drop the HL belief here — the word path destroys HL anyway, so
+   with HL already destroyed. Drop the HL belief here — the word path destroys HL anyway, so
    this is never weaker than what it replaces. Without it a compare of the same
    operand pair straight after another one reads HL as if it still held the
    left operand, and silently compares the previous result instead. */
@@ -1395,4 +1395,3 @@ static int signed_cmp_signflip(FILE *out, const Func *f, int is_signed)
     invalidate_de_cache();
     return 1;
 }
-

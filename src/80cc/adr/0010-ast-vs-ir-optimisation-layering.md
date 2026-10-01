@@ -31,7 +31,7 @@ a deliberate layering, not redundancy to remove.
      allocation, lowering) has less to chew on;
    - **canonicalise** the tree into the shapes `ir_build` is written to consume —
      `OP_A*` compound-assign nodes and commuted operands. `ir_build` depends on
-     this normalisation, so ast_opt is load-bearing, not optional.
+     this normalisation, so ast_opt is required.
 2. **IR opts do what only the lowered form allows.** CSE across synthesised
    address arithmetic, loop-invariant motion, and induction-variable SR need the
    three-address IR + liveness + loop structure that do not exist at the AST.

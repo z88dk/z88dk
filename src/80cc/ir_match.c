@@ -5,9 +5,8 @@
  * the scan, the binding, the standard safety conditions, the rewrite
  * plumbing and the NOP/compact step. A pattern contributes only its
  * templates plus (optionally) a check()/apply() escape hatch. Design
- * and migration plan: PATTERN_MATCHER_PLAN.md. The lesson encoded
- * here (BUG_LOG A33–A40): the bugs live in the side conditions, not
- * the match — so those are written, and fixed, exactly once.
+ * and migration plan: PATTERN_MATCHER_PLAN.md. BUG_LOG A33–A40 showed that
+ * the important checks belong in the side conditions, not in each match.
  *
  * The engine itself reads only the IR (ir.c / ir_analysis.c), so the
  * pattern tests stay portable; CPU applicability arrives as the target's
@@ -443,10 +442,10 @@ static int run_table_rounds(Func *f, const PatternDef *pats, int n_pats,
                 }
             }
 
-            /* Compact ONLY this round's compacting-pattern kills —
-               leftover NOPs from them would break the adjacency the
-               dead-spill analysis relies on, but NO_COMPACT NOPs are
-               load-bearing (long-push distances) and must survive. */
+            /* Compact only this round's compacting-pattern kills.
+               Leftover NOPs would break the adjacency used by dead-spill
+               analysis. Keep NO_COMPACT NOPs because they preserve long-push
+               distances. */
             if (bb_dirty && dead) {
                 int new_n = 0;
                 for (int k = 0; k < bb->n_ops; k++) {
@@ -574,10 +573,10 @@ static int rotl_check(Func *f, BB *bb, const int idx[],
 
        (x & y) | (~x & z)   ==   z ^ (x & (y ^ z))
 
-   Both pick y where x has a 1 bit and z where it has a 0. The point is not
-   that the right side has one fewer operator (4 -> 3, and the NOT goes, which
-   at width 4 is a whole 12-instruction byte chain). The point is that the left
-   side is a TREE and the right side is a CHAIN:
+   Both pick y where x has a 1 bit and z where it has a 0. The right side has
+   one fewer operator (4 -> 3, and the NOT goes, which at width 4 is a whole
+   12-instruction byte chain). The left side is a tree and the right side is a
+   chain:
 
        AND a <- x,y   NOT t <- x   AND b <- t,z   OR d <- a,b     tree
        XOR t1 <- y,z  AND t2 <- t1,x  XOR d <- t2,z               chain
@@ -1065,7 +1064,6 @@ static HelperInfo *incmhl_helper(int step, int addr_v)
     return hi;
 }
 
-/* Overwrite `o` with IR_HCALL hi (no result). */
 static void incmhl_to_hcall(Op *o, HelperInfo *hi, const Op *loc)
 {
     Op n;

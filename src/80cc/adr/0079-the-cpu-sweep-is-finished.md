@@ -5,7 +5,7 @@ Item 1 is **superseded by ADR 0081**, which shipped it.
 
 ## Context
 
-Vein 1 asked for one thing: diff each CPU's declared instruction set against
+Item 1 asked for one thing: diff each CPU's declared instruction set against
 what the lowerer emits, from `src/z80asm/dev/cpu/opcodes.dat`. It paid twice
 before this round (ADR 0039 LDSI, ADR 0075 the Rabbit store-reload fold) and
 three more times in it (ADR 0077 LDHI, ADR 0078 `add hl,a`, ADR 0080
@@ -57,8 +57,8 @@ Those 101 sites do not go through it. They are **hand-rolled** `emit(out,
 at a handful of emit sites that never call the materialiser. So the work is a
 small refactor — one `emit_frame_addr_hl(f, canon_off)` helper carrying the
 lea-or-sp decision, and the hand-rolled sites routed through it — not a new
-rung. ~167 bytes on ez80, and `!L.cur_frameless` is load-bearing at every one
-of them: `fp_active` returns TRUE for a frameless function.
+rung. ~167 bytes on ez80, and `!L.cur_frameless` is required at every one of
+them because `fp_active` returns TRUE for a frameless function.
 
 **2. z180 / ez80 `tst`.** `tst` is 2 bytes (`tst r`) or 3 (`tst n`) against
 `and`'s 1 and 2, so it can only pay where A must survive a **flag-only** test.
@@ -81,8 +81,8 @@ would cost `ld de,0; div dehl,bc` = **5 bytes against a 3-byte call**, which is
 the byte-for-tick trade ADR 0075 and ADR 0076 refused for the Rabbit multiply,
 at 8 corpus sites.
 
-**The general lesson, and it cost time twice now: the sweep must ask whether
-the shipped CODE PATH uses an instruction, not whether the COMPILER emits it.**
+**The sweep must check whether the shipped code path uses an instruction, not
+whether the compiler emits it.**
 A mnemonic missing from 80cc's asm may be missing because it belongs in the
 library — `mlt` on z180 and `mul` on z80n are the same story, both already
 inside `l_mult`.
@@ -94,8 +94,8 @@ preservation they offer is unwanted (4 park deletions, all in one function, for
 
 ## Consequences
 
-Vein 1 is **closed**. Item 1 shipped as ADR 0081 (−92 B on ez80, and it needed
-a copt rule to move with it). What the vein produced across its lifetime: six
+Item 1 is **closed**. It shipped as ADR 0081 (−92 B on ez80, and it needed
+a copt rule to move with it). What this work produced: six
 shipped optimisations (ADR 0039, 0075, 0077, 0078, 0080, 0081), three
 documented refusals and — via ADR 0081's regression test — one long-standing
 silent miscompile (ADR 0082), against a method that costs about an hour per
@@ -108,7 +108,7 @@ emitted), the block I/O and interrupt families, and every ADL-suffixed
 K-flag trip counter (ADR 0051, *Proposed*) stays parked with its 236 sites
 unsized — it is not an instruction gap but a loop-shape change.
 
-**The sweep's most valuable by-product is not an instruction at all.** Building
+**The sweep's most useful result is not an instruction.** Building
 ADR 0078 showed that 15 of 20 candidate sites are refused because
 `instr_effects` treats **every `call` as reading DE** (the `__sdcccall(1)`
 argument ABI) and **every `ret` as reading DE** (the DE:HL result ABI). Both

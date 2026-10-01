@@ -29,7 +29,7 @@ optional in the match, so an emitter that elides it still gets the store
 dropped — which is what keeps kc160 correct, where the value arrives by
 `ld hl,(sp+2)` rather than through A and the load is therefore live.
 
-## The trap this cost
+## The cost of the incorrect test
 
 The first version matched `ld l,a` followed directly by the chain and never
 fired. The final asm shows only one of the two lines, which reads as if the
