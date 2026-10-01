@@ -1606,6 +1606,14 @@ void execute_prompt(const void* data, void* response) {
     mi2_printf_prompt();
 }
 
+void execute_exit(const void* data, void* response) {
+    if (bk.is_remote_connected()) {
+        delete_all_breakpoints();
+    }
+
+    exit(0);
+}
+
 static void* debugger_mi2_console_loop(void* arg) {
     char *debugger_line = malloc(1024);
     size_t debugger_line_size = 1024;
@@ -1613,7 +1621,11 @@ static void* debugger_mi2_console_loop(void* arg) {
     while (1) {
         execute_on_main_thread(execute_prompt, NULL, NULL);
 
-        while (fgets(debugger_line, 1024, stdin) == 0) ;
+        while (fgets(debugger_line, 1024, stdin) == 0) {
+            if (feof(stdin) || ferror(stdin)) {
+                execute_on_main_thread(execute_exit, NULL, NULL);
+            }
+        }
 
 #ifdef DEBUGGER_MI2_CONSOLE_LOG
         mi2_debug_log_input(debugger_line);
