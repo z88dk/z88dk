@@ -2608,7 +2608,7 @@ int ir_opt_sym_deref_fold(Func *f)
    once the last deref through it has folded.
 
    This fold depends on the `idx-deref` lowering rung. The offset is profitable
-   only when the base uses an index register. See adr/0057. */
+   only when the base uses an index register. See adr/0057. 
 
    So the fold is AIMED, not general — only the shape that can win the index
    home, which is the one idx2_home_realizable admits:
