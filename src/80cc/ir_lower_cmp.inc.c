@@ -1758,26 +1758,33 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
            param_caller_off, but no SPILL slot — same PARAM_IN_PLACE gap
            hlde_belief_droppable already names above. BC/DE-cache exclusion
            added alongside it: a param is far likelier than a spill to arrive
-           calling-convention-resident there. */
+           calling-convention-resident there. sp-mode additionally skips
+           when the slot is in rabbit/kc160's native `ld hl,(sp+N)` range —
+           load_to_hl already reaches it in one instruction there, cheaper
+           than this path's address-compute. */
         if (count >= 8 && !hl_has(op->src[0])
             && !bc_has(op->src[0]) && !de_has(op->src[0])
             && ((f->vreg_spill_slot && f->vreg_spill_slot[op->src[0]] >= 0)
                 || (f->vregs[op->src[0]].flags & IR_VREG_PARAM_IN_PLACE))) {
-            ss_note_reload(f, op->src[0]);
             if (fp_active(f)) {
                 int ix = slot_ix_off(f, op->src[0]);
                 if (fp_offset_fits(ix + 1)) {
+                    ss_note_reload(f, op->src[0]);
                     emit(out, "ld\tl,(%s%+d)", frame_reg(), ix + 1);
                     emit(out, "ld\th,0");
                     goto shr_int_bit_remainder;
                 }
+            } else {
+                int off = slot_off(f, op->src[0]) + L.cur_sp_adjust;
+                if (!(off >= 0 && off <= sp_rel_max(f))) {
+                    ss_note_reload(f, op->src[0]);
+                    emit(out, "ld\thl,%d", off + 1);
+                    emit(out, "add\thl,sp");
+                    emit(out, "ld\tl,(hl)");        /* L = byte 1 */
+                    emit(out, "ld\th,0");
+                    goto shr_int_bit_remainder;
+                }
             }
-            int off = slot_off(f, op->src[0]) + L.cur_sp_adjust;
-            emit(out, "ld\thl,%d", off + 1);
-            emit(out, "add\thl,sp");
-            emit(out, "ld\tl,(hl)");        /* L = byte 1 */
-            emit(out, "ld\th,0");
-            goto shr_int_bit_remainder;
         }
         load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
         /* Mirror of SHL ≥8: >>8 just moves H→L and zeros H; extra

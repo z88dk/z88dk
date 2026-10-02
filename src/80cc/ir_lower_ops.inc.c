@@ -2542,26 +2542,34 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
            below-frame offset; for those fall through to load_to_hl
            (which copies BC/DE→HL) + the `ld h,l` strength reduction.
            [frame-byte-trunc] Mirror of gen_shr's own PARAM_IN_PLACE +
-           BC/DE-cache fix below. */
+           BC/DE-cache fix below. sp-mode additionally skips when the slot
+           is in rabbit/kc160's native `ld hl,(sp+N)` range: load_to_hl
+           already reaches it in one instruction there, cheaper than this
+           path's address-compute — regressed r2ka/r4k/r6k/kc160 until
+           guarded. */
         if (count >= 8 && !hl_has(op->src[0])
             && !bc_has(op->src[0]) && !de_has(op->src[0])
             && ((f->vreg_spill_slot && f->vreg_spill_slot[op->src[0]] >= 0)
                 || (f->vregs[op->src[0]].flags & IR_VREG_PARAM_IN_PLACE))) {
-            ss_note_reload(f, op->src[0]);
             if (fp_active(f)) {
                 int ix = slot_ix_off(f, op->src[0]);
                 if (fp_offset_fits(ix)) {
+                    ss_note_reload(f, op->src[0]);
                     emit(out, "ld\th,(%s%+d)", frame_reg(), ix);
                     emit(out, "ld\tl,0");
                     goto shl_int_bit_remainder;
                 }
+            } else {
+                int off = slot_off(f, op->src[0]) + L.cur_sp_adjust;
+                if (!(off >= 0 && off <= sp_rel_max(f))) {
+                    ss_note_reload(f, op->src[0]);
+                    emit(out, "ld\thl,%d", off);
+                    emit(out, "add\thl,sp");
+                    emit(out, "ld\th,(hl)");        /* H = byte 0 */
+                    emit(out, "ld\tl,0");
+                    goto shl_int_bit_remainder;
+                }
             }
-            int off = slot_off(f, op->src[0]) + L.cur_sp_adjust;
-            emit(out, "ld\thl,%d", off);
-            emit(out, "add\thl,sp");
-            emit(out, "ld\th,(hl)");        /* H = byte 0 */
-            emit(out, "ld\tl,0");
-            goto shl_int_bit_remainder;
         }
         load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
         /* Shifts of 8+: high byte shifts out entirely → low byte in H, 0
