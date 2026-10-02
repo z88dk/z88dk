@@ -14,6 +14,22 @@ static char *c_zcc_opt = "zcc_opt.def";
 static int  lineno = 0;
 static int  sccz80_mode = 0;
 
+/* -autoformat: auto-detect printf/scanf converters from call-site literals
+ * and emit CRT_printf_format / CRT_scanf_format into zcc_opt.def.
+ * Mirrors sccz80's compile-time scan for external compilers (llvmz80/sdcc). */
+static int      auto_format = 0;
+static uint64_t auto_printf_mask = 0;
+static uint64_t auto_scanf_mask = 0;
+
+/* First non-literal format call per family (to warn if pruning is active). */
+static int  auto_printf_nonlit_line = 0;
+static char auto_printf_nonlit_file[FILENAME_MAX+1];
+static int  auto_scanf_nonlit_line = 0;
+static char auto_scanf_nonlit_file[FILENAME_MAX+1];
+
+/* User specified explicit #pragma printf / scanf (suppresses warning). */
+static int  user_printf_pragma = 0;
+static int  user_scanf_pragma = 0;
 
 char *skip_ws(char *ptr)
 {
@@ -249,64 +265,69 @@ CONVSPEC scanf_formats[] = {
     { 0, 0, 0, 0 }
 };
 
-static uint64_t parse_format_string(char *arg, CONVSPEC *specifiers)
+/* Scan [start,end) for conversion specifiers and return the accumulated
+ * CRT_printf_format / CRT_scanf_format bitmask. A literal '%' introduces a
+ * specifier (flags, width/precision, length modifier, conversion letter);
+ * every other character -- including quotes, '=' and whitespace -- is plain
+ * separator text and is skipped. "%%" is a literal percent, not a specifier.
+ * This is the one place that understands the CONVSPEC tables: it serves both
+ * explicit '#pragma printf/scanf "..."' text and the -autoformat scan of a
+ * call site's literal format argument, so the two can never drift apart.
+ * If end is NULL, scans up to the terminating '\0'. */
+static uint64_t parse_format_string(const char *start, const char *end, CONVSPEC *specifiers)
 {
-    char c;
-    int complex, islong;
+    const char *arg = start;
     uint64_t format_option = 0;
-    CONVSPEC *fmt;
 
-    for (complex = 1; (c = *arg); ++arg)
+    if (end == NULL)
+        end = start + strlen(start);
+
+    while (arg < end)
     {
-        if (c == '/')
-            break;
+        int islong;
+        CONVSPEC *fmt;
 
-        if ((c == '%') || isspace(c) || (c == '"') || (c == '='))
-            continue;
+        if (*arg != '%') { arg++; continue; }
+        arg++;                              /* consume '%' */
+        if (arg < end && *arg == '%') { arg++; continue; }   /* "%%" literal */
 
-        if (*arg == '-' || *arg == '0' || *arg == '+' || *arg == ' ' || *arg == '*' || *arg == '.')
+        while (arg < end && (*arg == '-' || *arg == '+' || *arg == ' ' ||
+                              *arg == '#' || *arg == '0' || *arg == '*' ||
+                              *arg == '.' || isdigit((unsigned char)*arg)))
         {
-            if (complex < 2)
-                complex = 2; /* Switch to standard */
-            format_option |= 0x40000000;
-            while (!isalpha(*arg))
-                arg++;
-        }
-        else if (isdigit(*arg))
-        {
-            if (complex < 2)
-                complex = 2; /* Switch to standard */
-            format_option |= 0x40000000;
-            while (isdigit(*arg) || *arg == '.')
-                arg++;
+            format_option |= 0x40000000;    /* flags/width -- see CLIB_OPT_PRINTF
+                                              * in lib/crt/classic/crt_runtime_selection.inc */
+            arg++;
         }
 
         islong = 0;
-        if (*arg == 'l')
+        if (arg < end && *arg == 'l')
         {
-            if (complex < 2)
-                complex = 2;
             arg++;
             islong = 1;
-            if (*arg == 'l')
+            if (arg < end && *arg == 'l')
             {
                 arg++;
                 islong = 2;
             }
-        } else if ( *arg == 'h' ) {
+        } else if (arg < end && *arg == 'h') {
             arg++;
-            if ( *arg == 'h' ) arg++;
-        } else if ( *arg == 'z' ) {
+            if (arg < end && *arg == 'h') arg++;
+        } else if (arg < end && *arg == 'z') {
             arg++;
         }
+
+        if (arg >= end)
+            break;                           /* truncated format string */
+
+        if (!isalpha((unsigned char)*arg) && *arg != '[')
+            continue;                        /* not a conversion letter -- stray '%' */
 
         fmt = specifiers;
         while (fmt->fmt)
         {
             if (fmt->fmt == *arg)
             {
-                if (complex < fmt->complex)
-                    complex = fmt->complex;
                 switch (islong)
                 {
                 case 0:
@@ -325,11 +346,396 @@ static uint64_t parse_format_string(char *arg, CONVSPEC *specifiers)
         }
         if (fmt->fmt == 0)
             fprintf(stderr, "Ignoring unrecognized %s format specifier %%%c\n", (specifiers == printf_formats) ? "printf" : "scanf", *arg);
+
+        if (*arg == '[') {                   /* scanf %[...] set: skip to ']' */
+            while (arg < end && *arg != ']') arg++;
+        }
+        arg++;                               /* step past the conversion letter */
     }
 
     return format_option;
 }
 
+
+
+/* True if word `w` is a whole token in [s,e); distinguishes prototypes from calls. */
+static int region_has_word(const char *s, const char *e, const char *w)
+{
+    size_t wl = strlen(w);
+
+    for (; s + wl <= e; s++) {
+        char before, after;
+
+        if (strncmp(s, w, wl) != 0)
+            continue;
+        before = s[-1];             /* safe: the call's "name(" precedes s */
+        after  = s[wl];
+        if (!(isalnum((unsigned char)before) || before == '_') &&
+            !(isalnum((unsigned char)after)  || after == '_'))
+            return 1;
+    }
+    return 0;
+}
+
+/* 1-based format argument index for known printf/scanf functions (0 = none). */
+static int format_arg_index(const char *name, int *is_scanf)
+{
+    *is_scanf = 0;
+    if (!strcmp(name, "printf") || !strcmp(name, "printk") || !strcmp(name, "vprintf"))
+        return 1;
+    if (!strcmp(name, "fprintf") || !strcmp(name, "sprintf") ||
+        !strcmp(name, "vfprintf") || !strcmp(name, "vsprintf"))
+        return 2;
+    if (!strcmp(name, "snprintf") || !strcmp(name, "vsnprintf"))
+        return 3;
+    *is_scanf = 1;
+    if (!strcmp(name, "scanf") || !strcmp(name, "vscanf"))
+        return 1;
+    if (!strcmp(name, "fscanf") || !strcmp(name, "vfscanf") ||
+        !strcmp(name, "sscanf") || !strcmp(name, "vsscanf"))
+        return 2;
+    return 0;
+}
+
+/* Skip *pp past a quoted string or char literal; handles backslash escapes. */
+static void skip_quoted(const char **pp)
+{
+    char q = *(*pp)++;
+    while (**pp && **pp != q) {
+        if (**pp == '\\' && (*pp)[1]) (*pp)++;
+        (*pp)++;
+    }
+    if (**pp) (*pp)++;
+}
+
+/* Return start of argidx-th top-level argument of the call at `open`;
+ * sets *end_out to the following ',' or ')'.  Returns NULL if not found. */
+static const char *find_format_arg(const char *open, int argidx,
+                                   const char **end_out)
+{
+    const char *a        = open + 1;
+    const char *argstart = a;
+    int         depth    = 1;
+    int         curarg   = 1;
+
+    while (*a && depth > 0) {
+        if (*a == '"' || *a == '\'') { skip_quoted(&a); continue; }
+        if      (*a == '(' || *a == '[' || *a == '{') depth++;
+        else if (*a == ')' || *a == ']' || *a == '}') { if (--depth == 0) break; }
+        else if (*a == ',' && depth == 1) {
+            if (curarg == argidx) break;
+            argstart = ++a;
+            curarg++;
+            continue;
+        }
+        a++;
+    }
+
+    if (curarg != argidx) return NULL;
+    *end_out = a;
+    return argstart;
+}
+
+/* Scan preprocessed line for printf/scanf calls; accumulate converter masks.
+ * The literal format argument (quotes, '=', concatenation and all) is handed
+ * straight to parse_format_string -- the same specifier scanner that handles
+ * '#pragma printf/scanf' -- so there is only one place that walks a format
+ * string and knows the CONVSPEC tables. */
+static void scan_line_for_formats(const char *line)
+{
+    const char *p = line;
+
+    while (*p) {
+        if (*p == '"' || *p == '\'') { skip_quoted(&p); continue; }
+
+        if (!(isalpha(*p) || *p == '_')) { p++; continue; }
+        if (p != line && (isalnum(p[-1]) || p[-1] == '_')) {
+            while (isalnum(*p) || *p == '_') p++;
+            continue;
+        }
+
+        char name[NAMESIZE + 1]; int n = 0;
+        while ((isalnum(*p) || *p == '_') && n < NAMESIZE)
+            name[n++] = *p++;
+        name[n] = '\0';
+
+        const char *after_name = p;
+        while (isspace(*after_name)) after_name++;
+        if (*after_name != '(') continue;
+
+        int is_scanf, argidx;
+        argidx = format_arg_index(name, &is_scanf);
+        if (argidx == 0) continue;
+
+        const char *end, *argstart = find_format_arg(after_name, argidx, &end);
+        if (!argstart) continue;
+
+        const char *f = argstart;
+        while (isspace(*f) || *f == '(') f++;                      /* tolerate ("...") */
+
+        if (*f == '"') {
+            uint64_t m = parse_format_string(f, end, is_scanf ? scanf_formats : printf_formats);
+            if (is_scanf) auto_scanf_mask |= m;
+            else          auto_printf_mask |= m;
+        } else if (*f != '\0' && *f != ')' && !region_has_word(f, end, "char")) {
+            if (is_scanf) {
+                if (auto_scanf_nonlit_line == 0) {
+                    auto_scanf_nonlit_line = lineno;
+                    strncpy(auto_scanf_nonlit_file, filename, sizeof(auto_scanf_nonlit_file) - 1);
+                }
+            } else {
+                if (auto_printf_nonlit_line == 0) {
+                    auto_printf_nonlit_line = lineno;
+                    strncpy(auto_printf_nonlit_file, filename, sizeof(auto_printf_nonlit_file) - 1);
+                }
+            }
+        }
+    }
+}
+
+/* Warn if a non-literal format was used while literal pruning is active. */
+static void warn_nonliteral_format(const char *fam, const char *file, int line)
+{
+    char clean[FILENAME_MAX + 1];
+    const char *src = file;
+    size_t n;
+
+    if (*src == '"')
+        src++;                       /* drop opening quote from the marker */
+    strncpy(clean, src, sizeof(clean) - 1);
+    clean[sizeof(clean) - 1] = 0;
+    n = strlen(clean);
+    if (n && clean[n - 1] == '"')
+        clean[n - 1] = 0;            /* drop closing quote */
+
+    fprintf(stderr,
+        "%s:%d: note: %s format argument is not a string literal; -autoformat "
+        "cannot auto-select converters for it. Other call sites in this file "
+        "prune the %s converter table, so a converter used only by this runtime "
+        "format may be missing at runtime -- add an explicit "
+        "'#pragma %s = \"...\"' listing the conversions it uses.\n",
+        clean[0] ? clean : "<stdin>", line, fam, fam, fam);
+}
+
+/* Emit CRT_printf_format / CRT_scanf_format masks into zcc_opt.def.
+ * Values are OR-combined across translation units. */
+static void emit_auto_format(void)
+{
+    FILE *fp;
+
+    if (auto_printf_mask == 0 && auto_scanf_mask == 0)
+        return;
+
+    /* Warn if non-literal formats were seen while pruning this family. */
+    if (auto_printf_mask && auto_printf_nonlit_line && !user_printf_pragma)
+        warn_nonliteral_format("printf", auto_printf_nonlit_file, auto_printf_nonlit_line);
+    if (auto_scanf_mask && auto_scanf_nonlit_line && !user_scanf_pragma)
+        warn_nonliteral_format("scanf", auto_scanf_nonlit_file, auto_scanf_nonlit_line);
+
+    if ((fp = fopen(c_zcc_opt, "a")) == NULL) {
+        fprintf(stderr, "%s: Cannot open %s file\n", filename, c_zcc_opt);
+        exit(1);
+    }
+
+    if (auto_printf_mask) {
+        fprintf(fp, "\nIF !DEFINED_CRT_printf_format\n");
+        fprintf(fp, "\tdefc\tDEFINED_CRT_printf_format = 1\n");
+        fprintf(fp, "\tdefc CRT_printf_format = 0x%016" PRIx64 "\n", auto_printf_mask);
+        fprintf(fp, "ELSE\n");
+        fprintf(fp, "\tUNDEFINE temp_printf_format\n");
+        fprintf(fp, "\tdefc temp_printf_format = CRT_printf_format\n");
+        fprintf(fp, "\tUNDEFINE CRT_printf_format\n");
+        fprintf(fp, "\tdefc CRT_printf_format = temp_printf_format | 0x%016" PRIx64 "\n", auto_printf_mask);
+        fprintf(fp, "ENDIF\n\n");
+        fprintf(fp, "\nIF !NEED_printf\n\tDEFINE\tNEED_printf\nENDIF\n\n");
+    }
+
+    if (auto_scanf_mask) {
+        fprintf(fp, "\nIF !DEFINED_CRT_scanf_format\n");
+        fprintf(fp, "\tdefc\tDEFINED_CRT_scanf_format = 1\n");
+        fprintf(fp, "\tdefc CRT_scanf_format = 0x%016" PRIx64 "\n", auto_scanf_mask);
+        fprintf(fp, "ELSE\n");
+        fprintf(fp, "\tUNDEFINE temp_scanf_format\n");
+        fprintf(fp, "\tdefc temp_scanf_format = CRT_scanf_format\n");
+        fprintf(fp, "\tUNDEFINE CRT_scanf_format\n");
+        fprintf(fp, "\tdefc CRT_scanf_format = temp_scanf_format | 0x%016" PRIx64 "\n", auto_scanf_mask);
+        fprintf(fp, "ENDIF\n\n");
+        fprintf(fp, "\nIF !NEED_scanf\n\tDEFINE\tNEED_scanf\nENDIF\n\n");
+    }
+
+    fclose(fp);
+}
+
+#ifdef ZPRAGMA_TEST
+/* ---- unit tests for parse_format_string and scan_line_for_formats ---- */
+static int tests_run = 0, tests_failed = 0;
+
+static void check(const char *desc, uint64_t got, uint64_t want)
+{
+    tests_run++;
+    if (got != want) {
+        printf("FAIL [%s]: got 0x%08" PRIx64 ", want 0x%08" PRIx64 "\n",
+               desc, got, want);
+        tests_failed++;
+    }
+}
+
+/* Both the literal scan and the pragma scan now go through the same
+ * function: a quoted literal string is scanned verbatim (quotes included,
+ * since they are just skipped as non-'%' text), bounded by its own length. */
+#define SFL(s)    parse_format_string((s), (s) + strlen(s), printf_formats)
+#define SFLSC(s)  parse_format_string((s), (s) + strlen(s), scanf_formats)
+#define PFS(s)    parse_format_string((s), NULL, printf_formats)
+
+int main(void)
+{
+    /* plain specifiers */
+    check("%d",  SFL("\"%d\""),  0x01);
+    check("%u",  SFL("\"%u\""),  0x02);
+    check("%x",  SFL("\"%x\""),  0x04);
+    check("%s",  SFL("\"%s\""),  0x200);
+    check("%c",  SFL("\"%c\""),  0x400);
+    check("%f",  SFL("\"%f\""),  0x4000000);
+
+    /* length modifier */
+    check("%ld", SFL("\"%ld\""), 0x1000);
+    check("%lf", SFL("\"%lf\""), 0x4000000);  /* lval == val for float */
+
+    /* width/precision → bit 30 (flags handling) */
+    check("%6d",    SFL("\"%6d\""),    0x40000001);
+    check("%6.1f",  SFL("\"%6.1f\""),  0x44000000);
+    check("%-6d",   SFL("\"%-6d\""),   0x40000001);
+    check("%*d",    SFL("\"%*d\""),     0x40000001);
+
+    /* multiple specifiers */
+    check("%d %s",  SFL("\"%d %s\""),  0x201);
+    check("%d %f",  SFL("\"%d %f\""),  0x4000001);
+
+    /* adjacent string literal concatenation */
+    check("adj %d %s", SFL("\"%d\" \"%s\""), 0x201);
+
+    /* escaped quote inside literal must not end the scan */
+    check("esc quote", SFL("\"%d\\\"ok\\\"%s\""), 0x201);
+
+    /* %% is a literal percent, not a specifier */
+    check("%%", SFL("\"%%\""), 0x00);
+
+    /* empty string */
+    check("empty", SFL("\"\""), 0x00);
+
+    /* scanf specifiers */
+    check("scanf %d", SFLSC("\"%d\""),     0x01);
+    check("scanf %s", SFLSC("\"%s\""),     0x200);
+    check("scanf %[", SFLSC("\"%[a-z]\""), 0x200000);
+
+    /* untested specifiers from the printf table */
+    check("%o",  SFL("\"%o\""),  0x10);
+    check("%X",  SFL("\"%X\""),  0x08);
+    check("%i",  SFL("\"%i\""),  0x40);
+    check("%p",  SFL("\"%p\""),  0x80);
+    check("%e",  SFL("\"%e\""),  0x1000000);
+    check("%g",  SFL("\"%g\""),  0x10000000);
+    check("%n",  SFL("\"%n\""),  0x20);
+
+    /* z88dk-specific specifiers */
+    check("%B",  SFL("\"%B\""),  0x100);
+    check("%S",  SFL("\"%S\""),  0x2000200);
+
+    /* more flags — all must set bit 30 */
+    check("%0d",   SFL("\"%0d\""),   0x40000001);
+    check("%+d",   SFL("\"%+d\""),   0x40000001);
+    check("%#x",   SFL("\"%#x\""),   0x40000004);
+    check("% d",   SFL("\"% d\""),   0x40000001);
+    check("%-06.2f", SFL("\"%-06.2f\""), 0x44000000);
+
+    /* short length modifier: h and hh give the base (non-long) bitmask */
+    check("%hd",  SFL("\"%hd\""),  0x01);
+    check("%hhd", SFL("\"%hhd\""), 0x01);
+
+    /* three adjacent string literals */
+    check("adj 3", SFL("\"%d\" \"%f\" \"%s\""), 0x4000201);
+
+    /* backslash escape before next specifier must not swallow it */
+    check("\\n between", SFL("\"%d\\n%f\""), 0x4000001);
+
+    /* truncated % at end of string — must not crash, returns 0 */
+    check("truncated %", SFL("\"%\""),  0x00);
+
+    /* unknown specifier — must not crash, returns 0 */
+    check("unknown %q", SFL("\"%q\""), 0x00);
+
+    /* %lld: llval shifted to upper 32 bits; now preserved in uint64_t */
+    check("%lld", SFL("\"%lld\""), 0x100000000);
+
+    /* parse_format_string also serves '#pragma printf/scanf' text, which
+     * requires an explicit '%' per specifier just like a real format string
+     * (e.g. '#pragma printf = "%d %s"'). */
+    check("pfs %d",    PFS("%d"),    0x01);
+    check("pfs %f",    PFS("%f"),    0x4000000);
+    check("pfs %lf",   PFS("%lf"),   0x4000000);
+    check("pfs %ld",   PFS("%ld"),   0x1000);
+    check("pfs %d %s", PFS("%d %s"), 0x201);
+    check("pfs %6.1f", PFS("%6.1f"), 0x44000000);
+    check("pfs %o",    PFS("%o"),    0x10);
+    check("pfs %X",    PFS("%X"),    0x08);
+
+    /* ---- scan_line_for_formats ---- */
+#define SLF_RESET() \
+    (auto_printf_mask = auto_scanf_mask = \
+     auto_printf_nonlit_line = auto_scanf_nonlit_line = 0)
+#define SLF(line) (SLF_RESET(), scan_line_for_formats(line))
+
+    SLF("printf(\"%d\", x);");
+    check("slf printf %d",    auto_printf_mask, 0x01);
+    SLF("printf(\"%f\", x);");
+    check("slf printf %f",    auto_printf_mask, 0x4000000);
+    SLF("printf(\"%d %s\", x, y);");
+    check("slf printf %d %s", auto_printf_mask, 0x201);
+    SLF("fprintf(fp, \"%x\", x);");
+    check("slf fprintf %x",   auto_printf_mask, 0x04);
+    SLF("sprintf(buf, \"%d\", x);");
+    check("slf sprintf %d",   auto_printf_mask, 0x01);
+    SLF("snprintf(buf, 10, \"%d\", x);");
+    check("slf snprintf %d",  auto_printf_mask, 0x01);
+
+    SLF("scanf(\"%d\", &x);");
+    check("slf scanf %d",  auto_scanf_mask, 0x01);
+    SLF("sscanf(s, \"%s\", buf);");
+    check("slf sscanf %s", auto_scanf_mask, 0x200);
+
+    SLF("myprintf(\"%d\", x);");           /* unknown function — no effect */
+    check("slf unknown fn", auto_printf_mask, 0x00);
+    SLF("int myprintf = 0;");              /* mid-identifier, not a call */
+    check("slf mid-id",     auto_printf_mask, 0x00);
+    SLF("char *s = \"printf(\\\"%d\\\")\";"); /* format inside a string literal */
+    check("slf in string",  auto_printf_mask, 0x00);
+
+    SLF("printf(\"%d\", a); printf(\"%s\", b);"); /* two calls on one line */
+    check("slf two calls",  auto_printf_mask, 0x201);
+    SLF("printf(\"%d\", strlen(s));");     /* nested call as argument */
+    check("slf nested",     auto_printf_mask, 0x01);
+
+    lineno = 42;
+    SLF("printf(fmt, x);");               /* non-literal: mask stays 0, nonlit set */
+    check("slf nonlit mask",     auto_printf_mask,           0x00);
+    check("slf nonlit line set", auto_printf_nonlit_line,    42);
+
+    lineno = 42;
+    SLF("printf(\"%d\", x); printf(fmt, y);"); /* literal + non-literal */
+    check("slf mixed mask",  auto_printf_mask,           0x01);
+    check("slf mixed nonlit", auto_printf_nonlit_line,   42);
+    lineno = 0;
+
+#undef SLF_RESET
+#undef SLF
+
+    if (tests_failed == 0)
+        printf("PASS: %d tests\n", tests_run);
+    else
+        printf("FAILED: %d/%d\n", tests_failed, tests_run);
+    return tests_failed ? 1 : 0;
+}
+#else
 int main(int argc, char **argv)
 {
     int     i;
@@ -338,6 +744,8 @@ int main(int argc, char **argv)
     for ( i = 1 ; i < argc; i++ ) {
         if (strcmp(argv[i],"-sccz80") == 0 ) {
             sccz80_mode = 1;
+        } else if ( strcmp(argv[i],"-autoformat") == 0 ) {
+            auto_format = 1;
         } else if ( strncmp(argv[i],"-zcc-opt=", 9) == 0 ) {
             c_zcc_opt = argv[i] + 9;
         }
@@ -348,6 +756,9 @@ int main(int argc, char **argv)
 
     while ( fgets(buf, sizeof(buf) - 1, stdin) != NULL ) {
         lineno++;
+        /* Scan line for format call sites before pragma rewriting. */
+        if ( auto_format )
+            scan_line_for_formats(buf);
         ptr = skip_ws(buf);
         if ( strncmp(ptr,"#pragma", 7) == 0 ) {
             int  ol = 1;
@@ -390,11 +801,13 @@ int main(int argc, char **argv)
                 }
                 write_redirect(ptr,value);
             } else if ( strncmp(ptr,"printf", 6) == 0 ) {
-                uint64_t value = parse_format_string(ptr + 6, printf_formats);
+                uint64_t value = parse_format_string(ptr + 6, NULL, printf_formats);
+                user_printf_pragma = 1;
                 write_defined("CLIB_OPT_PRINTF", (int32_t)(value & 0xffffffff), 0);
                 write_defined("CLIB_OPT_PRINTF_2", (int32_t)((value >> 32) & 0xffffffff), 0);
             } else if ( strncmp(ptr,"scanf", 5) == 0 ) {
-                uint64_t value = parse_format_string(ptr + 5, scanf_formats);
+                uint64_t value = parse_format_string(ptr + 5, NULL, scanf_formats);
+                user_scanf_pragma = 1;
                 write_defined("CLIB_OPT_SCANF", (int32_t)(value & 0xffffffff), 0);
                 write_defined("CLIB_OPT_SCANF_2", (int32_t)((value >> 32) & 0xffffffff), 0);
             } else if ( strncmp(ptr,"string",6) == 0 ) {
@@ -464,4 +877,11 @@ int main(int argc, char **argv)
             fputs(buf,stdout);
         }
     }
+
+    /* Flush auto-detected converter masks into zcc_opt.def. */
+    if ( auto_format )
+        emit_auto_format();
+
+    return 0;
 }
+#endif /* ZPRAGMA_TEST */
