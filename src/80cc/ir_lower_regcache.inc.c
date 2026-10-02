@@ -709,6 +709,49 @@ static int hl_load_takes_remat(const Func *f, int v)
     return 1;
 }
 
+/* [frame-byte-trunc] One byte of a width-2 frame-resident vreg, read
+   directly instead of materialising the whole word into HL. fp-mode only:
+   `ld a,(sp+N)` is not a real instruction (unlike the word form, a
+   kc160/rabbit native op) — sp-mode falls back to the normal word load.
+   `hi` selects the high half (+1; little-endian storage). Caller must have
+   already confirmed via hl_load_takes_remat + a remat_def miss that
+   load_to_hl would otherwise do a real slot read. */
+static int emit_frame_byte_half_for_vreg(FILE *out, const Func *f, int v,
+                                         int hi)
+{
+    if (fp_active(f)) {
+        int ix_off = slot_ix_off(f, v) + (hi ? 1 : 0);
+        if (fp_offset_fits(ix_off)) {
+            emit(out, "ld\ta,(%s%+d)", frame_reg(), ix_off);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/* [frame-byte-trunc] Drop-in for the common `load_to_hl(v); emit("ld a,h"
+   or "ld a,l")` idiom wherever v's other half is never read afterward.
+   Takes the frame-direct byte read above when it applies, else falls back
+   to the original idiom unchanged — never leaves HL in a state the caller
+   wouldn't already have produced.
+
+   NOT a fit for a branch-fused compare (g_hc.branch_test_kind != 0):
+   measured as a net size LOSS there — such a compare usually guards a
+   loop whose body reads v again, and load_to_hl's side effect of leaving
+   HL caching v was doing real work this helper can't see. Safe where v's
+   full width is truly spent right here (a narrowing MOV/CONV_TRUNC, or a
+   value whose result replaces v outright). */
+static void load_byte_half_to_a(FILE *out, const Func *f, int v, int hi)
+{
+    if (!opt_disabled("frame-byte-trunc")
+        && hl_load_takes_remat(f, v)
+        && !(g_hc.remat_def && v >= 0 && v < f->n_vregs && g_hc.remat_def[v])
+        && emit_frame_byte_half_for_vreg(out, f, v, hi))
+        return;
+    load_to_hl(out, f, v);
+    emit(out, hi ? "ld\ta,h" : "ld\ta,l");
+}
+
 /* [SYMADDR_DEREF] Load `base` into HL for a deref at constant offset `off`,
    folding the offset into the symbol where the base is a rematerialisable
    `&symbol`. Returns the offset the CALLER still has to add: 0 when it folded,

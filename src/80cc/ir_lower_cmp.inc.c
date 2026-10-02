@@ -1666,8 +1666,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\th,0");
                 invalidate_hl_cache();
             } else if (count >= 8) {                 /* >>9..15: byte + residual */
-                load_to_hl(out, f, op->src[0]);
-                emit(out, "ld\ta,h");                /* surviving byte (no L hop) */
+                load_byte_half_to_a(out, f, op->src[0], 1); /* surviving byte */
                 emit_byte_lsr_a(out, count - 8, 0);
                 emit(out, "ld\tl,a");
                 emit(out, "ld\th,0");
@@ -1869,8 +1868,7 @@ static int gen_sar16(FILE *out, Func *f, const Op *op)
                8080/gbz80 would call l_asr for it. Needs no shift instruction at
                all, so every CPU takes this. Also the shape the signed
                divide-by-power-of-two reduction leans on for its bias. */
-            load_to_hl(out, f, op->src[0]);
-            emit(out, "ld\ta,h");
+            load_byte_half_to_a(out, f, op->src[0], 1);
             emit(out, "add\ta,a");               /* CY = sign bit */
             emit(out, "sbc\ta,a");               /* a = 0xFF if neg else 0x00 */
             emit(out, "ld\th,a");
@@ -1882,8 +1880,7 @@ static int gen_sar16(FILE *out, Func *f, const Op *op)
         if (has_sra && count >= 8) {
             /* `>>8` is a byte move: low = high byte, high = sign extension.
                Any residual (>>9..15) shifts the surviving bytes. */
-            load_to_hl(out, f, op->src[0]);
-            emit(out, "ld\ta,h");                /* a = high byte (sign source) */
+            load_byte_half_to_a(out, f, op->src[0], 1); /* a = high byte (sign source) */
             emit(out, "ld\tl,a");                /* low = high byte */
             emit(out, "add\ta,a");               /* CY = sign bit */
             emit(out, "sbc\ta,a");               /* a = 0xFF if neg else 0x00 */
