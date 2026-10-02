@@ -1726,9 +1726,16 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
            survives, into result L. Read it directly, skip the low byte.
            SLOT reads only — a register-only vreg (vreg_spill_slot == -1)
            would read a bogus below-frame offset, so those fall through to
-           load_to_hl + `ld l,h` (mirror of the SHL ≥8 guard). */
+           load_to_hl + `ld l,h` (mirror of the SHL ≥8 guard).
+           [frame-byte-trunc] An IN-PLACE PARAM has a memory home too, via
+           param_caller_off, but no SPILL slot — same PARAM_IN_PLACE gap
+           hlde_belief_droppable already names above. BC/DE-cache exclusion
+           added alongside it: a param is far likelier than a spill to arrive
+           calling-convention-resident there. */
         if (count >= 8 && !hl_has(op->src[0])
-            && f->vreg_spill_slot && f->vreg_spill_slot[op->src[0]] >= 0) {
+            && !bc_has(op->src[0]) && !de_has(op->src[0])
+            && ((f->vreg_spill_slot && f->vreg_spill_slot[op->src[0]] >= 0)
+                || (f->vregs[op->src[0]].flags & IR_VREG_PARAM_IN_PLACE))) {
             ss_note_reload(f, op->src[0]);
             if (fp_active(f)) {
                 int ix = slot_ix_off(f, op->src[0]);

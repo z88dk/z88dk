@@ -1844,6 +1844,27 @@ static int gen_conv_sx(FILE *out, Func *f, const Op *op)
     return -1;
 }
 
+/* [frame-byte-trunc] One byte of a width-2 frame-resident vreg, read
+   directly instead of materialising the whole word into HL. fp-mode only:
+   `ld a,(sp+N)` is not a real instruction (unlike the word form, a
+   kc160/rabbit native op) — sp-mode falls back to the normal word load.
+   `hi` selects the high half (+1; little-endian storage). Caller must have
+   already confirmed via hl_load_takes_remat + a remat_def miss that
+   load_to_hl would otherwise do a real slot read, so this never disturbs
+   HL or any belief about where `v` lives. */
+static int emit_frame_byte_half_for_vreg(FILE *out, const Func *f, int v,
+                                         int hi)
+{
+    if (fp_active(f)) {
+        int ix_off = slot_ix_off(f, v) + (hi ? 1 : 0);
+        if (fp_offset_fits(ix_off)) {
+            emit(out, "ld\ta,(%s%+d)", frame_reg(), ix_off);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
 {
     int src_w = f->vregs[op->src[0]].width;
@@ -1861,12 +1882,26 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
            and the result is its HIGH byte, not its low one. */
         if (src_w == 1) {
             load_byte_to_a(out, f, op->src[0]);
-        } else if (op->kind == IR_CONV_TRUNC_HI) {
-            load_to_hl(out, f, op->src[0]);
-            emit(out, "ld\ta,h");
         } else {
-            load_to_hl(out, f, op->src[0]);
-            emit(out, "ld\ta,l");
+            int hi = (op->kind == IR_CONV_TRUNC_HI);
+            /* [frame-byte-trunc] Only one byte of src[0] is kept — read it
+               straight from the frame instead of pulling the whole word
+               through HL when load_to_hl would otherwise need a real slot
+               read. */
+            if (!opt_disabled("frame-byte-trunc")
+                && hl_load_takes_remat(f, op->src[0])
+                && !(g_hc.remat_def && op->src[0] >= 0
+                     && op->src[0] < f->n_vregs
+                     && g_hc.remat_def[op->src[0]])
+                && emit_frame_byte_half_for_vreg(out, f, op->src[0], hi)) {
+                /* emitted straight to A; HL untouched */
+            } else if (hi) {
+                load_to_hl(out, f, op->src[0]);
+                emit(out, "ld\ta,h");
+            } else {
+                load_to_hl(out, f, op->src[0]);
+                emit(out, "ld\ta,l");
+            }
         }
         store_a_byte(out, f, op->dst);
         return 0;
@@ -2511,9 +2546,13 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
            on a genuine SLOT read — a register-only vreg (PR_BC/HL/DE,
            vreg_spill_slot == -1) would otherwise read a bogus
            below-frame offset; for those fall through to load_to_hl
-           (which copies BC/DE→HL) + the `ld h,l` strength reduction. */
+           (which copies BC/DE→HL) + the `ld h,l` strength reduction.
+           [frame-byte-trunc] Mirror of gen_shr's own PARAM_IN_PLACE +
+           BC/DE-cache fix below. */
         if (count >= 8 && !hl_has(op->src[0])
-            && f->vreg_spill_slot && f->vreg_spill_slot[op->src[0]] >= 0) {
+            && !bc_has(op->src[0]) && !de_has(op->src[0])
+            && ((f->vreg_spill_slot && f->vreg_spill_slot[op->src[0]] >= 0)
+                || (f->vregs[op->src[0]].flags & IR_VREG_PARAM_IN_PLACE))) {
             ss_note_reload(f, op->src[0]);
             if (fp_active(f)) {
                 int ix = slot_ix_off(f, op->src[0]);
