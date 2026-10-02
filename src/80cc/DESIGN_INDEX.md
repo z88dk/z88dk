@@ -64,9 +64,55 @@ Size across the corpus before implementing.
   two families and stop.
 - A `%CPU_HAS_*` macro survey found 5 of 14 never consulted (the other 4
   VM1-only) — not itself the CPU sweep (ADR 0079), which already closed.
+- Redundant signed-compare overflow correction: once a dominating branch
+  establishes a signed value's sign (e.g. surviving an `if (v<0)` clamp), a
+  later `v < K` / `v > K` against a same-sign constant still pays the full
+  `jp po,.../xor 0x80/rla` correction it no longer needs. Confirmed real in
+  `predbench`'s `classify` (a range-check ladder: 7 of 7 later compares
+  redundant) and `sat` (2 of 3) — ~45 B, but that is the WHOLE corpus
+  footprint today; the corpus has only one ladder-shaped function.
+  `sortbench`'s 9 occurrences looked like the same pattern on a `grep
+  jp.*po` census but are not: 3-way comparators and partition bounds, each a
+  genuinely distinct operand pair. Needs a real dominance check (does a
+  provably-reached prior branch fix this operand's sign?), not a textual
+  count — likely bigger on real range-check/classification code than on
+  this corpus. Not sized further.
+- `mix_char`/`mix_long`/`mix_store`-style over-spilling (several
+  independently-computed sub-expressions, each needing its own sign/zero
+  extension, combined into one accumulator, no loop, no call): genuine and
+  80cc-specific where it occurs — sdcc keeps the whole working set in
+  registers, 80cc round-trips 4 values through frame slots that trivially
+  fit the register file. Checked whether this generalizes and it does NOT:
+  `queenbench`'s `place` (recursive, can't be inlined) showed xcc *also*
+  spilling heavily and sdcc *also* reloading params from the frame inside
+  the loop; `predbench`'s `sat` (straight-line, no loop) showed both
+  compilers reloading the parameter on every compare — not a residency gap
+  there at all; `fixedbench`'s `qmul` (leaf, 2 params) showed no difference.
+  So this is a narrow, shape-specific finding (independent-sub-expressions
+  with no loop/call), not a general allocator weakness — do not reopen the
+  broader "80cc's allocator under-captures its own model" theory on this
+  evidence alone; the capture-gap finding predates this session and stands
+  on its own measurement.
 
 ## Recently closed (ADR has the detail)
 
+- **frame-byte-trunc — shipped, default-on.** A width-2 value truncated to
+  one byte (`gen_conv_trunc`, `gen_mov`, `gen_sar16`'s sign-extend cases, the
+  `gen_shr`/`gen_shl` partial-load fastpath) now reads just that byte from
+  the frame instead of materialising the whole word through HL first. Also
+  fixed: the partial-load fastpath missed every in-place PARAM (no SPILL
+  slot, so `vreg_spill_slot` alone didn't see it — same PARAM_IN_PLACE gap
+  `hlde_belief_droppable` already named), and briefly regressed
+  r2ka/r4k/r6k/kc160 until guarded to defer to their native `ld hl,(sp+N)`
+  word read when the slot is in range. `BENCH_MATRIX.txt` 80cc columns:
+  66 cells changed, 0 grown, -295 B total.
+- **IR_IVWIDTH — shipped opt-in, not yet default-on.** A loop counter proven
+  to hold only byte values throughout one specific loop (constant start in
+  0..255, step +1, constant exit bound ≤255) gets an 8-bit loop-exit compare
+  and increment instead of 16-bit. -254 B across 14 benches with the flag on,
+  0 B with it off (confirmed byte-identical), `long_ir` clean both frame
+  modes. Needs the tick scan (no cell slower) before flipping default-on —
+  not yet run.
 - **idx2 live-range reuse — ADR 0101.** The idx2 slot hosts non-overlapping
   live ranges instead of one whole-function owner. Measures zero today (BC's
   own multi-occupant check already claims every real disjoint-pair case
@@ -219,7 +265,7 @@ touched and report the count before and after.
 ### Debug output — permanent developer tools
 
 `IR_HOMEMAP` `IR_RANKDUMP` `IR_DUMP_ALLOC` `IR_EMIT_TRACE` `IR_OPT_VERBOSE`
-`IR_SPILL_STATS` `IR_IVWHY`
+`IR_SPILL_STATS` `IR_IVWHY` `IR_IVWIDTH_PROBE`
 `IR_DEADDEF_LOG` `IR_SPFLIP_LOG` `IR_CALLSPLIT_LOG`
 
 These print; they never change emitted code. `IR_HOMEMAP` is the first thing
@@ -233,6 +279,7 @@ to diff when an allocation decision changes.
 | `IR_BYTEPRESS` `IR_RANGEPROBE` | inert sizings: the byte-pair opportunity by pressure, and the ranging population | they are quoted in an ADR |
 | `IR_LIVEPROBE` | liveness census; `=2` gives the verbose form | — |
 | `IR_BYTEPACK` `IR_BYTEPACK_VERIFY` `IR_SLOTWHY` `IR_WIDENOSLOT` | opt-in allocator/lowering diagnostics and sizing probes | when the associated investigation is closed |
+| `IR_IVWIDTH` | opt-in prototype (marks + narrows byte-range loop counters); shipped, needs the tick scan before default-on | promoted to default-on, or refuted |
 | `IR_BC_STEP_CALL` `IR_BC_STEP_SCALAR` | retained diagnostic probes for the rejected ADR 0100 experiment; not optimisation options | if the probe code is removed |
 
 `IR_RANGEPROBE`'s 461 was an upper bound over the wrong population — do not

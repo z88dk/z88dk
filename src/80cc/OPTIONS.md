@@ -183,6 +183,8 @@ exists (ADR 0010).
 | `cmp-hi` | an unsigned `<`/`>=` against a constant compares both bytes |
 | `cmp-k` | a compare against a constant is not given its immediate form |
 | `byte-cmp-const` | a word compare against a byte-sized constant is not narrowed |
+| `frame-byte-trunc` | a width-2 value truncated to one byte materialises the whole word through HL first instead of reading the one byte directly |
+| `ivwidth` | opt-in (default off): a byte-range loop counter (`IR_IVWIDTH`) gets an 8-bit loop-exit compare instead of 16-bit |
 | `word-ztest` | a word zero test uses the baseline sequence |
 | `switch-byte-a` | a `char` switch scrutinee is widened to HL instead of staying in A |
 | `gpderef` | no general-pointer dereference form |
