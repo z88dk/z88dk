@@ -966,7 +966,6 @@ static int relax_line_size(const char *l)
         || !strncmp(s, "SECTION", 7) || !strncmp(s, "MODULE", 6)
         || !strncmp(s, "INCLUDE", 7))
         return 0;
-    /* Mnemonic. */
     const char *e = s;
     while (*e && *e != '\t' && *e != ' ' && *e != '\n') e++;
     size_t n = (size_t)(e - s);
@@ -1279,8 +1278,8 @@ static void copy_lower_stream(FILE *out, FILE *src)
 
    The two-line spellings `ld h,d; ld l,e` / `ld d,h; ld e,l` are still matched:
    this filter runs on rendered text, and it is cheaper to keep both forms here
-   than to require that every producer of a copy has been converted. THIS IS THE
-   THIRD CONSUMER of that text — the emitters, the copt rules in
+   than to require that every producer of a copy has been converted. The text
+   has three consumers: the emitters, the copt rules in
    lib/80cc_rules.1, and this. Changing how a copy is spelled means changing all
    three together, or a fold silently stops firing: respelling the copy without
    this hunk cost gbz80 79 bytes, entirely from copies that used to die here.
@@ -2770,9 +2769,9 @@ static void fold_de_pool_remat_add(char **lines, char *drop, int i,
    rather than guess). Bounded window (40 lines) — this shape is always
    local to one expression's codegen, never spans control flow in practice.
    CPU-generic by construction (the 2-line `ld hl,N`/`add hl,sp` addressing
-   and the `ex de,hl`/`ld de,hl` copy are not gbz80-specific spellings), so
-   this can fire on any CPU that lacks a native word-load-from-slot-into-DE,
-   not just gbz80 — worth checking 8080/8085 too, per
+   and the `ex de,hl`/`ld de,hl` copy are not gbz80-specific spellings). This
+   can fire on any CPU that lacks a native word-load-from-slot-into-DE.
+   Check 8080/8085 too, per
    GBZ80_DE_RELOAD_PLAN.md's cross-CPU note on the sibling `gen_ld_sym` lead.
 
    Denial-only: any bail just leaves the bracket in place, never a
@@ -4410,19 +4409,8 @@ static int frame_has_saved_iy(const Func *f)
     if (!f || f->is_naked || f->is_interrupt || !f->vreg_to_phys) return 0;
     for (int i = 0; i < f->n_vregs; i++) {
         int p = ir_home_assigned(f, i);
-        /* ►► ANY whole-pair IY home, not just idx3. In FP MODE the idx2 spare
-           IS IY (ir_idx2_reg: frame IX -> spare IY), and IY is callee-saved in
-           that ABI exactly as IX is — but this predicate only ever asked about
-           idx3, which is sp-mode. So an fp function that homed a value in IY
-           clobbered its CALLER's IY and never saved it.
-
-           That stayed latent while fp idx2 homes were rare; the idx-deref work
-           made them common (every read-only pointer param dereffed twice is now
-           a candidate) and it became a live miscompile — bitfieldbench reg_set
-           and reg_get, recordbench churn, on z180/ez80/kc160/rabbit, plus
-           long_ir/idxderef's bf_get, which is how it was caught. The
-           sp-mode mirror (frame_has_saved_ix) already tests the PhysReg
-           directly and had no such hole; this now matches it. */
+        /* Check every whole-pair IY home, including idx2. In FP mode idx2 is IY,
+           and the ABI requires it to be callee-saved. */
         if (p == IR_PR_IY) return 1;
         if (f->idx3_reg != IR_PR_NONE && p == f->idx3_reg) return 1;
         /* IY byte-half home (assign_idxhalf_homes): also occupies IY, which is
@@ -5137,7 +5125,7 @@ static void store_byte_adv(FILE *out, const char *reg, int last)
    move, so the push shift is irrelevant. `lea hl,ix+d` is 3 bytes against 4
    and writes no flags, where `add hl,sp` writes carry.
 
-   `!L.cur_frameless` is load-bearing: `fp_active` is TRUE for a frameless
+   `!L.cur_frameless` is required because `fp_active` is TRUE for a frameless
    function (it keeps fp-mode residency) and there is NO IX frame there, so an
    `(ix+d)` address would be taken off the caller's frame pointer. The vote
    through ds_ixaccess is deliberate and mirrors slot_ix_off — emitting an
@@ -6004,9 +5992,8 @@ static void rec_end(const Func *f)
         free(readb_chan);
         free(covered); free(live);
     }
-    /* [#13, INERT] frameless-via-sp cost model. A function that emitted the IX
-       apparatus (frame_has_saved_fp) but made ZERO (ix+-d) data accesses
-       (ds_ixaccess==0) wastes the whole ~11B apparatus — its frame is serviced
+    /* [#13, INERT] frameless-via-sp cost model. A function that saves IX but
+       makes no (ix+-d) data accesses wastes the ~11B save — its frame uses
        sp-relative (sp-parking / add hl,sp), so a genuine-sp flip is ~zero-cost.
        With ds_ixaccess>0 the flip costs ~+2B per access (sp vs ix), so flip iff
        2*N < save. Reports only; no codegen change. */
@@ -6268,6 +6255,7 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_CONV_ZX:           return gen_conv_zx(out, f, op);
     case IR_CONV_SX:           return gen_conv_sx(out, f, op);
     case IR_CONV_TRUNC:        return gen_conv_trunc(out, f, op);
+    case IR_CONV_TRUNC_HI:     return gen_conv_trunc(out, f, op);
     case IR_CONV_BYTE_TO_HIGH: return gen_conv_byte_to_high(out, f, op);
     case IR_SHL:               return gen_shl(out, f, op);
     case IR_SHR:               return gen_shr(out, f, op);
@@ -7770,17 +7758,8 @@ int ir_lower_func(FILE *out, Func *f)
                     int d = o->dst;
                     if (d < 0 || d >= f->n_vregs || ndef[d] != 1) continue;
                     if (f->vregs[d].width != 2) continue;
-                    /* ►► A PARAMETER'S INCOMING VALUE IS AN INVISIBLE DEF.
-                       ndef counts the defs in THIS function; the caller's value
-                       arrives without one. So a parameter assigned once, under a
-                       condition, looks single-def-constant and is not:
-
-                           int floor0(int v) { if (v < 0) v = 0; return v + 1; }
-
-                       remat took the `LD_IMM 0` as v's defining value and every
-                       read became `ld hl,0` — the parameter was never loaded, and
-                       floor0(5) returned 1. A SILENT wrong answer in an extremely
-                       ordinary idiom, on every CPU and both frame modes.
+                    /* A parameter's incoming value is not counted by ndef. A
+                       conditional assignment must not make it rematerialisable.
                        See test/suites/long_ir/parremat.c. */
                     if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
                                              | IR_VREG_PARAM))
@@ -7794,7 +7773,7 @@ int ir_lower_func(FILE *out, Func *f)
                     /* [remat-lea] Recompute `&local` at each use
                        (emit_remat_word) instead of spilling and reloading it —
                        the slot offset is fixed per function and cur_sp_adjust
-                       is tracked. Two exclusions, both load-bearing:
+                       is tracked. Two exclusions are required:
                        a PR_STACK tenant (its value is parked with push/pop, so
                        dropping the slot orphans half the pair and shifts every
                        later sp-relative offset — irgaps miscompiled), and ez80
@@ -8281,7 +8260,7 @@ int ir_lower_func(FILE *out, Func *f)
     if (deadframe_on() && !df_retry_done && rc == 0
         && L.frame_fully_dead && f->frame_size > 0 && rout != out) {
         df_retry_done = 1;
-        /* Clear EVERY slot, not just the PR_SPILL ones. A vreg with a RANGED
+        /* Clear every slot. A vreg with a RANGED
            register home (home_lo/home_hi narrower than the whole function)
            also owns a frame slot — that is where it lives outside its range —
            yet its vreg_to_phys is the REGISTER, not PR_SPILL. Restricting the
@@ -8411,11 +8390,8 @@ int ir_lower_func_flip(FILE *out, Func *f)
         return ir_lower_func(out, f);
     }
     int rc = ir_lower_func(fpbuf, f);
-    /* ►► Exclude uses_acc (float/longlong): fp_active is already false for them
-       (they address sp-relative) and they save IX because the acc/float HELPERS
-       clobber it — flipping drops that push ix, so the helper trashes the fp
-       caller's frame pointer → hang. Their IX save isn't a vreg home (idx2), so
-       frame_has_saved_ix can't catch it; exclude outright. */
+    /* Exclude uses_acc functions. Their helpers can clobber IX, and their save
+       is not represented as a vreg home. */
     /* Also exclude the register-arg entry conventions (mirror frameless_ok):
        fastcall (arg in HL/DEHL) and __sdcccall(1) have special prologues that
        juggle the register arg assuming the fp frame — flipping mishandles it. */
@@ -8429,20 +8405,13 @@ int ir_lower_func_flip(FILE *out, Func *f)
         spc->idx2_reg = ir_idx2_reg();     /* sp idx2=IX/idx3=IY: keep the opt */
         spc->idx3_reg = ir_idx3_reg();
         spc->exx_reg  = ir_exx_reg();
-        spc->flipped_from_fp = 1;          /* ►► save IX/IY it uses (fp callers need
-                                              them callee-saved) — see emit_prologue */
+        spc->flipped_from_fp = 1;          /* save IX/IY used by the SP version */
         FILE *spbuf = tmpfile();
         int rc2 = spbuf ? ir_lower_func(spbuf, spc) : -1;
         c_framepointer_is_ix = save;
         ir_free_cloned_func(spc);
-        /* ►► ABI safety net (general): if the sp output TOUCHES IX/IY as a
-           register (`\tix`/`,ix`/`(ix`) WITHOUT a matching `push ix` save, the
-           flipped fn would clobber the fp caller's callee-saved IX/IY — e.g. an
-           fnptr call via l_jpix emits `pop ix; call l_jpix` (unsaved). An idx2=IX
-           home IS saved (frame_has_saved_ix → push ix) so it passes. A
-           uses_acc callee clobbers IX INVISIBLY (inside the helper) — hence the
-           separate uses_acc exclusion above; this scan only sees the fn's own
-           text. On reject, emit the fp buffer (no flip). */
+        /* If the SP output uses IX/IY without saving them, the flip is unsafe.
+           An index home is saved by the normal prologue. */
         int ok = (rc2 == 0);
         if (ok && spbuf) {
             int uix = 0, uiy = 0, six = 0, siy = 0; char ln[1024]; rewind(spbuf);

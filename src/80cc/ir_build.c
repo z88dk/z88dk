@@ -2355,34 +2355,58 @@ static int agg_lvalue_addr(Builder *b, Node *node)
    word — a wider store would clobber the neighbour / overrun the struct).
    Returns `v` (the assigned value) or -1 on a deferred lvalue shape. Shared
    by plain `bf = x` (OP_ASSIGN) and `bf op= x` (compound). */
+/* Address of a bitfield's storage unit, shared by the store (lvalue) and
+   load (rvalue) paths. AST_GLOBAL_VAR/AST_LOCAL_VAR name the unit directly
+   (a struct/local whose address we need, not its value — LD_SYM / LEA);
+   OP_ADD/OP_SUB/OP_DEREF are already address-VALUED expressions (a folded
+   `base + byte_offset`, or a pointer being dereferenced) and build as any
+   other expression. Returns a width-2 vreg, or -1 (build_fail already
+   called) on an unrecognised shape. */
+static int build_bitfield_unit_addr(Builder *b, Node *lv, const char *what)
+{
+    if (lv->ast_type == AST_GLOBAL_VAR && lv->sym
+        && !sym_is_faracc(lv->sym) && !sym_is_namespaced(lv->sym)) {
+        int addr = new_temp(b, 2); b->f->vregs[addr].width = 2;
+        Op *op = ir_op_emit(cur_bb(b), IR_LD_SYM);
+        op->dst = addr; op->mem.kind = IR_MEM_SYM; op->mem.sym = lv->sym;
+        return addr;
+    }
+    if (lv->ast_type == AST_LOCAL_VAR && lv->sym) {
+        int src = sym_map_get(b, lv->sym);
+        if (src < 0) return build_fail("bitfield %s unknown local", what);
+        b->f->vregs[src].flags |= IR_VREG_ADDR_TAKEN;
+        int addr = new_temp(b, 2); b->f->vregs[addr].width = 2;
+        Op *op = ir_op_emit(cur_bb(b), IR_LEA);
+        op->dst = addr; op->src[0] = src;
+        return addr;
+    }
+    if (lv->ast_type == OP_ADD || lv->ast_type == OP_SUB
+        || lv->ast_type == OP_DEREF) {
+        return build_expr(b, lv);
+    }
+    return build_fail("bitfield %s lvalue shape deferred", what);
+}
+
 static int emit_bitfield_store(Builder *b, Node *lv, Type *bft,
                                int v, int unsigned_rhs)
 {
     int bsize = bft->bit_size, boff = bft->bit_offset;
     int64_t mask = ((int64_t)1 << bsize) - 1;
-    int64_t fieldmask = mask << boff;
-    int unit_w = (boff + bsize <= 8) ? 1 : 2;
+    /* Which byte(s) of the storage unit the field actually touches. A field
+       sharing a unit with an earlier one (boff > 0, e.g. a 1-bit flag packed
+       after a 12-bit field in the same 2-byte unit) can land entirely inside
+       the SECOND byte — the old `boff + bsize <= 8` test only recognised
+       byte 0, so a field like that still took the full 2-byte RMW path below
+       despite never touching the first byte. byte_off is the byte to address
+       (addr + byte_off); loff is the bit position WITHIN that byte. */
+    int byte_off  = boff / 8;
+    int byte_last = (boff + bsize - 1) / 8;
+    int loff      = boff - byte_off * 8;
+    int unit_w = (byte_off == byte_last) ? 1 : 2;
+    int64_t fieldmask = mask << loff;
     Kind unit_k = (unit_w == 1) ? KIND_CHAR : KIND_INT;
-    int addr;
-    if (lv->ast_type == AST_GLOBAL_VAR && lv->sym
-        && !sym_is_faracc(lv->sym) && !sym_is_namespaced(lv->sym)) {
-        addr = new_temp(b, 2); b->f->vregs[addr].width = 2;
-        Op *op = ir_op_emit(cur_bb(b), IR_LD_SYM);
-        op->dst = addr; op->mem.kind = IR_MEM_SYM; op->mem.sym = lv->sym;
-    } else if (lv->ast_type == AST_LOCAL_VAR && lv->sym) {
-        int src = sym_map_get(b, lv->sym);
-        if (src < 0) return build_fail("bitfield store unknown local");
-        b->f->vregs[src].flags |= IR_VREG_ADDR_TAKEN;
-        addr = new_temp(b, 2); b->f->vregs[addr].width = 2;
-        Op *op = ir_op_emit(cur_bb(b), IR_LEA);
-        op->dst = addr; op->src[0] = src;
-    } else if (lv->ast_type == OP_ADD || lv->ast_type == OP_SUB
-            || lv->ast_type == OP_DEREF) {
-        addr = build_expr(b, lv);
-        if (addr < 0) return -1;
-    } else {
-        return build_fail("bitfield store lvalue shape deferred");
-    }
+    int addr = build_bitfield_unit_addr(b, lv, "store");
+    if (addr < 0) return -1;
     if (b->f->vregs[v].width != 2) {
         int t = new_temp(b, 2); b->f->vregs[t].width = 2;
         OpKind cv = (b->f->vregs[v].width > 2) ? IR_CONV_TRUNC
@@ -2394,16 +2418,63 @@ static int emit_bitfield_store(Builder *b, Node *lv, Type *bft,
     int vm = new_temp(b, unit_w); b->f->vregs[vm].width = (int16_t)unit_w;
     Op *a1 = ir_op_emit(cur_bb(b), IR_AND);
     a1->dst = vm; a1->src[0] = v; a1->src[1] = -1; a1->imm = mask;
+    /* A field the packer forced into a genuinely 2-byte-wide unit (never
+       split mid-byte by align_struct — a field that doesn't fit in the
+       remaining bits of the current byte always starts a fresh unit, so
+       loff==0 whenever it spans two bytes) owns its low byte COMPLETELY:
+       masking v to bsize (>=9) bits never touches bits 0-7. That byte is
+       therefore an unconditional overwrite — no load, no mask, no merge —
+       and only the second byte (which may itself be a full overwrite too,
+       when bsize==16) needs an RMW. Matches sdcc's codegen for the same
+       shape; the general path below stays for every other case. */
+    if (unit_w == 2 && loff == 0) {
+        int lo = new_temp(b, 1); b->f->vregs[lo].width = 1;
+        Op *tl = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+        tl->dst = lo; tl->src[0] = vm;
+        Op *stlo = ir_op_emit(cur_bb(b), IR_ST_MEM);
+        stlo->src[0] = lo; stlo->mem.kind = IR_MEM_VREG;
+        stlo->mem.base = addr; stlo->mem.offset = byte_off; stlo->mem.elem = KIND_CHAR;
+
+        int hi = new_temp(b, 2); b->f->vregs[hi].width = 2;
+        { Op *sr = ir_emit_binop(cur_bb(b), IR_SHR, hi, vm, -1); sr->imm = 8; }
+        int hib = new_temp(b, 1); b->f->vregs[hib].width = 1;
+        Op *th = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+        th->dst = hib; th->src[0] = hi;
+
+        int himask = (int)((mask >> 8) & 0xFF);
+        if (himask == 0xFF) {
+            /* bsize == 16: the field owns the whole unit; byte 1 is also
+               a plain overwrite. */
+            Op *sthi = ir_op_emit(cur_bb(b), IR_ST_MEM);
+            sthi->src[0] = hib; sthi->mem.kind = IR_MEM_VREG;
+            sthi->mem.base = addr; sthi->mem.offset = byte_off + 1; sthi->mem.elem = KIND_CHAR;
+        } else {
+            int contb = new_temp(b, 1); b->f->vregs[contb].width = 1;
+            Op *ldb = ir_op_emit(cur_bb(b), IR_LD_MEM);
+            ldb->dst = contb; ldb->mem.kind = IR_MEM_VREG;
+            ldb->mem.base = addr; ldb->mem.offset = byte_off + 1; ldb->mem.elem = KIND_CHAR;
+            int clrb = new_temp(b, 1); b->f->vregs[clrb].width = 1;
+            Op *anb = ir_op_emit(cur_bb(b), IR_AND);
+            anb->dst = clrb; anb->src[0] = contb; anb->src[1] = -1;
+            anb->imm = (~himask) & 0xFF;
+            int newb = new_temp(b, 1); b->f->vregs[newb].width = 1;
+            ir_emit_binop(cur_bb(b), IR_OR, newb, clrb, hib);
+            Op *stb = ir_op_emit(cur_bb(b), IR_ST_MEM);
+            stb->src[0] = newb; stb->mem.kind = IR_MEM_VREG;
+            stb->mem.base = addr; stb->mem.offset = byte_off + 1; stb->mem.elem = KIND_CHAR;
+        }
+        return v;
+    }
     int vms = vm;
-    if (boff > 0) {
+    if (loff > 0) {
         vms = new_temp(b, unit_w); b->f->vregs[vms].width = (int16_t)unit_w;
         Op *sl = ir_op_emit(cur_bb(b), IR_SHL);
-        sl->dst = vms; sl->src[0] = vm; sl->src[1] = -1; sl->imm = boff;
+        sl->dst = vms; sl->src[0] = vm; sl->src[1] = -1; sl->imm = loff;
     }
     int cont = new_temp(b, unit_w); b->f->vregs[cont].width = (int16_t)unit_w;
     Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
     ld->dst = cont; ld->mem.kind = IR_MEM_VREG;
-    ld->mem.base = addr; ld->mem.elem = unit_k;
+    ld->mem.base = addr; ld->mem.offset = byte_off; ld->mem.elem = unit_k;
     int cleared = new_temp(b, unit_w); b->f->vregs[cleared].width = (int16_t)unit_w;
     Op *a2 = ir_op_emit(cur_bb(b), IR_AND);
     a2->dst = cleared; a2->src[0] = cont; a2->src[1] = -1;
@@ -2412,7 +2483,7 @@ static int emit_bitfield_store(Builder *b, Node *lv, Type *bft,
     ir_emit_binop(cur_bb(b), IR_OR, newv, cleared, vms);
     Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
     st->src[0] = newv; st->mem.kind = IR_MEM_VREG;
-    st->mem.base = addr; st->mem.elem = unit_k;
+    st->mem.base = addr; st->mem.offset = byte_off; st->mem.elem = unit_k;
     return v;
 }
 
@@ -3449,15 +3520,37 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         if (n->type && n->type->bit_size > 0) {
             int bsize = n->type->bit_size;
             int boff  = n->type->bit_offset;
-            n->type->bit_size = 0;          /* load the plain storage unit */
-            int cont = build_expr(b, n);
-            n->type->bit_size = (int16_t)bsize;
-            if (cont < 0) return -1;
-            int val = cont;
-            if (boff > 0) {
+            /* Same byte_off/loff narrowing as emit_bitfield_store: a field
+               that fits in one byte of its storage unit (not necessarily
+               byte 0 — e.g. a 1-bit flag packed after a wider field in the
+               same unit) only needs that byte read, not the full declared-
+               width (always >=2 bytes) "plain storage unit" load below. */
+            int byte_off  = boff / 8;
+            int byte_last = (boff + bsize - 1) / 8;
+            int loff      = boff - byte_off * 8;
+            int val;
+            if (byte_off == byte_last && n->operand) {
+                int addr = build_bitfield_unit_addr(b, n->operand, "load");
+                if (addr < 0) return -1;
+                int by = new_temp(b, 1); b->f->vregs[by].width = 1;
+                Op *ldb = ir_op_emit(cur_bb(b), IR_LD_MEM);
+                ldb->dst = by; ldb->mem.kind = IR_MEM_VREG;
+                ldb->mem.base = addr; ldb->mem.offset = byte_off; ldb->mem.elem = KIND_CHAR;
+                int w = new_temp(b, 2); b->f->vregs[w].width = 2;
+                Op *zx = ir_op_emit(cur_bb(b), IR_CONV_ZX);
+                zx->dst = w; zx->src[0] = by;
+                val = w;
+            } else {
+                n->type->bit_size = 0;          /* load the plain storage unit */
+                int cont = build_expr(b, n);
+                n->type->bit_size = (int16_t)bsize;
+                if (cont < 0) return -1;
+                val = cont;
+            }
+            if (loff > 0) {
                 int t = new_temp(b, 2); b->f->vregs[t].width = 2;
                 Op *sh = ir_op_emit(cur_bb(b), IR_SHR);
-                sh->dst = t; sh->src[0] = val; sh->src[1] = -1; sh->imm = boff;
+                sh->dst = t; sh->src[0] = val; sh->src[1] = -1; sh->imm = loff;
                 val = t;
             }
             int m = new_temp(b, 2); b->f->vregs[m].width = 2;
@@ -3878,7 +3971,6 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
     }
 
     case OP_COMP: {
-        /* ~x — bitwise complement. */
         if (!n->operand) return build_fail("OP_COMP with no operand");
         int v = build_expr(b, n->operand);
         if (v < 0) return -1;
@@ -6267,7 +6359,6 @@ static int build_cast(Builder *b, Node *n)
         return dst;
     }
     if (src_w == 2 && dst_w == 4) {
-        /* Int → long widening. */
         int unsigned_src = n->operand->type &&
                            n->operand->type->isunsigned;
         int dst = new_temp_kind(b, KIND_LONG);
@@ -7641,7 +7732,6 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
     f->acc_push     = acc_name("push");
     f->acc_loadpush = acc_name("loadpush");
 
-    /* Entry BB. */
     int entry = ir_bb_new(f);
     Builder b;
     builder_init(&b, f);

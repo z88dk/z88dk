@@ -11,7 +11,7 @@ was not on the list of qualifying uses, and it should be: a byte argument is a
 the load at the push site costs the same 3 bytes as the slot reload it replaces,
 and additionally drops the def's spill store and its slot.
 
-The witness is `emu.c`'s `effective_string` family:
+The test case is `emu.c`'s `effective_string` family:
 `return effective_ext(ptr, string_base_page, string_num_pages)` spilled both
 globals to the frame purely to read them straight back one op later.
 

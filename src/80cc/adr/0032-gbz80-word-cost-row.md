@@ -35,7 +35,7 @@ Swept over all sixteen combinations on the gbz80 corpus, both frame modes:
 | **3 (SLOT+BC)** | **72,204 B** — identical to mask 15 |
 
 The DE and IX/IY rows change nothing in any combination, so the mask stops at 3
-rather than 15 to say exactly which rows are load-bearing.
+rather than 15 to identify the rows that affect the result.
 
 ## Why it was held back, and what the delay actually taught
 
@@ -53,7 +53,7 @@ Once `[home-rearb]` completed that recovery by re-running allocation with the
 unrealisable value vetoed, the benchmark went neutral and mask 3 became **−92 B
 against mask 1, with 8 tick cells faster and none slower.**
 
-So the lesson is diagnostic: **a regression that appears when you correct a cost
+The diagnostic result is this: **a regression that appears when you correct a cost
 number is not automatically a ranking problem.** Here it was a register going
 unused after a failed home — which looks identical from the outside (a truer
 cost, a worse result) and needs a completely different fix. Check that a

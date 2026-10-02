@@ -46,8 +46,8 @@ there is nothing to trade.
 
 ## Why it fails, which is the part worth keeping
 
-The diagnosis is not what failed. The weight really is wrong by 10x to 100x, in
-one direction, and that finding stands.
+The weight really is wrong by 10x to 100x in one direction. That finding stands,
+but correcting it does not improve the result.
 
 What fails is the assumption that a more accurate input makes a better decision.
 The tell is `hashbench`: it is among the **worst** regressions on one CPU and
@@ -74,10 +74,10 @@ to hurt as help.
 
 ## Reopening
 
-Not on its own. Reopen it **after** the opportunity-cost term lands, and then
-only as a re-measurement — the implementation here is sound and needs no
-redesign. If the resolver can compare claims and this weight still does not pay,
-the diagnosis itself is wrong, which would be worth knowing.
+Reopen it **after** the opportunity-cost term lands, and then only as a
+re-measurement. The implementation here is sound and needs no redesign. If the
+resolver can compare claims and this weight still does not pay, the diagnosis
+itself is wrong, which would be worth knowing.
 
 The gate, its default-constant knob and the probe that measured the original
 error are all removed; their numbers are recorded above.

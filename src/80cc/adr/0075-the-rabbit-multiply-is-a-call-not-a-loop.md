@@ -145,7 +145,7 @@ sdcc. **Left alone**: gating it there costs a byte on `callbench`, where the
 `pop bc` is genuine argument cleanup with BC dead, and no 80cc kc160 shape
 needs it. Known latent hazard, recorded rather than paid for.
 
-**The lesson is one the index already carried and it still cost an hour**: the
+**The result matches the existing index rule, but it still cost an hour**: the
 compiler's own asm was correct at every stage. Only `zcc -a` — which has been
 through copt — showed the `pop bc` gone. Diff `z88dk-80cc` direct output against
 `zcc -a` before opening a backend pass.

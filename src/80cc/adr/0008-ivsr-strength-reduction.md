@@ -43,6 +43,6 @@ envelope so it only fires where the stepped pointer can actually live in BC.
   address recompute; residency then keeps the pointer and the accumulator in
   registers. A register-starved loop (pointer + index + accumulator) still needs
   the residency work to place the survivors.
-- The suppress heuristic and the BC-reachability bail are load-bearing: without
+- The suppress heuristic and the BC-reachability bail are required. Without
   them IVSR can create a second loop-carried value that spills and costs more
   than it saves.

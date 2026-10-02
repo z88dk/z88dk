@@ -531,6 +531,26 @@ ivsr_lftr_fp.bin: $(SOURCES) ivsr_lftr.c
 	$(call compile,-Cc-fframe-pointer)
 	$(runtest)
 
+ivsr_lftr_ez80.bin: $(SOURCES) ivsr_lftr.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+ivsr_lftr_ez80_fp.bin: $(SOURCES) ivsr_lftr.c
+	$(call compile_ez80_z80,-Cc-fframe-pointer)
+	$(runtest_ez80_z80)
+
+ivsr_lftr_kc160.bin: $(SOURCES) ivsr_lftr.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+ivsr_lftr_kc160_fp.bin: $(SOURCES) ivsr_lftr.c
+	$(call compile_kc160,-Cc-fframe-pointer)
+	$(runtest_kc160)
+
+ivsr_lftr_r4k.bin: $(SOURCES) ivsr_lftr.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
 # add hl,bc / sbc hl,bc with a BC-resident operand — z80 sp+fp plus 8080/gbz80
 # (which emulate sbc hl,de, so exercise the byte-wise C/B subtract path).
 binop_bc.bin: $(SOURCES) binop_bc.c
@@ -2232,6 +2252,14 @@ delive_8080.bin: $(SOURCES) delive.c
 # and overlapping views that must retain their memory representation.
 all: aggpromote.bin aggpromote_fp.bin aggpromote_8080.bin aggpromote_gbz80.bin
 
+# idx2 live-range reuse: a non-overlapping param/counter pair sharing the
+# slot, and an overlapping pair that must NOT share it.
+all: idx2reuse.bin idx2reuse_fp.bin idx2reuse_keep.bin idx2reuse_fp_keep.bin idx2reuse_ez80.bin idx2reuse_ez80_fp.bin idx2reuse_ez80_fp_keep.bin idx2reuse_8080.bin idx2reuse_gbz80.bin
+
+# IVSR induction pointer in idx2 (IX/IY): ez80/kc160/rabbit only, where
+# ivsr_lftr's walking pointer now also homes in the index register.
+all: ivsr_lftr_ez80.bin ivsr_lftr_ez80_fp.bin ivsr_lftr_kc160.bin ivsr_lftr_kc160_fp.bin ivsr_lftr_r4k.bin
+
 aggpromote.bin: $(SOURCES) aggpromote.c
 	$(compile)
 	$(runtest)
@@ -2245,5 +2273,41 @@ aggpromote_8080.bin: $(SOURCES) aggpromote.c
 	$(runtest_8080)
 
 aggpromote_gbz80.bin: $(SOURCES) aggpromote.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+idx2reuse.bin: $(SOURCES) idx2reuse.c
+	$(compile)
+	$(runtest)
+
+idx2reuse_fp.bin: $(SOURCES) idx2reuse.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+idx2reuse_keep.bin: $(SOURCES) idx2reuse.c
+	$(call compile,-Cc--opt-disable=idx2-reuse)
+	$(runtest)
+
+idx2reuse_fp_keep.bin: $(SOURCES) idx2reuse.c
+	$(call compile,-Cc-fframe-pointer -Cc--opt-disable=idx2-reuse)
+	$(runtest)
+
+idx2reuse_ez80.bin: $(SOURCES) idx2reuse.c
+	$(call compile_ez80_z80,)
+	$(runtest_ez80_z80)
+
+idx2reuse_ez80_fp.bin: $(SOURCES) idx2reuse.c
+	$(call compile_ez80_z80,-Cc-fframe-pointer)
+	$(runtest_ez80_z80)
+
+idx2reuse_ez80_fp_keep.bin: $(SOURCES) idx2reuse.c
+	$(call compile_ez80_z80,-Cc-fframe-pointer -Cc--opt-disable=idx2-reuse)
+	$(runtest_ez80_z80)
+
+idx2reuse_8080.bin: $(SOURCES) idx2reuse.c
+	$(compile_8080)
+	$(runtest_8080)
+
+idx2reuse_gbz80.bin: $(SOURCES) idx2reuse.c
 	$(compile_gbz80)
 	$(runtest_gbz80)

@@ -17,9 +17,8 @@ already-placed. The yield has then bought nothing: the index register is sitting
 After placement, if the deferred parameter is still unplaced and the index
 register is still genuinely free, give it the register.
 
-Both conditions are load-bearing: the yield is preserved whenever the counter
-**did** collect the index, and the revisit only fires in the case where the
-yield was wasted.
+Both conditions are required. The yield is preserved whenever the counter
+**did** collect the index, and the revisit only fires when the yield was wasted.
 
 ## Evidence
 

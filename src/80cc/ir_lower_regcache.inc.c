@@ -996,9 +996,13 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
         cache_de(vreg_id);
         return;
     }
-    if (L.rs.de == vreg_id && vreg_id >= 0) return;
+    if (L.rs.de == vreg_id && vreg_id >= 0) {
+        ss_note_cache_read(f, vreg_id);
+        return;
+    }
     /* PR_BC hit: BC→DE doesn't touch HL, so the push/pop is pointless. */
     if (bc_has(vreg_id) && f->vregs[vreg_id].width == 2) {
+        ss_note_cache_read(f, vreg_id);
         emit(out, "ld\te,c");
         emit(out, "ld\td,b");
         cache_de(vreg_id);
@@ -2242,8 +2246,8 @@ static void cache_dehl_no_spill(FILE *out, int vreg_id)
 {
     note_wide_noslot(vreg_id);
     /* Arrived straight off a fused byte chain: BC already holds the low half and
-       HL holds junk, so the stash is not merely wasted but would read the wrong
-       register. Publish the DEHL cache without it and leave HL unclaimed — a
+       HL holds junk. Do not emit the stash. It would read the wrong register.
+       Publish the DEHL cache without it and leave HL unclaimed — a
        later reader recovers the low half itself via load_to_dehl's lazy
        `ld hl,bc`. */
     if (L.la.cur_dehl_bc_is_low) {
@@ -2316,18 +2320,9 @@ static void store_dehl_finalize(FILE *out, const Func *f, int vreg_id)
 /* Fill an index home (idx2/idx3) with the WORD AT (HL), for the param
    prologue: HL already holds the caller-slot address.
 
-   ►► ez80 has `ld <idx>,(hl)` as ONE 2-byte instruction. Everywhere else the
-   pair has to come through HL and then the stack — `ld a,(hl+); ld h,(hl);
-   ld l,a; push hl; pop iy` — so the whole fill is 5 instructions against 1.
-
-   This is the missing SETUP cost the allocator never prices: it charges for
-   ACCESSES and nothing for filling a home, which is why an index home looked
-   free on ez80 fp where filling BC is the native `ld bc,(ix+d)`. Making the
-   fill cheap is better than pricing it.
-
-   ►► z80asm ACCEPTS `ld iy,(hl)` on EVERY cpu and silently expands it to 9
-   bytes where the hardware lacks it, so this MUST stay gated on IS_EZ80().
-   A missing gate would assemble clean and be a large size regression.
+   ez80 has `ld <idx>,(hl)` as one 2-byte instruction. Other CPUs need a
+   longer sequence. Keep this path gated on IS_EZ80(), because z80asm accepts
+   the synthetic spelling on CPUs that lack the instruction.
    Returns 1 if it emitted the whole fill; 0 means the caller does it the
    long way. */
 static void emit_idx_word_to_reg(FILE *out, const Func *f, int vreg_id,
@@ -2344,9 +2339,8 @@ static int emit_idx_word_from_hl_ptr(FILE *out, const Func *f, int vreg_id)
    `ld hl,off; add hl,sp; ld iy,(hl)` — and on ez80 forming an sp-relative
    address is the DEAR part (its fp slot is 2 cycles against 8 for sp).
 
-   ►► Same footgun as above, and worse: z80asm assembles `ld iy,(ix+d)` on
-   EVERY cpu and expands it to 12-14 bytes on z80/z180/rabbit. Gate on the two
-   CPUs that really have it. Returns 1 if it emitted the fill. */
+   z80asm also accepts this synthetic spelling on CPUs that lack it. Gate the
+   fast path on the CPUs with native support. */
 /* The sp-relative mirror: `ld iy,(sp+n)`. kc160 ONLY — ez80 has the (ix+d)
    and (hl) forms but NOT this one (z80asm rejects `ld iy,(sp+6)` for ez80),
    which is why the two helpers are separate rather than one CPU test.
@@ -2383,12 +2377,7 @@ static int emit_idx_word_from_frame(FILE *out, const Func *f, int vreg_id,
     /* Everywhere else, go through HL. `ld iy,(ix+d)` would ASSEMBLE here too —
        z80asm synthesises it — but at 12 bytes against the 9 this costs, so the
        pair is the destination and the index takes it from HL.
-       ►► The point is not only the 2 bytes this saves over the sp-relative
-       `ld hl,off; add hl,sp; ld a,(hl); inc hl; ld h,(hl); ld l,a`. It is that
-       `ld hl,(ix+d)` is the text the copt layer already knows: lib/80cc_rules.1
-       carries 24 rules keyed on `ld hl,(i[xy]+d)`, and the sp-relative sequence
-       matches none of them. Writing the frame access the way the rest of the
-       backend writes it puts this path inside the existing peepholes. */
+       This form also matches the existing copt rules for `ld hl,(ix+d)`. */
     emit(out, "ld\thl,(%s%+d)", frame_reg(), disp);
     emit_hl_to_idx_word(out, f, vreg_id);
     invalidate_hl_cache();

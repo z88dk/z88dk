@@ -246,7 +246,21 @@ typedef enum {
     /* conversions (paper-trace finding #3) */
     IR_CONV_ZX,         /* zero-extend smaller→larger */
     IR_CONV_SX,         /* sign-extend */
-    IR_CONV_TRUNC,      /* truncate larger→smaller */
+    IR_CONV_TRUNC,      /* truncate larger→smaller: takes the LOW byte/word */
+    IR_CONV_TRUNC_HI,   /* width-2 src -> width-1 dst ONLY: takes the byte at
+                           src+1 (the HIGH byte), not src+0. A distinct kind
+                           rather than a flag on IR_CONV_TRUNC deliberately —
+                           several passes (ir_opt_cse's op_has_imm_identity,
+                           the imm-const-fold at ir_opt.c ~4216, and possibly
+                           others) assume a plain TRUNC's identity/value does
+                           not depend on imm, which was true until the
+                           shr8trunc ir_match fusion (ir_match.c) started
+                           setting it. A same-kind overload would need every
+                           such site individually audited and fixed to stay
+                           correct (CSE already miscompiled this once); an
+                           unrecognised NEW kind just isn't special-cased by
+                           any of them, which is safe by construction — it
+                           only loses their optimisation, never correctness. */
     IR_CONV_BYTE_TO_HIGH, /* combined widen+shift: dst = (src<<8) */
 
     /* rotates with immediate count (finding #5) */

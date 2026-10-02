@@ -28,7 +28,7 @@ HL→DE staging copy being spelled as two page-prefixed 8-bit moves on Rabbit,
 fixed in `1b43c3a4c7` (see `emit_hl_to_de`). Worth remembering that a matrix can
 attribute a regression to whatever is being tested at the time.
 
-## The trap
+## The incorrect rule
 
 "Reads a slot it never wrote" is **not** `rec_slotwrite == 0`. A multi-def reader
 can have one def that stores and another that rides a register. The first version

@@ -25,7 +25,7 @@ residency test is therefore not a sound gate.
 
 The existing A/B evidence remains the decision boundary:
 
-| witness | effect of the swap |
+| test case | effect of the swap |
 |---|---|
 | `md5` | −6% ticks |
 | `binary-trees` | +0.39% ticks and +28 bytes |

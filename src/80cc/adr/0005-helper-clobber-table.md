@@ -39,7 +39,7 @@ is index- and alt-clean.
 - `IR_VERIFY` (ADR 0004) verifies the *call site* (`call l_x` touches no index
   reg), but **cannot** see inside the helper body — so the whitelist's safety
   rests on the manual asm audit, not the verifier. Grow it carefully.
-- This is the seam for the full `__preserve_regs` feature: the header attribute,
-  once consumed, would populate the same `CallInfo.clobbers`/`HelperInfo.clobbers`
-  masks for C-prototype library functions (Track A), reusing this exact
-  mechanism.
+- This provides the base for the full `__preserve_regs` feature: once consumed,
+  the header attribute could populate the same
+  `CallInfo.clobbers`/`HelperInfo.clobbers` masks for C-prototype library
+  functions (Track A).

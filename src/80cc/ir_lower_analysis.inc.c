@@ -229,13 +229,19 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
                  && g_hc.remat_def[op->src[1]])
             cst = op->src[1];
         if (cst >= 0) {
+            /* The other operand is being served straight out of HL with no
+               slot read — same as any other cache hit, this must be recorded
+               or the dead-store pass conservatively assumes a reload and
+               keeps an unneeded spill/park alive for it (missed in both
+               branches below: neither used to call this). */
+            int other = (cst == op->src[0]) ? op->src[1] : op->src[0];
+            ss_note_cache_read(f, other);
             /* A frame-address remat recomputes through HL, so it cannot be sent
                to DE while HL still holds the other operand — doing so left both
                registers holding the address (`&loc[i]` became `&loc + &loc`).
                The op is commutative, so swap the roles instead: park the HL
                operand in DE and rematerialise into HL. */
             if (remat_word_clobbers_hl(f, cst)) {
-                int other = (cst == op->src[0]) ? op->src[1] : op->src[0];
                 emit_ex_de_hl(out);
                 swap_hl_de_caches();
                 hl_about_to_change(cst);
@@ -1332,10 +1338,10 @@ static void emit_skip(FILE *out, const Func *f, const char *cc, int skip_bytes)
    and `xor a` destroys them, while `ld` leaves them alone. Both increments are
    one byte, so the skip distance is the same either way.
 
-   The byte form leaves HL ALONE, and that is the trap: the callers reach here
+   The byte form leaves HL unchanged. The callers reach here
    after arithmetic that destroyed HL (`sbc hl,de`, the sign-flip's `ld h,a`),
    and every one of them relied on the `ld hl,0` above to make the belief
-   false. So drop the HL belief here — the word path destroys HL anyway, so
+   with HL already destroyed. Drop the HL belief here — the word path destroys HL anyway, so
    this is never weaker than what it replaces. Without it a compare of the same
    operand pair straight after another one reads HL as if it still held the
    left operand, and silently compares the previous result instead. */
@@ -1389,4 +1395,3 @@ static int signed_cmp_signflip(FILE *out, const Func *f, int is_signed)
     invalidate_de_cache();
     return 1;
 }
-

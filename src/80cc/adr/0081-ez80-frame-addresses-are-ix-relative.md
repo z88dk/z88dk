@@ -29,7 +29,7 @@ One helper, `emit_frame_addr_hl(f, canon_off)`, carrying the lea-or-sp choice,
 with the hand-rolled sites routed through it. `canon_off` is the `slot_off`
 basis *without* `cur_sp_adjust`, which the helper adds for the sp form only.
 
-`!L.cur_frameless` is load-bearing: `fp_active` returns **true** for a
+`!L.cur_frameless` is required because `fp_active` returns **true** for a
 frameless function, because frameless keeps fp-mode residency and only loses
 the IX frame. An `(ix+d)` address there would be taken off the caller's frame
 pointer. The helper also votes in `ds_ixaccess`, mirroring `slot_ix_off` —

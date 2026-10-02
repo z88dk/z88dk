@@ -4,435 +4,175 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 2026-09-29. Keep it short: when a section stops describing what is
-live, it belongs in `adr/` or in git history, not here.
+Last swept: 1/10/2026. Keep it short: a list of items to tackle next, not a
+narrative — when a section stops describing what is live, it belongs in
+`adr/` or in git history, not here.
 
 ## Next action
 
-**START HERE: byte-scratch packing.** The remaining concrete density lead is
-the short-lived byte value that spills to a frame slot while B or D might be
-available. First add the verifier described in the task below: report B
-availability against BC tenants and D availability against DE clobbers, then
-size the lanes separately. Only a positive, pressure-aware result earns an
-opt-in prototype and the full gauntlet. Copt-engine embedding remains larger
-background work, not the next density experiment.
+**START HERE: byte-scratch packing.** Short-lived byte values spill to a
+frame slot while B or D might be available. Add the verifier first (B
+availability against BC tenants, D availability against DE clobbers), size
+the two lanes separately, and only promote to a gated prototype + full
+gauntlet on a positive, pressure-aware result. `IR_BYTEPRESS=2`'s existing
+upper bound (46/720 accesses retainable, ~92 B z80) is not a B/D forecast —
+`reg_set`/`reg_step` hold `IR_PR_BC` throughout their hot bodies, so B isn't
+concurrently available there; size B and D separately over disjoint ranges.
+`home-swap`/`idx-deref`/the duplicate-mask copt rule already cover the
+pointer/index and adjacent-mask portions — do not reopen them. Relaxing
+`byte_home_realizable` is refuted (+307 B, 49 larger cells at use-count 1).
 
-Session 1 today (`HANDOVER_2026-09-25.md`) closed two threads cleanly:
+**Also ready, arguably ahead of the above if picked up fresh:
+single-call-site static inlining.** Confirmed missing (xcc does it, 80cc
+doesn't) across 6+ benches: `widthbench` (`mix_char`/`mix_long`/`mix_store`),
+`divbench` (`udiv`/`sdiv`/`kmix`), `vecbench` (`dot`/`saxpy`), `fixedbench`
+(`iir`/`fxdot`), `bitfieldbench` (`reg_step`), `ptrbench` (six helpers folded
+by xcc), `queenbench` (`safe` into `place`). Zero duplication by construction
+— a function with exactly one call site can't cost anything to fold in, no
+heuristic needed. The strongest remaining lever with actual evidence behind
+it.
 
-1. **Cross-BB redundant-global-load elimination via merge-point phi
-   (`IR_XBB_PHI`) — CLOSED, do not re-attempt a third time.** Built a
-   revert-on-spill redesign (decide keep-vs-revert AFTER `ir_alloc` via
-   `ir_home_requires_slot()`, not the deleted unconditional-carrier shape),
-   measured, reverted. Two independent reasons it doesn't pay: the
-   opportunity is gbz80-only (every other 80cc target has a native wide
-   absolute load; gbz80's LR35902 core doesn't), and even there the real
-   per-read ceiling is exactly ONE byte once you account for the value-walk
-   both a reload and a spilled-reread share — a real merge's per-edge copy
-   cost doesn't survive that margin. Measured net -45 B on gbz80's real
-   corpus, but one file carried the whole result and 4 of 7 affected files
-   got WORSE even there. `ir_opt_probe_xbb_reload` (`IR_PROBE_XBB=1`, inert)
-   is the only piece that stays — still a fair sizing tool if a genuinely
-   different angle ever shows up. Full detail + the exact byte arithmetic:
-   memory `xbb-phi-gbz80-only`.
-2. **Loop-carried scalar residency — REFUTED. See ADR 0100.** The two
-   diagnostic widenings, `IR_BC_STEP_SCALAR` and `IR_BC_STEP_CALL`, were
-   tested. The call-containing case required three general allocator fixes,
-   then measured −7 B net over 504 cells, with one +4 B regression. Keep the
-   gates only for diagnosis; do not reopen without a different, pressure-aware
-   cost model.
+**Queued: byte-into-word carry-conditional add.** xcc folds a byte into a
+16-bit accumulator via `add a,l; ld l,a; jr nc,skip; inc h` instead of a full
+16-bit ALU op — general shape (`word += (unsigned char)byte_expr`, found in
+`hashbench`'s djb2 loop but not Horner-specific), not just one bench. Needs a
+single new fused IR op (`word = word + zx(byte)`, via an `ir_match` pattern
+like the `shr8trunc`/`IR_CONV_TRUNC_HI` precedent), not a `gen_add` change.
+Size across the corpus before implementing.
 
-**`[bc-call]` vs `__preserves_regs(b,c)` — CLOSED. See ADR 0094.** Unlike DE's
-`__preserves_regs(d,e)` (ADR 0084, inert — no in-tree callee uses it),
-`__preserves_regs(b,c)` is real: `ctype.h`'s `CTYPE_PRESERVE` puts it on every
-`is*`/`to*` fastcall variant, and the allocator already honours it (`gen_call`'s
-`bc_preserved` skips the push/pop guard). But the only two rewrites `[bc-call]`'s
-BC-liveness-at-calls feeds that can delete code are the `ld bc,hl` park drop
-(gated on the exact paired-register write, never a PR_BC vreg's single-register
-home writes) and `[idx-rmw-de]` (an exact 10-line adjacent match a call would
-break by construction) — and no `ld bc,hl` park in the tree today sits before a
-`call _sym` with its read after. Real rule gap, inert bug, same shape as ADR
-0084. No allocator change earns anything here; nothing to pick up.
+**Not queued, size permitting later:**
+- Multi-call-site duplicating inlining with a real profitability model
+  (`fixedbench`'s `qmul`, 73% slower than xcc -Of — xcc duplicates at 3 call
+  sites and exposes 2 literal-first-arg calls to constant-multiply strength
+  reduction). Bigger than single-call-site inlining above; needs a cost
+  model, not a blanket policy.
+- Full unrolling of a compile-time-constant trip-count loop (md5's
+  Transform, crcbench's bit loop, hashbench) — a straight code-size trade;
+  not pursued unless a future profitability model ends up covering it too.
+- Embedding copt's matching engine inside 80cc, with a liveness precondition
+  fed by 80cc's own backward pass, so the hand-written backward-liveness
+  rungs (`inc-mem`, `de-widen`, `idx-rmw-de`, …) could be copt-DSL rules
+  instead of one-off C blocks. A genuine mid-size project (engine extraction
+  + a new `%dead <reg>` precondition) — prototype on 2-3 existing rungs
+  first. Do NOT do this as an external `z88dk-copt` post-pass on rendered
+  text: tried once (`gwiden`), miscompiled with no liveness view. CFG-dataflow
+  rungs (`bc-flow`/`de-flow`) stay hand-written regardless.
+- Retiring the mirror predicate pairs (a legality proof and its emitter each
+  encoding the same facts): `op_de_clean`/`try_de_home_clean_store`,
+  `sp_dehome_loop_cmp_ok`/`try_sp_dehome_loop_cmp`,
+  `de_home_clean_bitop_ok`/its bitop emitter. If picked up, do exactly those
+  two families and stop.
+- A `%CPU_HAS_*` macro survey found 5 of 14 never consulted (the other 4
+  VM1-only) — not itself the CPU sweep (ADR 0079), which already closed.
 
-**Sizeable, not urgent: embed copt's matching ENGINE inside 80cc, extended
-with a liveness precondition fed by 80cc's own backward pass.** `ir_lower.c`'s
-backward pass (`b_live`/`c_live`/`d_live`/`e_live`/`f_live`, `drop[]`) now
-carries a growing family of small, individually-ADR'd rewrites written as
-hand-rolled C blocks matching an exact adjacent-line sequence and a liveness
-precondition — `inc-mem`, `de-widen`, `z80n-add-a`, `idx-rmw-de` (ADR 0088)
-and others. They read alike: pattern, liveness gate, replacement, opt-out
-name — exactly copt's rule shape (pattern → replacement, `%cpu`/`%notcpu`,
-`%check`/`%eval`/`%is`/`%not` preconditions) minus a liveness primitive.
+## Recently closed (ADR has the detail)
 
-Do NOT do this by calling the external `z88dk-copt` binary as a blind post-pass
-on assembled text — that was tried once, for the same shape of rewrite
-(`gwiden`, ir_lower.c:2167): copt applied it blind (no liveness) and
-miscompiled, and it only became safe once it moved into this pass, "the only
-place in the pipeline with real per-line liveness." copt runs after 80cc on
-raw text shared across sccz80/80cc/sdcc, with no view of frame mode, CPU
-dispatch, or 80cc's register-cache state.
+- **idx2 live-range reuse — ADR 0101.** The idx2 slot hosts non-overlapping
+  live ranges instead of one whole-function owner. Measures zero today (BC's
+  own multi-occupant check already claims every real disjoint-pair case
+  first); kept for shapes outside the sampled corpus.
+- **IVSR induction pointer in idx2 — ADR 0102.** ez80/kc160/rabbit only:
+  −495 B/−9.94M ticks over 44 cells. One disclosed regression
+  (`interpbench`/ez80/sp), root-caused to that feature's own cost pricing,
+  not contention — recosting attempted and reverted, see the ADR.
+- **switchbench vs xcc — not a lever.** `vm_run`'s dense switch is a linear
+  scan (sccz80-style) vs xcc's jump table, but the full z80 row shows
+  80cc-sp already beating xcc `-Of`. No measured deficiency.
+- **Cross-BB redundant-global-load elimination via merge-point phi — closed,
+  do not re-attempt a third time.** gbz80-only opportunity, real ceiling
+  ~1 B/read; net −45 B but inconsistent per-file. `IR_PROBE_XBB=1` stays as
+  an inert sizing tool.
+- **Loop-carried scalar residency — refuted, ADR 0100.** Do not reopen
+  without a different, pressure-aware cost model.
+- **`[bc-call]` vs `__preserves_regs(b,c)` — closed.** Real gap, inert bug:
+  no `ld bc,hl` park in the tree today sits before a call with its read
+  after. Nothing to pick up.
+- **Constant byte arguments to `__z88dk_sdccdecl` — closed, ADR 0095.**
+- **8085 K-flag trip counter — shipped, ADR 0051.**
+- **Byte scratch packing (B/D lanes) — shipped.** `byte-pack` /
+  `byte-pack-de` opt outs; `IR_BYTEPACK_VERIFY=1/2` keeps the sizing report.
+  (Not the same item as "START HERE" above, which is the next B/D
+  extension.)
+- **R800 CPU target + hardware multiply — shipped.** See
+  `src/80cc/R800_TARGET_PLAN.md` for the full arc.
+- **Local copy-paste housekeeping (six behaviour-neutral refactors) —
+  complete.** Do not merge `load_to_hl` with `load_to_de`, `gen_add` with
+  `gen_sub`, or the whole of `gen_cmp_lt_ge` with `gen_cmp_gt_le`.
+- **ADRs for the shipped optimisations, trimmed comments — mostly done.**
+  34 features documented (ADR 0039-0074). ~15 more registry names
+  (`remat-lea`, `dead-store-share`, `trunc-res`, `fclong-carry`,
+  `call-bremat`, …) still carry their justification in a long code comment
+  instead of an ADR — write the ADR, then cut the comment to the rule plus a
+  pointer. Figures belong in commit messages, `BENCH_MATRIX.txt` and the
+  ADR, never in a code comment. Five figure-carrying comments are exempt
+  because the figures ARE the content: the two `g0_word_cost`/`g0_word_bytes`
+  rows (ADR 0038), the C standard citation in `ast_codegen2.c`, and two
+  instruction-size comparisons (`ir_lower.c`'s pass-0c lookahead,
+  `ir_lower_ops.inc.c`'s inc/dec break-even).
 
-The idea worth sizing is narrower and avoids that trap: link `src/copt/copt.c`'s
-engine INTO 80cc as a library, not as an external post-pass. `main()`
-(copt.c:915-967) is thin CLI glue — argv parsing, `init()` loading rule files
-into a global rule list, `getlst()` reading stdin into a `struct lnode`
-doubly-linked line list, `opt()` run per node to quiescence, then print. The
-engine itself (`match`/`subst`/`check`/`check_eval`/`opt`) is already
-self-contained around that `lnode`/rule-list state — swapping the stdin/argv
-glue for an API (`copt_run(rules, lines) -> lines`) is a moderate refactor,
-not a rewrite. `struct lnode` (`l_text`, `l_len`, `l_prev`, `l_next`) has no
-spare field; add one (e.g. `l_live`, a register-bitmask) — trivial.
-The precondition system (`%cpu`/`%notcpu`/`%check`/`%eval`/`%is`/`%not`/
-`%notSame`) is already a general per-rule-firing hook; a new `%dead <reg>`
-primitive fits that shape directly. 80cc still runs its existing backward
-walk exactly once, stamps `l_live` on each line from ITS OWN liveness state
-(same source of truth as today, never re-derived by copt), then hands the
-annotated buffer to the embedded engine with rules written in copt's real DSL
-instead of one-off C blocks per rung.
+### The CPU-instruction-selection veins — all closed, see their ADRs
 
-Two real limits, both already true of the current hand-written rungs: (1) it
-only covers the straight-line matches — `bc-flow`/`de-flow` branch-target
-fixpoint rungs need CFG dataflow copt's linear multi-pass model doesn't do,
-so those stay hand-written regardless; (2) this is a genuine mid-size project
-(engine extraction + annotation plumbing + DSL extension for `%dead`), not a
-quick win — prototype it on 2-3 existing rungs (`idx-rmw-de`, `inc-mem`,
-`de-widen`) before committing further, and gate the prototype through the full
-gauntlet the same as any codegen change.
+1. CPU sweep (ADR 0079, 0081) — method: real-corpus mnemonic+operand diff
+   against `opcodes.dat`, not a mnemonic-only diff (blind in both
+   directions). Swept: vm1, gbz80, rabbit, 8085, 8080, z80, z80n, z180, ez80,
+   kc160.
+2. Zero-extension (ADR 0085) — a per-instruction ratio against another
+   compiler sizes a difference, not a recoverable one; count the bytes a
+   rung could actually delete first.
+3. Commutative swap in addition (ADR 0089, 0072) — pass-order-dependent, no
+   useful scalar gate.
+4. Indexed RMW address restoration (ADR 0093, supersedes 0088) — shipped
+   `[idx-rmw-de]`; the remaining base-address rung (18 cycles/5 bytes a
+   site) is sized, not queued.
+5. Masked word right-shift, Z80 only (ADR 0090) — accepted.
+6. Variable-count promoted byte shifts (ADR 0095) — accepted on
+   z80/z180/ez80_z80/gbz80/kc160; z80n/Rabbit excluded by tick regressions.
+7. Frame-local word-array RMW stack route (ADR 0098) — accepted on every
+   measured CPU except 8085 (grew 3 B).
+8. r6k instruction utilisation — word ALU against `(ix+d)` is done
+   (`try_binop_r6k_ixd`); `(sp+n)` forms were tested and rejected (+97 B
+   smaller but +1.4M ticks slower). Revisit only with a profitability
+   condition passing both axes.
 
-The masked word right-shift rung is accepted for plain Z80. See ADR 0090. The
-A-through-CB route is faster in all 10 affected sp/fp cells and has no
-compile-only corpus size change; other CB-shift CPUs remain out of scope.
+**Binop route note (background, not reopening ADR 0018):** a width-2 binop
+has three operand routes — a pair op with RHS in DE/BC, a byte-direct carry
+chain through A reading an eligible frame operand in place
+(`try_binop_ixd_fold`), or an already-resident byte-half operand. Sizing an
+extension is a per-binop, per-CPU choice, never a new permanent DE home.
 
+## How to work here — the traps that actually bit
 
-Variable-count promoted byte shifts are accepted on z80, z180, ez80_z80, gbz80,
-and kc160. See ADR 0095: left shifts need only a low-byte result; right shifts
-require a zero-/sign-extended byte proof. The A-byte loop uses E when BC is live
-and DE is free. Full corpus: −65 B, 10 smaller cells, none larger; shiftbench
-ticks improve on all enabled CPUs. z80n and Rabbit retain the word path after
-measured tick regressions.
-
-The frame-local word-array RMW stack route is accepted on GBZ80, Z80, Z80N,
-Z180, eZ80 Z80-mode, 8080, VM1, Rabbit 2000A/4000/6000, and KC160. See ADR
-0098. Exact pre-copt shapes select three routes: HL/BC with temporary stack
-homes, Rabbit's IY accumulator, and KC160's stack-relative accumulator slot.
-A and F must be dead after each rewritten sequence. 8085 stays disabled because
-the measured version grew by 3 B. `local-rmw` disables all routes;
-`gbz80-rmw` remains an alias. Full corpus scans changed only localbench:
-14/720 size cells shrank (−155 B total) and 14/720 valid tick cells improved
-(−81,382,400 ticks total); no cells grew or slowed.
-
-Follow-ups considered but not queued: do not enable the generic byte loop on
-z80n or Rabbit based only on ISA support; both regressed in ticks. A
-Z80N-specific byte lowering could try the DE barrel shifts (`bsla`/`bsrl`/
-`bsra de,b`), and a Rabbit-specific one could try its pair rotates (`rr hl`;
-native `rl hl` only from R4K), but each needs a complete staging-cost analysis
-and a fresh per-CPU tick scan before becoming work. Do not add an 8085 byte
-loop: it has no accumulator shifts, so the word/helper path remains appropriate;
-that path already uses the extended `sra hl` (ARHL) where useful. Keep
-materialized literal counts on the established path; narrowing them stranded a
-DE park in compound bitfield updates.
-
-### The veins worth digging, in order
-
-**1. The CPU sweep — CLOSED. See ADR 0079 (and 0081 for the row it got
-wrong).** The method,
-for whoever repeats it on a new CPU: take the mnemonics `opcodes.dat` declares
-REAL (`_`, not a synthetic `X`) for that CPU, take the mnemonics a full-corpus
-asm dump for that CPU actually emits in both frame modes, subtract — and then
-**read the operands**, because the mnemonic diff is blind in both directions.
-`add` is emitted as `add hl,de` while `add hl,a` never was; `inc` is emitted as
-`inc hl` while `inc (hl)` never was, and that one was worth 606 bytes. Also ask
-whether the shipped **code path** uses the instruction, not whether the
-**compiler** emits it: `mlt` on z180, `mul` on z80n and `div` on kc160 are all
-already inside library helpers.
-
-Swept and settled: **vm1**, **gbz80**, **rabbit**, **8085**, **8080**, **z80**,
-**z80n**, **z180**, **ez80**, **kc160**. Emit sites with their own push offset
-remain a separate question.
-
-**2. Zero-extension — CLOSED. See ADR 0085.** It was carried here for months as
-"the one *consistent* gap against ez80clang", on a per-1000-instruction ratio.
-The census that ratio never justified: **166 sites** in bench + real, 442-499
-over the whole dump, and the count barely moves with the CPU — so there is no
-target where it is the disease. Most sites are already at the z80 encoding
-floor: a zero-extended byte pushed as a word argument is `ld l,a; ld h,0;
-push hl` and nothing shorter exists. One rung shipped (ADR 0085);
-five shapes were sized and refused. **The lesson for the next vein: a
-per-instruction ratio against another compiler sizes a DIFFERENCE, not a
-RECOVERABLE one.** Count the bytes a rung could actually delete before calling
-something the next job.
-
-**3. The commutative swap in addition — CLOSED. See ADR 0089 (and ADR 0072
-for the A/B result).** A sound answer is pass-order-dependent: changing the
-operand roles changes pass-1 slot reads and therefore the pass-2 store-dead
-solution. A dual render is not a useful scalar gate. The emitter remains
-unchanged; the measured effects remain −6 % ticks in `md5`, +28 B in
-`binary-trees`, and +75 B in `emu.c`.
-
-**4. The indexed read-modify-write address restoration — SHIPPED. See ADR 0093
-(supersedes ADR 0088's "no emitter change" call).** The 720-cell final-assembly
-census found one complete `histbench` site in 8 CPU/frame cells, 5 bytes per
-site; `adv_a.c` and `clisp.c` had no eligible sites, and the broad reader
-matches elsewhere were pointer copies or temporaries. ADR 0088 declined to
-ship from the census alone; shipped 2026-09-18 as `[idx-rmw-de]`, a 10-line
-text match in `ir_lower.c`'s existing backward-liveness pass, gated on B/C/D/E
-all dead after. z80/z180/8080 fire (-5 B/site, matching the census); z80n
-text-matches the same pattern but the live liveness check correctly declines
-(DE proven live after on z80n, dead elsewhere) — the census had counted z80n
-as affected, the per-line liveness check is the one that gets believed. See
-`BENCH_MATRIX.txt` s7 (2026-09-18) for the dated numbers.
-
-The remaining instruction-selection rungs are not the current action.
-`histbench` on Z80 is 32.01 M ticks against xcc `-Of`'s 28.46 M, and
-80 % of either run is one basic block. Per iteration 80cc spends **518 cycles
-where xcc spends 471**. What looks expensive is not the gap: the x25173
-shift/add expansion is identical in both (14 `add hl,hl` + 6 `add hl,rr`), and
-**both compilers reload `seed` from its frame slot every iteration** — residency
-is not the difference here, so do not open the allocator for this. The 47 cycles
-split three ways and one is already had: frame addressing is worth 11, and fp
-mode collects it (the same block measures 504 cycles per iteration in fp, which
-is the 31.01 M column). The other two are rungs nothing in the tree does yet.
-
-* **A constant right shift of a word, Z80 only — CLOSED. See ADR 0090.**
-  The A-through-CB route (`ld a,l; (srl h; rra) × count; ld l,a`) for constant
-  counts 2..7 is accepted on plain Z80. It improved all 10 affected sp/fp cells
-  in the 60-cell corpus, with no slower cell and 2,140,848 fewer ticks total.
-  The full compile-only corpus size was unchanged; other CB-shift CPUs remain
-  out of scope until measured.
-* **The base address of the read-modify-write — 18 cycles and 5 bytes a site.**
-  80cc copies the computed address into BC, rebuilds HL from it after the word
-  load, and routes the incremented value back through `ex de,hl`: 13 bytes. HL
-  only advanced by one, so a single `dec hl` restores it and the increment can
-  stay in DE — `ld e,(hl); inc hl; ld d,(hl); dec hl; inc de; ld (hl),e;
-  inc hl; ld (hl),d`, 8 bytes, which is what xcc emits.
-
-The addition model, address-restoration census, and masked word right-shift
-rung are recorded in ADRs 0088-0090.
-
-**5. The 8085 K-flag trip counter — SHIPPED. See ADR 0051.** A private,
-positive-literal loop counter (`AST_LOOP_COUNTDOWN`, only ever built by the
-loop-reversal pass, which already proves it unread and dead after the loop —
-no separate shape analysis needed) seeds at N-1 instead of N and its latch
-branches on the 8085's K flag (`jp nk`) instead of rebuilding `ld a,h; or l;
-jp nz`. `k-trip` opt-out. 8085-only compile-only corpus scan: -156 B over
-52/60 cells, 0 larger, 0 build failures, sp and fp identical (8085 has no IX).
-`long_ir` 846/846 both frame modes.
-
-**6. Byte scratch packing — SHIPPED.** The verifier found a broad upper bound for
-short byte values, but only born-and-killed, single-definition, single-BB values
-with a real A-clobber and no call-argument use are admitted. Their exact live
-windows time-share B, with existing BC/C tenants and BC clobbers treated as
-interference. A second lane now admits one slot-backed D tenant per function;
-DE-clobbering gaps use the lowerer's existing lazy flush/reload protocol, and D
-is kept separate from B/C because they share one residency latch. The pre-link B+D scan saves
-−379 code bytes over 720 corpus cells (52 smaller, none larger); D contributes
-−56 bytes in nine cells relative to B-only. The full tick scan saves
-−17,686,184 ticks (52 faster, none slower); all tested long_ir CPU/frame builds
-pass 882/882 and the console gates show no regression (`today` SP remains a
-pre-existing baseline build failure). `byte-pack` disables both lanes;
-`byte-pack-de` disables only D; `IR_BYTEPACK_VERIFY=1/2` keeps the sizing report.
-
-**7. R800 CPU target + hardware multiply — SHIPPED.** New CPU end-to-end:
-`zcc`/`sccz80`/`80cc` all accept `-mr800`, object stays z80-stamped (`Z80ASM`
-column `-mz80`, empty `LIBNAME` — no separate library build), `lib/arch/
-r800/r800_rules.1` converts the plain `muluw`/`mulub` mnemonics (both z88dk's
-and sdcc's own spelling) to raw `defb` bytes at the copt layer, uniformly for
-every producer. No r800-specific `g0_word_cost` row: A/B measurement showed
-z80's own table (already tuned) produces smaller AND faster r800 code than a
-fresh table derived exactly from `opcode_data.dat` — the actual bug was 28
-CPU-eligibility gates (`c_cpu == CPU_Z80 || IS_Z80N() || ...`) across
-`ir_alloc.c`/`ir_lower.c`/`ir_lower_cmp.inc.c`/`ir_lower_ops.inc.c`/
-`ir_lower_regcache.inc.c`/`ir_opt.c`/`ir_compiler_glue.c` hard-excluding r800
-from `IX`/`IY` homing regardless of any cost table; widened to include
-`IS_R800()`. 16x16 int multiply lowers to `muluw hl,de` (`IS_R800() &&
-width==2`, `ir_build.c`/`ir_lower_ops.inc.c`); the widening 16x16→32 case
-(`unsigned long = uint*uint`) reuses the same instruction but commits the
-full `DEHL` product via `store_dehl_finalize` instead of truncating. `long_ir`
-passes clean (461, then 456 targets, all CPUs) at each step. See
-`BENCH_MATRIX.txt` s2-s4 (24/9/2026) for the dated numbers and
-`src/80cc/R800_TARGET_PLAN.md` for the full arc, including a widthbench
-byte-store optimisation that was tried and reverted (measured regression,
-not a correctness bug — the fast path perturbed the allocator's PR_STACK
-vs PR_SPILL choice elsewhere in the same function).
-
-### How to work here — the traps that actually bit
-
-* **`long_ir` FIRST, size second.** −1807 B over 720 cells was reported as a 13x
-  improvement on the day's shipped work; `long_ir` then came back 718/727. A
-  size scan on a compiler that miscompiles is not a weak measurement, it is
-  **noise that looks like a result**, and it persuades precisely because it is
-  large. Never quote a corpus delta before the correctness gate is green in both
-  frame modes.
-* **`make && cp && echo BUILT` lies**, and it is worse than it looks. It printed
-  BUILT on a failed build and a measurement then ran against a stale binary,
-  reporting a plausible `0/0`. Use `if make ...; then ... else echo FAILED; fi`
-  — **and run it from the repo root**: `PREFIX=$(pwd)` makes the working
-  directory load-bearing, so `make -C src/80cc PREFIX=$(pwd)` from `test/suites`
-  fails silently and leaves the old compiler installed. Two rounds of figures
-  came from that. **`md5sum bin/z88dk-80cc` before a scan** and compare it to
-  the build you think you are measuring; two scans of "identical" configurations
-  differing in 59 cells is not scan nondeterminism (the compiler is
-  deterministic — 8 runs, identical md5), it is the wrong binary.
-* **Gate the call sites, not a shared helper.** `opt_disabled()` placed inside
-  `alloc_note_late_home` also disabled the call-split's pre-existing use, so the
-  opt-out did not restore any previous compiler — it broke a working fix,
-  visible as `histbench` 385 -> 431, *the wrong direction*. An opt-out that does
-  not reproduce the old compiler is worse than none, because it is trusted.
-* **Check the units before believing a result.** Pricing a park with
-  `g0_word_bytes` against a gain from `interval_benefit_x` (which is
-  CYCLE-denominated) reported **145 of 145 sites paying**. In matching units it
-  was 7. *A 100 % result is a symptom, not a discovery.*
-* **A coarse summary can hide the answer.** The per-function realisation summary
-  showed *no change* on the exact CPU that regressed, while 12 of 22 per-vreg
-  rows differed. Ask for the per-item view before concluding.
-* **A corpus matrix is not the whole test set.** 720 cells said "no cell larger"
-  while a `long_ir` file was 17 bytes worse. Size claims must name their set.
-* **Attribute before you believe.** `strbench`'s −4.5 % was reported here as the
-  tight-homes flip; bisection showed it was `41d2e40dae` (BC step-param), landed
-  days earlier. If a bench moves, bisect it.
-* **`make -j` on `long_ir` garbles the log.** Concurrent writes interleave
-  mid-line, so the summed run count is nondeterministic and *under*-counts: 712
-  and 728 on two runs of an identical 376-target binary set, against a true 739
-  serially. Take the pass count from a **serial** run or it is fiction.
-* **A failed compile in the size scan reports its neighbour's size.** The scan
-  writes every object to one `/tmp` path, so a compile that fails leaves the
-  previous file's `.o` in place. That is what "structbench 375 -> 750" was: not a
-  regression, a stale object. A doubled figure is a symptom, not a discovery.
-* **copt is invisible to every dump you have.** The compiler's own asm can be
-  correct at every stage and `zcc -a` still be wrong — that is how ADR 0075's
-  `pop bc` went missing. Diff `z88dk-80cc` direct output against `zcc -a` before
-  opening a backend pass. This trap was already written down and still cost an
-  hour.
-* Building an old commit needs `src/config.h` and the `ext/uthash` submodule
+- **`long_ir` first, size second.** A size scan on a miscompiling compiler
+  is noise that looks like a result, and persuades precisely because it's
+  large. Never quote a corpus delta before both frame modes are green.
+- **`make && cp && echo BUILT` lies.** Use `if make ...; then … else echo
+  FAILED; fi`, and run from the repo root (`PREFIX=$(pwd)` makes cwd
+  load-bearing). `md5sum bin/z88dk-80cc` before a scan and compare it to the
+  build you think you're measuring.
+- **Gate the call site, not a shared helper** — a shared helper's opt-out can
+  silently disable an unrelated pre-existing use too.
+- **Check the units before believing a result** — a byte-denominated price
+  against a cycle-denominated gain reported 145/145 sites paying; in
+  matching units it was 7. A 100% result is a symptom, not a discovery.
+- **A coarse summary can hide the answer** — ask for the per-item view
+  before concluding.
+- **A corpus matrix is not the whole test set** — state which set a size
+  claim covers.
+- **Attribute before you believe** — if a bench moves, bisect it; don't
+  assume today's change caused it.
+- **`make -j` on `long_ir` garbles the log** — the summed run count
+  under-counts nondeterministically. Take the pass count from a serial run.
+- **A failed compile in a size scan reports its neighbour's size** if the
+  scan reuses one output path. A doubled figure is a symptom, not a
+  discovery.
+- **copt is invisible to every dump you have** — diff direct `z88dk-80cc`
+  output against `zcc -a` before opening a backend pass.
+- Building an old commit needs `src/config.h` and the `ext/uthash` submodule
   copied into the worktree — a fresh `git worktree` gets neither.
-
-### Background work, when there is time
-
-**Constant byte arguments to `__z88dk_sdccdecl` — CLOSED. See ADR 0095.**
-`read_reg` in the Magnetic emulator is the motivating real-file case. On a
-temporary annotated copy, Z80N-fp `code_compiler` falls 21,998→20,571 B
-(1,427 B); direct adjacent-pair packing saves a further 242 B over the
-rematerialisation-only intermediate. The lowerer traces a call-only byte value
-through pure conversions/copies to a unique immediate definition and removes
-its slot. Adjacent constant byte args now use `ld de,nn; push de`; every link
-in the trace is checked for address-taken and volatile flags, stopping the
-rewrite when aliasing or observable reads are possible. `long_ir` passes
-851/851 in each frame mode (the existing `longshl_vm1` assembler gap remains).
-The standard corpus has no size changes in 660 CPU/frame cells and no Z80 tick
-changes in 60 cells; the annotated real-file case is where this helps.
-
-**Local copy-paste housekeeping — COMPLETE (2026-09-19).**
-The six behavior-neutral refactors below are implemented; emitted assembly is
-unchanged.
-
-1. [x] `gen_step` replaces `gen_inc` / `gen_dec`; it selects `inc` / `dec`
-   with `+1` / `-1`.
-2. [x] `emit_dsub_jp(cc)` shares the 8085 DSUB-plus-branch sequence.
-3. [x] `emit_z80n_barrel_shift` shares the variable shift body
-   (`bsrl` / `bsra`).
-4. [x] Far-call BC save, restore, and cache invalidation use shared helpers.
-5. [x] `filter_dead_reg_copies` and `filter_dead_bc_parks` share
-   OOM-safe line buffering.
-6. [x] `try_fold_8085_addr_pair` shares the LDSI / LDHI rewrite skeleton.
-
-Validation against the exact pre-cleanup HEAD:
-
-- `long_ir`: 851/851 passed in sp and fp; only the existing
-  `longshl_vm1` assembler gap remains.
-- Reference assembly: 452 files identical; size: 720/720 cells identical;
-  Z80 ticks: 60/60 cells identical.
-- CLOB / PARK / REC / IX verifier logs match for z80, 8085, and z80n in
-  both frame modes; PARK reports zero steals and depth mismatches.
-- Console gates pass both modes for enigma, clisp, adv_a, sorter,
-  fmemopen, and fib. `today.c` fails identically before and after at
-  `time(tvec)`.
-
-Do not merge `load_to_hl` with `load_to_de`. Do not merge `gen_add` with
-`gen_sub`. Do not merge the whole of `gen_cmp_lt_ge` with `gen_cmp_gt_le`.
-`load_binop_operands` and `load_cmp_swap_operands` share a shape. The first
-has remat and commutative cases the swap path does not. memset,
-`emit_block_copy` and strcpy already share part of the BC save. Leave the
-backward-liveness rungs hand-written until the copt-embed prototype.
-
-Untracked junk in this directory (not compiled): `*.bak`, `*.orig`,
-`md5_fp_push.map`, `sp_ungated.map`. Delete when convenient.
-
-**Next task — size a byte-scratch packer, using `bitfieldbench` as
-the witness.** The latest full matrix (17/9 s4; later
-entries amend only `histbench` and `predbench`) leaves `bitfieldbench` at
-4474 B / 38.34 M ticks (80cc-fp) and 4483 B / 37.95 M (80cc-sp), against XCC
-at 3991 B / 30.42 M (`-Os`) and 4103 B / 27.02 M (`-Of`) on z80. The
-previous per-function read found the remaining `reg_set` gap in short-lived
-byte values: 80cc repeatedly uses frame slots (`ld (ix+d),a` / `or (ix+d)`)
-where XCC keeps a byte in E. `home-swap`, `idx-deref`, and the duplicate-mask
-copt rule already address the pointer/index and adjacent-mask portions; do not
-reopen them. Relaxing `byte_home_realizable` is also refuted: its single-use
-candidates add a slot-backed home rather than remove the slot (+307 B, 49
-larger corpus cells at use-count 1).
-
-`IR_BYTEPRESS=2` now gives the first ceiling: with two generic call-free byte
-lanes and interval overlap only, `reg_set` can retain 28/36 accesses,
-`reg_step` 14/16, and `reg_get` 4/4 — 46 accesses, an impossible-but-useful
-92-byte z80 upper bound at 2 bytes per frame-byte access. It is **not a B/D
-forecast**. `reg_set`'s input and `reg_step`'s pointer are each `IR_PR_BC`
-throughout their hot bodies, so B cannot be a concurrent scratch lane there;
-and `IR_PR_D` is deliberately lazy-spill, slot-backed today. A slotless B
-home and a traffic-only D cache therefore need separate sizing.
-
-First add a verifier that reports a candidate's B availability against BC-pair
-tenants and its D availability against DE clobbers, then calculate each lane
-separately over disjoint ranges. Only a positive result earns an experimental,
-gated prototype and long_ir positive and negative cases. A default-on decision
-needs the full gauntlet, corpus size and tick scans, and no slower valid-tick
-cell; retain it only if it improves beyond this one benchmark.
-
-**Binop route note.** This does not reopen ADR 0018's rejected policy of
-keeping a second operand resident in DE: its evacuation/restoration cost more
-than the reload it avoided, and its cross-BB carry duplicated HL's existing
-carry. The distinct question is local instruction selection. A width-2 binop
-has three operand routes: a pair operation with its RHS in DE or BC; a
-byte-direct carry chain through A reading an eligible frame operand in place;
-or an already-resident byte-half operand. The byte-direct route already exists
-in `try_binop_ixd_fold` for ADD/SUB/AND/OR/XOR, and in the compare folds. It
-declines when both operands are cheap gp pairs; that is correct. Size an
-extension as a per-binop, per-CPU choice — never as a new permanent DE home:
-sp-mode address formation and CPUs with cheap word slot loads can reverse the
-price, while a chosen byte-direct route can leave DE available for a separate
-short-lived cache.
-
-A survey of all 14 `CPU_HAS_*` macros found five the backend never consults;
-the other four are KR580VM1-only. That survey is **not** the sweep — the macros
-cover a fraction of each ISA, and ADR 0075's `mul` was not among them. The sweep
-is vein 1 above: `opcodes.dat` against a corpus asm dump.
-
-**Give the shipped optimisations ADRs, then trim their comments — DONE.**
-34 features documented (ADR 0039-0074), ~240 lines of comment removed, output
-byte-identical throughout. Each comment keeps the rule, the gate spelling and any
-correctness landmine; the figures live in the ADR.
-**48-bit literal range.** `3.0e38` errors in genmath/math48 (`max_exp` 127, about `1.7e38`). sccz80 accepts and wraps. IEEE `--math32` accepts `3.0e38` and saturates larger values to Inf. Do not loosen the 48-bit check.
-
-**Give the shipped default-on optimisations ADRs, then trim their comments.**
-Of 115 registry names only about 15 are named in an ADR. Roughly ten features —
-`remat-lea`, `dead-store-share`, `trunc-res`, `fclong-carry`, `call-bremat` and
-similar — carry their justification, including benchmark figures, in a long
-block comment and nowhere else. 26 such blocks hold ~370 lines.
-
-**Five figure-carrying blocks remain and SHOULD**, because there the numbers are
-the content rather than the justification: the two measured `g0_word_cost` /
-`g0_word_bytes` cost rows in `ir_alloc.c` (ADR 0038), the C standard citation in
-`ast_codegen2.c`, and two where the figures are instruction sizes being compared
-(`ir_lower.c`'s pass-0c lookahead, `ir_lower_ops.inc.c`'s inc/dec break-even).
-
-The rule that produced this, for anything added later: **write the ADR first,
-then cut the comment to the rule plus a pointer.** Figures belong in commit
-messages, `BENCH_MATRIX.txt` and the ADR — never in a code comment.
-
-One step of the original simplification plan was deliberately not done:
-retiring the mirror predicate pairs — a legality proof and its emitter each
-encoding the same facts, so an emitter change can silently invalidate its proof.
-The pairs are `op_de_clean` / `try_de_home_clean_store`,
-`sp_dehome_loop_cmp_ok` / `try_sp_dehome_loop_cmp`, and
-`de_home_clean_bitop_ok` with its bitop emitter. If it is picked up, do exactly
-those two families and stop; "one family at a time" has no natural end.
+- Untracked junk in this directory (not compiled): `*.bak`, `*.orig`,
+  `md5_fp_push.map`, `sp_ungated.map`. Delete when convenient. About 40
+  untracked `.py`/`.sh` analysis scripts remain too; the five the gauntlet
+  depends on are tracked.
 
 ## The standing invariants
 
@@ -453,7 +193,7 @@ promote it or delete it.
 
 ## Opt-outs
 
-One registry of 118 names, each described in `OPTIONS.md`. Two front doors:
+One registry, each name described in `OPTIONS.md`. Two front doors:
 
     --opt-disable=name,name     a compiler flag, for a user
     IR_OFF=name,name            the same registry, for a measurement
@@ -464,12 +204,8 @@ documented name no longer exists.
 
 ## Surviving gates
 
-43 remain. A gate needs a row here **and** a row needs a gate. The second
-direction had rotted: **14 rows named gates deleted in earlier sweeps**, whose
-explanatory comments survived in the source while the `getenv` did not, so the
-index promised debugging tools that could not be switched on. Nine real gates
-had no row at all. Both are fixed, and `scripts/check_gates.sh` now enforces it
-so the drift cannot return silently.
+A gate needs a row below **and** a row needs a gate; `scripts/check_gates.sh`
+enforces both directions.
 
 ### Verifiers — permanent, never swept
 
@@ -486,9 +222,8 @@ touched and report the count before and after.
 `IR_SPILL_STATS` `IR_IVWHY`
 `IR_DEADDEF_LOG` `IR_SPFLIP_LOG` `IR_CALLSPLIT_LOG`
 
-These print; they never change emitted code. Each is one to six lines inside a
-shipped feature, so they cost nothing to keep and answer "why did it do that".
-`IR_HOMEMAP` is the first thing to diff when an allocation decision changes.
+These print; they never change emitted code. `IR_HOMEMAP` is the first thing
+to diff when an allocation decision changes.
 
 ### Probes with a live question
 
@@ -500,9 +235,8 @@ shipped feature, so they cost nothing to keep and answer "why did it do that".
 | `IR_BYTEPACK` `IR_BYTEPACK_VERIFY` `IR_SLOTWHY` `IR_WIDENOSLOT` | opt-in allocator/lowering diagnostics and sizing probes | when the associated investigation is closed |
 | `IR_BC_STEP_CALL` `IR_BC_STEP_SCALAR` | retained diagnostic probes for the rejected ADR 0100 experiment; not optimisation options | if the probe code is removed |
 
-`IR_RANGEPROBE` carries a warning, not just a number: its 461 was an upper bound
-over the **wrong population** — see "do not size an opportunity by counting
-values that merely fail to interfere" above.
+`IR_RANGEPROBE`'s 461 was an upper bound over the wrong population — do not
+size an opportunity by counting values that merely fail to interfere.
 
 ### Developer switches, not optimisations
 
@@ -516,96 +250,46 @@ values that merely fail to interfere" above.
 | `IR_NO_NOTNOT_FOLD` | keep `!!x` as two coercions instead of folding to `x != 0` |
 
 `IR_OFF` is deliberately absent from these tables: it is the opt-out registry's
-front door, documented under **Opt-outs** below.
+front door, documented under **Opt-outs** above.
 
-### The ranging arc (ADR 0017) — CLOSED
-
-Not parked: closed on evidence. The table in "What closed" above has the
-results; ADR 0017 carries the reasoning and ADR 0029 the miscompile that ended
-stage 3.
+### The ranging arc (ADR 0017) — closed
 
 Promoted out: `IR_TIGHT_HOMES` -> `tight-homes`, default-on (ADR 0027);
 `IR_BC_STEP_PARAM` (ADR 0031). Refused and removed: `IR_RANGED` (ADR 0029,
-miscompiled), `IR_JR_UNCOND` (ADR 0033), `IR_TRIPW` (ADR 0028), `IR_INPLACE_MASK`
-and `IR_INPLACE_CMP`, `IR_OPRES` (ADR 0018), `IR_NO_A_CARRY`, `IR_FLIPCOST`,
-`IR_SPINC`, `IR_SPEXCL`, `IR_REHOME`. Cost correctness (ADR 0032) shipped;
-`IR_GBZ80_MASK` remains as the bisection tool for future gbz80 work.
+miscompiled), `IR_JR_UNCOND` (ADR 0033), `IR_TRIPW` (ADR 0028),
+`IR_INPLACE_MASK`/`IR_INPLACE_CMP`, `IR_OPRES` (ADR 0018), `IR_NO_A_CARRY`,
+`IR_FLIPCOST`, `IR_SPINC`, `IR_SPEXCL`, `IR_REHOME`. `IR_GBZ80_MASK` remains
+the bisection tool for future gbz80 work.
 
 ### Numeric knobs — a category with no home
 
 `IR_BCCALLCOST` `IR_BYTETIE` `IR_CS_EVICT_MIN` `IR_DEPARK_SWEEP` `IR_GBZ80_MASK`
 `IR_IVACCK` `IR_IVHOT` `IR_LONG_PUSHES` `IR_SPCOST` `IR_TM_MINGAIN`
 
-Each sets a tuning constant, so the opt-out registry cannot express them — it is
-on/off only. They are parked experiments with a dial. Decide them the same way:
-promote the tuned value into the code and delete the dial, or delete both.
+Each sets a tuning constant, so the opt-out registry can't express it — on/off
+only. Parked experiments with a dial: promote the tuned value into the code
+and delete the dial, or delete both.
 
 ## Documents
 
-The 92 untracked plans and handovers that used to sit here are committed on the
-branch **`80cc-docs-archive`** — one commit, never merged, not part of any
-history you have to read. Recover one with:
+The 92 untracked plans and handovers that used to sit here are committed on
+the branch **`80cc-docs-archive`** (one commit, never merged):
 
     git show 80cc-docs-archive:src/80cc/WIDTH_HANDOVER.md
     git checkout 80cc-docs-archive -- src/80cc/<file>.md
 
-What survives here is the durable layer: `adr/` (76 records), `CONTEXT.md`
-(vocabulary), `AGENTS.md` (working rules), this index, the validation and check
-scripts under `scripts/`, and the retired probe sources under `probes-retired/`.
+What survives here is the durable layer: `adr/` (102 records), `CONTEXT.md`
+(vocabulary), `AGENTS.md` (working rules), this index, the validation and
+check scripts under `scripts/`, and the retired probe sources under
+`probes-retired/`.
 
-`DEBUG_LOCALS_PLAN.md` became **ADR 0030** and was deleted — it recorded a
-shipped decision, which is what the durable layer is for.
-
-`CONTEXT.md` is spelled in capitals. This workspace is mounted from a
+`CONTEXT.md` is spelled in capitals: this workspace mounts from a
 case-insensitive host filesystem, so `context.md` resolves to the same file
-here and would not on a case-sensitive one — always write the capitalised name.
+here and would not on a case-sensitive one.
 
-### Refutations not yet promoted
-
-Nine refuted theses became ADRs 0018 to 0024. These remain recorded only in the
-archive branch, and are worth promoting if anyone proposes them again:
-
-- the long/swap thesis (the gap was byte widening, not long handling)
-- the in-place `(ix±d)` byte-ALU lever — no transient load feeds an in-place ALU
-- counter-step cost discounts — refuted seven times over, in several forms;
-  the call-containing residency attempt is now durable in ADR 0100
-- `ex de,hl` as the gbz80 gap — sized and mostly refuted
-- HL-staging as a density lever
-- ordered byte-vs-byte compares
-- the remat-LEA callless gate (worth 30 bytes or less)
-
-Known remaining hazard: about 40 untracked `.py` and `.sh` analysis scripts are
-still here and still untracked. They are not documents, so the sweep left them
-alone; a `git clean -fd` would remove them. The five scripts the gauntlet
-depends on are now tracked.
-
-
-### r6k instruction utilisation (18 Sep 2026, corrected 19 Sep 2026)
-
-Correction: the "identical to r4k" claim below was wrong. `try_binop_r6k_ixd`
-(`ir_lower_ops.inc.c`, shipped `71b66a9977`, mid-August) already emits
-`add hl,(ix+d)` / `and hl,(ix+d)` etc. in fp mode — confirmed by direct
-instrumentation: it fires 30 times across 8 of the 30 corpus benches
-(intbench, recordbench, maskbench, hashbench, bitfieldbench, widthbench,
-localbench, callbench), and the emitted asm was checked by hand for
-intbench.c. `r6k` is not in `gen_bench_matrix3.py`'s `CPUS` list at all — the
-18/9 "new r6k rows" came from an ad-hoc script variant, and whatever produced
-the "identical to r4k" reading did not exercise this fold (most likely an
-sp-only run: the fold is fp-only by construction, and sp mode is genuinely
-identical to r4k there since neither CPU has an sp-relative memory-ALU form).
-
-The missing r6k instruction selection is therefore narrower than first
-thought: word ALU against `(ix+d)` is done. Remaining candidates are word ALU
-against `(sp+n)`, the complete byte ALU family against `(sp+n)`, and
-`mul hl,de`/`mulu hl,de`.
-
-A first word-memory-ALU prototype for the `(sp+n)` form was tested and
-rejected: across the 30 r6k benches in both frame modes, direct stack/indexed
-substitutions reduced total size by 97 B but increased aggregate ticks by
-1,429,886 (26 cells faster, 34 slower). Isolating either route also increased
-ticks; a conservative DE-home guard was effectively neutral but still
-slightly worse (+2,520 ticks, with one slower cell). The long_ir probe passed
-in both frame modes, confirming the emitted forms, but that does not offset
-the corpus timing regression. No new selector or test is retained. Revisit
-only with a profitability condition that passes both corpus size and tick
-gates.
+Nine refuted theses (ADRs 0018-0024) remain recorded only in the archive
+branch — worth promoting if anyone proposes them again: the long/swap
+thesis, the in-place `(ix±d)` byte-ALU lever, counter-step cost discounts
+(refuted seven times; the call-containing attempt is durable in ADR 0100),
+`ex de,hl` as the gbz80 gap, HL-staging as a density lever, ordered
+byte-vs-byte compares, the remat-LEA callless gate.

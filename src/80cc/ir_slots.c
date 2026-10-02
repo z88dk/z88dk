@@ -118,7 +118,6 @@ void ir_assign_slots(Func *f)
             for (int k = 0; k < nd; k++) {
                 int d = defs[k];
                 if (d < 0 || d >= n_vregs) continue;
-                /* Conflict d with every currently-live vreg. */
                 uint32_t *drow = INTERF_ROW(d);
                 for (int w = 0; w < row_words; w++) {
                     uint32_t live_w = live[w];

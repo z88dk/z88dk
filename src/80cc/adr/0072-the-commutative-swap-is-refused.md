@@ -26,10 +26,9 @@ Where it is a fresh value that would never otherwise reach memory —
 
 ## What it would take
 
-Gating it needs a **cost model over the two-pass spill decision**, not a
-residency test. The question is not "where does this operand live" but "will
-reading it here resurrect a store the other pass elided" — and nothing in the
-allocator can answer that today.
+Gating it needs a **cost model over the two-pass spill decision**. The relevant
+question is whether reading the operand here resurrects a store that the other
+pass elided. Nothing in the allocator can answer that today.
 
 Recorded so the next person who notices the missing swap in addition does not
 have to rediscover the two-pass interaction.

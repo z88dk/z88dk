@@ -388,6 +388,7 @@ enum {
     CF_DE_GENERAL     = 1u << 4,   /* DE-home: a general (non-accumulate) home */
     CF_DE_PTR         = 1u << 5,   /* DE-home: a walking byte pointer (loop regalloc) */
     CF_DE_OPERAND     = 1u << 6,   /* DE-fold hint: reused deref/binop (DENSITY §4) */
+    CF_IDX2_INDUCTION = 1u << 7,   /* idx2: an IVSR second induction pointer */
 };
 /* Cost-model per-access weights (relative T-state savings of reg vs slot; the
    orchestrator's benefit = Σ depth-weighted access weights). A DEREF of a base
@@ -420,11 +421,10 @@ typedef struct {
    the pool (every proposer used the same 6-field fill). benefit is a placeholder —
    unified_arbitrate overwrites it with cost_benefit[v] before ranking. */
 /* [home-rearb] Values the LOWERER proved unrealizable. `[home-demote]` demotes
-   such a value to SPILL and re-renders, which fixes correctness but leaves the
-   register it vacated OFFERED TO NOBODY — the arbiter does not run again, so
-   the next-best candidate never gets its chance. histbench's `hist_pass` on
-   gbz80 is the witness: v1 takes BC, cannot realize it, is demoted, and v26 —
-   which would have used BC perfectly well — stays spilled for the rest of the
+   such a value to SPILL and re-renders, which fixes correctness but does not
+   reconsider the register it vacated. The next-best candidate never gets its
+   chance. In gbz80 `hist_pass`, v1 takes BC, cannot realise it, is demoted, and
+   v26 — which would have used BC — stays spilled for the rest of the
    function.
 
    So record the veto and let the driver re-arbitrate: a vetoed value is not
@@ -797,7 +797,7 @@ static void build_idx2_maps(const Func *f, int *is_base, int *cstep,
             if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
                 && o->mem.kind == IR_MEM_VREG
                 && o->mem.base >= 0 && o->mem.base < f->n_vregs) {
-                is_base[o->mem.base]++;                  /* counted */
+                is_base[o->mem.base]++;
                 if (o->mem.post_step != 0)
                     is_base[o->mem.base] |= IDX2_BASE_STEPPED;
             }
@@ -812,7 +812,20 @@ static void build_idx2_maps(const Func *f, int *is_base, int *cstep,
             if (d < 0 || d >= f->n_vregs) continue;
             if ((o->kind == IR_INC || o->kind == IR_DEC) && o->src[0] == d)
                 cstep[d]++;
+            /* An induction pointer steps by an arbitrary constant, not just
+               ±1 — gated to IR_VREG_INDUCTION so an unrelated self-add
+               elsewhere doesn't also qualify as a counter. */
+            else if ((o->kind == IR_ADD || o->kind == IR_SUB)
+                     && o->src[0] == d && o->src[1] == -1
+                     && (f->vregs[d].flags & IR_VREG_INDUCTION))
+                cstep[d]++;
             else if (o->kind == IR_LD_IMM) cinit[d]++;
+            /* An induction vreg has exactly 2 defs: the self-step above, and
+               one init. Catch-all rather than matching init kinds, since
+               rematerialization can fold a trivial copy-of-base into a
+               direct copy of base's own producer. */
+            else if (f->vregs[d].flags & IR_VREG_INDUCTION)
+                cinit[d]++;
             else cother[d]++;
         }
 }
@@ -843,6 +856,25 @@ static unsigned idx2_home_realizable(const Func *f, int v,
        it is the EVICTED scalar getting cheaper. adr/0062. Admit only the shape
        that measured positive; the assignment site's grounded idx_ben gate then
        prices it as usual. IR_IDX2BASE=0 opts out. */
+    /* Every induction vreg resolves HERE, unconditionally, before the
+       is_base[v]/counter dispatch below — a non-deref companion vreg (e.g.
+       LFTR's loop-bound pointer) is step-shaped like a counter but must not
+       fall through to the general-purpose counter path, which has no CPU
+       restriction. ez80/kc160/rabbit only: cheap native indexed addressing;
+       z80/z80n/z180/r800 already suppress a second induction pointer
+       upstream (ir_opt_ivsr assumes BC is the only home there), and r800's
+       faster clock doesn't change the indexed-vs-HL ratio. Only a
+       deref-base induction vreg (not a stepped/post-step companion) can
+       actually be homed — a pointer read only via whole-word compares has
+       no `(idx+d)` to fold into. */
+    if (vr->flags & IR_VREG_INDUCTION) {
+        if (!is_base[v] || (is_base[v] & IDX2_BASE_STEPPED)) return 0;
+        if (!idx2base_on()) return 0;
+        if (!(IS_EZ80() || IS_KC160() || IS_RABBIT())) return 0;
+        if (cstep[v] == 1 && cinit[v] == 1 && cother[v] == 0)
+            return CF_IDX2_INDUCTION;
+        return 0;
+    }
     if (is_base[v]) {
         if (!idx2base_on()) return 0;
         if (is_base[v] & IDX2_BASE_STEPPED) return 0;   /* walking ptr: wants HL/BC */
@@ -1085,15 +1117,9 @@ static int cs_evict_on(void)
     return c;
 }
 
-/* [prepush-narrow=1] Narrow the whole-function pre-pushed-call veto to the
-   calls that can really lose BC (prepush_bc_hazard).
-   DEFAULT-ON; `IR_OFF=prepush-narrow` opts out (and takes IR_CS_EVICT with it).
-
-   ►► IT IS A PAIR WITH bc-save-live — DO NOT SEPARATE THEM. Alone, the
-   narrowing regresses divbench and shiftbench badly, because it adds `push bc` /
-   `pop bc` pairs around calls; bc-save-live removes the ones whose tenant is
-   not live there, and together the regressions go to exactly zero. Flipping this
-   one on its own reinstates them. Evidence: adr/0063. */
+/* Narrow the pre-pushed-call veto to calls that can lose BC.
+   Keep this enabled with bc-save-live. The pair removes the extra save/restore
+   operations measured in divbench and shiftbench. See adr/0063. */
 static int prepushnarrow_on(void)
 {
     static int c = -1;
@@ -1475,10 +1501,9 @@ static int de_home_available(const Func *f)
 
 /* Inert agreement check (env IR_HR_CHECK): validates that home_realizable
    reproduces the proposers' pool EXACTLY — for every (v, class), the query
-   agrees with pool membership. Run pre-arbitration (vreg_to_phys still all
-   SPILL, the state the proposers saw). Logs any mismatch (false yes or false
-   no); expect ZERO on the corpus → home_realizable is a faithful generator,
-   ready for increment 3 to drive the colouring. Builds its OWN maps (independent
+   agrees with pool membership. Run it before arbitration, while vreg_to_phys is
+   still all SPILL. Log any mismatch. Expect zero mismatches on the corpus.
+   Build its own maps (independent
    recomputation via the factored helpers), so a mismatch would catch a real gap. */
 /* How many SPILLED, writable, non-address-taken width-2 values could take a
    loop home? The idx2 and EXX arms both gate on this same count, and they must
@@ -1520,11 +1545,10 @@ static int hr_residency_window(const Func *f, int v, int *lo, int *hi)
     return 1;
 }
 
-/* Inert home-recoverability verifier (env IR_HOME_VERIFY) — Phase-3 keystone.
+/* Inert home-recoverability verifier (env IR_HOME_VERIFY).
    The invariant ranged sharing MUST preserve: two vregs committed to the SAME
-   register home must not be simultaneously resident. Running it inert now proves
-   the net has zero false positives on the shipping corpus before it gates
-   anything, and it becomes the gate that rejects an unrealisable ranged home
+   register home must not be simultaneously resident. Run it as a report before
+   it gates anything. It will later reject an unrealised ranged home
    once home_lo/hi go non-degenerate (increment 4). Logs to stderr;
    IR_HOME_VERIFY_ABORT makes it fatal.
 
@@ -1856,8 +1880,8 @@ static int g0_word_bytes(int reg, int kind)
          SLOT write 8 -> 7    SLOT step 11 -> 16    IX/IY read+write 4 -> 3
        SLOT read 8, deref 9, BC 2/2/1/1, IX deref 3, IX step 2 and the whole fp
        row (6/6/7/13) assemble EXACTLY as priced. `IR_G0MEASURED=0` reverts.
-       This table feeds bc_byte_benefit, which is on the DEFAULT-ON IR_BCCALLCOST
-       path — it is not just the opt-in byte tie-break. */
+       This table feeds bc_byte_benefit, which the default-on IR_BCCALLCOST
+       path also uses. */
     static const int Z80B[GR_N][GK_N] = {
         /*SLOT*/{8,7,9,16}, /*BC*/{2,2,1,1}, /*DE*/{2,2,1,1},
         /*IX*/{3,3,3,2}, /*IY*/{3,3,3,2} };
@@ -1913,10 +1937,8 @@ static int g0_word_bytes(int reg, int kind)
    emit_hl_add_offset's; both arms are priced off the existing rows so a new CPU
    inherits them.
 
-   ►► Without this term the model rates a BC home and an index home ALIKE for a
-   struct pointer read at four field offsets, and the index home falls to a
-   scalar that must be pushed and popped at every read. The asymmetry is the
-   whole point: an index register cannot feed the ALU. adr/0065. */
+   Without this term, the model rates BC and index homes equally for offset
+   reads. See adr/0065. */
 static int g0_deref_walk(int ofs) { int k = ofs < 0 ? -ofs : ofs;
                                     return k < 4 ? k : 4; }
 
@@ -2125,8 +2147,56 @@ static inline int iv_overlap(const Func *f, int a, int b,
     return ans;
 }
 
+/* The idx2 slot may host several vregs whose live ranges never overlap, not
+   just one for the whole function. `overflow` forces every later query to
+   fail — both when the small fixed-size array is exhausted, and to
+   reproduce the old single-owner behaviour exactly when
+   `--opt-disable=idx2-reuse` is in effect. */
+#define IDX2_MAX_LIVE 16
+typedef struct {
+    int v[IDX2_MAX_LIVE], lo[IDX2_MAX_LIVE], hi[IDX2_MAX_LIVE];
+    int n;
+    int overflow;
+} Idx2Live;
+
+static int idx2_live_free(const Func *f, const Idx2Live *s, int v, int lo, int hi)
+{
+    if (s->overflow) return 0;
+    for (int i = 0; i < s->n; i++)
+        if (iv_overlap(f, v, s->v[i], lo, hi, s->lo[i], s->hi[i])) return 0;
+    return 1;
+}
+
+/* A later pass (`tight-homes`) narrows a whole-function home down to the
+   vreg's true live range, which starts/ends wherever `ir_live_range` says —
+   NOT necessarily at the first_use/last_use this overlap test was computed
+   against. Left alone, that pass could widen a verified-disjoint occupant's
+   realized home back into the window another occupant now also owns. So the
+   moment a SECOND occupant actually joins the slot, pin every occupant's
+   home (including the ones already accepted) to its own verified [lo,hi] as
+   a floor: tight-homes only ever narrows further (the max/min clamp below),
+   never widens past a floor that is already set, so the realized homes stay
+   inside the windows this test proved disjoint. A function that only ever
+   has ONE occupant (today, every sampled corpus/CPU/mode cell) never runs
+   this block, so its home is untouched — exactly the prior behaviour. */
+static void idx2_live_add(Func *f, Idx2Live *s, int v, int lo, int hi, int reuse_on)
+{
+    if (s->n > 0 && !s->overflow && f->home_lo && f->home_hi) {
+        for (int i = 0; i < s->n; i++) {
+            int w = s->v[i];
+            if (f->home_lo[w] < s->lo[i]) f->home_lo[w] = s->lo[i];
+            if (f->home_hi[w] > s->hi[i]) f->home_hi[w] = s->hi[i];
+        }
+        if (f->home_lo[v] < lo) f->home_lo[v] = lo;
+        if (f->home_hi[v] > hi) f->home_hi[v] = hi;
+    }
+    if (s->n < IDX2_MAX_LIVE) { s->v[s->n] = v; s->lo[s->n] = lo; s->hi[s->n] = hi; s->n++; }
+    else s->overflow = 1;
+    if (!reuse_on) s->overflow = 1;   /* single-owner: nobody else may join */
+}
+
 static int counter_yields_bc_to_index(const Func *f, const Cand *pool, int n, int v,
-                                       const long *idx_ben, int idx2_taken,
+                                       const long *idx_ben, const Idx2Live *idx2,
                                        int idx3_taken)
 {
     if (!is_compared_counter(f, v)) return 0;
@@ -2141,7 +2211,8 @@ static int counter_yields_bc_to_index(const Func *f, const Cand *pool, int n, in
     int has_free_idx = 0;
     for (int k = 0; k < n && !has_free_idx; k++) {
         if (pool[k].vreg != v) continue;
-        if ((pool[k].allowed & RC_IDX2) && !idx2_taken && f->idx2_reg != IR_PR_NONE)
+        if ((pool[k].allowed & RC_IDX2) && f->idx2_reg != IR_PR_NONE
+            && idx2_live_free(f, idx2, v, pool[k].lo, pool[k].hi))
             has_free_idx = 1;
         if ((pool[k].allowed & RC_IDX3) && !idx3_taken && f->idx3_reg != IR_PR_NONE)
             has_free_idx = 1;
@@ -2185,9 +2256,11 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
         }
         pool[j] = c;
     }
-    int idx2_taken = 0, byte_reg = 0;    /* 0 / 'C' / 'E' */
+    int byte_reg = 0;                    /* 0 / 'C' / 'E' */
     int idx2_defer = -1;                 /* best param that yielded to a counter */
     int idx3_taken = 0;                  /* the second index (IY) home */
+    int idx2_reuse_on = !opt_disabled("idx2-reuse");
+    Idx2Live idx2_live = {0};
     int exx_taken = 0;                   /* alt-bank invariant claimed → IX freed */
     int de_acc_vreg = -1;                /* DE-acc winner, APPLIED after the loop */
     int de_acc_general = 0;              /* winner is a general (non-acc) home */
@@ -2232,8 +2305,10 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
 
         if (c->allowed & RC_IDX2) {
             /* idx2 sub-priority: a stepping counter beats a param. Only take
-               idx2 for a param if no counter candidate is still assignable. */
-            if (idx2_taken) continue;
+               idx2 for a param if no counter candidate is still assignable
+               over an OVERLAPPING window — a non-overlapping param and
+               counter can both live here. */
+            if (!idx2_live_free(f, &idx2_live, v, c->lo, c->hi)) continue;
             if (f->idx2_reg == IR_PR_NONE) continue;
             /* G1 grounded gate: skip an index home that costs more than the slot
                for this value (read-only value on a cheap-slot target). G2: unless
@@ -2251,19 +2326,22 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                 continue;
             if (c->flags & CF_IDX2_PARAM) {
                 int counter_waiting = 0;
-                for (int k = 0; k < n; k++)
-                    if ((pool[k].allowed & RC_IDX2)
-                        && (pool[k].flags & CF_IDX2_COUNTER)
-                        && f->vreg_to_phys[pool[k].vreg] == IR_PR_SPILL) {
-                        counter_waiting = 1; break;
-                    }
-                /* ►► THE DEFERRAL MUST BE REVISITED. Yielding to a counter is
-                   right only if the counter GOES ON to take the index, and it
-                   often does not — the BC arm below places it there and its own
-                   IDX2 candidate is then skipped as already-placed, leaving the
-                   register claimed by NOBODY. Remember the best deferred param
-                   and give it the index after the loop if it is still free.
-                   adr/0059. */
+                for (int k = 0; k < n; k++) {
+                    if (!(pool[k].allowed & RC_IDX2)
+                        || !(pool[k].flags & CF_IDX2_COUNTER)
+                        || f->vreg_to_phys[pool[k].vreg] != IR_PR_SPILL)
+                        continue;
+                    /* A pending counter only threatens THIS param when their
+                       windows actually overlap — gated on idx2_reuse_on so the
+                       gate-off path keeps the old unconditional defer exactly. */
+                    if (idx2_reuse_on
+                        && !iv_overlap(f, v, pool[k].vreg, c->lo, c->hi,
+                                       pool[k].lo, pool[k].hi))
+                        continue;
+                    counter_waiting = 1; break;
+                }
+                /* Reconsider the best deferred parameter after the loop if the
+                   counter takes BC and leaves the index register unused. */
                 if (counter_waiting) {
                     if (idx2_defer < 0 || c->benefit > pool[idx2_defer].benefit)
                         idx2_defer = (int)(c - pool);
@@ -2271,13 +2349,13 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                 }
             }
             f->vreg_to_phys[v] = f->idx2_reg;
-            idx2_taken = 1;
+            idx2_live_add(f, &idx2_live, v, c->lo, c->hi, idx2_reuse_on);
             continue;
         }
 
         if (c->allowed & RC_IDX3) {
-            /* Writable loop var in an index register. First → IY (idx3_reg).
-               A SECOND writable → IX (idx2_reg) ONLY when the exx co-design
+            /* Writable loop var in an index register. First goes to IY
+               (idx3_reg). A second writable goes to IX (idx2_reg) only when the
                moved the invariant to the alt bank (exx_taken) and idx2 didn't
                claim IX — that's the search layout (lo→IX, hi→IY, key→alt). The
                lowering recognises IR_PR_IX as an index home via vreg_idx_home. */
@@ -2287,9 +2365,10 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
             if (!idx3_taken) {
                 f->vreg_to_phys[v] = f->idx3_reg;
                 idx3_taken = 1;
-            } else if (exx_taken && !idx2_taken && f->idx2_reg != IR_PR_NONE) {
+            } else if (exx_taken && f->idx2_reg != IR_PR_NONE
+                       && idx2_live_free(f, &idx2_live, v, c->lo, c->hi)) {
                 f->vreg_to_phys[v] = f->idx2_reg;   /* IX freed by exx */
-                idx2_taken = 1;
+                idx2_live_add(f, &idx2_live, v, c->lo, c->hi, idx2_reuse_on);
             }
             continue;
         }
@@ -2302,7 +2381,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                IX in practice (the `lea` idx-read gain). Skip DE here so v's own
                idx candidate (processed later) parks it in the free index. */
             if (counter_yields_bc_to_index(f, pool, n, v, idx_ben,
-                                           idx2_taken, idx3_taken))
+                                           &idx2_live, idx3_taken))
                 continue;
             /* GENERAL DE-home candidates are handled in a SEPARATE phase after
                this loop (see below): they are speculative (revert if no region
@@ -2367,7 +2446,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                below (which handles the no-index case, e.g. fp where IX is the frame
                pointer). Only when the index is genuinely free and not cost-rejected. */
             if (counter_yields_bc_to_index(f, pool, n, v, idx_ben,
-                                           idx2_taken, idx3_taken))
+                                           &idx2_live, idx3_taken))
                 continue;
             /* [mwbc-pressure] A loop-carried accumulator prices high for
                BC but is worth less there than the value it displaces. Give BC
@@ -2448,18 +2527,16 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
             continue;
         }
     }
-    /* ►► Revisit the param that yielded idx2 to a counter. If the counter did
-       not in fact take the index — it is normally also a BC candidate and the
-       BC arm above places it there, after which its own IDX2 candidate is
-       skipped as already-placed — the register is sitting EMPTY and the param
-       is in a slot. Give it the register. Only when idx2 is genuinely still
-       free and the param is still unplaced, so the yield is preserved whenever
-       the counter DID collect it. adr/0059. `--opt-disable=idx2-revisit`. */
-    if (idx2_defer >= 0 && !idx2_taken && f->idx2_reg != IR_PR_NONE
+    /* Revisit the parameter that yielded idx2 if the counter did not take the
+       index. Use the register only while it remains free. See adr/0059. */
+    if (idx2_defer >= 0 && f->idx2_reg != IR_PR_NONE
         && !opt_disabled("idx2-revisit")
-        && f->vreg_to_phys[pool[idx2_defer].vreg] == IR_PR_SPILL) {
+        && f->vreg_to_phys[pool[idx2_defer].vreg] == IR_PR_SPILL
+        && idx2_live_free(f, &idx2_live, pool[idx2_defer].vreg,
+                          pool[idx2_defer].lo, pool[idx2_defer].hi)) {
         f->vreg_to_phys[pool[idx2_defer].vreg] = f->idx2_reg;
-        idx2_taken = 1;
+        idx2_live_add(f, &idx2_live, pool[idx2_defer].vreg,
+                      pool[idx2_defer].lo, pool[idx2_defer].hi, idx2_reuse_on);
     }
     /* ---- PAIRWISE SWAP: BC <-> the index home ----------------------------
        The loop above is ISOLATION-PRICED GREEDY: it gives each candidate its
@@ -2476,14 +2553,15 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
        the same interval_benefit the loop ranked by. `--opt-disable=home-swap`
        opts out. */
     if (!opt_disabled("home-swap") && f->idx2_reg != IR_PR_NONE && bb_loop_depth) {
-        int v_bc = -1, v_idx = -1, n_bc = 0;
+        int v_bc = -1, v_idx = -1, n_bc = 0, n_idx = 0;
         for (int j = 0; j < f->n_vregs; j++) {
             if (f->vreg_to_phys[j] == IR_PR_BC) { v_bc = j; n_bc++; }
-            else if (f->vreg_to_phys[j] == f->idx2_reg) v_idx = j;
+            else if (f->vreg_to_phys[j] == f->idx2_reg) { v_idx = j; n_idx++; }
         }
         /* BC is multi-occupant; a swap is only well-defined with a single
-           tenant, and the index classes are one-tenant by construction. */
-        if (n_bc == 1 && v_bc >= 0 && v_idx >= 0 && v_bc != v_idx) {
+           tenant. idx2 may now also host more than one occupant (live-range
+           reuse) — the swap stays narrow and skips a multi-occupant idx2 too. */
+        if (n_bc == 1 && n_idx == 1 && v_bc >= 0 && v_idx >= 0 && v_bc != v_idx) {
             /* Each must be ALLOWED in the other's class — the pool records
                what the proposers admitted, including the idx gates. */
             int bc_ok_idx = 0, idx_ok_bc = 0;
@@ -5933,7 +6011,7 @@ void ir_alloc(Func *f)
                        IR_VREG_BC_PACK or IR_VREG_CALL_SPLIT blocker is another
                        ranged claim that already won its own competition; if one
                        of those overlaps, stand down. So is an IR_VREG_INDUCTION
-                       blocker, and that one is load-bearing: an IV in BC is
+                       blocker. An IV in BC is
                        stepped IN PLACE (`inc bc`) every iteration, so evicting it
                        turns a register step into a slot read-modify-write on
                        every trip — a cost no span-local read saving repays.
@@ -6189,9 +6267,8 @@ void ir_alloc(Func *f)
        now that stage 1 made the intervals truthful — while every home spanned
        the whole function, nothing could be disjoint from anything.
 
-       The question this answers is whether to BUILD stage 2, and it is the same
-       question IR_PAIRPROBE asked before the pair allocator (which it refused,
-       correctly, on zero opportunity). For each SPILLED value, is there a
+       This report asks whether stage 2 has useful candidates. For each spilled
+       value, is there a
        parking register whose every current tenant has a live range DISJOINT
        from it? If so that register could host it over its own window and the
        spill is avoidable; if the count is ~0 corpus-wide, stage 2 has nothing

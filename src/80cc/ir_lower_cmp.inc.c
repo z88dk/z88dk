@@ -747,6 +747,7 @@ static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
 {
     if (hl_has(op->src[1])) {
         /* src1 already in HL (its target). Load src0 into DE, keeping HL. */
+        ss_note_cache_read(f, op->src[1]);
         load_to_de_preserve_hl(out, f, op->src[0]);
         cache_de(op->src[0]);
         return;
@@ -754,6 +755,7 @@ static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
     if (hl_has(op->src[0])) {
         /* src0 in HL but wanted in DE. If it's the pending spill, flush it
            (store_hl leaves it in DE, the swap's intent). Else ex de,hl. */
+        ss_note_cache_read(f, op->src[0]);
         if (L.lazy_spill_on && L.pending_spill_v == op->src[0]) {
             pending_spill_flush();
             cache_de(op->src[0]);
@@ -767,6 +769,7 @@ static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
     }
     if (de_has(op->src[0])) {
         /* src0 already in DE: just bring src1 into HL (preserves DE). */
+        ss_note_cache_read(f, op->src[0]);
         load_to_hl(out, f, op->src[1]);
         return;
     }
@@ -782,6 +785,7 @@ static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
             load_to_hl(out, f, op->src[1]);
             return;
         }
+        ss_note_cache_read(f, op->src[1]);
         emit_ex_de_hl(out);
         swap_hl_de_caches();
         load_to_de_preserve_hl(out, f, op->src[0]);
@@ -1302,6 +1306,8 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         }
         if (!hl_has(op->src[1]))
             load_to_hl(out, f, op->src[1]);
+        else
+            ss_note_cache_read(f, op->src[1]);
         emit(out, "ld\t%s,l", counter);
         if (save_a) emit_sp(out, -2, "pop\taf");
         else         load_byte_to_a(out, f, op->src[0]);
@@ -1443,6 +1449,8 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             if (op->src[1] >= 0) {
                 if (!hl_has(op->src[1]))
                     load_to_hl(out, f, op->src[1]);
+                else
+                    ss_note_cache_read(f, op->src[1]);
                 emit(out, "ld\ta,l");
                 cache_a(op->src[1]);
                 load_to_dehl(out, f, op->src[0]);
@@ -1461,6 +1469,8 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                IR_SHR is always logical). Same staging as IR_SHL. */
             if (!hl_has(op->src[1]))
                 load_to_hl(out, f, op->src[1]);
+            else
+                ss_note_cache_read(f, op->src[1]);
             emit(out, "ld\ta,l");
             /* Count is in A. Mark A live so load_to_dehl's gbz80 byte-walk
                uses the A-preserving `ld r,(hl); inc hl`, not `ld a,(hl+)`
@@ -1565,7 +1575,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
            `byte_shift` bytes zero. One 4-instruction sequence per case. */
         switch (byte_shift) {
         case 0: break;
-        case 1: /* L=H H=E E=D D=0 */
+        case 1:
             emit(out, "ld\tl,h");
             emit(out, "ld\th,e");
             emit(out, "ld\te,d");

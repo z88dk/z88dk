@@ -52,7 +52,7 @@ those ops, so the IR can't see the adjacency. Running the filter before copt
 removes the dead labels and inline `defc`s that would otherwise split
 otherwise-consecutive instructions, letting copt's line-adjacent patterns fire.
 
-### The load-bearing soundness invariant: threading is operand-rewrite, not aliasing
+### The soundness invariant: threading rewrites operands, not aliases
 
 Jump threading **rewrites the jump operand** (`jp cc,X → jp cc,Y`) and leaves
 `X`'s `jp Y` body in place. It must **never** thread by aliasing `X` to `Y`

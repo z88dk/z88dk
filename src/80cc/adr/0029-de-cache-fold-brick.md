@@ -44,10 +44,10 @@ gap between definition and use, and the population of such values has never been
 measured on real files — the corpus does not contain the shape in quantity. It
 needs a measurement on a real char- and pointer-heavy file before promotion.
 
-The risk is not correctness but **clutter**: an opportunistic fold that fires
-rarely is a permanent complication to the belief cache for little return. If a
-measurement shows a thin population, refuse it and record that here, as 0018
-records its sibling.
+The fold can add **clutter** without changing correctness. If it fires rarely,
+it permanently complicates the belief cache for little return. If a measurement
+shows a thin population, refuse it and record that here, as 0018 records its
+sibling.
 
 ## Measured, and REJECTED (2026-09-15)
 
