@@ -106,13 +106,52 @@ Size across the corpus before implementing.
   r2ka/r4k/r6k/kc160 until guarded to defer to their native `ld hl,(sp+N)`
   word read when the slot is in range. `BENCH_MATRIX.txt` 80cc columns:
   66 cells changed, 0 grown, -295 B total.
-- **IR_IVWIDTH — shipped opt-in, not yet default-on.** A loop counter proven
-  to hold only byte values throughout one specific loop (constant start in
-  0..255, step +1, constant exit bound ≤255) gets an 8-bit loop-exit compare
-  and increment instead of 16-bit. -254 B across 14 benches with the flag on,
-  0 B with it off (confirmed byte-identical), `long_ir` clean both frame
-  modes. Needs the tick scan (no cell slower) before flipping default-on —
-  not yet run.
+- **IR_IVWIDTH — shipped opt-in, STALE MEASUREMENT, uncommitted fix on top.**
+  A loop counter proven to hold only byte values throughout one specific loop
+  (constant start in 0..255, step +1, constant exit bound ≤255) gets an
+  8-bit loop-exit compare and increment instead of 16-bit. The committed
+  version's -254 B/14-bench figure was WRONG — it shipped without checking
+  that the same vreg can be reused (non-SSA) for a SECOND, differently-ranged
+  loop elsewhere in the function (`searchbench`'s `r` drives both a bound-512
+  loop and a bound-6 one): marking is per-loop but `IR_VREG_BYTE_RANGE` is
+  per-vreg, so the mark from the small loop silently narrowed the big loop's
+  increment too — an 8-bit `inc` on a counter that needs 9 bits wraps and
+  infinite-loops. Caught by the tick scan (two cells hit the emulator's
+  timeout sentinel), NOT by `long_ir` or any size scan. The fix (require the
+  vreg to be referenced nowhere outside this one loop's preheader+body) is
+  written and correct — `long_ir` clean both frame modes, tick scan clean,
+  default-off byte-identical — but is **sitting uncommitted in `ir_opt.c`**,
+  on top of the already-committed buggy version. Apply it before touching
+  this again. The real number is -24 B total (z80/z80n/z180), -20 B
+  (ez80/kc160/rabbit4k), 0 B (8080/8085/gbz80 — no index register for the
+  fp-mode `inc (ix+d)` rung) across just 8 of 31 benches, for ~260 lines of
+  new allocator+lowering code — a poor size-to-complexity ratio. Recommend
+  against promoting to default-on; either commit the fix and leave it
+  opt-in, or revert the whole feature.
+- **Constant-multiply strength reduction doesn't cache its own operand under
+  register pressure.** A concrete, reproducible instance of the standing
+  allocator-capture-gap finding, found chasing `matrix_compute` (+106 B vs
+  sdcc, the single largest per-function gap in a 148-function/23-bench
+  census this session ran). The corpus-wide LCG (`seed = seed*25173+13849`,
+  textually present in 22 of ~30 bench files) shows TWO different outcomes:
+  in `bitfieldbench` the multiply loads `seed` once into BC and keeps it
+  resident through the whole shift-add decomposition (matches sdcc exactly);
+  in `matrixbench::matrix_compute` the SAME decomposition reloads `seed`
+  from its frame slot six separate times. The difference is register
+  pressure: `matrix_compute`'s loop counter `i` pins BC for indexing
+  `gridA[i]`/`gridB[i]`, leaving no spare pair — sdcc handles this by
+  temporarily borrowing DE (push/pop it around the computation) to hold the
+  original multiplicand for the chain's repeated references; 80cc's
+  strength-reduction codegen just re-emits `load_to_hl` on every reference
+  instead of caching the value it already loaded moments earlier. Likely
+  fixable LOCALLY in whichever `ir_lower*.inc.c` function lowers a constant
+  multiply's shift-add decomposition (cache the operand in a free register —
+  or stack-park it — for the chain's duration), not a full allocator
+  rewrite. Not sized: next step is a corpus census of the signature (a
+  `load_to_hl`-equivalent for the SAME vreg repeated within one straight-line
+  shift-add chain, no intervening clobber) to find how often the pressure
+  condition actually triggers it — `bitfieldbench`'s clean case shows it
+  does NOT fire universally just because the LCG is present.
 - **idx2 live-range reuse — ADR 0101.** The idx2 slot hosts non-overlapping
   live ranges instead of one whole-function owner. Measures zero today (BC's
   own multi-occupant check already claims every real disjoint-pair case
