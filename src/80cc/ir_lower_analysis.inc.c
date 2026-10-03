@@ -523,7 +523,7 @@ static void word_home_flush(FILE *out, const Func *f)
    per-iteration entry flush. Correct without a reload: compute_home_region
    proves the home rides physical DE across the region and no leaving-edge
    source redefines it before the branch, so DE = the final accumulator on
-   every region-leaving edge. fp-only (the word DE-home forms only in fp). */
+   every region-leaving edge. */
 static void word_home_exit_flush(FILE *out, const Func *f)
 {
     int v = g_hc.func_whome;
@@ -535,8 +535,8 @@ static void word_home_exit_flush(FILE *out, const Func *f)
         emit(out, "ld\t(%s%+d),d", frame_reg(), off + 1);
         return;
     }
-    /* Frameless: flush the DE home to its (caller) param slot via HL. */
-    if (L.cur_frameless) {
+    /* Frameless or sp mode: flush the DE home to its slot via HL. */
+    if (L.cur_frameless || !fp_active(f)) {
         emit(out, "ld\thl,%d", slot_off(f, v) + L.cur_sp_adjust);
         emit(out, "add\thl,sp");
         emit(out, "ld\t(hl),e");

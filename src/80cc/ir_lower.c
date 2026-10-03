@@ -155,6 +155,7 @@ typedef struct {
        the orchestrator elected to keep in DE across a loop — MOVED to g_hc.de_home
        (step 3a). cur_home_region_lo/hi is the proven BB span it stays resident. */
     int cur_home_region_lo, cur_home_region_hi, cur_home_exit_flush_bb;
+    int cur_home_exit_lazy;   /* word home's exit block returns: its flush is deferred */
     int *bb_byte_out;
     /* Per-BB A-cache exit tenant: the vreg A holds at BB exit, or -1. Set only
        when a byte compare (cp/or a) left the tested byte in A — word compares
@@ -8735,6 +8736,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
        the word DE-home (fp, flush E+D via ix) and the byte E/D-home (fp via ix
        or sp via HL, flush the one byte). IR_NO_WH_EXIT_HOIST opts out. */
     L.cur_home_exit_flush_bb = -1;
+    L.cur_home_exit_lazy = 0;
     if (L.cur_func_ehome >= 0
         && L.cur_home_region_lo >= 0 && !opt_disabled("wh-exit-hoist")) {
         int tgt = -1, ok = 1;
@@ -8771,18 +8773,20 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             }
             /* fp: the flush store is ix-relative, so its offset(s) must fit
                (word home writes 2 bytes: off and off+1; byte home just off).
-               sp: the flush addresses via HL, which reaches any slot — but the
-               word DE-home's exit flush is fp-only, so gate sp to byte homes. */
+               sp: the flush addresses via HL, which reaches any slot. */
             int slot_ok;
             if (fp_active(f)) {
                 int off = slot_ix_off(f, L.cur_func_ehome);
                 slot_ok = fp_offset_fits(off)
                     && (!g_hc.home_is_word || fp_offset_fits(off + 1));
             } else {
-                slot_ok = !g_hc.home_is_word;
+                slot_ok = 1;
             }
-            if (all_in && slot_ok)
+            if (all_in && slot_ok) {
                 L.cur_home_exit_flush_bb = tgt;
+                L.cur_home_exit_lazy = g_hc.home_is_word && ir_bb_n_succ(&f->bbs[tgt]) == 0
+                    && !opt_disabled("home-exit-de");
+            }
         }
     }
     L.cur_func_uses_params = func_uses_params(f);   /* frame-pointer elision */
@@ -8937,6 +8941,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            lands with the defer step. Clear it so nothing leaks. */
         L.pending_spill_v = -1;
         int hl_clobbered_at_entry = 0;
+        int exit_de_belief = -1;   /* word home DE still holds after its exit flush */
         /* Word DE-home exit-flush hoist: this block is the region's sole,
            dedicated exit — physical DE still holds the final accumulator (the
            region proof; nothing has emitted since the exit branch). Flush it to
@@ -8954,7 +8959,14 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             int hv = g_hc.home_is_word ? g_hc.func_whome : L.cur_func_ehome;
             int home_live = hv >= 0 && bb->live_in
                 && ir_bitset_get((const BitSet *)bb->live_in, hv);
-            if (home_live) {
+            /* A word home whose exit block ends in the return has no later
+               reader of its slot (the frame is released): keep it dirty in DE
+               and leave the flush to the first op that clobbers DE. */
+            int keep_dirty = home_live && L.cur_home_exit_lazy;
+            if (keep_dirty) {
+                exit_de_belief = hv;
+            } else if (home_live) {
+                if (g_hc.home_is_word && !opt_disabled("home-exit-de")) exit_de_belief = hv;
                 if (g_hc.home_is_word) word_home_exit_flush(out, f);
                 else                    byte_home_exit_flush(out, f);
                 /* Both flushes address the home's slot through HL, so HL no
@@ -8962,8 +8974,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                    address carry below must not re-assert their belief. */
                 hl_clobbered_at_entry = 1;
             }
-            L.cur_de_byte_home_dirty = 0;
-            L.cur_de_byte_home_vreg = -1;
+            if (!keep_dirty) {
+                L.cur_de_byte_home_dirty = 0;
+                L.cur_de_byte_home_vreg = -1;
+            }
         }
         /* Carry the HL cache across the BB boundary when ALL
            predecessors have already been lowered AND agree on
@@ -9022,6 +9036,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         else if (de_carry_on && bb_pred_cnt[bb->id] == 0 && entry_de >= 0 && bb->live_in
                  && ir_bitset_get((const BitSet *)bb->live_in, entry_de))
             cache_de(entry_de);
+        /* The exit flush stores DE and leaves it intact, so a read of the home
+           in this block takes it from DE instead of the slot just written. */
+        if (exit_de_belief >= 0) cache_de(exit_de_belief);
         /* [IR_FCLONG_CARRY] Re-assert the entry DEHL residency the branches above
            just cleared (every one of them ends in invalidate_de_cache /
            invalidate_hl_cache, both of which drop rs.dehl). Entry BB only, and
@@ -9779,7 +9796,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                        a coherent slot if it doesn't carry. */
                     if (L.cur_func_ehome >= 0 && bb_exit_flush_needed
                         && L.cur_de_byte_home_dirty && L.cur_de_byte_home_vreg >= 0
-                        && home_is_slotbacked(f, L.cur_de_byte_home_vreg))
+                        && home_is_slotbacked(f, L.cur_de_byte_home_vreg)
+                        && !(is_region_preheader && L.cur_home_exit_lazy
+                             && L.cur_de_byte_home_vreg == L.cur_func_ehome))
                         home_flush(out, f);
                     continue;
                 }
@@ -9834,7 +9853,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     home_clobber(out, f);
                 } else if (L.cur_de_byte_home_dirty && bb_exit_flush_needed
                            && (op->kind == IR_BR || op->kind == IR_BR_COND
-                               || op->kind == IR_BR_ZERO)) {
+                               || op->kind == IR_BR_ZERO)
+                           && !(is_region_preheader && L.cur_home_exit_lazy
+                                && L.cur_de_byte_home_vreg == L.cur_func_ehome)) {
                     home_flush(out, f);   /* keep belief */
                 }
             }
@@ -9887,7 +9908,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            branch in the dispatch above. */
         if (L.cur_func_ehome >= 0 && bb_exit_flush_needed && L.cur_de_byte_home_dirty
             && L.cur_de_byte_home_vreg >= 0
-            && home_is_slotbacked(f, L.cur_de_byte_home_vreg)) {
+            && home_is_slotbacked(f, L.cur_de_byte_home_vreg)
+            && !(is_region_preheader && L.cur_home_exit_lazy
+                 && L.cur_de_byte_home_vreg == L.cur_func_ehome)) {
             int lastk = bb->n_ops ? bb->ops[bb->n_ops - 1].kind : IR_NOP;
             if (lastk != IR_BR && lastk != IR_BR_COND
                 && lastk != IR_BR_ZERO && lastk != IR_RET

@@ -1143,6 +1143,15 @@
 =
 	ld	hl,%1
 
+;; #IW1: HL=DE then a swap — both registers already hold the same value, so the
+;; swap changes nothing. Drop it (#GB3 can then drop the copy itself if HL is
+;; reloaded). No liveness question: the register file is identical either way.
+%title #IW1 drop ex de,hl after ld hl,de (HL=DE, the swap is a no-op) (-1b)
+	ld	hl,de
+	ex	de,hl
+=
+	ld	hl,de
+
 ;; #GB4: BC->HL copy whose only consumer is `push hl` (then HL reloaded, dead) —
 ;; push bc directly (push hl==push bc when HL=BC). push de is the DEHL high half.
 %title #GB4 push bc instead of bc->hl copy for a dead push hl (-2b)
