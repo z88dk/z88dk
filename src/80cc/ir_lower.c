@@ -3003,6 +3003,103 @@ static void fold_xorflip_chain(char **lines, char *drop, int n)
     }
 }
 
+/* [mulchain-de] A const-multiply Horner chain (emit_const_mult_sr,
+   ir_build.c) whose multiplicand `v` has no register home reloads it on
+   every term instead of once:
+
+       ld   hl,(ix+d)      <- v (seeds acc = v)
+       add  hl,hl   {1,}
+     [ ex   de,hl
+       ld   hl,(ix+d)      <- v reloaded, SAME d
+       add  hl,de
+       add  hl,hl   {0,} ]+
+
+   Each `ex de,hl` only frees HL for the reload — DE's incoming value is
+   never read again, so DE is provably dead here by construction, no
+   liveness needed. Fix: load v into DE once up front, delete every
+   ex+reload pair, keep the `add hl,de`/doublings. The trailing `ld de,K /
+   add hl,de` for the chain's constant term is unrelated and left alone.
+
+   Runs as its own pass on the finished text, not inside
+   filter_dead_bc_parks's liveness sweep (its instr_effects assumes one
+   instruction per line; the rewritten seed line isn't). Denial-only:
+   --opt-disable=mulchain-de. */
+static int mulchain_match_reload_hl(const char *line, char *reg, int *off)
+{
+    char r[4] = {0};
+    int o = 0, consumed = 0;
+    if (sscanf(line, "\tld\thl,(%3[a-z]%d)%n", r, &o, &consumed) != 2)
+        return 0;
+    if (line[consumed] != '\n' || line[consumed + 1] != '\0')
+        return 0;
+    if (strcmp(r, "ix") != 0 && strcmp(r, "iy") != 0)
+        return 0;
+    strcpy(reg, r);
+    *off = o;
+    return 1;
+}
+
+static int mulchain_is_add_hl_hl(const char *l) { return !strcmp(l, "\tadd\thl,hl\n"); }
+static int mulchain_is_ex_de_hl(const char *l)  { return !strcmp(l, "\tex\tde,hl\n"); }
+static int mulchain_is_add_hl_de(const char *l) { return !strcmp(l, "\tadd\thl,de\n"); }
+
+static void fold_mulchain_de(char **lines, char *drop, int n)
+{
+    if (opt_disabled("mulchain-de")) return;
+    for (int i = 0; i + 3 < n; i++) {
+        if (drop[i]) continue;
+        char reg[4];
+        int off;
+        if (!mulchain_match_reload_hl(lines[i], reg, &off)) continue;
+        int j = i + 1, dbl = 0;
+        while (j < n && mulchain_is_add_hl_hl(lines[j])) { j++; dbl++; }
+        if (dbl < 1) continue;        /* acc must double at least once first */
+        int repeats = 0, k = j;
+        while (k + 2 < n && mulchain_is_ex_de_hl(lines[k])) {
+            char reg2[4];
+            int off2;
+            if (!mulchain_match_reload_hl(lines[k + 1], reg2, &off2)) break;
+            if (off2 != off || strcmp(reg2, reg) != 0) break;
+            if (!mulchain_is_add_hl_de(lines[k + 2])) break;
+            repeats++;
+            k += 3;
+            while (k < n && mulchain_is_add_hl_hl(lines[k])) k++;
+        }
+        if (repeats < 1) continue;
+        size_t len = strlen(lines[i]) + strlen("\tld\tde,hl\n") + 1;
+        char *nl = malloc(len);
+        if (!nl) continue;
+        snprintf(nl, len, "%s\tld\tde,hl\n", lines[i]);
+        free(lines[i]);
+        lines[i] = nl;
+        int m = j;
+        for (int r = 0; r < repeats; r++) {
+            drop[m] = 1;            /* ex de,hl */
+            drop[m + 1] = 1;        /* ld hl,(reg+off) reload */
+            m += 3;                 /* keep the add hl,de between */
+            while (m < n && mulchain_is_add_hl_hl(lines[m])) m++;
+        }
+        i = m - 1;                  /* resume scanning past the matched region */
+    }
+}
+
+void ir_lower_fold_mulchain_de(FILE *out, FILE *src)
+{
+    char **lines;
+    int n;
+    if (!slurp_lower_lines(src, &lines, &n)) {
+        copy_lower_stream(out, src);
+        return;
+    }
+    char *drop = calloc((size_t)(n > 0 ? n : 1), 1);
+    if (drop) fold_mulchain_de(lines, drop, n);
+    for (int i = 0; i < n; i++)
+        if (!drop || !drop[i]) fputs(lines[i], out);
+    for (int i = 0; i < n; i++) free(lines[i]);
+    free(lines);
+    free(drop);
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
