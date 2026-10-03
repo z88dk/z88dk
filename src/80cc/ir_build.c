@@ -236,6 +236,64 @@ static int ir_inline_block_ops_ok(void)
     return !IS_808x() && !IS_GBZ80();
 }
 
+/* Call-argument reordering. An argument that contains control flow (?:, &&,
+   ||) ends the basic block, so the pushes of the arguments built before it
+   cannot be made at their producers and every one of them spills. When all
+   the arguments are free of side effects and of volatile reads, their
+   evaluation order is unobservable, so the control-flow ones are built first
+   and the rest then form one straight run of pushes. Volatile accesses are
+   ordered with respect to each other, so at most one argument may touch one. */
+static int arg_pure_nonvolatile(Node *n, int *nvol)
+{
+    if (!n) return 1;
+    switch (n->ast_type) {
+    case AST_LITERAL: case AST_STR_LIT: case AST_LABEL:
+    case OP_ADDR: case AST_ADDR:
+        return 1;
+    case AST_LOCAL_VAR: case AST_GLOBAL_VAR:
+        if ((n->sym && n->sym->ctype && n->sym->ctype->isvolatile)
+            || (n->type && n->type->isvolatile))
+            (*nvol)++;
+        return 1;
+    case OP_NEG: case OP_COMP: case OP_LNEG: case OP_CAST: case OP_SIZEOF:
+        return arg_pure_nonvolatile(n->operand, nvol);
+    case OP_DEREF: case AST_DEREF:
+        if (n->type && n->type->isvolatile) (*nvol)++;
+        return arg_pure_nonvolatile(n->operand, nvol);
+    case AST_TERNARY:
+        return arg_pure_nonvolatile(n->cond, nvol)
+            && arg_pure_nonvolatile(n->then, nvol)
+            && arg_pure_nonvolatile(n->els, nvol);
+    case OP_ADD: case OP_SUB: case OP_MULT: case OP_DIV: case OP_MOD:
+    case OP_AND: case OP_OR:  case OP_XOR:
+    case OP_EQ:  case OP_NE:
+    case OP_LT:  case OP_LE: case OP_GT: case OP_GE:
+    case OP_SSHR: case OP_SSHL: case OP_USHR: case OP_USHL:
+    case OP_OROR: case OP_ANDAND:
+        return arg_pure_nonvolatile(n->left, nvol)
+            && arg_pure_nonvolatile(n->right, nvol);
+    default:
+        return 0;
+    }
+}
+
+static int arg_has_control_flow(Node *n)
+{
+    if (!n) return 0;
+    switch (n->ast_type) {
+    case AST_TERNARY: case OP_OROR: case OP_ANDAND:
+        return 1;
+    case OP_NEG: case OP_COMP: case OP_LNEG: case OP_CAST: case OP_SIZEOF:
+    case OP_DEREF: case AST_DEREF:
+        return arg_has_control_flow(n->operand);
+    case AST_LITERAL: case AST_STR_LIT: case AST_LOCAL_VAR:
+    case AST_GLOBAL_VAR: case AST_LABEL: case OP_ADDR: case AST_ADDR:
+        return 0;
+    default:
+        return arg_has_control_flow(n->left) || arg_has_control_flow(n->right);
+    }
+}
+
 static int build_expr(Builder *b, Node *n)
 {
     return build_expr_hinted(b, n, -1);
@@ -4161,6 +4219,35 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             int n_to_push = is_fastcall ? n_args - 1
                           : is_sdcccall1 ? 0
                           : n_args;
+            /* Build the control-flow arguments first (see arg_pure_nonvolatile). */
+            int pre_v[64];
+            int reorder = 0;
+            if (n_to_push == n_args && n_args >= 2 && n_args <= 64
+                && !opt_disabled("arg-reorder")) {
+                int any_cf = 0, all_ok = 1, vol_args = 0;
+                for (int i = 0; i < n_args && all_ok; i++) {
+                    Node *a = array_get_byindex(n->args, i);
+                    int nvol = 0;
+                    if (!a || (a->type && a->type->kind == KIND_STRUCT)
+                        || !arg_pure_nonvolatile(a, &nvol))
+                        all_ok = 0;
+                    else {
+                        if (nvol) vol_args++;
+                        if (arg_has_control_flow(a)) any_cf = 1;
+                    }
+                }
+                reorder = all_ok && any_cf && vol_args <= 1;
+            }
+            if (reorder) {
+                for (int i = 0; i < n_args; i++) pre_v[i] = -1;
+                for (int k = 0; k < n_args; k++) {
+                    int i = is_stdc ? n_args - 1 - k : k;
+                    Node *a = array_get_byindex(n->args, i);
+                    if (!arg_has_control_flow(a)) continue;
+                    pre_v[i] = build_expr(b, a);
+                    if (pre_v[i] < 0) { free(args); free(arg_pushed_bytes); return -1; }
+                }
+            }
             int push_bb   = b->cur_bb_id;
             int pushable  = 1;
             int push_ops[64];
@@ -4193,7 +4280,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                            : NULL;
                 int is_struct = arg_is_struct && pt_i && pt_i->kind == KIND_STRUCT;
                 if (is_struct) has_struct_arg = 1;
-                int v = arg_is_struct ? agg_lvalue_addr(b, a) : build_expr(b, a);
+                int v = (reorder && pre_v[i] >= 0) ? pre_v[i]
+                      : arg_is_struct ? agg_lvalue_addr(b, a) : build_expr(b, a);
                 if (v < 0) { free(args); free(arg_pushed_bytes); return -1; }
                 /* __z88dk_sdccdecl: a char parameter is passed as ONE
                    byte (not the smallc 2-byte int promotion). Truncate

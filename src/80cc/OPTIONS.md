@@ -44,6 +44,7 @@ exists (ADR 0010).
 
 | Name | Turning it off means |
 | --- | --- |
+| `arg-reorder` | keep call arguments in source order even when all are side-effect-free, so a control-flow argument spills the earlier ones |
 | `const-fold` | no IR constant folding |
 | `dce` | no dead-code elimination |
 | `dce-live` | DCE keeps its cheap form; no liveness-driven mark-and-sweep |
