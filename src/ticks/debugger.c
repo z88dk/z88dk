@@ -67,6 +67,12 @@ static uint8_t* xl(struct debugger_regs_t* regs) { return &regs->xl; }
 static uint8_t* yh(struct debugger_regs_t* regs) { return &regs->yh; }
 static uint8_t* yl(struct debugger_regs_t* regs) { return &regs->yl; }
 
+static uint8_t* i(struct debugger_regs_t* regs) { return &regs->i; }
+static uint8_t* r(struct debugger_regs_t* regs) { return &regs->r; }
+static uint8_t* iff1(struct debugger_regs_t* regs) { return &regs->iff1; }
+static uint8_t* iff2(struct debugger_regs_t* regs) { return &regs->iff2; }
+static uint8_t* im(struct debugger_regs_t* regs) { return &regs->im; }
+
 static uint16_t* sp(struct debugger_regs_t* regs) { return &regs->sp; }
 static uint16_t* pc(struct debugger_regs_t* regs) { return &regs->pc; }
 
@@ -99,6 +105,12 @@ static struct reg registers[] = {
     { "ixl", &xl,  NULL },
     { "iyh", &yh,  NULL },
     { "iyl", &yl,  NULL },
+    { "ir",  &r,   &i },
+    { "i",   &i,   NULL },
+    { "r",   &r,   NULL },
+    { "iff1", &iff1, NULL },
+    { "iff2", &iff2, NULL },
+    { "im",  &im,  NULL },
     { NULL, NULL, NULL },
 };
 
@@ -1537,7 +1549,7 @@ static int cmd_registers(int argc, char **argv)
     const unsigned short pc = bk.pc();
     const unsigned short sp = bk.sp();
 
-    struct debugger_regs_t regs;
+    struct debugger_regs_t regs = {0};
     bk.get_regs(&regs);
 
     if (isvm1()) {
@@ -1634,6 +1646,16 @@ static int cmd_registers(int argc, char **argv)
                        FNT_CLR "CLOCKL " FNT_RST "$" FNT_BLD "%04X" FNT_RST "\n",
                        regs.clockh, regs.clockl);
         }
+
+        if (regs.has_interrupt_state)
+        {
+            bk.console(FNT_CLR "i "    FNT_RST "$" FNT_BLD "%02X" FNT_RST "   "
+                       FNT_CLR "r "    FNT_RST "$" FNT_BLD "%02X" FNT_RST "   "
+                       FNT_CLR "iff1 " FNT_RST     FNT_BLD "%d"   FNT_RST "   "
+                       FNT_CLR "iff2 " FNT_RST     FNT_BLD "%d"   FNT_RST "   "
+                       FNT_CLR "im "   FNT_RST     FNT_BLD "%d"   FNT_RST "\n",
+                       regs.i, regs.r, regs.iff1 ? 1 : 0, regs.iff2 ? 1 : 0, regs.im);
+        }
     } else {  // Original output for non-active tty
         bk.console("pc=%04X, [pc]=%02X,    bc=%04X,  de=%04X,  hl=%04X,  af=%04X, ix=%04X, iy=%04X\n"
                "sp=%04X, [sp]=%04X, bc'=%04X, de'=%04X, hl'=%04X, af'=%04X\n"
@@ -1652,6 +1674,11 @@ static int cmd_registers(int argc, char **argv)
         if (regs.clockh || regs.clockl)
         {
             bk.console("clockh=%04X, clockhl=%04X\n", regs.clockh, regs.clockl);
+        }
+        if (regs.has_interrupt_state)
+        {
+            bk.console("i=%02X, r=%02X, iff1=%d, iff2=%d, im=%d\n",
+                       regs.i, regs.r, regs.iff1 ? 1 : 0, regs.iff2 ? 1 : 0, regs.im);
         }
     }
 
