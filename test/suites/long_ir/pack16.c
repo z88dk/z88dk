@@ -70,6 +70,40 @@ static unsigned int vol16(void)
     return ((unsigned int)vp[0] << 8) | (unsigned int)vp[1];
 }
 
+/* Global-array pair read at a run-time index: the two lanes' addresses are
+   separate sums over separately hoisted symbol loads. */
+static unsigned char g[16] = { 0x01, 0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78,
+                               0x89, 0x9A, 0xAB, 0xBC, 0xCD, 0xDE, 0xEF, 0xF0 };
+static unsigned char h[16] = { 0x10, 0x21, 0x32, 0x43, 0x54, 0x65, 0x76, 0x87,
+                               0x98, 0xA9, 0xBA, 0xCB, 0xDC, 0xED, 0xFE, 0x0F };
+
+static unsigned int gpair(unsigned int i)
+{
+    return ((unsigned int)g[(i * 2) + 0]) | (((unsigned int)g[(i * 2) + 1]) << 8);
+}
+
+static unsigned int gsum(void)
+{
+    unsigned int i, s = 0;
+    for (i = 0; i < 8; i++)
+        s += ((unsigned int)g[(i * 2) + 0]) | (((unsigned int)g[(i * 2) + 1]) << 8);
+    return s;
+}
+
+/* Must NOT fold: the lanes read two different arrays. */
+static unsigned int mixpair(unsigned int i)
+{
+    return ((unsigned int)g[(i * 2) + 0]) | (((unsigned int)h[(i * 2) + 1]) << 8);
+}
+
+/* Must NOT fold: the index changes between the two loads. */
+static unsigned int skew(unsigned int i)
+{
+    unsigned int lo = g[i * 2];
+    i = i + 1;
+    return lo | (((unsigned int)g[(i * 2) + 1]) << 8);
+}
+
 static void test_pack16(void)
 {
     Assert(be16(&buf[0]) == 0x1234u, "be16 @0");
@@ -88,6 +122,14 @@ static void test_pack16(void)
     Assert(le32(&buf[0]) == 0x78563412UL, "le32 @0 (folded)");
     Assert(be32(&buf[4]) == 0x9ABCDEF0UL, "be32 @4");
     Assert(le32(&buf[4]) == 0xF0DEBC9AUL, "le32 @4");
+
+    Assert(gpair(0) == 0x1201u, "gpair 0");
+    Assert(gpair(1) == 0x3423u, "gpair 1");
+    Assert(gpair(3) == 0x7867u, "gpair 3");
+    Assert(gpair(7) == 0xF0EFu, "gpair 7");
+    Assert(gsum() == 0x3BC0u, "gsum loop");
+    Assert(mixpair(2) == 0x6545u, "mixpair (different arrays, must not fold)");
+    Assert(skew(1) == 0x5623u, "skew (index moves, must not fold)");
 
     vp = buf;
     Assert(vol16() == 0x1234u, "vol16 (must not fold)");
