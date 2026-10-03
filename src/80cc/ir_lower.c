@@ -3161,6 +3161,15 @@ static int gbwm_enabled(void)
     return gbwm_on;
 }
 
+/* VM1 and Rabbit keep the `ex de,hl` form. */
+static int addr_fold_enabled(void)
+{
+    static int on = -1;
+    if (on < 0)
+        on = !IS_KR580VM1() && !IS_RABBIT() && !opt_disabled("addr-fold");
+    return on;
+}
+
 /* Mnemonics whose only use of HL is through a named operand. Anything else
    (call, ret, rst, an unrecognised op) may read HL implicitly. */
 static int gbwm_hl_safe_mnem(const char *m)
@@ -3656,6 +3665,24 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                     f_live = 0;
                     i = gs;
                     continue;
+                }
+            }
+            /* [addr-fold] `ex de,hl; ld hl,_sym; add hl,de` -> `ld de,_sym;
+               add hl,de` (-1 byte). The add is symmetric, but the new text
+               leaves DE holding the symbol instead of the old HL, so DE must
+               be dead after the add: the belief cache can keep using the
+               swapped value. Then the sweep carries on at the add. */
+            if (i >= 2 && addr_fold_enabled()
+                && !strcmp(lines[i], "\tadd\thl,de\n")
+                && !drop[i - 1] && !drop[i - 2]
+                && !strcmp(lines[i - 2], "\tex\tde,hl\n")
+                && gbwm_de_dead(lines, n, drop, i, d_live, e_live)) {
+                char sym[64], ld[80];
+                if (gbwm_ld_sym(lines[i - 1], "hl", sym, sizeof sym)) {
+                    snprintf(ld, sizeof ld, "\tld\tde,%s\n", sym);
+                    const char *nl[2] = { ld, "\tadd\thl,de\n" };
+                    if (gbwm_replace(lines, drop, i - 2, i, nl, 2))
+                        continue;
                 }
             }
             /* [local-rmw] The matched rewrite changes A/F only; both are dead at the

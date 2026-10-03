@@ -3,33 +3,6 @@
 	pop	%1
 =
 
-;; #ADDR: base+index address math emits `ex de,hl; ld hl,_base; add hl,de` (index
-;; in HL, base ADDRESS loaded into HL, index shuffled to DE). add hl,de is
-;; symmetric, so load the base straight into DE: `ld de,_base; add hl,de` — kills
-;; the ex de,hl and is 1 byte shorter. LIMITED TO `_%1` (a symbol-address immediate,
-;; the array-base case): this EXCLUDES an indirect `ld hl,(_x)` memory load — that
-;; would become `ld de,(_x)`, which 8080/8085/gbz80 have no instruction for, and is
-;; a byte LARGER than `ld hl,(nn)` on z80 anyway (no saving). Safe on DE-liveness:
-;; the ex materialises the index in DE purely as the add's addend (old DE discarded
-;; by `ld hl,_%1`, old HL/index consumed by the add), so DE is dead after.
-;; %notcpu 8085: NOT TRUE THERE. 8085 loads the index with LDSI+LHLX
-;; (`ld de,sp+N; ld hl,(de); ex de,hl`) and leaves it in DE across the add,
-;; reclaiming it with a LATER `ex de,hl` — so DE is live and the fold hands
-;; back the base instead of the index. sieve/z88dk-classic hangs on it.
-%title #ADDR fold ex-de-hl + symbol-address load + add into a direct de-load (-1b)
-%notcpu vm1
-%notcpu 8085
-%notcpu r2ka
-%notcpu r3k
-%notcpu r4k
-%notcpu r6k
-	ex	de,hl
-	ld	hl,_%1
-	add	hl,de
-=
-	ld	de,_%1
-	add	hl,de
-
 ;; #JI: `jp <cc>,L; jp M; L:` — the conditional jump targets the very NEXT label,
 ;; so it only chooses "fall through to L" vs "go to M". Invert the condition and
 ;; drop the jump-to-next: `jp <!cc>,M; L:` (−3b). L: stays (it may be a branch

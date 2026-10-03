@@ -33,6 +33,7 @@ all:	deaddereload.bin deaddereload_fp.bin deaddereload_gbz80.bin
 all:	xorflipconst.bin xorflipconst_fp.bin xorflipconst_gbz80.bin xorflipconst_8080.bin xorflipconst_vm1.bin
 all:	xorflipchain.bin xorflipchain_fp.bin xorflipchain_gbz80.bin xorflipchain_8080.bin
 all:	gbwordmem.bin gbwordmem_fp.bin gbwordmem_8080.bin gbwordmem_gbz80.bin gbwordmem_gbz80_keep.bin
+all:	ivsrsup.bin ivsrsup_fp.bin ivsrsup_gbz80.bin ivsrsup_gbz80_keep.bin ivsrsup_8080.bin ivsrsup_8085.bin ivsrsup_8085_keep.bin ivsrsup_vm1.bin
 all:	gbsmallframe.bin gbsmallframe_fp.bin gbsmallframe_gbz80.bin gbsmallframe_gbz80_keep.bin
 all:	lcallflags.bin lcallflags_fp.bin lcallflags_8080.bin lcallflags_8085.bin lcallflags_8085_keep.bin lcallflags_gbz80.bin
 JPTH = ../../../libsrc/l/sccz80/9-common/l_jpix.asm ../../../libsrc/l/sccz80/9-common/l_jpiy.asm
@@ -1227,6 +1228,38 @@ gbsmallframe_gbz80.bin: $(SOURCES) gbsmallframe.c
 gbsmallframe_gbz80_keep.bin: $(SOURCES) gbsmallframe.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -Cc--opt-disable=gb-small-frame --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_fp.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_gbz80.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_gbz80_keep.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -Cc--opt-disable=ivsr-suppress --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_8080.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_8085.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_8085_keep.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -Cc--opt-disable=ivsr-suppress --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_vm1.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=vm1 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mvm1 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 incmem.bin: $(SOURCES) incmem.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
