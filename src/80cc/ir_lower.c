@@ -3024,18 +3024,25 @@ static void fold_xorflip_chain(char **lines, char *drop, int n)
    filter_dead_bc_parks's liveness sweep (its instr_effects assumes one
    instruction per line; the rewritten seed line isn't). Denial-only:
    --opt-disable=mulchain-de. */
-static int mulchain_match_reload_hl(const char *line, char *reg, int *off)
+/* Reload of the multiplicand into HL: `ld hl,(ix+d)` or the stack-top form
+   `pop hl / push hl`. Returns the line count (0 = no match); `key` names
+   the source so every reload in one chain can be checked identical. */
+static int mulchain_match_reload_hl(char **lines, int n, int i, char *key)
 {
     char r[4] = {0};
     int o = 0, consumed = 0;
+    const char *line = lines[i];
+    if (!strcmp(line, "\tpop\thl\n") && i + 1 < n && !strcmp(lines[i + 1], "\tpush\thl\n")) {
+        strcpy(key, "tos");
+        return 2;
+    }
     if (sscanf(line, "\tld\thl,(%3[a-z]%d)%n", r, &o, &consumed) != 2)
         return 0;
     if (line[consumed] != '\n' || line[consumed + 1] != '\0')
         return 0;
     if (strcmp(r, "ix") != 0 && strcmp(r, "iy") != 0)
         return 0;
-    strcpy(reg, r);
-    *off = o;
+    snprintf(key, 16, "%s%+d", r, o);
     return 1;
 }
 
@@ -3048,35 +3055,37 @@ static void fold_mulchain_de(char **lines, char *drop, int n)
     if (opt_disabled("mulchain-de")) return;
     for (int i = 0; i + 3 < n; i++) {
         if (drop[i]) continue;
-        char reg[4];
-        int off;
-        if (!mulchain_match_reload_hl(lines[i], reg, &off)) continue;
-        int j = i + 1, dbl = 0;
+        char key[16];
+        int rl = mulchain_match_reload_hl(lines, n, i, key);
+        if (!rl) continue;
+        int j = i + rl, dbl = 0;
         while (j < n && mulchain_is_add_hl_hl(lines[j])) { j++; dbl++; }
         if (dbl < 1) continue;        /* acc must double at least once first */
         int repeats = 0, k = j;
         while (k + 2 < n && mulchain_is_ex_de_hl(lines[k])) {
-            char reg2[4];
-            int off2;
-            if (!mulchain_match_reload_hl(lines[k + 1], reg2, &off2)) break;
-            if (off2 != off || strcmp(reg2, reg) != 0) break;
-            if (!mulchain_is_add_hl_de(lines[k + 2])) break;
+            char key2[16];
+            int rl2 = mulchain_match_reload_hl(lines, n, k + 1, key2);
+            if (!rl2 || strcmp(key, key2) != 0) break;
+            if (k + 1 + rl2 >= n || !mulchain_is_add_hl_de(lines[k + 1 + rl2])) break;
             repeats++;
-            k += 3;
+            k += 2 + rl2;
             while (k < n && mulchain_is_add_hl_hl(lines[k])) k++;
         }
         if (repeats < 1) continue;
-        size_t len = strlen(lines[i]) + strlen("\tld\tde,hl\n") + 1;
+        /* the seed's last line gets the DE copy appended */
+        char *seed = lines[i + rl - 1];
+        size_t len = strlen(seed) + strlen("\tld\tde,hl\n") + 1;
         char *nl = malloc(len);
         if (!nl) continue;
-        snprintf(nl, len, "%s\tld\tde,hl\n", lines[i]);
-        free(lines[i]);
-        lines[i] = nl;
+        snprintf(nl, len, "%s\tld\tde,hl\n", seed);
+        free(seed);
+        lines[i + rl - 1] = nl;
         int m = j;
         for (int r = 0; r < repeats; r++) {
-            drop[m] = 1;            /* ex de,hl */
-            drop[m + 1] = 1;        /* ld hl,(reg+off) reload */
-            m += 3;                 /* keep the add hl,de between */
+            drop[m] = 1;                         /* ex de,hl */
+            int rl2 = mulchain_match_reload_hl(lines, n, m + 1, key);
+            for (int q = 0; q < rl2; q++) drop[m + 1 + q] = 1;
+            m += 2 + rl2;                        /* keep the add hl,de between */
             while (m < n && mulchain_is_add_hl_hl(lines[m])) m++;
         }
         i = m - 1;                  /* resume scanning past the matched region */

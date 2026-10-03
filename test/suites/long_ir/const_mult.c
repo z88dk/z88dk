@@ -45,6 +45,27 @@ static void test_unsigned_const_mult(void)
     assertEqual((int)(cm_u * 25173u & 0xffffu), (int)(3096279u & 0xffffu));
 }
 
+/* Loop-carried multiplicand that lives on the stack top, read for the
+   byte store, the chain and the add-back in one iteration. */
+static unsigned char cm_buf[8];
+
+static void test_lcg_loop(void)
+{
+    unsigned int i, seed = 0xC001U;
+    unsigned int ref = 0xC001U;
+    for (i = 0; i < 8; i++) {
+        cm_buf[i] = (unsigned char)(seed & 0xFFU);
+        seed = (unsigned int)(seed * 25173U + 13849U);
+    }
+    for (i = 0; i < 8; i++) {
+        assertEqual((int)cm_buf[i], (int)(ref & 0xFFU));
+        ref = (ref * 25173U + 13849U) & 0xFFFFU;   /* wraps: 16-bit */
+    }
+    assertEqual((int)seed, (int)ref);
+    assertEqual((int)cm_buf[0], 1);                /* 0xC001 low byte */
+    assertEqual((int)cm_buf[1], 0x6E);
+}
+
 static void test_long_const_mult(void)
 {
     cm_l = 100000L;
@@ -59,6 +80,7 @@ int main(int argc, char *argv[])
     suite_setup("const-multiply strength reduction");
     suite_add_test(test_int_const_mult);
     suite_add_test(test_unsigned_const_mult);
+    suite_add_test(test_lcg_loop);
     suite_add_test(test_long_const_mult);
     return suite_run();
 }
