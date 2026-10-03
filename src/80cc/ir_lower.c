@@ -4603,8 +4603,16 @@ static int func_has_indirect_call(const Func *f)
         const BB *bb = &f->bbs[b];
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *o = &bb->ops[j];
-            if (o->kind == IR_CALL && o->call && o->call->fnptr_vreg >= 0)
-                return 1;
+            if (o->kind == IR_CALL && o->call && o->call->fnptr_vreg >= 0) {
+                /* Only the fastcall / __sdcccall(1) / far dispatches go through
+                   IX (gen_call's idx_dispatch, l_farcall). A plain near
+                   `call l_jphl` leaves it alone. */
+                const CallInfo *ci = o->call;
+                if (opt_disabled("ix-indirect") || ci->far_fnptr
+                    || ci->abi == IR_ABI_FASTCALL
+                    || (ci->flags & SDCCCALL1))
+                    return 1;
+            }
         }
     }
     return 0;

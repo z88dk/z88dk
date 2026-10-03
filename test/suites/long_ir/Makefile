@@ -20,6 +20,7 @@ all:	strremat.bin strremat_fp.bin strremat_8080.bin strremat_gbz80.bin
 all:	fnptrdead.bin fnptrdead_fp.bin fnptrdead_8080.bin fnptrdead_gbz80.bin
 all:	argcf.bin argcf_fp.bin argcf_8080.bin argcf_gbz80.bin
 all:	jpnext.bin jpnext_fp.bin jpnext_8080.bin jpnext_gbz80.bin
+all:	ixind.bin
 all:	localrmw_gbz80.bin localrmw_gbz80_keep.bin
 all:	localrmw_z80.bin localrmw_z80n.bin localrmw_z180.bin localrmw_ez80_z80.bin localrmw_8080.bin localrmw_vm1.bin localrmw_r2ka.bin localrmw_r4k.bin localrmw_r6k.bin localrmw_kc160.bin localrmw_r800.bin localrmw_z80_keep.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
@@ -1796,6 +1797,14 @@ jpnext_8080.bin: $(SOURCES) jpnext.c
 jpnext_gbz80.bin: $(SOURCES) jpnext.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# An sp-mode function with a plain near indirect call no longer saves IX (the
+# call never touches it); the fastcall dispatch still does. Z80 family only, and
+# always built without the frame pointer: the test overwrites IX. See the file
+# header.
+ixind.bin: $(SOURCES) ixind.c $(JPTH)
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
 
 # A signed compare may drop its 7-byte sign correction only when BOTH operands
 # are provably non-negative. Pins the two ways the proof goes wrong: a PARAMETER

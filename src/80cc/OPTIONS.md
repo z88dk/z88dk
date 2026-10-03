@@ -135,6 +135,7 @@ exists (ADR 0010).
 
 | Name | Turning it off means |
 | --- | --- |
+| `ix-indirect` | an sp-mode function with any indirect call saves IX, even when the call does not dispatch through it |
 | `jp-next` | keep an unconditional `jp` that jumps to the label directly below it |
 | `lazy-spill` | spill at the definition instead of deferring to the clobber |
 | `a-carry` | the A-register belief is dropped at each basic-block boundary |
