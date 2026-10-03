@@ -4,13 +4,38 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 1/10/2026. Keep it short: a list of items to tackle next, not a
+Last swept: 3/10/2026. Keep it short: a list of items to tackle next, not a
 narrative — when a section stops describing what is live, it belongs in
 `adr/` or in git history, not here.
 
 ## Next action
 
-**START HERE: byte-scratch packing.** Short-lived byte values spill to a
+**START HERE: ptrbench.** The largest per-bench gap to sdcc on z80 (md5
+excluded, best of fp/sp): 7295 B fp / 7424 B sp against sdcc 6947 B and xcc
+-Os 6762 B, i.e. +348 B (5%) over sdcc and +533 B over xcc -Os. It is faster
+than both (11.3M ticks against sdcc 18.0M), so this is size only. The
+framework is no longer the cause (ADR 0103): measure the bench source on its
+own, not the linked binary.
+
+Do in this order, and stop at the first step that names the cause:
+1. Per-function table, 80cc against sdcc AND xcc, from the compiled objects
+   (see the density skill, section 2.1). Do not size from symbol gaps.
+2. Decide whether the gap is *inlining* (xcc folds six helpers; the single
+   call site costs nothing to fold, see below) or *per-function codegen*
+   (sdcc keeps the helpers as functions, so a gap against sdcc is not
+   inlining). The two comparisons give different answers; ptrbench is the
+   case where they may.
+3. For a codegen gap, the instruction census on the biggest function.
+
+Other large gaps to sdcc on z80, for after ptrbench: `bitfieldbench`
++260 B (7%), `localbench` +225 B (6%), `widthbench` +224 B (5%),
+`matrixbench` +182 B, `listbench` +156 B. gbz80 has the widest whole-table gap
+(+3.9%, sdcc smaller in 28 of 29).
+
+Trap: `md5` is a huge outlier (sdcc 28824 B, 80cc 17324 B); leave it out of any
+total or the table looks 80cc-favourable.
+
+**Also ready: byte-scratch packing.** Short-lived byte values spill to a
 frame slot while B or D might be available. Add the verifier first (B
 availability against BC tenants, D availability against DE clobbers), size
 the two lanes separately, and only promote to a gated prototype + full
@@ -22,7 +47,7 @@ concurrently available there; size B and D separately over disjoint ranges.
 pointer/index and adjacent-mask portions — do not reopen them. Relaxing
 `byte_home_realizable` is refuted (+307 B, 49 larger cells at use-count 1).
 
-**Also ready, arguably ahead of the above if picked up fresh:
+**Also ready, and the likely answer to ptrbench against xcc:
 single-call-site static inlining.** Confirmed missing (xcc does it, 80cc
 doesn't) across 6+ benches: `widthbench` (`mix_char`/`mix_long`/`mix_store`),
 `divbench` (`udiv`/`sdiv`/`kmix`), `vecbench` (`dot`/`saxpy`), `fixedbench`
@@ -96,6 +121,13 @@ Size across the corpus before implementing.
 
 ## Recently closed (ADR has the detail)
 
+- **Framework `test.c` cost — ADR 0103.** Six changes (string-literal remat,
+  dead indirect-call target spill, control-flow call arguments first,
+  jump-to-next, IX save only when used, BC hand-off). `test.c` 754 -> 596 B fp;
+  all 682 80cc matrix cells smaller, -85735 B. Left: the `longjmp` cleanup
+  (needs a `noreturn` concept) and the `if (p) p();` reload (needs an
+  address-keyed HL belief; an IR-level forward was tried and refused, see the
+  ADR).
 - **frame-byte-trunc — shipped, default-on.** A width-2 value truncated to
   one byte (`gen_conv_trunc`, `gen_mov`, `gen_sar16`'s sign-extend cases, the
   `gen_shr`/`gen_shl` partial-load fastpath) now reads just that byte from
