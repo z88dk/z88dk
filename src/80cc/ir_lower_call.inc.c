@@ -21,6 +21,16 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         emit(out, (IS_RABBIT()) ? "ipset\t3" : "di");
 
     int pre = (ci->pre_pushed > 0);
+    /* [callbc] Set true ONLY by this call's own PR_BC result stamp below, and
+       read ONLY by the pre-pushed-args epilogue further down, both within
+       THIS gen_call invocation — never compare vreg ids for this (an earlier
+       miscompile: `L.rs.bc == ci->ret_vreg` can be true from a STALE belief
+       left over from a past iteration of the same loop/call site, which is
+       exactly the same vreg id by construction, not because it was just
+       stamped this time — hashbench corrupted its BC-cached hash-table
+       pointer that way, through 7 CPUs, surviving --opt-disable=callbc
+       because the stale belief forms regardless of the admission gate). */
+    int callbc_fresh_stamp = 0;
 
     /* __sdcccall(1) register convention (z80/z180/z80n): 1st arg A/HL/HLDE,
        2nd DE (when eligible), the rest stacked (STDC R→L, pushed below).
@@ -566,7 +576,53 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             } else
                 store_a_byte(out, f, ci->ret_vreg);
         } else {                           /* width 2, result in HL */
-            if (L.la.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg)) {
+            /* [callbc] DEFAULT ON, --opt-disable=callbc opts out (ir_alloc.c:
+               bc_safe_producer_singledef). First corpus sizing found a +237 B
+               regression (structbench.c worst case, +10 B) from admitting a
+               call result anywhere letting ir_bc_pack's eviction logic
+               justify evicting an unrelated BC tenant elsewhere in the same
+               function, plus a +2 B tax from single-use call results (no
+               re-read to recoup) slipping past the dead-store check. Both
+               root-caused and fixed in ir_alloc.c (the eviction gain
+               computation now excludes call producers; collect_bc_temp_cands
+               now requires use_count>=2 for them). Re-sized clean: 0/720
+               corpus cells differ either way (size or ticks) — verified win
+               stands on adv_a.c (CHKRAND+SH_TELL, -8 B) and clisp.c
+               (-22/-32 B). See memory note callbc-admission-displacement.md.
+
+               A call RESULT homed in BC (bc_safe_producer_singledef admits
+               IR_CALL only — ir_alloc.c): stamp HL->BC here, mirroring
+               spill_and_swap_unless_dead's PR_BC branch, which this call-result
+               path does NOT fall through to (it uses store_hl_keep_hl, not
+               commit_hl_word). Without this stamp a PR_BC-homed call result
+               would be left ONLY in the HL cache belief — correct for the
+               immediate same-BB read, but any later bc_has() read finds BC
+               never actually loaded and falls back to a slot that was never
+               written (or doesn't exist for a NO_SLOT candidate). Checked
+               before the dead/pool combination below so a live PR_BC result
+               always gets its stamp regardless of cur_dst_dead (a dead dst
+               with the OLD code skipped everything safely because nothing
+               downstream reads it; it is equally safe to also emit the stamp
+               here, since cache_bc/cache_hl both still advertise the value in
+               both places and a dead vreg is simply never read either way).
+
+               ir_home_at (POINT query, interval-aware), NOT ir_home_assigned
+               (whole-function, ignores the interval) — a real miscompile:
+               ci->ret_vreg can be a [call-split] vreg whose vreg_to_phys is
+               GLOBALLY PR_BC but which is only BC-authoritative inside a
+               proven read-only span ELSEWHERE in the function; THIS call may
+               be a write to the same C variable entirely outside that span,
+               where the slot is still canonical. ir_home_assigned said PR_BC
+               unconditionally and the stamp corrupted hashbench's hash-table
+               state on 7 CPUs, surviving --opt-disable=callbc because the
+               call-split home was never gated by it in the first place. */
+            if (!L.la.cur_dst_dead
+                && ir_home_at(f, ci->ret_vreg) == IR_PR_BC) {
+                emit(out, "ld\tbc,hl");
+                cache_bc(ci->ret_vreg);
+                cache_hl(ci->ret_vreg);
+                callbc_fresh_stamp = 1;
+            } else if (L.la.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg)) {
                 cache_hl(ci->ret_vreg);    /* dead/reg-pool: keep in HL, no spill */
                 /* An index-register home (idx2/idx3 = IX/IY) survives the call
                    but is NOT kept live by the HL belief — that belief dies at
@@ -602,7 +658,19 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             emit(out, "pop\tbc");
             L.rs.bc = tenant;
             L.cur_sp_adjust -= 2;
-        } else {
+        } else if (!callbc_fresh_stamp) {
+            /* [callbc] Don't discard a stamp this SAME call's own result just
+               got a few lines above (ci->ret_vreg homed PR_BC) — there was no
+               PRE-EXISTING tenant to protect/restore here (saved==0), but that
+               says nothing about the result this call just produced. Without
+               this check every pre-pushed call in a function with ANY PR_BC
+               tenant (func_has_pr_bc) wiped out its own just-cached result
+               immediately, before the caller ever got to use it — long_ir's
+               idxderef (hoisted_base's result) aborted this way.
+               callbc_fresh_stamp (not an id compare) because L.rs.bc ==
+               ci->ret_vreg can ALSO be true from a stale belief left over
+               from an earlier iteration of the same loop/call site — hashbench
+               corrupted its BC-cached hash-table pointer that way. */
             invalidate_bc_cache();
         }
     }
