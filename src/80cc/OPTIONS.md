@@ -89,6 +89,7 @@ exists (ADR 0010).
 | `inc-mem` | a memory increment stays `ld a,MEM; inc a; ld MEM,a` instead of `inc MEM` |
 | `l-call-flags` | a `call l_*` runtime helper is assumed to read the flags, as any asm-linkage call is |
 | `gb-word-mem` | gbz80 word `++`/`--` and zero/constant word stores go through HL and DE instead of `inc (hl)`, `ld (hl+),a` and immediate stores |
+| `gb-small-frame` | gbz80 frames of 1 or 2 bytes open with `add sp,-N` and close with `add sp,N` instead of `dec sp` / `push af` and `inc sp` / `pop bc` |
 | `idx-rmw-de` | an indexed word RMW keeps the BC address park instead of the `dec hl`-restored DE route |
 | `shr-a-chain` | a constant word right shift stays `srl h; rr l` instead of the A-through-CB chain |
 | `shr-dead-l` | the dead `ld l,a` before an A-through-CB shift chain is kept |

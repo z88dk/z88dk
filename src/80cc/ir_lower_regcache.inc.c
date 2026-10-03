@@ -217,6 +217,16 @@ static void emit_add_sp_chain(FILE *out, int delta)
     while (rem) { int s = rem < 0 ? (rem < -128 ? -128 : rem)
                                   : (rem > 127 ? 127 : rem);
                   emit(out, "add\tsp,%d", s); rem -= s; }
+    L.last_add_sp = delta != 0;
+}
+
+/* gbz80 frames of 1-2 bytes: `push af` / `dec sp` reserve and `pop bc` /
+   `inc sp` free in 1 byte each, against 2 for `add sp,d`, and are no slower.
+   BC is dead at the teardown (the return value is in HL / DEHL / memory). */
+static int gb_small_frame(int n)
+{
+    return IS_GBZ80() && (n == 1 || n == 2)
+        && !opt_disabled("gb-small-frame");
 }
 
 /* True when a chained `add sp,delta` is available and no larger than the

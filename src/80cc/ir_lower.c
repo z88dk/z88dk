@@ -146,6 +146,7 @@ typedef struct {
     int spill_ix, spill_sp;
     int cur_func_uses_params;
     int cur_frameless;   /* fp-eligible but no IX frame (params read off sp) */
+    int last_add_sp;     /* the last emitted line was an `add sp,d` chain */
     /* B/C and D/E byte homes have independent residency. B/C homes are
        slotless and never dirty; D/E homes are slot-backed and may be dirty
        while lazy-spill keeps the value in the byte register. */
@@ -765,6 +766,7 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
        ARGUMENT ("%s%u" with pfx="and\t"), so the format string does not carry
        it. */
     L.rs.z_from_a = 0;
+    L.last_add_sp = 0;
     fputc('\t', out);
     vfprintf(out, fmt, ap);
     fputc('\n', out);
@@ -6966,7 +6968,11 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
         if (frame_has_saved_iy(f)) emit(out, "pop\tiy");
         emit(out, "pop\t%s", fr);
     } else if (!L.cur_frameless && f->frame_size > 0) {
-        if (use_add_sp(f, f->frame_size, is_acc ? 0 : 2)) {
+        /* A call's `add sp,N` cleanup right before folds with the frame drop
+           (copt #GB7), which beats the 1-byte pop. */
+        if (gb_small_frame(f->frame_size) && !L.last_add_sp) {
+            emit(out, f->frame_size == 2 ? "pop\tbc" : "inc\tsp");
+        } else if (use_add_sp(f, f->frame_size, is_acc ? 0 : 2)) {
             /* add sp,d preserves HL/DE/BC, so the int/long return-value
                stashes below are unneeded — drop the frame in one chain. */
             emit_add_sp_chain(out, f->frame_size);
@@ -7368,7 +7374,9 @@ static void emit_prologue(FILE *out, Func *f)
        frame_size (the push included). */
     int alloc_size = f->frame_size - autopush_bytes;
     if (alloc_size > 0) {
-        if (use_add_sp(f, -alloc_size, 0)) {
+        if (gb_small_frame(alloc_size)) {
+            emit(out, alloc_size == 2 ? "push\taf" : "dec\tsp");
+        } else if (use_add_sp(f, -alloc_size, 0)) {
             emit_add_sp_chain(out, -alloc_size);
         } else if (alloc_size <= 4) {
             /* Small frame: reserve with `push af` (2 bytes) + `dec sp` (1) — 1-2
