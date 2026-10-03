@@ -3567,6 +3567,8 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
        loop-home tenant (not itloc) blocks over its EXTENDED interval; an itloc
        tenant only over its TIGHT span (it releases BC when dead). */
     int packed = 0, last_fhi = -1; int rej_sib = 0, rej_ten = 0;
+    char *is_packed = calloc((size_t)(nc > 0 ? nc : 1), 1);
+    char *ten_only  = calloc((size_t)(nc > 0 ? nc : 1), 1);
     for (int i = 0; i < nc; i++) {
         int v = cand[i].vreg;
         if (cand[i].flo <= last_fhi) { rej_sib++; continue; }   /* packed sibling */
@@ -3583,13 +3585,61 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
         ir_liveprobe_decision_end();
         if (clash) {
             rej_ten++;
-continue;
+            if (ten_only) ten_only[i] = 1;
+            continue;
         }
         f->vreg_to_phys[v] = IR_PR_BC;
         f->vregs[v].flags |= IR_VREG_BC_PACK;
         last_fhi = cand[i].fhi;
+        if (is_packed) is_packed[i] = 1;
         packed++;
     }
+    /* Hand-off: a candidate blocked only by a tenant that dies at its def op
+       (`i2 = i << 1`) may share BC across that op. It displaces packed
+       candidates only if worth more: reads, or 0 for a remat constant. */
+    if (is_packed && ten_only && !opt_disabled("bc-handoff")) {
+        #define BCH_WORTH(v) ((def_kind[v] == IR_LD_IMM || def_kind[v] == IR_LD_SYM \
+                               || def_kind[v] == IR_LD_STR || def_kind[v] == IR_LEA) \
+                              ? 0 : use_count[v])
+        for (int i = 0; i < nc; i++) {
+            if (!ten_only[i]) continue;
+            int v = cand[i].vreg;
+            int blocked = 0;
+            for (int j = 0; j < f->n_vregs && !blocked; j++) {
+                if (f->vreg_to_phys[j] != IR_PR_BC) continue;
+                if (f->vregs[j].flags & IR_VREG_BC_PACK) continue;
+                int jlo, jhi;
+                bc_tenant_interval(j, itloc, itlo, ithi, first_use, last_use, &jlo, &jhi);
+                if (!iv_overlap(f, v, j, cand[i].flo, cand[i].fhi, jlo, jhi)) continue;
+                if (!(jhi == cand[i].flo && jlo < jhi && last_use[j] == jhi
+                      && !itloc[j]))
+                    blocked = 1;
+            }
+            if (blocked) continue;
+            long displaced = 0; int nd = 0;
+            for (int k = 0; k < nc; k++) {
+                if (!is_packed[k]) continue;
+                if (cand[k].flo <= cand[i].fhi && cand[i].flo <= cand[k].fhi) {
+                    displaced += BCH_WORTH(cand[k].vreg); nd++;
+                }
+            }
+            if (BCH_WORTH(v) <= displaced) continue;
+            for (int k = 0; k < nc; k++) {
+                if (!is_packed[k]) continue;
+                if (cand[k].flo <= cand[i].fhi && cand[i].flo <= cand[k].fhi) {
+                    int u = cand[k].vreg;
+                    f->vreg_to_phys[u] = IR_PR_SPILL;
+                    f->vregs[u].flags &= ~IR_VREG_BC_PACK;
+                    is_packed[k] = 0; packed--;
+                }
+            }
+            f->vreg_to_phys[v] = IR_PR_BC;
+            f->vregs[v].flags |= IR_VREG_BC_PACK;
+            is_packed[i] = 1; packed++;
+        }
+        #undef BCH_WORTH
+    }
+    free(is_packed); free(ten_only);
     if (getenv("IR_ALLOC_PROBE"))
         fprintf(stderr, "BC_PACK packed=%d of candidates=%d rejsib=%d rejten=%d\n",
                 packed, nc, rej_sib, rej_ten);

@@ -21,6 +21,7 @@ all:	fnptrdead.bin fnptrdead_fp.bin fnptrdead_8080.bin fnptrdead_gbz80.bin
 all:	argcf.bin argcf_fp.bin argcf_8080.bin argcf_gbz80.bin
 all:	jpnext.bin jpnext_fp.bin jpnext_8080.bin jpnext_gbz80.bin
 all:	ixind.bin
+all:	bchand.bin bchand_fp.bin bchand_8080.bin bchand_gbz80.bin
 all:	localrmw_gbz80.bin localrmw_gbz80_keep.bin
 all:	localrmw_z80.bin localrmw_z80n.bin localrmw_z180.bin localrmw_ez80_z80.bin localrmw_8080.bin localrmw_vm1.bin localrmw_r2ka.bin localrmw_r4k.bin localrmw_r6k.bin localrmw_kc160.bin localrmw_r800.bin localrmw_z80_keep.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
@@ -1795,6 +1796,25 @@ jpnext_8080.bin: $(SOURCES) jpnext.c
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 jpnext_gbz80.bin: $(SOURCES) jpnext.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# A BC temp may be defined by the very op that is the last read of an existing
+# BC tenant (an index dying at its own shift), so the doubled value stays in BC
+# instead of a frame slot. See the file header.
+bchand.bin: $(SOURCES) bchand.c
+	$(compile)
+	$(runtest)
+
+bchand_fp.bin: $(SOURCES) bchand.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+bchand_8080.bin: $(SOURCES) bchand.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bchand_gbz80.bin: $(SOURCES) bchand.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 

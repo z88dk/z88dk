@@ -80,6 +80,7 @@ exists (ADR 0010).
 
 | Name | Turning it off means |
 | --- | --- |
+| `bc-handoff` | a BC-packed temp may not take BC at the op where an existing BC tenant dies; it must wait for the tenant's whole range to end |
 | `bc-pack` | no tight BC packing pass after region selection |
 | `byte-pack` | no ranged packing of born-and-killed byte temporaries into B |
 | `byte-pack-de` | no single slot-backed D home for a born-and-killed byte temporary |
