@@ -204,10 +204,7 @@ static int op_dst_spill_is_dead(const BB *bb, int op_idx)
                      && use->mem.post_step == 0
                      && use->src[0] != op->dst
                      && use->src[1] != op->dst)
-                 /* Near indirect call with nothing between the def and
-                    `call l_jphl`: the target is still in HL, so the slot
-                    copy is never read. Any arg, hidden pointer, far or
-                    index/ret dispatch loads or pushes first. */
+                 /* zero-arg near indirect call: target still in HL */
                  || (use->kind == IR_CALL && use->call
                      && use->call->fnptr_vreg == op->dst
                      && use->call->target == NULL

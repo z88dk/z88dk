@@ -236,13 +236,9 @@ static int ir_inline_block_ops_ok(void)
     return !IS_808x() && !IS_GBZ80();
 }
 
-/* Call-argument reordering. An argument that contains control flow (?:, &&,
-   ||) ends the basic block, so the pushes of the arguments built before it
-   cannot be made at their producers and every one of them spills. When all
-   the arguments are free of side effects and of volatile reads, their
-   evaluation order is unobservable, so the control-flow ones are built first
-   and the rest then form one straight run of pushes. Volatile accesses are
-   ordered with respect to each other, so at most one argument may touch one. */
+/* A control-flow call argument (?:, &&, ||) ends the block and spills the
+   arguments built before it. If all arguments are pure (at most one touches a
+   volatile) their order is unobservable, so build the control-flow ones first. */
 static int arg_pure_nonvolatile(Node *n, int *nvol)
 {
     if (!n) return 1;
@@ -4219,7 +4215,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             int n_to_push = is_fastcall ? n_args - 1
                           : is_sdcccall1 ? 0
                           : n_args;
-            /* Build the control-flow arguments first (see arg_pure_nonvolatile). */
+            /* control-flow arguments first */
             int pre_v[64];
             int reorder = 0;
             if (n_to_push == n_args && n_args >= 2 && n_args <= 64

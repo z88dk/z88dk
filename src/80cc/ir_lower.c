@@ -4075,10 +4075,8 @@ verbatim:
 }
 
 /* ---- delete an unconditional jump to the label that follows it ----------- */
-/* The shared return block is emitted last, and tail merging and block layout
-   move code, so a `jp X` can end up directly above `X:`. Falling through is
-   the same control flow with no bytes: drop the jump. Only blank lines,
-   comments, debug markers and other labels may sit between the two. */
+/* Drop a `jp X` directly above `X:` (blank, comment, debug and label lines
+   may sit between). */
 static void filter_jump_to_next(FILE *out, FILE *src)
 {
     char buf[1024];
@@ -4142,8 +4140,7 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
        destination for everything downstream of here. */
     FILE *relax = branch_relax_enabled() ? tmpfile() : NULL;
     FILE *fout = relax ? relax : out;
-    /* Everything below writes to `fout`; the jump-to-next filter runs over that
-       text last, before relaxation sizes the jumps that are left. */
+    /* the jump-to-next filter runs last, before relaxation */
     FILE *jn_dest = fout;
     FILE *jnf = opt_disabled("jp-next") ? NULL : tmpfile();
     if (jnf) fout = jnf;
@@ -4604,9 +4601,7 @@ static int func_has_indirect_call(const Func *f)
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *o = &bb->ops[j];
             if (o->kind == IR_CALL && o->call && o->call->fnptr_vreg >= 0) {
-                /* Only the fastcall / __sdcccall(1) / far dispatches go through
-                   IX (gen_call's idx_dispatch, l_farcall). A plain near
-                   `call l_jphl` leaves it alone. */
+                /* only fastcall, sdcccall(1) and far dispatch use IX */
                 const CallInfo *ci = o->call;
                 if (opt_disabled("ix-indirect") || ci->far_fnptr
                     || ci->abi == IR_ABI_FASTCALL
