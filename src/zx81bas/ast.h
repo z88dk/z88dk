@@ -1060,7 +1060,7 @@ struct Prog : TreeNode {
     bool rem_invert = false;        // true if REM comments are inverted
     bool fast_mode = false;         // true if fast mode is enabled
     std::vector<std::string> dfile_lines;   // lines for the display file
-    bool dfile_colapsed = false;    // true if display file is collapsed
+    bool dfile_collapsed = false;    // true if display file is collapsed
     std::vector<uint8_t> sysvars_data;   // raw SYSVAR data
 
     // result of parsing, before lowering

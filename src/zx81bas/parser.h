@@ -100,7 +100,7 @@ private:
     StmtPtr parse_pragma_vars();
     void parse_vars_def(std::string& out_var_name, std::vector<int>& out_dims);
     StmtPtr parse_pragma_dfile();
-    StmtPtr parse_pragma_dfile_colapsed();
+    StmtPtr parse_pragma_dfile_collapsed();
     StmtPtr parse_pragma_sysvars();
 
     // statement parsers

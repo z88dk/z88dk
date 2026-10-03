@@ -20,4 +20,4 @@ defm "ex af, af'"
 !ENDASM
 # 3 "t/30-preproc/input/include_ok.bas"
 !VERBOSE =  1 
-!DFILE_COLAPSED =  0 
+!DFILE_COLLAPSED =  0 

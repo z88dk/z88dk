@@ -409,7 +409,7 @@ static void emit_display(Prog& prog, std::vector<std::string>& asm_source) {
         }
 
         // colapse end spaces if requested
-        if (prog.dfile_colapsed) {
+        if (prog.dfile_collapsed) {
             line_text = str_trim(line_text);
         }
 

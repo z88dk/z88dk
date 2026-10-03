@@ -54,7 +54,7 @@ The following pragma keywords are accepted:
 
 - #DFILE = "line 1","line 2", ..., "line 24": define initial screen.
 
-- #DFILE_COLAPSED = 0 or 1 (default 0): colapses all blanks in the display
+- #DFILE_COLLAPSED = 0 or 1 (default 0): colapses all blanks in the display
   file.
 
 - #SYSVARS = 0,1,2,3,4,...: define initial set of system variable values from
