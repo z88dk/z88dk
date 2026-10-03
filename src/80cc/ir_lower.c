@@ -2865,6 +2865,7 @@ static int line_reads_pair(const char *line, const char *pairname,
     const char *p = line;
     while (*p == ' ' || *p == '\t') p++;
     while (*p && *p != ' ' && *p != '\t') p++;    /* skip mnemonic */
+    while (*p == ' ' || *p == '\t') p++;          /* and the gap after it */
     char tok[8]; int ti = 0;
     for (;; p++) {
         char c = (*p == '\n' || *p == '\r') ? 0 : *p;
@@ -3110,6 +3111,396 @@ void ir_lower_fold_mulchain_de(FILE *out, FILE *src)
     free(drop);
 }
 
+/* [gb-word-mem] gbz80 has no `ld hl,(nn)` / `ld (nn),hl` and no indexed
+   addressing, so a word read-modify-write or constant store walks the value
+   through HL and DE. The memory forms are shorter and faster:
+
+     word ++ (slot or global):  inc (hl); jr nz,ASMPC+4; inc hl; inc (hl)
+     word --:                   ld a,(hl); sub 1; ld (hl+),a; jr nc,ASMPC+3; dec (hl)
+     word = 0:                  xor a; ld (hl+),a; ld (hl),a
+     slot = K, K in DE:         ld (hl),lo; inc hl; ld (hl),hi
+
+   The rewrites leave different values in A, HL and DE than the originals, so
+   each one requires the registers it changes to be dead. A and HL are checked
+   by a forward walk that follows branches; D, E and F come from the sweep. */
+static int gbwm_on = -1;
+static int gbwm_enabled(void)
+{
+    if (gbwm_on < 0)
+        gbwm_on = IS_GBZ80() && !opt_disabled("gb-word-mem");
+    return gbwm_on;
+}
+
+/* Mnemonics whose only use of HL is through a named operand. Anything else
+   (call, ret, rst, an unrecognised op) may read HL implicitly. */
+static int gbwm_hl_safe_mnem(const char *m)
+{
+    static const char *const ok[] = {
+        "ld", "ldh", "inc", "dec", "push", "pop", "add", "adc", "sub", "sbc",
+        "and", "or", "xor", "cp", "bit", "set", "res", "rl", "rr", "rlc",
+        "rrc", "sla", "sra", "srl", "swap", "rla", "rra", "rlca", "rrca",
+        "cpl", "scf", "ccf", "nop", "ex", "daa", NULL
+    };
+    for (int i = 0; ok[i]; i++)
+        if (!strcmp(m, ok[i])) return 1;
+    return 0;
+}
+
+/* Writes HL without reading it: `pop hl`, or `ld hl,X` with no H/L in X. */
+static int gbwm_kills_hl(const char *line)
+{
+    if (!strcmp(line, "\tpop\thl\n")) return 1;
+    if (strncmp(line, "\tld\thl,", 7)) return 0;
+    char buf[96];
+    if ((size_t)snprintf(buf, sizeof buf, "\tx\t%s", line + 7) >= sizeof buf)
+        return 0;
+    return !line_reads_pair(buf, "hl", 'h', 'l');
+}
+
+/* Writes both halves of DE without reading either. */
+static int gbwm_kills_de(const char *line, const InstrEffects *e)
+{
+    if (!strcmp(line, "\tpop\tde\n")) return 1;
+    if (e->d_read || e->e_read) return 0;
+    if (e->is_call) return (e->writes & IR_R_DE) != 0;
+    return e->d_write && e->e_write;
+}
+
+/* Non-zero if A (want_a), HL (want_hl) or DE (want_de) may be read on some
+   path from line `start`. `ex de,hl` swaps the HL and DE questions rather
+   than reading DE: the sweep counts it as a reader, which loses the common
+   `ex de,hl; ld hl,X` where the swapped value is dead. Dropped lines are
+   skipped. Calls, returns and branches out of the buffer answer live for HL
+   and A; DE follows instr_effects. `seen` memoises (line, state). */
+static int gbwm_live_walk(char **lines, int n, const char *drop, int start,
+                          int want_a, int want_hl, int want_de,
+                          unsigned char *seen, int depth)
+{
+    if (depth > 32) return 1;
+    for (int j = start; j < n; j++) {
+        int st = (want_a ? 1 : 0) | (want_hl ? 2 : 0) | (want_de ? 4 : 0);
+        if (!st) return 0;
+        if (drop[j]) continue;
+        if (seen[j] & (1u << st)) return 0;
+        seen[j] |= (unsigned char)(1u << st);
+        if (lines[j][0] != '\t') continue;         /* label: falls through */
+        char m[16]; const char *o;
+        if (!gw_split(lines[j], m, sizeof m, &o)) continue;
+        if (!strcmp(m, "C_LINE")) continue;
+        if (!strcmp(lines[j], "\tex\tde,hl\n")) {
+            int t = want_hl; want_hl = want_de; want_de = t;
+            continue;
+        }
+        char tgt[64];
+        if (xline_branch_target(lines[j], tgt, sizeof tgt)) {
+            /* An `ASMPC+n` skip lands a few lines down the fall-through, and
+               the lines it skips (inc/dec) kill none of A, HL or DE, so the
+               fall-through walk covers the taken path too. */
+            if (!strncmp(tgt, "ASMPC+", 6) && strchr(lines[j], ',')) {
+                for (int q = j + 1; q <= j + 2 && q < n; q++) {
+                    InstrEffects qe = instr_effects(lines[q]);
+                    if (gw_kills_a(lines[q]) || gbwm_kills_hl(lines[q])
+                        || gbwm_kills_de(lines[q], &qe))
+                        return 1;
+                }
+                continue;
+            }
+            int t = de_label_line(lines, n, tgt);
+            if (t < 0) return 1;
+            if (gbwm_live_walk(lines, n, drop, t, want_a, want_hl, want_de,
+                               seen, depth + 1))
+                return 1;
+            if (!strchr(lines[j], ',') && strncmp(lines[j] + 1, "djnz", 4))
+                return 0;
+            continue;
+        }
+        if (want_hl && (!gbwm_hl_safe_mnem(m)
+                        || (!gbwm_kills_hl(lines[j])
+                            && line_reads_pair(lines[j], "hl", 'h', 'l'))))
+            return 1;
+        if (want_a && !gw_kills_a(lines[j]) && !gw_no_a_read(lines[j]))
+            return 1;
+        InstrEffects e = instr_effects(lines[j]);
+        if (want_de && (e.unknown || e.d_read || e.e_read)) return 1;
+        if (want_a && gw_kills_a(lines[j])) want_a = 0;
+        if (want_hl && gbwm_kills_hl(lines[j])) want_hl = 0;
+        if (want_de && gbwm_kills_de(lines[j], &e)) want_de = 0;
+    }
+    return 1;
+}
+
+static int gbwm_dead_after3(char **lines, int n, const char *drop, int start,
+                            int want_a, int want_hl, int want_de)
+{
+    unsigned char *seen = calloc((size_t)(n > 0 ? n : 1), 1);
+    if (!seen) return 0;
+    int live = gbwm_live_walk(lines, n, drop, start, want_a, want_hl, want_de,
+                              seen, 0);
+    free(seen);
+    return !live;
+}
+
+static int gbwm_dead_after(char **lines, int n, const char *drop, int start,
+                           int want_a, int want_hl)
+{
+    return gbwm_dead_after3(lines, n, drop, start, want_a, want_hl, 0);
+}
+
+/* DE dead after line `e`: the sweep's answer, or the walk's when the sweep
+   was held back by an `ex de,hl`. */
+static int gbwm_de_dead(char **lines, int n, const char *drop, int e,
+                        int d_live, int e_live)
+{
+    return (!d_live && !e_live) || gbwm_dead_after3(lines, n, drop, e + 1, 0, 0, 1);
+}
+
+/* `\tld\t<reg>,<sym>\n` with <sym> a plain symbol or symbol+offset (no
+   parentheses, no register). Copies <sym> out. */
+static int gbwm_ld_sym(const char *line, const char *reg, char *sym, size_t sz)
+{
+    char want[16];
+    snprintf(want, sizeof want, "\tld\t%s,", reg);
+    size_t wl = strlen(want);
+    if (strncmp(line, want, wl)) return 0;
+    const char *p = line + wl;
+    if (*p != '_') return 0;
+    size_t k = 0;
+    while (p[k] && p[k] != '\n') {
+        if (!(isalnum((unsigned char)p[k]) || p[k] == '_' || p[k] == '+'))
+            return 0;
+        k++;
+    }
+    if (p[k] != '\n' || p[k + 1] || k + 1 > sz) return 0;
+    memcpy(sym, p, k); sym[k] = '\0';
+    return 1;
+}
+
+/* `\tld\t<reg>,<K>\n` with K a constant the store can spell as an immediate:
+   a decimal number or a symbol (+offset). */
+static int gbwm_ld_const(const char *line, const char *reg, char *k, size_t sz)
+{
+    char want[16];
+    snprintf(want, sizeof want, "\tld\t%s,", reg);
+    size_t wl = strlen(want);
+    if (strncmp(line, want, wl)) return 0;
+    const char *p = line + wl;
+    int num = 1;
+    size_t i = 0;
+    if (p[0] == '-') i = 1;
+    for (; p[i] && p[i] != '\n'; i++)
+        if (!isdigit((unsigned char)p[i])) num = 0;
+    if (num && i > (size_t)(p[0] == '-')) {
+        if (p[i] != '\n' || p[i + 1] || i + 1 > sz) return 0;
+        memcpy(k, p, i); k[i] = '\0';
+        return 1;
+    }
+    /* string-pool and C symbols */
+    if (strncmp(p, "i_", 2) && p[0] != '_') return 0;
+    for (i = 0; p[i] && p[i] != '\n'; i++)
+        if (!(isalnum((unsigned char)p[i]) || p[i] == '_' || p[i] == '+'))
+            return 0;
+    if (p[i] != '\n' || p[i + 1] || i + 1 > sz) return 0;
+    memcpy(k, p, i); k[i] = '\0';
+    return 1;
+}
+
+/* `sym` plus one, spelled the way the lowerer spells a high-byte address. */
+static void gbwm_sym_plus1(const char *sym, char *out, size_t sz)
+{
+    const char *plus = strrchr(sym, '+');
+    if (plus && isdigit((unsigned char)plus[1])) {
+        int off = atoi(plus + 1);
+        snprintf(out, sz, "%.*s+%d", (int)(plus - sym), sym, off + 1);
+    } else {
+        snprintf(out, sz, "%s+1", sym);
+    }
+}
+
+/* Replace lines[s..e] with `nnew` lines; the surplus is dropped. */
+static int gbwm_replace(char **lines, char *drop, int s, int e,
+                        const char *const *nl, int nnew)
+{
+    if (nnew > e - s + 1) return 0;
+    char *dup[8];
+    for (int k = 0; k < nnew; k++) {
+        dup[k] = strdup(nl[k]);
+        if (!dup[k]) { while (k--) free(dup[k]); return 0; }
+    }
+    for (int k = 0; k < nnew; k++) { free(lines[s + k]); lines[s + k] = dup[k]; }
+    for (int k = s + nnew; k <= e; k++) drop[k] = 1;
+    return 1;
+}
+
+static int gbwm_any_dropped(const char *drop, int s, int e)
+{
+    for (int k = s; k <= e; k++) if (drop[k]) return 1;
+    return 0;
+}
+
+/* Slot word ++/--:
+     ld hl,N; add hl,sp; ld a,(hl+); ld h,(hl); ld l,a; inc|dec hl;
+     ex de,hl|ld de,hl; ld hl,N; add hl,sp; ld (hl),e; inc hl; ld (hl),d
+     [ld hl,de]
+   ending at line `e`. */
+static int gbwm_slot_step(char **lines, int n, char *drop, int e,
+                          int d_live, int e_live, int f_live, int *startp)
+{
+    int tail = (e >= 12 && !strcmp(lines[e], "\tld\thl,de\n"));
+    int s = e - 11 - tail;
+    if (s < 0 || gbwm_any_dropped(drop, s, e) || f_live) return 0;
+    int n1, n2;
+    char c1[8], c2[8];
+    if (sscanf(lines[s], "\tld\thl,%d%1[\n]", &n1, c1) != 2) return 0;
+    if (strcmp(lines[s + 1], "\tadd\thl,sp\n")
+        || strcmp(lines[s + 2], "\tld\ta,(hl+)\n")
+        || strcmp(lines[s + 3], "\tld\th,(hl)\n")
+        || strcmp(lines[s + 4], "\tld\tl,a\n"))
+        return 0;
+    int is_inc = !strcmp(lines[s + 5], "\tinc\thl\n");
+    if (!is_inc && strcmp(lines[s + 5], "\tdec\thl\n")) return 0;
+    if (strcmp(lines[s + 6], "\tex\tde,hl\n") && strcmp(lines[s + 6], "\tld\tde,hl\n"))
+        return 0;
+    if (sscanf(lines[s + 7], "\tld\thl,%d%1[\n]", &n2, c2) != 2 || n1 != n2)
+        return 0;
+    if (strcmp(lines[s + 8], "\tadd\thl,sp\n")
+        || strcmp(lines[s + 9], "\tld\t(hl),e\n")
+        || strcmp(lines[s + 10], "\tinc\thl\n")
+        || strcmp(lines[s + 11], "\tld\t(hl),d\n"))
+        return 0;
+    if (!gbwm_dead_after(lines, n, drop, e + 1, 1, 1)
+        || !gbwm_de_dead(lines, n, drop, e, d_live, e_live))
+        return 0;
+    const char *inc[] = { lines[s], "\tadd\thl,sp\n", "\tinc\t(hl)\n",
+                          "\tjr\tnz,ASMPC+4\n", "\tinc\thl\n", "\tinc\t(hl)\n" };
+    const char *dec[] = { lines[s], "\tadd\thl,sp\n", "\tld\ta,(hl)\n",
+                          "\tsub\t1\n", "\tld\t(hl+),a\n", "\tjr\tnc,ASMPC+3\n",
+                          "\tdec\t(hl)\n" };
+    int ok = is_inc ? gbwm_replace(lines, drop, s, e, inc, 6)
+                    : gbwm_replace(lines, drop, s, e, dec, 7);
+    if (ok) *startp = s;
+    return ok;
+}
+
+/* Global word ++/--:
+     ld hl,S; ld a,(hl+); ld h,(hl); ld l,a; inc|dec hl;
+     ld a,l; ld (S),a; ld a,h; ld (S+1),a
+   ending at line `e`. DE is untouched either way. */
+static int gbwm_global_step(char **lines, int n, char *drop, int e,
+                            int f_live, int *startp)
+{
+    int s = e - 8;
+    if (s < 0 || gbwm_any_dropped(drop, s, e) || f_live) return 0;
+    char sym[96], sym1[112], want[128];
+    if (!gbwm_ld_sym(lines[s], "hl", sym, sizeof sym)) return 0;
+    if (strcmp(lines[s + 1], "\tld\ta,(hl+)\n")
+        || strcmp(lines[s + 2], "\tld\th,(hl)\n")
+        || strcmp(lines[s + 3], "\tld\tl,a\n"))
+        return 0;
+    int is_inc = !strcmp(lines[s + 4], "\tinc\thl\n");
+    if (!is_inc && strcmp(lines[s + 4], "\tdec\thl\n")) return 0;
+    if (strcmp(lines[s + 5], "\tld\ta,l\n") || strcmp(lines[s + 7], "\tld\ta,h\n"))
+        return 0;
+    snprintf(want, sizeof want, "\tld\t(%s),a\n", sym);
+    if (strcmp(lines[s + 6], want)) return 0;
+    gbwm_sym_plus1(sym, sym1, sizeof sym1);
+    snprintf(want, sizeof want, "\tld\t(%s),a\n", sym1);
+    if (strcmp(lines[s + 8], want)) return 0;
+    if (!gbwm_dead_after(lines, n, drop, e + 1, 1, 1)) return 0;
+    const char *inc[] = { lines[s], "\tinc\t(hl)\n", "\tjr\tnz,ASMPC+4\n",
+                          "\tinc\thl\n", "\tinc\t(hl)\n" };
+    const char *dec[] = { lines[s], "\tld\ta,(hl)\n", "\tsub\t1\n",
+                          "\tld\t(hl+),a\n", "\tjr\tnc,ASMPC+3\n", "\tdec\t(hl)\n" };
+    int ok = is_inc ? gbwm_replace(lines, drop, s, e, inc, 5)
+                    : gbwm_replace(lines, drop, s, e, dec, 6);
+    if (ok) *startp = s;
+    return ok;
+}
+
+/* Word zero through HL, as the lowerer spells it for a global:
+     ld (hl),+((0) & 255); inc hl; ld (hl),+(((0) >> 8) & 255)
+   ending at line `e`. HL ends at the same address either way. */
+static int gbwm_zero_store(char **lines, int n, char *drop, int e,
+                           int f_live, int *startp)
+{
+    int s = e - 2;
+    if (s < 0 || gbwm_any_dropped(drop, s, e) || f_live) return 0;
+    if (strcmp(lines[s], "\tld\t(hl),+((0) & 255)\n")
+        || strcmp(lines[s + 1], "\tinc\thl\n")
+        || strcmp(lines[s + 2], "\tld\t(hl),+(((0) >> 8) & 255)\n"))
+        return 0;
+    if (!gbwm_dead_after(lines, n, drop, e + 1, 1, 0)) return 0;
+    const char *nl[] = { "\txor\ta\n", "\tld\t(hl+),a\n", "\tld\t(hl),a\n" };
+    if (!gbwm_replace(lines, drop, s, e, nl, 3)) return 0;
+    *startp = s;
+    return 1;
+}
+
+/* Slot word = K with K staged in DE:
+     ld de,K | ld hl,K; ex de,hl
+     ld hl,N; add hl,sp; ld (hl),e; inc hl; ld (hl),d  [ex de,hl]
+   ending at line `e`. DE must be dead after: the rewrite never loads it. A
+   trailing `ex de,hl` leaves K in HL, rebuilt when HL is still live. */
+static int gbwm_slot_const(char **lines, int n, char *drop, int e,
+                           int d_live, int e_live, int f_live, int *startp)
+{
+    int ex = (e >= 6 && !strcmp(lines[e], "\tex\tde,hl\n"));
+    int st = e - 4 - ex;                          /* the `ld hl,N` */
+    if (st < 1 || gbwm_any_dropped(drop, st, e)) return 0;
+    int n1;
+    char c1[8], k[96];
+    if (sscanf(lines[st], "\tld\thl,%d%1[\n]", &n1, c1) != 2) return 0;
+    if (strcmp(lines[st + 1], "\tadd\thl,sp\n")
+        || strcmp(lines[st + 2], "\tld\t(hl),e\n")
+        || strcmp(lines[st + 3], "\tinc\thl\n")
+        || strcmp(lines[st + 4], "\tld\t(hl),d\n"))
+        return 0;
+    int s;
+    if (gbwm_ld_const(lines[st - 1], "de", k, sizeof k)) s = st - 1;
+    else if (st >= 2 && !strcmp(lines[st - 1], "\tex\tde,hl\n")
+             && gbwm_ld_const(lines[st - 2], "hl", k, sizeof k)) s = st - 2;
+    else return 0;
+    if (gbwm_any_dropped(drop, s, e)) return 0;
+    if (!gbwm_de_dead(lines, n, drop, e, d_live, e_live)) return 0;
+    int zero = !strcmp(k, "0");
+    if (zero && f_live) return 0;
+    int hl_live = ex && !gbwm_dead_after(lines, n, drop, e + 1, 0, 1);
+    if (zero && !gbwm_dead_after(lines, n, drop, e + 1, 1, 0)) return 0;
+    char slot[32], lo[128], hi[128], ldk[128];
+    snprintf(slot, sizeof slot, "\tld\thl,%d\n", n1);
+    snprintf(lo, sizeof lo, "\tld\t(hl),+((%s) & 255)\n", k);
+    snprintf(hi, sizeof hi, "\tld\t(hl),+(((%s) >> 8) & 255)\n", k);
+    snprintf(ldk, sizeof ldk, "\tld\thl,%s\n", k);
+    const char *nl[8];
+    int m = 0;
+    nl[m++] = slot;
+    nl[m++] = "\tadd\thl,sp\n";
+    if (zero) {
+        nl[m++] = "\txor\ta\n";
+        nl[m++] = "\tld\t(hl+),a\n";
+        nl[m++] = "\tld\t(hl),a\n";
+        if (hl_live) { nl[m++] = "\tld\th,a\n"; nl[m++] = "\tld\tl,a\n"; }
+    } else {
+        nl[m++] = lo;
+        nl[m++] = "\tinc\thl\n";
+        nl[m++] = hi;
+        if (hl_live) nl[m++] = ldk;
+    }
+    if (!gbwm_replace(lines, drop, s, e, nl, m)) return 0;
+    *startp = s;
+    return 1;
+}
+
+/* Try every [gb-word-mem] shape ending at line `e`. */
+static int gbwm_try(char **lines, int n, char *drop, int e,
+                    int d_live, int e_live, int f_live, int *startp)
+{
+    if (!gbwm_enabled() || drop[e]) return 0;
+    return gbwm_slot_step(lines, n, drop, e, d_live, e_live, f_live, startp)
+        || gbwm_global_step(lines, n, drop, e, f_live, startp)
+        || gbwm_slot_const(lines, n, drop, e, d_live, e_live, f_live, startp)
+        || gbwm_zero_store(lines, n, drop, e, f_live, startp);
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
@@ -3225,6 +3616,17 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                    pair is restored; unparked, it was dead on both sides. */
                 i -= 3;
                 continue;
+            }
+            /* [gb-word-mem] The new text leaves BC and DE as the old text found
+               them (DE was required dead where the old text wrote it) and
+               writes F before it reads it, so only F changes here. */
+            {
+                int gs;
+                if (gbwm_try(lines, n, drop, i, d_live, e_live, f_live, &gs)) {
+                    f_live = 0;
+                    i = gs;
+                    continue;
+                }
             }
             /* [local-rmw] The matched rewrite changes A/F only; both are dead at the
                tail. Temporary pushes are balanced and the sequence boundaries
@@ -3774,6 +4176,18 @@ static void filter_tail_merge(FILE *out, FILE *src, const Func *f)
         free(lines); lines = NULL; goto verbatim;
     }
     for (long k = 0; k < nc; k++) { jmp[k] = -1; jend[k] = -1; lab[k] = 0; }
+    /* An `ASMPC+n` skip jumps over the next one or two instructions by byte
+       count. A run that starts inside that span would replace the skipped
+       bytes with a `jp`, and the skip would land inside it. */
+    char *inskip = calloc((size_t)(nc > 0 ? nc : 1), 1);
+    if (!inskip) {
+        free(maxd); free(used); free(jmp); free(jend); free(lab); free(code);
+        for (long i = 0; i < n; i++) free(lines[i]);
+        free(lines); lines = NULL; goto verbatim;
+    }
+    for (long k = 0; k < nc; k++)
+        if (strstr(lines[code[k]], "ASMPC+"))
+            for (long q = k + 1; q <= k + 2 && q < nc; q++) inskip[q] = 1;
     for (long k = 0; k < nc; k++) {
         if (!tm_is_uncond_term(lines[code[k]])) { maxd[k] = 0; continue; }
         int d = 1;
@@ -3791,7 +4205,7 @@ static void filter_tail_merge(FILE *out, FILE *src, const Func *f)
     int nlab = 0;
     for (int d = TM_MAXD; d >= 1; d--) {
         for (long i = 0; i < nc; i++) {
-            if (maxd[i] < d || !TM_RANGE_FREE(i, d)) continue;
+            if (maxd[i] < d || !TM_RANGE_FREE(i, d) || inskip[i - d + 1]) continue;
             /* price the run once; a lower bound, so a merge only happens when
                it certainly pays */
             int bytes = 0;
@@ -3800,7 +4214,7 @@ static void filter_tail_merge(FILE *out, FILE *src, const Func *f)
             long grp[64]; int ng = 0;
             long last_end = i;                   /* keep runs disjoint */
             for (long j = i + 1; j < nc && ng < 64; j++) {
-                if (maxd[j] < d || !TM_RANGE_FREE(j, d)) continue;
+                if (maxd[j] < d || !TM_RANGE_FREE(j, d) || inskip[j - d + 1]) continue;
                 int eq = 1;
                 for (int q = 0; q < d; q++)
                     if (strcmp(lines[code[i - q]], lines[code[j - q]])) { eq = 0; break; }
@@ -3820,6 +4234,8 @@ static void filter_tail_merge(FILE *out, FILE *src, const Func *f)
             }
         }
     }
+
+    free(inskip);
 
     /* Emit. A merged run's lines are dropped and replaced by one `jp`; the only
        non-instruction lines inside a run are C_LINE markers, which go with it. */
@@ -5392,7 +5808,12 @@ static InstrEffects instr_effects(const char *line)
     else if (!strcmp(m,"sub")) w |= (!strcmp(o0,"hl") ? (IR_R_HL|IR_R_F) : (IR_R_A|IR_R_F));
     else if (!strcmp(m,"and")||!strcmp(m,"or")||!strcmp(m,"xor")) w |= IR_R_A|IR_R_F;
     else if (!strcmp(m,"cp"))                            w |= IR_R_F;
-    else if (!strcmp(m,"inc")||!strcmp(m,"dec"))         w |= lra_reg_of(o0)|IR_R_F;
+    /* A 16-bit inc/dec leaves the flags alone on every CPU in the family. */
+    else if (!strcmp(m,"inc")||!strcmp(m,"dec")) {
+        int pair = !strcmp(o0,"hl")||!strcmp(o0,"de")||!strcmp(o0,"bc")
+                || !strcmp(o0,"sp")||!strcmp(o0,"ix")||!strcmp(o0,"iy");
+        w |= lra_reg_of(o0) | (pair ? 0 : IR_R_F);
+    }
     else if (!strcmp(m,"sla")||!strcmp(m,"sra")||!strcmp(m,"srl")||!strcmp(m,"rl")
           || !strcmp(m,"rr")||!strcmp(m,"rlc")||!strcmp(m,"rrc")||!strcmp(m,"swap"))
                                                          w |= lra_reg_of(o0)|IR_R_F;
