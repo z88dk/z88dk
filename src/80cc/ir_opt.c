@@ -810,18 +810,19 @@ static int licm_pre_header(const Func *f, const int *in_loop, int header)
 /* Eligible-for-LICM ops: produce a value that doesn't depend on memory
    state or any other vreg (or whose sources are all loop-invariant).
    For this first cut we only handle the unconditionally-invariant
-   set: LD_IMM (constant), LD_SYM (sym address), LD_STR (literal queue
-   address), LEA (local frame address). */
+   set: LD_SYM (sym address) and LEA (local frame address). */
 static int licm_eligible_kind(OpKind k)
 {
     /* LD_IMM (a true constant) is trivially rematerialisable — a 3-byte
        immediate at each use. Hoisting it only makes the allocator spill it to
        a slot and reload per iteration (the greedy allocator can't hold it in a
        register across a body that clobbers HL/DE/BC), which is strictly worse.
-       Leave literals at the use site. LD_SYM (&global) STAYS eligible: hoisting
-       the invariant base is what lets IVSR strength-reduce `base + i` into a
-       register pointer walk (`inc bc`), a real win we must not forgo. */
-    return k == IR_LD_SYM || k == IR_LD_STR || k == IR_LEA;
+       Leave literals at the use site. LD_STR is the same: a string address
+       is an immediate, recomputed at each use. LD_SYM (&global) STAYS
+       eligible: hoisting the invariant base is what lets IVSR strength-reduce
+       `base + i` into a register pointer walk (`inc bc`), a real win we must
+       not forgo. */
+    return k == IR_LD_SYM || k == IR_LEA;
 }
 
 /* Insert `src_op` into `dst_bb` just BEFORE its last op (the

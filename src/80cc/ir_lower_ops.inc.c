@@ -162,6 +162,8 @@ static int gen_ld_str(FILE *out, Func *f, const Op *op)
     /* dst ← &literal_queue + imm. The per-TU label `i_<litlab>` is the
        start of the queue; `op->imm` is the byte offset of the string
        within it. */
+    if (L.la.cur_remat_def_dead && vreg_is_remat(f, op->dst))
+        return 0;
     emit(out, "ld\thl,i_%d+%lld", litlab, (long long)op->imm);
     commit_hl_word(out, f, op->dst);
     return 0;

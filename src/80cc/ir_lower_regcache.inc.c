@@ -319,6 +319,10 @@ static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp
         emit(out, "ld\t%s,%lld", rp, (long long)o->imm);
         return 1;
     }
+    if (o->kind == IR_LD_STR) {
+        emit(out, "ld\t%s,i_%d+%lld", rp, litlab, (long long)o->imm);
+        return 1;
+    }
     /* [remat-LEA] Frame-slot address (&local): recompute at the use instead of
        spilling+reloading, via `ld hl,slot_off+cur_sp_adjust; add hl,sp` then a move
        to de/bc (portable `ld d,h;ld e,l` — gbz80 has no `ex de,hl`). Clobbers ONLY

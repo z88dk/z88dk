@@ -16,6 +16,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 # fnptr-dispatch thunks (l_jpix/l_jpiy), linked explicitly until they live in
 # the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
 all:	countborrow.bin countborrow_gbz80.bin
+all:	strremat.bin strremat_fp.bin strremat_8080.bin strremat_gbz80.bin
 all:	localrmw_gbz80.bin localrmw_gbz80_keep.bin
 all:	localrmw_z80.bin localrmw_z80n.bin localrmw_z180.bin localrmw_ez80_z80.bin localrmw_8080.bin localrmw_vm1.bin localrmw_r2ka.bin localrmw_r4k.bin localrmw_r6k.bin localrmw_kc160.bin localrmw_r800.bin localrmw_z80_keep.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
@@ -1714,6 +1715,25 @@ parremat_8080.bin: $(SOURCES) parremat.c
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 parremat_gbz80.bin: $(SOURCES) parremat.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# A string-literal address (IR_LD_STR) is a rematerialisable constant: LICM no
+# longer hoists it into a loop-long frame slot and a call argument no longer
+# stores it to a slot only to reload it. See the file header.
+strremat.bin: $(SOURCES) strremat.c
+	$(compile)
+	$(runtest)
+
+strremat_fp.bin: $(SOURCES) strremat.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+strremat_8080.bin: $(SOURCES) strremat.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+strremat_gbz80.bin: $(SOURCES) strremat.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 

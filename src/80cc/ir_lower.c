@@ -7867,6 +7867,9 @@ int ir_lower_func(FILE *out, Func *f)
                     else if (o->kind == IR_LD_SYM && o->mem.sym
                              && !ns_sym_bails(o->mem.sym))
                         rd = o;
+                    /* A string-literal address is a link-time immediate. */
+                    else if (o->kind == IR_LD_STR)
+                        rd = o;
                     /* [remat-lea] Recompute `&local` at each use
                        (emit_remat_word) instead of spilling and reloading it —
                        the slot offset is fixed per function and cur_sp_adjust
