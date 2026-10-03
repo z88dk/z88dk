@@ -215,6 +215,8 @@ exists (ADR 0010).
 | `jr-relax` | `jp` is never relaxed to `jr` |
 | `label-elide` | dead basic-block labels are kept in the output |
 | `ret-thread` | a jump to a `ret` is not threaded |
+| `defassign-verify` | not an optimisation: no stderr warning for a local that is read but never written on any path (`IR_DEFASSIGN_VERIFY=1` widens it, `=2` aborts) |
+| `mulchain-de` | a constant-multiply shift-add chain reloads its multiplicand every term instead of keeping it in DE |
 
 ## Keeping this file true
 
