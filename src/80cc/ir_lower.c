@@ -1732,6 +1732,32 @@ static int xline_c_call(const char *line)
     return p[0] == '_' && p[1] != '_' && p[1] != 0;
 }
 
+/* [l-call-flags] Is this an unconditional call to a runtime helper
+   (`call l_sym`)? None of the l_* helpers 80cc emits reads the flags on entry:
+   an audit of every one it emits, on every CPU, found only reads whose value
+   is discarded (`ld a,h; rla` keeps the carry OUT) or `push af` saving A. So
+   the call kills F like a call to C code. BC is not covered: `l_i64_store`
+   takes its address there. `--opt-disable=l-call-flags` opts out. */
+static int lcallf_on = -1;
+static int lcallf_enabled(void)
+{
+    if (lcallf_on < 0) lcallf_on = !opt_disabled("l-call-flags");
+    return lcallf_on;
+}
+
+static int xline_l_call(const char *line)
+{
+    const char *p = line;
+    if (*p != ' ' && *p != '\t') return 0;
+    while (*p == ' ' || *p == '\t') p++;
+    if (strncmp(p, "call", 4)) return 0;
+    p += 4;
+    if (*p != ' ' && *p != '\t') return 0;
+    while (*p == ' ' || *p == '\t') p++;
+    return p[0] == 'l' && p[1] == '_' && p[2] != 0 && !strchr(p, ',')
+        && lcallf_enabled();
+}
+
 /* ---- [gwiden] byte-global widen: fold `ld l,a` into the word load ----------
    `ld a,(_g); ld l,a; ld h,0` (a byte global zero-extended into HL) is one byte
    longer than `ld hl,(_g); ld h,0`, which leaves HL identical — H is re-zeroed,
@@ -2620,6 +2646,8 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
             if (e.is_call) {   /* call/rst, or an indirect jump */
                 if (xline_c_call(lines[i]) && bccall_enabled())
                      { b_live = c_live = f_live = 0; }
+                else if (xline_l_call(lines[i]))
+                     { b_live = c_live = 1; f_live = 0; }
                 else { b_live = c_live = f_live = 1; }
                 /* [de-call] DE is live into a call only where the argument ABI
                    put something there — e.d_read carries the emitter's answer. */
@@ -3851,6 +3879,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                same `_sym` discriminator, so an asm-linkage call stays a reader.
                Checked first: xora_line_reads_f calls every branch a reader. */
             if (xline_c_call(lines[i]) && bccall_enabled()) f_live = 0;
+            else if (xline_l_call(lines[i]))   f_live = 0;
             /* [bc-flow] An UNCONDITIONAL branch to a label in this function
                reads no flags — take the target's. A conditional one reads F by
                definition and stays a reader. */
