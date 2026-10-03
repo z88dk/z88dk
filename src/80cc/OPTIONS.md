@@ -97,6 +97,7 @@ exists (ADR 0010).
 | `lea-frame-prologue` | ez80 fp-mode frame allocation uses `ld hl,-N; add hl,sp` instead of an IX-relative `lea` |
 | `bc-evict` | a BC tenant is never displaced by a better candidate |
 | `bc-per-cand` | BC cost is scored per class, not per candidate |
+| `callbc` | a call's word result never takes a BC home straight from the call, and a sign-fill arithmetic shift right still ends a BC pack span |
 | `bc-call-cost` | the arbiter does not charge a BC home for call preservation **(measure: `=<N>` sets the margin)** |
 | `byte-resident` | no byte homes (C slotless, E slot-backed) |
 | `byte-tie` | equal-tick byte candidates are not broken by byte count |
@@ -191,7 +192,6 @@ exists (ADR 0010).
 | `cmp-k` | a compare against a constant is not given its immediate form |
 | `byte-cmp-const` | a word compare against a byte-sized constant is not narrowed |
 | `frame-byte-trunc` | a width-2 value truncated to one byte materialises the whole word through HL first instead of reading the one byte directly |
-| `ivwidth` | opt-in (default off): a byte-range loop counter (`IR_IVWIDTH`) gets an 8-bit loop-exit compare instead of 16-bit |
 | `word-ztest` | a word zero test uses the baseline sequence |
 | `switch-byte-a` | a `char` switch scrutinee is widened to HL instead of staying in A |
 | `gpderef` | no general-pointer dereference form |
