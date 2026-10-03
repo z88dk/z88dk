@@ -106,28 +106,23 @@ Size across the corpus before implementing.
   r2ka/r4k/r6k/kc160 until guarded to defer to their native `ld hl,(sp+N)`
   word read when the slot is in range. `BENCH_MATRIX.txt` 80cc columns:
   66 cells changed, 0 grown, -295 B total.
-- **IR_IVWIDTH — shipped opt-in, STALE MEASUREMENT, uncommitted fix on top.**
-  A loop counter proven to hold only byte values throughout one specific loop
-  (constant start in 0..255, step +1, constant exit bound ≤255) gets an
-  8-bit loop-exit compare and increment instead of 16-bit. The committed
-  version's -254 B/14-bench figure was WRONG — it shipped without checking
-  that the same vreg can be reused (non-SSA) for a SECOND, differently-ranged
-  loop elsewhere in the function (`searchbench`'s `r` drives both a bound-512
-  loop and a bound-6 one): marking is per-loop but `IR_VREG_BYTE_RANGE` is
-  per-vreg, so the mark from the small loop silently narrowed the big loop's
-  increment too — an 8-bit `inc` on a counter that needs 9 bits wraps and
-  infinite-loops. Caught by the tick scan (two cells hit the emulator's
-  timeout sentinel), NOT by `long_ir` or any size scan. The fix (require the
-  vreg to be referenced nowhere outside this one loop's preheader+body) is
-  written and correct — `long_ir` clean both frame modes, tick scan clean,
-  default-off byte-identical — but is **sitting uncommitted in `ir_opt.c`**,
-  on top of the already-committed buggy version. Apply it before touching
-  this again. The real number is -24 B total (z80/z80n/z180), -20 B
-  (ez80/kc160/rabbit4k), 0 B (8080/8085/gbz80 — no index register for the
-  fp-mode `inc (ix+d)` rung) across just 8 of 31 benches, for ~260 lines of
-  new allocator+lowering code — a poor size-to-complexity ratio. Recommend
-  against promoting to default-on; either commit the fix and leave it
-  opt-in, or revert the whole feature.
+- **IR_IVWIDTH — REVERTED IN ENTIRETY.** A loop counter proven to hold only
+  byte values throughout one specific loop (constant start in 0..255, step
+  +1, constant exit bound ≤255) got an 8-bit loop-exit compare and increment
+  instead of 16-bit. The shipped version's -254 B/14-bench figure was WRONG —
+  it marked `IR_VREG_BYTE_RANGE` per-vreg, not per-loop, so a non-SSA vreg
+  reused for a SECOND, differently-ranged loop elsewhere in the function
+  (`searchbench`'s `r`, bound-512 and bound-6) silently got its big loop's
+  increment narrowed too, wrapping into an infinite loop — caught only by
+  the tick scan (emulator timeout), not `long_ir` or any size scan. A fix
+  was written (reject the vreg if referenced outside the one loop's
+  preheader+body) but the real yield after it was only -24 B (z80/z80n/z180),
+  -20 B (ez80/kc160/rabbit4k), 0 B elsewhere, across 8 of 31 benches, for
+  ~260 lines of new allocator+lowering code — not worth the complexity, so
+  the whole feature was reverted rather than fixed. `git revert
+  74c3fd3e0f` applied clean; gauntlet confirmed byte-identical to the
+  pre-feature baseline on corpus scan, long_ir (931/931 both frame modes),
+  and all deterministic behavioural gates.
 - **Constant-multiply strength reduction doesn't cache its own operand under
   register pressure.** A concrete, reproducible instance of the standing
   allocator-capture-gap finding, found chasing `matrix_compute` (+106 B vs
@@ -304,7 +299,7 @@ touched and report the count before and after.
 ### Debug output — permanent developer tools
 
 `IR_HOMEMAP` `IR_RANKDUMP` `IR_DUMP_ALLOC` `IR_EMIT_TRACE` `IR_OPT_VERBOSE`
-`IR_SPILL_STATS` `IR_IVWHY` `IR_IVWIDTH_PROBE`
+`IR_SPILL_STATS` `IR_IVWHY`
 `IR_DEADDEF_LOG` `IR_SPFLIP_LOG` `IR_CALLSPLIT_LOG`
 
 These print; they never change emitted code. `IR_HOMEMAP` is the first thing
@@ -318,7 +313,6 @@ to diff when an allocation decision changes.
 | `IR_BYTEPRESS` `IR_RANGEPROBE` | inert sizings: the byte-pair opportunity by pressure, and the ranging population | they are quoted in an ADR |
 | `IR_LIVEPROBE` | liveness census; `=2` gives the verbose form | — |
 | `IR_BYTEPACK` `IR_BYTEPACK_VERIFY` `IR_SLOTWHY` `IR_WIDENOSLOT` | opt-in allocator/lowering diagnostics and sizing probes | when the associated investigation is closed |
-| `IR_IVWIDTH` | opt-in prototype (marks + narrows byte-range loop counters); shipped, needs the tick scan before default-on | promoted to default-on, or refuted |
 | `IR_BC_STEP_CALL` `IR_BC_STEP_SCALAR` | retained diagnostic probes for the rejected ADR 0100 experiment; not optimisation options | if the probe code is removed |
 
 `IR_RANGEPROBE`'s 461 was an upper bound over the wrong population — do not
