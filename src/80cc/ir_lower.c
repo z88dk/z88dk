@@ -4074,6 +4074,54 @@ verbatim:
     while (fgets(buf, sizeof buf, src)) fputs(buf, out);
 }
 
+/* ---- delete an unconditional jump to the label that follows it ----------- */
+/* The shared return block is emitted last, and tail merging and block layout
+   move code, so a `jp X` can end up directly above `X:`. Falling through is
+   the same control flow with no bytes: drop the jump. Only blank lines,
+   comments, debug markers and other labels may sit between the two. */
+static void filter_jump_to_next(FILE *out, FILE *src)
+{
+    char buf[1024];
+    long cap = 256, n = 0;
+    char **L = malloc((size_t)cap * sizeof *L);
+    if (!L) goto verbatim;
+    rewind(src);
+    while (fgets(buf, sizeof buf, src)) {
+        if (n == cap) {
+            char **t = realloc(L, (size_t)(cap * 2) * sizeof *t);
+            if (!t) { for (long i = 0; i < n; i++) free(L[i]);
+                      free(L); goto verbatim; }
+            L = t; cap *= 2;
+        }
+        L[n] = strdup(buf);
+        if (!L[n]) { for (long i = 0; i < n; i++) free(L[i]);
+                     free(L); goto verbatim; }
+        n++;
+    }
+    for (long i = 0; i < n; i++) {
+        const char *tp; size_t tn;
+        int drop = 0;
+        if (bl_uncond_jump(L[i], &tp, &tn)) {
+            for (long j = i + 1; j < n && !drop; j++) {
+                const char *np; size_t nl;
+                if (L[j][0] == '\n' || L[j][0] == '\r' || L[j][0] == ';'
+                    || !strncmp(L[j], "\tC_LINE", 7))
+                    continue;
+                nl = bl_label_name(L[j], &np);
+                if (!nl) break;                    /* an instruction or directive */
+                if (nl == tn && !strncmp(np, tp, tn)) drop = 1;
+            }
+        }
+        if (!drop) fputs(L[i], out);
+    }
+    for (long i = 0; i < n; i++) free(L[i]);
+    free(L);
+    return;
+verbatim:
+    rewind(src);
+    while (fgets(buf, sizeof buf, src)) fputs(buf, out);
+}
+
 static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
                                          const Func *f)
 {
@@ -4094,6 +4142,11 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
        destination for everything downstream of here. */
     FILE *relax = branch_relax_enabled() ? tmpfile() : NULL;
     FILE *fout = relax ? relax : out;
+    /* Everything below writes to `fout`; the jump-to-next filter runs over that
+       text last, before relaxation sizes the jumps that are left. */
+    FILE *jn_dest = fout;
+    FILE *jnf = opt_disabled("jp-next") ? NULL : tmpfile();
+    if (jnf) fout = jnf;
     for (int i = 0; i <= max_bb; i++) thr[i] = -1;
     /* Pass 0: jump-threading map. A run of one or more bare labels
        `L_f..._bb_<n>:` whose first following instruction is an UNCONDITIONAL
@@ -4347,6 +4400,11 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
         rewind(blf);
         filter_block_layout(fout, blf);
         fclose(blf);
+    }
+    if (jnf) {
+        filter_jump_to_next(jn_dest, jnf);
+        fclose(jnf);
+        fout = jn_dest;
     }
     if (relax) {
         rewind(relax);
