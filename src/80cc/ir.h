@@ -141,6 +141,8 @@ typedef enum {
                                         (entry reload via emit_bc_reload on a cold
                                         belief), no exit spill. ir_assign_slots keeps
                                         its slot despite the PR_BC home. */
+    IR_VREG_IV_RECOMPUTE   = 1 << 12, /* ivsr-suppress kept this index for address
+                                        recompute: CSE leaves its `<<1` per use */
 } VRegFlags;
 
 typedef struct {

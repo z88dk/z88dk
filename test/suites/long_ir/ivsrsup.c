@@ -6,7 +6,8 @@
  * zero-trip loop.
  *
  *  - bdot   byte arrays, scale 1.
- *  - wdot   word arrays, scale 2, shared i*2.
+ *  - wdot   word arrays, scale 2: each address recomputes i*2
+ *          (ivsr-recompute; _rckeep shares it).
  *  - waxpy  word read-modify-write of one array from another.
  *
  * Every CPU builds it; _keep runs the opt-out on the CPUs it gates.

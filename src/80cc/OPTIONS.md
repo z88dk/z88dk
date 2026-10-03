@@ -65,6 +65,7 @@ exists (ADR 0010).
 | `ivsr` | no induction-variable strength reduction (ADR 0008) |
 | `ivsr-affine` | no folding of a non-power-of-two affine multiple (struct-array stride) |
 | `ivsr-suppress` | apply IVSR even on the CPUs where a walking pointer is not cheaper |
+| `ivsr-recompute` | CSE merges the `<<1` of an index that `ivsr-suppress` kept for address recompute, so two array addresses share one scaled index |
 | `lftr` | no linear-function test replacement |
 | `lftr-signed` | LFTR only where the bound is a constant, never a signed variable |
 | `cmp-unsign` | keep the sign tail on a comparison that cannot go negative |

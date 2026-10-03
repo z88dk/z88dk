@@ -1501,6 +1501,8 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
 
 /* Strength-reduce one natural loop (header h, single latch, pre-header
    ph; body = contiguous range [h, latch]). Returns derived IVs reduced. */
+static int niv_up_bound_ok(Func *f, int h, int c, int64_t *maxval);
+
 static int ivsr_process_loop(Func *f, int h, int latch, int ph)
 {
     int lo = h, hi = latch;
@@ -1572,7 +1574,15 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
                     if (sb >= 0)
                         addr_uses += ivsr_uses_in_op(&f->bbs[sb].ops[si], iv);
                     int remaining = ivsr_uses_in_loop(f, iv, lo, hi) - addr_uses;
-                    if (remaining > 2) continue;   /* iv survives → pointer redundant */
+                    if (remaining > 2) {           /* iv survives → pointer redundant */
+                        /* A byte-bounded counter is narrowed later and lives
+                           in a slot, so its recompute is not cheap. */
+                        int64_t maxv;
+                        if (!(K >= 0 && K <= 255
+                              && niv_up_bound_ok(f, h, iv, &maxv) && maxv <= 255))
+                            f->vregs[iv].flags |= IR_VREG_IV_RECOMPUTE;
+                        continue;
+                    }
                 }
 
                 cand[n_cand].d = d;     cand[n_cand].base = base;
@@ -1757,6 +1767,15 @@ int ir_opt_cse(Func *f)
             /* IR_ASM: unknown clobbers, wipe everything. */
             if (op->kind == IR_ASM) { n = 0; continue; }
 
+            /* A `<<1` of an index IVSR left for recompute is one `add hl,hl`
+               per use; a shared copy is a second live word that spills. */
+            if (op->kind == IR_SHL && op->src[1] == -1 && op->imm == 1
+                && op->src[0] >= 0
+                && (f->vregs[op->src[0]].flags & IR_VREG_IV_RECOMPUTE)
+                && !opt_disabled("ivsr-recompute")) {
+                cse_invalidate_for_write(tbl, &n, op->dst);
+                continue;
+            }
             if (cse_eligible(op->kind) && op->dst >= 0) {
                 int has_imm = op_has_imm_identity(op->kind);
                 /* Tripwire, not a diagnostic to dig for: a kind CSE treats as
