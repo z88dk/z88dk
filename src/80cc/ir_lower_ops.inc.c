@@ -386,39 +386,6 @@ static int try_inplace_home_unop(FILE *out, const Func *f, const Op *op,
     return 1;
 }
 
-/* [IR_IVWIDTH] A byte-range counter (ir.h's IR_VREG_BYTE_RANGE) steps in
-   place on its slot's low byte — `inc (ix+d)` or the sp-relative equivalent
-   — instead of a full word load+step+store. The flag guarantees the high
-   byte stays zero, so every other reader is unaffected. Skipped when a
-   register already caches the value, mirroring the other try_*_step_inplace
-   rungs above. */
-static int try_byterange_step_inplace(FILE *out, const Func *f, const Op *op,
-                                      int step)
-{
-    if (op->dst < 0 || op->dst != op->src[0]) return 0;
-    if (g_hc.branch_test_kind != 0) return 0;
-    if (!(f->vregs[op->dst].flags & IR_VREG_BYTE_RANGE)) return 0;
-    int v = op->dst;
-    if (hl_has(v) || bc_has(v) || de_has(v)) return 0;
-    int has_slot = (f->vreg_spill_slot && f->vreg_spill_slot[v] >= 0)
-                 || (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE);
-    if (!has_slot) return 0;
-    const char *mnem = step > 0 ? "inc" : "dec";
-    if (fp_active(f)) {
-        int ix_off = slot_ix_off(f, v);
-        if (!fp_offset_fits(ix_off)) return 0;
-        emit(out, "%s\t(%s%+d)", mnem, frame_reg(), ix_off);
-        return 1;
-    }
-    int off = slot_off(f, v) + L.cur_sp_adjust;
-    if (off < 0) return 0;
-    hl_about_to_change(-1);
-    emit(out, "ld\thl,%d", off);
-    emit(out, "add\thl,sp");
-    emit(out, "%s\t(hl)", mnem);
-    return 1;
-}
-
 static int gen_step(FILE *out, Func *f, const Op *op, int step)
 {
     const char *mnem = step > 0 ? "inc" : "dec";
@@ -495,7 +462,6 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
         if (bc_resident) cache_bc(op->dst); else cache_de(op->dst);
         return 0;
     }
-    if (try_byterange_step_inplace(out, f, op, step)) return 0;
     if (try_tos_step_inplace(out, f, op, step)) return 0;
     if (!hl_has(op->src[0]))
         load_to_hl(out, f, op->src[0]);

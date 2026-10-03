@@ -141,16 +141,6 @@ typedef enum {
                                         (entry reload via emit_bc_reload on a cold
                                         belief), no exit spill. ir_assign_slots keeps
                                         its slot despite the PR_BC home. */
-    IR_VREG_BYTE_RANGE     = 1 << 12, /* [IR_IVWIDTH] Opt-in prototype. A width-2
-                                        loop counter proven to start at K (0..255),
-                                        step +1, and exit on a compare against a
-                                        bound in K..255 — so every value it ever
-                                        holds, including at exit, fits a byte. Its
-                                        loop-exit compare and step may render as
-                                        byte ops on the slot's low half; the high
-                                        half stays the zero the init put there, so
-                                        every other reader is unaffected. Does not
-                                        change vregs[].width. */
 } VRegFlags;
 
 typedef struct {

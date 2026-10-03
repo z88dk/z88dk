@@ -318,34 +318,6 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         L.la.cur_skip_next_op = 1;
         return 0;
     }
-    /* [IR_IVWIDTH] A byte-range counter (IR_VREG_BYTE_RANGE) compared
-       against a byte constant, branch-fused: 0..255 never negative, so
-       signed/unsigned agree — compare just the low byte, same cf_true_long
-       branch logic as the full-word form. */
-    if ((op->kind == IR_CMP_LT || op->kind == IR_CMP_ULT)
-        && !opt_disabled("ivwidth")
-        && op->src[0] >= 0 && op->src[1] == -1 && op->imm_sym == NULL
-        && g_hc.branch_test_kind != 0
-        && (f->vregs[op->src[0]].flags & IR_VREG_BYTE_RANGE)
-        && op->imm >= 0 && op->imm <= 255) {
-        int v0 = op->src[0];
-        int got = 1;
-        if (vreg_in_pr_bc(f, v0))        emit(out, "ld\ta,c");
-        else if (vreg_is_pr_de(f, v0))   emit(out, "ld\ta,e");
-        else if (hl_has(v0))             emit(out, "ld\ta,l");
-        else if (!emit_frame_byte_half_for_vreg(out, f, v0, 0)) got = 0;
-        if (got) {
-            emit(out, "cp\t%u", (unsigned)(op->imm & 0xff));
-            int br_true = (g_hc.branch_test_kind == IR_BR_COND);
-            int want_carry = (cf_true_long == br_true);
-            emit(out, "jp\t%s,L_f%d_bb_%d",
-                 want_carry ? "c" : "nc", L.func_emit_idx,
-                 L.la.cur_branch_test_label);
-            L.rs.a = -1;
-            L.la.cur_skip_next_op = 1;
-            return 0;
-        }
-    }
     /* UNSIGNED width-2 vs a constant whose LOW BYTE IS ZERO (branch-fused):
        compare the HIGH BYTES only. For K = H*256 and i = ih*256 + il,
 
