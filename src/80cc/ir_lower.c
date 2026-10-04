@@ -3578,15 +3578,74 @@ static int gbwm_slot_const(char **lines, int n, char *drop, int e,
     return 1;
 }
 
+/* [gb-store-a] HL to a word slot:
+     ex de,hl | ld de,hl
+     ld hl,N; add hl,sp; ld (hl),e; inc hl; ld (hl),d
+   ending at line `e` becomes
+     ld a,l; ld d,h; ld hl,N; add hl,sp; ld (hl+),a; ld (hl),d
+   One byte and 8 cycles less. HL, D and F end the same; A and E differ, so
+   both must be dead after. */
+static int gbsa_on = -1;
+static int gbsa_fired;   /* the last gbwm_try success was gb-store-a */
+static int gbwm_store_a(char **lines, int n, char *drop, int e,
+                        int e_live, int *startp)
+{
+    if (gbsa_on < 0) gbsa_on = IS_GBZ80() && !opt_disabled("gb-store-a");
+    if (!gbsa_on || e < 5) return 0;
+    int st = e - 4;                               /* the `ld hl,N` */
+    if (gbwm_any_dropped(drop, st - 1, e)) return 0;
+    int n1;
+    char c1[8];
+    if (sscanf(lines[st], "\tld\thl,%d%1[\n]", &n1, c1) != 2) return 0;
+    if (strcmp(lines[st + 1], "\tadd\thl,sp\n")
+        || strcmp(lines[st + 2], "\tld\t(hl),e\n")
+        || strcmp(lines[st + 3], "\tinc\thl\n")
+        || strcmp(lines[st + 4], "\tld\t(hl),d\n"))
+        return 0;
+    if (strcmp(lines[st - 1], "\tex\tde,hl\n")
+        && strcmp(lines[st - 1], "\tld\tde,hl\n"))
+        return 0;
+    /* The value came out of DE just before (`ex de,hl` or `ld hl,de`): copt
+       folds that pair away and stores straight from DE, which is shorter. */
+    if (st >= 2 && !drop[st - 2]
+        && (!strcmp(lines[st - 2], "\tex\tde,hl\n")
+            || !strcmp(lines[st - 2], "\tld\thl,de\n")))
+        return 0;
+    /* A trailing `ex de,hl` brings the value back into HL: the store-and-keep
+       form, which the constant and zero rewrites fold better. */
+    if (e + 1 < n && !strcmp(lines[e + 1], "\tex\tde,hl\n")) return 0;
+    /* A constant or symbol value is stored as immediates elsewhere. */
+    {
+        char k[96];
+        if (st >= 2 && !drop[st - 2] && gbwm_ld_const(lines[st - 2], "hl", k, sizeof k))
+            return 0;
+    }
+    if (!gbwm_dead_after(lines, n, drop, e + 1, 1, 0)) return 0;
+    if (e_live && !gbwm_dead_after3(lines, n, drop, e + 1, 0, 0, 1)) return 0;
+    char slot[32];
+    snprintf(slot, sizeof slot, "\tld\thl,%d\n", n1);
+    const char *nl[6] = { "\tld\ta,l\n", "\tld\td,h\n", slot,
+                          "\tadd\thl,sp\n", "\tld\t(hl+),a\n",
+                          "\tld\t(hl),d\n" };
+    if (!gbwm_replace(lines, drop, st - 1, e, nl, 6)) return 0;
+    *startp = st - 1;
+    gbsa_fired = 1;
+    return 1;
+}
+
 /* Try every [gb-word-mem] shape ending at line `e`. */
 static int gbwm_try(char **lines, int n, char *drop, int e,
                     int d_live, int e_live, int f_live, int *startp)
 {
-    if (!gbwm_enabled() || drop[e]) return 0;
-    return gbwm_slot_step(lines, n, drop, e, d_live, e_live, f_live, startp)
-        || gbwm_global_step(lines, n, drop, e, f_live, startp)
-        || gbwm_slot_const(lines, n, drop, e, d_live, e_live, f_live, startp)
-        || gbwm_zero_store(lines, n, drop, e, f_live, startp);
+    gbsa_fired = 0;
+    if (drop[e]) return 0;
+    if (gbwm_enabled()
+        && (gbwm_slot_step(lines, n, drop, e, d_live, e_live, f_live, startp)
+            || gbwm_global_step(lines, n, drop, e, f_live, startp)
+            || gbwm_slot_const(lines, n, drop, e, d_live, e_live, f_live, startp)
+            || gbwm_zero_store(lines, n, drop, e, f_live, startp)))
+        return 1;
+    return gbwm_store_a(lines, n, drop, e, e_live, startp);
 }
 
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
@@ -3712,6 +3771,9 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 int gs;
                 if (gbwm_try(lines, n, drop, i, d_live, e_live, f_live, &gs)) {
                     f_live = 0;
+                    /* [gb-store-a] E was proven dead after and is not read;
+                       D is written before it is read. */
+                    if (gbsa_fired) d_live = e_live = 0;
                     i = gs;
                     continue;
                 }

@@ -93,6 +93,7 @@ exists (ADR 0010).
 | `dsub-bc` | An 8085 signed compare with one operand already in BC copies the RHS into BC (push/pop if BC is live) instead of subtracting BC where it is |
 | `hl-mem-carry` | a global word loaded for a branch test is reloaded in the block the branch reaches, instead of being taken from HL |
 | `addr-fold` | `ex de,hl; ld hl,_sym; add hl,de` stays as is instead of becoming `ld de,_sym; add hl,de` where DE is dead after the add (not on VM1 or Rabbit) |
+| `gb-store-a` | gbz80 HL-to-slot word stores go through DE (`ld de,hl; …; ld (hl),e; inc hl; ld (hl),d`) instead of A (`ld a,l; ld d,h; …; ld (hl+),a; ld (hl),d`) where A and E are dead |
 | `gb-small-frame` | gbz80 frames of 1 or 2 bytes open with `add sp,-N` and close with `add sp,N` instead of `dec sp` / `push af` and `inc sp` / `pop bc` |
 | `idx-rmw-de` | an indexed word RMW keeps the BC address park instead of the `dec hl`-restored DE route |
 | `shr-a-chain` | a constant word right shift stays `srl h; rr l` instead of the A-through-CB chain |
