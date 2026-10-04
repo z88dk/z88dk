@@ -324,6 +324,7 @@ static enum iostyle    compiler_style = outimplied;
 #define CC_80CC      3
 #define CC_XCC       4
 #define CC_MULTI     5
+#define CC_LLVMZ80   6
 
 static char           *c_compiler_type = "sccz80";
 static int             c_want_multi = 0;
@@ -351,6 +352,7 @@ static char  *c_options = NULL;
 static char  *c_z80asm_exe = "z88dk-z80asm";
 
 static char  *c_ez80clang_exe = "ez80-clang";
+static char  *c_llvmz80_exe = "llvmz80-clang";
 static char  *c_sdcc_exe = "z88dk-zsdcc";
 static char  *c_sccz80_exe = "z88dk-sccz80";
 static char  *c_80cc_exe = "z88dk-80cc";
@@ -459,6 +461,7 @@ static arg_t  config[] = {
     { "COPTRULESINLINE", 0, SetStringConfig, &c_coptrules_sccz80, NULL, "Optimisation file for inlining sccz80 ops", "\"DESTDIR/lib/z80rules.8\"" },
     { "COPTRULESTARGET", 0, SetStringConfig, &c_coptrules_target, NULL, "Optimisation file for target specific operations",NULL },
     { "EZ80CLANGRULES", 0, SetStringConfig, &c_ez80clang_opt, NULL, "Rules for ez80 clang", "DESTDIR/lib/clang_rules.1"},
+    { "LLVMZ80EXE", 0, SetStringConfig, &c_llvmz80_exe, NULL, "Path to llvm-z80 clang" },
     { "80CCRULES", 0, SetStringConfig, &c_80cc_opt, NULL, "Options for 80cc", "DESTDIR/lib/80cc_rules.1"},
     { "XCCRULES", 0, SetStringConfig, &c_xcc_opt, NULL, "Options for xcc", "DESTDIR/lib/xcc_rules.1"},
     { "SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "\"DESTDIR/lib/sdcc/sdcc_opt.1\"" },
@@ -1441,11 +1444,11 @@ int main(int argc, char **argv)
                 goto CASE_ASMFILE;
             }
             /* past clang+llvm related pre-processing */
-            if (compiler_type == CC_SDCC || compiler_type == CC_EZ80CLANG) {
+            if (compiler_type == CC_SDCC || compiler_type == CC_EZ80CLANG || compiler_type == CC_LLVMZ80) {
                 char zpragma_args[1024];
                 snprintf(zpragma_args, sizeof(zpragma_args),"-zcc-opt=\"%s\"%s",
                          zcc_opt_def,
-                         (compiler_type == CC_SDCC) ? " -autoformat" : "");
+                         (compiler_type == CC_SDCC || compiler_type == CC_LLVMZ80) ? " -autoformat" : "");
                 if (process(ft == CXXFILE ? ".cpp" : ".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
@@ -1476,13 +1479,16 @@ int main(int argc, char **argv)
                     compiler_arg = strdup(comparg);
                 }
 
-                if (process(".i", ".opt", c_compiler, compiler_arg, compiler_style, i, YES, NO)) {
+                if (process(".i", compiler_type == CC_LLVMZ80 ? ".asm" : ".opt",
+                            c_compiler, compiler_arg, compiler_style, i, YES, NO)) {
                     exit(1);
                 }
                 free(compiler_arg);
             }
         case OPTFILE:
             if (m4only || preprocessonly || dependencyonly) continue;
+            if (compiler_type == CC_LLVMZ80)
+                goto CASE_ASMFILE;
             if (compiler_type == CC_SDCC) {
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
@@ -3686,6 +3692,37 @@ static void configure_compiler(void)
         BuildOptions(&linkargs, "-D__COMPILER_MULTI");
         c_compiler = c_sccz80_exe;
         compiler_style = outspecified_flag;
+    } else if (strcmp(c_compiler_type, "llvmz80") == 0) {
+        char *env_llvmz80 = getenv("LLVMZ80EXE");
+
+        if (env_llvmz80 && *env_llvmz80)
+            c_llvmz80_exe = env_llvmz80;
+
+        preprocarg = " -E -D__CLANG -D__LLVMZ80 --target=z80-unknown-none-z88dk -std=gnu23";
+        BuildOptions(&cpparg, preprocarg);
+        BuildOptions(&asmargs, "-D__LLVMZ80");
+        BuildOptions(&linkargs, "-D__LLVMZ80");
+
+        if (opt_code_size) {
+            snprintf(buf, sizeof(buf), "--target=z80-unknown-none-z88dk -S -std=gnu23 -o - -Oz");
+        } else {
+            int lvl = peepholeopt;
+            if (lvl < 0) lvl = 0;
+            if (lvl > 3) lvl = 3;
+            snprintf(buf, sizeof(buf), "--target=z80-unknown-none-z88dk -S -std=gnu23 -o - -O%d", lvl);
+        }
+        add_option_to_compiler(buf);
+        add_option_to_compiler("-fdefault-calling-conv=sdcccall0");
+        if (c_generate_debug_info)
+            add_option_to_compiler("-g");
+        if (clangarg)
+            add_option_to_compiler(clangarg);
+
+        compiler_type = CC_LLVMZ80;
+        c_compiler = c_llvmz80_exe;
+        c_cpp_exe = c_llvmz80_exe;
+        compiler_style = filter_out;
+        c_stylecpp = filter_out;
     } else {
         printf("Unknown compiler type: %s\n",c_compiler_type);
         exit(1);

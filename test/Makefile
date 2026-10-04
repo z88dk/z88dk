@@ -20,6 +20,11 @@ subdirs-clean:
 
 .PHONY:	subdirs-all $(SUBDIRS)
 
+llvmz80:
+	$(MAKE) -C llvmz80 test
+
+.PHONY: llvmz80
+
 
 # The four lines are one recipe, so they stay ordered under -j: both compilers
 # write the same test.bin names into the same suite directories, so the passes
