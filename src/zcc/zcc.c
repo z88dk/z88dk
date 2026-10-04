@@ -1151,7 +1151,8 @@ int main(int argc, char **argv)
 
         unlink("zcc_opt.def");
 #ifndef WIN32
-        if (temp_path(tempdir, sizeof(tempdir), "tmpzccXXXXXXXX") != 0) {
+        if (temp_path(tempdir, sizeof(tempdir) - sizeof("/zcc_opt.def") + 1,
+                      "tmpzccXXXXXXXX") != 0) {
             fprintf(stderr, "Temporary directory path is too long\n");
             exit(1);
         }
