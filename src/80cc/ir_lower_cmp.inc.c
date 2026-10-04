@@ -1755,19 +1755,10 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             return 0;
         }
         if (try_const_barrel(out, f, op, 1)) return 0;
-        /* Partial-load fastpath for int SHR ≥ 8: only the high source byte
-           survives, into result L. Read it directly, skip the low byte.
-           SLOT reads only — a register-only vreg (vreg_spill_slot == -1)
-           would read a bogus below-frame offset, so those fall through to
-           load_to_hl + `ld l,h` (mirror of the SHL ≥8 guard).
-           [frame-byte-trunc] An IN-PLACE PARAM has a memory home too, via
-           param_caller_off, but no SPILL slot — same PARAM_IN_PLACE gap
-           hlde_belief_droppable already names above. BC/DE-cache exclusion
-           added alongside it: a param is far likelier than a spill to arrive
-           calling-convention-resident there. sp-mode additionally skips
-           when the slot is in rabbit/kc160's native `ld hl,(sp+N)` range —
-           load_to_hl already reaches it in one instruction there, cheaper
-           than this path's address-compute. */
+        /* SHR >= 8 keeps only the source's high byte (into L): read that
+           byte alone. Slot reads only, as for SHL; [frame-byte-trunc] also
+           excludes an in-place param (no spill slot) and a BC/DE-cached
+           value, and skips sp mode where rabbit/kc160 have `ld hl,(sp+N)`. */
         if (count >= 8 && !hl_has(op->src[0])
             && !bc_has(op->src[0]) && !de_has(op->src[0])
             && ((f->vreg_spill_slot && f->vreg_spill_slot[op->src[0]] >= 0)

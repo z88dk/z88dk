@@ -2502,19 +2502,10 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             return 0;
         }
         if (try_const_barrel(out, f, op, 0)) return 0;
-        /* Partial-load fastpath for int SHL ≥ 8: only the low
-           byte of the source survives, and goes into H of the
-           result. Read it directly; skip the high byte. Only fires
-           on a genuine SLOT read — a register-only vreg (PR_BC/HL/DE,
-           vreg_spill_slot == -1) would otherwise read a bogus
-           below-frame offset; for those fall through to load_to_hl
-           (which copies BC/DE→HL) + the `ld h,l` strength reduction.
-           [frame-byte-trunc] Mirror of gen_shr's own PARAM_IN_PLACE +
-           BC/DE-cache fix below. sp-mode additionally skips when the slot
-           is in rabbit/kc160's native `ld hl,(sp+N)` range: load_to_hl
-           already reaches it in one instruction there, cheaper than this
-           path's address-compute — regressed r2ka/r4k/r6k/kc160 until
-           guarded. */
+        /* SHL >= 8 keeps only the source's low byte (into H): read that
+           byte alone. Slot reads only; a register-homed source falls through
+           to load_to_hl + `ld h,l`. [frame-byte-trunc] Skipped in sp mode
+           where rabbit/kc160 read the word with one `ld hl,(sp+N)`. */
         if (count >= 8 && !hl_has(op->src[0])
             && !bc_has(op->src[0]) && !de_has(op->src[0])
             && ((f->vreg_spill_slot && f->vreg_spill_slot[op->src[0]] >= 0)

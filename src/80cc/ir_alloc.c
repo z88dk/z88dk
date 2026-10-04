@@ -563,20 +563,11 @@ static long cs_span_benefit(const Func *f, int v, int lo, int hi,
     return ben;
 }
 
-/* Op-kinds whose width-2 lowering STAMPS a PR_BC dst into BC (end in
-   spill_and_swap_unless_dead / commit_hl_word → `ld bc,hl`). A write-many int
-   IV lives in BC only if EVERY def is such a kind (else a def elsewhere leaves
-   BC stale). Phase 2 IV-residency proposer (iv_home_realizable) — which has
-   NO function-wide call-free guard of its own (unlike bc_home_realizable's
-   write-ONCE sibling, which requires func_is_call_free). IR_CALL/IR_HCALL
-   must NEVER be added here: a write-many loop-carried IV whose every def
-   happens to be a call result would then pass `all_defs_ok` with no check
-   that the loop (or the rest of the function) stays BC-safe across calls
-   elsewhere, which long_ir's gauntlet confirmed as a hard abort ("no live
-   register and no stack slot") across idxderef/delive/dsword/boolbyte/
-   fp_promote family/rabmul. See bc_safe_producer_singledef below, which
-   admits call results only through the write-ONCE path that already proves
-   the span call-free. */
+/* Op-kinds whose width-2 lowering stamps a PR_BC dst into BC (`ld bc,hl`).
+   A write-many IV lives in BC only if every def is such a kind. Never add
+   IR_CALL/IR_HCALL: the IV proposer does not prove its span call-free, so a
+   call-result def would put BC across a call; bc_safe_producer_singledef
+   admits calls only where the span is proven call-free. */
 static int bc_safe_producer(int k)
 {
     switch (k) {
@@ -595,57 +586,14 @@ static int bc_safe_producer(int k)
     }
 }
 
-/* [callbc] A call RESULT read >=2 times in a call-free straight-line span
-   (BC free throughout — nothing in that envelope calls) never used to be
-   eligible for a BC home, so it fell back to a push/pop round trip at EVERY
-   read instead of one `ld bc,hl` stamp (e.g. `(rand() % 256) < x`, where
-   rand()'s result is read 3 times by the signed-pow2-mod fast path —
-   src/80cc/HANDOVER_2026-10-03.md Finding 1).
-
-   Deliberately SEPARATE from bc_safe_producer (above), not folded into it:
-   this is called only from spill_word_producer_ok, which (unlike
-   iv_home_realizable's all_defs_ok scan) already requires write_count==1 —
-   so the only two consumers are collect_bc_temp_cands/ir_bc_pack (single-BB,
-   call-free SPAN explicitly checked by its own per-op scan) and
-   ir_stack_spill (single-def/single-use, same call-free span check via
-   stack_spill_span_hazard). Both already prove the exact span this result
-   lives in never crosses a call — the write-many IV proposer proves no such
-   thing and must keep seeing calls as unsafe.
-
-   IR_CALL only — NOT IR_HCALL. A plain IR_CALL (gen_call) is the smallc/stdc/
-   sdcccall(1) ABI this fix targets (rand()'s result). IR_HCALL is a WIDER
-   family (float/long helpers: FA, __i64_acc, DEHL-wide returns, their own
-   push/pop-arg and BC-as-argument conventions in some helpers — see
-   ir_lower_call.inc.c's acc_store_bc) that the gauntlet's long_ir run
-   (fp_promote_reg's `_Float16` multiply, v8/phys-BC "no live register and no
-   stack slot" abort) proved unsafe to fold in here blind: something in that
-   wider family's own BC usage is not accounted for by the span-hazard scan.
-   Needs its own investigation before admission, not bundled with this fix.
-
-   DEFAULT ON, --opt-disable=callbc opts out. First corpus sizing (11 CPUs x
-   sp/fp, 720 cells) found a real +237 B regression (154 cells larger) and
-   held this opt-in while it was investigated — a candidate winning PR_BC
-   could change the unified arbiter's ranking for an unrelated register-class
-   decision elsewhere in the SAME function (structbench.c's struct_run: a
-   call-result candidate's admission cost the array-base pointer its IY home
-   elsewhere in the function). Root-caused to two NARROW, independent gaps,
-   both fixed, neither requiring the general "price what a candidate
-   displaces" allocator work (memory note allocator-capture-gap.md documents
-   that as a separately still-open, much bigger problem):
-     1. ir_bc_pack's 5a cost-benefit eviction (search "ben[pass]" below) was
-        letting a call-result candidate's benefit justify EVICTING an
-        existing, unrelated BC tenant — fixed by excluding call producers
-        from that gain computation; they can still win a disjoint free slot,
-        just never justify evicting anyone.
-     2. A single-use call result (no re-read to ever recoup the stamp) could
-        still get admitted when op_dst_spill_is_dead's dead-single-use check
-        missed it (that check only recognizes the literal next op as the use;
-        an intervening operand load defeats it) — fixed by requiring
-        use_count>=2 for call producers outright in collect_bc_temp_cands,
-        which is the real CHKRAND/SH_TELL shape anyway.
-   Re-sized after both fixes: 0/720 size cells differ, 0/720 tick cells
-   differ, vs the pre-fix baseline — a true no-op everywhere except the two
-   real files this targets (adv_a.c -8 B, clisp.c -22/-32 B). */
+/* [callbc] A call result read two or more times in a call-free span takes a
+   BC home (one `ld bc,hl`) instead of a push/pop per read. Kept apart from
+   bc_safe_producer: its only callers (ir_bc_pack, ir_stack_spill) need
+   write_count==1 and check the span is call-free themselves.
+   IR_CALL only: IR_HCALL helpers have their own BC conventions (acc_store_bc)
+   that the span check does not model. ir_bc_pack also keeps call results from
+   evicting a BC tenant, and admits them only with two or more uses.
+   `--opt-disable=callbc` opts out. */
 static int bc_safe_producer_singledef(int k)
 {
     if (bc_safe_producer(k)) return 1;
@@ -2772,21 +2720,10 @@ static int bc_pack_span_kind_ok(OpKind k)
     }
 }
 
-/* [callbc] bc_pack_span_kind_ok's blanket IR_SHR exclusion is for the B shift
-   counter a VARIABLE count or a width-4 byte-shift loop needs — gen_sar16's
-   count>=15 branch (full sign fill: `sm = v >> (w*8-1)`, the top of the
-   signed-pow2-mod/div fast path, emit_const_sdiv_sr in ir_build.c) is neither:
-   it's `add a,a; sbc a,a; ld h,a; ld l,a` on every CPU, unconditionally, with
-   no has_sra/808x branch reached (that branch returns before any of them).
-   Checking the OP (not just the kind) admits exactly this one proven-BC-free
-   shape without opening the general SHR/SHL exclusion back up.
-
-   Gated on the SAME --opt-disable=callbc as bc_safe_producer_singledef,
-   even though this check runs for every candidate's span, not just
-   call-result ones: it exists ONLY to let CHKRAND's shape (a call result
-   whose span crosses this sign-fill SHR) through, so with the admission off
-   it's dead weight that was never separately corpus-sized — keep the two
-   gated together rather than shipping an unsized change by accident. */
+/* [callbc] bc_pack_span_kind_ok bars IR_SHR for the B shift counter. The
+   arithmetic count>=15 shift (gen_sar16's sign fill, `add a,a; sbc a,a;
+   ld h,a; ld l,a`) uses no BC on any CPU, so that one op is allowed. Gated
+   with callbc, the case it exists for. */
 static int bc_pack_span_op_ok(const Func *f, const Op *o)
 {
     if (bc_pack_span_kind_ok(o->kind)) return 1;
@@ -3193,16 +3130,10 @@ static SpillShape *compute_spill_shapes(const Func *f)
    ir_bc_pack and ir_stack_spill pack: width-2, currently SPILL, not
    param/addr-taken/volatile, and exactly one def by a register-stampable
    producer (bc_safe_producer). Each pass adds its own shape/span/use gates. */
-/* `allow_call_producer`: collect_bc_temp_cands (ir_bc_pack) passes 1 — its
-   PR_BC commit path (ir_lower_call.inc.c's new stamp, mirroring
-   spill_and_swap_unless_dead) is proven correct for a call result. ir_stack_
-   spill passes 0: its PR_STACK commit for a call result would route through
-   store_hl_keep_hl + a bare cache_hl (ir_lower_call.inc.c), which — unlike
-   commit_hl_word's own PR_STACK branch — does NOT invalidate the HL belief
-   for the TOS park; a reader would then trust a stale HL cache and skip the
-   balancing pop, corrupting the stack. That gap was never exercised before
-   calls could reach PR_STACK at all, so it stays closed here rather than
-   fixed blind under this task's narrower scope. */
+/* `allow_call_producer`: ir_bc_pack passes 1 (its PR_BC stamp handles a call
+   result). ir_stack_spill passes 0: a call result's PR_STACK commit goes
+   through store_hl_keep_hl + cache_hl, which leaves the HL belief over the
+   TOS park, so a reader could skip the balancing pop. */
 static int spill_word_producer_ok(const Func *f, int v,
                                   const int *write_count, const int *def_kind,
                                   int allow_call_producer)
@@ -3284,17 +3215,9 @@ static int collect_bc_temp_cands(const Func *f, const int *bb_first_op,
         if (!itloc[v]) continue;
         if (!spill_word_producer_ok(f, v, write_count, def_kind, 1)) continue;
         if (use_count[v] < 1) continue;
-        /* [callbc] A call result needs >=2 reads to ever recoup the `ld bc,hl`
-           stamp's cost — a single read has nothing to recoup regardless of
-           op_dst_spill_is_dead below, which only catches a dead single use
-           when it is the LITERAL next op (k==op_idx+1): `chk = call();
-           Assert(chk == CHK, ...)` inserts the constant 42's own LD_IMM
-           between the call and the comparison, so the check misses it and a
-           pure-overhead stamp fires for zero benefit — predbench/widthbench/
-           strbench/shiftbench's measured +2B. Every other bc_safe_producer
-           kind already gets this for free at use_count==1 (no stamp needed,
-           HL already holds the value); only the call-result path pays an
-           active cost to REACH BC, so it alone needs the floor. */
+        /* [callbc] A call result pays an `ld bc,hl` to reach BC, so it needs
+           two or more reads. op_dst_spill_is_dead only sees a dead single use
+           at the very next op and misses one with an operand load between. */
         if (def_kind[v] == IR_CALL && use_count[v] < 2) continue;
         /* Only pack when the SPILL alternative actually costs frame traffic: if
            the def's spill store is dead (value HL-carried to a single adjacent
@@ -3524,15 +3447,9 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                 int last = -1;
                 for (int i = 0; i < nc; i++) {
                     if (cand[i].flo <= last) continue;
-                    /* [callbc] A call-result candidate never justifies EVICTING
-                       an existing BC tenant — it can still win a disjoint FREE
-                       slot in the ordinary greedy pass below, just not tip this
-                       cost comparison. structbench's struct_run measured the
-                       alternative: evicting its array-base pointer's picker-
-                       placed BC tenant to seat a call result elsewhere in the
-                       function cost a DEPENDENT per-iteration address temp its
-                       own cheap IY-via-BC-leftover path (ir_iy_temp_pack), a
-                       knock-on this candidate's own cost_benefit can't see. */
+                    /* [callbc] A call result may take a free BC slot but never
+                       evicts a tenant: the eviction can cost a dependent temp its
+                       home (ir_iy_temp_pack), which cost_benefit cannot see. */
                     if (def_kind[cand[i].vreg] == IR_CALL) continue;
                     int clash = 0;
                     ir_liveprobe_decision_begin_site(2);
@@ -3702,30 +3619,10 @@ static int stack_spill_span_hazard(OpKind k)
     }
 }
 
-/* [IR_CALLBC_PROBE] INERT sizing probe (CHKRAND finding, src/80cc/
-   HANDOVER_2026-10-03.md Finding 1) — no codegen effect.
-
-   NARROW mode (def_kind restricted to IR_CALL/IR_HCALL): bc_safe_producer
-   (above) excludes call results from ir_bc_pack's candidate set outright, so
-   a call RESULT read >=2 times in a call-free straight-line span with BC
-   free the whole time (e.g. `v = rand(); ... v ... v ... v ...`) never even
-   gets OFFERED a BC home — it falls back to a push/pop round trip at every
-   read instead of one `ld bc,hl` stamp.
-
-   GENERAL mode (IR_CALLBC_PROBE=2): drop the producer-kind restriction and
-   instead ask the broader question — of EVERY local multi-read hazard-free
-   vreg (the same shape, any producer), how many are STILL IR_PR_SPILL after
-   every placement pass (arbiter, ir_bc_pack, both IY packs) has already had
-   its chance? That counts the call-producer gap above as a subset, PLUS any
-   case where an eligible producer lost BC to contention/eviction/the
-   arbiter's own cost model — the general "push/pop-protect pattern" the
-   handover's Finding 1 flagged as higher-value but higher-risk to fix.
-
-   Reuses compute_spill_shapes' local/single-BB/first-is-def shape (same
-   shape ir_stack_spill and ir_bc_pack already trust) plus
-   stack_spill_span_hazard's call/branch/ACC-op exclusion list. uses>=2 only
-   (uses==1 is already the ir_stack_spill shape, not this gap). Reports
-   candidates and their read counts; does not touch f->vreg_to_phys. */
+/* [IR_CALLBC_PROBE] Inert probe, no codegen effect. Counts local, multi-read,
+   hazard-free word vregs left IR_PR_SPILL after every placement pass: call
+   results only by default, any producer with IR_CALLBC_PROBE=2. Uses the
+   compute_spill_shapes shape and stack_spill_span_hazard's exclusions. */
 static void probe_call_result_bc(Func *f, const int *def_kind,
                                  const int *write_count)
 {

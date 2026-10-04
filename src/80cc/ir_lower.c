@@ -3099,27 +3099,12 @@ static void fold_xorflip_chain(char **lines, char *drop, int n)
     }
 }
 
-/* [mulchain-de] A const-multiply Horner chain (emit_const_mult_sr,
-   ir_build.c) whose multiplicand `v` has no register home reloads it on
-   every term instead of once:
-
-       ld   hl,(ix+d)      <- v (seeds acc = v)
-       add  hl,hl   {1,}
-     [ ex   de,hl
-       ld   hl,(ix+d)      <- v reloaded, SAME d
-       add  hl,de
-       add  hl,hl   {0,} ]+
-
-   Each `ex de,hl` only frees HL for the reload — DE's incoming value is
-   never read again, so DE is provably dead here by construction, no
-   liveness needed. Fix: load v into DE once up front, delete every
-   ex+reload pair, keep the `add hl,de`/doublings. The trailing `ld de,K /
-   add hl,de` for the chain's constant term is unrelated and left alone.
-
-   Runs as its own pass on the finished text, not inside
-   filter_dead_bc_parks's liveness sweep (its instr_effects assumes one
-   instruction per line; the rewritten seed line isn't). Denial-only:
-   --opt-disable=mulchain-de. */
+/* [mulchain-de] A const-multiply Horner chain (emit_const_mult_sr) whose
+   multiplicand has no register home reloads it every term:
+   `ex de,hl; ld hl,(ix+d); add hl,de`. The `ex` only frees HL, so DE is dead:
+   load the multiplicand into DE once and delete each ex+reload. Runs on the
+   finished text, outside filter_dead_bc_parks (the rewritten seed is two
+   instructions on one line). `--opt-disable=mulchain-de` opts out. */
 /* Reload of the multiplicand into HL: `ld hl,(ix+d)` or the stack-top form
    `pop hl / push hl`. Returns the line count (0 = no match); `key` names
    the source so every reload in one chain can be checked identical. */

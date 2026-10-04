@@ -743,18 +743,10 @@ static int emit_frame_byte_half_for_vreg(FILE *out, const Func *f, int v,
     return 0;
 }
 
-/* [frame-byte-trunc] Drop-in for the common `load_to_hl(v); emit("ld a,h"
-   or "ld a,l")` idiom wherever v's other half is never read afterward.
-   Takes the frame-direct byte read above when it applies, else falls back
-   to the original idiom unchanged — never leaves HL in a state the caller
-   wouldn't already have produced.
-
-   NOT a fit for a branch-fused compare (g_hc.branch_test_kind != 0):
-   measured as a net size LOSS there — such a compare usually guards a
-   loop whose body reads v again, and load_to_hl's side effect of leaving
-   HL caching v was doing real work this helper can't see. Safe where v's
-   full width is truly spent right here (a narrowing MOV/CONV_TRUNC, or a
-   value whose result replaces v outright). */
+/* [frame-byte-trunc] Drop-in for `load_to_hl(v); ld a,h|l` where v's other
+   half is not read again: the frame byte read above when it applies, else the
+   original idiom. Not for a branch-fused compare: the loop body there usually
+   reads v again, and the HL belief load_to_hl leaves is worth keeping. */
 static void load_byte_half_to_a(FILE *out, const Func *f, int v, int hi)
 {
     if (!opt_disabled("frame-byte-trunc")
