@@ -1556,15 +1556,15 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
                    iv still has >2 in-loop uses (LFTR needs exactly 2 = step +
                    exit test). A pure array-walk has exactly 2 left →
                    not suppressed, IVSR still fires. IR_NO_IVSR_SUPPRESS opts out.
-                   Gated to z80/z80n/z180/gbz80/808x/vm1 — the CPUs where a
-                   slot-homed pointer's load is several ops (`ld hl,(ix+d)` pair,
-                   the `ld hl,sp+d` / `add hl,sp` walks), so maintaining a spilled pointer costs
-                   more than recomputing. ez80/kc160/rabbit have a 1-op word slot
-                   load (+ native indexing), so the walking pointer stays cheaper
-                   there — leave IVSR on. */
+                   Gated to z80/z80n/z180/gbz80/808x/vm1/ez80 — the CPUs where
+                   a spilled pointer costs more to maintain than the index costs
+                   to rescale. ez80's native `ld hl,(ix+d)` is 5 cycles, not
+                   cheap (`--opt-disable=ivsr-suppress-ez80` leaves it out).
+                   kc160/rabbit keep IVSR on. */
                 if (!opt_disabled("ivsr-suppress")
                     && ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180
-                        || IS_GBZ80() || IS_808x() || IS_KR580VM1())
+                        || IS_GBZ80() || IS_808x() || IS_KR580VM1()
+                        || (IS_EZ80() && !opt_disabled("ivsr-suppress-ez80")))
                     && (scale & (scale - 1)) == 0    /* power-of-2 scale only */
                     && ivsr_base_is_const_sym(f, base, lo, hi)) {
                     /* Power-of-2 scale: recomputing `base + iv*2^k` from the

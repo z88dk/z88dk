@@ -27,9 +27,15 @@ three. Two changes on 4/10 (uncommitted at the time of writing):
   the margin covers what copt does after the estimate.
 
 ticks undercharged ez80 `ld rr,(ix+d)` / `ld (ix+d),rr` (1 cycle, not 5) until
-e67c93926d: any ez80 tick result before that favours frame-slot code. ADR
-0040's ez80-fp `remat-lea` exclusion rests on such a figure; lifted, it is
--4 B / -0.72% on localbench and nothing elsewhere. Remove it with an opt-out.
+e67c93926d: any ez80 tick result before that favours frame-slot code. Three
+ez80 exclusions resting on it are lifted (`idx2-call-ez80`,
+`ivsr-suppress-ez80`, `remat-lea-ez80fp`): ez80 sp -681 B / -1.51% ticks, fp
+-155 B / -0.40%, 0 slower except fixedbench fp (+7 B, +1.28%). Still open on
+ez80: the allocator's fp slot costs (2/2/2/4, real 5/5/7/11) move cells both
+ways when corrected; reading the deepest local with `pop hl; push hl` is
+-1336 B fp, +1 cycle per isolated access, and a net win where `push hl; pop
+hl` between chained accesses folds away. The word immediate-store fold stays
+excluded (+111/+153 B when lifted).
 
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,

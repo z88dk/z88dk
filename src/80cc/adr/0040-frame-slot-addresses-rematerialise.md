@@ -44,5 +44,5 @@ The ez80-fp figure above (+4.6 % ticks) was measured while ticks charged ez80's
 `ld rr,(ix+d)` / `ld (ix+d),rr` 1 cycle instead of 5 (fixed in e67c93926d), so
 the slot form it compared against was underpriced. Re-measured over the
 matrix with the fix, lifting the ez80-fp exclusion changes one cell: localbench
-ez80 fp, -4 B and -0.72 % ticks. The exclusion is no longer supported by
-evidence; removing it needs its own opt-out and test.
+ez80 fp, -4 B and -0.72 % ticks. The exclusion is lifted;
+`--opt-disable=remat-lea-ez80fp` restores it.

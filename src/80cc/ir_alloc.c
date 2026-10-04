@@ -1504,14 +1504,15 @@ static int idx2_home_available(const Func *f)
        Two exclusions:
         - fp mode (idx2=IY, cheap (ix+d) slots): lose/lose — the push/pop access
           + the caller-IX save beat nothing. Keep the blunt call-free gate.
-        - cheap-sp-slot CPUs: ez80 (native `ld hl,(ix+d)`), rabbit and kc160 all
-          address sp locals cheaply, so the dear-slot premise doesn't hold and
-          the idx2 home doesn't pay (same class the g0 dear-slot cost gates use).
-          Only the z80 family (z80/z180/z80n) has the dear `add hl,sp` walk.
+        - cheap-sp-slot CPUs: rabbit and kc160 address sp locals cheaply, so
+          the dear-slot premise doesn't hold and the idx2 home doesn't pay.
+          ez80 does not: in sp mode it walks `ld hl,N; add hl,sp`, so it takes
+          the home (`--opt-disable=idx2-call-ez80` excludes it again).
        IX is callee-saved (Part A saves it via frame_has_saved_ix; the library is
        IX-safe); reject when the function uses IX itself (fnptr dispatch/far). */
     if (c_framepointer_is_ix != -1) return 0;          /* sp mode only */
-    if (IS_EZ80() || IS_RABBIT() || IS_KC160()) return 0;   /* cheap sp slots */
+    if ((IS_EZ80() && opt_disabled("idx2-call-ez80")) || IS_RABBIT() || IS_KC160())
+        return 0;                                      /* cheap sp slots */
     if (func_call_clobbers(f) & CLOB_IX) return 0;     /* sp idx2 = IX */
     if (func_idx2_self_use(f)) return 0;
     return 1;

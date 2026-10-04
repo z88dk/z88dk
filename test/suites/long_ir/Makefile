@@ -2667,6 +2667,39 @@ all: ivsr_lftr_ez80.bin ivsr_lftr_ez80_fp.bin ivsr_lftr_kc160.bin ivsr_lftr_kc16
 all: ivsr_lftr_8080.bin ivsr_lftr_gbz80.bin ivsr_lftr_keep.bin
 all: derearb.bin derearb_fp.bin derearb_8080.bin derearb_gbz80.bin derearb_keep.bin
 
+# ez80 gates lifted once ticks priced ld rr,(ix+d) at 5: an sp index home
+# across calls (cmp_sign, bytecmp), IVSR redundant-pointer suppression
+# (ivsrsup), fp remat-lea (slotaddr). _keep restores all three exclusions.
+all: ivsrsup_ez80.bin ivsrsup_ez80_fp.bin ivsrsup_ez80_keep.bin slotaddr_ez80_fp.bin slotaddr_ez80_fp_keep.bin cmp_sign_ez80.bin bytecmp_ez80.bin
+
+ivsrsup_ez80.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_ez80_fp.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_ez80_keep.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -Cc--opt-disable=idx2-call-ez80,ivsr-suppress-ez80,remat-lea-ez80fp --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+slotaddr_ez80_fp.bin: $(SOURCES) slotaddr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+slotaddr_ez80_fp_keep.bin: $(SOURCES) slotaddr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -Cc--opt-disable=idx2-call-ez80,ivsr-suppress-ez80,remat-lea-ez80fp --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmp_sign_ez80.bin: $(SOURCES) cmp_sign.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytecmp_ez80.bin: $(SOURCES) bytecmp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 # de-rearb: a rejected word DE-home pick, lowered again without a DE-class home.
 derearb.bin: $(SOURCES) derearb.c
 	$(compile)

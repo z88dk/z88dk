@@ -65,6 +65,7 @@ exists (ADR 0010).
 | `ivsr` | no induction-variable strength reduction (ADR 0008) |
 | `ivsr-affine` | no folding of a non-power-of-two affine multiple (struct-array stride) |
 | `ivsr-suppress` | apply IVSR even on the CPUs where a walking pointer is not cheaper |
+| `ivsr-suppress-ez80` | ez80 is left out of the IVSR redundant-pointer suppression (the walking pointer is kept) |
 | `ivsr-recompute` | CSE merges the `<<1` of an index that `ivsr-suppress` kept for address recompute, so two array addresses share one scaled index |
 | `lftr` | no linear-function test replacement |
 | `lftr-signed` | LFTR only where the bound is a constant, never a signed variable |
@@ -118,6 +119,7 @@ exists (ADR 0010).
 | `idx2-counter` | an index home is offered to a counter even where it would cost `push iy`/`pop hl` per iteration |
 | `idx2-revisit` | a param that yielded the index register to a counter is never reconsidered |
 | `idx2-reuse` | the idx2 slot is a single whole-function owner instead of reusing it across non-overlapping live ranges |
+| `idx2-call-ez80` | on ez80 in sp mode a value is not given an index home across calls |
 | `idx-deref` | an index-homed pointer is not dereferenced in place, and its cost term goes with it (ADR 0026) |
 | `idxhalf` | no byte homes in IX/IY halves (sp mode, z80/z80n/ez80) |
 | `iy-temp-pack` | no IY packing for a short-lived temporary |
@@ -179,6 +181,7 @@ exists (ADR 0010).
 | `wh-exit-hoist` | a byte home is not flushed at the region exit |
 | `home-exit-dead` | flush a DE home at a loop exit even when it is dead there |
 | `remat-lea` | an address is reloaded rather than recomputed |
+| `remat-lea-ez80fp` | on ez80 in fp mode a frame-slot address gets a slot instead of being rematerialised |
 | `symaddr-deref` | a symbol address is not folded into its dereference |
 | `slot-addr-widen` | a cached slot address is not reused for a wider access |
 | `trunc-res` | a truncated result is materialised at full width first |

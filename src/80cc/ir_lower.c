@@ -8652,14 +8652,15 @@ static int ir_lower_func_body(FILE *out, Func *f)
                        is tracked. Two exclusions are required:
                        a PR_STACK tenant (its value is parked with push/pop, so
                        dropping the slot orphans half the pair and shifts every
-                       later sp-relative offset — irgaps miscompiled), and ez80
-                       in FP mode (cheap lea/(ix+d) makes per-use recompute a
-                       byte-for-tick loss; ez80-SP keeps it). Store-base LEAs
-                       keep their slot. Default-on; IR_OFF=remat-lea opts out.
+                       later sp-relative offset — irgaps miscompiled). ez80 fp
+                       takes it too since ticks prices `ld hl,(ix+d)` right
+                       (`--opt-disable=remat-lea-ez80fp` excludes it). Store-base
+                       LEAs keep their slot. Default-on; IR_OFF=remat-lea opts out.
                        Evidence and the CPU-test-vs-property lesson: adr/0040. */
                     else if (o->kind == IR_LEA && o->src[0] >= 0 && !func_has_call
                              && ir_home_at(f, o->dst) != IR_PR_STACK
-                             && !(IS_EZ80() && fp_active(f))
+                             && !(IS_EZ80() && fp_active(f)
+                                  && opt_disabled("remat-lea-ez80fp"))
                              && remat_lea_enabled())
                         rd = o;
                     if (rd) {
