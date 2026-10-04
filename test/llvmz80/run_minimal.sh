@@ -10,10 +10,14 @@ trap 'rm -rf "$WORK"' EXIT HUP INT TERM
 cd "$WORK"
 
 for optimisation in O0 O2 Os; do
-for test in varargs header_abi; do
+for test in varargs header_abi math32; do
+    mathlib=
+    if [ "$test" = math32 ]; then
+        mathlib=-lm
+    fi
     "$ZCC" +cpm -compiler=llvmz80 "-Cg-$optimisation" \
         -pragma-define:CLIB_MALLOC_HEAP_SIZE=1024 -create-app \
-        "$DIR/$test.c" -o "$test" > "$test-build.log" 2>&1 || {
+        "$DIR/$test.c" $mathlib -o "$test" > "$test-build.log" 2>&1 || {
         cat "$test-build.log"
         exit 1
     }
