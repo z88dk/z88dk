@@ -3133,15 +3133,29 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             cache_de(op->dst);
             return 0;
         }
-        if (IS_GBZ80())
-            emit_gb_word_load_hl(out, ir_sym_name(op->mem.sym), op->mem.offset);
-        else if (op->mem.offset)
-            emit(out, "ld\thl,(_%s+%d)%s",
-                 ir_sym_name(op->mem.sym), op->mem.offset, mem_vol_stamp(op));
-        else
-            emit(out, "ld\thl,(_%s)%s", ir_sym_name(op->mem.sym),
-                 mem_vol_stamp(op));
+        /* [hl-mem-carry] HL already holds this word: a predecessor's test
+           loaded it and nothing since wrote HL or memory. */
+        int hlm_hit = L.hlm_on && !op->mem.volatile_ && op->dst >= 0
+                      && f->vregs[op->dst].width == 2
+                      && L.hlm_sym == op->mem.sym && L.hlm_off == op->mem.offset
+                      && L.pending_spill_v < 0;
+        if (!hlm_hit) {
+            if (IS_GBZ80())
+                emit_gb_word_load_hl(out, ir_sym_name(op->mem.sym), op->mem.offset);
+            else if (op->mem.offset)
+                emit(out, "ld\thl,(_%s+%d)%s",
+                     ir_sym_name(op->mem.sym), op->mem.offset, mem_vol_stamp(op));
+            else
+                emit(out, "ld\thl,(_%s)%s", ir_sym_name(op->mem.sym),
+                     mem_vol_stamp(op));
+        }
         commit_hl_word(out, f, op->dst);
+        if (!op->mem.volatile_ && op->dst >= 0 && L.rs.hl == op->dst
+            && f->vregs[op->dst].width == 2 && hlm_enabled()) {
+            L.hlm_on = 1;
+            L.hlm_sym = op->mem.sym;
+            L.hlm_off = op->mem.offset;
+        }
         return 0;
     }
     if (op->mem.kind == IR_MEM_VREG) {

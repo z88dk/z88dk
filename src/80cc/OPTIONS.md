@@ -91,6 +91,7 @@ exists (ADR 0010).
 | `l-call-flags` | a `call l_*` runtime helper is assumed to read the flags, as any asm-linkage call is |
 | `gb-word-mem` | gbz80 word `++`/`--` and zero/constant word stores go through HL and DE instead of `inc (hl)`, `ld (hl+),a` and immediate stores |
 | `dsub-bc` | An 8085 signed compare with one operand already in BC copies the RHS into BC (push/pop if BC is live) instead of subtracting BC where it is |
+| `hl-mem-carry` | a global word loaded for a branch test is reloaded in the block the branch reaches, instead of being taken from HL |
 | `addr-fold` | `ex de,hl; ld hl,_sym; add hl,de` stays as is instead of becoming `ld de,_sym; add hl,de` where DE is dead after the add (not on VM1 or Rabbit) |
 | `gb-small-frame` | gbz80 frames of 1 or 2 bytes open with `add sp,-N` and close with `add sp,N` instead of `dec sp` / `push af` and `inc sp` / `pop bc` |
 | `idx-rmw-de` | an indexed word RMW keeps the BC address park instead of the `dec hl`-restored DE route |
@@ -219,6 +220,7 @@ exists (ADR 0010).
 | --- | --- |
 | `tail-merge` | duplicate instruction tails are not merged (per function) |
 | `block-layout` | no trace movement to delete a jump |
+| `block-layout-rounds` | block layout runs once, so a trace ending in a jump that another move replaced stays put |
 | `jr-relax` | `jp` is never relaxed to `jr` |
 | `label-elide` | dead basic-block labels are kept in the output |
 | `ret-thread` | a jump to a `ret` is not threaded |

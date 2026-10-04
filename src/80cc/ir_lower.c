@@ -147,6 +147,11 @@ typedef struct {
     int cur_func_uses_params;
     int cur_frameless;   /* fp-eligible but no IX frame (params read off sp) */
     int last_add_sp;     /* the last emitted line was an `add sp,d` chain */
+    /* [hl-mem-carry] HL holds the word at `_hlm_sym + hlm_off`: set by a
+       global word load, cleared by any line that may write HL or memory. */
+    int hlm_on, hlm_off;
+    SYMBOL *hlm_sym;
+    SYMBOL **bb_hlm_sym; int *bb_hlm_off; char *bb_sw_target;
     /* B/C and D/E byte homes have independent residency. B/C homes are
        slotless and never dirty; D/E homes are slot-backed and may be dirty
        while lazy-spill keeps the value in the byte register. */
@@ -665,6 +670,33 @@ static int pv_line_delta(const char *b)
     return 0;
 }
 
+static int hlm_enabled(void)
+{
+    static int on = -1;
+    if (on < 0) on = !opt_disabled("hl-mem-carry");
+    return on;
+}
+
+/* [hl-mem-carry] A line keeps "HL holds the global word" only if it has no
+   memory operand, is no call/rst/return, and does not write HL. */
+static int hlm_line_keeps(const char *line)
+{
+    char m[16]; size_t k = 0;
+    const char *p = line;
+    while (*p == ' ' || *p == '\t') p++;
+    while (p[k] && p[k] != '\t' && p[k] != ' ' && k + 1 < sizeof m) { m[k] = p[k]; k++; }
+    m[k] = 0;
+    if (strchr(line, '(')) return 0;
+    if (!strcmp(m, "call") || !strcmp(m, "rst") || !strncmp(m, "ret", 3)
+        || !strncmp(m, "ex", 2) || (!strncmp(m, "ld", 2) && strstr(line, "hl"))
+        || !strcmp(m, "pop") || !strcmp(m, "defw") || !strcmp(m, "defb"))
+        return 0;
+    if (!strcmp(m, "jp") || !strcmp(m, "jr")) return 1;   /* to a label */
+    InstrEffects e = instr_effects(line);
+    if (e.unknown || e.is_call || (e.writes & IR_R_HL)) return 0;
+    return 1;
+}
+
 static void vemit(FILE *out, const char *fmt, va_list ap)
 {
     if (spill_stats_on < 0) spill_stats_on = getenv("IR_SPILL_STATS") ? 1 : 0;
@@ -767,6 +799,13 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
        it. */
     L.rs.z_from_a = 0;
     L.last_add_sp = 0;
+    if (L.hlm_on) {
+        char hb[128];
+        va_list ap3; va_copy(ap3, ap);
+        vsnprintf(hb, sizeof hb, fmt, ap3);
+        va_end(ap3);
+        if (!hlm_line_keeps(hb)) L.hlm_on = 0;
+    }
     fputc('\t', out);
     vfprintf(out, fmt, ap);
     fputc('\n', out);
@@ -4878,6 +4917,27 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
         fclose(tmf);
     }
     if (blf) {
+        /* A moved trace can end in a jump that another move replaced, which
+           blocks the outer move in one round: rerun on the result until the
+           text stops changing (block-layout-rounds opts out). */
+        int rounds = opt_disabled("block-layout-rounds") ? 1 : 4;
+        for (int r = 1; r < rounds; r++) {
+            FILE *nx = tmpfile();
+            if (!nx) break;
+            rewind(blf);
+            filter_block_layout(nx, blf);
+            long a = ftell(blf), b = ftell(nx);
+            int same = (a == b);
+            if (same) {
+                rewind(blf); rewind(nx);
+                int c1, c2;
+                do { c1 = fgetc(blf); c2 = fgetc(nx); } while (c1 == c2 && c1 != EOF);
+                same = (c1 == c2);
+            }
+            fclose(blf);
+            blf = nx;
+            if (same) break;
+        }
         rewind(blf);
         filter_block_layout(fout, blf);
         fclose(blf);
@@ -8511,6 +8571,22 @@ int ir_lower_func(FILE *out, Func *f)
        on the HL state. */
     int *bb_hl_out = malloc((size_t)f->n_bbs * sizeof(int));
     int *bb_lowered = calloc((size_t)f->n_bbs, sizeof(int));
+    /* [hl-mem-carry] per-BB exit fact, and the BBs a switch can reach (those
+       edges are not in succ[], so the predecessor table misses them). */
+    L.bb_hlm_sym = calloc((size_t)f->n_bbs, sizeof(SYMBOL *));
+    L.bb_hlm_off = calloc((size_t)f->n_bbs, sizeof(int));
+    L.bb_sw_target = calloc((size_t)f->n_bbs, 1);
+    if (L.bb_sw_target)
+        for (int i = 0; i < f->n_bbs; i++)
+            for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                const Op *o = &f->bbs[i].ops[j];
+                if (o->kind != IR_SWITCH || !o->sw) continue;
+                for (int c = 0; c < o->sw->n_cases; c++)
+                    if (o->sw->target_bb[c] >= 0 && o->sw->target_bb[c] < f->n_bbs)
+                        L.bb_sw_target[o->sw->target_bb[c]] = 1;
+                if (o->sw->default_bb >= 0 && o->sw->default_bb < f->n_bbs)
+                    L.bb_sw_target[o->sw->default_bb] = 1;
+            }
     /* Per-BB pending-spill out: which width-2 vreg (if any) left this BB
        deferred (unstored, riding the HL carry) — the dual of bb_hl_out
        for the lazy-spill cross-BB carry. -1 = none. */
@@ -8983,6 +9059,9 @@ int ir_lower_func(FILE *out, Func *f)
 
     free(bb_alias);
     free(bb_hl_out);
+    free(L.bb_hlm_sym); L.bb_hlm_sym = NULL;
+    free(L.bb_hlm_off); L.bb_hlm_off = NULL;
+    free(L.bb_sw_target); L.bb_sw_target = NULL;
     free(bb_pending_out);
     free(L.bb_byte_out); L.bb_byte_out = NULL;
     free(L.bb_a_out); L.bb_a_out = NULL;
@@ -9497,6 +9576,21 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             invalidate_de_cache();
         } else {
             invalidate_hl_cache();
+        }
+        /* [hl-mem-carry] Inherit "HL holds _sym+off" when every predecessor
+           (all lowered, none a switch edge) left it. Set after the HL
+           invalidation above, which does not touch the fact. */
+        L.hlm_on = 0;
+        if (L.bb_hlm_sym && bb_pred_cnt[bb->id] > 0 && hlm_enabled()
+            && !(L.bb_sw_target && L.bb_sw_target[bb->id])) {
+            SYMBOL *ms = NULL; int mo = 0, ok = 1;
+            for (int p = 0; p < bb_pred_cnt[bb->id] && ok; p++) {
+                int pid = bb_preds[bb->id][p];
+                if (!bb_lowered[pid] || !L.bb_hlm_sym[pid]) ok = 0;
+                else if (!ms) { ms = L.bb_hlm_sym[pid]; mo = L.bb_hlm_off[pid]; }
+                else if (ms != L.bb_hlm_sym[pid] || mo != L.bb_hlm_off[pid]) ok = 0;
+            }
+            if (ok && ms) { L.hlm_on = 1; L.hlm_sym = ms; L.hlm_off = mo; }
         }
         /* DE cache carry: exact predecessor agreement is the only proof used
            here. A predecessor records -1 after any operation that invalidates
@@ -10412,6 +10506,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             L.bb_byte_out_dirty[bb->id] =
                 (L.bb_byte_out[bb->id] >= 0 && L.cur_de_byte_home_dirty) ? 1 : 0;
         bb_hl_out[bb->id] = L.rs.hl;
+        if (L.bb_hlm_sym) {
+            L.bb_hlm_sym[bb->id] = L.hlm_on ? L.hlm_sym : NULL;
+            L.bb_hlm_off[bb->id] = L.hlm_off;
+        }
         if (bb_bc_out) bb_bc_out[bb->id] = L.rs.bc;
         if (bb_de_out) bb_de_out[bb->id] = de_carry_on ? L.rs.de : -1;
         if (bb_hl_addr_out) bb_hl_addr_out[bb->id] = L.cur_hl_addr_off;
