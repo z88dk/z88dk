@@ -1166,6 +1166,29 @@ static int switch_index_in_range(const Func *f, int v, int hi)
     return seen;
 }
 
+/* [switch-chain] Bytes of the inline compare chain for a word switch
+   against `call l_case` + table + `jp default` (8 + 4 per case). */
+static int switch_chain_ok(const SwitchInfo *sw)
+{
+    if (opt_disabled("switch-chain") || sw->n_cases > 64) return 0;
+    int64_t v[64];
+    for (int i = 0; i < sw->n_cases; i++) v[i] = (int16_t)sw->values[i];
+    for (int i = 1; i < sw->n_cases; i++)
+        for (int k = i; k > 0 && v[k] < v[k - 1]; k--) {
+            int64_t t = v[k]; v[k] = v[k - 1]; v[k - 1] = t;
+        }
+    int chain = 3;                              /* jp default */
+    unsigned cur = 0;
+    for (int i = 0; i < sw->n_cases; i++) {
+        unsigned x = (unsigned)v[i] & 0xFFFFu;
+        unsigned d = (x - cur) & 0xFFFFu;
+        chain += (d <= 3) ? (int)d : (d >= 0xFFFDu) ? (int)(0x10000u - d) : 4;
+        chain += 5;                             /* ld a,h; or l; jp z */
+        cur = x;
+    }
+    return chain <= 8 + 4 * sw->n_cases;
+}
+
 static int gen_switch(FILE *out, Func *f, const Op *op)
 {
     const SwitchInfo *sw = op->sw;
@@ -1305,6 +1328,42 @@ static int gen_switch(FILE *out, Func *f, const Op *op)
             emit(out, "defw\t%d", (int)(sw->values[i] & 0xFFFF));
             emit(out, "defw\t%d", (int)((sw->values[i] >> 16) & 0xFFFF));
         }
+    } else if (switch_chain_ok(sw)) {
+        /* [switch-chain] Walk HL down through the sorted case values and test
+           for zero at each: `dec hl` (step <= 3) or `ld de,-d; add hl,de`, then
+           `ld a,h; or l; jp z,case`. Taken only when no larger than the
+           l_case call + table, so the helper is not linked for small switches. */
+        int ord[64];
+        int n = sw->n_cases;
+        for (int i = 0; i < n; i++) ord[i] = i;
+        for (int i = 1; i < n; i++)
+            for (int k = i; k > 0 && (int16_t)sw->values[ord[k]]
+                                      < (int16_t)sw->values[ord[k - 1]]; k--) {
+                int t = ord[k]; ord[k] = ord[k - 1]; ord[k - 1] = t;
+            }
+        load_to_hl(out, f, op->src[0]);
+        hl_about_to_change(-1);
+        invalidate_de_cache();
+        L.rs.a = -1;
+        unsigned cur = 0;
+        for (int i = 0; i < n; i++) {
+            unsigned v = (unsigned)sw->values[ord[i]] & 0xFFFFu;
+            unsigned d = (v - cur) & 0xFFFFu;
+            if (d <= 3)
+                for (unsigned k = d; k; k--) emit(out, "dec\thl");
+            else if (d >= 0xFFFDu)
+                for (unsigned k = 0x10000u - d; k; k--) emit(out, "inc\thl");
+            else {
+                emit(out, "ld\tde,%d", (int)((0x10000u - d) & 0xFFFFu));
+                emit(out, "add\thl,de");
+            }
+            cur = v;
+            emit(out, "ld\ta,h");
+            emit(out, "or\tl");
+            emit(out, "jp\tz,L_f%d_bb_%d", L.func_emit_idx, sw->target_bb[ord[i]]);
+        }
+        emit(out, "jp\tL_f%d_bb_%d", L.func_emit_idx, sw->default_bb);
+        return 0;
     } else {
         load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
         emit(out, "call\tl_case");

@@ -5629,6 +5629,27 @@ static void ss_note_store(const Func *f, int v);
 static void ss_note_cache_read(const Func *f, int v);
 static int  ss_store_dead_here(void);
 
+/* Distinct successors of BB i: succ[] plus switch targets and default.
+   `out` holds at least n_bbs entries. */
+static int bb_all_succ(const Func *f, int i, int *out)
+{
+    int n = 0;
+    const BB *bb = &f->bbs[i];
+#define BB_ADD_SUCC(x) do { int _x = (x); int _k = 0;                     \
+        if (_x < 0 || _x >= f->n_bbs) break;                              \
+        while (_k < n && out[_k] != _x) _k++;                             \
+        if (_k == n) out[n++] = _x; } while (0)
+    for (int s = 0; s < 2; s++) BB_ADD_SUCC(bb->succ[s]);
+    for (int j = 0; j < bb->n_ops; j++) {
+        const Op *o = &bb->ops[j];
+        if (o->kind != IR_SWITCH || !o->sw) continue;
+        for (int c = 0; c < o->sw->n_cases; c++) BB_ADD_SUCC(o->sw->target_bb[c]);
+        BB_ADD_SUCC(o->sw->default_bb);
+    }
+#undef BB_ADD_SUCC
+    return n;
+}
+
 /* One lowering pass of a function: prologue + the per-BB emit loop.
    Run once for the flag-off (single-pass) path, twice for the lazy-spill
    two-pass path (pass 1 deferral-off to a scratch stream to populate the
@@ -8623,16 +8644,18 @@ int ir_lower_func(FILE *out, Func *f)
     /* (remat_def table built earlier, BEFORE ir_assign_slots, so its NO_SLOT
        tagging is seen by slot assignment — see the block above gen ir_assign_slots.) */
     /* Predecessor table: bb_preds[bb] = list of pred bb ids,
-       bb_pred_cnt[bb] = length. Derived from succ[] of every BB. */
+       bb_pred_cnt[bb] = length. Derived from succ[] of every BB plus the
+       targets of a switch, which succ[] does not list: without them a case
+       block reached by fall-through looked single-predecessor and inherited
+       the fall-through's HL. */
     int *bb_pred_cnt = calloc((size_t)f->n_bbs, sizeof(int));
     int **bb_preds = calloc((size_t)f->n_bbs, sizeof(int *));
+    int *sl = malloc((size_t)(f->n_bbs > 0 ? f->n_bbs : 1) * sizeof(int));
     for (int i = 0; i < f->n_bbs; i++) {
         bb_hl_out[i] = -1;
         bb_pending_out[i] = -1;
-        for (int s = 0; s < 2; s++) {
-            int sb = f->bbs[i].succ[s];
-            if (sb >= 0 && sb < f->n_bbs) bb_pred_cnt[sb]++;
-        }
+        int ns = sl ? bb_all_succ(f, i, sl) : 0;
+        for (int s = 0; s < ns; s++) bb_pred_cnt[sl[s]]++;
     }
     for (int i = 0; i < f->n_bbs; i++) {
         if (bb_pred_cnt[i] > 0)
@@ -8641,14 +8664,13 @@ int ir_lower_func(FILE *out, Func *f)
     {
         int *fill = calloc((size_t)f->n_bbs, sizeof(int));
         for (int i = 0; i < f->n_bbs; i++) {
-            for (int s = 0; s < 2; s++) {
-                int sb = f->bbs[i].succ[s];
-                if (sb >= 0 && sb < f->n_bbs)
-                    bb_preds[sb][fill[sb]++] = i;
-            }
+            int ns = sl ? bb_all_succ(f, i, sl) : 0;
+            for (int s = 0; s < ns; s++)
+                bb_preds[sl[s]][fill[sl[s]]++] = i;
         }
         free(fill);
     }
+    free(sl);
 
     /* Trampoline elision: a BB whose only op is IR_BR emits as a
        `defc L_fN_bb_X = L_fN_bb_Y` label alias instead of label+jp —

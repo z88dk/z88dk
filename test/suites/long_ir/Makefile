@@ -36,6 +36,7 @@ all:	gbwordmem.bin gbwordmem_fp.bin gbwordmem_8080.bin gbwordmem_gbz80.bin gbwor
 all:	ivsrsup.bin ivsrsup_fp.bin ivsrsup_gbz80.bin ivsrsup_gbz80_keep.bin ivsrsup_8080.bin ivsrsup_8085.bin ivsrsup_8085_keep.bin ivsrsup_vm1.bin ivsrsup_8080_rckeep.bin
 all:	hlmemcarry.bin hlmemcarry_fp.bin hlmemcarry_gbz80.bin hlmemcarry_gbz80_keep.bin hlmemcarry_8080.bin hlmemcarry_8085.bin
 all:	decallasm.bin decallasm_fp.bin decallasm_keep.bin decallasm_gbz80.bin decallasm_8080.bin decallasm_8085.bin decallasm_8085_keep.bin
+all:	switchchain.bin switchchain_fp.bin switchchain_keep.bin switchchain_gbz80.bin switchchain_8080.bin switchchain_8085.bin
 all:	hcallstash.bin hcallstash_8085.bin hcallstash_8080.bin mathstash_8085.bin
 all:	dsubbc.bin dsubbc_fp.bin dsubbc_8085.bin dsubbc_8085_keep.bin dsubbc_8080.bin
 all:	gbsmallframe.bin gbsmallframe_fp.bin gbsmallframe_gbz80.bin gbsmallframe_gbz80_keep.bin
@@ -1355,6 +1356,30 @@ hcallstash_8080.bin: $(SOURCES) hcallstash.c
 
 mathstash_8085.bin: $(SOURCES) ../math/math.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-8085\\\"\"" -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m --math16 -lmath32_8085
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain_fp.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain_keep.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=switch-chain --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain_gbz80.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain_8080.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain_8085.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 incmem.bin: $(SOURCES) incmem.c

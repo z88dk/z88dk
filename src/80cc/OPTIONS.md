@@ -199,6 +199,7 @@ exists (ADR 0010).
 | `byte-cmp-const` | a word compare against a byte-sized constant is not narrowed |
 | `frame-byte-trunc` | a width-2 value truncated to one byte materialises the whole word through HL first instead of reading the one byte directly |
 | `word-ztest` | a word zero test uses the baseline sequence |
+| `switch-chain` | a small word switch calls `l_case` with a case table instead of an inline `dec hl` / zero-test chain, even when the chain is no larger |
 | `switch-byte-a` | a `char` switch scrutinee is widened to HL instead of staying in A |
 | `gpderef` | no general-pointer dereference form |
 | `lhlx-deref` | no `ld hl,(de)` dereference on the CPUs that have it |
