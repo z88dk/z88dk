@@ -177,6 +177,8 @@ void ez80_ld_ihl_xy(uint8_t opcode)
 
 
 
+// The DD/FD prefix is charged 1 cycle; these indexed word loads and
+// stores (rr and ix/iy) are 5 in Z80 mode (UM0077), so each adds 4.
 // dd,fd page
 // bc = $07
 // de = $17
@@ -192,7 +194,7 @@ void ez80_ld_rr_ixyd(uint8_t opcode, uint8_t prefix)
 
     *reg[0] = get_memory_data(addr);
     *reg[1] = get_memory_data(addr+1);
-    addr += 4; 
+    st += 4;
 }
 
 // dd,fd page
@@ -209,7 +211,7 @@ void ez80_ld_ixyd_rr(uint8_t opcode, uint8_t prefix)
 
     put_memory(addr, *reg[0]);
     put_memory(addr+1, *reg[1]);
-    addr += 4;
+    st += 4;
 }
 
 
@@ -241,7 +243,7 @@ void ez80_ld_xy_ixyd(uint8_t opcode, uint8_t prefix)
     *lsb = get_memory_data(addr);
     *msb = get_memory_data(addr+1);
 
-    st += 5;
+    st += 4;
 }
 
 // dd, fd page
@@ -270,7 +272,7 @@ void ez80_ld_ixyd_xy(uint8_t opcode, uint8_t prefix)
 
     put_memory(addr, *lsb);
     put_memory(addr+1, *msb);
-    st += 5;
+    st += 4;
 }
 
 
