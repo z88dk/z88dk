@@ -3648,6 +3648,68 @@ static int gbwm_try(char **lines, int n, char *drop, int e,
     return gbwm_store_a(lines, n, drop, e, e_live, startp);
 }
 
+/* [hl-const-reuse] `ld hl,J` while HL is known to hold the constant K: drop
+   it when J == K, step it when J == K +- 1 (`inc hl` / `dec hl`), else load
+   only the byte that differs (`ld l,n` / `ld h,n`, 2 bytes against 3). HL ends with the same value either way, so no liveness
+   is needed. The known value is forgotten at a label and at any line that
+   may write H or L. Chains through runs of constant argument pushes. */
+static void fold_hl_const_reuse(char **lines, char *drop, int n)
+{
+    if (opt_disabled("hl-const-reuse")) return;
+    int known = 0, used = 0;   /* used: HL was read since the known load */
+    long kv = 0;
+    for (int i = 0; i < n; i++) {
+        if (drop[i]) continue;
+        const char *l = lines[i];
+        if (l[0] != '\t' && l[0] != ' ') {
+            if (l[0] != '\n' && l[0] != ';') known = 0;
+            continue;
+        }
+        long v; char c1[4];
+        if (sscanf(l, "\tld\thl,%ld%1[\n]", &v, c1) == 2) {
+            v &= 0xFFFF;
+            /* An unread known load is dead and is deleted later; leave the
+               reload whole so that deletion still happens. */
+            if (!used) known = 0;
+            /* `ld hl,N; add hl,sp` has a shorter native form on these CPUs
+               (`ld hl,sp+N`, LDSI, `(sp+n)`); keep it whole for that fold. */
+            {
+                int k = i + 1;
+                while (k < n && (drop[k] || !strncmp(lines[k], "\tC_LINE", 7))) k++;
+                if (k < n && !strcmp(lines[k], "\tadd\thl,sp\n")
+                    && (IS_GBZ80() || IS_8085() || IS_RABBIT() || IS_KC160()))
+                    known = 0;
+            }
+            if (known && v == kv) {
+                drop[i] = 1;
+            } else if (known && !IS_8085()
+                       && (v == ((kv + 1) & 0xFFFF) || v == ((kv - 1) & 0xFFFF))) {
+                /* One byte. 8085 inx/dcx write the K flag, so not there. */
+                char *nl = strdup(v == ((kv + 1) & 0xFFFF) ? "\tinc\thl\n" : "\tdec\thl\n");
+                if (nl) { free(lines[i]); lines[i] = nl; }
+            } else if (known && ((v ^ kv) & 0xFF00) == 0) {
+                char b[24]; snprintf(b, sizeof b, "\tld\tl,%ld\n", v & 0xFF);
+                char *nl = strdup(b);
+                if (nl) { free(lines[i]); lines[i] = nl; }
+            } else if (known && ((v ^ kv) & 0x00FF) == 0) {
+                char b[24]; snprintf(b, sizeof b, "\tld\th,%ld\n", (v >> 8) & 0xFF);
+                char *nl = strdup(b);
+                if (nl) { free(lines[i]); lines[i] = nl; }
+            }
+            if (!(known && v == kv)) used = 0;
+            known = 1; kv = v;
+            continue;
+        }
+        char m[16]; const char *o;
+        if (!gw_split(l, m, sizeof m, &o)) continue;
+        if (!strcmp(m, "C_LINE")) continue;
+        if (line_reads_pair(l, "hl", 'h', 'l')) used = 1;
+        InstrEffects e = instr_effects(l);
+        if (e.unknown || e.is_call || e.is_boundary || (e.writes & IR_R_HL))
+            known = 0;
+    }
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
@@ -3677,6 +3739,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            is the only place in the pipeline with real per-line liveness. copt
            did it blind and miscompiled; see gw_fold_byte_global_widens. */
         gw_fold_byte_global_widens(lines, n, drop);
+        fold_hl_const_reuse(lines, drop, n);
         /* [IR_DEADDE_FOLD] Delete a store-then-dead-reload bracket where DE
            was never touched in between — see the function comment above.
            Bounded forward scan, self-contained (no liveness state needed

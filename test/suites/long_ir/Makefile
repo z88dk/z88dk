@@ -37,6 +37,7 @@ all:	ivsrsup.bin ivsrsup_fp.bin ivsrsup_gbz80.bin ivsrsup_gbz80_keep.bin ivsrsup
 all:	hlmemcarry.bin hlmemcarry_fp.bin hlmemcarry_gbz80.bin hlmemcarry_gbz80_keep.bin hlmemcarry_8080.bin hlmemcarry_8085.bin
 all:	decallasm.bin decallasm_fp.bin decallasm_keep.bin decallasm_gbz80.bin decallasm_8080.bin decallasm_8085.bin decallasm_8085_keep.bin
 all:	switchchain.bin switchchain_fp.bin switchchain_keep.bin switchchain_gbz80.bin switchchain_8080.bin switchchain_8085.bin switchchain_r4k.bin gbstorea.bin gbstorea_gbz80.bin gbstorea_gbz80_keep.bin gbstorea_8080.bin
+all:	hlconst.bin hlconst_fp.bin hlconst_keep.bin hlconst_gbz80.bin hlconst_8080.bin hlconst_8085.bin hlconst_r4k.bin
 all:	hcallstash.bin hcallstash_8085.bin hcallstash_8080.bin mathstash_8085.bin
 all:	dsubbc.bin dsubbc_fp.bin dsubbc_8085.bin dsubbc_8085_keep.bin dsubbc_8080.bin
 all:	gbsmallframe.bin gbsmallframe_fp.bin gbsmallframe_gbz80.bin gbsmallframe_gbz80_keep.bin
@@ -1401,6 +1402,34 @@ gbstorea_gbz80_keep.bin: $(SOURCES) gbstorea.c
 gbstorea_8080.bin: $(SOURCES) gbstorea.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst_fp.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst_keep.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=hl-const-reuse --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst_gbz80.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst_8080.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst_8085.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst_r4k.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 incmem.bin: $(SOURCES) incmem.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
