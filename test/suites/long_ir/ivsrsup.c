@@ -9,6 +9,8 @@
  *  - wdot   word arrays, scale 2: each address recomputes i*2
  *          (ivsr-recompute; _rckeep shares it).
  *  - waxpy  word read-modify-write of one array from another.
+ *  - kdot   constant bound: a byte-bounded counter, which keeps the
+ *           shared i*2 (no ivsr-recompute tag).
  *
  * Every CPU builds it; _keep runs the opt-out on the CPUs it gates.
  */
@@ -47,6 +49,16 @@ static void waxpy(int n, unsigned int a)
         wy[i] = a * wx[i] + wy[i];
 }
 
+static unsigned int kdot(void)
+{
+    unsigned int s = 0;
+    int i;
+
+    for (i = 0; i < N; i++)
+        s += wx[i] * wy[i];
+    return s;
+}
+
 static void fill(void)
 {
     int i;
@@ -75,6 +87,7 @@ static void test_wdot(void)
     Assert(wdot(4) == 30, "wdot part");
     Assert(wdot(0) == 0, "wdot zero");
     Assert(wdot(-1) == 0, "wdot negative");
+    Assert(kdot() == 3 * N * (N + 1) / 2, "kdot");
 }
 
 static void test_waxpy(void)

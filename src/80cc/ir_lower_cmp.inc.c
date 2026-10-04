@@ -673,6 +673,40 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             return 0;
         }
     }
+    /* [dsub-bc] 8085, an operand already in BC: DSUB takes it where it is.
+       RHS in BC: HL=src0, `sub hl,bc`, K = src0<src1.
+       LHS in BC: HL=src1, `sub hl,bc` gives src1-src0, and src0<src1 is
+       false exactly on K or Z; taken only when the branch jumps on that
+       side (two jumps, no local label). */
+    if (IS_8085() && is_signed && g_hc.branch_test_kind != 0
+        && op->src[0] >= 0 && op->src[1] >= 0
+        && f->vregs[op->src[0]].width == 2 && f->vregs[op->src[1]].width == 2
+        && L.pending_spill_v < 0 && !opt_disabled("dsub-bc")) {
+        int br_true = (g_hc.branch_test_kind == IR_BR_COND);
+        int want = (cf_true_long == br_true);      /* jump when src0<src1 */
+        if (bc_has(op->src[1]) && !bc_has(op->src[0])) {
+            ss_note_cache_read(f, op->src[1]);
+            load_to_hl(out, f, op->src[0]);
+            emit(out, "sub\thl,bc");
+            emit(out, "jp\t%s,L_f%d_bb_%d", want ? "k" : "nk",
+                 L.func_emit_idx, L.la.cur_branch_test_label);
+            invalidate_hl_cache();
+            L.la.cur_skip_next_op = 1;
+            return 0;
+        }
+        if (bc_has(op->src[0]) && !bc_has(op->src[1]) && !want) {
+            ss_note_cache_read(f, op->src[0]);
+            load_to_hl(out, f, op->src[1]);
+            emit(out, "sub\thl,bc");
+            emit(out, "jp\tk,L_f%d_bb_%d", L.func_emit_idx,
+                 L.la.cur_branch_test_label);
+            emit(out, "jp\tz,L_f%d_bb_%d", L.func_emit_idx,
+                 L.la.cur_branch_test_label);
+            invalidate_hl_cache();
+            L.la.cur_skip_next_op = 1;
+            return 0;
+        }
+    }
     load_binop_operands(out, f, op);   /* HL=src0, DE=src1 */
     /* 8085 DSUB + jp k/nk: fuse the compare into the branch. `sub hl,bc`
        (BC=src1) sets K=signed(src0<src1) and CF=unsigned borrow in one byte,
