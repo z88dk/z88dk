@@ -3173,6 +3173,8 @@ static void fold_mulchain_de(char **lines, char *drop, int n)
     }
 }
 
+static void fold_tos_rmw(char **lines, char *drop, int n);
+
 void ir_lower_fold_mulchain_de(FILE *out, FILE *src)
 {
     char **lines;
@@ -3182,7 +3184,10 @@ void ir_lower_fold_mulchain_de(FILE *out, FILE *src)
         return;
     }
     char *drop = calloc((size_t)(n > 0 ? n : 1), 1);
-    if (drop) fold_mulchain_de(lines, drop, n);
+    if (drop) {
+        fold_mulchain_de(lines, drop, n);
+        fold_tos_rmw(lines, drop, n);   /* after: it must not take a chain reload */
+    }
     for (int i = 0; i < n; i++)
         if (!drop || !drop[i]) fputs(lines[i], out);
     for (int i = 0; i < n; i++) free(lines[i]);
@@ -3707,6 +3712,46 @@ static void fold_hl_const_reuse(char **lines, char *drop, int n)
         InstrEffects e = instr_effects(l);
         if (e.unknown || e.is_call || e.is_boundary || (e.writes & IR_R_HL))
             known = 0;
+    }
+}
+
+/* [tos-rmw] A read-modify-write of the stack-top slot:
+     pop hl / push hl / <body> / pop de / push hl  ->  pop hl / <body> / push hl
+   The read's push and the write's pop cancel when the body is straight-line
+   and cannot see the stack (no push/pop/call/branch/label, no memory
+   operand), and DE is dead after the write. */
+static void fold_tos_rmw(char **lines, char *drop, int n)
+{
+    if (opt_disabled("tos-rmw")) return;
+    for (int i = 0; i + 1 < n; i++) {
+        if (drop[i] || strcmp(lines[i], "\tpop\thl\n")) continue;
+        int p = i + 1;
+        while (p < n && (drop[p] || !strncmp(lines[p], "\tC_LINE", 7))) p++;
+        if (p >= n || strcmp(lines[p], "\tpush\thl\n")) continue;
+        for (int j = p + 1; j < n; j++) {
+            if (drop[j] || !strncmp(lines[j], "\tC_LINE", 7)) continue;
+            const char *l = lines[j];
+            if (l[0] != '\t') break;                      /* label */
+            if (!strcmp(l, "\tpop\tde\n")) {
+                int k = j + 1;
+                while (k < n && (drop[k] || !strncmp(lines[k], "\tC_LINE", 7))) k++;
+                if (k < n && !strcmp(lines[k], "\tpush\thl\n")
+                    && gbwm_dead_after3(lines, n, drop, k + 1, 0, 0, 1)) {
+                    drop[p] = 1;
+                    drop[j] = 1;
+                }
+                break;
+            }
+            char m[16]; const char *o;
+            if (!gw_split(l, m, sizeof m, &o)) break;
+            if (strchr(l, '(') || strstr(l, "sp")) break;
+            InstrEffects e = instr_effects(l);
+            if (e.unknown || e.is_call || e.is_boundary) break;
+            if (!strcmp(m, "push") || !strcmp(m, "pop") || !strcmp(m, "jp")
+                || !strcmp(m, "jr") || !strcmp(m, "djnz") || !strncmp(m, "ret", 3)
+                || !strcmp(m, "rst") || !strcmp(m, "call"))
+                break;
+        }
     }
 }
 
