@@ -51,9 +51,15 @@
 // Make intellisense run easier..
 #if __clang__ | __CLANG | __XCC
 #define __STDC_ABI_ONLY
+#if defined(__LLVMZ80)
+#define __smallc __attribute__((smallc))
+#define __z88dk_callee __attribute__((z88dk_callee))
+#define __z88dk_fastcall __attribute__((z88dk_fastcall))
+#else
 #define __smallc
 #define __z88dk_callee
 #define __z88dk_fastcall
+#endif
 #endif
 
 #else
