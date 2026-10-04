@@ -383,7 +383,7 @@ extern unsigned long __LIB__   extract_bits_callee(unsigned char *data, unsigned
 #endif
 
 // Compare a file name in "8.3" format to a wildcard expression
-__ZPROTO2(int,,wcmatch,char,*wildname,char *,filename)
+__ZPROTO2(int,,wcmatch,char *,wildname,char *,filename)
 
 // Convert a BCD encoded value to unsigned int
 extern unsigned int __LIB__ unbcd(unsigned int value);
