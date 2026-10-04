@@ -727,9 +727,11 @@ void test_math16_edges()
 }
 #endif
 
-#ifdef MATH32
+#if defined(MATH32) && !defined(__Z88DK_NEWLIB)
 /* Classic printf %f/%e/%g formatting: %g selection, tiny %.2f precision,
- * overflow multiply to Inf, and subnormal/overflow literal clamps. */
+ * overflow multiply to Inf, and subnormal/overflow literal clamps.
+ * Newlib selects those converters when the library is built. The RC2014
+ * mask does not include them, so this test is classic only. */
 void test_math32_printf()
 {
     char buf[64];
@@ -759,7 +761,9 @@ void test_math32_printf()
     r.f = (FLOAT)1e39f;
     Assert(r.u == 0x7f800000ul, "overflow literal clamps to +Inf");
 }
+#endif
 
+#ifdef MATH32
 /* IEEE edges that the math32 cores document: FTZ/specials, exp overflow,
  * signed zero sqrt, packed qNaN divide, dissimilar-magnitude add (align). */
 void test_math32_edges()
@@ -974,7 +978,9 @@ int suite_math()
     suite_add_test(test_specials_sqrt);
 #endif
 #ifdef MATH32
+#ifndef __Z88DK_NEWLIB
     suite_add_test(test_math32_printf);
+#endif
     suite_add_test(test_math32_edges);
 #endif
 #ifdef MATH16
