@@ -124,6 +124,7 @@ static const OpInfo op_table[] = {
     [IR_MEMCPY]             = { "MEMCPY",               0, 0 },
     [IR_STRCPY]             = { "STRCPY",               0, 0 },
     [IR_STRCHR]             = { "STRCHR",               0, 0 },
+    [IR_SMAX0]              = { "SMAX0",                0, 0 },
 
     /* misc */
     [IR_NOP]                = { "NOP",                  0, 0 },

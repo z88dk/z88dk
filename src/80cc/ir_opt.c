@@ -1434,8 +1434,10 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
     f->vregs[pend].width = f->vregs[p].width;
     int v_b = -1, v_m = -1, v_neff = -1, v_scaled = -1;
     if (bound_v >= 0) {
-        v_b = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_b].width = 2;
-        v_m = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_m].width = 2;
+        if (!cmp_is_unsigned && opt_disabled("smax0")) {
+            v_b = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_b].width = 2;
+            v_m = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_m].width = 2;
+        }
         v_neff = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_neff].width = 2;
         if (sh > 0) {
             v_scaled = ir_vreg_new(f, KIND_INT, NULL, 0);
@@ -1467,18 +1469,25 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
            already, so neff = n directly — the clamp (SHR;SUB;AND, ~18B) is dead. */
         int neff = bound_v;
         if (!cmp_is_unsigned) {
-            /* max(0, n), branchlessly with only reliable ops (80cc has no
+            /* max(0, n). By default one IR_SMAX0. Under the smax0 opt-out,
+               branchlessly with only reliable ops (80cc has no
                arithmetic >> — IR_SHR is logical, #289 — and a standalone
                compare-to-value mis-lowers here):
                  sb   = (unsigned)n >> 15   (0 if n>=0, 1 if n<0)   [logical shift]
                  mask = sb - 1              (0xFFFF if n>=0, 0 if n<0)
                  neff = n & mask            (n if n>=0, 0 if n<0) */
-            ivsr_init_op(&o, IR_SHR); o.dst = v_b; o.src[0] = bound_v; o.imm = 15;
-            licm_insert_before_terminator(&f->bbs[ph], &o);
-            ivsr_init_op(&o, IR_SUB); o.dst = v_m; o.src[0] = v_b; o.imm = 1;
-            licm_insert_before_terminator(&f->bbs[ph], &o);
-            ivsr_init_op(&o, IR_AND); o.dst = v_neff; o.src[0] = bound_v; o.src[1] = v_m;
-            licm_insert_before_terminator(&f->bbs[ph], &o);
+            if (v_b < 0) {
+                /* [smax0] one op: a sign test and a conditional zero load. */
+                ivsr_init_op(&o, IR_SMAX0); o.dst = v_neff; o.src[0] = bound_v;
+                licm_insert_before_terminator(&f->bbs[ph], &o);
+            } else {
+                ivsr_init_op(&o, IR_SHR); o.dst = v_b; o.src[0] = bound_v; o.imm = 15;
+                licm_insert_before_terminator(&f->bbs[ph], &o);
+                ivsr_init_op(&o, IR_SUB); o.dst = v_m; o.src[0] = v_b; o.imm = 1;
+                licm_insert_before_terminator(&f->bbs[ph], &o);
+                ivsr_init_op(&o, IR_AND); o.dst = v_neff; o.src[0] = bound_v; o.src[1] = v_m;
+                licm_insert_before_terminator(&f->bbs[ph], &o);
+            }
             neff = v_neff;
         }
         int v_sc = neff;
@@ -2163,7 +2172,7 @@ static int dce_pure_kind(const Op *op)
     case IR_AND: case IR_OR: case IR_XOR:
     case IR_SHL: case IR_SHR:
     case IR_INC: case IR_DEC:
-    case IR_NEG: case IR_NOT:
+    case IR_NEG: case IR_NOT: case IR_SMAX0:
     case IR_CONV_ZX: case IR_CONV_SX:
     case IR_CONV_TRUNC: case IR_CONV_BYTE_TO_HIGH:
     case IR_CMP_EQ:  case IR_CMP_NE:

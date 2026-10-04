@@ -51,6 +51,12 @@ static void test_ivsr_lftr(void)
     assertEqual(ssum(0),  0);
     assertEqual(ssum(5),  15);
     assertEqual(ssum(-3), 0);        /* MUST be 0 iterations, not a wrapped loop */
+    assertEqual(ssum(-1), 0);
+    assertEqual(ssum(-32768), 0);    /* sign bit alone */
+    /* 2n wraps above base: an unclamped end pointer runs thousands of trips. */
+    assertEqual(ssum(-16384), 0);
+    assertEqual(ssum(-30000), 0);
+    assertEqual(ssum(1),  1);
     assertEqual(ssum(N),  210);
 }
 

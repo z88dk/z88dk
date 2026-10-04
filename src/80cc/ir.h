@@ -418,6 +418,10 @@ typedef enum {
        side effect). Gated to Z80-family by ir_build. */
     IR_STRCHR,
 
+    /* Signed word clamp: dst = src[0] < 0 ? 0 : src[0]. Width 2 only. IVSR's
+       LFTR builds it for a signed variable loop bound. */
+    IR_SMAX0,
+
     /* misc */
     IR_NOP,
     IR_ASM,             /* raw __asm{} block — opaque, full clobber;

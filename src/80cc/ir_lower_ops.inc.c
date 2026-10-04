@@ -1781,6 +1781,31 @@ static int gen_not(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* HL = max(src[0], 0), signed word. The negative path loads zero over a local
+   label, not an ASMPC skip: the text passes treat a label as a merge point,
+   so none of them carries "HL = 0" past it. */
+static int gen_smax0(FILE *out, Func *f, const Op *op)
+{
+    if (!hl_has(op->src[0]))
+        load_to_hl(out, f, op->src[0]);
+    else
+        ss_note_cache_read(f, op->src[0]);
+    int lbl = L.cmp_label_counter++;
+    if (CPU_HAS_CB_SHIFTS()) {
+        emit(out, "bit\t7,h");
+        emit(out, "jr\tz,L_f%d_cmp_ok_%d", L.func_emit_idx, lbl);
+    } else {
+        emit(out, "ld\ta,h");
+        emit(out, "add\ta,a");
+        emit(out, "jp\tnc,L_f%d_cmp_ok_%d", L.func_emit_idx, lbl);
+        invalidate_a_cache();
+    }
+    emit(out, "ld\thl,0");
+    fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, lbl);
+    commit_hl_word(out, f, op->dst);
+    return 0;
+}
+
 static int gen_conv_zx(FILE *out, Func *f, const Op *op)
 {
     int src_w = f->vregs[op->src[0]].width;

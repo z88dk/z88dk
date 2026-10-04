@@ -567,6 +567,20 @@ ivsr_lftr_r4k.bin: $(SOURCES) ivsr_lftr.c
 	$(compile_r4k)
 	$(runtest_r4k)
 
+# smax0: the signed-bound clamp. 8080 has no `bit`, so it takes the
+# `ld a,h; add a,a` form; _keep is the three-op opt-out.
+ivsr_lftr_8080.bin: $(SOURCES) ivsr_lftr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsr_lftr_gbz80.bin: $(SOURCES) ivsr_lftr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsr_lftr_keep.bin: $(SOURCES) ivsr_lftr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=smax0 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 # add hl,bc / sbc hl,bc with a BC-resident operand — z80 sp+fp plus 8080/gbz80
 # (which emulate sbc hl,de, so exercise the byte-wise C/B subtract path).
 binop_bc.bin: $(SOURCES) binop_bc.c
@@ -2650,6 +2664,7 @@ all: idx2reuse.bin idx2reuse_fp.bin idx2reuse_keep.bin idx2reuse_fp_keep.bin idx
 # IVSR induction pointer in idx2 (IX/IY): ez80/kc160/rabbit only, where
 # ivsr_lftr's walking pointer now also homes in the index register.
 all: ivsr_lftr_ez80.bin ivsr_lftr_ez80_fp.bin ivsr_lftr_kc160.bin ivsr_lftr_kc160_fp.bin ivsr_lftr_r4k.bin
+all: ivsr_lftr_8080.bin ivsr_lftr_gbz80.bin ivsr_lftr_keep.bin
 
 aggpromote.bin: $(SOURCES) aggpromote.c
 	$(compile)

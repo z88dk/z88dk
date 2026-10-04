@@ -7115,6 +7115,7 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_MOV:               return gen_mov(out, f, op);
     case IR_NEG:               return gen_neg(out, f, op);
     case IR_NOT:               return gen_not(out, f, op);
+    case IR_SMAX0:             return gen_smax0(out, f, op);
     case IR_CONV_ZX:           return gen_conv_zx(out, f, op);
     case IR_CONV_SX:           return gen_conv_sx(out, f, op);
     case IR_CONV_TRUNC:        return gen_conv_trunc(out, f, op);
