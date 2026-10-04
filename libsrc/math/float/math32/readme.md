@@ -336,7 +336,7 @@ float modf (float x, float *y);  float fmod (float x, float y);
 
 The stack-only engine matches the Z80 C11 contract used by `test/suites/math` (`test_math32_printf`): `%g` of `1.234e-37` is `1.234e-37`, `%g` of `-2.5e-5` is `-2.5e-05`, `%g` of `314.159` is `314.159`, `%.2f` of a tiny value is `0.00`. Classic `sprintf` also: `test/suites/stdio` `test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` (`--math32`; `%e` of `1.2345` is `1.234500e+00`). Integer `sscanf` is `test_scanf*.bin` (no `%f`). `test/suites/string` is `str*` only.
 
-Classic zsdcc does not scan printf formats. `--math32` does not enable `%f` / `%e` / `%g`. Add `#pragma printf = "%f %e %g"` or `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF`. Without that, printf writes the letter `f`, `e`, or `g`. sccz80 and 80cc scan the format string and do not need this. Do not set `NEED_printf` from `CLIB_32BIT_FLOATS` alone.
+Classic zsdcc scans `printf` and `scanf` string literals in the same `zcc` command. A literal `%f`, `%e`, or `%g` links that converter. sccz80 and 80cc use the same scan. `--math32` does not enable those converters by itself. A format that is not a string literal is not scanned. Add `#pragma printf = "%f %e %g"` for that call. A separate `zcc -c` drops the scan. Put the pragma in one file and pass `-pragma-include:`. `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF` sets a fixed mask and replaces the scan. Without the converter, printf writes the letter `f`, `e`, or `g`. Newlib does not use this scan. Set the pragma or `CLIB_OPT_PRINTF` there. Do not set `NEED_printf` from `CLIB_32BIT_FLOATS` alone.
 
 ---
 

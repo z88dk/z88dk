@@ -4,7 +4,13 @@ Read this file at the start of a page edit. Add rows when new commits or pull re
 
 The subject line is a filter. Each "Parsed patch" row below was taken from the diff (`git show` or the pull-request files), not from the commit comment. Procedure: skill `docs-wiki`, heading "Change index".
 
-Index built **2026-10-04**. Wiki clone: `/tmp/z88dk.wiki` at `791be74`. That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts.
+Index built **2026-10-04**. Wiki clone: `/tmp/z88dk.wiki` at `791be74` plus a local edit for `5215f2081f` (not pushed). That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts.
+
+## Parsed patch — classic sdcc printf scan
+
+| Source | What the patch says | Page |
+|--------|---------------------|------|
+| `5215f2081f` (merge `2afaa14410`, PR #3171). Subject: "(zpragma): Re-implement the format string scanning" | `zcc` passes `-autoformat` to zpragma for sdcc only (not ez80clang). zpragma scans printf and scanf string literals and ORs `CRT_printf_format` / `CRT_scanf_format` in that zcc run. Classic CRT uses the mask when `CLIB_OPT_PRINTF` is not set, so a literal `%f`, `%e`, or `%g` links that converter. An explicit `#pragma printf` or `-pragma-define:CLIB_OPT_PRINTF` replaces the scan. A non-literal format is not scanned. `zcc_opt.def` is new for each zcc run, so `zcc -c` then a later link drops the scan. Newlib does not read `CRT_printf_format`. | Corrected in `Math32`, `Classic--Maths-Libraries` (math32 and am9511), `Classic--Pragmas`, `Math16`, `NewLib--Platform--Embedded`. Product readmes: math32, math16, am9511, math48 |
 
 Pages are **not edited yet** unless a row says the sentence is already on the wiki.
 

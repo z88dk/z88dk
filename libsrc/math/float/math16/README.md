@@ -15,7 +15,7 @@ This is the z88dk 16-bit IEEE-754 standard math16 half precision floating point 
 
 Shared specials and coeff tables live under `asm/`. 8080 / 8085 / gbz80 are stack-only (no `exx` / IX / IY). Packed half×half and `sqrf16` use an 11×11 product; f24 (poly / inv / hypot / fma / sqrt) uses 16×16. Plain z80 unrolls both in-file (`mulu_32_16x16_gen` / `mulu_32_16x16`). Other Z80-family products call `l_mulu_32_16x16` (z80n `mul de`, z180 / ez80 `mlt`, kc160 / rabbit integer HW).
 
-The specialised nature of 16-bit floating point implies that this is an adjunct or special purpose maths library. It can be used to accelerate the calculation of floating point, where the results are only needed to 3.5 significant digits. Applications can include video games, or neural networks, for example. There is **no stdio / printf / scanf / dtoa requirement** on the math16 product itself; apps that need float print may pair another float library (e.g. math32) for I/O only.
+The specialised nature of 16-bit floating point implies that this is an adjunct or special purpose maths library. It can be used to accelerate the calculation of floating point, where the results are only needed to 3.5 significant digits. Applications can include video games, or neural networks, for example. There is **no stdio / printf / scanf / dtoa requirement** on the math16 product itself; apps that need float print may pair another float library (e.g. math32) for I/O only. Classic zsdcc scans `printf` literals in that same `zcc` command. The converters come from the main library, not from math16.
 
 *@feilipu, May 2020 / 8085 August 2026 / 8080 September 2026 / gbz80 September 2026*
 

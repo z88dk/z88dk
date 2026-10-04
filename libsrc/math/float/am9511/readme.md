@@ -147,6 +147,8 @@ IEEE-754 assumes bit 23 of the mantissa is 1 except where the exponent is zero.
 
 The z88dk am9511 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or the right hand side parameter is passed in DEHL, and the second or LHS parameter is passed on the stack. For zsdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
 
+Classic `%f`, `%e`, and `%g` use the same scan as math32. Classic zsdcc links a converter when the format literal uses it. `--math-am9511` does not enable those converters by itself. Newlib does not use this scan.
+
 The intrinsic functions, written in assembly, assume the sccz80 calling convention, and are by default `__z88dk_fastcall` or `__z88dk_callee`, which means that they will consume values passed in the DEHL registers, or on the stack respectively, returning with the value in DEHL.
 
 ```
