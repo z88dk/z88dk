@@ -4,7 +4,7 @@ Read this file at the start of a page edit. Add rows when new commits or pull re
 
 The subject line is a filter. Each "Parsed patch" row below was taken from the diff (`git show` or the pull-request files), not from the commit comment. Procedure: skill `docs-wiki`, heading "Change index".
 
-Index built **2026-10-04**. Wiki clone: `/tmp/z88dk.wiki` at `791be74` plus a local edit for `5215f2081f` (not pushed). That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts.
+Index built **2026-10-04**. Wiki clone: `/tmp/z88dk.wiki`, pushed. Printf pages: `6a20572`. #3040 page split and `draft:imported` removal: `eaa1cb0`. `draft:verified` removal: `811d405`. That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts.
 
 ## Parsed patch — classic sdcc printf scan
 
@@ -12,7 +12,7 @@ Index built **2026-10-04**. Wiki clone: `/tmp/z88dk.wiki` at `791be74` plus a lo
 |--------|---------------------|------|
 | `5215f2081f` (merge `2afaa14410`, PR #3171). Subject: "(zpragma): Re-implement the format string scanning" | `zcc` passes `-autoformat` to zpragma for sdcc only (not ez80clang). zpragma scans printf and scanf string literals and ORs `CRT_printf_format` / `CRT_scanf_format` in that zcc run. Classic CRT uses the mask when `CLIB_OPT_PRINTF` is not set, so a literal `%f`, `%e`, or `%g` links that converter. An explicit `#pragma printf` or `-pragma-define:CLIB_OPT_PRINTF` replaces the scan. A non-literal format is not scanned. `zcc_opt.def` is new for each zcc run, so `zcc -c` then a later link drops the scan. Newlib does not read `CRT_printf_format`. | Corrected in `Math32`, `Classic--Maths-Libraries` (math32 and am9511), `Classic--Pragmas`, `Math16`, `NewLib--Platform--Embedded`. Product readmes: math32, math16, am9511, math48 |
 
-Pages are **not edited yet** unless a row says the sentence is already on the wiki.
+The printf rows are on the wiki (`6a20572`). The #3040 rows at the bottom are on the wiki (`eaa1cb0`).
 
 ## Rules already decided (#3040)
 
@@ -20,10 +20,10 @@ Read from the issue comments, not from a commit subject.
 
 | Topic | Decision | Checked |
 |-------|----------|---------|
-| Classic vs newlib on one target page | Separate pages. One comment link only. First pages: `Platform---CPM`, `Platform---Sinclair-ZX-Spectrum` | no |
-| Reference cards | Not for the wiki. Cfg detail stays in the target skill | no |
-| "Not the other target" tables | Not for the wiki. One sentence and a link | no |
-| Draft HTML comments | Not for the wiki | no |
+| Classic vs newlib on one target page | Separate pages. One comment link only. First pages: `Platform---CPM`, `Platform---Sinclair-ZX-Spectrum` | `eaa1cb0` |
+| Reference cards | Not for the wiki. Cfg detail stays in the target skill | `eaa1cb0` on the #3040 pages below |
+| "Not the other target" tables | Not for the wiki. One sentence and a link | `eaa1cb0` on those pages |
+| Draft HTML comments | Not for the wiki | `draft:imported` removed in `eaa1cb0`. `draft:verified` removed in `811d405` |
 | Human sections already on the page | Keep them. Correct stale facts in place | — |
 
 ## Skipped (subject and paths are not a target page)
@@ -66,17 +66,22 @@ Do not write these onto the wiki until they merge. The title is not the change.
 | z88dk#2850 "Vz200 new asm files" | `include/arch/vz.h` and `libsrc/target/vz/vz200.lst`. Drops `vz_bgrd`, `vz_brick`, `vz_clrscr`, `vz_color` from the header and the list. Adds coarse scroll, smooth scroll, sprite draw, text, paper, irq on/off, `vz_waitvb`, and the matching callees. Comments inside the new asm disagree (1 pixel vs 4 pixels; `vz_coursescroll` comments say smooth scroll). Document only symbols that agree in the header and the `.lst` | `Platform---VZ200` |
 | z88dk#2162 "Add filesystem API and improve console output" | The file list is `libsrc/target/ticalc/fcntl/` plus TI-83 Plus and TI-86 `.def` files. It adds AppVar `open` / `read` / `write` / `close` / `lseek` / `remove` / `rename`. There is no console-output diff in the file list. Do not add a "small text" claim from the title | `Platform---TI-Calculators` or `ti_calculators` |
 
-## Page rows still open from #3040
+## Page rows from #3040
 
-The `-lm` sentences above stay. The split below is the unread page structure.
+The `-lm` sentences above stay. These rows are the page split, on the wiki as `eaa1cb0`.
 
-| Page | Source | What is still open | Checked |
-|------|--------|--------------------|---------|
-| `Platform---CPM` | #3040 | Classic page also holds a newlib card, a classic-vs-newlib table, and a smoke matrix. Quick Start, disc, console, file, and pragmas stay. Keep the parsed `-lm` sentences | no |
-| `Platform---Sinclair-ZX-Spectrum` | #3040 | Classic page also holds a newlib CLIB row, a newlib `zcc` line, and a "Not the Spectrum Next" table. Keep the parsed `-lm` / `-lmz` sentences | no |
-| `Platform---SMS` | #3040 | Reference card plus a newlib column. Classic checklist stays. No `-lm` hunk in the parsed commits above | no |
-| `Platform---ZX-Spectrum-Next-zxn` | #3040 | Flag page mixes classic and newlib. Classic narrative is `Platform---Sinclair-ZX-Spectrum-Next`. Keep the `b7635e8` float table | no |
-| `Platform---RC2014` | #3040 | Newlib-default page with a classic column and a reference card. Keep the 8085 `-lm` sentence from `242620c` | no |
-| `Platform---HBIOS` | #3040 | Newlib-default page with a classic-vs-newlib section and a reference card. No hunk in the parsed commits above | no |
-| `Newlib-Overview` | #3040 | Still says platform pages carry a reference card. `+cpm` and `+zx` rows are the comment-link target. The `7f97a28` maths paragraph stays | no |
-| `Platform` | #3040 | Index repeats classic and newlib for `+cpm` and `+zx`. The capability rows from `242620c` stay | no |
+| Page | Source | What changed | Checked |
+|------|--------|----------------|---------|
+| `Platform---CPM` | #3040 | Classic page. Newlib card, comparison table, and smoke matrix removed. Newlib line is one link to `Newlib-Overview`. Quick Start, disc, console, file, and pragmas stay. Parsed `-lm` sentences stay | `eaa1cb0` |
+| `Platform---Sinclair-ZX-Spectrum` | #3040 | Classic page. Newlib recipe and "Not the Spectrum Next" table removed. Next and newlib are one link each. `-lm` / `-lmz` stay. The `zx.cfg` name was dropped from the ROM-maths sentence | `eaa1cb0` |
+| `Platform---SMS` | #3040 | Classic page. Reference card, comparison table, and smoke table removed. Newlib link only. The `_stdout` printf note moved to `Newlib-Overview` | `eaa1cb0` |
+| `Platform---ZX-Spectrum-Next-zxn` | #3040 | Newlib page. Classic float and classic NEX/DOT recipes stay on `Platform---Sinclair-ZX-Spectrum-Next`. `b7635e8` newlib float sentences stay | `eaa1cb0` |
+| `Platform---Sinclair-ZX-Spectrum-Next` | #3040 | Classic page. Draft banner, comparison table, and newlib example removed. Classic `-lm` sentences stay. Subtype list no longer cites `zxn.cfg` | `eaa1cb0` |
+| `Platform---RC2014` | #3040 | Newlib page. Classic is one `-clib=default` sentence. 8085 subtype `-lm` sentence from `791be74` stays | `eaa1cb0` |
+| `Platform---HBIOS` | #3040 | Newlib page. Classic is one `-clib=default` sentence. Reference card removed | `eaa1cb0` |
+| `Platform---Z180` | #3040, `916f24a` | Newlib page. `math32_z180` / `--math48` sentences stay. Reference card removed | `eaa1cb0` |
+| `Platform---YAZ180` | #3040, `916f24a` | Same float sentences. Human subtype table. Reference card removed | `eaa1cb0` |
+| `Platform---SCZ180` | #3040, `916f24a` | Same float sentences. Human subtype table. Reference card removed | `eaa1cb0` |
+| `Platform---Z80-Embedded` | #3040, `916f24a` | `+z80` is newlib by default. `+embedded` is classic by default. One sentence each for the other library. CPU `-lm` names stay | `eaa1cb0` |
+| `Newlib-Overview` | #3040 | Human target table. CP/M, ZX, and SMS newlib lines live here. Maths paragraph from `7f97a28` stays. Cfg search-path sentence removed | `eaa1cb0` |
+| `Platform` | #3040 | Machine table names classic or newlib. `+cpm`, `+zx`, and `+sms` newlib rows point at `Newlib-Overview`. Capability rows from `242620c` stay | `eaa1cb0` |
