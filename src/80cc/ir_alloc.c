@@ -444,6 +444,12 @@ static int alloc_nveto;
 
 void ir_alloc_veto_reset(void) { alloc_nveto = 0; }
 
+/* [de-rearb] Set while the lowerer re-lowers a function whose word DE-home
+   pick it rejected: no DE-class home is proposed at all, so every later pack
+   sees DE and the pair the pick vacated as they would without the pick. */
+static int de_class_veto;
+void ir_alloc_de_veto(int on) { de_class_veto = on; }
+
 void ir_alloc_veto_add(int v)
 {
     if (v < 0) return;
@@ -1695,7 +1701,7 @@ static int collect_home_candidates(const Func *f,
                          RC_BYTE,
                          (vreg_single_bb(f, v) >= 0) ? CF_BYTE_SINGLE_BB : 0);
     /* (5) DE-class — three sub-shapes in pool order: acc, general, ptr. */
-    if (de_home_available(f)) {
+    if (de_home_available(f) && !de_class_veto) {
         if (c_word_resident && !opt_disabled("word-resident"))
             for (int v = 0; v < f->n_vregs; v++)
                 if (de_acc_realizable(f, v, use_count, write_count,

@@ -2665,6 +2665,28 @@ all: idx2reuse.bin idx2reuse_fp.bin idx2reuse_keep.bin idx2reuse_fp_keep.bin idx
 # ivsr_lftr's walking pointer now also homes in the index register.
 all: ivsr_lftr_ez80.bin ivsr_lftr_ez80_fp.bin ivsr_lftr_kc160.bin ivsr_lftr_kc160_fp.bin ivsr_lftr_r4k.bin
 all: ivsr_lftr_8080.bin ivsr_lftr_gbz80.bin ivsr_lftr_keep.bin
+all: derearb.bin derearb_fp.bin derearb_8080.bin derearb_gbz80.bin derearb_keep.bin
+
+# de-rearb: a rejected word DE-home pick, lowered again without a DE-class home.
+derearb.bin: $(SOURCES) derearb.c
+	$(compile)
+	$(runtest)
+
+derearb_fp.bin: $(SOURCES) derearb.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+derearb_8080.bin: $(SOURCES) derearb.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+derearb_gbz80.bin: $(SOURCES) derearb.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+derearb_keep.bin: $(SOURCES) derearb.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=de-rearb --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 aggpromote.bin: $(SOURCES) aggpromote.c
 	$(compile)

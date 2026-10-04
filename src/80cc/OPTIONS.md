@@ -111,6 +111,7 @@ exists (ADR 0010).
 | `byte-tie` | equal-tick byte candidates are not broken by byte count |
 | `word-resident` | no word (DE) home proposals |
 | `de-home` | no general DE home for a loop-carried word |
+| `de-rearb` | a word DE-home pick the render rejects is reverted to the allocator's snapshot only; the function is not lowered again without a DE-class home |
 | `loop-ra` | no loop-scoped DE allocation on top of `de-home` |
 | `iv-resident` | no home for a hot write-many induction variable |
 | `iv-acc` | no induction-variable accumulator home |

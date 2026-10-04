@@ -37,6 +37,7 @@ int ir_alloc_demote_home(Func *f, int v);
    so a re-run of ir_alloc offers its register to the next candidate instead of
    leaving it unused. Reset per function. */
 void ir_alloc_veto_reset(void);
+void ir_alloc_de_veto(int on);
 void ir_alloc_veto_add(int vreg);
 
 /* Does v need a frame slot backing its home? THE allocation answer, and the

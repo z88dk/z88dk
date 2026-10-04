@@ -10,22 +10,34 @@ narrative — when a section stops describing what is live, it belongs in
 
 ## Next action
 
-**START HERE: ptrbench.** The largest per-bench gap to sdcc on z80 (md5
-excluded, best of fp/sp): 7295 B fp / 7424 B sp against sdcc 6947 B and xcc
--Os 6762 B, i.e. +348 B (5%) over sdcc and +533 B over xcc -Os. It is faster
-than both (11.3M ticks against sdcc 18.0M), so this is size only. The
-framework is no longer the cause (ADR 0103): measure the bench source on its
-own, not the linked binary.
+**START HERE: ptrbench, init_data's struct loop.** z80 `code_compiler`, from
+the objects, 4/10/2026: 80cc fp 1381 B / sp 1458 B against sdcc 1160 B and
+xcc -Os 1074 B (3/10: 1418 / 1523). Size only; 80cc is the fastest of the
+three. Two changes on 4/10 (uncommitted at the time of writing):
+- `smax0`: LFTR's signed-bound `max(0,n)` is one op, `bit 7,h; jr z; ld hl,0`
+  (8080: `ld a,h; add a,a; jp nc`). Corpus -1090 B, 34 cells, 0 larger,
+  0 slower. Only ptrbench and backgammon take it in the corpus and examples.
+- `de-rearb`: a word DE-home pick the render rejects used to revert to the
+  allocator's snapshot, but packs made after the pick had seen the pair it
+  vacated as free and get demoted, so the function came out worse than
+  without the proposal (ptrbench `init_data` sp: 443 B against 418 B). The
+  function is lowered again from a clone with no DE-class home, and that
+  render is kept when a byte estimate puts it more than 3% smaller. 12 CPUs:
+  -2385 B, 123 cells, 0 larger. Always keeping it is -1638 B with 47 larger:
+  the margin covers what copt does after the estimate.
 
-Do in this order, and stop at the first step that names the cause:
-1. Per-function table, 80cc against sdcc AND xcc, from the compiled objects
-   (see the density skill, section 2.1). Do not size from symbol gaps.
-2. Decide whether the gap is *inlining* (xcc folds six helpers; the single
-   call site costs nothing to fold, see below) or *per-function codegen*
-   (sdcc keeps the helpers as functions, so a gap against sdcc is not
-   inlining). The two comparisons give different answers; ptrbench is the
-   case where they may.
-3. For a codegen gap, the instruction census on the biggest function.
+Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
+census of the final z80 fp asm finds 15 byte temps inside one straight run,
+10 with a free register, about 48 B. The 183-site sizing from September has
+been absorbed by later work.
+
+Next, `init_data` loop 4 (fp body 174 B): `arr[i*4+k]` and `recs[i].k` are
+both `base + 8i + 2k`, but the loaded value is parked in a slot because the
+value and the store address both want HL. The general route is to rewrite
+`(x+c)<<s` as `(x<<s)+(c<<s)` and let CSE share `8i`. Count the shape first.
+Traps from 3/10: `HANDOVER_2026-10-03_s2.md`. sdcc's z180 column is not a
+parity signal: at the default `--max-allocs-per-node 3000` sdcc's z180
+ptrbench is 1435 B, against 1153 B at 100000.
 
 Other large gaps to sdcc on z80, for after ptrbench: `bitfieldbench`
 +260 B (7%), `localbench` +225 B (6%), `widthbench` +224 B (5%),
@@ -35,7 +47,9 @@ Other large gaps to sdcc on z80, for after ptrbench: `bitfieldbench`
 Trap: `md5` is a huge outlier (sdcc 28824 B, 80cc 17324 B); leave it out of any
 total or the table looks 80cc-favourable.
 
-**Also ready: byte-scratch packing.** Short-lived byte values spill to a
+**Parked 4/10/2026: byte-scratch packing.** Re-sized on the final asm: about
+48 B on z80 fp (15 single-run byte temps, 10 with a free register), see
+the next action above. The original plan follows. Short-lived byte values spill to a
 frame slot while B or D might be available. Add the verifier first (B
 availability against BC tenants, D availability against DE clobbers), size
 the two lanes separately, and only promote to a gated prototype + full
@@ -323,7 +337,7 @@ enforces both directions.
 
 `IR_CLOB_VERIFY` `IR_HOME_VERIFY` `IR_HOME_VERIFY_ABORT` `IR_HOME_SLOT_VERIFY`
 `IR_HOME_SLOT_VERIFY_ABORT` `IR_IX_VERIFY` `IR_PARK_VERIFY` `IR_REC_VERIFY`
-`IR_VERIFY` `IR_VERIFY_ABORT` `IR_VERIFY_I2`
+`IR_VERIFY` `IR_VERIFY_ABORT` `IR_VERIFY_I2` `IR_DEFASSIGN_VERIFY`
 
 They answer no question and have no expiry. Run the relevant one for what you
 touched and report the count before and after.
@@ -345,6 +359,7 @@ to diff when an allocation decision changes.
 | `IR_BYTEPRESS` `IR_RANGEPROBE` | inert sizings: the byte-pair opportunity by pressure, and the ranging population | they are quoted in an ADR |
 | `IR_LIVEPROBE` | liveness census; `=2` gives the verbose form | — |
 | `IR_BYTEPACK` `IR_BYTEPACK_VERIFY` `IR_SLOTWHY` `IR_WIDENOSLOT` | opt-in allocator/lowering diagnostics and sizing probes | when the associated investigation is closed |
+| `IR_CALLBC_PROBE` | how many multi-read, hazard-free word values stay spilled after every placement pass (`=2`: any producer, not only call results) | when the opt-in `callbc` home is decided |
 | `IR_BC_STEP_CALL` `IR_BC_STEP_SCALAR` | retained diagnostic probes for the rejected ADR 0100 experiment; not optimisation options | if the probe code is removed |
 
 `IR_RANGEPROBE`'s 461 was an upper bound over the wrong population — do not

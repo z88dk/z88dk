@@ -7116,7 +7116,7 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_NEG:               return gen_neg(out, f, op);
     case IR_NOT:               return gen_not(out, f, op);
     case IR_SMAX0:             return gen_smax0(out, f, op);
-    case IR_CONV_ZX:           return gen_conv_zx(out, f, op);
+    case IR_CONV_ZX:          return gen_conv_zx(out, f, op);
     case IR_CONV_SX:           return gen_conv_sx(out, f, op);
     case IR_CONV_TRUNC:        return gen_conv_trunc(out, f, op);
     case IR_CONV_TRUNC_HI:     return gen_conv_trunc(out, f, op);
@@ -8174,6 +8174,7 @@ static int op_is_commutative(OpKind kind)
    counted down never does. Caught via countborrow.c hanging under
    IR_BC_STEP_CALL once a [home-demote] retry became reachable from a new
    call site — the underlying gap is general, not specific to that gate. */
+static int whome_rejected;   /* [de-rearb] this lowering rejected a DE pick */
 static void confirm_word_home_pick(Func *f, const int *bb_alias)
 {
     if (!ir_alloc_word_home_picked()) return;
@@ -8191,13 +8192,15 @@ static void confirm_word_home_pick(Func *f, const int *bb_alias)
         g_hc.de_home = -1;
         /* No region formed: the render cannot keep the promise the pick
            made, so reject it. The allocator reverts its own plan. */
-        if (wlo < 0)
+        if (wlo < 0) {
             ir_alloc_word_home_reject(f);
+            whome_rejected = 1;
+        }
     }
     ir_alloc_word_home_done();
 }
 
-int ir_lower_func(FILE *out, Func *f)
+static int ir_lower_func_body(FILE *out, Func *f)
 {
     if (!f) {
         fputs("ir_lower: null Func\n", stderr);
@@ -9251,6 +9254,163 @@ static int spflip_enabled(void)
         v = !opt_disabled("sp-flip");
     }
     return v;
+}
+
+
+/* [de-rearb] A rejected word DE-home pick is reverted to the plan the
+   allocator snapshotted when it made the pick, but every pack placed after
+   that point saw the pick's register picture: the pair it vacated as free and
+   DE as taken. The revert demotes the packs that now collide, so the function
+   can end up worse than if the pick had never been proposed. Lower a pristine
+   clone again with the DE class vetoed, which is the plan the allocator makes
+   without the proposal, and emit it when it is clearly smaller.
+   `--opt-disable=de-rearb` keeps the snapshot revert. */
+/* Z80-encoding byte estimate of one rendered line, for comparing two renders
+   of the same function. Not a bound in either direction. */
+static int rearb_line_bytes(const char *l)
+{
+    const char *s = l;
+    while (*s == '\t' || *s == ' ') s++;
+    if (s == l || !*s || *s == '\n' || *s == ';') return 0;
+    char m[12]; size_t k = 0;
+    while (s[k] && s[k] != '\t' && s[k] != ' ' && s[k] != '\n' && k + 1 < sizeof m) {
+        m[k] = s[k]; k++;
+    }
+    m[k] = 0;
+    const char *a = s + k;
+    while (*a == '\t' || *a == ' ') a++;
+    char arg[64]; k = 0;
+    while (a[k] && a[k] != '\n' && a[k] != ';' && k + 1 < sizeof arg) { arg[k] = a[k]; k++; }
+    while (k > 0 && (arg[k - 1] == ' ' || arg[k - 1] == '\t')) k--;
+    arg[k] = 0;
+    int idx = strstr(arg, "ix") || strstr(arg, "iy");
+    int ixd = strstr(arg, "(ix") || strstr(arg, "(iy");
+    int mem = strchr(arg, '(') != NULL;
+    const char *c = strchr(arg, ',');
+    #define IS(x) (!strcmp(m, x))
+    #define PAIR(p) (!strncmp(p, "hl", 2) || !strncmp(p, "de", 2) \
+                     || !strncmp(p, "bc", 2) || !strncmp(p, "sp", 2))
+    if (!strncmp(m, "EXTERN", 6) || !strncmp(m, "GLOBAL", 6)
+        || !strncmp(m, "C_LINE", 6) || !strncmp(m, "SECTION", 7)
+        || !strncmp(m, "PUBLIC", 6) || !strcmp(m, "defc"))
+        return 0;
+    if (IS("ld")) {
+        if (!c) return 3;
+        const char *src = c + 1;
+        int dpair = PAIR(arg) || !strncmp(arg, "ix", 2) || !strncmp(arg, "iy", 2);
+        int spair = PAIR(src);
+        if (ixd) {
+            if (!(dpair || spair)) return 3;
+            /* native word index loads/stores */
+            if (IS_EZ80()) return 3;
+            if ((IS_RABBIT() || IS_KC160())
+                && (!strncmp(arg, "hl", 2) || !strncmp(src, "hl", 2))) return 3;
+            return 6;
+        }
+        if (dpair && spair) return !strncmp(arg, "sp", 2) ? 1 + idx : 2;
+        if (dpair && *src == '(') return !strncmp(arg, "hl", 2) ? 3 : 4;
+        if (*arg == '(' && spair) {
+            if (!strcmp(arg, "(hl)") || !strcmp(arg, "(de)") || !strcmp(arg, "(bc)"))
+                return 2;
+            return !strncmp(src, "hl", 2) ? 3 : 4;
+        }
+        if (dpair) return 3 + idx;
+        if (strstr(arg, "(hl+)") || strstr(arg, "(hl-)")) return IS_GBZ80() ? 1 : 2;
+        if (!strcmp(arg, "(hl)") || !strcmp(src, "(hl)") || !strcmp(src, "(bc)")
+            || !strcmp(src, "(de)") || !strcmp(arg, "(bc)") || !strcmp(arg, "(de)"))
+            return (*src >= '0' && *src <= '9') || *src == '-' ? 2 : 1;
+        if (mem) return 3;
+        if (src[0] && !src[1] && strchr("abcdehl", src[0])) return 1;
+        return 2;
+    }
+    if (IS("push") || IS("pop")) return idx ? 2 : 1;
+    if (IS("inc") || IS("dec")) return ixd ? 3 : idx ? 2 : 1;
+    if (IS("add") || IS("adc") || IS("sbc") || IS("sub") || IS("and") || IS("or")
+        || IS("xor") || IS("cp")) {
+        if (PAIR(arg) || !strncmp(arg, "ix", 2) || !strncmp(arg, "iy", 2)) {
+            const char *o = c ? c + 1 : "";
+            if (!PAIR(o) && strncmp(o, "ix", 2) && strncmp(o, "iy", 2)) return 6;
+            return (IS("add") && !idx) ? 1 : 2;
+        }
+        const char *o = c ? c + 1 : arg;
+        if (ixd) return 3;
+        if (!strcmp(o, "(hl)")) return 1;
+        if (o[0] && !o[1] && strchr("abcdehl", o[0])) return 1;
+        return 2;
+    }
+    if (IS("jp")) return !strcmp(arg, "(hl)") ? 1 : 3;
+    if (IS("jr") || IS("djnz")) return IS_808x() ? 3 : 2;
+    if (IS("call")) return 3;
+    if (IS("ex")) return idx ? 2 : 1;
+    if (IS("bit") || IS("set") || IS("res") || IS("rl") || IS("rr") || IS("rlc")
+        || IS("rrc") || IS("sla") || IS("sra") || IS("srl") || IS("swap"))
+        return ixd ? 4 : 2;
+    if (IS("neg") || IS("ldir") || IS("lddr") || IS("ldi") || IS("ldd")) return 2;
+    if (IS("lea") || IS("pea")) return 3;
+    #undef IS
+    #undef PAIR
+    return 1;
+}
+
+static long render_size(FILE *fp)
+{
+    char ln[1024], prev[1024] = ""; long n = 0;
+    rewind(fp);
+    while (fgets(ln, sizeof ln, fp)) {
+        /* `ld hl,N; add hl,sp` has a shorter native form on these CPUs
+           (`ld hl,sp+N`, LDSI, `(sp+n)` addressing): charge the pair 2. */
+        if (!strcmp(ln, "\tadd\thl,sp\n") && !strncmp(prev, "\tld\thl,", 7)
+            && (prev[7] == '-' || (prev[7] >= '0' && prev[7] <= '9'))
+            && (IS_GBZ80() || IS_8085() || IS_RABBIT() || IS_KC160())) {
+            n -= 2;
+            strcpy(prev, ln);
+            continue;
+        }
+        n += rearb_line_bytes(ln);
+        if (strncmp(ln, "\tC_LINE", 7)) strcpy(prev, ln);
+    }
+    return n;
+}
+
+int ir_lower_func(FILE *out, Func *f)
+{
+    if (!f || f->is_naked || opt_disabled("de-rearb"))
+        return ir_lower_func_body(out, f);
+    Func *c = ir_clone_func(f);
+    FILE *buf = c ? tmpfile() : NULL;
+    if (!buf) {
+        if (c) ir_free_cloned_func(c);
+        return ir_lower_func_body(out, f);
+    }
+    whome_rejected = 0;
+    int rc = ir_lower_func_body(buf, f);
+    FILE *src = buf;
+    if (rc == 0 && whome_rejected) {
+        FILE *buf2 = tmpfile();
+        if (buf2) {
+            ir_alloc_de_veto(1);
+            int rc2 = ir_lower_func_body(buf2, c);
+            ir_alloc_de_veto(0);
+            /* The estimate does not see copt, so a margin up to 3% is noise. */
+            long so = render_size(buf), sn = render_size(buf2);
+            if (rc2 == 0 && sn + so / 33 < so) {
+                src = buf2;
+                /* -debug reads the frame layout off f after lowering. */
+                f->frame_size = c->frame_size;
+                if (c->n_vregs == f->n_vregs && c->vreg_spill_slot && f->vreg_spill_slot)
+                    memcpy(f->vreg_spill_slot, c->vreg_spill_slot,
+                           (size_t)f->n_vregs * sizeof(int));
+            } else fclose(buf2);
+        }
+    }
+    whome_rejected = 0;
+    rewind(src);
+    char ch[4096]; size_t n;
+    while ((n = fread(ch, 1, sizeof ch, src)) > 0) fwrite(ch, 1, n, out);
+    if (src != buf) fclose(src);
+    fclose(buf);
+    ir_free_cloned_func(c);
+    return rc;
 }
 
 /* [#13 costed flip] The flip is byte-beneficial when the saved IX apparatus
