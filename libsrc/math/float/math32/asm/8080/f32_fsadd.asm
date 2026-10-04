@@ -197,12 +197,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 ; X.exp == 255.  Y finite (already checked).
 .fa_spec_x
     ld hl,sp+0
-    ld a,(hl)                       ; MSB
+    ld a,(hl+)                      ; MSB
     and 07fh
-    inc hl
     inc hl                          ; LSB
-    or (hl)
-    inc hl                          ; mid
+    or (hl+)                        ; mid
     or (hl)
     jp NZ,fa_ret_nan                ; X NaN
     ld hl,sp+5                      ; sign
@@ -221,12 +219,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     inc a
     jp NZ,fa_ret_inf_y              ; Inf ± finite
     ld hl,sp+0
-    ld a,(hl)
+    ld a,(hl+)
     and 07fh
     inc hl
-    inc hl
-    or (hl)
-    inc hl
+    or (hl+)
     or (hl)
     jp NZ,fa_ret_nan                ; X NaN
     ld hl,sp+5                      ; X.sign
@@ -248,8 +244,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .fa_epi
     ; DEHL = result.  SP: X(6) Y(6) flag ret IEEE.
     ld bc,hl                        ; park result low
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld sp,hl                        ; drop X + Y park
     ld hl,bc                        ; DEHL = result
     pop bc                          ; drop flag

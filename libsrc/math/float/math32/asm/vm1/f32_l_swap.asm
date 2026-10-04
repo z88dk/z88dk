@@ -27,46 +27,38 @@ PUBLIC l_f32_swap
     push bc                         ; SP: ret, right LSW, right MSW, left LSW, left MSW
 
     ; swap LSW (sp+2 <-> sp+6)
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ex de,hl
     ld hl,(de)
     ld bc,hl                        ; BC = right LSW
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ex de,hl
     ld hl,(de)                      ; HL = left LSW
     ex de,hl
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ex de,hl
     ld (de),hl                      ; right LSW := left LSW
     ld hl,bc
     ex de,hl
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ex de,hl
     ld (de),hl                      ; left LSW := old right LSW
 
     ; swap MSW (sp+4 <-> sp+8)
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld hl,(de)
     ld bc,hl
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ex de,hl
     ld hl,(de)
     ex de,hl
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld (de),hl
     ld hl,bc
     ex de,hl
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ex de,hl
     ld (de),hl
 

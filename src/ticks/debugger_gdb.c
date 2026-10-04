@@ -39,6 +39,7 @@ char* script_file = NULL;
 int c_autolabel = 0;
 uint8_t temporary_break = 0;
 static uint8_t has_clock_register = 0;
+static uint8_t has_interrupt_registers = 0;
 static uint8_t registers_invalidated = 1;
 static pthread_cond_t network_op_cond;
 static pthread_mutex_t network_op_mutex;
@@ -96,6 +97,15 @@ const char* register_mapping_names[] = {
      */
     "clockl",
     "clockh",
+
+    /*
+     * Some emulators would report these registers, which expose the CPU's
+     * interrupt and refresh state
+     */
+    "ir",
+    "iff1",
+    "iff2",
+    "im",
 };
 
 static enum register_mapping_t register_mappings[32] = {0};
@@ -368,6 +378,25 @@ static struct debugger_regs_t* fetch_registers()
                     unwrap_reg(value, &registers.h_, &registers.l_);
                     break;
                 }
+                case REGISTER_MAPPING_IR: {
+                    unwrap_reg(value, &registers.i, &registers.r);
+                    break;
+                }
+                case REGISTER_MAPPING_IFF1: {
+                    uint8_t hi;
+                    unwrap_reg(value, &hi, &registers.iff1);
+                    break;
+                }
+                case REGISTER_MAPPING_IFF2: {
+                    uint8_t hi;
+                    unwrap_reg(value, &hi, &registers.iff2);
+                    break;
+                }
+                case REGISTER_MAPPING_IM: {
+                    uint8_t hi;
+                    unwrap_reg(value, &hi, &registers.im);
+                    break;
+                }
                 case REGISTER_MAPPING_UNKNOWN:
                 default: {
                     // we don't support such register, so we chose to ignore it
@@ -467,6 +496,7 @@ uint8_t get_memory(uint32_t at, memtype type)
 void get_regs(struct debugger_regs_t* regs)
 {
     memcpy(regs, fetch_registers(), sizeof(struct debugger_regs_t));
+    regs->has_interrupt_state = has_interrupt_registers;
 }
 
 void set_regs(struct debugger_regs_t* regs)
@@ -535,6 +565,22 @@ void set_regs(struct debugger_regs_t* regs)
             }
             case REGISTER_MAPPING_HL_: {
                 value = wrap_reg(regs->h_, regs->l_);
+                break;
+            }
+            case REGISTER_MAPPING_IR: {
+                value = wrap_reg(regs->i, regs->r);
+                break;
+            }
+            case REGISTER_MAPPING_IFF1: {
+                value = wrap_reg(0, regs->iff1);
+                break;
+            }
+            case REGISTER_MAPPING_IFF2: {
+                value = wrap_reg(0, regs->iff2);
+                break;
+            }
+            case REGISTER_MAPPING_IM: {
+                value = wrap_reg(0, regs->im);
                 break;
             }
             case REGISTER_MAPPING_UNKNOWN:
@@ -1093,6 +1139,7 @@ static uint8_t initialize_gdb_connection(void)
     // Reset register mappings
     register_mappings_count = 0;
     has_clock_register = 0;
+    has_interrupt_registers = 0;
 
     // Create read/write threads
     {
@@ -1220,6 +1267,13 @@ static uint8_t initialize_gdb_connection(void)
             }
             if (register_mappings[i] == REGISTER_MAPPING_CLOCKL) {
                 has_clock_register = 1;
+                continue;
+            }
+            if (register_mappings[i] == REGISTER_MAPPING_IR ||
+                register_mappings[i] == REGISTER_MAPPING_IFF1 ||
+                register_mappings[i] == REGISTER_MAPPING_IFF2 ||
+                register_mappings[i] == REGISTER_MAPPING_IM) {
+                has_interrupt_registers = 1;
                 continue;
             }
         }

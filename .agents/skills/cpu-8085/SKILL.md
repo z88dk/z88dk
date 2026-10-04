@@ -407,8 +407,8 @@ Partial **unroll** when the body is small. Entry style: public DE/HL form → **
 
 | Lesson | Detail |
 |--------|--------|
-| Prefer **restoring** `fsdiv` / `f16_div` over NR `fsinv`×mul for general `/` | z80 + 8085 cores; large TIMER win on divide-hot code (whetstone ~1.4×) |
-| `fsinv` stays NR | Use for reciprocal-as-primitive; HW mul (z80n `mul de` / z180 `mlt`) helps **inv**, not the restoring loop |
+| Prefer **restoring** `fsdiv` / `f16_div` for general `/` and for public `inv` | z80 + 8085 cores; large TIMER win on divide-hot code (whetstone ~1.4×) |
+| Public reciprocal is restoring `1/x` | `m32_fsinv_fastcall` / `asm_f16_inv` call the restoring divider. NR bodies live in `asm/<cpu>/hist/` and are not assembled. `invsqrt` stays NR |
 | 8085 core | Stack-only second operand / temps; `sub hl,bc` + `rl de`; **no** EXX / IX / IY |
 | Loop counter | Do not reuse the count register as a working BC/DE mid-loop (classic hang: never reaches `TIMER_STOP`) |
 | Rem / count clobber | Keep remainder high and step count off the hot DEHL path (stack slots) |

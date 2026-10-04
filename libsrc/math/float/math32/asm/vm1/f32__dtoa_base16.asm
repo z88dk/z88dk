@@ -46,8 +46,7 @@ PUBLIC m32__dtoa_base16
 
     sub 07eh
     ld b,a                          ; b = base 2 exponent
-    ld hl,4
-    add hl,sp                       ; hl = mantissa *
+    ld hl,sp+4                      ; hl = mantissa *
     ld de,4
     ld c,6
     ret

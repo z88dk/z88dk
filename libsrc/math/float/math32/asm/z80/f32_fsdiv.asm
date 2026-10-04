@@ -52,8 +52,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     push de
     push hl                     ; b
     push bc                     ; ret → SP = ret (2), b (4), a
-    ld hl,6                     ; a, not 4: ret+b sit under SP (#3088)
-    add hl,sp
+    ld hl,sp+6                  ; a, not 4: ret+b sit under SP (#3088)
     ld e,(hl+)
     ld d,(hl+)
     ld a,(hl+)
@@ -66,8 +65,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     pop bc                      ; ret
     push de
     push hl                     ; b → SP = b, a
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld e,(hl+)
     ld d,(hl+)
     ld a,(hl+)
@@ -95,20 +93,17 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld sp,hl
 
     ; ---- store a (+8..+11) and sign (+7) ----
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld (hl+),c                  ; aE
     ld (hl+),b                  ; aD
     ld (hl+),a                  ; aL
     ex af,af
     ld (hl),a                   ; aH
     ld e,a                      ; E = aH
-    ld hl,17
-    add hl,sp                   ; b3
+    ld hl,sp+17                 ; b3
     xor (hl)
     and 080h
-    ld hl,7
-    add hl,sp
+    ld hl,sp+7
     ld (hl),a                   ; sign
 
     ; ---- specials gate (packed IEEE on frame) ----
@@ -122,19 +117,15 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     and 07fh
     cp 07fh
     jr NZ,div_a_finite
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     bit 7,(hl)                  ; aL bit7 = exp LSB → must be 1 for exp 255
     jr Z,div_a_finite
-    ld a,(hl)
+    ld a,(hl-)
     and 07fh
-    dec hl
-    or (hl)                     ; aD
-    dec hl
+    or (hl-)                    ; aD
     or (hl)                     ; aE
     jp NZ,div_nan               ; a NaN
-    ld hl,17
-    add hl,sp
+    ld hl,sp+17
     ld a,(hl)
     and 07fh
     cp 07fh
@@ -145,8 +136,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     jp div_nan                  ; Inf / Inf or Inf / NaN-high
 
 .div_a_finite
-    ld hl,17
-    add hl,sp
+    ld hl,sp+17
     ld a,(hl)                   ; bH
     and 07fh
     cp 07fh
@@ -154,34 +144,28 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     dec hl
     bit 7,(hl)                  ; b exp LSB
     jr Z,div_b_finite
-    ld a,(hl)
+    ld a,(hl-)
     and 07fh
-    dec hl
-    or (hl)
-    dec hl
+    or (hl-)
     or (hl)
     jp NZ,div_nan               ; finite / NaN
     jp div_zero                 ; finite / Inf → 0
 
 .div_b_finite
     ; exp==0 is ±0 (no denormals)
-    ld hl,17
-    add hl,sp
-    ld a,(hl)                   ; bH
+    ld hl,sp+17
+    ld a,(hl-)                  ; bH
     add a,a
     ld b,a
-    dec hl
     ld a,(hl)
     rlca
     and 1
     or b                        ; exp b
     jr NZ,div_b_nz
-    ld hl,11
-    add hl,sp
-    ld a,(hl)                   ; aH
+    ld hl,sp+11
+    ld a,(hl-)                  ; aH
     add a,a
     ld b,a
-    dec hl
     ld a,(hl)
     rlca
     and 1
@@ -190,12 +174,10 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     jp div_inf                  ; finite/0
 
 .div_b_nz
-    ld hl,11
-    add hl,sp
-    ld a,(hl)                   ; aH
+    ld hl,sp+11
+    ld a,(hl-)                  ; aH
     add a,a
     ld b,a
-    dec hl
     ld a,(hl)
     rlca
     and 1
@@ -205,32 +187,24 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ; ---- unpack a → r +3..+5, exp → +6 (normals only) ----
     ld a,(hl)
     or 080h                     ; implicit 1
-    ld hl,5
-    add hl,sp
+    ld hl,sp+5
     ld (hl),a                   ; r2
-    ld hl,9
-    add hl,sp
+    ld hl,sp+9
     ld a,(hl)                   ; aD
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld (hl),a                   ; r1
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld a,(hl)                   ; aE
-    ld hl,3
-    add hl,sp
+    ld hl,sp+3
     ld (hl),a                   ; r0
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld (hl),c                   ; exp a
 
     ; ---- unpack b → d +0..+2 ----
-    ld hl,17
-    add hl,sp
-    ld a,(hl)
+    ld hl,sp+17
+    ld a,(hl-)
     add a,a
     ld b,a
-    dec hl
     ld a,(hl)
     rlca
     and 1
@@ -238,25 +212,19 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld c,a                      ; exp b (nonzero)
     ld a,(hl)
     or 080h
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ld (hl),a                   ; d2
-    ld hl,15
-    add hl,sp
+    ld hl,sp+15
     ld a,(hl)
-    ld hl,1
-    add hl,sp
+    ld hl,sp+1
     ld (hl),a                   ; d1
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ld a,(hl)
-    ld hl,0
-    add hl,sp
+    ld hl,sp+0
     ld (hl),a                   ; d0
 
 ; exp = exp_a - exp_b + 127  (FTZ: result exp<=0 → ±0, >=255 → ±inf)
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld a,(hl)
     sub c
     ld l,a
@@ -277,20 +245,17 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     jp NC,div_inf
     or a
     jp Z,div_zero               ; exp 0 → flush zero (no subnormals)
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld (hl),a
 
 .div_prenorm
     ; Load 24-bit rem/div into 32-bit hlhl'/dede'
     ; rem r2:r1:r0 at +5..+3; div d2:d1:d0 at +2..+0
-    ld hl,3
-    add hl,sp
+    ld hl,sp+3
     ld e,(hl+)                  ; r0
     ld d,(hl+)                  ; r1
     ld a,(hl)                   ; r2
-    ld hl,0
-    add hl,sp
+    ld hl,sp+0
     ld c,(hl+)                  ; d0
     ld b,(hl+)                  ; d1
     ld l,(hl)                   ; d2
@@ -334,8 +299,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     exx
     adc hl,hl                   ; C = rem high bit after prenorm shift
     push hl
-    ld hl,8                     ; exp at +6, +2 for push
-    add hl,sp
+    ld hl,sp+8                  ; exp at +6, +2 for push
     dec (hl)
     pop hl
 
@@ -405,8 +369,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     jr NZ,div_guard_done
     ld c,080h
     push hl
-    ld hl,8                     ; exp at +6, +2 for push
-    add hl,sp
+    ld hl,sp+8                  ; exp at +6, +2 for push
     inc (hl)
     ld a,(hl)
     pop hl
@@ -432,8 +395,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     exx
     pop de                      ; B=qhi, DE=qlo
 
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld a,(hl)                   ; exp (prenorm may have decremented)
     or a
     jp Z,div_zero
@@ -449,8 +411,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld a,c
     srl a
     ld c,a
-    ld hl,7
-    add hl,sp
+    ld hl,sp+7
     ld a,(hl)
     and 080h
     or c
@@ -471,8 +432,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     jp m32_fsconst_pnan
 
 .div_inf
-    ld hl,7
-    add hl,sp
+    ld hl,sp+7
     ld a,(hl)                   ; sign
     and 080h
     ld d,a                      ; D = sign for m32_fsmax
@@ -482,8 +442,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ret
 
 .div_zero
-    ld hl,7
-    add hl,sp
+    ld hl,sp+7
     ld a,(hl)                   ; sign
     and 080h
     ld d,a
@@ -495,8 +454,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 .div_unwind
     exx
     pop bc                      ; uret
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld sp,hl
     pop hl                      ; C ret
     pop de

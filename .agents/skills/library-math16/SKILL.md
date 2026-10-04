@@ -1,7 +1,8 @@
 ---
 name: library-math16
 description: >
-  math16 half-float library for z88dk: f16/f24 cores, restoring div vs NR inv,
+  math16 half-float library for z88dk: f16/f24 cores, restoring div and
+  public inv (NR inv bodies unlinked),
   classic +test recipes need z88dk-classic sources. Use when editing
   libsrc math16 or measuring half-float.
 ---
@@ -32,13 +33,14 @@ Policy mirrors math32:
 | Op | Algorithm |
 |----|-----------|
 | **div** / `asm_f16_div` | **Restoring** |
-| **inv** / `asm_f16_inv` | Newton–Raphson |
+| **inv** / `asm_f16_inv` | **Restoring** `1/x` via `asm/asm_f16_inv.asm`. The NR source is unchanged in `asm/<cpu>/hist/asm_f16_inv.asm` and is not assembled |
+| **SDCC div** / `cm16_sdcc_div` | **Restoring** `asm_f24_div_f24` (main = dividend, alt = divisor) |
 
 In **C higher functions** (`c/*.c`):
 
 | Need | Write | Do not write |
 |------|--------|----------------|
-| Reciprocal `1/n` | `1.0/x` (restoring `div`) | `invf16(x)` |
+| Reciprocal `1/n` | `1.0/x` or `invf16(x)` (both restoring `asm_f16_div`) | `asm/<cpu>/hist/asm_f16_inv.asm` |
 | Inverse square root | `invsqrtf16(x)` | `1.0/sqrtf16(x)` |
 | Square `x*x` | `sqrf16(x)` (fastcall, always +) | `mulf16(x,x)` / a `sqrf16` macro |
 | IEEE bits | `union float16_int` from `c/math16.h` | a local `uint16_t` union |
@@ -53,7 +55,7 @@ In **C higher functions** (`c/*.c`):
 4. 8085 math16 often also needs `-lmath32_8085` for higher helpers — match classic recipes.
 5. Suite: `make -C test/suites/math test_math16.bin test_math16_z180.bin test_math16_ez80_z80.bin test_math16_z80n.bin test_math16_r2ka.bin test_math16_r4k.bin test_math16_r6k.bin test_math16_kc160.bin test_math16_8085.bin test_math16_8080.bin test_math16_gbz80.bin`. Newlib: `+rc2014 -clib=new` with `-lmath16 -lmath32` (mirror math32 rc2014 recipe).
 6. Higher funcs layout: `c/z80/` (sccz80 +new), `c/8085/`, `c/8080/`, `c/gbz80/`. **`c/Makefile` clean:** only remove C-derived `*.asm` in those dirs (`$(AFILES8085)` / `$(AFILES8080)` / `$(AFILESGBZ80)`); keep hand-written `cm16_sccz80_*.asm`.
-7. Cores: `asm/{z80,8085,8080,gbz80}/`. Packed `*` / `sqrf16` = 11×11 (`asm_f16_mul_callee` / `asm_f16_sqr`). Poly, inv, sqrt NR, hypot, fma = f24 16×16 (`asm_f24_mul_f24`).
+7. Cores: `asm/{z80,8085,8080,gbz80}/`. Packed `*` / `sqrf16` = 11×11 (`asm_f16_mul_callee` / `asm_f16_sqr`). Poly, invsqrt, sqrt NR, hypot, fma = f24 16×16 (`asm_f24_mul_f24`). Public `invf16` is the restoring bridge, not that NR body.
 8. Unrolled 11×11 / 16×16 mulu is **`IF __CPU_Z80__` only**. z80n / z180 / ez80 / kc160 / rabbit call **`l_mulu_32_16x16`** (HW integer). Do not assemble the unrolled body into those products.
 9. `--math16` is **adjunct** (no conflict with math32/math48). Classic: `math16.lib` + `math16_{8085,8080,gbz80,…}.lib`. Newlib sccz80 **bakes math16 into `lib/clibs/sccz80/z80.lib`**. After core edits: delete `*math16*` `.o` under `libsrc/newlib/target/{math16,z80}/obj`, then `make -C libsrc/newlib math16 z80`. Prove `cm16_sccz80_mul_callee` is `G =` onto `asm_f16_mul_callee` (stale is `G A` at a later line).
 10. Classic 8085/8080/gbz80 Makefile targets have **no OBJECTS deps**. `rm` `obj/<cpu>/…/asm_f16_*.o` and `libsrc/math16*.lib`, then `make -C libsrc math16.lib` and `cp` into `lib/clibs/`. `fromfix16` / `tofix16` are Z80-family only (no fix16 product for 8080/8085/gbz80).

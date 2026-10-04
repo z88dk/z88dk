@@ -125,23 +125,22 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     push de
     push hl
     ld hl,sp+16
-    ld a,(hl)                   ; flag
+    ld a,(hl)                       ; flag
     pop hl
-    pop de                      ; A=flag DEHL=result
+    pop de                          ; A=flag DEHL=result
 
     ld bc,hl
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ld sp,hl
-    ld hl,bc                    ; DEHL restored; A=flag
+    ld hl,bc                        ; DEHL restored; A=flag
 
     or a
     jp Z,fm_done
 
-    pop bc                      ; ret
-    pop af                      ; Lh
-    pop af                      ; Ld
-    push bc                     ; ret only
+    pop bc                          ; ret
+    pop af                          ; Lh
+    pop af                          ; Ld
+    push bc                         ; ret only
 
 .fm_done
     ret
@@ -173,7 +172,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 .pk_round
     ld a,b
     cp 0ffh
-    jp NC,pk_ovl                ; final exponent >= 255 -> overflow
+    jp NC,pk_ovl                    ; final exponent >= 255 -> overflow
     ; Product HLDE: HLD = top 24, E = residual 8.  Form EHL mant.
     ld a,e                          ; A = residual
     ld e,h
@@ -278,8 +277,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 .fm_ret_nan
     ld hl,sp+12
     ld b,(hl)                       ; B=flag
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ld sp,hl
     ld a,b
     or a
@@ -296,8 +294,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld c,(hl)
     ld hl,sp+12
     ld b,(hl)                       ; B=flag C=sign
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ld sp,hl
     ld a,b
     or a
@@ -317,8 +314,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld c,(hl)
     ld hl,sp+12
     ld b,(hl)                       ; B=flag C=sign
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ld sp,hl
     ld a,b
     or a

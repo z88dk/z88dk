@@ -231,8 +231,13 @@ static void run_sqrt(FLOAT x, FLOAT e)
      * stack params on 8085 (and is wasteful on success everywhere). */
     if (approx_equal(e,r,EPSILON))
         return;
+#ifdef __Z88DK_NEWLIB
+    /* The $9000 image has no room for the float converter. */
+    Assert(0, "Sqrt mismatch");
+#else
     snprintf(buf,sizeof(buf),"Sqrt(%f) should be %.14f but was %.14f",(float)x,(float)e,(float)r);
     Assert(0, buf);
+#endif
 }
 
 void test_sqrt()
@@ -251,8 +256,12 @@ static void run_pow(FLOAT x, FLOAT y, FLOAT e)
     FLOAT r = POW(x,y);
     if (approx_equal(e,r,EPSILON))
         return;
+#ifdef __Z88DK_NEWLIB
+    Assert(0, "pow mismatch");
+#else
     snprintf(buf,sizeof(buf),"pow(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
     Assert(0, buf);
+#endif
 }
 
 void test_pow()
@@ -272,8 +281,12 @@ static void run_fmod(FLOAT x, FLOAT y, FLOAT e)
     FLOAT r = FMOD(x,y);
     if (approx_equal(e,r,EPSILON))
         return;
+#ifdef __Z88DK_NEWLIB
+    Assert(0, "fmod mismatch");
+#else
     snprintf(buf,sizeof(buf),"fmod(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
     Assert(0, buf);
+#endif
 }
 
 void test_fmod()
@@ -289,8 +302,12 @@ static void run_fmin(FLOAT x, FLOAT y, FLOAT e)
     FLOAT r = FMIN(x,y);
     if (approx_equal(e,r,EPSILON))
         return;
+#ifdef __Z88DK_NEWLIB
+    Assert(0, "fmin mismatch");
+#else
     snprintf(buf,sizeof(buf),"fmin(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
     Assert(0, buf);
+#endif
 }
 
 void test_fmin()
@@ -308,8 +325,12 @@ static void run_fmax(FLOAT x, FLOAT y, FLOAT e)
     FLOAT r = FMAX(x,y);
     if (approx_equal(e,r,EPSILON))
         return;
+#ifdef __Z88DK_NEWLIB
+    Assert(0, "fmax mismatch");
+#else
     snprintf(buf,sizeof(buf),"fmax(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
     Assert(0, buf);
+#endif
 }
 
 void test_fmax()
@@ -727,9 +748,12 @@ void test_math16_edges()
 }
 #endif
 
-#ifdef MATH32
+#if defined(MATH32) && !defined(__Z88DK_NEWLIB)
 /* Classic printf %f/%e/%g formatting: %g selection, tiny %.2f precision,
- * overflow multiply to Inf, and subnormal/overflow literal clamps. */
+ * overflow multiply to Inf, and subnormal/overflow literal clamps.
+ * Newlib selects the same converters from the format scan, but the
+ * RC2014 math suite already fills RAM at $9000, so this test stays
+ * classic. A small newlib program is the RC2014 check. */
 void test_math32_printf()
 {
     char buf[64];
@@ -759,7 +783,9 @@ void test_math32_printf()
     r.f = (FLOAT)1e39f;
     Assert(r.u == 0x7f800000ul, "overflow literal clamps to +Inf");
 }
+#endif
 
+#ifdef MATH32
 /* IEEE edges that the math32 cores document: FTZ/specials, exp overflow,
  * signed zero sqrt, packed qNaN divide, dissimilar-magnitude add (align). */
 void test_math32_edges()
@@ -974,7 +1000,9 @@ int suite_math()
     suite_add_test(test_specials_sqrt);
 #endif
 #ifdef MATH32
+#ifndef __Z88DK_NEWLIB
     suite_add_test(test_math32_printf);
+#endif
     suite_add_test(test_math32_edges);
 #endif
 #ifdef MATH16

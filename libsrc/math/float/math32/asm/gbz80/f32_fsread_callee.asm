@@ -27,9 +27,8 @@ PUBLIC cm32_sccz80_fsread1_callee
     ld de,hl                    ; DE = ret1
     ld hl,sp+2                  ; &MSW
     ld a,(hl)
-    ld (hl),e
+    ld (hl+),e
     ld e,a
-    inc hl
     ld a,(hl)
     ld (hl),d
     ld h,a

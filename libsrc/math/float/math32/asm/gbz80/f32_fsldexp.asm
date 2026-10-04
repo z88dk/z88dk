@@ -49,9 +49,8 @@ PUBLIC _m32_ldexpf
     ld de,hl                        ; DE = ret
     ld hl,sp+2                      ; &x.DE
     ld a,(hl)
-    ld (hl),e
+    ld (hl+),e
     ld e,a
-    inc hl
     ld a,(hl)
     ld (hl),d
     ld h,a
@@ -72,7 +71,7 @@ PUBLIC _m32_ldexpf
     ld hl,sp+4
     ld a,(hl+)
     ld h,(hl)
-    ld l,a                      ; HL = x.DE
+    ld l,a                          ; HL = x.DE
 
     add hl,hl                       ; exp → H, mant bits → L, sign → C
     inc h

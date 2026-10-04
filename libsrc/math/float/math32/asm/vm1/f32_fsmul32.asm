@@ -33,14 +33,12 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     push hl
     ; SP: Yhl Yde Ybc ret X.HL X.DE   (12)
 
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     push hl
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
@@ -70,90 +68,74 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ; ieee(4) → X.hl|X.de; grow +2 with X.bc; rotate to Y|ret|X
     push de                         ; save X.de
     ex de,hl                        ; DE = X.hl
-    ld hl,10                        ; ieee.HL after push
-    add hl,sp
+    ld hl,sp+10                     ; ieee.HL after push
     ex de,hl
     ld (de),hl                      ; X.hl
     pop hl                          ; X.de
     ex de,hl
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ex de,hl
     ld (de),hl                      ; X.de
     ; SP: Y ret X.hl X.de (12); BC = X.bc
 
     push bc                         ; SP: X.bc Yhl Yde Ybc ret X.hl X.de  (14)
     ; Left-rotate 7 words by 1 → Yhl Yde Ybc ret X.hl X.de X.bc
-    ld hl,0
-    add hl,sp
+    ld hl,sp+0
     ex de,hl
     ld hl,(de)
     ld bc,hl                        ; BC = old w0 (X.bc)
 
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ex de,hl
     ld hl,(de)
     ex de,hl
-    ld hl,0
-    add hl,sp
+    ld hl,sp+0
     ex de,hl
     ld (de),hl                      ; w0 = Yhl
 
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld hl,(de)
     ex de,hl
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ex de,hl
     ld (de),hl                      ; w1 = Yde
 
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ex de,hl
     ld hl,(de)
     ex de,hl
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld (de),hl                      ; w2 = Ybc
 
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ex de,hl
     ld hl,(de)
     ex de,hl
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ex de,hl
     ld (de),hl                      ; w3 = ret
 
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ex de,hl
     ld hl,(de)
     ex de,hl
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ex de,hl
     ld (de),hl                      ; w4 = X.hl
 
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ex de,hl
     ld hl,(de)
     ex de,hl
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ex de,hl
     ld (de),hl                      ; w5 = X.de
 
     ld hl,bc
     ex de,hl
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ex de,hl
     ld (de),hl                      ; w6 = X.bc
 
@@ -175,31 +157,26 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 ;=======================================================================
 .mul_body
     ; sign
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld a,(hl)                       ; Y.c
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     xor (hl)                        ; X.c
     ld c,a
 
     ; exponent
-    ld hl,13
-    add hl,sp
+    ld hl,sp+13
     ld a,(hl)                       ; X.exp
     ; ±0 is classified by the IEEE caller (fsmul / inv / sqrt / poly)
     sub 07fh
     jp C,fmchkuf
 
-    ld hl,5
-    add hl,sp
+    ld hl,sp+5
     add a,(hl)                      ; Y.exp
     jp C,mulovl
     jp fmnouf
 
 .fmchkuf
-    ld hl,5
-    add hl,sp
+    ld hl,sp+5
     add a,(hl)
     jp NC,mulzero
 
@@ -210,14 +187,12 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     push bc                         ; es ; SP: es Yhl Yde Ybc ret Xhl Xde Xbc
 
     ; mulu: DEHL=X, push y.DE, push y.HL
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a                          ; X.hl
     push hl
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a                          ; X.de
@@ -228,28 +203,24 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     push hl                         ; save X ; SP: Xhl Xde es Yhl Yde Ybc ret X...
 
     ; y.DE @ SP+8, y.HL @ SP+6
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     push hl                         ; y.DE
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     push hl                         ; y.HL
 
     ; restore X to DEHL
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     push hl
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
@@ -303,22 +274,17 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     push bc
     ; SP: es ml mh Yhl Yde Ybc ret Xhl Xde Xbc
 
-    ld hl,0
-    add hl,sp
+    ld hl,sp+0
     ld de,hl                        ; DE = src
-    ld hl,14
-    add hl,sp                       ; HL = dest X slot
+    ld hl,sp+14                     ; HL = dest X slot
     ld b,6
 .cp
-    ld a,(de)
-    ld (hl),a
-    inc de
-    inc hl
+    ld a,(de+)
+    ld (hl+),a
     dec b
     jp NZ,cp
 
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld sp,hl
 
     pop hl                          ; ret

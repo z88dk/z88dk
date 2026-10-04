@@ -28,7 +28,7 @@ Repository: https://github.com/z88dk/z88dk
 *	T *TArray_item(n)			// expand array if needed and return address of item
 *	size_t TArray_size()		// return number of elements
 *	TArray_set_size(n)			// set number of elements, call free_data on dropped ones
-*	TArray_remove_all()			// free each element and colapse array
+*	TArray_remove_all()			// free each element and collapse array
 *	T *TArray_push()			// add empty element to top, return address
 *	T *TArray_top()				// return pointer to top item, NULL if empty
 *	TArray_pop()				// drop top element

@@ -36,8 +36,7 @@ PUBLIC m32__dtoa_emit
     ld a,(bc)
     rla
     jp NC,no_sign
-    ld (hl),'-'
-    inc hl
+    ld (hl+),'-'
 
 .no_sign
     pop af
@@ -64,8 +63,7 @@ PUBLIC m32__dtoa_emit
     inc bc                          ; &iz
     ld a,(bc)
     call put_zeroes
-    ld (hl),'.'
-    inc hl
+    ld (hl+),'.'
     inc de                          ; skip '.'
     inc bc                          ; &fz
     ld a,(bc)
@@ -135,8 +133,7 @@ PUBLIC m32__dtoa_emit
     or a
     ret Z
 .pz_loop
-    ld (hl),'0'
-    inc hl
+    ld (hl+),'0'
     dec a
     jp NZ,pz_loop
     ret

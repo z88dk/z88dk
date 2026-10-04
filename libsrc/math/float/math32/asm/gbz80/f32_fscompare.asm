@@ -65,12 +65,12 @@ PUBLIC m32_compare, m32_compare_callee
     pop bc
     ld e,(hl+)
     ld d,(hl+)
-    push de                     ; LSW
+    push de                             ; LSW
     ld e,(hl+)
     ld d,(hl)
-    pop hl                      ; HL = LSW
-    push de                     ; MSW
-    push hl                     ; LSW on top
+    pop hl                              ; HL = LSW
+    push de                             ; MSW
+    push hl                             ; LSW on top
     push bc
     ret
 
@@ -90,9 +90,9 @@ PUBLIC m32_compare, m32_compare_callee
     jp Z,cp_lz
 
     ld hl,sp+5
-    ld b,(hl)                       ; L.sign|exp
+    ld b,(hl)                           ; L.sign|exp
     ld hl,sp+9
-    ld a,(hl)                       ; R.sign|exp
+    ld a,(hl)                           ; R.sign|exp
     ld c,a
     xor b
     and 080h
@@ -104,12 +104,11 @@ PUBLIC m32_compare, m32_compare_callee
     ; both +: high first L.H - R.H
     ld hl,sp+4
     ld e,(hl+)
-    ld d,(hl)                       ; DE = L.H
+    ld d,(hl)                           ; DE = L.H
     ld hl,sp+8
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp NZ,hi_fin
@@ -120,9 +119,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+6
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp C,lr_neg                         ; C from sbc; high-word path still jp NZ,hi_fin
@@ -136,9 +134,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+4
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp NZ,hi_fin
@@ -149,9 +146,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+2
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp C,lr_neg                         ; C from sbc; high-word path still jp NZ,hi_fin
@@ -180,9 +176,9 @@ PUBLIC m32_compare, m32_compare_callee
     jp Z,cc_lz
 
     ld hl,sp+13
-    ld b,(hl)                       ; R.sign|exp
+    ld b,(hl)                           ; R.sign|exp
     ld hl,sp+5
-    ld a,(hl)                       ; L.sign|exp
+    ld a,(hl)                           ; L.sign|exp
     ld c,a
     xor b
     and 080h
@@ -196,9 +192,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+4
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp NZ,hi_fin
@@ -209,9 +204,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+2
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp C,lr_neg                         ; C from sbc; high-word path still jp NZ,hi_fin
@@ -224,9 +218,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+12
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp NZ,hi_fin
@@ -237,9 +230,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+10
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp C,lr_neg                         ; C from sbc; high-word path still jp NZ,hi_fin
