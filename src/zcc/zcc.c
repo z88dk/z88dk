@@ -211,6 +211,7 @@ static int             copy_file(char *src, char *src_extension, char *dest, cha
 static int             prepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
 static int             copy_defc_file(char *name1, char *ext1, char *name2, char *ext2);
 static void            tempname(char *);
+static int             temp_path(char *, size_t, const char *);
 static void            find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t buflen);
 static void            parse_option(char *option);
 static void            add_zccopt(char *fmt, ...);
@@ -1150,11 +1151,13 @@ int main(int argc, char **argv)
 
         unlink("zcc_opt.def");
 #ifndef WIN32
-        char* ret = NULL;
-
-        while ( ret == NULL ) {
-            snprintf(tempdir, sizeof(tempdir),"/tmp/tmpzccXXXXXXXX");
-            ret = mkdtemp(tempdir);
+        if (temp_path(tempdir, sizeof(tempdir), "tmpzccXXXXXXXX") != 0) {
+            fprintf(stderr, "Temporary directory path is too long\n");
+            exit(1);
+        }
+        if (mkdtemp(tempdir) == NULL) {
+            fprintf(stderr, "Failed to create temporary directory <%s>\n", tempdir);
+            exit(1);
         }
 #else
         int ret = -1;
@@ -4041,7 +4044,10 @@ void tempname(char *filen)
                                         * files. */
         *ptr = 0;    /* Don't want to risk too long filenames */
 #else
-    strcpy(filen, "/tmp/tmpXXXXXXXX");
+    if (temp_path(filen, FILENAME_MAX + 1, "tmpXXXXXXXX") != 0) {
+        fprintf(stderr, "Temporary filename path is too long\n");
+        exit(1);
+    }
 
     /* Prevent linker warning: the use of mktemp is dangerous */
     /* mktemp(filen);                                         */
@@ -4050,6 +4056,20 @@ void tempname(char *filen)
         exit(1);
     }
 #endif
+}
+
+static int temp_path(char *path, size_t size, const char *name)
+{
+    const char *dir = getenv("TMPDIR");
+    size_t len;
+    int written;
+
+    if (dir == NULL || *dir == '\0')
+        dir = "/tmp";
+    len = strlen(dir);
+    written = snprintf(path, size, "%s%s%s", dir,
+                       len > 0 && dir[len - 1] != '/' ? "/" : "", name);
+    return written < 0 || (size_t)written >= size;
 }
 
 /*
