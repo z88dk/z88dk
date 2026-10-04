@@ -976,8 +976,18 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
                libsrc tanf16, `sinf16(x)/cosf16(x)`: l_f16_div takes args[0]
                stacked and args[1] in HL, and the cosf16 result IS args[1],
                sitting in HL when args[0] is loaded. Scan to n_args, not to
-               n_stacked — the endangered operand is usually the register one. */
-            if (L.rs.hl >= 0 && L.rs.hl != v && L.rs.de < 0
+               n_stacked — the endangered operand is usually the register one.
+               DE may still name a value that is dead here or recoverable
+               (the address an 8085 `ld hl,(de)` left behind). Take DE anyway:
+               the operand's own slot store may have been elided because an
+               earlier render served it from this stash. */
+            const BitSet *de_live = cur_bb ? ir_op_live_in(cur_bb, cur_op_idx) : NULL;
+            int de_free = L.rs.de < 0
+                || (!(g_hc.home_is_word && L.rs.de == g_hc.func_whome)
+                    && L.rs.de != L.cur_de_byte_home_vreg
+                    && ((de_live && !ir_bitset_get(de_live, L.rs.de))
+                        || hlde_belief_droppable(L.rs.de)));
+            if (L.rs.hl >= 0 && L.rs.hl != v && de_free
                 && L.rs.hl < f->n_vregs && f->vregs[L.rs.hl].width == 2) {
                 for (int j = i + 1; j < hi->n_args; j++)
                     if (hi->args[j] == L.rs.hl) {

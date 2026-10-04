@@ -593,8 +593,9 @@
 	ld	e,a
 	ld	hl,%1
 
-%title #G2 IR gbz80 drop dead ex de,hl (both DE,HL reloaded: ld de;ld hl)
+%title #G2 IR gbz80 drop dead ex de,hl (both DE,HL reloaded: ld de;ld hl). %not hl: `ld de,hl` copies the swapped HL
 %cpu gbz80
+%not %1 hl
 	ex	de,hl
 	ld	de,%1
 	ld	hl,%2
@@ -602,8 +603,9 @@
 	ld	de,%1
 	ld	hl,%2
 
-%title #G3 IR gbz80 drop dead ex de,hl (both reloaded: ld hl;ld de)
+%title #G3 IR gbz80 drop dead ex de,hl (both reloaded: ld hl;ld de). %not de: `ld hl,de` copies the swapped DE
 %cpu gbz80
+%not %2 de
 	ex	de,hl
 	ld	hl,%2
 	ld	de,%1
@@ -677,8 +679,8 @@
 =
 	ld	a,l
 
-%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (de first). %not (hl): ez80's ld de,(hl)/ld hl,(hl) READ the reg, so there the ex is a live deref
-%not %1 (hl)
+%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (de first). %not (hl): ez80's ld de,(hl)/ld hl,(hl) READ the reg, so there the ex is a live deref. %not hl / hl+N: `ld de,hl` copies the swapped HL
+%not %1 (hl) hl "hl[+][0-9]+"
 %not %2 (hl)
 	ex	de,hl
 	ld	de,%1
@@ -690,7 +692,7 @@
 %title #IR drop dead ex de,hl when both DE and HL are immediately reloaded. %not (hl): ez80's ld de,(hl)/ld hl,(hl) READ the reg, so there the ex is a live deref. %not %2 (de): 8085 LHLX `ld hl,(de)` reads DE, and here it runs BEFORE `ld de,%1` overwrites it — so the ex is the live thing that put the address there (the de-first variant above is safe, its ld de,%1 lands first)
 %not %1 (hl)
 %not %2 (hl)
-%not %2 (de)
+%not %2 (de) de
 	ex	de,hl
 	ld	hl,%2
 	ld	de,%1
