@@ -401,7 +401,18 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                        pre ? 0 : pushed_bytes + sp_adj_extra);
         /* Rabbit 4000+: `call (hl)` (ed ea) replaces the l_jphl thunk. */
         if (IS_RABBIT4K()) emit(out, "call\t(hl)");
-        else               emit(out, "call\tl_jphl");
+        else {
+            /* [de-call] as for a direct call below: the target reads DE only
+               under __sdcccall(1), a 4-byte fastcall argument or a DE
+               preserve. */
+            int de_arg = sc1;
+            if (is_fastcall && ci->n_args > 0
+                && f->vregs[ci->args[ci->n_args - 1]].width == 4)
+                de_arg = 1;
+            if (ci->preserved & IR_R_DE) de_arg = 1;
+            decall_note("l_jphl", !de_arg);
+            emit(out, "call\tl_jphl");
+        }
     } else if ((ci->flags & SHORTCALL) && !(ci->flags & SHORTCALL_HL)) {
         /* __z88dk_shortcall: dispatch via the rst vector, with the value
            as an inline operand (defb if it fits a byte, else defw) that

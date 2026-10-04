@@ -1627,13 +1627,38 @@ static void decall_note(const char *sym, int clean)
     xf_decall_n++;
 }
 
+/* 0: not an unconditional `call name`; 2: a call to l_case / l_setjmp;
+   1: any other plain call. */
+static int xline_plain_call(const char *line)
+{
+    const char *p = line;
+    if (*p != ' ' && *p != '\t') return 0;
+    while (*p == ' ' || *p == '\t') p++;
+    if (strncmp(p, "call", 4) || (p[4] != '\t' && p[4] != ' ')) return 0;
+    p += 4;
+    while (*p == ' ' || *p == '\t') p++;
+    if (!((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || *p == '_'))
+        return 0;
+    if (strchr(p, ',') || strchr(p, '(')) return 0;
+    size_t k = strcspn(p, " \t\r\n;");
+    if ((k == 6 && !strncmp(p, "l_case", 6)) || (k == 8 && !strncmp(p, "l_setjmp", 8)))
+        return 2;
+    return 1;
+}
+
 /* The rendered-text question: is THIS line a direct call whose target the
    emitter proved DE-clean? Shares xline_c_call's `_sym` discriminator, so an
    asm-linkage or double-underscored target is never even looked up. */
 static int xline_call_de_clean(const char *line)
 {
     if (xf_decall_full || opt_disabled("de-call")) return 0;
-    if (!xline_c_call(line)) return 0;
+    if (!xline_c_call(line)) {
+        /* [de-call-asm] An asm-linkage target: the emitter's record answers
+           for it too, and two runtime helpers are clean by audit — l_case
+           and l_setjmp write DE before reading it. */
+        if (opt_disabled("de-call-asm") || !xline_plain_call(line)) return 0;
+        if (xline_plain_call(line) == 2) return 1;
+    }
     const char *p = line;
     while (*p == ' ' || *p == '\t') p++;
     p += 4;                                     /* past "call" */
