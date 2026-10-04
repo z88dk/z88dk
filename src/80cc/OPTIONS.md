@@ -120,6 +120,7 @@ exists (ADR 0010).
 | `idx2-revisit` | a param that yielded the index register to a counter is never reconsidered |
 | `idx2-reuse` | the idx2 slot is a single whole-function owner instead of reusing it across non-overlapping live ranges |
 | `idx2-call-ez80` | on ez80 in sp mode a value is not given an index home across calls |
+| `ez80-hl-ihl` | on ez80 a word read through HL is the byte pair through A, not `ld hl,(hl)` |
 | `idx-deref` | an index-homed pointer is not dereferenced in place, and its cost term goes with it (ADR 0026) |
 | `idxhalf` | no byte homes in IX/IY halves (sp mode, z80/z80n/ez80) |
 | `iy-temp-pack` | no IY packing for a short-lived temporary |

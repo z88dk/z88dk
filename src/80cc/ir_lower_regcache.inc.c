@@ -383,6 +383,19 @@ static void emit_idx_word_to_reg(FILE *out, const Func *f, int vreg_id,
     }
 }
 
+/* HL = the word at (HL). ez80 has it native (`ld hl,(hl)`, 2 B, 4 cycles);
+   elsewhere it is the byte pair through A. `--opt-disable=ez80-hl-ihl`. */
+static void emit_word_via_hl(FILE *out)
+{
+    if (IS_EZ80() && !opt_disabled("ez80-hl-ihl")) {
+        emit(out, "ld\thl,(hl)");
+        return;
+    }
+    emit(out, "ld\ta,(hl+)");
+    emit(out, "ld\th,(hl)");
+    emit(out, "ld\tl,a");
+}
+
 /* Write HL into an index-register home (idx2/idx3). rabbit has `ld <idx>,hl`
    (4 cyc single op) vs its dear push/pop (~19); every other CPU — including ez80,
    which has no `lea` reverse — uses `push hl; pop <idx>`. Mirror of
@@ -687,9 +700,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         emit(out, "ld\thl,%d", off);
         emit(out, "add\thl,sp");
     }
-    emit(out, "ld\ta,(hl+)");
-    emit(out, "ld\th,(hl)");
-    emit(out, "ld\tl,a");
+    emit_word_via_hl(out);
     hl_about_to_change(vreg_id);
 }
 
@@ -2437,9 +2448,7 @@ static void load_sp_off_to_hl(FILE *out, int sp_off)
 {
     emit(out, "ld\thl,%d", sp_off);
     emit(out, "add\thl,sp");
-    emit(out, "ld\ta,(hl+)");
-    emit(out, "ld\th,(hl)");
-    emit(out, "ld\tl,a");
+    emit_word_via_hl(out);
 }
 
 /* ----- Op dispatch ------------------------------------------------------ */
