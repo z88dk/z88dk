@@ -36,9 +36,8 @@ PUBLIC asm_f16_poly
     ld de,hl                    ; DE = x
     ld hl,sp+2                  ; &n
     ld a,(hl)
-    ld (hl),e
+    ld (hl+),e
     ld e,a
-    inc hl
     ld a,(hl)
     ld (hl),d
     ld h,a
@@ -130,8 +129,7 @@ PUBLIC asm_f16_poly
 ; Finite f24 mul: DEHL = res, stack [ret][x.hl][x.de]...
 ; Poly x is a reduced argument; skip Inf/NaN. 16×16 core.
 .poly_mulx
-    ld b,d                      ; B = res.exp
-    ld c,e                      ; C = res.sign
+    ld bc,de                    ; B = res.exp ; C = res.sign
     push hl                     ; res.mant  [rm][ret][x.hl][x.de]
     ld hl,sp+6
     ld a,(hl+)                  ; x.sign

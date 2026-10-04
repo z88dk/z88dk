@@ -33,9 +33,8 @@ PUBLIC m32__dtoa_special
     ld de,inf_s
 
 .string
-    ld a,(de)
+    ld a,(de+)
     ld (hl+),a                      ; *p++
-    inc de
     or a
     jp NZ,string
     dec hl
@@ -43,10 +42,8 @@ PUBLIC m32__dtoa_special
     ret
 
 .zero
-    ld (hl),'0'
-    inc hl
-    ld (hl),'.'
-    inc hl
+    ld (hl+),'0'
+    ld (hl+),'.'
     or a                            ; NC
     ret
 

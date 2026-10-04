@@ -35,9 +35,8 @@ PUBLIC _m32_frexpf
     ld de,hl                        ; DE = ret
     ld hl,sp+2                      ; &x.DE
     ld a,(hl)
-    ld (hl),e
+    ld (hl+),e
     ld e,a
-    inc hl
     ld a,(hl)
     ld (hl),d
     ld h,a
@@ -58,7 +57,7 @@ PUBLIC _m32_frexpf
     ld hl,sp+4
     ld a,(hl+)
     ld h,(hl)
-    ld l,a                      ; HL = x.DE
+    ld l,a                          ; HL = x.DE
 
     add hl,hl                       ; exp → H, mant bits → L, sign → C
     ld a,h
@@ -68,13 +67,13 @@ PUBLIC _m32_frexpf
     sub h                           ; A = unbiased frexp exponent
 
 .frexp_zero
-    push hl                        ; DE = work
+    push hl                         ; DE = work
     ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld hl,sp+6                      ; ptr slot
     ld c,(hl+)
     ld b,(hl)
-    push hl                        ; HL = work again
+    push hl                         ; HL = work again
     ld hl,de                        ; HL↔DE without ex (56c)
     pop de
 

@@ -146,9 +146,8 @@ PUBLIC asm_f24_div_f24
     ld de,sp+2
     ld hl,(de)                  ; rem = X.mant
     ld de,sp+8
-    ld a,(de)
+    ld a,(de+)
     ld c,a
-    inc de
     ld a,(de)
     ld b,a                      ; BC = Y.mant = div
 

@@ -276,10 +276,8 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     add hl,sp
     ld b,6
 .cp
-    ld a,(de)
-    ld (hl),a
-    inc de
-    inc hl
+    ld a,(de+)
+    ld (hl+),a
     dec b
     jp NZ,cp
 

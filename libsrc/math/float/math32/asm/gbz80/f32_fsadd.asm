@@ -168,7 +168,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 ; Pack Y (B,C,LDE) → IEEE DEHL.  Through A only.
 .fa_pack_regs
     ld a,l
-    push hl                        ; HL = mid:lsb
+    push hl                         ; HL = mid:lsb
     ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     add a,a                         ; drop hidden 1
@@ -203,8 +203,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     and 07fh
     inc hl
     inc hl                          ; LSB
-    or (hl)
-    inc hl                          ; mid
+    or (hl+)                        ; mid
     or (hl)
     jp NZ,fa_ret_nan                ; X NaN
     ld hl,sp+5                      ; sign
@@ -227,8 +226,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     and 07fh
     inc hl
     inc hl
-    or (hl)
-    inc hl
+    or (hl+)
     or (hl)
     jp NZ,fa_ret_nan                ; X NaN
     ld hl,sp+5                      ; X.sign
@@ -443,7 +441,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     push hl                         ; LSB:mid
     ld l,c
     ld h,0
-    push hl                        ; DE = MSB word
+    push hl                         ; DE = MSB word
     ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld hl,sp+10                     ; X.MSB at +8 +2
@@ -479,7 +477,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld e,a                          ; E = Y.MSB
     ld a,d
     adc a,e                         ; MSB sum; C = bit24
-    push hl                        ; DE = low sum
+    push hl                         ; DE = low sum
     ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld l,a
@@ -514,7 +512,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld h,a                          ; HL = Y.low − X.low
     ld a,c
     sbc a,b                         ; Y.MSB − X.MSB − borrow
-    push hl                        ; DE = low diff
+    push hl                         ; DE = low diff
     ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld l,a

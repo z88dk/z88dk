@@ -65,8 +65,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     exx                         ; first h' = eeeeeeee, lde' = 1mmmmmmm mmmmmmmm mmmmmmmm
 
-    ld hl,002h                  ; get second operand off of the stack
-    add hl,sp
+    ld hl,sp+002h               ; get second operand off of the stack
     ld e,(hl+)
     ld d,(hl+)
     ld c,(hl+)
@@ -261,4 +260,3 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     rlca                        ; carry = result sign
     jp C,m32_fsconst_ninf
     jp m32_fsconst_pinf
-

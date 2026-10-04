@@ -31,17 +31,14 @@ PUBLIC m32_l0_mulu_32h_24x24
     ; sp+0 ret +2 xHL +4 xDE +6 yHL +8 yDE
 
     ; pass1: x * y.E >> 8
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld a,(hl)                   ; y.E
     or a
     jp Z,p1_zero
     push af
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld c,(hl)                   ; x.L
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ex de,hl
     ld hl,(de)
     ex de,hl                    ; x.DE
@@ -63,17 +60,14 @@ PUBLIC m32_l0_mulu_32h_24x24
     ; +0 accL +2 accH +4 ret +6 xHL +8 xDE +10 yHL +12 yDE
 
     ; pass2: x * y.D + acc >> 8
-    ld hl,13
-    add hl,sp
+    ld hl,sp+13
     ld a,(hl)                   ; y.D
     or a
     jp Z,p2_zero
     push af
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld c,(hl)                   ; x.L
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ex de,hl
     ld hl,(de)
     ex de,hl                    ; x.DE
@@ -104,17 +98,14 @@ PUBLIC m32_l0_mulu_32h_24x24
     push de
 
     ; pass3: x * y.L + acc
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ld a,(hl)                   ; y.L
     or a
     jp Z,p3_zero
     push af
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld c,(hl)                   ; x.L
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ex de,hl
     ld hl,(de)
     ex de,hl                    ; x.DE

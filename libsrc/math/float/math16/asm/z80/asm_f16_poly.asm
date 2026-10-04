@@ -91,23 +91,16 @@ PUBLIC asm_f16_poly
 
     push hl                     ; absolute table index on stack
 
-    ld e,(hl)                   ; collect (float_t)d[n-1]
-    inc hl
-    ld d,(hl)
-    inc hl
-    ld c,(hl)
-    inc hl
-    ld b,(hl)                   ; sdcc_float_t d[n-1] in bcde
-    inc hl
+    ld e,(hl+)                  ; collect (float_t)d[n-1]
+    ld d,(hl+)
+    ld c,(hl+)
+    ld b,(hl+)                  ; sdcc_float_t d[n-1] in bcde
     push bc                     ; sdcc_float_t d[n-1] on stack
     push de
 
-    ld e,(hl)                   ; collect d[n]
-    inc hl
-    ld d,(hl)
-    inc hl
-    ld a,(hl)
-    inc hl
+    ld e,(hl+)                  ; collect d[n]
+    ld d,(hl+)
+    ld a,(hl+)
     ld h,(hl)
     ld l,a
     ex de,hl                    ; sdcc_float_t res = d[n] in dehl
@@ -141,13 +134,10 @@ PUBLIC asm_f16_poly
     push af                     ; x lsw on stack preserved for next iteration
 
     dec hl
-    ld d,(hl)
-    dec hl
-    ld e,(hl)
+    ld d,(hl-)
+    ld e,(hl-)
     push de                     ; push d[--n] msw to stack
-    dec hl
-    ld d,(hl)
-    dec hl
+    ld d,(hl-)
     ld e,(hl)                   ; (float_t) d[--n] lsw
 
     ex (sp),hl                  ; next absolute table index to stack

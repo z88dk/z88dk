@@ -23,11 +23,9 @@ PUBLIC m32_compare, m32_compare_callee
 
 
 .m32_compare
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     call push_float_at
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     call push_float_at
     call cmp_lr_copies
     push af
@@ -83,27 +81,23 @@ PUBLIC m32_compare, m32_compare_callee
 
 ; SP: ret, L.L, L.H, R.L, R.H
 .cmp_lr_copies
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ex de,hl
     ld hl,(de)
     ex de,hl                        ; DE = L.H
     call exp_zero
     jp Z,cp_rz
 
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld hl,(de)
     ex de,hl                        ; DE = L.H
     call exp_zero
     jp Z,cp_lz
 
-    ld hl,5
-    add hl,sp
+    ld hl,sp+5
     ld b,(hl)                       ; L.sign|exp
-    ld hl,9
-    add hl,sp
+    ld hl,sp+9
     ld a,(hl)                       ; R.sign|exp
     ld c,a
     xor b
@@ -114,13 +108,11 @@ PUBLIC m32_compare, m32_compare_callee
     rla
     jp C,cp_neg
     ; both +: L.H vs R.H
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld hl,(de)                      ; HL = L.H
     push hl
-    ld hl,10                        ; R.H at +8 +2
-    add hl,sp
+    ld hl,sp+10                     ; R.H at +8 +2
     ex de,hl
     ld hl,(de)                      ; HL = R.H
     pop de
@@ -131,13 +123,11 @@ PUBLIC m32_compare, m32_compare_callee
     jp lr_pos
 
 .cp_low
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ex de,hl
     ld hl,(de)                      ; L.L
     push hl
-    ld hl,8                         ; R.L at +6 +2
-    add hl,sp
+    ld hl,sp+8                      ; R.L at +6 +2
     ex de,hl
     ld hl,(de)
     pop de
@@ -150,13 +140,11 @@ PUBLIC m32_compare, m32_compare_callee
 
 .cp_neg
     ; both -: R.H vs L.H
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ex de,hl
     ld hl,(de)
     push hl
-    ld hl,6                         ; L.H at +4 +2
-    add hl,sp
+    ld hl,sp+6                      ; L.H at +4 +2
     ex de,hl
     ld hl,(de)
     pop de
@@ -167,13 +155,11 @@ PUBLIC m32_compare, m32_compare_callee
     jp lr_pos
 
 .cp_low_neg
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ex de,hl
     ld hl,(de)                      ; R.L
     push hl
-    ld hl,4                         ; L.L at +2 +2
-    add hl,sp
+    ld hl,sp+4                      ; L.L at +2 +2
     ex de,hl
     ld hl,(de)
     pop de
@@ -193,27 +179,23 @@ PUBLIC m32_compare, m32_compare_callee
 
 ; SP: ret, R.L, R.H, rt, rr, L.L, L.H
 .cmp_lr_callee
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld hl,(de)
     ex de,hl                        ; DE = R.H
     call exp_zero
     jp Z,cc_rz
 
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ex de,hl
     ld hl,(de)
     ex de,hl                        ; DE = L.H
     call exp_zero
     jp Z,cc_lz
 
-    ld hl,13
-    add hl,sp
+    ld hl,sp+13
     ld b,(hl)                       ; R.sign|exp
-    ld hl,5
-    add hl,sp
+    ld hl,sp+5
     ld a,(hl)                       ; L.sign|exp
     ld c,a
     xor b
@@ -225,13 +207,11 @@ PUBLIC m32_compare, m32_compare_callee
     jp C,cc_neg
     ; callee both +: left is L at +10/+12, right is R at +2/+4
     ; original compared L.H (sp+12) - R.H (sp+4)
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ex de,hl
     ld hl,(de)
     push hl
-    ld hl,6                         ; R.H at +4 +2
-    add hl,sp
+    ld hl,sp+6                      ; R.H at +4 +2
     ex de,hl
     ld hl,(de)
     pop de
@@ -242,13 +222,11 @@ PUBLIC m32_compare, m32_compare_callee
     jp lr_pos
 
 .cc_low
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ex de,hl
     ld hl,(de)
     push hl
-    ld hl,4                         ; R.L at +2 +2
-    add hl,sp
+    ld hl,sp+4                      ; R.L at +2 +2
     ex de,hl
     ld hl,(de)
     pop de
@@ -260,13 +238,11 @@ PUBLIC m32_compare, m32_compare_callee
     ret
 
 .cc_neg
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld hl,(de)
     push hl
-    ld hl,14                        ; L.H at +12 +2
-    add hl,sp
+    ld hl,sp+14                     ; L.H at +12 +2
     ex de,hl
     ld hl,(de)
     pop de
@@ -277,13 +253,11 @@ PUBLIC m32_compare, m32_compare_callee
     jp lr_pos
 
 .cc_low_neg
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ex de,hl
     ld hl,(de)
     push hl
-    ld hl,12                        ; L.L at +10 +2
-    add hl,sp
+    ld hl,sp+12                     ; L.L at +10 +2
     ex de,hl
     ld hl,(de)
     pop de
@@ -302,46 +276,40 @@ PUBLIC m32_compare, m32_compare_callee
 
 
 .cp_rz
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld hl,(de)
     ex de,hl
     call exp_zero
     jp Z,lr_eq
-    ld hl,5
-    add hl,sp
+    ld hl,sp+5
     ld a,(hl)
     rla
     jp NC,lr_pos
     jp lr_neg
 
 .cp_lz
-    ld hl,9
-    add hl,sp
+    ld hl,sp+9
     ld a,(hl)
     rla
     jp NC,lr_neg
     jp lr_pos
 
 .cc_rz
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ex de,hl
     ld hl,(de)
     ex de,hl
     call exp_zero
     jp Z,lr_eq
-    ld hl,13
-    add hl,sp
+    ld hl,sp+13
     ld a,(hl)
     rla
     jp NC,lr_pos
     jp lr_neg
 
 .cc_lz
-    ld hl,5
-    add hl,sp
+    ld hl,sp+5
     ld a,(hl)
     rla
     jp NC,lr_neg

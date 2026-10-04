@@ -20,7 +20,6 @@
 
 ../../../math/float/math32/asm/z80/f32_fsadd32.asm
 ../../../math/float/math32/asm/z80/f32_fsdiv.asm
-../../../math/float/math32/asm/z80/f32_fsinv.asm
 ../../../math/float/math32/asm/z80/f32_fsmul.asm
 ../../../math/float/math32/asm/z80/f32_fsmul32.asm
 
@@ -42,6 +41,7 @@
 ../../../math/float/math32/asm/z80/f32_fserror.asm
 
 ../../../math/float/math32/asm/f32_fsconst.asm
+../../../math/float/math32/asm/f32_fsinv.asm
 ../../../math/float/math32/asm/f32_fssigdig.asm
 ../../../math/float/math32/asm/h32_coeff_atanf.asm
 ../../../math/float/math32/asm/h32_coeff_exp10f.asm

@@ -198,18 +198,15 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     ld hl,0
     push de
     push hl
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ex de,hl
     ld hl,(de)
     push hl
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ex de,hl
     ld hl,(de)
     push hl
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     call load_expanded
     push bc
     push de

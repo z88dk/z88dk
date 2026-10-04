@@ -35,8 +35,7 @@ PUBLIC m32__dtoa_digits
     push de
     push hl                         ; CALL+3 pushes: work at SP+8
     ld c,a
-    ld hl,38
-    add hl,sp
+    ld hl,sp+38
     ex de,hl
     ld hl,(de)
     ld (hl+),c                      ; *p++

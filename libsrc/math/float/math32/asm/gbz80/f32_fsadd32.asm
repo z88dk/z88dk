@@ -228,9 +228,8 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld de,hl                        ; DE = ret
     ld hl,sp+2                      ; &high
     ld a,(hl)
-    ld (hl),e
+    ld (hl+),e
     ld e,a
-    inc hl
     ld a,(hl)
     ld (hl),d
     ld h,a
@@ -399,7 +398,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 
 .a32_al_store
     ld bc,de                        ; park small.de
-    push hl                        ; DE = small.hl
+    push hl                         ; DE = small.hl
     ld hl,de                        ; HL↔DE without ex (56c)
     pop de
     ld hl,sp+10

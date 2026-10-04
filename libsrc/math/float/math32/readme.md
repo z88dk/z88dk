@@ -246,7 +246,7 @@ Rabbit (r2ka) and KC160 also expose `m32_sqr_32h_24x24` for the same `_fssqr` en
 
 #### Wide multiply for Newton–Raphson
 
-`mulu_32h_32x32` returns the high 32 bits of a 32×32 product for Newton–Raphson work that still needs a wide residual (notably `_fsinv`). General divide (`_fsdiv`) is restoring binary division and does not use this helper.
+`mulu_32h_32x32` returns the high 32 bits of a 32×32 product for Newton–Raphson work that still needs a wide residual (`invsqrt`, and `asm/<cpu>/hist/f32_fsinv.asm`). General divide (`_fsdiv`) and public `inv` are restoring binary division and do not use this helper.
 
 On Z80, `mulu_32h_32x32` uses four optimised `32_16×16` multiplies. On z180 / z80n the implementation truncates low-order carry work for speed: calculation starts at the 3rd byte of 8, and 11 `16_8×8` multiplies are required. Returning only bytes 4–7 leaves at most a small error in the least significant nibble of the 32-bit mantissa, which is discarded after rounding to 24-bit precision.
 
@@ -260,11 +260,11 @@ float inv (float x);
 | Op | Algorithm |
 |----|-----------|
 | `div` / `m32_fsdiv` | Restoring 24-bit mantissa divide, RNE on the guard |
-| `inv` / `m32_fsinv` | Newton–Raphson with wide multiplies |
+| `inv` / `m32_fsinv_fastcall` | Restoring `1/x` through `m32_fsdiv_callee` (`asm/f32_fsinv.asm`). The Newton–Raphson source is unchanged in `asm/<cpu>/hist/f32_fsinv.asm`. That directory is not assembled |
 
 The z80-family, 8085, 8080, vm1, and gbz80 divide cores share the same control structure. The z80 core keeps rem and divisor across the main and alternate sets. The 8080 / 8085 / vm1 / gbz80 cores keep rem in `DEHL`, the bit count in `B`, and the 3-byte divisor on a short stack frame.
 
-For plain `1/n`, restoring `div` is the faster path on the measured CPUs. Explicit `inv(x)` calls the NR inverse. sccz80 does not rewrite IEEE `1.0f/x` into `inv`.
+`inv(x)` is restoring `1/x`. The bridge in `asm/f32_fsinv.asm` calls `m32_fsdiv_callee`. sccz80 leaves a runtime `1.0f/x` as ordinary divide, so `inv(x)` and that divide return the same bits.
 
 Inputs with `exp == 0` are ±0. Result underflow flushes to signed zero. There is no gradual underflow from normalised representations.
 
