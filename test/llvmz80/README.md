@@ -2,7 +2,8 @@
 
 The `llvmz80` compiler selects `z80-unknown-none-z88dk` and sdcccall(0).
 Set `LLVMZ80EXE` to the clang executable.
-The compiler must support `-fdefault-calling-conv=sdcccall0`.
+Clang's z88dk target now defaults to sdcccall(0) even without this flag.
+The driver relies on that target ABI and does not inject a convention flag.
 User `-Cg` options follow the default options.
 The driver preprocesses in gnu23 mode.
 Changing only `-Cg-std` can make header selection differ from compilation.

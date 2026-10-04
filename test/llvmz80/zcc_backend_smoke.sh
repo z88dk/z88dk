@@ -52,61 +52,25 @@ case "$COMPILE_LINE" in
 esac
 
 case "$COMPILE_LINE" in
-    *-fdefault-calling-conv=sdcccall0*) ;;
-    *)
-        echo "FAIL: llvmz80 does not default to sdcccall(0)"
+    *-fdefault-calling-conv=*)
+        echo "FAIL: zcc must use the target ABI without a convention flag"
         exit 1
         ;;
 esac
 
-if ! "$ZCC" +cpm -compiler=llvmz80 -v -c "$WORK/main.c" \
-        -Cg-fdefault-calling-conv=sdcccall1 -o "$WORK/override.o" \
-        >"$WORK/override.log" 2>&1; then
-    cat "$WORK/override.log"
-    echo "FAIL: explicit sdcccall(1) override failed"
+if ! "$ZCC" +cpm -compiler=llvmz80 -a -Cg-emit-llvm \
+        "$WORK/main.c" -o "$WORK/default.asm" >"$WORK/default.log" 2>&1; then
+    cat "$WORK/default.log"
+    echo "FAIL: cannot inspect target function ABI"
     exit 1
 fi
-
-[ -f "$WORK/override.o" ] || {
-    echo "FAIL: override did not produce an object file"
-    exit 1
-}
-
-OVERRIDE_LINE=$(grep -F -- '-S ' "$WORK/override.log" | grep -F "$LLVMZ80EXE" | head -1 || true)
-case "$OVERRIDE_LINE" in
-    *-fdefault-calling-conv=sdcccall0*-fdefault-calling-conv=sdcccall1*) ;;
+DEFINITION=$(grep 'define .*@sum(' "$WORK/default.asm" || true)
+case "$DEFINITION" in
+    *z80_sdcccall0*) ;;
     *)
-        cat "$WORK/override.log"
-        echo "FAIL: user calling convention must follow the default"
+        echo "FAIL: target function does not use sdcccall(0): $DEFINITION"
         exit 1
         ;;
 esac
-
-for convention in default sdcccall1; do
-    set --
-    if [ "$convention" = sdcccall1 ]; then
-        set -- -Cg-fdefault-calling-conv=sdcccall1
-    fi
-    if ! "$ZCC" +cpm -compiler=llvmz80 -a -Cg-emit-llvm "$@" \
-            "$WORK/main.c" -o "$WORK/$convention.asm" \
-            >"$WORK/$convention.log" 2>&1; then
-        cat "$WORK/$convention.log"
-        echo "FAIL: cannot inspect $convention function ABI"
-        exit 1
-    fi
-    DEFINITION=$(grep 'define .*@sum(' "$WORK/$convention.asm" || true)
-    case "$convention:$DEFINITION" in
-        default:*z80_sdcccall0*) ;;
-        sdcccall1:*z80_sdcccall0*|*:)
-            echo "FAIL: unexpected $convention function ABI: $DEFINITION"
-            exit 1
-            ;;
-        sdcccall1:*) ;;
-        *)
-            echo "FAIL: default function does not use sdcccall(0): $DEFINITION"
-            exit 1
-            ;;
-    esac
-done
 
 echo "PASS: zcc compiles llvmz80 C with the native z88dk target triple"

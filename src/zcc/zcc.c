@@ -3715,7 +3715,6 @@ static void configure_compiler(void)
             snprintf(buf, sizeof(buf), "--target=z80-unknown-none-z88dk -S -std=gnu23 -o - -O%d", lvl);
         }
         add_option_to_compiler(buf);
-        add_option_to_compiler("-fdefault-calling-conv=sdcccall0");
         if (c_generate_debug_info)
             add_option_to_compiler("-g");
         if (clangarg)
