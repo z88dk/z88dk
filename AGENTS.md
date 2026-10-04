@@ -143,6 +143,7 @@ Host TIMER / suites: `+test` + `methodology-measure` / `tool-ticks`.
 |-------|------|
 | `style-libsrc-layout` | New or split library files |
 | `style-ste-writing` | Human prose only (not code) |
+| `docs-wiki` | z88dk.wiki pages: human prose, classic/newlib page split, change index |
 | `methodology-measure` | A/B, hotspots, z88dk benches, suites, wiki numbers |
 | `methodology-sdcc-vanilla` | Stock `sdcc` benches (`*/sdcc/`), not zsdcc |
 
