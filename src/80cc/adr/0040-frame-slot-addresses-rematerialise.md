@@ -37,3 +37,12 @@ are actually parked, so the CPU test cost about 93 sites per CPU.
 Asking the real question is both wider *and* safer: it now also protects a
 parked LEA on z80 and every other target, which the CPU test never covered. A
 standing lesson — when a gate names a CPU, check whether it means a property.
+
+## Note, 4/10/2026
+
+The ez80-fp figure above (+4.6 % ticks) was measured while ticks charged ez80's
+`ld rr,(ix+d)` / `ld (ix+d),rr` 1 cycle instead of 5 (fixed in e67c93926d), so
+the slot form it compared against was underpriced. Re-measured over the
+matrix with the fix, lifting the ez80-fp exclusion changes one cell: localbench
+ez80 fp, -4 B and -0.72 % ticks. The exclusion is no longer supported by
+evidence; removing it needs its own opt-out and test.

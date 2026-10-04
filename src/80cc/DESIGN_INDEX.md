@@ -26,6 +26,11 @@ three. Two changes on 4/10 (uncommitted at the time of writing):
   -2385 B, 123 cells, 0 larger. Always keeping it is -1638 B with 47 larger:
   the margin covers what copt does after the estimate.
 
+ticks undercharged ez80 `ld rr,(ix+d)` / `ld (ix+d),rr` (1 cycle, not 5) until
+e67c93926d: any ez80 tick result before that favours frame-slot code. ADR
+0040's ez80-fp `remat-lea` exclusion rests on such a figure; lifted, it is
+-4 B / -0.72% on localbench and nothing elsewhere. Remove it with an opt-out.
+
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,
 10 with a free register, about 48 B. The 183-site sizing from September has
