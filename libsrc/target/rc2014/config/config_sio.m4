@@ -139,7 +139,7 @@ define(`__IO_SIO_RX_SIZE', 0x80)          # Size of the Rx Buffer
 define(`__IO_SIO_RX_FULLISH', 0x`'eval(__IO_SIO_RX_SIZE-24,16))
                                           # Fullness of the Rx Buffer, when NOT_RTS is signalled
 define(`__IO_SIO_RX_EMPTYISH', 0x08)      # Fullness of the Rx Buffer, when RTS is signalled
-define(`__IO_SIO_TX_SIZE', 0x10)          # Size of the Tx Buffer   
+define(`__IO_SIO_TX_SIZE', 0x20)          # Size of the Tx Buffer   
 
 #
 # END OF USER CONFIGURATION
