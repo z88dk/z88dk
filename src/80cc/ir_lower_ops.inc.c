@@ -1183,7 +1183,7 @@ static int switch_chain_ok(const SwitchInfo *sw)
         unsigned x = (unsigned)v[i] & 0xFFFFu;
         unsigned d = (x - cur) & 0xFFFFu;
         chain += (d <= 3) ? (int)d : (d >= 0xFFFDu) ? (int)(0x10000u - d) : 4;
-        chain += 5;                             /* ld a,h; or l; jp z */
+        chain += IS_RABBIT4K() ? 4 : 5;         /* test hl | ld a,h; or l; jp z */
         cur = x;
     }
     return chain <= 8 + 4 * sw->n_cases;
@@ -1331,7 +1331,8 @@ static int gen_switch(FILE *out, Func *f, const Op *op)
     } else if (switch_chain_ok(sw)) {
         /* [switch-chain] Walk HL down through the sorted case values and test
            for zero at each: `dec hl` (step <= 3) or `ld de,-d; add hl,de`, then
-           `ld a,h; or l; jp z,case`. Taken only when no larger than the
+           `ld a,h; or l; jp z,case` (`test hl` on Rabbit 4000+). Taken only
+           when no larger than the
            l_case call + table, so the helper is not linked for small switches. */
         int ord[64];
         int n = sw->n_cases;
@@ -1358,8 +1359,12 @@ static int gen_switch(FILE *out, Func *f, const Op *op)
                 emit(out, "add\thl,de");
             }
             cur = v;
-            emit(out, "ld\ta,h");
-            emit(out, "or\tl");
+            if (IS_RABBIT4K()) {
+                emit(out, "test\thl");    /* 1 byte; 8-bit ops are 2 here */
+            } else {
+                emit(out, "ld\ta,h");
+                emit(out, "or\tl");
+            }
             emit(out, "jp\tz,L_f%d_bb_%d", L.func_emit_idx, sw->target_bb[ord[i]]);
         }
         emit(out, "jp\tL_f%d_bb_%d", L.func_emit_idx, sw->default_bb);
