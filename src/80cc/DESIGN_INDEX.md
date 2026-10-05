@@ -33,8 +33,10 @@ ez80 exclusions resting on it are lifted (`idx2-call-ez80`,
 -155 B / -0.40%, 0 slower except fixedbench fp (+7 B, +1.28%). That loss
 was IVSR suppression against a byte-bounded counter, which lives in a slot:
 ez80 steps a slot pointer natively, so there the pointer is kept
-(`ivsr-ez80-byte`, -41 B, fixedbench -1.0% fp / -1.8% sp, nothing else moves;
-on the Z80 family the same exception loses). ez80 word reads
+(`ivsr-ez80-byte`, -41 B, fixedbench -1.0% fp / -1.8% sp; on the Z80 family
+the same exception loses). Only for a scaled index: at scale 1 (byte arrays) the
+rebuild is a bare add and the counter wins (charmulbench ez80 +87 B sp until
+narrowed; the scans did not include charmulbench). ez80 word reads
 through HL use `ld hl,(hl)` (`ez80-hl-ihl`) and a stack-top read-modify-write
 drops its `push hl`/`pop de` pair (`tos-rmw`, after mulchain-de so it never
 takes a chain reload): together -1797 B over 229 cells, 0 larger, 254 faster,

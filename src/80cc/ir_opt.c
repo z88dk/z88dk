@@ -1585,8 +1585,10 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
                         int byte_iv = K >= 0 && K <= 255
                                    && niv_up_bound_ok(f, h, iv, &maxv) && maxv <= 255;
                         /* ez80 steps a slot pointer natively (`ld hl,(ix+d)`),
-                           so against a slot counter the pointer wins there. */
-                        if (!(byte_iv && IS_EZ80()
+                           so against a slot counter that must also be scaled
+                           the pointer wins there. At scale 1 the rebuild is a
+                           bare add and the counter still wins. */
+                        if (!(byte_iv && scale > 1 && IS_EZ80()
                               && !opt_disabled("ivsr-ez80-byte"))) {
                             if (!byte_iv)
                                 f->vregs[iv].flags |= IR_VREG_IV_RECOMPUTE;
