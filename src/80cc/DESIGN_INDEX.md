@@ -46,6 +46,16 @@ still lose on matrixbench (IY reduction eviction), callbench (the model
 charges every read of a value the lowerer keeps in a register) and
 localbench; those come before the cost change.
 
+localbench against sdcc on z80 (5/10/2026): the gap was `escaped` (frame
+addresses kept in slots in a function with calls: remat-lea is off there and
+lifting it still miscompiles sortbench), `scratch` (dead word stores) and
+`record`. Fixed: `ds-fp-store` (a word stored straight to `(ix+d)` was counted
+as a slot READ, so word dead-store never fired in fp; a dead spill reaching
+that path was then stored below the frame) and `dead-sp-addr` (unused
+`ld hl,N; add hl,sp`). -1561 B over 109 cells, 0 larger, 113 faster, 0
+slower; localbench z80 fp 277.5M -> 265.5M. Next: why remat-lea in a
+function with calls breaks sortbench.
+
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,
 10 with a free register, about 48 B. The 183-site sizing from September has

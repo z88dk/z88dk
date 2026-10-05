@@ -1110,7 +1110,19 @@ static int vreg_is_remat(const Func *f, int vreg)
    binop/LD_IMM pattern `<value in HL>; store_hl; ex de,hl; cache_hl` — on
    dead-dst emit nothing (HL already holds the value). Also fires for
    register-pool vregs: nothing to spill. */
+/* A store: its slot queries count as writes for [dead-store], as store_hl's
+   do (the fp `ld (ix+d),hl` path and its fp_tos_slot check were reads, so no
+   word stored this way was ever dropped). `--opt-disable=ds-fp-store`. */
+static void spill_and_swap_unless_dead_impl(FILE *out, const Func *f, int vreg);
 static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
+{
+    int save = slot_write_ctx;
+    if (!opt_disabled("ds-fp-store")) slot_write_ctx = 1;
+    spill_and_swap_unless_dead_impl(out, f, vreg);
+    slot_write_ctx = save;
+}
+
+static void spill_and_swap_unless_dead_impl(FILE *out, const Func *f, int vreg)
 {
     /* Rematerialisable constant: no slot, no store (value stays in HL). */
     if (vreg_is_remat(f, vreg)) return;
@@ -1179,6 +1191,11 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
            cache_hl(dst) advertises it, reaches readers via the HL carry. */
         return;
     }
+    /* A dead spill has no slot: the direct fp stores below would address
+       below the frame. The value is in HL and they leave no copy in DE, so
+       skipping the store keeps their contract. */
+    if (fp_active(f) && (f->vregs[vreg].flags & IR_VREG_DEAD_SPILL))
+        return;
     /* Word DE-home resident (fp): store HL straight to slot with NO `ex de,hl`
        staging — preserves DE (the running sum) so the spill is DE-clean and
        the home stays resident across the body. sp-mode needs HL for the slot

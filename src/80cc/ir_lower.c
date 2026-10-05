@@ -3715,6 +3715,54 @@ static void fold_hl_const_reuse(char **lines, char *drop, int n)
     }
 }
 
+/* Carry is overwritten before anything can read it, on the straight line
+   after `start`. Conservative: a label, branch or call answers no. */
+static int carry_dead_after(char **lines, const char *drop, int n, int start)
+{
+    for (int j = start; j < n && j < start + 16; j++) {
+        if (drop[j] || !strncmp(lines[j], "\tC_LINE", 7)) continue;
+        const char *l = lines[j];
+        if (l[0] != '\t') return 0;
+        char m[16]; const char *o;
+        if (!gw_split(l, m, sizeof m, &o)) return 0;
+        if (!strcmp(m, "ld") || !strcmp(m, "ex") || !strcmp(m, "inc")
+            || !strcmp(m, "dec") || !strcmp(m, "push") || !strcmp(m, "pop")) {
+            if (!strcmp(m, "push") && strstr(l, "af")) return 0;   /* reads F */
+            if (!strcmp(m, "pop") && strstr(l, "af")) return 1;    /* writes F */
+            continue;
+        }
+        if (!strcmp(m, "and") || !strcmp(m, "or") || !strcmp(m, "xor")
+            || !strcmp(m, "cp") || !strcmp(m, "sub") || !strcmp(m, "scf")
+            || !strcmp(m, "neg") || !strcmp(m, "sla") || !strcmp(m, "sra")
+            || !strcmp(m, "srl") || !strcmp(m, "rlca") || !strcmp(m, "rrca"))
+            return 1;
+        if (!strcmp(m, "add") && !strncmp(o, "a,", 2)) return 1;
+        if (!strcmp(m, "add") && !strncmp(o, "hl,", 3)) return 1;
+        return 0;
+    }
+    return 0;
+}
+
+/* [dead-sp-addr] `ld hl,N; add hl,sp` whose result is never read (an address
+   formed for a load that was then folded to `(ix+d)`): drop the pair when HL
+   and carry are both dead after it. */
+static void fold_dead_sp_addr(char **lines, char *drop, int n)
+{
+    if (opt_disabled("dead-sp-addr")) return;
+    for (int i = 0; i + 1 < n; i++) {
+        if (drop[i]) continue;
+        long v; char c1[4];
+        if (sscanf(lines[i], "\tld\thl,%ld%1[\n]", &v, c1) != 2) continue;
+        int k = i + 1;
+        while (k < n && (drop[k] || !strncmp(lines[k], "\tC_LINE", 7))) k++;
+        if (k >= n || strcmp(lines[k], "\tadd\thl,sp\n")) continue;
+        if (!gbwm_dead_after3(lines, n, drop, k + 1, 0, 1, 0)) continue;
+        if (!carry_dead_after(lines, drop, n, k + 1)) continue;
+        drop[i] = 1;
+        drop[k] = 1;
+    }
+}
+
 /* [tos-rmw] A read-modify-write of the stack-top slot:
      pop hl / push hl / <body> / pop de / push hl  ->  pop hl / <body> / push hl
    The read's push and the write's pop cancel when the body is straight-line
@@ -3790,6 +3838,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            Bounded forward scan, self-contained (no liveness state needed
            from the backward sweep below), so it runs as a pre-pass here. */
         fold_dead_de_reload(lines, drop, n);
+        fold_dead_sp_addr(lines, drop, n);
         fold_const_xorflip(lines, drop, n);
         fold_xorflip_chain(lines, drop, n);
         int b_live = 0, c_live = 0, d_live = 0, e_live = 0;

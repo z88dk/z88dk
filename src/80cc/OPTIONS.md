@@ -95,6 +95,7 @@ exists (ADR 0010).
 | `dsub-bc` | An 8085 signed compare with one operand already in BC copies the RHS into BC (push/pop if BC is live) instead of subtracting BC where it is |
 | `hl-const-reuse` | a constant loaded into HL while HL holds a known constant is reloaded in full, instead of being dropped, stepped (`inc hl`/`dec hl`) or loaded one byte |
 | `tos-rmw` | a stack-top slot read and write keep their `push hl` / `pop de` pair around a body that cannot see the stack |
+| `dead-sp-addr` | an `ld hl,N; add hl,sp` whose HL and carry are both dead is kept |
 | `hl-mem-carry` | a global word loaded for a branch test is reloaded in the block the branch reaches, instead of being taken from HL |
 | `addr-fold` | `ex de,hl; ld hl,_sym; add hl,de` stays as is instead of becoming `ld de,_sym; add hl,de` where DE is dead after the add (not on VM1 or Rabbit) |
 | `gb-store-a` | gbz80 HL-to-slot word stores go through DE (`ld de,hl; …; ld (hl),e; inc hl; ld (hl),d`) instead of A (`ld a,l; ld d,h; …; ld (hl+),a; ld (hl),d`) where A and E are dead |
@@ -172,6 +173,7 @@ exists (ADR 0010).
 | `declean` | a DE home is not proven clean across a bitop |
 | `dead-store` | a byte spill written but never read is still stored |
 | `dead-store-word` | the same for a word spill |
+| `ds-fp-store` | a word stored straight to an `(ix+d)` slot by a producer is counted as a slot read, so dead-store never drops it |
 | `dead-store-share` | dead-store analysis ignores slot sharing |
 | `dead-regcopy` | keep a register copy the final peephole would delete |
 | `regcopy-flow` | keep a GBZ80 HL restore before a local jump whose target immediately reloads HL |

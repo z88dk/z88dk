@@ -2724,6 +2724,38 @@ blayout_tosrmw_8080_keep.bin: $(SOURCES) blayout.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -Cc--opt-disable=tos-rmw --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+# ds-fp-store (dead word stores to (ix+d) dropped, never below the frame) and
+# dead-sp-addr (unused `ld hl,N; add hl,sp`); _keep opts out of both.
+all: dsfp.bin dsfp_fp.bin dsfp_8080.bin dsfp_gbz80.bin dsfp_ez80_fp.bin dsfp_z180_fp.bin dsfp_fp_keep.bin
+
+dsfp.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsfp_fp.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsfp_8080.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsfp_gbz80.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsfp_ez80_fp.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsfp_z180_fp.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsfp_fp_keep.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=ds-fp-store,dead-sp-addr --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 # yield-total (byteshr on ez80), deref-width (derefw), de-keep-hl (idxderef
 # on ez80 fp); _keep variants opt out.
 all: byteshr_ez80.bin byteshr_ez80_yt_keep.bin derefw_z180_fp.bin derefw_dw_keep.bin idxderef_ez80_fp_dkh_keep.bin
