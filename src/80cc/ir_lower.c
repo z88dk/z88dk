@@ -3216,6 +3216,8 @@ static void fold_mulchain_de(char **lines, char *drop, int n)
 }
 
 static void fold_tos_rmw(char **lines, char *drop, int n);
+static void fold_slot_bitop_de(char **lines, char *drop, int n);
+static void fold_mask_shl_a(char **lines, char *drop, int n);
 
 void ir_lower_fold_mulchain_de(FILE *out, FILE *src)
 {
@@ -3805,6 +3807,197 @@ static void fold_dead_sp_addr(char **lines, char *drop, int n)
     }
 }
 
+/* S, P/V and H are overwritten before anything can read them, on the straight
+   line after `start` (the flags `add a,a` and `add hl,hl` disagree on). Only a
+   full S/Z/P/V/H writer kills them; a label, branch, call, `push af`, `daa` or
+   anything unrecognised answers no. */
+static int szph_dead_after(char **lines, const char *drop, int n, int start)
+{
+    for (int j = start; j < n && j < start + 16; j++) {
+        if (drop[j] || !strncmp(lines[j], "\tC_LINE", 7)) continue;
+        const char *l = lines[j];
+        if (l[0] != '\t') return 0;
+        char m[16]; const char *o;
+        if (!gw_split(l, m, sizeof m, &o)) return 0;
+        if (!strcmp(m, "and") || !strcmp(m, "or") || !strcmp(m, "xor")
+            || !strcmp(m, "cp") || !strcmp(m, "sub") || !strcmp(m, "neg"))
+            return 1;
+        if ((!strcmp(m, "add") || !strcmp(m, "adc") || !strcmp(m, "sbc"))
+            && !strncmp(o, "a,", 2))
+            return 1;
+        if ((!strcmp(m, "inc") || !strcmp(m, "dec"))
+            && strncmp(o, "hl", 2) && strncmp(o, "de", 2) && strncmp(o, "bc", 2)
+            && strncmp(o, "sp", 2) && strncmp(o, "ix", 2) && strncmp(o, "iy", 2))
+            return 1;
+        if (!strcmp(m, "ld") || !strcmp(m, "ex") || !strcmp(m, "inc")
+            || !strcmp(m, "dec") || (!strcmp(m, "add") && !strncmp(o, "hl,", 3))) {
+            if (!strcmp(m, "ld") && (strstr(l, "a,i\n") || strstr(l, "a,r\n")))
+                return 0;                                   /* sets P/V */
+            continue;
+        }
+        if ((!strcmp(m, "push") || !strcmp(m, "pop")) && !strstr(l, "af"))
+            continue;
+        /* read neither S nor P/V; carry (which they may read) is 0 either way */
+        if (!strcmp(m, "rlca") || !strcmp(m, "rrca") || !strcmp(m, "rla")
+            || !strcmp(m, "rra") || !strcmp(m, "scf") || !strcmp(m, "ccf")
+            || !strcmp(m, "cpl"))
+            continue;
+        if (!strcmp(m, "pop") && strstr(l, "af")) return 1;
+        /* A C function (or the fnptr trampoline into one) never reads the
+           caller's flags; an asm helper might, so it answers live. */
+        if (!strcmp(m, "call") && !strchr(o, ',')
+            && (o[0] == '_' || !strncmp(o, "l_jphl\n", 7)
+                || !strncmp(o, "l_jpix\n", 7) || !strncmp(o, "l_jpiy\n", 7)))
+            return 1;
+        return 0;
+    }
+    return 0;
+}
+
+/* Non-zero if D (want_d) or E (want_e) may be read on some path from line
+   `start`, tracking the halves separately: `ld e,a; ld (ix+d),e` rewrites E
+   and reads only the new E, while D stays dead. Branches are followed; `ex
+   de,hl`, an `ASMPC` skip and anything instr_effects cannot place answer live.
+   `seen` memoises (line, state). */
+static int de_half_live_walk(char **lines, int n, const char *drop, int start,
+                             int want_d, int want_e, unsigned char *seen, int depth)
+{
+    if (depth > 32) return 1;
+    for (int j = start; j < n; j++) {
+        int st = (want_d ? 1 : 0) | (want_e ? 2 : 0);
+        if (!st) return 0;
+        if (drop[j]) continue;
+        if (seen[j] & (1u << st)) return 0;
+        seen[j] |= (unsigned char)(1u << st);
+        if (lines[j][0] != '\t') continue;              /* label: falls through */
+        char m[16]; const char *o;
+        if (!gw_split(lines[j], m, sizeof m, &o)) continue;
+        if (!strcmp(m, "C_LINE")) continue;
+        if (!strcmp(m, "ex")) return 1;
+        char tgt[64];
+        if (xline_branch_target(lines[j], tgt, sizeof tgt)) {
+            if (!strncmp(tgt, "ASMPC+", 6)) return 1;
+            int t = de_label_line(lines, n, tgt);
+            if (t < 0) return 1;
+            if (de_half_live_walk(lines, n, drop, t, want_d, want_e, seen, depth + 1))
+                return 1;
+            if (!strchr(lines[j], ',') && strncmp(lines[j] + 1, "djnz", 4))
+                return 0;
+            continue;
+        }
+        InstrEffects e = instr_effects(lines[j]);
+        if (e.unknown || e.is_call || e.is_boundary) return 1;
+        if ((want_d && e.d_read) || (want_e && e.e_read)) return 1;
+        if (want_d && e.d_write) want_d = 0;
+        if (want_e && e.e_write) want_e = 0;
+    }
+    return 1;
+}
+
+static int de_halves_dead_after(char **lines, int n, const char *drop, int start)
+{
+    unsigned char *seen = calloc((size_t)(n > 0 ? n : 1), 1);
+    if (!seen) return 0;
+    int live = de_half_live_walk(lines, n, drop, start, 1, 1, seen, 0);
+    free(seen);
+    return !live;
+}
+
+/* [slot-bitop-de] A 16-bit and/or/xor of two (ix+d) word slots, staged as
+     ld de,(ix+p); ld hl,(ix+q); ld a,l; OP e; ld l,a; ld a,h; OP d; ld h,a
+   becomes byte-direct `ld a,(ix+q); OP (ix+p); ld l,a; ld a,(ix+q+1);
+   OP (ix+p+1); ld h,a` when DE is dead after it (the replacement never loads
+   DE). Was copt #285r, which could not see whether DE is read next. */
+static int sbd_on(void)
+{
+    static int on = -1;
+    if (on < 0)
+        on = !opt_disabled("slot-bitop-de") && !IS_EZ80() && !IS_GBZ80()
+          && !IS_KC160() && !(IS_RABBIT() && !IS_RABBIT4K()) && !IS_808x()
+          && !IS_KR580VM1();
+    return on;
+}
+
+static void set_line(char **lines, int i, const char *fmt, ...)
+{
+    char buf[96];
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof buf, fmt, ap);
+    va_end(ap);
+    char *d = strdup(buf);
+    if (!d) return;
+    free(lines[i]);
+    lines[i] = d;
+}
+
+static void fold_slot_bitop_de(char **lines, char *drop, int n)
+{
+    if (!sbd_on()) return;
+    for (int i = 0; i + 7 < n; i++) {
+        int k[8], c = 0, j = i;
+        while (c < 8 && j < n) {
+            if (drop[j] || !strncmp(lines[j], "\tC_LINE", 7)) { j++; continue; }
+            if (lines[j][0] != '\t') break;
+            k[c++] = j++;
+        }
+        if (c < 8) continue;
+        int p, q; char c1[4], c2[4], op[4], op2[4];
+        if (sscanf(lines[k[0]], "\tld\tde,(ix%d)%1[\n]", &p, c1) != 2) continue;
+        if (sscanf(lines[k[1]], "\tld\thl,(ix%d)%1[\n]", &q, c2) != 2) continue;
+        if (strcmp(lines[k[2]], "\tld\ta,l\n") || strcmp(lines[k[4]], "\tld\tl,a\n")
+            || strcmp(lines[k[5]], "\tld\ta,h\n") || strcmp(lines[k[7]], "\tld\th,a\n"))
+            continue;
+        if (sscanf(lines[k[3]], "\t%3[a-z]\te%1[\n]", op, c1) != 2
+            || sscanf(lines[k[6]], "\t%3[a-z]\td%1[\n]", op2, c2) != 2
+            || strcmp(op, op2)
+            || (strcmp(op, "and") && strcmp(op, "or") && strcmp(op, "xor")))
+            continue;
+        if (p < -128 || p > 126 || q < -128 || q > 126) continue;
+        if (!de_halves_dead_after(lines, n, drop, k[7] + 1)) continue;
+        set_line(lines, k[0], "\tld\ta,(ix%+d)\n", q);
+        set_line(lines, k[1], "\t%s\t(ix%+d)\n", op, p);
+        drop[k[2]] = 1;
+        set_line(lines, k[3], "\tld\tl,a\n");
+        drop[k[4]] = 1;
+        set_line(lines, k[5], "\tld\ta,(ix%+d)\n", q + 1);
+        set_line(lines, k[6], "\t%s\t(ix%+d)\n", op, p + 1);
+        i = k[7];
+    }
+}
+
+/* [mask-shl-a] `ld a,(ix+d); and K; ld l,a; ld h,0; add hl,hl` with K <= 127
+   doubles in A instead (`and K; add a,a; ld l,a; ld h,0`, 7 cycles fewer) when
+   A is dead after it (it ends holding 2x, not x) and S, P/V and H are too (Z, C
+   and N agree: the masked value is under 128). Was copt #285q. Not Rabbit,
+   where it is no faster and a byte longer. */
+static void fold_mask_shl_a(char **lines, char *drop, int n)
+{
+    if (opt_disabled("mask-shl-a") || IS_RABBIT()) return;
+    for (int i = 0; i + 4 < n; i++) {
+        int k[5], c = 0, j = i;
+        while (c < 5 && j < n) {
+            if (drop[j] || !strncmp(lines[j], "\tC_LINE", 7)) { j++; continue; }
+            if (lines[j][0] != '\t') break;
+            k[c++] = j++;
+        }
+        if (c < 5) continue;
+        int d; long km; char c1[4], c2[4];
+        if (sscanf(lines[k[0]], "\tld\ta,(ix%d)%1[\n]", &d, c1) != 2) continue;
+        if (sscanf(lines[k[1]], "\tand\t%ld%1[\n]", &km, c2) != 2 || km < 0 || km > 127)
+            continue;
+        if (strcmp(lines[k[2]], "\tld\tl,a\n") || strcmp(lines[k[3]], "\tld\th,0\n")
+            || strcmp(lines[k[4]], "\tadd\thl,hl\n"))
+            continue;
+        if (!gbwm_dead_after3(lines, n, drop, k[4] + 1, 1, 0, 0)) continue;
+        if (!szph_dead_after(lines, drop, n, k[4] + 1)) continue;
+        set_line(lines, k[2], "\tadd\ta,a\n");
+        set_line(lines, k[3], "\tld\tl,a\n");
+        set_line(lines, k[4], "\tld\th,0\n");
+        i = k[4];
+    }
+}
+
 /* [tos-rmw] A read-modify-write of the stack-top slot:
      pop hl / push hl / <body> / pop de / push hl  ->  pop hl / <body> / push hl
    The read's push and the write's pop cancel when the body is straight-line
@@ -3881,6 +4074,8 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            from the backward sweep below), so it runs as a pre-pass here. */
         fold_dead_de_reload(lines, drop, n);
         fold_dead_sp_addr(lines, drop, n);
+        fold_slot_bitop_de(lines, drop, n);
+        fold_mask_shl_a(lines, drop, n);
         fold_const_xorflip(lines, drop, n);
         fold_xorflip_chain(lines, drop, n);
         int b_live = 0, c_live = 0, d_live = 0, e_live = 0;

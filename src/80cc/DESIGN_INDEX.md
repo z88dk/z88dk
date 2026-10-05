@@ -115,7 +115,12 @@ rules lacked the ez80 `ld hl,(hl)` guard (#285e/f/m, const/sym->DE, #DE-ix,
 `ld de` reload), #285q left A doubled (removed: 0 B, a few cycles), #DEBC left HL
 stale (now restores it), #HZ changed carry/parity (now matches its z/nz jump).
 None fired harmfully in the sampled output; cost +8 B corpus, z80 fp ticks up to
-+0.45% on four benches. Re-run the audit after editing a rule.
++0.45% on four benches. Re-run the audit after editing a rule. #285r and #285q
+then came back as post-render folds in filter_dead_bc_parks, where liveness is
+real: `slot-bitop-de` (and/or/xor, needs D and E dead, tracked per half) and
+`mask-shl-a` (needs A and S/P/V/H dead; a call to a C function or the fnptr
+trampoline kills the flags, a helper call does not). All 12 slowed cells back,
+-12 B (net -4 B against before the audit).
 
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,

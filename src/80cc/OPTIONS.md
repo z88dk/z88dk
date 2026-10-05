@@ -96,6 +96,8 @@ exists (ADR 0010).
 | `dsub-bc` | An 8085 signed compare with one operand already in BC copies the RHS into BC (push/pop if BC is live) instead of subtracting BC where it is |
 | `hl-const-reuse` | a constant loaded into HL while HL holds a known constant is reloaded in full, instead of being dropped, stepped (`inc hl`/`dec hl`) or loaded one byte |
 | `tos-rmw` | a stack-top slot read and write keep their `push hl` / `pop de` pair around a body that cannot see the stack |
+| `slot-bitop-de` | a 16-bit and/or/xor of two (ix+d) word slots is staged through DE and HL even when DE is dead after it |
+| `mask-shl-a` | a masked byte doubled as `ld l,a; ld h,0; add hl,hl` is not doubled in A first, even when A and S/P/V/H are dead after it |
 | `dead-sp-addr` | an `ld hl,N; add hl,sp` whose HL and carry are both dead is kept |
 | `hl-mem-carry` | a global word loaded for a branch test is reloaded in the block the branch reaches, instead of being taken from HL |
 | `addr-fold` | `ex de,hl; ld hl,_sym; add hl,de` stays as is instead of becoming `ld de,_sym; add hl,de` where DE is dead after the add (not on VM1 or Rabbit) |
