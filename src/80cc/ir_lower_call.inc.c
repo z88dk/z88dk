@@ -554,7 +554,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         } else if (ret_w > 4) {
             /* Wide return: the callee left it in the accumulator (FA for
                double, __i64_acc for long long); store it to the ret slot. */
-            if (!wide_acc_result_dead_in_acc(f, ci->ret_vreg)) {
+            if (!wide_acc_result_dead_in_acc(f, ci->ret_vreg)
+                && !wide_prepush(out, f, ci->ret_vreg)) {
                 emit_acc_slot_addr(out, f, ci->ret_vreg, 0);
                 emit_acc_store_hl(out, f, ci->ret_vreg);
             }
@@ -697,11 +698,22 @@ static const char *acc_mirror(const char *name, const char **then)
    from the accumulator — no reload). Pool-constant operands are loaded by
    address; never resident, so they end up loaded-last. */
 static int acc_push_one_operand(FILE *out, Func *f, const HelperInfo *hi,
-                                int *mirrored)
+                                int *mirrored, int *prepushed)
 {
     int push_pos = hi->acc_holds_lhs ? 1 : 0;
     int acc_pos  = hi->acc_holds_lhs ? 0 : 1;
     *mirrored = 0;
+    *prepushed = 0;
+    /* Pushed at its def (wide_prepush): already on the stack. */
+    if (wpp_n > 0) {
+        int top = wpp_stack[wpp_n - 1];
+        for (int p = 0; p < 2; p++)
+            if (!hi->acc_src_is_pool[p] && hi->args[p] == top) {
+                wpp_n--;
+                *prepushed = 1;
+                return 1 - p;
+            }
+    }
     if (hi->acc_commutative) {
         if      (acc_operand_resident(f, hi, 1)) { push_pos = 1; acc_pos = 0; }
         else if (acc_operand_resident(f, hi, 0)) { push_pos = 0; acc_pos = 1; }
@@ -762,10 +774,32 @@ static int call_sole_wide_arg(const Func *f, const CallInfo *ci, int v)
 
 /* Does `nx` read `v` once, straight from the accumulator when v is resident?
    Every consumer listed checks wide_acc_cell before loading the slot. */
-static int wide_next_reads_acc(const Func *f, const Op *nx, int v)
+static int wide_prepush_target(const Func *f, const BB *bb, int j, int v);
+
+/* Is the operand of the acc op at (bb, k) other than `v` pushed at its def
+   (wide_prepush_target), so `v` is read from the accumulator in place? */
+static int acc_partner_prepushed(const Func *f, const BB *bb, int k, int v)
 {
+    const HelperInfo *h = bb->ops[k].hcall;
+    if (!h || h->n_args != 2 || h->acc_count_in_a) return 0;
+    int p = (h->args[0] == v) ? 1 : (h->args[1] == v) ? 0 : -1;
+    if (p < 0 || h->acc_src_is_pool[1 - p] || h->acc_src_is_pool[p]) return 0;
+    int u = h->args[p];
+    if (u < 0 || u == v) return 0;
+    for (int j = k - 1; j >= 0; j--) {
+        int d[8]; int nd = ir_op_defs(&bb->ops[j], d, 8);
+        for (int q = 0; q < nd; q++)
+            if (d[q] == u) return wide_prepush_target(f, bb, j, u) == k;
+    }
+    return 0;
+}
+
+static int wide_next_reads_acc(const Func *f, const BB *bb, int k, int v)
+{
+    const Op *nx = &bb->ops[k];
     if (nx->kind == IR_ACC_BINOP || nx->kind == IR_ACC_CMP)
-        return acc_op_pushes_from_acc(nx->hcall, v);
+        return acc_op_pushes_from_acc(nx->hcall, v)
+            || acc_partner_prepushed(f, bb, k, v);
     if (opt_disabled("acc-drop-wide")) return 0;
     switch (nx->kind) {
     case IR_ACC_UNOP: {
@@ -793,6 +827,89 @@ static int wide_next_reads_acc(const Func *f, const Op *nx, int v)
    (push-from-acc) and v is dead afterwards, so its slot is never read.
    Conservative — any uncertainty (no liveness, BB-end, non-acc next op)
    keeps the store. */
+/* [acc-prepush] sccz80's order for a wide binop: push the operand the op pushes
+   as soon as it is computed, so the other one is computed straight into the
+   accumulator. Returns the consumer's op index in `bb` when the def of `v` at j
+   can be pushed there and left on the stack until that op, else -1. The stack
+   between stays LIFO: nothing in the window may open a push its own ops do not
+   close (argument groups, stacked helper args, PR_STACK parks), and no value
+   defined in the window may outlive it. */
+static int wide_prepush_target(const Func *f, const BB *bb, int j, int v)
+{
+    if (opt_disabled("acc-prepush") || v < 0 || v >= f->n_vregs) return -1;
+    const VReg *vr = &f->vregs[v];
+    if (vr->width <= 4
+        || (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM)))
+        return -1;
+    if (bb->live_out && ir_bitset_get(bb->live_out, v)) return -1;
+    /* no call argument group open at the def */
+    int depth = 0;
+    for (int i = 0; i < j; i++) {
+        const Op *o = &bb->ops[i];
+        if (o->kind == IR_PUSH_ARG && o->imm == 1) depth++;
+        else if (o->kind == IR_CALL && o->call && o->call->pre_pushed > 0 && depth > 0) depth--;
+    }
+    if (depth) return -1;
+    int k = -1, uses = 0;
+    for (int b2 = 0; b2 < f->n_bbs; b2++)
+        for (int i = 0; i < f->bbs[b2].n_ops; i++) {
+            const Op *o = &f->bbs[b2].ops[i];
+            int u[16]; int nu = ir_op_uses(o, u, 16);
+            for (int q = 0; q < nu; q++)
+                if (u[q] == v) { uses++; if (&f->bbs[b2] == bb && i > j) k = i; }
+        }
+    if (uses != 1 || k < 0) return -1;
+    const Op *c = &bb->ops[k];
+    const HelperInfo *h = c->hcall;
+    if ((c->kind != IR_ACC_BINOP && c->kind != IR_ACC_CMP) || !h || h->n_args != 2
+        || h->acc_count_in_a || h->args[0] == h->args[1])
+        return -1;
+    int pp = h->acc_holds_lhs ? 1 : 0;
+    if (h->acc_src_is_pool[pp] || h->acc_src_is_pool[1 - pp]) {
+        if (h->args[pp] != v) return -1;     /* a pool operand: keep the default */
+    } else if (h->args[pp] != v && !(h->acc_commutative && h->args[1 - pp] == v))
+        return -1;
+    for (int i = j + 1; i < k; i++) {
+        const Op *o = &bb->ops[i];
+        switch (o->kind) {
+        case IR_PUSH_ARG: case IR_PUSH_STRUCT: case IR_ASM: case IR_SWITCH: case IR_RET:
+            return -1;
+        case IR_CALL:
+            if (!o->call || o->call->pre_pushed > 0) return -1;
+            break;
+        case IR_HCALL:
+            if (!o->hcall || o->hcall->n_stacked > 0) return -1;
+            break;
+        default: break;
+        }
+        int u[16]; int nu = ir_op_uses(o, u, 16);
+        for (int q = 0; q < nu; q++)
+            if (u[q] >= 0 && ir_home_at(f, u[q]) == IR_PR_STACK) return -1;
+        int d[8]; int nd = ir_op_defs(o, d, 8);
+        for (int q = 0; q < nd; q++) {
+            if (d[q] < 0) continue;
+            if (ir_home_at(f, d[q]) == IR_PR_STACK) return -1;
+            const BitSet *after = (k + 1 < bb->n_ops) ? ir_op_live_in(bb, k + 1) : bb->live_out;
+            if (!after || ir_bitset_get(after, d[q])) return -1;
+        }
+    }
+    return k;
+}
+
+/* Push the just-produced wide result `v` (resident in the accumulator) for its
+   consumer, instead of storing it. */
+static int wide_prepush(FILE *out, const Func *f, int v)
+{
+    if (!cur_bb || wpp_n >= (int)(sizeof wpp_stack / sizeof wpp_stack[0])) return 0;
+    int k = wide_prepush_target(f, cur_bb, cur_op_idx, v);
+    if (k < 0) return 0;
+    const HelperInfo *h = cur_bb->ops[k].hcall;
+    emit(out, "call\t%s", h->acc_push);
+    L.cur_sp_adjust += h->acc_width;
+    wpp_stack[wpp_n++] = v;
+    return 1;
+}
+
 /* The static half of wide_acc_result_dead_in_acc: is the def at (bb, j) of
    wide `v` read straight from the accumulator by the next op, dying there? */
 static int wide_def_dropped_at(const Func *f, const BB *bb, int j, int v)
@@ -801,7 +918,7 @@ static int wide_def_dropped_at(const Func *f, const BB *bb, int j, int v)
     int k = j + 1;
     while (k < bb->n_ops && bb->ops[k].kind == IR_NOP) k++;
     if (k >= bb->n_ops) return 0;
-    if (!wide_next_reads_acc(f, &bb->ops[k], v)) return 0;
+    if (!wide_next_reads_acc(f, bb, k, v)) return 0;
     const BitSet *after = (k + 1 < bb->n_ops) ? ir_op_live_in(bb, k + 1) : bb->live_out;
     return after && !ir_bitset_get(after, v);
 }
@@ -837,7 +954,8 @@ static void compute_no_slot_wide(Func *f)
                         && o->hcall->acc_subkind != ACC_SUB_ACC2INT);
                 if (kind_ok && o->kind == IR_LD_MEM && o->mem.kind == IR_MEM_PORT)
                     kind_ok = 0;
-                if (kind_ok && wide_def_dropped_at(f, bb, j, v)) ok[v] = 1;
+                if (kind_ok && (wide_def_dropped_at(f, bb, j, v)
+                                || wide_prepush_target(f, bb, j, v) >= 0)) ok[v] = 1;
                 else ok[v] = -1;
             }
         }
@@ -853,8 +971,7 @@ static int wide_acc_result_dead_in_acc_1(const Func *f, int v)
     int j = cur_op_idx + 1;
     while (j < cur_bb->n_ops && cur_bb->ops[j].kind == IR_NOP) j++;
     if (j >= cur_bb->n_ops) return 0;
-    const Op *nx = &cur_bb->ops[j];
-    if (!wide_next_reads_acc(f, nx, v)) return 0;
+    if (!wide_next_reads_acc(f, cur_bb, j, v)) return 0;
     /* v must be dead after nx (its slot then never read). */
     const BitSet *after = (j + 1 < cur_bb->n_ops)
         ? ir_op_live_in(cur_bb, j + 1) : cur_bb->live_out;
@@ -908,7 +1025,8 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
             load_byte_to_a(out, f, rhs);      /* count -> A (offsets incl. push) */
         emit(out, "call\t%s", hi->name);
         L.cur_sp_adjust -= w;
-        if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)) {
+        if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)
+            && !wide_prepush(out, f, hi->ret_vreg)) {
             emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
             if (hi->acc_store_bc) { emit_hl_to_bc(out); }
             emit_c(out, CLOB_HL, "call\t%s", hi->acc_store);
@@ -922,12 +1040,15 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
 
     (void)lhs; (void)rhs;
     /* 1. push one operand (from the accumulator if already resident). */
-    int mirrored;
-    int acc_pos = acc_push_one_operand(out, f, hi, &mirrored);
-    L.cur_sp_adjust += w;
-    /* 2. acc operand -> acc (offsets now include the push) */
-    emit_acc_operand_addr(out, f, hi, acc_pos);
-    emit(out, "call\t%s", hi->acc_load);
+    int mirrored, prepushed;
+    int acc_pos = acc_push_one_operand(out, f, hi, &mirrored, &prepushed);
+    if (!prepushed) L.cur_sp_adjust += w;
+    /* 2. acc operand -> acc (offsets now include the push); after a push at
+       the def the other operand was computed straight into it */
+    if (!(prepushed && acc_operand_resident(f, hi, acc_pos))) {
+        emit_acc_operand_addr(out, f, hi, acc_pos);
+        emit(out, "call\t%s", hi->acc_load);
+    }
     /* 3. binop — the helper pops the pushed operand */
     const char *then = NULL;
     emit(out, "call\t%s", mirrored ? acc_mirror(hi->name, &then) : hi->name);
@@ -935,7 +1056,8 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
     L.cur_sp_adjust -= w;
     /* 4. acc -> dst slot — unless the result is consumed straight from the
        accumulator by the next op and dies there (slot never read). */
-    if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)) {
+    if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)
+        && !wide_prepush(out, f, hi->ret_vreg)) {
         emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
         if (hi->acc_store_bc) {        /* l_i64_store wants the address in BC */
             emit_hl_to_bc(out);
@@ -962,11 +1084,13 @@ static int gen_acc_cmp(FILE *out, Func *f, const Op *op)
         return -1;
     }
     int w = hi->acc_width;
-    int mirrored;
-    int acc_pos = acc_push_one_operand(out, f, hi, &mirrored);
-    L.cur_sp_adjust += w;
-    emit_acc_operand_addr(out, f, hi, acc_pos);
-    emit(out, "call\t%s", hi->acc_load);
+    int mirrored, prepushed;
+    int acc_pos = acc_push_one_operand(out, f, hi, &mirrored, &prepushed);
+    if (!prepushed) L.cur_sp_adjust += w;
+    if (!(prepushed && acc_operand_resident(f, hi, acc_pos))) {
+        emit_acc_operand_addr(out, f, hi, acc_pos);
+        emit(out, "call\t%s", hi->acc_load);
+    }
     emit(out, "call\t%s", mirrored ? acc_mirror(hi->name, NULL) : hi->name);
     L.cur_sp_adjust -= w;
     /* The bool (0/1) is in HL. Commit word-result way: spill to the slot only
@@ -982,7 +1106,7 @@ static int gen_acc_cmp(FILE *out, Func *f, const Op *op)
    store wants it in HL — emit_acc_slot_addr leaves it in HL either way. */
 static void store_acc_to_slot(FILE *out, const Func *f, int dst, const HelperInfo *hi)
 {
-    if (!wide_acc_result_dead_in_acc(f, dst)) {
+    if (!wide_acc_result_dead_in_acc(f, dst) && !wide_prepush(out, f, dst)) {
         emit_acc_slot_addr(out, f, dst, 0);
         if (hi->acc_store_bc) { emit_hl_to_bc(out); }
         emit(out, "call\t%s", hi->acc_store);

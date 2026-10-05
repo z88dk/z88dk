@@ -38,6 +38,14 @@ static int m_le(double a, double b) { return a <= b * 2; }
 static int m_gt(double a, double b) { return a > b * 2; }
 static int m_ge(double a, double b) { return a >= b * 2; }
 static int m_pool(double b) { return 9 < b * 2; }
+static double sq(double x) { return x * x; }
+static int ga = 7;
+static double p_nest(double a, double b, double c, double d, double e, double g)
+{ return (a * b - c * d) / (e - g); }
+static double p_call(double a, double b) { return a * 3 - sq(b + 1); }
+static double p_int(double a, int i) { return a / 2 - (double)(i * ga + 1); }
+static double p_deep(double a, double b) { return a - (b - (a - (b - 1))); }
+static int p_cmp(double a, double b) { return a * 2 < sq(b) - 1; }
 
 #endif
 
@@ -57,6 +65,12 @@ static int lm_lt(long long a, long long b) { return a < b * 2; }
 static int lm_ge(long long a, long long b) { return a >= b * 2; }
 static int lm_ult(unsigned long long a, unsigned long long b) { return a < b * 2; }
 static int lm_uge(unsigned long long a, unsigned long long b) { return a >= b * 2; }
+static long long lsq(long long x) { return x * x; }
+static long long lp_nest(long long a, long long b, long long c, long long d, long long e, long long g)
+{ return (a * b - c * d) / (e - g); }
+static long long lp_call(long long a, long long b) { return a * 3 - lsq(b + 1); }
+static long long lp_deep(long long a, long long b) { return a - (b - (a - (b - 1))); }
+static int lp_cmp(long long a, long long b) { return a * 2 < lsq(b) - 1; }
 
 #ifndef NO_DOUBLE
 static void test_accwide_double(void)
@@ -86,6 +100,11 @@ static void test_accwide_double(void)
     assertEqual(m_gt(5, 3), 0); assertEqual(m_gt(6, 3), 0); assertEqual(m_gt(7, 3), 1);
     assertEqual(m_ge(5, 3), 0); assertEqual(m_ge(6, 3), 1); assertEqual(m_ge(7, 3), 1);
     assertEqual(m_pool(4.5), 0); assertEqual(m_pool(5), 1);
+    assertEqual((int)p_nest(3, 4, 2, 5, 4, 3), 2);
+    assertEqual((int)p_call(5, 2), 6);
+    assertEqual((int)p_int(10, 2), -10);
+    assertEqual((int)p_deep(10, 4), 13);
+    assertEqual(p_cmp(3, 3), 1); assertEqual(p_cmp(4, 2), 0);
 }
 #endif
 
@@ -112,6 +131,10 @@ static void test_accwide_i64(void)
     assertEqual(lm_ge(5, 3), 0); assertEqual(lm_ge(6, 3), 1); assertEqual(lm_ge(-5, -3), 1);
     assertEqual(lm_ult(5, 3), 1); assertEqual(lm_ult(0xFFFFFFFFFFFFFFFFULL, 3), 0);
     assertEqual(lm_uge(5, 3), 0); assertEqual(lm_uge(0x8000000000000000ULL, 1), 1);
+    assertEqual((int)lp_nest(3, 4, 2, 5, 4, 3), 2);
+    assertEqual((int)lp_call(5, 2), 6);
+    assertEqual((int)lp_deep(10, 4), 13);
+    assertEqual(lp_cmp(3, 3), 1); assertEqual(lp_cmp(4, 2), 0);
 }
 
 int main(int argc, char *argv[])

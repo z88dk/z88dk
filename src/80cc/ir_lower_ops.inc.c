@@ -196,7 +196,7 @@ static int gen_mov(FILE *out, Func *f, const Op *op)
             emit_acc_slot_addr(out, f, op->src[0], 0);
             emit(out, "call\t%s", acc_prim(f, op->src[0], "load"));
         }
-        if (!wide_acc_result_dead_in_acc(f, op->dst)) {
+        if (!wide_acc_result_dead_in_acc(f, op->dst) && !wide_prepush(out, f, op->dst)) {
             emit_acc_slot_addr(out, f, op->dst, 0);
             emit_acc_store_hl(out, f, op->dst);
         }
@@ -3139,7 +3139,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             emit_hl_add_offset(out, op->mem.offset, 0, 0);  /* base+off (DE free) */
         }
         emit(out, "call\t%s", acc_prim(f, op->dst, "load"));
-        if (!wide_acc_result_dead_in_acc(f, op->dst)) {
+        if (!wide_acc_result_dead_in_acc(f, op->dst) && !wide_prepush(out, f, op->dst)) {
             emit_acc_slot_addr(out, f, op->dst, 0);
             emit_acc_store_hl(out, f, op->dst);
         }

@@ -214,6 +214,7 @@ exists (ADR 0010).
 | `acc-pool-operand` | a pool constant operand of a 5/6/8-byte double add/sub/mul/div is loaded into a vreg (and its slot) instead of being read by address |
 | `acc-drop-slot` | a double / long long whose every store is dropped still gets a frame slot |
 | `acc-mirror` | a compare or long long subtract whose right operand is in the accumulator and left is not reloads the right operand instead of calling the mirrored helper |
+| `acc-prepush` | the operand a double / long long binop or compare pushes is stored at its def and reloaded at the op, instead of being pushed when computed (sccz80 order) |
 | `alu-fold` | no `(ix+d)` ALU fold for AND/OR/XOR |
 | `ixd-fold` | no `(ix+d)` fold for the word accumulator |
 | `r6k-ixd-alu` | no Rabbit 6000 indexed ALU form |

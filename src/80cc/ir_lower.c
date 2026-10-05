@@ -364,6 +364,11 @@ typedef enum {
 static void apply_clobbers(Clobber c);
 static int wide_acc_result_dead_in_acc(const Func *f, int v);
 static void compute_no_slot_wide(Func *f);
+/* [acc-prepush] Wide values pushed at their def and not yet consumed by their
+   acc op, innermost last (wide_prepush). */
+static int wpp_stack[8];
+static int wpp_n;
+static int wide_prepush(FILE *out, const Func *f, int v);
 /* [IR_ACCDROP_VERIFY] Inert: report a slot read of a wide value whose store
    was dropped earlier in the same render (the consumer lost the accumulator
    before it looked). */
@@ -9704,6 +9709,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
 {
     const int de_carry_on = !opt_disabled("de-carry");
     accdrop_begin(f);
+    wpp_n = 0;
     /* Per-render BC-tenant map, the mirror of bb_hl_out. Local to one render:
        the carry is only consulted within a pass. NULL (OOM) degrades to "never
        carry", which is the safe direction. */
@@ -9941,6 +9947,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            a BB boundary would shift sp for unrelated code. */
         L.cur_sp_adjust = 0;
         L.cur_stack_resident = -1;   /* stack-transient never crosses a BB */
+        wpp_n = 0;                   /* nor does a wide push at its def */
         L.pv_depth = 0; L.pv_park_depth = -1; L.pv_park_vreg = -1;
         /* BC carry across the BB boundary — the exact mirror of the HL carry
            below. Previously the BC belief simply SURVIVED a boundary with no

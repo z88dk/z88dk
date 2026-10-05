@@ -87,8 +87,11 @@ reports a slot read after a dropped store. Then `acc-drop-slot` (a value whose
 every store drops gets no slot) and `acc-mirror` (a compare, or an i64
 subtract via negate, whose right operand is resident takes the mirrored
 helper; float subtract is not mirrored, the libraries sign a zero result
-differently): startrek 18107 B fp. Still open: float sub/div with the left
-operand in a slot; sccz80 pushes the left operand at its def.
+differently): startrek 18107 B fp. `acc-prepush` then takes sccz80's order:
+the operand a wide op pushes is pushed at its def when the stack between stays
+LIFO (no argument group, stacked helper args or PR_STACK park in the window,
+nothing defined there outliving it), and the other operand is computed straight
+into the accumulator: startrek 17108 B fp (sccz80 13816).
 
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,
