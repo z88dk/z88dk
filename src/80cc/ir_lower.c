@@ -5837,6 +5837,14 @@ static int param_caller_off(const Func *f, int vreg_id)
    byte-pair sequence. PARAM_IN_PLACE vregs return their caller-pushed-arg
    offset directly. */
 static void note_slot_use(int v);   /* frame-slot use accounting: fwd (defined with rec state) */
+/* [dead-slot-drop] Values whose slot was dropped for this render, and whether
+   the render reached one of them anyway (it must then be redone with slots). */
+static char *dsd_drop;
+static int   dsd_drop_nv;
+static int   dsd_viol;
+/* Candidates found by the last instrumented render. */
+static int  *dsd_cand;
+static int   dsd_ncand;
 static void note_wide_def(int v);      /* IR_WIDENOSLOT probe: fwd (defined with rec state) */
 static void note_wide_noslot(int v);   /* IR_WIDENOSLOT probe: fwd (defined with rec state) */
 /* [dead-store] write-context depth: >0 while lowering a store function body,
@@ -5963,6 +5971,9 @@ static void bc_step_note_reload(const Func *f, int v)
 static void require_slot(const Func *f, int vreg_id)
 {
     if (slot_off(f, vreg_id) >= 0) return;
+    /* [dead-slot-drop] A dropped slot reached after all: slot_off has flagged
+       the render, whose output is discarded and redone with slots. */
+    if (dsd_drop && vreg_id >= 0 && vreg_id < dsd_drop_nv && dsd_drop[vreg_id]) return;
     rec_note_violation(f, vreg_id);   /* B4: unrealizable home (about to abort) */
     if (hd_record(f, vreg_id)) return;
     ir_lower_loc();
@@ -6892,8 +6903,13 @@ static void note_wide_noslot(int v)
    function) the access is ALSO a write — so every slot_off inside a store (the
    actual store AND its non-emit guard checks like `slot_off()<0`) is attributed
    to the write, leaving rec_slotuse - rec_slotwrite = the true READ count. */
+
 static void note_slot_use(int v)
 {
+    /* Only the instrumented final render counts: the lazy-spill pass before it
+       is thrown away, and still emits the stores its analysis later drops. */
+    if (rec_counting && dsd_drop && v >= 0 && v < dsd_drop_nv && dsd_drop[v])
+        dsd_viol = 1;
     if (!rec_counting || v < 0 || v >= rec_nv || !rec_slotuse) return;
     rec_slotuse[v]++;
     if (slot_write_ctx && rec_slotwrite) rec_slotwrite[v]++;
@@ -7051,6 +7067,25 @@ static void rec_end(const Func *f)
             }
             int deadbytes = 0;
             for (int p = 0; p < fs; p++) if (covered[p] && !live[p]) deadbytes++;
+            /* [dead-slot-drop] A partly dead frame: list the values whose slot
+               the render never touched, under the same trust rule. */
+            dsd_ncand = 0;
+            if (deadbytes > 0 && deadbytes < fs && !opt_disabled("dead-slot-drop")) {
+                free(dsd_cand);
+                dsd_cand = malloc((size_t)f->n_vregs * sizeof(int));
+                for (int v = 0; dsd_cand && v < rec_nv && v < f->n_vregs; v++) {
+                    int off = f->vreg_spill_slot[v];
+                    if (off < 0 || off >= fs || rec_slotuse[v]) continue;
+                    const VReg *vr = &f->vregs[v];
+                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_PARAM
+                                     | IR_VREG_PARAM_IN_PLACE | IR_VREG_NO_SLOT
+                                     | IR_VREG_CALL_SPLIT | IR_VREG_VOLATILE))
+                        continue;
+                    if ((vr->width > 0 ? vr->width : 2) > 2) continue;
+                    if (!ir_home_covers_live_range(f, v)) continue;
+                    dsd_cand[dsd_ncand++] = v;
+                }
+            }
             /* Whole frame dead → the pass driver re-lowers this function
                frameless (frame_size=0). Only every-byte-dead qualifies: a
                partial shrink would move live slot offsets. */
@@ -9312,6 +9347,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
     FILE *rout;
     int df_retry_done = 0;   /* dead-frame elision: at most one re-lower */
     int ds_retry_done = 0;   /* [dead-store] dead byte-spill elision: one re-lower */
+    int dsd_retry = 0;       /* [dead-slot-drop] 1 = dropped, 2 = restored */
+    dsd_ncand = 0;
     int hd_retry_done = 0;   /* [home-demote] unrealizable home: one re-lower */
     /* [IR_HOMEMAP] Inert: dump every vreg's home, slot and residency window.
        hr_recoverability_verify only compares vregs that BOTH carry a pair/byte
@@ -9331,6 +9368,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
         }
     }
  deadframe_retry:
+    dsd_viol = 0;
     /* Render into a DISCARDABLE buffer whether or not labels are being elided.
        The dead-store / dead-frame retries below `goto deadframe_retry` and
        render the function again, discarding the first attempt with
@@ -9634,6 +9672,41 @@ static int ir_lower_func_body(FILE *out, Func *f)
         if (rout != out) fclose(rout);
         goto deadframe_retry;
     }
+    /* [dead-slot-drop] A partly dead frame: the render proved some values never
+       touch their slot. Give them none, recompact the frame and render again.
+       The new layout can change what the render does, so that render is
+       checked: if it reached a dropped slot after all, the slots come back and
+       the function is rendered once more as it was. */
+    if (dsd_retry == 1 && rc == 0 && rout != out && dsd_viol) {
+        dsd_retry = 2;
+        for (int v = 0; v < dsd_drop_nv && v < f->n_vregs; v++)
+            if (dsd_drop[v]) f->vregs[v].flags &= ~IR_VREG_SLOT_UNUSED;
+        free(dsd_drop); dsd_drop = NULL; dsd_drop_nv = 0;
+        ir_assign_slots(f);
+        L.cur_frameless = frameless_ok(f);
+        free(bb_hl_out_p1); bb_hl_out_p1 = NULL;
+        fclose(rout);
+        goto deadframe_retry;
+    }
+    if (!dsd_retry && rc == 0 && rout != out && dsd_ncand > 0
+        && !opt_disabled("dead-slot-drop")) {
+        dsd_retry = 1;
+        free(dsd_drop);
+        dsd_drop = calloc((size_t)f->n_vregs, 1);
+        dsd_drop_nv = dsd_drop ? f->n_vregs : 0;
+        for (int i = 0; dsd_drop && i < dsd_ncand; i++) {
+            dsd_drop[dsd_cand[i]] = 1;
+            f->vregs[dsd_cand[i]].flags |= IR_VREG_SLOT_UNUSED;
+        }
+        if (dsd_drop) {
+            ir_assign_slots(f);
+            L.cur_frameless = frameless_ok(f);
+            free(bb_hl_out_p1); bb_hl_out_p1 = NULL;
+            fclose(rout);
+            goto deadframe_retry;
+        }
+    }
+    free(dsd_drop); dsd_drop = NULL; dsd_drop_nv = 0;
     /* [IR_IX_VERIFY] sp-mode INDEX-preservation completeness check (debug-gated):
        if the render touched IX/IY but frame_has_saved_ix/iy decided NOT to save
        it, the caller's callee-saved index reg is clobbered — a hole in the save

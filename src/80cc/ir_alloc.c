@@ -382,6 +382,8 @@ int ir_home_requires_slot(const Func *f, int v)
     /* [dead-store] Written but never read: the store is skipped on the
        re-lower and the value rides A, so the frame can shrink. */
     if (f->vregs[v].flags & IR_VREG_DEAD_SPILL) needs = 0;
+    /* [dead-slot-drop] Never accessed in the last render. */
+    if (f->vregs[v].flags & IR_VREG_SLOT_UNUSED) needs = 0;
 
     return needs;
 }

@@ -143,6 +143,9 @@ typedef enum {
                                         its slot despite the PR_BC home. */
     IR_VREG_IV_RECOMPUTE   = 1 << 12, /* ivsr-suppress kept this index for address
                                         recompute: CSE leaves its `<<1` per use */
+    IR_VREG_SLOT_UNUSED    = 1 << 13, /* [dead-slot-drop] the last render never
+                                         touched this value's slot: the re-render
+                                         gives it none (verified, see ir_lower) */
 } VRegFlags;
 
 typedef struct {

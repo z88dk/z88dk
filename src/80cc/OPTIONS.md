@@ -98,6 +98,7 @@ exists (ADR 0010).
 | `tos-rmw` | a stack-top slot read and write keep their `push hl` / `pop de` pair around a body that cannot see the stack |
 | `slot-bitop-de` | a 16-bit and/or/xor of two (ix+d) word slots is staged through DE and HL even when DE is dead after it |
 | `mask-shl-a` | a masked byte doubled as `ld l,a; ld h,0; add hl,hl` is not doubled in A first, even when A and S/P/V/H are dead after it |
+| `dead-slot-drop` | a value whose frame slot the render never touched keeps the slot (only a wholly dead frame is dropped) |
 | `dead-sp-addr` | an `ld hl,N; add hl,sp` whose HL and carry are both dead is kept |
 | `hl-mem-carry` | a global word loaded for a branch test is reloaded in the block the branch reaches, instead of being taken from HL |
 | `addr-fold` | `ex de,hl; ld hl,_sym; add hl,de` stays as is instead of becoming `ld de,_sym; add hl,de` where DE is dead after the add (not on VM1 or Rabbit) |
