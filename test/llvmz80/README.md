@@ -8,6 +8,8 @@ User `-Cg` options follow the default options.
 The driver preprocesses in gnu23 mode.
 Changing only `-Cg-std` can make header selection differ from compilation.
 
+Only the classic C library in z88dk is currently supported. Newlib and other C libraries are not supported.
+
 The upstream `__ZPROTO*` definitions remain unchanged.
 The clang branch reverses arguments for existing classic library aliases.
 LLVM-Z80 attributes describe explicit smallc, fastcall and callee entries.
