@@ -113,6 +113,7 @@ exists (ADR 0010).
 | `byte-tie` | equal-tick byte candidates are not broken by byte count |
 | `word-resident` | no word (DE) home proposals |
 | `de-home` | no general DE home for a loop-carried word |
+| `deref-width` | a word dereference through BC/DE is priced as a byte `ld a,(bc)` rather than as a base read into HL |
 | `de-rearb` | a word DE-home pick the render rejects is reverted to the allocator's snapshot only; the function is not lowered again without a DE-class home |
 | `loop-ra` | no loop-scoped DE allocation on top of `de-home` |
 | `iv-resident` | no home for a hot write-many induction variable |
@@ -121,7 +122,9 @@ exists (ADR 0010).
 | `idx2-revisit` | a param that yielded the index register to a counter is never reconsidered |
 | `idx2-reuse` | the idx2 slot is a single whole-function owner instead of reusing it across non-overlapping live ranges |
 | `idx2-call-ez80` | on ez80 in sp mode a value is not given an index home across calls |
+| `yield-total` | a compared counter yields BC to a deref base for the index register even when the two homes are worth less together |
 | `ez80-hl-ihl` | on ez80 a word read through HL is the byte pair through A, not `ld hl,(hl)` |
+| `de-keep-hl` | a DE load that must keep HL saves it with `push hl`/`pop hl` even from an index home or an `(ix+d)` slot |
 | `idx-deref` | an index-homed pointer is not dereferenced in place, and its cost term goes with it (ADR 0026) |
 | `idxhalf` | no byte homes in IX/IY halves (sp mode, z80/z80n/ez80) |
 | `iy-temp-pack` | no IY packing for a short-lived temporary |

@@ -2052,6 +2052,13 @@ static int g0_deref_offset_cost(int reg, int ofs)
 /* The offset a deref op carries, or 0 for anything that is not one. Only a
    MEM_VREG access based on `v` walks; a post-stepped one reaches its field
    through the step and is left at 0. */
+/* Width of the value a deref op moves. */
+static int deref_width(const Func *f, const Op *o)
+{
+    int x = (o->kind == IR_LD_MEM) ? o->dst : o->src[0];
+    return (x >= 0 && x < f->n_vregs) ? f->vregs[x].width : 1;
+}
+
 static int g0_deref_ofs_of(const Op *o, int v)
 {
     if (!o || (o->kind != IR_LD_MEM && o->kind != IR_ST_MEM)) return 0;
@@ -2299,6 +2306,19 @@ static int counter_yields_bc_to_index(const Func *f, const Cand *pool, int n, in
         if (!ir_live_ranges_overlap(f, v, w)) continue;
         const LiveRange *lv = ir_live_range(f, v), *lw = ir_live_range(f, w);
         if (lv && lw && 2*(lw->end - lw->start) >= (lv->end - lv->start)) continue;
+        /* [yield-total] The swap must win in total: the base's BC gain plus
+           the counter's index gain against the counter's BC gain. */
+        if (!opt_disabled("yield-total")) {
+            long v_bc = 0, v_idx = 0;
+            for (int k = 0; k < n; k++) {
+                if (pool[k].vreg != v) continue;
+                if ((pool[k].allowed & RC_BC) && pool[k].benefit > v_bc)
+                    v_bc = pool[k].benefit;
+                if ((pool[k].allowed & (RC_IDX2 | RC_IDX3)) && pool[k].benefit > v_idx)
+                    v_idx = pool[k].benefit;
+            }
+            if (pool[j].benefit + v_idx <= v_bc) continue;
+        }
         return 1;   /* a deref-base wants BC + the index is cheap → counter → index */
     }
     return 0;
@@ -4338,7 +4358,15 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
             int u[16]; int nu=ir_op_uses(o,u,16);
             int dofs = g0_deref_ofs_of(o, v);
             for (int k=0;k<nu;k++) if (u[k]==v) {
-                if (v==mb)
+                if (v==mb && !is_index && deref_width(f, o) >= 2
+                    && !opt_disabled("deref-width"))
+                    /* [deref-width] a word through a pair goes via HL either
+                       way: only the base read differs */
+                    ben += w*((g0_word_cost(GR_SLOT,GK_READ)
+                               + g0_deref_offset_cost(GR_SLOT,dofs))
+                              - (g0_word_cost(R,GK_READ)
+                                 + g0_deref_offset_cost(R,dofs)));
+                else if (v==mb)
                     ben += w*((g0_word_cost(GR_SLOT,GK_DEREF)
                                + g0_deref_offset_cost(GR_SLOT,dofs))
                               - (g0_word_cost(R,GK_DEREF)

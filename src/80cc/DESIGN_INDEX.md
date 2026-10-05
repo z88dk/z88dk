@@ -39,6 +39,12 @@ slot costs (2/2/2/4, real 5/5/7/11) move cells both ways when corrected;
 reading the deepest word local with `pop hl; push hl` (fp_tos_slot) is a
 further -1263 B fp but 8 cells 0.6-3.3% slower (1 B saved per isolated access
 for 1 cycle). The word immediate-store fold stays excluded (+111/+153 B).
+Y/W/P landed (`yield-total`, `deref-width`, `de-keep-hl`): -56 B, 22 cells
+faster, 11 slower (callbench fp +0.3-0.6% from de-keep-hl, matrixbench sp up
+to +0.38% from deref-width). With them the corrected ez80 fp slot costs
+still lose on matrixbench (IY reduction eviction), callbench (the model
+charges every read of a value the lowerer keeps in a register) and
+localbench; those come before the cost change.
 
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,

@@ -2724,6 +2724,30 @@ blayout_tosrmw_8080_keep.bin: $(SOURCES) blayout.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -Cc--opt-disable=tos-rmw --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+# yield-total (byteshr on ez80), deref-width (derefw), de-keep-hl (idxderef
+# on ez80 fp); _keep variants opt out.
+all: byteshr_ez80.bin byteshr_ez80_yt_keep.bin derefw_z180_fp.bin derefw_dw_keep.bin idxderef_ez80_fp_dkh_keep.bin
+
+byteshr_ez80.bin: $(SOURCES) byteshr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+byteshr_ez80_yt_keep.bin: $(SOURCES) byteshr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -Cc--opt-disable=yield-total --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+derefw_z180_fp.bin: $(SOURCES) derefw.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+derefw_dw_keep.bin: $(SOURCES) derefw.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=deref-width --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+idxderef_ez80_fp_dkh_keep.bin: $(SOURCES) idxderef.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -Cc--opt-disable=de-keep-hl --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 # A word home placed after a rejected DE pick is demoted when the restored
 # tenant shares its pair (hist_pass hung on z80 fp).
 all: latepair.bin latepair_fp.bin latepair_8080.bin

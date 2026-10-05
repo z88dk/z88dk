@@ -1115,6 +1115,22 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
         load_to_de(out, f, vreg_id);
         return;
     }
+    /* [de-keep-hl] An index home and an (ix+d) word slot both reach DE
+       without HL (`lea de,iy` / `push iy; pop de`, `ld de,(ix+d)`). */
+    if (f->vregs[vreg_id].width == 2 && L.rs.hl != vreg_id
+        && !vreg_is_pr_stack(f, vreg_id) && !opt_disabled("de-keep-hl")) {
+        int direct = vreg_in_idx2(f, vreg_id);
+        if (!direct && fp_active(f) && slot_off(f, vreg_id) >= 0
+            && !(f->vreg_spill_slot && f->vreg_spill_slot[vreg_id] >= 0
+                 && fp_tos_slot(f, vreg_id))) {
+            int ix_off = slot_ix_off(f, vreg_id);
+            direct = fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1);
+        }
+        if (direct) {
+            load_to_de(out, f, vreg_id);
+            return;
+        }
+    }
     emit_sp(out, 2, "push\thl");
     load_to_de(out, f, vreg_id);
     L.cur_sp_adjust -= 2;
