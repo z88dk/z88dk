@@ -8240,6 +8240,29 @@ static void confirm_word_home_pick(Func *f, const int *bb_alias)
         if (wlo < 0) {
             ir_alloc_word_home_reject(f);
             whome_rejected = 1;
+            /* The restore can put a tenant back in a pair a later home now
+               holds. Recover as [home-rearb] does: demote, veto, re-arbitrate. */
+            static int depth;
+            int clash[16];
+            int nc = ir_alloc_word_home_clashes(clash, 16);
+            if (nc > 0) {
+                ir_alloc_word_home_done();
+                for (int i = 0; i < nc; i++) {
+                    ir_alloc_demote_home(f, clash[i]);
+                    if (home_rearb_enabled()) ir_alloc_veto_add(clash[i]);
+                }
+                if (home_rearb_enabled() && depth < 4) {
+                    depth++;
+                    ir_alloc(f);
+                    ir_alloc_veto_reset();
+                    confirm_word_home_pick(f, bb_alias);
+                    depth--;
+                }
+                ir_alloc_veto_reset();
+                ir_assign_slots(f);
+                L.cur_frameless = frameless_ok(f);
+                return;
+            }
         }
     }
     ir_alloc_word_home_done();

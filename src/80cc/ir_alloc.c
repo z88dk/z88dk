@@ -90,11 +90,29 @@ static int cs_best_span(const Func *f, int v, const int *bb_first_op,
    later (the call-split's ranged BC home, ~2700 lines further down) was silently
    wiped, leaving IR_VREG_CALL_SPLIT set with phys == SPILL. Mirror it into the
    snapshot so it survives the revert. */
+static unsigned char *late_pair_home;   /* word BC/DE homes placed after the pick */
+static int reject_clash[16];            /* restored tenants sharing a late home's pair */
+static int n_reject_clash;
+
+int ir_alloc_word_home_clashes(int *out, int max)
+{
+    int n = n_reject_clash < max ? n_reject_clash : max;
+    for (int i = 0; i < n; i++) out[i] = reject_clash[i];
+    n_reject_clash = 0;
+    return n;
+}
+
 static void alloc_note_late_home(Func *f, int v, PhysReg pr)
 {
     f->vreg_to_phys[v] = pr;
-    if (word_home_prepick && v >= 0 && v < f->n_vregs)
+    if (word_home_prepick && v >= 0 && v < f->n_vregs) {
         word_home_prepick[v] = pr;
+        if (pr == IR_PR_BC || pr == IR_PR_DE) {
+            if (!late_pair_home)
+                late_pair_home = calloc((size_t)f->n_vregs, 1);
+            if (late_pair_home) late_pair_home[v] = 1;
+        }
+    }
 }
 
 /* ---- The word DE-home pick, and its one legal rejection -------------------
@@ -141,6 +159,25 @@ void ir_alloc_word_home_reject(Func *f)
             }
         }
     }
+    /* A WORD home placed after the pick (a call-split's ranged BC) took the
+       pair the pick vacated, and the restored tenant now shares it. Report the
+       restored tenant: the lowerer demotes it and re-arbitrates. */
+    n_reject_clash = 0;
+    for (int v = 0; late_pair_home && v < f->n_vregs; v++) {
+        PhysReg pv = f->vreg_to_phys[v];
+        int vlo, vhi;
+        if (!late_pair_home[v] || (pv != IR_PR_BC && pv != IR_PR_DE)) continue;
+        if (!hr_residency_window(f, v, &vlo, &vhi)) continue;
+        for (int w = 0; w < f->n_vregs; w++) {
+            int wlo, whi, seen = 0;
+            if (w == v || late_pair_home[w] || f->vreg_to_phys[w] != pv) continue;
+            if (!hr_residency_window(f, w, &wlo, &whi)) continue;
+            if (wlo > vhi || whi < vlo) continue;
+            for (int k = 0; k < n_reject_clash; k++) if (reject_clash[k] == w) seen = 1;
+            if (!seen && n_reject_clash < (int)(sizeof reject_clash / sizeof reject_clash[0]))
+                reject_clash[n_reject_clash++] = w;
+        }
+    }
     f->word_home_vreg = -1;
     f->de_home_general = 0;
     f->de_home_is_ptr = 0;
@@ -168,6 +205,8 @@ void ir_alloc_word_home_done(void)
 {
     free(word_home_prepick);
     word_home_prepick = NULL;
+    free(late_pair_home);
+    late_pair_home = NULL;
 }
 
 /* Returns 1 if the spill of op->dst at bb->ops[op_idx] is dead — its
@@ -2623,6 +2662,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
        prepick snapshot is the full baseline (matches the sequential picker). */
     if (de_acc_vreg >= 0 && f->vreg_to_phys[de_acc_vreg] == IR_PR_SPILL) {
         free(word_home_prepick);
+        free(late_pair_home); late_pair_home = NULL;
         word_home_prepick = malloc((size_t)f->n_vregs * sizeof(int));
         if (word_home_prepick)
             memcpy(word_home_prepick, f->vreg_to_phys,
@@ -2679,6 +2719,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
         if (gbest >= 0 && !e_taken) {
             int v = pool[gbest].vreg;
             free(word_home_prepick);
+            free(late_pair_home); late_pair_home = NULL;
             word_home_prepick = malloc((size_t)f->n_vregs * sizeof(int));
             if (word_home_prepick)
                 memcpy(word_home_prepick, f->vreg_to_phys,

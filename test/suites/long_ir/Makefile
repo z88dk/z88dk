@@ -2724,6 +2724,22 @@ blayout_tosrmw_8080_keep.bin: $(SOURCES) blayout.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -Cc--opt-disable=tos-rmw --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+# A word home placed after a rejected DE pick is demoted when the restored
+# tenant shares its pair (hist_pass hung on z80 fp).
+all: latepair.bin latepair_fp.bin latepair_8080.bin
+
+latepair.bin: $(SOURCES) latepair.c
+	$(compile)
+	$(runtest)
+
+latepair_fp.bin: $(SOURCES) latepair.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+latepair_8080.bin: $(SOURCES) latepair.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 # de-rearb: a rejected word DE-home pick, lowered again without a DE-class home.
 derearb.bin: $(SOURCES) derearb.c
 	$(compile)
