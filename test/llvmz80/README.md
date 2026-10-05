@@ -33,6 +33,7 @@ The runtime tests check C23 at O0, O2 and Os.
 They use independent expected values and repeat calls to check stack cleanup.
 The tests require classic CP/M and an initialised heap.
 They do not use `-fno-builtin`.
+The runtime tests currently use `ntvcm` for CP/M execution. While `z88dk-ticks` can execute CP/M `.COM` binaries, it emits extra cycle-count information on stdout at exit and therefore does not currently replace `ntvcm`.
 
 Use a compiler that applies default0 to implicit library declarations.
 Otherwise unannotated `puts` and `vsnprintf` can retain the register ABI.

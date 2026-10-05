@@ -1,4 +1,6 @@
 #!/bin/sh
+# Verifies that zcc respects TMPDIR and creates intermediate files in the
+# specified temporary directory.
 set -eu
 
 DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)

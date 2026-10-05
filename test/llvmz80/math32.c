@@ -1,3 +1,5 @@
+/* Tests 32-bit floating point arithmetic and math32 runtime library linkage
+ * (-lm) under llvmz80. */
 #include <stdio.h>
 
 __attribute__((noinline)) static float arithmetic(float left, float right)

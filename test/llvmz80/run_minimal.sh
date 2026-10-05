@@ -1,4 +1,6 @@
 #!/bin/sh
+# Compiles header_abi.c and varargs.c for CP/M with llvmz80 across -O0, -O2, -Os,
+# runs the binaries under an emulator, and validates exact output matching.
 set -eu
 
 DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)

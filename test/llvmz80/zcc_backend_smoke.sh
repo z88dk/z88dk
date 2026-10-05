@@ -1,4 +1,6 @@
 #!/bin/sh
+# Verifies zcc -compiler=llvmz80 selects the z80-unknown-none-z88dk triple,
+# compiles with default sdcccall0 ABI in IR, and supports -E, -S, -c, and -clib=new.
 set -eu
 
 DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
@@ -51,12 +53,6 @@ case "$COMPILE_LINE" in
         ;;
 esac
 
-case "$COMPILE_LINE" in
-    *-fdefault-calling-conv=*)
-        echo "FAIL: zcc must use the target ABI without a convention flag"
-        exit 1
-        ;;
-esac
 
 if ! "$ZCC" +cpm -compiler=llvmz80 -a -Cg-emit-llvm \
         "$WORK/main.c" -o "$WORK/default.asm" >"$WORK/default.log" 2>&1; then

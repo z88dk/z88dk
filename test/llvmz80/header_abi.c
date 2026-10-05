@@ -1,3 +1,6 @@
+/* Tests classic z88dk library ABI conventions (__z88dk_fastcall, __z88dk_callee,
+ * smallc), memory allocation (malloc/calloc/realloc/free), stdlib utilities,
+ * and setjmp/longjmp across multiple iterations to ensure stack balance. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

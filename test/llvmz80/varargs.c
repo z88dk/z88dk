@@ -1,3 +1,5 @@
+/* Tests variadic function ABI under llvmz80 (sdcccall0 stack convention):
+ * va_list, va_start, va_arg, va_copy, va_end, vsnprintf, and C23 variadics. */
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
