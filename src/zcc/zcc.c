@@ -4044,7 +4044,8 @@ void tempname(char *filen)
                                         * files. */
         *ptr = 0;    /* Don't want to risk too long filenames */
 #else
-    if (temp_path(filen, FILENAME_MAX + 1, "tmpXXXXXXXX") != 0) {
+    if (temp_path(filen, FILENAME_MAX + 2 - sizeof(".lst"),
+                  "tmpXXXXXXXX") != 0) {
         fprintf(stderr, "Temporary filename path is too long\n");
         exit(1);
     }
