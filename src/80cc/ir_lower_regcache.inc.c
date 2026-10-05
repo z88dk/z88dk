@@ -320,7 +320,17 @@ static int remat_word_clobbers_hl(const Func *f, int vreg_id)
    Returns 1 if emitted, 0 if vreg isn't rematerializable. Caller updates the
    cache belief for `rp`. The LEA form clobbers HL when `rp` is not "hl" —
    see remat_word_clobbers_hl. */
+/* sp_adj: words the caller has pushed and not yet counted in cur_sp_adjust
+   (load_to_hl_adj during argument marshalling). Only a frame address needs it. */
+static int emit_remat_word_adj(FILE *out, const Func *f, int vreg_id,
+                               const char *rp, int sp_adj);
 static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp)
+{
+    return emit_remat_word_adj(out, f, vreg_id, rp, 0);
+}
+
+static int emit_remat_word_adj(FILE *out, const Func *f, int vreg_id,
+                               const char *rp, int sp_adj)
 {
     if (!g_hc.remat_def || vreg_id < 0 || vreg_id >= f->n_vregs) return 0;
     const Op *o = g_hc.remat_def[vreg_id];
@@ -342,7 +352,7 @@ static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp
     if (o->kind == IR_LEA && o->src[0] >= 0 && o->src[0] < f->n_vregs) {
         int src = o->src[0];
         emit(out, "ld\thl,%d",
-             slot_off(f, src) + L.cur_sp_adjust + (int)o->imm);
+             slot_off(f, src) + L.cur_sp_adjust + sp_adj + (int)o->imm);
         emit(out, "add\thl,sp");
         if (!strcmp(rp, "hl"))
             return 1;                                /* HL = addr; caller cache_hl */
@@ -550,8 +560,9 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     /* Rematerialize a constant/address instead of reloading its slot: a
        loop-invariant `ld hl,<const>` (10T) beats `ld hl,(ix+d)` (19T) and
        spills nothing. Cache-miss only (every register hit was checked above).
-       sp_adj is irrelevant — the constant is position-independent. */
-    if (width == 2 && emit_remat_word(out, f, vreg_id, "hl")) {
+       A constant ignores sp_adj; a frame address (&local) is sp-relative and
+       must count the words pushed so far. */
+    if (width == 2 && emit_remat_word_adj(out, f, vreg_id, "hl", sp_adj)) {
         rec_note(REC_REMAT, vreg_id);   /* B4: recovered by rematerialisation */
         hl_about_to_change(vreg_id);
         return;

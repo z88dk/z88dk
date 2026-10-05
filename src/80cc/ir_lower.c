@@ -654,11 +654,11 @@ static int frameprobe_line_bytes(const char *b)
    guard is not equivalent to a depth check even when it passes, because a
    BALANCED push/pop pair between park and use leaves cur_sp_adjust untouched
    while having consumed the parked word in between. */
-static long pv_steal, pv_depth_bad, pv_parks;
+static long pv_steal, pv_depth_bad, pv_parks, pv_orphan;
 static void park_verify_report(void)
 {
-    fprintf(stderr, "IR_PARK_VERIFY parks=%ld steal=%ld depth_mismatch=%ld\n",
-            pv_parks, pv_steal, pv_depth_bad);
+    fprintf(stderr, "IR_PARK_VERIFY parks=%ld steal=%ld depth_mismatch=%ld orphan=%ld\n",
+            pv_parks, pv_steal, pv_depth_bad, pv_orphan);
 }
 static int park_verify_on = -1;
 /* `push xx` / `pop xx` off the emitted line; +1/-1/0 in words. */
@@ -8711,12 +8711,13 @@ static int ir_lower_func_body(FILE *out, Func *f)
            safe to treat as the plain symbol-address constant it is. */
         int *store_base_hard = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
                                       sizeof(int));
-        /* remat-LEA is gated to CALLLESS functions (see the [remat-lea] note):
-           recomputing a frame-slot address mid-call-argument-marshalling would need
-           cur_sp_adjust to reflect the already-pushed args, and a &local passed to a
-           call is the concrete failure (sortbench qsort_rec's cmp(&v[j],&pivot)). A
-           function with no IR_CALL has no such marshalling, so every remat point is
-           sp-adjust-safe. */
+        /* remat-LEA was gated to CALLLESS functions: a &local recomputed while
+           call arguments are half-pushed must count those pushes (sortbench
+           qsort_rec's cmp(&v[j],&pivot) took the wrong address). load_to_hl_adj
+           now hands its sp_adj to the remat, so calls are allowed. It needs
+           lea-call-args too: without it a calling function parks its frame
+           addresses with pushes nothing pops, and SP no longer matches
+           cur_sp_adjust. `--opt-disable=remat-lea-call` restores the gate. */
         int func_has_call = 0;
         if (ndef && store_base && store_base_hard) {
             for (int b = 0; b < f->n_bbs; b++)
@@ -8774,7 +8775,9 @@ static int ir_lower_func_body(FILE *out, Func *f)
                        (`--opt-disable=remat-lea-ez80fp` excludes it). Store-base
                        LEAs keep their slot. Default-on; IR_OFF=remat-lea opts out.
                        Evidence and the CPU-test-vs-property lesson: adr/0040. */
-                    else if (o->kind == IR_LEA && o->src[0] >= 0 && !func_has_call
+                    else if (o->kind == IR_LEA && o->src[0] >= 0
+                             && (!func_has_call || (!opt_disabled("remat-lea-call")
+                                                    && !opt_disabled("lea-call-args")))
                              && ir_home_at(f, o->dst) != IR_PR_STACK
                              && !(IS_EZ80() && fp_active(f)
                                   && opt_disabled("remat-lea-ez80fp"))
@@ -9891,6 +9894,12 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             bb_lowered[bb->id] = 1;
             continue;
         }
+        /* [IR_PARK_VERIFY] a park or push still outstanding at a block end
+           is an ORPHAN: its pop was folded away and SP no longer matches
+           cur_sp_adjust (fp hid it until frame addresses went through SP). */
+        if (park_verify_on > 0 && rec_counting
+            && (L.cur_sp_adjust != 0 || L.cur_stack_resident >= 0))
+            pv_orphan++;
         emit_bb_label(out, bb->id);
         /* The long data-stack is per-BB. Any push/pop imbalance at
            a BB boundary would shift sp for unrelated code. */

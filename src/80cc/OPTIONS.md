@@ -189,6 +189,8 @@ exists (ADR 0010).
 | `home-exit-dead` | flush a DE home at a loop exit even when it is dead there |
 | `remat-lea` | an address is reloaded rather than recomputed |
 | `remat-lea-ez80fp` | on ez80 in fp mode a frame-slot address gets a slot instead of being rematerialised |
+| `remat-lea-call` | a frame-slot address in a function that makes a call gets a slot instead of being rematerialised |
+| `lea-call-args` | any call in a function makes every frame address count as needed, even when all its uses fold to `(ix+d)` |
 | `symaddr-deref` | a symbol address is not folded into its dereference |
 | `slot-addr-widen` | a cached slot address is not reused for a wider access |
 | `trunc-res` | a truncated result is materialised at full width first |

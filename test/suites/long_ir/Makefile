@@ -2724,6 +2724,38 @@ blayout_tosrmw_8080_keep.bin: $(SOURCES) blayout.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -Cc--opt-disable=tos-rmw --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+# remat-lea-call: &local rematerialised as a call argument counts the words
+# already pushed; _keep restores the no-call gate.
+all: remacall.bin remacall_fp.bin remacall_8080.bin remacall_gbz80.bin remacall_r2ka.bin remacall_ez80_fp.bin remacall_keep.bin
+
+remacall.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+remacall_fp.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+remacall_8080.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+remacall_gbz80.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+remacall_r2ka.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+remacall_ez80_fp.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+remacall_keep.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=remat-lea-call --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 # ds-fp-store (dead word stores to (ix+d) dropped, never below the frame) and
 # dead-sp-addr (unused `ld hl,N; add hl,sp`); _keep opts out of both.
 all: dsfp.bin dsfp_fp.bin dsfp_8080.bin dsfp_gbz80.bin dsfp_ez80_fp.bin dsfp_z180_fp.bin dsfp_fp_keep.bin

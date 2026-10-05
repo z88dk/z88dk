@@ -3072,7 +3072,17 @@ static int lea_all_uses_indexed(const Func *f, const Op *lea)
             const Op *o = &f->bbs[b].ops[j];
             if (o == lea) continue;
             if (o->src[0] == v || o->src[1] == v) return 0;
-            if (o->call || o->hcall) return 0;   /* args are listed elsewhere */
+            /* A call's args are listed in the call, not in src[]: the address
+               is needed if it is one of them, not merely because a call exists
+               (that made every LEA in a calling function look live, so it was
+               parked with a push its folded uses never popped). */
+            if (o->call && opt_disabled("lea-call-args")) return 0;
+            if (o->call)
+                for (int a = 0; a < o->call->n_args; a++)
+                    if (o->call->args[a] == v) return 0;
+            if (o->hcall)
+                for (int a = 0; a < o->hcall->n_args; a++)
+                    if (o->hcall->args[a] == v) return 0;
             if (o->mem.kind != IR_MEM_VREG || o->mem.base != v) continue;
             if (o->kind != IR_LD_MEM && o->kind != IR_ST_MEM) return 0;
             /* A store whose VALUE is a folded immediate (src[0] < 0) does NOT

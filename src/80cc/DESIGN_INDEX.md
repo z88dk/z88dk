@@ -53,8 +53,15 @@ lifting it still miscompiles sortbench), `scratch` (dead word stores) and
 as a slot READ, so word dead-store never fired in fp; a dead spill reaching
 that path was then stored below the frame) and `dead-sp-addr` (unused
 `ld hl,N; add hl,sp`). -1561 B over 109 cells, 0 larger, 113 faster, 0
-slower; localbench z80 fp 277.5M -> 265.5M. Next: why remat-lea in a
-function with calls breaks sortbench.
+slower; localbench z80 fp 277.5M -> 265.5M.
+
+`escaped` fixed (5/10/2026): `remat-lea-call` (a frame address rebuilt while
+call arguments are being pushed ignored the words already pushed: sortbench's
+`cmp(&v[j],&pivot)`) and `lea-call-args` (any call made every frame address
+look needed, so an address whose uses all fold to `(ix+d)` was parked with a
+push nothing popped; `IR_PARK_VERIFY` now counts these as `orphan`). -2324 B
+over 66 cells, 0 larger; ticks 72 faster, 0 slower once Rabbit `add hl,sp` was
+costed 2 cycles, not 11. Next on localbench: `record`.
 
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,
