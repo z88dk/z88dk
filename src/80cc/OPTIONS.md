@@ -216,6 +216,10 @@ exists (ADR 0010).
 | `acc-mirror` | a compare or long long subtract whose right operand is in the accumulator and left is not reloads the right operand instead of calling the mirrored helper |
 | `acc-prepush` | the operand a double / long long binop or compare pushes is stored at its def and reloaded at the op, instead of being pushed when computed (sccz80 order) |
 | `acc-conv-hl` | a word converted from the float accumulator is always stored, and a value whose next op converts it to double is stored though the conversion reads it from HL |
+| `reg-int-literal` | an integer literal used as a 4-byte / 2-byte float operand or cast to one is converted at run time (l_f32_sint2f) instead of becoming a float constant |
+| `hcall-commit` | a word result of a helper call is always stored to its slot (not dead-aware) |
+| `remat-imm32` | a 4-byte constant read only as helper-call arguments keeps its def and slot instead of being rebuilt at each read |
+| `f32-prepush` | a 4-byte value whose only use is a later helper's stacked argument is pushed at its def only in the narrow Lever A case (sp mode, nothing between), not across balanced calls or in fp mode |
 | `alu-fold` | no `(ix+d)` ALU fold for AND/OR/XOR |
 | `ixd-fold` | no `(ix+d)` fold for the word accumulator |
 | `r6k-ixd-alu` | no Rabbit 6000 indexed ALU form |

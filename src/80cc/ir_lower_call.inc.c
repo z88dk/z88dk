@@ -1239,6 +1239,22 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
             popped_bytes += 4;
             continue;
         }
+        /* [f32-prepush] pushed at its def, still on top */
+        if (w == 4 && v >= 0 && dpp_n > 0 && dpp_v[dpp_n - 1] == v && !hc_bc_saved
+            && L.cur_sp_adjust == dpp_sp[dpp_n - 1]) {
+            dpp_n--;
+            popped_bytes += 4;
+            continue;
+        }
+        for (int p = 0; w == 4 && p < dpp_n; p++)
+            if (dpp_v[p] == v) {
+                /* never stored: a slot load here would read garbage */
+                ir_lower_loc();
+                fprintf(stderr, "ir_lower: f32-prepush operand v%d is not on top of "
+                        "the stack at its helper (%s); use --opt-disable=f32-prepush\n",
+                        v, hi->name);
+                exit(1);
+            }
         if (w == 4) {
             /* The helper clobbers BC, so this operand's DEHL BC=low stash is
                dead unless the same vreg is re-loaded as a later operand.
@@ -1317,6 +1333,8 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
     if (hi->ret_vreg >= 0) {
         if (f->vregs[hi->ret_vreg].width == 4)
             store_dehl_finalize(out, f, hi->ret_vreg);
+        else if (f->vregs[hi->ret_vreg].width == 2 && !opt_disabled("hcall-commit"))
+            commit_hl_result(out, f, hi->ret_vreg);   /* dead-aware, keeps HL */
         else
             store_hl(out, f, hi->ret_vreg);
     }

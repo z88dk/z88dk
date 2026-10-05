@@ -30,6 +30,8 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
 {
     int dst_w = (op->dst >= 0) ? f->vregs[op->dst].width : 2;
     if (dst_w == 4) {
+        /* [remat-imm32] every read rebuilds it (load_to_dehl) */
+        if (vreg_is_remat(f, op->dst)) return 0;
         /* Long literal: load DEHL = K, then spill 4 bytes. */
         uint32_t k = (uint32_t)op->imm;
         emit(out, "ld\thl,%u", (unsigned)(k & 0xffff));

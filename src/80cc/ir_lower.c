@@ -369,6 +369,11 @@ static void compute_no_slot_wide(Func *f);
 static int wpp_stack[8];
 static int wpp_n;
 static int wide_prepush(FILE *out, const Func *f, int v);
+/* [f32-prepush] 4-byte helper operands pushed at their def, innermost last,
+   with cur_sp_adjust right after each push. */
+static int dpp_v[8], dpp_sp[8];
+static int dpp_n;
+static int dpp_next;   /* set by the lookahead: push this op's DEHL result */
 /* [IR_ACCDROP_VERIFY] Inert: report a slot read of a wide value whose store
    was dropped earlier in the same render (the consumer lost the accumulator
    before it looked). */
@@ -8191,6 +8196,83 @@ static int def_dst_dead(const Func *f, const BB *bb, int j)
    before use. KEEP it when a same-BB reader exists (that reader can share the
    register); cross-BB readers rematerialise regardless, so skipping is at worst
    byte-neutral there and a win when the def is otherwise dead. */
+/* [f32-prepush] May the 4-byte def of `v` at (bb, j) be pushed for its sole
+   use, the stacked operand of a later HCALL in the block? The stack must stay
+   LIFO up to that HCALL: no argument group, struct push, asm, switch, return,
+   long push or PR_STACK park in the window, no value defined there outliving
+   it, and no read there of a value pushed earlier and still pending. */
+static int f32_prepush_ok(const Func *f, const BB *bb, int j, int v)
+{
+    int depth = 0;
+    for (int i = 0; i < j; i++) {
+        const Op *o = &bb->ops[i];
+        if (o->kind == IR_PUSH_ARG && o->imm == 1) depth++;
+        else if (o->kind == IR_CALL && o->call && o->call->pre_pushed > 0 && depth > 0) depth--;
+    }
+    if (depth) return 0;
+    int k = -1;
+    for (int b2 = 0; b2 < f->n_bbs; b2++)
+        for (int i = 0; i < f->bbs[b2].n_ops; i++) {
+            const Op *o = &f->bbs[b2].ops[i];
+            int u[16]; int nu = ir_op_uses(o, u, 16);
+            for (int q = 0; q < nu; q++)
+                if (u[q] == v) {
+                    if (k >= 0 || &f->bbs[b2] != bb || i <= j) return 0;
+                    k = i;
+                }
+        }
+    if (k < 0) return 0;
+    const Op *c = &bb->ops[k];
+    if (c->kind != IR_HCALL || !c->hcall || c->hcall->n_stacked != 1
+        || c->hcall->n_args < 1 || c->hcall->args[0] != v)
+        return 0;
+    for (int a = 1; a < c->hcall->n_args; a++)
+        if (c->hcall->args[a] == v) return 0;
+    for (int i = j + 1; i < k; i++) {
+        const Op *o = &bb->ops[i];
+        switch (o->kind) {
+        case IR_PUSH_ARG: case IR_PUSH_STRUCT: case IR_ASM: case IR_SWITCH:
+        case IR_RET: case IR_PUSH_DEHL_LONG:
+            return 0;
+        case IR_CALL:
+            if (!o->call || o->call->pre_pushed > 0) return 0;
+            break;
+        default: break;
+        }
+        int u[16]; int nu = ir_op_uses(o, u, 16);
+        for (int q = 0; q < nu; q++) {
+            if (u[q] < 0) continue;
+            if (ir_home_at(f, u[q]) == IR_PR_STACK) return 0;
+            for (int p = 0; p < dpp_n; p++) if (dpp_v[p] == u[q]) return 0;
+        }
+        int d[8]; int nd = ir_op_defs(o, d, 8);
+        for (int q = 0; q < nd; q++) {
+            if (d[q] < 0) continue;
+            if (ir_home_at(f, d[q]) == IR_PR_STACK) return 0;
+            const BitSet *after = (k + 1 < bb->n_ops) ? ir_op_live_in(bb, k + 1) : bb->live_out;
+            if (!after || ir_bitset_get(after, d[q])) return 0;
+        }
+    }
+    return 1;
+}
+
+/* Every read of `v` is an argument of an IR_HCALL (loaded with load_to_dehl). */
+static int imm32_only_hcall_args(const Func *f, int v)
+{
+    int n = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int u[16]; int nu = ir_op_uses(o, u, 16);
+            for (int k = 0; k < nu; k++) {
+                if (u[k] != v) continue;
+                if (o->kind != IR_HCALL || !o->hcall) return 0;
+                n++;
+            }
+        }
+    return n > 0;
+}
+
 static int remat_def_materialization_dead(const Func *f, const BB *bb, int j)
 {
     const Op *op = &bb->ops[j];
@@ -8797,6 +8879,18 @@ static int ir_lower_func_body(FILE *out, Func *f)
                     const Op *o = &f->bbs[b].ops[j];
                     int d = o->dst;
                     if (d < 0 || d >= f->n_vregs || ndef[d] != 1) continue;
+                    /* [remat-imm32] A 4-byte constant read only as helper-call
+                       arguments (f32 operands): each read is `ld hl;ld de`
+                       via load_to_dehl, so it needs no def and no slot. */
+                    if (f->vregs[d].width == 4 && o->kind == IR_LD_IMM
+                        && !(f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                                  | IR_VREG_PARAM))
+                        && !opt_disabled("remat-imm32")
+                        && imm32_only_hcall_args(f, d)) {
+                        g_hc.remat_def[d] = o;
+                        f->vregs[d].flags |= IR_VREG_NO_SLOT;
+                        continue;
+                    }
                     if (f->vregs[d].width != 2) continue;
                     /* A parameter's incoming value is not counted by ndef. A
                        conditional assignment must not make it rematerialisable.
@@ -9720,6 +9814,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     const int de_carry_on = !opt_disabled("de-carry");
     accdrop_begin(f);
     wpp_n = 0;
+    dpp_n = 0; dpp_next = 0;
     /* Per-render BC-tenant map, the mirror of bb_hl_out. Local to one render:
        the carry is only consulted within a pass. NULL (OOM) degrades to "never
        carry", which is the safe direction. */
@@ -9958,6 +10053,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         L.cur_sp_adjust = 0;
         L.cur_stack_resident = -1;   /* stack-transient never crosses a BB */
         wpp_n = 0;                   /* nor does a wide push at its def */
+        dpp_n = 0; dpp_next = 0;
         L.pv_depth = 0; L.pv_park_depth = -1; L.pv_park_vreg = -1;
         /* BC carry across the BB boundary — the exact mirror of the HL carry
            below. Previously the BC belief simply SURVIVED a boundary with no
@@ -10835,6 +10931,22 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     }
                 }
             }
+
+            /* [f32-prepush] Lever A generalised: fp mode too, and a window that
+               may hold balanced calls and helper calls (pushes nest LIFO). The
+               conditions mirror acc-prepush (wide_prepush_target). */
+            dpp_next = 0;
+            if (!L.la.cur_dehl_push_to_stack && !opt_disabled("f32-prepush")
+                && dpp_n < (int)(sizeof dpp_v / sizeof dpp_v[0])
+                && !func_has_pr_bc(f)
+                && !L.la.cur_dehl_dst_dead_safe
+                && L.la.cur_dehl_inline_push < 0
+                && L.la.cur_stack_long_top < 0
+                && op->dst >= 0 && f->vregs[op->dst].width == 4
+                && !vreg_is_pr_dehl(f, op->dst)
+                && !(f->vregs[op->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                && !(bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, op->dst)))
+                dpp_next = f32_prepush_ok(f, bb, j, op->dst);
 
             /* `jp` to the immediately-following BB is dead — the
                label is the next instruction. Elide when this is an

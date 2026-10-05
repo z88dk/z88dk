@@ -94,8 +94,17 @@ nothing defined there outliving it), and the other operand is computed straight
 into the accumulator: startrek 17108 B fp (sccz80 13816). `acc-conv-hl`: a
 word converted out of the accumulator commits through the dead-aware HL path,
 and an int→acc conversion counts as reading its operand from HL for
-def_dst_dead: startrek 16617 B fp. Register-tier f32/f16 (HCALLs in DEHL/HL)
-has the same shapes and none of these fixes yet.
+def_dst_dead: startrek 16617 B fp. Register-tier f32/f16 (HCALLs in DEHL/HL):
+`reg-int-literal` (int literal operand / cast is a float constant),
+`hcall-commit` (a word HCALL result commits dead-aware; also reaches integer
+helpers: corpus -2373 B/254 cells), `remat-imm32` (a 4-byte constant read only
+as HCALL args is rebuilt at each read, no def/slot), `f32-prepush` (Lever A
+generalised to fp mode and to windows holding balanced calls; a pushed operand
+not on top at its helper aborts the compile rather than reading an unwritten
+slot). support/benchmarks math32 fp: whetstone -2554 B, n-body -1704 B,
+mandelbrot -793 B/-14.8% ticks; outputs identical in 4 maths libs x 3 builds.
+Found on the way: copt #DE7 left DE stale (fixed aa1501328b). Open: untouched
+frame slots are not dropped (console: 218 functions, 2918 B of frame).
 
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,

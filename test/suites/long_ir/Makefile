@@ -2725,10 +2725,10 @@ blayout_tosrmw_8080_keep.bin: $(SOURCES) blayout.c
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 # remat-lea-call: &local rematerialised as a call argument counts the words
-# [#DE7] register-tier floats; the copt #DE7 regression.
-# f32wide: c_twice's f32->int result takes the TOS store that copt #DE7
-# rewrites, then l_mult reads DE.
-all: f32wide.bin f32wide_fp.bin f32wide_mbf.bin f32wide_mbf_fp.bin f32wide_8085.bin f32wide_gbz80.bin f32wide_r2ka.bin
+# [#DE7 / reg-int-literal / hcall-commit / remat-imm32 / f32-prepush] register-tier floats.
+# f32wide_de7: with hcall-commit off the f32->int result takes the TOS store,
+# which copt #DE7 rewrites; c_twice reads DE after it.
+all: f32wide.bin f32wide_fp.bin f32wide_mbf.bin f32wide_mbf_fp.bin f32wide_8085.bin f32wide_gbz80.bin f32wide_r2ka.bin f32wide_keep.bin f32wide_de7.bin
 
 f32wide.bin: $(SOURCES) f32wide.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
@@ -2757,6 +2757,14 @@ f32wide_gbz80.bin: $(SOURCES) f32wide.c
 f32wide_r2ka.bin: $(SOURCES) f32wide.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -fframe-pointer --math32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_keep.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=reg-int-literal -Cc--opt-disable=remat-imm32 -Cc--opt-disable=f32-prepush -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_de7.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=hcall-commit -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 # [acc-drop-wide / acc-int-literal / acc-pool-operand] wide results read from the accumulator.
 all: accwide.bin accwide_fp.bin accwide_keep.bin accwide_z180.bin accwide_r2ka.bin accwide_r2ka_fp.bin accwide_ez80.bin accwide_kc160.bin

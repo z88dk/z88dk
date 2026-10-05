@@ -2025,6 +2025,15 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        e.g. a long-typed `x+r` whose int operands leave it width-2) read back
        correctly wherever it is later used as a long, instead of pulling a
        neighbouring slot's bytes in as the high half. */
+    if (f->vregs[vreg_id].width == 4 && vreg_is_remat(f, vreg_id)
+        && g_hc.remat_def[vreg_id]->kind == IR_LD_IMM) {
+        uint32_t k = (uint32_t)g_hc.remat_def[vreg_id]->imm;   /* [remat-imm32] */
+        emit(out, "ld\thl,%u", (unsigned)(k & 0xffff));
+        emit(out, "ld\tde,%u", (unsigned)((k >> 16) & 0xffff));
+        invalidate_de_cache();
+        publish_dehl_from_hl(out, vreg_id, no_bc);
+        return;
+    }
     if (f->vregs[vreg_id].width == 2) {
         int save = L.cur_sp_adjust;
         L.cur_sp_adjust += sp_adj;              /* sp-rel slot at sp+sp_adj (fp: ignored) */
@@ -2389,6 +2398,25 @@ static void emit_dehl_stack_push(FILE *out, int vreg_id)
 static void store_dehl_finalize(FILE *out, const Func *f, int vreg_id)
 {
     note_wide_def(vreg_id);
+    if (dpp_next && !L.la.cur_dehl_push_to_stack && !vreg_is_pr_dehl(f, vreg_id)) {
+        /* [f32-prepush] push it for its helper instead of storing it */
+        dpp_next = 0;
+        note_wide_noslot(vreg_id);
+        if (L.la.cur_dehl_bc_is_low) L.la.cur_dehl_bc_is_low = 0;
+        else                         emit(out, "ld\tbc,hl");
+        emit(out, "push\tde");
+        emit(out, "push\tbc");
+        L.cur_sp_adjust += 4;
+        dpp_v[dpp_n] = vreg_id;
+        dpp_sp[dpp_n] = L.cur_sp_adjust;
+        dpp_n++;
+        invalidate_hl_cache();
+        hl_about_to_change(vreg_id);
+        cache_dehl(vreg_id);
+        L.la.cur_dehl_push_to_stack = 0;
+        return;
+    }
+    dpp_next = 0;
     if (L.la.cur_dehl_dst_dead_safe || vreg_is_pr_dehl(f, vreg_id)) {
         cache_dehl_no_spill(out, vreg_id);
     } else if (L.la.cur_dehl_push_to_stack

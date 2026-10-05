@@ -1879,8 +1879,18 @@ static Kind reg_float_common(Kind a, Kind b)
    (the f16/f32 analog of build_operand_as_acc). Already-`fk` returns as-is; an
    integer source converts via int→float; the other register float converts
    f16↔f32. A width-8 int / acc-double source isn't handled here (-1). */
+static int emit_float_const(Builder *b, double value, Kind fk);
+
 static int build_operand_as_float_reg(Builder *b, Node *node, Kind fk)
 {
+    /* An integer literal is that float constant, not a runtime l_f*_sint2f. */
+    if (node && node->ast_type == AST_LITERAL && !opt_disabled("reg-int-literal")
+        && kind_is_integer(node_value_kind(node))) {
+        double val = (node->type && node->type->isunsigned)
+                   ? (double)node_int_bits(node) : (double)node_int_value(node);
+        int c = emit_float_const(b, val, fk);
+        if (c >= 0) return c;
+    }
     int v = build_expr(b, node);
     if (v < 0) return -1;
     Kind k = node_value_kind(node);
@@ -6155,6 +6165,15 @@ static int build_cast(Builder *b, Node *n)
     }
     if (is_acc_float_kind(dst_k)) {
         int c = acc_int_literal(b, n->operand);
+        if (c >= 0) return c;
+    }
+    if (is_register_float_kind(dst_k) && n->operand->ast_type == AST_LITERAL
+        && !opt_disabled("reg-int-literal")
+        && kind_is_integer(node_value_kind(n->operand))) {
+        Node *lit = n->operand;
+        double val = (lit->type && lit->type->isunsigned)
+                   ? (double)node_int_bits(lit) : (double)node_int_value(lit);
+        int c = emit_float_const(b, val, dst_k);
         if (c >= 0) return c;
     }
     int src_v = build_expr(b, n->operand);
