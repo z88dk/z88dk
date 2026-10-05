@@ -363,6 +363,7 @@ typedef enum {
 
 static void apply_clobbers(Clobber c);
 static int wide_acc_result_dead_in_acc(const Func *f, int v);
+static void compute_no_slot_wide(Func *f);
 /* [IR_ACCDROP_VERIFY] Inert: report a slot read of a wide value whose store
    was dropped earlier in the same render (the consumer lost the accumulator
    before it looked). */
@@ -5953,6 +5954,7 @@ static void emit_slot_addr_ofs(FILE *out, const Func *f, int vreg, int adj,
 static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
 {
     accdrop_check_read(f, vreg);
+    require_slot(f, vreg);   /* [acc-drop-slot] a dropped value has no slot */
     if (fp_active(f) && IS_EZ80()) {
         /* ez80: lea hl,ix+d is one 3-byte op, beating the 4-byte sp form. */
         int ixoff = slot_ix_off(f, vreg);
@@ -8838,6 +8840,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
         }
         free(store_base); free(store_base_hard);
     }
+    compute_no_slot_wide(f);
     ir_assign_slots(f);
     /* Frameless (Tier-B): decided once frame_size + homes are known; must be set
        before any fp_active/frame_has_saved_fp use (prepick region proof, render).

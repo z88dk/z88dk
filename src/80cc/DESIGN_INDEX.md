@@ -83,9 +83,12 @@ which is loaded by its own path); an integer literal operand becomes a pool
 constant (`acc-int-literal`) and a pool constant is read by address rather
 than through a vreg and slot (`acc-pool-operand`). startrek 20044 -> 18342 B
 fp, console +17% vs sccz80; bench corpus byte-identical. `IR_ACCDROP_VERIFY`
-reports a slot read after a dropped store. Still open: the dead slots stay in
-the frame, and a non-commutative op whose left operand is in a slot reloads
-the right one.
+reports a slot read after a dropped store. Then `acc-drop-slot` (a value whose
+every store drops gets no slot) and `acc-mirror` (a compare, or an i64
+subtract via negate, whose right operand is resident takes the mirrored
+helper; float subtract is not mirrored, the libraries sign a zero result
+differently): startrek 18107 B fp. Still open: float sub/div with the left
+operand in a slot; sccz80 pushes the left operand at its def.
 
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,

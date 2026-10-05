@@ -33,6 +33,11 @@ static double t2(double y) { return f2(y + 1, gi * 2, glg + 1); }
 static double t3(double y) { return f3(glg * 2, gi, y / 2); }
 static double t4(double y) { return f4(gi, y - 1, gi); }
 static double t6(double y) { return fc(y + 1); }
+static int m_lt(double a, double b) { return a < b * 2; }
+static int m_le(double a, double b) { return a <= b * 2; }
+static int m_gt(double a, double b) { return a > b * 2; }
+static int m_ge(double a, double b) { return a >= b * 2; }
+static int m_pool(double b) { return 9 < b * 2; }
 
 #endif
 
@@ -47,6 +52,11 @@ static void ll_store(long long x) { gl = x * 1000 + 3; }
 static long long l1(int a, long long x, int b) { return a + x * 2 + b; }
 static long long lfc(long long x) __z88dk_fastcall { return x + 1; }
 static int li = 3;
+static long long lm_sub(long long a, long long b) { return a - b * 3; }
+static int lm_lt(long long a, long long b) { return a < b * 2; }
+static int lm_ge(long long a, long long b) { return a >= b * 2; }
+static int lm_ult(unsigned long long a, unsigned long long b) { return a < b * 2; }
+static int lm_uge(unsigned long long a, unsigned long long b) { return a >= b * 2; }
 
 #ifndef NO_DOUBLE
 static void test_accwide_double(void)
@@ -71,6 +81,11 @@ static void test_accwide_double(void)
     assertEqual((int)t3(8), 43);
     assertEqual((int)t4(5.0), 307);
     assertEqual((int)t6(3.0), 8);
+    assertEqual(m_lt(5, 3), 1); assertEqual(m_lt(6, 3), 0); assertEqual(m_lt(7, 3), 0);
+    assertEqual(m_le(5, 3), 1); assertEqual(m_le(6, 3), 1); assertEqual(m_le(7, 3), 0);
+    assertEqual(m_gt(5, 3), 0); assertEqual(m_gt(6, 3), 0); assertEqual(m_gt(7, 3), 1);
+    assertEqual(m_ge(5, 3), 0); assertEqual(m_ge(6, 3), 1); assertEqual(m_ge(7, 3), 1);
+    assertEqual(m_pool(4.5), 0); assertEqual(m_pool(5), 1);
 }
 #endif
 
@@ -90,6 +105,13 @@ static void test_accwide_i64(void)
     assertEqual((int)(gl - 70000), 3);
     assertEqual((int)l1(li, (long long)7 * 3, li), 48);
     assertEqual((int)lfc((long long)li * 4), 13);
+    assertEqual((int)lm_sub(10, 4), -2);
+    assertEqual((int)lm_sub(-10, -4), 2);
+    assertEqual((int)(lm_sub(0x100000000LL, 1) >> 32), 0);
+    assertEqual(lm_lt(5, 3), 1); assertEqual(lm_lt(6, 3), 0); assertEqual(lm_lt(-7, -3), 1);
+    assertEqual(lm_ge(5, 3), 0); assertEqual(lm_ge(6, 3), 1); assertEqual(lm_ge(-5, -3), 1);
+    assertEqual(lm_ult(5, 3), 1); assertEqual(lm_ult(0xFFFFFFFFFFFFFFFFULL, 3), 0);
+    assertEqual(lm_uge(5, 3), 0); assertEqual(lm_uge(0x8000000000000000ULL, 1), 1);
 }
 
 int main(int argc, char *argv[])

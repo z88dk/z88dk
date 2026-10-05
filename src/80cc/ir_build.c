@@ -2702,9 +2702,11 @@ static int build_binop_float(Builder *b, Node *n)
                        ? ir_pool_litlab_double(n->right->zval) : -1;
             int rf = (r_pool >= 0) ? -1 : build_operand_as_acc(b, n->right);
             if (r_pool < 0 && rf < 0) return build_fail("float cmp: rhs not promotable");
+            int l_pool = (c_fp_size > 4 && lf != rf) ? take_pool_operand(b, lf) : -1;
+            if (r_pool < 0 && c_fp_size > 4 && lf != rf) r_pool = take_pool_operand(b, rf);
             int dst = new_temp_kind(b, KIND_INT);
             int *cargs = calloc(2, sizeof(int));
-            cargs[0] = lf; cargs[1] = (r_pool >= 0) ? -1 : rf;
+            cargs[0] = (l_pool >= 0) ? -1 : lf; cargs[1] = (r_pool >= 0) ? -1 : rf;
             Op *cop = ir_op_emit(cur_bb(b), IR_ACC_CMP);
             cop->dst = dst;
             HelperInfo *chi = calloc(1, sizeof(HelperInfo));
@@ -2715,6 +2717,7 @@ static int build_binop_float(Builder *b, Node *n)
             chi->acc_loadpush = acc_name("loadpush");
             chi->acc_width = c_fp_size; chi->acc_holds_lhs = 0;
             chi->acc_commutative = acc_stem_commutative(cstem);
+            if (l_pool >= 0) { chi->acc_src_is_pool[0] = 1; chi->acc_src_litlab[0] = l_pool; }
             if (r_pool >= 0) { chi->acc_src_is_pool[1] = 1; chi->acc_src_litlab[1] = r_pool; }
             cop->hcall = chi;
             return dst;

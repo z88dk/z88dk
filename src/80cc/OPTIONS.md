@@ -212,6 +212,8 @@ exists (ADR 0010).
 | `acc-drop-wide` | a wide (float / long long) result is stored to its slot even when the next op reads it from the accumulator and it dies there (only the binop/compare push case drops it), and a wide call argument is always reloaded from its slot |
 | `acc-int-literal` | an integer literal used as a 5/6/8-byte double operand or cast to one is converted at run time instead of becoming a double constant |
 | `acc-pool-operand` | a pool constant operand of a 5/6/8-byte double add/sub/mul/div is loaded into a vreg (and its slot) instead of being read by address |
+| `acc-drop-slot` | a double / long long whose every store is dropped still gets a frame slot |
+| `acc-mirror` | a compare or long long subtract whose right operand is in the accumulator and left is not reloads the right operand instead of calling the mirrored helper |
 | `alu-fold` | no `(ix+d)` ALU fold for AND/OR/XOR |
 | `ixd-fold` | no `(ix+d)` fold for the word accumulator |
 | `r6k-ixd-alu` | no Rabbit 6000 indexed ALU form |

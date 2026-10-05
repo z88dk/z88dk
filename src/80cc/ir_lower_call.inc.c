@@ -664,18 +664,55 @@ static int acc_operand_resident(const Func *f, const HelperInfo *hi, int pos)
         && *wide_acc_cell(f, hi->args[pos]) == hi->args[pos];
 }
 
+/* The helper that computes `name` with its operands exchanged, for an op that
+   is not commutative but has an exact mirror: a compare reverses its relation,
+   an i64 subtract negates its result (`then`). Float subtraction is not
+   mirrored: the formats differ in how they sign a zero result. NULL if none. */
+static const char *acc_mirror(const char *name, const char **then)
+{
+    static const char *const t[][3] = {
+        { "dlt", "dgt", NULL }, { "dgt", "dlt", NULL },
+        { "dleq", "dge", NULL }, { "dge", "dleq", NULL },
+        { "l_f64_lt", "l_f64_gt", NULL }, { "l_f64_gt", "l_f64_lt", NULL },
+        { "l_f64_le", "l_f64_ge", NULL }, { "l_f64_ge", "l_f64_le", NULL },
+        { "l_i64_lt", "l_i64_gt", NULL }, { "l_i64_gt", "l_i64_lt", NULL },
+        { "l_i64_le", "l_i64_ge", NULL }, { "l_i64_ge", "l_i64_le", NULL },
+        { "l_i64_ult", "l_i64_ugt", NULL }, { "l_i64_ugt", "l_i64_ult", NULL },
+        { "l_i64_ule", "l_i64_uge", NULL }, { "l_i64_uge", "l_i64_ule", NULL },
+        { "l_i64_sub", "l_i64_sub", "l_i64_neg" },
+    };
+    if (then) *then = NULL;
+    if (!name || opt_disabled("acc-mirror")) return NULL;
+    for (size_t i = 0; i < sizeof t / sizeof t[0]; i++)
+        if (!strcmp(name, t[i][0])) {
+            if (then) *then = t[i][2];
+            return t[i][1];
+        }
+    return NULL;
+}
+
 /* Push one operand of a wide binop/cmp and return the POSITION (0/1) to load
    into the accumulator. Honours acc_holds_lhs (non-commutative order); for a
    commutative op pushes whichever operand is accumulator-resident (straight
    from the accumulator — no reload). Pool-constant operands are loaded by
    address; never resident, so they end up loaded-last. */
-static int acc_push_one_operand(FILE *out, Func *f, const HelperInfo *hi)
+static int acc_push_one_operand(FILE *out, Func *f, const HelperInfo *hi,
+                                int *mirrored)
 {
     int push_pos = hi->acc_holds_lhs ? 1 : 0;
     int acc_pos  = hi->acc_holds_lhs ? 0 : 1;
+    *mirrored = 0;
     if (hi->acc_commutative) {
         if      (acc_operand_resident(f, hi, 1)) { push_pos = 1; acc_pos = 0; }
         else if (acc_operand_resident(f, hi, 0)) { push_pos = 0; acc_pos = 1; }
+    } else if (acc_operand_resident(f, hi, acc_pos)
+               && !acc_operand_resident(f, hi, push_pos)
+               && hi->args[0] != hi->args[1]
+               && acc_mirror(hi->name, NULL)) {
+        /* The operand the helper wants in the accumulator is already there:
+           push it instead and call the mirrored helper. */
+        int t = push_pos; push_pos = acc_pos; acc_pos = t;
+        *mirrored = 1;
     }
     if (acc_operand_resident(f, hi, push_pos)) {
         emit(out, "call\t%s", hi->acc_push);          /* already resident */
@@ -700,7 +737,11 @@ static int acc_op_pushes_from_acc(const HelperInfo *h, int v)
     int a0 = h->args[0], a1 = h->args[1];
     if (a0 == a1) return 0;            /* used as both operands → the load reads the slot */
     if (h->acc_commutative) return (v == a0 || v == a1);
-    return v == (h->acc_holds_lhs ? a1 : a0);   /* the fixed pushed operand */
+    if (v == (h->acc_holds_lhs ? a1 : a0)) return 1;   /* the fixed pushed operand */
+    /* The other operand, freshly resident while the pushed one is not (they
+       differ): acc_push_one_operand mirrors and pushes it from the
+       accumulator. */
+    return v == (h->acc_holds_lhs ? a0 : a1) && acc_mirror(h->name, NULL);
 }
 
 /* The only wide argument of a stacked, not pre-pushed call: the push loop
@@ -752,6 +793,60 @@ static int wide_next_reads_acc(const Func *f, const Op *nx, int v)
    (push-from-acc) and v is dead afterwards, so its slot is never read.
    Conservative — any uncertainty (no liveness, BB-end, non-acc next op)
    keeps the store. */
+/* The static half of wide_acc_result_dead_in_acc: is the def at (bb, j) of
+   wide `v` read straight from the accumulator by the next op, dying there? */
+static int wide_def_dropped_at(const Func *f, const BB *bb, int j, int v)
+{
+    if (opt_disabled("acc-drop") || v < 0) return 0;
+    int k = j + 1;
+    while (k < bb->n_ops && bb->ops[k].kind == IR_NOP) k++;
+    if (k >= bb->n_ops) return 0;
+    if (!wide_next_reads_acc(f, &bb->ops[k], v)) return 0;
+    const BitSet *after = (k + 1 < bb->n_ops) ? ir_op_live_in(bb, k + 1) : bb->live_out;
+    return after && !ir_bitset_get(after, v);
+}
+
+/* [acc-drop-slot] A wide vreg whose every def is dropped (above) is never
+   stored, so it needs no frame slot. Only defs whose lowering consults
+   wide_acc_result_dead_in_acc qualify; any other def keeps the slot. */
+static void compute_no_slot_wide(Func *f)
+{
+    if (opt_disabled("acc-drop-slot") || opt_disabled("acc-drop")) return;
+    int nv = f->n_vregs;
+    if (nv <= 0) return;
+    signed char *ok = malloc((size_t)nv);
+    if (!ok) return;
+    for (int v = 0; v < nv; v++) {
+        const VReg *vr = &f->vregs[v];
+        ok[v] = vr->width > 4
+             && !(vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM
+                               | IR_VREG_PARAM_IN_PLACE)) ? 0 : -1;
+    }
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int k = 0; k < nd; k++) {
+                int v = d[k];
+                if (v < 0 || v >= nv || ok[v] < 0) continue;
+                int kind_ok = o->kind == IR_ACC_BINOP || o->kind == IR_LD_MEM
+                    || (o->kind == IR_MOV && o->dst == v)
+                    || (o->kind == IR_CALL && o->call && o->call->ret_vreg == v)
+                    || (o->kind == IR_ACC_UNOP && o->hcall && o->hcall->ret_vreg == v
+                        && o->hcall->acc_subkind != ACC_SUB_ACC2INT);
+                if (kind_ok && o->kind == IR_LD_MEM && o->mem.kind == IR_MEM_PORT)
+                    kind_ok = 0;
+                if (kind_ok && wide_def_dropped_at(f, bb, j, v)) ok[v] = 1;
+                else ok[v] = -1;
+            }
+        }
+    }
+    for (int v = 0; v < nv; v++)
+        if (ok[v] == 1) f->vregs[v].flags |= IR_VREG_NO_SLOT;
+    free(ok);
+}
+
 static int wide_acc_result_dead_in_acc_1(const Func *f, int v)
 {
     if (opt_disabled("acc-drop") || !cur_bb || v < 0) return 0;
@@ -827,13 +922,16 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
 
     (void)lhs; (void)rhs;
     /* 1. push one operand (from the accumulator if already resident). */
-    int acc_pos = acc_push_one_operand(out, f, hi);
+    int mirrored;
+    int acc_pos = acc_push_one_operand(out, f, hi, &mirrored);
     L.cur_sp_adjust += w;
     /* 2. acc operand -> acc (offsets now include the push) */
     emit_acc_operand_addr(out, f, hi, acc_pos);
     emit(out, "call\t%s", hi->acc_load);
     /* 3. binop — the helper pops the pushed operand */
-    emit(out, "call\t%s", hi->name);
+    const char *then = NULL;
+    emit(out, "call\t%s", mirrored ? acc_mirror(hi->name, &then) : hi->name);
+    if (then) emit(out, "call\t%s", then);
     L.cur_sp_adjust -= w;
     /* 4. acc -> dst slot — unless the result is consumed straight from the
        accumulator by the next op and dies there (slot never read). */
@@ -864,11 +962,12 @@ static int gen_acc_cmp(FILE *out, Func *f, const Op *op)
         return -1;
     }
     int w = hi->acc_width;
-    int acc_pos = acc_push_one_operand(out, f, hi);
+    int mirrored;
+    int acc_pos = acc_push_one_operand(out, f, hi, &mirrored);
     L.cur_sp_adjust += w;
     emit_acc_operand_addr(out, f, hi, acc_pos);
     emit(out, "call\t%s", hi->acc_load);
-    emit(out, "call\t%s", hi->name);
+    emit(out, "call\t%s", mirrored ? acc_mirror(hi->name, NULL) : hi->name);
     L.cur_sp_adjust -= w;
     /* The bool (0/1) is in HL. Commit word-result way: spill to the slot only
        if live-read (dead → skipped), advertise HL = result so a following
