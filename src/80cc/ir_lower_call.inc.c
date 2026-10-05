@@ -1145,6 +1145,8 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         emit(out, "call\t%s", hi->name);
         invalidate_hl_bc();
         if (f->vregs[dst].width == 4) store_dehl_finalize(out, f, dst);
+        else if (f->vregs[dst].width == 2 && !opt_disabled("acc-conv-hl"))
+            commit_hl_result(out, f, dst);   /* dead-aware: often only passed on */
         else                         store_hl(out, f, dst);
         return 0;
     }

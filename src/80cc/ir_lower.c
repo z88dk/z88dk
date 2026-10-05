@@ -8148,12 +8148,22 @@ static int def_dst_dead(const Func *f, const BB *bb, int j)
             }
             for (int u = 0; u < nu; u++) {
                 if (uses[u] != op->dst) continue;
+                /* An int→acc conversion loads its int operand with
+                   load_to_hl / load_to_dehl, so it is served by the cache the
+                   same way (the operand sits in hcall->args, not src[]). */
+                const Op *ko = &bb->ops[k];
+                int conv_served = !opt_disabled("acc-conv-hl")
+                    && ko->kind == IR_ACC_UNOP && ko->hcall
+                    && ko->hcall->acc_subkind == ACC_SUB_INT2ACC
+                    && ko->hcall->n_args == 1 && ko->hcall->args[0] == op->dst
+                    && (f->vregs[op->dst].width == 2 || f->vregs[op->dst].width == 4);
                 int cache_served =
                     allow_cache_hit &&
                     k == j + 1 &&
                     !k_redefs_dst &&
-                    bb->ops[k].src[cache_pos] == op->dst &&
-                    bb->ops[k].src[1 - cache_pos] != op->dst;
+                    (conv_served ||
+                     (ko->src[cache_pos] == op->dst &&
+                      ko->src[1 - cache_pos] != op->dst));
                 if (!cache_served) { safe = 0; break; }
                 allow_cache_hit = 0;
             }

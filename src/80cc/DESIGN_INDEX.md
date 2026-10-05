@@ -91,7 +91,11 @@ differently): startrek 18107 B fp. `acc-prepush` then takes sccz80's order:
 the operand a wide op pushes is pushed at its def when the stack between stays
 LIFO (no argument group, stacked helper args or PR_STACK park in the window,
 nothing defined there outliving it), and the other operand is computed straight
-into the accumulator: startrek 17108 B fp (sccz80 13816).
+into the accumulator: startrek 17108 B fp (sccz80 13816). `acc-conv-hl`: a
+word converted out of the accumulator commits through the dead-aware HL path,
+and an int→acc conversion counts as reading its operand from HL for
+def_dst_dead: startrek 16617 B fp. Register-tier f32/f16 (HCALLs in DEHL/HL)
+has the same shapes and none of these fixes yet.
 
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,

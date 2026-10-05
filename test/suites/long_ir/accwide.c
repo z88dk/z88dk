@@ -46,6 +46,15 @@ static double p_call(double a, double b) { return a * 3 - sq(b + 1); }
 static double p_int(double a, int i) { return a / 2 - (double)(i * ga + 1); }
 static double p_deep(double a, double b) { return a - (b - (a - (b - 1))); }
 static int p_cmp(double a, double b) { return a * 2 < sq(b) - 1; }
+static int gt0;
+static int ival(void) { return ga * 3; }
+static long lval(void) { return 100000L + ga; }
+static int take(int x) { return x + 1; }
+static void c_store(double t) { gt0 = (int)t; }
+static int c_arg(double t) { return take((int)(t * 2)); }
+static int c_twice(double t) { int i = (int)t; return i * i + i; }
+static double c_call(void) { double s = (double)ival(); return s + 0.5; }
+static double c_lcall(void) { return (double)lval() / 2; }
 
 #endif
 
@@ -71,6 +80,9 @@ static long long lp_nest(long long a, long long b, long long c, long long d, lon
 static long long lp_call(long long a, long long b) { return a * 3 - lsq(b + 1); }
 static long long lp_deep(long long a, long long b) { return a - (b - (a - (b - 1))); }
 static int lp_cmp(long long a, long long b) { return a * 2 < lsq(b) - 1; }
+static int lgt0;
+static void lc_store(long long t) { lgt0 = (int)(t * 3); }
+static long long lc_call(void) { return (long long)ival() * 1000000; }
 
 #ifndef NO_DOUBLE
 static void test_accwide_double(void)
@@ -105,6 +117,11 @@ static void test_accwide_double(void)
     assertEqual((int)p_int(10, 2), -10);
     assertEqual((int)p_deep(10, 4), 13);
     assertEqual(p_cmp(3, 3), 1); assertEqual(p_cmp(4, 2), 0);
+    c_store(12.75); assertEqual(gt0, 12);
+    assertEqual(c_arg(4.25), 9);
+    assertEqual(c_twice(5.5), 30);
+    assertEqual((int)(c_call() * 2), 43);
+    assertEqual((int)(c_lcall() - 50000), 3);
 }
 #endif
 
@@ -135,6 +152,8 @@ static void test_accwide_i64(void)
     assertEqual((int)lp_call(5, 2), 6);
     assertEqual((int)lp_deep(10, 4), 13);
     assertEqual(lp_cmp(3, 3), 1); assertEqual(lp_cmp(4, 2), 0);
+    lc_store(41); assertEqual(lgt0, 123);
+    assertEqual((int)(lc_call() / 1000000), 21);
 }
 
 int main(int argc, char *argv[])

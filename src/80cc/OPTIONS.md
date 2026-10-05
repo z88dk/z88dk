@@ -215,6 +215,7 @@ exists (ADR 0010).
 | `acc-drop-slot` | a double / long long whose every store is dropped still gets a frame slot |
 | `acc-mirror` | a compare or long long subtract whose right operand is in the accumulator and left is not reloads the right operand instead of calling the mirrored helper |
 | `acc-prepush` | the operand a double / long long binop or compare pushes is stored at its def and reloaded at the op, instead of being pushed when computed (sccz80 order) |
+| `acc-conv-hl` | a word converted from the float accumulator is always stored, and a value whose next op converts it to double is stored though the conversion reads it from HL |
 | `alu-fold` | no `(ix+d)` ALU fold for AND/OR/XOR |
 | `ixd-fold` | no `(ix+d)` fold for the word accumulator |
 | `r6k-ixd-alu` | no Rabbit 6000 indexed ALU form |
