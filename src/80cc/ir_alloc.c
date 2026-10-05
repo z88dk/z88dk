@@ -3415,6 +3415,85 @@ static int prepush_bc_hazard(const Func *f)
     return 0;
 }
 
+/* (c) of the above, per value rather than per function: mark[v] = 1 for a value
+   WRITTEN inside an open group and read after the call that closes it, or read
+   before that write (a loop-carried value). Same emitter walk as
+   prepush_bc_hazard. */
+static void prepush_straddle_mark(const Func *f, char *mark)
+{
+    int nv = f->n_vregs;
+    int *def_at = malloc((size_t)nv * sizeof(int));
+    int *close_at = malloc((size_t)nv * sizeof(int));
+    int *open = malloc((size_t)nv * sizeof(int));
+    if (!def_at || !close_at || !open) {
+        for (int v = 0; v < nv; v++) mark[v] = 1;
+        free(def_at); free(close_at); free(open);
+        return;
+    }
+    for (int v = 0; v < nv; v++) { def_at[v] = -1; close_at[v] = -1; }
+    int depth = 0, g = 0, n_open = 0;
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++, g++) {
+            const Op *o = &f->bbs[i].ops[j];
+            if (o->kind == IR_PUSH_ARG && o->imm == 1) {
+                if (depth < BC_ARGS_SAVE_MAX_PROBE) depth++;
+            } else if (o->kind == IR_CALL && o->call
+                       && o->call->pre_pushed > 0) {
+                if (depth > 0) depth--;
+                for (int k = 0; k < n_open; k++)
+                    if (close_at[open[k]] < 0) close_at[open[k]] = g;
+                if (depth == 0) n_open = 0;
+                continue;
+            }
+            if (depth > 0) {
+                int d[8]; int nd = ir_op_defs(o, d, 8);
+                for (int k = 0; k < nd; k++)
+                    if (d[k] >= 0 && d[k] < nv && def_at[d[k]] < 0) {
+                        def_at[d[k]] = g;
+                        if (n_open < nv) open[n_open++] = d[k];
+                    }
+            }
+        }
+    g = 0;
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++, g++) {
+            const Op *o = &f->bbs[i].ops[j];
+            int nu = ir_op_uses_count(o);
+            int ub[16]; int *u = nu > 16 ? malloc((size_t)nu * sizeof(int)) : ub;
+            if (!u) { for (int v = 0; v < nv; v++) mark[v] = 1; break; }
+            nu = ir_op_uses(o, u, nu > 16 ? nu : 16);
+            for (int k = 0; k < nu; k++) {
+                int v = u[k];
+                if (v < 0 || v >= nv || def_at[v] < 0) continue;
+                if (g < def_at[v] || (close_at[v] >= 0 && g > close_at[v]))
+                    mark[v] = 1;
+            }
+            if (u != ub) free(u);
+        }
+    free(def_at); free(close_at); free(open);
+}
+
+/* [prepush-straddle] Take BC, B and C away from the values prepush_straddle_mark
+   finds. The save at a group's first push holds BC from BEFORE their write, and
+   the pop after the call puts it back over them: `say("x", ++n); return n;`
+   returned the old n. */
+static void prepush_straddle_demote(Func *f)
+{
+    if (opt_disabled("prepush-straddle") || !f->vreg_to_phys || f->n_vregs <= 0)
+        return;
+    char *mark = calloc((size_t)f->n_vregs, 1);
+    if (!mark) return;
+    prepush_straddle_mark(f, mark);
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (!mark[v]) continue;
+        int ph = f->vreg_to_phys[v];
+        if (ph != IR_PR_BC && ph != IR_PR_B && ph != IR_PR_C) continue;
+        ir_alloc_demote_home(f, v);
+        f->vregs[v].flags &= ~(IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT);
+    }
+    free(mark);
+}
+
 
 /* [IR_OFF=bc-per-cand] Default-on after the matrix: switchbench -1.96%..-5.63% and
    widthbench -0.14%..-1.43% on all six valid-tick CPUs, every other suite within
@@ -6575,6 +6654,7 @@ void ir_alloc(Func *f)
     assign_idxhalf_homes(f);
     bytepack_verify(f);   /* size the spill candidates before placement */
     bytepack_pack(f);
+    prepush_straddle_demote(f);
     hr_recoverability_verify(f);
     ir_liveprobe_flush(f->fn ? ir_sym_name(f->fn) : "?");
 }

@@ -141,6 +141,7 @@ exists (ADR 0010).
 | `mwbc` | no multi-write BC home |
 | `mwbc-pressure` | the multi-write BC home ignores register pressure |
 | `prepush-narrow` | the pre-pushed-call veto stays whole-function instead of narrowing |
+| `prepush-straddle` | a value written inside a pre-pushed argument group and read after its call keeps a BC, B or C home (the restore after the call overwrites it) |
 | `depth-weight` | loop depth stops weighting the cost model — every block counts once |
 | `g0-measured` | the cost model uses estimated rather than measured Z80 access costs **(measure)** |
 | `idx2-base` | an index home is not offered to a dereference base |

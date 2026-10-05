@@ -67,6 +67,14 @@ push nothing popped; `IR_PARK_VERIFY` now counts these as `orphan`). -2324 B
 over 66 cells, 0 larger; ticks 72 faster, 0 slower once Rabbit `add hl,sp` was
 costed 2 cycles, not 11. Next on localbench: `record`.
 
+Real code (5/10/2026): examples/console mm.c aborted in sp mode and the same
+shape miscompiled silently (long_ir prestrad: `say("x", ++n); return n;`
+returned the old n). BC is saved at a pre-pushed group's FIRST push, so a BC
+home written inside the group is undone by the restore after the call.
+`prepush-straddle` demotes just those values from BC/B/C; the bench corpus is
+byte-identical. Real-code size: console +20% vs sccz80, emu.c +9% vs sdcc
+(startrek float temps through slots is the largest single item).
+
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,
 10 with a free register, about 48 B. The 183-site sizing from September has
