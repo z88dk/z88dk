@@ -1,30 +1,19 @@
-5/10/2026 (s4) — tick re-measure only, no compiler change since ebd3b74c3a.
-The z180 and Rabbit cells of sccz80 and sdcc, and the z180 cells of 80cc,
-were re-run to pick up two z88dk-ticks timing fixes:
+5/10/2026 (s5) — one row re-measured at 31ac317db1 (fixedbench ez80, the
+only cell the change moves); every other cell carried forward.
 
-  a9fee5743b  ticks: Rabbit add hl,sp is 2 cycles, not the Z80's 11 (the
-              80cc Rabbit columns already had this at ebd3b74c3a)
-  4520ed370d  ticks: z180 add hl,rr / add hl,sp is 7 states, not 11
-              (add ix,rr 10)
+  31ac317db1  ivsr-ez80-byte: on ez80 a byte-bounded counter no longer
+              suppresses the walking pointers it would make redundant. The
+              counter lives in a slot, and ez80 steps a slot pointer
+              natively, so rebuilding base + i*2 each iteration lost there
 
-No size changed and no cell changed state (BUILD/WRONG/HANG). xcc is
-z80-only and the other CPUs are untouched.
+fixedbench ez80: 80cc-fp 3885B / 8.61M -> 3879B / 8.53M, 80cc-sp 3928B /
+8.64M -> 3893B / 8.49M. Against the pushed 856dfca673 this cell was +4 B /
++0.46% ticks (fp); it is now smaller and faster than pushed in both modes.
 
-┌───────────────┬───────┬─────────────────────────────┬────────────────┐
-│ column        │ cells │ ticks                       │ lower / higher │
-├───────────────┼───────┼─────────────────────────────┼────────────────┤
-│ sccz80 z180   │ 31    │ 2419.49M -> 2310.14M -4.52% │ 31 / 0         │
-│ sdcc z180     │ 30    │ 1164.07M -> 1116.54M -4.08% │ 29 / 0         │
-│ 80cc-fp z180  │ 31    │ 1059.31M -> 1004.59M -5.17% │ 31 / 0         │
-│ 80cc-sp z180  │ 31    │ 1146.95M -> 1061.20M -7.48% │ 31 / 0         │
-│ sccz80 Rabbit │ 93    │ 3412.93M -> 3273.87M -4.07% │ 79 / 0         │
-│ sdcc r2ka     │ 29    │ 572.41M -> 561.84M -1.85%   │ 17 / 0         │
-└───────────────┴───────┴─────────────────────────────┴────────────────┘
-
-80cc ticks against sdcc, md5 excluded (all columns now on the same ticks):
-z180 fp -11.01% (was -10.10%), z180 sp -5.90% (was -2.58%); r2ka fp -0.39%
-(was -2.28%), r2ka sp -6.37% (was -8.15%). The r2ka "was" figures compared
-fixed-ticks 80cc with old-ticks sdcc, so they flattered 80cc.
+Isolated code_compiler scan (12 CPUs, sp+fp, 720 cells): -41 B, 2 smaller,
+0 larger; tick scan 2 faster, 0 slower. Gauntlet: long_ir sp and FP=1 clean
+(new ivsrbyte targets on z80 and on ez80 sp/fp/opt-out keep), opt-out
+byte-identical to HEAD on 720 cells, enigma on ez80 and z80 sp/fp.
 
 ┌───────────────┬───────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┐
 │ benchmark     │ cpu   │ sccz80          │ xcc -Os         │ xcc -Of         │ sdcc            │ 80cc-fp         │ 80cc-sp         │
@@ -529,7 +518,7 @@ fixed-ticks 80cc with old-ticks sdcc, so they flattered 80cc.
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ fixedbench    │ z180  │ 4162B / 22.49M  │ —               │ —               │ 3991B / 14.33M  │ 4032B / 13.59M  │ 4037B / 13.74M  │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
-│ fixedbench    │ ez80  │ 4055B / 11.11M  │ —               │ —               │ BUILD           │ 3885B / 8.61M   │ 3928B / 8.64M   │
+│ fixedbench    │ ez80  │ 4055B / 11.11M  │ —               │ —               │ BUILD           │ 3879B / 8.53M   │ 3893B / 8.49M   │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ fixedbench    │ r2ka  │ 3893B / 9.99M   │ —               │ —               │ 3711B / 7.51M   │ 3721B / 6.21M   │ 3669B / 6.02M   │
 ├───────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
