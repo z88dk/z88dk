@@ -196,8 +196,10 @@ static int gen_mov(FILE *out, Func *f, const Op *op)
             emit_acc_slot_addr(out, f, op->src[0], 0);
             emit(out, "call\t%s", acc_prim(f, op->src[0], "load"));
         }
-        emit_acc_slot_addr(out, f, op->dst, 0);
-        emit_acc_store_hl(out, f, op->dst);
+        if (!wide_acc_result_dead_in_acc(f, op->dst)) {
+            emit_acc_slot_addr(out, f, op->dst, 0);
+            emit_acc_store_hl(out, f, op->dst);
+        }
         invalidate_hl_bc();
         *wide_acc_cell(f, op->dst) = op->dst;
         return 0;

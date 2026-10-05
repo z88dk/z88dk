@@ -2725,6 +2725,41 @@ blayout_tosrmw_8080_keep.bin: $(SOURCES) blayout.c
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 # remat-lea-call: &local rematerialised as a call argument counts the words
+# [acc-drop-wide / acc-int-literal / acc-pool-operand] wide results read from the accumulator.
+all: accwide.bin accwide_fp.bin accwide_keep.bin accwide_z180.bin accwide_r2ka.bin accwide_r2ka_fp.bin accwide_ez80.bin accwide_kc160.bin
+
+accwide.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_fp.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_keep.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=acc-drop-wide -Cc--opt-disable=acc-int-literal -Cc--opt-disable=acc-pool-operand -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_z180.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 --math-bbc -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_r2ka.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit --math-bbc -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_r2ka_fp.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -fframe-pointer --math-bbc -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_ez80.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --genmath -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_kc160.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160 -fframe-pointer --math-bbc -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mkc160 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 # [prepush-straddle] a value defined inside a pre-pushed group and read after its call.
 all: prestrad.bin prestrad_fp.bin prestrad_8080.bin prestrad_gbz80.bin prestrad_r2ka.bin prestrad_ez80.bin
 

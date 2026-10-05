@@ -363,6 +363,37 @@ typedef enum {
 
 static void apply_clobbers(Clobber c);
 static int wide_acc_result_dead_in_acc(const Func *f, int v);
+/* [IR_ACCDROP_VERIFY] Inert: report a slot read of a wide value whose store
+   was dropped earlier in the same render (the consumer lost the accumulator
+   before it looked). */
+static int accdrop_verify = -1;
+static unsigned accdrop_epoch;
+static unsigned *accdrop_at;
+static int accdrop_cap;
+static void accdrop_begin(const Func *f)
+{
+    if (accdrop_verify < 0) accdrop_verify = getenv("IR_ACCDROP_VERIFY") != NULL;
+    if (!accdrop_verify) return;
+    accdrop_epoch++;
+    if (f->n_vregs > accdrop_cap) {
+        unsigned *n = realloc(accdrop_at, (size_t)f->n_vregs * sizeof *n);
+        if (!n) return;
+        for (int i = accdrop_cap; i < f->n_vregs; i++) n[i] = 0;
+        accdrop_at = n; accdrop_cap = f->n_vregs;
+    }
+}
+static void accdrop_mark(int v, int dropped)
+{
+    if (accdrop_verify > 0 && v >= 0 && v < accdrop_cap)
+        accdrop_at[v] = dropped ? accdrop_epoch : 0;
+}
+static void accdrop_check_read(const Func *f, int v)
+{
+    if (accdrop_verify > 0 && v >= 0 && v < accdrop_cap
+        && accdrop_at[v] == accdrop_epoch)
+        fprintf(stderr, "IR_ACCDROP_VERIFY: %s reads v%d's slot after its store was dropped\n",
+                f->fn ? ir_sym_name(f->fn) : "?", v);
+}
 
 /* IR_SPILL_STATS (Phase-0 measurement): -1 = not yet probed, else 0/1. */
 static int spill_stats_on = -1;
@@ -5921,6 +5952,7 @@ static void emit_slot_addr_ofs(FILE *out, const Func *f, int vreg, int adj,
 
 static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
 {
+    accdrop_check_read(f, vreg);
     if (fp_active(f) && IS_EZ80()) {
         /* ez80: lea hl,ix+d is one 3-byte op, beating the 4-byte sp form. */
         int ixoff = slot_ix_off(f, vreg);
@@ -9668,6 +9700,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                              const int *bb_alias)
 {
     const int de_carry_on = !opt_disabled("de-carry");
+    accdrop_begin(f);
     /* Per-render BC-tenant map, the mirror of bb_hl_out. Local to one render:
        the carry is only consulted within a pass. NULL (OOM) degrades to "never
        carry", which is the safe direction. */

@@ -75,6 +75,18 @@ home written inside the group is undone by the restore after the call.
 byte-identical. Real-code size: console +20% vs sccz80, emu.c +9% vs sdcc
 (startrek float temps through slots is the largest single item).
 
+Wide accumulator (5/10/2026), double and long long: a result the next op reads
+straight from FA / __i64_acc and that dies there is no longer stored
+(`acc-drop-wide`; conversions, moves, returns, stores, a stacked call's only
+wide argument, which is now pushed from the accumulator; not a fastcall's,
+which is loaded by its own path); an integer literal operand becomes a pool
+constant (`acc-int-literal`) and a pool constant is read by address rather
+than through a vreg and slot (`acc-pool-operand`). startrek 20044 -> 18342 B
+fp, console +17% vs sccz80; bench corpus byte-identical. `IR_ACCDROP_VERIFY`
+reports a slot read after a dropped store. Still open: the dead slots stay in
+the frame, and a non-commutative op whose left operand is in a slot reloads
+the right one.
+
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,
 10 with a free register, about 48 B. The 183-site sizing from September has
@@ -386,7 +398,7 @@ enforces both directions.
 
 `IR_CLOB_VERIFY` `IR_HOME_VERIFY` `IR_HOME_VERIFY_ABORT` `IR_HOME_SLOT_VERIFY`
 `IR_HOME_SLOT_VERIFY_ABORT` `IR_IX_VERIFY` `IR_PARK_VERIFY` `IR_REC_VERIFY`
-`IR_VERIFY` `IR_VERIFY_ABORT` `IR_VERIFY_I2` `IR_DEFASSIGN_VERIFY`
+`IR_VERIFY` `IR_VERIFY_ABORT` `IR_VERIFY_I2` `IR_DEFASSIGN_VERIFY` `IR_ACCDROP_VERIFY`
 
 They answer no question and have no expiry. Run the relevant one for what you
 touched and report the count before and after.

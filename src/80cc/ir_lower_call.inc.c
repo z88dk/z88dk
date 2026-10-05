@@ -133,12 +133,19 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         if (width > 4) {
             /* Wide double arg: load slot into acc and push — combined (dldpsh)
                when the format provides it, else load + push. */
-            emit_acc_slot_addr(out, f, ci->args[i], pushed_bytes + sp_adj_extra);
-            if (acc_prim(f, ci->args[i], "loadpush")) {
-                emit(out, "call\t%s", acc_prim(f, ci->args[i], "loadpush"));
-            } else {
-                emit(out, "call\t%s", acc_prim(f, ci->args[i], "load"));
+            if (!opt_disabled("acc-drop-wide")
+                && *wide_acc_cell(f, ci->args[i]) == ci->args[i]) {
                 emit(out, "call\t%s", acc_prim(f, ci->args[i], "push"));
+            } else {
+                emit_acc_slot_addr(out, f, ci->args[i], pushed_bytes + sp_adj_extra);
+                if (acc_prim(f, ci->args[i], "loadpush")) {
+                    emit(out, "call\t%s", acc_prim(f, ci->args[i], "loadpush"));
+                } else {
+                    emit(out, "call\t%s", acc_prim(f, ci->args[i], "load"));
+                    emit(out, "call\t%s", acc_prim(f, ci->args[i], "push"));
+                }
+                if (!opt_disabled("acc-drop-wide"))
+                    *wide_acc_cell(f, ci->args[i]) = ci->args[i];
             }
             pushed_bytes += width;
             invalidate_hl_cache();
@@ -547,8 +554,10 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         } else if (ret_w > 4) {
             /* Wide return: the callee left it in the accumulator (FA for
                double, __i64_acc for long long); store it to the ret slot. */
-            emit_acc_slot_addr(out, f, ci->ret_vreg, 0);
-            emit_acc_store_hl(out, f, ci->ret_vreg);
+            if (!wide_acc_result_dead_in_acc(f, ci->ret_vreg)) {
+                emit_acc_slot_addr(out, f, ci->ret_vreg, 0);
+                emit_acc_store_hl(out, f, ci->ret_vreg);
+            }
             invalidate_hl_cache();
             *wide_acc_cell(f, ci->ret_vreg) = ci->ret_vreg;
         } else if (ret_w == 4) {
@@ -694,25 +703,74 @@ static int acc_op_pushes_from_acc(const HelperInfo *h, int v)
     return v == (h->acc_holds_lhs ? a1 : a0);   /* the fixed pushed operand */
 }
 
+/* The only wide argument of a stacked, not pre-pushed call: the push loop
+   then takes it straight from the accumulator. A fastcall's last argument is
+   loaded by its own path, outside that loop. */
+static int call_sole_wide_arg(const Func *f, const CallInfo *ci, int v)
+{
+    if (!ci || ci->pre_pushed > 0 || ci->abi == IR_ABI_FASTCALL) return 0;
+    int seen = 0;
+    for (int i = 0; i < ci->n_args; i++) {
+        int a = ci->args[i];
+        if (a < 0 || f->vregs[a].width <= 4) continue;
+        if (a != v || seen) return 0;
+        seen = 1;
+    }
+    return seen;
+}
+
+/* Does `nx` read `v` once, straight from the accumulator when v is resident?
+   Every consumer listed checks wide_acc_cell before loading the slot. */
+static int wide_next_reads_acc(const Func *f, const Op *nx, int v)
+{
+    if (nx->kind == IR_ACC_BINOP || nx->kind == IR_ACC_CMP)
+        return acc_op_pushes_from_acc(nx->hcall, v);
+    if (opt_disabled("acc-drop-wide")) return 0;
+    switch (nx->kind) {
+    case IR_ACC_UNOP: {
+        const HelperInfo *h = nx->hcall;
+        return h && h->n_args == 1 && h->args[0] == v
+            && h->acc_subkind != ACC_SUB_INT2ACC && h->acc_subkind != ACC_SUB_CROSS;
+    }
+    case IR_MOV:
+        return nx->src[0] == v && nx->dst >= 0 && f->vregs[nx->dst].width > 4;
+    case IR_RET:
+        return nx->src[0] == v;
+    case IR_ST_MEM:
+        return nx->src[0] == v && nx->mem.post_step == 0
+            && (nx->mem.kind == IR_MEM_SYM
+                || (nx->mem.kind == IR_MEM_VREG && nx->mem.base != v));
+    case IR_CALL:
+        return call_sole_wide_arg(f, nx->call, v);
+    default:
+        return 0;
+    }
+}
+
 /* A wide-accumulator result `v` just produced (and left resident) needs no
    slot store: the next real op consumes it straight from the accumulator
    (push-from-acc) and v is dead afterwards, so its slot is never read.
    Conservative — any uncertainty (no liveness, BB-end, non-acc next op)
    keeps the store. */
-static int wide_acc_result_dead_in_acc(const Func *f, int v)
+static int wide_acc_result_dead_in_acc_1(const Func *f, int v)
 {
     if (opt_disabled("acc-drop") || !cur_bb || v < 0) return 0;
     int j = cur_op_idx + 1;
     while (j < cur_bb->n_ops && cur_bb->ops[j].kind == IR_NOP) j++;
     if (j >= cur_bb->n_ops) return 0;
     const Op *nx = &cur_bb->ops[j];
-    if (nx->kind != IR_ACC_BINOP && nx->kind != IR_ACC_CMP) return 0;
-    if (!acc_op_pushes_from_acc(nx->hcall, v)) return 0;
+    if (!wide_next_reads_acc(f, nx, v)) return 0;
     /* v must be dead after nx (its slot then never read). */
     const BitSet *after = (j + 1 < cur_bb->n_ops)
         ? ir_op_live_in(cur_bb, j + 1) : cur_bb->live_out;
-    (void)f;
     return after && !ir_bitset_get(after, v);
+}
+
+static int wide_acc_result_dead_in_acc(const Func *f, int v)
+{
+    int dead = wide_acc_result_dead_in_acc_1(f, v);
+    accdrop_mark(v, dead);
+    return dead;
 }
 
 /* Wide memory-accumulator binop (IR_ACC_BINOP). Operands and result are
@@ -825,9 +883,11 @@ static int gen_acc_cmp(FILE *out, Func *f, const Op *op)
    store wants it in HL — emit_acc_slot_addr leaves it in HL either way. */
 static void store_acc_to_slot(FILE *out, const Func *f, int dst, const HelperInfo *hi)
 {
-    emit_acc_slot_addr(out, f, dst, 0);
-    if (hi->acc_store_bc) { emit_hl_to_bc(out); }
-    emit(out, "call\t%s", hi->acc_store);
+    if (!wide_acc_result_dead_in_acc(f, dst)) {
+        emit_acc_slot_addr(out, f, dst, 0);
+        if (hi->acc_store_bc) { emit_hl_to_bc(out); }
+        emit(out, "call\t%s", hi->acc_store);
+    }
     invalidate_hl_bc();
     *wide_acc_cell(f, dst) = dst;
 }

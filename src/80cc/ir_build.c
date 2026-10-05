@@ -1079,14 +1079,41 @@ static int emit_float_arith(Builder *b, Kind fk, const char *stem,
 /* Emit a wide memory-accumulator binop (IR_ACC_BINOP) for a 5/6-byte
    double: stem "add"/"sub"/"mul"/"div" → dadd/dsub/dmul/ddiv (FA model,
    acc holds LHS). Returns the result vreg (width c_fp_size) or -1. */
+/* `v` is a constant loaded from the literal pool in the current block and read
+   nowhere else: drop its load and return the pool label, so the acc op takes
+   the constant by address (no slot). -1 otherwise. */
+static int take_pool_operand(Builder *b, int v)
+{
+    if (v < 0 || opt_disabled("acc-pool-operand")) return -1;
+    BB *bb = cur_bb(b);
+    Op *def = NULL;
+    for (int j = 0; j < bb->n_ops; j++) {
+        Op *o = &bb->ops[j];
+        if (o->dst == v) {
+            if (def || o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_POOL) return -1;
+            def = o;
+            continue;
+        }
+        int u[16]; int nu = ir_op_uses(o, u, 16);
+        for (int k = 0; k < nu; k++) if (u[k] == v) return -1;
+    }
+    if (!def) return -1;
+    int lab = (int)def->mem.offset;
+    def->kind = IR_NOP;
+    def->dst = -1;
+    return lab;
+}
+
 static int emit_acc_binop(Builder *b, const char *stem, int lv, int rv)
 {
     const char *name = acc_name(stem);
     if (!name) return -1;
     int w = c_fp_size;
+    int l_pool = (lv == rv) ? -1 : take_pool_operand(b, lv);
+    int r_pool = (lv == rv) ? -1 : take_pool_operand(b, rv);
     int dst = new_temp_kind(b, KIND_DOUBLE);
     int *args = calloc(2, sizeof(int));
-    args[0] = lv; args[1] = rv;
+    args[0] = (l_pool >= 0) ? -1 : lv; args[1] = (r_pool >= 0) ? -1 : rv;
     Op *op = ir_op_emit(cur_bb(b), IR_ACC_BINOP);
     op->dst = dst;
     HelperInfo *hi = calloc(1, sizeof(HelperInfo));
@@ -1095,6 +1122,8 @@ static int emit_acc_binop(Builder *b, const char *stem, int lv, int rv)
     hi->acc_push = acc_name("push"); hi->acc_loadpush = acc_name("loadpush");
     hi->acc_width = w; hi->acc_holds_lhs = 0; hi->acc_store_bc = 0;
     hi->acc_commutative = acc_stem_commutative(stem);
+    if (l_pool >= 0) { hi->acc_src_is_pool[0] = 1; hi->acc_src_litlab[0] = l_pool; }
+    if (r_pool >= 0) { hi->acc_src_is_pool[1] = 1; hi->acc_src_litlab[1] = r_pool; }
     op->hcall = hi;
     return dst;
 }
@@ -1189,9 +1218,11 @@ static int emit_acc_int_binop(Builder *b, const char *stem,
 {
     const char *name = acc_int_name(stem, is_unsigned);
     if (!name) return -1;
+    int l_pool = (lv == rv) ? -1 : take_pool_operand(b, lv);
+    int r_pool = (lv == rv) ? -1 : take_pool_operand(b, rv);
     int dst = new_temp_kind(b, KIND_LONGLONG);
     int *args = calloc(2, sizeof(int));
-    args[0] = lv; args[1] = rv;
+    args[0] = (l_pool >= 0) ? -1 : lv; args[1] = (r_pool >= 0) ? -1 : rv;
     Op *op = ir_op_emit(cur_bb(b), IR_ACC_BINOP);
     op->dst = dst;
     HelperInfo *hi = calloc(1, sizeof(HelperInfo));
@@ -1200,6 +1231,8 @@ static int emit_acc_int_binop(Builder *b, const char *stem,
     hi->acc_push = "l_i64_push"; hi->acc_loadpush = NULL;
     hi->acc_width = 8; hi->acc_holds_lhs = 0; hi->acc_store_bc = 1;
     hi->acc_commutative = acc_stem_commutative(stem);
+    if (l_pool >= 0) { hi->acc_src_is_pool[0] = 1; hi->acc_src_litlab[0] = l_pool; }
+    if (r_pool >= 0) { hi->acc_src_is_pool[1] = 1; hi->acc_src_litlab[1] = r_pool; }
     op->hcall = hi;
     return dst;
 }
@@ -1713,8 +1746,24 @@ static int conv_int_vreg_to_acc(Builder *b, int v, int uns)
    register-tier float16 / _Accum is handled by its own path). node_value_kind
    unwraps a fnptr/func-call's KIND_FUNC so a double-returning call is
    recognised as already-double. */
+static int emit_float_const(Builder *b, double value, Kind fk);
+
+/* An integer literal used as an acc-tier double, as that double constant —
+   no runtime int→double conversion. -1 when `node` is not one. */
+static int acc_int_literal(Builder *b, Node *node)
+{
+    if (!node || node->ast_type != AST_LITERAL || opt_disabled("acc-int-literal"))
+        return -1;
+    if (!kind_is_integer(node_value_kind(node))) return -1;
+    double val = (node->type && node->type->isunsigned)
+               ? (double)node_int_bits(node) : (double)node_int_value(node);
+    return emit_float_const(b, val, KIND_DOUBLE);
+}
+
 static int build_operand_as_acc(Builder *b, Node *node)
 {
+    int c = acc_int_literal(b, node);
+    if (c >= 0) return c;
     int v = build_expr(b, node);
     if (v < 0) return -1;
     Kind k = node_value_kind(node);
@@ -2744,6 +2793,8 @@ static int binop_is_i64(Node *n)
 }
 
 /* long long binop/compare → l_i64_* via IR_ACC_*. */
+static int build_i64_operand(Builder *b, Node *node, int uns);
+
 static int build_binop_i64(Builder *b, Node *n)
 {
     Type *lvt = node_value_type(n->left);
@@ -2797,11 +2848,10 @@ static int build_binop_i64(Builder *b, Node *n)
         return dst;
     }
     if (stem) {
-        int r = build_expr(b, n->right);
+        int r = build_i64_operand(b, n->right, rvt && rvt->isunsigned);
         if (r < 0) return -1;
         l = promote_to_acc_int(b, l, lvt && lvt->isunsigned);
-        r = promote_to_acc_int(b, r, rvt && rvt->isunsigned);
-        if (l < 0 || r < 0) return -1;
+        if (l < 0) return -1;
         int dst = emit_acc_int_binop(b, stem, l, r, is_uns);
         if (dst < 0) return build_fail("i64 binop emit failed");
         return dst;
@@ -2826,6 +2876,21 @@ static int build_binop_i64(Builder *b, Node *n)
     return dst;
 }
 
+/* An i64 operand: an integer literal comes straight from the literal pool (no
+   long immediate widened at run time), anything else is built and promoted. */
+static int build_i64_operand(Builder *b, Node *node, int uns)
+{
+    if (node && node->ast_type == AST_LITERAL && !opt_disabled("acc-int-literal")
+        && kind_is_integer(node_value_kind(node)))
+        return emit_pool_load(b, node->int_literal
+                                 ? ir_pool_litlab_llong_exact(node_int_bits(node))
+                                 : ir_pool_litlab_llong(node_int_value(node)),
+                              8, KIND_LONGLONG);
+    int v = build_expr(b, node);
+    if (v < 0) return -1;
+    return promote_to_acc_int(b, v, uns);
+}
+
 /* True if this mul/div/mod is a long long op: acc-int result, or both operands
    acc-int (a mixed `ll * int` promotes to ll, caught by the result). */
 static int muldiv_is_i64(Node *n)
@@ -2841,13 +2906,10 @@ static int build_muldiv_i64(Builder *b, Node *n)
 {
     int is_uns = (n->left->type && n->left->type->isunsigned)
               || (n->right->type && n->right->type->isunsigned);
-    int l = build_expr(b, n->left);
+    int l = build_i64_operand(b, n->left, n->left->type && n->left->type->isunsigned);
     if (l < 0) return -1;
-    int r = build_expr(b, n->right);
+    int r = build_i64_operand(b, n->right, n->right->type && n->right->type->isunsigned);
     if (r < 0) return -1;
-    l = promote_to_acc_int(b, l, n->left->type && n->left->type->isunsigned);
-    r = promote_to_acc_int(b, r, n->right->type && n->right->type->isunsigned);
-    if (l < 0 || r < 0) return -1;
     const char *stem = (n->ast_type == OP_MULT) ? "mul"
                      : (n->ast_type == OP_DIV)  ? "div" : "mod";
     int dst = emit_acc_int_binop(b, stem, l, r, is_uns);
@@ -6087,6 +6149,10 @@ static int build_cast(Builder *b, Node *n)
         ir_emit_ld_imm(cur_bb(b), v,
                        scale_literal_for_kind(n->operand, dst_k));
         return v;
+    }
+    if (is_acc_float_kind(dst_k)) {
+        int c = acc_int_literal(b, n->operand);
+        if (c >= 0) return c;
     }
     int src_v = build_expr(b, n->operand);
     if (src_v < 0) return -1;

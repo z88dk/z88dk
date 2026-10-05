@@ -209,6 +209,9 @@ exists (ADR 0010).
 | `call-bremat` | a byte is reloaded after a call instead of rematerialised |
 | `sdccdecl-byte-const` | a constant byte argument to `__z88dk_sdccdecl` is stored in a frame slot instead of rematerialised at the push |
 | `acc-drop` | a wide accumulator result is stored even when dead in the accumulator |
+| `acc-drop-wide` | a wide (float / long long) result is stored to its slot even when the next op reads it from the accumulator and it dies there (only the binop/compare push case drops it), and a wide call argument is always reloaded from its slot |
+| `acc-int-literal` | an integer literal used as a 5/6/8-byte double operand or cast to one is converted at run time instead of becoming a double constant |
+| `acc-pool-operand` | a pool constant operand of a 5/6/8-byte double add/sub/mul/div is loaded into a vreg (and its slot) instead of being read by address |
 | `alu-fold` | no `(ix+d)` ALU fold for AND/OR/XOR |
 | `ixd-fold` | no `(ix+d)` fold for the word accumulator |
 | `r6k-ixd-alu` | no Rabbit 6000 indexed ALU form |
