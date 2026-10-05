@@ -998,9 +998,10 @@
 
 ;; the value round-trips HL->DE->HL (ex de,hl … ld hl,de) only to push it
 ;; via DE across inc sp/inc sp — but the sp bump never touches HL, so push HL
-;; directly. DE is left holding its prior (dead) value, not the staged HL: the
-;; ld hl,de restore shows HL, not DE, is the live output.
-%title #DE7 drop dead DE-staging of an HL value across a stack-bump push (-4b)
+;; directly. The original ends with BOTH HL and DE holding the value, and the
+;; lowerer's cache may read DE next (store_hl's contract is DE=value: an
+;; f32->int result squared went to l_mult with a stale DE), so DE is set too.
+%title #DE7 push HL directly across a stack-bump push, DE still the value (-1b)
 	ex	de,hl
 	inc	sp
 	inc	sp
@@ -1010,6 +1011,7 @@
 	inc	sp
 	inc	sp
 	push	hl
+	ld	de,hl
 
 ;; ex-restore variant of #DE7: the value is staged in DE, pushed across the sp
 ;; bump, then swapped back with a second ex de,hl. The two ex de,hl cancel (DE
