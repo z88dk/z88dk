@@ -390,6 +390,7 @@
 	ld	d,e
 
 %title #285e push BC instead of recovered HL before ld hl (-2b, -8t)
+%not %1 (hl)
 	ld	hl,bc
 	push	de
 	push	hl
@@ -400,6 +401,7 @@
 	ld	hl,%1
 
 %title #285f dead HL recovery before push de;push bc;ld hl (-2b, -8t)
+%not %1 (hl)
 	ld	hl,bc
 	push	de
 	push	bc
@@ -461,6 +463,7 @@
 	ld	hl,(ix%2)
 
 %title #285m caller-save BC + arg push via HL → push bc twice (-2b, -8t)
+%not %1 (hl)
 	push	bc
 	ld	hl,bc
 	push	hl
@@ -506,21 +509,8 @@
 	ld	l,a
 	ld	h,0
 
-%title #285q small-mask + add hl,hl → add a,a before the int-extend (-0b, -7t)
-%check 0 <= %2 <= 127
-	ld	a,(ix%1)
-	and	%2
-	ld	l,a
-	ld	h,0
-	add	hl,hl
-=
-	ld	a,(ix%1)
-	and	%2
-	add	a,a
-	ld	l,a
-	ld	h,0
-
-%title #285r 16-bit slot XOR via byte-direct xor (ix+d) (z80, -4b, -16t)
+%title #285r 16-bit slot XOR via byte-direct xor (ix+d), DE reloaded next (z80, -4b, -16t)
+%not %3 de "de[+][0-9]+" (de)
 %notcpu ez80
 %notcpu ez80_z80
 %notcpu gbz80
@@ -535,6 +525,7 @@
 	ld	a,h
 	xor	d
 	ld	h,a
+	ld	de,%3
 =
 	ld	a,(ix%2)
 	xor	(ix%1)
@@ -542,8 +533,10 @@
 	ld	a,(ix+%eval(%2 1 +))
 	xor	(ix+%eval(%1 1 +))
 	ld	h,a
+	ld	de,%3
 
-%title #285r-and 16-bit slot AND via byte-direct and (ix+d) (z80, -4b, -16t)
+%title #285r-and 16-bit slot AND via byte-direct and (ix+d), DE reloaded next (z80, -4b, -16t)
+%not %3 de "de[+][0-9]+" (de)
 %notcpu ez80
 %notcpu ez80_z80
 %notcpu gbz80
@@ -558,6 +551,7 @@
 	ld	a,h
 	and	d
 	ld	h,a
+	ld	de,%3
 =
 	ld	a,(ix%2)
 	and	(ix%1)
@@ -565,6 +559,7 @@
 	ld	a,(ix+%eval(%2 1 +))
 	and	(ix+%eval(%1 1 +))
 	ld	h,a
+	ld	de,%3
 
 %title #286 IR gbz80 fuse slot-addr ld hl,N + add hl,sp -> ld hl,sp+N (-2b, -7t)
 %cpu gbz80
@@ -700,7 +695,8 @@
 	ld	hl,%2
 	ld	de,%1
 
-%title #IR const/sym straight to DE: ld hl,X;ex de,hl;ld hl,Y -> ld de,X;ld hl,Y. X is symbol(_x)/immediate(digit) ONLY (regex) — NOT (mem)/sp+N, whose ld de,(nn)/ld de,sp+N are absent on 808x/gbz80; the ex's HL output dies in the next ld hl
+%title #IR const/sym straight to DE: ld hl,X;ex de,hl;ld hl,Y -> ld de,X;ld hl,Y. X is symbol(_x)/immediate(digit) ONLY (regex) — NOT (mem)/sp+N, whose ld de,(nn)/ld de,sp+N are absent on 808x/gbz80; the ex's HL output dies in the next ld hl. %not %2 (hl): ez80 `ld hl,(hl)` reads the HL the ex left
+%not %2 (hl)
 	%"ld	hl,([_0-9][_0-9a-zA-Z+]*)"1
 	ex	de,hl
 	ld	hl,%2
@@ -776,6 +772,7 @@
 ;; ld de,(sp+n) counterpart.
 ;; every CPU with the ld hl,(ix+d) macro also has ld de,(ix+d) (incl Rabbit)
 %title #DE-ix produce (ix) ld-hl value in DE not HL+ex when HL dead next (-1b, -4t)
+%not %2 (hl)
 	ld	hl,(ix%1)
 	ex	de,hl
 	ld	hl,%2
@@ -788,6 +785,7 @@
 %notcpu vm1
 %notcpu 8085
 %notcpu gbz80
+%not %2 (hl)
 	%"ld	hl,\((_[A-Za-z0-9_+]*)\)"1
 	ex	de,hl
 	ld	hl,%2
@@ -796,6 +794,7 @@
 	ld	hl,%2
 
 %title #DE2 peek TOS into DE not HL+ex when HL dead next (-1b, -4t)
+%not %1 (hl)
 	pop	hl
 	push	hl
 	ex	de,hl
@@ -806,6 +805,7 @@
 	ld	hl,%1
 
 %title #DE3 16-bit or/and/xor result into DE not HL+ex when HL dead next (-1b, -4t)
+%not %2 (hl)
 	ld	a,l
 	%"or|and|xor"1	e
 	ld	l,a
@@ -1031,13 +1031,17 @@
 ;; `or h` after ld h,0 is a no-op: h is 0, so (A|0)==A and the Z flag is
 ;; unchanged. Arises from a byte-wise EQ/NE compare of a zero-extended byte
 ;; (high half known 0) — the high-byte OR is redundant. General over the const.
+;; Only Z is the same: `or h` also clears carry and sets parity, which `sub`
+;; leaves as borrow/overflow, so the z/nz jump that consumes it is matched too.
 %title #HZ drop `or h` when h was just zeroed (redundant high-byte test) (-1b)
 	ld	h,0
 	sub	%1
 	or	h
+	j%"r|p"2	%"z|nz"3,%4
 =
 	ld	h,0
 	sub	%1
+	j%2	%3,%4
 
 ;; consecutive word stores to sp+N, sp+N+2, ...: after `ld hl,N;add hl,sp;
 ;; ld (hl),e;inc hl;ld (hl),d` HL = sp+N+1, and the ld de,K between doesn't
@@ -1075,9 +1079,11 @@
 ;; Dropping the intervening `ex de,hl` is sound and is the other half of the
 ;; win: the ex would leave HL = value and DE = ix+d+1, and the two lines that
 ;; follow overwrite BOTH (`ld de,%2` kills DE, the address reuse kills HL)
-;; without reading either.
+;; without reading either — unless `ld de,%2` reads HL (`hl`, `(hl)`, `hl+N`),
+;; which the %not excludes.
 %title #SP2L chained ix-rel word store: reuse HL via inc, not a second lea (-4b)
 %eval 0 = %3 %1 2 + -
+%not %2 hl (hl) "hl[+][0-9]+"
 	lea	hl,ix%1
 	ld	(hl),e
 	inc	hl
@@ -1227,6 +1233,7 @@
 	ld	a,b
 	ld	b,e
 	ld	e,a
+	ld	hl,bc
 
 ;; #FP1 a `pop bc` immediately before an `ld sp,ix` frame teardown is dead: the
 ;; `ld sp,ix` resets SP wholesale, so the pop's SP+2 is discarded and the value

@@ -108,6 +108,15 @@ mandelbrot -793 B/-14.8% ticks; outputs identical in 4 maths libs x 3 builds.
 Found on the way: copt #DE7 left DE stale (fixed aa1501328b). Open: untouched
 frame slots are not dropped (console: 218 functions, 2918 B of frame).
 
+copt rule audit (5/10/2026): scripts/copt_rule_audit.py simulates each rule's
+pattern and replacement and reports the state they leave different. Fixed: nine
+rules lacked the ez80 `ld hl,(hl)` guard (#285e/f/m, const/sym->DE, #DE-ix,
+#DE-glob, #DE2, #DE3, #SP2L), #285r/#285r-and left DE stale (now only before an
+`ld de` reload), #285q left A doubled (removed: 0 B, a few cycles), #DEBC left HL
+stale (now restores it), #HZ changed carry/parity (now matches its z/nz jump).
+None fired harmfully in the sampled output; cost +8 B corpus, z80 fp ticks up to
++0.45% on four benches. Re-run the audit after editing a rule.
+
 Lead 2 as it was written (a slotless multi-tenant byte packer) is parked: a
 census of the final z80 fp asm finds 15 byte temps inside one straight run,
 10 with a free register, about 48 B. The 183-site sizing from September has
