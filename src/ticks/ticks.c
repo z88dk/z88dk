@@ -207,7 +207,7 @@
           a= get_memory_data(mp= t+1)
 
 #define ADDISP(a, b)            \
-          st+= isez80() ? 1 : is808x() ? 10 : isgbz80() ? 8 : isr800() ? 1 : iskc160() ? 1 :  11,              \
+          st+= isez80() ? 1 : israbbit() ? 2 : is808x() ? 10 : isgbz80() ? 8 : isr800() ? 1 : iskc160() ? 1 :  11,              \
           v= sp+(b|a<<8),       \
           ff= ff  &128          \
             | v>>8&296,         \
@@ -218,7 +218,7 @@
           b= v
 
 #define ADDISP_ALTD(a, b, dh, dl)            \
-          st+= 11,              \
+          st+= israbbit() ? 2 : 11,     \
           v= sp+(b|a<<8),       \
           ff_= ff_  &128          \
             | v>>8&296,         \
