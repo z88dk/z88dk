@@ -1582,10 +1582,16 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
                         /* A byte-bounded counter is narrowed later and lives
                            in a slot, so its recompute is not cheap. */
                         int64_t maxv;
-                        if (!(K >= 0 && K <= 255
-                              && niv_up_bound_ok(f, h, iv, &maxv) && maxv <= 255))
-                            f->vregs[iv].flags |= IR_VREG_IV_RECOMPUTE;
-                        continue;
+                        int byte_iv = K >= 0 && K <= 255
+                                   && niv_up_bound_ok(f, h, iv, &maxv) && maxv <= 255;
+                        /* ez80 steps a slot pointer natively (`ld hl,(ix+d)`),
+                           so against a slot counter the pointer wins there. */
+                        if (!(byte_iv && IS_EZ80()
+                              && !opt_disabled("ivsr-ez80-byte"))) {
+                            if (!byte_iv)
+                                f->vregs[iv].flags |= IR_VREG_IV_RECOMPUTE;
+                            continue;
+                        }
                     }
                 }
 

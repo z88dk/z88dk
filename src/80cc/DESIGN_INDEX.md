@@ -30,7 +30,11 @@ ticks undercharged ez80 `ld rr,(ix+d)` / `ld (ix+d),rr` (1 cycle, not 5) until
 e67c93926d: any ez80 tick result before that favours frame-slot code. Three
 ez80 exclusions resting on it are lifted (`idx2-call-ez80`,
 `ivsr-suppress-ez80`, `remat-lea-ez80fp`): ez80 sp -681 B / -1.51% ticks, fp
--155 B / -0.40%, 0 slower except fixedbench fp (+7 B, +1.28%). ez80 word reads
+-155 B / -0.40%, 0 slower except fixedbench fp (+7 B, +1.28%). That loss
+was IVSR suppression against a byte-bounded counter, which lives in a slot:
+ez80 steps a slot pointer natively, so there the pointer is kept
+(`ivsr-ez80-byte`, -41 B, fixedbench -1.0% fp / -1.8% sp, nothing else moves;
+on the Z80 family the same exception loses). ez80 word reads
 through HL use `ld hl,(hl)` (`ez80-hl-ihl`) and a stack-top read-modify-write
 drops its `push hl`/`pop de` pair (`tos-rmw`, after mulchain-de so it never
 takes a chain reload): together -1797 B over 229 cells, 0 larger, 254 faster,

@@ -2725,6 +2725,25 @@ blayout_tosrmw_8080_keep.bin: $(SOURCES) blayout.c
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 # remat-lea-call: &local rematerialised as a call argument counts the words
+# [ivsr-ez80-byte] ez80 keeps walking pointers against a byte-bounded counter.
+all: ivsrbyte.bin ivsrbyte_ez80.bin ivsrbyte_ez80_fp.bin ivsrbyte_ez80_keep.bin
+
+ivsrbyte.bin: $(SOURCES) ivsrbyte.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrbyte_ez80.bin: $(SOURCES) ivsrbyte.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrbyte_ez80_fp.bin: $(SOURCES) ivsrbyte.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrbyte_ez80_keep.bin: $(SOURCES) ivsrbyte.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -Cc--opt-disable=ivsr-ez80-byte --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 # already pushed; _keep restores the no-call gate.
 all: remacall.bin remacall_fp.bin remacall_8080.bin remacall_gbz80.bin remacall_r2ka.bin remacall_ez80_fp.bin remacall_keep.bin
 

@@ -66,6 +66,7 @@ exists (ADR 0010).
 | `ivsr-affine` | no folding of a non-power-of-two affine multiple (struct-array stride) |
 | `ivsr-suppress` | apply IVSR even on the CPUs where a walking pointer is not cheaper |
 | `ivsr-suppress-ez80` | ez80 is left out of the IVSR redundant-pointer suppression (the walking pointer is kept) |
+| `ivsr-ez80-byte` | on ez80 a byte-bounded counter still suppresses the walking pointer it makes redundant |
 | `ivsr-recompute` | CSE merges the `<<1` of an index that `ivsr-suppress` kept for address recompute, so two array addresses share one scaled index |
 | `lftr` | no linear-function test replacement |
 | `lftr-signed` | LFTR only where the bound is a constant, never a signed variable |
