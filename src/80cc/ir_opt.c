@@ -1319,6 +1319,7 @@ typedef struct {
     int     add_bb, add_idx;   /* the `ADD d <- base, term` to NOP */
     int     shl_bb, shl_idx;   /* the scale `SHL` to NOP (-1 if scale 1) */
     int     p;          /* synthesised stepped pointer */
+    int     shared;     /* p is another candidate's pointer: no init/step of its own */
 } IvsrCand;
 
 #define IVSR_MAX_CAND 32
@@ -1505,6 +1506,38 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
     return 1;
 }
 
+/* The single definition of v anywhere in the function, or NULL. */
+static const Op *ivsr_single_def(const Func *f, int v)
+{
+    const Op *found = NULL;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int defs[8]; int nd = ir_op_defs(o, defs, 8);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] == v) {
+                    if (found) return NULL;
+                    found = o;
+                }
+        }
+    return found;
+}
+
+/* Two loop-invariant bases hold the same value: the same vreg, or two
+   rematerialised constants of the same symbol and offset (or immediate). */
+static int ivsr_same_base(const Func *f, int a, int b)
+{
+    if (a == b) return 1;
+    const Op *x = ivsr_single_def(f, a), *y = ivsr_single_def(f, b);
+    if (!x || !y || x->kind != y->kind) return 0;
+    if (x->kind == IR_LD_SYM)
+        return x->mem.sym == y->mem.sym && x->mem.offset == y->mem.offset;
+    if (x->kind == IR_LD_IMM)
+        return x->imm == y->imm
+            && f->vregs[a].width == f->vregs[b].width;
+    return 0;
+}
+
 /* Strength-reduce one natural loop (header h, single latch, pre-header
    ph; body = contiguous range [h, latch]). Returns derived IVs reduced. */
 static int niv_up_bound_ok(Func *f, int h, int c, int64_t *maxval);
@@ -1606,6 +1639,7 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
                 cand[n_cand].add_bb = b; cand[n_cand].add_idx = j;
                 cand[n_cand].shl_bb = sb; cand[n_cand].shl_idx = si;
                 cand[n_cand].p = -1;
+                cand[n_cand].shared = 0;
                 n_cand++;
                 break;  /* one reduction per ADD */
             }
@@ -1620,6 +1654,24 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
         /* INDUCTION marks the stepped pointer for the allocator's PR_BC
            pool — the one twice-written (init + step) vreg it admits, so
            the pointer lives in BC across the back-edge. */
+        /* A candidate with the same base, index, scale, init and step as an
+           earlier one is the same address sequence: share its pointer rather
+           than step a second copy. */
+        int twin = -1;
+        if (!opt_disabled("ivsr-share"))
+            for (int e = 0; e < c && twin < 0; e++)
+                if (!cand[e].shared && cand[e].iv == cand[c].iv
+                    && cand[e].scale == cand[c].scale
+                    && cand[e].K == cand[c].K && cand[e].D == cand[c].D
+                    && f->vregs[cand[e].d].width == f->vregs[d].width
+                    && f->vregs[cand[e].d].kind == f->vregs[d].kind
+                    && ivsr_same_base(f, cand[e].base, cand[c].base))
+                    twin = e;
+        if (twin >= 0) {
+            cand[c].p = cand[twin].p;
+            cand[c].shared = 1;
+            continue;
+        }
         int pv = ir_vreg_new(f, f->vregs[d].kind, NULL, IR_VREG_INDUCTION);
         f->vregs[pv].width = f->vregs[d].width;  /* exact pointer width */
         cand[c].p = pv;
@@ -1643,6 +1695,7 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
 
     /* Phase B — synthesise pre-header init and latch step. */
     for (int c = 0; c < n_cand; c++) {
+        if (cand[c].shared) continue;
         int64_t init_off = cand[c].K * cand[c].scale;
         int64_t step_off = cand[c].D * cand[c].scale;
         Op o;

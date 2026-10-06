@@ -237,6 +237,8 @@ exists (ADR 0010).
 | `frame-byte-trunc` | a width-2 value truncated to one byte materialises the whole word through HL first instead of reading the one byte directly |
 | `byte-half-direct` | a byte taken from a word held in BC or DE copies the whole word to HL first instead of reading `c`/`b`/`e`/`d` |
 | `sink-trunc` | a word-to-byte truncation is not moved down next to the byte store that reads it, so the byte lives across the address arithmetic |
+| `ivsr-suppress-lea` | a stepped pointer is made for a local array addressed from the frame, instead of rebuilding the address from sp (ez80 sp always keeps it) |
+| `ivsr-share` | two derived induction addresses with the same base, index, scale and step each get their own stepped pointer |
 | `trunc-store-bc` | a byte store of a word held in BC loads the byte through A and E instead of storing `c` straight through HL |
 | `self-ops` | no block-local value-equivalence folds (`1*x`, `(x+y)-y`, `x&~x`, `x^x`, `0 op x`) |
 | `self-div` | `x/x` is not folded to 1 and `x%x` to 0 (division by zero is undefined, so x is assumed nonzero) |
