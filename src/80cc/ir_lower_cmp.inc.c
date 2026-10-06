@@ -365,12 +365,14 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
        from the stack every iteration purely because DE was the compare's).
        Reads the operand where it already lives (cmp_byte_src). The low-byte-zero
        case above is shorter still, so it goes first. cmp-k. */
-    if ((op->kind == IR_CMP_ULT || op->kind == IR_CMP_UGE)
+    if ((op->kind == IR_CMP_ULT || op->kind == IR_CMP_UGE
+         || (is_signed && cmpk_signed_enabled()))
         && cmpk_enabled()
         && op->src[0] >= 0 && op->src[1] == -1 && op->imm_sym == NULL
         && g_hc.branch_test_kind != 0
         && f->vregs[op->src[0]].width == 2
-        && op->imm >= 0 && op->imm <= 0xffff) {
+        && (is_signed ? (op->imm >= -32768 && op->imm <= 32767)
+                      : (op->imm >= 0 && op->imm <= 0xffff))) {
         char klo[16], khi[16];
         int cls = cmp_byte_src(f, op->src[0], cpu_has_index_halves(),
                                klo, khi, sizeof klo);
@@ -400,7 +402,18 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             emit(out, "ld\ta,%s", klo);
             emit(out, "sub\t%u", (unsigned)(op->imm & 0xff));
             emit(out, "ld\ta,%s", khi);
-            emit(out, "sbc\ta,%u", (unsigned)(((uint16_t)op->imm >> 8) & 0xff));
+            if (is_signed) {
+                /* Signed x < K is unsigned (x^0x8000) < (K^0x8000). Flip bit 7 of
+                   the high byte keeping the borrow: rla puts bit 7 in CF and the
+                   borrow in bit 0, ccf inverts CF, rra restores both. */
+                emit(out, "rla");
+                emit(out, "ccf");
+                emit(out, "rra");
+                emit(out, "sbc\ta,%u",
+                     (unsigned)((((uint16_t)op->imm >> 8) & 0xff) ^ 0x80));
+            } else {
+                emit(out, "sbc\ta,%u", (unsigned)(((uint16_t)op->imm >> 8) & 0xff));
+            }
             int br_true = (g_hc.branch_test_kind == IR_BR_COND);
             int want_carry = (cf_true_long == br_true);
             emit(out, "jp\t%s,L_f%d_bb_%d", want_carry ? "c" : "nc",

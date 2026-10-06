@@ -233,6 +233,7 @@ exists (ADR 0010).
 | `r6k-ixd-alu` | no Rabbit 6000 indexed ALU form |
 | `cmp-hi` | an unsigned `<`/`>=` against a constant compares both bytes |
 | `cmp-k` | a compare against a constant is not given its immediate form |
+| `cmp-k-signed` | (not on the 8085) a signed word compare against a constant is not done byte-wise through A (`sub K_lo; ld a,hi; rla; ccf; rra; sbc a,K_hi^0x80`), so it goes through `sbc hl,de` and the overflow correction |
 | `byte-cmp-const` | a word compare against a byte-sized constant is not narrowed |
 | `frame-byte-trunc` | a width-2 value truncated to one byte materialises the whole word through HL first instead of reading the one byte directly |
 | `byte-half-direct` | a byte taken from a word held in BC or DE copies the whole word to HL first instead of reading `c`/`b`/`e`/`d` |

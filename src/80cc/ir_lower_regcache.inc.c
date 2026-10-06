@@ -3518,7 +3518,7 @@ static int op_de_clean(const Func *f, const Op *o)
                    ? f->vregs[o->src[0]].width : 4;
             return sw <= 2;
         }
-        return 0;
+        return g_hc.branch_test_kind != 0 && cmpk_imm_shape_ok(f, o);
     default:
         return 0;                     /* assume DE-clobbering */
     }
@@ -3532,15 +3532,26 @@ static int op_de_clean(const Func *f, const Op *o)
    the runtime op_de_clean. */
 static int cmpk_enabled(void);
 
+/* The byte-wise signed form loses on the 8085, whose native 16-bit subtract
+   makes the `sbc hl,de` route the same size or smaller. */
+static int cmpk_signed_enabled(void)
+{
+    return !opt_disabled("cmp-k-signed") && !IS_8085();
+}
+
 /* Unsigned word compare against a constant, branch-fused, read in place
    byte-wise through A (`ld a,lo; sub K; ld a,hi; sbc a,K`): A only, so DE, HL
    and BC all survive. Static mirror of the cmp-k path in gen_cmp. */
 static int cmpk_imm_shape_ok(const Func *f, const Op *o)
 {
-    if (o->kind != IR_CMP_ULT && o->kind != IR_CMP_UGE) return 0;
+    int sgn = (o->kind == IR_CMP_LT || o->kind == IR_CMP_GE);
+    if (o->kind != IR_CMP_ULT && o->kind != IR_CMP_UGE
+        && !(sgn && cmpk_signed_enabled()))
+        return 0;
     if (!cmpk_enabled() || o->src[0] < 0 || o->src[1] != -1 || o->imm_sym) return 0;
     if (o->src[0] >= f->n_vregs || f->vregs[o->src[0]].width != 2) return 0;
-    if (o->imm < 0 || o->imm > 0xffff) return 0;
+    if (sgn ? (o->imm < -32768 || o->imm > 32767) : (o->imm < 0 || o->imm > 0xffff)) return 0;
+    if (sgn && o->imm == 0) return 0;      /* the sign-bit test handles it */
     return cmp_fold_static_class(f, o->src[0]) != 0;
 }
 
