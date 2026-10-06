@@ -3085,3 +3085,46 @@ slotdrop_r2ka.bin: $(SOURCES) slotdrop.c
 slotdrop_keep.bin: $(SOURCES) slotdrop.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=dead-slot-drop -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# [small-frame-fast] 4-byte frames: ld hl,-4 form on z180, four dec sp on ez80/kc160.
+all: smallframe.bin smallframe_z180.bin smallframe_z180_fp.bin smallframe_ez80_z80.bin smallframe_ez80_z80_fp.bin smallframe_kc160.bin smallframe_kc160_fp.bin smallframe_kc160_keep.bin smallframe_8080.bin smallframe_8085.bin
+
+smallframe.bin: $(SOURCES) smallframe.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+smallframe_z180.bin: $(SOURCES) smallframe.c
+	$(compile_z180)
+	$(runtest_z180)
+
+smallframe_z180_fp.bin: $(SOURCES) smallframe.c
+	$(call compile_z180,-Cc-fframe-pointer)
+	$(runtest_z180)
+
+smallframe_ez80_z80.bin: $(SOURCES) smallframe.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+smallframe_ez80_z80_fp.bin: $(SOURCES) smallframe.c
+	$(call compile_ez80_z80,-Cc-fframe-pointer)
+	$(runtest_ez80_z80)
+
+smallframe_kc160.bin: $(SOURCES) smallframe.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+smallframe_kc160_fp.bin: $(SOURCES) smallframe.c
+	$(call compile_kc160,-Cc-fframe-pointer)
+	$(runtest_kc160)
+
+smallframe_kc160_keep.bin: $(SOURCES) smallframe.c
+	$(call compile_kc160,-Cc--opt-disable=small-frame-fast)
+	$(runtest_kc160)
+
+smallframe_8080.bin: $(SOURCES) smallframe.c
+	$(compile_8080)
+	$(runtest_8080)
+
+smallframe_8085.bin: $(SOURCES) smallframe.c
+	$(compile_8085)
+	$(runtest_8085)

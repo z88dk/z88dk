@@ -229,6 +229,46 @@ static int gb_small_frame(int n)
         && !opt_disabled("gb-small-frame");
 }
 
+/* A 4-byte frame: two `push af` are the slowest form on z180, ez80 and kc160.
+   Returns 1 for `ld hl,-4; add hl,sp; ld sp,hl` (z180, and only with HL
+   free), 2 for four `dec sp` (ez80, kc160: no slower, 1 byte smaller than
+   the ld form), 0 for `push af` x2. */
+static int sff_off;    /* off for the DE re-arbitration's estimate renders */
+static int sff_used;   /* a render took one of these forms */
+static int small_frame_form(int alloc_size, int hl_live)
+{
+    if (alloc_size != 4 || sff_off || opt_disabled("small-frame-fast")) return 0;
+    if (IS_EZ80() || IS_KC160()) { sff_used = 1; return 2; }
+    if (c_cpu == CPU_Z180 && !hl_live) { sff_used = 1; return 1; }
+    return 0;
+}
+
+/* Small-frame teardown where the default is slower and larger:
+     kc160, up to 5 bytes: `inc sp` per byte (its `pop` is 10 cycles, and the
+       ld form stashes HL around `ld hl,N; add hl,sp; ld sp,hl`);
+     5 bytes with a value in HL/DEHL: `pop af` x2 + `inc sp` (`inc sp` x5 on
+       ez80 and where `pop af` is unsafe) instead of the ld form and its stash.
+   At 6 bytes copt's folds make the ld form as fast. Every form keeps HL, DE
+   and BC. Returns 1 when it emitted. */
+static int small_teardown(FILE *out, const Func *f, int n, int is_acc, int width)
+{
+    (void)f;
+    (void)width;
+    if (sff_off || opt_disabled("small-frame-fast") || n < 1 || n > 5) return 0;
+    int incs = 0, pops = 0;
+    if (IS_KC160()) incs = n;
+    else if (n == 5 && !is_acc && IS_EZ80()) incs = n;
+    else if (n == 5 && !is_acc && tos_pushpop_ok(f)
+             && !IS_RABBIT() && !IS_GBZ80()) {
+        if (CPU_POP_AF_IS_SAFE()) pops = n / 2;
+        incs = n - 2 * pops;
+    } else return 0;
+    sff_used = 1;
+    for (int i = 0; i < pops; i++) emit(out, "pop\taf");
+    for (int i = 0; i < incs; i++) emit(out, "inc\tsp");
+    return 1;
+}
+
 /* True when a chained `add sp,delta` is available and no larger than the
    ld hl,delta / add hl,sp / ld sp,hl fallback (5 bytes) plus hl_extra
    bytes the caller spends preserving HL around that fallback. The chain

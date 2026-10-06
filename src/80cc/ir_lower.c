@@ -5845,6 +5845,11 @@ static int   dsd_viol;
 /* Candidates found by the last instrumented render. */
 static int  *dsd_cand;
 static int   dsd_ncand;
+/* Bytes dead-slot-drop saved in the last ir_lower_func_body. The DE
+   re-arbitration compares allocations, so it adds them back: the drop applies
+   to whichever render it picks. */
+static long rearb_bias;
+static long render_size(FILE *fp);
 static void note_wide_def(int v);      /* IR_WIDENOSLOT probe: fwd (defined with rec state) */
 static void note_wide_noslot(int v);   /* IR_WIDENOSLOT probe: fwd (defined with rec state) */
 /* [dead-store] write-context depth: >0 while lowering a store function body,
@@ -7588,6 +7593,8 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
             /* add sp,d preserves HL/DE/BC, so the int/long return-value
                stashes below are unneeded — drop the frame in one chain. */
             emit_add_sp_chain(out, f->frame_size);
+        } else if (small_teardown(out, f, f->frame_size, is_acc, width)) {
+            /* emitted */
         } else if (f->frame_size <= 4 && tos_pushpop_ok(f)) {
             /* Small frame: reclaim with `pop af` (2 bytes) / `inc sp` (1) — both
                preserve HL/DE/BC, so the return value (HL / DE:HL) survives with
@@ -7985,12 +7992,15 @@ static void emit_prologue(FILE *out, Func *f)
        allocate only the remainder; the epilogue still reclaims the full
        frame_size (the push included). */
     int alloc_size = f->frame_size - autopush_bytes;
+    int sff = 0;
     if (alloc_size > 0) {
         if (gb_small_frame(alloc_size)) {
             emit(out, alloc_size == 2 ? "push\taf" : "dec\tsp");
         } else if (use_add_sp(f, -alloc_size, 0)) {
             emit_add_sp_chain(out, -alloc_size);
-        } else if (alloc_size <= 4) {
+        } else if ((sff = small_frame_form(alloc_size, fc_autopush)) == 2) {
+            for (int k = 0; k < 4; k++) emit(out, "dec\tsp");
+        } else if (alloc_size <= 4 && !sff) {
             /* Small frame: reserve with `push af` (2 bytes) + `dec sp` (1) — 1-2
                instructions vs the 5-byte `ld hl,-N; add hl,sp; ld sp,hl`, and
                clobbers no register (push af leaves A/F unchanged; the ld-hl form
@@ -9348,7 +9358,9 @@ static int ir_lower_func_body(FILE *out, Func *f)
     int df_retry_done = 0;   /* dead-frame elision: at most one re-lower */
     int ds_retry_done = 0;   /* [dead-store] dead byte-spill elision: one re-lower */
     int dsd_retry = 0;       /* [dead-slot-drop] 1 = dropped, 2 = restored */
+    long dsd_pre = 0;        /* render size before the drop */
     dsd_ncand = 0;
+    rearb_bias = 0;
     int hd_retry_done = 0;   /* [home-demote] unrealizable home: one re-lower */
     /* [IR_HOMEMAP] Inert: dump every vreg's home, slot and residency window.
        hr_recoverability_verify only compares vregs that BOTH carry a pair/byte
@@ -9699,12 +9711,18 @@ static int ir_lower_func_body(FILE *out, Func *f)
             f->vregs[dsd_cand[i]].flags |= IR_VREG_SLOT_UNUSED;
         }
         if (dsd_drop) {
+            dsd_pre = render_size(rout);
             ir_assign_slots(f);
             L.cur_frameless = frameless_ok(f);
             free(bb_hl_out_p1); bb_hl_out_p1 = NULL;
             fclose(rout);
             goto deadframe_retry;
         }
+    }
+    if (dsd_retry == 1 && rc == 0 && rout != out) {
+        long pos = ftell(rout);
+        rearb_bias += dsd_pre - render_size(rout);
+        fseek(rout, pos, SEEK_SET);
     }
     free(dsd_drop); dsd_drop = NULL; dsd_drop_nv = 0;
     /* [IR_IX_VERIFY] sp-mode INDEX-preservation completeness check (debug-gated):
@@ -9905,6 +9923,22 @@ static long render_size(FILE *fp)
     return n;
 }
 
+/* Lower f with DE re-arbitration's render a size estimate, f's own render
+   (rc, into buf) already done. The estimate leaves out the size-for-speed
+   frame forms (sff_off): they apply to whichever render is picked and must
+   not pick it. */
+static long rearb_render(Func *g, int veto, FILE **fp, int *rc)
+{
+    *fp = tmpfile();
+    if (!*fp) { *rc = -1; return 0; }
+    sff_off = 1;
+    if (veto) ir_alloc_de_veto(1);
+    *rc = ir_lower_func_body(*fp, g);
+    if (veto) ir_alloc_de_veto(0);
+    sff_off = 0;
+    return render_size(*fp) + rearb_bias;
+}
+
 int ir_lower_func(FILE *out, Func *f)
 {
     if (!f || f->is_naked || opt_disabled("de-rearb"))
@@ -9916,25 +9950,43 @@ int ir_lower_func(FILE *out, Func *f)
         return ir_lower_func_body(out, f);
     }
     whome_rejected = 0;
+    sff_used = 0;
     int rc = ir_lower_func_body(buf, f);
+    long so = render_size(buf) + rearb_bias;
     FILE *src = buf;
+    Func *fin = NULL;
     if (rc == 0 && whome_rejected) {
-        FILE *buf2 = tmpfile();
-        if (buf2) {
-            ir_alloc_de_veto(1);
-            int rc2 = ir_lower_func_body(buf2, c);
-            ir_alloc_de_veto(0);
-            /* The estimate does not see copt, so a margin up to 3% is noise. */
-            long so = render_size(buf), sn = render_size(buf2);
-            if (rc2 == 0 && sn + so / 33 < so) {
-                src = buf2;
-                /* -debug reads the frame layout off f after lowering. */
-                f->frame_size = c->frame_size;
-                if (c->n_vregs == f->n_vregs && c->vreg_spill_slot && f->vreg_spill_slot)
-                    memcpy(f->vreg_spill_slot, c->vreg_spill_slot,
-                           (size_t)f->n_vregs * sizeof(int));
-            } else fclose(buf2);
+        /* With the frame forms on, compare like with like: both again
+           without them. A pristine clone stands in for f. */
+        Func *p = sff_used ? ir_clone_func(c) : NULL;
+        Func *c3 = ir_clone_func(c);
+        FILE *bp = NULL, *b2 = NULL;
+        int rcp = 0, rc2 = -1;
+        if (p) {
+            so = rearb_render(p, 0, &bp, &rcp);
+            if (rcp) so = -1;
         }
+        long sn = rearb_render(c, 1, &b2, &rc2);
+        if (rc2 == 0 && so >= 0 && sn + so / 33 < so) {
+            /* The veto render wins: render it for real, frame forms on. */
+            FILE *b3 = NULL; int rc3 = -1;
+            if (c3 && (b3 = tmpfile())) {
+                ir_alloc_de_veto(1);
+                rc3 = ir_lower_func_body(b3, c3);
+                ir_alloc_de_veto(0);
+            }
+            if (rc3 == 0) { src = b3; fin = c3; }
+            else { if (b3) fclose(b3); src = b2; b2 = NULL; fin = c; }
+            /* -debug reads the frame layout off f after lowering. */
+            f->frame_size = fin->frame_size;
+            if (fin->n_vregs == f->n_vregs && fin->vreg_spill_slot && f->vreg_spill_slot)
+                memcpy(f->vreg_spill_slot, fin->vreg_spill_slot,
+                       (size_t)f->n_vregs * sizeof(int));
+        }
+        if (bp) fclose(bp);
+        if (b2) fclose(b2);
+        if (p) ir_free_cloned_func(p);
+        if (c3) ir_free_cloned_func(c3);
     }
     whome_rejected = 0;
     rewind(src);
