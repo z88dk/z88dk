@@ -3103,6 +3103,9 @@ static int niv_down_exit_ok(Func *f, int h, int c)
     return 0;
 }
 
+static int cs_is_signed_cmp(OpKind k);
+static OpKind cs_unsigned_of(OpKind k);
+
 int ir_opt_narrow_iv(Func *f)
 {
     if (!f || f->n_bbs <= 0 || opt_disabled("iv-narrow")) return 0;
@@ -3164,6 +3167,18 @@ int ir_opt_narrow_iv(Func *f)
             f->vregs[c].width = 1;
             f->vregs[c].kind  = KIND_CHAR;
             narrowed++;
+            /* The counter is proven in [0,255] and reads as that byte, so a signed
+               test of it against a byte-range constant is the unsigned test:
+               `cp K` instead of the `xor 0x80; cp K^0x80` signed-byte bias. */
+            if (!opt_disabled("iv-narrow-unsigned"))
+                for (int b2 = 0; b2 < f->n_bbs; b2++)
+                    for (int j2 = 0; j2 < f->bbs[b2].n_ops; j2++) {
+                        Op *q = &f->bbs[b2].ops[j2];
+                        if (cs_is_signed_cmp(q->kind) && q->src[0] == c
+                            && q->src[1] == -1 && q->imm_sym == NULL
+                            && q->imm >= 0 && q->imm <= 255)
+                            q->kind = cs_unsigned_of(q->kind);
+                    }
         }
     }
     free(reach);
