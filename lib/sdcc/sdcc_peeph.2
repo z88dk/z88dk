@@ -1510,7 +1510,7 @@ replace restart {
 	; peephole 34 loaded %3 from %2 instead of going through %1 (ix).
 	ld	%1 (ix), %2
 	ld	%3, %2
-}
+} if canAssign(%3 %2)
 // Don't need to check for volatile, since ix is used for the stack.
 
 replace restart {
