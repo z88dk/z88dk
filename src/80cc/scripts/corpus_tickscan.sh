@@ -22,6 +22,7 @@ for b in $BENCHES; do
       gbz80) clib="-clib=gbz80"; mflag="-mgbz80";;
       kc160) clib="-clib=kc160"; mflag="-mkc160";;
       vm1) clib="-clib=vm1"; mflag="-mvm1";;
+      r800) clib="-mr800"; mflag="-mr800";;
     esac
     for m in sp fp; do
       fpf=""; [ "$m" = fp ] && fpf="-fframe-pointer"

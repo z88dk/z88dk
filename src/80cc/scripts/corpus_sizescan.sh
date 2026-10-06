@@ -5,7 +5,7 @@ export ZCCCFG=/workspaces/z88dk/lib/config PATH=${BIN:-/workspaces/z88dk/bin}:$P
 cd /workspaces/z88dk/test/suites
 OUT="$1"; : > "$OUT"
 BENCHES="charbench crcbench intbench ptrbench sieve rle sortbench queenbench searchbench switchbench structbench vecbench recordbench maskbench strbench listbench interpbench matrixbench hashbench fixedbench histbench lexbench md5 localbench predbench divbench shiftbench callbench bitfieldbench widthbench charmulbench"
-CPUS="${CPUS:-z80: z80n:-clib=z80n r2ka:-clib=rabbit r4k:-clib=rabbit4k r6k:-clib=rabbit6k z180:-clib=z180 ez80_z80:-clib=ez80_z80 gbz80:-clib=gbz80 kc160:-clib=kc160 8080:-clib=8080 8085:-clib=8085 vm1:-clib=vm1}"
+CPUS="${CPUS:-z80: z80n:-clib=z80n r2ka:-clib=rabbit r4k:-clib=rabbit4k r6k:-clib=rabbit6k z180:-clib=z180 ez80_z80:-clib=ez80_z80 gbz80:-clib=gbz80 kc160:-clib=kc160 8080:-clib=8080 8085:-clib=8085 vm1:-clib=vm1 r800:-mr800}"
 sec(){ z88dk-z80nm "$1" 2>/dev/null | grep -oE 'Section code_compiler: [0-9]+' | grep -oE '[0-9]+'; }
 for b in $BENCHES; do
   [ -d "$b" ] || continue

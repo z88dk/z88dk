@@ -99,7 +99,7 @@ exists (ADR 0010).
 | `slot-bitop-de` | a 16-bit and/or/xor of two (ix+d) word slots is staged through DE and HL even when DE is dead after it |
 | `mask-shl-a` | a masked byte doubled as `ld l,a; ld h,0; add hl,hl` is not doubled in A first, even when A and S/P/V/H are dead after it |
 | `dead-slot-drop` | a value whose frame slot the render never touched keeps the slot (only a wholly dead frame is dropped) |
-| `small-frame-fast` | small frames use the default forms: two `push af` for a 4-byte frame (not `ld hl,-4; add hl,sp; ld sp,hl` on z180 or four `dec sp` on ez80/kc160), and the ld-form teardown on kc160 and for 5-byte frames (not `inc sp` / `pop af`) |
+| `small-frame-fast` | small frames use the default forms: two `push af` for a 4-byte frame (not `ld hl,-4; add hl,sp; ld sp,hl` on z180 or four `dec sp` on ez80/kc160/r800), and the ld-form teardown on kc160 and for 5-byte frames (not `pop af` / `inc sp`) |
 | `dead-sp-addr` | an `ld hl,N; add hl,sp` whose HL and carry are both dead is kept |
 | `hl-mem-carry` | a global word loaded for a branch test is reloaded in the block the branch reaches, instead of being taken from HL |
 | `addr-fold` | `ex de,hl; ld hl,_sym; add hl,de` stays as is instead of becoming `ld de,_sym; add hl,de` where DE is dead after the add (not on VM1 or Rabbit) |
