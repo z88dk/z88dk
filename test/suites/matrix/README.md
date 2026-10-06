@@ -1,6 +1,6 @@
 # test/suites/matrix — BENCH_MATRIX workflow
 
-`../gen_bench_matrix3.py` is the full matrix generator. It measures 30 benchmarks
+`../gen_bench_matrix3.py` is the full matrix generator. It measures 38 benchmarks
 across 12 CPUs and prints the compiler columns as a box table.
 
 The generator expects a built tree. It sets `ZCCCFG` and adds `bin/` to `PATH`.

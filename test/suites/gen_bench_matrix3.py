@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build a complete, fresh benchmark matrix — every bench (including the seven
-added in August) x every CPU x 80cc-fp / 80cc-sp, with sccz80 and sdcc as z80-only
-reference columns.
+M4 FORTH benchmark rows) x every CPU x 80cc-fp / 80cc-sp, with sccz80 and sdcc
+as z80-only reference columns.
 
 It measures every benchmark in BENCHES and does not reuse a table skeleton.
 Each cell is `bytes / ticks(millions)`; a bench that will not build or run
@@ -20,7 +20,8 @@ BENCHES = ("charbench crcbench intbench ptrbench sieve rle sortbench queenbench 
            "searchbench switchbench structbench vecbench recordbench maskbench "
            "strbench listbench interpbench matrixbench hashbench fixedbench "
            "histbench lexbench bitfieldbench widthbench predbench shiftbench "
-           "localbench divbench callbench md5 charmulbench").split()
+           "localbench divbench callbench md5 charmulbench m4gcd m4bitcount "
+           "m4josephus m4kadane m4doors m4memory m4vcfe m4pangram").split()
 
 # cpu -> (make target, zcc clib flag, ticks machine flag)
 CPUS = [
