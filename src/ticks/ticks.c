@@ -2775,7 +2775,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         if (israbbit4k() && ih==0) r4k_pop_r32(opc, iy);
         else {
             uint8_t flags = get_memory_data(sp++);
-            st+= isez80() ? 3 : isgbz80() ? 12 : israbbit() ? 7 : isz180() ? 9 : 10;
+            st+= isez80() ? 3 : isgbz80() ? 12 : israbbit() ? 7 : isz180() ? 9 : isr800() ? 3 : iskc160() ? 2 : 10;
 
             // 8080: S Z 0 AC 0 P 1 C
             // 8085: S Z K AC 0 P V C
@@ -4466,7 +4466,7 @@ static void handle_ed_page(void)
     case 0x42: SBCHLRR(b, c); break;                   // SBC HL,BC
     case 0x52: SBCHLRR(d, e); break;                   // SBC HL,DE
     case 0x62: SBCHLRR(h, l); break;                   // SBC HL,HL
-    case 0x72: st+= isez80() ? 2 : israbbit() ? 4 : isz180() ? 10 : 15;                                // SBC HL,SP
+    case 0x72: st+= isez80() ? 2 : israbbit() ? 4 : isz180() ? 10 : isr800() ? 2 : iskc160() ? 2 : 15;                                // SBC HL,SP
                 v= (mp= l|h<<8)-sp-(ff>>8&1);
                 ++mp;
                 ff= v>>8;
@@ -4478,7 +4478,7 @@ static void handle_ed_page(void)
     case 0x4a: ADCHLRR(b, c); break;                   // ADC HL,BC
     case 0x5a: ADCHLRR(d, e); break;                   // ADC HL,DE
     case 0x6a: ADCHLRR(h, l); break;                   // ADC HL,HL
-    case 0x7a: st+=isez80() ? 2 : israbbit() ? 4 : isz180() ? 10 : iskc160() ? 2 : 15;                 // ADC HL,SP
+    case 0x7a: st+=isez80() ? 2 : israbbit() ? 4 : isz180() ? 10 : isr800() ? 2 : iskc160() ? 2 : 15;                 // ADC HL,SP
                 v= (mp= l|h<<8)+sp+(ff>>8&1);
                 ++mp;
                 ff= v>>8;
@@ -4490,7 +4490,7 @@ static void handle_ed_page(void)
     case 0x43: LDPNNRR(b, c, isez80() ? 6 : israbbit() ? 15 : isz180() ? 19 : isr800() ? 6 : iskc160() ? 5 : 20); break;               // LD (NN),BC
     case 0x53: LDPNNRR(d, e, isez80() ? 6 : israbbit() ? 15 : isz180() ? 19 : isr800() ? 6 : iskc160() ? 5 : 20); break;               // LD (NN),DE
     case 0x63: LDPNNRR(h, l, isez80() ? 6 : israbbit() ? 15 : isz180() ? 19 : isr800() ? 6 : iskc160() ? 5 : 20); break;               // LD (NN),HL
-    case 0x73: st+= isez80() ? 6 : israbbit() ? 15 : isz180() ? 19 : 20;                                // LD (NN),SP
+    case 0x73: st+= isez80() ? 6 : israbbit() ? 15 : isz180() ? 19 : isr800() ? 6 : iskc160() ? 5 : 20;                                // LD (NN),SP
                 mp= get_memory_inst(pc++);
                 put_memory(mp|= get_memory_inst(pc++)<<8, sp);
                 put_memory(++mp,sp>>8); break;
