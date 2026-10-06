@@ -150,7 +150,9 @@ static void compute_home_region(const Func *f, int home,
                        redef on a leaving edge always rejects there, preserving
                        gate-off byte-identity. */
                     const BB *tb = &f->bbs[t];
-                    if (!f->de_home_is_ptr
+                    int dead_exit_ok = (f->de_home_is_ptr
+                                        || !opt_disabled("dehome-dead-exit")) ? 1 : 0;
+                    if (!dead_exit_ok
                         || (tb->live_in
                             && ir_bitset_get((const BitSet *)tb->live_in, home)))
                         exit_bad = 1;

@@ -2918,6 +2918,40 @@ static int cmp_fold_static_class(const Func *f, int v)
     return 0;
 }
 
+/* Word AND/OR/XOR (two vregs) or NOT whose result lives in the BC home and whose
+   operands are readable in place (BC, the DE word home, an (ix+d) slot, an idx2
+   half): lowered byte-wise through A straight into C/B, never staging an
+   operand through DE or HL. Keyed on the fixed assignment so the region proof
+   and try_pair_bitop agree. */
+static int pair_bitop_src_ok(const Func *f, int v)
+{
+    if (v < 0 || v >= f->n_vregs || f->vregs[v].width != 2) return 0;
+    if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    if (v == g_hc.func_whome) return 1;
+    if (!f->vreg_to_phys) return 0;
+    if (ir_home_at(f, v) == IR_PR_BC) return 1;
+    if (op_is_ixd_slot(f, v)) return 1;
+    if (((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N()) && vreg_in_idx2(f, v)) return 1;
+    return 0;
+}
+
+static int pair_bitop_shape_ok(const Func *f, const Op *o)
+{
+    if (opt_disabled("pair-bitop")) return 0;
+    int is_not = (o->kind == IR_NOT);
+    if (!is_not && o->kind != IR_AND && o->kind != IR_OR && o->kind != IR_XOR)
+        return 0;
+    int d = o->dst;
+    if (d < 0 || d >= f->n_vregs || f->vregs[d].width != 2) return 0;
+    if (!f->vreg_to_phys || !vreg_in_pr_bc(f, d)) return 0;
+    if (d == g_hc.func_whome) return 0;
+    if (f->vregs[d].flags & (IR_VREG_CALL_SPLIT | IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+        return 0;
+    if (!pair_bitop_src_ok(f, o->src[0])) return 0;
+    if (is_not) return o->src[1] < 0;
+    return o->src[1] >= 0 && pair_bitop_src_ok(f, o->src[1]);
+}
+
 /* An int compare inside the general DE-home region that try_cmp_ixd_fold will
    lower DE-clean (reads both operands in place through A, never staging one into
    DE). Requires >=1 operand mem/idx (else the fold defers to `sbc hl,de`, which
@@ -3258,6 +3292,8 @@ static int sp_dehome_loop_cmp_ok(const Func *f, const Op *o)
    Clean = byte ALU through A, byte deref, pointer step, byte truth-test
    branch, plain branches, byte-wise loop test. Everything else (16/32-bit
    ops, stores, calls, switches, wide conversions) is a clobber. */
+static int cmpk_imm_shape_ok(const Func *f, const Op *o);
+
 static int op_de_clean(const Func *f, const Op *o)
 {
     int dw = (o->dst >= 0 && o->dst < f->n_vregs)
@@ -3268,6 +3304,10 @@ static int op_de_clean(const Func *f, const Op *o)
     if (g_hc.home_is_word) {
         if (is_word_accumulate(f, o)) return 1;
         if (o->kind == IR_LD_IMM && o->dst == g_hc.func_whome) return 1;
+        /* Step of the home itself (`i++`): `inc de` / `dec de` in place. */
+        if ((o->kind == IR_INC || o->kind == IR_DEC) && o->dst == g_hc.func_whome
+            && o->src[0] == o->dst && dw == 2 && !opt_disabled("de-home-step"))
+            return 1;
         /* Int deref (fp): register/sym base, offset>=-3 (inc/dec hl, no DE
            scratch), no post-step, not far/banked, dst not the home. Loads
            into HL/A with a DE-preserving spill, so DE (the home) survives —
@@ -3426,6 +3466,7 @@ static int op_de_clean(const Func *f, const Op *o)
                 return 1;
         }
     }
+    if (pair_bitop_shape_ok(f, o)) return 1;
     switch (o->kind) {
     case IR_NOP: case IR_BR:
         return 1;
@@ -3466,7 +3507,8 @@ static int op_de_clean(const Func *f, const Op *o)
         return dw == 1;               /* byte deref → A */
     case IR_CMP_ULT: case IR_CMP_UGE:
         /* byte-wise loop test: A-only, DE-clean — BC-vs-slot or slot-vs-slot */
-        return cmp_bytewise_ok(f, o) || cmp_bytewise_mem_ok(f, o);
+        return cmp_bytewise_ok(f, o) || cmp_bytewise_mem_ok(f, o)
+            || (g_hc.branch_test_kind != 0 && cmpk_imm_shape_ok(f, o));
     case IR_CMP_LT: case IR_CMP_GE:
         /* Signed X REL 0 sign-bit test (gen_cmp_lt_ge fastpath): branch-fused,
            loads the top byte + `add a,a` — A/HL only for width<=2, so DE (the
@@ -3488,6 +3530,20 @@ static int op_de_clean(const Func *f, const Op *o)
    and that branch itself — both of which lower to the A+BC-only
    `ld a,c; sub mem; ld a,b; sbc a,mem; jp` form. Everything else defers to
    the runtime op_de_clean. */
+static int cmpk_enabled(void);
+
+/* Unsigned word compare against a constant, branch-fused, read in place
+   byte-wise through A (`ld a,lo; sub K; ld a,hi; sbc a,K`): A only, so DE, HL
+   and BC all survive. Static mirror of the cmp-k path in gen_cmp. */
+static int cmpk_imm_shape_ok(const Func *f, const Op *o)
+{
+    if (o->kind != IR_CMP_ULT && o->kind != IR_CMP_UGE) return 0;
+    if (!cmpk_enabled() || o->src[0] < 0 || o->src[1] != -1 || o->imm_sym) return 0;
+    if (o->src[0] >= f->n_vregs || f->vregs[o->src[0]].width != 2) return 0;
+    if (o->imm < 0 || o->imm > 0xffff) return 0;
+    return cmp_fold_static_class(f, o->src[0]) != 0;
+}
+
 static int op_de_clean_static_inner(const Func *f, const BB *bb, int j);
 
 static int op_de_clean_static(const Func *f, const BB *bb, int j)
@@ -3512,6 +3568,15 @@ static int op_de_clean_static(const Func *f, const BB *bb, int j)
 static int op_de_clean_static_inner(const Func *f, const BB *bb, int j)
 {
     const Op *o = &bb->ops[j];
+    if (cmpk_imm_shape_ok(f, o) && j + 1 < bb->n_ops) {
+        const Op *nxt = &bb->ops[j + 1];
+        if ((nxt->kind == IR_BR_ZERO || nxt->kind == IR_BR_COND)
+            && nxt->src[0] == o->dst)
+            return 1;
+    }
+    if ((o->kind == IR_BR_ZERO || o->kind == IR_BR_COND) && j > 0
+        && bb->ops[j - 1].dst == o->src[0] && cmpk_imm_shape_ok(f, &bb->ops[j - 1]))
+        return 1;
     if ((o->kind == IR_CMP_ULT || o->kind == IR_CMP_UGE)
         && j + 1 < bb->n_ops) {
         const Op *nxt = &bb->ops[j + 1];

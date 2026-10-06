@@ -240,6 +240,9 @@ exists (ADR 0010).
 | `trunc-store-bc` | a byte store of a word held in BC loads the byte through A and E instead of storing `c` straight through HL |
 | `self-ops` | no block-local value-equivalence folds (`1*x`, `(x+y)-y`, `x&~x`, `x^x`, `0 op x`) |
 | `self-div` | `x/x` is not folded to 1 and `x%x` to 0 (division by zero is undefined, so x is assumed nonzero) |
+| `pair-bitop` | a word AND/OR/XOR/NOT with its result in BC stages operands through HL and DE instead of working byte-wise through A |
+| `de-home-step` | `i++` / `i--` of a word DE home goes through HL (`ld hl,de; inc hl; ex de,hl`) instead of `inc de`, and ends the DE-home region |
+| `dehome-dead-exit` | a general DE home is not kept resident in a loop whose leaving edge follows a redefinition of the home, even when the home is dead at the exit |
 | `word-ztest` | a word zero test uses the baseline sequence |
 | `switch-chain` | a small word switch calls `l_case` with a case table instead of an inline `dec hl` / zero-test chain, even when the chain is no larger |
 | `switch-byte-a` | a `char` switch scrutinee is widened to HL instead of staying in A |

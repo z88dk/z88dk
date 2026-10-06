@@ -233,6 +233,12 @@ static int gen_mov(FILE *out, Func *f, const Op *op)
     if (vreg_is_pr_de(f, op->dst)) {
         load_to_de(out, f, op->src[0]);
         cache_de(op->dst);
+        /* Word DE-home init (`i = start`): value in DE only, slot stale —
+           mark resident + dirty so the first DE clobber / BB exit flushes it. */
+        if (g_hc.home_is_word && op->dst == g_hc.func_whome) {
+            byte_home_note(op->dst);
+            L.cur_de_byte_home_dirty = 1;
+        }
         return 0;
     }
     if (L.rs.hl != op->src[0] || L.rs.hl < 0)
@@ -306,6 +312,9 @@ static int try_tos_rmw_reg(FILE *out, Func *f, const Op *op, int is_sub)
     if (v < 0 || op->src[0] != v) return 0;          /* in-place: dst == src[0] */
     int s = op->src[1];
     if (s < 0 || s == v || s >= f->n_vregs) return 0; /* distinct register src */
+    /* The word DE home rides DE with no cache belief; load_to_de would read its
+       stale slot and overwrite DE. try_de_home_operand_add handles it. */
+    if (g_hc.home_is_word && s == g_hc.func_whome && byte_home_holds(s)) return 0;
     if (f->vregs[v].width != 2 || f->vregs[s].width != 2) return 0;
     if (L.la.cur_dst_dead) return 0;
     if (vreg_in_register_pool(f, v)) return 0;       /* dst must be a real slot */
@@ -439,6 +448,18 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
         load_to_dehl(out, f, op->src[0]);
         emit(out, "call\t%s", step > 0 ? "l_inc_dehl" : "l_dec_dehl");
         store_dehl_finalize(out, f, op->dst);
+        return 0;
+    }
+    /* Step of the word DE home in place: DE is the home, so `inc de`/`dec de`
+       keeps it resident (the slot copy goes stale, as for the accumulate). */
+    if (g_hc.home_is_word && op->dst == g_hc.func_whome && op->dst >= 0
+        && op->src[0] == op->dst && f->vregs[op->dst].width == 2
+        && !opt_disabled("de-home-step") && byte_home_holds(op->dst)) {
+        emit(out, "%s\tde", mnem);
+        if (hl_has(op->dst)) invalidate_hl_cache();
+        cache_de(op->dst);
+        byte_home_note(op->dst);
+        L.cur_de_byte_home_dirty = 1;
         return 0;
     }
     /* idx2 stepping counter (register residency): the counter lives in the
@@ -1730,8 +1751,56 @@ static int gen_neg(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* Word AND/OR/XOR/NOT with the result in the BC home: read the operands in
+   place through A and write C/B directly (pair_bitop_shape_ok). HL and DE are
+   untouched, so a DE home survives. `mnem` NULL means NOT. Returns 1 if emitted. */
+static int try_pair_bitop(FILE *out, Func *f, const Op *op, const char *mnem)
+{
+    if (!pair_bitop_shape_ok(f, op)) return 0;
+    int idxhalf_ok = ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N());
+    int n = mnem ? 2 : 1;
+    char lo[2][16], hi[2][16];
+    int cls[2];
+    for (int k = 0; k < n; k++) {
+        int v = op->src[k];
+        cls[k] = cmp_byte_src(f, v, idxhalf_ok, lo[k], hi[k], sizeof lo[k]);
+        if (cls[k] == 0 && vreg_in_pr_bc(f, v)) {
+            emit_bc_reload(out, f, v, 0);
+            cls[k] = cmp_byte_src(f, v, idxhalf_ok, lo[k], hi[k], sizeof lo[k]);
+        }
+        if (cls[k] == 0) return 0;
+    }
+    if (L.lazy_spill_on && L.pending_spill_v >= 0) pending_spill_resolve();
+    for (int k = 0; k < n; k++) {
+        int v = op->src[k];
+        if (cls[k] == 2 && op_is_ixd_slot(f, v)) ss_note_reload(f, v);
+        else                                     ss_note_cache_read(f, v);
+    }
+    if (mnem) {
+        emit(out, "ld\ta,%s", lo[0]);
+        emit(out, "%s\t%s", mnem, lo[1]);
+        emit(out, "ld\tc,a");
+        emit(out, "ld\ta,%s", hi[0]);
+        emit(out, "%s\t%s", mnem, hi[1]);
+        emit(out, "ld\tb,a");
+    } else {
+        emit(out, "ld\ta,%s", lo[0]);
+        emit(out, "cpl");
+        emit(out, "ld\tc,a");
+        emit(out, "ld\ta,%s", hi[0]);
+        emit(out, "cpl");
+        emit(out, "ld\tb,a");
+    }
+    invalidate_a_cache();
+    if (hl_has(op->dst)) invalidate_hl_cache();
+    if (de_has(op->dst)) invalidate_de_cache();
+    cache_bc(op->dst);
+    return 1;
+}
+
 static int gen_not(FILE *out, Func *f, const Op *op)
 {
+    if (try_pair_bitop(out, f, op, NULL)) return 0;
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         /* Fused load+cpl: walk HL through the source slot reading
            each byte into A, complement, write into the target
@@ -6370,6 +6439,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
         return 0;
     }
 
+    if (try_pair_bitop(out, f, op, mnem)) return 0;
     {
         char m[8];
         snprintf(m, sizeof m, "%s\t", mnem);
