@@ -1364,3 +1364,25 @@
 	or	%1
 =
 	or	%1
+
+;; gbz80 has no `ex de,hl`: z80asm swaps through the stack (push hl; push de;
+;; pop hl; pop de: 4 bytes, 56 cycles). When the next instruction overwrites HL
+;; without reading it, only the HL -> DE half survives, which `ld de,hl` (ld
+;; d,h; ld e,l: 2 bytes, 8 cycles) does. No register is assumed dead: HL is
+;; written by the very next instruction. These come last so the rules that
+;; cancel or fold `ex de,hl` sequences see them first.
+%title #G10 IR gbz80 ex de,hl before pop hl is a copy (-2b, -48t)
+%cpu gbz80
+	ex	de,hl
+	pop	hl
+=
+	ld	de,hl
+	pop	hl
+
+%title #G11 IR gbz80 ex de,hl before ld hl,sp+n is a copy (-2b, -48t)
+%cpu gbz80
+	ex	de,hl
+	ld	hl,sp+%1
+=
+	ld	de,hl
+	ld	hl,sp+%1

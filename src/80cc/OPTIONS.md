@@ -166,6 +166,8 @@ exists (ADR 0010).
 | `jp-next` | keep an unconditional `jp` that jumps to the label directly below it |
 | `lazy-spill` | spill at the definition instead of deferring to the clobber |
 | `ss-evidence` | lazy spill keeps a spill store unless a hook proved every later use cache-served, instead of keeping it only for the slot reads the render emitted |
+| `ss-keep-hl` | lazy spill does not consider the stores of word call results (and other commits that keep the value in HL), so a dead one stays |
+| `gb-hl-to-de` | gbz80 moves a word from HL to DE with the synthesised `ex de,hl` even when DE holds nothing to keep, instead of `ld d,h; ld e,l` |
 | `a-carry` | the A-register belief is dropped at each basic-block boundary |
 | `hl-carry` | the HL belief is not carried across a basic-block edge |
 | `de-carry` | the DE belief is not carried into a compare across a basic-block edge |

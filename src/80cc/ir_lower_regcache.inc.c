@@ -959,6 +959,14 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
             cache_de(vreg_id);
             return;
         }
+        /* [gb-hl-to-de] gbz80 has no `ex de,hl` (a 4-byte push/pop swap):
+           when DE holds nothing worth keeping, copy instead, which also
+           leaves the value in HL. */
+        if (IS_GBZ80() && L.rs.de < 0 && !opt_disabled("gb-hl-to-de")) {
+            emit_hl_to_de(out);
+            cache_de(vreg_id);
+            return;
+        }
         emit_ex_de_hl(out);
         /* HL ↔ DE swap: caches swap too. cur_hl now has what DE held
            (the old rs.de or -1); cur_de gets what HL held. */
@@ -1368,8 +1376,19 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
         L.cur_stack_resident_spadj = L.cur_sp_adjust;
         return 1;
     }
+    /* [ss-keep-hl] Lazy spill: a word call result (or other keep-HL commit)
+       whose slot no later use reads. Each path below drops only its store and
+       keeps its register result: the value stays in HL (return 1), or the
+       last path leaves it in DE (return 0). Code after this was compiled
+       against that register in the render that proved the store dead. */
+    int ssd = 0;
+    if (vreg_id >= 0 && !opt_disabled("ss-keep-hl")) {
+        ss_note_store(f, vreg_id);
+        ssd = ss_store_dead_here();
+    }
     if (fp_active(f)) {
         if (fp_tos_slot(f, vreg_id)) {
+            if (ssd) return 1;
             emit(out, "pop\tde");               /* discard old TOS word (DE dead) */
             emit(out, "push\thl");              /* store; HL preserved */
             invalidate_de_cache();
@@ -1377,6 +1396,7 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
         }
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
+            if (ssd) return 1;
             emit(out, "ld\t(%s%+d),hl%s", frame_reg(), ix_off,
                  vol_stamp(f, vreg_id));         /* HL preserved — no ex */
             return 1;
@@ -1384,6 +1404,7 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
     }
     int off = slot_off(f, vreg_id) + L.cur_sp_adjust;
     if (off >= 0 && off <= sp_rel_max(f)) {
+        if (ssd) return 1;
         emit(out, "ld\t(sp+%d),hl%s", off, vol_stamp(f, vreg_id));  /* HL preserved */
         return 1;
     }
@@ -1425,6 +1446,7 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
                            && tos_store_vreg_live_after(f, L.rs.dehl));
             int de_free = !de_live && L.cur_de_byte_home_vreg < 0;
             if (!is_volatile && de_free) {
+                if (ssd) return 1;
                 emit(out, "pop\tde");
                 emit(out, "push\thl");
                 invalidate_de_cache();
@@ -1434,12 +1456,14 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
                       || !tos_store_vreg_live_after(f, L.rs.a);
             if (!is_volatile && !ktrip_pending && CPU_POP_AF_IS_SAFE()
                 && a_free) {
+                if (ssd) return 1;
                 emit(out, "pop\taf");
                 emit(out, "push\thl");
                 invalidate_a_cache();
                 return 1;
             }
             if (!ktrip_pending) {
+                if (ssd) return 1;
                 emit_sp(out, -1, "inc\tsp");
                 emit_sp(out, -1, "inc\tsp");
                 emit_sp(out,  2, "push\thl%s", vol_stamp(f, vreg_id));
@@ -1453,12 +1477,14 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
         && vreg_id >= 0
         && !(f->vregs[vreg_id].flags & IR_VREG_VOLATILE)
         && !tos_store_selector_on) {
+        if (ssd) return 1;
         emit(out, "pop\tde");
         emit(out, "push\thl");
         invalidate_de_cache();
         return 1;
     }
     if ((IS_8085()) && off >= 0 && off <= 255) {
+        if (ssd) return 1;
         emit(out, "ld\tde,sp+%d", off);         /* DE = &slot (dead after) */
         emit(out, "ld\t(de),hl");               /* HL preserved */
         invalidate_de_cache();
@@ -1468,6 +1494,14 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
        stage the value in DE and LEAVE it there — forcing it back to HL would
        cost the very `ex de,hl` we are eliminating. Return 0 so the caller caches
        DE. Identical cost to store_hl's fallback. */
+    if (ssd) {
+        /* DE = value, as the store path leaves it (gbz80: copy, its
+           `ex de,hl` is a stack swap) */
+        if (IS_GBZ80()) emit_hl_to_de(out);
+        else emit_ex_de_hl(out);
+        invalidate_hl_cache();
+        return 0;
+    }
     emit_ex_de_hl(out);        /* DE = value; HL scratch for the address */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
