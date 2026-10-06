@@ -194,6 +194,7 @@ int ir_opt_narrow_iv(Func *f);
  * narrow_byte, whose narrowed CONV operands are byte-identity copies that
  * would otherwise spill to a slot. Returns operands rewritten. */
 int ir_opt_copy_prop(Func *f);
+int ir_opt_sink_trunc(Func *f);
 
 /* Coalesce a single-use width-1 copy `d <- t` by folding t into d (renaming
  * every def of t to d, dropping the now-identity copy), so a char-ternary

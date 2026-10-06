@@ -1938,12 +1938,47 @@ static int gen_conv_sx(FILE *out, Func *f, const Op *op)
     return -1;
 }
 
+static int frame_slot_of(const Func *f, const Op *op, int *ofs);
+static const char *idx_deref_reg(const Func *f, const Op *op, int width);
+
+/* A word->byte truncation whose only reader is the byte store right after it,
+   with the word resident in BC and no offset or post-step: the store writes C
+   itself (`ld (hl),c`), so the truncation emits nothing. */
+static int trunc_fuses_to_store(const Func *f, const Op *tr, const Op *st)
+{
+    if (!tr || !st || opt_disabled("trunc-store-bc")) return 0;
+    if (tr->kind != IR_CONV_TRUNC || st->kind != IR_ST_MEM) return 0;
+    if (st->mem.kind != IR_MEM_VREG || st->src[0] != tr->dst
+        || st->mem.base == tr->dst || st->mem.offset != 0
+        || st->mem.post_step || st->mem.volatile_ || st->mem.bank_fn)
+        return 0;
+    if (tr->dst < 0 || f->vregs[tr->dst].width != 1
+        || tr->src[0] < 0 || f->vregs[tr->src[0]].width != 2)
+        return 0;
+    if (vreg_use_count_fn(f, tr->dst) != 1) return 0;
+    if (f->vregs[tr->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    /* Only where the store takes the generic byte path: every earlier form
+       (chain, symbol base, DE home, frame slot, index register, BC/DE pointer)
+       loads the byte through A itself. */
+    if (st->mem.chain || g_hc.de_home >= 0 || g_hc.func_whome >= 0) return 0;
+    if (st->mem.base < 0 || st->mem.base >= f->n_vregs) return 0;
+    if (g_hc.remat_def && g_hc.remat_def[st->mem.base]) return 0;
+    if (vreg_in_pr_bc(f, st->mem.base) || vreg_in_pr_de(f, st->mem.base)) return 0;
+    if (vreg_is_pr_stack(f, st->mem.base)) return 0;
+    { int ofs; if (frame_slot_of(f, st, &ofs) >= 0) return 0; }
+    if (idx_deref_reg(f, st, 1)) return 0;
+    return bc_has(tr->src[0]) && st->mem.base != tr->src[0];
+}
+
 static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
 {
     int src_w = f->vregs[op->src[0]].width;
     int dst_w = f->vregs[op->dst].width;
     const Op *br = byte_remat_of(f, op->dst);
     if (dst_w == 1 && br && br->kind == IR_LD_IMM) return 0;
+    if (cur_bb && cur_op_idx + 1 < cur_bb->n_ops
+        && trunc_fuses_to_store(f, op, &cur_bb->ops[cur_op_idx + 1]))
+        return 0;
     if ((src_w == 1 || src_w == 2) && dst_w == 1) {
         /* 2→1 narrow, or 1→1 no-op trunc (e.g. `(signed char)(char_expr)`
            where the expr was already evaluated at byte width, or a
@@ -4116,6 +4151,12 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
         }
         /* Indirect store: load value (DE), load address (HL), store. */
         int src_w = f->vregs[op->src[0]].width;
+        if (src_w == 1 && cur_bb && cur_op_idx > 0
+            && trunc_fuses_to_store(f, &cur_bb->ops[cur_op_idx - 1], op)) {
+            load_to_hl(out, f, op->mem.base);
+            emit(out, "ld\t(hl),c");
+            return 0;
+        }
         if (src_w == 1) {
             /* Byte store through a BC/DE-resident pointer, no offset: the z80
                stores A directly via (bc)/(de), so a walking char* dst homed in

@@ -235,6 +235,9 @@ exists (ADR 0010).
 | `cmp-k` | a compare against a constant is not given its immediate form |
 | `byte-cmp-const` | a word compare against a byte-sized constant is not narrowed |
 | `frame-byte-trunc` | a width-2 value truncated to one byte materialises the whole word through HL first instead of reading the one byte directly |
+| `byte-half-direct` | a byte taken from a word held in BC or DE copies the whole word to HL first instead of reading `c`/`b`/`e`/`d` |
+| `sink-trunc` | a word-to-byte truncation is not moved down next to the byte store that reads it, so the byte lives across the address arithmetic |
+| `trunc-store-bc` | a byte store of a word held in BC loads the byte through A and E instead of storing `c` straight through HL |
 | `word-ztest` | a word zero test uses the baseline sequence |
 | `switch-chain` | a small word switch calls `l_case` with a case table instead of an inline `dec hl` / zero-test chain, even when the chain is no larger |
 | `switch-byte-a` | a `char` switch scrutinee is widened to HL instead of staying in A |

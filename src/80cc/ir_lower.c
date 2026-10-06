@@ -8877,6 +8877,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
         /* Mark consecutive fixed-offset aggregate stores so the lowerer can
            walk one destination pointer across the chain. Run after DCE and
            copy propagation, when the final base/offset form is visible. */
+        (void)ir_opt_sink_trunc(f);
         int store_chain = ir_opt_store_chain(f);
         /* Fold single-use byte update-chain temps into their copy dst (the
            byte-home accumulator) so the char ternary's arms write the home

@@ -1162,7 +1162,9 @@ static int ivsr_base_is_const_sym(Func *f, int base, int lo, int hi)
             int nd = ir_op_defs(o, defs, 8);
             for (int k = 0; k < nd; k++)
                 if (defs[k] == base)
-                    return o->kind == IR_LD_SYM;   /* only LD_SYM counts */
+                    return o->kind == IR_LD_SYM
+                        || (o->kind == IR_LEA && !opt_disabled("ivsr-suppress-lea")
+                            && !(IS_EZ80() && c_framepointer_is_ix == -1));
         }
     }
     return 0;
@@ -4934,3 +4936,58 @@ int ir_opt_insert_long_pushes(Func *f, int allow_regular)
 
 /* ROTATE_LEFT triple fusion (fuse_rotl) migrated to the ir_match
    table as the `rotl` pattern — see ir_match.c. */
+
+/* Move a single-use word->byte CONV_TRUNC down to the byte store that reads
+   it, so the byte is not held (and spilled) across the address arithmetic
+   between them. Only within one block, with the source word unchanged and no
+   call or asm in between. */
+int ir_opt_sink_trunc(Func *f)
+{
+    if (!f || opt_disabled("sink-trunc")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *usecnt = calloc((size_t)nv, sizeof(int));
+    if (!usecnt) return 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
+            for (int t = 0; t < nu; t++)
+                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind != IR_CONV_TRUNC) continue;
+            int d = op->dst, s = op->src[0];
+            if (d < 0 || d >= nv || s < 0 || s >= nv) continue;
+            if (f->vregs[d].width != 1 || f->vregs[s].width != 2) continue;
+            if (usecnt[d] != 1) continue;
+            if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            int k, ok = 0;
+            for (k = j + 1; k < bb->n_ops; k++) {
+                const Op *o = &bb->ops[k];
+                int u[16]; int nu = ir_op_uses(o, u, 16);
+                int uses_d = 0;
+                for (int t = 0; t < nu; t++) if (u[t] == d) uses_d = 1;
+                if (uses_d) { ok = (o->kind == IR_ST_MEM && o->src[0] == d
+                                    && o->mem.base != d); break; }
+                if (o->kind == IR_CALL || o->kind == IR_HCALL || o->kind == IR_ASM)
+                    break;
+                int defs[8]; int nd = ir_op_defs(o, defs, 8);
+                int bad = 0;
+                for (int t = 0; t < nd; t++) if (defs[t] == s || defs[t] == d) bad = 1;
+                if (bad) break;
+            }
+            if (!ok || k == j + 1) continue;
+            Op tmp = *op;
+            memmove(&bb->ops[j], &bb->ops[j + 1], (size_t)(k - 1 - j) * sizeof(Op));
+            bb->ops[k - 1] = tmp;
+            changed++;
+            j--;                     /* re-examine the op now at j */
+        }
+    }
+    free(usecnt);
+    return changed;
+}

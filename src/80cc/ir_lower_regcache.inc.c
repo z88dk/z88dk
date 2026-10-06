@@ -816,6 +816,21 @@ static void load_byte_half_to_a(FILE *out, const Func *f, int v, int hi)
         && !(g_hc.remat_def && v >= 0 && v < f->n_vregs && g_hc.remat_def[v])
         && emit_frame_byte_half_for_vreg(out, f, v, hi))
         return;
+    /* A word resident in BC or DE: read the byte straight from its half, so HL
+       (often a live pointer) is not clobbered by a copy of the whole word. */
+    if (!opt_disabled("byte-half-direct") && f->vregs[v].width == 2
+        && !hl_has(v)) {
+        if (bc_has(v)) {
+            ss_note_cache_read(f, v);
+            emit(out, hi ? "ld\ta,b" : "ld\ta,c");
+            return;
+        }
+        if (de_has(v)) {
+            ss_note_cache_read(f, v);
+            emit(out, hi ? "ld\ta,d" : "ld\ta,e");
+            return;
+        }
+    }
     load_to_hl(out, f, v);
     emit(out, hi ? "ld\ta,h" : "ld\ta,l");
 }
