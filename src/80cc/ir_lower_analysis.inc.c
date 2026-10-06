@@ -371,6 +371,7 @@ static void emit_ex_de_hl(FILE *out)
 {
     emit(out, "ex\tde,hl");
     L.cur_hl_addr_off = -1;
+    L.rs.dehl = -1;          /* DE no longer holds the long's high half */
 }
 
 /* As cache_hl_slot_addr, but for an address that is not a slot base: the
@@ -991,6 +992,9 @@ static void ss_gen_op(Func *f, int b, int j, int g, int nv,
     int r0 = op_reload[g * 2], r1 = op_reload[g * 2 + 1];
     if (r0 >= 0 && r0 < nv) work[r0] = 1;
     if (r1 >= 0 && r1 < nv) work[r1] = 1;
+    /* [ss-evidence] A use is also not a reload when nothing in this op
+       touched its slot's bytes; either proof is enough. */
+    const int *rd = ssr_mode ? &ssr_read[g * SSR_K * 2] : NULL;
     int uses[16];
     int nu = ir_op_uses(&f->bbs[b].ops[j], uses,
                         (int)(sizeof uses / sizeof uses[0]));
@@ -999,8 +1003,20 @@ static void ss_gen_op(Func *f, int b, int j, int g, int nv,
         int uv = uses[u];
         if (uv < 0 || uv >= nv || !vreg_slot_deferrable(f, uv)) continue;
         if (uv == c0 || uv == c1) continue;   /* proven cache-served */
+        if (rd) {
+            /* No slot (dead-slot-drop): nothing to reload from; a touch of
+               it fails that drop's own check. */
+            if (f->vreg_spill_slot[uv] < 0) continue;
+            int lo = f->vreg_spill_slot[uv];
+            int hi = lo + (f->vregs[uv].width > 0 ? f->vregs[uv].width : 2);
+            int k = 0;
+            while (k < SSR_K && !(rd[2 * k + 1] && rd[2 * k] < hi
+                                  && rd[2 * k] + rd[2 * k + 1] > lo)) k++;
+            if (k == SSR_K) continue;         /* slot untouched in this op */
+        }
         work[uv] = 1;                         /* assume slot reload */
     }
+
 }
 
 /* Backward slot-liveness over the CFG. Returns a [total_ops] array:

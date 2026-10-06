@@ -165,6 +165,7 @@ exists (ADR 0010).
 | `ix-indirect` | an sp-mode function with any indirect call saves IX, even when the call does not dispatch through it |
 | `jp-next` | keep an unconditional `jp` that jumps to the label directly below it |
 | `lazy-spill` | spill at the definition instead of deferring to the clobber |
+| `ss-evidence` | lazy spill keeps a spill store unless a hook proved every later use cache-served, instead of keeping it only for the slot reads the render emitted |
 | `a-carry` | the A-register belief is dropped at each basic-block boundary |
 | `hl-carry` | the HL belief is not carried across a basic-block edge |
 | `de-carry` | the DE belief is not carried into a compare across a basic-block edge |

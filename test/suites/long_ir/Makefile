@@ -3132,3 +3132,42 @@ smallframe_8085.bin: $(SOURCES) smallframe.c
 smallframe_r800.bin: $(SOURCES) smallframe.c
 	$(compile_r800)
 	$(runtest_r800)
+
+# [ss-evidence] lazy-spill stores dropped when no slot read was emitted.
+all: ssevid.bin ssevid_fp.bin ssevid_8080.bin ssevid_gbz80.bin ssevid_z180_fp.bin ssevid_r2ka.bin ssevid_keep.bin ssevid_ez80_fp.bin ssevid_kc160.bin
+
+ssevid.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_fp.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_8080.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_gbz80.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_z180_fp.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_r2ka.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_keep.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=ss-evidence -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_ez80_fp.bin: $(SOURCES) ssevid.c
+	$(call compile_ez80_z80,-Cc-fframe-pointer)
+	$(runtest_ez80_z80)
+
+ssevid_kc160.bin: $(SOURCES) ssevid.c
+	$(compile_kc160)
+	$(runtest_kc160)

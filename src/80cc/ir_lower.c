@@ -5857,6 +5857,15 @@ static void note_wide_noslot(int v);   /* IR_WIDENOSLOT probe: fwd (defined with
    write count. Save/restore (not set/clear) because stores nest via
    pending_spill_resolve. */
 static int slot_write_ctx;
+/* [ss-evidence] Frame bytes the lazy-spill passes touched, per op, as seen at
+   the slot_off chokepoint: any access, read or write, under any value, since
+   coalesced values share a slot and an in-place update reads the source
+   through the destination's slot. Pass 1's decide which spill stores are
+   dead; pass 2's check that decision (see lower_func_body). */
+#define SSR_K 6
+static int  *ssr_read;   /* [ops * SSR_K * 2]: offset, width; width 0 = empty */
+static int   ssr_nops, ssr_bail, ssr_mode;
+static const Func *ssr_f;
 /* [#13 frameless probe] per-render count of (ix+-d) DATA accesses (every one
    computes its offset through slot_ix_off). rec_counting==0 ⇒ don't count (pass
    1 / no instrumentation). A framed function with ds_ixaccess==0 emitted its IX
@@ -6911,6 +6920,18 @@ static void note_wide_noslot(int v)
 
 static void note_slot_use(int v)
 {
+    if (ssr_read && (L.ss_phase == 1 || L.ss_phase == 2) && v >= 0
+        && v < ssr_f->n_vregs && L.ss_cur_g >= 0 && L.ss_cur_g < ssr_nops) {
+        int off = (ssr_f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)
+                ? -1 : ssr_f->vreg_spill_slot[v];
+        int w = ssr_f->vregs[v].width > 0 ? ssr_f->vregs[v].width : 2;
+        if (off >= 0) {
+            int *r = &ssr_read[L.ss_cur_g * SSR_K * 2], k = 0;
+            while (k < SSR_K && r[2 * k + 1] && !(r[2 * k] == off && r[2 * k + 1] == w)) k++;
+            if (k == SSR_K) ssr_bail = 1;
+            else { r[2 * k] = off; r[2 * k + 1] = w; }
+        }
+    }
     /* Only the instrumented final render counts: the lazy-spill pass before it
        is thrown away, and still emits the stores its analysis later drops. */
     if (rec_counting && dsd_drop && v >= 0 && v < dsd_drop_nv && dsd_drop[v])
@@ -9358,6 +9379,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
     int df_retry_done = 0;   /* dead-frame elision: at most one re-lower */
     int ds_retry_done = 0;   /* [dead-store] dead byte-spill elision: one re-lower */
     int dsd_retry = 0;       /* [dead-slot-drop] 1 = dropped, 2 = restored */
+    int ssr_off = 0, ssr_viol = 0;   /* [ss-evidence] fallen back / to fall back */
     long dsd_pre = 0;        /* render size before the drop */
     dsd_ncand = 0;
     rearb_bias = 0;
@@ -9487,6 +9509,14 @@ static int ir_lower_func_body(FILE *out, Func *f)
         }
         int alloc_ok = bb_hl_out_p1 && op_base && op_store && op_reload
             && op_cacheread && (src_snap || !total_ops);
+        /* [ss-evidence] Needs a discardable render to fall back from. */
+        ssr_mode = alloc_ok && !ssr_off && rout != out
+                   && !opt_disabled("ss-evidence");
+        if (ssr_mode) {
+            ssr_nops = osz; ssr_bail = 0; ssr_f = f;
+            ssr_read = calloc((size_t)osz * SSR_K * 2, sizeof(int));
+            if (!ssr_read) ssr_mode = 0;
+        }
         /* Scratch sink for pass 1: only its slot-store side-effects (the ss_op_*
            arrays) matter — the rendered text is discarded. tmpfile() is portable;
            open_memstream is POSIX-only (absent on mingw/Windows). */
@@ -9526,9 +9556,14 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 /* Backward slot-liveness → which spill stores are dead.
                    ss_pinned (an op with >2 distinct reloads — never seen
                    in practice) bails to no elision, which is correct. */
+                if (ssr_mode && ssr_bail) ssr_mode = 0;
                 signed char *store_dead = L.ss_pinned ? NULL
                     : ss_compute_dead(f, op_base, total_ops, op_store,
                                       op_reload, op_cacheread);
+                /* [ss-evidence] Pass 2 records its own reads: a store it
+                   dropped must still be dead by them. */
+                if (ssr_mode)
+                    memset(ssr_read, 0, (size_t)ssr_nops * SSR_K * 2 * sizeof(int));
                 /* Pass 2: skip the dead stores. */
                 L.ss_store_dead = store_dead;
                 L.ss_phase = store_dead ? 2 : 0;
@@ -9537,6 +9572,14 @@ static int ir_lower_func_body(FILE *out, Func *f)
                                        bb_pred_cnt, bb_preds, bb_alias);
                 L.ss_phase = 0;
                 L.ss_store_dead = NULL;
+                if (rc == 0 && ssr_mode && store_dead) {
+                    signed char *chk = ssr_bail ? NULL
+                        : ss_compute_dead(f, op_base, total_ops, op_store,
+                                          op_reload, op_cacheread);
+                    for (int g = 0; g < total_ops; g++)
+                        if (store_dead[g] && (!chk || !chk[g])) { ssr_viol = 1; break; }
+                    free(chk);
+                }
                 free(store_dead);
             }
             free(src_snap);
@@ -9549,6 +9592,17 @@ static int ir_lower_func_body(FILE *out, Func *f)
         L.ss_op_store = NULL;
         L.ss_op_reload = NULL;
         L.ss_op_cacheread = NULL;
+        free(ssr_read);
+        ssr_read = NULL; ssr_mode = 0;
+    }
+    /* [ss-evidence] Pass 2 read a slot whose store pass 1 found dead: render
+       again with the store kept by the conservative rule. */
+    if (ssr_viol && rout != out) {
+        ssr_viol = 0;
+        ssr_off = 1;
+        free(bb_hl_out_p1); bb_hl_out_p1 = NULL;
+        fclose(rout);
+        goto deadframe_retry;
     }
     /* [home-demote] The render found a register home it could not realize (a
        slotless value read with its register gone). Demote those vregs to

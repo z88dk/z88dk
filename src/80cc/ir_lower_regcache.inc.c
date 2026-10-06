@@ -2573,8 +2573,10 @@ static void cache_dehl(int v) { L.rs.dehl = v; }
    loaded by the prologue and never overwritten. load_to_hl / load_to_de
    short-circuit slot reads with `ld l,c; ld h,b` / `ld e,c; ld d,b`. */
 static int bc_has(int v) { return v >= 0 && L.rs.bc == v; }
-static void cache_bc(int v) { L.rs.bc = v; }
-static void invalidate_bc_cache(void) { L.rs.bc = -1; }
+/* BC is the long cache's low half (DE high, BC low): a new BC tenant or a
+   clobbered BC ends that claim too. */
+static void cache_bc(int v) { L.rs.bc = v; L.rs.dehl = -1; }
+static void invalidate_bc_cache(void) { L.rs.bc = -1; L.rs.dehl = -1; }
 
 /* Byte (A) value cache. Tracks which width-1 vreg A holds. Set when a
    byte spill is dead-skipped (value stays in A); consumed by the 1→2
