@@ -3134,7 +3134,7 @@ smallframe_r800.bin: $(SOURCES) smallframe.c
 	$(runtest_r800)
 
 # [ss-evidence] lazy-spill stores dropped when no slot read was emitted.
-all: ssevid.bin ssevid_fp.bin ssevid_8080.bin ssevid_gbz80.bin ssevid_z180_fp.bin ssevid_r2ka.bin ssevid_keep.bin ssevid_ez80_fp.bin ssevid_kc160.bin ssevid_gbz80_keep.bin
+all: ssevid.bin ssevid_fp.bin ssevid_8080.bin ssevid_gbz80.bin ssevid_z180_fp.bin ssevid_r2ka.bin ssevid_keep.bin ssevid_ez80_fp.bin ssevid_kc160.bin ssevid_gbz80_keep.bin ssevid_byte_keep.bin
 
 ssevid.bin: $(SOURCES) ssevid.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
@@ -3175,3 +3175,7 @@ ssevid_kc160.bin: $(SOURCES) ssevid.c
 ssevid_gbz80_keep.bin: $(SOURCES) ssevid.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -Cc--opt-disable=ss-keep-hl -Cc--opt-disable=gb-hl-to-de -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_byte_keep.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=ss-byte -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }

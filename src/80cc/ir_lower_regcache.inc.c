@@ -1745,6 +1745,17 @@ static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id)
        pre-tracker, byte-identical) and !VOLATILE (a volatile must reload). */
     int a_stays = a_carry_enabled()
                   && !(f->vregs[vreg_id].flags & IR_VREG_VOLATILE);
+    /* [ss-byte] Lazy spill: no later use reads this slot. Every path below
+       leaves the value in A (cached when a_stays); the last one first
+       resolves a pending word spill, which a dropped store does as well. */
+    ss_note_store(f, vreg_id);
+    if (ss_store_dead_here()) {
+        if (!(fp_active(f) && fp_offset_fits(slot_ix_off(f, vreg_id)))
+            && L.cur_hl_addr_off < 0)
+            pending_spill_resolve();
+        if (a_stays) cache_a(vreg_id);
+        return;
+    }
     if (fp_active(f)) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off)) {

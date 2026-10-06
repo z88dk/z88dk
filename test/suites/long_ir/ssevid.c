@@ -3,6 +3,7 @@
  * when nothing in its op touched the slot. The emu.c do_add shapes drop their
  * stores; the values read after a branch or across a loop keep them. */
 #include "test.h"
+#include <string.h>
 #include <intrinsic.h>
 
 typedef unsigned char type8;
@@ -27,6 +28,7 @@ static void add_l(void)
 }
 
 static void note(int v) { sink += v; }
+static int note2(int v) { sink += 2 * v; return v + 1; }
 
 /* The sum is read again after a call and in the other arm. */
 static long keep_branch(long a, long b, int c)
@@ -106,6 +108,96 @@ static int acc_calls(int n)
     return t;
 }
 
+/* [ss-byte] emu.c set_arg1's (Ax)+: byte operands used from A keep no slot
+   store; a byte read back after a call keeps its store. */
+static unsigned char opsize, regnr;
+static unsigned long regs[16];
+static unsigned long read_reg(int i) { return regs[i & 15]; }
+static void write_reg(int i, unsigned long v) { regs[i & 15] = v; }
+static unsigned long postinc(void)
+{
+    unsigned long a = read_reg(8 + regnr);
+    write_reg(8 + regnr, a + (1 << opsize));
+    return a;
+}
+static int byte_kept(unsigned char k)
+{
+    unsigned char m = (unsigned char)(k ^ opsize);
+    note(m);
+    return m + note2(m);
+}
+
+/* [ss-byte] examples/console/enigma.c's encoder: the notch compare loads a
+   byte that only the next `cp (hl)` reads, and its slot store goes. */
+static const unsigned char rotor[] = "EKMFLGDQVZNTOWYHXUSPAIBRCJAJDKSIRUXBLHWTMCQGZNPYFVOEBDFHJLCPRTXVZNYEIWGAKMUSQOESOVPZJAYQUIRHXLNFTGKDCMWBVZBRGITYUPSDNHLXAWMJQOFECK";
+static const unsigned char ref[] = "YRUHQSLDPXNGOKMIEBFZCWVJAT";
+static const unsigned char notch[] = "QEVJZ";
+static unsigned int flag;
+static const unsigned char order[3] = { 3, 1, 2 };
+static const unsigned char rings[3] = { 'W', 'X', 'T' };
+static unsigned char pos[3];
+static const unsigned char plug[] = "AMTE";
+static char *enigma(const char *in, char *out)
+{
+    unsigned int i, j;
+    int ch;
+    char *o = out;
+    pos[0] = 'A'; pos[1] = 'W'; pos[2] = 'E';
+    flag = 0;
+    while ((ch = *in++) != 0) {
+        pos[0]++;
+        if (pos[0] > 'Z') pos[0] -= 26;
+        if (flag) {
+            pos[1]++;
+            if (pos[1] > 'Z') pos[1] -= 26;
+            pos[2]++;
+            if (pos[2] > 'Z') pos[2] -= 26;
+            flag = 0;
+        }
+        if (pos[0] == notch[order[0] - 1]) {
+            pos[1]++;
+            if (pos[1] > 'Z') pos[1] -= 26;
+            if (pos[1] == notch[order[1] - 1]) flag = 1;
+        }
+        for (i = 0; plug[i]; i += 2) {
+            if (ch == plug[i]) ch = plug[i + 1];
+            else if (ch == plug[i + 1]) ch = plug[i];
+        }
+        for (i = 0; i < 3; i++) {
+            ch += pos[i] - 'A';
+            if (ch > 'Z') ch -= 26;
+            ch -= rings[i] - 'A';
+            if (ch < 'A') ch += 26;
+            ch = rotor[((order[i] - 1) * 26) + ch - 'A'];
+            ch += rings[i] - 'A';
+            if (ch > 'Z') ch -= 26;
+            ch -= pos[i] - 'A';
+            if (ch < 'A') ch += 26;
+        }
+        ch = ref[ch - 'A'];
+        for (i = 3; i; i--) {
+            ch += pos[i - 1] - 'A';
+            if (ch > 'Z') ch -= 26;
+            ch -= rings[i - 1] - 'A';
+            if (ch < 'A') ch += 26;
+            for (j = 0; j < 26; j++)
+                if (rotor[(26 * (order[i - 1] - 1)) + j] == ch) break;
+            ch = j + 'A';
+            ch += rings[i - 1] - 'A';
+            if (ch > 'Z') ch -= 26;
+            ch -= pos[i - 1] - 'A';
+            if (ch < 'A') ch += 26;
+        }
+        for (i = 0; plug[i]; i += 2) {
+            if (ch == plug[i]) ch = plug[i + 1];
+            else if (ch == plug[i + 1]) ch = plug[i];
+        }
+        *o++ = (char)ch;
+    }
+    *o = 0;
+    return out;
+}
+
 static void test_ssevid(void)
 {
     b1[0] = 0x12; b1[1] = 0x34; b1[2] = 0x56; b1[3] = 0x78;
@@ -156,6 +248,22 @@ static void test_ssevid(void)
     assertEqual(mem[7], 0x5e);
     assertEqual(mem[9], 0x22);
     assertEqual((int)output, 0);
+    regs[10] = 0x10000L; regnr = 2; opsize = 2;
+    assertEqual((int)postinc(), 0);
+    assertEqual((int)(regs[10] >> 16), 1);
+    assertEqual((int)regs[10], 4);
+    opsize = 1;
+    postinc();
+    assertEqual((int)regs[10], 6);
+    sink = 0;
+    assertEqual(byte_kept(0x40), 0x83);
+    assertEqual(sink, 0x41 * 3);
+    {
+        char buf[32];
+        const char *e = enigma("HELLOWORLDQQQQQQQQQQQQQQQQQQQQ", buf);
+        assertEqual(memcmp(e, "RXSECSTDFE", 10), 0);
+        assertEqual(e[29], 'H');
+    }
 }
 
 int main(int argc, char *argv[])

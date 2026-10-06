@@ -928,7 +928,10 @@ static void commit_a_byte(FILE *out, const Func *f, int v)
 static int vreg_slot_deferrable(const Func *f, int v)
 {
     if (v < 0) return 0;
-    if (f->vregs[v].width != 2 && f->vregs[v].width != 4) return 0;
+    /* [ss-byte] A byte: its stores all leave the value cached in A. */
+    if (f->vregs[v].width != 2 && f->vregs[v].width != 4
+        && !(f->vregs[v].width == 1 && !opt_disabled("ss-byte")))
+        return 0;
     if (f->vregs[v].flags
         & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
         return 0;
