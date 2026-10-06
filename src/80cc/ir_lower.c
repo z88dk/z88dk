@@ -8818,6 +8818,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
            `acc = 0; acc op= …` idiom) to MOV/LD_IMM. After st2ld (which can
            forward a stored constant into a use) and before the matcher/CSE/
            DCE that dedup and clean up the resulting MOVs. */
+        (void)ir_opt_self_ops(f);
         int cfold   = ir_opt_const_fold(f);
         /* Table-driven pattern matcher (ir_match.c) — migrated fusion
            passes run here, in table order, to fixpoint. After st2ld

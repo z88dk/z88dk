@@ -4991,3 +4991,181 @@ int ir_opt_sink_trunc(Func *f)
     free(usecnt);
     return changed;
 }
+
+/* ---- Block-local value equivalence: self-operations -----------------------
+   Tracks which vregs hold the SAME value inside one block (copies), which
+   hold a known constant, and which are the sum, difference or complement of
+   other values, then simplifies:
+       x / x -> 1      x % x -> 0      1 * x -> x      0 * x -> 0
+       (x + y) - y -> x      (x - y) + y -> x      x - x, x ^ x -> 0
+       x & x, x | x -> x     x & ~x -> 0     0 op x, x op 0 -> x
+   x / x assumes x != 0 (a divide by zero is undefined in C); `self-div` opts
+   out of the divide forms. A value is (vreg, version): each definition of a
+   vreg bumps its version, so a recorded value only names the vreg while the
+   version still matches. Address-taken and volatile vregs are never tracked. */
+typedef struct { int v, ver; } SoVal;
+typedef struct { int kind; SoVal a, b; } SoExpr;
+
+static int so_same(SoVal a, SoVal b) { return a.v == b.v && a.ver == b.ver; }
+
+int ir_opt_self_ops(Func *f)
+{
+    if (!f || opt_disabled("self-ops")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int       *ver  = calloc((size_t)nv, sizeof(int));
+    SoVal     *val  = calloc((size_t)nv, sizeof(SoVal));
+    int8_t    *kn   = calloc((size_t)nv, 1);
+    int64_t   *kv   = calloc((size_t)nv, sizeof(int64_t));
+    SoExpr    *ex   = calloc((size_t)nv, sizeof(SoExpr));
+    int8_t    *hasx = calloc((size_t)nv, 1);
+    if (!ver || !val || !kn || !kv || !ex || !hasx) {
+        free(ver); free(val); free(kn); free(kv); free(ex); free(hasx);
+        return 0;
+    }
+    int changed = 0;
+    int self_div = !opt_disabled("self-div");
+
+#define SO_OK(v) ((v) >= 0 && (v) < nv \
+                  && !(f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)))
+
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        memset(ver, 0, (size_t)nv * sizeof(int));
+        memset(kn, 0, (size_t)nv);
+        memset(hasx, 0, (size_t)nv);
+        for (int v = 0; v < nv; v++) val[v] = (SoVal){ v, 0 };
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            int d = op->dst;
+            int w = (d >= 0 && d < nv) ? f->vregs[d].width : 0;
+            int a = op->src[0], c = op->src[1];
+            int ok2 = SO_OK(a) && SO_OK(c) && f->vregs[a].width == w
+                      && f->vregs[c].width == w;
+            SoVal va = {-1, 0}, vc = {-1, 0};
+            if (SO_OK(a)) va = val[a];
+            if (SO_OK(c)) vc = val[c];
+            /* A tracked value names a vreg only while that vreg is unchanged. */
+#define SO_LIVE(x) ((x).v >= 0 && ver[(x).v] == (x).ver)
+            int k_a = SO_OK(a) && kn[a], k_c = SO_OK(c) && kn[c];
+            int fold = 0;          /* 0 none, 1 MOV d<-fr, 2 LD_IMM imm */
+            int fr = -1; int64_t fimm = 0;
+
+            if (d >= 0 && SO_OK(d) && w >= 1 && w <= 4) switch (op->kind) {
+            case IR_SUB:
+                if (ok2) {
+                    if (so_same(va, vc)) { fold = 2; fimm = 0; }
+                    else if (hasx[a] && ex[a].kind == IR_ADD) {
+                        if (so_same(ex[a].b, vc) && SO_LIVE(ex[a].a)) { fold = 1; fr = ex[a].a.v; }
+                        else if (so_same(ex[a].a, vc) && SO_LIVE(ex[a].b)) { fold = 1; fr = ex[a].b.v; }
+                    }
+                }
+                break;
+            case IR_ADD:
+                if (ok2) {
+                    if (k_a && kv[a] == 0) { fold = 1; fr = c; }
+                    else if (k_c && kv[c] == 0) { fold = 1; fr = a; }
+                    else if (hasx[a] && ex[a].kind == IR_SUB && so_same(ex[a].b, vc)
+                             && SO_LIVE(ex[a].a)) { fold = 1; fr = ex[a].a.v; }
+                    else if (hasx[c] && ex[c].kind == IR_SUB && so_same(ex[c].b, va)
+                             && SO_LIVE(ex[c].a)) { fold = 1; fr = ex[c].a.v; }
+                }
+                break;
+            case IR_XOR:
+                if (ok2) {
+                    if (so_same(va, vc)) { fold = 2; fimm = 0; }
+                    else if (k_a && kv[a] == 0) { fold = 1; fr = c; }
+                    else if (k_c && kv[c] == 0) { fold = 1; fr = a; }
+                }
+                break;
+            case IR_OR:
+                if (ok2) {
+                    if (so_same(va, vc)) { fold = 1; fr = a; }
+                    else if (k_a && kv[a] == 0) { fold = 1; fr = c; }
+                    else if (k_c && kv[c] == 0) { fold = 1; fr = a; }
+                }
+                break;
+            case IR_AND:
+                if (ok2) {
+                    if (so_same(va, vc)) { fold = 1; fr = a; }
+                    else if ((k_a && kv[a] == 0) || (k_c && kv[c] == 0)) { fold = 2; fimm = 0; }
+                    else if (hasx[a] && ex[a].kind == IR_NOT && so_same(ex[a].a, vc)) { fold = 2; fimm = 0; }
+                    else if (hasx[c] && ex[c].kind == IR_NOT && so_same(ex[c].a, va)) { fold = 2; fimm = 0; }
+                }
+                break;
+            case IR_HCALL: {
+                const HelperInfo *hi = op->hcall;
+                if (!hi || hi->n_args != 2 || hi->n_stacked != 0 || w != 2) break;
+                if (kind_is_floating(f->vregs[d].kind)) break;
+                if (hi->ret_vreg != d) break;
+                int x = hi->args[0], y = hi->args[1];
+                if (!SO_OK(x) || !SO_OK(y) || f->vregs[x].width != 2
+                    || f->vregs[y].width != 2) break;
+                if (!strcmp(hi->name, "l_mult")) {
+                    if (kn[x] && kv[x] == 1)      { fold = 1; fr = y; }
+                    else if (kn[y] && kv[y] == 1) { fold = 1; fr = x; }
+                    else if ((kn[x] && kv[x] == 0) || (kn[y] && kv[y] == 0))
+                        { fold = 2; fimm = 0; }
+                } else if (!strcmp(hi->name, "l_div") || !strcmp(hi->name, "l_div_u")) {
+                    /* args = { divisor, dividend } */
+                    if (kn[x] && kv[x] == 1) {
+                        if (hi->ret_in_de) { fold = 2; fimm = 0; }
+                        else               { fold = 1; fr = y; }
+                    } else if (self_div && so_same(val[x], val[y])) {
+                        fold = 2; fimm = hi->ret_in_de ? 0 : 1;
+                    }
+                }
+                break;
+            }
+            default: break;
+            }
+
+            if (fold == 1 && fr >= 0 && fr < nv && SO_OK(fr)
+                && f->vregs[fr].width == w) {
+                op->kind = IR_MOV; op->src[0] = fr; op->src[1] = -1;
+                op->imm = 0; op->hcall = NULL;
+                changed++;
+            } else if (fold == 2) {
+                op->kind = IR_LD_IMM; op->src[0] = -1; op->src[1] = -1;
+                op->imm = fimm; op->hcall = NULL;
+                changed++;
+            }
+
+            /* Update tracking for the definitions of this op. */
+            int defs[8]; int nd = ir_op_defs(op, defs, 8);
+            SoVal na = va, nb = vc; int ka = k_a, kc2 = k_c;
+            int64_t kva = (SO_OK(a) ? kv[a] : 0);
+            (void)nb; (void)kc2;
+            for (int t = 0; t < nd; t++) {
+                int x = defs[t];
+                if (x < 0 || x >= nv) continue;
+                ver[x]++;
+                val[x] = (SoVal){ x, ver[x] };
+                kn[x] = 0; hasx[x] = 0;
+            }
+            if (d >= 0 && d < nv && nd == 1 && defs[0] == d && SO_OK(d)) {
+                if (op->kind == IR_LD_IMM) {
+                    int64_t m = w == 1 ? 0xff : w == 2 ? 0xffff : 0xffffffffLL;
+                    if (w >= 1 && w <= 4) { kn[d] = 1; kv[d] = op->imm & m; }
+                } else if (op->kind == IR_MOV && SO_OK(op->src[0]) && op->src[0] != d
+                           && f->vregs[op->src[0]].width == w) {
+                    /* d now holds the value src held before this op */
+                    int s = op->src[0];
+                    SoVal sv = (s == a) ? na : val[s];
+                    val[d] = sv;
+                    if (s == a && ka) { kn[d] = 1; kv[d] = kva; }
+                    else if (s != a && kn[s]) { kn[d] = 1; kv[d] = kv[s]; }
+                } else if ((op->kind == IR_ADD || op->kind == IR_SUB || op->kind == IR_AND
+                            || op->kind == IR_OR || op->kind == IR_XOR) && ok2) {
+                    ex[d].kind = op->kind; ex[d].a = va; ex[d].b = vc; hasx[d] = 1;
+                } else if (op->kind == IR_NOT && SO_OK(a) && f->vregs[a].width == w) {
+                    ex[d].kind = IR_NOT; ex[d].a = va; ex[d].b = (SoVal){-1, 0}; hasx[d] = 1;
+                }
+            }
+        }
+    }
+    free(ver); free(val); free(kn); free(kv); free(ex); free(hasx);
+    return changed;
+#undef SO_OK
+#undef SO_LIVE
+}
