@@ -6,6 +6,37 @@ PUBLIC l_div_u
 
 ; HL = DE / HL, DE = DE % HL
 l_div_u:
+    ld      a,h             ; use the shorter path for an 8-bit divisor
+    or      a
+    jp      nz,div_16
+    ld      a,l
+    or      a
+    jp      z,div_16
+
+    ld      bc,hl           ; preserve the divisor in BC for callers
+    push    bc
+    ex      de,hl           ; HL = dividend, E = divisor
+    xor     a               ; clear the remainder
+    ld      b,16
+div_8_loop:
+    add     hl,hl           ; shift the next dividend bit into carry
+    rla                     ; shift it into the remainder
+    jp      c,div_8_sub     ; overflow means remainder >= divisor
+    cp      e
+    jp      c,div_8_next
+div_8_sub:
+    sub     e
+    inc     l               ; set the next quotient bit
+div_8_next:
+    dec     b
+    jp      nz,div_8_loop
+    ld      e,a
+    ld      d,0
+    or      a               ; match l_div_u's clear-carry return
+    pop     bc
+    ret
+
+div_16:
     LD      bc,hl           ; store divisor to bc
     LD      hl,0            ; clear remainder
     XOR     a               ; clear carry
@@ -66,4 +97,3 @@ ccduv4:
 ccduv5:
     EX      de,hl
     ret
-

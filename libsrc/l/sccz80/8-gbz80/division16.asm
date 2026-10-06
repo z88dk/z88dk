@@ -117,6 +117,35 @@ ___divu16_bcde:
         scf                     ; Set carry, invalid result
         ret
 divide:
+        ld      a,d
+        or      a
+        jr      NZ,divide16
+
+        ;; A zero high divisor needs only an 8-bit remainder.
+        ld      h,b             ; HL = dividend and quotient
+        ld      l,c
+        xor     a               ; clear the remainder
+        ld      b,16
+div8_loop:
+        add     hl,hl           ; shift the next dividend bit into carry
+        rla                     ; shift it into the remainder
+        jr      C,div8_sub      ; overflow means remainder >= divisor
+        cp      e
+        jr      C,div8_next
+div8_sub:
+        sub     e
+        inc     l               ; set the next quotient bit
+div8_next:
+        dec     b
+        jr      NZ,div8_loop
+        ld      e,a
+        ld      d,0
+        ld      b,h
+        ld      c,l
+        or      a               ; clear carry on success
+        ret
+
+divide16:
         ld      hl,bc           ; HL = dividend/quotient
         ld      bc,0x00        ; BC = remainder
         or      a               ; Clear carry to start

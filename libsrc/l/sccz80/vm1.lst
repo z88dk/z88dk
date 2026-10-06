@@ -1,4 +1,5 @@
 ${NEWLIB_ROOT}l/sccz80/7-vm1/l_compare_tf
+${NEWLIB_ROOT}l/sccz80/7-vm1/l_div_u
 ${NEWLIB_ROOT}l/sccz80/7-vm1/l_eq
 ${NEWLIB_ROOT}l/sccz80/7-vm1/l_ne
 ${NEWLIB_ROOT}l/sccz80/7-vm1/l_uge
