@@ -3429,6 +3429,16 @@ int ir_opt_narrow_iv(Func *f)
             if (c < 0 || c >= f->n_vregs) continue;
             int is_down = 0;
             if (!niv_counter_ok(f, cl, c, &is_down)) continue;
+            /* A counter whose latch tests the 8085 K flag is 16 bits wide: only
+               DEC rr sets K, and its seed is already shifted by one. */
+            int ktrip_latch = 0;
+            for (int b2 = 0; b2 < f->n_bbs && !ktrip_latch; b2++)
+                for (int j2 = 0; j2 < f->bbs[b2].n_ops; j2++) {
+                    const Op *q = &f->bbs[b2].ops[j2];
+                    if (q->kind == IR_BR_COND && q->src[0] == c
+                        && q->imm == IR_BRCOND_KTRIP) { ktrip_latch = 1; break; }
+                }
+            if (ktrip_latch) continue;
             int ok = 0;
             if (!is_down) {
                 int64_t maxv = 0;
