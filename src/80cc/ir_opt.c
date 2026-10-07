@@ -394,6 +394,20 @@ int ir_opt_st2ld(Func *f)
                 n = 0;
                 continue;
             }
+            /* Reading an address-taken or volatile vreg reads its slot: a
+               pending store through a pointer may have written it, so no
+               pending store is dead any more. */
+            {
+                int ud[8];
+                int un = ir_op_uses(op, ud, 8);
+                for (int t = 0; t < un; t++)
+                    if (ud[t] >= 0 && ud[t] < f->n_vregs
+                        && (f->vregs[ud[t]].flags
+                            & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))) {
+                        for (int k = 0; k < n; k++) sh[k].store_origin_op = -1;
+                        break;
+                    }
+            }
             /* A write to an address-taken or volatile vreg changes memory a
                pointer load can read, with no store op to show it. */
             {
