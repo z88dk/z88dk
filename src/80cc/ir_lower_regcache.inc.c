@@ -1808,8 +1808,9 @@ static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id)
     emit(out, "ld\t(hl),a%s", vol_stamp(f, vreg_id));
     /* HL clobbered with the slot address — drop stale cache claims (a
        caller may have cached the deref base in HL), then advertise HL as
-       this slot's address for the next same-slot access. */
-    invalidate_hl_cache();
+       this slot's address for the next same-slot access. DE is untouched:
+       a value held only there (its slot elided) must stay claimed. */
+    invalidate_hl_keep_de();
     cache_hl_slot_addr(f, vreg_id);
     if (a_stays) cache_a(vreg_id);
 }
