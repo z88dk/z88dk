@@ -1676,6 +1676,7 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
     }
     /* Past the register-cache hits: a slot read follows (fp or sp). */
     ss_note_reload(f, vreg_id);
+    require_slot(f, vreg_id);
     if (fp_active(f)) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off)) {
