@@ -1836,21 +1836,174 @@ static int cse_op_recordable(const Func *f, const Op *op)
         && cse_vreg_stable(f, op->src[1]);
 }
 
+/* Set when an alias-dependent CSE rewrite fires in the current function; the
+   lowerer then renders it again with `ir_cse_alias_veto` and keeps the smaller. */
+int ir_cse_alias_fired;
+int ir_cse_alias_veto;
+
+/* Value aliases for CSE. A MOV, or a second LD_SYM of the same symbol and
+   offset, makes its dst another name for an earlier vreg while neither is
+   redefined; entries are keyed on the earlier name, so `x*3` computed from a
+   forwarded copy of `x` meets the first computation. */
+typedef struct {
+    int    *canon;
+    int    *aliased;
+    int     n_aliased;
+    char   *glb;
+    char   *fixed;
+} CseAlias;
+
+static int cse_canon(const CseAlias *a, int nv, int v)
+{
+    return (a->canon && v >= 0 && v < nv) ? a->canon[v] : v;
+}
+
+static void cse_alias_write(CseAlias *a, int nv, int v)
+{
+    if (!a->canon || v < 0 || v >= nv || a->fixed[v]) return;
+    for (int k = 0; k < a->n_aliased; ) {
+        int y = a->aliased[k];
+        if (y == v || a->canon[y] == v) {
+            a->canon[y] = y;
+            a->aliased[k] = a->aliased[--a->n_aliased];
+        } else
+            k++;
+    }
+    a->canon[v] = v;
+}
+
+static void cse_alias_set(CseAlias *a, int nv, int d, int r)
+{
+    if (!a->canon || d < 0 || d >= nv || r < 0 || r >= nv || d == r) return;
+    a->canon[d] = r;
+    a->aliased[a->n_aliased++] = d;
+}
+
+static void cse_alias_reset(CseAlias *a, int nv)
+{
+    if (!a->canon) return;
+    for (int k = 0; k < a->n_aliased; k++) a->canon[a->aliased[k]] = a->aliased[k];
+    a->n_aliased = 0;
+    (void)nv;
+}
+
+/* Every vreg defined once, by an LD_SYM, names the address of its symbol:
+   two of them for the same symbol and offset are one value wherever they
+   are read (LICM hoists the copies into different blocks). Only keys are
+   compared, so the representative need not dominate the use. */
+static void cse_sym_canon(const Func *f, CseAlias *a)
+{
+    int nv = f->n_vregs;
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    if (!ndef) return;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int defs[8];
+            int nd = ir_op_defs(&f->bbs[b].ops[j], defs, 8);
+            for (int t = 0; t < nd; t++)
+                if (defs[t] >= 0 && defs[t] < nv) ndef[defs[t]]++;
+        }
+    struct { SYMBOL *sym; int off, rep; } reps[64];
+    int nr = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            int d = op->dst;
+            if (op->kind != IR_LD_SYM || !op->mem.sym || d < 0 || d >= nv
+                || ndef[d] != 1 || f->vregs[d].width != 2
+                || !cse_vreg_stable(f, d)) continue;
+            int k;
+            for (k = 0; k < nr; k++)
+                if (reps[k].sym == op->mem.sym && reps[k].off == op->mem.offset) break;
+            if (k < nr) {
+                a->canon[d] = reps[k].rep;
+                a->fixed[d] = 1;
+            } else if (nr < 64) {
+                reps[nr].sym = op->mem.sym; reps[nr].off = op->mem.offset;
+                reps[nr].rep = d; nr++;
+            }
+        }
+    free(ndef);
+}
+
+/* Ops known to leave memory alone; any other op may write it. */
+static int cse_op_keeps_memory(OpKind k)
+{
+    switch (k) {
+    case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR: case IR_LEA:
+    case IR_LD_MEM:
+    case IR_SUB: case IR_RSUB: case IR_AND: case IR_OR: case IR_XOR:
+    case IR_SHL: case IR_SHR: case IR_MUL: case IR_NEG: case IR_NOT:
+    case IR_CONV_ZX: case IR_CONV_SX: case IR_CONV_TRUNC: case IR_CONV_TRUNC_HI:
+    case IR_CONV_BYTE_TO_HIGH: case IR_ROTL: case IR_ROTR:
+    case IR_CMP_EQ: case IR_CMP_NE: case IR_CMP_LT: case IR_CMP_LE:
+    case IR_CMP_GT: case IR_CMP_GE: case IR_CMP_ULT: case IR_CMP_ULE:
+    case IR_CMP_UGT: case IR_CMP_UGE:
+    case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+        return 1;
+    case IR_ADD:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+static void cse_drop_loads(CSEntry *tbl, int *n)
+{
+    for (int k = 0; k < *n; ) {
+        if (tbl[k].kind == IR_LD_MEM) cse_drop(tbl, n, k);
+        else k++;
+    }
+}
+
 int ir_opt_cse(Func *f)
 {
     if (!f) return 0;
     int rewritten = 0;
     CSEntry tbl[MAX_CSE];
+    int nv = f->n_vregs;
+    CseAlias al = {0};
+    if (!opt_disabled("cse-alias") && !ir_cse_alias_veto && nv > 0) {
+        al.canon   = malloc((size_t)nv * sizeof(int));
+        al.aliased = malloc((size_t)nv * sizeof(int));
+        al.glb     = calloc((size_t)nv, 1);
+        al.fixed   = calloc((size_t)nv, 1);
+        if (!al.canon || !al.aliased || !al.glb || !al.fixed) {
+            free(al.canon); free(al.aliased); free(al.glb); free(al.fixed);
+            al.canon = al.aliased = NULL; al.glb = al.fixed = NULL;
+        } else {
+            for (int i = 0; i < nv; i++) al.canon[i] = i;
+            cse_sym_canon(f, &al);
+        }
+    }
 
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
         int n = 0;
+        cse_alias_reset(&al, nv);
+        if (al.glb) memset(al.glb, 0, (size_t)nv);
 
         for (int j = 0; j < bb->n_ops; j++) {
             Op *op = &bb->ops[j];
+            int soft_alias = -1;
+            int from_hit = 0;
+            if (al.canon) {
+                if (!cse_op_keeps_memory(op->kind)) cse_drop_loads(tbl, &n);
+                else {
+                    int wd[8];
+                    int wn = ir_op_defs(op, wd, 8);
+                    for (int t = 0; t < wn; t++)
+                        if (wd[t] >= 0 && wd[t] < nv
+                            && (f->vregs[wd[t]].flags
+                                & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))) {
+                            cse_drop_loads(tbl, &n);
+                            break;
+                        }
+                }
+            }
 
             /* IR_ASM: unknown clobbers, wipe everything. */
-            if (op->kind == IR_ASM) { n = 0; continue; }
+            if (op->kind == IR_ASM) { n = 0; cse_alias_reset(&al, nv); continue; }
 
             /* A `<<1` of an index IVSR left for recompute is one `add hl,hl`
                per use; a shared copy is a second live word that spills. */
@@ -1859,9 +2012,50 @@ int ir_opt_cse(Func *f)
                 && (f->vregs[op->src[0]].flags & IR_VREG_IV_RECOMPUTE)
                 && !opt_disabled("ivsr-recompute")) {
                 cse_invalidate_for_write(tbl, &n, op->dst);
+                cse_alias_write(&al, nv, op->dst);
                 continue;
             }
+            /* A load through a pointer vreg: same base value, offset and
+               width, nothing written in between. */
+            if (al.canon && op->kind == IR_LD_MEM && op->dst >= 0
+                && op->mem.kind == IR_MEM_VREG && op->mem.base >= 0
+                && op->mem.base < nv && !op->mem.volatile_
+                && op->mem.post_step == 0 && !op->mem.bank_fn
+                && op->mem.chain == 0 && op->mem.base != op->dst
+                && cse_vreg_stable(f, op->dst) && cse_vreg_stable(f, op->mem.base)
+                && f->vregs[op->dst].width <= 2) {
+                int bc = cse_canon(&al, nv, op->mem.base);
+                int dw = f->vregs[op->dst].width;
+                int hit = -1;
+                for (int k = 0; k < n; k++)
+                    if (tbl[k].kind == IR_LD_MEM && tbl[k].src0 == bc
+                        && tbl[k].imm == op->mem.offset && tbl[k].width == dw) {
+                        hit = k; break;
+                    }
+                if (hit >= 0) {
+                    int src_dst = tbl[hit].dst;
+                    op->kind = IR_MOV; op->src[0] = src_dst; op->src[1] = -1;
+                    op->imm = 0;
+                    op->mem.kind = IR_MEM_FRAME; op->mem.sym = NULL;
+                    op->mem.base = -1; op->mem.offset = 0; op->mem.elem = 0;
+                    op->mem.volatile_ = 0; op->mem.port = NULL;
+                    rewritten++;
+                    from_hit = 1;
+                    ir_cse_alias_fired = 1;
+                } else {
+                    cse_invalidate_for_write(tbl, &n, op->dst);
+                    if (n < MAX_CSE && bc != op->dst) {
+                        tbl[n].kind = IR_LD_MEM; tbl[n].src0 = bc; tbl[n].src1 = -1;
+                        tbl[n].imm = op->mem.offset; tbl[n].has_imm = 1;
+                        tbl[n].dst = op->dst; tbl[n].width = dw;
+                        n++;
+                    }
+                    goto cse_invalidated;
+                }
+            }
             if (cse_eligible(op->kind) && op->dst >= 0) {
+                int s0 = cse_canon(&al, nv, op->src[0]);
+                int s1 = cse_canon(&al, nv, op->src[1]);
                 int has_imm = op_has_imm_identity(op->kind);
                 /* Tripwire, not a diagnostic to dig for: a kind CSE treats as
                    imm-independent (has_imm==0) but which actually carries a
@@ -1896,18 +2090,30 @@ int ir_opt_cse(Func *f)
                 int hit = -1;
                 for (int k = 0; k < n; k++) {
                     if (tbl[k].kind     != op->kind)   continue;
-                    if (tbl[k].src0     != op->src[0]) continue;
-                    if (tbl[k].src1     != op->src[1]) continue;
+                    if (tbl[k].src0     != s0) continue;
+                    if (tbl[k].src1     != s1) continue;
                     if (tbl[k].width    != dst_w)      continue;
                     if (tbl[k].has_imm  != has_imm)    continue;
                     if (has_imm && tbl[k].imm != op->imm) continue;
                     hit = k;
                     break;
                 }
+                /* A widen of a global is one instruction pair to redo; a
+                   shared copy only costs a slot. Name it for later matches
+                   and keep the op. */
+                if (hit >= 0 && al.canon && s0 != op->src[0]
+                    && (op->kind == IR_CONV_ZX || op->kind == IR_CONV_SX)
+                    && al.glb[s0]) {
+                    soft_alias = cse_canon(&al, nv, tbl[hit].dst);
+                    cse_invalidate_for_write(tbl, &n, op->dst);
+                    goto cse_invalidated;
+                }
                 if (hit >= 0) {
                     /* Rewrite to IR_MOV dst <- existing dst; the lowerer
                        branches on dst width for long vs int. */
                     int src_dst = tbl[hit].dst;
+                    from_hit = 1;
+                    if (al.canon && (s0 != op->src[0] || s1 != op->src[1])) ir_cse_alias_fired = 1;
                     op->kind   = IR_MOV;
                     op->src[0] = src_dst;
                     op->src[1] = -1;
@@ -1932,10 +2138,11 @@ int ir_opt_cse(Func *f)
                     if (n < MAX_CSE
                         && op->src[0] != op->dst
                         && op->src[1] != op->dst
+                        && s0 != op->dst && s1 != op->dst
                         && cse_op_recordable(f, op)) {
                         tbl[n].kind    = op->kind;
-                        tbl[n].src0    = op->src[0];
-                        tbl[n].src1    = op->src[1];
+                        tbl[n].src0    = s0;
+                        tbl[n].src1    = s1;
                         tbl[n].imm     = op->imm;
                         tbl[n].has_imm = has_imm;
                         tbl[n].dst     = op->dst;
@@ -1963,8 +2170,36 @@ int ir_opt_cse(Func *f)
             if (op->kind == IR_HCALL && op->hcall
                 && op->hcall->ret_vreg >= 0)
                 cse_invalidate_for_write(tbl, &n, op->hcall->ret_vreg);
+            if (al.canon) {
+                int cdefs[8];
+                int cnd = ir_op_defs(op, cdefs, 8);
+                int src0c = cse_canon(&al, nv, op->src[0]);
+                for (int di = 0; di < cnd; di++) cse_alias_write(&al, nv, cdefs[di]);
+                if (op->kind == IR_CALL && op->call) cse_alias_write(&al, nv, op->call->ret_vreg);
+                if (op->kind == IR_HCALL && op->hcall) cse_alias_write(&al, nv, op->hcall->ret_vreg);
+                int d = op->dst;
+                for (int di = 0; di < cnd; di++)
+                    if (cdefs[di] >= 0 && cdefs[di] < nv) al.glb[cdefs[di]] = 0;
+                if (soft_alias >= 0 && cnd == 1 && cdefs[0] == d && soft_alias != d)
+                    cse_alias_set(&al, nv, d, soft_alias);
+                if (op->kind == IR_LD_MEM && op->mem.kind == IR_MEM_SYM && d >= 0 && d < nv)
+                    al.glb[d] = 1;
+                if (cnd == 1 && cdefs[0] == d && d >= 0 && d < nv
+                    && cse_vreg_stable(f, d)) {
+                    if (op->kind == IR_MOV && op->src[0] >= 0 && op->src[0] < nv
+                        && (from_hit || (f->vregs[d].width <= 2
+                            && (al.glb[op->src[0]] || al.glb[src0c])))
+                        && op->src[0] != d && cse_vreg_stable(f, op->src[0])
+                        && f->vregs[op->src[0]].width == f->vregs[d].width
+                        && src0c != d) {
+                        cse_alias_set(&al, nv, d, src0c);
+                        al.glb[d] = 1;
+                    }
+                }
+            }
         }
     }
+    free(al.canon); free(al.aliased); free(al.glb); free(al.fixed);
     return rewritten;
 }
 

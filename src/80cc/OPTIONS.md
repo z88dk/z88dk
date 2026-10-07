@@ -244,6 +244,8 @@ exists (ADR 0010).
 | `trunc-store-bc` | a byte store of a word held in BC loads the byte through A and E instead of storing `c` straight through HL |
 | `self-ops` | no block-local value-equivalence folds (`1*x`, `(x+y)-y`, `x&~x`, `x^x`, `0 op x`) |
 | `self-div` | `x/x` is not folded to 1 and `x%x` to 0 (division by zero is undefined, so x is assumed nonzero) |
+| `cse-alias` | arithmetic CSE keys on the operand vreg as written, so a value computed from a copy (or a repeated `&sym`) of an earlier operand is not matched with the first computation |
+| `cse-alias-pick` | a function where `cse-alias` rewrote something is not lowered a second time without it, so the alias render is kept even when the plain render is the same size or smaller |
 | `pair-bitop` | a word AND/OR/XOR/NOT with its result in BC stages operands through HL and DE instead of working byte-wise through A |
 | `de-home-step` | `i++` / `i--` of a word DE home goes through HL (`ld hl,de; inc hl; ex de,hl`) instead of `inc de`, and ends the DE-home region |
 | `dehome-dead-exit` | a general DE home is not kept resident in a loop whose leaving edge follows a redefinition of the home, even when the home is dead at the exit |

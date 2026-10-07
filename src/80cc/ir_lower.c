@@ -9995,9 +9995,15 @@ static long rearb_render(Func *g, int veto, FILE **fp, int *rc)
     return render_size(*fp) + rearb_bias;
 }
 
+/* [cse-alias-pick] CSE by alias shares values the allocator may then have
+   to keep alive across more code. When it fired in this function, lower a
+   pristine clone again without it and keep the alias render only when it is
+   clearly smaller (the estimate misses what copt does afterwards). `--opt-disable=cse-alias-pick` keeps the alias
+   render unconditionally. */
 int ir_lower_func(FILE *out, Func *f)
 {
-    if (!f || f->is_naked || opt_disabled("de-rearb"))
+    if (!f || f->is_naked
+        || (opt_disabled("de-rearb") && opt_disabled("cse-alias-pick")))
         return ir_lower_func_body(out, f);
     Func *c = ir_clone_func(f);
     FILE *buf = c ? tmpfile() : NULL;
@@ -10007,11 +10013,32 @@ int ir_lower_func(FILE *out, Func *f)
     }
     whome_rejected = 0;
     sff_used = 0;
+    ir_cse_alias_fired = 0;
     int rc = ir_lower_func_body(buf, f);
     long so = render_size(buf) + rearb_bias;
     FILE *src = buf;
     Func *fin = NULL;
-    if (rc == 0 && whome_rejected) {
+    int alias_off = 0;
+    if (rc == 0 && ir_cse_alias_fired && !opt_disabled("cse-alias-pick")) {
+        Func *ca = ir_clone_func(c);
+        FILE *ba = ca ? tmpfile() : NULL;
+        if (ba) {
+            ir_cse_alias_veto = 1;
+            int rca = ir_lower_func_body(ba, ca);
+            ir_cse_alias_veto = 0;
+            if (rca == 0 && render_size(ba) + rearb_bias <= so + 2 + so / 100) {
+                src = ba; fin = ca; alias_off = 1;
+                f->frame_size = ca->frame_size;
+                if (ca->n_vregs == f->n_vregs && ca->vreg_spill_slot && f->vreg_spill_slot)
+                    memcpy(f->vreg_spill_slot, ca->vreg_spill_slot,
+                           (size_t)f->n_vregs * sizeof(int));
+            } else {
+                fclose(ba); ba = NULL;
+            }
+        }
+        if (!alias_off && ca) ir_free_cloned_func(ca);
+    }
+    if (rc == 0 && whome_rejected && !alias_off && !opt_disabled("de-rearb")) {
         /* With the frame forms on, compare like with like: both again
            without them. A pristine clone stands in for f. */
         Func *p = sff_used ? ir_clone_func(c) : NULL;
@@ -10050,6 +10077,7 @@ int ir_lower_func(FILE *out, Func *f)
     while ((n = fread(ch, 1, sizeof ch, src)) > 0) fwrite(ch, 1, n, out);
     if (src != buf) fclose(src);
     fclose(buf);
+    if (alias_off && fin) ir_free_cloned_func(fin);
     ir_free_cloned_func(c);
     return rc;
 }
