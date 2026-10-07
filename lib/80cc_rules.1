@@ -1260,7 +1260,7 @@
 ;; %"and|or|xor"3 captures the mnemonic (group 3) — see z80rules.1, which 80cc
 ;; does not thread, so the equivalent fold there never reaches 80cc output.
 %title #W1 byte-global mask re-widen: byte load, drop dead ld h,0 (-3b)
-	ld	hl,(%1)
+	%"ld	hl,\(([_0-9][_0-9a-zA-Z+]*)\)"1
 	ld	h,0
 	ld	a,l
 	%"and|or|xor"3	%2
