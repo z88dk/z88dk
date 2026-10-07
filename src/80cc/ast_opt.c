@@ -4108,9 +4108,26 @@ static void dse_collect_escaped(Node *n, sym_set *escaped)
    anywhere in the function. Used for the conservative LABEL reset.
    Reads are detected at OP_DEREF(AST_LOCAL_VAR), and at LHS of
    compound-assigns / pre-post-step (which read-then-write). */
-static void dse_collect_ever_read(Node *n, sym_set *ever_read)
+typedef struct { Node **items; int n, cap; } node_seen;
+
+/* Subtrees can be shared by reference (a compound step reuses its index
+   expression), so a plain walk is exponential in the nesting; reading a node
+   twice adds nothing, so each is visited once. */
+static int node_seen_add(node_seen *v, Node *n)
+{
+    for (int i = 0; i < v->n; i++) if (v->items[i] == n) return 0;
+    if (v->n == v->cap) {
+        v->cap = v->cap ? v->cap * 2 : 64;
+        v->items = realloc(v->items, sizeof(Node *) * v->cap);
+    }
+    v->items[v->n++] = n;
+    return 1;
+}
+
+static void dse_collect_ever_read_v(Node *n, sym_set *ever_read, node_seen *seen)
 {
     if (!n) return;
+    if (!node_seen_add(seen, n)) return;
     switch (n->ast_type) {
     case AST_LITERAL: case AST_STR_LIT: case AST_GLOBAL_VAR:
     case AST_LABEL: case AST_JUMP: case AST_UNDECL:
@@ -4126,7 +4143,7 @@ static void dse_collect_ever_read(Node *n, sym_set *ever_read)
         if (n->operand && n->operand->ast_type == AST_LOCAL_VAR && n->operand->sym) {
             sym_set_add(ever_read, n->operand->sym);
         } else {
-            dse_collect_ever_read(n->operand, ever_read);
+            dse_collect_ever_read_v(n->operand, ever_read, seen);
         }
         return;
     case OP_ADDR: case AST_ADDR:
@@ -4136,66 +4153,73 @@ static void dse_collect_ever_read(Node *n, sym_set *ever_read)
            subtree. */
         if (n->operand && n->operand->ast_type != AST_LOCAL_VAR
                        && n->operand->ast_type != AST_GLOBAL_VAR)
-            dse_collect_ever_read(n->operand, ever_read);
+            dse_collect_ever_read_v(n->operand, ever_read, seen);
         return;
     case AST_FUNC_CALL: case AST_FUNCPTR_CALL:
         for (int i = 0; i < (int)array_len(n->args); i++)
-            dse_collect_ever_read(array_get_byindex(n->args, i), ever_read);
-        if (n->callee) dse_collect_ever_read(n->callee, ever_read);
+            dse_collect_ever_read_v(array_get_byindex(n->args, i), ever_read, seen);
+        if (n->callee) dse_collect_ever_read_v(n->callee, ever_read, seen);
         return;
     case AST_COMPOUND_STMT: case AST_INIT_LIST:
         for (int i = 0; i < (int)array_len(n->stmts); i++)
-            dse_collect_ever_read(array_get_byindex(n->stmts, i), ever_read);
+            dse_collect_ever_read_v(array_get_byindex(n->stmts, i), ever_read, seen);
         return;
     case AST_RETURN:
-        dse_collect_ever_read(n->retval, ever_read);
+        dse_collect_ever_read_v(n->retval, ever_read, seen);
         return;
     case AST_IF: case AST_TERNARY:
-        dse_collect_ever_read(n->cond, ever_read);
-        dse_collect_ever_read(n->then, ever_read);
-        dse_collect_ever_read(n->els,  ever_read);
+        dse_collect_ever_read_v(n->cond, ever_read, seen);
+        dse_collect_ever_read_v(n->then, ever_read, seen);
+        dse_collect_ever_read_v(n->els,  ever_read, seen);
         return;
     case AST_SWITCH:
-        dse_collect_ever_read(n->sw_expr, ever_read);
-        dse_collect_ever_read(n->sw_body, ever_read);
+        dse_collect_ever_read_v(n->sw_expr, ever_read, seen);
+        dse_collect_ever_read_v(n->sw_body, ever_read, seen);
         return;
     case AST_SWITCH_CASE:
-        dse_collect_ever_read(n->sw_value, ever_read);
+        dse_collect_ever_read_v(n->sw_value, ever_read, seen);
         return;
     case AST_DECL:
-        dse_collect_ever_read(n->declvar, ever_read);
+        dse_collect_ever_read_v(n->declvar, ever_read, seen);
         return;
     case AST_CRITICAL:
-        dse_collect_ever_read(n->operand, ever_read);
+        dse_collect_ever_read_v(n->operand, ever_read, seen);
         return;
     case OP_ASSIGN:
         /* RHS reads count; LHS does not (it's a write target). */
-        dse_collect_ever_read(n->right, ever_read);
+        dse_collect_ever_read_v(n->right, ever_read, seen);
         /* But if LHS is a complex lvalue (e.g. *(p+i)), the components
            are read — walk via the deref structure. Bare AST_LOCAL_VAR
            on LHS is a write target and should NOT be counted. */
         if (n->left && n->left->ast_type != AST_LOCAL_VAR
                     && n->left->ast_type != AST_GLOBAL_VAR)
-            dse_collect_ever_read(n->left, ever_read);
+            dse_collect_ever_read_v(n->left, ever_read, seen);
         return;
     case OP_AADD: case OP_ASUB: case OP_AMULT:
     case OP_ADIV: case OP_AMOD:
     case OP_AAND: case OP_AOR:  case OP_AXOR:
     case OP_ASSHR: case OP_ASSHL:
         /* Compound assign: LHS is read AND written. */
-        dse_collect_ever_read(n->left, ever_read);
-        dse_collect_ever_read(n->right, ever_read);
+        dse_collect_ever_read_v(n->left, ever_read, seen);
+        dse_collect_ever_read_v(n->right, ever_read, seen);
         return;
     case OP_PRE_INC: case OP_POST_INC: case OP_PRE_DEC: case OP_POST_DEC:
         /* Pre/post step: operand is read AND written. */
-        dse_collect_ever_read(n->operand, ever_read);
+        dse_collect_ever_read_v(n->operand, ever_read, seen);
         return;
     default:
-        if (n->left)    dse_collect_ever_read(n->left, ever_read);
-        if (n->right)   dse_collect_ever_read(n->right, ever_read);
-        if (n->operand) dse_collect_ever_read(n->operand, ever_read);
+        if (n->left)    dse_collect_ever_read_v(n->left, ever_read, seen);
+        if (n->right)   dse_collect_ever_read_v(n->right, ever_read, seen);
+        if (n->operand) dse_collect_ever_read_v(n->operand, ever_read, seen);
         return;
     }
+}
+
+static void dse_collect_ever_read(Node *n, sym_set *ever_read)
+{
+    node_seen seen = {0};
+    dse_collect_ever_read_v(n, ever_read, &seen);
+    free(seen.items);
 }
 
 static void dse_collect_referenced(Node *n, sym_set *referenced);
