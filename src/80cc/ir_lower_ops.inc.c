@@ -2342,6 +2342,14 @@ static void byte_alu_operand_emit(FILE *out, const Func *f,
     if (hl_has(m)) { ss_note_cache_read(f, m); emit(out, "%sl", prefix); return; }
     if (de_has(m)) { ss_note_cache_read(f, m); emit(out, "%se", prefix); return; }
     if (bc_has(m)) { ss_note_cache_read(f, m); emit(out, "%sc", prefix); return; }
+    /* A word homed in an index register has no slot: bring it into HL and take
+       the low byte (A is the other operand, so it cannot carry it). */
+    if (f->vregs[m].width == 2 && vreg_idx_home(f, m) != IR_PR_NONE) {
+        emit_idx_word_to_reg(out, f, m, "hl");
+        invalidate_hl_cache();
+        emit(out, "%sl", prefix);
+        return;
+    }
     /* [IR_BYTE_REMAT] Rematerialise a single-use global byte load as a memory
        operand: `ld hl,sym; <op> (hl)` — no slot store+reload. */
     {
@@ -2351,6 +2359,14 @@ static void byte_alu_operand_emit(FILE *out, const Func *f,
             emit(out, "ld\thl,%s", s);
             emit(out, "%s(hl)", prefix);
             hl_about_to_change(-1);
+            return;
+        }
+    }
+    /* A rematerialised constant has no slot: its low byte is the operand. */
+    if (g_hc.remat_def && m >= 0 && m < f->n_vregs) {
+        const Op *rd = g_hc.remat_def[m];
+        if (rd && rd->kind == IR_LD_IMM) {
+            emit(out, "%s%u", prefix, (unsigned)((uint64_t)rd->imm & 0xff));
             return;
         }
     }
@@ -6456,6 +6472,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
         && !vreg_is_pr_de(f, op->dst)) {
         emit(out, "%s\thl,de", mnem);
         commit_hl_word(out, f, op->dst);
+        if (de_has(op->dst)) invalidate_de_cache();   /* DE holds the old value */
         return 0;
     }
     /* PR_DE dst (variable RHS): write result bytes into E/D
@@ -6479,6 +6496,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
     emit(out, "%s\td", mnem);
     emit(out, "ld\th,a");
     commit_hl_word(out, f, op->dst);
+    if (de_has(op->dst)) invalidate_de_cache();       /* DE holds the old value */
     return 0;
 }
 

@@ -1661,8 +1661,16 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
        word paths (load_to_hl/de/bc) already call emit_remat_word. */
     if (vreg_id >= 0 && f->vregs[vreg_id].width == 2
         && vreg_is_remat(f, vreg_id)) {
+        /* A constant's low byte is an immediate: no HL, no belief to drop. */
+        const Op *rd = g_hc.remat_def ? g_hc.remat_def[vreg_id] : NULL;
+        if (rd && rd->kind == IR_LD_IMM) {
+            emit(out, "ld\ta,%u", (unsigned)((uint64_t)rd->imm & 0xff));
+            invalidate_a_cache();
+            return;
+        }
         if (emit_remat_word(out, f, vreg_id, "hl")) {
             emit(out, "ld\ta,l");
+            invalidate_hl_cache();   /* HL took the rebuilt value */
             return;
         }
     }
@@ -2622,7 +2630,7 @@ static int de_has(int v)
 
 /* Any DE change invalidates the long-DEHL cache (DE holds the high
    half — clobbering it breaks the cache). */
-static void cache_de(int v) { L.rs.de = v; L.rs.dehl = -1; }
+static void cache_de(int v) { L.rs.de = v; L.rs.dehl = -1; g_de_epoch++; }
 static void invalidate_de_cache(void) { L.rs.de = -1; L.rs.dehl = -1; }
 
 static int dehl_has(int v) { return v >= 0 && L.rs.dehl == v; }

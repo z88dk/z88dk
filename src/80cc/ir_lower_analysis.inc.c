@@ -1273,6 +1273,7 @@ static void commit_hl_word(FILE *out, const Func *f, int v)
        cache-hit and skip its reload → a self-copy. */
     if (v >= 0 && vreg_is_pr_stack(f, v)) { invalidate_hl_cache(); return; }
     cache_hl(v);
+    g_def_vreg = v; g_def_epoch = g_de_epoch;
 }
 
 /* Word result is in HL, dst v is a PR_DE-pool vreg: swap into DE and advertise

@@ -6050,6 +6050,13 @@ static int  home_is_slotbacked(const Func *f, int v);
 static const Op *find_unique_def(const Func *f, int v);
 static const Op *find_unique_use(const Func *f, int v);
 static int  de_home_indexed_add_ok(const Func *f, const Op *o);
+/* Bumped by every cache_de(): tells lower_func_render whether an op
+   re-established DE's tenant or left a stale one behind. */
+static unsigned g_de_epoch;
+/* The vreg most recently defined by commit_hl_word() and the DE epoch at that
+   point. */
+static int      g_def_vreg = -1;
+static unsigned g_def_epoch;
 static void cache_de(int v);
 static void cache_bc(int v);
 static void cache_hl(int vreg);
@@ -11462,11 +11469,20 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 clob_snap_bc = L.rs.bc; clob_snap_a  = L.rs.a;
             }
             home_slot_verify_mark_defs(f, op);
+            g_def_vreg = -1;
             if (op->kind == IR_RET) {
                 rc = lower_ret(out, f, op);
             } else {
                 rc = lower_op(out, f, op);
             }
+            /* The op committed a new value for dst in HL, DE still names dst
+               and nothing has set DE since: DE holds the OLD value (the op, or
+               an earlier one, read dst as an operand through DE). */
+            if (rc == 0 && op->dst >= 0 && op->dst < f->n_vregs
+                && g_def_vreg == op->dst && L.rs.de == op->dst
+                && g_de_epoch == g_def_epoch
+                && !vreg_is_pr_de(f, op->dst))
+                invalidate_de_cache();
             if (verify_on > 0 || clob_verify_on > 0 || home_slot_verify_enabled()) {
                 verify_buf[verify_len] = 0;
                 ir_verify_op(f, op, verify_buf);
