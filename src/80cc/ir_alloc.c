@@ -3825,6 +3825,7 @@ static void probe_call_result_bc(Func *f, const int *def_kind,
      - NO stack/control hazard between def and use (stack_spill_span_hazard);
      - DISJOINT from every other stack-transient (greedy) — at most one parked
        at a time, so a single TOS slot and LIFO are trivially safe. */
+static int is_cmp_op(int k);
 static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
                            const int *write_count)
 {
@@ -3852,6 +3853,11 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
 
     for (int v = 0; v < f->n_vregs; v++) {
         if (!spill_word_producer_ok(f, v, write_count, def_kind, 0)) continue;
+        /* A constant or address is rebuilt at its use; parking it would also
+           leave the park unpopped where the consumer folds it as an immediate. */
+        if (def_kind[v] == IR_LD_IMM || def_kind[v] == IR_LD_SYM
+            || def_kind[v] == IR_LEA || def_kind[v] == IR_LD_STR)
+            continue;
 
         /* Shared shape: single-BB, first-ref-is-def, not live across the BB, tight
            [lo,hi]; plus stack_spill's own "exactly one use". */
@@ -3869,6 +3875,16 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
         if (hi == lo + 1) {
             OpKind uk = bb->ops[hi].kind;
             if (uk == IR_ADD || uk == IR_AND || uk == IR_OR || uk == IR_XOR)
+                continue;
+        }
+
+        /* A byte-wide use reads one byte of the parked word, and the byte ALU
+           operand paths have no pop for it: they would read a frame slot the
+           value never had and leave the park on the stack. */
+        {
+            const Op *uo = &bb->ops[hi];
+            if (!is_cmp_op(uo->kind) && uo->dst >= 0 && uo->dst < f->n_vregs
+                && f->vregs[uo->dst].width == 1)
                 continue;
         }
 

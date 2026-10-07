@@ -558,6 +558,11 @@ void ir_dump_op(FILE *out, const Func *f, const Op *op)
             fprintf(out, "<call to %s, %d args>",
                     op->call->target ? "<sym>" : "<indirect>",
                     op->call->n_args);
+            for (int a = 0; a < op->call->n_args && op->call->args; a++) {
+                fputs(a ? ", " : " (", out);
+                ir_dump_vreg(out, f, op->call->args[a]);
+            }
+            if (op->call->n_args > 0 && op->call->args) fputs(")", out);
         } else {
             fputs("<call ?>", out);
         }
