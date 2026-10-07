@@ -976,6 +976,11 @@
 %notcpu vm1
 %notcpu 8085
 %notcpu gbz80
+%not %1 de
+%not %1 bc
+%not %1 sp
+%not %1 ix
+%not %1 iy
 	ex	de,hl
 	%"ld	hl,([_a-zA-Z0-9][_a-zA-Z0-9+]*)"1
 	ex	de,hl
