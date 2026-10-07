@@ -1808,7 +1808,7 @@ static int gen_not(FILE *out, Func *f, const Op *op)
            cpl chain (~16T saved per occurrence). Gated on a slot
            read (no DEHL cache hit, no FP mode). */
         if (!fp_active(f) && !dehl_has(op->src[0])) {
-            int off = slot_off(f, op->src[0]) + L.cur_sp_adjust;
+            int off = slot_sp_off(f, op->src[0]);
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");
             emit(out, "ld\ta,(hl)"); emit(out, "cpl");
@@ -2395,7 +2395,7 @@ static void byte_alu_operand_emit(FILE *out, const Func *f,
        `xor (sp+4)` does not), so normalise the prefix, which is spelled with
        the `a,` for add/adc and without it for the rest. */
     if (IS_R6K() && !fp_active(f) && alu_mem_prefix_ok(prefix)) {
-        int off = slot_off(f, m) + L.cur_sp_adjust;
+        int off = slot_sp_off(f, m);
         if (off >= 0 && off <= 255) {
             char mn[8];
             size_t n = 0;
@@ -2578,7 +2578,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             && !vreg_in_pr_bc(f, op->dst)
             && !dehl_has(op->src[0])
             && vreg_is_spilled(f, op->dst)) {
-            int off = slot_off(f, op->dst) + L.cur_sp_adjust;
+            int off = slot_sp_off(f, op->dst);
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");        /* HL = &slot[0] (LSB) */
             emit(out, "sla\t(hl)");          /* byte0: low bit=0, hi→C */
@@ -2732,7 +2732,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
                     goto shl_int_bit_remainder;
                 }
             } else {
-                int off = slot_off(f, op->src[0]) + L.cur_sp_adjust;
+                int off = slot_sp_off(f, op->src[0]);
                 if (!(off >= 0 && off <= sp_rel_max(f))) {
                     ss_note_reload(f, op->src[0]);
                     emit(out, "ld\thl,%d", off);
@@ -3454,7 +3454,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             && op->mem.post_step == 1
             && op->mem.base >= 0
             && !vreg_in_pr_bc(f, op->mem.base)) {
-            int p_off = slot_off(f, op->mem.base) + L.cur_sp_adjust;
+            int p_off = slot_sp_off(f, op->mem.base);
             emit(out, "ld\thl,%d", p_off);
             emit(out, "add\thl,sp");          /* HL = &p */
             emit(out, "inc\t(hl)");            /* ++p.byte0 */
@@ -3589,7 +3589,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                         stored = 1;
                     }
                 } else {
-                    int off = slot_off(f, base) + L.cur_sp_adjust;
+                    int off = slot_sp_off(f, base);
                     if (off >= 0 && off <= sp_rel_max(f)) {
                         emit(out, "ld\t(sp+%d),hl", off);
                         stored = 1;
@@ -4351,7 +4351,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                         if (i < 3) emit(out, "inc\tde");
                     }
                 } else {
-                    int voff = slot_off(f, op->src[0]) + L.cur_sp_adjust;
+                    int voff = slot_sp_off(f, op->src[0]);
                     emit(out, "ld\thl,%d", voff);
                     emit(out, "add\thl,sp");
                     for (int i = 0; i < 4; i++) {
@@ -4893,7 +4893,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                    IR_PUSH_DEHL_LONG) — the slot is then STALE and this
                    in-place RMW would add K to garbage. The const-RHS DEHL
                    path below serves the cached case. */
-                int off = slot_off(f, op->dst) + L.cur_sp_adjust;
+                int off = slot_sp_off(f, op->dst);
                 uint8_t k0 = (uint8_t)(k & 0xff);
                 uint8_t k1 = (uint8_t)((k >> 8) & 0xff);
                 uint8_t k2 = (uint8_t)((k >> 16) & 0xff);
@@ -5014,7 +5014,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
             if (!dehl_has(asrc0))
                 load_to_dehl(out, f, asrc0);
             /* DEHL = LHS, BC mirrors HL = LHS_LOW (B=b1, C=b0). */
-            int off = slot_off(f, asrc1) + L.cur_sp_adjust;
+            int off = slot_sp_off(f, asrc1);
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");        /* HL = &RHS, BC keeps LHS_LOW */
             emit(out, "ld\ta,c");           /* A = LHS_b0 */
@@ -5263,7 +5263,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
                 && !L.la.cur_dst_dead
                 && !vreg_in_pr_bc(f, op->dst)
                 && vreg_is_spilled(f, op->dst)) {
-                int off = slot_off(f, op->dst) + L.cur_sp_adjust;
+                int off = slot_sp_off(f, op->dst);
                 uint8_t k0 = (uint8_t)(k & 0xff);
                 uint8_t k1 = (uint8_t)((k >> 8) & 0xff);
                 uint8_t k2 = (uint8_t)((k >> 16) & 0xff);
@@ -5506,7 +5506,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         if (!fp_active(f) && !dehl_has(op->src[1])) {
             if (!dehl_has(op->src[0]))
                 load_to_dehl(out, f, op->src[0]);
-            int off = slot_off(f, op->src[1]) + L.cur_sp_adjust;
+            int off = slot_sp_off(f, op->src[1]);
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");        /* HL = &RHS */
             emit(out, "ld\ta,c");
@@ -6021,7 +6021,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                 && !vreg_is_pr_de(f, op->dst)
                 && !vreg_in_pr_bc(f, op->dst)) {
                 require_slot(f, op->dst);
-                int doff = slot_off(f, op->dst) + L.cur_sp_adjust;
+                int doff = slot_sp_off(f, op->dst);
                 /* The sp+0 TOS pop/push store beats the fused byte walk on
                    the z80 family, but on 808x its dearer push/pop loses to the
                    fused walk, so let 808x fuse even at sp+0. */

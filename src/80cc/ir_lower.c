@@ -4393,12 +4393,15 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 char buf[80];
                 const char *src = lines[i - 2] + 6;
                 if (strlen(src) < sizeof buf - 8) {
-                    snprintf(buf, sizeof buf, "\tld\tl,%s", src);
+                    int same = !strcmp(src, "l\n");   /* `ld l,l` is a no-op */
+                    if (same) snprintf(buf, sizeof buf, "\tld\th,0\n");
+                    else      snprintf(buf, sizeof buf, "\tld\tl,%s", src);
                     char *a = strdup(buf), *b = strdup("\tld\th,0\n");
                     if (a && b) {
                         free(lines[i - 2]); lines[i - 2] = a;
                         free(lines[i - 1]); lines[i - 1] = b;
                         drop[i] = 1;
+                        if (same) drop[i - 1] = 1;
                         /* The copy is gone, so its read of DE must not be
                            folded into the liveness above it — the two rewritten
                            lines carry their own effects when the walk reaches
@@ -5885,6 +5888,15 @@ static int slot_off(const Func *f, int vreg_id)
     return f->vreg_spill_slot[vreg_id];
 }
 
+/* sp-relative offset of a vreg's slot, or -1 when it has none. slot_off is -1
+   for a slot-less vreg, and adding the sp adjustment to that gave a positive
+   offset that passed every `off >= 0` test and read the wrong word. */
+static int slot_sp_off(const Func *f, int vreg_id)
+{
+    int so = slot_off(f, vreg_id);
+    return so < 0 ? -1 : so + L.cur_sp_adjust;
+}
+
 /* A vreg read/written through its frame slot MUST have one. A negative
    slot_off means a register-only vreg (PR_HL/DE/BC/DEHL) reached a slot
    access with its register already clobbered and no backing slot to
@@ -6470,7 +6482,8 @@ static InstrEffects instr_effects(const char *line)
     }
     else if (!strcmp(m,"djnz"))                          w |= IR_R_BC|IR_R_F;
     else if (!strcmp(m,"mlt"))                           w |= lra_reg_of(o0);
-    else if (!strcmp(m,"mul")||!strcmp(m,"muls"))        w |= lra_reg_of(o0)|IR_R_F;
+    /* kc160 `mul de,hl`: DEHL = DE*HL, so HL (low half) is written as well. */
+    else if (!strcmp(m,"mul")||!strcmp(m,"muls"))        w |= lra_reg_of(o0)|lra_reg_of(o1)|IR_R_F;
     /* r800 `muluw hl,de`: DEHL = HL*DE - writes HL (low) and DE (high),
        reads HL and DE. */
     else if (!strcmp(m,"muluw"))                         w |= IR_R_HL|IR_R_DE|IR_R_F;

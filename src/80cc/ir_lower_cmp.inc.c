@@ -502,7 +502,7 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             emit(out, "sbc\ta,%u", (unsigned)((k >> 24) & 0xff));
         } else if (!fp_active(f) && !dehl_has(op->src[1])) {
             load_to_dehl(out, f, op->src[0]);
-            int off = slot_off(f, op->src[1]) + L.cur_sp_adjust;
+            int off = slot_sp_off(f, op->src[1]);
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");
             emit(out, "ld\ta,c");        /* LHS b0 via BC mirror */
@@ -588,7 +588,7 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             emit(out, "ld\ta,b");
             emit(out, "sbc\ta,(%s%+d)", frame_reg(), ix + 1);
         } else {
-            int off = slot_off(f, s1) + L.cur_sp_adjust;
+            int off = slot_sp_off(f, s1);
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");
             emit(out, "ld\ta,c");
@@ -873,7 +873,7 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
             /* Load src[1] (minuend of the swapped subtraction) into DEHL,
                point HL at &src[0], subtract through (hl). */
             load_to_dehl(out, f, op->src[1]);
-            int off = slot_off(f, op->src[0]) + L.cur_sp_adjust;
+            int off = slot_sp_off(f, op->src[0]);
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");
             emit(out, "ld\ta,c");
@@ -1002,7 +1002,7 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
         } else if (!fp_active(f) && !dehl_has(op->src[1])) {
             /* Var RHS sp-rel: point HL at &RHS, XOR through (hl). */
             load_to_dehl(out, f, op->src[0]);
-            int off = slot_off(f, op->src[1]) + L.cur_sp_adjust;
+            int off = slot_sp_off(f, op->src[1]);
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");
             emit(out, "ld\ta,c");
@@ -1785,7 +1785,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                     goto shr_int_bit_remainder;
                 }
             } else {
-                int off = slot_off(f, op->src[0]) + L.cur_sp_adjust;
+                int off = slot_sp_off(f, op->src[0]);
                 if (!(off >= 0 && off <= sp_rel_max(f))) {
                     ss_note_reload(f, op->src[0]);
                     emit(out, "ld\thl,%d", off + 1);

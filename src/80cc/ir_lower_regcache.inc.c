@@ -992,7 +992,8 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
        through (hl), skipping load_to_hl's trailing `ld l,a`. Saves 1 byte
        vs load_to_hl + ex de,hl. HL is clobbered. */
     if (f->vregs[vreg_id].width == 2) {
-        int off = slot_off(f, vreg_id) + L.cur_sp_adjust;
+        require_slot(f, vreg_id);
+        int off = slot_sp_off(f, vreg_id);
         /* kc160 native ld de,(sp+d): DE=value, HL untouched — better
            than the byte walk, and leaves a pending HL spill intact. */
         if (IS_KC160()
@@ -1157,8 +1158,9 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
         }
     }
     /* kc160 native ld de,(sp+d) preserves HL on its own — no push/pop. */
-    if (IS_KC160() && f->vregs[vreg_id].width == 2) {
-        int off = slot_off(f, vreg_id) + L.cur_sp_adjust;
+    if (IS_KC160() && f->vregs[vreg_id].width == 2
+        && slot_off(f, vreg_id) >= 0) {
+        int off = slot_sp_off(f, vreg_id);
         if (off >= 0 && off <= sp_rel_max(f)) {
             ss_note_reload(f, vreg_id);
             emit(out, "ld\tde,(sp+%d)", off);
@@ -1168,8 +1170,9 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
     }
     /* Rabbit: park HL in DE across the load — ex de,hl; ld hl,(sp+d);
        ex de,hl. DE ends with the value, HL restored, no stack touch. */
-    if ((IS_RABBIT() || IS_KC160()) && f->vregs[vreg_id].width == 2) {
-        int off = slot_off(f, vreg_id) + L.cur_sp_adjust;
+    if ((IS_RABBIT() || IS_KC160()) && f->vregs[vreg_id].width == 2
+        && slot_off(f, vreg_id) >= 0) {
+        int off = slot_sp_off(f, vreg_id);
         if (off >= 0 && off <= sp_rel_max(f)) {
             ss_note_reload(f, vreg_id);
             emit_ex_de_hl(out);
@@ -1277,7 +1280,7 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
             return;
         }
     }
-    int off = slot_off(f, vreg_id) + L.cur_sp_adjust;
+    int off = slot_sp_off(f, vreg_id);
     /* Rabbit/kc160 native sp-relative store: ld (sp+N),hl then the
        contract ex de,hl (DE=value, HL=junk) — mirrors the fp path. */
     if (off >= 0 && off <= sp_rel_max(f)) {
@@ -1417,7 +1420,7 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
             return 1;
         }
     }
-    int off = slot_off(f, vreg_id) + L.cur_sp_adjust;
+    int off = slot_sp_off(f, vreg_id);
     if (off >= 0 && off <= sp_rel_max(f)) {
         if (ssd) return 1;
         emit(out, "ld\t(sp+%d),hl%s", off, vol_stamp(f, vreg_id));  /* HL preserved */
@@ -1803,7 +1806,7 @@ static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id)
        then materialize the slot address. `ld hl,off; add hl,sp` and the
        flush both leave A untouched, so store A directly — no E-stash. */
     pending_spill_resolve();
-    int off = slot_off(f, vreg_id) + L.cur_sp_adjust;
+    int off = slot_sp_off(f, vreg_id);
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
     emit(out, "ld\t(hl),a%s", vol_stamp(f, vreg_id));
@@ -1868,7 +1871,7 @@ static void partial_load_long_shr(FILE *out, const Func *f, int v,
         }
         /* FP-offset out of range — fall through to sp-rel. */
     }
-    int off = slot_off(f, v) + L.cur_sp_adjust;
+    int off = slot_sp_off(f, v);
     switch (byte_shift) {
     case 1:
         /* Reads 3 bytes (1, 2, 3) into target L, H, E. We can't write
@@ -2048,7 +2051,7 @@ static void partial_load_long_shl(FILE *out, const Func *f, int v,
             break;
         }
     }
-    int off = slot_off(f, v) + L.cur_sp_adjust;
+    int off = slot_sp_off(f, v);
     switch (byte_shift) {
     case 1:
         emit(out, "ld\thl,%d", off);
@@ -2329,7 +2332,7 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
             return;
         }
     }
-    int off = slot_off(f, vreg_id) + L.cur_sp_adjust;
+    int off = slot_sp_off(f, vreg_id);
     /* Top-of-stack long store: overwrite the sp+0 slot in place — discard
        its 4 bytes (`pop bc; pop bc`, BC clobbered by contract) and re-push
        DEHL. No address compute, no 4-byte walk, and HL stays valid (low
