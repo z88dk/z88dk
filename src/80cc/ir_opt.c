@@ -477,6 +477,12 @@ int ir_opt_st2ld(Func *f)
                    have written: those stores are no longer dead. */
                 if (op->mem.kind == IR_MEM_VREG)
                     for (int k = 0; k < n; k++) sh[k].store_origin_op = -1;
+                /* A load of a named object reads what a pending store through
+                   a pointer may have written to it. */
+                else if (op->mem.kind == IR_MEM_SYM)
+                    for (int k = 0; k < n; k++)
+                        if (sh[k].kind == IR_MEM_VREG)
+                            sh[k].store_origin_op = -1;
                 /* No match — track as an RLE source (origin -1: never
                    dead-store eligible). */
                 if (n < MAX_SHADOW) {
