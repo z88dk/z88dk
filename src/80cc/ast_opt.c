@@ -2194,7 +2194,14 @@ static void aopt_collect_escaped(Node *n)
 
 static int aopt_sym_aliased(SYMBOL *sym)
 {
-    return sym && sym_set_contains(&aopt_escaped, sym);
+    if (!sym) return 0;
+    /* An array or struct is reachable through any computed index or member
+       address (`arr[i] = v`, `&arr[1]`, an array name passed as a pointer),
+       none of which is a `&local` in the tree. */
+    if (sym->ctype && (sym->ctype->kind == KIND_ARRAY
+                       || sym->ctype->kind == KIND_STRUCT))
+        return 1;
+    return sym_set_contains(&aopt_escaped, sym);
 }
 
 /* A bare `(gv=g)` / `(lv=a)` node is an ADDRESS, and no store can change an
@@ -2273,7 +2280,9 @@ static int aopt_has_indirect_write(Node *n)
         break;
     case OP_PRE_INC: case OP_POST_INC:
     case OP_PRE_DEC: case OP_POST_DEC:
-        if (aopt_write_is_indirect(n->operand, 0)) return 1;
+        /* A step's operand is the ADDRESS of the object: `(*p)++` is
+           `(deref (lv=p))`, a write through p. */
+        if (aopt_write_is_indirect(n->operand, 1)) return 1;
         break;
     default:
         break;
@@ -2329,6 +2338,32 @@ static void cse_env_clone(cse_env *dst, const cse_env *src)
     dst->cap = src->n;
     dst->entries = src->n ? malloc(sizeof(cse_entry) * src->n) : NULL;
     if (src->n) memcpy(dst->entries, src->entries, sizeof(cse_entry) * src->n);
+}
+
+/* Bit width of an integer or pointer type, 0 for anything else. */
+static int cse_type_bits(const Type *t)
+{
+    if (!t) return 0;
+    switch (t->kind) {
+    case KIND_CHAR:     return 8;
+    case KIND_INT: case KIND_SHORT: case KIND_PTR: return 16;
+    case KIND_LONG:     return 32;
+    case KIND_LONGLONG: return 64;
+    default:            return 0;
+    }
+}
+
+/* A binding `expr -> sym` replaces a later occurrence of expr with a read of
+   sym, so sym must hold expr's whole value: `x = E` into an unsigned char
+   truncates E, and the next E must not become x. */
+static int cse_binding_fits(const SYMBOL *sym, const Node *expr)
+{
+    const Type *st = sym ? sym->ctype : NULL, *et = expr ? expr->type : NULL;
+    if (!st || !et) return 0;
+    int sb = cse_type_bits(st), eb = cse_type_bits(et);
+    if (!sb || !eb) return st->kind == et->kind;
+    if (sb == eb) return st->isunsigned == et->isunsigned;
+    return sb > eb && et->isunsigned;
 }
 
 static void cse_env_add(cse_env *e, Node *expr, SYMBOL *sym)
@@ -2759,7 +2794,8 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
         if (node->sym && node->declvar
             && is_cse_interesting(node->declvar)
             && is_side_effect_free(node->declvar)
-            && (!node->sym->ctype || !node->sym->ctype->isvolatile)) {
+            && (!node->sym->ctype || !node->sym->ctype->isvolatile)
+            && cse_binding_fits(node->sym, node->declvar)) {
             cse_env_add(env, node->declvar, node->sym);
         }
         return node;
@@ -2784,7 +2820,9 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
             && node->operand->operand
             && node->operand->operand->ast_type == AST_LOCAL_VAR
             && node->operand->operand->sym) {
+            /* `(*p)++` writes through p: whatever p reaches changes. */
             cse_env_invalidate_written(env, node->operand->operand->sym);
+            cse_env_invalidate_aliased(env);
         } else if (node->operand && node->operand->ast_type == AST_LOCAL_VAR
                    && node->operand->sym) {
             cse_env_invalidate_written(env, node->operand->sym);
@@ -2824,11 +2862,20 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
                bogus "unknown local" and abort the build, so globals are
                invalidated above but never recorded (as the comment in
                cse_walk_lvalue notes). */
+            /* A pointer read in the right side may reach the very variable
+               being stored (`a = *p ^ x` with p == &a): the write changes
+               the value the binding names. */
+            int self_aliased = (lhs_sym->storage != STKLOC
+                                || aopt_sym_aliased(lhs_sym))
+                            && node->right && aopt_reads_aliased_mem(node->right);
             if (node->right
                 && is_cse_interesting(node->right)
                 && is_side_effect_free(node->right)
                 && lhs_sym->ctype && !lhs_sym->ctype->isvolatile
-                && node->left->ast_type != AST_GLOBAL_VAR) {
+                && node->left->ast_type != AST_GLOBAL_VAR
+                && !self_aliased
+                && !subtree_mentions(node->right, lhs_sym)
+                && cse_binding_fits(lhs_sym, node->right)) {
                 cse_env_add(env, node->right, lhs_sym);
             }
         }
@@ -3156,6 +3203,10 @@ static int subtree_directly_mutates(Node *n, Node *cand)
                 t = n->left->operand->sym;
         }
         if (t && subtree_mentions(cand, t)) return 1;
+        /* A pointer read in cand may reach t: writing an escaped local or a
+           global by name changes what `*p` reads. */
+        if (t && (t->storage != STKLOC || aopt_sym_aliased(t))
+            && aopt_reads_aliased_mem(cand)) return 1;
     }
     if ((n->ast_type == OP_PRE_INC || n->ast_type == OP_POST_INC
       || n->ast_type == OP_PRE_DEC || n->ast_type == OP_POST_DEC)
@@ -3165,8 +3216,14 @@ static int subtree_directly_mutates(Node *n, Node *cand)
         if (o->ast_type == AST_LOCAL_VAR || o->ast_type == AST_GLOBAL_VAR) t = o->sym;
         else if (o->ast_type == OP_DEREF && o->operand
               && (o->operand->ast_type == AST_LOCAL_VAR
-               || o->operand->ast_type == AST_GLOBAL_VAR)) t = o->operand->sym;
+               || o->operand->ast_type == AST_GLOBAL_VAR)) {
+            t = o->operand->sym;
+            /* a step through a pointer writes whatever the pointer reaches */
+            if (aopt_reads_aliased_mem(cand)) return 1;
+        }
         if (t && subtree_mentions(cand, t)) return 1;
+        if (t && (t->storage != STKLOC || aopt_sym_aliased(t))
+            && aopt_reads_aliased_mem(cand)) return 1;
     }
     /* Address-of a sym the cand mentions: escape, future calls could
        mutate it. Conservative skip. */
@@ -3643,7 +3700,7 @@ static void licm_compute_modified(Node *node, sym_set *modified, int *has_call)
         break;
     case OP_PRE_INC: case OP_POST_INC:
     case OP_PRE_DEC: case OP_POST_DEC:
-        if (aopt_write_is_indirect(node->operand, 0))
+        if (aopt_write_is_indirect(node->operand, 1))
             *has_call = 1;
         if (node->operand) {
             Node *o = node->operand;
