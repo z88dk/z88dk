@@ -6,9 +6,10 @@ SECTION code_string
 
 PUBLIC strlen
 
+
 EXTERN asm_strlen
 
-strlen:
+strlen::
 IF __CPU_GBZ80__
    ld  hl,sp+2
    ld  a,(hl+)
@@ -32,7 +33,7 @@ ELSE
 ENDIF
 
 ; SDCC bridge for Classic
-IF __CLASSIC && !__CPU_GBZ80__
+IF __CLASSIC
 PUBLIC _strlen
 defc _strlen = strlen
 ENDIF
