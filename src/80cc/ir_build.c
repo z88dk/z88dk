@@ -4780,10 +4780,26 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             ld->mem.kind  = IR_MEM_SYM;
             ld->mem.sym   = gsym;
 
+            /* A near pointer steps by sizeof(the pointee). */
+            int gstride = 1;
+            if (n->type && n->type->kind == KIND_PTR) {
+                Type *pte = n->type->ptr;
+                gstride = !pte ? 0
+                        : (pte->kind == KIND_STRUCT || pte->kind == KIND_ARRAY)
+                          ? (int)pte->size : type_width(pte);
+                if (gstride <= 0)
+                    return build_fail("step on pointer to incomplete/"
+                                      "unknown type (global)");
+            }
             int new_v;
             if (w == 8) {
                 new_v = emit_acc_int_unary(b, old_v,
                             is_inc ? "l_i64_inc" : "l_i64_dec");
+            } else if (gstride != 1) {
+                new_v = new_temp(b, w);
+                Op *sop = ir_op_emit(cur_bb(b), is_inc ? IR_ADD : IR_SUB);
+                sop->dst = new_v; sop->src[0] = old_v; sop->src[1] = -1;
+                sop->imm = gstride;
             } else {
                 new_v = new_temp(b, w);
                 ir_emit_unop(cur_bb(b), is_inc ? IR_INC : IR_DEC,
@@ -4815,10 +4831,18 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                               "supported (operand ast=%d)",
                               n->operand->ast_type);
 
-        /* Restrict to plain integer kinds. KIND_PTR would need
-           sizeof(pointee) scaling on the step, which this path
-           doesn't yet implement — those still bail. */
-        if (!n->type
+        /* Plain integer kinds, or a near pointer, which steps by
+           sizeof(the pointee). */
+        int pstride = 1;
+        if (n->type && n->type->kind == KIND_PTR) {
+            Type *pte = n->type->ptr;
+            pstride = !pte ? 0
+                    : (pte->kind == KIND_STRUCT || pte->kind == KIND_ARRAY)
+                      ? (int)pte->size : type_width(pte);
+            if (pstride <= 0)
+                return build_fail("step on pointer to incomplete/unknown "
+                                  "type (non-LV)");
+        } else if (!n->type
             || (n->type->kind != KIND_CHAR
              && n->type->kind != KIND_INT
              && n->type->kind != KIND_SHORT
@@ -4845,6 +4869,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                                   "unmapped %s",
                                   addr_node->sym
                                       ? addr_node->sym->name : "?");
+        } else if (n->operand->ast_type == OP_DEREF) {
+            /* `(*X)++`: the operand is the DEREF node whose value is the
+               address of the object (a loaded pointer), not X itself. */
+            ptr_v = build_expr(b, n->operand);
+            if (ptr_v < 0) return -1;
         } else {
             ptr_v = build_expr(b, addr_node);
             if (ptr_v < 0) return -1;
@@ -4864,6 +4893,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         if (elem_w == 8) {
             new_v = emit_acc_int_unary(b, old_v,
                         is_inc ? "l_i64_inc" : "l_i64_dec");
+        } else if (pstride != 1) {
+            new_v = new_temp(b, elem_w);
+            Op *sop = ir_op_emit(cur_bb(b), is_inc ? IR_ADD : IR_SUB);
+            sop->dst = new_v; sop->src[0] = old_v; sop->src[1] = -1;
+            sop->imm = pstride;
         } else {
             new_v = new_temp(b, elem_w);
             ir_emit_unop(cur_bb(b), is_inc ? IR_INC : IR_DEC,
@@ -5791,7 +5825,11 @@ static int build_assign(Builder *b, Node *n)
                                       ? n->left->operand->sym->name
                                       : "?");
         } else {
-            ptr_v = build_expr(b, n->left->operand);
+            /* The destination's address is the VALUE of the deref node
+               `n->left` (a loaded pointer), not of its operand: for
+               `*ps[1] = x` the operand is `&ps[1]`, and storing there
+               overwrites the pointer array. */
+            ptr_v = build_expr(b, n->left);
             if (ptr_v < 0) return -1;
         }
         /* __far store (`*fp = v`): route through an lp_p* helper.
