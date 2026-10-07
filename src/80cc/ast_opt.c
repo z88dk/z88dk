@@ -2414,6 +2414,16 @@ static void cse_env_invalidate_aliased(cse_env *e)
     e->n = w;
 }
 
+/* A direct write to `sym` redefines it by name, but a pointer may read the
+   same memory: when sym is a global or an address-escaped local, entries that
+   read through a pointer go too. */
+static void cse_env_invalidate_written(cse_env *e, SYMBOL *sym)
+{
+    cse_env_invalidate_sym(e, sym);
+    if (sym && (sym->storage != STKLOC || aopt_sym_aliased(sym)))
+        cse_env_invalidate_aliased(e);
+}
+
 /* "Interesting" enough to record. SEF is checked separately. */
 /* A candidate becomes a synthesized local (cse_make_stub_sym /
    make_licm_stub_sym), so its type must be storable in one. `(void)x` is an
@@ -2774,10 +2784,10 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
             && node->operand->operand
             && node->operand->operand->ast_type == AST_LOCAL_VAR
             && node->operand->operand->sym) {
-            cse_env_invalidate_sym(env, node->operand->operand->sym);
+            cse_env_invalidate_written(env, node->operand->operand->sym);
         } else if (node->operand && node->operand->ast_type == AST_LOCAL_VAR
                    && node->operand->sym) {
-            cse_env_invalidate_sym(env, node->operand->sym);
+            cse_env_invalidate_written(env, node->operand->sym);
         } else {
             cse_env_clear(env);   /* unknown — bail */
         }
@@ -2807,7 +2817,7 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
         } else if (unknown) {
             cse_env_clear(env);
         } else if (lhs_sym) {
-            cse_env_invalidate_sym(env, lhs_sym);
+            cse_env_invalidate_written(env, lhs_sym);
             /* Record only when the destination is a local: the substitution
                (cse_make_lv_deref) reads the recorded sym back as an
                AST_LOCAL_VAR. A global destination would be re-read as a
@@ -2835,7 +2845,7 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
         if (node->left) node->left = cse_walk_lvalue(node->left, env, &lhs_sym,
                                                      &unknown, 0, NULL);
         if (unknown)         cse_env_clear(env);
-        else if (lhs_sym)    cse_env_invalidate_sym(env, lhs_sym);
+        else if (lhs_sym)    cse_env_invalidate_written(env, lhs_sym);
         return node;
     }
 

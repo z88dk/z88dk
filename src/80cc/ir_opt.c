@@ -394,6 +394,19 @@ int ir_opt_st2ld(Func *f)
                 n = 0;
                 continue;
             }
+            /* A write to an address-taken or volatile vreg changes memory a
+               pointer load can read, with no store op to show it. */
+            {
+                int wd[8];
+                int wn = ir_op_defs(op, wd, 8);
+                for (int t = 0; t < wn; t++)
+                    if (wd[t] >= 0 && wd[t] < f->n_vregs
+                        && (f->vregs[wd[t]].flags
+                            & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))) {
+                        n = 0;
+                        break;
+                    }
+            }
 
             /* IR_LD_MEM: forward against the shadow, else track this
                load so a later same-address load can MOV from it (RLE,
@@ -409,6 +422,7 @@ int ir_opt_st2ld(Func *f)
                    load's value. Drop those entries and don't track this
                    load (its [base] is about to mean something else). */
                 if (op->mem.post_step != 0 && op->mem.kind == IR_MEM_VREG) {
+                    for (int k = 0; k < n; k++) sh[k].store_origin_op = -1;
                     for (int k = 0; k < n; ) {
                         if ((sh[k].kind == IR_MEM_VREG
                              && sh[k].base == op->mem.base)
@@ -445,6 +459,10 @@ int ir_opt_st2ld(Func *f)
                     changed++;
                     continue;
                 }
+                /* A load through a pointer reads memory any pending store may
+                   have written: those stores are no longer dead. */
+                if (op->mem.kind == IR_MEM_VREG)
+                    for (int k = 0; k < n; k++) sh[k].store_origin_op = -1;
                 /* No match — track as an RLE source (origin -1: never
                    dead-store eligible). */
                 if (n < MAX_SHADOW) {
