@@ -3545,6 +3545,7 @@ static int ldmem_narrowable(const Op *op)
 }
 
 static int v_fits_byte(const Func *f, int v);
+static int v_defs_not_complete(const Func *f, int v);
 static int v_is_sx_of_byte(const Func *f, int v);
 
 /* [IR_SHRMASK] Do all readers of this shift mask its result down inside `keep`?
@@ -3704,11 +3705,22 @@ static int narrow_def_kind(const Func *f, const Op *op)
         || narrow_shr_kind(f, op);
 }
 
+/* The provers below read a vreg's value off its definitions. A parameter has
+   an incoming value with no definition, and an address-taken or volatile
+   vreg can be rewritten through memory, so neither is proved by its defs. */
+static int v_defs_not_complete(const Func *f, int v)
+{
+    return v < 0 || v >= f->n_vregs
+        || (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                 | IR_VREG_VOLATILE));
+}
+
 /* True if EVERY def of v is an AND with an immediate mask whose high byte
    is clear — so v's value provably fits in 8 bits and a zero/cond test on
    its low byte is a test of the whole value. */
 static int v_fits_byte_d(const Func *f, int v, int depth)
 {
+    if (v_defs_not_complete(f, v)) return 0;
     int seen = 0;
     for (int b = 0; b < f->n_bbs; b++) {
         const BB *bb = &f->bbs[b];
@@ -3766,6 +3778,7 @@ static int v_fits_byte(const Func *f, int v) { return v_fits_byte_d(f, v, 0); }
    yet bit 7 is set — narrowing would flip the sign test.) */
 static int v_is_sx_of_byte(const Func *f, int v)
 {
+    if (v_defs_not_complete(f, v)) return 0;
     int seen = 0;
     for (int b = 0; b < f->n_bbs; b++) {
         const BB *bb = &f->bbs[b];
@@ -3922,6 +3935,7 @@ static int cs_is_signed_cmp(OpKind k)
    the localbench/widthbench loop tests. The two proofs are complementary. */
 static int v_nonneg_iv(const Func *f, int v)
 {
+    if (v_defs_not_complete(f, v)) return 0;
     int seen_init = 0, seen_step = 0;
     for (int b = 0; b < f->n_bbs; b++) {
         const BB *bb = &f->bbs[b];

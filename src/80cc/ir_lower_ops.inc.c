@@ -3149,6 +3149,15 @@ static int emit_frame_word_store(FILE *out, const Func *f, int slot, int ofs,
     return 0;
 }
 
+/* A store to a frame slot through a pointer changes the vreg that owns it, so
+   no register may go on claiming that vreg's old value. */
+static void frame_store_drops_beliefs(int slot)
+{
+    if (L.rs.de == slot || L.rs.dehl == slot) invalidate_de_cache();
+    if (L.rs.bc == slot || L.rs.dehl == slot) invalidate_bc_cache();
+    if (L.rs.a == slot) invalidate_a_cache();
+}
+
 /* ---- [idx-deref] (ix+d)/(iy+d) through an INDEX-HOMED deref base ----------
    80cc's index home has always been a VALUE carrier: emit_idx_word_to_reg
    reads it with `push iy;pop hl`, so a pointer homed there still had to come
@@ -4189,6 +4198,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                     load_byte_to_a(out, f, op->src[0]);
                     emit(out, "ld\t(%s%+d),a%s", frame_reg(), disp,
                          mem_vol_stamp(op));
+                    frame_store_drops_beliefs(_slot);
                     return 0;
                 }
             }
@@ -4198,8 +4208,10 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
             if (_slot >= 0 && _w == 2 && frame_direct_ok(f, _slot, _ofs, 2)) {
                 load_to_hl(out, f, op->src[0]);
                 if (emit_frame_word_store(out, f, _slot, _ofs,
-                                          mem_vol_stamp(op)))
+                                          mem_vol_stamp(op))) {
+                    frame_store_drops_beliefs(_slot);
                     return 0;
+                }
             }
             /* [idx-deref] Mirror of the load rung: the base is already in
                IX/IY, so write the field at a displacement. Byte goes through
