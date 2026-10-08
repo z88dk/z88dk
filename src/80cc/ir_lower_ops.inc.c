@@ -2346,7 +2346,7 @@ static void byte_alu_operand_emit(FILE *out, const Func *f,
        the low byte (A is the other operand, so it cannot carry it). */
     if (f->vregs[m].width == 2 && vreg_idx_home(f, m) != IR_PR_NONE) {
         emit_idx_word_to_reg(out, f, m, "hl");
-        invalidate_hl_cache();
+        invalidate_hl_keep_de();     /* only HL changed */
         emit(out, "%sl", prefix);
         return;
     }
@@ -2371,6 +2371,7 @@ static void byte_alu_operand_emit(FILE *out, const Func *f,
         }
     }
     ss_note_reload(f, m);
+    require_slot(f, m);
     if (fp_active(f)) {
         int ix = slot_ix_off(f, m);
         if (fp_offset_fits(ix)) {

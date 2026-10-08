@@ -1643,7 +1643,7 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
     if (vreg_in_idx2(f, vreg_id) && f->vregs[vreg_id].width == 2) {
         emit_idx_word_to_reg(out, f, vreg_id, "hl");
         emit(out, "ld\ta,l");
-        invalidate_hl_cache();
+        invalidate_hl_keep_de();
         cache_a(vreg_id);
         return;
     }
