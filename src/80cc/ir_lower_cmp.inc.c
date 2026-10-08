@@ -386,7 +386,9 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
            immediate halves directly. 6B/22c against 7B/26c, and DE stays free
            for whatever else wanted it. The already-addressable cases above keep
            priority — they need no load at all. */
-        if (!cls && (IS_808x() || IS_GBZ80())) {
+        if (!cls && (IS_808x() || IS_GBZ80()
+                     || (!IS_8085() && g_hc.func_whome < 0 && g_hc.de_home < 0
+                         && !opt_disabled("cmp-k-load")))) {
             load_to_hl(out, f, op->src[0]);
             snprintf(klo, sizeof klo, "l");
             snprintf(khi, sizeof khi, "h");

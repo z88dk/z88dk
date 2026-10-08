@@ -5229,6 +5229,25 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         cache_bc(op->dst);
         return 0;
     }
+    /* Constant added to a value already in BC or DE: `ld hl,K; add hl,bc` is 4
+       bytes and 21 T against `ld hl,bc; ld de,K; add hl,de`, 6 bytes and 29 T,
+       and leaves DE (or BC) alone. A step of 1..3 stays an inc chain, and z80n
+       `add hl,nn` needs the value in HL first, so it loses here too. */
+    if (op->src[1] < 0 && op->imm_sym == NULL && L.pending_spill_v < 0
+        && !(op->imm >= 1 && op->imm <= 3)
+        && op->src[0] >= 0 && f->vregs[op->src[0]].width == 2
+        && (op->imm >= -32768 && op->imm <= 65535)
+        && !opt_disabled("add-k-reg")
+        && (bc_has(op->src[0]) || de_has(op->src[0]))
+        && !hl_has(op->src[0])) {
+        const char *r = bc_has(op->src[0]) ? "bc" : "de";
+        ss_note_cache_read(f, op->src[0]);
+        hl_about_to_change(-1);
+        emit(out, "ld\thl,%lld", (long long)(op->imm & 0xffff));
+        emit(out, "add\thl,%s", r);
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
     /* z80n const RHS: `add hl,nn` instead of `ld de,nn; add hl,de`.
        Same size, 5T cheaper, and — the real win — leaves DE intact so
        a value cached there survives. Standalone 16-bit add: this op
