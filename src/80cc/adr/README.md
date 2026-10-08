@@ -76,6 +76,7 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0101](0101-idx2-live-range-reuse.md) | **Accepted** — the idx2 slot hosts non-overlapping live ranges instead of one whole-function owner; measures zero today (BC's own multi-occupant check already claims every real case first), kept for future shapes |
 | [0102](0102-ivsr-induction-pointer-in-idx2.md) | **Accepted**, ez80/kc160/rabbit only — a second IVSR-reduced walking pointer can home in idx2; −495 B/−9.94M ticks over 44 cells, one disclosed regression (cost-model overvaluation, not contention) |
 | [0103](0103-8085-bc-word-reload-uses-lhlx.md) | **Accepted**, default on (`lhlx-bc`) — an 8085 BC word reload followed by `ld hl,bc` uses LDSI+LHLX instead of the byte walk. Not the ADR 0038 cost rows, and not the live-DE address form ADR 0039 left alone |
+| [0104](0104-constant-byte-return-loads-l.md) | **Accepted**, default on (`byte-ret`) — a constant byte return is `ld l,N` instead of `ld a,N` / `ld l,a`. Zero stays with `xor a`. The exit-path reload stays refused |
 | [0089](0089-addition-swap-has-no-scalar-two-pass-gate.md) | **Rejected** — a sound addition swap gate needs a second pass-1 render; md5 −6 % but binary-trees +28 B and emu.c +75 B |
 | [0088](0088-indexed-word-rmw-address-restoration-is-a-small-rung.md) | **Sized** — one histbench site in 8 CPU/frame cells, 40 B total; no emitter change |
 | [0073](0073-ask-slot-off-not-the-spill-slot.md) | **Accepted** — ask `slot_off`, not `vreg_spill_slot`; the wrong query cost structbench +10.5 % |

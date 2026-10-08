@@ -3047,6 +3047,55 @@ static void fold_xorflip_chain(char **lines, char *drop, int n)
     }
 }
 
+/* [byte-ret] A is dead after the pair when every straight-line follower
+   ignores A or overwrites it, or the path ends at an unconditional ret.
+   A label, branch, call, or read of A refuses. ret itself does not read A.
+   adr/0104. */
+static int byte_ret_a_dead(char **lines, const char *drop, int n, int start)
+{
+    int budget = 48;
+    for (int j = start; j < n && budget > 0; j++) {
+        if (drop[j]) continue;
+        budget--;
+        if (lines[j][0] != '\t') return 0;
+        if (gw_kills_a(lines[j])) return 1;
+        if (!strcmp(lines[j], "\tret\n")) return 1;
+        if (!gw_no_a_read(lines[j])) return 0;
+    }
+    return 0;
+}
+
+/* [byte-ret] `ld a,N` / `ld l,a` puts a constant byte in L via A. `ld l,N`
+   leaves L and H the same and drops the copy in A. N is 1..255: `ld a,0`
+   is the xor-a rung's input and stays. `--opt-disable=byte-ret` opts out.
+   adr/0104. */
+static int try_fold_byte_ret(char **lines, char *drop, int n, int i)
+{
+    int imm;
+    char expect[32];
+    char buf[32];
+    char *nl;
+    if (opt_disabled("byte-ret") || i < 1 || drop[i] || drop[i - 1])
+        return 0;
+    if (strcmp(lines[i], "\tld\tl,a\n") != 0)
+        return 0;
+    if (sscanf(lines[i - 1], "\tld\ta,%d\n", &imm) != 1
+        || imm < 1 || imm > 255)
+        return 0;
+    snprintf(expect, sizeof expect, "\tld\ta,%d\n", imm);
+    if (strcmp(lines[i - 1], expect) != 0)
+        return 0;
+    if (!byte_ret_a_dead(lines, drop, n, i + 1))
+        return 0;
+    snprintf(buf, sizeof buf, "\tld\tl,%d\n", imm);
+    nl = strdup(buf);
+    if (!nl) return 0;
+    free(lines[i]);
+    lines[i] = nl;
+    drop[i - 1] = 1;
+    return 1;
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
@@ -3188,6 +3237,10 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             }
             char bftgt[64];
             InstrEffects e = instr_effects(lines[i]);   /* single query (composes bc_line_effect) */
+            /* [byte-ret] Before [xor-a], so `ld a,0` is still the reload
+               this rung refuses and the xor-a rung still owns. */
+            if (try_fold_byte_ret(lines, drop, n, i))
+                continue;
             /* [xor-a] f_live here is the answer for the code AFTER line i,
                which is exactly what decides whether defining F costs anything.
                Rewrite first, then fold line i into the liveness. */
