@@ -102,6 +102,8 @@ int ir_alloc_word_home_clashes(int *out, int max)
     return n;
 }
 
+/* A home placed (or an occupant evicted) after the word DE-home pick must also
+   go into the pick's snapshot, or rejecting the pick restores a plan without it. */
 static void alloc_note_late_home(Func *f, int v, PhysReg pr)
 {
     f->vreg_to_phys[v] = pr;
@@ -3084,7 +3086,7 @@ static void ir_iy_reduction_pack(Func *f, const int *bb_in_loop,
         for (int v = 0; v < f->n_vregs; v++) {
             PhysReg p = f->vreg_to_phys[v];
             if (p == IR_PR_IY || p == IR_PR_IYL || p == IR_PR_IYH)
-                f->vreg_to_phys[v] = IR_PR_SPILL;   /* revert-to-slot */
+                alloc_note_late_home(f, v, IR_PR_SPILL);   /* revert-to-slot */
         }
         if (getenv("IR_ALLOC_PROBE"))
             fprintf(stderr, "IY_EVICT %d idx2 occupant(s) (fp wash) for candidate score=%ld\n",
@@ -3093,13 +3095,14 @@ static void ir_iy_reduction_pack(Func *f, const int *bb_in_loop,
     (void)occ_score;
 
     if (pick.win_acc) {
-        f->vreg_to_phys[pick.acc] = IR_PR_IY;
+        alloc_note_late_home(f, pick.acc, IR_PR_IY);
         f->idx3_reg = IR_PR_IY;
         if (getenv("IR_ALLOC_PROBE"))
             fprintf(stderr, "IY_ACC v%d bb%d score=%ld (loop-carried accumulator)\n",
                     pick.acc, pick.acc_bb, pick.acc_score);
     } else {
-        for (int m = 0; m < pick.nm; m++) f->vreg_to_phys[pick.members[m]] = IR_PR_IY;
+        for (int m = 0; m < pick.nm; m++)
+            alloc_note_late_home(f, pick.members[m], IR_PR_IY);
         f->idx3_reg = IR_PR_IY;
     }
 }
@@ -4289,7 +4292,7 @@ static void ir_iy_temp_pack(Func *f, const int *bb_first_op,
         for (int k = lo + 1; k <= hi && clean; k++)
             if (op_clobbers(f, &bb->ops[k]) & IR_R_IY) clean = 0;
         if (!clean) continue;
-        f->vreg_to_phys[v] = IR_PR_IY;
+        alloc_note_late_home(f, v, IR_PR_IY);
         f->idx3_reg = IR_PR_IY;
         last_fhi = cand[i].fhi;
         packed++;

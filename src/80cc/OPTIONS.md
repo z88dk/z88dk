@@ -278,6 +278,8 @@ exists (ADR 0010).
 | `label-elide` | dead basic-block labels are kept in the output |
 | `ret-thread` | a jump to a `ret` is not threaded |
 | `defassign-verify` | not an optimisation: no stderr warning for a local that is read but never written on any path (`IR_DEFASSIGN_VERIFY=1` widens it, `=2` aborts) |
+| `idx-cmp-mem` | a fused `*a == *b` branch reads an IX/IY-homed pointer through HL (`push iy; pop hl; cp (hl)`) instead of `cp (iy+0)` |
+| `idx-step-inc` | a step of 1 or 2 on an IX/IY-homed word is `ld de,k; add iy,de` instead of `inc iy` / `dec iy` |
 | `shl-add-pair` | `(x << n) + x` and `(x << n) - x` on longs reload x from its slot instead of saving it on the stack across the shift |
 | `long-mult-sr` | a long constant multiply other than 2^a, 2^a+1 and 2^a-1 is expanded to a shift/add chain instead of calling l_long_mult_u |
 | `mulchain-de` | a constant-multiply shift-add chain reloads its multiplicand every term instead of keeping it in DE |

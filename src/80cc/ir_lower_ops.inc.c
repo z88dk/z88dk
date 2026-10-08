@@ -682,10 +682,51 @@ static int gen_copy_step_brz(FILE *out, Func *f, const Op *op)
    A = *pa; then `cp (hl)` with HL = pb; branch to label on equal (imm bit0=1)
    or not-equal (imm bit0=0). Neither deref byte touches a slot — the whole
    compare is `ld a,(pa); ld hl,pb; cp (hl); jp cc`. Built by ir_match derefcmp. */
+/* The IX/IY name of a pointer homed in an index register, or NULL. The byte is
+   then reached as (ix+0) / (iy+0), with no copy of the pointer into HL. */
+static const char *idx_ptr_reg(const Func *f, int p)
+{
+    if (opt_disabled("idx-deref") || opt_disabled("idx-cmp-mem")) return NULL;
+    if (!f || p < 0 || p >= f->n_vregs) return NULL;
+    int pr = vreg_idx_home(f, p);
+    if (pr != IR_PR_IX && pr != IR_PR_IY) return NULL;
+    return idx_pr_name(pr);
+}
+
 static int gen_deref_cmp_br(FILE *out, Func *f, const Op *op)
 {
     int pa = op->src[0], pb = op->src[1];
     int fire_on_equal = (int)(op->imm & 1);
+    /* A pointer homed in IX/IY: read its byte as (iy+0), either into A or as the
+       cp operand. `ld a,(bc); cp (iy+0)` is 4 bytes and 26 T against
+       `push iy; pop hl; ld a,(bc); cp (hl)`, 5 bytes and 39 T. */
+    {
+        const char *ia = idx_ptr_reg(f, pa), *ib = idx_ptr_reg(f, pb);
+        if (ia || ib) {
+            int hl_used = 0;
+            if (ia && ib) {
+                emit(out, "ld\ta,(%s+0)", ia);
+                emit(out, "cp\t(%s+0)", ib);
+            } else {
+                const char *ir = ia ? ia : ib;
+                int other = ia ? pb : pa;           /* the pointer not in an index reg */
+                if (vreg_in_pr_bc(f, other) || vreg_in_pr_de(f, other)) {
+                    emit(out, "ld\ta,(%s)", vreg_in_pr_bc(f, other) ? "bc" : "de");
+                    emit(out, "cp\t(%s+0)", ir);
+                } else {
+                    load_to_hl(out, f, other);      /* before A is read: it may use A */
+                    emit(out, "ld\ta,(%s+0)", ir);
+                    emit(out, "cp\t(hl)");
+                    hl_used = 1;
+                }
+            }
+            invalidate_a_cache();
+            if (hl_used) invalidate_hl_cache();
+            emit(out, "jp\t%s,L_f%d_bb_%d", fire_on_equal ? "z" : "nz",
+                 L.func_emit_idx, op->label);
+            return 0;
+        }
+    }
     /* We need one pointer's byte in A and the other's addressable via (hl) for
        `cp (hl)`.  The pointer *address* loads can clobber A (in sp mode a slot
        load walks the value through A: `ld a,(hl+); ld h,(hl); ld l,a`), so *pa
@@ -4898,6 +4939,13 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         if (acc >= 0 && ir) {
             if (other >= 0 && ir_home_at(f, other) == home) {
                 emit(out, "add\t%s,%s", ir, ir);      /* x + x (both in reg) */
+            } else if (other < 0 && op->imm >= -2 && op->imm <= 2 && op->imm != 0
+                       && (!strcmp(ir, "ix") || !strcmp(ir, "iy"))
+                       && !opt_disabled("idx-step-inc")) {
+                /* A step of one or two: `inc iy` is 2 bytes against 5 for
+                   `ld de,k; add iy,de`, and leaves DE alone. */
+                for (int k = 0; k < (op->imm < 0 ? -op->imm : op->imm); k++)
+                    emit(out, "%s\t%s", op->imm < 0 ? "dec" : "inc", ir);
             } else {
                 if (other < 0) emit(out, "ld\tde,%lld", (long long)op->imm);
                 else           load_to_de(out, f, other);  /* HL scratch; reg preserved */
