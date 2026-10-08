@@ -4154,6 +4154,29 @@ static int try_fold_byte_ret(char **lines, char *drop, int n, int i)
     return 1;
 }
 
+/* [byte-ret] The final stage after tail merging. Merging must see the original
+   `ld l,a` tails: narrowing first makes constant returns differ and a merge
+   that would have paid is lost. The pair that remains adjacent after the merge
+   is by construction one whose A is not needed by a shared tail. */
+static void filter_byte_ret(FILE *out, FILE *src)
+{
+    char **lines;
+    int n;
+    if (!slurp_lower_lines(src, &lines, &n)) {
+        copy_lower_stream(out, src);
+        return;
+    }
+    char *drop = calloc((size_t)(n > 0 ? n : 1), 1);
+    if (drop)
+        for (int i = 0; i < n; i++)
+            try_fold_byte_ret(lines, drop, n, i);
+    for (int i = 0; i < n; i++) {
+        if (!drop || !drop[i]) fputs(lines[i], out);
+        free(lines[i]);
+    }
+    free(lines); free(drop);
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
@@ -4331,10 +4354,6 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             }
             char bftgt[64];
             InstrEffects e = instr_effects(lines[i]);   /* single query (composes bc_line_effect) */
-            /* [byte-ret] Before [xor-a], so `ld a,0` is still the reload
-               this rung refuses and the xor-a rung still owns. */
-            if (try_fold_byte_ret(lines, drop, n, i))
-                continue;
             /* [xor-a] f_live here is the answer for the code AFTER line i,
                which is exactly what decides whether defining F costs anything.
                Rewrite first, then fold line i into the liveness. */
@@ -5435,7 +5454,10 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
     /* Layout runs AFTER tail merging — it can move the traces tail merging
        creates — and before relaxation, which re-sizes the moved displacements. */
     FILE *blf = block_layout_enabled() ? tmpfile() : NULL;
-    FILE *fout2 = tmf ? tmf : (blf ? blf : fout);
+    /* [byte-ret] runs after tail merging and before layout. */
+    FILE *brf = opt_disabled("byte-ret") ? NULL : tmpfile();
+    FILE *after_tm = brf ? brf : (blf ? blf : fout);
+    FILE *fout2 = tmf ? tmf : after_tm;
     FILE *peep = (do_regcopy || do_bc_live) ? tmpfile() : NULL;
     FILE *dst = peep ? peep : fout2;
     /* Pass 2: emit, dropping `L_f<d>_bb_<n>:` lines whose n is unreferenced, and
@@ -5506,9 +5528,13 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
     }
     if (tmf) {
         rewind(tmf);
-        if (blf) { filter_tail_merge(blf, tmf, f); }
-        else       filter_tail_merge(fout, tmf, f);
+        filter_tail_merge(after_tm, tmf, f);
         fclose(tmf);
+    }
+    if (brf) {
+        rewind(brf);
+        filter_byte_ret(blf ? blf : fout, brf);
+        fclose(brf);
     }
     if (blf) {
         /* A moved trace can end in a jump that another move replaced, which
