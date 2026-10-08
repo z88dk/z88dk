@@ -2260,6 +2260,33 @@ all: idx2reuse.bin idx2reuse_fp.bin idx2reuse_keep.bin idx2reuse_fp_keep.bin idx
 # ivsr_lftr's walking pointer now also homes in the index register.
 all: ivsr_lftr_ez80.bin ivsr_lftr_ez80_fp.bin ivsr_lftr_kc160.bin ivsr_lftr_kc160_fp.bin ivsr_lftr_r4k.bin
 
+# 8085 BC word reload via LDSI+LHLX. 8080 is the no-LHLX control.
+all: lhlxbc.bin lhlxbc_fp.bin lhlxbc_8085.bin lhlxbc_8085_fp.bin lhlxbc_8085_keep.bin lhlxbc_8080.bin
+
+lhlxbc.bin: $(SOURCES) lhlxbc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+lhlxbc_fp.bin: $(SOURCES) lhlxbc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+lhlxbc_8085.bin: $(SOURCES) lhlxbc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+lhlxbc_8085_fp.bin: $(SOURCES) lhlxbc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+lhlxbc_8085_keep.bin: $(SOURCES) lhlxbc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -Cc--opt-disable=lhlx-bc --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+lhlxbc_8080.bin: $(SOURCES) lhlxbc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 aggpromote.bin: $(SOURCES) aggpromote.c
 	$(compile)
 	$(runtest)

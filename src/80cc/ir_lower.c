@@ -2640,6 +2640,50 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
                                      if (lel) lel[k] = 1; }   /* unsettled */
 }
 
+/* [lhlx-bc] A BC word reload that is copied straight back into HL:
+     ld hl,N / add hl,sp / ld c,(hl) / inc hl / ld b,(hl) / ld hl,bc
+   On the 8085 that is a byte walk plus a pair copy. LDSI + LHLX already
+   leaves the word in HL, and two byte moves fill BC:
+     ld de,sp+N / ld hl,(de) / ld b,h / ld c,l
+   HL and BC end with the same word. DE ends holding the slot address, so
+   D and E must be dead after the copy. `add hl,sp` writes carry and this
+   sequence does not, so F must be dead too. N is LDSI's unsigned byte.
+   This is the dead-DE case only. ADR 0039 left the live-DE address form
+   alone, and ADR 0038 refused retargeting the cost rows. Neither of those
+   is this rewrite: the byte walk is deleted, and only when DE is dead.
+   `--opt-disable=lhlx-bc` opts out. */
+static int try_fold_8085_bc_lhlx(char **lines, char *drop, int i,
+                                 int d_live, int e_live, int f_live)
+{
+    int n;
+    char *a, *b, *c, *d;
+    if (!IS_8085() || opt_disabled("lhlx-bc") || d_live || e_live || f_live)
+        return 0;
+    if (i < 5 || drop[i] || drop[i - 1] || drop[i - 2] || drop[i - 3]
+        || drop[i - 4] || drop[i - 5])
+        return 0;
+    if (strcmp(lines[i],     "\tld\thl,bc\n") != 0) return 0;
+    if (strcmp(lines[i - 1], "\tld\tb,(hl)\n") != 0) return 0;
+    if (strcmp(lines[i - 2], "\tinc\thl\n") != 0) return 0;
+    if (strcmp(lines[i - 3], "\tld\tc,(hl)\n") != 0) return 0;
+    if (strcmp(lines[i - 4], "\tadd\thl,sp\n") != 0) return 0;
+    if (sscanf(lines[i - 5], "\tld\thl,%d\n", &n) != 1 || n < 0 || n > 255)
+        return 0;
+    a = malloc(32);
+    if (!a) return 0;
+    snprintf(a, 32, "\tld\tde,sp+%d\n", n);
+    b = strdup("\tld\thl,(de)\n");
+    c = strdup("\tld\tb,h\n");
+    d = strdup("\tld\tc,l\n");
+    if (!b || !c || !d) { free(a); free(b); free(c); free(d); return 0; }
+    free(lines[i - 5]); lines[i - 5] = a;
+    free(lines[i - 4]); lines[i - 4] = b;
+    free(lines[i - 3]); lines[i - 3] = c;
+    free(lines[i - 2]); lines[i - 2] = d;
+    drop[i - 1] = drop[i] = 1;
+    return 1;
+}
+
 static void try_fold_8085_addr_pair(char **lines, char *drop, int i,
                                     int d_live, int e_live, int f_live,
                                     const char *opt, const char *add_line,
@@ -3151,6 +3195,11 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 char *nl = strdup("\txor\ta\n");
                 if (nl) { free(lines[i]); lines[i] = nl; }
             }
+            /* [lhlx-bc] See try_fold_8085_bc_lhlx. Must run before
+               [ldsi-addr]: both match this walk, and this one consumes the
+               `add hl,sp` the address rung would otherwise rewrite. */
+            if (try_fold_8085_bc_lhlx(lines, drop, i, d_live, e_live, f_live))
+                continue;
             /* [ldsi-addr] 8085 only. Forming a slot address costs
                `ld hl,N; add hl,sp` — 4 bytes, 20 cycles. The 8085 has LDSI,
                `ld de,sp+N`, which does it in 2 bytes and 10, so the pair
