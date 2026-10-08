@@ -237,6 +237,8 @@ exists (ADR 0010).
 | `cmp-unsign-dec` | a down-counting loop variable with a guarded decrement does not count as non-negative, so its compares keep the signed sign correction |
 | `f32-prepush-nostash` | a 4-byte operand pushed at its definition for a helper call copies its low half to BC before pushing, instead of pushing HL |
 | `hcall-arg-nostash` | a 4-byte result read only as the register operand of the helper call after it copies its low half to BC first |
+| `long-mem-rhs` | a long ADD/SUB/AND/OR/XOR whose operand is a global read once by the load just before it reads that global in place instead of loading and parking it |
+| `long-rmw-walk` | on 8080-family and gbz80, a long `g op= h` on two globals whose result feeds only the store back to g walks both a byte at a time through A instead of loading, combining and storing |
 | `bc-save-group` | the BC save at a pre-pushed call's first argument considers the rest of the block, not just the call it belongs to |
 | `add-k-reg` | a constant added to a word held in BC or DE is staged through `ld hl,bc; ld de,K; add hl,de` instead of `ld hl,K; add hl,bc` |
 | `cmp-k-load` | a word compare against a constant whose operand is not in a register or an index slot is staged through `ld de,K; and a; sbc hl,de` instead of loading it to HL and subtracting the immediate bytes through A |

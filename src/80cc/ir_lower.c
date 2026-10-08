@@ -242,6 +242,12 @@ typedef struct {
                               (IR_MEM_SYM) with no memory-write between def and use
                               — rematerialise `ld a,(sym)` at the use instead of a
                               slot store+reload. Opt-in IR_BYTE_REMAT. */
+    const Op **long_rmw_ld; /* per-vreg: the first load of a `g op= h` long read-modify-write on
+                               a global; the op that has v as its right operand walks both */
+    const Op **long_rmw_st; /* per-vreg: result vreg of such an op -> its store, which is skipped */
+    const Op **long_mem;  /* per-vreg: a width-4 single-use global load whose next op
+                             is the long ADD/SUB/AND/OR/XOR taking it as its right
+                             operand; the load is skipped and read at that op */
 } HomeCtx;
 static HomeCtx g_hc = { .de_home = -1, .func_whome = -1 };
 
@@ -251,6 +257,19 @@ static const Op *byte_remat_of(const Func *f, int v)
     if (!g_hc.byte_remat || v < 0 || v >= f->n_vregs) return NULL;
     return g_hc.byte_remat[v];
 }
+static const Op *long_rmw_ld_of(const Func *f, int v)
+{
+    if (!g_hc.long_rmw_ld || v < 0 || v >= f->n_vregs) return NULL;
+    return g_hc.long_rmw_ld[v];
+}
+
+/* The deferred global load for long vreg v, or NULL. */
+static const Op *long_mem_of(const Func *f, int v)
+{
+    if (!g_hc.long_mem || v < 0 || v >= f->n_vregs) return NULL;
+    return g_hc.long_mem[v];
+}
+
 /* Format the global operand of a byte-remat load into buf as `_sym[+off]`. */
 static void byte_remat_symstr(char *buf, size_t n, const Op *o)
 {
@@ -9069,6 +9088,115 @@ static int ir_lower_func_body(FILE *out, Func *f)
             }
         }
     }
+    /* long-mem-rhs: a width-4 integer global load read once, by the very next
+       op, as the right operand of a long ADD/SUB/AND/OR/XOR is not loaded; that
+       op reads the global in place. */
+    g_hc.long_mem = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                           sizeof(const Op *));
+    if (g_hc.long_mem && !opt_disabled("long-mem-rhs")) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            const BB *bb = &f->bbs[b];
+            for (int j = 0; j + 1 < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j], *u = &bb->ops[j + 1];
+                int d = o->dst;
+                if (o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_SYM) continue;
+                if (d < 0 || d >= f->n_vregs || f->vregs[d].width != 4) continue;
+                if (!vreg_kind_is_integer(f, d)) continue;
+                if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_NO_SLOT | IR_VREG_CALL_SPLIT))
+                    continue;
+                if (o->mem.volatile_ || !o->mem.sym || ns_sym_bails(o->mem.sym)
+                    || mem_bank_fn(&o->mem))
+                    continue;
+                if (u->kind != IR_ADD && u->kind != IR_SUB && u->kind != IR_AND
+                    && u->kind != IR_OR && u->kind != IR_XOR) continue;
+                int other = (u->src[1] == d) ? u->src[0]
+                          : (u->kind != IR_SUB && u->src[0] == d) ? u->src[1] : -1;
+                if (other < 0 || other == d
+                    || u->dst < 0 || f->vregs[u->dst].width != 4
+                    || !vreg_kind_is_integer(f, u->dst)
+                    || f->vregs[other].width != 4)
+                    continue;
+                if (vreg_is_pr_dehl(f, d) || vreg_in_pr_bc(f, d)) continue;
+                if (bb->live_out
+                    && ir_bitset_get((const BitSet *)bb->live_out, d)) continue;
+                int nuse = 0, ndef = 0;
+                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
+                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
+                        const Op *p = &f->bbs[bb2].ops[k];
+                        int df[8]; int nd = ir_op_defs(p, df, 8);
+                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
+                        int us[16]; int nu = ir_op_uses(p, us, 16);
+                        for (int t = 0; t < nu; t++) if (us[t] == d) nuse++;
+                    }
+                if (ndef != 1 || nuse != 1) continue;
+                /* The other operand parked on the data stack is popped by the
+                   generic path only. */
+                int parked = 0;
+                for (int k = 0; k < bb->n_ops && !parked; k++)
+                    if (bb->ops[k].kind == IR_PUSH_DEHL_LONG
+                        && bb->ops[k].src[0] == other)
+                        parked = 1;
+                if (parked) continue;
+                g_hc.long_mem[d] = o;
+                f->vregs[d].flags |= IR_VREG_NO_SLOT;
+            }
+        }
+    }
+    /* long-rmw-walk: `g op= h` on long globals, 8080 family and gbz80, where the
+       result feeds only the store back to g: both globals are walked a byte at a
+       time through A, so nothing is loaded or parked. */
+    g_hc.long_rmw_ld = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(const Op *));
+    g_hc.long_rmw_st = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(const Op *));
+    if (g_hc.long_rmw_ld && g_hc.long_rmw_st && g_hc.long_mem
+        && (IS_808x() || IS_GBZ80()) && !opt_disabled("long-rmw-walk")) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            const BB *bb = &f->bbs[b];
+            for (int j = 0; j + 3 < bb->n_ops; j++) {
+                const Op *ld = &bb->ops[j], *op = &bb->ops[j + 2], *st = &bb->ops[j + 3];
+                const Op *l2 = &bb->ops[j + 1];
+                int v0 = ld->dst, v2 = l2->dst, v1 = op->dst;
+                if (ld->kind != IR_LD_MEM || ld->mem.kind != IR_MEM_SYM) continue;
+                if (l2->kind != IR_LD_MEM || !long_mem_of(f, v2)) continue;
+                if (st->kind != IR_ST_MEM || st->mem.kind != IR_MEM_SYM || st->mem.chain) continue;
+                if (op->kind != IR_ADD && op->kind != IR_SUB && op->kind != IR_AND
+                    && op->kind != IR_OR && op->kind != IR_XOR) continue;
+                if (v0 < 0 || v1 < 0 || v0 >= f->n_vregs || v1 >= f->n_vregs) continue;
+                if (f->vregs[v0].width != 4 || !vreg_kind_is_integer(f, v0)) continue;
+                if (ld->mem.volatile_ || st->mem.volatile_ || !ld->mem.sym || ns_sym_bails(ld->mem.sym)
+                    || mem_bank_fn(&ld->mem) || mem_bank_fn(&st->mem))
+                    continue;
+                if (st->mem.sym != ld->mem.sym || st->mem.offset != ld->mem.offset) continue;
+                if (st->src[0] != v1) continue;
+                int ok = (op->src[0] == v0 && op->src[1] == v2)
+                      || (op->kind != IR_SUB && op->src[0] == v2 && op->src[1] == v0);
+                if (!ok) continue;
+                if (f->vregs[v0].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_NO_SLOT
+                                          | IR_VREG_CALL_SPLIT)) continue;
+                if (f->vregs[v1].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_CALL_SPLIT))
+                    continue;
+                if (vreg_in_pr_bc(f, v0) || vreg_in_pr_bc(f, v1)) continue;
+                /* v0 and v1: exactly one def and one use, none live out */
+                int n0 = 0, n1 = 0, d0 = 0, d1 = 0;
+                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
+                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
+                        const Op *p = &f->bbs[bb2].ops[k];
+                        int df[8]; int nd = ir_op_defs(p, df, 8);
+                        for (int t = 0; t < nd; t++) { if (df[t] == v0) d0++; if (df[t] == v1) d1++; }
+                        int us[16]; int nu = ir_op_uses(p, us, 16);
+                        for (int t = 0; t < nu; t++) { if (us[t] == v0) n0++; if (us[t] == v1) n1++; }
+                    }
+                if (d0 != 1 || n0 != 1 || d1 != 1 || n1 != 1) continue;
+                if (bb->live_out && (ir_bitset_get((const BitSet *)bb->live_out, v0)
+                                     || ir_bitset_get((const BitSet *)bb->live_out, v1)))
+                    continue;
+                g_hc.long_rmw_ld[v0] = ld;
+                g_hc.long_rmw_st[v1] = st;
+                f->vregs[v0].flags |= IR_VREG_NO_SLOT;
+                f->vregs[v1].flags |= IR_VREG_NO_SLOT;
+            }
+        }
+    }
     /* Auto-push param (opt-in IR_AUTOPUSH_PARAM): a fastcall register param that
        spills is materialised by a `push` at entry instead of stash+alloc+store.
        Flag it here (vreg_to_phys is final) so ir_assign_slots places it at the
@@ -9877,6 +10005,9 @@ static int ir_lower_func_body(FILE *out, Func *f)
     free(L.bb_byte_out_dirty); L.bb_byte_out_dirty = NULL;
     free(g_hc.remat_def); g_hc.remat_def = NULL;
     free(g_hc.byte_remat); g_hc.byte_remat = NULL;
+    free(g_hc.long_mem); g_hc.long_mem = NULL;
+    free(g_hc.long_rmw_ld); g_hc.long_rmw_ld = NULL;
+    free(g_hc.long_rmw_st); g_hc.long_rmw_st = NULL;
     free(bb_lowered);
     free(bb_pred_cnt);
     for (int i = 0; i < f->n_bbs; i++) free(bb_preds[i]);
@@ -11323,7 +11454,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         other_dies = od;
                     }
                     if (is_bitop && w4 && dst_in_src0
-                        && other_at_km1 && other_dies)
+                        && other_at_km1 && other_dies
+                        && !long_mem_of(f, bb->ops[consumer - 1].dst))
                         L.la.cur_dehl_push_to_stack = 1;
                 }
             }

@@ -3395,6 +3395,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
         commit_hl_word(out, f, op->dst);
         return 0;
     }
+    if (long_mem_of(f, op->dst) || long_rmw_ld_of(f, op->dst)) return 0;   /* read in place by its user */
     emit_ns_switch(out, mem_bank_fn(&op->mem));   /* __addressmod: page in */
     if (op->dst >= 0 && f->vregs[op->dst].width > 4) {
         /* Wide load: address into HL, acc_load→accumulator, store→dst slot. */
@@ -4935,6 +4936,115 @@ static int addbc_enabled(void)
     return v;
 }
 
+/* [long-rmw-walk] `g op= h` on long globals: walk both a byte at a time through
+   A and write the result straight back to g. The first load, the second load
+   and the store are skipped; this op does all of it. */
+static int gen_long_rmw_walk(FILE *out, Func *f, const Op *op)
+{
+    if (op->dst < 0 || !g_hc.long_rmw_st || !g_hc.long_rmw_st[op->dst]) return 0;
+    int gv = long_rmw_ld_of(f, op->src[0]) ? op->src[0] : op->src[1];
+    int hv = (gv == op->src[0]) ? op->src[1] : op->src[0];
+    const Op *g = long_rmw_ld_of(f, gv), *h = long_mem_of(f, hv);
+    if (!g || !h) return 0;
+    char gs[96], hs[96];
+    snprintf(gs, sizeof gs, "%s%s%+d", ir_sym_prefix(g->mem.sym), ir_sym_name(g->mem.sym), g->mem.offset);
+    snprintf(hs, sizeof hs, "%s%s%+d", ir_sym_prefix(h->mem.sym), ir_sym_name(h->mem.sym), h->mem.offset);
+    int sub = (op->kind == IR_SUB);
+    const char *a0 = op->kind == IR_ADD ? "add\ta,(hl)" : sub ? "sub\t(hl)"
+                   : op->kind == IR_AND ? "and\t(hl)" : op->kind == IR_OR ? "or\t(hl)" : "xor\t(hl)";
+    const char *an = op->kind == IR_ADD ? "adc\ta,(hl)" : sub ? "sbc\ta,(hl)" : a0;
+    pending_spill_resolve();
+    invalidate_hl_cache();
+    if (IS_GBZ80() && !sub) {
+        /* HL walks g (read and written back), DE walks h */
+        emit(out, "ld\thl,%s", gs);
+        emit(out, "ld\tde,%s", hs);
+        for (int i = 0; i < 4; i++) {
+            emit(out, "ld\ta,(de)");
+            emit(out, "%s", i == 0 ? a0 : an);
+            emit(out, i < 3 ? "ld\t(hl+),a" : "ld\t(hl),a");
+            if (i < 3) emit(out, "inc\tde");
+        }
+    } else {
+        /* HL walks h, DE walks g */
+        emit(out, "ld\thl,%s", hs);
+        emit(out, "ld\tde,%s", gs);
+        for (int i = 0; i < 4; i++) {
+            emit(out, "ld\ta,(de)");
+            emit(out, "%s", i == 0 ? a0 : an);
+            emit(out, "ld\t(de),a");
+            if (i < 3) { emit(out, "inc\tde"); emit(out, "inc\thl"); }
+        }
+    }
+    L.la.cur_skip_next_op = 1;     /* the store back to g is done */
+    return 1;
+}
+
+/* [long-mem-rhs] Long ADD/SUB/AND/OR/XOR whose right operand is the global the
+   preceding (skipped) load named: the global is read in place. Returns 0 when
+   the op does not have that shape. */
+static int gen_long_mem_rhs(FILE *out, Func *f, const Op *op)
+{
+    if (gen_long_rmw_walk(out, f, op)) return 1;
+    int lhs = op->src[0], rhs = op->src[1];
+    const Op *m = long_mem_of(f, rhs);
+    if (!m && op->kind != IR_SUB && (m = long_mem_of(f, lhs)) != NULL) {
+        lhs = rhs; rhs = op->src[0];            /* commutative: operands swapped upstream */
+    }
+    if (!m) return 0;
+    char s0[96], s2[96];
+    const char *pfx = ir_sym_prefix(m->mem.sym), *nm = ir_sym_name(m->mem.sym);
+    snprintf(s0, sizeof s0, "%s%s%+d", pfx, nm, m->mem.offset);
+    snprintf(s2, sizeof s2, "%s%s%+d", pfx, nm, m->mem.offset + 2);
+    int add = (op->kind == IR_ADD), sub = (op->kind == IR_SUB);
+    load_to_dehl(out, f, lhs);
+    if ((add || sub) && !IS_808x() && !IS_GBZ80()) {
+        /* DEHL = LHS; the global's halves go through BC. */
+        emit(out, "ld	bc,(%s)", s0);
+        if (sub) emit(out, "and	a");
+        emit(out, sub ? "sbc	hl,bc" : "add	hl,bc");
+        emit_ex_de_hl(out);
+        emit(out, "ld	bc,(%s)", s2);
+        emit(out, sub ? "sbc	hl,bc" : "adc	hl,bc");
+        emit_ex_de_hl(out);
+        store_dehl_finalize(out, f, op->dst);
+        return 1;
+    }
+    if (!add && !sub && !IS_GBZ80()) {
+        /* Absolute byte reads through A: no pointer and no BC shuffle. */
+        static const char *rr[4] = { "l", "h", "e", "d" };
+        const char *mn = add ? "add\ta," : op->kind == IR_AND ? "and\t"
+                       : op->kind == IR_OR ? "or\t" : "xor\t";
+        const char *mc = add ? "adc\ta," : mn;
+        for (int i = 0; i < 4; i++) {
+            char sb[96];
+            snprintf(sb, sizeof sb, "%s%s%+d", pfx, nm, m->mem.offset + i);
+            emit(out, "ld\ta,(%s)", sb);
+            emit(out, "%s%s", i == 0 ? mn : mc, rr[i]);
+            emit(out, "ld\t%s,a", rr[i]);
+        }
+        store_dehl_finalize(out, f, op->dst);
+        return 1;
+    }
+    /* Byte-wise through A with HL walking the global; the LHS is in BC (low)
+       and DE (high), which is where the sink expects the result. */
+    static const char *r[4] = { "c", "b", "e", "d" };
+    const char *a0 = add ? "add	a,(hl)" : sub ? "sub	(hl)"
+                   : op->kind == IR_AND ? "and	(hl)"
+                   : op->kind == IR_OR  ? "or	(hl)" : "xor	(hl)";
+    const char *an = add ? "adc	a,(hl)" : sub ? "sbc	a,(hl)" : a0;
+    emit(out, "ld	hl,%s", s0);
+    for (int i = 0; i < 4; i++) {
+        emit(out, "ld	a,%s", r[i]);
+        emit(out, "%s", i == 0 ? a0 : an);
+        emit(out, "ld	%s,a", r[i]);
+        if (i < 3) emit(out, "inc	hl");
+    }
+    L.la.cur_dehl_bc_is_low = 1;
+    store_dehl_finalize(out, f, op->dst);
+    return 1;
+}
+
 static int gen_add(FILE *out, Func *f, const Op *op)
 {
     /* LRA Phase 2b: accumulate directly in an index home. When dst is IX/IY-homed
@@ -5022,6 +5132,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
     if (op->dst >= 0 && f->vregs[op->dst].width == 4
         && vreg_kind_is_integer(f, op->dst)) {
         if (sap_pair == op) return sap_tail(out, f, op);
+        if (gen_long_mem_rhs(out, f, op)) return 0;
         /* Long add. Operand b pushed (HIGH then LOW), then DEHL = a.
            Inline the helper body directly — calling l_long_add would
            clobber IX (helper uses `pop ix` to stash retaddr), which
@@ -5424,6 +5535,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
     }
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         if (sap_pair == op) return sap_tail(out, f, op);
+        if (gen_long_mem_rhs(out, f, op)) return 0;
         if (op->src[1] == -1) {
             uint32_t k = (uint32_t)op->imm;
             /* In-place const SUB on a stack slot (mirror of the ADD
@@ -6068,6 +6180,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
         return finalize_byte_result(out, f, op, 0);
     }
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
+        if (gen_long_mem_rhs(out, f, op)) return 0;
         /* Long AND-mask + immediately-following BR_ZERO/COND fastpath
            (`(crc & 1UL) ? ...` bit-test). When the mask hits exactly one
            of the 4 bytes, byte-AND that byte and branch on Z — vs the full
