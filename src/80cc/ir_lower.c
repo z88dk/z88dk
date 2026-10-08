@@ -8387,6 +8387,7 @@ static int br_value_dead_after(const Func *f, const BB *bb, int j)
     return 1;
 }
 
+static int cmp_bytewise_mem_shape_ok(const Func *f, const Op *o);
 static int def_dst_dead(const Func *f, const BB *bb, int j)
 {
     const Op *op = &bb->ops[j];
@@ -8449,9 +8450,14 @@ static int def_dst_dead(const Func *f, const BB *bb, int j)
                     && ko->hcall->acc_subkind == ACC_SUB_INT2ACC
                     && ko->hcall->n_args == 1 && ko->hcall->args[0] == op->dst
                     && (f->vregs[op->dst].width == 2 || f->vregs[op->dst].width == 4);
+                /* The fp slot-to-slot compare reads both operands in place,
+                   whatever the registers hold. */
+                int slot_cmp = ko->kind >= IR_CMP_ULT && ko->kind <= IR_CMP_UGE
+                    && cmp_bytewise_mem_shape_ok(f, ko);
                 int cache_served =
                     allow_cache_hit &&
                     k == j + 1 &&
+                    !slot_cmp &&
                     !k_redefs_dst &&
                     (conv_served ||
                      (ko->src[cache_pos] == op->dst &&
