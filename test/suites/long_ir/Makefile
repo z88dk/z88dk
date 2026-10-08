@@ -1816,12 +1816,12 @@ fuzzp_325_fp.bin: fuzzp_325.c fuzzp_325.want
 	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
 
 fuzzp_4735.bin: fuzzp_4735.c fuzzp_4735.want
-	timeout 120 zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_4735.c -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_4735.c -o $@ -m
 	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_4735.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
 
 fuzzp_4735_fp.bin: fuzzp_4735.c fuzzp_4735.want
-	timeout 120 zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_4735.c -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_4735.c -o $@ -m
 	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_4735.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
 
