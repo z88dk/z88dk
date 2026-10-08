@@ -121,5 +121,11 @@ extern void __LIB__ intrinsic_slp(void) __smallc;
 
 #endif
 
+#if defined(__LLVMZ80) || defined(__CLANG)
+
+#define intrinsic_label(name)  __asm__(#name ":")
+
+#endif
+
 
 #endif
