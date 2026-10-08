@@ -2435,8 +2435,78 @@ static int finalize_byte_result(FILE *out, Func *f, const Op *op,
     return 0;
 }
 
+/* [shl-add-pair] `t = x << n; r = t + x` and `r = t - x` on longs (the 2^a+1 and
+   2^a-1 constant multiplies, and any C of that shape). The shift saves x on the
+   stack (push de; push hl, 2 bytes) and the add or subtract pops it back, where
+   reloading x from its slot costs 14 bytes for an add and 27 for a subtract.
+   The pair is decided when the shift is lowered, by looking at the next op, and
+   the add or subtract must follow immediately: if it does not take the saved
+   words the stack is wrong, so that is a hard error. */
+static const Op *sap_pair;
+static int       sap_adj, sap_t;
+
+static const Op *shl_addsub_pair(const Func *f, const Op *op)
+{
+    if (opt_disabled("shl-add-pair")) return NULL;
+    if (IS_808x() || IS_GBZ80()) return NULL;
+    if (!cur_bb || cur_op_idx < 0 || cur_op_idx + 1 >= cur_bb->n_ops) return NULL;
+    if (&cur_bb->ops[cur_op_idx] != op) return NULL;
+    const Op *nx = &cur_bb->ops[cur_op_idx + 1];
+    if (nx->kind != IR_ADD && nx->kind != IR_SUB) return NULL;
+    int x = op->src[0], t = op->dst;
+    if (x < 0 || t < 0 || x == t || nx->dst < 0 || nx->src[0] < 0 || nx->src[1] < 0)
+        return NULL;
+    if (f->vregs[x].width != 4 || f->vregs[t].width != 4
+        || f->vregs[nx->dst].width != 4)
+        return NULL;
+    if (!vreg_kind_is_integer(f, t) || !vreg_kind_is_integer(f, nx->dst))
+        return NULL;
+    int ok = (nx->src[0] == t && nx->src[1] == x)
+          || (nx->kind == IR_ADD && nx->src[0] == x && nx->src[1] == t);
+    if (!ok) return NULL;
+    if (find_unique_use(f, t) != nx) return NULL;
+    if (cur_bb->live_out && ir_bitset_get((const BitSet *)cur_bb->live_out, t))
+        return NULL;
+    if (vreg_is_pr_stack(f, t)
+        || (f->vregs[t].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)))
+        return NULL;
+    return nx;
+}
+
+/* The add or subtract half: DEHL = t, x's two words on the stack. */
+static int sap_tail(FILE *out, Func *f, const Op *op)
+{
+    if (sap_pair != op || L.cur_sp_adjust != sap_adj || !dehl_has(sap_t)) {
+        ir_lower_loc();
+        fprintf(stderr, "ir_lower: shl-add-pair lost its saved operand\n");
+        ir_lower_src();
+        exit(1);
+    }
+    sap_pair = NULL;
+    if (op->kind == IR_ADD) {
+        emit_sp(out, -2, "pop\tbc");           /* BC = x.LOW */
+        emit(out, "add\thl,bc");
+        emit_ex_de_hl(out);                    /* DE = LOW result, HL = t.HIGH */
+        emit_sp(out, -2, "pop\tbc");           /* BC = x.HIGH */
+        emit(out, "adc\thl,bc");
+    } else {
+        emit_sp(out, -2, "pop\tbc");
+        emit(out, "or\ta");                    /* clear carry */
+        emit(out, "sbc\thl,bc");
+        emit_ex_de_hl(out);
+        emit_sp(out, -2, "pop\tbc");
+        emit(out, "sbc\thl,bc");
+    }
+    emit_ex_de_hl(out);                        /* DEHL = result */
+    invalidate_hl_bc();
+    invalidate_de_cache();
+    store_dehl_finalize(out, f, op->dst);
+    return 0;
+}
+
 static int gen_shl(FILE *out, Func *f, const Op *op)
 {
+    sap_pair = NULL;
     int skip_byte = L.la.cur_skip_shl_byte;
     L.la.cur_skip_shl_byte = 0;
     /* General DE-home indexed deref: when this const-shift's ONLY use is an
@@ -2608,6 +2678,17 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
         if (IS_808x()) {
             gen_808x_long_const_shift(out, f, op, count, 0);
             return 0;
+        }
+        {
+            const Op *pr = (op->dst != op->src[0]) ? shl_addsub_pair(f, op) : NULL;
+            if (pr) {
+                load_to_dehl(out, f, op->src[0]);
+                emit_sp(out, 2, "push\tde");       /* x.HIGH */
+                emit_sp(out, 2, "push\thl");       /* x.LOW */
+                sap_pair = pr;
+                sap_t = op->dst;
+                sap_adj = L.cur_sp_adjust;
+            }
         }
         int byte_shift = count / 8;
         int bit_shift  = count % 8;
@@ -4874,6 +4955,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
     }
     if (op->dst >= 0 && f->vregs[op->dst].width == 4
         && vreg_kind_is_integer(f, op->dst)) {
+        if (sap_pair == op) return sap_tail(out, f, op);
         /* Long add. Operand b pushed (HIGH then LOW), then DEHL = a.
            Inline the helper body directly — calling l_long_add would
            clobber IX (helper uses `pop ix` to stash retaddr), which
@@ -5256,6 +5338,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         return finalize_byte_result(out, f, op, 0);
     }
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
+        if (sap_pair == op) return sap_tail(out, f, op);
         if (op->src[1] == -1) {
             uint32_t k = (uint32_t)op->imm;
             /* In-place const SUB on a stack slot (mirror of the ADD

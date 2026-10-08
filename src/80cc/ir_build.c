@@ -1505,6 +1505,21 @@ static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
     for (int i = 0; i < 64; i++) if ((u >> i) & 1u) { hi_bit = i; pop++; }
     if (hi_bit > maxsh) return -1;              /* top term shifts out of range */
 
+    /* A 32-bit chain is several shifts and adds, each a multi-instruction
+       sequence, against a 9-byte call to l_long_mult_u that costs about 1000
+       ticks. Measured over every constant to 130: 2^a+1 and 2^a-1 (one shift,
+       one add or subtract) save 600-900 ticks for 40-50 bytes, 13 ticks a byte
+       or better; any chain with a second shifted term or a Horner run (6, 10,
+       12, 20, 24, 25, 100 ...) costs 66-85 bytes for 5-8 ticks a byte, and
+       1000 costs 160 bytes to save 28 ticks. So only a power of two, 2^a+1
+       and 2^a-1 stay inline. `--opt-disable=long-mult-sr` inlines them all. */
+    if (w == 4 && !opt_disabled("long-mult-sr")) {
+        uint64_t lbit = u & (~u + 1u), upl = u + lbit;
+        int plus_minus_one = (pop == 2 && lo_bit == 0)
+                          || (lo_bit == 0 && (upl & (upl - 1)) == 0);
+        if (pop != 1 && !plus_minus_one) return -1;
+    }
+
     if (pop == 1)                               /* pure power of two */
         return sr_shift_left(b, v, lo_bit, w);
 

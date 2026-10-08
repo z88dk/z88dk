@@ -7501,6 +7501,14 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     lower_cur_file = op->file;
     lower_cur_line = op->line;
     lower_cur_op   = op;
+    /* A shift that saved its operand for the add or subtract after it
+       ([shl-add-pair]) must be followed by exactly that op. */
+    if (sap_pair && sap_pair != op) {
+        ir_lower_loc();
+        fprintf(stderr, "ir_lower: shl-add-pair left words on the stack\n");
+        ir_lower_src();
+        exit(1);
+    }
     switch (op->kind) {
 
     case IR_NOP:               return gen_nop(out, f, op);
