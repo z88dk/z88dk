@@ -3949,10 +3949,141 @@ static int cs_is_signed_cmp(OpKind k)
    ANDs, small constants, zero-extends, compare results and copies of those, so
    an `i = i + 1` induction variable fails it — which is exactly the shape in
    the localbench/widthbench loop tests. The two proofs are complementary. */
+/* ---- Guarded decrement of a non-negative induction variable ----------------
+   `for (x = 37; x > 29; x--)` never takes x below 29: the header test lets the
+   body run only while x >= 30, and the decrement is the one thing that changes x
+   in the loop. So a decrement by s is safe for non-negativity when the loop is a
+   simple header-tested range [h..latch], the header compares x >= L with the exit
+   branch outside the loop (a signed compare, so a negative x fails it), L >= s,
+   and the decrement is x's only definition inside the loop. */
+static int sd_reach(const Func *f, int *reach)
+{
+    int n = f->n_bbs;
+    int *stack = calloc((size_t)n, sizeof(int));
+    if (!stack) return 0;
+    int sp = 0;
+    for (int i = 0; i < n; i++) reach[i] = 0;
+    reach[0] = 1; stack[sp++] = 0;
+    while (sp > 0) {
+        BB *cbb = &f->bbs[stack[--sp]];
+        int ns = ir_bb_n_succ(cbb);
+        for (int s = 0; s < ns; s++) {
+            int sid = ir_bb_succ_at(cbb, s);
+            if (sid >= 0 && sid < n && !reach[sid]) { reach[sid] = 1; stack[sp++] = sid; }
+        }
+    }
+    free(stack);
+    return 1;
+}
+
+static int sd_has_succ(BB *bb, int target)
+{
+    int ns = ir_bb_n_succ(bb);
+    for (int s = 0; s < ns; s++)
+        if (ir_bb_succ_at(bb, s) == target) return 1;
+    return 0;
+}
+
+/* The innermost simple loop [*h..*l] holding block b: one entry (from a lower
+   block), one back edge, no reachable block outside the range branching into it
+   except at the header. 0 if there is none. */
+static int sd_simple_loop(const Func *f, const int *reach, int b, int *h, int *l)
+{
+    int n = f->n_bbs;
+    for (int cand = b; cand >= 0; cand--) {
+        if (!reach[cand]) continue;
+        int latch = -1, n_back = 0, n_entry = 0;
+        for (int p = 0; p < n; p++) {
+            if (!reach[p] || !sd_has_succ((BB *)&f->bbs[p], cand)) continue;
+            if (p < cand) n_entry++;
+            else { n_back++; latch = p; }
+        }
+        if (n_back != 1 || n_entry != 1 || latch < b) continue;
+        if (!licm_reaches((Func *)f, cand, latch)) continue;
+        for (int o = 0; o < n; o++) {
+            if (!reach[o] || (o >= cand && o <= latch)) continue;
+            int ns = ir_bb_n_succ((BB *)&f->bbs[o]);
+            for (int s = 0; s < ns; s++) {
+                int t = ir_bb_succ_at((BB *)&f->bbs[o], s);
+                if (t > cand && t <= latch) return 0;     /* a second way in */
+            }
+        }
+        *h = cand; *l = latch;
+        return 1;
+    }
+    return 0;
+}
+
+/* Step size if op is an in-place decrement of v, else 0. */
+static long sd_dec_step(const Op *op, int v)
+{
+    if (op->dst != v || op->src[0] != v) return 0;
+    if (op->kind == IR_DEC && op->src[1] == -1) return op->imm ? op->imm : 1;
+    if (op->kind == IR_SUB && op->src[1] == -1 && op->imm > 0) return op->imm;
+    if (op->kind == IR_ADD && op->src[1] == -1 && op->imm < 0) return -op->imm;
+    return 0;
+}
+
+static int sd_dec_guarded(const Func *f, int v, int db, int dj)
+{
+    if (opt_disabled("cmp-unsign-dec")) return 0;
+    long s = sd_dec_step(&f->bbs[db].ops[dj], v);
+    if (s <= 0) return 0;
+    int n = f->n_bbs;
+    int *reach = malloc((size_t)n * sizeof(int));
+    if (!reach) return 0;
+    int ok = 0, h, l;
+    if (sd_reach(f, reach) && reach[db] && sd_simple_loop(f, reach, db, &h, &l)
+        && db != h) {
+        /* the decrement is v's only definition in the loop */
+        int defs = 0;
+        for (int b = h; b <= l; b++) {
+            if (!reach[b]) continue;
+            for (int j = 0; j < f->bbs[b].n_ops; j++)
+                if (f->bbs[b].ops[j].dst == v) defs++;
+        }
+        if (defs == 1) {
+            const BB *hb = &f->bbs[h];
+            for (int j = 0; j + 1 < hb->n_ops && !ok; j++) {
+                const Op *c = &hb->ops[j], *br = &hb->ops[j + 1];
+                if ((c->kind != IR_CMP_GE && c->kind != IR_CMP_GT)
+                    || c->src[0] != v || c->src[1] != -1 || c->imm_sym
+                    || c->dst < 0)
+                    continue;
+                if (br->kind != IR_BR_ZERO || br->src[0] != c->dst) continue;
+                if (br->label < h || br->label > l) {       /* false leaves the loop */
+                    long lo = (c->kind == IR_CMP_GE) ? c->imm : c->imm + 1;
+                    if (lo >= s && lo >= 0) ok = 1;
+                }
+            }
+        }
+    }
+    free(reach);
+    return ok;
+}
+
+/* Is compare block cb inside a loop whose decrement of v is guarded? */
+static int sd_cb_in_guarded_loop(const Func *f, int cb, int v)
+{
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            if (sd_dec_step(&f->bbs[b].ops[j], v) <= 0) continue;
+            if (!sd_dec_guarded(f, v, b, j)) continue;
+            int n = f->n_bbs, h, l, ok = 0;
+            int *reach = malloc((size_t)n * sizeof(int));
+            if (reach && sd_reach(f, reach) && reach[b]
+                && sd_simple_loop(f, reach, b, &h, &l) && cb >= h && cb <= l)
+                ok = 1;
+            free(reach);
+            if (ok) return 1;
+        }
+    return 0;
+}
+
 static int v_nonneg_iv(const Func *f, int v)
 {
     if (v_defs_not_complete(f, v)) return 0;
-    int seen_init = 0, seen_step = 0;
+    int seen_init = 0, seen_step = 0, seen_dec = 0;
     for (int b = 0; b < f->n_bbs; b++) {
         const BB *bb = &f->bbs[b];
         for (int j = 0; j < bb->n_ops; j++) {
@@ -3961,6 +4092,10 @@ static int v_nonneg_iv(const Func *f, int v)
             if (op->kind == IR_LD_IMM) {
                 if (op->imm < 0) return 0;
                 seen_init = 1; continue;
+            }
+            if (sd_dec_step(op, v) > 0) {
+                if (!sd_dec_guarded(f, v, b, j)) return 0;
+                seen_dec = 1; continue;
             }
             /* in-place step by a positive immediate */
             if ((op->kind == IR_ADD || op->kind == IR_INC)
@@ -3974,7 +4109,7 @@ static int v_nonneg_iv(const Func *f, int v)
             return 0;                                /* any other def: unknown */
         }
     }
-    return seen_init && seen_step;
+    return seen_init && (seen_step || seen_dec);
 }
 
 /* The step immediate of a non-negative IV (0 if not one / unknown). */
@@ -4062,6 +4197,12 @@ static int cs_operand_safe(const Func *f, int cb, int x, long imm, long bound,
     /* A non-negative induction variable only rises, so it needs the compare to
        be what STOPS it — see cs_compare_bounds_loop. */
     if (v_nonneg_iv(f, x)) {
+        /* In a loop whose only change to x is a guarded decrement, x stays >= 0
+           wherever the compare is. */
+        if (sd_cb_in_guarded_loop(f, cb, x)) {
+            if (why) *why = "nonneg-dec";
+            return 1;
+        }
         long step = v_iv_step(f, x);
         if (why) *why = "nonneg-iv";
         return step > 0 && bound >= 0 && bound + step - 1 <= 32767
@@ -4101,6 +4242,12 @@ int ir_opt_cmp_unsign(Func *f)
     if (!f) return 0;
     if (opt_disabled("cmp-unsign")) return 0;
     int changed = 0;
+    /* Decide every compare first, convert afterwards: converting a loop's test to
+       unsigned would otherwise hide the guard another compare's proof leans on. */
+    int cap = 0, ncv = 0;
+    for (int b = 0; b < f->n_bbs; b++) cap += f->bbs[b].n_ops;
+    Op **cv = malloc((size_t)(cap > 0 ? cap : 1) * sizeof(Op *));
+    if (!cv) return 0;
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
         for (int j = 0; j < bb->n_ops; j++) {
@@ -4123,10 +4270,14 @@ int ir_opt_cmp_unsign(Func *f)
                 if (!cs_operand_safe(f, b, a, op->imm, bound, NULL)) continue;
                 if (bound < 0) continue;
             }
-            op->kind = cs_unsigned_of(op->kind);
-            changed++;
+            cv[ncv++] = op;
         }
     }
+    for (int i = 0; i < ncv; i++) {
+        cv[i]->kind = cs_unsigned_of(cv[i]->kind);
+        changed++;
+    }
+    free(cv);
     return changed;
 }
 
