@@ -67,6 +67,14 @@ Size across the corpus before implementing.
 
 ## Recently closed (ADR has the detail)
 
+- **Constant byte return loads L directly — ADR 0104.** `[byte-ret]`
+  replaces `ld a,N` / `ld l,a` with `ld l,N` when A is dead after the pair.
+  `ld a,0` stays with `[xor-a]`. The exit-path zero reload is not this
+  and stays refused.
+- **8085 BC word reload via LHLX — ADR 0103.** `[lhlx-bc]` replaces the
+  byte-walk-plus-`ld hl,bc` fill when DE and F are dead after it. Not the
+  ADR 0038 cost rows, and not the live-DE address form ADR 0039 left alone.
+
 - **idx2 live-range reuse — ADR 0101.** The idx2 slot hosts non-overlapping
   live ranges instead of one whole-function owner. Measures zero today (BC's
   own multi-occupant check already claims every real disjoint-pair case

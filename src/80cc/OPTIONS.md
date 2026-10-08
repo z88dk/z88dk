@@ -187,6 +187,8 @@ exists (ADR 0010).
 | `switch-byte-a` | a `char` switch scrutinee is widened to HL instead of staying in A |
 | `gpderef` | no general-pointer dereference form |
 | `lhlx-deref` | no `ld hl,(de)` dereference on the CPUs that have it |
+| `lhlx-bc` | an 8085 word reload into BC stays a byte walk plus `ld hl,bc`, instead of LDSI + LHLX |
+| `byte-ret` | a constant byte return stays `ld a,N` / `ld l,a` instead of `ld l,N` |
 | `lhlx-long` | no LDSI-based long load on 8085 |
 | `shlx-store` | no `ld (de),hl` store form |
 | `idx-fill` | an index home is filled with a load pair rather than one ez80 instruction |
