@@ -2643,8 +2643,8 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
 /* [lhlx-bc] A BC word reload that is copied straight back into HL:
      ld hl,N / add hl,sp / ld c,(hl) / inc hl / ld b,(hl) / ld hl,bc
    On the 8085 that is a byte walk plus a pair copy. LDSI + LHLX already
-   leaves the word in HL, and two byte moves fill BC:
-     ld de,sp+N / ld hl,(de) / ld b,h / ld c,l
+   leaves the word in HL, and one pair copy fills BC:
+     ld de,sp+N / ld hl,(de) / ld bc,hl
    HL and BC end with the same word. DE ends holding the slot address, so
    D and E must be dead after the copy. `add hl,sp` writes carry and this
    sequence does not, so F must be dead too. N is LDSI's unsigned byte.
@@ -2656,7 +2656,7 @@ static int try_fold_8085_bc_lhlx(char **lines, char *drop, int i,
                                  int d_live, int e_live, int f_live)
 {
     int n;
-    char *a, *b, *c, *d;
+    char *a, *b, *c;
     if (!IS_8085() || opt_disabled("lhlx-bc") || d_live || e_live || f_live)
         return 0;
     if (i < 5 || drop[i] || drop[i - 1] || drop[i - 2] || drop[i - 3]
@@ -2673,14 +2673,12 @@ static int try_fold_8085_bc_lhlx(char **lines, char *drop, int i,
     if (!a) return 0;
     snprintf(a, 32, "\tld\tde,sp+%d\n", n);
     b = strdup("\tld\thl,(de)\n");
-    c = strdup("\tld\tb,h\n");
-    d = strdup("\tld\tc,l\n");
-    if (!b || !c || !d) { free(a); free(b); free(c); free(d); return 0; }
+    c = strdup("\tld\tbc,hl\n");
+    if (!b || !c) { free(a); free(b); free(c); return 0; }
     free(lines[i - 5]); lines[i - 5] = a;
     free(lines[i - 4]); lines[i - 4] = b;
     free(lines[i - 3]); lines[i - 3] = c;
-    free(lines[i - 2]); lines[i - 2] = d;
-    drop[i - 1] = drop[i] = 1;
+    drop[i - 2] = drop[i - 1] = drop[i] = 1;
     return 1;
 }
 

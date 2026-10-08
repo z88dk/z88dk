@@ -18,7 +18,7 @@ ld hl,bc
 ```
 
 `ld hl,(de)` (LHLX) already yields that word. The same bytes in BC are
-`ld b,h; ld c,l`.
+the pair copy `ld bc,hl`.
 
 ## Decision
 
@@ -28,8 +28,7 @@ line run with:
 ```
 ld de,sp+N
 ld hl,(de)
-ld b,h
-ld c,l
+ld bc,hl
 ```
 
 when all of these hold:

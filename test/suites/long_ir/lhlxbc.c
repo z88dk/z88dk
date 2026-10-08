@@ -2,7 +2,7 @@
  *
  * The fill is `ld hl,N; add hl,sp; ld c,(hl); inc hl; ld b,(hl)` and the
  * first use copies it back with `ld hl,bc`. On the 8085 that becomes
- * `ld de,sp+N; ld hl,(de); ld b,h; ld c,l` when DE and F are dead after
+ * `ld de,sp+N; ld hl,(de); ld bc,hl` when DE and F are dead after
  * the copy. The value must survive: a wrong walk reads the adjacent slot.
  *
  * keep (gate off) and 8080 (no LHLX) must return the same numbers.
