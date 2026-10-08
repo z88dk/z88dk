@@ -1565,6 +1565,24 @@ static int bc_tenant_live_to_call(const Func *f)
     if (lo < 0) return 1;
     int hi = bc_op_global_index(f, cur_bb, cur_bb->n_ops - 1);
     if (hi < lo) hi = lo;
+    /* The window ends at the call that closes this push group: a nested group
+       opens at its own first push (imm == 1) and closes at its own call. The
+       rest of the block is not part of this save; a tenant defined after the
+       call needs nothing preserved. If the group does not close in the block
+       the window stays at the block end. */
+    if (!opt_disabled("bc-save-group")) {
+        int depth = 1;
+        for (int j = cur_op_idx + 1; j < cur_bb->n_ops; j++) {
+            const Op *o = &cur_bb->ops[j];
+            if (o->kind == IR_PUSH_ARG && o->imm == 1) depth++;
+            else if (o->kind == IR_CALL && o->call && o->call->pre_pushed > 0
+                     && --depth == 0) {
+                int e = bc_op_global_index(f, cur_bb, j);
+                if (e >= lo) hi = e;
+                break;
+            }
+        }
+    }
     return bc_tenant_live_over(f, lo, hi);
 }
 

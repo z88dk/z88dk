@@ -2494,6 +2494,17 @@ static void emit_dehl_stack_push(FILE *out, int vreg_id)
     note_wide_noslot(vreg_id);
     /* BC already the low half (fused byte chain) — the stash would read a junk
        HL. The pushed image is the same either way. */
+    if (L.la.cur_dehl_push_nostash && !L.la.cur_dehl_bc_is_low
+        && !opt_disabled("f32-prepush-nostash")) {
+        /* The helper that pops this image is the value's only reader. */
+        emit(out, "push\tde");
+        emit(out, "push\thl");
+        L.cur_sp_adjust += 4;
+        L.la.cur_dehl_inline_push = vreg_id;
+        L.la.cur_dehl_inline_push_base_sp = L.cur_sp_adjust;
+        invalidate_hl_cache();
+        return;
+    }
     if (L.la.cur_dehl_bc_is_low) L.la.cur_dehl_bc_is_low = 0;
     else                         emit(out, "ld\tbc,hl");
     emit(out, "push\tde");
@@ -2515,17 +2526,30 @@ static void store_dehl_finalize(FILE *out, const Func *f, int vreg_id)
         /* [f32-prepush] push it for its helper instead of storing it */
         dpp_next = 0;
         note_wide_noslot(vreg_id);
-        if (L.la.cur_dehl_bc_is_low) L.la.cur_dehl_bc_is_low = 0;
-        else                         emit(out, "ld\tbc,hl");
-        emit(out, "push\tde");
-        emit(out, "push\tbc");
+        /* The value's only reader is the helper that pops this image (see
+           f32_prepush_ok), so nothing will ever want BC = low: push HL as it
+           stands instead of copying it to BC first. */
+        if (L.la.cur_dehl_bc_is_low) {
+            L.la.cur_dehl_bc_is_low = 0;
+            emit(out, "push\tde");
+            emit(out, "push\tbc");
+        } else if (!opt_disabled("f32-prepush-nostash")) {
+            emit(out, "push\tde");
+            emit(out, "push\thl");
+        } else {
+            emit(out, "ld\tbc,hl");
+            emit(out, "push\tde");
+            emit(out, "push\tbc");
+        }
         L.cur_sp_adjust += 4;
         dpp_v[dpp_n] = vreg_id;
         dpp_sp[dpp_n] = L.cur_sp_adjust;
         dpp_n++;
         invalidate_hl_cache();
-        hl_about_to_change(vreg_id);
-        cache_dehl(vreg_id);
+        if (opt_disabled("f32-prepush-nostash")) {
+            hl_about_to_change(vreg_id);
+            cache_dehl(vreg_id);
+        }
         L.la.cur_dehl_push_to_stack = 0;
         return;
     }

@@ -234,6 +234,9 @@ exists (ADR 0010).
 | `cmp-hi` | an unsigned `<`/`>=` against a constant compares both bytes |
 | `cmp-k` | a compare against a constant is not given its immediate form |
 | `cmp-k-signed` | (not on the 8085) a signed word compare against a constant is not done byte-wise through A (`sub K_lo; ld a,hi; rla; ccf; rra; sbc a,K_hi^0x80`), so it goes through `sbc hl,de` and the overflow correction |
+| `f32-prepush-nostash` | a 4-byte operand pushed at its definition for a helper call copies its low half to BC before pushing, instead of pushing HL |
+| `hcall-arg-nostash` | a 4-byte result read only as the register operand of the helper call after it copies its low half to BC first |
+| `bc-save-group` | the BC save at a pre-pushed call's first argument considers the rest of the block, not just the call it belongs to |
 | `add-k-reg` | a constant added to a word held in BC or DE is staged through `ld hl,bc; ld de,K; add hl,de` instead of `ld hl,K; add hl,bc` |
 | `cmp-k-load` | a word compare against a constant whose operand is not in a register or an index slot is staged through `ld de,K; and a; sbc hl,de` instead of loading it to HL and subtracting the immediate bytes through A |
 | `iv-narrow-unsigned` | a loop counter narrowed to a byte is still compared as a signed byte (`xor 0x80; cp K^0x80`) rather than with an unsigned `cp K` |

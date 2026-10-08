@@ -208,7 +208,7 @@ typedef struct {
            paths have to spend `ld hl,bc` purely to feed it back — 4 bytes and 16
            cycles of round trip per site. Consumed (and cleared) by the sinks. */
         int cur_dehl_bc_is_low;
-        int cur_push_dehl_bc_dead;
+        int cur_push_dehl_bc_dead, cur_dehl_push_nostash;
         int cur_dehl_dst_dead_safe, cur_dst_dead;
         int cur_remat_def_dead;  /* remat NO_SLOT def with no same-BB reader → skip it */
         int cur_br_value_dead;   /* BR_ZERO/COND: tested value dead after → test in place */
@@ -10986,6 +10986,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                (`ld l,c; ld h,b`), no slot read, no register clobber. */
             L.la.cur_dehl_dst_dead_safe = 0;
             L.la.cur_dehl_dst_no_bc_stash = 0;
+            L.la.cur_dehl_push_nostash = 0;
             /* [IR_SHRNARROW] A width-4 constant shift whose ONLY use is the
                CONV_TRUNC on its heels needs to compute just the bytes the
                truncation keeps: result byte i is source bits [8i+K, 8i+K+8),
@@ -11119,6 +11120,24 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                             break;
                         }
                     }
+                }
+            }
+            /* A 4-byte result read only as the register operand of the helper
+               call that follows: the helper clobbers BC, and the load that
+               feeds it takes the low half from HL when HL is advertised, so the
+               BC=low stash is dead. */
+            if (op->dst >= 0 && f->vregs[op->dst].width == 4
+                && j + 1 < bb->n_ops && !opt_disabled("hcall-arg-nostash")) {
+                const Op *hx = &bb->ops[j + 1];
+                const HelperInfo *hh = hx->hcall;
+                if (hx->kind == IR_HCALL && hh && hh->n_args - hh->n_stacked == 1
+                    && hh->args[hh->n_stacked] == op->dst
+                    && find_unique_use(f, op->dst) == hx
+                    && !(bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, op->dst))) {
+                    int other = 0;
+                    for (int a = 0; a < hh->n_stacked; a++)
+                        if (hh->args[a] == op->dst) other = 1;
+                    if (!other) L.la.cur_dehl_dst_no_bc_stash = 1;
                 }
             }
             if (L.la.cur_dst_dead && op->dst >= 0
@@ -11370,8 +11389,11 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         for (int a = ko->hcall->n_stacked;
                              a < ko->hcall->n_args; a++)
                             if (ko->hcall->args[a] == op->dst) also_reg = 1;
-                        if (!also_reg)
+                        if (!also_reg) {
                             L.la.cur_dehl_push_to_stack = 1;
+                            /* its only reader is that helper, which pops the image */
+                            L.la.cur_dehl_push_nostash = 1;
+                        }
                     }
                 }
             }
