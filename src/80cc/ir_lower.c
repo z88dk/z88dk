@@ -1938,7 +1938,13 @@ static int gw_kills_a(const char *line)
         return !gw_ops_touch_a(o + 2);             /* `ld a,a` reads A */
     }
     if (!strcmp(m, "pop"))  return !strncmp(o, "af", 2);
-    if (!strcmp(m, "xor"))  return o[0] == 'a' && !isalnum((unsigned char)o[1]);
+    if (!strcmp(m, "xor")) {
+        /* `xor a` and `xor a,a` zero A; `xor a,(sp+2)` (the Rabbit spelling of
+           a read-modify) reads it. */
+        if (o[0] != 'a') return 0;
+        if (o[1] == ',') return o[2] == 'a' && !isalnum((unsigned char)o[3]);
+        return !isalnum((unsigned char)o[1]);
+    }
     return 0;
 }
 
