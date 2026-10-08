@@ -1,8 +1,8 @@
-# ADR 0104 — Sinking a loop-carried init to its first use
+# ADR 0106 — Sinking a loop-carried init to its first use
 
 Status: **Rejected** (2026-10)
 
-Relates to ADR 0021 (per-value spill heuristics) and ADR 0103 (the framework
+Relates to ADR 0021 (per-value spill heuristics) and ADR 0105 (the framework
 cost).
 
 ## Context

@@ -4,13 +4,29 @@ The only file that states the current next action. Everything else in this
 directory is either durable (`adr/`), a measurement (`../../test/suites/BENCH_MATRIX.txt`),
 or historical.
 
-Last swept: 3/10/2026. Keep it short: a list of items to tackle next, not a
+Last swept: 8/10/2026. Keep it short: a list of items to tackle next, not a
 narrative — when a section stops describing what is live, it belongs in
 `adr/` or in git history, not here.
 
 ## Next action
 
-**START HERE: ptrbench, init_data's struct loop.** z80 `code_compiler`, from
+**START HERE: long compares against a global.** `if (a > b)`, `a == b` and
+`a < K` on long globals still load, park and walk the operands: on z80 (-O2,
+code section) `a > b` is 60 B against sccz80 20 and sdcc 38, `a > 1000` 34
+against 19 and 35, `a == 0` 26 against 18 and 28. Same cure as ADR 0111: a
+single-use global load that feeds the compare is read in place (`ld bc,(sym)`
+with `sbc hl,bc` on the Z80 family, bytes through A elsewhere), and the branch
+fuses with it. Measure on the console programs, not the corpus: the corpus has
+no long globals. Then, in order: the retained-result form of the gbz80 walk
+(`a += b; t = a`) and `c = a + b` with a third global on 8080/gbz80 (42 / 51 B
+against 25 / 22 for the in-place form); `a += K` on a long global (26 B against
+21 to 22); the `puts` substitution for a constant `printf("...\n")` (about 90
+calls in `startrek`, about 4 B each); deferred stack cleanup between calls (at
+most 415 to 440 B over the console set); a precise array-escape analysis to
+win back what ADR 0112 costs (`startrek` fp, `m4doors` 2 to 4 %); the ADR 0113
+prototype.
+
+**Then: ptrbench, init_data's struct loop.** z80 `code_compiler`, from
 the objects, 4/10/2026: 80cc fp 1381 B / sp 1458 B against sdcc 1160 B and
 xcc -Os 1074 B (3/10: 1418 / 1523). Size only; 80cc is the fastest of the
 three. Two changes on 4/10 (uncommitted at the time of writing):
@@ -145,7 +161,7 @@ total or the table looks 80cc-favourable.
 
 **Parked 4/10/2026: byte-scratch packing.** Re-sized on the final asm: about
 48 B on z80 fp (15 single-run byte temps, 10 with a free register), see
-the next action above. The original plan follows. Short-lived byte values spill to a
+the ptrbench item above. The original plan follows. Short-lived byte values spill to a
 frame slot while B or D might be available. Add the verifier first (B
 availability against BC tenants, D availability against DE clobbers), size
 the two lanes separately, and only promote to a gated prototype + full
@@ -192,6 +208,9 @@ Size across the corpus before implementing.
   first. Do NOT do this as an external `z88dk-copt` post-pass on rendered
   text: tried once (`gwiden`), miscompiled with no liveness view. CFG-dataflow
   rungs (`bc-flow`/`de-flow`) stay hand-written regardless.
+  ADR 0113 now holds the proposal and its acceptance gates. `%check` and
+  `%eval` already exist in the engine, so only `%dead` and the embedding are
+  missing.
 - Retiring the mirror predicate pairs (a legality proof and its emitter each
   encoding the same facts): `op_de_clean`/`try_de_home_clean_store`,
   `sp_dehome_loop_cmp_ok`/`try_sp_dehome_loop_cmp`,
@@ -231,7 +250,18 @@ Size across the corpus before implementing.
 
 ## Recently closed (ADR has the detail)
 
-- **Framework `test.c` cost — ADR 0103.** Six changes (string-literal remat,
+- **8/10/2026 tranche, ADRs 0107 to 0112.** Long constant multiply is
+  expanded inline only when shorter than the helper call (0107). Shortest
+  forms for a word compare against a constant (-401 B corpus), a constant
+  added to a BC/DE word (-166 B), inc/dec and `cp (iy+0)` on IX/IY homes
+  (0108). Guarded decrements count as non-negative (console -27 B, 0109). A
+  BC save covers only its call (-104 B), and f32 helper operands skip the dead
+  `ld bc,hl` (`startrek --math32` -368 B sp / -328 B fp, 0110). A long
+  operation on a global reads it in place and `g op= h` walks bytes on the
+  8080 family and gbz80: `a += b` 58 -> 32 B Z80, 61 -> 25 B 8080, 67 -> 22 B
+  gbz80 (0111). The differential fuzzer found about 37 miscompiles; arrays
+  now always count as aliased (0112).
+- **Framework `test.c` cost — ADR 0105.** Six changes (string-literal remat,
   dead indirect-call target spill, control-flow call arguments first,
   jump-to-next, IX save only when used, BC hand-off). `test.c` 754 -> 596 B fp;
   all 682 80cc matrix cells smaller, -85735 B. Left: the `longjmp` cleanup
@@ -313,8 +343,8 @@ Size across the corpus before implementing.
 - **8085 K-flag trip counter — shipped, ADR 0051.**
 - **Byte scratch packing (B/D lanes) — shipped.** `byte-pack` /
   `byte-pack-de` opt outs; `IR_BYTEPACK_VERIFY=1/2` keeps the sizing report.
-  (Not the same item as "START HERE" above, which is the next B/D
-  extension.)
+  (Not the same item as the parked byte-scratch packing above, which
+  is the next B/D extension.)
 - **R800 CPU target + hardware multiply — shipped.** See
   `src/80cc/R800_TARGET_PLAN.md` for the full arc.
 - **Local copy-paste housekeeping (six behaviour-neutral refactors) —
