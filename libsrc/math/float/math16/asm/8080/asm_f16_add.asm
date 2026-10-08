@@ -257,8 +257,7 @@ PUBLIC asm_f24_add_f24
     pop af                      ; drop large.de
     ld de,0
     pop bc
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld sp,hl
     ld hl,0
     push bc
@@ -319,8 +318,7 @@ PUBLIC asm_f24_add_f24
 .ovf_de
     ; E already has sign; HL free → ld hl,n preserves DE
     pop bc
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld sp,hl
     push bc
     jp asm_f24_inf

@@ -3,7 +3,8 @@ name: library-math32
 description: >
   math32 IEEE single float library: multi-CPU layout (asm/z80, asm/8085,
   asm/8080, asm/vm1, asm/gbz80), products math32*.lib including ez80_z80 /
-  gbz80 / vm1, rounding policy, div=restoring / inv=NR, force rebuild. Use
+  gbz80 / vm1, rounding policy, div and public inv are restoring 1/x
+  (NR inv bodies unlinked), force rebuild. Use
   when editing libsrc/math/float/math32 or A/B float divide/mul.
 ---
 
@@ -81,18 +82,18 @@ engines are not bit-identical.
 | Op | Algorithm | Notes |
 |----|-----------|--------|
 | **`div` / `m32_fsdiv`** | **Restoring** 24-bit mantissa | z80 + **8085** + **8080** + **gbz80** cores; z80n/z180/ez80_z80 share z80 `asm/z80/f32_fsdiv.asm` |
-| **`inv` / `m32_fsinv`** | Newton–Raphson | Slower than `div` for a reciprocal. HW mul helps inv only |
+| **`inv` / `m32_fsinv_fastcall`** | **Restoring** `1/x` | Bridge `asm/f32_fsinv.asm` calls `m32_fsdiv_callee`. The NR source is unchanged in `asm/<cpu>/hist/f32_fsinv.asm` and is not assembled |
 | **`invsqrt` / `m32_fsinvsqrt`** | Quake seed + 3× NR | **Still the fastest** `1/sqrt`. Do not replace with `1.0/sqrt` |
-| math16 | Same split: restoring `asm_f16_div`, NR `asm_f16_inv` | |
+| math16 | Public `asm_f16_inv` is the same restoring bridge (`asm/asm_f16_inv.asm`). `invsqrt` stays NR | |
 
-Do **not** reintroduce NR trampoline `fsdiv` = `fsinv`+`fsmul` without A/B proof.
+Do **not** reintroduce NR trampoline `fsdiv` = `fsinv`+`fsmul` without A/B proof. Do **not** move `asm/<cpu>/hist/f32_fsinv.asm` back onto a `.lst` while the bridge exports `m32_fsinv_fastcall`.
 Docs: `math32/readme.md` § div/inv; measurement: **`methodology-measure`** § A/B.
 
 In **C higher functions** (`c/m32_*.c`):
 
 | Need | Write | Do not write |
 |------|--------|----------------|
-| Reciprocal `1/n` | `1.0/x` (restoring `div`) | `m32_invf(x)` |
+| Reciprocal `1/n` | `1.0/x` or `inv(x)` (both restoring `m32_fsdiv`) | `asm/<cpu>/hist/f32_fsinv.asm` |
 | Inverse square root | `m32_invsqrtf(x)` | `1.0/m32_sqrtf(x)` |
 
 `pow(x, -1)` / `sinh` / `cosh` / `tanh` / `atan` recip / `asinh` / `acosh` use divide. `pow(x, -0.5)` keeps `m32_invsqrtf`.
@@ -127,10 +128,11 @@ names; the **DEHL** entry is `*_fastcall` (`defc sin_fastcall = _m32_sinf`).
 
 Without the newlib remaps, sccz80 marks plain `sin` as `__z88dk_fastcall` and
 emits `call sin` with DEHL, but the linked object is the **stack bridge** (ignores
-DEHL). Symptom: hotspots show **zero** `m32_fsinv` / `m32_fsinvsqrt` /
+DEHL). Symptom: hotspots show **zero** `m32_fsinvsqrt` /
 `m32_fsmul32x32` entry hits, TIMER “too fast” (e.g. Whetstone ~15 KWIPS vs ~11),
 wrong numerics. Map proof of a healthy build: `sin_fastcall` / `sqrt_fastcall`
-present; app `.asm` shows `callsin_fastcall` not `callsin`.
+present; app `.asm` shows `callsin_fastcall` not `callsin`. Public `inv`
+lands in `asm/f32_fsinv.asm` and then `m32_fsdiv`. `asm/<cpu>/hist/f32_fsinv.asm` is not assembled.
 
 **Do not** “fair up” classic vs newlib by adding bench-only `invsqrt()` optims
 to one side only (n-body). Align source (`1.0/sqrt` vs half `invsqrtf16`) and
@@ -205,4 +207,4 @@ For eZ80: `z88dk-z80nm lib/clibs/math32_ez80_z80.lib | rg 'm32_mulu_32h|f32_z180
 - Z180 / eZ80 Z80-mode `mlt`: `cpu-z180`
 - Issue class: z88dk **#3061** (classic vs newlib Whetstone); **#3104** item 4 (stack-only dtoa rewrite) is done
 - Suite: `test/suites/math` (`test_math32*.bin`, including `test_math32_ez80_z80.bin`, `test_math32_vm1.bin`). Classic `%f`/`%e`/`%g` also: `test/suites/stdio` `test_sprintf_math32.bin` plus `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` (`--math32`). `test/suites/string` is `str*` only.
-- Classic zsdcc does not scan printf formats. `--math32` does not enable `%f`/`%e`/`%g`. Use `#pragma printf = "%f %e %g"` or `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF`. Do not `DEFINE NEED_printf` from `CLIB_32BIT_FLOATS`.
+- Classic zsdcc scans printf and scanf literals in the same `zcc` command (`zpragma -autoformat`, commit `5215f2081f`). A literal `%f` / `%e` / `%g` links that converter. `--math32` does not enable them by itself. A non-literal format, or a separate `zcc -c`, still needs `#pragma printf` or `-pragma-include:`. `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF` replaces the scan. Newlib reads `CRT_printf_format` in `lib/crt/newlib/clib_stubs.inc`: if the scan has a converter the library mask omits, the CRT rebuilds `vfprintf` as library mask OR scan. An explicit `CLIB_OPT_PRINTF` still replaces both. Do not `DEFINE NEED_printf` from `CLIB_32BIT_FLOATS`.

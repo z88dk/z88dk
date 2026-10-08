@@ -40,47 +40,39 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     push de
     push hl
     push bc
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     call load_ieee_dehl
     call unpack_dehl
     push de
     push hl
     push bc
 
-    ld hl,0
-    add hl,sp
+    ld hl,sp+0
     ld b,(hl)                       ; x.sign
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld a,(hl)                       ; y.sign
     xor b
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld (hl),a                       ; result sign at y.sign slot
 
     ; ---- specials gate ----
     ; Frame: x@0 (exp@1, mant@2/4/5), y@6 (exp@7, mant@8/10/11),
     ; sign xor @6 overwrites y sign byte used as result sign.
-    ld hl,7
-    add hl,sp
+    ld hl,sp+7
     ld a,(hl)                       ; y.exp
     inc a
     jp Z,fm_spec_y                  ; y.exp == 255
     dec a
     or a
     jp Z,fm_spec_y0                 ; y.exp == 0
-    ld hl,1
-    add hl,sp
+    ld hl,sp+1
     ld a,(hl)                       ; x.exp
     inc a
     jp Z,fm_spec_x                  ; x.exp == 255, y finite nonzero
 
-    ld hl,1
-    add hl,sp
+    ld hl,sp+1
     ld b,(hl)                       ; B = x.exp
-    ld hl,7
-    add hl,sp
+    ld hl,sp+7
     ld a,(hl)
     sub 07fh
     ld c,a                          ; C = y.exp − bias (keep sub flags)
@@ -100,25 +92,20 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 .fm_exp_ok
     or a
     jp Z,fm_zero
-    ld hl,7
-    add hl,sp
+    ld hl,sp+7
     ld (hl),a                       ; store exp sum
 
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ex de,hl
     ld hl,(de)
     push hl                         ; y.DE
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ex de,hl
     ld hl,(de)
     push hl                         ; y.HL
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld c,(hl)                       ; x.L (mant high)
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ex de,hl
     ld hl,(de)
     ex de,hl                        ; DE = x.DE
@@ -128,8 +115,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     push de
     push hl                         ; product high lives in HL
-    ld hl,10                ; sign/exp at +6/+7 +4
-    add hl,sp
+    ld hl,sp+10                     ; sign/exp at +6/+7 +4
     ld c,(hl+)                      ; *p++
     ld b,(hl)
     pop hl
@@ -139,27 +125,25 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ; DEHL=IEEE; stack: es_l LmH LmD es_r RmH RmD flag ret Lh Ld
     push de
     push hl
-    ld hl,16
-    add hl,sp
-    ld a,(hl)                   ; flag
+    ld hl,sp+16
+    ld a,(hl)                       ; flag
     pop hl
-    pop de                      ; A=flag DEHL=result
+    pop de                          ; A=flag DEHL=result
 
     ld bc,hl
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ld sp,hl
     ld hl,bc                        ; DEHL restored; A=flag
 
     or a
     jp Z,fm_done
 
-    pop bc                      ; ret
+    pop bc                          ; ret
     inc sp
     inc sp
     inc sp
     inc sp                          ; drop Lh,Ld (ret in BC, product in DEHL)
-    push bc                     ; ret only
+    push bc                         ; ret only
 
 .fm_done
     ret
@@ -191,7 +175,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 .pk_round
     ld a,b
     cp 0ffh
-    jp NC,pk_ovl                ; final exponent >= 255 -> overflow
+    jp NC,pk_ovl                    ; final exponent >= 255 -> overflow
     ; Product HLDE: HLD = top 24, E = residual 8.  Form EHL mant.
     ld a,e                          ; A = residual
     ld e,h
@@ -237,8 +221,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 ; y.exp == 0
 .fm_spec_y0
-    ld hl,1
-    add hl,sp
+    ld hl,sp+1
     ld a,(hl)
     inc a
     jp Z,fm_ret_nan                 ; Inf/NaN × 0
@@ -246,40 +229,33 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 ; y.exp == 255
 .fm_spec_y
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld a,(hl)
     and 07fh
     ld b,a
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ld a,(hl)
     or b
     ld b,a
-    ld hl,11
-    add hl,sp
+    ld hl,sp+11
     ld a,(hl)
     or b
     jp NZ,fm_ret_nan                ; y NaN
-    ld hl,1
-    add hl,sp
+    ld hl,sp+1
     ld a,(hl)                       ; x.exp
     or a
     jp Z,fm_ret_nan                 ; 0 × Inf
     inc a
     jp NZ,fm_ovl                    ; finite × Inf → ±Inf
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ld a,(hl)
     and 07fh
     ld b,a
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld a,(hl)
     or b
     ld b,a
-    ld hl,5
-    add hl,sp
+    ld hl,sp+5
     ld a,(hl)
     or b
     jp NZ,fm_ret_nan                ; NaN × Inf
@@ -287,29 +263,24 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 ; x.exp == 255, y finite nonzero
 .fm_spec_x
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ld a,(hl)
     and 07fh
     ld b,a
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld a,(hl)
     or b
     ld b,a
-    ld hl,5
-    add hl,sp
+    ld hl,sp+5
     ld a,(hl)
     or b
     jp NZ,fm_ret_nan                ; x NaN
     jp fm_ovl                       ; Inf × finite
 
 .fm_ret_nan
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld b,(hl)                       ; B=flag
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ld sp,hl
     ld a,b
     or a
@@ -324,14 +295,11 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jp m32_fsconst_pnan
 
 .fm_zero
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld c,(hl)
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld b,(hl)                       ; B=flag C=sign
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ld sp,hl
     ld a,b
     or a
@@ -349,14 +317,11 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jp m32_fsconst_pzero
 
 .fm_ovl
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld c,(hl)
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld b,(hl)                       ; B=flag C=sign
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ld sp,hl
     ld a,b
     or a

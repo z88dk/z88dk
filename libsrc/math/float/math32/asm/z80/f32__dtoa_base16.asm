@@ -40,8 +40,7 @@ PUBLIC m32__dtoa_base16
 
     push bc
 
-    ld hl,4
-    add hl,sp                   ; hl = mantissa *
+    ld hl,sp+4                  ; hl = mantissa *
 
     ld de,4
 
@@ -51,4 +50,3 @@ PUBLIC m32__dtoa_base16
 
     ld c,6                      ; max 6 hex digits
     ret
-

@@ -71,24 +71,20 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     push bc
     push de
     push hl                         ; park Y
-    ld hl,10                ; HL = &left IEEE
-    add hl,sp
+    ld hl,sp+10                     ; HL = &left IEEE
     call load_ieee                  ; DEHL = packed X
     call unpack_push                ; X slot on top; Y still parked
     ; +0 X(6) +6 Y.hl +8 Y.de +10 Y.bc +12 flag +14 ret +16 IEEE
 
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ex de,hl
     ld hl,(de)
     ld bc,hl                        ; Y.bc
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ex de,hl
     ld hl,(de)
     push hl                         ; Y.hl
-    ld hl,10                        ; Y.de at +8 +2
-    add hl,sp
+    ld hl,sp+10                     ; Y.de at +8 +2
     ex de,hl
     ld hl,(de)
     ex de,hl                        ; DE = Y.de
@@ -101,8 +97,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     inc a
     jp Z,fa_spec_y
     push hl                         ; Y.MSB lives in L; DE stays
-    ld hl,6                 ; X.exp at +4 +2
-    add hl,sp
+    ld hl,sp+6                      ; X.exp at +4 +2
     ld a,(hl)
     pop hl
     cp 255
@@ -128,8 +123,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 .fa_ops
     push hl                         ; Y.MSB lives in L; DE stays
-    ld hl,7                 ; X.sign at +5 +2
-    add hl,sp
+    ld hl,sp+7                      ; X.sign at +5 +2
     ld a,(hl)
     pop hl
     xor b
@@ -204,18 +198,14 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 ; X.exp == 255.  Y finite (already checked).
 .fa_spec_x
-    ld hl,0
-    add hl,sp
-    ld a,(hl)                       ; MSB
+    ld hl,sp+0
+    ld a,(hl+)                      ; MSB
     and 07fh
-    inc hl
     inc hl                          ; LSB
-    or (hl)
-    inc hl                          ; mid
+    or (hl+)                        ; mid
     or (hl)
     jp NZ,fa_ret_nan                ; X NaN
-    ld hl,5                 ; sign
-    add hl,sp
+    ld hl,sp+5                      ; sign
     ld a,(hl)
     jp fa_ret_inf
 
@@ -226,23 +216,18 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     or d
     or e
     jp NZ,fa_ret_nan                ; Y NaN
-    ld hl,4                 ; X.exp
-    add hl,sp
+    ld hl,sp+4                      ; X.exp
     ld a,(hl)
     inc a
     jp NZ,fa_ret_inf_y              ; Inf ± finite
-    ld hl,0
-    add hl,sp
-    ld a,(hl)
+    ld hl,sp+0
+    ld a,(hl+)
     and 07fh
     inc hl
-    inc hl
-    or (hl)
-    inc hl
+    or (hl+)
     or (hl)
     jp NZ,fa_ret_nan                ; X NaN
-    ld hl,5                 ; X.sign
-    add hl,sp
+    ld hl,sp+5                      ; X.sign
     ld a,(hl)
     xor b
     and 080h
@@ -261,8 +246,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .fa_epi
     ; DEHL = result.  SP: X(6) Y(6) flag ret IEEE.
     ld bc,hl                        ; park result low
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld sp,hl                        ; drop X + Y park
     ld hl,bc                        ; DEHL = result
     pop bc                          ; drop flag
@@ -330,18 +314,15 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     push hl                         ; Y
     ; +0 Y.hl +2 Y.de +4 Y.bc +6 af +8 ret +10 X
 
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ex de,hl
     ld hl,(de)
     ld bc,hl                        ; X.bc
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ex de,hl
     ld hl,(de)
     push hl                         ; X.MSB
-    ld hl,14                        ; X.LSB:mid at +12 +2
-    add hl,sp
+    ld hl,sp+14                     ; X.LSB:mid at +12 +2
     ex de,hl
     ld hl,(de)
     ex de,hl                        ; DE = X.de
@@ -351,33 +332,27 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     push hl                         ; park X.mant; BC stays
     ; +0 X.hl +2 X.de +4 Y.hl +6 Y.de +8 Y.bc +10 af +12 ret +14 X
 
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld hl,(de)
     ex de,hl
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ex de,hl
     ld (de),hl                      ; X.MSB := Y.hl
 
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ex de,hl
     ld hl,(de)
     ex de,hl
-    ld hl,16
-    add hl,sp
+    ld hl,sp+16
     ex de,hl
     ld (de),hl                      ; X.LSB:mid
 
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ex de,hl
     ld hl,(de)
     ex de,hl
-    ld hl,18
-    add hl,sp
+    ld hl,sp+18
     ex de,hl
     ld (de),hl                      ; X.exp:sign
 
@@ -404,12 +379,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld b,a                          ; count
     ; +0 Y.hl +2 Y.de +4 Y.bc +6 ret +8 X.MSB ...
 
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ld c,(hl+)                      ; LSB
     ld e,(hl)                       ; E = mid (Y parked)
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld l,(hl)                       ; L = MSB
     ld h,e                          ; H = mid, C = LSB
 
@@ -475,13 +448,11 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld l,c
     ld h,0
     ex de,hl                        ; DE = MSB word
-    ld hl,10                        ; X.MSB at +8 +2
-    add hl,sp
+    ld hl,sp+10                     ; X.MSB at +8 +2
     ld (hl+),e                      ; *p++
     ld (hl),d
     pop de                          ; LSB:mid
-    ld hl,10                        ; X.LSB:mid
-    add hl,sp
+    ld hl,sp+10                     ; X.LSB:mid
     ld (hl+),e                      ; *p++
     ld (hl),d
     pop hl
@@ -500,8 +471,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     push bc                         ; +0 se +2 ret +4 X.MSB +6 X.low
     ld a,l                          ; Y.MSB
     ld bc,de                        ; BC = Y.low
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld d,(hl+)                      ; D = X.MSB
     inc hl                          ; skip pad
     ld e,(hl+)                      ; *p++
@@ -529,8 +499,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ; Walk from X.MSB so sbc Carry is not lost to add hl,sp.
     push bc                         ; +0 se +2 ret +4 X.MSB +6 X.low
     ld a,l                          ; Y.MSB
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld b,(hl+)                      ; B = X.MSB
     inc hl                          ; skip pad
     ld c,(hl+)                      ; *p++

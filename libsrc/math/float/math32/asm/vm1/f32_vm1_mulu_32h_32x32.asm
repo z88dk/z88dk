@@ -26,16 +26,14 @@ PUBLIC m32_mulu_32h_32x32
     ; frame: +0 ret +2 x0 +4 x1 +6 y0 +8 y1
 
     ; ---- p00_hi = high16(x0*y0); abandon p00_lo ----
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ex de,hl
     ld hl,(de)                      ; x0
     ld a,h
     or l
     jp Z,p00_zero
     push hl                     ; save x0
-    ld hl,8                 ; y0 (after push)
-    add hl,sp
+    ld hl,sp+8                  ; y0 (after push)
     ex de,hl
     ld hl,(de)
     ld a,h
@@ -55,8 +53,7 @@ PUBLIC m32_mulu_32h_32x32
     ; stack: p00_hi, ret, x0, x1, y0, y1
 
     ; ---- p01 = x0*y1 ----
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld hl,(de)                      ; x0
     ld a,h
@@ -64,8 +61,7 @@ PUBLIC m32_mulu_32h_32x32
     jp Z,p01_zero
     push hl
     ; after push: x0s, p00_hi, ret, x0, x1, y0, y1 → y1 at +12
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ex de,hl
     ld hl,(de)
     ld a,h
@@ -87,8 +83,7 @@ PUBLIC m32_mulu_32h_32x32
     ; stack: p01_lo, p01_hi, p00_hi, ret, x0, x1, y0, y1
 
     ; ---- p10 = x1*y0 ----
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ex de,hl
     ld hl,(de)                      ; x1
     ld a,h
@@ -96,8 +91,7 @@ PUBLIC m32_mulu_32h_32x32
     jp Z,p10_zero
     push hl
     ; after push: x1s, p01_lo, p01_hi, p00_hi, ret, x0, x1, y0, y1 → y0 at +14
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ex de,hl
     ld hl,(de)
     ld a,h
@@ -149,16 +143,14 @@ PUBLIC m32_mulu_32h_32x32
     ; stack: c33, mid_hi, ret, x0, x1, y0, y1
 
     ; ---- p11 = x1*y1 ----
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ex de,hl
     ld hl,(de)                      ; x1
     ld a,h
     or l
     jp Z,p11_zero
     push hl
-    ld hl,14                ; y1
-    add hl,sp
+    ld hl,sp+14                 ; y1
     ex de,hl
     ld hl,(de)
     ld a,h

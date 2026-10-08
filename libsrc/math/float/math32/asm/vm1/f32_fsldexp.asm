@@ -57,11 +57,10 @@ PUBLIC _m32_ldexpf
 ; exit  : DEHL = x * 2^pw2
 .m32_fsldexp_callee
     ; SP+0 ret, SP+2 x.HL, SP+4 x.DE, SP+6 pw2
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld a,(hl+)                      ; *p++
     ld h,(hl)
-    ld l,a                      ; HL = x.DE
+    ld l,a                          ; HL = x.DE
 
     add hl,hl                       ; exp → H, mant bits → L, sign → C
     inc h
@@ -73,8 +72,7 @@ PUBLIC _m32_ldexpf
     jp Z,ldexp_inf_nan              ; exp was 0xff: return x
 
     push hl                         ; keep unpacked x.DE
-    ld hl,8                 ; pw2 at +6 +2
-    add hl,sp
+    ld hl,sp+8                      ; pw2 at +6 +2
     ld a,(hl)
     pop hl
     ld b,a                          ; save for sign test
@@ -98,8 +96,7 @@ PUBLIC _m32_ldexpf
 
 .ldexp_pack
     push hl                         ; keep H=new exp, L=mant bits
-    ld hl,7                 ; original D at +5 +2
-    add hl,sp
+    ld hl,sp+7                      ; original D at +5 +2
     ld a,(hl)
     pop hl
     rla                             ; sign → C
@@ -129,8 +126,7 @@ PUBLIC _m32_ldexpf
     jp ldexp_result                 ; negative pw2 + carry => A is new exp
 
 .ldexp_oflow
-    ld hl,5                 ; original D
-    add hl,sp
+    ld hl,sp+5                      ; original D
     ld a,(hl)
     and 080h
     or 07fh
@@ -149,8 +145,7 @@ PUBLIC _m32_ldexpf
     ret
 
 .ldexp_uflow
-    ld hl,5
-    add hl,sp
+    ld hl,sp+5
     ld a,(hl)
     add a,a                         ; sign → C
     ld de,0

@@ -246,7 +246,7 @@ Rabbit (r2ka) and KC160 also expose `m32_sqr_32h_24x24` for the same `_fssqr` en
 
 #### Wide multiply for Newton–Raphson
 
-`mulu_32h_32x32` returns the high 32 bits of a 32×32 product for Newton–Raphson work that still needs a wide residual (notably `_fsinv`). General divide (`_fsdiv`) is restoring binary division and does not use this helper.
+`mulu_32h_32x32` returns the high 32 bits of a 32×32 product for Newton–Raphson work that still needs a wide residual (`invsqrt`, and `asm/<cpu>/hist/f32_fsinv.asm`). General divide (`_fsdiv`) and public `inv` are restoring binary division and do not use this helper.
 
 On Z80, `mulu_32h_32x32` uses four optimised `32_16×16` multiplies. On z180 / z80n the implementation truncates low-order carry work for speed: calculation starts at the 3rd byte of 8, and 11 `16_8×8` multiplies are required. Returning only bytes 4–7 leaves at most a small error in the least significant nibble of the 32-bit mantissa, which is discarded after rounding to 24-bit precision.
 
@@ -260,11 +260,11 @@ float inv (float x);
 | Op | Algorithm |
 |----|-----------|
 | `div` / `m32_fsdiv` | Restoring 24-bit mantissa divide, RNE on the guard |
-| `inv` / `m32_fsinv` | Newton–Raphson with wide multiplies |
+| `inv` / `m32_fsinv_fastcall` | Restoring `1/x` through `m32_fsdiv_callee` (`asm/f32_fsinv.asm`). The Newton–Raphson source is unchanged in `asm/<cpu>/hist/f32_fsinv.asm`. That directory is not assembled |
 
 The z80-family, 8085, 8080, vm1, and gbz80 divide cores share the same control structure. The z80 core keeps rem and divisor across the main and alternate sets. The 8080 / 8085 / vm1 / gbz80 cores keep rem in `DEHL`, the bit count in `B`, and the 3-byte divisor on a short stack frame.
 
-For plain `1/n`, restoring `div` is the faster path on the measured CPUs. Explicit `inv(x)` calls the NR inverse. sccz80 does not rewrite IEEE `1.0f/x` into `inv`.
+`inv(x)` is restoring `1/x`. The bridge in `asm/f32_fsinv.asm` calls `m32_fsdiv_callee`. sccz80 leaves a runtime `1.0f/x` as ordinary divide, so `inv(x)` and that divide return the same bits.
 
 Inputs with `exp == 0` are ±0. Result underflow flushes to signed zero. There is no gradual underflow from normalised representations.
 
@@ -336,7 +336,7 @@ float modf (float x, float *y);  float fmod (float x, float y);
 
 The stack-only engine matches the Z80 C11 contract used by `test/suites/math` (`test_math32_printf`): `%g` of `1.234e-37` is `1.234e-37`, `%g` of `-2.5e-5` is `-2.5e-05`, `%g` of `314.159` is `314.159`, `%.2f` of a tiny value is `0.00`. Classic `sprintf` also: `test/suites/stdio` `test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` (`--math32`; `%e` of `1.2345` is `1.234500e+00`). Integer `sscanf` is `test_scanf*.bin` (no `%f`). `test/suites/string` is `str*` only.
 
-Classic zsdcc does not scan printf formats. `--math32` does not enable `%f` / `%e` / `%g`. Add `#pragma printf = "%f %e %g"` or `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF`. Without that, printf writes the letter `f`, `e`, or `g`. sccz80 and 80cc scan the format string and do not need this. Do not set `NEED_printf` from `CLIB_32BIT_FLOATS` alone.
+Classic zsdcc scans `printf` and `scanf` string literals in the same `zcc` command. A literal `%f`, `%e`, or `%g` links that converter. sccz80 and 80cc use the same scan. `--math32` does not enable those converters by itself. A format that is not a string literal is not scanned. Add `#pragma printf = "%f %e %g"` for that call. A separate `zcc -c` drops the scan. Put the pragma in one file and pass `-pragma-include:`. `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF` sets a fixed mask and replaces the scan. Without the converter, classic printf writes the letter `f`, `e`, or `g`. Newlib keeps its library mask for converters the scan already includes. When the scan names a converter that mask omits, the CRT rebuilds `vfprintf` with the library mask OR the scan. An explicit `CLIB_OPT_PRINTF` still replaces both. Do not set `NEED_printf` from `CLIB_32BIT_FLOATS` alone.
 
 ---
 

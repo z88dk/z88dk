@@ -521,7 +521,7 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "!DFILE_COLAPSED =  0 "
+                text: "!DFILE_COLLAPSED =  0 "
                 location: test_t_input_04_t.bas:42
             }
         tokens: [
@@ -532,8 +532,8 @@ TokFile {
             }
             Token {
                 type: Identifier
-                keyword: DFILE_COLAPSED
-                text: "DFILE_COLAPSED"
+                keyword: DFILE_COLLAPSED
+                text: "DFILE_COLLAPSED"
                 location: test_t_input_04_t.bas:42
             }
             Token {

@@ -233,7 +233,7 @@
 #define __IO_SIO_RX_SIZE        0x80
 #define __IO_SIO_RX_FULLISH     0x68
 #define __IO_SIO_RX_EMPTYISH    0x08
-#define __IO_SIO_TX_SIZE        0x10
+#define __IO_SIO_TX_SIZE        0x20
 
 
 

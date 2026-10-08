@@ -30,14 +30,12 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     push bc
     push de
     push hl                         ; Y | ret | ieee
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     ld bc,hl                        ; IEEE LSW
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
@@ -64,78 +62,62 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 
     push de
     ex de,hl                        ; DE = X.hl
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ld (hl+),e                      ; *p++
     ld (hl),d
     pop de                          ; X.de
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ld (hl+),e                      ; *p++
     ld (hl),d
     push bc                         ; X.bc | Y | ret | X.hl | X.de
 
-    ld hl,0
-    add hl,sp
+    ld hl,sp+0
     ld c,(hl+)                      ; *p++
     ld b,(hl)
 
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld hl,0
-    add hl,sp
+    ld hl,sp+0
     ld (hl+),e                      ; *p++
     ld (hl),d
 
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ld (hl+),e                      ; *p++
     ld (hl),d
 
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld (hl+),e                      ; *p++
     ld (hl),d
 
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld (hl+),e                      ; *p++
     ld (hl),d
 
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld (hl+),e                      ; *p++
     ld (hl),d
 
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ld (hl+),e                      ; *p++
     ld (hl),d
 
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld (hl+),c                      ; *p++
     ld (hl),b                       ; Y.hl Y.de Y.bc ret X.hl X.de X.bc
 
@@ -153,8 +135,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 ;=======================================================================
 .a32_body
     push hl                         ; park Y.hl; DE = Y.de stays
-    ld hl,9                 ; X.exp at +7 +2
-    add hl,sp
+    ld hl,sp+9                      ; X.exp at +7 +2
     ld a,(hl)
     pop hl
     sub b                           ; A = X.exp - Y.exp
@@ -175,8 +156,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 
 .a32_addsub
     push hl
-    ld hl,8                 ; X.sign at +6 +2
-    add hl,sp
+    ld hl,sp+8                      ; X.sign at +6 +2
     ld a,(hl)
     pop hl
     xor c
@@ -219,32 +199,25 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     push de
     push hl
     push bc                         ; +0 meta +2 low +4 high +6 ret +8 X
-    ld hl,0
-    add hl,sp
+    ld hl,sp+0
     ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld (hl+),e                      ; *p++
     ld (hl),d                       ; X.hl := meta
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ld (hl+),e                      ; *p++
     ld (hl),d                       ; X.de := low
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld (hl+),e                      ; *p++
     ld (hl),d                       ; X.bc := high
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld sp,hl                        ; drop park
     pop hl                          ; ret
     pop bc                          ; meta
@@ -276,20 +249,17 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     push hl                         ; Y
     ; +0 Y.hl +2 Y.de +4 Y.bc +6 af +8 ret +10 body_ret +12 X.hl +14 X.de +16 X.bc
 
-    ld hl,16
-    add hl,sp
+    ld hl,sp+16
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     ld bc,hl                        ; X.bc
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     push hl                         ; X.hl
-    ld hl,16                ; X.de at +14 +2
-    add hl,sp
+    ld hl,sp+16                     ; X.de at +14 +2
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
@@ -301,28 +271,22 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ; +0 X.hl +2 X.de +4 Y.hl +6 Y.de +8 Y.bc
     ; +10 af +12 ret +14 body +16 X.hl +18 X.de +20 X.bc
 
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld hl,16
-    add hl,sp
+    ld hl,sp+16
     ld (hl+),e                      ; *p++
     ld (hl),d
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld hl,18
-    add hl,sp
+    ld hl,sp+18
     ld (hl+),e                      ; *p++
     ld (hl),d
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld e,(hl+)                      ; *p++
     ld d,(hl)
-    ld hl,20
-    add hl,sp
+    ld hl,sp+20
     ld (hl+),e                      ; *p++
     ld (hl),d
 
@@ -347,14 +311,12 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ; +0 L.hl +2 L.de +4 L.bc +6 ret +8 body_ret +10 X.hl +12 X.de +14 X.bc
 
     push bc
-    ld hl,12                ; X.hl at +10 +2
-    add hl,sp
+    ld hl,sp+12                     ; X.hl at +10 +2
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
     ld bc,hl
-    ld hl,14
-    add hl,sp
+    ld hl,sp+14
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a
@@ -422,12 +384,10 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 .a32_al_store
     ld bc,de                        ; park small.de
     ex de,hl                        ; DE = small.hl
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ld (hl+),e                      ; *p++
     ld (hl),d                       ; X.hl
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld (hl+),c                      ; *p++
     ld (hl),b                       ; X.de
     pop hl
@@ -443,8 +403,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     push bc                         ; meta
     ld bc,de                        ; Y.de
     push hl                         ; Y.hl
-    ld hl,8                 ; X.hl at +6 +2
-    add hl,sp
+    ld hl,sp+8                      ; X.hl at +6 +2
     ld e,(hl+)                      ; *p++
     ld d,(hl)
     pop hl
@@ -453,8 +412,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     rla                             ; A = cy
     push hl                         ; sum.hl
     ld e,a                          ; E = cy
-    ld hl,10                ; X.de at +8 +2
-    add hl,sp
+    ld hl,sp+10                     ; X.de at +8 +2
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a                          ; HL = X.de
@@ -479,8 +437,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     push bc
     ld bc,de
     push hl
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld e,(hl+)                      ; *p++
     ld d,(hl)                       ; DE = X.hl
     pop hl                          ; Y.hl
@@ -494,8 +451,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     rla
     push hl
     ld e,a                          ; E = borrow
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ld a,(hl+)                      ; *p++
     ld h,(hl)
     ld l,a                          ; X.de
@@ -533,4 +489,3 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     or 1
     ld l,a
     ret
-

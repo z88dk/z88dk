@@ -1,5 +1,6 @@
 ../../../math/float/math16/asm/asm_f16_classify.asm
 ../../../math/float/math16/asm/asm_f16_inf.asm
+../../../math/float/math16/asm/asm_f16_inv.asm
 ../../../math/float/math16/asm/asm_f16_nan.asm
 ../../../math/float/math16/asm/asm_f16_neg.asm
 ../../../math/float/math16/asm/asm_f16_sigdig.asm

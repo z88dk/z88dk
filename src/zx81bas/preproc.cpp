@@ -116,7 +116,7 @@ static bool match_basic_pragma(const std::string& text, size_t& pos) {
                 keyword == "VERBOSE" ||
                 keyword == "VARS" ||
                 keyword == "DFILE" ||
-                keyword == "DFILE_COLAPSED" ||
+                keyword == "DFILE_COLLAPSED" ||
                 keyword == "SYSVARS") {
             return true;
         }

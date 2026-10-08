@@ -15,7 +15,7 @@ This is the z88dk 16-bit IEEE-754 standard math16 half precision floating point 
 
 Shared specials and coeff tables live under `asm/`. 8080 / 8085 / gbz80 are stack-only (no `exx` / IX / IY). Packed half×half and `sqrf16` use an 11×11 product; f24 (poly / inv / hypot / fma / sqrt) uses 16×16. Plain z80 unrolls both in-file (`mulu_32_16x16_gen` / `mulu_32_16x16`). Other Z80-family products call `l_mulu_32_16x16` (z80n `mul de`, z180 / ez80 `mlt`, kc160 / rabbit integer HW).
 
-The specialised nature of 16-bit floating point implies that this is an adjunct or special purpose maths library. It can be used to accelerate the calculation of floating point, where the results are only needed to 3.5 significant digits. Applications can include video games, or neural networks, for example. There is **no stdio / printf / scanf / dtoa requirement** on the math16 product itself; apps that need float print may pair another float library (e.g. math32) for I/O only.
+The specialised nature of 16-bit floating point implies that this is an adjunct or special purpose maths library. It can be used to accelerate the calculation of floating point, where the results are only needed to 3.5 significant digits. Applications can include video games, or neural networks, for example. There is **no stdio / printf / scanf / dtoa requirement** on the math16 product itself; apps that need float print may pair another float library (e.g. math32) for I/O only. Classic zsdcc scans `printf` literals in that same `zcc` command. The converters come from the main library, not from math16.
 
 *@feilipu, May 2020 / 8085 August 2026 / 8080 September 2026 / gbz80 September 2026*
 
@@ -270,7 +270,7 @@ Cores share the same label set (`div_body`, `div_bit_fail`, `div_quot_shift`, `d
 
 These functions are implemented in assembly language but they utilise the intrinsic assembly language functions to provide their returns. The use of the 16-bit mantissa expanded floating point format (`_f24`) functions to implement the derived functions means that their accuracy is maintained.
 
-The expanded floating point format is a useful tool for creating functions, as complex functions can be written quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `invf16()`, `fmaf16()` and the `polyf16()` functions.
+The expanded floating point format is a useful tool for creating functions, as complex functions can be written quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `fmaf16()` and the `polyf16()` functions.
 
 #### _inv()_
 
@@ -278,7 +278,7 @@ The expanded floating point format is a useful tool for creating functions, as c
 half_t invf16 (half_t x);
 ```
 
-**`invf16` / `asm_f16_inv`** remains Newton–Raphson on the expanded mantissa. Prefer divide for general `/` and for plain `1/n` (restoring div is faster than NR inv). sccz80 does not rewrite half/IEEE literal `1.0/x` to inv — that is ordinary divide. Keep explicit `invf16` for reciprocal-as-primitive / NR-based helpers.
+**`invf16` / `asm_f16_inv`** is restoring `1/x`. The bridge in `asm/asm_f16_inv.asm` calls `asm_f16_div_callee`. The Newton–Raphson source is unchanged in `asm/<cpu>/hist/asm_f16_inv.asm`. That directory is not assembled. SDCC half divide `cm16_sdcc_div` calls `asm_f24_div_f24`. `invsqrtf16` stays Newton–Raphson. sccz80 leaves a runtime `1.0/x` as ordinary divide, so `invf16(x)` and that divide return the same bits.
 
 #### _sqrt()_ and _invsqrt()_
 

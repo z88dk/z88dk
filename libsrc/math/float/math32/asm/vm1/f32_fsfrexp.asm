@@ -43,11 +43,10 @@ PUBLIC _m32_frexpf
 ; exit  : DEHL = fraction in [0.5, 1); *pw2 = frexp exponent
 .m32_fsfrexp_callee
     ; SP+0 ret, SP+2 x.HL, SP+4 x.DE, SP+6 ptr
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ld a,(hl+)                      ; *p++
     ld h,(hl)
-    ld l,a                      ; HL = x.DE
+    ld l,a                          ; HL = x.DE
 
     add hl,hl                       ; exp → H, mant bits → L, sign → C
     ld a,h
@@ -58,8 +57,7 @@ PUBLIC _m32_frexpf
 
 .frexp_zero
     ex de,hl                        ; DE = work
-    ld hl,6                 ; ptr slot
-    add hl,sp
+    ld hl,sp+6                      ; ptr slot
     ld c,(hl+)                      ; *p++
     ld b,(hl)
     ex de,hl                        ; HL = work again
@@ -71,8 +69,7 @@ PUBLIC _m32_frexpf
     ld (bc),a                       ; *pw2 = sign-extended exp
 
     push hl                         ; keep fraction work
-    ld hl,7                 ; original D at +5 +2
-    add hl,sp
+    ld hl,sp+7                      ; original D at +5 +2
     ld a,(hl)
     pop hl
     rla                             ; sign → C

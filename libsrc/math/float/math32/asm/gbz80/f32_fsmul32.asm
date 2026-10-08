@@ -284,9 +284,8 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ld de,hl                        ; DE = ret
     ld hl,sp+2                      ; &mh
     ld a,(hl)
-    ld (hl),e
+    ld (hl+),e
     ld e,a
-    inc hl
     ld a,(hl)
     ld (hl),d
     ld h,a

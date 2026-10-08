@@ -317,8 +317,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     pop hl                      ; DEHL = packed IEEE
 
     ld bc,hl
-    ld hl,18
-    add hl,sp
+    ld hl,sp+18
     ld sp,hl
     pop hl                      ; flag
     ld a,l
@@ -472,8 +471,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 
 .drop_frame
     pop bc                      ; uret
-    ld hl,18
-    add hl,sp
+    ld hl,sp+18
     ld sp,hl
     pop hl                      ; flag
     ld a,l

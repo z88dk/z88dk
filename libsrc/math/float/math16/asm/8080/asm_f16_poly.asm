@@ -132,8 +132,7 @@ PUBLIC asm_f16_poly
 
 ; Finite f24 mul: DEHL = res, stack [ret][x.hl][x.de]...
 .poly_mulx
-    ld b,d
-    ld c,e
+    ld bc,de
     push hl                     ; [rm][ret][x.hl][x.de]
     ld hl,sp+6
     ld a,(hl+)

@@ -35,6 +35,15 @@ enum register_mapping_t {
     REGISTER_MAPPING_CLOCKL,
     REGISTER_MAPPING_CLOCKH,
 
+    /*
+     * Combined interrupt register (I in the high byte, R in the low byte) and
+     * the interrupt state, reported by emulators that expose CPU control state.
+     */
+    REGISTER_MAPPING_IR,
+    REGISTER_MAPPING_IFF1,
+    REGISTER_MAPPING_IFF2,
+    REGISTER_MAPPING_IM,
+
     REGISTER_MAPPING_MAX,
     REGISTER_MAPPING_UNKNOWN
 };

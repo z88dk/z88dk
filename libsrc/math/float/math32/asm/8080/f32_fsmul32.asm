@@ -266,19 +266,15 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 
     ld hl,sp+0
     ld de,hl                        ; DE = src
-    ld hl,14
-    add hl,sp                       ; HL = dest X slot
+    ld hl,sp+14                     ; HL = dest X slot
     ld b,6
 .cp
-    ld a,(de)
-    ld (hl),a
-    inc de
-    inc hl
+    ld a,(de+)
+    ld (hl+),a
     dec b
     jp NZ,cp
 
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ld sp,hl
 
     pop hl                          ; ret

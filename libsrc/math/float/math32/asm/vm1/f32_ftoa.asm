@@ -260,8 +260,7 @@ EXTERN m32__dtoa_emit
 ; remainder is "n." drop the decimal point too.
 .m32__dtoa_g_strip
     ; CALL: work at SP+2, cursor at SP+32.  DE = slot.
-    ld hl,32
-    add hl,sp
+    ld hl,sp+32
     ex de,hl
     ld hl,(de)
     dec hl
@@ -279,8 +278,7 @@ EXTERN m32__dtoa_emit
     jp NZ,z_keep
     push hl
     xor a
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld (hl),a                       ; fz = work+2
     pop hl
     jp zstore                       ; NUL at '.'
@@ -334,8 +332,7 @@ EXTERN m32__dtoa_emit
     push bc
     push de
     push hl
-    ld hl,38
-    add hl,sp
+    ld hl,sp+38
     ex de,hl
     ld hl,(de)
     ld (hl+),a                      ; *p++
@@ -347,8 +344,7 @@ EXTERN m32__dtoa_emit
 
 
 .m32__dtoa_getdst
-    ld hl,32
-    add hl,sp
+    ld hl,sp+32
     ex de,hl
     ld hl,(de)
     ret

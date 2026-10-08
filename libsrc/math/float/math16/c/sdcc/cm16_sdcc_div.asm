@@ -7,9 +7,7 @@ PUBLIC cm16_sdcc_div
 
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
-
-EXTERN asm_f24_mul_f24
-EXTERN asm_f24_inv
+EXTERN asm_f24_div_f24
 
 EXTERN cm16_sdcc_readr
 
@@ -22,20 +20,19 @@ EXTERN cm16_sdcc_readr
     ; exit  : DEHL = sdcc_half(left/right)
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
+    ;
+    ; asm_f24_div_f24 wants main = dividend x and alt = divisor y.
+    ; asm_f24_f16 does not use exx, so y survives in the alt set.
 
-    call cm16_sdcc_readr
+    call cm16_sdcc_readr        ; HL = right = y
 
-    call asm_f24_f16            ; expand to dehl
-    call asm_f24_inv            ; 1/y   d'  = eeeeeeee e' = s-------
-    exx                         ;       hl' = 1mmmmmmm mmmmmmmm
-    
-    pop bc                      ; pop return address
-    pop hl                      ; get left operand off of the stack
-    push hl                     ; left operand on stack
-    push bc                     ; return address on stack
-    call asm_f24_f16            ; expand to dehl
-                                ; x      d  = eeeeeeee e  = s-------
-                                ;        hl = 1mmmmmmm mmmmmmmm
-    call asm_f24_mul_f24
-    jp asm_f16_f24              ; return   HL = sdcc_half
+    call asm_f24_f16            ; y in main
+    exx                         ; y in alt
 
+    pop bc                      ; ret
+    pop hl                      ; left = x half
+    push hl
+    push bc
+    call asm_f24_f16            ; x in main
+    call asm_f24_div_f24
+    jp asm_f16_f24              ; return HL = sdcc_half

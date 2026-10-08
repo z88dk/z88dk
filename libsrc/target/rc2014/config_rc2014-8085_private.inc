@@ -238,7 +238,7 @@ defc __IO_SIO_RR1_SDLC_EOF      = 0x80
 defc __IO_SIO_RX_SIZE      = 0x80
 defc __IO_SIO_RX_FULLISH      = 0x68
 defc __IO_SIO_RX_EMPTYISH      = 0x08
-defc __IO_SIO_TX_SIZE      = 0x10
+defc __IO_SIO_TX_SIZE      = 0x20
 
 
 

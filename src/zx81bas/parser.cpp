@@ -29,7 +29,7 @@ std::unordered_map<Keyword, Parser::StmtParser> Parser::pragma_parsers_lut = {
     { Keyword::VERBOSE,         &Parser::parse_pragma_verbose },
     { Keyword::VARS,            &Parser::parse_pragma_vars },
     { Keyword::DFILE,           &Parser::parse_pragma_dfile },
-    { Keyword::DFILE_COLAPSED,  &Parser::parse_pragma_dfile_colapsed },
+    { Keyword::DFILE_COLLAPSED,  &Parser::parse_pragma_dfile_collapsed },
     { Keyword::SYSVARS,         &Parser::parse_pragma_sysvars },
 };
 
@@ -1087,11 +1087,11 @@ StmtPtr Parser::parse_pragma_dfile() {
     return nullptr;
 }
 
-StmtPtr Parser::parse_pragma_dfile_colapsed() {
-    // #DFILE_COLAPSED = 0 or 1
+StmtPtr Parser::parse_pragma_dfile_collapsed() {
+    // #DFILE_COLLAPSED = 0 or 1
     expect(TokenType::Equal);
     const Token& num = expect(TokenType::Integer);
-    prog.dfile_colapsed = num.ivalue != 0;
+    prog.dfile_collapsed = num.ivalue != 0;
     return nullptr;
 }
 

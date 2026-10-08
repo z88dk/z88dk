@@ -20,7 +20,7 @@ void t_fileutil_path_canon(void)
 	TEST_ASSERT_EQUAL_STRING("..", path_canon(".."));
 	TEST_ASSERT_EQUAL_STRING("abc", path_canon("abc"));
 
-	// multiple slashes are colapsed
+	// multiple slashes are collapsed
 	TEST_ASSERT_EQUAL_STRING("abc/def", path_canon("abc//\\//def"));
 	TEST_ASSERT_EQUAL_STRING("abc/def", path_canon("abc//\\//def//\\//"));
 	TEST_ASSERT_EQUAL_STRING("c:abc/def", path_canon("c:abc//\\//def//\\//"));

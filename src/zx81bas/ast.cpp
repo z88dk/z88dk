@@ -2266,7 +2266,7 @@ void Prog::dump(DumpContext ctx) const {
         grandchild_ctx.line("\"" + line + "\"");
     }
     child_ctx.line("]");
-    child_ctx.line("dfile_colapsed: " + std::string(dfile_colapsed ? "true" :
+    child_ctx.line("dfile_collapsed: " + std::string(dfile_collapsed ? "true" :
                    "false"));
     child_ctx.line("sysvars_data: [");
     for (const auto& byte : sysvars_data) {

@@ -386,8 +386,7 @@ PUBLIC f16_8080_mulu_32_11x11
     ; only E=sign needed; HL free → ld hl,n preserves DE
     ld e,c
     pop bc
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld sp,hl
     push bc
     jp asm_f24_inf
@@ -396,8 +395,7 @@ PUBLIC f16_8080_mulu_32_11x11
     ; [cret][Y][X], C=sign
     ld e,c
     pop bc
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld sp,hl
     push bc
     jp asm_f24_inf
@@ -405,8 +403,7 @@ PUBLIC f16_8080_mulu_32_11x11
 .mulz
     ld e,c
     pop bc
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ld sp,hl
     push bc
     jp asm_f24_zero

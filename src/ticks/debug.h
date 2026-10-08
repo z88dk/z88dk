@@ -155,6 +155,13 @@ struct debugger_regs_t {
     unsigned char a_,b_,c_,d_,e_,h_,l_;
     unsigned char f, f_;
     unsigned char xh, xl, yh, yl;
+    unsigned char i, r, iff1, iff2, im;
+
+    /*
+     * Set when the backend reports any of i, r, iff1, iff2, or im, so that an
+     * all-zero value can be told apart from a register that is not reported.
+     */
+    unsigned char has_interrupt_state;
 
     /*
      * Some emulators would report this 16bit register pair, which could be used

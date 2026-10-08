@@ -23,7 +23,20 @@ char *error(char *fmt, ...)
 
 #include <sys/compiler.h>
 
-#ifdef __Z88DK_R2L_CALLING_CONVENTION
+#if defined(__LLVMZ80)
+
+typedef __builtin_va_list va_list;
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+#define va_start(...) __builtin_c23_va_start(__VA_ARGS__)
+#else
+#define va_start(ap, last) __builtin_va_start(ap, last)
+#endif
+#define va_arg(ap, type) __builtin_va_arg(ap, type)
+#define va_copy(dest, src) __builtin_va_copy(dest, src)
+#define va_end(ap) __builtin_va_end(ap)
+#define va_ptr(ap, type) (*(type *)((ap) - sizeof(type)))
+
+#elif defined(__Z88DK_R2L_CALLING_CONVENTION)
 
 /* sdcc/sccz80 in r2l mode is a lot more standard */
 typedef unsigned char * va_list;

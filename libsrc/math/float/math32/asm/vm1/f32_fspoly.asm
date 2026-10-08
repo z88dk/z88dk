@@ -25,12 +25,10 @@ PUBLIC _m32_polyf
 .m32_fspoly_callee
     ; SP: ret, n, dptr, x.HL, x.DE
 
-    ld hl,2
-    add hl,sp
+    ld hl,sp+2
     ld c,(hl)                       ; n
 
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld hl,(de)                          ; dptr
 
@@ -48,8 +46,7 @@ PUBLIC _m32_polyf
     ; frame pointer, so park the full mantissa first.
     push hl
     push de                         ; +0 Y.de +2 Y.hl +4 ret +6 n
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld a,(hl)
     or a
     jp NZ,fep_iter
@@ -66,23 +63,19 @@ PUBLIC _m32_polyf
     ; ---- res *= x ----
     push hl
     push de                         ; +0 Y.de +2 Y.hl +4 ret +6 n +8 dptr +10 xHL +12 xDE
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ex de,hl
     ld hl,(de)
     push hl                         ; x.DE; x.HL slides to +12
-    ld hl,12
-    add hl,sp
+    ld hl,sp+12
     ex de,hl
     ld hl,(de)
     push hl                         ; x.HL ; +0 xHL +2 xDE +4 Y.de +6 Y.hl
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld hl,(de)
     push hl
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ex de,hl
     ld hl,(de)
     pop de                          ; DEHL = Y.mant; BC still meta
@@ -95,12 +88,10 @@ PUBLIC _m32_polyf
     ; ---- res += d[n] ----
     push hl
     push de                         ; +0 P.de +2 P.hl +4 ret +6 n +8 dptr
-    ld hl,6
-    add hl,sp
+    ld hl,sp+6
     ld a,(hl)                       ; n
     push af
-    ld hl,10
-    add hl,sp
+    ld hl,sp+10
     ex de,hl
     ld hl,(de)                          ; dptr
     pop af
@@ -117,13 +108,11 @@ PUBLIC _m32_polyf
     pop hl
     push de                         ; X.DE
     push hl                         ; X.HL
-    ld hl,4
-    add hl,sp
+    ld hl,sp+4
     ex de,hl
     ld hl,(de)
     push hl
-    ld hl,8
-    add hl,sp
+    ld hl,sp+8
     ex de,hl
     ld hl,(de)
     pop de                          ; DEHL = product.mant

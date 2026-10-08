@@ -9,4 +9,4 @@ t/30-preproc/input/base.inc:6: ex af, af
 t/30-preproc/input/base.inc:7: defm "ex af, af'"
 t/30-preproc/input/base.inc:8: !ENDASM
 t/30-preproc/input/base.bas:3: !VERBOSE =  1 
-t/30-preproc/input/base.bas:4: !DFILE_COLAPSED =  0 
+t/30-preproc/input/base.bas:4: !DFILE_COLLAPSED =  0 

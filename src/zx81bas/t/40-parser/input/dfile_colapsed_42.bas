@@ -1,1 +1,0 @@
-#DFILE_COLAPSED = 42
