@@ -22,6 +22,7 @@ all:	accintcomp.bin accintcomp_fp.bin
 all:	bigframe.bin bigframe_fp.bin bigframe_8080.bin bigframe_r2ka.bin bigframe_ez80.bin bigframe_gbz80.bin
 all:	longasr.bin longasr_8080.bin longasr_gbz80.bin longasr_r2ka.bin longasr_ez80.bin longasr_8085.bin longasr_kc160.bin longasr_z180.bin longasr_r4k.bin longasr_fp.bin
 all:	crcloop.bin crcloop_8080.bin crcloop_gbz80.bin crcloop_r2ka.bin crcloop_ez80.bin crcloop_8085.bin crcloop_kc160.bin crcloop_z180.bin crcloop_r4k.bin crcloop_fp.bin
+all:	zxfold.bin zxfold_8080.bin zxfold_gbz80.bin zxfold_r2ka.bin zxfold_ez80.bin zxfold_8085.bin zxfold_kc160.bin zxfold_z180.bin zxfold_r4k.bin zxfold_fp.bin
 all:	countborrow.bin countborrow_gbz80.bin
 all:	strremat.bin strremat_fp.bin strremat_8080.bin strremat_gbz80.bin
 all:	fnptrdead.bin fnptrdead_fp.bin fnptrdead_8080.bin fnptrdead_gbz80.bin
@@ -4338,6 +4339,46 @@ crcloop_r4k.bin: $(SOURCES) crcloop.c
 	$(runtest_r4k)
 
 crcloop_fp.bin: $(SOURCES) crcloop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+zxfold.bin: $(SOURCES) zxfold.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+zxfold_8080.bin: $(SOURCES) zxfold.c
+	$(compile_8080)
+	$(runtest_8080)
+
+zxfold_gbz80.bin: $(SOURCES) zxfold.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+zxfold_r2ka.bin: $(SOURCES) zxfold.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+zxfold_ez80.bin: $(SOURCES) zxfold.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+zxfold_8085.bin: $(SOURCES) zxfold.c
+	$(compile_8085)
+	$(runtest_8085)
+
+zxfold_kc160.bin: $(SOURCES) zxfold.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+zxfold_z180.bin: $(SOURCES) zxfold.c
+	$(compile_z180)
+	$(runtest_z180)
+
+zxfold_r4k.bin: $(SOURCES) zxfold.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+zxfold_fp.bin: $(SOURCES) zxfold.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 

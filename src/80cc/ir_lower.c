@@ -248,6 +248,9 @@ typedef struct {
     const Op **long_rmw_ld; /* per-vreg: the first load of a `g op= h` long read-modify-write on
                                a global; the op that has v as its right operand walks both */
     const Op **long_rmw_st; /* per-vreg: result vreg of such an op -> its store, which is skipped */
+    const Op **long_zx;   /* per-vreg: a width-4 zero-extend of a frame word/byte whose
+                             only use is the next long AND/OR/XOR; the extend is
+                             skipped and that op reads the source bytes from the frame */
     const Op **long_mem;  /* per-vreg: a width-4 single-use global load whose next op
                              is the long ADD/SUB/AND/OR/XOR taking it as its right
                              operand; the load is skipped and read at that op */
@@ -264,6 +267,13 @@ static const Op *long_rmw_ld_of(const Func *f, int v)
 {
     if (!g_hc.long_rmw_ld || v < 0 || v >= f->n_vregs) return NULL;
     return g_hc.long_rmw_ld[v];
+}
+
+/* The deferred zero-extend for long vreg v, or NULL. */
+static const Op *long_zx_of(const Func *f, int v)
+{
+    if (!g_hc.long_zx || v < 0 || v >= f->n_vregs) return NULL;
+    return g_hc.long_zx[v];
 }
 
 /* The deferred global load for long vreg v, or NULL. */
@@ -9388,6 +9398,76 @@ static int ir_lower_func_body(FILE *out, Func *f)
             }
         }
     }
+    /* long-zx-fold: (unsigned long)w AND/OR/XOR other, w a word or byte in the
+       frame, other a long in the frame. The extend is not emitted: in
+       frame-pointer mode the bitop reads w's bytes from the frame and treats
+       the top bytes as zero, otherwise it builds the extend itself. The frame
+       mode is not final at this point, so it is tested where the op is
+       emitted. */
+    g_hc.long_zx = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                          sizeof(const Op *));
+    if (g_hc.long_zx && !opt_disabled("long-zx-fold")) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            const BB *bb = &f->bbs[b];
+            for (int j = 0; j + 1 < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j], *u = &bb->ops[j + 1];
+                int d = o->dst, w = o->src[0];
+                if (o->kind != IR_CONV_ZX) continue;
+                if (d < 0 || d >= f->n_vregs || f->vregs[d].width != 4) continue;
+                if (w < 0 || w >= f->n_vregs
+                    || (f->vregs[w].width != 1 && f->vregs[w].width != 2)) continue;
+                if (!vreg_kind_is_integer(f, d) || !vreg_kind_is_integer(f, w)) continue;
+                if (u->kind != IR_AND && u->kind != IR_OR && u->kind != IR_XOR) continue;
+                if (u->src[0] < 0 || u->src[1] < 0) continue;
+                int other = (u->src[0] == d) ? u->src[1] : (u->src[1] == d) ? u->src[0] : -1;
+                if (other < 0 || other == d || other >= f->n_vregs
+                    || f->vregs[other].width != 4 || !vreg_kind_is_integer(f, other))
+                    continue;
+                if (u->dst < 0 || u->dst >= f->n_vregs || f->vregs[u->dst].width != 4
+                    || !vreg_kind_is_integer(f, u->dst)
+                    || (f->vregs[u->dst].flags & (IR_VREG_VOLATILE | IR_VREG_ADDR_TAKEN)))
+                    continue;
+                if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_NO_SLOT | IR_VREG_CALL_SPLIT))
+                    continue;
+                /* the sources must have a frame slot that holds the value, and
+                   no register home that would leave the slot stale */
+                if (!vreg_is_spilled(f, w) || !vreg_is_spilled(f, other)) continue;
+                if (f->vregs[w].flags & (IR_VREG_NO_SLOT | IR_VREG_VOLATILE
+                                         | IR_VREG_ADDR_TAKEN | IR_VREG_DEAD_SPILL))
+                    continue;
+                if (f->vregs[other].flags & (IR_VREG_NO_SLOT | IR_VREG_VOLATILE
+                                             | IR_VREG_DEAD_SPILL))
+                    continue;
+                if (vreg_in_pr_bc(f, d)
+                    || vreg_is_pr_de(f, u->dst) || vreg_in_pr_bc(f, u->dst))
+                    continue;
+                if (bb->live_out
+                    && ir_bitset_get((const BitSet *)bb->live_out, d)) continue;
+                int dst_dead = def_dst_dead(f, bb, j + 1);
+                if (!dst_dead && !vreg_is_pr_dehl(f, u->dst)
+                    && (f->vregs[u->dst].flags & IR_VREG_NO_SLOT)) continue;
+                int nuse = 0, ndef = 0;
+                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
+                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
+                        const Op *p = &f->bbs[bb2].ops[k];
+                        int df[8]; int nd = ir_op_defs(p, df, 8);
+                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
+                        int us[16]; int nu = ir_op_uses(p, us, 16);
+                        for (int t = 0; t < nu; t++) if (us[t] == d) nuse++;
+                    }
+                if (ndef != 1 || nuse != 1) continue;
+                int parked = 0;
+                for (int k = 0; k < bb->n_ops && !parked; k++)
+                    if (bb->ops[k].kind == IR_PUSH_DEHL_LONG
+                        && (bb->ops[k].src[0] == other || bb->ops[k].src[0] == d))
+                        parked = 1;
+                if (parked) continue;
+                g_hc.long_zx[d] = o;
+                f->vregs[d].flags |= IR_VREG_NO_SLOT;
+            }
+        }
+    }
     /* long-rmw-walk: `g op= h` on long globals, 8080 family and gbz80, where the
        result feeds only the store back to g: both globals are walked a byte at a
        time through A, so nothing is loaded or parked. */
@@ -10251,6 +10331,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
     free(g_hc.remat_def); g_hc.remat_def = NULL;
     free(g_hc.byte_remat); g_hc.byte_remat = NULL;
     free(g_hc.long_mem); g_hc.long_mem = NULL;
+    free(g_hc.long_zx); g_hc.long_zx = NULL;
     free(g_hc.long_rmw_ld); g_hc.long_rmw_ld = NULL;
     free(g_hc.long_rmw_st); g_hc.long_rmw_st = NULL;
     free(bb_lowered);

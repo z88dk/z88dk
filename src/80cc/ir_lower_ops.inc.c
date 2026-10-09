@@ -1981,6 +1981,7 @@ static int gen_conv_zx(FILE *out, Func *f, const Op *op)
 {
     int src_w = f->vregs[op->src[0]].width;
     int dst_w = f->vregs[op->dst].width;
+    if (dst_w == 4 && long_zx_of(f, op->dst)) return 0;   /* read in place by its user */
     if (dst_w == 1) {
         /* Zero-extend whose result is only consumed at byte width
            (ir_opt_narrow_byte narrowed the dst): the low byte of the
@@ -4792,6 +4793,90 @@ static int try_fp_bytewise_commutative(FILE *out, const Func *f, const Op *op,
     return 1;
 }
 
+/* Build the deferred zero-extend `zx` into DEHL after all, for a user that
+   could not fold it: the same code gen_conv_zx would have emitted, published as
+   a dead-safe cache value (the extend's destination has no slot). */
+static void materialize_long_zx(FILE *out, Func *f, const Op *zx)
+{
+    int src_w = f->vregs[zx->src[0]].width;
+    if (src_w == 1) {
+        load_byte_to_a(out, f, zx->src[0]);
+        emit(out, "ld\tl,a");
+        emit(out, "ld\th,0");
+    } else {
+        load_to_hl(out, f, zx->src[0]);
+    }
+    emit(out, "ld\tde,0");
+    invalidate_de_cache();
+    cache_dehl_no_spill(out, zx->dst);
+}
+
+/* FP-mode long AND/OR/XOR whose one operand is a zero-extended frame word or
+   byte (long_zx): each result byte is built straight from memory — the word's
+   bytes come from the frame, the bytes above it are zero (a copy of the other
+   operand for OR/XOR, a constant 0 for AND). The extend never runs and nothing
+   is staged in DEHL. Returns 1 if emitted; 0 leaves nothing emitted. */
+static int try_fp_zx_bitop(FILE *out, Func *f, const Op *op, const Op *zx,
+                           const char *mnem)
+{
+    if (!fp_active(f)) return 0;
+    int zd = zx->dst, w = zx->src[0];
+    int other = (op->src[0] == zd) ? op->src[1] : op->src[0];
+    int ww = f->vregs[w].width;
+    int cached = dehl_has(other);
+    int dead = L.la.cur_dst_dead || vreg_is_pr_dehl(f, op->dst);
+    int sw = slot_ix_off(f, w);
+    if (!fp_offset_fits(sw) || !fp_offset_fits(sw + ww - 1)) return 0;
+    int so = 0, dd = 0;
+    if (!cached) {
+        so = slot_ix_off(f, other);
+        if (!fp_offset_fits(so) || !fp_offset_fits(so + 3)) return 0;
+    }
+    if (!dead) {
+        dd = slot_ix_off(f, op->dst);
+        if (!fp_offset_fits(dd) || !fp_offset_fits(dd + 3)) return 0;
+    }
+    int use_hl = (cached && L.rs.hl == other);
+    static const char *bc_byte[4] = { "c", "b", "e", "d" };
+    static const char *hl_byte[4] = { "l", "h", "e", "d" };
+    const char **rb = use_hl ? hl_byte : bc_byte;
+    pending_spill_resolve();
+    ss_note_reload(f, w);
+    if (cached) ss_note_cache_read(f, other); else ss_note_reload(f, other);
+    for (int i = 0; i < 4; i++) {
+        int lhs_mem = (i < ww);
+        if (lhs_mem) {
+            emit(out, "ld\ta,(%s%+d)", frame_reg(), sw + i);
+            if (cached) emit(out, "%s\ta,%s", mnem, rb[i]);
+            else        emit(out, "%s\ta,(%s%+d)", mnem, frame_reg(), so + i);
+            if (dead) emit(out, "ld\t%s,a", bc_byte[i]);
+            else      emit(out, "ld\t(%s%+d),a", frame_reg(), dd + i);
+        } else if (op->kind == IR_AND) {
+            if (dead) emit(out, "ld\t%s,0", bc_byte[i]);
+            else      emit(out, "ld\t(%s%+d),0", frame_reg(), dd + i);
+        } else {                               /* x ^ 0 == x | 0 == x */
+            if (dead) {
+                if (cached) {
+                    if (strcmp(rb[i], bc_byte[i]))
+                        emit(out, "ld\t%s,%s", bc_byte[i], rb[i]);
+                } else {
+                    emit(out, "ld\t%s,(%s%+d)", bc_byte[i], frame_reg(), so + i);
+                }
+            } else {
+                if (cached) {
+                    emit(out, "ld\t(%s%+d),%s", frame_reg(), dd + i, rb[i]);
+                } else {
+                    emit(out, "ld\ta,(%s%+d)", frame_reg(), so + i);
+                    emit(out, "ld\t(%s%+d),a", frame_reg(), dd + i);
+                }
+            }
+        }
+    }
+    invalidate_a_cache();
+    publish_bytewise_long_dst(op->dst, dead);
+    return 1;
+}
+
 /* Byte-wise ALU fold for a width-2 int op, used inside a DE-home region to keep
    DE (the resident home) clean: reads both operands where they live — register
    halves (c/b, l/h, e/d), (ix+d) slots, idx2 halves — and computes the result
@@ -6245,6 +6330,14 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
     }
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         if (gen_long_mem_rhs(out, f, op)) return 0;
+        {
+            const Op *zx = (op->src[0] >= 0 ? long_zx_of(f, op->src[0]) : NULL);
+            if (!zx && op->src[1] >= 0) zx = long_zx_of(f, op->src[1]);
+            if (zx) {
+                if (try_fp_zx_bitop(out, f, op, zx, mnem)) return 0;
+                materialize_long_zx(out, f, zx);    /* could not fold: build it now */
+            }
+        }
         /* Long AND-mask + immediately-following BR_ZERO/COND fastpath
            (`(crc & 1UL) ? ...` bit-test). When the mask hits exactly one
            of the 4 bytes, byte-AND that byte and branch on Z — vs the full

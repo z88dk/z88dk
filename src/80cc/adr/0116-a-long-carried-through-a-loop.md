@@ -2,7 +2,7 @@
 
 Status: **Accepted** (2026-10). Opt-outs: `long-asr-const`, `long-shr-bc`,
 `long-shl-tos`, `long-shl-tos-cache`, `tos-rmw`, `iv-narrow-latch`, `step-z`,
-`step-mem`.
+`step-mem`, `long-zx-fold`.
 
 ## Context
 
@@ -32,6 +32,11 @@ long, constant long shifts, byte packing) does not: on z80 it was 26.5M T for
   register operations lie between them.
 - `ir_opt_narrow_iv` also narrows a down-counter tested in the loop latch after
   its own decrement (seed 1 to 255), including the branch-if-nonzero form.
+- A long AND/OR/XOR whose operand is a single-use zero-extended frame word or
+  byte reads the word's bytes straight from the frame in frame-pointer mode: the
+  extend is not emitted, the bytes above the word are zero (a copy of the other
+  operand for OR/XOR, a constant for AND). Elsewhere the user builds the extend
+  itself. Test: `long_ir/zxfold.c`.
 - A byte inc/dec of a frame slot onto itself is `dec (ix+d)` or `dec (hl)`, and
   its Z flag feeds the following zero test.
 
