@@ -263,6 +263,11 @@ Size across the corpus before implementing.
   8080 family and gbz80: `a += b` 58 -> 32 B Z80, 61 -> 25 B 8080, 67 -> 22 B
   gbz80 (0111). The differential fuzzer found about 37 miscompiles; arrays
   now always count as aliased (0112).
+- **Index-home parameters and value-context `&&` (ADR 0118).** PR 3181's Z80
+  miscompile was two parameters sharing IX; `cmpbench` Z80 2071 -> 1247 B once
+  `&&`/`||` as values branch to a 0/1 join. Left: the `ld bc,1 / jp / ld bc,0`
+  join feeding an add, and an audit of the other per-block records for the
+  multi-exit assumption (`bb_byte_out`, pending spills).
 - **Literal printf and dead instructions (ADR 0117).** The survey has an xcc column
   (xcc `-Os` is 40 % larger than 80cc; 80cc is 8.1 % larger than sdcc on z80 fp).
   `printf("lit\n")` is `puts` and adjacent literal calls merge. Left: the

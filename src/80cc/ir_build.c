@@ -5207,6 +5207,23 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         if (!n->left || !n->right)
             return build_fail("OP_%s with missing operand",
                               n->ast_type == OP_ANDAND ? "ANDAND" : "OROR");
+        if (!opt_disabled("cond-value")) {
+            /* Branch each leg straight to the join and write 0 or 1 once,
+               rather than turning every leg into a stored boolean. */
+            int res    = get_dest_vreg(b, hint, 2);
+            int true_bb  = ir_bb_new(b->f);
+            int false_bb = ir_bb_new(b->f);
+            int join_bb  = ir_bb_new(b->f);
+            if (build_cond(b, n, true_bb, false_bb) != 0) return -1;
+            b->cur_bb_id = true_bb;
+            ir_emit_ld_imm(cur_bb(b), res, 1);
+            ir_emit_br(cur_bb(b), join_bb);
+            b->cur_bb_id = false_bb;
+            ir_emit_ld_imm(cur_bb(b), res, 0);
+            ir_emit_br(cur_bb(b), join_bb);
+            b->cur_bb_id = join_bb;
+            return res;
+        }
         int a_v = build_expr(b, n->left);
         if (a_v < 0) return -1;
 

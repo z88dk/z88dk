@@ -6461,6 +6461,35 @@ static void emit_slot_addr_off(FILE *out, const Func *f, int canon_off);
    rather than through hl_about_to_change. */
 static void hl_about_to_change(int v_new);
 
+/* Conditional side exits whose register beliefs differ from the ones the block
+   ends with. Successors take the end-of-block beliefs; the edge from an earlier
+   exit must not. Listed per (pred, target), reset for each render. */
+typedef struct { int pred, tgt; } UnsafeEdge;
+static UnsafeEdge *g_unsafe_edge;
+static int g_unsafe_n, g_unsafe_cap;
+
+static void unsafe_edge_add(int pred, int tgt)
+{
+    if (g_unsafe_n == g_unsafe_cap) {
+        int nc = g_unsafe_cap ? g_unsafe_cap * 2 : 16;
+        UnsafeEdge *ne = realloc(g_unsafe_edge, (size_t)nc * sizeof *ne);
+        if (!ne) return;
+        g_unsafe_edge = ne;
+        g_unsafe_cap = nc;
+    }
+    g_unsafe_edge[g_unsafe_n].pred = pred;
+    g_unsafe_edge[g_unsafe_n].tgt = tgt;
+    g_unsafe_n++;
+}
+
+static int edge_unsafe(int pred, int tgt)
+{
+    for (int i = 0; i < g_unsafe_n; i++)
+        if (g_unsafe_edge[i].pred == pred && g_unsafe_edge[i].tgt == tgt)
+            return 1;
+    return 0;
+}
+
 /* Cross-BB HL slot-address carry (default on; IR_OFF=hl-addr-carry reverts). */
 static int hladdr_bb_carry_on(void)
 {
@@ -10844,6 +10873,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         for (int i = 0; i < f->n_bbs; i++) bb_hl_addr_out[i] = -1;
     /* Per-pass state reset (everything that was at function entry except
        func_emit_idx, which the caller bumps once for both passes). */
+    g_unsafe_n = 0;
     L.cmp_label_counter = 0;
     L.lazy_spill_on = lazy;
     L.pending_spill_v = -1;
@@ -11005,7 +11035,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) { acarry = -1; break; }
-                int v = bb_hl_out[pid];
+                int v = edge_unsafe(pid, bb->id) ? -1 : bb_hl_out[pid];
                 if (v < 0) { acarry = -1; break; }
                 if (acarry == -2) acarry = v;
                 else if (acarry != v) { acarry = -1; break; }
@@ -11020,7 +11050,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                     int pid = bb_preds[bb->id][p];
                     if (!bb_lowered[pid]) { dcarry = -1; break; }
-                    int v = bb_de_out[pid];
+                    int v = edge_unsafe(pid, bb->id) ? -1 : bb_de_out[pid];
                     if (v < 0) { dcarry = -1; break; }
                     if (dcarry == -2) dcarry = v;
                     else if (dcarry != v) { dcarry = -1; break; }
@@ -11082,7 +11112,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) { bcarry = -1; break; }
-                int v = bb_bc_out ? bb_bc_out[pid] : -1;
+                int v = (bb_bc_out && !edge_unsafe(pid, bb->id)) ? bb_bc_out[pid] : -1;
                 if (v < 0) { bcarry = -1; break; }
                 if (bcarry == -2) bcarry = v;
                 else if (bcarry != v) { bcarry = -1; break; }
@@ -11158,7 +11188,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
             int pid = bb_preds[bb->id][p];
             if (!bb_lowered[pid]) { carry = -1; break; }
-            int v = bb_hl_out[pid];
+            int v = edge_unsafe(pid, bb->id) ? -1 : bb_hl_out[pid];
             if (v < 0) { carry = -1; break; }
             if (carry == -2) carry = v;
             else if (carry != v) { carry = -1; break; }
@@ -11205,7 +11235,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) { dcarry = -1; break; }
-                int v = bb_de_out[pid];
+                int v = edge_unsafe(pid, bb->id) ? -1 : bb_de_out[pid];
                 if (v < 0) { dcarry = -1; break; }
                 if (dcarry == -2) dcarry = v;
                 else if (dcarry != v) { dcarry = -1; break; }
@@ -11258,7 +11288,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) { addr_carry = -1; break; }
-                int o = bb_hl_addr_out[pid];
+                int o = edge_unsafe(pid, bb->id) ? -1 : bb_hl_addr_out[pid];
                 if (o < 0) { addr_carry = -1; break; }
                 if (addr_carry == -2) addr_carry = o;
                 else if (addr_carry != o) { addr_carry = -1; break; }
@@ -11279,7 +11309,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) { acarry = -1; break; }
-                int v = L.bb_a_out ? L.bb_a_out[pid] : -1;
+                int v = (L.bb_a_out && !edge_unsafe(pid, bb->id)) ? L.bb_a_out[pid] : -1;
                 if (v < 0) { acarry = -1; break; }
                 if (acarry == -2) acarry = v;
                 else if (acarry != v) { acarry = -1; break; }
@@ -11454,6 +11484,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             && L.cur_home_exit_flush_bb < 0)
             home_flush(out, f);   /* keep belief; slot now coherent */
         if (frameprobe_on()) frameprobe_region_break();   /* BB boundary */
+        /* Register beliefs at each conditional side exit, compared with the
+           end-of-block state once the block is done. */
+        struct { int tgt, addr, hl, a, bc, de; } sides[16];
+        int n_sides = 0, sides_over = 0, side_over_blk = 0;
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *op = &bb->ops[j];
             int rc;
@@ -12129,6 +12163,21 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             }
             L.ss_cur_g = -1;
             if (rc != 0) goto cleanup_err;
+            {
+                const Op *bo = (L.la.cur_skip_next_op && j + 1 < bb->n_ops)
+                             ? &bb->ops[j + 1] : op;
+                if (bo->kind == IR_BR_ZERO || bo->kind == IR_BR_COND) {
+                    if (n_sides < 16) {
+                        sides[n_sides].tgt = bo->label;
+                        sides[n_sides].addr = L.cur_hl_addr_off;
+                        sides[n_sides].hl = L.rs.hl;
+                        sides[n_sides].a = L.rs.a;
+                        sides[n_sides].bc = L.rs.bc;
+                        sides[n_sides].de = L.rs.de;
+                        n_sides++;
+                    } else sides_over = 1;
+                }
+            }
             if (L.la.cur_skip_next_op) {
                 j++;  /* the fastpath consumed op[i+1] (the branch) */
             }
@@ -12159,17 +12208,33 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             L.bb_byte_out_dirty[bb->id] =
                 (L.bb_byte_out[bb->id] >= 0 && L.cur_de_byte_home_dirty) ? 1 : 0;
         bb_hl_out[bb->id] = L.rs.hl;
+        if (!opt_disabled("side-exit-carry")) {
+            for (int k = 0; k < n_sides; k++) {
+                if (sides[k].addr == L.cur_hl_addr_off && sides[k].hl == L.rs.hl
+                    && sides[k].a == L.rs.a && sides[k].bc == L.rs.bc
+                    && sides[k].de == L.rs.de)
+                    continue;
+                unsafe_edge_add(bb->id, sides[k].tgt);
+                if (bb_alias && sides[k].tgt >= 0 && sides[k].tgt < f->n_bbs
+                    && bb_alias[sides[k].tgt] >= 0)
+                    unsafe_edge_add(bb->id, bb_alias[sides[k].tgt]);
+            }
+            if (sides_over) {          /* too many exits to track: carry nothing */
+                bb_hl_out[bb->id] = -1;
+                side_over_blk = 1;
+            }
+        }
         if (L.bb_hlm_sym) {
             L.bb_hlm_sym[bb->id] = L.hlm_on ? L.hlm_sym : NULL;
             L.bb_hlm_off[bb->id] = L.hlm_off;
         }
-        if (bb_bc_out) bb_bc_out[bb->id] = L.rs.bc;
-        if (bb_de_out) bb_de_out[bb->id] = de_carry_on ? L.rs.de : -1;
-        if (bb_hl_addr_out) bb_hl_addr_out[bb->id] = L.cur_hl_addr_off;
+        if (bb_bc_out) bb_bc_out[bb->id] = side_over_blk ? -1 : L.rs.bc;
+        if (bb_de_out) bb_de_out[bb->id] = (de_carry_on && !side_over_blk) ? L.rs.de : -1;
+        if (bb_hl_addr_out) bb_hl_addr_out[bb->id] = side_over_blk ? -1 : L.cur_hl_addr_off;
         /* A holds a known byte here only if a byte compare (cp/or a) left it —
            word compares and calls clear rs.a. So rs.a captures A-preservation
            to the (branch) terminator; successors inherit it. */
-        if (L.bb_a_out) L.bb_a_out[bb->id] = L.rs.a;
+        if (L.bb_a_out) L.bb_a_out[bb->id] = side_over_blk ? -1 : L.rs.a;
         bb_pending_out[bb->id] = L.pending_spill_v;
         bb_lowered[bb->id] = 1;
     }

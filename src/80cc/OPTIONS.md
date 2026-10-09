@@ -114,6 +114,8 @@ exists (ADR 0010).
 | `dead-ex-de-hl` | an `ex de,hl` after which neither HL nor DE is read is kept |
 | `dead-ld-hl-a` | an `ld h,a; ld l,a` pair whose HL is rewritten before it is read is kept |
 | `st-pop-de` | a word store through a pointer in HL pops a stack-parked value through HL (and reloads the pointer) instead of `pop de` |
+| `cond-value` | `a && b` and `a || b` used as a value build each leg as a stored boolean instead of branching straight to a 0/1 join |
+| `side-exit-carry` | a block with a conditional side exit hands its successors the register beliefs it holds at the end, even where an earlier exit held something else |
 | `printf-puts` | a literal-only `printf` statement stays a `printf` call: no `puts` rewrite and no merging of adjacent ones |
 | `lea-frame-prologue` | ez80 fp-mode frame allocation uses `ld hl,-N; add hl,sp` instead of an IX-relative `lea` |
 | `bc-evict` | a BC tenant is never displaced by a better candidate |

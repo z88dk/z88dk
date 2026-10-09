@@ -25,6 +25,8 @@ all:	crcloop.bin crcloop_8080.bin crcloop_gbz80.bin crcloop_r2ka.bin crcloop_ez8
 all:	zxfold.bin zxfold_8080.bin zxfold_gbz80.bin zxfold_r2ka.bin zxfold_ez80.bin zxfold_8085.bin zxfold_kc160.bin zxfold_z180.bin zxfold_r4k.bin zxfold_fp.bin
 all:	printfputs.bin printfputs_asm.bin
 all:	bytestore.bin bytestore_8080.bin bytestore_gbz80.bin bytestore_r2ka.bin bytestore_ez80.bin bytestore_8085.bin bytestore_kc160.bin bytestore_z180.bin bytestore_r4k.bin bytestore_fp.bin
+all:	condvalue.bin condvalue_8080.bin condvalue_gbz80.bin condvalue_r2ka.bin condvalue_ez80.bin condvalue_8085.bin condvalue_kc160.bin condvalue_z180.bin condvalue_r4k.bin condvalue_fp.bin
+all:	idx2param.bin idx2param_8080.bin idx2param_gbz80.bin idx2param_r2ka.bin idx2param_ez80.bin idx2param_8085.bin idx2param_kc160.bin idx2param_z180.bin idx2param_r4k.bin idx2param_fp.bin
 all:	densify.bin densify_8080.bin densify_gbz80.bin densify_r2ka.bin densify_ez80.bin densify_8085.bin densify_kc160.bin densify_z180.bin densify_r4k.bin densify_fp.bin
 all:	foldshift.bin foldshift_8080.bin foldshift_gbz80.bin foldshift_r2ka.bin foldshift_ez80.bin foldshift_8085.bin foldshift_kc160.bin foldshift_z180.bin foldshift_r4k.bin foldshift_fp.bin
 all:	countborrow.bin countborrow_gbz80.bin
@@ -4423,6 +4425,86 @@ bytestore_r4k.bin: $(SOURCES) bytestore.c
 	$(runtest_r4k)
 
 bytestore_fp.bin: $(SOURCES) bytestore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+condvalue.bin: $(SOURCES) condvalue.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+condvalue_8080.bin: $(SOURCES) condvalue.c
+	$(compile_8080)
+	$(runtest_8080)
+
+condvalue_gbz80.bin: $(SOURCES) condvalue.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+condvalue_r2ka.bin: $(SOURCES) condvalue.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+condvalue_ez80.bin: $(SOURCES) condvalue.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+condvalue_8085.bin: $(SOURCES) condvalue.c
+	$(compile_8085)
+	$(runtest_8085)
+
+condvalue_kc160.bin: $(SOURCES) condvalue.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+condvalue_z180.bin: $(SOURCES) condvalue.c
+	$(compile_z180)
+	$(runtest_z180)
+
+condvalue_r4k.bin: $(SOURCES) condvalue.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+condvalue_fp.bin: $(SOURCES) condvalue.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+idx2param.bin: $(SOURCES) idx2param.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+idx2param_8080.bin: $(SOURCES) idx2param.c
+	$(compile_8080)
+	$(runtest_8080)
+
+idx2param_gbz80.bin: $(SOURCES) idx2param.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+idx2param_r2ka.bin: $(SOURCES) idx2param.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+idx2param_ez80.bin: $(SOURCES) idx2param.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+idx2param_8085.bin: $(SOURCES) idx2param.c
+	$(compile_8085)
+	$(runtest_8085)
+
+idx2param_kc160.bin: $(SOURCES) idx2param.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+idx2param_z180.bin: $(SOURCES) idx2param.c
+	$(compile_z180)
+	$(runtest_z180)
+
+idx2param_r4k.bin: $(SOURCES) idx2param.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+idx2param_fp.bin: $(SOURCES) idx2param.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
