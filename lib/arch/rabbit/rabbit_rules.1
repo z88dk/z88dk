@@ -264,10 +264,13 @@
 
 %notcpu r6k
 %notcpu r4k
+%is %1 "ld.*" "push.hl" "push.de" "push.bc" "pop.*" "ex.*" "ret" "inc.*" "dec.*" "add.hl,.*"
 	ld	hl,0	;const
+	%1
 =
 	bool	hl
 	rr	hl
+	%1
 
 	pop	hl
 	push	hl

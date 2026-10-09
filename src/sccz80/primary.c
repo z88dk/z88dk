@@ -910,14 +910,15 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
     }
     if ( kind_is_integer(lval->cast_type->kind) && dest_lval->is_const) {
         int64_t val = dest_lval->const_val;
-        if ( lval->cast_type->kind < dest_lval->val_type) {
-            if ( lval->cast_type->kind == KIND_INT ) {
-                dest_lval->const_val = lval->cast_type->isunsigned ? (uint16_t)(val & 0xffff) : (int16_t)(val & 0xffff);
-            } else if ( lval->cast_type->kind == KIND_CHAR) {
-                dest_lval->const_val = lval->cast_type->isunsigned ? (uint8_t)(val & 0xff) : (int8_t)(val & 0xff);
-            } else if ( lval->cast_type->kind == KIND_LONG) {
-                dest_lval->const_val = lval->cast_type->isunsigned ? (uint32_t)(val & 0xffffffff) : (int32_t)(val & 0xffffffff);
-            }
+        /* Always mask to the size of the target: a folded constant such as
+           0xFF + 1 keeps the type of its first operand (char) while holding
+           256, so comparing the types to decide whether to truncate misses it. */
+        if ( lval->cast_type->kind == KIND_INT ) {
+            dest_lval->const_val = lval->cast_type->isunsigned ? (uint16_t)(val & 0xffff) : (int16_t)(val & 0xffff);
+        } else if ( lval->cast_type->kind == KIND_CHAR) {
+            dest_lval->const_val = lval->cast_type->isunsigned ? (uint8_t)(val & 0xff) : (int8_t)(val & 0xff);
+        } else if ( lval->cast_type->kind == KIND_LONG) {
+            dest_lval->const_val = lval->cast_type->isunsigned ? (uint32_t)(val & 0xffffffff) : (int32_t)(val & 0xffffffff);
         }
 
     }
