@@ -275,6 +275,7 @@ exists (ADR 0010).
 | `long-shr-bc` | a bit-only long `>>` of a DE:BC-cached value fetches the low half into HL and stashes it back |
 | `long-zx-fold` | a zero-extended word or byte feeding a long AND/OR/XOR is built in DEHL instead of read from the frame |
 | `byte-store-reg` | a byte held in L is stored to its frame slot through A instead of `ld (ix+d),l` |
+| `long-fold-sp` | the zero-extend / byte-shift fold into a long bitop or add is used in frame-pointer mode only; sp-addressed code builds the operand |
 | `byte-clean` | the byte clean-up after narrowing is skipped altogether |
 | `byte-ext-src` | a byte op reading a widened byte reads the widened word, not the byte it came from |
 | `frame-byte-trunc-sp` | in sp mode the low byte of a word in the frame is read by loading the whole word, as in fp mode before the byte read |

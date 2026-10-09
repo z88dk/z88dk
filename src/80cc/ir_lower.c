@@ -9457,6 +9457,22 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 if (vreg_in_pr_bc(f, d)
                     || vreg_is_pr_de(f, u->dst) || vreg_in_pr_bc(f, u->dst))
                     continue;
+                /* the folded operand's source is read from its slot: if the op
+                   that defined it left it in the DEHL cache only (no store), the
+                   slot is stale */
+                {
+                    int stale = 0;
+                    for (int jd = j - 1; jd >= 0 && !stale; jd--) {
+                        int df[8]; int nd = ir_op_defs(&bb->ops[jd], df, 8);
+                        for (int t = 0; t < nd; t++)
+                            if (df[t] == w) {
+                                if (def_dst_dead(f, bb, jd)) stale = 1;
+                                jd = -1;
+                                break;
+                            }
+                    }
+                    if (stale) continue;
+                }
                 if (bb->live_out
                     && ir_bitset_get((const BitSet *)bb->live_out, d)) continue;
                 int dst_dead = def_dst_dead(f, bb, j + 1);

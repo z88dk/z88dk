@@ -4848,14 +4848,16 @@ typedef struct {
     int other, other_is_src0;
     int cached, dead, use_hl;
     int so, dd;
+    int sp;               /* 1: addressed through sp (no usable (ix+d)) */
 } FoldPlan;
 
 static int def_dst_dead(const Func *f, const BB *bb, int j);
 
-static int fold_plan(Func *f, const Op *prod, int uidx, FoldPlan *pl)
+static int fold_plan_fp(Func *f, const Op *prod, int uidx, FoldPlan *pl)
 {
     if (opt_disabled("long-zx-fold") || !cur_bb || uidx >= cur_bb->n_ops) return 0;
     if (!fp_active(f) || L.cur_frameless) return 0;
+    pl->sp = 0;
     const Op *u = &cur_bb->ops[uidx];
     int pd = prod->dst;
     if (u->kind != IR_AND && u->kind != IR_OR && u->kind != IR_XOR
@@ -4893,6 +4895,68 @@ static int fold_plan(Func *f, const Op *prod, int uidx, FoldPlan *pl)
     return 1;
 }
 
+
+/* sp-addressed form: operands are reached through an HL pointer into the frame.
+   The other operand rides in BC:DE (loaded there if not already), the folded
+   operand's bytes are combined with it through `(hl)`, and the result is left
+   in BC:DE for the usual store. */
+static int fold_plan_sp(Func *f, const Op *prod, int uidx, FoldPlan *pl)
+{
+    if (opt_disabled("long-zx-fold") || opt_disabled("long-fold-sp")
+        || !cur_bb || uidx >= cur_bb->n_ops) return 0;
+    const Op *u = &cur_bb->ops[uidx];
+    int pd = prod->dst;
+    if (u->kind != IR_AND && u->kind != IR_OR && u->kind != IR_XOR
+        && u->kind != IR_ADD && u->kind != IR_SUB) return 0;
+    if (u->src[0] < 0 || u->src[1] < 0 || (u->src[0] != pd && u->src[1] != pd))
+        return 0;
+    pl->user = u;
+    pl->other_is_src0 = (u->src[1] == pd);
+    pl->other = pl->other_is_src0 ? u->src[0] : u->src[1];
+    if (!fold_bytes(f, prod, &pl->fb)) return 0;
+    int arith_ops = (u->kind == IR_ADD || u->kind == IR_SUB);
+    int first = -1;
+    for (int i = 0; i < 4; i++) {
+        if (arith_ops && pl->fb.kind[i] == 2) return 0;
+        if (arith_ops && i == 0 && pl->fb.kind[0] == 0) return 0;
+        if (pl->fb.kind[i] == 1) {
+            if (first < 0) first = i;
+            else if (pl->fb.v[i] != pl->fb.v[first]
+                     || pl->fb.b[i] != pl->fb.b[first] + (i - first)) return 0;
+            if (slot_off(f, pl->fb.v[i]) < 0) return 0;
+        }
+    }
+    if (first < 0) return 0;
+    /* sign bytes follow the memory bytes and read the last of them */
+    for (int i = 0; i < 4; i++)
+        if (pl->fb.kind[i] == 2 && (first < 0 || pl->fb.b[first] > 3)) return 0;
+    pl->cached = dehl_has(pl->other);
+    pl->use_hl = (pl->cached && L.rs.hl == pl->other);
+    if (!pl->cached && slot_off(f, pl->other) < 0) return 0;
+    pl->dead = 0; pl->so = pl->dd = 0;
+    pl->sp = 1;
+    if (prod->kind == IR_SHL && u->dst == prod->src[0]) return 0;
+    return 1;
+}
+
+static int fold_plan(Func *f, const Op *prod, int uidx, FoldPlan *pl)
+{
+    /* the other operand parked on the data stack (no slot write behind it) is
+       read by the generic path only */
+    if (cur_bb && uidx < cur_bb->n_ops) {
+        const Op *u = &cur_bb->ops[uidx];
+        for (int s = 0; s < 2; s++) {
+            int v = u->src[s];
+            if (v < 0 || v == prod->dst) continue;
+            if (v == L.la.cur_stack_long_top || v == L.la.cur_dehl_inline_push
+                || vreg_is_pr_stack(f, v))
+                return 0;
+        }
+    }
+    if (fold_plan_fp(f, prod, uidx, pl)) return 1;
+    return fold_plan_sp(f, prod, uidx, pl);
+}
+
 /* Producer side: should this zero-extend / shift emit nothing? Whatever the
    answer, the result has no slot, so when it is built it is published as a
    dead-safe cache value for the next op. */
@@ -4908,9 +4972,81 @@ static int fold_producer_skip(Func *f, const Op *prod)
     return 0;
 }
 
+static void fold_emit_sp(FILE *out, Func *f, const FoldPlan *pl)
+{
+    const Op *u = pl->user;
+    static const char *rg[4] = { "c", "b", "e", "d" };
+    int bitop = (u->kind == IR_AND || u->kind == IR_OR || u->kind == IR_XOR);
+    const char *m0 = u->kind == IR_ADD ? "add" : u->kind == IR_SUB ? "sub"
+                   : u->kind == IR_AND ? "and" : u->kind == IR_OR ? "or" : "xor";
+    const char *mN = u->kind == IR_ADD ? "adc" : u->kind == IR_SUB ? "sbc" : m0;
+    int first = -1;
+    for (int i = 0; i < 4; i++) if (pl->fb.kind[i] == 1) { first = i; break; }
+    pending_spill_resolve();
+    /* the other operand in BC:DE (BC = low half, DE = high half) */
+    if (!pl->cached) {
+        L.la.cur_load_to_dehl_no_hl = 1;
+        load_to_dehl(out, f, pl->other);
+    } else {
+        ss_note_cache_read(f, pl->other);
+        /* the producer advertised HL as the low half and skipped the BC stash */
+        if (pl->use_hl) emit(out, "ld\tbc,hl");
+    }
+    for (int i = 0; i < 4; i++)
+        if (pl->fb.kind[i]) ss_note_reload(f, pl->fb.v[i]);
+    /* HL -> the folded operand's first memory byte (flags are free to change:
+       the carry chain only starts below) */
+    emit_frame_addr_hl(out, f, slot_off(f, pl->fb.v[first]) + pl->fb.b[first]);
+    int sign_in_h = 0;
+    for (int i = 0; i < 4; i++) {
+        const char *r = rg[i];
+        int k = pl->fb.kind[i];
+        const char *mn = (i == 0) ? m0 : mN;
+        if (bitop) {
+            if (k == 0) {
+                if (u->kind == IR_AND) emit(out, "ld\t%s,0", r);
+            } else if (k == 1) {
+                emit(out, "ld\ta,%s", r);
+                emit(out, "%s\t(hl)", mn);
+                emit(out, "ld\t%s,a", r);
+            } else {
+                if (!sign_in_h) {
+                    emit(out, "ld\ta,(hl)");
+                    emit(out, "add\ta,a");
+                    emit(out, "sbc\ta,a");
+                    emit(out, "ld\th,a");
+                    sign_in_h = 1;
+                }
+                emit(out, "ld\ta,h");
+                emit(out, "%s\ta,%s", mn, r);
+                emit(out, "ld\t%s,a", r);
+            }
+        } else if (u->kind == IR_ADD) {
+            emit(out, "ld\ta,%s", r);
+            if (k) emit(out, "%s\ta,(hl)", mn); else emit(out, "%s\ta,0", mn);
+            emit(out, "ld\t%s,a", r);
+        } else if (!pl->other_is_src0) {              /* folded - other */
+            if (k) emit(out, "ld\ta,(hl)"); else emit(out, "ld\ta,0");
+            emit(out, "%s\ta,%s", mn, r);
+            emit(out, "ld\t%s,a", r);
+        } else {                                       /* other - folded */
+            emit(out, "ld\ta,%s", r);
+            if (k) emit(out, "%s\ta,(hl)", mn); else emit(out, "%s\ta,0", mn);
+            emit(out, "ld\t%s,a", r);
+        }
+        if (k == 1 && i + 1 < 4 && pl->fb.kind[i + 1] == 1)
+            emit(out, "inc\thl");
+    }
+    invalidate_a_cache();
+    invalidate_hl_cache();
+    L.la.cur_dehl_bc_is_low = 1;               /* result is in BC (low) : DE (high) */
+    store_dehl_finalize(out, f, u->dst);
+}
+
 static void fold_emit(FILE *out, Func *f, const FoldPlan *pl)
 {
     const Op *u = pl->user;
+    if (pl->sp) { fold_emit_sp(out, f, pl); return; }
     static const char *bc_byte[4] = { "c", "b", "e", "d" };
     static const char *hl_byte[4] = { "l", "h", "e", "d" };
     const char **rb = pl->use_hl ? hl_byte : bc_byte;

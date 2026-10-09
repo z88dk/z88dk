@@ -41,6 +41,12 @@ long, constant long shifts, byte packing) does not: on z80 it was 26.5M T for
   the producer is built as usual, with no slot of its own unless its user is an
   ADD/SUB. ADD/SUB do not fold sign-filled or left-shifted operands (the carry
   chain). Tests: `long_ir/zxfold.c`, `foldshift.c`.
+  The sp form (`long-fold-sp`) has no `(ix+d)`: the other operand goes to
+  BC:DE and the folded operand's bytes are combined through one `(hl)` walk,
+  result left in BC:DE for the store. The plan declines when the other operand
+  is parked on the stack, and the prepass rejects a source defined into the
+  DEHL cache without a store; a cached HL low half is moved to BC so both
+  passes agree. lshiftbench sp: 8080 -124 B, gbz80 -112 B, r2ka -141 B.
 - A byte taken from a long or a word in HL is stored to its frame slot as
   `ld (ix+d),l` when nothing reads it next, instead of through A. Test:
   `long_ir/bytestore.c`.

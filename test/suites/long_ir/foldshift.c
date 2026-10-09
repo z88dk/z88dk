@@ -41,6 +41,66 @@ static unsigned long zsub(unsigned long x, unsigned int w) { return x - (unsigne
 static unsigned long zsub2(unsigned long x, unsigned int w) { return (unsigned long)w - x; }
 static unsigned long badd(unsigned long x, unsigned char c) { return (unsigned long)c + x; }
 
+
+/* Chains of shifts xor'd into an accumulator and a byte-reversal built from
+ * zero-extended shifted bytes: the forms lshiftbench uses. Expected values were
+ * computed on the host. */
+static unsigned long kshift(unsigned long v)
+{
+    unsigned long a;
+    a  = (v >> 8) & 0xffffffffUL;
+    a ^= (v >> 16);
+    a ^= (v >> 24);
+    a ^= (v << 8)  & 0xffffffffUL;
+    a ^= (v << 16) & 0xffffffffUL;
+    a ^= (v << 24) & 0xffffffffUL;
+    a ^= (v >> 1);
+    a ^= (v << 1)  & 0xffffffffUL;
+    a ^= (v << 3)  & 0xffffffffUL;
+    a ^= (v >> 5);
+    return a;
+}
+
+static unsigned long ksshift(unsigned long v)
+{
+    long s = (long)v;
+    unsigned long a;
+    a  = (unsigned long)(s >> 8);
+    a ^= (unsigned long)(s >> 16);
+    a ^= (unsigned long)(s >> 24);
+    a ^= (unsigned long)(s >> 31);
+    a ^= (unsigned long)(s >> 7);
+    return a;
+}
+
+static unsigned long pack(unsigned long v)
+{
+    unsigned char b0 = (unsigned char)v;
+    unsigned char b1 = (unsigned char)(v >> 8);
+    unsigned char b2 = (unsigned char)(v >> 16);
+    unsigned char b3 = (unsigned char)(v >> 24);
+    return ((unsigned long)b0 << 24) | ((unsigned long)b1 << 16)
+         | ((unsigned long)b2 << 8) | b3;
+}
+
+static int chains(void)
+{
+    int bad = 0;
+    if (kshift(0x12345679UL) != 0xa77cc9c5UL) bad++;
+    if (kshift(0x80000001UL) != 0x4581818aUL) bad++;
+    if (kshift(0xFEDCBA98UL) != 0x8d18a3f0UL) bad++;
+    if (kshift(0x0000FFFFUL) != 0x000687f9UL) bad++;
+    if (ksshift(0x12345679UL) != 0x00364edcUL) bad++;
+    if (ksshift(0x80000001UL) != 0xff7f807fUL) bad++;
+    if (ksshift(0xFEDCBA98UL) != 0xfffc9b12UL) bad++;
+    if (ksshift(0x0000FFFFUL) != 0x00000100UL) bad++;
+    if (pack(0x12345679UL) != 0x79563412UL) bad++;
+    if (pack(0x80000001UL) != 0x01000080UL) bad++;
+    if (pack(0xFEDCBA98UL) != 0x98badcfeUL) bad++;
+    if (pack(0x0000FFFFUL) != 0xffff0000UL) bad++;
+    return bad;
+}
+
 static int run(void)
 {
     int bad = 0, i;
@@ -58,6 +118,7 @@ static int run(void)
         STEST(^, 16); STEST(&, 16); STEST(|, 16);
         STEST(^, 24); STEST(&, 24); STEST(|, 24);
     }
+    bad += chains();
     if (zadd(0x0001FFFFUL, 0xFFFFu) != 0x0002FFFEUL) bad++;
     if (zadd(0xFFFFFFFFUL, 1u) != 0UL) bad++;
     if (zsub(0x00010000UL, 1u) != 0x0000FFFFUL) bad++;
