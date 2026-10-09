@@ -8,7 +8,7 @@ BENCH = charbench crcbench intbench ptrbench sieve rle \
            structbench vecbench recordbench maskbench \
            strbench listbench interpbench matrixbench \
            hashbench fixedbench histbench lexbench \
-           bitfieldbench widthbench predbench \
+           bitfieldbench widthbench predbench cmpbench \
            shiftbench localbench divbench callbench \
            m4gcd m4bitcount m4josephus m4kadane m4doors m4memory m4vcfe \
            m4pangram
