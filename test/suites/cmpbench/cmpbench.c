@@ -1,6 +1,20 @@
 /*
  * cmpbench.c — relational operators whose result is a value.
  *
+ * Two miscompiles turned up while cutting this bench down. The source
+ * stays off both of them.
+ *
+ * sccz80 deletes an unsigned char compare against (unsigned char)(0xFF + 1).
+ * The sum is 256. The range check uses -128..255 for a char and ignores
+ * the cast to 0, warns "expression is always true", and replaces the
+ * compare with the constant 1. A zero byte then compares unequal. The
+ * host and 80cc return 0 for that case. Each k + 1 below fits in a byte.
+ *
+ * Z80 80cc returns 4 instead of 3 for a=-8, b=-7, c=0 when the six
+ * signed relations sit in the same function as the && chains. The stack
+ * frame and -fframe-pointer both do it. 8080 and 8085 80cc return 3,
+ * and so does sccz80. Those relations are in order().
+ *
  * predbench uses a compare as control flow (if, &&, ?:) and can leave the
  * result in the flags. The expressions here are values. Each one is added
  * into an accumulator. That is the shape of a long run of
