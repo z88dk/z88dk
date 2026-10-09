@@ -21,6 +21,10 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         emit(out, (IS_RABBIT()) ? "ipset\t3" : "di");
 
     int pre = (ci->pre_pushed > 0);
+    /* [callbc] Set only by this call's own PR_BC result stamp. Not an id
+       compare: L.rs.bc can equal ci->ret_vreg from a stale belief left by an
+       earlier pass through the same call site. */
+    int callbc_fresh_stamp = 0;
 
     /* __sdcccall(1) register convention (z80/z180/z80n): 1st arg A/HL/HLDE,
        2nd DE (when eligible), the rest stacked (STDC R→L, pushed below).
@@ -129,12 +133,19 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         if (width > 4) {
             /* Wide double arg: load slot into acc and push — combined (dldpsh)
                when the format provides it, else load + push. */
-            emit_acc_slot_addr(out, f, ci->args[i], pushed_bytes + sp_adj_extra);
-            if (acc_prim(f, ci->args[i], "loadpush")) {
-                emit(out, "call\t%s", acc_prim(f, ci->args[i], "loadpush"));
-            } else {
-                emit(out, "call\t%s", acc_prim(f, ci->args[i], "load"));
+            if (!opt_disabled("acc-drop-wide")
+                && *wide_acc_cell(f, ci->args[i]) == ci->args[i]) {
                 emit(out, "call\t%s", acc_prim(f, ci->args[i], "push"));
+            } else {
+                emit_acc_slot_addr(out, f, ci->args[i], pushed_bytes + sp_adj_extra);
+                if (acc_prim(f, ci->args[i], "loadpush")) {
+                    emit(out, "call\t%s", acc_prim(f, ci->args[i], "loadpush"));
+                } else {
+                    emit(out, "call\t%s", acc_prim(f, ci->args[i], "load"));
+                    emit(out, "call\t%s", acc_prim(f, ci->args[i], "push"));
+                }
+                if (!opt_disabled("acc-drop-wide"))
+                    *wide_acc_cell(f, ci->args[i]) = ci->args[i];
             }
             pushed_bytes += width;
             invalidate_hl_cache();
@@ -391,7 +402,18 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                        pre ? 0 : pushed_bytes + sp_adj_extra);
         /* Rabbit 4000+: `call (hl)` (ed ea) replaces the l_jphl thunk. */
         if (IS_RABBIT4K()) emit(out, "call\t(hl)");
-        else               emit(out, "call\tl_jphl");
+        else {
+            /* [de-call] as for a direct call below: the target reads DE only
+               under __sdcccall(1), a 4-byte fastcall argument or a DE
+               preserve. */
+            int de_arg = sc1;
+            if (is_fastcall && ci->n_args > 0
+                && f->vregs[ci->args[ci->n_args - 1]].width == 4)
+                de_arg = 1;
+            if (ci->preserved & IR_R_DE) de_arg = 1;
+            decall_note("l_jphl", !de_arg);
+            emit(out, "call\tl_jphl");
+        }
     } else if ((ci->flags & SHORTCALL) && !(ci->flags & SHORTCALL_HL)) {
         /* __z88dk_shortcall: dispatch via the rst vector, with the value
            as an inline operand (defb if it fits a byte, else defw) that
@@ -532,8 +554,11 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         } else if (ret_w > 4) {
             /* Wide return: the callee left it in the accumulator (FA for
                double, __i64_acc for long long); store it to the ret slot. */
-            emit_acc_slot_addr(out, f, ci->ret_vreg, 0);
-            emit_acc_store_hl(out, f, ci->ret_vreg);
+            if (!wide_acc_result_dead_in_acc(f, ci->ret_vreg)
+                && !wide_prepush(out, f, ci->ret_vreg)) {
+                emit_acc_slot_addr(out, f, ci->ret_vreg, 0);
+                emit_acc_store_hl(out, f, ci->ret_vreg);
+            }
             invalidate_hl_cache();
             *wide_acc_cell(f, ci->ret_vreg) = ci->ret_vreg;
         } else if (ret_w == 4) {
@@ -566,7 +591,19 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             } else
                 store_a_byte(out, f, ci->ret_vreg);
         } else {                           /* width 2, result in HL */
-            if (L.la.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg)) {
+            /* [callbc] A call result homed in BC: stamp HL->BC here. This path
+               stores with store_hl_keep_hl, so spill_and_swap_unless_dead's
+               PR_BC stamp never runs, and a later bc_has() read would find BC
+               unloaded. ir_home_at, not ir_home_assigned: a [call-split] result
+               is BC-authoritative only inside its span, and this call may write
+               the same variable outside it, where the slot is canonical. */
+            if (!L.la.cur_dst_dead
+                && ir_home_at(f, ci->ret_vreg) == IR_PR_BC) {
+                emit(out, "ld\tbc,hl");
+                cache_bc(ci->ret_vreg);
+                cache_hl(ci->ret_vreg);
+                callbc_fresh_stamp = 1;
+            } else if (L.la.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg)) {
                 cache_hl(ci->ret_vreg);    /* dead/reg-pool: keep in HL, no spill */
                 /* An index-register home (idx2/idx3 = IX/IY) survives the call
                    but is NOT kept live by the HL belief — that belief dies at
@@ -602,7 +639,9 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             emit(out, "pop\tbc");
             L.rs.bc = tenant;
             L.cur_sp_adjust -= 2;
-        } else {
+        } else if (!callbc_fresh_stamp) {
+            /* [callbc] No tenant was saved, but keep this call's own fresh
+               result stamp: dropping it loses the value before its first use. */
             invalidate_bc_cache();
         }
     }
@@ -626,18 +665,66 @@ static int acc_operand_resident(const Func *f, const HelperInfo *hi, int pos)
         && *wide_acc_cell(f, hi->args[pos]) == hi->args[pos];
 }
 
+/* The helper that computes `name` with its operands exchanged, for an op that
+   is not commutative but has an exact mirror: a compare reverses its relation,
+   an i64 subtract negates its result (`then`). Float subtraction is not
+   mirrored: the formats differ in how they sign a zero result. NULL if none. */
+static const char *acc_mirror(const char *name, const char **then)
+{
+    static const char *const t[][3] = {
+        { "dlt", "dgt", NULL }, { "dgt", "dlt", NULL },
+        { "dleq", "dge", NULL }, { "dge", "dleq", NULL },
+        { "l_f64_lt", "l_f64_gt", NULL }, { "l_f64_gt", "l_f64_lt", NULL },
+        { "l_f64_le", "l_f64_ge", NULL }, { "l_f64_ge", "l_f64_le", NULL },
+        { "l_i64_lt", "l_i64_gt", NULL }, { "l_i64_gt", "l_i64_lt", NULL },
+        { "l_i64_le", "l_i64_ge", NULL }, { "l_i64_ge", "l_i64_le", NULL },
+        { "l_i64_ult", "l_i64_ugt", NULL }, { "l_i64_ugt", "l_i64_ult", NULL },
+        { "l_i64_ule", "l_i64_uge", NULL }, { "l_i64_uge", "l_i64_ule", NULL },
+        { "l_i64_sub", "l_i64_sub", "l_i64_neg" },
+    };
+    if (then) *then = NULL;
+    if (!name || opt_disabled("acc-mirror")) return NULL;
+    for (size_t i = 0; i < sizeof t / sizeof t[0]; i++)
+        if (!strcmp(name, t[i][0])) {
+            if (then) *then = t[i][2];
+            return t[i][1];
+        }
+    return NULL;
+}
+
 /* Push one operand of a wide binop/cmp and return the POSITION (0/1) to load
    into the accumulator. Honours acc_holds_lhs (non-commutative order); for a
    commutative op pushes whichever operand is accumulator-resident (straight
    from the accumulator — no reload). Pool-constant operands are loaded by
    address; never resident, so they end up loaded-last. */
-static int acc_push_one_operand(FILE *out, Func *f, const HelperInfo *hi)
+static int acc_push_one_operand(FILE *out, Func *f, const HelperInfo *hi,
+                                int *mirrored, int *prepushed)
 {
     int push_pos = hi->acc_holds_lhs ? 1 : 0;
     int acc_pos  = hi->acc_holds_lhs ? 0 : 1;
+    *mirrored = 0;
+    *prepushed = 0;
+    /* Pushed at its def (wide_prepush): already on the stack. */
+    if (wpp_n > 0) {
+        int top = wpp_stack[wpp_n - 1];
+        for (int p = 0; p < 2; p++)
+            if (!hi->acc_src_is_pool[p] && hi->args[p] == top) {
+                wpp_n--;
+                *prepushed = 1;
+                return 1 - p;
+            }
+    }
     if (hi->acc_commutative) {
         if      (acc_operand_resident(f, hi, 1)) { push_pos = 1; acc_pos = 0; }
         else if (acc_operand_resident(f, hi, 0)) { push_pos = 0; acc_pos = 1; }
+    } else if (acc_operand_resident(f, hi, acc_pos)
+               && !acc_operand_resident(f, hi, push_pos)
+               && hi->args[0] != hi->args[1]
+               && acc_mirror(hi->name, NULL)) {
+        /* The operand the helper wants in the accumulator is already there:
+           push it instead and call the mirrored helper. */
+        int t = push_pos; push_pos = acc_pos; acc_pos = t;
+        *mirrored = 1;
     }
     if (acc_operand_resident(f, hi, push_pos)) {
         emit(out, "call\t%s", hi->acc_push);          /* already resident */
@@ -662,7 +749,77 @@ static int acc_op_pushes_from_acc(const HelperInfo *h, int v)
     int a0 = h->args[0], a1 = h->args[1];
     if (a0 == a1) return 0;            /* used as both operands → the load reads the slot */
     if (h->acc_commutative) return (v == a0 || v == a1);
-    return v == (h->acc_holds_lhs ? a1 : a0);   /* the fixed pushed operand */
+    if (v == (h->acc_holds_lhs ? a1 : a0)) return 1;   /* the fixed pushed operand */
+    /* The other operand, freshly resident while the pushed one is not (they
+       differ): acc_push_one_operand mirrors and pushes it from the
+       accumulator. */
+    return v == (h->acc_holds_lhs ? a0 : a1) && acc_mirror(h->name, NULL);
+}
+
+/* The only wide argument of a stacked, not pre-pushed call: the push loop
+   then takes it straight from the accumulator. A fastcall's last argument is
+   loaded by its own path, outside that loop. */
+static int call_sole_wide_arg(const Func *f, const CallInfo *ci, int v)
+{
+    if (!ci || ci->pre_pushed > 0 || ci->abi == IR_ABI_FASTCALL) return 0;
+    int seen = 0;
+    for (int i = 0; i < ci->n_args; i++) {
+        int a = ci->args[i];
+        if (a < 0 || f->vregs[a].width <= 4) continue;
+        if (a != v || seen) return 0;
+        seen = 1;
+    }
+    return seen;
+}
+
+/* Does `nx` read `v` once, straight from the accumulator when v is resident?
+   Every consumer listed checks wide_acc_cell before loading the slot. */
+static int wide_prepush_target(const Func *f, const BB *bb, int j, int v);
+
+/* Is the operand of the acc op at (bb, k) other than `v` pushed at its def
+   (wide_prepush_target), so `v` is read from the accumulator in place? */
+static int acc_partner_prepushed(const Func *f, const BB *bb, int k, int v)
+{
+    const HelperInfo *h = bb->ops[k].hcall;
+    if (!h || h->n_args != 2 || h->acc_count_in_a) return 0;
+    int p = (h->args[0] == v) ? 1 : (h->args[1] == v) ? 0 : -1;
+    if (p < 0 || h->acc_src_is_pool[1 - p] || h->acc_src_is_pool[p]) return 0;
+    int u = h->args[p];
+    if (u < 0 || u == v) return 0;
+    for (int j = k - 1; j >= 0; j--) {
+        int d[8]; int nd = ir_op_defs(&bb->ops[j], d, 8);
+        for (int q = 0; q < nd; q++)
+            if (d[q] == u) return wide_prepush_target(f, bb, j, u) == k;
+    }
+    return 0;
+}
+
+static int wide_next_reads_acc(const Func *f, const BB *bb, int k, int v)
+{
+    const Op *nx = &bb->ops[k];
+    if (nx->kind == IR_ACC_BINOP || nx->kind == IR_ACC_CMP)
+        return acc_op_pushes_from_acc(nx->hcall, v)
+            || acc_partner_prepushed(f, bb, k, v);
+    if (opt_disabled("acc-drop-wide")) return 0;
+    switch (nx->kind) {
+    case IR_ACC_UNOP: {
+        const HelperInfo *h = nx->hcall;
+        return h && h->n_args == 1 && h->args[0] == v
+            && h->acc_subkind != ACC_SUB_INT2ACC && h->acc_subkind != ACC_SUB_CROSS;
+    }
+    case IR_MOV:
+        return nx->src[0] == v && nx->dst >= 0 && f->vregs[nx->dst].width > 4;
+    case IR_RET:
+        return nx->src[0] == v;
+    case IR_ST_MEM:
+        return nx->src[0] == v && nx->mem.post_step == 0
+            && (nx->mem.kind == IR_MEM_SYM
+                || (nx->mem.kind == IR_MEM_VREG && nx->mem.base != v));
+    case IR_CALL:
+        return call_sole_wide_arg(f, nx->call, v);
+    default:
+        return 0;
+    }
 }
 
 /* A wide-accumulator result `v` just produced (and left resident) needs no
@@ -670,20 +827,162 @@ static int acc_op_pushes_from_acc(const HelperInfo *h, int v)
    (push-from-acc) and v is dead afterwards, so its slot is never read.
    Conservative — any uncertainty (no liveness, BB-end, non-acc next op)
    keeps the store. */
-static int wide_acc_result_dead_in_acc(const Func *f, int v)
+/* [acc-prepush] sccz80's order for a wide binop: push the operand the op pushes
+   as soon as it is computed, so the other one is computed straight into the
+   accumulator. Returns the consumer's op index in `bb` when the def of `v` at j
+   can be pushed there and left on the stack until that op, else -1. The stack
+   between stays LIFO: nothing in the window may open a push its own ops do not
+   close (argument groups, stacked helper args, PR_STACK parks), and no value
+   defined in the window may outlive it. */
+static int wide_prepush_target(const Func *f, const BB *bb, int j, int v)
+{
+    if (opt_disabled("acc-prepush") || v < 0 || v >= f->n_vregs) return -1;
+    const VReg *vr = &f->vregs[v];
+    if (vr->width <= 4
+        || (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM)))
+        return -1;
+    if (bb->live_out && ir_bitset_get(bb->live_out, v)) return -1;
+    /* no call argument group open at the def */
+    int depth = 0;
+    for (int i = 0; i < j; i++) {
+        const Op *o = &bb->ops[i];
+        if (o->kind == IR_PUSH_ARG && o->imm == 1) depth++;
+        else if (o->kind == IR_CALL && o->call && o->call->pre_pushed > 0 && depth > 0) depth--;
+    }
+    if (depth) return -1;
+    int k = -1, uses = 0;
+    for (int b2 = 0; b2 < f->n_bbs; b2++)
+        for (int i = 0; i < f->bbs[b2].n_ops; i++) {
+            const Op *o = &f->bbs[b2].ops[i];
+            int u[16]; int nu = ir_op_uses(o, u, 16);
+            for (int q = 0; q < nu; q++)
+                if (u[q] == v) { uses++; if (&f->bbs[b2] == bb && i > j) k = i; }
+        }
+    if (uses != 1 || k < 0) return -1;
+    const Op *c = &bb->ops[k];
+    const HelperInfo *h = c->hcall;
+    if ((c->kind != IR_ACC_BINOP && c->kind != IR_ACC_CMP) || !h || h->n_args != 2
+        || h->acc_count_in_a || h->args[0] == h->args[1])
+        return -1;
+    int pp = h->acc_holds_lhs ? 1 : 0;
+    if (h->acc_src_is_pool[pp] || h->acc_src_is_pool[1 - pp]) {
+        if (h->args[pp] != v) return -1;     /* a pool operand: keep the default */
+    } else if (h->args[pp] != v && !(h->acc_commutative && h->args[1 - pp] == v))
+        return -1;
+    for (int i = j + 1; i < k; i++) {
+        const Op *o = &bb->ops[i];
+        switch (o->kind) {
+        case IR_PUSH_ARG: case IR_PUSH_STRUCT: case IR_ASM: case IR_SWITCH: case IR_RET:
+            return -1;
+        case IR_CALL:
+            if (!o->call || o->call->pre_pushed > 0) return -1;
+            break;
+        case IR_HCALL:
+            if (!o->hcall || o->hcall->n_stacked > 0) return -1;
+            break;
+        default: break;
+        }
+        int u[16]; int nu = ir_op_uses(o, u, 16);
+        for (int q = 0; q < nu; q++)
+            if (u[q] >= 0 && ir_home_at(f, u[q]) == IR_PR_STACK) return -1;
+        int d[8]; int nd = ir_op_defs(o, d, 8);
+        for (int q = 0; q < nd; q++) {
+            if (d[q] < 0) continue;
+            if (ir_home_at(f, d[q]) == IR_PR_STACK) return -1;
+            const BitSet *after = (k + 1 < bb->n_ops) ? ir_op_live_in(bb, k + 1) : bb->live_out;
+            if (!after || ir_bitset_get(after, d[q])) return -1;
+        }
+    }
+    return k;
+}
+
+/* Push the just-produced wide result `v` (resident in the accumulator) for its
+   consumer, instead of storing it. */
+static int wide_prepush(FILE *out, const Func *f, int v)
+{
+    if (!cur_bb || wpp_n >= (int)(sizeof wpp_stack / sizeof wpp_stack[0])) return 0;
+    int k = wide_prepush_target(f, cur_bb, cur_op_idx, v);
+    if (k < 0) return 0;
+    const HelperInfo *h = cur_bb->ops[k].hcall;
+    emit(out, "call\t%s", h->acc_push);
+    L.cur_sp_adjust += h->acc_width;
+    wpp_stack[wpp_n++] = v;
+    return 1;
+}
+
+/* The static half of wide_acc_result_dead_in_acc: is the def at (bb, j) of
+   wide `v` read straight from the accumulator by the next op, dying there? */
+static int wide_def_dropped_at(const Func *f, const BB *bb, int j, int v)
+{
+    if (opt_disabled("acc-drop") || v < 0) return 0;
+    int k = j + 1;
+    while (k < bb->n_ops && bb->ops[k].kind == IR_NOP) k++;
+    if (k >= bb->n_ops) return 0;
+    if (!wide_next_reads_acc(f, bb, k, v)) return 0;
+    const BitSet *after = (k + 1 < bb->n_ops) ? ir_op_live_in(bb, k + 1) : bb->live_out;
+    return after && !ir_bitset_get(after, v);
+}
+
+/* [acc-drop-slot] A wide vreg whose every def is dropped (above) is never
+   stored, so it needs no frame slot. Only defs whose lowering consults
+   wide_acc_result_dead_in_acc qualify; any other def keeps the slot. */
+static void compute_no_slot_wide(Func *f)
+{
+    if (opt_disabled("acc-drop-slot") || opt_disabled("acc-drop")) return;
+    int nv = f->n_vregs;
+    if (nv <= 0) return;
+    signed char *ok = malloc((size_t)nv);
+    if (!ok) return;
+    for (int v = 0; v < nv; v++) {
+        const VReg *vr = &f->vregs[v];
+        ok[v] = vr->width > 4
+             && !(vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM
+                               | IR_VREG_PARAM_IN_PLACE)) ? 0 : -1;
+    }
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int k = 0; k < nd; k++) {
+                int v = d[k];
+                if (v < 0 || v >= nv || ok[v] < 0) continue;
+                int kind_ok = o->kind == IR_ACC_BINOP || o->kind == IR_LD_MEM
+                    || (o->kind == IR_MOV && o->dst == v)
+                    || (o->kind == IR_CALL && o->call && o->call->ret_vreg == v)
+                    || (o->kind == IR_ACC_UNOP && o->hcall && o->hcall->ret_vreg == v
+                        && o->hcall->acc_subkind != ACC_SUB_ACC2INT);
+                if (kind_ok && o->kind == IR_LD_MEM && o->mem.kind == IR_MEM_PORT)
+                    kind_ok = 0;
+                if (kind_ok && (wide_def_dropped_at(f, bb, j, v)
+                                || wide_prepush_target(f, bb, j, v) >= 0)) ok[v] = 1;
+                else ok[v] = -1;
+            }
+        }
+    }
+    for (int v = 0; v < nv; v++)
+        if (ok[v] == 1) f->vregs[v].flags |= IR_VREG_NO_SLOT;
+    free(ok);
+}
+
+static int wide_acc_result_dead_in_acc_1(const Func *f, int v)
 {
     if (opt_disabled("acc-drop") || !cur_bb || v < 0) return 0;
     int j = cur_op_idx + 1;
     while (j < cur_bb->n_ops && cur_bb->ops[j].kind == IR_NOP) j++;
     if (j >= cur_bb->n_ops) return 0;
-    const Op *nx = &cur_bb->ops[j];
-    if (nx->kind != IR_ACC_BINOP && nx->kind != IR_ACC_CMP) return 0;
-    if (!acc_op_pushes_from_acc(nx->hcall, v)) return 0;
+    if (!wide_next_reads_acc(f, cur_bb, j, v)) return 0;
     /* v must be dead after nx (its slot then never read). */
     const BitSet *after = (j + 1 < cur_bb->n_ops)
         ? ir_op_live_in(cur_bb, j + 1) : cur_bb->live_out;
-    (void)f;
     return after && !ir_bitset_get(after, v);
+}
+
+static int wide_acc_result_dead_in_acc(const Func *f, int v)
+{
+    int dead = wide_acc_result_dead_in_acc_1(f, v);
+    accdrop_mark(v, dead);
+    return dead;
 }
 
 /* Wide memory-accumulator binop (IR_ACC_BINOP). Operands and result are
@@ -726,7 +1025,8 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
             load_byte_to_a(out, f, rhs);      /* count -> A (offsets incl. push) */
         emit(out, "call\t%s", hi->name);
         L.cur_sp_adjust -= w;
-        if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)) {
+        if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)
+            && !wide_prepush(out, f, hi->ret_vreg)) {
             emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
             if (hi->acc_store_bc) { emit_hl_to_bc(out); }
             emit_c(out, CLOB_HL, "call\t%s", hi->acc_store);
@@ -740,17 +1040,24 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
 
     (void)lhs; (void)rhs;
     /* 1. push one operand (from the accumulator if already resident). */
-    int acc_pos = acc_push_one_operand(out, f, hi);
-    L.cur_sp_adjust += w;
-    /* 2. acc operand -> acc (offsets now include the push) */
-    emit_acc_operand_addr(out, f, hi, acc_pos);
-    emit(out, "call\t%s", hi->acc_load);
+    int mirrored, prepushed;
+    int acc_pos = acc_push_one_operand(out, f, hi, &mirrored, &prepushed);
+    if (!prepushed) L.cur_sp_adjust += w;
+    /* 2. acc operand -> acc (offsets now include the push); after a push at
+       the def the other operand was computed straight into it */
+    if (!(prepushed && acc_operand_resident(f, hi, acc_pos))) {
+        emit_acc_operand_addr(out, f, hi, acc_pos);
+        emit(out, "call\t%s", hi->acc_load);
+    }
     /* 3. binop — the helper pops the pushed operand */
-    emit(out, "call\t%s", hi->name);
+    const char *then = NULL;
+    emit(out, "call\t%s", mirrored ? acc_mirror(hi->name, &then) : hi->name);
+    if (then) emit(out, "call\t%s", then);
     L.cur_sp_adjust -= w;
     /* 4. acc -> dst slot — unless the result is consumed straight from the
        accumulator by the next op and dies there (slot never read). */
-    if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)) {
+    if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)
+        && !wide_prepush(out, f, hi->ret_vreg)) {
         emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
         if (hi->acc_store_bc) {        /* l_i64_store wants the address in BC */
             emit_hl_to_bc(out);
@@ -777,11 +1084,14 @@ static int gen_acc_cmp(FILE *out, Func *f, const Op *op)
         return -1;
     }
     int w = hi->acc_width;
-    int acc_pos = acc_push_one_operand(out, f, hi);
-    L.cur_sp_adjust += w;
-    emit_acc_operand_addr(out, f, hi, acc_pos);
-    emit(out, "call\t%s", hi->acc_load);
-    emit(out, "call\t%s", hi->name);
+    int mirrored, prepushed;
+    int acc_pos = acc_push_one_operand(out, f, hi, &mirrored, &prepushed);
+    if (!prepushed) L.cur_sp_adjust += w;
+    if (!(prepushed && acc_operand_resident(f, hi, acc_pos))) {
+        emit_acc_operand_addr(out, f, hi, acc_pos);
+        emit(out, "call\t%s", hi->acc_load);
+    }
+    emit(out, "call\t%s", mirrored ? acc_mirror(hi->name, NULL) : hi->name);
     L.cur_sp_adjust -= w;
     /* The bool (0/1) is in HL. Commit word-result way: spill to the slot only
        if live-read (dead → skipped), advertise HL = result so a following
@@ -796,9 +1106,11 @@ static int gen_acc_cmp(FILE *out, Func *f, const Op *op)
    store wants it in HL — emit_acc_slot_addr leaves it in HL either way. */
 static void store_acc_to_slot(FILE *out, const Func *f, int dst, const HelperInfo *hi)
 {
-    emit_acc_slot_addr(out, f, dst, 0);
-    if (hi->acc_store_bc) { emit_hl_to_bc(out); }
-    emit(out, "call\t%s", hi->acc_store);
+    if (!wide_acc_result_dead_in_acc(f, dst) && !wide_prepush(out, f, dst)) {
+        emit_acc_slot_addr(out, f, dst, 0);
+        if (hi->acc_store_bc) { emit_hl_to_bc(out); }
+        emit(out, "call\t%s", hi->acc_store);
+    }
     invalidate_hl_bc();
     *wide_acc_cell(f, dst) = dst;
 }
@@ -833,6 +1145,8 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         emit(out, "call\t%s", hi->name);
         invalidate_hl_bc();
         if (f->vregs[dst].width == 4) store_dehl_finalize(out, f, dst);
+        else if (f->vregs[dst].width == 2 && !opt_disabled("acc-conv-hl"))
+            commit_hl_result(out, f, dst);   /* dead-aware: often only passed on */
         else                         store_hl(out, f, dst);
         return 0;
     }
@@ -925,6 +1239,22 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
             popped_bytes += 4;
             continue;
         }
+        /* [f32-prepush] pushed at its def, still on top */
+        if (w == 4 && v >= 0 && dpp_n > 0 && dpp_v[dpp_n - 1] == v && !hc_bc_saved
+            && L.cur_sp_adjust == dpp_sp[dpp_n - 1]) {
+            dpp_n--;
+            popped_bytes += 4;
+            continue;
+        }
+        for (int p = 0; w == 4 && p < dpp_n; p++)
+            if (dpp_v[p] == v) {
+                /* never stored: a slot load here would read garbage */
+                ir_lower_loc();
+                fprintf(stderr, "ir_lower: f32-prepush operand v%d is not on top of "
+                        "the stack at its helper (%s); use --opt-disable=f32-prepush\n",
+                        v, hi->name);
+                exit(1);
+            }
         if (w == 4) {
             /* The helper clobbers BC, so this operand's DEHL BC=low stash is
                dead unless the same vreg is re-loaded as a later operand.
@@ -947,8 +1277,18 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
                libsrc tanf16, `sinf16(x)/cosf16(x)`: l_f16_div takes args[0]
                stacked and args[1] in HL, and the cosf16 result IS args[1],
                sitting in HL when args[0] is loaded. Scan to n_args, not to
-               n_stacked — the endangered operand is usually the register one. */
-            if (L.rs.hl >= 0 && L.rs.hl != v && L.rs.de < 0
+               n_stacked — the endangered operand is usually the register one.
+               DE may still name a value that is dead here or recoverable
+               (the address an 8085 `ld hl,(de)` left behind). Take DE anyway:
+               the operand's own slot store may have been elided because an
+               earlier render served it from this stash. */
+            const BitSet *de_live = cur_bb ? ir_op_live_in(cur_bb, cur_op_idx) : NULL;
+            int de_free = L.rs.de < 0
+                || (!(g_hc.home_is_word && L.rs.de == g_hc.func_whome)
+                    && L.rs.de != L.cur_de_byte_home_vreg
+                    && ((de_live && !ir_bitset_get(de_live, L.rs.de))
+                        || hlde_belief_droppable(L.rs.de)));
+            if (L.rs.hl >= 0 && L.rs.hl != v && de_free
                 && L.rs.hl < f->n_vregs && f->vregs[L.rs.hl].width == 2) {
                 for (int j = i + 1; j < hi->n_args; j++)
                     if (hi->args[j] == L.rs.hl) {
@@ -993,6 +1333,8 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
     if (hi->ret_vreg >= 0) {
         if (f->vregs[hi->ret_vreg].width == 4)
             store_dehl_finalize(out, f, hi->ret_vreg);
+        else if (f->vregs[hi->ret_vreg].width == 2 && !opt_disabled("hcall-commit"))
+            commit_hl_result(out, f, hi->ret_vreg);   /* dead-aware, keeps HL */
         else
             store_hl(out, f, hi->ret_vreg);
     }

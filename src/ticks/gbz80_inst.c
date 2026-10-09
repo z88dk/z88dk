@@ -18,7 +18,7 @@ void gbz80_add_sp_d(void)
     uint32_t v;
 
     SUSPECT_IMPL("Incorrect flags");
-    st += 4;
+    st += 16;
     v = sp + (get_memory_inst(pc++)^128)-128;
     sp = v & 0xffff;
     if ( v >> 16 ) ff |= 256;

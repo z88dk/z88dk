@@ -141,6 +141,11 @@ typedef enum {
                                         (entry reload via emit_bc_reload on a cold
                                         belief), no exit spill. ir_assign_slots keeps
                                         its slot despite the PR_BC home. */
+    IR_VREG_IV_RECOMPUTE   = 1 << 12, /* ivsr-suppress kept this index for address
+                                        recompute: CSE leaves its `<<1` per use */
+    IR_VREG_SLOT_UNUSED    = 1 << 13, /* [dead-slot-drop] the last render never
+                                         touched this value's slot: the re-render
+                                         gives it none (verified, see ir_lower) */
 } VRegFlags;
 
 typedef struct {
@@ -415,6 +420,10 @@ typedef enum {
        leaves the match pointer (or NULL) in the dst vreg. Pure read (no
        side effect). Gated to Z80-family by ir_build. */
     IR_STRCHR,
+
+    /* Signed word clamp: dst = src[0] < 0 ? 0 : src[0]. Width 2 only. IVSR's
+       LFTR builds it for a signed variable loop bound. */
+    IR_SMAX0,
 
     /* misc */
     IR_NOP,

@@ -1693,6 +1693,67 @@ static int pack_match_lane(Func *f, BB *bb, const int *def_idx,
     return 0;
 }
 
+/* Function-wide sole definer of v, or NULL when it has none or several. */
+static const Op *pack_sole_def(const Func *f, int v)
+{
+    const Op *found = NULL;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int defs[4], nd = ir_op_defs(o, defs, 4);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] == v) {
+                    if (found) return NULL;
+                    found = o;
+                }
+        }
+    return found;
+}
+
+/* Two address operands holding the same value at op positions lo..hi: the
+   same vreg with no write between, or two loads of one link-time symbol
+   (LICM hoists each use of a global's address as its own vreg). */
+static int pack_same_operand(Func *f, BB *bb, const int *def_idx, int lo,
+                             int hi, int x, int y)
+{
+    x = pack_canon(f, bb, def_idx, x);   /* CSE leaves duplicates as MOVs */
+    y = pack_canon(f, bb, def_idx, y);
+    if (x == y) {
+        for (int k = lo + 1; k < hi; k++)
+            if (bb->ops[k].dst == x) return 0;
+        return 1;
+    }
+    const Op *dx = pack_sole_def(f, x), *dy = pack_sole_def(f, y);
+    return dx && dy && dx->kind == IR_LD_SYM && dy->kind == IR_LD_SYM
+        && dx->mem.sym && dx->mem.sym == dy->mem.sym
+        && dx->mem.offset == dy->mem.offset
+        && !dx->mem.bank_fn && !dy->mem.bank_fn
+        && f->vregs[x].width == f->vregs[y].width;
+}
+
+/* Lane bases a and b (canonical vregs) address the same byte: the same vreg,
+   or two register-register ADDs in this BB over equal operands. This is what
+   `a[2*i]` | `a[2*i+1]` leaves once the +1 has been folded into the load's
+   offset: the second address is a duplicate of the first that CSE could not
+   see through the separately hoisted symbol loads. */
+static int pack_same_base(Func *f, BB *bb, const int *def_idx,
+                          int a, int b)
+{
+    if (a == b) return 1;
+    if (a < 0 || b < 0 || a >= f->n_vregs || b >= f->n_vregs) return 0;
+    int ia = def_idx[a], ib = def_idx[b];
+    if (ia < 0 || ib < 0) return 0;
+    const Op *oa = &bb->ops[ia], *ob = &bb->ops[ib];
+    if (oa->kind != IR_ADD || ob->kind != IR_ADD) return 0;
+    if (oa->src[1] < 0 || ob->src[1] < 0) return 0;
+    if (f->vregs[a].width != f->vregs[b].width) return 0;
+    int lo = ia < ib ? ia : ib, hi = ia < ib ? ib : ia;
+    return (pack_same_operand(f, bb, def_idx, lo, hi, oa->src[0], ob->src[0])
+            && pack_same_operand(f, bb, def_idx, lo, hi, oa->src[1], ob->src[1]))
+        || (pack_same_operand(f, bb, def_idx, lo, hi, oa->src[0], ob->src[1])
+            && pack_same_operand(f, bb, def_idx, lo, hi, oa->src[1], ob->src[0]));
+}
+
 /* Walk the OR tree at root_idx, validate the 4-lane little-endian
    pack, and return the rewrite + kill set. def_idx is built by the
    caller. Returns 0 ok (out_* and lanes/or_idx filled), -1 no match. */
@@ -1744,7 +1805,7 @@ static int pack_analyze(Func *f, BB *bb, const int *def_idx,
     int seen = 0, base = lanes[0].base;
     int le_off = INT32_MAX, be_end = INT32_MAX, le_ok = 1, be_ok = 1;
     for (int i = 0; i < 4 && i < want_lanes; i++) {
-        if (lanes[i].base != base) return -1;
+        if (!pack_same_base(f, bb, def_idx, lanes[i].base, base)) return -1;
         int lo_i = lanes[i].offset - lanes[i].shift / 8;
         int hi_i = lanes[i].offset + lanes[i].shift / 8;
         if (le_off == INT32_MAX) le_off = lo_i; else if (lo_i != le_off) le_ok = 0;
@@ -1754,6 +1815,14 @@ static int pack_analyze(Func *f, BB *bb, const int *def_idx,
         seen |= bit;
     }
     if (seen != (1 << want_lanes) - 1) return -1;
+    /* Equal bases may be distinct vregs; take the earliest-defined so it is
+       live at every lane's load and passes the redefinition check below. */
+    for (int i = 0; i < want_lanes; i++) {
+        int bi = lanes[i].base;
+        if (bi >= 0 && bi < f->n_vregs && base >= 0 && base < f->n_vregs
+            && def_idx[bi] < def_idx[base])
+            base = bi;
+    }
     int is_be, base_off;
     if (le_ok)      { is_be = 0; base_off = le_off; }
     else if (be_ok) { is_be = 1; base_off = be_end - (want_lanes - 1); }

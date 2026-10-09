@@ -35,8 +35,11 @@ void ir_compute_liveness(Func *f);
 /* [IR_DEFASSIGN_VERIFY] Definite-assignment check: flags a read of a
    local that is not defined on every path from function entry (the
    source-level bug class behind `time_t t; time(t);` — read before
-   assigned). Env-gated, no-op unless IR_DEFASSIGN_VERIFY is set;
-   "1" warns to stderr, "2" also aborts. Meant to run once per function,
+   assigned). By default warns on stderr only when NO path
+   writes the local before the read (no false positives);
+   --opt-disable=defassign-verify or IR_DEFASSIGN_VERIFY=0 silences it.
+   IR_DEFASSIGN_VERIFY=1 widens it to "not written on every path" (can
+   false-positive on path-correlated code), "2" also aborts. Meant to run once per function,
    right after ir_build finishes it and before ir_alloc/ir_lower ever
    see it, so the result does not depend on frame mode (unlike
    ir_lower.c's require_slot backstop, whose trigger is an accident of

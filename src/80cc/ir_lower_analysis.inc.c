@@ -150,7 +150,9 @@ static void compute_home_region(const Func *f, int home,
                        redef on a leaving edge always rejects there, preserving
                        gate-off byte-identity. */
                     const BB *tb = &f->bbs[t];
-                    if (!f->de_home_is_ptr
+                    int dead_exit_ok = (f->de_home_is_ptr
+                                        || !opt_disabled("dehome-dead-exit")) ? 1 : 0;
+                    if (!dead_exit_ok
                         || (tb->live_in
                             && ir_bitset_get((const BitSet *)tb->live_in, home)))
                         exit_bad = 1;
@@ -371,6 +373,7 @@ static void emit_ex_de_hl(FILE *out)
 {
     emit(out, "ex\tde,hl");
     L.cur_hl_addr_off = -1;
+    L.rs.dehl = -1;          /* DE no longer holds the long's high half */
 }
 
 /* As cache_hl_slot_addr, but for an address that is not a slot base: the
@@ -523,7 +526,7 @@ static void word_home_flush(FILE *out, const Func *f)
    per-iteration entry flush. Correct without a reload: compute_home_region
    proves the home rides physical DE across the region and no leaving-edge
    source redefines it before the branch, so DE = the final accumulator on
-   every region-leaving edge. fp-only (the word DE-home forms only in fp). */
+   every region-leaving edge. */
 static void word_home_exit_flush(FILE *out, const Func *f)
 {
     int v = g_hc.func_whome;
@@ -535,8 +538,8 @@ static void word_home_exit_flush(FILE *out, const Func *f)
         emit(out, "ld\t(%s%+d),d", frame_reg(), off + 1);
         return;
     }
-    /* Frameless: flush the DE home to its (caller) param slot via HL. */
-    if (L.cur_frameless) {
+    /* Frameless or sp mode: flush the DE home to its slot via HL. */
+    if (L.cur_frameless || !fp_active(f)) {
         emit(out, "ld\thl,%d", slot_off(f, v) + L.cur_sp_adjust);
         emit(out, "add\thl,sp");
         emit(out, "ld\t(hl),e");
@@ -927,7 +930,10 @@ static void commit_a_byte(FILE *out, const Func *f, int v)
 static int vreg_slot_deferrable(const Func *f, int v)
 {
     if (v < 0) return 0;
-    if (f->vregs[v].width != 2 && f->vregs[v].width != 4) return 0;
+    /* [ss-byte] A byte: its stores all leave the value cached in A. */
+    if (f->vregs[v].width != 2 && f->vregs[v].width != 4
+        && !(f->vregs[v].width == 1 && !opt_disabled("ss-byte")))
+        return 0;
     if (f->vregs[v].flags
         & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
         return 0;
@@ -991,6 +997,9 @@ static void ss_gen_op(Func *f, int b, int j, int g, int nv,
     int r0 = op_reload[g * 2], r1 = op_reload[g * 2 + 1];
     if (r0 >= 0 && r0 < nv) work[r0] = 1;
     if (r1 >= 0 && r1 < nv) work[r1] = 1;
+    /* [ss-evidence] A use is also not a reload when nothing in this op
+       touched its slot's bytes; either proof is enough. */
+    const int *rd = ssr_mode ? &ssr_read[g * SSR_K * 2] : NULL;
     int uses[16];
     int nu = ir_op_uses(&f->bbs[b].ops[j], uses,
                         (int)(sizeof uses / sizeof uses[0]));
@@ -999,8 +1008,20 @@ static void ss_gen_op(Func *f, int b, int j, int g, int nv,
         int uv = uses[u];
         if (uv < 0 || uv >= nv || !vreg_slot_deferrable(f, uv)) continue;
         if (uv == c0 || uv == c1) continue;   /* proven cache-served */
+        if (rd) {
+            /* No slot (dead-slot-drop): nothing to reload from; a touch of
+               it fails that drop's own check. */
+            if (f->vreg_spill_slot[uv] < 0) continue;
+            int lo = f->vreg_spill_slot[uv];
+            int hi = lo + (f->vregs[uv].width > 0 ? f->vregs[uv].width : 2);
+            int k = 0;
+            while (k < SSR_K && !(rd[2 * k + 1] && rd[2 * k] < hi
+                                  && rd[2 * k] + rd[2 * k + 1] > lo)) k++;
+            if (k == SSR_K) continue;         /* slot untouched in this op */
+        }
         work[uv] = 1;                         /* assume slot reload */
     }
+
 }
 
 /* Backward slot-liveness over the CFG. Returns a [total_ops] array:
@@ -1110,7 +1131,19 @@ static int vreg_is_remat(const Func *f, int vreg)
    binop/LD_IMM pattern `<value in HL>; store_hl; ex de,hl; cache_hl` — on
    dead-dst emit nothing (HL already holds the value). Also fires for
    register-pool vregs: nothing to spill. */
+/* A store: its slot queries count as writes for [dead-store], as store_hl's
+   do (the fp `ld (ix+d),hl` path and its fp_tos_slot check were reads, so no
+   word stored this way was ever dropped). `--opt-disable=ds-fp-store`. */
+static void spill_and_swap_unless_dead_impl(FILE *out, const Func *f, int vreg);
 static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
+{
+    int save = slot_write_ctx;
+    if (!opt_disabled("ds-fp-store")) slot_write_ctx = 1;
+    spill_and_swap_unless_dead_impl(out, f, vreg);
+    slot_write_ctx = save;
+}
+
+static void spill_and_swap_unless_dead_impl(FILE *out, const Func *f, int vreg)
 {
     /* Rematerialisable constant: no slot, no store (value stays in HL). */
     if (vreg_is_remat(f, vreg)) return;
@@ -1179,6 +1212,11 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
            cache_hl(dst) advertises it, reaches readers via the HL carry. */
         return;
     }
+    /* A dead spill has no slot: the direct fp stores below would address
+       below the frame. The value is in HL and they leave no copy in DE, so
+       skipping the store keeps their contract. */
+    if (fp_active(f) && (f->vregs[vreg].flags & IR_VREG_DEAD_SPILL))
+        return;
     /* Word DE-home resident (fp): store HL straight to slot with NO `ex de,hl`
        staging — preserves DE (the running sum) so the spill is DE-clean and
        the home stays resident across the body. sp-mode needs HL for the slot
@@ -1235,6 +1273,7 @@ static void commit_hl_word(FILE *out, const Func *f, int v)
        cache-hit and skip its reload → a self-copy. */
     if (v >= 0 && vreg_is_pr_stack(f, v)) { invalidate_hl_cache(); return; }
     cache_hl(v);
+    g_def_vreg = v; g_def_epoch = g_de_epoch;
 }
 
 /* Word result is in HL, dst v is a PR_DE-pool vreg: swap into DE and advertise

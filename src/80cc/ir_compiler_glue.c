@@ -146,10 +146,7 @@ int ir_lower_to_output(Func *f)
     int rc = ir_lower_func_flip(mem, f);
     if (rc == 0) {
         rewind(mem);
-        char chunk[4096];
-        size_t n;
-        while ((n = fread(chunk, 1, sizeof chunk, mem)) > 0)
-            fwrite(chunk, 1, n, output);
+        ir_lower_fold_mulchain_de(output, mem);
     }
     fclose(mem);
 

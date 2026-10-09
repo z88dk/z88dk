@@ -3,33 +3,6 @@
 	pop	%1
 =
 
-;; #ADDR: base+index address math emits `ex de,hl; ld hl,_base; add hl,de` (index
-;; in HL, base ADDRESS loaded into HL, index shuffled to DE). add hl,de is
-;; symmetric, so load the base straight into DE: `ld de,_base; add hl,de` — kills
-;; the ex de,hl and is 1 byte shorter. LIMITED TO `_%1` (a symbol-address immediate,
-;; the array-base case): this EXCLUDES an indirect `ld hl,(_x)` memory load — that
-;; would become `ld de,(_x)`, which 8080/8085/gbz80 have no instruction for, and is
-;; a byte LARGER than `ld hl,(nn)` on z80 anyway (no saving). Safe on DE-liveness:
-;; the ex materialises the index in DE purely as the add's addend (old DE discarded
-;; by `ld hl,_%1`, old HL/index consumed by the add), so DE is dead after.
-;; %notcpu 8085: NOT TRUE THERE. 8085 loads the index with LDSI+LHLX
-;; (`ld de,sp+N; ld hl,(de); ex de,hl`) and leaves it in DE across the add,
-;; reclaiming it with a LATER `ex de,hl` — so DE is live and the fold hands
-;; back the base instead of the index. sieve/z88dk-classic hangs on it.
-%title #ADDR fold ex-de-hl + symbol-address load + add into a direct de-load (-1b)
-%notcpu vm1
-%notcpu 8085
-%notcpu r2ka
-%notcpu r3k
-%notcpu r4k
-%notcpu r6k
-	ex	de,hl
-	ld	hl,_%1
-	add	hl,de
-=
-	ld	de,_%1
-	add	hl,de
-
 ;; #JI: `jp <cc>,L; jp M; L:` — the conditional jump targets the very NEXT label,
 ;; so it only chooses "fall through to L" vs "go to M". Invert the condition and
 ;; drop the jump-to-next: `jp <!cc>,M; L:` (−3b). L: stays (it may be a branch
@@ -417,6 +390,7 @@
 	ld	d,e
 
 %title #285e push BC instead of recovered HL before ld hl (-2b, -8t)
+%not %1 (hl)
 	ld	hl,bc
 	push	de
 	push	hl
@@ -427,6 +401,7 @@
 	ld	hl,%1
 
 %title #285f dead HL recovery before push de;push bc;ld hl (-2b, -8t)
+%not %1 (hl)
 	ld	hl,bc
 	push	de
 	push	bc
@@ -488,6 +463,7 @@
 	ld	hl,(ix%2)
 
 %title #285m caller-save BC + arg push via HL → push bc twice (-2b, -8t)
+%not %1 (hl)
 	push	bc
 	ld	hl,bc
 	push	hl
@@ -533,21 +509,8 @@
 	ld	l,a
 	ld	h,0
 
-%title #285q small-mask + add hl,hl → add a,a before the int-extend (-0b, -7t)
-%check 0 <= %2 <= 127
-	ld	a,(ix%1)
-	and	%2
-	ld	l,a
-	ld	h,0
-	add	hl,hl
-=
-	ld	a,(ix%1)
-	and	%2
-	add	a,a
-	ld	l,a
-	ld	h,0
-
-%title #285r 16-bit slot XOR via byte-direct xor (ix+d) (z80, -4b, -16t)
+%title #285r 16-bit slot XOR via byte-direct xor (ix+d), DE reloaded next (z80, -4b, -16t)
+%not %3 de "de[+][0-9]+" (de)
 %notcpu ez80
 %notcpu ez80_z80
 %notcpu gbz80
@@ -562,6 +525,7 @@
 	ld	a,h
 	xor	d
 	ld	h,a
+	ld	de,%3
 =
 	ld	a,(ix%2)
 	xor	(ix%1)
@@ -569,8 +533,10 @@
 	ld	a,(ix+%eval(%2 1 +))
 	xor	(ix+%eval(%1 1 +))
 	ld	h,a
+	ld	de,%3
 
-%title #285r-and 16-bit slot AND via byte-direct and (ix+d) (z80, -4b, -16t)
+%title #285r-and 16-bit slot AND via byte-direct and (ix+d), DE reloaded next (z80, -4b, -16t)
+%not %3 de "de[+][0-9]+" (de)
 %notcpu ez80
 %notcpu ez80_z80
 %notcpu gbz80
@@ -585,6 +551,7 @@
 	ld	a,h
 	and	d
 	ld	h,a
+	ld	de,%3
 =
 	ld	a,(ix%2)
 	and	(ix%1)
@@ -592,6 +559,7 @@
 	ld	a,(ix+%eval(%2 1 +))
 	and	(ix+%eval(%1 1 +))
 	ld	h,a
+	ld	de,%3
 
 %title #286 IR gbz80 fuse slot-addr ld hl,N + add hl,sp -> ld hl,sp+N (-2b, -7t)
 %cpu gbz80
@@ -620,8 +588,9 @@
 	ld	e,a
 	ld	hl,%1
 
-%title #G2 IR gbz80 drop dead ex de,hl (both DE,HL reloaded: ld de;ld hl)
+%title #G2 IR gbz80 drop dead ex de,hl (both DE,HL reloaded: ld de;ld hl). %not hl: `ld de,hl` copies the swapped HL
 %cpu gbz80
+%not %1 hl
 	ex	de,hl
 	ld	de,%1
 	ld	hl,%2
@@ -629,8 +598,9 @@
 	ld	de,%1
 	ld	hl,%2
 
-%title #G3 IR gbz80 drop dead ex de,hl (both reloaded: ld hl;ld de)
+%title #G3 IR gbz80 drop dead ex de,hl (both reloaded: ld hl;ld de). %not de: `ld hl,de` copies the swapped DE
 %cpu gbz80
+%not %2 de
 	ex	de,hl
 	ld	hl,%2
 	ld	de,%1
@@ -704,8 +674,8 @@
 =
 	ld	a,l
 
-%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (de first). %not (hl): ez80's ld de,(hl)/ld hl,(hl) READ the reg, so there the ex is a live deref
-%not %1 (hl)
+%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (de first). %not (hl): ez80's ld de,(hl)/ld hl,(hl) READ the reg, so there the ex is a live deref. %not hl / hl+N: `ld de,hl` copies the swapped HL
+%not %1 (hl) hl "hl[+][0-9]+"
 %not %2 (hl)
 	ex	de,hl
 	ld	de,%1
@@ -717,7 +687,7 @@
 %title #IR drop dead ex de,hl when both DE and HL are immediately reloaded. %not (hl): ez80's ld de,(hl)/ld hl,(hl) READ the reg, so there the ex is a live deref. %not %2 (de): 8085 LHLX `ld hl,(de)` reads DE, and here it runs BEFORE `ld de,%1` overwrites it — so the ex is the live thing that put the address there (the de-first variant above is safe, its ld de,%1 lands first)
 %not %1 (hl)
 %not %2 (hl)
-%not %2 (de)
+%not %2 (de) de
 	ex	de,hl
 	ld	hl,%2
 	ld	de,%1
@@ -725,7 +695,8 @@
 	ld	hl,%2
 	ld	de,%1
 
-%title #IR const/sym straight to DE: ld hl,X;ex de,hl;ld hl,Y -> ld de,X;ld hl,Y. X is symbol(_x)/immediate(digit) ONLY (regex) — NOT (mem)/sp+N, whose ld de,(nn)/ld de,sp+N are absent on 808x/gbz80; the ex's HL output dies in the next ld hl
+%title #IR const/sym straight to DE: ld hl,X;ex de,hl;ld hl,Y -> ld de,X;ld hl,Y. X is symbol(_x)/immediate(digit) ONLY (regex) — NOT (mem)/sp+N, whose ld de,(nn)/ld de,sp+N are absent on 808x/gbz80; the ex's HL output dies in the next ld hl. %not %2 (hl): ez80 `ld hl,(hl)` reads the HL the ex left
+%not %2 (hl)
 	%"ld	hl,([_0-9][_0-9a-zA-Z+]*)"1
 	ex	de,hl
 	ld	hl,%2
@@ -801,6 +772,7 @@
 ;; ld de,(sp+n) counterpart.
 ;; every CPU with the ld hl,(ix+d) macro also has ld de,(ix+d) (incl Rabbit)
 %title #DE-ix produce (ix) ld-hl value in DE not HL+ex when HL dead next (-1b, -4t)
+%not %2 (hl)
 	ld	hl,(ix%1)
 	ex	de,hl
 	ld	hl,%2
@@ -813,6 +785,7 @@
 %notcpu vm1
 %notcpu 8085
 %notcpu gbz80
+%not %2 (hl)
 	%"ld	hl,\((_[A-Za-z0-9_+]*)\)"1
 	ex	de,hl
 	ld	hl,%2
@@ -821,6 +794,7 @@
 	ld	hl,%2
 
 %title #DE2 peek TOS into DE not HL+ex when HL dead next (-1b, -4t)
+%not %1 (hl)
 	pop	hl
 	push	hl
 	ex	de,hl
@@ -831,6 +805,7 @@
 	ld	hl,%1
 
 %title #DE3 16-bit or/and/xor result into DE not HL+ex when HL dead next (-1b, -4t)
+%not %2 (hl)
 	ld	a,l
 	%"or|and|xor"1	e
 	ld	l,a
@@ -1001,6 +976,11 @@
 %notcpu vm1
 %notcpu 8085
 %notcpu gbz80
+%not %1 de
+%not %1 bc
+%not %1 sp
+%not %1 ix
+%not %1 iy
 	ex	de,hl
 	%"ld	hl,([_a-zA-Z0-9][_a-zA-Z0-9+]*)"1
 	ex	de,hl
@@ -1023,9 +1003,10 @@
 
 ;; the value round-trips HL->DE->HL (ex de,hl … ld hl,de) only to push it
 ;; via DE across inc sp/inc sp — but the sp bump never touches HL, so push HL
-;; directly. DE is left holding its prior (dead) value, not the staged HL: the
-;; ld hl,de restore shows HL, not DE, is the live output.
-%title #DE7 drop dead DE-staging of an HL value across a stack-bump push (-4b)
+;; directly. The original ends with BOTH HL and DE holding the value, and the
+;; lowerer's cache may read DE next (store_hl's contract is DE=value: an
+;; f32->int result squared went to l_mult with a stale DE), so DE is set too.
+%title #DE7 push HL directly across a stack-bump push, DE still the value (-1b)
 	ex	de,hl
 	inc	sp
 	inc	sp
@@ -1035,6 +1016,7 @@
 	inc	sp
 	inc	sp
 	push	hl
+	ld	de,hl
 
 ;; ex-restore variant of #DE7: the value is staged in DE, pushed across the sp
 ;; bump, then swapped back with a second ex de,hl. The two ex de,hl cancel (DE
@@ -1054,13 +1036,17 @@
 ;; `or h` after ld h,0 is a no-op: h is 0, so (A|0)==A and the Z flag is
 ;; unchanged. Arises from a byte-wise EQ/NE compare of a zero-extended byte
 ;; (high half known 0) — the high-byte OR is redundant. General over the const.
+;; Only Z is the same: `or h` also clears carry and sets parity, which `sub`
+;; leaves as borrow/overflow, so the z/nz jump that consumes it is matched too.
 %title #HZ drop `or h` when h was just zeroed (redundant high-byte test) (-1b)
 	ld	h,0
 	sub	%1
 	or	h
+	j%"r|p"2	%"z|nz"3,%4
 =
 	ld	h,0
 	sub	%1
+	j%2	%3,%4
 
 ;; consecutive word stores to sp+N, sp+N+2, ...: after `ld hl,N;add hl,sp;
 ;; ld (hl),e;inc hl;ld (hl),d` HL = sp+N+1, and the ld de,K between doesn't
@@ -1098,9 +1084,11 @@
 ;; Dropping the intervening `ex de,hl` is sound and is the other half of the
 ;; win: the ex would leave HL = value and DE = ix+d+1, and the two lines that
 ;; follow overwrite BOTH (`ld de,%2` kills DE, the address reuse kills HL)
-;; without reading either.
+;; without reading either — unless `ld de,%2` reads HL (`hl`, `(hl)`, `hl+N`),
+;; which the %not excludes.
 %title #SP2L chained ix-rel word store: reuse HL via inc, not a second lea (-4b)
 %eval 0 = %3 %1 2 + -
+%not %2 hl (hl) "hl[+][0-9]+"
 	lea	hl,ix%1
 	ld	(hl),e
 	inc	hl
@@ -1142,6 +1130,15 @@
 	ld	hl,%1
 =
 	ld	hl,%1
+
+;; #IW1: HL=DE then a swap — both registers already hold the same value, so the
+;; swap changes nothing. Drop it (#GB3 can then drop the copy itself if HL is
+;; reloaded). No liveness question: the register file is identical either way.
+%title #IW1 drop ex de,hl after ld hl,de (HL=DE, the swap is a no-op) (-1b)
+	ld	hl,de
+	ex	de,hl
+=
+	ld	hl,de
 
 ;; #GB4: BC->HL copy whose only consumer is `push hl` (then HL reloaded, dead) —
 ;; push bc directly (push hl==push bc when HL=BC). push de is the DEHL high half.
@@ -1241,6 +1238,7 @@
 	ld	a,b
 	ld	b,e
 	ld	e,a
+	ld	hl,bc
 
 ;; #FP1 a `pop bc` immediately before an `ld sp,ix` frame teardown is dead: the
 ;; `ld sp,ix` resets SP wholesale, so the pop's SP+2 is discarded and the value
@@ -1262,7 +1260,7 @@
 ;; %"and|or|xor"3 captures the mnemonic (group 3) — see z80rules.1, which 80cc
 ;; does not thread, so the equivalent fold there never reaches 80cc output.
 %title #W1 byte-global mask re-widen: byte load, drop dead ld h,0 (-3b)
-	ld	hl,(%1)
+	%"ld	hl,\(([_0-9][_0-9a-zA-Z+]*)\)"1
 	ld	h,0
 	ld	a,l
 	%"and|or|xor"3	%2
@@ -1371,3 +1369,25 @@
 	or	%1
 =
 	or	%1
+
+;; gbz80 has no `ex de,hl`: z80asm swaps through the stack (push hl; push de;
+;; pop hl; pop de: 4 bytes, 56 cycles). When the next instruction overwrites HL
+;; without reading it, only the HL -> DE half survives, which `ld de,hl` (ld
+;; d,h; ld e,l: 2 bytes, 8 cycles) does. No register is assumed dead: HL is
+;; written by the very next instruction. These come last so the rules that
+;; cancel or fold `ex de,hl` sequences see them first.
+%title #G10 IR gbz80 ex de,hl before pop hl is a copy (-2b, -48t)
+%cpu gbz80
+	ex	de,hl
+	pop	hl
+=
+	ld	de,hl
+	pop	hl
+
+%title #G11 IR gbz80 ex de,hl before ld hl,sp+n is a copy (-2b, -48t)
+%cpu gbz80
+	ex	de,hl
+	ld	hl,sp+%1
+=
+	ld	de,hl
+	ld	hl,sp+%1

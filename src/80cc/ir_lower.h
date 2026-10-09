@@ -24,6 +24,12 @@
 int ir_lower_func(FILE *out, Func *f);
 int ir_lower_func_flip(FILE *out, Func *f);
 
+/* Post-render peephole (after branch relaxation etc.): keeps a Horner
+   shift-add chain's multiplicand resident in DE instead of reloading it
+   every term. See ir_lower.c for the shape. Copies `src` to `out`;
+   `src`/`out` must differ. --opt-disable=mulchain-de to opt out. */
+void ir_lower_fold_mulchain_de(FILE *out, FILE *src);
+
 /* Assign frame slots to all vregs. Sets f->frame_size and
    f->vreg_spill_slot. The dumb lowerer puts every vreg in a slot
    sized to its width, packed back-to-back from sp+0 upward. */

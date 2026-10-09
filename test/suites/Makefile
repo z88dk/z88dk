@@ -9,7 +9,9 @@ BENCH = charbench crcbench intbench ptrbench sieve rle \
            strbench listbench interpbench matrixbench \
            hashbench fixedbench histbench lexbench \
            bitfieldbench widthbench predbench \
-           shiftbench localbench divbench callbench
+           shiftbench localbench divbench callbench \
+           m4gcd m4bitcount m4josephus m4kadane m4doors m4memory m4vcfe \
+           m4pangram
 
 ifeq ($(COMPILER),80cc)
 SUBDIRS += long_ir debuginfo

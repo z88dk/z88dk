@@ -236,6 +236,60 @@ static int ir_inline_block_ops_ok(void)
     return !IS_808x() && !IS_GBZ80();
 }
 
+/* A control-flow call argument (?:, &&, ||) ends the block and spills the
+   arguments built before it. If all arguments are pure (at most one touches a
+   volatile) their order is unobservable, so build the control-flow ones first. */
+static int arg_pure_nonvolatile(Node *n, int *nvol)
+{
+    if (!n) return 1;
+    switch (n->ast_type) {
+    case AST_LITERAL: case AST_STR_LIT: case AST_LABEL:
+    case OP_ADDR: case AST_ADDR:
+        return 1;
+    case AST_LOCAL_VAR: case AST_GLOBAL_VAR:
+        if ((n->sym && n->sym->ctype && n->sym->ctype->isvolatile)
+            || (n->type && n->type->isvolatile))
+            (*nvol)++;
+        return 1;
+    case OP_NEG: case OP_COMP: case OP_LNEG: case OP_CAST: case OP_SIZEOF:
+        return arg_pure_nonvolatile(n->operand, nvol);
+    case OP_DEREF: case AST_DEREF:
+        if (n->type && n->type->isvolatile) (*nvol)++;
+        return arg_pure_nonvolatile(n->operand, nvol);
+    case AST_TERNARY:
+        return arg_pure_nonvolatile(n->cond, nvol)
+            && arg_pure_nonvolatile(n->then, nvol)
+            && arg_pure_nonvolatile(n->els, nvol);
+    case OP_ADD: case OP_SUB: case OP_MULT: case OP_DIV: case OP_MOD:
+    case OP_AND: case OP_OR:  case OP_XOR:
+    case OP_EQ:  case OP_NE:
+    case OP_LT:  case OP_LE: case OP_GT: case OP_GE:
+    case OP_SSHR: case OP_SSHL: case OP_USHR: case OP_USHL:
+    case OP_OROR: case OP_ANDAND:
+        return arg_pure_nonvolatile(n->left, nvol)
+            && arg_pure_nonvolatile(n->right, nvol);
+    default:
+        return 0;
+    }
+}
+
+static int arg_has_control_flow(Node *n)
+{
+    if (!n) return 0;
+    switch (n->ast_type) {
+    case AST_TERNARY: case OP_OROR: case OP_ANDAND:
+        return 1;
+    case OP_NEG: case OP_COMP: case OP_LNEG: case OP_CAST: case OP_SIZEOF:
+    case OP_DEREF: case AST_DEREF:
+        return arg_has_control_flow(n->operand);
+    case AST_LITERAL: case AST_STR_LIT: case AST_LOCAL_VAR:
+    case AST_GLOBAL_VAR: case AST_LABEL: case OP_ADDR: case AST_ADDR:
+        return 0;
+    default:
+        return arg_has_control_flow(n->left) || arg_has_control_flow(n->right);
+    }
+}
+
 static int build_expr(Builder *b, Node *n)
 {
     return build_expr_hinted(b, n, -1);
@@ -1025,14 +1079,41 @@ static int emit_float_arith(Builder *b, Kind fk, const char *stem,
 /* Emit a wide memory-accumulator binop (IR_ACC_BINOP) for a 5/6-byte
    double: stem "add"/"sub"/"mul"/"div" → dadd/dsub/dmul/ddiv (FA model,
    acc holds LHS). Returns the result vreg (width c_fp_size) or -1. */
+/* `v` is a constant loaded from the literal pool in the current block and read
+   nowhere else: drop its load and return the pool label, so the acc op takes
+   the constant by address (no slot). -1 otherwise. */
+static int take_pool_operand(Builder *b, int v)
+{
+    if (v < 0 || opt_disabled("acc-pool-operand")) return -1;
+    BB *bb = cur_bb(b);
+    Op *def = NULL;
+    for (int j = 0; j < bb->n_ops; j++) {
+        Op *o = &bb->ops[j];
+        if (o->dst == v) {
+            if (def || o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_POOL) return -1;
+            def = o;
+            continue;
+        }
+        int u[16]; int nu = ir_op_uses(o, u, 16);
+        for (int k = 0; k < nu; k++) if (u[k] == v) return -1;
+    }
+    if (!def) return -1;
+    int lab = (int)def->mem.offset;
+    def->kind = IR_NOP;
+    def->dst = -1;
+    return lab;
+}
+
 static int emit_acc_binop(Builder *b, const char *stem, int lv, int rv)
 {
     const char *name = acc_name(stem);
     if (!name) return -1;
     int w = c_fp_size;
+    int l_pool = (lv == rv) ? -1 : take_pool_operand(b, lv);
+    int r_pool = (lv == rv) ? -1 : take_pool_operand(b, rv);
     int dst = new_temp_kind(b, KIND_DOUBLE);
     int *args = calloc(2, sizeof(int));
-    args[0] = lv; args[1] = rv;
+    args[0] = (l_pool >= 0) ? -1 : lv; args[1] = (r_pool >= 0) ? -1 : rv;
     Op *op = ir_op_emit(cur_bb(b), IR_ACC_BINOP);
     op->dst = dst;
     HelperInfo *hi = calloc(1, sizeof(HelperInfo));
@@ -1041,6 +1122,8 @@ static int emit_acc_binop(Builder *b, const char *stem, int lv, int rv)
     hi->acc_push = acc_name("push"); hi->acc_loadpush = acc_name("loadpush");
     hi->acc_width = w; hi->acc_holds_lhs = 0; hi->acc_store_bc = 0;
     hi->acc_commutative = acc_stem_commutative(stem);
+    if (l_pool >= 0) { hi->acc_src_is_pool[0] = 1; hi->acc_src_litlab[0] = l_pool; }
+    if (r_pool >= 0) { hi->acc_src_is_pool[1] = 1; hi->acc_src_litlab[1] = r_pool; }
     op->hcall = hi;
     return dst;
 }
@@ -1135,9 +1218,11 @@ static int emit_acc_int_binop(Builder *b, const char *stem,
 {
     const char *name = acc_int_name(stem, is_unsigned);
     if (!name) return -1;
+    int l_pool = (lv == rv) ? -1 : take_pool_operand(b, lv);
+    int r_pool = (lv == rv) ? -1 : take_pool_operand(b, rv);
     int dst = new_temp_kind(b, KIND_LONGLONG);
     int *args = calloc(2, sizeof(int));
-    args[0] = lv; args[1] = rv;
+    args[0] = (l_pool >= 0) ? -1 : lv; args[1] = (r_pool >= 0) ? -1 : rv;
     Op *op = ir_op_emit(cur_bb(b), IR_ACC_BINOP);
     op->dst = dst;
     HelperInfo *hi = calloc(1, sizeof(HelperInfo));
@@ -1146,6 +1231,8 @@ static int emit_acc_int_binop(Builder *b, const char *stem,
     hi->acc_push = "l_i64_push"; hi->acc_loadpush = NULL;
     hi->acc_width = 8; hi->acc_holds_lhs = 0; hi->acc_store_bc = 1;
     hi->acc_commutative = acc_stem_commutative(stem);
+    if (l_pool >= 0) { hi->acc_src_is_pool[0] = 1; hi->acc_src_litlab[0] = l_pool; }
+    if (r_pool >= 0) { hi->acc_src_is_pool[1] = 1; hi->acc_src_litlab[1] = r_pool; }
     op->hcall = hi;
     return dst;
 }
@@ -1418,6 +1505,21 @@ static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
     for (int i = 0; i < 64; i++) if ((u >> i) & 1u) { hi_bit = i; pop++; }
     if (hi_bit > maxsh) return -1;              /* top term shifts out of range */
 
+    /* A 32-bit chain is several shifts and adds, each a multi-instruction
+       sequence, against a 9-byte call to l_long_mult_u that costs about 1000
+       ticks. Measured over every constant to 130: 2^a+1 and 2^a-1 (one shift,
+       one add or subtract) save 600-900 ticks for 40-50 bytes, 13 ticks a byte
+       or better; any chain with a second shifted term or a Horner run (6, 10,
+       12, 20, 24, 25, 100 ...) costs 66-85 bytes for 5-8 ticks a byte, and
+       1000 costs 160 bytes to save 28 ticks. So only a power of two, 2^a+1
+       and 2^a-1 stay inline. `--opt-disable=long-mult-sr` inlines them all. */
+    if (w == 4 && !opt_disabled("long-mult-sr")) {
+        uint64_t lbit = u & (~u + 1u), upl = u + lbit;
+        int plus_minus_one = (pop == 2 && lo_bit == 0)
+                          || (lo_bit == 0 && (upl & (upl - 1)) == 0);
+        if (pop != 1 && !plus_minus_one) return -1;
+    }
+
     if (pop == 1)                               /* pure power of two */
         return sr_shift_left(b, v, lo_bit, w);
 
@@ -1659,8 +1761,24 @@ static int conv_int_vreg_to_acc(Builder *b, int v, int uns)
    register-tier float16 / _Accum is handled by its own path). node_value_kind
    unwraps a fnptr/func-call's KIND_FUNC so a double-returning call is
    recognised as already-double. */
+static int emit_float_const(Builder *b, double value, Kind fk);
+
+/* An integer literal used as an acc-tier double, as that double constant —
+   no runtime int→double conversion. -1 when `node` is not one. */
+static int acc_int_literal(Builder *b, Node *node)
+{
+    if (!node || node->ast_type != AST_LITERAL || opt_disabled("acc-int-literal"))
+        return -1;
+    if (!kind_is_integer(node_value_kind(node))) return -1;
+    double val = (node->type && node->type->isunsigned)
+               ? (double)node_int_bits(node) : (double)node_int_value(node);
+    return emit_float_const(b, val, KIND_DOUBLE);
+}
+
 static int build_operand_as_acc(Builder *b, Node *node)
 {
+    int c = acc_int_literal(b, node);
+    if (c >= 0) return c;
     int v = build_expr(b, node);
     if (v < 0) return -1;
     Kind k = node_value_kind(node);
@@ -1776,8 +1894,18 @@ static Kind reg_float_common(Kind a, Kind b)
    (the f16/f32 analog of build_operand_as_acc). Already-`fk` returns as-is; an
    integer source converts via int→float; the other register float converts
    f16↔f32. A width-8 int / acc-double source isn't handled here (-1). */
+static int emit_float_const(Builder *b, double value, Kind fk);
+
 static int build_operand_as_float_reg(Builder *b, Node *node, Kind fk)
 {
+    /* An integer literal is that float constant, not a runtime l_f*_sint2f. */
+    if (node && node->ast_type == AST_LITERAL && !opt_disabled("reg-int-literal")
+        && kind_is_integer(node_value_kind(node))) {
+        double val = (node->type && node->type->isunsigned)
+                   ? (double)node_int_bits(node) : (double)node_int_value(node);
+        int c = emit_float_const(b, val, fk);
+        if (c >= 0) return c;
+    }
     int v = build_expr(b, node);
     if (v < 0) return -1;
     Kind k = node_value_kind(node);
@@ -2599,9 +2727,11 @@ static int build_binop_float(Builder *b, Node *n)
                        ? ir_pool_litlab_double(n->right->zval) : -1;
             int rf = (r_pool >= 0) ? -1 : build_operand_as_acc(b, n->right);
             if (r_pool < 0 && rf < 0) return build_fail("float cmp: rhs not promotable");
+            int l_pool = (c_fp_size > 4 && lf != rf) ? take_pool_operand(b, lf) : -1;
+            if (r_pool < 0 && c_fp_size > 4 && lf != rf) r_pool = take_pool_operand(b, rf);
             int dst = new_temp_kind(b, KIND_INT);
             int *cargs = calloc(2, sizeof(int));
-            cargs[0] = lf; cargs[1] = (r_pool >= 0) ? -1 : rf;
+            cargs[0] = (l_pool >= 0) ? -1 : lf; cargs[1] = (r_pool >= 0) ? -1 : rf;
             Op *cop = ir_op_emit(cur_bb(b), IR_ACC_CMP);
             cop->dst = dst;
             HelperInfo *chi = calloc(1, sizeof(HelperInfo));
@@ -2612,6 +2742,7 @@ static int build_binop_float(Builder *b, Node *n)
             chi->acc_loadpush = acc_name("loadpush");
             chi->acc_width = c_fp_size; chi->acc_holds_lhs = 0;
             chi->acc_commutative = acc_stem_commutative(cstem);
+            if (l_pool >= 0) { chi->acc_src_is_pool[0] = 1; chi->acc_src_litlab[0] = l_pool; }
             if (r_pool >= 0) { chi->acc_src_is_pool[1] = 1; chi->acc_src_litlab[1] = r_pool; }
             cop->hcall = chi;
             return dst;
@@ -2690,6 +2821,8 @@ static int binop_is_i64(Node *n)
 }
 
 /* long long binop/compare → l_i64_* via IR_ACC_*. */
+static int build_i64_operand(Builder *b, Node *node, int uns);
+
 static int build_binop_i64(Builder *b, Node *n)
 {
     Type *lvt = node_value_type(n->left);
@@ -2743,11 +2876,10 @@ static int build_binop_i64(Builder *b, Node *n)
         return dst;
     }
     if (stem) {
-        int r = build_expr(b, n->right);
+        int r = build_i64_operand(b, n->right, rvt && rvt->isunsigned);
         if (r < 0) return -1;
         l = promote_to_acc_int(b, l, lvt && lvt->isunsigned);
-        r = promote_to_acc_int(b, r, rvt && rvt->isunsigned);
-        if (l < 0 || r < 0) return -1;
+        if (l < 0) return -1;
         int dst = emit_acc_int_binop(b, stem, l, r, is_uns);
         if (dst < 0) return build_fail("i64 binop emit failed");
         return dst;
@@ -2772,6 +2904,21 @@ static int build_binop_i64(Builder *b, Node *n)
     return dst;
 }
 
+/* An i64 operand: an integer literal comes straight from the literal pool (no
+   long immediate widened at run time), anything else is built and promoted. */
+static int build_i64_operand(Builder *b, Node *node, int uns)
+{
+    if (node && node->ast_type == AST_LITERAL && !opt_disabled("acc-int-literal")
+        && kind_is_integer(node_value_kind(node)))
+        return emit_pool_load(b, node->int_literal
+                                 ? ir_pool_litlab_llong_exact(node_int_bits(node))
+                                 : ir_pool_litlab_llong(node_int_value(node)),
+                              8, KIND_LONGLONG);
+    int v = build_expr(b, node);
+    if (v < 0) return -1;
+    return promote_to_acc_int(b, v, uns);
+}
+
 /* True if this mul/div/mod is a long long op: acc-int result, or both operands
    acc-int (a mixed `ll * int` promotes to ll, caught by the result). */
 static int muldiv_is_i64(Node *n)
@@ -2787,13 +2934,10 @@ static int build_muldiv_i64(Builder *b, Node *n)
 {
     int is_uns = (n->left->type && n->left->type->isunsigned)
               || (n->right->type && n->right->type->isunsigned);
-    int l = build_expr(b, n->left);
+    int l = build_i64_operand(b, n->left, n->left->type && n->left->type->isunsigned);
     if (l < 0) return -1;
-    int r = build_expr(b, n->right);
+    int r = build_i64_operand(b, n->right, n->right->type && n->right->type->isunsigned);
     if (r < 0) return -1;
-    l = promote_to_acc_int(b, l, n->left->type && n->left->type->isunsigned);
-    r = promote_to_acc_int(b, r, n->right->type && n->right->type->isunsigned);
-    if (l < 0 || r < 0) return -1;
     const char *stem = (n->ast_type == OP_MULT) ? "mul"
                      : (n->ast_type == OP_DIV)  ? "div" : "mod";
     int dst = emit_acc_int_binop(b, stem, l, r, is_uns);
@@ -4161,6 +4305,35 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             int n_to_push = is_fastcall ? n_args - 1
                           : is_sdcccall1 ? 0
                           : n_args;
+            /* control-flow arguments first */
+            int pre_v[64];
+            int reorder = 0;
+            if (n_to_push == n_args && n_args >= 2 && n_args <= 64
+                && !opt_disabled("arg-reorder")) {
+                int any_cf = 0, all_ok = 1, vol_args = 0;
+                for (int i = 0; i < n_args && all_ok; i++) {
+                    Node *a = array_get_byindex(n->args, i);
+                    int nvol = 0;
+                    if (!a || (a->type && a->type->kind == KIND_STRUCT)
+                        || !arg_pure_nonvolatile(a, &nvol))
+                        all_ok = 0;
+                    else {
+                        if (nvol) vol_args++;
+                        if (arg_has_control_flow(a)) any_cf = 1;
+                    }
+                }
+                reorder = all_ok && any_cf && vol_args <= 1;
+            }
+            if (reorder) {
+                for (int i = 0; i < n_args; i++) pre_v[i] = -1;
+                for (int k = 0; k < n_args; k++) {
+                    int i = is_stdc ? n_args - 1 - k : k;
+                    Node *a = array_get_byindex(n->args, i);
+                    if (!arg_has_control_flow(a)) continue;
+                    pre_v[i] = build_expr(b, a);
+                    if (pre_v[i] < 0) { free(args); free(arg_pushed_bytes); return -1; }
+                }
+            }
             int push_bb   = b->cur_bb_id;
             int pushable  = 1;
             int push_ops[64];
@@ -4193,7 +4366,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                            : NULL;
                 int is_struct = arg_is_struct && pt_i && pt_i->kind == KIND_STRUCT;
                 if (is_struct) has_struct_arg = 1;
-                int v = arg_is_struct ? agg_lvalue_addr(b, a) : build_expr(b, a);
+                int v = (reorder && pre_v[i] >= 0) ? pre_v[i]
+                      : arg_is_struct ? agg_lvalue_addr(b, a) : build_expr(b, a);
                 if (v < 0) { free(args); free(arg_pushed_bytes); return -1; }
                 /* __z88dk_sdccdecl: a char parameter is passed as ONE
                    byte (not the smallc 2-byte int promotion). Truncate
@@ -4621,10 +4795,26 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             ld->mem.kind  = IR_MEM_SYM;
             ld->mem.sym   = gsym;
 
+            /* A near pointer steps by sizeof(the pointee). */
+            int gstride = 1;
+            if (n->type && n->type->kind == KIND_PTR) {
+                Type *pte = n->type->ptr;
+                gstride = !pte ? 0
+                        : (pte->kind == KIND_STRUCT || pte->kind == KIND_ARRAY)
+                          ? (int)pte->size : type_width(pte);
+                if (gstride <= 0)
+                    return build_fail("step on pointer to incomplete/"
+                                      "unknown type (global)");
+            }
             int new_v;
             if (w == 8) {
                 new_v = emit_acc_int_unary(b, old_v,
                             is_inc ? "l_i64_inc" : "l_i64_dec");
+            } else if (gstride != 1) {
+                new_v = new_temp(b, w);
+                Op *sop = ir_op_emit(cur_bb(b), is_inc ? IR_ADD : IR_SUB);
+                sop->dst = new_v; sop->src[0] = old_v; sop->src[1] = -1;
+                sop->imm = gstride;
             } else {
                 new_v = new_temp(b, w);
                 ir_emit_unop(cur_bb(b), is_inc ? IR_INC : IR_DEC,
@@ -4656,10 +4846,18 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                               "supported (operand ast=%d)",
                               n->operand->ast_type);
 
-        /* Restrict to plain integer kinds. KIND_PTR would need
-           sizeof(pointee) scaling on the step, which this path
-           doesn't yet implement — those still bail. */
-        if (!n->type
+        /* Plain integer kinds, or a near pointer, which steps by
+           sizeof(the pointee). */
+        int pstride = 1;
+        if (n->type && n->type->kind == KIND_PTR) {
+            Type *pte = n->type->ptr;
+            pstride = !pte ? 0
+                    : (pte->kind == KIND_STRUCT || pte->kind == KIND_ARRAY)
+                      ? (int)pte->size : type_width(pte);
+            if (pstride <= 0)
+                return build_fail("step on pointer to incomplete/unknown "
+                                  "type (non-LV)");
+        } else if (!n->type
             || (n->type->kind != KIND_CHAR
              && n->type->kind != KIND_INT
              && n->type->kind != KIND_SHORT
@@ -4686,6 +4884,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                                   "unmapped %s",
                                   addr_node->sym
                                       ? addr_node->sym->name : "?");
+        } else if (n->operand->ast_type == OP_DEREF) {
+            /* `(*X)++`: the operand is the DEREF node whose value is the
+               address of the object (a loaded pointer), not X itself. */
+            ptr_v = build_expr(b, n->operand);
+            if (ptr_v < 0) return -1;
         } else {
             ptr_v = build_expr(b, addr_node);
             if (ptr_v < 0) return -1;
@@ -4705,6 +4908,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         if (elem_w == 8) {
             new_v = emit_acc_int_unary(b, old_v,
                         is_inc ? "l_i64_inc" : "l_i64_dec");
+        } else if (pstride != 1) {
+            new_v = new_temp(b, elem_w);
+            Op *sop = ir_op_emit(cur_bb(b), is_inc ? IR_ADD : IR_SUB);
+            sop->dst = new_v; sop->src[0] = old_v; sop->src[1] = -1;
+            sop->imm = pstride;
         } else {
             new_v = new_temp(b, elem_w);
             ir_emit_unop(cur_bb(b), is_inc ? IR_INC : IR_DEC,
@@ -5632,7 +5840,11 @@ static int build_assign(Builder *b, Node *n)
                                       ? n->left->operand->sym->name
                                       : "?");
         } else {
-            ptr_v = build_expr(b, n->left->operand);
+            /* The destination's address is the VALUE of the deref node
+               `n->left` (a loaded pointer), not of its operand: for
+               `*ps[1] = x` the operand is `&ps[1]`, and storing there
+               overwrites the pointer array. */
+            ptr_v = build_expr(b, n->left);
             if (ptr_v < 0) return -1;
         }
         /* __far store (`*fp = v`): route through an lp_p* helper.
@@ -6003,6 +6215,19 @@ static int build_cast(Builder *b, Node *n)
         ir_emit_ld_imm(cur_bb(b), v,
                        scale_literal_for_kind(n->operand, dst_k));
         return v;
+    }
+    if (is_acc_float_kind(dst_k)) {
+        int c = acc_int_literal(b, n->operand);
+        if (c >= 0) return c;
+    }
+    if (is_register_float_kind(dst_k) && n->operand->ast_type == AST_LITERAL
+        && !opt_disabled("reg-int-literal")
+        && kind_is_integer(node_value_kind(n->operand))) {
+        Node *lit = n->operand;
+        double val = (lit->type && lit->type->isunsigned)
+                   ? (double)node_int_bits(lit) : (double)node_int_value(lit);
+        int c = emit_float_const(b, val, dst_k);
+        if (c >= 0) return c;
     }
     int src_v = build_expr(b, n->operand);
     if (src_v < 0) return -1;

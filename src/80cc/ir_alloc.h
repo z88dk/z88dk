@@ -25,6 +25,8 @@ void ir_alloc(Func *f);
 int  ir_alloc_word_home_picked(void);
 void ir_alloc_word_home_reject(Func *f);
 void ir_alloc_word_home_done(void);
+/* Restored tenants that share a pair with a home placed after the pick. */
+int  ir_alloc_word_home_clashes(int *out, int max);
 
 /* [home-demote] Drop v to a frame slot after the render proved its register
    home unrealizable, clearing the flags that would suppress the slot. Returns
@@ -37,6 +39,7 @@ int ir_alloc_demote_home(Func *f, int v);
    so a re-run of ir_alloc offers its register to the next candidate instead of
    leaving it unused. Reset per function. */
 void ir_alloc_veto_reset(void);
+void ir_alloc_de_veto(int on);
 void ir_alloc_veto_add(int vreg);
 
 /* Does v need a frame slot backing its home? THE allocation answer, and the

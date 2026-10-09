@@ -2194,7 +2194,14 @@ static void aopt_collect_escaped(Node *n)
 
 static int aopt_sym_aliased(SYMBOL *sym)
 {
-    return sym && sym_set_contains(&aopt_escaped, sym);
+    if (!sym) return 0;
+    /* An array or struct is reachable through any computed index or member
+       address (`arr[i] = v`, `&arr[1]`, an array name passed as a pointer),
+       none of which is a `&local` in the tree. */
+    if (sym->ctype && (sym->ctype->kind == KIND_ARRAY
+                       || sym->ctype->kind == KIND_STRUCT))
+        return 1;
+    return sym_set_contains(&aopt_escaped, sym);
 }
 
 /* A bare `(gv=g)` / `(lv=a)` node is an ADDRESS, and no store can change an
@@ -2273,7 +2280,9 @@ static int aopt_has_indirect_write(Node *n)
         break;
     case OP_PRE_INC: case OP_POST_INC:
     case OP_PRE_DEC: case OP_POST_DEC:
-        if (aopt_write_is_indirect(n->operand, 0)) return 1;
+        /* A step's operand is the ADDRESS of the object: `(*p)++` is
+           `(deref (lv=p))`, a write through p. */
+        if (aopt_write_is_indirect(n->operand, 1)) return 1;
         break;
     default:
         break;
@@ -2329,6 +2338,32 @@ static void cse_env_clone(cse_env *dst, const cse_env *src)
     dst->cap = src->n;
     dst->entries = src->n ? malloc(sizeof(cse_entry) * src->n) : NULL;
     if (src->n) memcpy(dst->entries, src->entries, sizeof(cse_entry) * src->n);
+}
+
+/* Bit width of an integer or pointer type, 0 for anything else. */
+static int cse_type_bits(const Type *t)
+{
+    if (!t) return 0;
+    switch (t->kind) {
+    case KIND_CHAR:     return 8;
+    case KIND_INT: case KIND_SHORT: case KIND_PTR: return 16;
+    case KIND_LONG:     return 32;
+    case KIND_LONGLONG: return 64;
+    default:            return 0;
+    }
+}
+
+/* A binding `expr -> sym` replaces a later occurrence of expr with a read of
+   sym, so sym must hold expr's whole value: `x = E` into an unsigned char
+   truncates E, and the next E must not become x. */
+static int cse_binding_fits(const SYMBOL *sym, const Node *expr)
+{
+    const Type *st = sym ? sym->ctype : NULL, *et = expr ? expr->type : NULL;
+    if (!st || !et) return 0;
+    int sb = cse_type_bits(st), eb = cse_type_bits(et);
+    if (!sb || !eb) return st->kind == et->kind;
+    if (sb == eb) return st->isunsigned == et->isunsigned;
+    return sb > eb && et->isunsigned;
 }
 
 static void cse_env_add(cse_env *e, Node *expr, SYMBOL *sym)
@@ -2412,6 +2447,16 @@ static void cse_env_invalidate_aliased(cse_env *e)
         w++;
     }
     e->n = w;
+}
+
+/* A direct write to `sym` redefines it by name, but a pointer may read the
+   same memory: when sym is a global or an address-escaped local, entries that
+   read through a pointer go too. */
+static void cse_env_invalidate_written(cse_env *e, SYMBOL *sym)
+{
+    cse_env_invalidate_sym(e, sym);
+    if (sym && (sym->storage != STKLOC || aopt_sym_aliased(sym)))
+        cse_env_invalidate_aliased(e);
 }
 
 /* "Interesting" enough to record. SEF is checked separately. */
@@ -2749,7 +2794,8 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
         if (node->sym && node->declvar
             && is_cse_interesting(node->declvar)
             && is_side_effect_free(node->declvar)
-            && (!node->sym->ctype || !node->sym->ctype->isvolatile)) {
+            && (!node->sym->ctype || !node->sym->ctype->isvolatile)
+            && cse_binding_fits(node->sym, node->declvar)) {
             cse_env_add(env, node->declvar, node->sym);
         }
         return node;
@@ -2774,10 +2820,12 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
             && node->operand->operand
             && node->operand->operand->ast_type == AST_LOCAL_VAR
             && node->operand->operand->sym) {
-            cse_env_invalidate_sym(env, node->operand->operand->sym);
+            /* `(*p)++` writes through p: whatever p reaches changes. */
+            cse_env_invalidate_written(env, node->operand->operand->sym);
+            cse_env_invalidate_aliased(env);
         } else if (node->operand && node->operand->ast_type == AST_LOCAL_VAR
                    && node->operand->sym) {
-            cse_env_invalidate_sym(env, node->operand->sym);
+            cse_env_invalidate_written(env, node->operand->sym);
         } else {
             cse_env_clear(env);   /* unknown — bail */
         }
@@ -2807,18 +2855,27 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
         } else if (unknown) {
             cse_env_clear(env);
         } else if (lhs_sym) {
-            cse_env_invalidate_sym(env, lhs_sym);
+            cse_env_invalidate_written(env, lhs_sym);
             /* Record only when the destination is a local: the substitution
                (cse_make_lv_deref) reads the recorded sym back as an
                AST_LOCAL_VAR. A global destination would be re-read as a
                bogus "unknown local" and abort the build, so globals are
                invalidated above but never recorded (as the comment in
                cse_walk_lvalue notes). */
+            /* A pointer read in the right side may reach the very variable
+               being stored (`a = *p ^ x` with p == &a): the write changes
+               the value the binding names. */
+            int self_aliased = (lhs_sym->storage != STKLOC
+                                || aopt_sym_aliased(lhs_sym))
+                            && node->right && aopt_reads_aliased_mem(node->right);
             if (node->right
                 && is_cse_interesting(node->right)
                 && is_side_effect_free(node->right)
                 && lhs_sym->ctype && !lhs_sym->ctype->isvolatile
-                && node->left->ast_type != AST_GLOBAL_VAR) {
+                && node->left->ast_type != AST_GLOBAL_VAR
+                && !self_aliased
+                && !subtree_mentions(node->right, lhs_sym)
+                && cse_binding_fits(lhs_sym, node->right)) {
                 cse_env_add(env, node->right, lhs_sym);
             }
         }
@@ -2835,7 +2892,7 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
         if (node->left) node->left = cse_walk_lvalue(node->left, env, &lhs_sym,
                                                      &unknown, 0, NULL);
         if (unknown)         cse_env_clear(env);
-        else if (lhs_sym)    cse_env_invalidate_sym(env, lhs_sym);
+        else if (lhs_sym)    cse_env_invalidate_written(env, lhs_sym);
         return node;
     }
 
@@ -3146,6 +3203,10 @@ static int subtree_directly_mutates(Node *n, Node *cand)
                 t = n->left->operand->sym;
         }
         if (t && subtree_mentions(cand, t)) return 1;
+        /* A pointer read in cand may reach t: writing an escaped local or a
+           global by name changes what `*p` reads. */
+        if (t && (t->storage != STKLOC || aopt_sym_aliased(t))
+            && aopt_reads_aliased_mem(cand)) return 1;
     }
     if ((n->ast_type == OP_PRE_INC || n->ast_type == OP_POST_INC
       || n->ast_type == OP_PRE_DEC || n->ast_type == OP_POST_DEC)
@@ -3155,8 +3216,14 @@ static int subtree_directly_mutates(Node *n, Node *cand)
         if (o->ast_type == AST_LOCAL_VAR || o->ast_type == AST_GLOBAL_VAR) t = o->sym;
         else if (o->ast_type == OP_DEREF && o->operand
               && (o->operand->ast_type == AST_LOCAL_VAR
-               || o->operand->ast_type == AST_GLOBAL_VAR)) t = o->operand->sym;
+               || o->operand->ast_type == AST_GLOBAL_VAR)) {
+            t = o->operand->sym;
+            /* a step through a pointer writes whatever the pointer reaches */
+            if (aopt_reads_aliased_mem(cand)) return 1;
+        }
         if (t && subtree_mentions(cand, t)) return 1;
+        if (t && (t->storage != STKLOC || aopt_sym_aliased(t))
+            && aopt_reads_aliased_mem(cand)) return 1;
     }
     /* Address-of a sym the cand mentions: escape, future calls could
        mutate it. Conservative skip. */
@@ -3633,7 +3700,7 @@ static void licm_compute_modified(Node *node, sym_set *modified, int *has_call)
         break;
     case OP_PRE_INC: case OP_POST_INC:
     case OP_PRE_DEC: case OP_POST_DEC:
-        if (aopt_write_is_indirect(node->operand, 0))
+        if (aopt_write_is_indirect(node->operand, 1))
             *has_call = 1;
         if (node->operand) {
             Node *o = node->operand;
@@ -4041,9 +4108,26 @@ static void dse_collect_escaped(Node *n, sym_set *escaped)
    anywhere in the function. Used for the conservative LABEL reset.
    Reads are detected at OP_DEREF(AST_LOCAL_VAR), and at LHS of
    compound-assigns / pre-post-step (which read-then-write). */
-static void dse_collect_ever_read(Node *n, sym_set *ever_read)
+typedef struct { Node **items; int n, cap; } node_seen;
+
+/* Subtrees can be shared by reference (a compound step reuses its index
+   expression), so a plain walk is exponential in the nesting; reading a node
+   twice adds nothing, so each is visited once. */
+static int node_seen_add(node_seen *v, Node *n)
+{
+    for (int i = 0; i < v->n; i++) if (v->items[i] == n) return 0;
+    if (v->n == v->cap) {
+        v->cap = v->cap ? v->cap * 2 : 64;
+        v->items = realloc(v->items, sizeof(Node *) * v->cap);
+    }
+    v->items[v->n++] = n;
+    return 1;
+}
+
+static void dse_collect_ever_read_v(Node *n, sym_set *ever_read, node_seen *seen)
 {
     if (!n) return;
+    if (!node_seen_add(seen, n)) return;
     switch (n->ast_type) {
     case AST_LITERAL: case AST_STR_LIT: case AST_GLOBAL_VAR:
     case AST_LABEL: case AST_JUMP: case AST_UNDECL:
@@ -4059,7 +4143,7 @@ static void dse_collect_ever_read(Node *n, sym_set *ever_read)
         if (n->operand && n->operand->ast_type == AST_LOCAL_VAR && n->operand->sym) {
             sym_set_add(ever_read, n->operand->sym);
         } else {
-            dse_collect_ever_read(n->operand, ever_read);
+            dse_collect_ever_read_v(n->operand, ever_read, seen);
         }
         return;
     case OP_ADDR: case AST_ADDR:
@@ -4069,66 +4153,73 @@ static void dse_collect_ever_read(Node *n, sym_set *ever_read)
            subtree. */
         if (n->operand && n->operand->ast_type != AST_LOCAL_VAR
                        && n->operand->ast_type != AST_GLOBAL_VAR)
-            dse_collect_ever_read(n->operand, ever_read);
+            dse_collect_ever_read_v(n->operand, ever_read, seen);
         return;
     case AST_FUNC_CALL: case AST_FUNCPTR_CALL:
         for (int i = 0; i < (int)array_len(n->args); i++)
-            dse_collect_ever_read(array_get_byindex(n->args, i), ever_read);
-        if (n->callee) dse_collect_ever_read(n->callee, ever_read);
+            dse_collect_ever_read_v(array_get_byindex(n->args, i), ever_read, seen);
+        if (n->callee) dse_collect_ever_read_v(n->callee, ever_read, seen);
         return;
     case AST_COMPOUND_STMT: case AST_INIT_LIST:
         for (int i = 0; i < (int)array_len(n->stmts); i++)
-            dse_collect_ever_read(array_get_byindex(n->stmts, i), ever_read);
+            dse_collect_ever_read_v(array_get_byindex(n->stmts, i), ever_read, seen);
         return;
     case AST_RETURN:
-        dse_collect_ever_read(n->retval, ever_read);
+        dse_collect_ever_read_v(n->retval, ever_read, seen);
         return;
     case AST_IF: case AST_TERNARY:
-        dse_collect_ever_read(n->cond, ever_read);
-        dse_collect_ever_read(n->then, ever_read);
-        dse_collect_ever_read(n->els,  ever_read);
+        dse_collect_ever_read_v(n->cond, ever_read, seen);
+        dse_collect_ever_read_v(n->then, ever_read, seen);
+        dse_collect_ever_read_v(n->els,  ever_read, seen);
         return;
     case AST_SWITCH:
-        dse_collect_ever_read(n->sw_expr, ever_read);
-        dse_collect_ever_read(n->sw_body, ever_read);
+        dse_collect_ever_read_v(n->sw_expr, ever_read, seen);
+        dse_collect_ever_read_v(n->sw_body, ever_read, seen);
         return;
     case AST_SWITCH_CASE:
-        dse_collect_ever_read(n->sw_value, ever_read);
+        dse_collect_ever_read_v(n->sw_value, ever_read, seen);
         return;
     case AST_DECL:
-        dse_collect_ever_read(n->declvar, ever_read);
+        dse_collect_ever_read_v(n->declvar, ever_read, seen);
         return;
     case AST_CRITICAL:
-        dse_collect_ever_read(n->operand, ever_read);
+        dse_collect_ever_read_v(n->operand, ever_read, seen);
         return;
     case OP_ASSIGN:
         /* RHS reads count; LHS does not (it's a write target). */
-        dse_collect_ever_read(n->right, ever_read);
+        dse_collect_ever_read_v(n->right, ever_read, seen);
         /* But if LHS is a complex lvalue (e.g. *(p+i)), the components
            are read — walk via the deref structure. Bare AST_LOCAL_VAR
            on LHS is a write target and should NOT be counted. */
         if (n->left && n->left->ast_type != AST_LOCAL_VAR
                     && n->left->ast_type != AST_GLOBAL_VAR)
-            dse_collect_ever_read(n->left, ever_read);
+            dse_collect_ever_read_v(n->left, ever_read, seen);
         return;
     case OP_AADD: case OP_ASUB: case OP_AMULT:
     case OP_ADIV: case OP_AMOD:
     case OP_AAND: case OP_AOR:  case OP_AXOR:
     case OP_ASSHR: case OP_ASSHL:
         /* Compound assign: LHS is read AND written. */
-        dse_collect_ever_read(n->left, ever_read);
-        dse_collect_ever_read(n->right, ever_read);
+        dse_collect_ever_read_v(n->left, ever_read, seen);
+        dse_collect_ever_read_v(n->right, ever_read, seen);
         return;
     case OP_PRE_INC: case OP_POST_INC: case OP_PRE_DEC: case OP_POST_DEC:
         /* Pre/post step: operand is read AND written. */
-        dse_collect_ever_read(n->operand, ever_read);
+        dse_collect_ever_read_v(n->operand, ever_read, seen);
         return;
     default:
-        if (n->left)    dse_collect_ever_read(n->left, ever_read);
-        if (n->right)   dse_collect_ever_read(n->right, ever_read);
-        if (n->operand) dse_collect_ever_read(n->operand, ever_read);
+        if (n->left)    dse_collect_ever_read_v(n->left, ever_read, seen);
+        if (n->right)   dse_collect_ever_read_v(n->right, ever_read, seen);
+        if (n->operand) dse_collect_ever_read_v(n->operand, ever_read, seen);
         return;
     }
+}
+
+static void dse_collect_ever_read(Node *n, sym_set *ever_read)
+{
+    node_seen seen = {0};
+    dse_collect_ever_read_v(n, ever_read, &seen);
+    free(seen.items);
 }
 
 static void dse_collect_referenced(Node *n, sym_set *referenced);

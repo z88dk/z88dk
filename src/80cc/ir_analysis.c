@@ -16,7 +16,9 @@
  */
 
 #include "ir_analysis.h"
+#include "ccdefs.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -443,8 +445,10 @@ void ir_compute_liveness(Func *f)
 static int defassign_verify_level(void)
 {
     const char *v = getenv("IR_DEFASSIGN_VERIFY");
-    if (!v || !v[0]) return 0;
-    return (v[0] == '2') ? 2 : 1;
+    if (v && v[0] == '0') return 0;
+    if (v && v[0] == '2') return 2;
+    if (v && v[0]) return 1;
+    return opt_disabled("defassign-verify") ? 0 : 3;
 }
 
 /* Forward "must be defined" dataflow at BB granularity: MEET = intersection
@@ -459,6 +463,9 @@ static int defassign_verify_level(void)
 void ir_verify_definite_assignment(const Func *f)
 {
     int level = defassign_verify_level();
+    /* level 3 (default): warn only when no path writes the vreg before the
+       read — never a false positive. 1/2 (env): "not written on every path". */
+    int may = (level == 3);
     if (!level || !f || f->n_bbs == 0 || f->n_vregs == 0) return;
 
     int n = f->n_vregs;
@@ -477,7 +484,7 @@ void ir_verify_definite_assignment(const Func *f)
        invisible to this pass (same under-approximation ir_slots.c's
        interference model already accepts) — so treat it as always
        defined rather than false-positive on it. */
-    memset(in_set, 1, (size_t)f->n_bbs * (size_t)n);
+    memset(in_set, may ? 0 : 1, (size_t)f->n_bbs * (size_t)n);
     memset(in_set, 0, (size_t)n);
     for (int v = 0; v < n; v++)
         if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN))
@@ -510,8 +517,10 @@ void ir_verify_definite_assignment(const Func *f)
                 int suc = ir_bb_succ_at(bb, s);
                 if (suc <= 0 || suc >= f->n_bbs) continue;   /* keep BB0 pinned */
                 char *sin = in_set + (size_t)suc * n;
-                for (int v = 0; v < n; v++)
-                    if (sin[v] && !out[v]) { sin[v] = 0; changed = 1; }
+                for (int v = 0; v < n; v++) {
+                    if (may) { if (out[v] && !sin[v]) { sin[v] = 1; changed = 1; } }
+                    else if (sin[v] && !out[v]) { sin[v] = 0; changed = 1; }
+                }
             }
         }
     } while (changed);
@@ -532,12 +541,17 @@ void ir_verify_definite_assignment(const Func *f)
             for (int k = 0; k < nu; k++) {
                 int vr = ubuf[k];
                 if (vr < 0 || vr >= n || seen[vr] || reported[vr]) continue;
+                /* compiler temporaries (LICM etc.) carry a non-identifier name */
+                const char *vn = ir_sym_name(f->vregs[vr].sym);
+                if (!vn || !(isalpha((unsigned char)vn[0]) || vn[0] == '_')) continue;
                 reported[vr] = 1;
                 fprintf(stderr,
-                    "IR_DEFASSIGN_VERIFY: %s: '%s' (v%d, width %d) read "
-                    "before any write, at %s:%d — undefined behaviour in "
-                    "the source unless it is genuinely set on every path "
-                    "reaching this read (a codegen bug if so)\n",
+                    may ? "warning: %s: '%s' (v%d, width %d) is read but never "
+                          "written on any path, at %s:%d — undefined behaviour\n"
+                        : "IR_DEFASSIGN_VERIFY: %s: '%s' (v%d, width %d) read "
+                          "before any write, at %s:%d — undefined behaviour in "
+                          "the source unless it is genuinely set on every path "
+                          "reaching this read (a codegen bug if so)\n",
                     ir_sym_name(f->fn), ir_sym_name(f->vregs[vr].sym),
                     vr, f->vregs[vr].width,
                     op->file ? op->file : "?", op->line);

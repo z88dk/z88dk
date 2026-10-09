@@ -70,6 +70,7 @@ int ir_opt_st2ld(Func *f);
  * Returns the number of ops rewritten to IR_MOV.
  */
 int ir_opt_cse(Func *f);
+extern int ir_cse_alias_fired, ir_cse_alias_veto;
 
 /* Spatial address CSE (clustered array access, e.g. a stencil's a[k], a[k-1],
  * a[k+1]). Within a BB, memory accesses whose byte address is the same
@@ -194,6 +195,8 @@ int ir_opt_narrow_iv(Func *f);
  * narrow_byte, whose narrowed CONV operands are byte-identity copies that
  * would otherwise spill to a slot. Returns operands rewritten. */
 int ir_opt_copy_prop(Func *f);
+int ir_opt_sink_trunc(Func *f);
+int ir_opt_self_ops(Func *f);
 
 /* Coalesce a single-use width-1 copy `d <- t` by folding t into d (renaming
  * every def of t to d, dropping the now-identity copy), so a char-ternary

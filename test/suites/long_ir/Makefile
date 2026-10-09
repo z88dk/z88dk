@@ -16,6 +16,12 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 # fnptr-dispatch thunks (l_jpix/l_jpiy), linked explicitly until they live in
 # the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
 all:	countborrow.bin countborrow_gbz80.bin
+all:	strremat.bin strremat_fp.bin strremat_8080.bin strremat_gbz80.bin
+all:	fnptrdead.bin fnptrdead_fp.bin fnptrdead_8080.bin fnptrdead_gbz80.bin
+all:	argcf.bin argcf_fp.bin argcf_8080.bin argcf_gbz80.bin
+all:	jpnext.bin jpnext_fp.bin jpnext_8080.bin jpnext_gbz80.bin
+all:	ixind.bin
+all:	bchand.bin bchand_fp.bin bchand_8080.bin bchand_gbz80.bin
 all:	localrmw_gbz80.bin localrmw_gbz80_keep.bin
 all:	localrmw_z80.bin localrmw_z80n.bin localrmw_z180.bin localrmw_ez80_z80.bin localrmw_8080.bin localrmw_vm1.bin localrmw_r2ka.bin localrmw_r4k.bin localrmw_r6k.bin localrmw_kc160.bin localrmw_r800.bin localrmw_z80_keep.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
@@ -26,9 +32,19 @@ all:	poolremat.bin poolremat_fp.bin poolremat_gbz80.bin poolremat_8080.bin poolr
 all:	deaddereload.bin deaddereload_fp.bin deaddereload_gbz80.bin
 all:	xorflipconst.bin xorflipconst_fp.bin xorflipconst_gbz80.bin xorflipconst_8080.bin xorflipconst_vm1.bin
 all:	xorflipchain.bin xorflipchain_fp.bin xorflipchain_gbz80.bin xorflipchain_8080.bin
+all:	gbwordmem.bin gbwordmem_fp.bin gbwordmem_8080.bin gbwordmem_gbz80.bin gbwordmem_gbz80_keep.bin
+all:	ivsrsup.bin ivsrsup_fp.bin ivsrsup_gbz80.bin ivsrsup_gbz80_keep.bin ivsrsup_8080.bin ivsrsup_8085.bin ivsrsup_8085_keep.bin ivsrsup_vm1.bin ivsrsup_8080_rckeep.bin
+all:	hlmemcarry.bin hlmemcarry_fp.bin hlmemcarry_gbz80.bin hlmemcarry_gbz80_keep.bin hlmemcarry_8080.bin hlmemcarry_8085.bin
+all:	decallasm.bin decallasm_fp.bin decallasm_keep.bin decallasm_gbz80.bin decallasm_8080.bin decallasm_8085.bin decallasm_8085_keep.bin
+all:	switchchain.bin switchchain_fp.bin switchchain_keep.bin switchchain_gbz80.bin switchchain_8080.bin switchchain_8085.bin switchchain_r4k.bin gbstorea.bin gbstorea_gbz80.bin gbstorea_gbz80_keep.bin gbstorea_8080.bin
+all:	hlconst.bin hlconst_fp.bin hlconst_keep.bin hlconst_gbz80.bin hlconst_8080.bin hlconst_8085.bin hlconst_r4k.bin
+all:	hcallstash.bin hcallstash_8085.bin hcallstash_8080.bin mathstash_8085.bin
+all:	dsubbc.bin dsubbc_fp.bin dsubbc_8085.bin dsubbc_8085_keep.bin dsubbc_8080.bin
+all:	gbsmallframe.bin gbsmallframe_fp.bin gbsmallframe_gbz80.bin gbsmallframe_gbz80_keep.bin
+all:	lcallflags.bin lcallflags_fp.bin lcallflags_8080.bin lcallflags_8085.bin lcallflags_8085_keep.bin lcallflags_gbz80.bin
 JPTH = ../../../libsrc/l/sccz80/9-common/l_jpix.asm ../../../libsrc/l/sccz80/9-common/l_jpiy.asm
 
-all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin structval.bin structval_gbz80.bin structval_8080.bin structval_8085.bin fixed.bin sdcccall.bin sdcccall_kc160.bin wr.bin wr_fp.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin fnptr_fastcall_noidx.bin fnptr_fastcall_gbz80.bin fnptr_fastcall_8080.bin fnptr_fastcall_8085.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin cmp_sign.bin remat.bin idxcmp.bin idxcmp_fp.bin ixdcmp.bin ixdcmp_fp.bin dehome.bin dehome_fp.bin looppr.bin looppr_fp.bin redwb.bin redwb_fp.bin redwb_8080.bin addrcse.bin addrcse_fp.bin idxhome.bin idxhome_fp.bin longlong.bin bitfield.bin umaxd.bin ternwiden.bin ternwiden_fp.bin fp_to_int.bin fp_to_int_reg.bin linewrap.bin widen.bin hwmul.bin hwmul_z180.bin hwmul_ez80.bin hwmul_z80n.bin hwmul_kc160.bin narrowmul.bin narrowmul_fp.bin narrowmul_8080.bin derefcmp.bin derefcmp_fp.bin bytecmp.bin bytecmp_fp.bin bytecmp_8080.bin bytecmp_gbz80.bin bremat.bin bremat_fp.bin bremat_8080.bin bremat_gbz80.bin fclong.bin fclong_fp.bin fclong_8080.bin fclong_gbz80.bin memberarr.bin memberarr_fp.bin memberarr_8080.bin memberarr_gbz80.bin statscope.bin statscope_fp.bin statscope_8080.bin statscope_gbz80.bin byteparam.bin byteparam_fp.bin byteparam_8080.bin byteparam_gbz80.bin fcparam.bin fcparam_fp.bin fcparam_8080.bin fcparam_gbz80.bin storecall.bin storecall_fp.bin storecall_8080.bin storecall_gbz80.bin compoundwiden.bin compoundwiden_fp.bin compoundwiden_8080.bin compoundwiden_gbz80.bin ivsr_lftr.bin ivsr_lftr_fp.bin binop_bc.bin binop_bc_fp.bin binop_bc_8080.bin binop_bc_gbz80.bin callsplit.bin callsplit_fp.bin callsplit_8080.bin callsplit_8085.bin callsplit_gbz80.bin jrelax.bin jrelax_fp.bin jrelax_8080.bin jrelax_gbz80.bin slotaddr.bin slotaddr_fp.bin slotaddr_8080.bin slotaddr_8085.bin slotaddr_gbz80.bin slotaddr_vm1.bin shrmask.bin shrmask_fp.bin shrmask_8080.bin shrmask_8085.bin shrmask_gbz80.bin idxbase.bin idxbase_fp.bin idxbase_8080.bin idxbase_gbz80.bin idxderef.bin idxderef_fp.bin idxderef_8080.bin idxderef_gbz80.bin idxderef_ez80.bin idxderef_ez80_fp.bin idxderef_z180.bin idxderef_z180_fp.bin idxderef_kc160.bin idxderef_kc160_fp.bin idxderef_r800.bin idxderef_r800_fp.bin idxderef_r2ka.bin idxderef_r4k.bin tailmerge.bin tailmerge_fp.bin tailmerge_8080.bin tailmerge_gbz80.bin byteshr.bin byteshr_fp.bin byteshr_8080.bin byteshr_8085.bin byteshr_gbz80.bin blayout.bin blayout_fp.bin blayout_8080.bin blayout_gbz80.bin retthread.bin retthread_fp.bin retthread_8080.bin retthread_gbz80.bin dsword.bin dsword_fp.bin dsword_8080.bin dsword_gbz80.bin prepush.bin prepush_fp.bin prepush_8080.bin prepush_gbz80.bin constern.bin constern_fp.bin constern_8080.bin naked.bin naked_fp.bin naked_8080.bin voidhoist.bin voidhoist_fp.bin szstatic.bin szstatic_fp.bin deaddef.bin deaddef_fp.bin deaddef_8080.bin dsub.bin dsub_fp.bin dsub_8085.bin dsub_8080.bin longshl.bin longshl_fp.bin longshl_8085.bin longshl_8080.bin longshl_vm1.bin longshl_gbz80.bin lhlx.bin lhlx_fp.bin lhlx_8085.bin lhlx_8080.bin derefw.bin derefw_fp.bin derefw_8085.bin derefw_8080.bin depark.bin depark_fp.bin depark_8085.bin depark_8085_keep.bin depark_8080.bin ldsiaddr.bin ldsiaddr_fp.bin ldsiaddr_8085.bin ldsiaddr_8085_fp.bin ldsiaddr_8085_keep.bin ldsiaddr_8080.bin ldhiaddr.bin ldhiaddr_fp.bin ldhiaddr_8085.bin ldhiaddr_8085_fp.bin ldhiaddr_8085_keep.bin ldhiaddr_8080.bin znadda.bin znadda_fp.bin znadda_z80n.bin znadda_z80n_fp.bin znadda_z80n_keep.bin znadda_8080.bin incmem.bin incmem_fp.bin incmem_keep.bin incmem_fp_keep.bin incmem_8080.bin incmem_gbz80.bin incmem_8085.bin incmem_r4k.bin leafa.bin leafa_fp.bin leafa_ez80.bin leafa_ez80_fp.bin leafa_ez80_fp_keep.bin leafa_8080.bin cfescape.bin cfescape_fp.bin cfescape_8080.bin cfescape_gbz80.bin cfescape_8085.bin cfescape_r4k.bin cfescape_ez80.bin aliaswr.bin aliaswr_fp.bin aliaswr_8080.bin aliaswr_gbz80.bin aliaswr_8085.bin aliaswr_r4k.bin aliaswr_ez80.bin leaimm.bin leaimm_fp.bin leaimm_8085.bin leaimm_8080.bin csparam.bin csparam_fp.bin csparam_8080.bin csparam_gbz80.bin rotl32.bin rotl32_fp.bin rotl32_8080.bin rotl32_gbz80.bin mux.bin mux_fp.bin mux_8080.bin mux_gbz80.bin demorgan.bin demorgan_fp.bin demorgan_8080.bin pack16.bin pack16_fp.bin pack16_8080.bin pack16_gbz80.bin cmphi.bin cmphi_fp.bin cmphi_8080.bin cmphi_gbz80.bin sfr.bin sfr_fp.bin sfr_8080.bin boolbyte.bin boolbyte_fp.bin boolbyte_8080.bin boolbyte_gbz80.bin narrowld.bin narrowld_fp.bin narrowld_8080.bin narrowld_gbz80.bin dsshare.bin dsshare_fp.bin dsshare_8080.bin dsshare_gbz80.bin addridx.bin addridx_fp.bin addridx_8080.bin addridx_8085.bin unionmem.bin unionmem_fp.bin bfcse.bin bfcse_fp.bin castcse.bin castcse_fp.bin shrnarrow.bin shrnarrow_fp.bin shrnarrow_8080.bin shrnarrow_gbz80.bin copta.bin copta_fp.bin copta_8080.bin copta_gbz80.bin ivacc.bin ivacc_fp.bin ivacc_8080.bin ivacc_gbz80.bin cmpsign.bin cmpsign_fp.bin cmpsign_8080.bin cmpsign_gbz80.bin parremat.bin parremat_fp.bin parremat_8080.bin parremat_gbz80.bin widen2.bin widen2_fp.bin addridx_r6k.bin binop_bc_r6k.bin boolbyte_r6k.bin bremat_r6k.bin fclong_r6k.bin memberarr_r6k.bin statscope_r6k.bin bytecmp_r6k.bin byteparam_r6k.bin callsplit_r6k.bin cmphi_r6k.bin compoundwiden_r6k.bin csparam_r6k.bin deaddef_r6k.bin demorgan_r6k.bin dsshare_r6k.bin dsword_r6k.bin fcparam_r6k.bin fnptr_fastcall_r6k.bin jrelax_r6k.bin retthread_r6k.bin mux_r6k.bin narrowld_r6k.bin narrowmul_r6k.bin pack16_r6k.bin rotl32_r6k.bin storecall_r6k.bin structval_r6k.bin remat_r6k.bin sfr_r6k.bin addridx_r2ka.bin binop_bc_r2ka.bin boolbyte_r2ka.bin bremat_r2ka.bin fclong_r2ka.bin memberarr_r2ka.bin statscope_r2ka.bin bytecmp_r2ka.bin byteparam_r2ka.bin callsplit_r2ka.bin cmphi_r2ka.bin compoundwiden_r2ka.bin csparam_r2ka.bin deaddef_r2ka.bin demorgan_r2ka.bin dsshare_r2ka.bin dsword_r2ka.bin fcparam_r2ka.bin fnptr_fastcall_r2ka.bin jrelax_r2ka.bin retthread_r2ka.bin mux_r2ka.bin narrowld_r2ka.bin narrowmul_r2ka.bin pack16_r2ka.bin rotl32_r2ka.bin storecall_r2ka.bin structval_r2ka.bin remat_r2ka.bin sfr_r2ka.bin addridx_r4k.bin binop_bc_r4k.bin boolbyte_r4k.bin bremat_r4k.bin fclong_r4k.bin memberarr_r4k.bin statscope_r4k.bin bytecmp_r4k.bin byteparam_r4k.bin callsplit_r4k.bin cmphi_r4k.bin compoundwiden_r4k.bin csparam_r4k.bin deaddef_r4k.bin demorgan_r4k.bin dsshare_r4k.bin dsword_r4k.bin fcparam_r4k.bin fnptr_fastcall_r4k.bin jrelax_r4k.bin retthread_r4k.bin mux_r4k.bin narrowld_r4k.bin narrowmul_r4k.bin pack16_r4k.bin rotl32_r4k.bin storecall_r4k.bin structval_r4k.bin remat_r4k.bin sfr_r4k.bin rabmul.bin rabmul_fp.bin rabmul_r2ka.bin rabmul_r4k.bin rabmul_r6k.bin rabmul_8080.bin delive.bin delive_fp.bin delive_8085.bin delive_8085_fp.bin delive_8085_keep.bin delive_z80n.bin delive_8080.bin dewiden.bin dewiden_fp.bin dewiden_keep.bin dewiden_fp_keep.bin dewiden_8080.bin dewiden_gbz80.bin dewiden_r4k.bin regcopyflow.bin regcopyflow_fp.bin regcopyflow_gbz80.bin regcopyflow_gbz80_keep.bin shrdeadl.bin shrdeadl_fp.bin shrdeadl_keep.bin shrdeadl_fp_keep.bin shrdeadl_8080.bin shrtbac.bin shrtbac_fp.bin shrtbac_keep.bin shrtbac_gbz80.bin shrtbac_8080.bin leapro.bin leapro_fp.bin leapro_ez80_fp.bin leapro_ez80_fp_keep.bin leapro_8080.bin
+all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin structval.bin structval_gbz80.bin structval_8080.bin structval_8085.bin fixed.bin sdcccall.bin sdcccall_kc160.bin wr.bin wr_fp.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin fnptr_fastcall_noidx.bin fnptr_fastcall_gbz80.bin fnptr_fastcall_8080.bin fnptr_fastcall_8085.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin cmp_sign.bin remat.bin idxcmp.bin idxcmp_fp.bin ixdcmp.bin ixdcmp_fp.bin dehome.bin dehome_fp.bin looppr.bin looppr_fp.bin redwb.bin redwb_fp.bin redwb_8080.bin addrcse.bin addrcse_fp.bin idxhome.bin idxhome_fp.bin longlong.bin bitfield.bin umaxd.bin ternwiden.bin ternwiden_fp.bin fp_to_int.bin fp_to_int_reg.bin linewrap.bin widen.bin hwmul.bin hwmul_z180.bin hwmul_ez80.bin hwmul_z80n.bin hwmul_kc160.bin narrowmul.bin narrowmul_fp.bin narrowmul_8080.bin derefcmp.bin derefcmp_fp.bin bytecmp.bin bytecmp_fp.bin bytecmp_8080.bin bytecmp_gbz80.bin bremat.bin bremat_fp.bin bremat_8080.bin bremat_gbz80.bin fclong.bin fclong_fp.bin fclong_8080.bin fclong_gbz80.bin memberarr.bin memberarr_fp.bin memberarr_8080.bin memberarr_gbz80.bin statscope.bin statscope_fp.bin statscope_8080.bin statscope_gbz80.bin byteparam.bin byteparam_fp.bin byteparam_8080.bin byteparam_gbz80.bin fcparam.bin fcparam_fp.bin fcparam_8080.bin fcparam_gbz80.bin storecall.bin storecall_fp.bin storecall_8080.bin storecall_gbz80.bin compoundwiden.bin compoundwiden_fp.bin compoundwiden_8080.bin compoundwiden_gbz80.bin ivsr_lftr.bin ivsr_lftr_fp.bin binop_bc.bin binop_bc_fp.bin binop_bc_8080.bin binop_bc_gbz80.bin callsplit.bin callsplit_fp.bin callsplit_8080.bin callsplit_8085.bin callsplit_gbz80.bin jrelax.bin jrelax_fp.bin jrelax_8080.bin jrelax_gbz80.bin slotaddr.bin slotaddr_fp.bin slotaddr_8080.bin slotaddr_8085.bin slotaddr_gbz80.bin slotaddr_vm1.bin shrmask.bin shrmask_fp.bin shrmask_8080.bin shrmask_8085.bin shrmask_gbz80.bin idxbase.bin idxbase_fp.bin idxbase_8080.bin idxbase_gbz80.bin idxderef.bin idxderef_fp.bin idxderef_8080.bin idxderef_gbz80.bin idxderef_ez80.bin idxderef_ez80_fp.bin idxderef_z180.bin idxderef_z180_fp.bin idxderef_kc160.bin idxderef_kc160_fp.bin idxderef_r800.bin idxderef_r800_fp.bin idxderef_r2ka.bin idxderef_r4k.bin tailmerge.bin tailmerge_fp.bin tailmerge_8080.bin tailmerge_gbz80.bin byteshr.bin byteshr_fp.bin byteshr_8080.bin byteshr_8085.bin byteshr_gbz80.bin blayout.bin blayout_fp.bin blayout_8080.bin blayout_gbz80.bin retthread.bin retthread_fp.bin retthread_8080.bin retthread_gbz80.bin dsword.bin dsword_fp.bin dsword_8080.bin dsword_gbz80.bin prepush.bin prepush_fp.bin prepush_8080.bin prepush_gbz80.bin constern.bin constern_fp.bin constern_8080.bin naked.bin naked_fp.bin naked_8080.bin voidhoist.bin voidhoist_fp.bin szstatic.bin szstatic_fp.bin deaddef.bin deaddef_fp.bin deaddef_8080.bin dsub.bin dsub_fp.bin dsub_8085.bin dsub_8080.bin longshl.bin longshl_fp.bin longshl_8085.bin longshl_8080.bin longshl_vm1.bin longshl_gbz80.bin lhlx.bin lhlx_fp.bin lhlx_8085.bin lhlx_8080.bin derefw.bin derefw_fp.bin derefw_8085.bin derefw_8080.bin depark.bin depark_fp.bin depark_8085.bin depark_8085_keep.bin depark_8080.bin ldsiaddr.bin ldsiaddr_fp.bin ldsiaddr_8085.bin ldsiaddr_8085_fp.bin ldsiaddr_8085_keep.bin ldsiaddr_8080.bin ldhiaddr.bin ldhiaddr_fp.bin ldhiaddr_8085.bin ldhiaddr_8085_fp.bin ldhiaddr_8085_keep.bin ldhiaddr_8080.bin znadda.bin znadda_fp.bin znadda_z80n.bin znadda_z80n_fp.bin znadda_z80n_keep.bin znadda_8080.bin incmem.bin incmem_fp.bin incmem_keep.bin incmem_fp_keep.bin incmem_8080.bin incmem_gbz80.bin incmem_8085.bin incmem_r4k.bin leafa.bin leafa_fp.bin leafa_ez80.bin leafa_ez80_fp.bin leafa_ez80_fp_keep.bin leafa_8080.bin cfescape.bin cfescape_fp.bin cfescape_8080.bin cfescape_gbz80.bin cfescape_8085.bin cfescape_r4k.bin cfescape_ez80.bin aliaswr.bin aliaswr_fp.bin aliaswr_8080.bin aliaswr_gbz80.bin aliaswr_8085.bin aliaswr_r4k.bin aliaswr_ez80.bin csealias.bin csealias_fp.bin csealias_8080.bin csealias_gbz80.bin csealias_8085.bin csealias_r4k.bin csealias_ez80.bin longmultgate.bin ivpair.bin idxstep.bin cmpkload.bin addkreg.bin bcsavegrp.bin downloop.bin downloop_fp.bin downloop_8080.bin downloop_gbz80.bin downloop_r4k.bin downloop_ez80.bin downloop_z80n.bin downloop_z180.bin bcsavegrp_fp.bin bcsavegrp_8080.bin bcsavegrp_gbz80.bin bcsavegrp_r4k.bin bcsavegrp_ez80.bin bcsavegrp_z80n.bin bcsavegrp_z180.bin addkreg_fp.bin addkreg_8080.bin addkreg_gbz80.bin addkreg_r4k.bin addkreg_ez80.bin addkreg_z80n.bin addkreg_z180.bin cmpkload_fp.bin cmpkload_8080.bin cmpkload_gbz80.bin cmpkload_r4k.bin cmpkload_ez80.bin cmpkload_z80n.bin cmpkload_z180.bin idxstep_fp.bin idxstep_r4k.bin idxstep_ez80.bin idxstep_z80n.bin ivpair_fp.bin ivpair_r4k.bin ivpair_ez80.bin ivpair_z80n.bin longmultgate_fp.bin longmultgate_8080.bin longmultgate_gbz80.bin longmultgate_8085.bin longmultgate_r4k.bin longmultgate_ez80.bin ptrescape.bin ptrescape_fp.bin ptrescape_8080.bin ptrescape_gbz80.bin ptrescape_8085.bin ptrescape_r4k.bin ptrescape_ez80.bin ptrfuzz.bin ptrfuzz_fp.bin ptrfuzz_8080.bin ptrfuzz_gbz80.bin ptrfuzz_8085.bin ptrfuzz_r4k.bin ptrfuzz_ez80.bin fuzz_1037.bin fuzz_1037_fp.bin fuzz_1039.bin fuzz_1039_fp.bin fuzz_161.bin fuzz_161_fp.bin fuzz_214.bin fuzz_214_fp.bin fuzz_232.bin fuzz_232_fp.bin fuzz_2496.bin fuzz_2496_fp.bin fuzz_2734.bin fuzz_2734_fp.bin fuzzp_1232.bin fuzzp_1232_fp.bin fuzzp_1428.bin fuzzp_1428_fp.bin fuzzp_1478b.bin fuzzp_1478b_fp.bin fuzzp_325.bin fuzzp_325_fp.bin fuzzp_4735.bin fuzzp_4735_fp.bin fuzzp_6486.bin fuzzp_6486_fp.bin fuzzp_7421.bin fuzzp_7421_fp.bin fuzzp_k2_8085.bin fuzzp_k2_8085_fp.bin fuzzp_480_kc160.bin fuzzp_480_kc160_fp.bin fuzzp_929_r6k.bin fuzzp_929_r6k_fp.bin fuzzp_5075_r2ka.bin fuzzp_5075_r2ka_fp.bin fuzzp_5629_z80n.bin fuzzp_5629_z80n_fp.bin fuzzp_327_kc160.bin fuzzp_327_kc160_fp.bin fuzzp_351_r2ka.bin fuzzp_351_r2ka_fp.bin fuzzp_326_r2ka.bin fuzzp_326_r2ka_fp.bin fuzzp_7255.bin fuzzp_7255_fp.bin fuzzp_6302.bin fuzzp_6302_fp.bin leaimm.bin leaimm_fp.bin leaimm_8085.bin leaimm_8080.bin csparam.bin csparam_fp.bin csparam_8080.bin csparam_gbz80.bin rotl32.bin rotl32_fp.bin rotl32_8080.bin rotl32_gbz80.bin mux.bin mux_fp.bin mux_8080.bin mux_gbz80.bin demorgan.bin demorgan_fp.bin demorgan_8080.bin pack16.bin pack16_fp.bin pack16_8080.bin pack16_gbz80.bin homeexit.bin homeexit_fp.bin homeexit_8080.bin homeexit_gbz80.bin cmphi.bin cmphi_fp.bin cmphi_8080.bin cmphi_gbz80.bin sfr.bin sfr_fp.bin sfr_8080.bin boolbyte.bin boolbyte_fp.bin boolbyte_8080.bin boolbyte_gbz80.bin narrowld.bin narrowld_fp.bin narrowld_8080.bin narrowld_gbz80.bin dsshare.bin dsshare_fp.bin dsshare_8080.bin dsshare_gbz80.bin addridx.bin addridx_fp.bin addridx_8080.bin addridx_8085.bin unionmem.bin unionmem_fp.bin bfcse.bin bfcse_fp.bin castcse.bin castcse_fp.bin shrnarrow.bin shrnarrow_fp.bin shrnarrow_8080.bin shrnarrow_gbz80.bin copta.bin copta_fp.bin copta_8080.bin copta_gbz80.bin ivacc.bin ivacc_fp.bin ivacc_8080.bin ivacc_gbz80.bin cmpsign.bin cmpsign_fp.bin cmpsign_8080.bin cmpsign_gbz80.bin parremat.bin parremat_fp.bin parremat_8080.bin parremat_gbz80.bin widen2.bin widen2_fp.bin addridx_r6k.bin binop_bc_r6k.bin boolbyte_r6k.bin bremat_r6k.bin fclong_r6k.bin memberarr_r6k.bin statscope_r6k.bin bytecmp_r6k.bin byteparam_r6k.bin callsplit_r6k.bin cmphi_r6k.bin compoundwiden_r6k.bin csparam_r6k.bin deaddef_r6k.bin demorgan_r6k.bin dsshare_r6k.bin dsword_r6k.bin fcparam_r6k.bin fnptr_fastcall_r6k.bin jrelax_r6k.bin retthread_r6k.bin mux_r6k.bin narrowld_r6k.bin narrowmul_r6k.bin pack16_r6k.bin rotl32_r6k.bin storecall_r6k.bin structval_r6k.bin remat_r6k.bin sfr_r6k.bin addridx_r2ka.bin binop_bc_r2ka.bin boolbyte_r2ka.bin bremat_r2ka.bin fclong_r2ka.bin memberarr_r2ka.bin statscope_r2ka.bin bytecmp_r2ka.bin byteparam_r2ka.bin callsplit_r2ka.bin cmphi_r2ka.bin compoundwiden_r2ka.bin csparam_r2ka.bin deaddef_r2ka.bin demorgan_r2ka.bin dsshare_r2ka.bin dsword_r2ka.bin fcparam_r2ka.bin fnptr_fastcall_r2ka.bin jrelax_r2ka.bin retthread_r2ka.bin mux_r2ka.bin narrowld_r2ka.bin narrowmul_r2ka.bin pack16_r2ka.bin rotl32_r2ka.bin storecall_r2ka.bin structval_r2ka.bin remat_r2ka.bin sfr_r2ka.bin addridx_r4k.bin binop_bc_r4k.bin boolbyte_r4k.bin bremat_r4k.bin fclong_r4k.bin memberarr_r4k.bin statscope_r4k.bin bytecmp_r4k.bin byteparam_r4k.bin callsplit_r4k.bin cmphi_r4k.bin compoundwiden_r4k.bin csparam_r4k.bin deaddef_r4k.bin demorgan_r4k.bin dsshare_r4k.bin dsword_r4k.bin fcparam_r4k.bin fnptr_fastcall_r4k.bin jrelax_r4k.bin retthread_r4k.bin mux_r4k.bin narrowld_r4k.bin narrowmul_r4k.bin pack16_r4k.bin rotl32_r4k.bin storecall_r4k.bin structval_r4k.bin remat_r4k.bin sfr_r4k.bin rabmul.bin rabmul_fp.bin rabmul_r2ka.bin rabmul_r4k.bin rabmul_r6k.bin rabmul_8080.bin delive.bin delive_fp.bin delive_8085.bin delive_8085_fp.bin delive_8085_keep.bin delive_z80n.bin delive_8080.bin dewiden.bin dewiden_fp.bin dewiden_keep.bin dewiden_fp_keep.bin dewiden_8080.bin dewiden_gbz80.bin dewiden_r4k.bin regcopyflow.bin regcopyflow_fp.bin regcopyflow_gbz80.bin regcopyflow_gbz80_keep.bin shrdeadl.bin shrdeadl_fp.bin shrdeadl_keep.bin shrdeadl_fp_keep.bin shrdeadl_8080.bin shrtbac.bin shrtbac_fp.bin shrtbac_keep.bin shrtbac_gbz80.bin shrtbac_8080.bin leapro.bin leapro_fp.bin leapro_ez80_fp.bin leapro_ez80_fp_keep.bin leapro_8080.bin longmemrhs.bin longmemrhs_fp.bin longmemrhs_8080.bin longmemrhs_8085.bin longmemrhs_gbz80.bin longmemrhs_r4k.bin longmemrhs_ez80.bin longmemrhs_z80n.bin longmemrhs_z180.bin longmemrhs_kc160.bin longmemrhs_r2ka.bin longmempark.bin longmempark_fp.bin longmempark_8080.bin longmempark_8085.bin longmempark_gbz80.bin longmempark_r4k.bin longmempark_ez80.bin longmempark_z80n.bin longmempark_z180.bin longmempark_kc160.bin longmempark_r2ka.bin retmerge.bin retmerge_fp.bin retmerge_8080.bin retmerge_8085.bin retmerge_gbz80.bin retmerge_r4k.bin retmerge_ez80.bin
 
 test.bin: $(SOURCES) long_ir.c
 	$(compile)
@@ -550,6 +566,20 @@ ivsr_lftr_kc160_fp.bin: $(SOURCES) ivsr_lftr.c
 ivsr_lftr_r4k.bin: $(SOURCES) ivsr_lftr.c
 	$(compile_r4k)
 	$(runtest_r4k)
+
+# smax0: the signed-bound clamp. 8080 has no `bit`, so it takes the
+# `ld a,h; add a,a` form; _keep is the three-op opt-out.
+ivsr_lftr_8080.bin: $(SOURCES) ivsr_lftr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsr_lftr_gbz80.bin: $(SOURCES) ivsr_lftr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsr_lftr_keep.bin: $(SOURCES) ivsr_lftr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=smax0 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 # add hl,bc / sbc hl,bc with a BC-resident operand — z80 sp+fp plus 8080/gbz80
 # (which emulate sbc hl,de, so exercise the byte-wise C/B subtract path).
@@ -1159,6 +1189,262 @@ regcopyflow_gbz80_keep.bin: $(SOURCES) regcopyflow.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -Cc--opt-disable=regcopy-flow --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+lcallflags.bin: $(SOURCES) lcallflags.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+lcallflags_fp.bin: $(SOURCES) lcallflags.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+lcallflags_8080.bin: $(SOURCES) lcallflags.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+lcallflags_8085.bin: $(SOURCES) lcallflags.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+lcallflags_8085_keep.bin: $(SOURCES) lcallflags.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -Cc--opt-disable=l-call-flags --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+lcallflags_gbz80.bin: $(SOURCES) lcallflags.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbwordmem.bin: $(SOURCES) gbwordmem.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbwordmem_fp.bin: $(SOURCES) gbwordmem.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbwordmem_8080.bin: $(SOURCES) gbwordmem.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbwordmem_gbz80.bin: $(SOURCES) gbwordmem.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbwordmem_gbz80_keep.bin: $(SOURCES) gbwordmem.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -Cc--opt-disable=gb-word-mem --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbsmallframe.bin: $(SOURCES) gbsmallframe.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbsmallframe_fp.bin: $(SOURCES) gbsmallframe.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbsmallframe_gbz80.bin: $(SOURCES) gbsmallframe.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbsmallframe_gbz80_keep.bin: $(SOURCES) gbsmallframe.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -Cc--opt-disable=gb-small-frame --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_fp.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_gbz80.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_gbz80_keep.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -Cc--opt-disable=ivsr-suppress --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_8080.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_8085.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_8085_keep.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -Cc--opt-disable=ivsr-suppress --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_vm1.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=vm1 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mvm1 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_8080_rckeep.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -Cc--opt-disable=ivsr-recompute --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsubbc.bin: $(SOURCES) dsubbc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsubbc_fp.bin: $(SOURCES) dsubbc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsubbc_8085.bin: $(SOURCES) dsubbc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsubbc_8085_keep.bin: $(SOURCES) dsubbc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -Cc--opt-disable=dsub-bc --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsubbc_8080.bin: $(SOURCES) dsubbc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlmemcarry.bin: $(SOURCES) hlmemcarry.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlmemcarry_fp.bin: $(SOURCES) hlmemcarry.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlmemcarry_gbz80.bin: $(SOURCES) hlmemcarry.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlmemcarry_gbz80_keep.bin: $(SOURCES) hlmemcarry.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -Cc--opt-disable=hl-mem-carry,block-layout-rounds --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlmemcarry_8080.bin: $(SOURCES) hlmemcarry.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlmemcarry_8085.bin: $(SOURCES) hlmemcarry.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+decallasm.bin: $(SOURCES) decallasm.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+decallasm_fp.bin: $(SOURCES) decallasm.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+decallasm_keep.bin: $(SOURCES) decallasm.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=de-call-asm --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+decallasm_gbz80.bin: $(SOURCES) decallasm.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+decallasm_8080.bin: $(SOURCES) decallasm.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+decallasm_8085.bin: $(SOURCES) decallasm.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+decallasm_8085_keep.bin: $(SOURCES) decallasm.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -Cc--opt-disable=de-call-asm --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hcallstash.bin: $(SOURCES) hcallstash.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m 
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hcallstash_8085.bin: $(SOURCES) hcallstash.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -DMATH16 -D__MATH_MATH16 -fp-mode=ieee -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m --math16 -lmath32_8085
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hcallstash_8080.bin: $(SOURCES) hcallstash.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -DMATH16 -D__MATH_MATH16 -fp-mode=ieee -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m --math16 -lmath32_8080
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+mathstash_8085.bin: $(SOURCES) ../math/math.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-8085\\\"\"" -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m --math16 -lmath32_8085
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain_fp.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain_keep.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=switch-chain --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain_gbz80.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain_8080.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain_8085.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+switchchain_r4k.bin: $(SOURCES) switchchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbstorea.bin: $(SOURCES) gbstorea.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbstorea_gbz80.bin: $(SOURCES) gbstorea.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbstorea_gbz80_keep.bin: $(SOURCES) gbstorea.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -Cc--opt-disable=gb-store-a --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+gbstorea_8080.bin: $(SOURCES) gbstorea.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst_fp.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst_keep.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=hl-const-reuse --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst_gbz80.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst_8080.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst_8085.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlconst_r4k.bin: $(SOURCES) hlconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 incmem.bin: $(SOURCES) incmem.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
@@ -1346,6 +1632,630 @@ aliaswr_r4k.bin: $(SOURCES) aliaswr.c
 aliaswr_ez80.bin: $(SOURCES) aliaswr.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+csealias.bin: $(SOURCES) csealias.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+csealias_fp.bin: $(SOURCES) csealias.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+csealias_8080.bin: $(SOURCES) csealias.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+csealias_gbz80.bin: $(SOURCES) csealias.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+csealias_8085.bin: $(SOURCES) csealias.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+csealias_r4k.bin: $(SOURCES) csealias.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+csealias_ez80.bin: $(SOURCES) csealias.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmultgate.bin: $(SOURCES) longmultgate.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmultgate_fp.bin: $(SOURCES) longmultgate.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmultgate_8080.bin: $(SOURCES) longmultgate.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmultgate_gbz80.bin: $(SOURCES) longmultgate.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmultgate_8085.bin: $(SOURCES) longmultgate.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmultgate_r4k.bin: $(SOURCES) longmultgate.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmultgate_ez80.bin: $(SOURCES) longmultgate.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivpair.bin: $(SOURCES) ivpair.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivpair_fp.bin: $(SOURCES) ivpair.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivpair_r4k.bin: $(SOURCES) ivpair.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivpair_ez80.bin: $(SOURCES) ivpair.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivpair_z80n.bin: $(SOURCES) ivpair.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+idxstep.bin: $(SOURCES) idxstep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+idxstep_fp.bin: $(SOURCES) idxstep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+idxstep_r4k.bin: $(SOURCES) idxstep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+idxstep_ez80.bin: $(SOURCES) idxstep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+idxstep_z80n.bin: $(SOURCES) idxstep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpkload.bin: $(SOURCES) cmpkload.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpkload_fp.bin: $(SOURCES) cmpkload.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpkload_8080.bin: $(SOURCES) cmpkload.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpkload_gbz80.bin: $(SOURCES) cmpkload.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpkload_r4k.bin: $(SOURCES) cmpkload.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpkload_ez80.bin: $(SOURCES) cmpkload.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpkload_z80n.bin: $(SOURCES) cmpkload.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpkload_z180.bin: $(SOURCES) cmpkload.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+addkreg.bin: $(SOURCES) addkreg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+addkreg_fp.bin: $(SOURCES) addkreg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+addkreg_8080.bin: $(SOURCES) addkreg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+addkreg_gbz80.bin: $(SOURCES) addkreg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+addkreg_r4k.bin: $(SOURCES) addkreg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+addkreg_ez80.bin: $(SOURCES) addkreg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+addkreg_z80n.bin: $(SOURCES) addkreg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+addkreg_z180.bin: $(SOURCES) addkreg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmemrhs.bin: $(SOURCES) longmemrhs.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmemrhs_fp.bin: $(SOURCES) longmemrhs.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmemrhs_8080.bin: $(SOURCES) longmemrhs.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmemrhs_8085.bin: $(SOURCES) longmemrhs.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmemrhs_gbz80.bin: $(SOURCES) longmemrhs.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmemrhs_r4k.bin: $(SOURCES) longmemrhs.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmemrhs_ez80.bin: $(SOURCES) longmemrhs.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmemrhs_z80n.bin: $(SOURCES) longmemrhs.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmemrhs_z180.bin: $(SOURCES) longmemrhs.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmemrhs_kc160.bin: $(SOURCES) longmemrhs.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+longmemrhs_r2ka.bin: $(SOURCES) longmemrhs.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+longmempark.bin: $(SOURCES) longmempark.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmempark_fp.bin: $(SOURCES) longmempark.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmempark_8080.bin: $(SOURCES) longmempark.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmempark_8085.bin: $(SOURCES) longmempark.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmempark_gbz80.bin: $(SOURCES) longmempark.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmempark_r4k.bin: $(SOURCES) longmempark.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmempark_ez80.bin: $(SOURCES) longmempark.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmempark_z80n.bin: $(SOURCES) longmempark.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmempark_z180.bin: $(SOURCES) longmempark.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longmempark_kc160.bin: $(SOURCES) longmempark.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+longmempark_r2ka.bin: $(SOURCES) longmempark.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+retmerge.bin: $(SOURCES) retmerge.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+retmerge_fp.bin: $(SOURCES) retmerge.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+retmerge_8080.bin: $(SOURCES) retmerge.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+retmerge_8085.bin: $(SOURCES) retmerge.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+retmerge_gbz80.bin: $(SOURCES) retmerge.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+retmerge_r4k.bin: $(SOURCES) retmerge.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+retmerge_ez80.bin: $(SOURCES) retmerge.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bcsavegrp.bin: $(SOURCES) bcsavegrp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bcsavegrp_fp.bin: $(SOURCES) bcsavegrp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bcsavegrp_8080.bin: $(SOURCES) bcsavegrp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bcsavegrp_gbz80.bin: $(SOURCES) bcsavegrp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bcsavegrp_r4k.bin: $(SOURCES) bcsavegrp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bcsavegrp_ez80.bin: $(SOURCES) bcsavegrp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bcsavegrp_z80n.bin: $(SOURCES) bcsavegrp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bcsavegrp_z180.bin: $(SOURCES) bcsavegrp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+downloop.bin: $(SOURCES) downloop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+downloop_fp.bin: $(SOURCES) downloop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+downloop_8080.bin: $(SOURCES) downloop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+downloop_gbz80.bin: $(SOURCES) downloop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+downloop_r4k.bin: $(SOURCES) downloop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+downloop_ez80.bin: $(SOURCES) downloop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+downloop_z80n.bin: $(SOURCES) downloop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+downloop_z180.bin: $(SOURCES) downloop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrescape.bin: $(SOURCES) ptrescape.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrescape_fp.bin: $(SOURCES) ptrescape.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrescape_8080.bin: $(SOURCES) ptrescape.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrescape_gbz80.bin: $(SOURCES) ptrescape.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrescape_8085.bin: $(SOURCES) ptrescape.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrescape_r4k.bin: $(SOURCES) ptrescape.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrescape_ez80.bin: $(SOURCES) ptrescape.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrfuzz.bin: $(SOURCES) ptrfuzz.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrfuzz_fp.bin: $(SOURCES) ptrfuzz.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrfuzz_8080.bin: $(SOURCES) ptrfuzz.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrfuzz_gbz80.bin: $(SOURCES) ptrfuzz.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrfuzz_8085.bin: $(SOURCES) ptrfuzz.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrfuzz_r4k.bin: $(SOURCES) ptrfuzz.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ptrfuzz_ez80.bin: $(SOURCES) ptrfuzz.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+
+# Reduced programs from the differential fuzzer (see the comment in each file).
+fuzz_1037.bin: $(SOURCES) fuzz_1037.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_1037_fp.bin: $(SOURCES) fuzz_1037.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_1039.bin: $(SOURCES) fuzz_1039.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_1039_fp.bin: $(SOURCES) fuzz_1039.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_161.bin: $(SOURCES) fuzz_161.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_161_fp.bin: $(SOURCES) fuzz_161.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_214.bin: $(SOURCES) fuzz_214.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_214_fp.bin: $(SOURCES) fuzz_214.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_2496.bin: $(SOURCES) fuzz_2496.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_2496_fp.bin: $(SOURCES) fuzz_2496.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_2734.bin: $(SOURCES) fuzz_2734.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_2734_fp.bin: $(SOURCES) fuzz_2734.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_232.bin: $(SOURCES) fuzz_232.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzz_232_fp.bin: $(SOURCES) fuzz_232.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+fuzzp_1232.bin: fuzzp_1232.c fuzzp_1232.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_1232.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_1232.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_1232_fp.bin: fuzzp_1232.c fuzzp_1232.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_1232.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_1232.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_1428.bin: fuzzp_1428.c fuzzp_1428.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_1428.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_1428.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_1428_fp.bin: fuzzp_1428.c fuzzp_1428.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_1428.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_1428.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_1478b.bin: fuzzp_1478b.c fuzzp_1478b.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_1478b.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_1478b.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_1478b_fp.bin: fuzzp_1478b.c fuzzp_1478b.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_1478b.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_1478b.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_325.bin: fuzzp_325.c fuzzp_325.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_325.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_325.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_325_fp.bin: fuzzp_325.c fuzzp_325.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_325.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_325.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_4735.bin: fuzzp_4735.c fuzzp_4735.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_4735.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_4735.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_4735_fp.bin: fuzzp_4735.c fuzzp_4735.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_4735.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_4735.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_6486.bin: fuzzp_6486.c fuzzp_6486.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_6486.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_6486.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_6486_fp.bin: fuzzp_6486.c fuzzp_6486.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_6486.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_6486.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_7421.bin: fuzzp_7421.c fuzzp_7421.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_7421.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_7421.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_7421_fp.bin: fuzzp_7421.c fuzzp_7421.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_7421.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_7421.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_k2_8085.bin: fuzzp_k2.c fuzzp_k2.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_k2.c -o $@ -m
+	@$(MACHINE) -m8085 $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_k2.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_k2_8085_fp.bin: fuzzp_k2.c fuzzp_k2.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_k2.c -o $@ -m
+	@$(MACHINE) -m8085 $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_k2.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_480_kc160.bin: fuzzp_480.c fuzzp_480.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_480.c -o $@ -m
+	@$(MACHINE) -mkc160 $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_480.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_480_kc160_fp.bin: fuzzp_480.c fuzzp_480.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160 -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_480.c -o $@ -m
+	@$(MACHINE) -mkc160 $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_480.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_929_r6k.bin: fuzzp_929.c fuzzp_929.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit6k  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_929.c -o $@ -m
+	@$(MACHINE) -mr6k $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_929.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_929_r6k_fp.bin: fuzzp_929.c fuzzp_929.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit6k -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_929.c -o $@ -m
+	@$(MACHINE) -mr6k $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_929.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_5075_r2ka.bin: fuzzp_5075.c fuzzp_5075.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_5075.c -o $@ -m
+	@$(MACHINE) -mr2ka $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_5075.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_5075_r2ka_fp.bin: fuzzp_5075.c fuzzp_5075.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_5075.c -o $@ -m
+	@$(MACHINE) -mr2ka $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_5075.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_5629_z80n.bin: fuzzp_5629.c fuzzp_5629.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_5629.c -o $@ -m
+	@$(MACHINE) -mz80n $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_5629.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_5629_z80n_fp.bin: fuzzp_5629.c fuzzp_5629.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_5629.c -o $@ -m
+	@$(MACHINE) -mz80n $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_5629.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_327_kc160.bin: fuzzp_327.c fuzzp_327.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_327.c -o $@ -m
+	@$(MACHINE) -mkc160 $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_327.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_327_kc160_fp.bin: fuzzp_327.c fuzzp_327.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160 -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_327.c -o $@ -m
+	@$(MACHINE) -mkc160 $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_327.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_351_r2ka.bin: fuzzp_351.c fuzzp_351.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_351.c -o $@ -m
+	@$(MACHINE) -mr2ka $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_351.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_351_r2ka_fp.bin: fuzzp_351.c fuzzp_351.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_351.c -o $@ -m
+	@$(MACHINE) -mr2ka $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_351.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_326_r2ka.bin: fuzzp_326.c fuzzp_326.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_326.c -o $@ -m
+	@$(MACHINE) -mr2ka $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_326.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_326_r2ka_fp.bin: fuzzp_326.c fuzzp_326.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_326.c -o $@ -m
+	@$(MACHINE) -mr2ka $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_326.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_7255.bin: fuzzp_7255.c fuzzp_7255.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_7255.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_7255.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_7255_fp.bin: fuzzp_7255.c fuzzp_7255.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_7255.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_7255.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_6302.bin: fuzzp_6302.c fuzzp_6302.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_6302.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_6302.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
+
+fuzzp_6302_fp.bin: fuzzp_6302.c fuzzp_6302.want
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) fuzzp_6302.c -o $@ -m
+	@$(MACHINE) -b msx $@ | tr -d '\r' | grep -v '^Ticks' | grep -v '^$$' | head -2 | diff - fuzzp_6302.want || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
 
 leaimm.bin: $(SOURCES) leaimm.c
 	$(compile)
@@ -1572,6 +2482,22 @@ pack16_gbz80.bin: $(SOURCES) pack16.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+homeexit.bin: $(SOURCES) homeexit.c
+	$(compile)
+	$(runtest)
+
+homeexit_fp.bin: $(SOURCES) homeexit.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+homeexit_8080.bin: $(SOURCES) homeexit.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+homeexit_gbz80.bin: $(SOURCES) homeexit.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 # Unsigned width-2 bound compare against a constant with a ZERO LOW BYTE:
 # `i < K` is exactly `hi(i) < hi(K)`, so the lowerer compares high bytes only
 # (ld a,h; cp H) instead of ld hl / ld de / and a / sbc hl,de. Pins the branch
@@ -1716,6 +2642,109 @@ parremat_8080.bin: $(SOURCES) parremat.c
 parremat_gbz80.bin: $(SOURCES) parremat.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# A string-literal address (IR_LD_STR) is a rematerialisable constant: LICM no
+# longer hoists it into a loop-long frame slot and a call argument no longer
+# stores it to a slot only to reload it. See the file header.
+strremat.bin: $(SOURCES) strremat.c
+	$(compile)
+	$(runtest)
+
+strremat_fp.bin: $(SOURCES) strremat.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+strremat_8080.bin: $(SOURCES) strremat.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+strremat_gbz80.bin: $(SOURCES) strremat.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# A zero-argument near indirect call reads its target from HL, so the target's
+# frame copy is not stored; every other position keeps its slot. See the file
+# header.
+fnptrdead.bin: $(SOURCES) fnptrdead.c
+	$(compile)
+	$(runtest)
+
+fnptrdead_fp.bin: $(SOURCES) fnptrdead.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+fnptrdead_8080.bin: $(SOURCES) fnptrdead.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fnptrdead_gbz80.bin: $(SOURCES) fnptrdead.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# A call argument with control flow (?:, &&, ||) no longer forces the earlier
+# arguments through frame slots: pure argument lists are reordered so the pushes
+# stay in one block. Impure lists keep left-to-right. See the file header.
+argcf.bin: $(SOURCES) argcf.c
+	$(compile)
+	$(runtest)
+
+argcf_fp.bin: $(SOURCES) argcf.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+argcf_8080.bin: $(SOURCES) argcf.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+argcf_gbz80.bin: $(SOURCES) argcf.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# An unconditional jump to the label directly below it is deleted in the final
+# text (the shared return block is emitted last, so the block above it ends in
+# one). Non-adjacent jumps stay. See the file header.
+jpnext.bin: $(SOURCES) jpnext.c
+	$(compile)
+	$(runtest)
+
+jpnext_fp.bin: $(SOURCES) jpnext.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+jpnext_8080.bin: $(SOURCES) jpnext.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+jpnext_gbz80.bin: $(SOURCES) jpnext.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# A BC temp may be defined by the very op that is the last read of an existing
+# BC tenant (an index dying at its own shift), so the doubled value stays in BC
+# instead of a frame slot. See the file header.
+bchand.bin: $(SOURCES) bchand.c
+	$(compile)
+	$(runtest)
+
+bchand_fp.bin: $(SOURCES) bchand.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+bchand_8080.bin: $(SOURCES) bchand.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bchand_gbz80.bin: $(SOURCES) bchand.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# An sp-mode function with a plain near indirect call no longer saves IX (the
+# call never touches it); the fastcall dispatch still does. Z80 family only, and
+# always built without the frame pointer: the test overwrites IX. See the file
+# header.
+ixind.bin: $(SOURCES) ixind.c $(JPTH)
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
 
 # A signed compare may drop its 7-byte sign correction only when BOTH operands
 # are provably non-negative. Pins the two ways the proof goes wrong: a PARAMETER
@@ -2259,6 +3288,343 @@ all: idx2reuse.bin idx2reuse_fp.bin idx2reuse_keep.bin idx2reuse_fp_keep.bin idx
 # IVSR induction pointer in idx2 (IX/IY): ez80/kc160/rabbit only, where
 # ivsr_lftr's walking pointer now also homes in the index register.
 all: ivsr_lftr_ez80.bin ivsr_lftr_ez80_fp.bin ivsr_lftr_kc160.bin ivsr_lftr_kc160_fp.bin ivsr_lftr_r4k.bin
+all: ivsr_lftr_8080.bin ivsr_lftr_gbz80.bin ivsr_lftr_keep.bin
+all: derearb.bin derearb_fp.bin derearb_8080.bin derearb_gbz80.bin derearb_keep.bin
+
+# ez80 gates lifted once ticks priced ld rr,(ix+d) at 5: an sp index home
+# across calls (cmp_sign, bytecmp), IVSR redundant-pointer suppression
+# (ivsrsup), fp remat-lea (slotaddr). _keep restores all three exclusions.
+all: ivsrsup_ez80.bin ivsrsup_ez80_fp.bin ivsrsup_ez80_keep.bin slotaddr_ez80_fp.bin slotaddr_ez80_fp_keep.bin cmp_sign_ez80.bin bytecmp_ez80.bin
+
+ivsrsup_ez80.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_ez80_fp.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrsup_ez80_keep.bin: $(SOURCES) ivsrsup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -Cc--opt-disable=idx2-call-ez80,ivsr-suppress-ez80,remat-lea-ez80fp --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+slotaddr_ez80_fp.bin: $(SOURCES) slotaddr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+slotaddr_ez80_fp_keep.bin: $(SOURCES) slotaddr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -Cc--opt-disable=idx2-call-ez80,ivsr-suppress-ez80,remat-lea-ez80fp --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmp_sign_ez80.bin: $(SOURCES) cmp_sign.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytecmp_ez80.bin: $(SOURCES) bytecmp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# ez80 `ld hl,(hl)` word reads and the tos-rmw fold (push hl ... pop de
+# cancelled around a stack-top read-modify-write); _keep variants opt out.
+all: blayout_ez80.bin blayout_ez80_fp.bin blayout_ez80_ihl_keep.bin blayout_tosrmw_keep.bin blayout_tosrmw_8080_keep.bin
+
+blayout_ez80.bin: $(SOURCES) blayout.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+blayout_ez80_fp.bin: $(SOURCES) blayout.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+blayout_ez80_ihl_keep.bin: $(SOURCES) blayout.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -Cc--opt-disable=ez80-hl-ihl --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+blayout_tosrmw_keep.bin: $(SOURCES) blayout.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=tos-rmw --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+blayout_tosrmw_8080_keep.bin: $(SOURCES) blayout.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -Cc--opt-disable=tos-rmw --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# remat-lea-call: &local rematerialised as a call argument counts the words
+# [slot-bitop-de / mask-shl-a] post-render folds that replaced copt #285r / #285q.
+all: postfold.bin postfold_fp.bin postfold_z180_fp.bin postfold_z80n_fp.bin postfold_ez80_fp.bin postfold_r4k_fp.bin postfold_keep.bin
+
+postfold.bin: $(SOURCES) postfold.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+postfold_fp.bin: $(SOURCES) postfold.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+postfold_z180_fp.bin: $(SOURCES) postfold.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+postfold_z80n_fp.bin: $(SOURCES) postfold.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+postfold_ez80_fp.bin: $(SOURCES) postfold.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+postfold_r4k_fp.bin: $(SOURCES) postfold.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit4k -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr4k $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+postfold_keep.bin: $(SOURCES) postfold.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=slot-bitop-de -Cc--opt-disable=mask-shl-a -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# [#DE7 / reg-int-literal / hcall-commit / remat-imm32 / f32-prepush] register-tier floats.
+# f32wide_de7: with hcall-commit off the f32->int result takes the TOS store,
+# which copt #DE7 rewrites; c_twice reads DE after it.
+all: f32wide.bin f32wide_fp.bin f32wide_mbf.bin f32wide_mbf_fp.bin f32wide_8085.bin f32wide_gbz80.bin f32wide_r2ka.bin f32wide_keep.bin f32wide_de7.bin
+
+f32wide.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_fp.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_mbf.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_mbf_fp.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_8085.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_gbz80.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_r2ka.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -fframe-pointer --math32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_keep.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=reg-int-literal -Cc--opt-disable=remat-imm32 -Cc--opt-disable=f32-prepush -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_de7.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=hcall-commit -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# [acc-drop-wide / acc-int-literal / acc-pool-operand] wide results read from the accumulator.
+all: accwide.bin accwide_fp.bin accwide_keep.bin accwide_z180.bin accwide_r2ka.bin accwide_r2ka_fp.bin accwide_ez80.bin accwide_kc160.bin
+
+accwide.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_fp.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_keep.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=acc-drop-wide -Cc--opt-disable=acc-int-literal -Cc--opt-disable=acc-pool-operand -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_z180.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 --math-bbc -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_r2ka.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit --math-bbc -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_r2ka_fp.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -fframe-pointer --math-bbc -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_ez80.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --genmath -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accwide_kc160.bin: $(SOURCES) accwide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160 -fframe-pointer --math-bbc -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mkc160 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# [prepush-straddle] a value defined inside a pre-pushed group and read after its call.
+all: prestrad.bin prestrad_fp.bin prestrad_8080.bin prestrad_gbz80.bin prestrad_r2ka.bin prestrad_ez80.bin
+
+prestrad.bin: $(SOURCES) prestrad.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+prestrad_fp.bin: $(SOURCES) prestrad.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+prestrad_8080.bin: $(SOURCES) prestrad.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+prestrad_gbz80.bin: $(SOURCES) prestrad.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+prestrad_r2ka.bin: $(SOURCES) prestrad.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+prestrad_ez80.bin: $(SOURCES) prestrad.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# [ivsr-ez80-byte] ez80 keeps walking pointers against a byte-bounded counter.
+all: ivsrbyte.bin ivsrbyte_ez80.bin ivsrbyte_ez80_fp.bin ivsrbyte_ez80_keep.bin
+
+ivsrbyte.bin: $(SOURCES) ivsrbyte.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrbyte_ez80.bin: $(SOURCES) ivsrbyte.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrbyte_ez80_fp.bin: $(SOURCES) ivsrbyte.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrbyte_ez80_keep.bin: $(SOURCES) ivsrbyte.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -Cc--opt-disable=ivsr-ez80-byte --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# already pushed; _keep restores the no-call gate.
+all: remacall.bin remacall_fp.bin remacall_8080.bin remacall_gbz80.bin remacall_r2ka.bin remacall_ez80_fp.bin remacall_keep.bin
+
+remacall.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+remacall_fp.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+remacall_8080.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+remacall_gbz80.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+remacall_r2ka.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+remacall_ez80_fp.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+remacall_keep.bin: $(SOURCES) remacall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=remat-lea-call --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# ds-fp-store (dead word stores to (ix+d) dropped, never below the frame) and
+# dead-sp-addr (unused `ld hl,N; add hl,sp`); _keep opts out of both.
+all: dsfp.bin dsfp_fp.bin dsfp_8080.bin dsfp_gbz80.bin dsfp_ez80_fp.bin dsfp_z180_fp.bin dsfp_fp_keep.bin
+
+dsfp.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsfp_fp.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsfp_8080.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsfp_gbz80.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsfp_ez80_fp.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsfp_z180_fp.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsfp_fp_keep.bin: $(SOURCES) dsfp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=ds-fp-store,dead-sp-addr --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# yield-total (byteshr on ez80), deref-width (derefw), de-keep-hl (idxderef
+# on ez80 fp); _keep variants opt out.
+all: byteshr_ez80.bin byteshr_ez80_yt_keep.bin derefw_z180_fp.bin derefw_dw_keep.bin idxderef_ez80_fp_dkh_keep.bin
+
+byteshr_ez80.bin: $(SOURCES) byteshr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+byteshr_ez80_yt_keep.bin: $(SOURCES) byteshr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -Cc--opt-disable=yield-total --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+derefw_z180_fp.bin: $(SOURCES) derefw.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+derefw_dw_keep.bin: $(SOURCES) derefw.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=deref-width --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+idxderef_ez80_fp_dkh_keep.bin: $(SOURCES) idxderef.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -Cc--opt-disable=de-keep-hl --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# A word home placed after a rejected DE pick is demoted when the restored
+# tenant shares its pair (hist_pass hung on z80 fp).
+all: latepair.bin latepair_fp.bin latepair_8080.bin
+
+latepair.bin: $(SOURCES) latepair.c
+	$(compile)
+	$(runtest)
+
+latepair_fp.bin: $(SOURCES) latepair.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+latepair_8080.bin: $(SOURCES) latepair.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# de-rearb: a rejected word DE-home pick, lowered again without a DE-class home.
+derearb.bin: $(SOURCES) derearb.c
+	$(compile)
+	$(runtest)
+
+derearb_fp.bin: $(SOURCES) derearb.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+derearb_8080.bin: $(SOURCES) derearb.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+derearb_gbz80.bin: $(SOURCES) derearb.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+derearb_keep.bin: $(SOURCES) derearb.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=de-rearb --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 # 8085 BC word reload via LDSI+LHLX. 8080 is the no-LHLX control.
 all: lhlxbc.bin lhlxbc_fp.bin lhlxbc_8085.bin lhlxbc_8085_fp.bin lhlxbc_8085_keep.bin lhlxbc_8080.bin
@@ -2367,3 +3733,341 @@ idx2reuse_8080.bin: $(SOURCES) idx2reuse.c
 idx2reuse_gbz80.bin: $(SOURCES) idx2reuse.c
 	$(compile_gbz80)
 	$(runtest_gbz80)
+
+# [dead-slot-drop] untouched frame slots dropped by a verified re-render;
+# slotdrop_r2ka also takes the restore-the-slots fallback.
+all: slotdrop.bin slotdrop_fp.bin slotdrop_gbz80.bin slotdrop_8080.bin slotdrop_z180_fp.bin slotdrop_r2ka.bin slotdrop_keep.bin
+
+slotdrop.bin: $(SOURCES) slotdrop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+slotdrop_fp.bin: $(SOURCES) slotdrop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+slotdrop_gbz80.bin: $(SOURCES) slotdrop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+slotdrop_8080.bin: $(SOURCES) slotdrop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+slotdrop_z180_fp.bin: $(SOURCES) slotdrop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+slotdrop_r2ka.bin: $(SOURCES) slotdrop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+slotdrop_keep.bin: $(SOURCES) slotdrop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=dead-slot-drop -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# [small-frame-fast] 4-byte frames: ld hl,-4 form on z180, four dec sp on ez80/kc160.
+all: smallframe.bin smallframe_z180.bin smallframe_z180_fp.bin smallframe_ez80_z80.bin smallframe_ez80_z80_fp.bin smallframe_kc160.bin smallframe_kc160_fp.bin smallframe_kc160_keep.bin smallframe_8080.bin smallframe_8085.bin smallframe_r800.bin
+
+smallframe.bin: $(SOURCES) smallframe.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+smallframe_z180.bin: $(SOURCES) smallframe.c
+	$(compile_z180)
+	$(runtest_z180)
+
+smallframe_z180_fp.bin: $(SOURCES) smallframe.c
+	$(call compile_z180,-Cc-fframe-pointer)
+	$(runtest_z180)
+
+smallframe_ez80_z80.bin: $(SOURCES) smallframe.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+smallframe_ez80_z80_fp.bin: $(SOURCES) smallframe.c
+	$(call compile_ez80_z80,-Cc-fframe-pointer)
+	$(runtest_ez80_z80)
+
+smallframe_kc160.bin: $(SOURCES) smallframe.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+smallframe_kc160_fp.bin: $(SOURCES) smallframe.c
+	$(call compile_kc160,-Cc-fframe-pointer)
+	$(runtest_kc160)
+
+smallframe_kc160_keep.bin: $(SOURCES) smallframe.c
+	$(call compile_kc160,-Cc--opt-disable=small-frame-fast)
+	$(runtest_kc160)
+
+smallframe_8080.bin: $(SOURCES) smallframe.c
+	$(compile_8080)
+	$(runtest_8080)
+
+smallframe_8085.bin: $(SOURCES) smallframe.c
+	$(compile_8085)
+	$(runtest_8085)
+
+smallframe_r800.bin: $(SOURCES) smallframe.c
+	$(compile_r800)
+	$(runtest_r800)
+
+# [ss-evidence] lazy-spill stores dropped when no slot read was emitted.
+all: ssevid.bin ssevid_fp.bin ssevid_8080.bin ssevid_gbz80.bin ssevid_z180_fp.bin ssevid_r2ka.bin ssevid_keep.bin ssevid_ez80_fp.bin ssevid_kc160.bin ssevid_gbz80_keep.bin ssevid_byte_keep.bin
+
+ssevid.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_fp.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_8080.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_gbz80.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_z180_fp.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_r2ka.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_keep.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=ss-evidence -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_ez80_fp.bin: $(SOURCES) ssevid.c
+	$(call compile_ez80_z80,-Cc-fframe-pointer)
+	$(runtest_ez80_z80)
+
+ssevid_kc160.bin: $(SOURCES) ssevid.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+ssevid_gbz80_keep.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -Cc--opt-disable=ss-keep-hl -Cc--opt-disable=gb-hl-to-de -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ssevid_byte_keep.bin: $(SOURCES) ssevid.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=ss-byte -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# [trunc-store-bc] byte store of a truncated word counter, and the shapes that must not fuse.
+all: trstore.bin trstore_fp.bin trstore_8080.bin trstore_gbz80.bin trstore_r2ka.bin trstore_ez80.bin trstore_ez80_fp.bin trstore_z180.bin
+
+trstore.bin: $(SOURCES) trstore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+trstore_fp.bin: $(SOURCES) trstore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+trstore_8080.bin: $(SOURCES) trstore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+trstore_gbz80.bin: $(SOURCES) trstore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+trstore_r2ka.bin: $(SOURCES) trstore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+trstore_ez80.bin: $(SOURCES) trstore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+trstore_ez80_fp.bin: $(SOURCES) trstore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+trstore_z180.bin: $(SOURCES) trstore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+
+# [self-ops] block-local value equivalence folds, and the shapes that must not fold.
+all: selfops.bin selfops_fp.bin selfops_8080.bin selfops_gbz80.bin selfops_r2ka.bin selfops_ez80.bin selfops_z180.bin
+
+selfops.bin: $(SOURCES) selfops.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+selfops_fp.bin: $(SOURCES) selfops.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+selfops_8080.bin: $(SOURCES) selfops.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+selfops_gbz80.bin: $(SOURCES) selfops.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+selfops_r2ka.bin: $(SOURCES) selfops.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+selfops_ez80.bin: $(SOURCES) selfops.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+selfops_z180.bin: $(SOURCES) selfops.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+
+# [pair-bitop] word bit ops between register words, a DE-stepped counter, and dead/live loop exits.
+all: pairbitop.bin pairbitop_fp.bin pairbitop_8080.bin pairbitop_gbz80.bin pairbitop_r2ka.bin pairbitop_ez80.bin pairbitop_z180.bin pairbitop_8085.bin
+
+pairbitop.bin: $(SOURCES) pairbitop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+pairbitop_fp.bin: $(SOURCES) pairbitop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+pairbitop_8080.bin: $(SOURCES) pairbitop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+pairbitop_gbz80.bin: $(SOURCES) pairbitop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+pairbitop_r2ka.bin: $(SOURCES) pairbitop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+pairbitop_ez80.bin: $(SOURCES) pairbitop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+pairbitop_z180.bin: $(SOURCES) pairbitop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+pairbitop_8085.bin: $(SOURCES) pairbitop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+
+# [ivsr-share] derived induction addresses that share a pointer, and ones that must not.
+all: ivsrshare.bin ivsrshare_fp.bin ivsrshare_8080.bin ivsrshare_gbz80.bin ivsrshare_r2ka.bin ivsrshare_ez80.bin ivsrshare_z180.bin ivsrshare_8085.bin
+
+ivsrshare.bin: $(SOURCES) ivsrshare.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrshare_fp.bin: $(SOURCES) ivsrshare.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrshare_8080.bin: $(SOURCES) ivsrshare.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrshare_gbz80.bin: $(SOURCES) ivsrshare.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrshare_r2ka.bin: $(SOURCES) ivsrshare.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrshare_ez80.bin: $(SOURCES) ivsrshare.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrshare_z180.bin: $(SOURCES) ivsrshare.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivsrshare_8085.bin: $(SOURCES) ivsrshare.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+
+# [cmp-k-signed] signed word compare against a constant, byte-wise through A.
+all: cmpks.bin cmpks_fp.bin cmpks_8080.bin cmpks_gbz80.bin cmpks_r2ka.bin cmpks_ez80.bin cmpks_z180.bin cmpks_8085.bin cmpks_vm1.bin
+
+cmpks.bin: $(SOURCES) cmpks.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpks_fp.bin: $(SOURCES) cmpks.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpks_8080.bin: $(SOURCES) cmpks.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpks_gbz80.bin: $(SOURCES) cmpks.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpks_r2ka.bin: $(SOURCES) cmpks.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpks_ez80.bin: $(SOURCES) cmpks.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpks_z180.bin: $(SOURCES) cmpks.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpks_8085.bin: $(SOURCES) cmpks.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpks_vm1.bin: $(SOURCES) cmpks.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=vm1 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mvm1 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+
+# [iv-narrow-unsigned] byte-narrowed loop counters compared unsigned, around the 127/128 and 254/255 edges.
+all: ivnu.bin ivnu_fp.bin ivnu_8080.bin ivnu_gbz80.bin ivnu_r2ka.bin ivnu_ez80.bin ivnu_z180.bin
+
+ivnu.bin: $(SOURCES) ivnu.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivnu_fp.bin: $(SOURCES) ivnu.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivnu_8080.bin: $(SOURCES) ivnu.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivnu_gbz80.bin: $(SOURCES) ivnu.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivnu_r2ka.bin: $(SOURCES) ivnu.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivnu_ez80.bin: $(SOURCES) ivnu.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivnu_z180.bin: $(SOURCES) ivnu.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+

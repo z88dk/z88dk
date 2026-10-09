@@ -29,7 +29,7 @@ reload. That change stays refused.
 
 ## Decision
 
-In the rendered-text pass, before the xor-a rewrite, replace
+In the rendered-text pass, replace
 
 ```
 ld a,N
@@ -52,3 +52,16 @@ the earlier copy in A leaves the same A at `ret`.
 
 `byte-ret`, default on. `test/suites/long_ir/byteret.c` runs on z80 and
 8085, both frame modes, and with the gate off.
+
+## Stage order (8/10/2026)
+
+The fold first ran inside the peephole rung loop, before the xor-a rewrite.
+That is before tail merging, and the narrowing makes constant returns differ:
+three returns that ended in a shared `ld l,a; inc sp; pop iy; ret` each became
+`ld l,N; inc sp; pop iy; ret`, the merge no longer paid, and `rpn.c` (sp) grew
+by 2 B. The fold is now its own stage, `filter_byte_ret`, after tail merging
+and before block layout. A merged site keeps `ld a,N` ahead of its `jp` because
+the shared tail reads A; an unmerged site is narrowed as before. The `ld a,0`
+case is unchanged: the xor-a rung runs earlier and the fold refuses 0.
+Corpus result identical (the same 16 cells, -92 B), `rpn.c` back to 557 B.
+`long_ir/retmerge.c` checks every constant path.
