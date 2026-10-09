@@ -261,6 +261,11 @@ Size across the corpus before implementing.
   8080 family and gbz80: `a += b` 58 -> 32 B Z80, 61 -> 25 B 8080, 67 -> 22 B
   gbz80 (0111). The differential fuzzer found about 37 miscompiles; arrays
   now always count as aliased (0112).
+- **widthbench, byte clean-up (ADR 0114).** A byte op reading a widened byte
+  reads the byte it came from; `mix_char` 596 -> 435 T (sp). Still 510 T
+  against sdcc 351 in fp: the byte locals go to frame slots because BC is
+  busy, which is the parked byte-scratch item, now with a ticks case
+  behind it as well as bytes.
 - **Framework `test.c` cost — ADR 0105.** Six changes (string-literal remat,
   dead indirect-call target spill, control-flow call arguments first,
   jump-to-next, IX save only when used, BC hand-off). `test.c` 754 -> 596 B fp;
