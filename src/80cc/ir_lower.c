@@ -248,6 +248,8 @@ typedef struct {
     const Op **long_rmw_ld; /* per-vreg: the first load of a `g op= h` long read-modify-write on
                                a global; the op that has v as its right operand walks both */
     const Op **long_rmw_st; /* per-vreg: result vreg of such an op -> its store, which is skipped */
+    char *long_zx_keep;   /* per-vreg: that producer's user is an ADD/SUB, so its result keeps a slot
+                             and is built the ordinary way when the fold cannot happen */
     const Op **long_zx;   /* per-vreg: a width-4 zero-extend of a frame word/byte whose
                              only use is the next long AND/OR/XOR; the extend is
                              skipped and that op reads the source bytes from the frame */
@@ -9398,26 +9400,39 @@ static int ir_lower_func_body(FILE *out, Func *f)
             }
         }
     }
-    /* long-zx-fold: (unsigned long)w AND/OR/XOR other, w a word or byte in the
-       frame, other a long in the frame. The extend is not emitted: in
-       frame-pointer mode the bitop reads w's bytes from the frame and treats
-       the top bytes as zero, otherwise it builds the extend itself. The frame
-       mode is not final at this point, so it is tested where the op is
-       emitted. */
+    /* long-zx-fold: a single-use zero-extend of a frame word/byte, or constant
+       shift by 8/16/24 of a frame long, whose only user is the next long
+       AND/OR/XOR/ADD/SUB with a frame long as the other operand. The producer
+       emits nothing when its user can read the bytes in place (frame-pointer
+       mode); otherwise it is built as usual and handed over in the DEHL cache.
+       Either way its result needs no slot. The frame mode is not final here, so
+       it is tested where the ops are emitted. */
     g_hc.long_zx = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
                           sizeof(const Op *));
+    g_hc.long_zx_keep = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), 1);
     if (g_hc.long_zx && !opt_disabled("long-zx-fold")) {
         for (int b = 0; b < f->n_bbs; b++) {
             const BB *bb = &f->bbs[b];
             for (int j = 0; j + 1 < bb->n_ops; j++) {
                 const Op *o = &bb->ops[j], *u = &bb->ops[j + 1];
                 int d = o->dst, w = o->src[0];
-                if (o->kind != IR_CONV_ZX) continue;
+                int is_zx = (o->kind == IR_CONV_ZX);
+                int is_sh = ((o->kind == IR_SHR || o->kind == IR_SHL)
+                             && o->src[1] < 0
+                             && ((int)(o->imm & 0x1f) == 8 || (int)(o->imm & 0x1f) == 16
+                                 || (int)(o->imm & 0x1f) == 24));
+                if (!is_zx && !is_sh) continue;
                 if (d < 0 || d >= f->n_vregs || f->vregs[d].width != 4) continue;
-                if (w < 0 || w >= f->n_vregs
-                    || (f->vregs[w].width != 1 && f->vregs[w].width != 2)) continue;
+                if (w < 0 || w >= f->n_vregs) continue;
+                if (is_zx && f->vregs[w].width != 1 && f->vregs[w].width != 2) continue;
+                if (is_sh && f->vregs[w].width != 4) continue;
                 if (!vreg_kind_is_integer(f, d) || !vreg_kind_is_integer(f, w)) continue;
-                if (u->kind != IR_AND && u->kind != IR_OR && u->kind != IR_XOR) continue;
+                int arith_user = (u->kind == IR_ADD || u->kind == IR_SUB);
+                if (u->kind != IR_AND && u->kind != IR_OR && u->kind != IR_XOR
+                    && !arith_user) continue;
+                /* ADD/SUB chain the carry: no sign fill, no zero first byte */
+                if (arith_user && is_sh
+                    && (o->kind == IR_SHL || (o->imm & IR_SHR_ARITH))) continue;
                 if (u->src[0] < 0 || u->src[1] < 0) continue;
                 int other = (u->src[0] == d) ? u->src[1] : (u->src[1] == d) ? u->src[0] : -1;
                 if (other < 0 || other == d || other >= f->n_vregs
@@ -9464,7 +9479,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                         parked = 1;
                 if (parked) continue;
                 g_hc.long_zx[d] = o;
-                f->vregs[d].flags |= IR_VREG_NO_SLOT;
+                if (arith_user && g_hc.long_zx_keep) g_hc.long_zx_keep[d] = 1;
+                else f->vregs[d].flags |= IR_VREG_NO_SLOT;
             }
         }
     }
@@ -10332,6 +10348,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
     free(g_hc.byte_remat); g_hc.byte_remat = NULL;
     free(g_hc.long_mem); g_hc.long_mem = NULL;
     free(g_hc.long_zx); g_hc.long_zx = NULL;
+    free(g_hc.long_zx_keep); g_hc.long_zx_keep = NULL;
     free(g_hc.long_rmw_ld); g_hc.long_rmw_ld = NULL;
     free(g_hc.long_rmw_st); g_hc.long_rmw_st = NULL;
     free(bb_lowered);

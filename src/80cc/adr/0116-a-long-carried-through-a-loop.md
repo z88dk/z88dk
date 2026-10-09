@@ -2,7 +2,7 @@
 
 Status: **Accepted** (2026-10). Opt-outs: `long-asr-const`, `long-shr-bc`,
 `long-shl-tos`, `long-shl-tos-cache`, `tos-rmw`, `iv-narrow-latch`, `step-z`,
-`step-mem`, `long-zx-fold`.
+`step-mem`, `long-zx-fold`, `byte-store-reg`.
 
 ## Context
 
@@ -32,11 +32,18 @@ long, constant long shifts, byte packing) does not: on z80 it was 26.5M T for
   register operations lie between them.
 - `ir_opt_narrow_iv` also narrows a down-counter tested in the loop latch after
   its own decrement (seed 1 to 255), including the branch-if-nonzero form.
-- A long AND/OR/XOR whose operand is a single-use zero-extended frame word or
-  byte reads the word's bytes straight from the frame in frame-pointer mode: the
-  extend is not emitted, the bytes above the word are zero (a copy of the other
-  operand for OR/XOR, a constant for AND). Elsewhere the user builds the extend
-  itself. Test: `long_ir/zxfold.c`.
+- A long AND/OR/XOR/ADD/SUB whose operand is a single-use zero-extended frame
+  word or byte, or a constant shift by 8/16/24 of a frame long, reads that
+  operand's bytes straight from the frame in frame-pointer mode: the producer is
+  not emitted (a shift is a re-indexing, a sign-filled `>>` recomputes the sign
+  byte where it is needed, bytes above a zero-extend are zero: a copy of the
+  other operand for OR/XOR, a constant for AND, `adc a,0` for ADD). Elsewhere
+  the producer is built as usual, with no slot of its own unless its user is an
+  ADD/SUB. ADD/SUB do not fold sign-filled or left-shifted operands (the carry
+  chain). Tests: `long_ir/zxfold.c`, `foldshift.c`.
+- A byte taken from a long or a word in HL is stored to its frame slot as
+  `ld (ix+d),l` when nothing reads it next, instead of through A. Test:
+  `long_ir/bytestore.c`.
 - A byte inc/dec of a frame slot onto itself is `dec (ix+d)` or `dec (hl)`, and
   its Z flag feeds the following zero test.
 

@@ -265,9 +265,10 @@ Size across the corpus before implementing.
   now always count as aliased (0112).
 - **A long carried through a loop (ADR 0116).** `lshiftbench` is the benchmark for
   it (crcbench hides the gap). Left: an allocator home for 32-bit values (sdcc keeps
-  the CRC long in `c,b,e,d`; the gap is 1.8 x in ticks), the same fold for ADD/SUB and for a
-  sign-extended operand, a constant byte-multiple shift folded into a byte-wise
-  consumer (ksshift), and the first backlog line below.
+  the CRC long in `c,b,e,d`; the gap is 1.8 x in ticks), the fold of a
+  sign-extended operand and of ADD/SUB sign cases, the sp-mode form of the byte-wise
+  fold, copy propagation of byte extracts of a long parameter (`pack`), and the first
+  backlog line below.
 - **Rabbit `sub hl,de` and the `jr` size model (ADR 0115).** r2ka/r3k no longer
   emit the helper-call `sub hl,de`; register-only forms are sized exactly.
   Left: share a second `return` epilogue (the merger claims a tail once).

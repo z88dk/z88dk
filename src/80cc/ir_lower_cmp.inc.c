@@ -1331,6 +1331,10 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
        logical srl/l_lsr zero-fills. */
     int arith = (op->imm & IR_SHR_ARITH) != 0;
 
+    if (op->dst >= 0 && f->vregs[op->dst].width == 4 && long_zx_of(f, op->dst)
+        && fold_producer_skip(f, op))
+        return 0;
+
     /* Variable-count byte >> on CB-shift CPUs. The promoted source reaches
        width 1 only when narrow_shr_kind proved it is zero-extended (logical)
        or sign-extended (arithmetic) from a byte. Keep 808x on its established

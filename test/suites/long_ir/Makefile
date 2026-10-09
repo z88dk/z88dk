@@ -23,6 +23,8 @@ all:	bigframe.bin bigframe_fp.bin bigframe_8080.bin bigframe_r2ka.bin bigframe_e
 all:	longasr.bin longasr_8080.bin longasr_gbz80.bin longasr_r2ka.bin longasr_ez80.bin longasr_8085.bin longasr_kc160.bin longasr_z180.bin longasr_r4k.bin longasr_fp.bin
 all:	crcloop.bin crcloop_8080.bin crcloop_gbz80.bin crcloop_r2ka.bin crcloop_ez80.bin crcloop_8085.bin crcloop_kc160.bin crcloop_z180.bin crcloop_r4k.bin crcloop_fp.bin
 all:	zxfold.bin zxfold_8080.bin zxfold_gbz80.bin zxfold_r2ka.bin zxfold_ez80.bin zxfold_8085.bin zxfold_kc160.bin zxfold_z180.bin zxfold_r4k.bin zxfold_fp.bin
+all:	bytestore.bin bytestore_8080.bin bytestore_gbz80.bin bytestore_r2ka.bin bytestore_ez80.bin bytestore_8085.bin bytestore_kc160.bin bytestore_z180.bin bytestore_r4k.bin bytestore_fp.bin
+all:	foldshift.bin foldshift_8080.bin foldshift_gbz80.bin foldshift_r2ka.bin foldshift_ez80.bin foldshift_8085.bin foldshift_kc160.bin foldshift_z180.bin foldshift_r4k.bin foldshift_fp.bin
 all:	countborrow.bin countborrow_gbz80.bin
 all:	strremat.bin strremat_fp.bin strremat_8080.bin strremat_gbz80.bin
 all:	fnptrdead.bin fnptrdead_fp.bin fnptrdead_8080.bin fnptrdead_gbz80.bin
@@ -4379,6 +4381,86 @@ zxfold_r4k.bin: $(SOURCES) zxfold.c
 	$(runtest_r4k)
 
 zxfold_fp.bin: $(SOURCES) zxfold.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytestore.bin: $(SOURCES) bytestore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytestore_8080.bin: $(SOURCES) bytestore.c
+	$(compile_8080)
+	$(runtest_8080)
+
+bytestore_gbz80.bin: $(SOURCES) bytestore.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+bytestore_r2ka.bin: $(SOURCES) bytestore.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+bytestore_ez80.bin: $(SOURCES) bytestore.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+bytestore_8085.bin: $(SOURCES) bytestore.c
+	$(compile_8085)
+	$(runtest_8085)
+
+bytestore_kc160.bin: $(SOURCES) bytestore.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+bytestore_z180.bin: $(SOURCES) bytestore.c
+	$(compile_z180)
+	$(runtest_z180)
+
+bytestore_r4k.bin: $(SOURCES) bytestore.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+bytestore_fp.bin: $(SOURCES) bytestore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+foldshift.bin: $(SOURCES) foldshift.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+foldshift_8080.bin: $(SOURCES) foldshift.c
+	$(compile_8080)
+	$(runtest_8080)
+
+foldshift_gbz80.bin: $(SOURCES) foldshift.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+foldshift_r2ka.bin: $(SOURCES) foldshift.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+foldshift_ez80.bin: $(SOURCES) foldshift.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+foldshift_8085.bin: $(SOURCES) foldshift.c
+	$(compile_8085)
+	$(runtest_8085)
+
+foldshift_kc160.bin: $(SOURCES) foldshift.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+foldshift_z180.bin: $(SOURCES) foldshift.c
+	$(compile_z180)
+	$(runtest_z180)
+
+foldshift_r4k.bin: $(SOURCES) foldshift.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+foldshift_fp.bin: $(SOURCES) foldshift.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 

@@ -1977,11 +1977,12 @@ static int gen_smax0(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+static int fold_producer_skip(Func *f, const Op *prod);
 static int gen_conv_zx(FILE *out, Func *f, const Op *op)
 {
     int src_w = f->vregs[op->src[0]].width;
     int dst_w = f->vregs[op->dst].width;
-    if (dst_w == 4 && long_zx_of(f, op->dst)) return 0;   /* read in place by its user */
+    if (dst_w == 4 && long_zx_of(f, op->dst) && fold_producer_skip(f, op)) return 0;
     if (dst_w == 1) {
         /* Zero-extend whose result is only consumed at byte width
            (ir_opt_narrow_byte narrowed the dst): the low byte of the
@@ -2158,6 +2159,11 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
            and the result is its HIGH byte, not its low one. */
         if (src_w == 1) {
             load_byte_to_a(out, f, op->src[0]);
+        } else if (op->kind != IR_CONV_TRUNC_HI && hl_has(op->src[0])) {
+            /* the word is in HL: its low byte goes to the slot straight from L */
+            ss_note_cache_read(f, op->src[0]);
+            store_byte_from_reg(out, f, op->dst, "l");
+            return 0;
         } else {
             load_byte_half_to_a(out, f, op->src[0], op->kind == IR_CONV_TRUNC_HI);
         }
@@ -2193,8 +2199,7 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
     if (src_w == 4 && dst_w == 1) {
         /* Long → char: take low byte of low half. */
         load_to_dehl(out, f, op->src[0]);
-        emit(out, "ld\ta,l");
-        store_a_byte(out, f, op->dst);
+        store_byte_from_reg(out, f, op->dst, "l");
         invalidate_hl_cache();
         return 0;
     }
@@ -2608,6 +2613,9 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
     sap_pair = NULL;
     int skip_byte = L.la.cur_skip_shl_byte;
     L.la.cur_skip_shl_byte = 0;
+    if (op->dst >= 0 && f->vregs[op->dst].width == 4 && long_zx_of(f, op->dst)
+        && fold_producer_skip(f, op))
+        return 0;
     /* General DE-home indexed deref: when this const-shift's ONLY use is an
        ADD that try_de_home_indexed_add rematerializes from BC (`add hl,bc`),
        its result is dead — skip the whole op (compute + store). */
@@ -4793,88 +4801,191 @@ static int try_fp_bytewise_commutative(FILE *out, const Func *f, const Op *op,
     return 1;
 }
 
-/* Build the deferred zero-extend `zx` into DEHL after all, for a user that
-   could not fold it: the same code gen_conv_zx would have emitted, published as
-   a dead-safe cache value (the extend's destination has no slot). */
-static void materialize_long_zx(FILE *out, Func *f, const Op *zx)
+/* ---- folded long operands ------------------------------------------------
+   A single-use long that is only a re-indexing of a frame word/long — a
+   zero-extend, or a constant shift by 8/16/24 — is not built. Its one user, the
+   very next AND/OR/XOR/ADD/SUB, reads each byte of it where it lives:
+       zero-extend of w       byte i = w[i] below w's width, else 0
+       x >> 8k (logical)      byte i = x[i+k] while i+k < 4, else 0
+       x >> 8k (arithmetic)   the same, else the sign of x (x[3] bit 7)
+       x << 8k                byte i = x[i-k] from k up, else 0
+   so no register work is done for the shift and nothing is staged in DEHL.
+   The producer and the user both ask fold_plan, which depends only on state
+   neither of them changes, so they always agree. */
+typedef struct {
+    int kind[4];          /* 0 zero, 1 memory, 2 sign of memory byte */
+    int v[4];             /* source vreg */
+    int b[4];             /* byte index in that vreg's slot */
+} FoldBytes;
+
+static int fold_bytes(const Func *f, const Op *prod, FoldBytes *fb)
 {
-    int src_w = f->vregs[zx->src[0]].width;
-    if (src_w == 1) {
-        load_byte_to_a(out, f, zx->src[0]);
-        emit(out, "ld\tl,a");
-        emit(out, "ld\th,0");
-    } else {
-        load_to_hl(out, f, zx->src[0]);
+    memset(fb, 0, sizeof *fb);
+    if (prod->kind == IR_CONV_ZX) {
+        int w = prod->src[0], ww = f->vregs[w].width;
+        for (int i = 0; i < 4; i++)
+            if (i < ww) { fb->kind[i] = 1; fb->v[i] = w; fb->b[i] = i; }
+        return 1;
     }
-    emit(out, "ld\tde,0");
-    invalidate_de_cache();
-    cache_dehl_no_spill(out, zx->dst);
+    if (prod->src[1] >= 0) return 0;
+    int cnt = (int)(prod->imm & 0x1f), k = cnt / 8, s = prod->src[0];
+    int arith = (prod->kind == IR_SHR && (prod->imm & IR_SHR_ARITH));
+    if (cnt % 8 || k < 1 || k > 3) return 0;
+    for (int i = 0; i < 4; i++) {
+        if (prod->kind == IR_SHR) {
+            if (i + k < 4) { fb->kind[i] = 1; fb->v[i] = s; fb->b[i] = i + k; }
+            else if (arith) { fb->kind[i] = 2; fb->v[i] = s; fb->b[i] = 3; }
+        } else if (prod->kind == IR_SHL) {
+            if (i >= k) { fb->kind[i] = 1; fb->v[i] = s; fb->b[i] = i - k; }
+        } else return 0;
+    }
+    return 1;
 }
 
-/* FP-mode long AND/OR/XOR whose one operand is a zero-extended frame word or
-   byte (long_zx): each result byte is built straight from memory — the word's
-   bytes come from the frame, the bytes above it are zero (a copy of the other
-   operand for OR/XOR, a constant 0 for AND). The extend never runs and nothing
-   is staged in DEHL. Returns 1 if emitted; 0 leaves nothing emitted. */
-static int try_fp_zx_bitop(FILE *out, Func *f, const Op *op, const Op *zx,
-                           const char *mnem)
+typedef struct {
+    const Op *user;
+    FoldBytes fb;
+    int other, other_is_src0;
+    int cached, dead, use_hl;
+    int so, dd;
+} FoldPlan;
+
+static int def_dst_dead(const Func *f, const BB *bb, int j);
+
+static int fold_plan(Func *f, const Op *prod, int uidx, FoldPlan *pl)
 {
-    if (!fp_active(f)) return 0;
-    int zd = zx->dst, w = zx->src[0];
-    int other = (op->src[0] == zd) ? op->src[1] : op->src[0];
-    int ww = f->vregs[w].width;
-    int cached = dehl_has(other);
-    int dead = L.la.cur_dst_dead || vreg_is_pr_dehl(f, op->dst);
-    int sw = slot_ix_off(f, w);
-    if (!fp_offset_fits(sw) || !fp_offset_fits(sw + ww - 1)) return 0;
-    int so = 0, dd = 0;
-    if (!cached) {
-        so = slot_ix_off(f, other);
-        if (!fp_offset_fits(so) || !fp_offset_fits(so + 3)) return 0;
-    }
-    if (!dead) {
-        dd = slot_ix_off(f, op->dst);
-        if (!fp_offset_fits(dd) || !fp_offset_fits(dd + 3)) return 0;
-    }
-    int use_hl = (cached && L.rs.hl == other);
-    static const char *bc_byte[4] = { "c", "b", "e", "d" };
-    static const char *hl_byte[4] = { "l", "h", "e", "d" };
-    const char **rb = use_hl ? hl_byte : bc_byte;
-    pending_spill_resolve();
-    ss_note_reload(f, w);
-    if (cached) ss_note_cache_read(f, other); else ss_note_reload(f, other);
+    if (opt_disabled("long-zx-fold") || !cur_bb || uidx >= cur_bb->n_ops) return 0;
+    if (!fp_active(f) || L.cur_frameless) return 0;
+    const Op *u = &cur_bb->ops[uidx];
+    int pd = prod->dst;
+    if (u->kind != IR_AND && u->kind != IR_OR && u->kind != IR_XOR
+        && u->kind != IR_ADD && u->kind != IR_SUB) return 0;
+    if (u->src[0] < 0 || u->src[1] < 0 || (u->src[0] != pd && u->src[1] != pd))
+        return 0;
+    pl->user = u;
+    pl->other_is_src0 = (u->src[1] == pd);
+    pl->other = pl->other_is_src0 ? u->src[0] : u->src[1];
+    if (!fold_bytes(f, prod, &pl->fb)) return 0;
+    int arith_ops = (u->kind == IR_ADD || u->kind == IR_SUB);
     for (int i = 0; i < 4; i++) {
-        int lhs_mem = (i < ww);
-        if (lhs_mem) {
-            emit(out, "ld\ta,(%s%+d)", frame_reg(), sw + i);
-            if (cached) emit(out, "%s\ta,%s", mnem, rb[i]);
-            else        emit(out, "%s\ta,(%s%+d)", mnem, frame_reg(), so + i);
-            if (dead) emit(out, "ld\t%s,a", bc_byte[i]);
-            else      emit(out, "ld\t(%s%+d),a", frame_reg(), dd + i);
-        } else if (op->kind == IR_AND) {
-            if (dead) emit(out, "ld\t%s,0", bc_byte[i]);
-            else      emit(out, "ld\t(%s%+d),0", frame_reg(), dd + i);
-        } else {                               /* x ^ 0 == x | 0 == x */
-            if (dead) {
-                if (cached) {
-                    if (strcmp(rb[i], bc_byte[i]))
-                        emit(out, "ld\t%s,%s", bc_byte[i], rb[i]);
-                } else {
-                    emit(out, "ld\t%s,(%s%+d)", bc_byte[i], frame_reg(), so + i);
-                }
-            } else {
-                if (cached) {
-                    emit(out, "ld\t(%s%+d),%s", frame_reg(), dd + i, rb[i]);
-                } else {
-                    emit(out, "ld\ta,(%s%+d)", frame_reg(), so + i);
-                    emit(out, "ld\t(%s%+d),a", frame_reg(), dd + i);
-                }
-            }
+        if (arith_ops && pl->fb.kind[i] == 2) return 0;       /* sign: carry chain */
+        if (arith_ops && i == 0 && pl->fb.kind[0] == 0) return 0;  /* needs CF=0 */
+        if (pl->fb.kind[i]) {
+            int o = slot_ix_off(f, pl->fb.v[i]) + pl->fb.b[i];
+            if (!fp_offset_fits(o)) return 0;
         }
     }
-    invalidate_a_cache();
-    publish_bytewise_long_dst(op->dst, dead);
+    pl->cached = dehl_has(pl->other);
+    pl->use_hl = (pl->cached && L.rs.hl == pl->other);
+    pl->dead = def_dst_dead(f, cur_bb, uidx) || vreg_is_pr_dehl(f, u->dst);
+    pl->so = pl->dd = 0;
+    if (!pl->cached) {
+        pl->so = slot_ix_off(f, pl->other);
+        if (!fp_offset_fits(pl->so) || !fp_offset_fits(pl->so + 3)) return 0;
+    }
+    if (!pl->dead) {
+        if (f->vregs[u->dst].flags & IR_VREG_NO_SLOT) return 0;
+        pl->dd = slot_ix_off(f, u->dst);
+        if (!fp_offset_fits(pl->dd) || !fp_offset_fits(pl->dd + 3)) return 0;
+    }
+    /* a shift left reads bytes the result overwrites if dst is its own source */
+    if (prod->kind == IR_SHL && u->dst == prod->src[0]) return 0;
     return 1;
+}
+
+/* Producer side: should this zero-extend / shift emit nothing? Whatever the
+   answer, the result has no slot, so when it is built it is published as a
+   dead-safe cache value for the next op. */
+static int fold_producer_skip(Func *f, const Op *prod)
+{
+    FoldPlan pl;
+    if (!cur_bb) return 0;
+    if (fold_plan(f, prod, cur_op_idx + 1, &pl)) return 1;
+    /* the result has no slot unless its user is an ADD/SUB (whose operand
+       order is not ours to choose) */
+    if (!(g_hc.long_zx_keep && g_hc.long_zx_keep[prod->dst]))
+        L.la.cur_dehl_dst_dead_safe = 1;
+    return 0;
+}
+
+static void fold_emit(FILE *out, Func *f, const FoldPlan *pl)
+{
+    const Op *u = pl->user;
+    static const char *bc_byte[4] = { "c", "b", "e", "d" };
+    static const char *hl_byte[4] = { "l", "h", "e", "d" };
+    const char **rb = pl->use_hl ? hl_byte : bc_byte;
+    int bitop = (u->kind == IR_AND || u->kind == IR_OR || u->kind == IR_XOR);
+    const char *m0 = u->kind == IR_ADD ? "add" : u->kind == IR_SUB ? "sub"
+                   : u->kind == IR_AND ? "and" : u->kind == IR_OR ? "or" : "xor";
+    const char *mN = u->kind == IR_ADD ? "adc" : u->kind == IR_SUB ? "sbc" : m0;
+    pending_spill_resolve();
+    for (int i = 0; i < 4; i++)
+        if (pl->fb.kind[i]) ss_note_reload(f, pl->fb.v[i]);
+    if (pl->cached) ss_note_cache_read(f, pl->other); else ss_note_reload(f, pl->other);
+    for (int i = 0; i < 4; i++) {
+        char ob[40], fo[40];
+        if (pl->cached) snprintf(ob, sizeof ob, "%s", rb[i]);
+        else snprintf(ob, sizeof ob, "(%s%+d)", frame_reg(), pl->so + i);
+        int k = pl->fb.kind[i];
+        if (k) snprintf(fo, sizeof fo, "(%s%+d)", frame_reg(),
+                        slot_ix_off(f, pl->fb.v[i]) + pl->fb.b[i]);
+        if (bitop && k == 0) {
+            if (u->kind == IR_AND) {
+                if (pl->dead) emit(out, "ld\t%s,0", bc_byte[i]);
+                else          emit(out, "ld\t(%s%+d),0", frame_reg(), pl->dd + i);
+            } else if (!pl->dead && !pl->cached && pl->dd == pl->so) {
+                /* x |= 0 / x ^= 0 in place: the byte is already there */
+            } else if (pl->dead) {
+                if (!pl->cached) emit(out, "ld\t%s,%s", bc_byte[i], ob);
+                else if (strcmp(rb[i], bc_byte[i]))
+                    emit(out, "ld\t%s,%s", bc_byte[i], rb[i]);
+            } else if (pl->cached) {
+                emit(out, "ld\t(%s%+d),%s", frame_reg(), pl->dd + i, rb[i]);
+            } else {
+                emit(out, "ld\ta,%s", ob);
+                emit(out, "ld\t(%s%+d),a", frame_reg(), pl->dd + i);
+            }
+            continue;
+        }
+        const char *mn = (i == 0) ? m0 : mN;
+        if (bitop) {
+            emit(out, "ld\ta,%s", fo);
+            if (k == 2) { emit(out, "add\ta,a"); emit(out, "sbc\ta,a"); }
+            emit(out, "%s\ta,%s", mn, ob);
+        } else if (u->kind == IR_ADD) {
+            if (k) { emit(out, "ld\ta,%s", fo); emit(out, "%s\ta,%s", mn, ob); }
+            else   { emit(out, "ld\ta,%s", ob); emit(out, "%s\ta,0", mn); }
+        } else {                                   /* SUB: src0 - src1 */
+            if (!pl->other_is_src0) {              /* folded operand is src0 */
+                if (k) emit(out, "ld\ta,%s", fo); else emit(out, "ld\ta,0");
+                emit(out, "%s\ta,%s", mn, ob);
+            } else {                               /* other - folded */
+                emit(out, "ld\ta,%s", ob);
+                if (k) emit(out, "%s\ta,%s", mn, fo); else emit(out, "%s\ta,0", mn);
+            }
+        }
+        if (pl->dead) emit(out, "ld\t%s,a", bc_byte[i]);
+        else          emit(out, "ld\t(%s%+d),a", frame_reg(), pl->dd + i);
+    }
+    invalidate_a_cache();
+    publish_bytewise_long_dst(u->dst, pl->dead);
+}
+
+/* User side: fold the producer of either operand into this op. Returns 1 if
+   emitted, 0 when neither operand is a folded producer, -1 if the producer
+   skipped itself but the plan no longer holds (an internal error). */
+static int gen_long_fold(FILE *out, Func *f, const Op *op)
+{
+    for (int s = 0; s < 2; s++) {
+        int v = op->src[s];
+        const Op *prod = (v >= 0) ? long_zx_of(f, v) : NULL;
+        if (!prod) continue;
+        FoldPlan pl;
+        if (!fold_plan(f, prod, cur_op_idx, &pl)) return 0;   /* built normally */
+        fold_emit(out, f, &pl);
+        return 1;
+    }
+    return 0;
 }
 
 /* Byte-wise ALU fold for a width-2 int op, used inside a DE-home region to keep
@@ -5281,6 +5392,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         && vreg_kind_is_integer(f, op->dst)) {
         if (sap_pair == op) return sap_tail(out, f, op);
         if (gen_long_mem_rhs(out, f, op)) return 0;
+        if (gen_long_fold(out, f, op)) return 0;
         /* Long add. Operand b pushed (HIGH then LOW), then DEHL = a.
            Inline the helper body directly — calling l_long_add would
            clobber IX (helper uses `pop ix` to stash retaddr), which
@@ -5684,6 +5796,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         if (sap_pair == op) return sap_tail(out, f, op);
         if (gen_long_mem_rhs(out, f, op)) return 0;
+        if (gen_long_fold(out, f, op)) return 0;
         if (op->src[1] == -1) {
             uint32_t k = (uint32_t)op->imm;
             /* In-place const SUB on a stack slot (mirror of the ADD
@@ -6330,14 +6443,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
     }
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         if (gen_long_mem_rhs(out, f, op)) return 0;
-        {
-            const Op *zx = (op->src[0] >= 0 ? long_zx_of(f, op->src[0]) : NULL);
-            if (!zx && op->src[1] >= 0) zx = long_zx_of(f, op->src[1]);
-            if (zx) {
-                if (try_fp_zx_bitop(out, f, op, zx, mnem)) return 0;
-                materialize_long_zx(out, f, zx);    /* could not fold: build it now */
-            }
-        }
+        if (gen_long_fold(out, f, op)) return 0;
         /* Long AND-mask + immediately-following BR_ZERO/COND fastpath
            (`(crc & 1UL) ? ...` bit-test). When the mask hits exactly one
            of the 4 bytes, byte-AND that byte and branch on Z — vs the full
