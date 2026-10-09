@@ -1478,6 +1478,11 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
              arithmetic  no 808x equivalent, so use the bias identity
                          `sra(a,n) == ((a ^ 0x80) >>_logical n) - (0x80 >> n)`,
                          branchless and clobbering only A. */
+        if (arith && count >= 7) {              /* the sign mask: 0 or 0xff */
+            emit(out, "add\ta,a");
+            emit(out, "sbc\ta,a");
+            return finalize_byte_result(out, f, op, 0);
+        }
         if (IS_808x()) {
             if (arith) emit(out, "xor\t%d", 0x80);
             emit_byte_lsr_a(out, count, !arith && (op->imm & IR_SHR_MASKED));
