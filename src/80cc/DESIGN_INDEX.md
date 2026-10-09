@@ -263,6 +263,11 @@ Size across the corpus before implementing.
   8080 family and gbz80: `a += b` 58 -> 32 B Z80, 61 -> 25 B 8080, 67 -> 22 B
   gbz80 (0111). The differential fuzzer found about 37 miscompiles; arrays
   now always count as aliased (0112).
+- **Literal printf and dead instructions (ADR 0117).** The survey has an xcc column
+  (xcc `-Os` is 40 % larger than 80cc; 80cc is 8.1 % larger than sdcc on z80 fp).
+  `printf("lit\n")` is `puts` and adjacent literal calls merge. Left: the
+  largest per-function gaps (`invazion` main, `text3dmaze` generate, `kaleido`
+  rnd_bars), `printf("%s\n", s)`, signed word `/2^k` (13 B, 9 B with a branch).
 - **A long carried through a loop (ADR 0116).** `lshiftbench` is the benchmark for
   it (crcbench hides the gap). Left: an allocator home for 32-bit values (sdcc keeps
   the CRC long in `c,b,e,d`; the gap is 1.8 x in ticks), the fold of a

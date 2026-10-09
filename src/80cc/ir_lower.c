@@ -3117,7 +3117,8 @@ static int line_reads_pair(const char *line, const char *pairname,
     while (*p == ' ' || *p == '\t') p++;          /* and the gap after it */
     char tok[8]; int ti = 0;
     for (;; p++) {
-        char c = (*p == '\n' || *p == '\r') ? 0 : *p;
+        char c = (*p == '\n' || *p == '\r' || *p == ';') ? 0 : *p;
+        if (c == ' ' || c == '\t') c = ',';       /* a trailing comment follows */
         if (c == ',' || c == '(' || c == ')' || c == '+' || c == 0) {
             tok[ti] = 0;
             if (ti && (!strcmp(tok, pairname)
@@ -3873,13 +3874,14 @@ static void fold_hl_const_reuse(char **lines, char *drop, int n)
 }
 
 /* Carry is overwritten before anything can read it, on the straight line
-   after `start`. Conservative: a label, branch or call answers no. */
+   after `start`. Conservative: a branch or call answers no; a label is
+   passed through (only this path's reads matter). */
 static int carry_dead_after(char **lines, const char *drop, int n, int start)
 {
     for (int j = start; j < n && j < start + 16; j++) {
         if (drop[j] || !strncmp(lines[j], "\tC_LINE", 7)) continue;
         const char *l = lines[j];
-        if (l[0] != '\t') return 0;
+        if (l[0] != '\t') continue;                /* label: falls through */
         char m[16]; const char *o;
         if (!gw_split(l, m, sizeof m, &o)) return 0;
         if (!strcmp(m, "ld") || !strcmp(m, "ex") || !strcmp(m, "inc")
@@ -3917,6 +3919,79 @@ static void fold_dead_sp_addr(char **lines, char *drop, int n)
         if (!carry_dead_after(lines, drop, n, k + 1)) continue;
         drop[i] = 1;
         drop[k] = 1;
+    }
+}
+
+/* [dead-ex-de-hl] `ex de,hl` after which neither HL nor DE is read before it
+   is rewritten (a store that left its value in HL for a reader that never
+   came): drop it. */
+static void fold_dead_ex_de_hl(char **lines, char *drop, int n)
+{
+    if (IS_GBZ80() || opt_disabled("dead-ex-de-hl")) return;
+    for (int i = 0; i + 1 < n; i++) {
+        if (drop[i] || strcmp(lines[i], "\tex\tde,hl\n")) continue;
+        if (!gbwm_dead_after3(lines, n, drop, i + 1, 0, 1, 1)) continue;
+        drop[i] = 1;
+    }
+}
+
+/* [dead-ld-hl-a] `ld h,a; ld l,a` (either order) whose H and L are each
+   rewritten before being read: the sign-mask widen ahead of a `& K` leaves it
+   behind. Drop the pair; A is untouched either way. */
+static int hl_halves_rewritten(char **lines, const char *drop, int n, int start)
+{
+    int hd = 0, ld = 0, dd = 0, ed = 0;
+    for (int j = start, cnt = 0; j < n && cnt < 8; j++) {
+        if (drop[j] || !strncmp(lines[j], "\tC_LINE", 7)) continue;
+        cnt++;
+        char m[16]; const char *o;
+        if (lines[j][0] != '\t' || !gw_split(lines[j], m, sizeof m, &o)) return 0;
+        /* `ld e,..; ld d,..; ex de,hl` rewrites HL from DE; the swap leaves the
+           dropped value in DE, so DE must be dead after it */
+        if (!strcmp(m, "ld") && (!strncmp(o, "e,", 2) || !strncmp(o, "d,", 2))) {
+            if (strpbrk(o + 2, "hl")) return 0;
+            if (o[0] == 'e') ed = 1; else dd = 1;
+            continue;
+        }
+        if (!strcmp(lines[j], "\tld\thl,de\n")) return dd && ed;
+        if (!strcmp(lines[j], "\tex\tde,hl\n"))
+            return dd && ed && gbwm_dead_after3(lines, n, drop, j + 1, 0, 0, 1);
+        if (!strcmp(m, "ld") && (!strncmp(o, "h,", 2) || !strncmp(o, "l,", 2))) {
+            if (strpbrk(o + 2, "hl")) return 0;
+            if (o[0] == 'h') hd = 1; else ld = 1;
+            if (hd && ld) return 1;
+            continue;
+        }
+        if (!strcmp(m, "ld") && !strncmp(o, "a,", 2) && !strpbrk(o + 2, "hl"))
+            continue;
+        if ((!strcmp(m, "and") || !strcmp(m, "or") || !strcmp(m, "xor")
+             || !strcmp(m, "cp") || !strcmp(m, "sub"))
+            && !strpbrk(o, "hl"))
+            continue;
+        return 0;
+    }
+    return 0;
+}
+
+static void fold_dead_ld_hl_a(char **lines, char *drop, int n)
+{
+    if (opt_disabled("dead-ld-hl-a")) return;
+    for (int i = 0; i + 1 < n; i++) {
+        if (drop[i]) continue;
+        int hl = !strcmp(lines[i], "\tld\th,a\n");
+        if (!hl && strcmp(lines[i], "\tld\tl,a\n")) continue;
+        int k = i + 1;
+        while (k < n && (drop[k] || !strncmp(lines[k], "\tC_LINE", 7))) k++;
+        if (k >= n || strcmp(lines[k], hl ? "\tld\tl,a\n" : "\tld\th,a\n"))
+            continue;
+        /* a following `ld a,<reg just copied from a>` is a no-op: drop it too */
+        int k2 = k + 1;
+        while (k2 < n && (drop[k2] || !strncmp(lines[k2], "\tC_LINE", 7))) k2++;
+        int reload = k2 < n && !strcmp(lines[k2], hl ? "\tld\ta,l\n" : "\tld\ta,h\n");
+        if (!hl_halves_rewritten(lines, drop, n, (reload ? k2 : k) + 1)) continue;
+        drop[i] = 1;
+        drop[k] = 1;
+        if (reload) drop[k2] = 1;
     }
 }
 
@@ -4343,6 +4418,8 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            from the backward sweep below), so it runs as a pre-pass here. */
         fold_dead_de_reload(lines, drop, n);
         fold_dead_sp_addr(lines, drop, n);
+        fold_dead_ex_de_hl(lines, drop, n);
+        fold_dead_ld_hl_a(lines, drop, n);
         fold_slot_bitop_de(lines, drop, n);
         fold_mask_shl_a(lines, drop, n);
         fold_const_xorflip(lines, drop, n);

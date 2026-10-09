@@ -110,6 +110,11 @@ exists (ADR 0010).
 | `shr-dead-l` | the dead `ld l,a` before an A-through-CB shift chain is kept |
 | `shr-tbac` | a masked `(x >> n) & M` in a loop keeps the top-byte `add hl,hl` route instead of the A-chain |
 | `lea-frame-addr` | ez80 fp-mode frame addresses go through `add hl,sp` instead of `lea hl,ix+d` |
+| `fp-de-store` | fp-mode word store from DE goes through `ld hl,N; add hl,sp` instead of two `ld (ix+d),r` |
+| `dead-ex-de-hl` | an `ex de,hl` after which neither HL nor DE is read is kept |
+| `dead-ld-hl-a` | an `ld h,a; ld l,a` pair whose HL is rewritten before it is read is kept |
+| `st-pop-de` | a word store through a pointer in HL pops a stack-parked value through HL (and reloads the pointer) instead of `pop de` |
+| `printf-puts` | a literal-only `printf` statement stays a `printf` call: no `puts` rewrite and no merging of adjacent ones |
 | `lea-frame-prologue` | ez80 fp-mode frame allocation uses `ld hl,-N; add hl,sp` instead of an IX-relative `lea` |
 | `bc-evict` | a BC tenant is never displaced by a better candidate |
 | `bc-per-cand` | BC cost is scored per class, not per candidate |

@@ -23,7 +23,9 @@ all:	bigframe.bin bigframe_fp.bin bigframe_8080.bin bigframe_r2ka.bin bigframe_e
 all:	longasr.bin longasr_8080.bin longasr_gbz80.bin longasr_r2ka.bin longasr_ez80.bin longasr_8085.bin longasr_kc160.bin longasr_z180.bin longasr_r4k.bin longasr_fp.bin
 all:	crcloop.bin crcloop_8080.bin crcloop_gbz80.bin crcloop_r2ka.bin crcloop_ez80.bin crcloop_8085.bin crcloop_kc160.bin crcloop_z180.bin crcloop_r4k.bin crcloop_fp.bin
 all:	zxfold.bin zxfold_8080.bin zxfold_gbz80.bin zxfold_r2ka.bin zxfold_ez80.bin zxfold_8085.bin zxfold_kc160.bin zxfold_z180.bin zxfold_r4k.bin zxfold_fp.bin
+all:	printfputs.bin printfputs_asm.bin
 all:	bytestore.bin bytestore_8080.bin bytestore_gbz80.bin bytestore_r2ka.bin bytestore_ez80.bin bytestore_8085.bin bytestore_kc160.bin bytestore_z180.bin bytestore_r4k.bin bytestore_fp.bin
+all:	densify.bin densify_8080.bin densify_gbz80.bin densify_r2ka.bin densify_ez80.bin densify_8085.bin densify_kc160.bin densify_z180.bin densify_r4k.bin densify_fp.bin
 all:	foldshift.bin foldshift_8080.bin foldshift_gbz80.bin foldshift_r2ka.bin foldshift_ez80.bin foldshift_8085.bin foldshift_kc160.bin foldshift_z180.bin foldshift_r4k.bin foldshift_fp.bin
 all:	countborrow.bin countborrow_gbz80.bin
 all:	strremat.bin strremat_fp.bin strremat_8080.bin strremat_gbz80.bin
@@ -4424,6 +4426,46 @@ bytestore_fp.bin: $(SOURCES) bytestore.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+densify.bin: $(SOURCES) densify.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+densify_8080.bin: $(SOURCES) densify.c
+	$(compile_8080)
+	$(runtest_8080)
+
+densify_gbz80.bin: $(SOURCES) densify.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+densify_r2ka.bin: $(SOURCES) densify.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+densify_ez80.bin: $(SOURCES) densify.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+densify_8085.bin: $(SOURCES) densify.c
+	$(compile_8085)
+	$(runtest_8085)
+
+densify_kc160.bin: $(SOURCES) densify.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+densify_z180.bin: $(SOURCES) densify.c
+	$(compile_z180)
+	$(runtest_z180)
+
+densify_r4k.bin: $(SOURCES) densify.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+densify_fp.bin: $(SOURCES) densify.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 foldshift.bin: $(SOURCES) foldshift.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
@@ -4464,3 +4506,14 @@ foldshift_fp.bin: $(SOURCES) foldshift.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+
+# Literal-only printf: runtime output equals the host's, and the calls became puts.
+printfputs.bin: printfputs.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -I$(FRAMEWORK_DIR) $< -o $@
+	@z88dk-ticks -w 300 $@ | grep -v '^Ticks' | sed '$$d' | diff - printfputs.expect || { echo "$(RED)" `date +%H:%M:%S` " Test failure: printfputs output $(RESET)" ; exit 1; }
+
+printfputs_asm.bin: printfputs.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -I$(FRAMEWORK_DIR) -S $< -o printfputs.asm
+	@test `grep -c 'call[[:space:]]*puts' printfputs.asm` -ge 4 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: no puts calls $(RESET)" ; exit 1; }
+	@test `grep -c 'call[[:space:]]*printf' printfputs.asm` -le 14 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: printf calls not merged $(RESET)" ; exit 1; }
+	@rm -f printfputs.asm

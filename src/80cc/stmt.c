@@ -9,6 +9,8 @@
 
 #include "ccdefs.h"
 
+static void txt_note(struct nodepair *pair, int before);
+
 static void ns(void);
 static Node *compound(void);
 static Node *doiferror(void);
@@ -230,8 +232,10 @@ struct nodepair *statement(void)
             pair->node = dolabel();
 
             if ( pair->node == NULL ) {
+                int lit_before = litptr;
                 pair->node = doexpr()->node;
                 ns();
+                txt_note(pair, lit_before);
             }
             st = STEXP;
         }
@@ -239,6 +243,135 @@ struct nodepair *statement(void)
     lastst = st;
     pair->i = st;
     return (pair);
+}
+
+
+/* ---- literal-only printf / puts statements ----
+   `printf("a\n");` becomes `puts("a");`, and adjacent literal-only calls merge
+   into one. Only a call whose result is unused (an expression statement), whose
+   format has no `%`, and whose callee is the library function. The merged text
+   replaces the literals when they are the tail of the literal queue, so no
+   orphan string is left behind. */
+typedef struct {
+    Node *node;
+    int   start;     /* litq index of the literal's first byte */
+    int   fresh;     /* appended by this statement, so it is the queue tail */
+    int   before;    /* litptr before the statement */
+    int   after;     /* litptr after the statement */
+} TxtStmt;
+
+static TxtStmt txt_cur;
+
+#define TXT_MAX 400
+
+static int txt_callee_ok(SYMBOL *sym, const char *name)
+{
+    return sym && !strcmp(sym->name, name) && !sym->func_defined
+        && sym->storage != STATIK;
+}
+
+/* The lone call an expression statement wraps; NULL otherwise. */
+static Node *txt_call(Node *stmt)
+{
+    if (!stmt || stmt->ast_type != AST_COMPOUND_STMT || !stmt->stmts
+        || array_len(stmt->stmts) != 1)
+        return NULL;
+    return array_get_byindex(stmt->stmts, 0);
+}
+
+/* Text a literal-only printf/puts statement writes; 0 when `stmt` is not one. */
+static int txt_text(Node *stmt, char *buf, int *start)
+{
+    Node *n = txt_call(stmt);
+    if (!n || n->ast_type != AST_FUNC_CALL || !n->args || array_len(n->args) != 1)
+        return 0;
+    int isputs = txt_callee_ok(n->sym, "puts");
+    if (!isputs && !txt_callee_ok(n->sym, "printf")) return 0;
+    Node *a = array_get_byindex(n->args, 0);
+    if (!a || a->ast_type != AST_STR_LIT) return 0;
+    int off = (int)a->zval + 1;
+    if (off < 1 || off >= litptr) return 0;
+    const char *t = (const char *)litq + off;
+    size_t len = strnlen(t, (size_t)(litptr - off));
+    if (len >= TXT_MAX) return 0;
+    if (!isputs && memchr(t, '%', len)) return 0;
+    memcpy(buf, t, len);
+    if (isputs) buf[len++] = '\n';
+    buf[len] = 0;
+    *start = off;
+    return 1;
+}
+
+/* Make `stmt` write `full`: a puts call when it ends in a newline. */
+static int txt_build(const char *full, Node *stmt, TxtStmt *st)
+{
+    int len = (int)strlen(full);
+    int isputs = len > 0 && full[len - 1] == '\n';
+    SYMBOL *fn = findglb(isputs ? "puts" : "printf");
+    if (!fn || !fn->ctype || fn->ctype->kind != KIND_FUNC) return 0;
+    unsigned char tmp[TXT_MAX * 2 + 2];
+    memcpy(tmp, full, (size_t)len);
+    if (isputs) len--;
+    tmp[len] = 0;
+    int before = litptr;
+    int32_t val;
+    storeq(len + 1, tmp, &val);
+    array *args = array_init(NULL);
+    array_add(args, ast_str_lit((int)val));
+    Node *old = txt_call(stmt);
+    Node *n = ast_function_call(AST_FUNC_CALL, fn, fn->ctype, args);
+    n->filename = old->filename;
+    n->line = old->line;
+    array_set_byindex(stmt->stmts, 0, n);
+    st->node = stmt;
+    st->start = (int)val + 1;
+    st->fresh = litptr != before;
+    st->before = before;
+    st->after = litptr;
+    return 1;
+}
+
+/* After an expression statement: remember it when it is a literal-only call,
+   turning `printf("..\n")` into `puts("..")`. */
+static void txt_note(struct nodepair *pair, int before)
+{
+    char buf[TXT_MAX + 2];
+    int start;
+    txt_cur.node = NULL;
+    if (opt_disabled("printf-puts") || !txt_text(pair->node, buf, &start)) return;
+    int isputs = !strcmp(txt_call(pair->node)->sym->name, "puts");
+    int len = (int)strlen(buf);
+    TxtStmt st = { pair->node, start, 0, before, litptr };
+    st.fresh = start == before && litptr == before + len + 1 - isputs;
+    if (!isputs && len > 0 && buf[len - 1] == '\n' && st.fresh) {
+        litptr = before;                       /* retract the literal, rebuild */
+        TxtStmt ns;
+        if (!txt_build(buf, pair->node, &ns)) { litptr = st.after; return; }
+        st = ns;
+    }
+    txt_cur = st;
+}
+
+/* Fold `cur` into the statement `prev` that precedes it; 1 when merged. */
+static int txt_merge(TxtStmt *prev, TxtStmt *cur)
+{
+    char a[TXT_MAX + 2], b[TXT_MAX + 2];
+    int sa, sb;
+    if (!prev->fresh || cur->before != prev->after || litptr != cur->after
+        || !(cur->after == prev->after || cur->fresh))
+        return 0;
+    if (!txt_text(prev->node, a, &sa) || !txt_text(cur->node, b, &sb)) return 0;
+    if (strlen(a) + strlen(b) >= TXT_MAX) return 0;
+    char full[TXT_MAX * 2 + 2];
+    memcpy(full, a, strlen(a));
+    strcpy(full + strlen(a), b);
+    int keep = litptr;
+    litptr = prev->before;
+    TxtStmt ns;
+    if (!txt_build(full, prev->node, &ns)) { litptr = keep; return 0; }
+    ns.before = prev->before;
+    *prev = ns;
+    return 1;
 }
 
 /*
@@ -268,8 +401,19 @@ Node *compound(void)
     savloc = locptr;
     declared = 0; /* may declare local variables */
     ++ncmp; /* new level open */
+    TxtStmt txt_prev = { NULL, 0, 0, 0, 0 };
     while (cmatch('}') == 0) {
+        txt_cur.node = NULL;
         struct nodepair *pair = statement(); /* do one */
+        if (txt_cur.node && txt_cur.node == pair->node) {
+            if (txt_prev.node && array_len(array)
+                && array_get_byindex(array, (int)array_len(array) - 1) == txt_prev.node
+                && txt_merge(&txt_prev, &txt_cur))
+                continue;
+            txt_prev = txt_cur;
+        } else {
+            txt_prev.node = NULL;
+        }
         array_add(array, pair->node);
     }
     --ncmp; /* close current level */

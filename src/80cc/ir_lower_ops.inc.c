@@ -4675,7 +4675,10 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                    fall to the original path (load value to HL first) — else
                    load_to_de strands it. */
                 && (hlde_belief_droppable(op->src[0])
-                    || de_has(op->src[0]) || bc_has(op->src[0]))) {
+                    || de_has(op->src[0]) || bc_has(op->src[0])
+                    || (!opt_disabled("st-pop-de")
+                        && vreg_is_pr_stack(f, op->src[0])
+                        && stack_parked(op->src[0])))) {
                 load_to_de(out, f, op->src[0]);        /* DE = value; base kept in HL */
                 load_to_hl(out, f, op->mem.base);      /* elided if HL still = base */
             } else {
