@@ -1390,6 +1390,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
                 | (fa_^fr_) & 16;
             } else {
             a= t= a*257>>7;
+            if ( isgbz80() ) fr= 1; // sm83 clears Z
             ff= ff&215
                 | t &296;
             fb= fb      &128
@@ -1412,6 +1413,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
             } else {
             a= t= a>>1
                 | ((a&1)+1^1)<<7;
+            if ( isgbz80() ) fr= 1; // sm83 clears Z
             ff= ff&215
                 | t &296;
             fb= fb      &128
@@ -1434,6 +1436,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
             } else {
                 a= t= a<<1
                     | ff>>8 & 1;
+                if ( isgbz80() ) fr= 1; // sm83 clears Z
                 ff= ff&215
                     | t &296;
                 fb= fb      & 128
@@ -1455,6 +1458,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
                     | (fa_^fr_) & 16;
             } else {
                 a= t= (a*513 | ff&256)>>1;
+                if ( isgbz80() ) fr= 1; // sm83 clears Z
                 ff= ff&215
                     | t &296;
                 fb= fb      &128
