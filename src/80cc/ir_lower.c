@@ -256,6 +256,9 @@ typedef struct {
     const Op **long_mem;  /* per-vreg: a width-4 single-use global load whose next op
                              is the long ADD/SUB/AND/OR/XOR taking it as its right
                              operand; the load is skipped and read at that op */
+    const Op **word_mem;  /* per-vreg: a width-2 single-use global load whose next op
+                             is the word ADD/SUB taking it as an operand; the load is
+                             skipped and read by `ld de,(sym)` at that op */
 } HomeCtx;
 static HomeCtx g_hc = { .de_home = -1, .func_whome = -1 };
 
@@ -283,6 +286,13 @@ static const Op *long_mem_of(const Func *f, int v)
 {
     if (!g_hc.long_mem || v < 0 || v >= f->n_vregs) return NULL;
     return g_hc.long_mem[v];
+}
+
+/* The deferred global load for word vreg v, or NULL. */
+static const Op *word_mem_of(const Func *f, int v)
+{
+    if (!g_hc.word_mem || v < 0 || v >= f->n_vregs) return NULL;
+    return g_hc.word_mem[v];
 }
 
 /* Format the global operand of a byte-remat load into buf as `_sym[+off]`. */
@@ -3954,6 +3964,10 @@ static int hl_halves_rewritten(char **lines, const char *drop, int n, int start)
             continue;
         }
         if (!strcmp(lines[j], "\tld\thl,de\n")) return dd && ed;
+        if (!strcmp(lines[j], "\tpop\thl\n") || !strcmp(lines[j], "\tld\thl,bc\n"))
+            return 1;                               /* HL wholly rewritten */
+        if (!strncmp(lines[j], "\tld\thl,", 7) && !strpbrk(lines[j] + 7, "hl("))
+            return 1;
         if (!strcmp(lines[j], "\tex\tde,hl\n"))
             return dd && ed && gbwm_dead_after3(lines, n, drop, j + 1, 0, 0, 1);
         if (!strcmp(m, "ld") && (!strncmp(o, "h,", 2) || !strncmp(o, "l,", 2))) {
@@ -9506,6 +9520,68 @@ static int ir_lower_func_body(FILE *out, Func *f)
             }
         }
     }
+    /* word-mem-rhs: a width-2 integer global load read once, by the very next op,
+       as an operand of a word ADD or SUB is not loaded; that op reads the global
+       with `ld de,(sym)`, which leaves HL alone. Needs the absolute DE load, and a
+       function with nothing homed in DE. */
+    g_hc.word_mem = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                           sizeof(const Op *));
+    if (g_hc.word_mem && !opt_disabled("word-mem-rhs")
+        && !IS_808x() && !IS_GBZ80() && !f->de_home_general) {
+        int de_homed = 0;
+        for (int v = 0; v < f->n_vregs && !de_homed; v++) {
+            PhysReg ph = ir_home_assigned(f, v);
+            if (ph == IR_PR_DE || ph == IR_PR_E || ph == IR_PR_D) de_homed = 1;
+        }
+        for (int b = 0; b < f->n_bbs && !de_homed; b++) {
+            const BB *bb = &f->bbs[b];
+            for (int j = 0; j + 1 < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j], *u = &bb->ops[j + 1];
+                int d = o->dst;
+                if (o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_SYM) continue;
+                if (d < 0 || d >= f->n_vregs || f->vregs[d].width != 2) continue;
+                if (!vreg_kind_is_integer(f, d)) continue;
+                if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_NO_SLOT | IR_VREG_CALL_SPLIT
+                                         | IR_VREG_PARAM))
+                    continue;
+                if (o->mem.volatile_ || !o->mem.sym || ns_sym_bails(o->mem.sym)
+                    || mem_bank_fn(&o->mem) || o->mem.elem == KIND_CPTR)
+                    continue;
+                if (u->kind != IR_ADD && u->kind != IR_SUB) continue;
+                if (u->src[0] < 0 || u->src[1] < 0) continue;
+                int other = (u->src[1] == d) ? u->src[0]
+                          : (u->kind == IR_ADD && u->src[0] == d) ? u->src[1] : -1;
+                if (other < 0 || other == d
+                    || u->dst < 0 || f->vregs[u->dst].width != 2
+                    || !vreg_kind_is_integer(f, u->dst)
+                    || f->vregs[other].width != 2
+                    || (f->vregs[u->dst].flags & IR_VREG_VOLATILE))
+                    continue;
+                if (ir_home_assigned(f, d) != IR_PR_SPILL
+                    && ir_home_assigned(f, d) != IR_PR_STACK)
+                    continue;
+                if (vreg_idx_home(f, u->dst) != IR_PR_NONE
+                    || vreg_idx_home(f, other) != IR_PR_NONE
+                    || vreg_in_exx(f, u->dst) || vreg_in_exx(f, other))
+                    continue;
+                if (bb->live_out
+                    && ir_bitset_get((const BitSet *)bb->live_out, d)) continue;
+                int nuse = 0, ndef = 0;
+                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
+                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
+                        const Op *p = &f->bbs[bb2].ops[k];
+                        int df[8]; int nd = ir_op_defs(p, df, 8);
+                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
+                        int us[16]; int nu = ir_op_uses(p, us, 16);
+                        for (int t = 0; t < nu; t++) if (us[t] == d) nuse++;
+                    }
+                if (ndef != 1 || nuse != 1) continue;
+                g_hc.word_mem[d] = o;
+                f->vregs[d].flags |= IR_VREG_NO_SLOT;
+            }
+        }
+    }
     /* long-zx-fold: a single-use zero-extend of a frame word/byte, or constant
        shift by 8/16/24 of a frame long, whose only user is the next long
        AND/OR/XOR/ADD/SUB with a frame long as the other operand. The producer
@@ -10469,6 +10545,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
     free(g_hc.remat_def); g_hc.remat_def = NULL;
     free(g_hc.byte_remat); g_hc.byte_remat = NULL;
     free(g_hc.long_mem); g_hc.long_mem = NULL;
+    free(g_hc.word_mem); g_hc.word_mem = NULL;
     free(g_hc.long_zx); g_hc.long_zx = NULL;
     free(g_hc.long_zx_keep); g_hc.long_zx_keep = NULL;
     free(g_hc.long_rmw_ld); g_hc.long_rmw_ld = NULL;

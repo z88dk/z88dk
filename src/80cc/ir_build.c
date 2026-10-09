@@ -1523,6 +1523,14 @@ static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
     if (pop == 1)                               /* pure power of two */
         return sr_shift_left(b, v, lo_bit, w);
 
+    if (pop == 2 && lo_bit > 0 && !opt_disabled("mult-factor")) {
+        /* (v<<hi) + (v<<lo) == ((v<<(hi-lo)) + v) << lo: lo fewer shifts, and
+           v is added back as itself. */
+        int t = sr_shift_left(b, v, hi_bit - lo_bit, w);
+        int sum = new_temp_kind(b, kw);
+        ir_emit_binop(cur_bb(b), IR_ADD, sum, t, v);
+        return sr_shift_left(b, sum, lo_bit, w);
+    }
     if (pop == 2) {                             /* (v<<hi) + (v<<lo) */
         int hi = sr_shift_left(b, v, hi_bit, w);
         int lo = sr_shift_left(b, v, lo_bit, w);
@@ -1538,6 +1546,13 @@ static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
         int a = 0;
         for (int i = 0; i < 64; i++) if ((up >> i) & 1u) a = i;
         if (a > maxsh) return -1;
+        if (lo_bit > 0 && !opt_disabled("mult-factor")) {
+            /* (v<<a) - (v<<lo) == ((v<<(a-lo)) - v) << lo */
+            int t = sr_shift_left(b, v, a - lo_bit, w);
+            int diff = new_temp_kind(b, kw);
+            ir_emit_binop(cur_bb(b), IR_SUB, diff, t, v);
+            return sr_shift_left(b, diff, lo_bit, w);
+        }
         int hi = sr_shift_left(b, v, a, w);
         int lo = sr_shift_left(b, v, lo_bit, w);
         int dst = new_temp_kind(b, kw);

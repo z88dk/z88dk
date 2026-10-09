@@ -263,6 +263,10 @@ Size across the corpus before implementing.
   8080 family and gbz80: `a += b` 58 -> 32 B Z80, 61 -> 25 B 8080, 67 -> 22 B
   gbz80 (0111). The differential fuzzer found about 37 miscompiles; arrays
   now always count as aliased (0112).
+- **Word operands kept in registers (ADR 0119).** x*(2^a+1) copies x to DE, x*10 is
+  `((x<<2)+x)<<1`, `g1 += g2` reads g2 with `ld de,(g2)`; survey z80 fp 10.2 % ->
+  6.4 % over sdcc. Left: `xc++ == K` on a global, the parked-address pointer store,
+  `long + 16-bit constant`, then `rnd_bars`, `pi` main, `bincomp`.
 - **Index-home parameters and value-context `&&` (ADR 0118).** PR 3181's Z80
   miscompile was two parameters sharing IX; `cmpbench` Z80 2071 -> 1247 B once
   `&&`/`||` as values branch to a 0/1 join. Left: the `ld bc,1 / jp / ld bc,0`

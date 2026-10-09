@@ -25,6 +25,8 @@ all:	crcloop.bin crcloop_8080.bin crcloop_gbz80.bin crcloop_r2ka.bin crcloop_ez8
 all:	zxfold.bin zxfold_8080.bin zxfold_gbz80.bin zxfold_r2ka.bin zxfold_ez80.bin zxfold_8085.bin zxfold_kc160.bin zxfold_z180.bin zxfold_r4k.bin zxfold_fp.bin
 all:	printfputs.bin printfputs_asm.bin
 all:	bytestore.bin bytestore_8080.bin bytestore_gbz80.bin bytestore_r2ka.bin bytestore_ez80.bin bytestore_8085.bin bytestore_kc160.bin bytestore_z180.bin bytestore_r4k.bin bytestore_fp.bin
+all:	globaladd.bin globaladd_8080.bin globaladd_gbz80.bin globaladd_r2ka.bin globaladd_ez80.bin globaladd_8085.bin globaladd_kc160.bin globaladd_z180.bin globaladd_r4k.bin globaladd_fp.bin
+all:	mulconst.bin mulconst_8080.bin mulconst_gbz80.bin mulconst_r2ka.bin mulconst_ez80.bin mulconst_8085.bin mulconst_kc160.bin mulconst_z180.bin mulconst_r4k.bin mulconst_fp.bin
 all:	condvalue.bin condvalue_8080.bin condvalue_gbz80.bin condvalue_r2ka.bin condvalue_ez80.bin condvalue_8085.bin condvalue_kc160.bin condvalue_z180.bin condvalue_r4k.bin condvalue_fp.bin
 all:	idx2param.bin idx2param_8080.bin idx2param_gbz80.bin idx2param_r2ka.bin idx2param_ez80.bin idx2param_8085.bin idx2param_kc160.bin idx2param_z180.bin idx2param_r4k.bin idx2param_fp.bin
 all:	densify.bin densify_8080.bin densify_gbz80.bin densify_r2ka.bin densify_ez80.bin densify_8085.bin densify_kc160.bin densify_z180.bin densify_r4k.bin densify_fp.bin
@@ -4425,6 +4427,86 @@ bytestore_r4k.bin: $(SOURCES) bytestore.c
 	$(runtest_r4k)
 
 bytestore_fp.bin: $(SOURCES) bytestore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+globaladd.bin: $(SOURCES) globaladd.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+globaladd_8080.bin: $(SOURCES) globaladd.c
+	$(compile_8080)
+	$(runtest_8080)
+
+globaladd_gbz80.bin: $(SOURCES) globaladd.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+globaladd_r2ka.bin: $(SOURCES) globaladd.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+globaladd_ez80.bin: $(SOURCES) globaladd.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+globaladd_8085.bin: $(SOURCES) globaladd.c
+	$(compile_8085)
+	$(runtest_8085)
+
+globaladd_kc160.bin: $(SOURCES) globaladd.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+globaladd_z180.bin: $(SOURCES) globaladd.c
+	$(compile_z180)
+	$(runtest_z180)
+
+globaladd_r4k.bin: $(SOURCES) globaladd.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+globaladd_fp.bin: $(SOURCES) globaladd.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+mulconst.bin: $(SOURCES) mulconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+mulconst_8080.bin: $(SOURCES) mulconst.c
+	$(compile_8080)
+	$(runtest_8080)
+
+mulconst_gbz80.bin: $(SOURCES) mulconst.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+mulconst_r2ka.bin: $(SOURCES) mulconst.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+mulconst_ez80.bin: $(SOURCES) mulconst.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+mulconst_8085.bin: $(SOURCES) mulconst.c
+	$(compile_8085)
+	$(runtest_8085)
+
+mulconst_kc160.bin: $(SOURCES) mulconst.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+mulconst_z180.bin: $(SOURCES) mulconst.c
+	$(compile_z180)
+	$(runtest_z180)
+
+mulconst_r4k.bin: $(SOURCES) mulconst.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+mulconst_fp.bin: $(SOURCES) mulconst.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 

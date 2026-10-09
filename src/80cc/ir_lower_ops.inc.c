@@ -2608,6 +2608,51 @@ static int sap_tail(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* [shl-copy-de] `t = x << n; r = t + x` and `r = t - x` on words (the 2^a+1
+   and 2^a-1 constant multiplies). x is still needed by the add, so without this
+   the shift spills it to its slot and the add reloads it; a copy in DE costs two
+   bytes. Only where nothing lives in DE and the add is the very next op. */
+static int shl_word_copy_de_ok(const Func *f, const Op *op)
+{
+    if (opt_disabled("shl-copy-de")) return 0;
+    /* Only where a slot word costs a synthesised pair of byte accesses; the
+       8085, ez80, Rabbit and kc160 have a native word slot access. */
+    if (IS_8085() || IS_EZ80() || IS_RABBIT() || IS_KC160()) return 0;
+    if (!cur_bb || cur_op_idx < 0 || cur_op_idx + 1 >= cur_bb->n_ops) return 0;
+    if (&cur_bb->ops[cur_op_idx] != op) return 0;
+    const Op *nx = &cur_bb->ops[cur_op_idx + 1];
+    if (nx->kind != IR_ADD && nx->kind != IR_SUB) return 0;
+    int x = op->src[0], t = op->dst;
+    if (x < 0 || t < 0 || x == t || nx->dst < 0 || nx->src[0] < 0 || nx->src[1] < 0)
+        return 0;
+    if (f->vregs[x].width != 2 || f->vregs[t].width != 2
+        || f->vregs[nx->dst].width != 2)
+        return 0;
+    int ok = (nx->src[0] == t && nx->src[1] == x)
+          || (nx->kind == IR_ADD && nx->src[0] == x && nx->src[1] == t);
+    if (!ok) return 0;
+    if (find_unique_use(f, t) != nx) return 0;
+    if (cur_bb->live_out && ir_bitset_get((const BitSet *)cur_bb->live_out, t))
+        return 0;
+    if (vreg_is_pr_stack(f, t) || vreg_is_pr_de(f, t) || vreg_is_pr_de(f, x)
+        || (f->vregs[t].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)))
+        return 0;
+    if (L.rs.dehl >= 0 || L.cur_de_byte_home_vreg >= 0 || bc_has(x))
+        return 0;
+    if (ir_home_at(f, x) != IR_PR_SPILL && ir_home_at(f, x) != IR_PR_STACK)
+        return 0;                                   /* x reads from its own home */
+    /* A vreg homed in DE must not be live over the shift and the add. */
+    int g = bc_op_global_index(f, cur_bb, cur_op_idx);
+    if (g < 0) return 0;
+    for (int i = 0; i < f->n_vregs; i++) {
+        if (ir_home_assigned(f, i) != IR_PR_DE) continue;
+        const LiveRange *lr = ir_live_range(f, i);
+        if (!lr || lr->start < 0 || (lr->start <= g + 1 && lr->end >= g))
+            return 0;
+    }
+    return 1;
+}
+
 static int gen_shl(FILE *out, Func *f, const Op *op)
 {
     sap_pair = NULL;
@@ -2957,6 +3002,11 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             }
         }
         load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
+        if (count > 0 && shl_word_copy_de_ok(f, op)) {
+            invalidate_de_cache();
+            emit_hl_to_de(out);
+            cache_de(op->src[0]);
+        }
         /* Shifts of 8+: high byte shifts out entirely → low byte in H, 0
            in L, then extra shifts above 8 are `add hl,hl`. Saves 8 inst vs
            the straight unroll at count==8 (the `byte << 8` promote). */
@@ -3467,7 +3517,8 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
         commit_hl_word(out, f, op->dst);
         return 0;
     }
-    if (long_mem_of(f, op->dst) || long_rmw_ld_of(f, op->dst)) return 0;   /* read in place by its user */
+    if (long_mem_of(f, op->dst) || long_rmw_ld_of(f, op->dst)
+        || word_mem_of(f, op->dst)) return 0;   /* read in place by its user */
     emit_ns_switch(out, mem_bank_fn(&op->mem));   /* __addressmod: page in */
     if (op->dst >= 0 && f->vregs[op->dst].width > 4) {
         /* Wide load: address into HL, acc_load→accumulator, store→dst slot. */
@@ -5443,8 +5494,37 @@ static int gen_long_mem_rhs(FILE *out, Func *f, const Op *op)
     return 1;
 }
 
+/* [word-mem-rhs] Word ADD or SUB with an operand that is the global the
+   preceding (skipped) load named: HL takes the other operand and the global is
+   read with `ld de,(sym)`, which leaves HL alone. */
+static int gen_word_mem_rhs(FILE *out, Func *f, const Op *op)
+{
+    if (op->dst < 0 || f->vregs[op->dst].width != 2) return 0;
+    int lhs = op->src[0], rhs = op->src[1];
+    const Op *m = word_mem_of(f, rhs);
+    if (!m && op->kind == IR_ADD && (m = word_mem_of(f, lhs)) != NULL) {
+        lhs = rhs;                                  /* commutative */
+        rhs = op->src[0];
+    }
+    if (!m) return 0;
+    load_to_hl(out, f, lhs);
+    invalidate_de_cache();
+    if (m->mem.offset)
+        emit(out, "ld\tde,(%s%s%+d)", ir_sym_prefix(m->mem.sym),
+             ir_sym_name(m->mem.sym), m->mem.offset);
+    else
+        emit(out, "ld\tde,(%s%s)", ir_sym_prefix(m->mem.sym),
+             ir_sym_name(m->mem.sym));
+    if (op->kind == IR_SUB) emit(out, "and\ta");
+    emit(out, op->kind == IR_SUB ? "sbc\thl,de" : "add\thl,de");
+    invalidate_de_cache();
+    commit_hl_result(out, f, op->dst);
+    return 1;
+}
+
 static int gen_add(FILE *out, Func *f, const Op *op)
 {
+    if (gen_word_mem_rhs(out, f, op)) return 0;
     /* LRA Phase 2b: accumulate directly in an index home. When dst is IX/IY-homed
        (idx2/idx3) and one src shares that exact home — the running chain value is
        already resident in the index reg — load the OTHER operand into DE and
@@ -5822,6 +5902,18 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         commit_hl_result(out, f, op->dst);
         return 0;
     }
+    /* One operand in HL and the other in DE: `add hl,de` and nothing else, even
+       when one of them also has a copy in BC. */
+    if (op->src[1] >= 0 && op->src[0] != op->src[1] && L.pending_spill_v < 0
+        && ((hl_has(op->src[0]) && de_has(op->src[1]))
+            || (hl_has(op->src[1]) && de_has(op->src[0])))
+        && !opt_disabled("add-hl-de")) {
+        ss_note_cache_read(f, op->src[0]);
+        ss_note_cache_read(f, op->src[1]);
+        emit(out, "add\thl,de");
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
     /* One operand HL-resident, the OTHER already in BC: `add hl,bc` directly.
        add is commutative, so this skips staging src1 into DE (the generic
        `ex de,hl; ld hl,bc; add hl,de`) — 1 byte, and crucially leaves DE
@@ -5905,6 +5997,7 @@ static int func_has_bc_home(const Func *f)
 
 static int gen_sub(FILE *out, Func *f, const Op *op)
 {
+    if (gen_word_mem_rhs(out, f, op)) return 0;
     if (try_de_home_def(out, f, op))
         return 0;
     /* In-place `p -= K` (small K) on a TOS-parked word: step it in place. */

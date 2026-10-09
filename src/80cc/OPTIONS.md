@@ -116,6 +116,10 @@ exists (ADR 0010).
 | `st-pop-de` | a word store through a pointer in HL pops a stack-parked value through HL (and reloads the pointer) instead of `pop de` |
 | `cond-value` | `a && b` and `a || b` used as a value build each leg as a stored boolean instead of branching straight to a 0/1 join |
 | `side-exit-carry` | a block with a conditional side exit hands its successors the register beliefs it holds at the end, even where an earlier exit held something else |
+| `shl-copy-de` | a word `t = x << n; t + x` (and `t - x`) spills x and reloads it instead of copying it to DE |
+| `mult-factor` | a word multiply by 2^a+2^b or 2^a-2^b stays `(v<<a) +- (v<<b)` instead of `((v<<(a-b)) +- v) << b` |
+| `word-mem-rhs` | a word `a + g` or `a - g` on a single-use global load loads it first instead of reading it with `ld de,(g)` at the add |
+| `add-hl-de` | a word add with one operand in HL and the other in DE goes through BC when one of them also has a copy there |
 | `printf-puts` | a literal-only `printf` statement stays a `printf` call: no `puts` rewrite and no merging of adjacent ones |
 | `lea-frame-prologue` | ez80 fp-mode frame allocation uses `ld hl,-N; add hl,sp` instead of an IX-relative `lea` |
 | `bc-evict` | a BC tenant is never displaced by a better candidate |
