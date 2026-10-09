@@ -189,6 +189,7 @@ int ir_opt_cmp_unsign(Func *f);
  * byte inc/dec step, 1-byte slot, int uses auto-widen. IR_NO_IV_NARROW opts
  * out. Returns the number of counters narrowed. */
 int ir_opt_narrow_iv(Func *f);
+int ir_opt_step_cmp(Func *f);
 
 /* Local (per-BB) copy propagation: rewrites src operands reading an
  * identity copy (MOV / same-width CONV_SX|ZX) to read the copy's source,

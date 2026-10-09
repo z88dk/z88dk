@@ -119,6 +119,12 @@ exists (ADR 0010).
 | `shl-copy-de` | a word `t = x << n; t + x` (and `t - x`) spills x and reloads it instead of copying it to DE |
 | `mult-factor` | a word multiply by 2^a+2^b or 2^a-2^b stays `(v<<a) +- (v<<b)` instead of `((v<<(a-b)) +- v) << b` |
 | `word-mem-rhs` | a word `a + g` or `a - g` on a single-use global load loads it first instead of reading it with `ld de,(g)` at the add |
+| `word-mem-defer` | the global load for `a + g` must be the op just before the add |
+| `step-cmp` | `x++ == K` keeps the old value of x and compares it, instead of comparing the stepped value with K+1 |
+| `ret-cc-bc` | a conditional `ret` is a reader of BC, so a park before it is kept |
+| `long-add-carry` | a long add of a constant that fits 16 bits (or a small negative) goes through `ex de,hl; ld bc,0; adc hl,bc; ex de,hl` instead of a skipped `inc de` or `dec de` |
+| `slot-park-de` | a word stored to a frame slot and reloaded with D and E untouched in between goes through the slot instead of DE (frame-pointer mode, Z80 family) |
+| `long-cmp-ixd` | a long ordered compare in frame-pointer mode stages both operands through the stack instead of comparing against the right-hand slot a byte at a time |
 | `add-hl-de` | a word add with one operand in HL and the other in DE goes through BC when one of them also has a copy there |
 | `printf-puts` | a literal-only `printf` statement stays a `printf` call: no `puts` rewrite and no merging of adjacent ones |
 | `lea-frame-prologue` | ez80 fp-mode frame allocation uses `ld hl,-N; add hl,sp` instead of an IX-relative `lea` |

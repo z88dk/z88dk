@@ -502,6 +502,27 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             emit(out, "sbc\ta,%u", (unsigned)((k >> 16) & 0xff));
             emit(out, "ld\ta,d");
             emit(out, "sbc\ta,%u", (unsigned)((k >> 24) & 0xff));
+        } else if (fp_active(f) && !L.cur_frameless && !dehl_has(op->src[1])
+                   && L.la.cur_stack_long_top != op->src[1]
+                   && !long_mem_of(f, op->src[1])
+                   && !vreg_in_pr_bc(f, op->src[1])
+                   && op->src[0] != op->src[1]
+                   && vreg_is_spilled(f, op->src[1])
+                   && fp_offset_fits(slot_ix_off(f, op->src[1]))
+                   && fp_offset_fits(slot_ix_off(f, op->src[1]) + 3)
+                   && !opt_disabled("long-cmp-ixd")) {
+            /* RHS read from its frame slot a byte at a time. */
+            load_to_dehl(out, f, op->src[0]);
+            int ix = slot_ix_off(f, op->src[1]);
+            ss_note_reload(f, op->src[1]);
+            emit(out, "ld\ta,l");
+            emit(out, "sub\t(%s%+d)", frame_reg(), ix);
+            emit(out, "ld\ta,h");
+            emit(out, "sbc\ta,(%s%+d)", frame_reg(), ix + 1);
+            emit(out, "ld\ta,e");
+            emit(out, "sbc\ta,(%s%+d)", frame_reg(), ix + 2);
+            emit(out, "ld\ta,d");
+            emit(out, "sbc\ta,(%s%+d)", frame_reg(), ix + 3);
         } else if (!fp_active(f) && !dehl_has(op->src[1])) {
             load_to_dehl(out, f, op->src[0]);
             int off = slot_sp_off(f, op->src[1]);

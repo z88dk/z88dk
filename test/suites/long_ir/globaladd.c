@@ -30,6 +30,15 @@ static int loop(int n)
     return s;
 }
 
+static long garr[8];
+static long *gp = garr;
+static void store_idx(int i)    { gp[i] = -16L; gp[i + 1] = 16L; }
+static int shl_add(int p)       { return ga + (p << 2) + p; }
+static int shl_sub(int p)       { return (p << 2) - ga; }
+static int shl_addr(int p)      { return (p << 2) + ga; }
+static int shl_mul(int p)       { return ga + p * 6; }
+static int via_call(int p)      { return ga + p * 3 + gb; }
+
 static int chain(int p, int q) { return (p + ga) * 3 + (q - gb); }
 
 static void check(void)
@@ -54,6 +63,19 @@ static void check(void)
     assertEqual(twice(10), (10 + 1000) + (10 - 1000) + 1000);
     assertEqual(loop(5), 5 * 1000 - 5 * -400);
     assertEqual(chain(2, 3), (2 + 1000) * 3 + (3 + 400));
+    ga = 1000; gb = 5;
+    store_idx(2);
+    assertEqual(garr[2], -16L);
+    assertEqual(garr[3], 16L);
+    store_idx(5);
+    assertEqual(garr[5], -16L);
+    assertEqual(garr[6], 16L);
+    assertEqual(garr[2], -16L);
+    assertEqual(shl_add(3), 1000 + 12 + 3);
+    assertEqual(shl_sub(3), 12 - 1000);
+    assertEqual(shl_addr(3), 12 + 1000);
+    assertEqual(shl_mul(3), 1000 + 18);
+    assertEqual(via_call(3), 1000 + 9 + 5);
     ga = 32767; gb = 1;
     assertEqual(add_gg(), -32768);
     ga = -32768;

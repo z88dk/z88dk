@@ -3281,6 +3281,56 @@ int ir_opt_conv_mask_fold(Func *f)
     return changed;
 }
 
+/* ---- Compare against a stepped value (ir_opt_step_cmp) ---------------
+   `t = x + 1; ...; x == K` (the old value of `x++ == K`) is `t == K + 1` in
+   the width of x, and the same for a decrement. The old value then needs no
+   copy kept across the step. Only EQ and NE, whose result does not depend on
+   signedness; the stepped value must still be intact where the compare reads. */
+int ir_opt_step_cmp(Func *f)
+{
+    if (!f || opt_disabled("step-cmp")) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int i = 0; i < bb->n_ops; i++) {
+            const Op *s = &bb->ops[i];
+            if ((s->kind != IR_INC && s->kind != IR_DEC) || s->dst < 0
+                || s->src[0] < 0 || s->dst == s->src[0] || s->src[1] >= 0)
+                continue;
+            int x = s->src[0], d = s->dst;
+            int w = f->vregs[x].width;
+            if ((w != 1 && w != 2) || f->vregs[d].width != w) continue;
+            if (f->vregs[x].flags & (IR_VREG_VOLATILE | IR_VREG_ADDR_TAKEN)) continue;
+            for (int j = i + 1; j < bb->n_ops; j++) {
+                Op *c = &bb->ops[j];
+                if ((c->kind == IR_CMP_EQ || c->kind == IR_CMP_NE)
+                    && c->src[0] == x && c->src[1] < 0 && !c->imm_sym) {
+                    int64_t mask = (w == 1) ? 0xff : 0xffff;
+                    int64_t n = c->imm + (s->kind == IR_INC ? 1 : -1);
+                    int64_t m = n & mask;
+                    if (c->imm < 0) {
+                        int64_t sb = (w == 1) ? 0x80 : 0x8000;
+                        if (m >= sb) m -= (mask + 1);
+                    }
+                    c->src[0] = d;
+                    c->imm = m;
+                    changed++;
+                    continue;
+                }
+                int df[8]; int nd = ir_op_defs(c, df, 8);
+                int clobbered = 0;
+                for (int t = 0; t < nd; t++)
+                    if (df[t] == x || df[t] == d) clobbered = 1;
+                if (clobbered || c->kind == IR_CALL || c->kind == IR_HCALL
+                    || c->kind == IR_BR || c->kind == IR_BR_ZERO
+                    || c->kind == IR_BR_COND || c->kind == IR_RET)
+                    break;
+            }
+        }
+    }
+    return changed;
+}
+
 /* ---- Induction-variable range narrowing (ir_opt_narrow_iv) ----------
    A loop counter whose value range provably fits [0,256) is retyped to a
    byte (width 1, KIND_CHAR): the step becomes a byte inc/dec and its slot is

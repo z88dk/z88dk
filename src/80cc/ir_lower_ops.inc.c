@@ -5507,7 +5507,28 @@ static int gen_word_mem_rhs(FILE *out, Func *f, const Op *op)
         rhs = op->src[0];
     }
     if (!m) return 0;
-    load_to_hl(out, f, lhs);
+    int in_de = de_has(lhs) || vreg_in_pr_de(f, lhs);
+    if (in_de && op->kind == IR_ADD) {
+        /* The other operand is already in DE: the global goes to HL. */
+        ss_note_cache_read(f, lhs);
+        hl_about_to_change(-1);
+        if (m->mem.offset)
+            emit(out, "ld\thl,(%s%s%+d)", ir_sym_prefix(m->mem.sym),
+                 ir_sym_name(m->mem.sym), m->mem.offset);
+        else
+            emit(out, "ld\thl,(%s%s)", ir_sym_prefix(m->mem.sym),
+                 ir_sym_name(m->mem.sym));
+        emit(out, "add\thl,de");
+        commit_hl_result(out, f, op->dst);
+        return 1;
+    }
+    if (in_de) {
+        ss_note_cache_read(f, lhs);
+        emit_ex_de_hl(out);
+        swap_hl_de_caches();
+    } else {
+        load_to_hl(out, f, lhs);
+    }
     invalidate_de_cache();
     if (m->mem.offset)
         emit(out, "ld\tde,(%s%s%+d)", ir_sym_prefix(m->mem.sym),
@@ -5680,6 +5701,15 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\ta,d");
                 emit(out, "adc\ta,%u", (unsigned)((k >> 24) & 0xff));
                 emit(out, "ld\td,a");
+            } else if (((k >> 16) & 0xffff) == 0 && !opt_disabled("long-add-carry")) {
+                /* K fits 16 bits: the high word only takes the carry. */
+                emit_skip(out, f, "nc", 1);
+                emit(out, "inc\tde");
+            } else if (((k >> 16) & 0xffff) == 0xffff && !opt_disabled("long-add-carry")) {
+                /* K is a small negative: the high word loses one unless the
+                   low add carried. */
+                emit_skip(out, f, "c", 1);
+                emit(out, "dec\tde");
             } else {
                 emit_ex_de_hl(out);             /* DE = result LOW, HL = LHS_HIGH */
                 emit(out, "ld\tbc,%u",
@@ -6092,6 +6122,13 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\ta,d");
                 emit(out, "sbc\ta,%u", (unsigned)((k >> 24) & 0xff));
                 emit(out, "ld\td,a");
+            } else if (((k >> 16) & 0xffff) == 0 && !opt_disabled("long-add-carry")) {
+                /* K fits 16 bits: the high word only takes the borrow. */
+                emit(out, "ld\tbc,%u", (unsigned)(k & 0xffff));
+                emit(out, "or\ta");
+                emit(out, "sbc\thl,bc");
+                emit_skip(out, f, "nc", 1);
+                emit(out, "dec\tde");
             } else {
                 emit(out, "ld\tbc,%u", (unsigned)(k & 0xffff));
                 emit(out, "or\ta");                     /* clear carry */

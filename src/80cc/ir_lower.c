@@ -4009,6 +4009,104 @@ static void fold_dead_ld_hl_a(char **lines, char *drop, int n)
     }
 }
 
+/* [slot-park-de] Frame-pointer mode on the Z80 family, where a word slot access
+   is two byte accesses: `ld (ix+d),hl` ... `ld hl,(ix+d)` with D and E untouched
+   between them and no other reference to the slot in the function is
+   `ld de,hl` ... `ld hl,de`. Skipped in a function that forms a frame address,
+   since the slot could then be reached through a pointer. */
+static int slot_ix_ref(const char *line, int d)
+{
+    char a[24], b[24];
+    snprintf(a, sizeof a, "(ix%+d)", d);
+    snprintf(b, sizeof b, "(ix%+d)", d + 1);
+    return strstr(line, a) || strstr(line, b);
+}
+
+static void fold_slot_park_de(char **lines, char *drop, int n)
+{
+    if (opt_disabled("slot-park-de")) return;
+    if (IS_EZ80() || IS_RABBIT() || IS_KC160() || IS_808x()
+        || IS_GBZ80())
+        return;
+    for (int i = 0; i < n; i++) {
+        const char *l = lines[i];
+        if (!strncmp(l, "\tpush\tix\n", 9) && i > 12) return;      /* frame address */
+        if (!strncmp(l, "\tadd\thl,sp\n", 12)
+            && !(i + 1 < n && !strcmp(lines[i + 1], "\tld\tsp,hl\n")))
+            return;                                     /* not the frame allocation */
+        if (strstr(l, "\tlea\t")) return;
+    }
+    /* The frame size, from the prologue: the deepest word is read with pop and
+       push, which the text does not show as an ix access. */
+    int frame = -1, ip = -1;
+    for (int i = 0; i + 1 < n && i < 12; i++)
+        if (!strcmp(lines[i], "\tld\tix,0\n") && !strcmp(lines[i + 1], "\tadd\tix,sp\n")) {
+            ip = i + 2;
+            break;
+        }
+    if (ip < 0) return;
+    {
+        int k = ip, sz = 0;
+        while (k < n && !strcmp(lines[k], "\tpush\taf\n")) { sz += 2; k++; }
+        if (sz == 0 && k + 2 < n) {
+            int v;
+            char c2[4];
+            if (sscanf(lines[k], "\tld\thl,-%d%1[\n]", &v, c2) == 2
+                && !strcmp(lines[k + 1], "\tadd\thl,sp\n")
+                && !strcmp(lines[k + 2], "\tld\tsp,hl\n"))
+                sz = v;
+        }
+        frame = sz;
+    }
+    if (frame <= 0) return;
+    for (int i = 0; i + 1 < n; i++) {
+        int d;
+        char c1[4];
+        if (drop[i] || sscanf(lines[i], "\tld\t(ix%d),hl%1[\n]", &d, c1) != 2)
+            continue;
+        if (d <= -frame || d >= 0) continue;       /* bottom word, or not a local */
+        char want[40];
+        snprintf(want, sizeof want, "\tld\thl,(ix%+d)\n", d);
+        int found = -1;
+        for (int j = i + 1; j < n && j < i + 80; j++) {
+            if (drop[j] || !strncmp(lines[j], "\tC_LINE", 7)) continue;
+            if (lines[j][0] != '\t') break;                      /* label */
+            if (!strcmp(lines[j], want)) { found = j; break; }
+            if (slot_ix_ref(lines[j], d)) break;
+            InstrEffects e = instr_effects(lines[j]);
+            if (e.unknown || e.is_call || e.is_boundary
+                || e.d_read || e.e_read || e.d_write || e.e_write
+                || strstr(lines[j], "de") || strstr(lines[j], "\tex\t")
+                || strstr(lines[j], "(sp"))
+                break;
+        }
+        if (found < 0) continue;
+        /* The slot must be dead after the reload: on the straight line below,
+           its next reference is a whole-word store, or the function returns. */
+        int dead = 0;
+        for (int k = found + 1; k < n && k < found + 200; k++) {
+            if (drop[k] || !strncmp(lines[k], "\tC_LINE", 7)) continue;
+            if (lines[k][0] != '\t') continue;                   /* label: fall through */
+            char sa[24], sb[24];
+            snprintf(sa, sizeof sa, "\tld\t(ix%+d),hl\n", d);
+            snprintf(sb, sizeof sb, "\tld\t(ix%+d),hl\n", d);
+            if (!strcmp(lines[k], sa)) { dead = 1; break; }
+            if (slot_ix_ref(lines[k], d)) break;                  /* read, or a part-word write */
+            if (!strcmp(lines[k], "\tret\n")) { dead = 1; break; }
+            if (!strncmp(lines[k], "\tjp", 3) || !strncmp(lines[k], "\tjr", 3)
+                || !strncmp(lines[k], "\tdjnz", 5) || !strncmp(lines[k], "\trst", 4)
+                || !strncmp(lines[k], "\treti", 5) || !strncmp(lines[k], "\tretn", 5)
+                || !strncmp(lines[k], "\tldir", 5) || !strncmp(lines[k], "\tlddr", 5))
+                break;
+        }
+        if (!dead) continue;
+        free(lines[i]);
+        lines[i] = strdup("\tld\tde,hl\n");
+        free(lines[found]);
+        lines[found] = strdup("\tld\thl,de\n");
+    }
+}
+
 /* S, P/V and H are overwritten before anything can read them, on the straight
    line after `start` (the flags `add a,a` and `add hl,hl` disagree on). Only a
    full S/Z/P/V/H writer kills them; a label, branch, call, `push af`, `daa` or
@@ -4434,6 +4532,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
         fold_dead_sp_addr(lines, drop, n);
         fold_dead_ex_de_hl(lines, drop, n);
         fold_dead_ld_hl_a(lines, drop, n);
+        fold_slot_park_de(lines, drop, n);
         fold_slot_bitop_de(lines, drop, n);
         fold_mask_shl_a(lines, drop, n);
         fold_const_xorflip(lines, drop, n);
@@ -4823,6 +4922,10 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 c_live = cond ? (tc | c_live) : tc;
                 if (dj) b_live = 1;
             }
+            /* `ret cc`: BC is dead on the taken edge (as at a bare ret), and the
+               fall-through sees the state already computed from below. */
+            else if (call && !strncmp(lines[i], "\tret\t", 5)
+                     && !opt_disabled("ret-cc-bc")) { }
             else if (call){ b_live = c_live = 1; }
             else if (park) {
                 if (!b_live && !c_live) drop[i] = 1;
@@ -9306,6 +9409,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
         int narrow  = ir_opt_narrow_byte(f);
         narrow += ir_opt_byte_cleanup(f);   /* identity masks; byte reads skip a widening */
         ir_opt_cmp_unsign(f);           /* drop the signed-compare sign tail */
+        (void)ir_opt_step_cmp(f);       /* x++ == K  ->  stepped value == K+1 */
         /* narrow_byte turns promoting CONV_SX|ZX operands into
            byte-identity copies; propagate them away (else they spill to a
            slot) and DCE the now-dead copies. */
@@ -9528,18 +9632,45 @@ static int ir_lower_func_body(FILE *out, Func *f)
                            sizeof(const Op *));
     if (g_hc.word_mem && !opt_disabled("word-mem-rhs")
         && !IS_808x() && !IS_GBZ80() && !f->de_home_general) {
-        int de_homed = 0;
-        for (int v = 0; v < f->n_vregs && !de_homed; v++) {
+        int de_homed = 0, de_byte_homed = 0;
+        for (int v = 0; v < f->n_vregs; v++) {
             PhysReg ph = ir_home_assigned(f, v);
-            if (ph == IR_PR_DE || ph == IR_PR_E || ph == IR_PR_D) de_homed = 1;
+            if (ph == IR_PR_DE) de_homed = 1;
+            if (ph == IR_PR_E || ph == IR_PR_D) de_byte_homed = 1;
         }
-        for (int b = 0; b < f->n_bbs && !de_homed; b++) {
+        for (int b = 0; b < f->n_bbs && !de_byte_homed; b++) {
             const BB *bb = &f->bbs[b];
             for (int j = 0; j + 1 < bb->n_ops; j++) {
-                const Op *o = &bb->ops[j], *u = &bb->ops[j + 1];
+                const Op *o = &bb->ops[j];
+                const Op *u = &bb->ops[j + 1];
                 int d = o->dst;
                 if (o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_SYM) continue;
                 if (d < 0 || d >= f->n_vregs || f->vregs[d].width != 2) continue;
+                /* The user may come a few pure ops later: nothing between may
+                   write memory, so the load can wait for it. */
+                if (!opt_disabled("word-mem-defer")) {
+                    int ku = -1;
+                    for (int k = j + 1; k < bb->n_ops && ku < 0; k++) {
+                        int us[16]; int nu = ir_op_uses(&bb->ops[k], us, 16);
+                        for (int t = 0; t < nu; t++) if (us[t] == d) { ku = k; break; }
+                        if (ku >= 0) break;
+                        switch (bb->ops[k].kind) {
+                        case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR:
+                        case IR_LEA: case IR_ADD: case IR_SUB: case IR_RSUB:
+                        case IR_AND: case IR_OR: case IR_XOR: case IR_SHL: case IR_SHR:
+                        case IR_NEG: case IR_NOT: case IR_INC: case IR_DEC:
+                        case IR_CONV_ZX: case IR_CONV_SX: case IR_CONV_TRUNC:
+                            break;
+                        case IR_LD_MEM:
+                            if (bb->ops[k].mem.volatile_) k = bb->n_ops;
+                            break;
+                        default:
+                            k = bb->n_ops;               /* anything else: stop */
+                        }
+                    }
+                    if (ku < 0) continue;
+                    u = &bb->ops[ku];
+                }
                 if (!vreg_kind_is_integer(f, d)) continue;
                 if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
                                          | IR_VREG_NO_SLOT | IR_VREG_CALL_SPLIT
@@ -9577,6 +9708,23 @@ static int ir_lower_func_body(FILE *out, Func *f)
                         for (int t = 0; t < nu; t++) if (us[t] == d) nuse++;
                     }
                 if (ndef != 1 || nuse != 1) continue;
+                /* A value homed in DE other than the operands and the result
+                   must not be live where the add reads the global. */
+                if (de_homed) {
+                    int gj = bc_op_global_index(f, bb, j);
+                    int gu = gj + (int)(u - o);
+                    int clash = (gj < 0);
+                    for (int w = 0; w < f->n_vregs && !clash; w++) {
+                        if (ir_home_assigned(f, w) != IR_PR_DE
+                            || w == other || w == d || w == u->dst)
+                            continue;
+                        const LiveRange *lr = ir_live_range(f, w);
+                        if (!lr || lr->start < 0
+                            || (lr->start <= gu && lr->end >= gj))
+                            clash = 1;
+                    }
+                    if (clash) continue;
+                }
                 g_hc.word_mem[d] = o;
                 f->vregs[d].flags |= IR_VREG_NO_SLOT;
             }

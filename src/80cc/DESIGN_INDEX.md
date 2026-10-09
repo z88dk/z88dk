@@ -263,6 +263,9 @@ Size across the corpus before implementing.
   8080 family and gbz80: `a += b` 58 -> 32 B Z80, 61 -> 25 B 8080, 67 -> 22 B
   gbz80 (0111). The differential fuzzer found about 37 miscompiles; arrays
   now always count as aliased (0112).
+- **Stepped compares, constant long adds, frame-slot parks (ADR 0120).** Survey z80 fp
+  6.2 % over sdcc. Left: `rnd_bars`, `bincomp`, `generate`, `select_move`, and the
+  parked-address pointer store.
 - **Word operands kept in registers (ADR 0119).** x*(2^a+1) copies x to DE, x*10 is
   `((x<<2)+x)<<1`, `g1 += g2` reads g2 with `ld de,(g2)`; survey z80 fp 10.2 % ->
   6.4 % over sdcc. Left: `xc++ == K` on a global, the parked-address pointer store,

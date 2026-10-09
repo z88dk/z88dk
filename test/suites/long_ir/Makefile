@@ -25,6 +25,9 @@ all:	crcloop.bin crcloop_8080.bin crcloop_gbz80.bin crcloop_r2ka.bin crcloop_ez8
 all:	zxfold.bin zxfold_8080.bin zxfold_gbz80.bin zxfold_r2ka.bin zxfold_ez80.bin zxfold_8085.bin zxfold_kc160.bin zxfold_z180.bin zxfold_r4k.bin zxfold_fp.bin
 all:	printfputs.bin printfputs_asm.bin
 all:	bytestore.bin bytestore_8080.bin bytestore_gbz80.bin bytestore_r2ka.bin bytestore_ez80.bin bytestore_8085.bin bytestore_kc160.bin bytestore_z180.bin bytestore_r4k.bin bytestore_fp.bin
+all:	longcmp.bin longcmp_8080.bin longcmp_gbz80.bin longcmp_r2ka.bin longcmp_ez80.bin longcmp_8085.bin longcmp_kc160.bin longcmp_z180.bin longcmp_r4k.bin longcmp_fp.bin
+all:	longaddk.bin longaddk_8080.bin longaddk_gbz80.bin longaddk_r2ka.bin longaddk_ez80.bin longaddk_8085.bin longaddk_kc160.bin longaddk_z180.bin longaddk_r4k.bin longaddk_fp.bin
+all:	stepcmp.bin stepcmp_8080.bin stepcmp_gbz80.bin stepcmp_r2ka.bin stepcmp_ez80.bin stepcmp_8085.bin stepcmp_kc160.bin stepcmp_z180.bin stepcmp_r4k.bin stepcmp_fp.bin
 all:	globaladd.bin globaladd_8080.bin globaladd_gbz80.bin globaladd_r2ka.bin globaladd_ez80.bin globaladd_8085.bin globaladd_kc160.bin globaladd_z180.bin globaladd_r4k.bin globaladd_fp.bin
 all:	mulconst.bin mulconst_8080.bin mulconst_gbz80.bin mulconst_r2ka.bin mulconst_ez80.bin mulconst_8085.bin mulconst_kc160.bin mulconst_z180.bin mulconst_r4k.bin mulconst_fp.bin
 all:	condvalue.bin condvalue_8080.bin condvalue_gbz80.bin condvalue_r2ka.bin condvalue_ez80.bin condvalue_8085.bin condvalue_kc160.bin condvalue_z180.bin condvalue_r4k.bin condvalue_fp.bin
@@ -4427,6 +4430,126 @@ bytestore_r4k.bin: $(SOURCES) bytestore.c
 	$(runtest_r4k)
 
 bytestore_fp.bin: $(SOURCES) bytestore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longcmp.bin: $(SOURCES) longcmp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longcmp_8080.bin: $(SOURCES) longcmp.c
+	$(compile_8080)
+	$(runtest_8080)
+
+longcmp_gbz80.bin: $(SOURCES) longcmp.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+longcmp_r2ka.bin: $(SOURCES) longcmp.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+longcmp_ez80.bin: $(SOURCES) longcmp.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+longcmp_8085.bin: $(SOURCES) longcmp.c
+	$(compile_8085)
+	$(runtest_8085)
+
+longcmp_kc160.bin: $(SOURCES) longcmp.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+longcmp_z180.bin: $(SOURCES) longcmp.c
+	$(compile_z180)
+	$(runtest_z180)
+
+longcmp_r4k.bin: $(SOURCES) longcmp.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+longcmp_fp.bin: $(SOURCES) longcmp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longaddk.bin: $(SOURCES) longaddk.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longaddk_8080.bin: $(SOURCES) longaddk.c
+	$(compile_8080)
+	$(runtest_8080)
+
+longaddk_gbz80.bin: $(SOURCES) longaddk.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+longaddk_r2ka.bin: $(SOURCES) longaddk.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+longaddk_ez80.bin: $(SOURCES) longaddk.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+longaddk_8085.bin: $(SOURCES) longaddk.c
+	$(compile_8085)
+	$(runtest_8085)
+
+longaddk_kc160.bin: $(SOURCES) longaddk.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+longaddk_z180.bin: $(SOURCES) longaddk.c
+	$(compile_z180)
+	$(runtest_z180)
+
+longaddk_r4k.bin: $(SOURCES) longaddk.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+longaddk_fp.bin: $(SOURCES) longaddk.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+stepcmp.bin: $(SOURCES) stepcmp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+stepcmp_8080.bin: $(SOURCES) stepcmp.c
+	$(compile_8080)
+	$(runtest_8080)
+
+stepcmp_gbz80.bin: $(SOURCES) stepcmp.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+stepcmp_r2ka.bin: $(SOURCES) stepcmp.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+stepcmp_ez80.bin: $(SOURCES) stepcmp.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+stepcmp_8085.bin: $(SOURCES) stepcmp.c
+	$(compile_8085)
+	$(runtest_8085)
+
+stepcmp_kc160.bin: $(SOURCES) stepcmp.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+stepcmp_z180.bin: $(SOURCES) stepcmp.c
+	$(compile_z180)
+	$(runtest_z180)
+
+stepcmp_r4k.bin: $(SOURCES) stepcmp.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+stepcmp_fp.bin: $(SOURCES) stepcmp.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
