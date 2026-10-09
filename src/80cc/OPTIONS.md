@@ -265,6 +265,14 @@ exists (ADR 0010).
 | `lhlx-bc` | an 8085 word reload into BC stays a byte walk plus `ld hl,bc`, instead of LDSI + LHLX |
 | `byte-ret` | a constant byte return stays `ld a,N` / `ld l,a` instead of `ld l,N` |
 | `byte-mask-ident` | a byte `and 0xff`, `or 0` or `xor 0` is kept as an op instead of becoming a copy |
+| `long-asr-const` | a constant arithmetic long `>>` calls `l_asr_dehl` instead of moving bytes and shifting inline |
+| `iv-narrow-latch` | a down-counter tested in the loop latch is not narrowed to a byte |
+| `step-z` | a byte inc/dec does not hand its Z flag to the following zero test |
+| `long-shl-tos` | an in-place long `<< 1` on the top-of-stack slot walks the four bytes in memory |
+| `tos-rmw` | a long updated in place on the top of the stack keeps its load-copy and replacement pops |
+| `long-shl-tos-cache` | the top-of-stack long shift does not leave its result cached in DE:BC |
+| `step-mem` | a byte frame slot stepped onto itself goes through A instead of `inc/dec (mem)` |
+| `long-shr-bc` | a bit-only long `>>` of a DE:BC-cached value fetches the low half into HL and stashes it back |
 | `byte-clean` | the byte clean-up after narrowing is skipped altogether |
 | `byte-ext-src` | a byte op reading a widened byte reads the widened word, not the byte it came from |
 | `frame-byte-trunc-sp` | in sp mode the low byte of a word in the frame is read by loading the whole word, as in fp mode before the byte read |

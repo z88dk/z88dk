@@ -17,6 +17,11 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 # the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
 all:	rabsub.bin rabsub_r2ka.bin rabsub_r4k.bin rabsub_asm.bin jrtight.bin jrtight_r2ka.bin jrtight_ez80.bin jrtight_kc160.bin jrtight_asm.bin
 all:	smod.bin smod_8080.bin smod_gbz80.bin smod_r2ka.bin smod_ez80.bin smod_kc160.bin smod_8085.bin smod_fp.bin
+all:	blockfn.bin blockfn_8080.bin blockfn_gbz80.bin blockfn_r2ka.bin blockfn_ez80.bin blockfn_8085.bin blockfn_fp.bin
+all:	accintcomp.bin accintcomp_fp.bin
+all:	bigframe.bin bigframe_fp.bin bigframe_8080.bin bigframe_r2ka.bin bigframe_ez80.bin bigframe_gbz80.bin
+all:	longasr.bin longasr_8080.bin longasr_gbz80.bin longasr_r2ka.bin longasr_ez80.bin longasr_8085.bin longasr_kc160.bin longasr_z180.bin longasr_r4k.bin longasr_fp.bin
+all:	crcloop.bin crcloop_8080.bin crcloop_gbz80.bin crcloop_r2ka.bin crcloop_ez80.bin crcloop_8085.bin crcloop_kc160.bin crcloop_z180.bin crcloop_r4k.bin crcloop_fp.bin
 all:	countborrow.bin countborrow_gbz80.bin
 all:	strremat.bin strremat_fp.bin strremat_8080.bin strremat_gbz80.bin
 all:	fnptrdead.bin fnptrdead_fp.bin fnptrdead_8080.bin fnptrdead_gbz80.bin
@@ -4194,5 +4199,145 @@ smod_8085.bin: $(SOURCES) smod.c
 
 smod_fp.bin: $(SOURCES) smod.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+blockfn.bin: $(SOURCES) blockfn.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+blockfn_8080.bin: $(SOURCES) blockfn.c
+	$(compile_8080)
+	$(runtest_8080)
+
+blockfn_gbz80.bin: $(SOURCES) blockfn.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+blockfn_r2ka.bin: $(SOURCES) blockfn.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+blockfn_ez80.bin: $(SOURCES) blockfn.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+blockfn_8085.bin: $(SOURCES) blockfn.c
+	$(compile_8085)
+	$(runtest_8085)
+
+blockfn_fp.bin: $(SOURCES) blockfn.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accintcomp.bin: $(SOURCES) accintcomp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+accintcomp_fp.bin: $(SOURCES) accintcomp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bigframe.bin: $(SOURCES) bigframe.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bigframe_fp.bin: $(SOURCES) bigframe.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bigframe_8080.bin: $(SOURCES) bigframe.c
+	$(compile_8080)
+	$(runtest_8080)
+
+bigframe_r2ka.bin: $(SOURCES) bigframe.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+bigframe_ez80.bin: $(SOURCES) bigframe.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+bigframe_gbz80.bin: $(SOURCES) bigframe.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+longasr.bin: $(SOURCES) longasr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longasr_8080.bin: $(SOURCES) longasr.c
+	$(compile_8080)
+	$(runtest_8080)
+
+longasr_gbz80.bin: $(SOURCES) longasr.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+longasr_r2ka.bin: $(SOURCES) longasr.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+longasr_ez80.bin: $(SOURCES) longasr.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+longasr_8085.bin: $(SOURCES) longasr.c
+	$(compile_8085)
+	$(runtest_8085)
+
+longasr_kc160.bin: $(SOURCES) longasr.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+longasr_z180.bin: $(SOURCES) longasr.c
+	$(compile_z180)
+	$(runtest_z180)
+
+longasr_r4k.bin: $(SOURCES) longasr.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+longasr_fp.bin: $(SOURCES) longasr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+crcloop.bin: $(SOURCES) crcloop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+crcloop_8080.bin: $(SOURCES) crcloop.c
+	$(compile_8080)
+	$(runtest_8080)
+
+crcloop_gbz80.bin: $(SOURCES) crcloop.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+crcloop_r2ka.bin: $(SOURCES) crcloop.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+crcloop_ez80.bin: $(SOURCES) crcloop.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+crcloop_8085.bin: $(SOURCES) crcloop.c
+	$(compile_8085)
+	$(runtest_8085)
+
+crcloop_kc160.bin: $(SOURCES) crcloop.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+crcloop_z180.bin: $(SOURCES) crcloop.c
+	$(compile_z180)
+	$(runtest_z180)
+
+crcloop_r4k.bin: $(SOURCES) crcloop.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+crcloop_fp.bin: $(SOURCES) crcloop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 

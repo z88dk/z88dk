@@ -3368,6 +3368,8 @@ static int niv_down_exit_ok(Func *f, int h, int c)
         const Op *o = &hb->ops[j];
         /* while (c) / while (c != 0) / while (c > 0): stops at 0, never neg. */
         if (o->kind == IR_BR_ZERO && o->src[0] == c) return 1;
+        if (o->kind == IR_BR_COND && o->src[0] == c && o->imm != IR_BRCOND_KTRIP)
+            return 1;                  /* loops while c is non-zero */
         if (o->src[0] != c || o->src[1] != -1) continue;
         if ((o->kind == IR_CMP_NE || o->kind == IR_CMP_GT
              || o->kind == IR_CMP_UGT) && o->imm == 0) return 1;
@@ -3406,7 +3408,7 @@ int ir_opt_narrow_iv(Func *f)
     for (int h = 0; h < f->n_bbs; h++) {
         if (!reach[h]) continue;
         /* Single-latch natural loop (mirror ir_opt_ivsr's scan). */
-        int n_entry = 0, n_back = 0;
+        int n_entry = 0, n_back = 0, latch = -1;
         for (int b = 0; b < f->n_bbs; b++) {
             BB *bb = &f->bbs[b];
             int ns = ir_bb_n_succ(bb), targets_h = 0;
@@ -3414,18 +3416,24 @@ int ir_opt_narrow_iv(Func *f)
                 if (ir_bb_succ_at(bb, s) == h) { targets_h = 1; break; }
             if (!targets_h) continue;
             if (b < h) n_entry++;
-            else if (b >= h && reach[b] && licm_reaches(f, h, b)) n_back++;
+            else if (b >= h && reach[b] && licm_reaches(f, h, b)) { n_back++; latch = b; }
         }
         if (n_entry != 1 || n_back != 1) continue;
 
-        /* Look in the header for a counter-vs-constant guard. */
-        BB *hb = &f->bbs[h];
+        /* Look in the header for a counter-vs-constant guard; a down-counter
+           may instead be tested in the latch, after its own decrement. */
+        for (int pass = 0; pass < 2; pass++) {
+        if (pass && (latch == h || latch < 0 || opt_disabled("iv-narrow-latch")))
+            break;
+        BB *hb = &f->bbs[pass ? latch : h];
         for (int j = 0; j < hb->n_ops; j++) {
             const Op *o = &hb->ops[j];
             int c = -1;
             if ((o->kind >= IR_CMP_EQ && o->kind <= IR_CMP_UGE)
                 && o->src[0] >= 0 && o->src[1] == -1) c = o->src[0];
             else if (o->kind == IR_BR_ZERO && o->src[0] >= 0) c = o->src[0];
+            else if (o->kind == IR_BR_COND && o->src[0] >= 0 && o->imm != IR_BRCOND_KTRIP)
+                c = o->src[0];
             if (c < 0 || c >= f->n_vregs) continue;
             int is_down = 0;
             if (!niv_counter_ok(f, cl, c, &is_down)) continue;
@@ -3440,7 +3448,17 @@ int ir_opt_narrow_iv(Func *f)
                 }
             if (ktrip_latch) continue;
             int ok = 0;
-            if (!is_down) {
+            if (pass) {
+                /* Latch test: the one DEC of c must come first in this block,
+                   so the test sees the decremented value, and a seed of at
+                   least 1 keeps it from going below 0. */
+                int dec_first = 0;
+                for (int k = 0; k < j; k++)
+                    if (hb->ops[k].kind == IR_DEC && hb->ops[k].src[0] == c
+                        && hb->ops[k].dst == c) dec_first = 1;
+                ok = is_down && dec_first && cl[c].initval >= 1
+                     && cl[c].initval <= 255 && niv_down_exit_ok(f, latch, c);
+            } else if (!is_down) {
                 int64_t maxv = 0;
                 ok = niv_up_bound_ok(f, h, c, &maxv) && maxv <= 255;
             } else {
@@ -3462,6 +3480,7 @@ int ir_opt_narrow_iv(Func *f)
                             && q->imm >= 0 && q->imm <= 255)
                             q->kind = cs_unsigned_of(q->kind);
                     }
+        }
         }
     }
     free(reach);

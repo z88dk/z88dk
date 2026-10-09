@@ -4,7 +4,7 @@
 export ZCCCFG=/workspaces/z88dk/lib/config PATH=${BIN:-/workspaces/z88dk/bin}:$PATH
 cd /workspaces/z88dk/test/suites
 OUT="$1"; : > "$OUT"
-BENCHES="${BENCHES:-charbench crcbench intbench ptrbench sieve rle sortbench queenbench searchbench switchbench structbench vecbench recordbench maskbench strbench listbench interpbench matrixbench hashbench fixedbench histbench lexbench md5 localbench predbench divbench shiftbench callbench bitfieldbench widthbench charmulbench}"
+BENCHES="${BENCHES:-charbench crcbench intbench ptrbench sieve rle sortbench queenbench searchbench switchbench structbench vecbench recordbench maskbench strbench listbench interpbench matrixbench hashbench fixedbench histbench lexbench md5 localbench predbench divbench shiftbench lshiftbench callbench bitfieldbench widthbench charmulbench}"
 CPUS="${CPUS:-z80}"
 for b in $BENCHES; do
   [ -d "$b" ] || continue

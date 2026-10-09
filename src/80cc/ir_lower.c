@@ -82,6 +82,9 @@ struct RegState {
     int fa;     /* vreg resident in the float accumulator (FA, math48 alt regs) */
     int i64_acc;/* vreg resident in __i64_acc (long long) — a SEPARATE physical
                    store from FA, so its residency is tracked independently */
+    int z_from_v;/* vreg id + 1 whose in-memory byte the LAST emitted instruction
+                    left Z set from (`dec (hl)`/`dec (ix+d)`); 0 = none. Cleared
+                    on every emit, like z_from_a. */
     int z_from_a;/* 1 when the LAST emitted instruction set Z/S from A's current
                     value (an `and`/`or`/`xor` on A). Invalidate-by-default at
                     the vemit chokepoint, like the `a` tracker above: anything
@@ -859,6 +862,7 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
        ARGUMENT ("%s%u" with pfx="and\t"), so the format string does not carry
        it. */
     L.rs.z_from_a = 0;
+    L.rs.z_from_v = 0;
     L.last_add_sp = 0;
     if (L.hlm_on) {
         char hb[128];
@@ -4226,6 +4230,46 @@ static int try_fold_byte_ret(char **lines, char *drop, int n, int i)
     return 1;
 }
 
+/* [tos-rmw] A long read-modify-written on the top of the stack is loaded
+   without removing it (`pop hl; pop de; push de; push hl`) and replaced at the
+   end (`pop bc; pop bc; push de; push hl`). With only register operations in
+   between, the copy and the replacement cancel: keep the two pops, drop the
+   other six. Anything that names memory or the stack pointer in between blocks
+   it, so a popped slot is never read or hit by a push while it is empty. */
+static int tos_rmw_body_ok(const char *l)
+{
+    if (l[0] != '\t') return 0;
+    const char *e = l + 1;
+    while (*e && *e != '\t' && *e != ' ' && *e != '\n') e++;
+    size_t n = (size_t)(e - l - 1);
+    static const char *ok[] = {"ld", "xor", "and", "or", "add", "adc", "sub",
+        "sbc", "inc", "dec", "cp", "rl", "rr", "sla", "sra", "srl", "rla",
+        "rra", "rlca", "rrca", "cpl", "neg", "ex", "bit", "res", "set", NULL};
+    int found = 0;
+    for (int k = 0; ok[k]; k++)
+        if (strlen(ok[k]) == n && !strncmp(l + 1, ok[k], n)) { found = 1; break; }
+    if (!found) return 0;
+    if (strchr(e, '(') || strstr(e, "sp")) return 0;
+    return 1;
+}
+
+static void try_fold_tos_rmw(char **lines, char *drop, int n, int i)
+{
+    if (opt_disabled("tos-rmw")) return;
+    if (i + 3 >= n || strcmp(lines[i], "\tpop\thl\n") || strcmp(lines[i + 1], "\tpop\tde\n")
+        || strcmp(lines[i + 2], "\tpush\tde\n") || strcmp(lines[i + 3], "\tpush\thl\n"))
+        return;
+    for (int j = i + 4; j < n && j < i + 4 + 40; j++) {
+        if (j + 3 < n && !strcmp(lines[j], "\tpop\tbc\n") && !strcmp(lines[j + 1], "\tpop\tbc\n")
+            && !strcmp(lines[j + 2], "\tpush\tde\n") && !strcmp(lines[j + 3], "\tpush\thl\n")) {
+            drop[i + 2] = drop[i + 3] = drop[j] = drop[j + 1] = 1;
+            return;
+        }
+        if (lines[j][0] == '\n' || !strncmp(lines[j], "\tC_LINE", 7)) continue;
+        if (!tos_rmw_body_ok(lines[j])) return;
+    }
+}
+
 /* [byte-ret] The final stage after tail merging. Merging must see the original
    `ld l,a` tails: narrowing first makes constant returns differ and a merge
    that would have paid is lost. The pair that remains adjacent after the merge
@@ -4240,8 +4284,10 @@ static void filter_byte_ret(FILE *out, FILE *src)
     }
     char *drop = calloc((size_t)(n > 0 ? n : 1), 1);
     if (drop)
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++) {
             try_fold_byte_ret(lines, drop, n, i);
+            try_fold_tos_rmw(lines, drop, n, i);
+        }
     for (int i = 0; i < n; i++) {
         if (!drop || !drop[i]) fputs(lines[i], out);
         free(lines[i]);

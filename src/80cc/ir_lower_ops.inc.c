@@ -408,9 +408,47 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
        bytes — clobbering the adjacent packed char slot. */
     if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
         if (try_inplace_home_unop(out, f, op, mnem, 0)) return 0;
+        /* A plain frame-slot byte stepped onto itself: step the slot in place
+           (`dec (ix+d)`, or `dec (hl)` with the slot address in HL) and leave
+           Z for a following zero test. Only when no register holds the value
+           and it has no home, so the slot is the one live copy. */
+        {
+            int v = op->dst;
+            if (op->src[0] == v && !opt_disabled("step-mem")
+                && vreg_is_spilled(f, v)
+                && !(f->vregs[v].flags & (IR_VREG_VOLATILE | IR_VREG_DEAD_SPILL))
+                && byte_home_phys(f, v) == IR_PR_NONE
+                && idxhalf_phys(f, v) == IR_PR_NONE
+                && !a_has(v) && !hl_has(v) && !de_has(v) && !bc_has(v)
+                && !vreg_is_remat(f, v) && !byte_remat_of(f, v)
+                && !vreg_is_pr_stack(f, v) && L.af_park_depth == 0) {
+                if (fp_active(f)) {
+                    int ix_off = slot_ix_off(f, v);
+                    if (fp_offset_fits(ix_off)) {
+                        ss_note_reload(f, v);
+                        require_slot(f, v);
+                        emit(out, "%s\t(%s%+d)", mnem, frame_reg(), ix_off);
+                        L.rs.z_from_v = v + 1;
+                        return 0;
+                    }
+                } else {
+                    ss_note_reload(f, v);
+                    require_slot(f, v);
+                    pending_spill_resolve();
+                    emit_byte_slot_addr(out, f, v);
+                    emit(out, "%s\t(hl)", mnem);
+                    L.rs.z_from_v = v + 1;
+                    return 0;
+                }
+            }
+        }
         load_byte_to_a(out, f, op->src[0]);
         emit(out, "%s\ta", mnem);
         commit_a_byte(out, f, op->dst);
+        /* inc/dec a leaves Z set from the stepped byte and the store that
+           follows does not touch the flags, so a zero test of the result
+           (a counted loop's exit) can skip its `or a`. */
+        if (a_has(op->dst) && !opt_disabled("step-z")) L.rs.z_from_a = 1;
         return 0;
     }
     /* width-4: step DEHL via the library helper (carries across all four
@@ -521,6 +559,7 @@ static void emit_test_zero(FILE *out, Func *f, int src)
         /* Byte truth-test: the value fits in 8 bits (the narrow pass only
            routes a byte-mask AND / byte vreg here), so `or a` on the low
            byte sets Z for the whole value — no `ld h,0` widen. */
+        if (L.rs.z_from_v == src + 1) return;   /* `dec (mem)` just set Z */
         if (!a_has(src)) load_byte_to_a(out, f, src);
         /* The mask that produced this byte already set Z from it (`and K`), and
            nothing has been emitted since — so the `or a` is dead. rs.z_from_a is
@@ -2709,6 +2748,30 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             && !dehl_has(op->src[0])
             && vreg_is_spilled(f, op->dst)) {
             int off = slot_sp_off(f, op->dst);
+            if (off == 0 && !opt_disabled("long-shl-tos")) {
+                /* The slot is the top of the stack: pop it into HL/DE, shift
+                   through the pair and push it back — 9 bytes and about 70 T
+                   against the 15 B and 100 T byte walk below. */
+                emit_sp(out, -2, "pop\thl");
+                emit_sp(out, -2, "pop\tde");
+                emit(out, "add\thl,hl");
+                emit(out, "rl\te");
+                emit(out, "rl\td");
+                emit_sp(out, 2, "push\tde");
+                emit_sp(out, 2, "push\thl");
+                if (!opt_disabled("long-shl-tos-cache")) {
+                    /* DE:HL still hold the result: claim the long cache (BC =
+                       low half is its contract) so a test of one byte reads the
+                       register, not the stack slot. */
+                    emit(out, "ld\tbc,hl");
+                    invalidate_hl_cache();
+                    cache_dehl(op->dst);
+                    return 0;
+                }
+                invalidate_hl_bc();
+                invalidate_de_cache();
+                return 0;
+            }
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");        /* HL = &slot[0] (LSB) */
             emit(out, "sla\t(hl)");          /* byte0: low bit=0, hi→C */
