@@ -1050,6 +1050,67 @@ static int branch_relax_enabled(void)
     return relax_on;
 }
 
+/* Exact-enough sizes for register-only forms; 0 = not a register form. */
+static int relax_fn_has_asm;      /* set per function by filter_relax_branches */
+static int relax_tight_sizes(void)
+{
+    if (IS_RABBIT4K() || IS_808x()) return 0;
+    /* 80cc emits no ADL-suffixed (ez80) or prefixed (kc160) forms itself, but
+       an __asm block may. */
+    if ((IS_EZ80() || IS_KC160()) && relax_fn_has_asm) return 0;
+    return 1;
+}
+
+static int relax_is_r8(const char *t, size_t k)
+{
+    return k == 1 && strchr("abcdehl", t[0]) != NULL;
+}
+
+static int relax_is_r16(const char *t, size_t k)
+{
+    return (k == 2 && (!strncmp(t, "bc", 2) || !strncmp(t, "de", 2)
+                       || !strncmp(t, "hl", 2) || !strncmp(t, "sp", 2)
+                       || !strncmp(t, "af", 2)));
+}
+
+/* `s`/`n` = mnemonic, `arg` = operands. Only the shapes below, all <= 2 bytes
+   on every CPU relax_tight_sizes() admits. */
+static int relax_reg_form_size(size_t n, const char *s, const char *arg)
+{
+    #define MN(x) (n == strlen(x) && !strncmp(s, x, n))
+    char a[32], *c;
+    size_t i = 0;
+    while (arg[i] && arg[i] != '\n' && arg[i] != '\r' && arg[i] != ';'
+           && arg[i] != '\t' && arg[i] != ' ' && i + 1 < sizeof a) {
+        a[i] = arg[i]; i++;
+    }
+    a[i] = '\0';
+    c = strchr(a, ',');
+    size_t l1 = c ? (size_t)(c - a) : i;
+    const char *o2 = c ? c + 1 : NULL;
+    size_t l2 = o2 ? strlen(o2) : 0;
+    if (MN("ret") || MN("exx") || MN("rla") || MN("rra") || MN("rlca")
+        || MN("rrca") || MN("cpl") || MN("scf") || MN("ccf"))
+        return (i == 0) ? 2 : 0;
+    if ((MN("inc") || MN("dec")) && !c
+        && (relax_is_r8(a, l1) || relax_is_r16(a, l1)))
+        return 2;
+    if ((MN("push") || MN("pop")) && !c && relax_is_r16(a, l1)) return 2;
+    if (MN("ex") && c && ((!strncmp(a, "de,hl", 5) && i == 5)
+                          || (!strncmp(a, "af,af'", 6) && i == 6)))
+        return 2;
+    if (MN("ld") && c && relax_is_r8(a, l1) && relax_is_r8(o2, l2)) return 2;
+    if ((MN("add") || MN("adc") || MN("sub") || MN("sbc") || MN("and")
+         || MN("or") || MN("xor") || MN("cp"))) {
+        if (!c && relax_is_r8(a, l1)) return 2;
+        if (c && l1 == 1 && a[0] == 'a' && relax_is_r8(o2, l2)) return 2;
+        if (MN("add") && c && l1 == 2 && !strncmp(a, "hl", 2)
+            && relax_is_r16(o2, l2) && strncmp(o2, "af", 2)) return 2;
+    }
+    #undef MN
+    return 0;
+}
+
 /* Upper bound, in bytes, on what `l` assembles to on ANY target. Data
    directives return a blocker so no branch is measured across a table. */
 static int relax_line_size(const char *l)
@@ -1075,6 +1136,13 @@ static int relax_line_size(const char *l)
     const char *arg = e;
     while (*arg == '\t' || *arg == ' ') arg++;
     #define MN(x) (n == strlen(x) && !strncmp(s, x, n))
+    /* Plain register forms are at most 2 bytes. Rabbit 4000+ is left on the
+       loose bound (its extended ALU and SP-relative forms sit behind a prefix),
+       as are ez80 and kc160 in a function with an __asm block. */
+    if (relax_tight_sizes()) {
+        int t = relax_reg_form_size(n, s, arg);
+        if (t) return t;
+    }
     /* Index-register addressing: 6 (the z80 synthetic `ld rr,(ix+d)` pair). */
     if (strstr(arg, "(ix") || strstr(arg, "(iy")) return 6;
     /* Rabbit's 16-bit logical ops expand to 8. */
@@ -1217,6 +1285,10 @@ static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
             free(lines); rewind(src);
             while (fgets(buf, sizeof buf, src)) fputs(buf, out); return; }
     }
+    relax_fn_has_asm = 0;
+    for (int b = 0; f && b < f->n_bbs; b++)
+        for (int o = 0; o < f->bbs[b].n_ops; o++)
+            if (f->bbs[b].ops[o].kind == IR_ASM) relax_fn_has_asm = 1;
     int *size = malloc((size_t)(n > 0 ? n : 1) * sizeof(int));
     if (size) {
         for (int i = 0; i < n; i++) size[i] = relax_line_size(lines[i]);

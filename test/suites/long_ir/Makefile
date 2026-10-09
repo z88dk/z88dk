@@ -15,6 +15,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 
 # fnptr-dispatch thunks (l_jpix/l_jpiy), linked explicitly until they live in
 # the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
+all:	rabsub.bin rabsub_r2ka.bin rabsub_r4k.bin rabsub_asm.bin jrtight.bin jrtight_r2ka.bin jrtight_ez80.bin jrtight_kc160.bin jrtight_asm.bin
 all:	countborrow.bin countborrow_gbz80.bin
 all:	strremat.bin strremat_fp.bin strremat_8080.bin strremat_gbz80.bin
 all:	fnptrdead.bin fnptrdead_fp.bin fnptrdead_8080.bin fnptrdead_gbz80.bin
@@ -4115,3 +4116,49 @@ ivnu_z180.bin: $(SOURCES) ivnu.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+# Rabbit 2000/3000 have no `sub hl,de` (z80asm makes it a helper call).
+rabsub.bin: $(SOURCES) rabsub.c
+	$(compile_z80)
+	$(runtest_z80)
+
+rabsub_r2ka.bin: $(SOURCES) rabsub.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+rabsub_r4k.bin: $(SOURCES) rabsub.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+rabsub_asm.bin: rabsub.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -mr2ka -I$(FRAMEWORK_DIR) -S $< -o rabsub_r2ka.asm
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -mr4k -I$(FRAMEWORK_DIR) -S $< -o rabsub_r4k.asm
+	@test `grep -c 'sub[[:space:]]*hl,de' rabsub_r2ka.asm` -eq 0 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: sub hl,de on r2ka $(RESET)" ; exit 1; }
+	@test `grep -c 'sub[[:space:]]*hl,de' rabsub_r4k.asm` -ge 1 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: no native sub hl,de on r4k $(RESET)" ; exit 1; }
+	@rm -f rabsub_r2ka.asm rabsub_r4k.asm
+
+# Relaxation size model: exact on z80/r2ka, loose on ez80/kc160/r4k in a
+# function with an __asm block.
+jrtight.bin: $(SOURCES) jrtight.c
+	$(compile_z80)
+	$(runtest_z80)
+
+jrtight_r2ka.bin: $(SOURCES) jrtight.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+jrtight_ez80.bin: $(SOURCES) jrtight.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+jrtight_kc160.bin: $(SOURCES) jrtight.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+jrtight_asm.bin: jrtight.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -mz80 -I$(FRAMEWORK_DIR) -S $< -o jrtight_z80.asm
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -mr2ka -I$(FRAMEWORK_DIR) -S $< -o jrtight_r2ka.asm
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -mez80_z80 -I$(FRAMEWORK_DIR) -S $< -o jrtight_ez80.asm
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -mkc160 -I$(FRAMEWORK_DIR) -S $< -o jrtight_kc160.asm
+	@for c in z80 r2ka; do test `grep -c '^[[:space:]]*jr[[:space:]]*z,' jrtight_$$c.asm` -ge 1 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: branch not relaxed on $$c $(RESET)" ; exit 1; }; done
+	@for c in ez80 kc160; do test `grep -c '^[[:space:]]*jp[[:space:]]*z,' jrtight_$$c.asm` -ge 1 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: asm function relaxed on $$c $(RESET)" ; exit 1; }; done
+	@rm -f jrtight_z80.asm jrtight_r2ka.asm jrtight_ez80.asm jrtight_kc160.asm

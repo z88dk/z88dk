@@ -26,6 +26,8 @@ most 415 to 440 B over the console set); a precise array-escape analysis to
 win back what ADR 0112 costs (`startrek` fp, `m4doors` 2 to 4 %); the ADR 0113
 prototype.
 
+**Backlog: compare lowering.** More compare defects will turn up; add them here. Known: an `==`/`!=` of two words re-swaps the operands with a second `ex de,hl` (`ex de,hl; ld hl,(sp+n); ex de,hl; or a; sbc hl,de`; the order does not matter for Z, so the last `ex` is 1 B and 2 clocks wasted per compare; seen in queenbench `safe()` on r2ka).
+
 **Then: ptrbench, init_data's struct loop.** z80 `code_compiler`, from
 the objects, 4/10/2026: 80cc fp 1381 B / sp 1458 B against sdcc 1160 B and
 xcc -Os 1074 B (3/10: 1418 / 1523). Size only; 80cc is the fastest of the
@@ -261,6 +263,9 @@ Size across the corpus before implementing.
   8080 family and gbz80: `a += b` 58 -> 32 B Z80, 61 -> 25 B 8080, 67 -> 22 B
   gbz80 (0111). The differential fuzzer found about 37 miscompiles; arrays
   now always count as aliased (0112).
+- **Rabbit `sub hl,de` and the `jr` size model (ADR 0115).** r2ka/r3k no longer
+  emit the helper-call `sub hl,de`; register-only forms are sized exactly.
+  Left: share a second `return` epilogue (the merger claims a tail once).
 - **widthbench, byte clean-up (ADR 0114).** A byte op reading a widened byte
   reads the byte it came from; `mix_char` 596 -> 435 T (sp). Still 510 T
   against sdcc 351 in fp: the byte locals go to frame slots because BC is

@@ -5859,8 +5859,9 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
        (HL=minuend, BC=subtrahend) works — no swap. z80-family: `and a; sbc hl,bc`.
        808x/gbz80 (sbc hl,de is emulated): the same byte-wise subtract off C/B
        instead of E/D — into DE when that's the dst (mirrors the load_binop path
-       below). Rabbit has native `sub hl,de` but no BC form → falls through. */
-    if (op->src[1] >= 0 && bc_has(op->src[1]) && !IS_RABBIT()
+       below). Rabbit 4000+ has native `sub hl,de` (a helper call on r2k/r3k)
+       but no BC form → falls through. */
+    if (op->src[1] >= 0 && bc_has(op->src[1]) && !IS_RABBIT4K()
         && L.pending_spill_v < 0) {
         ss_note_cache_read(f, op->src[1]);
         load_to_hl(out, f, op->src[0]);       /* minuend → HL (preserves BC) */
@@ -5898,8 +5899,8 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
     }
     if (try_binop_ixd_fold(out, f, op, "sub\t", "sbc\ta,")) return 0;
     load_binop_operands(out, f, op);
-    if (IS_RABBIT()) {
-        emit(out, "sub\thl,de");        /* Rabbit native (r2k+), DE preserved */
+    if (IS_RABBIT4K()) {
+        emit(out, "sub\thl,de");        /* Rabbit 4000+ native, DE preserved */
     } else if ((IS_808x() || IS_GBZ80())) {
         /* gbz80/808x: `sbc hl,de` is emulated (push/pop x4 + helper).
            Subtract byte-wise; write straight into DE when that's the dst
