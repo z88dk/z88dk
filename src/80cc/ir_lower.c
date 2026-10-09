@@ -9054,6 +9054,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
            and slot sizing (which reads the now-narrowed widths). */
         int ivnarrow = ir_opt_narrow_iv(f);
         int narrow  = ir_opt_narrow_byte(f);
+        narrow += ir_opt_byte_cleanup(f);   /* identity masks; byte reads skip a widening */
         ir_opt_cmp_unsign(f);           /* drop the signed-compare sign tail */
         /* narrow_byte turns promoting CONV_SX|ZX operands into
            byte-identity copies; propagate them away (else they spill to a

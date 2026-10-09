@@ -805,6 +805,8 @@ static int emit_frame_byte_half_for_vreg(FILE *out, const Func *f, int v,
     return 0;
 }
 
+static void load_byte_to_a(FILE *out, const Func *f, int vreg_id);
+
 /* [frame-byte-trunc] Drop-in for `load_to_hl(v); ld a,h|l` where v's other
    half is not read again: the frame byte read above when it applies, else the
    original idiom. Not for a branch-fused compare: the loop body there usually
@@ -816,6 +818,15 @@ static void load_byte_half_to_a(FILE *out, const Func *f, int v, int hi)
         && !(g_hc.remat_def && v >= 0 && v < f->n_vregs && g_hc.remat_def[v])
         && emit_frame_byte_half_for_vreg(out, f, v, hi))
         return;
+    /* sp mode, low byte of a word that lives in the frame: read just that byte
+       through the slot address, as the byte path of an and/or does, instead of
+       loading the whole word and copying L. */
+    if (!hi && !fp_active(f) && !opt_disabled("frame-byte-trunc-sp")
+        && f->vregs[v].width == 2 && hl_load_takes_remat(f, v)
+        && !(g_hc.remat_def && v >= 0 && v < f->n_vregs && g_hc.remat_def[v])) {
+        load_byte_to_a(out, f, v);
+        return;
+    }
     /* A word resident in BC or DE: read the byte straight from its half, so HL
        (often a live pointer) is not clobbered by a copy of the whole word. */
     if (!opt_disabled("byte-half-direct") && f->vregs[v].width == 2

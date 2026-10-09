@@ -264,6 +264,10 @@ exists (ADR 0010).
 | `lhlx-deref` | no `ld hl,(de)` dereference on the CPUs that have it |
 | `lhlx-bc` | an 8085 word reload into BC stays a byte walk plus `ld hl,bc`, instead of LDSI + LHLX |
 | `byte-ret` | a constant byte return stays `ld a,N` / `ld l,a` instead of `ld l,N` |
+| `byte-mask-ident` | a byte `and 0xff`, `or 0` or `xor 0` is kept as an op instead of becoming a copy |
+| `byte-clean` | the byte clean-up after narrowing is skipped altogether |
+| `byte-ext-src` | a byte op reading a widened byte reads the widened word, not the byte it came from |
+| `frame-byte-trunc-sp` | in sp mode the low byte of a word in the frame is read by loading the whole word, as in fp mode before the byte read |
 | `lhlx-long` | no LDSI-based long load on 8085 |
 | `shlx-store` | no `ld (de),hl` store form |
 | `idx-fill` | an index home is filled with a load pair rather than one ez80 instruction |

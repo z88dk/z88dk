@@ -4223,6 +4223,72 @@ static OpKind cs_unsigned_of(OpKind k)
     }
 }
 
+
+/* ---- Byte clean-up after narrowing (ir_opt_byte_cleanup) ------------
+   Two things narrowing leaves behind, both exact:
+   - A byte `x & 0xff`, `x | 0` or `x ^ 0` (the mask of a wider expression
+     whose result was narrowed) is a copy.
+   - A byte-result op that reads a widened byte only reads its low byte, which
+     is the byte the widening came from. When CSE has merged the widening with
+     one that feeds word code, the op would otherwise read the widened word
+     back from its frame slot, forcing the word to be stored for nothing.
+     Read the original byte instead. The byte must have a single def, so it
+     still holds the value at this use; its live range grows to cover it. */
+static int bc_single_def(const int *ndef, int v) { return v >= 0 && ndef[v] == 1; }
+
+int ir_opt_byte_cleanup(Func *f)
+{
+    if (opt_disabled("byte-clean")) return 0;
+    int nv = f->n_vregs, changed = 0;
+    int *ndef = calloc((size_t)(nv > 0 ? nv : 1), sizeof *ndef);
+    const Op **def = calloc((size_t)(nv > 0 ? nv : 1), sizeof *def);
+    if (!ndef || !def) { free(ndef); free(def); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int t = 0; t < nd; t++)
+                if (d[t] >= 0 && d[t] < nv) { ndef[d[t]]++; def[d[t]] = o; }
+        }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->dst < 0 || o->dst >= nv || f->vregs[o->dst].width != 1) continue;
+            if (f->vregs[o->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            if (o->src[1] == -1 && o->src[0] >= 0
+                && ((o->kind == IR_AND && (o->imm & 0xff) == 0xff)
+                    || ((o->kind == IR_OR || o->kind == IR_XOR) && (o->imm & 0xff) == 0))
+                && !opt_disabled("byte-mask-ident")) {
+                /* a copy, not a CONV_TRUNC: a truncation feeding a store is
+                   fused into the store, which then forms the address before the
+                   byte and has to park it, where the byte stayed in A */
+                o->kind = IR_MOV;
+                o->imm = 0;
+                changed++;
+            }
+            /* ops whose low result byte depends only on the low operand bytes */
+            int low_only = o->kind == IR_ADD || o->kind == IR_SUB || o->kind == IR_AND
+                        || o->kind == IR_OR || o->kind == IR_XOR || o->kind == IR_MOV
+                        || o->kind == IR_CONV_TRUNC
+                        || (o->kind == IR_SHL && o->src[1] == -1);
+            if (!low_only || opt_disabled("byte-ext-src")) continue;
+            for (int s = 0; s < 2; s++) {
+                int w = o->src[s];
+                if (w < 0 || w >= nv || f->vregs[w].width < 2) continue;
+                if (!bc_single_def(ndef, w)) continue;
+                const Op *dw = def[w];
+                if (!dw || (dw->kind != IR_CONV_ZX && dw->kind != IR_CONV_SX)) continue;
+                int x = dw->src[0];
+                if (x < 0 || x >= nv || f->vregs[x].width != 1 || !bc_single_def(ndef, x)) continue;
+                if (f->vregs[x].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+                o->src[s] = x;
+                changed++;
+            }
+        }
+    free(ndef); free(def);
+    return changed;
+}
+
 /* ---- Signed compares that need no sign correction (ir_opt_cmp_unsign) ----
    A signed 16-bit compare lowers to `and a; sbc hl,de` plus SEVEN BYTES of pure
    sign correction — `ld a,h; jp po,L; xor 0x80; L: rla` — because the carry out

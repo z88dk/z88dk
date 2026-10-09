@@ -174,6 +174,7 @@ int ir_opt_prune_unreachable(Func *f);
  * ir_lower emits the 8-bit-in-A form. IR_NO_NARROW_BYTE opts out.
  * Returns the number of ops narrowed. */
 int ir_opt_narrow_byte(Func *f);
+int ir_opt_byte_cleanup(Func *f);
 
 /* [IR_CMPSIGN_PROBE] Inert: classify each signed compare by which
    non-negativity proof would let its 7-byte sign correction be dropped. */
