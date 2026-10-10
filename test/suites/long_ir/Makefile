@@ -5068,3 +5068,45 @@ minclamp_r4k.bin: $(SOURCES) minclamp.c
 minclamp_fp.bin: $(SOURCES) minclamp.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+all:	hlind.bin hlind_8080.bin hlind_gbz80.bin hlind_r2ka.bin hlind_ez80.bin hlind_8085.bin hlind_kc160.bin hlind_z180.bin hlind_r4k.bin hlind_fp.bin
+
+hlind.bin: $(SOURCES) hlind.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hlind_8080.bin: $(SOURCES) hlind.c
+	$(compile_8080)
+	$(runtest_8080)
+
+hlind_gbz80.bin: $(SOURCES) hlind.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+hlind_r2ka.bin: $(SOURCES) hlind.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+hlind_ez80.bin: $(SOURCES) hlind.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+hlind_8085.bin: $(SOURCES) hlind.c
+	$(compile_8085)
+	$(runtest_8085)
+
+hlind_kc160.bin: $(SOURCES) hlind.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+hlind_z180.bin: $(SOURCES) hlind.c
+	$(compile_z180)
+	$(runtest_z180)
+
+hlind_r4k.bin: $(SOURCES) hlind.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+hlind_fp.bin: $(SOURCES) hlind.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }

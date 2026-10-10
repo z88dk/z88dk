@@ -194,7 +194,7 @@
 ;; so keep the setup load there. Fires after a const/label store stops consuming
 ;; the value it left in HL (gbz80 absolute global stores).
 %title #285b2 drop dead ld hl before ld hl (-3b)
-%not %2 (hl)
+%not %2 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ld	hl,%1
 	ld	hl,%2
 =
@@ -314,7 +314,7 @@
 ;; E=h — the same DE:BC the swap+park yields — without touching A or HL. The
 ;; trailing `ld hl,%1` proves the swapped HL is dead. 8 insns -> 5.
 %title #285u swap_endian_32 + BC-park, swapped HL dead -> straight into DE:BC (-3 insns)
-%not %1 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ld	a,l
 	ld	l,d
 	ld	d,a
@@ -390,7 +390,7 @@
 	ld	d,e
 
 %title #285e push BC instead of recovered HL before ld hl (-2b, -8t)
-%not %1 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ld	hl,bc
 	push	de
 	push	hl
@@ -401,7 +401,7 @@
 	ld	hl,%1
 
 %title #285f dead HL recovery before push de;push bc;ld hl (-2b, -8t)
-%not %1 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ld	hl,bc
 	push	de
 	push	bc
@@ -463,7 +463,7 @@
 	ld	hl,(ix%2)
 
 %title #285m caller-save BC + arg push via HL → push bc twice (-2b, -8t)
-%not %1 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	push	bc
 	ld	hl,bc
 	push	hl
@@ -576,10 +576,21 @@
 ;; 27) which READS HL, so the relocated value would differ — excluded precisely
 ;; via %notSame rather than gating out all of ez80.
 %title #G6 word-load + ex de,hl -> straight into DE (HL reloaded next)
-%not %1 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ld	a,(hl+)
 	ld	h,(hl)
 	ld	l,a
+	ex	de,hl
+	ld	hl,%1
+=
+	ld	a,(hl+)
+	ld	d,(hl)
+	ld	e,a
+	ld	hl,%1
+
+%title #G6r Rabbit word-load at (hl+0) + ex de,hl -> byte walk straight into DE (HL reloaded next): same size, one clock less. The lowerer treats A as clobbered after the load, so the walk's A is safe
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
+	ld	hl,(hl+0)
 	ex	de,hl
 	ld	hl,%1
 =
@@ -645,7 +656,7 @@
 ;; be read directly into DE. This avoids the pair copy before the HL reload.
 %title #G8 IR gbz80 read TOS word directly into DE before an HL reload (-8T)
 %cpu gbz80
-%not %1 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	pop	hl
 	push	hl
 	ld	de,hl
@@ -675,8 +686,8 @@
 	ld	a,l
 
 %title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (de first). %not (hl): ez80's ld de,(hl)/ld hl,(hl) READ the reg, so there the ex is a live deref. %not hl / hl+N: `ld de,hl` copies the swapped HL
-%not %1 (hl) hl "hl[+][0-9]+"
-%not %2 (hl)
+%not %1 (hl) hl "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
+%not %2 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ex	de,hl
 	ld	de,%1
 	ld	hl,%2
@@ -685,8 +696,8 @@
 	ld	hl,%2
 
 %title #IR drop dead ex de,hl when both DE and HL are immediately reloaded. %not (hl): ez80's ld de,(hl)/ld hl,(hl) READ the reg, so there the ex is a live deref. %not %2 (de): 8085 LHLX `ld hl,(de)` reads DE, and here it runs BEFORE `ld de,%1` overwrites it — so the ex is the live thing that put the address there (the de-first variant above is safe, its ld de,%1 lands first)
-%not %1 (hl)
-%not %2 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
+%not %2 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 %not %2 (de) de
 	ex	de,hl
 	ld	hl,%2
@@ -696,7 +707,7 @@
 	ld	de,%1
 
 %title #IR const/sym straight to DE: ld hl,X;ex de,hl;ld hl,Y -> ld de,X;ld hl,Y. X is symbol(_x)/immediate(digit) ONLY (regex) — NOT (mem)/sp+N, whose ld de,(nn)/ld de,sp+N are absent on 808x/gbz80; the ex's HL output dies in the next ld hl. %not %2 (hl): ez80 `ld hl,(hl)` reads the HL the ex left
-%not %2 (hl)
+%not %2 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	%"ld	hl,([_0-9][_0-9a-zA-Z+]*)"1
 	ex	de,hl
 	ld	hl,%2
@@ -779,7 +790,7 @@
 ;; ld de,(sp+n) counterpart.
 ;; every CPU with the ld hl,(ix+d) macro also has ld de,(ix+d) (incl Rabbit)
 %title #DE-ix produce (ix) ld-hl value in DE not HL+ex when HL dead next (-1b, -4t)
-%not %2 (hl)
+%not %2 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ld	hl,(ix%1)
 	ex	de,hl
 	ld	hl,%2
@@ -792,7 +803,7 @@
 %notcpu vm1
 %notcpu 8085
 %notcpu gbz80
-%not %2 (hl)
+%not %2 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	%"ld	hl,\((_[A-Za-z0-9_+]*)\)"1
 	ex	de,hl
 	ld	hl,%2
@@ -801,7 +812,7 @@
 	ld	hl,%2
 
 %title #DE2 peek TOS into DE not HL+ex when HL dead next (-1b, -4t)
-%not %1 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	pop	hl
 	push	hl
 	ex	de,hl
@@ -812,7 +823,7 @@
 	ld	hl,%1
 
 %title #DE3 16-bit or/and/xor result into DE not HL+ex when HL dead next (-1b, -4t)
-%not %2 (hl)
+%not %2 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ld	a,l
 	%"or|and|xor"1	e
 	ld	l,a
@@ -998,7 +1009,7 @@
 ;; of the SAME value into HL is redundant (back-reference %1). %not excludes the
 ;; ez80 `ld hl,(hl)` deref (reads HL, could differ).
 %title #R4 drop redundant ld hl,K reload after a store that leaves HL intact (-3b)
-%not %1 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ld	hl,%1
 	ld	(%2),hl
 	ld	hl,%1
@@ -1095,7 +1106,7 @@
 ;; which the %not excludes.
 %title #SP2L chained ix-rel word store: reuse HL via inc, not a second lea (-4b)
 %eval 0 = %3 %1 2 + -
-%not %2 hl (hl) "hl[+][0-9]+"
+%not %2 hl (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	lea	hl,ix%1
 	ld	(hl),e
 	inc	hl
@@ -1123,7 +1134,7 @@
 ;; #GB2: BC->HL copy (ld hl,bc) before a FULL HL reload is dead (HL
 ;; overwritten before use; BC unchanged). %not %1 (hl): ez80 `ld hl,(hl)` READS HL.
 %title #GB2 drop dead ld hl,bc before a full HL reload (-2b)
-%not %1 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ld	hl,bc
 	ld	hl,%1
 =
@@ -1132,7 +1143,7 @@
 ;; #GB3: DE->HL variant of #GB2 (ld hl,de = HL=DE). The reverse ld de,hl is
 ;; NOT dead (DE holds the result) — excluded. %not %1 (hl) for ez80 ld hl,(hl).
 %title #GB3 drop dead ld hl,de before a full HL reload (-2b)
-%not %1 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ld	hl,de
 	ld	hl,%1
 =
@@ -1150,7 +1161,7 @@
 ;; #GB4: BC->HL copy whose only consumer is `push hl` (then HL reloaded, dead) —
 ;; push bc directly (push hl==push bc when HL=BC). push de is the DEHL high half.
 %title #GB4 push bc instead of bc->hl copy for a dead push hl (-2b)
-%not %1 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ld	hl,bc
 	push	de
 	push	hl
@@ -1165,9 +1176,9 @@
 ;; 8085 LDHI `ld de,hl+n` also reads HL — dropping the copy leaves DE = old_HL+n
 ;; (scanf %ld: ns->fmt became str+2).
 %title #GB5 drop dead ld hl,de before ld de,X;ld hl,Y (-2b)
-%not %1 (hl)
-%not %1 "hl[+][0-9]+"
-%not %2 (hl)
+%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
+%not %1 "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
+%not %2 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
 	ld	hl,de
 	ld	de,%1
 	ld	hl,%2

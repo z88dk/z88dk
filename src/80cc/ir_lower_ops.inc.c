@@ -3525,6 +3525,21 @@ static int lea_all_uses_indexed(const Func *f, const Op *lea)
     return seen > 0;
 }
 
+/* A word read at offset 0 whose pointer is stored through again soon after
+   (`a[i] = f(a[i])`) is the shape the read-modify-write rewrites match as the
+   byte walk, so leave it as the walk. */
+static int rab_rmw_walk(const Op *op, int mem_off)
+{
+    if (mem_off != 0 || !cur_bb || op->mem.base < 0) return 0;
+    for (int k = cur_op_idx + 1; k < cur_bb->n_ops && k < cur_op_idx + 16; k++) {
+        const Op *o = &cur_bb->ops[k];
+        if (o->kind == IR_ST_MEM && o->mem.kind == IR_MEM_VREG
+            && o->mem.base == op->mem.base && o->mem.offset == 0)
+            return 1;
+    }
+    return 0;
+}
+
 static int gen_ld_mem(FILE *out, Func *f, const Op *op)
 {
     /* Port read. Result is a zero-extended byte in HL, matching the width-2
@@ -4001,6 +4016,16 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             commit_hl_result(out, f, op->dst);
             return 0;
         }
+        /* Rabbit reads a word at HL+d into HL in one instruction, leaving A and
+           DE alone. d is a signed byte. */
+        int rab_ind = IS_RABBIT() && dst_w == 2 && !lhlx_deref
+            && !opt_disabled("rabbit-hl-ind")
+            && mem_off >= -128 && mem_off <= 127
+            && (!vreg_in_pr_de(f, op->dst) || mem_off != 0)
+            && !rab_rmw_walk(op, mem_off);
+        if (rab_ind) {
+            /* the load below needs no address adjustment */
+        } else
         /* Word DE-home active: reach the field offset DE-clean (DE = home
            accumulator, BC = stepped base, neither free as scratch). A is
            free (the load below clobbers it). Any offset (A-add is
@@ -4061,7 +4086,11 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             /* PR_DE dst: same byte sequence but writes E/D, no
                spill. HL becomes scratch (slot+1, untracked). */
             if (vreg_in_pr_de(f, op->dst)) {
-                if (IS_EZ80()) {
+                if (rab_ind) {
+                    emit(out, "ld\thl,(hl%+d)", mem_off);
+                    emit_ex_de_hl(out);          /* DE = the word */
+                    invalidate_a_cache();
+                } else if (IS_EZ80()) {
                     emit(out, "ld\tde,(hl)");   /* ez80: DE = *HL */
                 } else {
                     emit(out, "ld\ta,(hl+)");
@@ -4072,7 +4101,12 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 cache_de(op->dst);
                 return 0;
             }
-            if (IS_EZ80()) {
+            if (rab_ind) {
+                emit(out, "ld\thl,(hl%+d)", mem_off);
+                /* A is untouched, but a copt rule may turn this into the byte
+                   walk, which is not. */
+                invalidate_a_cache();
+            } else if (IS_EZ80()) {
                 emit(out, "ld\thl,(hl)");        /* ez80: HL = *HL */
             } else {
                 emit(out, "ld\ta,(hl+)");
