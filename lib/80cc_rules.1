@@ -713,6 +713,13 @@
 	ld	de,%1
 	ld	hl,%2
 
+%title #IR no park around a symbol/immediate DE load: push hl;ld de,X;pop hl -> ld de,X (-2b). Symbol/immediate X only (regex): ld de,X reads neither HL nor SP
+	push	hl
+	%"ld	de,([_0-9][_0-9a-zA-Z+]*)"1
+	pop	hl
+=
+	ld	de,%1
+
 %title #290 post-increment: dec instead of reloading the pre-inc value saved in a frame slot (-2b)
 	ld	(ix%1),hl
 	inc	hl
