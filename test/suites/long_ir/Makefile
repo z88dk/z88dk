@@ -5026,3 +5026,45 @@ stkbase_asm.bin: stkbase.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -I$(FRAMEWORK_DIR) -S $< -o stkbase.asm
 	@test `grep -c 'ld[[:space:]]*(hl),c' stkbase.asm` -ge 1 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: the byte store is not ld (hl),c $(RESET)" ; exit 1; }
 	@rm -f stkbase.asm
+
+all:	minclamp.bin minclamp_8080.bin minclamp_gbz80.bin minclamp_r2ka.bin minclamp_ez80.bin minclamp_8085.bin minclamp_kc160.bin minclamp_z180.bin minclamp_r4k.bin minclamp_fp.bin
+
+minclamp.bin: $(SOURCES) minclamp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+minclamp_8080.bin: $(SOURCES) minclamp.c
+	$(compile_8080)
+	$(runtest_8080)
+
+minclamp_gbz80.bin: $(SOURCES) minclamp.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+minclamp_r2ka.bin: $(SOURCES) minclamp.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+minclamp_ez80.bin: $(SOURCES) minclamp.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+minclamp_8085.bin: $(SOURCES) minclamp.c
+	$(compile_8085)
+	$(runtest_8085)
+
+minclamp_kc160.bin: $(SOURCES) minclamp.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+minclamp_z180.bin: $(SOURCES) minclamp.c
+	$(compile_z180)
+	$(runtest_z180)
+
+minclamp_r4k.bin: $(SOURCES) minclamp.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+minclamp_fp.bin: $(SOURCES) minclamp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }

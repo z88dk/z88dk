@@ -207,7 +207,15 @@ static int gen_mov(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (dst_w == 4) {
-        /* Long slot-to-slot copy. */
+        /* Long slot-to-slot copy. Slot sharing makes it a no-op. */
+        if (fp_active(f) && op->src[0] != op->dst && !dehl_has(op->src[0]) && !hl_has(op->src[0])
+            && !vreg_is_remat(f, op->src[0])
+            && ir_home_assigned(f, op->src[0]) == IR_PR_SPILL
+            && ir_home_assigned(f, op->dst) == IR_PR_SPILL
+            && f->vregs[op->src[0]].width == 4
+            && slot_off(f, op->src[0]) >= 0
+            && slot_off(f, op->src[0]) == slot_off(f, op->dst))
+            return 0;
         load_to_dehl(out, f, op->src[0]);
         store_dehl_finalize(out, f, op->dst);
         return 0;
@@ -2181,7 +2189,18 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (src_w == 4 && dst_w == 2) {
-        /* Long → int: just take the low half (HL of DEHL). */
+        /* Long → int: just take the low half (HL of DEHL). A frame-resident
+           long not held in registers is read as its low word only. */
+        if (fp_active(f) && !dehl_has(op->src[0]) && !hl_has(op->src[0])
+            && ir_home_assigned(f, op->src[0]) == IR_PR_SPILL
+            && !vreg_is_remat(f, op->src[0])
+            && !fp_tos_slot(f, op->src[0])
+            && fp_offset_fits(slot_ix_off(f, op->src[0]))) {
+            pending_spill_resolve();
+            ss_note_reload(f, op->src[0]);
+            emit(out, "ld\thl,(%s%+d)", frame_reg(), slot_ix_off(f, op->src[0]));
+            invalidate_hl_cache();
+        } else
         load_to_dehl(out, f, op->src[0]);
         /* [trunc-res] HL holds the result — say so. The old form spilled it
            and then invalidated the cache, so the consumer one op later reloaded

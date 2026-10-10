@@ -7141,7 +7141,7 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
            default) char, the common text-scan form. */
         else if (!lhs->type->isunsigned
                  && (k == IR_CMP_EQ || k == IR_CMP_NE)
-                 && C >= 0 && C <= 127)
+                 && C >= -128 && C <= 127)
             keep_byte_cmp = 1;
         /* Signed char relational (`c < ' '`, `c >= '0'`): kept a byte and lowered
            with the +128 bias (`xor 0x80; cp K^0x80` → unsigned cp) instead of
@@ -7237,6 +7237,11 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
             }
             imm = eff + 1;
         }
+        /* A negative constant compared for equality with a signed byte is
+           its byte pattern. */
+        if (keep_byte_cmp && width == 1 && imm < 0
+            && (k == IR_CMP_EQ || k == IR_CMP_NE))
+            imm &= 0xff;
         int dst = get_dest_vreg(b, hint, dst_w);
         Op *op = ir_op_emit(cur_bb(b), k);
         op->dst    = dst;
