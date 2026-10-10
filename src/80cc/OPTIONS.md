@@ -129,6 +129,7 @@ exists (ADR 0010).
 | `prop-over-call` | a call forgets every propagated local constant, not only those whose address escaped |
 | `byte-const-smallc` | a constant byte passed only to stacked smallc calls keeps a frame slot and is loaded through A |
 | `sx-arg` | a signed char argument to an int parameter is zero-extended, not sign-extended |
+| `stack-spill-base` | an array-element address is parked on the stack around the byte truncation of the value stored through it |
 | `sub-as-add` | a word minus a constant is subtracted, not added as the negated constant |
 | `ret-cc-bc` | a conditional `ret` is a reader of BC, so a park before it is kept |
 | `long-add-carry` | a long add of a constant that fits 16 bits (or a small negative) goes through `ex de,hl; ld bc,0; adc hl,bc; ex de,hl` instead of a skipped `inc de` or `dec de` |
@@ -136,6 +137,7 @@ exists (ADR 0010).
 | `long-cmp-ixd` | a long ordered compare in frame-pointer mode stages both operands through the stack instead of comparing against the right-hand slot a byte at a time |
 | `add-hl-de` | a word add with one operand in HL and the other in DE goes through BC when one of them also has a copy there |
 | `printf-puts` | a literal-only `printf` statement stays a `printf` call: no `puts` rewrite and no merging of adjacent ones |
+| `printf-puts-scan` | a literal-only `printf` becomes `puts` even in a file that also calls `printf` with arguments (which pays for `puts` on top of `printf`) |
 | `lea-frame-prologue` | ez80 fp-mode frame allocation uses `ld hl,-N; add hl,sp` instead of an IX-relative `lea` |
 | `bc-evict` | a BC tenant is never displaced by a better candidate |
 | `bc-per-cand` | BC cost is scored per class, not per candidate |

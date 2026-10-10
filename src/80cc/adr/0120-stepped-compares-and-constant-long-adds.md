@@ -69,3 +69,8 @@ Test: `argpop.c`.
 - `sx-arg`: a signed char argument to an int parameter or a variadic slot is sign-extended. It was zero-extended (`printf("%d", (signed char)-3)` printed 253).
 
 Test: `constcall.c`.
+
+- `stack-spill-base`: an array-element address is no longer parked on the stack around the byte truncation of the value stored through it. The park blocked the `ld (hl),c` store and cost `m4memory` 30-40% in ticks. A wider rule (any address used by the next load or store) made `rle` 44 B larger and was dropped.
+- `printf-puts-scan`: a literal-only `printf` becomes `puts` only when the file has no other `printf`-family call, or already calls `puts`. `puts` is about 65 B of library code, and the conversion saves about 3 B per call, so a file that links `printf` anyway pays for it (`md5` +67 B).
+
+Tests: `stkbase.c`, `printfonly.c`, `printfmixed.c`.

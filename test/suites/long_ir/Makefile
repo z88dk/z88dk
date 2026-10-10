@@ -23,7 +23,7 @@ all:	bigframe.bin bigframe_fp.bin bigframe_8080.bin bigframe_r2ka.bin bigframe_e
 all:	longasr.bin longasr_8080.bin longasr_gbz80.bin longasr_r2ka.bin longasr_ez80.bin longasr_8085.bin longasr_kc160.bin longasr_z180.bin longasr_r4k.bin longasr_fp.bin
 all:	crcloop.bin crcloop_8080.bin crcloop_gbz80.bin crcloop_r2ka.bin crcloop_ez80.bin crcloop_8085.bin crcloop_kc160.bin crcloop_z180.bin crcloop_r4k.bin crcloop_fp.bin
 all:	zxfold.bin zxfold_8080.bin zxfold_gbz80.bin zxfold_r2ka.bin zxfold_ez80.bin zxfold_8085.bin zxfold_kc160.bin zxfold_z180.bin zxfold_r4k.bin zxfold_fp.bin
-all:	printfputs.bin printfputs_asm.bin
+all:	printfputs.bin printfputs_asm.bin printfonly_asm.bin printfmixed_asm.bin
 all:	bytestore.bin bytestore_8080.bin bytestore_gbz80.bin bytestore_r2ka.bin bytestore_ez80.bin bytestore_8085.bin bytestore_kc160.bin bytestore_z180.bin bytestore_r4k.bin bytestore_fp.bin
 all:	longcmp.bin longcmp_8080.bin longcmp_gbz80.bin longcmp_r2ka.bin longcmp_ez80.bin longcmp_8085.bin longcmp_kc160.bin longcmp_z180.bin longcmp_r4k.bin longcmp_fp.bin
 all:	longaddk.bin longaddk_8080.bin longaddk_gbz80.bin longaddk_r2ka.bin longaddk_ez80.bin longaddk_8085.bin longaddk_kc160.bin longaddk_z180.bin longaddk_r4k.bin longaddk_fp.bin
@@ -32,6 +32,7 @@ all:	bytemask.bin bytemask_8080.bin bytemask_gbz80.bin bytemask_r2ka.bin bytemas
 all:	cmpminus1.bin cmpminus1_8080.bin cmpminus1_gbz80.bin cmpminus1_r2ka.bin cmpminus1_ez80.bin cmpminus1_8085.bin cmpminus1_kc160.bin cmpminus1_z180.bin cmpminus1_r4k.bin cmpminus1_fp.bin
 all:	argpop.bin argpop_8080.bin argpop_gbz80.bin argpop_r2ka.bin argpop_ez80.bin argpop_8085.bin argpop_kc160.bin argpop_z180.bin argpop_r4k.bin argpop_fp.bin
 all:	constcall.bin constcall_8080.bin constcall_gbz80.bin constcall_r2ka.bin constcall_ez80.bin constcall_8085.bin constcall_kc160.bin constcall_z180.bin constcall_r4k.bin constcall_fp.bin
+all:	stkbase_asm.bin stkbase.bin stkbase_8080.bin stkbase_gbz80.bin stkbase_r2ka.bin stkbase_ez80.bin stkbase_8085.bin stkbase_kc160.bin stkbase_z180.bin stkbase_r4k.bin stkbase_fp.bin
 all:	globaladd.bin globaladd_8080.bin globaladd_gbz80.bin globaladd_r2ka.bin globaladd_ez80.bin globaladd_8085.bin globaladd_kc160.bin globaladd_z180.bin globaladd_r4k.bin globaladd_fp.bin
 all:	mulconst.bin mulconst_8080.bin mulconst_gbz80.bin mulconst_r2ka.bin mulconst_ez80.bin mulconst_8085.bin mulconst_kc160.bin mulconst_z180.bin mulconst_r4k.bin mulconst_fp.bin
 all:	condvalue.bin condvalue_8080.bin condvalue_gbz80.bin condvalue_r2ka.bin condvalue_ez80.bin condvalue_8085.bin condvalue_kc160.bin condvalue_z180.bin condvalue_r4k.bin condvalue_fp.bin
@@ -4717,6 +4718,46 @@ constcall_fp.bin: $(SOURCES) constcall.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+stkbase.bin: $(SOURCES) stkbase.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+stkbase_8080.bin: $(SOURCES) stkbase.c
+	$(compile_8080)
+	$(runtest_8080)
+
+stkbase_gbz80.bin: $(SOURCES) stkbase.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+stkbase_r2ka.bin: $(SOURCES) stkbase.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+stkbase_ez80.bin: $(SOURCES) stkbase.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+stkbase_8085.bin: $(SOURCES) stkbase.c
+	$(compile_8085)
+	$(runtest_8085)
+
+stkbase_kc160.bin: $(SOURCES) stkbase.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+stkbase_z180.bin: $(SOURCES) stkbase.c
+	$(compile_z180)
+	$(runtest_z180)
+
+stkbase_r4k.bin: $(SOURCES) stkbase.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+stkbase_fp.bin: $(SOURCES) stkbase.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 globaladd.bin: $(SOURCES) globaladd.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
@@ -4968,3 +5009,20 @@ printfputs_asm.bin: printfputs.c
 	@test `grep -c 'call[[:space:]]*puts' printfputs.asm` -ge 4 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: no puts calls $(RESET)" ; exit 1; }
 	@test `grep -c 'call[[:space:]]*printf' printfputs.asm` -le 14 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: printf calls not merged $(RESET)" ; exit 1; }
 	@rm -f printfputs.asm
+
+# A file whose only printf calls are literal-only gets puts; one that also prints with arguments keeps printf.
+printfonly_asm.bin: printfonly.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -I$(FRAMEWORK_DIR) -S $< -o printfonly.asm
+	@test `grep -c 'call[[:space:]]*puts' printfonly.asm` -ge 1 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: no puts call $(RESET)" ; exit 1; }
+	@test `grep -c 'call[[:space:]]*printf' printfonly.asm` -eq 0 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: printf calls remain $(RESET)" ; exit 1; }
+	@rm -f printfonly.asm
+
+printfmixed_asm.bin: printfmixed.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -I$(FRAMEWORK_DIR) -S $< -o printfmixed.asm
+	@test `grep -c 'call[[:space:]]*puts' printfmixed.asm` -eq 0 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: puts used with printf in the file $(RESET)" ; exit 1; }
+	@rm -f printfmixed.asm
+
+stkbase_asm.bin: stkbase.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -I$(FRAMEWORK_DIR) -S $< -o stkbase.asm
+	@test `grep -c 'ld[[:space:]]*(hl),c' stkbase.asm` -ge 1 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: the byte store is not ld (hl),c $(RESET)" ; exit 1; }
+	@rm -f stkbase.asm

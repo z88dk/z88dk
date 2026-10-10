@@ -8,6 +8,7 @@
  */
 
 #include "ccdefs.h"
+#include <ctype.h>
 
 static void txt_note(struct nodepair *pair, int before);
 
@@ -246,6 +247,104 @@ struct nodepair *statement(void)
 }
 
 
+/* Whether a literal-only printf may become puts. puts costs library bytes of
+   its own, so it pays only when the translation unit has no other use of the
+   printf engine (or already calls puts). A prescan of the preprocessed text
+   decides; when the text cannot be read (a pipe) the fold stays on. */
+static int txt_puts_allowed = 1;
+
+static int txt_is_call_ctx(int prev, const char *pw, size_t pwl)
+{
+    if (prev == 0) return 1;
+    if (strchr(";{}):,=(?!&|", prev)) return 1;
+    return pwl && ((pwl == 4 && !strncmp(pw, "else", 4))
+                   || (pwl == 2 && !strncmp(pw, "do", 2))
+                   || (pwl == 6 && !strncmp(pw, "return", 6)));
+}
+
+void txt_prescan(FILE *fp)
+{
+    txt_puts_allowed = 1;
+    if (!fp || opt_disabled("printf-puts-scan")) return;
+    long pos = ftell(fp);
+    if (pos < 0 || fseek(fp, 0, SEEK_END) != 0) return;
+    long size = ftell(fp);
+    if (size <= 0 || size > (16L << 20) || fseek(fp, 0, SEEK_SET) != 0) {
+        fseek(fp, pos, SEEK_SET);
+        return;
+    }
+    char *buf = malloc((size_t)size + 1);
+    size_t got = buf ? fread(buf, 1, (size_t)size, fp) : 0;
+    fseek(fp, pos, SEEK_SET);
+    if (!buf) return;
+    buf[got] = 0;
+    int complex = 0, has_puts = 0, prev = 0, bol = 1;
+    char pw[48]; size_t pwl = 0;
+    for (size_t i = 0; i < got; i++) {
+        unsigned char c = (unsigned char)buf[i];
+        if (c == '\n') { bol = 1; continue; }
+        if (c == ' ' || c == '\t' || c == '\r') continue;
+        if (bol && c == '#') {                 /* line marker / pragma */
+            while (i < got && buf[i] != '\n') i++;
+            bol = 1;
+            continue;
+        }
+        bol = 0;
+        if (c == '"' || c == '\'') {
+            char q = (char)c;
+            for (i++; i < got && buf[i] != q && buf[i] != '\n'; i++)
+                if (buf[i] == '\\') i++;
+            prev = q; pwl = 0;
+            continue;
+        }
+        if (isalpha(c) || c == '_') {
+            size_t b = i;
+            while (i < got && (isalnum((unsigned char)buf[i]) || buf[i] == '_')) i++;
+            size_t len = i - b;
+            i--;
+            static const char *fam[] = { "printf", "fprintf", "sprintf", "snprintf",
+                "vprintf", "vfprintf", "vsprintf", "vsnprintf", NULL };
+            int is_puts = len == 4 && !strncmp(buf + b, "puts", 4);
+            int is_fam = 0;
+            for (int k = 0; fam[k]; k++)
+                if (strlen(fam[k]) == len && !strncmp(buf + b, fam[k], len)) is_fam = 1;
+            if (is_fam || is_puts) {
+                size_t j = i + 1;
+                while (j < got && isspace((unsigned char)buf[j])) j++;
+                if (j < got && buf[j] == '(' && txt_is_call_ctx(prev, pw, pwl)) {
+                    if (is_puts) has_puts = 1;
+                    else if (len != 6) complex = 1;       /* not plain printf */
+                    else {
+                        j++;
+                        while (j < got && isspace((unsigned char)buf[j])) j++;
+                        int lit_only = 0;
+                        if (j < got && buf[j] == '"') {
+                            int pct = 0;
+                            while (j < got && buf[j] == '"') {
+                                for (j++; j < got && buf[j] != '"' && buf[j] != '\n'; j++) {
+                                    if (buf[j] == '\\') j++;
+                                    else if (buf[j] == '%') pct = 1;
+                                }
+                                j++;
+                                while (j < got && isspace((unsigned char)buf[j])) j++;
+                            }
+                            lit_only = !pct && j < got && buf[j] == ')';
+                        }
+                        if (!lit_only) complex = 1;
+                    }
+                }
+            }
+            pwl = len < sizeof pw ? len : 0;
+            if (pwl) memcpy(pw, buf + b, pwl);
+            prev = 'a';
+            continue;
+        }
+        prev = c; pwl = 0;
+    }
+    free(buf);
+    txt_puts_allowed = !complex || has_puts;
+}
+
 /* ---- literal-only printf / puts statements ----
    `printf("a\n");` becomes `puts("a");`, and adjacent literal-only calls merge
    into one. Only a call whose result is unused (an expression statement), whose
@@ -306,7 +405,7 @@ static int txt_text(Node *stmt, char *buf, int *start)
 static int txt_build(const char *full, Node *stmt, TxtStmt *st)
 {
     int len = (int)strlen(full);
-    int isputs = len > 0 && full[len - 1] == '\n';
+    int isputs = len > 0 && full[len - 1] == '\n' && txt_puts_allowed;
     SYMBOL *fn = findglb(isputs ? "puts" : "printf");
     if (!fn || !fn->ctype || fn->ctype->kind != KIND_FUNC) return 0;
     unsigned char tmp[TXT_MAX * 2 + 2];
@@ -343,7 +442,7 @@ static void txt_note(struct nodepair *pair, int before)
     int len = (int)strlen(buf);
     TxtStmt st = { pair->node, start, 0, before, litptr };
     st.fresh = start == before && litptr == before + len + 1 - isputs;
-    if (!isputs && len > 0 && buf[len - 1] == '\n' && st.fresh) {
+    if (!isputs && txt_puts_allowed && len > 0 && buf[len - 1] == '\n' && st.fresh) {
         litptr = before;                       /* retract the literal, rebuild */
         TxtStmt ns;
         if (!txt_build(buf, pair->node, &ns)) { litptr = st.after; return; }

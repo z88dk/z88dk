@@ -3897,6 +3897,18 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
             if (uk == IR_ADD || uk == IR_AND || uk == IR_OR || uk == IR_XOR)
                 continue;
         }
+        /* The same with a byte truncation between (`*p = (char)i`): the byte
+           is read from its register through A, leaving HL alone. */
+        if (hi == lo + 2 && !opt_disabled("stack-spill-base")) {
+            const Op *mid = &bb->ops[lo + 1], *uo = &bb->ops[hi];
+            if (mid->kind == IR_CONV_TRUNC && mid->dst >= 0
+                && f->vregs[mid->dst].width == 1
+                && mid->src[0] >= 0 && mid->src[0] != v
+                && (uo->kind == IR_ST_MEM || uo->kind == IR_LD_MEM)
+                && uo->mem.kind == IR_MEM_VREG && uo->mem.base == v
+                && uo->src[0] == mid->dst)
+                continue;
+        }
         /* The same with one global word load between: `a += g` loads g with
            `ld de,(g)`, which leaves HL (where v rides) alone. */
         if (hi == lo + 2 && !IS_808x() && !IS_GBZ80()
