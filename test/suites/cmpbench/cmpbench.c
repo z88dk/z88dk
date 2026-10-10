@@ -1,20 +1,6 @@
 /*
  * cmpbench.c — relational operators whose result is a value.
  *
- * Two miscompiles turned up while cutting this bench down. The source
- * stays off both of them.
- *
- * sccz80 deletes an unsigned char compare against (unsigned char)(0xFF + 1).
- * The sum is 256. The range check uses -128..255 for a char and ignores
- * the cast to 0, warns "expression is always true", and replaces the
- * compare with the constant 1. A zero byte then compares unequal. The
- * host and 80cc return 0 for that case. Each k + 1 below fits in a byte.
- *
- * Z80 80cc returns 4 instead of 3 for a=-8, b=-7, c=0 when the six
- * signed relations sit in the same function as the && chains. The stack
- * frame and -fframe-pointer both do it. 8080 and 8085 80cc return 3,
- * and so does sccz80. Those relations are in order().
- *
  * predbench uses a compare as control flow (if, &&, ?:) and can leave the
  * result in the flags. The expressions here are values. Each one is added
  * into an accumulator. That is the shape of a long run of
@@ -36,6 +22,9 @@
  * One copy inside a loop hides that cost. Each ARM below is its own
  * expression, and the constants differ so the copies stay separate.
  * The checksum checks the value. Short-circuit behaviour is predbench.
+ *
+ * The signed relations sit in the same function as the && chains.
+ * One arm compares an unsigned char with (unsigned char)(0xFF + 1).
  */
 #include <stdlib.h>
 #ifndef HOST_VERIFY
@@ -48,17 +37,16 @@
 
 static unsigned char cell[32];
 
-/* n, rc and p belong to arms(). k + 1 must fit in a byte: sccz80 folds
-   `unsigned char != 256` to true and drops the compare. */
+/* n, rc and p are the locals in value_cmp. */
 #define ARM(k, ia, ib) \
     n += (rc == (unsigned)(k) && p[ia] == (unsigned char)(k) \
           && p[ib] != (unsigned char)((k) + 1))
 
-static unsigned int arms(unsigned char *p, unsigned int rc)
+static unsigned int value_cmp(unsigned char *p, unsigned int rc, int a, int b, int c)
 {
     unsigned int n = 0;
 
-    ARM(0x00FE,  0,  7);
+    ARM(0x00FF,  0,  7);
     ARM(0x0000,  3, 12);
     ARM(0x0001,  6, 17);
     ARM(0x0080,  9, 22);
@@ -74,14 +62,6 @@ static unsigned int arms(unsigned char *p, unsigned int rc)
     ARM(0x0020,  7,  8);
     ARM(0x007F, 10, 13);
     ARM(0x000D, 13, 18);
-    return n & 0xffffu;
-}
-
-/* Signed relations stay in their own function. Z80 80cc returns 4 instead
-   of 3 for a=-8, b=-7, c=0 when these six lines share a function with arms. */
-static unsigned int order(int a, int b, int c)
-{
-    unsigned int n = 0;
 
     n += (a < b);
     n += (a > c);
@@ -105,7 +85,7 @@ static unsigned int cmp_compute(void)
             int a = (int)(s & 15) - 8;
             int b = (int)((s >> 2) & 15) - 7;
             int c = (int)((s >> 4) & 7);
-            chk = (chk + arms(cell, s) + order(a, b, c)) & 0xffffu;
+            chk = (chk + value_cmp(cell, s, a, b, c)) & 0xffffu;
         }
     }
     return chk;
