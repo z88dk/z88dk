@@ -116,8 +116,7 @@
 	call	l_long_aslo
 	pop	bc
 	call	l_plong
-	bool	hl
-	rr	hl
+	ld	hl,0	;const
 	add	sp,4
 	ret
 
