@@ -174,6 +174,7 @@ int ir_opt_prune_unreachable(Func *f);
  * ir_lower emits the 8-bit-in-A form. IR_NO_NARROW_BYTE opts out.
  * Returns the number of ops narrowed. */
 int ir_opt_narrow_byte(Func *f);
+int ir_opt_byte_cleanup(Func *f);
 
 /* [IR_CMPSIGN_PROBE] Inert: classify each signed compare by which
    non-negativity proof would let its 7-byte sign correction be dropped. */
@@ -188,6 +189,8 @@ int ir_opt_cmp_unsign(Func *f);
  * byte inc/dec step, 1-byte slot, int uses auto-widen. IR_NO_IV_NARROW opts
  * out. Returns the number of counters narrowed. */
 int ir_opt_narrow_iv(Func *f);
+int ir_opt_step_cmp(Func *f);
+int ir_opt_const_local(Func *f);
 
 /* Local (per-BB) copy propagation: rewrites src operands reading an
  * identity copy (MOV / same-width CONV_SX|ZX) to read the copy's source,

@@ -805,6 +805,8 @@ static int emit_frame_byte_half_for_vreg(FILE *out, const Func *f, int v,
     return 0;
 }
 
+static void load_byte_to_a(FILE *out, const Func *f, int vreg_id);
+
 /* [frame-byte-trunc] Drop-in for `load_to_hl(v); ld a,h|l` where v's other
    half is not read again: the frame byte read above when it applies, else the
    original idiom. Not for a branch-fused compare: the loop body there usually
@@ -816,6 +818,15 @@ static void load_byte_half_to_a(FILE *out, const Func *f, int v, int hi)
         && !(g_hc.remat_def && v >= 0 && v < f->n_vregs && g_hc.remat_def[v])
         && emit_frame_byte_half_for_vreg(out, f, v, hi))
         return;
+    /* sp mode, low byte of a word that lives in the frame: read just that byte
+       through the slot address, as the byte path of an and/or does, instead of
+       loading the whole word and copying L. */
+    if (!hi && !fp_active(f) && !opt_disabled("frame-byte-trunc-sp")
+        && f->vregs[v].width == 2 && hl_load_takes_remat(f, v)
+        && !(g_hc.remat_def && v >= 0 && v < f->n_vregs && g_hc.remat_def[v])) {
+        load_byte_to_a(out, f, v);
+        return;
+    }
     /* A word resident in BC or DE: read the byte straight from its half, so HL
        (often a live pointer) is not clobbered by a copy of the whole word. */
     if (!opt_disabled("byte-half-direct") && f->vregs[v].width == 2
@@ -1711,14 +1722,60 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
    [dead-store] write context (save/restore — nests via pending_spill_resolve)
    so every slot_off it makes counts as a write, not a read. */
 static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id);
+/* Store the byte held in register `reg` (l, e, c ...) as vreg's value. Where the
+   frame slot is a plain (ix+d) the store is `ld (ix+d),reg` and A is never
+   touched; every other path loads A first and goes through store_a_byte. */
+static const char *g_store_src;
+static void store_a_byte(FILE *out, const Func *f, int vreg_id);
+static void store_byte_from_reg(FILE *out, const Func *f, int vreg_id,
+                                const char *reg)
+{
+    g_store_src = reg;
+    store_a_byte(out, f, vreg_id);
+    g_store_src = NULL;
+}
 static void store_a_byte(FILE *out, const Func *f, int vreg_id)
 {
     int save = slot_write_ctx; slot_write_ctx = 1;
     store_a_byte_impl(out, f, vreg_id);
     slot_write_ctx = save;
 }
+/* Does the op right after the current one read v? Then A should keep it. */
+static int store_next_op_reads(const Func *f, int v)
+{
+    (void)f;
+    if (!cur_bb || cur_op_idx + 1 >= cur_bb->n_ops) return 0;
+    int uses[16];
+    int nu = ir_op_uses(&cur_bb->ops[cur_op_idx + 1], uses,
+                        (int)(sizeof uses / sizeof uses[0]));
+    for (int i = 0; i < nu; i++) if (uses[i] == v) return 1;
+    return 0;
+}
+
 static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id)
 {
+    const char *sreg = g_store_src;
+    g_store_src = NULL;
+    if (sreg) {
+        /* register source: only the plain frame-slot store avoids A */
+        const VReg *sv = &f->vregs[vreg_id];
+        if (!opt_disabled("byte-store-reg") && fp_active(f) && !L.cur_frameless
+            && !(sv->flags & (IR_VREG_VOLATILE | IR_VREG_DEAD_SPILL | IR_VREG_NO_SLOT))
+            && idxhalf_phys(f, vreg_id) == IR_PR_NONE
+            && byte_home_phys(f, vreg_id) == IR_PR_NONE
+            && slot_off(f, vreg_id) >= 0
+            && !store_next_op_reads(f, vreg_id)) {
+            ss_note_store(f, vreg_id);
+            if (!ss_store_dead_here()) {
+                int ix_off = slot_ix_off(f, vreg_id);
+                if (fp_offset_fits(ix_off)) {
+                    emit(out, "ld\t(%s%+d),%s", frame_reg(), ix_off, sreg);
+                    return;
+                }
+            }
+        }
+        emit(out, "ld\ta,%s", sreg);
+    }
     /* [dead-store] Dead spill: the slot is written but never read (proven by
        the read/write split, coalescing-checked). Skip the store entirely — A
        already holds the value; cache it so every use (same BB, or the next via

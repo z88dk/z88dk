@@ -26,6 +26,8 @@ most 415 to 440 B over the console set); a precise array-escape analysis to
 win back what ADR 0112 costs (`startrek` fp, `m4doors` 2 to 4 %); the ADR 0113
 prototype.
 
+**Backlog: compare lowering.** More compare defects will turn up; add them here. Known: an `==`/`!=` of two words re-swaps the operands with a second `ex de,hl` (`ex de,hl; ld hl,(sp+n); ex de,hl; or a; sbc hl,de`; the order does not matter for Z, so the last `ex` is 1 B and 2 clocks wasted per compare; seen in queenbench `safe()` on r2ka).
+
 **Then: ptrbench, init_data's struct loop.** z80 `code_compiler`, from
 the objects, 4/10/2026: 80cc fp 1381 B / sp 1458 B against sdcc 1160 B and
 xcc -Os 1074 B (3/10: 1418 / 1523). Size only; 80cc is the fastest of the
@@ -261,6 +263,37 @@ Size across the corpus before implementing.
   8080 family and gbz80: `a += b` 58 -> 32 B Z80, 61 -> 25 B 8080, 67 -> 22 B
   gbz80 (0111). The differential fuzzer found about 37 miscompiles; arrays
   now always count as aliased (0112).
+- **Stepped compares, constant long adds, frame-slot parks (ADR 0120).** Survey z80 fp
+  6.2 % over sdcc. Left: `rnd_bars`, `bincomp`, `generate`, `select_move`, and the
+  parked-address pointer store.
+- **Word operands kept in registers (ADR 0119).** x*(2^a+1) copies x to DE, x*10 is
+  `((x<<2)+x)<<1`, `g1 += g2` reads g2 with `ld de,(g2)`; survey z80 fp 10.2 % ->
+  6.4 % over sdcc. Left: `xc++ == K` on a global, the parked-address pointer store,
+  `long + 16-bit constant`, then `rnd_bars`, `pi` main, `bincomp`.
+- **Index-home parameters and value-context `&&` (ADR 0118).** PR 3181's Z80
+  miscompile was two parameters sharing IX; `cmpbench` Z80 2071 -> 1247 B once
+  `&&`/`||` as values branch to a 0/1 join. Left: the `ld bc,1 / jp / ld bc,0`
+  join feeding an add, and an audit of the other per-block records for the
+  multi-exit assumption (`bb_byte_out`, pending spills).
+- **Literal printf and dead instructions (ADR 0117).** The survey has an xcc column
+  (xcc `-Os` is 40 % larger than 80cc; 80cc is 8.1 % larger than sdcc on z80 fp).
+  `printf("lit\n")` is `puts` and adjacent literal calls merge. Left: the
+  largest per-function gaps (`invazion` main, `text3dmaze` generate, `kaleido`
+  rnd_bars), `printf("%s\n", s)`, signed word `/2^k` (13 B, 9 B with a branch).
+- **A long carried through a loop (ADR 0116).** `lshiftbench` is the benchmark for
+  it (crcbench hides the gap). Left: an allocator home for 32-bit values (sdcc keeps
+  the CRC long in `c,b,e,d`; the gap is 1.8 x in ticks), the fold of a
+  sign-extended operand and of ADD/SUB sign cases, the sp-mode form of the byte-wise
+  fold, copy propagation of byte extracts of a long parameter (`pack`), and the first
+  backlog line below.
+- **Rabbit `sub hl,de` and the `jr` size model (ADR 0115).** r2ka/r3k no longer
+  emit the helper-call `sub hl,de`; register-only forms are sized exactly.
+  Left: share a second `return` epilogue (the merger claims a tail once).
+- **widthbench, byte clean-up (ADR 0114).** A byte op reading a widened byte
+  reads the byte it came from; `mix_char` 596 -> 435 T (sp). Still 510 T
+  against sdcc 351 in fp: the byte locals go to frame slots because BC is
+  busy, which is the parked byte-scratch item, now with a ticks case
+  behind it as well as bytes.
 - **Framework `test.c` cost — ADR 0105.** Six changes (string-literal remat,
   dead indirect-call target spill, control-flow call arguments first,
   jump-to-next, IX save only when used, BC hand-off). `test.c` 754 -> 596 B fp;

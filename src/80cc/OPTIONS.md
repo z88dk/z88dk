@@ -61,6 +61,8 @@ exists (ADR 0010).
 | `var-byte-shift` | keep a promoted variable-count byte shift on the established word-width path |
 | `shr-wide` | a constant-count right shift is not narrowed to a byte |
 | `shr-mask` | no folding of the mask a narrowed right shift implies |
+| `shr-arith-mask` | an arithmetic right shift masked into a byte stays a word shift |
+| `bitop-bytes` | an OR of two byte-valued operands keeps a word result |
 | `iv-narrow` | no narrowing of an induction variable |
 | `ivsr` | no induction-variable strength reduction (ADR 0008) |
 | `ivsr-affine` | no folding of a non-power-of-two affine multiple (struct-array stride) |
@@ -110,6 +112,32 @@ exists (ADR 0010).
 | `shr-dead-l` | the dead `ld l,a` before an A-through-CB shift chain is kept |
 | `shr-tbac` | a masked `(x >> n) & M` in a loop keeps the top-byte `add hl,hl` route instead of the A-chain |
 | `lea-frame-addr` | ez80 fp-mode frame addresses go through `add hl,sp` instead of `lea hl,ix+d` |
+| `fp-de-store` | fp-mode word store from DE goes through `ld hl,N; add hl,sp` instead of two `ld (ix+d),r` |
+| `dead-ex-de-hl` | an `ex de,hl` after which neither HL nor DE is read is kept |
+| `dead-ld-hl-a` | an `ld h,a; ld l,a` pair whose HL is rewritten before it is read is kept |
+| `st-pop-de` | a word store through a pointer in HL pops a stack-parked value through HL (and reloads the pointer) instead of `pop de` |
+| `cond-value` | `a && b` and `a || b` used as a value build each leg as a stored boolean instead of branching straight to a 0/1 join |
+| `side-exit-carry` | a block with a conditional side exit hands its successors the register beliefs it holds at the end, even where an earlier exit held something else |
+| `shl-copy-de` | a word `t = x << n; t + x` (and `t - x`) spills x and reloads it instead of copying it to DE |
+| `mult-factor` | a word multiply by 2^a+2^b or 2^a-2^b stays `(v<<a) +- (v<<b)` instead of `((v<<(a-b)) +- v) << b` |
+| `word-mem-rhs` | a word `a + g` or `a - g` on a single-use global load loads it first instead of reading it with `ld de,(g)` at the add |
+| `word-mem-defer` | the global load for `a + g` must be the op just before the add |
+| `step-cmp` | `x++ == K` keeps the old value of x and compares it, instead of comparing the stepped value with K+1 |
+| `cmp-minus1` | a word compared with -1 loads the constant and subtracts it |
+| `arg-pop-hl` | the first stack argument is read with `ld hl,2; add hl,sp; …` instead of pop/pop/push/push |
+| `const-local` | a byte local assigned one constant keeps its byte slot, widened at each read |
+| `prop-over-call` | a call forgets every propagated local constant, not only those whose address escaped |
+| `byte-const-smallc` | a constant byte passed only to stacked smallc calls keeps a frame slot and is loaded through A |
+| `sx-arg` | a signed char argument to an int parameter is zero-extended, not sign-extended |
+| `stack-spill-base` | an array-element address is parked on the stack around the byte truncation of the value stored through it |
+| `sub-as-add` | a word minus a constant is subtracted, not added as the negated constant |
+| `ret-cc-bc` | a conditional `ret` is a reader of BC, so a park before it is kept |
+| `long-add-carry` | a long add of a constant that fits 16 bits (or a small negative) goes through `ex de,hl; ld bc,0; adc hl,bc; ex de,hl` instead of a skipped `inc de` or `dec de` |
+| `slot-park-de` | a word stored to a frame slot and reloaded with D and E untouched in between goes through the slot instead of DE (frame-pointer mode, Z80 family) |
+| `long-cmp-ixd` | a long ordered compare in frame-pointer mode stages both operands through the stack instead of comparing against the right-hand slot a byte at a time |
+| `add-hl-de` | a word add with one operand in HL and the other in DE goes through BC when one of them also has a copy there |
+| `printf-puts` | a literal-only `printf` statement stays a `printf` call: no `puts` rewrite and no merging of adjacent ones |
+| `printf-puts-scan` | a literal-only `printf` becomes `puts` even in a file that also calls `printf` with arguments (which pays for `puts` on top of `printf`) |
 | `lea-frame-prologue` | ez80 fp-mode frame allocation uses `ld hl,-N; add hl,sp` instead of an IX-relative `lea` |
 | `bc-evict` | a BC tenant is never displaced by a better candidate |
 | `bc-per-cand` | BC cost is scored per class, not per candidate |
@@ -264,6 +292,21 @@ exists (ADR 0010).
 | `lhlx-deref` | no `ld hl,(de)` dereference on the CPUs that have it |
 | `lhlx-bc` | an 8085 word reload into BC stays a byte walk plus `ld hl,bc`, instead of LDSI + LHLX |
 | `byte-ret` | a constant byte return stays `ld a,N` / `ld l,a` instead of `ld l,N` |
+| `byte-mask-ident` | a byte `and 0xff`, `or 0` or `xor 0` is kept as an op instead of becoming a copy |
+| `long-asr-const` | a constant arithmetic long `>>` calls `l_asr_dehl` instead of moving bytes and shifting inline |
+| `iv-narrow-latch` | a down-counter tested in the loop latch is not narrowed to a byte |
+| `step-z` | a byte inc/dec does not hand its Z flag to the following zero test |
+| `long-shl-tos` | an in-place long `<< 1` on the top-of-stack slot walks the four bytes in memory |
+| `tos-rmw` | a long updated in place on the top of the stack keeps its load-copy and replacement pops |
+| `long-shl-tos-cache` | the top-of-stack long shift does not leave its result cached in DE:BC |
+| `step-mem` | a byte frame slot stepped onto itself goes through A instead of `inc/dec (mem)` |
+| `long-shr-bc` | a bit-only long `>>` of a DE:BC-cached value fetches the low half into HL and stashes it back |
+| `long-zx-fold` | a zero-extended word or byte feeding a long AND/OR/XOR is built in DEHL instead of read from the frame |
+| `byte-store-reg` | a byte held in L is stored to its frame slot through A instead of `ld (ix+d),l` |
+| `long-fold-sp` | the zero-extend / byte-shift fold into a long bitop or add is used in frame-pointer mode only; sp-addressed code builds the operand |
+| `byte-clean` | the byte clean-up after narrowing is skipped altogether |
+| `byte-ext-src` | a byte op reading a widened byte reads the widened word, not the byte it came from |
+| `frame-byte-trunc-sp` | in sp mode the low byte of a word in the frame is read by loading the whole word, as in fp mode before the byte read |
 | `lhlx-long` | no LDSI-based long load on 8085 |
 | `shlx-store` | no `ld (de),hl` store form |
 | `idx-fill` | an index home is filled with a load pair rather than one ez80 instruction |

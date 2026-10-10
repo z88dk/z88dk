@@ -205,9 +205,14 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                fp mode uses `ld a,(ix+d)` (3 B, no HL clobber) instead of the
                sp-relative `ld hl,adj; add hl,sp; ld a,(hl)` (an ix frame slot is
                fixed across the arg pushes; the sp form is only needed frameless). */
-            push_arg_byte_to_a(out, f, ci->args[i], pushed_bytes + sp_adj_extra);
-            emit(out, "ld\tl,a");
-            emit(out, "ld\th,0");
+            const Op *rm = byte_remat_of(f, ci->args[i]);
+            if (rm && rm->kind == IR_LD_IMM) {
+                emit(out, "ld\thl,%d", (int)(rm->imm & 0xff));
+            } else {
+                push_arg_byte_to_a(out, f, ci->args[i], pushed_bytes + sp_adj_extra);
+                emit(out, "ld\tl,a");
+                emit(out, "ld\th,0");
+            }
             emit(out, "push\thl");
             pushed_bytes += 2;
         } else {

@@ -3281,6 +3281,56 @@ int ir_opt_conv_mask_fold(Func *f)
     return changed;
 }
 
+/* ---- Compare against a stepped value (ir_opt_step_cmp) ---------------
+   `t = x + 1; ...; x == K` (the old value of `x++ == K`) is `t == K + 1` in
+   the width of x, and the same for a decrement. The old value then needs no
+   copy kept across the step. Only EQ and NE, whose result does not depend on
+   signedness; the stepped value must still be intact where the compare reads. */
+int ir_opt_step_cmp(Func *f)
+{
+    if (!f || opt_disabled("step-cmp")) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int i = 0; i < bb->n_ops; i++) {
+            const Op *s = &bb->ops[i];
+            if ((s->kind != IR_INC && s->kind != IR_DEC) || s->dst < 0
+                || s->src[0] < 0 || s->dst == s->src[0] || s->src[1] >= 0)
+                continue;
+            int x = s->src[0], d = s->dst;
+            int w = f->vregs[x].width;
+            if ((w != 1 && w != 2) || f->vregs[d].width != w) continue;
+            if (f->vregs[x].flags & (IR_VREG_VOLATILE | IR_VREG_ADDR_TAKEN)) continue;
+            for (int j = i + 1; j < bb->n_ops; j++) {
+                Op *c = &bb->ops[j];
+                if ((c->kind == IR_CMP_EQ || c->kind == IR_CMP_NE)
+                    && c->src[0] == x && c->src[1] < 0 && !c->imm_sym) {
+                    int64_t mask = (w == 1) ? 0xff : 0xffff;
+                    int64_t n = c->imm + (s->kind == IR_INC ? 1 : -1);
+                    int64_t m = n & mask;
+                    if (c->imm < 0) {
+                        int64_t sb = (w == 1) ? 0x80 : 0x8000;
+                        if (m >= sb) m -= (mask + 1);
+                    }
+                    c->src[0] = d;
+                    c->imm = m;
+                    changed++;
+                    continue;
+                }
+                int df[8]; int nd = ir_op_defs(c, df, 8);
+                int clobbered = 0;
+                for (int t = 0; t < nd; t++)
+                    if (df[t] == x || df[t] == d) clobbered = 1;
+                if (clobbered || c->kind == IR_CALL || c->kind == IR_HCALL
+                    || c->kind == IR_BR || c->kind == IR_BR_ZERO
+                    || c->kind == IR_BR_COND || c->kind == IR_RET)
+                    break;
+            }
+        }
+    }
+    return changed;
+}
+
 /* ---- Induction-variable range narrowing (ir_opt_narrow_iv) ----------
    A loop counter whose value range provably fits [0,256) is retyped to a
    byte (width 1, KIND_CHAR): the step becomes a byte inc/dec and its slot is
@@ -3368,6 +3418,8 @@ static int niv_down_exit_ok(Func *f, int h, int c)
         const Op *o = &hb->ops[j];
         /* while (c) / while (c != 0) / while (c > 0): stops at 0, never neg. */
         if (o->kind == IR_BR_ZERO && o->src[0] == c) return 1;
+        if (o->kind == IR_BR_COND && o->src[0] == c && o->imm != IR_BRCOND_KTRIP)
+            return 1;                  /* loops while c is non-zero */
         if (o->src[0] != c || o->src[1] != -1) continue;
         if ((o->kind == IR_CMP_NE || o->kind == IR_CMP_GT
              || o->kind == IR_CMP_UGT) && o->imm == 0) return 1;
@@ -3406,7 +3458,7 @@ int ir_opt_narrow_iv(Func *f)
     for (int h = 0; h < f->n_bbs; h++) {
         if (!reach[h]) continue;
         /* Single-latch natural loop (mirror ir_opt_ivsr's scan). */
-        int n_entry = 0, n_back = 0;
+        int n_entry = 0, n_back = 0, latch = -1;
         for (int b = 0; b < f->n_bbs; b++) {
             BB *bb = &f->bbs[b];
             int ns = ir_bb_n_succ(bb), targets_h = 0;
@@ -3414,18 +3466,24 @@ int ir_opt_narrow_iv(Func *f)
                 if (ir_bb_succ_at(bb, s) == h) { targets_h = 1; break; }
             if (!targets_h) continue;
             if (b < h) n_entry++;
-            else if (b >= h && reach[b] && licm_reaches(f, h, b)) n_back++;
+            else if (b >= h && reach[b] && licm_reaches(f, h, b)) { n_back++; latch = b; }
         }
         if (n_entry != 1 || n_back != 1) continue;
 
-        /* Look in the header for a counter-vs-constant guard. */
-        BB *hb = &f->bbs[h];
+        /* Look in the header for a counter-vs-constant guard; a down-counter
+           may instead be tested in the latch, after its own decrement. */
+        for (int pass = 0; pass < 2; pass++) {
+        if (pass && (latch == h || latch < 0 || opt_disabled("iv-narrow-latch")))
+            break;
+        BB *hb = &f->bbs[pass ? latch : h];
         for (int j = 0; j < hb->n_ops; j++) {
             const Op *o = &hb->ops[j];
             int c = -1;
             if ((o->kind >= IR_CMP_EQ && o->kind <= IR_CMP_UGE)
                 && o->src[0] >= 0 && o->src[1] == -1) c = o->src[0];
             else if (o->kind == IR_BR_ZERO && o->src[0] >= 0) c = o->src[0];
+            else if (o->kind == IR_BR_COND && o->src[0] >= 0 && o->imm != IR_BRCOND_KTRIP)
+                c = o->src[0];
             if (c < 0 || c >= f->n_vregs) continue;
             int is_down = 0;
             if (!niv_counter_ok(f, cl, c, &is_down)) continue;
@@ -3440,7 +3498,17 @@ int ir_opt_narrow_iv(Func *f)
                 }
             if (ktrip_latch) continue;
             int ok = 0;
-            if (!is_down) {
+            if (pass) {
+                /* Latch test: the one DEC of c must come first in this block,
+                   so the test sees the decremented value, and a seed of at
+                   least 1 keeps it from going below 0. */
+                int dec_first = 0;
+                for (int k = 0; k < j; k++)
+                    if (hb->ops[k].kind == IR_DEC && hb->ops[k].src[0] == c
+                        && hb->ops[k].dst == c) dec_first = 1;
+                ok = is_down && dec_first && cl[c].initval >= 1
+                     && cl[c].initval <= 255 && niv_down_exit_ok(f, latch, c);
+            } else if (!is_down) {
                 int64_t maxv = 0;
                 ok = niv_up_bound_ok(f, h, c, &maxv) && maxv <= 255;
             } else {
@@ -3462,6 +3530,7 @@ int ir_opt_narrow_iv(Func *f)
                             && q->imm >= 0 && q->imm <= 255)
                             q->kind = cs_unsigned_of(q->kind);
                     }
+        }
         }
     }
     free(reach);
@@ -3632,8 +3701,10 @@ static int v_is_const_shr(const Func *f, int v)
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *d = &bb->ops[j];
             if (d->dst != v) continue;
-            if (d->kind != IR_SHR || d->src[1] != -1) return 0;
-            if (d->imm & IR_SHR_ARITH) return 0;
+            if ((d->kind != IR_SHR && d->kind != IR_SHL) || d->src[1] != -1)
+                return 0;
+            if (d->kind == IR_SHR && (d->imm & IR_SHR_ARITH)
+                && opt_disabled("shr-arith-mask")) return 0;
             int n = (int)(d->imm & 0xff);
             if (n < 1 || n > 7) return 0;
             seen = 1;
@@ -4223,6 +4294,72 @@ static OpKind cs_unsigned_of(OpKind k)
     }
 }
 
+
+/* ---- Byte clean-up after narrowing (ir_opt_byte_cleanup) ------------
+   Two things narrowing leaves behind, both exact:
+   - A byte `x & 0xff`, `x | 0` or `x ^ 0` (the mask of a wider expression
+     whose result was narrowed) is a copy.
+   - A byte-result op that reads a widened byte only reads its low byte, which
+     is the byte the widening came from. When CSE has merged the widening with
+     one that feeds word code, the op would otherwise read the widened word
+     back from its frame slot, forcing the word to be stored for nothing.
+     Read the original byte instead. The byte must have a single def, so it
+     still holds the value at this use; its live range grows to cover it. */
+static int bc_single_def(const int *ndef, int v) { return v >= 0 && ndef[v] == 1; }
+
+int ir_opt_byte_cleanup(Func *f)
+{
+    if (opt_disabled("byte-clean")) return 0;
+    int nv = f->n_vregs, changed = 0;
+    int *ndef = calloc((size_t)(nv > 0 ? nv : 1), sizeof *ndef);
+    const Op **def = calloc((size_t)(nv > 0 ? nv : 1), sizeof *def);
+    if (!ndef || !def) { free(ndef); free(def); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int t = 0; t < nd; t++)
+                if (d[t] >= 0 && d[t] < nv) { ndef[d[t]]++; def[d[t]] = o; }
+        }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->dst < 0 || o->dst >= nv || f->vregs[o->dst].width != 1) continue;
+            if (f->vregs[o->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            if (o->src[1] == -1 && o->src[0] >= 0
+                && ((o->kind == IR_AND && (o->imm & 0xff) == 0xff)
+                    || ((o->kind == IR_OR || o->kind == IR_XOR) && (o->imm & 0xff) == 0))
+                && !opt_disabled("byte-mask-ident")) {
+                /* a copy, not a CONV_TRUNC: a truncation feeding a store is
+                   fused into the store, which then forms the address before the
+                   byte and has to park it, where the byte stayed in A */
+                o->kind = IR_MOV;
+                o->imm = 0;
+                changed++;
+            }
+            /* ops whose low result byte depends only on the low operand bytes */
+            int low_only = o->kind == IR_ADD || o->kind == IR_SUB || o->kind == IR_AND
+                        || o->kind == IR_OR || o->kind == IR_XOR || o->kind == IR_MOV
+                        || o->kind == IR_CONV_TRUNC
+                        || (o->kind == IR_SHL && o->src[1] == -1);
+            if (!low_only || opt_disabled("byte-ext-src")) continue;
+            for (int s = 0; s < 2; s++) {
+                int w = o->src[s];
+                if (w < 0 || w >= nv || f->vregs[w].width < 2) continue;
+                if (!bc_single_def(ndef, w)) continue;
+                const Op *dw = def[w];
+                if (!dw || (dw->kind != IR_CONV_ZX && dw->kind != IR_CONV_SX)) continue;
+                int x = dw->src[0];
+                if (x < 0 || x >= nv || f->vregs[x].width != 1 || !bc_single_def(ndef, x)) continue;
+                if (f->vregs[x].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+                o->src[s] = x;
+                changed++;
+            }
+        }
+    free(ndef); free(def);
+    return changed;
+}
+
 /* ---- Signed compares that need no sign correction (ir_opt_cmp_unsign) ----
    A signed 16-bit compare lowers to `and a; sbc hl,de` plus SEVEN BYTES of pure
    sign correction — `ld a,h; jp po,L; xor 0x80; L: rla` — because the carry out
@@ -4282,6 +4419,28 @@ int ir_opt_cmp_unsign(Func *f)
 }
 
 
+/* Is every def of v an OR of two values that each fit a byte? The result
+   then fits a byte too, so v may be byte-wide whatever reads it; a wide reader
+   zero-extends. */
+static int bitop_of_bytes(const Func *f, int v)
+{
+    if (opt_disabled("bitop-bytes") || v_defs_not_complete(f, v)) return 0;
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            if (op->dst != v) continue;
+            if (op->kind != IR_OR
+                || op->src[0] < 0 || !v_fits_byte(f, op->src[0])) return 0;
+            if (op->src[1] >= 0 ? !v_fits_byte(f, op->src[1])
+                                : (op->imm & ~0xFFLL) != 0) return 0;
+            seen = 1;
+        }
+    }
+    return seen;
+}
+
 int ir_opt_narrow_byte(Func *f)
 {
     if (!f) return 0;
@@ -4314,7 +4473,7 @@ int ir_opt_narrow_byte(Func *f)
         for (int d = 0; d < f->n_vregs; d++) {
             if (!hasdef[d] || bad[d]) continue;
             if (f->vregs[d].width != 2) continue;
-            if (demands_low_byte_only(f, d)) {
+            if (demands_low_byte_only(f, d) || bitop_of_bytes(f, d)) {
                 f->vregs[d].width = 1;
                 f->vregs[d].kind  = KIND_CHAR;   /* keep kind/width consistent */
                 pass_changed++;
@@ -4613,6 +4772,48 @@ static int cf_width_mask(int w, int64_t *mask)
     case 4: *mask = 0xFFFFFFFFLL; return 1;
     default: return 0;   /* width 8 / unknown: don't fold */
     }
+}
+
+/* A byte local assigned one constant and read only through widening
+   conversions: each widening becomes the constant itself, so the byte need
+   not survive in a frame slot across calls (`c = 'A'; f(crc, c); g(c)`). */
+int ir_opt_const_local(Func *f)
+{
+    if (!f || opt_disabled("const-local")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    const Op **def = calloc((size_t)nv, sizeof(const Op *));
+    if (!ndef || !def) { free(ndef); free(def); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int k = 0; k < nd; k++)
+                if (d[k] >= 0 && d[k] < nv) { ndef[d[k]]++; def[d[k]] = o; }
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_CONV_ZX && o->kind != IR_CONV_SX) continue;
+            int v = o->src[0], d = o->dst;
+            if (v < 0 || v >= nv || d < 0 || d >= nv || ndef[v] != 1) continue;
+            if (f->vregs[v].width != 1 || f->vregs[d].width != 2) continue;
+            if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                     | IR_VREG_VOLATILE)) continue;
+            const Op *dop = def[v];
+            if (dop->kind != IR_LD_IMM || dop->dst != v || dop->imm_sym) continue;
+            int64_t k = dop->imm & 0xff;
+            if (o->kind == IR_CONV_SX && (k & 0x80)) k -= 0x100;
+            o->kind = IR_LD_IMM;
+            o->imm = k & 0xffff;
+            o->src[0] = -1;
+            o->src[1] = -1;
+            changed++;
+        }
+    free(ndef); free(def);
+    return changed;
 }
 
 int ir_opt_const_fold(Func *f)

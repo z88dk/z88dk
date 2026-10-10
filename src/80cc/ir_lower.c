@@ -82,6 +82,9 @@ struct RegState {
     int fa;     /* vreg resident in the float accumulator (FA, math48 alt regs) */
     int i64_acc;/* vreg resident in __i64_acc (long long) — a SEPARATE physical
                    store from FA, so its residency is tracked independently */
+    int z_from_v;/* vreg id + 1 whose in-memory byte the LAST emitted instruction
+                    left Z set from (`dec (hl)`/`dec (ix+d)`); 0 = none. Cleared
+                    on every emit, like z_from_a. */
     int z_from_a;/* 1 when the LAST emitted instruction set Z/S from A's current
                     value (an `and`/`or`/`xor` on A). Invalidate-by-default at
                     the vemit chokepoint, like the `a` tracker above: anything
@@ -245,9 +248,17 @@ typedef struct {
     const Op **long_rmw_ld; /* per-vreg: the first load of a `g op= h` long read-modify-write on
                                a global; the op that has v as its right operand walks both */
     const Op **long_rmw_st; /* per-vreg: result vreg of such an op -> its store, which is skipped */
+    char *long_zx_keep;   /* per-vreg: that producer's user is an ADD/SUB, so its result keeps a slot
+                             and is built the ordinary way when the fold cannot happen */
+    const Op **long_zx;   /* per-vreg: a width-4 zero-extend of a frame word/byte whose
+                             only use is the next long AND/OR/XOR; the extend is
+                             skipped and that op reads the source bytes from the frame */
     const Op **long_mem;  /* per-vreg: a width-4 single-use global load whose next op
                              is the long ADD/SUB/AND/OR/XOR taking it as its right
                              operand; the load is skipped and read at that op */
+    const Op **word_mem;  /* per-vreg: a width-2 single-use global load whose next op
+                             is the word ADD/SUB taking it as an operand; the load is
+                             skipped and read by `ld de,(sym)` at that op */
 } HomeCtx;
 static HomeCtx g_hc = { .de_home = -1, .func_whome = -1 };
 
@@ -263,11 +274,25 @@ static const Op *long_rmw_ld_of(const Func *f, int v)
     return g_hc.long_rmw_ld[v];
 }
 
+/* The deferred zero-extend for long vreg v, or NULL. */
+static const Op *long_zx_of(const Func *f, int v)
+{
+    if (!g_hc.long_zx || v < 0 || v >= f->n_vregs) return NULL;
+    return g_hc.long_zx[v];
+}
+
 /* The deferred global load for long vreg v, or NULL. */
 static const Op *long_mem_of(const Func *f, int v)
 {
     if (!g_hc.long_mem || v < 0 || v >= f->n_vregs) return NULL;
     return g_hc.long_mem[v];
+}
+
+/* The deferred global load for word vreg v, or NULL. */
+static const Op *word_mem_of(const Func *f, int v)
+{
+    if (!g_hc.word_mem || v < 0 || v >= f->n_vregs) return NULL;
+    return g_hc.word_mem[v];
 }
 
 /* Format the global operand of a byte-remat load into buf as `_sym[+off]`. */
@@ -859,6 +884,7 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
        ARGUMENT ("%s%u" with pfx="and\t"), so the format string does not carry
        it. */
     L.rs.z_from_a = 0;
+    L.rs.z_from_v = 0;
     L.last_add_sp = 0;
     if (L.hlm_on) {
         char hb[128];
@@ -1050,6 +1076,67 @@ static int branch_relax_enabled(void)
     return relax_on;
 }
 
+/* Exact-enough sizes for register-only forms; 0 = not a register form. */
+static int relax_fn_has_asm;      /* set per function by filter_relax_branches */
+static int relax_tight_sizes(void)
+{
+    if (IS_RABBIT4K() || IS_808x()) return 0;
+    /* 80cc emits no ADL-suffixed (ez80) or prefixed (kc160) forms itself, but
+       an __asm block may. */
+    if ((IS_EZ80() || IS_KC160()) && relax_fn_has_asm) return 0;
+    return 1;
+}
+
+static int relax_is_r8(const char *t, size_t k)
+{
+    return k == 1 && strchr("abcdehl", t[0]) != NULL;
+}
+
+static int relax_is_r16(const char *t, size_t k)
+{
+    return (k == 2 && (!strncmp(t, "bc", 2) || !strncmp(t, "de", 2)
+                       || !strncmp(t, "hl", 2) || !strncmp(t, "sp", 2)
+                       || !strncmp(t, "af", 2)));
+}
+
+/* `s`/`n` = mnemonic, `arg` = operands. Only the shapes below, all <= 2 bytes
+   on every CPU relax_tight_sizes() admits. */
+static int relax_reg_form_size(size_t n, const char *s, const char *arg)
+{
+    #define MN(x) (n == strlen(x) && !strncmp(s, x, n))
+    char a[32], *c;
+    size_t i = 0;
+    while (arg[i] && arg[i] != '\n' && arg[i] != '\r' && arg[i] != ';'
+           && arg[i] != '\t' && arg[i] != ' ' && i + 1 < sizeof a) {
+        a[i] = arg[i]; i++;
+    }
+    a[i] = '\0';
+    c = strchr(a, ',');
+    size_t l1 = c ? (size_t)(c - a) : i;
+    const char *o2 = c ? c + 1 : NULL;
+    size_t l2 = o2 ? strlen(o2) : 0;
+    if (MN("ret") || MN("exx") || MN("rla") || MN("rra") || MN("rlca")
+        || MN("rrca") || MN("cpl") || MN("scf") || MN("ccf"))
+        return (i == 0) ? 2 : 0;
+    if ((MN("inc") || MN("dec")) && !c
+        && (relax_is_r8(a, l1) || relax_is_r16(a, l1)))
+        return 2;
+    if ((MN("push") || MN("pop")) && !c && relax_is_r16(a, l1)) return 2;
+    if (MN("ex") && c && ((!strncmp(a, "de,hl", 5) && i == 5)
+                          || (!strncmp(a, "af,af'", 6) && i == 6)))
+        return 2;
+    if (MN("ld") && c && relax_is_r8(a, l1) && relax_is_r8(o2, l2)) return 2;
+    if ((MN("add") || MN("adc") || MN("sub") || MN("sbc") || MN("and")
+         || MN("or") || MN("xor") || MN("cp"))) {
+        if (!c && relax_is_r8(a, l1)) return 2;
+        if (c && l1 == 1 && a[0] == 'a' && relax_is_r8(o2, l2)) return 2;
+        if (MN("add") && c && l1 == 2 && !strncmp(a, "hl", 2)
+            && relax_is_r16(o2, l2) && strncmp(o2, "af", 2)) return 2;
+    }
+    #undef MN
+    return 0;
+}
+
 /* Upper bound, in bytes, on what `l` assembles to on ANY target. Data
    directives return a blocker so no branch is measured across a table. */
 static int relax_line_size(const char *l)
@@ -1075,6 +1162,13 @@ static int relax_line_size(const char *l)
     const char *arg = e;
     while (*arg == '\t' || *arg == ' ') arg++;
     #define MN(x) (n == strlen(x) && !strncmp(s, x, n))
+    /* Plain register forms are at most 2 bytes. Rabbit 4000+ is left on the
+       loose bound (its extended ALU and SP-relative forms sit behind a prefix),
+       as are ez80 and kc160 in a function with an __asm block. */
+    if (relax_tight_sizes()) {
+        int t = relax_reg_form_size(n, s, arg);
+        if (t) return t;
+    }
     /* Index-register addressing: 6 (the z80 synthetic `ld rr,(ix+d)` pair). */
     if (strstr(arg, "(ix") || strstr(arg, "(iy")) return 6;
     /* Rabbit's 16-bit logical ops expand to 8. */
@@ -1217,6 +1311,10 @@ static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
             free(lines); rewind(src);
             while (fgets(buf, sizeof buf, src)) fputs(buf, out); return; }
     }
+    relax_fn_has_asm = 0;
+    for (int b = 0; f && b < f->n_bbs; b++)
+        for (int o = 0; o < f->bbs[b].n_ops; o++)
+            if (f->bbs[b].ops[o].kind == IR_ASM) relax_fn_has_asm = 1;
     int *size = malloc((size_t)(n > 0 ? n : 1) * sizeof(int));
     if (size) {
         for (int i = 0; i < n; i++) size[i] = relax_line_size(lines[i]);
@@ -3029,7 +3127,8 @@ static int line_reads_pair(const char *line, const char *pairname,
     while (*p == ' ' || *p == '\t') p++;          /* and the gap after it */
     char tok[8]; int ti = 0;
     for (;; p++) {
-        char c = (*p == '\n' || *p == '\r') ? 0 : *p;
+        char c = (*p == '\n' || *p == '\r' || *p == ';') ? 0 : *p;
+        if (c == ' ' || c == '\t') c = ',';       /* a trailing comment follows */
         if (c == ',' || c == '(' || c == ')' || c == '+' || c == 0) {
             tok[ti] = 0;
             if (ti && (!strcmp(tok, pairname)
@@ -3354,6 +3453,10 @@ static int gbwm_live_walk(char **lines, int n, const char *drop, int start,
             continue;
         }
         char tgt[64];
+        /* A plain `ret` ends the function: DE is dead there unless it carries
+           the return value; A and HL are not modelled, so they stay live. */
+        if (!strcmp(lines[j], "\tret\n"))
+            return want_a || want_hl || (want_de && xline_ret_reads_de());
         if (xline_branch_target(lines[j], tgt, sizeof tgt)) {
             /* An `ASMPC+n` skip lands a few lines down the fall-through, and
                the lines it skips (inc/dec) kill none of A, HL or DE, so the
@@ -3785,13 +3888,14 @@ static void fold_hl_const_reuse(char **lines, char *drop, int n)
 }
 
 /* Carry is overwritten before anything can read it, on the straight line
-   after `start`. Conservative: a label, branch or call answers no. */
+   after `start`. Conservative: a branch or call answers no; a label is
+   passed through (only this path's reads matter). */
 static int carry_dead_after(char **lines, const char *drop, int n, int start)
 {
     for (int j = start; j < n && j < start + 16; j++) {
         if (drop[j] || !strncmp(lines[j], "\tC_LINE", 7)) continue;
         const char *l = lines[j];
-        if (l[0] != '\t') return 0;
+        if (l[0] != '\t') continue;                /* label: falls through */
         char m[16]; const char *o;
         if (!gw_split(l, m, sizeof m, &o)) return 0;
         if (!strcmp(m, "ld") || !strcmp(m, "ex") || !strcmp(m, "inc")
@@ -3829,6 +3933,223 @@ static void fold_dead_sp_addr(char **lines, char *drop, int n)
         if (!carry_dead_after(lines, drop, n, k + 1)) continue;
         drop[i] = 1;
         drop[k] = 1;
+    }
+}
+
+/* [arg-pop-hl] The first stack argument read through `ld hl,2; add hl,sp;
+   ld a,(hl+); ld h,(hl); ld l,a` (8 B): when A and DE are dead after it, take
+   the word by popping the return address and the argument, then pushing both
+   back (4 B, same time). */
+static void fold_arg_pop_hl(char **lines, char *drop, int n)
+{
+    static const char *pat[5] = { "\tld\thl,2\n", "\tadd\thl,sp\n",
+        "\tld\ta,(hl+)\n", "\tld\th,(hl)\n", "\tld\tl,a\n" };
+    /* pop/push cost more than the walk on the CPUs with cheap loads (z180). */
+    if ((c_cpu != CPU_Z80 && c_cpu != CPU_Z80N) || opt_disabled("arg-pop-hl")) return;
+    for (int i = 0; i < n; i++) {
+        if (drop[i] || strcmp(lines[i], pat[0])) continue;
+        int idx[5] = { i, 0, 0, 0, 0 }, k = i, ok = 1;
+        for (int p = 1; p < 5 && ok; p++) {
+            k++;
+            while (k < n && (drop[k] || !strncmp(lines[k], "\tC_LINE", 7))) k++;
+            if (k >= n || strcmp(lines[k], pat[p])) ok = 0; else idx[p] = k;
+        }
+        if (!ok) continue;
+        /* Followed by `ex de,hl` the argument wants to be in DE: pop it there
+           directly (HL takes the return address and must be dead). */
+        int x = idx[4] + 1;
+        while (x < n && (drop[x] || !strncmp(lines[x], "\tC_LINE", 7))) x++;
+        if (x < n && !strcmp(lines[x], "\tex\tde,hl\n")
+            && gbwm_dead_after3(lines, n, drop, x + 1, 1, 1, 0)) {
+            free(lines[idx[0]]); lines[idx[0]] = strdup("\tpop\thl\n");
+            free(lines[idx[1]]); lines[idx[1]] = strdup("\tpop\tde\n");
+            free(lines[idx[2]]); lines[idx[2]] = strdup("\tpush\tde\n");
+            free(lines[idx[3]]); lines[idx[3]] = strdup("\tpush\thl\n");
+            drop[idx[4]] = 1;
+            drop[x] = 1;
+            continue;
+        }
+        if (!gbwm_dead_after3(lines, n, drop, idx[4] + 1, 1, 0, 1)) continue;
+        free(lines[idx[0]]); lines[idx[0]] = strdup("\tpop\tde\n");
+        free(lines[idx[1]]); lines[idx[1]] = strdup("\tpop\thl\n");
+        free(lines[idx[2]]); lines[idx[2]] = strdup("\tpush\thl\n");
+        free(lines[idx[3]]); lines[idx[3]] = strdup("\tpush\tde\n");
+        drop[idx[4]] = 1;
+    }
+}
+
+/* [dead-ex-de-hl] `ex de,hl` after which neither HL nor DE is read before it
+   is rewritten (a store that left its value in HL for a reader that never
+   came): drop it. */
+static void fold_dead_ex_de_hl(char **lines, char *drop, int n)
+{
+    if (IS_GBZ80() || opt_disabled("dead-ex-de-hl")) return;
+    for (int i = 0; i + 1 < n; i++) {
+        if (drop[i] || strcmp(lines[i], "\tex\tde,hl\n")) continue;
+        if (!gbwm_dead_after3(lines, n, drop, i + 1, 0, 1, 1)) continue;
+        drop[i] = 1;
+    }
+}
+
+/* [dead-ld-hl-a] `ld h,a; ld l,a` (either order) whose H and L are each
+   rewritten before being read: the sign-mask widen ahead of a `& K` leaves it
+   behind. Drop the pair; A is untouched either way. */
+static int hl_halves_rewritten(char **lines, const char *drop, int n, int start)
+{
+    int hd = 0, ld = 0, dd = 0, ed = 0;
+    for (int j = start, cnt = 0; j < n && cnt < 8; j++) {
+        if (drop[j] || !strncmp(lines[j], "\tC_LINE", 7)) continue;
+        cnt++;
+        char m[16]; const char *o;
+        if (lines[j][0] != '\t' || !gw_split(lines[j], m, sizeof m, &o)) return 0;
+        /* `ld e,..; ld d,..; ex de,hl` rewrites HL from DE; the swap leaves the
+           dropped value in DE, so DE must be dead after it */
+        if (!strcmp(m, "ld") && (!strncmp(o, "e,", 2) || !strncmp(o, "d,", 2))) {
+            if (strpbrk(o + 2, "hl")) return 0;
+            if (o[0] == 'e') ed = 1; else dd = 1;
+            continue;
+        }
+        if (!strcmp(lines[j], "\tld\thl,de\n")) return dd && ed;
+        if (!strcmp(lines[j], "\tpop\thl\n") || !strcmp(lines[j], "\tld\thl,bc\n"))
+            return 1;                               /* HL wholly rewritten */
+        if (!strncmp(lines[j], "\tld\thl,", 7) && !strpbrk(lines[j] + 7, "hl("))
+            return 1;
+        if (!strcmp(lines[j], "\tex\tde,hl\n"))
+            return dd && ed && gbwm_dead_after3(lines, n, drop, j + 1, 0, 0, 1);
+        if (!strcmp(m, "ld") && (!strncmp(o, "h,", 2) || !strncmp(o, "l,", 2))) {
+            if (strpbrk(o + 2, "hl")) return 0;
+            if (o[0] == 'h') hd = 1; else ld = 1;
+            if (hd && ld) return 1;
+            continue;
+        }
+        if (!strcmp(m, "ld") && !strncmp(o, "a,", 2) && !strpbrk(o + 2, "hl"))
+            continue;
+        if ((!strcmp(m, "and") || !strcmp(m, "or") || !strcmp(m, "xor")
+             || !strcmp(m, "cp") || !strcmp(m, "sub"))
+            && !strpbrk(o, "hl"))
+            continue;
+        return 0;
+    }
+    return 0;
+}
+
+static void fold_dead_ld_hl_a(char **lines, char *drop, int n)
+{
+    if (opt_disabled("dead-ld-hl-a")) return;
+    for (int i = 0; i + 1 < n; i++) {
+        if (drop[i]) continue;
+        int hl = !strcmp(lines[i], "\tld\th,a\n");
+        if (!hl && strcmp(lines[i], "\tld\tl,a\n")) continue;
+        int k = i + 1;
+        while (k < n && (drop[k] || !strncmp(lines[k], "\tC_LINE", 7))) k++;
+        if (k >= n || strcmp(lines[k], hl ? "\tld\tl,a\n" : "\tld\th,a\n"))
+            continue;
+        /* a following `ld a,<reg just copied from a>` is a no-op: drop it too */
+        int k2 = k + 1;
+        while (k2 < n && (drop[k2] || !strncmp(lines[k2], "\tC_LINE", 7))) k2++;
+        int reload = k2 < n && !strcmp(lines[k2], hl ? "\tld\ta,l\n" : "\tld\ta,h\n");
+        if (!hl_halves_rewritten(lines, drop, n, (reload ? k2 : k) + 1)) continue;
+        drop[i] = 1;
+        drop[k] = 1;
+        if (reload) drop[k2] = 1;
+    }
+}
+
+/* [slot-park-de] Frame-pointer mode on the Z80 family, where a word slot access
+   is two byte accesses: `ld (ix+d),hl` ... `ld hl,(ix+d)` with D and E untouched
+   between them and no other reference to the slot in the function is
+   `ld de,hl` ... `ld hl,de`. Skipped in a function that forms a frame address,
+   since the slot could then be reached through a pointer. */
+static int slot_ix_ref(const char *line, int d)
+{
+    char a[24], b[24];
+    snprintf(a, sizeof a, "(ix%+d)", d);
+    snprintf(b, sizeof b, "(ix%+d)", d + 1);
+    return strstr(line, a) || strstr(line, b);
+}
+
+static void fold_slot_park_de(char **lines, char *drop, int n)
+{
+    if (opt_disabled("slot-park-de")) return;
+    if (IS_EZ80() || IS_RABBIT() || IS_KC160() || IS_808x()
+        || IS_GBZ80())
+        return;
+    for (int i = 0; i < n; i++) {
+        const char *l = lines[i];
+        if (!strncmp(l, "\tpush\tix\n", 9) && i > 12) return;      /* frame address */
+        if (!strncmp(l, "\tadd\thl,sp\n", 12)
+            && !(i + 1 < n && !strcmp(lines[i + 1], "\tld\tsp,hl\n")))
+            return;                                     /* not the frame allocation */
+        if (strstr(l, "\tlea\t")) return;
+    }
+    /* The frame size, from the prologue: the deepest word is read with pop and
+       push, which the text does not show as an ix access. */
+    int frame = -1, ip = -1;
+    for (int i = 0; i + 1 < n && i < 12; i++)
+        if (!strcmp(lines[i], "\tld\tix,0\n") && !strcmp(lines[i + 1], "\tadd\tix,sp\n")) {
+            ip = i + 2;
+            break;
+        }
+    if (ip < 0) return;
+    {
+        int k = ip, sz = 0;
+        while (k < n && !strcmp(lines[k], "\tpush\taf\n")) { sz += 2; k++; }
+        if (sz == 0 && k + 2 < n) {
+            int v;
+            char c2[4];
+            if (sscanf(lines[k], "\tld\thl,-%d%1[\n]", &v, c2) == 2
+                && !strcmp(lines[k + 1], "\tadd\thl,sp\n")
+                && !strcmp(lines[k + 2], "\tld\tsp,hl\n"))
+                sz = v;
+        }
+        frame = sz;
+    }
+    if (frame <= 0) return;
+    for (int i = 0; i + 1 < n; i++) {
+        int d;
+        char c1[4];
+        if (drop[i] || sscanf(lines[i], "\tld\t(ix%d),hl%1[\n]", &d, c1) != 2)
+            continue;
+        if (d <= -frame || d >= 0) continue;       /* bottom word, or not a local */
+        char want[40];
+        snprintf(want, sizeof want, "\tld\thl,(ix%+d)\n", d);
+        int found = -1;
+        for (int j = i + 1; j < n && j < i + 80; j++) {
+            if (drop[j] || !strncmp(lines[j], "\tC_LINE", 7)) continue;
+            if (lines[j][0] != '\t') break;                      /* label */
+            if (!strcmp(lines[j], want)) { found = j; break; }
+            if (slot_ix_ref(lines[j], d)) break;
+            InstrEffects e = instr_effects(lines[j]);
+            if (e.unknown || e.is_call || e.is_boundary
+                || e.d_read || e.e_read || e.d_write || e.e_write
+                || strstr(lines[j], "de") || strstr(lines[j], "\tex\t")
+                || strstr(lines[j], "(sp"))
+                break;
+        }
+        if (found < 0) continue;
+        /* The slot must be dead after the reload: on the straight line below,
+           its next reference is a whole-word store, or the function returns. */
+        int dead = 0;
+        for (int k = found + 1; k < n && k < found + 200; k++) {
+            if (drop[k] || !strncmp(lines[k], "\tC_LINE", 7)) continue;
+            if (lines[k][0] != '\t') continue;                   /* label: fall through */
+            char sa[24], sb[24];
+            snprintf(sa, sizeof sa, "\tld\t(ix%+d),hl\n", d);
+            snprintf(sb, sizeof sb, "\tld\t(ix%+d),hl\n", d);
+            if (!strcmp(lines[k], sa)) { dead = 1; break; }
+            if (slot_ix_ref(lines[k], d)) break;                  /* read, or a part-word write */
+            if (!strcmp(lines[k], "\tret\n")) { dead = 1; break; }
+            if (!strncmp(lines[k], "\tjp", 3) || !strncmp(lines[k], "\tjr", 3)
+                || !strncmp(lines[k], "\tdjnz", 5) || !strncmp(lines[k], "\trst", 4)
+                || !strncmp(lines[k], "\treti", 5) || !strncmp(lines[k], "\tretn", 5)
+                || !strncmp(lines[k], "\tldir", 5) || !strncmp(lines[k], "\tlddr", 5))
+                break;
+        }
+        if (!dead) continue;
+        free(lines[i]);
+        lines[i] = strdup("\tld\tde,hl\n");
+        free(lines[found]);
+        lines[found] = strdup("\tld\thl,de\n");
     }
 }
 
@@ -4154,6 +4475,46 @@ static int try_fold_byte_ret(char **lines, char *drop, int n, int i)
     return 1;
 }
 
+/* [tos-rmw] A long read-modify-written on the top of the stack is loaded
+   without removing it (`pop hl; pop de; push de; push hl`) and replaced at the
+   end (`pop bc; pop bc; push de; push hl`). With only register operations in
+   between, the copy and the replacement cancel: keep the two pops, drop the
+   other six. Anything that names memory or the stack pointer in between blocks
+   it, so a popped slot is never read or hit by a push while it is empty. */
+static int tos_rmw_body_ok(const char *l)
+{
+    if (l[0] != '\t') return 0;
+    const char *e = l + 1;
+    while (*e && *e != '\t' && *e != ' ' && *e != '\n') e++;
+    size_t n = (size_t)(e - l - 1);
+    static const char *ok[] = {"ld", "xor", "and", "or", "add", "adc", "sub",
+        "sbc", "inc", "dec", "cp", "rl", "rr", "sla", "sra", "srl", "rla",
+        "rra", "rlca", "rrca", "cpl", "neg", "ex", "bit", "res", "set", NULL};
+    int found = 0;
+    for (int k = 0; ok[k]; k++)
+        if (strlen(ok[k]) == n && !strncmp(l + 1, ok[k], n)) { found = 1; break; }
+    if (!found) return 0;
+    if (strchr(e, '(') || strstr(e, "sp")) return 0;
+    return 1;
+}
+
+static void try_fold_tos_rmw(char **lines, char *drop, int n, int i)
+{
+    if (opt_disabled("tos-rmw")) return;
+    if (i + 3 >= n || strcmp(lines[i], "\tpop\thl\n") || strcmp(lines[i + 1], "\tpop\tde\n")
+        || strcmp(lines[i + 2], "\tpush\tde\n") || strcmp(lines[i + 3], "\tpush\thl\n"))
+        return;
+    for (int j = i + 4; j < n && j < i + 4 + 40; j++) {
+        if (j + 3 < n && !strcmp(lines[j], "\tpop\tbc\n") && !strcmp(lines[j + 1], "\tpop\tbc\n")
+            && !strcmp(lines[j + 2], "\tpush\tde\n") && !strcmp(lines[j + 3], "\tpush\thl\n")) {
+            drop[i + 2] = drop[i + 3] = drop[j] = drop[j + 1] = 1;
+            return;
+        }
+        if (lines[j][0] == '\n' || !strncmp(lines[j], "\tC_LINE", 7)) continue;
+        if (!tos_rmw_body_ok(lines[j])) return;
+    }
+}
+
 /* [byte-ret] The final stage after tail merging. Merging must see the original
    `ld l,a` tails: narrowing first makes constant returns differ and a merge
    that would have paid is lost. The pair that remains adjacent after the merge
@@ -4168,8 +4529,10 @@ static void filter_byte_ret(FILE *out, FILE *src)
     }
     char *drop = calloc((size_t)(n > 0 ? n : 1), 1);
     if (drop)
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++) {
             try_fold_byte_ret(lines, drop, n, i);
+            try_fold_tos_rmw(lines, drop, n, i);
+        }
     for (int i = 0; i < n; i++) {
         if (!drop || !drop[i]) fputs(lines[i], out);
         free(lines[i]);
@@ -4213,6 +4576,10 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            from the backward sweep below), so it runs as a pre-pass here. */
         fold_dead_de_reload(lines, drop, n);
         fold_dead_sp_addr(lines, drop, n);
+        fold_dead_ex_de_hl(lines, drop, n);
+        fold_arg_pop_hl(lines, drop, n);
+        fold_dead_ld_hl_a(lines, drop, n);
+        fold_slot_park_de(lines, drop, n);
         fold_slot_bitop_de(lines, drop, n);
         fold_mask_shl_a(lines, drop, n);
         fold_const_xorflip(lines, drop, n);
@@ -4602,6 +4969,10 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 c_live = cond ? (tc | c_live) : tc;
                 if (dj) b_live = 1;
             }
+            /* `ret cc`: BC is dead on the taken edge (as at a bare ret), and the
+               fall-through sees the state already computed from below. */
+            else if (call && !strncmp(lines[i], "\tret\t", 5)
+                     && !opt_disabled("ret-cc-bc")) { }
             else if (call){ b_live = c_live = 1; }
             else if (park) {
                 if (!b_live && !c_live) drop[i] = 1;
@@ -6253,6 +6624,35 @@ static void emit_slot_addr_off(FILE *out, const Func *f, int canon_off);
    HL tenant MOVES to DE (it is not clobbered), so swaps route here
    rather than through hl_about_to_change. */
 static void hl_about_to_change(int v_new);
+
+/* Conditional side exits whose register beliefs differ from the ones the block
+   ends with. Successors take the end-of-block beliefs; the edge from an earlier
+   exit must not. Listed per (pred, target), reset for each render. */
+typedef struct { int pred, tgt; } UnsafeEdge;
+static UnsafeEdge *g_unsafe_edge;
+static int g_unsafe_n, g_unsafe_cap;
+
+static void unsafe_edge_add(int pred, int tgt)
+{
+    if (g_unsafe_n == g_unsafe_cap) {
+        int nc = g_unsafe_cap ? g_unsafe_cap * 2 : 16;
+        UnsafeEdge *ne = realloc(g_unsafe_edge, (size_t)nc * sizeof *ne);
+        if (!ne) return;
+        g_unsafe_edge = ne;
+        g_unsafe_cap = nc;
+    }
+    g_unsafe_edge[g_unsafe_n].pred = pred;
+    g_unsafe_edge[g_unsafe_n].tgt = tgt;
+    g_unsafe_n++;
+}
+
+static int edge_unsafe(int pred, int tgt)
+{
+    for (int i = 0; i < g_unsafe_n; i++)
+        if (g_unsafe_edge[i].pred == pred && g_unsafe_edge[i].tgt == tgt)
+            return 1;
+    return 0;
+}
 
 /* Cross-BB HL slot-address carry (default on; IR_OFF=hl-addr-carry reverts). */
 static int hladdr_bb_carry_on(void)
@@ -9005,6 +9405,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
            DCE that dedup and clean up the resulting MOVs. */
         (void)ir_opt_self_ops(f);
         int cfold   = ir_opt_const_fold(f);
+        cfold      += ir_opt_const_local(f);
         /* Table-driven pattern matcher (ir_match.c) — migrated fusion
            passes run here, in table order, to fixpoint. After st2ld
            (forwarding can expose imm→CONV chains), before CSE so identical
@@ -9054,7 +9455,9 @@ static int ir_lower_func_body(FILE *out, Func *f)
            and slot sizing (which reads the now-narrowed widths). */
         int ivnarrow = ir_opt_narrow_iv(f);
         int narrow  = ir_opt_narrow_byte(f);
+        narrow += ir_opt_byte_cleanup(f);   /* identity masks; byte reads skip a widening */
         ir_opt_cmp_unsign(f);           /* drop the signed-compare sign tail */
+        (void)ir_opt_step_cmp(f);       /* x++ == K  ->  stepped value == K+1 */
         /* narrow_byte turns promoting CONV_SX|ZX operands into
            byte-identity copies; propagate them away (else they spill to a
            slot) and DCE the now-dead copies. */
@@ -9266,6 +9669,212 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 if (parked) continue;
                 g_hc.long_mem[d] = o;
                 f->vregs[d].flags |= IR_VREG_NO_SLOT;
+            }
+        }
+    }
+    /* word-mem-rhs: a width-2 integer global load read once, by the very next op,
+       as an operand of a word ADD or SUB is not loaded; that op reads the global
+       with `ld de,(sym)`, which leaves HL alone. Needs the absolute DE load, and a
+       function with nothing homed in DE. */
+    g_hc.word_mem = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                           sizeof(const Op *));
+    if (g_hc.word_mem && !opt_disabled("word-mem-rhs")
+        && !IS_808x() && !IS_GBZ80() && !f->de_home_general) {
+        int de_homed = 0, de_byte_homed = 0;
+        for (int v = 0; v < f->n_vregs; v++) {
+            PhysReg ph = ir_home_assigned(f, v);
+            if (ph == IR_PR_DE) de_homed = 1;
+            if (ph == IR_PR_E || ph == IR_PR_D) de_byte_homed = 1;
+        }
+        for (int b = 0; b < f->n_bbs && !de_byte_homed; b++) {
+            const BB *bb = &f->bbs[b];
+            for (int j = 0; j + 1 < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j];
+                const Op *u = &bb->ops[j + 1];
+                int d = o->dst;
+                if (o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_SYM) continue;
+                if (d < 0 || d >= f->n_vregs || f->vregs[d].width != 2) continue;
+                /* The user may come a few pure ops later: nothing between may
+                   write memory, so the load can wait for it. */
+                if (!opt_disabled("word-mem-defer")) {
+                    int ku = -1;
+                    for (int k = j + 1; k < bb->n_ops && ku < 0; k++) {
+                        int us[16]; int nu = ir_op_uses(&bb->ops[k], us, 16);
+                        for (int t = 0; t < nu; t++) if (us[t] == d) { ku = k; break; }
+                        if (ku >= 0) break;
+                        switch (bb->ops[k].kind) {
+                        case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR:
+                        case IR_LEA: case IR_ADD: case IR_SUB: case IR_RSUB:
+                        case IR_AND: case IR_OR: case IR_XOR: case IR_SHL: case IR_SHR:
+                        case IR_NEG: case IR_NOT: case IR_INC: case IR_DEC:
+                        case IR_CONV_ZX: case IR_CONV_SX: case IR_CONV_TRUNC:
+                            break;
+                        case IR_LD_MEM:
+                            if (bb->ops[k].mem.volatile_) k = bb->n_ops;
+                            break;
+                        default:
+                            k = bb->n_ops;               /* anything else: stop */
+                        }
+                    }
+                    if (ku < 0) continue;
+                    u = &bb->ops[ku];
+                }
+                if (!vreg_kind_is_integer(f, d)) continue;
+                if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_NO_SLOT | IR_VREG_CALL_SPLIT
+                                         | IR_VREG_PARAM))
+                    continue;
+                if (o->mem.volatile_ || !o->mem.sym || ns_sym_bails(o->mem.sym)
+                    || mem_bank_fn(&o->mem) || o->mem.elem == KIND_CPTR)
+                    continue;
+                if (u->kind != IR_ADD && u->kind != IR_SUB) continue;
+                if (u->src[0] < 0 || u->src[1] < 0) continue;
+                int other = (u->src[1] == d) ? u->src[0]
+                          : (u->kind == IR_ADD && u->src[0] == d) ? u->src[1] : -1;
+                if (other < 0 || other == d
+                    || u->dst < 0 || f->vregs[u->dst].width != 2
+                    || !vreg_kind_is_integer(f, u->dst)
+                    || f->vregs[other].width != 2
+                    || (f->vregs[u->dst].flags & IR_VREG_VOLATILE))
+                    continue;
+                if (ir_home_assigned(f, d) != IR_PR_SPILL
+                    && ir_home_assigned(f, d) != IR_PR_STACK)
+                    continue;
+                if (vreg_idx_home(f, u->dst) != IR_PR_NONE
+                    || vreg_idx_home(f, other) != IR_PR_NONE
+                    || vreg_in_exx(f, u->dst) || vreg_in_exx(f, other))
+                    continue;
+                if (bb->live_out
+                    && ir_bitset_get((const BitSet *)bb->live_out, d)) continue;
+                int nuse = 0, ndef = 0;
+                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
+                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
+                        const Op *p = &f->bbs[bb2].ops[k];
+                        int df[8]; int nd = ir_op_defs(p, df, 8);
+                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
+                        int us[16]; int nu = ir_op_uses(p, us, 16);
+                        for (int t = 0; t < nu; t++) if (us[t] == d) nuse++;
+                    }
+                if (ndef != 1 || nuse != 1) continue;
+                /* A value homed in DE other than the operands and the result
+                   must not be live where the add reads the global. */
+                if (de_homed) {
+                    int gj = bc_op_global_index(f, bb, j);
+                    int gu = gj + (int)(u - o);
+                    int clash = (gj < 0);
+                    for (int w = 0; w < f->n_vregs && !clash; w++) {
+                        if (ir_home_assigned(f, w) != IR_PR_DE
+                            || w == other || w == d || w == u->dst)
+                            continue;
+                        const LiveRange *lr = ir_live_range(f, w);
+                        if (!lr || lr->start < 0
+                            || (lr->start <= gu && lr->end >= gj))
+                            clash = 1;
+                    }
+                    if (clash) continue;
+                }
+                g_hc.word_mem[d] = o;
+                f->vregs[d].flags |= IR_VREG_NO_SLOT;
+            }
+        }
+    }
+    /* long-zx-fold: a single-use zero-extend of a frame word/byte, or constant
+       shift by 8/16/24 of a frame long, whose only user is the next long
+       AND/OR/XOR/ADD/SUB with a frame long as the other operand. The producer
+       emits nothing when its user can read the bytes in place (frame-pointer
+       mode); otherwise it is built as usual and handed over in the DEHL cache.
+       Either way its result needs no slot. The frame mode is not final here, so
+       it is tested where the ops are emitted. */
+    g_hc.long_zx = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                          sizeof(const Op *));
+    g_hc.long_zx_keep = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), 1);
+    if (g_hc.long_zx && !opt_disabled("long-zx-fold")) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            const BB *bb = &f->bbs[b];
+            for (int j = 0; j + 1 < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j], *u = &bb->ops[j + 1];
+                int d = o->dst, w = o->src[0];
+                int is_zx = (o->kind == IR_CONV_ZX);
+                int is_sh = ((o->kind == IR_SHR || o->kind == IR_SHL)
+                             && o->src[1] < 0
+                             && ((int)(o->imm & 0x1f) == 8 || (int)(o->imm & 0x1f) == 16
+                                 || (int)(o->imm & 0x1f) == 24));
+                if (!is_zx && !is_sh) continue;
+                if (d < 0 || d >= f->n_vregs || f->vregs[d].width != 4) continue;
+                if (w < 0 || w >= f->n_vregs) continue;
+                if (is_zx && f->vregs[w].width != 1 && f->vregs[w].width != 2) continue;
+                if (is_sh && f->vregs[w].width != 4) continue;
+                if (!vreg_kind_is_integer(f, d) || !vreg_kind_is_integer(f, w)) continue;
+                int arith_user = (u->kind == IR_ADD || u->kind == IR_SUB);
+                if (u->kind != IR_AND && u->kind != IR_OR && u->kind != IR_XOR
+                    && !arith_user) continue;
+                /* ADD/SUB chain the carry: no sign fill, no zero first byte */
+                if (arith_user && is_sh
+                    && (o->kind == IR_SHL || (o->imm & IR_SHR_ARITH))) continue;
+                if (u->src[0] < 0 || u->src[1] < 0) continue;
+                int other = (u->src[0] == d) ? u->src[1] : (u->src[1] == d) ? u->src[0] : -1;
+                if (other < 0 || other == d || other >= f->n_vregs
+                    || f->vregs[other].width != 4 || !vreg_kind_is_integer(f, other))
+                    continue;
+                if (u->dst < 0 || u->dst >= f->n_vregs || f->vregs[u->dst].width != 4
+                    || !vreg_kind_is_integer(f, u->dst)
+                    || (f->vregs[u->dst].flags & (IR_VREG_VOLATILE | IR_VREG_ADDR_TAKEN)))
+                    continue;
+                if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_NO_SLOT | IR_VREG_CALL_SPLIT))
+                    continue;
+                /* the sources must have a frame slot that holds the value, and
+                   no register home that would leave the slot stale */
+                if (!vreg_is_spilled(f, w) || !vreg_is_spilled(f, other)) continue;
+                if (f->vregs[w].flags & (IR_VREG_NO_SLOT | IR_VREG_VOLATILE
+                                         | IR_VREG_ADDR_TAKEN | IR_VREG_DEAD_SPILL))
+                    continue;
+                if (f->vregs[other].flags & (IR_VREG_NO_SLOT | IR_VREG_VOLATILE
+                                             | IR_VREG_DEAD_SPILL))
+                    continue;
+                if (vreg_in_pr_bc(f, d)
+                    || vreg_is_pr_de(f, u->dst) || vreg_in_pr_bc(f, u->dst))
+                    continue;
+                /* the folded operand's source is read from its slot: if the op
+                   that defined it left it in the DEHL cache only (no store), the
+                   slot is stale */
+                {
+                    int stale = 0;
+                    for (int jd = j - 1; jd >= 0 && !stale; jd--) {
+                        int df[8]; int nd = ir_op_defs(&bb->ops[jd], df, 8);
+                        for (int t = 0; t < nd; t++)
+                            if (df[t] == w) {
+                                if (def_dst_dead(f, bb, jd)) stale = 1;
+                                jd = -1;
+                                break;
+                            }
+                    }
+                    if (stale) continue;
+                }
+                if (bb->live_out
+                    && ir_bitset_get((const BitSet *)bb->live_out, d)) continue;
+                int dst_dead = def_dst_dead(f, bb, j + 1);
+                if (!dst_dead && !vreg_is_pr_dehl(f, u->dst)
+                    && (f->vregs[u->dst].flags & IR_VREG_NO_SLOT)) continue;
+                int nuse = 0, ndef = 0;
+                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
+                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
+                        const Op *p = &f->bbs[bb2].ops[k];
+                        int df[8]; int nd = ir_op_defs(p, df, 8);
+                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
+                        int us[16]; int nu = ir_op_uses(p, us, 16);
+                        for (int t = 0; t < nu; t++) if (us[t] == d) nuse++;
+                    }
+                if (ndef != 1 || nuse != 1) continue;
+                int parked = 0;
+                for (int k = 0; k < bb->n_ops && !parked; k++)
+                    if (bb->ops[k].kind == IR_PUSH_DEHL_LONG
+                        && (bb->ops[k].src[0] == other || bb->ops[k].src[0] == d))
+                        parked = 1;
+                if (parked) continue;
+                g_hc.long_zx[d] = o;
+                if (arith_user && g_hc.long_zx_keep) g_hc.long_zx_keep[d] = 1;
+                else f->vregs[d].flags |= IR_VREG_NO_SLOT;
             }
         }
     }
@@ -10132,6 +10741,9 @@ static int ir_lower_func_body(FILE *out, Func *f)
     free(g_hc.remat_def); g_hc.remat_def = NULL;
     free(g_hc.byte_remat); g_hc.byte_remat = NULL;
     free(g_hc.long_mem); g_hc.long_mem = NULL;
+    free(g_hc.word_mem); g_hc.word_mem = NULL;
+    free(g_hc.long_zx); g_hc.long_zx = NULL;
+    free(g_hc.long_zx_keep); g_hc.long_zx_keep = NULL;
     free(g_hc.long_rmw_ld); g_hc.long_rmw_ld = NULL;
     free(g_hc.long_rmw_st); g_hc.long_rmw_st = NULL;
     free(bb_lowered);
@@ -10534,6 +11146,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         for (int i = 0; i < f->n_bbs; i++) bb_hl_addr_out[i] = -1;
     /* Per-pass state reset (everything that was at function entry except
        func_emit_idx, which the caller bumps once for both passes). */
+    g_unsafe_n = 0;
     L.cmp_label_counter = 0;
     L.lazy_spill_on = lazy;
     L.pending_spill_v = -1;
@@ -10695,7 +11308,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) { acarry = -1; break; }
-                int v = bb_hl_out[pid];
+                int v = edge_unsafe(pid, bb->id) ? -1 : bb_hl_out[pid];
                 if (v < 0) { acarry = -1; break; }
                 if (acarry == -2) acarry = v;
                 else if (acarry != v) { acarry = -1; break; }
@@ -10710,7 +11323,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                     int pid = bb_preds[bb->id][p];
                     if (!bb_lowered[pid]) { dcarry = -1; break; }
-                    int v = bb_de_out[pid];
+                    int v = edge_unsafe(pid, bb->id) ? -1 : bb_de_out[pid];
                     if (v < 0) { dcarry = -1; break; }
                     if (dcarry == -2) dcarry = v;
                     else if (dcarry != v) { dcarry = -1; break; }
@@ -10772,7 +11385,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) { bcarry = -1; break; }
-                int v = bb_bc_out ? bb_bc_out[pid] : -1;
+                int v = (bb_bc_out && !edge_unsafe(pid, bb->id)) ? bb_bc_out[pid] : -1;
                 if (v < 0) { bcarry = -1; break; }
                 if (bcarry == -2) bcarry = v;
                 else if (bcarry != v) { bcarry = -1; break; }
@@ -10848,7 +11461,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
             int pid = bb_preds[bb->id][p];
             if (!bb_lowered[pid]) { carry = -1; break; }
-            int v = bb_hl_out[pid];
+            int v = edge_unsafe(pid, bb->id) ? -1 : bb_hl_out[pid];
             if (v < 0) { carry = -1; break; }
             if (carry == -2) carry = v;
             else if (carry != v) { carry = -1; break; }
@@ -10895,7 +11508,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) { dcarry = -1; break; }
-                int v = bb_de_out[pid];
+                int v = edge_unsafe(pid, bb->id) ? -1 : bb_de_out[pid];
                 if (v < 0) { dcarry = -1; break; }
                 if (dcarry == -2) dcarry = v;
                 else if (dcarry != v) { dcarry = -1; break; }
@@ -10948,7 +11561,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) { addr_carry = -1; break; }
-                int o = bb_hl_addr_out[pid];
+                int o = edge_unsafe(pid, bb->id) ? -1 : bb_hl_addr_out[pid];
                 if (o < 0) { addr_carry = -1; break; }
                 if (addr_carry == -2) addr_carry = o;
                 else if (addr_carry != o) { addr_carry = -1; break; }
@@ -10969,7 +11582,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) { acarry = -1; break; }
-                int v = L.bb_a_out ? L.bb_a_out[pid] : -1;
+                int v = (L.bb_a_out && !edge_unsafe(pid, bb->id)) ? L.bb_a_out[pid] : -1;
                 if (v < 0) { acarry = -1; break; }
                 if (acarry == -2) acarry = v;
                 else if (acarry != v) { acarry = -1; break; }
@@ -11144,6 +11757,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             && L.cur_home_exit_flush_bb < 0)
             home_flush(out, f);   /* keep belief; slot now coherent */
         if (frameprobe_on()) frameprobe_region_break();   /* BB boundary */
+        /* Register beliefs at each conditional side exit, compared with the
+           end-of-block state once the block is done. */
+        struct { int tgt, addr, hl, a, bc, de; } sides[16];
+        int n_sides = 0, sides_over = 0, side_over_blk = 0;
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *op = &bb->ops[j];
             int rc;
@@ -11819,6 +12436,21 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             }
             L.ss_cur_g = -1;
             if (rc != 0) goto cleanup_err;
+            {
+                const Op *bo = (L.la.cur_skip_next_op && j + 1 < bb->n_ops)
+                             ? &bb->ops[j + 1] : op;
+                if (bo->kind == IR_BR_ZERO || bo->kind == IR_BR_COND) {
+                    if (n_sides < 16) {
+                        sides[n_sides].tgt = bo->label;
+                        sides[n_sides].addr = L.cur_hl_addr_off;
+                        sides[n_sides].hl = L.rs.hl;
+                        sides[n_sides].a = L.rs.a;
+                        sides[n_sides].bc = L.rs.bc;
+                        sides[n_sides].de = L.rs.de;
+                        n_sides++;
+                    } else sides_over = 1;
+                }
+            }
             if (L.la.cur_skip_next_op) {
                 j++;  /* the fastpath consumed op[i+1] (the branch) */
             }
@@ -11849,17 +12481,33 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             L.bb_byte_out_dirty[bb->id] =
                 (L.bb_byte_out[bb->id] >= 0 && L.cur_de_byte_home_dirty) ? 1 : 0;
         bb_hl_out[bb->id] = L.rs.hl;
+        if (!opt_disabled("side-exit-carry")) {
+            for (int k = 0; k < n_sides; k++) {
+                if (sides[k].addr == L.cur_hl_addr_off && sides[k].hl == L.rs.hl
+                    && sides[k].a == L.rs.a && sides[k].bc == L.rs.bc
+                    && sides[k].de == L.rs.de)
+                    continue;
+                unsafe_edge_add(bb->id, sides[k].tgt);
+                if (bb_alias && sides[k].tgt >= 0 && sides[k].tgt < f->n_bbs
+                    && bb_alias[sides[k].tgt] >= 0)
+                    unsafe_edge_add(bb->id, bb_alias[sides[k].tgt]);
+            }
+            if (sides_over) {          /* too many exits to track: carry nothing */
+                bb_hl_out[bb->id] = -1;
+                side_over_blk = 1;
+            }
+        }
         if (L.bb_hlm_sym) {
             L.bb_hlm_sym[bb->id] = L.hlm_on ? L.hlm_sym : NULL;
             L.bb_hlm_off[bb->id] = L.hlm_off;
         }
-        if (bb_bc_out) bb_bc_out[bb->id] = L.rs.bc;
-        if (bb_de_out) bb_de_out[bb->id] = de_carry_on ? L.rs.de : -1;
-        if (bb_hl_addr_out) bb_hl_addr_out[bb->id] = L.cur_hl_addr_off;
+        if (bb_bc_out) bb_bc_out[bb->id] = side_over_blk ? -1 : L.rs.bc;
+        if (bb_de_out) bb_de_out[bb->id] = (de_carry_on && !side_over_blk) ? L.rs.de : -1;
+        if (bb_hl_addr_out) bb_hl_addr_out[bb->id] = side_over_blk ? -1 : L.cur_hl_addr_off;
         /* A holds a known byte here only if a byte compare (cp/or a) left it —
            word compares and calls clear rs.a. So rs.a captures A-preservation
            to the (branch) terminator; successors inherit it. */
-        if (L.bb_a_out) L.bb_a_out[bb->id] = L.rs.a;
+        if (L.bb_a_out) L.bb_a_out[bb->id] = side_over_blk ? -1 : L.rs.a;
         bb_pending_out[bb->id] = L.pending_spill_v;
         bb_lowered[bb->id] = 1;
     }
@@ -11904,7 +12552,7 @@ static void emit_byte_remat_to_a(FILE *out, const Op *o)
     }
 }
 /* Return true only when every observed use of v is as a width-1 argument to a
-   __z88dk_sdccdecl call. The byte rematerialisation below has no slot to fall
+   stacked-argument call. The byte rematerialisation below has no slot to fall
    back to, so even one non-call consumer must keep the normal definition. */
 static int byte_call_only_sdccdecl(const Func *f, int v)
 {
@@ -11917,8 +12565,11 @@ static int byte_call_only_sdccdecl(const Func *f, int v)
             for (int k = 0; k < nu; k++)
                 if (uses[k] == v) { has_v = 1; break; }
             if (!has_v) continue;
-            if (op->kind != IR_CALL || !op->call
-                || !(op->call->flags & SDCCDECL))
+            if (op->kind != IR_CALL || !op->call) return 0;
+            if (!(op->call->flags & SDCCDECL)
+                && (opt_disabled("byte-const-smallc")
+                    || (op->call->flags & (FASTCALL | SDCCCALL1))
+                    || op->call->abi == IR_ABI_FASTCALL))
                 return 0;
             int is_byte_arg = 0;
             for (int i = 0; i < op->call->n_args; i++)

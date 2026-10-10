@@ -9,6 +9,7 @@
 #include "ccdefs.h"
 #include "tokeniser.h"
 #include "ir_match.h"   /* ir_match_disable for --opt-disable=pattern: */
+void txt_prescan(FILE *fp);
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
 extern unsigned _stklen = 8192U; /* Default stack size 4096 bytes is too small. */
@@ -844,6 +845,7 @@ void openin(void)
                 exit(1);
             }
             input_is_pipe = 0;
+            txt_prescan(input);
         } else {
             input = cpp_open(c_cpp_exe, Filename);
             if (input == NULL)
