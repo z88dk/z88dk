@@ -1137,7 +1137,19 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
        the halves instead (Z = equal, no helper, no DE load for const RHS). */
     int z_true = (op->kind == IR_CMP_EQ);
     int cmp_hl_holds_src0 = 0;   /* compare left src0 intact in HL (no sbc) */
-    if (!(IS_808x() || IS_GBZ80())) {
+    if (op->src[1] == -1 && !op->imm_sym && src0w == 2
+        && (uint16_t)op->imm == 0xffff && !opt_disabled("cmp-minus1")
+        && (g_hc.branch_test_kind != 0 || !IS_RABBIT())) {
+        /* x == -1 / != -1: both halves are 0xff exactly when their AND is, so
+           `inc a` sets Z. No `ld de,-1`, and HL still holds x. Rabbit's value
+           form tests HL, not the flags, so only its branch form qualifies. */
+        load_to_hl(out, f, op->src[0]);
+        emit(out, "ld\ta,h");
+        emit(out, "and\tl");
+        emit(out, "inc\ta");
+        invalidate_a_cache();
+        cmp_hl_holds_src0 = 1;
+    } else if (!(IS_808x() || IS_GBZ80())) {
         if (op->src[1] == -1 && op->imm == 0 && !op->imm_sym && src0w == 2) {
             /* x == 0 / x != 0: OR the halves — Z iff HL==0. No `ld de,0; sbc
                hl,de` (the DE load is pure overhead against zero). HL is left

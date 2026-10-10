@@ -6039,6 +6039,15 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         return 0;
     if (try_word_step_imm(out, f, op, 1))   /* dst = src0 - small K via dec hl */
         return 0;
+    /* A word minus a constant is the word plus the negated constant: the add
+       form needs no `and a`, and the 808x/gbz80 byte-wise subtract goes away. */
+    if (op->src[1] == -1 && op->dst >= 0 && f->vregs[op->dst].width == 2
+        && !opt_disabled("sub-as-add")) {
+        Op t = *op;
+        t.kind = IR_ADD;
+        t.imm = (int64_t)(int16_t)(-op->imm);
+        return gen_add(out, f, &t);
+    }
     if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
         /* Byte sub in A. Not commutative: A = src[0] - src[1]. If only
            src[1] is A-resident, spill it to its slot first so loading

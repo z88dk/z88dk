@@ -61,6 +61,8 @@ exists (ADR 0010).
 | `var-byte-shift` | keep a promoted variable-count byte shift on the established word-width path |
 | `shr-wide` | a constant-count right shift is not narrowed to a byte |
 | `shr-mask` | no folding of the mask a narrowed right shift implies |
+| `shr-arith-mask` | an arithmetic right shift masked into a byte stays a word shift |
+| `bitop-bytes` | an OR of two byte-valued operands keeps a word result |
 | `iv-narrow` | no narrowing of an induction variable |
 | `ivsr` | no induction-variable strength reduction (ADR 0008) |
 | `ivsr-affine` | no folding of a non-power-of-two affine multiple (struct-array stride) |
@@ -121,6 +123,8 @@ exists (ADR 0010).
 | `word-mem-rhs` | a word `a + g` or `a - g` on a single-use global load loads it first instead of reading it with `ld de,(g)` at the add |
 | `word-mem-defer` | the global load for `a + g` must be the op just before the add |
 | `step-cmp` | `x++ == K` keeps the old value of x and compares it, instead of comparing the stepped value with K+1 |
+| `cmp-minus1` | a word compared with -1 loads the constant and subtracts it |
+| `sub-as-add` | a word minus a constant is subtracted, not added as the negated constant |
 | `ret-cc-bc` | a conditional `ret` is a reader of BC, so a park before it is kept |
 | `long-add-carry` | a long add of a constant that fits 16 bits (or a small negative) goes through `ex de,hl; ld bc,0; adc hl,bc; ex de,hl` instead of a skipped `inc de` or `dec de` |
 | `slot-park-de` | a word stored to a frame slot and reloaded with D and E untouched in between goes through the slot instead of DE (frame-pointer mode, Z80 family) |

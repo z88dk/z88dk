@@ -3701,8 +3701,10 @@ static int v_is_const_shr(const Func *f, int v)
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *d = &bb->ops[j];
             if (d->dst != v) continue;
-            if (d->kind != IR_SHR || d->src[1] != -1) return 0;
-            if (d->imm & IR_SHR_ARITH) return 0;
+            if ((d->kind != IR_SHR && d->kind != IR_SHL) || d->src[1] != -1)
+                return 0;
+            if (d->kind == IR_SHR && (d->imm & IR_SHR_ARITH)
+                && opt_disabled("shr-arith-mask")) return 0;
             int n = (int)(d->imm & 0xff);
             if (n < 1 || n > 7) return 0;
             seen = 1;
@@ -4417,6 +4419,28 @@ int ir_opt_cmp_unsign(Func *f)
 }
 
 
+/* Is every def of v an OR of two values that each fit a byte? The result
+   then fits a byte too, so v may be byte-wide whatever reads it; a wide reader
+   zero-extends. */
+static int bitop_of_bytes(const Func *f, int v)
+{
+    if (opt_disabled("bitop-bytes") || v_defs_not_complete(f, v)) return 0;
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            if (op->dst != v) continue;
+            if (op->kind != IR_OR
+                || op->src[0] < 0 || !v_fits_byte(f, op->src[0])) return 0;
+            if (op->src[1] >= 0 ? !v_fits_byte(f, op->src[1])
+                                : (op->imm & ~0xFFLL) != 0) return 0;
+            seen = 1;
+        }
+    }
+    return seen;
+}
+
 int ir_opt_narrow_byte(Func *f)
 {
     if (!f) return 0;
@@ -4449,7 +4473,7 @@ int ir_opt_narrow_byte(Func *f)
         for (int d = 0; d < f->n_vregs; d++) {
             if (!hasdef[d] || bad[d]) continue;
             if (f->vregs[d].width != 2) continue;
-            if (demands_low_byte_only(f, d)) {
+            if (demands_low_byte_only(f, d) || bitop_of_bytes(f, d)) {
                 f->vregs[d].width = 1;
                 f->vregs[d].kind  = KIND_CHAR;   /* keep kind/width consistent */
                 pass_changed++;

@@ -51,3 +51,12 @@ and extended `globaladd.c`, all CPUs and both frame modes.
   over many small shapes; the largest single one is a store through a computed
   pointer with the address parked on the stack.
 - A byte temp gets a B home for a value read once from A (`x++ == K` on a char).
+
+## Addendum: byte masks, constant subtracts, compares with -1
+
+- `shr-arith-mask`, and a constant left shift: a shift of a promoted char whose only reader masks into a byte is computed in A (`(p[0]<<4)&060`, `(p[1]>>4)&017`).
+- `bitop-bytes`: an OR of two byte-valued operands is byte-wide. XOR was tried and grew `localbench` (the byte temporary takes a frame slot), so it stays wide.
+- `sub-as-add`: a word minus a constant is `ld de,-K; add hl,de`.
+- `cmp-minus1`: `x == -1` is `ld a,h; and l; inc a`. Rabbit's value form tests HL, so only its branch form uses it.
+
+Tests: `bytemask.c`, `cmpminus1.c`.

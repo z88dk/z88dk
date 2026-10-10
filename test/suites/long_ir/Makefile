@@ -28,6 +28,8 @@ all:	bytestore.bin bytestore_8080.bin bytestore_gbz80.bin bytestore_r2ka.bin byt
 all:	longcmp.bin longcmp_8080.bin longcmp_gbz80.bin longcmp_r2ka.bin longcmp_ez80.bin longcmp_8085.bin longcmp_kc160.bin longcmp_z180.bin longcmp_r4k.bin longcmp_fp.bin
 all:	longaddk.bin longaddk_8080.bin longaddk_gbz80.bin longaddk_r2ka.bin longaddk_ez80.bin longaddk_8085.bin longaddk_kc160.bin longaddk_z180.bin longaddk_r4k.bin longaddk_fp.bin
 all:	stepcmp.bin stepcmp_8080.bin stepcmp_gbz80.bin stepcmp_r2ka.bin stepcmp_ez80.bin stepcmp_8085.bin stepcmp_kc160.bin stepcmp_z180.bin stepcmp_r4k.bin stepcmp_fp.bin
+all:	bytemask.bin bytemask_8080.bin bytemask_gbz80.bin bytemask_r2ka.bin bytemask_ez80.bin bytemask_8085.bin bytemask_kc160.bin bytemask_z180.bin bytemask_r4k.bin bytemask_fp.bin
+all:	cmpminus1.bin cmpminus1_8080.bin cmpminus1_gbz80.bin cmpminus1_r2ka.bin cmpminus1_ez80.bin cmpminus1_8085.bin cmpminus1_kc160.bin cmpminus1_z180.bin cmpminus1_r4k.bin cmpminus1_fp.bin
 all:	globaladd.bin globaladd_8080.bin globaladd_gbz80.bin globaladd_r2ka.bin globaladd_ez80.bin globaladd_8085.bin globaladd_kc160.bin globaladd_z180.bin globaladd_r4k.bin globaladd_fp.bin
 all:	mulconst.bin mulconst_8080.bin mulconst_gbz80.bin mulconst_r2ka.bin mulconst_ez80.bin mulconst_8085.bin mulconst_kc160.bin mulconst_z180.bin mulconst_r4k.bin mulconst_fp.bin
 all:	condvalue.bin condvalue_8080.bin condvalue_gbz80.bin condvalue_r2ka.bin condvalue_ez80.bin condvalue_8085.bin condvalue_kc160.bin condvalue_z180.bin condvalue_r4k.bin condvalue_fp.bin
@@ -4550,6 +4552,86 @@ stepcmp_r4k.bin: $(SOURCES) stepcmp.c
 	$(runtest_r4k)
 
 stepcmp_fp.bin: $(SOURCES) stepcmp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytemask.bin: $(SOURCES) bytemask.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytemask_8080.bin: $(SOURCES) bytemask.c
+	$(compile_8080)
+	$(runtest_8080)
+
+bytemask_gbz80.bin: $(SOURCES) bytemask.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+bytemask_r2ka.bin: $(SOURCES) bytemask.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+bytemask_ez80.bin: $(SOURCES) bytemask.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+bytemask_8085.bin: $(SOURCES) bytemask.c
+	$(compile_8085)
+	$(runtest_8085)
+
+bytemask_kc160.bin: $(SOURCES) bytemask.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+bytemask_z180.bin: $(SOURCES) bytemask.c
+	$(compile_z180)
+	$(runtest_z180)
+
+bytemask_r4k.bin: $(SOURCES) bytemask.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+bytemask_fp.bin: $(SOURCES) bytemask.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpminus1.bin: $(SOURCES) cmpminus1.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpminus1_8080.bin: $(SOURCES) cmpminus1.c
+	$(compile_8080)
+	$(runtest_8080)
+
+cmpminus1_gbz80.bin: $(SOURCES) cmpminus1.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+cmpminus1_r2ka.bin: $(SOURCES) cmpminus1.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+cmpminus1_ez80.bin: $(SOURCES) cmpminus1.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+cmpminus1_8085.bin: $(SOURCES) cmpminus1.c
+	$(compile_8085)
+	$(runtest_8085)
+
+cmpminus1_kc160.bin: $(SOURCES) cmpminus1.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+cmpminus1_z180.bin: $(SOURCES) cmpminus1.c
+	$(compile_z180)
+	$(runtest_z180)
+
+cmpminus1_r4k.bin: $(SOURCES) cmpminus1.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+cmpminus1_fp.bin: $(SOURCES) cmpminus1.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
