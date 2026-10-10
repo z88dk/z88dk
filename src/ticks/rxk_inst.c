@@ -149,7 +149,9 @@ void rxk_ld_hl_ihlxyd(uint8_t opcode, uint8_t prefix)
     }
     if ( altd ) { h_ = ht; l_ = lt; }
     else { h = ht; l = lt; }
-    st += 11;
+    /* ld hl,(ix+d) is 9 clocks on the R2000/R3000/R4000 and 10 on the R5000/R6000;
+       the (iy+d) and (hl+d) forms add the 2-clock prefix (11 and 12) */
+    st += israbbit6k() ? 10 : 9;
 }
 
 void rxk_ld_ihlxyd_hl(uint8_t opcode, uint8_t prefix)
@@ -171,7 +173,9 @@ void rxk_ld_ihlxyd_hl(uint8_t opcode, uint8_t prefix)
         put_memory(t + 1, h);
         break;
     }
-    st += 11;
+    /* ld (ix+d),hl is 11 clocks on the R2000/R3000/R4000 and 12 on the R5000/R6000;
+       the (iy+d) and (hl+d) forms add the 2-clock prefix (13 and 14) */
+    st += israbbit6k() ? 12 : 11;
 }
 
 void rxk_ld_hl_xy(uint8_t opcode, uint8_t prefix)
