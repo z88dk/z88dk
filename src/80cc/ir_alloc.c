@@ -2241,14 +2241,27 @@ typedef struct {
     int v[IDX2_MAX_LIVE], lo[IDX2_MAX_LIVE], hi[IDX2_MAX_LIVE];
     int n;
     int overflow;
+    int param_hi;            /* end of the parameter occupant, or -1 */
 } Idx2Live;
 
-static int idx2_live_free(const Func *f, const Idx2Live *s, int v, int lo, int hi)
+/* A parameter is loaded into the home in the prologue, whatever window the
+   allocator proved for it. So it may only share the home as the first
+   occupant, and everything after it must start once it has ended: a later
+   occupant that starts earlier would be overwritten by the prologue load. */
+static int idx2_live_free_p(const Func *f, const Idx2Live *s, int v, int lo, int hi,
+                            int is_param)
 {
     if (s->overflow) return 0;
+    if (is_param && s->n > 0) return 0;
+    if (s->n > 0 && s->param_hi >= 0 && lo <= s->param_hi) return 0;
     for (int i = 0; i < s->n; i++)
         if (iv_overlap(f, v, s->v[i], lo, hi, s->lo[i], s->hi[i])) return 0;
     return 1;
+}
+
+static int idx2_live_free(const Func *f, const Idx2Live *s, int v, int lo, int hi)
+{
+    return idx2_live_free_p(f, s, v, lo, hi, 0);
 }
 
 /* A later pass (`tight-homes`) narrows a whole-function home down to the
@@ -2358,6 +2371,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
     int idx3_taken = 0;                  /* the second index (IY) home */
     int idx2_reuse_on = !opt_disabled("idx2-reuse");
     Idx2Live idx2_live = {0};
+    idx2_live.param_hi = -1;
     int exx_taken = 0;                   /* alt-bank invariant claimed → IX freed */
     int de_acc_vreg = -1;                /* DE-acc winner, APPLIED after the loop */
     int de_acc_general = 0;              /* winner is a general (non-acc) home */
@@ -2405,7 +2419,8 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                idx2 for a param if no counter candidate is still assignable
                over an OVERLAPPING window — a non-overlapping param and
                counter can both live here. */
-            if (!idx2_live_free(f, &idx2_live, v, c->lo, c->hi)) continue;
+            if (!idx2_live_free_p(f, &idx2_live, v, c->lo, c->hi,
+                                  (c->flags & CF_IDX2_PARAM) != 0)) continue;
             if (f->idx2_reg == IR_PR_NONE) continue;
             /* G1 grounded gate: skip an index home that costs more than the slot
                for this value (read-only value on a cheap-slot target). G2: unless
@@ -2447,6 +2462,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
             }
             f->vreg_to_phys[v] = f->idx2_reg;
             idx2_live_add(f, &idx2_live, v, c->lo, c->hi, idx2_reuse_on);
+            if (c->flags & CF_IDX2_PARAM) idx2_live.param_hi = c->hi;
             continue;
         }
 
@@ -2629,11 +2645,12 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
     if (idx2_defer >= 0 && f->idx2_reg != IR_PR_NONE
         && !opt_disabled("idx2-revisit")
         && f->vreg_to_phys[pool[idx2_defer].vreg] == IR_PR_SPILL
-        && idx2_live_free(f, &idx2_live, pool[idx2_defer].vreg,
-                          pool[idx2_defer].lo, pool[idx2_defer].hi)) {
+        && idx2_live_free_p(f, &idx2_live, pool[idx2_defer].vreg,
+                            pool[idx2_defer].lo, pool[idx2_defer].hi, 1)) {
         f->vreg_to_phys[pool[idx2_defer].vreg] = f->idx2_reg;
         idx2_live_add(f, &idx2_live, pool[idx2_defer].vreg,
                       pool[idx2_defer].lo, pool[idx2_defer].hi, idx2_reuse_on);
+        idx2_live.param_hi = pool[idx2_defer].hi;
     }
     /* ---- PAIRWISE SWAP: BC <-> the index home ----------------------------
        The loop above is ISOLATION-PRICED GREEDY: it gives each candidate its
@@ -3878,6 +3895,31 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
         if (hi == lo + 1) {
             OpKind uk = bb->ops[hi].kind;
             if (uk == IR_ADD || uk == IR_AND || uk == IR_OR || uk == IR_XOR)
+                continue;
+        }
+        /* The same with a byte truncation between (`*p = (char)i`): the byte
+           is read from its register through A, leaving HL alone. */
+        if (hi == lo + 2 && !opt_disabled("stack-spill-base")) {
+            const Op *mid = &bb->ops[lo + 1], *uo = &bb->ops[hi];
+            if (mid->kind == IR_CONV_TRUNC && mid->dst >= 0
+                && f->vregs[mid->dst].width == 1
+                && mid->src[0] >= 0 && mid->src[0] != v
+                && (uo->kind == IR_ST_MEM || uo->kind == IR_LD_MEM)
+                && uo->mem.kind == IR_MEM_VREG && uo->mem.base == v
+                && uo->src[0] == mid->dst)
+                continue;
+        }
+        /* The same with one global word load between: `a += g` loads g with
+           `ld de,(g)`, which leaves HL (where v rides) alone. */
+        if (hi == lo + 2 && !IS_808x() && !IS_GBZ80()
+            && !opt_disabled("word-mem-rhs")) {
+            const Op *mid = &bb->ops[lo + 1], *uo = &bb->ops[hi];
+            if ((uo->kind == IR_ADD || (uo->kind == IR_SUB && uo->src[0] == v))
+                && mid->kind == IR_LD_MEM && mid->mem.kind == IR_MEM_SYM
+                && !mid->mem.volatile_ && mid->dst >= 0
+                && f->vregs[mid->dst].width == 2
+                && ((uo->src[0] == v && uo->src[1] == mid->dst)
+                    || (uo->src[1] == v && uo->src[0] == mid->dst)))
                 continue;
         }
 

@@ -19,7 +19,7 @@ ENV    = dict(os.environ, ZCCCFG=os.path.join(ROOT, "lib/config"),
 BENCHES = ("charbench crcbench intbench ptrbench sieve rle sortbench queenbench "
            "searchbench switchbench structbench vecbench recordbench maskbench "
            "strbench listbench interpbench matrixbench hashbench fixedbench "
-           "histbench lexbench bitfieldbench widthbench predbench cmpbench shiftbench "
+           "histbench lexbench bitfieldbench widthbench predbench cmpbench shiftbench lshiftbench "
            "localbench divbench callbench md5 charmulbench m4gcd m4bitcount "
            "m4josephus m4kadane m4doors m4memory m4vcfe m4pangram").split()
 

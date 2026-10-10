@@ -1343,6 +1343,23 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
         invalidate_de_cache();
         return;
     }
+    if (fp_active(f) && !L.cur_frameless && !opt_disabled("fp-de-store")) {
+        int ix_off = canon - f->frame_size;
+        if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
+            if (rec_counting) ds_ixaccess++;
+            if (IS_EZ80()) {
+                emit(out, "ld\t(%s%+d),de%s", frame_reg(), ix_off,
+                     vol_stamp(f, vreg));
+            } else {
+                emit(out, "ld\t(%s%+d),e%s", frame_reg(), ix_off,
+                     vol_stamp(f, vreg));
+                emit(out, "ld\t(%s%+d),d", frame_reg(), ix_off + 1);
+            }
+            emit_ex_de_hl(out);
+            invalidate_de_cache();
+            return;
+        }
+    }
     emit_frame_addr_hl(out, f, canon);       /* [lea-frame-addr] on ez80 fp */
     emit(out, "ld\t(hl),e");
     emit(out, "inc\thl");

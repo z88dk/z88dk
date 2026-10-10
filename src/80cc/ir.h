@@ -151,7 +151,7 @@ typedef enum {
 typedef struct {
     int      id;        /* unique within Func; -1 = invalid */
     Kind     kind;      /* KIND_CHAR / KIND_INT / KIND_LONG / KIND_PTR / etc. */
-    int16_t  width;     /* scalar size in bytes (1/2/4/8); for KIND_ARRAY
+    int32_t  width;     /* scalar size in bytes (1/2/4/8); for KIND_ARRAY
                            locals, overloaded as the slot byte count
                            (int16_t fits arrays up to ~32KB). */
     SYMBOL  *sym;       /* backing sym (NULL = compiler temp) */

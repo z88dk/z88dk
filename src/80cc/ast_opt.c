@@ -5295,7 +5295,7 @@ static Node *prop_walk(Node *node, prop_env *env, int *had_call_or_escape)
         /* Inline asm is opaque: it can clobber registers, write through
            pointers, modify any local. Treat like a function call —
            mark the flag so the statement walker clears the env. */
-        if (had_call_or_escape) *had_call_or_escape = 1;
+        if (had_call_or_escape) *had_call_or_escape = 2;
         return node;
 
     case AST_FUNC_CALL:
@@ -5366,7 +5366,12 @@ static Node *prop_walk(Node *node, prop_env *env, int *had_call_or_escape)
             /* Function-call inside the stmt: clear all (any local could
                have been mutated through an earlier &x escape we missed,
                or via a pointer parameter). */
-            if (local_had_call) prop_env_clear(env);
+            if (local_had_call == 1 && !opt_disabled("prop-over-call")) {
+                /* A call cannot write a local whose address never escaped. */
+                for (int q = env->n - 1; q >= 0; q--)
+                    if (aopt_sym_aliased(env->entries[q].sym))
+                        prop_env_remove(env, env->entries[q].sym);
+            } else if (local_had_call) prop_env_clear(env);
         }
         return node;
     }

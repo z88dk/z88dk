@@ -775,7 +775,7 @@ static int new_local_vreg(Builder *b, SYMBOL *sym)
         /* Byte count lives in sym->ctype->size (sym->size is used
            for goto labels / per-sym bookkeeping). */
         int sz = sym->ctype ? sym->ctype->size : 0;
-        b->f->vregs[v].width = (int16_t)sz;
+        b->f->vregs[v].width = sz;
         b->f->vregs[v].flags |= IR_VREG_ADDR_TAKEN;
     } else {
         int w = width_for_kind(k);
@@ -1523,6 +1523,14 @@ static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
     if (pop == 1)                               /* pure power of two */
         return sr_shift_left(b, v, lo_bit, w);
 
+    if (pop == 2 && lo_bit > 0 && !opt_disabled("mult-factor")) {
+        /* (v<<hi) + (v<<lo) == ((v<<(hi-lo)) + v) << lo: lo fewer shifts, and
+           v is added back as itself. */
+        int t = sr_shift_left(b, v, hi_bit - lo_bit, w);
+        int sum = new_temp_kind(b, kw);
+        ir_emit_binop(cur_bb(b), IR_ADD, sum, t, v);
+        return sr_shift_left(b, sum, lo_bit, w);
+    }
     if (pop == 2) {                             /* (v<<hi) + (v<<lo) */
         int hi = sr_shift_left(b, v, hi_bit, w);
         int lo = sr_shift_left(b, v, lo_bit, w);
@@ -1538,6 +1546,13 @@ static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
         int a = 0;
         for (int i = 0; i < 64; i++) if ((up >> i) & 1u) a = i;
         if (a > maxsh) return -1;
+        if (lo_bit > 0 && !opt_disabled("mult-factor")) {
+            /* (v<<a) - (v<<lo) == ((v<<(a-lo)) - v) << lo */
+            int t = sr_shift_left(b, v, a - lo_bit, w);
+            int diff = new_temp_kind(b, kw);
+            ir_emit_binop(cur_bb(b), IR_SUB, diff, t, v);
+            return sr_shift_left(b, diff, lo_bit, w);
+        }
         int hi = sr_shift_left(b, v, a, w);
         int lo = sr_shift_left(b, v, lo_bit, w);
         int dst = new_temp_kind(b, kw);
@@ -2190,16 +2205,26 @@ static int build_int_compound_float(Builder *b, Node *n, const char *stem,
 
     int rv = build_expr(b, n->right);
     if (rv < 0) return -1;
-    rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+    int acc = is_acc_float_kind(fk);        /* 5/6-byte double tier */
+    if (!acc) rv = coerce_int_to_float_kind(b, rv, n->right, fk);
 
     /* int lvalue --(widen)--> float, OP, --(narrow)--> int */
     #define INTF_ARITH(LV, OUT) do {                                        \
-        int fl_ = emit_float_reg_from_int(b, (LV), fk, uns);                \
+        int lv_ = (LV);                                                     \
+        if (acc && lw == 1) {                                               \
+            int wt_ = new_temp_kind(b, KIND_INT);                           \
+            Op *cv_ = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX); \
+            cv_->dst = wt_; cv_->src[0] = lv_; lv_ = wt_;                   \
+        }                                                                   \
+        int fl_ = acc ? emit_acc_from_int(b, lv_, uns)                      \
+                      : emit_float_reg_from_int(b, lv_, fk, uns);           \
         if (fl_ < 0) return build_fail("int-float compound: widen failed");  \
-        int fr_ = emit_float_arith(b, fk, stem, fl_, rv);                   \
+        int fr_ = acc ? emit_acc_binop(b, stem, fl_, rv)                    \
+                      : emit_float_arith(b, fk, stem, fl_, rv);             \
         if (fr_ < 0) return build_fail("int-float compound: %s failed", stem);\
-        (OUT) = emit_int_from_float_reg(b, fr_, fk, uns,                    \
-                                        (lw == 4) ? 4 : 2);                 \
+        (OUT) = acc ? emit_acc_to_int(b, fr_, (lw == 4) ? 4 : 2)            \
+                    : emit_int_from_float_reg(b, fr_, fk, uns,              \
+                                              (lw == 4) ? 4 : 2);           \
         if ((OUT) < 0) return build_fail("int-float compound: narrow failed");\
         if (lw == 1) {                                                      \
             int bt_ = new_temp_kind(b, KIND_CHAR);                          \
@@ -3563,6 +3588,16 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
     }
 
     case AST_LOCAL_VAR:
+        /* A block-scope function declaration decays to the function's address. */
+        if (n->sym && ((Kind)n->sym->type == KIND_FUNC
+                       || (n->sym->ctype && n->sym->ctype->kind == KIND_FUNC))) {
+            int v = new_temp(b, 2);
+            Op *op = ir_op_emit(cur_bb(b), IR_LD_SYM);
+            op->dst = v;
+            op->mem.kind = IR_MEM_SYM;
+            op->mem.sym  = n->sym;
+            return v;
+        }
         /* Bare AST_LOCAL_VAR for scalars is the *address* of the local
            — rvalue reads come through OP_DEREF (handled below), and
            the bare form appears only as the LHS of OP_ASSIGN (handled
@@ -4399,6 +4434,26 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     Type *pt = array_get_byindex(n->sym->ctype->parameters, i);
                     v = widen_arg_to_param(b, v, a, pt);
                 }
+                /* A signed char argument to an int parameter (or a variadic
+                   slot) is promoted by sign; the push would otherwise
+                   zero-extend the byte. */
+                if (!arg_is_struct && b->f->vregs[v].width == 1
+                    && a && a->type && kind_is_integer((Kind)a->type->kind)
+                    && !a->type->isunsigned
+                    && !((n->sym->ctype ? n->sym->ctype->flags : 0)
+                         & (SDCCDECL | SDCCCALL1))
+                    && !opt_disabled("sx-arg")) {
+                    Type *pt = (n->sym->ctype && n->sym->ctype->parameters
+                                && i < (int)array_len(n->sym->ctype->parameters))
+                             ? array_get_byindex(n->sym->ctype->parameters, i)
+                             : NULL;
+                    if (!pt || pt->kind == KIND_ELLIPSES
+                        || (kind_is_integer(pt->kind) && type_width(pt) >= 2)) {
+                        int wt = new_temp_kind(b, KIND_INT);
+                        Op *cv = ir_op_emit(cur_bb(b), IR_CONV_SX);
+                        cv->dst = wt; cv->src[0] = v; v = wt;
+                    }
+                }
                 args[i] = v;
                 /* Bytes this arg occupies on the caller stack: a struct's full
                    size (its vreg is just the 2-byte address), else the vreg
@@ -4963,6 +5018,16 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         }
         if (n->operand && n->operand->ast_type == AST_LOCAL_VAR) {
             SYMBOL *sym = n->operand->sym;
+            /* `&f` of a block-scope function declaration is the function. */
+            if (sym && ((Kind)sym->type == KIND_FUNC
+                        || (sym->ctype && sym->ctype->kind == KIND_FUNC))) {
+                int dst = new_temp(b, 2);
+                Op *op = ir_op_emit(cur_bb(b), IR_LD_SYM);
+                op->dst = dst;
+                op->mem.kind = IR_MEM_SYM;
+                op->mem.sym  = sym;
+                return dst;
+            }
             int src = sym ? sym_map_get(b, sym) : -1;
             if (src < 0)
                 return build_fail("OP_ADDR on unknown local %s",
@@ -5084,7 +5149,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             && kind_is_integer(n->left->type->kind)
             && !is_acc_int_kind(n->left->type->kind)
             && n->right
-            && is_register_float_kind(node_value_kind(n->right)))
+            && (is_register_float_kind(node_value_kind(n->right))
+                || is_acc_float_kind(node_value_kind(n->right))))
             return build_int_compound_float(b, n,
                        (n->ast_type == OP_AADD) ? "add" : "sub",
                        node_value_kind(n->right));
@@ -5141,7 +5207,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             && n->left->type && kind_is_integer(n->left->type->kind)
             && !is_acc_int_kind(n->left->type->kind)
             && n->right
-            && is_register_float_kind(node_value_kind(n->right)))
+            && (is_register_float_kind(node_value_kind(n->right))
+                || is_acc_float_kind(node_value_kind(n->right))))
             return build_int_compound_float(b, n,
                        (n->ast_type == OP_AMULT) ? "mul" : "div",
                        node_value_kind(n->right));
@@ -5175,6 +5242,23 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         if (!n->left || !n->right)
             return build_fail("OP_%s with missing operand",
                               n->ast_type == OP_ANDAND ? "ANDAND" : "OROR");
+        if (!opt_disabled("cond-value")) {
+            /* Branch each leg straight to the join and write 0 or 1 once,
+               rather than turning every leg into a stored boolean. */
+            int res    = get_dest_vreg(b, hint, 2);
+            int true_bb  = ir_bb_new(b->f);
+            int false_bb = ir_bb_new(b->f);
+            int join_bb  = ir_bb_new(b->f);
+            if (build_cond(b, n, true_bb, false_bb) != 0) return -1;
+            b->cur_bb_id = true_bb;
+            ir_emit_ld_imm(cur_bb(b), res, 1);
+            ir_emit_br(cur_bb(b), join_bb);
+            b->cur_bb_id = false_bb;
+            ir_emit_ld_imm(cur_bb(b), res, 0);
+            ir_emit_br(cur_bb(b), join_bb);
+            b->cur_bb_id = join_bb;
+            return res;
+        }
         int a_v = build_expr(b, n->left);
         if (a_v < 0) return -1;
 
@@ -7547,7 +7631,7 @@ static int build_stmt(Builder *b, Node *n)
         if ((Kind)n->sym->type == KIND_STRUCT
             || (Kind)n->sym->type == KIND_ARRAY) {
             int sz = n->sym->ctype ? n->sym->ctype->size : 0;
-            if (sz <= 0 || sz > 32767)
+            if (sz <= 0 || sz > 65000)
                 return build_fail("AST_DECL aggregate sym=%s size=%d "
                                   "out of int16_t slot range",
                                   n->sym->name, sz);
@@ -7588,6 +7672,9 @@ static int build_stmt(Builder *b, Node *n)
             }
             return 0;
         }
+        /* A block-scope function declaration (`int f();` inside a body) names a
+           function and allocates nothing. */
+        if ((Kind)n->sym->type == KIND_FUNC) return 0;
         if (!is_register_int_kind(n->sym->type)
             && !is_register_float_kind(n->sym->type)
             && !is_acc_float_kind(n->sym->type)
@@ -8112,7 +8199,7 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
                                       "unsupported", pt->name, sz);
                 }
                 int sv = ir_vreg_new(b.f, (int)psym->type, psym, IR_VREG_PARAM);
-                b.f->vregs[sv].width  = (int16_t)sz;
+                b.f->vregs[sv].width  = sz;
                 b.f->vregs[sv].flags |= IR_VREG_ADDR_TAKEN;
                 sym_map_set(&b, psym, sv);
                 continue;
