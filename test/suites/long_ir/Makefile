@@ -31,6 +31,7 @@ all:	stepcmp.bin stepcmp_8080.bin stepcmp_gbz80.bin stepcmp_r2ka.bin stepcmp_ez8
 all:	bytemask.bin bytemask_8080.bin bytemask_gbz80.bin bytemask_r2ka.bin bytemask_ez80.bin bytemask_8085.bin bytemask_kc160.bin bytemask_z180.bin bytemask_r4k.bin bytemask_fp.bin
 all:	cmpminus1.bin cmpminus1_8080.bin cmpminus1_gbz80.bin cmpminus1_r2ka.bin cmpminus1_ez80.bin cmpminus1_8085.bin cmpminus1_kc160.bin cmpminus1_z180.bin cmpminus1_r4k.bin cmpminus1_fp.bin
 all:	argpop.bin argpop_8080.bin argpop_gbz80.bin argpop_r2ka.bin argpop_ez80.bin argpop_8085.bin argpop_kc160.bin argpop_z180.bin argpop_r4k.bin argpop_fp.bin
+all:	constcall.bin constcall_8080.bin constcall_gbz80.bin constcall_r2ka.bin constcall_ez80.bin constcall_8085.bin constcall_kc160.bin constcall_z180.bin constcall_r4k.bin constcall_fp.bin
 all:	globaladd.bin globaladd_8080.bin globaladd_gbz80.bin globaladd_r2ka.bin globaladd_ez80.bin globaladd_8085.bin globaladd_kc160.bin globaladd_z180.bin globaladd_r4k.bin globaladd_fp.bin
 all:	mulconst.bin mulconst_8080.bin mulconst_gbz80.bin mulconst_r2ka.bin mulconst_ez80.bin mulconst_8085.bin mulconst_kc160.bin mulconst_z180.bin mulconst_r4k.bin mulconst_fp.bin
 all:	condvalue.bin condvalue_8080.bin condvalue_gbz80.bin condvalue_r2ka.bin condvalue_ez80.bin condvalue_8085.bin condvalue_kc160.bin condvalue_z180.bin condvalue_r4k.bin condvalue_fp.bin
@@ -4673,6 +4674,46 @@ argpop_r4k.bin: $(SOURCES) argpop.c
 	$(runtest_r4k)
 
 argpop_fp.bin: $(SOURCES) argpop.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+constcall.bin: $(SOURCES) constcall.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+constcall_8080.bin: $(SOURCES) constcall.c
+	$(compile_8080)
+	$(runtest_8080)
+
+constcall_gbz80.bin: $(SOURCES) constcall.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+constcall_r2ka.bin: $(SOURCES) constcall.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+constcall_ez80.bin: $(SOURCES) constcall.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+constcall_8085.bin: $(SOURCES) constcall.c
+	$(compile_8085)
+	$(runtest_8085)
+
+constcall_kc160.bin: $(SOURCES) constcall.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+constcall_z180.bin: $(SOURCES) constcall.c
+	$(compile_z180)
+	$(runtest_z180)
+
+constcall_r4k.bin: $(SOURCES) constcall.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+constcall_fp.bin: $(SOURCES) constcall.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 

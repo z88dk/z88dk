@@ -64,3 +64,8 @@ Tests: `bytemask.c`, `cmpminus1.c`.
 - `arg-pop-hl` (z80, z80n): the first stack argument of a leaf function, read as `ld hl,2; add hl,sp; ld a,(hl+); ld h,(hl); ld l,a`, is `pop de; pop hl; push hl; push de` when A and DE are dead. The liveness walk now ends at a plain `ret`. z180 is excluded (slower there). When an `ex de,hl` follows, the argument is popped straight into DE. `predbench` sp runs 0.04% slower: the old sequence left A = L, so the next `ld a,l` was dropped, and it is kept now.
 
 Test: `argpop.c`.
+
+- `prop-over-call`: constant propagation of locals keeps every local whose address never escapes across a call (inline asm still forgets all). `const-local`: a byte local assigned one constant and widened by a conversion becomes the constant. `byte-const-smallc`: a constant byte passed only to stacked smallc calls has no slot and is `ld hl,K; push hl`.
+- `sx-arg`: a signed char argument to an int parameter or a variadic slot is sign-extended. It was zero-extended (`printf("%d", (signed char)-3)` printed 253).
+
+Test: `constcall.c`.

@@ -4774,6 +4774,48 @@ static int cf_width_mask(int w, int64_t *mask)
     }
 }
 
+/* A byte local assigned one constant and read only through widening
+   conversions: each widening becomes the constant itself, so the byte need
+   not survive in a frame slot across calls (`c = 'A'; f(crc, c); g(c)`). */
+int ir_opt_const_local(Func *f)
+{
+    if (!f || opt_disabled("const-local")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    const Op **def = calloc((size_t)nv, sizeof(const Op *));
+    if (!ndef || !def) { free(ndef); free(def); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int k = 0; k < nd; k++)
+                if (d[k] >= 0 && d[k] < nv) { ndef[d[k]]++; def[d[k]] = o; }
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_CONV_ZX && o->kind != IR_CONV_SX) continue;
+            int v = o->src[0], d = o->dst;
+            if (v < 0 || v >= nv || d < 0 || d >= nv || ndef[v] != 1) continue;
+            if (f->vregs[v].width != 1 || f->vregs[d].width != 2) continue;
+            if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                     | IR_VREG_VOLATILE)) continue;
+            const Op *dop = def[v];
+            if (dop->kind != IR_LD_IMM || dop->dst != v || dop->imm_sym) continue;
+            int64_t k = dop->imm & 0xff;
+            if (o->kind == IR_CONV_SX && (k & 0x80)) k -= 0x100;
+            o->kind = IR_LD_IMM;
+            o->imm = k & 0xffff;
+            o->src[0] = -1;
+            o->src[1] = -1;
+            changed++;
+        }
+    free(ndef); free(def);
+    return changed;
+}
+
 int ir_opt_const_fold(Func *f)
 {
     if (!f) return 0;

@@ -9405,6 +9405,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
            DCE that dedup and clean up the resulting MOVs. */
         (void)ir_opt_self_ops(f);
         int cfold   = ir_opt_const_fold(f);
+        cfold      += ir_opt_const_local(f);
         /* Table-driven pattern matcher (ir_match.c) — migrated fusion
            passes run here, in table order, to fixpoint. After st2ld
            (forwarding can expose imm→CONV chains), before CSE so identical
@@ -12551,7 +12552,7 @@ static void emit_byte_remat_to_a(FILE *out, const Op *o)
     }
 }
 /* Return true only when every observed use of v is as a width-1 argument to a
-   __z88dk_sdccdecl call. The byte rematerialisation below has no slot to fall
+   stacked-argument call. The byte rematerialisation below has no slot to fall
    back to, so even one non-call consumer must keep the normal definition. */
 static int byte_call_only_sdccdecl(const Func *f, int v)
 {
@@ -12564,8 +12565,11 @@ static int byte_call_only_sdccdecl(const Func *f, int v)
             for (int k = 0; k < nu; k++)
                 if (uses[k] == v) { has_v = 1; break; }
             if (!has_v) continue;
-            if (op->kind != IR_CALL || !op->call
-                || !(op->call->flags & SDCCDECL))
+            if (op->kind != IR_CALL || !op->call) return 0;
+            if (!(op->call->flags & SDCCDECL)
+                && (opt_disabled("byte-const-smallc")
+                    || (op->call->flags & (FASTCALL | SDCCCALL1))
+                    || op->call->abi == IR_ABI_FASTCALL))
                 return 0;
             int is_byte_arg = 0;
             for (int i = 0; i < op->call->n_args; i++)

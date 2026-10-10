@@ -4434,6 +4434,26 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     Type *pt = array_get_byindex(n->sym->ctype->parameters, i);
                     v = widen_arg_to_param(b, v, a, pt);
                 }
+                /* A signed char argument to an int parameter (or a variadic
+                   slot) is promoted by sign; the push would otherwise
+                   zero-extend the byte. */
+                if (!arg_is_struct && b->f->vregs[v].width == 1
+                    && a && a->type && kind_is_integer((Kind)a->type->kind)
+                    && !a->type->isunsigned
+                    && !((n->sym->ctype ? n->sym->ctype->flags : 0)
+                         & (SDCCDECL | SDCCCALL1))
+                    && !opt_disabled("sx-arg")) {
+                    Type *pt = (n->sym->ctype && n->sym->ctype->parameters
+                                && i < (int)array_len(n->sym->ctype->parameters))
+                             ? array_get_byindex(n->sym->ctype->parameters, i)
+                             : NULL;
+                    if (!pt || pt->kind == KIND_ELLIPSES
+                        || (kind_is_integer(pt->kind) && type_width(pt) >= 2)) {
+                        int wt = new_temp_kind(b, KIND_INT);
+                        Op *cv = ir_op_emit(cur_bb(b), IR_CONV_SX);
+                        cv->dst = wt; cv->src[0] = v; v = wt;
+                    }
+                }
                 args[i] = v;
                 /* Bytes this arg occupies on the caller stack: a struct's full
                    size (its vreg is just the 2-byte address), else the vreg
