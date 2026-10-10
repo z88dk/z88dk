@@ -3453,6 +3453,10 @@ static int gbwm_live_walk(char **lines, int n, const char *drop, int start,
             continue;
         }
         char tgt[64];
+        /* A plain `ret` ends the function: DE is dead there unless it carries
+           the return value; A and HL are not modelled, so they stay live. */
+        if (!strcmp(lines[j], "\tret\n"))
+            return want_a || want_hl || (want_de && xline_ret_reads_de());
         if (xline_branch_target(lines[j], tgt, sizeof tgt)) {
             /* An `ASMPC+n` skip lands a few lines down the fall-through, and
                the lines it skips (inc/dec) kill none of A, HL or DE, so the
@@ -3929,6 +3933,33 @@ static void fold_dead_sp_addr(char **lines, char *drop, int n)
         if (!carry_dead_after(lines, drop, n, k + 1)) continue;
         drop[i] = 1;
         drop[k] = 1;
+    }
+}
+
+/* [arg-pop-hl] The first stack argument read through `ld hl,2; add hl,sp;
+   ld a,(hl+); ld h,(hl); ld l,a` (8 B): when A and DE are dead after it, take
+   the word by popping the return address and the argument, then pushing both
+   back (4 B, same time). */
+static void fold_arg_pop_hl(char **lines, char *drop, int n)
+{
+    static const char *pat[5] = { "\tld\thl,2\n", "\tadd\thl,sp\n",
+        "\tld\ta,(hl+)\n", "\tld\th,(hl)\n", "\tld\tl,a\n" };
+    /* pop/push cost more than the walk on the CPUs with cheap loads (z180). */
+    if ((c_cpu != CPU_Z80 && c_cpu != CPU_Z80N) || opt_disabled("arg-pop-hl")) return;
+    for (int i = 0; i < n; i++) {
+        if (drop[i] || strcmp(lines[i], pat[0])) continue;
+        int idx[5] = { i, 0, 0, 0, 0 }, k = i, ok = 1;
+        for (int p = 1; p < 5 && ok; p++) {
+            k++;
+            while (k < n && (drop[k] || !strncmp(lines[k], "\tC_LINE", 7))) k++;
+            if (k >= n || strcmp(lines[k], pat[p])) ok = 0; else idx[p] = k;
+        }
+        if (!ok || !gbwm_dead_after3(lines, n, drop, idx[4] + 1, 1, 0, 1)) continue;
+        free(lines[idx[0]]); lines[idx[0]] = strdup("\tpop\tde\n");
+        free(lines[idx[1]]); lines[idx[1]] = strdup("\tpop\thl\n");
+        free(lines[idx[2]]); lines[idx[2]] = strdup("\tpush\thl\n");
+        free(lines[idx[3]]); lines[idx[3]] = strdup("\tpush\tde\n");
+        drop[idx[4]] = 1;
     }
 }
 
@@ -4531,6 +4562,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
         fold_dead_de_reload(lines, drop, n);
         fold_dead_sp_addr(lines, drop, n);
         fold_dead_ex_de_hl(lines, drop, n);
+        fold_arg_pop_hl(lines, drop, n);
         fold_dead_ld_hl_a(lines, drop, n);
         fold_slot_park_de(lines, drop, n);
         fold_slot_bitop_de(lines, drop, n);

@@ -60,3 +60,7 @@ and extended `globaladd.c`, all CPUs and both frame modes.
 - `cmp-minus1`: `x == -1` is `ld a,h; and l; inc a`. Rabbit's value form tests HL, so only its branch form uses it.
 
 Tests: `bytemask.c`, `cmpminus1.c`.
+
+- `arg-pop-hl` (z80, z80n): the first stack argument of a leaf function, read as `ld hl,2; add hl,sp; ld a,(hl+); ld h,(hl); ld l,a`, is `pop de; pop hl; push hl; push de` when A and DE are dead. The liveness walk now ends at a plain `ret`. z180 is excluded (slower there). Three z80 sp-mode benches run 0.01-0.04% slower.
+
+Test: `argpop.c`.

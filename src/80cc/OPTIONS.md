@@ -124,6 +124,7 @@ exists (ADR 0010).
 | `word-mem-defer` | the global load for `a + g` must be the op just before the add |
 | `step-cmp` | `x++ == K` keeps the old value of x and compares it, instead of comparing the stepped value with K+1 |
 | `cmp-minus1` | a word compared with -1 loads the constant and subtracts it |
+| `arg-pop-hl` | the first stack argument is read with `ld hl,2; add hl,sp; …` instead of pop/pop/push/push |
 | `sub-as-add` | a word minus a constant is subtracted, not added as the negated constant |
 | `ret-cc-bc` | a conditional `ret` is a reader of BC, so a park before it is kept |
 | `long-add-carry` | a long add of a constant that fits 16 bits (or a small negative) goes through `ex de,hl; ld bc,0; adc hl,bc; ex de,hl` instead of a skipped `inc de` or `dec de` |
