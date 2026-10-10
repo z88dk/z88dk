@@ -61,6 +61,6 @@ and extended `globaladd.c`, all CPUs and both frame modes.
 
 Tests: `bytemask.c`, `cmpminus1.c`.
 
-- `arg-pop-hl` (z80, z80n): the first stack argument of a leaf function, read as `ld hl,2; add hl,sp; ld a,(hl+); ld h,(hl); ld l,a`, is `pop de; pop hl; push hl; push de` when A and DE are dead. The liveness walk now ends at a plain `ret`. z180 is excluded (slower there). Three z80 sp-mode benches run 0.01-0.04% slower.
+- `arg-pop-hl` (z80, z80n): the first stack argument of a leaf function, read as `ld hl,2; add hl,sp; ld a,(hl+); ld h,(hl); ld l,a`, is `pop de; pop hl; push hl; push de` when A and DE are dead. The liveness walk now ends at a plain `ret`. z180 is excluded (slower there). When an `ex de,hl` follows, the argument is popped straight into DE. `predbench` sp runs 0.04% slower: the old sequence left A = L, so the next `ld a,l` was dropped, and it is kept now.
 
 Test: `argpop.c`.

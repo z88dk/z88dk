@@ -3954,7 +3954,22 @@ static void fold_arg_pop_hl(char **lines, char *drop, int n)
             while (k < n && (drop[k] || !strncmp(lines[k], "\tC_LINE", 7))) k++;
             if (k >= n || strcmp(lines[k], pat[p])) ok = 0; else idx[p] = k;
         }
-        if (!ok || !gbwm_dead_after3(lines, n, drop, idx[4] + 1, 1, 0, 1)) continue;
+        if (!ok) continue;
+        /* Followed by `ex de,hl` the argument wants to be in DE: pop it there
+           directly (HL takes the return address and must be dead). */
+        int x = idx[4] + 1;
+        while (x < n && (drop[x] || !strncmp(lines[x], "\tC_LINE", 7))) x++;
+        if (x < n && !strcmp(lines[x], "\tex\tde,hl\n")
+            && gbwm_dead_after3(lines, n, drop, x + 1, 1, 1, 0)) {
+            free(lines[idx[0]]); lines[idx[0]] = strdup("\tpop\thl\n");
+            free(lines[idx[1]]); lines[idx[1]] = strdup("\tpop\tde\n");
+            free(lines[idx[2]]); lines[idx[2]] = strdup("\tpush\tde\n");
+            free(lines[idx[3]]); lines[idx[3]] = strdup("\tpush\thl\n");
+            drop[idx[4]] = 1;
+            drop[x] = 1;
+            continue;
+        }
+        if (!gbwm_dead_after3(lines, n, drop, idx[4] + 1, 1, 0, 1)) continue;
         free(lines[idx[0]]); lines[idx[0]] = strdup("\tpop\tde\n");
         free(lines[idx[1]]); lines[idx[1]] = strdup("\tpop\thl\n");
         free(lines[idx[2]]); lines[idx[2]] = strdup("\tpush\thl\n");
