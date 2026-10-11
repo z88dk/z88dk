@@ -196,6 +196,8 @@ exists (ADR 0010).
 
 | Name | Turning it off means |
 | --- | --- |
+| `wide-mem` | a double read once from a global is loaded at its definition and kept in a frame slot, not read in place where it is used |
+| `acc-phi` | a wide value that every predecessor of a join block leaves in the accumulator is stored by each and reloaded at the join |
 | `rabbit-hl-ind` | Rabbit does not read a word at HL plus a signed byte with one `ld hl,(hl+d)` |
 | `ix-indirect` | an sp-mode function with any indirect call saves IX, even when the call does not dispatch through it |
 | `jp-next` | keep an unconditional `jp` that jumps to the label directly below it |

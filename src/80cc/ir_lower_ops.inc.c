@@ -3550,7 +3550,8 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (long_mem_of(f, op->dst) || long_rmw_ld_of(f, op->dst)
-        || word_mem_of(f, op->dst)) return 0;   /* read in place by its user */
+        || word_mem_of(f, op->dst) || wide_mem_of(f, op->dst))
+        return 0;                               /* read in place by its user */
     emit_ns_switch(out, mem_bank_fn(&op->mem));   /* __addressmod: page in */
     if (op->dst >= 0 && f->vregs[op->dst].width > 4) {
         /* Wide load: address into HL, acc_load→accumulator, store→dst slot. */

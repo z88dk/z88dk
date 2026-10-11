@@ -254,6 +254,7 @@ typedef struct {
     const Op **long_zx;   /* per-vreg: a width-4 zero-extend of a frame word/byte whose
                              only use is the next long AND/OR/XOR; the extend is
                              skipped and that op reads the source bytes from the frame */
+    const Op **wide_mem;  /* per-vreg: a wide float single-use global load read in place at its use */
     const Op **long_mem;  /* per-vreg: a width-4 single-use global load whose next op
                              is the long ADD/SUB/AND/OR/XOR taking it as its right
                              operand; the load is skipped and read at that op */
@@ -282,6 +283,10 @@ static const Op *long_rmw_ld_of(const Func *f, int v)
 /* The deferred zero-extend for long vreg v, or NULL. */
 static const Op *long_zx_of(const Func *f, int v)
 { return hc_lookup(f, g_hc.long_zx, v); }
+
+/* The deferred global load for wide (>4 byte) float vreg v, or NULL. */
+static const Op *wide_mem_of(const Func *f, int v)
+{ return hc_lookup(f, g_hc.wide_mem, v); }
 
 /* The deferred global load for long vreg v, or NULL. */
 static const Op *long_mem_of(const Func *f, int v)
@@ -409,6 +414,7 @@ static void compute_no_slot_wide(Func *f);
 static int wpp_stack[8];
 static int wpp_n;
 static int wide_prepush(FILE *out, const Func *f, int v);
+static int wide_prepush_target(const Func *f, const BB *bb, int j, int v);
 /* [f32-prepush] 4-byte helper operands pushed at their def, innermost last,
    with cur_sp_adjust right after each push. */
 static int dpp_v[8], dpp_sp[8];
@@ -6937,6 +6943,14 @@ static void emit_slot_addr_ofs(FILE *out, const Func *f, int vreg, int adj,
 
 static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
 {
+    const Op *wm = wide_mem_of(f, vreg);
+    if (wm) {                              /* [wide-mem] read the global in place */
+        if (wm->mem.offset)
+            emit(out, "ld\thl,_%s+%d", ir_sym_name(wm->mem.sym), wm->mem.offset);
+        else
+            emit(out, "ld\thl,_%s", ir_sym_name(wm->mem.sym));
+        return;
+    }
     accdrop_check_read(f, vreg);
     require_slot(f, vreg);   /* [acc-drop-slot] a dropped value has no slot */
     if (fp_active(f) && IS_EZ80()) {
@@ -9767,6 +9781,74 @@ static int ir_lower_func_body(FILE *out, Func *f)
             }
         }
     }
+    /* wide-mem: a float (>4 byte) global load read once, later in the same block
+       with nothing between that can write memory, is not loaded and not spilled:
+       its reader takes the address of the global instead of the address of a
+       frame slot (emit_acc_slot_addr). Re-reading the global costs less than the
+       frame temp, which needs a store and a reload. */
+    g_hc.wide_mem = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                           sizeof(const Op *));
+    if (g_hc.wide_mem && !opt_disabled("wide-mem")) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            const BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j];
+                int d = o->dst;
+                if (o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_SYM) continue;
+                if (d < 0 || d >= f->n_vregs || f->vregs[d].width <= 4) continue;
+                if (f->vregs[d].kind == KIND_LONGLONG || vreg_kind_is_integer(f, d))
+                    continue;
+                if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_NO_SLOT | IR_VREG_CALL_SPLIT
+                                         | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+                    continue;
+                if (o->mem.volatile_ || !o->mem.sym || ns_sym_bails(o->mem.sym)
+                    || mem_bank_fn(&o->mem))
+                    continue;
+                /* acc-prepush pushes it at its def; its partner operand is
+                   kept in the accumulator on that understanding. */
+                if (wide_prepush_target(f, bb, j, d) >= 0) continue;
+                int nuse = 0, ndef = 0, use_j = -1;
+                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
+                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
+                        const Op *p = &f->bbs[bb2].ops[k];
+                        int df[8]; int nd = ir_op_defs(p, df, 8);
+                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
+                        int us[16]; int nu = ir_op_uses(p, us, 16);
+                        for (int t = 0; t < nu; t++)
+                            if (us[t] == d) {
+                                nuse++;
+                                if (bb2 == b) use_j = k;
+                            }
+                    }
+                if (ndef != 1 || nuse != 1 || use_j <= j) continue;
+                if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, d))
+                    continue;
+                int hazard = 0;
+                for (int k = j + 1; k < use_j && !hazard; k++) {
+                    switch (bb->ops[k].kind) {
+                    case IR_NOP: case IR_MOV: case IR_LD_IMM: case IR_LD_SYM:
+                    case IR_LD_STR: case IR_LEA: case IR_LD_MEM:
+                    case IR_ADD: case IR_SUB: case IR_RSUB: case IR_AND: case IR_OR:
+                    case IR_XOR: case IR_SHL: case IR_SHR: case IR_MUL: case IR_NEG:
+                    case IR_NOT: case IR_CONV_ZX: case IR_CONV_SX: case IR_CONV_TRUNC:
+                    case IR_CMP_EQ: case IR_CMP_NE: case IR_CMP_LT: case IR_CMP_LE:
+                    case IR_CMP_GT: case IR_CMP_GE: case IR_CMP_ULT: case IR_CMP_ULE:
+                    case IR_CMP_UGT: case IR_CMP_UGE:
+                    case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+                    case IR_PUSH_ARG: case IR_ACC_BINOP: case IR_ACC_CMP:
+                    case IR_ACC_UNOP:
+                        break;
+                    default:
+                        hazard = 1;
+                    }
+                }
+                if (hazard) continue;
+                g_hc.wide_mem[d] = o;
+                f->vregs[d].flags |= IR_VREG_NO_SLOT;
+            }
+        }
+    }
     /* long-mem-rhs: a width-4 integer global load read once, by the very next
        op, as the right operand of a long ADD/SUB/AND/OR/XOR is not loaded; that
        op reads the global in place. */
@@ -10891,6 +10973,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
     free(g_hc.remat_def); g_hc.remat_def = NULL;
     free(g_hc.byte_remat); g_hc.byte_remat = NULL;
     free(g_hc.long_mem); g_hc.long_mem = NULL;
+    free(g_hc.wide_mem); g_hc.wide_mem = NULL;
     free(g_hc.word_mem); g_hc.word_mem = NULL;
     free(g_hc.long_zx); g_hc.long_zx = NULL;
     free(g_hc.long_zx_keep); g_hc.long_zx_keep = NULL;
@@ -11679,6 +11762,11 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         if (bb_pred_cnt[bb->id] == 0 && entry_dehl >= 0 && bb->live_in
             && ir_bitset_get((const BitSet *)bb->live_in, entry_dehl))
             cache_dehl(entry_dehl);
+        /* [acc-phi] The wide value every predecessor left in the accumulator. */
+        {
+            int jv = wide_join_value(f, (int)(bb - f->bbs));
+            if (jv >= 0) *wide_acc_cell(f, jv) = jv;
+        }
         entry_hl = -1;   /* consumed at the first BB; never re-seed */
         entry_de = -1;   /* consumed at the first BB; never re-seed */
         entry_dehl = -1;

@@ -21,6 +21,21 @@ static void store_g(double x) { gd = x * 3 + 1; }
 static int cmp_lit(double x) { return x * 2 < 9; }
 static double redef(double x) { x = x * 4; x = x - 1; return x; }
 static double chain(int a, int b) { return (double)a / 8 * 3 - b / (double)4; }
+
+/* [wide-mem / acc-phi] A global double read once is read where it is used, but
+ * never past a write to it; a ?: result left in the accumulator by both arms is
+ * not stored, but a value read again later still is. */
+static double wg1 = 3, wg2 = 4, wg3;
+static void wbump(void) { wg1 = wg1 + 1; }
+static double w_stale(void) { double t = wg1; wg1 = 5; return t * 2 + wg1; }
+static double w_call(void) { double t = wg1; wbump(); return t + wg1; }
+static double w_chain(void) { wg3 = 75 - wg1 - wg2; return wg3; }
+static double w_twice(void) { return wg1 - wg2 - wg1; }
+static double w_ptr(double *p) { double t = wg1; *p = 9; return t + wg1; }
+static double tern_ret(int c, double a, double b) { return c ? a * 2 : b + 1.5; }
+static double tern_use(int c, double a, double b) { return (c ? a + 1 : b + 2) * 3; }
+static double tern_twice(int c, double a, double b) { double t = c ? a : b; return t + t; }
+static double tern_call(int c) { return c ? rnd_like(500) : wg2; }
 static int gi = 3;
 static long glg = 5;
 static double f1(int a, double x, int b) { return a + x * 2 + b; }
@@ -122,6 +137,23 @@ static void test_accwide_double(void)
     assertEqual(c_twice(5.5), 30);
     assertEqual((int)(c_call() * 2), 43);
     assertEqual((int)(c_lcall() - 50000), 3);
+    wg1 = 3; wg2 = 4;
+    assertEqual((int)w_stale(), 11);
+    wg1 = 3;
+    assertEqual((int)w_call(), 7);
+    wg1 = 3;
+    assertEqual((int)w_chain(), 68);
+    assertEqual((int)w_twice(), -4);
+    wg1 = 3;
+    assertEqual((int)w_ptr(&wg1), 12);
+    assertEqual((int)(tern_ret(1, 3, 0) * 2), 12);
+    assertEqual((int)(tern_ret(0, 0, 2) * 2), 7);
+    assertEqual((int)tern_use(1, 1, 0), 6);
+    assertEqual((int)tern_use(0, 1, 2), 12);
+    assertEqual((int)tern_twice(1, 3, 5), 6);
+    assertEqual((int)tern_twice(0, 3, 5), 10);
+    assertEqual((int)(tern_call(1) * 4), 8);
+    assertEqual((int)tern_call(0), 4);
 }
 #endif
 

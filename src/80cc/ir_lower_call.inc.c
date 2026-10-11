@@ -917,11 +917,89 @@ static int wide_prepush(FILE *out, const Func *f, int v)
     return 1;
 }
 
+/* Does this op leave the wide value it defines resident in the accumulator? */
+static int wide_def_leaves_acc(const Op *o, int v)
+{
+    if (o->kind == IR_LD_MEM && o->mem.kind == IR_MEM_PORT) return 0;
+    return o->kind == IR_ACC_BINOP || o->kind == IR_LD_MEM
+        || (o->kind == IR_MOV && o->dst == v)
+        || (o->kind == IR_CALL && o->call && o->call->ret_vreg == v)
+        || (o->kind == IR_ACC_UNOP && o->hcall && o->hcall->ret_vreg == v
+            && o->hcall->acc_subkind != ACC_SUB_ACC2INT);
+}
+
+/* [acc-phi] The wide value `v` that block `jb` reads first thing, straight from
+   the accumulator, when EVERY way into the block leaves it there: each
+   predecessor ends with the def of v followed by an unconditional branch to jb
+   and nothing else, and v dies at the reader. Such a value (a ?: result, say)
+   needs no slot: the defs skip the store and the reader finds it in the
+   accumulator. Returns v, or -1. */
+static int wide_join_value(const Func *f, int jb)
+{
+    if (opt_disabled("acc-phi") || opt_disabled("acc-drop") || jb <= 0
+        || jb >= f->n_bbs)
+        return -1;
+    const BB *J = &f->bbs[jb];
+    int k = 0;
+    while (k < J->n_ops && J->ops[k].kind == IR_NOP) k++;
+    if (k >= J->n_ops) return -1;
+    int u[16]; int nu = ir_op_uses(&J->ops[k], u, 16);
+    int v = -1;
+    for (int q = 0; q < nu && v < 0; q++) {
+        int c = u[q];
+        if (c < 0 || c >= f->n_vregs || f->vregs[c].width <= 4) continue;
+        if (f->vregs[c].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                 | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+            continue;
+        if (wide_next_reads_acc(f, J, k, c)) v = c;
+    }
+    if (v < 0) return -1;
+    const BitSet *after = (k + 1 < J->n_ops) ? ir_op_live_in(J, k + 1) : J->live_out;
+    if (!after || ir_bitset_get(after, v)) return -1;
+    int npred = 0;
+    for (int p = 0; p < f->n_bbs; p++) {
+        int succ[64]; int ns = bb_all_succ(f, p, succ);
+        int hits = 0;
+        for (int s = 0; s < ns; s++) if (succ[s] == jb) hits = 1;
+        if (!hits) continue;
+        const BB *P = &f->bbs[p];
+        if (p == jb || ns != 1) return -1;
+        int e = P->n_ops - 1;
+        while (e >= 0 && P->ops[e].kind == IR_NOP) e--;
+        if (e < 1 || P->ops[e].kind != IR_BR || P->ops[e].label != J->id) return -1;
+        int d = e - 1;
+        while (d >= 0 && P->ops[d].kind == IR_NOP) d--;
+        if (d < 0 || !wide_def_leaves_acc(&P->ops[d], v)) return -1;
+        int df[8]; int nd = ir_op_defs(&P->ops[d], df, 8), isdef = 0;
+        for (int q = 0; q < nd; q++) if (df[q] == v) isdef = 1;
+        if (!isdef) return -1;
+        npred++;
+    }
+    return npred > 0 ? v : -1;
+}
+
+/* Is the def at (bb, j) of wide `v` the last thing its block does before it
+   branches to a join block that reads v from the accumulator (see above)? */
+static int wide_def_into_join(const Func *f, const BB *bb, int j, int v)
+{
+    if (v < 0) return 0;
+    int k = j + 1;
+    while (k < bb->n_ops && bb->ops[k].kind == IR_NOP) k++;
+    if (k >= bb->n_ops || bb->ops[k].kind != IR_BR) return 0;
+    for (int e = k + 1; e < bb->n_ops; e++)
+        if (bb->ops[e].kind != IR_NOP) return 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        if (f->bbs[b].id == bb->ops[k].label)
+            return wide_join_value(f, b) == v;
+    return 0;
+}
+
 /* The static half of wide_acc_result_dead_in_acc: is the def at (bb, j) of
    wide `v` read straight from the accumulator by the next op, dying there? */
 static int wide_def_dropped_at(const Func *f, const BB *bb, int j, int v)
 {
     if (opt_disabled("acc-drop") || v < 0) return 0;
+    if (wide_def_into_join(f, bb, j, v)) return 1;
     int k = j + 1;
     while (k < bb->n_ops && bb->ops[k].kind == IR_NOP) k++;
     if (k >= bb->n_ops) return 0;
@@ -975,7 +1053,10 @@ static void compute_no_slot_wide(Func *f)
 static int wide_acc_result_dead_in_acc(const Func *f, int v)
 {
     int dead = 0;
-    if (!opt_disabled("acc-drop") && cur_bb && v >= 0) {
+    if (!opt_disabled("acc-drop") && cur_bb && v >= 0
+        && wide_def_into_join(f, cur_bb, cur_op_idx, v))
+        dead = 1;
+    else if (!opt_disabled("acc-drop") && cur_bb && v >= 0) {
         int j = cur_op_idx + 1;
         while (j < cur_bb->n_ops && cur_bb->ops[j].kind == IR_NOP) j++;
         /* v must be read by the next op and dead after it (its slot then
