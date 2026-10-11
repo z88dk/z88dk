@@ -454,6 +454,11 @@ int ir_opt_st2ld(Func *f)
                     hit = k;
                     break;
                 }
+                /* A value wider than 4 bytes has no register home: the copy it
+                   would be forwarded from is a frame slot, and reading that
+                   costs more than reading the memory it came from. */
+                if (hit >= 0 && dst_w > 4 && !opt_disabled("st2ld-wide-keep"))
+                    hit = -1;
                 if (hit >= 0) {
                     /* Forward: rewrite as IR_MOV dst <- cached vreg.
                        Does NOT mark the origin store dead — only a
