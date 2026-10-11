@@ -21,28 +21,6 @@ static const Op *find_unique_use(const Func *f, int v)
     return found;
 }
 
-/* The single op that defines vreg v, or NULL if v has zero or multiple defs.
-   Whole-function scan (defs counted via ir_op_defs, POSTSTEP included). Used by
-   the general DE-home indexed-deref fold to inspect a shift's shape. */
-static const Op *find_unique_def(const Func *f, int v)
-{
-    const Op *found = NULL;
-    if (v < 0 || v >= f->n_vregs) return NULL;
-    for (int i = 0; i < f->n_bbs; i++) {
-        const BB *bb = &f->bbs[i];
-        for (int j = 0; j < bb->n_ops; j++) {
-            int defs[8];
-            int nd = ir_op_defs(&bb->ops[j], defs, 8);
-            for (int k = 0; k < nd; k++)
-                if (defs[k] == v) {
-                    if (found) return NULL;   /* multiple defs */
-                    found = &bb->ops[j];
-                }
-        }
-    }
-    return found;
-}
-
 /* Max BB id in the natural loop of back-edge latch->header: the header plus
    every block that can reach the latch without passing through the header
    (backward reachability over preds). Returns latch's id if any body block is

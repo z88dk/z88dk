@@ -18,6 +18,8 @@
  *  - label_inside  a tail whose interior carries a branch TARGET. The run may
  *                  not be merged across it -- control can enter mid-run, and a
  *                  merged copy would lose that entry.
+ *  - thread_dispatch  arms ending in a call that meet at a shared tail (the
+ *                  exits are threaded past the merged tail's lone `jp`).
  *  - deep_tail     a long shared suffix (deepest-first clustering must take the
  *                  whole run, not a 4-instruction prefix of it).
  *
@@ -112,6 +114,29 @@ static unsigned int deep_tail(unsigned int x)
     return (unsigned int)(v + 9u);
 }
 
+/* Arms that each end in a call and meet at a shared tail. The merged tail
+ * leaves each arm's exit jumping through a lone-`jp` label, which a later
+ * pass threads straight to the survivor: every arm must still reach it. */
+static unsigned int step3(unsigned int a, unsigned int b)
+{
+    return (unsigned int)(a * 3u + b);
+}
+
+static unsigned int thread_dispatch(unsigned int n)
+{
+    unsigned int acc = 0, k;
+    for (k = 0; k < n; k++) {
+        switch (k & 3u) {
+        case 0: acc = step3(acc, 1u); break;
+        case 1: acc = step3(acc, 2u); break;
+        case 2: acc = step3(acc, 5u); break;
+        default: acc = step3(acc, 7u); break;
+        }
+        acc = (unsigned int)((acc + k) ^ 0x1234u);
+    }
+    return acc;
+}
+
 static void test_tailmerge(void)
 {
     g_sink = 0;
@@ -140,6 +165,11 @@ static void test_tailmerge(void)
     assertEqual(deep_tail(0), 3205u);
     assertEqual(deep_tail(1), 3161u);
     assertEqual(deep_tail(8), 3189u);
+
+    assertEqual(thread_dispatch(0), 0u);
+    assertEqual(thread_dispatch(1), 4661u);
+    assertEqual(thread_dispatch(4), 37429u);
+    assertEqual(thread_dispatch(9), 38307u);
 
     assertEqual(g_sink, 46300u);
 }

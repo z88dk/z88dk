@@ -10,9 +10,7 @@
    into DE via load_binop_operands; the immediate form frees it there too. */
 static int cmpk_enabled(void)
 {
-    static int v = -1;
-    if (v < 0) v = !opt_disabled("cmp-k");
-    return v;
+    return !opt_disabled("cmp-k");
 }
 
 static int cpu_has_index_halves(void)

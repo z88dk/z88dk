@@ -787,7 +787,7 @@ static void symoff_apply(Func *f, BB *bb, const int idx[],
                   ADD survives with t1 swapped for i (template keep
                   bit). */
 
-enum { ZV_T = 1, ZV_P, ZV_T2, ZV_I };   /* vregoff binding vars */
+enum { ZV_T = 1, ZV_P, ZV_T2, ZV_I, ZV_S };   /* vregoff binding vars */
 
 static int vregoff_mem_ok(const Func *f, const Op *m, int base,
                           const int uc[], int width_of)
@@ -883,6 +883,40 @@ static void vregoff_idx_apply(Func *f, BB *bb, const int idx[],
     a2->src[slot]  = bind[ZV_I];
     m3->mem.offset = (int)((int64_t)m3->mem.offset
                            + vregoff_k(ad, imm[0]));
+}
+
+/* vregoff_symidx  LD_SYM s <- sym+K1; ADD t <- s,x (either order);
+                   MEM [t, K2]  →  LD_SYM s <- sym+K1+K2; ADD t <- s,x;
+                   MEM [t, 0]. The field offset of `sym[i].f` rides in the
+                   symbol operand, so the address costs one `ld de,_sym+K`
+                   instead of that plus a second constant add. */
+static int vregoff_symidx_check(Func *f, BB *bb, const int idx[],
+                                const int64_t imm[], const int bind[],
+                                const int uc[])
+{
+    (void)imm;
+    const Op *ld = &bb->ops[idx[0]];
+    const Op *ad = &bb->ops[idx[1]];
+    const Op *ms = &bb->ops[idx[2]];
+    int s = bind[ZV_S], t = bind[ZV_T];
+    if (ld->mem.kind != IR_MEM_SYM || !ld->mem.sym) return 0;
+    if (uc[s] != 1 || f->vregs[s].width != 2) return 0;
+    if (ad->src[0] < 0 || ad->src[1] < 0 || ad->imm_sym) return 0;
+    if ((ad->src[0] == s) == (ad->src[1] == s)) return 0;
+    if (!vregoff_mem_ok(f, ms, t, uc, t)) return 0;
+    if (ms->mem.offset == 0) return 0;
+    int64_t no = (int64_t)ld->mem.offset + ms->mem.offset;
+    return no >= INT32_MIN && no <= INT32_MAX;
+}
+
+static void vregoff_symidx_apply(Func *f, BB *bb, const int idx[],
+                                 const int64_t imm[], const int bind[])
+{
+    (void)f; (void)imm; (void)bind;
+    Op *ld = &bb->ops[idx[0]];
+    Op *ms = &bb->ops[idx[2]];
+    ld->mem.offset = (int)((int64_t)ld->mem.offset + ms->mem.offset);
+    ms->mem.offset = 0;
 }
 
 static const PatternDef ir_patterns[] = {
@@ -1006,6 +1040,18 @@ static const PatternDef ir_patterns_vregoff[] = {
             .dst = IR_MS_ANY, .src0 = IR_MS_ANY, .src1 = IR_MS_ANY },
       },
       .check = vregoff_idx_check, .apply = vregoff_idx_apply },
+
+    { .name = "vregoff_symidx", .n_ops = 3,
+      .flags = IR_PAT_NO_AUTO_TEMPS | IR_PAT_COMMUTATIVE | IR_PAT_GAP_OK,
+      .ops = {
+          { .kind = IR_LD_SYM, .dst = ZV_S, .keep = 1 },
+          { .kind = IR_ADD, .dst = ZV_T, .src0 = ZV_S,
+            .src1 = IR_MS_ANY, .keep = 1 },
+          { .kind = IR_LD_MEM, .kind_alt = 1 + IR_ST_MEM,
+            .dst = IR_MS_ANY, .src0 = IR_MS_ANY, .src1 = IR_MS_ANY,
+            .keep = 1 },
+      },
+      .check = vregoff_symidx_check, .apply = vregoff_symidx_apply },
 };
 
 /* incmhl — discarded-result long ++/-- in memory:
@@ -1693,23 +1739,6 @@ static int pack_match_lane(Func *f, BB *bb, const int *def_idx,
     return 0;
 }
 
-/* Function-wide sole definer of v, or NULL when it has none or several. */
-static const Op *pack_sole_def(const Func *f, int v)
-{
-    const Op *found = NULL;
-    for (int b = 0; b < f->n_bbs; b++)
-        for (int j = 0; j < f->bbs[b].n_ops; j++) {
-            const Op *o = &f->bbs[b].ops[j];
-            int defs[4], nd = ir_op_defs(o, defs, 4);
-            for (int k = 0; k < nd; k++)
-                if (defs[k] == v) {
-                    if (found) return NULL;
-                    found = o;
-                }
-        }
-    return found;
-}
-
 /* Two address operands holding the same value at op positions lo..hi: the
    same vreg with no write between, or two loads of one link-time symbol
    (LICM hoists each use of a global's address as its own vreg). */
@@ -1723,7 +1752,7 @@ static int pack_same_operand(Func *f, BB *bb, const int *def_idx, int lo,
             if (bb->ops[k].dst == x) return 0;
         return 1;
     }
-    const Op *dx = pack_sole_def(f, x), *dy = pack_sole_def(f, y);
+    const Op *dx = ir_sole_def(f, x), *dy = ir_sole_def(f, y);
     return dx && dy && dx->kind == IR_LD_SYM && dy->kind == IR_LD_SYM
         && dx->mem.sym && dx->mem.sym == dy->mem.sym
         && dx->mem.offset == dy->mem.offset

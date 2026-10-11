@@ -1166,13 +1166,13 @@ static int de_ptr_realizable(const Func *f, int v, const int *use_count,
    z80/gbz80/8085 ticks all faster-or-neutral). Opt out with IR_OFF=call-split
    (byte-identical to pre-flip). The dear-slot CPU gate (deref_gap>=15) inside
    the selection keeps cheap-slot CPUs byte-identical regardless. */
-static int callsplit_on(void) { static int c = -1; if (c < 0) c = !opt_disabled("call-split"); return c; }
+static int callsplit_on(void) { return !opt_disabled("call-split"); }
 
 /* [IR_OFF=iy-long] Opt OUT of running the IY packs in a function the BC veto
    excludes. They self-guard with a per-op op_clobbers IR_R_IY check over the
    candidate's live range, so the BC veto buys them nothing — it names another
    register's restriction. adr/0060. */
-static int iylong_off(void) { static int c = -1; if (c < 0) c = opt_disabled("iy-long"); return c; }
+static int iylong_off(void) { return opt_disabled("iy-long"); }
 
 /* [IR_CS_EVICT=0/1] Let a call-bounded split EVICT a picker-placed BC tenant it
    out-benefits, instead of silently losing BC to whoever the picker placed
@@ -1183,14 +1183,10 @@ static int iylong_off(void) { static int c = -1; if (c < 0) c = opt_disabled("iy
 static int prepushnarrow_on(void);
 static int cs_evict_on(void)
 {
-    static int c = -1;
-    if (c < 0) {
-        /* Follows prepush-narrow unless explicitly disabled. (The old
-           IR_CS_EVICT=1 could also force it ON against that default; nothing
-           used that direction, so the switch is disable-only now.) */
-        c = !opt_disabled("cs-evict") && prepushnarrow_on();
-    }
-    return c;
+    /* Follows prepush-narrow unless explicitly disabled. (The old
+       IR_CS_EVICT=1 could also force it ON against that default; nothing
+       used that direction, so the switch is disable-only now.) */
+    return !opt_disabled("cs-evict") && prepushnarrow_on();
 }
 
 /* Narrow the pre-pushed-call veto to calls that can lose BC.
@@ -1198,9 +1194,7 @@ static int cs_evict_on(void)
    operations measured in divbench and shiftbench. See adr/0063. */
 static int prepushnarrow_on(void)
 {
-    static int c = -1;
-    if (c < 0) c = !opt_disabled("prepush-narrow");
-    return c;
+    return !opt_disabled("prepush-narrow");
 }
 
 /* [mwbc] The corrected loop-depth weight plus the two cost-model repairs that
@@ -1210,9 +1204,7 @@ static int prepushnarrow_on(void)
    DEFAULT-ON; `IR_OFF=mwbc` opts out, byte-identical to pre-flip. */
 static int mwbc_on(void)
 {
-    static int c = -1;
-    if (c < 0) c = !opt_disabled("mwbc");
-    return c;
+    return !opt_disabled("mwbc");
 }
 /* [mwbc-pressure] The BC reservation that keeps a loop-carried accumulator
    available to the IY reduction pack. Independent of mwbc_on() — it is a pass
@@ -1220,9 +1212,7 @@ static int mwbc_on(void)
    the ranking has changed enough to take the value in the first place. */
 static int mwbc_pressure_on(void)
 {
-    static int c = -1;
-    if (c < 0) c = !opt_disabled("mwbc-pressure");
-    return c;
+    return !opt_disabled("mwbc-pressure");
 }
 
 
@@ -1431,14 +1421,7 @@ static int iv_home_hot_enough(const Func *f, int v, const int *use_count,
 
        `IR_IVACC=0` / `--opt-disable=iv-acc` opts out. `IR_IVHOT=<N>` re-sweeps
        the constant, `IR_IVACCK=<N>` the margin, `IR_IVWHY` prints the census. */
-    {
-        static int acc_on = -1;
-        if (acc_on < 0) {
-            /* opt_disabled("iv-acc") below is the switch; this was a duplicate. */
-            acc_on = 1;
-        }
-        if (!acc_on || opt_disabled("iv-acc")) return 0;
-    }
+    if (opt_disabled("iv-acc")) return 0;
     if (!bb_loop_depth) return 0;      /* no loop map: keep the old answer */
     return bc_call_save_charge(f, v, bb_loop_depth, bb_cond_shift) == 0;
 }
@@ -1894,9 +1877,7 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
    DEFAULT-ON at margin 2; `IR_OFF=bc-call-cost` opts out, `=<N>` sets the margin. */
 static int bccallcost_on(void)
 {
-    static int c = -1;
-    if (c < 0) c = !opt_disabled("bc-call-cost");
-    return c;
+    return !opt_disabled("bc-call-cost");
 }
 
 /* Eviction hysteresis, as the arbiter's counter-yield uses at 1.4x: decline the
@@ -3523,9 +3504,7 @@ static void prepush_straddle_demote(Func *f)
    sp/fp; adv_a -4/-6, clisp -59/-8, enigma unchanged. Opt out to revert. */
 static int bcpercand_on(void)
 {
-    static int on = -1;
-    if (on < 0) on = !opt_disabled("bc-per-cand");
-    return on;
+    return !opt_disabled("bc-per-cand");
 }
 
 static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
@@ -4000,9 +3979,7 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
    Z80 row. Default ON: the row is now micro-benchmarked (z80_cost_bench.py). */
 static int g0measured_on(void)
 {
-    static int on = -1;
-    if (on < 0) on = !opt_disabled("g0-measured");
-    return on;
+    return !opt_disabled("g0-measured");
 }
 
 static int g0_word_cost(int reg, int kind)
@@ -4899,9 +4876,7 @@ static void bytepack_verify(const Func *f)
    with B/C homes until the lowerer has separate residency latches. */
 static int bytepack_on(void)
 {
-    static int on = -1;
-    if (on < 0) on = !opt_disabled("byte-pack");
-    return on;
+    return !opt_disabled("byte-pack");
 }
 
 static void bytepack_pack(Func *f)

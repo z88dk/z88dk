@@ -43,9 +43,7 @@ typedef struct {
    --opt-disable=aggregate-promote or IR_OFF=aggregate-promote. */
 static int agg_promote_enabled(void)
 {
-    static int enabled = -1;
-    if (enabled < 0) enabled = !opt_disabled("aggregate-promote");
-    return enabled;
+    return !opt_disabled("aggregate-promote");
 }
 
 typedef struct {
@@ -1544,29 +1542,12 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
     return 1;
 }
 
-/* The single definition of v anywhere in the function, or NULL. */
-static const Op *ivsr_single_def(const Func *f, int v)
-{
-    const Op *found = NULL;
-    for (int b = 0; b < f->n_bbs; b++)
-        for (int j = 0; j < f->bbs[b].n_ops; j++) {
-            const Op *o = &f->bbs[b].ops[j];
-            int defs[8]; int nd = ir_op_defs(o, defs, 8);
-            for (int k = 0; k < nd; k++)
-                if (defs[k] == v) {
-                    if (found) return NULL;
-                    found = o;
-                }
-        }
-    return found;
-}
-
 /* Two loop-invariant bases hold the same value: the same vreg, or two
    rematerialised constants of the same symbol and offset (or immediate). */
 static int ivsr_same_base(const Func *f, int a, int b)
 {
     if (a == b) return 1;
-    const Op *x = ivsr_single_def(f, a), *y = ivsr_single_def(f, b);
+    const Op *x = ir_sole_def(f, a), *y = ir_sole_def(f, b);
     if (!x || !y || x->kind != y->kind) return 0;
     if (x->kind == IR_LD_SYM)
         return x->mem.sym == y->mem.sym && x->mem.offset == y->mem.offset;

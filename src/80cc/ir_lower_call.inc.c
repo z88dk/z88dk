@@ -574,6 +574,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                 && L.la.cur_stack_long_top < 0 && !L.la.cur_dehl_dst_dead_safe
                 && !vreg_is_pr_dehl(f, ci->ret_vreg))
                 emit_dehl_stack_push(out, ci->ret_vreg);
+            else if (dpp_next)
+                store_dehl_finalize(out, f, ci->ret_vreg);   /* [f32-prepush] */
             else
                 store_dehl_cached(out, f, ci->ret_vreg);
             L.la.cur_dehl_push_to_stack = 0;
@@ -970,22 +972,20 @@ static void compute_no_slot_wide(Func *f)
     free(ok);
 }
 
-static int wide_acc_result_dead_in_acc_1(const Func *f, int v)
-{
-    if (opt_disabled("acc-drop") || !cur_bb || v < 0) return 0;
-    int j = cur_op_idx + 1;
-    while (j < cur_bb->n_ops && cur_bb->ops[j].kind == IR_NOP) j++;
-    if (j >= cur_bb->n_ops) return 0;
-    if (!wide_next_reads_acc(f, cur_bb, j, v)) return 0;
-    /* v must be dead after nx (its slot then never read). */
-    const BitSet *after = (j + 1 < cur_bb->n_ops)
-        ? ir_op_live_in(cur_bb, j + 1) : cur_bb->live_out;
-    return after && !ir_bitset_get(after, v);
-}
-
 static int wide_acc_result_dead_in_acc(const Func *f, int v)
 {
-    int dead = wide_acc_result_dead_in_acc_1(f, v);
+    int dead = 0;
+    if (!opt_disabled("acc-drop") && cur_bb && v >= 0) {
+        int j = cur_op_idx + 1;
+        while (j < cur_bb->n_ops && cur_bb->ops[j].kind == IR_NOP) j++;
+        /* v must be read by the next op and dead after it (its slot then
+           never read). */
+        if (j < cur_bb->n_ops && wide_next_reads_acc(f, cur_bb, j, v)) {
+            const BitSet *after = (j + 1 < cur_bb->n_ops)
+                ? ir_op_live_in(cur_bb, j + 1) : cur_bb->live_out;
+            dead = after && !ir_bitset_get(after, v);
+        }
+    }
     accdrop_mark(v, dead);
     return dead;
 }

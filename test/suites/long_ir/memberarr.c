@@ -83,6 +83,47 @@ static u32 write_then_read(void)
     return u.blah[2].l;
 }
 
+/* A field of a GLOBAL array element at a runtime index: `g_recs[i].c`. The
+ * field offset rides in the symbol operand (`_g_recs+4`) and the index is
+ * added to it, so a wrong fold shows as a neighbouring field or element read
+ * and written instead. Every value is distinct. */
+struct rec { int a; int b; int c; int d; };
+static struct rec g_recs[4];
+static int g_grid[4][4];
+
+static void sym_field_fill(void)
+{
+    int i;
+    for (i = 0; i < 4; i++) {
+        g_recs[i].a = 0x100 + i;
+        g_recs[i].b = 0x200 + i;
+        g_recs[i].c = 0x300 + i;
+        g_recs[i].d = 0x400 + i;
+        g_grid[i][0] = 0x500 + i;
+        g_grid[i][3] = 0x600 + i;
+    }
+}
+static int sym_field_read(int i)  { return g_recs[i].c; }
+static void sym_field_write(int i, int v) { g_recs[i].c = v; }
+static int grid_col3(int i)       { return g_grid[i][3]; }
+static void grid_col3_set(int i, int v) { g_grid[i][3] = v; }
+
+static void sym_field_run(void)
+{
+    sym_field_fill();
+    Assert(sym_field_read(0) == 0x300, "recs[0].c");
+    Assert(sym_field_read(3) == 0x303, "recs[3].c");
+    Assert(grid_col3(1) == 0x601, "grid[1][3]");
+    Assert(grid_col3(2) == 0x602, "grid[2][3]");
+    sym_field_write(2, 0x777);
+    Assert(g_recs[2].c == 0x777, "recs[2].c written");
+    Assert(g_recs[2].b == 0x202 && g_recs[2].d == 0x402, "recs[2] neighbours");
+    Assert(g_recs[1].c == 0x301 && g_recs[3].c == 0x303, "other elements");
+    grid_col3_set(1, 0x888);
+    Assert(g_grid[1][3] == 0x888, "grid[1][3] written");
+    Assert(g_grid[1][0] == 0x501 && g_grid[2][3] == 0x602, "grid neighbours");
+}
+
 static void run(void)
 {
     Assert(sizeof(struct x) == 15, "sizeof struct x");
@@ -111,6 +152,7 @@ static void run(void)
         Assert(u.c == 0x5a, "c intact");
         Assert(u.blah[1].l == 0x22222222ul, "blah[1] intact");
     }
+    sym_field_run();
 }
 int main(int c, char **v)
 {

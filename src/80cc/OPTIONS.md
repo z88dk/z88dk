@@ -44,6 +44,8 @@ exists (ADR 0010).
 
 | Name | Turning it off means |
 | --- | --- |
+| `deref-cmp` | the matcher does not fuse a dereference load with its compare |
+| `pack16` | the matcher does not fold two adjacent bytes into a 16-bit load |
 | `arg-reorder` | keep call arguments in source order even when all are side-effect-free, so a control-flow argument spills the earlier ones |
 | `const-fold` | no IR constant folding |
 | `dce` | no dead-code elimination |
@@ -86,6 +88,9 @@ exists (ADR 0010).
 
 | Name | Turning it off means |
 | --- | --- |
+| `idx2` | no spare index register (or VM1 h'l') home for a loop-invariant word |
+| `idx3` | no second index-half home (IY) for a word (needs `c_idx3_residency`) |
+| `exx` | no alternate-bank (BC') home for a loop-invariant word (needs `c_exx_residency`) |
 | `bc-handoff` | a BC-packed temp may not take BC at the op where an existing BC tenant dies; it must wait for the tenant's whole range to end |
 | `bc-pack` | no tight BC packing pass after region selection |
 | `byte-pack` | no ranged packing of born-and-killed byte temporaries into B |
@@ -190,6 +195,7 @@ exists (ADR 0010).
 
 | Name | Turning it off means |
 | --- | --- |
+| `rabbit-hl-ind` | Rabbit does not read a word at HL plus a signed byte with one `ld hl,(hl+d)` |
 | `ix-indirect` | an sp-mode function with any indirect call saves IX, even when the call does not dispatch through it |
 | `jp-next` | keep an unconditional `jp` that jumps to the label directly below it |
 | `lazy-spill` | spill at the definition instead of deferring to the clobber |
@@ -324,7 +330,10 @@ exists (ADR 0010).
 
 | Name | Turning it off means |
 | --- | --- |
+| `dead-pair-load` | a pair load overwritten before any read stays in the text |
 | `tail-merge` | duplicate instruction tails are not merged (per function) |
+| `dehl-stash-dead` | in fp mode a stored 4-byte value keeps its `ld bc,hl` stash even when the next code-emitting op is a helper call, or a copy that is its last use, that reads it from HL:DE |
+| `tm-thread` | a jump to a label whose block is a lone `jp` is not sent straight to that target after tail merging |
 | `block-layout` | no trace movement to delete a jump |
 | `block-layout-rounds` | block layout runs once, so a trace ending in a jump that another move replaced stays put |
 | `jr-relax` | `jp` is never relaxed to `jr` |

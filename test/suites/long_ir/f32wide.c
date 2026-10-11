@@ -35,6 +35,32 @@ static float p_deep(float a, float b) { return a - (b - (a - (b - 1))); }
 static int p_cmp(float a, float b) { return a * 2 < sqf(b) - 1; }
 static void p_store(float a, float b) { gf = (a + 1) / (b - 1); }
 
+/* A float RETURNED BY A CALL is the stacked operand of a later helper: it is
+ * pushed straight from the call, with other pushed operands still pending
+ * underneath, and the pending ones must come back off in the right order. */
+float fk(float x) { return x + 1; }
+static float c_chain(float a, float b) { return a / fk(b) * (fk(a) + 2); }
+static float c_sum(float a) { return fk(a) + fk(a * 2); }
+static float c_nest(float a) { return fk(a) * fk(fk(a)); }
+
+/* The same pushes with an argument group already open underneath: the helper
+ * operand is pushed above arguments of the enclosing call and must come off
+ * before the next argument lands. */
+int sink3(int tag, float x, float y) { return tag + (int)x * 10 + (int)y; }
+int sink3b(float x, int tag, float y) { return tag + (int)x * 10 + (int)y; }
+/* A variable assigned from a call and then compared with a constant: the
+ * variable is stored, and the compare reads it from the registers. */
+static float c_assign(float a)
+{
+    float c = fk(a);
+    if (c == 9.0f)
+        c = 1.0f;
+    return c * 2 + c;
+}
+static int c_open(float a, float b) { return sink3(1, (a - b) * 2, fk(a) + b); }
+static int c_open2(float a, float b) { return sink3b(a * 2, 3, fk(b) - 1); }
+static int c_open3(float a, float b) { return sink3(2, fk(a) * fk(b), (fk(b) + a) / 2); }
+
 static void test_f32wide(void)
 {
     c_store(12.75f); assertEqual(gt0, 12);
@@ -52,6 +78,14 @@ static void test_f32wide(void)
     assertEqual((int)p_deep(10, 4), 13);
     assertEqual(p_cmp(3, 3), 1); assertEqual(p_cmp(4, 2), 0);
     p_store(5, 4); assertEqual((int)gf, 2);
+    assertEqual((int)c_chain(6, 2), 18);
+    assertEqual((int)c_sum(6), 20);
+    assertEqual((int)c_nest(3), 20);
+    assertEqual((int)c_assign(8), 3);
+    assertEqual((int)c_assign(3), 12);
+    assertEqual(c_open(6, 2), 90);
+    assertEqual(c_open2(5, 3), 3 + 100 + 3);
+    assertEqual(c_open3(3, 2), 125);
 }
 
 #ifdef HAVE_F16
