@@ -12014,7 +12014,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     if (ko->kind == IR_CALL || ko->kind == IR_HCALL
                         || ko->kind == IR_ASM
                         || (ko->dst >= 0 && ko->dst < f->n_vregs
-                            && f->vregs[ko->dst].width == 4)) {
+                            && f->vregs[ko->dst].width == 4
+                            && !(ko->kind == IR_LD_IMM
+                                 && vreg_is_remat(f, ko->dst)))) {
                         L.la.cur_push_dehl_bc_dead = 1;
                         break;
                     }
@@ -12036,7 +12038,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     if (ko->kind == IR_CALL || ko->kind == IR_HCALL
                         || ko->kind == IR_ASM
                         || (ko->dst >= 0 && ko->dst < f->n_vregs
-                            && f->vregs[ko->dst].width == 4)) {
+                            && f->vregs[ko->dst].width == 4
+                            && !(ko->kind == IR_LD_IMM
+                                 && vreg_is_remat(f, ko->dst)))) {
                         L.la.cur_store_dehl_bc_dead = 1;   /* clobbered before read */
                         break;
                     }

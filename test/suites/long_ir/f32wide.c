@@ -48,6 +48,15 @@ static float c_nest(float a) { return fk(a) * fk(fk(a)); }
  * before the next argument lands. */
 int sink3(int tag, float x, float y) { return tag + (int)x * 10 + (int)y; }
 int sink3b(float x, int tag, float y) { return tag + (int)x * 10 + (int)y; }
+/* A variable assigned from a call and then compared with a constant: the
+ * variable is stored, and the compare reads it from the registers. */
+static float c_assign(float a)
+{
+    float c = fk(a);
+    if (c == 9.0f)
+        c = 1.0f;
+    return c * 2 + c;
+}
 static int c_open(float a, float b) { return sink3(1, (a - b) * 2, fk(a) + b); }
 static int c_open2(float a, float b) { return sink3b(a * 2, 3, fk(b) - 1); }
 static int c_open3(float a, float b) { return sink3(2, fk(a) * fk(b), (fk(b) + a) / 2); }
@@ -72,6 +81,8 @@ static void test_f32wide(void)
     assertEqual((int)c_chain(6, 2), 18);
     assertEqual((int)c_sum(6), 20);
     assertEqual((int)c_nest(3), 20);
+    assertEqual((int)c_assign(8), 3);
+    assertEqual((int)c_assign(3), 12);
     assertEqual(c_open(6, 2), 90);
     assertEqual(c_open2(5, 3), 3 + 100 + 3);
     assertEqual(c_open3(3, 2), 125);
