@@ -1294,6 +1294,14 @@ static void copy_lower_stream(FILE *out, FILE *src)
     while (fgets(buf, sizeof buf, src)) fputs(buf, out);
 }
 
+static void relax_note_fn(const Func *f)
+{
+    relax_fn_has_asm = 0;
+    for (int b = 0; f && b < f->n_bbs; b++)
+        for (int o = 0; o < f->bbs[b].n_ops; o++)
+            if (f->bbs[b].ops[o].kind == IR_ASM) relax_fn_has_asm = 1;
+}
+
 static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
 {
     char **lines;
@@ -1302,10 +1310,7 @@ static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
         copy_lower_stream(out, src);
         return;
     }
-    relax_fn_has_asm = 0;
-    for (int b = 0; f && b < f->n_bbs; b++)
-        for (int o = 0; o < f->bbs[b].n_ops; o++)
-            if (f->bbs[b].ops[o].kind == IR_ASM) relax_fn_has_asm = 1;
+    relax_note_fn(f);
     int *size = malloc((size_t)(n > 0 ? n : 1) * sizeof(int));
     if (size) {
         for (int i = 0; i < n; i++) size[i] = relax_line_size(lines[i]);
@@ -5579,7 +5584,11 @@ typedef struct {
 /* True when `name` appears in `line` as a whole identifier. */
 static int tmthr_mentions(const char *line, const char *name, size_t len)
 {
-    for (const char *p = line; (p = strstr(p, name)) != NULL; p++) {
+    char key[256];
+    if (len >= sizeof key) return 1;                 /* too long to test: keep it */
+    memcpy(key, name, len);
+    key[len] = 0;
+    for (const char *p = line; (p = strstr(p, key)) != NULL; p++) {
         char before = p > line ? p[-1] : ' ', after = p[len];
         int id_b = (before >= 'A' && before <= 'Z') || (before >= 'a' && before <= 'z')
                 || (before >= '0' && before <= '9') || before == '_' || before == '.'
@@ -5590,6 +5599,27 @@ static int tmthr_mentions(const char *line, const char *name, size_t len)
         if (!id_b && !id_a) return 1;
     }
     return 0;
+}
+
+/* Index of the line defining label `name`, or -1. */
+static long tmthr_label_line(char **L, long n, const char *name, size_t len)
+{
+    for (long i = 0; i < n; i++) {
+        const char *q;
+        size_t ql = bl_label_name(L[i], &q);
+        if (ql == len && !strncmp(q, name, len)) return i;
+    }
+    return -1;
+}
+
+/* Would a `jr` at line `from` reach the label at line `to`? Same measure as the
+   relax pass: the bytes between the two lines, <= 126. */
+static int tmthr_jr_fits(const int *size, long from, long to)
+{
+    long lo = (to > from) ? from + 1 : to, hi = (to > from) ? to : from;
+    long span = 0;
+    for (long k = lo; k < hi && span <= 126; k++) span += size[k];
+    return span <= 126;
 }
 
 /* An unconditional transfer of control: nothing falls through it. */
@@ -5607,7 +5637,7 @@ static int tmthr_find(const TmThr *t, int n, const char *s, size_t len)
     return -1;
 }
 
-static void filter_thread_trampolines(FILE *out, FILE *src)
+static void filter_thread_trampolines(FILE *out, FILE *src, const Func *f)
 {
     char **L;
     int n_lines;
@@ -5620,6 +5650,10 @@ static void filter_thread_trampolines(FILE *out, FILE *src)
     long n = n_lines;
     TmThr *t = calloc((size_t)(n > 0 ? n : 1), sizeof *t);
     char **nw = calloc((size_t)(n > 0 ? n : 1), sizeof *nw);   /* rewritten jumps */
+    int *size = malloc((size_t)(n > 0 ? n : 1) * sizeof *size);
+    relax_note_fn(f);
+    if (size)
+        for (long i = 0; i < n; i++) size[i] = relax_line_size(L[i]);
     int nt = 0;
     if (t && nw) {
         for (long i = 0; i < n; i++) {
@@ -5659,6 +5693,16 @@ static void filter_thread_trampolines(FILE *out, FILE *src)
                 cur = t[k].to; cl = t[k].to_len; hops++;
             }
             if (!hops || hops >= 8) continue;               /* none, or a cycle */
+            /* A conditional jump that fits a `jr` to the trampoline but not to
+               the final target would grow to a `jp cc` (dearer when it falls
+               through), so leave it. */
+            if (c && size) {
+                long io = tmthr_label_line(L, n, lab, (size_t)(e - lab));
+                long in = tmthr_label_line(L, n, cur, cl);
+                if (io >= 0 && tmthr_jr_fits(size, i, io)
+                    && !(in >= 0 && tmthr_jr_fits(size, i, in)))
+                    continue;
+            }
             size_t pre = (size_t)(lab - L[i]);
             char *nl2 = malloc(pre + cl + 2);
             if (!nl2) continue;
@@ -5705,6 +5749,7 @@ static void filter_thread_trampolines(FILE *out, FILE *src)
         fputs(nw && nw[i] ? nw[i] : L[i], out);
     }
     free(gone);
+    free(size);
     for (long i = 0; i < n; i++) { free(L[i]); if (nw) free(nw[i]); }
     free(L);
     free(t);
@@ -6042,7 +6087,7 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
         FILE *tt = tmpfile();
         if (tt) {
             filter_tail_merge(tt, tmf, f);
-            filter_thread_trampolines(after_tm, tt);
+            filter_thread_trampolines(after_tm, tt, f);
             fclose(tt);
         } else
             filter_tail_merge(after_tm, tmf, f);
