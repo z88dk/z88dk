@@ -205,6 +205,7 @@ typedef struct {
         int cur_load_to_dehl_no_hl, cur_load_to_dehl_no_bc;
         int cur_stack_long_top, cur_dehl_inline_push, cur_dehl_inline_push_base_sp;
         int cur_dehl_push_to_stack, cur_store_dehl_bc_dead, cur_dehl_dst_no_bc_stash;
+        int cur_store_dehl_stash_dead;   /* next emitting op is a helper call reading dst first */
         /* Fused byte-chain result: the value is already BC=low / DE=high with HL
            NOT holding the low half. Every sink of store_dehl_finalize opens with
            `ld bc,hl` to establish exactly that, so without this flag the fused
@@ -12023,9 +12024,27 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 }
             }
             L.la.cur_store_dehl_bc_dead = 0;
+            L.la.cur_store_dehl_stash_dead = 0;
             if (fp_active(f) && op->dst >= 0
                 && f->vregs[op->dst].width == 4) {
                 int V = op->dst;
+                /* The value's next reader is a helper call that loads it first,
+                   with nothing emitted in between: HL:DE still hold it there, and
+                   the call clobbers BC, so the `ld bc,hl` stash is never read. */
+                for (int k = j + 1; k < bb->n_ops; k++) {
+                    const Op *ko = &bb->ops[k];
+                    if (ko->kind == IR_NOP
+                        || (ko->kind == IR_LD_IMM && ko->dst >= 0
+                            && f->vregs[ko->dst].width == 4
+                            && vreg_is_remat(f, ko->dst)))
+                        continue;
+                    if (ko->kind == IR_HCALL && ko->hcall && ko->hcall->n_args > 0
+                        && ko->hcall->args[0] == V
+                        && (ko->hcall->n_stacked >= 1 || ko->hcall->n_args == 1)
+                        && !opt_disabled("dehl-stash-dead"))
+                        L.la.cur_store_dehl_stash_dead = 1;
+                    break;
+                }
                 for (int k = j + 1; k < bb->n_ops; k++) {
                     const Op *ko = &bb->ops[k];
                     int uses[16];
@@ -12064,6 +12083,16 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     && (nxt2->src[0] == op->dst
                         || nxt2->src[1] == op->dst))
                     L.la.cur_dehl_dst_no_bc_stash = 1;
+                /* A long copy that is the value's last use: the copy reads
+                   it straight from HL:DE, so the stash is never read. */
+                if (nxt2->kind == IR_MOV && nxt2->src[0] == op->dst
+                    && nxt2->dst >= 0 && f->vregs[nxt2->dst].width == 4
+                    && !opt_disabled("dehl-stash-dead")) {
+                    const BitSet *after = (j + 2 < bb->n_ops)
+                        ? ir_op_live_in(bb, j + 2) : bb->live_out;
+                    if (after && !ir_bitset_get(after, op->dst))
+                        L.la.cur_dehl_dst_no_bc_stash = 1;
+                }
                 /* Same conclusion for a dead-dst long that is immediately
                    PUSHED as a call argument. cache_dehl_no_spill skips the
                    slot write and stashes BC=low so a later cache hit can

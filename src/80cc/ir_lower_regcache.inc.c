@@ -2382,7 +2382,7 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
             /* DEHL cache contract: BC = low half so a later load_to_dehl_adj
                cache hit recovers HL via `ld hl,bc`. Dead when the next op
                clobbers BC first — store_dehl_cached then drops the claim. */
-            if (!L.la.cur_store_dehl_bc_dead)
+            if (!L.la.cur_store_dehl_bc_dead && !L.la.cur_store_dehl_stash_dead)
                 emit(out, "ld\tbc,hl");
             return;
         }
@@ -2487,9 +2487,20 @@ static void store_dehl_cached(FILE *out, const Func *f, int vreg_id)
         return;
     }
     int bc_dead = L.la.cur_store_dehl_bc_dead;
+    /* Only the (ix+d) store path leaves HL:DE intact and honours the flag. */
+    int stash_dead = L.la.cur_store_dehl_stash_dead && !bc_dead
+        && fp_active(f) && !fp_tos_slot(f, vreg_id)
+        && fp_offset_fits(slot_ix_off(f, vreg_id))
+        && fp_offset_fits(slot_ix_off(f, vreg_id) + 3);
     store_dehl(out, f, vreg_id);
     invalidate_hl_cache();
-    if (bc_dead) {
+    if (stash_dead) {
+        /* No stash was emitted: HL:DE still hold the value for the helper
+           call that reads it next, so advertise them rather than BC. */
+        hl_about_to_change(vreg_id);
+        L.rs.de = -1;
+        L.rs.dehl = vreg_id;
+    } else if (bc_dead) {
         /* store_dehl skipped the `ld bc,hl`, so BC != low — don't claim a
            DEHL cache a later hit would recover via `ld hl,bc`. Reads reload
            from the slot. */
