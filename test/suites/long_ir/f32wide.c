@@ -43,6 +43,15 @@ static float c_chain(float a, float b) { return a / fk(b) * (fk(a) + 2); }
 static float c_sum(float a) { return fk(a) + fk(a * 2); }
 static float c_nest(float a) { return fk(a) * fk(fk(a)); }
 
+/* The same pushes with an argument group already open underneath: the helper
+ * operand is pushed above arguments of the enclosing call and must come off
+ * before the next argument lands. */
+int sink3(int tag, float x, float y) { return tag + (int)x * 10 + (int)y; }
+int sink3b(float x, int tag, float y) { return tag + (int)x * 10 + (int)y; }
+static int c_open(float a, float b) { return sink3(1, (a - b) * 2, fk(a) + b); }
+static int c_open2(float a, float b) { return sink3b(a * 2, 3, fk(b) - 1); }
+static int c_open3(float a, float b) { return sink3(2, fk(a) * fk(b), (fk(b) + a) / 2); }
+
 static void test_f32wide(void)
 {
     c_store(12.75f); assertEqual(gt0, 12);
@@ -63,6 +72,9 @@ static void test_f32wide(void)
     assertEqual((int)c_chain(6, 2), 18);
     assertEqual((int)c_sum(6), 20);
     assertEqual((int)c_nest(3), 20);
+    assertEqual(c_open(6, 2), 90);
+    assertEqual(c_open2(5, 3), 3 + 100 + 3);
+    assertEqual(c_open3(3, 2), 125);
 }
 
 #ifdef HAVE_F16

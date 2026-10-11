@@ -9160,13 +9160,6 @@ static int def_dst_dead(const Func *f, const BB *bb, int j)
    it, and no read there of a value pushed earlier and still pending. */
 static int f32_prepush_ok(const Func *f, const BB *bb, int j, int v)
 {
-    int depth = 0;
-    for (int i = 0; i < j; i++) {
-        const Op *o = &bb->ops[i];
-        if (o->kind == IR_PUSH_ARG && o->imm == 1) depth++;
-        else if (o->kind == IR_CALL && o->call && o->call->pre_pushed > 0 && depth > 0) depth--;
-    }
-    if (depth) return 0;
     int k = -1;
     for (int b2 = 0; b2 < f->n_bbs; b2++)
         for (int i = 0; i < f->bbs[b2].n_ops; i++) {
