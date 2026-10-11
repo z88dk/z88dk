@@ -1369,3 +1369,20 @@ int ir_compact_vregs(Func *f)
     free(remap);
     return removed;
 }
+
+const Op *ir_sole_def(const Func *f, int v)
+{
+    const Op *found = NULL;
+    if (v < 0 || v >= f->n_vregs) return NULL;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int defs[8], nd = ir_op_defs(o, defs, 8);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] == v) {
+                    if (found) return NULL;
+                    found = o;
+                }
+        }
+    return found;
+}

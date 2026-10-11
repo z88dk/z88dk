@@ -124,6 +124,8 @@ int ir_func_total_ops(const Func *f);
    (never more than max) — safe to iterate over a fixed-size buffer. When the
    true number matters, size the buffer with the *_count form first. */
 int  ir_op_defs(const Op *op, int *out, int max);
+/* The only op defining vreg v anywhere in f, or NULL if none or several. */
+const Op *ir_sole_def(const Func *f, int v);
 int  ir_op_uses(const Op *op, int *out, int max);
 int  ir_op_defs_count(const Op *op);
 int  ir_op_uses_count(const Op *op);

@@ -1693,23 +1693,6 @@ static int pack_match_lane(Func *f, BB *bb, const int *def_idx,
     return 0;
 }
 
-/* Function-wide sole definer of v, or NULL when it has none or several. */
-static const Op *pack_sole_def(const Func *f, int v)
-{
-    const Op *found = NULL;
-    for (int b = 0; b < f->n_bbs; b++)
-        for (int j = 0; j < f->bbs[b].n_ops; j++) {
-            const Op *o = &f->bbs[b].ops[j];
-            int defs[4], nd = ir_op_defs(o, defs, 4);
-            for (int k = 0; k < nd; k++)
-                if (defs[k] == v) {
-                    if (found) return NULL;
-                    found = o;
-                }
-        }
-    return found;
-}
-
 /* Two address operands holding the same value at op positions lo..hi: the
    same vreg with no write between, or two loads of one link-time symbol
    (LICM hoists each use of a global's address as its own vreg). */
@@ -1723,7 +1706,7 @@ static int pack_same_operand(Func *f, BB *bb, const int *def_idx, int lo,
             if (bb->ops[k].dst == x) return 0;
         return 1;
     }
-    const Op *dx = pack_sole_def(f, x), *dy = pack_sole_def(f, y);
+    const Op *dx = ir_sole_def(f, x), *dy = ir_sole_def(f, y);
     return dx && dy && dx->kind == IR_LD_SYM && dy->kind == IR_LD_SYM
         && dx->mem.sym && dx->mem.sym == dy->mem.sym
         && dx->mem.offset == dy->mem.offset

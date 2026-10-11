@@ -262,38 +262,33 @@ typedef struct {
 } HomeCtx;
 static HomeCtx g_hc = { .de_home = -1, .func_whome = -1 };
 
+/* Per-vreg lookup in one of the g_hc op tables; NULL when the table is off or
+   v is out of range. */
+static const Op *hc_lookup(const Func *f, const Op **tbl, int v)
+{
+    if (!tbl || v < 0 || v >= f->n_vregs) return NULL;
+    return tbl[v];
+}
+
 /* [IR_BYTE_REMAT] The rematerialising global-load op for byte vreg v, or NULL. */
 static const Op *byte_remat_of(const Func *f, int v)
-{
-    if (!g_hc.byte_remat || v < 0 || v >= f->n_vregs) return NULL;
-    return g_hc.byte_remat[v];
-}
+{ return hc_lookup(f, g_hc.byte_remat, v); }
+
+/* The first load of a long read-modify-write for long vreg v, or NULL. */
 static const Op *long_rmw_ld_of(const Func *f, int v)
-{
-    if (!g_hc.long_rmw_ld || v < 0 || v >= f->n_vregs) return NULL;
-    return g_hc.long_rmw_ld[v];
-}
+{ return hc_lookup(f, g_hc.long_rmw_ld, v); }
 
 /* The deferred zero-extend for long vreg v, or NULL. */
 static const Op *long_zx_of(const Func *f, int v)
-{
-    if (!g_hc.long_zx || v < 0 || v >= f->n_vregs) return NULL;
-    return g_hc.long_zx[v];
-}
+{ return hc_lookup(f, g_hc.long_zx, v); }
 
 /* The deferred global load for long vreg v, or NULL. */
 static const Op *long_mem_of(const Func *f, int v)
-{
-    if (!g_hc.long_mem || v < 0 || v >= f->n_vregs) return NULL;
-    return g_hc.long_mem[v];
-}
+{ return hc_lookup(f, g_hc.long_mem, v); }
 
 /* The deferred global load for word vreg v, or NULL. */
 static const Op *word_mem_of(const Func *f, int v)
-{
-    if (!g_hc.word_mem || v < 0 || v >= f->n_vregs) return NULL;
-    return g_hc.word_mem[v];
-}
+{ return hc_lookup(f, g_hc.word_mem, v); }
 
 /* Format the global operand of a byte-remat load into buf as `_sym[+off]`. */
 static void byte_remat_symstr(char *buf, size_t n, const Op *o)
@@ -1296,20 +1291,52 @@ static int relax_in_ji_window(char **lines, int n, int i)
     return 0;
 }
 
-static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
+/* Read a function's rendered assembly for the whole-function text filters.
+   On allocation failure, rewind so the caller can copy the input verbatim. */
+static int slurp_lower_lines(FILE *src, char ***lines_out, int *count_out)
 {
     char buf[1024];
-    char **lines = NULL; int n = 0, cap = 0;
+    char **lines = NULL;
+    int n = 0, cap = 0;
     while (fgets(buf, sizeof buf, src)) {
-        if (n == cap) { cap = cap ? cap * 2 : 256;
+        if (n == cap) {
+            cap = cap ? cap * 2 : 256;
             char **nl = realloc(lines, (size_t)cap * sizeof *lines);
-            if (!nl) { free(lines); rewind(src);            /* OOM: verbatim */
-                while (fgets(buf, sizeof buf, src)) fputs(buf, out); return; }
-            lines = nl; }
-        lines[n++] = strdup(buf);
-        if (!lines[n - 1]) { for (int i = 0; i < n - 1; i++) free(lines[i]);
-            free(lines); rewind(src);
-            while (fgets(buf, sizeof buf, src)) fputs(buf, out); return; }
+            if (!nl) {
+                for (int i = 0; i < n; i++) free(lines[i]);
+                free(lines);
+                rewind(src);
+                return 0;
+            }
+            lines = nl;
+        }
+        char *line = strdup(buf);
+        if (!line) {
+            for (int i = 0; i < n; i++) free(lines[i]);
+            free(lines);
+            rewind(src);
+            return 0;
+        }
+        lines[n++] = line;
+    }
+    *lines_out = lines;
+    *count_out = n;
+    return 1;
+}
+
+static void copy_lower_stream(FILE *out, FILE *src)
+{
+    char buf[1024];
+    while (fgets(buf, sizeof buf, src)) fputs(buf, out);
+}
+
+static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
+{
+    char **lines;
+    int n;
+    if (!slurp_lower_lines(src, &lines, &n)) {
+        copy_lower_stream(out, src);
+        return;
     }
     relax_fn_has_asm = 0;
     for (int b = 0; f && b < f->n_bbs; b++)
@@ -1431,45 +1458,6 @@ static int shr_dead_l_store(char **lines, int n, int at)
     if (chain < 2) return 0;              /* at least one srl/rra pair */
     if (j >= n || strcmp(lines[j], "\tld\tl,a\n")) return 0;
     return drop;
-}
-
-/* Read a function's rendered assembly for the whole-function text filters.
-   On allocation failure, rewind so the caller can copy the input verbatim. */
-static int slurp_lower_lines(FILE *src, char ***lines_out, int *count_out)
-{
-    char buf[1024];
-    char **lines = NULL;
-    int n = 0, cap = 0;
-    while (fgets(buf, sizeof buf, src)) {
-        if (n == cap) {
-            cap = cap ? cap * 2 : 256;
-            char **nl = realloc(lines, (size_t)cap * sizeof *lines);
-            if (!nl) {
-                for (int i = 0; i < n; i++) free(lines[i]);
-                free(lines);
-                rewind(src);
-                return 0;
-            }
-            lines = nl;
-        }
-        char *line = strdup(buf);
-        if (!line) {
-            for (int i = 0; i < n; i++) free(lines[i]);
-            free(lines);
-            rewind(src);
-            return 0;
-        }
-        lines[n++] = line;
-    }
-    *lines_out = lines;
-    *count_out = n;
-    return 1;
-}
-
-static void copy_lower_stream(FILE *out, FILE *src)
-{
-    char buf[1024];
-    while (fgets(buf, sizeof buf, src)) fputs(buf, out);
 }
 
 /* Post-render peephole: drop a dead one-way register copy `ld hl,de` (HL:=DE)
@@ -1788,14 +1776,21 @@ static void decall_note(const char *sym, int clean)
 
 /* 0: not an unconditional `call name`; 2: a call to l_case / l_setjmp;
    1: any other plain call. */
-static int xline_plain_call(const char *line)
+static const char *xline_call_operand(const char *line)
 {
     const char *p = line;
-    if (*p != ' ' && *p != '\t') return 0;
+    if (*p != ' ' && *p != '\t') return NULL;
     while (*p == ' ' || *p == '\t') p++;
-    if (strncmp(p, "call", 4) || (p[4] != '\t' && p[4] != ' ')) return 0;
+    if (strncmp(p, "call", 4) || (p[4] != '\t' && p[4] != ' ')) return NULL;
     p += 4;
     while (*p == ' ' || *p == '\t') p++;
+    return p;
+}
+
+static int xline_plain_call(const char *line)
+{
+    const char *p = xline_call_operand(line);
+    if (!p) return 0;
     if (!((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || *p == '_'))
         return 0;
     if (strchr(p, ',') || strchr(p, '(')) return 0;
@@ -1972,13 +1967,8 @@ static int lcallf_enabled(void)
 
 static int xline_l_call(const char *line)
 {
-    const char *p = line;
-    if (*p != ' ' && *p != '\t') return 0;
-    while (*p == ' ' || *p == '\t') p++;
-    if (strncmp(p, "call", 4)) return 0;
-    p += 4;
-    if (*p != ' ' && *p != '\t') return 0;
-    while (*p == ' ' || *p == '\t') p++;
+    const char *p = xline_call_operand(line);
+    if (!p) return 0;
     return p[0] == 'l' && p[1] == '_' && p[2] != 0 && !strchr(p, ',')
         && lcallf_enabled();
 }
@@ -5221,23 +5211,11 @@ static void filter_tail_merge(FILE *out, FILE *src, const Func *f)
 {
     (void)f;
     char buf[1024];
-    long cap = 256, n = 0;
-    char **lines = malloc((size_t)cap * sizeof *lines);
-    if (!lines) goto verbatim;
+    char **lines;
+    int n_lines;
     rewind(src);
-    while (fgets(buf, sizeof buf, src)) {
-        if (n == cap) {
-            long nc = cap * 2;
-            char **t = realloc(lines, (size_t)nc * sizeof *t);
-            if (!t) { for (long i = 0; i < n; i++) free(lines[i]);
-                      free(lines); lines = NULL; goto verbatim; }
-            lines = t; cap = nc;
-        }
-        lines[n] = strdup(buf);
-        if (!lines[n]) { for (long i = 0; i < n; i++) free(lines[i]);
-                         free(lines); lines = NULL; goto verbatim; }
-        n++;
-    }
+    if (!slurp_lower_lines(src, &lines, &n_lines)) goto verbatim;
+    long n = n_lines;
     long *code = malloc((size_t)(n > 0 ? n : 1) * sizeof *code);
     if (!code) { for (long i = 0; i < n; i++) free(lines[i]);
                  free(lines); lines = NULL; goto verbatim; }
@@ -5448,22 +5426,11 @@ static int bl_is_uncond_term(const char *l)
 static void filter_block_layout(FILE *out, FILE *src)
 {
     char buf[1024];
-    long cap = 256, n = 0;
-    char **L = malloc((size_t)cap * sizeof *L);
-    if (!L) goto verbatim;
+    char **L;
+    int n_lines;
     rewind(src);
-    while (fgets(buf, sizeof buf, src)) {
-        if (n == cap) {
-            char **t = realloc(L, (size_t)(cap * 2) * sizeof *t);
-            if (!t) { for (long i = 0; i < n; i++) free(L[i]);
-                      free(L); L = NULL; goto verbatim; }
-            L = t; cap *= 2;
-        }
-        L[n] = strdup(buf);
-        if (!L[n]) { for (long i = 0; i < n; i++) free(L[i]);
-                     free(L); L = NULL; goto verbatim; }
-        n++;
-    }
+    if (!slurp_lower_lines(src, &L, &n_lines)) goto verbatim;
+    long n = n_lines;
     long *jmp_to = malloc((size_t)(n > 0 ? n : 1) * sizeof *jmp_to);
     long *jmp_end = malloc((size_t)(n > 0 ? n : 1) * sizeof *jmp_end);
     int  *claimed = calloc((size_t)(n > 0 ? n : 1), sizeof *claimed);
@@ -5683,22 +5650,11 @@ static void drop_dead_pair_loads(char **L, long n, char *dead)
 static void filter_jump_to_next(FILE *out, FILE *src)
 {
     char buf[1024];
-    long cap = 256, n = 0;
-    char **L = malloc((size_t)cap * sizeof *L);
-    if (!L) goto verbatim;
+    char **L;
+    int n_lines;
     rewind(src);
-    while (fgets(buf, sizeof buf, src)) {
-        if (n == cap) {
-            char **t = realloc(L, (size_t)(cap * 2) * sizeof *t);
-            if (!t) { for (long i = 0; i < n; i++) free(L[i]);
-                      free(L); goto verbatim; }
-            L = t; cap *= 2;
-        }
-        L[n] = strdup(buf);
-        if (!L[n]) { for (long i = 0; i < n; i++) free(L[i]);
-                     free(L); goto verbatim; }
-        n++;
-    }
+    if (!slurp_lower_lines(src, &L, &n_lines)) goto verbatim;
+    long n = n_lines;
     /* An unconditional jump straight after another one, with no label
        between, can never run. */
     char *dead = calloc((size_t)n + 1, 1);
@@ -6699,7 +6655,6 @@ static void home_flush(FILE *out, const Func *f);
 static void home_clobber(FILE *out, const Func *f);
 static int  home_rehome(FILE *out, const Func *f);
 static int  home_is_slotbacked(const Func *f, int v);
-static const Op *find_unique_def(const Func *f, int v);
 static const Op *find_unique_use(const Func *f, int v);
 static int  de_home_indexed_add_ok(const Func *f, const Op *o);
 /* Bumped by every cache_de(): tells lower_func_render whether an op

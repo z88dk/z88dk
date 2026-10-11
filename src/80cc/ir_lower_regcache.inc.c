@@ -3122,7 +3122,7 @@ static int de_home_indexed_add_ok(const Func *f, const Op *o)
     if (!f->vreg_to_phys) return 0;
     for (int which = 0; which < 2; which++) {
         int sidx = o->src[which], sbase = o->src[which ^ 1];
-        const Op *d = find_unique_def(f, sidx);
+        const Op *d = ir_sole_def(f, sidx);
         if (!d || d->kind != IR_SHL || d->src[1] >= 0) continue;
         if (d->imm < 1 || d->imm > 2) continue;
         int idx = d->src[0];

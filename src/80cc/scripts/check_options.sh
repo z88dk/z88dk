@@ -6,8 +6,8 @@ code=$(python3 - <<'PYCODE'
 import pathlib
 import re
 
-files = ["ir_alloc.c", "ir_build.c", "ir_lower.c", "ir_opt.c", "ir_slots.c", "ir_analysis.c",
-         "ast_opt.c", "stmt.c"] + [p.name for p in pathlib.Path(".").glob("*.inc.c")]
+files = [p.name for p in pathlib.Path(".").glob("*.c")
+         if p.name not in ("main.c", "ir_selftest.c")]
 names = set()
 for filename in files:
     try:

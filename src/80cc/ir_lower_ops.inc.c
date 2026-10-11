@@ -4960,11 +4960,11 @@ typedef struct {
 
 static int def_dst_dead(const Func *f, const BB *bb, int j);
 
-static int fold_plan_fp(Func *f, const Op *prod, int uidx, FoldPlan *pl)
+/* The part of a fold plan that does not depend on the frame mode: the user op
+   (and/or/xor/add/sub with the producer as one operand), the producer's byte
+   plan, and the cache state of the other operand. */
+static int fold_plan_head(Func *f, const Op *prod, int uidx, FoldPlan *pl)
 {
-    if (opt_disabled("long-zx-fold") || !cur_bb || uidx >= cur_bb->n_ops) return 0;
-    if (!fp_active(f) || L.cur_frameless) return 0;
-    pl->sp = 0;
     const Op *u = &cur_bb->ops[uidx];
     int pd = prod->dst;
     if (u->kind != IR_AND && u->kind != IR_OR && u->kind != IR_XOR
@@ -4975,17 +4975,28 @@ static int fold_plan_fp(Func *f, const Op *prod, int uidx, FoldPlan *pl)
     pl->other_is_src0 = (u->src[1] == pd);
     pl->other = pl->other_is_src0 ? u->src[0] : u->src[1];
     if (!fold_bytes(f, prod, &pl->fb)) return 0;
-    int arith_ops = (u->kind == IR_ADD || u->kind == IR_SUB);
-    for (int i = 0; i < 4; i++) {
-        if (arith_ops && pl->fb.kind[i] == 2) return 0;       /* sign: carry chain */
-        if (arith_ops && i == 0 && pl->fb.kind[0] == 0) return 0;  /* needs CF=0 */
+    if (u->kind == IR_ADD || u->kind == IR_SUB) {
+        if (pl->fb.kind[0] == 0) return 0;                /* needs CF=0 */
+        for (int i = 0; i < 4; i++)
+            if (pl->fb.kind[i] == 2) return 0;            /* sign: carry chain */
+    }
+    pl->cached = dehl_has(pl->other);
+    pl->use_hl = (pl->cached && L.rs.hl == pl->other);
+    return 1;
+}
+
+static int fold_plan_fp(Func *f, const Op *prod, int uidx, FoldPlan *pl)
+{
+    if (opt_disabled("long-zx-fold") || !cur_bb || uidx >= cur_bb->n_ops) return 0;
+    if (!fp_active(f) || L.cur_frameless) return 0;
+    pl->sp = 0;
+    if (!fold_plan_head(f, prod, uidx, pl)) return 0;
+    const Op *u = pl->user;
+    for (int i = 0; i < 4; i++)
         if (pl->fb.kind[i]) {
             int o = slot_ix_off(f, pl->fb.v[i]) + pl->fb.b[i];
             if (!fp_offset_fits(o)) return 0;
         }
-    }
-    pl->cached = dehl_has(pl->other);
-    pl->use_hl = (pl->cached && L.rs.hl == pl->other);
     pl->dead = def_dst_dead(f, cur_bb, uidx) || vreg_is_pr_dehl(f, u->dst);
     pl->so = pl->dd = 0;
     if (!pl->cached) {
@@ -5002,43 +5013,24 @@ static int fold_plan_fp(Func *f, const Op *prod, int uidx, FoldPlan *pl)
     return 1;
 }
 
-
-/* sp-addressed form: operands are reached through an HL pointer into the frame.
-   The other operand rides in BC:DE (loaded there if not already), the folded
-   operand's bytes are combined with it through `(hl)`, and the result is left
-   in BC:DE for the usual store. */
 static int fold_plan_sp(Func *f, const Op *prod, int uidx, FoldPlan *pl)
 {
     if (opt_disabled("long-zx-fold") || opt_disabled("long-fold-sp")
         || !cur_bb || uidx >= cur_bb->n_ops) return 0;
-    const Op *u = &cur_bb->ops[uidx];
-    int pd = prod->dst;
-    if (u->kind != IR_AND && u->kind != IR_OR && u->kind != IR_XOR
-        && u->kind != IR_ADD && u->kind != IR_SUB) return 0;
-    if (u->src[0] < 0 || u->src[1] < 0 || (u->src[0] != pd && u->src[1] != pd))
-        return 0;
-    pl->user = u;
-    pl->other_is_src0 = (u->src[1] == pd);
-    pl->other = pl->other_is_src0 ? u->src[0] : u->src[1];
-    if (!fold_bytes(f, prod, &pl->fb)) return 0;
-    int arith_ops = (u->kind == IR_ADD || u->kind == IR_SUB);
+    if (!fold_plan_head(f, prod, uidx, pl)) return 0;
+    const Op *u = pl->user;
     int first = -1;
-    for (int i = 0; i < 4; i++) {
-        if (arith_ops && pl->fb.kind[i] == 2) return 0;
-        if (arith_ops && i == 0 && pl->fb.kind[0] == 0) return 0;
+    for (int i = 0; i < 4; i++)
         if (pl->fb.kind[i] == 1) {
             if (first < 0) first = i;
             else if (pl->fb.v[i] != pl->fb.v[first]
                      || pl->fb.b[i] != pl->fb.b[first] + (i - first)) return 0;
             if (slot_off(f, pl->fb.v[i]) < 0) return 0;
         }
-    }
     if (first < 0) return 0;
     /* sign bytes follow the memory bytes and read the last of them */
     for (int i = 0; i < 4; i++)
-        if (pl->fb.kind[i] == 2 && (first < 0 || pl->fb.b[first] > 3)) return 0;
-    pl->cached = dehl_has(pl->other);
-    pl->use_hl = (pl->cached && L.rs.hl == pl->other);
+        if (pl->fb.kind[i] == 2 && pl->fb.b[first] > 3) return 0;
     if (!pl->cached && slot_off(f, pl->other) < 0) return 0;
     pl->dead = 0; pl->so = pl->dd = 0;
     pl->sp = 1;
@@ -5352,7 +5344,7 @@ static int try_de_home_indexed_add(FILE *out, Func *f, const Op *op)
     if (!de_home_indexed_add_ok(f, op)) return 0;
     for (int which = 0; which < 2; which++) {
         int sidx = op->src[which], sbase = op->src[which ^ 1];
-        const Op *d = find_unique_def(f, sidx);
+        const Op *d = ir_sole_def(f, sidx);
         if (!d || d->kind != IR_SHL || d->src[1] >= 0) continue;
         if (d->imm < 1 || d->imm > 2) continue;
         int idx = d->src[0];
