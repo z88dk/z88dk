@@ -5581,6 +5581,102 @@ verbatim:
     while (fgets(buf, sizeof buf, src)) fputs(buf, out);
 }
 
+/* ---- drop a pair load nobody reads ---------------------------------------- */
+/* `ld hl,sym` whose HL is overwritten, in straight-line code, before anything
+   reads it. Only an address, an immediate, a register or a frame slot is
+   dropped: another memory source might be a volatile read. */
+static int dpl_mnemonic(const char *l, char *mn, size_t cap)
+{
+    if (l[0] != '\t') return 0;
+    const char *p = l + 1;
+    size_t k = 0;
+    while (*p && *p != '\t' && *p != ' ' && *p != '\n' && k + 1 < cap) mn[k++] = *p++;
+    mn[k] = 0;
+    return k > 0;
+}
+
+/* The register pairs named in a line's operands: bit 0 = hl/h/l, 1 = de/d/e,
+   2 = bc/b/c. An identifier is a register only when it IS one (`h`, `de`); a
+   symbol or a number never is. */
+static int dpl_mentions(const char *args)
+{
+    int m = 0;
+    for (const char *p = args; *p; ) {
+        if ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || *p == '_'
+            || *p == '.' || (*p >= '0' && *p <= '9') || *p == '$') {
+            const char *e = p;
+            while ((*e >= 'a' && *e <= 'z') || (*e >= 'A' && *e <= 'Z')
+                   || (*e >= '0' && *e <= '9') || *e == '_' || *e == '.'
+                   || *e == '$' || *e == '\'')
+                e++;
+            size_t n = (size_t)(e - p);
+            #define DPL_IS(s) (n == strlen(s) && !strncmp(p, s, n))
+            if (DPL_IS("hl") || DPL_IS("h") || DPL_IS("l") || DPL_IS("hl'")) m |= 1;
+            else if (DPL_IS("de") || DPL_IS("d") || DPL_IS("e")) m |= 2;
+            else if (DPL_IS("bc") || DPL_IS("b") || DPL_IS("c")) m |= 4;
+            else if (n > 0 && p[n - 1] == '\'') m |= 7;   /* shadow register */
+            #undef DPL_IS
+            p = e;
+        } else p++;
+    }
+    return m;
+}
+
+static void drop_dead_pair_loads(char **L, long n, char *dead)
+{
+    static const char *plain[] = {"ld", "push", "pop", "add", "adc", "sub", "sbc",
+        "and", "or", "xor", "cp", "inc", "dec", "ex", "neg", "cpl", "rla", "rra",
+        "rlca", "rrca", "rl", "rr", "rlc", "rrc", "sla", "sra", "srl", "bit",
+        "res", "set", "scf", "ccf", "daa", NULL};
+    if (opt_disabled("dead-pair-load")) return;
+    for (long i = 0; i < n; i++) {
+        char mn[16];
+        if (!dpl_mnemonic(L[i], mn, sizeof mn) || strcmp(mn, "ld")) continue;
+        const char *a = L[i] + 1 + strlen(mn);
+        while (*a == '\t' || *a == ' ') a++;
+        int bit = !strncmp(a, "hl,", 3) ? 1 : !strncmp(a, "de,", 3) ? 2
+                : !strncmp(a, "bc,", 3) ? 4 : 0;
+        if (!bit) continue;
+        const char *src = a + 3;
+        int reg_src = (!strncmp(src, "hl\n", 3) || !strncmp(src, "de\n", 3)
+                       || !strncmp(src, "bc\n", 3));
+        int frame_src = (!strncmp(src, "(ix", 3) || !strncmp(src, "(iy", 3));
+        if (!(reg_src || frame_src || *src == '_' || *src == 'i'
+              || (*src >= '0' && *src <= '9') || *src == '-'))
+            continue;
+        if (strchr(src, ';')) continue;
+        if (!frame_src && strchr(src, '(')) continue;
+        int killed = 0;
+        for (long j = i + 1; j < n && j < i + 40; j++) {
+            const char *l = L[j];
+            if (l[0] == '\n' || l[0] == ';' || !strncmp(l, "\tC_LINE", 7)) continue;
+            if (dead[j]) continue;
+            char m2[16];
+            if (!dpl_mnemonic(l, m2, sizeof m2)) break;      /* label or directive */
+            int ok = 0;
+            for (int k = 0; plain[k]; k++) if (!strcmp(plain[k], m2)) { ok = 1; break; }
+            if (!ok) break;
+            const char *args = l + 1 + strlen(m2);
+            int men = dpl_mentions(args);
+            if (!(men & bit)) continue;
+            /* a whole write that reads nothing of the pair kills the load */
+            if (!strcmp(m2, "pop")) {
+                const char *r = args; while (*r == '\t' || *r == ' ') r++;
+                if ((bit == 1 && !strncmp(r, "hl", 2)) || (bit == 2 && !strncmp(r, "de", 2))
+                    || (bit == 4 && !strncmp(r, "bc", 2)))
+                    killed = 1;
+            } else if (!strcmp(m2, "ld")) {
+                const char *r = args; while (*r == '\t' || *r == ' ') r++;
+                int tgt = !strncmp(r, "hl,", 3) ? 1 : !strncmp(r, "de,", 3) ? 2
+                        : !strncmp(r, "bc,", 3) ? 4 : 0;
+                if (tgt == bit && !(dpl_mentions(r + 3) & bit)) killed = 1;
+            }
+            break;
+        }
+        if (killed) dead[i] = 1;
+    }
+}
+
 /* ---- delete an unconditional jump to the label that follows it ----------- */
 /* Drop a `jp X` directly above `X:` (blank, comment, debug and label lines
    may sit between). */
@@ -5603,15 +5699,36 @@ static void filter_jump_to_next(FILE *out, FILE *src)
                      free(L); goto verbatim; }
         n++;
     }
+    /* An unconditional jump straight after another one, with no label
+       between, can never run. */
+    char *dead = calloc((size_t)n + 1, 1);
+    if (dead) drop_dead_pair_loads(L, n, dead);
+    if (dead) {
+        int after_jump = 0;
+        for (long i = 0; i < n; i++) {
+            const char *tp; size_t tn;
+            if (L[i][0] == '\n' || L[i][0] == '\r' || L[i][0] == ';'
+                || !strncmp(L[i], "\tC_LINE", 7))
+                continue;
+            if (bl_label_name(L[i], &tp)) { after_jump = 0; continue; }
+            if (bl_uncond_jump(L[i], &tp, &tn)) {
+                if (after_jump) dead[i] = 1;
+                after_jump = 1;
+            } else
+                after_jump = 0;
+        }
+    }
     for (long i = 0; i < n; i++) {
         const char *tp; size_t tn;
         int drop = 0;
+        if (dead && dead[i]) continue;
         if (bl_uncond_jump(L[i], &tp, &tn)) {
             for (long j = i + 1; j < n && !drop; j++) {
                 const char *np; size_t nl;
                 if (L[j][0] == '\n' || L[j][0] == '\r' || L[j][0] == ';'
                     || !strncmp(L[j], "\tC_LINE", 7))
                     continue;
+                if (dead && dead[j]) continue;
                 nl = bl_label_name(L[j], &np);
                 if (!nl) break;                    /* an instruction or directive */
                 if (nl == tn && !strncmp(np, tp, tn)) drop = 1;
@@ -5619,6 +5736,7 @@ static void filter_jump_to_next(FILE *out, FILE *src)
         }
         if (!drop) fputs(L[i], out);
     }
+    free(dead);
     for (long i = 0; i < n; i++) free(L[i]);
     free(L);
     return;

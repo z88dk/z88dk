@@ -316,6 +316,7 @@ static int integer_literal_fits_zdouble(const Node *node)
  */
 /* Defined with the dead-code pass below; the ternary fold needs it. */
 static int literal_truthy(Node *n);
+static int cse_type_bits(const Type *t);
 
 static void fold_visit(const AstSlot *slot, void *ctx)
 {
@@ -425,6 +426,26 @@ Node *ast_fold_constants(Node *node)
                 }
             }
             return ast_literal_int(node->type, (uint64_t)narrowed);
+        }
+        /* A narrowing cast of a value ternary moves into the arms, so each
+           arm computes only the bits the cast keeps and the join holds the
+           narrow value. */
+        if (node->operand && node->operand->ast_type == AST_TERNARY
+            && node->operand->cond && node->operand->then && node->operand->els
+            && node->type && node->operand->type
+            && kind_is_integer(node->type->kind)
+            && kind_is_integer(node->operand->type->kind)
+            && cse_type_bits(node->type) > 0
+            && cse_type_bits(node->type) < cse_type_bits(node->operand->type)) {
+            Node *t = node->operand;
+            Node *c1 = ast_cast(node->type, t->then);
+            Node *c2 = ast_cast(node->type, t->els);
+            c1->filename = c2->filename = node->filename;
+            c1->line = c2->line = node->line;
+            t->then = ast_fold_constants(c1);
+            t->els  = ast_fold_constants(c2);
+            t->type = node->type;
+            return t;
         }
         return node;
 
@@ -3098,6 +3119,26 @@ static void collect_sef_subtrees(Node *node, array *bag)
            Repeats WITHIN one arm are still synthesised when synthesize_walk
            recurses into that arm's compound. */
         collect_sef_subtrees(node->cond, bag);
+        /* A subexpression of an arm that the cond already evaluates costs
+           nothing extra to hoist: the cond computes it on every path. */
+        if (node->cond && (node->then || node->els)) {
+            array *cb = array_init(NULL);
+            array *ab = array_init(NULL);
+            collect_sef_subtrees(node->cond, cb);
+            if (node->then) collect_sef_subtrees(node->then, ab);
+            if (node->els)  collect_sef_subtrees(node->els, ab);
+            for (int i = 0; i < (int)array_len(ab); i++) {
+                Node *a = array_get_byindex(ab, i);
+                if (cse_type_bits(a->type) < 32) continue;
+                for (int j = 0; j < (int)array_len(cb); j++)
+                    if (nodes_equivalent(a, array_get_byindex(cb, j))) {
+                        array_add(bag, a);
+                        break;
+                    }
+            }
+            array_free(cb);
+            array_free(ab);
+        }
         return;
     case AST_SWITCH:
         /* sw_expr only — not sw_body (the case arms are mutually exclusive; see
