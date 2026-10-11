@@ -288,6 +288,55 @@ static const Op *long_zx_of(const Func *f, int v)
 static const Op *wide_mem_of(const Func *f, int v)
 { return hc_lookup(f, g_hc.wide_mem, v); }
 
+/* Nothing in ops (from, to) of bb can write memory: only ops that cannot, and a
+   float helper (registers in, registers out). w4: a four-byte value is being
+   read where it is used, which also admits the float helpers. */
+static int wm_span_safe(const BB *bb, int from, int to, int w4)
+{
+    for (int k = from + 1; k < to; k++) {
+        switch (bb->ops[k].kind) {
+        case IR_NOP: case IR_MOV: case IR_LD_IMM: case IR_LD_SYM:
+        case IR_LD_STR: case IR_LEA: case IR_LD_MEM:
+        case IR_ADD: case IR_SUB: case IR_RSUB: case IR_AND: case IR_OR:
+        case IR_XOR: case IR_SHL: case IR_SHR: case IR_MUL: case IR_NEG:
+        case IR_NOT: case IR_CONV_ZX: case IR_CONV_SX: case IR_CONV_TRUNC:
+        case IR_CMP_EQ: case IR_CMP_NE: case IR_CMP_LT: case IR_CMP_LE:
+        case IR_CMP_GT: case IR_CMP_GE: case IR_CMP_ULT: case IR_CMP_ULE:
+        case IR_CMP_UGT: case IR_CMP_UGE:
+        case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+        case IR_PUSH_ARG: case IR_ACC_BINOP: case IR_ACC_CMP: case IR_ACC_UNOP:
+            break;
+        case IR_HCALL: {
+            const HelperInfo *h = bb->ops[k].hcall;
+            if (!(w4 && h && h->name
+                  && (!strncmp(h->name, "l_f32_", 6) || !strncmp(h->name, "l_f16_", 6))))
+                return 0;
+            break;
+        }
+        default:
+            return 0;
+        }
+    }
+    return 1;
+}
+
+/* May op u read four-byte vreg v in place from memory (see wide-mem)? */
+static int wm_reader_ok(const Op *u, int v)
+{
+    if (u->kind == IR_PUSH_ARG || u->kind == IR_RET || u->kind == IR_CALL)
+        return 1;
+    if (u->kind == IR_MOV && u->src[0] == v) return 1;
+    if (u->kind == IR_ST_MEM && u->src[0] == v && u->mem.base != v) return 1;
+    if (u->kind == IR_HCALL && u->hcall
+        && u->hcall->n_stacked < u->hcall->n_args
+        && u->hcall->args[u->hcall->n_stacked] == v) {
+        for (int a = 0; a < u->hcall->n_args; a++)
+            if (a != u->hcall->n_stacked && u->hcall->args[a] == v) return 0;
+        return 1;
+    }
+    return 0;
+}
+
 /* The deferred global load for long vreg v, or NULL. */
 static const Op *long_mem_of(const Func *f, int v)
 { return hc_lookup(f, g_hc.long_mem, v); }
@@ -9238,14 +9287,27 @@ static int f32_prepush_ok(const Func *f, const BB *bb, int j, int v)
         return 0;
     for (int a = 1; a < c->hcall->n_args; a++)
         if (c->hcall->args[a] == v) return 0;
+    int wdepth = 0;   /* argument groups opened and closed inside the window */
     for (int i = j + 1; i < k; i++) {
         const Op *o = &bb->ops[i];
         switch (o->kind) {
-        case IR_PUSH_ARG: case IR_PUSH_STRUCT: case IR_ASM: case IR_SWITCH:
+        case IR_PUSH_STRUCT: case IR_ASM: case IR_SWITCH:
         case IR_RET: case IR_PUSH_DEHL_LONG:
             return 0;
+        case IR_PUSH_ARG:
+            /* A call's arguments pushed above the value and popped by that call
+               leave it where it was: allowed when the group opens and closes in
+               the window (imm=1 marks a group's first push). */
+            if (opt_disabled("f32-prepush-groups")) return 0;
+            if (o->imm == 1) wdepth++;
+            else if (wdepth == 0) return 0;
+            break;
         case IR_CALL:
-            if (!o->call || o->call->pre_pushed > 0) return 0;
+            if (!o->call) return 0;
+            if (o->call->pre_pushed > 0) {
+                if (opt_disabled("f32-prepush-groups") || wdepth == 0) return 0;
+                wdepth--;
+            }
             break;
         default: break;
         }
@@ -9263,7 +9325,7 @@ static int f32_prepush_ok(const Func *f, const BB *bb, int j, int v)
             if (!after || ir_bitset_get(after, d[q])) return 0;
         }
     }
-    return 1;
+    return wdepth == 0;
 }
 
 /* Every read of `v` is an argument of an IR_HCALL (loaded with load_to_dehl). */
@@ -9885,6 +9947,64 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 if (hazard) continue;
                 g_hc.wide_mem[d] = o;
                 f->vregs[d].flags |= IR_VREG_NO_SLOT;
+            }
+        }
+    }
+    /* wide-mem, stored copy: a four-byte result stored to a global by the very
+       next op, and read again later in the block with nothing that can write
+       memory in between, is not kept in a frame slot. The store reads it from
+       the registers, and the later readers read the global the store wrote. */
+    if (g_hc.wide_mem && !opt_disabled("wide-mem") && !opt_disabled("wide-mem-store")) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            const BB *bb = &f->bbs[b];
+            for (int j = 0; j + 1 < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j];
+                int df[8]; int nd = ir_op_defs(o, df, 8);
+                if (nd != 1) continue;
+                int v = df[0];
+                if (v < 0 || v >= f->n_vregs || f->vregs[v].width != 4) continue;
+                if (g_hc.wide_mem[v]) continue;
+                if (f->vregs[v].kind == KIND_LONGLONG) continue;
+                if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_NO_SLOT | IR_VREG_CALL_SPLIT
+                                         | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+                    continue;
+                if (ir_home_assigned(f, v) != IR_PR_SPILL) continue;
+                int sj = j + 1;
+                while (sj < bb->n_ops && bb->ops[sj].kind == IR_NOP) sj++;
+                if (sj >= bb->n_ops) continue;
+                const Op *st = &bb->ops[sj];
+                if (st->kind != IR_ST_MEM || st->mem.kind != IR_MEM_SYM
+                    || st->src[0] != v || st->mem.volatile_ || !st->mem.sym
+                    || st->mem.post_step || ns_sym_bails(st->mem.sym)
+                    || mem_bank_fn(&st->mem) || st->mem.elem == KIND_CPTR)
+                    continue;   /* a store of a four-byte value writes all four bytes */
+                int ndef = 0, nuse = 0, ok = 1, last = -1, far_use = 0;
+                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
+                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
+                        const Op *p = &f->bbs[bb2].ops[k];
+                        int dd[8]; int ndd = ir_op_defs(p, dd, 8);
+                        for (int t = 0; t < ndd; t++) if (dd[t] == v) ndef++;
+                        int us[16]; int nu = ir_op_uses(p, us, 16);
+                        for (int t = 0; t < nu; t++)
+                            if (us[t] == v && p != st) {
+                                nuse++;
+                                if (bb2 != b || k <= sj) ok = 0;
+                                else {
+                                    last = k;
+                                    if (!wm_reader_ok(p, v)) ok = 0;
+                                    if (!wm_span_safe(bb, sj, k, 1)) ok = 0;
+                                    int nx = sj + 1;
+                                    while (nx < bb->n_ops && bb->ops[nx].kind == IR_NOP) nx++;
+                                    if (k != nx) far_use = 1;
+                                }
+                            }
+                    }
+                if (ndef != 1 || nuse < 1 || !ok || !far_use || last < 0) continue;
+                if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, v))
+                    continue;
+                g_hc.wide_mem[v] = st;
+                f->vregs[v].flags |= IR_VREG_NO_SLOT;
             }
         }
     }
@@ -12134,6 +12254,17 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             L.la.cur_dehl_dst_dead_safe = 0;
             L.la.cur_dehl_dst_no_bc_stash = 0;
             L.la.cur_dehl_push_nostash = 0;
+            /* [wide-mem] A result whose later readers read the global that the
+               very next op stores it to: that store takes it from the registers
+               and no slot copy is made. */
+            if (op->dst >= 0 && f->vregs[op->dst].width == 4 && j + 1 < bb->n_ops) {
+                const Op *wm = wide_mem_of(f, op->dst);
+                int nx = j + 1;
+                while (nx < bb->n_ops && bb->ops[nx].kind == IR_NOP) nx++;
+                if (wm && wm->kind == IR_ST_MEM && nx < bb->n_ops
+                    && &bb->ops[nx] == wm)
+                    L.la.cur_dehl_dst_dead_safe = 1;
+            }
             /* [IR_SHRNARROW] A width-4 constant shift whose ONLY use is the
                CONV_TRUNC on its heels needs to compute just the bytes the
                truncation keeps: result byte i is source bits [8i+K, 8i+K+8),

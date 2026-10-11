@@ -79,6 +79,14 @@ static long  w4_lret(void) { return wl1; }
 static long  w4_lstale(void) { long t = wl1; wl1 = 7; return t + wl1; }
 static void  w4_lcopy(void) { wl2 = wl1; }
 
+/* A call result held while later calls build their arguments: the result is
+ * pushed when produced and comes back off in order. */
+float p2(float x, float y) { return x - y * 2; }
+static float c_triple(float a, float b, float c) { return fk(a) + fk(b) * fk(c); }
+static float c_args2(float a, float b) { return p2(fk(a), fk(b)); }
+static float c_deep(float a, float b) { return fk(a) - p2(fk(b), fk(a) + 1) * fk(b); }
+static float c_mixed(int n, float a, float b) { return fk(a) * n + p2(b, fk(a)); }
+
 static void test_f32wide(void)
 {
     c_store(12.75f); assertEqual(gt0, 12);
@@ -102,6 +110,10 @@ static void test_f32wide(void)
     assertEqual((int)c_assign(8), 3);
     assertEqual((int)c_assign(3), 12);
     assertEqual(c_open(6, 2), 90);
+    assertEqual((int)c_triple(1, 2, 3), 14);
+    assertEqual((int)c_args2(5, 2), 0);
+    assertEqual((int)c_deep(3, 1), 20);
+    assertEqual((int)c_mixed(2, 3, 5), 5);
     wf1 = 3; wf2 = 4; wl1 = 100000; wl2 = 0;
     assertEqual((int)w4_ret(), 3);
     assertEqual((int)wf1, 9);
