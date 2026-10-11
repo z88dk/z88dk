@@ -5562,6 +5562,154 @@ static void drop_dead_pair_loads(char **L, long n, char *dead)
 }
 
 /* ---- delete an unconditional jump to the label that follows it ----------- */
+/* ---- jump threading after tail merging ------------------------------------
+   Tail merging leaves `L_bb_4:` holding just `jp L_tm_1`, and every `jp L_bb_4`
+   then pays a second jump. Send each jump to a label whose block is a lone
+   unconditional `jp` straight to that jump's final target. The trampoline and
+   its label stay, because code may still fall into it. Runs before block
+   layout, whose single-reference test then sees the lower counts.
+   `--opt-disable=tm-thread` opts out. */
+typedef struct {
+    const char *name; size_t len;      /* the trampoline's label */
+    const char *to; size_t to_len;     /* where its jp goes */
+    long first, jp;                    /* first label line of its run, and the jp */
+} TmThr;
+
+/* True when `name` appears in `line` as a whole identifier. */
+static int tmthr_mentions(const char *line, const char *name, size_t len)
+{
+    for (const char *p = line; (p = strstr(p, name)) != NULL; p++) {
+        char before = p > line ? p[-1] : ' ', after = p[len];
+        int id_b = (before >= 'A' && before <= 'Z') || (before >= 'a' && before <= 'z')
+                || (before >= '0' && before <= '9') || before == '_' || before == '.'
+                || before == '$';
+        int id_a = (after >= 'A' && after <= 'Z') || (after >= 'a' && after <= 'z')
+                || (after >= '0' && after <= '9') || after == '_' || after == '.'
+                || after == '$';
+        if (!id_b && !id_a) return 1;
+    }
+    return 0;
+}
+
+/* An unconditional transfer of control: nothing falls through it. */
+static int tmthr_no_fallthrough(const char *l)
+{
+    const char *tp; size_t tn;
+    return !strcmp(l, "\tret\n") || !strncmp(l, "\tjp\t(", 6)
+        || bl_uncond_jump(l, &tp, &tn);
+}
+
+static int tmthr_find(const TmThr *t, int n, const char *s, size_t len)
+{
+    for (int i = 0; i < n; i++)
+        if (t[i].len == len && !strncmp(t[i].name, s, len)) return i;
+    return -1;
+}
+
+static void filter_thread_trampolines(FILE *out, FILE *src)
+{
+    char **L;
+    int n_lines;
+    rewind(src);
+    if (opt_disabled("tm-thread") || !slurp_lower_lines(src, &L, &n_lines)) {
+        rewind(src);
+        copy_lower_stream(out, src);
+        return;
+    }
+    long n = n_lines;
+    TmThr *t = calloc((size_t)(n > 0 ? n : 1), sizeof *t);
+    char **nw = calloc((size_t)(n > 0 ? n : 1), sizeof *nw);   /* rewritten jumps */
+    int nt = 0;
+    if (t && nw) {
+        for (long i = 0; i < n; i++) {
+            const char *np;
+            size_t nl = bl_label_name(L[i], &np);
+            if (!nl || strncmp(np, "L_f", 3)) continue;     /* function-local only */
+            /* The run of labels ending at the first real line. */
+            long j = i + 1;
+            while (j < n) {
+                const char *q;
+                if (L[j][0] == '\n' || L[j][0] == ';' || !strncmp(L[j], "\tC_LINE", 7)
+                    || bl_label_name(L[j], &q)) { j++; continue; }
+                break;
+            }
+            const char *tp; size_t tn;
+            if (j >= n || strncmp(L[j], "\tjp\t", 4) || !bl_uncond_jump(L[j], &tp, &tn))
+                continue;
+            if (tn == nl && !strncmp(tp, np, nl)) continue;       /* jp to itself */
+            t[nt].name = np; t[nt].len = nl; t[nt].to = tp; t[nt].to_len = tn;
+            t[nt].first = i; t[nt].jp = j;
+            nt++;
+        }
+        for (long i = 0; i < n; i++) {
+            const char *p = L[i];
+            if (strncmp(p, "\tjp\t", 4)) continue;
+            p += 4;
+            const char *c = strchr(p, ',');
+            const char *lab = c ? c + 1 : p;
+            const char *e = lab;
+            while ((*e >= 'A' && *e <= 'Z') || (*e >= 'a' && *e <= 'z')
+                   || (*e >= '0' && *e <= '9') || *e == '_' || *e == '.' || *e == '$')
+                e++;
+            if ((*e != '\n' && *e != '\r' && *e != '\0') || e == lab) continue;
+            const char *cur = lab; size_t cl = (size_t)(e - lab);
+            int hops = 0, k;
+            while (hops < 8 && (k = tmthr_find(t, nt, cur, cl)) >= 0) {
+                cur = t[k].to; cl = t[k].to_len; hops++;
+            }
+            if (!hops || hops >= 8) continue;               /* none, or a cycle */
+            size_t pre = (size_t)(lab - L[i]);
+            char *nl2 = malloc(pre + cl + 2);
+            if (!nl2) continue;
+            memcpy(nl2, L[i], pre);
+            memcpy(nl2 + pre, cur, cl);
+            nl2[pre + cl] = '\n'; nl2[pre + cl + 1] = 0;
+            nw[i] = nl2;                  /* `cur` reads L[], so swap at the end */
+        }
+    }
+    /* A trampoline that nothing references any more and nothing falls into
+       is dead code: drop its labels and its jump. */
+    char *gone = (t && nw) ? calloc((size_t)(n > 0 ? n : 1), 1) : NULL;
+    if (gone) {
+        for (int k = 0; k < nt; k++) {
+            long run = t[k].first;
+            while (run > 0 && gone[run - 1] == 0) {          /* walk back over its label run */
+                const char *q;
+                if (bl_label_name(L[run - 1], &q)) run--; else break;
+            }
+            long p = run - 1;
+            while (p >= 0 && (L[p][0] == '\n' || L[p][0] == ';'
+                              || !strncmp(L[p], "\tC_LINE", 7))) p--;
+            if (p >= 0 && !tmthr_no_fallthrough(nw[p] ? nw[p] : L[p])) continue;
+            int refd = 0;
+            for (long i = run; i <= t[k].jp && !refd; i++) {
+                const char *q;
+                if (!bl_label_name(L[i], &q)) continue;
+                size_t ql = bl_label_name(L[i], &q);
+                for (long m = 0; m < n && !refd; m++) {
+                    const char *r;
+                    if (bl_label_name(L[m], &r)) continue;
+                    if (tmthr_mentions(nw[m] ? nw[m] : L[m], q, ql)) refd = 1;
+                }
+            }
+            if (refd) continue;
+            for (long i = run; i <= t[k].jp; i++) {
+                const char *q;
+                if (bl_label_name(L[i], &q) || i == t[k].jp) gone[i] = 1;
+            }
+        }
+    }
+    for (long i = 0; i < n; i++) {
+        if (gone && gone[i]) continue;
+        fputs(nw && nw[i] ? nw[i] : L[i], out);
+    }
+    free(gone);
+    for (long i = 0; i < n; i++) { free(L[i]); if (nw) free(nw[i]); }
+    free(L);
+    free(t);
+    free(nw);
+}
+
 /* Drop a `jp X` directly above `X:` (blank, comment, debug and label lines
    may sit between). */
 static void filter_jump_to_next(FILE *out, FILE *src)
@@ -5890,7 +6038,13 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
     }
     if (tmf) {
         rewind(tmf);
-        filter_tail_merge(after_tm, tmf, f);
+        FILE *tt = tmpfile();
+        if (tt) {
+            filter_tail_merge(tt, tmf, f);
+            filter_thread_trampolines(after_tm, tt);
+            fclose(tt);
+        } else
+            filter_tail_merge(after_tm, tmf, f);
         fclose(tmf);
     }
     if (brf) {

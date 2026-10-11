@@ -332,6 +332,7 @@ exists (ADR 0010).
 | --- | --- |
 | `dead-pair-load` | a pair load overwritten before any read stays in the text |
 | `tail-merge` | duplicate instruction tails are not merged (per function) |
+| `tm-thread` | a jump to a label whose block is a lone `jp` is not sent straight to that target after tail merging |
 | `block-layout` | no trace movement to delete a jump |
 | `block-layout-rounds` | block layout runs once, so a trace ending in a jump that another move replaced stays put |
 | `jr-relax` | `jp` is never relaxed to `jr` |
