@@ -1409,3 +1409,18 @@
 =
 	ld	de,hl
 	ld	hl,sp+%1
+
+;; Load a double and push it, as one library call. The load leaves the value in
+;; the accumulator and the push copies it, so the combined helper is the same
+;; sequence: -3b and one call. (sccz80 has this rule in z80rules.1.)
+%title #DLP dload then dpush -> dldpsh (-3b)
+	call	dload
+	call	dpush
+=
+	call	dldpsh
+
+%title #DLP l_f64_load then l_f64_dpush -> l_f64_dldpsh (-3b)
+	call	l_f64_load
+	call	l_f64_dpush
+=
+	call	l_f64_dldpsh
