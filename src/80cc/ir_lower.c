@@ -9795,8 +9795,16 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 const Op *o = &bb->ops[j];
                 int d = o->dst;
                 if (o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_SYM) continue;
-                if (d < 0 || d >= f->n_vregs || f->vregs[d].width <= 4) continue;
-                if (f->vregs[d].kind == KIND_LONGLONG || vreg_kind_is_integer(f, d))
+                if (d < 0 || d >= f->n_vregs || f->vregs[d].width < 4) continue;
+                if (f->vregs[d].kind == KIND_LONGLONG) continue;
+                /* A wide float is read through the accumulator address helper.
+                   A four-byte value (float, long, fixed point) is read through
+                   load_to_dehl, and only the readers that go through it qualify
+                   (checked below). */
+                int w4 = (f->vregs[d].width == 4);
+                if (!w4 && vreg_kind_is_integer(f, d)) continue;
+                if (w4 && (o->mem.elem == KIND_CPTR
+                           || ir_home_assigned(f, d) != IR_PR_SPILL))
                     continue;
                 if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
                                          | IR_VREG_NO_SLOT | IR_VREG_CALL_SPLIT
@@ -9824,6 +9832,28 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 if (ndef != 1 || nuse != 1 || use_j <= j) continue;
                 if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, d))
                     continue;
+                if (w4) {
+                    const Op *u = &bb->ops[use_j];
+                    int ok = (u->kind == IR_PUSH_ARG
+                              || u->kind == IR_RET || u->kind == IR_CALL
+                              || (u->kind == IR_MOV && u->src[0] == d)
+                              || (u->kind == IR_ST_MEM && u->src[0] == d
+                                  && u->mem.base != d));
+                    /* A helper takes its register operand last, after the
+                       stacked ones are loaded and pushed, so reading the global
+                       there leaves nothing in DEHL to lose. A stacked operand
+                       is loaded first and would destroy a partner that arrives
+                       in DEHL. */
+                    if (u->kind == IR_HCALL && u->hcall
+                        && u->hcall->n_stacked < u->hcall->n_args
+                        && u->hcall->args[u->hcall->n_stacked] == d) {
+                        ok = 1;
+                        for (int a2 = 0; a2 < u->hcall->n_args; a2++)
+                            if (a2 != u->hcall->n_stacked && u->hcall->args[a2] == d)
+                                ok = 0;
+                    }
+                    if (!ok) continue;
+                }
                 int hazard = 0;
                 for (int k = j + 1; k < use_j && !hazard; k++) {
                     switch (bb->ops[k].kind) {
@@ -9839,6 +9869,15 @@ static int ir_lower_func_body(FILE *out, Func *f)
                     case IR_PUSH_ARG: case IR_ACC_BINOP: case IR_ACC_CMP:
                     case IR_ACC_UNOP:
                         break;
+                    case IR_HCALL: {
+                        /* a float helper takes registers and writes no memory */
+                        const HelperInfo *h = bb->ops[k].hcall;
+                        if (!(w4 && h && h->name
+                              && (!strncmp(h->name, "l_f32_", 6)
+                                  || !strncmp(h->name, "l_f16_", 6))))
+                            hazard = 1;
+                        break;
+                    }
                     default:
                         hazard = 1;
                     }

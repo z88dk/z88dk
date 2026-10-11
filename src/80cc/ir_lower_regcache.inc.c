@@ -2146,6 +2146,7 @@ static void partial_load_long_shl(FILE *out, const Func *f, int v,
    byte-direct unary chain — IR_NOT/IR_NEG — that walks H/L/E/D through A and
    never reads BC), skip the stash AND don't publish the BC-implying claim, or
    that later `ld hl,bc` would read stale BC. */
+static void emit_gb_long_load(FILE *out, const char *sym, int off);
 static void publish_dehl_from_hl(FILE *out, int vreg_id, int no_bc)
 {
     if (!no_bc)
@@ -2169,6 +2170,30 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        the caller overwrites HL itself, and the rs.hl==vreg_id hit can't
        coincide with a width-2 pending (different widths). */
     pending_spill_resolve();
+    const Op *wm4 = (f->vregs[vreg_id].width == 4 && !dehl_has(vreg_id))
+                  ? wide_mem_of(f, vreg_id) : NULL;
+    if (wm4) {                                  /* [wide-mem] read the global here */
+        const char *sn = ir_sym_name(wm4->mem.sym);
+        int off = wm4->mem.offset;
+        if (IS_GBZ80()) {
+            emit_gb_long_load(out, sn, off);
+        } else if (IS_808x()) {
+            /* no absolute `ld de,(nn)`: high half into HL, to DE, then the low */
+            if (off) emit(out, "ld\thl,(_%s+%d)", sn, off + 2);
+            else     emit(out, "ld\thl,(_%s+2)", sn);
+            emit_ex_de_hl(out);
+            if (off) emit(out, "ld\thl,(_%s+%d)", sn, off);
+            else     emit(out, "ld\thl,(_%s)", sn);
+        } else {
+            if (off) emit(out, "ld\thl,(_%s+%d)", sn, off);
+            else     emit(out, "ld\thl,(_%s)", sn);
+            emit(out, "ld\tde,(_%s+%d)", sn, off + 2);
+        }
+        invalidate_de_cache();
+        invalidate_a_cache();
+        publish_dehl_from_hl(out, vreg_id, no_bc);
+        return;
+    }
     if (dehl_has(vreg_id)) {
         /* Cache hit: DE has high half, BC has low half. Recover HL with
            `ld hl,bc` (~12 T-states) vs ~120 for a full slot read. Skip the

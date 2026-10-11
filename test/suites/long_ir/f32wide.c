@@ -61,6 +61,24 @@ static int c_open(float a, float b) { return sink3(1, (a - b) * 2, fk(a) + b); }
 static int c_open2(float a, float b) { return sink3b(a * 2, 3, fk(b) - 1); }
 static int c_open3(float a, float b) { return sink3(2, fk(a) * fk(b), (fk(b) + a) / 2); }
 
+
+/* [wide-mem, 4-byte] A float or long read once from a global is read where it is
+ * used, but never past a write to it, and never when its partner operand would
+ * be lost from DEHL. */
+static float wf1 = 3, wf2 = 4;
+static long  wl1 = 100000, wl2;
+static void wbump(void) { wf1 = wf1 + 1; }
+static float wtake(float a) { return a + 1; }
+static float w4_ret(void) { float t = wf1; wf1 = 9; return t; }
+static float w4_sub(void) { return wf2 - wf1; }
+static float w4_mix(float x) { return x * wf1 + wf2 * x; }
+static void  w4_copy(void) { wf2 = wf1; }
+static float w4_arg(void) { return wtake(wf1); }
+static float w4_call(void) { float t = wf1; wbump(); return t + wf1; }
+static long  w4_lret(void) { return wl1; }
+static long  w4_lstale(void) { long t = wl1; wl1 = 7; return t + wl1; }
+static void  w4_lcopy(void) { wl2 = wl1; }
+
 static void test_f32wide(void)
 {
     c_store(12.75f); assertEqual(gt0, 12);
@@ -84,6 +102,19 @@ static void test_f32wide(void)
     assertEqual((int)c_assign(8), 3);
     assertEqual((int)c_assign(3), 12);
     assertEqual(c_open(6, 2), 90);
+    wf1 = 3; wf2 = 4; wl1 = 100000; wl2 = 0;
+    assertEqual((int)w4_ret(), 3);
+    assertEqual((int)wf1, 9);
+    wf1 = 3;
+    assertEqual((int)w4_sub(), 1);
+    assertEqual((int)w4_mix(2), 14);
+    w4_copy(); assertEqual((int)wf2, 3);
+    assertEqual((int)w4_arg(), 4);
+    wf1 = 3;
+    assertEqual((int)w4_call(), 7);
+    Assert(w4_lret() == 100000L, "long returned from a global");
+    Assert(w4_lstale() == 100007L, "long read before its global was written");
+    w4_lcopy(); Assert(wl2 == 7L, "long copied between globals");
     assertEqual(c_open2(5, 3), 3 + 100 + 3);
     assertEqual(c_open3(3, 2), 125);
 }
