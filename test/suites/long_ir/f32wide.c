@@ -35,6 +35,14 @@ static float p_deep(float a, float b) { return a - (b - (a - (b - 1))); }
 static int p_cmp(float a, float b) { return a * 2 < sqf(b) - 1; }
 static void p_store(float a, float b) { gf = (a + 1) / (b - 1); }
 
+/* A float RETURNED BY A CALL is the stacked operand of a later helper: it is
+ * pushed straight from the call, with other pushed operands still pending
+ * underneath, and the pending ones must come back off in the right order. */
+float fk(float x) { return x + 1; }
+static float c_chain(float a, float b) { return a / fk(b) * (fk(a) + 2); }
+static float c_sum(float a) { return fk(a) + fk(a * 2); }
+static float c_nest(float a) { return fk(a) * fk(fk(a)); }
+
 static void test_f32wide(void)
 {
     c_store(12.75f); assertEqual(gt0, 12);
@@ -52,6 +60,9 @@ static void test_f32wide(void)
     assertEqual((int)p_deep(10, 4), 13);
     assertEqual(p_cmp(3, 3), 1); assertEqual(p_cmp(4, 2), 0);
     p_store(5, 4); assertEqual((int)gf, 2);
+    assertEqual((int)c_chain(6, 2), 18);
+    assertEqual((int)c_sum(6), 20);
+    assertEqual((int)c_nest(3), 20);
 }
 
 #ifdef HAVE_F16

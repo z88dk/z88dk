@@ -574,6 +574,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                 && L.la.cur_stack_long_top < 0 && !L.la.cur_dehl_dst_dead_safe
                 && !vreg_is_pr_dehl(f, ci->ret_vreg))
                 emit_dehl_stack_push(out, ci->ret_vreg);
+            else if (dpp_next)
+                store_dehl_finalize(out, f, ci->ret_vreg);   /* [f32-prepush] */
             else
                 store_dehl_cached(out, f, ci->ret_vreg);
             L.la.cur_dehl_push_to_stack = 0;
