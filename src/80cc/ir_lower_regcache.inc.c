@@ -1971,9 +1971,7 @@ static void partial_load_long_shr(FILE *out, const Func *f, int v,
    adr/0053. */
 static int shrnarrow_on(void)
 {
-    static int c = -1;
-    if (c < 0) c = !opt_disabled("shr-narrow");
-    return c;
+    return !opt_disabled("shr-narrow");
 }
 
 /* Uses of v across the whole function — the single-use test [IR_SHRNARROW]

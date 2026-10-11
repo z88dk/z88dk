@@ -43,9 +43,7 @@ typedef struct {
    --opt-disable=aggregate-promote or IR_OFF=aggregate-promote. */
 static int agg_promote_enabled(void)
 {
-    static int enabled = -1;
-    if (enabled < 0) enabled = !opt_disabled("aggregate-promote");
-    return enabled;
+    return !opt_disabled("aggregate-promote");
 }
 
 typedef struct {

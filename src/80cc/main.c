@@ -955,8 +955,11 @@ static void opt_code_speed_inert(option *arg, char *val)
 
 /* Named IR/lowering optimisation gates disabled via --opt-disable=<name>.
    There are >32, so they are a name-set rather than bits in c_opt_disable. */
-static char *ir_opt_disabled_names[80];
-static int   n_ir_opt_disabled;
+typedef struct opt_name {
+    char           *name;
+    UT_hash_handle  hh;
+} opt_name;
+static opt_name *ir_opt_disabled_names;
 static int   ir_opt_disable_all;
 
 static void ir_opt_disable_add(const char *name, size_t len);
@@ -990,21 +993,23 @@ int opt_disabled(const char *name)
 {
     ir_opt_disable_env();
     if (ir_opt_disable_all) return 1;
-    for (int i = 0; i < n_ir_opt_disabled; i++)
-        if (strcmp(ir_opt_disabled_names[i], name) == 0) return 1;
-    return 0;
+    opt_name *found;
+    HASH_FIND_STR(ir_opt_disabled_names, name, found);
+    return found != NULL;
 }
 
 static void ir_opt_disable_add(const char *name, size_t len)
 {
-    if (n_ir_opt_disabled >= (int)(sizeof ir_opt_disabled_names
-                                   / sizeof ir_opt_disabled_names[0]))
-        return;
+    opt_name *e = malloc(sizeof *e);
     char *s = malloc(len + 1);
-    if (!s) return;
+    if (!e || !s) { free(e); free(s); return; }
     memcpy(s, name, len);
     s[len] = 0;
-    ir_opt_disabled_names[n_ir_opt_disabled++] = s;
+    opt_name *dup;
+    HASH_FIND_STR(ir_opt_disabled_names, s, dup);
+    if (dup) { free(e); free(s); return; }
+    e->name = s;
+    HASH_ADD_KEYPTR(hh, ir_opt_disabled_names, e->name, strlen(e->name), e);
 }
 
 static void opt_disable(option *arg, char *val)

@@ -1552,9 +1552,7 @@ static int bc_args_save_depth;
    prepushnarrow_on. */
 static int bcsave_live_on(void)
 {
-    static int c = -1;
-    if (c < 0) c = !opt_disabled("bc-save-live");
-    return c;
+    return !opt_disabled("bc-save-live");
 }
 
 /* True if v is one of the plain PR_BC tenants a call must preserve. */
@@ -5425,9 +5423,7 @@ static int try_index_half_word_add(FILE *out, Func *f, const Op *op)
 /* [add-bc] `add hl,bc` when ONE operand is BC-resident. IR_OFF=add-bc opts out. */
 static int addbc_enabled(void)
 {
-    static int v = -1;
-    if (v < 0) v = !opt_disabled("add-bc");
-    return v;
+    return !opt_disabled("add-bc");
 }
 
 /* [long-rmw-walk] `g op= h` on long globals: walk both a byte at a time through
