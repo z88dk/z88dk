@@ -2,6 +2,7 @@
  * `call l_glong`. The value, the register state after it and a following
  * load must match the inline sequence. */
 #include "test.h"
+#include <intrinsic.h>
 
 static long   la[8];
 static unsigned long ula[8];
@@ -20,6 +21,12 @@ static float  fsum(int i, int j)       { return fa[i] + fa[j] * 2; }
 static long   two_loads(int i)         { long t = la[i]; sink++; return t + la[i + 1]; }
 static int    cmp_l(int i, int j)      { return la[i] < la[j]; }
 static void   copy_l(int i, int j)     { la[i] = la[j]; }
+/* A big-endian read of a long: the load and the byte reverse are fused by the
+ * copt rules, so --opt-code-size leaves the load inline when a swap follows. */
+static unsigned char be_buf[16];
+static unsigned long be_read(unsigned char *p)           { return intrinsic_swap_endian_32(*(unsigned long *)p); }
+static void          be_write(unsigned char *p, unsigned long v) { *(unsigned long *)p = intrinsic_swap_endian_32(v); }
+static unsigned long be_add(unsigned char *p, unsigned char *q) { return be_read(p) + be_read(q); }
 static long   add_arg(long x, long y)  { return x + y; }
 static long   call_l(int i, int j)     { return add_arg(la[i], la[j]); }
 
@@ -38,6 +45,13 @@ static void test_sizeglong(void)
     assertEqual(cmp_l(1, 6), 1); assertEqual(cmp_l(6, 1), 0);
     copy_l(0, 7); assertEqual(la[0] == la[7], 1);
     assertEqual(call_l(2, 6) == la[2] + la[6], 1);
+    be_buf[0] = 0x12; be_buf[1] = 0x34; be_buf[2] = 0x56; be_buf[3] = 0x78;
+    be_buf[4] = 0x00; be_buf[5] = 0x01; be_buf[6] = 0x00; be_buf[7] = 0x02;
+    Assert(be_read(be_buf) == 0x12345678UL, "big-endian read");
+    Assert(be_add(be_buf, be_buf + 4) == 0x1235567AUL, "big-endian add");
+    be_write(be_buf + 8, 0xA1B2C3D4UL);
+    assertEqual(be_buf[8] == 0xA1 && be_buf[9] == 0xB2 && be_buf[10] == 0xC3 && be_buf[11] == 0xD4, 1);
+    Assert(be_read(be_buf + 8) == 0xA1B2C3D4UL, "big-endian write then read");
 }
 
 int main(int argc, char *argv[])
