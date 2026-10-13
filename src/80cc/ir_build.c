@@ -4246,6 +4246,47 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         int is_fastcall = (n->sym->ctype
                            && (n->sym->ctype->flags & FASTCALL));
         int n_args = n->args ? (int)array_len(n->args) : 0;
+        /* __builtin_bswap16/32 are IR operations, not calls (include/intrinsic.h
+           maps intrinsic_swap_endian_16/32 to them under 80cc, and there is no
+           library routine behind either). The 32-bit one is IR_BSWAP, the 16-bit
+           one a rotate by 8. An integer argument of another width is extended or
+           truncated to the operand width first. */
+        if (n_args == 1) {
+            const char *sn = n->sym->name;
+            int w32 = !strcmp(sn, "__builtin_bswap32");
+            int w16 = !strcmp(sn, "__builtin_bswap16");
+            Node *a0 = array_get_byindex(n->args, 0);
+            if ((w32 || w16) && a0 && a0->type
+                && kind_is_integer(node_value_kind(a0))
+                && !is_acc_int_kind(node_value_kind(a0))) {
+                int ow = w32 ? 4 : 2;
+                int v = build_expr(b, a0);
+                if (v < 0) return -1;
+                int sw = b->f->vregs[v].width;
+                if (sw < ow) {
+                    int wt = new_temp_kind(b, w32 ? KIND_LONG : KIND_INT);
+                    b->f->vregs[wt].width = (int16_t)ow;
+                    Op *cv = ir_op_emit(cur_bb(b), a0->type->isunsigned ? IR_CONV_ZX : IR_CONV_SX);
+                    cv->dst = wt; cv->src[0] = v;
+                    v = wt;
+                } else if (sw > ow) {
+                    int wt = new_temp_kind(b, w32 ? KIND_LONG : KIND_INT);
+                    b->f->vregs[wt].width = (int16_t)ow;
+                    Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+                    tr->dst = wt; tr->src[0] = v;
+                    v = wt;
+                }
+                int dst = new_temp_kind(b, w32 ? KIND_LONG : KIND_INT);
+                b->f->vregs[dst].width = (int16_t)ow;
+                if (w32) {
+                    ir_emit_unop(cur_bb(b), IR_BSWAP, dst, v);
+                } else {
+                    Op *op = ir_op_emit(cur_bb(b), IR_ROTL);
+                    op->dst = dst; op->src[0] = v; op->imm = 8;
+                }
+                return dst;
+            }
+        }
         /* Inline a const-count __builtin_memset as IR_MEMSET — the whole
            point of the builtin is to inline when the count is const, no
            call. The lowerer unrolls `ld (hl),e; inc hl` for small counts

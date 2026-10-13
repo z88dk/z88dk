@@ -215,6 +215,7 @@ int ir_opt_coalesce_copies(Func *f);
  * x&all-ones, x<<0, x>>0, …) to a MOV or LD_IMM. Folds the `acc = 0;
  * acc op= …` idiom (e.g. `main`'s `res += f()`). Returns ops simplified. */
 int ir_opt_const_fold(Func *f);
+int ir_opt_bswap_fold(Func *f);
 
 /* Reassociate a reduction's left-leaning add-tree (`acc += x0+x1+…+xk`)
    into k+1 direct accumulates `acc += xi`, in place (no op insertion). Frees

@@ -249,6 +249,9 @@ typedef enum {
     IR_NOT,
     IR_INC,
     IR_DEC,
+    IR_BSWAP,           /* dst = byte-reverse of src[0], width 4: bytes 0..3 -> 3..0
+                           (intrinsic_swap_endian_32, __builtin_bswap32). Width 2 is
+                           IR_ROTL by 8. */
 
     /* conversions (paper-trace finding #3) */
     IR_CONV_ZX,         /* zero-extend smaller→larger */

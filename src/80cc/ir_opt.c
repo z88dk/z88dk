@@ -605,7 +605,7 @@ static int cse_eligible(OpKind k)
     case IR_ADD: case IR_SUB: case IR_RSUB:
     case IR_AND: case IR_OR: case IR_XOR:
     case IR_SHL: case IR_SHR:
-    case IR_NEG: case IR_NOT:
+    case IR_NEG: case IR_NOT: case IR_BSWAP:
     case IR_CONV_ZX: case IR_CONV_SX:
     case IR_CONV_TRUNC: case IR_CONV_BYTE_TO_HIGH:
     case IR_ROTL: case IR_ROTR:
@@ -1939,7 +1939,7 @@ static int cse_op_keeps_memory(OpKind k)
     case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR: case IR_LEA:
     case IR_LD_MEM:
     case IR_SUB: case IR_RSUB: case IR_AND: case IR_OR: case IR_XOR:
-    case IR_SHL: case IR_SHR: case IR_MUL: case IR_NEG: case IR_NOT:
+    case IR_SHL: case IR_SHR: case IR_MUL: case IR_NEG: case IR_NOT: case IR_BSWAP:
     case IR_CONV_ZX: case IR_CONV_SX: case IR_CONV_TRUNC: case IR_CONV_TRUNC_HI:
     case IR_CONV_BYTE_TO_HIGH: case IR_ROTL: case IR_ROTR:
     case IR_CMP_EQ: case IR_CMP_NE: case IR_CMP_LT: case IR_CMP_LE:
@@ -2494,7 +2494,7 @@ static int dce_pure_kind(const Op *op)
     case IR_AND: case IR_OR: case IR_XOR:
     case IR_SHL: case IR_SHR:
     case IR_INC: case IR_DEC:
-    case IR_NEG: case IR_NOT: case IR_SMAX0:
+    case IR_NEG: case IR_NOT: case IR_SMAX0: case IR_BSWAP:
     case IR_CONV_ZX: case IR_CONV_SX:
     case IR_CONV_TRUNC: case IR_CONV_BYTE_TO_HIGH:
     case IR_CMP_EQ:  case IR_CMP_NE:
@@ -4948,6 +4948,42 @@ int ir_opt_const_local(Func *f)
     return changed;
 }
 
+/* bswap(bswap(x)) is x. Both reverses must define single-definition vregs, so
+   the inner source cannot have been redefined between the two. The inner
+   reverse is left for dead-code removal. */
+int ir_opt_bswap_fold(Func *f)
+{
+    if (!f || opt_disabled("bswap-fold")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    const Op **def = calloc((size_t)nv, sizeof(const Op *));
+    if (!ndef || !def) { free(ndef); free(def); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int q = 0; q < nd; q++)
+                if (d[q] >= 0 && d[q] < nv) { ndef[d[q]]++; def[d[q]] = o; }
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_BSWAP) continue;
+            int s = o->src[0];
+            if (s < 0 || s >= nv || ndef[s] != 1 || !def[s] || def[s]->kind != IR_BSWAP)
+                continue;
+            int x = def[s]->src[0];
+            if (x < 0 || x >= nv || ndef[x] > 1) continue;
+            if (f->vregs[x].width != f->vregs[o->dst].width) continue;
+            o->kind = IR_MOV; o->src[0] = x; o->src[1] = -1; o->imm = 0;
+            changed++;
+        }
+    free(ndef); free(def);
+    return changed;
+}
+
 int ir_opt_const_fold(Func *f)
 {
     if (!f) return 0;
@@ -5003,6 +5039,17 @@ int ir_opt_const_fold(Func *f)
                     op->kind = IR_LD_IMM; op->imm = mask; op->src[0] = -1; op->src[1] = -1; folded = 1;
                 } else if (op->kind == IR_OR && (KCONST(s1, &c) && c == mask)) {
                     op->kind = IR_LD_IMM; op->imm = mask; op->src[0] = -1; op->src[1] = -1; folded = 1;
+                }
+                break;
+            }
+            case IR_BSWAP: {                    /* bswap of a constant is a constant */
+                int64_t c;
+                if (w == 4 && KCONST(s0, &c)) {
+                    uint32_t u = (uint32_t)c;
+                    op->kind = IR_LD_IMM;
+                    op->imm = (int64_t)(((u & 0xFFu) << 24) | ((u & 0xFF00u) << 8)
+                                        | ((u >> 8) & 0xFF00u) | (u >> 24));
+                    op->src[0] = -1; op->src[1] = -1; folded = 1;
                 }
                 break;
             }

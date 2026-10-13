@@ -8388,6 +8388,7 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_DEC:               return gen_step(out, f, op, -1);
     case IR_POSTSTEP:          return gen_poststep(out, f, op);
     case IR_ROTL:              return gen_rotl(out, f, op);
+    case IR_BSWAP:             return gen_bswap(out, f, op);
     case IR_EXTRACT_BYTE:      return gen_extract_byte(out, f, op);
     case IR_BR:                return gen_br(out, f, op);
     case IR_BR_ZERO:           return gen_br_zero(out, f, op);
@@ -9787,6 +9788,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
            DCE that dedup and clean up the resulting MOVs. */
         (void)ir_opt_self_ops(f);
         int cfold   = ir_opt_const_fold(f);
+        cfold      += ir_opt_bswap_fold(f);
         cfold      += ir_opt_const_local(f);
         /* Table-driven pattern matcher (ir_match.c) — migrated fusion
            passes run here, in table order, to fixpoint. After st2ld

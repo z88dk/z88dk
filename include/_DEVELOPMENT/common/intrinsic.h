@@ -77,7 +77,11 @@ extern void __LIB__ *intrinsic_return_bc(void) __SMALLC __preserves_regs(a,b,c,d
 extern void __LIB__ *intrinsic_return_de(void) __SMALLC __preserves_regs(a,b,c,d,e);
 
 
-#ifdef __SCCZ80
+#ifdef __80CC
+// 80cc turns the byte reverses into IR operations; there is no library routine behind them
+extern unsigned int __builtin_bswap16(unsigned int n);
+#define intrinsic_swap_endian_16(a) __builtin_bswap16(a)
+#elif defined(__SCCZ80)
 extern unsigned int __LIB__ intrinsic_swap_endian_16(unsigned int n) __SMALLC __z88dk_fastcall;
 #else
 extern unsigned int intrinsic_swap_endian_16(unsigned int n)  __preserves_regs(b,c,d,e);
@@ -86,7 +90,10 @@ extern unsigned int intrinsic_swap_endian_16_fastcall(unsigned int n) __preserve
 #endif
 
 
-#ifdef __SCCZ80
+#ifdef __80CC
+extern unsigned long __builtin_bswap32(unsigned long n);
+#define intrinsic_swap_endian_32(a) __builtin_bswap32(a)
+#elif defined(__SCCZ80)
 extern unsigned long __LIB__ intrinsic_swap_endian_32(unsigned long n) __SMALLC __z88dk_fastcall;
 #else
 extern unsigned long intrinsic_swap_endian_32(unsigned long n)  __preserves_regs(b,c);

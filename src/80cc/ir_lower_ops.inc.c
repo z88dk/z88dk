@@ -994,6 +994,95 @@ static int gen_rotl(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+static void emit_hl_add_offset(FILE *out, int off, int use_bc, int avoid_bc);
+
+/* The four-byte store through a pointer that immediately follows this IR_BSWAP
+   and is the reverse's only reader, or NULL. The store is the plain case: no
+   volatile, bank switch, post-step or store chain, a full-word element, a small
+   offset, and a base that does not live in BC (BC holds the value). */
+static const Op *bswap_store_of(const Func *f, const Op *op)
+{
+    if (opt_disabled("bswap-fuse") || IS_GBZ80()) return NULL;
+    if (op->dst < 0 || !cur_bb || cur_op_idx < 0 || cur_op_idx + 1 >= cur_bb->n_ops)
+        return NULL;
+    if (&cur_bb->ops[cur_op_idx] != op) return NULL;
+    const Op *st = &cur_bb->ops[cur_op_idx + 1];
+    if (st->kind != IR_ST_MEM || st->src[0] != op->dst) return NULL;
+    if (st->mem.kind != IR_MEM_VREG || st->mem.base < 0 || st->mem.base == op->src[0])
+        return NULL;
+    if (st->mem.volatile_ || st->mem.post_step || st->mem.chain || mem_bank_fn(&st->mem))
+        return NULL;
+    if (kind_scalar_width(st->mem.elem) != 4) return NULL;
+    if (st->mem.offset < -3 || st->mem.offset > 3) return NULL;
+    if (vreg_in_pr_bc(f, st->mem.base)) return NULL;
+    if (find_unique_use(f, op->dst) != st) return NULL;
+    if (cur_bb->live_out && ir_bitset_get((const BitSet *)cur_bb->live_out, op->dst))
+        return NULL;
+    if (f->vregs[op->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return NULL;
+    return st;
+}
+
+/* IR_BSWAP: DEHL = byte reverse of DEHL. D<->L and E<->H swap through A. */
+static int gen_bswap(FILE *out, Func *f, const Op *op)
+{
+    if (op->dst < 0 || f->vregs[op->dst].width != 4
+        || f->vregs[op->src[0]].width != 4) {
+        fprintf(stderr, "ir_lower: IR_BSWAP needs a width-4 operand and result\n");
+        return -1;
+    }
+    const Op *st = bswap_store_of(f, op);
+    if (st) {
+        /* The next op stores this reverse through a pointer and nothing else
+           reads it: write the source's bytes in reverse order and never form
+           the reversed value. Needs the value in DE:BC (B = H, C = L), so HL is
+           free for the address. */
+        load_to_dehl(out, f, op->src[0]);
+        if (!dehl_has(op->src[0])) emit(out, "ld\tbc,hl");
+        if (!hl_has(st->mem.base))
+            load_to_hl(out, f, st->mem.base);
+        else
+            ss_note_cache_read(f, st->mem.base);
+        emit_hl_add_offset(out, st->mem.offset, 0, 0);       /* inc/dec only */
+        emit(out, "ld\t(hl),d");
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),e");
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),b");
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),c");
+        invalidate_hl_cache();          /* DE and BC are untouched: the DEHL cache stays */
+        note_wide_def(op->dst);
+        note_wide_noslot(op->dst);      /* the reversed value is never formed */
+        L.la.cur_skip_next_op = 1;      /* the store is done */
+        return 0;
+    }
+    load_to_dehl(out, f, op->src[0]);
+    if (!opt_disabled("bswap-bc")) {
+        /* The reverse of D,E,H,L is L,H,E,D in D,E,B,C order: the high half is
+           the old L,H and the low half the old E,D. Build it as DE = high and
+           BC = low, with HL left as junk, which is the form every consumer
+           accepts (a reader that wants HL takes it from BC). */
+        emit(out, "ld\tc,d");
+        emit(out, "ld\tb,e");
+        emit(out, "ld\te,h");
+        emit(out, "ld\td,l");
+        invalidate_hl_bc();
+        L.la.cur_dehl_bc_is_low = 1;
+        store_dehl_finalize(out, f, op->dst);
+        return 0;
+    }
+    emit(out, "ld\ta,l");
+    emit(out, "ld\tl,d");
+    emit(out, "ld\td,a");
+    emit(out, "ld\ta,h");
+    emit(out, "ld\th,e");
+    emit(out, "ld\te,a");
+    invalidate_a_cache();
+    invalidate_hl_bc();                 /* DEHL permuted: BC's low-half mirror is stale */
+    store_dehl_finalize(out, f, op->dst);
+    return 0;
+}
+
 /* Inlined const-count memset (IR_MEMSET): src[0] = dst pointer,
    src[1] = fill byte value, imm = count (>0). Loads the fill byte
    into E (load_to_de leaves the low byte there) and the dst pointer into
@@ -3541,6 +3630,24 @@ static int rab_rmw_walk(const Op *op, int mem_off)
     return 0;
 }
 
+/* The IR_BSWAP that immediately follows this four-byte load and is its only
+   reader, or NULL. Lets the load read its bytes in reverse order instead of
+   loading and then permuting. */
+static const Op *bswap_of_load(const Func *f, const Op *op)
+{
+    if (opt_disabled("bswap-fuse") || IS_GBZ80()) return NULL;
+    if (op->dst < 0 || f->vregs[op->dst].width != 4) return NULL;
+    if (!cur_bb || cur_op_idx < 0 || cur_op_idx + 1 >= cur_bb->n_ops) return NULL;
+    if (&cur_bb->ops[cur_op_idx] != op) return NULL;
+    const Op *nx = &cur_bb->ops[cur_op_idx + 1];
+    if (nx->kind != IR_BSWAP || nx->src[0] != op->dst || nx->dst < 0) return NULL;
+    if (find_unique_use(f, op->dst) != nx) return NULL;
+    if (cur_bb->live_out && ir_bitset_get((const BitSet *)cur_bb->live_out, op->dst))
+        return NULL;
+    if (f->vregs[op->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return NULL;
+    return nx;
+}
+
 static int gen_ld_mem(FILE *out, Func *f, const Op *op)
 {
     /* Port read. Result is a zero-extended byte in HL, matching the width-2
@@ -4063,6 +4170,28 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             commit_a_byte(out, f, op->dst);
         } else if (dst_w == 4) {
             /* Long load: 4 bytes from (hl) into DEHL (DE=high, HL=low). */
+            const Op *sw = bswap_of_load(f, op);
+            if (sw) {
+                /* The next op is this load's byte reverse and nothing else reads
+                   the load: read the bytes straight into D, E, H, L in address
+                   order. The reverse is done and the load never exists. */
+                emit(out, "ld\td,(hl)");
+                emit(out, "inc\thl");
+                emit(out, "ld\te,(hl)");
+                emit(out, "inc\thl");
+                emit(out, "ld\ta,(hl+)");
+                emit(out, "ld\tl,(hl)");
+                emit(out, "ld\th,a");
+                invalidate_a_cache();
+                invalidate_hl_bc();
+                /* The load itself is never defined: say so, so its frame slot
+                   counts as unused. */
+                note_wide_def(op->dst);
+                note_wide_noslot(op->dst);
+                store_dehl_finalize(out, f, sw->dst);
+                L.la.cur_skip_next_op = 1;      /* the BSWAP is done */
+                return 0;
+            }
             if (IS_GBZ80()) {
                 /* gbz80 only emulates `ex de,hl` (808x has native XCHG).
                    Load the low word straight into BC, the high word into DE,
