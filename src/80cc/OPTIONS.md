@@ -91,6 +91,7 @@ exists (ADR 0010).
 | Name | Turning it off means |
 | --- | --- |
 | `f32-rhs-last` | a pure, non-volatile RHS of a register-float `-=` or `/=` is built after the lvalue read |
+| `acc-f2int-store` | a double stored to an integer of two bytes or less is converted to a long and then truncated, not converted straight to an int |
 
 ## Allocation (`ir_alloc.c`)
 
@@ -205,6 +206,7 @@ exists (ADR 0010).
 | --- | --- |
 | `wide-mem-store` | a four-byte result stored to a global by the next operation, and read again later in the block, keeps a frame-slot copy instead of being read back from the global |
 | `f32-prepush-groups` | a float result is not pushed when produced if a call's argument group opens and closes before its helper (the result is stored in a frame slot instead) |
+| `f32-prepush-pop` | a helper result is not pushed when produced if the helper itself takes the previously pushed operand off the stack (the result is stored in a frame slot instead) |
 | `wide-mem` | a double (and a float, long or fixed-point value read as the register operand of a helper, a call or push argument, a store, a move or a return) read once from a global is loaded at its definition and kept in a frame slot, not read in place where it is used |
 | `acc-phi` | a wide value that every predecessor of a join block leaves in the accumulator is stored by each and reloaded at the join |
 | `rabbit-hl-ind` | Rabbit does not read a word at HL plus a signed byte with one `ld hl,(hl+d)` |

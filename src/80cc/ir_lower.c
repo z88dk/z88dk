@@ -9302,6 +9302,17 @@ static int def_dst_dead(const Func *f, const BB *bb, int j)
    before use. KEEP it when a same-BB reader exists (that reader can share the
    register); cross-BB readers rematerialise regardless, so skipping is at worst
    byte-neutral there and a win when the def is otherwise dead. */
+/* Is op an HCALL whose one stacked operand is the pending inline push? Its own
+   lowering takes that image off the stack, so the marker is not stale for
+   anything the op produces. */
+static int op_pops_inline_push(const Op *op)
+{
+    return !opt_disabled("f32-prepush-pop")
+        && op->kind == IR_HCALL && op->hcall && op->hcall->n_stacked == 1
+        && op->hcall->args[0] == L.la.cur_dehl_inline_push
+        && L.cur_sp_adjust == L.la.cur_dehl_inline_push_base_sp;
+}
+
 /* [f32-prepush] May the 4-byte def of `v` at (bb, j) be pushed for its sole
    use, the stacked operand of a later HCALL in the block? The stack must stay
    LIFO up to that HCALL: no argument group, struct push, asm, switch, return,
@@ -12878,7 +12889,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 && dpp_n < (int)(sizeof dpp_v / sizeof dpp_v[0])
                 && !func_has_pr_bc(f)
                 && !L.la.cur_dehl_dst_dead_safe
-                && L.la.cur_dehl_inline_push < 0
+                && (L.la.cur_dehl_inline_push < 0
+                    || op_pops_inline_push(op))
                 && L.la.cur_stack_long_top < 0
                 && op->dst >= 0 && f->vregs[op->dst].width == 4
                 && !vreg_is_pr_dehl(f, op->dst)

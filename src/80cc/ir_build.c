@@ -685,6 +685,8 @@ static const char *acc_name(const char *stem)
     if (!strcmp(stem, "ulong2f"))  return f64 ? "l_f64_ulong2f" : "ufloat";
     if (!strcmp(stem, "f2sint"))   return f64 ? "l_f64_f2sint"  : "ifix";
     if (!strcmp(stem, "f2slong"))  return f64 ? "l_f64_f2slong" : "ifix";
+    if (!strcmp(stem, "f2uint"))   return f64 ? "l_f64_f2uint"  : "ifix";
+    if (!strcmp(stem, "f2ulong"))  return f64 ? "l_f64_f2ulong" : "ifix";
     return NULL;
 }
 
@@ -1187,12 +1189,13 @@ static int emit_acc_from_int(Builder *b, int src_v, int src_unsigned)
 /* 5/6-byte double → int/long (IR_ACC_UNOP, subkind 1): ifix. ifix
    returns the full DEHL (signed long); a width-2 dst takes HL, a width-4
    dst takes DEHL (gen_acc_unop picks the store by dst width). */
-static int emit_acc_to_int(Builder *b, int src_v, int ret_w)
+static int emit_acc_to_int(Builder *b, int src_v, int ret_w, int uns)
 {
     int dst = new_temp(b, ret_w);
     b->f->vregs[dst].width = (int16_t)ret_w;
-    acc_tier_fa(acc_unop1(b, acc_name((ret_w == 4) ? "f2slong" : "f2sint"),
-                          src_v, dst), ACC_SUB_ACC2INT);
+    const char *stem = (ret_w == 4) ? (uns ? "f2ulong" : "f2slong")
+                                    : (uns ? "f2uint"  : "f2sint");
+    acc_tier_fa(acc_unop1(b, acc_name(stem), src_v, dst), ACC_SUB_ACC2INT);
     return dst;
 }
 
@@ -2057,7 +2060,7 @@ static int coerce_float_to_int_kind(Builder *b, int v, Node *src,
                                      (dst_w == 4) ? 4 : 2);
         if (iv < 0) return v;
     } else {
-        iv = emit_acc_to_int(b, v, (dst_w == 4) ? 4 : 2);
+        iv = emit_acc_to_int(b, v, (dst_w == 4) ? 4 : 2, dst_uns);
     }
     if (dst_w == 1) {
         int bt = new_temp_kind(b, KIND_CHAR);
@@ -2252,7 +2255,7 @@ static int build_int_compound_float(Builder *b, Node *n, const char *stem,
         int fr_ = acc ? emit_acc_binop(b, stem, fl_, rv)                    \
                       : emit_float_arith(b, fk, stem, fl_, rv);             \
         if (fr_ < 0) return build_fail("int-float compound: %s failed", stem);\
-        (OUT) = acc ? emit_acc_to_int(b, fr_, (lw == 4) ? 4 : 2)            \
+        (OUT) = acc ? emit_acc_to_int(b, fr_, (lw == 4) ? 4 : 2, uns)        \
                     : emit_int_from_float_reg(b, fr_, fk, uns,              \
                                               (lw == 4) ? 4 : 2);           \
         if ((OUT) < 0) return build_fail("int-float compound: narrow failed");\
@@ -5806,7 +5809,12 @@ static int build_assign(Builder *b, Node *n)
         }
         if (is_acc_float_kind(node_value_kind(n->right))
             && kind_is_integer(store_k) && !is_acc_int_kind(store_k))
-            rhs_v = emit_acc_to_int(b, rhs_v, 4);
+            /* A store narrower than four bytes takes the int result: the long
+               would be built in DEHL only to be truncated. */
+            rhs_v = emit_acc_to_int(b, rhs_v,
+                        (!opt_disabled("acc-f2int-store") && type_width(store_t) <= 2)
+                            ? 2 : 4,
+                        store_t && store_t->isunsigned);
         /* Same for the register tier (f16 / IEEE-32 `double` under --math32):
            convert to the destination's width. Unlike the acc tier there is no
            width mismatch to trip the coercion below, so without this the raw
@@ -6509,7 +6517,8 @@ static int build_cast(Builder *b, Node *n)
        narrows the int result. */
     if (is_acc_float_kind(src_k) && !kind_is_floating(dst_k)
         && !is_acc_int_kind(dst_k)) {
-        int iv = emit_acc_to_int(b, src_v, (dst_w == 4) ? 4 : 2);
+        int iv = emit_acc_to_int(b, src_v, (dst_w == 4) ? 4 : 2,
+                                 n->type && n->type->isunsigned);
         if (dst_w == 1) {
             int bt = new_temp_kind(b, KIND_CHAR);
             Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
