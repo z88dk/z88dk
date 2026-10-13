@@ -10008,35 +10008,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
                     }
                     if (!ok) continue;
                 }
-                int hazard = 0;
-                for (int k = j + 1; k < use_j && !hazard; k++) {
-                    switch (bb->ops[k].kind) {
-                    case IR_NOP: case IR_MOV: case IR_LD_IMM: case IR_LD_SYM:
-                    case IR_LD_STR: case IR_LEA: case IR_LD_MEM:
-                    case IR_ADD: case IR_SUB: case IR_RSUB: case IR_AND: case IR_OR:
-                    case IR_XOR: case IR_SHL: case IR_SHR: case IR_MUL: case IR_NEG:
-                    case IR_NOT: case IR_CONV_ZX: case IR_CONV_SX: case IR_CONV_TRUNC:
-                    case IR_CMP_EQ: case IR_CMP_NE: case IR_CMP_LT: case IR_CMP_LE:
-                    case IR_CMP_GT: case IR_CMP_GE: case IR_CMP_ULT: case IR_CMP_ULE:
-                    case IR_CMP_UGT: case IR_CMP_UGE:
-                    case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
-                    case IR_PUSH_ARG: case IR_ACC_BINOP: case IR_ACC_CMP:
-                    case IR_ACC_UNOP:
-                        break;
-                    case IR_HCALL: {
-                        /* a float helper takes registers and writes no memory */
-                        const HelperInfo *h = bb->ops[k].hcall;
-                        if (!(w4 && h && h->name
-                              && (!strncmp(h->name, "l_f32_", 6)
-                                  || !strncmp(h->name, "l_f16_", 6))))
-                            hazard = 1;
-                        break;
-                    }
-                    default:
-                        hazard = 1;
-                    }
-                }
-                if (hazard) continue;
+                if (!wm_span_safe(bb, j, use_j, w4)) continue;
                 g_hc.wide_mem[d] = o;
                 f->vregs[d].flags |= IR_VREG_NO_SLOT;
             }
