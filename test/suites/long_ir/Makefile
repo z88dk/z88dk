@@ -3526,7 +3526,7 @@ f32wide_8080.bin: $(SOURCES) f32wide.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
-WMKEEP = -Cc--opt-disable=wide-mem -Cc--opt-disable=wide-mem-store -Cc--opt-disable=acc-phi -Cc--opt-disable=f32-prepush-groups -Cc--opt-disable=f32-hcall-reg -Cc--opt-disable=f32-rhs-last -Cc--opt-disable=symidx-mem-late -Cc--opt-disable=st2ld-wide-keep -Cc--opt-disable=bc-call-meta -Cc--opt-disable=f32-prepush-pop
+WMKEEP = -Cc--opt-disable=wide-mem -Cc--opt-disable=wide-mem-store -Cc--opt-disable=acc-phi -Cc--opt-disable=f32-prepush-groups -Cc--opt-disable=f32-hcall-reg -Cc--opt-disable=f32-rhs-last -Cc--opt-disable=symidx-mem-late -Cc--opt-disable=st2ld-wide-keep -Cc--opt-disable=bc-call-meta -Cc--opt-disable=f32-prepush-pop -Cc--opt-disable=dead-slot-wide -Cc--opt-disable=retry-ir-restore -Cc--opt-disable=frameless-reset
 
 f32wide_wmkeep.bin: $(SOURCES) f32wide.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) $(WMKEEP) -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
