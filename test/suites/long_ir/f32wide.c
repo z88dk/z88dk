@@ -7,6 +7,7 @@
  * for the _Float16 half (HAVE_F16). */
 #include "test.h"
 #include <stdlib.h>
+#include <math.h>
 
 static int gt0;
 static int ga = 7;
@@ -21,6 +22,10 @@ static int c_ret(float t) { return (int)(t * 2) + 1; }
 static int c_arg(float t) { return take((int)(t * 2)); }
 static int c_twice(float t) { int i = (int)t; return i * i + i; }
 static float c_call(void) { return (float)ival() + 0.5f; }
+
+/* A parameter passed directly to a float helper must not leave a phantom
+ * width-4 frame slot when the helper result is returned immediately. */
+static float hcall_param_const(float x) { return 3.0f * x; }
 
 static float l_right(float a) { return a * 2 - 3; }
 static float l_left(float a) { return 10 - a * 2; }
@@ -48,6 +53,12 @@ static float c_nest(float a) { return fk(a) * fk(fk(a)); }
  * before the next argument lands. */
 int sink3(int tag, float x, float y) { return tag + (int)x * 10 + (int)y; }
 int sink3b(float x, int tag, float y) { return tag + (int)x * 10 + (int)y; }
+static int floor_then_sink(float x)
+{
+    float t = floor(x + 0.75f);
+    gf = t;
+    return sink3(1, t, 0);
+}
 /* A variable assigned from a call and then compared with a constant: the
  * variable is stored, and the compare reads it from the registers. */
 static float c_assign(float a)
@@ -61,6 +72,70 @@ static int c_open(float a, float b) { return sink3(1, (a - b) * 2, fk(a) + b); }
 static int c_open2(float a, float b) { return sink3b(a * 2, 3, fk(b) - 1); }
 static int c_open3(float a, float b) { return sink3(2, fk(a) * fk(b), (fk(b) + a) / 2); }
 
+
+/* [f32-hcall-reg] An indexed global float is kept in DEHL as the register
+ * operand of a later helper call while another wide operand is already staged. */
+static float hcall_a[10][7], hcall_h2, hcall_h3, hcall_r;
+static int hcall_k;
+static void hcall_reg_mix(void)
+{ hcall_r = hcall_a[hcall_k][6] * hcall_a[hcall_k][5] + hcall_h2 * hcall_h3; }
+
+/* The field displacement of an indexed global float is part of the symbol
+ * address even when the symbol base and the index were built separately. */
+static float field_grid[8][10];
+static float indexed_field_only(int k)
+{ return field_grid[k][5]; }
+static float indexed_field_sum(int k)
+{ return field_grid[k][0] + field_grid[k][5]; }
+static float indexed_field_loop(int n)
+{
+    float sum = 0;
+    int k;
+    for (k = 0; k < n; ++k) sum += field_grid[k][5];
+    return sum;
+}
+
+/* Each register-float compound operator can stage the indexed lvalue first
+ * and read its simple global RHS last, avoiding a frame home for that RHS. */
+static float compound_grid[8], compound_add = 2, compound_sub = 3;
+static float compound_mul = 4, compound_div = 2;
+static float compound_rhs_grid[8];
+static void indexed_compounds(int k)
+{
+    compound_grid[k] = 12;
+    compound_grid[k] += compound_add;
+    compound_grid[k] -= compound_sub;
+    compound_grid[k] *= compound_mul;
+    compound_grid[k] /= compound_div;
+}
+static float local_compounds(void)
+{
+    float x = 20;
+    x += compound_add;
+    x *= compound_mul;
+    x -= compound_sub;
+    x /= compound_div;
+    return x;
+}
+static float local_compound_expr(float y)
+{
+    float x = 100;
+    x -= compound_sub + y;
+    x /= compound_div + 1;
+    return x;
+}
+static float local_compound_conditional(int choose)
+{
+    float x = 100;
+    x -= choose ? compound_sub + compound_div : compound_rhs_grid[0];
+    return x;
+}
+static void indexed_compound_expr(int k)
+{
+    compound_grid[k] = 100;
+    compound_grid[k] -= compound_rhs_grid[k] + compound_sub;
+    compound_grid[k] /= compound_div + 1;
+}
 
 /* [wide-mem, 4-byte] A float or long read once from a global is read where it is
  * used, but never past a write to it, and never when its partner operand would
@@ -94,6 +169,7 @@ static void test_f32wide(void)
     assertEqual(c_arg(4.25f), 9);
     assertEqual(c_twice(5.5f), 30);
     assertEqual((int)(c_call() * 2), 43);
+    assertEqual((int)hcall_param_const(4), 12);
     assertEqual((int)l_right(5), 7);
     assertEqual((int)l_left(3), 4);
     assertEqual((int)l_div(3), 25);
@@ -110,6 +186,8 @@ static void test_f32wide(void)
     assertEqual((int)c_assign(8), 3);
     assertEqual((int)c_assign(3), 12);
     assertEqual(c_open(6, 2), 90);
+    assertEqual(floor_then_sink(3.5f), 41);
+    assertEqual((int)gf, 4);
     assertEqual((int)c_triple(1, 2, 3), 14);
     assertEqual((int)c_args2(5, 2), 0);
     assertEqual((int)c_deep(3, 1), 20);
@@ -127,6 +205,19 @@ static void test_f32wide(void)
     Assert(w4_lret() == 100000L, "long returned from a global");
     Assert(w4_lstale() == 100007L, "long read before its global was written");
     w4_lcopy(); Assert(wl2 == 7L, "long copied between globals");
+    hcall_a[3][6] = 2; hcall_a[3][5] = 5; hcall_h2 = 3; hcall_h3 = 4; hcall_k = 3;
+    hcall_reg_mix(); assertEqual((int)hcall_r, 22);
+    field_grid[3][0] = 2; field_grid[3][5] = 7;
+    assertEqual((int)indexed_field_only(3), 7);
+    assertEqual((int)indexed_field_sum(3), 9);
+    assertEqual((int)indexed_field_loop(4), 7);
+    indexed_compounds(3); assertEqual((int)compound_grid[3], 22);
+    assertEqual((int)local_compounds(), 42);
+    assertEqual((int)local_compound_expr(7), 30);
+    compound_rhs_grid[3] = 7;
+    indexed_compound_expr(3); assertEqual((int)compound_grid[3], 30);
+    assertEqual((int)local_compound_conditional(1), 95);
+    assertEqual((int)local_compound_conditional(0), 100);
     assertEqual(c_open2(5, 3), 3 + 100 + 3);
     assertEqual(c_open3(3, 2), 125);
 }

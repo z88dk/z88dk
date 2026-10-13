@@ -2593,6 +2593,11 @@ static void emit_dehl_stack_push(FILE *out, int vreg_id)
         L.cur_sp_adjust += 4;
         L.la.cur_dehl_inline_push = vreg_id;
         L.la.cur_dehl_inline_push_base_sp = L.cur_sp_adjust;
+        if (f32_stack_n < (int)(sizeof f32_stack_v / sizeof f32_stack_v[0])) {
+            f32_stack_v[f32_stack_n] = vreg_id;
+            f32_stack_sp[f32_stack_n] = L.cur_sp_adjust;
+            f32_stack_n++;
+        }
         invalidate_hl_cache();
         return;
     }
@@ -2603,6 +2608,11 @@ static void emit_dehl_stack_push(FILE *out, int vreg_id)
     L.cur_sp_adjust += 4;
     L.la.cur_dehl_inline_push = vreg_id;
     L.la.cur_dehl_inline_push_base_sp = L.cur_sp_adjust;
+    if (f32_stack_n < (int)(sizeof f32_stack_v / sizeof f32_stack_v[0])) {
+        f32_stack_v[f32_stack_n] = vreg_id;
+        f32_stack_sp[f32_stack_n] = L.cur_sp_adjust;
+        f32_stack_n++;
+    }
     /* HL was consumed producing the value; claim it for OUR low half so
        the next op doesn't treat a stale tenant as an address. */
     invalidate_hl_cache();

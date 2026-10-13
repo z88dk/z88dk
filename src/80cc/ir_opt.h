@@ -150,6 +150,7 @@ int ir_opt_dce(Func *f);
  * reclaims the now-dead LD_SYM). Returns folds made. */
 int ir_opt_sym_cmp_fold(Func *f);
 int ir_opt_sym_addr_fold(Func *f);
+int ir_opt_symidx_mem_late(Func *f);
 int ir_opt_sym_deref_fold(Func *f);
 int ir_opt_deref_offset(Func *f);
 int ir_opt_store_chain(Func *f);

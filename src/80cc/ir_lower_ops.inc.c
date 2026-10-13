@@ -7104,6 +7104,8 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                 }
                 L.cur_sp_adjust -= 4;
                 L.la.cur_dehl_inline_push = -1;
+                if (f32_stack_n > 0 && f32_stack_v[f32_stack_n - 1] == bsrc1)
+                    f32_stack_n--;
                 invalidate_a_cache();
             }
             /* BC=low / DE=high is what every sink wants — signal it instead of

@@ -262,6 +262,26 @@ static int op_dst_spill_is_dead(const BB *bb, int op_idx)
     return 1;
 }
 
+/* A width-4 HCALL result is already in DEHL.  When the only following use is
+   an immediate return, the return consumes that register value directly; a
+   frame slot is unnecessary.  HCALL results normally stay out of the DEHL
+   pool because a later helper/call may clobber the cache, so keep this proof
+   deliberately limited to the adjacent RET shape. */
+static int hcall_ret_spill_is_dead(const Func *f, const BB *bb, int op_idx)
+{
+    const Op *op = &bb->ops[op_idx];
+    if (op->kind != IR_HCALL || !op->hcall
+        || op->hcall->ret_vreg < 0)
+        return 0;
+    int v = op->hcall->ret_vreg;
+    if (v >= f->n_vregs || f->vregs[v].width != 4)
+        return 0;
+    int k = op_idx + 1;
+    while (k < bb->n_ops && bb->ops[k].kind == IR_NOP) k++;
+    return k < bb->n_ops && bb->ops[k].kind == IR_RET
+        && bb->ops[k].src[0] == v;
+}
+
 /* ---- The point query: where is v homed AT A GIVEN POINT? ------------------
    Pure: the flat op index is passed in, not read from lowerer state, so
    allocation, slot assignment, the verifiers and a test can all ask the same
@@ -6536,10 +6556,17 @@ void ir_alloc(Func *f)
                     && op->call->ret_vreg >= 0)
                     dehl_ok[op->call->ret_vreg] = 0;
                 if (op->kind == IR_HCALL && op->hcall
-                    && op->hcall->ret_vreg >= 0)
+                    && op->hcall->ret_vreg >= 0
+                    && !hcall_ret_spill_is_dead(f, bb, j))
                     dehl_ok[op->hcall->ret_vreg] = 0;
                 if (op->dst < 0) continue;
                 int eligible;
+                if (op->kind == IR_HCALL && op->hcall
+                    && op->hcall->ret_vreg >= 0) {
+                    if (!hcall_ret_spill_is_dead(f, bb, j))
+                        dehl_ok[op->hcall->ret_vreg] = 0;
+                    continue;
+                }
                 switch (op->kind) {
                 case IR_LD_IMM: case IR_LD_SYM: case IR_LD_MEM:
                 case IR_MOV:

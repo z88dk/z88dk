@@ -9,6 +9,7 @@ double g;
 
 /* --- arithmetic (mixed int OP double, both operand orders) --- */
 static int a_mul(void){ double d = 4.0; return (int)(3 * d) + (int)(d * 5); }   /* 12+20 */
+static int a_param_const_mul(double d){ return (int)(3.0 * d); }                  /* 3*d */
 static int a_div(void){ double d = 4.0; return (int)(d / 2) + (int)(40 / d); }  /* 2+10 */
 static int a_addsub(void){ double d = 4.0; return (int)(3 + d) + (int)(d - 1); }/* 7+3 */
 static int a_char(void){ char c = 6; double d = 4.0; return (int)(c * d); }     /* 24 */
@@ -58,7 +59,7 @@ static int int_arg_to_double_param(void){
 
 static void test_fp_promote(void)
 {
-    assertEqual(a_mul(), 32); assertEqual(a_div(), 12); assertEqual(a_addsub(), 10);
+    assertEqual(a_mul(), 32); assertEqual(a_param_const_mul(4), 12); assertEqual(a_div(), 12); assertEqual(a_addsub(), 10);
     assertEqual(a_char(), 24); assertEqual(a_long(), 400); assertEqual(a_ll(), 28);
     assertEqual(c_gt(), 3);
     assertEqual(s_glob_var(7), 7); assertEqual(s_glob_const(), 9);

@@ -2125,6 +2125,18 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
        the freshly-loaded accumulator in the DEHL/reg slot. Matches sccz80's
        staging; without it the rhs is spilled to a frame slot and reloaded.
        Acc tier (FA model) keeps lhs-first — it doesn't use the DEHL stack. */
+    /* For noncommutative f32 `lhs -= rhs` / `lhs /= rhs`, build the lvalue
+       read first and the RHS last. The helper wants lhs stacked and rhs in
+       DEHL. Building rhs first can make its value survive the lvalue address
+       calculation, creating a redundant frame temporary. Commutative += and
+       *= already use the cheaper stack-argument route below. Restrict this
+       reorder to pure, non-volatile operands. */
+    int nvol = 0;
+    int rhs_last = !is_acc
+        && !opt_disabled("f32-rhs-last")
+        && (!strcmp(stem, "sub") || !strcmp(stem, "div"))
+        && arg_pure_nonvolatile(lvn, &nvol)
+        && arg_pure_nonvolatile(n->right, &nvol) && nvol == 0;
     int fc_commutative = !is_acc
         && (!strcmp(stem, "add") || !strcmp(stem, "mul"))
         && !opt_disabled("f32-stack-arg");
@@ -2133,16 +2145,24 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
         : fc_commutative ? emit_float_arith(b, fk, stem, rv, (LV)) \
                          : emit_float_arith(b, fk, stem, (LV), rv))
 
-    int rv = build_expr(b, n->right);
-    if (rv < 0) return -1;
-    /* Convert a mixed rhs (int, or the other float tier) to the lvalue's
-       float kind — the conversion the front end no longer inserts. */
-    rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+    int rv = -1;
+    if (!rhs_last) {
+        rv = build_expr(b, n->right);
+        if (rv < 0) return -1;
+        /* Convert a mixed rhs (int, or the other float tier) to the lvalue's
+           float kind — the conversion the front end no longer inserts. */
+        rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+    }
 
     if (lvn->ast_type == AST_LOCAL_VAR) {
         int lhs_v = lvn->sym ? sym_map_get(b, lvn->sym) : -1;
         if (lhs_v < 0)
             return build_fail("float compound-assign: unknown local");
+        if (rhs_last) {
+            rv = build_expr(b, n->right);
+            if (rv < 0) return -1;
+            rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+        }
         int res = COMPOUND_ARITH(lhs_v);
         if (res < 0) return -1;
         ir_emit_mov(cur_bb(b), lhs_v, res);
@@ -2154,6 +2174,11 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
         int loaded = new_temp_kind(b, fk);
         Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
         ld->dst = loaded; ld->mem.kind = IR_MEM_SYM; ld->mem.sym = g;
+        if (rhs_last) {
+            rv = build_expr(b, n->right);
+            if (rv < 0) return -1;
+            rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+        }
         int res = COMPOUND_ARITH(loaded);
         if (res < 0) return -1;
         Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
@@ -2169,6 +2194,11 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
     ld->dst = loaded; ld->mem.kind = IR_MEM_VREG;
     ld->mem.base = ptr_v; ld->mem.elem = elem;
     ld->mem.bank_fn = bf;
+    if (rhs_last) {
+        rv = build_expr(b, n->right);
+        if (rv < 0) return -1;
+        rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+    }
     int res = COMPOUND_ARITH(loaded);
     if (res < 0) return -1;
     Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
@@ -6848,8 +6878,10 @@ static int build_muldiv_integer(Builder *b, Node *n)
     /* Constant-multiply strength reduction: x*C → shifts + add/sub for
        cheap C, replacing the l_mult/l_long_mult helper. Skipped on
        targets with a hardware multiply (Rabbit `mul`), which keep the
-       helper. Integer width 2/4 only; one literal operand. */
+       helper. Integer width 2/4 only; one literal operand. Floating and
+       fixed-point values must stay on their typed helper paths. */
     if (n->ast_type == OP_MULT
+        && !is_flt && !is_fix16 && !is_fix32
         && !IS_RABBIT()
         && (width == 2 || width == 4)) {
         Node *litn = (n->right && n->right->ast_type == AST_LITERAL) ? n->right

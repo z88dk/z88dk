@@ -469,6 +469,7 @@ static int wide_prepush_target(const Func *f, const BB *bb, int j, int v);
 static int dpp_v[8], dpp_sp[8];
 static int dpp_n;
 static int dpp_next;   /* set by the lookahead: push this op's DEHL result */
+static int f32_stack_v[8], f32_stack_sp[8], f32_stack_n;
 /* [IR_ACCDROP_VERIFY] Inert: report a slot read of a wide value whose store
    was dropped earlier in the same render (the consumer lost the accumulator
    before it looked). */
@@ -1777,16 +1778,19 @@ static int xline_ret_reads_de(void)
 
    `--opt-disable=de-call` opts out, byte for byte. Evidence: adr/0084. */
 #define DECALL_MAX 96
-static struct { char name[56]; unsigned char dirty; } xf_decall[DECALL_MAX];
+static struct { char name[56]; unsigned char dirty, bc_dirty; } xf_decall[DECALL_MAX];
 static int xf_decall_n;
 static int xf_decall_full;
+static const char *xline_call_operand(const char *line);
+static int xline_plain_call(const char *line);
 
-static void decall_note(const char *sym, int clean)
+static void decall_note(const char *sym, int clean, int bc_clean)
 {
     if (!sym || !*sym) return;
     for (int i = 0; i < xf_decall_n; i++)
         if (!strcmp(xf_decall[i].name, sym)) {
             if (!clean) xf_decall[i].dirty = 1;
+            if (!bc_clean) xf_decall[i].bc_dirty = 1;
             return;
         }
     if (xf_decall_n >= DECALL_MAX || strlen(sym) + 1 > sizeof xf_decall[0].name) {
@@ -1795,7 +1799,32 @@ static void decall_note(const char *sym, int clean)
     }
     strcpy(xf_decall[xf_decall_n].name, sym);
     xf_decall[xf_decall_n].dirty = (unsigned char)!clean;
+    xf_decall[xf_decall_n].bc_dirty = (unsigned char)!bc_clean;
     xf_decall_n++;
+}
+
+/* Direct calls emitted by gen_call have no BC argument.  A BC value can be
+   live across one only when the callee was declared to preserve it.  Unlike
+   xline_c_call, this also covers asm-linkage names such as printf and
+   floor_fastcall. Return -1 for unknown calls, 0 for BC-preserving calls,
+   and 1 when BC is dead into this call. */
+static int xline_call_bc_fact(const char *line)
+{
+    if (xf_decall_full || opt_disabled("bc-call")
+        || opt_disabled("bc-call-meta") || !xline_plain_call(line))
+        return -1;
+    const char *p = xline_call_operand(line);
+    if (!p) return -1;
+    char sym[56]; size_t k = 0;
+    while (p[k] && p[k] != '\n' && p[k] != '\r' && p[k] != ' '
+           && p[k] != '\t' && p[k] != ';' && k + 1 < sizeof sym) {
+        sym[k] = p[k]; k++;
+    }
+    if (p[k] && p[k] != '\n' && p[k] != '\r') return -1;
+    sym[k] = '\0';
+    for (int i = 0; i < xf_decall_n; i++)
+        if (!strcmp(xf_decall[i].name, sym)) return !xf_decall[i].bc_dirty;
+    return -1;
 }
 
 /* 0: not an unconditional `call name`; 2: a call to l_case / l_setjmp;
@@ -1966,6 +1995,17 @@ static int xline_c_call(const char *line)
     if (*p != ' ' && *p != '\t') return 0;
     while (*p == ' ' || *p == '\t') p++;
     return p[0] == '_' && p[1] != '_' && p[1] != 0;
+}
+
+static int xline_call_bc_kills(const char *line)
+{
+    if (!bccall_enabled()) return 0;
+    int fact = xline_call_bc_fact(line);
+    if (fact >= 0) return fact;
+    /* A full table may hide a BC-preserving direct call.  Keep the older
+       `_sym` fallback only when the metadata extension is opted out. */
+    if (xf_decall_full && !opt_disabled("bc-call-meta")) return 0;
+    return xline_c_call(line);
 }
 
 /* [l-call-flags] Is this an unconditional call to a runtime helper
@@ -4929,7 +4969,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             /* [bc-call] A branch's successor may read BC; a call to a compiled
                C function cannot — see xline_c_call. Everything else (a jump, an
                asm-linkage call, a conditional call) stays conservative. */
-            else if (call && xline_c_call(lines[i]) && bccall_enabled())
+            else if (call && xline_call_bc_kills(lines[i]))
                           { b_live = c_live = 0; }
             /* [bc-flow] A branch to a label in this function is not a black
                box: take the liveness the fixpoint computed for its target (plus
@@ -9328,6 +9368,42 @@ static int f32_prepush_ok(const Func *f, const BB *bb, int j, int v)
     return wdepth == 0;
 }
 
+/* A later binary helper may have a short chain of wide load/helper operands
+   between the producer and its stacked use.  The ordinary proof rejects the
+   chain when one of those temporary operands is stack-homed, even though each
+   temporary is consumed only by another HCALL and the existing HCALL lowering
+   keeps its own argument pushes balanced. */
+static int f32_hcall_chain_prepush_ok(const Func *f, const BB *bb, int j, int v)
+{
+    int consumer = -1;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int i = 0; i < f->bbs[b].n_ops; i++) {
+            const Op *o = &f->bbs[b].ops[i];
+            int u[16], nu = ir_op_uses(o, u, 16);
+            for (int q = 0; q < nu; q++)
+                if (u[q] == v) {
+                    if (consumer >= 0 || &f->bbs[b] != bb || i <= j) return 0;
+                    consumer = i;
+                }
+        }
+    if (consumer < 0 || consumer <= j + 1) return 0;
+    const Op *c = &bb->ops[consumer];
+    if (c->kind != IR_HCALL || !c->hcall || c->hcall->n_stacked != 1
+        || c->hcall->args[0] != v)
+        return 0;
+    for (int i = j + 1; i < consumer; i++) {
+        const Op *o = &bb->ops[i];
+        if (o->kind != IR_LD_MEM && o->kind != IR_HCALL) return 0;
+        int d[8], nd = ir_op_defs(o, d, 8);
+        for (int q = 0; q < nd; q++) {
+            if (d[q] < 0 || f->vregs[d[q]].width != 4) return 0;
+            const Op *u = find_unique_use(f, d[q]);
+            if (!u || u->kind != IR_HCALL || !u->hcall) return 0;
+        }
+    }
+    return 1;
+}
+
 /* Every read of `v` is an argument of an IR_HCALL (loaded with load_to_dehl). */
 static int imm32_only_hcall_args(const Func *f, int v)
 {
@@ -9731,6 +9807,11 @@ static int ir_lower_func_body(FILE *out, Func *f)
                     pruned, aggpromoted, hoisted, ivsr, early, fwd, cfold, reassoc, match,
                     cse, addrcse, packs, late, pushes, deadret, symcmp, dce, narrow, ivnarrow);
     }
+
+    /* Some indexed-global member offsets settle into MEM.displacement only
+       after the matcher has run. Fold that final form once, outside the
+       optimisation fixpoint, before vreg compaction and allocation. */
+    (void)ir_opt_symidx_mem_late(f);
 
     /* Drop orphan vregs (abandoned builder temps — in no op slot) before the
        id-indexed analysis/allocation tables get built. Renumbers survivors;
@@ -11656,6 +11737,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     L.la.cur_stack_long_top = -1;
     L.la.cur_dehl_inline_push = -1;
     L.la.cur_dehl_inline_push_base_sp = 0;
+    f32_stack_n = 0;
     L.la.cur_dehl_push_to_stack = 0;
     L.la.cur_dehl_bc_is_low = 0;
     cur_emitted_file = NULL;
@@ -11795,6 +11877,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         L.la.cur_stack_long_top = -1;
         L.la.cur_dehl_inline_push = -1;
         L.la.cur_dehl_inline_push_base_sp = 0;
+        f32_stack_n = 0;
         L.la.cur_dehl_push_to_stack = 0;
         cur_bank_fn = NULL;   /* __addressmod: bank unknown at a BB merge */
         /* No pending spill crosses into a BB yet — the cross-BB inherit
@@ -12346,6 +12429,18 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         && (ko->hcall->n_stacked >= 1 || ko->hcall->n_args == 1)
                         && !opt_disabled("dehl-stash-dead"))
                         L.la.cur_store_dehl_stash_dead = 1;
+                    if (ko->kind == IR_CALL && ko->call && ko->call->target
+                        && !(ko->call->preserved & IR_R_BC)
+                        && !opt_disabled("dehl-stash-dead")) {
+                        for (int a = 0; a < ko->call->n_args; a++) {
+                            int av = ko->call->args[a];
+                            if (av == V && av >= 0 && av < f->n_vregs
+                                && f->vregs[av].width == 4) {
+                                L.la.cur_store_dehl_stash_dead = 1;
+                                break;
+                            }
+                        }
+                    }
                     break;
                 }
                 for (int k = j + 1; k < bb->n_ops; k++) {
@@ -12406,10 +12501,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                    This is the producer-side half of the argument case: the
                    push's own load_to_dehl is a cache hit, so no_bc there has
                    nothing left to suppress. */
-                if (fp_active(f) && op->dst >= 0
-                    && f->vregs[op->dst].width == 4
-                    && j + 1 < bb->n_ops
-                    && (bb->ops[j + 1].kind == IR_PUSH_ARG
+            if (op->dst >= 0
+                && f->vregs[op->dst].width == 4
+                && j + 1 < bb->n_ops
+                && (bb->ops[j + 1].kind == IR_PUSH_ARG
                         || bb->ops[j + 1].kind == IR_PUSH_DEHL_LONG)
                     && bb->ops[j + 1].src[0] == op->dst) {
                     int V = op->dst;
@@ -12432,6 +12527,39 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     }
                 }
             }
+            /* A direct call can consume a freshly-produced width-4 value in
+               DEHL just like the helper path above.  If the call does not
+               preserve BC and this is the value's only use, the producer's
+               BC=low stash cannot be recovered after the call. */
+            if (op->dst >= 0 && f->vregs[op->dst].width == 4
+                && j + 1 < bb->n_ops
+                && !opt_disabled("dehl-stash-dead")) {
+                const Op *cx = &bb->ops[j + 1];
+                const CallInfo *cc = cx->call;
+                if (cx->kind == IR_CALL && cc && cc->target
+                    && cc->abi == IR_ABI_FASTCALL && cc->n_args == 1
+                    && !cc->pre_pushed && !cc->ret_longlong
+                    && !(cc->flags & (SHORTCALL | SHORTCALL_HL | HL_CALL
+                                      | BANKED | SDCCCALL1))
+                    && !(cc->preserved & IR_R_BC)
+                    && !(bb->live_out
+                         && ir_bitset_get((const BitSet *)bb->live_out,
+                                          op->dst))) {
+                    int narg = 0, later = 0;
+                    for (int a = 0; a < cc->n_args; a++)
+                        if (cc->args[a] == op->dst) narg++;
+                    for (int k = j + 2; k < bb->n_ops && !later; k++) {
+                        int uses[16];
+                        int nu = ir_op_uses(&bb->ops[k], uses, 16);
+                        for (int u = 0; u < nu; u++)
+                            if (uses[u] == op->dst) { later = 1; break; }
+                    }
+                    if (narg == 1 && !later) {
+                        L.la.cur_dehl_dst_dead_safe = 1;
+                        L.la.cur_dehl_dst_no_bc_stash = 1;
+                    }
+                }
+            }
             /* A 4-byte result read only as the register operand of the helper
                call that follows: the helper clobbers BC, and the load that
                feeds it takes the low half from HL when HL is advertised, so the
@@ -12448,6 +12576,39 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     for (int a = 0; a < hh->n_stacked; a++)
                         if (hh->args[a] == op->dst) other = 1;
                     if (!other) L.la.cur_dehl_dst_no_bc_stash = 1;
+                }
+            }
+            /* A wide result used only as the register operand of a binary
+               helper can stay in DEHL when the helper's stacked operand is
+               already staged.  The generic def_dst_dead() test only sees
+               ordinary operands in op->src[]; HCALL operands live in
+               hcall->args[], so it otherwise misses this cache-served use
+               and store_dehl_finalize writes a frame slot unnecessarily.
+               The stacked operand must be the value currently at TOS. */
+            if (!L.la.cur_dehl_dst_dead_safe
+                && op->dst >= 0 && f->vregs[op->dst].width == 4
+                && j + 1 < bb->n_ops
+                && !opt_disabled("f32-prepush")
+                && !opt_disabled("f32-hcall-reg")) {
+                const Op *hx = &bb->ops[j + 1];
+                const HelperInfo *hh = hx->hcall;
+                if (hx->kind == IR_HCALL && hh
+                    && hh->n_stacked == 1
+                    && hh->n_args - hh->n_stacked == 1
+                    && hh->args[1] == op->dst
+                    && find_unique_use(f, op->dst) == hx
+                    && !(bb->live_out
+                         && ir_bitset_get((const BitSet *)bb->live_out, op->dst))) {
+                    int stacked = hh->args[0];
+                    int staged =
+                        (f32_stack_n > 0
+                         && stacked == f32_stack_v[f32_stack_n - 1]
+                         && L.cur_sp_adjust == f32_stack_sp[f32_stack_n - 1]);
+                    if (!staged && dpp_n > 0)
+                        staged = (stacked == dpp_v[dpp_n - 1]
+                                  && L.cur_sp_adjust == dpp_sp[dpp_n - 1]);
+                    if (staged)
+                        L.la.cur_dehl_dst_dead_safe = 1;
                 }
             }
             if (L.la.cur_dst_dead && op->dst >= 0
@@ -12722,8 +12883,11 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 && op->dst >= 0 && f->vregs[op->dst].width == 4
                 && !vreg_is_pr_dehl(f, op->dst)
                 && !(f->vregs[op->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
-                && !(bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, op->dst)))
+                && !(bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, op->dst))) {
                 dpp_next = f32_prepush_ok(f, bb, j, op->dst);
+                if (!dpp_next && !opt_disabled("f32-hcall-reg"))
+                    dpp_next = f32_hcall_chain_prepush_ok(f, bb, j, op->dst);
+            }
 
             /* `jp` to the immediately-following BB is dead — the
                label is the next instruction. Elide when this is an

@@ -24,6 +24,7 @@ all:	longasr.bin longasr_8080.bin longasr_gbz80.bin longasr_r2ka.bin longasr_ez8
 all:	crcloop.bin crcloop_8080.bin crcloop_gbz80.bin crcloop_r2ka.bin crcloop_ez80.bin crcloop_8085.bin crcloop_kc160.bin crcloop_z180.bin crcloop_r4k.bin crcloop_fp.bin
 all:	zxfold.bin zxfold_8080.bin zxfold_gbz80.bin zxfold_r2ka.bin zxfold_ez80.bin zxfold_8085.bin zxfold_kc160.bin zxfold_z180.bin zxfold_r4k.bin zxfold_fp.bin
 all:	printfputs.bin printfputs_asm.bin printfonly_asm.bin printfmixed_asm.bin
+all:	callcleanup.bin callcleanup_fp.bin callcleanup_keep.bin callcleanup_8080.bin callcleanup_8085.bin
 all:	bytestore.bin bytestore_8080.bin bytestore_gbz80.bin bytestore_r2ka.bin bytestore_ez80.bin bytestore_8085.bin bytestore_kc160.bin bytestore_z180.bin bytestore_r4k.bin bytestore_fp.bin
 all:	longcmp.bin longcmp_8080.bin longcmp_gbz80.bin longcmp_r2ka.bin longcmp_ez80.bin longcmp_8085.bin longcmp_kc160.bin longcmp_z180.bin longcmp_r4k.bin longcmp_fp.bin
 all:	longaddk.bin longaddk_8080.bin longaddk_gbz80.bin longaddk_r2ka.bin longaddk_ez80.bin longaddk_8085.bin longaddk_kc160.bin longaddk_z180.bin longaddk_r4k.bin longaddk_fp.bin
@@ -1977,6 +1978,26 @@ bytecleanup_r2ka.bin: $(SOURCES) bytecleanup.c
 	$(compile_r2ka)
 	$(runtest_r2ka)
 
+callcleanup.bin: $(SOURCES) callcleanup.c
+	$(compile)
+	$(runtest)
+
+callcleanup_fp.bin: $(SOURCES) callcleanup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+callcleanup_keep.bin: $(SOURCES) callcleanup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=call-sp-cleanup --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+callcleanup_8080.bin: $(SOURCES) callcleanup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+callcleanup_8085.bin: $(SOURCES) callcleanup.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
 bcsavegrp.bin: $(SOURCES) bcsavegrp.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
@@ -3451,7 +3472,7 @@ postfold_keep.bin: $(SOURCES) postfold.c
 # [#DE7 / reg-int-literal / hcall-commit / remat-imm32 / f32-prepush] register-tier floats.
 # f32wide_de7: with hcall-commit off the f32->int result takes the TOS store,
 # which copt #DE7 rewrites; c_twice reads DE after it.
-all: f32wide.bin f32wide_fp.bin f32wide_mbf.bin f32wide_mbf_fp.bin f32wide_8085.bin f32wide_gbz80.bin f32wide_r2ka.bin f32wide_keep.bin f32wide_de7.bin
+all: f32wide.bin f32wide_fp.bin f32wide_mbf.bin f32wide_mbf_fp.bin f32wide_8085.bin f32wide_gbz80.bin f32wide_r2ka.bin f32wide_kc160.bin f32wide_kc160_fp.bin f32wide_ez80_fp.bin f32wide_keep.bin f32wide_de7.bin
 
 f32wide.bin: $(SOURCES) f32wide.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
@@ -3480,6 +3501,18 @@ f32wide_gbz80.bin: $(SOURCES) f32wide.c
 f32wide_r2ka.bin: $(SOURCES) f32wide.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -fframe-pointer --math32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_kc160.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160 -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mkc160 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_kc160_fp.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160 -fframe-pointer -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mkc160 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f32wide_ez80_fp.bin: $(SOURCES) f32wide.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 f32wide_keep.bin: $(SOURCES) f32wide.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=reg-int-literal -Cc--opt-disable=remat-imm32 -Cc--opt-disable=f32-prepush -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m

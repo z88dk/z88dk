@@ -79,11 +79,18 @@ exists (ADR 0010).
 | `cmp-unsign` | keep the sign tail on a comparison that cannot go negative |
 | `conv-mask-fold` | keep a widening conversion feeding a mask |
 | `sym-addr-fold` | keep `&sym + K` as an add instead of a symbol address |
+| `symidx-mem-late` | keep a displaced indexed-global load instead of folding the displacement into the symbol address |
 | `sym-cmp-fold` | no folding of a symbol address into a compare |
 | `sym-deref-fold` | no folding of a symbol address into a dereference |
 | `reassoc` | no reassociation of word-resident expressions |
 | `reduce-coalesce` | no coalescing during strength reduction |
 | `word-resident` | no word-residency proposals at all (gates `reassoc` and `reduce-coalesce` too) |
+
+## IR builder (`ir_build.c`)
+
+| Name | Turning it off means |
+| --- | --- |
+| `f32-rhs-last` | a pure, non-volatile RHS of a register-float `-=` or `/=` is built after the lvalue read |
 
 ## Allocation (`ir_alloc.c`)
 
@@ -249,6 +256,8 @@ exists (ADR 0010).
 | `add-bc` | `add hl,bc` is not used when one operand is BC-resident |
 | `dsub` | no `sbc hl,bc` on the CPUs that have it |
 | `bc-call` | BC is not kept live across a call |
+| `bc-call-meta` | use only the older C-symbol heuristic for dead BC parks at calls, not the direct call's preserve metadata |
+| `call-sp-cleanup` | use `pop bc` chains instead of HL-based stack cleanup when the result does not occupy HL |
 | `bc-save-live` | BC is saved around a call even when it holds nothing live |
 | `bc-step-param` | a stepped pointer parameter is reloaded from its slot each iteration instead of riding BC (ADR 0031) |
 | `bc-live` | no BC park sweep in the final peephole |
@@ -276,6 +285,7 @@ exists (ADR 0010).
 | `cmp-unsign-dec` | a down-counting loop variable with a guarded decrement does not count as non-negative, so its compares keep the signed sign correction |
 | `f32-prepush-nostash` | a 4-byte operand pushed at its definition for a helper call copies its low half to BC before pushing, instead of pushing HL |
 | `hcall-arg-nostash` | a 4-byte result read only as the register operand of the helper call after it copies its low half to BC first |
+| `f32-hcall-reg` | a 4-byte result whose helper's other operand is already staged is kept in DEHL for the helper's register operand |
 | `long-mem-rhs` | a long ADD/SUB/AND/OR/XOR whose operand is a global read once by the load just before it reads that global in place instead of loading and parking it |
 | `long-rmw-walk` | on 8080-family and gbz80, a long `g op= h` on two globals whose result feeds only the store back to g walks both a byte at a time through A instead of loading, combining and storing |
 | `bc-save-group` | the BC save at a pre-pushed call's first argument considers the rest of the block, not just the call it belongs to |
