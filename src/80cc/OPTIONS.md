@@ -115,6 +115,8 @@ exists (ADR 0010).
 | `slot-bitop-de` | a 16-bit and/or/xor of two (ix+d) word slots is staged through DE and HL even when DE is dead after it |
 | `mask-shl-a` | a masked byte doubled as `ld l,a; ld h,0; add hl,hl` is not doubled in A first, even when A and S/P/V/H are dead after it |
 | `dead-slot-drop` | a value whose frame slot the render never touched keeps the slot (only a wholly dead frame is dropped) |
+| `dead-slot-wide` | a four-byte value whose every definition is pushed or left in DEHL keeps its frame slot when the render never touches it |
+| `dead-slot-guard` | a frame whose four-byte slots were dropped is kept even when the re-rendered function is larger |
 | `small-frame-fast` | small frames use the default forms: two `push af` for a 4-byte frame (not `ld hl,-4; add hl,sp; ld sp,hl` on z180 or four `dec sp` on ez80/kc160/r800), and the ld-form teardown on kc160 and for 5-byte frames (not `pop af` / `inc sp`) |
 | `dead-sp-addr` | an `ld hl,N; add hl,sp` whose HL and carry are both dead is kept |
 | `hl-mem-carry` | a global word loaded for a branch test is reloaded in the block the branch reaches, instead of being taken from HL |
@@ -207,6 +209,8 @@ exists (ADR 0010).
 | `wide-mem-store` | a four-byte result stored to a global by the next operation, and read again later in the block, keeps a frame-slot copy instead of being read back from the global |
 | `f32-prepush-groups` | a float result is not pushed when produced if a call's argument group opens and closes before its helper (the result is stored in a frame slot instead) |
 | `f32-prepush-pop` | a helper result is not pushed when produced if the helper itself takes the previously pushed operand off the stack (the result is stored in a frame slot instead) |
+| `retry-ir-restore` | a re-render of a function starts from the operand order the previous render left, not the order before the first render |
+| `frameless-reset` | a function's early passes see the previous function's frameless state, as if it were their own |
 | `wide-mem` | a double (and a float, long or fixed-point value read as the register operand of a helper, a call or push argument, a store, a move or a return) read once from a global is loaded at its definition and kept in a frame slot, not read in place where it is used |
 | `acc-phi` | a wide value that every predecessor of a join block leaves in the accumulator is stored by each and reloaded at the join |
 | `rabbit-hl-ind` | Rabbit does not read a word at HL plus a signed byte with one `ld hl,(hl+d)` |

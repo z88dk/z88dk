@@ -6655,6 +6655,13 @@ static int   dsd_drop_nv;
 static int   dsd_viol;
 /* Candidates found by the last instrumented render. */
 static int  *dsd_cand;
+static int   dsd_wide;   /* a four-byte value is among the candidates */
+static int  *retry_src_snap;   /* operands of every op before the first render */
+static int   retry_src_n;
+static int  *dsd_slot_save;    /* vreg_spill_slot before a drop, for an exact rollback */
+static int   dsd_frame_save;
+static int   dsd_narrow_only;   /* a wide drop was rolled back: try the narrow ones alone */
+static int   dsd_wide_drop;   /* ...and was dropped by the render in flight */
 static int   dsd_ncand;
 /* Bytes dead-slot-drop saved in the last ir_lower_func_body. The DE
    re-arbitration compares allocations, so it adds them back: the drop applies
@@ -7756,6 +7763,15 @@ static void note_wide_noslot(int v)
     rec_wide_noslot[v]++;
 }
 
+/* A four-byte value whose every definition took a no-slot path (pushed or left
+   in DEHL): its frame slot is never written, so an unused slot is a proof. */
+static int wide_slot_untouched(int v, int w)
+{
+    return w == 4 && !dsd_narrow_only && rec_wide_defs && rec_wide_noslot
+        && rec_wide_defs[v] > 0 && rec_wide_defs[v] == rec_wide_noslot[v]
+        && !opt_disabled("dead-slot-wide");
+}
+
 /* Record a genuine frame-slot access emitted for v (called from slot_off /
    slot_ix_off). Guarded by rec_counting so only the final render counts. When
    the WRITE context is active (slot_write_ctx, set for the whole body of a store
@@ -7941,9 +7957,20 @@ static void rec_end(const Func *f)
             /* [dead-slot-drop] A partly dead frame: list the values whose slot
                the render never touched, under the same trust rule. */
             dsd_ncand = 0;
-            if (deadbytes > 0 && deadbytes < fs && !opt_disabled("dead-slot-drop")) {
+            /* A four-byte value held to the checked drop only: the whole-frame
+               drop below is not re-checked. */
+            int nwide = 0;
+            for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
+                int off = f->vreg_spill_slot[v];
+                if (off >= 0 && off < fs && !rec_slotuse[v]
+                    && wide_slot_untouched(v, f->vregs[v].width))
+                    nwide++;
+            }
+            if ((deadbytes > 0 || nwide > 0) && deadbytes < fs
+                && !opt_disabled("dead-slot-drop")) {
                 free(dsd_cand);
                 dsd_cand = malloc((size_t)f->n_vregs * sizeof(int));
+                dsd_wide = 0;
                 for (int v = 0; dsd_cand && v < rec_nv && v < f->n_vregs; v++) {
                     int off = f->vreg_spill_slot[v];
                     if (off < 0 || off >= fs || rec_slotuse[v]) continue;
@@ -7952,8 +7979,10 @@ static void rec_end(const Func *f)
                                      | IR_VREG_PARAM_IN_PLACE | IR_VREG_NO_SLOT
                                      | IR_VREG_CALL_SPLIT | IR_VREG_VOLATILE))
                         continue;
-                    if ((vr->width > 0 ? vr->width : 2) > 2) continue;
+                    int dw = vr->width > 0 ? vr->width : 2;
+                    if (dw > 2 && !wide_slot_untouched(v, dw)) continue;
                     if (!ir_home_covers_live_range(f, v)) continue;
+                    if (dw > 2) dsd_wide = 1;
                     dsd_cand[dsd_ncand++] = v;
                 }
             }
@@ -9622,6 +9651,11 @@ static int ir_lower_func_body(FILE *out, Func *f)
     xf_ret_dispatch  = 0;
     /* [de-call] the proved-clean call targets are per function too. */
     xf_decall_n = 0; xf_decall_full = 0;
+    /* L.cur_frameless is the previous function's answer until this one has had
+       its slots assigned. Passes that run before then ask fp_active(), which
+       returns 1 for a frameless function, so a stale value made them behave
+       as if this function were frameless. */
+    if (!opt_disabled("frameless-reset")) L.cur_frameless = 0;
 
     /* __naked: emit the body verbatim — no prologue, no epilogue, no frame,
        no BB labels, no trailing `ret`. ir_build has already restricted the
@@ -9940,6 +9974,11 @@ static int ir_lower_func_body(FILE *out, Func *f)
        its reader takes the address of the global instead of the address of a
        frame slot (emit_acc_slot_addr). Re-reading the global costs less than the
        frame temp, which needs a store and a reload. */
+    /* A earlier lowering of this function marked its wide-mem values NO_SLOT;
+       take those marks back so this one decides afresh. */
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vregs[v].flags & IR_VREG_WIDE_MEM)
+            f->vregs[v].flags &= (uint16_t)~(IR_VREG_WIDE_MEM | IR_VREG_NO_SLOT);
     g_hc.wide_mem = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
                            sizeof(const Op *));
     if (g_hc.wide_mem && !opt_disabled("wide-mem")) {
@@ -10010,7 +10049,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 }
                 if (!wm_span_safe(bb, j, use_j, w4)) continue;
                 g_hc.wide_mem[d] = o;
-                f->vregs[d].flags |= IR_VREG_NO_SLOT;
+                f->vregs[d].flags |= IR_VREG_NO_SLOT | IR_VREG_WIDE_MEM;
             }
         }
     }
@@ -10068,7 +10107,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, v))
                     continue;
                 g_hc.wide_mem[v] = st;
-                f->vregs[v].flags |= IR_VREG_NO_SLOT;
+                f->vregs[v].flags |= IR_VREG_NO_SLOT | IR_VREG_WIDE_MEM;
             }
         }
     }
@@ -10739,6 +10778,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
     int df_retry_done = 0;   /* dead-frame elision: at most one re-lower */
     int ds_retry_done = 0;   /* [dead-store] dead byte-spill elision: one re-lower */
     int dsd_retry = 0;       /* [dead-slot-drop] 1 = dropped, 2 = restored */
+    dsd_narrow_only = 0;
     int ssr_off = 0, ssr_viol = 0;   /* [ss-evidence] fallen back / to fall back */
     long dsd_pre = 0;        /* render size before the drop */
     dsd_ncand = 0;
@@ -10761,7 +10801,33 @@ static int ir_lower_func_body(FILE *out, Func *f)
                     f->vregs[v].width, f->vregs[v].flags);
         }
     }
+    /* The lowering swaps commutative operands in place, so a re-render of this
+       function would start from the first render's mutated IR. Take the
+       operands as the first render finds them and put them back before each
+       render. */
+    if (!retry_src_snap && !opt_disabled("retry-ir-restore")) {
+        int t = 0;
+        for (int b = 0; b < f->n_bbs; b++) t += f->bbs[b].n_ops;
+        retry_src_n = t;
+        retry_src_snap = t ? malloc((size_t)t * 2 * sizeof(int)) : NULL;
+        if (retry_src_snap) {
+            int q = 0;
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int o = 0; o < f->bbs[b].n_ops; o++) {
+                    retry_src_snap[q++] = f->bbs[b].ops[o].src[0];
+                    retry_src_snap[q++] = f->bbs[b].ops[o].src[1];
+                }
+        }
+    }
  deadframe_retry:
+    if (retry_src_snap) {
+        int q = 0;
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int o = 0; o < f->bbs[b].n_ops; o++) {
+                f->bbs[b].ops[o].src[0] = retry_src_snap[q++];
+                f->bbs[b].ops[o].src[1] = retry_src_snap[q++];
+            }
+    }
     dsd_viol = 0;
     /* Render into a DISCARDABLE buffer whether or not labels are being elided.
        The dead-store / dead-frame retries below `goto deadframe_retry` and
@@ -11103,12 +11169,34 @@ static int ir_lower_func_body(FILE *out, Func *f)
        The new layout can change what the render does, so that render is
        checked: if it reached a dropped slot after all, the slots come back and
        the function is rendered once more as it was. */
+    /* A dropped four-byte slot re-packs the frame, which can move a word spill
+       off the cheap top-of-stack slot. Keep the drop only if the render did not
+       grow; otherwise take the same way back as a dropped slot being reached. */
+    if (dsd_retry == 1 && rc == 0 && rout != out && !dsd_viol && dsd_wide_drop
+        && !opt_disabled("dead-slot-guard")) {
+        long pos = ftell(rout);
+        long after = render_size(rout);
+        fseek(rout, pos, SEEK_SET);
+        if (after > dsd_pre)
+            dsd_viol = 1;
+    }
     if (dsd_retry == 1 && rc == 0 && rout != out && dsd_viol) {
-        dsd_retry = 2;
+        /* A rolled-back set that held a four-byte value must not take the
+           narrow drops down with it: they stand on their own proof. */
+        int again = dsd_wide_drop && !dsd_narrow_only;
+        dsd_retry = again ? 0 : 2;
+        if (again) dsd_narrow_only = 1;
+        dsd_viol = 0;
         for (int v = 0; v < dsd_drop_nv && v < f->n_vregs; v++)
             if (dsd_drop[v]) f->vregs[v].flags &= ~IR_VREG_SLOT_UNUSED;
         free(dsd_drop); dsd_drop = NULL; dsd_drop_nv = 0;
-        ir_assign_slots(f);
+        if (dsd_slot_save && f->vreg_spill_slot) {
+            memcpy(f->vreg_spill_slot, dsd_slot_save,
+                   (size_t)f->n_vregs * sizeof(int));
+            f->frame_size = dsd_frame_save;
+        } else {
+            ir_assign_slots(f);
+        }
         L.cur_frameless = frameless_ok(f);
         free(bb_hl_out_p1); bb_hl_out_p1 = NULL;
         fclose(rout);
@@ -11117,6 +11205,15 @@ static int ir_lower_func_body(FILE *out, Func *f)
     if (!dsd_retry && rc == 0 && rout != out && dsd_ncand > 0
         && !opt_disabled("dead-slot-drop")) {
         dsd_retry = 1;
+        dsd_wide_drop = dsd_wide;
+        free(dsd_slot_save); dsd_slot_save = NULL;
+        if (f->vreg_spill_slot) {
+            dsd_slot_save = malloc((size_t)f->n_vregs * sizeof(int));
+            if (dsd_slot_save)
+                memcpy(dsd_slot_save, f->vreg_spill_slot,
+                       (size_t)f->n_vregs * sizeof(int));
+            dsd_frame_save = f->frame_size;
+        }
         free(dsd_drop);
         dsd_drop = calloc((size_t)f->n_vregs, 1);
         dsd_drop_nv = dsd_drop ? f->n_vregs : 0;
@@ -11193,6 +11290,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
     free(L.bb_a_out); L.bb_a_out = NULL;
     free(L.vreg_wc); L.vreg_wc = NULL;
     free(L.bb_byte_out_dirty); L.bb_byte_out_dirty = NULL;
+    free(retry_src_snap); retry_src_snap = NULL; retry_src_n = 0;
     free(g_hc.remat_def); g_hc.remat_def = NULL;
     free(g_hc.byte_remat); g_hc.byte_remat = NULL;
     free(g_hc.long_mem); g_hc.long_mem = NULL;

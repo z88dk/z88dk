@@ -146,6 +146,8 @@ typedef enum {
     IR_VREG_SLOT_UNUSED    = 1 << 13, /* [dead-slot-drop] the last render never
                                          touched this value's slot: the re-render
                                          gives it none (verified, see ir_lower) */
+    IR_VREG_WIDE_MEM       = 1 << 14, /* [wide-mem] marked NO_SLOT by that pass; cleared and
+                                         re-decided on every lowering of the function */
 } VRegFlags;
 
 typedef struct {
