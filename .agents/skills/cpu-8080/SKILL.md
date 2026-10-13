@@ -410,6 +410,7 @@ Assembler sugar. **Strict** / `-no-synth` forbids free synthetics. Listings (`-l
 8. **`cpl` does not touch flags.** Do not expect Z80 H/N.
 9. **No copt pass on library asm.** Hand-written `libsrc/**` is assembled as-is. Remove dead moves yourself. Match the target file’s whitespace. Do **not** use `xor a` for `ld a,0` when CF must survive. Checklist: **`tool-copt`**, **`methodology-measure`**.
 10. **`__CPU_INTEL__` is set for 8080.** 9-common already takes this path. Fork into `8-8080/` only when the 8080 form still needs its own file (`i32/`, `l_asr`, `l_rlde`, `f48/`). Do not “fix” 9-common with `#if __CPU_8080__` to emit 8085 ops.
+11. **`ei` does not enable interrupts until the following instruction has completed.** `ei` / `ret` returns without an interrupt between them. An interrupt cannot land on the instruction after `ei`. Same delay on 8085, Z80, and gbz80.
 
 ## Preference order (8080-only code)
 

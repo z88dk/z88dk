@@ -259,7 +259,7 @@ Normal-mode aliases: `sub a,r`. House style in `8-gbz80/` writes `sub a,r`.
 | F8 | ld hl,sp+* | LD HL,SP+r8 | 2 | 12 | 00HC | * signed. Also `ldhl sp,*`. `ld hl,sp` = `F8 00` |
 | F9 | ld sp,hl | LD SP,HL | 1 | 8 | ---- | |
 | FA | ld a,(**) | LD A,(a16) | 3 | 16 | ---- | not Z80 `jp m` |
-| FB | ei | EI | 1 | 4 | ---- | enable after the next instruction |
+| FB | ei | EI | 1 | 4 | ---- | enable after the next instruction, so `ei` / `ret` is not interrupted |
 | FC | — | — | | | | unused |
 | FD | — | — | | | | unused (not IY prefix) |
 | FE | cp * | CP d8 | 2 | 8 | Z1HC | |

@@ -551,6 +551,7 @@ Assembler must be **8085-aware** (these encodings are not Z80 prefixes).
 10. **Illegal chip `(de)` stores** — only `a` / `hl`. Saccharine `ld (de+),a` is fine. `ld (de),l` assembling is a **paid** `ex de,hl` expansion, not a chip op.
 11. **`__CPU_INTEL__` is set for 8085.** 9-common `IF __CPU_INTEL__` takes the 8080-portable path and will not emit `rl de` / `sra hl`. Do not “fix” those files with `#if __CPU_8085__`. Fork into `7-8085/` and list the module first (`l/util/8085.lst`, `l/sccz80/8085.lst`). Existing forks: `l_lsl_dehl`, `l_asr_dehl`, `l_long_asr`, `l_small_atoul` / `htoul` / `otoul` / `utoa`, `l_gint1sp`…`l_gint8sp`. **New 8085-only code** does not `call l_gint*sp` — open-code `ld de,sp+*` / `ld hl,(de)`.
 12. **No `srl`, no `bit n,r`, no `ld bc,sp+*`, no `ld bc,(de)`.** `CB` is `rst v`. LDSI is **DE** only. Word through DE is HL. `inc`/`dec` on a pair are **±1 byte**, not ±element.
+13. **`ei` does not enable interrupts until the following instruction has completed.** `ei` / `ret` returns without an interrupt between them. An interrupt cannot land on the instruction after `ei`.
 
 ## Preference order (when writing 8085-only code)
 

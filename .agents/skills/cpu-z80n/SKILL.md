@@ -222,7 +222,7 @@ How to `rg` without bulk-load: **`tool-z80asm`**.
 
 ## Related
 
-- Base Z80 model: `cpu-z80`
+- Base Z80 model: `cpu-z80` (`ei` enables after the next instruction, so `ei` / `ret` is not interrupted)
 - Assembler fixtures / nextreg mnemonic examples: `tool-z80asm`
 - Measure: `methodology-measure`, `tool-ticks`
 - SpecNext: [Extended ISA](https://wiki.specnext.dev/Extended_Z80_instruction_set) · [Copper](https://wiki.specnext.dev/Copper) · [Board / nextregs](https://wiki.specnext.dev/Board_feature_control)

@@ -20,6 +20,7 @@ Z80-compatible with extras (e.g. **`mlt`**). Used by `+z180`, `+yaz180`, `+scz18
 | math32 | `math32_z180.lib`; eZ80 Z80-mode product is **`math32_ez80_z80.lib`** (`newlibfiles_ez80_z80.lst` → same Z180 `mlt` helpers) |
 | CPU define | `-mz180` → `__CPU_Z180__`. `-mez80_z80` → **`__CPU_EZ80_Z80__`** (not `__CPU_EZ80__`; that is ADL `-mez80`) |
 | Targets | See `target/z180`, `target/yaz180`, `target/scz180`; classic `+test -clib=ez80_z80` for eZ80 Z80-mode |
+| `ei` | Same as Z80 (`cpu-z80`): enables after the next instruction, so `ei` / `ret` is not interrupted |
 
 ## Synthetic opcodes (z80asm)
 
