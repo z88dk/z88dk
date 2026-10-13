@@ -36,6 +36,11 @@ static double tern_ret(int c, double a, double b) { return c ? a * 2 : b + 1.5; 
 static double tern_use(int c, double a, double b) { return (c ? a + 1 : b + 2) * 3; }
 static double tern_twice(int c, double a, double b) { double t = c ? a : b; return t + t; }
 static double tern_call(int c) { return c ? rnd_like(500) : wg2; }
+/* [acc-f2int-store] A double stored to an int-sized lvalue converts straight to
+ * an int, signed or unsigned. */
+static int gsi; static unsigned gui; static unsigned char guc; static long gsl; static unsigned long gul;
+static void f2i_store(double x) { gsi = x; gui = x; guc = x; gsl = x; gul = x; }
+static unsigned f2i_ret(double x) { return x; }
 static int gi = 3;
 static long glg = 5;
 static double f1(int a, double x, int b) { return a + x * 2 + b; }
@@ -137,6 +142,11 @@ static void test_accwide_double(void)
     assertEqual(c_twice(5.5), 30);
     assertEqual((int)(c_call() * 2), 43);
     assertEqual((int)(c_lcall() - 50000), 3);
+    f2i_store(1234.0);
+    assertEqual(gsi, 1234); assertEqual(gui, 1234); assertEqual(guc, 210);
+    Assert(gsl == 1234L, "double to long"); Assert(gul == 1234UL, "double to ulong");
+    f2i_store(-7.0); assertEqual(gsi, -7);
+    f2i_store(40000.0); assertEqual(gui, 40000); assertEqual((int)f2i_ret(50000.0) == (int)50000u, 1);
     wg1 = 3; wg2 = 4;
     assertEqual((int)w_stale(), 11);
     wg1 = 3;

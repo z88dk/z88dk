@@ -53,6 +53,13 @@ static float c_nest(float a) { return fk(a) * fk(fk(a)); }
  * before the next argument lands. */
 int sink3(int tag, float x, float y) { return tag + (int)x * 10 + (int)y; }
 int sink3b(float x, int tag, float y) { return tag + (int)x * 10 + (int)y; }
+/* An HCALL result returned at once stays in DEHL, no frame slot. */
+static long hret_lmul(long a, long b) { return a * b; }
+static long hret_ldiv(long a, long b) { return a / b; }
+static long hret_lmod(long a, long b) { return a % b; }
+static float hret_fdiv(float a, float b) { return a / b; }
+static float hret_fsub(float a, float b) { return a - b; }
+
 static int floor_then_sink(float x)
 {
     float t = floor(x + 0.75f);
@@ -170,6 +177,11 @@ static void test_f32wide(void)
     assertEqual(c_twice(5.5f), 30);
     assertEqual((int)(c_call() * 2), 43);
     assertEqual((int)hcall_param_const(4), 12);
+    Assert(hret_lmul(70000L, 3L) == 210000L, "long mul returned from helper");
+    Assert(hret_ldiv(210000L, 3L) == 70000L, "long div returned from helper");
+    Assert(hret_lmod(100003L, 10L) == 3L, "long mod returned from helper");
+    assertEqual((int)hret_fdiv(21, 3), 7);
+    assertEqual((int)hret_fsub(21, 3), 18);
     assertEqual((int)l_right(5), 7);
     assertEqual((int)l_left(3), 4);
     assertEqual((int)l_div(3), 25);
