@@ -18,6 +18,10 @@ int main(int argc, char *argv[])
     res += test_strrev();
     res += test_strncat();
     res += test_strchr();
+    res += test_strnlen();
+    res += test_stpncpy();
+    res += test_strxfrm();
+    res += test_strrcspn();
 
     return res;
 }

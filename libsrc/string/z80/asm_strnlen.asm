@@ -46,7 +46,7 @@ loop:
    or a
    jr Z,isend
 
-   inc (hl)
+   inc hl
 
    dec c
    jr NZ,loop

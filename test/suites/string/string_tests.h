@@ -20,6 +20,10 @@ extern int test_memccpy();
 extern int test_strrev();
 extern int test_strncat();
 extern int test_strchr();
+extern int test_strnlen();
+extern int test_stpncpy();
+extern int test_strxfrm();
+extern int test_strrcspn();
 
 
 
