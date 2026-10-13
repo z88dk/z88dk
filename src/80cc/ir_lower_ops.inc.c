@@ -4070,6 +4070,18 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 load_byte_adv(out, "e", 0);     /* E = byte 2 */
                 load_byte_adv(out, "d", 1);     /* D = byte 3  (DE = HIGH) */
                 emit_bc_to_hl(out);         /* HL = LOW */
+            } else if (IS_EZ80() && !opt_disabled("ez80-long-ihl")) {
+                /* ez80: both words straight from (hl); HL is read by the last
+                   load, so DE takes the low word first. DE = high, HL = low. */
+                emit(out, "ld\tde,(hl)");
+                emit(out, "inc\thl");
+                emit(out, "inc\thl");
+                emit(out, "ld\thl,(hl)");
+                emit_ex_de_hl(out);
+                invalidate_a_cache();
+            } else if (c_opt_code_size && !opt_disabled("size-glong")) {
+                /* l_glong: DE = high, HL = low, A clobbered, BC untouched. */
+                emit_c(out, CLOB_HL, "call\tl_glong");
             } else {
                 emit(out, "ld\te,(hl)");        /* E = byte 0 */
                 emit(out, "inc\thl");
@@ -4248,6 +4260,7 @@ static int try_de_home_mask_store(FILE *out, Func *f, const Op *op)
    the operation widths and legal stores in the normal CPU-specific lowerer. */
 static int try_store_chain(FILE *out, Func *f, const Op *op)
 {
+    int long_end = -1;   /* where HL ends after a long store (ez80 pair stores move it less) */
     if (op->mem.chain == 1) {
         if (!cur_bb || cur_op_idx + 1 >= cur_bb->n_ops
             || cur_bb->ops[cur_op_idx + 1].kind != IR_ST_MEM
@@ -4330,10 +4343,7 @@ static int try_store_chain(FILE *out, Func *f, const Op *op)
             emit_sp(out, -2, "pop\tbc");
             emit_sp(out, -2, "pop\tde");
             emit_sp(out, -2, "pop\thl");
-            store_byte_adv(out, "c", 0);
-            store_byte_adv(out, "b", 0);
-            store_byte_adv(out, "e", 0);
-            store_byte_adv(out, "d", 1);
+            long_end = store_long_hl(out);
         }
     } else {
         store_chain_base = -1;
@@ -4343,6 +4353,8 @@ static int try_store_chain(FILE *out, Func *f, const Op *op)
     invalidate_hl_cache();
     if (store_chain_in_de)
         store_chain_hl_off = op->mem.offset + f->vregs[op->src[0]].width;
+    else if (long_end >= 0)
+        store_chain_hl_off = op->mem.offset + long_end;
     else
         store_chain_hl_off = op->mem.offset + f->vregs[op->src[0]].width - 1;
     if (cur_op_idx + 1 >= cur_bb->n_ops
@@ -4643,10 +4655,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 else
                     ss_note_cache_read(f, op->mem.base);
                 emit_hl_add_offset(out, op->mem.offset, 0, 0); /* inc/dec only */
-                store_byte_adv(out, "c", 0);
-                store_byte_adv(out, "b", 0);
-                store_byte_adv(out, "e", 0);
-                store_byte_adv(out, "d", 1);
+                (void)store_long_hl(out);
                 invalidate_hl_cache();
                 /* DE/BC untouched — the DEHL cache stays valid. */
             } else if (src_slotted && small_off) {

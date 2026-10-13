@@ -138,6 +138,7 @@ static option  sccz80_opts[] = {
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, NULL, 0 },
     { 0, "opt-disable", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "=<list> Disable named optimisations (comma-separated). `all` disables every one; pattern:<name> disables one IR pattern-matcher entry. Every name is listed and described in src/80cc/OPTIONS.md; the same registry is reachable as IR_OFF=<list> in the environment, which is how the corpus scans measure it. Useful for bisecting miscompiles.", NULL, opt_disable, 0 },
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "(inert) Accepted for --math16 alias / sccz80-family CLI compatibility; no effect in the IR back end", NULL, opt_code_speed_inert, 0 },
+    { 0, "opt-code-size", OPT_BOOL|OPT_DOUBLE_DASH, "Prefer shorter library-helper calls to longer inline sequences (slower)", &c_opt_code_size, NULL, 0 },
     { 0, "ast-print", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Build the AST per function, print it to stderr, and skip code generation", &c_ast_print, NULL, 0 },
     { 0, "ast-print-types", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Decorate the AST print with type/qualifier/attribute info; implies --ast-print", &c_ast_print_types, NULL, 0 },
     { 0, "", OPT_HEADER, "Frame pointer / index-register reservation:", NULL, NULL, 0 },

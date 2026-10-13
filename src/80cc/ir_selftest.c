@@ -405,6 +405,7 @@ static void build_hcall_test(Func *f)
 /* Compiler globals the lowerer consults; ir_selftest links standalone
    so we stub the ones it needs to default-off values. */
 int c_framepointer_is_ix = -1;
+int c_opt_code_size;
 int c_cpu = 1;                  /* = CPU_Z80 (define.h not in selftest includes);
                                    the IS_*() macros read this — z80 default path */
 

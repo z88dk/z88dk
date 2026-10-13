@@ -174,6 +174,8 @@ exists (ADR 0010).
 | `idx2-call-ez80` | on ez80 in sp mode a value is not given an index home across calls |
 | `yield-total` | a compared counter yields BC to a deref base for the index register even when the two homes are worth less together |
 | `ez80-hl-ihl` | on ez80 a word read through HL is the byte pair through A, not `ld hl,(hl)` |
+| `ez80-long-ihl` | an ez80 four-byte load through HL reads the high word with the byte walk instead of `ld hl,(hl)` |
+| `ez80-word-st` | an ez80 word or long stored through HL is two single-byte stores with `inc hl` between them, not `ld (hl),rr` |
 | `de-keep-hl` | a DE load that must keep HL saves it with `push hl`/`pop hl` even from an index home or an `(ix+d)` slot |
 | `idx-deref` | an index-homed pointer is not dereferenced in place, and its cost term goes with it (ADR 0026) |
 | `idxhalf` | no byte homes in IX/IY halves (sp mode, z80/z80n/ez80) |
@@ -263,6 +265,7 @@ exists (ADR 0010).
 | `dsub` | no `sbc hl,bc` on the CPUs that have it |
 | `bc-call` | BC is not kept live across a call |
 | `bc-call-meta` | use only the older C-symbol heuristic for dead BC parks at calls, not the direct call's preserve metadata |
+| `size-glong` | with `--opt-code-size`, a four-byte load through HL is the inline byte sequence, not `call l_glong` |
 | `call-sp-cleanup` | use `pop bc` chains instead of HL-based stack cleanup when the result does not occupy HL |
 | `bc-save-live` | BC is saved around a call even when it holds nothing live |
 | `bc-step-param` | a stepped pointer parameter is reloaded from its slot each iteration instead of riding BC (ADR 0031) |

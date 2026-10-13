@@ -1322,6 +1322,7 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
     emit_ex_de_hl(out);        /* DE = value */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
+    if (ez80_store_pair(out, "e", "d", vol_stamp(f, vreg_id))) return;
     emit(out, "ld\t(hl),e%s", vol_stamp(f, vreg_id));
     emit(out, "inc\thl");
     emit(out, "ld\t(hl),d");
@@ -1534,15 +1535,20 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
     emit_ex_de_hl(out);        /* DE = value; HL scratch for the address */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
-    emit(out, "ld\t(hl),e%s", vol_stamp(f, vreg_id));
-    emit(out, "inc\thl");
-    emit(out, "ld\t(hl),d");
-    /* HL is not junk: it points at the slot's HIGH byte. Publishing that as an
+    int hl_hi = 1;                 /* HL ends on the slot's high byte ... */
+    if (ez80_store_pair(out, "e", "d", vol_stamp(f, vreg_id))) hl_hi = 0;   /* ... or on its low byte */
+    else {
+        emit(out, "ld\t(hl),e%s", vol_stamp(f, vreg_id));
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),d");
+    }
+    /* HL is not junk: it points at the slot's HIGH byte (low byte after the
+       ez80 pair store). Publishing that as an
        address belief lets the next slot access walk to it with inc/dec instead
        of recomputing `ld hl,nn;add hl,sp`. invalidate_hl_cache() first, for the
        DE/DEHL/A clobbers and the pending-spill flush it also performs. */
     invalidate_hl_cache();         /* HL holds the slot address, not the value */
-    if (slotaddr_widen()) cache_hl_addr_off(slot_off(f, vreg_id) + 1);
+    if (slotaddr_widen()) cache_hl_addr_off(slot_off(f, vreg_id) + hl_hi);
     return 0;                      /* value left in DE */
 }
 
@@ -2476,6 +2482,13 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
     if (!bc_low) emit(out, "ld\tbc,hl");   /* BC = low (B=hi byte, C=lo byte) */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");         /* HL = &slot+0 */
+    if (IS_EZ80() && !opt_disabled("ez80-word-st")) {
+        emit(out, "ld\t(hl),bc");        /* slot+0..1 = low half */
+        emit(out, "inc\thl");
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),de");        /* slot+2..3 = high half */
+        return;
+    }
     store_byte_adv(out, "c", 0);
     store_byte_adv(out, "b", 0);
     store_byte_adv(out, "e", 0);

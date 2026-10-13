@@ -7183,6 +7183,22 @@ static void load_byte_adv(FILE *out, const char *reg, int last)
     }
 }
 
+/* ez80: store a register pair through HL with the native `ld (hl),rr`. Writes
+   the pair's low byte at (hl) and its high byte at (hl+1), like the two byte
+   stores it replaces, but leaves HL unchanged (the byte form leaves it one
+   higher). Returns 0 when the pair or CPU does not qualify. */
+static int ez80_store_pair(FILE *out, const char *lo, const char *hi, const char *stamp)
+{
+    if (!IS_EZ80() || opt_disabled("ez80-word-st")) return 0;
+    const char *rr = NULL;
+    if (lo[0] == 'e' && hi[0] == 'd') rr = "de";
+    else if (lo[0] == 'c' && hi[0] == 'b') rr = "bc";
+    else if (lo[0] == 'l' && hi[0] == 'h') rr = "hl";
+    if (!rr || lo[1] || hi[1]) return 0;
+    emit(out, "ld\t(hl),%s%s", rr, stamp ? stamp : "");
+    return 1;
+}
+
 static void store_byte_adv(FILE *out, const char *reg, int last)
 {
     int is_a = (reg[0] == 'a' && reg[1] == 0);
@@ -7194,6 +7210,25 @@ static void store_byte_adv(FILE *out, const char *reg, int last)
         emit(out, "ld\t(hl),%s", reg);
         if (!last) emit(out, "inc\thl");
     }
+}
+
+/* Store the long in BC:DE (low:high) through HL, which points at its first byte.
+   Returns how far HL has moved from there: 3 after the byte chain, 2 after the
+   ez80 pair stores. */
+static int store_long_hl(FILE *out)
+{
+    if (IS_EZ80() && !opt_disabled("ez80-word-st")) {
+        emit(out, "ld\t(hl),bc");
+        emit(out, "inc\thl");
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),de");
+        return 2;
+    }
+    store_byte_adv(out, "c", 0);
+    store_byte_adv(out, "b", 0);
+    store_byte_adv(out, "e", 0);
+    store_byte_adv(out, "d", 1);
+    return 3;
 }
 
 /* [lea-frame-addr] Put a frame address into HL, choosing the shorter form.

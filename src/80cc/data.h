@@ -62,6 +62,7 @@ extern SYMBOL *currfn;
 extern int debuglevel;
 extern int c_assembler_type;
 extern int c_framepointer_is_ix;
+extern int c_opt_code_size;
 extern int c_reserve_iy;
 extern int c_reserve_ix;
 extern int c_idx2_invariant;
