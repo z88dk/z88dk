@@ -269,6 +269,7 @@ exists (ADR 0010).
 | `bswap-fuse` | a four-byte load through HL followed by its byte reverse is a load and a separate six-instruction reverse, not one read in reverse order |
 | `bswap-bc` | a four-byte byte reverse is the six-instruction swap through A in DE:HL, not four moves that leave the result in DE:BC |
 | `bswap-fold` | a byte reverse of a byte reverse is two operations, not a copy |
+| `strlen-fold` | strlen of a string literal is a call, not a constant |
 | `size-glong` | with `--opt-code-size`, a four-byte load through HL is the inline byte sequence, not `call l_glong` |
 | `call-sp-cleanup` | use `pop bc` chains instead of HL-based stack cleanup when the result does not occupy HL |
 | `bc-save-live` | BC is saved around a call even when it holds nothing live |

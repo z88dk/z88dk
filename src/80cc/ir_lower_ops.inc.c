@@ -3314,6 +3314,8 @@ static int emit_gb_const_word_store(FILE *out, const Func *f, int src,
     char v[96];
     if (o->kind == IR_LD_IMM)
         snprintf(v, sizeof v, "%lld", (long long)o->imm);
+    else if (o->kind == IR_LD_STR)
+        snprintf(v, sizeof v, "i_%d+%lld", litlab, (long long)o->imm);
     else if (o->mem.offset)
         snprintf(v, sizeof v, "%s%s+%d", ir_sym_prefix(o->mem.sym),
                  ir_sym_name(o->mem.sym), o->mem.offset);

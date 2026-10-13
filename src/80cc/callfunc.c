@@ -46,6 +46,7 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
         functype = default_function_with_type("(funcpointer)", functype);
     }
 
+    int lit_before = 0;
     argnumber = 0;
     (void)minifunc; /* set by SetMiniFunc but its return value is unused
                        in AST-codegen mode; the side-effect on
@@ -74,6 +75,7 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
         }
         argnumber++;
 
+        lit_before = litptr;
         pair = expression(&vconst, &val, &type);
         array_add(function_args, pair->node);
 
@@ -124,6 +126,27 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
         if ( !(functype->funcattrs.hasva
                && argnumber == array_len(functype->parameters) - 1) )
             errorfmt("Too few arguments to call to function '%s'", 1, functype->name);
+    }
+
+    /* __builtin_strlen_fastcall: the length of a string literal is a
+       constant, and a literal that nothing else shares leaves the pool.
+       Any other argument is a call to the library routine. */
+    if (ptr && !function_pointer_call
+        && strcmp(ptr->name, "__builtin_strlen_fastcall") == 0) {
+        Node *a0 = argnumber ? array_get_byindex(function_args, 0) : NULL;
+        if (argnumber == 1 && a0 && a0->ast_type == AST_STR_LIT && !c_disable_builtins
+            && !opt_disabled("strlen-fold")) {
+            int off = (int)a0->zval + 1;
+            int len = (int)strnlen((const char *)litq + off, (size_t)(litptr - off));
+            if (a0->zval == lit_before - 1 && litptr > lit_before)
+                litptr = lit_before;
+            return ast_literal_int(type_uint, (uint64_t)len);
+        }
+        SYMBOL *lib = findglb("strlen_fastcall");
+        if (lib && lib->ctype && lib->ctype->kind == KIND_FUNC) {
+            ptr = lib;
+            functype = lib->ctype;
+        }
     }
 
     node = ast_function_call(function_pointer_call ? AST_FUNCPTR_CALL : AST_FUNC_CALL, ptr, functype, function_args);
