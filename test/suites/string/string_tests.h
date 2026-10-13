@@ -16,6 +16,7 @@ extern int test_strrstr();
 extern int test_strncmp();
 extern int test_strlcpy();
 extern int test_strlcat();
+extern int test_memccpy();
 extern int test_strrev();
 extern int test_strncat();
 extern int test_strchr();

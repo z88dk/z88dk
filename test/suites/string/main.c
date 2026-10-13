@@ -1,4 +1,4 @@
- 
+
 
 #include "string_tests.h"
 
@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     res += test_strrstr();
     res += test_strlcpy();
     res += test_strlcat();
+    res += test_memccpy();
     res += test_strrev();
     res += test_strncat();
     res += test_strchr();
