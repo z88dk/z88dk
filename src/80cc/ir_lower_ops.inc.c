@@ -2633,8 +2633,11 @@ static int shl_word_copy_de_ok(const Func *f, const Op *op)
 {
     if (opt_disabled("shl-copy-de")) return 0;
     /* Only where a slot word costs a synthesised pair of byte accesses; the
-       8085, ez80, Rabbit and kc160 have a native word slot access. */
-    if (IS_8085() || IS_EZ80() || IS_RABBIT() || IS_KC160()) return 0;
+       8085, Rabbit and kc160 have a native word slot access. So does the ez80
+       through IX, but in sp mode it has to form the address first
+       (`ld hl,n; add hl,sp; ld de,(hl)`), which is dearer than the copy. */
+    if (IS_8085() || IS_RABBIT() || IS_KC160()) return 0;
+    if (IS_EZ80() && (fp_active(f) || opt_disabled("ez80-shl-copy-de"))) return 0;
     if (!cur_bb || cur_op_idx < 0 || cur_op_idx + 1 >= cur_bb->n_ops) return 0;
     if (&cur_bb->ops[cur_op_idx] != op) return 0;
     const Op *nx = &cur_bb->ops[cur_op_idx + 1];

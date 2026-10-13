@@ -176,6 +176,7 @@ exists (ADR 0010).
 | `ez80-hl-ihl` | on ez80 a word read through HL is the byte pair through A, not `ld hl,(hl)` |
 | `ez80-long-ihl` | an ez80 four-byte load through HL reads the high word with the byte walk instead of `ld hl,(hl)` |
 | `ez80-word-st` | an ez80 word or long stored through HL is two single-byte stores with `inc hl` between them, not `ld (hl),rr` |
+| `ez80-shl-copy-de` | an ez80 sp-mode word shift that feeds an add or subtract of the original reloads it from its slot instead of copying it to DE |
 | `de-keep-hl` | a DE load that must keep HL saves it with `push hl`/`pop hl` even from an index home or an `(ix+d)` slot |
 | `idx-deref` | an index-homed pointer is not dereferenced in place, and its cost term goes with it (ADR 0026) |
 | `idxhalf` | no byte homes in IX/IY halves (sp mode, z80/z80n/ez80) |
