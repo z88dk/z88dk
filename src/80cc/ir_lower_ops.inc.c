@@ -4070,6 +4070,9 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 load_byte_adv(out, "e", 0);     /* E = byte 2 */
                 load_byte_adv(out, "d", 1);     /* D = byte 3  (DE = HIGH) */
                 emit_bc_to_hl(out);         /* HL = LOW */
+            } else if (c_opt_code_size && !opt_disabled("size-glong")) {
+                /* l_glong: DE = high, HL = low, A clobbered, BC untouched. */
+                emit_c(out, CLOB_HL, "call\tl_glong");
             } else if (IS_EZ80() && !opt_disabled("ez80-long-ihl")) {
                 /* ez80: both words straight from (hl); HL is read by the last
                    load, so DE takes the low word first. DE = high, HL = low. */
@@ -4079,9 +4082,6 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\thl,(hl)");
                 emit_ex_de_hl(out);
                 invalidate_a_cache();
-            } else if (c_opt_code_size && !opt_disabled("size-glong")) {
-                /* l_glong: DE = high, HL = low, A clobbered, BC untouched. */
-                emit_c(out, CLOB_HL, "call\tl_glong");
             } else {
                 emit(out, "ld\te,(hl)");        /* E = byte 0 */
                 emit(out, "inc\thl");
