@@ -990,7 +990,7 @@ void test_strtod(void)
     double got;
     const char *text;
 
-    // C90 decimal subject sequence. Hexadecimal floats are left for later.
+    // C90 decimal subject sequence, then the C99 hexadecimal form.
     expect_strtod("12xyz", "xyz", 12.0, "strtod 12");
     expect_strtod("-2", "", -2.0, "strtod -2");
     expect_strtod("1.5", "", 1.5, "strtod 1.5");
@@ -1003,7 +1003,25 @@ void test_strtod(void)
     expect_strtod("1.5e3.5", ".5", 1500.0, "strtod stops at trailing dot");
     expect_strtod("-1.25e", "e", -1.25, "strtod incomplete exponent");
     expect_strtod("--1.25", "", 1.25, "strtod doubled minus");
-    expect_strtod("0x10", "x10", 0.0, "strtod stops at hex marker");
+    expect_strtod("0x10", "", 16.0, "strtod 0x10");
+    expect_strtod("0X10", "", 16.0, "strtod 0X10");
+    expect_strtod("0x10xyz", "xyz", 16.0, "strtod 0x10 tail");
+    expect_strtod("0x1.8p1", "", 3.0, "strtod 0x1.8p1");
+    expect_strtod("0x1.8P+1", "", 3.0, "strtod 0x1.8P+1");
+    expect_strtod("-0x1p1", "", -2.0, "strtod -0x1p1");
+    expect_strtod("--0x8", "", 8.0, "strtod doubled minus hex");
+    expect_strtod("0x.8", "", 0.5, "strtod 0x.8");
+    expect_strtod("0x1.", "", 1.0, "strtod 0x1.");
+    expect_strtod("0x10p-4", "", 1.0, "strtod 0x10p-4");
+    expect_strtod("0xfp0", "", 15.0, "strtod 0xfp0");
+    expect_strtod("  0xAB", "", 171.0, "strtod 0xAB");
+    expect_strtod("0x1p", "p", 1.0, "strtod incomplete binary exponent");
+    expect_strtod("0x1p+", "p+", 1.0, "strtod binary exponent sign only");
+    expect_strtod("0x1p-1xyz", "xyz", 0.5, "strtod 0x1p-1 tail");
+    expect_strtod("0x0p99", "", 0.0, "strtod zero hex mantissa");
+    expect_strtod("0x", "x", 0.0, "strtod bare 0x");
+    expect_strtod("0x.", "x.", 0.0, "strtod 0x. has no digits");
+    expect_strtod("0xp1", "xp1", 0.0, "strtod 0xp1 has no digits");
 
     text = "abc";
     end = 0;
