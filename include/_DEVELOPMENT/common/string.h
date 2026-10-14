@@ -222,7 +222,12 @@ extern size_t __LIB__ strlcpy_callee(char *dst,const char *src,size_t n) __SMALL
 
 extern size_t __LIB__ strlen(const char *s) __SMALLC __preserves_regs(d,e);
 extern size_t __LIB__ strlen_fastcall(const char *s) __preserves_regs(d,e) __z88dk_fastcall;
+#ifdef __80CC
+extern size_t __LIB__ __builtin_strlen_fastcall(const char *s) __preserves_regs(d,e) __z88dk_fastcall;
+#define strlen(a) __builtin_strlen_fastcall(a)
+#else
 #define strlen(a) strlen_fastcall(a)
+#endif
 
 
 extern char __LIB__ *strlwr(char *s) __SMALLC __preserves_regs(b,c,d,e);

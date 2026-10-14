@@ -1322,6 +1322,7 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
     emit_ex_de_hl(out);        /* DE = value */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
+    if (ez80_store_pair(out, "e", "d", vol_stamp(f, vreg_id))) return;
     emit(out, "ld\t(hl),e%s", vol_stamp(f, vreg_id));
     emit(out, "inc\thl");
     emit(out, "ld\t(hl),d");
@@ -1534,15 +1535,20 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
     emit_ex_de_hl(out);        /* DE = value; HL scratch for the address */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
-    emit(out, "ld\t(hl),e%s", vol_stamp(f, vreg_id));
-    emit(out, "inc\thl");
-    emit(out, "ld\t(hl),d");
-    /* HL is not junk: it points at the slot's HIGH byte. Publishing that as an
+    int hl_hi = 1;                 /* HL ends on the slot's high byte ... */
+    if (ez80_store_pair(out, "e", "d", vol_stamp(f, vreg_id))) hl_hi = 0;   /* ... or on its low byte */
+    else {
+        emit(out, "ld\t(hl),e%s", vol_stamp(f, vreg_id));
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),d");
+    }
+    /* HL is not junk: it points at the slot's HIGH byte (low byte after the
+       ez80 pair store). Publishing that as an
        address belief lets the next slot access walk to it with inc/dec instead
        of recomputing `ld hl,nn;add hl,sp`. invalidate_hl_cache() first, for the
        DE/DEHL/A clobbers and the pending-spill flush it also performs. */
     invalidate_hl_cache();         /* HL holds the slot address, not the value */
-    if (slotaddr_widen()) cache_hl_addr_off(slot_off(f, vreg_id) + 1);
+    if (slotaddr_widen()) cache_hl_addr_off(slot_off(f, vreg_id) + hl_hi);
     return 0;                      /* value left in DE */
 }
 
@@ -2146,6 +2152,7 @@ static void partial_load_long_shl(FILE *out, const Func *f, int v,
    byte-direct unary chain — IR_NOT/IR_NEG — that walks H/L/E/D through A and
    never reads BC), skip the stash AND don't publish the BC-implying claim, or
    that later `ld hl,bc` would read stale BC. */
+static void emit_gb_long_load(FILE *out, const char *sym, int off);
 static void publish_dehl_from_hl(FILE *out, int vreg_id, int no_bc)
 {
     if (!no_bc)
@@ -2169,6 +2176,30 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        the caller overwrites HL itself, and the rs.hl==vreg_id hit can't
        coincide with a width-2 pending (different widths). */
     pending_spill_resolve();
+    const Op *wm4 = (f->vregs[vreg_id].width == 4 && !dehl_has(vreg_id))
+                  ? wide_mem_of(f, vreg_id) : NULL;
+    if (wm4) {                                  /* [wide-mem] read the global here */
+        const char *sn = ir_sym_name(wm4->mem.sym);
+        int off = wm4->mem.offset;
+        if (IS_GBZ80()) {
+            emit_gb_long_load(out, sn, off);
+        } else if (IS_808x()) {
+            /* no absolute `ld de,(nn)`: high half into HL, to DE, then the low */
+            if (off) emit(out, "ld\thl,(_%s+%d)", sn, off + 2);
+            else     emit(out, "ld\thl,(_%s+2)", sn);
+            emit_ex_de_hl(out);
+            if (off) emit(out, "ld\thl,(_%s+%d)", sn, off);
+            else     emit(out, "ld\thl,(_%s)", sn);
+        } else {
+            if (off) emit(out, "ld\thl,(_%s+%d)", sn, off);
+            else     emit(out, "ld\thl,(_%s)", sn);
+            emit(out, "ld\tde,(_%s+%d)", sn, off + 2);
+        }
+        invalidate_de_cache();
+        invalidate_a_cache();
+        publish_dehl_from_hl(out, vreg_id, no_bc);
+        return;
+    }
     if (dehl_has(vreg_id)) {
         /* Cache hit: DE has high half, BC has low half. Recover HL with
            `ld hl,bc` (~12 T-states) vs ~120 for a full slot read. Skip the
@@ -2451,6 +2482,13 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
     if (!bc_low) emit(out, "ld\tbc,hl");   /* BC = low (B=hi byte, C=lo byte) */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");         /* HL = &slot+0 */
+    if (IS_EZ80() && !opt_disabled("ez80-word-st")) {
+        emit(out, "ld\t(hl),bc");        /* slot+0..1 = low half */
+        emit(out, "inc\thl");
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),de");        /* slot+2..3 = high half */
+        return;
+    }
     store_byte_adv(out, "c", 0);
     store_byte_adv(out, "b", 0);
     store_byte_adv(out, "e", 0);
@@ -2568,6 +2606,11 @@ static void emit_dehl_stack_push(FILE *out, int vreg_id)
         L.cur_sp_adjust += 4;
         L.la.cur_dehl_inline_push = vreg_id;
         L.la.cur_dehl_inline_push_base_sp = L.cur_sp_adjust;
+        if (f32_stack_n < (int)(sizeof f32_stack_v / sizeof f32_stack_v[0])) {
+            f32_stack_v[f32_stack_n] = vreg_id;
+            f32_stack_sp[f32_stack_n] = L.cur_sp_adjust;
+            f32_stack_n++;
+        }
         invalidate_hl_cache();
         return;
     }
@@ -2578,6 +2621,11 @@ static void emit_dehl_stack_push(FILE *out, int vreg_id)
     L.cur_sp_adjust += 4;
     L.la.cur_dehl_inline_push = vreg_id;
     L.la.cur_dehl_inline_push_base_sp = L.cur_sp_adjust;
+    if (f32_stack_n < (int)(sizeof f32_stack_v / sizeof f32_stack_v[0])) {
+        f32_stack_v[f32_stack_n] = vreg_id;
+        f32_stack_sp[f32_stack_n] = L.cur_sp_adjust;
+        f32_stack_n++;
+    }
     /* HL was consumed producing the value; claim it for OUR low half so
        the next op doesn't treat a stale tenant as an address. */
     invalidate_hl_cache();

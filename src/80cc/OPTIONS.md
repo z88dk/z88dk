@@ -54,6 +54,7 @@ exists (ADR 0010).
 | `dead-def-live` | `dead-def` decides without per-edge liveness (more conservative) |
 | `prune` | keep unreachable basic blocks |
 | `aggregate-promote` | keep fixed-offset fields of non-escaping local structs in memory |
+| `st2ld-wide-keep` | a load wider than 4 bytes is forwarded from an earlier store or load of the same address into a copy, which lives in a frame slot |
 | `coalesce-copies` | keep `IR_MOV` copies that could be coalesced away |
 | `addr-cse` | recompute an address expression instead of reusing it |
 | `deref-offset` | keep a field offset as a separate address temporary rather than folding it into the access — the other half of `idx-deref` |
@@ -78,11 +79,19 @@ exists (ADR 0010).
 | `cmp-unsign` | keep the sign tail on a comparison that cannot go negative |
 | `conv-mask-fold` | keep a widening conversion feeding a mask |
 | `sym-addr-fold` | keep `&sym + K` as an add instead of a symbol address |
+| `symidx-mem-late` | keep a displaced indexed-global load instead of folding the displacement into the symbol address |
 | `sym-cmp-fold` | no folding of a symbol address into a compare |
 | `sym-deref-fold` | no folding of a symbol address into a dereference |
 | `reassoc` | no reassociation of word-resident expressions |
 | `reduce-coalesce` | no coalescing during strength reduction |
 | `word-resident` | no word-residency proposals at all (gates `reassoc` and `reduce-coalesce` too) |
+
+## IR builder (`ir_build.c`)
+
+| Name | Turning it off means |
+| --- | --- |
+| `f32-rhs-last` | a pure, non-volatile RHS of a register-float `-=` or `/=` is built after the lvalue read |
+| `acc-f2int-store` | a double stored to an integer of two bytes or less is converted to a long and then truncated, not converted straight to an int |
 
 ## Allocation (`ir_alloc.c`)
 
@@ -106,6 +115,8 @@ exists (ADR 0010).
 | `slot-bitop-de` | a 16-bit and/or/xor of two (ix+d) word slots is staged through DE and HL even when DE is dead after it |
 | `mask-shl-a` | a masked byte doubled as `ld l,a; ld h,0; add hl,hl` is not doubled in A first, even when A and S/P/V/H are dead after it |
 | `dead-slot-drop` | a value whose frame slot the render never touched keeps the slot (only a wholly dead frame is dropped) |
+| `dead-slot-wide` | a four-byte value whose every definition is pushed or left in DEHL keeps its frame slot when the render never touches it |
+| `dead-slot-guard` | a frame whose four-byte slots were dropped is kept even when the re-rendered function is larger |
 | `small-frame-fast` | small frames use the default forms: two `push af` for a 4-byte frame (not `ld hl,-4; add hl,sp; ld sp,hl` on z180 or four `dec sp` on ez80/kc160/r800), and the ld-form teardown on kc160 and for 5-byte frames (not `pop af` / `inc sp`) |
 | `dead-sp-addr` | an `ld hl,N; add hl,sp` whose HL and carry are both dead is kept |
 | `hl-mem-carry` | a global word loaded for a branch test is reloaded in the block the branch reaches, instead of being taken from HL |
@@ -163,6 +174,9 @@ exists (ADR 0010).
 | `idx2-call-ez80` | on ez80 in sp mode a value is not given an index home across calls |
 | `yield-total` | a compared counter yields BC to a deref base for the index register even when the two homes are worth less together |
 | `ez80-hl-ihl` | on ez80 a word read through HL is the byte pair through A, not `ld hl,(hl)` |
+| `ez80-long-ihl` | an ez80 four-byte load through HL reads the high word with the byte walk instead of `ld hl,(hl)` |
+| `ez80-word-st` | an ez80 word or long stored through HL is two single-byte stores with `inc hl` between them, not `ld (hl),rr` |
+| `ez80-shl-copy-de` | an ez80 sp-mode word shift that feeds an add or subtract of the original reloads it from its slot instead of copying it to DE |
 | `de-keep-hl` | a DE load that must keep HL saves it with `push hl`/`pop hl` even from an index home or an `(ix+d)` slot |
 | `idx-deref` | an index-homed pointer is not dereferenced in place, and its cost term goes with it (ADR 0026) |
 | `idxhalf` | no byte homes in IX/IY halves (sp mode, z80/z80n/ez80) |
@@ -195,6 +209,13 @@ exists (ADR 0010).
 
 | Name | Turning it off means |
 | --- | --- |
+| `wide-mem-store` | a four-byte result stored to a global by the next operation, and read again later in the block, keeps a frame-slot copy instead of being read back from the global |
+| `f32-prepush-groups` | a float result is not pushed when produced if a call's argument group opens and closes before its helper (the result is stored in a frame slot instead) |
+| `f32-prepush-pop` | a helper result is not pushed when produced if the helper itself takes the previously pushed operand off the stack (the result is stored in a frame slot instead) |
+| `retry-ir-restore` | a re-render of a function starts from the operand order the previous render left, not the order before the first render |
+| `frameless-reset` | a function's early passes see the previous function's frameless state, as if it were their own |
+| `wide-mem` | a double (and a float, long or fixed-point value read as the register operand of a helper, a call or push argument, a store, a move or a return) read once from a global is loaded at its definition and kept in a frame slot, not read in place where it is used |
+| `acc-phi` | a wide value that every predecessor of a join block leaves in the accumulator is stored by each and reloaded at the join |
 | `rabbit-hl-ind` | Rabbit does not read a word at HL plus a signed byte with one `ld hl,(hl+d)` |
 | `ix-indirect` | an sp-mode function with any indirect call saves IX, even when the call does not dispatch through it |
 | `jp-next` | keep an unconditional `jp` that jumps to the label directly below it |
@@ -244,6 +265,16 @@ exists (ADR 0010).
 | `add-bc` | `add hl,bc` is not used when one operand is BC-resident |
 | `dsub` | no `sbc hl,bc` on the CPUs that have it |
 | `bc-call` | BC is not kept live across a call |
+| `bc-call-meta` | use only the older C-symbol heuristic for dead BC parks at calls, not the direct call's preserve metadata |
+| `bswap-fuse` | a four-byte load through HL followed by its byte reverse is a load and a separate six-instruction reverse, not one read in reverse order |
+| `bswap-bc` | a four-byte byte reverse is the six-instruction swap through A in DE:HL, not four moves that leave the result in DE:BC |
+| `bswap-fold` | a byte reverse of a byte reverse is two operations, not a copy |
+| `strlen-fold` | strlen of a string literal is a call, not a constant |
+| `fabs-inline` | fabs and fabsf16 of a 32-bit IEEE, 32-bit MBF, 64-bit MBF or float16 value are a library call, not a sign bit clear |
+| `fabs-fa-clear` | fabs of a 64-bit MBF value calls the library routine, not a sign bit clear in the accumulator (--opt-code-size also calls) |
+| `switch-unreachable` | a switch case or default that is __builtin_unreachable still gets its compare |
+| `size-glong` | with `--opt-code-size`, a four-byte load through HL is the inline byte sequence, not `call l_glong` |
+| `call-sp-cleanup` | use `pop bc` chains instead of HL-based stack cleanup when the result does not occupy HL |
 | `bc-save-live` | BC is saved around a call even when it holds nothing live |
 | `bc-step-param` | a stepped pointer parameter is reloaded from its slot each iteration instead of riding BC (ADR 0031) |
 | `bc-live` | no BC park sweep in the final peephole |
@@ -271,6 +302,7 @@ exists (ADR 0010).
 | `cmp-unsign-dec` | a down-counting loop variable with a guarded decrement does not count as non-negative, so its compares keep the signed sign correction |
 | `f32-prepush-nostash` | a 4-byte operand pushed at its definition for a helper call copies its low half to BC before pushing, instead of pushing HL |
 | `hcall-arg-nostash` | a 4-byte result read only as the register operand of the helper call after it copies its low half to BC first |
+| `f32-hcall-reg` | a 4-byte result whose helper's other operand is already staged is kept in DEHL for the helper's register operand |
 | `long-mem-rhs` | a long ADD/SUB/AND/OR/XOR whose operand is a global read once by the load just before it reads that global in place instead of loading and parking it |
 | `long-rmw-walk` | on 8080-family and gbz80, a long `g op= h` on two globals whose result feeds only the store back to g walks both a byte at a time through A instead of loading, combining and storing |
 | `bc-save-group` | the BC save at a pre-pushed call's first argument considers the rest of the block, not just the call it belongs to |

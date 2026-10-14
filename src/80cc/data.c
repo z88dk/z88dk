@@ -95,6 +95,7 @@ int debuglevel;
  *        Framepointer stuff - tis broken!
  */
 int c_framepointer_is_ix;
+int c_opt_code_size;     /* --opt-code-size: prefer shorter helper calls to inline sequences */
 
 /* Platform-reserved index registers: when set, the compiler must not use that
    index register for ANY residency (idx2/idx3/exx-adjacent/LRA-IY homes).

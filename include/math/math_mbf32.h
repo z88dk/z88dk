@@ -70,12 +70,21 @@ extern double_t __LIB__ modf(double_t, double_t *) __smallc; /* decomposes a num
 extern double_t __LIB__ ldexp(double_t x, int pw2) __smallc;
 #define scalbn(x,pw2) ldexp(x,pw2)
 extern double_t __LIB__ frexp(double_t x, int *pw2) __smallc;
-#define copysign(a,b) (b<.0?-fabs(a):fabs(a))
+#ifdef __80CC
+extern int __LIB__ __builtin_signbit(double_t);
+#define signbit(x) __builtin_signbit(x)
+#else
 #define signbit(x) (x != fabs(x))
+#endif
+#define copysign(a,b) (b<.0?-fabs(a):fabs(a))
 
 
 /* General */
 extern double_t __LIB__ fabs(double_t) __smallc;
+#ifdef __80CC
+extern double_t __LIB__ __builtin_fabs(double_t x);
+#define fabs(x) __builtin_fabs(x)
+#endif
 extern double_t __LIB__ fmod(double_t,double_t) __smallc;
 extern double_t __LIB__ fmax(double_t,double_t) __smallc;
 extern double_t __LIB__ fmin(double_t,double_t) __smallc;

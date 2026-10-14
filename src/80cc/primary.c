@@ -10,6 +10,32 @@
 
 #include "ccdefs.h"
 
+/* __builtin_choose_expr(constant, a, b): the value is a or b according to the
+   constant. Both are parsed; the other one is dropped. */
+static int choose_expr(LVALUE *lval)
+{
+    double val = 0;
+    Kind   valtype;
+    LVALUE other;
+    int    k, k2;
+
+    needchar('(');
+    if (constexpr(&val, &valtype, 1) == 0)
+        errorfmt("__builtin_choose_expr needs a constant first argument", 1);
+    needchar(',');
+    memset(lval, 0, sizeof(LVALUE));
+    memset(&other, 0, sizeof(LVALUE));
+    k = heir1(lval);
+    needchar(',');
+    k2 = heir1(&other);
+    needchar(')');
+    if (val == 0) {
+        *lval = other;
+        return k2;
+    }
+    return k;
+}
+
 int primary(LVALUE* lval)
 {
     char sname[NAMESIZE];
@@ -52,6 +78,11 @@ int primary(LVALUE* lval)
         } else if ( strcmp(sname, "__builtin_offsetof") == 0 ) {
             offset_of(lval);
             return(0);
+        } else if ( strcmp(sname, "__builtin_types_compatible_p") == 0 ) {
+            types_compatible_p(lval);
+            return (0);
+        } else if ( strcmp(sname, "__builtin_choose_expr") == 0 ) {
+            return choose_expr(lval);
         } else if ( strcmp(sname, "__func__") == 0 ) {
             /* Append currfn->name (with trailing \0) to the literal
                queue; the IR emits the reference from the AST_STR_LIT node. */
@@ -174,8 +205,13 @@ int primary(LVALUE* lval)
             } else {
                 /* assume it's a function we haven't seen yet */
                 /* NB value set to 0 */
-                warningfmt("implicit-function-definition", "Implicit definition of function '%s' it will return an int. Prototype it explicitly if this is not what you want.", sname);
-                ptr = addglb(sname, default_function(sname), 0, KIND_INT, 0, STATIK);
+                int hint_void = strcmp(sname, "__builtin_unreachable") == 0
+                             || strcmp(sname, "__builtin_assume") == 0;
+                int hint = hint_void || strcmp(sname, "__builtin_expect") == 0;
+                if (!hint)
+                    warningfmt("implicit-function-definition", "Implicit definition of function '%s' it will return an int. Prototype it explicitly if this is not what you want.", sname);
+                ptr = addglb(sname, hint_void ? default_function_with_type(sname, type_void)
+                                              : default_function(sname), 0, KIND_INT, 0, STATIK);
                 ptr->size = 0;
                 ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
             }

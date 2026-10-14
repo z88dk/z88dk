@@ -428,6 +428,11 @@ extern double_t fabs(double_t x);
 extern double_t fabs_fastcall(double_t x) __z88dk_fastcall;
 #define fabs(a) fabs_fastcall(a)
 #endif
+#ifdef __80CC
+extern double_t __LIB__ __builtin_fabs(double_t x);
+#undef fabs
+#define fabs(a) __builtin_fabs(a)
+#endif
 
 
 extern double_t __LIB__ hypot(double_t x,double_t y) __SMALLC;
@@ -1291,6 +1296,11 @@ extern half_t __LIB__ fabsf16(half_t x) __SMALLC __z88dk_fastcall;
 extern half_t fabsf16(half_t x);
 extern half_t fabsf16_fastcall(half_t x) __z88dk_fastcall;
 #define fabsf16(a) fabsf16_fastcall(a)
+#endif
+#ifdef __80CC
+extern half_t __LIB__ __builtin_fabsf16(half_t x);
+#undef fabsf16
+#define fabsf16(a) __builtin_fabsf16(a)
 #endif
 
 

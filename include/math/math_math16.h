@@ -170,6 +170,10 @@ extern half_t __LIB__ invsqrtf16(half_t a) __z88dk_fastcall;
 
 /* General */
 extern half_t __LIB__ fabsf16(half_t x) __z88dk_fastcall;
+#ifdef __80CC
+extern half_t __LIB__ __builtin_fabsf16(half_t x);
+#define fabsf16(x) __builtin_fabsf16(x)
+#endif
 extern half_t __LIB__ negf16(half_t x) __z88dk_fastcall;
 
 #endif

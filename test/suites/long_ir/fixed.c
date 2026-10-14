@@ -21,6 +21,7 @@ _Accum fx_g;
 
 int  fx_const_add(void)  { return (int)(1.5k + 1.5k); }   /* 3.0k -> 3   */
 int  fx_const_mul(void)  { return (int)(2.0k * 3.0k); }   /* 6.0k -> 6   */
+int  fx_param_const_mul(_Accum x) { return (int)(3.0k * x); } /* 3*x */
 int  fx_cassign_add(void){ _Accum a = 3.0k; a += 2.5k; return (int)a; }  /* 5.5k -> 5 */
 int  fx_cassign_sub(void){ _Accum a = 9.0k; a -= 2.5k; return (int)a; }  /* 6.5k -> 6 */
 int  fx_cassign_mul(void){ _Accum a = 2.0k; _Accum b = 4.0k; a *= b; return (int)a; } /* 8.0k */
@@ -31,6 +32,7 @@ static void test_accum_const(void)
 {
     Assert(fx_const_add() == 3, "(int)(1.5k+1.5k) materialises 768 not 3");
     Assert(fx_const_mul() == 6, "(int)(2.0k*3.0k) keeps Q-format");
+    Assert(fx_param_const_mul(4.0k) == 12, "_Accum constant-left multiply keeps Q-format");
 }
 
 static void test_accum_compound(void)

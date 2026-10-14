@@ -454,6 +454,11 @@ int ir_opt_st2ld(Func *f)
                     hit = k;
                     break;
                 }
+                /* A value wider than 4 bytes has no register home: the copy it
+                   would be forwarded from is a frame slot, and reading that
+                   costs more than reading the memory it came from. */
+                if (hit >= 0 && dst_w > 4 && !opt_disabled("st2ld-wide-keep"))
+                    hit = -1;
                 if (hit >= 0) {
                     /* Forward: rewrite as IR_MOV dst <- cached vreg.
                        Does NOT mark the origin store dead — only a
@@ -600,7 +605,7 @@ static int cse_eligible(OpKind k)
     case IR_ADD: case IR_SUB: case IR_RSUB:
     case IR_AND: case IR_OR: case IR_XOR:
     case IR_SHL: case IR_SHR:
-    case IR_NEG: case IR_NOT:
+    case IR_NEG: case IR_NOT: case IR_BSWAP:
     case IR_CONV_ZX: case IR_CONV_SX:
     case IR_CONV_TRUNC: case IR_CONV_BYTE_TO_HIGH:
     case IR_ROTL: case IR_ROTR:
@@ -896,6 +901,57 @@ static void prune_free_bb(BB *bb)
     }
     free(bb->ops);
     free(bb->pred);
+}
+
+/* A block that holds only __builtin_unreachable. */
+static int bb_is_unreach(const Func *f, int id)
+{
+    if (id < 0 || id >= f->n_bbs) return 0;
+    const BB *bb = &f->bbs[id];
+    return bb->n_ops == 1 && bb->ops[0].kind == IR_RET
+        && bb->ops[0].imm == IR_RET_UNREACH;
+}
+
+/* Switch targets that are __builtin_unreachable can never be taken: such cases
+   are dropped, and an unreachable default makes the last case the fall-through
+   so its compare disappears. A switch left with no cases becomes a jump. */
+int ir_opt_switch_unreachable(Func *f)
+{
+    if (!f || f->n_bbs <= 0 || opt_disabled("switch-unreachable")) return 0;
+    int changed = 0;
+    for (int i = 0; i < f->n_bbs; i++) {
+        BB *bb = &f->bbs[i];
+        if (bb->n_ops == 0) continue;
+        Op *o = &bb->ops[bb->n_ops - 1];
+        SwitchInfo *sw = o->kind == IR_SWITCH ? o->sw : NULL;
+        if (!sw) continue;
+        for (int c = 0; c < sw->n_cases;) {
+            if (bb_is_unreach(f, sw->target_bb[c])) {
+                for (int k = c + 1; k < sw->n_cases; k++) {
+                    sw->values[k - 1] = sw->values[k];
+                    sw->target_bb[k - 1] = sw->target_bb[k];
+                }
+                sw->n_cases--;
+                changed++;
+            } else c++;
+        }
+        if (bb_is_unreach(f, sw->default_bb) && sw->n_cases > 0) {
+            sw->default_bb = sw->target_bb[sw->n_cases - 1];
+            sw->n_cases--;
+            changed++;
+        }
+        if (sw->n_cases == 0 && !bb_is_unreach(f, sw->default_bb)) {
+            o->kind = IR_BR;
+            o->label = sw->default_bb;
+            o->src[0] = -1;
+            o->sw = NULL;
+            bb->succ[0] = o->label;
+            bb->succ[1] = -1;
+            free(sw->values); free(sw->target_bb); free(sw);
+            changed++;
+        }
+    }
+    return changed;
 }
 
 int ir_opt_prune_unreachable(Func *f)
@@ -1934,7 +1990,7 @@ static int cse_op_keeps_memory(OpKind k)
     case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR: case IR_LEA:
     case IR_LD_MEM:
     case IR_SUB: case IR_RSUB: case IR_AND: case IR_OR: case IR_XOR:
-    case IR_SHL: case IR_SHR: case IR_MUL: case IR_NEG: case IR_NOT:
+    case IR_SHL: case IR_SHR: case IR_MUL: case IR_NEG: case IR_NOT: case IR_BSWAP:
     case IR_CONV_ZX: case IR_CONV_SX: case IR_CONV_TRUNC: case IR_CONV_TRUNC_HI:
     case IR_CONV_BYTE_TO_HIGH: case IR_ROTL: case IR_ROTR:
     case IR_CMP_EQ: case IR_CMP_NE: case IR_CMP_LT: case IR_CMP_LE:
@@ -2489,7 +2545,7 @@ static int dce_pure_kind(const Op *op)
     case IR_AND: case IR_OR: case IR_XOR:
     case IR_SHL: case IR_SHR:
     case IR_INC: case IR_DEC:
-    case IR_NEG: case IR_NOT: case IR_SMAX0:
+    case IR_NEG: case IR_NOT: case IR_SMAX0: case IR_BSWAP:
     case IR_CONV_ZX: case IR_CONV_SX:
     case IR_CONV_TRUNC: case IR_CONV_BYTE_TO_HIGH:
     case IR_CMP_EQ:  case IR_CMP_NE:
@@ -2778,13 +2834,26 @@ int ir_opt_sym_addr_fold(Func *f)
     int     *isk = calloc((size_t)nv, sizeof(int));
     int64_t *kval = calloc((size_t)nv, sizeof(int64_t));
     int     *ndef = calloc((size_t)nv, sizeof(int));
-    if (!sym || !off || !isk || !kval || !ndef) {
-        free(sym); free(off); free(isk); free(kval); free(ndef); return 0;
+    int     *usec = calloc((size_t)nv, sizeof(int));
+    Op     **defs = calloc((size_t)nv, sizeof(Op *));
+    if (!sym || !off || !isk || !kval || !ndef || !usec || !defs) {
+        free(sym); free(off); free(isk); free(kval); free(ndef);
+        free(usec); free(defs); return 0;
     }
     for (int b = 0; b < f->n_bbs; b++)
         for (int j = 0; j < f->bbs[b].n_ops; j++) {
-            const Op *op = &f->bbs[b].ops[j];
-            if (op->dst >= 0 && op->dst < nv) ndef[op->dst]++;
+            Op *op = &f->bbs[b].ops[j];
+            int defined[8];
+            int nd = ir_op_defs(op, defined, 8);
+            for (int q = 0; q < nd; q++)
+                if (defined[q] >= 0 && defined[q] < nv) {
+                    ndef[defined[q]]++;
+                    defs[defined[q]] = op;
+                }
+            int uses[16];
+            int nu = ir_op_uses(op, uses, 16);
+            for (int k = 0; k < nu; k++)
+                if (uses[k] >= 0 && uses[k] < nv) usec[uses[k]]++;
         }
     for (int b = 0; b < f->n_bbs; b++)
         for (int j = 0; j < f->bbs[b].n_ops; j++) {
@@ -2808,7 +2877,10 @@ int ir_opt_sym_addr_fold(Func *f)
        ir_alloc's symbol-address remat skips IR_ST_MEM bases. Folding one here
        miscompiled ptrbench. Mark every store base and leave those alone. */
     int *st_base = calloc((size_t)nv, sizeof(int));
-    if (!st_base) { free(sym); free(off); free(isk); free(kval); free(ndef); return 0; }
+    if (!st_base) {
+        free(sym); free(off); free(isk); free(kval); free(ndef);
+        free(usec); free(defs); return 0;
+    }
     for (int b = 0; b < f->n_bbs; b++)
         for (int j = 0; j < f->bbs[b].n_ops; j++) {
             const Op *o = &f->bbs[b].ops[j];
@@ -2850,7 +2922,137 @@ int ir_opt_sym_addr_fold(Func *f)
             changed++;
         }
     }
-    free(sym); free(off); free(isk); free(kval); free(ndef); free(st_base);
+    /* Indexed member address: `base=&g; indexed=base+i; dst=indexed+K`.
+       The constant is often an immediate on the final ADD, and the scaled
+       index can put many ops between these three definitions. Do not match
+       adjacency. Instead require exclusive uses of `base` and `indexed`, a
+       single definition for each, and both ADDs in the same BB. Move K into
+       the symbol address and give the indexed ADD the final destination; the
+       final ADD is then dead. This keeps the final vreg's slot/home identity
+       unchanged, unlike a global vreg rename. */
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *tail = &bb->ops[j];
+            if (tail->kind != IR_ADD || tail->imm_sym || tail->dst < 0
+                || tail->dst >= nv || ndef[tail->dst] != 1
+                || f->vregs[tail->dst].width != 2
+                || (f->vregs[tail->dst].flags & (IR_VREG_PARAM |
+                    IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)))
+                continue;
+            int mid = tail->src[0];
+            int64_t k = tail->imm;
+            if (tail->src[1] >= 0) {
+                int kv = tail->src[1];
+                if (kv >= nv || !isk[kv]) {
+                    kv = mid; mid = tail->src[1];
+                }
+                if (kv < 0 || kv >= nv || !isk[kv]) continue;
+                k = kval[kv];
+            }
+            if (mid < 0 || mid >= nv || ndef[mid] != 1 || usec[mid] != 1
+                || f->vregs[mid].width != 2) continue;
+            Op *indexed = defs[mid];
+            if (!indexed || indexed->kind != IR_ADD || indexed->imm_sym)
+                continue;
+            int base = indexed->src[0];
+            if (base < 0 || base >= nv || !sym[base]) base = indexed->src[1];
+            if (base < 0 || base >= nv || !sym[base] || ndef[base] != 1
+                || usec[base] != 1 || f->vregs[base].width != 2)
+                continue;
+            Op *ld = defs[base];
+            if (!ld || ld->kind != IR_LD_SYM || !ld->mem.sym
+                || ld->mem.bank_fn) continue;
+            int pos = -1;
+            for (int q = 0; q < j; q++)
+                if (&bb->ops[q] == indexed) { pos = q; break; }
+            if (pos < 0) continue;
+            int early = 0;
+            for (int q = pos + 1; q < j && !early; q++) {
+                int uses[16], nu = ir_op_uses(&bb->ops[q], uses, 16);
+                for (int u = 0; u < nu; u++)
+                    if (uses[u] == tail->dst) { early = 1; break; }
+            }
+            if (early) continue;
+            int64_t combined = (int64_t)ld->mem.offset + k;
+            if (combined < INT_MIN || combined > INT_MAX) continue;
+            ld->mem.offset = (int)combined;
+            indexed->dst = tail->dst;
+            tail->kind = IR_NOP;
+            tail->dst = -1;
+            tail->src[0] = tail->src[1] = -1;
+            changed++;
+        }
+    }
+    free(sym); free(off); free(isk); free(kval); free(ndef);
+    free(usec); free(defs); free(st_base);
+    return changed;
+}
+
+/* The normal vregoff_symidx matcher runs before some address ADDs become
+   displaced MEM operands. Run this final form once, after the optimiser's
+   fixpoint: `s=&g; t=s+i; MEM[t+K]` becomes `s=&g+K; t=s+i; MEM[t]`.
+   Both address vregs must have one definition and one use, so changing the
+   symbol displacement cannot affect another read of the base. */
+int ir_opt_symidx_mem_late(Func *f)
+{
+    if (!f || opt_disabled("sym-addr-fold")
+        || opt_disabled("symidx-mem-late")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    int *nuse = calloc((size_t)nv, sizeof(int));
+    Op **def = calloc((size_t)nv, sizeof(Op *));
+    if (!ndef || !nuse || !def) {
+        free(ndef); free(nuse); free(def); return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *op = &f->bbs[b].ops[j];
+            int d[8], u[16];
+            int nd = ir_op_defs(op, d, 8), nu = ir_op_uses(op, u, 16);
+            for (int q = 0; q < nd; q++)
+                if (d[q] >= 0 && d[q] < nv) {
+                    ndef[d[q]]++;
+                    def[d[q]] = op;
+                }
+            for (int q = 0; q < nu; q++)
+                if (u[q] >= 0 && u[q] < nv) nuse[u[q]]++;
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *m = &f->bbs[b].ops[j];
+            /* Keep pointer stores out of this fold: the allocator's symbol
+               rematerialisation does not compose with their RMW lowering. */
+            if (m->kind != IR_LD_MEM
+                || m->mem.kind != IR_MEM_VREG || !m->mem.offset
+                || m->mem.post_step || m->mem.volatile_ || m->mem.bank_fn)
+                continue;
+            int t = m->mem.base;
+            if (t < 0 || t >= nv || ndef[t] != 1 || nuse[t] != 1
+                || f->vregs[t].width != 2 || m->src[0] == t
+                || m->src[1] == t) continue;
+            Op *a = def[t];
+            if (!a || a->kind != IR_ADD || a->imm_sym
+                || a->src[0] < 0 || a->src[1] < 0) continue;
+            int s = a->src[0];
+            if (s < 0 || s >= nv || !def[s] || def[s]->kind != IR_LD_SYM)
+                s = a->src[1];
+            if (s < 0 || s >= nv || ndef[s] != 1 || nuse[s] != 1
+                || f->vregs[s].width != 2
+                || (f->vregs[s].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                       | IR_VREG_VOLATILE))) continue;
+            Op *ld = def[s];
+            if (!ld || ld->kind != IR_LD_SYM || !ld->mem.sym
+                || ld->mem.bank_fn || ir_sym_bank_fn(ld->mem.sym)) continue;
+            int64_t off = (int64_t)ld->mem.offset + m->mem.offset;
+            if (off < INT_MIN || off > INT_MAX) continue;
+            ld->mem.offset = (int)off;
+            m->mem.offset = 0;
+            changed++;
+        }
+    free(ndef); free(nuse); free(def);
     return changed;
 }
 
@@ -4797,6 +4999,42 @@ int ir_opt_const_local(Func *f)
     return changed;
 }
 
+/* bswap(bswap(x)) is x. Both reverses must define single-definition vregs, so
+   the inner source cannot have been redefined between the two. The inner
+   reverse is left for dead-code removal. */
+int ir_opt_bswap_fold(Func *f)
+{
+    if (!f || opt_disabled("bswap-fold")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    const Op **def = calloc((size_t)nv, sizeof(const Op *));
+    if (!ndef || !def) { free(ndef); free(def); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int q = 0; q < nd; q++)
+                if (d[q] >= 0 && d[q] < nv) { ndef[d[q]]++; def[d[q]] = o; }
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_BSWAP) continue;
+            int s = o->src[0];
+            if (s < 0 || s >= nv || ndef[s] != 1 || !def[s] || def[s]->kind != IR_BSWAP)
+                continue;
+            int x = def[s]->src[0];
+            if (x < 0 || x >= nv || ndef[x] > 1) continue;
+            if (f->vregs[x].width != f->vregs[o->dst].width) continue;
+            o->kind = IR_MOV; o->src[0] = x; o->src[1] = -1; o->imm = 0;
+            changed++;
+        }
+    free(ndef); free(def);
+    return changed;
+}
+
 int ir_opt_const_fold(Func *f)
 {
     if (!f) return 0;
@@ -4852,6 +5090,17 @@ int ir_opt_const_fold(Func *f)
                     op->kind = IR_LD_IMM; op->imm = mask; op->src[0] = -1; op->src[1] = -1; folded = 1;
                 } else if (op->kind == IR_OR && (KCONST(s1, &c) && c == mask)) {
                     op->kind = IR_LD_IMM; op->imm = mask; op->src[0] = -1; op->src[1] = -1; folded = 1;
+                }
+                break;
+            }
+            case IR_BSWAP: {                    /* bswap of a constant is a constant */
+                int64_t c;
+                if (w == 4 && KCONST(s0, &c)) {
+                    uint32_t u = (uint32_t)c;
+                    op->kind = IR_LD_IMM;
+                    op->imm = (int64_t)(((u & 0xFFu) << 24) | ((u & 0xFF00u) << 8)
+                                        | ((u >> 8) & 0xFF00u) | (u >> 24));
+                    op->src[0] = -1; op->src[1] = -1; folded = 1;
                 }
                 break;
             }

@@ -3655,6 +3655,9 @@ static void configure_compiler(void)
         if ( c_generate_debug_info) {
             add_option_to_compiler("-debug-defc");
         }
+        if (opt_code_size) {
+            add_option_to_compiler("--opt-code-size");
+        }
         compiler_type = CC_80CC;
         c_compiler = c_80cc_exe;
         compiler_style = outspecified_flag;

@@ -36,7 +36,7 @@ jobs:
     - name: Get latest nightly
       run: |
         curl -L -o z88dk-win32-latest.zip http://nightly.z88dk.org/z88dk-win32-latest.zip
-        unzip -d win32-latest z88dk-win32-latest.zip
+        unzip -o -q -d win32-latest z88dk-win32-latest.zip
     - name: Find MSBuild
       uses: microsoft/setup-msbuild@v3
       with:

@@ -21,7 +21,7 @@ jobs:
     - name: Get lastest nightly
       run: |
         curl -L -o z88dk-win32-latest.zip http://nightly.z88dk.org/z88dk-win32-latest.zip
-        unzip -d win32-latest z88dk-win32-latest.zip
+        unzip -o -q -d win32-latest z88dk-win32-latest.zip
     - name: Copy files from nightly
       run: |
         copy /y win32-latest\z88dk\bin\z88dk-z80asm.exe  win32-latest\z88dk\src\z80asm\

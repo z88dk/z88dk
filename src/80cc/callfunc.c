@@ -28,6 +28,28 @@ static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
  *      zero, will call the contents of HL
  */
 
+/* True when the compiler clears the sign bit of an argument of this kind
+   itself: float16, the 32-bit IEEE and MBF formats and the 64-bit MBF format
+   have a fixed sign bit position. Every other format calls the library. */
+int fabs_inline_ok(Kind kind, int half)
+{
+    if (c_disable_builtins || opt_disabled("fabs-inline")) return 0;
+    if (half) return kind == KIND_FLOAT16;
+    if (kind != KIND_DOUBLE) return 0;
+    if (c_fp_size == 8) return 1;
+    return c_fp_size == 4 && (c_maths_mode == MATHS_IEEE || c_maths_mode == MATHS_MBFS);
+}
+
+/* Sign bit of the 32-bit float formats whose signbit is done in
+   line: IEEE single bit 31, MBF single bit 23. 0 for every other format. */
+int64_t fp32_sign_mask(void)
+{
+    if (c_fp_size != 4) return 0;
+    if (c_maths_mode == MATHS_IEEE) return 0x80000000LL;
+    if (c_maths_mode == MATHS_MBFS) return 0x00800000LL;
+    return 0;
+}
+
 Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
 {
     int isscanf = 0;
@@ -46,6 +68,7 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
         functype = default_function_with_type("(funcpointer)", functype);
     }
 
+    int lit_before = 0;
     argnumber = 0;
     (void)minifunc; /* set by SetMiniFunc but its return value is unused
                        in AST-codegen mode; the side-effect on
@@ -74,6 +97,7 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
         }
         argnumber++;
 
+        lit_before = litptr;
         pair = expression(&vconst, &val, &type);
         array_add(function_args, pair->node);
 
@@ -124,6 +148,60 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
         if ( !(functype->funcattrs.hasva
                && argnumber == array_len(functype->parameters) - 1) )
             errorfmt("Too few arguments to call to function '%s'", 1, functype->name);
+    }
+
+    /* __builtin_expect(x, c) is x: the likelihood hint changes no code. */
+    if (ptr && !function_pointer_call && argnumber == 2
+        && strcmp(ptr->name, "__builtin_expect") == 0)
+        return array_get_byindex(function_args, 0);
+
+    /* __builtin_strlen_fastcall: the length of a string literal is a
+       constant, and a literal that nothing else shares leaves the pool.
+       Any other argument is a call to the library routine. */
+    if (ptr && !function_pointer_call
+        && strcmp(ptr->name, "__builtin_strlen_fastcall") == 0) {
+        Node *a0 = argnumber ? array_get_byindex(function_args, 0) : NULL;
+        if (argnumber == 1 && a0 && a0->ast_type == AST_STR_LIT && !c_disable_builtins
+            && !opt_disabled("strlen-fold")) {
+            int off = (int)a0->zval + 1;
+            int len = (int)strnlen((const char *)litq + off, (size_t)(litptr - off));
+            if (a0->zval == lit_before - 1 && litptr > lit_before)
+                litptr = lit_before;
+            return ast_literal_int(type_uint, (uint64_t)len);
+        }
+        SYMBOL *lib = findglb("strlen_fastcall");
+        if (lib && lib->ctype && lib->ctype->kind == KIND_FUNC) {
+            ptr = lib;
+            functype = lib->ctype;
+        }
+    }
+
+    /* __builtin_fabs / __builtin_fabsf16: the sign bit is cleared in line when
+       the format allows it, otherwise the library routine is called. */
+    if (ptr && !function_pointer_call
+        && (strcmp(ptr->name, "__builtin_fabs") == 0
+            || strcmp(ptr->name, "__builtin_fabsf16") == 0)) {
+        int half = ptr->name[strlen(ptr->name) - 1] == '6';
+        Node *a0 = argnumber == 1 ? array_get_byindex(function_args, 0) : NULL;
+        if (!(a0 && a0->type && fabs_inline_ok(a0->type->kind, half))) {
+            char fast[32];
+            snprintf(fast, sizeof fast, "%s_fastcall", ptr->name + 10);
+            SYMBOL *lib = findglb(fast);
+            if (!lib) lib = findglb(ptr->name + 10);
+            if (lib && lib->ctype && lib->ctype->kind == KIND_FUNC) {
+                ptr = lib;
+                functype = lib->ctype;
+            }
+        }
+    }
+
+    /* __builtin_signbit: done in line for the 32-bit IEEE and MBF formats; it
+       has no library routine. */
+    if (ptr && !function_pointer_call && strcmp(ptr->name, "__builtin_signbit") == 0) {
+        Node *a0 = argnumber == 1 ? array_get_byindex(function_args, 0) : NULL;
+        if (!(fp32_sign_mask() && a0
+              && (!a0->type || a0->type->kind == KIND_DOUBLE || kind_is_integer(a0->type->kind))))
+            errorfmt("signbit is not supported for this floating point format", 1);
     }
 
     node = ast_function_call(function_pointer_call ? AST_FUNCPTR_CALL : AST_FUNC_CALL, ptr, functype, function_args);

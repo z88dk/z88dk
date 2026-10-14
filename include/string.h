@@ -245,7 +245,12 @@ extern size_t __LIB__ strlcpy_callee(char *dst,const char *src,size_t n) __small
 extern size_t __LIB__  strlen(const char *s);
 #if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern size_t __LIB__  strlen_fastcall(const char *s) __z88dk_fastcall;
+#ifdef __80CC
+extern size_t __LIB__  __builtin_strlen_fastcall(const char *s) __z88dk_fastcall;
+#define strlen(x) __builtin_strlen_fastcall(x)
+#else
 #define strlen(x) strlen_fastcall(x)
+#endif
 #endif
 
 

@@ -225,110 +225,9 @@
 =
 	pop	%1
 
-;; #285r: the swap_endian_32 intrinsic (z80rules.9) byte-reverses DEHL via
-;; `ld a,l; ld l,d; ld d,a; ld a,h; ld h,e; ld e,a` (swaps D<->L, E<->H through A).
-;; 80cc parks the pre-swap low word with `ld bc,hl` just before it — dead: the
-;; rearrange reads only L/D/H/E/A (never B/C) and produces a fresh DEHL, so the
-;; park is never consumed. Drop it.
-%title #285r drop dead ld bc,hl before swap_endian_32 rearrange (-2b)
-	ld	bc,hl
-	ld	a,l
-	ld	l,d
-	ld	d,a
-	ld	a,h
-	ld	h,e
-	ld	e,a
-=
-	ld	a,l
-	ld	l,d
-	ld	d,a
-	ld	a,h
-	ld	h,e
-	ld	e,a
 
-;; #285s: a register-pointer big-endian long read — read_l(p) = swap_endian_32(
-;; *(type32*)p) — lowers to a little-endian 4-byte load into DEHL (`ld e,(hl);
-;; inc; ld d,(hl); inc; ld a,(hl+); ld h,(hl); ld l,a; ex de,hl`) followed by the
-;; byte-reverse (#285r already dropped its dead `ld bc,hl`). The whole thing just
-;; wants bytes m0,m1,m2,m3 (address order) in D,E,H,L — load them there directly,
-;; deleting the ex + 6-insn swap tail. HL ends at +3 in both (from `ld a,(hl+)`),
-;; so a live pointer is unaffected. 14 insns -> 7.
-%title #285s big-endian long read: load bytes direct into DEHL (-7 insns)
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	inc	hl
-	ld	a,(hl+)
-	ld	h,(hl)
-	ld	l,a
-	ex	de,hl
-	ld	a,l
-	ld	l,d
-	ld	d,a
-	ld	a,h
-	ld	h,e
-	ld	e,a
-=
-	ld	d,(hl)
-	inc	hl
-	ld	e,(hl)
-	inc	hl
-	ld	a,(hl+)
-	ld	l,(hl)
-	ld	h,a
 
-;; #285t: a DOUBLE byte-reverse — the big-endian direct load (#285s output:
-;; D=m0,E=m1,H=m2,L=m3) followed by another swap rearrange (-> D=m3,E=m2,H=m1,
-;; L=m0) is just the plain LITTLE-endian load. Arises from a source double swap
-;; that cancels (e.g. swap_endian(read_l(p)) / a write_l-of-read_l roundtrip).
-;; Collapse the 13 insns to the ordinary 8-insn little-endian load; HL ends +3 in
-;; both. (#285r/#285s run first, exposing this big-endian-load + lone swap.)
-%title #285t double byte-reverse collapses to a little-endian load (-5 insns)
-	ld	d,(hl)
-	inc	hl
-	ld	e,(hl)
-	inc	hl
-	ld	a,(hl+)
-	ld	l,(hl)
-	ld	h,a
-	ld	a,l
-	ld	l,d
-	ld	d,a
-	ld	a,h
-	ld	h,e
-	ld	e,a
-=
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	inc	hl
-	ld	a,(hl+)
-	ld	h,(hl)
-	ld	l,a
-	ex	de,hl
 
-;; #285u: swap_endian_32 into HL then `ld bc,hl` park (DE:BC long home), where
-;; the swapped HL is immediately reloaded (`ld hl,..`) — so only the DE:BC copy
-;; is consumed. Produce DE:BC directly: `ld c,d; ld b,e; ld e,h; ld d,l` reads
-;; the four source bytes (H,E,D,L untouched by earlier lines) into B=e C=d D=l
-;; E=h — the same DE:BC the swap+park yields — without touching A or HL. The
-;; trailing `ld hl,%1` proves the swapped HL is dead. 8 insns -> 5.
-%title #285u swap_endian_32 + BC-park, swapped HL dead -> straight into DE:BC (-3 insns)
-%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
-	ld	a,l
-	ld	l,d
-	ld	d,a
-	ld	a,h
-	ld	h,e
-	ld	e,a
-	ld	bc,hl
-	ld	hl,%1
-=
-	ld	c,d
-	ld	b,e
-	ld	e,h
-	ld	d,l
-	ld	hl,%1
 
 ;; #285v: any `ld bc,` immediately overwritten by another `ld bc,` — the first
 ;; is dead (BC reloaded before any read, and no `ld bc,` form reads BC or has a
@@ -1197,17 +1096,35 @@
 	ld	hl,de
 
 ;; #GB7: fold two consecutive `add sp,N; add sp,M` into one. gbz80/z80 `add sp,d`
-;; is a signed byte [-128,127]; %check can only bound ONE var, so bound EACH
-;; addend to [-64,63] => sum in [-128,126], provably in range (correctly rejects
-;; md5's add sp,-128 / add sp,127 overflow pairs). Misses folds where an addend
-;; exceeds 63, but catches the common small frame adjusts (add sp,8; add sp,2).
+;; is a signed byte [-128,127]. %check bounds each addend (and so proves both are
+;; numbers); the %eval proves the SUM fits: (sum + 128) >> 8 is 0 exactly when
+;; the sum is in [-128,127]. Catches a call cleanup followed by a frame release
+;; (add sp,6; add sp,104) as well as the small frame adjusts.
 %title #GB7 fold add sp,N;add sp,M -> add sp,N+M (-2b)
-%check -64 <= %1 <= 63
-%check -64 <= %2 <= 63
+%check -128 <= %1 <= 127
+%check -128 <= %2 <= 127
+%eval 0 = %1 %2 + 128 + 8 >
 	add	sp,%1
 	add	sp,%2
 =
 	add	sp,%eval(%1 %2 +)
+
+;; #SP1: the stack arguments a call leaves behind are dropped with `pop bc`, then
+;; the frame is released through HL with the result stashed in BC. The pop is
+;; dead (BC is overwritten at once), so fold its two bytes into the release:
+;; one more word of sp adjust, one pop fewer (-1b, -10T per word).
+%title #SP1 fold pop bc into the following sp release via hl (-1b)
+%check -32768 <= %1 <= 32765
+	pop	bc
+	ld	bc,hl
+	ld	hl,%1
+	add	hl,sp
+	ld	sp,hl
+=
+	ld	bc,hl
+	ld	hl,%eval(%1 2 +)
+	add	hl,sp
+	ld	sp,hl
 
 ;; #GB8: gbz80 mem->mem word copy. A word loaded via the `ld a,(hl+)` walk then
 ;; byte-stored to a global forms the word in HL only for the store, which reads
@@ -1232,31 +1149,6 @@
 	ld	(%2),a
 	ld	hl,%3
 
-;; #DEBC swap_endian_32 under DE:BC residency. z80rules.9 inlines
-;; intrinsic_swap_endian_32 to a DEHL byte-reversal; when the value is resident
-;; in DE:BC (IR_LONG_DEBC) the 80cc lowerer brackets it with the DE:BC<->DEHL
-;; fastcall marshalling `ld hl,bc` (recover the low word) ... `ld bc,hl` (park
-;; the reversed result back). Reverse the bytes in place across D/E/B/C instead,
-;; dropping both — HL is dead after the park (the value moved to BC). Only the
-;; DE:BC form has the `ld hl,bc`/`ld bc,hl` bracket, so this is byte-identical
-;; for sccz80 and for 80cc with the gate off.
-%title #DEBC swap_endian_32 in DE:BC, no HL round-trip (-2b)
-	ld	hl,bc
-	ld	a,l
-	ld	l,d
-	ld	d,a
-	ld	a,h
-	ld	h,e
-	ld	e,a
-	ld	bc,hl
-=
-	ld	a,c
-	ld	c,d
-	ld	d,a
-	ld	a,b
-	ld	b,e
-	ld	e,a
-	ld	hl,bc
 
 ;; #FP1 a `pop bc` immediately before an `ld sp,ix` frame teardown is dead: the
 ;; `ld sp,ix` resets SP wholesale, so the pop's SP+2 is discarded and the value
@@ -1409,3 +1301,18 @@
 =
 	ld	de,hl
 	ld	hl,sp+%1
+
+;; Load a double and push it, as one library call. The load leaves the value in
+;; the accumulator and the push copies it, so the combined helper is the same
+;; sequence: -3b and one call. (sccz80 has this rule in z80rules.1.)
+%title #DLP dload then dpush -> dldpsh (-3b)
+	call	dload
+	call	dpush
+=
+	call	dldpsh
+
+%title #DLP l_f64_load then l_f64_dpush -> l_f64_dldpsh (-3b)
+	call	l_f64_load
+	call	l_f64_dpush
+=
+	call	l_f64_dldpsh

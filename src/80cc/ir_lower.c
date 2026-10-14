@@ -254,6 +254,7 @@ typedef struct {
     const Op **long_zx;   /* per-vreg: a width-4 zero-extend of a frame word/byte whose
                              only use is the next long AND/OR/XOR; the extend is
                              skipped and that op reads the source bytes from the frame */
+    const Op **wide_mem;  /* per-vreg: a wide float single-use global load read in place at its use */
     const Op **long_mem;  /* per-vreg: a width-4 single-use global load whose next op
                              is the long ADD/SUB/AND/OR/XOR taking it as its right
                              operand; the load is skipped and read at that op */
@@ -282,6 +283,59 @@ static const Op *long_rmw_ld_of(const Func *f, int v)
 /* The deferred zero-extend for long vreg v, or NULL. */
 static const Op *long_zx_of(const Func *f, int v)
 { return hc_lookup(f, g_hc.long_zx, v); }
+
+/* The deferred global load for wide (>4 byte) float vreg v, or NULL. */
+static const Op *wide_mem_of(const Func *f, int v)
+{ return hc_lookup(f, g_hc.wide_mem, v); }
+
+/* Nothing in ops (from, to) of bb can write memory: only ops that cannot, and a
+   float helper (registers in, registers out). w4: a four-byte value is being
+   read where it is used, which also admits the float helpers. */
+static int wm_span_safe(const BB *bb, int from, int to, int w4)
+{
+    for (int k = from + 1; k < to; k++) {
+        switch (bb->ops[k].kind) {
+        case IR_NOP: case IR_MOV: case IR_LD_IMM: case IR_LD_SYM:
+        case IR_LD_STR: case IR_LEA: case IR_LD_MEM:
+        case IR_ADD: case IR_SUB: case IR_RSUB: case IR_AND: case IR_OR:
+        case IR_XOR: case IR_SHL: case IR_SHR: case IR_MUL: case IR_NEG:
+        case IR_NOT: case IR_CONV_ZX: case IR_CONV_SX: case IR_CONV_TRUNC:
+        case IR_CMP_EQ: case IR_CMP_NE: case IR_CMP_LT: case IR_CMP_LE:
+        case IR_CMP_GT: case IR_CMP_GE: case IR_CMP_ULT: case IR_CMP_ULE:
+        case IR_CMP_UGT: case IR_CMP_UGE:
+        case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+        case IR_PUSH_ARG: case IR_ACC_BINOP: case IR_ACC_CMP: case IR_ACC_UNOP:
+            break;
+        case IR_HCALL: {
+            const HelperInfo *h = bb->ops[k].hcall;
+            if (!(w4 && h && h->name
+                  && (!strncmp(h->name, "l_f32_", 6) || !strncmp(h->name, "l_f16_", 6))))
+                return 0;
+            break;
+        }
+        default:
+            return 0;
+        }
+    }
+    return 1;
+}
+
+/* May op u read four-byte vreg v in place from memory (see wide-mem)? */
+static int wm_reader_ok(const Op *u, int v)
+{
+    if (u->kind == IR_PUSH_ARG || u->kind == IR_RET || u->kind == IR_CALL)
+        return 1;
+    if (u->kind == IR_MOV && u->src[0] == v) return 1;
+    if (u->kind == IR_ST_MEM && u->src[0] == v && u->mem.base != v) return 1;
+    if (u->kind == IR_HCALL && u->hcall
+        && u->hcall->n_stacked < u->hcall->n_args
+        && u->hcall->args[u->hcall->n_stacked] == v) {
+        for (int a = 0; a < u->hcall->n_args; a++)
+            if (a != u->hcall->n_stacked && u->hcall->args[a] == v) return 0;
+        return 1;
+    }
+    return 0;
+}
 
 /* The deferred global load for long vreg v, or NULL. */
 static const Op *long_mem_of(const Func *f, int v)
@@ -409,11 +463,13 @@ static void compute_no_slot_wide(Func *f);
 static int wpp_stack[8];
 static int wpp_n;
 static int wide_prepush(FILE *out, const Func *f, int v);
+static int wide_prepush_target(const Func *f, const BB *bb, int j, int v);
 /* [f32-prepush] 4-byte helper operands pushed at their def, innermost last,
    with cur_sp_adjust right after each push. */
 static int dpp_v[8], dpp_sp[8];
 static int dpp_n;
 static int dpp_next;   /* set by the lookahead: push this op's DEHL result */
+static int f32_stack_v[8], f32_stack_sp[8], f32_stack_n;
 /* [IR_ACCDROP_VERIFY] Inert: report a slot read of a wide value whose store
    was dropped earlier in the same render (the consumer lost the accumulator
    before it looked). */
@@ -1722,16 +1778,19 @@ static int xline_ret_reads_de(void)
 
    `--opt-disable=de-call` opts out, byte for byte. Evidence: adr/0084. */
 #define DECALL_MAX 96
-static struct { char name[56]; unsigned char dirty; } xf_decall[DECALL_MAX];
+static struct { char name[56]; unsigned char dirty, bc_dirty; } xf_decall[DECALL_MAX];
 static int xf_decall_n;
 static int xf_decall_full;
+static const char *xline_call_operand(const char *line);
+static int xline_plain_call(const char *line);
 
-static void decall_note(const char *sym, int clean)
+static void decall_note(const char *sym, int clean, int bc_clean)
 {
     if (!sym || !*sym) return;
     for (int i = 0; i < xf_decall_n; i++)
         if (!strcmp(xf_decall[i].name, sym)) {
             if (!clean) xf_decall[i].dirty = 1;
+            if (!bc_clean) xf_decall[i].bc_dirty = 1;
             return;
         }
     if (xf_decall_n >= DECALL_MAX || strlen(sym) + 1 > sizeof xf_decall[0].name) {
@@ -1740,7 +1799,32 @@ static void decall_note(const char *sym, int clean)
     }
     strcpy(xf_decall[xf_decall_n].name, sym);
     xf_decall[xf_decall_n].dirty = (unsigned char)!clean;
+    xf_decall[xf_decall_n].bc_dirty = (unsigned char)!bc_clean;
     xf_decall_n++;
+}
+
+/* Direct calls emitted by gen_call have no BC argument.  A BC value can be
+   live across one only when the callee was declared to preserve it.  Unlike
+   xline_c_call, this also covers asm-linkage names such as printf and
+   floor_fastcall. Return -1 for unknown calls, 0 for BC-preserving calls,
+   and 1 when BC is dead into this call. */
+static int xline_call_bc_fact(const char *line)
+{
+    if (xf_decall_full || opt_disabled("bc-call")
+        || opt_disabled("bc-call-meta") || !xline_plain_call(line))
+        return -1;
+    const char *p = xline_call_operand(line);
+    if (!p) return -1;
+    char sym[56]; size_t k = 0;
+    while (p[k] && p[k] != '\n' && p[k] != '\r' && p[k] != ' '
+           && p[k] != '\t' && p[k] != ';' && k + 1 < sizeof sym) {
+        sym[k] = p[k]; k++;
+    }
+    if (p[k] && p[k] != '\n' && p[k] != '\r') return -1;
+    sym[k] = '\0';
+    for (int i = 0; i < xf_decall_n; i++)
+        if (!strcmp(xf_decall[i].name, sym)) return !xf_decall[i].bc_dirty;
+    return -1;
 }
 
 /* 0: not an unconditional `call name`; 2: a call to l_case / l_setjmp;
@@ -1911,6 +1995,17 @@ static int xline_c_call(const char *line)
     if (*p != ' ' && *p != '\t') return 0;
     while (*p == ' ' || *p == '\t') p++;
     return p[0] == '_' && p[1] != '_' && p[1] != 0;
+}
+
+static int xline_call_bc_kills(const char *line)
+{
+    if (!bccall_enabled()) return 0;
+    int fact = xline_call_bc_fact(line);
+    if (fact >= 0) return fact;
+    /* A full table may hide a BC-preserving direct call.  Keep the older
+       `_sym` fallback only when the metadata extension is opted out. */
+    if (xf_decall_full && !opt_disabled("bc-call-meta")) return 0;
+    return xline_c_call(line);
 }
 
 /* [l-call-flags] Is this an unconditional call to a runtime helper
@@ -4874,7 +4969,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             /* [bc-call] A branch's successor may read BC; a call to a compiled
                C function cannot — see xline_c_call. Everything else (a jump, an
                asm-linkage call, a conditional call) stays conservative. */
-            else if (call && xline_c_call(lines[i]) && bccall_enabled())
+            else if (call && xline_call_bc_kills(lines[i]))
                           { b_live = c_live = 0; }
             /* [bc-flow] A branch to a label in this function is not a black
                box: take the liveness the fixpoint computed for its target (plus
@@ -6560,6 +6655,13 @@ static int   dsd_drop_nv;
 static int   dsd_viol;
 /* Candidates found by the last instrumented render. */
 static int  *dsd_cand;
+static int   dsd_wide;   /* a four-byte value is among the candidates */
+static int  *retry_src_snap;   /* operands of every op before the first render */
+static int   retry_src_n;
+static int  *dsd_slot_save;    /* vreg_spill_slot before a drop, for an exact rollback */
+static int   dsd_frame_save;
+static int   dsd_narrow_only;   /* a wide drop was rolled back: try the narrow ones alone */
+static int   dsd_wide_drop;   /* ...and was dropped by the render in flight */
 static int   dsd_ncand;
 /* Bytes dead-slot-drop saved in the last ir_lower_func_body. The DE
    re-arbitration compares allocations, so it adds them back: the drop applies
@@ -6937,6 +7039,14 @@ static void emit_slot_addr_ofs(FILE *out, const Func *f, int vreg, int adj,
 
 static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
 {
+    const Op *wm = wide_mem_of(f, vreg);
+    if (wm) {                              /* [wide-mem] read the global in place */
+        if (wm->mem.offset)
+            emit(out, "ld\thl,_%s+%d", ir_sym_name(wm->mem.sym), wm->mem.offset);
+        else
+            emit(out, "ld\thl,_%s", ir_sym_name(wm->mem.sym));
+        return;
+    }
     accdrop_check_read(f, vreg);
     require_slot(f, vreg);   /* [acc-drop-slot] a dropped value has no slot */
     if (fp_active(f) && IS_EZ80()) {
@@ -7073,6 +7183,22 @@ static void load_byte_adv(FILE *out, const char *reg, int last)
     }
 }
 
+/* ez80: store a register pair through HL with the native `ld (hl),rr`. Writes
+   the pair's low byte at (hl) and its high byte at (hl+1), like the two byte
+   stores it replaces, but leaves HL unchanged (the byte form leaves it one
+   higher). Returns 0 when the pair or CPU does not qualify. */
+static int ez80_store_pair(FILE *out, const char *lo, const char *hi, const char *stamp)
+{
+    if (!IS_EZ80() || opt_disabled("ez80-word-st")) return 0;
+    const char *rr = NULL;
+    if (lo[0] == 'e' && hi[0] == 'd') rr = "de";
+    else if (lo[0] == 'c' && hi[0] == 'b') rr = "bc";
+    else if (lo[0] == 'l' && hi[0] == 'h') rr = "hl";
+    if (!rr || lo[1] || hi[1]) return 0;
+    emit(out, "ld\t(hl),%s%s", rr, stamp ? stamp : "");
+    return 1;
+}
+
 static void store_byte_adv(FILE *out, const char *reg, int last)
 {
     int is_a = (reg[0] == 'a' && reg[1] == 0);
@@ -7084,6 +7210,25 @@ static void store_byte_adv(FILE *out, const char *reg, int last)
         emit(out, "ld\t(hl),%s", reg);
         if (!last) emit(out, "inc\thl");
     }
+}
+
+/* Store the long in BC:DE (low:high) through HL, which points at its first byte.
+   Returns how far HL has moved from there: 3 after the byte chain, 2 after the
+   ez80 pair stores. */
+static int store_long_hl(FILE *out)
+{
+    if (IS_EZ80() && !opt_disabled("ez80-word-st")) {
+        emit(out, "ld\t(hl),bc");
+        emit(out, "inc\thl");
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),de");
+        return 2;
+    }
+    store_byte_adv(out, "c", 0);
+    store_byte_adv(out, "b", 0);
+    store_byte_adv(out, "e", 0);
+    store_byte_adv(out, "d", 1);
+    return 3;
 }
 
 /* [lea-frame-addr] Put a frame address into HL, choosing the shorter form.
@@ -7653,6 +7798,17 @@ static void note_wide_noslot(int v)
     rec_wide_noslot[v]++;
 }
 
+/* A four-byte value that took a no-slot path (pushed or left in DEHL) and whose
+   slot the render never accessed. The definitions are not all counted by one
+   path (a call result is noted as a no-slot value without a definition), so the
+   counts are not compared: the drop is checked by its re-render, which puts the
+   slots back if one is reached after all. */
+static int wide_slot_untouched(int v, int w)
+{
+    return w == 4 && !dsd_narrow_only && rec_wide_noslot
+        && rec_wide_noslot[v] > 0 && !opt_disabled("dead-slot-wide");
+}
+
 /* Record a genuine frame-slot access emitted for v (called from slot_off /
    slot_ix_off). Guarded by rec_counting so only the final render counts. When
    the WRITE context is active (slot_write_ctx, set for the whole body of a store
@@ -7838,9 +7994,20 @@ static void rec_end(const Func *f)
             /* [dead-slot-drop] A partly dead frame: list the values whose slot
                the render never touched, under the same trust rule. */
             dsd_ncand = 0;
-            if (deadbytes > 0 && deadbytes < fs && !opt_disabled("dead-slot-drop")) {
+            /* A four-byte value held to the checked drop only: the whole-frame
+               drop below is not re-checked. */
+            int nwide = 0;
+            for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
+                int off = f->vreg_spill_slot[v];
+                if (off >= 0 && off < fs && !rec_slotuse[v]
+                    && wide_slot_untouched(v, f->vregs[v].width))
+                    nwide++;
+            }
+            if ((deadbytes > 0 || nwide > 0) && deadbytes < fs
+                && !opt_disabled("dead-slot-drop")) {
                 free(dsd_cand);
                 dsd_cand = malloc((size_t)f->n_vregs * sizeof(int));
+                dsd_wide = 0;
                 for (int v = 0; dsd_cand && v < rec_nv && v < f->n_vregs; v++) {
                     int off = f->vreg_spill_slot[v];
                     if (off < 0 || off >= fs || rec_slotuse[v]) continue;
@@ -7849,8 +8016,10 @@ static void rec_end(const Func *f)
                                      | IR_VREG_PARAM_IN_PLACE | IR_VREG_NO_SLOT
                                      | IR_VREG_CALL_SPLIT | IR_VREG_VOLATILE))
                         continue;
-                    if ((vr->width > 0 ? vr->width : 2) > 2) continue;
+                    int dw = vr->width > 0 ? vr->width : 2;
+                    if (dw > 2 && !wide_slot_untouched(v, dw)) continue;
                     if (!ir_home_covers_live_range(f, v)) continue;
+                    if (dw > 2) dsd_wide = 1;
                     dsd_cand[dsd_ncand++] = v;
                 }
             }
@@ -8221,6 +8390,7 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_DEC:               return gen_step(out, f, op, -1);
     case IR_POSTSTEP:          return gen_poststep(out, f, op);
     case IR_ROTL:              return gen_rotl(out, f, op);
+    case IR_BSWAP:             return gen_bswap(out, f, op);
     case IR_EXTRACT_BYTE:      return gen_extract_byte(out, f, op);
     case IR_BR:                return gen_br(out, f, op);
     case IR_BR_ZERO:           return gen_br_zero(out, f, op);
@@ -8499,12 +8669,22 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
             emit(out, "ld\tsp,hl");               /* drop the args */
             emit(out, "exx");                     /* restore value + retaddr */
             emit(out, "push\tbc");
+        } else if (width == 4 && callee_args <= 16) {
+            /* 8080/8085: no alt regs and no `add sp,d`, so the sp math would need
+               HL — which a long result also occupies, with no spare pair (BC holds
+               the retaddr). A few argument bytes are dropped by popping them into
+               AF instead (A and the flags carry no part of the result). */
+            emit(out, "pop\tbc");                 /* BC = return address */
+            for (int rem = callee_args; rem > 0; rem -= 2) {
+                if (rem >= 2 && CPU_POP_AF_IS_SAFE()) emit(out, "pop\taf");
+                else for (int k = rem >= 2 ? 2 : 1; k > 0; k--) emit(out, "inc\tsp");
+            }
+            emit(out, "push\tbc");
         } else if (width == 4) {
-            /* 8080/8085: no alt regs and no `add sp,d`, so the sp math needs HL
-               — which a long result also occupies, with no spare pair (BC holds
-               the retaddr). Genuinely unsupported; diagnose, don't miscompile. */
-            fprintf(stderr, "ir_lower: __z88dk_callee with a long return is "
-                            "unsupported on 8080/8085\n");
+            /* More argument bytes than that need the sp math in HL, which a long
+               result also occupies with no spare pair. Diagnose, don't miscompile. */
+            fprintf(stderr, "ir_lower: __z88dk_callee with a long return and more "
+                            "than 16 bytes of arguments is unsupported on 8080/8085\n");
             return -1;
         } else {
             /* 8080/8085, int result in HL (≤2B): park it in DE via ex de,hl
@@ -9199,6 +9379,17 @@ static int def_dst_dead(const Func *f, const BB *bb, int j)
    before use. KEEP it when a same-BB reader exists (that reader can share the
    register); cross-BB readers rematerialise regardless, so skipping is at worst
    byte-neutral there and a win when the def is otherwise dead. */
+/* Is op an HCALL whose one stacked operand is the pending inline push? Its own
+   lowering takes that image off the stack, so the marker is not stale for
+   anything the op produces. */
+static int op_pops_inline_push(const Op *op)
+{
+    return !opt_disabled("f32-prepush-pop")
+        && op->kind == IR_HCALL && op->hcall && op->hcall->n_stacked == 1
+        && op->hcall->args[0] == L.la.cur_dehl_inline_push
+        && L.cur_sp_adjust == L.la.cur_dehl_inline_push_base_sp;
+}
+
 /* [f32-prepush] May the 4-byte def of `v` at (bb, j) be pushed for its sole
    use, the stacked operand of a later HCALL in the block? The stack must stay
    LIFO up to that HCALL: no argument group, struct push, asm, switch, return,
@@ -9224,14 +9415,27 @@ static int f32_prepush_ok(const Func *f, const BB *bb, int j, int v)
         return 0;
     for (int a = 1; a < c->hcall->n_args; a++)
         if (c->hcall->args[a] == v) return 0;
+    int wdepth = 0;   /* argument groups opened and closed inside the window */
     for (int i = j + 1; i < k; i++) {
         const Op *o = &bb->ops[i];
         switch (o->kind) {
-        case IR_PUSH_ARG: case IR_PUSH_STRUCT: case IR_ASM: case IR_SWITCH:
+        case IR_PUSH_STRUCT: case IR_ASM: case IR_SWITCH:
         case IR_RET: case IR_PUSH_DEHL_LONG:
             return 0;
+        case IR_PUSH_ARG:
+            /* A call's arguments pushed above the value and popped by that call
+               leave it where it was: allowed when the group opens and closes in
+               the window (imm=1 marks a group's first push). */
+            if (opt_disabled("f32-prepush-groups")) return 0;
+            if (o->imm == 1) wdepth++;
+            else if (wdepth == 0) return 0;
+            break;
         case IR_CALL:
-            if (!o->call || o->call->pre_pushed > 0) return 0;
+            if (!o->call) return 0;
+            if (o->call->pre_pushed > 0) {
+                if (opt_disabled("f32-prepush-groups") || wdepth == 0) return 0;
+                wdepth--;
+            }
             break;
         default: break;
         }
@@ -9247,6 +9451,42 @@ static int f32_prepush_ok(const Func *f, const BB *bb, int j, int v)
             if (ir_home_at(f, d[q]) == IR_PR_STACK) return 0;
             const BitSet *after = (k + 1 < bb->n_ops) ? ir_op_live_in(bb, k + 1) : bb->live_out;
             if (!after || ir_bitset_get(after, d[q])) return 0;
+        }
+    }
+    return wdepth == 0;
+}
+
+/* A later binary helper may have a short chain of wide load/helper operands
+   between the producer and its stacked use.  The ordinary proof rejects the
+   chain when one of those temporary operands is stack-homed, even though each
+   temporary is consumed only by another HCALL and the existing HCALL lowering
+   keeps its own argument pushes balanced. */
+static int f32_hcall_chain_prepush_ok(const Func *f, const BB *bb, int j, int v)
+{
+    int consumer = -1;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int i = 0; i < f->bbs[b].n_ops; i++) {
+            const Op *o = &f->bbs[b].ops[i];
+            int u[16], nu = ir_op_uses(o, u, 16);
+            for (int q = 0; q < nu; q++)
+                if (u[q] == v) {
+                    if (consumer >= 0 || &f->bbs[b] != bb || i <= j) return 0;
+                    consumer = i;
+                }
+        }
+    if (consumer < 0 || consumer <= j + 1) return 0;
+    const Op *c = &bb->ops[consumer];
+    if (c->kind != IR_HCALL || !c->hcall || c->hcall->n_stacked != 1
+        || c->hcall->args[0] != v)
+        return 0;
+    for (int i = j + 1; i < consumer; i++) {
+        const Op *o = &bb->ops[i];
+        if (o->kind != IR_LD_MEM && o->kind != IR_HCALL) return 0;
+        int d[8], nd = ir_op_defs(o, d, 8);
+        for (int q = 0; q < nd; q++) {
+            if (d[q] < 0 || f->vregs[d[q]].width != 4) return 0;
+            const Op *u = find_unique_use(f, d[q]);
+            if (!u || u->kind != IR_HCALL || !u->hcall) return 0;
         }
     }
     return 1;
@@ -9459,6 +9699,11 @@ static int ir_lower_func_body(FILE *out, Func *f)
     xf_ret_dispatch  = 0;
     /* [de-call] the proved-clean call targets are per function too. */
     xf_decall_n = 0; xf_decall_full = 0;
+    /* L.cur_frameless is the previous function's answer until this one has had
+       its slots assigned. Passes that run before then ask fp_active(), which
+       returns 1 for a frameless function, so a stale value made them behave
+       as if this function were frameless. */
+    if (!opt_disabled("frameless-reset")) L.cur_frameless = 0;
 
     /* __naked: emit the body verbatim — no prologue, no epilogue, no frame,
        no BB labels, no trailing `ret`. ir_build has already restricted the
@@ -9524,6 +9769,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
            corrupting the loop/depth scans LICM and ir_alloc's residency picks
            rely on. Every later pass then sees a clean, contiguously-numbered
            CFG. */
+        (void)ir_opt_switch_unreachable(f);
         int pruned  = ir_opt_prune_unreachable(f);
         int aggpromoted = ir_opt_promote_aggregate_fields(f);
         int hoisted = ir_opt_licm(f);
@@ -9555,6 +9801,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
            DCE that dedup and clean up the resulting MOVs. */
         (void)ir_opt_self_ops(f);
         int cfold   = ir_opt_const_fold(f);
+        cfold      += ir_opt_bswap_fold(f);
         cfold      += ir_opt_const_local(f);
         /* Table-driven pattern matcher (ir_match.c) — migrated fusion
            passes run here, in table order, to fixpoint. After st2ld
@@ -9655,6 +9902,11 @@ static int ir_lower_func_body(FILE *out, Func *f)
                     pruned, aggpromoted, hoisted, ivsr, early, fwd, cfold, reassoc, match,
                     cse, addrcse, packs, late, pushes, deadret, symcmp, dce, narrow, ivnarrow);
     }
+
+    /* Some indexed-global member offsets settle into MEM.displacement only
+       after the matcher has run. Fold that final form once, outside the
+       optimisation fixpoint, before vreg compaction and allocation. */
+    (void)ir_opt_symidx_mem_late(f);
 
     /* Drop orphan vregs (abandoned builder temps — in no op slot) before the
        id-indexed analysis/allocation tables get built. Renumbers survivors;
@@ -9764,6 +10016,148 @@ static int ir_lower_func_body(FILE *out, Func *f)
                        or reloaded — so ir_assign_slots skips it, frame_size shrinks. */
                     f->vregs[d].flags |= IR_VREG_NO_SLOT;
                 }
+            }
+        }
+    }
+    /* wide-mem: a float (>4 byte) global load read once, later in the same block
+       with nothing between that can write memory, is not loaded and not spilled:
+       its reader takes the address of the global instead of the address of a
+       frame slot (emit_acc_slot_addr). Re-reading the global costs less than the
+       frame temp, which needs a store and a reload. */
+    /* A earlier lowering of this function marked its wide-mem values NO_SLOT;
+       take those marks back so this one decides afresh. */
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vregs[v].flags & IR_VREG_WIDE_MEM)
+            f->vregs[v].flags &= (uint16_t)~(IR_VREG_WIDE_MEM | IR_VREG_NO_SLOT);
+    g_hc.wide_mem = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                           sizeof(const Op *));
+    if (g_hc.wide_mem && !opt_disabled("wide-mem")) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            const BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j];
+                int d = o->dst;
+                if (o->kind != IR_LD_MEM || o->mem.kind != IR_MEM_SYM) continue;
+                if (d < 0 || d >= f->n_vregs || f->vregs[d].width < 4) continue;
+                if (f->vregs[d].kind == KIND_LONGLONG) continue;
+                /* A wide float is read through the accumulator address helper.
+                   A four-byte value (float, long, fixed point) is read through
+                   load_to_dehl, and only the readers that go through it qualify
+                   (checked below). */
+                int w4 = (f->vregs[d].width == 4);
+                if (!w4 && vreg_kind_is_integer(f, d)) continue;
+                if (w4 && (o->mem.elem == KIND_CPTR
+                           || ir_home_assigned(f, d) != IR_PR_SPILL))
+                    continue;
+                if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_NO_SLOT | IR_VREG_CALL_SPLIT
+                                         | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+                    continue;
+                if (o->mem.volatile_ || !o->mem.sym || ns_sym_bails(o->mem.sym)
+                    || mem_bank_fn(&o->mem))
+                    continue;
+                /* acc-prepush pushes it at its def; its partner operand is
+                   kept in the accumulator on that understanding. */
+                if (wide_prepush_target(f, bb, j, d) >= 0) continue;
+                int nuse = 0, ndef = 0, use_j = -1;
+                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
+                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
+                        const Op *p = &f->bbs[bb2].ops[k];
+                        int df[8]; int nd = ir_op_defs(p, df, 8);
+                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
+                        int us[16]; int nu = ir_op_uses(p, us, 16);
+                        for (int t = 0; t < nu; t++)
+                            if (us[t] == d) {
+                                nuse++;
+                                if (bb2 == b) use_j = k;
+                            }
+                    }
+                if (ndef != 1 || nuse != 1 || use_j <= j) continue;
+                if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, d))
+                    continue;
+                if (w4) {
+                    const Op *u = &bb->ops[use_j];
+                    int ok = (u->kind == IR_PUSH_ARG
+                              || u->kind == IR_RET || u->kind == IR_CALL
+                              || (u->kind == IR_MOV && u->src[0] == d)
+                              || (u->kind == IR_ST_MEM && u->src[0] == d
+                                  && u->mem.base != d));
+                    /* A helper takes its register operand last, after the
+                       stacked ones are loaded and pushed, so reading the global
+                       there leaves nothing in DEHL to lose. A stacked operand
+                       is loaded first and would destroy a partner that arrives
+                       in DEHL. */
+                    if (u->kind == IR_HCALL && u->hcall
+                        && u->hcall->n_stacked < u->hcall->n_args
+                        && u->hcall->args[u->hcall->n_stacked] == d) {
+                        ok = 1;
+                        for (int a2 = 0; a2 < u->hcall->n_args; a2++)
+                            if (a2 != u->hcall->n_stacked && u->hcall->args[a2] == d)
+                                ok = 0;
+                    }
+                    if (!ok) continue;
+                }
+                if (!wm_span_safe(bb, j, use_j, w4)) continue;
+                g_hc.wide_mem[d] = o;
+                f->vregs[d].flags |= IR_VREG_NO_SLOT | IR_VREG_WIDE_MEM;
+            }
+        }
+    }
+    /* wide-mem, stored copy: a four-byte result stored to a global by the very
+       next op, and read again later in the block with nothing that can write
+       memory in between, is not kept in a frame slot. The store reads it from
+       the registers, and the later readers read the global the store wrote. */
+    if (g_hc.wide_mem && !opt_disabled("wide-mem") && !opt_disabled("wide-mem-store")) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            const BB *bb = &f->bbs[b];
+            for (int j = 0; j + 1 < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j];
+                int df[8]; int nd = ir_op_defs(o, df, 8);
+                if (nd != 1) continue;
+                int v = df[0];
+                if (v < 0 || v >= f->n_vregs || f->vregs[v].width != 4) continue;
+                if (g_hc.wide_mem[v]) continue;
+                if (f->vregs[v].kind == KIND_LONGLONG) continue;
+                if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_NO_SLOT | IR_VREG_CALL_SPLIT
+                                         | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+                    continue;
+                if (ir_home_assigned(f, v) != IR_PR_SPILL) continue;
+                int sj = j + 1;
+                while (sj < bb->n_ops && bb->ops[sj].kind == IR_NOP) sj++;
+                if (sj >= bb->n_ops) continue;
+                const Op *st = &bb->ops[sj];
+                if (st->kind != IR_ST_MEM || st->mem.kind != IR_MEM_SYM
+                    || st->src[0] != v || st->mem.volatile_ || !st->mem.sym
+                    || st->mem.post_step || ns_sym_bails(st->mem.sym)
+                    || mem_bank_fn(&st->mem) || st->mem.elem == KIND_CPTR)
+                    continue;   /* a store of a four-byte value writes all four bytes */
+                int ndef = 0, nuse = 0, ok = 1, last = -1, far_use = 0;
+                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
+                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
+                        const Op *p = &f->bbs[bb2].ops[k];
+                        int dd[8]; int ndd = ir_op_defs(p, dd, 8);
+                        for (int t = 0; t < ndd; t++) if (dd[t] == v) ndef++;
+                        int us[16]; int nu = ir_op_uses(p, us, 16);
+                        for (int t = 0; t < nu; t++)
+                            if (us[t] == v && p != st) {
+                                nuse++;
+                                if (bb2 != b || k <= sj) ok = 0;
+                                else {
+                                    last = k;
+                                    if (!wm_reader_ok(p, v)) ok = 0;
+                                    if (!wm_span_safe(bb, sj, k, 1)) ok = 0;
+                                    int nx = sj + 1;
+                                    while (nx < bb->n_ops && bb->ops[nx].kind == IR_NOP) nx++;
+                                    if (k != nx) far_use = 1;
+                                }
+                            }
+                    }
+                if (ndef != 1 || nuse < 1 || !ok || !far_use || last < 0) continue;
+                if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, v))
+                    continue;
+                g_hc.wide_mem[v] = st;
+                f->vregs[v].flags |= IR_VREG_NO_SLOT | IR_VREG_WIDE_MEM;
             }
         }
     }
@@ -10434,6 +10828,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
     int df_retry_done = 0;   /* dead-frame elision: at most one re-lower */
     int ds_retry_done = 0;   /* [dead-store] dead byte-spill elision: one re-lower */
     int dsd_retry = 0;       /* [dead-slot-drop] 1 = dropped, 2 = restored */
+    dsd_narrow_only = 0;
     int ssr_off = 0, ssr_viol = 0;   /* [ss-evidence] fallen back / to fall back */
     long dsd_pre = 0;        /* render size before the drop */
     dsd_ncand = 0;
@@ -10456,7 +10851,33 @@ static int ir_lower_func_body(FILE *out, Func *f)
                     f->vregs[v].width, f->vregs[v].flags);
         }
     }
+    /* The lowering swaps commutative operands in place, so a re-render of this
+       function would start from the first render's mutated IR. Take the
+       operands as the first render finds them and put them back before each
+       render. */
+    if (!retry_src_snap && !opt_disabled("retry-ir-restore")) {
+        int t = 0;
+        for (int b = 0; b < f->n_bbs; b++) t += f->bbs[b].n_ops;
+        retry_src_n = t;
+        retry_src_snap = t ? malloc((size_t)t * 2 * sizeof(int)) : NULL;
+        if (retry_src_snap) {
+            int q = 0;
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int o = 0; o < f->bbs[b].n_ops; o++) {
+                    retry_src_snap[q++] = f->bbs[b].ops[o].src[0];
+                    retry_src_snap[q++] = f->bbs[b].ops[o].src[1];
+                }
+        }
+    }
  deadframe_retry:
+    if (retry_src_snap) {
+        int q = 0;
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int o = 0; o < f->bbs[b].n_ops; o++) {
+                f->bbs[b].ops[o].src[0] = retry_src_snap[q++];
+                f->bbs[b].ops[o].src[1] = retry_src_snap[q++];
+            }
+    }
     dsd_viol = 0;
     /* Render into a DISCARDABLE buffer whether or not labels are being elided.
        The dead-store / dead-frame retries below `goto deadframe_retry` and
@@ -10798,12 +11219,34 @@ static int ir_lower_func_body(FILE *out, Func *f)
        The new layout can change what the render does, so that render is
        checked: if it reached a dropped slot after all, the slots come back and
        the function is rendered once more as it was. */
+    /* A dropped four-byte slot re-packs the frame, which can move a word spill
+       off the cheap top-of-stack slot. Keep the drop only if the render did not
+       grow; otherwise take the same way back as a dropped slot being reached. */
+    if (dsd_retry == 1 && rc == 0 && rout != out && !dsd_viol && dsd_wide_drop
+        && !opt_disabled("dead-slot-guard")) {
+        long pos = ftell(rout);
+        long after = render_size(rout);
+        fseek(rout, pos, SEEK_SET);
+        if (after > dsd_pre)
+            dsd_viol = 1;
+    }
     if (dsd_retry == 1 && rc == 0 && rout != out && dsd_viol) {
-        dsd_retry = 2;
+        /* A rolled-back set that held a four-byte value must not take the
+           narrow drops down with it: they stand on their own proof. */
+        int again = dsd_wide_drop && !dsd_narrow_only;
+        dsd_retry = again ? 0 : 2;
+        if (again) dsd_narrow_only = 1;
+        dsd_viol = 0;
         for (int v = 0; v < dsd_drop_nv && v < f->n_vregs; v++)
             if (dsd_drop[v]) f->vregs[v].flags &= ~IR_VREG_SLOT_UNUSED;
         free(dsd_drop); dsd_drop = NULL; dsd_drop_nv = 0;
-        ir_assign_slots(f);
+        if (dsd_slot_save && f->vreg_spill_slot) {
+            memcpy(f->vreg_spill_slot, dsd_slot_save,
+                   (size_t)f->n_vregs * sizeof(int));
+            f->frame_size = dsd_frame_save;
+        } else {
+            ir_assign_slots(f);
+        }
         L.cur_frameless = frameless_ok(f);
         free(bb_hl_out_p1); bb_hl_out_p1 = NULL;
         fclose(rout);
@@ -10812,6 +11255,15 @@ static int ir_lower_func_body(FILE *out, Func *f)
     if (!dsd_retry && rc == 0 && rout != out && dsd_ncand > 0
         && !opt_disabled("dead-slot-drop")) {
         dsd_retry = 1;
+        dsd_wide_drop = dsd_wide;
+        free(dsd_slot_save); dsd_slot_save = NULL;
+        if (f->vreg_spill_slot) {
+            dsd_slot_save = malloc((size_t)f->n_vregs * sizeof(int));
+            if (dsd_slot_save)
+                memcpy(dsd_slot_save, f->vreg_spill_slot,
+                       (size_t)f->n_vregs * sizeof(int));
+            dsd_frame_save = f->frame_size;
+        }
         free(dsd_drop);
         dsd_drop = calloc((size_t)f->n_vregs, 1);
         dsd_drop_nv = dsd_drop ? f->n_vregs : 0;
@@ -10888,9 +11340,11 @@ static int ir_lower_func_body(FILE *out, Func *f)
     free(L.bb_a_out); L.bb_a_out = NULL;
     free(L.vreg_wc); L.vreg_wc = NULL;
     free(L.bb_byte_out_dirty); L.bb_byte_out_dirty = NULL;
+    free(retry_src_snap); retry_src_snap = NULL; retry_src_n = 0;
     free(g_hc.remat_def); g_hc.remat_def = NULL;
     free(g_hc.byte_remat); g_hc.byte_remat = NULL;
     free(g_hc.long_mem); g_hc.long_mem = NULL;
+    free(g_hc.wide_mem); g_hc.wide_mem = NULL;
     free(g_hc.word_mem); g_hc.word_mem = NULL;
     free(g_hc.long_zx); g_hc.long_zx = NULL;
     free(g_hc.long_zx_keep); g_hc.long_zx_keep = NULL;
@@ -11414,6 +11868,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     L.la.cur_stack_long_top = -1;
     L.la.cur_dehl_inline_push = -1;
     L.la.cur_dehl_inline_push_base_sp = 0;
+    f32_stack_n = 0;
     L.la.cur_dehl_push_to_stack = 0;
     L.la.cur_dehl_bc_is_low = 0;
     cur_emitted_file = NULL;
@@ -11553,6 +12008,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         L.la.cur_stack_long_top = -1;
         L.la.cur_dehl_inline_push = -1;
         L.la.cur_dehl_inline_push_base_sp = 0;
+        f32_stack_n = 0;
         L.la.cur_dehl_push_to_stack = 0;
         cur_bank_fn = NULL;   /* __addressmod: bank unknown at a BB merge */
         /* No pending spill crosses into a BB yet — the cross-BB inherit
@@ -11679,6 +12135,11 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         if (bb_pred_cnt[bb->id] == 0 && entry_dehl >= 0 && bb->live_in
             && ir_bitset_get((const BitSet *)bb->live_in, entry_dehl))
             cache_dehl(entry_dehl);
+        /* [acc-phi] The wide value every predecessor left in the accumulator. */
+        {
+            int jv = wide_join_value(f, (int)(bb - f->bbs));
+            if (jv >= 0) *wide_acc_cell(f, jv) = jv;
+        }
         entry_hl = -1;   /* consumed at the first BB; never re-seed */
         entry_de = -1;   /* consumed at the first BB; never re-seed */
         entry_dehl = -1;
@@ -12007,6 +12468,17 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             L.la.cur_dehl_dst_dead_safe = 0;
             L.la.cur_dehl_dst_no_bc_stash = 0;
             L.la.cur_dehl_push_nostash = 0;
+            /* [wide-mem] A result whose later readers read the global that the
+               very next op stores it to: that store takes it from the registers
+               and no slot copy is made. */
+            if (op->dst >= 0 && f->vregs[op->dst].width == 4 && j + 1 < bb->n_ops) {
+                const Op *wm = wide_mem_of(f, op->dst);
+                int nx = j + 1;
+                while (nx < bb->n_ops && bb->ops[nx].kind == IR_NOP) nx++;
+                if (wm && wm->kind == IR_ST_MEM && nx < bb->n_ops
+                    && &bb->ops[nx] == wm)
+                    L.la.cur_dehl_dst_dead_safe = 1;
+            }
             /* [IR_SHRNARROW] A width-4 constant shift whose ONLY use is the
                CONV_TRUNC on its heels needs to compute just the bytes the
                truncation keeps: result byte i is source bits [8i+K, 8i+K+8),
@@ -12088,6 +12560,18 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         && (ko->hcall->n_stacked >= 1 || ko->hcall->n_args == 1)
                         && !opt_disabled("dehl-stash-dead"))
                         L.la.cur_store_dehl_stash_dead = 1;
+                    if (ko->kind == IR_CALL && ko->call && ko->call->target
+                        && !(ko->call->preserved & IR_R_BC)
+                        && !opt_disabled("dehl-stash-dead")) {
+                        for (int a = 0; a < ko->call->n_args; a++) {
+                            int av = ko->call->args[a];
+                            if (av == V && av >= 0 && av < f->n_vregs
+                                && f->vregs[av].width == 4) {
+                                L.la.cur_store_dehl_stash_dead = 1;
+                                break;
+                            }
+                        }
+                    }
                     break;
                 }
                 for (int k = j + 1; k < bb->n_ops; k++) {
@@ -12148,10 +12632,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                    This is the producer-side half of the argument case: the
                    push's own load_to_dehl is a cache hit, so no_bc there has
                    nothing left to suppress. */
-                if (fp_active(f) && op->dst >= 0
-                    && f->vregs[op->dst].width == 4
-                    && j + 1 < bb->n_ops
-                    && (bb->ops[j + 1].kind == IR_PUSH_ARG
+            if (op->dst >= 0
+                && f->vregs[op->dst].width == 4
+                && j + 1 < bb->n_ops
+                && (bb->ops[j + 1].kind == IR_PUSH_ARG
                         || bb->ops[j + 1].kind == IR_PUSH_DEHL_LONG)
                     && bb->ops[j + 1].src[0] == op->dst) {
                     int V = op->dst;
@@ -12174,6 +12658,39 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     }
                 }
             }
+            /* A direct call can consume a freshly-produced width-4 value in
+               DEHL just like the helper path above.  If the call does not
+               preserve BC and this is the value's only use, the producer's
+               BC=low stash cannot be recovered after the call. */
+            if (op->dst >= 0 && f->vregs[op->dst].width == 4
+                && j + 1 < bb->n_ops
+                && !opt_disabled("dehl-stash-dead")) {
+                const Op *cx = &bb->ops[j + 1];
+                const CallInfo *cc = cx->call;
+                if (cx->kind == IR_CALL && cc && cc->target
+                    && cc->abi == IR_ABI_FASTCALL && cc->n_args == 1
+                    && !cc->pre_pushed && !cc->ret_longlong
+                    && !(cc->flags & (SHORTCALL | SHORTCALL_HL | HL_CALL
+                                      | BANKED | SDCCCALL1))
+                    && !(cc->preserved & IR_R_BC)
+                    && !(bb->live_out
+                         && ir_bitset_get((const BitSet *)bb->live_out,
+                                          op->dst))) {
+                    int narg = 0, later = 0;
+                    for (int a = 0; a < cc->n_args; a++)
+                        if (cc->args[a] == op->dst) narg++;
+                    for (int k = j + 2; k < bb->n_ops && !later; k++) {
+                        int uses[16];
+                        int nu = ir_op_uses(&bb->ops[k], uses, 16);
+                        for (int u = 0; u < nu; u++)
+                            if (uses[u] == op->dst) { later = 1; break; }
+                    }
+                    if (narg == 1 && !later) {
+                        L.la.cur_dehl_dst_dead_safe = 1;
+                        L.la.cur_dehl_dst_no_bc_stash = 1;
+                    }
+                }
+            }
             /* A 4-byte result read only as the register operand of the helper
                call that follows: the helper clobbers BC, and the load that
                feeds it takes the low half from HL when HL is advertised, so the
@@ -12190,6 +12707,39 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     for (int a = 0; a < hh->n_stacked; a++)
                         if (hh->args[a] == op->dst) other = 1;
                     if (!other) L.la.cur_dehl_dst_no_bc_stash = 1;
+                }
+            }
+            /* A wide result used only as the register operand of a binary
+               helper can stay in DEHL when the helper's stacked operand is
+               already staged.  The generic def_dst_dead() test only sees
+               ordinary operands in op->src[]; HCALL operands live in
+               hcall->args[], so it otherwise misses this cache-served use
+               and store_dehl_finalize writes a frame slot unnecessarily.
+               The stacked operand must be the value currently at TOS. */
+            if (!L.la.cur_dehl_dst_dead_safe
+                && op->dst >= 0 && f->vregs[op->dst].width == 4
+                && j + 1 < bb->n_ops
+                && !opt_disabled("f32-prepush")
+                && !opt_disabled("f32-hcall-reg")) {
+                const Op *hx = &bb->ops[j + 1];
+                const HelperInfo *hh = hx->hcall;
+                if (hx->kind == IR_HCALL && hh
+                    && hh->n_stacked == 1
+                    && hh->n_args - hh->n_stacked == 1
+                    && hh->args[1] == op->dst
+                    && find_unique_use(f, op->dst) == hx
+                    && !(bb->live_out
+                         && ir_bitset_get((const BitSet *)bb->live_out, op->dst))) {
+                    int stacked = hh->args[0];
+                    int staged =
+                        (f32_stack_n > 0
+                         && stacked == f32_stack_v[f32_stack_n - 1]
+                         && L.cur_sp_adjust == f32_stack_sp[f32_stack_n - 1]);
+                    if (!staged && dpp_n > 0)
+                        staged = (stacked == dpp_v[dpp_n - 1]
+                                  && L.cur_sp_adjust == dpp_sp[dpp_n - 1]);
+                    if (staged)
+                        L.la.cur_dehl_dst_dead_safe = 1;
                 }
             }
             if (L.la.cur_dst_dead && op->dst >= 0
@@ -12459,13 +13009,17 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 && dpp_n < (int)(sizeof dpp_v / sizeof dpp_v[0])
                 && !func_has_pr_bc(f)
                 && !L.la.cur_dehl_dst_dead_safe
-                && L.la.cur_dehl_inline_push < 0
+                && (L.la.cur_dehl_inline_push < 0
+                    || op_pops_inline_push(op))
                 && L.la.cur_stack_long_top < 0
                 && op->dst >= 0 && f->vregs[op->dst].width == 4
                 && !vreg_is_pr_dehl(f, op->dst)
                 && !(f->vregs[op->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
-                && !(bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, op->dst)))
+                && !(bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, op->dst))) {
                 dpp_next = f32_prepush_ok(f, bb, j, op->dst);
+                if (!dpp_next && !opt_disabled("f32-hcall-reg"))
+                    dpp_next = f32_hcall_chain_prepush_ok(f, bb, j, op->dst);
+            }
 
             /* `jp` to the immediately-following BB is dead — the
                label is the next instruction. Elide when this is an

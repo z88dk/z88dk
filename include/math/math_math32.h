@@ -206,6 +206,13 @@ extern double_t __LIB__ fabs(double_t x);
 extern double_t __LIB__ fabs_fastcall(double_t x) __z88dk_fastcall;
 #define fabs(x) fabs_fastcall(x)
 #endif
+#ifdef __80CC
+extern double_t __LIB__ __builtin_fabs(double_t x);
+#undef fabs
+#define fabs(x) __builtin_fabs(x)
+extern int __LIB__ __builtin_signbit(double_t);
+#define signbit(x) __builtin_signbit(x)
+#endif
 
 __ZPROTO2(double_t,,fmod,double_t,x,double_t,y)
 #ifndef __STDC_ABI_ONLY

@@ -150,6 +150,7 @@ int ir_opt_dce(Func *f);
  * reclaims the now-dead LD_SYM). Returns folds made. */
 int ir_opt_sym_cmp_fold(Func *f);
 int ir_opt_sym_addr_fold(Func *f);
+int ir_opt_symidx_mem_late(Func *f);
 int ir_opt_sym_deref_fold(Func *f);
 int ir_opt_deref_offset(Func *f);
 int ir_opt_store_chain(Func *f);
@@ -168,6 +169,7 @@ int ir_opt_conv_mask_fold(Func *f);
  * every later pass sees a clean CFG. IR_NO_PRUNE opts out. Returns the
  * number of blocks removed. */
 int ir_opt_prune_unreachable(Func *f);
+int ir_opt_switch_unreachable(Func *f);
 
 /* Byte-width narrowing: a promoted int binop (add/sub/and/or/xor/shl)
  * whose result is only truncated back to a byte is re-typed width-1 so
@@ -214,6 +216,7 @@ int ir_opt_coalesce_copies(Func *f);
  * x&all-ones, x<<0, x>>0, …) to a MOV or LD_IMM. Folds the `acc = 0;
  * acc op= …` idiom (e.g. `main`'s `res += f()`). Returns ops simplified. */
 int ir_opt_const_fold(Func *f);
+int ir_opt_bswap_fold(Func *f);
 
 /* Reassociate a reduction's left-leaning add-tree (`acc += x0+x1+…+xk`)
    into k+1 direct accumulates `acc += xi`, in place (no op insertion). Frees

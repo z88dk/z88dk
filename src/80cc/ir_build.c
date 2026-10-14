@@ -677,6 +677,7 @@ static const char *acc_name(const char *stem)
     if (!strcmp(stem, "eq"))       return f64 ? "l_f64_eq"  : "deq";
     if (!strcmp(stem, "ne"))       return f64 ? "l_f64_ne"  : "dne";
     if (!strcmp(stem, "neg"))      return f64 ? "l_f64_negate" : "minusfa";
+    if (!strcmp(stem, "fabs"))     return f64 ? "fabs" : NULL;
     if (!strcmp(stem, "ftof16"))   return f64 ? "l_f64_ftof16" : "l_f48_ftof16";
     if (!strcmp(stem, "f16tof"))   return f64 ? "l_f64_f16tof" : "l_f48_f16tof";
     if (!strcmp(stem, "sint2f"))   return f64 ? "l_f64_sint2f"  : "l_int2long_s_float";
@@ -685,6 +686,8 @@ static const char *acc_name(const char *stem)
     if (!strcmp(stem, "ulong2f"))  return f64 ? "l_f64_ulong2f" : "ufloat";
     if (!strcmp(stem, "f2sint"))   return f64 ? "l_f64_f2sint"  : "ifix";
     if (!strcmp(stem, "f2slong"))  return f64 ? "l_f64_f2slong" : "ifix";
+    if (!strcmp(stem, "f2uint"))   return f64 ? "l_f64_f2uint"  : "ifix";
+    if (!strcmp(stem, "f2ulong"))  return f64 ? "l_f64_f2ulong" : "ifix";
     return NULL;
 }
 
@@ -1187,12 +1190,13 @@ static int emit_acc_from_int(Builder *b, int src_v, int src_unsigned)
 /* 5/6-byte double → int/long (IR_ACC_UNOP, subkind 1): ifix. ifix
    returns the full DEHL (signed long); a width-2 dst takes HL, a width-4
    dst takes DEHL (gen_acc_unop picks the store by dst width). */
-static int emit_acc_to_int(Builder *b, int src_v, int ret_w)
+static int emit_acc_to_int(Builder *b, int src_v, int ret_w, int uns)
 {
     int dst = new_temp(b, ret_w);
     b->f->vregs[dst].width = (int16_t)ret_w;
-    acc_tier_fa(acc_unop1(b, acc_name((ret_w == 4) ? "f2slong" : "f2sint"),
-                          src_v, dst), ACC_SUB_ACC2INT);
+    const char *stem = (ret_w == 4) ? (uns ? "f2ulong" : "f2slong")
+                                    : (uns ? "f2uint"  : "f2sint");
+    acc_tier_fa(acc_unop1(b, acc_name(stem), src_v, dst), ACC_SUB_ACC2INT);
     return dst;
 }
 
@@ -2057,7 +2061,7 @@ static int coerce_float_to_int_kind(Builder *b, int v, Node *src,
                                      (dst_w == 4) ? 4 : 2);
         if (iv < 0) return v;
     } else {
-        iv = emit_acc_to_int(b, v, (dst_w == 4) ? 4 : 2);
+        iv = emit_acc_to_int(b, v, (dst_w == 4) ? 4 : 2, dst_uns);
     }
     if (dst_w == 1) {
         int bt = new_temp_kind(b, KIND_CHAR);
@@ -2125,6 +2129,18 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
        the freshly-loaded accumulator in the DEHL/reg slot. Matches sccz80's
        staging; without it the rhs is spilled to a frame slot and reloaded.
        Acc tier (FA model) keeps lhs-first — it doesn't use the DEHL stack. */
+    /* For noncommutative f32 `lhs -= rhs` / `lhs /= rhs`, build the lvalue
+       read first and the RHS last. The helper wants lhs stacked and rhs in
+       DEHL. Building rhs first can make its value survive the lvalue address
+       calculation, creating a redundant frame temporary. Commutative += and
+       *= already use the cheaper stack-argument route below. Restrict this
+       reorder to pure, non-volatile operands. */
+    int nvol = 0;
+    int rhs_last = !is_acc
+        && !opt_disabled("f32-rhs-last")
+        && (!strcmp(stem, "sub") || !strcmp(stem, "div"))
+        && arg_pure_nonvolatile(lvn, &nvol)
+        && arg_pure_nonvolatile(n->right, &nvol) && nvol == 0;
     int fc_commutative = !is_acc
         && (!strcmp(stem, "add") || !strcmp(stem, "mul"))
         && !opt_disabled("f32-stack-arg");
@@ -2133,16 +2149,24 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
         : fc_commutative ? emit_float_arith(b, fk, stem, rv, (LV)) \
                          : emit_float_arith(b, fk, stem, (LV), rv))
 
-    int rv = build_expr(b, n->right);
-    if (rv < 0) return -1;
-    /* Convert a mixed rhs (int, or the other float tier) to the lvalue's
-       float kind — the conversion the front end no longer inserts. */
-    rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+    int rv = -1;
+    if (!rhs_last) {
+        rv = build_expr(b, n->right);
+        if (rv < 0) return -1;
+        /* Convert a mixed rhs (int, or the other float tier) to the lvalue's
+           float kind — the conversion the front end no longer inserts. */
+        rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+    }
 
     if (lvn->ast_type == AST_LOCAL_VAR) {
         int lhs_v = lvn->sym ? sym_map_get(b, lvn->sym) : -1;
         if (lhs_v < 0)
             return build_fail("float compound-assign: unknown local");
+        if (rhs_last) {
+            rv = build_expr(b, n->right);
+            if (rv < 0) return -1;
+            rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+        }
         int res = COMPOUND_ARITH(lhs_v);
         if (res < 0) return -1;
         ir_emit_mov(cur_bb(b), lhs_v, res);
@@ -2154,6 +2178,11 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
         int loaded = new_temp_kind(b, fk);
         Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
         ld->dst = loaded; ld->mem.kind = IR_MEM_SYM; ld->mem.sym = g;
+        if (rhs_last) {
+            rv = build_expr(b, n->right);
+            if (rv < 0) return -1;
+            rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+        }
         int res = COMPOUND_ARITH(loaded);
         if (res < 0) return -1;
         Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
@@ -2169,6 +2198,11 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
     ld->dst = loaded; ld->mem.kind = IR_MEM_VREG;
     ld->mem.base = ptr_v; ld->mem.elem = elem;
     ld->mem.bank_fn = bf;
+    if (rhs_last) {
+        rv = build_expr(b, n->right);
+        if (rv < 0) return -1;
+        rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+    }
     int res = COMPOUND_ARITH(loaded);
     if (res < 0) return -1;
     Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
@@ -2222,7 +2256,7 @@ static int build_int_compound_float(Builder *b, Node *n, const char *stem,
         int fr_ = acc ? emit_acc_binop(b, stem, fl_, rv)                    \
                       : emit_float_arith(b, fk, stem, fl_, rv);             \
         if (fr_ < 0) return build_fail("int-float compound: %s failed", stem);\
-        (OUT) = acc ? emit_acc_to_int(b, fr_, (lw == 4) ? 4 : 2)            \
+        (OUT) = acc ? emit_acc_to_int(b, fr_, (lw == 4) ? 4 : 2, uns)        \
                     : emit_int_from_float_reg(b, fr_, fk, uns,              \
                                               (lw == 4) ? 4 : 2);           \
         if ((OUT) < 0) return build_fail("int-float compound: narrow failed");\
@@ -4213,6 +4247,70 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         int is_fastcall = (n->sym->ctype
                            && (n->sym->ctype->flags & FASTCALL));
         int n_args = n->args ? (int)array_len(n->args) : 0;
+        /* __builtin_bswap16/32 are IR operations, not calls (include/intrinsic.h
+           maps intrinsic_swap_endian_16/32 to them under 80cc, and there is no
+           library routine behind either). The 32-bit one is IR_BSWAP, the 16-bit
+           one a rotate by 8. An integer argument of another width is extended or
+           truncated to the operand width first. */
+        if (n_args == 1) {
+            const char *sn = n->sym->name;
+            int w32 = !strcmp(sn, "__builtin_bswap32");
+            int w16 = !strcmp(sn, "__builtin_bswap16");
+            int ws = !strcmp(sn, "__builtin_swap_word_32");   /* halves of a long */
+            int w64 = !strcmp(sn, "__builtin_bswap64");
+            Node *a0 = array_get_byindex(n->args, 0);
+            if (w64 && a0 && a0->type && kind_is_integer(node_value_kind(a0))) {
+                /* 64-bit byte reverse: the value goes through __i64_acc and the
+                   lowerer reverses the eight bytes there. */
+                int v = build_expr(b, a0);
+                if (v < 0) return -1;
+                if ((int)b->f->vregs[v].kind != KIND_LONGLONG) {
+                    int uns = a0->type->isunsigned;
+                    if (b->f->vregs[v].width == 1) {
+                        int wt = new_temp(b, 2);
+                        Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+                        cv->dst = wt; cv->src[0] = v;
+                        v = wt;
+                    }
+                    v = emit_acc_int_from_int(b, v, uns);
+                }
+                return emit_acc_int_unary(b, v, "l_i64_bswap");
+            }
+            w32 |= ws;
+            if ((w32 || w16) && a0 && a0->type
+                && kind_is_integer(node_value_kind(a0))
+                && !is_acc_int_kind(node_value_kind(a0))) {
+                int ow = w32 ? 4 : 2;
+                int v = build_expr(b, a0);
+                if (v < 0) return -1;
+                int sw = b->f->vregs[v].width;
+                if (sw < ow) {
+                    int wt = new_temp_kind(b, w32 ? KIND_LONG : KIND_INT);
+                    b->f->vregs[wt].width = (int16_t)ow;
+                    Op *cv = ir_op_emit(cur_bb(b), a0->type->isunsigned ? IR_CONV_ZX : IR_CONV_SX);
+                    cv->dst = wt; cv->src[0] = v;
+                    v = wt;
+                } else if (sw > ow) {
+                    int wt = new_temp_kind(b, w32 ? KIND_LONG : KIND_INT);
+                    b->f->vregs[wt].width = (int16_t)ow;
+                    Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+                    tr->dst = wt; tr->src[0] = v;
+                    v = wt;
+                }
+                int dst = new_temp_kind(b, w32 ? KIND_LONG : KIND_INT);
+                b->f->vregs[dst].width = (int16_t)ow;
+                if (ws) {
+                    Op *op = ir_op_emit(cur_bb(b), IR_ROTL);
+                    op->dst = dst; op->src[0] = v; op->imm = 16;
+                } else if (w32) {
+                    ir_emit_unop(cur_bb(b), IR_BSWAP, dst, v);
+                } else {
+                    Op *op = ir_op_emit(cur_bb(b), IR_ROTL);
+                    op->dst = dst; op->src[0] = v; op->imm = 8;
+                }
+                return dst;
+            }
+        }
         /* Inline a const-count __builtin_memset as IR_MEMSET — the whole
            point of the builtin is to inline when the count is const, no
            call. The lowerer unrolls `ld (hl),e; inc hl` for small counts
@@ -4261,6 +4359,72 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 op->imm    = (int)cnt->zval; /* byte count */
                 return dst_v;
             }
+        }
+        /* __builtin_fabs / __builtin_fabsf16 (callfunction keeps the call only
+           for formats fabs_inline_ok accepts): clear the sign bit. float16 is
+           bit 15, IEEE single bit 31, MBF single bit 23; the 64-bit MBF format
+           is a FA-tier helper that clears the sign byte in place. */
+        if (n_args == 1
+            && (strcmp(n->sym->name, "__builtin_fabs") == 0
+                || strcmp(n->sym->name, "__builtin_fabsf16") == 0)) {
+            Node *a0 = array_get_byindex(n->args, 0);
+            int half = n->sym->name[strlen(n->sym->name) - 1] == '6';
+            if (a0 && a0->type && fabs_inline_ok(a0->type->kind, half)) {
+                Kind nk = a0->type->kind;
+                int fv = build_expr(b, a0);
+                if (fv < 0) return -1;
+                if (is_acc_float_kind(nk)) {
+                    int dst = new_temp_kind(b, KIND_DOUBLE);
+                    acc_tier_fa(acc_unop1(b, acc_name("fabs"), fv, dst), ACC_SUB_ACC_UNARY);
+                    return dst;
+                }
+                int64_t mask = nk == KIND_FLOAT16 ? 0x7fff
+                             : c_maths_mode == MATHS_IEEE ? 0x7fffffffLL : 0xff7fffffLL;
+                int dst = new_temp_kind(b, nk);
+                Op *op = ir_op_emit(cur_bb(b), IR_AND);
+                op->dst = dst; op->src[0] = fv; op->src[1] = -1;
+                op->imm = mask;
+                return dst;
+            }
+        }
+        /* __builtin_signbit (callfunction keeps the call only for the 32-bit
+           IEEE and MBF formats): the byte holding the sign bit is the top byte
+           for IEEE and the one below it for MBF; test its bit 7. */
+        if (n_args == 1 && strcmp(n->sym->name, "__builtin_signbit") == 0) {
+            int64_t sm = fp32_sign_mask();
+            Node *ai = array_get_byindex(n->args, 0);
+            int fv = build_expr(b, ai);
+            if (fv < 0) return -1;
+            fv = coerce_int_to_float_kind(b, fv, ai, KIND_DOUBLE);
+            if (fv < 0) return -1;
+            int sh = new_temp_kind(b, KIND_LONG);
+            Op *op = ir_op_emit(cur_bb(b), IR_SHR);
+            op->dst = sh; op->src[0] = fv; op->src[1] = -1;
+            op->imm = sm == 0x80000000LL ? 24 : 16;
+            int by = new_temp(b, 1), bm = new_temp(b, 1);
+            op = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+            op->dst = by; op->src[0] = sh;
+            op = ir_op_emit(cur_bb(b), IR_AND);
+            op->dst = bm; op->src[0] = by; op->src[1] = -1; op->imm = 0x80;
+            int dst = new_temp_kind(b, KIND_INT);
+            op = ir_op_emit(cur_bb(b), IR_CMP_NE);
+            op->dst = dst; op->src[0] = bm; op->src[1] = -1; op->imm = 0;
+            return dst;
+        }
+        /* __builtin_unreachable: a return marked as never reached, which
+           ir_opt_switch_unreachable uses to drop switch compares. The code
+           after it is parked in a fresh block. __builtin_assume only promises
+           a condition and changes nothing yet. */
+        if (n_args == 0 && strcmp(n->sym->name, "__builtin_unreachable") == 0) {
+            Op *rt = ir_emit_ret(cur_bb(b), -1);
+            rt->imm = IR_RET_UNREACH;
+            b->cur_bb_id = ir_bb_new(b->f);
+        }
+        if ((n_args == 0 && strcmp(n->sym->name, "__builtin_unreachable") == 0)
+            || (n_args == 1 && strcmp(n->sym->name, "__builtin_assume") == 0)) {
+            int dv = new_temp(b, 2);
+            ir_emit_ld_imm(cur_bb(b), dv, 0);
+            return dv;
         }
         /* Inline __builtin_strcpy (always — variable length, no const
            needed): IR_STRCPY (dst, src), lowered to a NUL-terminated
@@ -5776,7 +5940,12 @@ static int build_assign(Builder *b, Node *n)
         }
         if (is_acc_float_kind(node_value_kind(n->right))
             && kind_is_integer(store_k) && !is_acc_int_kind(store_k))
-            rhs_v = emit_acc_to_int(b, rhs_v, 4);
+            /* A store narrower than four bytes takes the int result: the long
+               would be built in DEHL only to be truncated. */
+            rhs_v = emit_acc_to_int(b, rhs_v,
+                        (!opt_disabled("acc-f2int-store") && type_width(store_t) <= 2)
+                            ? 2 : 4,
+                        store_t && store_t->isunsigned);
         /* Same for the register tier (f16 / IEEE-32 `double` under --math32):
            convert to the destination's width. Unlike the acc tier there is no
            width mismatch to trip the coercion below, so without this the raw
@@ -6479,7 +6648,8 @@ static int build_cast(Builder *b, Node *n)
        narrows the int result. */
     if (is_acc_float_kind(src_k) && !kind_is_floating(dst_k)
         && !is_acc_int_kind(dst_k)) {
-        int iv = emit_acc_to_int(b, src_v, (dst_w == 4) ? 4 : 2);
+        int iv = emit_acc_to_int(b, src_v, (dst_w == 4) ? 4 : 2,
+                                 n->type && n->type->isunsigned);
         if (dst_w == 1) {
             int bt = new_temp_kind(b, KIND_CHAR);
             Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
@@ -6848,8 +7018,10 @@ static int build_muldiv_integer(Builder *b, Node *n)
     /* Constant-multiply strength reduction: x*C → shifts + add/sub for
        cheap C, replacing the l_mult/l_long_mult helper. Skipped on
        targets with a hardware multiply (Rabbit `mul`), which keep the
-       helper. Integer width 2/4 only; one literal operand. */
+       helper. Integer width 2/4 only; one literal operand. Floating and
+       fixed-point values must stay on their typed helper paths. */
     if (n->ast_type == OP_MULT
+        && !is_flt && !is_fix16 && !is_fix32
         && !IS_RABBIT()
         && (width == 2 || width == 4)) {
         Node *litn = (n->right && n->right->ast_type == AST_LITERAL) ? n->right

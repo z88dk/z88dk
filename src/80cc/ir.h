@@ -146,6 +146,8 @@ typedef enum {
     IR_VREG_SLOT_UNUSED    = 1 << 13, /* [dead-slot-drop] the last render never
                                          touched this value's slot: the re-render
                                          gives it none (verified, see ir_lower) */
+    IR_VREG_WIDE_MEM       = 1 << 14, /* [wide-mem] marked NO_SLOT by that pass; cleared and
+                                         re-decided on every lowering of the function */
 } VRegFlags;
 
 typedef struct {
@@ -247,6 +249,9 @@ typedef enum {
     IR_NOT,
     IR_INC,
     IR_DEC,
+    IR_BSWAP,           /* dst = byte-reverse of src[0], width 4: bytes 0..3 -> 3..0
+                           (intrinsic_swap_endian_32, __builtin_bswap32). Width 2 is
+                           IR_ROTL by 8. */
 
     /* conversions (paper-trace finding #3) */
     IR_CONV_ZX,         /* zero-extend smaller→larger */
@@ -307,7 +312,8 @@ typedef enum {
                            Lowers to the l_case / l_long_case inline
                            table (char: inline cp chain). Terminator;
                            successors are sw->target_bb[] + default. */
-    IR_RET,             /* return src[0] (or no value if src[0]==-1) */
+    IR_RET,             /* return src[0] (or no value if src[0]==-1). imm ==
+                           IR_RET_UNREACH marks __builtin_unreachable. */
 
     /* calls */
     IR_CALL,            /* call function — CallInfo */
@@ -568,6 +574,8 @@ typedef struct {
     int         acc_src_litlab[2];  /* the i_<litlab> when acc_src_is_pool[i] */
     AccSubkind  acc_subkind;   /* IR_ACC_UNOP shape — see AccSubkind */
 } HelperInfo;
+
+#define IR_RET_UNREACH 0x756e72   /* IR_RET.imm of __builtin_unreachable */
 
 /* IR_SWITCH payload. Lowering route:
    is_char   → inline `ld a,l` + cp/jp z chain (cp is cheap);
