@@ -83,9 +83,7 @@ asm_shellsort:
    ; hl = nmemb, de = width. The 8-bit multiply swaps de when
    ; width < 256 and nmemb >= 256, so keep width across the call.
    push de
-   push ix
    call l_mulu_16_16x16
-   pop ix
    pop de                      ; width. pop does not change flags
    jp c, fail_mul              ; stack = base, gap_elems, caller exx
 
@@ -121,9 +119,7 @@ gap_loop:
    ld h,d                      ; hl = gap_elems
    ld e,c
    ld d,b                      ; de = width
-   push ix
    call l_mulu_16_16x16        ; hl = gap bytes
-   pop ix
    pop bc                      ; width
    jp c, fail_frame
 
