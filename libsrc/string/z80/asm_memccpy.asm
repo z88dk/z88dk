@@ -2,7 +2,7 @@
 ; ===============================================================
 ; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
-; 
+;
 ; void *memccpy(void * restrict s1, const void * restrict s2, int c, size_t n)
 ;
 ; Copy n chars from s2 to s1, stopping early the first time
@@ -28,8 +28,8 @@ asm_memccpy:
    ;          a = char c
    ;
    ; exit  :  a = char c
-   ;         de = ptr in dst following last char copied  
-   ; 
+   ;         de = ptr in dst following last char copied
+   ;
    ;         char c found
    ;
    ;            carry reset, z flag set
@@ -49,6 +49,7 @@ asm_memccpy:
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
 
+enter:
    ld (__memccpy_value),a
    dec bc
    inc b
@@ -88,7 +89,14 @@ match:
 test0:
    inc b
    dec b
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ; C was zero. B != 0 is a real multiple of 256. The Intel loop reads the
+   ; stop character from __memccpy_value and needs the dec/inc/inc setup.
+   ; Jumping to loop would compare against the BSS zero instead.
+   jr NZ,enter
+ELSE
    jr NZ,loop
+ENDIF
 
    jr nomatch
 

@@ -47,7 +47,8 @@ offset   size (bytes)   description
 
   0          2          next = pointer to next header
   2          2          committed = number of bytes allocated in this block + header size (0 if no allocation)
-  4          2          prev = pointer to previous header (0 if none)
+  4          2          prev = previous header. The first header uses
+                        this word as the free-list head (see below).
   6         ...         mem[] = allocated plus unallocated memory padding to next header
 
 The heap data type is very rich to allow full C11 compliance.  It
@@ -60,6 +61,30 @@ block can be resized in place.
 
 The memory allocation strategy is first fit, except for realloc which
 is largest fit.
+
+malloc and free search an address-ordered list of spare tails. A
+committed block with a tail of at least 7 bytes stores a 6-byte node
+there (next, prev, owner). A committed value of 0 is not listed, so
+the bytes at block+6 stay intact. malloc and largest-fit test the
+first block on every call, which is where that hole lives. The first
+header's prev word is the list head: 0 until the list is built, then
+a node, or the address of the word itself when the list is empty.
+Removing a tail splices that node from the prev and next words it
+already holds, after the owner word and the neighbour link both name
+this block. In-place realloc still compares the next header and does
+not walk the live blocks.
+
+A one-byte count of non-first committed == 0 holes lets largest-fit
+trust the free list when the count is 0. The count may stay high
+after one of those holes is allocated. A high count forces one
+address-chain scan, and that scan writes the count again.
+
+__CLIB_OPT_MALLOC in the target config selects this search. The
+Malloc section of config_clib.m4 sets it. 1 is the spare-tail
+search above. 0 is the address-chain walker: each call walks the
+block headers, and that walker is the smaller program. The
+library is built with 0. A different value takes effect when the
+library is assembled again.
 
 
 ========

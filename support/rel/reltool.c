@@ -8,7 +8,8 @@
  *   reltool -list   file.relx
  *   reltool -dump   file.relx
  *   reltool -disasm file.relx
- *   reltool -split  file.relx
+ *   reltool -split  file.relx   -> split the relx file into files with single elements
+ *   reltool -export file.relx   -> (not working yet) extract z88dk obj files from the relx file
  *
  */
 
@@ -39,7 +40,7 @@ typedef struct {
 } EXTERNAL;
 
 static EXTERNAL extsyms[256];
-static int extcount;
+static int ext_count;
 
 
 typedef enum {
@@ -59,6 +60,9 @@ typedef struct {
 
 RELOC relocs[2048];
 int reloc_count;
+
+
+static char module_name[64]="unk_module";
 
 
 static SYMBOL symbols[MAX_SYMBOLS];
@@ -128,6 +132,197 @@ static int current_segment = 0;
 
 
 
+/* ******************************************************
+
+         (START)   z88dk obj format output   (START)
+
+   ****************************************************** */
+
+static void wrd(FILE*f,unsigned v)
+{
+    fputc(v&255,f);
+    fputc(v>>8,f);
+    fputc(0,f);
+    fputc(0,f);
+} 
+
+static void wr32(FILE*f,unsigned v)
+{
+    fputc(v&255,f);
+    fputc(v>>8,f);
+    fputc(v>>16,f);
+    fputc(v>>24,f);
+} 
+
+
+static char *st[4096];
+static unsigned st_count;
+
+#define RANGE_WORD 1
+#define RANGE_UNDEFINED 0xffffffffu
+
+#define DEFAULT_CODE_SECTION "code_clib"
+#define DEFAULT_DATA_SECTION "data_clib"
+#define DEFAULT_BSS_SECTION  "bss_clib"
+
+
+static unsigned add_string(const char*s) {
+    unsigned i;
+    for(i=0;i<st_count;i++)
+        if(!strcmp(st[i],s)) return i;
+    st[st_count]=strdup(s);
+    return st_count++;
+}
+
+static void fix_symbol(char *name) {
+    while (*name)
+    {
+        if (*name == '$') *name = '_';
+        name++;
+    }
+}
+
+
+static void write_strtable(FILE*fp) {
+    unsigned i,pos=0,aligned,total=0;
+    long base=ftell(fp);
+
+    wrd(fp,st_count);
+    wrd(fp,0);
+    for(i=0;i<st_count;i++)
+        { wrd(fp,pos); pos+=(unsigned)strlen(st[i])+1; }
+    total=pos; aligned=(total+3)&~3u;
+    for(i=0;i<st_count;i++)
+        fwrite(st[i],1,strlen(st[i])+1,fp);
+    while(total++<aligned)
+        fputc(0,fp);
+    long end=ftell(fp);
+    fseek(fp,base+4,SEEK_SET);
+    wrd(fp,aligned);
+    fseek(fp,end,SEEK_SET);
+}
+
+
+static void write_object(const char*outname, int mod) {
+    unsigned code_sid, data_sid, bss_sid;
+    FILE*fp=fopen(outname,"wb");
+    long hdr,pexpr,psym,pext,pmod,psec,pstr,end;
+    int i;
+
+    if(!fp) return;
+    st_count=0;
+    add_string(""); 
+
+    unsigned fname_sid = add_string("RELtool-imported-module");
+
+    code_sid = add_string(DEFAULT_CODE_SECTION);
+    //data_sid = add_string(DEFAULT_DATA_SECTION);
+    //bss_sid = add_string(DEFAULT_BSS_SECTION);
+
+    add_string(module_name);
+    for(i=0;i<symbol_count;i++) add_string(symbols[i].name);
+    for(i=0;i<ext_count;i++) add_string(extsyms[i].name);
+
+    fwrite("Z80RMF18",1,8,fp);
+
+    /* cpu_id (8080 works also for Z80) */
+    wrd(fp,10);  //  (1=Z80, 10=8080, 11=8085)
+
+    /* swap_ixiy */
+    wrd(fp,0);
+
+    hdr=ftell(fp); for(i=0;i<6;i++) wr32(fp,0xffffffffu);
+
+
+    /* --------------------------------------------------
+     * Expressions Area
+     * -------------------------------------------------- */
+    pexpr=ftell(fp);
+    for(i=0;i<reloc_count;i++) {
+        const char*s=relocs[i].symbol?relocs[i].symbol:"";
+        add_string(s);
+
+
+        wrd(fp,RANGE_WORD);
+        wrd(fp,0);                        // filename
+        wrd(fp,0);                        // line
+        wrd(fp,0);                        // section?
+        //wrd(fp,code_sid);
+
+        wrd(fp,relocs[i].addr);           // asmpc
+        wrd(fp,relocs[i].addr);           // code_pos
+        wrd(fp,2);                        // opcode_size
+        wrd(fp,add_string(s));            // target_name
+        wrd(fp,add_string(s));            // expression_text
+    }
+    wr32(fp,RANGE_UNDEFINED);
+    psym=ftell(fp);
+
+    for(i=0;i<symbol_count;i++) {
+        wrd(fp,2);
+        wrd(fp,2);   // 1-C, 2-A,
+        wrd(fp,code_sid);
+        wrd(fp,symbols[i].value);
+        wrd(fp,add_string(symbols[i].name));
+        wrd(fp,fname_sid);   // TODO: add source file reference
+        wrd(fp,mod);         // Module number
+    }
+    wrd(fp,0);
+
+    /* --------------------------------------------------
+     * Externals Area
+     * -------------------------------------------------- */
+    pext=ftell(fp);
+    for(i=0;i<ext_count;i++) wrd(fp,add_string(extsyms[i].name));
+    wrd(fp,0);
+    pmod=ftell(fp);
+    wrd(fp,add_string(module_name));
+    psec=ftell(fp);
+
+    /* --------------------------------------------------
+     * Sections Area
+     * -------------------------------------------------- */
+    wrd(fp,progsize?progsize:proglen);    // code_size
+    wrd(fp,code_sid);                     //section
+    wr32(fp,0xffffffffu);                 // org                 
+    wrd(fp,1);                            // align
+
+    fwrite(prog,1,progsize?progsize:proglen,fp);
+    while(ftell(fp)&3) fputc(0,fp);
+    wr32(fp,0xffffffffu);
+
+    /* --------------------------------------------------
+     * String Table
+     * -------------------------------------------------- */
+#ifdef DEBUG
+    for(i=0;i<st_count;i++)
+        printf("%3d : '%s'\n",i,st[i]);
+#endif
+    pstr=ftell(fp); write_strtable(fp);
+    end=ftell(fp);
+    fseek(fp,hdr,SEEK_SET);
+    wrd(fp,pmod);   wrd(fp,pexpr);   wrd(fp,psym);
+    wrd(fp,pext);   wrd(fp,psec);    wrd(fp,pstr);
+#ifdef DEBUG
+    printf("pexpr=%04lX\n",pexpr);
+    printf("psym =%04lX\n",psym);
+    printf("pext =%04lX\n",pext);
+    printf("pmod =%04lX\n",pmod);
+    printf("psec =%04lX\n",psec);
+    printf("pstr =%04lX\n",pstr);
+#endif
+    fseek(fp,end,SEEK_SET);
+    fclose(fp);
+    }
+
+/* ******************************************************
+
+          (END)   z88dk obj format output   (END)
+
+   ****************************************************** */
+
+
+
 #ifdef DEBUG
 static void dump_chain(unsigned char *prog, unsigned p)
 {
@@ -146,7 +341,7 @@ static void dump_chain(unsigned char *prog, unsigned p)
 }
 #endif
 
-static RELOC *find_reloc(unsigned addr){
+static RELOC *find_reloc(unsigned addr) {
     int i;
     for (i = 0; i < reloc_count; i++)
     {
@@ -161,11 +356,11 @@ static void add_external(unsigned char *prog, const char *name, unsigned chain)
 {
     unsigned p;
 
-    if (extcount >= 256)
+    if (ext_count >= 256)
         return;
 
-    strcpy(extsyms[extcount].name, name);
-    extsyms[extcount].chain = chain;
+    strcpy(extsyms[ext_count].name, name);
+    extsyms[ext_count].chain = chain;
 
     p = chain;
 
@@ -178,19 +373,19 @@ static void add_external(unsigned char *prog, const char *name, unsigned chain)
             relocs[reloc_count].addr   = p;
             relocs[reloc_count].target = 0;
             relocs[reloc_count].type   = REL_EXTERNAL;
-            relocs[reloc_count].symbol = extsyms[extcount].name;
+            relocs[reloc_count].symbol = extsyms[ext_count].name;
             reloc_count++;
         }
         else
         {
             r->type   = REL_EXTERNAL;
-            r->symbol = extsyms[extcount].name;
+            r->symbol = extsyms[ext_count].name;
         }
 
         p = prog[p] | (prog[p+1] << 8);
     }
 
-    extcount++;
+    ext_count++;
 }
 
 
@@ -202,7 +397,7 @@ static void add_external(unsigned char *prog, const char *name, unsigned chain)
 //  printf("lookup_external(%04X)\n", addr);
 //#endif
 //
-//    for (i = 0; i < extcount; i++)
+//    for (i = 0; i < ext_count; i++)
 //    {
 //        unsigned p = extsyms[i].chain;
 //
@@ -913,6 +1108,7 @@ static void disasm_module(void)
 }
 
 
+
 static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
 {
     unsigned len;
@@ -979,15 +1175,21 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
 
         printf("\"%s\"", name);
 
+        if (ctrl == PROGRAM_NAME) {
+            strcpy(module_name, name);
+        }
+
         if (ctrl == CHAIN_EXTERNAL) {
 #ifdef DEBUG
             printf(" chain:");
             dump_chain(prog, value);
 #endif
+            if (dumpmode == 3) fix_symbol(name);
             add_external(prog, name, value);
         }
 
         if (ctrl == DEFINE_ENTRY_POINT) {
+            if (dumpmode == 3) fix_symbol(name);
             add_symbol(name,atype,value);
         }
     }
@@ -1011,7 +1213,7 @@ static void do_dump(FILE *f, int dumpmode)
     {
         long pos = ftell(f) - 1;
 
-        if (dumpmode) printf("%05lX  ", pos);
+        if (dumpmode < 3) printf("%05lX  ", pos);
 
         switch (tok)
         {
@@ -1021,7 +1223,7 @@ static void do_dump(FILE *f, int dumpmode)
 
                 read8(f, &v);
                 code_put8(v);
-                if (dumpmode) printf("ABS %02X\n", v);
+                if (dumpmode < 3) printf("ABS %02X\n", v);
                 break;
             }
 
@@ -1035,11 +1237,11 @@ static void do_dump(FILE *f, int dumpmode)
                 code_put16(v, tok);
 
                 if (tok == TOK_PRGREL)
-                    if (dumpmode) printf("PROGREL %04X\n", v);
+                    if (dumpmode < 3) printf("PROGREL %04X\n", v);
                 if (tok == TOK_DATAREL)
-                    if (dumpmode) printf("DATAREL %04X\n", v);
+                    if (dumpmode < 3) printf("DATAREL %04X\n", v);
                 if (tok == TOK_COMREL)
-                    if (dumpmode) printf("COMREL %04X\n", v);
+                    if (dumpmode < 3) printf("COMREL %04X\n", v);
 
                 break;
             }
@@ -1052,7 +1254,7 @@ static void do_dump(FILE *f, int dumpmode)
                 read8(f, &b);
                 read8(f, &n);
 
-                if (dumpmode) printf("PAD raw=%02X bits=%u\n", b, n);
+                if (dumpmode < 3) printf("PAD raw=%02X bits=%u\n", b, n);
                 break;
             }
 
@@ -1071,15 +1273,27 @@ static void do_dump(FILE *f, int dumpmode)
                     printf("DATA LEN     : %04X\n", datalen);
 #endif
                     if (progsize == 0) progsize = proglen;
-                    printf("\n\n--- DISASSEMBLY ---\n");
-                    disasm_module();
-                    dump_data_module();
-                    printf("\n--- --- --- --- ---\n\n");
+                    if (dumpmode == 2) {
+                        printf("\n\n--- DISASSEMBLY ---\n");
+                        disasm_module();
+                        dump_data_module();
+                        printf("\n--- --- --- --- ---\n\n");
+                    }
+
+                    if (dumpmode == 3)
+                    {
+                        char objname[128];
+
+                        sprintf(objname, "%s.o", module_name);
+                        write_object(objname,mod);
+
+                        printf("Written: %s\n", objname);
+                    }
 
                     proglen = progsize = 0;
                     datalen = datasize = 0;
                     reloc_count = 0;
-                    extcount = 0;
+                    ext_count = 0;
                     symbol_count = 0;
 
                     mod++;
@@ -1154,6 +1368,8 @@ static void do_split(FILE *f, const char *srcname)
 }
 
 
+
+
 int main(int argc, char *argv[])
 {
     FILE *f;
@@ -1164,7 +1380,9 @@ int main(int argc, char *argv[])
         printf("  reltool -list   file.relx\n");
         printf("  reltool -dump   file.relx\n");
         printf("  reltool -disasm file.relx\n");
-        printf("  reltool -split  file.relx\n");
+        printf("  reltool -split  file.relx   -> cut the relx into files with single elements\n");
+        printf("  reltool -export file.relx   -> (not working) extract z88dk obj files from the relx file\n");
+
         return 1;
     }
 
@@ -1188,6 +1406,9 @@ int main(int argc, char *argv[])
 
     else if (!strcmp(argv[1], "-split"))
         do_split(f, argv[2]);
+
+    else if (!strcmp(argv[1], "-export"))
+        do_dump(f,3);
 
     else
         printf("Unknown option\n");

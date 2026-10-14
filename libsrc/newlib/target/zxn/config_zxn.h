@@ -305,6 +305,11 @@
 #define __CLIB_OPT_SORT_QSORT_ENABLE_INSERTION  0x04
 #define __CLIB_OPT_SORT_QSORT_ENABLE_EQUAL  0x08
 
+#define __CLIB_OPT_MALLOC  0
+
+#define __CLIB_OPT_MALLOC_SMALL  0
+#define __CLIB_OPT_MALLOC_FAST  1
+
 #define __CLIB_OPT_ERROR  0x00
 
 #define __CLIB_OPT_ERROR_ENABLED  0x01
@@ -2945,8 +2950,8 @@
 // Sets the X pixel offset (two high bits) used for drawing Tilemap graphics on the screen
 #define REG_TILEMAP_OFFSET_X_MSB 0x2f
 
-// Sets the X pixel offset (two low bits) used for drawing Tilemap graphics on the screen
-#define REG_TILEMAP_OFFSET_X_LSB 0x3
+// Sets the X pixel offset (eight low bits) used for drawing Tilemap graphics on the screen
+#define REG_TILEMAP_OFFSET_X_LSB 0x30
 
 // Sets the Y pixel offset used for drawing Tilemap graphics on the screen
 #define REG_TILEMAP_OFFSET_Y 0x31
@@ -2970,6 +2975,77 @@
 
 // Tilemap second palette
 #define RPC_SELECT_TILEMAP_PALETTE_1 0x70
+
+// ------------------------------------------
+// Tilemap control register and flags
+// ------------------------------------------
+
+// Controls the tilemap mode and enables it
+#define REG_TILEMAP_CONTROL 0x6B
+
+// Enable the tilemap
+#define RTC_ENABLE_TILEMAP 0x80
+
+// Tilemap size: 40x32 (default) or 80x32
+#define RTC_40x32_MODE 0x00
+#define RTC_80x32_MODE 0x40
+
+// Eliminate the attribute entry in the tilemap
+#define RTC_ELIMINATE_ATTRIBUTE_BYTE 0x20
+
+// Palette select: first (default) or second tilemap palette
+#define RTC_SELECT_PALETTE_0 0x00
+#define RTC_SELECT_PALETTE_1 0x10
+
+// Select textmode
+#define RTC_ACTIVATE_TEXT_MODE 0x08
+
+// Activate 512 tile mode
+#define RTC_ACTIVATE_512_TILE_MODE 0x02
+
+// Force the tilemap on top of the ULA
+#define RTC_FORCE_TILEMAP_OVER_ULA 0x01
+
+// --------------------------------------------------
+// Default tilemap attribute register and flags
+// --------------------------------------------------
+
+// Attribute applied to every tile when REG_TILEMAP_CONTROL bit 5 is set
+#define REG_DEFAULT_TILEMAP_ATTRIBUTE 0x6C
+
+// Palette offset occupies the four high bits
+#define RDTA_PALETTE_OFFSET_MASK 0xF0
+
+// Mirror the tile horizontally
+#define RDTA_X_MIRROR 0x08
+
+// Mirror the tile vertically
+#define RDTA_Y_MIRROR 0x04
+
+// Rotate the tile
+#define RDTA_ROTATE 0x02
+
+// Draw the ULA over the tilemap. In 512 tile mode this bit is bit 8 of the tile number instead
+#define RDTA_ULA_OVER_TILEMAP 0x01
+#define RDTA_TILE_INDEX_BIT_8 0x01
+
+// ------------------------------------------------------
+// Tilemap and tile definition base address registers
+// ------------------------------------------------------
+
+// MSB of the tilemap base address as an offset into bank 5 or bank 7
+#define REG_TILEMAP_BASE_ADDRESS 0x6E
+
+// MSB of the tile definitions base address as an offset into bank 5 or bank 7
+#define REG_TILE_DEFINITIONS_BASE_ADDRESS 0x6F
+
+// Select bank 7 rather than bank 5 for the two registers above
+#define RTBA_SELECT_BANK_7 0x80
+#define RTDBA_SELECT_BANK_7 0x80
+
+// Offset within the bank occupies the six low bits
+#define RTBA_OFFSET_MASK 0x3F
+#define RTDBA_OFFSET_MASK 0x3F
 
 
 
@@ -3041,6 +3117,759 @@
 
 // Enable cliping of sprites over the border
 #define RSLS_ENABLE_SPRITES_CLIPING_OVER_BORDER 0x20
+
+
+
+
+
+// ------------------------------------------
+// ULA control and display control registers
+// ------------------------------------------
+
+// Controls the ULA output and how it is blended with the tilemap
+#define REG_ULA_CONTROL 0x68
+
+// Disable the ULA output
+#define RUC_DISABLE_ULA_OUTPUT 0x80
+
+// Blending in SLU modes 6 and 7 (bits 6:5)
+#define RUC_ULA_AS_BLEND_COLOR 0x00
+#define RUC_NO_BLENDING 0x20
+#define RUC_ULA_TILEMAP_MIX_AS_BLEND_COLOR 0x40
+#define RUC_TILEMAP_AS_BLEND_COLOR 0x60
+
+// Cancel entries in the 8x5 matrix for the extended keys
+#define RUC_CANCEL_EXTENDED_KEYS_IN_MATRIX 0x10
+
+// Enable ULA+
+#define RUC_ENABLE_ULA_PLUS 0x08
+
+// ULA half pixel scroll
+#define RUC_HALF_PIXEL_SCROLL 0x04
+
+// Enable stencil mode when both the ULA and the tilemap are enabled
+#define RUC_ENABLE_STENCIL_MODE 0x01
+
+// ------------------------------------------
+// Display control 1
+// ------------------------------------------
+
+// Enables layer 2 and the ULA shadow display and aliases the Timex display modes
+#define REG_DISPLAY_CONTROL 0x69
+
+// Enable layer 2 (alias of port 0x123B bit 1)
+#define RDC_ENABLE_LAYER_2 0x80
+
+// Enable the ULA shadow display (alias of port 0x7FFD bit 3)
+#define RDC_ENABLE_ULA_SHADOW_DISPLAY 0x40
+
+// Timex display mode bits (alias of port 0xFF bits 5:0)
+#define RDC_TIMEX_DISPLAY_MODE_MASK 0x3F
+
+// ------------------------------------------
+// ULA scroll
+// ------------------------------------------
+
+// ULA X offset (0-255)
+#define REG_ULA_OFFSET_X 0x26
+
+// ULA Y offset (0-191)
+#define REG_ULA_OFFSET_Y 0x27
+
+// ------------------------------------------
+// LoRes control
+// ------------------------------------------
+
+#define REG_LORES_CONTROL 0x6A
+
+// LoRes is Radastan mode: 128x96x4 in 6144 bytes
+#define RLC_RADASTAN_MODE 0x20
+
+// Radastan Timex display file xor
+#define RLC_RADASTAN_TIMEX_XOR 0x10
+
+// Palette offset occupies the four low bits (only bits 1:0 apply in ULA+ mode)
+#define RLC_PALETTE_OFFSET_MASK 0x0F
+
+
+
+
+
+// ------------------------------------------
+// Layer 2 control register and flags
+// ------------------------------------------
+
+// Selects the layer 2 resolution and palette offset
+#define REG_LAYER_2_CONTROL 0x70
+
+// Layer 2 resolution (bits 5:4)
+#define RL2C_RESOLUTION_256x192x8 0x00
+#define RL2C_RESOLUTION_320x256x8 0x10
+#define RL2C_RESOLUTION_640x256x4 0x20
+
+// Palette offset occupies the four low bits
+#define RL2C_PALETTE_OFFSET_MASK 0x0F
+
+// ------------------------------------------
+// Layer 2 X scroll MSB
+// ------------------------------------------
+
+// Bit 0 is the MSB of the layer 2 horizontal scroll amount
+#define REG_LAYER_2_OFFSET_X_MSB 0x71
+
+
+
+
+
+// --------------------------------------------------------
+// Interrupt control status and enable registers
+// --------------------------------------------------------
+
+// Selects the maskable interrupt mode and the programmable im2 vector
+#define REG_INTERRUPT_CONTROL 0xC0
+
+// Programmable portion of the im2 vector occupies the three high bits
+#define RIC_IM2_VECTOR_MASK 0xE0
+
+// Enable stackless nmi response
+#define RIC_ENABLE_STACKLESS_NMI 0x08
+
+// Current Z80 interrupt mode (read only) in bits 2:1
+#define RIC_Z80_INTERRUPT_MODE_MASK 0x06
+
+// Maskable interrupt mode: pulse (0) or hardware im2 (1)
+#define RIC_MODE_PULSE 0x00
+#define RIC_MODE_HW_IM2 0x01
+
+// --------------------------------------------------------
+// Interrupt enable registers
+// --------------------------------------------------------
+// A disabled device interrupt enters a polled mode
+
+#define REG_INTERRUPT_ENABLE_0 0xC4
+#define REG_INTERRUPT_ENABLE_1 0xC5
+#define REG_INTERRUPT_ENABLE_2 0xC6
+
+// --------------------------------------------------------
+// Interrupt status registers
+// --------------------------------------------------------
+// Reading a set bit means the device generated an interrupt or one is pending
+// Writing a set bit clears that status
+
+#define REG_INTERRUPT_STATUS_0 0xC8
+#define REG_INTERRUPT_STATUS_1 0xC9
+#define REG_INTERRUPT_STATUS_2 0xCA
+
+// --------------------------------------------------------
+// DMA interrupt enable registers
+// --------------------------------------------------------
+// A set bit means the interrupt will interrupt a dma operation in hardware im2 mode
+
+#define REG_DMA_INTERRUPT_ENABLE_0 0xCC
+#define REG_DMA_INTERRUPT_ENABLE_1 0xCD
+#define REG_DMA_INTERRUPT_ENABLE_2 0xCE
+
+// --------------------------------------------------------
+// Bits shared by the group 0 registers above
+// --------------------------------------------------------
+// Bit 7 is the expansion bus /INT in REG_INTERRUPT_ENABLE_0 and the NMI in
+// REG_DMA_INTERRUPT_ENABLE_0. It is reserved in REG_INTERRUPT_STATUS_0
+
+#define RI0_EXPANSION_BUS 0x80
+#define RI0_NMI 0x80
+#define RI0_LINE 0x02
+#define RI0_ULA 0x01
+
+// --------------------------------------------------------
+// Bits shared by the group 1 registers above (CTC channels)
+// --------------------------------------------------------
+
+#define RI1_CTC_CHANNEL_0 0x01
+#define RI1_CTC_CHANNEL_1 0x02
+#define RI1_CTC_CHANNEL_2 0x04
+#define RI1_CTC_CHANNEL_3 0x08
+#define RI1_CTC_CHANNEL_4 0x10
+#define RI1_CTC_CHANNEL_5 0x20
+#define RI1_CTC_CHANNEL_6 0x40
+#define RI1_CTC_CHANNEL_7 0x80
+
+// --------------------------------------------------------
+// Bits shared by the group 2 registers above (UART)
+// --------------------------------------------------------
+// The Rx available and Rx near full sources share one interrupt and
+// Rx near full overrides Rx available
+
+#define RI2_UART0_RX_AVAILABLE 0x01
+#define RI2_UART0_RX_NEAR_FULL 0x02
+#define RI2_UART0_TX_EMPTY 0x04
+#define RI2_UART1_RX_AVAILABLE 0x10
+#define RI2_UART1_RX_NEAR_FULL 0x20
+#define RI2_UART1_TX_EMPTY 0x40
+
+// --------------------------------------------------------
+// Vertical line count offset
+// --------------------------------------------------------
+
+// Offset added to the vertical line counter. It affects the copper the line
+// interrupt and the active line count. A change takes up to one frame to occur
+#define REG_LINE_INTERRUPT_OFFSET 0x64
+
+// --------------------------------------------------------
+// Generate maskable interrupt
+// --------------------------------------------------------
+// Reading a set bit means the interrupt occurred or is pending (alias of bits
+// in REG_INTERRUPT_STATUS_0 to REG_INTERRUPT_STATUS_2). Writing a set bit
+// always generates a maskable interrupt regardless of the enables
+
+#define REG_GENERATE_MASKABLE_INTERRUPT 0x20
+
+#define RGMI_LINE 0x80
+#define RGMI_ULA 0x40
+#define RGMI_CTC_CHANNEL_0 0x01
+#define RGMI_CTC_CHANNEL_1 0x02
+#define RGMI_CTC_CHANNEL_2 0x04
+#define RGMI_CTC_CHANNEL_3 0x08
+
+// --------------------------------------------------------
+// NMI return address
+// --------------------------------------------------------
+// The return address written during an nmi acknowledge cycle is always stored here
+
+#define REG_NMI_RETURN_ADDRESS_L 0xC2
+#define REG_NMI_RETURN_ADDRESS_H 0xC3
+
+
+
+
+
+// ------------------------------------------
+// Extended keys registers
+// ------------------------------------------
+// Nextreg 0x68 bit 4 (RUC_CANCEL_EXTENDED_KEYS_IN_MATRIX) stops the extended
+// keys from making entries in the 8x5 matrix
+
+// Read the state of the first group of extended keys
+#define REG_EXTENDED_KEYS_0 0xB0
+
+#define REK0_SEMICOLON 0x80
+#define REK0_QUOTE 0x40
+#define REK0_COMMA 0x20
+#define REK0_PERIOD 0x10
+#define REK0_UP 0x08
+#define REK0_DOWN 0x04
+#define REK0_LEFT 0x02
+#define REK0_RIGHT 0x01
+
+// Read the state of the second group of extended keys
+#define REG_EXTENDED_KEYS_1 0xB1
+
+#define REK1_DELETE 0x80
+#define REK1_EDIT 0x40
+#define REK1_BREAK 0x20
+#define REK1_INV_VIDEO 0x10
+#define REK1_TRUE_VIDEO 0x08
+#define REK1_GRAPH 0x04
+#define REK1_CAPS_LOCK 0x02
+#define REK1_EXTEND 0x01
+
+// ------------------------------------------
+// Extended MD pad buttons
+// ------------------------------------------
+// Read only. A set bit means the button is pressed
+
+#define REG_EXTENDED_MD_PAD_BUTTONS 0xB2
+
+#define REMPB_RIGHT_X 0x80
+#define REMPB_RIGHT_Z 0x40
+#define REMPB_RIGHT_Y 0x20
+#define REMPB_RIGHT_MODE 0x10
+#define REMPB_LEFT_X 0x08
+#define REMPB_LEFT_Z 0x04
+#define REMPB_LEFT_Y 0x02
+#define REMPB_LEFT_MODE 0x01
+
+
+
+
+
+// ------------------------------------------
+// Peripheral 5 setting
+// ------------------------------------------
+
+// Multiface type mouse dpi and mouse button order
+#define REG_PERIPHERAL_5 0x0A
+
+// Multiface type (bits 7:6) (config mode only)
+#define RP5_MULTIFACE_P3 0x00
+#define RP5_MULTIFACE_128_V87_2 0x40
+#define RP5_MULTIFACE_128_V87_12 0x80
+#define RP5_MULTIFACE_1 0xC0
+
+// Swap sd0 and sd1 (config mode only)
+#define RP5_SWAP_SD0_SD1 0x20
+
+// Enable divmmc automap
+#define RP5_ENABLE_DIVMMC_AUTOMAP 0x10
+
+// Reverse the left and right mouse buttons
+#define RP5_MOUSE_REVERSE_BUTTONS 0x08
+
+// Mouse dpi (bits 1:0)
+#define RP5_MOUSE_LOW_DPI 0x00
+#define RP5_MOUSE_DEFAULT_DPI 0x01
+#define RP5_MOUSE_MEDIUM_DPI 0x02
+#define RP5_MOUSE_HIGH_DPI 0x03
+
+// ------------------------------------------
+// Joystick I/O mode
+// ------------------------------------------
+// While in i/o mode the joystick ports are driven as general purpose pins.
+// Keyboard joystick types produce no readings but the pins can still be read
+// via the Kempston ports
+
+#define REG_JOYSTICK_IO_MODE 0x0B
+
+// Enable i/o mode
+#define RJIM_ENABLE_IO_MODE 0x80
+
+// I/O mode (bits 5:4)
+#define RJIM_MODE_BIT_BANG 0x00
+#define RJIM_MODE_CLOCK 0x10
+#define RJIM_MODE_UART_LEFT_PORT 0x20
+#define RJIM_MODE_UART_RIGHT_PORT 0x30
+
+// Mode parameter. Bit bang mode: pin 7 state. Clock mode: run the clock.
+// Uart mode: redirect the pi uart1 (1) instead of the esp uart0 (0)
+#define RJIM_PARAMETER 0x01
+
+
+
+
+
+// ------------------------------------------
+// DAC mirror registers
+// ------------------------------------------
+// Writing sends an 8-bit sample to the corresponding side. Reading returns the
+// MSB of the current I2S sample whose LSB is latched into REG_DAC_MONO (0x2D)
+// These registers let the copper drive the stereo DACs
+
+// 8-bit sample written to the left side DAC B
+#define REG_DAC_LEFT 0x2C
+
+// 8-bit sample written to the right side DAC C
+#define REG_DAC_RIGHT 0x2E
+
+
+
+
+
+// ------------------------------------------
+// Copper 16-bit data write
+// ------------------------------------------
+// Values are written in pairs: first the MSB for an even copper address and
+// then the LSB for an odd copper address. The whole 16-bit instruction is
+// stored at once after the LSB is written. The copper address auto-increments
+// after each write
+
+#define REG_COPPER_DATA_16 0x63
+
+
+
+
+
+// ------------------------------------------
+// Expansion bus enable
+// ------------------------------------------
+// Bits 7:4 take effect immediately. Bits 3:0 are copied into bits 7:4 on a soft reset
+
+#define REG_EXPANSION_BUS_ENABLE 0x80
+
+// Enable the expansion bus
+#define REBE_ENABLE 0x80
+
+// Enable romcs rom replacement from divmmc banks 14 and 15
+#define REBE_ENABLE_ROMCS_REPLACEMENT 0x40
+
+// Disable i/o cycles and ignore iorqula
+#define REBE_DISABLE_IO_CYCLES 0x20
+
+// Disable memory cycles and ignore romcs
+#define REBE_DISABLE_MEMORY_CYCLES 0x10
+
+// The same settings applied on the next soft reset
+#define REBE_ENABLE_ON_SOFT_RESET 0x08
+#define REBE_ENABLE_ROMCS_REPLACEMENT_ON_SOFT_RESET 0x04
+#define REBE_DISABLE_IO_CYCLES_ON_SOFT_RESET 0x02
+#define REBE_DISABLE_MEMORY_CYCLES_ON_SOFT_RESET 0x01
+
+// ------------------------------------------
+// Expansion bus control
+// ------------------------------------------
+
+#define REG_EXPANSION_BUS_CONTROL 0x81
+
+// ROMCS is asserted on the expansion bus (read only)
+#define REBC_ROMCS_ASSERTED 0x80
+
+// Allow peripherals to override the ULA on some even port reads (Rotronics Wafadrive)
+#define REBC_ALLOW_ULA_OVERRIDE 0x40
+
+// Disable the expansion bus nmi debounce (Opus Discovery)
+#define REBC_DISABLE_NMI_DEBOUNCE 0x20
+
+// Propagate the max cpu clock at all times including when the expansion bus is off
+#define REBC_PROPAGATE_MAX_CPU_CLOCK 0x10
+
+// Enable +3 fdc signals on the expansion bus (issue 5 only)
+#define REBC_ENABLE_P3_FDC_SIGNALS 0x08
+
+// Max cpu speed while the expansion bus is on (bits 1:0 and currently fixed at 3.5MHz)
+#define REBC_MAX_CPU_SPEED_MASK 0x03
+#define REBC_MAX_CPU_SPEED_3MHZ 0x00
+
+// --------------------------------------------------------
+// Port decoding enables
+// --------------------------------------------------------
+// Two 32-bit registers with the least significant byte first. A clear bit
+// disables the internal device. The internal enables always apply. While the
+// expansion bus is on the expansion bus enables are ANDed with them and io
+// cycles to a disabled port propagate to the expansion bus
+
+#define REG_INTERNAL_PORT_DECODING_0 0x82
+#define REG_INTERNAL_PORT_DECODING_1 0x83
+#define REG_INTERNAL_PORT_DECODING_2 0x84
+#define REG_INTERNAL_PORT_DECODING_3 0x85
+
+#define REG_EXPANSION_BUS_DECODING_0 0x86
+#define REG_EXPANSION_BUS_DECODING_1 0x87
+#define REG_EXPANSION_BUS_DECODING_2 0x88
+#define REG_EXPANSION_BUS_DECODING_3 0x89
+
+// Bits of REG_INTERNAL_PORT_DECODING_0 and REG_EXPANSION_BUS_DECODING_0
+#define RPD0_PORT_FF 0x01
+#define RPD0_PORT_7FFD 0x02
+#define RPD0_PORT_DFFD 0x04
+#define RPD0_PORT_1FFD 0x08
+#define RPD0_P3_FLOATING_BUS 0x10
+#define RPD0_ZXN_DMA 0x20
+#define RPD0_KEMPSTON_1 0x40
+#define RPD0_KEMPSTON_2 0x80
+
+// Bits of REG_INTERNAL_PORT_DECODING_1 and REG_EXPANSION_BUS_DECODING_1
+#define RPD1_DIVMMC 0x01
+#define RPD1_MULTIFACE 0x02
+#define RPD1_I2C 0x04
+#define RPD1_SPI 0x08
+#define RPD1_UART 0x10
+#define RPD1_MOUSE 0x20
+#define RPD1_SPRITES 0x40
+#define RPD1_LAYER_2 0x80
+
+// Bits of REG_INTERNAL_PORT_DECODING_2 and REG_EXPANSION_BUS_DECODING_2
+#define RPD2_AY 0x01
+#define RPD2_DAC_SOUNDRIVE_1 0x02
+#define RPD2_DAC_SOUNDRIVE_2 0x04
+#define RPD2_DAC_STEREO_PROFI_COVOX 0x08
+#define RPD2_DAC_STEREO_COVOX 0x10
+#define RPD2_DAC_MONO_PENTAGON_ATM 0x20
+#define RPD2_DAC_MONO_GS_COVOX 0x40
+#define RPD2_DAC_MONO_SPECDRUM 0x80
+
+// Bits of REG_INTERNAL_PORT_DECODING_3 and REG_EXPANSION_BUS_DECODING_3
+#define RPD3_ULA_PLUS 0x01
+#define RPD3_Z80_DMA 0x02
+#define RPD3_PENTAGON_1024 0x04
+#define RPD3_CTC 0x08
+
+// Register reset mode: selects whether these registers are set on a soft or a hard reset
+#define RPD3_REGISTER_RESET_MODE 0x80
+
+// ------------------------------------------
+// Expansion bus io propagate
+// ------------------------------------------
+// While the expansion bus is on the io cycles for the selected ports are also
+// sent to the bus so external peripherals can follow the internal state. Values read
+// from the bus on port 0xfe are mixed into keyboard reads
+
+#define REG_EXPANSION_BUS_IO_PROPAGATE 0x8A
+
+#define REBIP_PORT_EFF7 0x20
+#define REBIP_PORT_FF 0x10
+#define REBIP_PORT_1FFD 0x08
+#define REBIP_PORT_DFFD 0x04
+#define REBIP_PORT_7FFD 0x02
+#define REBIP_PORT_FE 0x01
+
+
+
+
+
+// ------------------------------------------
+// Alternate ROM
+// ------------------------------------------
+// Bits 7:4 take effect immediately. Bits 3:0 are copied into bits 7:4 on a soft reset
+
+#define REG_ALTERNATE_ROM 0x8C
+
+// Enable the alternate rom
+#define RAR_ENABLE 0x80
+
+// Make the alternate rom visible only during writes instead of replacing the rom during reads
+#define RAR_WRITE_ONLY 0x40
+
+// Lock ROM1 (the 48K rom) and ROM0 (the 128K rom). Applies even while the alternate rom is disabled
+#define RAR_LOCK_ROM1 0x20
+#define RAR_LOCK_ROM0 0x10
+
+// The same settings applied on the next soft reset
+#define RAR_ENABLE_ON_SOFT_RESET 0x08
+#define RAR_WRITE_ONLY_ON_SOFT_RESET 0x04
+#define RAR_LOCK_ROM1_ON_SOFT_RESET 0x02
+#define RAR_LOCK_ROM0_ON_SOFT_RESET 0x01
+
+// ------------------------------------------
+// Spectrum 128K memory mapping
+// ------------------------------------------
+// A single register view of ports 0x7ffd and 0xdffd and 0x1ffd. Writes take
+// effect at once as if made through the ports
+
+#define REG_SPECTRUM_128K_MAPPING 0x8E
+
+// RAM bank 0-15 in bits 7:4 (port 0xdffd bit 0 and port 0x7ffd bits 2:0)
+#define RSM_RAM_BANK_MASK 0xF0
+
+// Write 1 to change the RAM bank. Always reads as 1
+#define RSM_CHANGE_RAM_BANK 0x08
+
+// Paging mode: special all RAM (port 0x1ffd bit 0)
+#define RSM_ALL_RAM 0x04
+
+// ROM select or the all RAM configuration when RSM_ALL_RAM is set (bits 1:0)
+#define RSM_ROM_MASK 0x03
+#define RSM_ALL_RAM_MASK 0x03
+
+// ------------------------------------------
+// Memory mapping mode
+// ------------------------------------------
+// How ports 0x7ffd and 0xdffd and 0x1ffd and 0xeff7 page memory
+
+#define REG_MEMORY_MAPPING_MODE 0x8F
+
+#define RMMM_ZX_128K_P3 0x00
+#define RMMM_PENTAGON_512K 0x02
+#define RMMM_PENTAGON_1024K 0x03
+
+
+
+
+
+// ------------------------------------------
+// Raspberry Pi GPIO
+// ------------------------------------------
+// Two 28-bit registers with the least significant byte first. Each bit is one GPIO pin
+
+// A set bit enables output on that pin (pins 1:0 cannot be enabled)
+#define REG_PI_GPIO_OUTPUT_ENABLE_0 0x90
+#define REG_PI_GPIO_OUTPUT_ENABLE_1 0x91
+#define REG_PI_GPIO_OUTPUT_ENABLE_2 0x92
+#define REG_PI_GPIO_OUTPUT_ENABLE_3 0x93
+
+// Read or write the pin state. Writes reach only the pins with output enabled
+#define REG_PI_GPIO_0 0x98
+#define REG_PI_GPIO_1 0x99
+#define REG_PI_GPIO_2 0x9A
+#define REG_PI_GPIO_3 0x9B
+
+// ------------------------------------------
+// Raspberry Pi peripheral enable
+// ------------------------------------------
+
+#define REG_PI_PERIPHERAL_ENABLE 0xA0
+
+// Enable the uart on GPIO 14 and 15 (overrides gpio)
+#define RPPE_ENABLE_UART 0x20
+
+// Connect Rx to GPIO 14 and Tx to GPIO 15 (to talk to a pi) instead of Rx to 15 and Tx to 14 (for pi hats)
+#define RPPE_UART_RX_ON_GPIO_14 0x10
+
+// Enable I2C on GPIO 2 and 3 (overrides gpio)
+#define RPPE_ENABLE_I2C 0x08
+
+// Enable SPI on GPIO 7 to 11 (overrides gpio)
+#define RPPE_ENABLE_SPI 0x01
+
+// ------------------------------------------
+// Raspberry Pi I2S audio control
+// ------------------------------------------
+
+#define REG_PI_I2S_AUDIO_CONTROL 0xA2
+
+// I2S enable (bits 7:6)
+#define RPIAC_I2S_OFF 0x00
+#define RPIAC_I2S_MONO_RIGHT 0x40
+#define RPIAC_I2S_MONO_LEFT 0x80
+#define RPIAC_I2S_STEREO 0xC0
+
+// PCM_DOUT from the pi and PCM_DIN to the pi (for a pi) instead of the reverse (for pi hats)
+#define RPIAC_PCM_DOUT_FROM_PI 0x10
+
+// Mute each side
+#define RPIAC_MUTE_LEFT 0x08
+#define RPIAC_MUTE_RIGHT 0x04
+
+// Reserved bit that must be written as 1
+#define RPIAC_RESERVED_SET 0x02
+
+// Direct the i2s audio to EAR on port 0xfe
+#define RPIAC_I2S_TO_EAR 0x01
+
+
+
+
+
+// ------------------------------------------
+// ESP wifi GPIO
+// ------------------------------------------
+
+// Output enable for the ESP GPIO pins (GPIO2 is read only so its enable is fixed at 0)
+#define REG_ESP_GPIO_OUTPUT_ENABLE 0xA8
+
+// Read or write the ESP GPIO pins
+#define REG_ESP_GPIO 0xA9
+
+// Bits of both registers above
+#define RESPG_GPIO0 0x01
+#define RESPG_GPIO2 0x04
+
+
+
+
+
+// ------------------------------------------
+// DivMMC entry points
+// ------------------------------------------
+
+// Enable automap on an instruction fetch from each rst address
+#define REG_DIVMMC_ENTRY_POINTS_0 0xB8
+
+// Automap always on that address (1) or only when rom3 is present (0)
+#define REG_DIVMMC_ENTRY_POINTS_VALID_0 0xB9
+
+// Instant (1) or delayed (0) mapping on that address
+#define REG_DIVMMC_ENTRY_POINTS_TIMING_0 0xBA
+
+// Bits of the three registers above (one per rst address)
+#define RDEP0_ADDRESS_0000 0x01
+#define RDEP0_ADDRESS_0008 0x02
+#define RDEP0_ADDRESS_0010 0x04
+#define RDEP0_ADDRESS_0018 0x08
+#define RDEP0_ADDRESS_0020 0x10
+#define RDEP0_ADDRESS_0028 0x20
+#define RDEP0_ADDRESS_0030 0x40
+#define RDEP0_ADDRESS_0038 0x80
+
+// Automap on the remaining entry points
+#define REG_DIVMMC_ENTRY_POINTS_1 0xBB
+
+// Enable automap on 0x3dxx for TRDOS (instant and rom3 only)
+#define RDEP1_TRDOS_3DXX 0x80
+
+// Disable automap on 0x1ff8-0x1fff (delayed)
+#define RDEP1_DISABLE_1FF8 0x40
+
+// Enable automap on the NextZXOS tape traps 0x056a and 0x04d7 (delayed and rom3 only)
+#define RDEP1_NEXTZXOS_TAPE_056A 0x20
+#define RDEP1_NEXTZXOS_TAPE_04D7 0x10
+
+// Enable automap on the esxdos and original DivMMC tape traps 0x0562 and 0x04c6 (delayed and rom3 only)
+#define RDEP1_ESXDOS_TAPE_0562 0x08
+#define RDEP1_ESXDOS_TAPE_04C6 0x04
+
+// Enable automap on 0x0066 with the nmi button (instant or delayed)
+#define RDEP1_NMI_0066_INSTANT 0x02
+#define RDEP1_NMI_0066_DELAYED 0x01
+
+
+
+
+
+// ------------------------------------------
+// User register
+// ------------------------------------------
+
+// Unused storage available to the user
+#define REG_USER_0 0x7F
+
+// ------------------------------------------
+// I/O traps (experimental)
+// ------------------------------------------
+// A trap generates a multiface nmi that is flagged in REG_RESET. Traps are not
+// triggered by the dma or while the multiface or divmmc or an external nmi is active
+
+#define REG_IO_TRAPS 0xD8
+
+// Enable the +3 fdc traps on ports 0x2ffd and 0x3ffd
+#define RIT_ENABLE_P3_FDC_TRAPS 0x01
+
+// Byte written during the trapped i/o write cycle
+#define REG_IO_TRAP_WRITE 0xD9
+
+// Cause of the trap
+#define REG_IO_TRAP_CAUSE 0xDA
+
+#define RITC_NONE 0x00
+#define RITC_PORT_2FFD_READ 0x01
+#define RITC_PORT_3FFD_READ 0x02
+#define RITC_PORT_3FFD_WRITE 0x03
+
+// --------------------------------------------------------
+// XDEV command (issues 4 and 5 only)
+// --------------------------------------------------------
+// Selects the Xilinx device attached to the register and then talks to it
+
+#define REG_XDEV_COMMAND 0xF0
+
+// Select mode: reads 1 in select mode. Write 1 to enter it or 0 to attach the selected device
+#define RXC_SELECT_MODE 0x80
+
+// Select mode: change the selected device (write together with RXC_SELECT_MODE)
+#define RXC_CHANGE_DEVICE 0x40
+
+// Select mode: device (bits 1:0)
+#define RXC_DEVICE_MASK 0x03
+#define RXC_DEVICE_NONE 0x00
+#define RXC_DEVICE_DNA 0x01
+#define RXC_DEVICE_XADC 0x02
+
+// DNA mode: next dna bit. The first eight bits read give the length of the dna string
+#define RXC_DNA_BIT 0x01
+
+// XADC mode read: busy with a conversion (BUSY) and conversion done (EOC) and sequence done (EOS)
+#define RXC_XADC_BUSY 0x40
+#define RXC_XADC_EOC 0x02
+#define RXC_XADC_EOS 0x01
+
+// XADC mode write: reset the XADC (RESET) and start a conversion (CONVST)
+#define RXC_XADC_RESET 0x40
+#define RXC_XADC_CONVST 0x01
+
+// --------------------------------------------------------
+// XADC DRP access (issues 4 and 5 only)
+// --------------------------------------------------------
+// Writing REG_XADC_REGISTER starts the read or write. Leave at least six 28MHz
+// cycles after each access
+
+#define REG_XADC_REGISTER 0xF8
+
+// Write to the XADC DRP port instead of reading from it (reads as 0)
+#define RXR_WRITE 0x80
+
+// DRP register address DADDR
+#define RXR_ADDRESS_MASK 0x7F
+
+// DRP data bus D7:0 and D15:8. Reads store the result here and writes take the value from here
+#define REG_XADC_DATA_L 0xF9
+#define REG_XADC_DATA_H 0xFA
 
 
 

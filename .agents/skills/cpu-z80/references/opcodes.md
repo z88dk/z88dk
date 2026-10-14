@@ -225,7 +225,7 @@ Flags `------`. Cyc 4, or 7 if `(hl)` is involved. `halt` (76): 1 byte, **4** T,
 | E3 | ex (sp),hl | 1 | 19 | |
 | E9 | jp (hl) | 1 | 4 | |
 | EB | ex de,hl | 1 | 4 | |
-| F3 / FB | di / ei | 1 | 4 | ei takes effect after the **next** instruction |
+| F3 / FB | di / ei | 1 | 4 | `ei` enables after the next instruction, so `ei` / `ret` is not interrupted |
 | F9 | ld sp,hl | 1 | 6 | |
 | C7…FF | rst p | 1 | 11 | p = 00,08,…,38 |
 
