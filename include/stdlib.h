@@ -76,8 +76,12 @@ extern char __LIB__ *utoa_callee(uint16_t num,char *buf,int radix) __smallc __z8
 #endif
 
 
-// double strtod(char *s, char **endp);     /* check math library for availability */
-#if defined(__MATH_MATH32) || ((defined(__8080) || defined(__GBZ80)) && (defined(__MATH_MBF32) || defined(__MATH_AM9511) || defined(__MATH_DAI32)))
+// Z80-family crt0 asm strtod links for math32, math48 and am9511.
+// cimpl strtod links for mbf32 and daimath32 on 8080, 8085, vm1 and gbz80.
+// +cpm -clib=8085 defines __8085 and not __8080.
+#if defined(__MATH_MATH32) || defined(__MATH_MATH48) || defined(__MATH_AM9511) \
+    || ((defined(__8080) || defined(__8085) || defined(__VM1) || defined(__GBZ80)) \
+        && (defined(__MATH_MBF32) || defined(__MATH_DAI32)))
 extern double strtod(const char *nptr, char **endptr);
 #endif
 
