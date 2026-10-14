@@ -1,12 +1,24 @@
-
 ; ===============================================================
-; Nov 2014
+; October 2026
 ; ===============================================================
-; 
+;
 ; void shellsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *))
 ;
-; Shellsort the array using the comparison function supplied.
-; REENTRANT VERSION NEEDS TO BE WRITTEN
+; Shellsort with gaps n/2, n/4, ... 1. State lives on the stack and in
+; the alternate register set, so a comparator may call shellsort again.
+;
+; IX stays the comparator. The alternate set during a pass is:
+;   bc' = gap in bytes
+;   de' = end (one past the last byte)
+;   hl' = base
+; Those three are pushed around the compare call. The caller's
+; alternate set is saved for the whole sort.
+;
+; AF' is not used. The ZX81 NMI keeps a display line count in AF' and
+; does not save the caller's copy. IY is not used.
+;
+; Classic qsort links asm_quicksort and does not include this file.
+; The __CLASSIC comparator path stays so one core still serves both.
 ;
 ; ===============================================================
 
@@ -16,9 +28,10 @@ SECTION code_stdlib
 PUBLIC asm_shellsort
 
 EXTERN l_mulu_16_16x16, asm0_memswap
+EXTERN error_einval_zc, error_erange_zc
 
 IF __CLASSIC
-   EXTERN l_jpix               ; classic: comparator reached via ix closure (see asm_quicksort.asm)
+   EXTERN l_jpix
 ELSE
    EXTERN l_compare_de_hl
 ENDIF
@@ -32,164 +45,255 @@ asm_shellsort:
    ;
    ; exit  : none
    ;
-   ;         if an error below occurs, no sorting is done.
-   ;
    ;         einval if size == 0
-   ;         einval if array size > 64k
-   ;         erange if array wraps 64k boundary
+   ;         erange if nmemb * size overflows 16 bits
+   ;         erange if base + nmemb * size wraps
    ;
    ; uses  : af, bc, de, hl, compare function
 
-   ex de,hl
+   ld a,d
+   or e
+   jp z, error_einval_zc       ; size == 0
 
-   ; hl = size = width
-   ; bc = base
-   ; de = nmemb = nel
-   ; ix = compare
+   ld a,h
+   or l
+   ret z                       ; nmemb == 0
 
-	push de	; ngap
-	push hl ;width
-	ld	(__stdlib_shellsort_base),bc
+   dec hl
+   ld a,h
+   or l
+   ret z                       ; nmemb == 1
 
-	; t1 = nel * width;
-	call	l_mulu_16_16x16
-	ld	(__stdlib_shellsort_t1),hl
+   inc hl                      ; hl = nmemb >= 2
 
-	; for (ngap = nel / 2; ngap > 0; ngap /= 2) {
-.shs_i3
-	pop de	; width
-	pop hl  ; ngap
-	srl h			; _ngap/2 ..bit rotation
-	rr  l
-	ld	a,h
-	or	l
+   ; caller's alternate set, restored on every exit after this point
+   exx
+   push bc
+   push de
+   push hl
+   exx
 
-	ret z
-	push hl ; ngap
-	push de	; width
-	
-	; gap = ngap * width;
-	;ld d,h
-	;ld e,l
-	;ld	hl,(__stdlib_shellsort_width)
-	call	l_mulu_16_16x16
-	ld	(__stdlib_shellsort_gap),hl
-	; t2 = gap + width;
+   ; frame above that, low address first:
+   ;   sp+0 end
+   ;   sp+2 base
+   ;   sp+4 gap_elems
 
-	pop de
-	push de
+   push hl                     ; gap_elems = nmemb
+   push bc                     ; base
+   ; hl = nmemb, de = width. The 8-bit multiply swaps de when
+   ; width < 256 and nmemb >= 256, so keep width across the call.
+   push de
+   push ix
+   call l_mulu_16_16x16
+   pop ix
+   pop de                      ; width. pop does not change flags
+   jp c, fail_mul              ; stack = base, gap_elems, caller exx
 
-	push hl
-	;ex	de,hl
-	;ld	hl,(__stdlib_shellsort_width)
-	add	hl,de
-	ld	(__stdlib_shellsort_t2),hl
+   pop bc                      ; base
+   add hl,bc                   ; hl = end
+   jp c, fail_end              ; stack = gap_elems, caller exx
 
-	; jd = (unsigned int) base + gap;
-	ld	de,(__stdlib_shellsort_base)
-	ex	(sp),hl		; retrieve 'gap'
-	add	hl,de
-	ld	(__stdlib_shellsort_jd),hl
-	pop hl			; t2
-	jr	shs_i8
-	
-.shs_i6
-	ld	de,(__stdlib_shellsort_i)
-	pop hl
-	push hl
-	;ld	hl,(__stdlib_shellsort_width)
-	add	hl,de
-	;ld	(__stdlib_shellsort_i),hl
+   push bc                     ; base
+   push hl                     ; end
+   ld c,e
+   ld b,d                      ; bc = width
 
-	; for (i = t2; i <= t1; i += width)
-.shs_i8
-	ld	(__stdlib_shellsort_i),hl
-	ex	de,hl
-	ld	hl,(__stdlib_shellsort_t1)
-	
-	; de = i, hl = t1, carry=0 from "add hl,de" in both paths
-	
-	sbc hl,de
-	jr c, shs_i3    ; if t1-i < 0 (if i>t1)
+   ; gap_elems is under end and base.
 
-	; for (j =  i - t2..
-	ld	hl,(__stdlib_shellsort_t2)
-	ex	de,hl
-.shs_i11
-	and	a
-	sbc	hl,de		; same subtraction is used twice in the for loop
-	ld	(__stdlib_shellsort_j),hl
+gap_loop:
 
-	; for ..; j>0; ..
-	jp	m,shs_i6
- 
-        ; hl = j
-        
-        ld c,l
-        ld b,h                 ; bc = j
-        
-        ld hl,(__stdlib_shellsort_jd)
-        add hl,bc
-        
-        ex de,hl               ; de = jd + j
-        
-        ld hl,(__stdlib_shellsort_base)
-        add hl,bc              ; hl = base + j
+   ld hl,4
+   add hl,sp
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                   ; de = gap_elems
+   srl d
+   rr e
+   ld (hl),d
+   dec hl
+   ld (hl),e
+   ld a,d
+   or e
+   jp z, done
 
-        ; if ((*compar)(base+j, jd+j) <=0) break;
+   push bc                     ; width
+   ld l,e
+   ld h,d                      ; hl = gap_elems
+   ld e,c
+   ld d,b                      ; de = width
+   push ix
+   call l_mulu_16_16x16        ; hl = gap bytes
+   pop ix
+   pop bc                      ; width
+   jp c, fail_frame
 
-        IF __CLASSIC
-        call l_jpix            ; compare(de = jd+j, hl = base+j) via closure thunk
-        ELSE
-        call l_compare_de_hl   ; compare(de = jd+j, hl = base+j)
-        ENDIF
-        jp p, shs_i6              ; if *(jd+j) >= *(base+j)
+   ; bc' = gap, de' = end, hl' = base. Width stays in bc.
+   push bc                     ; width
+   ld c,l
+   ld b,h                      ; bc = gap
+   ld hl,2
+   add hl,sp                   ; pushed width, then end
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                   ; de = end
+   inc hl
+   ld a,(hl)
+   inc hl
+   ld h,(hl)
+   ld l,a                      ; hl = base
+   push hl
+   push de
+   push bc
+   exx
+   pop bc                      ; gap
+   pop de                      ; end
+   pop hl                      ; base
+   exx
+   pop bc                      ; width
 
-        ; de = jd + j (2nd arg)
-        ; hl = base + j (1st arg)
-        ; stack = width
-	
-	pop bc
-	push bc
-	
-	call	asm0_memswap
+   push bc
+   exx
+   push hl                     ; base
+   push bc                     ; gap
+   exx
+   pop bc                      ; gap
+   pop hl                      ; base
+   add hl,bc                   ; hl = i = base + gap
+   pop bc                      ; width
+   jp c, fail_frame
 
-	; for ... j -= gap)
-	ld	hl,(__stdlib_shellsort_j)
-	ld	de,(__stdlib_shellsort_gap)
-	jr	shs_i11
+i_loop:
 
+   ; hl = i, bc = width, ix = compar
+   ; bc' = gap, de' = end, hl' = base
 
-SECTION bss_clib
-SECTION bss_stdlib
+   push hl
+   exx
+   push de                     ; copy end
+   exx
+   pop de
+   pop hl                      ; hl = i, de = end
+   ld a,l
+   sub e
+   ld a,h
+   sbc a,d
+   jr nc, gap_loop             ; i >= end
 
-__stdlib_shellsort_i:          defw 0
-__stdlib_shellsort_j:          defw 0
-__stdlib_shellsort_t1:         defw 0
-__stdlib_shellsort_t2:         defw 0
-__stdlib_shellsort_jd:         defw 0
-__stdlib_shellsort_base:       defw 0
-__stdlib_shellsort_gap:        defw 0
+   push hl                     ; save i
+   ld d,h
+   ld e,l                      ; de = right = i
+   push bc
+   exx
+   push bc                     ; copy gap
+   exx
+   pop bc
+   or a
+   sbc hl,bc                   ; hl = left = i - gap
+   pop bc                      ; width
 
+j_loop:
 
+   ; hl = left, de = right, bc = width
+   ; stack = i, end, base, gap_elems, caller exx
 
-; Original code taken from the BDS C by Leor Zolman
-; Asm version by Stefano Bodrato
-;
-;void qsort(char *base, unsigned int nel, unsigned int width, void *compar)
-;{	int i, j;
-;	unsigned gap, ngap, t1;
-;	int jd, t2;
-;
-;	t1 = nel * width;
-;	for (ngap = nel / 2; ngap > 0; ngap /= 2) {
-;	   gap = ngap * width;
-;	   t2 = gap + width;
-;	   jd = (unsigned int) base + gap;
-;	   for (i = t2; i <= t1; i += width)
-;	      for (j =  i - t2; j >= 0; j -= gap) {
-;		if ((*compar)(base+j, jd+j) <=0) break;
-;			 memswap(base+j, jd+j, width);
-;	      }
-;	}
-;}
+   exx
+   push bc
+   push de
+   push hl
+   exx
+
+IF __CLASSIC
+   call l_jpix
+ELSE
+   call l_compare_de_hl        ; p set when right >= left
+ENDIF
+
+   exx
+   pop hl
+   pop de
+   pop bc
+   exx
+   jp p, next_i                ; exx and pop do not change flags
+
+   push bc
+   call asm0_memswap           ; hl = left on exit
+   pop bc                      ; width
+
+   ld d,h
+   ld e,l                      ; right = old left
+   push bc
+   exx
+   push bc                     ; copy gap
+   exx
+   pop bc
+   or a
+   sbc hl,bc                   ; left -= gap
+   pop bc
+   jr c, next_i                ; stepped below address 0
+
+   push de                     ; right must survive the test
+   push hl
+   exx
+   push hl                     ; copy base
+   exx
+   pop de                      ; de = base
+   pop hl                      ; hl = left
+   ld a,l
+   sub e
+   ld a,h
+   sbc a,d
+   pop de                      ; de = right. pop does not change flags
+   jr nc, j_loop               ; left >= base
+
+next_i:
+
+   pop hl                      ; i
+   add hl,bc                   ; i += width
+   jp nc, i_loop
+   jp fail_frame
+
+done:
+
+   ; stack = end, base, gap_elems, caller exx
+   pop hl
+   pop hl
+   pop hl
+
+restore_exx:
+
+   exx
+   pop hl
+   pop de
+   pop bc
+   exx
+   ret
+
+fail_mul:
+
+   ; stack = base, gap_elems, caller exx
+   pop hl
+   pop hl
+   jr fail_errno
+
+fail_end:
+
+   ; stack = gap_elems, caller exx
+   pop hl
+   jr fail_errno
+
+fail_frame:
+
+   ; stack = end, base, gap_elems, caller exx
+   ; i is not on the stack
+   pop hl
+   pop hl
+   pop hl
+
+fail_errno:
+
+   exx
+   pop hl
+   pop de
+   pop bc
+   exx
+   jp error_erange_zc
