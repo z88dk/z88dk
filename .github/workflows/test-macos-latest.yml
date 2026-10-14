@@ -19,7 +19,7 @@ jobs:
     - name: Get lastest nightly
       run: |
         curl -L -o z88dk-osx-latest.zip http://nightly.z88dk.org/z88dk-osx-latest.zip
-        unzip -d osx-latest z88dk-osx-latest.zip
+        unzip -o -q -d osx-latest z88dk-osx-latest.zip
     - name: Copy files from nightly
       run: |
         cp osx-latest/z88dk/bin/z88dk-z80asm      osx-latest/z88dk/src/z80asm/
