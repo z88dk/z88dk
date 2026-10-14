@@ -31,6 +31,11 @@ newlib/alloc/malloc/z80/asm_realloc_unlocked
 newlib/alloc/malloc/z80/asm__falloc
 newlib/alloc/malloc/z80/asm__falloc_unlocked
 newlib/alloc/malloc/z80/__heap_allocate_block
+newlib/alloc/malloc/z80/__heap_fl_fit
+newlib/alloc/malloc/z80/__heap_fl_link
+newlib/alloc/malloc/z80/__heap_fl_node
+newlib/alloc/malloc/z80/__heap_fl_prepare
+newlib/alloc/malloc/z80/__heap_fl_unlink
 newlib/alloc/malloc/z80/__heap_lock_acquire
 newlib/alloc/malloc/z80/__heap_lock_release
 newlib/alloc/malloc/z80/__heap_place_block

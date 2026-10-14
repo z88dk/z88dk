@@ -48,17 +48,27 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK April 20, 2020
+Z88DK October 14, 2026
 new/sccz80
-2711 bytes less page zero
+7707 bytes less page zero
 
-cycle count  = 6582763903
-time @ 4MHz  = 6582763903 / 4*10^6 = 27 min 25 sec
+cycle count  = 389283490
+time @ 4MHz  = 389283490 / 4*10^6 = 1 min 37.32 sec
+
+malloc searches an address-ordered free list of spare tails. Removing a
+tail splices the node from the links it already holds. In-place realloc
+still compares the next header. Same source and compiler against the
+previous allocator: 6578438820 cycles. The free-list allocator before
+this size pass was 394509309 cycles and 7795 bytes less page zero.
 
 
-Z88DK August 16, 2026
+Z88DK October 14, 2026
 new/zsdcc 4.6.0 #16639
-2632 bytes less page zero
+7705 bytes less page zero
 
-cycle count  = 6570984020
-time @ 4MHz  = 6570984020 / 4*10^6 =  27 min 23 sec
+cycle count  = 388921443
+time @ 4MHz  = 388921443 / 4*10^6 = 1 min 37.23 sec
+
+Measured on the free-list allocator before the size pass above.
+z88dk-zsdcc was not available to retime that pass. The assembler
+sources are shared with the sccz80 library.

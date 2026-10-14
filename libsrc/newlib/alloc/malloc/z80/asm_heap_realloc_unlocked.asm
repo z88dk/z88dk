@@ -29,6 +29,8 @@ SECTION code_alloc_malloc
 PUBLIC asm_heap_realloc_unlocked
 
 EXTERN error_enomem_zc, __heap_allocate_block, asm_memmove, asm_heap_free_unlocked, l_ltu_bc_hl
+EXTERN __heap_fl_anchor, __heap_fl_prepare, __heap_fl_unlink, __heap_fl_link
+EXTERN __heap_fl_hole_heap, __heap_fl_hole_count
 
 asm_heap_realloc_unlocked:
 
@@ -50,18 +52,22 @@ asm_heap_realloc_unlocked:
    ;
    ; uses  : af, bc, de, hl
 
+   push hl
+   call __heap_fl_prepare      ; de = heap. builds the free list once
+   pop hl
+
    push de                     ; save void *heap
    push hl                     ; save void *p
-   
+
    ld hl,6                     ; sizeof(heap header)
    add hl,bc                   ; add space for header to request size
    jp c, error_enomem_zc - 2
-   
+
    ld c,l
    ld b,h                      ; bc = gross request size
-   
+
    pop hl                      ; hl = void *p
-   
+
    ld a,h
    or l
    jr z, allocating            ; if p == 0, we are allocating
@@ -71,7 +77,7 @@ resize:
    ; hl = void *p
    ; bc = gross request size
    ; stack = void *heap
-   
+
    ld de,-5
    add hl,de                   ; hl = & block_p->next + 1b
 
@@ -80,7 +86,7 @@ resize:
    ld e,(hl)                   ; de = block_p->next = & block_next
 
    ex de,hl
-   
+
    or a
    sbc hl,de
    sbc hl,bc                   ; hl = block_next - block_p - gross_request
@@ -89,24 +95,39 @@ resize:
    jr c, resize_fail           ; if cannot resize in place
 
    ; resize will be successful
+   ;
+   ; The spare tail moves with committed, so the old node has to come
+   ; off the free list before the new one goes on.
 
    ; hl = & block_p
    ; bc = gross request size
    ; stack = void *heap
 
+   push hl
+   call __heap_fl_unlink
+   pop hl
+
    inc hl
    inc hl
-   
+
    ld (hl),c
    inc hl
    ld (hl),b                   ; block_p->committed = gross request size
-   inc hl
-   
-   inc hl
-   inc hl                      ; hl = void *p
-   
+
+   dec hl
+   dec hl
+   dec hl                      ; hl = & block_p
+
+   push hl
+   call __heap_fl_link
+   pop hl
+
+   ld de,6
+   add hl,de                   ; hl = void *p
+
    pop de                      ; junk item on stack
-   ret                         ; carry is reset
+   or a
+   ret
 
 
 allocating:
@@ -114,34 +135,34 @@ allocating:
    ; p == 0 so we are allocating not resizing
 
    pop hl
-   
+
    ; hl = void *heap
    ; bc = gross request size
 
    call largest_fit
    jp c, error_enomem_zc
-   
+
    ; de = & block_largest
    ; bc = gross request size
 
    ld l,e
    ld h,d
-   
+
    inc hl
    inc hl
-   
+
    ld a,(hl)
    inc hl
    ld h,(hl)
    ld l,a                      ; hl = block->committed
-   
+
    add hl,de
    ex de,hl
-   
+
    ; de = & block_new
    ; hl = & block
    ; bc = gross request size
-   
+
    jp __heap_allocate_block
 
 
@@ -155,33 +176,38 @@ resize_fail:
 
    inc hl
    inc hl
-   
+
    ld e,(hl)
    inc hl
    ld d,(hl)                   ; de = p->committed = p_old->committed
    inc hl
-   
+
    inc hl
-   inc hl                     ; hl = void *p = void *p_old
-   
-   pop af
-   push hl
-   push de
-   push af
+   inc hl                      ; hl = void *p = void *p_old
 
-   ; hl = void *p_old
-   ; bc = gross request size
-   ; stack = void *p_old, p_old->committed, void *heap
+   ex (sp),hl                  ; hl = void *heap, stack = void *p_old
+   push de                     ; stack = p_old->committed, void *p_old
+   push hl                     ; stack = void *heap, p_old->committed, void *p_old
 
-   call asm_heap_free_unlocked
+   ld e,l
+   ld d,h                      ; de = void *heap
+
+   ld hl,4
+   add hl,sp
+   ld a,(hl)
+   inc hl
+   ld h,(hl)
+   ld l,a                      ; hl = void *p_old
+
+   call asm_heap_free_unlocked ; de must be the heap. bc preserved.
    pop hl
 
    ; find the largest block in the heap
-   
+
    ; hl = void *heap
    ; bc = gross request size
-   ; stack = void *p_old, p_old->committed
-   
+   ; stack = p_old->committed, void *p_old
+
    call largest_fit
    jr c, alloc_fail
 
@@ -193,39 +219,39 @@ resize_fail:
 
    ld l,e
    ld h,d
-   
+
    inc hl
    inc hl
-   
+
    ld a,(hl)
    inc hl
    ld h,(hl)
    ld l,a                      ; hl = block->committed
-   
+
    add hl,de
    ex de,hl
-   
+
    ; de = & block_new
    ; hl = & block
    ; bc = gross request size
    ; stack = void *p_old, p_old->committed
-   
+
    call __heap_allocate_block
    ex de,hl
 
    ; copy data from old block to new block
-   
+
    ; de = void *p_new
    ; stack = void *p_old, p_old->committed
-   
+
    pop bc
-   
+
    ld hl,-6                    ; sizeof(heap header)
    add hl,bc
-   
+
    ld c,l
    ld b,h                      ; bc = num bytes in p
-   
+
    pop hl                      ; hl = void *p_old
    jp asm_memmove
 
@@ -234,41 +260,55 @@ alloc_fail:
 
    ; failed to find a large enough block
    ; must restore old block to heap
-   
+   ;
+   ; The first block's prev word is the free-list head, so it is not
+   ; a previous header. Every other block still points at its owner.
+
    ; stack = void *p_old, p_old->committed
 
    pop bc                      ; bc = block_p->committed
    pop hl                      ; hl = void *p
-   
-   dec hl
-   ld d,(hl)
-   dec hl
-   ld e,(hl)                   ; de = block_p->prev = & block_prev
 
-   dec hl
-   dec hl
-   dec hl
-   dec hl                      ; hl = & block_p
-   
-   ex de,hl
-   
-   ; bc = block_p->committed = gross request size
-   ; de = & block_p = & block_new
-   ; hl = & block_prev = & block
-   
+   ld de,-6
+   add hl,de                   ; hl = & block_p
+
+   push hl
+
+   ld de,(__heap_fl_anchor)
+   dec de
+   dec de
+   dec de
+   dec de                      ; de = & first block
+
+   ld a,l
+   cp e
+   jr nz, alloc_fail_prev
    ld a,h
-   or l
-   jr nz, prev_present
-   
-   ; block_p is the first block in the heap
-   
-   ld l,e
-   ld h,d
+   cp d
+   jr nz, alloc_fail_prev
 
-prev_present:
+   pop hl
+   ld e,l
+   ld d,h                      ; overlay the first block
+   call __heap_allocate_block
+   jp error_enomem_zc
+
+alloc_fail_prev:
+
+   pop hl                      ; hl = & block_p
+   push hl
+
+   ld de,4
+   add hl,de
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                   ; de = block_p->prev = & block_prev
+
+   pop hl
+   ex de,hl                    ; hl = & block_prev, de = & block_p
 
    call __heap_allocate_block  ; restore block to the heap
-   jp error_enomem_zc   
+   jp error_enomem_zc
 
 
 largest_fit:
@@ -280,96 +320,332 @@ largest_fit:
    ;         bc = gross request size
    ;
    ;         carry set if no block large enough for request
+   ;
+   ; The free list names every committed tail of at least 7 bytes.
+   ; A non-first committed == 0 wilderness is not on that list. The
+   ; hole count says when one of those can still exist. The count may
+   ; stay high after malloc takes such a hole. It is never left low.
 
-   ld de,6                     ; sizeof(mutex)
-   add hl,de
+   push ix
+   push bc                     ; save gross request
 
-   push bc                     ; save gross request size
-   
-   ld bc,0
-   push bc
+   ld bc,0                     ; best size
+   ld ix,0                     ; best block
 
-   ex de,hl
-   push de
-   
-block_loop:
-   
-   ; bc = largest block size
-   ; de = & block to examine
-   ; stack = gross request size, & block_largest, junk
+   ld hl,(__heap_fl_anchor)
+   dec hl
+   dec hl
+   dec hl
+   dec hl                      ; hl = & first block
 
-   pop af                      ; remove junk from stack
-   push de                     ; save & block
+   call region_best
 
-   ex de,hl
-   
+   ld hl,(__heap_fl_anchor)
    ld e,(hl)
    inc hl
-   ld d,(hl)                   ; de = block->next = & block_next
-   
+   ld d,(hl)
+   dec hl                      ; de = head, hl = & head
+
+best_walk:
+
    ld a,d
    or e
-   jr z, end_loop              ; if end of heap reached
+   jr z, best_done
+
+   ld a,e
+   cp l
+   jr nz, best_node
+   ld a,d
+   cp h
+   jr z, best_done             ; empty sentinel
+
+best_node:
+
+   push hl                     ; save & head
+   push de                     ; save & node
+
+   ld hl,4
+   add hl,de
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   ex de,hl                    ; hl = owner
+
+   call region_best
+
+   pop hl                      ; hl = & node
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                   ; de = node->next
+   pop hl                      ; hl = & head
+   jr best_walk
+
+best_done:
+
+   call hole_cache_miss        ; carry set if the list may not be complete
+   jr c, full_scan
+
+   pop hl                      ; hl = gross request
+   push hl
+
+   call l_ltu_bc_hl            ; carry if best size < gross
+   jr c, best_short
+
+   pop bc                      ; bc = gross request
+   push ix
+   pop de                      ; de = & block_largest
+   pop ix
+   or a
+   ret
+
+best_short:
+
+   ; A tail shorter than 7 is absent from the list. It can satisfy
+   ; only a gross request below 7.
+
+   pop hl                      ; hl = gross request
+   push hl
+
+   ld a,h
+   or a
+   jr nz, best_fail
+
+   ld a,l
+   cp 7
+   jr c, full_scan
+
+best_fail:
+
+   pop bc
+   pop ix
+   scf
+   ret
+
+full_scan:
+
+   ; stack = gross request, saved ix
+
+   xor a
+   ld (__heap_fl_hole_count),a
+
+   ld hl,(__heap_fl_anchor)
+   ld a,l
+   sub 10
+   ld e,a
+   ld a,h
+   sbc a,0
+   ld d,a
+   ld (__heap_fl_hole_heap),de
+
+   ld bc,0
+   ld ix,0
+
+   ld hl,(__heap_fl_anchor)
+   dec hl
+   dec hl
+   dec hl
+   dec hl                      ; hl = & first block
+
+scan_loop:
+
+   ; hl = & block
+   ; bc = best size
+   ; ix = & best block
+
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   dec hl                      ; de = block->next
+
+   ld a,d
+   or e
+   jr z, scan_end
+
+   push de                     ; save & next
+   push hl
 
    inc hl
-   
-   push bc                     ; save largest block size
-   
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                   ; de = block->committed
+   pop hl                      ; hl = & block
+
+   push bc
+   ld c,e
+   ld b,d                      ; bc = committed
+   call note_hole
+   pop bc                      ; bc = best size
+
+   call region_best
+   pop hl                      ; hl = & next block
+   jr scan_loop
+
+scan_end:
+
+   pop hl                      ; hl = gross request
+   push ix
+   pop de                      ; de = & block_largest
+
+   call l_ltu_bc_hl            ; carry if best size < gross
+   ld c,l
+   ld b,h                      ; bc = gross request
+   jr c, scan_fail
+
+   pop ix
+   or a
+   ret
+
+scan_fail:
+
+   pop ix
+   scf
+   ret
+
+
+region_best:
+
+   ; Consider one block's free bytes.
+   ;
+   ; enter : hl = & block
+   ;         bc = best size so far
+   ;         ix = & best block so far
+   ;
+   ; exit  : bc = best size
+   ;         ix = & best block
+   ;         hl unchanged? no, hl is consumed
+   ;
+   ; uses  : af, de, hl
+
+   push bc                     ; best size
+   push hl                     ; & block
+
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                   ; de = block->next
+   ld a,d
+   or e
+   jr z, region_none
+
+   inc hl
    ld c,(hl)
    inc hl
    ld b,(hl)                   ; bc = block->committed
 
-   dec hl
-   dec hl
-   dec hl                      ; hl = & block
-   
-   ex de,hl
-   
-   ; bc = block->committed
-   ; de = & block
-   ; hl = & block_next
-   ; stack = gross request size, & block_largest, & block, largest block size
-   
-   push hl                     ; save & block_next
-   
-   sbc hl,de
-   sbc hl,bc                   ; hl = free bytes in this block
-   
-   pop de                      ; de = & block_next
-   pop bc                      ; bc = largest block size
-
-   call l_ltu_bc_hl
-   jr nc, block_loop           ; if bc >= hl
-
-block_bigger:
-
-   ; hl = new largest block size
-   ; de = & block_next
-   ; stack = gross request size, & block_largest, & block
-
-   ld c,l
-   ld b,h                      ; bc = new largest block size
-   
-   pop hl
-   ex (sp),hl                  ; replace & block_largest with & block
+   pop hl                      ; hl = & block
    push hl
-   
-   jr block_loop
 
-end_loop:
+   add hl,bc                   ; hl = allocation address
+   ex de,hl                    ; de = allocation address, hl = block->next
+   or a
+   sbc hl,de                   ; hl = free bytes
 
-   ; biggest block found
-   
-   ; bc = largest block size
-   ; stack = gross request size, & block_largest, junk
+   pop de                      ; de = & block
+   pop bc                      ; bc = best size
 
+   push de
+   call l_ltu_bc_hl            ; carry if best < free
+   jr c, region_bigger
+
+   pop af
+   ret
+
+region_bigger:
+
+   pop ix                      ; ix = & block
+   ld c,l
+   ld b,h                      ; bc = free bytes
+   ret
+
+region_none:
+
+   pop hl
+   pop bc
+   ret
+
+
+hole_cache_miss:
+
+   ; carry set when largest-fit must walk the address chain
+   ;
+   ; preserves bc, de, hl, ix
+
+   push hl
+   push de
+   push bc
+
+   ld de,(__heap_fl_hole_heap)
+   ld hl,(__heap_fl_anchor)
+   ld a,l
+   sub 10
+   ld c,a
+   ld a,h
+   sbc a,0
+   cp d
+   jr nz, hole_miss
+   ld a,c
+   cp e
+   jr nz, hole_miss
+
+   ld a,(__heap_fl_hole_count)
+   or a
+   jr nz, hole_miss
+
+   pop bc
    pop de
-   pop de                      ; de = & block_largest
+   pop hl
+   or a
+   ret
 
-   ld l,c
-   ld h,b                      ; hl = largest block size
-   
-   pop bc                      ; bc = gross request size
+hole_miss:
 
-   sbc hl,bc
-   ret                         ; carry set if block not large enough
+   pop bc
+   pop de
+   pop hl
+   scf
+   ret
+
+
+note_hole:
+
+   ; Count a non-first committed == 0 block.
+   ;
+   ; enter : hl = & block
+   ;         bc = committed
+   ;
+   ; exit  : hl, bc, de unchanged
+   ;
+   ; uses  : af
+
+   ld a,b
+   or c
+   ret nz
+
+   push de
+   push hl
+
+   ld de,(__heap_fl_anchor)
+   dec de
+   dec de
+   dec de
+   dec de                      ; de = & first block
+
+   ld a,l
+   cp e
+   jr nz, note_count
+   ld a,h
+   cp d
+   jr z, note_out
+
+note_count:
+
+   ld a,(__heap_fl_hole_count)
+   inc a
+   jr z, note_out              ; saturated at 255
+   ld (__heap_fl_hole_count),a
+
+note_out:
+
+   pop hl
+   pop de
+   ret

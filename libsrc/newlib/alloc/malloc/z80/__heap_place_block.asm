@@ -75,28 +75,39 @@ __heap_place_block:
    jr nz, committed_nonzero    ; if committed != 0
    
    ; committed == 0 so either block_new sits exactly on
-   ; top of this header or it is at least six bytes ahead
-   
-   ld hl,6
-   
-   call committed_nonzero
-   ret nc
+   ; top of this header or it is at least six bytes ahead.
+   ; The nonzero path pops two saved words, so this case
+   ; cannot call it.
 
-   ; bc = gross request size
-   ; de = & block_new
-   ; hl = & block
-   
+   ; bc = & block
+   ; stack = & block, gross request size
+
+   ld hl,6
+   add hl,bc                   ; hl = first byte after this header
+
+   call l_ltu_de_hl            ; carry if block_new < block + 6
+   jr c, place_overlay
+
+   pop bc                      ; bc = gross request size
+   pop hl                      ; hl = & block
+   or a
+   ret
+
+place_overlay:
+
+   pop bc                      ; bc = gross request size
+   pop hl                      ; hl = & block
+
    ld a,e
    cp l
-   
-   scf
-   ret nz
-   
+   jr nz, place_overlay_fail
+
    ld a,d
    cp h
-   
-   ret z                       ; if block == block_new
-   
+   ret z                       ; block_new == block, carry reset
+
+place_overlay_fail:
+
    scf
    ret
    

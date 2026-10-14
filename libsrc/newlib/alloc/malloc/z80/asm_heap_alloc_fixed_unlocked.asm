@@ -20,7 +20,7 @@ SECTION code_alloc_malloc
 
 PUBLIC asm_heap_alloc_fixed_unlocked
 
-EXTERN l_ltu_de_hl, __heap_place_block, __heap_allocate_block, error_enomem_zc
+EXTERN l_ltu_de_hl, __heap_place_block, __heap_allocate_block, __heap_fl_prepare, error_enomem_zc
 
 asm_heap_alloc_fixed_unlocked:
 
@@ -42,6 +42,12 @@ asm_heap_alloc_fixed_unlocked:
    ;            carry set, errno = ENOMEM
    ;
    ; uses  : af, bc, de, hl
+
+   push hl
+   push bc
+   call __heap_fl_prepare
+   pop bc
+   pop hl
 
    push hl                     ; save size
 

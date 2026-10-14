@@ -22,7 +22,7 @@ SECTION code_alloc_malloc
 
 PUBLIC asm_heap_alloc_aligned_unlocked
 
-EXTERN __heap_place_block, __heap_allocate_block, l_andc_hl_bc
+EXTERN __heap_place_block, __heap_allocate_block, __heap_fl_prepare, l_andc_hl_bc
 EXTERN l_power_2_bc, asm_heap_alloc_unlocked, error_enomem_zc, error_einval_zc
 
 asm_heap_alloc_aligned_unlocked:
@@ -67,6 +67,12 @@ asm_heap_alloc_aligned_unlocked:
    ; de = void *heap
    ; hl = size
    ; bc = alignment - 1
+
+   push hl
+   push bc
+   call __heap_fl_prepare
+   pop bc
+   pop hl
 
    push bc                     ; save alignment - 1
    

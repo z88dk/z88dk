@@ -16,14 +16,14 @@ SECTION code_alloc_malloc
 
 PUBLIC asm_heap_free_unlocked
 
-EXTERN l_setmem_hl
+EXTERN __heap_fl_anchor, __heap_fl_prepare, __heap_fl_link, __heap_fl_unlink
 
 asm_heap_free_unlocked:
 
    ; Return the memory block to the heap for reuse without locking
    ;
    ; enter : hl = void *p
-   ;         de = void *heap (unused)
+   ;         de = void *heap
    ;
    ; exit  : carry reset
    ;
@@ -32,50 +32,117 @@ asm_heap_free_unlocked:
    ld a,h
    or l
    ret z                       ; if p == 0
-   
-   dec hl                      ; step into block header
-   ld d,(hl)
-   dec hl
-   ld e,(hl)                   ; de = block->prev = & block_prev
-   
-   dec hl
-   dec hl                      ; hl = & block->committed
 
-   ld a,d
-   or e
-   jp z, l_setmem_hl - 4       ; if there is no previous block, set block->committed = 0
+   push bc
+   push hl                     ; save void *p
 
-remove_block:
+   call __heap_fl_prepare
 
-   dec hl
-   dec hl
+   pop hl                      ; hl = void *p
+
+   ld de,-6
+   add hl,de                   ; hl = & block
+
+   push hl
+   call __heap_fl_unlink       ; drop this block's tail before it moves
+   pop hl
+
+   ld de,(__heap_fl_anchor)
+   dec de
+   dec de
+   dec de
+   dec de                      ; de = & first block
+
+   ld a,l
+   cp e
+   jr nz, free_unlink
+
+   ld a,h
+   cp d
+   jr nz, free_unlink
+
+   inc hl
+   inc hl                      ; hl = & block->committed
+
+   xor a
+   ld (hl),a
+   inc hl
+   ld (hl),a                   ; committed = 0. The hole stays off the
+                               ; free list so the old payload is intact.
+                               ; malloc tests this first block directly.
+
+   pop bc
+   or a
+   ret
+
+free_unlink:
 
    ; hl = & block
-   ; de = & block_prev
+   ; splice it out of the address chain, then list the previous block's
+   ; grown tail. A previous block with committed == 0 is not listed.
 
-   ldi
-   inc bc                      ; undo changes to bc
+   push hl
 
-   ld a,(hl)
-   ld (de),a                   ; block_prev->next = block->next
-   
-   dec de                      ; de = & block_prev
-   dec hl                      ; hl = & block
-   
-   ld l,(hl)
-   ld h,a                      ; hl = block->next = & block_next
+   ld de,4
+   add hl,de
 
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                   ; de = block->prev
+
+   pop hl                      ; hl = & block
+
+   push hl
+   push de
+
+   ld l,e
+   ld h,d                      ; hl = & block_prev
+
+   call __heap_fl_unlink       ; old tail, before next changes
+
+   pop de                      ; de = & block_prev
+   pop hl                      ; hl = & block
+
+   push de
+
+   ld c,(hl)
+   inc hl
+   ld b,(hl)                   ; bc = block->next
+   dec hl
+
+   ex de,hl                    ; hl = & block_prev, de = & block
+
+   ld (hl),c
+   inc hl
+   ld (hl),b                   ; block_prev->next = block->next
+
+   ld a,b
+   or c
+   jr z, free_no_next
+
+   ld l,c
+   ld h,b
    ld a,(hl)
    inc hl
    or (hl)
-   ret z                       ; if there is no block_next
+   jr z, free_no_next          ; terminator has no prev word
 
-   inc hl
-   inc hl
-   inc hl
-   
+   ld hl,4
+   add hl,bc                   ; hl = & block_next->prev
+
+   pop de
+   push de
+
    ld (hl),e
    inc hl
    ld (hl),d                   ; block_next->prev = & block_prev
-   
+
+free_no_next:
+
+   pop hl                      ; hl = & block_prev
+
+   call __heap_fl_link
+
+   pop bc
+   or a
    ret

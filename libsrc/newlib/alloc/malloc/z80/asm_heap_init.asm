@@ -17,7 +17,7 @@ PUBLIC asm_heap_init
 
 EXTERN mtx_plain, asm_mtx_init, error_enolck_zc
 
-EXTERN l_setmem_hl
+EXTERN l_setmem_hl, __heap_fl_prepare
 
 asm_heap_init:
 
@@ -74,4 +74,12 @@ asm_heap_init:
    call l_setmem_hl - 8        ; zero out four bytes
    
    pop hl                      ; hl = void *heap
+   push hl
+
+   ld e,l
+   ld d,h
+   call __heap_fl_prepare      ; head word becomes the empty sentinel
+
+   pop hl
+   or a
    ret

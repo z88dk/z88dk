@@ -122,28 +122,33 @@ cycle count  = 240336355
 time @ 4MHz  = 240336355 / 4x10^6 = 60.09 seconds
 
 5.
-Z88DK August 16, 2026
+Z88DK October 14, 2026
 zsdcc 4.6.0 #16639 / new c library
-2632 bytes less page zero
+7705 bytes less page zero
 
-cycle count  = 6570984020
-time @ 4MHz  = 6570984020 / 4*10^6 =  27 min 23 sec
+cycle count  = 388921443
+time @ 4MHz  = 388921443 / 4*10^6 = 1 min 37.23 sec
 
 Issue #113: https://github.com/z88dk/z88dk/issues/113
-Library optimization for fast realloc causes slow free block search
-when a thousand blocks are allocated in this benchmark.
+Free-list allocator before the sccz80 size pass in row 6. z88dk-zsdcc
+was not available to retime that pass. Previous published run on the
+old allocator was 6570984020 cycles.
 
 6.
-Z88DK April 20, 2020
+Z88DK October 14, 2026
 sccz80 / new c library
-2711 bytes less page zero
+7707 bytes less page zero
 
-cycle count  = 6582763903
-time @ 4MHz  = 6582763903 / 4*10^6 = 27 min 25 sec
+cycle count  = 389283490
+time @ 4MHz  = 389283490 / 4*10^6 = 1 min 37.32 sec
 
 Issue #113: https://github.com/z88dk/z88dk/issues/113
-Library optimization for fast realloc causes slow free block search
-when a thousand blocks are allocated in this benchmark.
+malloc searches an address-ordered free list of spare tails, so this
+benchmark no longer walks every live block. Removing a tail splices
+the node from the links it already holds. In-place realloc still
+compares the next header. Same source against the previous allocator:
+6578438820 cycles. The free-list allocator before this size pass was
+394509309 cycles and 7795 bytes less page zero.
 
 7.
 IAR Z80 V4.06A

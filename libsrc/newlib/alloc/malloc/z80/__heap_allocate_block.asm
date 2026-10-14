@@ -4,6 +4,8 @@ SECTION code_alloc_malloc
 
 PUBLIC __heap_allocate_block
 
+EXTERN __heap_fl_link, __heap_fl_unlink
+
 __heap_allocate_block:
 
    ; Create a new block inside the existing block at the given address.
@@ -18,6 +20,14 @@ __heap_allocate_block:
    ;         carry reset
    ;
    ; uses  : af, de, hl
+
+   ; A non-first committed == 0 hole is not removed from the hole
+   ; count here. The count may stay high. Largest-fit treats that as
+   ; a miss and the following scan recounts. The count must not go low.
+   call __heap_fl_unlink       ; drop the old tail, if it was listed
+
+   push de                     ; save & block_new
+   push hl                     ; save & block
 
    ; if block_new == block, we are overlaying
    
@@ -98,8 +108,7 @@ block_next_absent:
    inc hl
    ld (hl),d                   ; block_new->prev = & block
    
-   inc hl                      ; hl = & allocated memory in block_new
-   ret                         ; carry is reset
+   jp alloc_epilogue
 
 overlay_block:
 
@@ -120,4 +129,49 @@ overlay_block:
    inc hl
    inc hl                      ; hl = & allocated memory in block
    
-   ret                         ; carry is reset
+   jp alloc_epilogue
+
+alloc_epilogue:
+
+   ; stack = & block_new, & block
+   ; bc    = gross request size
+
+   pop hl                      ; hl = & block
+   pop de                      ; de = & block_new
+
+   push bc
+   push de
+
+   call __heap_fl_link         ; remainder, or the alignment gap
+
+   pop de
+   pop bc
+
+   ld a,l
+   cp e
+   jr nz, alloc_link_new
+
+   ld a,h
+   cp d
+   jr z, alloc_user
+
+alloc_link_new:
+
+   push bc
+   push de
+
+   ld l,e
+   ld h,d                      ; hl = & block_new
+
+   call __heap_fl_link
+
+   pop de
+   pop bc
+
+alloc_user:
+
+   ld hl,6
+   add hl,de                   ; hl = & allocated memory
+
+   or a
+   ret
