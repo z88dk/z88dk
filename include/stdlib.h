@@ -77,7 +77,7 @@ extern char __LIB__ *utoa_callee(uint16_t num,char *buf,int radix) __smallc __z8
 
 
 // double strtod(char *s, char **endp);     /* check math library for availability */
-#if defined(__MATH_MATH32)
+#if defined(__MATH_MATH32) || ((defined(__8080) || defined(__GBZ80)) && (defined(__MATH_MBF32) || defined(__MATH_AM9511) || defined(__MATH_DAI32)))
 extern double strtod(const char *nptr, char **endptr);
 #endif
 

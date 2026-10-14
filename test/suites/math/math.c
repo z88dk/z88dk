@@ -971,6 +971,57 @@ void test_math32_edges()
 }
 #endif
 
+#if !defined(MATH16) && (defined(__8080) || defined(__GBZ80)) && (defined(__MATH_MATH32) || defined(__MATH_MBF32) || defined(__MATH_AM9511) || defined(__MATH_DAI32))
+static void expect_strtod(const char *in, const char *tail, double expect, char *msg)
+{
+    char *end;
+    double got;
+
+    end = 0;
+    got = strtod(in, &end);
+    Assert(approx_equal((FLOAT)got, (FLOAT)expect, EPSILON), msg);
+    Assert(end != 0, msg);
+    Assert(strcmp(end, tail) == 0, msg);
+}
+
+void test_strtod(void)
+{
+    char *end;
+    double got;
+    const char *text;
+
+    // C90 decimal subject sequence. Hexadecimal floats are left for later.
+    expect_strtod("12xyz", "xyz", 12.0, "strtod 12");
+    expect_strtod("-2", "", -2.0, "strtod -2");
+    expect_strtod("1.5", "", 1.5, "strtod 1.5");
+    expect_strtod(".5", "", 0.5, "strtod .5");
+    expect_strtod("1.", "", 1.0, "strtod 1.");
+    expect_strtod("  1.25e1xyz", "xyz", 12.5, "strtod 1.25e1");
+    expect_strtod("1.25e+1", "", 12.5, "strtod 1.25e+1");
+    expect_strtod("2.5e-1", "", 0.25, "strtod 2.5e-1");
+    expect_strtod("+1.e3", "", 1000.0, "strtod +1.e3");
+    expect_strtod("1.5e3.5", ".5", 1500.0, "strtod stops at trailing dot");
+    expect_strtod("-1.25e", "e", -1.25, "strtod incomplete exponent");
+    expect_strtod("--1.25", "", 1.25, "strtod doubled minus");
+    expect_strtod("0x10", "x10", 0.0, "strtod stops at hex marker");
+
+    text = "abc";
+    end = 0;
+    got = strtod(text, &end);
+    Assert(got == (FLOAT)0.0, "strtod no conversion is zero");
+    Assert(end == text, "strtod no conversion keeps the start");
+
+    text = "  .";
+    end = 0;
+    got = strtod(text, &end);
+    Assert(got == (FLOAT)0.0, "strtod lone dot is zero");
+    Assert(end == text, "strtod lone dot keeps the start");
+
+    got = strtod("4", 0);
+    Assert(got == (FLOAT)4.0, "strtod null end pointer");
+}
+#endif
+
 int suite_math()
 {
     suite_setup(MATH_LIBRARY " Tests");
@@ -1008,6 +1059,9 @@ int suite_math()
 #ifdef MATH16
     suite_add_test(test_math16_mul);
     suite_add_test(test_math16_edges);
+#endif
+#if !defined(MATH16) && (defined(__8080) || defined(__GBZ80)) && (defined(__MATH_MATH32) || defined(__MATH_MBF32) || defined(__MATH_AM9511) || defined(__MATH_DAI32))
+    suite_add_test(test_strtod);
 #endif
     return suite_run();
 }

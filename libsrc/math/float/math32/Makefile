@@ -10,10 +10,10 @@ vpath %.c ../cimpl
 # 8085 higher funcs: sccz80 via `make -C c 8085` → c/8085/*.asm in newlibfiles_8085.lst
 # vm1 higher funcs: sccz80 via `make -C c vm1` → c/vm1/*.asm in newlibfiles_vm1.lst
 # Z80 higher funcs: SDCC via `make -C c` → c/z80/*.asm in newlibfiles_z80.lst
-# Stack-only products keep cimpl atof / fix16 only.  ftoa/ftoe/ftog are
-# the asm dtoa engine (asm/*/f32_fto*.asm).  Z80-family uses the lm32
-# sccz80 wrappers onto stdlib asm_dtoa.
-CFILES  = atof.c tofix16.c fromfix16.c
+# Stack-only products keep cimpl atof / strtod / fix16 only.  ftoa/ftoe/ftog
+# are the asm dtoa engine (asm/*/f32_fto*.asm).  Z80-family uses the lm32
+# sccz80 wrappers onto stdlib asm_dtoa.  Z80 strtod stays the stdlib asm.
+CFILES  = atof.c strtod.c tofix16.c fromfix16.c
 OBJECTS = $(CFILES:.c=.o)
 OBJECTS_LM32_TEXT = atof.o tofix16.o fromfix16.o
 
