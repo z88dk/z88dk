@@ -4739,6 +4739,13 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 return 0;
             }
             load_byte_to_a(out, f, op->src[0]);
+            /* HL already holds the base: the byte stays in A. */
+            if (hl_has(op->mem.base) && !st_step && op->mem.offset == 0
+                && !opt_disabled("st-byte-nostash")) {
+                emit(out, "ld\t(hl),a%s", mem_vol_stamp(op));
+                invalidate_de_cache();     /* as the E stash did */
+                return 0;
+            }
             emit(out, "ld\te,a");           /* stash byte across HL load */
             /* E (DE's low half) is now the store value, NOT whatever vreg
                the DE cache believed it held (e.g. `arr[i]=v` after `&arr+i`

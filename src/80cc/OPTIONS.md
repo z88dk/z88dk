@@ -313,6 +313,8 @@ exists (ADR 0010).
 | `byte-cmp-const` | a word compare against a byte-sized constant is not narrowed |
 | `frame-byte-trunc` | a width-2 value truncated to one byte materialises the whole word through HL first instead of reading the one byte directly |
 | `byte-half-direct` | a byte taken from a word held in BC or DE copies the whole word to HL first instead of reading `c`/`b`/`e`/`d` |
+| `ret-thread-pair` | an unconditional `jp` to a bare `ret` right after a conditional `jp` stays a `jp`, even when the conditional's target is not the next label |
+| `st-byte-nostash` | a byte store through a base already in HL copies the byte to E first, instead of storing from A |
 | `sink-trunc` | a word-to-byte truncation is not moved down next to the byte store that reads it, so the byte lives across the address arithmetic |
 | `ivsr-suppress-lea` | a stepped pointer is made for a local array addressed from the frame, instead of rebuilding the address from sp (ez80 sp always keeps it) |
 | `ivsr-share` | two derived induction addresses with the same base, index, scale and step each get their own stepped pointer |

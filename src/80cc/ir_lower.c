@@ -6022,6 +6022,7 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
     if (conv) {
         long idx = 0, cand = -1;
         int cand_tgt = -1, cand_cond = 0, prev_cond_jp = 0;
+        int prev_cond_tgt = -1, cand_prev_tgt = -1;
         rewind(rout);
         while (fgets(line, sizeof line, rout)) {
             long here = idx++;
@@ -6033,7 +6034,7 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
                 continue;
             if (cand >= 0) {                      /* resolve the pending candidate */
                 int veto = 0;
-                if (cand_cond && strncmp(line, "\tjp\t", 4) == 0 && !strchr(line, ','))
+                if (cand_cond == 1 && strncmp(line, "\tjp\t", 4) == 0 && !strchr(line, ','))
                     veto = 1;                     /* invert-me pair: leave to copt */
                 if (line[0] == 'L') {             /* jump to the very next label? */
                     char *p = strstr(line, "_bb_");
@@ -6042,26 +6043,36 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
                         while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
                         if (*q == ':' && n <= max_bb) {
                             int t = (thr[n] >= 0) ? thr[n] : n;
-                            if (t == cand_tgt) veto = 1;
+                            if (cand_cond == 2) { if (t == cand_prev_tgt) veto = 1; }
+                            else if (t == cand_tgt) veto = 1;
                         }
                     }
                 }
                 if (!veto) conv[cand] = 1;
                 cand = -1;
             }
-            int this_cond_jp = 0;
+            int this_cond_jp = 0, this_tgt = -1;
             if (strncmp(line, "\tjp\t", 4) == 0) {
                 this_cond_jp = (strchr(line, ',') != NULL);
                 char rcc[8]; int rbb;
                 if (retthread_parts(line, rcc, sizeof rcc, &rbb) && rbb <= max_bb) {
                     int t = (thr[rbb] >= 0) ? thr[rbb] : rbb;
+                    this_tgt = t;
                     if (t <= max_bb && retlab[t]) {
-                        if (!rcc[0]) { if (!prev_cond_jp) conv[here] = 1; }
+                        if (!rcc[0]) {
+                            if (!prev_cond_jp) conv[here] = 1;
+                            else if (prev_cond_tgt >= 0 && !opt_disabled("ret-thread-pair")) {
+                                /* Only the next label lets copt invert the pair. */
+                                cand = here; cand_tgt = t; cand_cond = 2;
+                                cand_prev_tgt = prev_cond_tgt;
+                            }
+                        }
                         else { cand = here; cand_tgt = t; cand_cond = 1; }
                     }
                 }
             }
             prev_cond_jp = this_cond_jp;
+            prev_cond_tgt = this_cond_jp ? this_tgt : -1;
         }
         if (cand >= 0) conv[cand] = 1;            /* nothing follows: convert */
     }
