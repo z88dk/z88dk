@@ -94,12 +94,12 @@
 #define VM1_OF_ONLY()   do { if (isvm1()) fk = ((fr ^ fa) & (fr ^ fb)) >> 7 & 1; } while (0)
 
 #define INCW(a, b)              \
-          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 2 : iskc160() ? 1 : 6, \
+          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 2 : iskc160() ? 1 : isz180() ? 4 : 6, \
           ++b || a++, \
           fk = (a|b) == 0 ? 1 : 0
 
 #define DECW(a, b)              \
-          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 2 : iskc160() ? 1 : 6, \
+          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 2 : iskc160() ? 1 : isz180() ? 4 : 6, \
           b-- || a--, \
           fk = (a&b) == 0xff ? 1 : 0
 
@@ -1041,7 +1041,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
     r++;
     switch( (opc = get_memory_inst(pc++)) ){
       case 0x00: // NOP
-        st+= israbbit() ? 2 : isz180() ? 3 : iskc160() ? 1 : isr800() ? 1 : 4;
+        st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : iskc160() ? 1 : isr800() ? 1 : 4;
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         break;
       case 0x40: // LD B,B // (R6K) alts
@@ -1210,7 +1210,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           INCW(xh, xl);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x33: // INC SP
-        st+= isez80() ? 1 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 1 : iskc160() ? 1 : 6;
+        st+= isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 1 : iskc160() ? 1 : isz180() ? 4 : 6;
         sp++;
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x0b: // DEC BC / (R4K) LDF (lmn),BCDE LDF (lmn),JKHL
@@ -1233,7 +1233,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           DECW(xh, xl);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x3b: // DEC SP
-        st+= isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 1 : iskc160() ? 1 : 6;
+        st+= isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 1 : iskc160() ? 1 : isz180() ? 4 : 6;
         sp--;
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x04: // INC B
