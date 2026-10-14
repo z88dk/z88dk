@@ -83,7 +83,7 @@ __CLIB_OPT_MALLOC in the target config selects this search. The
 Malloc section of config_clib.m4 sets it. 1 is the spare-tail
 search above. 0 is the address-chain walker: each call walks the
 block headers, and that walker is the smaller program. The
-library is built with 1. A different value takes effect when the
+library is built with 0. A different value takes effect when the
 library is assembled again.
 
 

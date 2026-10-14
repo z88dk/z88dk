@@ -502,7 +502,7 @@ define(`__CLIB_OPT_SORT_QSORT_ENABLE_EQUAL', 0x08)
 ; Select the search used by malloc(), free() and realloc().
 ; The choice is fixed when the library is assembled.
 
-define(`__CLIB_OPT_MALLOC', 1)
+define(`__CLIB_OPT_MALLOC', 0)
 
 define(`__CLIB_OPT_MALLOC_SMALL', 0)
 define(`__CLIB_OPT_MALLOC_FAST',  1)
