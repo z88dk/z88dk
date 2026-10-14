@@ -1281,7 +1281,25 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
             emit_acc_slot_addr(out, f, src, 0);
             emit(out, "call\t%s", hi->acc_load);
         }
-        emit(out, "call\t%s", hi->name);
+        if (!strcmp(hi->name, "fabs") && hi->acc_width == 8
+            && !c_opt_code_size && !opt_disabled("fabs-fa-clear")) {
+            /* 64-bit MBF keeps its sign in bit 7 of FA byte 6: clear it where
+               it sits instead of calling the library routine. The call is
+               smaller, so --opt-code-size keeps it. */
+            emit(out, "EXTERN\t___mbf64_FA");
+            emit(out, "ld\thl,___mbf64_FA+6");
+            if (IS_8080() || IS_8085()) {
+                emit(out, "ld\ta,(hl)");
+                emit(out, "and\t127");
+                emit(out, "ld\t(hl),a");
+            } else {
+                emit(out, "res\t7,(hl)");
+            }
+            invalidate_hl_bc();
+            invalidate_a_cache();
+        } else {
+            emit(out, "call\t%s", hi->name);
+        }
         store_acc_to_slot(out, f, dst, hi);
         return 0;
     }

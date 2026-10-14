@@ -677,6 +677,7 @@ static const char *acc_name(const char *stem)
     if (!strcmp(stem, "eq"))       return f64 ? "l_f64_eq"  : "deq";
     if (!strcmp(stem, "ne"))       return f64 ? "l_f64_ne"  : "dne";
     if (!strcmp(stem, "neg"))      return f64 ? "l_f64_negate" : "minusfa";
+    if (!strcmp(stem, "fabs"))     return f64 ? "fabs" : NULL;
     if (!strcmp(stem, "ftof16"))   return f64 ? "l_f64_ftof16" : "l_f48_ftof16";
     if (!strcmp(stem, "f16tof"))   return f64 ? "l_f64_f16tof" : "l_f48_f16tof";
     if (!strcmp(stem, "sint2f"))   return f64 ? "l_f64_sint2f"  : "l_int2long_s_float";
@@ -4335,6 +4336,57 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 op->imm    = (int)cnt->zval; /* byte count */
                 return dst_v;
             }
+        }
+        /* __builtin_fabs / __builtin_fabsf16 (callfunction keeps the call only
+           for formats fabs_inline_ok accepts): clear the sign bit. float16 is
+           bit 15, IEEE single bit 31, MBF single bit 23; the 64-bit MBF format
+           is a FA-tier helper that clears the sign byte in place. */
+        if (n_args == 1
+            && (strcmp(n->sym->name, "__builtin_fabs") == 0
+                || strcmp(n->sym->name, "__builtin_fabsf16") == 0)) {
+            Node *a0 = array_get_byindex(n->args, 0);
+            int half = n->sym->name[strlen(n->sym->name) - 1] == '6';
+            if (a0 && a0->type && fabs_inline_ok(a0->type->kind, half)) {
+                Kind nk = a0->type->kind;
+                int fv = build_expr(b, a0);
+                if (fv < 0) return -1;
+                if (is_acc_float_kind(nk)) {
+                    int dst = new_temp_kind(b, KIND_DOUBLE);
+                    acc_tier_fa(acc_unop1(b, acc_name("fabs"), fv, dst), ACC_SUB_ACC_UNARY);
+                    return dst;
+                }
+                int64_t mask = nk == KIND_FLOAT16 ? 0x7fff
+                             : c_maths_mode == MATHS_IEEE ? 0x7fffffffLL : 0xff7fffffLL;
+                int dst = new_temp_kind(b, nk);
+                Op *op = ir_op_emit(cur_bb(b), IR_AND);
+                op->dst = dst; op->src[0] = fv; op->src[1] = -1;
+                op->imm = mask;
+                return dst;
+            }
+        }
+        /* __builtin_signbit (callfunction keeps the call only for the 32-bit
+           IEEE and MBF formats): the byte holding the sign bit is the top byte
+           for IEEE and the one below it for MBF; test its bit 7. */
+        if (n_args == 1 && strcmp(n->sym->name, "__builtin_signbit") == 0) {
+            int64_t sm = fp32_sign_mask();
+            Node *ai = array_get_byindex(n->args, 0);
+            int fv = build_expr(b, ai);
+            if (fv < 0) return -1;
+            fv = coerce_int_to_float_kind(b, fv, ai, KIND_DOUBLE);
+            if (fv < 0) return -1;
+            int sh = new_temp_kind(b, KIND_LONG);
+            Op *op = ir_op_emit(cur_bb(b), IR_SHR);
+            op->dst = sh; op->src[0] = fv; op->src[1] = -1;
+            op->imm = sm == 0x80000000LL ? 24 : 16;
+            int by = new_temp(b, 1), bm = new_temp(b, 1);
+            op = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+            op->dst = by; op->src[0] = sh;
+            op = ir_op_emit(cur_bb(b), IR_AND);
+            op->dst = bm; op->src[0] = by; op->src[1] = -1; op->imm = 0x80;
+            int dst = new_temp_kind(b, KIND_INT);
+            op = ir_op_emit(cur_bb(b), IR_CMP_NE);
+            op->dst = dst; op->src[0] = bm; op->src[1] = -1; op->imm = 0;
+            return dst;
         }
         /* Inline __builtin_strcpy (always — variable length, no const
            needed): IR_STRCPY (dst, src), lowered to a NUL-terminated

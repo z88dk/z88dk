@@ -56,6 +56,8 @@ typedef long double zdouble;
  */
 
 extern Node    *callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
+extern int      fabs_inline_ok(Kind kind, int half);
+extern int64_t  fp32_sign_mask(void);
 
 
 /* cdbfile.c */

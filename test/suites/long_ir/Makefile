@@ -5329,3 +5329,59 @@ strlenlit_ez80.bin: $(SOURCES) strlenlit.c
 strlenlit_ez80_fp.bin: $(SOURCES) strlenlit.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# [fabsin] fabs and fabsf16 clear the sign bit in line for IEEE/MBF 32-bit and float16.
+all:	fabsin.bin fabsin_fp.bin fabsin_mbf.bin fabsin_mbf_fp.bin fabsin_8085.bin fabsin_gbz80.bin fabsin_r2ka.bin fabsin_kc160.bin fabsin_ez80_fp.bin fabsin_8080.bin fabsin_keep.bin
+
+fabsin.bin: $(SOURCES) fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fabsin_fp.bin: $(SOURCES) fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fabsin_mbf.bin: $(SOURCES) fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fabsin_mbf_fp.bin: $(SOURCES) fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fabsin_8085.bin: $(SOURCES) fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fabsin_gbz80.bin: $(SOURCES) fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fabsin_r2ka.bin: $(SOURCES) fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -fframe-pointer --math32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fabsin_kc160.bin: $(SOURCES) fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160 -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mkc160 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fabsin_ez80_fp.bin: $(SOURCES) fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fabsin_8080.bin: $(SOURCES) fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fabsin_keep.bin: $(SOURCES) fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=fabs-inline -fp-mode=ieee --math16 --math32 -DHAVE_F16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# [fabsin] The 64-bit MBF library needs a BASIC ROM to run, so fabs of an MBF64 value is assembled only.
+all:	fabsin_mbf64.o fabsin_mbf64_os.o
+
+fabsin_mbf64.o: fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc-fp-mode=mbf64 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) -c $< -o $@
+
+fabsin_mbf64_os.o: fabsin.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc-fp-mode=mbf64 --opt-code-size -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) -c $< -o $@
