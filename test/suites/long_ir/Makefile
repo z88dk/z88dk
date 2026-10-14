@@ -5385,3 +5385,50 @@ fabsin_mbf64.o: fabsin.c
 
 fabsin_mbf64_os.o: fabsin.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc-fp-mode=mbf64 --opt-code-size -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) -c $< -o $@
+
+# [hints] __builtin_expect, __builtin_assume and __builtin_unreachable.
+all:	hints.bin hints_fp.bin hints_8080.bin hints_8085.bin hints_gbz80.bin hints_r2ka.bin hints_kc160.bin hints_ez80_fp.bin hints_z80n.bin hints_keep.bin hints_os.bin
+
+hints.bin: $(SOURCES) hints.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hints_fp.bin: $(SOURCES) hints.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hints_8080.bin: $(SOURCES) hints.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hints_8085.bin: $(SOURCES) hints.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hints_gbz80.bin: $(SOURCES) hints.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hints_r2ka.bin: $(SOURCES) hints.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hints_kc160.bin: $(SOURCES) hints.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mkc160 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hints_ez80_fp.bin: $(SOURCES) hints.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hints_z80n.bin: $(SOURCES) hints.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hints_keep.bin: $(SOURCES) hints.c
+	zcc +test -vn -Cc--opt-disable=switch-unreachable $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+hints_os.bin: $(SOURCES) hints.c
+	zcc +test -vn --opt-code-size $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }

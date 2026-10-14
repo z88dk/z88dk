@@ -103,6 +103,7 @@ extern int        qstr(double *val);
 extern void       stowlit(int value, int size);
 extern void       size_of(LVALUE *lval);
 extern void       offset_of(LVALUE *lval);
+extern void       types_compatible_p(LVALUE *lval);
 extern void       write_constant_queue(void);
 extern void       indicate_constant_written(int litlab);
 extern int        ir_pool_litlab_llong(zdouble dval);

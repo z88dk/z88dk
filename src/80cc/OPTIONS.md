@@ -272,6 +272,7 @@ exists (ADR 0010).
 | `strlen-fold` | strlen of a string literal is a call, not a constant |
 | `fabs-inline` | fabs and fabsf16 of a 32-bit IEEE, 32-bit MBF, 64-bit MBF or float16 value are a library call, not a sign bit clear |
 | `fabs-fa-clear` | fabs of a 64-bit MBF value calls the library routine, not a sign bit clear in the accumulator (--opt-code-size also calls) |
+| `switch-unreachable` | a switch case or default that is __builtin_unreachable still gets its compare |
 | `size-glong` | with `--opt-code-size`, a four-byte load through HL is the inline byte sequence, not `call l_glong` |
 | `call-sp-cleanup` | use `pop bc` chains instead of HL-based stack cleanup when the result does not occupy HL |
 | `bc-save-live` | BC is saved around a call even when it holds nothing live |

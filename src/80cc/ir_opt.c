@@ -903,6 +903,57 @@ static void prune_free_bb(BB *bb)
     free(bb->pred);
 }
 
+/* A block that holds only __builtin_unreachable. */
+static int bb_is_unreach(const Func *f, int id)
+{
+    if (id < 0 || id >= f->n_bbs) return 0;
+    const BB *bb = &f->bbs[id];
+    return bb->n_ops == 1 && bb->ops[0].kind == IR_RET
+        && bb->ops[0].imm == IR_RET_UNREACH;
+}
+
+/* Switch targets that are __builtin_unreachable can never be taken: such cases
+   are dropped, and an unreachable default makes the last case the fall-through
+   so its compare disappears. A switch left with no cases becomes a jump. */
+int ir_opt_switch_unreachable(Func *f)
+{
+    if (!f || f->n_bbs <= 0 || opt_disabled("switch-unreachable")) return 0;
+    int changed = 0;
+    for (int i = 0; i < f->n_bbs; i++) {
+        BB *bb = &f->bbs[i];
+        if (bb->n_ops == 0) continue;
+        Op *o = &bb->ops[bb->n_ops - 1];
+        SwitchInfo *sw = o->kind == IR_SWITCH ? o->sw : NULL;
+        if (!sw) continue;
+        for (int c = 0; c < sw->n_cases;) {
+            if (bb_is_unreach(f, sw->target_bb[c])) {
+                for (int k = c + 1; k < sw->n_cases; k++) {
+                    sw->values[k - 1] = sw->values[k];
+                    sw->target_bb[k - 1] = sw->target_bb[k];
+                }
+                sw->n_cases--;
+                changed++;
+            } else c++;
+        }
+        if (bb_is_unreach(f, sw->default_bb) && sw->n_cases > 0) {
+            sw->default_bb = sw->target_bb[sw->n_cases - 1];
+            sw->n_cases--;
+            changed++;
+        }
+        if (sw->n_cases == 0 && !bb_is_unreach(f, sw->default_bb)) {
+            o->kind = IR_BR;
+            o->label = sw->default_bb;
+            o->src[0] = -1;
+            o->sw = NULL;
+            bb->succ[0] = o->label;
+            bb->succ[1] = -1;
+            free(sw->values); free(sw->target_bb); free(sw);
+            changed++;
+        }
+    }
+    return changed;
+}
+
 int ir_opt_prune_unreachable(Func *f)
 {
     if (!f || f->n_bbs <= 0) return 0;

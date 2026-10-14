@@ -723,6 +723,9 @@ int heirb(LVALUE* lval)
                         lval->node = callfunction(ptr,NULL);
                     }
                     return_type = lval->ltype->return_type;
+                    if (ptr && lval->node && lval->node->type
+                        && strcmp(ptr->name, "__builtin_expect") == 0)
+                        return_type = lval->node->type;
                 } else {
                     // No idea what you are doing, calling a non pointer
                     errorfmt("Calling a non-pointer function?",1);

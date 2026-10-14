@@ -169,6 +169,7 @@ int ir_opt_conv_mask_fold(Func *f);
  * every later pass sees a clean CFG. IR_NO_PRUNE opts out. Returns the
  * number of blocks removed. */
 int ir_opt_prune_unreachable(Func *f);
+int ir_opt_switch_unreachable(Func *f);
 
 /* Byte-width narrowing: a promoted int binop (add/sub/and/or/xor/shl)
  * whose result is only truncated back to a byte is re-typed width-1 so

@@ -394,6 +394,28 @@ void offset_of(LVALUE *lval)
 
 }
 
+/* __builtin_types_compatible_p(type, type): 1 when the two types are the same,
+   0 otherwise. A pointer and an array are different types here, unlike in
+   type_matches. */
+void types_compatible_p(LVALUE *lval)
+{
+    Type *t1 = NULL, *t2 = NULL;
+
+    needchar('(');
+    t1 = parse_expr_type();
+    needchar(',');
+    t2 = parse_expr_type();
+    needchar(')');
+    if (t1 == NULL || t2 == NULL)
+        errorfmt("__builtin_types_compatible_p needs two types", 1);
+    lval->const_val = t1 && t2 && t1->kind == t2->kind && type_matches(t1, t2);
+    lval->is_const = 1;
+    lval->val_type = KIND_INT;
+    lval->ptr_type = KIND_NONE;
+    lval->ltype = type_int;
+    lval->node = ast_literal(lval->ltype, lval->const_val);
+}
+
 /* Perform a sizeof (works on variables as well */
 void size_of(LVALUE* lval)
 {

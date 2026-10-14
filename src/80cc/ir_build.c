@@ -4388,6 +4388,21 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             op->dst = dst; op->src[0] = bm; op->src[1] = -1; op->imm = 0;
             return dst;
         }
+        /* __builtin_unreachable: a return marked as never reached, which
+           ir_opt_switch_unreachable uses to drop switch compares. The code
+           after it is parked in a fresh block. __builtin_assume only promises
+           a condition and changes nothing yet. */
+        if (n_args == 0 && strcmp(n->sym->name, "__builtin_unreachable") == 0) {
+            Op *rt = ir_emit_ret(cur_bb(b), -1);
+            rt->imm = IR_RET_UNREACH;
+            b->cur_bb_id = ir_bb_new(b->f);
+        }
+        if ((n_args == 0 && strcmp(n->sym->name, "__builtin_unreachable") == 0)
+            || (n_args == 1 && strcmp(n->sym->name, "__builtin_assume") == 0)) {
+            int dv = new_temp(b, 2);
+            ir_emit_ld_imm(cur_bb(b), dv, 0);
+            return dv;
+        }
         /* Inline __builtin_strcpy (always — variable length, no const
            needed): IR_STRCPY (dst, src), lowered to a NUL-terminated
            copy loop. strcpy returns dst. */

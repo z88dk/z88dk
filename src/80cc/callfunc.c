@@ -150,6 +150,11 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
             errorfmt("Too few arguments to call to function '%s'", 1, functype->name);
     }
 
+    /* __builtin_expect(x, c) is x: the likelihood hint changes no code. */
+    if (ptr && !function_pointer_call && argnumber == 2
+        && strcmp(ptr->name, "__builtin_expect") == 0)
+        return array_get_byindex(function_args, 0);
+
     /* __builtin_strlen_fastcall: the length of a string literal is a
        constant, and a literal that nothing else shares leaves the pool.
        Any other argument is a call to the library routine. */

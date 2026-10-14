@@ -9757,6 +9757,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
            corrupting the loop/depth scans LICM and ir_alloc's residency picks
            rely on. Every later pass then sees a clean, contiguously-numbered
            CFG. */
+        (void)ir_opt_switch_unreachable(f);
         int pruned  = ir_opt_prune_unreachable(f);
         int aggpromoted = ir_opt_promote_aggregate_fields(f);
         int hoisted = ir_opt_licm(f);
