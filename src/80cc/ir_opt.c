@@ -6025,6 +6025,23 @@ int ir_opt_rotl_bitop(Func *f)
             int jb = rw_find_def(bb, j, r);
             if (jb < 0) continue;
             Op *bo = &bb->ops[jb];
+            /* swap(swap(x)) is x */
+            if (bo->kind == IR_ROTL && (bo->imm & 15) == 8 && bo->src[1] < 0
+                && bo->src[0] >= 0 && bo->src[0] < nv
+                && f->vregs[bo->src[0]].width == 2 && defcnt[d2] == 1
+                && !opt_disabled("swap-swap")) {
+                int xx = bo->src[0], bad2 = 0;
+                for (int k = jb + 1; k < j && !bad2; k++) {
+                    int dd[8]; int nd = ir_op_defs(&bb->ops[k], dd, 8);
+                    for (int t = 0; t < nd; t++) if (dd[t] == xx) bad2 = 1;
+                }
+                if (!bad2) {
+                    r2->kind = IR_MOV; r2->src[0] = xx; r2->src[1] = -1; r2->imm = 0;
+                    bo->kind = IR_NOP; bo->dst = -1; bo->src[0] = -1; bo->src[1] = -1; bo->imm = 0;
+                    changed++;
+                    continue;
+                }
+            }
             if (!rw_bitop(bo->kind) || bo->src[1] >= 0 || bo->imm_sym) continue;
             int x1 = bo->src[0];
             if (x1 < 0 || x1 >= nv || usecnt[x1] != 1 || defcnt[x1] != 1) continue;

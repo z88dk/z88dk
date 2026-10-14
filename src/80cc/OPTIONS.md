@@ -326,6 +326,8 @@ exists (ADR 0010).
 | `barrel-push` | a z80n shift result pushed as the next call argument is swapped into HL first, instead of pushed from DE |
 | `alloc-barrel-de` | the operand of a z80n constant shift is not given the DE home, so it is built in HL and swapped |
 | `sym-addr-walk` | consecutive constant stores to nearby bytes of one global reload HL with the address, instead of stepping it with inc/dec |
+| `swap-swap` | two 16-bit byte swaps in a row are both emitted, instead of cancelling |
+| `rmw-hl` | a byte read-modify-write of a global reads and writes through absolute addresses, instead of one `ld hl,g` shared by the load and the store |
 | `sink-trunc` | a word-to-byte truncation is not moved down next to the byte store that reads it, so the byte lives across the address arithmetic |
 | `ivsr-suppress-lea` | a stepped pointer is made for a local array addressed from the frame, instead of rebuilding the address from sp (ez80 sp always keeps it) |
 | `ivsr-share` | two derived induction addresses with the same base, index, scale and step each get their own stepped pointer |

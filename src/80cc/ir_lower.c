@@ -359,6 +359,8 @@ static void byte_remat_symstr(char *buf, size_t n, const Op *o)
 
 static int sdccdecl_byte_const_enabled(void);
 static void emit_byte_remat_to_a(FILE *out, const Op *o);
+static int rmw_chain_to_store(const Func *f, const BB *bb, int start, int vreg,
+                              SYMBOL *sym, int off);
 static int byte_call_only_sdccdecl(const Func *f, int v);
 static const Op *byte_imm_origin(const Func *f, int v, int depth);
 
@@ -13301,6 +13303,49 @@ static int sdccdecl_byte_const_enabled(void)
 
 /* Materialise a byte-remat source in A. Global byte loads re-issue the
    absolute memory read; constants load their low byte directly. */
+/* Can byte operand `v` be applied to A without touching HL? An immediate, a byte
+   register home, or (frame-pointer mode) a frame slot read through IX/IY. */
+static int rmw_operand_hl_free(const Func *f, int v)
+{
+    if (v < 0 || v >= f->n_vregs) return 0;
+    if (g_hc.remat_def && g_hc.remat_def[v] && g_hc.remat_def[v]->kind == IR_LD_IMM)
+        return 1;
+    if (byte_remat_of(f, v)) return 0;
+    if (byte_home_phys(f, v) != IR_PR_NONE) return 1;
+    if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    return fp_active(f) && fp_offset_fits(slot_ix_off(f, v));
+}
+
+/* Is the byte loaded into `vreg` (global `sym`+`off`) combined by a short chain
+   of byte ALU ops that touch no HL and then stored straight back to the same
+   byte? `start` is the first op of the chain. Then the whole read-modify-write
+   goes through HL: `ld hl,g` / `ld a,(hl)` ... `ld (hl),a`. */
+static int rmw_chain_to_store(const Func *f, const BB *bb, int start, int vreg,
+                              SYMBOL *sym, int off)
+{
+    if (!bb || start < 0 || opt_disabled("rmw-hl")) return 0;
+    int cur = vreg;
+    for (int k = start; k < bb->n_ops && k < start + 4; k++) {
+        const Op *o = &bb->ops[k];
+        if (o->kind == IR_ST_MEM && o->mem.kind == IR_MEM_SYM && o->mem.sym == sym
+            && o->mem.offset == off && o->src[0] == cur && !o->mem.volatile_
+            && !o->mem.bank_fn && k > start)
+            return find_unique_use(f, vreg) != NULL;
+        int alu = (o->kind == IR_AND || o->kind == IR_OR || o->kind == IR_XOR
+                   || o->kind == IR_ADD || o->kind == IR_SUB);
+        if (!alu || o->dst < 0 || f->vregs[o->dst].width != 1) return 0;
+        int comm = (o->kind != IR_SUB);
+        int other;
+        if (o->src[0] == cur) other = o->src[1];
+        else if (comm && o->src[1] == cur) other = o->src[0];
+        else return 0;
+        if (other >= 0 && !rmw_operand_hl_free(f, other)) return 0;
+        if (find_unique_use(f, cur) != o) return 0;
+        cur = o->dst;
+    }
+    return 0;
+}
+
 static void emit_byte_remat_to_a(FILE *out, const Op *o)
 {
     if (o->kind == IR_LD_IMM) {
@@ -13308,6 +13353,18 @@ static void emit_byte_remat_to_a(FILE *out, const Op *o)
     } else {
         char s[80];
         byte_remat_symstr(s, sizeof s, o);
+        /* A read-modify-write of this global: go through HL, which the store
+           back then reuses. */
+        if (o->kind == IR_LD_MEM && o->mem.kind == IR_MEM_SYM && cur_lazy_func
+            && cur_bb && cur_op_idx >= 0
+            && rmw_chain_to_store(cur_lazy_func, cur_bb, cur_op_idx, o->dst,
+                                  o->mem.sym, o->mem.offset)) {
+            hl_about_to_change(-1);
+            emit(out, "ld\thl,%s", s);
+            emit(out, "ld\ta,(hl)");
+            L.hla_on = 1; L.hla_sym = o->mem.sym; L.hla_off = o->mem.offset;
+            return;
+        }
         emit(out, "ld\ta,(%s)", s);
     }
 }

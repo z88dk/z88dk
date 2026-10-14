@@ -3803,6 +3803,20 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                MUST be byte-sized (store_a_byte, not store_hl): a word spill
                into a trailing 1-byte slot writes one past the frame and
                clobbers the return address. */
+            if (!op->mem.volatile_ && cur_bb && cur_op_idx >= 0
+                && &cur_bb->ops[cur_op_idx] == op
+                && rmw_chain_to_store(f, cur_bb, cur_op_idx + 1, op->dst,
+                                      op->mem.sym, op->mem.offset)) {
+                hl_about_to_change(-1);
+                if (op->mem.offset)
+                    emit(out, "ld\thl,_%s+%d", ir_sym_name(op->mem.sym), op->mem.offset);
+                else
+                    emit(out, "ld\thl,_%s", ir_sym_name(op->mem.sym));
+                emit(out, "ld\ta,(hl)");
+                L.hla_on = 1; L.hla_sym = op->mem.sym; L.hla_off = op->mem.offset;
+                commit_a_byte(out, f, op->dst);
+                return 0;
+            }
             if (op->mem.offset)
                 emit(out, "ld\ta,(_%s+%d)%s",
                      ir_sym_name(op->mem.sym), op->mem.offset, mem_vol_stamp(op));
@@ -4730,6 +4744,12 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
         if (src_w == 1) {
             /* Byte store to a global. `ld a,r; ld (sym),a`. */
             load_byte_to_a(out, f, op->src[0]);
+            if (L.hla_on && L.hla_sym == op->mem.sym && L.hla_off == op->mem.offset
+                && !op->mem.volatile_ && !opt_disabled("rmw-hl")) {
+                emit(out, "ld\t(hl),a");    /* HL still holds the address */
+                invalidate_hl_cache();
+                return 0;
+            }
             if (op->mem.offset)
                 emit(out, "ld\t(_%s+%d),a",
                      ir_sym_name(op->mem.sym), op->mem.offset);
