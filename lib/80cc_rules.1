@@ -293,6 +293,60 @@
 	ld	l,a
 	or	h
 
+;; #FRC: argument cleanup straight before `ld sp,ix` is dead, since the frame
+;; reset overwrites SP. What the cleanup left in HL or BC was junk, so leaving
+;; those registers alone is no change. A return-value load or the DE-preserving
+;; `ex de,hl` pair between the cleanup and the reset is kept as it was.
+%title #FRC drop call cleanup before the frame reset (-4b)
+	ld	hl,%1
+	add	hl,sp
+	ld	sp,hl
+	ld	sp,ix
+=
+	ld	sp,ix
+
+%title #FRC drop call cleanup before a return-value load and the frame reset (-4b)
+%not %2 sp hl "(hl)" "hl[+-][0-9]+"
+	ld	hl,%1
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,%2
+	ld	sp,ix
+=
+	ld	hl,%2
+	ld	sp,ix
+
+%title #FRC drop result-preserving call cleanup before the frame reset (-5b)
+	ex	de,hl
+	ld	hl,%1
+	add	hl,sp
+	ld	sp,hl
+	ex	de,hl
+	ld	sp,ix
+=
+	ld	sp,ix
+
+%title #FRC drop a pop bc cleanup before the frame reset (-1b)
+	pop	bc
+	ld	sp,ix
+=
+	ld	sp,ix
+
+%title #FRC drop a pop bc cleanup before a return-value load and the frame reset (-1b)
+%not %1 sp hl "(hl)" "hl[+-][0-9]+"
+	pop	bc
+	ld	hl,%1
+	ld	sp,ix
+=
+	ld	hl,%1
+	ld	sp,ix
+
+%title #FRC drop an inc sp cleanup before the frame reset (-1b)
+	inc	sp
+	ld	sp,ix
+=
+	ld	sp,ix
+
 ;; #285p: byte-swapped word load `ld a,(hl+); ld h,(hl); ld l,a; ld l,h; ld h,a`
 ;; (reads b0,b1; arranges H=b0,L=b1) — load b1 straight into L instead of the
 ;; H-then-copy detour, dropping the dead `ld l,a`. Net H=b0/L=b1 unchanged; the
