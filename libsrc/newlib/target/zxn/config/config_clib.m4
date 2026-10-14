@@ -496,6 +496,21 @@ define(`__CLIB_OPT_SORT_QSORT_ENABLE_EQUAL', 0x08)
 ; bit  3 = $08 = enable equal items distribution
 
 ; #############################################################
+; ## Malloc ###################################################
+; #############################################################
+
+; Select the search used by malloc(), free() and realloc().
+; The choice is fixed when the library is assembled.
+
+define(`__CLIB_OPT_MALLOC', 1)
+
+define(`__CLIB_OPT_MALLOC_SMALL', 0)
+define(`__CLIB_OPT_MALLOC_FAST',  1)
+
+; 0 = address-chain walker (size, then speed)
+; 1 = spare-tail search (speed, then size)
+
+; #############################################################
 ; ## Error Strings ############################################
 ; #############################################################
 
@@ -712,6 +727,11 @@ PUBLIC `__CLIB_OPT_SORT_QSORT_PIVOT_RAN'
 PUBLIC `__CLIB_OPT_SORT_QSORT_ENABLE_INSERTION'
 PUBLIC `__CLIB_OPT_SORT_QSORT_ENABLE_EQUAL'
 
+PUBLIC `__CLIB_OPT_MALLOC'
+
+PUBLIC `__CLIB_OPT_MALLOC_SMALL'
+PUBLIC `__CLIB_OPT_MALLOC_FAST'
+
 PUBLIC `__CLIB_OPT_ERROR'
 
 PUBLIC `__CLIB_OPT_ERROR_ENABLED'
@@ -915,6 +935,11 @@ defc `__CLIB_OPT_SORT_QSORT_PIVOT_RAN' = __CLIB_OPT_SORT_QSORT_PIVOT_RAN
 defc `__CLIB_OPT_SORT_QSORT_ENABLE_INSERTION' = __CLIB_OPT_SORT_QSORT_ENABLE_INSERTION
 defc `__CLIB_OPT_SORT_QSORT_ENABLE_EQUAL' = __CLIB_OPT_SORT_QSORT_ENABLE_EQUAL
 
+defc `__CLIB_OPT_MALLOC' = __CLIB_OPT_MALLOC
+
+defc `__CLIB_OPT_MALLOC_SMALL' = __CLIB_OPT_MALLOC_SMALL
+defc `__CLIB_OPT_MALLOC_FAST' = __CLIB_OPT_MALLOC_FAST
+
 defc `__CLIB_OPT_ERROR' = __CLIB_OPT_ERROR
 
 defc `__CLIB_OPT_ERROR_ENABLED' = __CLIB_OPT_ERROR_ENABLED
@@ -1117,6 +1142,11 @@ ifdef(`CFG_C_DEF',
 `#define' `__CLIB_OPT_SORT_QSORT_PIVOT_RAN'  __CLIB_OPT_SORT_QSORT_PIVOT_RAN
 `#define' `__CLIB_OPT_SORT_QSORT_ENABLE_INSERTION'  __CLIB_OPT_SORT_QSORT_ENABLE_INSERTION
 `#define' `__CLIB_OPT_SORT_QSORT_ENABLE_EQUAL'  __CLIB_OPT_SORT_QSORT_ENABLE_EQUAL
+
+`#define' `__CLIB_OPT_MALLOC'  __CLIB_OPT_MALLOC
+
+`#define' `__CLIB_OPT_MALLOC_SMALL'  __CLIB_OPT_MALLOC_SMALL
+`#define' `__CLIB_OPT_MALLOC_FAST'  __CLIB_OPT_MALLOC_FAST
 
 `#define' `__CLIB_OPT_ERROR'  __CLIB_OPT_ERROR
 

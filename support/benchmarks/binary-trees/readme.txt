@@ -130,9 +130,10 @@ cycle count  = 388921443
 time @ 4MHz  = 388921443 / 4*10^6 = 1 min 37.23 sec
 
 Issue #113: https://github.com/z88dk/z88dk/issues/113
-Free-list allocator before the sccz80 size pass in row 6. z88dk-zsdcc
-was not available to retime that pass. Previous published run on the
-old allocator was 6570984020 cycles.
+This row is the fast setting, measured before the size pass in row 6.
+__CLIB_OPT_MALLOC is 1, the spare-tail search. z88dk-zsdcc was not
+available to retime that pass. Previous published run on the old
+allocator was 6570984020 cycles.
 
 6.
 Z88DK October 14, 2026
@@ -143,12 +144,13 @@ cycle count  = 389283490
 time @ 4MHz  = 389283490 / 4*10^6 = 1 min 37.32 sec
 
 Issue #113: https://github.com/z88dk/z88dk/issues/113
-malloc searches an address-ordered free list of spare tails, so this
-benchmark no longer walks every live block. Removing a tail splices
-the node from the links it already holds. In-place realloc still
-compares the next header. Same source against the previous allocator:
-6578438820 cycles. The free-list allocator before this size pass was
-394509309 cycles and 7795 bytes less page zero.
+This row is the fast setting. __CLIB_OPT_MALLOC is 1, the spare-tail
+search. malloc searches an address-ordered free list of spare tails,
+so this benchmark no longer walks every live block. Removing a tail
+splices the node from the links it already holds. In-place realloc
+still compares the next header. Same source against the previous
+allocator: 6578438820 cycles. The free-list allocator before this
+size pass was 394509309 cycles and 7795 bytes less page zero.
 
 7.
 IAR Z80 V4.06A

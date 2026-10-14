@@ -55,11 +55,13 @@ new/sccz80
 cycle count  = 389283490
 time @ 4MHz  = 389283490 / 4*10^6 = 1 min 37.32 sec
 
-malloc searches an address-ordered free list of spare tails. Removing a
-tail splices the node from the links it already holds. In-place realloc
-still compares the next header. Same source and compiler against the
-previous allocator: 6578438820 cycles. The free-list allocator before
-this size pass was 394509309 cycles and 7795 bytes less page zero.
+This result is the fast setting. __CLIB_OPT_MALLOC is 1, the spare-tail
+search. malloc searches an address-ordered free list of spare tails.
+Removing a tail splices the node from the links it already holds.
+In-place realloc still compares the next header. Same source and
+compiler against the previous allocator: 6578438820 cycles. The
+free-list allocator before this size pass was 394509309 cycles and
+7795 bytes less page zero.
 
 
 Z88DK October 14, 2026
@@ -69,6 +71,7 @@ new/zsdcc 4.6.0 #16639
 cycle count  = 388921443
 time @ 4MHz  = 388921443 / 4*10^6 = 1 min 37.23 sec
 
-Measured on the free-list allocator before the size pass above.
-z88dk-zsdcc was not available to retime that pass. The assembler
-sources are shared with the sccz80 library.
+This result is the fast setting, measured before the size pass above.
+__CLIB_OPT_MALLOC is 1, the spare-tail search. z88dk-zsdcc was not
+available to retime that pass. The assembler sources are shared with
+the sccz80 library.
