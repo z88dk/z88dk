@@ -165,8 +165,8 @@ static unsigned st_count;
 #define DEFAULT_DATA_SECTION "data_clib"
 #define DEFAULT_BSS_SECTION  "bss_clib"
 
-static unsigned add_string(const char*s)
-{
+
+static unsigned add_string(const char*s) {
     unsigned i;
     for(i=0;i<st_count;i++)
         if(!strcmp(st[i],s)) return i;
@@ -174,32 +174,36 @@ static unsigned add_string(const char*s)
     return st_count++;
 }
 
-static void fix_symbol(char *name)
-{
+static void fix_symbol(char *name) {
     while (*name)
     {
-        if (*name == '$')
-            *name = '_';
-
+        if (*name == '$') *name = '_';
         name++;
     }
 }
 
-static void write_strtable(FILE*fp){
-    unsigned i,pos=0,aligned,total=0; long base=ftell(fp);
+
+static void write_strtable(FILE*fp) {
+    unsigned i,pos=0,aligned,total=0;
+    long base=ftell(fp);
 
     wrd(fp,st_count);
     wrd(fp,0);
-    for(i=0;i<st_count;i++){ wrd(fp,pos); pos+=(unsigned)strlen(st[i])+1; }
+    for(i=0;i<st_count;i++)
+        { wrd(fp,pos); pos+=(unsigned)strlen(st[i])+1; }
     total=pos; aligned=(total+3)&~3u;
-    for(i=0;i<st_count;i++) fwrite(st[i],1,strlen(st[i])+1,fp);
-    while(total++<aligned) fputc(0,fp);
+    for(i=0;i<st_count;i++)
+        fwrite(st[i],1,strlen(st[i])+1,fp);
+    while(total++<aligned)
+        fputc(0,fp);
     long end=ftell(fp);
-    fseek(fp,base+4,SEEK_SET); wrd(fp,aligned);
+    fseek(fp,base+4,SEEK_SET);
+    wrd(fp,aligned);
     fseek(fp,end,SEEK_SET);
 }
 
-static void write_object(const char*outname, int mod){
+
+static void write_object(const char*outname, int mod) {
     unsigned code_sid, data_sid, bss_sid;
     FILE*fp=fopen(outname,"wb");
     long hdr,pexpr,psym,pext,pmod,psec,pstr,end;
@@ -209,7 +213,7 @@ static void write_object(const char*outname, int mod){
     st_count=0;
     add_string(""); 
 
-    unsigned fname_sid = add_string("Imported-REL");
+    unsigned fname_sid = add_string("RELtool-imported-module");
 
     code_sid = add_string(DEFAULT_CODE_SECTION);
     //data_sid = add_string(DEFAULT_DATA_SECTION);
@@ -243,6 +247,7 @@ static void write_object(const char*outname, int mod){
         wrd(fp,0);                        // filename
         wrd(fp,0);                        // line
         wrd(fp,0);                        // section?
+        //wrd(fp,code_sid);
 
         wrd(fp,relocs[i].addr);           // asmpc
         wrd(fp,relocs[i].addr);           // code_pos
@@ -255,8 +260,8 @@ static void write_object(const char*outname, int mod){
 
     for(i=0;i<symbol_count;i++) {
         wrd(fp,2);
-        wrd(fp,1);
-        wrd(fp,0);
+        wrd(fp,2);   // 1-C, 2-A,
+        wrd(fp,code_sid);
         wrd(fp,symbols[i].value);
         wrd(fp,add_string(symbols[i].name));
         wrd(fp,fname_sid);   // TODO: add source file reference
@@ -264,21 +269,21 @@ static void write_object(const char*outname, int mod){
     }
     wrd(fp,0);
 
-
     /* --------------------------------------------------
      * Externals Area
      * -------------------------------------------------- */
     pext=ftell(fp);
     for(i=0;i<ext_count;i++) wrd(fp,add_string(extsyms[i].name));
     wrd(fp,0);
-    pmod=ftell(fp); wrd(fp,add_string(module_name));
+    pmod=ftell(fp);
+    wrd(fp,add_string(module_name));
     psec=ftell(fp);
 
     /* --------------------------------------------------
      * Sections Area
      * -------------------------------------------------- */
     wrd(fp,progsize?progsize:proglen);    // code_size
-    wrd(fp,add_string(module_name));      // section_name_strid
+    wrd(fp,code_sid);                     //section
     wr32(fp,0xffffffffu);                 // org                 
     wrd(fp,1);                            // align
 
@@ -336,7 +341,7 @@ static void dump_chain(unsigned char *prog, unsigned p)
 }
 #endif
 
-static RELOC *find_reloc(unsigned addr){
+static RELOC *find_reloc(unsigned addr) {
     int i;
     for (i = 0; i < reloc_count; i++)
     {
