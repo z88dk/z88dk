@@ -5093,6 +5093,19 @@ int ir_opt_const_fold(Func *f)
                 }
                 break;
             }
+            case IR_ROTL: case IR_ROTR: {       /* a rotated constant is a constant */
+                int64_t c;
+                int bits = (w == 1) ? 8 : (w == 2) ? 16 : (w == 4) ? 32 : 0;
+                if (bits && s1 == -1 && KCONST(s0, &c)) {
+                    unsigned n = (unsigned)op->imm % (unsigned)bits;
+                    uint64_t u = (uint64_t)c & (uint64_t)mask;
+                    if (op->kind == IR_ROTR) n = (bits - n) % bits;
+                    if (n) u = ((u << n) | (u >> (bits - n))) & (uint64_t)mask;
+                    op->kind = IR_LD_IMM; op->imm = (int64_t)u;
+                    op->src[0] = -1; op->src[1] = -1; folded = 1;
+                }
+                break;
+            }
             case IR_BSWAP: {                    /* bswap of a constant is a constant */
                 int64_t c;
                 if (w == 4 && KCONST(s0, &c)) {
@@ -5159,7 +5172,10 @@ int ir_opt_const_fold(Func *f)
                src[0] is gone — incl. after a &sym+const base folds this into a
                MEM_SYM store). Byte folds everywhere, word is CPU-gated. Skip
                volatile / __addressmod (special lowering). */
-            if (op->kind == IR_ST_MEM && op->mem.kind == IR_MEM_VREG
+            if (op->kind == IR_ST_MEM
+                && (op->mem.kind == IR_MEM_VREG
+                    || (op->mem.kind == IR_MEM_SYM && s0 >= 0 && s0 < nv
+                        && f->vregs[s0].width == 1 && !opt_disabled("cf-st-sym")))
                 && s0 >= 0 && s0 < nv && known[s0]
                 && !op->mem.volatile_ && !op->mem.bank_fn) {
                 int sw = f->vregs[s0].width;
@@ -5936,6 +5952,301 @@ int ir_opt_sink_trunc(Func *f)
         }
     }
     free(usecnt);
+    return changed;
+}
+
+/* ---- byte-swap conjugation and word read-modify-write narrowing -----------
+   A bitwise op against a constant commutes with a 16-bit byte swap:
+       swap(swap(x) OP K)  ->  x OP swap(K)
+   and a word `*p OP= K` whose constant leaves one byte unchanged (0 for or/xor,
+   0xff for and) reads and writes only the other byte. Both work on one block,
+   on single-use temporaries, with nothing that writes memory in between. */
+static int rw_nowrite(const Op *o)
+{
+    switch (o->kind) {
+    case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR: case IR_LEA:
+    case IR_ADD: case IR_SUB: case IR_RSUB: case IR_AND: case IR_OR: case IR_XOR:
+    case IR_SHL: case IR_SHR: case IR_MUL: case IR_NEG: case IR_NOT:
+    case IR_INC: case IR_DEC: case IR_ROTL: case IR_ROTR: case IR_NOP:
+    case IR_CONV_ZX: case IR_CONV_SX: case IR_CONV_TRUNC:
+    case IR_CMP_EQ: case IR_CMP_NE: case IR_CMP_LT: case IR_CMP_LE:
+    case IR_CMP_GT: case IR_CMP_GE: case IR_CMP_ULT: case IR_CMP_ULE:
+    case IR_CMP_UGT: case IR_CMP_UGE:
+        return 1;
+    case IR_LD_MEM:
+        return !o->mem.volatile_ && !o->mem.post_step && !o->mem.bank_fn;
+    default:
+        return 0;
+    }
+}
+
+static int rw_find_def(const BB *bb, int upto, int v)
+{
+    for (int k = upto - 1; k >= 0; k--)
+        if (bb->ops[k].dst == v) return k;
+    return -1;
+}
+
+static void rw_delete_op(BB *bb, int idx)
+{
+    memmove(&bb->ops[idx], &bb->ops[idx + 1], (size_t)(bb->n_ops - idx - 1) * sizeof(Op));
+    bb->n_ops--;
+}
+
+static int rw_bitop(OpKind k) { return k == IR_AND || k == IR_OR || k == IR_XOR; }
+
+int ir_opt_rotl_bitop(Func *f)
+{
+    if (!f || opt_disabled("rotl-bitop")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *usecnt = calloc((size_t)nv, sizeof(int));
+    int *defcnt = calloc((size_t)nv, sizeof(int));
+    if (!usecnt || !defcnt) { free(usecnt); free(defcnt); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
+            for (int t = 0; t < nu; t++)
+                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
+            int dd[8]; int nd = ir_op_defs(&f->bbs[b].ops[j], dd, 8);
+            for (int t = 0; t < nd; t++)
+                if (dd[t] >= 0 && dd[t] < nv) defcnt[dd[t]]++;
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *r2 = &bb->ops[j];
+            if (r2->kind != IR_ROTL || (r2->imm & 15) != 8 || r2->src[1] >= 0) continue;
+            int d2 = r2->dst, r = r2->src[0];
+            if (d2 < 0 || r < 0 || d2 >= nv || r >= nv) continue;
+            if (f->vregs[d2].width != 2 || f->vregs[r].width != 2) continue;
+            if (usecnt[r] != 1 || defcnt[r] != 1) continue;
+            int jb = rw_find_def(bb, j, r);
+            if (jb < 0) continue;
+            Op *bo = &bb->ops[jb];
+            if (!rw_bitop(bo->kind) || bo->src[1] >= 0 || bo->imm_sym) continue;
+            int x1 = bo->src[0];
+            if (x1 < 0 || x1 >= nv || usecnt[x1] != 1 || defcnt[x1] != 1) continue;
+            int ja = rw_find_def(bb, jb, x1);
+            if (ja < 0) continue;
+            Op *r1 = &bb->ops[ja];
+            if (r1->kind != IR_ROTL || (r1->imm & 15) != 8 || r1->src[1] >= 0) continue;
+            int x = r1->src[0];
+            if (x < 0 || x >= nv || f->vregs[x].width != 2) continue;
+            /* x must still hold the same value at the bitop. */
+            int bad = 0;
+            for (int k = ja + 1; k < jb && !bad; k++) {
+                int dd[8]; int nd = ir_op_defs(&bb->ops[k], dd, 8);
+                for (int t = 0; t < nd; t++) if (dd[t] == x) bad = 1;
+            }
+            if (bad) continue;
+            if (defcnt[d2] != 1) continue;
+            uint64_t K = (uint64_t)bo->imm & 0xffff;
+            bo->imm = (int64_t)(((K & 0xff) << 8) | (K >> 8));
+            bo->src[0] = x;
+            bo->dst = d2;
+            r2->kind = IR_NOP;
+            r2->dst = -1; r2->src[0] = -1; r2->src[1] = -1; r2->imm = 0;
+            r1->kind = IR_NOP;
+            r1->dst = -1; r1->src[0] = -1; r1->src[1] = -1;
+            changed++;
+        }
+    }
+    free(usecnt); free(defcnt);
+    return changed;
+}
+
+/* Are the two address operands the same location, with nothing between the
+   points that read them able to change it? A pointer held in a global is
+   loaded twice by `*arg1 = f(*arg1)`; both loads see the same value when no
+   store separates them. */
+static int rw_same_addr(const Func *f, const BB *bb, int ja, int jb,
+                        const Op *a, const Op *b)
+{
+    if (a->mem.kind != b->mem.kind || a->mem.offset != b->mem.offset) return 0;
+    if (a->mem.kind == IR_MEM_SYM) return a->mem.sym == b->mem.sym;
+    if (a->mem.kind != IR_MEM_VREG) return 0;
+    if (a->mem.base == b->mem.base) return 1;
+    int p = a->mem.base, q = b->mem.base;
+    if (p < 0 || q < 0 || p >= f->n_vregs || q >= f->n_vregs) return 0;
+    int dp = rw_find_def(bb, ja, p), dq = rw_find_def(bb, jb, q);
+    if (dp < 0 || dq < 0) return 0;
+    const Op *op = &bb->ops[dp], *oq = &bb->ops[dq];
+    if (op->kind != IR_LD_MEM || oq->kind != IR_LD_MEM) return 0;
+    if (op->mem.kind != IR_MEM_SYM || oq->mem.kind != IR_MEM_SYM) return 0;
+    if (op->mem.sym != oq->mem.sym || op->mem.offset != oq->mem.offset) return 0;
+    if (op->mem.volatile_ || oq->mem.volatile_) return 0;
+    int lo = dp < dq ? dp : dq, hi = dp < dq ? dq : dp;
+    for (int k = lo + 1; k < hi; k++)
+        if (!rw_nowrite(&bb->ops[k])) return 0;
+    /* neither pointer vreg may be redefined before its use */
+    for (int k = dp + 1; k < ja; k++) if (bb->ops[k].dst == p) return 0;
+    for (int k = dq + 1; k < jb; k++) if (bb->ops[k].dst == q) return 0;
+    return 1;
+}
+
+int ir_opt_rmw_narrow(Func *f)
+{
+    if (!f || opt_disabled("rmw-narrow")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *usecnt = calloc((size_t)nv, sizeof(int));
+    int *defcnt = calloc((size_t)nv, sizeof(int));
+    if (!usecnt || !defcnt) { free(usecnt); free(defcnt); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
+            for (int t = 0; t < nu; t++)
+                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
+            int dd[8]; int nd = ir_op_defs(&f->bbs[b].ops[j], dd, 8);
+            for (int t = 0; t < nd; t++)
+                if (dd[t] >= 0 && dd[t] < nv) defcnt[dd[t]]++;
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *st = &bb->ops[j];
+            if (st->kind != IR_ST_MEM || st->src[0] < 0 || st->src[0] >= nv) continue;
+            int r = st->src[0], w = f->vregs[r].width;
+            if (w != 2 && w != 4) continue;
+            if (st->mem.volatile_ || st->mem.post_step || st->mem.bank_fn) continue;
+            if (usecnt[r] != 1 || defcnt[r] != 1) continue;
+            int jb = rw_find_def(bb, j, r);
+            if (jb < 0) continue;
+            Op *bo = &bb->ops[jb];
+            if (!rw_bitop(bo->kind) || bo->src[1] >= 0 || bo->imm_sym) continue;
+            int x = bo->src[0];
+            if (x < 0 || x >= nv || f->vregs[x].width != w) continue;
+            if (usecnt[x] != 1 || defcnt[x] != 1) continue;
+            int ja = rw_find_def(bb, jb, x);
+            if (ja < 0) continue;
+            Op *ld = &bb->ops[ja];
+            if (ld->kind != IR_LD_MEM || ld->mem.volatile_ || ld->mem.post_step
+                || ld->mem.bank_fn) continue;
+            int bad = 0;
+            for (int k = ja + 1; k < j && !bad; k++)
+                if (!rw_nowrite(&bb->ops[k])) bad = 1;
+            if (bad || !rw_same_addr(f, bb, ja, j, ld, st)) continue;
+            uint64_t K = (uint64_t)bo->imm;
+            unsigned ident = (bo->kind == IR_AND) ? 0xffu : 0u;
+            int which = -1, cnt = 0;
+            for (int i = 0; i < w; i++)
+                if (((K >> (8 * i)) & 0xff) != ident) { which = i; cnt++; }
+            if (cnt != 1) continue;
+            if (st->mem.kind == IR_MEM_VREG) st->mem.base = ld->mem.base;
+            ld->mem.offset += which;
+            ld->mem.elem = KIND_CHAR;
+            st->mem.offset += which;
+            st->mem.elem = KIND_CHAR;
+            bo->imm = (int64_t)((K >> (8 * which)) & 0xff);
+            f->vregs[x].width = 1;
+            f->vregs[r].width = 1;
+            changed++;
+        }
+    }
+    free(usecnt); free(defcnt);
+    return changed;
+}
+
+/* A 16-bit byte swap whose only reader is the word store after it: store the
+   unswapped value with its bytes in reverse order instead. Runs last, once no
+   pass left can mistake the store for an ordinary one. */
+int ir_opt_fuse_bswap_store(Func *f)
+{
+    if (!f || opt_disabled("bswap-store")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *usecnt = calloc((size_t)nv, sizeof(int));
+    if (!usecnt) return 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
+            for (int t = 0; t < nu; t++)
+                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *st = &bb->ops[j];
+            if (st->kind != IR_ST_MEM || st->src[0] < 0 || st->src[0] >= nv) continue;
+            int v2 = st->src[0];
+            if (f->vregs[v2].width != 2 || usecnt[v2] != 1) continue;
+            if (st->mem.volatile_ || st->mem.post_step || st->mem.bank_fn
+                || st->mem.chain || st->mem.bswap16) continue;
+            if (st->mem.kind != IR_MEM_VREG && st->mem.kind != IR_MEM_SYM) continue;
+            if (kind_scalar_width(st->mem.elem) != 2) continue;
+            int jr = rw_find_def(bb, j, v2);
+            if (jr < 0) continue;
+            Op *ro = &bb->ops[jr];
+            if (ro->kind != IR_ROTL || (ro->imm & 15) != 8 || ro->src[1] >= 0) continue;
+            int v1 = ro->src[0];
+            if (v1 < 0 || v1 >= nv || f->vregs[v1].width != 2) continue;
+            int bad = 0;
+            for (int k = jr + 1; k < j && !bad; k++) {
+                int dd[8]; int nd = ir_op_defs(&bb->ops[k], dd, 8);
+                for (int t = 0; t < nd; t++)
+                    if (dd[t] == v1 || dd[t] == st->mem.base) bad = 1;
+            }
+            if (bad) continue;
+            st->src[0] = v1;
+            st->mem.bswap16 = 1;
+            rw_delete_op(bb, jr);
+            j--;
+            changed++;
+        }
+    }
+    free(usecnt);
+    return changed;
+}
+
+/* The load twin of the store fusion: a word loaded through a pointer whose only
+   reader is a 16-bit byte swap is loaded with its bytes in reverse order. */
+int ir_opt_fuse_bswap_load(Func *f)
+{
+    if (!f || opt_disabled("bswap-load")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *usecnt = calloc((size_t)nv, sizeof(int));
+    int *defcnt = calloc((size_t)nv, sizeof(int));
+    if (!usecnt || !defcnt) { free(usecnt); free(defcnt); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
+            for (int t = 0; t < nu; t++)
+                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
+            int dd[8]; int nd = ir_op_defs(&f->bbs[b].ops[j], dd, 8);
+            for (int t = 0; t < nd; t++)
+                if (dd[t] >= 0 && dd[t] < nv) defcnt[dd[t]]++;
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *ro = &bb->ops[j];
+            if (ro->kind != IR_ROTL || (ro->imm & 15) != 8 || ro->src[1] >= 0) continue;
+            int v2 = ro->dst, v1 = ro->src[0];
+            if (v1 < 0 || v2 < 0 || v1 >= nv || v2 >= nv) continue;
+            if (f->vregs[v1].width != 2 || f->vregs[v2].width != 2) continue;
+            if (usecnt[v1] != 1 || defcnt[v1] != 1 || defcnt[v2] != 1) continue;
+            int jl = rw_find_def(bb, j, v1);
+            if (jl < 0) continue;
+            Op *ld = &bb->ops[jl];
+            if (ld->kind != IR_LD_MEM || ld->mem.kind != IR_MEM_VREG) continue;
+            if (ld->mem.volatile_ || ld->mem.post_step || ld->mem.bank_fn
+                || ld->mem.bswap16) continue;
+            if (kind_scalar_width(ld->mem.elem) != 2) continue;
+            if (f->vregs[v1].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            ld->dst = v2;
+            ld->mem.bswap16 = 1;
+            rw_delete_op(bb, j);
+            j--;
+            changed++;
+        }
+    }
+    free(usecnt); free(defcnt);
     return changed;
 }
 

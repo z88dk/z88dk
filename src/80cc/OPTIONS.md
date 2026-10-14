@@ -315,6 +315,17 @@ exists (ADR 0010).
 | `byte-half-direct` | a byte taken from a word held in BC or DE copies the whole word to HL first instead of reading `c`/`b`/`e`/`d` |
 | `ret-thread-pair` | an unconditional `jp` to a bare `ret` right after a conditional `jp` stays a `jp`, even when the conditional's target is not the next label |
 | `st-byte-nostash` | a byte store through a base already in HL copies the byte to E first, instead of storing from A |
+| `rotl-bitop` | a bitwise op with a constant between two 16-bit byte swaps keeps both swaps, instead of applying the swapped constant without them |
+| `rmw-narrow` | a word read-modify-write that changes one byte (`*p \|= 0x100`) loads and stores both bytes |
+| `cf-late` | constant folding is not repeated after byte narrowing, so a narrowed constant stays a truncation held in a register or slot |
+| `cf-st-sym` | a constant byte stored to a global symbol stays in a register instead of being an immediate store |
+| `bswap-store` | a 16-bit byte swap feeding a word store is swapped in registers, instead of storing the bytes in reverse order |
+| `slot-long-ldir` | a long stored from a frame slot to a pointer is four `ld a,(hl) / ld (de),a` pairs, not a block copy |
+| `bswap-load` | a word loaded through a pointer and then byte-swapped is swapped in registers, instead of loaded with its bytes in reverse order |
+| `barrel-load-de` | a z80n constant shift loads its value into HL and swaps it to DE, instead of loading DE directly |
+| `barrel-push` | a z80n shift result pushed as the next call argument is swapped into HL first, instead of pushed from DE |
+| `alloc-barrel-de` | the operand of a z80n constant shift is not given the DE home, so it is built in HL and swapped |
+| `sym-addr-walk` | consecutive constant stores to nearby bytes of one global reload HL with the address, instead of stepping it with inc/dec |
 | `sink-trunc` | a word-to-byte truncation is not moved down next to the byte store that reads it, so the byte lives across the address arithmetic |
 | `ivsr-suppress-lea` | a stepped pointer is made for a local array addressed from the frame, instead of rebuilding the address from sp (ez80 sp always keeps it) |
 | `ivsr-share` | two derived induction addresses with the same base, index, scale and step each get their own stepped pointer |

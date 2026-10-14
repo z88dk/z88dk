@@ -1353,6 +1353,7 @@ static void emit_z80n_barrel_shift(FILE *out, Func *f, const Op *op,
     invalidate_hl_cache();
     invalidate_de_cache();
     if (!bc_live) invalidate_bc_cache();
+    if (barrel_push_fuse(out, f, op)) return;
     if (vreg_is_pr_de(f, op->dst)) {
         cache_de(op->dst);
         return;

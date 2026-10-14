@@ -201,6 +201,10 @@ int ir_opt_const_local(Func *f);
  * would otherwise spill to a slot. Returns operands rewritten. */
 int ir_opt_copy_prop(Func *f);
 int ir_opt_sink_trunc(Func *f);
+int ir_opt_rotl_bitop(Func *f);
+int ir_opt_fuse_bswap_store(Func *f);
+int ir_opt_fuse_bswap_load(Func *f);
+int ir_opt_rmw_narrow(Func *f);
 int ir_opt_self_ops(Func *f);
 
 /* Coalesce a single-use width-1 copy `d <- t` by folding t into d (renaming

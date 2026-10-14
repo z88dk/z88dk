@@ -274,6 +274,25 @@
 	ld	de,%2
 	bsrl	de,b
 
+;; #ORHL: after `ld h,a` the accumulator already holds H, so the zero test of
+;; HL as `ld a,l / or h` is just `or l`. A ends as l|h either way, with the same
+;; flags, and H and L are untouched, so no liveness is needed.
+%title #ORHL zero test of HL right after ld h,a (-1b)
+	ld	h,a
+	ld	a,l
+	or	h
+=
+	ld	h,a
+	or	l
+
+%title #ORHL zero test of HL right after ld l,a (-1b)
+	ld	l,a
+	ld	a,h
+	or	l
+=
+	ld	l,a
+	or	h
+
 ;; #285p: byte-swapped word load `ld a,(hl+); ld h,(hl); ld l,a; ld l,h; ld h,a`
 ;; (reads b0,b1; arranges H=b0,L=b1) — load b1 straight into L instead of the
 ;; H-then-copy detour, dropping the dead `ld l,a`. Net H=b0/L=b1 unchanged; the

@@ -197,6 +197,10 @@ typedef struct {
                            the addressing (the *p++ pattern). 0 = none. */
     int      chain;     /* IR_ST_MEM store chain: 1 = first, 2 = continuation;
                            zero for an ordinary memory operation. */
+    int      bswap16;   /* IR_ST_MEM word store: write the two bytes in
+                           reverse order (a fused 16-bit byte swap). Set
+                           by ir_opt_fuse_bswap_store, after every other
+                           memory pass. */
     SYMBOL  *bank_fn;   /* __addressmod: page-in fn to call before an
                            indirect (IR_MEM_VREG) namespaced access; the
                            namespace is recovered from the pointer/array

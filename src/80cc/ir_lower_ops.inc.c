@@ -150,12 +150,33 @@ static int gen_ld_sym(FILE *out, Func *f, const Op *op)
        (classic lib symbols are unprefixed); ordinary globals (incl. arrays/
        structs) keep the `_`. ir_sym_prefix encodes that rule. */
     const char *pfx = ir_sym_prefix(op->mem.sym);
-    if (op->mem.offset)
+    /* Only when the very next op is a constant store through this address:
+       an address nothing reads is deleted by a later peephole, which an
+       inc/dec would defeat. */
+    int feeds_store = 0;
+    if (cur_bb && cur_op_idx >= 0 && cur_op_idx + 1 < cur_bb->n_ops
+        && &cur_bb->ops[cur_op_idx] == op) {
+        const Op *nx = &cur_bb->ops[cur_op_idx + 1];
+        feeds_store = nx->kind == IR_ST_MEM && nx->mem.kind == IR_MEM_VREG
+                   && nx->mem.base == op->dst && nx->src[0] < 0
+                   && !nx->mem.volatile_ && !nx->mem.post_step && !nx->mem.bank_fn;
+    }
+    int walk = feeds_store && L.hla_on && L.hla_sym == op->mem.sym && !IS_GBZ80()
+            && !opt_disabled("sym-addr-walk")
+            && op->mem.offset - L.hla_off >= -2 && op->mem.offset - L.hla_off <= 2;
+    if (walk) {
+        int d = op->mem.offset - L.hla_off;
+        for (int i = 0; i < d; i++) emit(out, "inc\thl");
+        for (int i = 0; i > d; i--) emit(out, "dec\thl");
+    } else if (op->mem.offset)
         emit(out, "ld\thl,%s%s+%d",
              pfx, ir_sym_name(op->mem.sym), op->mem.offset);
     else
         emit(out, "ld\thl,%s%s", pfx, ir_sym_name(op->mem.sym));
     commit_hl_word(out, f, op->dst);
+    if (!IS_GBZ80() && feeds_store) {
+        L.hla_on = 1; L.hla_sym = op->mem.sym; L.hla_off = op->mem.offset;
+    }
     return 0;
 }
 
@@ -2335,6 +2356,26 @@ static int gen_conv_byte_to_high(FILE *out, Func *f, const Op *op)
     return -1;
 }
 
+/* A barrel-shift result whose only reader is the call-argument push right after
+   it is pushed straight from DE. Returns 1 when it did (the push op is
+   skipped). */
+static int barrel_push_fuse(FILE *out, const Func *f, const Op *op)
+{
+    if (opt_disabled("barrel-push")) return 0;
+    if (!cur_bb || cur_op_idx < 0 || cur_op_idx + 1 >= cur_bb->n_ops) return 0;
+    if (&cur_bb->ops[cur_op_idx] != op) return 0;
+    const Op *nx = &cur_bb->ops[cur_op_idx + 1];
+    if (nx->kind != IR_PUSH_ARG || nx->src[0] != op->dst || op->dst < 0) return 0;
+    if (f->vregs[op->dst].width != 2 || func_has_pr_bc(f)) return 0;
+    if (vreg_is_pr_de(f, op->dst) || vreg_is_pr_stack(f, op->dst)) return 0;
+    if (find_unique_use(f, op->dst) != nx) return 0;
+    emit_sp(out, 2, "push\tde");
+    L.la.cur_skip_next_op = 1;
+    invalidate_hl_cache();
+    invalidate_de_cache();
+    return 1;
+}
+
 /* z80n constant 16-bit shift via `bsla/bsrl de,b`. Fires only when it
    does NOT grow code vs the unrolled form: SHL unrolls to N `add hl,hl`
    (1B each), SHR to N `srl h;rr l` (2B each), both with a ld-pair
@@ -2357,20 +2398,27 @@ static int try_const_barrel(FILE *out, Func *f, const Op *op, int is_shr)
     /* +2 when a live BC must be saved around the count load (see below). */
     int barrel = 5 + (pr_de ? 0 : 1) + (L.rs.bc >= 0 ? 2 : 0);
     if (unroll < barrel) return 0;
-    load_to_hl(out, f, op->src[0]);
     /* `ld b,N` clobbers B; a live BC tenant (rs.bc>=0) may be
        register-resident with a stale slot, so push/pop it — bsxa sets no
        flags and pop bc doesn't touch them, so K/CF etc. are irrelevant
        here anyway and BC is restored intact. */
     int bc_live = (L.rs.bc >= 0);
-    if (bc_live) emit(out, "push\tbc");
-    emit(out, "ld\tb,%d", n);
-    emit_ex_de_hl(out);                  /* DE = value */
+    if (!opt_disabled("barrel-load-de")) {
+        load_to_de(out, f, op->src[0]);  /* DE = value */
+        if (bc_live) emit(out, "push\tbc");
+        emit(out, "ld\tb,%d", n);
+    } else {
+        load_to_hl(out, f, op->src[0]);
+        if (bc_live) emit(out, "push\tbc");
+        emit(out, "ld\tb,%d", n);
+        emit_ex_de_hl(out);              /* DE = value */
+    }
     emit(out, is_shr ? "bsrl\tde,b" : "bsla\tde,b");
     if (bc_live) emit(out, "pop\tbc");       /* restore live BC */
     invalidate_hl_cache();
     invalidate_de_cache();
     if (!bc_live) invalidate_bc_cache();
+    if (barrel_push_fuse(out, f, op)) return 1;
     if (pr_de) { cache_de(op->dst); return 1; }
     emit_ex_de_hl(out);                  /* HL = result */
     commit_hl_word(out, f, op->dst);
@@ -3637,8 +3685,33 @@ static const Op *bswap_of_load(const Func *f, const Op *op)
     return nx;
 }
 
+/* Word load through a pointer with the bytes in reverse order (a fused 16-bit
+   byte swap, set by ir_opt_fuse_bswap_load): H = first byte, L = second. */
+static int gen_ld_bswap16(FILE *out, Func *f, const Op *op)
+{
+    const char *ixr = idx_deref_reg(f, op, 2);
+    if (ixr) {
+        hl_about_to_change(-1);
+        emit(out, "ld\th,(%s%+d)", ixr, op->mem.offset);
+        emit(out, "ld\tl,(%s%+d)", ixr, op->mem.offset + 1);
+    } else {
+        load_to_hl(out, f, op->mem.base);
+        emit_hl_add_offset(out, op->mem.offset, 1, 1);
+        emit(out, "ld\ta,(hl)");
+        emit(out, "inc\thl");
+        emit(out, "ld\tl,(hl)");
+        emit(out, "ld\th,a");
+        invalidate_a_cache();
+        hl_about_to_change(-1);
+    }
+    commit_hl_result(out, f, op->dst);
+    return 0;
+}
+
 static int gen_ld_mem(FILE *out, Func *f, const Op *op)
 {
+    if (op->mem.bswap16)
+        return gen_ld_bswap16(out, f, op);
     /* Port read. Result is a zero-extended byte in HL, matching the width-2
        vreg the frontend gives a port access. No ns switch: a port has no
        address space to page in. */
@@ -4487,8 +4560,37 @@ static int try_store_chain(FILE *out, Func *f, const Op *op)
     return 1;
 }
 
+/* Word store with the bytes in reverse order (a fused 16-bit byte swap, set by
+   ir_opt_fuse_bswap_store): DE = value, HL = address, high byte first. */
+static int gen_st_bswap16(FILE *out, Func *f, const Op *op)
+{
+    load_to_hl(out, f, op->src[0]);
+    emit_ex_de_hl(out);                 /* DE = value */
+    { int t = L.rs.hl; L.rs.hl = L.rs.de; L.rs.de = t; L.rs.dehl = -1; }
+    if (op->mem.kind == IR_MEM_SYM) {
+        hl_about_to_change(-1);
+        if (op->mem.offset)
+            emit(out, "ld\thl,%s%s%+d", ir_sym_prefix(op->mem.sym),
+                 ir_sym_name(op->mem.sym), op->mem.offset);
+        else
+            emit(out, "ld\thl,%s%s", ir_sym_prefix(op->mem.sym),
+                 ir_sym_name(op->mem.sym));
+    } else {
+        load_to_hl(out, f, op->mem.base);
+        emit_hl_add_offset(out, op->mem.offset, 1, 1);
+    }
+    emit(out, "ld\t(hl),d");
+    emit(out, "inc\thl");
+    emit(out, "ld\t(hl),e");
+    invalidate_hl_cache();
+    invalidate_de_cache();
+    return 0;
+}
+
 static int gen_st_mem(FILE *out, Func *f, const Op *op)
 {
+    if (op->mem.bswap16)
+        return gen_st_bswap16(out, f, op);
     if (op->mem.chain && try_store_chain(out, f, op))
         return 0;
     /* Port write. Must come before every fold below: those all assume the
@@ -4568,10 +4670,24 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
             int w = kind_scalar_width(op->mem.elem);
             const char *s = ir_sym_name(op->mem.sym);
             int off = op->mem.offset;
-            if (off) emit(out, "ld\thl,_%s+%d", s, off);
-            else     emit(out, "ld\thl,_%s", s);
+            int walked = 0;
+            if (L.hla_on && L.hla_sym == op->mem.sym && !opt_disabled("sym-addr-walk")) {
+                int d = off - L.hla_off;
+                if (d >= -2 && d <= 2) {
+                    for (int i = 0; i < d; i++) emit(out, "inc\thl");
+                    for (int i = 0; i > d; i--) emit(out, "dec\thl");
+                    walked = 1;
+                }
+            }
+            if (!walked) {
+                if (off) emit(out, "ld\thl,_%s+%d", s, off);
+                else     emit(out, "ld\thl,_%s", s);
+            }
             emit_folded_imm_store(out, w, (uint32_t)op->imm);
             invalidate_hl_cache();
+            if (!IS_GBZ80() && !op->mem.volatile_) {
+                L.hla_on = 1; L.hla_sym = op->mem.sym; L.hla_off = off + w - 1;
+            }
             return 0;
         }
         int src_w = (op->src[0] >= 0)
@@ -4689,6 +4805,39 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
            DE-cache drop (leaves PR_DE free). Width (1/2/4) from mem.elem. */
         if (op->src[0] < 0) {
             int w = kind_scalar_width(op->mem.elem);
+            /* Base is `&global`: same address walk as the MEM_SYM store. */
+            const Op *brd = (g_hc.remat_def && op->mem.base >= 0
+                             && op->mem.base < f->n_vregs)
+                          ? g_hc.remat_def[op->mem.base] : NULL;
+            if (brd && brd->kind == IR_LD_SYM && brd->mem.sym && !brd->mem.bank_fn
+                && !IS_GBZ80() && !op->mem.volatile_
+                && !opt_disabled("sym-addr-walk")) {
+                int off = brd->mem.offset + op->mem.offset;
+                if (hl_has(op->mem.base)) {      /* HL already holds the base */
+                    ss_note_cache_read(f, op->mem.base);
+                    L.hla_on = 1; L.hla_sym = brd->mem.sym; L.hla_off = brd->mem.offset;
+                }
+                const char *pfx = ir_sym_prefix(brd->mem.sym);
+                const char *sn = ir_sym_name(brd->mem.sym);
+                int walked = 0;
+                if (L.hla_on && L.hla_sym == brd->mem.sym) {
+                    int d = off - L.hla_off;
+                    if (d >= -2 && d <= 2) {
+                        for (int i = 0; i < d; i++) emit(out, "inc\thl");
+                        for (int i = 0; i > d; i--) emit(out, "dec\thl");
+                        walked = 1;
+                    }
+                }
+                if (!walked) {
+                    hl_about_to_change(-1);
+                    if (off) emit(out, "ld\thl,%s%s%+d", pfx, sn, off);
+                    else     emit(out, "ld\thl,%s%s", pfx, sn);
+                }
+                emit_folded_imm_store(out, w, (uint32_t)op->imm);
+                invalidate_hl_cache();
+                L.hla_on = 1; L.hla_sym = brd->mem.sym; L.hla_off = off + w - 1;
+                return 0;
+            }
             load_to_hl(out, f, op->mem.base);
             emit_hl_add_offset(out, op->mem.offset, 1, 1);  /* use BC scratch → keep DE */
             emit_folded_imm_store(out, w, (uint32_t)op->imm);
@@ -4808,6 +4957,9 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                     int voff = slot_sp_off(f, op->src[0]);
                     emit(out, "ld\thl,%d", voff);
                     emit(out, "add\thl,sp");
+                    if (!(IS_808x() || IS_GBZ80()) && !opt_disabled("slot-long-ldir")) {
+                        emit_block_copy(out, f, 4);
+                    } else
                     for (int i = 0; i < 4; i++) {
                         emit(out, "ld\ta,(hl)");
                         emit(out, "ld\t(de),a");

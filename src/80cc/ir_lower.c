@@ -154,6 +154,10 @@ typedef struct {
        global word load, cleared by any line that may write HL or memory. */
     int hlm_on, hlm_off;
     SYMBOL *hlm_sym;
+    /* HL holds the ADDRESS `_hla_sym + hla_off` (left by a folded constant store
+       to a global); dropped by any emitted line that may write HL. */
+    int hla_on, hla_off;
+    SYMBOL *hla_sym;
     SYMBOL **bb_hlm_sym; int *bb_hlm_off; char *bb_sw_target;
     /* B/C and D/E byte homes have independent residency. B/C homes are
        slotless and never dirty; D/E homes are slot-backed and may be dirty
@@ -914,6 +918,14 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
         vsnprintf(hb, sizeof hb, fmt, ap3);
         va_end(ap3);
         if (!hlm_line_keeps(hb)) L.hlm_on = 0;
+    }
+    if (L.hla_on) {
+        char hb[128];
+        va_list ap4; va_copy(ap4, ap);
+        vsnprintf(hb, sizeof hb, fmt, ap4);
+        va_end(ap4);
+        InstrEffects e = instr_effects(hb);
+        if (e.unknown || (e.writes & IR_R_HL)) L.hla_on = 0;
     }
     fputc('\t', out);
     vfprintf(out, fmt, ap);
@@ -9854,6 +9866,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
            base at all) and before dce, which reclaims the emptied ADDs. */
         (void)ir_opt_deref_offset(f);
         (void)ir_opt_conv_mask_fold(f);   /* AND(sx,mask)→zx; dce reclaims the sx */
+        (void)ir_opt_rotl_bitop(f);       /* swap(swap(x) op K) -> x op swap(K) */
+        (void)ir_opt_rmw_narrow(f);       /* word `*p |= K` touching one byte */
         int dce     = ir_opt_dce(f);
         /* Re-type promoted int ops whose result is only truncated to a
            byte as width-1 — must run after dce (fewer ops to scan, dead
@@ -9871,6 +9885,9 @@ static int ir_lower_func_body(FILE *out, Func *f)
            slot) and DCE the now-dead copies. */
         int cprop   = ir_opt_copy_prop(f);
         if (cprop) dce += ir_opt_dce(f);
+        /* A truncation of a constant that narrowing created is itself a
+           constant; fold it so every store of it is an immediate. */
+        if (!opt_disabled("cf-late") && ir_opt_const_fold(f)) dce += ir_opt_dce(f);
         /* Mark consecutive fixed-offset aggregate stores so the lowerer can
            walk one destination pointer across the chain. Run after DCE and
            copy propagation, when the final base/offset form is visible. */
@@ -9918,6 +9935,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
        after the matcher has run. Fold that final form once, outside the
        optimisation fixpoint, before vreg compaction and allocation. */
     (void)ir_opt_symidx_mem_late(f);
+    (void)ir_opt_fuse_bswap_store(f);   /* swap16 + word store -> reversed store */
+    (void)ir_opt_fuse_bswap_load(f);    /* word load + swap16 -> reversed load */
 
     /* Drop orphan vregs (abandoned builder temps — in no op slot) before the
        id-indexed analysis/allocation tables get built. Renumbers survivors;
@@ -12102,6 +12121,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            (all lowered, none a switch edge) left it. Set after the HL
            invalidation above, which does not touch the fact. */
         L.hlm_on = 0;
+        L.hla_on = 0;
         if (L.bb_hlm_sym && bb_pred_cnt[bb->id] > 0 && hlm_enabled()
             && !(L.bb_sw_target && L.bb_sw_target[bb->id])) {
             SYMBOL *ms = NULL; int mo = 0, ok = 1;

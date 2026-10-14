@@ -5247,6 +5247,44 @@ void ir_alloc(Func *f)
         }
     }
 
+    /* The operand of a z80n constant barrel shift goes to the DE home pool below,
+       not HL: `bsrl de,b` wants it in DE. Leave it out of the HL pool, but only
+       when the DE pool will take it (one def, one use, in the producer set). */
+    if (IS_Z80N() && !opt_disabled("alloc-barrel-de")) {
+        int *bd = calloc((size_t)f->n_vregs, sizeof(int));
+        int *bu = calloc((size_t)f->n_vregs, sizeof(int));
+        if (bd && bu) {
+            for (int i = 0; i < f->n_bbs; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                    int buf[16];
+                    int n = ir_op_defs(&f->bbs[i].ops[j], buf, 16);
+                    for (int k = 0; k < n; k++)
+                        if (buf[k] >= 0 && buf[k] < f->n_vregs) bd[buf[k]]++;
+                    n = ir_op_uses(&f->bbs[i].ops[j], buf, 16);
+                    for (int k = 0; k < n; k++)
+                        if (buf[k] >= 0 && buf[k] < f->n_vregs) bu[buf[k]]++;
+                }
+            for (int i = 0; i < f->n_bbs; i++) {
+                const BB *bb = &f->bbs[i];
+                for (int j = 0; j + 1 < bb->n_ops; j++) {
+                    const Op *op = &bb->ops[j], *nxt = &bb->ops[j + 1];
+                    int v = op->dst;
+                    if (v < 0 || v >= f->n_vregs || !cacheable[v]) continue;
+                    if (op->kind != IR_CONV_ZX && op->kind != IR_LD_MEM
+                        && op->kind != IR_MOV && op->kind != IR_LD_IMM) continue;
+                    if (nxt->kind != IR_SHL && nxt->kind != IR_SHR) continue;
+                    if (nxt->src[0] != v || nxt->src[1] >= 0
+                        || (nxt->imm & IR_SHR_ARITH)) continue;
+                    int n = (int)nxt->imm & 0x1f;
+                    int unroll = (n >= 8) ? (n - 6) : (nxt->kind == IR_SHR ? 2 * n : n);
+                    if (n < 1 || n >= 16 || unroll < 6) continue;
+                    if (bd[v] != 1 || bu[v] != 1) continue;
+                    cacheable[v] = 0;
+                }
+            }
+        }
+        free(bd); free(bu);
+    }
     for (int v = 0; v < f->n_vregs; v++) {
         if (cacheable[v]) f->vreg_to_phys[v] = IR_PR_HL;
     }
@@ -5343,9 +5381,23 @@ void ir_alloc(Func *f)
             if (bb->live_out
                 && ir_bitset_get((const BitSet *)bb->live_out, v))
                 continue;
-            if (nxt->src[1] != v || nxt->src[0] == v) continue;
+            /* The operand of a z80n constant-count barrel shift: `bsrl de,b`
+               wants its value in DE, so the producer builds it there. The
+               size test mirrors try_const_barrel's. */
+            int barrel_use = 0;
+            if (IS_Z80N() && (nxt->kind == IR_SHL || nxt->kind == IR_SHR)
+                && nxt->src[0] == v && nxt->src[1] < 0
+                && !(nxt->imm & IR_SHR_ARITH)
+                && !opt_disabled("alloc-barrel-de")) {
+                int n = (int)nxt->imm & 0x1f;
+                int is_shr = (nxt->kind == IR_SHR);
+                int unroll = (n >= 8) ? (n - 6) : (is_shr ? 2 * n : n);
+                barrel_use = (n >= 1 && n < 16 && unroll >= 6);
+            }
+            if (!barrel_use && (nxt->src[1] != v || nxt->src[0] == v)) continue;
             int nxt_eligible;
-            switch (nxt->kind) {
+            if (barrel_use) nxt_eligible = 1;
+            else switch (nxt->kind) {
             case IR_ADD: case IR_SUB: case IR_RSUB:
             case IR_AND: case IR_OR: case IR_XOR:
             case IR_CMP_EQ:  case IR_CMP_NE:
