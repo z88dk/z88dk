@@ -309,6 +309,7 @@ Do not use helper `call __z80asm__*` as the core of a hot hand-written routine. 
 9. **16-bit `dec rr` does not set Z** (8080). No `dec bc; jp nz` as a count test. Test through A.
 10. **No copt on library asm.** Scan dead moves yourself. `tool-copt`, `methodology-measure`.
 11. From **v2.5**, **`-lm`** and **`--math32`** link `math32_vm1`. **`--math16`** is not a vm1 product. **`--math-mbf32`** remains the pre-v2.5 documented default, not `-lm`.
+12. **`ei` does not enable interrupts until the following instruction has completed.** `ei` / `ret` returns without an interrupt between them. Same delay as the 8080.
 
 ## Preference order (vm1-only code)
 

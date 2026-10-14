@@ -12,7 +12,7 @@
 ; If (s1 == NULL) && (n == 0) the function runs without writing
 ; the transformed string to s1.
 ;
-; Returns strlen(resulting s1).
+; Returns the length of the transformed string, whether or not it fits in n.
 ;
 ; ===============================================================
 
@@ -37,8 +37,8 @@ asm_strxfrm:
    ;
    ;         else:
    ;
-   ;           hl = strlen(resulting s1)
-   ;           carry set if not all chars of s2 transformed
+   ;           hl = strlen of the transformed string
+   ;           carry set if that length does not fit in n
    ;
    ; uses  : af, bc, de, hl
 
@@ -54,9 +54,28 @@ asm_strxfrm:
 
    push hl                     ; save src
 
+   ; One byte of n is the terminating NUL. dec / inc b / inc c runs
+   ; as many times as the count it is given, so n == 1 must stay out.
+IF __CPU_8085__
+
+   dec bc
+   dec bc
+   jp k,end_n                  ; n was 1
+   inc b
+   inc c
+
+ELSE
+
+   dec bc
+   ld a,b
+   or c
+   jr Z,end_n                  ; n was 1
+
    dec bc
    inc b
    inc c
+
+ENDIF
 
 loop:
    ld a,(hl)
@@ -84,13 +103,28 @@ loop:
    jr NZ,loop
 
 end_n:
-   call end_s2
-   scf
-   ret
+
+   ; Payload bytes are spent. A NUL here means the string fits in n.
+   ld a,(hl)
+   or a
+   jr Z,end_s2
+
+   xor a
+
+seek_nul:
+   cp (hl)
+   jr Z,end_trunc
+
+   inc hl
+   jr seek_nul
+
+end_trunc:
+   ld (de),a                   ; terminate dst
+   pop bc                      ; bc = src
+   jp strlen_set
 
 end_s2:
    ld (de),a                   ; terminate dst
-
    pop bc                      ; bc = src
 
 IF __CPU_8080__ || __CPU_GBZ80__
@@ -103,8 +137,28 @@ IF __CPU_8080__ || __CPU_GBZ80__
 ELIF __CPU_8085__
    sub hl,bc
 ELSE
-   sbc hl,bc                   ; hl = num chars written to s1
+   or a
+   sbc hl,bc                   ; hl = strlen of the transformed string
 ENDIF
 
    or a
+   ret
+
+strlen_set:
+
+IF __CPU_8080__ || __CPU_GBZ80__
+   ld  a,l
+   sub c
+   ld  l,a
+   ld  a,h
+   sbc b
+   ld  h,a
+ELIF __CPU_8085__
+   sub hl,bc
+ELSE
+   or a
+   sbc hl,bc
+ENDIF
+
+   scf
    ret

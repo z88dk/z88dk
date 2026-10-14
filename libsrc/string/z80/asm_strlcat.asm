@@ -2,7 +2,7 @@
 ; ===============================================================
 ; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
-; 
+;
 ; size_t strlcat(char * restrict s1, const char * restrict s2, size_t n)
 ;
 ; Append chars from s2 to s1 such that the total length of the resulting s1
@@ -24,7 +24,7 @@ asm_strlcat:
    ; enter : hl = char *s1 = dst
    ;         de = char *s2 = src
    ;         bc = size_t n
-   
+
    ; exit  : hl = strlen(s1) + strlen(s2)
    ;         bc = char *s1
    ;         carry set if complete strlcat not possible
@@ -32,7 +32,7 @@ asm_strlcat:
    ; uses  : af, bc, de, hl
 
    push hl                     ; save s1 to compute strlen(s1) later
-   
+
    ld a,b                      ; catch degenerate case where n == 0
    or c
    jr Z,szexceeded0
@@ -41,11 +41,30 @@ asm_strlcat:
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
 
-   dec bc                      ; bc decr by one extra allowing for the dst NUL
+   ; One less than n, so the copy loop keeps a byte for the terminating NUL.
+   ; n == 1 leaves no room to append. A count of zero must not fall into the
+   ; 256x256 setup below: that setup runs 65536 times and would append src.
+IF __CPU_8085__
+
+   dec bc
+   dec bc
+   jp k,szexceeded0            ; n was 1
+   inc b
+   inc c
+
+ELSE
+
+   dec bc
+   ld a,b
+   or c
+   jr Z,szexceeded0            ; n was 1
+   xor a
 
    dec bc
    inc b
    inc c
+
+ENDIF
 
 srchloop:
    cp (hl)
@@ -70,7 +89,7 @@ ELSE
 ENDIF
 
    ; append to string s1 with chars from string s2
-   
+
    ex de,hl                    ; de = s1, hl = s2
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
@@ -169,7 +188,7 @@ ENDIF
    ret
 
 szexceeded0:
-   
+
    ; hl = nth char in s1
    ; de = char *s2
    ; bc = 0

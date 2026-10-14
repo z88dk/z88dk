@@ -158,7 +158,7 @@ How to read lines: skill **`tool-z80asm`**. `rg` one mnemonic. Never bulk-read h
 5. **`ld a,i` P/V is IFF2**, not parity of A.
 6. **`sll` and `ixh`/`ixl` are undocumented.** Strict assemble rejects them.
 7. **`mlt` / `slp` / `in0` are Z180.** They are not on this CPU.
-8. **`ei` enables after the next instruction.**
+8. **`ei` does not enable interrupts until the following instruction has completed.** `ei` / `ret` therefore returns without an interrupt between them. An interrupt cannot land on the instruction after `ei`.
 9. No copt pass on library asm. Scan for `ex de,hl` / pair copies before you finish a hot routine.
 
 ## Preference order (Z80-only code)

@@ -245,7 +245,7 @@ Encoding: high nibble destination row (4=B,5=D,6=H,7=M/A), low nibble source (sa
 | F8 | ret m | RM | 1 | 12/6 | ------- | S=1 |
 | F9 | ld sp,hl | SPHL | 1 | 6 | ------- | |
 | FA | jp m,** | JM a16 | 3 | 10/7 | ------- | |
-| FB | ei | EI | 1 | 4 | ------- | enable after next instruction |
+| FB | ei | EI | 1 | 4 | ------- | enable after the next instruction, so `ei` / `ret` is not interrupted |
 | FC | call m,** | CM a16 | 3 | 18/9 | ------- | |
 | FD | jp k,** | JK a16 | 3 | 10/7 | ------- | undoc; also jx5 / jui |
 | FE | cp * | CPI d8 | 2 | 7 | SZKAPVC | |

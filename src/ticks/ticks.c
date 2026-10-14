@@ -93,15 +93,24 @@
 /* For CP, which never wrote fk: leave the 8085's K flag alone. */
 #define VM1_OF_ONLY()   do { if (isvm1()) fk = ((fr ^ fa) & (fr ^ fb)) >> 7 & 1; } while (0)
 
-#define INCW(a, b)              \
-          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 2 : iskc160() ? 1 : isz180() ? 4 : 6, \
+/* UM005003 Table 40: Z180 inc rr / dec rr are 4 states. IX and IY are a different row. */
+#define INCW_STATES         (isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 2 : iskc160() ? 1 : 6)
+#define DECW_STATES         (isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 2 : iskc160() ? 1 : 6)
+
+#define INCW_N(a, b, n)     \
+          st += (n), \
           ++b || a++, \
           fk = (a|b) == 0 ? 1 : 0
 
-#define DECW(a, b)              \
-          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 2 : iskc160() ? 1 : isz180() ? 4 : 6, \
+#define DECW_N(a, b, n)     \
+          st += (n), \
           b-- || a--, \
           fk = (a&b) == 0xff ? 1 : 0
+
+#define INCW(a, b)          INCW_N(a, b, isz180() ? 4 : INCW_STATES)
+#define DECW(a, b)          DECW_N(a, b, isz180() ? 4 : DECW_STATES)
+#define INCXY(a, b)         INCW_N(a, b, INCW_STATES)
+#define DECXY(a, b)         DECW_N(a, b, DECW_STATES)
 
 #define INC(r,r_) do {               \
           st +=isez80() ? 1 : israbbit() ? 2 : (is8080()||isvm1()) ? 5 : isr800() ? 1  : iskc160() ? 1 : 4; \
@@ -1205,9 +1214,9 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           if ( altd ) INCW(h_,l_);
           else INCW(h, l);
         } else if( iy )
-          INCW(yh, yl);
+          INCXY(yh, yl);
         else
-          INCW(xh, xl);
+          INCXY(xh, xl);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x33: // INC SP
         st+= isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 1 : iskc160() ? 1 : isz180() ? 4 : 6;
@@ -1228,9 +1237,9 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           if ( altd ) DECW(h_,l_);
           else DECW(h, l);
         } else if( iy )
-          DECW(yh, yl);
+          DECXY(yh, yl);
         else
-          DECW(xh, xl);
+          DECXY(xh, xl);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x3b: // DEC SP
         st+= isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 1 : iskc160() ? 1 : isz180() ? 4 : 6;

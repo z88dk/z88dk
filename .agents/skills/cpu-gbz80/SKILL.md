@@ -461,6 +461,10 @@ has no P/V).
 11. **No copt pass on library asm.** Hand-written `libsrc/**` is assembled
     as-is. Remove dead moves yourself. Match the target file’s whitespace.
     Checklist: **`tool-copt`**, **`methodology-measure`**.
+12. **`ei` does not enable interrupts until the following instruction has
+    completed.** `ei` / `ret` returns without an interrupt between them.
+    An interrupt cannot land on the instruction after `ei`. `reti` (`D9`)
+    is a different opcode.
 
 ## Preference order (gbz80-only code)
 

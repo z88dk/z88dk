@@ -35,7 +35,12 @@ asm_stpncpy:
 
    ld a,b
    or c
-   jr Z,exit
+   jr NZ,have_n
+
+   inc a                       ; n == 0 writes nothing, so Z is clear
+   jr exit
+
+have_n:
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
 
@@ -56,6 +61,11 @@ loop:
    jr NZ,loop
    dec b
    jr NZ,loop
+
+   ; Counters are already terminal. The pad loop would write 65536 NULs.
+   ld hl,de
+   and a                       ; last byte was not NUL
+   ret
 
 copied:
    ld hl,de                     ; save addr of first NUL in s1
