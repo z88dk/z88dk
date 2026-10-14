@@ -5522,3 +5522,35 @@ calleelong_vm1.bin: $(SOURCES) calleelong.c
 calleelong_os.bin: $(SOURCES) calleelong.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --opt-code-size -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# [shiftconst] a constant shifted by a variable count.
+all:	shiftconst.bin shiftconst_fp.bin shiftconst_z80n.bin shiftconst_z80n_fp.bin shiftconst_z80n_keep.bin shiftconst_8080.bin shiftconst_r2ka.bin
+
+shiftconst.bin: $(SOURCES) shiftconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+shiftconst_fp.bin: $(SOURCES) shiftconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+shiftconst_z80n.bin: $(SOURCES) shiftconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+shiftconst_z80n_fp.bin: $(SOURCES) shiftconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+shiftconst_z80n_keep.bin: $(SOURCES) shiftconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n -Cc--opt-disable=shift-const-bsxa -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+shiftconst_8080.bin: $(SOURCES) shiftconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+shiftconst_r2ka.bin: $(SOURCES) shiftconst.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+

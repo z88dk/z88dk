@@ -2344,6 +2344,8 @@ static int gen_conv_byte_to_high(FILE *out, Func *f, const Op *op)
    (and high counts) where add-hl-hl's cheapness no longer dominates.
    bsxa sets no flags, but the result is a value, never a branch cond.
    Returns 1 if it emitted the shift. */
+static void emit_z80n_barrel_shift(FILE *out, Func *f, const Op *op,
+                                   const char *mnem);
 static int try_const_barrel(FILE *out, Func *f, const Op *op, int is_shr)
 {
     if (!(IS_Z80N()) || op->src[1] >= 0)
@@ -3138,22 +3140,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
        instead of the add-hl-hl;dec;jr loop (~per-bit). bsla sets no
        flags, but the result feeds a value dst, not a branch. */
     if (IS_Z80N()) {
-        load_binop_operands(out, f, op);   /* HL=value(src0), DE=count(src1) */
-        int bc_live = (L.rs.bc >= 0);  /* `ld b,e` clobbers B — preserve */
-        if (bc_live) emit(out, "push\tbc");
-        emit(out, "ld\tb,e");              /* B = count low byte */
-        emit_ex_de_hl(out);            /* DE = value */
-        emit(out, "bsla\tde,b");           /* DE = value << B */
-        if (bc_live) emit(out, "pop\tbc");
-        invalidate_hl_cache();
-        invalidate_de_cache();
-        if (!bc_live) invalidate_bc_cache();  /* B clobbered */
-        if (vreg_is_pr_de(f, op->dst)) {
-            cache_de(op->dst);
-            return 0;
-        }
-        emit_ex_de_hl(out);            /* HL = result */
-        commit_hl_word(out, f, op->dst);
+        emit_z80n_barrel_shift(out, f, op, "bsla");
         return 0;
     }
     int n = L.cmp_label_counter++;
