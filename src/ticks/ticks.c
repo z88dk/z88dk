@@ -17,10 +17,11 @@
 
 #define ALUr_TICKS     (isez80() ? 1 :                    israbbit() ? 2 : isr800() ? 1 : iskc160() ? 1 : isgbz80() ? 4 : 4)
 #define ALURxy_TICKS   (isez80() ? 1 :                                     isr800() ? 2 :                                 4)
-#define ALUiHL_TICKS   (isez80() ? 2 :                    israbbit() ? 5 : isr800() ? 2 : iskc160() ? 3 : isgbz80() ? 8 : 7)
+/* UM005003: Z180 ALU (HL) and ALU n are 6. ALU (IX+d) is 14, so the body after the 3-state prefix is 11. */
+#define ALUiHL_TICKS   (isez80() ? 2 :                    israbbit() ? 5 : isr800() ? 2 : iskc160() ? 3 : isgbz80() ? 8 : isz180() ? 6 : 7)
 // The 0xdd,0xfd prefix has already been added here
-#define ALUiXY_TICKS   (isez80() ? 3 : israbbit4k() ? 9 : israbbit() ? 7 : isr800() ? 5 : iskc160() ? 4 :                 15)
-#define ALUn_TICKS     (isez80() ? 2 :                    israbbit() ? 4 : isr800() ? 2 : iskc160() ? 1 : isgbz80() ? 8 :  7)
+#define ALUiXY_TICKS   (isez80() ? 3 : israbbit4k() ? 9 : israbbit() ? 7 : isr800() ? 5 : iskc160() ? 4 : isz180() ? 11 : 15)
+#define ALUn_TICKS     (isez80() ? 2 :                    israbbit() ? 4 : isr800() ? 2 : iskc160() ? 1 : isgbz80() ? 8 : isz180() ? 6 :  7)
 
 #define LDrr_TICKS     (isez80() ? 1                    : israbbit() ? 2 : isr800() ? 1 : iskc160() ? 1 : isgbz80() ? 4 : (is8080()||isvm1()) ? 5 : 4 )
 
@@ -93,7 +94,7 @@
 /* For CP, which never wrote fk: leave the 8085's K flag alone. */
 #define VM1_OF_ONLY()   do { if (isvm1()) fk = ((fr ^ fa) & (fr ^ fb)) >> 7 & 1; } while (0)
 
-/* UM005003 Table 40: Z180 inc rr / dec rr are 4 states. IX and IY are a different row. */
+/* UM005003: INC ww / DEC ww are 4 states. INC IX / DEC IX are 7, the 3-state DD/FD prefix plus a 4-state body. */
 #define INCW_STATES         (isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 2 : iskc160() ? 1 : 6)
 #define DECW_STATES         (isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 2 : iskc160() ? 1 : 6)
 
@@ -109,8 +110,8 @@
 
 #define INCW(a, b)          INCW_N(a, b, isz180() ? 4 : INCW_STATES)
 #define DECW(a, b)          DECW_N(a, b, isz180() ? 4 : DECW_STATES)
-#define INCXY(a, b)         INCW_N(a, b, INCW_STATES)
-#define DECXY(a, b)         DECW_N(a, b, DECW_STATES)
+#define INCXY(a, b)         INCW_N(a, b, isz180() ? 4 : INCW_STATES)
+#define DECXY(a, b)         DECW_N(a, b, isz180() ? 4 : DECW_STATES)
 
 #define INC(r,r_) do {               \
           st +=isez80() ? 1 : israbbit() ? 2 : (is8080()||isvm1()) ? 5 : isr800() ? 1  : iskc160() ? 1 : 4; \
@@ -134,8 +135,9 @@
           }                    \
         } while (0)
 
+/* UM005003 INC (IX+d) / DEC (IX+d) are 18: prefix 3 plus this body. */
 #define INCPI(a, b) do {            \
-          st +=isez80() ? 5 : israbbit() ? 12 : isr800() ? 7 : iskc160() ? 6 : 19; \
+          st +=isez80() ? 5 : israbbit() ? 12 : isr800() ? 7 : iskc160() ? 6 : isz180() ? 15 : 19; \
           if (altd) {           \
             fa_= get_memory_data(t= (get_memory_inst(pc++)^128)-128+(b|a<<8)), \
             ff_= ff_&256          \
@@ -148,7 +150,7 @@
         } while(0)
 
 #define DECPI(a, b) do {        \
-          st +=isez80() ? 5 : israbbit() ? 12 : isr800() ? 7 : iskc160() ? 6 : 19; \
+          st +=isez80() ? 5 : israbbit() ? 12 : isr800() ? 7 : iskc160() ? 6 : isz180() ? 15 : 19; \
           if (altd) {           \
             fa_= get_memory_data(t= (get_memory_inst(pc++)^128)-128+(b|a<<8)), \
             ff_= ff_&256          \
@@ -584,9 +586,9 @@
           fa= ~(fr= t),         \
           fb= 0
 
-// 11T has already been added + index flag
+/* Indexed CB setup is already added. UM005003 BIT b,(IX+d) is 15: prefix 3 + setup 9 + this 3. */
 #define BITI(n) do {               \
-          st += isez80() ? -7 :israbbit() ? -1 : isz180() ? 4 : isr800() ? -6 : iskc160() ? - 7 : 5; \
+          st += isez80() ? -7 :israbbit() ? -1 : isz180() ? 3 : isr800() ? -6 : iskc160() ? - 7 : 5; \
           if ( altd ) {           \
             ff_= ff_    & -256    \
               | mp>>8 &   40      \
@@ -628,8 +630,9 @@
           t = l|h<<8, \
           put_memory(t, get_memory_data(t) | n)
 
+/* UM005003: IN r,(C) is 9, OUT (C),r is 10. */
 #define INR(r)                  \
-          st+= isr800() ? 3 : 12,              \
+          st+= isr800() ? 3 : isz180() ? 9 : 12,              \
           r= in(mp= b<<8 | c),  \
           ++mp,                 \
           ff= ff & -256         \
@@ -638,7 +641,7 @@
           fb= 0
 
 #define OUTR(r)                 \
-          st+= isr800() ? 3 : 12,              \
+          st+= isr800() ? 3 : isz180() ? 10 : 12,              \
           out(mp= c | b<<8, r), \
           ++mp
 
@@ -695,15 +698,15 @@
     } while (0)
 
 #define UNDOCUMENTED_IM0() do { \
-        st += 8; im = 0;        \
+        st += isz180() ? 6 : 8; im = 0; \
     } while (0)
 
 #define UNDOCUMENTED_IM1() do { \
-        st += 8; im = 1;        \
+        st += isz180() ? 6 : 8; im = 1; \
     } while (0)
 
 #define UNDOCUMENTED_IM2() do { \
-        st += 8; im = 2;        \
+        st += isz180() ? 6 : 8; im = 2; \
     } while (0)
 
 #define UNDOCUMENTED_RETN() do { \
@@ -1280,7 +1283,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
       case 0x34: // INC (HL) // INC (IX+d) // INC (IY+d)
         SUSPECT_IMPL("altd should affect flags")
         if( ih )
-          st+=isez80() ? 4 : israbbit() ? 8 : is808x() ? 10 : isgbz80() ? 12 : isr800() ? 4 : iskc160() ? 5 : 11,
+          st+=isez80() ? 4 : israbbit() ? 8 : is808x() ? 10 : isgbz80() ? 12 : isr800() ? 4 : iskc160() ? 5 : isz180() ? 10 : 11,
           fa= get_memory_data(t= l | h<<8),
           ff= ff&256
             | (fr= put_memory(t,fa+(fb=+1)));
@@ -1327,7 +1330,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
       case 0x35: // DEC (HL) // DEC (IX+d) // DEC (IY+d)
         SUSPECT_IMPL("altd should affect flags")
         if( ih )
-          st+=isez80() ? 4 : israbbit() ? 8 : is808x() ? 10 : isgbz80() ? 12 : isr800() ? 4 : iskc160() ? 5 : 11,
+          st+=isez80() ? 4 : israbbit() ? 8 : is808x() ? 10 : isgbz80() ? 12 : isr800() ? 4 : iskc160() ? 5 : isz180() ? 10 : 11,
           fa= get_memory_data(t= l | h<<8),
           ff= ff&256
             | (fr= put_memory(t,fa+(fb=-1)));
@@ -1620,10 +1623,10 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           break;
         }
         if( ( altd && --b_) || ( altd == 0 && --b) )
-          st+= isez80() ? 4 : israbbit4k() ? 6 : israbbit() ? 5 : isr800() ? 3 : iskc160() ? 4 : 13,
+          st+= isez80() ? 4 : israbbit4k() ? 6 : israbbit() ? 5 : isr800() ? 3 : iskc160() ? 4 : isz180() ? 9 : 13,
           mp= pc+= (get_memory_inst(pc)^128)-127;
         else
-          st+= isez80() ? 2 : israbbit4k() ? 6 : israbbit() ? 5 : isr800() ? 2 : iskc160() ? 3 : 8,
+          st+= isez80() ? 2 : israbbit4k() ? 6 : israbbit() ? 5 : isr800() ? 2 : iskc160() ? 3 : isz180() ? 7 : 8,
           pc++;
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x27: // DAA / (RCM) add sp,d / (EZ80) ld hl,(ix+d) (prefixed)
@@ -3002,7 +3005,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           ioi=1;
           st+=2;
         } else {
-          st+= is808x() ? 10 : isr800() ? 3 : iskc160() ? 5 : 11;
+          st+= is808x() ? 10 : isr800() ? 3 : iskc160() ? 5 : isz180() ? 10 : 11;
           out(mp= get_memory_inst(pc++) | a<<8, a);
           mp= mp&65280
             | ++mp;
@@ -3016,7 +3019,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           ioe=1;
           st+=2;
         } else {
-          st+= is808x() ? 10 : isr800() ? 3 : iskc160() ? 4 : 11;
+          st+= is808x() ? 10 : isr800() ? 3 : iskc160() ? 4 : isz180() ? 9 : 11;
           a= in(mp= get_memory_inst(pc++) | a<<8);
           ++mp;
           ih=1;altd=0,alts=0;ioi=0;ioe=0;
@@ -4554,7 +4557,7 @@ static void handle_ed_page(void)
 
 
     case 0x44:       // NEG
-        st+= 8;
+        st+= isz180() ? 6 : 8;
         fr= a= (ff= (fb= ~a)+1);
         fa= 0; 
         break;
@@ -4564,7 +4567,7 @@ static void handle_ed_page(void)
         break;
     case 0x46:  // IM0 // (RCM) IPSET 0
         if (israbbit()) rxk_ipset(opc);
-        else { st+= 8; im= 0; }
+        else { st+= isz180() ? 6 : 8; im= 0; }
         break;
     case 0x47: // LD I,A // (RCM) LD EIR,A
         if (israbbit()) rxk_ld_eir_a(opc);
@@ -4599,7 +4602,7 @@ static void handle_ed_page(void)
         break;
     case 0x56:  // IM1 // (RCM) IPSET 1
         if (israbbit()) rxk_ipset(opc);
-        else { st+= 8; im= 1; }
+        else { st+= isz180() ? 6 : 8; im= 1; }
         break;
     case 0x57:  // LD A,I // (RCM) LD A,EIR
         if ( israbbit() ) rxk_ld_a_eir(opc);
@@ -4617,7 +4620,7 @@ static void handle_ed_page(void)
         break;
     case 0x5e: // IM2 // (RCM) IPSET 3
         if (israbbit()) rxk_ipset(opc);
-        else { st+= 8; im= 2; }
+        else { st+= isz180() ? 6 : 8; im= 2; }
         break;
     case 0x5f:  // LD A,R // (RCM) LD A,IIR
         if ( israbbit() ) rxk_ld_a_iir(opc);
