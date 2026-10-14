@@ -7798,13 +7798,15 @@ static void note_wide_noslot(int v)
     rec_wide_noslot[v]++;
 }
 
-/* A four-byte value whose every definition took a no-slot path (pushed or left
-   in DEHL): its frame slot is never written, so an unused slot is a proof. */
+/* A four-byte value that took a no-slot path (pushed or left in DEHL) and whose
+   slot the render never accessed. The definitions are not all counted by one
+   path (a call result is noted as a no-slot value without a definition), so the
+   counts are not compared: the drop is checked by its re-render, which puts the
+   slots back if one is reached after all. */
 static int wide_slot_untouched(int v, int w)
 {
-    return w == 4 && !dsd_narrow_only && rec_wide_defs && rec_wide_noslot
-        && rec_wide_defs[v] > 0 && rec_wide_defs[v] == rec_wide_noslot[v]
-        && !opt_disabled("dead-slot-wide");
+    return w == 4 && !dsd_narrow_only && rec_wide_noslot
+        && rec_wide_noslot[v] > 0 && !opt_disabled("dead-slot-wide");
 }
 
 /* Record a genuine frame-slot access emitted for v (called from slot_off /
@@ -8667,12 +8669,22 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
             emit(out, "ld\tsp,hl");               /* drop the args */
             emit(out, "exx");                     /* restore value + retaddr */
             emit(out, "push\tbc");
+        } else if (width == 4 && callee_args <= 16) {
+            /* 8080/8085: no alt regs and no `add sp,d`, so the sp math would need
+               HL — which a long result also occupies, with no spare pair (BC holds
+               the retaddr). A few argument bytes are dropped by popping them into
+               AF instead (A and the flags carry no part of the result). */
+            emit(out, "pop\tbc");                 /* BC = return address */
+            for (int rem = callee_args; rem > 0; rem -= 2) {
+                if (rem >= 2 && CPU_POP_AF_IS_SAFE()) emit(out, "pop\taf");
+                else for (int k = rem >= 2 ? 2 : 1; k > 0; k--) emit(out, "inc\tsp");
+            }
+            emit(out, "push\tbc");
         } else if (width == 4) {
-            /* 8080/8085: no alt regs and no `add sp,d`, so the sp math needs HL
-               — which a long result also occupies, with no spare pair (BC holds
-               the retaddr). Genuinely unsupported; diagnose, don't miscompile. */
-            fprintf(stderr, "ir_lower: __z88dk_callee with a long return is "
-                            "unsupported on 8080/8085\n");
+            /* More argument bytes than that need the sp math in HL, which a long
+               result also occupies with no spare pair. Diagnose, don't miscompile. */
+            fprintf(stderr, "ir_lower: __z88dk_callee with a long return and more "
+                            "than 16 bytes of arguments is unsupported on 8080/8085\n");
             return -1;
         } else {
             /* 8080/8085, int result in HL (≤2B): park it in DE via ex de,hl

@@ -1096,17 +1096,35 @@
 	ld	hl,de
 
 ;; #GB7: fold two consecutive `add sp,N; add sp,M` into one. gbz80/z80 `add sp,d`
-;; is a signed byte [-128,127]; %check can only bound ONE var, so bound EACH
-;; addend to [-64,63] => sum in [-128,126], provably in range (correctly rejects
-;; md5's add sp,-128 / add sp,127 overflow pairs). Misses folds where an addend
-;; exceeds 63, but catches the common small frame adjusts (add sp,8; add sp,2).
+;; is a signed byte [-128,127]. %check bounds each addend (and so proves both are
+;; numbers); the %eval proves the SUM fits: (sum + 128) >> 8 is 0 exactly when
+;; the sum is in [-128,127]. Catches a call cleanup followed by a frame release
+;; (add sp,6; add sp,104) as well as the small frame adjusts.
 %title #GB7 fold add sp,N;add sp,M -> add sp,N+M (-2b)
-%check -64 <= %1 <= 63
-%check -64 <= %2 <= 63
+%check -128 <= %1 <= 127
+%check -128 <= %2 <= 127
+%eval 0 = %1 %2 + 128 + 8 >
 	add	sp,%1
 	add	sp,%2
 =
 	add	sp,%eval(%1 %2 +)
+
+;; #SP1: the stack arguments a call leaves behind are dropped with `pop bc`, then
+;; the frame is released through HL with the result stashed in BC. The pop is
+;; dead (BC is overwritten at once), so fold its two bytes into the release:
+;; one more word of sp adjust, one pop fewer (-1b, -10T per word).
+%title #SP1 fold pop bc into the following sp release via hl (-1b)
+%check -32768 <= %1 <= 32765
+	pop	bc
+	ld	bc,hl
+	ld	hl,%1
+	add	hl,sp
+	ld	sp,hl
+=
+	ld	bc,hl
+	ld	hl,%eval(%1 2 +)
+	add	hl,sp
+	ld	sp,hl
 
 ;; #GB8: gbz80 mem->mem word copy. A word loaded via the `ld a,(hl+)` walk then
 ;; byte-stored to a global forms the word in HL only for the store, which reads
