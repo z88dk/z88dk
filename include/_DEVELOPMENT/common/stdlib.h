@@ -175,18 +175,18 @@ extern void __LIB__ _ldivu__callee(ldivu_t *ld,unsigned long numer,unsigned long
 #define _ldivu_(a,b,c) _ldivu__callee(a,b,c)
 
 
-extern void __LIB__ _insertion_sort_(void *base,size_t nmemb,size_t size,void *compar) __SMALLC;
-extern void __LIB__ _insertion_sort__callee(void *base,size_t nmemb,size_t size,void *compar) __SMALLC __z88dk_callee;
+extern void __LIB__ _insertion_sort_(void *base,size_t nmemb,size_t size,int (*compar)(const void *, const void *)) __SMALLC;
+extern void __LIB__ _insertion_sort__callee(void *base,size_t nmemb,size_t size,int (*compar)(const void *, const void *)) __SMALLC __z88dk_callee;
 #define _insertion_sort_(a,b,c,d) _insertion_sort__callee(a,b,c,d)
 
 
-extern void __LIB__ _quicksort_(void *base,size_t nmemb,size_t size,void *compar) __SMALLC;
-extern void __LIB__ _quicksort__callee(void *base,size_t nmemb,size_t size,void *compar) __SMALLC __z88dk_callee;
+extern void __LIB__ _quicksort_(void *base,size_t nmemb,size_t size,int (*compar)(const void *, const void *)) __SMALLC;
+extern void __LIB__ _quicksort__callee(void *base,size_t nmemb,size_t size,int (*compar)(const void *, const void *)) __SMALLC __z88dk_callee;
 #define _quicksort_(a,b,c,d) _quicksort__callee(a,b,c,d)
 
 
-extern void __LIB__ _shellsort_(void *base,size_t nmemb,size_t size,void *compar) __SMALLC;
-extern void __LIB__ _shellsort__callee(void *base,size_t nmemb,size_t size,void *compar) __SMALLC __z88dk_callee;
+extern void __LIB__ _shellsort_(void *base,size_t nmemb,size_t size,int (*compar)(const void *, const void *)) __SMALLC;
+extern void __LIB__ _shellsort__callee(void *base,size_t nmemb,size_t size,int (*compar)(const void *, const void *)) __SMALLC __z88dk_callee;
 #define _shellsort_(a,b,c,d) _shellsort__callee(a,b,c,d)
 
 
@@ -217,13 +217,13 @@ extern uint16_t _random_uniform_xor_8__fastcall(uint32_t *seed) __z88dk_fastcall
 #endif
 
 
-extern int __LIB__ _strtoi_(char *nptr,char **endptr,int base) __SMALLC;
-extern int __LIB__ _strtoi__callee(char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
+extern int __LIB__ _strtoi_(const char *nptr,char **endptr,int base) __SMALLC;
+extern int __LIB__ _strtoi__callee(const char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
 #define _strtoi_(a,b,c) _strtoi__callee(a,b,c)
 
 
-extern uint16_t __LIB__ _strtou_(char *nptr,char **endptr,int base) __SMALLC;
-extern uint16_t __LIB__ _strtou__callee(char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
+extern uint16_t __LIB__ _strtou_(const char *nptr,char **endptr,int base) __SMALLC;
+extern uint16_t __LIB__ _strtou__callee(const char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
 #define _strtou_(a,b,c) _strtou__callee(a,b,c)
 
 
@@ -253,26 +253,26 @@ extern int atexit_fastcall(void *func) __z88dk_fastcall;
 
 
 #ifdef __SCCZ80
-extern double_t __LIB__ atof(char *nptr) __SMALLC __z88dk_fastcall;
+extern double_t __LIB__ atof(const char *nptr) __SMALLC __z88dk_fastcall;
 #else
-extern double_t atof(char *nptr);
-extern double_t atof_fastcall(char *nptr) __z88dk_fastcall;
+extern double_t atof(const char *nptr);
+extern double_t atof_fastcall(const char *nptr) __z88dk_fastcall;
 #define atof(a) atof_fastcall(a)
 #endif
 
 
-extern int __LIB__ atoi(char *buf) __SMALLC;
-extern int __LIB__ atoi_fastcall(char *buf) __z88dk_fastcall;
+extern int __LIB__ atoi(const char *buf) __SMALLC;
+extern int __LIB__ atoi_fastcall(const char *buf) __z88dk_fastcall;
 #define atoi(a) atoi_fastcall(a)
 
 
-extern long __LIB__ atol(char *buf) __SMALLC;
-extern long __LIB__ atol_fastcall(char *buf) __z88dk_fastcall;
+extern long __LIB__ atol(const char *buf) __SMALLC;
+extern long __LIB__ atol_fastcall(const char *buf) __z88dk_fastcall;
 #define atol(a) atol_fastcall(a)
 
 
-extern void __LIB__ *bsearch(void *key,void *base,size_t nmemb,size_t size,void *compar) __SMALLC;
-extern void __LIB__ *bsearch_callee(void *key,void *base,size_t nmemb,size_t size,void *compar) __SMALLC __z88dk_callee;
+extern void __LIB__ *bsearch(const void *key,const void *base,size_t nmemb,size_t size,int (*compar)(const void *, const void *)) __SMALLC;
+extern void __LIB__ *bsearch_callee(const void *key,const void *base,size_t nmemb,size_t size,int (*compar)(const void *, const void *)) __SMALLC __z88dk_callee;
 #define bsearch(a,b,c,d,e) bsearch_callee(a,b,c,d,e)
 
 
@@ -340,8 +340,8 @@ extern char __LIB__ *ltoa_callee(long num,char *buf,int radix) __SMALLC __z88dk_
 #define ltoa(a,b,c) ltoa_callee(a,b,c)
 
 
-extern void __LIB__ qsort(void *base,size_t nmemb,size_t size,void *compar) __SMALLC;
-extern void __LIB__ qsort_callee(void *base,size_t nmemb,size_t size,void *compar) __SMALLC __z88dk_callee;
+extern void __LIB__ qsort(void *base,size_t nmemb,size_t size,int (*compar)(const void *, const void *)) __SMALLC;
+extern void __LIB__ qsort_callee(void *base,size_t nmemb,size_t size,int (*compar)(const void *, const void *)) __SMALLC __z88dk_callee;
 #define qsort(a,b,c,d) qsort_callee(a,b,c,d)
 
 
@@ -361,31 +361,31 @@ extern void __LIB__ srand_fastcall(uint16_t seed) __preserves_regs(b,c,d,e,h,l) 
 #define srand(a) srand_fastcall(a)
 
 
-extern double_t __LIB__ strtod(char *nptr,char **endptr) __SMALLC;
-extern double_t __LIB__ strtod_callee(char *nptr,char **endptr) __SMALLC __z88dk_callee;
+extern double_t __LIB__ strtod(const char *nptr,char **endptr) __SMALLC;
+extern double_t __LIB__ strtod_callee(const char *nptr,char **endptr) __SMALLC __z88dk_callee;
 #define strtod(a,b) strtod_callee(a,b)
 
 
-extern float_t __LIB__ strtof(char *nptr,char **endptr) __SMALLC;
-extern float_t __LIB__ strtof_callee(char *nptr,char **endptr) __SMALLC __z88dk_callee;
+extern float_t __LIB__ strtof(const char *nptr,char **endptr) __SMALLC;
+extern float_t __LIB__ strtof_callee(const char *nptr,char **endptr) __SMALLC __z88dk_callee;
 #define strtof(a,b) strtof_callee(a,b)
 
 
-extern long __LIB__ strtol(char *nptr,char **endptr,int base) __SMALLC;
-extern long __LIB__ strtol_callee(char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
+extern long __LIB__ strtol(const char *nptr,char **endptr,int base) __SMALLC;
+extern long __LIB__ strtol_callee(const char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
 #define strtol(a,b,c) strtol_callee(a,b,c)
 
 
-extern uint32_t __LIB__ strtoul(char *nptr,char **endptr,int base) __SMALLC;
-extern uint32_t __LIB__ strtoul_callee(char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
+extern uint32_t __LIB__ strtoul(const char *nptr,char **endptr,int base) __SMALLC;
+extern uint32_t __LIB__ strtoul_callee(const char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
 #define strtoul(a,b,c) strtoul_callee(a,b,c)
 
 
 #ifdef __SCCZ80
-extern int __LIB__ system(char *s) __SMALLC __z88dk_fastcall;
+extern int __LIB__ system(const char *s) __SMALLC __z88dk_fastcall;
 #else
-extern int system(char *s);
-extern int system_fastcall(char *s) __z88dk_fastcall;
+extern int system(const char *s);
+extern int system_fastcall(const char *s) __z88dk_fastcall;
 #define system(a) system_fastcall(a)
 #endif
 
@@ -475,21 +475,21 @@ extern void __LIB__ *realloc_unlocked_callee(void *p,size_t size) __SMALLC __z88
 
 #ifdef __CLANG
 
-extern long long atoll(char *buf);
+extern long long atoll(const char *buf);
 extern void _lldiv_(lldiv_t *ld,long long numer,long long denom);
 extern void _lldivu_(lldivu_t *ld,unsigned long long numer,unsigned long long denom);
 extern long long llabs(long long i);
 extern char *lltoa(long long num,char *buf,int radix);
-extern long long strtoll(char *nptr,char **endptr,int base);
-extern unsigned long long strtoull(char *nptr,char **endptr,int base);
+extern long long strtoll(const char *nptr,char **endptr,int base);
+extern unsigned long long strtoull(const char *nptr,char **endptr,int base);
 extern char *ulltoa(unsigned long long num,char *buf,int radix);
 
 #endif
 
 #ifdef __SDCC
 
-extern long long atoll(char *buf);
-extern long long atoll_callee(char *buf) __z88dk_callee;
+extern long long atoll(const char *buf);
+extern long long atoll_callee(const char *buf) __z88dk_callee;
 #define atoll(a) atoll_callee(a)
 
 extern void __LIB__ _lldiv_(lldiv_t *ld,long long numer,long long denom) __SMALLC;
@@ -512,13 +512,13 @@ extern char __LIB__ *lltoa_callee(long long num,char *buf,int radix) __SMALLC __
 #define lltoa(a,b,c) lltoa_callee(a,b,c)
 
 
-extern long long __LIB__ strtoll(char *nptr,char **endptr,int base) __SMALLC;
-extern long long __LIB__ strtoll_callee(char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
+extern long long __LIB__ strtoll(const char *nptr,char **endptr,int base) __SMALLC;
+extern long long __LIB__ strtoll_callee(const char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
 #define strtoll(a,b,c) strtoll_callee(a,b,c)
 
 
-extern unsigned long long __LIB__ strtoull(char *nptr,char **endptr,int base) __SMALLC;
-extern unsigned long long __LIB__ strtoull_callee(char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
+extern unsigned long long __LIB__ strtoull(const char *nptr,char **endptr,int base) __SMALLC;
+extern unsigned long long __LIB__ strtoull_callee(const char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
 #define strtoull(a,b,c) strtoull_callee(a,b,c)
 
 
@@ -532,8 +532,8 @@ extern char __LIB__ *ulltoa_callee(unsigned long long num,char *buf,int radix) _
 
 #ifdef __SCCZ80
 
-extern long long atoll(char *buf);
-extern long long atoll_callee(char *buf) __z88dk_callee;
+extern long long atoll(const char *buf);
+extern long long atoll_callee(const char *buf) __z88dk_callee;
 #define atoll(a) atoll_callee(a)
 
 extern long long llabs(long long i);
@@ -545,13 +545,13 @@ extern char __LIB__ *lltoa_callee(long long num,char *buf,int radix) __SMALLC __
 #define lltoa(a,b,c) lltoa_callee(a,b,c)
 
 
-extern long long __LIB__ strtoll(char *nptr,char **endptr,int base) __SMALLC;
-extern long long __LIB__ strtoll_callee(char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
+extern long long __LIB__ strtoll(const char *nptr,char **endptr,int base) __SMALLC;
+extern long long __LIB__ strtoll_callee(const char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
 #define strtoll(a,b,c) strtoll_callee(a,b,c)
 
 
-extern unsigned long long __LIB__ strtoull(char *nptr,char **endptr,int base) __SMALLC;
-extern unsigned long long __LIB__ strtoull_callee(char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
+extern unsigned long long __LIB__ strtoull(const char *nptr,char **endptr,int base) __SMALLC;
+extern unsigned long long __LIB__ strtoull_callee(const char *nptr,char **endptr,int base) __SMALLC __z88dk_callee;
 #define strtoull(a,b,c) strtoull_callee(a,b,c)
 
 

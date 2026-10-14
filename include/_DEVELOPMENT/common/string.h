@@ -369,7 +369,7 @@ extern size_t __LIB__ strxfrm_callee(char *dst,const char *src,size_t n) __SMALL
    #ifndef __DISABLE_BUILTIN_MEMCPY
    #undef  memcpy
    #define memcpy(a,b,c)   __builtin_memcpy(a,b,c)
-   extern void __LIB__    *__builtin_memcpy(void *dst, void *src,size_t n) __smallc;
+   extern void __LIB__    *__builtin_memcpy(void *dst, const void *src,size_t n) __smallc;
    #endif
    
    #ifndef __DISABLE_BUILTIN_STRCPY
