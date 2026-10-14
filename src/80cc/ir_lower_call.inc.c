@@ -1281,7 +1281,26 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
             emit_acc_slot_addr(out, f, src, 0);
             emit(out, "call\t%s", hi->acc_load);
         }
-        if (!strcmp(hi->name, "fabs") && hi->acc_width == 8
+        if (!strcmp(hi->name, "l_i64_bswap")) {
+            /* Reverse the eight bytes of __i64_acc: swap the bytes inside each
+               16-bit word and exchange words 0<->3 and 1<->2. */
+            emit(out, "EXTERN\t__i64_acc");
+            for (int w = 0; w < 2; w++) {
+                emit(out, "ld\thl,(__i64_acc+%d)", 2 * w);
+                emit(out, "ld\tde,(__i64_acc+%d)", 6 - 2 * w);
+                emit(out, "ld\ta,h");
+                emit(out, "ld\th,l");
+                emit(out, "ld\tl,a");
+                emit(out, "ld\ta,d");
+                emit(out, "ld\td,e");
+                emit(out, "ld\te,a");
+                emit(out, "ld\t(__i64_acc+%d),hl", 6 - 2 * w);
+                emit(out, "ld\t(__i64_acc+%d),de", 2 * w);
+            }
+            invalidate_hl_bc();
+            invalidate_de_cache();
+            invalidate_a_cache();
+        } else if (!strcmp(hi->name, "fabs") && hi->acc_width == 8
             && !c_opt_code_size && !opt_disabled("fabs-fa-clear")) {
             /* 64-bit MBF keeps its sign in bit 7 of FA byte 6: clear it where
                it sits instead of calling the library routine. The call is

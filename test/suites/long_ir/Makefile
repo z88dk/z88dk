@@ -5432,3 +5432,38 @@ hints_keep.bin: $(SOURCES) hints.c
 hints_os.bin: $(SOURCES) hints.c
 	zcc +test -vn --opt-code-size $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# [bswap64] __builtin_bswap64 and intrinsic_swap_word_32 (the 64-bit accumulator needs a z80-family CPU).
+all:	bswap64.bin bswap64_fp.bin bswap64_r2ka.bin bswap64_z180.bin bswap64_ez80.bin bswap64_ez80_fp.bin bswap64_kc160.bin bswap64_z80n.bin
+
+bswap64.bin: $(SOURCES) bswap64.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bswap64_fp.bin: $(SOURCES) bswap64.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bswap64_r2ka.bin: $(SOURCES) bswap64.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bswap64_z180.bin: $(SOURCES) bswap64.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bswap64_ez80.bin: $(SOURCES) bswap64.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bswap64_ez80_fp.bin: $(SOURCES) bswap64.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bswap64_kc160.bin: $(SOURCES) bswap64.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mkc160 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bswap64_z80n.bin: $(SOURCES) bswap64.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }

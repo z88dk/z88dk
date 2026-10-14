@@ -4256,7 +4256,27 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             const char *sn = n->sym->name;
             int w32 = !strcmp(sn, "__builtin_bswap32");
             int w16 = !strcmp(sn, "__builtin_bswap16");
+            int ws = !strcmp(sn, "__builtin_swap_word_32");   /* halves of a long */
+            int w64 = !strcmp(sn, "__builtin_bswap64");
             Node *a0 = array_get_byindex(n->args, 0);
+            if (w64 && a0 && a0->type && kind_is_integer(node_value_kind(a0))) {
+                /* 64-bit byte reverse: the value goes through __i64_acc and the
+                   lowerer reverses the eight bytes there. */
+                int v = build_expr(b, a0);
+                if (v < 0) return -1;
+                if ((int)b->f->vregs[v].kind != KIND_LONGLONG) {
+                    int uns = a0->type->isunsigned;
+                    if (b->f->vregs[v].width == 1) {
+                        int wt = new_temp(b, 2);
+                        Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+                        cv->dst = wt; cv->src[0] = v;
+                        v = wt;
+                    }
+                    v = emit_acc_int_from_int(b, v, uns);
+                }
+                return emit_acc_int_unary(b, v, "l_i64_bswap");
+            }
+            w32 |= ws;
             if ((w32 || w16) && a0 && a0->type
                 && kind_is_integer(node_value_kind(a0))
                 && !is_acc_int_kind(node_value_kind(a0))) {
@@ -4279,7 +4299,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 }
                 int dst = new_temp_kind(b, w32 ? KIND_LONG : KIND_INT);
                 b->f->vregs[dst].width = (int16_t)ow;
-                if (w32) {
+                if (ws) {
+                    Op *op = ir_op_emit(cur_bb(b), IR_ROTL);
+                    op->dst = dst; op->src[0] = v; op->imm = 16;
+                } else if (w32) {
                     ir_emit_unop(cur_bb(b), IR_BSWAP, dst, v);
                 } else {
                     Op *op = ir_op_emit(cur_bb(b), IR_ROTL);

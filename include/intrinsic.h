@@ -113,11 +113,14 @@ extern unsigned int __builtin_bswap16(unsigned int n);
 extern unsigned long __builtin_bswap32(unsigned long n);
 #define intrinsic_swap_endian_16(a) __builtin_bswap16(a)
 #define intrinsic_swap_endian_32(a) __builtin_bswap32(a)
+extern unsigned long long __builtin_bswap64(unsigned long long n);
+extern unsigned long __builtin_swap_word_32(unsigned long n);
+#define intrinsic_swap_word_32(a) __builtin_swap_word_32(a)
 #else
 extern unsigned int __LIB__ intrinsic_swap_endian_16(unsigned int n) __smallc __z88dk_fastcall __preserves_regs(b,c,d,e);
 extern unsigned long __LIB__ intrinsic_swap_endian_32(unsigned long n) __smallc __z88dk_fastcall __preserves_regs(b,c);
-#endif
 extern unsigned long __LIB__ intrinsic_swap_word_32(unsigned long n) __smallc __z88dk_fastcall __preserves_regs(a,b,c);
+#endif
 
 
 #define intrinsic_emit_helper(arg)  { extern void intrinsic_emit_##arg(void); intrinsic_emit_##arg(); }
