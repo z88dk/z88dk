@@ -4,9 +4,9 @@ Read this file at the start of a page edit. Add rows when new commits or pull re
 
 The subject line is a filter. Each "Parsed patch" row below was taken from the diff (`git show` or the pull-request files), not from the commit comment. Procedure: skill `docs-wiki`, heading "Change index".
 
-Index built **2026-10-04**. Added **2026-10-14** through product `origin/master` `49678ddd96` and wiki `origin/master` `d9ebfaf`. Wiki clone: `/tmp/z88dk.wiki`, pushed. Printf pages: `6a20572`. #3040 page split and `draft:imported` removal: `eaa1cb0`. `draft:verified` removal: `811d405`. That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts.
+Index built **2026-10-04**. Added **2026-10-15** through product `origin/master` `2a5638fa37`. Wiki `origin/master` is still `d9ebfaf`. Wiki clone: `/tmp/z88dk.wiki`. Printf pages: `6a20572`. #3040 page split and `draft:imported` removal: `eaa1cb0`. `draft:verified` removal: `811d405`. That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts.
 
-#3187 merged as `49678ddd96`. #3186 is still open. Both are on the wiki as `d9ebfaf`.
+#3187 merged as `49678ddd96` and #3186 merged as `8ab2e80f99`. Both size and malloc sentences are already on the wiki as `d9ebfaf`. The rows below from closed issues #29, #1881, and #201 are not on the wiki yet.
 
 ## Parsed patch — classic sdcc printf scan
 
@@ -35,6 +35,8 @@ Read from the issue comments, not from a commit subject.
 | z88dk#3048 | `test/suites/recordbench/recordbench.c` only. Signed/unsigned compare. No platform page |
 | z88dk#2155 | `src/ticks/debugger_mi2.c`, `src/ticks/syms.c`. Host debugger. No platform page |
 | product `origin/master` `c076f150d2`..`49678ddd96`, except the rows below | 80cc, sccz80, copt, ticks, tests, temporary-path fixes, and merges #3174, #3177, #3178, #3180, #3181, #3182, #3183, #3184. No CLIB default, target cfg, or wiki sentence. |
+| `47901a27c1`, `6343d0ef10` | `z88dk-ticks` Z180 state counts. Host emulator. No platform page. |
+| `0936a566b0`, `4025e3ca60` | `src/ticks/reltool.c` only. Host tool. |
 
 ## Parsed patches — wiki commits already applied
 
@@ -79,13 +81,28 @@ These commits **are** the wiki text. Do not add a second sentence from the subje
 
 ## Parsed patches — open pull requests (not shipped)
 
-Do not write these onto the wiki until they merge. The title is not the change. #3186 is the exception below: the size sentence is on the wiki while the PR is open.
+Do not write these onto the wiki until they merge. The title is not the change. #3186 has merged. Its row stays here so the size sentence is not written a second time.
 
 | Source | What the patch says | Page when it merges |
 |--------|---------------------|---------------------|
 | z88dk#2850 "Vz200 new asm files" | `include/arch/vz.h` and `libsrc/target/vz/vz200.lst`. Drops `vz_bgrd`, `vz_brick`, `vz_clrscr`, `vz_color` from the header and the list. Adds coarse scroll, smooth scroll, sprite draw, text, paper, irq on/off, `vz_waitvb`, and the matching callees. Comments inside the new asm disagree (1 pixel vs 4 pixels; `vz_coursescroll` comments say smooth scroll). Document only symbols that agree in the header and the `.lst` | `Platform---VZ200` |
 | z88dk#2162 "Add filesystem API and improve console output" | The file list is `libsrc/target/ticalc/fcntl/` plus TI-83 Plus and TI-86 `.def` files. It adds AppVar `open` / `read` / `write` / `close` / `lseek` / `remove` / `rename`. There is no console-output diff in the file list. Do not add a "small text" claim from the title | `Platform---TI-Calculators` or `ti_calculators` |
-| z88dk#3186 head `6bcd17c2` "80cc: Floating point optimisations". Still open. | `zcc --opt-code-size` passes `--opt-code-size` to 80cc. 80cc then uses a helper call when that call is shorter than the inline code. `OPTIONS.md` adds opt-out names. Those names stay off the wiki. | `Tool---80cc`, one sentence. Checked `d9ebfaf` while the PR is open. |
+| z88dk#3186 merged as `8ab2e80f99` "80cc: Floating point optimisations" | `zcc --opt-code-size` passes `--opt-code-size` to 80cc as well as to sdcc. 80cc then uses a helper call when that call is shorter than the inline code. `OPTIONS.md` opt-out names stay off the wiki. `-fframe-pointer` was already on the page. | `Tool---80cc`. The size sentence is already there. Checked `d9ebfaf`. No further edit. |
+
+## Closed issues since 2026-10-14
+
+The issue title is a filter. The merged patch is the fact. These rows are not on the wiki yet, except where the table says the page already matches.
+
+| Source | What the patch says | Page |
+|--------|---------------------|------|
+| #29, merge `3e8951d995` (PR #3189) and `50a1a97b79` | `asm_shellsort.asm` keeps the sort state on the stack and in the alternate register set. A comparator may call shellsort again. The sort does not use AF' or IY. IX is the comparator. The multiply is not wrapped in `push ix` / `pop ix`. Classic `qsort` links `asm_quicksort` and does not include this file. | `Configuration`, footnote 3. The page says "Shellsort is currently non-reentrant." Replace that sentence. Not checked. |
+| #113, merge `49678ddd96` (PR #3187) | Already parsed above. `__CLIB_OPT_MALLOC` `0` is the address-chain walker. The built libraries use `0`. | `Configuration` and `NewLib--Platform--Embedded`. Checked `d9ebfaf`. No further edit. |
+| #1881, merges `f5acc85e4b` (PR #3191) and `2a5638fa37` (PR #3193) | Classic `strtod` reads a C90 decimal number and a C99 hexadecimal number (`0x`, optional point, optional `p`/`P` and a decimal power). `inf` and `nan` stay unrecognised. The prototype in `include/stdlib.h` is present for `__MATH_MATH32`, `__MATH_MATH48`, and `__MATH_AM9511` on every CPU, and for `__MATH_MBF32` or `__MATH_DAI32` when the CPU is `__8080`, `__8085`, `__VM1`, or `__GBZ80`. `+cpm -clib=8085` defines `__8085` only. Z80-family math32, math48, and am9511 link the crt0 assembly parser. Stack-only math32, and mbf32 and daimath32 on 8080, 8085, vm1, and gbz80, link `libsrc/math/float/cimpl/strtod.c`. `strtod.c` is not built for genmath, mbf64, or cpc maths. | `Classic--Maths-Libraries`, section "Floating point maths". Add the availability sentence. Do not edit `overview.md`: its "not implemented" list is the new library, and this patch does not add newlib `strtod`. Do not edit `Configuration` `CLIB_OPT_STRTOD`: that row is the newlib nan/hex option. Not checked. |
+| #201, merge `d3697a38ad` (PR #3190) | `z180_delay_tstate` waits at least 115 states, including the call and the ret. The counts in the routine are the Z8018x manual (call 16, `add hl,rr` 7, `jr` taken 8). `z180_delay_ms` waits that many milliseconds at `__CPU_CLOCK`. Classic `cpu_delay_tstate` and `cpu_delay_ms` on the Z180 are these routines. The Z80 functions stay at a minimum of 141. | `Platform---Z180`. The page has no delay sentence. Add one after "Floating point". Do not change the 141 on `z80.md` or `stdlib.md`. Not checked. |
+| #27, merge `c3d7eb8c85` (PR #3188) | `const` was added on read-only pointers in `include/_DEVELOPMENT/common/stdio.h`, `stdlib.h`, and `string.h`, and in the matching `proto/` headers. | No wiki page reprints those newlib prototypes. `string.md` and `stdlib.md` cite classic `include/string.h` and `include/stdlib.h`, which this patch does not change. No edit. |
+| #1129 closed 2026-10-14 | No product diff in this index range. The zsdcc 4.6.0 object for the reported loop is a 254-iteration `djnz`. Warning 158 is still emitted. | No wiki page describes warning 158. Do not write that the warning is gone. No edit. |
+| #3157, #3059 closed 2026-10-02 | The printf and scanf scan is the parsed row for `5215f2081f` / `731173ca7f`. | Already on the wiki (`6a20572`, `d9ebfaf`). No further edit. |
+| #3185, #3165, #3169, #2974, #380 | No wiki sentence states the old behaviour. #3185 is an llvm-z80 callback attribute. #3165 is an sccz80 unsigned long remainder. #3169 is a host antivirus report. #2974 is the SDCC 4.6.0 test request. #380 has no single patch in `63aca848fa..2a5638fa37`. | No edit. |
 
 ## Page rows from #3040
 

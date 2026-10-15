@@ -48,14 +48,14 @@ Build the index before you edit pages. Later page work reads the index. It does 
 
 The subject line is a filter. The patch is the fact. A subject that names one machine often edits other targets, and it can describe a change the diff does not make.
 
-1. List new commits on `z88dk/z88dk` and `z88dk/z88dk.wiki` since the date in the index. List open pull requests. Start issues from [issue #3040](https://github.com/z88dk/z88dk/issues/3040).
+1. List new commits on `z88dk/z88dk` and `z88dk/z88dk.wiki` since the date in the index. List open pull requests. List issues closed since that date. Start the standing rules from [issue #3040](https://github.com/z88dk/z88dk/issues/3040).
 2. Open a commit or pull request when the subject or title names a target, a `+name`, a machine, a CLIB, or a behaviour the wiki states (maths flag, file I/O, packaging, console). Also open it when the paths touch `lib/config/*.cfg`, `libsrc/target/`, `libsrc/newlib/target/`, `include/arch/`, or a wiki `Platform*` page.
 3. Leave it closed when the subject and the paths are outside that set (a test-only fix, a host debugger, formatting). Write one index line that says why it was skipped.
 4. Parse the patch before you write the row:
    - `git show --stat <commit>`, then the hunks. On a merge, use the first-parent diff (`git diff <commit>^1 <commit>`).
    - On a pull request, read the changed files. The title does not limit which of those files you read.
    - On a wiki commit, list every page the diff touches. Do not stop at the machine named in the subject.
-5. Write the row from the hunks. One sentence: the flag, library name, default, or output file a person would see. If the subject and the hunk disagree, keep the hunk. If the hunk does not say what the subject claims, do not put that claim on the wiki.
+5. Write the row from the hunks. One sentence: the flag, library name, default, or output file a person would see. If the subject and the hunk disagree, keep the hunk. If the hunk does not say what the subject claims, do not put that claim on the wiki. A closed issue uses the same rule. The issue title is only a filter. Read the merged patch that closed it. If the wiki still states the old behaviour, name that page and the sentence to replace. If no page states it, write one skip line.
 6. Name the wiki page and the section to correct. Keep that section. An unmerged pull request is not shipped behaviour. Record it, and do not write it onto the wiki until it is merged.
 7. One row per page per change, in `references/change-index.md`. A later edit of that page reads those rows, then the tree file the hunk names (`lib/config/<target>.cfg`, the header, `changelog.txt`). It does not reread the commit, and it does not trust the subject.
 8. After the wiki edit, mark the row checked and note the wiki commit.

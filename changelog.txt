@@ -5,38 +5,69 @@ z88dk v2.5 - xx.xx.202x
 
 Headline features for this release:
 
+80cc is a new optimising C compiler in this release. It uses the sccz80 calling convention, so the classic libraries still link. The --opt-code-size option selects shorter code. On the Z80, -fframe-pointer addresses local variables with IX. Without that option, 80cc addresses locals from the stack pointer.
+
+From this release, -lm selects math32 on classic and on newlib. The --math32 option selects the same library. math32 runs on the 8080, the 8085, the KR580VM1, the gbz80, the Z80N, and the Rabbit. The half-precision library, math16, runs on the 8080, the 8085, and the gbz80. Divide, and the public inverse, use a restoring 1/x in both libraries.
+
++zx81 and +lambda keep genmath_zx81 when you ask for -lm. The ROM interrupt on those machines does not save AF', and math32 uses ex af,af'. ROM floating point stays on -lmz for the machines that have it.
+
+The KR580VM1 (vm1) is a supported processor in this release. z80asm accepts its opcodes. Classic +test can build for this processor, and math32 supplies its floating point library.
+
+This release builds zsdcc from SDCC 4.6.0 revision r16639. The patched compiler keeps the z88dk calling conventions.
+
+Newlib products now install next to the classic libraries. sccz80 products go under lib/clibs/sccz80, and sdcc products go under lib/clibs/sdcc_ix. The +hbios, +scz180, +yaz180, +rc2014, and +cpm targets now live in the classic tree, and their newlib drivers moved with them.
+
+Classic strtod reads a C90 decimal number and a C99 hexadecimal number. The hexadecimal form starts with 0x and can take a decimal power after p or P. The C parser links for mbf32 and daimath32 on the 8080, the 8085, the KR580VM1, and the gbz80. Z80-family math32, math48, and am9511 keep the assembly strtod in the crt0.
+
+Classic zsdcc now reads printf and scanf format strings during the compile. A literal %f, %e, or %g links the matching float converter.
+
+z88dk-zx81bas is a new tool for ZX81 BASIC that contains inline assembly. Mark the assembly with #ASM and #ENDASM. The tool sends that code to z80asm and writes a .p tape image.
+
 More detailed, but still incomplete changelist:
 
 - [appmake] +hdos disc writing support
-- [classic] Reset escape code for gencon vt100 bridge now resets colours
+- [appmake] TeleDisk image support in cpmdisk
+- [appmake] cpmdisk can omit unused extents
 - [classic] +alphatp2 target working
 - [classic] +gal faster plotting
 - [classic] +hdos fcntl available
+- [classic] +hdos time(), clock(), and default_device()
 - [classic] +phc25 New target
 - [classic] +p2000 Inkey keyboard driver available
+- [classic] +pps low-memory crt0 layout
 - [classic] +sms now has access to newlib libraries
 - [classic] +test Support for KR580VM1 (vm1) processor
 - [classic] +x07 Support much improved
 - [classic] +z88 Support for 512z64 graphics
 - [classic] +zxn Thin sprite wrapper available
 - [classic] +zxn Plotting now support on layer 2 screen
-- [classic] +zxn Hardware headers available
+- [classic] +zxn Hardware headers for the full nextreg set
 - [classic] targets +hbios, +scz180, +yaz180, +rc2014 migrated
-- [newlib] library products install under lib/clibs/{sccz80,sdcc_ix,sdcc_iy}/ (classic clibs layout)
-- [all] set math32 as the default floating point library (exceptions notwithstanding)
+- [classic] zsdcc selects the printf and scanf float converter from the format string
+- [classic] strtod accepts C90 decimal and C99 hexadecimal text for 8080, 8085, vm1, and gbz80
+- [classic] Extra interrupt support for the 8085 and the NSC800
+- [classic] V9938 palette functions
+- [classic] Einstein mode 7
+- [newlib] library products install under lib/clibs/sccz80/ and lib/clibs/sdcc_ix/
+- [newlib] __CLIB_OPT_MALLOC selects a spare-tail malloc search (0 keeps the small walker)
+- [all] -lm is math32 on classic and newlib. +zx81 and +lambda keep genmath_zx81. ROM maths stay on -lmz
 - [all] The toolchain now supports the KR580VM1 (vm1) processor
-- [all] math32 floating point support for Intel 8080, 8085, VM1 and Nintendo gbz80
-- [all] math16 half-precision floating point support for Intel 8080, 8085, and Nintendo gbz80
+- [all] math32 floating point support for 8080, 8085, vm1, gbz80, z80n, and Rabbit
+- [all] math16 half-precision floating point support for 8080, 8085, and gbz80
+- [all] math32 and math16 divide and inv use a restoring 1/x
 - [all] AI agent support via AGENTS.md and .agents/skills (Grok/Claude discovery symlinks)
 - [copt] Additional conditions for compiler and pattern formats
-- [80cc] New optimising compiler, compatible with sccz0
+- [copt] ez80-clang rules for LLVM 19
+- [80cc] New optimising compiler, using sccz80 calling convention and stack pointer, or optionally using IX frame pointer.
 - [ticks] 8085, z80n, kc160, r4k, r6k fixes
-- [ucpp] Big fixes for #line handling
 - [z88dk-dis] Support for decoding rst calls
 - [z80asm] Bug fixes
 - [z80asm] #define now supported as alias for defc
 - [zcc] add multi compiler selection tool (sccz80, 80cc-sp, 80cc-fp)
+- [zcc] llvm-z80 backend for classic C
 - [zsdcc] Upgraded to SDCC 4.6.0 r16639
+- [gdb] IM 2 support, watchpoints, O-packets, and the Z80 I and R registers
+- [zx81bas] Build a ZX81 .p tape from BASIC with inline assembly
 
 
 z88dk v2.4 - 02.10.2025
