@@ -62,6 +62,11 @@ RELOC relocs[2048];
 int reloc_count;
 
 
+/* Used by do_export */
+static unsigned current_seg;
+static unsigned current_lc;
+
+
 static char module_name[64]="unk_module";
 
 
@@ -128,8 +133,6 @@ unsigned datalen;
 unsigned progsize;
 unsigned datasize;
 
-static int current_segment = 0;
-
 
 
 /* ******************************************************
@@ -158,7 +161,8 @@ static void wr32(FILE*f,unsigned v)
 static char *st[4096];
 static unsigned st_count;
 
-#define RANGE_WORD 1
+//#define RANGE_WORD 1  // 8 bit
+#define RANGE_WORD 4  // 16 bit
 #define RANGE_UNDEFINED 0xffffffffu
 
 #define DEFAULT_CODE_SECTION "code_clib"
@@ -166,20 +170,31 @@ static unsigned st_count;
 #define DEFAULT_BSS_SECTION  "bss_clib"
 
 
-static unsigned add_string(const char*s) {
-    unsigned i;
-    for(i=0;i<st_count;i++)
-        if(!strcmp(st[i],s)) return i;
-    st[st_count]=strdup(s);
-    return st_count++;
+// On any simbol name we find, we kill the '$' character
+static char *fix_symbol(char *name) {
+    char *p = name;
+
+    while (*p) {
+        if (*p == '$')
+            *p = '_';
+        p++;
+    }
+    return name;
 }
 
-static void fix_symbol(char *name) {
-    while (*name)
-    {
-        if (*name == '$') *name = '_';
-        name++;
-    }
+static unsigned add_string(const char*s) {
+
+    char fixed[64];
+
+    strncpy(fixed,s,sizeof(fixed)-1);
+    fixed[sizeof(fixed)-1] = 0;
+    fix_symbol(fixed);
+
+    unsigned i;
+    for(i=0;i<st_count;i++)
+        if(!strcmp(st[i],fixed)) return i;
+    st[st_count]=strdup(fixed);
+    return st_count++;
 }
 
 
@@ -220,6 +235,9 @@ static void write_object(const char*outname, int mod) {
     //bss_sid = add_string(DEFAULT_BSS_SECTION);
 
     add_string(module_name);
+    add_string("__RELX_CODE");
+    add_string("__RELX_DATA");
+
     for(i=0;i<symbol_count;i++) add_string(symbols[i].name);
     for(i=0;i<ext_count;i++) add_string(extsyms[i].name);
 
@@ -237,57 +255,137 @@ static void write_object(const char*outname, int mod) {
     /* --------------------------------------------------
      * Expressions Area
      * -------------------------------------------------- */
-    pexpr=ftell(fp);
-    for(i=0;i<reloc_count;i++) {
-        const char*s=relocs[i].symbol?relocs[i].symbol:"";
-        add_string(s);
+    pexpr = ftell(fp);
 
+    for(i=0;i<reloc_count;i++)
+    {
+        char expr[128];
+        char target[64];
+
+        expr[0]=0;
+        target[0]=0;
+
+        switch(relocs[i].type)
+        {
+            case TOK_PRGREL:
+                strcpy(target,"__RELX_CODE");
+                sprintf(expr,
+                        "__RELX_CODE+%d",
+                        relocs[i].target);
+                break;
+
+            case TOK_DATAREL:
+                strcpy(target,"__RELX_DATA");
+                sprintf(expr,
+                        "__RELX_DATA+%d",
+                        relocs[i].target);
+                break;
+
+            case REL_EXTERNAL:
+                strcpy(target,
+                       relocs[i].symbol ?
+                       relocs[i].symbol : "");
+
+                strcpy(expr,target);
+                break;
+
+            default:
+                continue;
+        }
+
+        add_string(target);
+        add_string(expr);
 
         wrd(fp,RANGE_WORD);
-        wrd(fp,0);                        // filename
-        wrd(fp,0);                        // line
-        wrd(fp,0);                        // section?
-        //wrd(fp,code_sid);
 
-        wrd(fp,relocs[i].addr);           // asmpc
-        wrd(fp,relocs[i].addr);           // code_pos
-        wrd(fp,2);                        // opcode_size
-        wrd(fp,add_string(s));            // target_name
-        wrd(fp,add_string(s));            // expression_text
-    }
-    wr32(fp,RANGE_UNDEFINED);
-    psym=ftell(fp);
+        wrd(fp,0);                 /* filename */
+        wrd(fp,0);                 /* line */
 
-    for(i=0;i<symbol_count;i++) {
-        wrd(fp,2);
-        wrd(fp,2);   // 1-C, 2-A,
         wrd(fp,code_sid);
-        wrd(fp,symbols[i].value);
+
+        wrd(fp,relocs[i].addr);    /* asmpc     */
+        wrd(fp,relocs[i].addr);    /* patchptr  */
+        wrd(fp,2);                 /* 16-bit    */
+
+        wrd(fp,add_string(target));
+        wrd(fp,add_string(expr));
+    }
+
+    wr32(fp,RANGE_UNDEFINED);
+
+    /* --------------------------------------------------
+     * Synthetic symbols
+     * -------------------------------------------------- */
+    psym = ftell(fp);
+
+    wrd(fp,1);                     /* local      */
+    wrd(fp,2);                     /* address    */
+    wrd(fp,code_sid);
+    wrd(fp,0);
+    wrd(fp,add_string("__RELX_CODE"));
+    wrd(fp,fname_sid);
+    wrd(fp,mod);
+
+    wrd(fp,1);                     /* local      */
+    wrd(fp,2);                     /* address    */
+    wrd(fp,code_sid);
+    wrd(fp,progsize);
+    wrd(fp,add_string("__RELX_DATA"));
+    wrd(fp,fname_sid);
+    wrd(fp,mod);
+
+
+    /* --------------------------------------------------
+     * Exported Symbols
+     * -------------------------------------------------- */
+
+    for(i=0;i<symbol_count;i++)
+    {
+        unsigned value = symbols[i].value;
+
+        if(symbols[i].type == SEG_DATA)
+            value += progsize;
+
+        wrd(fp,2);            /* public */
+        wrd(fp,2);            /* 1-Constant, 2-Address, 3-Expression */
+        wrd(fp,code_sid);
+        wrd(fp,value);
+
         wrd(fp,add_string(symbols[i].name));
-        wrd(fp,fname_sid);   // TODO: add source file reference
-        wrd(fp,mod);         // Module number
+        wrd(fp,fname_sid);    /* TODO: add source file reference */
+        wrd(fp,mod);          /* module number */
     }
     wrd(fp,0);
+
 
     /* --------------------------------------------------
      * Externals Area
      * -------------------------------------------------- */
+
     pext=ftell(fp);
-    for(i=0;i<ext_count;i++) wrd(fp,add_string(extsyms[i].name));
+    for(i=0;i<ext_count;i++)
+        wrd(fp,add_string(extsyms[i].name));
+
     wrd(fp,0);
     pmod=ftell(fp);
     wrd(fp,add_string(module_name));
+    wrd(fp,0);
     psec=ftell(fp);
+
 
     /* --------------------------------------------------
      * Sections Area
      * -------------------------------------------------- */
-    wrd(fp,progsize?progsize:proglen);    // code_size
-    wrd(fp,code_sid);                     //section
-    wr32(fp,0xffffffffu);                 // org                 
-    wrd(fp,1);                            // align
+    unsigned section_size;
 
-    fwrite(prog,1,progsize?progsize:proglen,fp);
+    section_size = progsize + datasize;
+
+    wrd(fp,section_size);      // code_size, originak fallback to proglen (not consistent yet) removed
+    wrd(fp,code_sid);          // section name
+    wr32(fp,0xffffffffu);      // org
+    wrd(fp,1);                 // align
+    fwrite(prog,1,section_size,fp);
+
     while(ftell(fp)&3) fputc(0,fp);
     wr32(fp,0xffffffffu);
 
@@ -1117,7 +1215,7 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
     unsigned i;
     unsigned c;
 
-    if ((!dumpmode) || ctrl < 3)
+    if ((!dumpmode) && ctrl < 3)
         printf("SPECIAL %-20s  ", ctrl_name[ctrl]);
 
     if (ctrl >= DEFINE_COMMON_SIZE && ctrl <= END_PROGRAM)
@@ -1142,7 +1240,14 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
         }
 
         if ((dumpmode) || ((ctrl>=EXTERNAL_OFFSET) && (ctrl<=DEFINE_PROGRAM_SIZE))) printf("%-20s -> $%04X", ctrl_name[ctrl], value);
-        
+
+        // Switch to the segment we are currently working on
+        if (ctrl == SET_LOCATION_COUNTER)
+        {
+            current_seg = atype;
+            current_lc  = value;
+        }
+
         // Set Code Location Counter
         if ((atype == SEG_PROGRAM) && (ctrl == SET_LOCATION_COUNTER)) proglen =0;
 
@@ -1184,13 +1289,17 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
             printf(" chain:");
             dump_chain(prog, value);
 #endif
-            if (dumpmode == 3) fix_symbol(name);
+            //if (dumpmode == 3) fix_symbol(name);
             add_external(prog, name, value);
         }
 
         if (ctrl == DEFINE_ENTRY_POINT) {
-            if (dumpmode == 3) fix_symbol(name);
-            add_symbol(name,atype,value);
+            //if (dumpmode == 3) fix_symbol(name);
+            //add_symbol(name,atype,value);
+            add_symbol(name, current_seg, current_lc);
+#ifdef DEBUG
+            printf("  SYM %-20s seg=%u lc=%04X\n", name, current_seg, current_lc);
+#endif
         }
     }
 
