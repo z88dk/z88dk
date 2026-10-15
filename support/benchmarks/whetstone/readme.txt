@@ -144,11 +144,11 @@ zsdcc    | z80  | math32  | 364_117_796     | 10.9855  (Sep 17, 2026)
 sccz80   | 8085 | math32  | 642_569_364   | 6.2250  (Sep 17, 2026)
 sccz80   | z80  | mbf32   | 544_395_320     | 7.3476  (Jul 2026)
 sccz80   | 8085 | mbf32   | 548_321_291     | 7.2950  (Jul 2026)
-80cc     | z80  | mbf32   | 565_813_830     | 7.0695  (Aug 19, 2026)
-80cc     | 8085 | mbf32   | 553_345_612     | 7.2288  (Aug 19, 2026)
+80cc     | z80  | mbf32   | 541_237_337     | 7.3905  (Oct 15, 2026)
+80cc     | 8085 | mbf32   | 543_592_857     | 7.3585  (Oct 15, 2026)
 sccz80   | z80  | genmath | 1_284_172_870   | 3.1148
-80cc     | z80  | math32  | 375_270_916               | 10.6590  (Sep 17, 2026)
-80cc     | 8085 | math32  | 643_286_803               | 6.2181  (Sep 17, 2026)
+80cc     | z80  | math32  | 352_030_380               | 11.3626  (Oct 15, 2026)
+80cc     | 8085 | math32  | 639_193_330               | 6.2579  (Oct 15, 2026)
 
 
 RESULTS (full multi-toolchain archive)
@@ -289,26 +289,26 @@ KWIPS        = 100*10*1 / 160.6423 = 6.2250
 MWIPS        = 6.2250 / 1000 = 0.0062250
 
 11b.
-Z88DK September 17, 2026
+Z88DK October 15, 2026
 80cc / classic c library / math32
 IEEE 32-bit float 24 bit mantissa + 8 bit exponent
-14251 bytes less page zero
+10782 bytes less page zero
 
-cycle count  = 375270916
-time @ 4MHz  = 375270916 / 4x10^6 = 93.8177 seconds
-KWIPS        = 100*10*1 / 93.8177 = 10.6590
-MWIPS        = 10.6590 / 1000 = 0.0106590
+cycle count  = 352030380
+time @ 4MHz  = 352030380 / 4x10^6 = 88.0076 seconds
+KWIPS        = 100*10*1 / 88.0076 = 11.3626
+MWIPS        = 11.3626 / 1000 = 0.0113626
 
 11c.
-Z88DK September 17, 2026
+Z88DK October 15, 2026
 80cc / classic c library / 8085 / math32
 IEEE 32-bit float (math32_8085)
-13751 bytes less page zero
+12106 bytes less page zero
 
-cycle count  = 643286803
-time @ 4MHz  = 643286803 / 4x10^6 = 160.8217 seconds
-KWIPS        = 100*10*1 / 160.8217 = 6.2181
-MWIPS        = 6.2181 / 1000 = 0.0062181
+cycle count  = 639193330
+time @ 4MHz  = 639193330 / 4x10^6 = 159.7983 seconds
+KWIPS        = 100*10*1 / 159.7983 = 6.2579
+MWIPS        = 6.2579 / 1000 = 0.0062579
 
 12.
 Z88DK July 19, 2026
@@ -322,23 +322,23 @@ KWIPS        = 100*10*1 / 136.0988 = 7.3476
 MWIPS        = 7.3476 / 1000 = 0.0073476
 
 13.
-Z88DK August 19, 2026
+Z88DK October 15, 2026
 80cc / classic c library / MBF32
-10384 bytes less page zero
+6752 bytes less page zero
 
-cycle count  = 565813830
-time @ 4MHz  = 565813830 / 4x10^6 = 141.4535 seconds
-KWIPS        = 100*10*1 / 141.4535 = 7.0695
-MWIPS        = 7.0695 / 1000 = 0.0070695
+cycle count  = 541237337
+time @ 4MHz  = 541237337 / 4x10^6 = 135.3093 seconds
+KWIPS        = 100*10*1 / 135.3093 = 7.3905
+MWIPS        = 7.3905 / 1000 = 0.0073905
 
-Z88DK August 19, 2026
+Z88DK October 15, 2026
 80cc / classic c library / 8085 / MBF32
-8372 bytes less page zero
+6312 bytes less page zero
 
-cycle count  = 553345612
-time @ 4MHz  = 553345612 / 4x10^6 = 138.3364 seconds
-KWIPS        = 100*10*1 / 138.3364 = 7.2288
-MWIPS        = 7.2288 / 1000 = 0.0072288
+cycle count  = 543592857
+time @ 4MHz  = 543592857 / 4x10^6 = 135.8982 seconds
+KWIPS        = 100*10*1 / 135.8982 = 7.3585
+MWIPS        = 7.3585 / 1000 = 0.0073585
 
 Z88DK July 19, 2026
 sccz80 / classic c library / 8085 CPU / MBF32

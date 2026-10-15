@@ -29,8 +29,8 @@ classic/sccz80/8085/math16
 zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math16 -lmath32_8085 -lndos -m
 
 classic/80cc/math32
-zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
-# Z80 80cc: -fframe-pointer (IX).
+zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
+# Z80 80cc best case: locals from the stack pointer.
 
 classic/80cc/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
@@ -123,20 +123,20 @@ time @ 4MHz  = 1952471924 / 4*10^6 =  8 min  8 sec
 (opt with sqr(): 899712336 ticks, 4660 bytes.)
 
 
-Z88DK September 17, 2026
+Z88DK October 15, 2026
 80cc / classic / math32
-4769 bytes less page zero
+3770 bytes less page zero
 
-cycle count  = 1335270909
-time @ 4MHz  = 1335270909 / 4*10^6 =  5 min 34 sec
+cycle count  = 1128700455
+time @ 4MHz  = 1128700455 / 4*10^6 =  4 min 42 sec
 
 
-Z88DK September 17, 2026
+Z88DK October 15, 2026
 80cc / classic / 8085 / math32
-4784 bytes less page zero
+4477 bytes less page zero
 
-cycle count  = 1967526067
-time @ 4MHz  = 1967526067 / 4*10^6 =  8 min 12 sec
+cycle count  = 1968066894
+time @ 4MHz  = 1968066894 / 4*10^6 =  8 min 12 sec
 
 
 Z88DK July 19, 2026

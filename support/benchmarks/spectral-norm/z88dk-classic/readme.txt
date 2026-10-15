@@ -24,7 +24,7 @@ sccz80/classic/8085/math32
 zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm --math32 -lndos -create-app
 
 80cc/classic/math32
-zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm --math32 -lndos
+zcc +test -compiler=80cc -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm --math32 -lndos
 
 80cc/classic/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm --math32 -lndos
@@ -59,8 +59,8 @@ sccz80/classic/8085/math16
 zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math16 -lmath32_8085 -lndos -m
 
 80cc/classic/math32
-zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
-# Z80 80cc: -fframe-pointer (IX).
+zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
+# Z80 80cc best case: locals from the stack pointer.
 
 80cc/classic/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
@@ -138,24 +138,24 @@ cycle count  = 7709718754
 time @ 4MHz  = 7709718754 / 4*10^6 =  32 min  7 sec
 
 
-Z88DK September 17, 2026
+Z88DK October 15, 2026
 80cc / classic c library / math32
-6251 bytes less page zero
+5814 bytes less page zero
 
 error: 9 * 10^(-7)
 
-cycle count  = 4571625723
-time @ 4MHz  = 4571625723 / 4*10^6 =  19 min  3 sec
+cycle count  = 4235871703
+time @ 4MHz  = 4235871703 / 4*10^6 =  17 min 39 sec
 
 
-Z88DK September 17, 2026
+Z88DK October 15, 2026
 80cc / classic c library / 8085 / math32
-6809 bytes less page zero
+6702 bytes less page zero
 
 error: 9 * 10^(-7)
 
-cycle count  = 7704100775
-time @ 4MHz  = 7704100775 / 4*10^6 =  32 min  6 sec
+cycle count  = 7624085173
+time @ 4MHz  = 7624085173 / 4*10^6 =  31 min 46 sec
 
 
 Z88DK July 19, 2026

@@ -65,8 +65,8 @@ Compiler | CPU  | Ticks
 ---------|------|----------------
 sccz80   | z80  | 1_992_348_390  (Aug 19, 2026)
 sccz80   | 8085 | 1_922_636_057  (Aug 19, 2026)
-80cc     | z80  | 2_229_596_893  (Aug 19, 2026)
-80cc     | 8085 | 1_979_531_647  (Aug 19, 2026)
+80cc     | z80  | 1_968_985_581  (Oct 15, 2026)
+80cc     | 8085 | 1_911_764_319  (Oct 15, 2026)
 zsdcc    | z80  | 4_012_863_322  (Aug 16, 2026)
 
 
@@ -161,19 +161,19 @@ sccz80 / classic c library / 8085 CPU
 cycle count  = 1922636057
 time @ 4MHz  = 1922636057 / 4*10^6 =  8 min  1 sec
 
-Z88DK August 19, 2026
+Z88DK October 15, 2026
 80cc / classic c library
-7718 bytes less page zero
+7236 bytes less page zero
 
-cycle count  = 2229596893
-time @ 4MHz  = 2229596893 / 4*10^6 =  9 min 17 sec
+cycle count  = 1968985581
+time @ 4MHz  = 1968985581 / 4*10^6 =  8 min 12 sec
 
-Z88DK August 19, 2026
+Z88DK October 15, 2026
 80cc / classic c library / 8085 CPU
-7639 bytes less page zero
+7398 bytes less page zero
 
-cycle count  = 1979531647
-time @ 4MHz  = 1979531647 / 4*10^6 =  8 min 15 sec
+cycle count  = 1911764319
+time @ 4MHz  = 1911764319 / 4*10^6 =  7 min 58 sec
 
 RESULTS - PI_LDIV.C (LDIV USED)
 ===============================

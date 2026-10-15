@@ -51,9 +51,9 @@ classic/zsdcc
 zcc +test -vn -DTIMER -DSTYLE=0 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-ran-20.bin -lndos -m
 
 classic/80cc
-zcc +test -compiler=80cc -vn -fframe-pointer -DTIMER -DSTYLE=0 -DNUM=20 -D__Z88DK -O2 sort.c -o sort-ran-20.bin -lndos -m
+zcc +test -compiler=80cc -vn -DTIMER -DSTYLE=0 -DNUM=20 -D__Z88DK -O2 sort.c -o sort-ran-20.bin -lndos -m
 # Same flags for STYLE=0..3 and NUM=20/5000.
-# Z80 80cc: -fframe-pointer (IX).
+# Z80 80cc best case: locals from the stack pointer.
 
 zcc +test -vn -DTIMER -DSTYLE=1 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-ord-20.bin -lndos -m
 zcc +test -vn -DTIMER -DSTYLE=2 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-rev-20.bin -lndos -m
@@ -120,18 +120,18 @@ sort-rev-5000     32248314     8.0621 sec
 sort-equ-5000   6716015259    1679.0038 sec
 
 
-Z88DK August 19, 2026
+Z88DK October 15, 2026
 classic / 80cc
-1933 bytes less page zero
+1837 bytes less page zero
 Classic qsort (equals is the usual worst case).
 80cc + -clib=8085 does not link qsort.
 
                cycle count    time @ 4MHz
 
-sort-ran-20         50233     0.0126 sec
-sort-ord-20         38248     0.0096 sec
-sort-rev-20         45159     0.0113 sec
-sort-equ-20        117722     0.0294 sec
+sort-ran-20         50230     0.0126 sec
+sort-ord-20         38245     0.0096 sec
+sort-rev-20         45156     0.0113 sec
+sort-equ-20        117719     0.0294 sec
 
 sort-ran-5000    38866533     9.7166 sec
 sort-ord-5000    29294145     7.3235 sec

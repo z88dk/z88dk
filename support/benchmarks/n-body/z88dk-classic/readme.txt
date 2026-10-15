@@ -65,8 +65,8 @@ classic/sccz80/8085/math16
 zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints n-body.c -o n-body.bin --math16 -lmath32_8085 -m -lndos
 
 classic/80cc/math32
-zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math32 -m -lndos
-# Z80 80cc: -fframe-pointer (IX).
+zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math32 -m -lndos
+# Z80 80cc best case: locals from the stack pointer.
 
 classic/80cc/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math32 -m -lndos
@@ -169,20 +169,20 @@ time @ 4MHz  = 1488228803 / 4*10^6 =  6 min 12 sec
 Energy: -0.1690752 / -0.1690861 (N=1000).
 
 
-Z88DK September 17, 2026
+Z88DK October 15, 2026
 80cc / classic / math32
-9385 bytes less page zero
+6859 bytes less page zero
 
-cycle count  = 881844523
-time @ 4MHz  = 881844523 / 4*10^6 =  3 min 40 sec
+cycle count  = 800805511
+time @ 4MHz  = 800805511 / 4*10^6 =  3 min 20 sec
 
 
-Z88DK September 17, 2026
+Z88DK October 15, 2026
 80cc / classic / 8085 / math32
-8593 bytes less page zero
+7629 bytes less page zero
 
-cycle count  = 1476931107
-time @ 4MHz  = 1476931107 / 4*10^6 =  6 min  9 sec
+cycle count  = 1460762215
+time @ 4MHz  = 1460762215 / 4*10^6 =  6 min  5 sec
 
 
 Z88DK September 17, 2026

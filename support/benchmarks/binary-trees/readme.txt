@@ -81,8 +81,8 @@ Compiler | CPU  | Library | Ticks
 sccz80   | z80  | mbf32   | 145_563_150
 sccz80   | 8085 | mbf32   | 127_055_600  (Jul 2026)
 zsdcc    | z80  | math48  | 149_280_700 (Aug 16, 2026)
-80cc     | z80  | mbf32   | 151_824_215 (Aug 19, 2026)
-80cc     | 8085 | mbf32   | 150_137_083 (Aug 19, 2026)
+80cc     | z80  | mbf32   | 137_486_796 (Oct 15, 2026)
+80cc     | 8085 | mbf32   | 125_194_602 (Oct 15, 2026)
 
 
 RESULTS (full multi-toolchain archive)
