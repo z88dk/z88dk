@@ -47,8 +47,6 @@ all:	argcf.bin argcf_fp.bin argcf_8080.bin argcf_gbz80.bin
 all:	jpnext.bin jpnext_fp.bin jpnext_8080.bin jpnext_gbz80.bin
 all:	ixind.bin
 all:	bchand.bin bchand_fp.bin bchand_8080.bin bchand_gbz80.bin
-all:	localrmw_gbz80.bin localrmw_gbz80_keep.bin
-all:	localrmw_z80.bin localrmw_z80n.bin localrmw_z180.bin localrmw_ez80_z80.bin localrmw_8080.bin localrmw_vm1.bin localrmw_r2ka.bin localrmw_r4k.bin localrmw_r6k.bin localrmw_kc160.bin localrmw_r800.bin localrmw_z80_keep.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
 all:	derefcmp_bcstep.bin derefcmp_bcstep_8080.bin
 all:	directwiden.bin directwiden_z80n.bin directwiden_ez80_z80.bin directwiden_r800.bin
@@ -1489,62 +1487,6 @@ incmem_fp_keep.bin: $(SOURCES) incmem.c
 incmem_8080.bin: $(SOURCES) incmem.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
-
-localrmw_z80.bin: $(SOURCES) localrmw.c
-	$(compile)
-	$(runtest)
-
-localrmw_z80_keep.bin: $(SOURCES) localrmw.c
-	zcc +test -vn $(CFLAGS) -Cc--opt-disable=local-rmw $^ -o $@ -m
-	@$(MACHINE) -b msx $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
-
-localrmw_z80n.bin: $(SOURCES) localrmw.c
-	$(compile_z80n)
-	$(runtest_z80n)
-
-localrmw_z180.bin: $(SOURCES) localrmw.c
-	$(compile_z180)
-	$(runtest_z180)
-
-localrmw_ez80_z80.bin: $(SOURCES) localrmw.c
-	$(compile_ez80_z80)
-	$(runtest_ez80_z80)
-
-localrmw_8080.bin: $(SOURCES) localrmw.c
-	$(compile_8080)
-	$(runtest_8080)
-
-localrmw_vm1.bin: $(SOURCES) localrmw.c
-	$(compile_vm1)
-	$(runtest_vm1)
-
-localrmw_r2ka.bin: $(SOURCES) localrmw.c
-	$(compile_r2ka)
-	$(runtest_r2ka)
-
-localrmw_r4k.bin: $(SOURCES) localrmw.c
-	$(compile_r4k)
-	$(runtest_r4k)
-
-localrmw_r6k.bin: $(SOURCES) localrmw.c
-	$(compile_r6k)
-	$(runtest_r6k)
-
-localrmw_kc160.bin: $(SOURCES) localrmw.c
-	$(compile_kc160)
-	$(runtest_kc160)
-
-localrmw_r800.bin: $(SOURCES) localrmw.c
-	$(compile_r800)
-	$(runtest_r800)
-
-localrmw_gbz80.bin: $(SOURCES) localrmw.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
-	@$(MACHINE) -mgbz80 $@
-
-localrmw_gbz80_keep.bin: $(SOURCES) localrmw.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=gbz80-rmw -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
-	@$(MACHINE) -mgbz80 $@
 
 incmem_gbz80.bin: $(SOURCES) incmem.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m

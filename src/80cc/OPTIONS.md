@@ -371,8 +371,6 @@ exists (ADR 0010).
 | `depark` | no unparking of a value held in E or D alone |
 | `gbz80-tos-read` | GBZ80 word reads at the top frame slot use direct SP-relative loads instead of the POP/PUSH path |
 | `tos-store` | GBZ80 eligible nonvolatile top-of-stack word stores keep the register-preserving path instead of using the POP/PUSH selector |
-| `local-rmw` | the measured frame-local word RMW keeps its address and updated value on the stack instead of repeatedly spilling them to frame slots |
-| `gbz80-rmw` | compatibility opt-out alias for `local-rmw` |
 
 ## Text layer (ADR 0013, ADR 0025)
 
