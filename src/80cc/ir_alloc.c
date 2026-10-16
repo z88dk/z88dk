@@ -3844,6 +3844,9 @@ static void probe_call_result_bc(Func *f, const int *def_kind,
      - NO stack/control hazard between def and use (stack_spill_span_hazard);
      - DISJOINT from every other stack-transient (greedy) — at most one parked
        at a time, so a single TOS slot and LIFO are trivially safe. */
+/* A parked word is read non-destructively until its last op, and parks nest. */
+#define STACK_SPILL_MAX_USES 6
+#define STACK_SPILL_MAX_DEPTH 4
 static int is_cmp_op(int k);
 static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
                            const int *write_count)
@@ -3864,7 +3867,13 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
     if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180
           || IS_808x() || IS_GBZ80())) return;
 
-    typedef struct { int vreg, flo, fhi; } SCand;
+    /* Multi-use parks nest: the lowering keeps a stack of resident parks and
+       reads a non-final use with `pop r; push r`. Single-use parks stay
+       disjoint when the gate is off. */
+    /* The vm1's `ld hl,(de)` already keeps an address in registers across the
+       load, so a park there is pure overhead. */
+    int multi = !opt_disabled("stack-spill-multi") && !IS_KR580VM1();
+    typedef struct { int vreg, flo, fhi, nuse, use[STACK_SPILL_MAX_USES], depth; } SCand;
     SCand *cand = calloc((size_t)f->n_vregs, sizeof(SCand));
     SpillShape *sh = compute_spill_shapes(f);
     if (!cand || !sh) { free(cand); free(sh); return; }
@@ -3880,8 +3889,10 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
 
         /* Shared shape: single-BB, first-ref-is-def, not live across the BB, tight
            [lo,hi]; plus stack_spill's own "exactly one use". */
-        if (!sh[v].local || sh[v].uses != 1) continue;
+        if (!sh[v].local || sh[v].uses < 1) continue;
+        if (sh[v].uses != 1 && (!multi || sh[v].uses > STACK_SPILL_MAX_USES)) continue;
         int bb_of = sh[v].bb_of, lo = sh[v].lo, hi = sh[v].hi;
+        int nuse = sh[v].uses;
 
         const BB *bb = &f->bbs[bb_of];
         if (op_dst_spill_is_dead(bb, lo)) continue;   /* value rides HL — no win */
@@ -3931,6 +3942,49 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
                 && f->vregs[uo->dst].width == 1)
                 continue;
         }
+        /* Every reading op, in order. A parked value is read once per op (a
+           second read in the final op would find the word already popped), and
+           each reader needs the same byte-use exclusion as the last one. */
+        int use_at[STACK_SPILL_MAX_USES], n_use_at = 0, multi_ok = 1;
+        for (int j = lo + 1; j <= hi && multi_ok; j++) {
+            const Op *uo = &bb->ops[j];
+            int u[16]; int nu = ir_op_uses(uo, u, (int)(sizeof u / sizeof u[0]));
+            int c = 0;
+            for (int k = 0; k < nu; k++) if (u[k] == v) c++;
+            if (!c) continue;
+            if (c > 1 || n_use_at >= STACK_SPILL_MAX_USES) { multi_ok = 0; break; }
+            if (!is_cmp_op(uo->kind) && uo->dst >= 0 && uo->dst < f->n_vregs
+                && f->vregs[uo->dst].width == 1)
+                multi_ok = 0;
+            use_at[n_use_at++] = bb_first_op[bb_of] + j;
+        }
+        if (!multi_ok || n_use_at != nuse) continue;
+        /* Between reads the word must stay at TOS. A wide (long) operand stages
+           through the stack, so a span that touches one cannot keep a park for
+           a second reader. */
+        if (nuse > 1) {
+            int wide = 0;
+            for (int j = lo + 1; j <= hi && !wide; j++) {
+                const Op *wo = &bb->ops[j];
+                int u[16]; int nu = ir_op_uses(wo, u, (int)(sizeof u / sizeof u[0]));
+                if (wo->dst >= 0 && f->vregs[wo->dst].width > 2) wide = 1;
+                for (int k = 0; k < nu && !wide; k++)
+                    if (u[k] >= 0 && f->vregs[u[k]].width > 2) wide = 1;
+            }
+            if (wide) continue;
+            /* An in-place update of a frame word (`acc += x`) reaches its slot
+               with pop/push only while that slot is at TOS; a park above it
+               would turn that into a full slot access. */
+            int rmw = 0;
+            for (int j = lo + 1; j <= hi && !rmw; j++) {
+                const Op *ro = &bb->ops[j];
+                if (ro->dst >= 0 && ro->dst == ro->src[0]
+                    && f->vregs[ro->dst].width == 2
+                    && f->vreg_to_phys[ro->dst] == IR_PR_SPILL)
+                    rmw = 1;
+            }
+            if (rmw) continue;
+        }
 
         /* A symbol ADDRESS whose one use is an ST_MEM base costs nothing at
            all: gen_st_mem folds `t = &sym; *t = v` into the direct absolute
@@ -3958,6 +4012,8 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
         cand[nc].vreg = v;
         cand[nc].flo  = bb_first_op[bb_of] + lo;
         cand[nc].fhi  = bb_first_op[bb_of] + hi;
+        cand[nc].nuse = n_use_at;
+        for (int k = 0; k < n_use_at; k++) cand[nc].use[k] = use_at[k];
         nc++;
     }
 
@@ -3969,12 +4025,48 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
         cand[j] = c;
     }
     int placed = 0, last_fhi = -1;
+    /* Single-reader parks first, disjoint as before: multi-reader parks may only
+       add to that set, never displace one of its members. */
+    int *acc = calloc((size_t)(nc > 0 ? nc : 1), sizeof *acc), nacc = 0;
     for (int i = 0; i < nc; i++) {
-        if (cand[i].flo <= last_fhi) continue;   /* overlaps a parked sibling */
+        if (cand[i].nuse != 1 || cand[i].flo <= last_fhi) continue;
         f->vreg_to_phys[cand[i].vreg] = IR_PR_STACK;
         last_fhi = cand[i].fhi;
         placed++;
+        if (acc) acc[nacc++] = i;
     }
+    if (multi && acc) {
+        /* Parks form a stack: accepted ranges are disjoint or strictly nested,
+           and no read of an outer park falls inside an inner one's span (it
+           would not be at TOS). A read in the inner park's def op is fine: the
+           source is read before the result is pushed. */
+        for (int i = 0; i < nc; i++) {
+            SCand *y = &cand[i];
+            if (y->nuse == 1) continue;
+            int ok = 1, depth = 0;
+            for (int a = 0; a < nacc && ok; a++) {
+                const SCand *x = &cand[acc[a]];
+                if (y->flo > x->fhi || y->fhi < x->flo) continue;          /* disjoint */
+                const SCand *out_c = NULL, *in_c = NULL;
+                if (x->flo < y->flo && y->fhi < x->fhi) { out_c = x; in_c = y; depth++; }
+                else if (y->flo < x->flo && x->fhi < y->fhi) { out_c = y; in_c = x; }
+                else { ok = 0; break; }                                    /* partial overlap */
+                for (int k = 0; k < out_c->nuse; k++)
+                    if (out_c->use[k] > in_c->flo && out_c->use[k] <= in_c->fhi) ok = 0;
+                if (in_c == x && x->depth + 1 >= STACK_SPILL_MAX_DEPTH) ok = 0;
+            }
+            if (!ok || depth + 1 > STACK_SPILL_MAX_DEPTH) continue;
+            y->depth = depth;
+            for (int a = 0; a < nacc; a++) {
+                SCand *x = &cand[acc[a]];
+                if (y->flo < x->flo && x->fhi < y->fhi) x->depth++;
+            }
+            acc[nacc++] = i;
+            f->vreg_to_phys[y->vreg] = IR_PR_STACK;
+            placed++;
+        }
+    }
+    free(acc);
     if (getenv("IR_ALLOC_PROBE"))
         fprintf(stderr, "STACK_SPILL placed=%d of candidates=%d\n", placed, nc);
     free(cand); free(sh);

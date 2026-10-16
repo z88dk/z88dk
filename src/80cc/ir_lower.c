@@ -11,6 +11,7 @@
  * z80 only — other CPUs abort at lower_unit.
  */
 
+#define PARK_MAX 8   /* nested IR_PR_STACK parks in one BB */
 #include "ccdefs.h"     /* real KIND_* / function-modifier flags / c_banked_style
                            — sets DEFINE_H so ir.h uses the actual enum */
 #include "ir_lower.h"
@@ -111,26 +112,22 @@ typedef struct {
        slot reads add this to compensate. Reset per BB. Stack-consuming helpers
        (l_long_or/add) pop their RHS with no IR_POP — gen_hcall decrements it. */
     int cur_sp_adjust;
-    /* Stack-transient spill (IR_PR_STACK): the vreg whose value is currently
-       push-parked at TOS (via `push hl` at its def), or -1. Its single use pops
-       it. cur_sp_adjust is held +2 while it's parked so intervening sp-relative
-       slot accesses stay correct. Allocator guarantees these ranges are disjoint
-       within a BB (one parked at a time), so a single slot suffices. Reset per
-       BB alongside cur_sp_adjust. */
-    int cur_stack_resident;
-    /* cur_sp_adjust captured right after the park's `push hl`. The pop is valid
-       only while the parked word is still at TOS — cur_sp_adjust unchanged since
-       (nothing else pushed on top). stack_parked() checks this; on mismatch the
+    /* Stack-transient spill (IR_PR_STACK): the vregs whose values are currently
+       push-parked, outermost first, each with cur_sp_adjust captured right after
+       its `push`. cur_sp_adjust is held +2 per park so intervening sp-relative
+       slot accesses stay correct. A park is readable only while it is the top
+       entry and nothing else was pushed since (stack_parked()); on mismatch the
        read falls through to require_slot (a loud abort, never a silent wrong
-       pop). */
-    int cur_stack_resident_spadj;
+       pop). The allocator guarantees the ranges nest, so reads find their park
+       at TOS. Reset per BB alongside cur_sp_adjust. */
+    int park_v[PARK_MAX], park_adj[PARK_MAX], park_last[PARK_MAX], n_park;
     /* [IR_PARK_VERIFY] Shadow stack depth counted from the EMITTED TEXT, not
        from cur_sp_adjust. Only ~24 of 218 pushes go through emit_sp, so
        cur_sp_adjust cannot see the lowerings that use push/pop as scratch —
        which is exactly the interleaving that makes a park unsafe. pv_depth
        counts every push/pop vemit renders; pv_park_depth is the depth the
        parked word sits at (-1 = no park). Verifier only; no codegen effect. */
-    int pv_depth, pv_park_depth, pv_park_vreg;
+    int pv_depth, pv_pd[PARK_MAX], pv_pv[PARK_MAX], pv_n, pv_next_vreg;
     int pv_expect_push, pv_expect_pop;
     /* NO_SLOT byte emergency spill via AF (replaces the old below-sp `ld
        (ix-(frame+1)),a` / sp-1 write). When a slotless byte in A must survive an
@@ -371,8 +368,6 @@ static LowerState L = {
     .cur_func_ehome = -1,
     .cur_home_region_lo = -1, .cur_home_region_hi = -1,
     .cur_home_exit_flush_bb = -1, .pending_spill_v = -1,
-    .cur_stack_resident = -1,
-    .pv_park_depth = -1, .pv_park_vreg = -1,
 };
 
 
@@ -851,25 +846,33 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
             if (d > 0) {
                 L.pv_depth++;
                 if (L.pv_expect_push) {          /* this push IS the park */
-                    L.pv_park_depth = L.pv_depth;
-                    L.pv_park_vreg  = L.cur_stack_resident;
+                    if (L.pv_n < PARK_MAX) {
+                        L.pv_pd[L.pv_n] = L.pv_depth;
+                        L.pv_pv[L.pv_n] = L.pv_next_vreg;
+                        L.pv_n++;
+                    }
                     L.pv_expect_push = 0; pv_parks++;
                 }
             } else if (d < 0) {
-                if (L.pv_expect_pop) {           /* the park's designated pop */
-                    if (L.pv_depth != L.pv_park_depth) {
+                if (L.pv_expect_pop) {           /* a park's designated pop */
+                    if (L.pv_n > 0 && L.pv_depth != L.pv_pd[L.pv_n - 1]) {
                         pv_depth_bad++;
                         fprintf(stderr, "PARK_DEPTH fn=%s v%d parked_at=%d popped_at=%d\n",
                                 (cur_lazy_func && cur_lazy_func->fn) ? ir_sym_name(cur_lazy_func->fn) : "?",
-                                L.pv_park_vreg, L.pv_park_depth, L.pv_depth);
+                                L.pv_pv[L.pv_n - 1], L.pv_pd[L.pv_n - 1], L.pv_depth);
                     }
-                    L.pv_park_depth = -1; L.pv_park_vreg = -1; L.pv_expect_pop = 0;
-                } else if (L.pv_park_depth >= 0 && L.pv_depth == L.pv_park_depth) {
-                    pv_steal++;                  /* somebody else took the park */
-                    fprintf(stderr, "PARK_STEAL fn=%s v%d at_depth=%d by: %s\n",
-                            (cur_lazy_func && cur_lazy_func->fn) ? ir_sym_name(cur_lazy_func->fn) : "?",
-                            L.pv_park_vreg, L.pv_depth, buf);
-                    L.pv_park_depth = -1; L.pv_park_vreg = -1;
+                    if (L.pv_n > 0) L.pv_n--;
+                    L.pv_expect_pop = 0;
+                } else {
+                    for (int k = 0; k < L.pv_n; k++) {
+                        if (L.pv_depth != L.pv_pd[k]) continue;
+                        pv_steal++;              /* somebody else took the park */
+                        fprintf(stderr, "PARK_STEAL fn=%s v%d at_depth=%d by: %s\n",
+                                (cur_lazy_func && cur_lazy_func->fn) ? ir_sym_name(cur_lazy_func->fn) : "?",
+                                L.pv_pv[k], L.pv_depth, buf);
+                        L.pv_n = k;
+                        break;
+                    }
                 }
                 L.pv_depth--;
             }
@@ -11425,8 +11428,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     if (L.bb_byte_out_dirty)
         for (int i = 0; i < f->n_bbs; i++) L.bb_byte_out_dirty[i] = 0;
     L.cur_sp_adjust = 0;
-    L.cur_stack_resident = -1;
-    L.pv_depth = 0; L.pv_park_depth = -1; L.pv_park_vreg = -1;
+    L.n_park = 0;
+    L.pv_depth = 0; L.pv_n = 0;
     L.af_park_depth = 0;
     bc_args_save_depth = 0;
     L.la.cur_stack_long_top = -1;
@@ -11524,16 +11527,16 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            is an ORPHAN: its pop was folded away and SP no longer matches
            cur_sp_adjust (fp hid it until frame addresses went through SP). */
         if (park_verify_on > 0 && rec_counting
-            && (L.cur_sp_adjust != 0 || L.cur_stack_resident >= 0))
+            && (L.cur_sp_adjust != 0 || L.n_park > 0))
             pv_orphan++;
         emit_bb_label(out, bb->id);
         /* The long data-stack is per-BB. Any push/pop imbalance at
            a BB boundary would shift sp for unrelated code. */
         L.cur_sp_adjust = 0;
-        L.cur_stack_resident = -1;   /* stack-transient never crosses a BB */
+        L.n_park = 0;                /* stack-transient never crosses a BB */
         wpp_n = 0;                   /* nor does a wide push at its def */
         dpp_n = 0; dpp_next = 0;
-        L.pv_depth = 0; L.pv_park_depth = -1; L.pv_park_vreg = -1;
+        L.pv_depth = 0; L.pv_n = 0;
         /* BC carry across the BB boundary — the exact mirror of the HL carry
            below. Previously the BC belief simply SURVIVED a boundary with no
            check, which is unsound: BC may be taken by a transient deref base or
@@ -12660,6 +12663,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             }
             cur_bb = bb;
             cur_op_idx = j;
+            park_drop_dead(out, j);
             /* Byte-home lazy-spill. Two cases for the slot-backed home (E/D):
                - A non-DE-clean op may clobber E → spill + drop the belief.
                - A terminating branch to a back-edge / merge target → spill
