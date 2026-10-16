@@ -3870,9 +3870,11 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
     /* Multi-use parks nest: the lowering keeps a stack of resident parks and
        reads a non-final use with `pop r; push r`. Single-use parks stay
        disjoint when the gate is off. */
-    /* The vm1's `ld hl,(de)` already keeps an address in registers across the
-       load, so a park there is pure overhead. */
-    int multi = !opt_disabled("stack-spill-multi") && !IS_KR580VM1();
+    int multi = !opt_disabled("stack-spill-multi");
+    /* The vm1's `ld hl,(de)` loads through an address and leaves it in a
+       register pair, so a short read-modify-write needs no spill there: only
+       a span long enough to reuse the registers is worth a park. */
+    int min_span = IS_KR580VM1() ? 5 : 0;
     typedef struct { int vreg, flo, fhi, nuse, use[STACK_SPILL_MAX_USES], depth, bb, dropped; } SCand;
     SCand *cand = calloc((size_t)f->n_vregs, sizeof(SCand));
     SpillShape *sh = compute_spill_shapes(f);
@@ -3959,6 +3961,17 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
             use_at[n_use_at++] = bb_first_op[bb_of] + j;
         }
         if (!multi_ok || n_use_at != nuse) continue;
+        if (nuse > 1 && hi - lo < min_span) {
+            /* Only a short load/modify/store through the address is spared. */
+            int all_base = 1;
+            for (int k = 0; k < n_use_at; k++) {
+                const Op *uo = &bb->ops[use_at[k] - bb_first_op[bb_of]];
+                if (!((uo->kind == IR_LD_MEM || uo->kind == IR_ST_MEM)
+                      && uo->mem.kind == IR_MEM_VREG && uo->mem.base == v))
+                    all_base = 0;
+            }
+            if (all_base) continue;
+        }
         /* Between reads the word must stay at TOS. A wide (long) operand stages
            through the stack, so a span that touches one cannot keep a park for
            a second reader. */

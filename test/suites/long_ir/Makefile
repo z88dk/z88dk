@@ -5750,7 +5750,7 @@ rmwglobal_keep.bin: $(SOURCES) rmwglobal.c
 
 
 # [stackpark] word temps with several readers parked on the stack.
-all:	stackpark.bin stackpark_fp.bin stackpark_z80n.bin stackpark_z180.bin stackpark_8080.bin stackpark_8085.bin stackpark_gbz80.bin stackpark_r2ka.bin stackpark_keep.bin
+all:	stackpark.bin stackpark_fp.bin stackpark_z80n.bin stackpark_z180.bin stackpark_8080.bin stackpark_8085.bin stackpark_gbz80.bin stackpark_r2ka.bin stackpark_vm1.bin stackpark_keep.bin
 
 stackpark.bin: $(SOURCES) stackpark.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
@@ -5783,6 +5783,10 @@ stackpark_gbz80.bin: $(SOURCES) stackpark.c
 stackpark_r2ka.bin: $(SOURCES) stackpark.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=rabbit -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mr2ka $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+stackpark_vm1.bin: $(SOURCES) stackpark.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=vm1 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mvm1 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 stackpark_keep.bin: $(SOURCES) stackpark.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=stack-spill-multi -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
