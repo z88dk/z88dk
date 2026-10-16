@@ -399,7 +399,7 @@ Size across the corpus before implementing.
   pointer. Figures belong in commit messages, `BENCH_MATRIX.txt` and the
   ADR, never in a code comment. Five figure-carrying comments are exempt
   because the figures ARE the content: the two `g0_word_cost`/`g0_word_bytes`
-  rows (ADR 0038), the C standard citation in `ast_codegen2.c`, and two
+  rows (ADR 0038), the C standard citation in `ast_opt.c`, and two
   instruction-size comparisons (`ir_lower.c`'s pass-0c lookahead,
   `ir_lower_ops.inc.c`'s inc/dec break-even).
 
