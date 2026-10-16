@@ -62,7 +62,7 @@ RELOC relocs[2048];
 int reloc_count;
 
 
-/* Used by do_export */
+/*  To be used by do_export in the future  */
 static unsigned current_seg;
 static unsigned current_lc;
 
@@ -161,7 +161,21 @@ static void wr32(FILE*f,unsigned v)
 static char *st[4096];
 static unsigned st_count;
 
-//#define RANGE_WORD 1  // 8 bit
+// Range:
+//    0 : end marker
+//    1 : 8-bit relative offset for JR
+//    2 : 8-bit unsigned
+//    3 : 8-bit signed
+//    4 : 16-bit value little-endian
+
+//    7 : unsigned byte extended to 16 bits
+//    8 : signed byte sign-extended to 16 bits
+
+//   10 : byte offset to 0xFF00
+
+//   11 : DEFC expression assigning a symbol
+//   12 : 16-bit relative offset for JRE
+
 #define RANGE_WORD 4  // 16 bit
 #define RANGE_UNDEFINED 0xffffffffu
 
@@ -218,25 +232,27 @@ static void write_strtable(FILE*fp) {
 }
 
 
-static void write_object(const char*outname, int mod) {
+static void do_export(const char*outname, int mod) {
     unsigned code_sid, data_sid, bss_sid;
     FILE*fp=fopen(outname,"wb");
     long hdr,pexpr,psym,pext,pmod,psec,pstr,end;
     int i;
+    int have_code_section = 0;
+	int have_data_section = 0;
 
     if(!fp) return;
     st_count=0;
     add_string(""); 
 
-    unsigned fname_sid = add_string("RELtool-imported-module");
+    unsigned fname_sid = add_string("RELtool_module");
 
     code_sid = add_string(DEFAULT_CODE_SECTION);
     //data_sid = add_string(DEFAULT_DATA_SECTION);
     //bss_sid = add_string(DEFAULT_BSS_SECTION);
 
-    add_string(module_name);
-    add_string("__RELX_CODE");
-    add_string("__RELX_DATA");
+    //add_string(module_name);
+    //code_sid = add_string("__RELX_CODE");
+    //data_sid = add_string("__RELX_DATA");
 
     for(i=0;i<symbol_count;i++) add_string(symbols[i].name);
     for(i=0;i<ext_count;i++) add_string(extsyms[i].name);
@@ -249,7 +265,10 @@ static void write_object(const char*outname, int mod) {
     /* swap_ixiy */
     wrd(fp,0);
 
-    hdr=ftell(fp); for(i=0;i<6;i++) wr32(fp,0xffffffffu);
+    /* Header position */
+    hdr=ftell(fp);
+    /* Init with 'no section' */
+    for(i=0;i<6;i++)  wr32(fp,RANGE_UNDEFINED);
 
 
     /* --------------------------------------------------
@@ -272,6 +291,7 @@ static void write_object(const char*outname, int mod) {
                 sprintf(expr,
                         "__RELX_CODE+%d",
                         relocs[i].target);
+                have_code_section=1;
                 break;
 
             case TOK_DATAREL:
@@ -279,15 +299,16 @@ static void write_object(const char*outname, int mod) {
                 sprintf(expr,
                         "__RELX_DATA+%d",
                         relocs[i].target);
+                have_data_section=1;
                 break;
 
-            case REL_EXTERNAL:
-                strcpy(target,
-                       relocs[i].symbol ?
-                       relocs[i].symbol : "");
-
-                strcpy(expr,target);
-                break;
+            // case REL_EXTERNAL:
+            //     strcpy(target,
+            //            relocs[i].symbol ?
+            //            relocs[i].symbol : "");
+            // 
+            //     strcpy(expr,target);
+            //     break;
 
             default:
                 continue;
@@ -298,41 +319,49 @@ static void write_object(const char*outname, int mod) {
 
         wrd(fp,RANGE_WORD);
 
-        wrd(fp,0);                 /* filename */
-        wrd(fp,0);                 /* line */
+        wrd(fp,fname_sid);         /* filename */
+        wrd(fp,0);               /* line/module number ? */
 
-        wrd(fp,code_sid);
+        wrd(fp,code_sid);          /* section name */
 
-        wrd(fp,relocs[i].addr);    /* asmpc     */
+        wrd(fp,relocs[i].addr-1);  /* asmpc     */
         wrd(fp,relocs[i].addr);    /* patchptr  */
-        wrd(fp,2);                 /* 16-bit    */
+        wrd(fp,2);                 /* 16-bit type expression */
 
         wrd(fp,add_string(target));
+        //wrd(fp,0);
         wrd(fp,add_string(expr));
+
+printf("target='%s' expr='%s'\n", target, expr);
     }
 
-    wr32(fp,RANGE_UNDEFINED);
+    //wr32(fp,RANGE_UNDEFINED);
+    wr32(fp,0);
 
     /* --------------------------------------------------
      * Synthetic symbols
      * -------------------------------------------------- */
     psym = ftell(fp);
 
-    wrd(fp,1);                     /* local      */
-    wrd(fp,2);                     /* address    */
-    wrd(fp,code_sid);
-    wrd(fp,0);
-    wrd(fp,add_string("__RELX_CODE"));
-    wrd(fp,fname_sid);
-    wrd(fp,mod);
+    if (have_code_section) {
+        wrd(fp,1);                     /* local      */
+        wrd(fp,2);                     /* address    */
+        wrd(fp,code_sid);
+        wrd(fp,0);
+        wrd(fp,add_string("__RELX_CODE"));
+        wrd(fp,fname_sid);
+        wrd(fp,mod);
+    }
 
-    wrd(fp,1);                     /* local      */
-    wrd(fp,2);                     /* address    */
-    wrd(fp,code_sid);
-    wrd(fp,progsize);
-    wrd(fp,add_string("__RELX_DATA"));
-    wrd(fp,fname_sid);
-    wrd(fp,mod);
+    if (have_data_section) {
+        wrd(fp,1);                     /* local      */
+        wrd(fp,2);                     /* address    */
+        wrd(fp,code_sid);
+        wrd(fp,progsize);
+        wrd(fp,add_string("__RELX_DATA"));
+        wrd(fp,fname_sid);
+        wrd(fp,mod);
+    }
 
 
     /* --------------------------------------------------
@@ -367,15 +396,22 @@ static void write_object(const char*outname, int mod) {
         wrd(fp,add_string(extsyms[i].name));
 
     wrd(fp,0);
+
+
+    /* --------------------------------------------------
+     * Module Area
+     * -------------------------------------------------- */
+
     pmod=ftell(fp);
     wrd(fp,add_string(module_name));
-    wrd(fp,0);
-    psec=ftell(fp);
+    //wrd(fp,0);
 
 
     /* --------------------------------------------------
      * Sections Area
      * -------------------------------------------------- */
+
+    psec=ftell(fp);
     unsigned section_size;
 
     section_size = progsize + datasize;
@@ -389,6 +425,7 @@ static void write_object(const char*outname, int mod) {
     while(ftell(fp)&3) fputc(0,fp);
     wr32(fp,0xffffffffu);
 
+
     /* --------------------------------------------------
      * String Table
      * -------------------------------------------------- */
@@ -398,19 +435,32 @@ static void write_object(const char*outname, int mod) {
 #endif
     pstr=ftell(fp); write_strtable(fp);
     end=ftell(fp);
+
+    // Back to header, set the existing pointers
     fseek(fp,hdr,SEEK_SET);
-    wrd(fp,pmod);   wrd(fp,pexpr);   wrd(fp,psym);
-    wrd(fp,pext);   wrd(fp,psec);    wrd(fp,pstr);
+
+    wrd(fp,pmod);  // Module name
+    if (psym > pexpr)
+        wrd(fp,pexpr); // Expressions
+    if (pext > psym)
+        wrd(fp,psym);  // Defined Symbols
+    if (psec > pext)
+        wrd(fp,pext);  // External Symbols
+    wrd(fp,psec);  // Sections
+    wrd(fp,pstr);  // String Tabke
+
+    fseek(fp,end,SEEK_SET);
+    fclose(fp);
+
 #ifdef DEBUG
+    printf("pmod =%04lX\n",pmod);
     printf("pexpr=%04lX\n",pexpr);
     printf("psym =%04lX\n",psym);
     printf("pext =%04lX\n",pext);
-    printf("pmod =%04lX\n",pmod);
     printf("psec =%04lX\n",psec);
     printf("pstr =%04lX\n",pstr);
 #endif
-    fseek(fp,end,SEEK_SET);
-    fclose(fp);
+
     }
 
 /* ******************************************************
@@ -486,6 +536,8 @@ static void add_external(unsigned char *prog, const char *name, unsigned chain)
     ext_count++;
 }
 
+
+/*  To be used by do_export or disassemblers in the future  */
 
 //static const char *lookup_external(unsigned char *prog, unsigned addr)
 //{
@@ -1332,6 +1384,7 @@ static void do_dump(FILE *f, int dumpmode)
 
                 read8(f, &v);
                 code_put8(v);
+                current_lc++;
                 if (dumpmode < 3) printf("ABS %02X\n", v);
                 break;
             }
@@ -1344,6 +1397,8 @@ static void do_dump(FILE *f, int dumpmode)
 
                 read16(f, &v);
                 code_put16(v, tok);
+                current_lc++;
+                current_lc++;
 
                 if (tok == TOK_PRGREL)
                     if (dumpmode < 3) printf("PROGREL %04X\n", v);
@@ -1394,7 +1449,7 @@ static void do_dump(FILE *f, int dumpmode)
                         char objname[128];
 
                         sprintf(objname, "%s.o", module_name);
-                        write_object(objname,mod);
+                        do_export(objname,mod);
 
                         printf("Written: %s\n", objname);
                     }
@@ -1404,6 +1459,8 @@ static void do_dump(FILE *f, int dumpmode)
                     reloc_count = 0;
                     ext_count = 0;
                     symbol_count = 0;
+                    current_lc = 0;
+
 
                     mod++;
 
