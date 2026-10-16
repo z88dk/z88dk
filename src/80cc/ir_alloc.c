@@ -6826,7 +6826,7 @@ void ir_alloc(Func *f)
        admissibility gates applied before anyone believes it. */
     if (getenv("IR_RANGEPROBE")) {
         static const PhysReg park[] = { IR_PR_BC, IR_PR_DE, IR_PR_IX, IR_PR_IY };
-        int n_spill = 0, n_share = 0, n_fn_share = 0;
+        int n_spill = 0, n_share = 0;
         for (int v = 0; v < f->n_vregs; v++) {
             if (!f->vreg_to_phys || f->vreg_to_phys[v] != IR_PR_SPILL) continue;
             const LiveRange *lv = ir_live_range(f, v);
@@ -6872,11 +6872,9 @@ void ir_alloc(Func *f)
                 }
             }
         }
-        if (n_share) n_fn_share = 1;
         if (n_spill)
-            fprintf(stderr, "RANGEPROBE %-20s spilled=%d  time-shareable=%d%s\n",
-                    f->fn ? ir_sym_name(f->fn) : "?", n_spill, n_share,
-                    n_fn_share ? "" : "");
+            fprintf(stderr, "RANGEPROBE %-20s spilled=%d  time-shareable=%d\n",
+                    f->fn ? ir_sym_name(f->fn) : "?", n_spill, n_share);
     }
 
     /* [IR_HOMEMAP] Inert: the final placement, one line per homed vreg. The

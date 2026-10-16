@@ -1720,7 +1720,8 @@ static int de_fwd_walk(char **lines, int n, int start, int d_live, int e_live,
            found by dumping the window at a disagreement, and the reason the
            park@23 site in bitfieldbench is genuinely dead.) */
         if ((e.d_read && d_live) || (e.e_read && e_live)) {
-            if (readerp) *readerp = j; return 1;
+            if (readerp) *readerp = j;
+            return 1;
         }
         /* [de-ret] A return that does not read DE ends this path with the
            value unread — the walk must agree with the backward sweep, or it
@@ -2748,7 +2749,7 @@ static int line_reads_pair(const char *line, const char *pairname,
    uses `sbc hl,de` + an overflow-flag check instead) recomputes the flipped
    sign bit at runtime even when the operand being flipped is a compile-time
    constant (`ld de,2` — d is PROVABLY 0, so d^0x80 is PROVABLY 0x80, always,
-   for this def). Sized on examples/console/*.c (+test -clib=gbz80): 216 real
+   for this def). Sized on examples/console (+test -clib=gbz80): 216 real
    hits (probe-verified, not the informal 102 a quick script first
    estimated) across 28 files, plus 19 on the bench corpus (not corpus-only —
    real files just have far more signed-comparison-against-a-constant code).
@@ -9244,6 +9245,27 @@ static void confirm_word_home_pick(Func *f, const int *bb_alias)
     ir_alloc_word_home_done();
 }
 
+/* Function-wide def and use counts of vreg v. use_j (optional) receives the
+   index of the last use in block bb, or -1. */
+static void count_defs_uses(const Func *f, int v, int bb, int *ndef, int *nuse,
+                            int *use_j)
+{
+    *ndef = *nuse = 0;
+    if (use_j) *use_j = -1;
+    for (int b2 = 0; b2 < f->n_bbs; b2++)
+        for (int k = 0; k < f->bbs[b2].n_ops; k++) {
+            const Op *p = &f->bbs[b2].ops[k];
+            int df[8]; int nd = ir_op_defs(p, df, 8);
+            for (int t = 0; t < nd; t++) if (df[t] == v) (*ndef)++;
+            int us[16]; int nu = ir_op_uses(p, us, 16);
+            for (int t = 0; t < nu; t++)
+                if (us[t] == v) {
+                    (*nuse)++;
+                    if (use_j && b2 == bb) *use_j = k;
+                }
+        }
+}
+
 static int ir_lower_func_body(FILE *out, Func *f)
 {
     if (!f) {
@@ -9519,17 +9541,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 if (o->mem.volatile_ || !o->mem.sym || ns_sym_bails(o->mem.sym))
                     continue;
                 /* exactly one def + one use, use in this BB after j */
-                int ndef = 0, nuse = 0, use_j = -1;
-                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
-                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
-                        const Op *p = &f->bbs[bb2].ops[k];
-                        int df[8]; int nd = ir_op_defs(p, df, 8);
-                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
-                        int u[16]; int nu = ir_op_uses(p, u, 16);
-                        for (int t = 0; t < nu; t++) if (u[t] == d) {
-                            nuse++; if (bb2 == b) use_j = k;
-                        }
-                    }
+                int ndef, nuse, use_j;
+                count_defs_uses(f, d, b, &ndef, &nuse, &use_j);
                 if (ndef != 1 || nuse != 1 || use_j <= j) continue;
                 if (bb->live_out
                     && ir_bitset_get((const BitSet *)bb->live_out, d)) continue;
@@ -9626,19 +9639,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 /* acc-prepush pushes it at its def; its partner operand is
                    kept in the accumulator on that understanding. */
                 if (wide_prepush_target(f, bb, j, d) >= 0) continue;
-                int nuse = 0, ndef = 0, use_j = -1;
-                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
-                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
-                        const Op *p = &f->bbs[bb2].ops[k];
-                        int df[8]; int nd = ir_op_defs(p, df, 8);
-                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
-                        int us[16]; int nu = ir_op_uses(p, us, 16);
-                        for (int t = 0; t < nu; t++)
-                            if (us[t] == d) {
-                                nuse++;
-                                if (bb2 == b) use_j = k;
-                            }
-                    }
+                int ndef, nuse, use_j;
+                count_defs_uses(f, d, b, &ndef, &nuse, &use_j);
                 if (ndef != 1 || nuse != 1 || use_j <= j) continue;
                 if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, d))
                     continue;
@@ -9760,15 +9762,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 if (vreg_is_pr_dehl(f, d) || vreg_in_pr_bc(f, d)) continue;
                 if (bb->live_out
                     && ir_bitset_get((const BitSet *)bb->live_out, d)) continue;
-                int nuse = 0, ndef = 0;
-                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
-                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
-                        const Op *p = &f->bbs[bb2].ops[k];
-                        int df[8]; int nd = ir_op_defs(p, df, 8);
-                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
-                        int us[16]; int nu = ir_op_uses(p, us, 16);
-                        for (int t = 0; t < nu; t++) if (us[t] == d) nuse++;
-                    }
+                int ndef, nuse;
+                count_defs_uses(f, d, -1, &ndef, &nuse, NULL);
                 if (ndef != 1 || nuse != 1) continue;
                 /* The other operand parked on the data stack is popped by the
                    generic path only. */
@@ -9857,15 +9852,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                     continue;
                 if (bb->live_out
                     && ir_bitset_get((const BitSet *)bb->live_out, d)) continue;
-                int nuse = 0, ndef = 0;
-                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
-                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
-                        const Op *p = &f->bbs[bb2].ops[k];
-                        int df[8]; int nd = ir_op_defs(p, df, 8);
-                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
-                        int us[16]; int nu = ir_op_uses(p, us, 16);
-                        for (int t = 0; t < nu; t++) if (us[t] == d) nuse++;
-                    }
+                int ndef, nuse;
+                count_defs_uses(f, d, -1, &ndef, &nuse, NULL);
                 if (ndef != 1 || nuse != 1) continue;
                 /* A value homed in DE other than the operands and the result
                    must not be live where the add reads the global. */
@@ -9967,15 +9955,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 int dst_dead = def_dst_dead(f, bb, j + 1);
                 if (!dst_dead && !vreg_is_pr_dehl(f, u->dst)
                     && (f->vregs[u->dst].flags & IR_VREG_NO_SLOT)) continue;
-                int nuse = 0, ndef = 0;
-                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
-                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
-                        const Op *p = &f->bbs[bb2].ops[k];
-                        int df[8]; int nd = ir_op_defs(p, df, 8);
-                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
-                        int us[16]; int nu = ir_op_uses(p, us, 16);
-                        for (int t = 0; t < nu; t++) if (us[t] == d) nuse++;
-                    }
+                int ndef, nuse;
+                count_defs_uses(f, d, -1, &ndef, &nuse, NULL);
                 if (ndef != 1 || nuse != 1) continue;
                 int parked = 0;
                 for (int k = 0; k < bb->n_ops && !parked; k++)

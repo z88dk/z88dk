@@ -5035,6 +5035,32 @@ int ir_opt_bswap_fold(Func *f)
     return changed;
 }
 
+/* Function-wide use counts per vreg, and def counts when defcnt != NULL.
+   Returns 0 on allocation failure; the caller frees the arrays. */
+static int count_uses_defs(const Func *f, int **usecnt, int **defcnt)
+{
+    int nv = f->n_vregs;
+    *usecnt = calloc((size_t)nv, sizeof(int));
+    if (defcnt) *defcnt = calloc((size_t)nv, sizeof(int));
+    if (!*usecnt || (defcnt && !*defcnt)) {
+        free(*usecnt);
+        if (defcnt) free(*defcnt);
+        return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            int u[16]; int nu = ir_op_uses(op, u, 16);
+            for (int t = 0; t < nu; t++)
+                if (u[t] >= 0 && u[t] < nv) (*usecnt)[u[t]]++;
+            if (!defcnt) continue;
+            int dd[8]; int nd = ir_op_defs(op, dd, 8);
+            for (int t = 0; t < nd; t++)
+                if (dd[t] >= 0 && dd[t] < nv) (*defcnt)[dd[t]]++;
+        }
+    return 1;
+}
+
 int ir_opt_const_fold(Func *f)
 {
     if (!f) return 0;
@@ -5043,19 +5069,13 @@ int ir_opt_const_fold(Func *f)
     if (nv <= 0) return 0;
     int8_t  *known = calloc((size_t)nv, 1);
     int64_t *val   = calloc((size_t)nv, sizeof(int64_t));
-    int     *usecnt = calloc((size_t)nv, sizeof(int));
-    if (!known || !val || !usecnt) { free(known); free(val); free(usecnt); return 0; }
+    int     *usecnt = NULL;
+    if (!known || !val || !count_uses_defs(f, &usecnt, NULL)) { free(known); free(val); return 0; }
     int changed = 0;
     /* Function-wide use counts — gate the const-widen rewrite (below) to
        SINGLE-USE sources so it only fires when it makes the source constant
        dead (strictly a win); rewriting a multi-use source just duplicates the
        constant and perturbs allocation (queenbench-fp +2). */
-    for (int b = 0; b < f->n_bbs; b++)
-        for (int j = 0; j < f->bbs[b].n_ops; j++) {
-            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
-            for (int t = 0; t < nu; t++)
-                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
-        }
 
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
@@ -5909,14 +5929,8 @@ int ir_opt_sink_trunc(Func *f)
     if (!f || opt_disabled("sink-trunc")) return 0;
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
-    int *usecnt = calloc((size_t)nv, sizeof(int));
-    if (!usecnt) return 0;
-    for (int b = 0; b < f->n_bbs; b++)
-        for (int j = 0; j < f->bbs[b].n_ops; j++) {
-            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
-            for (int t = 0; t < nu; t++)
-                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
-        }
+    int *usecnt;
+    if (!count_uses_defs(f, &usecnt, NULL)) return 0;
     int changed = 0;
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
@@ -6000,18 +6014,8 @@ int ir_opt_rotl_bitop(Func *f)
     if (!f || opt_disabled("rotl-bitop")) return 0;
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
-    int *usecnt = calloc((size_t)nv, sizeof(int));
-    int *defcnt = calloc((size_t)nv, sizeof(int));
-    if (!usecnt || !defcnt) { free(usecnt); free(defcnt); return 0; }
-    for (int b = 0; b < f->n_bbs; b++)
-        for (int j = 0; j < f->bbs[b].n_ops; j++) {
-            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
-            for (int t = 0; t < nu; t++)
-                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
-            int dd[8]; int nd = ir_op_defs(&f->bbs[b].ops[j], dd, 8);
-            for (int t = 0; t < nd; t++)
-                if (dd[t] >= 0 && dd[t] < nv) defcnt[dd[t]]++;
-        }
+    int *usecnt, *defcnt;
+    if (!count_uses_defs(f, &usecnt, &defcnt)) return 0;
     int changed = 0;
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
@@ -6108,18 +6112,8 @@ int ir_opt_rmw_narrow(Func *f)
     if (!f || opt_disabled("rmw-narrow")) return 0;
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
-    int *usecnt = calloc((size_t)nv, sizeof(int));
-    int *defcnt = calloc((size_t)nv, sizeof(int));
-    if (!usecnt || !defcnt) { free(usecnt); free(defcnt); return 0; }
-    for (int b = 0; b < f->n_bbs; b++)
-        for (int j = 0; j < f->bbs[b].n_ops; j++) {
-            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
-            for (int t = 0; t < nu; t++)
-                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
-            int dd[8]; int nd = ir_op_defs(&f->bbs[b].ops[j], dd, 8);
-            for (int t = 0; t < nd; t++)
-                if (dd[t] >= 0 && dd[t] < nv) defcnt[dd[t]]++;
-        }
+    int *usecnt, *defcnt;
+    if (!count_uses_defs(f, &usecnt, &defcnt)) return 0;
     int changed = 0;
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
@@ -6175,14 +6169,8 @@ int ir_opt_fuse_bswap_store(Func *f)
     if (!f || opt_disabled("bswap-store")) return 0;
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
-    int *usecnt = calloc((size_t)nv, sizeof(int));
-    if (!usecnt) return 0;
-    for (int b = 0; b < f->n_bbs; b++)
-        for (int j = 0; j < f->bbs[b].n_ops; j++) {
-            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
-            for (int t = 0; t < nu; t++)
-                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
-        }
+    int *usecnt;
+    if (!count_uses_defs(f, &usecnt, NULL)) return 0;
     int changed = 0;
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
@@ -6226,18 +6214,8 @@ int ir_opt_fuse_bswap_load(Func *f)
     if (!f || opt_disabled("bswap-load")) return 0;
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
-    int *usecnt = calloc((size_t)nv, sizeof(int));
-    int *defcnt = calloc((size_t)nv, sizeof(int));
-    if (!usecnt || !defcnt) { free(usecnt); free(defcnt); return 0; }
-    for (int b = 0; b < f->n_bbs; b++)
-        for (int j = 0; j < f->bbs[b].n_ops; j++) {
-            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
-            for (int t = 0; t < nu; t++)
-                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
-            int dd[8]; int nd = ir_op_defs(&f->bbs[b].ops[j], dd, 8);
-            for (int t = 0; t < nd; t++)
-                if (dd[t] >= 0 && dd[t] < nv) defcnt[dd[t]]++;
-        }
+    int *usecnt, *defcnt;
+    if (!count_uses_defs(f, &usecnt, &defcnt)) return 0;
     int changed = 0;
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];

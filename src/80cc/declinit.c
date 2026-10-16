@@ -4,6 +4,22 @@
 
 #include "ccdefs.h"
 
+/* Allocate *list on first use */
+static void ensure_list(array **list)
+{
+    if (*list == NULL) *list = array_init(NULL);
+}
+
+/* Emit "defb" with the low n (3 or 4) bytes of val, least significant first */
+static void defbytes(uint32_t val, int n)
+{
+    defbyte();
+    for (int i = 0; i < n; i++) {
+        if (i) outbyte(',');
+        outdec((val >> (8 * i)) & 0xff);
+    }
+}
+
 static int init(Type *type, int dump, Node **out_node);
 static int agg_init(Type *type, int isflexible, array **out_list);
 
@@ -196,7 +212,7 @@ int str_init(Type *tag, array **out_list)
             str_init(ptr->tag, subout);
             needchar('}');
             if (out_list) {
-                if (*out_list == NULL) *out_list = array_init(NULL);
+                ensure_list(out_list);
                 array_add(*out_list, ast_init_list(sub));
             }
         } else if ( ( ptr->kind == KIND_ARRAY && ptr->ptr->kind != KIND_CHAR ) ) {
@@ -206,7 +222,7 @@ int str_init(Type *tag, array **out_list)
             agg_init(ptr, ptr->size == -1 && i == num_fields - 1, subout);
             needchar('}');
             if (out_list) {
-                if (*out_list == NULL) *out_list = array_init(NULL);
+                ensure_list(out_list);
                 array_add(*out_list, ast_init_list(sub));
             }
         } else if ( ptr->kind == KIND_ARRAY && ptr->ptr->kind == KIND_CHAR ) {
@@ -217,14 +233,14 @@ int str_init(Type *tag, array **out_list)
                 agg_init(ptr,0, subout);
                 needchar('}');
                 if (out_list) {
-                    if (*out_list == NULL) *out_list = array_init(NULL);
+                    ensure_list(out_list);
                     array_add(*out_list, ast_init_list(sub));
                 }
             } else {
                 Node *elem = NULL;
                 init(ptr,1, out_list ? &elem : NULL);
                 if (out_list) {
-                    if (*out_list == NULL) *out_list = array_init(NULL);
+                    ensure_list(out_list);
                     array_add(*out_list, elem);
                 }
             }
@@ -232,7 +248,7 @@ int str_init(Type *tag, array **out_list)
             Node *elem = NULL;
             init(ptr,1, out_list ? &elem : NULL);
             if (out_list) {
-                if (*out_list == NULL) *out_list = array_init(NULL);
+                ensure_list(out_list);
                 array_add(*out_list, elem);
             }
         }
@@ -248,7 +264,7 @@ int str_init(Type *tag, array **out_list)
            assembled value. The Type used is rough — int is fine for
            narrow packs, the consumer will see a `(?bf 0xVAL)` shape. */
         if (out_list) {
-            if (*out_list == NULL) *out_list = array_init(NULL);
+            ensure_list(out_list);
             array_add(*out_list, ast_literal(type_int, (zdouble)bitfield_value));
         }
         (void)bitfield_first_idx;
@@ -289,7 +305,7 @@ int agg_init(Type *type, int isflexible, array **out_list)
                 /* AST: a `0` placeholder for an unused struct slot —
                    represent as an empty init-list. */
                 if (out_list) {
-                    if (*out_list == NULL) *out_list = array_init(NULL);
+                    ensure_list(out_list);
                     array_add(*out_list, ast_init_list(NULL));
                 }
             } else if  ( done == 0 ) {
@@ -302,7 +318,7 @@ int agg_init(Type *type, int isflexible, array **out_list)
                 array **subout = out_list ? &sub : NULL;
                 size += str_init(type->ptr->tag, subout);
                 if (out_list) {
-                    if (*out_list == NULL) *out_list = array_init(NULL);
+                    ensure_list(out_list);
                     array_add(*out_list, ast_init_list(sub));
                 }
             }
@@ -316,7 +332,7 @@ int agg_init(Type *type, int isflexible, array **out_list)
                 size += agg_init(type->ptr, isflexible, subout);
                 needchar('}');
                 if (out_list) {
-                    if (*out_list == NULL) *out_list = array_init(NULL);
+                    ensure_list(out_list);
                     array_add(*out_list, ast_init_list(sub));
                 }
             } else {
@@ -327,7 +343,7 @@ int agg_init(Type *type, int isflexible, array **out_list)
                    Node *elem = NULL;
                    size += init(type->ptr,1, out_list ? &elem : NULL);
                    if (out_list) {
-                       if (*out_list == NULL) *out_list = array_init(NULL);
+                       ensure_list(out_list);
                        array_add(*out_list, elem);
                    }
                } else {
@@ -335,7 +351,7 @@ int agg_init(Type *type, int isflexible, array **out_list)
                    array **subout = out_list ? &sub : NULL;
                    size += agg_init(type->ptr, isflexible, subout);
                    if (out_list) {
-                       if (*out_list == NULL) *out_list = array_init(NULL);
+                       ensure_list(out_list);
                        array_add(*out_list, ast_init_list(sub));
                    }
                }
@@ -354,7 +370,7 @@ int agg_init(Type *type, int isflexible, array **out_list)
                     size += init(type->ptr,1, out_list ? &elem : NULL);
                 }
                 if (out_list) {
-                    if (*out_list == NULL) *out_list = array_init(NULL);
+                    ensure_list(out_list);
                     array_add(*out_list, elem);
                 }
             }
@@ -672,57 +688,24 @@ constdecl:
                     uint64_t raw = ivalue;
                     uint32_t val = (uint32_t)raw;
                     /* there appears to be a bug in z80asm regarding defq */
-                    defbyte();
-                    outdec(((uint32_t)val % 65536UL) % 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val % 65536UL) / 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val / 65536UL) % 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val / 65536UL) / 256);
+                    defbytes(val, 4);
                     nl();
                     val = (uint32_t)(raw >> 32);
-                    defbyte();
-                    outdec(((uint32_t)val % 65536UL) % 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val % 65536UL) / 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val / 65536UL) % 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val / 65536UL) / 256);
+                    defbytes(val, 4);
                 } else if (type->kind == KIND_LONG ){
                     uint32_t val = (uint32_t)ivalue;
                     /* there appears to be a bug in z80asm regarding defq */
-                    defbyte();
-                    outdec(((uint32_t)val % 65536UL) % 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val % 65536UL) / 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val / 65536UL) % 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val / 65536UL) / 256);
+                    defbytes(val, 4);
                 } else if (type->kind == KIND_CPTR) {
                     uint32_t val = (uint32_t)ivalue;
-                    defbyte();
-                    outdec(((uint32_t)val % 65536UL) % 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val % 65536UL) / 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val / 65536UL) % 256);
+                    defbytes(val, 3);
                 } else if ( type->kind == KIND_ACCUM16 ) {
                     uint16_t val = ((int16_t)((value) / (1.0 / 256.0) + ((value) >= 0 ? 0.5 : -0.5)));
                     defword();
                     outdec(val);
                 } else if ( type->kind == KIND_ACCUM32) {
                     uint32_t val = ((int32_t)((value) / (1.0 / 65536.0) + ((value) >= 0 ? 0.5 : -0.5)));
-                    defbyte();
-                    outdec(((uint32_t)val % 65536UL) % 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val % 65536UL) / 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val / 65536UL) % 256);
-                    outbyte(',');
-                    outdec(((uint32_t)val / 65536UL) / 256);
+                    defbytes(val, 4);
                 } else {
                     if (type->kind == KIND_CHAR ) 
                         defbyte();
