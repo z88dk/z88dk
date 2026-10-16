@@ -9,7 +9,7 @@
  *   reltool -dump   file.relx
  *   reltool -disasm file.relx
  *   reltool -split  file.relx   -> split the relx file into files with single elements
- *   reltool -export file.relx   -> (not working yet) extract z88dk obj files from the relx file
+ *   reltool -export file.relx   -> (experimental) extract z88dk obj files from the relx file
  *
  */
 
@@ -24,22 +24,22 @@
 #define TOK_SPECIAL  0x80
 #define TOK_PAD      0xFE
 
-#define MAX_MODULE_NAME 64
+#define MAX_LBL_NAME 64
 #define MAX_SYMBOLS 1024
 
 typedef struct
 {
-    char name[64];
+    char name[MAX_LBL_NAME];
     unsigned type;
     unsigned value;
 } SYMBOL;
 
 typedef struct {
-    char name[64];
+    char name[MAX_LBL_NAME];
     unsigned chain;
 } EXTERNAL;
 
-static EXTERNAL extsyms[256];
+static EXTERNAL extsyms[MAX_SYMBOLS];
 static int ext_count;
 
 
@@ -62,12 +62,12 @@ RELOC relocs[2048];
 int reloc_count;
 
 
-/*  To be used by do_export in the future  */
-static unsigned current_seg;
+/*  Needed do_export */
+static unsigned current_seg;   // TODO:  DATA section
 static unsigned current_lc;
 
 
-static char module_name[64]="unk_module";
+static char module_name[MAX_LBL_NAME]="unk_module";
 
 
 static SYMBOL symbols[MAX_SYMBOLS];
@@ -78,7 +78,7 @@ typedef struct
 {
     long start;
     long end;
-    char name[MAX_MODULE_NAME];
+    char name[MAX_LBL_NAME];
 } MODULE;
 
 static const char *ctrl_name[16] =
@@ -198,7 +198,7 @@ static char *fix_symbol(char *name) {
 
 static unsigned add_string(const char*s) {
 
-    char fixed[64];
+    char fixed[MAX_LBL_NAME];
 
     strncpy(fixed,s,sizeof(fixed)-1);
     fixed[sizeof(fixed)-1] = 0;
@@ -238,7 +238,7 @@ static void do_export(const char*outname, int mod) {
     long hdr,pexpr,psym,pext,pmod,psec,pstr,end;
     int i;
     int have_code_section = 0;
-	int have_data_section = 0;
+    int have_data_section = 0;
 
     if(!fp) return;
     st_count=0;
@@ -279,7 +279,7 @@ static void do_export(const char*outname, int mod) {
     for(i=0;i<reloc_count;i++)
     {
         char expr[128];
-        char target[64];
+        char target[MAX_LBL_NAME];
 
         expr[0]=0;
         target[0]=0;
@@ -302,13 +302,13 @@ static void do_export(const char*outname, int mod) {
                 have_data_section=1;
                 break;
 
-            // case REL_EXTERNAL:
-            //     strcpy(target,
-            //            relocs[i].symbol ?
-            //            relocs[i].symbol : "");
-            // 
-            //     strcpy(expr,target);
-            //     break;
+            case REL_EXTERNAL:
+                strcpy(target,
+                       relocs[i].symbol ?
+                       relocs[i].symbol : "");
+            
+                strcpy(expr,target);
+                break;
 
             default:
                 continue;
@@ -320,7 +320,7 @@ static void do_export(const char*outname, int mod) {
         wrd(fp,RANGE_WORD);
 
         wrd(fp,fname_sid);         /* filename */
-        wrd(fp,0);               /* line/module number ? */
+        wrd(fp,mod);               /* line/module number ? */
 
         wrd(fp,code_sid);          /* section name */
 
@@ -332,7 +332,7 @@ static void do_export(const char*outname, int mod) {
         //wrd(fp,0);
         wrd(fp,add_string(expr));
 
-printf("target='%s' expr='%s'\n", target, expr);
+        // printf("target='%s' expr='%s'\n", target, expr);
     }
 
     //wr32(fp,RANGE_UNDEFINED);
@@ -578,7 +578,7 @@ static void code_put8(unsigned v)
 
 static void code_put16(unsigned v, unsigned tok)
 {
-    relocs[reloc_count].addr   = proglen;
+    relocs[reloc_count].addr   = current_lc;
     relocs[reloc_count].target = v;
     relocs[reloc_count].type   = tok;
     relocs[reloc_count].symbol = NULL;
@@ -667,7 +667,7 @@ static const char *lookup_any_symbol(unsigned value)
 
 static const char *format_addr(unsigned pc)
 {
-    static char buf[64];
+    static char buf[MAX_LBL_NAME];
     RELOC *r;
     unsigned v;
 
@@ -1310,7 +1310,7 @@ static void dump_special(FILE *f, unsigned ctrl, int dumpmode)
 
     if (ctrl < EXTERNAL_OFFSET)
     {
-        char name[64];
+        char name[MAX_LBL_NAME];
 
         read8(f, &len);
 
@@ -1397,8 +1397,7 @@ static void do_dump(FILE *f, int dumpmode)
 
                 read16(f, &v);
                 code_put16(v, tok);
-                current_lc++;
-                current_lc++;
+                current_lc += 2;
 
                 if (tok == TOK_PRGREL)
                     if (dumpmode < 3) printf("PROGREL %04X\n", v);
@@ -1547,7 +1546,7 @@ int main(int argc, char *argv[])
         printf("  reltool -dump   file.relx\n");
         printf("  reltool -disasm file.relx\n");
         printf("  reltool -split  file.relx   -> cut the relx into files with single elements\n");
-        printf("  reltool -export file.relx   -> (not working) extract z88dk obj files from the relx file\n");
+        printf("  reltool -export file.relx   -> (experimental) extract z88dk obj files from the relx file\n");
 
         return 1;
     }
