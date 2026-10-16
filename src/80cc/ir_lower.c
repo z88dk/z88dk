@@ -120,7 +120,7 @@ typedef struct {
        read falls through to require_slot (a loud abort, never a silent wrong
        pop). The allocator guarantees the ranges nest, so reads find their park
        at TOS. Reset per BB alongside cur_sp_adjust. */
-    int park_v[PARK_MAX], park_adj[PARK_MAX], park_last[PARK_MAX], n_park;
+    int park_v[PARK_MAX], park_adj[PARK_MAX], park_last[PARK_MAX], park_nreads[PARK_MAX], n_park;
     /* [IR_PARK_VERIFY] Shadow stack depth counted from the EMITTED TEXT, not
        from cur_sp_adjust. Only ~24 of 218 pushes go through emit_sp, so
        cur_sp_adjust cannot see the lowerings that use push/pop as scratch —

@@ -187,6 +187,7 @@ exists (ADR 0010).
 | `home-swap` | two placed homes are never exchanged even when the swap wins |
 | `stack-spill` | no parking of a value on the data stack instead of a frame slot |
 | `stack-spill-multi` | a word read more than once, or nested inside another parked word, stays in a frame slot instead of being parked on the data stack and read back with pop/push |
+| `stack-spill-reuse` | a parked word that has later readers is not read back from the stack while a register still holds it |
 | `tight-homes` | home intervals stay whole-function instead of narrowing to the live range (stage 1 of the ranging arc, ADR 0027) |
 | `call-split` | no call-bounded live-range splitting |
 | `cs-evict` | a call-split tenant never displaces an incumbent |

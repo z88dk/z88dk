@@ -1248,7 +1248,13 @@ static void commit_hl_word(FILE *out, const Func *f, int v)
        destination symbol-address was pr_stack-homed: the dst's `ld hl,_sym`
        clobbered HL holding the source, but the stale cache let the source load
        cache-hit and skip its reload → a self-copy. */
-    if (v >= 0 && vreg_is_pr_stack(f, v)) { invalidate_hl_cache(); return; }
+    if (v >= 0 && vreg_is_pr_stack(f, v)) {
+        invalidate_hl_cache();
+        /* A word with later readers is still in HL after its push; they may use
+           it, and the last reader pops regardless of any belief. */
+        if (park_more_reads(v)) cache_hl(v);
+        return;
+    }
     cache_hl(v);
     g_def_vreg = v; g_def_epoch = g_de_epoch;
 }

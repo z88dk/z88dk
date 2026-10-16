@@ -3873,7 +3873,7 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
     /* The vm1's `ld hl,(de)` already keeps an address in registers across the
        load, so a park there is pure overhead. */
     int multi = !opt_disabled("stack-spill-multi") && !IS_KR580VM1();
-    typedef struct { int vreg, flo, fhi, nuse, use[STACK_SPILL_MAX_USES], depth; } SCand;
+    typedef struct { int vreg, flo, fhi, nuse, use[STACK_SPILL_MAX_USES], depth, bb, dropped; } SCand;
     SCand *cand = calloc((size_t)f->n_vregs, sizeof(SCand));
     SpillShape *sh = compute_spill_shapes(f);
     if (!cand || !sh) { free(cand); free(sh); return; }
@@ -3972,18 +3972,6 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
                     if (u[k] >= 0 && f->vregs[u[k]].width > 2) wide = 1;
             }
             if (wide) continue;
-            /* An in-place update of a frame word (`acc += x`) reaches its slot
-               with pop/push only while that slot is at TOS; a park above it
-               would turn that into a full slot access. */
-            int rmw = 0;
-            for (int j = lo + 1; j <= hi && !rmw; j++) {
-                const Op *ro = &bb->ops[j];
-                if (ro->dst >= 0 && ro->dst == ro->src[0]
-                    && f->vregs[ro->dst].width == 2
-                    && f->vreg_to_phys[ro->dst] == IR_PR_SPILL)
-                    rmw = 1;
-            }
-            if (rmw) continue;
         }
 
         /* A symbol ADDRESS whose one use is an ST_MEM base costs nothing at
@@ -4013,6 +4001,7 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
         cand[nc].flo  = bb_first_op[bb_of] + lo;
         cand[nc].fhi  = bb_first_op[bb_of] + hi;
         cand[nc].nuse = n_use_at;
+        cand[nc].bb = bb_of;
         for (int k = 0; k < n_use_at; k++) cand[nc].use[k] = use_at[k];
         nc++;
     }
@@ -4064,6 +4053,40 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
             acc[nacc++] = i;
             f->vreg_to_phys[y->vreg] = IR_PR_STACK;
             placed++;
+        }
+    }
+    /* An in-place update of a frame word (`acc += x`) reaches its slot with
+       pop/push only while nothing is parked above it. A multi-reader park that
+       is the only one over such an update costs more than it saves, so drop it;
+       where another park already covers the update the idiom is gone anyway. */
+    if (multi && acc) {
+        int changed = 1;
+        while (changed) {
+            changed = 0;
+            for (int a = 0; a < nacc; a++) {
+                SCand *y = &cand[acc[a]];
+                if (y->nuse == 1 || y->dropped) continue;
+                const BB *bb = &f->bbs[y->bb];
+                for (int fl = y->flo + 1; fl <= y->fhi && !y->dropped; fl++) {
+                    const Op *ro = &bb->ops[fl - bb_first_op[y->bb]];
+                    if (!(ro->dst >= 0 && ro->dst == ro->src[0]
+                          && f->vregs[ro->dst].width == 2
+                          && f->vreg_to_phys[ro->dst] == IR_PR_SPILL))
+                        continue;
+                    int cover = 0;
+                    for (int c = 0; c < nacc; c++) {
+                        const SCand *x = &cand[acc[c]];
+                        if (!x->dropped && x->nuse > 1 && x->bb == y->bb
+                            && x->flo <= fl && fl <= x->fhi)
+                            cover++;
+                    }
+                    if (cover < 2) {
+                        y->dropped = 1;
+                        f->vreg_to_phys[y->vreg] = IR_PR_SPILL;
+                        placed--; changed = 1;
+                    }
+                }
+            }
         }
     }
     free(acc);

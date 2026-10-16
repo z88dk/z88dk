@@ -163,17 +163,31 @@ static int stack_parked(int vreg_id)
 }
 
 /* Index of the last op in this BB that reads vreg v (-1 if none). */
-static int park_last_use(int v)
+static int park_last_use(int v, int *nreads)
 {
     int last = -1;
+    *nreads = 0;
     if (!cur_bb) return last;
-    for (int j = cur_op_idx + 1; j < cur_bb->n_ops; j++) {
+    /* A parked word is local to the BB and defined before any read, so scan
+       it all: the push may be emitted after its defining op (lazy spill). */
+    for (int j = 0; j < cur_bb->n_ops; j++) {
         int u[16];
         int n = ir_op_uses(&cur_bb->ops[j], u, (int)(sizeof u / sizeof u[0]));
         for (int k = 0; k < n; k++)
-            if (u[k] == v) last = j;
+            if (u[k] == v) { last = j; (*nreads)++; }
     }
     return last;
+}
+
+/* The top park is v and a later op still reads it. */
+static int park_more_reads(int v)
+{
+    /* The 8085's `ld de,sp+n` slot access is cheaper than holding the word. */
+    return !opt_disabled("stack-spill-reuse") && !opt_disabled("stack-spill-multi")
+        && !IS_8085()
+        && L.n_park > 0 && L.park_v[L.n_park - 1] == v
+        && L.park_nreads[L.n_park - 1] > 1
+        && cur_op_idx < L.park_last[L.n_park - 1];
 }
 
 /* Read the top park into register `reg`: the last reader takes the word, an
@@ -197,6 +211,13 @@ static void park_read(FILE *out, const Func *f, int v, const char *reg)
    when the op that owned the read comes up: drop the dead word before it. */
 static void park_drop_dead(FILE *out, int op_idx)
 {
+    /* The op that reads a park for the last time must go through the loader,
+       which takes the word: a register belief would let it skip the pop. */
+    for (int k = 0; k < L.n_park; k++) {
+        if (L.park_last[k] != op_idx) continue;
+        if (L.rs.hl == L.park_v[k]) invalidate_hl_cache();
+        if (L.rs.de == L.park_v[k]) invalidate_de_cache();
+    }
     while (L.n_park > 0 && L.park_last[L.n_park - 1] < op_idx
            && L.cur_sp_adjust == L.park_adj[L.n_park - 1]) {
         emit_sp(out, -2, "inc\tsp");
@@ -213,7 +234,7 @@ static void park_note_push(int v)
     if (L.n_park < PARK_MAX) {
         L.park_v[L.n_park] = v;
         L.park_adj[L.n_park] = L.cur_sp_adjust;
-        L.park_last[L.n_park] = park_last_use(v);
+        L.park_last[L.n_park] = park_last_use(v, &L.park_nreads[L.n_park]);
         L.n_park++;
     }
 }
@@ -524,7 +545,8 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        can't skip the balancing pop (which would leak the pushed word). Valid only
        when it is actually TOS: sp_adj==0 and it's the resident park (the allocator
        forbids calls / other stack ops between def and use). */
-    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id) && sp_adj == 0) {
+    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id) && sp_adj == 0
+        && !(park_more_reads(vreg_id) && hl_has(vreg_id))) {
         park_read(out, f, vreg_id, "hl");
         hl_about_to_change(vreg_id);
         return;
@@ -940,7 +962,8 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
     /* Stack-transient spill parked at TOS: pop straight into DE (its single use).
        Checked FIRST — before the DE-cache hit — so a stale cache_de(dst) can't
        skip the balancing pop. Doesn't disturb HL. See load_to_hl_adj. */
-    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)) {
+    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)
+        && !(park_more_reads(vreg_id) && de_has(vreg_id))) {
         park_read(out, f, vreg_id, "de");
         cache_de(vreg_id);
         return;
@@ -1184,7 +1207,8 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
        exactly this function's contract. Checked FIRST (before the DE-cache hit)
        so a stale cache_de(dst) can't skip the balancing pop. (The generic push-hl
        path below would shove HL on top of the park and pop the wrong word.) */
-    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)) {
+    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)
+        && !(park_more_reads(vreg_id) && de_has(vreg_id))) {
         park_read(out, f, vreg_id, "de");
         cache_de(vreg_id);
         return;
