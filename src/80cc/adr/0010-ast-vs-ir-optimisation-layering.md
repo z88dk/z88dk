@@ -42,8 +42,8 @@ a deliberate layering, not redundancy to remove.
    arithmetic that lowering synthesises (IR).
 
 (The classic *AST-direct code generator* was retired in favour of the IR pipeline
-— see the header of `ast_codegen2.c` — but that was the codegen *walker*, not the
-AST *optimiser*. `ast_opt` is independent of it and remains in active use.)
+but that was the codegen *walker*, not the AST *optimiser*. `ast_opt` is
+independent of it and remains in active use.)
 
 ## Consequences
 

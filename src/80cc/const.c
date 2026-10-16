@@ -1,9 +1,4 @@
-/*
- *      Small C+ Compiler
- *      Split into parts 3/3/99 djm
- *
- *      This part deals with the evaluation of a constant
- */
+/* Constant evaluation: numbers, strings, sizeof, offsetof, float encoding */
 
 #include "ccdefs.h"
 #include "tokeniser.h"
@@ -48,10 +43,6 @@ static void dofloat_am9511(double raw, unsigned char fa[]);
 static void decompose_float(double raw, struct fp_decomposed *fs);
 
 
-/* Modified slightly to sort have two pools - one for strings and one
- * for doubles..
- */
-
 int constant(LVALUE* lval)
 {
     int32_t val;
@@ -81,17 +72,9 @@ int constant(LVALUE* lval)
     return (0);
 }
 
-/* Parse a float / fixed-point literal. Tokeniser-driven: TK_FLOAT
-   carries the parsed wide-precision value and the suffix-derived
-   kind (DOUBLE / FLOAT16 / ACCUM16 / ACCUM32). Returns 0 for any
-   other token.
-
-   Consumes leading +/- like number() does, so `+1.5` / `-1.5` /
-   `+6.10352e-5` parse as a single signed float literal. Without
-   this, `number()` would eat the `+`/`-` first (because constant()
-   tries fnumber before number) then fail when it sees TK_FLOAT,
-   leaving the parser stranded mid-literal. Restores lptr on
-   non-float token so number() / pstr() can still take it. */
+/* Parse a float / fixed-point literal from TK_FLOAT, consuming leading +/-
+   (number() would otherwise eat the sign and strand the parser). lptr is
+   restored on any other token so number() / pstr() can still take it. */
 int fnumber(LVALUE *lval)
 {
     int klptr = lptr;
@@ -128,19 +111,9 @@ int fnumber(LVALUE *lval)
 }
 
 
-/* Parse an integer literal. Tokeniser-driven: TK_NUMBER carries
-   the value (any base — decimal/hex/0b binary/octal), the suffix-
-   derived signedness, and the kind (INT/LONG/LONGLONG, magnitude-
-   promoted by the lexer). All suffix work — U/L/LL/S — is done
-   by lex_int_suffix in tokeniser.c. Float/fixed-point suffixes
-   (f/f16/hk/k/lk) are not our problem: fnumber() handles them
-   via TK_FLOAT, and constant() calls fnumber() before number().
-
-   Leading unary +/- is consumed at the character level so a
-   literal-with-sign like `-42` still produces a single TK_NUMBER
-   payload. (Unary +/- in expression context is handled by the
-   expression machinery; this is the legacy embedded-sign path
-   that sccz80's number() has always supported.) */
+/* Parse an integer literal from TK_NUMBER (any base; suffix and kind are
+   settled by the tokeniser). Consumes a leading +/- at the character level
+   so `-42` is one literal. */
 int number(LVALUE *lval)
 {
     int minus = 1;
@@ -241,19 +214,14 @@ int pstr(LVALUE *lval)
     return 1;
 }
 
-/* Scan in literals within function into temporary buffer and then
- * check to see if present elsewhere, if so do the merge as for doubles
- */
-
+/* Read a string literal into tempq and merge it with an identical earlier one */
 int tstr(int32_t* val)
 {
     if (tk_peek_kind_at_lptr() != TK_STRING)
         return 0;
     int n = 0;
-    /* C99 adjacent-literal concat across lines: the tokeniser only
-       concats within one fed line (its buffer doesn't refill mid-
-       lex). Walk consecutive TK_STRING tokens at the parser level,
-       letting blanks()/vinline pull more input between iterations. */
+    /* Adjacent literals concatenate across lines; the tokeniser only joins
+       them within one fed line, so walk the TK_STRING tokens here. */
     do {
         Token *tok = tk_peek(current_tokeniser, 0);
         int tlen = tok->text_len;
@@ -270,35 +238,23 @@ int tstr(int32_t* val)
     return storeq(n + 1, tempq, val);
 }
 
-/*
- * Messed around with 5/5/99 djm to allow queues to start from 1
- * internally, but to the asm file show it to start from 0
- */
-
+/* Literal queue indices start at 1 internally (miniprintf scan relies on it)
+   and at 0 in the asm. */
 int storeq(int length, unsigned char* queue, int32_t* val)
 {
     int j, k, len;
-    /* Have stashed it in our temporary queue, we know the length, so lets
-    * get checking to see if one exactly the same has already been placed
-    * in there...
-    */
     k = length;
-    len = litptr - k; /* Amount of leeway to search through.. */
-    j = 1; /* Literal queue starts from 1 not 0 now
-                         * this allows scan for miniprintf to work
-                         * correctly
-                         */
+    len = litptr - k;
+    j = 1;
     while (len >= j) {
         if (strncmp((char*)queue, (char*)litq + j, k) == 0) {
             *val = j - 1;
             return (1);
-        } /*success!*/
+        }
         j++;
     }
-    /* If we get here, then dump it in the queue as per normal... */
     *val = (int32_t)litptr - 1;
     for (j = 0; j < k; j++) {
-        /* Have to dump it in our special queue here for function literals */
         if ((litptr + 1) >= FNMAX) {
             errorfmt("Literal Queue Overflow", 1);
         }
@@ -314,8 +270,7 @@ int qstr(double *val)
         return -1;
     *val = gltptr;
     int cnt = 0;
-    /* C99 adjacent-literal concat across lines — same loop pattern
-       as tstr, but stowing into the global literal queue. */
+    /* adjacent literals concatenate, as in tstr */
     do {
         Token *tok = tk_peek(current_tokeniser, 0);
         for (int i = 0; i < tok->text_len; i++) {
@@ -364,8 +319,6 @@ void offset_of(LVALUE *lval)
                         tag = ptr->ctype->ptr->tag;
                     } else if ( ptr->ctype->kind == KIND_STRUCT ) {
                         tag = ptr->ctype->tag;
-                    } else {
-//                        printf("%d\n",ptr->type);
                     }
                 }
             }
@@ -691,14 +644,8 @@ static void dofloat_ieee(double raw, unsigned char fa[])
         uint32_t fp_value = 0;
 
         decompose_float(raw, &fs);
-        
-        // Bundle up mantissa
         fp_value = ( ( (uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16))  & 0x007fffff;
-
-        // And now the exponent
         fp_value |= (((uint32_t)fs.exponent) << 23);
-
-        // And the sign bit
         fp_value |= fs.sign ? 0x80000000 : 0x00000000;
         pack32bit_float(fp_value, fa);
     }
@@ -729,16 +676,8 @@ static void dofloat_ieee16(double raw, unsigned char fa[])
 
         c_fp_exponent_bias = saved_exp;
         c_fp_mantissa_bytes = saved_mant;
-        
-
-
-        // Bundle up mantissa - it's only 10 bits
         fp_value = ((((uint32_t)fs.mantissa[6]) << 3) |  ((((uint32_t)fs.mantissa[5]) >> 5 ) & 0x07) ) & 0x3ff  ;
-
-        // And now the exponent
         fp_value |= (((uint32_t)fs.exponent) << 10) & 0x7fc0;
-
-        // And the sign bit
         fp_value |= fs.sign ? 0x8000 : 0x0000;
         fa[0] = fp_value & 0xff;
         fa[1] = (fp_value & 0xff00) >> 8;
@@ -751,14 +690,8 @@ static void dofloat_mbfs(double raw, unsigned char fa[])
     uint32_t fp_value = 0;
 
     decompose_float(raw, &fs);
-
-    // Bundle up mantissa
     fp_value = ( ( (uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16))  & 0x007fffff;
-
-    // And now the exponent
     fp_value |= (((uint32_t)fs.exponent) << 24);
-
-    // And the sign bit
     fp_value |= fs.sign ? 0x00800000 : 0x00000000;
     pack32bit_float(fp_value, fa);
 }
@@ -770,14 +703,8 @@ static void dofloat_am9511(double raw, unsigned char fa[])
 
     if ( raw != 0.0 ) {
         decompose_float(raw, &fs);
-
-        // Bundle up mantissa
         fp_value = (((uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16)) | 0x00800000;
-
-        // And now the exponent
         fp_value |= ((((uint32_t)fs.exponent) << 24) & 0x7f000000);
-
-        // And the sign bit
         fp_value |= fs.sign ? 0x80000000 : 0x00000000;
     }
     pack32bit_float(fp_value, fa);

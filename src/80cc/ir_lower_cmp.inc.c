@@ -1328,16 +1328,32 @@ static int tbac_on(void)
 static void emit_z80n_barrel_shift(FILE *out, Func *f, const Op *op,
                                    const char *mnem)
 {
-    load_binop_operands(out, f, op);         /* HL=value, DE=count */
-    int bc_live = (L.rs.bc >= 0);
-    if (bc_live) emit(out, "push\tbc");
-    emit(out, "ld\tb,e");
-    emit_ex_de_hl(out);                      /* DE=value */
+    int bc_live;
+    /* Constant value: count to B, constant straight into DE. */
+    const Op *cd = (g_hc.remat_def && op->src[0] >= 0
+                    && op->src[0] < f->n_vregs) ? g_hc.remat_def[op->src[0]]
+                                                : NULL;
+    if (cd && cd->kind == IR_LD_IMM && !opt_disabled("shift-const-bsxa")) {
+        bc_live = (L.rs.bc >= 0);
+        int cnt_de = de_has(op->src[1]);
+        if (cnt_de) ss_note_cache_read(f, op->src[1]);
+        else load_to_hl(out, f, op->src[1]);
+        if (bc_live) emit(out, "push\tbc");
+        emit(out, cnt_de ? "ld\tb,e" : "ld\tb,l");
+        emit(out, "ld\tde,%lld", (long long)cd->imm);
+    } else {
+        load_binop_operands(out, f, op);     /* HL=value, DE=count */
+        bc_live = (L.rs.bc >= 0);
+        if (bc_live) emit(out, "push\tbc");
+        emit(out, "ld\tb,e");
+        emit_ex_de_hl(out);                  /* DE=value */
+    }
     emit(out, "%s\tde,b", mnem);
     if (bc_live) emit(out, "pop\tbc");
     invalidate_hl_cache();
     invalidate_de_cache();
     if (!bc_live) invalidate_bc_cache();
+    if (barrel_push_fuse(out, f, op)) return;
     if (vreg_is_pr_de(f, op->dst)) {
         cache_de(op->dst);
         return;

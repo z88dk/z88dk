@@ -11,6 +11,7 @@
  * z80 only — other CPUs abort at lower_unit.
  */
 
+#define PARK_MAX 8   /* nested IR_PR_STACK parks in one BB */
 #include "ccdefs.h"     /* real KIND_* / function-modifier flags / c_banked_style
                            — sets DEFINE_H so ir.h uses the actual enum */
 #include "ir_lower.h"
@@ -111,26 +112,22 @@ typedef struct {
        slot reads add this to compensate. Reset per BB. Stack-consuming helpers
        (l_long_or/add) pop their RHS with no IR_POP — gen_hcall decrements it. */
     int cur_sp_adjust;
-    /* Stack-transient spill (IR_PR_STACK): the vreg whose value is currently
-       push-parked at TOS (via `push hl` at its def), or -1. Its single use pops
-       it. cur_sp_adjust is held +2 while it's parked so intervening sp-relative
-       slot accesses stay correct. Allocator guarantees these ranges are disjoint
-       within a BB (one parked at a time), so a single slot suffices. Reset per
-       BB alongside cur_sp_adjust. */
-    int cur_stack_resident;
-    /* cur_sp_adjust captured right after the park's `push hl`. The pop is valid
-       only while the parked word is still at TOS — cur_sp_adjust unchanged since
-       (nothing else pushed on top). stack_parked() checks this; on mismatch the
+    /* Stack-transient spill (IR_PR_STACK): the vregs whose values are currently
+       push-parked, outermost first, each with cur_sp_adjust captured right after
+       its `push`. cur_sp_adjust is held +2 per park so intervening sp-relative
+       slot accesses stay correct. A park is readable only while it is the top
+       entry and nothing else was pushed since (stack_parked()); on mismatch the
        read falls through to require_slot (a loud abort, never a silent wrong
-       pop). */
-    int cur_stack_resident_spadj;
+       pop). The allocator guarantees the ranges nest, so reads find their park
+       at TOS. Reset per BB alongside cur_sp_adjust. */
+    int park_v[PARK_MAX], park_adj[PARK_MAX], park_last[PARK_MAX], park_nreads[PARK_MAX], n_park;
     /* [IR_PARK_VERIFY] Shadow stack depth counted from the EMITTED TEXT, not
        from cur_sp_adjust. Only ~24 of 218 pushes go through emit_sp, so
        cur_sp_adjust cannot see the lowerings that use push/pop as scratch —
        which is exactly the interleaving that makes a park unsafe. pv_depth
        counts every push/pop vemit renders; pv_park_depth is the depth the
        parked word sits at (-1 = no park). Verifier only; no codegen effect. */
-    int pv_depth, pv_park_depth, pv_park_vreg;
+    int pv_depth, pv_pd[PARK_MAX], pv_pv[PARK_MAX], pv_n, pv_next_vreg;
     int pv_expect_push, pv_expect_pop;
     /* NO_SLOT byte emergency spill via AF (replaces the old below-sp `ld
        (ix-(frame+1)),a` / sp-1 write). When a slotless byte in A must survive an
@@ -154,6 +151,10 @@ typedef struct {
        global word load, cleared by any line that may write HL or memory. */
     int hlm_on, hlm_off;
     SYMBOL *hlm_sym;
+    /* HL holds the ADDRESS `_hla_sym + hla_off` (left by a folded constant store
+       to a global); dropped by any emitted line that may write HL. */
+    int hla_on, hla_off;
+    SYMBOL *hla_sym;
     SYMBOL **bb_hlm_sym; int *bb_hlm_off; char *bb_sw_target;
     /* B/C and D/E byte homes have independent residency. B/C homes are
        slotless and never dirty; D/E homes are slot-backed and may be dirty
@@ -355,6 +356,8 @@ static void byte_remat_symstr(char *buf, size_t n, const Op *o)
 
 static int sdccdecl_byte_const_enabled(void);
 static void emit_byte_remat_to_a(FILE *out, const Op *o);
+static int rmw_chain_to_store(const Func *f, const BB *bb, int start, int vreg,
+                              SYMBOL *sym, int off);
 static int byte_call_only_sdccdecl(const Func *f, int v);
 static const Op *byte_imm_origin(const Func *f, int v, int depth);
 
@@ -365,8 +368,6 @@ static LowerState L = {
     .cur_func_ehome = -1,
     .cur_home_region_lo = -1, .cur_home_region_hi = -1,
     .cur_home_exit_flush_bb = -1, .pending_spill_v = -1,
-    .cur_stack_resident = -1,
-    .pv_park_depth = -1, .pv_park_vreg = -1,
 };
 
 
@@ -845,25 +846,33 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
             if (d > 0) {
                 L.pv_depth++;
                 if (L.pv_expect_push) {          /* this push IS the park */
-                    L.pv_park_depth = L.pv_depth;
-                    L.pv_park_vreg  = L.cur_stack_resident;
+                    if (L.pv_n < PARK_MAX) {
+                        L.pv_pd[L.pv_n] = L.pv_depth;
+                        L.pv_pv[L.pv_n] = L.pv_next_vreg;
+                        L.pv_n++;
+                    }
                     L.pv_expect_push = 0; pv_parks++;
                 }
             } else if (d < 0) {
-                if (L.pv_expect_pop) {           /* the park's designated pop */
-                    if (L.pv_depth != L.pv_park_depth) {
+                if (L.pv_expect_pop) {           /* a park's designated pop */
+                    if (L.pv_n > 0 && L.pv_depth != L.pv_pd[L.pv_n - 1]) {
                         pv_depth_bad++;
                         fprintf(stderr, "PARK_DEPTH fn=%s v%d parked_at=%d popped_at=%d\n",
                                 (cur_lazy_func && cur_lazy_func->fn) ? ir_sym_name(cur_lazy_func->fn) : "?",
-                                L.pv_park_vreg, L.pv_park_depth, L.pv_depth);
+                                L.pv_pv[L.pv_n - 1], L.pv_pd[L.pv_n - 1], L.pv_depth);
                     }
-                    L.pv_park_depth = -1; L.pv_park_vreg = -1; L.pv_expect_pop = 0;
-                } else if (L.pv_park_depth >= 0 && L.pv_depth == L.pv_park_depth) {
-                    pv_steal++;                  /* somebody else took the park */
-                    fprintf(stderr, "PARK_STEAL fn=%s v%d at_depth=%d by: %s\n",
-                            (cur_lazy_func && cur_lazy_func->fn) ? ir_sym_name(cur_lazy_func->fn) : "?",
-                            L.pv_park_vreg, L.pv_depth, buf);
-                    L.pv_park_depth = -1; L.pv_park_vreg = -1;
+                    if (L.pv_n > 0) L.pv_n--;
+                    L.pv_expect_pop = 0;
+                } else {
+                    for (int k = 0; k < L.pv_n; k++) {
+                        if (L.pv_depth != L.pv_pd[k]) continue;
+                        pv_steal++;              /* somebody else took the park */
+                        fprintf(stderr, "PARK_STEAL fn=%s v%d at_depth=%d by: %s\n",
+                                (cur_lazy_func && cur_lazy_func->fn) ? ir_sym_name(cur_lazy_func->fn) : "?",
+                                L.pv_pv[k], L.pv_depth, buf);
+                        L.pv_n = k;
+                        break;
+                    }
                 }
                 L.pv_depth--;
             }
@@ -914,6 +923,14 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
         vsnprintf(hb, sizeof hb, fmt, ap3);
         va_end(ap3);
         if (!hlm_line_keeps(hb)) L.hlm_on = 0;
+    }
+    if (L.hla_on) {
+        char hb[128];
+        va_list ap4; va_copy(ap4, ap);
+        vsnprintf(hb, sizeof hb, fmt, ap4);
+        va_end(ap4);
+        InstrEffects e = instr_effects(hb);
+        if (e.unknown || (e.writes & IR_R_HL)) L.hla_on = 0;
     }
     fputc('\t', out);
     vfprintf(out, fmt, ap);
@@ -1703,7 +1720,8 @@ static int de_fwd_walk(char **lines, int n, int start, int d_live, int e_live,
            found by dumping the window at a disagreement, and the reason the
            park@23 site in bitfieldbench is genuinely dead.) */
         if ((e.d_read && d_live) || (e.e_read && e_live)) {
-            if (readerp) *readerp = j; return 1;
+            if (readerp) *readerp = j;
+            return 1;
         }
         /* [de-ret] A return that does not read DE ends this path with the
            value unread — the walk must agree with the backward sweep, or it
@@ -2353,451 +2371,6 @@ static int deflow_enabled(void)
     return !opt_disabled("de-flow");
 }
 
-/* [local-rmw] The GBZ80 route keeps the RMW address and replacement word on
-   the hardware stack while the accumulator is updated in HL. The exact match,
-   stack offsets and dead-A/F gates preserve the measured sequence assumptions. */
-static int local_rmw_enabled(void)
-{
-    return !opt_disabled("local-rmw")
-        && !opt_disabled("gbz80-rmw");     /* compatibility alias */
-}
-
-static int gbz80_rmw_sp_pair_off(char **lines, int at, int *off)
-{
-    int n;
-    char want[64];
-    if (at < 0 || sscanf(lines[at], "\tld\thl,%d", &n) != 1
-        || n < 0 || n > 65535
-        || strcmp(lines[at + 1], "\tadd\thl,sp\n"))
-        return 0;
-    if (snprintf(want, sizeof want, "\tld\thl,%d\n", n) >= (int)sizeof want
-        || strcmp(lines[at], want))
-        return 0;
-    *off = n;
-    return 1;
-}
-
-/* The 48-line pre-copt shape emitted for localbench's frame-resident word
-   RMW. Six stack-slot addresses are parameterised; all other text must match
-   exactly so the replacement cannot drift into a nearby sequence. */
-static int gbz80_rmw_stack_match(char **lines, int n, const char *drop,
-                                 int end, int *acc_off)
-{
-    static const char *shape[48] = {
-        "\tex\tde,hl\n", NULL, "\tadd\thl,sp\n",
-        "\tld\t(hl),e\n", "\tinc\thl\n", "\tld\t(hl),d\n",
-        "\tld\thl,de\n", "\tld\ta,(hl+)\n", "\tld\th,(hl)\n",
-        "\tld\tl,a\n", "\tex\tde,hl\n", NULL,
-        "\tadd\thl,sp\n", "\tld\t(hl),e\n", "\tinc\thl\n",
-        "\tld\t(hl),d\n", "\tld\thl,de\n", "\tex\tde,hl\n", NULL,
-        "\tadd\thl,sp\n", "\tld\ta,(hl+)\n", "\tld\th,(hl)\n",
-        "\tld\tl,a\n", "\tadd\thl,de\n", "\tex\tde,hl\n", NULL,
-        "\tadd\thl,sp\n", "\tld\t(hl),e\n", "\tinc\thl\n",
-        "\tld\t(hl),d\n", NULL, "\tadd\thl,sp\n",
-        "\tld\ta,(hl+)\n", "\tld\th,(hl)\n", "\tld\tl,a\n",
-        "\tadd\thl,bc\n", "\tld\ta,h\n", "\tand\t63\n",
-        "\tld\th,a\n", "\tex\tde,hl\n", NULL,
-        "\tadd\thl,sp\n", "\tld\ta,(hl+)\n", "\tld\th,(hl)\n",
-        "\tld\tl,a\n", "\tld\t(hl),e\n", "\tinc\thl\n",
-        "\tld\t(hl),d\n"
-    };
-    static const int off_at[6] = { 1, 11, 18, 25, 30, 40 };
-    int off[6], start = end - 47;
-    if (!IS_GBZ80() || start < 0 || end >= n)
-        return 0;
-    for (int k = 0; k < 48; k++) {
-        int rel = start + k;
-        if (drop[rel]) return 0;
-        if (shape[k]) {
-            if (strcmp(lines[rel], shape[k])) return 0;
-        } else {
-            int ignored;
-            if (!gbz80_rmw_sp_pair_off(lines, rel, &ignored)) return 0;
-        }
-    }
-    for (int k = 0; k < 6; k++)
-        if (!gbz80_rmw_sp_pair_off(lines, start + off_at[k], &off[k]))
-            return 0;
-    if (off[0] != off[5] || off[1] != off[4] || off[2] != off[3]
-        || off[2] > 123)
-        return 0;                       /* +4 stack bytes must remain encodable */
-    *acc_off = off[2];
-    return 1;
-}
-
-static int gbz80_rmw_stack_rewrite(char **lines, char *drop, int start,
-                                   int acc_off)
-{
-    static const char *replacement[26] = {
-        "\tpush\thl\n", "\tld\ta,(hl+)\n", "\tld\td,(hl)\n",
-        "\tld\te,a\n", "\tld\thl,de\n", "\tadd\thl,bc\n",
-        "\tld\ta,h\n", "\tand\t63\n", "\tld\th,a\n", "\tpush\thl\n",
-        NULL, "\tld\ta,(hl+)\n", "\tld\th,(hl)\n", "\tld\tl,a\n",
-        "\tadd\thl,de\n", "\tpush\thl\n", "\tpop\tde\n", NULL,
-        "\tld\t(hl),e\n", "\tinc\thl\n", "\tld\t(hl),d\n",
-        "\tpop\tde\n", "\tpop\thl\n", "\tld\t(hl),e\n",
-        "\tinc\thl\n", "\tld\t(hl),d\n"
-    };
-    char *fresh[26] = { 0 };
-    char buf[64];
-    if (acc_off < 0 || acc_off > 123) return 0;
-    for (int k = 0; k < 26; k++) {
-        if (replacement[k]) fresh[k] = strdup(replacement[k]);
-        else {
-            snprintf(buf, sizeof buf, "\tld\thl,sp+%d\n", acc_off + 4);
-            fresh[k] = strdup(buf);
-        }
-        if (!fresh[k]) {
-            for (int j = 0; j < 26; j++) free(fresh[j]);
-            return 0;
-        }
-    }
-    drop[start] = 1;                  /* the old EX swapped away the address in HL */
-    for (int k = 0; k < 26; k++) {
-        free(lines[start + 1 + k]);
-        lines[start + 1 + k] = fresh[k];
-    }
-    for (int k = 27; k < 48; k++) drop[start + k] = 1;
-    return 1;
-}
-
-/* [local-rmw] Exact pre-copt localbench/scratch loop bodies for the
-   measured SP backends. These routes avoid frame-slot round trips by keeping
-   the array pointer and replacement word on the hardware stack. 8085 is
-   intentionally excluded: its measured byte cost grew. */
-static const char *local_rmw_shape_z80[] = {
-    "\tld\thl,2\n",
-    "\tadd\thl,sp\n",
-    "\tadd\thl,de\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,34\n",
-    "\tadd\thl,sp\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-    "\tex\tde,hl\n",
-    "\tld\ta,(hl+)\n",
-    "\tld\th,(hl)\n",
-    "\tld\tl,a\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,36\n",
-    "\tadd\thl,sp\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-    "\tex\tde,hl\n",
-    "\tex\tde,hl\n",
-    "\tpop\thl\n",
-    "\tadd\thl,de\n",
-    "\tpush\thl\n",
-    "\tld\thl,36\n",
-    "\tadd\thl,sp\n",
-    "\tld\ta,(hl+)\n",
-    "\tld\th,(hl)\n",
-    "\tld\tl,a\n",
-    "\tadd\thl,bc\n",
-    "\tld\ta,h\n",
-    "\tand\t63\n",
-    "\tld\th,a\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,34\n",
-    "\tadd\thl,sp\n",
-    "\tld\ta,(hl+)\n",
-    "\tld\th,(hl)\n",
-    "\tld\tl,a\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-};
-
-static const char *local_rmw_shape_ez80[] = {
-    "\tld\thl,2\n",
-    "\tadd\thl,sp\n",
-    "\tadd\thl,de\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,34\n",
-    "\tadd\thl,sp\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,(hl)\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,36\n",
-    "\tadd\thl,sp\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-    "\tex\tde,hl\n",
-    "\tex\tde,hl\n",
-    "\tpop\thl\n",
-    "\tadd\thl,de\n",
-    "\tpush\thl\n",
-    "\tld\thl,36\n",
-    "\tadd\thl,sp\n",
-    "\tld\ta,(hl+)\n",
-    "\tld\th,(hl)\n",
-    "\tld\tl,a\n",
-    "\tadd\thl,bc\n",
-    "\tld\ta,h\n",
-    "\tand\t63\n",
-    "\tld\th,a\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,34\n",
-    "\tadd\thl,sp\n",
-    "\tld\ta,(hl+)\n",
-    "\tld\th,(hl)\n",
-    "\tld\tl,a\n",
-    "\tld\t(hl),de\n",
-};
-
-static const char *local_rmw_shape_8080[] = {
-    "\tld\thl,2\n",
-    "\tadd\thl,sp\n",
-    "\tadd\thl,de\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,34\n",
-    "\tadd\thl,sp\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-    "\tex\tde,hl\n",
-    "\tld\ta,(hl+)\n",
-    "\tld\th,(hl)\n",
-    "\tld\tl,a\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,36\n",
-    "\tadd\thl,sp\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-    "\tex\tde,hl\n",
-    "\tex\tde,hl\n",
-    "\tpop\thl\n",
-    "\tpush\thl\n",
-    "\tadd\thl,de\n",
-    "\tpop\tde\n",
-    "\tpush\thl\n",
-    "\tld\thl,36\n",
-    "\tadd\thl,sp\n",
-    "\tld\ta,(hl+)\n",
-    "\tld\th,(hl)\n",
-    "\tld\tl,a\n",
-    "\tadd\thl,bc\n",
-    "\tld\ta,h\n",
-    "\tand\t63\n",
-    "\tld\th,a\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,34\n",
-    "\tadd\thl,sp\n",
-    "\tld\ta,(hl+)\n",
-    "\tld\th,(hl)\n",
-    "\tld\tl,a\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-};
-
-static const char *local_rmw_shape_vm1[] = {
-    "\tld\thl,2\n",
-    "\tadd\thl,sp\n",
-    "\tadd\thl,de\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,34\n",
-    "\tadd\thl,sp\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-    "\tex\tde,hl\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,(de)\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,36\n",
-    "\tadd\thl,sp\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-    "\tex\tde,hl\n",
-    "\tex\tde,hl\n",
-    "\tpop\thl\n",
-    "\tpush\thl\n",
-    "\tadd\thl,de\n",
-    "\tpop\tde\n",
-    "\tpush\thl\n",
-    "\tld\thl,36\n",
-    "\tadd\thl,sp\n",
-    "\tld\ta,(hl+)\n",
-    "\tld\th,(hl)\n",
-    "\tld\tl,a\n",
-    "\tadd\thl,bc\n",
-    "\tld\ta,h\n",
-    "\tand\t63\n",
-    "\tld\th,a\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,34\n",
-    "\tadd\thl,sp\n",
-    "\tld\ta,(hl+)\n",
-    "\tld\th,(hl)\n",
-    "\tld\tl,a\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-};
-
-static const char *local_rmw_shape_rabbit[] = {
-    "\tld\thl,0\n",
-    "\tadd\thl,sp\n",
-    "\tadd\thl,de\n",
-    "\tld\t(sp+32),hl\n",
-    "\tld\ta,(hl+)\n",
-    "\tld\th,(hl)\n",
-    "\tld\tl,a\n",
-    "\tld\t(sp+34),hl\n",
-    "\tex\tde,hl\n",
-    "\tadd\tiy,de\n",
-    "\tld\thl,(sp+34)\n",
-    "\tadd\thl,bc\n",
-    "\tld\ta,h\n",
-    "\tand\t63\n",
-    "\tld\th,a\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,(sp+32)\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-};
-
-static const char *local_rmw_shape_kc160[] = {
-    "\tld\thl,0\n",
-    "\tadd\thl,sp\n",
-    "\tadd\thl,de\n",
-    "\tld\t(sp+34),hl\n",
-    "\tld\ta,(hl+)\n",
-    "\tld\th,(hl)\n",
-    "\tld\tl,a\n",
-    "\tld\tde,hl\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,(sp+32)\n",
-    "\tadd\thl,de\n",
-    "\tld\t(sp+32),hl\n",
-    "\tld\thl,de\n",
-    "\tadd\thl,bc\n",
-    "\tld\ta,h\n",
-    "\tand\t63\n",
-    "\tld\th,a\n",
-    "\tex\tde,hl\n",
-    "\tld\thl,(sp+34)\n",
-    "\tld\t(hl),e\n",
-    "\tinc\thl\n",
-    "\tld\t(hl),d\n",
-};
-
-static const char *local_rmw_replace_sp[] = {
-    "\tld\thl,2\n", "\tadd\thl,sp\n", "\tadd\thl,de\n",
-    "\tpush\thl\n", "\tld\ta,(hl+)\n", "\tld\td,(hl)\n",
-    "\tld\te,a\n", "\tld\thl,de\n", "\tadd\thl,bc\n",
-    "\tld\ta,h\n", "\tand\t63\n", "\tld\th,a\n",
-    "\tpush\thl\n", "\tld\thl,4\n", "\tadd\thl,sp\n",
-    "\tld\ta,(hl+)\n", "\tld\th,(hl)\n", "\tld\tl,a\n",
-    "\tadd\thl,de\n", "\tpush\thl\n", "\tpop\tde\n",
-    "\tld\thl,4\n", "\tadd\thl,sp\n", "\tld\t(hl),e\n",
-    "\tinc\thl\n", "\tld\t(hl),d\n", "\tpop\tde\n",
-    "\tpop\thl\n", "\tld\t(hl),e\n", "\tinc\thl\n",
-    "\tld\t(hl),d\n"
-};
-
-static const char *local_rmw_replace_rabbit[] = {
-    "\tld\thl,0\n", "\tadd\thl,sp\n", "\tadd\thl,de\n",
-    "\tpush\thl\n", "\tld\ta,(hl+)\n", "\tld\th,(hl)\n",
-    "\tld\tl,a\n", "\tex\tde,hl\n", "\tadd\tiy,de\n",
-    "\tld\thl,de\n", "\tadd\thl,bc\n", "\tld\ta,h\n",
-    "\tand\t63\n", "\tld\th,a\n", "\tex\tde,hl\n",
-    "\tpop\thl\n", "\tld\t(hl),e\n", "\tinc\thl\n",
-    "\tld\t(hl),d\n"
-};
-
-static const char *local_rmw_replace_kc160[] = {
-    "\tld\thl,0\n", "\tadd\thl,sp\n", "\tadd\thl,de\n",
-    "\tpush\thl\n", "\tld\ta,(hl+)\n", "\tld\th,(hl)\n",
-    "\tld\tl,a\n", "\tld\tde,hl\n",
-    "\tld\thl,(sp+34)\n", "\tadd\thl,de\n", "\tld\t(sp+34),hl\n",
-    "\tld\thl,de\n", "\tadd\thl,bc\n", "\tld\ta,h\n",
-    "\tand\t63\n", "\tld\th,a\n", "\tex\tde,hl\n",
-    "\tpop\thl\n", "\tld\t(hl),e\n", "\tinc\thl\n",
-    "\tld\t(hl),d\n"
-};
-
-static int local_rmw_other_match(char **lines, int n, const char *drop,
-                                 int end, int *start, int *span)
-{
-    const char **shape = NULL;
-    int len = 0;
-    if ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180) {
-        shape = local_rmw_shape_z80;
-        len = (int)(sizeof local_rmw_shape_z80 / sizeof local_rmw_shape_z80[0]);
-    } else if (IS_EZ80()) {
-        shape = local_rmw_shape_ez80;
-        len = (int)(sizeof local_rmw_shape_ez80 / sizeof local_rmw_shape_ez80[0]);
-    } else if (IS_8080()) {
-        shape = local_rmw_shape_8080;
-        len = (int)(sizeof local_rmw_shape_8080 / sizeof local_rmw_shape_8080[0]);
-    } else if (IS_KR580VM1()) {
-        shape = local_rmw_shape_vm1;
-        len = (int)(sizeof local_rmw_shape_vm1 / sizeof local_rmw_shape_vm1[0]);
-    } else if (c_cpu == CPU_R2KA || c_cpu == CPU_R4K || IS_R6K()) {
-        shape = local_rmw_shape_rabbit;
-        len = (int)(sizeof local_rmw_shape_rabbit / sizeof local_rmw_shape_rabbit[0]);
-    } else if (IS_KC160()) {
-        shape = local_rmw_shape_kc160;
-        len = (int)(sizeof local_rmw_shape_kc160 / sizeof local_rmw_shape_kc160[0]);
-    }
-    if (!shape || len == 0 || end < len - 1 || end >= n) return 0;
-    int at = end - len + 1;
-    for (int k = 0; k < len; k++)
-        if (drop[at + k] || strcmp(lines[at + k], shape[k])) return 0;
-    *start = at;
-    *span = len;
-    return 1;
-}
-
-static int local_rmw_replace_span(char **lines, char *drop, int start,
-                                  int old_len, const char **replacement,
-                                  int new_len)
-{
-    char **fresh = calloc((size_t)new_len, sizeof *fresh);
-    if (!fresh) return 0;
-    for (int k = 0; k < new_len; k++) {
-        fresh[k] = strdup(replacement[k]);
-        if (!fresh[k]) {
-            for (int j = 0; j < new_len; j++) free(fresh[j]);
-            free(fresh);
-            return 0;
-        }
-    }
-    for (int k = 0; k < new_len; k++) {
-        free(lines[start + k]);
-        lines[start + k] = fresh[k];
-    }
-    free(fresh);
-    for (int k = new_len; k < old_len; k++) drop[start + k] = 1;
-    return 1;
-}
-
-static int local_rmw_other_rewrite(char **lines, char *drop, int start,
-                                   int old_len)
-{
-    const char **replacement = local_rmw_replace_sp;
-    int new_len = (int)(sizeof local_rmw_replace_sp / sizeof local_rmw_replace_sp[0]);
-    if (c_cpu == CPU_R2KA || c_cpu == CPU_R4K || IS_R6K()) {
-        replacement = local_rmw_replace_rabbit;
-        new_len = (int)(sizeof local_rmw_replace_rabbit / sizeof local_rmw_replace_rabbit[0]);
-    } else if (IS_KC160()) {
-        replacement = local_rmw_replace_kc160;
-        new_len = (int)(sizeof local_rmw_replace_kc160 / sizeof local_rmw_replace_kc160[0]);
-    }
-    return local_rmw_replace_span(lines, drop, start, old_len, replacement, new_len);
-}
-
 /* [bc-flow] Is this line a label of the form `name:` at column 0? */
 static int xline_label(const char *l, char *out, size_t n)
 {
@@ -3176,7 +2749,7 @@ static int line_reads_pair(const char *line, const char *pairname,
    uses `sbc hl,de` + an overflow-flag check instead) recomputes the flipped
    sign bit at runtime even when the operand being flipped is a compile-time
    constant (`ld de,2` — d is PROVABLY 0, so d^0x80 is PROVABLY 0x80, always,
-   for this def). Sized on examples/console/*.c (+test -clib=gbz80): 216 real
+   for this def). Sized on examples/console (+test -clib=gbz80): 216 real
    hits (probe-verified, not the informal 102 a quick script first
    estimated) across 28 files, plus 19 on the bench corpus (not corpus-only —
    real files just have far more signed-comparison-against-a-constant code).
@@ -4712,29 +4285,6 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                         continue;
                 }
             }
-            /* [local-rmw] The matched rewrite changes A/F only; both are dead at the
-               tail. Temporary pushes are balanced and the sequence boundaries
-               preserve all other live registers. */
-            int rmw_acc_off, rmw_start = 0, rmw_span = 0, rmw_kind = 0;
-            if (local_rmw_enabled() && !f_live) {
-                if (gbz80_rmw_stack_match(lines, n, drop, i, &rmw_acc_off)) {
-                    rmw_start = i - 47;
-                    rmw_span = 48;
-                    rmw_kind = 1;
-                } else if (local_rmw_other_match(lines, n, drop, i,
-                                                &rmw_start, &rmw_span)) {
-                    rmw_kind = 2;
-                }
-                if (rmw_kind) {
-                    unsigned char *seen = calloc((size_t)(n > 0 ? n : 1), 1);
-                    int a_dead = seen && !im_a_live_walk(lines, n, i + 1, seen, 0);
-                    free(seen);
-                    if (a_dead && (rmw_kind == 1
-                        ? gbz80_rmw_stack_rewrite(lines, drop, rmw_start, rmw_acc_off)
-                        : local_rmw_other_rewrite(lines, drop, rmw_start, rmw_span)))
-                        continue;
-                }
-            }
             char bftgt[64];
             InstrEffects e = instr_effects(lines[i]);   /* single query (composes bc_line_effect) */
             /* [xor-a] f_live here is the answer for the code AFTER line i,
@@ -6022,6 +5572,7 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
     if (conv) {
         long idx = 0, cand = -1;
         int cand_tgt = -1, cand_cond = 0, prev_cond_jp = 0;
+        int prev_cond_tgt = -1, cand_prev_tgt = -1;
         rewind(rout);
         while (fgets(line, sizeof line, rout)) {
             long here = idx++;
@@ -6033,7 +5584,7 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
                 continue;
             if (cand >= 0) {                      /* resolve the pending candidate */
                 int veto = 0;
-                if (cand_cond && strncmp(line, "\tjp\t", 4) == 0 && !strchr(line, ','))
+                if (cand_cond == 1 && strncmp(line, "\tjp\t", 4) == 0 && !strchr(line, ','))
                     veto = 1;                     /* invert-me pair: leave to copt */
                 if (line[0] == 'L') {             /* jump to the very next label? */
                     char *p = strstr(line, "_bb_");
@@ -6042,26 +5593,36 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
                         while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
                         if (*q == ':' && n <= max_bb) {
                             int t = (thr[n] >= 0) ? thr[n] : n;
-                            if (t == cand_tgt) veto = 1;
+                            if (cand_cond == 2) { if (t == cand_prev_tgt) veto = 1; }
+                            else if (t == cand_tgt) veto = 1;
                         }
                     }
                 }
                 if (!veto) conv[cand] = 1;
                 cand = -1;
             }
-            int this_cond_jp = 0;
+            int this_cond_jp = 0, this_tgt = -1;
             if (strncmp(line, "\tjp\t", 4) == 0) {
                 this_cond_jp = (strchr(line, ',') != NULL);
                 char rcc[8]; int rbb;
                 if (retthread_parts(line, rcc, sizeof rcc, &rbb) && rbb <= max_bb) {
                     int t = (thr[rbb] >= 0) ? thr[rbb] : rbb;
+                    this_tgt = t;
                     if (t <= max_bb && retlab[t]) {
-                        if (!rcc[0]) { if (!prev_cond_jp) conv[here] = 1; }
+                        if (!rcc[0]) {
+                            if (!prev_cond_jp) conv[here] = 1;
+                            else if (prev_cond_tgt >= 0 && !opt_disabled("ret-thread-pair")) {
+                                /* Only the next label lets copt invert the pair. */
+                                cand = here; cand_tgt = t; cand_cond = 2;
+                                cand_prev_tgt = prev_cond_tgt;
+                            }
+                        }
                         else { cand = here; cand_tgt = t; cand_cond = 1; }
                     }
                 }
             }
             prev_cond_jp = this_cond_jp;
+            prev_cond_tgt = this_cond_jp ? this_tgt : -1;
         }
         if (cand >= 0) conv[cand] = 1;            /* nothing follows: convert */
     }
@@ -9684,6 +9245,27 @@ static void confirm_word_home_pick(Func *f, const int *bb_alias)
     ir_alloc_word_home_done();
 }
 
+/* Function-wide def and use counts of vreg v. use_j (optional) receives the
+   index of the last use in block bb, or -1. */
+static void count_defs_uses(const Func *f, int v, int bb, int *ndef, int *nuse,
+                            int *use_j)
+{
+    *ndef = *nuse = 0;
+    if (use_j) *use_j = -1;
+    for (int b2 = 0; b2 < f->n_bbs; b2++)
+        for (int k = 0; k < f->bbs[b2].n_ops; k++) {
+            const Op *p = &f->bbs[b2].ops[k];
+            int df[8]; int nd = ir_op_defs(p, df, 8);
+            for (int t = 0; t < nd; t++) if (df[t] == v) (*ndef)++;
+            int us[16]; int nu = ir_op_uses(p, us, 16);
+            for (int t = 0; t < nu; t++)
+                if (us[t] == v) {
+                    (*nuse)++;
+                    if (use_j && b2 == bb) *use_j = k;
+                }
+        }
+}
+
 static int ir_lower_func_body(FILE *out, Func *f)
 {
     if (!f) {
@@ -9843,6 +9425,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
            base at all) and before dce, which reclaims the emptied ADDs. */
         (void)ir_opt_deref_offset(f);
         (void)ir_opt_conv_mask_fold(f);   /* AND(sx,mask)→zx; dce reclaims the sx */
+        (void)ir_opt_rotl_bitop(f);       /* swap(swap(x) op K) -> x op swap(K) */
+        (void)ir_opt_rmw_narrow(f);       /* word `*p |= K` touching one byte */
         int dce     = ir_opt_dce(f);
         /* Re-type promoted int ops whose result is only truncated to a
            byte as width-1 — must run after dce (fewer ops to scan, dead
@@ -9860,6 +9444,9 @@ static int ir_lower_func_body(FILE *out, Func *f)
            slot) and DCE the now-dead copies. */
         int cprop   = ir_opt_copy_prop(f);
         if (cprop) dce += ir_opt_dce(f);
+        /* A truncation of a constant that narrowing created is itself a
+           constant; fold it so every store of it is an immediate. */
+        if (!opt_disabled("cf-late") && ir_opt_const_fold(f)) dce += ir_opt_dce(f);
         /* Mark consecutive fixed-offset aggregate stores so the lowerer can
            walk one destination pointer across the chain. Run after DCE and
            copy propagation, when the final base/offset form is visible. */
@@ -9907,6 +9494,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
        after the matcher has run. Fold that final form once, outside the
        optimisation fixpoint, before vreg compaction and allocation. */
     (void)ir_opt_symidx_mem_late(f);
+    (void)ir_opt_fuse_bswap_store(f);   /* swap16 + word store -> reversed store */
+    (void)ir_opt_fuse_bswap_load(f);    /* word load + swap16 -> reversed load */
 
     /* Drop orphan vregs (abandoned builder temps — in no op slot) before the
        id-indexed analysis/allocation tables get built. Renumbers survivors;
@@ -9952,17 +9541,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 if (o->mem.volatile_ || !o->mem.sym || ns_sym_bails(o->mem.sym))
                     continue;
                 /* exactly one def + one use, use in this BB after j */
-                int ndef = 0, nuse = 0, use_j = -1;
-                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
-                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
-                        const Op *p = &f->bbs[bb2].ops[k];
-                        int df[8]; int nd = ir_op_defs(p, df, 8);
-                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
-                        int u[16]; int nu = ir_op_uses(p, u, 16);
-                        for (int t = 0; t < nu; t++) if (u[t] == d) {
-                            nuse++; if (bb2 == b) use_j = k;
-                        }
-                    }
+                int ndef, nuse, use_j;
+                count_defs_uses(f, d, b, &ndef, &nuse, &use_j);
                 if (ndef != 1 || nuse != 1 || use_j <= j) continue;
                 if (bb->live_out
                     && ir_bitset_get((const BitSet *)bb->live_out, d)) continue;
@@ -10059,19 +9639,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 /* acc-prepush pushes it at its def; its partner operand is
                    kept in the accumulator on that understanding. */
                 if (wide_prepush_target(f, bb, j, d) >= 0) continue;
-                int nuse = 0, ndef = 0, use_j = -1;
-                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
-                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
-                        const Op *p = &f->bbs[bb2].ops[k];
-                        int df[8]; int nd = ir_op_defs(p, df, 8);
-                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
-                        int us[16]; int nu = ir_op_uses(p, us, 16);
-                        for (int t = 0; t < nu; t++)
-                            if (us[t] == d) {
-                                nuse++;
-                                if (bb2 == b) use_j = k;
-                            }
-                    }
+                int ndef, nuse, use_j;
+                count_defs_uses(f, d, b, &ndef, &nuse, &use_j);
                 if (ndef != 1 || nuse != 1 || use_j <= j) continue;
                 if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, d))
                     continue;
@@ -10193,15 +9762,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 if (vreg_is_pr_dehl(f, d) || vreg_in_pr_bc(f, d)) continue;
                 if (bb->live_out
                     && ir_bitset_get((const BitSet *)bb->live_out, d)) continue;
-                int nuse = 0, ndef = 0;
-                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
-                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
-                        const Op *p = &f->bbs[bb2].ops[k];
-                        int df[8]; int nd = ir_op_defs(p, df, 8);
-                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
-                        int us[16]; int nu = ir_op_uses(p, us, 16);
-                        for (int t = 0; t < nu; t++) if (us[t] == d) nuse++;
-                    }
+                int ndef, nuse;
+                count_defs_uses(f, d, -1, &ndef, &nuse, NULL);
                 if (ndef != 1 || nuse != 1) continue;
                 /* The other operand parked on the data stack is popped by the
                    generic path only. */
@@ -10290,15 +9852,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                     continue;
                 if (bb->live_out
                     && ir_bitset_get((const BitSet *)bb->live_out, d)) continue;
-                int nuse = 0, ndef = 0;
-                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
-                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
-                        const Op *p = &f->bbs[bb2].ops[k];
-                        int df[8]; int nd = ir_op_defs(p, df, 8);
-                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
-                        int us[16]; int nu = ir_op_uses(p, us, 16);
-                        for (int t = 0; t < nu; t++) if (us[t] == d) nuse++;
-                    }
+                int ndef, nuse;
+                count_defs_uses(f, d, -1, &ndef, &nuse, NULL);
                 if (ndef != 1 || nuse != 1) continue;
                 /* A value homed in DE other than the operands and the result
                    must not be live where the add reads the global. */
@@ -10400,15 +9955,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 int dst_dead = def_dst_dead(f, bb, j + 1);
                 if (!dst_dead && !vreg_is_pr_dehl(f, u->dst)
                     && (f->vregs[u->dst].flags & IR_VREG_NO_SLOT)) continue;
-                int nuse = 0, ndef = 0;
-                for (int bb2 = 0; bb2 < f->n_bbs; bb2++)
-                    for (int k = 0; k < f->bbs[bb2].n_ops; k++) {
-                        const Op *p = &f->bbs[bb2].ops[k];
-                        int df[8]; int nd = ir_op_defs(p, df, 8);
-                        for (int t = 0; t < nd; t++) if (df[t] == d) ndef++;
-                        int us[16]; int nu = ir_op_uses(p, us, 16);
-                        for (int t = 0; t < nu; t++) if (us[t] == d) nuse++;
-                    }
+                int ndef, nuse;
+                count_defs_uses(f, d, -1, &ndef, &nuse, NULL);
                 if (ndef != 1 || nuse != 1) continue;
                 int parked = 0;
                 for (int k = 0; k < bb->n_ops && !parked; k++)
@@ -11861,8 +11409,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     if (L.bb_byte_out_dirty)
         for (int i = 0; i < f->n_bbs; i++) L.bb_byte_out_dirty[i] = 0;
     L.cur_sp_adjust = 0;
-    L.cur_stack_resident = -1;
-    L.pv_depth = 0; L.pv_park_depth = -1; L.pv_park_vreg = -1;
+    L.n_park = 0;
+    L.pv_depth = 0; L.pv_n = 0;
     L.af_park_depth = 0;
     bc_args_save_depth = 0;
     L.la.cur_stack_long_top = -1;
@@ -11960,16 +11508,16 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            is an ORPHAN: its pop was folded away and SP no longer matches
            cur_sp_adjust (fp hid it until frame addresses went through SP). */
         if (park_verify_on > 0 && rec_counting
-            && (L.cur_sp_adjust != 0 || L.cur_stack_resident >= 0))
+            && (L.cur_sp_adjust != 0 || L.n_park > 0))
             pv_orphan++;
         emit_bb_label(out, bb->id);
         /* The long data-stack is per-BB. Any push/pop imbalance at
            a BB boundary would shift sp for unrelated code. */
         L.cur_sp_adjust = 0;
-        L.cur_stack_resident = -1;   /* stack-transient never crosses a BB */
+        L.n_park = 0;                /* stack-transient never crosses a BB */
         wpp_n = 0;                   /* nor does a wide push at its def */
         dpp_n = 0; dpp_next = 0;
-        L.pv_depth = 0; L.pv_park_depth = -1; L.pv_park_vreg = -1;
+        L.pv_depth = 0; L.pv_n = 0;
         /* BC carry across the BB boundary — the exact mirror of the HL carry
            below. Previously the BC belief simply SURVIVED a boundary with no
            check, which is unsound: BC may be taken by a transient deref base or
@@ -12091,6 +11639,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            (all lowered, none a switch edge) left it. Set after the HL
            invalidation above, which does not touch the fact. */
         L.hlm_on = 0;
+        L.hla_on = 0;
         if (L.bb_hlm_sym && bb_pred_cnt[bb->id] > 0 && hlm_enabled()
             && !(L.bb_sw_target && L.bb_sw_target[bb->id])) {
             SYMBOL *ms = NULL; int mo = 0, ok = 1;
@@ -13095,6 +12644,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             }
             cur_bb = bb;
             cur_op_idx = j;
+            park_drop_dead(out, j);
             /* Byte-home lazy-spill. Two cases for the slot-backed home (E/D):
                - A non-DE-clean op may clobber E → spill + drop the belief.
                - A terminating branch to a back-edge / merge target → spill
@@ -13270,6 +12820,49 @@ static int sdccdecl_byte_const_enabled(void)
 
 /* Materialise a byte-remat source in A. Global byte loads re-issue the
    absolute memory read; constants load their low byte directly. */
+/* Can byte operand `v` be applied to A without touching HL? An immediate, a byte
+   register home, or (frame-pointer mode) a frame slot read through IX/IY. */
+static int rmw_operand_hl_free(const Func *f, int v)
+{
+    if (v < 0 || v >= f->n_vregs) return 0;
+    if (g_hc.remat_def && g_hc.remat_def[v] && g_hc.remat_def[v]->kind == IR_LD_IMM)
+        return 1;
+    if (byte_remat_of(f, v)) return 0;
+    if (byte_home_phys(f, v) != IR_PR_NONE) return 1;
+    if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    return fp_active(f) && fp_offset_fits(slot_ix_off(f, v));
+}
+
+/* Is the byte loaded into `vreg` (global `sym`+`off`) combined by a short chain
+   of byte ALU ops that touch no HL and then stored straight back to the same
+   byte? `start` is the first op of the chain. Then the whole read-modify-write
+   goes through HL: `ld hl,g` / `ld a,(hl)` ... `ld (hl),a`. */
+static int rmw_chain_to_store(const Func *f, const BB *bb, int start, int vreg,
+                              SYMBOL *sym, int off)
+{
+    if (!bb || start < 0 || opt_disabled("rmw-hl")) return 0;
+    int cur = vreg;
+    for (int k = start; k < bb->n_ops && k < start + 4; k++) {
+        const Op *o = &bb->ops[k];
+        if (o->kind == IR_ST_MEM && o->mem.kind == IR_MEM_SYM && o->mem.sym == sym
+            && o->mem.offset == off && o->src[0] == cur && !o->mem.volatile_
+            && !o->mem.bank_fn && k > start)
+            return find_unique_use(f, vreg) != NULL;
+        int alu = (o->kind == IR_AND || o->kind == IR_OR || o->kind == IR_XOR
+                   || o->kind == IR_ADD || o->kind == IR_SUB);
+        if (!alu || o->dst < 0 || f->vregs[o->dst].width != 1) return 0;
+        int comm = (o->kind != IR_SUB);
+        int other;
+        if (o->src[0] == cur) other = o->src[1];
+        else if (comm && o->src[1] == cur) other = o->src[0];
+        else return 0;
+        if (other >= 0 && !rmw_operand_hl_free(f, other)) return 0;
+        if (find_unique_use(f, cur) != o) return 0;
+        cur = o->dst;
+    }
+    return 0;
+}
+
 static void emit_byte_remat_to_a(FILE *out, const Op *o)
 {
     if (o->kind == IR_LD_IMM) {
@@ -13277,6 +12870,18 @@ static void emit_byte_remat_to_a(FILE *out, const Op *o)
     } else {
         char s[80];
         byte_remat_symstr(s, sizeof s, o);
+        /* A read-modify-write of this global: go through HL, which the store
+           back then reuses. */
+        if (o->kind == IR_LD_MEM && o->mem.kind == IR_MEM_SYM && cur_lazy_func
+            && cur_bb && cur_op_idx >= 0
+            && rmw_chain_to_store(cur_lazy_func, cur_bb, cur_op_idx, o->dst,
+                                  o->mem.sym, o->mem.offset)) {
+            hl_about_to_change(-1);
+            emit(out, "ld\thl,%s", s);
+            emit(out, "ld\ta,(hl)");
+            L.hla_on = 1; L.hla_sym = o->mem.sym; L.hla_off = o->mem.offset;
+            return;
+        }
         emit(out, "ld\ta,(%s)", s);
     }
 }

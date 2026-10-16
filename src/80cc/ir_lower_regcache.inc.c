@@ -154,12 +154,89 @@ static int vreg_is_pr_stack(const Func *f, int vreg_id)
     if (vreg_id < 0 || vreg_id >= f->n_vregs) return 0;
     return ir_home_at(f, vreg_id) == IR_PR_STACK;
 }
-/* True if vreg_id's value is currently push-parked AND still at TOS (nothing
-   pushed on top since the park — cur_sp_adjust unchanged). */
+/* True if vreg_id's value is currently push-parked AND still at TOS (the top
+   park, nothing pushed on top since — cur_sp_adjust unchanged). */
 static int stack_parked(int vreg_id)
 {
-    return vreg_id >= 0 && L.cur_stack_resident == vreg_id
-        && L.cur_sp_adjust == L.cur_stack_resident_spadj;
+    return vreg_id >= 0 && L.n_park > 0 && L.park_v[L.n_park - 1] == vreg_id
+        && L.cur_sp_adjust == L.park_adj[L.n_park - 1];
+}
+
+/* Index of the last op in this BB that reads vreg v (-1 if none). */
+static int park_last_use(int v, int *nreads)
+{
+    int last = -1;
+    *nreads = 0;
+    if (!cur_bb) return last;
+    /* A parked word is local to the BB and defined before any read, so scan
+       it all: the push may be emitted after its defining op (lazy spill). */
+    for (int j = 0; j < cur_bb->n_ops; j++) {
+        int u[16];
+        int n = ir_op_uses(&cur_bb->ops[j], u, (int)(sizeof u / sizeof u[0]));
+        for (int k = 0; k < n; k++)
+            if (u[k] == v) { last = j; (*nreads)++; }
+    }
+    return last;
+}
+
+/* The top park is v and a later op still reads it. */
+static int park_more_reads(int v)
+{
+    /* The 8085's `ld de,sp+n` slot access is cheaper than holding the word. */
+    return !opt_disabled("stack-spill-reuse") && !opt_disabled("stack-spill-multi")
+        && !IS_8085()
+        && L.n_park > 0 && L.park_v[L.n_park - 1] == v
+        && L.park_nreads[L.n_park - 1] > 1
+        && cur_op_idx < L.park_last[L.n_park - 1];
+}
+
+/* Read the top park into register `reg`: the last reader takes the word, an
+   earlier one puts it straight back so the next reader finds it at TOS. */
+static void park_read(FILE *out, const Func *f, int v, const char *reg)
+{
+    int keep = !opt_disabled("stack-spill-multi") && L.n_park > 0
+               && cur_op_idx < L.park_last[L.n_park - 1];
+    L.pv_expect_pop = 1;          /* [IR_PARK_VERIFY] this pop is the park's */
+    ss_note_reload(f, v);
+    emit_sp(out, -2, "pop\t%s", reg);
+    if (keep) {
+        L.pv_expect_push = 1; L.pv_next_vreg = v;
+        emit_sp(out, 2, "push\t%s", reg);
+    } else {
+        L.n_park--;
+    }
+}
+
+/* A read fused into an earlier op's lowering leaves its park still resident
+   when the op that owned the read comes up: drop the dead word before it. */
+static void park_drop_dead(FILE *out, int op_idx)
+{
+    /* The op that reads a park for the last time must go through the loader,
+       which takes the word: a register belief would let it skip the pop. */
+    for (int k = 0; k < L.n_park; k++) {
+        if (L.park_last[k] != op_idx) continue;
+        if (L.rs.hl == L.park_v[k]) invalidate_hl_cache();
+        if (L.rs.de == L.park_v[k]) invalidate_de_cache();
+    }
+    while (L.n_park > 0 && L.park_last[L.n_park - 1] < op_idx
+           && L.cur_sp_adjust == L.park_adj[L.n_park - 1]) {
+        emit_sp(out, -2, "inc\tsp");
+        emit(out, "inc\tsp");
+        if (L.pv_n > 0) { L.pv_n--; }
+        if (L.pv_depth > 0) L.pv_depth--;
+        L.n_park--;
+    }
+}
+
+/* A park's `push` has just been emitted via emit_sp. */
+static void park_note_push(int v)
+{
+    if (L.n_park < PARK_MAX) {
+        L.park_v[L.n_park] = v;
+        L.park_adj[L.n_park] = L.cur_sp_adjust;
+        L.park_last[L.n_park] = park_last_use(v, &L.park_nreads[L.n_park]);
+        L.n_park++;
+    }
 }
 
 static int vreg_in_pr_de(const Func *f, int vreg_id)
@@ -468,11 +545,9 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        can't skip the balancing pop (which would leak the pushed word). Valid only
        when it is actually TOS: sp_adj==0 and it's the resident park (the allocator
        forbids calls / other stack ops between def and use). */
-    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id) && sp_adj == 0) {
-        L.pv_expect_pop = 1;      /* [IR_PARK_VERIFY] this pop is the park's */
-        ss_note_reload(f, vreg_id);
-        emit_sp(out, -2, "pop\thl");
-        L.cur_stack_resident = -1;
+    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id) && sp_adj == 0
+        && !(park_more_reads(vreg_id) && hl_has(vreg_id))) {
+        park_read(out, f, vreg_id, "hl");
         hl_about_to_change(vreg_id);
         return;
     }
@@ -887,11 +962,9 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
     /* Stack-transient spill parked at TOS: pop straight into DE (its single use).
        Checked FIRST — before the DE-cache hit — so a stale cache_de(dst) can't
        skip the balancing pop. Doesn't disturb HL. See load_to_hl_adj. */
-    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)) {
-        L.pv_expect_pop = 1;      /* [IR_PARK_VERIFY] this pop is the park's */
-        ss_note_reload(f, vreg_id);
-        emit_sp(out, -2, "pop\tde");
-        L.cur_stack_resident = -1;
+    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)
+        && !(park_more_reads(vreg_id) && de_has(vreg_id))) {
+        park_read(out, f, vreg_id, "de");
         cache_de(vreg_id);
         return;
     }
@@ -1134,11 +1207,9 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
        exactly this function's contract. Checked FIRST (before the DE-cache hit)
        so a stale cache_de(dst) can't skip the balancing pop. (The generic push-hl
        path below would shove HL on top of the park and pop the wrong word.) */
-    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)) {
-        L.pv_expect_pop = 1;      /* [IR_PARK_VERIFY] this pop is the park's */
-        ss_note_reload(f, vreg_id);
-        emit_sp(out, -2, "pop\tde");
-        L.cur_stack_resident = -1;
+    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)
+        && !(park_more_reads(vreg_id) && de_has(vreg_id))) {
+        park_read(out, f, vreg_id, "de");
         cache_de(vreg_id);
         return;
     }
@@ -1264,10 +1335,9 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
        load_to_* check the park before any cache, so a caller's later cache_hl(v)
        can't skip the pop. */
     if (vreg_id >= 0 && vreg_is_pr_stack(f, vreg_id)) {
-        L.cur_stack_resident = vreg_id;
-        L.pv_expect_push = 1;     /* [IR_PARK_VERIFY] this push IS the park */
+        L.pv_expect_push = 1; L.pv_next_vreg = vreg_id;   /* [IR_PARK_VERIFY] this push IS the park */
         emit_sp(out, 2, "push\thl");
-        L.cur_stack_resident_spadj = L.cur_sp_adjust;
+        park_note_push(vreg_id);
         return;
     }
     if (fp_active(f)) {
@@ -1400,10 +1470,9 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
         return 1;
     }
     if (vreg_id >= 0 && vreg_is_pr_stack(f, vreg_id)) {
-        L.cur_stack_resident = vreg_id;
-        L.pv_expect_push = 1;     /* [IR_PARK_VERIFY] this push IS the park */
+        L.pv_expect_push = 1; L.pv_next_vreg = vreg_id;   /* [IR_PARK_VERIFY] this push IS the park */
         emit_sp(out, 2, "push\thl");            /* HL preserved by push */
-        L.cur_stack_resident_spadj = L.cur_sp_adjust;
+        park_note_push(vreg_id);
         return 1;
     }
     /* [ss-keep-hl] Lazy spill: a word call result (or other keep-HL commit)
@@ -1616,10 +1685,7 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
     /* Stack-transient word parked at TOS: pop into HL, low byte → A. Before the
        A-cache hit so a stale a_has can't skip the pop. */
     if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)) {
-        L.pv_expect_pop = 1;      /* [IR_PARK_VERIFY] this pop is the park's */
-        ss_note_reload(f, vreg_id);
-        emit_sp(out, -2, "pop\thl");
-        L.cur_stack_resident = -1;
+        park_read(out, f, vreg_id, "hl");
         emit(out, "ld\ta,l");
         cache_a(vreg_id);
         return;

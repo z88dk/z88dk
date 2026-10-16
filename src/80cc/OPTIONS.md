@@ -186,6 +186,9 @@ exists (ADR 0010).
 | `graph-alloc` | no interference-graph-driven index benefit |
 | `home-swap` | two placed homes are never exchanged even when the swap wins |
 | `stack-spill` | no parking of a value on the data stack instead of a frame slot |
+| `stack-spill-multi` | a word read more than once, or nested inside another parked word, stays in a frame slot instead of being parked on the data stack and read back with pop/push |
+| `stack-spill-reuse` | a parked word that has later readers is not read back from the stack while a register still holds it |
+| `idx-add-keep-de` | an add of a register operand into an index-register home forgets that DE still holds the operand |
 | `tight-homes` | home intervals stay whole-function instead of narrowing to the live range (stage 1 of the ranging arc, ADR 0027) |
 | `call-split` | no call-bounded live-range splitting |
 | `cs-evict` | a call-split tenant never displaces an incumbent |
@@ -272,6 +275,7 @@ exists (ADR 0010).
 | `strlen-fold` | strlen of a string literal is a call, not a constant |
 | `fabs-inline` | fabs and fabsf16 of a 32-bit IEEE, 32-bit MBF, 64-bit MBF or float16 value are a library call, not a sign bit clear |
 | `fabs-fa-clear` | fabs of a 64-bit MBF value calls the library routine, not a sign bit clear in the accumulator (--opt-code-size also calls) |
+| `shift-const-bsxa` | z80n shift of a constant by a variable count loads the constant and count via HL and DE, then swaps, instead of loading the constant straight into DE |
 | `switch-unreachable` | a switch case or default that is __builtin_unreachable still gets its compare |
 | `size-glong` | with `--opt-code-size`, a four-byte load through HL is the inline byte sequence, not `call l_glong` |
 | `call-sp-cleanup` | use `pop bc` chains instead of HL-based stack cleanup when the result does not occupy HL |
@@ -312,6 +316,21 @@ exists (ADR 0010).
 | `byte-cmp-const` | a word compare against a byte-sized constant is not narrowed |
 | `frame-byte-trunc` | a width-2 value truncated to one byte materialises the whole word through HL first instead of reading the one byte directly |
 | `byte-half-direct` | a byte taken from a word held in BC or DE copies the whole word to HL first instead of reading `c`/`b`/`e`/`d` |
+| `ret-thread-pair` | an unconditional `jp` to a bare `ret` right after a conditional `jp` stays a `jp`, even when the conditional's target is not the next label |
+| `st-byte-nostash` | a byte store through a base already in HL copies the byte to E first, instead of storing from A |
+| `rotl-bitop` | a bitwise op with a constant between two 16-bit byte swaps keeps both swaps, instead of applying the swapped constant without them |
+| `rmw-narrow` | a word read-modify-write that changes one byte (`*p \|= 0x100`) loads and stores both bytes |
+| `cf-late` | constant folding is not repeated after byte narrowing, so a narrowed constant stays a truncation held in a register or slot |
+| `cf-st-sym` | a constant byte stored to a global symbol stays in a register instead of being an immediate store |
+| `bswap-store` | a 16-bit byte swap feeding a word store is swapped in registers, instead of storing the bytes in reverse order |
+| `slot-long-ldir` | a long stored from a frame slot to a pointer is four `ld a,(hl) / ld (de),a` pairs, not a block copy |
+| `bswap-load` | a word loaded through a pointer and then byte-swapped is swapped in registers, instead of loaded with its bytes in reverse order |
+| `barrel-load-de` | a z80n constant shift loads its value into HL and swaps it to DE, instead of loading DE directly |
+| `barrel-push` | a z80n shift result pushed as the next call argument is swapped into HL first, instead of pushed from DE |
+| `alloc-barrel-de` | the operand of a z80n constant shift is not given the DE home, so it is built in HL and swapped |
+| `sym-addr-walk` | consecutive constant stores to nearby bytes of one global reload HL with the address, instead of stepping it with inc/dec |
+| `swap-swap` | two 16-bit byte swaps in a row are both emitted, instead of cancelling |
+| `rmw-hl` | a byte read-modify-write of a global reads and writes through absolute addresses, instead of one `ld hl,g` shared by the load and the store |
 | `sink-trunc` | a word-to-byte truncation is not moved down next to the byte store that reads it, so the byte lives across the address arithmetic |
 | `ivsr-suppress-lea` | a stepped pointer is made for a local array addressed from the frame, instead of rebuilding the address from sp (ez80 sp always keeps it) |
 | `ivsr-share` | two derived induction addresses with the same base, index, scale and step each get their own stepped pointer |
@@ -355,8 +374,6 @@ exists (ADR 0010).
 | `depark` | no unparking of a value held in E or D alone |
 | `gbz80-tos-read` | GBZ80 word reads at the top frame slot use direct SP-relative loads instead of the POP/PUSH path |
 | `tos-store` | GBZ80 eligible nonvolatile top-of-stack word stores keep the register-preserving path instead of using the POP/PUSH selector |
-| `local-rmw` | the measured frame-local word RMW keeps its address and updated value on the stack instead of repeatedly spilling them to frame slots |
-| `gbz80-rmw` | compatibility opt-out alias for `local-rmw` |
 
 ## Text layer (ADR 0013, ADR 0025)
 

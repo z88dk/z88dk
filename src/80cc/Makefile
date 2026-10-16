@@ -36,9 +36,7 @@ OBJS =	callfunc.o     	\
 	declparse.o	\
 	../common/option.o \
 	node.o		\
-	ast_codegen2.o  \
 	ast_opt.o	\
-	ast_iter.o	\
 	ir.o		\
 	ir_lower.o	\
 	ir_slots.o	\

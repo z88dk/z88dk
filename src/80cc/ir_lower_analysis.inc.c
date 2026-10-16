@@ -1131,10 +1131,9 @@ static void spill_and_swap_unless_dead_impl(FILE *out, const Func *f, int vreg)
        intervening sp-relative slot reads stay correct. Handled before the
        cur_dst_dead early-out so the push/pop always balances. */
     if (vreg >= 0 && vreg_is_pr_stack(f, vreg)) {
-        L.cur_stack_resident = vreg;
-        L.pv_expect_push = 1;     /* [IR_PARK_VERIFY] this push IS the park */
+        L.pv_expect_push = 1; L.pv_next_vreg = vreg;   /* [IR_PARK_VERIFY] this push IS the park */
         emit_sp(out, 2, "push\thl");
-        L.cur_stack_resident_spadj = L.cur_sp_adjust;
+        park_note_push(vreg);
         /* The value now lives at TOS, not in HL. Forget any HL belief: it must
            NOT be re-advertised (commit_hl_word skips cache_hl for us) — a reader
            that trusted HL would use the wrong value AND skip the balancing pop.
@@ -1249,7 +1248,13 @@ static void commit_hl_word(FILE *out, const Func *f, int v)
        destination symbol-address was pr_stack-homed: the dst's `ld hl,_sym`
        clobbered HL holding the source, but the stale cache let the source load
        cache-hit and skip its reload → a self-copy. */
-    if (v >= 0 && vreg_is_pr_stack(f, v)) { invalidate_hl_cache(); return; }
+    if (v >= 0 && vreg_is_pr_stack(f, v)) {
+        invalidate_hl_cache();
+        /* A word with later readers is still in HL after its push; they may use
+           it, and the last reader pops regardless of any belief. */
+        if (park_more_reads(v)) cache_hl(v);
+        return;
+    }
     cache_hl(v);
     g_def_vreg = v; g_def_epoch = g_de_epoch;
 }
@@ -1283,10 +1288,9 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
        `ld de,K` LD_IMM fastpath reaches here, and PR_STACK is neither dst-dead
        nor register-pool). Its single use pops it; the caller must NOT cache_hl. */
     if (vreg >= 0 && vreg_is_pr_stack(f, vreg)) {
-        L.cur_stack_resident = vreg;
-        L.pv_expect_push = 1;     /* [IR_PARK_VERIFY] this push IS the park */
+        L.pv_expect_push = 1; L.pv_next_vreg = vreg;   /* [IR_PARK_VERIFY] this push IS the park */
         emit_sp(out, 2, "push\tde");
-        L.cur_stack_resident_spadj = L.cur_sp_adjust;
+        park_note_push(vreg);
         invalidate_de_cache();
         return;
     }

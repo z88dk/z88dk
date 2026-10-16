@@ -399,7 +399,7 @@ Size across the corpus before implementing.
   pointer. Figures belong in commit messages, `BENCH_MATRIX.txt` and the
   ADR, never in a code comment. Five figure-carrying comments are exempt
   because the figures ARE the content: the two `g0_word_cost`/`g0_word_bytes`
-  rows (ADR 0038), the C standard citation in `ast_codegen2.c`, and two
+  rows (ADR 0038), the C standard citation in `ast_opt.c`, and two
   instruction-size comparisons (`ir_lower.c`'s pass-0c lookahead,
   `ir_lower_ops.inc.c`'s inc/dec break-even).
 
@@ -420,8 +420,6 @@ Size across the corpus before implementing.
 5. Masked word right-shift, Z80 only (ADR 0090) — accepted.
 6. Variable-count promoted byte shifts (ADR 0095) — accepted on
    z80/z180/ez80_z80/gbz80/kc160; z80n/Rabbit excluded by tick regressions.
-7. Frame-local word-array RMW stack route (ADR 0098) — accepted on every
-   measured CPU except 8085 (grew 3 B).
 8. r6k instruction utilisation — word ALU against `(ix+d)` is done
    (`try_binop_r6k_ixd`); `(sp+n)` forms were tested and rejected (+97 B
    smaller but +1.4M ticks slower). Revisit only with a profitability

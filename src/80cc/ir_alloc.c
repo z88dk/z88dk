@@ -3844,6 +3844,9 @@ static void probe_call_result_bc(Func *f, const int *def_kind,
      - NO stack/control hazard between def and use (stack_spill_span_hazard);
      - DISJOINT from every other stack-transient (greedy) — at most one parked
        at a time, so a single TOS slot and LIFO are trivially safe. */
+/* A parked word is read non-destructively until its last op, and parks nest. */
+#define STACK_SPILL_MAX_USES 6
+#define STACK_SPILL_MAX_DEPTH 4
 static int is_cmp_op(int k);
 static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
                            const int *write_count)
@@ -3864,7 +3867,15 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
     if (!((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180
           || IS_808x() || IS_GBZ80())) return;
 
-    typedef struct { int vreg, flo, fhi; } SCand;
+    /* Multi-use parks nest: the lowering keeps a stack of resident parks and
+       reads a non-final use with `pop r; push r`. Single-use parks stay
+       disjoint when the gate is off. */
+    int multi = !opt_disabled("stack-spill-multi");
+    /* The vm1's `ld hl,(de)` loads through an address and leaves it in a
+       register pair, so a short read-modify-write needs no spill there: only
+       a span long enough to reuse the registers is worth a park. */
+    int min_span = IS_KR580VM1() ? 5 : 0;
+    typedef struct { int vreg, flo, fhi, nuse, use[STACK_SPILL_MAX_USES], depth, bb, dropped; } SCand;
     SCand *cand = calloc((size_t)f->n_vregs, sizeof(SCand));
     SpillShape *sh = compute_spill_shapes(f);
     if (!cand || !sh) { free(cand); free(sh); return; }
@@ -3880,8 +3891,10 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
 
         /* Shared shape: single-BB, first-ref-is-def, not live across the BB, tight
            [lo,hi]; plus stack_spill's own "exactly one use". */
-        if (!sh[v].local || sh[v].uses != 1) continue;
+        if (!sh[v].local || sh[v].uses < 1) continue;
+        if (sh[v].uses != 1 && (!multi || sh[v].uses > STACK_SPILL_MAX_USES)) continue;
         int bb_of = sh[v].bb_of, lo = sh[v].lo, hi = sh[v].hi;
+        int nuse = sh[v].uses;
 
         const BB *bb = &f->bbs[bb_of];
         if (op_dst_spill_is_dead(bb, lo)) continue;   /* value rides HL — no win */
@@ -3931,6 +3944,48 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
                 && f->vregs[uo->dst].width == 1)
                 continue;
         }
+        /* Every reading op, in order. A parked value is read once per op (a
+           second read in the final op would find the word already popped), and
+           each reader needs the same byte-use exclusion as the last one. */
+        int use_at[STACK_SPILL_MAX_USES], n_use_at = 0, multi_ok = 1;
+        for (int j = lo + 1; j <= hi && multi_ok; j++) {
+            const Op *uo = &bb->ops[j];
+            int u[16]; int nu = ir_op_uses(uo, u, (int)(sizeof u / sizeof u[0]));
+            int c = 0;
+            for (int k = 0; k < nu; k++) if (u[k] == v) c++;
+            if (!c) continue;
+            if (c > 1 || n_use_at >= STACK_SPILL_MAX_USES) { multi_ok = 0; break; }
+            if (!is_cmp_op(uo->kind) && uo->dst >= 0 && uo->dst < f->n_vregs
+                && f->vregs[uo->dst].width == 1)
+                multi_ok = 0;
+            use_at[n_use_at++] = bb_first_op[bb_of] + j;
+        }
+        if (!multi_ok || n_use_at != nuse) continue;
+        if (nuse > 1 && hi - lo < min_span) {
+            /* Only a short load/modify/store through the address is spared. */
+            int all_base = 1;
+            for (int k = 0; k < n_use_at; k++) {
+                const Op *uo = &bb->ops[use_at[k] - bb_first_op[bb_of]];
+                if (!((uo->kind == IR_LD_MEM || uo->kind == IR_ST_MEM)
+                      && uo->mem.kind == IR_MEM_VREG && uo->mem.base == v))
+                    all_base = 0;
+            }
+            if (all_base) continue;
+        }
+        /* Between reads the word must stay at TOS. A wide (long) operand stages
+           through the stack, so a span that touches one cannot keep a park for
+           a second reader. */
+        if (nuse > 1) {
+            int wide = 0;
+            for (int j = lo + 1; j <= hi && !wide; j++) {
+                const Op *wo = &bb->ops[j];
+                int u[16]; int nu = ir_op_uses(wo, u, (int)(sizeof u / sizeof u[0]));
+                if (wo->dst >= 0 && f->vregs[wo->dst].width > 2) wide = 1;
+                for (int k = 0; k < nu && !wide; k++)
+                    if (u[k] >= 0 && f->vregs[u[k]].width > 2) wide = 1;
+            }
+            if (wide) continue;
+        }
 
         /* A symbol ADDRESS whose one use is an ST_MEM base costs nothing at
            all: gen_st_mem folds `t = &sym; *t = v` into the direct absolute
@@ -3958,6 +4013,9 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
         cand[nc].vreg = v;
         cand[nc].flo  = bb_first_op[bb_of] + lo;
         cand[nc].fhi  = bb_first_op[bb_of] + hi;
+        cand[nc].nuse = n_use_at;
+        cand[nc].bb = bb_of;
+        for (int k = 0; k < n_use_at; k++) cand[nc].use[k] = use_at[k];
         nc++;
     }
 
@@ -3969,12 +4027,82 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
         cand[j] = c;
     }
     int placed = 0, last_fhi = -1;
+    /* Single-reader parks first, disjoint as before: multi-reader parks may only
+       add to that set, never displace one of its members. */
+    int *acc = calloc((size_t)(nc > 0 ? nc : 1), sizeof *acc), nacc = 0;
     for (int i = 0; i < nc; i++) {
-        if (cand[i].flo <= last_fhi) continue;   /* overlaps a parked sibling */
+        if (cand[i].nuse != 1 || cand[i].flo <= last_fhi) continue;
         f->vreg_to_phys[cand[i].vreg] = IR_PR_STACK;
         last_fhi = cand[i].fhi;
         placed++;
+        if (acc) acc[nacc++] = i;
     }
+    if (multi && acc) {
+        /* Parks form a stack: accepted ranges are disjoint or strictly nested,
+           and no read of an outer park falls inside an inner one's span (it
+           would not be at TOS). A read in the inner park's def op is fine: the
+           source is read before the result is pushed. */
+        for (int i = 0; i < nc; i++) {
+            SCand *y = &cand[i];
+            if (y->nuse == 1) continue;
+            int ok = 1, depth = 0;
+            for (int a = 0; a < nacc && ok; a++) {
+                const SCand *x = &cand[acc[a]];
+                if (y->flo > x->fhi || y->fhi < x->flo) continue;          /* disjoint */
+                const SCand *out_c = NULL, *in_c = NULL;
+                if (x->flo < y->flo && y->fhi < x->fhi) { out_c = x; in_c = y; depth++; }
+                else if (y->flo < x->flo && x->fhi < y->fhi) { out_c = y; in_c = x; }
+                else { ok = 0; break; }                                    /* partial overlap */
+                for (int k = 0; k < out_c->nuse; k++)
+                    if (out_c->use[k] > in_c->flo && out_c->use[k] <= in_c->fhi) ok = 0;
+                if (in_c == x && x->depth + 1 >= STACK_SPILL_MAX_DEPTH) ok = 0;
+            }
+            if (!ok || depth + 1 > STACK_SPILL_MAX_DEPTH) continue;
+            y->depth = depth;
+            for (int a = 0; a < nacc; a++) {
+                SCand *x = &cand[acc[a]];
+                if (y->flo < x->flo && x->fhi < y->fhi) x->depth++;
+            }
+            acc[nacc++] = i;
+            f->vreg_to_phys[y->vreg] = IR_PR_STACK;
+            placed++;
+        }
+    }
+    /* An in-place update of a frame word (`acc += x`) reaches its slot with
+       pop/push only while nothing is parked above it. A multi-reader park that
+       is the only one over such an update costs more than it saves, so drop it;
+       where another park already covers the update the idiom is gone anyway. */
+    if (multi && acc) {
+        int changed = 1;
+        while (changed) {
+            changed = 0;
+            for (int a = 0; a < nacc; a++) {
+                SCand *y = &cand[acc[a]];
+                if (y->nuse == 1 || y->dropped) continue;
+                const BB *bb = &f->bbs[y->bb];
+                for (int fl = y->flo + 1; fl <= y->fhi && !y->dropped; fl++) {
+                    const Op *ro = &bb->ops[fl - bb_first_op[y->bb]];
+                    if (!(ro->dst >= 0 && ro->dst == ro->src[0]
+                          && f->vregs[ro->dst].width == 2
+                          && f->vreg_to_phys[ro->dst] == IR_PR_SPILL))
+                        continue;
+                    int cover = 0;
+                    for (int c = 0; c < nacc; c++) {
+                        const SCand *x = &cand[acc[c]];
+                        if (!x->dropped && x->nuse > 1 && x->bb == y->bb
+                            && x->flo <= fl && fl <= x->fhi)
+                            cover++;
+                    }
+                    if (cover < 2) {
+                        y->dropped = 1;
+                        f->vreg_to_phys[y->vreg] = IR_PR_SPILL;
+                        placed--; changed = 1;
+                    }
+                }
+            }
+        }
+    }
+    free(acc);
     if (getenv("IR_ALLOC_PROBE"))
         fprintf(stderr, "STACK_SPILL placed=%d of candidates=%d\n", placed, nc);
     free(cand); free(sh);
@@ -5247,6 +5375,44 @@ void ir_alloc(Func *f)
         }
     }
 
+    /* The operand of a z80n constant barrel shift goes to the DE home pool below,
+       not HL: `bsrl de,b` wants it in DE. Leave it out of the HL pool, but only
+       when the DE pool will take it (one def, one use, in the producer set). */
+    if (IS_Z80N() && !opt_disabled("alloc-barrel-de")) {
+        int *bd = calloc((size_t)f->n_vregs, sizeof(int));
+        int *bu = calloc((size_t)f->n_vregs, sizeof(int));
+        if (bd && bu) {
+            for (int i = 0; i < f->n_bbs; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                    int buf[16];
+                    int n = ir_op_defs(&f->bbs[i].ops[j], buf, 16);
+                    for (int k = 0; k < n; k++)
+                        if (buf[k] >= 0 && buf[k] < f->n_vregs) bd[buf[k]]++;
+                    n = ir_op_uses(&f->bbs[i].ops[j], buf, 16);
+                    for (int k = 0; k < n; k++)
+                        if (buf[k] >= 0 && buf[k] < f->n_vregs) bu[buf[k]]++;
+                }
+            for (int i = 0; i < f->n_bbs; i++) {
+                const BB *bb = &f->bbs[i];
+                for (int j = 0; j + 1 < bb->n_ops; j++) {
+                    const Op *op = &bb->ops[j], *nxt = &bb->ops[j + 1];
+                    int v = op->dst;
+                    if (v < 0 || v >= f->n_vregs || !cacheable[v]) continue;
+                    if (op->kind != IR_CONV_ZX && op->kind != IR_LD_MEM
+                        && op->kind != IR_MOV && op->kind != IR_LD_IMM) continue;
+                    if (nxt->kind != IR_SHL && nxt->kind != IR_SHR) continue;
+                    if (nxt->src[0] != v || nxt->src[1] >= 0
+                        || (nxt->imm & IR_SHR_ARITH)) continue;
+                    int n = (int)nxt->imm & 0x1f;
+                    int unroll = (n >= 8) ? (n - 6) : (nxt->kind == IR_SHR ? 2 * n : n);
+                    if (n < 1 || n >= 16 || unroll < 6) continue;
+                    if (bd[v] != 1 || bu[v] != 1) continue;
+                    cacheable[v] = 0;
+                }
+            }
+        }
+        free(bd); free(bu);
+    }
     for (int v = 0; v < f->n_vregs; v++) {
         if (cacheable[v]) f->vreg_to_phys[v] = IR_PR_HL;
     }
@@ -5343,9 +5509,23 @@ void ir_alloc(Func *f)
             if (bb->live_out
                 && ir_bitset_get((const BitSet *)bb->live_out, v))
                 continue;
-            if (nxt->src[1] != v || nxt->src[0] == v) continue;
+            /* The operand of a z80n constant-count barrel shift: `bsrl de,b`
+               wants its value in DE, so the producer builds it there. The
+               size test mirrors try_const_barrel's. */
+            int barrel_use = 0;
+            if (IS_Z80N() && (nxt->kind == IR_SHL || nxt->kind == IR_SHR)
+                && nxt->src[0] == v && nxt->src[1] < 0
+                && !(nxt->imm & IR_SHR_ARITH)
+                && !opt_disabled("alloc-barrel-de")) {
+                int n = (int)nxt->imm & 0x1f;
+                int is_shr = (nxt->kind == IR_SHR);
+                int unroll = (n >= 8) ? (n - 6) : (is_shr ? 2 * n : n);
+                barrel_use = (n >= 1 && n < 16 && unroll >= 6);
+            }
+            if (!barrel_use && (nxt->src[1] != v || nxt->src[0] == v)) continue;
             int nxt_eligible;
-            switch (nxt->kind) {
+            if (barrel_use) nxt_eligible = 1;
+            else switch (nxt->kind) {
             case IR_ADD: case IR_SUB: case IR_RSUB:
             case IR_AND: case IR_OR: case IR_XOR:
             case IR_CMP_EQ:  case IR_CMP_NE:
@@ -6646,7 +6826,7 @@ void ir_alloc(Func *f)
        admissibility gates applied before anyone believes it. */
     if (getenv("IR_RANGEPROBE")) {
         static const PhysReg park[] = { IR_PR_BC, IR_PR_DE, IR_PR_IX, IR_PR_IY };
-        int n_spill = 0, n_share = 0, n_fn_share = 0;
+        int n_spill = 0, n_share = 0;
         for (int v = 0; v < f->n_vregs; v++) {
             if (!f->vreg_to_phys || f->vreg_to_phys[v] != IR_PR_SPILL) continue;
             const LiveRange *lv = ir_live_range(f, v);
@@ -6692,11 +6872,9 @@ void ir_alloc(Func *f)
                 }
             }
         }
-        if (n_share) n_fn_share = 1;
         if (n_spill)
-            fprintf(stderr, "RANGEPROBE %-20s spilled=%d  time-shareable=%d%s\n",
-                    f->fn ? ir_sym_name(f->fn) : "?", n_spill, n_share,
-                    n_fn_share ? "" : "");
+            fprintf(stderr, "RANGEPROBE %-20s spilled=%d  time-shareable=%d\n",
+                    f->fn ? ir_sym_name(f->fn) : "?", n_spill, n_share);
     }
 
     /* [IR_HOMEMAP] Inert: the final placement, one line per homed vreg. The

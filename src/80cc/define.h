@@ -578,7 +578,7 @@ enum asttype {
                            the byte offset into the literal queue
                            (`litq`). Walker emits
                            `ld hl, i_<global_litlab>+<zval>` via
-                           `immedlit`. Built by tstr() in const.c and
+                           the literal-queue load. Built by tstr() in const.c and
                            __func__ in primary.c. Distinct from
                            AST_LITERAL of pointer type so the walker
                            doesn't conflate it with a numeric pointer
