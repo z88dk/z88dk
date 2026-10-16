@@ -5928,7 +5928,8 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                 if (other < 0) emit(out, "ld\tde,%lld", (long long)op->imm);
                 else           load_to_de(out, f, other);  /* HL scratch; reg preserved */
                 emit(out, "add\t%s,de", ir);
-                invalidate_de_cache();
+                if (other < 0 || opt_disabled("idx-add-keep-de"))
+                    invalidate_de_cache();          /* DE holds the constant */
             }
             /* dst's value now lives ONLY in the index register — it just
                changed. Any register cache still naming dst is stale: reads of
