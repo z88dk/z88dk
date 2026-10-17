@@ -9,7 +9,7 @@ CPUS = r2ka r3k r4k
 # Result bytes at 0x100..0x10d, little endian words / bytes
 EXPECTED = ef be fe ca aa 55 83 11 44 00 00 00 57 13
 
-all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix runcrt_,$(CPUS)) banktests fartests far24tests
+all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests
 
 mmu.bin: mmu.asm
 	z88dk-z80asm -mr3k -b mmu.asm
@@ -39,6 +39,22 @@ run4k_%: mmu4k.bin
 		echo "$(RED)rabbit_mmu 4k $* failed: got '$$got'$(RESET)"; exit 1; \
 	fi
 
+# R4K and later: 12 bit DATSEG/STKSEG offsets through the L and H registers,
+# DATASEG as the 8 bit alias. mmu4k_seg.asm leaves its results at 0x100.
+EXPECTED4KSEG = 77 88 99 10 00
+
+mmu4k_seg.bin: mmu4k_seg.asm
+	z88dk-z80asm -mr4k -b mmu4k_seg.asm
+
+run4kseg_%: mmu4k_seg.bin
+	@z88dk-ticks -m$* -end 5f -output mmu4k_seg_$*.out mmu4k_seg.bin > /dev/null
+	@got=$$(od -An -tx1 -j256 -N5 mmu4k_seg_$*.out | tr -s ' \n' ' ' | sed 's/^ //;s/ $$//'); \
+	if [ "$$got" = "$(EXPECTED4KSEG)" ]; then \
+		echo "$(GREEN)rabbit_mmu 4k seg $* passed$(RESET)"; \
+	else \
+		echo "$(RED)rabbit_mmu 4k seg $* failed: got '$$got'$(RESET)"; exit 1; \
+	fi
+
 # crt_init_rabbit.inc: the crt programs the MMU from CRT_RABBIT_* pragmas
 CRT_CLIB_r2ka = rabbit
 CRT_CLIB_r3k  = rabbit
@@ -51,7 +67,7 @@ CRT_PRAGMAS = -pragma-define:CRT_RABBIT_SEGSIZE=0x84 \
 runcrt_%: crt_mmu.c
 	@zcc +test -clib=$(CRT_CLIB_$*) $(CRT_PRAGMAS) crt_mmu.c -o crt_$*.bin
 	@got=$$(z88dk-ticks -m$* crt_$*.bin | head -1); \
-	if [ "$$got" = "xpc=82 segsize=84 dataseg=10 stackseg=20" ]; then \
+	if [ "$$got" = "xpc=82 segsize=84 dataseg=10 stackseg=20 dh=00 sh=00" ]; then \
 		echo "$(GREEN)rabbit_mmu crt $* passed$(RESET)"; \
 	else \
 		echo "$(RED)rabbit_mmu crt $* failed: got '$$got'$(RESET)"; exit 1; \
@@ -118,7 +134,19 @@ $(foreach cpu,r4k r6k,$(foreach comp,$(BANK_COMPILERS),$(eval $(call far24_test,
 
 far24tests: $(FAR24_TESTS)
 
+# R4K and later: the 12 bit segment offsets go through the L and H registers
+runcrt12_%: crt_mmu.c
+	@zcc +test -clib=$(CRT_CLIB_$*) -pragma-define:CRT_RABBIT_SEGSIZE=0x84 \
+		-pragma-define:CRT_RABBIT_DATASEG=0xa34 -pragma-define:CRT_RABBIT_STACKSEG=0x201 \
+		-pragma-define:CRT_RABBIT_XPC=0x82 crt_mmu.c -o crt12_$*.bin
+	@got=$$(z88dk-ticks -m$* crt12_$*.bin | head -1); \
+	if [ "$$got" = "xpc=82 segsize=84 dataseg=34 stackseg=01 dh=0a sh=02" ]; then \
+		echo "$(GREEN)rabbit_mmu crt 12-bit $* passed$(RESET)"; \
+	else \
+		echo "$(RED)rabbit_mmu crt 12-bit $* failed: got '$$got'$(RESET)"; exit 1; \
+	fi
+
 clean:
-	rm -f mmu.bin mmu4k.bin mmu_*.out mmu4k_*.out crt_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin *.lis *.o *~ zcc_opt.def
+	rm -f mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin *.lis *.o *~ zcc_opt.def
 
 .PHONY: all banktests fartests far24tests clean

@@ -330,8 +330,8 @@ static uint8_t *rabbit_phys;
 static uint32_t rabbit_phys_mask;
 static uint16_t rabbit_xpc;
 static uint8_t  rabbit_mmu_segsize = 0xff;
-static uint8_t  rabbit_mmu_dataseg;
-static uint8_t  rabbit_mmu_stackseg;
+static uint16_t rabbit_mmu_dataseg;     /* 4k units: 8 bits on R2K/R3K, 12 on R4K and later */
+static uint16_t rabbit_mmu_stackseg;
 // Offset added to a logical address, indexed by its top nibble
 static uint32_t rabbit_seg_off[16];
 
@@ -339,6 +339,11 @@ static uint32_t rabbit_seg_off[16];
 #define RABBIT_IO_STACKSEG  0x0011
 #define RABBIT_IO_DATASEG   0x0012
 #define RABBIT_IO_SEGSIZE   0x0013
+/* Rabbit 4000 and later: 12 bit segment offsets in a low and a high register */
+#define RABBIT_IO_STKSEGL   0x001a
+#define RABBIT_IO_STKSEGH   0x001b
+#define RABBIT_IO_DATSEGL   0x001e
+#define RABBIT_IO_DATSEGH   0x001f
 
 static void rabbit_remap(void)
 {
@@ -360,12 +365,42 @@ static void rabbit_remap(void)
 
 static void rabbit_io_write(uint16_t reg, uint8_t value)
 {
+    int wide = (c_cpu & (CPU_R4K|CPU_R6K)) != 0;
+
     switch ( reg ) {
     case RABBIT_IO_STACKSEG:
         rabbit_mmu_stackseg = value;
+        if ( wide ) {
+            ioi_mem[RABBIT_IO_STKSEGL] = value;
+            ioi_mem[RABBIT_IO_STKSEGH] = 0;
+        }
         break;
     case RABBIT_IO_DATASEG:
         rabbit_mmu_dataseg = value;
+        if ( wide ) {
+            ioi_mem[RABBIT_IO_DATSEGL] = value;
+            ioi_mem[RABBIT_IO_DATSEGH] = 0;
+        }
+        break;
+    case RABBIT_IO_STKSEGL:
+        if ( !wide ) return;
+        rabbit_mmu_stackseg = (rabbit_mmu_stackseg & 0x0f00) | value;
+        ioi_mem[RABBIT_IO_STACKSEG] = value;
+        break;
+    case RABBIT_IO_STKSEGH:
+        if ( !wide ) return;
+        ioi_mem[RABBIT_IO_STKSEGH] = value & 0x0f;
+        rabbit_mmu_stackseg = (rabbit_mmu_stackseg & 0x00ff) | (value & 0x0f) << 8;
+        break;
+    case RABBIT_IO_DATSEGL:
+        if ( !wide ) return;
+        rabbit_mmu_dataseg = (rabbit_mmu_dataseg & 0x0f00) | value;
+        ioi_mem[RABBIT_IO_DATASEG] = value;
+        break;
+    case RABBIT_IO_DATSEGH:
+        if ( !wide ) return;
+        ioi_mem[RABBIT_IO_DATSEGH] = value & 0x0f;
+        rabbit_mmu_dataseg = (rabbit_mmu_dataseg & 0x00ff) | (value & 0x0f) << 8;
         break;
     case RABBIT_IO_SEGSIZE:
         rabbit_mmu_segsize = value;

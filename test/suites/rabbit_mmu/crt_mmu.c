@@ -22,7 +22,8 @@ static unsigned char get_ioi(unsigned int reg) __z88dk_fastcall
 
 int main(void)
 {
-    printf("xpc=%02x segsize=%02x dataseg=%02x stackseg=%02x\n",
-        get_xpc(), get_ioi(0x13), get_ioi(0x12), get_ioi(0x11));
+    printf("xpc=%02x segsize=%02x dataseg=%02x stackseg=%02x dh=%02x sh=%02x\n",
+        get_xpc(), get_ioi(0x13), get_ioi(0x12), get_ioi(0x11),
+        get_ioi(0x1f), get_ioi(0x1b));
     return 0;
 }
