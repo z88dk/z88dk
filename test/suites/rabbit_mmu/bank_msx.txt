@@ -1,5 +1,5 @@
-break 5:8000
+break 5:$8000
 cont
 reg
-x /3 5:8000
+x /3 5:$8000
 quit

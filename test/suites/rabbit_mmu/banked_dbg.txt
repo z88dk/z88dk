@@ -1,8 +1,8 @@
 break _bank1_inc
 break _bank2_mul
-break 3:e000
+break 3:0xe000
 cont
 reg
-x /4 1:e000
+x /4 1:0xe000
 cont
 quit

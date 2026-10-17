@@ -156,7 +156,7 @@ DBG_TESTS += rundbg_$(1)
 rundbg_$(1): banked_main.c banked_b1.c banked_b2.c banked_b3.c banked_dbg.txt
 	@zcc +test -compiler=sccz80 -clib=$$(CRT_CLIB_$(1)) -pragma-define:CRT_RABBIT_BANKS=3 banked_main.c banked_b1.c banked_b2.c banked_b3.c -o dbg_$(1).bin -m
 	@out=$$$$(z88dk-ticks -m$(1) -banks -x dbg_$(1).map -d -script banked_dbg.txt dbg_$(1).bin 2>&1); \
-	for want in "Hit breakpoint 1: @1:E000 (_bank1_inc)" "Hit breakpoint 2: @2:E000 (_bank2_mul)" "$$(DBG_XPC_$(1))" "1E000:   "; do \
+	for want in 'Hit breakpoint 1: @$$$$1:$$$$E000 (_bank1_inc)' 'Hit breakpoint 2: @$$$$2:$$$$E000 (_bank2_mul)' "$$(DBG_XPC_$(1))" "1E000:   "; do \
 		echo "$$$$out" | grep -qF "$$$$want" || { echo "$$(RED)rabbit_mmu debugger $(1) failed: no '$$$$want'$$(RESET)"; exit 1; }; \
 	done; \
 	echo "$$(GREEN)rabbit_mmu debugger $(1) passed$$(RESET)"
@@ -174,7 +174,7 @@ bankstyletests: runbank_zxn runbank_msx
 runbank_zxn: bank_zxn.asm bank_zxn.txt
 	@z88dk-z80asm -mz80n -b bank_zxn.asm
 	@out=$$(z88dk-ticks -mz80n -d -script bank_zxn.txt bank_zxn.bin 2>&1); \
-	for want in "Hit breakpoint 1: @10:C000" "6=10 7=11" "10C000:   3E 42 C9"; do \
+	for want in 'Hit breakpoint 1: @$$10:$$C000' "6=10 7=11" "10C000:   3E 42 C9"; do \
 		echo "$$out" | grep -qF "$$want" || { echo "$(RED)rabbit_mmu zxn banks failed: no '$$want'$(RESET)"; exit 1; }; \
 	done; \
 	echo "$(GREEN)rabbit_mmu zxn banks passed$(RESET)"
@@ -182,7 +182,7 @@ runbank_zxn: bank_zxn.asm bank_zxn.txt
 runbank_msx: bank_msx.asm bank_msx.txt
 	@z88dk-z80asm -mz80 -b bank_msx.asm
 	@out=$$(z88dk-ticks -mz80 -b msx -d -script bank_msx.txt bank_msx.bin 2>&1); \
-	for want in "Hit breakpoint 1: @5:8000" "2=05" "58000:   3E 42 C9"; do \
+	for want in 'Hit breakpoint 1: @$$5:$$8000' "2=05" "58000:   3E 42 C9"; do \
 		echo "$$out" | grep -qF "$$want" || { echo "$(RED)rabbit_mmu msx banks failed: no '$$want'$(RESET)"; exit 1; }; \
 	done; \
 	echo "$(GREEN)rabbit_mmu msx banks passed$(RESET)"

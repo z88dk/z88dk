@@ -137,7 +137,7 @@ static const char *pc_text(void)
     uint32_t    banked = current_banked_pc();
 
     if ( banked > 0xffff ) {
-        snprintf(buf, sizeof(buf), "%X:%04X", (unsigned)(banked >> 16), (unsigned)(banked & 0xffff));
+        snprintf(buf, sizeof(buf), "$%X:$%04X", (unsigned)(banked >> 16), (unsigned)(banked & 0xffff));
     } else {
         snprintf(buf, sizeof(buf), "%04x", bk.pc());
     }
@@ -1478,22 +1478,16 @@ int parse_address(char *arg, const char** corrected_source)
     char *end;
 
     if ( bk.banked_pc != NULL ) {
-        /* bank:address, both hexadecimal as in the map file and the messages,
-           with or without a $ prefix */
-        char *bank_start = arg;
+        /* bank:address, each part a number as everywhere else: decimal, or
+           hexadecimal with a $ or 0x prefix */
         char *bank_end;
-        long  bank;
+        int   bank = parse_number(arg, &bank_end);
 
-        if ( *bank_start == '$' ) bank_start++;
-        bank = strtol(bank_start, &bank_end, 16);
-        if ( bank_end != bank_start && *bank_end == ':' && bank > 0 && bank < 256 ) {
-            char *addr_start = bank_end + 1;
+        if ( bank_end != arg && *bank_end == ':' && bank > 0 && bank < 256 ) {
             char *addr_end;
-            long  offset;
+            int   offset = parse_number(bank_end + 1, &addr_end);
 
-            if ( *addr_start == '$' ) addr_start++;
-            offset = strtol(addr_start, &addr_end, 16);
-            if ( addr_end != addr_start && *addr_end == 0 ) {
+            if ( addr_end != bank_end + 1 && *addr_end == 0 ) {
                 return bank << 16 | (offset & 0xffff);
             }
         }

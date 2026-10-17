@@ -1,5 +1,5 @@
-break 10:c000
+break 0x10:0xc000
 cont
 reg
-x /3 10:c000
+x /3 0x10:0xc000
 quit
