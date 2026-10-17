@@ -6,17 +6,67 @@
 ;
 ;   physical = xpc * 0x1000 + hl,   hl in 0xE000-0xFFFF
 ;
+; R2K and R3K have an 8-bit XPC and reach the first 1MB. R4K and later use
+; the 12-bit LXPC and reach the whole 16MB.
+;
 ; Entry: ebc = far address
-;         a' = XPC to use for local addresses (from __far_start)
+;         a' = XPC to use for local addresses (from __far_start, R2K/R3K)
 ; Exit:   hl = address to access
 ;        ebc = unchanged
 ;
-; Corrupts: a, d. The caller's stack must be below 0xE000, or it is moved
-; out from under it with the window.
+; Corrupts: a, d. The caller's stack must be below 0xE000,
+; or it is moved out from under it with the window.
 
     SECTION code_l_sccz80_far
     PUBLIC  __far_page
 
+IF __CPU_R4K__ || __CPU_R5K__ || __CPU_R6K__
+    EXTERN  __far_lxpc_save
+
+__far_page:
+    ld      a,e
+    and     a
+    jr      z,localfar
+    ld      a,b                     ; lxpc = (ebc >> 12) - 0xe
+    rrca
+    rrca
+    rrca
+    rrca
+    and     $0f
+    ld      l,a
+    ld      a,e
+    rrca
+    rrca
+    rrca
+    rrca
+    ld      d,a
+    and     $f0
+    or      l
+    ld      l,a
+    ld      a,d
+    and     $0f
+    ld      h,a
+    ld      a,l
+    sub     $0e
+    ld      l,a
+    jr      nc,nocarry
+    dec     h
+nocarry:
+    ld      lxpc,hl
+    ld      a,b                     ; hl = 0xe000 + (ebc & 0xfff)
+    and     $0f
+    or      $e0
+    ld      h,a
+    ld      l,c
+    ret
+
+localfar:
+    ld      hl,(__far_lxpc_save)
+    ld      lxpc,hl
+    ld      h,b
+    ld      l,c
+    ret
+ELSE
 __far_page:
     ld      a,e
     and     a
@@ -51,3 +101,4 @@ localfar:
     ld      h,b
     ld      l,c
     ret
+ENDIF

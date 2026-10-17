@@ -9,7 +9,7 @@ CPUS = r2ka r3k r4k
 # Result bytes at 0x100..0x10d, little endian words / bytes
 EXPECTED = ef be fe ca aa 55 83 11 44 00 00 00 57 13
 
-all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix runcrt_,$(CPUS)) banktests fartests
+all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix runcrt_,$(CPUS)) banktests fartests far24tests
 
 mmu.bin: mmu.asm
 	z88dk-z80asm -mr3k -b mmu.asm
@@ -98,7 +98,27 @@ $(foreach cpu,$(CPUS),$(foreach comp,$(BANK_COMPILERS),$(eval $(call far_test,$(
 
 fartests: $(FAR_TESTS)
 
-clean:
-	rm -f mmu.bin mmu4k.bin mmu_*.out mmu4k_*.out crt_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin *.lis *.o *~ zcc_opt.def
+# R4K and later: the 12 bit LXPC reaches the whole 16MB space
+FAR24_EXPECTED = 11112222 33334444 50 53
+CRT_CLIB_r6k = rabbit6k
 
-.PHONY: all banktests fartests clean
+define far24_test
+FAR24_TESTS += runfar24_$(1)_$(2)
+runfar24_$(1)_$(2): far24_main.c
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -pragma-define:CRT_RABBIT_BANKS=0 far24_main.c -o far24_$(1)_$(2).bin
+	@got=$$$$(z88dk-ticks -m$(1) far24_$(1)_$(2).bin | head -1); \
+	if [ "$$$$got" = "$$(FAR24_EXPECTED)" ]; then \
+		echo "$$(GREEN)rabbit_mmu far24 $(1) $(2) passed$$(RESET)"; \
+	else \
+		echo "$$(RED)rabbit_mmu far24 $(1) $(2) failed: got '$$$$got'$$(RESET)"; exit 1; \
+	fi
+endef
+
+$(foreach cpu,r4k r6k,$(foreach comp,$(BANK_COMPILERS),$(eval $(call far24_test,$(cpu),$(comp)))))
+
+far24tests: $(FAR24_TESTS)
+
+clean:
+	rm -f mmu.bin mmu4k.bin mmu_*.out mmu4k_*.out crt_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin *.lis *.o *~ zcc_opt.def
+
+.PHONY: all banktests fartests far24tests clean
