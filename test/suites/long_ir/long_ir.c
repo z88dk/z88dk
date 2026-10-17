@@ -276,6 +276,27 @@ int far_ptrmem(void)
     if ((unsigned long)rec.fp != 0x20304UL) ok = 0;
     return ok;
 }
+
+/* The same through a pointer parameter: `*q++` steps 3 bytes, and a constant
+   far pointer stores 3 bytes. */
+int far_ptrstep(char * __far *q, unsigned char *raw)
+{
+    char * __far a, * __far b;
+    int ok = 1, i;
+    for (i = 0; i < 12; i++) raw[i] = 0xA5;
+    q[0] = far_mk(0x10001L);
+    q[1] = far_mk(0x20002L);
+    a = *q++; b = *q++;
+    if ((unsigned long)a != 0x10001UL || (unsigned long)b != 0x20002UL) ok = 0;
+    q = (char * __far *)raw;
+    q[1] = 0;
+    q[2] = (char * __far)0x40506L;
+    if (raw[2] != 0xA5 || raw[3] || raw[4] || raw[5] || raw[6] != 6 || raw[7] != 5
+        || raw[8] != 4 || raw[9] != 0xA5) ok = 0;
+    *q++ = far_mk(0x70809L);
+    if (raw[0] != 9 || raw[2] != 7 || raw[3] != 0 || q != (char * __far *)(raw + 3)) ok = 0;
+    return ok;
+}
 #endif /* HAVE_FAR */
 
 /* Pointer DIFFERENCE returns the element count, not the byte count — the
@@ -1367,6 +1388,8 @@ static void test_far(void)
     far_h_wr((_Float16)7);
     Assert(far_h_eq((_Float16)7), "__far _Float16 element (2B float via lp_gint)");
     Assert(far_ptrmem(),          "__far pointer array/member store is 3 bytes");
+    { unsigned char rawb[12]; char * __far fa[3];
+      Assert(far_ptrstep(fa, rawb), "__far pointer *q++ and constant store"); }
 #endif /* HAVE_FAR */
     Assert(near_idiff(5) == 5,    "near int* difference (scaled /2)");
     Assert(near_ldiff(3) == 3,    "near long* difference (scaled /4)");

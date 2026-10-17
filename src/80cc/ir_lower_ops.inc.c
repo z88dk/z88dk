@@ -4687,6 +4687,19 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
            the next array element or struct member. The value is staged on the
            stack so DEHL is free for the address; BC carries each pair. */
         load_to_dehl(out, f, op->src[0]);
+        if (vreg_is_pr_stack(f, op->mem.base)) {
+            /* The base waits on TOS; staging the value there would bury it. */
+            emit_hl_to_bc(out);                /* BC = offset */
+            load_to_hl(out, f, op->mem.base);  /* pops the base */
+            emit_hl_add_offset(out, op->mem.offset, 0, 1);
+            emit(out, "ld\t(hl),c");
+            emit(out, "inc\thl");
+            emit(out, "ld\t(hl),b");
+            emit(out, "inc\thl");
+            emit(out, "ld\t(hl),e");
+            invalidate_hl_bc();
+            return 0;
+        }
         emit(out, "push\tde");                /* bank (E) */
         emit(out, "push\thl");                /* offset */
         load_to_hl_adj(out, f, op->mem.base, 4);

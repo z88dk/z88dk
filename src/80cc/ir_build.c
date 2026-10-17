@@ -764,6 +764,16 @@ static int type_width(Type *t)
     return w ? w : 2;
 }
 
+/* Bytes an object of type t occupies in memory, which is the pointer step.
+   Aggregates carry the real size; a __far pointer is 3 bytes in memory though
+   4 in registers. */
+static int pointee_size(const Type *t)
+{
+    if (t->kind == KIND_STRUCT || t->kind == KIND_ARRAY) return (int)t->size;
+    if (t->kind == KIND_CPTR) return 3;
+    return type_width((Type *)t);
+}
+
 /* The element kind of a pointer-based access to an object of type t and width
    elem_w. A __far pointer is four bytes in registers but three in memory, so it
    must be read and written as KIND_CPTR; as a long it would write the fourth
@@ -3867,7 +3877,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                result width if unavailable. */
             int pointee_w = lsym->ctype && lsym->ctype->ptr
                 ? type_width(lsym->ctype->ptr) : elem_w;
-            if (pointee_w != 1 && pointee_w != 2 && pointee_w != 4)
+            if (lsym->ctype && lsym->ctype->ptr
+                && lsym->ctype->ptr->kind == KIND_CPTR)
+                pointee_w = 3;              /* a far pointer is 3 bytes in memory */
+            if (pointee_w != 1 && pointee_w != 2 && pointee_w != 3
+                && pointee_w != 4)
                 return build_fail("deref-step pointee width %d "
                                   "not supported", pointee_w);
 
@@ -4969,9 +4983,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 /* sizeof(pointee): struct/array carry the real byte size
                    in ->size; scalars come from type_width (type_width
                    returns 2 for aggregates, so it can't be used alone). */
-                stride = !pte ? 0
-                       : (pte->kind == KIND_STRUCT || pte->kind == KIND_ARRAY)
-                         ? (int)pte->size : type_width(pte);
+                stride = !pte ? 0 : pointee_size(pte);
                 if (stride <= 0)
                     return build_fail("step on pointer to incomplete/"
                                       "unknown type (sym=%s)",
@@ -5035,9 +5047,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             int gstride = 1;
             if (n->type && n->type->kind == KIND_PTR) {
                 Type *pte = n->type->ptr;
-                gstride = !pte ? 0
-                        : (pte->kind == KIND_STRUCT || pte->kind == KIND_ARRAY)
-                          ? (int)pte->size : type_width(pte);
+                gstride = !pte ? 0 : pointee_size(pte);
                 if (gstride <= 0)
                     return build_fail("step on pointer to incomplete/"
                                       "unknown type (global)");
@@ -5087,9 +5097,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         int pstride = 1;
         if (n->type && n->type->kind == KIND_PTR) {
             Type *pte = n->type->ptr;
-            pstride = !pte ? 0
-                    : (pte->kind == KIND_STRUCT || pte->kind == KIND_ARRAY)
-                      ? (int)pte->size : type_width(pte);
+            pstride = !pte ? 0 : pointee_size(pte);
             if (pstride <= 0)
                 return build_fail("step on pointer to incomplete/unknown "
                                   "type (non-LV)");
