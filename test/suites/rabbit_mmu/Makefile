@@ -31,7 +31,7 @@ ifdef RMMU_WINDOWS
 all:
 	@echo "rabbit_mmu: skipped (POSIX-shell recipes; not run on Windows)"
 else
-all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests bankstyletests
+all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests farstrtests bankstyletests
 endif
 
 mmu.bin: mmu.asm
@@ -316,7 +316,32 @@ $(foreach comp,$(BANK_COMPILERS),$(eval $(call dbgz_test,$(comp))))
 
 dbgztests: $(DBGZ_TESTS)
 
-clean:
-	rm -f *.o m4_*.out dbgz_*.bin dbgz_*.map dbgb_*.bin dbgb_*.map dbgv_*.bin dbgv_*.map dbgv_*.out pragma_*.bin dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+# The far string functions and sprintf with a far %S, on far memory that
+# crosses 256 byte, 4k and 64k boundaries. The generic far suite
+# (test/suites/far) runs on the Rabbit as well.
+FARSUITE = ../far/main.c ../far/sprintf.c ../far/strcasecmpf.c ../far/strchrf.c ../far/strcmpf.c ../far/strncatf.c
+FRAMEWORK_SRC = $(wildcard ../../framework/*.c)
 
-.PHONY: all banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests bankstyletests runbank_zxn runbank_msx clean
+define farstr_test
+FARSTR_TESTS += runfarstr_$(1)_$(2)
+runfarstr_$(1)_$(2): farstr_main.c
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -pragma-define:CRT_RABBIT_BANKS=0 farstr_main.c -lm -o farstr_$(1)_$(2).bin
+	@got=$$$$(z88dk-ticks -m$(1) farstr_$(1)_$(2).bin | head -3 | tr '\n' ' '); \
+	case "$$$$got" in *"checks=45 fails=0"*) echo "$$(GREEN)rabbit_mmu far strings $(1) $(2) passed$$(RESET)";; \
+	*) echo "$$(RED)rabbit_mmu far strings $(1) $(2) failed: $$$$got$$(RESET)"; exit 1;; esac
+FARSTR_TESTS += runfarsuite_$(1)_$(2)
+runfarsuite_$(1)_$(2): $$(FARSUITE)
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -I../../framework -DNO_LOG_RUNNING -DNO_LOG_PASSED -D__Z80 -pragma-define:CRT_RABBIT_BANKS=0 $$(FRAMEWORK_SRC) $$(FARSUITE) -lm -o farsuite_$(1)_$(2).bin
+	@got=$$$$(z88dk-ticks -m$(1) -w 60 farsuite_$(1)_$(2).bin | grep -c " 0 failed"); \
+	if [ "$$$$got" = "5" ]; then echo "$$(GREEN)rabbit_mmu far suite $(1) $(2) passed$$(RESET)"; \
+	else echo "$$(RED)rabbit_mmu far suite $(1) $(2) failed: $$$$got of 5 groups clean$$(RESET)"; exit 1; fi
+endef
+
+$(foreach cpu,r2ka r3k r4k r6k,$(foreach comp,$(BANK_COMPILERS),$(eval $(call farstr_test,$(cpu),$(comp)))))
+
+farstrtests: $(FARSTR_TESTS)
+
+clean:
+	rm -f *.o m4_*.out farstr_*.bin farsuite_*.bin dbgz_*.bin dbgz_*.map dbgb_*.bin dbgb_*.map dbgv_*.bin dbgv_*.map dbgv_*.out pragma_*.bin dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+
+.PHONY: all banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests farstrtests bankstyletests runbank_zxn runbank_msx clean

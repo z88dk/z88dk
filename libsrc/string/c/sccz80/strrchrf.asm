@@ -5,7 +5,7 @@
 ; $Id: strrchr_far.asm,v 1.5 2017-01-02 20:37:10 aralbrec Exp $
 ;
 
-IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CPU_KC160__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_KC160__
 
     SECTION   code_clib
     SECTION   code_far
@@ -19,6 +19,45 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 ;far *strrchr(far *s,int c)
 ; finds pointer to last occurrence of c in s (or NULL if not found)
 
+IF __CPU_RABBIT__
+; Rabbit has no ixl, ixh or iyl: IX stays the frame pointer, the counter is the
+; argument cell in the frame and a byte kept over a page-in goes on the stack
+.strrchrf
+._strrchrf
+    push    ix
+    ld      ix,4            ; +2 pushed IX +2 return address
+    add     ix,sp
+    ld      e,0
+    ld      h,e
+    ld      l,e
+    exx                     ; E'H'L'=NULL pointer, if char not found
+    ld      c,(ix+2)
+    ld      b,(ix+3)        ; BC = far offset
+    ld      e,(ix+4)        ; EBC = far pointer
+    call    __far_start
+    ex      af,af'
+    call    __far_page
+.strrchr1
+    ld      a,(hl)
+    cp      (ix+0)          ; the char argument stays in the frame
+    jr      nz,strrchr2     ; on if not found character
+    push    bc
+    push    de
+    exx
+    pop     de
+    pop     hl              ; store position of occurrence (EHL)
+    exx
+.strrchr2
+    call    l_far_incptrs
+    and     a
+    jr      nz,strrchr1
+    exx                     ; EHL=pointer to last, or NULL
+    ex      af,af'
+    call    __far_end
+    pop     ix
+    ld      d,0             ; the far pointer returned has d = 0 (__far_page leaves junk in it)
+    ret
+ELSE
 .strrchrf
 ._strrchrf
     push    ix              ; preserve caller's IX (80cc fp frame pointer)
@@ -55,4 +94,5 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     call    __far_end
     pop     ix              ; restore caller's IX
     ret
+ENDIF
 ENDIF

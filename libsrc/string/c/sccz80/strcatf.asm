@@ -5,7 +5,7 @@
 ; $Id: strcat_far.asm,v 1.5 2017-01-02 20:37:10 aralbrec Exp $
 ;
 
-IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CPU_KC160__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_KC160__
 
     SECTION   code_clib
     SECTION   code_far
@@ -20,6 +20,54 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 ;far *strcat(far *s1,far *s2)
 ; concatenates s2 onto the end of s1
 
+IF __CPU_RABBIT__
+; Rabbit has no ixl, ixh or iyl: IX stays the frame pointer, the counter is the
+; argument cell in the frame and a byte kept over a page-in goes on the stack
+.strcatf
+._strcatf
+    push    ix
+    ld      ix,4            ; +2 pushed IX +2 return address
+    add     ix,sp
+    ld      c,(ix+0)
+    ld      b,(ix+1)
+    ld      e,(ix+2)        ; E'B'C'=s2
+    exx
+    ld      c,(ix+4)
+    ld      b,(ix+5)
+    ld      e,(ix+6)        ; EBC=s1
+    call    __far_start
+    ex      af,af'          ; save seg 1 binding
+    call    __far_page      ; start with s1
+    jr      startfind
+.findend
+    call    l_far_incptrs
+.startfind
+    ld      a,(hl)          ; char from s1
+    and     a
+    jr      nz,findend
+    exx                     ; switch to s2
+.catloop
+    call    __far_page
+    ld      a,(hl)          ; char from s2
+    push    af              ; Rabbit has no iyl: keep it on the stack over the page-in
+    call    l_far_incptrs
+    exx
+    call    __far_page
+    pop     af
+    ld      (hl),a          ; place in s1
+    call    l_far_incptrs
+    exx
+    and     a
+    jr      nz,catloop
+    ex      af,af'
+    call    __far_end
+    ld      l,(ix+4)
+    ld      h,(ix+5)
+    ld      e,(ix+6)        ; EHL=s1
+    pop     ix
+    ld      d,0             ; the far pointer returned has d = 0 (__far_page leaves junk in it)
+    ret
+ELSE
 .strcatf
 ._strcatf
     push    ix              ; preserve caller's IX (80cc fp frame pointer)
@@ -66,4 +114,5 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     pop     ix              ; restore caller's IX
     ret
 
+ENDIF
 ENDIF

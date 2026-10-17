@@ -1,7 +1,7 @@
     MODULE  sprintff_outc
     SECTION code_clib
 
-IF __CPU_Z80__
+IF __CPU_Z80__ || __CPU_RABBIT__
     PUBLIC  sprintff_outc     
     EXTERN  fputc_cons
 

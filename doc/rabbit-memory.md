@@ -177,6 +177,12 @@ mapping.
 For far pointers without code banks, define `CRT_RABBIT_BANKS=0`. This
 moves the stack below the window.
 
+The far string functions (`strcpyf`, `strcmpf`, `memcpyf` and the rest of the
+`*f` functions in `string.h`) and `sprintf` with a far `%S` work on the Rabbit.
+The Rabbit has no `ixl`, `ixh` or `iyl`, so its versions keep a byte over a
+page-in on the stack and use the argument cells on the stack as counters.
+A far pointer that a function returns has its top byte set to 0.
+
 The Rabbit 4000 version keeps the old `LXPC` in a static word. A far access
 is therefore not reentrant. Do not use far pointers in an interrupt routine
 if the main program uses them.
@@ -260,8 +266,6 @@ MSX, the bank is the 16K page at 0x8000, and pages 0 to 3 hold the 64K image.
   exit method, because that method uses `halt`. Use
   `-pragma-define:CRT_ON_EXIT=0x10002`.
 * `__far` function pointers (`l_farcall`) have no Rabbit implementation.
-* The far string functions (`strcmpf` and others) are not in the Rabbit
-  libraries.
 * `bt`, `finish`, `up` and `down` read the bank stack of `banked_call`. A
   banked function returns into `banked_call`, so the real caller and its bank
   are on that stack. The debugger finds the stack by the name

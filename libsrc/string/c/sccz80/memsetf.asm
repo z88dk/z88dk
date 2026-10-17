@@ -1,6 +1,6 @@
 ; memset function for use with far pointers
 
-IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CPU_KC160__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_KC160__
     SECTION   code_clib
     SECTION   code_far
 
@@ -50,6 +50,9 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     ld      l,(ix+4)
     ld      h,(ix+5)
     ld      e,(ix+6)        ; EHL=s1
+IF __CPU_RABBIT__
+    ld      d,0             ; the far pointer returned has d = 0 (__far_page leaves junk in it)
+ENDIF
     pop     ix              ; restore caller's IX
     ret
 ENDIF

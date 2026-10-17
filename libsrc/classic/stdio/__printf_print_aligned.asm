@@ -57,7 +57,7 @@ print_buffer:
     or      e
     jr      z,buffer_done
     ld      a,(bc)
-IF __CPU_Z80__
+IF __CPU_Z80__ || __CPU_RABBIT__
     bit     7,(ix-4)
     call    nz,__printf_pickup_far
 ENDIF
