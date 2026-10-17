@@ -25,6 +25,7 @@ static uint8_t *z180_get_memory_addr(uint32_t pc, memtype type);
 static void     z180_handle_out(int port, int value);
 static void     rabbit_init(void);
 static uint8_t *rabbit_get_memory_addr(uint32_t pc, memtype type);
+static void     rabbit_write_hook(uint16_t addr, uint8_t value);
 static void     msx_init(void);
 static uint8_t *msx_get_memory_addr(uint32_t pc, memtype type);
 static void     msx_handle_out(int port, int value);
@@ -46,6 +47,7 @@ static unsigned char *zx_rom[2];
 static int            inst_mode = 1;       // We're reading an instruction
 
 static memory_func   get_mem_addr;
+static void        (*write_hook)(uint16_t addr, uint8_t value);
 static void        (*handle_out)(int port, int value);
 static int         (*handle_in)(int port);
 
@@ -82,8 +84,10 @@ uint8_t put_memory(uint16_t pc, uint8_t b)
   bk.debugger_write_memory(pc, b);
   if (pc < c_rom_size)
     return *get_memory_addr(pc, MEM_TYPE_DATA);
-  else
-    return *get_memory_addr(pc, MEM_TYPE_DATA) = b;
+  *get_memory_addr(pc, MEM_TYPE_DATA) = b;
+  if (write_hook)
+    write_hook(pc, b);
+  return b;
 }
 
 uint8_t *get_memory_addr(uint32_t pc, memtype type)
@@ -319,30 +323,115 @@ static void zx_handle_out(int port, int value)
 
 
 
-// Rabbit - need to handle ioi/ioe
+// Rabbit - segmented logical space over a flat physical array, plus ioi/ioe
 static uint8_t *ioi_mem;
 static uint8_t *ioe_mem;
+static uint8_t *rabbit_phys;
+static uint32_t rabbit_phys_mask;
+static uint16_t rabbit_xpc;
+static uint8_t  rabbit_mmu_segsize = 0xff;
+static uint8_t  rabbit_mmu_dataseg;
+static uint8_t  rabbit_mmu_stackseg;
+// Offset added to a logical address, indexed by its top nibble
+static uint32_t rabbit_seg_off[16];
+
+#define RABBIT_IO_MMIDR     0x0010
+#define RABBIT_IO_STACKSEG  0x0011
+#define RABBIT_IO_DATASEG   0x0012
+#define RABBIT_IO_SEGSIZE   0x0013
+
+static void rabbit_remap(void)
+{
+    int data_n = rabbit_mmu_segsize & 0x0f;
+    int stack_n = rabbit_mmu_segsize >> 4;
+    int n;
+
+    for ( n = 0; n < 16; n++ ) {
+        if ( n >= 0xe )
+            rabbit_seg_off[n] = (uint32_t)rabbit_xpc << 12;
+        else if ( n >= stack_n )
+            rabbit_seg_off[n] = (uint32_t)rabbit_mmu_stackseg << 12;
+        else if ( n >= data_n )
+            rabbit_seg_off[n] = (uint32_t)rabbit_mmu_dataseg << 12;
+        else
+            rabbit_seg_off[n] = 0;
+    }
+}
+
+static void rabbit_io_write(uint16_t reg, uint8_t value)
+{
+    switch ( reg ) {
+    case RABBIT_IO_STACKSEG:
+        rabbit_mmu_stackseg = value;
+        break;
+    case RABBIT_IO_DATASEG:
+        rabbit_mmu_dataseg = value;
+        break;
+    case RABBIT_IO_SEGSIZE:
+        rabbit_mmu_segsize = value;
+        break;
+    default:
+        return;
+    }
+    rabbit_remap();
+}
 
 static uint8_t *rabbit_get_memory_addr(uint32_t pc, memtype type)
 {
+    if ( type == MEM_TYPE_PHYSICAL && !ioi && !ioe )
+        return &rabbit_phys[pc & rabbit_phys_mask];
+
     pc &= 0xffff;
     if (ioi && type != MEM_TYPE_INST) {
-      return &ioi_mem[pc & 65535];
+      return &ioi_mem[pc];
     } else if (ioe && type != MEM_TYPE_INST) {
-      return &ioe_mem[pc & 65535];
+      return &ioe_mem[pc];
     }
-    return &mem[pc & 65535];
+    return &rabbit_phys[(pc + rabbit_seg_off[pc >> 12]) & rabbit_phys_mask];
 }
 
 static void rabbit_init(void) 
 {
-    mem = calloc(65536, 1);
+    // The allocation is untouched until used, so the larger size costs nothing
+    rabbit_phys = calloc(16 * 1024 * 1024, 1);
+    rabbit_phys_mask = (c_cpu & (CPU_R4K|CPU_R6K)) ? 0xffffff : 0xfffff;
     get_mem_addr = rabbit_get_memory_addr;
+    write_hook = rabbit_write_hook;
 
     ioi_mem = calloc(65536,1);
     ioe_mem = calloc(65536,1);
 
-    // Initialse some registers here
+    ioi_mem[RABBIT_IO_SEGSIZE] = rabbit_mmu_segsize;
+    rabbit_xpc = 0;
+    rabbit_remap();
+}
+
+// An internal I/O write may change the memory map
+static void rabbit_write_hook(uint16_t addr, uint8_t value)
+{
+    if ( ioi )
+        rabbit_io_write(addr, value);
+}
+
+uint8_t rabbit_phys_read(uint32_t addr)
+{
+    return rabbit_phys[addr & rabbit_phys_mask];
+}
+
+void rabbit_phys_write(uint32_t addr, uint8_t value)
+{
+    rabbit_phys[addr & rabbit_phys_mask] = value;
+}
+
+uint16_t rabbit_get_xpc(void)
+{
+    return rabbit_xpc;
+}
+
+void rabbit_set_xpc(uint16_t value)
+{
+    rabbit_xpc = value;
+    rabbit_remap();
 }
 
 // Get the value of an internal register

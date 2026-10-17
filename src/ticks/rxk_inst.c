@@ -225,13 +225,13 @@ void rxk_mul(uint8_t opcode)
 
 void rxk_ld_xpc_a(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode, "ld xpc,a");
+    rabbit_set_xpc(a);
     st += 4;
 }
 
 void rxk_ld_a_xpc(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode, "ld a,xpc");
+    a = rabbit_get_xpc() & 0xff;
     st += 4;
 }
 
@@ -250,89 +250,130 @@ void rxk_pop_ip(uint8_t opcode)
 
 
 
-void rxk_ldp_hl_irr(uint8_t opcode, uint8_t prefix)
+
+// LDP forms address physical memory: bits 19:16 come from A[3:0]
+static uint32_t ldp_phys(uint16_t addr)
+{
+    return ((uint32_t)(a & 0x0f) << 16) | addr;
+}
+
+static void ldp_store(uint16_t addr, uint8_t lo, uint8_t hi)
+{
+    uint32_t phys = ldp_phys(addr);
+
+    rabbit_phys_write(phys, lo);
+    rabbit_phys_write(phys + 1, hi);
+}
+
+static void ldp_load(uint16_t addr, uint8_t *lo, uint8_t *hi)
+{
+    uint32_t phys = ldp_phys(addr);
+
+    *lo = rabbit_phys_read(phys);
+    *hi = rabbit_phys_read(phys + 1);
+}
+
+static uint16_t ldp_addr_reg(uint8_t prefix)
 {
     switch (prefix) {
-    case 0xed:
-        UNIMPLEMENTED(0xed00|opcode, "ldp hl,(hl)");
-        break;
-    case 0xdd:
-        UNIMPLEMENTED(0xed00|opcode, "ldp hl,(ix)");
-        break;
-    case 0xfd:
-        UNIMPLEMENTED(0xfd00|opcode, "ldp hl,(iy)");
-        break;
+    case 0xdd: return xh << 8 | xl;
+    case 0xfd: return yh << 8 | yl;
+    default:   return h << 8 | l;
     }
+}
+
+static uint16_t ldp_fetch_mn(void)
+{
+    uint16_t mn = get_memory_inst(pc++);
+
+    mn |= get_memory_inst(pc++) << 8;
+    return mn;
+}
+
+void rxk_ldp_hl_irr(uint8_t opcode, uint8_t prefix)
+{
+    ioi = ioe = 0;
+    ldp_load(ldp_addr_reg(prefix), &l, &h);
     st += 10;
 }
 
 void rxk_ldp_rr_inm(uint8_t opcode, uint8_t prefix)
 {
+    uint16_t mn = ldp_fetch_mn();
+
+    ioi = ioe = 0;
     switch (prefix) {
-    case 0xed:
-        UNIMPLEMENTED(0xed00|opcode, "ldp hl,(nm)");
-        break;
-    case 0xdd:
-        UNIMPLEMENTED(0xed00|opcode, "ldp ix,(nm)");
-        break;
-    case 0xfd:
-        UNIMPLEMENTED(0xfd00|opcode, "ldp iy,(nm)");
-        break;
+    case 0xdd: ldp_load(mn, &xl, &xh); break;
+    case 0xfd: ldp_load(mn, &yl, &yh); break;
+    default:   ldp_load(mn, &l, &h); break;
     }
     st += 13;
 }
 
 void rxk_ldp_inm_rr(uint8_t opcode, uint8_t prefix)
 {
+    uint16_t mn = ldp_fetch_mn();
+
+    ioi = ioe = 0;
     switch (prefix) {
-    case 0xed:
-        UNIMPLEMENTED(0xed00|opcode, "ldp (nm),hl");
-        break;
-    case 0xdd:
-        UNIMPLEMENTED(0xed00|opcode, "ldp (nm),ix");
-        break;
-    case 0xfd:
-        UNIMPLEMENTED(0xfd00|opcode, "ldp (nm),iy");
-        break;
+    case 0xdd: ldp_store(mn, xl, xh); break;
+    case 0xfd: ldp_store(mn, yl, yh); break;
+    default:   ldp_store(mn, l, h); break;
     }
     st += 15;
 }
 
-
-
 void rxk_ldp_irr_hl(uint8_t opcode, uint8_t prefix)
 {
-    switch (prefix) {
-    case 0xed:
-        UNIMPLEMENTED(0xed00|opcode, "ldp (hl),hl");
-        break;
-    case 0xdd:
-        UNIMPLEMENTED(0xed00|opcode, "ldp (ix),hl");
-        break;
-    case 0xfd:
-        UNIMPLEMENTED(0xfd00|opcode, "ldp (iy),hl");
-        break;
-    }
+    ioi = ioe = 0;
+    ldp_store(ldp_addr_reg(prefix), l, h);
     st += 12;
 }
 
 void rxk_lret(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode, "lret");
+    uint16_t ret;
+
+    ioi = ioe = 0;
+    ret = get_memory_data(sp++);
+    ret |= get_memory_data(sp++) << 8;
+    rabbit_set_xpc(get_memory_data(sp++));
+    mp = pc = ret;
     st += 13;
 }
 
 void rxk_lcall(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "lcall x,mn");
+    uint16_t mn = ldp_fetch_mn();
+    uint8_t  x = get_memory_inst(pc++);
+
+    ioi = ioe = 0;
+    put_memory(--sp, rabbit_get_xpc() & 0xff);
+    put_memory(--sp, pc >> 8);
+    put_memory(--sp, pc);
+    rabbit_set_xpc(x);
+    mp = pc = mn;
     st += 19;
 }
 
 void rxk_ljp(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "ljp x,mn");
+    uint16_t mn = ldp_fetch_mn();
+    uint8_t  x = get_memory_inst(pc++);
+
+    ioi = ioe = 0;
+    rabbit_set_xpc(x);
+    mp = pc = mn;
     st += 10;
 }
+
+
+
+
+
+
+
+
 
 void rxk_ipres(uint8_t opcode)
 {
