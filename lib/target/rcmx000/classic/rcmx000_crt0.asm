@@ -77,4 +77,4 @@ l_dcal:
     INCLUDE "crt/classic/crt_runtime_selection.inc"
 
     INCLUDE "crt/classic/crt_section.inc"
-
+    INCLUDE "crt/classic/crt_rabbit_banks.inc"

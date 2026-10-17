@@ -19,7 +19,12 @@
 
 
     defc    TAR__clib_exit_stack_size = 32
+IF DEFINED_CRT_RABBIT_BANKS
+    ; Code banks use the XPC window, so the stack has to stay below it
+    defc    TAR__register_sp = 0xE000
+ELSE
     defc    TAR__register_sp = 65280
+ENDIF
     defc    CRT_KEY_DEL = 127
     defc    __CPU_CLOCK = 4000000
 
@@ -108,4 +113,4 @@ l_dcal:
 
     INCLUDE "crt/classic/crt_runtime_selection.inc" 
     INCLUDE	"crt/classic/crt_section.inc"
-
+    INCLUDE "crt/classic/crt_rabbit_banks.inc"

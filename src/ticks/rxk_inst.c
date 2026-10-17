@@ -375,15 +375,21 @@ void rxk_ljp(uint8_t opcode)
 
 
 
+// The interrupt priority register is four 2-bit levels used as a stack. It is
+// tracked so ipset/ipres pair up, but ticks does not use it to mask interrupts.
+static uint8_t rabbit_ip;
+
 void rxk_ipres(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "ipres");
+    rabbit_ip = (rabbit_ip >> 2) | (rabbit_ip << 6);
     st += 4;
 }
 
 void rxk_ipset(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "ipset");
+    static const uint8_t level[] = { [0x46] = 0, [0x56] = 1, [0x4e] = 2, [0x5e] = 3 };
+
+    rabbit_ip = (rabbit_ip << 2) | level[opcode];
     st += 4;
 }
 

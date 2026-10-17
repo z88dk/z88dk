@@ -9,7 +9,7 @@ CPUS = r2ka r3k r4k
 # Result bytes at 0x100..0x10d, little endian words / bytes
 EXPECTED = ef be fe ca aa 55 83 11 44 00 00 00 57 13
 
-all: $(addprefix run_,$(CPUS)) $(addprefix runcrt_,$(CPUS))
+all: $(addprefix run_,$(CPUS)) $(addprefix runcrt_,$(CPUS)) banktests
 
 mmu.bin: mmu.asm
 	z88dk-z80asm -mr3k -b mmu.asm
@@ -41,7 +41,30 @@ runcrt_%: crt_mmu.c
 		echo "$(RED)rabbit_mmu crt $* failed: got '$$got'$(RESET)"; exit 1; \
 	fi
 
-clean:
-	rm -f mmu.bin mmu_*.out crt_*.bin *.lis *.o *~ zcc_opt.def
+# Banked calls: functions in two code banks (XPC = bank * 2). The banks are
+# loaded after the root image by ticks -banks. BANK_ASM adds banked_call.asm
+# when the startup library is older than the source.
+BANK_COMPILERS = sccz80 80cc
+BANK_EXPECTED = 42 200 100023 6
+BANK_ASM =
 
-.PHONY: all clean
+define bank_test
+BANK_TESTS += runbank_$(1)_$(2)
+runbank_$(1)_$(2): banked_main.c banked_b1.c banked_b2.c
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -pragma-define:CRT_RABBIT_BANKS=2 $$(BANK_ASM) banked_main.c banked_b1.c banked_b2.c -o bank_$(1)_$(2).bin
+	@got=$$$$(z88dk-ticks -m$(1) -banks bank_$(1)_$(2).bin | head -1); \
+	if [ "$$$$got" = "$$(BANK_EXPECTED)" ]; then \
+		echo "$$(GREEN)rabbit_mmu banked $(1) $(2) passed$$(RESET)"; \
+	else \
+		echo "$$(RED)rabbit_mmu banked $(1) $(2) failed: got '$$$$got'$$(RESET)"; exit 1; \
+	fi
+endef
+
+$(foreach cpu,$(CPUS),$(foreach comp,$(BANK_COMPILERS),$(eval $(call bank_test,$(cpu),$(comp)))))
+
+banktests: $(BANK_TESTS)
+
+clean:
+	rm -f mmu.bin mmu_*.out crt_*.bin bank_*.bin bank_*_BANK_*.bin *.lis *.o *~ zcc_opt.def
+
+.PHONY: all banktests clean

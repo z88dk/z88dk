@@ -100,3 +100,4 @@ ELIF DEFINED_CRT_ORG_BSS
     defc __crt_model = 1
 ENDIF
     INCLUDE	"crt/classic/crt_section.inc"
+    INCLUDE "crt/classic/crt_rabbit_banks.inc"
