@@ -3748,6 +3748,29 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
         *wide_acc_cell(f, op->dst) = op->dst;
         return 0;
     }
+    if (op->mem.kind == IR_MEM_VREG && op->mem.elem == KIND_CPTR
+        && op->dst >= 0 && f->vregs[op->dst].width == 4
+        && !op->mem.post_step && op->mem.base >= 0) {
+        /* __far pointer VALUE through a pointer (`*pp`, `a[i]`): three bytes in
+           memory. Read the offset and the bank byte, never the fourth byte (it
+           is the next element), and give DEHL its invariant D=0, E=bank,
+           HL=offset. */
+        load_to_hl(out, f, op->mem.base);
+        emit_hl_add_offset(out, op->mem.offset, 1, 1);
+        emit(out, "ld\te,(hl)");
+        emit(out, "inc\thl");
+        emit(out, "ld\td,(hl)");              /* DE = offset */
+        emit(out, "inc\thl");
+        emit(out, "ld\ta,(hl)");              /* A = bank */
+        emit_ex_de_hl(out);                    /* HL = offset */
+        emit(out, "ld\te,a");
+        emit(out, "ld\td,0");                 /* DE = 0:bank */
+        invalidate_hl_cache();
+        invalidate_de_cache();
+        invalidate_a_cache();
+        store_dehl_finalize(out, f, op->dst);
+        return 0;
+    }
     if (op->mem.kind == IR_MEM_SYM) {
         int dst_w = (op->dst >= 0)
                   ? f->vregs[op->dst].width : 2;
@@ -4656,6 +4679,28 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
         return 0;
     if (try_de_home_clean_store(out, f, op))
         return 0;
+    if (op->mem.kind == IR_MEM_VREG && op->mem.elem == KIND_CPTR
+        && op->src[0] >= 0 && f->vregs[op->src[0]].width == 4
+        && !op->mem.post_step && op->mem.base >= 0) {
+        /* __far pointer VALUE through a pointer (`*pp = fp`, `a[i] = fp`):
+           three bytes in memory. Writing the fourth DEHL byte would overwrite
+           the next array element or struct member. The value is staged on the
+           stack so DEHL is free for the address; BC carries each pair. */
+        load_to_dehl(out, f, op->src[0]);
+        emit(out, "push\tde");                /* bank (E) */
+        emit(out, "push\thl");                /* offset */
+        load_to_hl_adj(out, f, op->mem.base, 4);
+        emit_hl_add_offset(out, op->mem.offset, 1, 1);
+        emit(out, "pop\tbc");                 /* BC = offset */
+        emit(out, "ld\t(hl),c");
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),b");
+        emit(out, "inc\thl");
+        emit(out, "pop\tbc");                 /* C = bank */
+        emit(out, "ld\t(hl),c");
+        invalidate_hl_bc();
+        return 0;
+    }
     if (op->src[0] >= 0 && f->vregs[op->src[0]].width > 4) {
         /* Wide double store: dload(src)→FA, address into HL, dstore. */
         if (*wide_acc_cell(f, op->src[0]) != op->src[0]) {

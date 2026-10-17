@@ -764,6 +764,31 @@ static int type_width(Type *t)
     return w ? w : 2;
 }
 
+/* The element kind of a pointer-based access to an object of type t and width
+   elem_w. A __far pointer is four bytes in registers but three in memory, so it
+   must be read and written as KIND_CPTR; as a long it would write the fourth
+   byte over its neighbour (the next array element or struct member). */
+static Kind mem_elem_kind(const Type *t, int elem_w)
+{
+    if (elem_w == 4 && t && t->kind == KIND_CPTR)
+        return KIND_CPTR;
+    return (elem_w == 1) ? KIND_CHAR : (elem_w == 2) ? KIND_INT : KIND_LONG;
+}
+
+/* The same for an assignment, whose stored type may sit on the node, the lvalue
+   or the lvalue's pointee depending on the parser's shape. */
+static Kind store_elem_kind(const Node *n, int elem_w)
+{
+    if (elem_w == 4) {
+        const Type *l = n->left ? n->left->type : NULL;
+        if ((n->type && n->type->kind == KIND_CPTR)
+            || (l && (l->kind == KIND_CPTR
+                      || (l->kind == KIND_PTR && l->ptr && l->ptr->kind == KIND_CPTR))))
+            return KIND_CPTR;
+    }
+    return mem_elem_kind(n->left ? n->left->type : NULL, elem_w);
+}
+
 /* Allocate a vreg for a source-declared local. Registers it in the
    sym_map and gives it the local's sym for the dumper.
 
@@ -1013,8 +1038,7 @@ static int init_typed_region(Builder *b, int base, int off,
     st->mem.kind = IR_MEM_VREG;
     st->mem.base = base;
     st->mem.offset = off;
-    st->mem.elem = wide_acc ? t->kind
-                 : (w == 1) ? KIND_CHAR : (w == 2) ? KIND_INT : KIND_LONG;
+    st->mem.elem = wide_acc ? t->kind : mem_elem_kind(t, w);
     return 0;
 }
 
@@ -3310,9 +3334,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
     /* Keep the element kind in a local: the `ld` Op* points into the BB's
        ops array, which the emits below (binop, store) can realloc — reading
        ld->mem.elem afterwards would be a use-after-free. */
-    Kind elem_k = (elem_w == 1) ? KIND_CHAR
-                : (elem_w == 2) ? KIND_INT
-                :                 KIND_LONG;
+    Kind elem_k = mem_elem_kind(n->left->type, elem_w);
     Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
     ld->dst       = loaded;
     ld->mem.kind  = IR_MEM_VREG;
@@ -3876,9 +3898,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             ld->dst      = dst;
             ld->mem.kind = IR_MEM_VREG;
             ld->mem.base = p_vreg;
-            ld->mem.elem = (elem_w == 1) ? KIND_CHAR
-                         : (elem_w == 2) ? KIND_INT
-                         :                 KIND_LONG;
+            ld->mem.elem = mem_elem_kind(n->type, elem_w);
             ld->mem.volatile_ = deref_is_volatile(n);
             ld->mem.bank_fn = (SYMBOL *)deref_bank_fn(n);  /* `*p++` into a space */
             if (!is_pre) EMIT_BUMP();
@@ -3955,10 +3975,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 ld->dst       = dst;
                 ld->mem.kind  = IR_MEM_VREG;
                 ld->mem.base  = base;
-                ld->mem.elem  = wide_acc ? ek
-                              : (elem_w == 1) ? KIND_CHAR
-                              : (elem_w == 2) ? KIND_INT
-                              :                 KIND_LONG;
+                ld->mem.elem  = wide_acc ? ek : mem_elem_kind(n->type, elem_w);
                 return dst;
             }
             return v;
@@ -4064,9 +4081,9 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             op->dst       = dst;
             op->mem.kind  = IR_MEM_VREG;
             op->mem.base  = ptr_v;
-            op->mem.elem  = (elem_w == 1) ? KIND_CHAR
-                          : (elem_w == 2) ? KIND_INT
-                          :                 KIND_LONG;
+            op->mem.elem  = mem_elem_kind(n->type, elem_w);
+            if (op->mem.elem == KIND_CPTR)
+                b->f->vregs[dst].kind = KIND_CPTR;
             op->mem.bank_fn = bf;
             return dst;
         }
@@ -6130,7 +6147,8 @@ static int build_assign(Builder *b, Node *n)
            int for the chained-assign / member-store shape, where the
            parser records the scalar value type. */
         int elem_w = 0;
-        if (n->type && is_register_int_kind(n->type->kind))
+        if (n->type && (is_register_int_kind(n->type->kind)
+                        || n->type->kind == KIND_CPTR))
             elem_w = type_width(n->type);
         if (elem_w == 0 && n->left->type
             && n->left->type->kind == KIND_PTR
@@ -6230,9 +6248,7 @@ static int build_assign(Builder *b, Node *n)
         op->src[0]   = rhs_v;
         op->mem.kind = IR_MEM_VREG;
         op->mem.base = ptr_v;
-        op->mem.elem = (elem_w == 1) ? KIND_CHAR
-                     : (elem_w == 2) ? KIND_INT
-                     :                 KIND_LONG;
+        op->mem.elem = store_elem_kind(n, elem_w);
         op->mem.volatile_ = deref_is_volatile(n->left);
         op->mem.bank_fn = bf;
         return rhs_v;
@@ -6351,7 +6367,8 @@ static int build_assign(Builder *b, Node *n)
            RHS-value type IS the store width; the LHS pointer type
            can mislead. */
         int elem_w = 0;
-        if (n->type && is_register_int_kind(n->type->kind))
+        if (n->type && (is_register_int_kind(n->type->kind)
+                        || n->type->kind == KIND_CPTR))
             elem_w = type_width(n->type);
         if (elem_w == 0 && n->left->type->ptr)
             elem_w = type_width(n->left->type->ptr);
@@ -6387,9 +6404,7 @@ static int build_assign(Builder *b, Node *n)
         op->src[0]   = rhs_v;
         op->mem.kind = IR_MEM_VREG;
         op->mem.base = ptr_v;
-        op->mem.elem = (elem_w == 1) ? KIND_CHAR
-                     : (elem_w == 2) ? KIND_INT
-                     :                 KIND_LONG;
+        op->mem.elem = store_elem_kind(n, elem_w);
         op->mem.volatile_ = deref_is_volatile(n->left);
         op->mem.bank_fn = bf;
         return rhs_v;

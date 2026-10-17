@@ -312,11 +312,6 @@ MSX, the bank is the 16K page at 0x8000, and pages 0 to 3 hold the 64K image.
   exit method, because that method uses `halt`. Use
   `-pragma-define:CRT_ON_EXIT=0x10002`.
 * `__far` function pointers (`l_farcall`) have no Rabbit implementation.
-* `80cc` writes four bytes when it stores a `__far` pointer through a computed
-  address, for example `p[i] = malloc_far(n)` in an array of far pointers. A far
-  pointer has three bytes, so the store overwrites the next byte. This is a
-  bug in `80cc` on every CPU, not only on the Rabbit. Use separate variables
-  instead of an array of far pointers until it is fixed.
 * `bt`, `finish`, `up` and `down` read the bank stack of `banked_call`. A
   banked function returns into `banked_call`, so the real caller and its bank
   are on that stack. The debugger finds the stack by the name

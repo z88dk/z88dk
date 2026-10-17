@@ -252,6 +252,30 @@ int * __far far_ret(void)      { return (int * __far)far_gbuf; }       /* __far 
 _Float16 far_hbuf[2];
 void far_h_wr(_Float16 v) { _Float16 * __far p = (_Float16 * __far)far_hbuf; *p = v; }
 int  far_h_eq(_Float16 v) { _Float16 * __far p = (_Float16 * __far)far_hbuf; return *p == v; }
+
+/* A __far pointer is 3 bytes in memory. Stored through a computed address
+   (array element, struct member) it must not touch the neighbouring byte. */
+struct far_rec { unsigned char pre; char * __far fp; unsigned char post; };
+static char * __far far_mk(long v) { return (char * __far)v; }
+int far_ptrmem(void)
+{
+    char * __far arr[3];
+    struct far_rec rec;
+    char * __far *pp = arr;
+    int i, ok = 1;
+    unsigned char *raw = (unsigned char *)arr;
+
+    for (i = 0; i < 9; i++) raw[i] = 0xA5;
+    for (i = 0; i < 3; i++) pp[i] = far_mk(0x1000L * (i + 1) + i);
+    for (i = 0; i < 3; i++)
+        if ((unsigned long)arr[i] != 0x1000UL * (i + 1) + i) ok = 0;
+    if ((unsigned long)pp[2] != 0x3002UL) ok = 0;
+    rec.pre = 0x11; rec.post = 0x22;
+    rec.fp = far_mk(0x20304L);
+    if (rec.pre != 0x11 || rec.post != 0x22) ok = 0;
+    if ((unsigned long)rec.fp != 0x20304UL) ok = 0;
+    return ok;
+}
 #endif /* HAVE_FAR */
 
 /* Pointer DIFFERENCE returns the element count, not the byte count — the
@@ -1342,6 +1366,7 @@ static void test_far(void)
     Assert(r[0] == 0x4321,        "__far pointer return value");
     far_h_wr((_Float16)7);
     Assert(far_h_eq((_Float16)7), "__far _Float16 element (2B float via lp_gint)");
+    Assert(far_ptrmem(),          "__far pointer array/member store is 3 bytes");
 #endif /* HAVE_FAR */
     Assert(near_idiff(5) == 5,    "near int* difference (scaled /2)");
     Assert(near_ldiff(3) == 3,    "near long* difference (scaled /4)");
