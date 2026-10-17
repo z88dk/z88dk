@@ -9,7 +9,7 @@ CPUS = r2ka r3k r4k
 # Result bytes at 0x100..0x10d, little endian words / bytes
 EXPECTED = ef be fe ca aa 55 83 11 44 00 00 00 57 13
 
-all: $(addprefix run_,$(CPUS)) $(addprefix runcrt_,$(CPUS)) banktests fartests
+all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix runcrt_,$(CPUS)) banktests fartests
 
 mmu.bin: mmu.asm
 	z88dk-z80asm -mr3k -b mmu.asm
@@ -21,6 +21,22 @@ run_%: mmu.bin
 		echo "$(GREEN)rabbit_mmu $* passed$(RESET)"; \
 	else \
 		echo "$(RED)rabbit_mmu $* failed: got '$$got'$(RESET)"; exit 1; \
+	fi
+
+# R4K and later: 12 bit LXPC, llcall/llret/lljp, ldf through the window.
+# mmu4k.asm leaves its results at 0x100.
+EXPECTED4K = bc 0a 5a 00 ef 0d 77 00 ef 0d 23 01 57 04 77 07
+
+mmu4k.bin: mmu4k.asm
+	z88dk-z80asm -mr4k -b mmu4k.asm
+
+run4k_%: mmu4k.bin
+	@z88dk-ticks -m$* -end 7f -output mmu4k_$*.out mmu4k.bin > /dev/null
+	@got=$$(od -An -tx1 -j256 -N16 mmu4k_$*.out | tr -s ' \n' ' ' | sed 's/^ //;s/ $$//'); \
+	if [ "$$got" = "$(EXPECTED4K)" ]; then \
+		echo "$(GREEN)rabbit_mmu 4k $* passed$(RESET)"; \
+	else \
+		echo "$(RED)rabbit_mmu 4k $* failed: got '$$got'$(RESET)"; exit 1; \
 	fi
 
 # crt_init_rabbit.inc: the crt programs the MMU from CRT_RABBIT_* pragmas
@@ -83,6 +99,6 @@ $(foreach cpu,$(CPUS),$(foreach comp,$(BANK_COMPILERS),$(eval $(call far_test,$(
 fartests: $(FAR_TESTS)
 
 clean:
-	rm -f mmu.bin mmu_*.out crt_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin *.lis *.o *~ zcc_opt.def
+	rm -f mmu.bin mmu4k.bin mmu_*.out mmu4k_*.out crt_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin *.lis *.o *~ zcc_opt.def
 
 .PHONY: all banktests fartests clean

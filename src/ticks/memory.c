@@ -378,7 +378,8 @@ static void rabbit_io_write(uint16_t reg, uint8_t value)
 
 static uint8_t *rabbit_get_memory_addr(uint32_t pc, memtype type)
 {
-    if ( type == MEM_TYPE_PHYSICAL && !ioi && !ioe )
+    // A 32-bit pointer of 0xffff:addr is a logical address
+    if ( type == MEM_TYPE_PHYSICAL && (pc & 0xffff0000) != 0xffff0000 )
         return &rabbit_phys[pc & rabbit_phys_mask];
 
     pc &= 0xffff;
