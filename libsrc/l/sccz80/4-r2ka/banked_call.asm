@@ -17,8 +17,8 @@
 banked_call:
     ipset   3
     pop     hl                          ; inline target
-    ld      (banked_mainsp),sp
-    ld      sp,(banked_tempsp)
+    ld      (___z88dk_banked_mainsp),sp
+    ld      sp,(___z88dk_banked_banksp)
     ld      a,xpc
     push    af                          ; caller's XPC
     ld      e,(hl)                      ; address
@@ -29,8 +29,8 @@ banked_call:
     inc     hl
     inc     hl                          ; skip the rest of the defq
     push    hl                          ; real return address
-    ld      (banked_tempsp),sp
-    ld      sp,(banked_mainsp)
+    ld      (___z88dk_banked_banksp),sp
+    ld      sp,(___z88dk_banked_mainsp)
     add     a,a
     ld      xpc,a
     ipres
@@ -38,12 +38,12 @@ banked_call:
     ld      h,d
     call    l_dcal
     ipset   3
-    ld      (banked_mainsp),sp
-    ld      sp,(banked_tempsp)
+    ld      (___z88dk_banked_mainsp),sp
+    ld      sp,(___z88dk_banked_banksp)
     pop     bc                          ; real return address
     pop     af                          ; caller's XPC
-    ld      (banked_tempsp),sp
-    ld      sp,(banked_mainsp)
+    ld      (___z88dk_banked_banksp),sp
+    ld      sp,(___z88dk_banked_mainsp)
     ld      xpc,a
     push    bc
     ipres
@@ -53,7 +53,7 @@ banked_call:
     SECTION code_crt_init
 
     pop     de                          ; crt0_init return address
-    ld      (banked_tempsp),sp
+    ld      (___z88dk_banked_banksp),sp
     ld      hl,-CLIB_BANKING_STACK_SIZE
     add     hl,sp
     ld      sp,hl
@@ -62,7 +62,10 @@ banked_call:
 
     SECTION bss_driver
 
-banked_mainsp:
+; z88dk-ticks finds these two variables by name to unwind a banked call.
+; The bank stack holds, for each call, the real return address and then af
+; with the saved bank in a.
+___z88dk_banked_mainsp:
     defw    0
-banked_tempsp:
+___z88dk_banked_banksp:
     defw    0

@@ -120,8 +120,8 @@ IF CRT_DISABLELOADER != 1
     PUBLIC  banked_call
 banked_call:
     pop     hl              ; Get the return address
-    ld      (mainsp),sp
-    ld      sp,(tempsp)
+    ld      (___z88dk_banked_mainsp),sp
+    ld      sp,(___z88dk_banked_banksp)
     in      a,(PORT_BANK3)
     push    af              ; Push the current bank onto the stack
     ld      e,(hl)          ; Fetch the call address
@@ -132,18 +132,18 @@ banked_call:
     inc     hl
     inc     hl              ; Yes this should be here
     push    hl              ; Push the real return address
-    ld      (tempsp),sp
-    ld      sp,(mainsp)
+    ld      (___z88dk_banked_banksp),sp
+    ld      sp,(___z88dk_banked_mainsp)
     out     (PORT_BANK3),a
     ld      l,e
     ld      h,d
     call	l_dcal		; jp(hl)
-    ld      (mainsp),sp
-    ld      sp,(tempsp)
+    ld      (___z88dk_banked_mainsp),sp
+    ld      sp,(___z88dk_banked_banksp)
     pop     bc              ; Get the return address
     pop     af              ; Pop the old bank
-    ld      (tempsp),sp
-    ld      sp,(mainsp)
+    ld      (___z88dk_banked_banksp),sp
+    ld      sp,(___z88dk_banked_mainsp)
     out     (PORT_BANK3),a
     push    bc
     ret
@@ -261,9 +261,12 @@ __basename_ext:
     defm    "00.bin"
     defb    0
 
-tempsp:     defw    tempstack + CLIB_BANKING_STACK_SIZE
+; z88dk-ticks finds these two variables by name to unwind a banked call.
+; The bank stack holds, for each call, the real return address and then af
+; with the saved bank in a.
+___z88dk_banked_banksp:     defw    tempstack + CLIB_BANKING_STACK_SIZE
 
     SECTION bss_crt
-mainsp:     defs    2
+___z88dk_banked_mainsp:     defs    2
 tempstack:  defs    CLIB_BANKING_STACK_SIZE
 ENDIF
