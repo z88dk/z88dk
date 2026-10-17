@@ -5,6 +5,10 @@
 ; the 64k root image contiguously. Bank 0 is the root image, so banks start at 1.
 ; z80asm keeps the bank number in the address bits above 16.
 ;
+; The window is also the top of the near address space: the stack and all
+; data must sit below 0xE000, or they move with XPC. Far pointers use the same
+; window, so set CRT_RABBIT_BANKS=0 for far pointers without code banks.
+;
 ; Include after crt_section.inc. Nothing is emitted unless
 ; CRT_RABBIT_BANKS (the number of banks, at most 120 for a 1MB part) is set.
 ; CRT_ORG_BANK_nn (hex nn) overrides the logical origin of a bank.
