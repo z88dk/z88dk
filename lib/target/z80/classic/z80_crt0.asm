@@ -59,6 +59,7 @@ IFDEF CRT_INCLUDE_PREAMBLE
 ENDIF
 
 start:
+    INCLUDE "crt/classic/crt_init_rabbit.inc"
     INCLUDE "crt/classic/crt_init_sp.inc"
     ; Setup BSS memory and perform other initialisation
     call    crt0_init
