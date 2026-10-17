@@ -9,7 +9,7 @@ CPUS = r2ka r3k r4k
 # Result bytes at 0x100..0x10d, little endian words / bytes
 EXPECTED = ef be fe ca aa 55 83 11 44 00 00 00 57 13
 
-all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests bankstyletests
+all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests pragmatests bankstyletests
 
 mmu.bin: mmu.asm
 	z88dk-z80asm -mr3k -b mmu.asm
@@ -211,7 +211,25 @@ runbank_msx: bank_msx.asm bank_msx.txt
 	done; \
 	echo "$(GREEN)rabbit_mmu msx banks passed$(RESET)"
 
-clean:
-	rm -f *.o m4_*.out dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+# #pragma bank directly followed by static and struct declarations. sccz80
+# once read the first word of the next declaration as part of the pragma.
+define pragma_test
+PRAGMA_TESTS += runpragma_$(1)_$(2)
+runpragma_$(1)_$(2): pragma_main.c pragma_b1.c
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -pragma-define:CRT_RABBIT_BANKS=1 pragma_main.c pragma_b1.c -o pragma_$(1)_$(2).bin
+	@got=$$$$(z88dk-ticks -m$(1) -banks pragma_$(1)_$(2).bin | head -1); \
+	if [ "$$$$got" = "43" ]; then \
+		echo "$$(GREEN)rabbit_mmu pragma bank $(1) $(2) passed$$(RESET)"; \
+	else \
+		echo "$$(RED)rabbit_mmu pragma bank $(1) $(2) failed: got '$$$$got'$$(RESET)"; exit 1; \
+	fi
+endef
 
-.PHONY: all banktests fartests far24tests debugtests dbglinetests bankstyletests runbank_zxn runbank_msx clean
+$(foreach cpu,r2ka r4k,$(foreach comp,$(BANK_COMPILERS),$(eval $(call pragma_test,$(cpu),$(comp)))))
+
+pragmatests: $(PRAGMA_TESTS)
+
+clean:
+	rm -f *.o m4_*.out pragma_*.bin dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+
+.PHONY: all banktests fartests far24tests debugtests dbglinetests pragmatests bankstyletests runbank_zxn runbank_msx clean

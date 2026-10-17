@@ -752,8 +752,23 @@ void dopragma(void)
         Kind valtype;
         double val;
         char   buf[100];
+        int    have_bank = 0;
 
-        if ( constexpr(&val, &valtype, 1) ) {
+        blanks();
+        if ( isdigit((unsigned char)ch()) ) {
+            /* A plain number is read here. The expression parser looks at the
+               next line for an operator, and eats the first word of the
+               declaration that follows the pragma. */
+            char *end;
+
+            val = strtol(&line[lptr], &end, 0);
+            lptr += end - &line[lptr];
+            have_bank = 1;
+        } else {
+            have_bank = constexpr(&val, &valtype, 1);
+        }
+
+        if ( have_bank ) {
             snprintf(buf,sizeof(buf),"CODE_%d",(int)val);
             c_code_section = STRDUP(buf);
             snprintf(buf,sizeof(buf),"RODATA_%d",(int)val);
