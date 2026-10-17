@@ -31,7 +31,7 @@ ifdef RMMU_WINDOWS
 all:
 	@echo "rabbit_mmu: skipped (POSIX-shell recipes; not run on Windows)"
 else
-all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests farstrtests bankstyletests
+all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests farstrtests lxpctests bankstyletests
 endif
 
 mmu.bin: mmu.asm
@@ -363,7 +363,41 @@ $(foreach t,$(FARHEAP_TESTS),$(eval FARSTR_TESTS += $(t)))
 
 farstrtests: $(FARSTR_TESTS)
 
-clean:
-	rm -f *.o m4_*.out farstr_*.bin farsuite_*.bin farheap_*.bin dbgz_*.bin dbgz_*.map dbgb_*.bin dbgb_*.map dbgv_*.bin dbgv_*.map dbgv_*.out pragma_*.bin dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+# The 12-bit LXPC of the Rabbit 4000 and later: banks above 255 (bank 300 is
+# 0x12c, bank 2000 is 0x7d0), nested banked calls with 32-bit return values,
+# banked data in a high bank and the debugger. lxpc_banks.asm comes first
+# because it places the bank sections.
+define lxpc_test
+LXPC_TESTS += runlxpc_$(1)_$(2)
+runlxpc_$(1)_$(2): lxpc_main.c lxpc_b300.c lxpc_b2000.c lxpc_banks.asm
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -pragma-define:CRT_RABBIT_BANKS=1 lxpc_banks.asm lxpc_main.c lxpc_b300.c lxpc_b2000.c -o lxpc_$(1)_$(2).bin
+	@got=$$$$(z88dk-ticks -m$(1) -banks lxpc_$(1)_$(2).bin | head -1); \
+	if [ "$$$$got" = "700021 15 4321 16909060" ]; then echo "$$(GREEN)rabbit_mmu lxpc banks $(1) $(2) passed$$(RESET)"; \
+	else echo "$$(RED)rabbit_mmu lxpc banks $(1) $(2) failed: got '$$$$got'$$(RESET)"; exit 1; fi
+LXPC_TESTS += rundbglxpc_$(1)_$(2)
+rundbglxpc_$(1)_$(2): lxpc_main.c lxpc_b300.c lxpc_b2000.c lxpc_banks.asm lxpc_dbg.txt lxpc_dbg2.txt
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -debug -pragma-define:CRT_RABBIT_BANKS=1 lxpc_banks.asm lxpc_main.c lxpc_b300.c lxpc_b2000.c -o lxpcd_$(1)_$(2).bin -m
+	@out=$$$$(z88dk-ticks -m$(1) -banks -x lxpcd_$(1)_$(2).map -d -script lxpc_dbg.txt lxpcd_$(1)_$(2).bin 2>&1); \
+	for want in 'Hit breakpoint 1: @$$$$7D0:$$$$E0' 'function bank2000_inner' 'function bank300_calc' 'xpc=FA0' 'bank2000_inner returned: 21' $$(LXPC_WANT_$(2)); do \
+		echo "$$$$out" | grep -qF -- "$$$$want" || { echo "$$(RED)rabbit_mmu lxpc debugger $(1) $(2) failed: no '$$$$want'$$(RESET)"; exit 1; }; \
+	done; \
+	out=$$$$(z88dk-ticks -m$(1) -banks -x lxpcd_$(1)_$(2).map -d -script lxpc_dbg2.txt lxpcd_$(1)_$(2).bin 2>&1); \
+	for want in 'Hit breakpoint 1: @$$$$12C:$$$$E000 (_bank300_calc)' '7D0E000:   '; do \
+		echo "$$$$out" | grep -qF -- "$$$$want" || { echo "$$(RED)rabbit_mmu lxpc debugger $(1) $(2) failed: no '$$$$want'$$(RESET)"; exit 1; }; \
+	done; \
+	echo "$$(GREEN)rabbit_mmu lxpc debugger $(1) $(2) passed$$(RESET)"
+endef
 
-.PHONY: all banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests farstrtests bankstyletests runbank_zxn runbank_msx clean
+# sccz80 keeps the whole call chain; 80cc has no caller frame for main and
+# a wrong long local in this program, with or without banks
+LXPC_WANT_sccz80 = 'function main' 'r = 700000'
+LXPC_WANT_80cc =
+
+$(foreach cpu,r4k r6k,$(foreach comp,$(BANK_COMPILERS),$(eval $(call lxpc_test,$(cpu),$(comp)))))
+
+lxpctests: $(LXPC_TESTS)
+
+clean:
+	rm -f *.o m4_*.out lxpc_*.bin lxpcd_*.bin lxpcd_*.map farstr_*.bin farsuite_*.bin farheap_*.bin dbgz_*.bin dbgz_*.map dbgb_*.bin dbgb_*.map dbgv_*.bin dbgv_*.map dbgv_*.out pragma_*.bin dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+
+.PHONY: all banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests farstrtests lxpctests bankstyletests runbank_zxn runbank_msx clean

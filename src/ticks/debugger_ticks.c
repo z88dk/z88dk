@@ -50,7 +50,7 @@ static uint32_t get_banked_pc()
 static int get_banked_caller(unsigned depth, uint32_t *caller)
 {
     int      var = symbol_resolve("___z88dk_banked_banksp", NULL);
-    uint16_t sp, entry;
+    uint16_t sp, entry, saved;
 
     /* Debugger reads must not trigger watchpoints */
 #define PEEK(a) (*get_memory_addr((uint16_t)(a), MEM_TYPE_DATA))
@@ -60,7 +60,13 @@ static int get_banked_caller(unsigned depth, uint32_t *caller)
     entry = sp + depth * 4;
     if ( entry < sp )
         return 0;
-    *caller = memory_banked_caller(PEEK(entry + 3), PEEK(entry) | PEEK(entry + 1) << 8);
+    /* The Rabbit 4000 and later save the whole LXPC as a word, the others save
+       af with the bank in a */
+    if ( israbbit() && (c_cpu & (CPU_R4K|CPU_R6K)) )
+        saved = PEEK(entry + 2) | PEEK(entry + 3) << 8;
+    else
+        saved = PEEK(entry + 3);
+    *caller = memory_banked_caller(saved, PEEK(entry) | PEEK(entry + 1) << 8);
 #undef PEEK
     return 1;
 }

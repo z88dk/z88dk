@@ -8,13 +8,49 @@
 ;
 ; Bank 0 is the root image and stays a local address.
 ;
-; Entry: ehl = banked address
+; Rabbit 4000 and later: the bank is 16 bits, in de.
+;
+; Entry: ehl = banked address (de on the Rabbit 4000 and later)
 ; Exit:  ehl = far address, d = 0
 
     SECTION code_l_sccz80_far
     PUBLIC  l_far_mapaddr
 
 l_far_mapaddr:
+IF __CPU_R4K__ || __CPU_R5K__ || __CPU_R6K__
+    ; The bank has 16 bits here: d is its high byte
+    ld      a,e
+    or      d
+    ret     z                       ; bank 0 is the root image, a local address
+    ld      a,e
+    and     $07
+    rrca
+    rrca
+    rrca                            ; (bank & 7) << 5
+    ld      b,a
+    ld      a,e
+    rrca
+    rrca
+    rrca
+    and     $1f                     ; low part of bank >> 3
+    ld      e,a
+    ld      a,d
+    rlca
+    rlca
+    rlca
+    rlca
+    rlca                            ; high part of bank >> 3
+    or      e
+    ld      e,a                     ; e = bank >> 3
+    ld      a,h
+    add     a,b
+    ld      h,a
+    ld      a,e
+    adc     a,0
+    ld      e,a
+    ld      d,0
+    ret
+ELSE
     ld      a,e
     and     a
     ret     z
@@ -34,3 +70,4 @@ l_far_mapaddr:
     ld      e,a
     ld      d,0
     ret
+ENDIF

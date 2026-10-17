@@ -23,7 +23,7 @@ static debug_sym_type* cdb_ctypes = NULL;
 static cline *clines[65536] = {0};
 /* Source lines of banked code, indexed by bank (address >> 16) then by the
    address in the bank window. The arrays are allocated when a bank has lines. */
-static cline **bank_clines[256] = {0};
+static cline **bank_clines[4096] = {0};
 
 static cline **cline_slot(int address, int create)
 {
@@ -33,7 +33,7 @@ static cline **cline_slot(int address, int create)
         return NULL;
     if ( bank == 0 )
         return &clines[address];
-    if ( bank > 255 )
+    if ( bank > 4095 )
         return NULL;
     if ( bank_clines[bank] == NULL ) {
         if ( !create )

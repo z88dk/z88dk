@@ -156,8 +156,31 @@ a 4-byte `defq` of the target.
 The separate stack has `CLIB_BANKING_STACK_SIZE` bytes (100 by default).
 The function sees a normal near-call frame.
 
-`banked_call` saves and restores only the low 8 bits of `XPC`. A banked call
-from code that runs with an `LXPC` above 255 loses the high bits.
+On the Rabbit 2000 and 3000 `banked_call` saves and restores the 8-bit `XPC`.
+On the Rabbit 4000 and later it reads the 16-bit bank from the upper two bytes
+of the `defq` and saves and restores the whole 12-bit `LXPC`. It preserves `HL`
+and `DE`, so the return value of a banked function is not changed.
+
+| | Rabbit 2000, 3000 | Rabbit 4000 and later |
+|---|---|---|
+| physical memory | 1MB | 16MB |
+| highest bank | 120 | 2040 |
+| bank sections in `crt_rabbit_banks.inc` | 1 to 120 | 1 to 255 |
+
+Bank N is at physical N × 0x2000 + 0xE000, so the highest bank is the last one
+that fits in the physical memory. For a bank above 255, define the sections in
+your own file and give it first on the command line, because the first mention
+of a section places it:
+
+```
+    SECTION BANK_12C            ; bank 300 is 0x12C
+    org $12C0000 + 0xE000
+    SECTION CODE_300
+    SECTION RODATA_300
+```
+
+`z80asm` writes the bank to `<name>_BANK_12C.bin`, and `z88dk-ticks -banks`
+loads it. The test `lxpc_*` in `test/suites/rabbit_mmu` uses banks 300 and 2000.
 
 Data can also be banked. Declare it with `__banked`, and put it in a bank
 with `#pragma bank`. The compiler uses `l_far_mapaddr` and the far routines.
@@ -283,7 +306,6 @@ MSX, the bank is the 16K page at 0x8000, and pages 0 to 3 hold the 64K image.
 ## Known limits
 
 * The stack and data must be below 0xE000 if you use banks or far pointers.
-* `banked_call` keeps only the low 8 bits of `XPC`.
 * An interrupt routine must save and restore `XPC` itself if it uses the
   window.
 * The `+z80` target with a Rabbit library does not link with the default

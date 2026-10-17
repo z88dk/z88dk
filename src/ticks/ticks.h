@@ -113,7 +113,7 @@ extern const char *rabbit_mmu_text(void);
 extern uint32_t  memory_banked_pc(uint16_t pc);
 extern uint8_t  *memory_debug_addr(uint32_t addr, memtype type);
 extern const char *memory_mmu_text(void);
-extern uint32_t  memory_banked_caller(uint8_t saved, uint16_t ret);
+extern uint32_t  memory_banked_caller(uint16_t saved, uint16_t ret);
 extern int       memory_has_banks(void);
 extern void      memory_bank_store(unsigned bank, unsigned offset, uint8_t value);
 extern void      rabbit_set_xpc(uint16_t value);

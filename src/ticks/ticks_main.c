@@ -208,7 +208,7 @@ static void load_bank_images(const char *input)
   if ( dot && !strchr(dot, '/') && !strchr(dot, '\\') )
     *dot = 0;
 
-  for ( bank = 1; bank < 256; bank++ ) {
+  for ( bank = 1; bank < 4096; bank++ ) {
     snprintf(path, sizeof(path), "%s_BANK_%02X.bin", base, bank);
     if ( (bf = fopen(path, "rb")) == NULL )
       continue;

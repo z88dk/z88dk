@@ -546,7 +546,10 @@ void memory_bank_store(unsigned bank, unsigned offset, uint8_t value)
 {
     switch ( current_model ) {
     case MODEL_RABBIT:
-        if ( bank >= 1 && offset < 0x2000 )
+        /* The bank has to be inside the physical memory (120 banks below 1MB,
+           2040 below 16MB) or it would wrap on to the root image */
+        if ( bank >= 1 && offset < 0x2000
+             && 0x10000 + (bank - 1) * 0x2000 + offset <= rabbit_phys_mask )
             rabbit_phys_write(0x10000 + (bank - 1) * 0x2000 + offset, value);
         break;
     case MODEL_ZXN:
@@ -610,15 +613,16 @@ uint8_t *memory_debug_addr(uint32_t addr, memtype type)
 
 /* The code that made a banked call, from its return address and the bank that
    banked_call saved. The saved byte is what the banking code reads back:
-     Rabbit  XPC, so the bank is half of it
+     Rabbit  XPC (LXPC on the Rabbit 4000 and later), so the bank is half of it
      ZXN     the 8K page in MMU slot 6, 0xff when nothing is paged in
      MSX     the 16K page at 0x8000, below 4 when the 64k image is there */
-uint32_t memory_banked_caller(uint8_t saved, uint16_t ret)
+uint32_t memory_banked_caller(uint16_t saved, uint16_t ret)
 {
     uint32_t bank = 0;
 
     switch ( current_model ) {
     case MODEL_RABBIT:
+        /* XPC on the Rabbit 2000 and 3000, the 12-bit LXPC on the 4000 and later */
         if ( saved >= 2 && (saved & 1) == 0 && ret >= 0xe000 )
             bank = saved / 2;
         break;

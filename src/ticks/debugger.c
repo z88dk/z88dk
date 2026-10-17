@@ -1476,7 +1476,7 @@ int parse_address(char *arg, const char** corrected_source)
         char *bank_end;
         int   bank = parse_number(arg, &bank_end);
 
-        if ( bank_end != arg && *bank_end == ':' && bank > 0 && bank < 256 ) {
+        if ( bank_end != arg && *bank_end == ':' && bank > 0 && bank < 4096 ) {
             char *addr_end;
             int   offset = parse_number(bank_end + 1, &addr_end);
 
