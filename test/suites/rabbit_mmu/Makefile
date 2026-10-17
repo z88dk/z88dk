@@ -42,16 +42,14 @@ runcrt_%: crt_mmu.c
 	fi
 
 # Banked calls and data in three code banks (XPC = bank * 2). The banks are
-# loaded after the root image by ticks -banks. RABBIT_ASM adds the library
-# sources when the startup library is older than them.
+# loaded after the root image by ticks -banks.
 BANK_COMPILERS = sccz80 80cc
 BANK_EXPECTED = 42 200 100023 6 4321 1020304
-RABBIT_ASM =
 
 define bank_test
 BANK_TESTS += runbank_$(1)_$(2)
 runbank_$(1)_$(2): banked_main.c banked_b1.c banked_b2.c banked_b3.c
-	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -pragma-define:CRT_RABBIT_BANKS=3 $$(RABBIT_ASM) banked_main.c banked_b1.c banked_b2.c banked_b3.c -o bank_$(1)_$(2).bin
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -pragma-define:CRT_RABBIT_BANKS=3 banked_main.c banked_b1.c banked_b2.c banked_b3.c -o bank_$(1)_$(2).bin
 	@got=$$$$(z88dk-ticks -m$(1) -banks bank_$(1)_$(2).bin | head -1); \
 	if [ "$$$$got" = "$$(BANK_EXPECTED)" ]; then \
 		echo "$$(GREEN)rabbit_mmu banked $(1) $(2) passed$$(RESET)"; \
@@ -71,7 +69,7 @@ FAR_EXPECTED = 16 17 18 19 | 1234 | 11223344 | 99 3
 define far_test
 FAR_TESTS += runfar_$(1)_$(2)
 runfar_$(1)_$(2): far_main.c
-	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -pragma-define:CRT_RABBIT_BANKS=0 $$(RABBIT_ASM) far_main.c -o far_$(1)_$(2).bin
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -pragma-define:CRT_RABBIT_BANKS=0 far_main.c -o far_$(1)_$(2).bin
 	@got=$$$$(z88dk-ticks -m$(1) far_$(1)_$(2).bin | head -1); \
 	if [ "$$$$got" = "$$(FAR_EXPECTED)" ]; then \
 		echo "$$(GREEN)rabbit_mmu far $(1) $(2) passed$$(RESET)"; \
