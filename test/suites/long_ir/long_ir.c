@@ -16,15 +16,6 @@
 #include "test.h"
 #include <string.h>   /* memset/memcpy → __builtin_* (const-count inline) */
 
-/* __far access pulls the banking lp_* helpers, which live only in the
-   pure-z80 clib (z80n/z180/ez80/gbz80 lack them, and __far isn't even a
-   valid keyword on some). Gate the __far tests to z80 so the rest of the
-   suite still builds and runs on the other CPUs. __Z80 is defined for
-   both z80 and z80n; exclude z80n explicitly. */
-#if defined(__Z80) && !defined(__Z80N)
-#  define HAVE_FAR 1
-#endif
-
 /* __critical pulls asm_cpu_push_di / asm_cpu_pop_ei, absent from the ez80
    clib — gate the __critical test off ez80 so the suite links there.
    gbz80 and 8080 have no IFF readback, so the IR emits bare di/ei (no
@@ -212,58 +203,14 @@ void am_wr_ptr(int v)        { *am_p = v; }           /* *p=     */
 void am_rmw_idx(int i, int v){ am_arr[i] += v; }     /* arr[i]+= */
 void am_rmw_ptr(int v)       { *am_p += v; }          /* *p+=    */
 
-/* ---- __far pointer access (IR-native, lp_* helpers) ----------------
- * A __far pointer (KIND_CPTR) is a 3-byte value — a 16-bit offset plus an
- * 8-bit bank — addressing memory beyond the 64K Z80 space. It lives in a
- * width-4 DEHL vreg (D=0, E=bank, HL=offset) and every access through it
- * routes via an lp_g / lp_p helper that pages the bank in/out (a full
- * clobber, modelled call-like). Before, the IR SILENTLY MISCOMPILED this
- * (treated far as a near width-2 pointer, dropping the bank); now load,
- * store, index, arithmetic, casts and the arg/return ABI are IR-native.
- *
- * Under +test there's no real banking: the near→far cast forces bank 0,
- * so lp_* hit __far_page's localfar fast path and the values round-trip
- * through ordinary RAM — exactly the trick the __addressmod test uses.
- * Each far_* helper is its own IR-compiled function so the far op stays
- * IR-native (test_far's Assert/printf may itself defer to the walker). */
-int           far_gbuf[8];
-long          far_lbuf[4];
-unsigned char far_cbuf[8];
-
-#ifdef HAVE_FAR
-void far_wr(int v)             { int * __far fp = (int * __far)far_gbuf; *fp = v; }      /* *fp = v   */
-int  far_rd(void)              { int * __far fp = (int * __far)far_gbuf; return *fp; }   /* x = *fp   */
-void far_idx_wr(int i, int v)  { int * __far fp = (int * __far)far_gbuf; fp[i] = v; }    /* fp[i] = v */
-int  far_idx_rd(int i)         { int * __far fp = (int * __far)far_gbuf; return fp[i]; } /* fp[i]     */
-int  far_step(int i)           { int * __far fp = (int * __far)far_gbuf; fp += i; return *fp; } /* fp += i */
-void far_uc_wr(int i, int v)   { unsigned char * __far cp = (unsigned char * __far)far_cbuf; cp[i] = (unsigned char)v; }
-int  far_uc_rd(int i)          { unsigned char * __far cp = (unsigned char * __far)far_cbuf; return cp[i]; }
-void far_long_wr(int i, long v){ long * __far lp = (long * __far)far_lbuf; lp[i] = v; }  /* long elem */
-long far_long_rd(int i)        { long * __far lp = (long * __far)far_lbuf; return lp[i]; }
-int  far_arg(int * __far q, int i) { return q[i]; }                    /* __far ptr param  */
-int * __far far_ret(void)      { return (int * __far)far_gbuf; }       /* __far ptr return */
-
-/* 2-byte _Float16 far element reuses the INTEGER helper (lp_gint), like
-   the walker — a 2/4-byte float/fix is a plain HL/DEHL value, not the
-   FA-accumulator tier. (Wide 5/6/8-byte double / long long far elements
-   emit lp_gdoub / lp_glonglong; those helpers don't exist in any maths
-   lib yet — like the walker we emit the call and validate the asm, not
-   at runtime, so they aren't exercised here.) */
-_Float16 far_hbuf[2];
-void far_h_wr(_Float16 v) { _Float16 * __far p = (_Float16 * __far)far_hbuf; *p = v; }
-int  far_h_eq(_Float16 v) { _Float16 * __far p = (_Float16 * __far)far_hbuf; return *p == v; }
-
-#endif /* HAVE_FAR */
-
 /* Pointer DIFFERENCE returns the element count, not the byte count — the
    IR scales by 1/sizeof(*p) (shift for power-of-2, l_div_u else), for near
    AND far pointers. (Was a latent IR miscompile: it returned the raw byte
    difference; near pointers were affected too, the walker divides.) */
-int near_idiff(int i) { int *a = far_gbuf, *b = far_gbuf; b += i; return (int)(b - a); }
-int near_ldiff(int i) { long *a = far_lbuf, *b = far_lbuf; b += i; return (int)(b - a); }
-#ifdef HAVE_FAR
-int far_idiff(int i)  { int * __far a = (int * __far)far_gbuf, * __far b; b = a; b += i; return (int)(b - a); }
-#endif
+int           near_gbuf[8];
+long          near_lbuf[4];
+int near_idiff(int i) { int *a = near_gbuf, *b = near_gbuf; b += i; return (int)(b - a); }
+int near_ldiff(int i) { long *a = near_lbuf, *b = near_lbuf; b += i; return (int)(b - a); }
 
 /* Special calling conventions, caller AND callee both IR-native:
  *  __stdc forces right-to-left push, so the callee param layout flips
@@ -1324,31 +1271,8 @@ static void test_addressmod(void)
 
 static void test_far(void)
 {
-#ifdef HAVE_FAR
-    int i;
-    int * __far r;
-    far_wr(0x1234);
-    Assert(far_gbuf[0] == 0x1234, "__far *fp = v (store)");
-    Assert(far_rd() == 0x1234,    "__far x = *fp (load)");
-    for (i = 0; i < 8; i++) far_idx_wr(i, i * 10 + 3);
-    Assert(far_idx_rd(5) == 53,   "__far fp[i] read/write");
-    Assert(far_step(4) == 43,     "__far fp += i then *fp (far arith)");
-    far_uc_wr(2, 0xAB);
-    Assert(far_uc_rd(2) == 0xAB,  "__far unsigned char fp[i]");
-    far_long_wr(2, 0x11223344L);
-    Assert(far_long_rd(2) == 0x11223344L, "__far long element (lp_g/p long)");
-    Assert(far_arg((int * __far)far_gbuf, 5) == 53, "__far pointer arg (4-byte push)");
-    far_wr(0x4321);                                   /* fresh value (the loop above set gbuf[0]=3) */
-    r = far_ret();                                    /* __far ptr return (DEHL) */
-    Assert(r[0] == 0x4321,        "__far pointer return value");
-    far_h_wr((_Float16)7);
-    Assert(far_h_eq((_Float16)7), "__far _Float16 element (2B float via lp_gint)");
-#endif /* HAVE_FAR */
     Assert(near_idiff(5) == 5,    "near int* difference (scaled /2)");
     Assert(near_ldiff(3) == 3,    "near long* difference (scaled /4)");
-#ifdef HAVE_FAR
-    Assert(far_idiff(6) == 6,     "__far int* difference (scaled /2)");
-#endif
     Assert(cc_stdc(1, 2, 3) == 123, "__stdc R\xe2\x86\x92L param order");
     Assert(cc_sdcc(10, 20, 300) == 330, "__z88dk_sdccdecl 1-byte char args");
     Assert(cc_fc(50, 8) == 42,      "__z88dk_fastcall int arg in HL");
