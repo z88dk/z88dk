@@ -220,6 +220,7 @@ Start the debugger with `-d`. Load the map file with `-x` so that names work.
 | `x /4 1:0xE000`, `dis 0x1E000 3` | show the memory of a bank, even if it is not mapped |
 | `break b1.c:4` | break on a source line. Build with `-debug`. The line can be in banked code. |
 | `list`, `next`, `step` | show and step source lines in banked code |
+| `print`, `bt` | print locals, statics and globals, and a banked array or structure. `bt` shows the innermost frame. |
 | `watch read bank3_val`, `watch write 3:0xE000` | watch a banked address. It hits only while the bank is mapped. |
 
 A watchpoint on a plain address, such as `0xE000`, hits for any bank.
@@ -244,9 +245,11 @@ MSX, the bank is the 16K page at 0x8000, and pages 0 to 3 hold the 64K image.
 * `__far` function pointers (`l_farcall`) have no Rabbit implementation.
 * The far string functions (`strcmpf` and others) are not in the Rabbit
   libraries.
-* `bt`, `finish`, `up`, `down` and the printing of local variables do not
-  follow a call from one bank to another. Nobody has tested them in banked
-  code.
+* `bt`, `finish`, `up` and `down` follow a call only if the caller is in the
+  root image. The return address on the stack has 16 bits and does not say
+  which bank the caller was in. The innermost frame is always correct.
+* A static variable is visible only in the file of the current function, as
+  in C. In a banked function, `print` finds the statics of that file.
 
 ## Tests
 

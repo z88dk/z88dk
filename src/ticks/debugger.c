@@ -481,7 +481,7 @@ void debugger_request_a_break() {
 
 static void debugger_print_prompt(char *prompt, size_t prompt_size, char *buf, size_t buf_size) {
     uint16_t sym_offset;
-    symbol* sym = symbol_find_lower(bk.pc(), SYM_ADDRESS, &sym_offset);
+    symbol* sym = symbol_find_lower(current_banked_pc(), SYM_ADDRESS, &sym_offset);
     if (sym == NULL) {
         buf[0] = 0;
     } else {
@@ -725,14 +725,14 @@ void debugger()
                     dodebug=1;
                     break;
                 } else if ( elem->type == BREAK_CHECK8 && bk.get_memory(elem->lcheck_arg, MEM_TYPE_DATA) == elem->lvalue ) {
-                    bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                    bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                     elem->enabled = 0;
                     dodebug=1;
                     break;
                 } else if ( elem->type == BREAK_CHECK16 &&
                             bk.get_memory(elem->lcheck_arg, MEM_TYPE_DATA) == elem->lvalue  &&
                             bk.get_memory(elem->hcheck_arg, MEM_TYPE_DATA) == elem->hvalue  ) {
-                    bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                    bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                     elem->enabled = 0;
                     dodebug=1;
                     break;
@@ -752,14 +752,14 @@ void debugger()
                         lc = ((uint8_t *)r->word(&regs));
 #endif
                         if (*lc == elem->lvalue && *hc == elem->hvalue) {
-                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                             elem->enabled = 0;
                             dodebug=1;
                             break;
                         }
                     } else if (r->high == NULL) {
                         if (*(r->low(&regs)) == elem->lvalue) {
-                            bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                             elem->enabled = 0;
                             dodebug=1;
                             break;
@@ -767,7 +767,7 @@ void debugger()
                     } else {
                         if (*(r->low(&regs)) == elem->lvalue && *(r->high(&regs)) == elem->hvalue)
                         {
-                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                             elem->enabled = 0;
                             dodebug=1;
                             break;
@@ -1020,7 +1020,7 @@ static int cmd_frame(int argc, char **argv)
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
     uint16_t stack = regs.sp;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     size_t frames_count = debug_stack_frames_count(first_frame_pointer);
@@ -1082,7 +1082,7 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
@@ -1232,7 +1232,7 @@ static void info_section_locals() {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
@@ -1278,7 +1278,7 @@ static void info_section_globals() {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
@@ -1375,7 +1375,7 @@ static int cmd_backtrace(int argc, char **argv)
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     if (first_frame_pointer == NULL) {
@@ -1822,7 +1822,7 @@ static int cmd_finish(int argc, char **argv)
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 1);
 
@@ -2342,7 +2342,7 @@ static int cmd_list(int argc, char **argv)
         struct debugger_regs_t regs;
         bk.get_regs(&regs);
         uint16_t stack = regs.sp;
-        uint16_t at = bk.pc();
+        uint32_t at = current_banked_pc();
 
         debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
         debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);

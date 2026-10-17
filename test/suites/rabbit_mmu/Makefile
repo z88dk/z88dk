@@ -9,7 +9,7 @@ CPUS = r2ka r3k r4k
 # Result bytes at 0x100..0x10d, little endian words / bytes
 EXPECTED = ef be fe ca aa 55 83 11 44 00 00 00 57 13
 
-all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests pragmatests bankstyletests
+all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests dbgvartests pragmatests bankstyletests
 
 mmu.bin: mmu.asm
 	z88dk-z80asm -mr3k -b mmu.asm
@@ -229,7 +229,25 @@ $(foreach cpu,r2ka r4k,$(foreach comp,$(BANK_COMPILERS),$(eval $(call pragma_tes
 
 pragmatests: $(PRAGMA_TESTS)
 
-clean:
-	rm -f *.o m4_*.out pragma_*.bin dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+# Variables in banked code: statics, function statics, locals and a const
+# array in another bank. The comparison is of the lines that print a value.
+define dbgvar_test
+DBGVAR_TESTS += rundbgvar_$(1)_$(2)
+rundbgvar_$(1)_$(2): dbgv_main.c dbgv_b1.c dbgv_b3.c dbgv.txt dbgv.expected
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -debug -pragma-define:CRT_RABBIT_BANKS=3 dbgv_main.c dbgv_b1.c dbgv_b3.c -o dbgv_$(1)_$(2).bin -m
+	@z88dk-ticks -m$(1) -banks -x dbgv_$(1)_$(2).map -d -script dbgv.txt dbgv_$(1)_$(2).bin 2>&1 | grep -F ' = <' > dbgv_$(1)_$(2).out; \
+	if cmp -s dbgv_$(1)_$(2).out dbgv.expected; then \
+		echo "$$(GREEN)rabbit_mmu variables $(1) $(2) passed$$(RESET)"; \
+	else \
+		echo "$$(RED)rabbit_mmu variables $(1) $(2) failed:$$(RESET)"; diff dbgv.expected dbgv_$(1)_$(2).out; exit 1; \
+	fi
+endef
 
-.PHONY: all banktests fartests far24tests debugtests dbglinetests pragmatests bankstyletests runbank_zxn runbank_msx clean
+$(foreach cpu,r2ka r4k,$(foreach comp,$(BANK_COMPILERS),$(eval $(call dbgvar_test,$(cpu),$(comp)))))
+
+dbgvartests: $(DBGVAR_TESTS)
+
+clean:
+	rm -f *.o m4_*.out dbgv_*.bin dbgv_*.map dbgv_*.out pragma_*.bin dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+
+.PHONY: all banktests fartests far24tests debugtests dbglinetests dbgvartests pragmatests bankstyletests runbank_zxn runbank_msx clean

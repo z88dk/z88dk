@@ -136,7 +136,7 @@ struct debug_frame_pointer_s {
     symbol*                 symbol;
     debug_sym_function*     function;
     uint16_t                offset;
-    uint16_t                address;
+    uint32_t                address;
     uint16_t                return_address;
     uint32_t                frame_pointer;
     const char*             filename;
@@ -197,7 +197,7 @@ extern debug_sym_symbol* cdb_get_first_local_symbol(const char* filename);
 extern debug_sym_symbol* cdb_find_symbol(const char* cname, const char* filename);
 extern debug_sym_type* cdb_find_type(const char* tname);
 
-extern debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit);
+extern debug_frame_pointer* debug_stack_frames_construct(uint32_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit);
 extern debug_frame_pointer* debug_stack_frames_at(debug_frame_pointer* first, size_t frame);
 extern size_t debug_stack_frames_count(debug_frame_pointer* first);
 extern void debug_stack_frames_free(debug_frame_pointer* stack_frames);

@@ -1326,7 +1326,7 @@ static uint16_t get_current_framepointer(struct debugger_regs_t *regs, size_t* i
 }
 
 static uint8_t recover_from_frame_pointer(symbol* sym, uint16_t frame_pointer,
-                                          uint8_t* unreliable_offset, uint16_t* at, uint16_t* stack,
+                                          uint8_t* unreliable_offset, int* at, uint16_t* stack,
                                           debug_frame_pointer** first, debug_frame_pointer** last)
 {
     // we have no idea where we are but, but somebody called us, and it's return address
@@ -1363,7 +1363,9 @@ static uint8_t recover_from_frame_pointer(symbol* sym, uint16_t frame_pointer,
     return 0;
 }
 
-debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit)
+/* pc is a banked address (bank << 16 | pc) when the code is in a bank. The
+   callers' addresses, from the stack, have 16 bits. */
+debug_frame_pointer* debug_stack_frames_construct(uint32_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit)
 {
     size_t invalidate_stack_after;
     uint16_t frame_pointer = get_current_framepointer(regs, &invalidate_stack_after);
@@ -1374,7 +1376,7 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
     uint8_t unreliable_offset = 0;
     uint8_t entry_num = 0;
     uint16_t stack = sp;
-    uint16_t at = pc;
+    int      at = pc;
 
     do {
         entry_num++;
