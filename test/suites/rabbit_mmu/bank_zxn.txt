@@ -1,0 +1,5 @@
+break 10:c000
+cont
+reg
+x /3 10:c000
+quit

@@ -48,6 +48,9 @@ static int            inst_mode = 1;       // We're reading an instruction
 
 static memory_func   get_mem_addr;
 static void        (*write_hook)(uint16_t addr, uint8_t value);
+
+// Which banking scheme the debugger has to understand
+static enum { MODEL_OTHER, MODEL_RABBIT, MODEL_ZXN, MODEL_MSX } current_model = MODEL_OTHER;
 static void        (*handle_out)(int port, int value);
 static int         (*handle_in)(int port);
 
@@ -208,6 +211,7 @@ static void zxn_init(void)
 
 
     standard_init();
+    current_model = MODEL_ZXN;
     get_mem_addr = zxn_get_memory_addr;
     handle_out = zxn_handle_out;
 }
@@ -431,6 +435,7 @@ static void rabbit_init(void)
     // The allocation is untouched until used, so the larger size costs nothing
     rabbit_phys = calloc(16 * 1024 * 1024, 1);
     rabbit_phys_mask = (c_cpu & (CPU_R4K|CPU_R6K)) ? 0xffffff : 0xfffff;
+    current_model = MODEL_RABBIT;
     get_mem_addr = rabbit_get_memory_addr;
     write_hook = rabbit_write_hook;
 
@@ -510,6 +515,83 @@ int rabbit_get_ioi_reg(int reg)
 }
 
 
+/* Debugger view of banked memory. A bank is addressed as bank << 16 | address
+   in the bank window, which is how z80asm lays out the bank sections:
+     Rabbit  bank N is XPC = N * 2 in 0xe000-0xffff
+     ZXN     bank N is the 8k page N (and N+1) in MMU slots 6 and 7, 0xc000-0xffff
+     MSX     bank N is the 16k page N in 0x8000-0xbfff, pages 4 and up being
+             the pages above the four that hold the 64k image */
+
+// pc extended with the bank mapped in its window, or pc if it is in none
+uint32_t memory_banked_pc(uint16_t pc)
+{
+    switch ( current_model ) {
+    case MODEL_RABBIT:
+        return rabbit_banked_pc(pc);
+    case MODEL_ZXN:
+        if ( pc >= 0xc000 && zxnext_mmu[6] != 0xff )
+            return (uint32_t)zxnext_mmu[6] << 16 | pc;
+        break;
+    case MODEL_MSX:
+        if ( pc >= 0x8000 && pc < 0xc000 && msx_mmu[2] >= 4 )
+            return (uint32_t)msx_mmu[2] << 16 | pc;
+        break;
+    default:
+        break;
+    }
+    return pc;
+}
+
+// Where a debugger address lives. Addresses up to 64k are logical ones.
+uint8_t *memory_debug_addr(uint32_t addr, memtype type)
+{
+    uint32_t bank = addr >> 16;
+    uint16_t off = addr & 0xffff;
+
+    if ( bank == 0 )
+        return get_memory_addr(off, type);
+
+    switch ( current_model ) {
+    case MODEL_RABBIT:
+        return get_memory_addr(rabbit_debug_physical(addr), MEM_TYPE_PHYSICAL);
+    case MODEL_ZXN:
+        if ( off >= 0xc000 && bank + (off >> 13) - 6 < 256 )
+            return &zxn_banks[bank + (off >> 13) - 6][off & 0x1fff];
+        break;
+    case MODEL_MSX:
+        if ( off >= 0x8000 && off < 0xc000 && bank < 256 )
+            return &msx_banks[bank][off & 0x3fff];
+        break;
+    default:
+        break;
+    }
+    return get_memory_addr(off, type);
+}
+
+// One line describing the memory map, or NULL
+const char *memory_mmu_text(void)
+{
+    static char buf[160];
+    int         i, n;
+
+    switch ( current_model ) {
+    case MODEL_RABBIT:
+        return rabbit_mmu_text();
+    case MODEL_ZXN:
+        n = snprintf(buf, sizeof(buf), "mmu slots:");
+        for ( i = 0; i < 8; i++ )
+            n += snprintf(buf + n, sizeof(buf) - n, " %d=%02x", i, zxnext_mmu[i]);
+        return buf;
+    case MODEL_MSX:
+        snprintf(buf, sizeof(buf), "pages: 0=%02x 1=%02x 2=%02x 3=%02x",
+            msx_mmu[0], msx_mmu[1], msx_mmu[2], msx_mmu[3]);
+        return buf;
+    default:
+        return NULL;
+    }
+}
+
+
 // MSX: 256 pages of 16k, paged in at a 16k boundary
 static void msx_init(void) 
 {
@@ -523,6 +605,7 @@ static void msx_init(void)
     msx_mmu[2] = 0x02;
     msx_mmu[3] = 0x03;
 
+    current_model = MODEL_MSX;
     get_mem_addr = msx_get_memory_addr;
     handle_out = msx_handle_out;
     handle_in = msx_handle_in;

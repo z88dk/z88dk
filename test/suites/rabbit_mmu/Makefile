@@ -9,7 +9,7 @@ CPUS = r2ka r3k r4k
 # Result bytes at 0x100..0x10d, little endian words / bytes
 EXPECTED = ef be fe ca aa 55 83 11 44 00 00 00 57 13
 
-all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests
+all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests bankstyletests
 
 mmu.bin: mmu.asm
 	z88dk-z80asm -mr3k -b mmu.asm
@@ -166,7 +166,28 @@ $(foreach cpu,r2ka r4k,$(eval $(call dbg_test,$(cpu))))
 
 debugtests: $(DBG_TESTS)
 
-clean:
-	rm -f mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map *.lis *.o *~ zcc_opt.def
+# The other banking styles under the debugger: ZXN MMU slots 6 and 7 and MSX
+# 16k pages. Each program maps a bank, copies code in, calls it and the script
+# breaks in the bank with bank:address.
+bankstyletests: runbank_zxn runbank_msx
 
-.PHONY: all banktests fartests far24tests debugtests clean
+runbank_zxn: bank_zxn.asm bank_zxn.txt
+	@z88dk-z80asm -mz80n -b bank_zxn.asm
+	@out=$$(z88dk-ticks -mz80n -d -script bank_zxn.txt bank_zxn.bin 2>&1); \
+	for want in "Hit breakpoint 1: @10:C000" "6=10 7=11" "10C000:   3E 42 C9"; do \
+		echo "$$out" | grep -qF "$$want" || { echo "$(RED)rabbit_mmu zxn banks failed: no '$$want'$(RESET)"; exit 1; }; \
+	done; \
+	echo "$(GREEN)rabbit_mmu zxn banks passed$(RESET)"
+
+runbank_msx: bank_msx.asm bank_msx.txt
+	@z88dk-z80asm -mz80 -b bank_msx.asm
+	@out=$$(z88dk-ticks -mz80 -b msx -d -script bank_msx.txt bank_msx.bin 2>&1); \
+	for want in "Hit breakpoint 1: @5:8000" "2=05" "58000:   3E 42 C9"; do \
+		echo "$$out" | grep -qF "$$want" || { echo "$(RED)rabbit_mmu msx banks failed: no '$$want'$(RESET)"; exit 1; }; \
+	done; \
+	echo "$(GREEN)rabbit_mmu msx banks passed$(RESET)"
+
+clean:
+	rm -f mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+
+.PHONY: all banktests fartests far24tests debugtests bankstyletests runbank_zxn runbank_msx clean

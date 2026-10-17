@@ -1477,21 +1477,28 @@ int parse_address(char *arg, const char** corrected_source)
     int  where;
     char *end;
 
-    where = parse_number(arg, &end);
-    if ( end != arg && *end == ':' && bk.banked_pc != NULL ) {
-        /* bank:address, as z80asm numbers the bank sections */
-        /* The offset is hexadecimal, with or without a $ or 0x prefix */
-        char *addr_start = end + 1;
-        char *addr_end;
-        int   offset;
+    if ( bk.banked_pc != NULL ) {
+        /* bank:address, both hexadecimal as in the map file and the messages,
+           with or without a $ prefix */
+        char *bank_start = arg;
+        char *bank_end;
+        long  bank;
 
-        if ( *addr_start == '$' ) addr_start++;
-        offset = strtol(addr_start, &addr_end, 16);
+        if ( *bank_start == '$' ) bank_start++;
+        bank = strtol(bank_start, &bank_end, 16);
+        if ( bank_end != bank_start && *bank_end == ':' && bank > 0 && bank < 256 ) {
+            char *addr_start = bank_end + 1;
+            char *addr_end;
+            long  offset;
 
-        if ( addr_end != addr_start && where > 0 && where < 256 ) {
-            return where << 16 | (offset & 0xffff);
+            if ( *addr_start == '$' ) addr_start++;
+            offset = strtol(addr_start, &addr_end, 16);
+            if ( addr_end != addr_start && *addr_end == 0 ) {
+                return bank << 16 | (offset & 0xffff);
+            }
         }
     }
+    where = parse_number(arg, &end);
     if ( end == arg ) {
         where = symbol_resolve(arg, NULL);
         if ( where == -1 ) {
