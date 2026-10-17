@@ -21,6 +21,7 @@ all:	blockfn.bin blockfn_8080.bin blockfn_gbz80.bin blockfn_r2ka.bin blockfn_ez8
 all:	accintcomp.bin accintcomp_fp.bin
 all:	bigframe.bin bigframe_fp.bin bigframe_8080.bin bigframe_r2ka.bin bigframe_ez80.bin bigframe_gbz80.bin
 all:	farptr.bin farptr_8080.bin farptr_8085.bin farptr_gbz80.bin farptr_r2ka.bin farptr_r4k.bin farptr_ez80.bin farptr_z180.bin farptr_z80n.bin farptr_kc160.bin farptr_fp.bin
+all:	farlp.bin farlp_r2ka.bin farlp_r4k.bin farlp_z80n.bin farlp_fp.bin
 all:	longasr.bin longasr_8080.bin longasr_gbz80.bin longasr_r2ka.bin longasr_ez80.bin longasr_8085.bin longasr_kc160.bin longasr_z180.bin longasr_r4k.bin longasr_fp.bin
 all:	crcloop.bin crcloop_8080.bin crcloop_gbz80.bin crcloop_r2ka.bin crcloop_ez80.bin crcloop_8085.bin crcloop_kc160.bin crcloop_z180.bin crcloop_r4k.bin crcloop_fp.bin
 all:	zxfold.bin zxfold_8080.bin zxfold_gbz80.bin zxfold_r2ka.bin zxfold_ez80.bin zxfold_8085.bin zxfold_kc160.bin zxfold_z180.bin zxfold_r4k.bin zxfold_fp.bin
@@ -4322,6 +4323,26 @@ farptr_kc160.bin: $(SOURCES) farptr.c
 
 farptr_fp.bin: $(SOURCES) farptr.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+farlp.bin: $(SOURCES) farlp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -lmath16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+farlp_r2ka.bin: $(SOURCES) farlp.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+farlp_r4k.bin: $(SOURCES) farlp.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+farlp_z80n.bin: $(SOURCES) farlp.c
+	$(compile_z80n)
+	$(runtest_z80n)
+
+farlp_fp.bin: $(SOURCES) farlp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -lmath16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 longasr.bin: $(SOURCES) longasr.c
