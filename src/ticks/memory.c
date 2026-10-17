@@ -15,6 +15,7 @@ typedef uint8_t *(*memory_func)(uint32_t pc, memtype type);
 static void     standard_init(void);
 static uint8_t *standard_get_memory_addr(uint32_t pc, memtype type);
 static void     zxn_init(void);
+static int      zxn_handle_in(int port);
 static uint8_t *zxn_get_memory_addr(uint32_t pc, memtype type);
 static void     zxn_handle_out(int port, int value);
 static void     zx_init(char *config);
@@ -214,6 +215,7 @@ static void zxn_init(void)
     current_model = MODEL_ZXN;
     get_mem_addr = zxn_get_memory_addr;
     handle_out = zxn_handle_out;
+    handle_in = zxn_handle_in;
 }
 
 static uint8_t *zxn_get_memory_addr(uint32_t pc, memtype type)
@@ -228,19 +230,27 @@ static uint8_t *zxn_get_memory_addr(uint32_t pc, memtype type)
 }
 
 
+/* Next registers: a write to port 0x243b selects a register, and the select
+   stays until the next one. Port 0x253b reads and writes the selected
+   register. Only the MMU slots, registers 0x50 to 0x57, are modelled. */
+static int zxn_selected_register = -1;
+
 static void zxn_handle_out(int port, int value)
 {
-  static int nextport = 0;
-
-  if ( port == 0x243B && nextport == 0 ) {
-      nextport = value;
+  if ( port == 0x243B ) {
+      zxn_selected_register = value;
       return;
   }
-  if ( nextport >= 0x50 && nextport <= 0x57 ) {
-    zxnext_mmu[nextport - 0x50] = value;
+  if ( port == 0x253B && zxn_selected_register >= 0x50 && zxn_selected_register <= 0x57 ) {
+    zxnext_mmu[zxn_selected_register - 0x50] = value;
   }
-  nextport = 0;
-  return;
+}
+
+static int zxn_handle_in(int port)
+{
+  if ( port == 0x253B && zxn_selected_register >= 0x50 && zxn_selected_register <= 0x57 )
+    return zxnext_mmu[zxn_selected_register - 0x50];
+  return -1;
 }
 
 static void load_rom(char *filename, unsigned char *buf, size_t len)
@@ -522,6 +532,36 @@ int rabbit_get_ioi_reg(int reg)
      MSX     bank N is the 16k page N in 0x8000-0xbfff, pages 4 and up being
              the pages above the four that hold the 64k image */
 
+/* Loading a bank image (the _BANK_nn.bin files that z80asm writes). nn is the
+   bank number as in the section names, and offset is the byte in the file.
+     Rabbit  8K at physical 0x10000 + (nn - 1) * 0x2000
+     ZXN     16K over the 8K pages nn and nn + 1
+     MSX     16K in the 16K page nn */
+int memory_has_banks(void)
+{
+    return current_model != MODEL_OTHER;
+}
+
+void memory_bank_store(unsigned bank, unsigned offset, uint8_t value)
+{
+    switch ( current_model ) {
+    case MODEL_RABBIT:
+        if ( bank >= 1 && offset < 0x2000 )
+            rabbit_phys_write(0x10000 + (bank - 1) * 0x2000 + offset, value);
+        break;
+    case MODEL_ZXN:
+        if ( bank + (offset >> 13) < 256 && offset < 0x4000 )
+            zxn_banks[bank + (offset >> 13)][offset & 0x1fff] = value;
+        break;
+    case MODEL_MSX:
+        if ( bank < 256 && offset < 0x4000 )
+            msx_banks[bank][offset] = value;
+        break;
+    default:
+        break;
+    }
+}
+
 // pc extended with the bank mapped in its window, or pc if it is in none
 uint32_t memory_banked_pc(uint16_t pc)
 {
@@ -566,6 +606,34 @@ uint8_t *memory_debug_addr(uint32_t addr, memtype type)
         break;
     }
     return get_memory_addr(off, type);
+}
+
+/* The code that made a banked call, from its return address and the bank that
+   banked_call saved. The saved byte is what the banking code reads back:
+     Rabbit  XPC, so the bank is half of it
+     ZXN     the 8K page in MMU slot 6, 0xff when nothing is paged in
+     MSX     the 16K page at 0x8000, below 4 when the 64k image is there */
+uint32_t memory_banked_caller(uint8_t saved, uint16_t ret)
+{
+    uint32_t bank = 0;
+
+    switch ( current_model ) {
+    case MODEL_RABBIT:
+        if ( saved >= 2 && (saved & 1) == 0 && ret >= 0xe000 )
+            bank = saved / 2;
+        break;
+    case MODEL_ZXN:
+        if ( saved != 0xff && saved != 0 && ret >= 0xc000 )
+            bank = saved;
+        break;
+    case MODEL_MSX:
+        if ( saved >= 4 && ret >= 0x8000 && ret < 0xc000 )
+            bank = saved;
+        break;
+    default:
+        break;
+    }
+    return bank << 16 | ret;
 }
 
 // One line describing the memory map, or NULL

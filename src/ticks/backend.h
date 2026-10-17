@@ -27,6 +27,9 @@ typedef uint32_t (*uint32_t_cb)();
 typedef void (*log_cb)(const char *fmt, ...);
 typedef void (*console_raw_cb)(const char *str, size_t len);
 typedef uint8_t (*breakpoints_check_cb)();
+/* The n-th entry of the bank stack, counted from the top: the banked address of
+   the code that made the n-th banked call that is still running. 0 if none. */
+typedef int (*banked_caller_cb)(unsigned depth, uint32_t *caller);
 
 typedef breakpoint_ret_t (*breakpoint_cb)(uint8_t type, uint16_t at, uint8_t sz);
 typedef uint8_t (*connect_cb)(const char* address);
@@ -80,6 +83,8 @@ typedef struct {
     uint32_t_cb banked_pc;
     /* Optional: one line describing the memory map, or NULL */
     get_charp_cb mmu_info;
+    /* Optional: used to walk past banked_call when building the frames */
+    banked_caller_cb banked_caller;
 } backend_t;
 
 extern backend_t bk;

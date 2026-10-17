@@ -137,7 +137,7 @@ struct debug_frame_pointer_s {
     debug_sym_function*     function;
     uint16_t                offset;
     uint32_t                address;
-    uint16_t                return_address;
+    uint32_t                return_address;
     uint32_t                frame_pointer;
     const char*             filename;
     int                     lineno;

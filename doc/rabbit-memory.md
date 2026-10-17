@@ -220,7 +220,8 @@ Start the debugger with `-d`. Load the map file with `-x` so that names work.
 | `x /4 1:0xE000`, `dis 0x1E000 3` | show the memory of a bank, even if it is not mapped |
 | `break b1.c:4` | break on a source line. Build with `-debug`. The line can be in banked code. |
 | `list`, `next`, `step` | show and step source lines in banked code |
-| `print`, `bt` | print locals, statics and globals, and a banked array or structure. `bt` shows the innermost frame. |
+| `print` | print locals, statics and globals, and a banked array or structure |
+| `bt`, `up`, `down`, `finish` | walk through banked calls, from the root image or from another bank |
 | `watch read bank3_val`, `watch write 3:0xE000` | watch a banked address. It hits only while the bank is mapped. |
 
 A watchpoint on a plain address, such as `0xE000`, hits for any bank.
@@ -228,9 +229,25 @@ Each part of `bank:address` is a number. A number is decimal, or
 hexadecimal with a `$` or `0x` prefix. A hit message prints the address in
 the same style, for example `Hit breakpoint 1: @$1:$E000 (_bank1_inc)`.
 
-The ZXN and MSX memory models of `z88dk-ticks` use the same notation. On the
-ZXN, the bank is the first of the two 8K pages in MMU slots 6 and 7, as in
-`zxn_banked_call.asm`. This was not tested with a real ZXN build. On the
+The ZXN and MSX memory models of `z88dk-ticks` use the same notation, and
+`-banks` loads their bank images in the same way. On the ZXN, bank N is the 8K
+page N (and N + 1) in MMU slots 6 and 7. On the MSX, the bank is the 16K page
+at 0x8000, and pages 0 to 3 hold the 64K image. The ZXN is tested with the
+real `zxn_banked_call.asm`. The MSX is not tested with a real MSX banked
+program, because the MSX ROM mappers switch pages by writes to cartridge
+addresses, which ticks does not model.
+
+To run banked code on the ZXN, make these changes to the `+test -clib=zxn`
+command line:
+
+1. Put a file with the bank sections first, for example `SECTION BANK_10`
+   with `org $10C000` and `SECTION CODE_16`.
+2. Add `libsrc/target/zxn/far/zxn_banked_call.asm` with
+   `-Ca-D__CLASSIC`.
+3. Put the stack below 0xC000 with `-pragma-define:REGISTER_SP=0xBF00`.
+4. Run with `z88dk-ticks -mz80n -banks`.
+
+The test `dbgz_*` in `test/suites/rabbit_mmu` shows all of this. On the
 MSX, the bank is the 16K page at 0x8000, and pages 0 to 3 hold the 64K image.
 
 ## Known limits
@@ -245,11 +262,10 @@ MSX, the bank is the 16K page at 0x8000, and pages 0 to 3 hold the 64K image.
 * `__far` function pointers (`l_farcall`) have no Rabbit implementation.
 * The far string functions (`strcmpf` and others) are not in the Rabbit
   libraries.
-* `bt`, `finish`, `up` and `down` stop at a `banked_call`. A banked function
-  returns to `banked_call`, which has no debug information. The address and
-  the bank of the real caller are on the separate bank stack, and the debugger
-  does not read that stack. This is the same for a call from the root image
-  and for a call from another bank. The innermost frame is correct.
+* `bt`, `finish`, `up` and `down` read the bank stack of `banked_call`. A
+  banked function returns into `banked_call`, so the real caller and its bank
+  are on that stack. The debugger finds the stack by the name
+  `___z88dk_banked_banksp`. It is tested for the Rabbit and for the ZX Next.
 * A static variable is visible only in the file of the current function, as
   in C. In a banked function, `print` finds the statics of that file.
 

@@ -159,8 +159,7 @@ static void usage(void)
     printf("  -v             Verbose logging\n");
     printf("  -l X           Load file to address\n");
     printf("  -b <model>     Memory model (zxn/zx/z180/msx)\n");
-    printf("  -banks         Rabbit: load <input>_BANK_nn.bin at physical 0x10000 + (nn-1) * 0x2000\n");
-    printf("  -banks         Rabbit: also load <input>_BANK_nn.bin at physical 0x10000 + (nn-1) * 0x2000\n");
+    printf("  -banks         Load <input>_BANK_nn.bin bank images (Rabbit, ZX Next or MSX model)\n");
     printf("  -m8080         Emulate an 8080\n");
     printf("  -m8085         Emulate an 8085 (mostly)\n");
     printf("  -mvm1          Emulate a KR580VM1\n");
@@ -192,15 +191,16 @@ static void usage(void)
 }
   
 
-static int c_rabbit_banks = 0;
+static int c_load_banks = 0;
 
-/* Rabbit code banks: bank nn is the 8k page seen at XPC = nn * 2, which
-   puts the banks directly after the 64k root image. */
-static void load_rabbit_banks(const char *input)
+/* Bank images: <name>_BANK_nn.bin, as z80asm writes them next to the program.
+   memory_bank_store() knows where bank nn goes in the banking model. */
+static void load_bank_images(const char *input)
 {
   char     base[1024], path[1100];
   char    *dot;
-  int      bank, i, c;
+  int      bank, c;
+  unsigned i;
   FILE    *bf;
 
   snprintf(base, sizeof(base), "%s", input);
@@ -212,8 +212,8 @@ static void load_rabbit_banks(const char *input)
     snprintf(path, sizeof(path), "%s_BANK_%02X.bin", base, bank);
     if ( (bf = fopen(path, "rb")) == NULL )
       continue;
-    for ( i = 0; i < 0x2000 && (c = fgetc(bf)) != EOF; i++ )
-      rabbit_phys_write(0x10000 + (bank - 1) * 0x2000 + i, c);
+    for ( i = 0; (c = fgetc(bf)) != EOF; i++ )
+      memory_bank_store(bank, i, c);
     fclose(bf);
   }
 }
@@ -241,7 +241,7 @@ int main (int argc, char **argv){
           break;
         case 'b':
           if ( strcmp(&argv[0][1], "banks") == 0 ) {
-            c_rabbit_banks = 1;
+            c_load_banks = 1;
             argv--;
             argc++;
           } else {
@@ -440,10 +440,10 @@ int main (int argc, char **argv){
           *get_memory_addr(load_address+l, MEM_TYPE_INST) = fgetc(fh);
         }
       }
-      if ( c_rabbit_banks ) {
-        if ( !israbbit() )
-          exit_log(1, "-banks needs a Rabbit cpu\n");
-        load_rabbit_banks(argv[1]);
+      if ( c_load_banks ) {
+        if ( !memory_has_banks() )
+          exit_log(1, "-banks needs a Rabbit, ZX Next or MSX memory model\n");
+        load_bank_images(argv[1]);
       }
     }
     ++argv;

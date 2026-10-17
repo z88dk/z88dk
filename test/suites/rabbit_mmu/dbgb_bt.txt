@@ -1,0 +1,9 @@
+break dbgb_b2.c:5
+cont
+bt
+up
+print o
+print a
+up
+print m
+quit

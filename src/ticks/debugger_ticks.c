@@ -44,6 +44,27 @@ static uint32_t get_banked_pc()
     return memory_banked_pc(pc);
 }
 
+/* banked_call keeps the real return address and the saved bank on a separate
+   stack, whose pointer is ___z88dk_banked_banksp. Each banked call that is
+   still running has an entry: the return address, then af with the bank in a. */
+static int get_banked_caller(unsigned depth, uint32_t *caller)
+{
+    int      var = symbol_resolve("___z88dk_banked_banksp", NULL);
+    uint16_t sp, entry;
+
+    /* Debugger reads must not trigger watchpoints */
+#define PEEK(a) (*get_memory_addr((uint16_t)(a), MEM_TYPE_DATA))
+    if ( var < 0 )
+        return 0;
+    sp = PEEK(var) | PEEK(var + 1) << 8;
+    entry = sp + depth * 4;
+    if ( entry < sp )
+        return 0;
+    *caller = memory_banked_caller(PEEK(entry + 3), PEEK(entry) | PEEK(entry + 1) << 8);
+#undef PEEK
+    return 1;
+}
+
 static char* get_mmu_info()
 {
     return (char *)memory_mmu_text();
@@ -290,4 +311,5 @@ backend_t ticks_debugger_backend = {
     .remote_closed = ticks_remote_closed,
     .banked_pc = get_banked_pc,
     .mmu_info = get_mmu_info,
+    .banked_caller = get_banked_caller,
 };

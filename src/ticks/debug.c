@@ -1378,10 +1378,29 @@ debug_frame_pointer* debug_stack_frames_construct(uint32_t pc, uint16_t sp, stru
     uint16_t stack = sp;
     int      at = pc;
 
+    unsigned banked_depth = 0;
+
     do {
         entry_num++;
         uint16_t offset;
         symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
+
+        /* A banked function returns into banked_call. The real caller, with
+           its bank, is on the bank stack, so carry on from there. */
+        if (entry_num > 1 && sym != NULL && bk.banked_caller != NULL &&
+            (strcmp(sym->name, "banked_call") == 0 || strcmp(sym->name, "_banked_call") == 0)) {
+            uint32_t banked_caller;
+
+            if (bk.banked_caller(banked_depth, &banked_caller)) {
+                banked_depth++;
+                at = banked_caller;
+                if (last) {
+                    last->return_address = banked_caller;
+                }
+                continue;
+            }
+        }
+
         if (sym == NULL || sym->file == NULL) {
             if (entry_num == 1 && frame_pointer &&
                 recover_from_frame_pointer(sym, frame_pointer,
@@ -1549,6 +1568,19 @@ debug_frame_pointer* debug_stack_frames_construct(uint32_t pc, uint16_t sp, stru
         }
 
         new_frame->return_address = at;
+
+        /* Returning into banked_call: the real caller is on the bank stack */
+        if (bk.banked_caller != NULL) {
+            uint16_t ret_offset;
+            symbol* ret_sym = symbol_find_lower(at, SYM_ADDRESS, &ret_offset);
+            uint32_t real_caller;
+
+            if (ret_sym != NULL &&
+                (strcmp(ret_sym->name, "banked_call") == 0 || strcmp(ret_sym->name, "_banked_call") == 0) &&
+                bk.banked_caller(banked_depth, &real_caller)) {
+                new_frame->return_address = real_caller;
+            }
+        }
 
         if (strcmp(sym->name, "main") == 0 || strcmp(sym->name, "_main") == 0) {
             break;

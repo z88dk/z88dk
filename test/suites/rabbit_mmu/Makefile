@@ -9,7 +9,7 @@ CPUS = r2ka r3k r4k
 # Result bytes at 0x100..0x10d, little endian words / bytes
 EXPECTED = ef be fe ca aa 55 83 11 44 00 00 00 57 13
 
-all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests dbgvartests pragmatests bankstyletests
+all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests bankstyletests
 
 mmu.bin: mmu.asm
 	z88dk-z80asm -mr3k -b mmu.asm
@@ -247,7 +247,53 @@ $(foreach cpu,r2ka r4k,$(foreach comp,$(BANK_COMPILERS),$(eval $(call dbgvar_tes
 
 dbgvartests: $(DBGVAR_TESTS)
 
-clean:
-	rm -f *.o m4_*.out dbgv_*.bin dbgv_*.map dbgv_*.out pragma_*.bin dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+# Backtrace through banked_call: root -> bank 1 -> bank 2. The real callers and
+# their banks are on the bank stack. bt, up, print and finish walk it.
+define dbgb_test
+DBGB_TESTS += rundbgb_$(1)_$(2)
+rundbgb_$(1)_$(2): dbgb_main.c dbgb_b1.c dbgb_b2.c dbgb_bt.txt dbgb_fin.txt
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -debug -pragma-define:CRT_RABBIT_BANKS=2 dbgb_main.c dbgb_b1.c dbgb_b2.c -o dbgb_$(1)_$(2).bin -m
+	@out=$$$$(z88dk-ticks -m$(1) -banks -x dbgb_$(1)_$(2).map -d -script dbgb_bt.txt dbgb_$(1)_$(2).bin 2>&1); \
+	for want in 'function bank2_inner' '<int16_t>i = 11' 'function bank1_outer' '<int16_t>o = 10' 'function main' '<int16_t>m = 100' 'at dbgb_b2.c:5' 'at dbgb_b1.c:6' 'at dbgb_main.c:5' 'frame 2'; do \
+		echo "$$$$out" | grep -qF -- "$$$$want" || { echo "$$(RED)rabbit_mmu backtrace $(1) $(2) failed: no '$$$$want'$$(RESET)"; exit 1; }; \
+	done; \
+	out=$$$$(z88dk-ticks -m$(1) -banks -x dbgb_$(1)_$(2).map -d -script dbgb_fin.txt dbgb_$(1)_$(2).bin 2>&1); \
+	for want in 'function bank2_inner returned: 33' '(_bank1_outer+' 'function bank1_outer returned: 43' '(_main+'; do \
+		echo "$$$$out" | grep -qF -- "$$$$want" || { echo "$$(RED)rabbit_mmu finish $(1) $(2) failed: no '$$$$want'$$(RESET)"; exit 1; }; \
+	done; \
+	echo "$$(GREEN)rabbit_mmu banked backtrace $(1) $(2) passed$$(RESET)"
+endef
 
-.PHONY: all banktests fartests far24tests debugtests dbglinetests dbgvartests pragmatests bankstyletests runbank_zxn runbank_msx clean
+$(foreach cpu,r2ka r4k,$(foreach comp,$(BANK_COMPILERS),$(eval $(call dbgb_test,$(cpu),$(comp)))))
+
+dbgbtests: $(DBGB_TESTS)
+
+# The same backtrace on the ZX Next, with the real zxn_banked_call.asm. Bank N
+# is the 8K page N (and N+1) in MMU slots 6 and 7, so the stack has to stay
+# below 0xC000 (REGISTER_SP). dbgz_banks.asm comes first because it places
+# the bank sections.
+ZXN_BANKED_CALL = ../../../libsrc/target/zxn/far/zxn_banked_call.asm
+
+define dbgz_test
+DBGZ_TESTS += rundbgz_$(1)
+rundbgz_$(1): dbgz_main.c dbgz_b1.c dbgz_b2.c dbgz_banks.asm dbgz_bt.txt dbgz_fin.txt
+	@zcc +test -clib=zxn -compiler=$(1) -debug -pragma-define:REGISTER_SP=0xBF00 dbgz_banks.asm dbgz_main.c dbgz_b1.c dbgz_b2.c $$(ZXN_BANKED_CALL) -Ca-D__CLASSIC -o dbgz_$(1).bin -m
+	@out=$$$$(z88dk-ticks -mz80n -banks -x dbgz_$(1).map -d -script dbgz_bt.txt dbgz_$(1).bin 2>&1); \
+	for want in 'function bank2_inner' '<int16_t>i = 11' 'function bank1_outer' '<int16_t>o = 10' 'function main' 'at dbgz_b2.c:5' 'at dbgz_b1.c:6' 'at dbgz_main.c:5' 'frame 2' '6=20 7=21'; do \
+		echo "$$$$out" | grep -qF -- "$$$$want" || { echo "$$(RED)rabbit_mmu zxn backtrace $(1) failed: no '$$$$want'$$(RESET)"; exit 1; }; \
+	done; \
+	out=$$$$(z88dk-ticks -mz80n -banks -x dbgz_$(1).map -d -script dbgz_fin.txt dbgz_$(1).bin 2>&1); \
+	for want in 'function bank2_inner returned: 33' '(_bank1_outer+' 'function bank1_outer returned: 43' '(_main+'; do \
+		echo "$$$$out" | grep -qF -- "$$$$want" || { echo "$$(RED)rabbit_mmu zxn finish $(1) failed: no '$$$$want'$$(RESET)"; exit 1; }; \
+	done; \
+	echo "$$(GREEN)rabbit_mmu zxn banked backtrace $(1) passed$$(RESET)"
+endef
+
+$(foreach comp,$(BANK_COMPILERS),$(eval $(call dbgz_test,$(comp))))
+
+dbgztests: $(DBGZ_TESTS)
+
+clean:
+	rm -f *.o m4_*.out dbgz_*.bin dbgz_*.map dbgb_*.bin dbgb_*.map dbgv_*.bin dbgv_*.map dbgv_*.out pragma_*.bin dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+
+.PHONY: all banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests bankstyletests runbank_zxn runbank_msx clean
