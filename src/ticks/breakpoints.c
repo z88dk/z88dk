@@ -224,6 +224,11 @@ void warn_existing_temp_breakpoints()
     }
 }
 
+uint32_t current_banked_pc(void)
+{
+    return bk.banked_pc ? bk.banked_pc() : bk.pc();
+}
+
 uint8_t process_temp_breakpoints() {
     uint8_t dodebug = 0;
 
@@ -278,7 +283,7 @@ uint8_t process_temp_breakpoints() {
                     } else {
                         const char *filename;
                         int   lineno;
-                        const unsigned short pc = bk.pc();
+                        const uint32_t pc = current_banked_pc();
                         if (debug_find_source_location(pc, &filename, &lineno) < 0) {
                             // don't know where we are, keep going
                             if (reason == TMP_REASON_STEP_SOURCE_LINE) {

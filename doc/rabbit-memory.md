@@ -218,7 +218,11 @@ Start the debugger with `-d`. Load the map file with `-x` so that names work.
 | `break 1:0xE000` | break on `bank:address` |
 | `reg` | also shows `xpc`, `segsize`, `dataseg` and `stackseg` |
 | `x /4 1:0xE000`, `dis 0x1E000 3` | show the memory of a bank, even if it is not mapped |
+| `break b1.c:4` | break on a source line. Build with `-debug`. The line can be in banked code. |
+| `list`, `next`, `step` | show and step source lines in banked code |
+| `watch read bank3_val`, `watch write 3:0xE000` | watch a banked address. It hits only while the bank is mapped. |
 
+A watchpoint on a plain address, such as `0xE000`, hits for any bank.
 Each part of `bank:address` is a number. A number is decimal, or
 hexadecimal with a `$` or `0x` prefix. A hit message prints the address in
 the same style, for example `Hit breakpoint 1: @$1:$E000 (_bank1_inc)`.
@@ -240,8 +244,9 @@ MSX, the bank is the 16K page at 0x8000, and pages 0 to 3 hold the 64K image.
 * `__far` function pointers (`l_farcall`) have no Rabbit implementation.
 * The far string functions (`strcmpf` and others) are not in the Rabbit
   libraries.
-* Watchpoints and source-line breakpoints in banked code do not know about
-  banks.
+* `bt`, `finish`, `up`, `down` and the printing of local variables do not
+  follow a call from one bank to another. Nobody has tested them in banked
+  code.
 
 ## Tests
 

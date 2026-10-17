@@ -9,7 +9,7 @@ CPUS = r2ka r3k r4k
 # Result bytes at 0x100..0x10d, little endian words / bytes
 EXPECTED = ef be fe ca aa 55 83 11 44 00 00 00 57 13
 
-all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests bankstyletests
+all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests bankstyletests
 
 mmu.bin: mmu.asm
 	z88dk-z80asm -mr3k -b mmu.asm
@@ -150,6 +150,8 @@ runcrt12_%: crt_mmu.c
 # of reg, and x on a banked address. banked_dbg.txt is the debugger script.
 DBG_XPC_r2ka = xpc=02 
 DBG_XPC_r4k = xpc=002 
+DBG_WXPC_r2ka = xpc=06 
+DBG_WXPC_r4k = xpc=006 
 
 define dbg_test
 DBG_TESTS += rundbg_$(1)
@@ -159,8 +161,30 @@ rundbg_$(1): banked_main.c banked_b1.c banked_b2.c banked_b3.c banked_dbg.txt
 	for want in 'Hit breakpoint 1: @$$$$1:$$$$E000 (_bank1_inc)' 'Hit breakpoint 2: @$$$$2:$$$$E000 (_bank2_mul)' "$$(DBG_XPC_$(1))" "1E000:   "; do \
 		echo "$$$$out" | grep -qF "$$$$want" || { echo "$$(RED)rabbit_mmu debugger $(1) failed: no '$$$$want'$$(RESET)"; exit 1; }; \
 	done; \
+	out=$$$$(z88dk-ticks -m$(1) -banks -x dbg_$(1).map -d -script banked_watch.txt dbg_$(1).bin 2>&1); \
+	for want in '(read) @$$$$3e000 (_bank3_val)' '(read) @$$$$4e000 (<unknown>)' "Hit watchpoint 1" "$$(DBG_WXPC_$(1))"; do \
+		echo "$$$$out" | grep -qF -- "$$$$want" || { echo "$$(RED)rabbit_mmu watchpoint $(1) failed: no '$$$$want'$$(RESET)"; exit 1; }; \
+	done; \
+	echo "$$$$out" | grep -qF "Hit watchpoint 2" && { echo "$$(RED)rabbit_mmu watchpoint $(1) failed: bank 4 is not mapped$$(RESET)"; exit 1; }; \
 	echo "$$(GREEN)rabbit_mmu debugger $(1) passed$$(RESET)"
 endef
+
+# Source lines in banked code: break file:line, list and next. -debug puts the
+# lines in the map file as symbols with the bank in bits 16 and up.
+define dbgline_test
+DBGLINE_TESTS += rundbgline_$(1)_$(2)
+rundbgline_$(1)_$(2): dbgl_main.c dbgl_b1.c dbgl.txt
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) -debug -pragma-define:CRT_RABBIT_BANKS=1 dbgl_main.c dbgl_b1.c -o dbgl_$(1)_$(2).bin -m
+	@out=$$$$(z88dk-ticks -m$(1) -banks -x dbgl_$(1)_$(2).map -d -script dbgl.txt dbgl_$(1)_$(2).bin 2>&1); \
+	for want in 'Hit breakpoint 1: @$$$$1:$$$$E0' '(_bank1_inc+' '>    4:     int y = x + 1;' '>    5:     return y;'; do \
+		echo "$$$$out" | grep -qF -- "$$$$want" || { echo "$$(RED)rabbit_mmu source lines $(1) $(2) failed: no '$$$$want'$$(RESET)"; exit 1; }; \
+	done; \
+	echo "$$(GREEN)rabbit_mmu source lines $(1) $(2) passed$$(RESET)"
+endef
+
+$(foreach cpu,r2ka r4k,$(foreach comp,$(BANK_COMPILERS),$(eval $(call dbgline_test,$(cpu),$(comp)))))
+
+dbglinetests: $(DBGLINE_TESTS)
 
 $(foreach cpu,r2ka r4k,$(eval $(call dbg_test,$(cpu))))
 
@@ -188,6 +212,6 @@ runbank_msx: bank_msx.asm bank_msx.txt
 	echo "$(GREEN)rabbit_mmu msx banks passed$(RESET)"
 
 clean:
-	rm -f mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+	rm -f *.o m4_*.out dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
 
-.PHONY: all banktests fartests far24tests debugtests bankstyletests runbank_zxn runbank_msx clean
+.PHONY: all banktests fartests far24tests debugtests dbglinetests bankstyletests runbank_zxn runbank_msx clean

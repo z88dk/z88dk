@@ -124,13 +124,6 @@ typedef struct {
 static int last_evaluation_id = 0;
 
 static void completion(const char *buf, linenoiseCompletions *lc, void *ctx);
-/* The pc as a banked address (bank << 16 | pc) when the backend has code
-   banks and the pc is in one, otherwise the plain pc */
-static uint32_t current_banked_pc(void)
-{
-    return bk.banked_pc ? bk.banked_pc() : bk.pc();
-}
-
 static const char *pc_text(void)
 {
     static char buf[24];
@@ -796,7 +789,7 @@ void debugger()
         trace_source = 0;
         const char *filename;
         int   lineno;
-        if ( debug_find_source_location(bk.pc(), &filename, &lineno) < 0 ) {
+        if ( debug_find_source_location(current_banked_pc(), &filename, &lineno) < 0 ) {
             disassemble2(bk.pc(), buf, sizeof(buf), 0);
             bk.console("%s\n",buf);
         } else {
@@ -892,7 +885,7 @@ static int cmd_next_source(int argc, char **argv)
 {
     const char *filename;
     int   lineno;
-    const unsigned short pc = bk.pc();
+    const uint32_t pc = current_banked_pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
         bk.console("Warning: cannot obtain current source line.\n");
         return 0;
@@ -912,7 +905,7 @@ static int cmd_step_source(int argc, char **argv)
 {
     const char *filename;
     int   lineno;
-    const unsigned short pc = bk.pc();
+    const uint32_t pc = current_banked_pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
         bk.console("Warning: cannot obtain current source line.\n");
         return 0;
@@ -2369,6 +2362,11 @@ static int cmd_list(int argc, char **argv)
 
     const char *filename;
     int   lineno;
+
+    /* The innermost frame is where the pc is, in its bank */
+    if ( current_frame == 0 ) {
+        addr = current_banked_pc();
+    }
 
     if ( argc == 2 ) {
         int a2 = parse_address(argv[1], NULL);

@@ -21,6 +21,27 @@ static debug_sym_file* cdb_files = NULL;
 
 static debug_sym_type* cdb_ctypes = NULL;
 static cline *clines[65536] = {0};
+/* Source lines of banked code, indexed by bank (address >> 16) then by the
+   address in the bank window. The arrays are allocated when a bank has lines. */
+static cline **bank_clines[256] = {0};
+
+static cline **cline_slot(int address, int create)
+{
+    int bank = (address >> 16) & 0xffff;
+
+    if ( address < 0 )
+        return NULL;
+    if ( bank == 0 )
+        return &clines[address];
+    if ( bank > 255 )
+        return NULL;
+    if ( bank_clines[bank] == NULL ) {
+        if ( !create )
+            return NULL;
+        bank_clines[bank] = calloc(65536, sizeof(cline *));
+    }
+    return &bank_clines[bank][address & 0xffff];
+}
 
 
 // Crude dehexer....
@@ -752,7 +773,9 @@ void debug_add_cline(const char *filename, const char *function, int lineno, int
     cl->scope_block = scope_block;
     HASH_ADD_INT(cf->lines, line, cl);
 
-    clines[cl->address] = cl;  // TODO Banking
+    cline **slot = cline_slot(cl->address, 1);
+    if ( slot != NULL )
+        *slot = cl;
 }
 
 int debug_find_source_location(int address, const char **filename, int *lineno)
@@ -765,15 +788,16 @@ int debug_find_source_location(int address, const char **filename, int *lineno)
     }
     int topmost_address = original_sym->address;
 
-    while ( clines[address] == NULL && address > 0 ) {
+    cline **slot;
+    while ( ((slot = cline_slot(address, 0)) == NULL || *slot == NULL) && address > 0 ) {
         if (address < topmost_address) {
             return -1;
         }
         address--;
     }
-    if ( clines[address] == NULL) return -1;
-    *filename = clines[address]->file->file;
-    *lineno = clines[address]->line;
+    if ( (slot = cline_slot(address, 0)) == NULL || *slot == NULL ) return -1;
+    *filename = (*slot)->file->file;
+    *lineno = (*slot)->line;
 
     return 0;
 }

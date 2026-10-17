@@ -1,0 +1,7 @@
+watch read bank3_val
+watch read 4:0xe000
+watch
+cont
+reg
+cont
+quit

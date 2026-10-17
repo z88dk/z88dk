@@ -292,6 +292,17 @@ int symbol_resolve(char *name, const char *filename)
 
 
 // Find a symbol lower than where we were
+/* First symbol in the hash bucket of addr that lives at addr, or NULL */
+static symbol *symbol_bucket_at(int addr)
+{
+    symbol *sym = symbols[addr % SYM_TAB_SIZE];
+
+    while ( sym != NULL && sym->address != addr ) {
+        sym = sym->next;
+    }
+    return sym;
+}
+
 symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
 {
     symbol *sym;
@@ -301,12 +312,21 @@ symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
         if ( addr < 0 ) {
             return NULL;
         }
-    
-        while ( (sym = symbols[addr % SYM_TAB_SIZE]) == NULL && addr > 0 ) {
+
+        /* The table is hashed on the low 16 bits, so a bucket also holds the
+           symbols of other banks: only a symbol at exactly addr counts. */
+        while ( (sym = symbol_bucket_at(addr)) == NULL && addr > 0 ) {
             addr--;
+            if ( original_address - addr > 0xffff || (addr >> 16) != (original_address >> 16) ) {
+                return NULL;    /* the offset has 16 bits, and a label belongs to its own bank */
+            }
         }
 
         while ( sym != NULL ) {
+            if ( sym->address != addr ) {
+                sym = sym->next;
+                continue;
+            }
             if ( preferred_type == SYM_ANY ) {
                 break;
             }
@@ -320,8 +340,11 @@ symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
         if ( sym != NULL ) {
             *offset = original_address - addr;
             return sym;
-        } 
+        }
         addr--;
+        if ( original_address - addr > 0xffff || (addr >> 16) != (original_address >> 16) ) {
+            return NULL;
+        }
     }
 
     return NULL;

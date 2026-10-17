@@ -127,20 +127,29 @@ void set_regs(struct debugger_regs_t* regs)
     }
 }
 
+/* A watchpoint above 64k is a banked address (bank << 16 | address in the bank
+   window). It matches an access through the window while its bank is mapped. */
+static int watch_matches(const breakpoint *elem, int addr)
+{
+    if ( elem->value > 0xffff )
+        return addr >= 0 && addr <= 0xffff && elem->value == (int)memory_banked_pc(addr);
+    return elem->value == addr;
+}
+
 void debugger_write_memory(int addr, uint8_t val)
 {
     breakpoint *elem;
-    int         i = 0;
+    int         i = 0;      /* the number that the watch command shows */
     LL_FOREACH(watchpoints, elem) {
+        i++;
         if ( elem->enabled == 0 ) {
             continue;
         }
-        if ( elem->type == BREAK_WRITE && elem->value == addr ) {
+        if ( elem->type == BREAK_WRITE && watch_matches(elem, addr) ) {
             printf("Hit watchpoint %d\n",i);
             debugger_active = 1;
             break;
         }
-        i++;
     }
 }
 
@@ -150,15 +159,15 @@ void debugger_read_memory(int addr)
     int         i = 0;
 
     LL_FOREACH(watchpoints, elem) {
+        i++;
         if ( elem->enabled == 0 ) {
             continue;
         }
-        if ( elem->type == BREAK_READ && elem->value == addr ) {
+        if ( elem->type == BREAK_READ && watch_matches(elem, addr) ) {
             printf("Hit watchpoint %d\n",i);
             debugger_active = 1;
             break;
         }
-        i++;
     }
 }
 
