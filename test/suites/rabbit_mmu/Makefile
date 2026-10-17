@@ -9,7 +9,30 @@ CPUS = r2ka r3k r4k
 # Result bytes at 0x100..0x10d, little endian words / bytes
 EXPECTED = ef be fe ca aa 55 83 11 44 00 00 00 57 13
 
+# The recipes are POSIX shell (sh, od, sed, grep) and the debugger tests script
+# z88dk-ticks over stdin. They do not run under Windows shells
+# (cygwin/mingw/msys), so skip the whole suite there, compile included.
+UNAME := $(shell uname -s 2>/dev/null)
+RMMU_WINDOWS :=
+ifeq ($(OS),Windows_NT)
+RMMU_WINDOWS := 1
+endif
+ifneq (,$(findstring CYGWIN,$(UNAME)))
+RMMU_WINDOWS := 1
+endif
+ifneq (,$(findstring MINGW,$(UNAME)))
+RMMU_WINDOWS := 1
+endif
+ifneq (,$(findstring MSYS,$(UNAME)))
+RMMU_WINDOWS := 1
+endif
+
+ifdef RMMU_WINDOWS
+all:
+	@echo "rabbit_mmu: skipped (POSIX-shell recipes; not run on Windows)"
+else
 all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests bankstyletests
+endif
 
 mmu.bin: mmu.asm
 	z88dk-z80asm -mr3k -b mmu.asm
