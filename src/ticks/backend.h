@@ -75,6 +75,11 @@ typedef struct {
 	get_charp_cb script_filename;
     void_cb remote_closed;
     uint8_t_cb should_download_binary_on_connect;
+    /* Optional: pc extended with the Rabbit code bank in bits 16 and up, so
+       that it compares with a banked symbol address; NULL when not banked */
+    uint32_t_cb banked_pc;
+    /* Optional: one line describing the memory map, or NULL */
+    get_charp_cb mmu_info;
 } backend_t;
 
 extern backend_t bk;

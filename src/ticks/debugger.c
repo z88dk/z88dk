@@ -124,6 +124,26 @@ typedef struct {
 static int last_evaluation_id = 0;
 
 static void completion(const char *buf, linenoiseCompletions *lc, void *ctx);
+/* The pc as a banked address (bank << 16 | pc) when the backend has code
+   banks and the pc is in one, otherwise the plain pc */
+static uint32_t current_banked_pc(void)
+{
+    return bk.banked_pc ? bk.banked_pc() : bk.pc();
+}
+
+static const char *pc_text(void)
+{
+    static char buf[24];
+    uint32_t    banked = current_banked_pc();
+
+    if ( banked > 0xffff ) {
+        snprintf(buf, sizeof(buf), "%X:%04X", (unsigned)(banked >> 16), (unsigned)(banked & 0xffff));
+    } else {
+        snprintf(buf, sizeof(buf), "%04x", bk.pc());
+    }
+    return buf;
+}
+
 static int cmd_next(int argc, char **argv);
 static int cmd_next_source(int argc, char **argv);
 static int cmd_step(int argc, char **argv);
@@ -701,12 +721,13 @@ void debugger()
                     continue;
                 }
 
-                if ( elem->type == BREAK_PC && elem->value == bk.pc() ) {
+                if ( elem->type == BREAK_PC && elem->value == (elem->value > 0xffff ? current_banked_pc() : bk.pc()) ) {
+                    const int label_at = elem->value > 0xffff ? elem->value : bk.pc();
                     if (elem->auto_remove) {
-                        bk.console("Hit breakpoint (temp): @%04x (%s)\n",bk.pc(),resolve_to_label(bk.pc()));
+                        bk.console("Hit breakpoint (temp): @%s (%s)\n",pc_text(),resolve_to_label(label_at));
                         delete_breakpoint(elem);
                     } else {
-                        bk.console("Hit breakpoint %d: @%04x (%s)\n",i,bk.pc(),resolve_to_label(bk.pc()));
+                        bk.console("Hit breakpoint %d: @%s (%s)\n",i,pc_text(),resolve_to_label(label_at));
                     }
                     dodebug=1;
                     break;
@@ -1457,6 +1478,20 @@ int parse_address(char *arg, const char** corrected_source)
     char *end;
 
     where = parse_number(arg, &end);
+    if ( end != arg && *end == ':' && bk.banked_pc != NULL ) {
+        /* bank:address, as z80asm numbers the bank sections */
+        /* The offset is hexadecimal, with or without a $ or 0x prefix */
+        char *addr_start = end + 1;
+        char *addr_end;
+        int   offset;
+
+        if ( *addr_start == '$' ) addr_start++;
+        offset = strtol(addr_start, &addr_end, 16);
+
+        if ( addr_end != addr_start && where > 0 && where < 256 ) {
+            return where << 16 | (offset & 0xffff);
+        }
+    }
     if ( end == arg ) {
         where = symbol_resolve(arg, NULL);
         if ( where == -1 ) {
@@ -1680,6 +1715,10 @@ static int cmd_registers(int argc, char **argv)
             bk.console("i=%02X, r=%02X, iff1=%d, iff2=%d, im=%d\n",
                        regs.i, regs.r, regs.iff1 ? 1 : 0, regs.iff2 ? 1 : 0, regs.im);
         }
+    }
+
+    if ( bk.mmu_info != NULL && bk.mmu_info() != NULL ) {
+        bk.console("%s\n", bk.mmu_info());
     }
 
     return 0;
@@ -1975,7 +2014,9 @@ static int cmd_examine(int argc, char **argv)
 	}
 
     abuf[16] = 0;                                             // Zero terminated string
-    addr %= 0x10000;                                          // First address with overflow correction
+    /* Above 64k the address is a banked or physical one and is not wrapped */
+    const int wide = addr > 0xffff;
+    if ( !wide ) addr %= 0x10000;                             // First address with overflow correction
 
     for ( i = 0; i < len; i++ ) {
         uint8_t b = bk.get_memory(addr, MEM_TYPE_DATA);
@@ -1998,7 +2039,7 @@ static int cmd_examine(int argc, char **argv)
 			bk.console("   %.*s\n", (i % 16) + 1, abuf);      // Suffix line with ASCII dump
 		}
 
-        addr = (addr + 1) % 0x10000;                          // Next address with overflow correction
+        addr = wide ? addr + 1 : (addr + 1) % 0x10000;        // Next address with overflow correction
     }
     return 0;
 }

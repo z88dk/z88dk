@@ -33,7 +33,20 @@ uint16_t get_sp()
 
 uint8_t get_ticks_memory(uint32_t at, memtype type)
 {
+    /* Above 64k the debugger means a banked or a physical Rabbit address */
+    if ( israbbit() && at > 0xffff )
+        return get_memory(rabbit_debug_physical(at), MEM_TYPE_PHYSICAL);
     return get_memory(at, type);
+}
+
+static uint32_t get_banked_pc()
+{
+    return israbbit() ? rabbit_banked_pc(pc) : pc;
+}
+
+static char* get_mmu_info()
+{
+    return israbbit() ? (char *)rabbit_mmu_text() : NULL;
 }
 
 uint8_t is_verbose()
@@ -266,4 +279,6 @@ backend_t ticks_debugger_backend = {
     .ctrl_c = ctrl_c,
     .time = ticks_time,
     .remote_closed = ticks_remote_closed,
+    .banked_pc = get_banked_pc,
+    .mmu_info = get_mmu_info,
 };

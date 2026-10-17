@@ -9,7 +9,7 @@ CPUS = r2ka r3k r4k
 # Result bytes at 0x100..0x10d, little endian words / bytes
 EXPECTED = ef be fe ca aa 55 83 11 44 00 00 00 57 13
 
-all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests
+all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests
 
 mmu.bin: mmu.asm
 	z88dk-z80asm -mr3k -b mmu.asm
@@ -146,7 +146,27 @@ runcrt12_%: crt_mmu.c
 		echo "$(RED)rabbit_mmu crt 12-bit $* failed: got '$$got'$(RESET)"; exit 1; \
 	fi
 
-clean:
-	rm -f mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin *.lis *.o *~ zcc_opt.def
+# The debugger: breakpoints on banked symbols and bank:address, the XPC line
+# of reg, and x on a banked address. banked_dbg.txt is the debugger script.
+DBG_XPC_r2ka = xpc=02 
+DBG_XPC_r4k = xpc=002 
 
-.PHONY: all banktests fartests far24tests clean
+define dbg_test
+DBG_TESTS += rundbg_$(1)
+rundbg_$(1): banked_main.c banked_b1.c banked_b2.c banked_b3.c banked_dbg.txt
+	@zcc +test -compiler=sccz80 -clib=$$(CRT_CLIB_$(1)) -pragma-define:CRT_RABBIT_BANKS=3 banked_main.c banked_b1.c banked_b2.c banked_b3.c -o dbg_$(1).bin -m
+	@out=$$$$(z88dk-ticks -m$(1) -banks -x dbg_$(1).map -d -script banked_dbg.txt dbg_$(1).bin 2>&1); \
+	for want in "Hit breakpoint 1: @1:E000 (_bank1_inc)" "Hit breakpoint 2: @2:E000 (_bank2_mul)" "$$(DBG_XPC_$(1))" "1E000:   "; do \
+		echo "$$$$out" | grep -qF "$$$$want" || { echo "$$(RED)rabbit_mmu debugger $(1) failed: no '$$$$want'$$(RESET)"; exit 1; }; \
+	done; \
+	echo "$$(GREEN)rabbit_mmu debugger $(1) passed$$(RESET)"
+endef
+
+$(foreach cpu,r2ka r4k,$(eval $(call dbg_test,$(cpu))))
+
+debugtests: $(DBG_TESTS)
+
+clean:
+	rm -f mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map *.lis *.o *~ zcc_opt.def
+
+.PHONY: all banktests fartests far24tests debugtests clean

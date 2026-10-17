@@ -1,0 +1,8 @@
+break _bank1_inc
+break _bank2_mul
+break 3:e000
+cont
+reg
+x /4 1:e000
+cont
+quit

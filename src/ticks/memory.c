@@ -459,6 +459,37 @@ void rabbit_phys_write(uint32_t addr, uint8_t value)
     rabbit_phys[addr & rabbit_phys_mask] = value;
 }
 
+/* A banked address is bank << 16 | window address, as z80asm lays out the
+   bank sections. Bank N is seen at XPC = N * 2. */
+uint32_t rabbit_banked_pc(uint16_t addr)
+{
+    if ( rabbit_phys && addr >= 0xe000 && rabbit_xpc >= 2 && (rabbit_xpc & 1) == 0 )
+        return (uint32_t)(rabbit_xpc / 2) << 16 | addr;
+    return addr;
+}
+
+/* The physical address behind a debugger address: a banked address in the
+   window, otherwise a physical address as it is */
+uint32_t rabbit_debug_physical(uint32_t addr)
+{
+    if ( (addr & 0xffff) >= 0xe000 && addr > 0xffff )
+        return (addr >> 16) * 0x2000 + 0xe000 + (addr & 0x1fff);
+    return addr;
+}
+
+const char *rabbit_mmu_text(void)
+{
+    static char buf[160];
+
+    if ( !rabbit_phys )
+        return NULL;
+    snprintf(buf, sizeof(buf), "xpc=%0*X%s segsize=%02X dataseg=%03X stackseg=%03X",
+        (c_cpu & (CPU_R4K|CPU_R6K)) ? 3 : 2, rabbit_xpc,
+        (rabbit_xpc >= 2 && (rabbit_xpc & 1) == 0) ? "" : " (not a bank)",
+        rabbit_mmu_segsize, rabbit_mmu_dataseg, rabbit_mmu_stackseg);
+    return buf;
+}
+
 uint16_t rabbit_get_xpc(void)
 {
     return rabbit_xpc;
