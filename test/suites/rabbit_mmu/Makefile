@@ -339,9 +339,31 @@ endef
 
 $(foreach cpu,r2ka r3k r4k r6k,$(foreach comp,$(BANK_COMPILERS),$(eval $(call farstr_test,$(cpu),$(comp)))))
 
+# The far heap that the crt sets up. Each case is: name, pragmas, text expected.
+# The program takes a 16 byte block first, so the first big block is 0x13 bytes in.
+define farheap_case
+FARHEAP_TESTS += runfarheap_$(1)_$(2)_$(3)
+runfarheap_$(1)_$(2)_$(3): farheap_main.c
+	@zcc +test -compiler=$(2) -clib=$$(CRT_CLIB_$(1)) $(4) farheap_main.c -o farheap_$(1)_$(2)_$(3).bin
+	@got=$$$$(z88dk-ticks -m$(1) -c 100000000 farheap_$(1)_$(2)_$(3).bin | head -3 | tr '\n' ' '); \
+	case "$$$$got" in *"$(5)"*) echo "$$(GREEN)rabbit_mmu far heap $(3) $(1) $(2) passed$$(RESET)";; \
+	*) echo "$$(RED)rabbit_mmu far heap $(3) $(1) $(2) failed: $$$$got$$(RESET)"; exit 1;; esac
+endef
+
+define farheap_cases
+$(call farheap_case,$(1),$(2),none,-pragma-define:CRT_RABBIT_BANKS=0,no far heap)
+$(call farheap_case,$(1),$(2),size,-pragma-define:CRT_RABBIT_BANKS=0 -pragma-define:CRT_RABBIT_FARHEAP_SIZE=0x30000,first block 10016 far heap ok)
+$(call farheap_case,$(1),$(2),banks16k,-pragma-define:CRT_RABBIT_BANKS=0 -pragma-define:CLIB_FARHEAP_BANKS=12,first block 10016 far heap ok)
+$(call farheap_case,$(1),$(2),base,-pragma-define:CRT_RABBIT_BANKS=0 -pragma-define:CRT_RABBIT_FARHEAP_SIZE=0x30000 -pragma-define:CRT_RABBIT_FARHEAP_BASE=0x80000,first block 80016 far heap ok)
+$(call farheap_case,$(1),$(2),afterbanks,-pragma-define:CRT_RABBIT_BANKS=3 -pragma-define:CRT_RABBIT_FARHEAP_SIZE=0x30000,first block 16016 far heap ok)
+endef
+
+$(foreach cpu,r2ka r3k r4k r6k,$(foreach comp,$(BANK_COMPILERS),$(eval $(call farheap_cases,$(cpu),$(comp)))))
+$(foreach t,$(FARHEAP_TESTS),$(eval FARSTR_TESTS += $(t)))
+
 farstrtests: $(FARSTR_TESTS)
 
 clean:
-	rm -f *.o m4_*.out farstr_*.bin farsuite_*.bin dbgz_*.bin dbgz_*.map dbgb_*.bin dbgb_*.map dbgv_*.bin dbgv_*.map dbgv_*.out pragma_*.bin dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+	rm -f *.o m4_*.out farstr_*.bin farsuite_*.bin farheap_*.bin dbgz_*.bin dbgz_*.map dbgb_*.bin dbgb_*.map dbgv_*.bin dbgv_*.map dbgv_*.out pragma_*.bin dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
 
 .PHONY: all banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests farstrtests bankstyletests runbank_zxn runbank_msx clean

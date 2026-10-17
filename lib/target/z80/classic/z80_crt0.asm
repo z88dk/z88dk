@@ -68,6 +68,7 @@ start:
 
     ; Setup heap if required
     INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_rabbit_farheap.inc"
 
     ; Setup the desired interrupt mode
     INCLUDE "crt/classic/crt_init_interrupt_mode.inc"

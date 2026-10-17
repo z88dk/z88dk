@@ -183,6 +183,30 @@ The Rabbit has no `ixl`, `ixh` or `iyl`, so its versions keep a byte over a
 page-in on the stack and use the argument cells on the stack as counters.
 A far pointer that a function returns has its top byte set to 0.
 
+### Far heap
+
+The crt can set up the far heap for `malloc_far` and the related functions.
+A far address is a physical address, so the heap is a range of physical
+memory that nothing else uses. `+test`, `+z80` and `+rcmx000` include
+`lib/crt/classic/crt_init_rabbit_farheap.inc` after the near heap is set up.
+It does nothing unless you give a size.
+
+| Pragma | Meaning |
+|---|---|
+| `CRT_RABBIT_FARHEAP_SIZE` | size of the heap in bytes |
+| `CLIB_FARHEAP_BANKS` | size in units of 16K, as on the other targets |
+| `CRT_RABBIT_FARHEAP_BASE` | physical address of the start |
+
+The default start is the first address after the code banks:
+0x10000 + `CRT_RABBIT_BANKS` × 0x2000. `sbrk_far` takes at most 64K, so the
+crt adds a bigger heap in chunks of 64K, up to 64 chunks (4MB). The Rabbit 2000
+and 3000 reach the first 1MB, so keep the heap below that on those processors.
+
+```
+zcc +test -clib=rabbit -pragma-define:CRT_RABBIT_BANKS=0 \
+    -pragma-define:CRT_RABBIT_FARHEAP_SIZE=0x30000 prog.c -o prog.bin
+```
+
 The Rabbit 4000 version keeps the old `LXPC` in a static word. A far access
 is therefore not reentrant. Do not use far pointers in an interrupt routine
 if the main program uses them.
@@ -266,6 +290,11 @@ MSX, the bank is the 16K page at 0x8000, and pages 0 to 3 hold the 64K image.
   exit method, because that method uses `halt`. Use
   `-pragma-define:CRT_ON_EXIT=0x10002`.
 * `__far` function pointers (`l_farcall`) have no Rabbit implementation.
+* `80cc` writes four bytes when it stores a `__far` pointer through a computed
+  address, for example `p[i] = malloc_far(n)` in an array of far pointers. A far
+  pointer has three bytes, so the store overwrites the next byte. This is a
+  bug in `80cc` on every CPU, not only on the Rabbit. Use separate variables
+  instead of an array of far pointers until it is fixed.
 * `bt`, `finish`, `up` and `down` read the bank stack of `banked_call`. A
   banked function returns into `banked_call`, so the real caller and its bank
   are on that stack. The debugger finds the stack by the name

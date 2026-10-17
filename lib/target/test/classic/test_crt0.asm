@@ -70,6 +70,7 @@ IF !__CPU_RABBIT__
     ei
 ENDIF
     INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_rabbit_farheap.inc"
     ld      a,(argv_length)
     and     a
     jp      z,argv_done

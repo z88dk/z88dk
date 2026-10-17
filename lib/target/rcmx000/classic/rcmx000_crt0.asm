@@ -57,6 +57,7 @@ start:
     ld      (__restore_sp_onexit),sp
     include "target/rcmx000/classic/rcmx000_boot.asm"
     call    crt0_init
+    INCLUDE "crt/classic/crt_init_rabbit_farheap.inc"
     call    _main	;Call user program
         
 __Exit:
