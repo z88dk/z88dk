@@ -245,9 +245,11 @@ MSX, the bank is the 16K page at 0x8000, and pages 0 to 3 hold the 64K image.
 * `__far` function pointers (`l_farcall`) have no Rabbit implementation.
 * The far string functions (`strcmpf` and others) are not in the Rabbit
   libraries.
-* `bt`, `finish`, `up` and `down` follow a call only if the caller is in the
-  root image. The return address on the stack has 16 bits and does not say
-  which bank the caller was in. The innermost frame is always correct.
+* `bt`, `finish`, `up` and `down` stop at a `banked_call`. A banked function
+  returns to `banked_call`, which has no debug information. The address and
+  the bank of the real caller are on the separate bank stack, and the debugger
+  does not read that stack. This is the same for a call from the root image
+  and for a call from another bank. The innermost frame is correct.
 * A static variable is visible only in the file of the current function, as
   in C. In a banked function, `print` finds the statics of that file.
 
