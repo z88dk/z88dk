@@ -50,6 +50,41 @@ int far_ptrstep(char * __far *q, unsigned char *raw)
     return ok;
 }
 
+struct far_s { unsigned char a; char * __far p; unsigned char b; };
+union far_u { char * __far p; unsigned char c[3]; };
+struct far_s far_gs[2];
+char * __far far_gi[2] = { (char * __far)0x10101L, (char * __far)0x20202L };
+
+/* Array and struct shapes: a local initialiser, an array of structs, a union,
+   and stepping a pointer to far pointers. */
+int far_shapes(void)
+{
+    char * __far l[3] = { (char * __far)0x50505L, (char * __far)0x60606L, (char * __far)0x70707L };
+    struct far_s a[2];
+    union far_u u;
+    char * __far *pp = l;
+    int i, ok = 1;
+
+    if ((unsigned long)l[0] != 0x50505UL || (unsigned long)l[1] != 0x60606UL
+        || (unsigned long)l[2] != 0x70707UL) ok = 0;
+    if ((unsigned long)far_gi[0] != 0x10101UL || (unsigned long)far_gi[1] != 0x20202UL) ok = 0;
+    for (i = 0; i < 2; i++) { a[i].a = 0x11; a[i].b = 0x22; a[i].p = far_mk(0x1000L + i); }
+    for (i = 0; i < 2; i++) {
+        far_gs[i].a = 3; far_gs[i].b = 4; far_gs[i].p = far_mk(0x2000L + i);
+        if ((unsigned long)a[i].p != 0x1000UL + i || a[i].a != 0x11 || a[i].b != 0x22) ok = 0;
+    }
+    for (i = 0; i < 2; i++)
+        if ((unsigned long)far_gs[i].p != 0x2000UL + i || far_gs[i].a != 3 || far_gs[i].b != 4) ok = 0;
+    u.p = far_mk(0x0A0B0CL);
+    if (u.c[0] != 0x0C || u.c[1] != 0x0B || u.c[2] != 0x0A) ok = 0;
+    if ((unsigned long)*(pp + 1) != 0x60606UL || (unsigned long)pp[2] != 0x70707UL) ok = 0;
+    if ((int)((pp + 2) - pp) != 2 || (int)((unsigned char *)(pp + 2) - (unsigned char *)pp) != 6) ok = 0;
+    pp += 2; pp--;
+    if ((unsigned long)*pp != 0x60606UL) ok = 0;
+    return ok;
+}
+
+static void check_shapes(void)  { assertEqual(far_shapes(), 1); }
 static void check_ptrmem(void)  { assertEqual(far_ptrmem(), 1); }
 static void check_ptrstep(void)
 {
@@ -63,6 +98,7 @@ int main(int argc, char *argv[])
     (void)argc; (void)argv;
     suite_setup("far pointer in memory");
     suite_add_test(check_ptrmem);
+    suite_add_test(check_shapes);
     suite_add_test(check_ptrstep);
     return suite_run();
 }

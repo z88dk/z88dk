@@ -975,8 +975,7 @@ static int init_typed_region(Builder *b, int base, int off,
         if (!el) return -2;
         int n = t->len;
         if (n <= 0) return -2;
-        int el_sz = (el->kind == KIND_STRUCT || el->kind == KIND_ARRAY)
-                  ? (int)el->size : type_width(el);
+        int el_sz = pointee_size(el);
         if (el_sz <= 0) return -2;
         if (init && init->ast_type != AST_INIT_LIST) return -2;
         int n_init = (init && init->stmts)
@@ -993,7 +992,7 @@ static int init_typed_region(Builder *b, int base, int off,
 
     /* Scalar leaf. */
     int w = width_for_kind(t->kind);
-    if (t->kind == KIND_PTR || t->kind == KIND_CPTR) w = 2;
+    if (t->kind == KIND_PTR) w = 2;
     /* Wide accumulator-tier leaf: a 5-8B double or a long long. Stored via
        IR_ST_MEM's acc path (dload→FA→dstore / __i64 helpers) with the
        element's true kind, base+off honoured by the lowerer. */
