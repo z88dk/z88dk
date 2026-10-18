@@ -2014,6 +2014,13 @@ static int try_pair_bitop(FILE *out, Func *f, const Op *op, const char *mnem)
 
 static int gen_not(FILE *out, Func *f, const Op *op)
 {
+    if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
+        /* Byte NOT: A = ~src[0], stored as ONE byte. The width-2 path below
+           commits a word, which overruns a one-byte slot. */
+        load_byte_to_a(out, f, op->src[0]);
+        emit(out, "cpl");
+        return finalize_byte_result(out, f, op, 1);
+    }
     if (try_pair_bitop(out, f, op, NULL)) return 0;
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         /* Fused load+cpl: walk HL through the source slot reading
