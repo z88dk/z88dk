@@ -22,6 +22,8 @@ all:	accintcomp.bin accintcomp_fp.bin
 all:	bigframe.bin bigframe_fp.bin bigframe_8080.bin bigframe_r2ka.bin bigframe_ez80.bin bigframe_gbz80.bin
 all:	farptr.bin farptr_8080.bin farptr_8085.bin farptr_gbz80.bin farptr_r2ka.bin farptr_r4k.bin farptr_ez80.bin farptr_z180.bin farptr_z80n.bin farptr_kc160.bin farptr_fp.bin
 all:	farlp.bin farlp_r2ka.bin farlp_r4k.bin farlp_z80n.bin farlp_fp.bin
+all:	complement.bin complement_fp.bin complement_z80n.bin complement_z180.bin complement_ez80.bin complement_8080.bin
+all:	ternary.bin ternary_fp.bin ternary_z80n.bin ternary_z180.bin ternary_ez80.bin ternary_8080.bin
 all:	iytemp.bin iytemp_fp.bin iytemp_z80n.bin iytemp_z180.bin iytemp_ez80.bin iytemp_8080.bin
 all:	longasr.bin longasr_8080.bin longasr_gbz80.bin longasr_r2ka.bin longasr_ez80.bin longasr_8085.bin longasr_kc160.bin longasr_z180.bin longasr_r4k.bin longasr_fp.bin
 all:	crcloop.bin crcloop_8080.bin crcloop_gbz80.bin crcloop_r2ka.bin crcloop_ez80.bin crcloop_8085.bin crcloop_kc160.bin crcloop_z180.bin crcloop_r4k.bin crcloop_fp.bin
@@ -4367,6 +4369,54 @@ iytemp_ez80.bin: $(SOURCES) iytemp.c
 	$(runtest_ez80_z80)
 
 iytemp_8080.bin: $(SOURCES) iytemp.c
+	$(compile_8080)
+	$(runtest_8080)
+
+ternary.bin: $(SOURCES) ternary.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ternary_fp.bin: $(SOURCES) ternary.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ternary_z80n.bin: $(SOURCES) ternary.c
+	$(compile_z80n)
+	$(runtest_z80n)
+
+ternary_z180.bin: $(SOURCES) ternary.c
+	$(compile_z180)
+	$(runtest_z180)
+
+ternary_ez80.bin: $(SOURCES) ternary.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+ternary_8080.bin: $(SOURCES) ternary.c
+	$(compile_8080)
+	$(runtest_8080)
+
+complement.bin: $(SOURCES) complement.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+complement_fp.bin: $(SOURCES) complement.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+complement_z80n.bin: $(SOURCES) complement.c
+	$(compile_z80n)
+	$(runtest_z80n)
+
+complement_z180.bin: $(SOURCES) complement.c
+	$(compile_z180)
+	$(runtest_z180)
+
+complement_ez80.bin: $(SOURCES) complement.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+complement_8080.bin: $(SOURCES) complement.c
 	$(compile_8080)
 	$(runtest_8080)
 
