@@ -73,6 +73,9 @@ extern breakpoint *watchpoints;
 extern temporary_breakpoint_t* temporary_breakpoints;
 extern int next_breakpoint_number;
 
+/* pc, with the bank of its window in bits 16 and up when the backend has banks */
+extern uint32_t current_banked_pc(void);
+
 extern breakpoint* add_breakpoint(breakpoint_type type, enum bk_breakpoint_type bk_type, int bk_size, int value,
     const char* text, uint8_t temporary);
 extern breakpoint* add_watchpoint(breakpoint_type operation, int value, breakpoint_ret_t* result);

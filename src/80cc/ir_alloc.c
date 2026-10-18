@@ -4427,6 +4427,11 @@ static void ir_iy_temp_pack(Func *f, const int *bb_first_op,
            misses this. Register homes pay off for values that must otherwise be
            STORED and RELOADED across an HL-clobbering gap. */
         if (def_kind[v] == IR_LD_MEM) continue;
+        /* A constant or an address is rebuilt at each use; the lowering never
+           commits its def into a home, so an IY tenant would be read unset. */
+        if (def_kind[v] == IR_LD_IMM || def_kind[v] == IR_LD_SYM
+            || def_kind[v] == IR_LEA || def_kind[v] == IR_LD_STR)
+            continue;
         if (g0_index_benefit(g0t[v]) <= 0) continue;          /* cheap slot: no win */
         if (cand[i].flo <= last_fhi) continue;                /* overlaps a packed sibling */
         /* Require an HL-CLOBBERING op strictly between the def and the last use.

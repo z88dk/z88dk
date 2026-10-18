@@ -224,13 +224,18 @@ void warn_existing_temp_breakpoints()
     }
 }
 
+uint32_t current_banked_pc(void)
+{
+    return bk.banked_pc ? bk.banked_pc() : bk.pc();
+}
+
 uint8_t process_temp_breakpoints() {
     uint8_t dodebug = 0;
 
     temporary_breakpoint_t* b;
     temporary_breakpoint_t* tmp;
     DL_FOREACH_SAFE(temporary_breakpoints, b, tmp) {
-        if ((b->at == TEMP_BREAKPOINT_ANYWHERE) || (bk.pc() == b->at)) {
+        if ((b->at == TEMP_BREAKPOINT_ANYWHERE) || ((b->at > 0xffff ? current_banked_pc() : bk.pc()) == b->at)) {
             dodebug = 1;
             temporary_breakpoint_reason_t reason = b->reason;
             switch (reason) {
@@ -278,7 +283,7 @@ uint8_t process_temp_breakpoints() {
                     } else {
                         const char *filename;
                         int   lineno;
-                        const unsigned short pc = bk.pc();
+                        const uint32_t pc = current_banked_pc();
                         if (debug_find_source_location(pc, &filename, &lineno) < 0) {
                             // don't know where we are, keep going
                             if (reason == TMP_REASON_STEP_SOURCE_LINE) {

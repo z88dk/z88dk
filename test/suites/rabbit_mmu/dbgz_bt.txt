@@ -1,0 +1,10 @@
+break dbgz_b2.c:5
+cont
+bt
+reg
+up
+print o
+print a
+up
+print m
+quit

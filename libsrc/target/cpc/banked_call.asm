@@ -10,8 +10,8 @@
 banked_call:
     di
     pop     hl                          ;Return address
-    ld      (mainsp), sp
-    ld      sp, (tempsp)
+    ld      (___z88dk_banked_mainsp), sp
+    ld      sp, (___z88dk_banked_banksp)
     ld      a, (cpc_memory_register)
     push    af
     ld      e, (hl)                     ; Fetch the call address
@@ -22,8 +22,8 @@ banked_call:
     inc     hl
     inc     hl                          ; Yes this should be here
     push    hl                          ; Push the real return address
-    ld      (tempsp), sp
-    ld      sp, (mainsp)
+    ld      (___z88dk_banked_banksp), sp
+    ld      sp, (___z88dk_banked_mainsp)
     ld      (cpc_memory_register), a
     ld      c, a
     ld      b, $7f
@@ -33,12 +33,12 @@ banked_call:
     ld      h, d
     call    l_jphl
     di
-    ld      (mainsp), sp
-    ld      sp, (tempsp)
+    ld      (___z88dk_banked_mainsp), sp
+    ld      sp, (___z88dk_banked_banksp)
     pop     bc                          ; Get the return address
     pop     af                          ; Pop the old bank
-    ld      (tempsp), sp
-    ld      sp, (mainsp)
+    ld      (___z88dk_banked_banksp), sp
+    ld      sp, (___z88dk_banked_mainsp)
     push    bc
     ld      b, $7f
     ld      (cpc_memory_register), a
@@ -51,7 +51,7 @@ banked_call:
     SECTION code_crt_init
 
     pop     de
-    ld      (tempsp), sp
+    ld      (___z88dk_banked_banksp), sp
     ld      hl, -CLIB_BANKING_STACK_SIZE
     add     hl, sp
     ld      sp, hl
@@ -59,9 +59,12 @@ banked_call:
 
     SECTION bss_driver
 
-mainsp:
+; z88dk-ticks finds these two variables by name to unwind a banked call.
+; The bank stack holds, for each call, the real return address and then af
+; with the saved bank in a.
+___z88dk_banked_mainsp:
     defw    0
-tempsp:
+___z88dk_banked_banksp:
     defw    0
     SECTION data_driver
 cpc_memory_register:

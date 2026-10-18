@@ -1,0 +1,14 @@
+break dbgv_b1.c:9
+break dbgv_main.c:10
+cont
+print s_bank1
+print calls
+print bank3_name
+print y
+print x
+cont
+print s_root
+print s_main
+print r
+print g_root
+quit

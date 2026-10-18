@@ -233,7 +233,7 @@ void expression_resolve_struct_member(struct expression_result_t *struct_, const
     while (child)
     {
         if (strcmp(child->symbol->symbol_name, member) == 0) {
-            uint16_t ptr = struct_->as_pointer.ptr + child->offset;
+            uint32_t ptr = struct_->as_pointer.ptr + child->offset;
             debug_resolve_expression_element(
                 &child->symbol->type_record, child->symbol->type_record.first,
                 RESOLVE_BY_POINTER, ptr, result);
@@ -437,6 +437,8 @@ void expression_math_add(struct expression_result_t* a, struct expression_result
             }
             if (is_primitive_integer_type(b->type.first)) {
                 result->as_pointer.ptr = a->as_pointer.ptr + b->as_int * get_type_memory_size(a->type.first->next);
+                /* A near pointer wraps at 64k, the location of a banked array does not */
+                if (a->as_pointer.ptr <= 0xffff) result->as_pointer.ptr &= 0xffff;
             } else {
                 set_expression_result_error(result);
                 sprintf(result->as_error, "Cannot do pointer math with non-integers");
@@ -497,6 +499,7 @@ void expression_math_sub(struct expression_result_t* a, struct expression_result
             }
             if (is_primitive_integer_type(b->type.first)) {
                 result->as_pointer.ptr = a->as_pointer.ptr - b->as_int * get_type_memory_size(a->type.first->next);
+                if (a->as_pointer.ptr <= 0xffff) result->as_pointer.ptr &= 0xffff;
             } else {
                 set_expression_result_error(result);
                 sprintf(result->as_error, "Cannot do pointer math with non-integers");
@@ -617,7 +620,7 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
         case TYPE_ARRAY: {
             int maxlen = Max(0, Min(10, (int)result->type.size));
             utstring_printf(buffer, "%#04x [%d] = { ", result->as_pointer.ptr, (int)result->type.size);
-            uint16_t ptr = result->as_pointer.ptr;
+            uint32_t ptr = result->as_pointer.ptr;
             for ( int i = 0; i < maxlen; i++ ) {
                 utstring_printf(buffer, "%s[%d] = ", i != 0 ? ", " : "", i);
                 struct expression_result_t elr = {0};
@@ -663,7 +666,7 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
                 return buffer;
             }
             debug_sym_type_member* child = t->first_child;
-            uint16_t ptr = result->as_pointer.ptr;
+            uint32_t ptr = result->as_pointer.ptr;
             utstring_printf(buffer, "{");
             uint8_t first = 1;
             while (child) {

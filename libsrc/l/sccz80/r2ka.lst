@@ -1,5 +1,10 @@
 ${NEWLIB_ROOT}l/sccz80/4-r2ka/l_asr_u
 ${NEWLIB_ROOT}l/sccz80/4-r2ka/l_mult
+${NEWLIB_ROOT}l/sccz80/4-r2ka/banked_call
+${NEWLIB_ROOT}l/sccz80/4-r2ka/far/__far_start
+${NEWLIB_ROOT}l/sccz80/4-r2ka/far/__far_end
+${NEWLIB_ROOT}l/sccz80/4-r2ka/far/__far_page
+${NEWLIB_ROOT}l/sccz80/4-r2ka/far/l_far_mapaddr
 ${NEWLIB_ROOT}l/sccz80/4-r2ka/i32/l_long_asr_uo
 ${NEWLIB_ROOT}l/sccz80/4-r2ka/i32/l_long_asl
 ${NEWLIB_ROOT}l/sccz80/4-r2ka/i32/l_long_and

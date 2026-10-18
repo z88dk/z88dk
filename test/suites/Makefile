@@ -1,7 +1,7 @@
 
 
 
-SUBDIRS = string ctype stdio stdlib malloc target_io math imath md5 regex sccz80 zx far zcc-multi
+SUBDIRS = string ctype stdio stdlib malloc target_io math imath md5 regex sccz80 zx far zcc-multi rabbit_mmu
 # benchmark suites (also self-checking via host-verified assertEqual)
 BENCH = charbench crcbench intbench ptrbench sieve rle \
            sortbench queenbench searchbench switchbench \

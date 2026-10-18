@@ -59,6 +59,7 @@ IFDEF CRT_INCLUDE_PREAMBLE
 ENDIF
 
 start:
+    INCLUDE "crt/classic/crt_init_rabbit.inc"
     INCLUDE "crt/classic/crt_init_sp.inc"
     ; Setup BSS memory and perform other initialisation
     call    crt0_init
@@ -67,6 +68,7 @@ start:
 
     ; Setup heap if required
     INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_rabbit_farheap.inc"
 
     ; Setup the desired interrupt mode
     INCLUDE "crt/classic/crt_init_interrupt_mode.inc"
@@ -99,3 +101,4 @@ ELIF DEFINED_CRT_ORG_BSS
     defc __crt_model = 1
 ENDIF
     INCLUDE	"crt/classic/crt_section.inc"
+    INCLUDE "crt/classic/crt_rabbit_banks.inc"

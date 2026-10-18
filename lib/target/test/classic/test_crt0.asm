@@ -19,7 +19,12 @@
 
 
     defc    TAR__clib_exit_stack_size = 32
+IF DEFINED_CRT_RABBIT_BANKS
+    ; Code banks use the XPC window, so the stack has to stay below it
+    defc    TAR__register_sp = 0xE000
+ELSE
     defc    TAR__register_sp = 65280
+ENDIF
     defc    CRT_KEY_DEL = 127
     defc    __CPU_CLOCK = 4000000
 
@@ -57,11 +62,7 @@ IF CRT_ORG_CODE = 0x0000
 ENDIF
 
 program:
-IF __CPU_R4K__ || __CPU_R5K__ || __CPU_R6K__
-    ;; Enable R4K instruction mode on the R4K
-    ld      a,$c0
-    ioi ld  ($0420),a       ;EDMR register (p299 in R4000UM.pdf)
-ENDIF
+    INCLUDE "crt/classic/crt_init_rabbit.inc"
     INCLUDE "crt/classic/crt_init_sp.inc"
     call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
@@ -69,6 +70,7 @@ IF !__CPU_RABBIT__
     ei
 ENDIF
     INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_rabbit_farheap.inc"
     ld      a,(argv_length)
     and     a
     jp      z,argv_done
@@ -112,4 +114,4 @@ l_dcal:
 
     INCLUDE "crt/classic/crt_runtime_selection.inc" 
     INCLUDE	"crt/classic/crt_section.inc"
-
+    INCLUDE "crt/classic/crt_rabbit_banks.inc"

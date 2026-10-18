@@ -11,8 +11,8 @@
 banked_call:
    di
    pop hl
-   ld (mainsp), sp             ; Save the current stack pointer
-   ld sp, (tempsp)             ; Set the stack pointer to the temporary stack
+   ld (___z88dk_banked_mainsp), sp             ; Save the current stack pointer
+   ld sp, (___z88dk_banked_banksp)             ; Set the stack pointer to the temporary stack
 
    ld a, (cur_bank)            ; Get the current bank
    push af                     ; Save the current bank in the stack
@@ -26,8 +26,8 @@ banked_call:
    inc hl                      ; Yes this should be here
    push hl                     ; Push the real return address
 
-   ld (tempsp), sp             ; Saves the temporal call stack 
-   ld sp, (mainsp)             ; and restores the regular stack
+   ld (___z88dk_banked_banksp), sp             ; Saves the temporal call stack 
+   ld sp, (___z88dk_banked_mainsp)             ; and restores the regular stack
 
    ; Sets MMU (as per defined) the new pages (A and A+1)
    ld (cur_bank), a
@@ -39,14 +39,14 @@ banked_call:
    call l_jphl                ; Calls the banked function    
 
    di
-   ld (mainsp), sp             ; Sets the temporal stack pointer
-   ld sp, (tempsp)
+   ld (___z88dk_banked_mainsp), sp             ; Sets the temporal stack pointer
+   ld sp, (___z88dk_banked_banksp)
 
    pop bc                      ; Get the return address
    pop af                      ; Pop the old page
 
-   ld (tempsp), sp       ; Restores the default stack pointer
-   ld sp, (mainsp)
+   ld (___z88dk_banked_banksp), sp       ; Restores the default stack pointer
+   ld sp, (___z88dk_banked_mainsp)
 
    push bc                     ; Push the return address
 
@@ -83,7 +83,7 @@ _initbankedsp:
 IF __CLASSIC
     pop     de
 ENDIF
-    ld      (tempsp),sp
+    ld      (___z88dk_banked_banksp),sp
     ld      hl,-CLIB_BANKING_STACK_SIZE
     add     hl,sp
     ld      sp,hl
@@ -94,7 +94,10 @@ ENDIF
 
    SECTION bss_driver
 
-tempsp:     defw 0
+; z88dk-ticks finds these two variables by name to unwind a banked call.
+; The bank stack holds, for each call, the real return address and then af
+; with the saved bank in a.
+___z88dk_banked_banksp:     defw 0
 cur_bank:   defb 0
-mainsp:     defw 0
+___z88dk_banked_mainsp:     defw 0
 

@@ -159,6 +159,7 @@ static void usage(void)
     printf("  -v             Verbose logging\n");
     printf("  -l X           Load file to address\n");
     printf("  -b <model>     Memory model (zxn/zx/z180/msx)\n");
+    printf("  -banks         Load <input>_BANK_nn.bin bank images (Rabbit, ZX Next or MSX model)\n");
     printf("  -m8080         Emulate an 8080\n");
     printf("  -m8085         Emulate an 8085 (mostly)\n");
     printf("  -mvm1          Emulate a KR580VM1\n");
@@ -190,6 +191,33 @@ static void usage(void)
 }
   
 
+static int c_load_banks = 0;
+
+/* Bank images: <name>_BANK_nn.bin, as z80asm writes them next to the program.
+   memory_bank_store() knows where bank nn goes in the banking model. */
+static void load_bank_images(const char *input)
+{
+  char     base[1024], path[1100];
+  char    *dot;
+  int      bank, c;
+  unsigned i;
+  FILE    *bf;
+
+  snprintf(base, sizeof(base), "%s", input);
+  dot = strrchr(base, '.');
+  if ( dot && !strchr(dot, '/') && !strchr(dot, '\\') )
+    *dot = 0;
+
+  for ( bank = 1; bank < 4096; bank++ ) {
+    snprintf(path, sizeof(path), "%s_BANK_%02X.bin", base, bank);
+    if ( (bf = fopen(path, "rb")) == NULL )
+      continue;
+    for ( i = 0; (c = fgetc(bf)) != EOF; i++ )
+      memory_bank_store(bank, i, c);
+    fclose(bf);
+  }
+}
+
 int main (int argc, char **argv){
   int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0, symbol_addr = -1;
   uint8_t opc, w, r, u;
@@ -212,7 +240,13 @@ int main (int argc, char **argv){
           c_max_runticks = 400000000LL * alarmtime;
           break;
         case 'b':
-          c_memory_model = argv[1];
+          if ( strcmp(&argv[0][1], "banks") == 0 ) {
+            c_load_banks = 1;
+            argv--;
+            argc++;
+          } else {
+            c_memory_model = argv[1];
+          }
           break;
         case 'p':
           symbol_addr= symbol_resolve(argv[1], NULL);
@@ -405,6 +439,11 @@ int main (int argc, char **argv){
         for ( l = 0; l < size; l++ ) {
           *get_memory_addr(load_address+l, MEM_TYPE_INST) = fgetc(fh);
         }
+      }
+      if ( c_load_banks ) {
+        if ( !memory_has_banks() )
+          exit_log(1, "-banks needs a Rabbit, ZX Next or MSX memory model\n");
+        load_bank_images(argv[1]);
       }
     }
     ++argv;

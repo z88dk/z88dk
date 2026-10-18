@@ -106,6 +106,19 @@ extern void memory_handle_paging(int port, int value);
 extern int memory_in(int port);
 extern void memory_reset_paging();
 extern int       rabbit_get_ioi_reg(int reg);
+extern uint16_t  rabbit_get_xpc(void);
+extern uint32_t  rabbit_banked_pc(uint16_t addr);
+extern uint32_t  rabbit_debug_physical(uint32_t addr);
+extern const char *rabbit_mmu_text(void);
+extern uint32_t  memory_banked_pc(uint16_t pc);
+extern uint8_t  *memory_debug_addr(uint32_t addr, memtype type);
+extern const char *memory_mmu_text(void);
+extern uint32_t  memory_banked_caller(uint16_t saved, uint16_t ret);
+extern int       memory_has_banks(void);
+extern void      memory_bank_store(unsigned bank, unsigned offset, uint8_t value);
+extern void      rabbit_set_xpc(uint16_t value);
+extern uint8_t   rabbit_phys_read(uint32_t addr);
+extern void      rabbit_phys_write(uint32_t addr, uint8_t value);
 
 // Rabbit registers
 #define RABBIT_EDMR  0x0420    // If 0xc0 then R4K mode, otherwise in R2K

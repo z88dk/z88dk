@@ -857,7 +857,7 @@ void r4k_ldf_r32_ilmn(uint8_t opcode, uint8_t isjkhl)
     uint8_t **reg32 = get_r32_dest_ptr(isjkhl);
 
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
-           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 8 ) |
            (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
     pc += 3;
 
@@ -879,7 +879,7 @@ void r4k_ldf_ilmn_r32(uint8_t opcode, uint8_t isjkhl)
     reg32 = get_r32_source_ptr(isjkhl);
     
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
-           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 8 ) |
            (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
     pc += 3;
 
@@ -1118,7 +1118,7 @@ void r4k_ldf_a_ilmn(uint8_t opcode)
     uint32_t addr;
 
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
-           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 8 ) |
            (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
     pc += 3;
 
@@ -1134,7 +1134,7 @@ void r4k_ldf_ilmn_a(uint8_t opcode)
     uint32_t addr;
 
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
-           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 8 ) |
            (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
     pc += 3;
 
@@ -1150,7 +1150,7 @@ void r4k_ldf_hl_ilmn(uint8_t opcode)
     uint32_t addr;
 
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
-           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 8 ) |
            (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
     pc += 3;
 
@@ -1172,7 +1172,7 @@ void r4k_ldf_ilmn_hl(uint8_t opcode)
     uint32_t addr;
 
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
-           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 8 ) |
            (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
     pc += 3;
 
@@ -1194,7 +1194,7 @@ void r4k_ldf_rr_ilmn(uint8_t opcode)
     dl = get_rr_lsb_ptr(dreg, altd);
 
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
-           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 8 ) |
            (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
     pc += 3;
 
@@ -1216,7 +1216,7 @@ void r4k_ldf_ilmn_rr(uint8_t opcode)
 
 
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
-           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 8 ) |
            (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
     pc += 3;
 
@@ -1238,7 +1238,7 @@ void r4k_ldf_pd_ilmn(uint8_t opcode)
     uint32_t addr;
 
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
-           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 8 ) |
            (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
     pc += 3;
 
@@ -1258,7 +1258,7 @@ void r4k_ldf_ilmn_ps(uint8_t opcode)
     uint32_t ps = read_ps(reg);
 
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
-           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 8 ) |
            (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
     pc += 3;
 
@@ -1668,23 +1668,48 @@ void r4k_jre(uint8_t opcode, uint8_t dojump)
 
 void r4k_lljp(uint8_t opcode, uint8_t dojump)
 {
-    if (opcode == 0x87) {
-        UNIMPLEMENTED( opcode, "lljp lxpc,mn");
-    } else {
-        UNIMPLEMENTED( 0xed00 | opcode, "lljp cc/cx,lxpc,mn");
+    uint16_t mn = get_memory_inst(pc++);
+    uint16_t lxpc;
+
+    mn |= get_memory_inst(pc++) << 8;
+    lxpc = get_memory_inst(pc++);
+    lxpc |= get_memory_inst(pc++) << 8;
+    ioi = ioe = 0;
+    if (dojump) {
+        rabbit_set_xpc(lxpc & 0x0fff);
+        mp = pc = mn;
     }
     st += 14;
 }
 
+static void r4k_far_call(uint16_t target, uint16_t lxpc)
+{
+    uint16_t cur = rabbit_get_xpc();
+
+    ioi = ioe = 0;
+    put_memory(--sp, cur >> 8);
+    put_memory(--sp, cur);
+    put_memory(--sp, pc >> 8);
+    put_memory(--sp, pc);
+    rabbit_set_xpc(lxpc & 0x0fff);
+    mp = pc = target;
+}
+
 void r4k_llcall(uint8_t opcode)
 {
-    UNIMPLEMENTED( opcode, "llcall lxpc,mn");
+    uint16_t mn = get_memory_inst(pc++);
+    uint16_t lxpc;
+
+    mn |= get_memory_inst(pc++) << 8;
+    lxpc = get_memory_inst(pc++);
+    lxpc |= get_memory_inst(pc++) << 8;
+    r4k_far_call(mn, lxpc);
     st += 24;
 }
 
 void r4k_llcall_jkhl(uint8_t opcode)
 {
-    UNIMPLEMENTED( opcode, "llcall (jkhl)");
+    r4k_far_call(h << 8 | l, j << 8 | k);
     st += 19;
 }
 
@@ -1811,13 +1836,21 @@ void r4k_copyr(uint8_t opcode)
 
 void r4k_ld_hl_lxpc(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "ld hl,lxpc");
+    uint16_t lxpc = rabbit_get_xpc();
+
+    if (altd) {
+        h_ = lxpc >> 8;
+        l_ = lxpc;
+    } else {
+        h = lxpc >> 8;
+        l = lxpc;
+    }
     st += 2;
 }
 
 void r4k_ld_lxpc_hl(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "ld lxpc,hl");
+    rabbit_set_xpc((h << 8 | l) & 0x0fff);
     st += 2;
 }
 
@@ -1847,7 +1880,15 @@ void r4k_sysret(uint8_t opcode)
 
 void r4k_llret(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode, "llret");
+    uint16_t ret, lxpc;
+
+    ioi = ioe = 0;
+    ret = get_memory_data(sp++);
+    ret |= get_memory_data(sp++) << 8;
+    lxpc = get_memory_data(sp++);
+    lxpc |= get_memory_data(sp++) << 8;
+    rabbit_set_xpc(lxpc);
+    mp = pc = ret;
     st += 14;
 }
 

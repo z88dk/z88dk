@@ -21,6 +21,27 @@ static debug_sym_file* cdb_files = NULL;
 
 static debug_sym_type* cdb_ctypes = NULL;
 static cline *clines[65536] = {0};
+/* Source lines of banked code, indexed by bank (address >> 16) then by the
+   address in the bank window. The arrays are allocated when a bank has lines. */
+static cline **bank_clines[4096] = {0};
+
+static cline **cline_slot(int address, int create)
+{
+    int bank = (address >> 16) & 0xffff;
+
+    if ( address < 0 )
+        return NULL;
+    if ( bank == 0 )
+        return &clines[address];
+    if ( bank > 4095 )
+        return NULL;
+    if ( bank_clines[bank] == NULL ) {
+        if ( !create )
+            return NULL;
+        bank_clines[bank] = calloc(65536, sizeof(cline *));
+    }
+    return &bank_clines[bank][address & 0xffff];
+}
 
 
 // Crude dehexer....
@@ -752,7 +773,9 @@ void debug_add_cline(const char *filename, const char *function, int lineno, int
     cl->scope_block = scope_block;
     HASH_ADD_INT(cf->lines, line, cl);
 
-    clines[cl->address] = cl;  // TODO Banking
+    cline **slot = cline_slot(cl->address, 1);
+    if ( slot != NULL )
+        *slot = cl;
 }
 
 int debug_find_source_location(int address, const char **filename, int *lineno)
@@ -765,15 +788,16 @@ int debug_find_source_location(int address, const char **filename, int *lineno)
     }
     int topmost_address = original_sym->address;
 
-    while ( clines[address] == NULL && address > 0 ) {
+    cline **slot;
+    while ( ((slot = cline_slot(address, 0)) == NULL || *slot == NULL) && address > 0 ) {
         if (address < topmost_address) {
             return -1;
         }
         address--;
     }
-    if ( clines[address] == NULL) return -1;
-    *filename = clines[address]->file->file;
-    *lineno = clines[address]->line;
+    if ( (slot = cline_slot(address, 0)) == NULL || *slot == NULL ) return -1;
+    *filename = (*slot)->file->file;
+    *lineno = (*slot)->line;
 
     return 0;
 }
@@ -1302,7 +1326,7 @@ static uint16_t get_current_framepointer(struct debugger_regs_t *regs, size_t* i
 }
 
 static uint8_t recover_from_frame_pointer(symbol* sym, uint16_t frame_pointer,
-                                          uint8_t* unreliable_offset, uint16_t* at, uint16_t* stack,
+                                          uint8_t* unreliable_offset, int* at, uint16_t* stack,
                                           debug_frame_pointer** first, debug_frame_pointer** last)
 {
     // we have no idea where we are but, but somebody called us, and it's return address
@@ -1339,7 +1363,9 @@ static uint8_t recover_from_frame_pointer(symbol* sym, uint16_t frame_pointer,
     return 0;
 }
 
-debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit)
+/* pc is a banked address (bank << 16 | pc) when the code is in a bank. The
+   callers' addresses, from the stack, have 16 bits. */
+debug_frame_pointer* debug_stack_frames_construct(uint32_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit)
 {
     size_t invalidate_stack_after;
     uint16_t frame_pointer = get_current_framepointer(regs, &invalidate_stack_after);
@@ -1350,12 +1376,31 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
     uint8_t unreliable_offset = 0;
     uint8_t entry_num = 0;
     uint16_t stack = sp;
-    uint16_t at = pc;
+    int      at = pc;
+
+    unsigned banked_depth = 0;
 
     do {
         entry_num++;
         uint16_t offset;
         symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
+
+        /* A banked function returns into banked_call. The real caller, with
+           its bank, is on the bank stack, so carry on from there. */
+        if (entry_num > 1 && sym != NULL && bk.banked_caller != NULL &&
+            (strcmp(sym->name, "banked_call") == 0 || strcmp(sym->name, "_banked_call") == 0)) {
+            uint32_t banked_caller;
+
+            if (bk.banked_caller(banked_depth, &banked_caller)) {
+                banked_depth++;
+                at = banked_caller;
+                if (last) {
+                    last->return_address = banked_caller;
+                }
+                continue;
+            }
+        }
+
         if (sym == NULL || sym->file == NULL) {
             if (entry_num == 1 && frame_pointer &&
                 recover_from_frame_pointer(sym, frame_pointer,
@@ -1523,6 +1568,19 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
         }
 
         new_frame->return_address = at;
+
+        /* Returning into banked_call: the real caller is on the bank stack */
+        if (bk.banked_caller != NULL) {
+            uint16_t ret_offset;
+            symbol* ret_sym = symbol_find_lower(at, SYM_ADDRESS, &ret_offset);
+            uint32_t real_caller;
+
+            if (ret_sym != NULL &&
+                (strcmp(ret_sym->name, "banked_call") == 0 || strcmp(ret_sym->name, "_banked_call") == 0) &&
+                bk.banked_caller(banked_depth, &real_caller)) {
+                new_frame->return_address = real_caller;
+            }
+        }
 
         if (strcmp(sym->name, "main") == 0 || strcmp(sym->name, "_main") == 0) {
             break;

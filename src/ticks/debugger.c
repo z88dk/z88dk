@@ -124,6 +124,19 @@ typedef struct {
 static int last_evaluation_id = 0;
 
 static void completion(const char *buf, linenoiseCompletions *lc, void *ctx);
+static const char *pc_text(void)
+{
+    static char buf[24];
+    uint32_t    banked = current_banked_pc();
+
+    if ( banked > 0xffff ) {
+        snprintf(buf, sizeof(buf), "$%X:$%04X", (unsigned)(banked >> 16), (unsigned)(banked & 0xffff));
+    } else {
+        snprintf(buf, sizeof(buf), "%04x", bk.pc());
+    }
+    return buf;
+}
+
 static int cmd_next(int argc, char **argv);
 static int cmd_next_source(int argc, char **argv);
 static int cmd_step(int argc, char **argv);
@@ -468,7 +481,7 @@ void debugger_request_a_break() {
 
 static void debugger_print_prompt(char *prompt, size_t prompt_size, char *buf, size_t buf_size) {
     uint16_t sym_offset;
-    symbol* sym = symbol_find_lower(bk.pc(), SYM_ADDRESS, &sym_offset);
+    symbol* sym = symbol_find_lower(current_banked_pc(), SYM_ADDRESS, &sym_offset);
     if (sym == NULL) {
         buf[0] = 0;
     } else {
@@ -701,24 +714,25 @@ void debugger()
                     continue;
                 }
 
-                if ( elem->type == BREAK_PC && elem->value == bk.pc() ) {
+                if ( elem->type == BREAK_PC && elem->value == (elem->value > 0xffff ? current_banked_pc() : bk.pc()) ) {
+                    const int label_at = elem->value > 0xffff ? elem->value : bk.pc();
                     if (elem->auto_remove) {
-                        bk.console("Hit breakpoint (temp): @%04x (%s)\n",bk.pc(),resolve_to_label(bk.pc()));
+                        bk.console("Hit breakpoint (temp): @%s (%s)\n",pc_text(),resolve_to_label(label_at));
                         delete_breakpoint(elem);
                     } else {
-                        bk.console("Hit breakpoint %d: @%04x (%s)\n",i,bk.pc(),resolve_to_label(bk.pc()));
+                        bk.console("Hit breakpoint %d: @%s (%s)\n",i,pc_text(),resolve_to_label(label_at));
                     }
                     dodebug=1;
                     break;
                 } else if ( elem->type == BREAK_CHECK8 && bk.get_memory(elem->lcheck_arg, MEM_TYPE_DATA) == elem->lvalue ) {
-                    bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                    bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                     elem->enabled = 0;
                     dodebug=1;
                     break;
                 } else if ( elem->type == BREAK_CHECK16 &&
                             bk.get_memory(elem->lcheck_arg, MEM_TYPE_DATA) == elem->lvalue  &&
                             bk.get_memory(elem->hcheck_arg, MEM_TYPE_DATA) == elem->hvalue  ) {
-                    bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                    bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                     elem->enabled = 0;
                     dodebug=1;
                     break;
@@ -738,14 +752,14 @@ void debugger()
                         lc = ((uint8_t *)r->word(&regs));
 #endif
                         if (*lc == elem->lvalue && *hc == elem->hvalue) {
-                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                             elem->enabled = 0;
                             dodebug=1;
                             break;
                         }
                     } else if (r->high == NULL) {
                         if (*(r->low(&regs)) == elem->lvalue) {
-                            bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                             elem->enabled = 0;
                             dodebug=1;
                             break;
@@ -753,7 +767,7 @@ void debugger()
                     } else {
                         if (*(r->low(&regs)) == elem->lvalue && *(r->high(&regs)) == elem->hvalue)
                         {
-                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                             elem->enabled = 0;
                             dodebug=1;
                             break;
@@ -775,7 +789,7 @@ void debugger()
         trace_source = 0;
         const char *filename;
         int   lineno;
-        if ( debug_find_source_location(bk.pc(), &filename, &lineno) < 0 ) {
+        if ( debug_find_source_location(current_banked_pc(), &filename, &lineno) < 0 ) {
             disassemble2(bk.pc(), buf, sizeof(buf), 0);
             bk.console("%s\n",buf);
         } else {
@@ -871,7 +885,7 @@ static int cmd_next_source(int argc, char **argv)
 {
     const char *filename;
     int   lineno;
-    const unsigned short pc = bk.pc();
+    const uint32_t pc = current_banked_pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
         bk.console("Warning: cannot obtain current source line.\n");
         return 0;
@@ -891,7 +905,7 @@ static int cmd_step_source(int argc, char **argv)
 {
     const char *filename;
     int   lineno;
-    const unsigned short pc = bk.pc();
+    const uint32_t pc = current_banked_pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
         bk.console("Warning: cannot obtain current source line.\n");
         return 0;
@@ -1006,7 +1020,7 @@ static int cmd_frame(int argc, char **argv)
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
     uint16_t stack = regs.sp;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     size_t frames_count = debug_stack_frames_count(first_frame_pointer);
@@ -1068,7 +1082,7 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
@@ -1218,7 +1232,7 @@ static void info_section_locals() {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
@@ -1264,7 +1278,7 @@ static void info_section_globals() {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
@@ -1361,7 +1375,7 @@ static int cmd_backtrace(int argc, char **argv)
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     if (first_frame_pointer == NULL) {
@@ -1456,6 +1470,21 @@ int parse_address(char *arg, const char** corrected_source)
     int  where;
     char *end;
 
+    if ( bk.banked_pc != NULL ) {
+        /* bank:address, each part a number as everywhere else: decimal, or
+           hexadecimal with a $ or 0x prefix */
+        char *bank_end;
+        int   bank = parse_number(arg, &bank_end);
+
+        if ( bank_end != arg && *bank_end == ':' && bank > 0 && bank < 4096 ) {
+            char *addr_end;
+            int   offset = parse_number(bank_end + 1, &addr_end);
+
+            if ( addr_end != bank_end + 1 && *addr_end == 0 ) {
+                return bank << 16 | (offset & 0xffff);
+            }
+        }
+    }
     where = parse_number(arg, &end);
     if ( end == arg ) {
         where = symbol_resolve(arg, NULL);
@@ -1682,6 +1711,10 @@ static int cmd_registers(int argc, char **argv)
         }
     }
 
+    if ( bk.mmu_info != NULL && bk.mmu_info() != NULL ) {
+        bk.console("%s\n", bk.mmu_info());
+    }
+
     return 0;
 }
 
@@ -1789,7 +1822,7 @@ static int cmd_finish(int argc, char **argv)
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 1);
 
@@ -1975,7 +2008,9 @@ static int cmd_examine(int argc, char **argv)
 	}
 
     abuf[16] = 0;                                             // Zero terminated string
-    addr %= 0x10000;                                          // First address with overflow correction
+    /* Above 64k the address is a banked or physical one and is not wrapped */
+    const int wide = addr > 0xffff;
+    if ( !wide ) addr %= 0x10000;                             // First address with overflow correction
 
     for ( i = 0; i < len; i++ ) {
         uint8_t b = bk.get_memory(addr, MEM_TYPE_DATA);
@@ -1998,7 +2033,7 @@ static int cmd_examine(int argc, char **argv)
 			bk.console("   %.*s\n", (i % 16) + 1, abuf);      // Suffix line with ASCII dump
 		}
 
-        addr = (addr + 1) % 0x10000;                          // Next address with overflow correction
+        addr = wide ? addr + 1 : (addr + 1) % 0x10000;        // Next address with overflow correction
     }
     return 0;
 }
@@ -2307,7 +2342,7 @@ static int cmd_list(int argc, char **argv)
         struct debugger_regs_t regs;
         bk.get_regs(&regs);
         uint16_t stack = regs.sp;
-        uint16_t at = bk.pc();
+        uint32_t at = current_banked_pc();
 
         debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
         debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);
@@ -2327,6 +2362,11 @@ static int cmd_list(int argc, char **argv)
 
     const char *filename;
     int   lineno;
+
+    /* The innermost frame is where the pc is, in its bank */
+    if ( current_frame == 0 ) {
+        addr = current_banked_pc();
+    }
 
     if ( argc == 2 ) {
         int a2 = parse_address(argv[1], NULL);

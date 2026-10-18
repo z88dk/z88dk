@@ -15,6 +15,7 @@ typedef uint8_t *(*memory_func)(uint32_t pc, memtype type);
 static void     standard_init(void);
 static uint8_t *standard_get_memory_addr(uint32_t pc, memtype type);
 static void     zxn_init(void);
+static int      zxn_handle_in(int port);
 static uint8_t *zxn_get_memory_addr(uint32_t pc, memtype type);
 static void     zxn_handle_out(int port, int value);
 static void     zx_init(char *config);
@@ -25,6 +26,7 @@ static uint8_t *z180_get_memory_addr(uint32_t pc, memtype type);
 static void     z180_handle_out(int port, int value);
 static void     rabbit_init(void);
 static uint8_t *rabbit_get_memory_addr(uint32_t pc, memtype type);
+static void     rabbit_write_hook(uint16_t addr, uint8_t value);
 static void     msx_init(void);
 static uint8_t *msx_get_memory_addr(uint32_t pc, memtype type);
 static void     msx_handle_out(int port, int value);
@@ -46,6 +48,10 @@ static unsigned char *zx_rom[2];
 static int            inst_mode = 1;       // We're reading an instruction
 
 static memory_func   get_mem_addr;
+static void        (*write_hook)(uint16_t addr, uint8_t value);
+
+// Which banking scheme the debugger has to understand
+static enum { MODEL_OTHER, MODEL_RABBIT, MODEL_ZXN, MODEL_MSX } current_model = MODEL_OTHER;
 static void        (*handle_out)(int port, int value);
 static int         (*handle_in)(int port);
 
@@ -82,8 +88,10 @@ uint8_t put_memory(uint16_t pc, uint8_t b)
   bk.debugger_write_memory(pc, b);
   if (pc < c_rom_size)
     return *get_memory_addr(pc, MEM_TYPE_DATA);
-  else
-    return *get_memory_addr(pc, MEM_TYPE_DATA) = b;
+  *get_memory_addr(pc, MEM_TYPE_DATA) = b;
+  if (write_hook)
+    write_hook(pc, b);
+  return b;
 }
 
 uint8_t *get_memory_addr(uint32_t pc, memtype type)
@@ -204,8 +212,10 @@ static void zxn_init(void)
 
 
     standard_init();
+    current_model = MODEL_ZXN;
     get_mem_addr = zxn_get_memory_addr;
     handle_out = zxn_handle_out;
+    handle_in = zxn_handle_in;
 }
 
 static uint8_t *zxn_get_memory_addr(uint32_t pc, memtype type)
@@ -220,19 +230,27 @@ static uint8_t *zxn_get_memory_addr(uint32_t pc, memtype type)
 }
 
 
+/* Next registers: a write to port 0x243b selects a register, and the select
+   stays until the next one. Port 0x253b reads and writes the selected
+   register. Only the MMU slots, registers 0x50 to 0x57, are modelled. */
+static int zxn_selected_register = -1;
+
 static void zxn_handle_out(int port, int value)
 {
-  static int nextport = 0;
-
-  if ( port == 0x243B && nextport == 0 ) {
-      nextport = value;
+  if ( port == 0x243B ) {
+      zxn_selected_register = value;
       return;
   }
-  if ( nextport >= 0x50 && nextport <= 0x57 ) {
-    zxnext_mmu[nextport - 0x50] = value;
+  if ( port == 0x253B && zxn_selected_register >= 0x50 && zxn_selected_register <= 0x57 ) {
+    zxnext_mmu[zxn_selected_register - 0x50] = value;
   }
-  nextport = 0;
-  return;
+}
+
+static int zxn_handle_in(int port)
+{
+  if ( port == 0x253B && zxn_selected_register >= 0x50 && zxn_selected_register <= 0x57 )
+    return zxnext_mmu[zxn_selected_register - 0x50];
+  return -1;
 }
 
 static void load_rom(char *filename, unsigned char *buf, size_t len)
@@ -319,30 +337,183 @@ static void zx_handle_out(int port, int value)
 
 
 
-// Rabbit - need to handle ioi/ioe
+// Rabbit - segmented logical space over a flat physical array, plus ioi/ioe
 static uint8_t *ioi_mem;
 static uint8_t *ioe_mem;
+static uint8_t *rabbit_phys;
+static uint32_t rabbit_phys_mask;
+static uint16_t rabbit_xpc;
+static uint8_t  rabbit_mmu_segsize = 0xff;
+static uint16_t rabbit_mmu_dataseg;     /* 4k units: 8 bits on R2K/R3K, 12 on R4K and later */
+static uint16_t rabbit_mmu_stackseg;
+// Offset added to a logical address, indexed by its top nibble
+static uint32_t rabbit_seg_off[16];
+
+#define RABBIT_IO_MMIDR     0x0010
+#define RABBIT_IO_STACKSEG  0x0011
+#define RABBIT_IO_DATASEG   0x0012
+#define RABBIT_IO_SEGSIZE   0x0013
+/* Rabbit 4000 and later: 12 bit segment offsets in a low and a high register */
+#define RABBIT_IO_STKSEGL   0x001a
+#define RABBIT_IO_STKSEGH   0x001b
+#define RABBIT_IO_DATSEGL   0x001e
+#define RABBIT_IO_DATSEGH   0x001f
+
+static void rabbit_remap(void)
+{
+    int data_n = rabbit_mmu_segsize & 0x0f;
+    int stack_n = rabbit_mmu_segsize >> 4;
+    int n;
+
+    for ( n = 0; n < 16; n++ ) {
+        if ( n >= 0xe )
+            rabbit_seg_off[n] = (uint32_t)rabbit_xpc << 12;
+        else if ( n >= stack_n )
+            rabbit_seg_off[n] = (uint32_t)rabbit_mmu_stackseg << 12;
+        else if ( n >= data_n )
+            rabbit_seg_off[n] = (uint32_t)rabbit_mmu_dataseg << 12;
+        else
+            rabbit_seg_off[n] = 0;
+    }
+}
+
+static void rabbit_io_write(uint16_t reg, uint8_t value)
+{
+    int wide = (c_cpu & (CPU_R4K|CPU_R6K)) != 0;
+
+    switch ( reg ) {
+    case RABBIT_IO_STACKSEG:
+        rabbit_mmu_stackseg = value;
+        if ( wide ) {
+            ioi_mem[RABBIT_IO_STKSEGL] = value;
+            ioi_mem[RABBIT_IO_STKSEGH] = 0;
+        }
+        break;
+    case RABBIT_IO_DATASEG:
+        rabbit_mmu_dataseg = value;
+        if ( wide ) {
+            ioi_mem[RABBIT_IO_DATSEGL] = value;
+            ioi_mem[RABBIT_IO_DATSEGH] = 0;
+        }
+        break;
+    case RABBIT_IO_STKSEGL:
+        if ( !wide ) return;
+        rabbit_mmu_stackseg = (rabbit_mmu_stackseg & 0x0f00) | value;
+        ioi_mem[RABBIT_IO_STACKSEG] = value;
+        break;
+    case RABBIT_IO_STKSEGH:
+        if ( !wide ) return;
+        ioi_mem[RABBIT_IO_STKSEGH] = value & 0x0f;
+        rabbit_mmu_stackseg = (rabbit_mmu_stackseg & 0x00ff) | (value & 0x0f) << 8;
+        break;
+    case RABBIT_IO_DATSEGL:
+        if ( !wide ) return;
+        rabbit_mmu_dataseg = (rabbit_mmu_dataseg & 0x0f00) | value;
+        ioi_mem[RABBIT_IO_DATASEG] = value;
+        break;
+    case RABBIT_IO_DATSEGH:
+        if ( !wide ) return;
+        ioi_mem[RABBIT_IO_DATSEGH] = value & 0x0f;
+        rabbit_mmu_dataseg = (rabbit_mmu_dataseg & 0x00ff) | (value & 0x0f) << 8;
+        break;
+    case RABBIT_IO_SEGSIZE:
+        rabbit_mmu_segsize = value;
+        break;
+    default:
+        return;
+    }
+    rabbit_remap();
+}
 
 static uint8_t *rabbit_get_memory_addr(uint32_t pc, memtype type)
 {
+    // A 32-bit pointer of 0xffff:addr is a logical address
+    if ( type == MEM_TYPE_PHYSICAL && (pc & 0xffff0000) != 0xffff0000 )
+        return &rabbit_phys[pc & rabbit_phys_mask];
+
     pc &= 0xffff;
     if (ioi && type != MEM_TYPE_INST) {
-      return &ioi_mem[pc & 65535];
+      return &ioi_mem[pc];
     } else if (ioe && type != MEM_TYPE_INST) {
-      return &ioe_mem[pc & 65535];
+      return &ioe_mem[pc];
     }
-    return &mem[pc & 65535];
+    return &rabbit_phys[(pc + rabbit_seg_off[pc >> 12]) & rabbit_phys_mask];
 }
 
 static void rabbit_init(void) 
 {
-    mem = calloc(65536, 1);
+    // The allocation is untouched until used, so the larger size costs nothing
+    rabbit_phys = calloc(16 * 1024 * 1024, 1);
+    rabbit_phys_mask = (c_cpu & (CPU_R4K|CPU_R6K)) ? 0xffffff : 0xfffff;
+    current_model = MODEL_RABBIT;
     get_mem_addr = rabbit_get_memory_addr;
+    write_hook = rabbit_write_hook;
 
     ioi_mem = calloc(65536,1);
     ioe_mem = calloc(65536,1);
 
-    // Initialse some registers here
+    ioi_mem[RABBIT_IO_SEGSIZE] = rabbit_mmu_segsize;
+    rabbit_xpc = 0;
+    rabbit_remap();
+}
+
+// An internal I/O write may change the memory map
+static void rabbit_write_hook(uint16_t addr, uint8_t value)
+{
+    if ( ioi )
+        rabbit_io_write(addr, value);
+}
+
+uint8_t rabbit_phys_read(uint32_t addr)
+{
+    return rabbit_phys[addr & rabbit_phys_mask];
+}
+
+void rabbit_phys_write(uint32_t addr, uint8_t value)
+{
+    rabbit_phys[addr & rabbit_phys_mask] = value;
+}
+
+/* A banked address is bank << 16 | window address, as z80asm lays out the
+   bank sections. Bank N is seen at XPC = N * 2. */
+uint32_t rabbit_banked_pc(uint16_t addr)
+{
+    if ( rabbit_phys && addr >= 0xe000 && rabbit_xpc >= 2 && (rabbit_xpc & 1) == 0 )
+        return (uint32_t)(rabbit_xpc / 2) << 16 | addr;
+    return addr;
+}
+
+/* The physical address behind a debugger address: a banked address in the
+   window, otherwise a physical address as it is */
+uint32_t rabbit_debug_physical(uint32_t addr)
+{
+    if ( (addr & 0xffff) >= 0xe000 && addr > 0xffff )
+        return (addr >> 16) * 0x2000 + 0xe000 + (addr & 0x1fff);
+    return addr;
+}
+
+const char *rabbit_mmu_text(void)
+{
+    static char buf[160];
+
+    if ( !rabbit_phys )
+        return NULL;
+    snprintf(buf, sizeof(buf), "xpc=%0*X%s segsize=%02X dataseg=%03X stackseg=%03X",
+        (c_cpu & (CPU_R4K|CPU_R6K)) ? 3 : 2, rabbit_xpc,
+        (rabbit_xpc >= 2 && (rabbit_xpc & 1) == 0) ? "" : " (not a bank)",
+        rabbit_mmu_segsize, rabbit_mmu_dataseg, rabbit_mmu_stackseg);
+    return buf;
+}
+
+uint16_t rabbit_get_xpc(void)
+{
+    return rabbit_xpc;
+}
+
+void rabbit_set_xpc(uint16_t value)
+{
+    rabbit_xpc = value;
+    rabbit_remap();
 }
 
 // Get the value of an internal register
@@ -351,6 +522,145 @@ int rabbit_get_ioi_reg(int reg)
     reg &= 0xffff;
 
     return ioi_mem[reg];
+}
+
+
+/* Debugger view of banked memory. A bank is addressed as bank << 16 | address
+   in the bank window, which is how z80asm lays out the bank sections:
+     Rabbit  bank N is XPC = N * 2 in 0xe000-0xffff
+     ZXN     bank N is the 8k page N (and N+1) in MMU slots 6 and 7, 0xc000-0xffff
+     MSX     bank N is the 16k page N in 0x8000-0xbfff, pages 4 and up being
+             the pages above the four that hold the 64k image */
+
+/* Loading a bank image (the _BANK_nn.bin files that z80asm writes). nn is the
+   bank number as in the section names, and offset is the byte in the file.
+     Rabbit  8K at physical 0x10000 + (nn - 1) * 0x2000
+     ZXN     16K over the 8K pages nn and nn + 1
+     MSX     16K in the 16K page nn */
+int memory_has_banks(void)
+{
+    return current_model != MODEL_OTHER;
+}
+
+void memory_bank_store(unsigned bank, unsigned offset, uint8_t value)
+{
+    switch ( current_model ) {
+    case MODEL_RABBIT:
+        /* The bank has to be inside the physical memory (120 banks below 1MB,
+           2040 below 16MB) or it would wrap on to the root image */
+        if ( bank >= 1 && offset < 0x2000
+             && 0x10000 + (bank - 1) * 0x2000 + offset <= rabbit_phys_mask )
+            rabbit_phys_write(0x10000 + (bank - 1) * 0x2000 + offset, value);
+        break;
+    case MODEL_ZXN:
+        if ( bank + (offset >> 13) < 256 && offset < 0x4000 )
+            zxn_banks[bank + (offset >> 13)][offset & 0x1fff] = value;
+        break;
+    case MODEL_MSX:
+        if ( bank < 256 && offset < 0x4000 )
+            msx_banks[bank][offset] = value;
+        break;
+    default:
+        break;
+    }
+}
+
+// pc extended with the bank mapped in its window, or pc if it is in none
+uint32_t memory_banked_pc(uint16_t pc)
+{
+    switch ( current_model ) {
+    case MODEL_RABBIT:
+        return rabbit_banked_pc(pc);
+    case MODEL_ZXN:
+        if ( pc >= 0xc000 && zxnext_mmu[6] != 0xff )
+            return (uint32_t)zxnext_mmu[6] << 16 | pc;
+        break;
+    case MODEL_MSX:
+        if ( pc >= 0x8000 && pc < 0xc000 && msx_mmu[2] >= 4 )
+            return (uint32_t)msx_mmu[2] << 16 | pc;
+        break;
+    default:
+        break;
+    }
+    return pc;
+}
+
+// Where a debugger address lives. Addresses up to 64k are logical ones.
+uint8_t *memory_debug_addr(uint32_t addr, memtype type)
+{
+    uint32_t bank = addr >> 16;
+    uint16_t off = addr & 0xffff;
+
+    if ( bank == 0 )
+        return get_memory_addr(off, type);
+
+    switch ( current_model ) {
+    case MODEL_RABBIT:
+        return get_memory_addr(rabbit_debug_physical(addr), MEM_TYPE_PHYSICAL);
+    case MODEL_ZXN:
+        if ( off >= 0xc000 && bank + (off >> 13) - 6 < 256 )
+            return &zxn_banks[bank + (off >> 13) - 6][off & 0x1fff];
+        break;
+    case MODEL_MSX:
+        if ( off >= 0x8000 && off < 0xc000 && bank < 256 )
+            return &msx_banks[bank][off & 0x3fff];
+        break;
+    default:
+        break;
+    }
+    return get_memory_addr(off, type);
+}
+
+/* The code that made a banked call, from its return address and the bank that
+   banked_call saved. The saved byte is what the banking code reads back:
+     Rabbit  XPC (LXPC on the Rabbit 4000 and later), so the bank is half of it
+     ZXN     the 8K page in MMU slot 6, 0xff when nothing is paged in
+     MSX     the 16K page at 0x8000, below 4 when the 64k image is there */
+uint32_t memory_banked_caller(uint16_t saved, uint16_t ret)
+{
+    uint32_t bank = 0;
+
+    switch ( current_model ) {
+    case MODEL_RABBIT:
+        /* XPC on the Rabbit 2000 and 3000, the 12-bit LXPC on the 4000 and later */
+        if ( saved >= 2 && (saved & 1) == 0 && ret >= 0xe000 )
+            bank = saved / 2;
+        break;
+    case MODEL_ZXN:
+        if ( saved != 0xff && saved != 0 && ret >= 0xc000 )
+            bank = saved;
+        break;
+    case MODEL_MSX:
+        if ( saved >= 4 && ret >= 0x8000 && ret < 0xc000 )
+            bank = saved;
+        break;
+    default:
+        break;
+    }
+    return bank << 16 | ret;
+}
+
+// One line describing the memory map, or NULL
+const char *memory_mmu_text(void)
+{
+    static char buf[160];
+    int         i, n;
+
+    switch ( current_model ) {
+    case MODEL_RABBIT:
+        return rabbit_mmu_text();
+    case MODEL_ZXN:
+        n = snprintf(buf, sizeof(buf), "mmu slots:");
+        for ( i = 0; i < 8; i++ )
+            n += snprintf(buf + n, sizeof(buf) - n, " %d=%02x", i, zxnext_mmu[i]);
+        return buf;
+    case MODEL_MSX:
+        snprintf(buf, sizeof(buf), "pages: 0=%02x 1=%02x 2=%02x 3=%02x",
+            msx_mmu[0], msx_mmu[1], msx_mmu[2], msx_mmu[3]);
+        return buf;
+    default:
+        return NULL;
+    }
 }
 
 
@@ -367,6 +677,7 @@ static void msx_init(void)
     msx_mmu[2] = 0x02;
     msx_mmu[3] = 0x03;
 
+    current_model = MODEL_MSX;
     get_mem_addr = msx_get_memory_addr;
     handle_out = msx_handle_out;
     handle_in = msx_handle_in;

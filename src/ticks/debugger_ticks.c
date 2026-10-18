@@ -33,7 +33,47 @@ uint16_t get_sp()
 
 uint8_t get_ticks_memory(uint32_t at, memtype type)
 {
+    /* Above 64k the debugger means a bank:address in the banked memory model */
+    if ( at > 0xffff )
+        return *memory_debug_addr(at, type);
     return get_memory(at, type);
+}
+
+static uint32_t get_banked_pc()
+{
+    return memory_banked_pc(pc);
+}
+
+/* banked_call keeps the real return address and the saved bank on a separate
+   stack, whose pointer is ___z88dk_banked_banksp. Each banked call that is
+   still running has an entry: the return address, then af with the bank in a. */
+static int get_banked_caller(unsigned depth, uint32_t *caller)
+{
+    int      var = symbol_resolve("___z88dk_banked_banksp", NULL);
+    uint16_t sp, entry, saved;
+
+    /* Debugger reads must not trigger watchpoints */
+#define PEEK(a) (*get_memory_addr((uint16_t)(a), MEM_TYPE_DATA))
+    if ( var < 0 )
+        return 0;
+    sp = PEEK(var) | PEEK(var + 1) << 8;
+    entry = sp + depth * 4;
+    if ( entry < sp )
+        return 0;
+    /* The Rabbit 4000 and later save the whole LXPC as a word, the others save
+       af with the bank in a */
+    if ( israbbit() && (c_cpu & (CPU_R4K|CPU_R6K)) )
+        saved = PEEK(entry + 2) | PEEK(entry + 3) << 8;
+    else
+        saved = PEEK(entry + 3);
+    *caller = memory_banked_caller(saved, PEEK(entry) | PEEK(entry + 1) << 8);
+#undef PEEK
+    return 1;
+}
+
+static char* get_mmu_info()
+{
+    return (char *)memory_mmu_text();
 }
 
 uint8_t is_verbose()
@@ -114,20 +154,29 @@ void set_regs(struct debugger_regs_t* regs)
     }
 }
 
+/* A watchpoint above 64k is a banked address (bank << 16 | address in the bank
+   window). It matches an access through the window while its bank is mapped. */
+static int watch_matches(const breakpoint *elem, int addr)
+{
+    if ( elem->value > 0xffff )
+        return addr >= 0 && addr <= 0xffff && elem->value == (int)memory_banked_pc(addr);
+    return elem->value == addr;
+}
+
 void debugger_write_memory(int addr, uint8_t val)
 {
     breakpoint *elem;
-    int         i = 0;
+    int         i = 0;      /* the number that the watch command shows */
     LL_FOREACH(watchpoints, elem) {
+        i++;
         if ( elem->enabled == 0 ) {
             continue;
         }
-        if ( elem->type == BREAK_WRITE && elem->value == addr ) {
+        if ( elem->type == BREAK_WRITE && watch_matches(elem, addr) ) {
             printf("Hit watchpoint %d\n",i);
             debugger_active = 1;
             break;
         }
-        i++;
     }
 }
 
@@ -137,15 +186,15 @@ void debugger_read_memory(int addr)
     int         i = 0;
 
     LL_FOREACH(watchpoints, elem) {
+        i++;
         if ( elem->enabled == 0 ) {
             continue;
         }
-        if ( elem->type == BREAK_READ && elem->value == addr ) {
+        if ( elem->type == BREAK_READ && watch_matches(elem, addr) ) {
             printf("Hit watchpoint %d\n",i);
             debugger_active = 1;
             break;
         }
-        i++;
     }
 }
 
@@ -266,4 +315,7 @@ backend_t ticks_debugger_backend = {
     .ctrl_c = ctrl_c,
     .time = ticks_time,
     .remote_closed = ticks_remote_closed,
+    .banked_pc = get_banked_pc,
+    .mmu_info = get_mmu_info,
+    .banked_caller = get_banked_caller,
 };
