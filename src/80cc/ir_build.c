@@ -3525,6 +3525,24 @@ static inline int get_dest_typed(Builder *b, int hint, int width, Kind kind)
     return v;
 }
 
+/* Move a ternary arm into the shared result vreg. An integer arm narrower
+   than the result (`c ? int8_var : int_expr`) is widened by its own
+   signedness; a plain MOV would zero-extend a signed value. */
+static void ternary_arm_to_result(Builder *b, const Node *arm, int result, int v)
+{
+    if (v == result) return;
+    int aw = b->f->vregs[v].width, rw = b->f->vregs[result].width;
+    Kind ak = (Kind)b->f->vregs[v].kind, rk = (Kind)b->f->vregs[result].kind;
+    if (aw > 0 && aw < rw && kind_is_integer(ak) && kind_is_integer(rk)
+        && !is_acc_int_kind(ak) && !is_acc_int_kind(rk)) {
+        int uns = arm->type && arm->type->isunsigned;
+        Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+        cv->dst = result; cv->src[0] = v;
+        return;
+    }
+    ir_emit_mov(cur_bb(b), result, v);
+}
+
 static int build_expr_hinted(Builder *b, Node *n, int hint)
 {
     if (n && n->filename && n->line > 0) {
@@ -5287,13 +5305,13 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         b->cur_bb_id = then_bb;
         int t = build_expr_hinted(b, n->then, result);
         if (t < 0) return -1;
-        if (t != result) ir_emit_mov(cur_bb(b), result, t);
+        ternary_arm_to_result(b, n->then, result, t);
         ir_emit_br(cur_bb(b), exit_bb);
 
         b->cur_bb_id = els_bb;
         int e = build_expr_hinted(b, n->els, result);
         if (e < 0) return -1;
-        if (e != result) ir_emit_mov(cur_bb(b), result, e);
+        ternary_arm_to_result(b, n->els, result, e);
         ir_emit_br(cur_bb(b), exit_bb);
 
         b->cur_bb_id = exit_bb;
