@@ -287,7 +287,7 @@ int get_cur_opcode_size(void) {
 *	has a defined origin. Start at the command line origin, or at 0 if negative
 *----------------------------------------------------------------------------*/
 void sections_alloc_addr(void) {
-    Section1* section, *next_section;
+    Section1* section, *next_section, *bank;
     Section1HashElem* iter;
     int addr;
 
@@ -295,8 +295,15 @@ void sections_alloc_addr(void) {
 
     /* allocate addr in sequence */
     addr = 0;
+    bank = NULL;
     for (section = get_first_section(&iter); section != NULL;
             section = next_section) {
+        /* a section with ORG or ORG -1 starts a new bank, i.e. a new binary file */
+        if (bank == NULL || section->origin >= 0 || section->section_split) {
+            bank = section;
+        }
+        section->bank = bank;
+
         if (section->origin >= 0) {		/* break in address space */
             if ((option_relocatable() || option_appmake()) &&
                     section != get_first_section(&iter)) {

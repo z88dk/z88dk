@@ -785,13 +785,13 @@ static void define_location_symbols(void) {
                        (unsigned int)start_addr, (unsigned int)end_addr - 1);
 
             Str_sprintf(name, ASMHEAD_KW, section->name, "_");
-            define_global_def_sym(Str_data(name), start_addr);
+            define_global_def_sym(Str_data(name), start_addr)->bank = section->bank;
 
             Str_sprintf(name, ASMTAIL_KW, section->name, "_");
-            define_global_def_sym(Str_data(name), end_addr);
+            define_global_def_sym(Str_data(name), end_addr)->bank = section->bank;
 
             Str_sprintf(name, ASMSIZE_KW, section->name, "_");
-            define_global_def_sym(Str_data(name), end_addr - start_addr);
+            define_global_def_sym(Str_data(name), end_addr - start_addr)->bank = section->bank;
         }
     }
 

@@ -39,6 +39,10 @@ int			 addr;				// start address of this section,
 // computed by sections_alloc_addr()
 int			 origin;			// ORG address of section, -1 if not defined
 int			 align;				// if align>1, section is aligned at align-boundaries
+struct Section1* bank;			// first section of the block this section is linked
+// into: the last section at or before it with an ORG
+// (or ORG -1), which names the binary file it goes to;
+// computed by sections_alloc_addr() (weak ref)
 bool		 origin_found : 1;	// ORG already found in code
 bool		 origin_opts : 1;	// ORG was defined from command line options,
 // override asm code

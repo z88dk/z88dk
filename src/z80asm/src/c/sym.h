@@ -41,6 +41,10 @@ bool			is_touched : 1;		/* true if symbol was used, e.g. returned by
 bool			is_global_def : 1;	/* true for __head, __tail, __size symbols */
 struct Module1*  module;			/* module which owns symbol (weak ref) */
 struct Section1* section;			/* section where expression is defined (weak ref) */
+struct Section1* bank;				/* for __<section>_head, _tail and _size: the bank
+										 * (first section of the block) the section is
+										 * linked into, shown in the map file;
+										 * NULL otherwise (weak ref) */
 const char*	   filename;			/* file where defined */
 int				line_num;			/* line where defined */
 END_CLASS;
