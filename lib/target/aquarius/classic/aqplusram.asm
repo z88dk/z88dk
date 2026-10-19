@@ -33,6 +33,11 @@ ENDIF
     org     CRT_ORG_CODE
 
 start:
+IF CRT_AQPLUS_BANK3_RAM
+    in      a,(PORT_BANK2)
+    inc     a
+    out     (PORT_BANK3),a
+ENDIF
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
     INCLUDE "crt/classic/crt_init_sp.inc"
     call    crt0_init
