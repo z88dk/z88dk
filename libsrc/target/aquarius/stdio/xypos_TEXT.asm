@@ -28,18 +28,16 @@ xypos_BITMAP_ATTR:
     ret
 
 xypos:
-    ld      a,c     ;save column
-    ld      l,b
+    ld      a,b     ;row * 5 fits in 8 bits (rows < 51)
+    add     a,a     ;*2
+    add     a,a     ;*4
+    add     a,b     ;*5
+    ld      l,a
     ld      h,0
-    add     hl,hl   ;*2
-    ld      bc,hl
-    add     hl,hl   ;*4
-    add     hl,hl   ;*8
-    add     hl,bc   ;*10
+    add     hl,hl   ;*10
     add     hl,hl   ;*20
     add     hl,hl   ;*40
-    ld      c,a     ;add column (b=0 already)
-    ld      b,0
+    ld      b,0     ;add column (c)
     add     hl,bc
     ret
 

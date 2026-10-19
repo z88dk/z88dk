@@ -12,21 +12,17 @@ EXTERN  __aquarius_video_base
 ; Exit: 
 ;       hl = address
 xypos_BITMAP:
-    ld      a,c     ;save column for later
-    ld      l,b
-    ld      h,0
-    add     hl,hl   ;*2
-    add     hl,hl   ;*4
-    add     hl,hl   ;*8
-    add     hl,hl   ;*16
-    add     hl,hl   ;*32
-    add     hl,hl   ;*64
-    ld      bc,hl
-    add     hl,hl   ;*128
-    add     hl,hl   ;*256
-    add     hl,bc   ;*320
-    ld      c,a     ;Add column
-    ld      b,0
+    ld      a,b     ;row * 320 = row * 5 * 64, and row * 5 fits in 8 bits (rows < 51)
+    add     a,a     ;*2
+    add     a,a     ;*4
+    add     a,b     ;*5
+    ld      h,a     ;*5 * 256
+    ld      l,0
+    srl     h       ;/2
+    rr      l
+    srl     h       ;/4: *5 * 64
+    rr      l
+    ld      b,0     ;Add column (c)
     add     hl,bc
     ld      bc,(__aquarius_video_base)
     add     hl,bc

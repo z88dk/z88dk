@@ -38,30 +38,48 @@ not_udg:
     add     hl,de
     dec     h       ; -32 characters
     ex      de,hl   ; de = font
+
     call    xypos_BITMAP
     ld      a,(generic_console_flags)
+    ld      b,a
     rlca
     sbc     a,a
-    ld      c,a		;x = 0 / 255
-    ld      b,8
-hires_printc_1:
+    ld      c,a     ; c = 0 / 255: the xor mask, for inverse
+    bit     4,b
+    ld      b,8     ; (not affecting the flag)
+    jr      z,row
+
+    ; bold: each row is ORed with itself shifted right
+bold_row:
     push    bc
-    ld      a,(generic_console_flags)
-    bit     4,a
     ld      a,(de)
     ld      b,a
-    jr      z,no_32_bold
     rrca
     or      b
-no_32_bold:
     xor     c
     ld      (hl),a
     inc     de
     ld      bc,40
     add     hl,bc
-no_overflow:
     pop     bc
-    djnz    hires_printc_1
+    djnz    bold_row
+    jr      underline
+
+    ; plain and inverse, the usual case: one loop, the mask is 0 or 255
+row:
+    ld      a,(de)
+    xor     c
+    ld      (hl),a
+    inc     de
+    ld      a,l
+    add     a,40
+    ld      l,a
+    jr      nc,no_carry
+    inc     h
+no_carry:
+    djnz    row
+
+underline:
     ; Consider underline
     ld      a,(generic_console_flags)
     bit     3,a
@@ -78,6 +96,3 @@ do_attribute:
 
     call    __aquarius_video_pageout
     ret
-
-
-
