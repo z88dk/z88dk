@@ -605,7 +605,9 @@ static void _write_symbol_file(const char* filename, Module1* module,
             Str_append_sprintf(line, ", %s", sym->is_global_def ? "def" : "");
             Str_append_sprintf(line, ", %s", (module == NULL
                                               && sym->module != NULL) ? sym->module->modname : "");
-            Str_append_sprintf(line, ", %s", sym->section->name);
+            /* __<section>_head, _tail and _size show the bank the section is in */
+            Str_append_sprintf(line, ", %s",
+                               sym->bank != NULL ? sym->bank->name : sym->section->name);
             Str_append_sprintf(line, ", ");
             if (sym->filename && sym->filename[0]) {
                 Str_append_sprintf(line, "%s:%d", sym->filename, sym->line_num);
