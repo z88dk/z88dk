@@ -1,5 +1,11 @@
 ## TODO
 
+Bugs:
+- Splices are in the same parenthesis group as array index, i.e.
+  A$(2,3,1 TO 10)
+- Power is left associative, i.e. 2**3**4 resolves to (2**3)**4. The code
+  does not parse 2**3**4
+
 Optimize:
 - Remove redundant GOTOs
 - Dead code elimination
