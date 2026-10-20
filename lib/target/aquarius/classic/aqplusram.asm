@@ -32,7 +32,11 @@ ENDIF
 
     org     CRT_ORG_CODE
 
+IF DEFINED_CRT_COMPRESS_AQX
+    INCLUDE "target/aquarius/classic/aqx_zx0.asm"
+ELSE
 start:
+ENDIF
 IF CRT_AQPLUS_BANK3_RAM
     in      a,(PORT_BANK2)
     inc     a

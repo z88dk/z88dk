@@ -31,11 +31,20 @@ ssize_t write(int fd,void * ptr,size_t len) __smallc __naked
     ld      l,a     ;hl=ptr
     call    __esp_send_bytes
 
-    ; Read result
-    call    __esp_read_byte
-    ld      l,a
-    call    __esp_read_byte
-    ld      h,a
-    ret
+      ; Read result.  The ESP protocol returns a status byte first,
+      ; followed by the transferred byte count on success.  Match the
+      ; read() implementation and return -1 for an ESP error.
+      call    __esp_read_byte
+      and     a
+      jr      z,write_ok
+      ld      hl,-1
+      ret
+
+write_ok:
+      call    __esp_read_byte
+      ld      l,a
+      call    __esp_read_byte
+      ld      h,a
+      ret
 #endasm
 }

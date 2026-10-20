@@ -16,620 +16,697 @@
 
 #include "appmake.h"
 
-static char             *binname      = NULL;
-static char             *outfile      = NULL;
-static char				*crtfile	  = NULL;
-static char              audio        = 0;
-static char              fast         = 0;
-static char              khz_22       = 0;
-static char              dumb         = 0;
-static char              loud         = 0;
-static char              help         = 0;
-static char              aqex         = 0;
-static int               page         = 0;
-static int               exec         = -1;
-static char              aqx          = 0;
-static int				 origin       = -1;
+static char *binname = NULL;
+static char *outfile = NULL;
+static char *crtfile = NULL;
+static char audio = 0;
+static char fast = 0;
+static char khz_22 = 0;
+static char dumb = 0;
+static char loud = 0;
+static char help = 0;
+static char aqex = 0;
+static int page = 0;
+static int exec = -1;
+static char aqx = 0;
+static int origin = -1;
 
-static uint8_t           h_lvl;
-static uint8_t           l_lvl;
-
+static uint8_t h_lvl;
+static uint8_t l_lvl;
 
 /* Options that are available for this module */
 option_t aquarius_options[] = {
-    { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
-    { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
-    { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
-    {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
-    {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
-    {  0,  "22",       "22050hz bitrate option",     OPT_BOOL,  &khz_22 },
-    {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
-    {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
-    {  0,  "aqex",     "Output .aqex file for Aquarius+",  OPT_BOOL,  &aqex },
-    {  0,  "page",     "Page number to load to when --aqex is specified", OPT_INT, &page},
-    {  0,  "exec",     "Specify execution address when --aqex is specified", OPT_INT, &exec},
-    {  0,  "aqx",      "Output .aqx file for Aquarius+",   OPT_BOOL,  &aqx },
-    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
-    {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
-    {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
-};
+    {'h', "help", "Display this help", OPT_BOOL, &help},
+    {'b', "binfile", "Linked binary file", OPT_STR, &binname},
+    {'o', "output", "Name of output file", OPT_STR, &outfile},
+    {0, "audio", "Create also a WAV file", OPT_BOOL, &audio},
+    {0, "fast", "Create a fast loading WAV", OPT_BOOL, &fast},
+    {0, "22", "22050hz bitrate option", OPT_BOOL, &khz_22},
+    {0, "dumb", "Just convert to WAV a tape file", OPT_BOOL, &dumb},
+    {0, "loud", "Louder audio volume", OPT_BOOL, &loud},
+    {0, "aqex", "Output .aqex file for Aquarius+", OPT_BOOL, &aqex},
+    {0, "page", "Page number to load to when --aqex is specified", OPT_INT, &page},
+    {0, "exec", "Specify execution address when --aqex is specified", OPT_INT, &exec},
+    {0, "aqx", "Output .aqx file for Aquarius+", OPT_BOOL, &aqx},
+    {'c', "crt0file", "crt0 file used in linking", OPT_STR, &crtfile},
+    {0, "org", "Origin of the binary", OPT_INT, &origin},
+    {0, NULL, NULL, OPT_NONE, NULL}};
 
-
-
-
-//Aquarius:
-//  Each bit is two full waves.
-//      Bit 0 is four half-longs
-//      Bit 1 is four half-shorts
-//      A half short is 9 samples @ 44,100 MHz
-//      A half long is 18 samples
-//  Each byte is:
-//      bit of 0 for start bit
-//      eight data bits, MSB first
-//      bit of 1 for stop bit
-//      bit of 1 for stop bit
+// Aquarius:
+//   Each bit is two full waves.
+//       Bit 0 is four half-longs
+//       Bit 1 is four half-shorts
+//       A half short is 9 samples @ 44,100 MHz
+//       A half long is 18 samples
+//   Each byte is:
+//       bit of 0 for start bit
+//       eight data bits, MSB first
+//       bit of 1 for stop bit
+//       bit of 1 for stop bit
 //
-//  Blocking:
-//      Synch Block: at least 6 bytes of 0xFF followed by end-of-synch byte of 0x00
-//      Name block:  0-terminated variable length string (BASIC uses up to 6 long)
-//          Name block is followed by Synch block
-//      Main data block:  Stream of data, no subdividing.
+//   Blocking:
+//       Synch Block: at least 6 bytes of 0xFF followed by end-of-synch byte of 0x00
+//       Name block:  0-terminated variable length string (BASIC uses up to 6 long)
+//           Name block is followed by Synch block
+//       Main data block:  Stream of data, no subdividing.
 //
-//  NOTE:  no checksums, no quality-of-data.  It sucks, it's unreliable.
+//   NOTE:  no checksums, no quality-of-data.  It sucks, it's unreliable.
 
-
-#define MODE_PRENAMESYNCH  0
-#define MODE_GETNAMEBLOCK  1
+#define MODE_PRENAMESYNCH 0
+#define MODE_GETNAMEBLOCK 1
 #define MODE_POSTNAMESYNCH 2
-#define MODE_GETMAINBLOCK  3
-
-
+#define MODE_GETMAINBLOCK 3
 
 // This is the core loop for the waveform creation.
 
-void aq_bit(FILE* fpout, unsigned char bit)
+void aq_bit(FILE *fpout, unsigned char bit)
 {
-int i,j;
-int p0, p1;
+    int i, j;
+    int p0, p1;
 
-if (fast) {
-	p0=5;
-	p1=20;
-} else {
-	p0=12;
-	p1=24;
+    if (fast)
+    {
+        p0 = 5;
+        p1 = 20;
+    }
+    else
+    {
+        p0 = 12;
+        p1 = 24;
+    }
+
+    for (i = 0; i < 1; i++)
+    {
+        if (bit)
+        {
+            // Full wavelength of short
+            for (j = 0; j < p0; j++)
+                fputc(h_lvl, fpout);
+            for (j = 0; j < p0; j++)
+                fputc(l_lvl, fpout);
+            for (j = 0; j < p0; j++)
+                fputc(h_lvl, fpout);
+            for (j = 0; j < p0; j++)
+                fputc(l_lvl, fpout);
+        }
+        else
+        {
+            // Full wavelength of long
+            for (j = 0; j < p1; j++)
+                fputc(h_lvl, fpout);
+            for (j = 0; j < p1; j++)
+                fputc(l_lvl, fpout);
+            for (j = 0; j < p1; j++)
+                fputc(h_lvl, fpout);
+            for (j = 0; j < p1; j++)
+                fputc(l_lvl, fpout);
+        }
+    }
 }
-
-	for (i=0;i<1;i++) {
-		if (bit) {
-			//Full wavelength of short
-			for (j = 0; j < p0; j++)
-				fputc(h_lvl, fpout);
-			for (j = 0; j < p0; j++)
-				fputc(l_lvl, fpout);
-			for (j = 0; j < p0; j++)
-				fputc(h_lvl, fpout);
-			for (j = 0; j < p0; j++)
-				fputc(l_lvl, fpout);
-
-		} else {
-			//Full wavelength of long
-			for (j = 0; j < p1; j++)
-				fputc(h_lvl, fpout);
-			for (j = 0; j < p1; j++)
-				fputc(l_lvl, fpout);
-			for (j = 0; j < p1; j++)
-				fputc(h_lvl, fpout);
-			for (j = 0; j < p1; j++)
-				fputc(l_lvl, fpout);
-
-		}
-	}
-}
-
-
-
 
 /* Main entry for the Mattel Aquarius packager/encoder */
 
 int aquarius_exec(char *target)
 {
-    char    filename[FILENAME_MAX+1];
-    char    wavfile[FILENAME_MAX+1];
-    char    ldr_name[FILENAME_MAX+1];
+    char filename[FILENAME_MAX + 1];
+    char wavfile[FILENAME_MAX + 1];
+    char ldr_name[FILENAME_MAX + 1];
 
-    char	mybuf[20];
-    char    *copy1, *copy2;
-    FILE	*fpin, *fpout;
-    int	c;
-    int	i,j;
-    int	len;
-    int	dlen;
-	int step;
-    
-	int ncharin;
-	static uint8_t cmin, cmout;
+    char mybuf[20];
+    char *copy1, *copy2;
+    FILE *fpin, *fpout;
+    int c;
+    int i, j;
+    int len;
+    int dlen;
+    int compress_aqx = 0;
+    size_t packed_len = 0;
+    uint8_t *packed = NULL;
+    int step;
 
-    int  WriteSilence;
-    int  nmode;
-    int  nbyteinblock;		// Could be used for logging
+    int ncharin;
+    static uint8_t cmin, cmout;
 
+    int WriteSilence;
+    int nmode;
+    int nbyteinblock; // Could be used for logging
 
-    if ( help || binname == NULL )
+    if (help || binname == NULL)
         return -1;
 
-    if (loud) {
+    if (loud)
+    {
         h_lvl = 0xFd;
         l_lvl = 2;
-    } else {
+    }
+    else
+    {
         h_lvl = 0xe0;
         l_lvl = 0x20;
     }
 
-    if (dumb) {
+    if (dumb)
+    {
         strcpy(filename, binname);
+    }
+    else
+    {
+        if (outfile == NULL)
+        {
+            strcpy(filename, binname);
+            if (aqex)
+            {
+                suffix_change(filename, ".aqex");
+            }
+            else if (aqx)
+            {
+                suffix_change(filename, ".aqx");
+            }
+            else
+            {
+                suffix_change(filename, ".caq");
+            }
+        }
+        else
+        {
+            strcpy(filename, outfile);
+        }
 
-    } else {
-		if ( outfile == NULL ) {
-			strcpy(filename,binname);
-			if ( aqex ) {
-				suffix_change(filename,".aqex");
-			} else if ( aqx ) {
-				suffix_change(filename,".aqx");
-			} else {
-				suffix_change(filename,".caq");
-			}
-		} else {
-			strcpy(filename,outfile);
-		}
+        if ((fpin = fopen_bin(binname, NULL)) == NULL)
+        {
+            printf("Can't open input file %s\n", binname);
+            exit(1);
+        }
 
-		if ( (fpin=fopen_bin(binname, NULL) ) == NULL ) {
-			printf("Can't open input file %s\n",binname);
-			exit(1);
-		}
+        /*
+         *	Now we try to determine the size of the file
+         *	to be converted
+         */
 
+        if (fseek(fpin, 0, SEEK_END))
+        {
+            printf("Couldn't determine size of file\n");
+            fclose(fpin);
+            exit(1);
+        }
 
-		/*
-	 	*	Now we try to determine the size of the file
-	 	*	to be converted
-	 	*/
-	 
-		if	(fseek(fpin,0,SEEK_END)) {
-			printf("Couldn't determine size of file\n");
-			fclose(fpin);
-			exit(1);
-		}
-		
-		len=ftell(fpin);
-		dlen=(len)/4;
-		
-		fseek(fpin,0L,SEEK_SET);
-		
-		if ( aqex || aqx ) {
-		    char   crtname[FILENAME_MAX];
-			unsigned loadAddr;
+        len = ftell(fpin);
+        dlen = (len) / 4;
 
-			// Generate the crtfile name from the binary file name
-			// if it's not passed in on the command line
-			if ( crtfile == NULL ) {
-		        strncpy(crtname, filename, FILENAME_MAX);
-		        suffix_change(crtname, "");
-		        crtfile = crtname;
-			}
+        fseek(fpin, 0L, SEEK_SET);
 
-			// Override the load and exec address if origin is set from the command line
-			if ( origin >= 0 ) {
-				loadAddr = origin;
-			} else {
-				// Try to find the CRT_ORG_CODE symbol
-				if ( (loadAddr = parameter_search(crtfile, ".map", "CRT_ORG_CODE") ) < 0 )
-			       	exit_log(1, "Error: Could not determine load address. Specify the --org parameter.\n");
-			}
+        if (aqex || aqx)
+        {
+            char crtname[FILENAME_MAX];
+            unsigned loadAddr;
 
-			// Open the output file
-			if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-			    exit_log(1, "Error: Could not create binary file (%s)\n", filename);
-			}
+            // Generate the crtfile name from the binary file name
+            // if it's not passed in on the command line
+            if (crtfile == NULL)
+            {
+                strncpy(crtname, filename, FILENAME_MAX);
+                suffix_change(crtname, "");
+                crtfile = crtname;
+            }
 
-			if (aqex) {
-				char *basename = zbasename(filename);
-				writestring("AQPLUS", fpout);	// file header
-				// 64 byte resource header
-				writestring("EXEC", fpout);	// resource type
-				writelong(len,fpout);		// program length
-				// 16 byte resource ID
-				// use filename as resource ID
-				// but truncate to 16 bytes
-				// and pad with 0x00
-				for (i=0;i<16&&i<strlen(basename);i++)
-					writebyte(basename[i],fpout);
-				for (;i<16;i++)
-					writebyte(0x00,fpout);
-				writeword(loadAddr,fpout);	// load address
-				if (exec != -1)
-					writeword(exec,fpout);	// exec address
-				else
-					writeword(loadAddr,fpout);	// exec address
-				writebyte(page,fpout);		// page #
-				// padding
-				for (i=0;i<35;i++)
-					writebyte(0x00,fpout);
-			} else {
-				char execAddrStr[16];
-				sprintf(execAddrStr, "($%04x)", loadAddr);
+            // Override the load and exec address if origin is set from the command line
+            if (origin >= 0)
+            {
+                loadAddr = origin;
+            }
+            else
+            {
+                // Try to find the CRT_ORG_CODE symbol
+                if ((loadAddr = parameter_search(crtfile, ".map", "CRT_ORG_CODE")) < 0)
+                    exit_log(1, "Error: Could not determine load address. Specify the --org parameter.\n");
+            }
 
-				/* Write out the header  */
-				for (i=1;i<=12;i++)
-					writebyte(0xff,fpout);
-				writebyte(0x00,fpout);
-				writestring("LOADR",fpout);
-				writebyte(0x00,fpout);
-				for (i=1;i<=12;i++)
-					writebyte(0xff,fpout);
-				writebyte(0x00,fpout);
+            /* A compressed AQX CRT exports this marker and the bootstrap symbols. */
+            compress_aqx = aqx && parameter_search(crtfile, ".map", "CRT_COMPRESS_AQX") >= 0;
+            if (compress_aqx)
+            {
+                long entry_point = parameter_search(crtfile, ".map", "__aqx_zx0_program_entry_point");
+                long compressed_size = parameter_search(crtfile, ".map", "__aqx_zx0_compressed_size");
+                uint8_t *image;
+                char utname[FILENAME_MAX + 1], ctname[FILENAME_MAX + 1], cmdline[FILENAME_MAX + 1];
+                FILE *temp;
+                long clen;
 
-				// BASIC program loaded to $3901
-				writeword(0x3912,fpout);	/* points to next line */
-				writeword(0x000a,fpout);	/* Line #10 */
+                if (entry_point < (long)loadAddr || compressed_size < (long)loadAddr ||
+                    compressed_size - loadAddr + 2 >= entry_point - loadAddr)
+                    exit_log(1, "Invalid AQX compression symbols in CRT\n");
+                image = malloc(len);
+                if (image == NULL || fread(image, 1, len, fpin) != (size_t)len)
+                    exit_log(1, "Could not read AQX binary for compression\n");
+                get_temporary_filename(utname);
+                get_temporary_filename(ctname);
+                if ((temp = fopen(utname, "wb")) == NULL)
+                    exit_log(1, "Could not create AQX compression input\n");
+                fwrite(image + (entry_point - loadAddr), 1, len - (entry_point - loadAddr), temp);
+                fclose(temp);
+                snprintf(cmdline, sizeof(cmdline), "z88dk-zx0 -f %s %s", utname, ctname);
+                if (system(cmdline) != 0)
+                    exit_log(1, "Unable to compress AQX binary\n");
+                if ((temp = fopen(ctname, "rb")) == NULL)
+                    exit_log(1, "Could not open compressed AQX binary\n");
+                fseek(temp, 0, SEEK_END);
+                clen = ftell(temp);
+                fseek(temp, 0, SEEK_SET);
+                packed_len = (entry_point - loadAddr) + clen;
+                packed = malloc(packed_len);
+                if (packed == NULL || fread(packed + (entry_point - loadAddr), 1, clen, temp) != (size_t)clen)
+                    exit_log(1, "Could not read compressed AQX binary\n");
+                fclose(temp);
+                memcpy(packed, image, entry_point - loadAddr);
+                packed[compressed_size - loadAddr + 1] = clen & 0xff;
+                packed[compressed_size - loadAddr + 2] = (clen >> 8) & 0xff;
+                free(image);
+                remove(utname);
+                remove(ctname);
+                fprintf(stderr, "AQX ZX0: %d -> %ld bytes\n", len - (int)(entry_point - loadAddr), clen);
+            }
 
-				// X=USR
-				writebyte(0x58,fpout);
-				writebyte(0xb0,fpout);
-				writebyte(0xb5,fpout);
+            // Open the output file
+            if ((fpout = fopen(filename, "wb")) == NULL)
+            {
+                exit_log(1, "Error: Could not create binary file (%s)\n", filename);
+            }
 
-				// ($xxxx)
-				writestring(execAddrStr,fpout); /* start address */
+            if (aqex)
+            {
+                char *basename = zbasename(filename);
+                writestring("AQPLUS", fpout); // file header
+                // 64 byte resource header
+                writestring("EXEC", fpout); // resource type
+                writelong(len, fpout);      // program length
+                // 16 byte resource ID
+                // use filename as resource ID
+                // but truncate to 16 bytes
+                // and pad with 0x00
+                for (i = 0; i < 16 && i < strlen(basename); i++)
+                    writebyte(basename[i], fpout);
+                for (; i < 16; i++)
+                    writebyte(0x00, fpout);
+                writeword(loadAddr, fpout); // load address
+                if (exec != -1)
+                    writeword(exec, fpout); // exec address
+                else
+                    writeword(loadAddr, fpout); // exec address
+                writebyte(page, fpout);         // page #
+                // padding
+                for (i = 0; i < 35; i++)
+                    writebyte(0x00, fpout);
+            }
+            else
+            {
+                char execAddrStr[16];
+                sprintf(execAddrStr, "($%04x)", loadAddr);
 
-				// Pad to the load address
-				for(i=0; i<(loadAddr-0x390f); i++)
-					writebyte(0x00,fpout);
+                /* Write out the header  */
+                for (i = 1; i <= 12; i++)
+                    writebyte(0xff, fpout);
+                writebyte(0x00, fpout);
+                writestring("LOADR", fpout);
+                writebyte(0x00, fpout);
+                for (i = 1; i <= 12; i++)
+                    writebyte(0xff, fpout);
+                writebyte(0x00, fpout);
 
-			}
+                // BASIC program loaded to $3901
+                writeword(0x3912, fpout); /* points to next line */
+                writeword(0x000a, fpout); /* Line #10 */
 
-			/* We append the binary file */
-			for (i=0; i<len;i++) {
-				c=getc(fpin);
-				writebyte(c,fpout);
-			}
+                // X=USR
+                writebyte(0x58, fpout);
+                writebyte(0xb0, fpout);
+                writebyte(0xb5, fpout);
 
-		} else {
-			/****************/
-			/* BASIC loader */
-			/****************/
+                // ($xxxx)
+                writestring(execAddrStr, fpout); /* start address */
 
-			// Create the loader name, we need to take the zdirname, add an underscore, then the filename
-			copy1 = strdup(filename);
-			copy2 = strdup(filename);
-			snprintf(ldr_name, sizeof(ldr_name), "%s/_%s", zdirname(copy1), zbasename(copy2));
-			free(copy1);
-			free(copy2);
-			if ( (fpout=fopen(ldr_name,"wb") ) == NULL ) {
-				printf("Can't create the loader file\n");
-				exit(1);
-			}
+                // Pad to the load address
+                for (i = 0; i < (loadAddr - 0x390f); i++)
+                    writebyte(0x00, fpout);
+            }
 
-			/* Write out the header  */
-			for	(i=1;i<=12;i++)
-				writebyte(255,fpout);
-			writebyte(0,fpout);
-			writestring("LOADR",fpout);
-			writebyte(0,fpout);
-			for	(i=1;i<=12;i++)
-				writebyte(255,fpout);
+            /* We append the binary file, optionally replacing its tail with ZX0. */
+            if (compress_aqx)
+            {
+                for (i = 0; i < (int)packed_len; i++)
+                    writebyte(packed[i], fpout);
+                free(packed);
+            }
+            else
+            {
+                for (i = 0; i < len; i++)
+                {
+                    c = getc(fpin);
+                    writebyte(c, fpout);
+                }
+            }
+        }
+        else
+        {
+            /****************/
+            /* BASIC loader */
+            /****************/
 
-			writebyte(0,fpout);
+            // Create the loader name, we need to take the zdirname, add an underscore, then the filename
+            copy1 = strdup(filename);
+            copy2 = strdup(filename);
+            snprintf(ldr_name, sizeof(ldr_name), "%s/_%s", zdirname(copy1), zbasename(copy2));
+            free(copy1);
+            free(copy2);
+            if ((fpout = fopen(ldr_name, "wb")) == NULL)
+            {
+                printf("Can't create the loader file\n");
+                exit(1);
+            }
 
-			writeword(14601,fpout);	/* points to line 10 */
+            /* Write out the header  */
+            for (i = 1; i <= 12; i++)
+                writebyte(255, fpout);
+            writebyte(0, fpout);
+            writestring("LOADR", fpout);
+            writebyte(0, fpout);
+            for (i = 1; i <= 12; i++)
+                writebyte(255, fpout);
 
-			writeword(5,fpout);	/*  5 U=0 */
-			writebyte('U',fpout);
-			writebyte(0xB0,fpout);
-			writebyte('0',fpout);
+            writebyte(0, fpout);
 
-			writebyte(0,fpout);
-			writeword(14609,fpout);	/* points to line 20 */
+            writeword(14601, fpout); /* points to line 10 */
 
-			writeword(10,fpout);	/*  10 X=0 */
-			writebyte('X',fpout);
-			writebyte(0xB0,fpout);
-			writebyte('0',fpout);
+            writeword(5, fpout); /*  5 U=0 */
+            writebyte('U', fpout);
+            writebyte(0xB0, fpout);
+            writebyte('0', fpout);
 
-			writebyte(0,fpout);
-			writeword(14621+2,fpout);	/* points to line 30 */
+            writebyte(0, fpout);
+            writeword(14609, fpout); /* points to line 20 */
 
-			writeword(20,fpout);	/*  20 DIMA(xxxxx) */
-			writebyte(0x85,fpout);
-			writebyte('A',fpout);
-			writebyte('(',fpout);
-			sprintf(mybuf,"%i",dlen);
-			for	(i=1;i<=(5-strlen(mybuf));i++)
-				writebyte('0',fpout);
-			writestring(mybuf,fpout);
-			writebyte(')',fpout);
+            writeword(10, fpout); /*  10 X=0 */
+            writebyte('X', fpout);
+            writebyte(0xB0, fpout);
+            writebyte('0', fpout);
 
-			writebyte(0,fpout);
-			writeword(14629+2,fpout);	/* points to line 40 */
+            writebyte(0, fpout);
+            writeword(14621 + 2, fpout); /* points to line 30 */
 
-			writeword(30,fpout);	/*  30 CLOAD*A */
-			writebyte(0x9A,fpout);
-			writebyte(0xAA,fpout);
-			writebyte('A',fpout);
+            writeword(20, fpout); /*  20 DIMA(xxxxx) */
+            writebyte(0x85, fpout);
+            writebyte('A', fpout);
+            writebyte('(', fpout);
+            sprintf(mybuf, "%i", dlen);
+            for (i = 1; i <= (5 - strlen(mybuf)); i++)
+                writebyte('0', fpout);
+            writestring(mybuf, fpout);
+            writebyte(')', fpout);
 
-			writebyte(0,fpout);
-			writeword(14651+2,fpout);	/* points to line 50 */
+            writebyte(0, fpout);
+            writeword(14629 + 2, fpout); /* points to line 40 */
 
-			writeword(40,fpout);	/*  40 POKE14340,PEEK(14552)+7 */
-			writebyte(0x94,fpout);
-			writestring("14340,",fpout);
-			writebyte(0xC1,fpout);
-			writestring("(14552)",fpout);
-			writebyte(0xA8,fpout);
-			writebyte('7',fpout);
+            writeword(30, fpout); /*  30 CLOAD*A */
+            writebyte(0x9A, fpout);
+            writebyte(0xAA, fpout);
+            writebyte('A', fpout);
 
-			writebyte(0,fpout);
-			writeword(14671+2,fpout);	/* points to line 60 */
+            writebyte(0, fpout);
+            writeword(14651 + 2, fpout); /* points to line 50 */
 
-			writeword(50,fpout);	/*  50 POKE14341,PEEK(14553) */
-			writebyte(0x94,fpout);
-			writestring("14341,",fpout);
-			writebyte(0xC1,fpout);
-			writestring("(14553)",fpout);
+            writeword(40, fpout); /*  40 POKE14340,PEEK(14552)+7 */
+            writebyte(0x94, fpout);
+            writestring("14340,", fpout);
+            writebyte(0xC1, fpout);
+            writestring("(14552)", fpout);
+            writebyte(0xA8, fpout);
+            writebyte('7', fpout);
 
-			writebyte(0,fpout);
-			writeword(14682+2,fpout);	/* points to end of program */
+            writebyte(0, fpout);
+            writeword(14671 + 2, fpout); /* points to line 60 */
 
-			writeword(60,fpout);	/*  60 X=USR(0) */
-			writebyte('X',fpout);
-			writebyte(0xB0,fpout);
-			writebyte(0xB5,fpout);
-			writestring("(0)",fpout);
+            writeword(50, fpout); /*  50 POKE14341,PEEK(14553) */
+            writebyte(0x94, fpout);
+            writestring("14341,", fpout);
+            writebyte(0xC1, fpout);
+            writestring("(14553)", fpout);
 
-			for	(i=1;i<=25;i++)
-				writebyte(0,fpout);
+            writebyte(0, fpout);
+            writeword(14682 + 2, fpout); /* points to end of program */
 
-			fclose(fpout);
+            writeword(60, fpout); /*  60 X=USR(0) */
+            writebyte('X', fpout);
+            writebyte(0xB0, fpout);
+            writebyte(0xB5, fpout);
+            writestring("(0)", fpout);
 
+            for (i = 1; i <= 25; i++)
+                writebyte(0, fpout);
 
-			/*********************/
-			/* Binary array file */
-			/*********************/
+            fclose(fpout);
 
-			/* Write out the header  */
-			if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-				printf("Can't create the data file\n");
-				exit(1);
-			}
+            /*********************/
+            /* Binary array file */
+            /*********************/
 
-			// "ffffffffffffffffffffffff 
+            /* Write out the header  */
+            if ((fpout = fopen(filename, "wb")) == NULL)
+            {
+                printf("Can't create the data file\n");
+                exit(1);
+            }
 
-			/* Write out the header  */
-			for	(i=1;i<=12;i++)
-				writebyte(255,fpout);
+            // "ffffffffffffffffffffffff
 
-			//00
-			writebyte(0,fpout);
+            /* Write out the header  */
+            for (i = 1; i <= 12; i++)
+                writebyte(255, fpout);
 
-			/* Write out the "file name" */
-			for	(i=1;i<=6;i++)
-				writebyte('#',fpout);
+            // 00
+            writebyte(0, fpout);
 
-			for	(i=1;i<=6;i++)
-				writebyte(0,fpout);
+            /* Write out the "file name" */
+            for (i = 1; i <= 6; i++)
+                writebyte('#', fpout);
 
+            for (i = 1; i <= 6; i++)
+                writebyte(0, fpout);
 
-			/* Mattel games loader relocator */
+            /* Mattel games loader relocator */
 
-			writebyte(0x2A,fpout);	// ld	hl,(14552)
-			writeword(14552,fpout);
-			writebyte(0x23,fpout);	// inc	hl
-			writebyte(0x23,fpout);	// inc	hl
-			writebyte(0x4e,fpout);	// ld	c,(hl)
-			writebyte(0x23,fpout);	// inc	hl
-			writebyte(0x46,fpout);	// ld	b,(hl)
-			writebyte(0x11,fpout);	// le	de,67
-			writeword(67,fpout);
-			writebyte(0x19,fpout);	// add	hl,de
-			writebyte(0xe5,fpout);	// push	hl
-			writebyte(0xc5,fpout);	// push	bc
-			writebyte(0xe1,fpout);	// pop	hl
-			writebyte(0xb7,fpout);	// or	a
-			writebyte(0xed,fpout);	// sbc	hl,de
-			writebyte(0x52,fpout);
-			writebyte(0xe5,fpout);	// push hl
-			writebyte(0xc1,fpout);	// pop	bc
-			writebyte(0xe1,fpout);	// pop	hl
-			writebyte(0x23,fpout);	// inc hl
-			writebyte(0x7e,fpout);	// ld	a,(hl)
-			writebyte(0xb7,fpout);	// or	a
-			writebyte(0x28,fpout);	// jr	z,-4
-			writebyte(0xfb,fpout);
-			writebyte(0x11,fpout);	// ld de,14768
-			writeword(14768,fpout);
-			writebyte(0xed,fpout);	// ldir
-			writebyte(0xb0,fpout);
+            writebyte(0x2A, fpout); // ld	hl,(14552)
+            writeword(14552, fpout);
+            writebyte(0x23, fpout); // inc	hl
+            writebyte(0x23, fpout); // inc	hl
+            writebyte(0x4e, fpout); // ld	c,(hl)
+            writebyte(0x23, fpout); // inc	hl
+            writebyte(0x46, fpout); // ld	b,(hl)
+            writebyte(0x11, fpout); // le	de,67
+            writeword(67, fpout);
+            writebyte(0x19, fpout); // add	hl,de
+            writebyte(0xe5, fpout); // push	hl
+            writebyte(0xc5, fpout); // push	bc
+            writebyte(0xe1, fpout); // pop	hl
+            writebyte(0xb7, fpout); // or	a
+            writebyte(0xed, fpout); // sbc	hl,de
+            writebyte(0x52, fpout);
+            writebyte(0xe5, fpout); // push hl
+            writebyte(0xc1, fpout); // pop	bc
+            writebyte(0xe1, fpout); // pop	hl
+            writebyte(0x23, fpout); // inc hl
+            writebyte(0x7e, fpout); // ld	a,(hl)
+            writebyte(0xb7, fpout); // or	a
+            writebyte(0x28, fpout); // jr	z,-4
+            writebyte(0xfb, fpout);
+            writebyte(0x11, fpout); // ld de,14768
+            writeword(14768, fpout);
+            writebyte(0xed, fpout); // ldir
+            writebyte(0xb0, fpout);
 
-			for	(i=1;i<=41;i++)
-				writebyte(0,fpout);
+            for (i = 1; i <= 41; i++)
+                writebyte(0, fpout);
 
-			/* We append the binary file */
+            /* We append the binary file */
 
-			for (i=0; i<len;i++) {
-				c=getc(fpin);
-				writebyte(c,fpout);
-			}
+            for (i = 0; i < len; i++)
+            {
+                c = getc(fpin);
+                writebyte(c, fpout);
+            }
 
-			/* Now let's append zeroes and close */
+            /* Now let's append zeroes and close */
 
-			for	(i=1;i<=(len%4);i++)
-				writebyte(0,fpout);
+            for (i = 1; i <= (len % 4); i++)
+                writebyte(0, fpout);
 
-			for	(i=1;i<=38;i++)
-				writebyte(0,fpout);
-		}
+            for (i = 1; i <= 38; i++)
+                writebyte(0, fpout);
+        }
 
-		fclose(fpin);
-		fclose(fpout);
-
-	}
+        fclose(fpin);
+        fclose(fpout);
+    }
 
     /* ***************************************** */
     /*  Now, if requested, create the audio file */
     /* ***************************************** */
-    if ((audio) || (fast) || (khz_22) || (loud)) {
-		if (dumb)
-			step=2;
-		else
-			step=0;
-		
-		strcpy(wavfile, filename);
-		suffix_change(wavfile, ".RAW");
-		if ((fpout = fopen(wavfile, "wb")) == NULL) {
-			exit_log(1,"Can't open output raw audio file <%s>\n", wavfile);
-		}
+    if ((audio) || (fast) || (khz_22) || (loud))
+    {
+        if (dumb)
+            step = 2;
+        else
+            step = 0;
 
-		do {
+        strcpy(wavfile, filename);
+        suffix_change(wavfile, ".RAW");
+        if ((fpout = fopen(wavfile, "wb")) == NULL)
+        {
+            exit_log(1, "Can't open output raw audio file <%s>\n", wavfile);
+        }
 
-			switch (step) {
-			case 0:
-				fpin = fopen(ldr_name, "rb");
-				break;
-			
-			// if we're in 'dumb' mode we'll get here
-			case 1:
-				fpin = fopen(filename, "rb");
-				break;
-			
-			// if we're in 'dumb' mode we'll get here
-			default:
-				fpin = fopen(filename, "rb");
-				break;
-			}
+        do
+        {
 
-			if (fpin == NULL) {
-				exit_log(1,"Can't open file %s for wave conversion\n", filename);
-			}
+            switch (step)
+            {
+            case 0:
+                fpin = fopen(ldr_name, "rb");
+                break;
 
-			if (fseek(fpin, 0, SEEK_END)) {
-				fclose(fpin);
-				exit_log(1,"Couldn't determine size of file <%s>\n",filename);
-			}
-			len = ftell(fpin);
-			fseek(fpin, 0L, SEEK_SET);
+            // if we're in 'dumb' mode we'll get here
+            case 1:
+                fpin = fopen(filename, "rb");
+                break;
 
-			/* leading silence */
-			for (i = 0; i < 0x5000; i++)
-				fputc(0x80, fpout);
+            // if we're in 'dumb' mode we'll get here
+            default:
+                fpin = fopen(filename, "rb");
+                break;
+            }
 
-			nbyteinblock = 0;
+            if (fpin == NULL)
+            {
+                exit_log(1, "Can't open file %s for wave conversion\n", filename);
+            }
 
-			nmode = MODE_PRENAMESYNCH;
-			WriteSilence = 1;
+            if (fseek(fpin, 0, SEEK_END))
+            {
+                fclose(fpin);
+                exit_log(1, "Couldn't determine size of file <%s>\n", filename);
+            }
+            len = ftell(fpin);
+            fseek(fpin, 0L, SEEK_SET);
 
-			while (ftell(fpin) < len)
-			{
+            /* leading silence */
+            for (i = 0; i < 0x5000; i++)
+                fputc(0x80, fpout);
 
-				if ((WriteSilence) && (step == 1)) {
-					/* pause between blocks to permit typing CLOAD "" */
-					for (i = 0; i < 0x20000; i++)
-						fputc(0x80, fpout);
-					WriteSilence=0;
-				}
-				
-				
-				cmin = getc(fpin);
-				ncharin = (int)cmin;    //fossil left over from time we were reading the file
+            nbyteinblock = 0;
 
-				switch(nmode)
-				{
-					case MODE_PRENAMESYNCH:
-						nbyteinblock++;
-						if (ncharin == 0x00)
-						{
-							nmode = MODE_GETNAMEBLOCK;
-							nbyteinblock = 0;
-						}
-						break;
+            nmode = MODE_PRENAMESYNCH;
+            WriteSilence = 1;
 
-					case MODE_GETNAMEBLOCK:
-						nbyteinblock++;
-						if (ncharin == 6)
-						{
-							nbyteinblock = 0;
-							nmode = MODE_POSTNAMESYNCH;
-						}
-						break;
+            while (ftell(fpin) < len)
+            {
 
-					case MODE_POSTNAMESYNCH:
-						nbyteinblock++;
-						if (ncharin == 0x00)
-						{
-							nmode = MODE_GETMAINBLOCK;
-							nbyteinblock = 0;
-						}
-						break;
+                if ((WriteSilence) && (step == 1))
+                {
+                    /* pause between blocks to permit typing CLOAD "" */
+                    for (i = 0; i < 0x20000; i++)
+                        fputc(0x80, fpout);
+                    WriteSilence = 0;
+                }
 
-					case MODE_GETMAINBLOCK:
-						nbyteinblock++;
-						break;
+                cmin = getc(fpin);
+                ncharin = (int)cmin; // fossil left over from time we were reading the file
 
-					default:
-						WriteSilence = 0;
-						break;
-				}
+                switch (nmode)
+                {
+                case MODE_PRENAMESYNCH:
+                    nbyteinblock++;
+                    if (ncharin == 0x00)
+                    {
+                        nmode = MODE_GETNAMEBLOCK;
+                        nbyteinblock = 0;
+                    }
+                    break;
 
+                case MODE_GETNAMEBLOCK:
+                    nbyteinblock++;
+                    if (ncharin == 6)
+                    {
+                        nbyteinblock = 0;
+                        nmode = MODE_POSTNAMESYNCH;
+                    }
+                    break;
 
-				//Starting a byte
-				cmout = (unsigned char)ncharin;
+                case MODE_POSTNAMESYNCH:
+                    nbyteinblock++;
+                    if (ncharin == 0x00)
+                    {
+                        nmode = MODE_GETMAINBLOCK;
+                        nbyteinblock = 0;
+                    }
+                    break;
 
-				//Aquarius:
-				//  Each bit is two full waves.
-				//      Bit 0 is four half-longs
-				//      Bit 1 is four half-shorts
-				//  Each byte is:
-				//      bit of 0 for start bit
-				//      eight data bits, MSB first
-				//      bit of 1 for stop bit
-				//      bit of 1 for stop bit
-				
-				//start bit of 0
-				aq_bit(fpout,0);
+                case MODE_GETMAINBLOCK:
+                    nbyteinblock++;
+                    break;
 
-				for (j = 7; j >= 0; j--)
-				{
-					if (cmout & (1 << j))
-						//1 bit, two full shorts
-						aq_bit(fpout,1);
-					else
-						//0 bit, two full longs
-						aq_bit(fpout,0);
-				}
+                default:
+                    WriteSilence = 0;
+                    break;
+                }
 
-				//stop bit of 1
-				aq_bit(fpout,1);
+                // Starting a byte
+                cmout = (unsigned char)ncharin;
 
-				//stop bit of 1
-				aq_bit(fpout,1);
+                // Aquarius:
+                //   Each bit is two full waves.
+                //       Bit 0 is four half-longs
+                //       Bit 1 is four half-shorts
+                //   Each byte is:
+                //       bit of 0 for start bit
+                //       eight data bits, MSB first
+                //       bit of 1 for stop bit
+                //       bit of 1 for stop bit
 
-			} //while !EOF
+                // start bit of 0
+                aq_bit(fpout, 0);
 
-			/* trailing silence */
-			for (i = 0; i < 0x8000; i++)
-				fputc(0x80, fpout);
+                for (j = 7; j >= 0; j--)
+                {
+                    if (cmout & (1 << j))
+                        // 1 bit, two full shorts
+                        aq_bit(fpout, 1);
+                    else
+                        // 0 bit, two full longs
+                        aq_bit(fpout, 0);
+                }
 
-			step++;
-			fclose(fpin);
-		} while (step < 2);
+                // stop bit of 1
+                aq_bit(fpout, 1);
+
+                // stop bit of 1
+                aq_bit(fpout, 1);
+
+            } // while !EOF
+
+            /* trailing silence */
+            for (i = 0; i < 0x8000; i++)
+                fputc(0x80, fpout);
+
+            step++;
+            fclose(fpin);
+        } while (step < 2);
 
         fclose(fpout);
 
         /* Now let's think at the WAV format */
-		if (khz_22)
-			raw2wav_22k(wavfile,2);
-		else
-			raw2wav(wavfile);
+        if (khz_22)
+            raw2wav_22k(wavfile, 2);
+        else
+            raw2wav(wavfile);
     }
 
     return 0;
 }
-	
-
