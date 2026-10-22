@@ -294,7 +294,7 @@ int z88_exec(char* target)
         if (c_installer)  SaveBank(32768, outfile,".ap1");
     }
     SaveBank(49152, outfile, ".63");
-    SaveBank(49152, outfile,  ".ap0");
+    if (c_installer) SaveBank(49152, outfile,  ".ap0");
 
     // Save a .epr version as well
     SaveBlock( memory, 65536 - (( pages == 1  ? 2 : pages) * 16384), ( pages == 1  ? 2 : pages) * 16384, outfile, ".epr");
