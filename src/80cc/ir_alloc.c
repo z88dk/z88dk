@@ -5725,6 +5725,10 @@ void ir_alloc(Func *f)
            p→h exists with h.id ≤ B.id ≤ p.id — reliable because the
            builder produces reducible CFGs. One cheap pass. */
         int *bb_in_loop  = calloc((size_t)f->n_bbs, sizeof(int));
+        /* bb_in_loop AND depth>0: id-based back-edges are over-approximate
+           (an else-arm laid out after its join jumps "backwards"), so IY
+           accumulator discovery needs a dominance-checked loop. */
+        int *bb_real_loop = calloc((size_t)f->n_bbs, sizeof(int));
         /* bb_loop_lo/hi[b]: [header, tail] bb-id span of the loop
            containing b (b itself if outside any loop). In-loop uses
            extend the PR_BC interval to the whole loop body — else a
@@ -5748,12 +5752,12 @@ void ir_alloc(Func *f)
            does not run. */
         int *bb_cond_shift = calloc((size_t)f->n_bbs, sizeof(int));
         if (!write_count || !use_count || !first_use || !last_use
-            || !bb_in_loop || !def_kind || !bb_loop_lo || !bb_loop_hi
+            || !bb_in_loop || !bb_real_loop || !def_kind || !bb_loop_lo || !bb_loop_hi
             || !bb_first_op || !bb_last_op || !bb_loop_depth || !bb_cond_shift
             || !cost_benefit || !all_defs_ok) {
             free(write_count); free(use_count);
             free(first_use); free(last_use);
-            free(bb_in_loop); free(def_kind);
+            free(bb_in_loop); free(bb_real_loop); free(def_kind);
             free(bb_loop_lo); free(bb_loop_hi);
             free(bb_first_op); free(bb_last_op);
             free(bb_loop_depth); free(bb_cond_shift);
@@ -6267,9 +6271,11 @@ void ir_alloc(Func *f)
                                 pool[i].allowed, pool[i].benefit, pool[i].lo, pool[i].hi,
                                 use_count[pool[i].vreg], idx_ben ? idx_ben[pool[i].vreg] : -1,
                                 f->vregs[pool[i].vreg].flags);
+                for (int b = 0; b < f->n_bbs; b++)
+                    bb_real_loop[b] = bb_in_loop[b] && bb_loop_depth[b] > 0;
                 unified_arbitrate(f, pool, np, idx_ben, NULL, bb_loop_depth,
                                   bb_cond_shift,
-                                  contended_acc_yields_bc(f, bb_in_loop, use_count));
+                                  contended_acc_yields_bc(f, bb_real_loop, use_count));
                 free(idx_ben);
                 free(pool);
             }
@@ -6286,8 +6292,10 @@ void ir_alloc(Func *f)
                    write_count, use_count, cost_benefit, !bc_region_ok, bb_loop_depth, bb_cond_shift);
         /* LRA Phase 2c (default on, IR_NO_LRA opts out): home a DE-dirty
            reduction chain in IY (add iy,de), taking the spill losers BC couldn't. */
+        for (int b = 0; b < f->n_bbs; b++)
+            bb_real_loop[b] = bb_in_loop[b] && bb_loop_depth[b] > 0;
         if (iy_region_ok)
-        ir_iy_reduction_pack(f, bb_in_loop, use_count);
+        ir_iy_reduction_pack(f, bb_real_loop, use_count);
         /* S3 Tier A (default on, --opt-disable=iy-temp-pack opts out): pack the
            born-killed word temps BC declined into IY over disjoint ranges, if a
            reduction pack didn't already claim IY. Cost-gated to dear-slot CPUs. */
@@ -6705,6 +6713,7 @@ void ir_alloc(Func *f)
         free(first_use);
         free(last_use);
         free(bb_in_loop);
+        free(bb_real_loop);
         free(def_kind);
         free(bb_loop_lo);
         free(bb_loop_hi);
