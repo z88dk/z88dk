@@ -3179,8 +3179,8 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
    * that reach -end still print the bare integer. */
   if ( pc != end && st >= counter ) {
     fprintf(stderr, "ticks: stopped at counter limit (%llu); raise -counter\n", st);
-    printf("Ticks: %llu (counter limit)\n", st);
-  } else if ( counter != -1 )
+    if ( !c_no_cycles ) printf("Ticks: %llu (counter limit)\n", st);
+  } else if ( counter != -1 && !c_no_cycles )
     printf("%llu\n", st);
   warn_existing_temp_breakpoints();
   if (profiler_enabled) {

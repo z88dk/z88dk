@@ -22,6 +22,7 @@ int    c_rom_size = 0;
 int    c_ioport = -1;
 int    c_autolabel = 0;
 int    c_z80asm_tests = 0;
+int    c_no_cycles = 0;      /* suppress end-of-run cycle-count printf */
 
 static char   cmd_arguments[255];
 static int    cmd_arguments_len = 0;
@@ -180,6 +181,10 @@ static void usage(void)
     printf("  -ide0 <file>    file to be ide device 0\n");
     printf("  -ide1 <file>   Set file to be ide device 1\n");
     printf("  -iochar X      Set port X to be character input/output\n");
+    printf("  -no-cycles     Suppress end-of-run cycle-count printf (makes ticks\n");
+    printf("                 silent on normal exit; program's own stdout unaffected).\n");
+    printf("                 Useful for using ticks as a drop-in CP/M emulator in\n");
+    printf("                 test suites where only the program's output should appear.\n");
     printf("  -output <file> dumps the RAM content to a 64K file\n");
     printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n");
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n");
@@ -342,6 +347,16 @@ int main (int argc, char **argv){
           }
           argv--;
           argc++;
+          break;
+        case 'n':
+          if (strcmp(&argv[0][1], "no-cycles") == 0) {
+            c_no_cycles = 1;
+            argv--;
+            argc++;
+          } else {
+            fprintf(stderr, "\nWrong Argument: %s\n", argv[0]);
+            exit(EXIT_FAILURE);
+          }
           break;
         case 'o':
           c_output= argv[1];

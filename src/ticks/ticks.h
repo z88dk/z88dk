@@ -49,6 +49,7 @@ extern int break_required;
 extern int c_rc2014_mode;
 extern int c_cpm_mode;
 extern int c_z80asm_tests;
+extern int c_no_cycles;
 
 extern uint8_t verbose;
 extern char* script_file;
