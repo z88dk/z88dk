@@ -2,7 +2,8 @@
 name: cpu-z80
 description: >
   Z80-family coding notes for z88dk library and app asm: IX/IY, exx, djnz,
-  shadow registers, documented vs strict Z80, opcode map (flags and T-states).
+  shadow registers, documented vs strict Z80, opcode map (flags and T-states),
+  and ED absolute loads ld bc/de/sp,(nn) and ld (nn),bc/de/sp.
   Use when writing or reviewing z80 (not 8085/8080/gbz80) assembly under
   libsrc or hand asm.
 ---
@@ -26,7 +27,64 @@ Full grids: [references/opcodes.md](references/opcodes.md).
 
 Documented encodings in this skill were checked against `cpu_test_z80_strict_ok.asm` (173 representatives, 0 misses). If a fixture and clrhome disagree on **bytes**, the fixture wins. If they disagree on **flags or T-states**, clrhome wins.
 
-clrhome also shows **Z180-only** ops. Those are not Z80. See `cpu-z180`.
+## clrhome colours
+
+The grid is [clrhome](https://clrhome.org/table/). Read the colour before you copy an opcode.
+
+| Colour | CSS class | Meaning |
+|--------|-----------|---------|
+| Grey | (default) | Documented Z80 |
+| Blue | `link` | The cell opens a longer form |
+| Pink | `undocumented` | Undocumented **Z80 only**. Not a strict op |
+| Purple | `z180` | **Not Z80.** Z180, eZ80, and other Z180-compatible CPUs. See `cpu-z180` |
+
+The page legend says "Z180 only" on the purple cells. Treat that set as the Z180 family, including eZ80 and other CPUs that copy it.
+
+Pink copies of the absolute word loads are `ED 63` (`ld (**),hl`) and `ED 6B` (`ld hl,(**)`). Do not emit them. z80asm emits `22` and `2A` for those mnemonics.
+
+## Static word in BC, DE, or SP
+
+These documented ED ops move one static word. Flags stay unchanged. Each op is 4 bytes and 20 T-states. Encodings are `cpu_test_z80_strict_ok.asm`.
+
+| Zilog | Encoding |
+|-------|----------|
+| `ld bc,(**)` | `ED 4B` |
+| `ld de,(**)` | `ED 5B` |
+| `ld sp,(**)` | `ED 7B` |
+| `ld (**),bc` | `ED 43` |
+| `ld (**),de` | `ED 53` |
+| `ld (**),sp` | `ED 73` |
+
+`ld hl,(**)` is `2A` (3 bytes, 16 T). `ld (**),hl` is `22` (3 bytes, 16 T). Use those when the word belongs in HL.
+
+`ld ix,(**)` / `ld (**),ix` are `DD 2A` / `DD 22`. IY uses `FD`. They are not ED ops.
+
+Use the ED form when the word already sits in BC, DE, or SP, or must end in that pair. HL stays as it was. Do not `push hl`, load the static word through HL, and `pop hl`.
+
+Keep `2A` and `22` when HL is free and the word should stay in HL. Those ops are shorter than a trip through BC or DE.
+
+`ld de,hl` is two 8-bit loads. It is not `ld de,(nn)`. There is no `ld de,sp`. Store SP with `ld (**),sp`.
+
+8085 has no ED prefix. Do not put these ops in an `asm/8085/` tree. In a file that both CPUs assemble, keep them inside an `IF` for Z80.
+
+```asm
+    ld      de,(count)          ;HL stays
+    ld      (params),de         ;DE stays, HL stays
+    ld      (save_sp),sp
+    ld      sp,(save_sp)
+```
+
+Do not write the long form when BC or DE is free:
+
+```asm
+    push    hl
+    ld      hl,(count)
+    ld      d,h
+    ld      e,l
+    pop     hl
+```
+
+When BC, DE, and HL are all live, one `push` / `pop` remains. Use a free pair when one exists.
 
 ## Conventions
 
@@ -160,15 +218,17 @@ How to read lines: skill **`tool-z80asm`**. `rg` one mnemonic. Never bulk-read h
 7. **`mlt` / `slp` / `in0` are Z180.** They are not on this CPU.
 8. **`ei` does not enable interrupts until the following instruction has completed.** `ei` / `ret` therefore returns without an interrupt between them. An interrupt cannot land on the instruction after `ei`.
 9. No copt pass on library asm. Scan for `ex de,hl` / pair copies before you finish a hot routine.
+10. **Do not copy a static word through HL** when the pair is BC, DE, or SP. `ld de,(nn)` leaves HL. `push hl` / `ld hl,(nn)` / `pop hl` is the long form.
 
 ## Preference order (Z80-only code)
 
 1. Documented ops that z80asm strict accepts.
-2. `exx` for a second long. IX/IY when an index or frame is real.
-3. `sbc hl,de` / `adc hl,bc` for 16-bit add/sub with carry.
-4. `djnz` and `ldir`/`cpir` when the count is in B or BC.
-5. Synthetics `ld de,hl` and friends in normal mode.
-6. Undocumented `ixh` / `sll` only when the size or T-state win is measured.
+2. Static word into or out of BC, DE, or SP: `ld rr,(nn)` / `ld (nn),rr`. Leave HL alone.
+3. `exx` for a second long. IX/IY when an index or frame is real.
+4. `sbc hl,de` / `adc hl,bc` for 16-bit add/sub with carry.
+5. `djnz` and `ldir`/`cpir` when the count is in B or BC.
+6. Synthetics `ld de,hl` and friends in normal mode.
+7. Undocumented `ixh` / `sll` only when the size or T-state win is measured.
 
 ## Related
 

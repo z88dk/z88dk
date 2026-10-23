@@ -5,6 +5,17 @@
 **Encodings:** `src/z80asm/dev/cpu/cpu_test_z80_strict_ok.asm` (documented native ops).  
 Undocumented forms that z80asm still accepts in **normal** mode: `cpu_test_z80_ok.asm`.
 
+clrhome colours, from `opcode-table.css`:
+
+| Colour | CSS class | Meaning |
+|--------|-----------|---------|
+| Grey | default cell | Documented Z80 |
+| Blue | `link` | The cell opens a longer form |
+| Pink | `undocumented` (`#c08c98`) | Undocumented Z80 only |
+| Purple | `z180` (`#b8a6c2`) | Not Z80. Z180, eZ80, and other Z180-compatible CPUs. See `cpu-z180` |
+
+The page legend prints "Z180 only" on the purple row. That set is the Z180 family, not the Z80 set. Pink is not a Z180 op.
+
 Immediate placeholders: `*` = signed or unsigned 8-bit (d8 / displacement), `**` = 16-bit immediate or address.
 
 When encodings disagree, **the z80asm fixture wins**. When flags or T-states disagree with other web tables, **clrhome wins**. The tree still wins over this skill if a fixture later changes.
@@ -92,8 +103,8 @@ Empty / Z180 / undocumented cells are omitted. z80asm `-mz80` **strict** matches
 | 41–79 step 8 | `out (c),r` | 2 | 12 | `------` | |
 | 42 / 52 / 62 / 72 | `sbc hl,bc/de/hl/sp` | 2 | 15 | `SZHV1C` | |
 | 4A / 5A / 6A / 7A | `adc hl,bc/de/hl/sp` | 2 | 15 | `SZHV0C` | |
-| 43 / 53 / 73 | `ld (**),bc/de/sp` | 4 | 20 | `------` | |
-| 4B / 5B / 7B | `ld bc/de/sp,(**)` | 4 | 20 | `------` | |
+| 43 / 53 / 73 | `ld (**),bc/de/sp` | 4 | 20 | `------` | Does not use HL. Prefer this when the word is in that pair |
+| 4B / 5B / 7B | `ld bc/de/sp,(**)` | 4 | 20 | `------` | Does not use HL. Prefer this over a copy through HL |
 | 44 | `neg` | 2 | 8 | `SZHV1C` | A ← 0−A |
 | 45 | `retn` | 2 | 14 | `------` | restores IFF from IFF2 |
 | 46 | `im 0` | 2 | 8 | `------` | |
@@ -123,7 +134,9 @@ Empty / Z180 / undocumented cells are omitted. z80asm `-mz80` **strict** matches
 | BA | `indr` | 2 | 21/16 | `----11` | |
 | BB | `otdr` | 2 | 21/16 | `----11` | |
 
-`ld hl,(**)` documented is **`2A`**, not `ED 6B`. `ld (**),hl` documented is **`22`**, not `ED 63`. Those ED forms are undocumented duplicates. z80asm still emits `2A` / `22` for the Zilog source.
+`ld hl,(**)` documented is **`2A`** (3 bytes, 16 T), not `ED 6B`. `ld (**),hl` documented is **`22`** (3 bytes, 16 T), not `ED 63`. Those ED forms are pink undocumented duplicates. z80asm still emits `2A` / `22` for the Zilog source.
+
+Use `ED 4B` / `5B` / `7B` and `ED 43` / `53` / `73` when the static word is in BC, DE, or SP. HL stays. Do not `push hl` around `ld hl,(**)` only to rebuild BC or DE. Keep `2A` / `22` when the word belongs in HL. HL is free then, and those ops are shorter.
 
 ---
 
@@ -244,9 +257,9 @@ Flags `------`. Cyc 4, or 7 if `(hl)` is involved. `halt` (76): 1 byte, **4** T,
 
 ---
 
-## Undocumented Z80 (clrhome + z80asm normal `*_ok.asm`)
+## Undocumented Z80 (clrhome pink + z80asm normal `*_ok.asm`)
 
-**Not** in `cpu_test_z80_strict_ok.asm`. Do not emit these in strict builds. Prefer documented ops in new library code unless a measured win needs them.
+Pink on clrhome (`undocumented`). **Not** in `cpu_test_z80_strict_ok.asm`. Do not emit these in strict builds. Prefer documented ops in new library code unless a measured win needs them. Pink is Z80 only. It is not the purple Z180 set.
 
 | Form | Encoding | Cyc | Notes |
 |------|----------|-----|-------|
@@ -260,13 +273,15 @@ Flags `------`. Cyc 4, or 7 if `(hl)` is involved. `halt` (76): 1 byte, **4** T,
 
 ---
 
-## Not Z80 (on the clrhome page as “Z180 only”)
+## Not Z80 (clrhome purple, page legend “Z180 only”)
 
-These encodings are **absent** from `cpu_test_z80_ok.asm` and `*_strict_ok.asm`.
+Purple cells are **absent** from `cpu_test_z80_ok.asm` and `*_strict_ok.asm`.
+
+They are Z180, eZ80, and other Z180-compatible CPUs. They are not Z80. The page legend says "Z180 only".
 
 `mlt bc/de/hl/sp`, `slp`, `tst r/(hl)/n`, `tstio n`, `in0 r,(n)`, `out0 (n),r`, `otim` / `otimr` / `otdm` / `otdmr`.
 
-Use `cpu-z180` and `-mz180`.
+Use `cpu-z180` and `-mz180` (eZ80 Z80-mode: `-mez80_z80`).
 
 ---
 
