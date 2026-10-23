@@ -12,7 +12,7 @@
 #include "ir_alloc.h"
 #include "ir_analysis.h"
 
-extern char c_debug_adb_defc;   /* -debug: pin named-local slots (dedicated) */
+extern int  c_debug_adb_defc;   /* -debug: pin named-local slots (dedicated) */
 
 #include <stdio.h>
 #include <stdlib.h>

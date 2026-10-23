@@ -406,6 +406,7 @@ static char  *c_genmathlib = "math32@{ZCC_LIBCPU}";
 static int    c_user_fp_mode_explicit = 0;
 static int    c_stylecpp = outspecified_flag;
 static char  *c_swallow_mf = NULL;
+static int    c_swallow_mt = 0;
 
 static char  *c_extension = NULL;
 static char  *c_assembler = NULL;
@@ -623,7 +624,7 @@ static option options[] = {
     { 0, "custom-copt-rules", OPT_STRING,  "Custom user copt rules" , &c_coptrules_user, NULL, 0},
     { 'M', NULL, OPT_BOOL|OPT_PRIVATE,  "Swallow -M option in configs" , &swallow_M, NULL, 0},
     { 0, "MD", OPT_BOOL|OPT_PRIVATE,  "Ignore -MD" , &swallow_M, NULL, 0},
-    { 0, "MT", OPT_BOOL|OPT_PRIVATE,  "Ignore -MT" , &c_swallow_mf, NULL, 0},
+    { 0, "MT", OPT_BOOL|OPT_PRIVATE,  "Ignore -MT" , &c_swallow_mt, NULL, 0},
     { 0, "MF", OPT_STRING|OPT_PRIVATE,  "Ignore -MF" , &c_swallow_mf, NULL, 0},
     { 0, "vn", OPT_BOOL_FALSE|OPT_PRIVATE,  "Turn off command tracing" , &verbose, NULL, 0},
     { 0, "no-cleanup", OPT_BOOL_FALSE, "Don't cleanup temporary files", &cleanup, NULL, 0 },

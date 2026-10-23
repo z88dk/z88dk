@@ -25,6 +25,7 @@ all:	farlp.bin farlp_r2ka.bin farlp_r4k.bin farlp_z80n.bin farlp_fp.bin
 all:	complement.bin complement_fp.bin complement_z80n.bin complement_z180.bin complement_ez80.bin complement_8080.bin
 all:	ternary.bin ternary_fp.bin ternary_z80n.bin ternary_z180.bin ternary_ez80.bin ternary_8080.bin
 all:	iytemp.bin iytemp_fp.bin iytemp_z80n.bin iytemp_z180.bin iytemp_ez80.bin iytemp_8080.bin
+all:	joinacc.bin joinacc_fp.bin joinacc_reserve_iy.bin joinacc_reserve_iy_fp.bin joinacc_z80n.bin joinacc_8080.bin joinacc_gbz80.bin joinacc_r2ka.bin joinacc_asm.bin
 all:	longasr.bin longasr_8080.bin longasr_gbz80.bin longasr_r2ka.bin longasr_ez80.bin longasr_8085.bin longasr_kc160.bin longasr_z180.bin longasr_r4k.bin longasr_fp.bin
 all:	crcloop.bin crcloop_8080.bin crcloop_gbz80.bin crcloop_r2ka.bin crcloop_ez80.bin crcloop_8085.bin crcloop_kc160.bin crcloop_z180.bin crcloop_r4k.bin crcloop_fp.bin
 all:	zxfold.bin zxfold_8080.bin zxfold_gbz80.bin zxfold_r2ka.bin zxfold_ez80.bin zxfold_8085.bin zxfold_kc160.bin zxfold_z180.bin zxfold_r4k.bin zxfold_fp.bin
@@ -4371,6 +4372,44 @@ iytemp_ez80.bin: $(SOURCES) iytemp.c
 iytemp_8080.bin: $(SOURCES) iytemp.c
 	$(compile_8080)
 	$(runtest_8080)
+
+joinacc.bin: $(SOURCES) joinacc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+joinacc_fp.bin: $(SOURCES) joinacc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+joinacc_reserve_iy.bin: $(SOURCES) joinacc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --reserve-regs-iy -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+joinacc_reserve_iy_fp.bin: $(SOURCES) joinacc.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --reserve-regs-iy -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+joinacc_z80n.bin: $(SOURCES) joinacc.c
+	$(compile_z80n)
+	$(runtest_z80n)
+
+joinacc_8080.bin: $(SOURCES) joinacc.c
+	$(compile_8080)
+	$(runtest_8080)
+
+joinacc_gbz80.bin: $(SOURCES) joinacc.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+joinacc_r2ka.bin: $(SOURCES) joinacc.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+joinacc_asm.bin: joinacc.c
+	@for f in "" "-fframe-pointer" "--reserve-regs-iy"; do \
+	  zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) $$f -DASMONLY -I$(FRAMEWORK_DIR) -S $< -o joinacc_a.asm || exit 1; \
+	  test `grep -ci '[^a-z]iy' joinacc_a.asm` -eq 0 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: join value homed in IY ($$f) $(RESET)" ; exit 1; }; \
+	done; rm -f joinacc_a.asm
 
 ternary.bin: $(SOURCES) ternary.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m

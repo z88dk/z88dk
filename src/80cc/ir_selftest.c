@@ -58,7 +58,7 @@ int opt_disabled(const char *name)
 
 /* Option globals the IR layer reads. Real definitions are in main.c / data.c,
    which the selftest doesn't link; these carry the same defaults. */
-char c_debug_adb_defc = 0;
+int  c_debug_adb_defc = 0;
 char c_debug_entry_points = 0;
 int  c_reserve_ix = 0;
 int  c_reserve_iy = 0;
