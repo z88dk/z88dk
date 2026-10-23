@@ -17,7 +17,7 @@ extern unsigned _stklen = 8192U; /* Default stack size 4096 bytes is too small. 
 
 static char   *c_output_extension = "asm";
 static char   *c_output_file = NULL;
-       char    c_debug_adb_defc = 0;
+       int     c_debug_adb_defc = 0;
        char    c_debug_entry_points = 0;
 int     c_banked_style = BANKED_STYLE_REGULAR;
 

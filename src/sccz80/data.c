@@ -56,7 +56,7 @@ int need_floatpack, ncomp;
 int stackargs;
 
 
-char c_default_unsigned;
+int  c_default_unsigned;
 
 int nxtlab, /* next avail label # */
     glblab, /* For initializing global literals */

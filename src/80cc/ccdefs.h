@@ -61,7 +61,7 @@ extern int64_t  fp32_sign_mask(void);
 
 
 /* cdbfile.c */
-extern char     c_debug_adb_defc;   /* -debug: emit sdcc-compatible cdb */
+extern int      c_debug_adb_defc;   /* -debug: emit sdcc-compatible cdb */
 extern void     debug_write_module(void);
 extern void     debug_write_symbol(SYMBOL *sym);
 extern void     debug_write_type(Type *type);

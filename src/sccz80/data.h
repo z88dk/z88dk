@@ -30,7 +30,7 @@ extern char Filename[];
 extern int need_floatpack;
 extern int ncomp;
 extern int stackargs;
-extern char c_default_unsigned;
+extern int  c_default_unsigned;
 extern int nxtlab;
 extern int glblab;
 extern int litlab;
