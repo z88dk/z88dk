@@ -39,11 +39,13 @@ program:
 
     INCLUDE "crt/classic/crt_init_heap.inc"
 
+IF (__crt_enable_eidi & 0x02)
     ld  hl,asm_im1_handler
     ld  ($f302),hl		;vsync interrupt
     ld  a,2			;Enable vsync interrupt only
     out ($e4),a
     out ($e6),a
+ENDIF
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 ; Entry to the user code
