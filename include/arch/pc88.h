@@ -322,4 +322,11 @@ extern void __LIB__ pc88_locate(unsigned int x, unsigned int y) __smallc;
 // Set text windows (40 or 80 columns, 20 or 25 rows)
 extern void __LIB__ pc88_crtset(int width, int height) __smallc;
 
+
+// Disk (the unit's own protocol; no BASIC or ROM needed).  Sectors are 256 bytes, the first on a track is 1 and the tracks
+// alternate sides (track = 2 * cylinder + side); a run of sectors carries on to the next track.  Return 0, or 1 on an error.
+// Interrupts should be off.
+extern int __LIB__ pc88_disk_read(uint8_t drive, uint8_t track, uint8_t sector, uint8_t count, void *buf) __smallc;
+extern int __LIB__ pc88_disk_write(uint8_t drive, uint8_t track, uint8_t sector, uint8_t count, const void *buf) __smallc;
+
 #endif
