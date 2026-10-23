@@ -303,8 +303,8 @@ static int             c_cpu = 0;
 static int             c_nocrt = 0;
 static char           *c_crt_incpath = NULL;
 static int             processing_user_command_line_arg = 0;
-static char            c_sccz80_r2l_calling;
-static char            c_copy_m4_processed_files;
+static int             c_sccz80_r2l_calling;
+static int             c_copy_m4_processed_files;
 
 static char            filenamebuf[FILENAME_MAX + 1];
 #ifdef WIN32
@@ -421,8 +421,8 @@ static int    c_aliases_array_num = 0;
 static char **aliases = NULL;
 static int    aliases_num = 0;
 
-static char   c_generate_debug_info = 0;
-static char   c_help = 0;
+static int    c_generate_debug_info = 0;
+static int    c_help = 0;
 
 static char *opt_code_seg = NULL;
 static char *opt_const_seg = NULL;
