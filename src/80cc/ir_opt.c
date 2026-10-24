@@ -504,8 +504,13 @@ int ir_opt_st2ld(Func *f)
             /* IR_ST_MEM: update shadow. */
             if (op->kind == IR_ST_MEM) {
                 if (op->mem.volatile_ || !trackable_kind(op->mem.kind)
-                    || op->src[0] < 0) {
-                    /* Untrackable store — alias risk, drop everything. */
+                    || op->src[0] < 0
+                    || (op->mem.post_step != 0
+                        && op->mem.kind == IR_MEM_VREG)) {
+                    /* Untrackable store — alias risk, drop everything. A
+                       post-stepping store (`*p++ = v`) moves its base, so the
+                       next `*p++ = v` is a different address, not an overwrite
+                       of this one. */
                     n = 0;
                     continue;
                 }

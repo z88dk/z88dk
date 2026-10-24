@@ -36,6 +36,7 @@ all:	longcmp.bin longcmp_8080.bin longcmp_gbz80.bin longcmp_r2ka.bin longcmp_ez8
 all:	longaddk.bin longaddk_8080.bin longaddk_gbz80.bin longaddk_r2ka.bin longaddk_ez80.bin longaddk_8085.bin longaddk_kc160.bin longaddk_z180.bin longaddk_r4k.bin longaddk_fp.bin
 all:	stepcmp.bin stepcmp_8080.bin stepcmp_gbz80.bin stepcmp_r2ka.bin stepcmp_ez80.bin stepcmp_8085.bin stepcmp_kc160.bin stepcmp_z180.bin stepcmp_r4k.bin stepcmp_fp.bin
 all:	stepparam.bin stepparam_8080.bin stepparam_gbz80.bin stepparam_r2ka.bin stepparam_ez80.bin stepparam_8085.bin stepparam_kc160.bin stepparam_z180.bin stepparam_r4k.bin stepparam_fp.bin
+all:	poststore.bin poststore_8080.bin poststore_gbz80.bin poststore_r2ka.bin poststore_ez80.bin poststore_8085.bin poststore_kc160.bin poststore_z180.bin poststore_r4k.bin poststore_fp.bin
 all:	bytemask.bin bytemask_8080.bin bytemask_gbz80.bin bytemask_r2ka.bin bytemask_ez80.bin bytemask_8085.bin bytemask_kc160.bin bytemask_z180.bin bytemask_r4k.bin bytemask_fp.bin
 all:	cmpminus1.bin cmpminus1_8080.bin cmpminus1_gbz80.bin cmpminus1_r2ka.bin cmpminus1_ez80.bin cmpminus1_8085.bin cmpminus1_kc160.bin cmpminus1_z180.bin cmpminus1_r4k.bin cmpminus1_fp.bin
 all:	argpop.bin argpop_8080.bin argpop_gbz80.bin argpop_r2ka.bin argpop_ez80.bin argpop_8085.bin argpop_kc160.bin argpop_z180.bin argpop_r4k.bin argpop_fp.bin
@@ -4777,6 +4778,46 @@ stepparam_r4k.bin: $(SOURCES) stepparam.c
 	$(runtest_r4k)
 
 stepparam_fp.bin: $(SOURCES) stepparam.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+poststore.bin: $(SOURCES) poststore.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+poststore_8080.bin: $(SOURCES) poststore.c
+	$(compile_8080)
+	$(runtest_8080)
+
+poststore_gbz80.bin: $(SOURCES) poststore.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+poststore_r2ka.bin: $(SOURCES) poststore.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+poststore_ez80.bin: $(SOURCES) poststore.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+poststore_8085.bin: $(SOURCES) poststore.c
+	$(compile_8085)
+	$(runtest_8085)
+
+poststore_kc160.bin: $(SOURCES) poststore.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+poststore_z180.bin: $(SOURCES) poststore.c
+	$(compile_z180)
+	$(runtest_z180)
+
+poststore_r4k.bin: $(SOURCES) poststore.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+poststore_fp.bin: $(SOURCES) poststore.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
