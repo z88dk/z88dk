@@ -6083,6 +6083,29 @@ void ir_alloc(Func *f)
                 }
             }
         }
+        /* A written (stepped) param held in BC is loaded in the prologue, and
+           its caller slot goes stale once it steps. Its interval therefore
+           starts at entry, not at its first textual reference: a packed temp
+           between the two would clobber BC, and the reload on the way into the
+           loop would read the stale slot (`*s++` copied the first char). */
+        for (int v = 0; v < f->n_vregs; v++)
+            if ((f->vregs[v].flags & IR_VREG_PARAM) && write_count[v] > 0
+                && first_use[v] > 0)
+                first_use[v] = 0;
+        /* The step may be fused into a load/store as mem.post_step, which
+           write_count does not see. */
+        for (int i = 0; i < f->n_bbs; i++)
+            for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                const Op *op = &f->bbs[i].ops[j];
+                if ((op->kind == IR_LD_MEM || op->kind == IR_ST_MEM)
+                    && op->mem.kind == IR_MEM_VREG && op->mem.post_step) {
+                    int b = op->mem.base;
+                    if (b >= 0 && b < f->n_vregs
+                        && (f->vregs[b].flags & IR_VREG_PARAM)
+                        && first_use[b] > 0)
+                        first_use[b] = 0;
+                }
+            }
         /* [IR_BYTEPRESS] INERT — size the byte-pair opportunity by PRESSURE
            rather than hotness. Reports, per function:
              cands    width-1 vregs with no register home, not addr-taken or
