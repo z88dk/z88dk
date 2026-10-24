@@ -1906,6 +1906,17 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     int mainbank_occupied;
 
+    // a program linked below 0x4000 (crt_org_code 0, say): the rom's address space.  The loader maps 5,2,0 at 0x4000 and up only, so what is
+    // below goes in a 16k bank of its own, which a few bytes of code (put in a free place in the main bank, which the nex starts) map into the
+    // first two slots (nextreg 0x50 and 0x51: 8k pages 2 * bank and 2 * bank + 1) before they jump to the program's start.
+
+    int low_program;            // the program starts below 0x4000
+    int low_used;               // and has bytes there
+    int low_bank;               // the 16k bank they are in
+    int entry;                  // the address the nex starts at
+    unsigned char *low;
+    unsigned char *used;
+
     FILE *fin;
     FILE *fout;
 
@@ -1935,9 +1946,18 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
         if ((register_sp = parameter_search(zxc->crtfile, ".map", "__register_sp")) < 0)
             exit_log(1, "Error: Stack location must be set (%d)\n", register_sp);
 
-        if ((crt_org_code = parameter_search(zxc->crtfile, ".map", "__crt_org_code")) < 0)
+        if ((crt_org_code = get_org_addr(zxc->crtfile)) < 0)
             exit_log(1, "Error: Unable to find org address\n");
     }
+
+    low_program = !zxnex->norun && crt_org_code < 0x4000;
+    low_used = 0;
+    low_bank = -1;
+    entry = crt_org_code;
+    low = must_malloc(0x4000);
+    used = must_malloc(0x10000);
+    memset(low, fillbyte, 0x4000);
+    memset(used, 0, 0x10000);
 
     core_version = parameter_search(zxc->crtfile, ".map", "__CRT_CORE_VERSION");
     file_handle = parameter_search(zxc->crtfile, ".map", "__z_fd_nex");
@@ -2021,8 +2041,10 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
         for (i = 0; i < memory->mainbank.num; ++i)
         {
             struct section_bin *sb = &memory->mainbank.secbin[i];
+            unsigned char *data;
+            int            first, last;
 
-            if (sb->org < 0x4000)
+            if ((sb->org < 0x4000) && !low_program)
                 exit_log(1, "Error: Section %s has org in rom 0x%04x\n", sb->section_name, sb->org);
 
             if ((fin = fopen(sb->filename, "rb")) == NULL)
@@ -2031,7 +2053,9 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
             if (fseek(fin, sb->offset, SEEK_SET) != 0)
                 exit_log(1, "Error: Can't seek to %" PRIu32 " in file %s\n", sb->offset, sb->filename);
 
-            if (fread(&mem[sb->org - 0x4000], sb->size, 1, fin) < 1)
+            data = must_malloc(sb->size + 1);
+
+            if ((sb->size > 0) && (fread(data, sb->size, 1, fin) < 1))
             {
                 fclose(fin);
                 exit_log(1, "Error: Expected %d bytes from file %s\n", sb->size, sb->filename);
@@ -2039,11 +2063,105 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
             fclose(fin);
 
+            // below 0x4000 (a program that starts there) is the low bank's, the rest the main bank's
+
+            for (j = 0; j < (int)sb->size; ++j)
+            {
+                int addr = sb->org + j;
+
+                if (addr >= 0x10000)
+                    exit_log(1, "Error: Section %s runs past 0xffff\n", sb->section_name);
+
+                used[addr] = 1;
+
+                if (addr < 0x4000)
+                {
+                    low[addr] = data[j];
+                    low_used = 1;
+                }
+                else
+                    mem[addr - 0x4000] = data[j];
+            }
+
+            free(data);
+
             if (sb->size > 0)
             {
-                for (j = (sb->org >> 13) & 0x7; j <= (((sb->org + sb->size - 1) >> 13) & 0x7); ++j)
-                    mainbank_occupied |= 1 << j;
+                first = sb->org;
+                last = sb->org + sb->size - 1;
+
+                if (last >= 0x4000)
+                {
+                    if (first < 0x4000) first = 0x4000;
+
+                    for (j = (first >> 13) & 0x7; j <= ((last >> 13) & 0x7); ++j)
+                        mainbank_occupied |= 1 << j;
+                }
             }
+        }
+
+        // a program that starts below 0x4000: the low bank is the first free of 1, 3, 4 and 6 (the others are the 128k's shadow screen
+        // and layer 2's), and the loader goes in the highest free 16 bytes of a main bank that is written anyway (bank 0 if there are none)
+
+        if (low_program && low_used)
+        {
+            static const unsigned char candidates[] = { 1, 3, 4, 6 };
+            unsigned char stub[16];
+            int           stub_size = 0, at = -1, b, a, k;
+
+            for (k = 0; k < 4; ++k)
+            {
+                struct memory_bank *mb = &memory->bankspace[bsnum_bank].membank[candidates[k]];
+
+                if (mb->num == 0)
+                {
+                    low_bank = candidates[k];
+                    break;
+                }
+            }
+
+            if (low_bank < 0)
+                exit_log(1, "Error: The program is below 0x4000 and needs a bank for it: 1, 3, 4 and 6 are all in use\n");
+
+            stub[stub_size++] = 0xf3;                       // di
+            stub[stub_size++] = 0x3e;                       // ld a,2 * bank
+            stub[stub_size++] = low_bank * 2;
+            stub[stub_size++] = 0xed;                       // nextreg 0x50,a
+            stub[stub_size++] = 0x92;
+            stub[stub_size++] = 0x50;
+            stub[stub_size++] = 0x3c;                       // inc a
+            stub[stub_size++] = 0xed;                       // nextreg 0x51,a
+            stub[stub_size++] = 0x92;
+            stub[stub_size++] = 0x51;
+            stub[stub_size++] = 0xc3;                       // jp crt_org_code
+            stub[stub_size++] = crt_org_code & 0xff;
+            stub[stub_size++] = (crt_org_code >> 8) & 0xff;
+
+            if (mainbank_occupied == 0)
+                mainbank_occupied = 0xc0;                   // (bank 0, and the loader at the top of it)
+
+            for (a = 0x10000 - stub_size; (a >= 0x4000) && (at < 0); --a)
+            {
+                b = (a >= 0xc000) ? 0xc0 : (a >= 0x8000) ? 0x30 : 0x0c;
+
+                if (!(mainbank_occupied & b))
+                    continue;
+
+                for (k = 0; k < stub_size; ++k)
+                    if (used[a + k] || (((a + k) >> 14) != (a >> 14)))
+                        break;
+
+                if (k == stub_size)
+                    at = a;
+            }
+
+            if (at < 0)
+                exit_log(1, "Error: The program is below 0x4000 and there is no free space in the main bank for the %d byte loader that maps it\n", stub_size);
+
+            memcpy(&mem[at - 0x4000], stub, stub_size);
+            entry = at;
+
+            printf("Notice: the program below 0x4000 is in bank %d, which the %d byte loader at 0x%04x maps into slots 0 and 1\n", low_bank, stub_size, at);
         }
 
         // bank 5
@@ -2084,7 +2202,14 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
         // banks 5, 2, 0 were in the main memory bank
 
-        if ((i != 5) && (i != 2) && (i != 0))
+        if ((i == low_bank) && (low_bank > 0))
+        {
+            nh.Banks[i] = 1;
+            nh.NumBanksToLoad++;
+            fwrite(low, 0x4000, 1, fout);
+            printf("Bank %d (the program below 0x4000)\n", i);
+        }
+        else if ((i != 5) && (i != 2) && (i != 0))
         {
             if (mb->num > 0)
             {
@@ -2131,8 +2256,8 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
     nh.SP[0] = register_sp & 0xff;
     nh.SP[1] = (register_sp >> 8) & 0xff;
 
-    nh.PC[0] = crt_org_code & 0xff;
-    nh.PC[1] = (crt_org_code >> 8) & 0xff;
+    nh.PC[0] = entry & 0xff;
+    nh.PC[1] = (entry >> 8) & 0xff;
 
     if (core_version > 0)
     {
@@ -2156,6 +2281,9 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
     fwrite(&nh, sizeof(nh), 1, fout);
 
     fclose(fout);
+
+    free(low);
+    free(used);
 
     return 0;
 }
