@@ -1,17 +1,23 @@
-;       CRT0 for the Mattel Aquarius
+; crt0 for Aquarius+ RAM builds
 ;
-;       Stefano Bodrato Dec. 2000
-;
-;       If an error occurs eg break we just drop back to BASIC
-;
-;       $Id: aquarius_crt0.asm $
-;
+; This file handles both classic aqx files + the  allram variant
 
-IF      !DEFINED_CRT_ORG_CODE
-    defc    CRT_ORG_CODE  = 14768
+
+
+
+
+
+
+IF DEFINED_CRT_AQXALLRAM 
+    IF !DEFINED_CRT_ORG_CODE
+        ; -subtype=allram: where the program is loaded and started (the bootstrap, aqx_bootstrap.asm, loads from here to $4000, so
+        ; it has to be below $4000, and above the bootstrap's own $0000-$01FF)
+        defc CRT_ORG_CODE = $0200
+    ENDIF
+    IF !DEFINED_REGISTER_SP
+        defc REGISTER_SP = $c000
+    ENDIF
 ENDIF
-
-
 
 
 IFNDEF CLIB_FARHEAP_FIRST
@@ -26,18 +32,23 @@ IF CLIB_FARHEAP_BANKS = -1
 ENDIF
 
 
+; Fall back to the default origin
+IFNDEF CRT_ORG_CODE
+    defc    CRT_ORG_CODE  = 14768
+ENDIF
+
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -1
     INCLUDE "crt/classic/crt_rules.inc"
 
     org     CRT_ORG_CODE
 
-IF DEFINED_CRT_COMPRESS_AQX
+IF DEFINED_CRT_COMPRESS_AQX && !DEFINED_CRT_AQXALLRAM
     INCLUDE "target/aquarius/classic/aqx_zx0.asm"
 ELSE
 start:
 ENDIF
-IF CRT_AQPLUS_BANK3_RAM
+IF CRT_AQPLUS_BANK3_RAM && !DEFINED_CRT_AQXALLRAM
     in      a,(PORT_BANK2)
     inc     a
     out     (PORT_BANK3),a
@@ -53,6 +64,7 @@ ENDIF
 IF CRT_DISABLELOADER != 1
     call    loadbanks
 ENDIF
+
 IF CLIB_FARHEAP_BANKS
     call    setup_far_heap
 ENDIF
@@ -63,8 +75,15 @@ __Exit:
 
 
 __restore_sp_onexit:
+IF DEFINED_CRT_AQXALLRAM
+    di
+aqxallram_halt:
+    halt
+    jr      aqxallram_halt
+ELSE
     ld  sp,0        ;Restore stack to entry value
     ret
+ENDIF
 
 
 

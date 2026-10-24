@@ -29,10 +29,19 @@ static char aqex = 0;
 static int page = 0;
 static int exec = -1;
 static char aqx = 0;
+static char aqxallram = 0;
 static int origin = -1;
 
 static uint8_t h_lvl;
 static uint8_t l_lvl;
+
+#define AQX_BOOT_LOAD_ADDRESS 0x3e00
+#define AQX_BOOT_STAGE_ADDRESS 0x0200
+#define AQX_BOOT_STAGE_LIMIT 0xff00
+#define AQX_BOOT_SIZE 0x1c0
+#define AQX_BOOT_FILENAME_OFFSET 0x140
+#define AQX_BOOT_FILENAME_LENGTH_OFFSET 0x90
+#define AQX_BOOT_FILENAME_MAX 22
 
 /* Options that are available for this module */
 option_t aquarius_options[] = {
@@ -48,6 +57,7 @@ option_t aquarius_options[] = {
     {0, "page", "Page number to load to when --aqex is specified", OPT_INT, &page},
     {0, "exec", "Specify execution address when --aqex is specified", OPT_INT, &exec},
     {0, "aqx", "Output .aqx file for Aquarius+", OPT_BOOL, &aqx},
+    {0, "aqxallram", "Output a two-stage all-RAM .aqx file for Aquarius+", OPT_BOOL, &aqxallram},
     {'c', "crt0file", "crt0 file used in linking", OPT_STR, &crtfile},
     {0, "org", "Origin of the binary", OPT_INT, &origin},
     {0, NULL, NULL, OPT_NONE, NULL}};
@@ -178,7 +188,7 @@ int aquarius_exec(char *target)
             {
                 suffix_change(filename, ".aqex");
             }
-            else if (aqx)
+            else if (aqx || aqxallram)
             {
                 suffix_change(filename, ".aqx");
             }
@@ -215,7 +225,7 @@ int aquarius_exec(char *target)
 
         fseek(fpin, 0L, SEEK_SET);
 
-        if (aqex || aqx)
+        if (aqex || aqx || aqxallram)
         {
             char crtname[FILENAME_MAX];
             unsigned loadAddr;
@@ -230,7 +240,11 @@ int aquarius_exec(char *target)
             }
 
             // Override the load and exec address if origin is set from the command line
-            if (origin >= 0)
+            if (aqxallram)
+            {
+                loadAddr = AQX_BOOT_LOAD_ADDRESS;
+            }
+            else if (origin >= 0)
             {
                 loadAddr = origin;
             }
@@ -242,7 +256,7 @@ int aquarius_exec(char *target)
             }
 
             /* A compressed AQX CRT exports this marker and the bootstrap symbols. */
-            compress_aqx = aqx && parameter_search(crtfile, ".map", "CRT_COMPRESS_AQX") >= 0;
+            compress_aqx = aqx && parameter_search(crtfile, ".map", "CRT_COMPRESS_AQX") > 0;
             if (compress_aqx)
             {
                 long entry_point = parameter_search(crtfile, ".map", "__aqx_zx0_program_entry_point");
@@ -317,6 +331,57 @@ int aquarius_exec(char *target)
                 for (i = 0; i < 35; i++)
                     writebyte(0x00, fpout);
             }
+            else if (aqxallram)
+            {
+                const char *stage_name = zbasename(binname);
+                char bootname[FILENAME_MAX + 1];
+                FILE *bootstrap_fp;
+                uint8_t bootstrap[AQX_BOOT_SIZE];
+                size_t stage_name_len = strlen(stage_name);
+
+                if (len > AQX_BOOT_STAGE_LIMIT - AQX_BOOT_STAGE_ADDRESS)
+                    exit_log(1, "AQX boot stage is too large (%d bytes; maximum is %d)\n", len,
+                             AQX_BOOT_STAGE_LIMIT - AQX_BOOT_STAGE_ADDRESS);
+                if (stage_name_len > AQX_BOOT_FILENAME_MAX)
+                    exit_log(1, "AQX boot stage filename is too long (%s; maximum is %d characters)\n", stage_name,
+                             AQX_BOOT_FILENAME_MAX);
+
+                if (parameter_search(crtfile, ".map", "__aqx_bootstrap_built") <= 0)
+                    exit_log(1, "AQX boot CRT did not emit a BOOTSTRAP section\n");
+                strcpy(bootname, binname);
+                suffix_change(bootname, "_BOOTSTRAP.bin");
+                if ((bootstrap_fp = fopen_bin(bootname, crtfile)) == NULL)
+                    exit_log(1, "Can't open AQX bootstrap file %s\n", bootname);
+                if (fread(bootstrap, 1, sizeof(bootstrap), bootstrap_fp) != sizeof(bootstrap) ||
+                    fgetc(bootstrap_fp) != EOF)
+                {
+                    fclose(bootstrap_fp);
+                    exit_log(1, "Invalid AQX bootstrap size in %s\n", bootname);
+                }
+                fclose(bootstrap_fp);
+
+                memset(bootstrap + AQX_BOOT_FILENAME_OFFSET, 0, AQX_BOOT_FILENAME_MAX + 1);
+                memcpy(bootstrap + AQX_BOOT_FILENAME_OFFSET, stage_name, stage_name_len);
+                bootstrap[AQX_BOOT_FILENAME_LENGTH_OFFSET] = stage_name_len + 1;
+
+                for (i = 1; i <= 12; i++)
+                    writebyte(0xff, fpout);
+                writebyte(0x00, fpout);
+                writestring("LOADR", fpout);
+                writebyte(0x00, fpout);
+                for (i = 1; i <= 12; i++)
+                    writebyte(0xff, fpout);
+                writebyte(0x00, fpout);
+                writeword(0x3912, fpout);
+                writeword(0x000a, fpout);
+                writebyte(0x58, fpout);
+                writebyte(0xb0, fpout);
+                writebyte(0xb5, fpout);
+                writestring("($3e00)", fpout);
+                for (i = 0; i < AQX_BOOT_LOAD_ADDRESS - 0x390f; i++)
+                    writebyte(0x00, fpout);
+                fwrite(bootstrap, 1, sizeof(bootstrap), fpout);
+            }
             else
             {
                 char execAddrStr[16];
@@ -350,7 +415,11 @@ int aquarius_exec(char *target)
             }
 
             /* We append the binary file, optionally replacing its tail with ZX0. */
-            if (compress_aqx)
+            if (aqxallram)
+            {
+                /* The bootstrap above is the complete AQX payload. */
+            }
+            else if (compress_aqx)
             {
                 for (i = 0; i < (int)packed_len; i++)
                     writebyte(packed[i], fpout);
