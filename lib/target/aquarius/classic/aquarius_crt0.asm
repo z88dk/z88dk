@@ -117,6 +117,13 @@ IF CLIB_AQUARIUS_PLUS = 1
 
 ENDIF
 
+
+
+; Emit the independent AQX relocation bootstrap after the normal CRT section
+; map has been established, following the Multi8 bootstrap convention.
+IF DEFINED_CRT_AQXALLRAM
+    INCLUDE "target/aquarius/classic/aqx_bootstrap.asm"
+ENDIF
+
     SECTION UNASSIGNED
     org     0
-
