@@ -1,6 +1,6 @@
 ; -----------------------------------------------------------------------------
-; ZX0 decoder by Einar Saukas
-; "Standard" version (69 bytes only)
+; ZX0 decoder by Einar Saukas & Urusergi
+; "Standard" version (68 bytes only)
 ; -----------------------------------------------------------------------------
 ; Parameters:
 ;   HL: source address (compressed data)
@@ -28,14 +28,12 @@ dzx0s_copy:
         add     a, a                    ; copy from literals or new offset?
         jr      nc, dzx0s_literals
 dzx0s_new_offset:
-        call    dzx0s_elias             ; obtain offset MSB
-        ex      af, af'
-        pop     af                      ; discard last offset
-        xor     a                       ; adjust for negative offset
-        sub     c
+        pop     bc                      ; discard last offset
+        ld      c, $fe                  ; prepare negative offset
+        call    dzx0s_elias_loop        ; obtain offset MSB
+        inc     c
         ret     z                       ; check end marker
-        ld      b, a
-        ex      af, af'
+        ld      b, c
         ld      c, (hl)                 ; obtain offset LSB
         inc     hl
         rr      b                       ; last offset bit becomes first length bit

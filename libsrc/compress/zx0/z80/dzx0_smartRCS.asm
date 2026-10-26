@@ -1,5 +1,5 @@
 ; -----------------------------------------------------------------------------
-; "Smart" integrated RCS+ZX0 decoder by Einar Saukas (113 bytes)
+; "Smart" integrated RCS+ZX0 decoder by Einar Saukas (112 bytes)
 ; -----------------------------------------------------------------------------
 ; Parameters:
 ;   HL: source address (compressed data)
@@ -37,14 +37,12 @@ dzx0r_copy_loop:
         add     a, a                    ; copy from literals or new offset?
         jr      nc, dzx0r_literals
 dzx0r_new_offset:
-        call    dzx0r_elias             ; obtain offset MSB
-        ex      af, af'
-        pop     af                      ; discard last offset
-        xor     a                       ; adjust for negative offset
-        sub     c
+        pop     bc                      ; discard last offset
+        ld      c, $fe                  ; prepare negative offset
+        call    dzx0r_elias_loop        ; obtain offset MSB
+        inc     c
         ret     z                       ; check end marker
-        ld      b, a
-        ex      af, af'
+        ld      b, c
         ld      c, (hl)                 ; obtain offset LSB
         inc     hl
         rr      b                       ; last offset bit becomes first length bit

@@ -10,11 +10,11 @@
 dzx0_standard_back:
         ld      bc, 1                   ; preserve default offset 1
         push    bc
-        dec     c
         ld      a, $80
 dzx0sb_literals:
         call    dzx0sb_elias            ; obtain length
         lddr                            ; copy literals
+        inc     c
         add     a, a                    ; copy from last offset or new offset?
         jr      c, dzx0sb_new_offset
         call    dzx0sb_elias            ; obtain length
@@ -23,6 +23,7 @@ dzx0sb_copy:
         push    hl                      ; preserve offset
         add     hl, de                  ; calculate destination - offset
         lddr                            ; copy from offset
+        inc     c
         pop     hl                      ; restore offset
         ex      (sp), hl                ; preserve offset, restore source
         add     a, a                    ; copy from literals or new offset?
@@ -45,19 +46,17 @@ dzx0sb_new_offset:
         call    c, dzx0sb_elias_backtrack
         inc     bc
         jr      dzx0sb_copy
-dzx0sb_elias:
-        inc     c                       ; inverted interlaced Elias gamma coding
-dzx0sb_elias_loop:
+dzx0sb_elias_backtrack:
         add     a, a
+        rl      c
+        rl      b
+dzx0sb_elias:
+        add     a, a                    ; inverted interlaced Elias gamma coding
         jr      nz, dzx0sb_elias_skip
         ld      a, (hl)                 ; load another group of 8 bits
         dec     hl
         rla
 dzx0sb_elias_skip:
-        ret     nc
-dzx0sb_elias_backtrack:
-        add     a, a
-        rl      c
-        rl      b
-        jr      dzx0sb_elias_loop
+        jr      c, dzx0sb_elias_backtrack
+        ret
 ; -----------------------------------------------------------------------------

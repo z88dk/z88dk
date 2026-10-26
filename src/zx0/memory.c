@@ -34,17 +34,15 @@ BLOCK *ghost_root = NULL;
 BLOCK *dead_array = NULL;
 int dead_array_size = 0;
 
-BLOCK *allocate(int bits, int index, int offset, int length, BLOCK *chain) {
+BLOCK *allocate(int bits, int index, int offset, BLOCK *chain) {
     BLOCK *ptr;
 
     if (ghost_root) {
         ptr = ghost_root;
         ghost_root = ptr->ghost_chain;
-        if (ptr->chain) {
-            if (!--ptr->chain->references) {
-                ptr->chain->ghost_chain = ghost_root;
-                ghost_root = ptr->chain;
-            }
+        if (ptr->chain && !--ptr->chain->references) {
+            ptr->chain->ghost_chain = ghost_root;
+            ghost_root = ptr->chain;
         }
     } else {
         if (!dead_array_size) {
@@ -60,7 +58,6 @@ BLOCK *allocate(int bits, int index, int offset, int length, BLOCK *chain) {
     ptr->bits = bits;
     ptr->index = index;
     ptr->offset = offset;
-    ptr->length = length;
     if (chain)
         chain->references++;
     ptr->chain = chain;
@@ -70,11 +67,9 @@ BLOCK *allocate(int bits, int index, int offset, int length, BLOCK *chain) {
 
 void assign(BLOCK **ptr, BLOCK *chain) {
     chain->references++;
-    if (*ptr) {
-        if (!--(*ptr)->references) {
-            (*ptr)->ghost_chain = ghost_root;
-            ghost_root = *ptr;
-        }
+    if (*ptr && !--(*ptr)->references) {
+        (*ptr)->ghost_chain = ghost_root;
+        ghost_root = *ptr;
     }
     *ptr = chain;
 }

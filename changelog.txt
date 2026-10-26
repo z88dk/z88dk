@@ -78,6 +78,7 @@ More detailed, but still incomplete changelist:
 - [all] math16 half-precision floating point support for 8080, 8085, and gbz80
 - [all] math32 and math16 divide and inv use a restoring 1/x
 - [all] AI agent support via AGENTS.md and .agents/skills (Grok/Claude discovery symlinks)
+- [all] ZX0 host tools and decompressors are v2.2. Forward data uses the v2 format. -c writes classic v1
 - [z80asm] Bug fixes
 - [z80asm] #define now supported as alias for defc
 - [z88dk-copt] Additional conditions for compiler and pattern formats

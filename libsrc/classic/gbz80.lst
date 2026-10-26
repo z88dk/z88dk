@@ -1,5 +1,6 @@
 @classic/alloc/alloc_gbz80.lst
 compress/aplib/obj/${TYPE}/**/*.o
+compress/zx0/obj/${TYPE}/**/*.o
 @classic/compress/zx7/zx7.lst
 ctype/obj/${TYPE}/**/*.o
 error/obj/${TYPE}/**/*.o

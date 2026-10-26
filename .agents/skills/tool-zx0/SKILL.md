@@ -23,13 +23,14 @@ Host-side **ZX0** compressor (optimal LZ77/LZSS-style format for small machines)
 ## Host usage (live binary)
 
 ```text
-z88dk-zx0 [-f] [-b] [-q] input [output.zx0]
+z88dk-zx0 [-f] [-c] [-b] [-q] input [output.zx0]
   -f      Force overwrite of output file
+  -c      Classic file format (v1.*)
   -b      Compress backwards
   -q      Quick non-optimal compression
 ```
 
-Upstream-style default name is `input.zx0` when output is omitted (see `src/zx0/README.md`). The z88dk binary uses the flags above.
+The host tools are ZX0 v2.2. Forward compression uses the v2 format. `-c` writes classic v1. Backwards compression keeps the v1 bitstream. Library decompressors decode v2 forward data and the backwards bitstream. Upstream-style default name is `input.zx0` when output is omitted (see `src/zx0/README.md`).
 
 Decompress on the host with **`z88dk-dzx0`**.
 
