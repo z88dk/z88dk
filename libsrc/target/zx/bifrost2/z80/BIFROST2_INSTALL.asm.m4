@@ -39,14 +39,14 @@ defs 65041 - 51625 - ASMPC
 ; INLINE DZX0_TURBO SO THAT NO SYMBOLS ARE EXPORTED
 
 ; -----------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; ZX0 decoder by Einar Saukas & introspec
-; "Turbo" version (128 bytes, 20% faster)
+; "Turbo" version (126 bytes, 21% faster)
 ; -----------------------------------------------------------------------------
 ; Parameters:
 ;   HL: source address (compressed data)
 ;   DE: destination address (decompressing)
 ; -----------------------------------------------------------------------------
-
 
 
 ; Entry: hl = void *src
@@ -61,20 +61,17 @@ dzx0_turbo:
         ld      a, $80
         jr      dzx0t_literals
 dzx0t_new_offset:
-        inc     c                       ; obtain offset MSB
+        ld      c, $fe                  ; prepare negative offset
         add     a, a
         jp      nz, dzx0t_new_offset_skip
         ld      a, (hl)                 ; load another group of 8 bits
         inc     hl
         rla
 dzx0t_new_offset_skip:
-        call    nc, dzx0t_elias
-        ex      af, af'                 ; adjust for negative offset
-        xor     a
-        sub     c
+        call    nc, dzx0t_elias         ; obtain offset MSB
+        inc     c
         ret     z                       ; check end marker
-        ld      b, a
-        ex      af, af'
+        ld      b, c
         ld      c, (hl)                 ; obtain offset LSB
         inc     hl
         rr      b                       ; last offset bit becomes first length bit
@@ -119,31 +116,34 @@ dzx0t_elias:
         add     a, a
         jr      nc, dzx0t_elias
         ret     nz
-dzx0t_elias_reload:
         ld      a, (hl)                 ; load another group of 8 bits
         inc     hl
         rla
         ret     c
         add     a, a
         rl      c
-        rl      b
         add     a, a
         ret     c
         add     a, a
         rl      c
-        rl      b
         add     a, a
         ret     c
         add     a, a
         rl      c
-        rl      b
         add     a, a
         ret     c
+dzx0t_elias_loop:
         add     a, a
         rl      c
         rl      b
         add     a, a
-        jp      dzx0t_elias_reload
+        jr      nc, dzx0t_elias_loop
+        ret     nz
+        ld      a, (hl)                 ; load another group of 8 bits
+        inc     hl
+        rla
+        jr      nc, dzx0t_elias_loop
+        ret
 ; -----------------------------------------------------------------------------
 
 

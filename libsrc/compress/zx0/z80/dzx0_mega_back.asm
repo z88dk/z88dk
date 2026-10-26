@@ -1,6 +1,6 @@
 ; -----------------------------------------------------------------------------
 ; ZX0 decoder by Einar Saukas & introspec
-; "Mega" version (677 bytes, 28% faster) - BACKWARDS VARIANT
+; "Mega" version (676 bytes, 28% faster) - BACKWARDS VARIANT
 ; -----------------------------------------------------------------------------
 ; Parameters:
 ;   HL: last source address (compressed data)
@@ -10,11 +10,9 @@
 dzx0_mega_back:
         ld      bc, 1                   ; preserve default offset 1
         ld      (dzx0mb_last_offset+1), bc
-        dec     c
         jr      dzx0mb_literals0
 
 dzx0mb_new_offset6:
-        inc     c
         add     a, a                    ; obtain offset MSB
         jp      nc, dzx0mb_new_offset5
         add     a, a
@@ -67,11 +65,11 @@ dzx0mb_length1:
         lddr                            ; copy from offset
         inc     c
         ldd                             ; copy one more from offset
+        inc     c
         pop     hl                      ; restore source
         add     a, a                    ; copy from literals or new offset?
         jr      c, dzx0mb_new_offset0
 dzx0mb_literals0:
-        inc     c
         ld      a, (hl)                 ; load another group of 8 bits
         dec     hl
         add     a, a                    ; obtain length
@@ -92,9 +90,9 @@ dzx0mb_elias_literals3:
         jp      c, dzx0mb_elias_literals1
 dzx0mb_literals1:
         lddr                            ; copy literals
+        inc     c
         add     a, a                    ; copy from last offset or new offset?
         jr      c, dzx0mb_new_offset0
-        inc     c
         ld      a, (hl)                 ; load another group of 8 bits
         dec     hl
         add     a, a                    ; obtain length
@@ -118,12 +116,12 @@ dzx0mb_reuse1:
         ld      hl, (dzx0mb_last_offset+1)
         add     hl, de                  ; calculate destination - offset
         lddr                            ; copy from offset
+        inc     c
         pop     hl                      ; restore source
         add     a, a                    ; copy from literals or new offset?
         jr      nc, dzx0mb_literals0
 
 dzx0mb_new_offset0:
-        inc     c
         ld      a, (hl)                 ; load another group of 8 bits
         dec     hl
         add     a, a                    ; obtain offset MSB
@@ -178,11 +176,11 @@ dzx0mb_length3:
         lddr                            ; copy from offset
         inc     c
         ldd                             ; copy one more from offset
+        inc     c
         pop     hl                      ; restore source
         add     a, a                    ; copy from literals or new offset?
         jr      c, dzx0mb_new_offset2
 dzx0mb_literals2:
-        inc     c
         add     a, a                    ; obtain length
         jp      nc, dzx0mb_literals1
         add     a, a
@@ -203,9 +201,9 @@ dzx0mb_elias_literals5:
         jp      c, dzx0mb_elias_literals3
 dzx0mb_literals3:
         lddr                            ; copy literals
+        inc     c
         add     a, a                    ; copy from last offset or new offset?
         jr      c, dzx0mb_new_offset2
-        inc     c
         add     a, a                    ; obtain length
         jp      nc, dzx0mb_reuse1
         add     a, a
@@ -229,12 +227,12 @@ dzx0mb_reuse3:
         ld      hl, (dzx0mb_last_offset+1)
         add     hl, de                  ; calculate destination - offset
         lddr                            ; copy from offset
+        inc     c
         pop     hl                      ; restore source
         add     a, a                    ; copy from literals or new offset?
         jr      nc, dzx0mb_literals2
 
 dzx0mb_new_offset2:
-        inc     c
         add     a, a                    ; obtain offset MSB
         jp      nc, dzx0mb_new_offset1
         add     a, a
@@ -289,11 +287,11 @@ dzx0mb_length5:
         lddr                            ; copy from offset
         inc     c
         ldd                             ; copy one more from offset
+        inc     c
         pop     hl                      ; restore source
         add     a, a                    ; copy from literals or new offset?
         jr      c, dzx0mb_new_offset4
 dzx0mb_literals4:
-        inc     c
         add     a, a                    ; obtain length
         jp      nc, dzx0mb_literals3
         add     a, a
@@ -314,9 +312,9 @@ dzx0mb_elias_literals7:
         jp      c, dzx0mb_elias_literals5
 dzx0mb_literals5:
         lddr                            ; copy literals
+        inc     c
         add     a, a                    ; copy from last offset or new offset?
         jr      c, dzx0mb_new_offset4
-        inc     c
         add     a, a                    ; obtain length
         jp      nc, dzx0mb_reuse3
         add     a, a
@@ -340,12 +338,12 @@ dzx0mb_reuse5:
         ld      hl, (dzx0mb_last_offset+1)
         add     hl, de                  ; calculate destination - offset
         lddr                            ; copy from offset
+        inc     c
         pop     hl                      ; restore source
         add     a, a                    ; copy from literals or new offset?
         jr      nc, dzx0mb_literals4
 
 dzx0mb_new_offset4:
-        inc     c
         add     a, a                    ; obtain offset MSB
         jp      nc, dzx0mb_new_offset3
         add     a, a
@@ -400,11 +398,11 @@ dzx0mb_length7:
         lddr                            ; copy from offset
         inc     c
         ldd                             ; copy one more from offset
+        inc     c
         pop     hl                      ; restore source
         add     a, a                    ; copy from literals or new offset?
         jp      c, dzx0mb_new_offset6
 dzx0mb_literals6:
-        inc     c
         add     a, a                    ; obtain length
         jp      nc, dzx0mb_literals5
         add     a, a
@@ -425,9 +423,9 @@ dzx0mb_elias_literals1:
         jp      c, dzx0mb_elias_literals7
 dzx0mb_literals7:
         lddr                            ; copy literals
+        inc     c
         add     a, a                    ; copy from last offset or new offset?
         jp      c, dzx0mb_new_offset6
-        inc     c
         add     a, a                    ; obtain length
         jp      nc, dzx0mb_reuse5
         add     a, a
@@ -452,6 +450,7 @@ dzx0mb_last_offset:
         ld      hl, 0
         add     hl, de                  ; calculate destination - offset
         lddr                            ; copy from offset
+        inc     c
         pop     hl                      ; restore source
         add     a, a                    ; copy from literals or new offset?
         jr      nc, dzx0mb_literals6

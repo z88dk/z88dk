@@ -47,14 +47,12 @@ dzx0s_copy:
     add     a,a
     jr      nc,dzx0s_literals
 dzx0s_new_offset:
-    call    dzx0s_elias
-    ex      af,af'
-    pop     af
-    xor     a
-    sub     c
+    pop     bc
+    ld      c,$fe
+    call    dzx0s_elias_loop
+    inc     c
     ret     z
-    ld      b,a
-    ex      af,af'
+    ld      b,c
     ld      c,(hl)
     inc     hl
     rr      b

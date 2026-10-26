@@ -28,7 +28,6 @@ int bit_mask;
 int bit_value;
 int backtrack;
 int last_byte;
-int last_offset;
 
 int read_byte() {
     if (input_index == partial_counter) {
@@ -57,10 +56,10 @@ int read_bit() {
     return bit_value & bit_mask ? 1 : 0;
 }
 
-int read_interlaced_elias_gamma() {
+int read_interlaced_elias_gamma(int inverted) {
     int value = 1;
     while (!read_bit()) {
-        value = value << 1 | read_bit();
+        value = value << 1 | read_bit() ^ inverted;
     }
     return value;
 }
@@ -91,12 +90,13 @@ void write_bytes(int offset, int length) {
         exit(1);
     }
     while (length-- > 0) {
-        i = (int)output_index-offset;
+        i = output_index-offset;
         write_byte(output_data[i >= 0 ? i : BUFFER_SIZE+i]);
     }
 }
 
-void decompress() {
+void decompress(int classic_mode) {
+    int last_offset = INITIAL_OFFSET;
     int length;
     int i;
 
@@ -114,26 +114,22 @@ void decompress() {
     output_size = 0;
     bit_mask = 0;
     backtrack = FALSE;
-    last_offset = INITIAL_OFFSET;
 
 COPY_LITERALS:
-    length = read_interlaced_elias_gamma();
-    for (i = 0; i < length; i++) {
+    length = read_interlaced_elias_gamma(FALSE);
+    for (i = 0; i < length; i++)
         write_byte(read_byte());
-    }
-    if (read_bit()) {
+    if (read_bit())
         goto COPY_FROM_NEW_OFFSET;
-    }
 
 /*COPY_FROM_LAST_OFFSET:*/
-    length = read_interlaced_elias_gamma();
+    length = read_interlaced_elias_gamma(FALSE);
     write_bytes(last_offset, length);
-    if (!read_bit()) {
+    if (!read_bit())
         goto COPY_LITERALS;
-    }
 
 COPY_FROM_NEW_OFFSET:
-    last_offset = read_interlaced_elias_gamma();
+    last_offset = read_interlaced_elias_gamma(!classic_mode);
     if (last_offset == 256) {
         save_output();
         if (input_index != partial_counter) {
@@ -142,27 +138,29 @@ COPY_FROM_NEW_OFFSET:
         }
         return;
     }
-    last_offset = ((last_offset-1)<<7)+128-(read_byte()>>1);
+    last_offset = last_offset*128-(read_byte()>>1);
     backtrack = TRUE;
-    length = read_interlaced_elias_gamma()+1;
+    length = read_interlaced_elias_gamma(FALSE)+1;
     write_bytes(last_offset, length);
-    if (read_bit()) {
+    if (read_bit())
         goto COPY_FROM_NEW_OFFSET;
-    } else {
+    else
         goto COPY_LITERALS;
-    }
 }
 
 int main(int argc, char *argv[]) {
     int forced_mode = FALSE;
+    int classic_mode = FALSE;
     int i;
 
-    printf("DZX0 v1.5: Data decompressor by Einar Saukas\n");
+    printf("DZX0 v2.2: Data decompressor by Einar Saukas\n");
 
     /* process hidden optional parameters */
     for (i = 1; i < argc && *argv[i] == '-'; i++) {
         if (!strcmp(argv[i], "-f")) {
             forced_mode = TRUE;
+        } else if (!strcmp(argv[i], "-c")) {
+            classic_mode = TRUE;
         } else {
             fprintf(stderr, "Error: Invalid parameter %s\n", argv[i]);
             exit(1);
@@ -186,8 +184,9 @@ int main(int argc, char *argv[]) {
         input_name = argv[i];
         output_name = argv[i+1];
     } else {
-        fprintf(stderr, "Usage: %s [-f] input.zx0 [output]\n"
-                        "  -f      Force overwrite of output file\n", argv[0]);
+        fprintf(stderr, "Usage: %s [-f] [-c] input.zx0 [output]\n"
+                        "  -f      Force overwrite of output file\n"
+                        "  -c      Classic file format (v1.*)\n", argv[0]);
         exit(1);
     }
 
@@ -212,7 +211,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* generate output file */
-    decompress();
+    decompress(classic_mode);
 
     /* close input file */
     fclose(ifp);

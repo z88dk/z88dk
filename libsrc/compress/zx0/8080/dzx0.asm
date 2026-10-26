@@ -5,6 +5,7 @@
 ; v2 (2021-02-17) - 101 bytes forward / 100 bytes backward
 ; v3 (2021-02-22) - 99 bytes forward / 98 bytes backward
 ; v4 (2021-02-23) - 98 bytes forward / 97 bytes backward
+; v5 (2026-10-15) - forward decoder reads the ZX0 v2 offset MSB
 ; -----------------------------------------------------------------------------
 ; Parameters (forward):
 ;   HL: source address (compressed data)
@@ -47,8 +48,8 @@ dzx0s_copy:
 		add a
 		jnc dzx0s_literals
 dzx0s_new_offset:
-		call dzx0s_elias
 IF BACKWARD
+		call dzx0s_elias
 		inx sp
 		inx sp
 		dcr d
@@ -56,14 +57,12 @@ IF BACKWARD
 		dcr e
 		mov d,e
 ELSE
-		mov d,a
-		pop psw
-		xra a
-		sub e
+		pop d
+		mvi e,0feh
+		call dzx0s_elias_loop
+		inr e
 		rz
-		mov e,d
-		mov d,a
-		mov a,e
+		mov d,e
 ENDIF
 		push b
 		mov b,a

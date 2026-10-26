@@ -9,13 +9,13 @@
 dzx0_smartrcs_back:
         ld      bc, 1                   ; preserve default offset 1
         push    bc
-        dec     c
         ld      a, $80
 dzx0rb_literals:
         call    dzx0rb_elias            ; obtain length
 dzx0rb_literals_loop:
         call    dzx0rb_copy_byte        ; copy literals
         jp      pe, dzx0rb_literals_loop
+        inc     c
         add     a, a                    ; copy from last offset or new offset?
         jr      c, dzx0rb_new_offset
         call    dzx0rb_elias            ; obtain length
@@ -32,6 +32,7 @@ dzx0rb_copy_loop:
         pop     hl
         dec     hl
         jp      pe, dzx0rb_copy_loop
+        inc     c
         pop     hl                      ; restore offset
         ex      (sp), hl                ; preserve offset, restore source
         add     a, a                    ; copy from literals or new offset?
@@ -54,21 +55,19 @@ dzx0rb_new_offset:
         call    c, dzx0rb_elias_backtrack
         inc     bc
         jr      dzx0rb_copy
-dzx0rb_elias:
-        inc     c                       ; inverted interlaced Elias gamma coding
-dzx0rb_elias_loop:
+dzx0rb_elias_backtrack:
         add     a, a
+        rl      c
+        rl      b
+dzx0rb_elias:
+        add     a, a                    ; inverted interlaced Elias gamma coding
         jr      nz, dzx0rb_elias_skip
         ld      a, (hl)                 ; load another group of 8 bits
         dec     hl
         rla
 dzx0rb_elias_skip:
-        ret     nc
-dzx0rb_elias_backtrack:
-        add     a, a
-        rl      c
-        rl      b
-        jr      dzx0rb_elias_loop
+        jr      c, dzx0rb_elias_backtrack
+        ret
 dzx0rb_copy_byte:
         push    de                      ; preserve destination
         call    dzx0rb_convert          ; convert destination
