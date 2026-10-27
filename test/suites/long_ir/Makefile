@@ -57,6 +57,7 @@ all:	ixind.bin
 all:	bchand.bin bchand_fp.bin bchand_8080.bin bchand_gbz80.bin
 all:	constcond.bin constcond_fp.bin constcond_8080.bin constcond_gbz80.bin
 all:	bytecmprr.bin bytecmprr_fp.bin bytecmprr_8080.bin bytecmprr_gbz80.bin bytecmprr_r2ka.bin bytecmprr_z180.bin
+all:	ldirect.bin ldirect_fp.bin ldirect_8080.bin ldirect_gbz80.bin ldirect_r2ka.bin ldirect_z180.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
 all:	derefcmp_bcstep.bin derefcmp_bcstep_8080.bin
 all:	directwiden.bin directwiden_z80n.bin directwiden_ez80_z80.bin directwiden_r800.bin
@@ -2827,6 +2828,31 @@ bytecmprr_r2ka.bin: $(SOURCES) bytecmprr.c
 	$(runtest_r2ka)
 
 bytecmprr_z180.bin: $(SOURCES) bytecmprr.c
+	$(compile_z180)
+	$(runtest_z180)
+
+# A pointer-read byte goes straight to its register where A is dead. See the file header.
+ldirect.bin: $(SOURCES) ldirect.c
+	$(compile)
+	$(runtest)
+
+ldirect_fp.bin: $(SOURCES) ldirect.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+ldirect_8080.bin: $(SOURCES) ldirect.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ldirect_gbz80.bin: $(SOURCES) ldirect.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ldirect_r2ka.bin: $(SOURCES) ldirect.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+ldirect_z180.bin: $(SOURCES) ldirect.c
 	$(compile_z180)
 	$(runtest_z180)
 

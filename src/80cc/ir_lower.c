@@ -2339,6 +2339,57 @@ static void gw_fold_byte_global_widens(char **lines, int n, char *drop)
     }
 }
 
+/* [ld-direct] `ld a,(hl|ix+d|iy+d); ld r,a` is one instruction, `ld r,(...)`,
+   when A is dead afterwards: the byte goes straight to r. Same shape and same
+   obligation as [gwiden] — the fold deletes the only instruction that puts the
+   byte in A, so it runs only where gw_a_dead_after proves A is overwritten
+   unread. Only the register-indirect and indexed sources qualify: `(bc)`,
+   `(de)` and `(nn)` have no `ld r,(...)` form. A trailing `;volatile` stamp
+   fails the exact-shape test and keeps the access as written.
+   IR_OFF=ld-direct opts out. */
+static int lddirect_enabled(void)
+{
+    return !opt_disabled("ld-direct");
+}
+
+/* `\tld\ta,(hl)\n`, `\tld\ta,(ix+4)\n`, `\tld\ta,(iy-2)\n` and nothing else. */
+static int ld_direct_src(const char *line)
+{
+    if (strncmp(line, "\tld\ta,(", 7)) return 0;
+    const char *p = line + 7;                      /* just past '(' */
+    if (!strncmp(p, "hl)\n", 4)) return 1;
+    if (strncmp(p, "ix", 2) && strncmp(p, "iy", 2)) return 0;
+    if (p[2] != '+' && p[2] != '-') return 0;
+    const char *q = p + 3;
+    if (!isdigit((unsigned char)*q)) return 0;
+    while (isdigit((unsigned char)*q)) q++;
+    return q[0] == ')' && q[1] == '\n';
+}
+
+/* `\tld\tr,a\n` for r in b c d e h l. */
+static int ld_direct_dst(const char *line)
+{
+    if (strncmp(line, "\tld\t", 4)) return 0;
+    char r = line[4];
+    return strchr("bcdehl", r) && r && !strcmp(line + 5, ",a\n");
+}
+
+static void gw_fold_byte_ld_direct(char **lines, int n, char *drop)
+{
+    if (!lddirect_enabled()) return;
+    for (int i = 0; i + 1 < n; i++) {
+        if (!ld_direct_src(lines[i]) || !ld_direct_dst(lines[i + 1])) continue;
+        if (drop[i] || drop[i + 1]) continue;
+        if (!gw_a_dead_after(lines, n, i + 2)) continue;
+        char *nl = malloc(strlen(lines[i]) + 4);
+        if (!nl) continue;
+        sprintf(nl, "\tld\t%c,%s", lines[i + 1][4], lines[i] + 6);   /* "(...)\n" */
+        free(lines[i]); lines[i] = nl;
+        drop[i + 1] = 1;                           /* the `ld r,a` is now dead */
+        i++;
+    }
+}
+
 /* bc-flow: follow intra-function branches when deciding BC liveness in the
    park sweep. Without it every branch is treated as "a successor may read BC",
    which keeps a stash alive that the target provably never reads — 64 of the
@@ -4158,6 +4209,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            is the only place in the pipeline with real per-line liveness. copt
            did it blind and miscompiled; see gw_fold_byte_global_widens. */
         gw_fold_byte_global_widens(lines, n, drop);
+        gw_fold_byte_ld_direct(lines, n, drop);
         fold_hl_const_reuse(lines, drop, n);
         /* [IR_DEADDE_FOLD] Delete a store-then-dead-reload bracket where DE
            was never touched in between — see the function comment above.
