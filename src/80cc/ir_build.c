@@ -8479,8 +8479,8 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
     }
 
     /* IR_DEFASSIGN_VERIFY: run before ir_alloc/ir_lower ever see f, so the
-       result is frame-mode independent (see ir_analysis.h). No-op unless
-       the env var is set. */
+       result is frame-mode independent (see ir_analysis.h). The default
+       warns; IR_DEFASSIGN_VERIFY=2 aborts. */
     ir_verify_definite_assignment(f);
 
     /* Flag a function that uses an IX-clobbering maths helper so the

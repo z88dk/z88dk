@@ -1002,11 +1002,44 @@ static void ss_gen_op(Func *f, int b, int j, int g, int nv,
 
 }
 
+/* One edge into the backward slot-live set. */
+static void ss_union_target(const Func *f, int sb, char **lin, char *work, int nv)
+{
+    if (sb < 0 || sb >= f->n_bbs || !lin[sb]) return;
+    for (int v = 0; v < nv; v++)
+        if (lin[sb][v]) work[v] = 1;
+}
+
+/* A store later in this block kills the slot only on the fall-through.
+   The block-end union of succ[2] is already undone by that store by the
+   time the walk reaches an earlier exit, and succ[2] drops a third
+   target. Re-seed each branch's own target so the store that feeds the
+   taken edge stays live. Same edges as dd_live_on_any_succ. */
+static void ss_union_op_edges(const Func *f, const Op *op, char **lin,
+                              char *work, int nv)
+{
+    switch (op->kind) {
+    case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+    case IR_DEREF_CMP_BR: case IR_COPY_STEP_BRZ:
+        ss_union_target(f, op->label, lin, work, nv);
+        break;
+    case IR_SWITCH:
+        if (!op->sw) break;
+        for (int c = 0; c < op->sw->n_cases; c++)
+            ss_union_target(f, op->sw->target_bb[c], lin, work, nv);
+        ss_union_target(f, op->sw->default_bb, lin, work, nv);
+        break;
+    default:
+        break;
+    }
+}
+
 /* Backward slot-liveness over the CFG. Returns a [total_ops] array:
    dead[g]==1 iff the spill store at op g writes a slot no reload reads before
-   the next store — so the store is dead and the value reaches readers in HL.
-   Per op the store KILLs its vreg and the GEN set (ss_gen_op) re-adds
-   reloaded vregs; dead iff not slot-live immediately after. Caller frees. */
+   the next store on every path — so the store is dead and the value reaches
+   readers in HL. Per op the store KILLs its vreg and the GEN set
+   (ss_gen_op) re-adds reloaded vregs; a branch first re-seeds its target.
+   Dead iff not slot-live immediately after. Caller frees. */
 static signed char *ss_compute_dead(Func *f, const int *op_base,
                                     int total_ops, const int *op_store,
                                     const int *op_reload,
@@ -1043,6 +1076,7 @@ static signed char *ss_compute_dead(Func *f, const int *op_base,
             }
             for (int j = bb->n_ops - 1; j >= 0; j--) {
                 int g = op_base[b] + j;
+                ss_union_op_edges(f, &bb->ops[j], lin, work, nv);
                 int sv = op_store[g];
                 if (sv >= 0 && sv < nv) work[sv] = 0;        /* store kills */
                 ss_gen_op(f, b, j, g, nv, op_reload, op_cacheread, work);
@@ -1066,6 +1100,7 @@ static signed char *ss_compute_dead(Func *f, const int *op_base,
         }
         for (int j = bb->n_ops - 1; j >= 0; j--) {
             int g = op_base[b] + j;
+            ss_union_op_edges(f, &bb->ops[j], lin, work, nv);
             int sv = op_store[g];
             if (sv >= 0 && sv < nv) { dead[g] = work[sv] ? 0 : 1; work[sv] = 0; }
             ss_gen_op(f, b, j, g, nv, op_reload, op_cacheread, work);

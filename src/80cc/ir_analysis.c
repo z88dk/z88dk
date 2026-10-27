@@ -451,15 +451,58 @@ static int defassign_verify_level(void)
     return opt_disabled("defassign-verify") ? 0 : 3;
 }
 
+/* Push this block's OUT into one successor and mark it reachable.
+   BB 0 stays pinned to its entry seed (params and nothing else). */
+static void defassign_to_succ(const Func *f, int suc, const char *out,
+                              char *in_set, char *reach, int n, int may,
+                              int *changed)
+{
+    if (suc <= 0 || suc >= f->n_bbs) return;
+    if (!reach[suc]) { reach[suc] = 1; *changed = 1; }
+    char *sin = in_set + (size_t)suc * (size_t)n;
+    for (int v = 0; v < n; v++) {
+        if (may) {
+            if (out[v] && !sin[v]) { sin[v] = 1; *changed = 1; }
+        } else if (sin[v] && !out[v]) {
+            sin[v] = 0;
+            *changed = 1;
+        }
+    }
+}
+
+/* Every branch op is an edge. succ[2] keeps two targets and drops the
+   rest, so a parameter read past the third exit looked unwritten. */
+static void defassign_block_succs(const Func *f, const BB *bb, const char *out,
+                                  char *in_set, char *reach, int n, int may,
+                                  int *changed)
+{
+    for (int j = 0; j < bb->n_ops; j++) {
+        const Op *op = &bb->ops[j];
+        switch (op->kind) {
+        case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+        case IR_DEREF_CMP_BR: case IR_COPY_STEP_BRZ:
+            defassign_to_succ(f, op->label, out, in_set, reach, n, may, changed);
+            break;
+        case IR_SWITCH:
+            if (!op->sw) break;
+            for (int c = 0; c < op->sw->n_cases; c++)
+                defassign_to_succ(f, op->sw->target_bb[c], out, in_set, reach, n, may, changed);
+            defassign_to_succ(f, op->sw->default_bb, out, in_set, reach, n, may, changed);
+            break;
+        default:
+            break;
+        }
+    }
+    defassign_to_succ(f, bb->succ[0], out, in_set, reach, n, may, changed);
+    defassign_to_succ(f, bb->succ[1], out, in_set, reach, n, may, changed);
+}
+
 /* Forward "must be defined" dataflow at BB granularity: MEET = intersection
-   over predecessors, GEN[bb] = every vreg defined anywhere in bb (valid
-   because a BB runs straight-line to its terminator — if bb defines v at
-   all, v is defined by the time control leaves bb). Predecessors aren't
-   used directly (bb->pred is never populated by ir_build — see ir_build.c);
-   instead this propagates forward along successors, AND-ing each bb's
-   computed OUT into every successor's IN, same shape ir_compute_liveness
-   uses for live_out but MUST/intersect instead of MAY/union and forward
-   instead of backward. Monotone (sets only shrink), so it terminates. */
+   over predecessors, GEN[bb] = every vreg defined anywhere in bb (a def
+   after a side exit still counts — block granularity, same as before).
+   Predecessors aren't used directly (bb->pred is never populated by
+   ir_build — see ir_build.c); this propagates forward along every branch
+   target. May-mode sets only grow; must-mode sets only shrink. */
 void ir_verify_definite_assignment(const Func *f)
 {
     int level = defassign_verify_level();
@@ -473,10 +516,12 @@ void ir_verify_definite_assignment(const Func *f)
     char *out    = malloc((size_t)n);
     char *seen   = malloc((size_t)n);
     char *reported = calloc((size_t)n, 1);
-    if (!in_set || !out || !seen || !reported) {
-        free(in_set); free(out); free(seen); free(reported);
+    char *reach = calloc((size_t)f->n_bbs, 1);
+    if (!in_set || !out || !seen || !reported || !reach) {
+        free(in_set); free(out); free(seen); free(reported); free(reach);
         return;
     }
+    reach[0] = 1;
 
     /* Optimistic start: every BB "fully defined" on entry except BB 0
        (the function entry), which starts empty save for params. An
@@ -494,6 +539,7 @@ void ir_verify_definite_assignment(const Func *f)
     do {
         changed = 0;
         for (int b = 0; b < f->n_bbs; b++) {
+            if (!reach[b]) continue;
             const BB *bb = &f->bbs[b];
             char *bin = in_set + (size_t)b * n;
             memcpy(out, bin, (size_t)n);
@@ -512,16 +558,7 @@ void ir_verify_definite_assignment(const Func *f)
                 if (op->kind == IR_ASM && op->dst >= 0 && op->dst < n)
                     out[op->dst] = 1;
             }
-            int ns = ir_bb_n_succ(bb);
-            for (int s = 0; s < ns; s++) {
-                int suc = ir_bb_succ_at(bb, s);
-                if (suc <= 0 || suc >= f->n_bbs) continue;   /* keep BB0 pinned */
-                char *sin = in_set + (size_t)suc * n;
-                for (int v = 0; v < n; v++) {
-                    if (may) { if (out[v] && !sin[v]) { sin[v] = 1; changed = 1; } }
-                    else if (sin[v] && !out[v]) { sin[v] = 0; changed = 1; }
-                }
-            }
+            defassign_block_succs(f, bb, out, in_set, reach, n, may, &changed);
         }
     } while (changed);
 
@@ -530,6 +567,9 @@ void ir_verify_definite_assignment(const Func *f)
        with no guaranteed prior write on some path reaching it. One
        report per vreg per function. */
     for (int b = 0; b < f->n_bbs; b++) {
+        /* A read in a block nothing reaches is not a path. The for-loop
+           step of an infinite loop whose body always returns is that shape. */
+        if (!reach[b]) continue;
         const BB *bb = &f->bbs[b];
         memcpy(seen, in_set + (size_t)b * n, (size_t)n);
         for (int j = 0; j < bb->n_ops; j++) {
@@ -567,8 +607,9 @@ void ir_verify_definite_assignment(const Func *f)
 
     int any = 0;
     for (int v = 0; v < n; v++) any |= reported[v];
-    free(in_set); free(out); free(seen);
-    if (any && level >= 2) {
+    free(in_set); free(out); free(seen); free(reach);
+    /* Level 3 (the default) warns. Only IR_DEFASSIGN_VERIFY=2 aborts. */
+    if (any && level == 2) {
         fprintf(stderr, "IR_DEFASSIGN_VERIFY: aborting (level 2)\n");
         free(reported);
         exit(1);
