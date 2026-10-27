@@ -174,6 +174,8 @@ typedef struct {
     int      base;        /* radix: 10 / 16 / 8 / 2. C types a hex/octal/binary
                              constant that overflows the signed range as the
                              corresponding UNSIGNED type; decimal stays signed. */
+    int      suffix_long; /* 1 if an L or LL suffix was written. Magnitude
+                             promotion to long does not set this. */
 } TokenNumeric;
 
 typedef struct {

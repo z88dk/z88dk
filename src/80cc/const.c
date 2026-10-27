@@ -49,6 +49,7 @@ int constant(LVALUE* lval)
     lval->val_type = KIND_INT;
     lval->ltype = type_int;
     lval->is_const = 1; /* assume constant will be found */
+    lval->explicit_long = 0;
     if (fnumber(lval)) {
         lval->flags = FLAGS_NONE;
         lval->node = ast_literal(lval->ltype, lval->const_val);
@@ -57,6 +58,7 @@ int constant(LVALUE* lval)
         lval->node = lval->int_const_valid
                    ? ast_literal_int(lval->ltype, lval->int_const_val)
                    : ast_literal(lval->ltype, lval->const_val);
+        lval->node->explicit_long = lval->explicit_long;
         return (1);
     } else if (tstr(&val)) {
         lval->const_val = val;
@@ -141,6 +143,8 @@ int number(LVALUE *lval)
     lval->const_val = value;
     lval->int_const_val = (uint64_t)value;
     lval->int_const_valid = 1;
+    /* `65536` is long by magnitude. `65536L` is long by suffix. */
+    lval->explicit_long = tok->num.suffix_long ? 1 : 0;
 
     /* Magnitude-based typing, matches legacy behaviour.  Use the token's
        exact integer value here: const_val is a zdouble and may not represent

@@ -482,10 +482,60 @@ static int64_t fold_sext(int64_t v, int width)
     return (int64_t)((uint64_t)v << sh) >> sh;
 }
 
+static int fold_type_width(const Type *t)
+{
+    Kind k = t ? t->kind : KIND_INT;
+    if (k == KIND_CHAR) return 8;
+    if (k == KIND_LONG || k == KIND_PTR || k == KIND_CPTR) return 32;
+    if (k == KIND_LONGLONG) return 64;
+    return 16;
+}
+
+static int64_t fold_low_bits(int64_t raw, int width)
+{
+    if (width >= 64) return raw;
+    return (int64_t)((uint64_t)raw & (((uint64_t)1 << width) - 1));
+}
+
+/* Add/sub/mul/bitwise/shl. A stored sign extension keeps its signed
+   value, so `1L + (int)-1` is 0 and `1L + (3 - 5)` is -1. A truncated
+   overflow (high bits clear, narrow sign bit set) keeps those low
+   bits, so `65536 - (16384 * 2)` is 32768. */
+static int64_t fold_arith_bits(const Node *n)
+{
+    int width, raw_is_sext;
+    int64_t raw;
+
+    if (!n) return 0;
+    raw = node_int_value(n);
+    width = fold_type_width(n->type);
+    if (!n->type || n->type->isunsigned || !kind_is_integer(n->type->kind))
+        return fold_low_bits(raw, width);
+    raw_is_sext = raw == fold_sext(raw, width);
+    return raw_is_sext ? raw : fold_low_bits(raw, width);
+}
+
+/* Signed div/mod and arithmetic >> read the operand as signed.
+   `(16384 * 2) / 2` is -16384. Unsigned operands stay bit patterns. */
+static int64_t fold_signed_bits(const Node *n)
+{
+    int64_t raw;
+    int width;
+
+    if (!n) return 0;
+    raw = node_int_value(n);
+    width = fold_type_width(n->type);
+    if (n->type && n->type->isunsigned)
+        return fold_low_bits(raw, width);
+    return fold_sext(raw, width);
+}
+
 static int64_t fold_integer_result(int64_t value, const Type *type)
 {
     int width;
     int is_unsigned;
+    int64_t lim;
+    uint64_t mask;
 
     if (!type || !kind_is_integer(type->kind)) return value;
     if (type->kind == KIND_CHAR) width = 8;
@@ -493,10 +543,17 @@ static int64_t fold_integer_result(int64_t value, const Type *type)
     else if (type->kind == KIND_LONG) width = 32;
     else width = 64;
     is_unsigned = type->isunsigned;
-    if (width == 64) return value;
+    if (width >= 64) return value;
+    mask = ((uint64_t)1 << width) - 1;
     if (is_unsigned)
-        return (int64_t)((uint64_t)value & (((uint64_t)1 << width) - 1));
-    return fold_sext(value, width);
+        return (int64_t)((uint64_t)value & mask);
+    /* In range: keep the sign extension. Out of range: keep the
+       truncated bits with the high bits clear, so arithmetic reads
+       the wrap as those bits (`65536 - (16384 * 2)` is 32768). */
+    lim = (int64_t)1 << (width - 1);
+    if (value >= -lim && value <= lim - 1)
+        return value;
+    return (int64_t)((uint64_t)value & mask);
 }
 
 /* The parser can hand ast_fold_constants a binary node before the type
@@ -599,7 +656,8 @@ static int eval_decimal_exact(Node *node, long double *out)
         if (kind_is_integer(node->type->kind)) {
             *out = node->type->isunsigned
                  ? (long double)node_int_bits(node)
-                 : (long double)node_int_value(node);
+                 : (long double)fold_sext(node_int_value(node),
+                                          fold_type_width(node->type));
             return 1;
         }
         if (kind_is_decimal(node->type->kind)) {
@@ -695,6 +753,82 @@ static int integer_literal_fits_zdouble(const Node *node)
 static int literal_truthy(Node *n);
 static int cse_type_bits(const Type *t);
 
+/* Narrow a fitted long on the first fold only. A later fold can see a
+   constant that const-prop made out of a variable (`65536 - n`); that
+   expression is still a long. */
+static int fold_narrow_calls = 1;
+
+static Node *fold_int_literal(Node *at, Type *type, uint64_t value,
+                              int explicit_long)
+{
+    Node *n = ast_literal_int(type ? type : type_int, value);
+    n->explicit_long = explicit_long ? 1 : 0;
+    if (at) {
+        n->filename = at->filename;
+        n->line = at->line;
+    }
+    return n;
+}
+
+static Type *call_func_type(const Node *call)
+{
+    if (call->sym && call->sym->ctype && call->sym->ctype->kind == KIND_FUNC)
+        return call->sym->ctype;
+    if (call->type && call->type->kind == KIND_FUNC)
+        return call->type;
+    return NULL;
+}
+
+/* K&R, an ellipsis, or an argument past the prototype has no type. */
+static int call_slot_untyped(const Type *ft, int index)
+{
+    Type *pt;
+
+    if (!ft || ft->funcattrs.oldstyle)
+        return 1;
+    if (!ft->parameters || index >= (int)array_len(ft->parameters))
+        return 1;
+    pt = array_get_byindex(ft->parameters, index);
+    return !pt || pt->kind == KIND_ELLIPSES;
+}
+
+/* An ellipsis or K&R slot has no parameter type. A folded long whose
+   value fits in 16 bits is pushed as an int. An L suffix or a cast to
+   long stays 32 bits. The last fastcall argument stays in registers. */
+static void fold_fitted_call_args(Node *call)
+{
+    Type *ft;
+    int n, i, fastcall;
+
+    if (!fold_narrow_calls || !call || !call->args)
+        return;
+    n = (int)array_len(call->args);
+    ft = call_func_type(call);
+    fastcall = ft && (ft->flags & FASTCALL);
+    for (i = 0; i < n; i++) {
+        Node *arg = array_get_byindex(call->args, i);
+        Node *repl;
+        int64_t val;
+
+        if (fastcall && i == n - 1)
+            continue;
+        if (!call_slot_untyped(ft, i))
+            continue;
+        if (!arg || arg->ast_type != AST_LITERAL || !arg->int_literal
+            || !arg->type || arg->type->kind != KIND_LONG || arg->explicit_long)
+            continue;
+        val = node_int_value(arg);
+        if (val < -32768 || val > 65535)
+            continue;
+        if (val > 32767)
+            repl = fold_int_literal(arg, type_uint, (uint64_t)(val & 0xffff), 0);
+        else
+            repl = fold_int_literal(arg, type_int,
+                                    (uint64_t)(int64_t)(int16_t)val, 0);
+        array_set_byindex(call->args, i, repl);
+    }
+}
+
 static void fold_visit(const AstSlot *slot, void *ctx)
 {
     (void)ctx;
@@ -729,10 +863,17 @@ Node *ast_fold_constants(Node *node)
                     return ast_literal(type_int, (zdouble)(fv == 0));
                 return node;
             }
-            int64_t v = node_int_value(node->operand), r;
+            int64_t v = (node->ast_type == OP_LNEG)
+                      ? node_int_value(node->operand)
+                      : fold_signed_bits(node->operand);
+            int64_t r;
             if (try_fold_unop(node->ast_type, v, &r)) {
                 Type *t = node->type ? node->type : node->operand->type;
-                return ast_literal_int(t ? t : type_int, (uint64_t)r);
+                if (node->ast_type == OP_LNEG)
+                    return fold_int_literal(node, type_int, (uint64_t)r, 0);
+                r = fold_integer_result(r, t);
+                return fold_int_literal(node, t, (uint64_t)r,
+                                        node->operand->explicit_long);
             }
         }
         return node;
@@ -765,6 +906,18 @@ Node *ast_fold_constants(Node *node)
             int64_t narrowed = v;
             Kind dst = node->type->kind;
             Kind src = node->operand->type->kind;
+            /* A wider signed cast sign-extends the source bits. A stored
+               overflow (`16384 * 2` kept as the int bits 32768) is still
+               the signed value -32768 when cast to long. */
+            if (kind_is_integer(src) && kind_is_integer(dst)) {
+                int sw = fold_type_width(node->operand->type);
+                int dw = fold_type_width(node->type);
+                if (dw > sw) {
+                    v = node->operand->type->isunsigned
+                      ? fold_low_bits(v, sw) : fold_sext(v, sw);
+                    narrowed = v;
+                }
+            }
             /* Reduce the literal to the TARGET type's representable range:
                mask to its width and reinterpret per its signedness. Not
                gated on dst<src — a same-width signedness change is also a
@@ -775,7 +928,6 @@ Node *ast_fold_constants(Node *node)
                leaves `(unsigned char)-7` as -7 and `(signed char)200` as
                200. In-range values mask to themselves (no-op). KIND src
                ordering: CHAR<SHORT<INT<LONG<LONGLONG. */
-            (void)src;
             if (kind_is_integer(dst)) {
                 int is_un = node->type->isunsigned;
                 int64_t lo = 0, hi = 0;
@@ -802,7 +954,8 @@ Node *ast_fold_constants(Node *node)
                     }
                 }
             }
-            return ast_literal_int(node->type, (uint64_t)narrowed);
+            return fold_int_literal(node, node->type, (uint64_t)narrowed,
+                                    dst == KIND_LONG || dst == KIND_LONGLONG);
         }
         /* A narrowing cast of a value ternary moves into the arms, so each
            arm computes only the bits the cast keeps and the join holds the
@@ -896,7 +1049,7 @@ Node *ast_fold_constants(Node *node)
                     node->filename, node->line,
                     "%s shifting by more than size of object, changed to zero",
                     dir);
-                return ast_literal_int(L->type, 0);
+                return fold_int_literal(node, L->type, 0, L->explicit_long);
             }
         }
         if (L && R && L->ast_type == AST_LITERAL && R->ast_type == AST_LITERAL) {
@@ -933,10 +1086,9 @@ Node *ast_fold_constants(Node *node)
                     return ast_literal(t ? t : type_int, dv);
                 }
             } else {
-                int64_t l = node_int_value(L);
-                int64_t r = node_int_value(R);
-                int64_t v;
+                int64_t l, r, v;
                 int fold_op = node->ast_type;
+                int explicit_long = 0;
                 /* `>>` is parsed OP_SSHR unconditionally; for an unsigned
                    LHS it shifts LOGICALLY (and the runtime lowers both to
                    the logical IR_SHR). Fold logically so `0x8000…ULL >> 1`
@@ -948,13 +1100,30 @@ Node *ast_fold_constants(Node *node)
                    below mis-handles mixed signedness (e.g. int vs unsigned
                    int at the 0x8000 boundary). Result type is always int. */
                 if (is_compare_op(fold_op)) {
+                    l = node_int_value(L);
+                    r = node_int_value(R);
                     if (try_fold_compare(fold_op, l, r, L->type, R->type, &v))
-                        return ast_literal_int(type_int, (uint64_t)v);
-                } else if (try_fold_binop(fold_op, l, r, &v)) {
-                    Type *t = node->type ? node->type
-                                         : fold_common_integer_type(L->type, R->type);
-                    v = fold_integer_result(v, t);
-                    return ast_literal_int(t ? t : type_int, (uint64_t)v);
+                        return fold_int_literal(node, type_int, (uint64_t)v, 0);
+                } else {
+                    if (fold_op == OP_DIV || fold_op == OP_MOD)
+                        l = fold_signed_bits(L), r = fold_signed_bits(R);
+                    else if (fold_op == OP_SSHR)
+                        l = fold_signed_bits(L), r = node_int_value(R);
+                    else if (fold_op == OP_USHR)
+                        l = fold_low_bits(node_int_value(L),
+                                          fold_type_width(L->type)),
+                        r = node_int_value(R);
+                    else
+                        l = fold_arith_bits(L), r = fold_arith_bits(R);
+                    if (try_fold_binop(fold_op, l, r, &v)) {
+                        Type *t = node->type ? node->type
+                                             : fold_common_integer_type(L->type, R->type);
+                        v = fold_integer_result(v, t);
+                        if (fold_op != OP_ANDAND && fold_op != OP_OROR)
+                            explicit_long = (L->explicit_long || R->explicit_long);
+                        return fold_int_literal(node, t ? t : type_int,
+                                                 (uint64_t)v, explicit_long);
+                    }
                 }
             }
         }
@@ -982,6 +1151,11 @@ Node *ast_fold_constants(Node *node)
             return node->els;
         return node;
     }
+
+    case AST_FUNC_CALL:
+    case AST_FUNCPTR_CALL:
+        fold_fitted_call_args(node);
+        return node;
 
     default:
         return node;
@@ -5445,7 +5619,11 @@ Node *ast_opt_run(Node *root)
        a candidate reads something a call or an indirect store can reach. */
     sym_set_init(&aopt_escaped);
     aopt_collect_escaped(root);
+    fold_narrow_calls = 1;
     if (!(c_opt_disable & OPT_DISABLE_FOLD)) root = ast_fold_constants(root);
+    /* Later folds must not shrink a long that only became constant
+       because a variable was propagated. */
+    fold_narrow_calls = 0;
     if (!(c_opt_disable & OPT_DISABLE_PROP)) root = ast_const_propagate(root);
     /* Re-fold: propagation may have created new fully-literal sub-trees
        (e.g. `int x = 5; int y = x + 1;` → `int y = 5 + 1;` → fold to 6). */
@@ -5503,6 +5681,7 @@ Node *ast_opt_run(Node *root)
        intact for threading, dead-code, demote etc. above. */
     if (!(c_opt_disable & OPT_DISABLE_LOOP_REVERSE)) root = ast_loop_reverse(root);
     sym_set_free(&aopt_escaped);
+    fold_narrow_calls = 1;
     return root;
 }
 
@@ -5638,6 +5817,7 @@ static Node *clone_literal(Node *lit)
     c->zval = lit->zval;
     c->ival = lit->ival;
     c->int_literal = lit->int_literal;
+    c->explicit_long = lit->explicit_long;
     c->filename = lit->filename;
     c->line = lit->line;
     return c;
@@ -5658,8 +5838,13 @@ static Node *coerce_literal_to_sym(Node *lit, SYMBOL *sym)
     Type *st = sym ? sym->ctype : NULL;
     if (!st) return lit;
     if (lit->type && lit->type->kind == st->kind
-        && !!lit->type->isunsigned == !!st->isunsigned)
-        return lit;                              /* already the right type */
+        && !!lit->type->isunsigned == !!st->isunsigned) {
+        /* A long object keeps its width when the constant is substituted
+           into an untyped call. */
+        if (st->kind == KIND_LONG || st->kind == KIND_LONGLONG)
+            lit->explicit_long = 1;
+        return lit;
+    }
     Node *folded = ast_fold_constants(ast_cast(st, lit));
     if (folded && folded->ast_type == AST_LITERAL
         && folded->type && folded->type->kind == st->kind)
