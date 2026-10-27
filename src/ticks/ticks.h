@@ -44,6 +44,8 @@ extern long long st;
 extern int trace;
 extern int c_rom_size;		/* amount of memory in low addresses that is read-only */
 extern int c_ioport;
+extern int c_iotimer;		/* port that resets / samples the cycle count, or -1 */
+extern int c_mmtimer;		/* address that receives the 8-byte count, or -1 */
 extern int break_required;
 
 extern int c_rc2014_mode;
@@ -154,6 +156,8 @@ extern void apu_write_command(uint8_t cmd);
 
 extern int hook_console_out(int port, int value);
 extern int hook_console_in(int port);
+extern int hook_iotimer_out(int port, int value);
+extern int hook_iotimer_in(int port);
 
 // ez80
 extern void ez80_lea_rr_xyd(uint8_t opcode);

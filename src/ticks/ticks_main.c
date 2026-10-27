@@ -20,6 +20,8 @@ int    c_rc2014_mode = 0;
 int    c_cpm_mode = 0;
 int    c_rom_size = 0;
 int    c_ioport = -1;
+int    c_iotimer = -1;
+int    c_mmtimer = -1;
 int    c_autolabel = 0;
 int    c_z80asm_tests = 0;
 int    c_no_cycles = 0;      /* suppress end-of-run cycle-count printf */
@@ -181,6 +183,10 @@ static void usage(void)
     printf("  -ide0 <file>    file to be ide device 0\n");
     printf("  -ide1 <file>   Set file to be ide device 1\n");
     printf("  -iochar X      Set port X to be character input/output\n");
+    printf("  -iotimer X     Set port X to the cycle-count timer (0..255)\n");
+    printf("  -mmtimer X     Symbol or hex address for the 8-byte count\n");
+    printf("                 A write to -iotimer resets that count; a read\n");
+    printf("                 stores it little-endian and returns 0 in A\n");
     printf("  -no-cycles     Suppress end-of-run cycle-count printf (makes ticks\n");
     printf("                 silent on normal exit; program's own stdout unaffected).\n");
     printf("                 Useful for using ticks as a drop-in CP/M emulator in\n");
@@ -190,7 +196,7 @@ static void usage(void)
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n");
     printf("  -x <file>      Symbol or map file to read\n");
 	printf("  -script <file> Script file to run at the console\n");
-    printf("                 Use before -pc,-start,-end to enable symbols\n\n");
+    printf("                 Use before -pc,-start,-end,-mmtimer to enable symbols\n\n");
     printf("  Default values for -pc, -start and -end are 0000 if omitted.\n");
     printf("  When the program exits, it'll show the number of cycles between start and end trigger in decimal\n\n");
 }
@@ -280,6 +286,12 @@ int main (int argc, char **argv){
             hook_io_set_ide_device(1, argv[1]);
           } else if ( strcmp(&argv[0][1], "iochar") == 0 ) {
             c_ioport = strtol(argv[1], NULL, 10);
+          } else if ( strcmp(&argv[0][1], "iotimer") == 0 ) {
+            char *end = NULL;
+            long port = strtol(argv[1], &end, 0);
+            if (end == argv[1] || *end || port < 0 || port > 255)
+              exit_log(1, "-iotimer port must be 0..255\n");
+            c_iotimer = (int)port;
           } else {
             intr= strtol(argv[1], NULL, 10);
           }
@@ -306,6 +318,20 @@ int main (int argc, char **argv){
           read_symbol_file(argv[1]);
           break;
         case 'm':
+          if ( strcmp(&argv[0][1], "mmtimer") == 0 ) {
+            char *end = NULL;
+            long addr;
+            symbol_addr = symbol_resolve(argv[1], NULL);
+            if (symbol_addr != -1) {
+              c_mmtimer = symbol_addr;
+            } else {
+              addr = strtol(argv[1], &end, 16);
+              if (end == argv[1] || *end || addr < 0 || addr > 0xffff)
+                exit_log(1, "-mmtimer needs a symbol or a hex address\n");
+              c_mmtimer = (int)addr;
+            }
+            break;
+          }
           if ( strcmp(&argv[0][1],"mz80") == 0 ) {
             c_cpu = CPU_Z80;
           } else if ( strcmp(&argv[0][1],"mz80_strict") == 0 ) {
@@ -471,6 +497,11 @@ int main (int argc, char **argv){
     exit(EXIT_FAILURE);
   }
 
+
+  if ((c_iotimer >= 0) != (c_mmtimer >= 0))
+    exit_log(1, "-iotimer and -mmtimer must be used together\n");
+  if (c_iotimer >= 0 && c_ioport >= 0 && (c_iotimer & 0xff) == (c_ioport & 0xff))
+    exit_log(1, "-iotimer and -iochar must use different ports\n");
 
   cpu_run(c_max_runticks, intr, intr, start, end);
 

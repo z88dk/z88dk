@@ -87,6 +87,7 @@ More detailed, but still incomplete changelist:
 - [z88dk-gdb] IM 2 support, watchpoints, O-packets, and the Z80 I and R registers
 - [z88dk-ticks] 8085, z80n, kc160, r4k, r6k fixes
 - [z88dk-ticks] Support for the Rabbit banking model
+- [z88dk-ticks] -iotimer and -mmtimer read the cycle count from inside the program
 - [z88dk-zsdcc] Upgraded to SDCC 4.6.0 r16639
 - [zcc] add multi compiler selection tool (sccz80, 80cc-sp, 80cc-fp)
 - [zcc] llvm-z80 backend for classic C
