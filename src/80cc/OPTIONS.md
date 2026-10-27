@@ -300,6 +300,7 @@ exists (ADR 0010).
 | `alu-fold` | no `(ix+d)` ALU fold for AND/OR/XOR |
 | `ixd-fold` | no `(ix+d)` fold for the word accumulator |
 | `r6k-ixd-alu` | no Rabbit 6000 indexed ALU form |
+| `cmp-byte` | an unsigned `<`, `<=`, `>`, `>=` of two byte values is widened to 16 bits and compared with `sbc hl,de` instead of `ld a,x; cp y` |
 | `cmp-hi` | an unsigned `<`/`>=` against a constant compares both bytes |
 | `cmp-k` | a compare against a constant is not given its immediate form |
 | `cmp-k-signed` | (not on the 8085) a signed word compare against a constant is not done byte-wise through A (`sub K_lo; ld a,hi; rla; ccf; rra; sbc a,K_hi^0x80`), so it goes through `sbc hl,de` and the overflow correction |

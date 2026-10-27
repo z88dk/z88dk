@@ -9569,7 +9569,10 @@ static int ir_lower_func_body(FILE *out, Func *f)
                    evicted by a global load, so the A-carry can hand it to the
                    next block and the value's own slot — and often the whole
                    frame — falls away. */
-                if (!use_ok && (uop->kind == IR_CMP_EQ || uop->kind == IR_CMP_NE)
+                if (!use_ok && (uop->kind == IR_CMP_EQ || uop->kind == IR_CMP_NE
+                                || ((uop->kind == IR_CMP_ULT || uop->kind == IR_CMP_UGE
+                                     || uop->kind == IR_CMP_UGT || uop->kind == IR_CMP_ULE)
+                                    && !opt_disabled("cmp-byte")))
                     && uop->src[0] >= 0 && uop->src[0] < f->n_vregs
                     && uop->src[1] >= 0 && uop->src[1] < f->n_vregs
                     && f->vregs[uop->src[0]].width == 1
