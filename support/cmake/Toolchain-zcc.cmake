@@ -8,13 +8,20 @@ if (NOT DEFINED ZCCTARGET)
     message(FATAL_ERROR "Please define variable ZCCTARGET to specify +configuration for zcc. Try the following: cmake -DZCCTARGET=<target> --toolchain=${CMAKE_CURRENT_LIST_DIR}/Toolchain-zcc.cmake")
 endif()
 
+# These generators pick their own compiler and ignore CMAKE_C_COMPILER.
+if(CMAKE_GENERATOR MATCHES "Visual Studio|Xcode")
+    message(FATAL_ERROR "The ${CMAKE_GENERATOR} generator does not call CMAKE_C_COMPILER. Use Ninja or Unix Makefiles.")
+endif()
+
 set(CMAKE_C_COMPILER zcc)
 set(CMAKE_ASM_COMPILER zcc)
 set(CMAKE_AR z88dk-z80asm)
 
 set(CMAKE_C_COMPILER_ID Z88DK CACHE INTERNAL "")
+set(CMAKE_C_COMPILER_ID_RUN TRUE)
 set(CMAKE_C_SIMULATE_ID Z88DK CACHE INTERNAL "")
 set(CMAKE_ASM_COMPILER_ID Z88DK CACHE INTERNAL "")
+set(CMAKE_ASM_COMPILER_ID_RUN TRUE)
 
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_C_COMPILER_WORKS TRUE CACHE INTERNAL "")
