@@ -7,6 +7,23 @@
 extern unsigned int  __LIB__ in_Joystick1(void);
 extern unsigned int  __LIB__ in_Joystick2(void);
 
+// Mouse (the SAM Coupe mouse interface), as in input.h: buttons are 00000MRL
+// active high.  The position is 0..255 by 0..191 (IN_MAX_X, IN_MAX_Y).
+// in_MouseSAMInit returns non-zero if a mouse answered: with none,
+// in_MouseSAM returns no buttons and leaves the position alone (it looks for
+// one again now and then), so a program can fall back to the keyboard.
+// The state is in the library's bss: it must be mapped when these are called.
+extern int  __LIB__ in_MouseSAMInit(void);
+extern int  __LIB__ in_MouseSAMPresent(void);
+extern void __LIB__ in_MouseSAM(unsigned char *buttons, unsigned int *xcoord, unsigned int *ycoord) __smallc;
+extern void __LIB__ in_MouseSAMSetPos(unsigned int xcoord, unsigned int ycoord) __smallc;
+
+extern void __LIB__ in_MouseSAM_callee(unsigned char *buttons, unsigned int *xcoord, unsigned int *ycoord) __smallc __z88dk_callee;
+extern void __LIB__ in_MouseSAMSetPos_callee(unsigned int xcoord, unsigned int ycoord) __smallc __z88dk_callee;
+
+#define in_MouseSAM(a,b,c)     in_MouseSAM_callee(a,b,c)
+#define in_MouseSAMSetPos(a,b) in_MouseSAMSetPos_callee(a,b)
+
 // Hardware ports
 __sfr __at 0xfa IO_LMPR;       // Bottom 32k 
 __sfr __at 0xfb IO_HMPR;       // Top 32k

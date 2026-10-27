@@ -55,6 +55,7 @@ section code_l
 section code_l_sccz80
 section code_l_sdcc
 section code_l_clang
+section code_l_xcc
 section code_locale
 section code_math
 section code_network

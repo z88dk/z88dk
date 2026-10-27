@@ -315,7 +315,7 @@ extern void __LIB__  in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uin
 #endif
 
 #ifdef __SAM__
-
+   #define IN_MAX_X    255  /* largest x coord  */
    #define IN_MAX_Y    191  /* largest y coord  */
 #endif
 
