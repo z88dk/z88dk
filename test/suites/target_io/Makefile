@@ -2,6 +2,7 @@ include ../make.config
 
 # target_io — serial (printf/scanf) + disk (creat/write/lseek/read/close)
 # under z88dk-ticks for multiple targets.
+# iotimer.asm checks the cycle-count port (-iotimer / -mmtimer) beside -iochar.
 #
 # Layout:
 #   io_tests.c              shared tests
@@ -39,7 +40,8 @@ all: \
 	test_cpm_new_z80.com \
 	test_rc2014_z80_CODE.bin \
 	test_rc2014_8085_CODE.bin \
-	test_rc2014_cpm.com
+	test_rc2014_cpm.com \
+	test_iotimer
 
 # ---------------------------------------------------------------------------
 # CP/M classic — native fcntl via BDOS; default subtype only (Z80 + 8085)
@@ -119,7 +121,37 @@ test_rc2014_cpm.com: $(COMMON_NATIVE)
 #	@printf '%s\n' '$(SCANF_INPUT)' | $(MACHINE) $@ || exit 1
 # ---------------------------------------------------------------------------
 
+# Issue 134: write resets the readable count, read stores 8 LE bytes.
+# The printed hex is a snapshot from before those writes. Exit Ticks must
+# be larger, which fails if a write clears the emulator counter.
+define iotimer_run
+	@echo "$(GREEN)" `date +%H:%M:%S` " Starting iotimer $(1) $(RESET)"
+	@out=$$($(MACHINE) $(1) -x $(2) -iochar 1 -iotimer 2 -mmtimer tickbuf $(3) 2>&1); \
+	ec=$$?; printf '%s\n' "$$out"; \
+	snap=$$(printf '%s\n' "$$out" | sed -n 's/^T\([0-9A-F]\{4\}\)P.*/\1/p'); \
+	host=$$(printf '%s\n' "$$out" | sed -n 's/^Ticks: //p'); \
+	test $$ec -eq 0 && test -n "$$snap" && test -n "$$host" && \
+	test $$(printf '%d' 0x$$snap) -lt $$host \
+		|| { echo "$(RED)" `date +%H:%M:%S` " iotimer $(1) failure $(RESET)"; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " iotimer $(1) completed $(RESET)"
+endef
+
+test_iotimer: iotimer.asm
+	z88dk-z80asm -mz80 -b -s -otest_iotimer_z80.bin $<
+	$(call iotimer_run,-mz80,iotimer.sym,test_iotimer_z80.bin)
+	rm -f iotimer.o iotimer.sym
+	z88dk-z80asm -m8080 -b -s -otest_iotimer_8080.bin $<
+	$(call iotimer_run,-m8080,iotimer.sym,test_iotimer_8080.bin)
+	$(call iotimer_run,-m8085,iotimer.sym,test_iotimer_8080.bin)
+	$(call iotimer_run,-mvm1,iotimer.sym,test_iotimer_8080.bin)
+	rm -f iotimer.o iotimer.sym
+	z88dk-z80asm -mz180 -b -s -otest_iotimer_z180.bin $<
+	$(call iotimer_run,-mz180,iotimer.sym,test_iotimer_z180.bin)
+	rm -f iotimer.o iotimer.sym
+
+.PHONY: test_iotimer
+
 clean:
-	rm -f *.com *.bin *.map *.o *.def zcc_opt.def *~ \
+	rm -f *.com *.bin *.map *.o *.sym *.def zcc_opt.def *~ \
 		suite.dat a.dat b.dat fopen.dat \
 		test_cpm_* test_rc2014_* TEST_CPM_* TEST.DAT test.dat APP.COM app
