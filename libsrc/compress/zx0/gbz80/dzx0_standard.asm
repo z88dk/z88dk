@@ -17,7 +17,9 @@ dzx0_standard:
         ld      a, $80
 dzx0s_literals:
         call    dzx0s_elias             ; obtain length
+        push    af                      ; preserve bitstream
         call    dzx0s_ldir              ; copy literals
+        pop     af
         add     a, a                    ; copy from last offset or new offset?
         jr      c, dzx0s_new_offset
         call    dzx0s_elias             ; obtain length
@@ -28,12 +30,13 @@ dzx0s_copy:
         ld      a, (hl+)
         ld      h, (hl)
         ld      l, a
-        pop     af
         add     hl, de                  ; calculate destination - offset
         call    dzx0s_ldir              ; copy from offset
+        pop     af
         pop     hl                      ; restore source
         add     a, a                    ; copy from literals or new offset?
         jr      nc, dzx0s_literals
+
 dzx0s_new_offset:
         pop     bc                      ; discard last offset
         ld      c, $fe                  ; prepare negative offset
@@ -50,6 +53,7 @@ dzx0s_new_offset:
         call    nc, dzx0s_elias_backtrack
         inc     bc
         jr      dzx0s_copy
+
 dzx0s_elias:
         inc     c                       ; interlaced Elias gamma coding
 dzx0s_elias_loop:
@@ -59,21 +63,24 @@ dzx0s_elias_loop:
         rla
 dzx0s_elias_skip:
         ret     c
+
 dzx0s_elias_backtrack:
         add     a, a
         rl      c
         rl      b
         jr      dzx0s_elias_loop
+
 dzx0s_ldir:
-        push    af
+        dec     bc                      ; split loop wins from 4 bytes
+        inc     b
+        inc     c
 dzx0s_ldir_loop:
         ld      a, (hl+)
-        ld      (de), a
-        inc     de
-        dec     bc
-        ld      a, b
-        or      c
+        ld      (de+), a
+        dec     c
         jr      nz, dzx0s_ldir_loop
-        pop     af
+        dec     b
+        jr      nz, dzx0s_ldir_loop
         ret
+
 ; -----------------------------------------------------------------------------

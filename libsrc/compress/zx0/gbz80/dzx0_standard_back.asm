@@ -16,7 +16,9 @@ dzx0_standard_back:
         ld      a, $80
 dzx0sb_literals:
         call    dzx0sb_elias            ; obtain length
+        push    af                      ; preserve bitstream
         call    dzx0sb_lddr             ; copy literals
+        pop     af
         inc     c
         add     a, a                    ; copy from last offset or new offset?
         jr      c, dzx0sb_new_offset
@@ -28,13 +30,14 @@ dzx0sb_copy:
         ld      a, (hl+)
         ld      h, (hl)
         ld      l, a
-        pop     af
         add     hl, de                  ; calculate destination + offset
         call    dzx0sb_lddr             ; copy from offset
+        pop     af
         pop     hl                      ; restore source
         inc     c
         add     a, a                    ; copy from literals or new offset?
         jr      nc, dzx0sb_literals
+
 dzx0sb_new_offset:
         inc     sp                      ; discard last offset
         inc     sp
@@ -53,6 +56,7 @@ dzx0sb_new_offset:
         call    c, dzx0sb_elias_backtrack
         inc     bc
         jr      dzx0sb_copy
+
 dzx0sb_elias_backtrack:
         add     a, a
         rl      c
@@ -65,16 +69,18 @@ dzx0sb_elias:
 dzx0sb_elias_skip:
         jr      c, dzx0sb_elias_backtrack
         ret
+
 dzx0sb_lddr:
-        push    af
+        dec     bc                      ; split loop wins from 4 bytes
+        inc     b
+        inc     c
 dzx0sb_lddr_loop:
         ld      a, (hl-)
-        ld      (de), a
-        dec     de
-        dec     bc
-        ld      a, b
-        or      c
+        ld      (de-), a
+        dec     c
         jr      nz, dzx0sb_lddr_loop
-        pop     af
+        dec     b
+        jr      nz, dzx0sb_lddr_loop
         ret
+
 ; -----------------------------------------------------------------------------

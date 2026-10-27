@@ -6,4 +6,4 @@ PUBLIC asm_dzx0_standard
 
 asm_dzx0_standard:
 
-INCLUDE "dzx0.asm"
+INCLUDE "dzx0_standard.asm"
