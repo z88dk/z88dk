@@ -7173,6 +7173,44 @@ static int build_muldiv_integer(Builder *b, Node *n)
     return dst;
 }
 
+/* Upper bound (0..32767) of an integer expression that is provably
+   non-negative, or -1 when it is not known to be. A compare of two such values
+   gives the same answer signed or unsigned, so the cheaper unsigned form (and
+   the byte `cp` it leads to) can be kept. Literals, zero-extended unsigned
+   chars, casts to unsigned char, and sums and masks of these. */
+static int expr_nonneg_max(Node *e)
+{
+    if (!e) return -1;
+    switch (e->ast_type) {
+    case AST_LITERAL: {
+        if (!e->type || !is_register_int_kind(e->type->kind)) return -1;
+        int64_t v = node_int_value(e);
+        return (v >= 0 && v <= 32767) ? (int)v : -1;
+    }
+    case OP_ADD: {
+        int a = expr_nonneg_max(e->left), c = expr_nonneg_max(e->right);
+        if (a < 0 || c < 0 || a + c > 32767) return -1;
+        return a + c;
+    }
+    case OP_AND: {
+        int a = expr_nonneg_max(e->left), c = expr_nonneg_max(e->right);
+        if (a < 0) return c;
+        if (c < 0) return a;
+        return a < c ? a : c;
+    }
+    case OP_CAST:
+        if (e->type && e->type->isunsigned && type_width(e->type) == 1)
+            return 255;
+        return -1;
+    default:
+        break;
+    }
+    if (e->type && e->type->isunsigned && is_register_int_kind(e->type->kind)
+        && type_width(e->type) == 1)
+        return 255;
+    return -1;
+}
+
 static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
 {
     /* ---- integer family (the residual) ---------------------------- */
@@ -7189,6 +7227,28 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
         || k == IR_CMP_GT || k == IR_CMP_GE) {
         int uns = (n->left  && n->left->type  && n->left->type->isunsigned)
                || (n->right && n->right->type && n->right->type->isunsigned);
+        /* For two integer operands the rule works on the PROMOTED types: a
+           char or short narrower than int promotes to a signed int, so
+           `signed char < unsigned char` and `int < unsigned char` are signed,
+           and `long < unsigned int` is signed because long holds every
+           unsigned int. Unsigned wins only when both are unsigned, or the
+           unsigned operand is at least as wide as the other (after promotion
+           to int). Pointers and other types keep the either-unsigned rule. */
+        Type *lt_ = n->left ? n->left->type : NULL;
+        Type *rt_ = n->right ? n->right->type : NULL;
+        if (lt_ && rt_ && is_register_int_kind(lt_->kind)
+            && is_register_int_kind(rt_->kind)) {
+            int lw = (int)type_width(lt_), rw = (int)type_width(rt_);
+            int lpw = lw < 2 ? 2 : lw, rpw = rw < 2 ? 2 : rw;
+            int l_uns = lt_->isunsigned && lw >= 2;
+            int r_uns = rt_->isunsigned && rw >= 2;
+            uns = (lt_->isunsigned && rt_->isunsigned)
+               || (l_uns && lpw >= rpw) || (r_uns && rpw >= lpw);
+            /* Two provably non-negative values compare the same either way. */
+            if (!uns && expr_nonneg_max(n->left) >= 0
+                && expr_nonneg_max(n->right) >= 0)
+                uns = 1;
+        }
         if (uns) {
             switch (k) {
             case IR_CMP_LT: k = IR_CMP_ULT; break;
@@ -7523,6 +7583,25 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
             cv->dst = wtmp; cv->src[0] = r;
             r = wtmp;
         }
+    }
+    /* A signed relational of two byte variables compares the promoted ints.
+       The lowerer widens a byte operand by zero-extension, so a negative char
+       would read as 128..255; extend each by its own signedness here, as the
+       explicit (int) form does. Equality and the unsigned relations are
+       unaffected by the zero-extension and stay at byte width. */
+    if (is_cmp && width == 1 && b->f->vregs[r].width == 1
+        && (k == IR_CMP_LT || k == IR_CMP_LE
+            || k == IR_CMP_GT || k == IR_CMP_GE)) {
+        int *side[2] = { &l, &r };
+        const Node *src_n[2] = { lhs, rhs };
+        for (int i = 0; i < 2; i++) {
+            int uns = !src_n[i]->type || src_n[i]->type->isunsigned;
+            int wtmp = new_temp_kind(b, KIND_INT);
+            Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+            cv->dst = wtmp; cv->src[0] = *side[i];
+            *side[i] = wtmp;
+        }
+        width = 2;
     }
     int dst = get_dest_vreg(b, hint, dst_w);
     Op *bop = ir_emit_binop(cur_bb(b), k, dst, l, r);
