@@ -40,6 +40,7 @@ static int lastline = 0;
 
 static int swactive = 0; /* true inside a switch */
 static int swdefault = 0; /* default label number, else 0 */
+static int swdefault_sp = 0; /* compiler SP at the default label */
 
 static int incritical = 0;  /* Are we in a __critical block */
 
@@ -475,13 +476,14 @@ void dofor(void)
 void doswitch(void)
 {
     WHILE_TAB wq;
-    int endlab, swact, swdef;
-    SW_TAB *swnex, *swptr;
+    int endlab, swact, swdef, swdef_sp, entry_sp;
+    SW_TAB *swnex, *swptr, *p;
     Type   *switch_type;
     t_buffer* buf;
 
     swact = swactive;
     swdef = swdefault;
+    swdef_sp = swdefault_sp;
     swnex = swptr = swnext;
     addwhile(&wq);
     (wqptr - 1)->loop = 0;
@@ -489,26 +491,62 @@ void doswitch(void)
     switch_type = doexpr(); /* evaluate switch expression */
     needchar(')');
     swdefault = 0;
+    swdefault_sp = 0;
     swactive = 1;
     endlab = getlabel();
     /* gen_jp_label(endlab) ; */
 
+    /* Locals of this block are allocated in the buffered body, before
+       the case label. The dispatcher jumps to the label, so a case
+       reached that way must be entered at the depth the label was
+       compiled for. Fall-through still runs the allocation itself. */
+    entry_sp = Zsp;
     buf = startbuffer(100);
     statement(); /* cases, etc. */
     /* gen_jp_label(wq.exit) ; */
     suspendbuffer();
 
-    postlabel(endlab);
-    gen_switch_preamble(switch_type->kind);
-    while (swptr < swnext ) {
-        gen_switch_case(switch_type->kind, swptr->value, swptr->label);
-        ++swptr;
+    {
+        int ncase = (int)(swnext - swptr);
+        int stub[NUMCASE];
+        int def_stub = 0;
+        int i;
+        int saved_sp;
+
+        for (i = 0, p = swptr; i < ncase; i++, p++) {
+            stub[i] = (p->sp != entry_sp) ? getlabel() : 0;
+        }
+        if (swdefault && swdefault_sp != entry_sp)
+            def_stub = getlabel();
+
+        postlabel(endlab);
+        gen_switch_preamble(switch_type->kind);
+        for (i = 0, p = swptr; i < ncase; i++, p++) {
+            gen_switch_case(switch_type->kind, p->value,
+                            stub[i] ? stub[i] : p->label);
+        }
+        gen_switch_postamble(switch_type->kind);
+        if (swdefault)
+            gen_jp_label(def_stub ? def_stub : swdefault, 1);
+        else
+            gen_jp_label(wq.exit, 1);
+
+        saved_sp = Zsp;
+        Zsp = entry_sp;
+        for (i = 0, p = swptr; i < ncase; i++, p++) {
+            if (!stub[i])
+                continue;
+            postlabel(stub[i]);
+            modstk(p->sp, KIND_NONE, NO, YES);
+            gen_jp_label(p->label, 1);
+        }
+        if (def_stub) {
+            postlabel(def_stub);
+            modstk(swdefault_sp, KIND_NONE, NO, YES);
+            gen_jp_label(swdefault, 1);
+        }
+        Zsp = saved_sp;
     }
-    gen_switch_postamble(switch_type->kind);
-    if (swdefault)
-        gen_jp_label(swdefault,1);
-    else
-        gen_jp_label(wq.exit,1);
 
     clearbuffer(buf);
 
@@ -516,6 +554,7 @@ void doswitch(void)
     delwhile();
     swnext = swnex;
     swdefault = swdef;
+    swdefault_sp = swdef_sp;
     swactive = swact;
 }
 
@@ -533,6 +572,7 @@ void docase(void)
         return;
     }
     postlabel(swnext->label = getlabel());
+    swnext->sp = Zsp;
     constexpr(&value,&valtype, 1);
     if ( kind_is_decimal(valtype)) 
         warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
@@ -550,6 +590,7 @@ void dodefault(void)
         errorfmt("Not in switch", 0 );
     needchar(':');
     postlabel(swdefault = getlabel());
+    swdefault_sp = Zsp;
 }
 
 /*
