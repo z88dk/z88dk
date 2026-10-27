@@ -22,8 +22,10 @@ TARGET_KC160 = test_kc160_bitfields.bin test_kc160_rshift.bin test_kc160_lshift.
 CFILES = $(wildcard *.c)
 # constpush.c checks sccz80 issue #321: a fitted folded long is pushed
 # as 16 bits. 80cc keeps 65536 - 32768 as the 32-bit value 0x00018000.
+# switchinit.c jumps over an aggregate initializer. On this tree 80cc's
+# defassign check aborts that unreachable copy; sccz80 still runs it.
 ifneq ($(COMPILER),sccz80)
-CFILES := $(filter-out constpush.c,$(CFILES))
+CFILES := $(filter-out constpush.c switchinit.c,$(CFILES))
 endif
 TARGET_Z80 := $(foreach test,$(CFILES:.c=),test_$(test).bin)
 

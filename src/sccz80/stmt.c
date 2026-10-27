@@ -499,8 +499,12 @@ void doswitch(void)
     /* Locals of this block are allocated in the buffered body, before
        the case label. The dispatcher jumps to the label, so a case
        reached that way must be entered at the depth the label was
-       compiled for. Fall-through still runs the allocation itself. */
+       compiled for. Fall-through still runs the allocation itself.
+       addwhile() sampled Zsp before the expression; break has to
+       restore the same depth the body was compiled against. */
     entry_sp = Zsp;
+    wq.sp = entry_sp;
+    (wqptr - 1)->sp = entry_sp;
     buf = startbuffer(100);
     statement(); /* cases, etc. */
     /* gen_jp_label(wq.exit) ; */
@@ -532,15 +536,17 @@ void doswitch(void)
             gen_jp_label(wq.exit, 1);
 
         saved_sp = Zsp;
-        Zsp = entry_sp;
         for (i = 0, p = swptr; i < ncase; i++, p++) {
             if (!stub[i])
                 continue;
+            /* Each stub is relative to entry. modstk does not assign Zsp. */
+            Zsp = entry_sp;
             postlabel(stub[i]);
             modstk(p->sp, KIND_NONE, NO, YES);
             gen_jp_label(p->label, 1);
         }
         if (def_stub) {
+            Zsp = entry_sp;
             postlabel(def_stub);
             modstk(swdefault_sp, KIND_NONE, NO, YES);
             gen_jp_label(swdefault, 1);
