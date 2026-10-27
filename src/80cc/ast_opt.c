@@ -1054,9 +1054,7 @@ Node *ast_fold_constants(Node *node)
                         return fold_int_literal(node, type_int, (uint64_t)v);
                 } else if (fold_op == OP_SSHR || fold_op == OP_USHR
                         || fold_op == OP_SSHL || fold_op == OP_USHL
-                        || fold_op == OP_ANDAND || fold_op == OP_OROR
-                        || (L->type && !kind_is_integer(L->type->kind))
-                        || (R->type && !kind_is_integer(R->type->kind))) {
+                        || fold_op == OP_ANDAND || fold_op == OP_OROR) {
                     /* Shifts use the promoted left operand only. An unsigned
                        count must not turn `>>` into a logical shift.
                        `&&` / `||` test each operand against zero. */
@@ -1072,6 +1070,19 @@ Node *ast_fold_constants(Node *node)
                         Type *t = fold_shift_type(node->type, L->type);
                         v = fold_integer_result(v, t);
                         return fold_int_literal(node, t, (uint64_t)v);
+                    }
+                } else if ((L->type && !kind_is_integer(L->type->kind))
+                        || (R->type && !kind_is_integer(R->type->kind))) {
+                    /* Pointer arithmetic keeps the pointer type. Folding a
+                       far address as int drops the bank. */
+                    l = fold_signed_bits(L);
+                    r = fold_signed_bits(R);
+                    if (try_fold_binop(fold_op, l, r, &v)) {
+                        Type *t = node->type ? node->type
+                                 : fold_common_integer_type(L->type, R->type);
+                        v = fold_integer_result(v, t);
+                        return fold_int_literal(node, t ? t : type_int,
+                                                 (uint64_t)v);
                     }
                 } else {
                     /* Arithmetic and bitwise ops run in the common type.
