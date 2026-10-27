@@ -497,7 +497,6 @@ struct lvalue_s {
         zdouble const_val ;             /* value of constant expression (& other uses) */
         uint64_t int_const_val;         /* exact integer constant bits */
         unsigned char int_const_valid;  /* const_val was parsed as integer */
-        unsigned char explicit_long;    /* L/LL suffix or cast to long */
         Kind val_type ;                 /* type of value calculated */
         enum symbol_flags flags;        /* As per symbol */
         Type *cast_type;
@@ -715,7 +714,6 @@ struct node_s {
     };
     uint64_t ival;              /* exact integer literal bits */
     unsigned char int_literal;  /* zval is backed by ival */
-    unsigned char explicit_long; /* L/LL suffix or cast to long */
 };
 
 static inline uint64_t node_int_bits(const Node *node)

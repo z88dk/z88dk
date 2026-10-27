@@ -26,7 +26,7 @@ static SYMBOL    *deref(LVALUE *lval, char isaddr);
 
 
 Kind expression_exact(int  *con, zdouble *val, uint64_t *ival,
-                      int *ival_valid, Type **type, int *explicit_long)
+                      int *ival_valid, Type **type)
 {
     LVALUE lval={0};
 
@@ -39,15 +39,13 @@ Kind expression_exact(int  *con, zdouble *val, uint64_t *ival,
         *ival = lval.int_const_val;
     if (ival_valid)
         *ival_valid = lval.int_const_valid;
-    if (explicit_long)
-        *explicit_long = lval.explicit_long;
     *type = lval.ltype;
     return lval.ltype ? lval.ltype->kind : KIND_NONE;
 }
 
 Kind expression(int *con, zdouble *val, Type **type)
 {
-    return expression_exact(con, val, NULL, NULL, type, NULL);
+    return expression_exact(con, val, NULL, NULL, type);
 }
 
 int heir1(LVALUE* lval)
@@ -566,6 +564,7 @@ int heira(LVALUE *lval)
         lval->const_val = (int64_t)~(uint64_t)lval->const_val;
         if (lval->int_const_valid)
             lval->int_const_val = ~lval->int_const_val;
+        NormaliseIntegerConstant(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('!')) {
@@ -576,6 +575,7 @@ int heira(LVALUE *lval)
         lval->const_val = !lval->const_val;
         if (lval->int_const_valid)
             lval->int_const_val = lval->int_const_val ? 0 : 1;
+        NormaliseIntegerConstant(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('-')) {
@@ -585,6 +585,7 @@ int heira(LVALUE *lval)
         lval->const_val = -lval->const_val;
         if (lval->int_const_valid)
             lval->int_const_val = (uint64_t)(0 - lval->int_const_val);
+        NormaliseIntegerConstant(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('*')) { /* unary * */

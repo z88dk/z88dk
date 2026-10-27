@@ -686,9 +686,6 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
 
     dest_lval->ltype = lval->cast_type;
     dest_lval->val_type = dest_lval->ltype->kind;
-    /* A cast to long is a 32-bit value. A cast to int is not. */
-    dest_lval->explicit_long = (lval->cast_type->kind == KIND_LONG ||
-                                lval->cast_type->kind == KIND_LONGLONG);
     lval->cast_type = NULL;
     dest_lval->ptr_type = KIND_NONE;
     if ( ispointer(dest_lval->ltype) ) {

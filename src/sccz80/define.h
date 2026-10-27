@@ -439,7 +439,6 @@ struct lvalue_s {
         zdouble const_val ;             /* value of constant expression (& other uses) */
         uint64_t int_const_val;         /* exact integer constant bits */
         unsigned char int_const_valid;  /* const_val was parsed as integer */
-        unsigned char explicit_long;    /* L suffix or cast to long */
         void (*binop)(LVALUE *lval) ;   /* function address of highest/last binary operator */
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
         Type *stage_add_ltype;          /* Type at stage_add being set */

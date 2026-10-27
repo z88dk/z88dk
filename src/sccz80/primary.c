@@ -861,7 +861,7 @@ int constexpr_exact(double *val, uint64_t *ival, int *ival_valid,
     Type   *type_ptr;
     
     setstage(&before, &start);
-    valtype = expression_exact(&con, &valtemp, ival, ival_valid, &type_ptr, NULL);
+    valtype = expression_exact(&con, &valtemp, ival, ival_valid, &type_ptr);
     *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
     *type = valtype;
@@ -890,6 +890,36 @@ void cscale(Type *type, int* val)
 }
 
 
+/* Store the constant as the value of its current integer type.
+   Unsigned keeps the low bits. Signed wraps two's complement and
+   is sign-extended, so a later widen still sign-extends. */
+void NormaliseIntegerConstant(LVALUE *lval)
+{
+    unsigned bits;
+    uint64_t value;
+    uint64_t mask;
+
+    if (!lval || !lval->int_const_valid || !lval->ltype)
+        return;
+    if (!kind_is_integer(lval->ltype->kind))
+        return;
+    bits = lval->ltype->size > 0 ? (unsigned)lval->ltype->size * 8 : 64;
+    if (bits >= 64) {
+        lval->const_val = lval->ltype->isunsigned
+            ? (zdouble)lval->int_const_val
+            : (zdouble)(int64_t)lval->int_const_val;
+        return;
+    }
+    mask = (UINT64_C(1) << bits) - 1;
+    value = lval->int_const_val & mask;
+    if (!lval->ltype->isunsigned && (value & (UINT64_C(1) << (bits - 1))))
+        value |= UINT64_MAX << bits;
+    lval->int_const_val = value;
+    lval->const_val = lval->ltype->isunsigned
+        ? (zdouble)(value & mask)
+        : (zdouble)(int64_t)value;
+}
+
 /**
  * \param lval - The lval that holds the cast informatino
  * \param dest_lval - The lvalue that will be changed
@@ -908,11 +938,11 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
     } else if ( t2 == KIND_CPTR ) {
         t2 = KIND_LONG;
     }
-    if ( kind_is_integer(lval->cast_type->kind) && dest_lval->is_const) {
+    /* A constant known only as zdouble is masked here. An exact integer
+       is converted after the destination type is installed. */
+    if ( kind_is_integer(lval->cast_type->kind) && dest_lval->is_const
+         && !dest_lval->int_const_valid) {
         int64_t val = dest_lval->const_val;
-        /* Always mask to the size of the target: a folded constant such as
-           0xFF + 1 keeps the type of its first operand (char) while holding
-           256, so comparing the types to decide whether to truncate misses it. */
         if ( lval->cast_type->kind == KIND_INT ) {
             dest_lval->const_val = lval->cast_type->isunsigned ? (uint16_t)(val & 0xffff) : (int16_t)(val & 0xffff);
         } else if ( lval->cast_type->kind == KIND_CHAR) {
@@ -920,16 +950,14 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
         } else if ( lval->cast_type->kind == KIND_LONG) {
             dest_lval->const_val = lval->cast_type->isunsigned ? (uint32_t)(val & 0xffffffff) : (int32_t)(val & 0xffffffff);
         }
-
     }
 
     force(t1, t2, lval->cast_type->isunsigned, dest_lval->ltype->isunsigned, 0); // TODO lconst
 
     dest_lval->ltype = lval->cast_type;
     dest_lval->val_type = dest_lval->ltype->kind;
-    /* A cast to long is a request for a 32-bit value. A cast to int is not. */
-    dest_lval->explicit_long = (lval->cast_type->kind == KIND_LONG ||
-                                lval->cast_type->kind == KIND_LONGLONG);
+    if (dest_lval->int_const_valid && kind_is_integer(dest_lval->val_type))
+        NormaliseIntegerConstant(dest_lval);
     lval->cast_type = NULL;
     dest_lval->ptr_type = KIND_NONE;
     if ( ispointer(dest_lval->ltype) ) {

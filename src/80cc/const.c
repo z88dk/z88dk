@@ -49,7 +49,6 @@ int constant(LVALUE* lval)
     lval->val_type = KIND_INT;
     lval->ltype = type_int;
     lval->is_const = 1; /* assume constant will be found */
-    lval->explicit_long = 0;
     if (fnumber(lval)) {
         lval->flags = FLAGS_NONE;
         lval->node = ast_literal(lval->ltype, lval->const_val);
@@ -58,7 +57,6 @@ int constant(LVALUE* lval)
         lval->node = lval->int_const_valid
                    ? ast_literal_int(lval->ltype, lval->int_const_val)
                    : ast_literal(lval->ltype, lval->const_val);
-        lval->node->explicit_long = lval->explicit_long;
         return (1);
     } else if (tstr(&val)) {
         lval->const_val = val;
@@ -143,8 +141,6 @@ int number(LVALUE *lval)
     lval->const_val = value;
     lval->int_const_val = (uint64_t)value;
     lval->int_const_valid = 1;
-    /* `65536` is long by magnitude. `65536L` is long by suffix. */
-    lval->explicit_long = tok->num.suffix_long ? 1 : 0;
 
     /* Magnitude-based typing, matches legacy behaviour.  Use the token's
        exact integer value here: const_val is a zdouble and may not represent
@@ -157,10 +153,14 @@ int number(LVALUE *lval)
     if (value > UINT32_MAX || value < INT32_MIN) {
         lval->val_type = KIND_LONGLONG;
     }
-    /* Explicit-suffix override: `5L` keeps KIND_LONG even though
-       magnitude says CHAR. */
+    /* `5L` keeps KIND_LONG even though magnitude says CHAR. The tokeniser
+       also ranks an unsuffixed decimal outside signed int as long, so
+       `32768` is long. `32768U` and `0x8000` stay unsigned int. */
     if (tok_kind >= KIND_LONG && tok_kind > lval->val_type)
         lval->val_type = tok_kind;
+    if (tok_base == 10 && !isunsigned && lval->val_type == KIND_INT
+        && value > 32767)
+        lval->val_type = KIND_LONG;
     /* C integer-constant rule: an unsuffixed HEX/OCTAL/BINARY constant whose
        value exceeds the SIGNED range of its size class takes the corresponding
        UNSIGNED type (decimal stays signed and widens instead). Without this,

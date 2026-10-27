@@ -204,16 +204,9 @@ static int fold_integer_exact(LVALUE *left, LVALUE *right,
 
 static void set_exact_integer_result(LVALUE *left, uint64_t value)
 {
-    unsigned bits = left->ltype && left->ltype->size > 0
-                  ? (unsigned)left->ltype->size * 8 : 64;
-    if (bits < 64)
-        value &= (UINT64_C(1) << bits) - 1;
     left->int_const_val = value;
     left->int_const_valid = 1;
-    left->const_val = left->ltype && left->ltype->isunsigned
-                    ? (int64_t)value
-                    : (int64_t)(bits < 64 && (value & (UINT64_C(1) << (bits - 1)))
-                                ? value | (UINT64_MAX << bits) : value);
+    NormaliseIntegerConstant(left);
 }
 
 
@@ -434,7 +427,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         // Fold constants if we can
         if ( lval->is_const && lval2->is_const ) {
             int is16bit = lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR;
-            lval->explicit_long = lval->explicit_long || lval2->explicit_long;
             uint64_t exact_value;
             if (lval->int_const_valid && lval2->int_const_valid
                 && !kind_is_decimal(lhs_val_type)
@@ -555,9 +547,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                     const_val = (int64_t)lval2->const_val;
             }
             clearstage(before, 0);
-            // Promote lhs if it's a smaller integer type than the constant
+            // Promote lhs if it's a smaller integer type than the constant.
+            // force() is (dest, src, dest unsigned, src unsigned). The
+            // source signedness selects sign- or zero-extension.
             if ( lhs_val_type < rhs_val_type) {
-                force(rhs_val_type, lhs_val_type, lval->ltype->isunsigned, lval2->ltype->isunsigned,1);
+                force(rhs_val_type, lhs_val_type, lval2->ltype->isunsigned, lval->ltype->isunsigned,1);
             }
         } else if ( lval1_wasconst && kind_is_integer(lval2->val_type) ) {
             /* Handle the case that the constant was on the left */
@@ -573,7 +567,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 const_val = (int64_t)lval->const_val;
             }
             clearstage(before_constlval, 0);
-            force(lhs_val_type, rhs_val_type, lval2->ltype->isunsigned, lval->ltype->isunsigned,1);
+            force(lhs_val_type, rhs_val_type, lval->ltype->isunsigned, lval2->ltype->isunsigned,1);
         }
         // If we should actually do the constant operation, do it
         if ( doconstoper ) {
@@ -827,7 +821,6 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
     if (lval->is_const && lval2->is_const) {
         // Both operators are constant fold them
-        lval->explicit_long = lval->explicit_long || lval2->explicit_long;
         if (lval->int_const_valid && lval2->int_const_valid
             && !kind_is_decimal(lval->val_type)
             && !kind_is_decimal(lval2->val_type)) {

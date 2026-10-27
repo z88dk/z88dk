@@ -546,8 +546,6 @@ static void lex_number(Tokeniser *t, Token *tok, int first)
     int s_kind = KIND_INT;
     int s_unsigned = 0;
     lex_int_suffix(t, &s_kind, &s_unsigned);
-    /* Captured before the magnitude promotion below overwrites s_kind. */
-    tok->num.suffix_long = s_kind >= KIND_LONG;
     /* No-suffix size promotion: int → long when out of 16-bit range.
        A hex/octal/binary (or U-suffixed) constant may take the UNSIGNED
        type of its rank first (C integer-constant rule), so a value that
