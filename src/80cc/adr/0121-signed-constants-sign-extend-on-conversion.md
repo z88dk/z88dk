@@ -33,7 +33,11 @@ Follow the integer conversion rules. The same rules apply in both front ends.
   98304. `1L + (3 - 5)` is -1. `1L + (int)-1` is 0.
   `(signed char)200` is -56, and `1L + (signed char)200` is -55.
 - A right shift of a negative signed value is the existing arithmetic shift.
-  `(16384 * 2) >> 1` is -16384.
+  `(16384 * 2) >> 1` is -16384. The count's type does not change that, so
+  `(16384 * 2) >> 1u` is also -16384.
+- `/` and `%` convert both operands to the result type before the operation.
+  `(-1) / 2u` is 32767. `(-1L) / 0x8000` is 0. A `char` promotes to `int`
+  first, so `(unsigned char)200 / (signed char)-2` is -100.
 - Default argument promotions do not narrow a `long`. `printf("%ld", 32768)`
   pushes four bytes. A prototype still converts: `unsigned int` keeps the
   low 16 bits of 98304, which are 32768.
@@ -50,4 +54,5 @@ agree on these constants.
 
 `test/suites/sccz80/constpush.c` runs for sccz80 and for 80cc. It checks the
 values above, the 32-bit push of a decimal long, the unsigned-int cast, a
-prototype conversion, and a fastcall long.
+prototype conversion, a fastcall long, mixed `/` and `%`, a `char` promotion,
+and a signed right shift whose count is unsigned.

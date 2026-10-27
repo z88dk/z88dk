@@ -1,7 +1,8 @@
 /* Constant conversion on a 16-bit int.
  * An unsuffixed decimal that does not fit in signed int is long.
  * Signed overflow wraps in the result type, then a wider conversion
- * sign-extends. Unsigned widens by zero-extension. A long argument
+ * sign-extends. Unsigned widens by zero-extension. Division and
+ * remainder convert both operands to that type first. A long argument
  * stays a long: default promotions do not narrow it.
  */
 #include "test.h"
@@ -45,6 +46,36 @@ void test_constpush(void)
     Assert((long)((16384 * 2) >> 1) == -16384L, "arithmetic shift of the wrap");
     Assert((unsigned long)-1 == 4294967295UL, "unsigned long keeps all bits");
     Assert((long)32768U == 32768L, "32768U zero-extends to long");
+
+    /* The operation runs in the common type. char promotes to signed int.
+       An unsigned count does not change a signed right shift. */
+    Assert((long)(-1 / 2u) == 32767L, "-1 / 2u");
+    Assert((long)(-1 / 1u) == 65535L, "-1 / 1u");
+    Assert((long)((16384 * 2) / 2u) == 16384L, "wrapped product / 2u");
+    Assert((long)(-3 % 2u) == 1L, "-3 % 2u");
+    Assert((long)((16384 * 2) % 3u) == 2L, "wrapped product % 3u");
+    Assert((-1L) / 0x8000 == 0L, "(-1L) / 0x8000");
+    Assert((long)((unsigned char)200 / (signed char)-2) == -100L, "promoted char division");
+    Assert((-3 % 2) == -1, "signed remainder keeps the sign");
+    Assert((1L + (-1 / 1u)) == 65536L, "unsigned quotient widens by zero");
+    Assert((-1L) + 0x8000 == 32767L, "signed long plus 0x8000");
+    Assert(((-2L) + 1u) < 0, "signed long plus unsigned int stays signed");
+    Assert((-1L) < 1u, "(-1L) < 1u");
+    Assert((-1L) < 0x8000, "(-1L) < 0x8000");
+    Assert((long)((16384 * 2) >> 1u) == -16384L, "unsigned shift count stays arithmetic");
+    Assert(((int)-1 >> 1u) == -1, "signed >> unsigned count");
+    Assert(((unsigned char)200 >> 1) == 100, "unsigned char promotes before >>");
+    Assert(((signed char)0x80 >> 1) == -64, "signed char >> stays arithmetic");
+    Assert(((unsigned char)1 << 8) == 256, "unsigned char promotes before <<");
+    Assert(((signed char)0x80 << 1) == -256, "signed char << promotes");
+    Assert(((signed char)-2 / (unsigned char)2) == -1, "promoted char / unsigned char");
+    Assert(((unsigned char)200 * (signed char)-2) == -400, "promoted char multiply");
+    Assert((long)(200 * 200) == -25536L, "signed 200*200 wraps");
+    Assert((long)(200u * 200u) == 40000L, "unsigned 200u*200u zero-extends");
+    Assert((-1L) / 1UL == 4294967295UL, "(-1L) / 1UL");
+    Assert((int)-1 / 2UL == 2147483647UL, "(int)-1 / 2UL");
+    Assert(((unsigned long)-1 >> 1) == 2147483647UL, "logical >> of unsigned long");
+    Assert(((unsigned long)-1 >> 1u) == 2147483647UL, "logical >> of unsigned long by unsigned");
 
     sprintf(buf, "%ld", (long)MAINBANK_ADDR);
     expect(buf, "98304", "%ld of 65536 - 16384*2");

@@ -167,14 +167,182 @@ static int integer_constant_needs_exact(const LVALUE *value)
         || integer_signed_value(value) < -exact_limit;
 }
 
+/* Integer promotions. char becomes signed int: a 16-bit int represents
+   every 8-bit value. short is the same width as int on this target. */
+static void promoted_integer(const Type *type, int *width, int *is_unsigned)
+{
+    Kind kind = type ? type->kind : KIND_INT;
+
+    if (kind == KIND_LONGLONG) {
+        *width = 64;
+        *is_unsigned = type->isunsigned;
+    } else if (kind == KIND_LONG) {
+        *width = 32;
+        *is_unsigned = type->isunsigned;
+    } else if ((kind == KIND_INT || kind == KIND_SHORT) && type && type->isunsigned) {
+        *width = 16;
+        *is_unsigned = 1;
+    } else {
+        *width = 16;
+        *is_unsigned = 0;
+    }
+}
+
+/* Usual arithmetic conversions. A wider signed type on this target can
+   represent every value of a narrower unsigned type, so the wider signed
+   type wins. `(-1L) / 0x8000` is a signed long division. */
+static void common_integer(const Type *a, const Type *b, int *width, int *is_unsigned)
+{
+    int wa, ua, wb, ub;
+
+    promoted_integer(a, &wa, &ua);
+    promoted_integer(b, &wb, &ub);
+    if (wa == wb) {
+        *width = wa;
+        *is_unsigned = ua || ub;
+    } else if (wa > wb) {
+        *width = wa;
+        *is_unsigned = ua;
+    } else {
+        *width = wb;
+        *is_unsigned = ub;
+    }
+}
+
+static uint64_t unsigned_low(int64_t value, int width)
+{
+    if (width >= 64)
+        return (uint64_t)value;
+    return (uint64_t)value & ((UINT64_C(1) << width) - 1);
+}
+
+static int64_t signed_low(int64_t value, int width)
+{
+    uint64_t bits;
+
+    if (width >= 64)
+        return value;
+    bits = unsigned_low(value, width);
+    if (bits & (UINT64_C(1) << (width - 1)))
+        bits |= UINT64_MAX << width;
+    return (int64_t)bits;
+}
+
+static void set_folded_integer_type(LVALUE *left, int width, int is_unsigned)
+{
+    if (width >= 64) {
+        left->val_type = KIND_LONGLONG;
+        left->ltype = is_unsigned ? type_ulonglong : type_longlong;
+    } else if (width >= 32) {
+        left->val_type = KIND_LONG;
+        left->ltype = is_unsigned ? type_ulong : type_long;
+    } else {
+        left->val_type = KIND_INT;
+        left->ltype = is_unsigned ? type_uint : type_int;
+    }
+}
+
+/* The non-constant path rewrites a long partner to long or unsigned long
+   before this fold, then discards that code when both sides are constant.
+   The fold has to see the types from before that rewrite, or
+   `(-1L) / 0x8000` becomes an unsigned long division. */
+struct fold_types {
+    int saved;
+    Type *ltype;
+    Type *rtype;
+    Kind lkind;
+    Kind rkind;
+};
+
+static void save_integer_fold_types(const LVALUE *left, const LVALUE *right,
+                                    struct fold_types *saved)
+{
+    saved->saved = 0;
+    if (!left->is_const || !right->is_const || !left->int_const_valid || !right->int_const_valid)
+        return;
+    if (!left->ltype || !right->ltype)
+        return;
+    if (!kind_is_integer(left->ltype->kind) || !kind_is_integer(right->ltype->kind))
+        return;
+    saved->saved = 1;
+    saved->ltype = left->ltype;
+    saved->rtype = right->ltype;
+    saved->lkind = left->val_type;
+    saved->rkind = right->val_type;
+}
+
+static void restore_integer_fold_types(LVALUE *left, LVALUE *right,
+                                       const struct fold_types *saved)
+{
+    if (!saved->saved)
+        return;
+    left->ltype = saved->ltype;
+    left->val_type = saved->lkind;
+    right->ltype = saved->rtype;
+    right->val_type = saved->rkind;
+}
+
 static int fold_integer_exact(LVALUE *left, LVALUE *right,
                               void (*oper)(LVALUE *), uint64_t *result)
 {
-    uint64_t l = integer_bits(left);
-    uint64_t r = integer_bits(right);
-    int unsigned_op = left->ltype->isunsigned || right->ltype->isunsigned;
+    int both_int = left->ltype && right->ltype
+                && kind_is_integer(left->ltype->kind)
+                && kind_is_integer(right->ltype->kind);
+
+    if (!both_int) {
+        /* Pointer sums keep the left type and the address bits. */
+        uint64_t l = integer_bits(left);
+        uint64_t r = integer_bits(right);
+        int unsigned_op = left->ltype->isunsigned || right->ltype->isunsigned;
+        int64_t sl = integer_signed_value(left);
+        int64_t sr = integer_signed_value(right);
+
+        if (oper == zadd) *result = l + r;
+        else if (oper == zsub) *result = l - r;
+        else if (oper == mult) *result = l * r;
+        else if (oper == zand) *result = l & r;
+        else if (oper == zor)  *result = l | r;
+        else if (oper == zxor) *result = l ^ r;
+        else if (oper == asl)  *result = l << (unsigned)r;
+        else if (oper == asr) {
+            if (unsigned_op) *result = l >> (unsigned)r;
+            else *result = (uint64_t)(sl >> (unsigned)r);
+        } else if (oper == zdiv) {
+            if (r == 0) return 0;
+            *result = unsigned_op ? l / r : (uint64_t)(sl / sr);
+        } else if (oper == zmod) {
+            if (r == 0) return 0;
+            *result = unsigned_op ? l % r : (uint64_t)(sl % sr);
+        } else if (oper == zeq) *result = (l == r);
+        else if (oper == zne) *result = (l != r);
+        else if (oper == zlt) *result = unsigned_op ? (l < r) : (sl < sr);
+        else if (oper == zle) *result = unsigned_op ? (l <= r) : (sl <= sr);
+        else if (oper == zgt) *result = unsigned_op ? (l > r) : (sl > sr);
+        else if (oper == zge) *result = unsigned_op ? (l >= r) : (sl >= sr);
+        else return 0;
+        return 1;
+    }
+
+    /* Convert both operands to the common type, then operate.
+       `(-1) / 2u` is 32767. `(unsigned char)200 / (signed char)-2` is -100.
+       A shift uses the promoted left operand only, so `(16384 * 2) >> 1u`
+       stays an arithmetic shift. */
+    int shift = oper == asl || oper == asr;
+    int width, uns;
     int64_t sl = integer_signed_value(left);
     int64_t sr = integer_signed_value(right);
+    uint64_t l, r;
+
+    if (shift)
+        promoted_integer(left->ltype, &width, &uns);
+    else
+        common_integer(left->ltype, right->ltype, &width, &uns);
+
+    l = uns ? unsigned_low(sl, width) : (uint64_t)signed_low(sl, width);
+    r = shift ? 0 : (uns ? unsigned_low(sr, width) : (uint64_t)signed_low(sr, width));
+
+    if ((oper == zdiv || oper == zmod) && r == 0)
+        return 0;
 
     if (oper == zadd) *result = l + r;
     else if (oper == zsub) *result = l - r;
@@ -182,31 +350,46 @@ static int fold_integer_exact(LVALUE *left, LVALUE *right,
     else if (oper == zand) *result = l & r;
     else if (oper == zor)  *result = l | r;
     else if (oper == zxor) *result = l ^ r;
-    else if (oper == asl)  *result = l << (unsigned)r;
+    else if (oper == asl) *result = l << (unsigned)sr;
     else if (oper == asr) {
-        if (unsigned_op) *result = l >> (unsigned)r;
-        else *result = (uint64_t)(sl >> (unsigned)r);
-    } else if (oper == zdiv) {
-        if (r == 0) return 0;
-        *result = unsigned_op ? l / r : (uint64_t)(sl / sr);
-    } else if (oper == zmod) {
-        if (r == 0) return 0;
-        *result = unsigned_op ? l % r : (uint64_t)(sl % sr);
-    } else if (oper == zeq) *result = (l == r);
+        if (uns) *result = l >> (unsigned)sr;
+        else *result = (uint64_t)((int64_t)l >> (unsigned)sr);
+    } else if (oper == zdiv) *result = uns ? l / r : (uint64_t)((int64_t)l / (int64_t)r);
+    else if (oper == zmod) *result = uns ? l % r : (uint64_t)((int64_t)l % (int64_t)r);
+    else if (oper == zeq) *result = (l == r);
     else if (oper == zne) *result = (l != r);
-    else if (oper == zlt) *result = unsigned_op ? (l < r) : (sl < sr);
-    else if (oper == zle) *result = unsigned_op ? (l <= r) : (sl <= sr);
-    else if (oper == zgt) *result = unsigned_op ? (l > r) : (sl > sr);
-    else if (oper == zge) *result = unsigned_op ? (l >= r) : (sl >= sr);
+    else if (oper == zlt) *result = uns ? (l < r) : ((int64_t)l < (int64_t)r);
+    else if (oper == zle) *result = uns ? (l <= r) : ((int64_t)l <= (int64_t)r);
+    else if (oper == zgt) *result = uns ? (l > r) : ((int64_t)l > (int64_t)r);
+    else if (oper == zge) *result = uns ? (l >= r) : ((int64_t)l >= (int64_t)r);
     else return 0;
+
+    if (operator_is_comparison(oper))
+        set_folded_integer_type(left, 16, 0);
+    else
+        set_folded_integer_type(left, width, uns);
     return 1;
 }
 
 static void set_exact_integer_result(LVALUE *left, uint64_t value)
 {
+    unsigned bits;
+
     left->int_const_val = value;
     left->int_const_valid = 1;
-    NormaliseIntegerConstant(left);
+    if (left->ltype && kind_is_integer(left->ltype->kind)) {
+        NormaliseIntegerConstant(left);
+        return;
+    }
+    /* A near pointer is loaded from const_val. NormaliseIntegerConstant
+       ignores a non-integer, so a pointer sum would keep the old address.
+       `(unsigned char *)56469 + 3` is 56472. */
+    bits = left->ltype && left->ltype->size > 0
+         ? (unsigned)left->ltype->size * 8 : 64;
+    if (bits < 64)
+        value &= (UINT64_C(1) << bits) - 1;
+    left->int_const_val = value;
+    left->const_val = (zdouble)value;
 }
 
 
@@ -223,6 +406,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     Kind   lhs_val_type = lval->val_type;
     Kind   rhs_val_type;
     int   lval1_wasconst = 0;
+    struct fold_types fold_types = {0};
 
     savesp = Zsp;
     setstage(&before, &start);
@@ -235,6 +419,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (plnge1(heir, lval2))
             rvalue(lval2);
         rhs_val_type = lval2->val_type;
+        save_integer_fold_types(lval, lval2, &fold_types);
         setstage(&before_constlval, &start_constlval);
 
         lval->stage_add = stagenext;
@@ -426,8 +611,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     if ( doper != NULL || intcheck(lval,lval2) == 0 ) {
         // Fold constants if we can
         if ( lval->is_const && lval2->is_const ) {
-            int is16bit = lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR;
+            int is16bit;
             uint64_t exact_value;
+            restore_integer_fold_types(lval, lval2, &fold_types);
+            is16bit = lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR;
             if (lval->int_const_valid && lval2->int_const_valid
                 && !kind_is_decimal(lhs_val_type)
                 && !kind_is_decimal(rhs_val_type)
@@ -591,6 +778,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     int oldsp = Zsp;
     double val;
     int lhs_val_type, rhs_val_type;
+    struct fold_types fold_types = {0};
 
     lhs_val_type = lval->val_type;
     setstage(&before, &start);
@@ -601,6 +789,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             rvalue(lval2);
 
         rhs_val_type = lval2->val_type;
+        save_integer_fold_types(lval, lval2, &fold_types);
 
         /* Fold a constant mixed integer/decimal addition before the integer
            staging path emits a conversion.  That path used to leave an
@@ -821,6 +1010,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
     if (lval->is_const && lval2->is_const) {
         // Both operators are constant fold them
+        restore_integer_fold_types(lval, lval2, &fold_types);
         if (lval->int_const_valid && lval2->int_const_valid
             && !kind_is_decimal(lval->val_type)
             && !kind_is_decimal(lval2->val_type)) {
