@@ -231,7 +231,8 @@ extern void       parse_warning_option(const char *value);
 /* expr.c */
 extern Kind       expression(int *con, zdouble *val, Type **type);
 extern Kind       expression_exact(int *con, zdouble *val, uint64_t *ival,
-                                   int *ival_valid, Type **type);
+                                   int *ival_valid, Type **type,
+                                   int *explicit_long);
 extern int        heir1(LVALUE *lval);
 extern int        heira(LVALUE *lval);
 

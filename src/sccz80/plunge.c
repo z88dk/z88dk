@@ -434,6 +434,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         // Fold constants if we can
         if ( lval->is_const && lval2->is_const ) {
             int is16bit = lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR;
+            lval->explicit_long = lval->explicit_long || lval2->explicit_long;
             uint64_t exact_value;
             if (lval->int_const_valid && lval2->int_const_valid
                 && !kind_is_decimal(lhs_val_type)
@@ -826,6 +827,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
     if (lval->is_const && lval2->is_const) {
         // Both operators are constant fold them
+        lval->explicit_long = lval->explicit_long || lval2->explicit_long;
         if (lval->int_const_valid && lval2->int_const_valid
             && !kind_is_decimal(lval->val_type)
             && !kind_is_decimal(lval2->val_type)) {

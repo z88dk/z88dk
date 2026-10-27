@@ -297,6 +297,7 @@ typecheck:
 
         if (cmatch('L')) {
             lval->val_type = KIND_LONG;
+            lval->explicit_long = 1;
             if (cmatch('L'))
                 lval->val_type = KIND_LONGLONG;
             break;

@@ -861,7 +861,7 @@ int constexpr_exact(double *val, uint64_t *ival, int *ival_valid,
     Type   *type_ptr;
     
     setstage(&before, &start);
-    valtype = expression_exact(&con, &valtemp, ival, ival_valid, &type_ptr);
+    valtype = expression_exact(&con, &valtemp, ival, ival_valid, &type_ptr, NULL);
     *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
     *type = valtype;
@@ -927,6 +927,9 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
 
     dest_lval->ltype = lval->cast_type;
     dest_lval->val_type = dest_lval->ltype->kind;
+    /* A cast to long is a request for a 32-bit value. A cast to int is not. */
+    dest_lval->explicit_long = (lval->cast_type->kind == KIND_LONG ||
+                                lval->cast_type->kind == KIND_LONGLONG);
     lval->cast_type = NULL;
     dest_lval->ptr_type = KIND_NONE;
     if ( ispointer(dest_lval->ltype) ) {

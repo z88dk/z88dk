@@ -26,7 +26,7 @@ static SYMBOL    *deref(LVALUE *lval, char isaddr);
 
 
 Kind expression_exact(int  *con, zdouble *val, uint64_t *ival,
-                      int *ival_valid, Type **type)
+                      int *ival_valid, Type **type, int *explicit_long)
 {
     LVALUE lval={0};
 
@@ -39,13 +39,15 @@ Kind expression_exact(int  *con, zdouble *val, uint64_t *ival,
         *ival = lval.int_const_val;
     if (ival_valid)
         *ival_valid = lval.int_const_valid;
+    if (explicit_long)
+        *explicit_long = lval.explicit_long;
     *type = lval.ltype;
     return lval.ltype ? lval.ltype->kind : KIND_NONE;
 }
 
 Kind expression(int *con, zdouble *val, Type **type)
 {
-    return expression_exact(con, val, NULL, NULL, type);
+    return expression_exact(con, val, NULL, NULL, type, NULL);
 }
 
 int heir1(LVALUE* lval)
