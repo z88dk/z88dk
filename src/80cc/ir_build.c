@@ -7627,6 +7627,14 @@ static int naked_stmt_is_frameless(const Node *n)
 static int emit_cond_false_exit(Builder *b, Node *n, int false_bb);
 static int emit_cond_true_exit(Builder *b, Node *n, int true_bb);
 
+/* A literal condition leaf: 1 and sets *truth when `n` is a constant. */
+static int cond_const_leaf(const Node *n, int *truth)
+{
+    if (!n || n->ast_type != AST_LITERAL) return 0;
+    *truth = n->zval != 0;
+    return 1;
+}
+
 /* Branch to false_bb when `n` is FALSE, else fall through — an && operand. */
 static int emit_cond_false_exit(Builder *b, Node *n, int false_bb)
 {
@@ -7654,6 +7662,13 @@ static int emit_cond_false_exit(Builder *b, Node *n, int false_bb)
         if (!n->operand) return build_fail("OP_LNEG with missing operand");
         return emit_cond_true_exit(b, n->operand, false_bb);
     default: {
+        int t;
+        if (cond_const_leaf(n, &t)) {
+            if (t) return 0;
+            ir_emit_br(cur_bb(b), false_bb);
+            b->cur_bb_id = ir_bb_new(b->f);   /* unreachable remainder */
+            return 0;
+        }
         int v = build_expr(b, n);
         if (v < 0) return -1;
         ir_emit_br_zero(cur_bb(b), v, false_bb);
@@ -7690,6 +7705,13 @@ static int emit_cond_true_exit(Builder *b, Node *n, int true_bb)
         if (!n->operand) return build_fail("OP_LNEG with missing operand");
         return emit_cond_false_exit(b, n->operand, true_bb);
     default: {
+        int t;
+        if (cond_const_leaf(n, &t)) {
+            if (!t) return 0;
+            ir_emit_br(cur_bb(b), true_bb);
+            b->cur_bb_id = ir_bb_new(b->f);   /* unreachable remainder */
+            return 0;
+        }
         int v = build_expr(b, n);
         if (v < 0) return -1;
         ir_emit_br_cond(cur_bb(b), v, true_bb);
@@ -7701,6 +7723,19 @@ static int emit_cond_true_exit(Builder *b, Node *n, int true_bb)
 static int build_cond(Builder *b, Node *n, int true_bb, int false_bb)
 {
     if (!n) return build_fail("build_cond: null condition");
+    /* Only the truth value matters here, so an identity constant drops out:
+       1 && x, x && 1, 0 || x, x || 0 are all just x. */
+    for (;;) {
+        int t;
+        if (n->ast_type == OP_ANDAND && n->left && n->right) {
+            if (cond_const_leaf(n->left, &t) && t)  { n = n->right; continue; }
+            if (cond_const_leaf(n->right, &t) && t) { n = n->left;  continue; }
+        } else if (n->ast_type == OP_OROR && n->left && n->right) {
+            if (cond_const_leaf(n->left, &t) && !t)  { n = n->right; continue; }
+            if (cond_const_leaf(n->right, &t) && !t) { n = n->left;  continue; }
+        }
+        break;
+    }
     switch (n->ast_type) {
     case OP_ANDAND:
         if (emit_cond_false_exit(b, n, false_bb) != 0) return -1;

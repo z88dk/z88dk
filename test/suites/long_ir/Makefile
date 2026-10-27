@@ -55,6 +55,7 @@ all:	argcf.bin argcf_fp.bin argcf_8080.bin argcf_gbz80.bin
 all:	jpnext.bin jpnext_fp.bin jpnext_8080.bin jpnext_gbz80.bin
 all:	ixind.bin
 all:	bchand.bin bchand_fp.bin bchand_8080.bin bchand_gbz80.bin
+all:	constcond.bin constcond_fp.bin constcond_8080.bin constcond_gbz80.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
 all:	derefcmp_bcstep.bin derefcmp_bcstep_8080.bin
 all:	directwiden.bin directwiden_z80n.bin directwiden_ez80_z80.bin directwiden_r800.bin
@@ -2782,6 +2783,24 @@ bchand_8080.bin: $(SOURCES) bchand.c
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 bchand_gbz80.bin: $(SOURCES) bchand.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# A constant operand of && / || in a condition is folded away; the live
+# operand keeps its side effects. See the file header.
+constcond.bin: $(SOURCES) constcond.c
+	$(compile)
+	$(runtest)
+
+constcond_fp.bin: $(SOURCES) constcond.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+constcond_8080.bin: $(SOURCES) constcond.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+constcond_gbz80.bin: $(SOURCES) constcond.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
