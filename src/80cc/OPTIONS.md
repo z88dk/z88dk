@@ -147,6 +147,8 @@ exists (ADR 0010).
 | `sx-arg` | a signed char argument to an int parameter is zero-extended, not sign-extended |
 | `stack-spill-base` | an array-element address is parked on the stack around the byte truncation of the value stored through it |
 | `sub-as-add` | a word minus a constant is subtracted, not added as the negated constant |
+| `sub-neg` | a byte subtract whose subtrahend is in A and dead spills it and reloads the minuend instead of negating A and adding |
+| `rsub-byte` | a constant minus a byte whose result is truncated to a byte is computed in 16 bits (`ld hl,K; sbc hl,de`) instead of in A |
 | `ret-cc-bc` | a conditional `ret` is a reader of BC, so a park before it is kept |
 | `long-add-carry` | a long add of a constant that fits 16 bits (or a small negative) goes through `ex de,hl; ld bc,0; adc hl,bc; ex de,hl` instead of a skipped `inc de` or `dec de` |
 | `slot-park-de` | a word stored to a frame slot and reloaded with D and E untouched in between goes through the slot instead of DE (frame-pointer mode, Z80 family) |
@@ -200,6 +202,7 @@ exists (ADR 0010).
 | `g0-measured` | the cost model uses estimated rather than measured Z80 access costs **(measure)** |
 | `idx2-base` | an index home is not offered to a dereference base |
 | `byte-remat` | a byte loaded from a global is spilled instead of re-loaded at the use |
+| `byte-remat-arith` | a single-use global byte feeding a byte add or subtract is loaded and spilled to a slot instead of read at the operation |
 | `remat` | no rematerialisation of constants and symbol addresses |
 | `slot-prune` | keep a frame slot for a byte that only ever rides A |
 | `dead-de-reload` | keep a dead DE reload before a later use |

@@ -9630,6 +9630,15 @@ static int ir_lower_func_body(FILE *out, Func *f)
                     && f->vregs[uop->src[0]].width == 1
                     && f->vregs[uop->src[1]].width == 1)
                     use_ok = 1;
+                /* A byte ADD or SUB reads src[0] through load_byte_to_a and src[1]
+                   through byte_alu_operand, both of which rematerialise, so the
+                   global is read at the add/sub and never takes a slot.
+                   byte-remat-arith opts out. */
+                if (!use_ok && (uop->kind == IR_ADD || uop->kind == IR_SUB)
+                    && uop->dst >= 0 && uop->dst < f->n_vregs
+                    && f->vregs[uop->dst].width == 1
+                    && !opt_disabled("byte-remat-arith"))
+                    use_ok = 1;
                 /* [IR_CALL_BREMAT] A call ARGUMENT is a terminal consumer too:
                    the marshaller reads the byte once and pushes it, through
                    push_arg_byte_to_a (stacked), load_to_hl_adj (sc1 register)

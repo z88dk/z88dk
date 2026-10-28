@@ -6473,6 +6473,19 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
             load_byte_to_a(out, f, op->src[0]);
             emit_byte_add_imm(out, (unsigned)(op->imm & 0xff), 1);
         } else {
+            /* The subtrahend is in A and dies here: a - b = (-b) + a. Negate A
+               in place (cpl; inc a is neg's size and time on every CPU) and add
+               the minuend where it lives, so neither operand takes a slot.
+               sub-neg opts out. */
+            if (a_has(op->src[1]) && !a_has(op->src[0])
+                && !opt_disabled("sub-neg")
+                && !tos_store_vreg_live_after(f, op->src[1])) {
+                emit(out, "cpl");
+                emit(out, "inc\ta");
+                invalidate_a_cache();
+                byte_alu_operand(out, f, "add\ta,", op->src[0]);
+                return finalize_byte_result(out, f, op, 0);
+            }
             if (a_has(op->src[1]) && !a_has(op->src[0]))
                 store_a_byte(out, f, op->src[1]);
             load_byte_to_a(out, f, op->src[0]);
@@ -6981,6 +6994,24 @@ static int gen_mul(FILE *out, Func *f, const Op *op)
 static int gen_rsub(FILE *out, Func *f, const Op *op)
 {
     uint16_t k = (uint16_t)op->imm;
+    /* Byte result: K - x in A. Only x's low byte matters. rsub-byte opts out. */
+    if (op->dst >= 0 && f->vregs[op->dst].width == 1
+        && op->src[0] >= 0 && !opt_disabled("rsub-byte")) {
+        int s = op->src[0];
+        if (a_has(s)) {
+            if (tos_store_vreg_live_after(f, s))
+                store_a_byte(out, f, s);          /* x is needed again: keep a copy */
+            emit(out, "cpl");
+            emit(out, "inc\ta");                  /* A = -x */
+            emit(out, "add\ta,%u", (unsigned)(k & 0xff));
+            invalidate_a_cache();
+        } else {
+            emit(out, "ld\ta,%u", (unsigned)(k & 0xff));
+            invalidate_a_cache();
+            byte_alu_operand(out, f, "sub\t", s);
+        }
+        return finalize_byte_result(out, f, op, 0);
+    }
     if (!(IS_808x() || IS_GBZ80())) {
         /* Native 16-bit subtract: DE = var, HL = imm, HL -= DE. */
         load_to_de(out, f, op->src[0]);
