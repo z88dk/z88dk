@@ -20,6 +20,8 @@ all:	smod.bin smod_8080.bin smod_gbz80.bin smod_r2ka.bin smod_ez80.bin smod_kc16
 all:	blockfn.bin blockfn_8080.bin blockfn_gbz80.bin blockfn_r2ka.bin blockfn_ez80.bin blockfn_8085.bin blockfn_fp.bin
 all:	accintcomp.bin accintcomp_fp.bin
 all:	bigframe.bin bigframe_fp.bin bigframe_8080.bin bigframe_r2ka.bin bigframe_ez80.bin bigframe_gbz80.bin
+all:	bytearg.bin bytearg_fp.bin bytearg_8080.bin bytearg_r2ka.bin bytearg_ez80.bin bytearg_gbz80.bin bytearg_off.bin bytearg_fp_off.bin
+all:	ivstep.bin ivstep_fp.bin ivstep_8080.bin ivstep_z180.bin ivstep_ez80.bin ivstep_r2ka.bin ivstep_gbz80.bin
 all:	farptr.bin farptr_8080.bin farptr_8085.bin farptr_gbz80.bin farptr_r2ka.bin farptr_r4k.bin farptr_ez80.bin farptr_z180.bin farptr_z80n.bin farptr_kc160.bin farptr_fp.bin
 all:	farlp.bin farlp_r2ka.bin farlp_r4k.bin farlp_z80n.bin farlp_fp.bin
 all:	complement.bin complement_fp.bin complement_z80n.bin complement_z180.bin complement_ez80.bin complement_8080.bin
@@ -4487,6 +4489,66 @@ bigframe_ez80.bin: $(SOURCES) bigframe.c
 bigframe_gbz80.bin: $(SOURCES) bigframe.c
 	$(compile_gbz80)
 	$(runtest_gbz80)
+
+bytearg.bin: $(SOURCES) bytearg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytearg_fp.bin: $(SOURCES) bytearg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytearg_8080.bin: $(SOURCES) bytearg.c
+	$(compile_8080)
+	$(runtest_8080)
+
+bytearg_r2ka.bin: $(SOURCES) bytearg.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+bytearg_ez80.bin: $(SOURCES) bytearg.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+bytearg_gbz80.bin: $(SOURCES) bytearg.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+ivstep.bin: $(SOURCES) ivstep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivstep_fp.bin: $(SOURCES) ivstep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivstep_8080.bin: $(SOURCES) ivstep.c
+	$(compile_8080)
+	$(runtest_8080)
+
+ivstep_r2ka.bin: $(SOURCES) ivstep.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+ivstep_ez80.bin: $(SOURCES) ivstep.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+ivstep_gbz80.bin: $(SOURCES) ivstep.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+ivstep_z180.bin: $(SOURCES) ivstep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytearg_off.bin: $(SOURCES) bytearg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=arg-widen -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytearg_fp_off.bin: $(SOURCES) bytearg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=arg-hi-dc -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 farptr.bin: $(SOURCES) farptr.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m

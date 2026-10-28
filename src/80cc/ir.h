@@ -614,6 +614,10 @@ typedef struct {
     HelperInfo *hcall;      /* IR_HCALL only — heap allocated */
     SwitchInfo *sw;         /* IR_SWITCH only — heap allocated */
     const char *asm_text;   /* IR_ASM raw asm payload */
+    int      from_byte;     /* IR_PUSH_ARG: a byte argument widened at its producer, a call that used
+                               to take the slot path with no PUSH_ARG at all */
+    int      hi_dc;         /* IR_PUSH_ARG: the slot is a char parameter, so the
+                               high byte of the pushed word is never read */
 
     /* Source location for debug / -gcline output. */
     const char *file;

@@ -7326,7 +7326,13 @@ RegMask op_clobbers(const Func *f, const Op *op)
         if (op->call && op->call->fnptr_vreg < 0)
             return (IR_R_ALL & ~IR_R_IY & ~IR_R_IX) & ~op->call->preserved;
         return IR_R_ALL;
-    case IR_ASM: case IR_PUSH_ARG:
+    case IR_PUSH_ARG:
+        /* Loads the value into HL/DEHL and pushes it; an index register is read
+           (push ix/iy; pop hl) but never written, so a home there survives. */
+        if (!opt_disabled("push-idx-keep") && (op->from_byte || ir_iy_home_available(f)))
+            return IR_R_ALL & ~IR_R_IX & ~IR_R_IY;
+        return IR_R_ALL;
+    case IR_ASM:
     case IR_PUSH_STRUCT: case IR_RET: case IR_MEMSET:
     case IR_MEMCPY:
         return IR_R_ALL;               /* opaque: helper call / whole-reg-set */

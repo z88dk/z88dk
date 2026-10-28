@@ -72,4 +72,7 @@ int  ir_home_hi_of(const Func *f, int v);
    not (the no-clobber envelope keeps them resident for the whole function). */
 int ir_home_reg_is_slotbacked(PhysReg pr);
 
+/* True when IY can home a value in this function (CPU has it, not reserved). */
+int ir_iy_home_available(const Func *f);
+
 #endif /* IR_ALLOC_H */

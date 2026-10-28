@@ -273,6 +273,22 @@ static int arg_pure_nonvolatile(Node *n, int *nvol)
     }
 }
 
+/* A literal or a plain variable: loading it at its push costs about what
+   loading it earlier would. */
+static int arg_is_trivial(Node *n)
+{
+    if (!n) return 1;
+    switch (n->ast_type) {
+    case AST_LITERAL: case AST_STR_LIT: case AST_LOCAL_VAR: case AST_GLOBAL_VAR:
+        return 1;
+    case OP_DEREF: case AST_DEREF:        /* a plain variable read */
+        return n->operand && (n->operand->ast_type == AST_LOCAL_VAR
+                           || n->operand->ast_type == AST_GLOBAL_VAR);
+    default:
+        return 0;
+    }
+}
+
 static int arg_has_control_flow(Node *n)
 {
     if (!n) return 0;
@@ -4554,7 +4570,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                           : n_args;
             /* control-flow arguments first */
             int pre_v[64];
-            int reorder = 0;
+            int reorder = 0, hoist = 0;
             if (n_to_push == n_args && n_args >= 2 && n_args <= 64
                 && !opt_disabled("arg-reorder")) {
                 int any_cf = 0, all_ok = 1, vol_args = 0;
@@ -4569,14 +4585,32 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                         if (arg_has_control_flow(a)) any_cf = 1;
                     }
                 }
-                reorder = all_ok && any_cf && vol_args <= 1;
+                /* A byte argument that needs computing, pushed after a trivial
+                   one, is built first: its operands may sit on top of the stack
+                   and are cheaper to reach before anything is pushed. */
+                if (all_ok && !any_cf && !opt_disabled("arg-hoist")
+                    && !(fl & (SDCCDECL | SDCCCALL1))) {
+                    int seen_trivial = 0;
+                    for (int k = 0; k < n_args; k++) {
+                        int i = is_stdc ? n_args - 1 - k : k;
+                        Node *a = array_get_byindex(n->args, i);
+                        if (arg_is_trivial(a)) { seen_trivial = 1; continue; }
+                        if (seen_trivial && a && a->type && a->type->size == 1) {
+                            hoist = 1; break;
+                        }
+                    }
+                }
+                reorder = all_ok && (any_cf || hoist) && vol_args <= 1;
             }
             if (reorder) {
                 for (int i = 0; i < n_args; i++) pre_v[i] = -1;
                 for (int k = 0; k < n_args; k++) {
                     int i = is_stdc ? n_args - 1 - k : k;
                     Node *a = array_get_byindex(n->args, i);
-                    if (!arg_has_control_flow(a)) continue;
+                    if (!arg_has_control_flow(a)
+                        && !(hoist && !arg_is_trivial(a) && a->type
+                             && a->type->size == 1))
+                        continue;
                     pre_v[i] = build_expr(b, a);
                     if (pre_v[i] < 0) { free(args); free(arg_pushed_bytes); return -1; }
                 }
@@ -4666,6 +4700,20 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                         cv->dst = wt; cv->src[0] = v; v = wt;
                     }
                 }
+                /* A byte arg to a 2-byte stack slot (smallc / stdc / callee)
+                   is zero-extended at its producer so the push can follow it
+                   directly; a byte arg left at width 1 rolls every push in
+                   the call back to the slot path. */
+                int widened_byte = 0;
+                if (!arg_is_struct && k < n_to_push
+                    && b->f->vregs[v].width == 1
+                    && !(fl & (SDCCDECL | SDCCCALL1))
+                    && !opt_disabled("arg-widen")) {
+                    int wt = new_temp_kind(b, KIND_INT);
+                    Op *cv = ir_op_emit(cur_bb(b), IR_CONV_ZX);
+                    cv->dst = wt; cv->src[0] = v; v = wt;
+                    widened_byte = 1;
+                }
                 args[i] = v;
                 /* Bytes this arg occupies on the caller stack: a struct's full
                    size (its vreg is just the 2-byte address), else the vreg
@@ -4690,6 +4738,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     Op *p = ir_op_emit(cur_bb(b), IR_PUSH_ARG);
                     p->src[0] = v;
                     p->src[1] = -1;
+                    p->from_byte = widened_byte;
+                    p->hi_dc = (pt_i && pt_i->kind == KIND_CHAR
+                                && !(fl & (SDCCDECL | SDCCCALL1))
+                                && !opt_disabled("arg-hi-dc"));
                     /* imm=1 marks the call's FIRST push: if the
                        function keeps a PR_BC tenant, the lowerer
                        saves BC there — BELOW the arg block — and

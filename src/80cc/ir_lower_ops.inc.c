@@ -524,6 +524,7 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
         && !opt_disabled("de-home-step") && byte_home_holds(op->dst)) {
         emit(out, "%s\tde", mnem);
         if (hl_has(op->dst)) invalidate_hl_cache();
+        if (bc_has(op->dst)) invalidate_bc_cache();
         cache_de(op->dst);
         byte_home_note(op->dst);
         L.cur_de_byte_home_dirty = 1;
@@ -536,6 +537,7 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
         emit(out, "%s\t%s", mnem, vreg_idx_name(f, op->dst));
         if (hl_has(op->dst)) invalidate_hl_cache();
         if (de_has(op->dst)) invalidate_de_cache();
+        if (bc_has(op->dst)) invalidate_bc_cache();
         return 0;
     }
     /* Step a BC/DE-homed walking pointer in place instead of copying through HL.
@@ -553,6 +555,9 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
         && (bc_resident || de_resident)) {
         emit(out, "%s\t%s", mnem, bc_resident ? "bc" : "de");
         if (hl_has(op->dst)) invalidate_hl_cache();
+        /* A copy of the old value in the other pair is stale now. */
+        if (bc_resident && de_has(op->dst)) invalidate_de_cache();
+        if (!bc_resident && bc_has(op->dst)) invalidate_bc_cache();
         if (bc_resident) cache_bc(op->dst); else cache_de(op->dst);
         return 0;
     }
@@ -2124,7 +2129,9 @@ static int gen_conv_zx(FILE *out, Func *f, const Op *op)
             return 0;
         }
         emit(out, "ld\tl,a");
-        emit(out, "ld\th,0");
+        const Op *use = find_unique_use(f, op->dst);
+        if (!(use && use->kind == IR_PUSH_ARG && use->hi_dc))
+            emit(out, "ld\th,0");
         commit_hl_word(out, f, op->dst);
         return 0;
     }

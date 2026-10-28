@@ -192,6 +192,11 @@ exists (ADR 0010).
 | `stack-spill-multi` | a word read more than once, or nested inside another parked word, stays in a frame slot instead of being parked on the data stack and read back with pop/push |
 | `stack-spill-reuse` | a parked word that has later readers is not read back from the stack while a register still holds it |
 | `idx-add-keep-de` | an add of a register operand into an index-register home forgets that DE still holds the operand |
+| `arg-widen` | a byte argument to a stack slot is no longer zero-extended where it is produced, so one byte argument sends the whole call back to the slot path |
+| `arg-hi-dc` | a byte pushed for a char parameter is zero-extended even though the callee never reads the high byte |
+| `push-idx-keep` | a pre-pushed call argument is treated as clobbering IX and IY, so an index-register home does not survive it |
+| `slot0-weight` | the value given frame offset 0 is chosen by static access count, not loop-weighted, and may be a register-resident value |
+| `arg-hoist` | a byte argument that needs computing is no longer built before a trivial argument pushed ahead of it, so its operands can sit under the pushes |
 | `tight-homes` | home intervals stay whole-function instead of narrowing to the live range (stage 1 of the ranging arc, ADR 0027) |
 | `call-split` | no call-bounded live-range splitting |
 | `cs-evict` | a call-split tenant never displaces an incumbent |
