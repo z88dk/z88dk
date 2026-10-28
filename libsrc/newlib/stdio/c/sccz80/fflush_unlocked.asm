@@ -11,6 +11,8 @@ EXTERN asm_fflush_unlocked
 fflush_unlocked:
 
    push hl
+   ex (sp),ix
+
+   call asm_fflush_unlocked
    pop ix
-   
-   jp asm_fflush_unlocked
+   ret

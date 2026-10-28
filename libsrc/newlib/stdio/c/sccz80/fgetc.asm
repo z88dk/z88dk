@@ -17,9 +17,11 @@ EXTERN asm_fgetc
 fgetc:
 
    push hl
+   ex (sp),ix
+
+   call asm_fgetc
    pop ix
-   
-   jp asm_fgetc
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

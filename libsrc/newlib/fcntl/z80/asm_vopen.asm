@@ -39,15 +39,25 @@ asm_vopen:
    ;            hl = -1
    ;            carry set, errno set
    ;
-   ; uses  : all except iy
+   ; uses  : all except ix, iy
    
    ; check oflag
-   
+
+   push ix
+
    ld a,c
    and $03
-   jp z, error_einval_mc       ; if at least one of RW not set
-   
+   jr z, vopen_einval          ; if at least one of RW not set
+
    res 7,c                     ; set ref_count to one
+   call asm0_vopen
+   pop ix
+   ret
+
+vopen_einval:
+
+   pop ix
+   jp error_einval_mc
 
 asm0_vopen:
 

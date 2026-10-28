@@ -8,11 +8,4 @@ PUBLIC _fscanf_unlocked
 
 EXTERN asm_fscanf_unlocked
 
-_fscanf_unlocked:
-
-   push ix
-   
-   call asm_fscanf_unlocked
-   
-   pop ix
-   ret
+defc _fscanf_unlocked = asm_fscanf_unlocked

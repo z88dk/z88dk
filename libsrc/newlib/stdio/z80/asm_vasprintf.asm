@@ -55,9 +55,10 @@ asm_vasprintf:
    exx
    
    jp z, error_einval_mc       ; if ptr == NULL
-   
+
    ; use vsnprintf to determine length of result
-   
+
+   push ix
    push bc                     ; save arg
    push de                     ; save format
    
@@ -78,14 +79,13 @@ asm_vasprintf:
    
    ; hl  = char *s
    ; hl' = char **ptr
-   ; stack = arg, format, length
+   ; stack = ix, arg, format, length
    
    push hl
    exx
    pop de                      ; de = char *s
 
-   ld (hl),e
-   inc hl
+   ld (hl+),e
    ld (hl),d                   ; *ptr = s
    
    pop bc                      ; bc = length
@@ -100,7 +100,9 @@ asm_vasprintf:
    ; de  = char *format
    ; bc  = void *arg
    
-   jp asm_vsnprintf
+   call asm_vsnprintf
+   pop ix
+   ret
 
 error_3:
 
@@ -110,12 +112,13 @@ error_2:
 
    pop de
    pop bc
-   
+
    exx
 
    ld (hl),0
    inc hl
    ld (hl),0                   ; *ptr = 0
-   
+
    exx
+   pop ix
    jp error_mc

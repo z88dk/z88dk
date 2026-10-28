@@ -8,11 +8,4 @@ PUBLIC _open
 
 EXTERN asm_open
 
-_open:
-
-   push ix
-   
-   call asm_open
-   
-   pop ix
-   ret
+defc _open = asm_open

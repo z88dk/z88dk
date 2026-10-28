@@ -20,9 +20,4 @@ _vasprintf_callee:
 
 l0_vasprintf_callee:
 
-   push ix
-   
-   call asm_vasprintf
-   
-   pop ix
-   ret
+   jp asm_vasprintf

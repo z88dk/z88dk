@@ -14,14 +14,7 @@ PUBLIC _fscanf
 
 EXTERN asm_fscanf
 
-_fscanf:
-
-   push ix
-   
-   call asm_fscanf
-   
-   pop ix
-   ret
+defc _fscanf = asm_fscanf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

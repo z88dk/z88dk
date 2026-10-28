@@ -94,7 +94,8 @@ buffer_zerolen:
 output_string:
 
    ; create a fake FILE structure on the stack
-   
+
+   push ix
    ld hl,0
    push hl
    ld hl,$8000 + (vsnprintf_outchar / 256)
@@ -114,7 +115,7 @@ output_string:
    pop bc
    pop bc
    pop bc
-   
+   pop ix
    ret
 
 vsnprintf_outchar:
@@ -146,8 +147,7 @@ _writ:
    sbc hl,bc
    call l_neg_hl               ; hl = n - out_length
    
-   ld c,l
-   ld b,h                      ; bc = size_t n (remaining)
+   ld bc,hl                    ; bc = size_t n (remaining)
    
    push de
    exx
@@ -214,8 +214,7 @@ _putc_many:
    sbc hl,bc
    call l_neg_hl               ; hl = n - out_length
    
-   ld c,l
-   ld b,h                      ; bc = size_t n (remaining)
+   ld bc,hl                    ; bc = size_t n (remaining)
    
    push de
    exx

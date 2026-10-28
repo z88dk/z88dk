@@ -11,6 +11,8 @@ EXTERN asm_clearerr_unlocked
 clearerr_unlocked:
 
    push hl
+   ex (sp),ix
+
+   call asm_clearerr_unlocked
    pop ix
-   
-   jp asm_clearerr_unlocked
+   ret

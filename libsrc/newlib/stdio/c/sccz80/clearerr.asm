@@ -17,9 +17,11 @@ EXTERN asm_clearerr
 clearerr:
 
    push hl
+   ex (sp),ix
+
+   call asm_clearerr
    pop ix
-   
-   jp asm_clearerr
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

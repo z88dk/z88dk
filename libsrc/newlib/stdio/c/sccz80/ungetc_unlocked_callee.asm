@@ -11,7 +11,13 @@ EXTERN asm_ungetc_unlocked
 ungetc_unlocked_callee:
 
    pop hl
-   pop ix
+   pop de
    ex (sp),hl
-   
-   jp asm_ungetc_unlocked
+
+   push ix
+   push de
+   pop ix
+
+   call asm_ungetc_unlocked
+   pop ix
+   ret

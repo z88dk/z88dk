@@ -17,9 +17,11 @@ EXTERN asm_ferror
 ferror:
 
    push hl
+   ex (sp),ix
+
+   call asm_ferror
    pop ix
-   
-   jp asm_ferror
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

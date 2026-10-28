@@ -11,6 +11,8 @@ EXTERN asm_fileno_unlocked
 fileno_unlocked:
 
    push hl
+   ex (sp),ix
+
+   call asm_fileno_unlocked
    pop ix
-   
-   jp asm_fileno_unlocked
+   ret

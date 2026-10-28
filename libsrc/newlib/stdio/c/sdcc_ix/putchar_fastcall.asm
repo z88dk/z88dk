@@ -14,14 +14,7 @@ PUBLIC _putchar_fastcall
 
 EXTERN asm_putchar
 
-_putchar_fastcall:
-
-   push ix
-   
-   call asm_putchar
-   
-   pop ix
-   ret
+defc _putchar_fastcall = asm_putchar
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

@@ -11,8 +11,14 @@ EXTERN asm_freopen_unlocked
 freopen_unlocked_callee:
 
    pop hl
-   pop ix
+   pop bc
    pop de
    ex (sp),hl
-   
-   jp asm_freopen_unlocked
+
+   push ix
+   push bc
+   pop ix
+
+   call asm_freopen_unlocked
+   pop ix
+   ret

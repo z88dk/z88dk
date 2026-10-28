@@ -8,11 +8,4 @@ PUBLIC _asprintf
 
 EXTERN asm_asprintf
 
-_asprintf:
-
-   push ix
-   
-   call asm_asprintf
-   
-   pop ix
-   ret
+defc _asprintf = asm_asprintf

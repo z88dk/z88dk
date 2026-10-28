@@ -24,7 +24,7 @@ asm_ioctl:
    ;
    ; exit  : success
    ;
-   ;            ix = FDSTRUCT* corresponding to receiving device
+   ;            ix unchanged
    ;            hl = return value
    ;            carry reset
    ;
@@ -33,10 +33,13 @@ asm_ioctl:
    ;            hl = -1
    ;            carry set, errno set
    ;
-   ; uses  : af, bc, de, hl, ix
+   ; uses  : af, bc, de, hl
 
    call __stdio_varg_2         ; de = fd
    call __stdio_nextarg_bc     ; bc = request
-   
+
    ex de,hl
-   jp asm_vioctl
+   push ix
+   call asm_vioctl
+   pop ix
+   ret

@@ -17,9 +17,4 @@ _vscanf_unlocked_callee:
 
 l0_vscanf_unlocked_callee:
 
-   push ix
-   
-   call asm_vscanf_unlocked
-   
-   pop ix
-   ret
+   jp asm_vscanf_unlocked

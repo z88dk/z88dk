@@ -22,7 +22,7 @@ asm_fprintf_unlocked:
    ;
    ; enter : none
    ;
-   ; exit  : ix = FILE *
+   ; exit  : ix unchanged
    ;         de = char *format (next unexamined char)
    ;
    ;         success
@@ -45,13 +45,15 @@ asm_fprintf_unlocked:
    ; uses  : all
 
    call __stdio_varg_2
-   
+
+   push ix
    push de
    pop ix                      ; ix = FILE *
-   
+
    call __stdio_nextarg_de     ; de = char *format
-   
-   ld c,l
-   ld b,h                      ; bc = void *arg
-   
-   jp asm_vfprintf_unlocked
+
+   ld bc,hl                    ; bc = void *arg
+
+   call asm_vfprintf_unlocked
+   pop ix
+   ret

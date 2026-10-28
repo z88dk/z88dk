@@ -10,11 +10,22 @@ EXTERN asm_fread_unlocked
 
 fread_unlocked_callee:
 
-   pop af
-   pop ix
    pop hl
-   pop bc
    pop de
+   pop bc
+   pop af
+   ex (sp),hl
+
+   push ix
+   push de
+   pop ix
+   push bc
+   push hl
+   pop de
+   pop hl
    push af
-   
-   jp asm_fread_unlocked
+   pop bc
+
+   call asm_fread_unlocked
+   pop ix
+   ret

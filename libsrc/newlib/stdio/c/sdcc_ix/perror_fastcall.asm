@@ -8,11 +8,4 @@ PUBLIC _perror_fastcall
 
 EXTERN asm_perror
 
-_perror_fastcall:
-
-   push ix
-   
-   call asm_perror
-   
-   pop ix
-   ret
+defc _perror_fastcall = asm_perror

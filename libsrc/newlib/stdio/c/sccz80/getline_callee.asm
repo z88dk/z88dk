@@ -17,11 +17,17 @@ EXTERN asm_getline
 getline_callee:
 
    pop hl
-   pop ix
+   pop bc
    pop de
    ex (sp),hl
-   
-   jp asm_getline
+
+   push ix
+   push bc
+   pop ix
+
+   call asm_getline
+   pop ix
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

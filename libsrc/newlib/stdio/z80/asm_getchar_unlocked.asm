@@ -22,7 +22,7 @@ asm_getchar_unlocked:
 
    ; enter : none
    ;
-   ; exit  : ix = FILE *stdin
+   ; exit  : ix unchanged
    ;
    ;         if success
    ;
@@ -34,7 +34,10 @@ asm_getchar_unlocked:
    ;            hl = -1
    ;            carry set
    ;
-   ; uses  : all
+   ; uses  : all except ix
 
+   push ix
    ld ix,(_stdin)
-   jp asm_fgetc_unlocked
+   call asm_fgetc_unlocked
+   pop ix
+   ret

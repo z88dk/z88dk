@@ -8,11 +8,4 @@ PUBLIC _sscanf
 
 EXTERN asm_sscanf
 
-_sscanf:
-
-   push ix
-   
-   call asm_sscanf
-   
-   pop ix
-   ret
+defc _sscanf = asm_sscanf

@@ -17,9 +17,11 @@ EXTERN asm_fileno
 fileno:
 
    push hl
+   ex (sp),ix
+
+   call asm_fileno
    pop ix
-   
-   jp asm_fileno
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

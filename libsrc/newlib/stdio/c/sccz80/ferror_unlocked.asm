@@ -11,6 +11,8 @@ EXTERN asm_ferror_unlocked
 ferror_unlocked:
 
    push hl
+   ex (sp),ix
+
+   call asm_ferror_unlocked
    pop ix
-   
-   jp asm_ferror_unlocked
+   ret

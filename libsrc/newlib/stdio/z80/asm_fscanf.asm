@@ -28,7 +28,7 @@ asm_fscanf:
    ;
    ; enter : none
    ;
-   ; exit  : ix = FILE *
+   ; exit  : ix unchanged
    ;         de = char *format (next unexamined char)
    ;         hl = number of items assigned
    ;         de'= number of chars consumed from the stream
@@ -55,16 +55,18 @@ asm_fscanf:
    ; uses  : all
 
    call __stdio_varg_2
-   
+
+   push ix
    push de
    pop ix                      ; ix = FILE *
-   
+
    call __stdio_nextarg_de     ; de = char *format
-   
-   ld c,l
-   ld b,h                      ; bc = void *arg
-   
-   jp asm_vfscanf
+
+   ld bc,hl                    ; bc = void *arg
+
+   call asm_vfscanf
+   pop ix
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

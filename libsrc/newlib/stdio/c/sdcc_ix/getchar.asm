@@ -14,14 +14,7 @@ PUBLIC _getchar
 
 EXTERN asm_getchar
 
-_getchar:
-
-   push ix
-   
-   call asm_getchar
-   
-   pop ix
-   ret
+defc _getchar = asm_getchar
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

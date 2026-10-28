@@ -28,7 +28,7 @@ asm_printf:
    ;
    ; enter : none
    ;
-   ; exit  : ix = FILE *stdout
+   ; exit  : ix unchanged
    ;         de = char *format (next unexamined char)
    ;
    ;         success
@@ -53,8 +53,7 @@ asm_printf:
 
    call __stdio_varg_2         ; de = char *format
    
-   ld c,l
-   ld b,h                      ; bc = void *arg
+   ld bc,hl                    ; bc = void *arg
    
    jp asm_vprintf
 

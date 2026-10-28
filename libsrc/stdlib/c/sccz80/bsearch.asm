@@ -12,26 +12,39 @@ EXTERN asm_bsearch
 
 bsearch:
 
-   pop af
-   pop ix
-   pop de
-   pop hl
-   pop bc
-   exx
-   pop bc
-   
-   push bc
-   push bc
-   push hl
+   push ix
+
+   ld hl,sp+4
+   ld e,(hl+)
+   ld d,(hl)
    push de
-   push hl
-   push af
-   
+   pop ix
+
+   ld hl,sp+6
+   ld e,(hl+)
+   ld d,(hl)
+
+   ld hl,sp+8
+   ld c,(hl+)
+   ld b,(hl)
+   push bc
+
+   ld hl,sp+12
+   ld c,(hl+)
+   ld b,(hl)
+   push bc
+
+   ld hl,sp+16
+   ld c,(hl+)
+   ld b,(hl)
    push bc
    pop af
-   
-   exx
-   jp asm_bsearch
+   pop bc
+   pop hl
+
+   call asm_bsearch
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

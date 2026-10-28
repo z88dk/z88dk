@@ -23,12 +23,7 @@ _vprintf_callee:
 
 l0_vprintf_callee:
 
-   push ix
-   
-   call asm_vprintf
-   
-   pop ix
-   ret
+   jp asm_vprintf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

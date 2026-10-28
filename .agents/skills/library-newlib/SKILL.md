@@ -336,6 +336,18 @@ math (Whetstone, n-body).
 
 ---
 
+## 8. Caller IX
+
+A Z80 newlib C entry that writes IX saves the caller IX and restores it before `ret`. An `asm0_*` label still enters and exits with IX = FILE *. It does not save. SDCC keeps `ex (sp),ix` when that instruction loads FILE * or a comparator. A bridge that only pushes IX becomes `defc` after the asm saves IX.
+
+`__stdio_varg_2` on SDCC uses `ld hl,4`. That skips two return addresses. Do not push IX on those bridges.
+
+A terminal driver uses `ex (sp),ix` as the FDSTRUCT message protocol. Do not add a second save there.
+
+8080, 8085, and gbz80 have no IX. Guard `push ix` in a shared file with `IF !__CPU_INTEL__ && !__CPU_GBZ80__`. `stdio/z80` is already the Z80 build.
+
+These C paths still write IX: the sccz80 `strtol` and `itoa` bridges, `fopen`, `fmemopen`, and `fdopen`, fcntl other than `open` and `ioctl`, and the caller-cleanup stdio symbols. The headers call the callee or fastcall symbols. `asm_vioctl` still returns the FDSTRUCT in IX.
+
 ## Related
 
 - Classic: `library-classic`

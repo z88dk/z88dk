@@ -17,9 +17,11 @@ EXTERN asm_fclose
 fclose:
 
    push hl
+   ex (sp),ix
+
+   call asm_fclose
    pop ix
-   
-   jp asm_fclose
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

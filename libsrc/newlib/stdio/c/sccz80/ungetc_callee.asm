@@ -17,10 +17,16 @@ EXTERN asm_ungetc
 ungetc_callee:
 
    pop hl
-   pop ix
+   pop de
    ex (sp),hl
-   
-   jp asm_ungetc
+
+   push ix
+   push de
+   pop ix
+
+   call asm_ungetc
+   pop ix
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

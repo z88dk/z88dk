@@ -8,11 +8,4 @@ PUBLIC _puts_unlocked_fastcall
 
 EXTERN asm_puts_unlocked
 
-_puts_unlocked_fastcall:
-
-   push ix
-   
-   call asm_puts_unlocked
-   
-   pop ix
-   ret
+defc _puts_unlocked_fastcall = asm_puts_unlocked

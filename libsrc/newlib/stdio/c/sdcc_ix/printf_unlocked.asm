@@ -8,11 +8,4 @@ PUBLIC _printf_unlocked
 
 EXTERN asm_printf_unlocked
 
-_printf_unlocked:
-
-   push ix
-   
-   call asm_printf_unlocked
-   
-   pop ix
-   ret
+defc _printf_unlocked = asm_printf_unlocked

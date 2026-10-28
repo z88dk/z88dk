@@ -11,6 +11,8 @@ EXTERN asm_flockfile
 flockfile:
 
    push hl
+   ex (sp),ix
+
+   call asm_flockfile
    pop ix
-   
-   jp asm_flockfile
+   ret

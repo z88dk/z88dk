@@ -11,6 +11,8 @@ EXTERN asm_ftell_unlocked
 ftell_unlocked:
 
    push hl
+   ex (sp),ix
+
+   call asm_ftell_unlocked
    pop ix
-   
-   jp asm_ftell_unlocked
+   ret

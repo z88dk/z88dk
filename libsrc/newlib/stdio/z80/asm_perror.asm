@@ -23,11 +23,12 @@ asm_perror:
 
    ; enter : hl = char *s
    ;
-   ; exit  : ix = FILE *stderr
+   ; exit  : ix unchanged
    ;         carry set on error
    ;
    ; uses  : all except ix
    
+   push ix
    ld ix,(_stderr)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -39,14 +40,14 @@ IF __CLIB_OPT_MULTITHREAD & $02
       EXTERN __stdio_verify_valid_lock
    
       call __stdio_verify_valid_lock
-      ret c
+      jr c, perror_exit
    
    ELSE
    
       EXTERN __stdio_lock_acquire, error_mc
       
       call __stdio_lock_acquire
-      jp c, error_mc
+      jr c, perror_mc
 
    ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -59,7 +60,7 @@ ELSE
       EXTERN __stdio_verify_valid
       
       call __stdio_verify_valid
-      ret c
+      jr c, perror_exit
    
    ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -98,11 +99,31 @@ IF __CLIB_OPT_MULTITHREAD & $02
    EXTERN __stdio_lock_release
 
    call asm0_fputc_unlocked
-   jp __stdio_lock_release
+   call __stdio_lock_release
 
 ELSE
 
-   jp asm0_fputc_unlocked
+   call asm0_fputc_unlocked
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+perror_exit:
+
+   pop ix
+   ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $02
+
+   IF !(__CLIB_OPT_STDIO & $01)
+
+perror_mc:
+
+   pop ix
+   jp error_mc
+
+   ENDIF
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

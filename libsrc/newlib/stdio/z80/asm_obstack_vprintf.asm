@@ -42,6 +42,7 @@ asm_obstack_vprintf:
    ;            
    ; uses  : all
    
+   push ix
    push bc                     ; save arg
    push de                     ; save format
    push hl                     ; save obstack
@@ -60,8 +61,7 @@ asm_obstack_vprintf:
    
    ; attempt to grow object
    
-   ld c,l
-   ld b,h                      ; bc = size
+   ld bc,hl                    ; bc = size
    
    ex (sp),hl                  ; hl = obstack
    
@@ -71,7 +71,7 @@ asm_obstack_vprintf:
    ; no errors to here so can assume no more errors will occur
    
    ; de  = char *s
-   ; stack = arg, format, length
+   ; stack = ix, arg, format, length
 
    push de
    exx
@@ -86,7 +86,9 @@ asm_obstack_vprintf:
    ; de  = char *format
    ; bc  = void *arg
    
-   jp asm_vsnprintf
+   call asm_vsnprintf
+   pop ix
+   ret
 
 error_3:
 
@@ -96,5 +98,5 @@ error_2:
 
    pop de
    pop bc
-   
+   pop ix
    jp error_mc
