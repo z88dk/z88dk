@@ -36,7 +36,9 @@ is omitted, it is the c90base build. Page zero is included. Classic
 and newlib use this same count. Per-module TIMER sizes are in the
 RESULT blocks. Those are separate images.
 
-80cc is built without -fframe-pointer.
+80cc stack is the default. Locals are relative to the stack
+pointer. 80cc frame passes -fframe-pointer. Locals are relative to
+IX. 8085 does not get that flag.
 
 From this directory, `make` rebuilds the matrix. `make classic`,
 `make new`, and `make 8085` are the subsets. `make -j` is safe.
@@ -48,25 +50,26 @@ outside these three-compiler tables.
 CLASSIC Z80
 ===========
 
-Z80, 4 MHz, classic +test, October 27, 2026.
+Z80, 4 MHz, classic +test, October 29, 2026.
 Full RESULT blocks: z88dk-classic/readme.txt.
 
-Compiler | Bytes | c90base | c90lib | Total | c90base ticks | c90lib ticks
----------|------:|-------:|-------:|------:|--------------:|-------------:
-sccz80   | 27605 |    1.9 |    3.3 |   5.2 |   168_749_272 |  491_595_488
-80cc     | 28110 |    3.1 |    3.9 |   7.0 |   102_158_431 |  410_457_676
-zsdcc    | 25341 |    3.5 |    4.4 |   7.9 |    91_051_880 |  367_241_838
+Compiler   | Bytes | c90base | c90lib | Total | c90base ticks | c90lib ticks
+-----------|------:|-------:|-------:|------:|--------------:|-------------:
+sccz80     | 27605 |    1.9 |    3.3 |   5.2 |   168_749_272 |  491_595_488
+80cc stack | 28110 |    3.1 |    3.9 |   7.0 |   102_158_431 |  410_457_676
+80cc frame | 28533 |    3.1 |    3.9 |   7.0 |   102_618_241 |  406_156_584
+zsdcc      | 25341 |    3.5 |    4.4 |   7.9 |    91_051_880 |  367_241_838
 
 zsdcc is 4.6.0 #16639. The sccz80 iotimer image printed 1, 3, and 4.
-The 80cc iotimer image printed 3, 3, and 6. The zsdcc iotimer image
-printed 3, 4, and 7. Those prints are this table truncated to an
-integer.
+The 80cc stack image printed 3, 3, and 6. The 80cc frame image
+printed 3, 3, and 6. The zsdcc iotimer image printed 3, 4, and 7.
+Those prints are this table truncated to an integer.
 
 
 NEWLIB Z80
 ==========
 
-Z80, 4 MHz, +z80 -startup=0, October 27, 2026.
+Z80, 4 MHz, +z80 -startup=0, October 29, 2026.
 Full RESULT blocks: z88dk-new/readme.txt.
 
 c90lib calls realloc. These rows are the fast spare-tail allocator
@@ -77,18 +80,19 @@ libsrc/newlib/target/z80/obj/config_private.inc, and run
 `make -C libsrc/newlib z80` before `make new`. c90base does not
 call malloc. Its cycle count does not include heap init.
 
-Compiler | Bytes | c90base | c90lib | Total | c90base ticks | c90lib ticks
----------|------:|-------:|-------:|------:|--------------:|-------------:
-sccz80   | 29010 |    1.9 |    2.9 |   4.8 |   168_749_224 |  557_117_716
-80cc     | 29178 |    3.1 |    3.4 |   6.5 |   102_158_431 |  475_976_814
-zsdcc    | 26691 |    3.5 |    3.8 |   7.3 |    92_368_035 |  419_437_901
+Compiler   | Bytes | c90base | c90lib | Total | c90base ticks | c90lib ticks
+-----------|------:|-------:|-------:|------:|--------------:|-------------:
+sccz80     | 29010 |    1.9 |    2.9 |   4.8 |   168_749_224 |  557_117_716
+80cc stack | 29194 |    3.1 |    3.4 |   6.5 |   102_158_431 |  475_987_866
+80cc frame | 29673 |    3.1 |    3.4 |   6.5 |   102_618_241 |  471_783_902
+zsdcc      | 26691 |    3.5 |    3.8 |   7.3 |    92_368_035 |  419_437_901
 
 zsdcc is 4.6.0 #16639. The sccz80 iotimer image printed 1, 2, and 3.
-That print is this sccz80 row truncated to an integer. The 80cc
-iotimer image printed 3, 3, and 6. That print is this 80cc row
-truncated to an integer. The zsdcc
-iotimer image printed 1, 1, and 2. This table uses the TIMER formula
-for that row: 3.5 and 3.8, total 7.3. The program's final divide by
-100 calls __div32, the xcc register helper, and that call produces the
-printed 1. The workload finishes with no ERROR line. TIMER_STOP is
-before that divide.
+That print is this sccz80 row truncated to an integer. The 80cc stack
+iotimer image printed 3, 3, and 6. The 80cc frame iotimer image
+printed 3, 3, and 6. Those prints are this table truncated to an
+integer. The zsdcc iotimer image printed 1, 1, and 2.
+This table uses the TIMER formula for that row: 3.5 and 3.8, total
+7.3. The program's final divide by 100 calls __div32. That call
+produces the printed 1. The workload finishes with no ERROR line.
+TIMER_STOP is before that divide.

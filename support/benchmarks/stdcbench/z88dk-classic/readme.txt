@@ -28,10 +28,11 @@ From support/benchmarks/stdcbench:
 
 make classic
 
-That builds and times sccz80, 80cc, and zsdcc, each for c90base and
-c90lib, and it builds the three iotimer images. Each result is
-build/<name>/ticks. make -j is safe. 80cc is built without
--fframe-pointer.
+That builds and times sccz80, 80cc stack, 80cc frame, and zsdcc.
+Each compiler has a c90base image, a c90lib image, and an iotimer
+image. Each result is build/<name>/ticks. make -j is safe. 80cc
+stack is the default. 80cc frame passes -fframe-pointer. The 8085
+row does not pass that flag.
 
 make 8085
 
@@ -42,7 +43,8 @@ IN-PROGRAM SCORE
 
 `make classic` also builds the iotimer images. Port 2, buffer
 _tickbuf, T-states/40. The sccz80 image printed 1, 3, and 4.
-The 80cc image printed 3, 3, and 6. That image is 28110 bytes.
+The 80cc stack image printed 3, 3, and 6. That image is 28110 bytes.
+The 80cc frame image printed 3, 3, and 6. That image is 28533 bytes.
 The zsdcc image printed 3, 4, and 7. That image is 25341 bytes.
 Those prints truncate the score. The RESULT blocks keep one decimal.
 
@@ -76,8 +78,8 @@ time @ 4MHz  = 130654532 / 4*10^6 = 32.66 sec
 stdcbench score = 2.4
 
 
-Z88DK October 27, 2026
-80cc / classic c library / c90base
+Z88DK October 29, 2026
+80cc stack / classic c library / c90base
 9035 bytes less page zero
 
 cycle count  = 102158431
@@ -85,12 +87,30 @@ time @ 4MHz  = 102158431 / 4*10^6 = 25.54 sec
 stdcbench score = 3.1
 
 
-Z88DK October 27, 2026
-80cc / classic c library / c90lib
+Z88DK October 29, 2026
+80cc stack / classic c library / c90lib
 22988 bytes less page zero
 
 cycle count  = 410457676
 time @ 4MHz  = 410457676 / 4*10^6 = 102.61 sec
+stdcbench score = 3.9
+
+
+Z88DK October 29, 2026
+80cc frame / classic c library / c90base
+9113 bytes less page zero
+
+cycle count  = 102618241
+time @ 4MHz  = 102618241 / 4*10^6 = 25.65 sec
+stdcbench score = 3.1
+
+
+Z88DK October 29, 2026
+80cc frame / classic c library / c90lib
+23346 bytes less page zero
+
+cycle count  = 406156584
+time @ 4MHz  = 406156584 / 4*10^6 = 101.54 sec
 stdcbench score = 3.9
 
 
