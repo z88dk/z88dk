@@ -16,8 +16,7 @@
 # libsrc/newlib/target/z80/obj/config_private.inc, then
 # `make -C libsrc/newlib z80`. That refreshes sccz80/z80.lib and
 # sdcc_ix/z80.lib. c90base does not call malloc.
-# 80cc is the stack-pointer build (the default). 80cc-fp passes
-# -fframe-pointer. 8085 is not given that flag.
+# 80cc is built without -fframe-pointer.
 
 ROOT  := $(abspath .)
 CSRC  := $(wildcard $(ROOT)/*.c)
@@ -36,13 +35,10 @@ classic: \
 	$(BUILD)/classic-sccz80-c90lib/ticks \
 	$(BUILD)/classic-80cc-c90base/ticks \
 	$(BUILD)/classic-80cc-c90lib/ticks \
-	$(BUILD)/classic-80cc-fp-c90base/ticks \
-	$(BUILD)/classic-80cc-fp-c90lib/ticks \
 	$(BUILD)/classic-zsdcc-c90base/ticks \
 	$(BUILD)/classic-zsdcc-c90lib/ticks \
 	$(BUILD)/classic-sccz80-iotimer/ticks \
 	$(BUILD)/classic-80cc-iotimer/ticks \
-	$(BUILD)/classic-80cc-fp-iotimer/ticks \
 	$(BUILD)/classic-zsdcc-iotimer/ticks
 
 new: \
@@ -50,13 +46,10 @@ new: \
 	$(BUILD)/new-sccz80-c90lib/ticks \
 	$(BUILD)/new-80cc-c90base/ticks \
 	$(BUILD)/new-80cc-c90lib/ticks \
-	$(BUILD)/new-80cc-fp-c90base/ticks \
-	$(BUILD)/new-80cc-fp-c90lib/ticks \
 	$(BUILD)/new-zsdcc-c90base/ticks \
 	$(BUILD)/new-zsdcc-c90lib/ticks \
 	$(BUILD)/new-sccz80-iotimer/ticks \
 	$(BUILD)/new-80cc-iotimer/ticks \
-	$(BUILD)/new-80cc-fp-iotimer/ticks \
 	$(BUILD)/new-zsdcc-iotimer/ticks
 
 8085: $(BUILD)/classic-8085-c90base/ticks
@@ -147,18 +140,6 @@ $(eval $(call RUN,classic-80cc-c90lib,\
 	-I$(ROOT) -I$(ROOT)/z88dk-classic,\
 	$(CL_PORT),$(CL_END),classic-timer,lib,plain))
 
-$(eval $(call RUN,classic-80cc-fp-c90base,\
-	+test -compiler=80cc -fframe-pointer -vn -O2 -D__Z88DK -DTIMER \
-	-DSTDCBENCH_WHICH=1 \
-	-I$(ROOT) -I$(ROOT)/z88dk-classic,\
-	$(CL_PORT),$(CL_END),classic-timer,base,plain))
-
-$(eval $(call RUN,classic-80cc-fp-c90lib,\
-	+test -compiler=80cc -fframe-pointer -vn -O2 -D__Z88DK -DTIMER \
-	-DSTDCBENCH_WHICH=2 \
-	-I$(ROOT) -I$(ROOT)/z88dk-classic,\
-	$(CL_PORT),$(CL_END),classic-timer,lib,plain))
-
 $(eval $(call RUN,classic-zsdcc-c90base,\
 	+test -compiler=sdcc -vn -SO3 --max-allocs-per-node200000 \
 	-D__Z88DK -DTIMER -DSTDCBENCH_WHICH=1 \
@@ -178,12 +159,6 @@ $(eval $(call RUN,classic-sccz80-iotimer,\
 
 $(eval $(call RUN,classic-80cc-iotimer,\
 	+test -compiler=80cc -vn -O2 -D__Z88DK -DSTDCBENCH_IOTIMER \
-	-I$(ROOT) -I$(ROOT)/z88dk-classic,\
-	$(CL_PORT),$(CL_END),classic-io,io,plain))
-
-$(eval $(call RUN,classic-80cc-fp-iotimer,\
-	+test -compiler=80cc -fframe-pointer -vn -O2 -D__Z88DK \
-	-DSTDCBENCH_IOTIMER \
 	-I$(ROOT) -I$(ROOT)/z88dk-classic,\
 	$(CL_PORT),$(CL_END),classic-io,io,plain))
 
@@ -220,18 +195,6 @@ $(eval $(call RUN,new-80cc-c90lib,\
 	-I$(ROOT) -I$(ROOT)/z88dk-new,\
 	$(NW_PORT),$(NW_END),new-timer,lib,fast))
 
-$(eval $(call RUN,new-80cc-fp-c90base,\
-	+z80 -compiler=80cc -fframe-pointer -vn -startup=0 -clib=new -O2 \
-	-D__Z88DK -DTIMER -DSTDCBENCH_WHICH=1 \
-	-I$(ROOT) -I$(ROOT)/z88dk-new,\
-	$(NW_PORT),$(NW_END),new-timer,base,plain))
-
-$(eval $(call RUN,new-80cc-fp-c90lib,\
-	+z80 -compiler=80cc -fframe-pointer -vn -startup=0 -clib=new -O2 \
-	-D__Z88DK -DTIMER -DSTDCBENCH_WHICH=2 \
-	-I$(ROOT) -I$(ROOT)/z88dk-new,\
-	$(NW_PORT),$(NW_END),new-timer,lib,fast))
-
 $(eval $(call RUN,new-zsdcc-c90base,\
 	+z80 -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 \
 	-D__Z88DK -DTIMER -DSTDCBENCH_WHICH=1 \
@@ -251,12 +214,6 @@ $(eval $(call RUN,new-sccz80-iotimer,\
 
 $(eval $(call RUN,new-80cc-iotimer,\
 	+z80 -compiler=80cc -vn -startup=0 -clib=new -O2 \
-	-D__Z88DK -DSTDCBENCH_IOTIMER \
-	-I$(ROOT) -I$(ROOT)/z88dk-new,\
-	$(NW_PORT),$(NW_END),new-io,io,fast))
-
-$(eval $(call RUN,new-80cc-fp-iotimer,\
-	+z80 -compiler=80cc -fframe-pointer -vn -startup=0 -clib=new -O2 \
 	-D__Z88DK -DSTDCBENCH_IOTIMER \
 	-I$(ROOT) -I$(ROOT)/z88dk-new,\
 	$(NW_PORT),$(NW_END),new-io,io,fast))

@@ -25,7 +25,7 @@ From support/benchmarks/stdcbench, after the fast-allocator rebuild:
 
 make build/new-sccz80-iotimer/ticks
 
-The image is 28717 bytes. It prints c90base 1, c90lib 2, final 3.
+The image is 29010 bytes. It prints c90base 1, c90lib 2, final 3.
 That print truncates the score. The RESULT blocks keep one decimal.
 The integer after the scores is the cycle count up to the halt.
 The TIMER column is build/new-sccz80-c90base/ticks and
@@ -41,15 +41,13 @@ From support/benchmarks/stdcbench:
 
 make new
 
-That builds and times sccz80, 80cc stack, 80cc frame, and zsdcc.
-Each compiler has a c90base image, a c90lib image, and an iotimer
-image. Each result is build/<name>/ticks. make -j is safe. c90lib
-and iotimer jobs stop if the map still shows the small allocator.
+That builds and times sccz80, 80cc, and zsdcc, each for c90base and
+c90lib, and it builds the three iotimer images. Each result is
+build/<name>/ticks. make -j is safe. c90lib and iotimer jobs stop
+if the map still shows the small allocator.
 
-80cc stack is the default. 80cc frame passes -fframe-pointer.
-The 80cc stack c90base iteration is the same 102158431 T-states as
-classic. The 80cc frame c90base iteration is the same 102618241
-T-states as classic.
+80cc is built without -fframe-pointer. The c90base iteration is the
+same 102158431 T-states as classic.
 
 On a c90lib map, asm_heap_realloc_unlocked and
 asm_heap_realloc_unlocked_fast are the same address.
@@ -60,16 +58,12 @@ IN-PROGRAM SCORE
 `make new` builds the iotimer images. Port 2, buffer _tickbuf,
 T-states/40. Pass -x before -end and -mmtimer.
 
-The sccz80 image is 28717 bytes. It prints 1, 2, and 3. That print
+The sccz80 image prints 1, 2, and 3. That print truncates the score.
+
+The 80cc image is 29178 bytes. It prints 3, 3, and 6. That print
 truncates the score.
 
-The 80cc stack image is 29178 bytes. It prints 3, 3, and 6. That
-print truncates the score.
-
-The 80cc frame image is 29657 bytes. It prints 3, 3, and 6. That
-print truncates the score.
-
-The zsdcc image is 26398 bytes. It prints 1, 1, and 2, and it prints
+The zsdcc image is 26691 bytes. It prints 1, 1, and 2, and it prints
 no ERROR line. Those printed scores are the quotient from __div32.
 Newlib places section code_l_xcc, so __div32 is a real address. The
 helper is the xcc routine: dividend in DE:HL, divisor at ix+4. The
@@ -82,37 +76,37 @@ RESULT
 The byte count is the .bin file size. Page zero is included, the same
 definition as the classic results in this benchmark.
 
-Z88DK October 28, 2026
+Z88DK October 27, 2026
 sccz80 / new c library / c90base
-8088 bytes less page zero
+7785 bytes less page zero
 
-cycle count  = 168749272
-time @ 4MHz  = 168749272 / 4*10^6 = 42.19 sec
+cycle count  = 168749224
+time @ 4MHz  = 168749224 / 4*10^6 = 42.19 sec
 stdcbench score = 1.9
 
 
-Z88DK October 28, 2026
+Z88DK October 27, 2026
 sccz80 / new c library / c90lib
-23802 bytes less page zero
+24095 bytes less page zero
 
-cycle count  = 557139262
-time @ 4MHz  = 557139262 / 4*10^6 = 139.28 sec
+cycle count  = 557117716
+time @ 4MHz  = 557117716 / 4*10^6 = 139.28 sec
 stdcbench score = 2.9
 
 Fast allocator, __CLIB_OPT_MALLOC = 1.
 
 
-Z88DK October 28, 2026
-80cc stack / new c library / c90base
-7949 bytes less page zero
+Z88DK October 27, 2026
+80cc / new c library / c90base
+7646 bytes less page zero
 
 cycle count  = 102158431
 time @ 4MHz  = 102158431 / 4*10^6 = 25.54 sec
 stdcbench score = 3.1
 
 
-Z88DK October 28, 2026
-80cc stack / new c library / c90lib
+Z88DK October 27, 2026
+80cc / new c library / c90lib
 24114 bytes less page zero
 
 cycle count  = 475976814
@@ -124,48 +118,26 @@ The both-module iotimer image is 29178 bytes. It printed 3, 3, and 6.
 The reported total is 6.5.
 
 
-Z88DK October 28, 2026
-80cc frame / new c library / c90base
-7773 bytes less page zero
-
-cycle count  = 102618241
-time @ 4MHz  = 102618241 / 4*10^6 = 25.65 sec
-stdcbench score = 3.1
-
-
-Z88DK October 28, 2026
-80cc frame / new c library / c90lib
-24520 bytes less page zero
-
-cycle count  = 471756734
-time @ 4MHz  = 471756734 / 4*10^6 = 117.94 sec
-stdcbench score = 3.4
-
-Fast allocator, __CLIB_OPT_MALLOC = 1.
-The both-module iotimer image is 29657 bytes. It printed 3, 3, and 6.
-The reported total is 6.5.
-
-
-Z88DK October 28, 2026
+Z88DK October 27, 2026
 zsdcc 4.6.0 #16639 / new c library / c90base
-7556 bytes less page zero
+7253 bytes less page zero
 
-cycle count  = 92368235
-time @ 4MHz  = 92368235 / 4*10^6 = 23.09 sec
+cycle count  = 92368035
+time @ 4MHz  = 92368035 / 4*10^6 = 23.09 sec
 stdcbench score = 3.5
 
 Score is the TIMER formula. The in-program divide by 100 printed 1.
 
 
-Z88DK October 28, 2026
+Z88DK October 27, 2026
 zsdcc 4.6.0 #16639 / new c library / c90lib
-21752 bytes less page zero
+22045 bytes less page zero
 
-cycle count  = 419470349
-time @ 4MHz  = 419470349 / 4*10^6 = 104.87 sec
+cycle count  = 419437901
+time @ 4MHz  = 419437901 / 4*10^6 = 104.86 sec
 stdcbench score = 3.8
 
 Fast allocator, __CLIB_OPT_MALLOC = 1. Score is the TIMER formula.
 The in-program divide by 100 printed 1. The both-module iotimer image
-is 26398 bytes, and its printed final score is 2. The reported total
+is 26691 bytes, and its printed final score is 2. The reported total
 is 7.3.
