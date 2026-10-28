@@ -42,10 +42,7 @@ _INMouseSAM:
     dec     (hl)
     jr      nz, done
     ld      (hl), 30
-    call    INMouseSAMDetect
-    ld      hl, 0                       ; (the detecting scans' movement is not the user's)
-    ld      (_in_SAMcoordX), hl
-    ld      (_in_SAMcoordY), hl
+    call    INMouseSAMDetect            ; (the detecting scans do not move the position: a program may be moving it itself)
     ld      a, (_in_SAMpresent)
     or      a
     jr      z, done
@@ -67,9 +64,7 @@ done:
 ; uses : AF,BC,DE,HL
 
 INMouseSAMDetect:
-    call    settle
     call    sam_scan
-    call    settle
     call    sam_scan
     ret     z                           ; (a held cursor key or Control fails the gate)
     ld      hl, scanbuf + 3
@@ -85,22 +80,17 @@ detect_or:
     ld      (_in_SAMpresent), a
     ret
 
-; Leave the interface alone for a while.  It starts a new cycle of nibbles after
-; a pause in the reads (back to back scans continue the old one part-way), and
-; the detecting scan has to start at the beginning.
-; uses : B
-
-settle:
-    ld      b, 0
-settle_loop:
-    djnz    settle_loop
-    ret
-
-; Read one scan into scanbuf.
+; Read one scan into scanbuf.  The interface starts a new cycle of nibbles after
+; a pause in the reads, but a scan which follows another read of the port too
+; closely (the keyboard's, or the last scan) carries on part-way through the
+; old one and reads garbage: so wait first.
 ; exit : nz = scan good, z = the gate nibble was not $F (a cursor key or Control is down)
 ; uses : AF,BC,D,HL
 
 sam_scan:
+    ld      b, 0
+settle:
+    djnz    settle
     ld      bc, $fffe
     in      a, (c)                      ; strobe
     ld      hl, scanbuf

@@ -40,3 +40,9 @@ target/aquarius/obj/aquarius/x/target/aquarius/stdio/fputc_cons_aqplus.o
 target/aquarius/obj/aquarius/x/target/aquarius/stdio/fgetc_cons_aqplus.o
 target/aquarius/obj/aquarius/x/target/aquarius/interrupt/im1_init.o
 target/aquarius/obj/aquarius/x/target/aquarius/interrupt/add_raster_int.o
+target/aquarius/obj/aquarius/x/target/aquarius/input/INMouseAQPlus.o
+target/aquarius/obj/aquarius/x/target/aquarius/input/in_MouseAQPlus.o
+target/aquarius/obj/aquarius/x/target/aquarius/input/in_MouseAQPlus_callee.o
+target/aquarius/obj/aquarius/x/target/aquarius/input/in_MouseAQPlusInit.o
+target/aquarius/obj/aquarius/x/target/aquarius/input/in_MouseAQPlusSetPos.o
+target/aquarius/obj/aquarius/x/target/aquarius/input/in_MouseAQPlusSetPos_callee.o
