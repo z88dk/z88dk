@@ -7106,16 +7106,13 @@ RegMask op_clobbers(const Func *f, const Op *op)
             return IR_R_HL | IR_R_DE | IR_R_BC | IR_R_A | IR_R_F | IR_R_MEM;
         return IR_R_ALL;
     case IR_CALL:
-        /* 5b: IX/IY are callee-saved. A DIRECT call to a known function preserves
-           BOTH — every 80cc function does (fp mode: IX is the frame pointer, saved
-           via frame_has_saved_fp; sp mode: frame_has_saved_ix push/pop's it when
-           the function uses IX; IY likewise via frame_has_saved_iy), and the
-           callable library saves them: far mem/str routines, the float libs, and
-           qsort/bsearch (which push/pop IX around their own comparator dispatch).
-           The only callable IY clobberers are ZX-Spectrum-specific (zxmath ftoa,
-           sp1 sprites, wyz sound) and run under --reserve-regs-iy anyway. So a
-           value in IX or IY survives a direct call with no spill/reload. INDIRECT
-           (function-pointer) calls have an unknown target → stay conservative. */
+        /* 5b: IX/IY are callee-saved by 80cc's own functions. A frame-pointer
+           function does not rely on the callee for the frame register: gen_call
+           pushes it below the arguments and pops it before the result store,
+           because newlib sccz80 objects (sprintf, qsort, FILE* in IX) change IX
+           and sccz80 never keeps a frame there. The mask still excludes IX/IY.
+           ORing them in would not reload the frame; the spill does. INDIRECT
+           calls have an unknown target and stay conservative. */
         /* __preserves_regs(...) on the callee removes those register pairs
            from the clobber set (op->call->preserved; 0 when unannotated), so
            a value stays resident across the call — e.g. a pointer kept in BC
@@ -11413,6 +11410,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     L.pv_depth = 0; L.pv_n = 0;
     L.af_park_depth = 0;
     bc_args_save_depth = 0;
+    fp_args_save_depth = 0;
     L.la.cur_stack_long_top = -1;
     L.la.cur_dehl_inline_push = -1;
     L.la.cur_dehl_inline_push_base_sp = 0;
@@ -11553,6 +11551,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         }
         L.af_park_depth = 0;         /* AF byte-park never crosses a BB */
         bc_args_save_depth = 0;
+        fp_args_save_depth = 0;
         L.la.cur_stack_long_top = -1;
         L.la.cur_dehl_inline_push = -1;
         L.la.cur_dehl_inline_push_base_sp = 0;

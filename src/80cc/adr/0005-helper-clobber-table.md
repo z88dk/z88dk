@@ -43,3 +43,6 @@ is index- and alt-clean.
   the header attribute could populate the same
   `CallInfo.clobbers`/`HelperInfo.clobbers` masks for C-prototype library
   functions (Track A).
+- ADR 0122 saves the frame around `IR_CALL` only. An `HCALL` is not wrapped.
+  A helper off this whitelist that changes IX can still break a frame-pointer
+  caller.

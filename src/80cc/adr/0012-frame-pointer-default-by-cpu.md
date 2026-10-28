@@ -1,6 +1,6 @@
 # ADR 0012 — Per-CPU default for the frame pointer
 
-Status: Accepted (implementation pending — see Consequences)
+Status: Accepted (the default flip is still pending — see Consequences)
 
 ## Context
 
@@ -42,12 +42,12 @@ default `c_framepointer_is_ix` chosen per CPU in the CPU-setup code.
 
 ## Consequences
 
-- **Gated on the IX-clobber safety audit — this is the real blocker, not perf.**
-  fp keeps IX live across calls, and several classic-lib asm routines clobber IX
-  (the callback-via-IX class; qsort/bsearch are fixed, but the general "save IX
-  around calls to IX-clobbering helpers" work is not complete). Flipping the
-  default before that audit is closed could miscompile programs that call those
-  routines. So the perf decision is made, but the *rollout* waits on IX safety.
+- **Call-site IX safety is ADR 0122.** A function that keeps a frame saves
+  that register around each `IR_CALL`. A callee that changes IX no longer
+  breaks `ld sp,ix` in that caller. The sccz80 library is unchanged. sccz80
+  does not keep a frame in IX, and both compilers link the same library.
+  The default flip below is still not done. It remains a separate decision.
+  Do not set `c_framepointer_is_ix` from the call-site save.
 - Implementation is a per-CPU assignment of the default `c_framepointer_is_ix`
   (1 for z80/z80n/z180/ez80, -1 otherwise) in main.c's CPU setup, replacing the
   current uniform -1 default. The existing forced -1 for gbz80/8080/8085 stays.
@@ -58,4 +58,5 @@ default `c_framepointer_is_ix` chosen per CPU in the CPU-setup code.
 - Numbers backing this live in BENCH_MATRIX.txt (per the ADR convention, kept out
   of this document); re-check them if the CPU cost model or residency changes.
 
-See ADR 0011 (index-register roles / reservation) and ADR 0002 (register model).
+See ADR 0011 (index-register roles / reservation), ADR 0002 (register model),
+and ADR 0122 (the frame register saved around each call).

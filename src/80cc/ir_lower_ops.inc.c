@@ -1220,6 +1220,63 @@ static int gen_memcpy(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* Frame register saved below a call's arguments. The epilogue of a
+   frame-pointer function does `ld sp,ix` (or iy) / `pop ix`, so a callee
+   that changes the frame register returns to the wrong address. Newlib's
+   sccz80 objects do that (sprintf, qsort, FILE* in IX). sccz80 itself
+   never addresses locals through IX, and both compilers link the same
+   prebuilt library, so the save is emitted here and only while this
+   function actually keeps a frame. Pushed after any BC tenant and before
+   the arguments: __stdio_varg_2 walks (n+1)*2+1 and never sees the word.
+   The word is not part of pushed_bytes. Stack mode does not save — IX
+   may be an idx2 home there. */
+#define FP_ARGS_SAVE_MAX 8
+static int fp_args_save_depth;
+
+static int call_saves_frame(const Func *f)
+{
+    /* Same gate as the epilogue's `ld sp,<frame>` / `pop <frame>`. */
+    return f && fp_active(f) && !L.cur_frameless;
+}
+
+/* First push of a pre-pushed call. ir_build stamps IR_PUSH_ARG with
+   imm==1 (also the BC-tenant marker) and IR_PUSH_STRUCT with
+   IR_PUSH_STRUCT_OPENS. A struct cannot use imm==1: imm is the byte
+   count, and a 1-byte struct is legal. A nested call stamps its own
+   first push, so the depth counter pairs the pop with this call. */
+static int fp_push_opens_call(const Op *op)
+{
+    if (!op) return 0;
+    if (op->kind == IR_PUSH_ARG) return op->imm == 1;
+    if (op->kind == IR_PUSH_STRUCT)
+        return (op->imm & IR_PUSH_STRUCT_OPENS) != 0;
+    return 0;
+}
+
+/* Pre-pushed path: the arguments are already destined for the stack, so
+   the save has to happen on the opening push. Records one stack entry
+   per call so a nested call pops its own word. */
+static int emit_pre_frame_save(FILE *out, const Func *f)
+{
+    if (!call_saves_frame(f)) return 0;
+    if (fp_args_save_depth >= FP_ARGS_SAVE_MAX) {
+        fputs("ir_lower: frame-pointer save nested too deep\n", stderr);
+        return -1;
+    }
+    emit(out, "push\t%s", frame_reg());
+    L.cur_sp_adjust += 2;
+    fp_args_save_depth++;
+    return 0;
+}
+
+static void fp_restore_pre_frame(FILE *out)
+{
+    if (fp_args_save_depth <= 0) return;
+    fp_args_save_depth--;
+    emit(out, "pop\t%s", frame_reg());
+    L.cur_sp_adjust -= 2;
+}
+
 /* IR_PUSH_STRUCT: allocate imm bytes on the data stack and block-copy the
    struct (address in src[0]) into it, so byte i lands at sp+i (natural order,
    exact size) — matches sccz80's struct-arg push (codegen.c:1041-1050) and
@@ -1228,8 +1285,13 @@ static int gen_memcpy(FILE *out, Func *f, const Op *op)
    allocated region, so it doesn't clobber the copied bytes. */
 static int gen_push_struct(FILE *out, Func *f, const Op *op)
 {
-    int size = (int)op->imm;
+    /* Mask the opener bit before the cast. A raw cast of a flagged imm
+       is not the byte count. */
+    int size = (int)(op->imm & ~IR_PUSH_STRUCT_OPENS);
     if (size <= 0) return 0;
+    /* Opening push of this call: frame word below the struct image. */
+    if (fp_push_opens_call(op) && emit_pre_frame_save(out, f) < 0)
+        return -1;
     load_to_hl(out, f, op->src[0]);   /* HL = struct source address */
     emit_ex_de_hl(out);           /* DE = source */
     emit(out, "ld\thl,%d", -size);
@@ -1774,6 +1836,10 @@ static int gen_push_arg(FILE *out, Func *f, const Op *op)
         bc_args_saved_stack[bc_args_save_depth] = save;
         bc_args_save_stack[bc_args_save_depth++] = L.rs.bc;
     }
+    /* After the BC tenant, so the frame word is the one directly under
+       arg0. A nested call's opener pushes and pops its own word. */
+    if (fp_push_opens_call(op) && emit_pre_frame_save(out, f) < 0)
+        return -1;
     int v = op->src[0];
     int w = (v >= 0 && v < f->n_vregs) ? f->vregs[v].width : 2;
     if (w == 4) {

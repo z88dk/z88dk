@@ -111,13 +111,23 @@ static int gen_call(FILE *out, Func *f, const Op *op)
     if (bc_saved) {
         emit(out, "push\tbc");
     }
-    int sp_adj_extra = bc_saved ? 2 : 0;
+    /* No pre-pushed args: the frame save pairs entirely inside this call,
+       under the arguments this loop is about to push. Pre-pushed calls
+       already saved on their opening IR_PUSH_*. Not counted in
+       pushed_bytes — `ld a,n` must stay the argument-word count. */
+    int fp_saved = 0;
+    if (!pre && call_saves_frame(f)) {
+        emit(out, "push\t%s", frame_reg());
+        fp_saved = 1;
+    }
+    int sp_adj_extra = (bc_saved ? 2 : 0) + (fp_saved ? 2 : 0);
 
     /* Push args. SMALLC/CALLEE: left-to-right. STDC: right-to-left.
        CALLEE cleans the stack after ret instead of us.
        Each push shifts sp, but slot loads use `add hl,sp`, so bump the slot
-       offset by bytes already pushed (+ saved BC) to keep landing on the
-       original slot.
+       offset by bytes already pushed (+ saved BC and the saved frame word)
+       to keep landing on the original slot. A nonzero sp_adj also stops
+       the fp TOS pop/push from reading the saved frame as a local.
        Fastcall: push n-1 args (SMALLC order), then load the LAST arg into HL
        (or DEHL for width 4) just before the call; that load is emitted below. */
     int pushed_bytes = 0;
@@ -534,6 +544,16 @@ static int gen_call(FILE *out, Func *f, const Op *op)
 
     if (ci->is_critical)
         emit(out, (IS_RABBIT()) ? "ipres" : "ei");
+
+    /* Frame word is directly under the arguments, above any BC tenant.
+       Pop it before the result store: `ld (<frame>+d),hl` needs the
+       frame back. The pre-pushed BC pop stays after the store so a
+       BC-homed result (callbc_fresh_stamp) is not overwritten. `pop ix`
+       does not clobber HL, DE, A, or flags. */
+    if (fp_saved)
+        emit(out, "pop\t%s", frame_reg());
+    else if (pre)
+        fp_restore_pre_frame(out);
 
     /* Restore the BC pushed before the call. arg setup may have reloaded BC to
        a different tenant (emit_bc_reload), so re-sync the cache to the tenant

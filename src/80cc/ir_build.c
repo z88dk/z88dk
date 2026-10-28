@@ -4683,6 +4683,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     p->src[0] = v;
                     p->src[1] = -1;
                     p->imm    = struct_bytes;
+                    /* First push of this call. A struct cannot use imm==1
+                       (that value is a legal size). A nested call stamps
+                       its own first push. */
+                    if (n_push_ops == 0)
+                        p->imm |= IR_PUSH_STRUCT_OPENS;
                     push_ops[n_push_ops++] = cur_bb(b)->n_ops - 1;
                 } else if (want_push && pushable && !is_struct
                     && (w == 2 || w == 4)

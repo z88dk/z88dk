@@ -40,6 +40,11 @@ frontend (ir_build.c) → IR
 
 - `long_ir` 400/400 **sp AND fp** (`FP=1`) — run both; some bugs are fp-only (IX frame)
   or sp-only.
+- **Frame-pointer call save** (ADR 0122). A function that keeps a frame pushes
+  `frame_reg()` under each `IR_CALL` and pops it before the next frame use.
+  Correctness fix, no opt-out. Gate: `test/suites/long_ir/fpsave.c`
+  (`fpsave_fp.bin`, Z80, `-fframe-pointer`). Stack mode does not save. Do not
+  add `push ix` to the sccz80 library for this, and do not wrap `l_*` helpers.
 - The suite `make` only checks the **z80 exit code**; other CPUs pass-through even on
   failure. To validate another CPU, run its `.bin` through `z88dk-ticks -m<cpu>`
   yourself. Per-CPU: `-m z80n -b msx`, `-mgbz80`, `-m8080`, `-m8085`, `-mz180`,
@@ -131,7 +136,8 @@ read outside `ir_alloc.c`. A render that cannot realise a home REPORTS it
 ## Gate mechanisms
 
 - **Every rung that changes emitted code ships an opt-out, in the same commit.**
-  A new lowering, peephole or cost change is not complete until it has a name in
+  A correctness fix that must not be disabled (ADR 0082, ADR 0122) does not add
+  an opt-out. A new lowering, peephole or cost change is not complete until it has a name in
   the registry, a row in `OPTIONS.md`, and a regression target under
   `test/suites/long_ir`. This is not paperwork: the opt-out IS the A/B mechanism
   the corpus scans use (`IR_OFF=<name>` as the baseline), so a rung without one

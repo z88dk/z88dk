@@ -383,7 +383,10 @@ typedef enum {
        lands at sp+i (natural order, exact size — the sdcccall(0) stacked
        layout). The copy reuses emit_block_copy (ldir on z80, the
        __z80asm__ldir lib helper on 808x/gbz80). Like IR_PUSH_ARG it is a
-       pre-pushed arg; the matching IR_CALL's caller-cleanup pops it. */
+       pre-pushed arg; the matching IR_CALL's caller-cleanup pops it.
+       The low 31 bits of imm are the byte count. Bit 62
+       (IR_PUSH_STRUCT_OPENS) marks the first push of the call. A struct
+       cannot use imm==1: that value is a legal size. */
     IR_PUSH_STRUCT,
 
     /* Byte extract: dst = (src[0] >> 8*imm) & 0xFF, imm in 0..3.
@@ -463,6 +466,11 @@ typedef enum {
    which costs (8-n) one-byte `add hl,hl` instead of n four-byte `srl h; rr l`
    — and on 808x replaces a call to the l_asr_u runtime loop outright. */
 #define IR_SHR_TOPBYTE ((int64_t)1 << 42)
+/* First IR_PUSH_STRUCT of a pre-pushed call. The low bits stay the byte
+   count. gen_push_struct masks this off before it reads the size. A
+   struct cannot use imm==1 (IR_PUSH_ARG's opener): a 1-byte struct is
+   legal. Bit 62 stays positive and clear of the IR_SHR markers. */
+#define IR_PUSH_STRUCT_OPENS ((int64_t)1 << 62)
 
 /* ----- ABI / call descriptors ------------------------------------------ */
 

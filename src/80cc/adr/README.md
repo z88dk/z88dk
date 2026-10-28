@@ -94,6 +94,7 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0119](0119-word-operands-kept-in-registers.md) | **Accepted** — x*(2^a+1) copies x to DE across the shift, x*(2^a+2^b) is factored, a single-use global word is read with `ld de,(g)` at the add; survey z80 fp -3.4 %, corpus -3740 B / 0 larger |
 | [0120](0120-stepped-compares-and-constant-long-adds.md) | **Accepted** — `x++ == K` compares the stepped value, long plus a 16-bit constant is a skipped `inc de`, a frame-slot park goes through DE, long compares read the right operand from its slot; survey z80 fp gap to sdcc 6.2 % |
 | [0089](0089-addition-swap-has-no-scalar-two-pass-gate.md) | **Rejected** — a sound addition swap gate needs a second pass-1 render; md5 −6 % but binary-trees +28 B and emu.c +75 B |
+| [0122](0122-frame-pointer-call-saves-the-frame.md) | **Accepted** — a function that keeps a frame saves that register around each call, so a callee that changes IX no longer breaks the epilogue. Not gated. 0122 leaves 0121 for #3204 |
 | [0088](0088-indexed-word-rmw-address-restoration-is-a-small-rung.md) | **Sized** — one histbench site in 8 CPU/frame cells, 40 B total; no emitter change |
 | [0073](0073-ask-slot-off-not-the-spill-slot.md) | **Accepted** — ask `slot_off`, not `vreg_spill_slot`; the wrong query cost structbench +10.5 % |
 | [0072](0072-the-commutative-swap-is-refused.md) | **Rejected** — the commutative swap in addition resurrects an elided store; md5 −6 % against emu.c +75 B |

@@ -8,7 +8,9 @@ The z80 family has exactly two index registers, IX and IY. They are precious:
 they enable `(ix+d)`/`(iy+d)` addressing and are the only spare 16-bit homes once
 BC/DE are committed to loop pointers/IVs (ADR 0002), but each `(ix+d)` access is
 slow (2 opcodes / ~19T) and IX/IY are **callee-saved**, so using one costs a
-prologue/epilogue push-pop. The back end has two competing consumers for them:
+prologue/epilogue push-pop. ADR 0122 amends the frame-pointer case. A function
+that keeps a frame saves that register around each call. The back end has two
+competing consumers for them:
 
 - a **frame pointer** (fp-mode, `-fframe-pointer`), addressing locals via `ix+d`;
 - **residency**: `idx2` (a loop-invariant base, ADR 0003) and the **LRA reduction
@@ -70,3 +72,6 @@ history of callee-saved miscompiles.
   in fp-mode, resolved by benefit ranking (ADR 0003).
 - The reserve flags are off by default and, when off, are **byte-identical** to
   the prior compiler (ADR 0004).
+- **Amended by ADR 0122.** An 80cc function that uses IX or IY still saves it
+  in the prologue. An sp-mode idx2 home still needs the callee to preserve IX.
+  A function that keeps a frame saves that register around each call.

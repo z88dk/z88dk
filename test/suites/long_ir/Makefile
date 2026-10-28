@@ -54,6 +54,7 @@ all:	fnptrdead.bin fnptrdead_fp.bin fnptrdead_8080.bin fnptrdead_gbz80.bin
 all:	argcf.bin argcf_fp.bin argcf_8080.bin argcf_gbz80.bin
 all:	jpnext.bin jpnext_fp.bin jpnext_8080.bin jpnext_gbz80.bin
 all:	ixind.bin
+all:	fpsave_fp.bin
 all:	bchand.bin bchand_fp.bin bchand_8080.bin bchand_gbz80.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
 all:	derefcmp_bcstep.bin derefcmp_bcstep_8080.bin
@@ -2791,6 +2792,13 @@ bchand_gbz80.bin: $(SOURCES) bchand.c
 # header.
 ixind.bin: $(SOURCES) ixind.c $(JPTH)
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	$(runtest)
+
+# Frame-pointer callers save the frame around calls whose callees zero IX.
+# Z80 only, and always built with the frame pointer. Stack mode does not
+# save (IX may be an idx2 home). See the file header and ADR 0122.
+fpsave_fp.bin: $(SOURCES) fpsave.c $(JPTH)
+	$(call compile,-Cc-fframe-pointer)
 	$(runtest)
 
 # A signed compare may drop its 7-byte sign correction only when BOTH operands

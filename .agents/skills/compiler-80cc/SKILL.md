@@ -28,6 +28,8 @@ Binary: `z88dk-80cc`. Source: `src/80cc/`. Rules file: `lib/80cc_rules.1`.
 
 8085 has no IX. Do not pass `-fframe-pointer` on `-clib=8085`.
 
+A function that keeps a frame saves that register around each C call and restores it before the next frame use (ADR 0122). The save is in the 80cc caller. Stack mode does not save. Do not add `push ix` to sccz80 library asm for this. The suite gate is `test/suites/long_ir/fpsave.c` (`fpsave_fp.bin`).
+
 Integer benches (sieve, fannkuch) are usually smaller and faster with `-fframe-pointer`. math32 TIMER is usually **slower and larger**: extra time is in 80cc C glue (`ix+d`, byte `add/adc a,(ix+d)`, spills around `l_f32_*`). math32 library cycle counts stay the same. Prove with ticks hotspots rolled up to the C function (`advance`, `selectRandom`), not to `CLIB_*` const symbols.
 
 Recipe comment used in `z88dk-classic/readme.txt`:

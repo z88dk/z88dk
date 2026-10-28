@@ -704,16 +704,13 @@ static int func_idx2_self_use(const Func *f)
    The allocator asks per home: an IY word-home is safe across calls iff IY isn't in
    this set; likewise IX for the fp frame pointer. Returns the UNION of callee-saved
    registers clobbered by any callee f reaches.
-   Returns the empty set: the maintainer's ABI decision is that the callable library
-   is IX/IY-safe. Audit behind it: far mem and str routines now save both; qsort/bsearch
-   use IX not IY; ADT-callback routines (adt_Heap*, adt_ListSearch) clobber IY but are
-   niche/accepted; setjmp/longjmp RESTORE IY (context switch, not a clobber). The one
-   broad IY-clobberer is the FLOAT library — handled OUT of band at link/config level
-   (the IY word-home optimisation is switched off when a float library is linked; a
-   link-time fact is more reliable than per-function float detection). This function is
-   the extension point if a per-callee clobber signal is ever wanted (OR in CLOB_IX/
-   CLOB_IY for a blacklisted callee, name visible at the IR_CALL). This is what 5b gates
-   IY word-homes on instead of the blunt `func_is_call_free`. */
+   Returns the empty set. ORing CLOB_IX here only stops an idx2 home; it does
+   not reload a frame pointer. gen_call saves the frame register around a call
+   when the epilogue uses `ld sp,<frame>`, which is what newlib sccz80 needs:
+   those objects change IX, and sccz80 never keeps a frame in IX. This function
+   is the extension point if a per-callee clobber signal is ever wanted (OR in
+   CLOB_IX/CLOB_IY for a blacklisted callee, name visible at the IR_CALL). This
+   is what 5b gates IY word-homes on instead of the blunt `func_is_call_free`. */
 enum { CLOB_IX = 1u << 0, CLOB_IY = 1u << 1 };
 static unsigned func_call_clobbers(const Func *f)
 {
