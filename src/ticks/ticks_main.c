@@ -153,9 +153,9 @@ static void usage(void)
     printf("  z88dk-ticks [-x <file>] [-pc X] [-start X] [-end X] [-counter X] <input_file>\n\n");
     printf("  <input_file>   File between 1 and 65536 bytes with Z80 machine code\n");
     printf("  -trace         outputs register values and disassembly while executing\n");
-    printf("  -pc X          X in hexadecimal is the initial PC value\n");
-    printf("  -start X       X in hexadecimal is the PC condition to start the counter\n");
-    printf("  -end X         X in hexadecimal is the PC condition to exit\n");
+    printf("  -pc X          X (symbol or hex value) is the initial PC value\n");
+    printf("  -start X       X (symbol or hex value) is the PC condition to start the counter\n");
+    printf("  -end X         X (symbol or hex value) is the PC condition to exit\n");
     printf("  -counter X     X in decimal is another condition to exit (default 100000000)\n");
     printf("  -int X         X in decimal are number of cycles for periodic interrupts\n");
     printf("  -d             Enable debugger\n");
@@ -194,9 +194,9 @@ static void usage(void)
     printf("  -output <file> dumps the RAM content to a 64K file\n");
     printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n");
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n");
-    printf("  -x <file>      Symbol or map file to read\n");
-	printf("  -script <file> Script file to run at the console\n");
-    printf("                 Use before -pc,-start,-end,-mmtimer to enable symbols\n\n");
+    printf("  -x <file>      Symbol or map file to read; must precede -pc,-start,-end,-mmtimer\n");
+    printf("                 for symbol-name resolution in those options\n");
+    printf("  -script <file> Script file to run at the console\n\n");
     printf("  Default values for -pc, -start and -end are 0000 if omitted.\n");
     printf("  When the program exits, it'll show the number of cycles between start and end trigger in decimal\n\n");
 }
