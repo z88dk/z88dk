@@ -60,6 +60,9 @@ all:	bytecmprr.bin bytecmprr_fp.bin bytecmprr_8080.bin bytecmprr_gbz80.bin bytec
 all:	ldirect.bin ldirect_fp.bin ldirect_8080.bin ldirect_gbz80.bin ldirect_r2ka.bin ldirect_z180.bin
 all:	scmp.bin scmp_fp.bin scmp_8080.bin scmp_gbz80.bin scmp_r2ka.bin scmp_z180.bin
 all:	bytearith.bin bytearith_fp.bin bytearith_8080.bin bytearith_gbz80.bin bytearith_r2ka.bin bytearith_z180.bin
+all:	joincarry.bin joincarry_fp.bin joincarry_8080.bin joincarry_gbz80.bin joincarry_r2ka.bin joincarry_z180.bin
+all:	stchain.bin stchain_fp.bin stchain_8080.bin stchain_gbz80.bin stchain_r2ka.bin stchain_z180.bin
+all:	treewalk.bin treewalk_fp.bin treewalk_8080.bin treewalk_gbz80.bin treewalk_r2ka.bin treewalk_z180.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
 all:	derefcmp_bcstep.bin derefcmp_bcstep_8080.bin
 all:	directwiden.bin directwiden_z80n.bin directwiden_ez80_z80.bin directwiden_r800.bin
@@ -2905,6 +2908,81 @@ bytearith_r2ka.bin: $(SOURCES) bytearith.c
 	$(runtest_r2ka)
 
 bytearith_z180.bin: $(SOURCES) bytearith.c
+	$(compile_z180)
+	$(runtest_z180)
+
+# A byte set in if/else arms or a nested ternary survives the join. See the file header.
+joincarry.bin: $(SOURCES) joincarry.c
+	$(compile)
+	$(runtest)
+
+joincarry_fp.bin: $(SOURCES) joincarry.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+joincarry_8080.bin: $(SOURCES) joincarry.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+joincarry_gbz80.bin: $(SOURCES) joincarry.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+joincarry_r2ka.bin: $(SOURCES) joincarry.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+joincarry_z180.bin: $(SOURCES) joincarry.c
+	$(compile_z180)
+	$(runtest_z180)
+
+# A field-store chain through a call-result pointer. See the file header.
+stchain.bin: $(SOURCES) stchain.c
+	$(compile)
+	$(runtest)
+
+stchain_fp.bin: $(SOURCES) stchain.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+stchain_8080.bin: $(SOURCES) stchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+stchain_gbz80.bin: $(SOURCES) stchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+stchain_r2ka.bin: $(SOURCES) stchain.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+stchain_z180.bin: $(SOURCES) stchain.c
+	$(compile_z180)
+	$(runtest_z180)
+
+# Two arms sharing a tail, one falling into the join. See the file header.
+treewalk.bin: $(SOURCES) treewalk.c
+	$(compile)
+	$(runtest)
+
+treewalk_fp.bin: $(SOURCES) treewalk.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+treewalk_8080.bin: $(SOURCES) treewalk.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+treewalk_gbz80.bin: $(SOURCES) treewalk.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+treewalk_r2ka.bin: $(SOURCES) treewalk.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+treewalk_z180.bin: $(SOURCES) treewalk.c
 	$(compile_z180)
 	$(runtest_z180)
 

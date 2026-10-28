@@ -5269,7 +5269,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 
         int then_bb = ir_bb_new(b->f);
         int els_bb  = ir_bb_new(b->f);
-        int exit_bb = ir_bb_new(b->f);
+        /* The join is created after the arms (late-join), so it lays out after
+           every block a nested conditional adds; the lowerer then sees all of
+           its predecessors first and can carry the value in A across it. */
+        int late_join = !opt_disabled("late-join");
+        int exit_bb = late_join ? -1 : ir_bb_new(b->f);
         /* A hint vreg lets both arms write the value directly — no
            result temp, and the caller skips the wrapping MOV. Size the
            result from the ternary's type: hardcoding width 2 truncated
@@ -5306,14 +5310,21 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         int t = build_expr_hinted(b, n->then, result);
         if (t < 0) return -1;
         ternary_arm_to_result(b, n->then, result, t);
-        ir_emit_br(cur_bb(b), exit_bb);
+        int then_end = b->cur_bb_id;
+        if (!late_join) ir_emit_br(cur_bb(b), exit_bb);
 
         b->cur_bb_id = els_bb;
         int e = build_expr_hinted(b, n->els, result);
         if (e < 0) return -1;
         ternary_arm_to_result(b, n->els, result, e);
-        ir_emit_br(cur_bb(b), exit_bb);
+        int els_end = b->cur_bb_id;
+        if (!late_join) ir_emit_br(cur_bb(b), exit_bb);
 
+        if (late_join) {
+            exit_bb = ir_bb_new(b->f);
+            b->cur_bb_id = then_end;  ir_emit_br(cur_bb(b), exit_bb);
+            b->cur_bb_id = els_end;   ir_emit_br(cur_bb(b), exit_bb);
+        }
         b->cur_bb_id = exit_bb;
         return result;
     }
@@ -8292,7 +8303,12 @@ static int build_stmt(Builder *b, Node *n)
             return 0;
         }
         int then_bb = ir_bb_new(b->f);
-        int exit_bb = ir_bb_new(b->f);
+        /* if/else: the join is created after both arms (late-join), so it lays
+           out after any block a nested conditional adds. Not for the loop
+           desugaring (its else is a goto to the exit), nor for an else-less if. */
+        int late_join = (n->els && n->els->ast_type != AST_JUMP
+                         && !opt_disabled("late-join"));
+        int exit_bb = late_join ? -1 : ir_bb_new(b->f);
         int els_bb  = n->els ? ir_bb_new(b->f) : exit_bb;
 
         /* ast_conditional() (node.c) builds this AST_IF/AST_TERNARY node
@@ -8315,14 +8331,21 @@ static int build_stmt(Builder *b, Node *n)
 
         b->cur_bb_id = then_bb;
         if (n->then && build_stmt(b, n->then) != 0) return -1;
-        close_bb_with_fallthrough(b, exit_bb);
+        int then_end = b->cur_bb_id;
+        if (!late_join) close_bb_with_fallthrough(b, exit_bb);
 
         if (n->els) {
             b->cur_bb_id = els_bb;
             if (build_stmt(b, n->els) != 0) return -1;
-            close_bb_with_fallthrough(b, exit_bb);
+            if (!late_join) close_bb_with_fallthrough(b, exit_bb);
         }
 
+        if (late_join) {
+            int els_end = b->cur_bb_id;
+            exit_bb = ir_bb_new(b->f);
+            b->cur_bb_id = then_end; close_bb_with_fallthrough(b, exit_bb);
+            b->cur_bb_id = els_end;  close_bb_with_fallthrough(b, exit_bb);
+        }
         b->cur_bb_id = exit_bb;
         return 0;
     }

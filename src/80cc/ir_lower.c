@@ -4830,6 +4830,149 @@ static int tm_range_free(const int *used, long k, int d)
     return 1;
 }
 
+/* A line that is a code label: column 0, `name:` and nothing else. */
+static int tm_label_name(const char *l, char *buf, size_t bufsz)
+{
+    if (!l[0] || l[0] == '\t' || l[0] == ' ' || l[0] == ';' || l[0] == '\n'
+        || l[0] == '.') return 0;
+    const char *e = l;
+    while ((*e >= 'A' && *e <= 'Z') || (*e >= 'a' && *e <= 'z')
+           || (*e >= '0' && *e <= '9') || *e == '_' || *e == '$')
+        e++;
+    if (e == l || *e != ':') return 0;
+    const char *t = e + 1;
+    while (*t == '\r') t++;
+    if (*t != '\n' && *t != '\0') return 0;
+    size_t n = (size_t)(e - l);
+    if (n >= bufsz) return 0;
+    memcpy(buf, l, n); buf[n] = '\0';
+    return 1;
+}
+
+/* Index of the instruction `back` instructions before line `i` (0 = i itself),
+   skipping blanks, comments and C_LINE; -1 if a label, directive or the start
+   of the function comes first. */
+static long tm_insn_back(char **lines, long i, int back)
+{
+    long j = i;
+    for (;;) {
+        if (j < 0) return -1;
+        if (tm_is_insn(lines[j])) {
+            if (back-- == 0) return j;
+        } else if (tm_is_barrier(lines[j])) {
+            return -1;
+        }
+        j--;
+    }
+}
+
+/* Do the `want` instructions ending at line a match those ending at line b? */
+static int tm_tails_equal(char **lines, long a, long b, int want)
+{
+    for (int k = 0; k < want; k++) {
+        long x = tm_insn_back(lines, a, k), y = tm_insn_back(lines, b, k);
+        if (x < 0 || y < 0 || strcmp(lines[x], lines[y])) return 0;
+    }
+    return 1;
+}
+
+/* [tm-fallthrough] A run that FALLS INTO a label does not end at a terminator,
+   so it can never merge with an identical run that ends `jp label`. When such
+   a partner exists - another `jp label` preceded by the same `min` instructions
+   - make the fall-through explicit (`jp label` above the label) so the two
+   compare equal. The jump is dropped again at emit if it stays directly above
+   its label. Deliberately narrow: a broad version merged many small tails and
+   pushed conditional branches out of `jr` range. Only when the later
+   jump-to-next cleanup runs. IR_OFF=tm-fallthrough opts out;
+   IR_TM_FT_MIN sets the shared-instruction threshold (default 10). */
+static char *tm_make_fallthrough_explicit(char ***plines, int *pn)
+{
+    if (opt_disabled("tm-fallthrough") || opt_disabled("jp-next")) return NULL;
+    int min = 10;
+    const char *e = getenv("IR_TM_FT_MIN");
+    if (e && e[0]) min = atoi(e);
+    if (min < 2) min = 2;
+    char **lines = *plines;
+    int n = *pn, extra = 0;
+    char lab[200];
+    int *ins = calloc((size_t)(n > 0 ? n : 1), sizeof *ins);
+    if (!ins) return NULL;
+    int prev_insn = -1;                           /* index of the last code line */
+    for (int i = 0; i < n; i++) {
+        if (tm_label_name(lines[i], lab, sizeof lab)) {
+            if (prev_insn >= 0 && !tm_is_uncond_term(lines[prev_insn])) {
+                /* look for another run that ends `jp lab` with the same tail */
+                for (int q = 0; q < n; q++) {
+                    const char *t = lines[q];
+                    if (q == prev_insn || (*t != '\t' && *t != ' ')) continue;
+                    while (*t == '\t' || *t == ' ') t++;
+                    if (strncmp(t, "jp", 2) || (t[2] != '\t' && t[2] != ' ')) continue;
+                    t += 2;
+                    while (*t == '\t' || *t == ' ') t++;
+                    size_t m = strlen(lab);
+                    if (strncmp(t, lab, m) || (t[m] != '\n' && t[m] != '\r' && t[m] != '\0'))
+                        continue;
+                    long qb = tm_insn_back(lines, q, 1);   /* instruction before the jp */
+                    if (qb < 0) continue;
+                    if (tm_tails_equal(lines, prev_insn, qb, min)) {
+                        ins[prev_insn] = 1;
+                        extra++;
+                        break;
+                    }
+                }
+            }
+            prev_insn = -1;
+        } else if (tm_is_insn(lines[i])) {
+            prev_insn = i;
+        } else if (tm_is_barrier(lines[i])) {
+            prev_insn = -1;
+        }
+    }
+    if (!extra) { free(ins); return NULL; }
+    char **nl = malloc((size_t)(n + extra) * sizeof *nl);
+    char *flag = calloc((size_t)(n + extra), 1);
+    if (!nl || !flag) { free(nl); free(flag); free(ins); return NULL; }
+    int k = 0;
+    for (int i = 0; i < n; i++) {
+        nl[k++] = lines[i];
+        if (!ins[i]) continue;
+        int j = i + 1;
+        while (j < n && !tm_label_name(lines[j], lab, sizeof lab)) j++;
+        char *jl = malloc(strlen(lab) + 8);
+        if (!jl) continue;
+        sprintf(jl, "\tjp\t%s\n", lab);
+        flag[k] = 1;
+        nl[k++] = jl;
+    }
+    free(ins);
+    free(lines);
+    *plines = nl;
+    *pn = k;
+    return flag;
+}
+
+/* Is line i, a `jp L`, followed (past blanks, comments and C_LINE) by `L:`? */
+static int tm_jp_above_label(char **lines, long n, long i)
+{
+    char tgt[200], lab[200];
+    const char *p = lines[i];
+    while (*p == '\t' || *p == ' ') p++;
+    if (strncmp(p, "jp", 2)) return 0;
+    p += 2;
+    while (*p == '\t' || *p == ' ') p++;
+    size_t m = 0;
+    while (p[m] && p[m] != '\n' && p[m] != '\r' && p[m] != ' ' && p[m] != '\t'
+           && m + 1 < sizeof tgt) { tgt[m] = p[m]; m++; }
+    tgt[m] = '\0';
+    for (long j = i + 1; j < n; j++) {
+        const char *l = lines[j];
+        if (!l[0] || l[0] == '\n' || l[0] == '\r' || l[0] == ';') continue;
+        if (tm_label_name(l, lab, sizeof lab)) return !strcmp(lab, tgt);
+        if (tm_is_barrier(l)) return 0;
+    }
+    return 0;
+}
+
 /* Merge duplicated tails in one rendered function body. */
 static void filter_tail_merge(FILE *out, FILE *src, const Func *f)
 {
@@ -4839,6 +4982,7 @@ static void filter_tail_merge(FILE *out, FILE *src, const Func *f)
     int n_lines;
     rewind(src);
     if (!slurp_lower_lines(src, &lines, &n_lines)) goto verbatim;
+    char *tm_inserted = tm_make_fallthrough_explicit(&lines, &n_lines);
     long n = n_lines;
     long *code = malloc((size_t)(n > 0 ? n : 1) * sizeof *code);
     if (!code) { for (long i = 0; i < n; i++) free(lines[i]);
@@ -4957,11 +5101,18 @@ static void filter_tail_merge(FILE *out, FILE *src, const Func *f)
                 skip_to = runend[i];
                 continue;
             }
+            if (tm_inserted && tm_inserted[i] && tm_jp_above_label(lines, n, i))
+                continue;                  /* the explicit fall-through was not needed */
             fputs(lines[i], out);
         }
     } else {
-        for (long i = 0; i < n; i++) fputs(lines[i], out);
+        for (long i = 0; i < n; i++) {
+            if (tm_inserted && tm_inserted[i] && tm_jp_above_label(lines, n, i))
+                continue;
+            fputs(lines[i], out);
+        }
     }
+    free(tm_inserted);
     #undef TM_RANGE_FREE
     free(runend); free(isstart); free(labat); free(labnm);
     free(maxd); free(used); free(jmp); free(jend); free(lab); free(code);
@@ -11531,6 +11682,23 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 bb_hl_out[bb->id] = acarry;
             else
                 bb_hl_out[bb->id] = -1;
+            /* The same for A: the trampoline runs nothing, so what its
+               predecessors agree is in A is still in A at its successor. */
+            if (L.bb_a_out && a_carry_enabled() && !opt_disabled("late-join")) {
+                int a2 = -2;
+                for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
+                    int pid = bb_preds[bb->id][p];
+                    if (!bb_lowered[pid]) { a2 = -1; break; }
+                    int v = edge_unsafe(pid, bb->id) ? -1 : L.bb_a_out[pid];
+                    if (v < 0) { a2 = -1; break; }
+                    if (a2 == -2) a2 = v;
+                    else if (a2 != v) { a2 = -1; break; }
+                }
+                L.bb_a_out[bb->id] =
+                    (a2 >= 0 && bb->live_in
+                     && ir_bitset_get((const BitSet *)bb->live_in, a2))
+                    ? a2 : -1;
+            }
             if (de_carry_on && bb_de_out) {
                 int dcarry = -2;
                 for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {

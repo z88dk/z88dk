@@ -4524,6 +4524,10 @@ static int try_store_chain(FILE *out, Func *f, const Op *op)
         }
         load_to_hl(out, f, op->src[0]);
         emit_ex_de_hl(out);
+        /* ex de,hl swapped the registers, so swap the beliefs too: a base that
+           was resident in DE is now in HL, and DE holds the value. Without this
+           load_to_hl(base) sees "base in DE" and copies the value over it. */
+        { int t = L.rs.hl; L.rs.hl = L.rs.de; L.rs.de = t; L.rs.dehl = -1; }
         load_to_hl(out, f, op->mem.base);
         emit_hl_add_offset(out, op->mem.offset, 1, 1);
         emit(out, "ld\t(hl),e");

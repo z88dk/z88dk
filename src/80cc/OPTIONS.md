@@ -133,6 +133,7 @@ exists (ADR 0010).
 | `dead-ld-hl-a` | an `ld h,a; ld l,a` pair whose HL is rewritten before it is read is kept |
 | `st-pop-de` | a word store through a pointer in HL pops a stack-parked value through HL (and reloads the pointer) instead of `pop de` |
 | `cond-value` | `a && b` and `a || b` used as a value build each leg as a stored boolean instead of branching straight to a 0/1 join |
+| `late-join` | the join block of an if/else or a value ternary is created before its arms, so a nested conditional's blocks lay out after it and a value cannot be carried in A across the join |
 | `side-exit-carry` | a block with a conditional side exit hands its successors the register beliefs it holds at the end, even where an earlier exit held something else |
 | `shl-copy-de` | a word `t = x << n; t + x` (and `t - x`) spills x and reloads it instead of copying it to DE |
 | `mult-factor` | a word multiply by 2^a+2^b or 2^a-2^b stays `(v<<a) +- (v<<b)` instead of `((v<<(a-b)) +- v) << b` |
@@ -386,6 +387,7 @@ exists (ADR 0010).
 | --- | --- |
 | `dead-pair-load` | a pair load overwritten before any read stays in the text |
 | `tail-merge` | duplicate instruction tails are not merged (per function) |
+| `tm-fallthrough` | tail merging does not treat a run that falls into a label as ending in a jump to it, so it cannot merge with an identical run that does |
 | `dehl-stash-dead` | in fp mode a stored 4-byte value keeps its `ld bc,hl` stash even when the next code-emitting op is a helper call, or a copy that is its last use, that reads it from HL:DE |
 | `tm-thread` | a jump to a label whose block is a lone `jp` is not sent straight to that target after tail merging |
 | `block-layout` | no trace movement to delete a jump |
