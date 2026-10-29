@@ -270,6 +270,19 @@ static int gen_mov(FILE *out, Func *f, const Op *op)
         }
         return 0;
     }
+    /* Source and destination share one index register: the value is already
+       where it must be. Only beliefs naming dst (its old value) go stale. */
+    if (dst_w == 2 && op->dst >= 0 && op->src[0] >= 0 && !opt_disabled("mov-same-idx")
+        && vreg_idx_home(f, op->dst) != IR_PR_NONE
+        && ir_home_at(f, op->src[0]) == ir_home_at(f, op->dst)) {
+        if (op->src[0] != op->dst) {
+            if (L.rs.hl == op->dst) invalidate_hl_cache();
+            if (L.rs.de == op->dst) invalidate_de_cache();
+            if (L.rs.bc == op->dst) invalidate_bc_cache();
+            if (L.rs.a  == op->dst) invalidate_a_cache();
+        }
+        return 0;
+    }
     if (L.rs.hl != op->src[0] || L.rs.hl < 0)
         load_to_hl(out, f, op->src[0]);
     commit_hl_word(out, f, op->dst);

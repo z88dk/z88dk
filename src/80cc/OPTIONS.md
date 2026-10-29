@@ -197,6 +197,7 @@ exists (ADR 0010).
 | `push-idx-keep` | a pre-pushed call argument is treated as clobbering IX and IY, so an index-register home does not survive it |
 | `slot0-weight` | the value given frame offset 0 is chosen by static access count, not loop-weighted, and may be a register-resident value |
 | `arg-hoist` | a byte argument that needs computing is no longer built before a trivial argument pushed ahead of it, so its operands can sit under the pushes |
+| `mov-same-idx` | a word copy between two vregs homed in the same IX/IY register is emitted as `push iy; pop hl; push hl; pop iy` instead of nothing |
 | `tight-homes` | home intervals stay whole-function instead of narrowing to the live range (stage 1 of the ranging arc, ADR 0027) |
 | `call-split` | no call-bounded live-range splitting |
 | `cs-evict` | a call-split tenant never displaces an incumbent |
