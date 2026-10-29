@@ -42,6 +42,12 @@ extern void  __LIB__ set_crtc_10(void *reg_list) __z88dk_fastcall;
 // Set a single register in the 6845 CRTC
 extern void __LIB__ set_crtc_reg(int reg, int val) __smallc;
 
+// Read count sectors of 256 bytes into buf from the floppy disk controller, starting at the sector (the first on a track is 1) of the track (the
+// sides alternate: track = 2 * cylinder + side), carrying on to the next track after sector 16.  Returns 0, or 1 on an error.  Interrupts are
+// turned off for the call.  The disk in drive 0 is the one booted from.
+extern int __LIB__ x1_disk_read(uint8_t drive, uint8_t track, uint8_t sector, uint8_t count, void *buf) __smallc;
+extern int __LIB__ x1_disk_write(uint8_t drive, uint8_t track, uint8_t sector, uint8_t count, const void *buf) __smallc;
+
 // Send a command to the SUB-CPU
 extern void  __LIB__ subcpu_command(int command) __z88dk_fastcall;
 

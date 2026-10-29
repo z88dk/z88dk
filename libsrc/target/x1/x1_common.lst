@@ -50,6 +50,9 @@ target/x1/obj/${TARGET}/x/target/x1/x1/x1_set_palette.o
 target/x1/obj/${TARGET}/x/target/x1/x1/x1_load_pcg.o
 target/x1/obj/${TARGET}/x/target/x1/x1/asm_load_pcg.o
 target/x1/obj/${TARGET}/x/target/x1/x1/asm_x1_keyboard_handler.o
+target/x1/obj/${TARGET}/x/target/x1/x1/x1_disk_run.o
+target/x1/obj/${TARGET}/x/target/x1/x1/x1_disk_read.o
+target/x1/obj/${TARGET}/x/target/x1/x1/x1_disk_write.o
 target/x1/obj/${TARGET}/time/clock.o
 target/x1/obj/${TARGET}/time/time.o
 target/x1/obj/${TARGET}/x/target/x1/psg/set_psg.o
