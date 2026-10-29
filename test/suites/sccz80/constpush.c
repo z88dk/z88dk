@@ -76,6 +76,14 @@ void test_constpush(void)
     Assert((int)-1 / 2UL == 2147483647UL, "(int)-1 / 2UL");
     Assert(((unsigned long)-1 >> 1) == 2147483647UL, "logical >> of unsigned long");
     Assert(((unsigned long)-1 >> 1u) == 2147483647UL, "logical >> of unsigned long by unsigned");
+    Assert(~(unsigned char)0 < 0, "complement promotes unsigned char");
+    Assert((long)~(unsigned char)0 == -1L, "complement of zero char is -1");
+    Assert((long)~(signed char)0x80 == 127L, "complement of signed char");
+    Assert((long)-(unsigned char)200 == -200L, "negation promotes unsigned char");
+    Assert((long)~0u == 65535L, "complement of unsigned int");
+    Assert((1L && 1L) == 1 && (0L || 0) == 0, "logical operators yield int");
+    Assert((char *)10 - (char *)4 == 6, "char pointer difference");
+    Assert((int *)10 - (int *)4 == 3, "int pointer difference");
 
     sprintf(buf, "%ld", (long)MAINBANK_ADDR);
     expect(buf, "98304", "%ld of 65536 - 16384*2");

@@ -239,6 +239,25 @@ static Type *promote_types(Type *t1, Type *t2)
     return type_int;
 }
 
+/* Integer promotions. unsigned char fits in signed int, so a char
+   promotes to signed int. short is the same width as int. */
+static Type *integer_promote_type(const Type *t)
+{
+    if (!t || !kind_is_integer(t->kind))
+        return t ? (Type *)t : type_int;
+    if (t->kind == KIND_CHAR)
+        return type_int;
+    if ((t->kind == KIND_SHORT || t->kind == KIND_INT) && t->isunsigned)
+        return type_uint;
+    if (t->kind == KIND_SHORT || t->kind == KIND_INT)
+        return type_int;
+    if (t->kind == KIND_LONG)
+        return t->isunsigned ? type_ulong : type_long;
+    if (t->kind == KIND_LONGLONG)
+        return t->isunsigned ? type_ulonglong : type_longlong;
+    return type_int;
+}
+
 void ast_normalize_types(Node *node)
 {
     if (!node) return;
@@ -325,9 +344,19 @@ void ast_normalize_types(Node *node)
         if (!node->type) node->type = type_int;
         break;
     case OP_PRE_INC: case OP_POST_INC: case OP_PRE_DEC: case OP_POST_DEC:
-    case OP_COMP: case OP_LNEG: case OP_NEG:
         ast_normalize_types(node->operand);
         if (!node->type) node->type = node->operand->type;
+        break;
+    case OP_LNEG:
+        ast_normalize_types(node->operand);
+        if (!node->type) node->type = type_int;
+        break;
+    case OP_COMP: case OP_NEG:
+        /* ~ and unary minus promote first. `(long)~(unsigned char)0`
+           is -1. `-(unsigned char)200` is -200. */
+        ast_normalize_types(node->operand);
+        if (!node->type)
+            node->type = integer_promote_type(node->operand ? node->operand->type : NULL);
         break;
     case OP_DEREF:
         /* Preserve the storage type the parser stamped on the load
@@ -832,9 +861,12 @@ Node *ast_fold_constants(Node *node)
                       : fold_signed_bits(node->operand);
             int64_t r;
             if (try_fold_unop(node->ast_type, v, &r)) {
-                Type *t = node->type ? node->type : node->operand->type;
+                Type *t;
                 if (node->ast_type == OP_LNEG)
                     return fold_int_literal(node, type_int, (uint64_t)r);
+                /* constexpr folds before ast_normalize_types, so promote
+                   here as well as in the normaliser. */
+                t = integer_promote_type(node->operand->type);
                 r = fold_integer_result(r, t);
                 return fold_int_literal(node, t, (uint64_t)r);
             }
@@ -1052,12 +1084,16 @@ Node *ast_fold_constants(Node *node)
                     r = node_int_value(R);
                     if (try_fold_compare(fold_op, l, r, L->type, R->type, &v))
                         return fold_int_literal(node, type_int, (uint64_t)v);
+                } else if (fold_op == OP_ANDAND || fold_op == OP_OROR) {
+                    /* Each operand is tested against zero. The result is int. */
+                    l = fold_signed_bits(L);
+                    r = fold_signed_bits(R);
+                    if (try_fold_binop(fold_op, l, r, &v))
+                        return fold_int_literal(node, type_int, (uint64_t)v);
                 } else if (fold_op == OP_SSHR || fold_op == OP_USHR
-                        || fold_op == OP_SSHL || fold_op == OP_USHL
-                        || fold_op == OP_ANDAND || fold_op == OP_OROR) {
+                        || fold_op == OP_SSHL || fold_op == OP_USHL) {
                     /* Shifts use the promoted left operand only. An unsigned
-                       count must not turn `>>` into a logical shift.
-                       `&&` / `||` test each operand against zero. */
+                       count must not turn `>>` into a logical shift. */
                     if (fold_op == OP_SSHR)
                         l = fold_signed_bits(L), r = node_int_value(R);
                     else if (fold_op == OP_USHR)
@@ -1080,6 +1116,18 @@ Node *ast_fold_constants(Node *node)
                     if (try_fold_binop(fold_op, l, r, &v)) {
                         Type *t = node->type ? node->type
                                  : fold_common_integer_type(L->type, R->type);
+                        /* ptr - ptr is an element count. The IR scales a
+                           live subtraction; a folded literal has to do it. */
+                        if (fold_op == OP_SUB
+                            && L->type && R->type
+                            && !kind_is_integer(L->type->kind)
+                            && !kind_is_integer(R->type->kind)) {
+                            int elem = (L->type->ptr && L->type->ptr->size > 0)
+                                     ? L->type->ptr->size : 1;
+                            if (elem > 1)
+                                v /= elem;
+                            t = type_int;
+                        }
                         v = fold_integer_result(v, t);
                         return fold_int_literal(node, t ? t : type_int,
                                                  (uint64_t)v);

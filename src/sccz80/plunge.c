@@ -374,6 +374,21 @@ static int fold_integer_exact(LVALUE *left, LVALUE *right,
     return 1;
 }
 
+/* A constant pointer difference is reloaded from the folded value.
+   zdiv_const only emits the scale, so divide the value here. */
+static void scale_ptr_diff(LVALUE *lval, int scale)
+{
+    if (scale <= 1)
+        return;
+    if (lval->is_const) {
+        if (lval->int_const_valid)
+            lval->int_const_val = (uint64_t)((int64_t)lval->int_const_val / scale);
+        lval->const_val /= scale;
+        return;
+    }
+    zdiv_const(lval, scale);
+}
+
 static void set_exact_integer_result(LVALUE *left, uint64_t value)
 {
     unsigned bits;
@@ -1046,23 +1061,23 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     
     if (oper == zsub && lval->ptr_type) {
         if (lval->ptr_type == KIND_INT && lval2->ptr_type == KIND_INT) {
-            zdiv_const(lval,2);  /* Divide by two */
+            scale_ptr_diff(lval,2);  /* Divide by two */
         } else if (lval->ptr_type == KIND_PTR && lval2->ptr_type == KIND_PTR) {
-            zdiv_const(lval,2);  /* Divide by two */
+            scale_ptr_diff(lval,2);  /* Divide by two */
         } else if (lval->ptr_type == KIND_CPTR && lval2->ptr_type == KIND_CPTR) {
-            zdiv_const(lval,3);
+            scale_ptr_diff(lval,3);
         } else if (lval->ptr_type == KIND_LONG && lval2->ptr_type == KIND_LONG) {
-            zdiv_const(lval,4); /* div by 4 */
+            scale_ptr_diff(lval,4); /* div by 4 */
        } else if (lval->ptr_type == KIND_ACCUM32 && lval2->ptr_type == KIND_ACCUM32) {
-            zdiv_const(lval,4); /* div by 4 */
+            scale_ptr_diff(lval,4); /* div by 4 */
         } else if (lval->ptr_type == KIND_FLOAT16 && lval2->ptr_type == KIND_FLOAT16) {
-            zdiv_const(lval,2); /* div by 2 */
+            scale_ptr_diff(lval,2); /* div by 2 */
        } else if (lval->ptr_type == KIND_ACCUM16 && lval2->ptr_type == KIND_ACCUM16) {
-            zdiv_const(lval,2); /* div by 2 */
+            scale_ptr_diff(lval,2); /* div by 2 */
         } else if (lval->ptr_type == KIND_DOUBLE && lval2->ptr_type == KIND_DOUBLE) {
-            zdiv_const(lval,c_fp_size); /* div by 6 */
+            scale_ptr_diff(lval,c_fp_size); /* div by 6 */
         } else if (lval->ptr_type == KIND_STRUCT && lval2->ptr_type == KIND_STRUCT) {
-            zdiv_const(lval, lval->ltype->ptr->tag->size);
+            scale_ptr_diff(lval, lval->ltype->ptr->tag->size);
         } else if (lval->ptr_type == KIND_CHAR && lval->ptr_type == KIND_CHAR ) {
         } else if (lval->ptr_type && lval2->ptr_type && lval->ptr_type != lval2->ptr_type ) {
             UT_string  *str;

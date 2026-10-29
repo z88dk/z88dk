@@ -38,6 +38,11 @@ Follow the integer conversion rules. The same rules apply in both front ends.
 - `/` and `%` convert both operands to the result type before the operation.
   `(-1) / 2u` is 32767. `(-1L) / 0x8000` is 0. A `char` promotes to `int`
   first, so `(unsigned char)200 / (signed char)-2` is -100.
+- Unary `~` and unary `-` promote a `char` to `int` before the operation.
+  `(long)~(unsigned char)0` is -1. `(long)-(unsigned char)200` is -200.
+  `&&` and `||` yield `int`.
+- A pointer difference counts elements. `(int *)10 - (int *)4` is 3.
+  `(char *)10 - (char *)4` is 6.
 - Default argument promotions do not narrow a `long`. `printf("%ld", 32768)`
   pushes four bytes. A prototype still converts: `unsigned int` keeps the
   low 16 bits of 98304, which are 32768.

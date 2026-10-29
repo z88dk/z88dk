@@ -513,6 +513,18 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
     return lval->symbol;
 }
 
+/* ~ and unary minus promote a char to signed int before the operation.
+   `(long)~(unsigned char)0` is -1. `-(unsigned char)200` is -200. */
+static void promote_unary_integer(LVALUE *lval)
+{
+    if (!lval || !lval->ltype || !kind_is_integer(lval->ltype->kind))
+        return;
+    if (lval->ltype->kind == KIND_CHAR) {
+        lval->val_type = KIND_INT;
+        lval->ltype = type_int;
+    }
+}
+
 int heira(LVALUE *lval)
 {
     int k, j;
@@ -560,6 +572,7 @@ int heira(LVALUE *lval)
             errorfmt("Unary ~ operator is not valid for floating point",1);
         if ( kind_is_fixed(lval->val_type) )
             errorfmt("Unary ~ operator is not valid for fixed point",1);
+        promote_unary_integer(lval);
         com(lval);
         lval->const_val = (int64_t)~(uint64_t)lval->const_val;
         if (lval->int_const_valid)
@@ -581,6 +594,7 @@ int heira(LVALUE *lval)
     } else if (cmatch('-')) {
         if (heira(lval))
             rvalue(lval);
+        promote_unary_integer(lval);
         neg(lval);
         lval->const_val = -lval->const_val;
         if (lval->int_const_valid)
