@@ -14,5 +14,8 @@ fmemopen_callee:
    pop de
    pop bc
    ex (sp),hl
-   
-   jp asm_fmemopen
+
+   push ix
+   call asm_fmemopen
+   pop ix
+   ret

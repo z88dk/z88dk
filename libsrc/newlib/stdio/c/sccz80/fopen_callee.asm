@@ -13,5 +13,8 @@ fopen_callee:
    pop hl
    pop de
    ex (sp),hl
-   
-   jp asm_fopen
+
+   push ix
+   call asm_fopen
+   pop ix
+   ret

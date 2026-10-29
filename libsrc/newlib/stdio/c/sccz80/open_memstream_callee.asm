@@ -14,5 +14,8 @@ open_memstream_callee:
    pop hl
    pop de
    push af
-   
-   jp asm_open_memstream
+
+   push ix
+   call asm_open_memstream
+   pop ix
+   ret
