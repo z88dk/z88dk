@@ -273,6 +273,22 @@ static int arg_pure_nonvolatile(Node *n, int *nvol)
     }
 }
 
+/* A literal or a plain variable: loading it at its push costs about what
+   loading it earlier would. */
+static int arg_is_trivial(Node *n)
+{
+    if (!n) return 1;
+    switch (n->ast_type) {
+    case AST_LITERAL: case AST_STR_LIT: case AST_LOCAL_VAR: case AST_GLOBAL_VAR:
+        return 1;
+    case OP_DEREF: case AST_DEREF:        /* a plain variable read */
+        return n->operand && (n->operand->ast_type == AST_LOCAL_VAR
+                           || n->operand->ast_type == AST_GLOBAL_VAR);
+    default:
+        return 0;
+    }
+}
+
 static int arg_has_control_flow(Node *n)
 {
     if (!n) return 0;
@@ -4554,7 +4570,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                           : n_args;
             /* control-flow arguments first */
             int pre_v[64];
-            int reorder = 0;
+            int reorder = 0, hoist = 0;
             if (n_to_push == n_args && n_args >= 2 && n_args <= 64
                 && !opt_disabled("arg-reorder")) {
                 int any_cf = 0, all_ok = 1, vol_args = 0;
@@ -4569,14 +4585,32 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                         if (arg_has_control_flow(a)) any_cf = 1;
                     }
                 }
-                reorder = all_ok && any_cf && vol_args <= 1;
+                /* A byte argument that needs computing, pushed after a trivial
+                   one, is built first: its operands may sit on top of the stack
+                   and are cheaper to reach before anything is pushed. */
+                if (all_ok && !any_cf && !opt_disabled("arg-hoist")
+                    && !(fl & (SDCCDECL | SDCCCALL1))) {
+                    int seen_trivial = 0;
+                    for (int k = 0; k < n_args; k++) {
+                        int i = is_stdc ? n_args - 1 - k : k;
+                        Node *a = array_get_byindex(n->args, i);
+                        if (arg_is_trivial(a)) { seen_trivial = 1; continue; }
+                        if (seen_trivial && a && a->type && a->type->size == 1) {
+                            hoist = 1; break;
+                        }
+                    }
+                }
+                reorder = all_ok && (any_cf || hoist) && vol_args <= 1;
             }
             if (reorder) {
                 for (int i = 0; i < n_args; i++) pre_v[i] = -1;
                 for (int k = 0; k < n_args; k++) {
                     int i = is_stdc ? n_args - 1 - k : k;
                     Node *a = array_get_byindex(n->args, i);
-                    if (!arg_has_control_flow(a)) continue;
+                    if (!arg_has_control_flow(a)
+                        && !(hoist && !arg_is_trivial(a) && a->type
+                             && a->type->size == 1))
+                        continue;
                     pre_v[i] = build_expr(b, a);
                     if (pre_v[i] < 0) { free(args); free(arg_pushed_bytes); return -1; }
                 }
@@ -4666,6 +4700,20 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                         cv->dst = wt; cv->src[0] = v; v = wt;
                     }
                 }
+                /* A byte arg to a 2-byte stack slot (smallc / stdc / callee)
+                   is zero-extended at its producer so the push can follow it
+                   directly; a byte arg left at width 1 rolls every push in
+                   the call back to the slot path. */
+                int widened_byte = 0;
+                if (!arg_is_struct && k < n_to_push
+                    && b->f->vregs[v].width == 1
+                    && !(fl & (SDCCDECL | SDCCCALL1))
+                    && !opt_disabled("arg-widen")) {
+                    int wt = new_temp_kind(b, KIND_INT);
+                    Op *cv = ir_op_emit(cur_bb(b), IR_CONV_ZX);
+                    cv->dst = wt; cv->src[0] = v; v = wt;
+                    widened_byte = 1;
+                }
                 args[i] = v;
                 /* Bytes this arg occupies on the caller stack: a struct's full
                    size (its vreg is just the 2-byte address), else the vreg
@@ -4690,6 +4738,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     Op *p = ir_op_emit(cur_bb(b), IR_PUSH_ARG);
                     p->src[0] = v;
                     p->src[1] = -1;
+                    p->from_byte = widened_byte;
+                    p->hi_dc = (pt_i && pt_i->kind == KIND_CHAR
+                                && !(fl & (SDCCDECL | SDCCCALL1))
+                                && !opt_disabled("arg-hi-dc"));
                     /* imm=1 marks the call's FIRST push: if the
                        function keeps a PR_BC tenant, the lowerer
                        saves BC there — BELOW the arg block — and
@@ -5269,7 +5321,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 
         int then_bb = ir_bb_new(b->f);
         int els_bb  = ir_bb_new(b->f);
-        int exit_bb = ir_bb_new(b->f);
+        /* The join is created after the arms (late-join), so it lays out after
+           every block a nested conditional adds; the lowerer then sees all of
+           its predecessors first and can carry the value in A across it. */
+        int late_join = !opt_disabled("late-join");
+        int exit_bb = late_join ? -1 : ir_bb_new(b->f);
         /* A hint vreg lets both arms write the value directly — no
            result temp, and the caller skips the wrapping MOV. Size the
            result from the ternary's type: hardcoding width 2 truncated
@@ -5306,14 +5362,21 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         int t = build_expr_hinted(b, n->then, result);
         if (t < 0) return -1;
         ternary_arm_to_result(b, n->then, result, t);
-        ir_emit_br(cur_bb(b), exit_bb);
+        int then_end = b->cur_bb_id;
+        if (!late_join) ir_emit_br(cur_bb(b), exit_bb);
 
         b->cur_bb_id = els_bb;
         int e = build_expr_hinted(b, n->els, result);
         if (e < 0) return -1;
         ternary_arm_to_result(b, n->els, result, e);
-        ir_emit_br(cur_bb(b), exit_bb);
+        int els_end = b->cur_bb_id;
+        if (!late_join) ir_emit_br(cur_bb(b), exit_bb);
 
+        if (late_join) {
+            exit_bb = ir_bb_new(b->f);
+            b->cur_bb_id = then_end;  ir_emit_br(cur_bb(b), exit_bb);
+            b->cur_bb_id = els_end;   ir_emit_br(cur_bb(b), exit_bb);
+        }
         b->cur_bb_id = exit_bb;
         return result;
     }
@@ -7173,6 +7236,44 @@ static int build_muldiv_integer(Builder *b, Node *n)
     return dst;
 }
 
+/* Upper bound (0..32767) of an integer expression that is provably
+   non-negative, or -1 when it is not known to be. A compare of two such values
+   gives the same answer signed or unsigned, so the cheaper unsigned form (and
+   the byte `cp` it leads to) can be kept. Literals, zero-extended unsigned
+   chars, casts to unsigned char, and sums and masks of these. */
+static int expr_nonneg_max(Node *e)
+{
+    if (!e) return -1;
+    switch (e->ast_type) {
+    case AST_LITERAL: {
+        if (!e->type || !is_register_int_kind(e->type->kind)) return -1;
+        int64_t v = node_int_value(e);
+        return (v >= 0 && v <= 32767) ? (int)v : -1;
+    }
+    case OP_ADD: {
+        int a = expr_nonneg_max(e->left), c = expr_nonneg_max(e->right);
+        if (a < 0 || c < 0 || a + c > 32767) return -1;
+        return a + c;
+    }
+    case OP_AND: {
+        int a = expr_nonneg_max(e->left), c = expr_nonneg_max(e->right);
+        if (a < 0) return c;
+        if (c < 0) return a;
+        return a < c ? a : c;
+    }
+    case OP_CAST:
+        if (e->type && e->type->isunsigned && type_width(e->type) == 1)
+            return 255;
+        return -1;
+    default:
+        break;
+    }
+    if (e->type && e->type->isunsigned && is_register_int_kind(e->type->kind)
+        && type_width(e->type) == 1)
+        return 255;
+    return -1;
+}
+
 static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
 {
     /* ---- integer family (the residual) ---------------------------- */
@@ -7189,6 +7290,28 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
         || k == IR_CMP_GT || k == IR_CMP_GE) {
         int uns = (n->left  && n->left->type  && n->left->type->isunsigned)
                || (n->right && n->right->type && n->right->type->isunsigned);
+        /* For two integer operands the rule works on the PROMOTED types: a
+           char or short narrower than int promotes to a signed int, so
+           `signed char < unsigned char` and `int < unsigned char` are signed,
+           and `long < unsigned int` is signed because long holds every
+           unsigned int. Unsigned wins only when both are unsigned, or the
+           unsigned operand is at least as wide as the other (after promotion
+           to int). Pointers and other types keep the either-unsigned rule. */
+        Type *lt_ = n->left ? n->left->type : NULL;
+        Type *rt_ = n->right ? n->right->type : NULL;
+        if (lt_ && rt_ && is_register_int_kind(lt_->kind)
+            && is_register_int_kind(rt_->kind)) {
+            int lw = (int)type_width(lt_), rw = (int)type_width(rt_);
+            int lpw = lw < 2 ? 2 : lw, rpw = rw < 2 ? 2 : rw;
+            int l_uns = lt_->isunsigned && lw >= 2;
+            int r_uns = rt_->isunsigned && rw >= 2;
+            uns = (lt_->isunsigned && rt_->isunsigned)
+               || (l_uns && lpw >= rpw) || (r_uns && rpw >= lpw);
+            /* Two provably non-negative values compare the same either way. */
+            if (!uns && expr_nonneg_max(n->left) >= 0
+                && expr_nonneg_max(n->right) >= 0)
+                uns = 1;
+        }
         if (uns) {
             switch (k) {
             case IR_CMP_LT: k = IR_CMP_ULT; break;
@@ -7524,6 +7647,25 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
             r = wtmp;
         }
     }
+    /* A signed relational of two byte variables compares the promoted ints.
+       The lowerer widens a byte operand by zero-extension, so a negative char
+       would read as 128..255; extend each by its own signedness here, as the
+       explicit (int) form does. Equality and the unsigned relations are
+       unaffected by the zero-extension and stay at byte width. */
+    if (is_cmp && width == 1 && b->f->vregs[r].width == 1
+        && (k == IR_CMP_LT || k == IR_CMP_LE
+            || k == IR_CMP_GT || k == IR_CMP_GE)) {
+        int *side[2] = { &l, &r };
+        const Node *src_n[2] = { lhs, rhs };
+        for (int i = 0; i < 2; i++) {
+            int uns = !src_n[i]->type || src_n[i]->type->isunsigned;
+            int wtmp = new_temp_kind(b, KIND_INT);
+            Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+            cv->dst = wtmp; cv->src[0] = *side[i];
+            *side[i] = wtmp;
+        }
+        width = 2;
+    }
     int dst = get_dest_vreg(b, hint, dst_w);
     Op *bop = ir_emit_binop(cur_bb(b), k, dst, l, r);
     if (shr_arith_bit) bop->imm |= shr_arith_bit;   /* variable-count signed >> */
@@ -7627,6 +7769,14 @@ static int naked_stmt_is_frameless(const Node *n)
 static int emit_cond_false_exit(Builder *b, Node *n, int false_bb);
 static int emit_cond_true_exit(Builder *b, Node *n, int true_bb);
 
+/* A literal condition leaf: 1 and sets *truth when `n` is a constant. */
+static int cond_const_leaf(const Node *n, int *truth)
+{
+    if (!n || n->ast_type != AST_LITERAL) return 0;
+    *truth = n->zval != 0;
+    return 1;
+}
+
 /* Branch to false_bb when `n` is FALSE, else fall through — an && operand. */
 static int emit_cond_false_exit(Builder *b, Node *n, int false_bb)
 {
@@ -7654,6 +7804,13 @@ static int emit_cond_false_exit(Builder *b, Node *n, int false_bb)
         if (!n->operand) return build_fail("OP_LNEG with missing operand");
         return emit_cond_true_exit(b, n->operand, false_bb);
     default: {
+        int t;
+        if (cond_const_leaf(n, &t)) {
+            if (t) return 0;
+            ir_emit_br(cur_bb(b), false_bb);
+            b->cur_bb_id = ir_bb_new(b->f);   /* unreachable remainder */
+            return 0;
+        }
         int v = build_expr(b, n);
         if (v < 0) return -1;
         ir_emit_br_zero(cur_bb(b), v, false_bb);
@@ -7690,6 +7847,13 @@ static int emit_cond_true_exit(Builder *b, Node *n, int true_bb)
         if (!n->operand) return build_fail("OP_LNEG with missing operand");
         return emit_cond_false_exit(b, n->operand, true_bb);
     default: {
+        int t;
+        if (cond_const_leaf(n, &t)) {
+            if (!t) return 0;
+            ir_emit_br(cur_bb(b), true_bb);
+            b->cur_bb_id = ir_bb_new(b->f);   /* unreachable remainder */
+            return 0;
+        }
         int v = build_expr(b, n);
         if (v < 0) return -1;
         ir_emit_br_cond(cur_bb(b), v, true_bb);
@@ -7701,6 +7865,19 @@ static int emit_cond_true_exit(Builder *b, Node *n, int true_bb)
 static int build_cond(Builder *b, Node *n, int true_bb, int false_bb)
 {
     if (!n) return build_fail("build_cond: null condition");
+    /* Only the truth value matters here, so an identity constant drops out:
+       1 && x, x && 1, 0 || x, x || 0 are all just x. */
+    for (;;) {
+        int t;
+        if (n->ast_type == OP_ANDAND && n->left && n->right) {
+            if (cond_const_leaf(n->left, &t) && t)  { n = n->right; continue; }
+            if (cond_const_leaf(n->right, &t) && t) { n = n->left;  continue; }
+        } else if (n->ast_type == OP_OROR && n->left && n->right) {
+            if (cond_const_leaf(n->left, &t) && !t)  { n = n->right; continue; }
+            if (cond_const_leaf(n->right, &t) && !t) { n = n->left;  continue; }
+        }
+        break;
+    }
     switch (n->ast_type) {
     case OP_ANDAND:
         if (emit_cond_false_exit(b, n, false_bb) != 0) return -1;
@@ -8178,7 +8355,12 @@ static int build_stmt(Builder *b, Node *n)
             return 0;
         }
         int then_bb = ir_bb_new(b->f);
-        int exit_bb = ir_bb_new(b->f);
+        /* if/else: the join is created after both arms (late-join), so it lays
+           out after any block a nested conditional adds. Not for the loop
+           desugaring (its else is a goto to the exit), nor for an else-less if. */
+        int late_join = (n->els && n->els->ast_type != AST_JUMP
+                         && !opt_disabled("late-join"));
+        int exit_bb = late_join ? -1 : ir_bb_new(b->f);
         int els_bb  = n->els ? ir_bb_new(b->f) : exit_bb;
 
         /* ast_conditional() (node.c) builds this AST_IF/AST_TERNARY node
@@ -8201,14 +8383,21 @@ static int build_stmt(Builder *b, Node *n)
 
         b->cur_bb_id = then_bb;
         if (n->then && build_stmt(b, n->then) != 0) return -1;
-        close_bb_with_fallthrough(b, exit_bb);
+        int then_end = b->cur_bb_id;
+        if (!late_join) close_bb_with_fallthrough(b, exit_bb);
 
         if (n->els) {
             b->cur_bb_id = els_bb;
             if (build_stmt(b, n->els) != 0) return -1;
-            close_bb_with_fallthrough(b, exit_bb);
+            if (!late_join) close_bb_with_fallthrough(b, exit_bb);
         }
 
+        if (late_join) {
+            int els_end = b->cur_bb_id;
+            exit_bb = ir_bb_new(b->f);
+            b->cur_bb_id = then_end; close_bb_with_fallthrough(b, exit_bb);
+            b->cur_bb_id = els_end;  close_bb_with_fallthrough(b, exit_bb);
+        }
         b->cur_bb_id = exit_bb;
         return 0;
     }

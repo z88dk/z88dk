@@ -1332,18 +1332,15 @@ static Node *try_simplify_binop(Node *node)
             return l;          /* x + 0, x - 0, x | 0, x ^ 0, x >> 0, x << 0 → x */
         case OP_MULT:
         case OP_AND:
-            /* x * 0 / x & 0 → 0, but only if x has no side effect. */
-            if (l && l->ast_type == AST_LITERAL) {
-                /* both literal — already handled by fold; leave for
-                   completeness. */
-            }
-            return r;          /* literal 0 (could short-circuit eval of l, but x might have side effects) */
-            /* TODO: preserve side effects of l. For now: keep node. */
+            /* x * 0 / x & 0 → 0, only when x has no side effect. */
+            if (is_side_effect_free(l)) return r;
+            break;
         /* NOT `x || 0 → x`: the result of || is a normalised 0/1 bool, but
            x can be any nonzero value (or a wide/float whose low word is 0).
            `int r = x || 0` proved this folds to the raw x. Build the OROR. */
         case OP_ANDAND:
-            return r;          /* x && 0 → 0 (x might have side effects! but legacy short-circuits anyway) */
+            if (is_side_effect_free(l)) return r;   /* x && 0 → 0 */
+            break;
         }
     }
     if (is_int_literal(l, 0)) {
@@ -1353,7 +1350,8 @@ static Node *try_simplify_binop(Node *node)
             return r;          /* 0 + x, 0 | x, 0 ^ x → x */
         case OP_MULT:
         case OP_AND:
-            return l;          /* 0 * x / 0 & x → 0 (assuming x side-effect-free; conservative) */
+            if (is_side_effect_free(r)) return l;   /* 0 * x / 0 & x → 0 */
+            break;
         /* NOT `0 || x → x`: result is a normalised 0/1 bool, not raw x. */
         case OP_ANDAND:
             return l;          /* 0 && x → 0 (x not evaluated; 0 side-effect-free) */

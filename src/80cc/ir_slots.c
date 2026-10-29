@@ -12,6 +12,7 @@
 #include "ir_alloc.h"
 #include "ir_analysis.h"
 
+int opt_disabled(const char *name);
 extern int  c_debug_adb_defc;   /* -debug: pin named-local slots (dedicated) */
 
 #include <stdio.h>
@@ -32,6 +33,42 @@ static int sp0_fastpath_possible(const Func *f)
                   && !f->uses_acc;
     if (fp_active) return 0;
     return tos_pushpop_ok(f);
+}
+
+/* Natural-loop nesting depth per BB: for each back edge p->h (h <= p) the body
+   is h plus every BB that reaches p without passing through h. */
+static int *slot_loop_depths(const Func *f)
+{
+    int n = f->n_bbs;
+    int *depth = calloc((size_t)(n > 0 ? n : 1), sizeof(int));
+    char *in = calloc((size_t)(n > 0 ? n : 1), 1);
+    int *stack = calloc((size_t)(n > 0 ? n : 1), sizeof(int));
+    if (!depth || !in || !stack) { free(depth); free(in); free(stack); return NULL; }
+    for (int p = 0; p < n; p++) {
+        int ns = ir_bb_n_succ(&f->bbs[p]);
+        for (int k = 0; k < ns; k++) {
+            int h = ir_bb_succ_at(&f->bbs[p], k);
+            if (h < 0 || h > p) continue;
+            memset(in, 0, (size_t)n);
+            in[h] = 1;
+            int sp = 0;
+            if (!in[p]) { in[p] = 1; stack[sp++] = p; }
+            while (sp > 0) {
+                int x = stack[--sp];
+                for (int b = 0; b < n; b++) {
+                    if (in[b]) continue;
+                    int nb = ir_bb_n_succ(&f->bbs[b]);
+                    for (int q = 0; q < nb; q++)
+                        if (ir_bb_succ_at(&f->bbs[b], q) == x) {
+                            in[b] = 1; stack[sp++] = b; break;
+                        }
+                }
+            }
+            for (int b = 0; b < n; b++) if (in[b]) depth[b]++;
+        }
+    }
+    free(in); free(stack);
+    return depth;
 }
 
 void ir_assign_slots(Func *f)
@@ -188,9 +225,13 @@ void ir_assign_slots(Func *f)
             fputs("ir_lower: out of memory (use_cnt)\n", stderr);
             abort();
         }
+        int weighted = !opt_disabled("slot0-weight");
+        int *ldepth = weighted ? slot_loop_depths(f) : NULL;
         for (int b = 0; b < f->n_bbs; b++) {
             BB *bb = &f->bbs[b];
             int depth = 0;   /* outstanding pushes ~ cur_sp_adjust != 0 */
+            long wt = 1;
+            for (int d = 0; ldepth && d < ldepth[b] && d < 3; d++) wt *= 4;
             for (int j = 0; j < bb->n_ops; j++) {
                 Op *op = &bb->ops[j];
                 /* Accesses see the depth at op entry (any value loaded is
@@ -200,10 +241,10 @@ void ir_assign_slots(Func *f)
                     int tmp[16];
                     int nu = ir_op_uses(op, tmp, 16);
                     for (int k = 0; k < nu; k++)
-                        if (tmp[k] >= 0 && tmp[k] < n_vregs) use_cnt[tmp[k]]++;
+                        if (tmp[k] >= 0 && tmp[k] < n_vregs) use_cnt[tmp[k]] += wt;
                     int nd = ir_op_defs(op, tmp, 16);
                     for (int k = 0; k < nd; k++)
-                        if (tmp[k] >= 0 && tmp[k] < n_vregs) use_cnt[tmp[k]]++;
+                        if (tmp[k] >= 0 && tmp[k] < n_vregs) use_cnt[tmp[k]] += wt;
                 }
                 switch (op->kind) {
                 case IR_PUSH_ARG:       depth++; break;
@@ -214,6 +255,7 @@ void ir_assign_slots(Func *f)
                 }
             }
         }
+        free(ldepth);
         /* Both width-2 (pop hl;push hl) and width-4 (pop hl;pop de;...)
            have a sp+0 fastpath; only one vreg can own offset 0. Score by
            raw clean-access count, width-2 and width-4 competing equally:
@@ -226,6 +268,9 @@ void ir_assign_slots(Func *f)
         long best = 0;
         for (int v = 0; v < n_vregs; v++) {
             if (!needs_slot[v]) continue;
+            /* A register-resident value with a backing slot reads its register, not
+               the stack: sp+0 buys it nothing. */
+            if (weighted && f->vreg_to_phys && ir_home_assigned(f, v) != IR_PR_SPILL) continue;
             VReg *vr = &f->vregs[v];
             int width = (vr->width > 0) ? vr->width : 2;
             if (width != 2 && width != 4) continue;
