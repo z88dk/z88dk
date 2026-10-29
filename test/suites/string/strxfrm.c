@@ -2,13 +2,18 @@
 
 #include "string_tests.h"
 
+static char buf[8];
+
+/* defc is assemble-time. The call keeps the block in the image.
+   File-scope #asm is rejected by sdcc; zpragma accepts it in a function. */
+static void strxfrm_bind_ordinal(void)
+{
 #asm
 PUBLIC __lc_char_ordinal
 EXTERN l_ret
 defc __lc_char_ordinal = l_ret
 #endasm
-
-static char buf[8];
+}
 
 
 void strxfrm_limits()
@@ -35,6 +40,7 @@ void strxfrm_limits()
 
 int test_strxfrm()
 {
+    strxfrm_bind_ordinal();
     suite_setup("Strxfrm Tests");
     suite_add_test(strxfrm_limits);
 
