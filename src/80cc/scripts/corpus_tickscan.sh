@@ -10,7 +10,7 @@ for b in $BENCHES; do
   [ -d "$b" ] || continue
   for cpu in $CPUS; do
     case $cpu in
-      z80)  clib=""; mflag="-b msx";;
+      z80)  clib=""; mflag="";;
       z80n) clib="-clib=z80n"; mflag="-mz80n";;
       r2ka) clib="-clib=rabbit"; mflag="-mr2ka";;
       r4k)  clib="-clib=rabbit4k"; mflag="-mr4k";;

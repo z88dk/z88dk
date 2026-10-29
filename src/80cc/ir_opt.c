@@ -3741,6 +3741,8 @@ static int narrow_kind(const Op *op)
     switch (op->kind) {
     case IR_ADD: case IR_SUB:
     case IR_AND: case IR_OR: case IR_XOR:
+    /* K - x: the low byte of the result depends only on the low byte of x. */
+    case IR_RSUB:
     /* Zero/sign-extend feeding only byte uses degrades to a byte copy:
        the low byte of zext(src)/sext(src) == low byte of src for any
        source width, so the extension's high-byte work is dead. (Signed

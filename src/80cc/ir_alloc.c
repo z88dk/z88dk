@@ -2883,6 +2883,9 @@ static int lra_iy_available(const Func *f)
     return 1;   /* IY occupancy handled (with benefit arbitration) in the pass */
 }
 
+/* Can this function home a value in IY at all? (exported for op_clobbers) */
+int ir_iy_home_available(const Func *f) { return lra_iy_available(f); }
+
 /* A vreg that can be a reduction-chain member homed in IY: a plain width-2
    spill temp (no address-taken/volatile/param). */
 static int lra_iy_chain_ok(const Func *f, int v)

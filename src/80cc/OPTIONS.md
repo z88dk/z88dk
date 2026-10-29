@@ -133,6 +133,7 @@ exists (ADR 0010).
 | `dead-ld-hl-a` | an `ld h,a; ld l,a` pair whose HL is rewritten before it is read is kept |
 | `st-pop-de` | a word store through a pointer in HL pops a stack-parked value through HL (and reloads the pointer) instead of `pop de` |
 | `cond-value` | `a && b` and `a || b` used as a value build each leg as a stored boolean instead of branching straight to a 0/1 join |
+| `late-join` | the join block of an if/else or a value ternary is created before its arms, so a nested conditional's blocks lay out after it and a value cannot be carried in A across the join |
 | `side-exit-carry` | a block with a conditional side exit hands its successors the register beliefs it holds at the end, even where an earlier exit held something else |
 | `shl-copy-de` | a word `t = x << n; t + x` (and `t - x`) spills x and reloads it instead of copying it to DE |
 | `mult-factor` | a word multiply by 2^a+2^b or 2^a-2^b stays `(v<<a) +- (v<<b)` instead of `((v<<(a-b)) +- v) << b` |
@@ -147,6 +148,8 @@ exists (ADR 0010).
 | `sx-arg` | a signed char argument to an int parameter is zero-extended, not sign-extended |
 | `stack-spill-base` | an array-element address is parked on the stack around the byte truncation of the value stored through it |
 | `sub-as-add` | a word minus a constant is subtracted, not added as the negated constant |
+| `sub-neg` | a byte subtract whose subtrahend is in A and dead spills it and reloads the minuend instead of negating A and adding |
+| `rsub-byte` | a constant minus a byte whose result is truncated to a byte is computed in 16 bits (`ld hl,K; sbc hl,de`) instead of in A |
 | `ret-cc-bc` | a conditional `ret` is a reader of BC, so a park before it is kept |
 | `long-add-carry` | a long add of a constant that fits 16 bits (or a small negative) goes through `ex de,hl; ld bc,0; adc hl,bc; ex de,hl` instead of a skipped `inc de` or `dec de` |
 | `slot-park-de` | a word stored to a frame slot and reloaded with D and E untouched in between goes through the slot instead of DE (frame-pointer mode, Z80 family) |
@@ -189,6 +192,12 @@ exists (ADR 0010).
 | `stack-spill-multi` | a word read more than once, or nested inside another parked word, stays in a frame slot instead of being parked on the data stack and read back with pop/push |
 | `stack-spill-reuse` | a parked word that has later readers is not read back from the stack while a register still holds it |
 | `idx-add-keep-de` | an add of a register operand into an index-register home forgets that DE still holds the operand |
+| `arg-widen` | a byte argument to a stack slot is no longer zero-extended where it is produced, so one byte argument sends the whole call back to the slot path |
+| `arg-hi-dc` | a byte pushed for a char parameter is zero-extended even though the callee never reads the high byte |
+| `push-idx-keep` | a pre-pushed call argument is treated as clobbering IX and IY, so an index-register home does not survive it |
+| `slot0-weight` | the value given frame offset 0 is chosen by static access count, not loop-weighted, and may be a register-resident value |
+| `arg-hoist` | a byte argument that needs computing is no longer built before a trivial argument pushed ahead of it, so its operands can sit under the pushes |
+| `mov-same-idx` | a word copy between two vregs homed in the same IX/IY register is emitted as `push iy; pop hl; push hl; pop iy` instead of nothing |
 | `tight-homes` | home intervals stay whole-function instead of narrowing to the live range (stage 1 of the ranging arc, ADR 0027) |
 | `call-split` | no call-bounded live-range splitting |
 | `cs-evict` | a call-split tenant never displaces an incumbent |
@@ -200,6 +209,7 @@ exists (ADR 0010).
 | `g0-measured` | the cost model uses estimated rather than measured Z80 access costs **(measure)** |
 | `idx2-base` | an index home is not offered to a dereference base |
 | `byte-remat` | a byte loaded from a global is spilled instead of re-loaded at the use |
+| `byte-remat-arith` | a single-use global byte feeding a byte add or subtract is loaded and spilled to a slot instead of read at the operation |
 | `remat` | no rematerialisation of constants and symbol addresses |
 | `slot-prune` | keep a frame slot for a byte that only ever rides A |
 | `dead-de-reload` | keep a dead DE reload before a later use |
@@ -300,6 +310,7 @@ exists (ADR 0010).
 | `alu-fold` | no `(ix+d)` ALU fold for AND/OR/XOR |
 | `ixd-fold` | no `(ix+d)` fold for the word accumulator |
 | `r6k-ixd-alu` | no Rabbit 6000 indexed ALU form |
+| `cmp-byte` | an unsigned `<`, `<=`, `>`, `>=` of two byte values is widened to 16 bits and compared with `sbc hl,de` instead of `ld a,x; cp y` |
 | `cmp-hi` | an unsigned `<`/`>=` against a constant compares both bytes |
 | `cmp-k` | a compare against a constant is not given its immediate form |
 | `cmp-k-signed` | (not on the 8085) a signed word compare against a constant is not done byte-wise through A (`sub K_lo; ld a,hi; rla; ccf; rra; sbc a,K_hi^0x80`), so it goes through `sbc hl,de` and the overflow correction |
@@ -374,6 +385,7 @@ exists (ADR 0010).
 | `depark` | no unparking of a value held in E or D alone |
 | `gbz80-tos-read` | GBZ80 word reads at the top frame slot use direct SP-relative loads instead of the POP/PUSH path |
 | `tos-store` | GBZ80 eligible nonvolatile top-of-stack word stores keep the register-preserving path instead of using the POP/PUSH selector |
+| `ld-direct` | a byte read from `(hl)`, `(ix+d)` or `(iy+d)` into a register pair half goes through A (`ld a,(ix+4); ld e,a`) even where A is dead afterwards |
 
 ## Text layer (ADR 0013, ADR 0025)
 
@@ -381,6 +393,7 @@ exists (ADR 0010).
 | --- | --- |
 | `dead-pair-load` | a pair load overwritten before any read stays in the text |
 | `tail-merge` | duplicate instruction tails are not merged (per function) |
+| `tm-fallthrough` | tail merging does not treat a run that falls into a label as ending in a jump to it, so it cannot merge with an identical run that does |
 | `dehl-stash-dead` | in fp mode a stored 4-byte value keeps its `ld bc,hl` stash even when the next code-emitting op is a helper call, or a copy that is its last use, that reads it from HL:DE |
 | `tm-thread` | a jump to a label whose block is a lone `jp` is not sent straight to that target after tail merging |
 | `block-layout` | no trace movement to delete a jump |

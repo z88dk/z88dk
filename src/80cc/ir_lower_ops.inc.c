@@ -270,6 +270,19 @@ static int gen_mov(FILE *out, Func *f, const Op *op)
         }
         return 0;
     }
+    /* Source and destination share one index register: the value is already
+       where it must be. Only beliefs naming dst (its old value) go stale. */
+    if (dst_w == 2 && op->dst >= 0 && op->src[0] >= 0 && !opt_disabled("mov-same-idx")
+        && vreg_idx_home(f, op->dst) != IR_PR_NONE
+        && ir_home_at(f, op->src[0]) == ir_home_at(f, op->dst)) {
+        if (op->src[0] != op->dst) {
+            if (L.rs.hl == op->dst) invalidate_hl_cache();
+            if (L.rs.de == op->dst) invalidate_de_cache();
+            if (L.rs.bc == op->dst) invalidate_bc_cache();
+            if (L.rs.a  == op->dst) invalidate_a_cache();
+        }
+        return 0;
+    }
     if (L.rs.hl != op->src[0] || L.rs.hl < 0)
         load_to_hl(out, f, op->src[0]);
     commit_hl_word(out, f, op->dst);
@@ -524,6 +537,7 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
         && !opt_disabled("de-home-step") && byte_home_holds(op->dst)) {
         emit(out, "%s\tde", mnem);
         if (hl_has(op->dst)) invalidate_hl_cache();
+        if (bc_has(op->dst)) invalidate_bc_cache();
         cache_de(op->dst);
         byte_home_note(op->dst);
         L.cur_de_byte_home_dirty = 1;
@@ -536,6 +550,7 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
         emit(out, "%s\t%s", mnem, vreg_idx_name(f, op->dst));
         if (hl_has(op->dst)) invalidate_hl_cache();
         if (de_has(op->dst)) invalidate_de_cache();
+        if (bc_has(op->dst)) invalidate_bc_cache();
         return 0;
     }
     /* Step a BC/DE-homed walking pointer in place instead of copying through HL.
@@ -553,6 +568,9 @@ static int gen_step(FILE *out, Func *f, const Op *op, int step)
         && (bc_resident || de_resident)) {
         emit(out, "%s\t%s", mnem, bc_resident ? "bc" : "de");
         if (hl_has(op->dst)) invalidate_hl_cache();
+        /* A copy of the old value in the other pair is stale now. */
+        if (bc_resident && de_has(op->dst)) invalidate_de_cache();
+        if (!bc_resident && bc_has(op->dst)) invalidate_bc_cache();
         if (bc_resident) cache_bc(op->dst); else cache_de(op->dst);
         return 0;
     }
@@ -2124,7 +2142,9 @@ static int gen_conv_zx(FILE *out, Func *f, const Op *op)
             return 0;
         }
         emit(out, "ld\tl,a");
-        emit(out, "ld\th,0");
+        const Op *use = find_unique_use(f, op->dst);
+        if (!(use && use->kind == IR_PUSH_ARG && use->hi_dc))
+            emit(out, "ld\th,0");
         commit_hl_word(out, f, op->dst);
         return 0;
     }
@@ -4524,6 +4544,10 @@ static int try_store_chain(FILE *out, Func *f, const Op *op)
         }
         load_to_hl(out, f, op->src[0]);
         emit_ex_de_hl(out);
+        /* ex de,hl swapped the registers, so swap the beliefs too: a base that
+           was resident in DE is now in HL, and DE holds the value. Without this
+           load_to_hl(base) sees "base in DE" and copies the value over it. */
+        { int t = L.rs.hl; L.rs.hl = L.rs.de; L.rs.de = t; L.rs.dehl = -1; }
         load_to_hl(out, f, op->mem.base);
         emit_hl_add_offset(out, op->mem.offset, 1, 1);
         emit(out, "ld\t(hl),e");
@@ -6473,6 +6497,19 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
             load_byte_to_a(out, f, op->src[0]);
             emit_byte_add_imm(out, (unsigned)(op->imm & 0xff), 1);
         } else {
+            /* The subtrahend is in A and dies here: a - b = (-b) + a. Negate A
+               in place (cpl; inc a is neg's size and time on every CPU) and add
+               the minuend where it lives, so neither operand takes a slot.
+               sub-neg opts out. */
+            if (a_has(op->src[1]) && !a_has(op->src[0])
+                && !opt_disabled("sub-neg")
+                && !tos_store_vreg_live_after(f, op->src[1])) {
+                emit(out, "cpl");
+                emit(out, "inc\ta");
+                invalidate_a_cache();
+                byte_alu_operand(out, f, "add\ta,", op->src[0]);
+                return finalize_byte_result(out, f, op, 0);
+            }
             if (a_has(op->src[1]) && !a_has(op->src[0]))
                 store_a_byte(out, f, op->src[1]);
             load_byte_to_a(out, f, op->src[0]);
@@ -6981,6 +7018,24 @@ static int gen_mul(FILE *out, Func *f, const Op *op)
 static int gen_rsub(FILE *out, Func *f, const Op *op)
 {
     uint16_t k = (uint16_t)op->imm;
+    /* Byte result: K - x in A. Only x's low byte matters. rsub-byte opts out. */
+    if (op->dst >= 0 && f->vregs[op->dst].width == 1
+        && op->src[0] >= 0 && !opt_disabled("rsub-byte")) {
+        int s = op->src[0];
+        if (a_has(s)) {
+            if (tos_store_vreg_live_after(f, s))
+                store_a_byte(out, f, s);          /* x is needed again: keep a copy */
+            emit(out, "cpl");
+            emit(out, "inc\ta");                  /* A = -x */
+            emit(out, "add\ta,%u", (unsigned)(k & 0xff));
+            invalidate_a_cache();
+        } else {
+            emit(out, "ld\ta,%u", (unsigned)(k & 0xff));
+            invalidate_a_cache();
+            byte_alu_operand(out, f, "sub\t", s);
+        }
+        return finalize_byte_result(out, f, op, 0);
+    }
     if (!(IS_808x() || IS_GBZ80())) {
         /* Native 16-bit subtract: DE = var, HL = imm, HL -= DE. */
         load_to_de(out, f, op->src[0]);

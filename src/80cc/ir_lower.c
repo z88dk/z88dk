@@ -2339,6 +2339,57 @@ static void gw_fold_byte_global_widens(char **lines, int n, char *drop)
     }
 }
 
+/* [ld-direct] `ld a,(hl|ix+d|iy+d); ld r,a` is one instruction, `ld r,(...)`,
+   when A is dead afterwards: the byte goes straight to r. Same shape and same
+   obligation as [gwiden] — the fold deletes the only instruction that puts the
+   byte in A, so it runs only where gw_a_dead_after proves A is overwritten
+   unread. Only the register-indirect and indexed sources qualify: `(bc)`,
+   `(de)` and `(nn)` have no `ld r,(...)` form. A trailing `;volatile` stamp
+   fails the exact-shape test and keeps the access as written.
+   IR_OFF=ld-direct opts out. */
+static int lddirect_enabled(void)
+{
+    return !opt_disabled("ld-direct");
+}
+
+/* `\tld\ta,(hl)\n`, `\tld\ta,(ix+4)\n`, `\tld\ta,(iy-2)\n` and nothing else. */
+static int ld_direct_src(const char *line)
+{
+    if (strncmp(line, "\tld\ta,(", 7)) return 0;
+    const char *p = line + 7;                      /* just past '(' */
+    if (!strncmp(p, "hl)\n", 4)) return 1;
+    if (strncmp(p, "ix", 2) && strncmp(p, "iy", 2)) return 0;
+    if (p[2] != '+' && p[2] != '-') return 0;
+    const char *q = p + 3;
+    if (!isdigit((unsigned char)*q)) return 0;
+    while (isdigit((unsigned char)*q)) q++;
+    return q[0] == ')' && q[1] == '\n';
+}
+
+/* `\tld\tr,a\n` for r in b c d e h l. */
+static int ld_direct_dst(const char *line)
+{
+    if (strncmp(line, "\tld\t", 4)) return 0;
+    char r = line[4];
+    return strchr("bcdehl", r) && r && !strcmp(line + 5, ",a\n");
+}
+
+static void gw_fold_byte_ld_direct(char **lines, int n, char *drop)
+{
+    if (!lddirect_enabled()) return;
+    for (int i = 0; i + 1 < n; i++) {
+        if (!ld_direct_src(lines[i]) || !ld_direct_dst(lines[i + 1])) continue;
+        if (drop[i] || drop[i + 1]) continue;
+        if (!gw_a_dead_after(lines, n, i + 2)) continue;
+        char *nl = malloc(strlen(lines[i]) + 4);
+        if (!nl) continue;
+        sprintf(nl, "\tld\t%c,%s", lines[i + 1][4], lines[i] + 6);   /* "(...)\n" */
+        free(lines[i]); lines[i] = nl;
+        drop[i + 1] = 1;                           /* the `ld r,a` is now dead */
+        i++;
+    }
+}
+
 /* bc-flow: follow intra-function branches when deciding BC liveness in the
    park sweep. Without it every branch is treated as "a successor may read BC",
    which keeps a stash alive that the target provably never reads — 64 of the
@@ -4158,6 +4209,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            is the only place in the pipeline with real per-line liveness. copt
            did it blind and miscompiled; see gw_fold_byte_global_widens. */
         gw_fold_byte_global_widens(lines, n, drop);
+        gw_fold_byte_ld_direct(lines, n, drop);
         fold_hl_const_reuse(lines, drop, n);
         /* [IR_DEADDE_FOLD] Delete a store-then-dead-reload bracket where DE
            was never touched in between — see the function comment above.
@@ -4778,6 +4830,149 @@ static int tm_range_free(const int *used, long k, int d)
     return 1;
 }
 
+/* A line that is a code label: column 0, `name:` and nothing else. */
+static int tm_label_name(const char *l, char *buf, size_t bufsz)
+{
+    if (!l[0] || l[0] == '\t' || l[0] == ' ' || l[0] == ';' || l[0] == '\n'
+        || l[0] == '.') return 0;
+    const char *e = l;
+    while ((*e >= 'A' && *e <= 'Z') || (*e >= 'a' && *e <= 'z')
+           || (*e >= '0' && *e <= '9') || *e == '_' || *e == '$')
+        e++;
+    if (e == l || *e != ':') return 0;
+    const char *t = e + 1;
+    while (*t == '\r') t++;
+    if (*t != '\n' && *t != '\0') return 0;
+    size_t n = (size_t)(e - l);
+    if (n >= bufsz) return 0;
+    memcpy(buf, l, n); buf[n] = '\0';
+    return 1;
+}
+
+/* Index of the instruction `back` instructions before line `i` (0 = i itself),
+   skipping blanks, comments and C_LINE; -1 if a label, directive or the start
+   of the function comes first. */
+static long tm_insn_back(char **lines, long i, int back)
+{
+    long j = i;
+    for (;;) {
+        if (j < 0) return -1;
+        if (tm_is_insn(lines[j])) {
+            if (back-- == 0) return j;
+        } else if (tm_is_barrier(lines[j])) {
+            return -1;
+        }
+        j--;
+    }
+}
+
+/* Do the `want` instructions ending at line a match those ending at line b? */
+static int tm_tails_equal(char **lines, long a, long b, int want)
+{
+    for (int k = 0; k < want; k++) {
+        long x = tm_insn_back(lines, a, k), y = tm_insn_back(lines, b, k);
+        if (x < 0 || y < 0 || strcmp(lines[x], lines[y])) return 0;
+    }
+    return 1;
+}
+
+/* [tm-fallthrough] A run that FALLS INTO a label does not end at a terminator,
+   so it can never merge with an identical run that ends `jp label`. When such
+   a partner exists - another `jp label` preceded by the same `min` instructions
+   - make the fall-through explicit (`jp label` above the label) so the two
+   compare equal. The jump is dropped again at emit if it stays directly above
+   its label. Deliberately narrow: a broad version merged many small tails and
+   pushed conditional branches out of `jr` range. Only when the later
+   jump-to-next cleanup runs. IR_OFF=tm-fallthrough opts out;
+   IR_TM_FT_MIN sets the shared-instruction threshold (default 10). */
+static char *tm_make_fallthrough_explicit(char ***plines, int *pn)
+{
+    if (opt_disabled("tm-fallthrough") || opt_disabled("jp-next")) return NULL;
+    int min = 10;
+    const char *e = getenv("IR_TM_FT_MIN");
+    if (e && e[0]) min = atoi(e);
+    if (min < 2) min = 2;
+    char **lines = *plines;
+    int n = *pn, extra = 0;
+    char lab[200];
+    int *ins = calloc((size_t)(n > 0 ? n : 1), sizeof *ins);
+    if (!ins) return NULL;
+    int prev_insn = -1;                           /* index of the last code line */
+    for (int i = 0; i < n; i++) {
+        if (tm_label_name(lines[i], lab, sizeof lab)) {
+            if (prev_insn >= 0 && !tm_is_uncond_term(lines[prev_insn])) {
+                /* look for another run that ends `jp lab` with the same tail */
+                for (int q = 0; q < n; q++) {
+                    const char *t = lines[q];
+                    if (q == prev_insn || (*t != '\t' && *t != ' ')) continue;
+                    while (*t == '\t' || *t == ' ') t++;
+                    if (strncmp(t, "jp", 2) || (t[2] != '\t' && t[2] != ' ')) continue;
+                    t += 2;
+                    while (*t == '\t' || *t == ' ') t++;
+                    size_t m = strlen(lab);
+                    if (strncmp(t, lab, m) || (t[m] != '\n' && t[m] != '\r' && t[m] != '\0'))
+                        continue;
+                    long qb = tm_insn_back(lines, q, 1);   /* instruction before the jp */
+                    if (qb < 0) continue;
+                    if (tm_tails_equal(lines, prev_insn, qb, min)) {
+                        ins[prev_insn] = 1;
+                        extra++;
+                        break;
+                    }
+                }
+            }
+            prev_insn = -1;
+        } else if (tm_is_insn(lines[i])) {
+            prev_insn = i;
+        } else if (tm_is_barrier(lines[i])) {
+            prev_insn = -1;
+        }
+    }
+    if (!extra) { free(ins); return NULL; }
+    char **nl = malloc((size_t)(n + extra) * sizeof *nl);
+    char *flag = calloc((size_t)(n + extra), 1);
+    if (!nl || !flag) { free(nl); free(flag); free(ins); return NULL; }
+    int k = 0;
+    for (int i = 0; i < n; i++) {
+        nl[k++] = lines[i];
+        if (!ins[i]) continue;
+        int j = i + 1;
+        while (j < n && !tm_label_name(lines[j], lab, sizeof lab)) j++;
+        char *jl = malloc(strlen(lab) + 8);
+        if (!jl) continue;
+        sprintf(jl, "\tjp\t%s\n", lab);
+        flag[k] = 1;
+        nl[k++] = jl;
+    }
+    free(ins);
+    free(lines);
+    *plines = nl;
+    *pn = k;
+    return flag;
+}
+
+/* Is line i, a `jp L`, followed (past blanks, comments and C_LINE) by `L:`? */
+static int tm_jp_above_label(char **lines, long n, long i)
+{
+    char tgt[200], lab[200];
+    const char *p = lines[i];
+    while (*p == '\t' || *p == ' ') p++;
+    if (strncmp(p, "jp", 2)) return 0;
+    p += 2;
+    while (*p == '\t' || *p == ' ') p++;
+    size_t m = 0;
+    while (p[m] && p[m] != '\n' && p[m] != '\r' && p[m] != ' ' && p[m] != '\t'
+           && m + 1 < sizeof tgt) { tgt[m] = p[m]; m++; }
+    tgt[m] = '\0';
+    for (long j = i + 1; j < n; j++) {
+        const char *l = lines[j];
+        if (!l[0] || l[0] == '\n' || l[0] == '\r' || l[0] == ';') continue;
+        if (tm_label_name(l, lab, sizeof lab)) return !strcmp(lab, tgt);
+        if (tm_is_barrier(l)) return 0;
+    }
+    return 0;
+}
+
 /* Merge duplicated tails in one rendered function body. */
 static void filter_tail_merge(FILE *out, FILE *src, const Func *f)
 {
@@ -4787,6 +4982,7 @@ static void filter_tail_merge(FILE *out, FILE *src, const Func *f)
     int n_lines;
     rewind(src);
     if (!slurp_lower_lines(src, &lines, &n_lines)) goto verbatim;
+    char *tm_inserted = tm_make_fallthrough_explicit(&lines, &n_lines);
     long n = n_lines;
     long *code = malloc((size_t)(n > 0 ? n : 1) * sizeof *code);
     if (!code) { for (long i = 0; i < n; i++) free(lines[i]);
@@ -4905,11 +5101,18 @@ static void filter_tail_merge(FILE *out, FILE *src, const Func *f)
                 skip_to = runend[i];
                 continue;
             }
+            if (tm_inserted && tm_inserted[i] && tm_jp_above_label(lines, n, i))
+                continue;                  /* the explicit fall-through was not needed */
             fputs(lines[i], out);
         }
     } else {
-        for (long i = 0; i < n; i++) fputs(lines[i], out);
+        for (long i = 0; i < n; i++) {
+            if (tm_inserted && tm_inserted[i] && tm_jp_above_label(lines, n, i))
+                continue;
+            fputs(lines[i], out);
+        }
     }
+    free(tm_inserted);
     #undef TM_RANGE_FREE
     free(runend); free(isstart); free(labat); free(labnm);
     free(maxd); free(used); free(jmp); free(jend); free(lab); free(code);
@@ -7123,7 +7326,13 @@ RegMask op_clobbers(const Func *f, const Op *op)
         if (op->call && op->call->fnptr_vreg < 0)
             return (IR_R_ALL & ~IR_R_IY & ~IR_R_IX) & ~op->call->preserved;
         return IR_R_ALL;
-    case IR_ASM: case IR_PUSH_ARG:
+    case IR_PUSH_ARG:
+        /* Loads the value into HL/DEHL and pushes it; an index register is read
+           (push ix/iy; pop hl) but never written, so a home there survives. */
+        if (!opt_disabled("push-idx-keep") && (op->from_byte || ir_iy_home_available(f)))
+            return IR_R_ALL & ~IR_R_IX & ~IR_R_IY;
+        return IR_R_ALL;
+    case IR_ASM:
     case IR_PUSH_STRUCT: case IR_RET: case IR_MEMSET:
     case IR_MEMCPY:
         return IR_R_ALL;               /* opaque: helper call / whole-reg-set */
@@ -9569,11 +9778,23 @@ static int ir_lower_func_body(FILE *out, Func *f)
                    evicted by a global load, so the A-carry can hand it to the
                    next block and the value's own slot — and often the whole
                    frame — falls away. */
-                if (!use_ok && (uop->kind == IR_CMP_EQ || uop->kind == IR_CMP_NE)
+                if (!use_ok && (uop->kind == IR_CMP_EQ || uop->kind == IR_CMP_NE
+                                || ((uop->kind == IR_CMP_ULT || uop->kind == IR_CMP_UGE
+                                     || uop->kind == IR_CMP_UGT || uop->kind == IR_CMP_ULE)
+                                    && !opt_disabled("cmp-byte")))
                     && uop->src[0] >= 0 && uop->src[0] < f->n_vregs
                     && uop->src[1] >= 0 && uop->src[1] < f->n_vregs
                     && f->vregs[uop->src[0]].width == 1
                     && f->vregs[uop->src[1]].width == 1)
+                    use_ok = 1;
+                /* A byte ADD or SUB reads src[0] through load_byte_to_a and src[1]
+                   through byte_alu_operand, both of which rematerialise, so the
+                   global is read at the add/sub and never takes a slot.
+                   byte-remat-arith opts out. */
+                if (!use_ok && (uop->kind == IR_ADD || uop->kind == IR_SUB)
+                    && uop->dst >= 0 && uop->dst < f->n_vregs
+                    && f->vregs[uop->dst].width == 1
+                    && !opt_disabled("byte-remat-arith"))
                     use_ok = 1;
                 /* [IR_CALL_BREMAT] A call ARGUMENT is a terminal consumer too:
                    the marshaller reads the byte once and pushes it, through
@@ -11467,6 +11688,23 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 bb_hl_out[bb->id] = acarry;
             else
                 bb_hl_out[bb->id] = -1;
+            /* The same for A: the trampoline runs nothing, so what its
+               predecessors agree is in A is still in A at its successor. */
+            if (L.bb_a_out && a_carry_enabled() && !opt_disabled("late-join")) {
+                int a2 = -2;
+                for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
+                    int pid = bb_preds[bb->id][p];
+                    if (!bb_lowered[pid]) { a2 = -1; break; }
+                    int v = edge_unsafe(pid, bb->id) ? -1 : L.bb_a_out[pid];
+                    if (v < 0) { a2 = -1; break; }
+                    if (a2 == -2) a2 = v;
+                    else if (a2 != v) { a2 = -1; break; }
+                }
+                L.bb_a_out[bb->id] =
+                    (a2 >= 0 && bb->live_in
+                     && ir_bitset_get((const BitSet *)bb->live_in, a2))
+                    ? a2 : -1;
+            }
             if (de_carry_on && bb_de_out) {
                 int dcarry = -2;
                 for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {

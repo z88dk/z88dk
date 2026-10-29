@@ -2899,8 +2899,9 @@ void add_file_to_process(char *filename, char process_extension)
     char *p;
     struct stat tmp;
 
-    if (((p = strtok(filename, " \r\n\t")) != NULL) && *p) {
-        p = strip_outer_quotes(p);
+    /* One filename. Callers already split arguments. Spaces belong to the path. */
+    if (filename != NULL && *filename) {
+        p = strip_outer_quotes(filename);
 
         if (*p == '@') {
             struct tokens_list_s* tokens = gather_from_list_file(p + 1);
@@ -2949,8 +2950,6 @@ void add_file_to_process(char *filename, char process_extension)
 
                     add_file_to_process(outname, 1);
                 }
-
-                p = strtok(NULL, " \r\n\t");
             }
 
             cmd_free_tokens(tokens);

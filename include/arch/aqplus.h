@@ -317,4 +317,22 @@ static __sfr __at 0xF8 IO_PSG2DATA;
 static __sfr __at 0xF9 IO_PSG2ADDR;
 static __sfr __at 0xFB IO_SYSCTRL;
 
+
+// Mouse (the ESP32's GETMOUSE), as in input.h: buttons are 00000MRL active
+// high.  The position is 0..319 by 0..199.  The ESP32 knows the mouse's own
+// position, so the library keeps its own and adds the mouse's movement to it:
+// in_MouseAQPlusSetPos moves it.  in_MouseAQPlusInit returns non-zero if the
+// ESP32 has a mouse: with none, in_MouseAQPlus returns no buttons and leaves
+// the position alone, so a program can fall back to the keyboard.
+extern int  __LIB__ in_MouseAQPlusInit(void);
+extern int  __LIB__ in_MouseAQPlusPresent(void);
+extern void __LIB__ in_MouseAQPlus(unsigned char *buttons, unsigned int *xcoord, unsigned int *ycoord) __smallc;
+extern void __LIB__ in_MouseAQPlusSetPos(unsigned int xcoord, unsigned int ycoord) __smallc;
+
+extern void __LIB__ in_MouseAQPlus_callee(unsigned char *buttons, unsigned int *xcoord, unsigned int *ycoord) __smallc __z88dk_callee;
+extern void __LIB__ in_MouseAQPlusSetPos_callee(unsigned int xcoord, unsigned int ycoord) __smallc __z88dk_callee;
+
+#define in_MouseAQPlus(a,b,c)     in_MouseAQPlus_callee(a,b,c)
+#define in_MouseAQPlusSetPos(a,b) in_MouseAQPlusSetPos_callee(a,b)
+
 #endif

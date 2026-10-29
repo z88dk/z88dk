@@ -20,6 +20,8 @@ all:	smod.bin smod_8080.bin smod_gbz80.bin smod_r2ka.bin smod_ez80.bin smod_kc16
 all:	blockfn.bin blockfn_8080.bin blockfn_gbz80.bin blockfn_r2ka.bin blockfn_ez80.bin blockfn_8085.bin blockfn_fp.bin
 all:	accintcomp.bin accintcomp_fp.bin
 all:	bigframe.bin bigframe_fp.bin bigframe_8080.bin bigframe_r2ka.bin bigframe_ez80.bin bigframe_gbz80.bin
+all:	bytearg.bin bytearg_fp.bin bytearg_8080.bin bytearg_r2ka.bin bytearg_ez80.bin bytearg_gbz80.bin bytearg_off.bin bytearg_fp_off.bin
+all:	ivstep.bin ivstep_fp.bin ivstep_8080.bin ivstep_z180.bin ivstep_ez80.bin ivstep_r2ka.bin ivstep_gbz80.bin
 all:	farptr.bin farptr_8080.bin farptr_8085.bin farptr_gbz80.bin farptr_r2ka.bin farptr_r4k.bin farptr_ez80.bin farptr_z180.bin farptr_z80n.bin farptr_kc160.bin farptr_fp.bin
 all:	farlp.bin farlp_r2ka.bin farlp_r4k.bin farlp_z80n.bin farlp_fp.bin
 all:	complement.bin complement_fp.bin complement_z80n.bin complement_z180.bin complement_ez80.bin complement_8080.bin
@@ -55,6 +57,14 @@ all:	argcf.bin argcf_fp.bin argcf_8080.bin argcf_gbz80.bin
 all:	jpnext.bin jpnext_fp.bin jpnext_8080.bin jpnext_gbz80.bin
 all:	ixind.bin
 all:	bchand.bin bchand_fp.bin bchand_8080.bin bchand_gbz80.bin
+all:	constcond.bin constcond_fp.bin constcond_8080.bin constcond_gbz80.bin
+all:	bytecmprr.bin bytecmprr_fp.bin bytecmprr_8080.bin bytecmprr_gbz80.bin bytecmprr_r2ka.bin bytecmprr_z180.bin
+all:	ldirect.bin ldirect_fp.bin ldirect_8080.bin ldirect_gbz80.bin ldirect_r2ka.bin ldirect_z180.bin
+all:	scmp.bin scmp_fp.bin scmp_8080.bin scmp_gbz80.bin scmp_r2ka.bin scmp_z180.bin
+all:	bytearith.bin bytearith_fp.bin bytearith_8080.bin bytearith_gbz80.bin bytearith_r2ka.bin bytearith_z180.bin
+all:	joincarry.bin joincarry_fp.bin joincarry_8080.bin joincarry_gbz80.bin joincarry_r2ka.bin joincarry_z180.bin
+all:	stchain.bin stchain_fp.bin stchain_8080.bin stchain_gbz80.bin stchain_r2ka.bin stchain_z180.bin
+all:	treewalk.bin treewalk_fp.bin treewalk_8080.bin treewalk_gbz80.bin treewalk_r2ka.bin treewalk_z180.bin
 all:	homeexitdead_gbz80.bin homeexitdead_gbz80_keep.bin
 all:	derefcmp_bcstep.bin derefcmp_bcstep_8080.bin
 all:	directwiden.bin directwiden_z80n.bin directwiden_ez80_z80.bin directwiden_r800.bin
@@ -2785,6 +2795,199 @@ bchand_gbz80.bin: $(SOURCES) bchand.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+# A constant operand of && / || in a condition is folded away; the live
+# operand keeps its side effects. See the file header.
+constcond.bin: $(SOURCES) constcond.c
+	$(compile)
+	$(runtest)
+
+constcond_fp.bin: $(SOURCES) constcond.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+constcond_8080.bin: $(SOURCES) constcond.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+constcond_gbz80.bin: $(SOURCES) constcond.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# Two unsigned bytes compare in A (`ld a,x; cp y`). See the file header.
+bytecmprr.bin: $(SOURCES) bytecmprr.c
+	$(compile)
+	$(runtest)
+
+bytecmprr_fp.bin: $(SOURCES) bytecmprr.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+bytecmprr_8080.bin: $(SOURCES) bytecmprr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytecmprr_gbz80.bin: $(SOURCES) bytecmprr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytecmprr_r2ka.bin: $(SOURCES) bytecmprr.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+bytecmprr_z180.bin: $(SOURCES) bytecmprr.c
+	$(compile_z180)
+	$(runtest_z180)
+
+# A pointer-read byte goes straight to its register where A is dead. See the file header.
+ldirect.bin: $(SOURCES) ldirect.c
+	$(compile)
+	$(runtest)
+
+ldirect_fp.bin: $(SOURCES) ldirect.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+ldirect_8080.bin: $(SOURCES) ldirect.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ldirect_gbz80.bin: $(SOURCES) ldirect.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ldirect_r2ka.bin: $(SOURCES) ldirect.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+ldirect_z180.bin: $(SOURCES) ldirect.c
+	$(compile_z180)
+	$(runtest_z180)
+
+# Signed relational compares of two bytes sign-extend the operands. See the file header.
+scmp.bin: $(SOURCES) scmp.c
+	$(compile)
+	$(runtest)
+
+scmp_fp.bin: $(SOURCES) scmp.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+scmp_8080.bin: $(SOURCES) scmp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+scmp_gbz80.bin: $(SOURCES) scmp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+scmp_r2ka.bin: $(SOURCES) scmp.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+scmp_z180.bin: $(SOURCES) scmp.c
+	$(compile_z180)
+	$(runtest_z180)
+
+# Byte add/sub read their operands in place; the subtrahend in A is negated. See the file header.
+bytearith.bin: $(SOURCES) bytearith.c
+	$(compile)
+	$(runtest)
+
+bytearith_fp.bin: $(SOURCES) bytearith.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+bytearith_8080.bin: $(SOURCES) bytearith.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytearith_gbz80.bin: $(SOURCES) bytearith.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytearith_r2ka.bin: $(SOURCES) bytearith.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+bytearith_z180.bin: $(SOURCES) bytearith.c
+	$(compile_z180)
+	$(runtest_z180)
+
+# A byte set in if/else arms or a nested ternary survives the join. See the file header.
+joincarry.bin: $(SOURCES) joincarry.c
+	$(compile)
+	$(runtest)
+
+joincarry_fp.bin: $(SOURCES) joincarry.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+joincarry_8080.bin: $(SOURCES) joincarry.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+joincarry_gbz80.bin: $(SOURCES) joincarry.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+joincarry_r2ka.bin: $(SOURCES) joincarry.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+joincarry_z180.bin: $(SOURCES) joincarry.c
+	$(compile_z180)
+	$(runtest_z180)
+
+# A field-store chain through a call-result pointer. See the file header.
+stchain.bin: $(SOURCES) stchain.c
+	$(compile)
+	$(runtest)
+
+stchain_fp.bin: $(SOURCES) stchain.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+stchain_8080.bin: $(SOURCES) stchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+stchain_gbz80.bin: $(SOURCES) stchain.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+stchain_r2ka.bin: $(SOURCES) stchain.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+stchain_z180.bin: $(SOURCES) stchain.c
+	$(compile_z180)
+	$(runtest_z180)
+
+# Two arms sharing a tail, one falling into the join. See the file header.
+treewalk.bin: $(SOURCES) treewalk.c
+	$(compile)
+	$(runtest)
+
+treewalk_fp.bin: $(SOURCES) treewalk.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+treewalk_8080.bin: $(SOURCES) treewalk.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+treewalk_gbz80.bin: $(SOURCES) treewalk.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+treewalk_r2ka.bin: $(SOURCES) treewalk.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+treewalk_z180.bin: $(SOURCES) treewalk.c
+	$(compile_z180)
+	$(runtest_z180)
+
 # An sp-mode function with a plain near indirect call no longer saves IX (the
 # call never touches it); the fastcall dispatch still does. Z80 family only, and
 # always built without the frame pointer: the test overwrites IX. See the file
@@ -4286,6 +4489,66 @@ bigframe_ez80.bin: $(SOURCES) bigframe.c
 bigframe_gbz80.bin: $(SOURCES) bigframe.c
 	$(compile_gbz80)
 	$(runtest_gbz80)
+
+bytearg.bin: $(SOURCES) bytearg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytearg_fp.bin: $(SOURCES) bytearg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytearg_8080.bin: $(SOURCES) bytearg.c
+	$(compile_8080)
+	$(runtest_8080)
+
+bytearg_r2ka.bin: $(SOURCES) bytearg.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+bytearg_ez80.bin: $(SOURCES) bytearg.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+bytearg_gbz80.bin: $(SOURCES) bytearg.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+ivstep.bin: $(SOURCES) ivstep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER))  --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivstep_fp.bin: $(SOURCES) ivstep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ivstep_8080.bin: $(SOURCES) ivstep.c
+	$(compile_8080)
+	$(runtest_8080)
+
+ivstep_r2ka.bin: $(SOURCES) ivstep.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+ivstep_ez80.bin: $(SOURCES) ivstep.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+ivstep_gbz80.bin: $(SOURCES) ivstep.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+ivstep_z180.bin: $(SOURCES) ivstep.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytearg_off.bin: $(SOURCES) bytearg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=arg-widen -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bytearg_fp_off.bin: $(SOURCES) bytearg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=arg-hi-dc -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 farptr.bin: $(SOURCES) farptr.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m

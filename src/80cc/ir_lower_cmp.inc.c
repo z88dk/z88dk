@@ -279,8 +279,45 @@ static void emit_dsub_jp(FILE *out, const char *cc)
     L.la.cur_skip_next_op = 1;
 }
 
+/* [cmp-byte] Unsigned ordered compare of two width-1 vregs: `ld a,x; cp y`, CF =
+   x < y. A width-1 operand is zero-extended, so this is exactly the widened
+   16-bit compare, without the two widenings and `sbc hl,de`. GT/LE swap the
+   operands. Branch-fused or a 0/1 value. IR_OFF=cmp-byte opts out. */
+static int try_cmp_byte_rr(FILE *out, const Func *f, const Op *op)
+{
+    if (opt_disabled("cmp-byte")) return 0;
+    switch (op->kind) {
+    case IR_CMP_ULT: case IR_CMP_UGE: case IR_CMP_UGT: case IR_CMP_ULE: break;
+    default: return 0;
+    }
+    int s0 = op->src[0], s1 = op->src[1];
+    if (s0 < 0 || s1 < 0 || s0 >= f->n_vregs || s1 >= f->n_vregs) return 0;
+    if (f->vregs[s0].width != 1 || f->vregs[s1].width != 1) return 0;
+    int swap = (op->kind == IR_CMP_UGT || op->kind == IR_CMP_ULE);
+    int cf_true = (op->kind == IR_CMP_ULT || op->kind == IR_CMP_UGT);
+    int m = swap ? s1 : s0, n = swap ? s0 : s1;    /* CF = m < n */
+    /* n already sits in A and m would evict it: n would take a fresh frame slot
+       (store, reload, cp mem), no cheaper than the widened compare. A
+       rematerialised operand has no slot, so it stays on this path. */
+    if (a_has(n) && !a_has(m) && !byte_remat_of(f, n) && !byte_remat_of(f, m))
+        return 0;
+    load_byte_to_a(out, f, m);
+    byte_alu_operand(out, f, "cp\t", n);
+    if (g_hc.branch_test_kind != 0) {
+        int br_true = (g_hc.branch_test_kind == IR_BR_COND);
+        emit(out, "jp\t%s,L_f%d_bb_%d", (cf_true == br_true) ? "c" : "nc",
+             L.func_emit_idx, L.la.cur_branch_test_label);
+        L.la.cur_skip_next_op = 1;
+        return 1;
+    }
+    L.rs.a = -1;
+    commit_carry_bool(out, f, op->dst, cf_true);
+    return 1;
+}
+
 static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
 {
+    if (try_cmp_byte_rr(out, f, op)) return 0;
     if (try_sp_dehome_loop_cmp(out, f, op)) return 0;
     if (try_cmp_ixd_fold(out, f, op)) return 0;
     if (try_exx_compare(out, f, op)) return 0;
@@ -867,6 +904,7 @@ static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
 
 static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
 {
+    if (try_cmp_byte_rr(out, f, op)) return 0;
     if (try_sp_dehome_loop_cmp(out, f, op)) return 0;
     if (try_cmp_ixd_fold(out, f, op)) return 0;
     if (try_exx_compare(out, f, op)) return 0;
