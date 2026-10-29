@@ -9,6 +9,7 @@
 #define __X1_H__
 
 #include <sys/compiler.h>
+#include <stdint.h>
 
 // PSG register, sound, ...
 
