@@ -35,17 +35,11 @@ ELSE
    pop bc
    pop de
    ld a,e
-   push de
-   exx
-   pop de
-   exx
    pop hl
    pop de
    push de
    push hl
-   exx
    push de
-   exx
    push bc
    exx
    push hl

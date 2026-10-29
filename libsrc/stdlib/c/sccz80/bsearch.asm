@@ -24,22 +24,23 @@ bsearch:
    ld e,(hl+)
    ld d,(hl)
 
+   ld hl,sp+10
+   ld c,(hl+)
+   ld b,(hl)
+
+   ; AF is the key, so load it last. The nmemb load uses A.
    ld hl,sp+8
-   ld c,(hl+)
-   ld b,(hl)
-   push bc
+   ld a,(hl+)
+   ld h,(hl)
+   ld l,a
+   push hl
 
-   ld hl,sp+12
-   ld c,(hl+)
-   ld b,(hl)
-   push bc
-
-   ld hl,sp+16
-   ld c,(hl+)
-   ld b,(hl)
-   push bc
+   ld hl,sp+14
+   ld a,(hl+)
+   ld h,(hl)
+   ld l,a
+   push hl
    pop af
-   pop bc
    pop hl
 
    call asm_bsearch

@@ -22,15 +22,14 @@ _shellsort_:
    ld e,(hl+)
    ld d,(hl)
 
-   ld hl,sp+8
+   ld hl,sp+10
    ld c,(hl+)
    ld b,(hl)
-   push bc
 
-   ld hl,sp+12
-   ld c,(hl+)
-   ld b,(hl)
-   pop hl
+   ld hl,sp+8
+   ld a,(hl+)
+   ld h,(hl)
+   ld l,a
 
    call asm_shellsort
    pop ix

@@ -19,12 +19,11 @@ qsort_callee:
    push ix
    push de
    pop ix
-   push bc
-   pop de
-   push hl
+
+   ld de,bc
+   ld bc,hl
    push af
    pop hl
-   pop bc
 
    call asm_qsort
    pop ix

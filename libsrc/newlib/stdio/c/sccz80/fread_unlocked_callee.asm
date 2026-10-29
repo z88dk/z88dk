@@ -19,10 +19,9 @@ fread_unlocked_callee:
    push ix
    push de
    pop ix
-   push bc
-   push hl
-   pop de
-   pop hl
+
+   ld de,hl
+   ld hl,bc
    push af
    pop bc
 

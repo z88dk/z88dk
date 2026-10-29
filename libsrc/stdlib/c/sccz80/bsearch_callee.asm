@@ -12,41 +12,26 @@ EXTERN asm_bsearch
 
 bsearch_callee:
 
-   ex (sp),ix
+   ; Park ret, then compar/size/nmemb in the alt set. Base and key
+   ; stay on the main set so the later exx can load IX.
+   exx
    pop hl
+   exx
    pop de
    pop bc
+   pop hl
+   exx
+   pop bc
    pop af
-   ex (sp),hl
-
-   push ix
-   push de
-   pop ix
 
    push hl
+   push ix
    push bc
-   push af
-
-   ld hl,sp+10
-   ld e,(hl+)
-   ld d,(hl)
-
-   ld hl,sp+6
-   ld c,(hl+)
-   ld b,(hl)
-
-   ld hl,sp+10
-   ld (hl+),c
-   ld (hl),b
-
+   exx
    push de
-   pop af
-   pop hl
-   pop de
-   pop bc
-
-   ex (sp),ix
    pop ix
+   ld de,bc
+   pop bc
 
    call asm_bsearch
    pop ix

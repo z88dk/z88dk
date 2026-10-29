@@ -19,12 +19,11 @@ _insertion_sort__callee:
    push ix
    push de
    pop ix
-   push bc
-   pop de
-   push hl
+
+   ld de,bc
+   ld bc,hl
    push af
    pop hl
-   pop bc
 
    call asm_insertion_sort
    pop ix

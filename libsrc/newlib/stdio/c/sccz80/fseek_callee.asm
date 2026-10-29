@@ -25,10 +25,9 @@ fseek_callee:
    push ix
    ld ix,hl
 
-   push de
+   ld hl,de
    push af
    pop de
-   pop hl
 
    call asm_fseek
    pop ix
