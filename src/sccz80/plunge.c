@@ -320,6 +320,9 @@ static int fold_integer_exact(LVALUE *left, LVALUE *right,
         else if (oper == zgt) *result = unsigned_op ? (l > r) : (sl > sr);
         else if (oper == zge) *result = unsigned_op ? (l >= r) : (sl >= sr);
         else return 0;
+        /* A comparison result is an int. A pointer sum keeps its type. */
+        if (operator_is_comparison(oper))
+            set_folded_integer_type(left, 16, 0);
         return 1;
     }
 
