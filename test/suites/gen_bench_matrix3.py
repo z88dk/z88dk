@@ -25,7 +25,7 @@ BENCHES = ("charbench crcbench intbench ptrbench sieve rle sortbench queenbench 
 
 # cpu -> (make target, zcc clib flag, ticks machine flag)
 CPUS = [
-    ("z80",   "test.bin",          "",              "-b msx"),
+    ("z80",   "test.bin",          "",              ""),
     ("z80n",  "test_z80n.bin",     "-clib=z80n",    "-mz80n"),
     ("z180",  "test_z180.bin",     "-clib=z180",    "-mz180"),
     ("ez80",  "test_ez80_z80.bin", "-clib=ez80_z80","-mez80_z80"),
@@ -112,7 +112,7 @@ def xcc_cell(bench, profile):
     if r is None or not os.path.exists(out):
         return "BUILD"
     size = os.path.getsize(out)
-    r = sh(f"z88dk-ticks -w 300 -b msx {out}", cwd=d)
+    r = sh(f"z88dk-ticks -w 300 {out}", cwd=d)
     if r is None:
         return f"{size}B / HANG"
     m = re.search(r"Ticks:\s*(\d+)", r.stdout + r.stderr)
