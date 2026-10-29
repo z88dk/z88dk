@@ -18,14 +18,5 @@ _strncasecmp:
    push de
    push af
 
-IF __CPU_Z180__ ||  __CPU_RABBIT__
-
    EXTERN asm_strncasecmp
    jp     asm_strncasecmp
-
-ELSE
-
-   EXTERN l0_strncasecmp_callee
-   jp     l0_strncasecmp_callee
-
-ENDIF

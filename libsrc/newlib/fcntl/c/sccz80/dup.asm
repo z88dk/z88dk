@@ -8,4 +8,9 @@ PUBLIC dup
 
 EXTERN asm_dup
 
-defc dup = asm_dup
+dup:
+
+   push ix
+   call asm_dup
+   pop ix
+   ret

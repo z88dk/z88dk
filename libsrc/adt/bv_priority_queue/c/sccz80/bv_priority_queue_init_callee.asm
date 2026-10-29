@@ -12,13 +12,22 @@ EXTERN asm_bv_priority_queue_init
 bv_priority_queue_init_callee:
 
    pop af
-   pop ix
+   exx
+   pop hl
+   exx
    pop hl
    pop bc
    pop de
    push af
-   
-   jp asm_bv_priority_queue_init
+   push ix
+   exx
+   push hl
+   pop ix
+   exx
+
+   call asm_bv_priority_queue_init
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

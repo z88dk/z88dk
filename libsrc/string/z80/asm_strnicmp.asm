@@ -31,4 +31,4 @@ defc asm_strnicmp = asm_strncasecmp
    ;         if s1<<s2 : hl<0, c+nz flags set
    ;         if s1>>s2 : hl>0, nc+nz flag set
    ;
-   ; uses  : af, bc, de, hl, ixl
+   ; uses  : af, bc, de, hl

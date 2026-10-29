@@ -19,5 +19,8 @@ read:
    push de
    push bc
    push af
-   
-   jp asm_read
+
+   push ix
+   call asm_read
+   pop ix
+   ret

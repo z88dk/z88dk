@@ -8,4 +8,9 @@ PUBLIC close
 
 EXTERN asm_close
 
-defc close = asm_close
+close:
+
+   push ix
+   call asm_close
+   pop ix
+   ret

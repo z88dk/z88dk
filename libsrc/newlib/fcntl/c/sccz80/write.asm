@@ -19,5 +19,8 @@ write:
    push de
    push bc
    push af
-   
-   jp asm_write
+
+   push ix
+   call asm_write
+   pop ix
+   ret

@@ -13,7 +13,13 @@ fzx_puts_justified_callee:
    pop af
    pop bc
    pop hl
-   pop ix
+   ex (sp),ix
+   exx
+   pop hl
    push af
-   
-   jp asm_fzx_puts_justified
+   push hl
+   exx
+
+   call asm_fzx_puts_justified
+   pop ix
+   ret

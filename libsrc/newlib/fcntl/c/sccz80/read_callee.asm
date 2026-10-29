@@ -14,5 +14,8 @@ read_callee:
    pop bc
    pop de
    ex (sp),hl
-   
-   jp asm_read
+
+   push ix
+   call asm_read
+   pop ix
+   ret

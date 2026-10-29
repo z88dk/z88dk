@@ -23,5 +23,8 @@ l0_lseek_callee:
    exx
    push bc
    exx
-   
-   jp asm_lseek
+
+   push ix
+   call asm_lseek
+   pop ix
+   ret

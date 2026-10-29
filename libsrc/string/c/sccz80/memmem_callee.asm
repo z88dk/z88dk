@@ -20,20 +20,26 @@ IF __CLASSIC
    pop bc
    exx
 ELSE
+   ex (sp),ix
+   exx
+   pop hl
+   push af
+   push hl
+   exx
+   call asm_memmem
    pop ix
+   ret
 ENDIF
    push af
-  
+
 IF __CLASSIC
    exx
    push bc
    exx
    ex (sp),ix
    call asm_memmem
-   pop  ix
+   pop ix
    ret
-ELSE 
-   jp asm_memmem
 ENDIF
 
 ; SDCC bridge for Classic

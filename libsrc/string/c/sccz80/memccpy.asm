@@ -29,18 +29,27 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
    ld  d,(hl)
    pop hl
 ELSE
-   pop ix
+   exx
+   pop hl
+   exx
    pop bc
    pop de
    ld a,e
+   push de
+   exx
+   pop de
+   exx
    pop hl
    pop de
-
    push de
    push hl
+   exx
    push de
+   exx
    push bc
-   push ix
+   exx
+   push hl
+   exx
 ENDIF
 
 IF __CLASSIC && __CPU_GBZ80__

@@ -68,7 +68,8 @@ asm0_vopen:
    ; hl = void *arg (0 if no args)
    
    call asm_target_open_p1     ; target can place state in exx set
-   jp c, error_mc              ; target reports error
+   call c, error_mc            ; return so the caller can pop its frame
+   ret c
    
    ; allocate an FDSTRUCT
    
@@ -84,7 +85,8 @@ asm0_vopen:
    call asm_heap_alloc         ; allocate out of stdio heap
    
    pop bc                      ; bc = sizeof(FDSTRUCT)
-   jp c, error_mc              ; if memory unavailable
+   call c, error_mc            ; if memory unavailable
+   ret c
 
    ; hl = FDSTRUCT *
    ; bc = sizeof(FDSTRUCT)
@@ -107,7 +109,8 @@ IF __CLIB_OPT_MULTITHREAD & $08
 
    call critical_section
 
-   jp __fcntl_unlock_fdtbl
+   call __fcntl_unlock_fdtbl
+   ret
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -116,9 +119,15 @@ critical_section:
 
    ex de,hl                    ; de = FDSTRUCT *
    call __fcntl_first_available_fd
-   
-   jp nz, error_enfile_mc      ; if no fd slot is available
-   
+   jr z, fd_available
+
+   ex de,hl                    ; hl = FDSTRUCT *, no slot to install it
+   ld de,(__stdio_heap)
+   call asm_heap_free
+   jp error_enfile_mc
+
+fd_available:
+
    ld a,__fcntl_fdtbl_size
    sub b
    
@@ -161,4 +170,6 @@ target_error_p2:
    ld de,(__stdio_heap)
    call asm_heap_free
    
-   jp error_mc - 1
+   pop af                      ; discard fd
+   call error_mc
+   ret

@@ -14,12 +14,25 @@ fzx_write_callee:
    pop af
    pop bc
    pop de
-   pop ix
+   ex (sp),ix
+   exx
+   pop hl
    push af
+   push hl
+   exx
+
+   call asm_fzx_write
+   jr nc, fzx_write_callee_ok
+   call l_neg_hl
+
+fzx_write_callee_ok:
+
+   pop ix
+   ret
 
 fzx0_write_callee:
 
    call asm_fzx_write
    ret nc
-   
+
    jp l_neg_hl
