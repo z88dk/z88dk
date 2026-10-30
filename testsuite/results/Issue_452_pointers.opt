@@ -48,7 +48,11 @@
 	ex	de,hl
 	and	a
 	sbc	hl,de
-	srl	h
+	bit	7,h
+	jr	z,i_2
+	inc	hl
+.i_2
+	sra	h
 	rr	l
 	pop	bc
 	pop	bc
@@ -73,9 +77,15 @@
 	ex	de,hl
 	and	a
 	sbc	hl,de
-	srl	h
+	bit	7,h
+	jr	z,i_3
+	inc	hl
+	inc	hl
+	inc	hl
+.i_3
+	sra	h
 	rr	l
-	srl	h
+	sra	h
 	rr	l
 	pop	bc
 	pop	bc
@@ -102,7 +112,7 @@
 	sbc	hl,de
 	ld	de,6
 	ex	de,hl
-	call	l_div_u
+	call	l_div
 	pop	bc
 	pop	bc
 	ret
@@ -128,7 +138,7 @@
 	sbc	hl,de
 	ld	de,3
 	ex	de,hl
-	call	l_div_u
+	call	l_div
 	pop	bc
 	pop	bc
 	ret
@@ -149,7 +159,7 @@
 	sbc	hl,de
 	ld	de,3
 	ex	de,hl
-	call	l_div_u
+	call	l_div
 	pop	bc
 	pop	bc
 	ret
@@ -170,7 +180,7 @@
 	sbc	hl,de
 	ld	de,3
 	ex	de,hl
-	call	l_div_u
+	call	l_div
 	pop	bc
 	pop	bc
 	ret

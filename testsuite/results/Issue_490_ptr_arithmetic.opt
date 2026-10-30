@@ -46,7 +46,11 @@
 	ex	de,hl
 	and	a
 	sbc	hl,de
-	srl	h
+	bit	7,h
+	jr	z,i_2
+	inc	hl
+.i_2
+	sra	h
 	rr	l
 	exx
 	ld	hl,12	;const
@@ -71,9 +75,15 @@
 	ex	de,hl
 	and	a
 	sbc	hl,de
-	srl	h
+	bit	7,h
+	jr	z,i_3
+	inc	hl
+	inc	hl
+	inc	hl
+.i_3
+	sra	h
 	rr	l
-	srl	h
+	sra	h
 	rr	l
 	exx
 	ld	hl,22	;const
@@ -100,7 +110,7 @@
 	sbc	hl,de
 	ld	de,6
 	ex	de,hl
-	call	l_div_u
+	call	l_div
 	exx
 	ld	hl,32	;const
 	add	hl,sp
@@ -123,7 +133,7 @@
 	sbc	hl,de
 	ld	de,6
 	ex	de,hl
-	call	l_div_u
+	call	l_div
 	pop	bc
 	ret
 
