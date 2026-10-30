@@ -493,6 +493,42 @@ uint8_t get_memory(uint32_t at, memtype type)
     return mem_fetch[at - mem_requested_at];
 }
 
+/* The gdb protocol cannot read the ZX Next MMU, but the ZXN banked_call
+   (libsrc/target/zxn/far/zxn_banked_call.asm) keeps the page it maps at the
+   start of the banking window in cur_bank, and the window is the 16K segment
+   CLIB_BANKING_SEGMENT. A pc in the window is extended with that page, as
+   z88dk-ticks -banks does on the ZXN, so a line or symbol at page << 16 |
+   address matches only while its page is mapped. Without banked_call in the
+   map the page cannot be known, and pc stays 16 bits. It also stays 16 bits
+   when the map has no code in that page, so a map with 16-bit addresses only
+   works as before. */
+static uint32_t get_banked_pc()
+{
+    uint16_t pc = get_pc();
+    symbol  *cur_bank = find_symbol_byname("cur_bank", NULL);
+    int      segment = symbol_resolve("CLIB_BANKING_SEGMENT", NULL);
+    uint32_t banked;
+    uint16_t offset;
+    uint8_t  page;
+
+    /* No memory request while the target runs: the debugger compares a
+       banked breakpoint just after it has sent a step */
+    if (debugger_active == 0 || cur_bank == NULL || cur_bank->address > 0xffff ||
+        strcmp(cur_bank->name_module, "cur_bank_zxn_banked_call") != 0 ||
+        segment < 0 || segment > 3 || (pc >> 14) != segment) {
+        return pc;
+    }
+    page = get_memory(cur_bank->address, MEM_TYPE_DATA);
+    if (page == 0 || page == 0xff) {
+        return pc;  /* 0xff is banked_call's value for the ROM */
+    }
+    banked = (uint32_t)page << 16 | pc;
+    if (symbol_find_lower(banked, SYM_ANY, &offset) == NULL) {
+        return pc;
+    }
+    return banked;
+}
+
 void get_regs(struct debugger_regs_t* regs)
 {
     memcpy(regs, fetch_registers(), sizeof(struct debugger_regs_t));
@@ -924,6 +960,10 @@ void execute_on_main_thread_no_response(trapped_action_t call, const void* data)
 
 static void gdb_execution_stopped(int code)
 {
+    /* The target has run, so the memory read before may have changed. The
+       page in cur_bank, for one, has to be read again at every stop. */
+    mem_requested_amount = 0;
+
     if (debugger_active == 1)
     {
         return;
@@ -1617,6 +1657,7 @@ static backend_t gdb_backend = {
 	.script_filename = script_filename,
     .remote_closed = gdb_remote_closed,
     .should_download_binary_on_connect = gdb_should_download_binary_on_connect,
+    .banked_pc = get_banked_pc,
 };
 
 static void process_scheduled_actions()
