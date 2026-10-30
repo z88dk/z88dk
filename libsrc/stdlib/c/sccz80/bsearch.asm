@@ -12,26 +12,40 @@ EXTERN asm_bsearch
 
 bsearch:
 
-   pop af
-   pop ix
-   pop de
-   pop hl
-   pop bc
-   exx
-   pop bc
-   
-   push bc
-   push bc
-   push hl
+   push ix
+
+   ld hl,sp+4
+   ld e,(hl+)
+   ld d,(hl)
    push de
+   pop ix
+
+   ld hl,sp+6
+   ld e,(hl+)
+   ld d,(hl)
+
+   ld hl,sp+10
+   ld c,(hl+)
+   ld b,(hl)
+
+   ; AF is the key, so load it last. The nmemb load uses A.
+   ld hl,sp+8
+   ld a,(hl+)
+   ld h,(hl)
+   ld l,a
    push hl
-   push af
-   
-   push bc
+
+   ld hl,sp+14
+   ld a,(hl+)
+   ld h,(hl)
+   ld l,a
+   push hl
    pop af
-   
-   exx
-   jp asm_bsearch
+   pop hl
+
+   call asm_bsearch
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

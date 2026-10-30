@@ -17,11 +17,17 @@ EXTERN asm_freopen
 freopen_callee:
 
    pop hl
-   pop ix
+   pop bc
    pop de
    ex (sp),hl
-   
-   jp asm_freopen
+
+   push ix
+   push bc
+   pop ix
+
+   call asm_freopen
+   pop ix
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

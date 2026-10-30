@@ -11,6 +11,8 @@ EXTERN asm_fclose_unlocked
 fclose_unlocked:
 
    push hl
+   ex (sp),ix
+
+   call asm_fclose_unlocked
    pop ix
-   
-   jp asm_fclose_unlocked
+   ret

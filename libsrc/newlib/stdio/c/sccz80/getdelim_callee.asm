@@ -17,12 +17,18 @@ EXTERN asm_getdelim
 getdelim_callee:
 
    pop hl
-   pop ix
+   pop af
    pop bc
    pop de
    ex (sp),hl
-   
-   jp asm_getdelim
+
+   push ix
+   push af
+   pop ix
+
+   call asm_getdelim
+   pop ix
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

@@ -8,11 +8,4 @@ PUBLIC _ioctl
 
 EXTERN asm_ioctl
 
-_ioctl:
-
-   push ix
-   
-   call asm_ioctl
-   
-   pop ix
-   ret
+defc _ioctl = asm_ioctl

@@ -17,9 +17,4 @@ _vopen_callee:
 
 l0_vopen_callee:
 
-   push ix
-   
-   call asm_vopen
-   
-   pop ix
-   ret
+   jp asm_vopen

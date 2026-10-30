@@ -16,14 +16,22 @@ EXTERN asm_fseek
 
 fseek_callee:
 
-   pop af
-   pop bc
    pop hl
+   pop bc
    pop de
-   pop ix
+   pop af
+   ex (sp),hl
+
+   push ix
+   ld ix,hl
+
+   ld hl,de
    push af
-   
-   jp asm_fseek
+   pop de
+
+   call asm_fseek
+   pop ix
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

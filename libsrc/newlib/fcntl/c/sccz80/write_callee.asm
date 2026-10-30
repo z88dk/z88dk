@@ -14,5 +14,8 @@ write_callee:
    pop bc
    pop de
    ex (sp),hl
-   
-   jp asm_write
+
+   push ix
+   call asm_write
+   pop ix
+   ret

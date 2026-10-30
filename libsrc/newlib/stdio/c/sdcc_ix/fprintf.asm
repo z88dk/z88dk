@@ -14,14 +14,7 @@ PUBLIC _fprintf
 
 EXTERN asm_fprintf
 
-_fprintf:
-
-   push ix
-   
-   call asm_fprintf
-   
-   pop ix
-   ret
+defc _fprintf = asm_fprintf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

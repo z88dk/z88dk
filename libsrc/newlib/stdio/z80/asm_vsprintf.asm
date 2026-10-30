@@ -45,7 +45,8 @@ asm_vsprintf:
    ; uses  : all
 
    ; create a fake FILE structure on the stack
-   
+
+   push ix
    ld hl,0
    push hl
    ld hl,$8000 + (vsprintf_outchar / 256)
@@ -72,7 +73,8 @@ asm_vsprintf:
    ex de,hl
    ld (hl),0
    exx
-   
+
+   pop ix
    ret
 
 vsprintf_outchar:

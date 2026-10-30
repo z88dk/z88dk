@@ -13,5 +13,8 @@ dup2_callee:
    pop hl
    pop de
    ex (sp),hl
-   
-   jp asm_dup2
+
+   push ix
+   call asm_dup2
+   pop ix
+   ret

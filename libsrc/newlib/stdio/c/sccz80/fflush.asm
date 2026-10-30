@@ -17,9 +17,11 @@ EXTERN asm_fflush
 fflush:
 
    push hl
+   ex (sp),ix
+
+   call asm_fflush
    pop ix
-   
-   jp asm_fflush
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

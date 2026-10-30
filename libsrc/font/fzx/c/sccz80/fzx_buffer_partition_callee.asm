@@ -14,7 +14,13 @@ fzx_buffer_partition_callee:
    pop hl
    pop bc
    pop de
-   pop ix
+   ex (sp),ix
+   exx
+   pop hl
    push af
-   
-   jp asm_fzx_buffer_partition
+   push hl
+   exx
+
+   call asm_fzx_buffer_partition
+   pop ix
+   ret

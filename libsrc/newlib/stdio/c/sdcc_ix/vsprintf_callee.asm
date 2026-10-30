@@ -20,9 +20,4 @@ _vsprintf_callee:
 
 l0_vsprintf_callee:
 
-   push ix
-   
-   call asm_vsprintf
-   
-   pop ix
-   ret
+   jp asm_vsprintf

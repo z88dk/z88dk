@@ -10,11 +10,19 @@ EXTERN asm_fseek_unlocked
 
 fseek_unlocked_callee:
 
-   pop af
-   pop bc
    pop hl
+   pop bc
    pop de
-   pop ix
+   pop af
+   ex (sp),hl
+
+   push ix
+   ld ix,hl
+
+   ld hl,de
    push af
-   
-   jp asm_fseek_unlocked
+   pop de
+
+   call asm_fseek_unlocked
+   pop ix
+   ret

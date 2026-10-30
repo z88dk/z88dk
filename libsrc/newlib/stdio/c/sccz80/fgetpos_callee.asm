@@ -16,12 +16,20 @@ EXTERN asm_fgetpos
 
 fgetpos_callee:
 
-   pop af
    pop hl
+   pop de
+   pop bc
+
+   push ix
+   push bc
    pop ix
-   push af
-   
-   jp asm_fgetpos
+   ex (sp),hl
+   push hl
+   ex de,hl
+
+   call asm_fgetpos
+   pop ix
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

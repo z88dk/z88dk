@@ -22,7 +22,7 @@ asm_scanf_unlocked:
    ;
    ; enter : none
    ;
-   ; exit  : ix = FILE *
+   ; exit  : ix unchanged
    ;         de = char *format (next unexamined char)
    ;         hl = number of items assigned
    ;         de'= number of chars consumed from the stream
@@ -49,7 +49,6 @@ asm_scanf_unlocked:
 
    call __stdio_varg_2         ; de = char *format
    
-   ld c,l
-   ld b,h                      ; bc = void *arg
+   ld bc,hl                    ; bc = void *arg
    
    jp asm_vscanf_unlocked

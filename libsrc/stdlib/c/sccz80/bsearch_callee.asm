@@ -12,20 +12,30 @@ EXTERN asm_bsearch
 
 bsearch_callee:
 
-   pop af
-   pop ix
-   pop de
+   ; Park ret, then compar/size/nmemb in the alt set. Base and key
+   ; stay on the main set so the later exx can load IX.
+   exx
    pop hl
+   exx
+   pop de
    pop bc
+   pop hl
    exx
    pop bc
-   push af
-   
-   push bc
    pop af
+
+   push hl
+   push ix
+   push bc
    exx
-   
-   jp asm_bsearch
+   push de
+   pop ix
+   ld de,bc
+   pop bc
+
+   call asm_bsearch
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

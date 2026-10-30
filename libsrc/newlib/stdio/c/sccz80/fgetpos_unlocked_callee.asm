@@ -10,9 +10,17 @@ EXTERN asm_fgetpos_unlocked
 
 fgetpos_unlocked_callee:
 
-   pop af
    pop hl
+   pop de
+   pop bc
+
+   push ix
+   push bc
    pop ix
-   push af
-   
-   jp asm_fgetpos_unlocked
+   ex (sp),hl
+   push hl
+   ex de,hl
+
+   call asm_fgetpos_unlocked
+   pop ix
+   ret

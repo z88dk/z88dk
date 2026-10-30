@@ -14,14 +14,7 @@ PUBLIC _gets_fastcall
 
 EXTERN asm_gets
 
-_gets_fastcall:
-
-   push ix
-   
-   call asm_gets
-   
-   pop ix
-   ret
+defc _gets_fastcall = asm_gets
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

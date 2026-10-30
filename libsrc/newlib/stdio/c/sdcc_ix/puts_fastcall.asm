@@ -13,14 +13,7 @@ PUBLIC _puts_fastcall
 
 EXTERN asm_puts
 
-_puts_fastcall:
-
-   push ix
-   
-   call asm_puts
-   
-   pop ix
-   ret
+defc _puts_fastcall = asm_puts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

@@ -11,6 +11,8 @@ EXTERN asm_rewind_unlocked
 rewind_unlocked:
 
    push hl
+   ex (sp),ix
+
+   call asm_rewind_unlocked
    pop ix
-   
-   jp asm_rewind_unlocked
+   ret

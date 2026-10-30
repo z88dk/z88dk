@@ -33,7 +33,12 @@ asm_strncasecmp:
    ;         if s1<<s2 : hl<0, c+nz flags set
    ;         if s1>>s2 : hl>0, nc+nz flag set
    ;
-   ; uses  : af, bc, de, hl, ixl
+   ; uses  : af, bc, de, hl
+
+IF __CPU_Z180__ | __CPU_RABBIT__ | __CPU_INTEL__ | __CPU_GBZ80__ | __CPU_KC160__ | __CLASSIC
+ELSE
+   push ix
+ENDIF
 
 loop:
 
@@ -82,6 +87,10 @@ equal:                       ; both strings ended same time
 
    ld l,a
    ld h,a
+IF __CPU_Z180__ | __CPU_RABBIT__ | __CPU_INTEL__ | __CPU_GBZ80__ | __CPU_KC160__ | __CLASSIC
+ELSE
+   pop ix
+ENDIF
    ret
 
 different:
@@ -94,6 +103,7 @@ IF __CPU_Z180__ |  __CPU_RABBIT__ | __CPU_INTEL__ | __CPU_GBZ80__ | __CPU_KC160_
 ELSE
 
    sub ixl
+   pop ix
 
 ENDIF
 

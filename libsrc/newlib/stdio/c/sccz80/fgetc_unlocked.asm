@@ -11,6 +11,8 @@ EXTERN asm_fgetc_unlocked
 fgetc_unlocked:
 
    push hl
+   ex (sp),ix
+
+   call asm_fgetc_unlocked
    pop ix
-   
-   jp asm_fgetc_unlocked
+   ret

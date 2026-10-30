@@ -19,5 +19,8 @@ vioctl:
    push bc
    push de
    push af
-   
-   jp asm_vioctl
+
+   push ix
+   call asm_vioctl
+   pop ix
+   ret

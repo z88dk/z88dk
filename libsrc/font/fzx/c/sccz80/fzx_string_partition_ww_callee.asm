@@ -13,7 +13,13 @@ fzx_string_partition_ww_callee:
    pop af
    pop hl
    pop de
-   pop ix
+   ex (sp),ix
+   exx
+   pop hl
    push af
-   
-   jp asm_fzx_string_partition_ww
+   push hl
+   exx
+
+   call asm_fzx_string_partition_ww
+   pop ix
+   ret

@@ -16,14 +16,24 @@ EXTERN asm_fread
 
 fread_callee:
 
-   pop af
-   pop ix
    pop hl
-   pop bc
    pop de
+   pop bc
+   pop af
+   ex (sp),hl
+
+   push ix
+   push de
+   pop ix
+
+   ld de,hl
+   ld hl,bc
    push af
-   
-   jp asm_fread
+   pop bc
+
+   call asm_fread
+   pop ix
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

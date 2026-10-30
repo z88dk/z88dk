@@ -11,11 +11,17 @@ EXTERN asm_heap_info_unlocked
 heap_info_unlocked:
 
    pop af
-   pop ix
+   pop bc
    pop de
-   
+
    push de
    push hl
    push af
-   
-   jp asm_heap_info_unlocked
+
+   push ix
+   push bc
+   pop ix
+
+   call asm_heap_info_unlocked
+   pop ix
+   ret

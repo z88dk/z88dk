@@ -17,5 +17,8 @@ dup2:
    push hl
    push de
    push af
-   
-   jp asm_dup2
+
+   push ix
+   call asm_dup2
+   pop ix
+   ret

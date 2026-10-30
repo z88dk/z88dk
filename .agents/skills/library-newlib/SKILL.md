@@ -336,6 +336,22 @@ math (Whetstone, n-body).
 
 ---
 
+## 8. Caller IX
+
+A Z80 newlib C entry that writes IX saves the caller IX and restores it before `ret`. An `asm0_*` label still enters and exits with IX = FILE *. It does not save. SDCC keeps `ex (sp),ix` when that instruction loads FILE * or a comparator. A bridge that only pushes IX becomes `defc` after the asm saves IX.
+
+`__stdio_varg_2` on SDCC uses `ld hl,4`. That skips two return addresses. Do not push IX on those bridges.
+
+A terminal driver uses `ex (sp),ix` as the FDSTRUCT message protocol. Do not add a second save there.
+
+8080, 8085, and gbz80 have no IX. Guard `push ix` in a shared file with `IF !__CPU_INTEL__ && !__CPU_GBZ80__`. `stdio/z80` is already the Z80 build.
+
+A C entry that loads an argument with `pop ix` and then tail-jumps has already replaced the caller IX. Save the caller IX before that load and `call` the body. If the body does not write IX, keep the return address in another register and do not load IX. `strtol` and `itoa` callee bridges already save IX. Stdio fastcall entries use `ex (sp),ix` and `call`. Stdio callee entries used by the headers do the same.
+
+`memccpy` does not load IX. `memmem` saves IX around `call asm_memmem`. `strncasecmp` saves IX on the `ixl` path inside `asm_strncasecmp`. `read`, `write`, `lseek`, `close`, `dup`, `dup2`, and `vioctl` save the caller IX in the sccz80 bridge. `creat` saves it in `asm_creat`. `asm0_vopen` returns on error so `asm_vopen` can pop IX, and so `fopen` can free the FILE. `asm_vioctl` still returns the FDSTRUCT in IX to its asm caller. Generic header callees for `heap_info`, `balloc_addmem`, priority-queue `init`, `w_vector_insert_n`, and `fzx_*` in `libsrc/font/fzx/c/sccz80` do not return with the caller IX replaced.
+
+Caller-cleanup stdio symbols and the non-callee adt and fzx symbols still `pop ix`. The headers call the callee form. `fzx_putc_callee` and `fzx_tshr_putc_callee` still `pop ix`. Target `pop ix` wrappers under `libsrc/target`, `libsrc/temp/sp1`, and the zx, sms, and ts2068 window helpers are outside the generic `+z80` library. Mouse `pop ix` is the return address for `jp (ix)`. `math48` and `bit_beepfx` are not in that library.
+
 ## Related
 
 - Classic: `library-classic`

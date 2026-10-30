@@ -22,7 +22,7 @@ asm_vprintf_unlocked:
    ; enter : de = char *format
    ;         bc = void *stack_param = arg
    ;
-   ; exit  : ix = FILE *stdout
+   ; exit  : ix unchanged
    ;         de = char *format (next unexamined char)
    ;
    ;         success
@@ -43,7 +43,10 @@ asm_vprintf_unlocked:
    ;
    ;            more errors may be set by underlying driver
    ;            
-   ; uses  : all
+   ; uses  : all except ix
 
+   push ix
    ld ix,(_stdout)
-   jp asm_vfprintf_unlocked
+   call asm_vfprintf_unlocked
+   pop ix
+   ret

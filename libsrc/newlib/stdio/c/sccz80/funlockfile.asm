@@ -11,6 +11,8 @@ EXTERN asm_funlockfile
 funlockfile:
 
    push hl
+   ex (sp),ix
+
+   call asm_funlockfile
    pop ix
-   
-   jp asm_funlockfile
+   ret

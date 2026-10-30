@@ -17,9 +17,11 @@ EXTERN asm_rewind
 rewind:
 
    push hl
+   ex (sp),ix
+
+   call asm_rewind
    pop ix
-   
-   jp asm_rewind
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

@@ -14,14 +14,7 @@ PUBLIC _scanf
 
 EXTERN asm_scanf
 
-_scanf:
-
-   push ix
-   
-   call asm_scanf
-   
-   pop ix
-   ret
+defc _scanf = asm_scanf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

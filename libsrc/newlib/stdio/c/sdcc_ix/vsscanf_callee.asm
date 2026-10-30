@@ -18,9 +18,4 @@ _vsscanf_callee:
 
 l0_vsscanf_callee:
 
-   push ix
-   
-   call asm_vsscanf
-   
-   pop ix
-   ret
+   jp asm_vsscanf

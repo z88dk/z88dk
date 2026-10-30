@@ -17,9 +17,11 @@ EXTERN asm_feof
 feof:
 
    push hl
+   ex (sp),ix
+
+   call asm_feof
    pop ix
-   
-   jp asm_feof
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

@@ -22,7 +22,7 @@ asm_vscanf_unlocked:
    ; enter : de = char *format
    ;         bc = void *stack_param = arg
    ;
-   ; exit  : ix = FILE *stdin
+   ; exit  : ix unchanged
    ;         de = char *format (next unexamined char)
    ;         hl = number of items assigned
    ;         de'= number of chars consumed from the stream
@@ -48,5 +48,8 @@ asm_vscanf_unlocked:
    ;            
    ; uses  : all except ix
 
+   push ix
    ld ix,(_stdin)
-   jp asm_vfscanf_unlocked
+   call asm_vfscanf_unlocked
+   pop ix
+   ret

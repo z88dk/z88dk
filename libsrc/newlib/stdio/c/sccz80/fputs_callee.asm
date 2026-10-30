@@ -17,10 +17,16 @@ EXTERN asm_fputs
 fputs_callee:
 
    pop hl
-   pop ix
+   pop de
    ex (sp),hl
-   
-   jp asm_fputs
+
+   push ix
+   push de
+   pop ix
+
+   call asm_fputs
+   pop ix
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

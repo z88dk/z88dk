@@ -16,21 +16,8 @@ _strncasecmp_callee:
    pop bc
    push af
 
-IF __CPU_Z180__ ||  __CPU_RABBIT__
-
-   jp asm_strncasecmp
-
-ELSE
-
 PUBLIC l0_strncasecmp_callee
 
 l0_strncasecmp_callee:
 
-   push ix
-   
-   call asm_strncasecmp
-   
-   pop ix
-   ret
-
-ENDIF
+   jp asm_strncasecmp

@@ -13,7 +13,13 @@ fzx_at_callee:
    pop af
    pop bc
    pop hl
-   pop ix
+   ex (sp),ix
+   exx
+   pop hl
    push af
-   
-   jp asm_fzx_at
+   push hl
+   exx
+
+   call asm_fzx_at
+   pop ix
+   ret

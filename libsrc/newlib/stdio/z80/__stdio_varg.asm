@@ -26,17 +26,7 @@ __stdio_varg_2:
    ;
    ; uses  : af, de, hl
 
-IF __SDCC_IX
-
-   ld hl,8                     ; all vararg functions save ix and have extra call
-
-ELSE
-
-   ld hl,4
-
-ENDIF
-
-   add hl,sp
+   ld hl,sp+4                  ; two returns, the bridge does not push ix
    
    jp __stdio_nextarg_de
 

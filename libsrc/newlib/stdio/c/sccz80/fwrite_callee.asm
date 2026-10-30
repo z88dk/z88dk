@@ -17,12 +17,18 @@ EXTERN asm_fwrite
 fwrite_callee:
 
    pop hl
-   pop ix
+   pop af
    pop de
    pop bc
    ex (sp),hl
-   
-   jp asm_fwrite
+
+   push ix
+   push af
+   pop ix
+
+   call asm_fwrite
+   pop ix
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

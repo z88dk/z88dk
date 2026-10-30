@@ -22,14 +22,12 @@ EXTERN asm0_vfscanf_unlocked, error_einval_zc, error_mc
 
 error_s_null:
 
-   ld c,l
-   ld b,h
+   ld bc,hl
    
    exx
    
    ld de,0
-   ld l,e
-   ld h,d
+   ld hl,de
 
    exx
    
@@ -68,7 +66,8 @@ asm_vsscanf:
    jr z, error_s_null          ; if s == NULL
 
    ; create a fake FILE structure on the stack
-   
+
+   push ix
    push hl                     ; char *s is stored in the FILE *
    ld hl,$0260
    push hl
@@ -88,7 +87,7 @@ asm_vsscanf:
    pop bc
    pop bc
    pop bc                      ; bc = char *s (next unexamined char)
-
+   pop ix
    ret
 
 sscanf_inchar:
@@ -109,14 +108,12 @@ _eatc:
    ; bc'= reserved
    ; de'= reserved
    
-   ld c,l
-   ld b,h
+   ld bc,hl
    inc bc                      ; bc = max chars to read + 1
    
    ld de,$ffff                 ; de = number of chars read - 1
    
-   ld l,(ix+5)
-   ld h,(ix+6)
+   ld hl,(ix+5)
    dec hl                      ; hl = char *s - 1
 
 _eatc_loop:
@@ -143,14 +140,12 @@ _eatc_loop:
 
 return_unqualified:
    
-   ld (ix+5),l
-   ld (ix+6),h                 ; write char *s to file structure
+   ld (ix+5),hl                ; write char *s to file structure
    
    ld l,a
    ld h,0                      ; hl = next unconsumed char
    
-   ld c,e
-   ld b,d                      ; bc = number of bytes consumed from string
+   ld bc,de                    ; bc = number of bytes consumed from string
    
    or a                        ; report no error
    ret
@@ -175,13 +170,11 @@ _read:
 
    exx
    
-   ld l,(ix+5)
-   ld h,(ix+6)                 ; hl = char *s
+   ld hl,(ix+5)                ; hl = char *s
    
    call asm__memstrcpy
    
-   ld (ix+5),l
-   ld (ix+6),h                 ; update char *s
+   ld (ix+5),hl                ; update char *s
    
    push bc
    
@@ -193,8 +186,7 @@ _read:
    ld a,b
    or c
    
-   ld c,l
-   ld b,h                      ; bc = num bytes copied
+   ld bc,hl                    ; bc = num bytes copied
 
    ret z                       ; if request completely satisfied
    
@@ -211,17 +203,14 @@ _seek:
    
    exx
    
-   ld c,l
-   ld b,h                      ; bc = seek forward length
+   ld bc,hl                    ; bc = seek forward length
    
-   ld l,(ix+5)
-   ld h,(ix+6)                 ; hl = char *s
+   ld hl,(ix+5)                ; hl = char *s
    
    call asm_strnlen
    add hl,de                   ; hl = new char *s
    
-   ld (ix+5),l
-   ld (ix+6),h
+   ld (ix+5),hl
    
    exx
       

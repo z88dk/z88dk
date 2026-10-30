@@ -54,13 +54,14 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
    push bc
    ret
 ELSE
-   pop ix
+   pop de
    pop bc
-   pop de
-   ld a,e
    pop hl
-   pop de
-   push ix
+   ld a,l
+   pop hl
+   ex (sp),hl
+   ex de,hl
+   ex (sp),hl
 
    jp asm_memccpy
 ENDIF

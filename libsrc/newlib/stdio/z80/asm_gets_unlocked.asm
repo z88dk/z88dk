@@ -29,7 +29,7 @@ asm_gets_unlocked:
 
    ; enter : hl = char *s
    ;
-   ; exit  : ix = FILE *stdin
+   ; exit  : ix unchanged
    ;
    ;         if success
    ;
@@ -58,6 +58,7 @@ asm_gets_unlocked:
    ;
    ; uses  : all except ix
 
+   push ix
    ld ix,(_stdin)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -66,7 +67,25 @@ IF __CLIB_OPT_STDIO & $01
    EXTERN __stdio_verify_valid, error_zc
 
    call __stdio_verify_valid
-   jp c, error_zc
+   jr c, gets_unlocked_err
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   call asm0_gets_unlocked
+
+gets_unlocked_exit:
+
+   pop ix
+   ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+gets_unlocked_err:
+
+   pop ix
+   jp error_zc
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

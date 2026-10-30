@@ -14,7 +14,13 @@ fzx_write_justified_callee:
    pop hl
    pop bc
    pop de
-   pop ix
+   ex (sp),ix
+   exx
+   pop hl
    push af
-   
-   jp asm_fzx_write_justified
+   push hl
+   exx
+
+   call asm_fzx_write_justified
+   pop ix
+   ret

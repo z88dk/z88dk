@@ -11,6 +11,8 @@ EXTERN asm_ftrylockfile
 ftrylockfile:
 
    push hl
+   ex (sp),ix
+
+   call asm_ftrylockfile
    pop ix
-   
-   jp asm_ftrylockfile
+   ret

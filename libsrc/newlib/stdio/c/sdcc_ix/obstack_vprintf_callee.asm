@@ -18,9 +18,4 @@ _obstack_vprintf_callee:
 
 l0_obstack_vprintf_callee:
 
-   push ix
-   
-   call asm_obstack_vprintf
-   
-   pop ix
-   ret
+   jp asm_obstack_vprintf

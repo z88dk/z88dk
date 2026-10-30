@@ -14,5 +14,8 @@ vioctl_callee:
    pop de
    pop bc
    ex (sp),hl
-   
-   jp asm_vioctl
+
+   push ix
+   call asm_vioctl
+   pop ix
+   ret

@@ -17,9 +17,4 @@ _vprintf_unlocked_callee:
 
 l0_vprintf_unlocked_callee:
 
-   push ix
-   
-   call asm_vprintf_unlocked
-   
-   pop ix
-   ret
+   jp asm_vprintf_unlocked

@@ -28,7 +28,7 @@ asm_puts:
 
    ; enter : hl = char *s
    ;
-   ; exit  : ix = FILE *stdout
+   ; exit  : ix unchanged
    ;
    ;         success
    ;
@@ -40,8 +40,9 @@ asm_puts:
    ;            hl = -1
    ;            carry set, errno set
    ;
-   ; uses  : all
+   ; uses  : all except ix
 
+   push ix
    ld ix,(_stdout)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -50,20 +51,38 @@ IF __CLIB_OPT_STDIO & $01
    EXTERN __stdio_verify_valid_lock
 
    call __stdio_verify_valid_lock
-   ret c
+   jr c, puts_exit
 
 ELSE
 
    EXTERN __stdio_lock_acquire, error_enolck_mc
-   
+
    call __stdio_lock_acquire
-   jp c, error_enolck_mc
+   jr c, puts_enolck
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
+
    call asm0_puts_unlocked
-   jp __stdio_lock_release
+   call __stdio_lock_release
+
+puts_exit:
+
+   pop ix
+   ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF !(__CLIB_OPT_STDIO & $01)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+puts_enolck:
+
+   pop ix
+   jp error_enolck_mc
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

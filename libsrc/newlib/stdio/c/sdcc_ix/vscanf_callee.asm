@@ -23,12 +23,7 @@ _vscanf_callee:
 
 l0_vscanf_callee:
 
-   push ix
-   
-   call asm_vscanf
-   
-   pop ix
-   ret
+   jp asm_vscanf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

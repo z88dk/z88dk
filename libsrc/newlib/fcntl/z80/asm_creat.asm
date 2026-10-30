@@ -14,7 +14,7 @@ SECTION code_fcntl
 
 PUBLIC asm_creat
 
-EXTERN asm0_vopen, l_inc_sp
+EXTERN asm0_vopen
 
 asm_creat:
 
@@ -32,14 +32,17 @@ asm_creat:
    ;            hl = -1
    ;            carry set, errno set
    ;
-   ; uses  : all except iy
+   ; uses  : all except ix, iy
 
+   push ix
    push bc                     ; save mode
-   
+
    ld hl,0
    add hl,sp                   ; hl = void *arg
-   
+
    ld bc,$52                   ; O_WRONLY|O_CREAT|O_TRUNC
    call asm0_vopen
-   
-   jp l_inc_sp - 2             ; pop item from stack
+
+   pop bc                      ; discard mode
+   pop ix
+   ret
