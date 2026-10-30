@@ -14,8 +14,6 @@
     PUBLIC    __Exit         ; jp'd to by exit()
     PUBLIC    l_dcal          ; jp(hl)
 
-    defc	CRT_ORG_CODE = 0x7cdd
-
     defc	CONSOLE_ROWS = 16
     defc	CONSOLE_COLUMNS = 32
 
@@ -23,8 +21,12 @@
 
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__clib_exit_stack_size = 0
-    defc    TAR__register_sp = -1
     defc	__CPU_CLOCK = 4000000 
+
+IF (!DEFINED_startup | (startup=1))
+    ; Called from BASIC (the program is loaded at $7CDD, with BASIC still in RAM below and above it)
+    defc	CRT_ORG_CODE = 0x7cdd
+    defc    TAR__register_sp = -1
     INCLUDE "crt/classic/crt_rules.inc"
 
     org     CRT_ORG_CODE
@@ -50,6 +52,44 @@ __restore_sp_onexit:
     ld      sp,0            ;Restore stack to entry value
 noop:
     ret
+ELSE
+    ; All RAM (-subtype=allram): the program is linked at $0000 and takes the whole machine, with the stack at the top of memory and BASIC gone.
+    IFNDEF  CRT_ORG_CODE
+    defc    CRT_ORG_CODE = 0x0000
+    ENDIF
+    defc    TAR__register_sp = 0x0000
+    defc    TAR__crt_enable_rst = $8080
+    defc    TAR__crt_on_exit = $10001       ;loop forever
+    EXTERN  asm_im1_handler
+    defc    _z80_rst_38h = asm_im1_handler
+    INCLUDE "crt/classic/crt_rules.inc"
+
+    PUBLIC  __spc1000_allram_start
+
+    org     CRT_ORG_CODE
+
+if (ASMPC<>$0000)
+    defs    CODE_ALIGNMENT_ERROR
+endif
+    di
+    jp      __spc1000_allram_start
+
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
+
+__spc1000_allram_start:
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    im      1
+    ei
+
+    call    _main           ; Call user program
+__Exit:
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
+ENDIF
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
@@ -101,3 +141,8 @@ ENDIF
     INCLUDE "crt/classic/crt_section.inc"
 
     INCLUDE "crt/classic/mc6847/mc6847_mode_disable.inc"
+
+IF (DEFINED_startup && startup=2)
+    ; The bootstrap BASIC loads, which unpacks the program (a section of its own: <program>_BOOTSTRAP.bin)
+    INCLUDE "target/spc1000/classic/bootstrap.asm"
+ENDIF
