@@ -47,6 +47,17 @@ Follow the integer conversion rules. The same rules apply in both front ends.
   `(long *)34 - (long *)2` is 8. The folded subtraction is a signed
   `int` before the element scale runs. An unsigned mask of the address
   delta makes `(int *)0 - (int *)10` into 32763.
+  A value that is not a constant follows the same rule.
+  `p - (p + 5)` for an `int *` is -5. A power-of-two element size
+  is an arithmetic shift. Any other size is a signed division.
+  A struct uses its own size. The #452, #490, and pointer_arith tests record this scale.
+- A far pointer value is 24 bits. A far comparison yields `int`.
+  `(char *__far)0x01020304 == (char *__far)0x00020304`.
+  `(char *__far)0x81ff6 + 3` is `0x81ff9`.
+- An `int` widens before a `long` constant is added.
+  `1 + 40000L` is 40001. `65535u + 1L` is 65536.
+  sccz80 calls `l_inclong` or `l_declong` for a long or far `+ 1` or `- 1`.
+  `--opt-code-speed` can inline that step.
 - Default argument promotions do not narrow a `long`. `printf("%ld", 32768)`
   pushes four bytes. A prototype still converts: `unsigned int` keeps the
   low 16 bits of 98304, which are 32768.
@@ -64,11 +75,9 @@ agree on these constants.
 `test/suites/sccz80/constpush.c` runs for sccz80 and for 80cc. It checks the
 values above, the 32-bit push of a decimal long, the unsigned-int cast, a
 prototype conversion, a fastcall long, mixed `/` and `%`, a `char` promotion,
-and a signed right shift whose count is unsigned. It also checks a
-negative constant pointer difference.
+and a signed right shift whose count is unsigned.
 
-A pointer difference that is not folded is a signed element count.
-`p - (p + 5)` for an `int *` is -5. The scale is a signed division.
-
-A `char` variable promotes before unary `-` and unary `~`.
-An `int` widens before a `long` constant is added. `1 + 40000L` is 40001.
+`test/suites/sccz80/conv.c` checks these rules when the value is not a
+constant. It covers a `char` unary, a far comparison, a pointer
+difference, and a `long` add. sdcc does not build `constpush.c` or
+`conv.c`.

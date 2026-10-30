@@ -254,7 +254,8 @@ Size across the corpus before implementing.
 
 - **Signed constants sign-extend on conversion (ADR 0121).** An unsuffixed
   decimal outside signed int is long. Signed overflow wraps, then a wider
-  conversion sign-extends. A long argument stays a long.
+  conversion sign-extends. A long argument stays a long. A pointer
+  difference is a signed element count. Not gated.
 - **8/10/2026 tranche, ADRs 0107 to 0112.** Long constant multiply is
   expanded inline only when shorter than the helper call (0107). Shortest
   forms for a word compare against a constant (-401 B corpus), a constant
