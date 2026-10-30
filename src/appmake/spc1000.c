@@ -5,10 +5,11 @@
 
 #include "appmake.h"
 
-/* -subtype=allram: the program is linked at its own address ($0000), packed with ZX0 and put after the CRT's bootstrap, which BASIC loads at
-   $7CDD (lib/target/spc1000/classic/bootstrap.asm).  The bootstrap moves the packed data up to end at __spc1000_bootstrap_top and unpacks it in place,
-   so the program must not catch up with the packed data there. */
+/* How much space between the unpacked and the unpacker */
 #define ALLRAM_SLACK 16
+
+/* A loaded file can't extend beyond here or things break */
+#define ALLRAM_LOAD_END 0xD1BF
 
 
 static char             *binname      = NULL;
@@ -142,6 +143,8 @@ int spc1000_exec(char* target)
         if (top - clen - org < (len - clen) + ALLRAM_SLACK)
             exit_log(1, "The program unpacks over its own packed data (%ld bytes of program, %ld packed, which end at %ld: the program must be %ld at most)\n",
                      (long)len, clen, top, top - org - ALLRAM_SLACK);
+        if (boot_org + payload_len - 1 > ALLRAM_LOAD_END)
+            exit_log(1, "The packed program is too big to load: it ends at %ld, BASIC is above %d (%ld bytes over)\n", boot_org + payload_len - 1, ALLRAM_LOAD_END, boot_org + payload_len - 1 - ALLRAM_LOAD_END);
         if (boot_org + payload_len > reloc)
             exit_log(1, "The packed program (to %ld) runs into the unpacker at %ld\n", boot_org + payload_len, reloc);
         fprintf(stderr, "SPC-1000 allram: %d bytes packed to %ld, loaded at $%04lX to $%04lX\n", len, clen, boot_org, boot_org + payload_len - 1);
@@ -166,9 +169,10 @@ int spc1000_exec(char* target)
     /* Offset 0x10 */
     writebyte(0x00, fpout);
     writebyte(0x00, fpout);
-    /* Length of the file + headers */
-    writebyte((len + 13) % 256, fpout);
-    writebyte((len + 13) / 256, fpout);
+    /* The size of what the loader loads, from the start of the BASIC line: the line (8 bytes), the zeros to 0xC0 (56) and the program.  (It was len + 13, the
+       size when the zeros were 5: the last 51 bytes of the program were not loaded, and a program that needs them, its end, did not run.) */
+    writebyte((len + 0x40) % 256, fpout);
+    writebyte((len + 0x40) / 256, fpout);
     /* Loading address */
     writebyte(pos % 256, fpout);
     writebyte((pos / 256) % 256, fpout);
