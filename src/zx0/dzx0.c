@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
         input_size = strlen(input_name);
         if (input_size > 4 && !strcmp(input_name+input_size-4, ".zx0")) {
             input_size = strlen(input_name);
-            output_name = (char *)malloc(input_size);
+            output_name = (char *)malloc(input_size + 1);
             strcpy(output_name, input_name);
             output_name[input_size-4] = '\0';
         } else {
