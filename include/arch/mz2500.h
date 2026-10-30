@@ -53,4 +53,18 @@ extern void __LIB__ mz2500_wait_vblank(void);
 extern int __LIB__ mz2500_disk_rw(uint8_t write, uint8_t drive, uint8_t cylinder, uint8_t head, uint8_t sector, void *buf) __smallc;
 extern void __LIB__ mz2500_disk_off(void);
 
+// The mouse (the SIO's channel B), as in input.h: buttons are 00000MRL active high, the position is 0..319 by 0..199.  The movement the mouse has sent
+// since the last call is added to the position, so call in_MouseMZ2500 once a frame or so; in_MouseMZ2500SetPos moves it.  A mouse cannot be detected:
+// in_MouseMZ2500Init (position to 0,0) always returns non-zero.
+extern int  __LIB__ in_MouseMZ2500Init(void);
+extern int  __LIB__ in_MouseMZ2500Present(void);
+extern void __LIB__ in_MouseMZ2500(unsigned char *buttons, unsigned int *xcoord, unsigned int *ycoord) __smallc;
+extern void __LIB__ in_MouseMZ2500SetPos(unsigned int xcoord, unsigned int ycoord) __smallc;
+
+extern void __LIB__ in_MouseMZ2500_callee(unsigned char *buttons, unsigned int *xcoord, unsigned int *ycoord) __smallc __z88dk_callee;
+extern void __LIB__ in_MouseMZ2500SetPos_callee(unsigned int xcoord, unsigned int ycoord) __smallc __z88dk_callee;
+
+#define in_MouseMZ2500(a,b,c)     in_MouseMZ2500_callee(a,b,c)
+#define in_MouseMZ2500SetPos(a,b) in_MouseMZ2500SetPos_callee(a,b)
+
 #endif
