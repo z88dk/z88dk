@@ -16063,7 +16063,7 @@ replace restart {
 	djnz	%2
 	ld	%4,a
 	; peephole z88dk-411k
-} if notUsed('a')
+} if notUsed('a'), notSame(%3 'a')
 
 replace restart {
 	ld	a,#0x08
@@ -18973,7 +18973,7 @@ replace restart {
 	rra
 	ld	%2,a
 	; peephole z88dk-431
-}
+} if notSame(%1 'a')
 
 replace restart {
 	ld	bc,%1
@@ -25609,7 +25609,7 @@ replace restart {
 	rra
 	ld	%2,a
 	; peephole z88dk-505a
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'a')
 
 replace restart {
 	ld	%2,a
@@ -25620,7 +25620,7 @@ replace restart {
 	rra
 	ld	%2,a
 	; peephole z88dk-505b
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'a')
 
 replace restart {
 	srl	%1
@@ -25639,7 +25639,7 @@ replace restart {
 	rra
 	ld	%2,a
 	; peephole z88dk-506a
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'a')
 
 replace restart {
 	ld	%2,a
@@ -25650,7 +25650,7 @@ replace restart {
 	rra	
 	ld	%2,a
 	; peephole z88dk-506b
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'a')
 
 replace restart {
 	sla	l
@@ -25677,7 +25677,7 @@ replace restart {
 	rla
 	ld	%2,a
 	; peephole z88dk-507a
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'a')
 
 replace restart {
 	ld	%2,a
@@ -25688,7 +25688,7 @@ replace restart {
 	rla
 	ld	%2,a
 	; peephole z88dk-507b
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'a')
 
 
 
