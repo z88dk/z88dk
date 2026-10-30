@@ -420,8 +420,9 @@ static void cmd_thread_info(const char* flow, int argc, char **argv) {
 
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
+    uint32_t pc = current_banked_pc();
 
-    debug_frame_pointer* fp = debug_stack_frames_construct(regs.pc, regs.sp, &regs, 1);
+    debug_frame_pointer* fp = debug_stack_frames_construct(pc, regs.sp, &regs, 1);
 
     if (fp) {
         if (fp->symbol && fp->filename && fp->function) {
@@ -440,11 +441,11 @@ static void cmd_thread_info(const char* flow, int argc, char **argv) {
     }
 
     uint16_t offset = 0;
-    symbol* s = symbol_find_lower(regs.pc, SYM_ADDRESS, &offset);
+    symbol* s = symbol_find_lower(pc, SYM_ADDRESS, &offset);
 
     const char* filename = "unknown.c";
     int lineno;
-    if (s == NULL || debug_find_source_location(regs.pc, &filename, &lineno)) {
+    if (s == NULL || debug_find_source_location(pc, &filename, &lineno)) {
         mi2_printf_response(flow, 
             "done,threads=[{id=\"1\",target-id=\"Thread\","
             "frame={level=\"0\",addr=\"0x%08x\","
@@ -484,7 +485,7 @@ static void cmd_stack_list_variables(const char* flow, int argc, char **argv) {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     if (first_frame_pointer == NULL)
@@ -906,7 +907,8 @@ static void sprintf_frame0(UT_string* ptr) {
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
 
-    debug_frame_pointer* fp = debug_stack_frames_construct(regs.pc, regs.sp, &regs, 1);
+    uint32_t pc = current_banked_pc();
+    debug_frame_pointer* fp = debug_stack_frames_construct(pc, regs.sp, &regs, 1);
 
     if (fp) {
         if (fp->symbol && fp->filename && fp->function) {
@@ -919,11 +921,11 @@ static void sprintf_frame0(UT_string* ptr) {
         }
     } else {
         uint16_t offset;
-        symbol* sym = symbol_find_lower(regs.pc, SYM_ADDRESS, &offset);
+        symbol* sym = symbol_find_lower(pc, SYM_ADDRESS, &offset);
         if (sym != NULL) {
             const char *filename = "unknown.c";
             int lineno = 0;
-            if (debug_find_source_location(regs.pc, &filename, &lineno)) {
+            if (debug_find_source_location(pc, &filename, &lineno)) {
                 utstring_printf(ptr, "level=\"0\",addr=\"0x%08x\",func=\"%s\","
                                      "file=\"%s\","
                                      "fullname=\"%s\",line=\"%d\","
@@ -954,20 +956,20 @@ static void cmd_stack_list_frames(const char* flow, int argc, char **argv) {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     UT_string* dump_buffer;
     utstring_new(dump_buffer);
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(regs.pc, regs.sp, &regs, 0);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, regs.sp, &regs, 0);
     if (first_frame_pointer == NULL) {
         uint16_t offset;
-        symbol* sym = symbol_find_lower(regs.pc, SYM_ADDRESS, &offset);
+        symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
         if (sym != NULL) {
 
             const char *filename = "unknown.c";
             int lineno;
-            if (debug_find_source_location(regs.pc, &filename, &lineno)) {
+            if (debug_find_source_location(at, &filename, &lineno)) {
                 utstring_printf(dump_buffer,
                     "frame={level=\"0\",addr=\"0x%08x\",func=\"%s\","
                     "file=\"%s\","
@@ -998,12 +1000,12 @@ static void cmd_stack_list_frames(const char* flow, int argc, char **argv) {
                     "frame={level=\"%d\",addr=\"0x%08x\",func=\"%s\","
                     "file=\"%s\","
                     "fullname=\"%s\",line=\"%d\","
-                    "arch=\"z80\"}", level, fp->address, fp->function->name,
+                    "arch=\"z80\"}", level, fp->address & 0xffff, fp->function->name,
                     fp->filename, fp->filename, fp->lineno);
             } else {
                 utstring_printf(dump_buffer,
                     "frame={level=\"%d\",addr=\"0x%08x\"}",
-                    level, fp->address);
+                    level, fp->address & 0xffff);
             }
 
             fp = fp->next;
@@ -1028,9 +1030,9 @@ static void cmd_stack_info_depth(const char* flow, int argc, char **argv) {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(regs.pc, regs.sp, &regs, 0);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, regs.sp, &regs, 0);
     if (first_frame_pointer == NULL) {
         mi2_printf_response(flow, "done,depth=\"0\"");
         return;
@@ -1280,7 +1282,7 @@ static void cmd_fin(const char* flow, int argc, char **argv) {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 1);
 
@@ -1308,7 +1310,7 @@ static void cmd_next(const char* flow, int argc, char **argv) {
 
     const char *filename;
     int   lineno;
-    const unsigned short pc = bk.pc();
+    const uint32_t pc = current_banked_pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
         add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_NEXT_SOURCE_LINE, NULL, 0);
         bk.next(0);
@@ -1327,7 +1329,7 @@ static void cmd_step(const char* flow, int argc, char **argv) {
 
     const char *filename;
     int   lineno;
-    const unsigned short pc = bk.pc();
+    const uint32_t pc = current_banked_pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
         add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_STEP_SOURCE_LINE, NULL, 0);
         bk.step(0);
@@ -1544,7 +1546,7 @@ static void mi2_execution_stopped(int code) {
             }
             switch (elem->type) {
                 case BREAK_PC: {
-                    if (elem->value == regs.pc) {
+                    if (elem->value == (elem->value > 0xffff ? current_banked_pc() : regs.pc)) {
                         breakpoint_hit = elem;
                     }
                     break;
