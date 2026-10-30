@@ -37,6 +37,7 @@ row does not pass that flag.
 make 8085
 
 is sccz80 c90base with -clib=8085 and z88dk-ticks -m8085.
+Other classic CPU rows are in the parent readme.
 
 IN-PROGRAM SCORE
 ================
@@ -44,14 +45,14 @@ IN-PROGRAM SCORE
 `make classic` also builds the iotimer images. Port 2, buffer
 _tickbuf, T-states/40. The sccz80 image printed 1, 3, and 4.
 The 80cc stack image printed 3, 3, and 6. That image is 28110 bytes.
-The 80cc frame image printed 3, 3, and 6. That image is 28533 bytes.
+The 80cc frame image printed 3, 4, and 7. That image is 27489 bytes.
 The zsdcc image printed 3, 4, and 7. That image is 25341 bytes.
 Those prints truncate the score. The RESULT blocks keep one decimal.
 
 RESULT
 ======
 
-Z88DK October 27, 2026
+Z88DK October 30, 2026
 sccz80 / classic c library / c90base
 9118 bytes less page zero
 
@@ -60,7 +61,7 @@ time @ 4MHz  = 168749272 / 4*10^6 = 42.19 sec
 stdcbench score = 1.9
 
 
-Z88DK October 27, 2026
+Z88DK October 30, 2026
 sccz80 / classic c library / c90lib
 22630 bytes less page zero
 
@@ -69,7 +70,7 @@ time @ 4MHz  = 491595488 / 4*10^6 = 122.90 sec
 stdcbench score = 3.3
 
 
-Z88DK October 27, 2026
+Z88DK October 30, 2026
 sccz80 / classic c library / 8085 / c90base
 9431 bytes less page zero
 
@@ -78,7 +79,7 @@ time @ 4MHz  = 130654532 / 4*10^6 = 32.66 sec
 stdcbench score = 2.4
 
 
-Z88DK October 29, 2026
+Z88DK October 30, 2026
 80cc stack / classic c library / c90base
 9035 bytes less page zero
 
@@ -87,7 +88,7 @@ time @ 4MHz  = 102158431 / 4*10^6 = 25.54 sec
 stdcbench score = 3.1
 
 
-Z88DK October 29, 2026
+Z88DK October 30, 2026
 80cc stack / classic c library / c90lib
 22988 bytes less page zero
 
@@ -96,25 +97,25 @@ time @ 4MHz  = 410457676 / 4*10^6 = 102.61 sec
 stdcbench score = 3.9
 
 
-Z88DK October 29, 2026
+Z88DK October 30, 2026
 80cc frame / classic c library / c90base
-9113 bytes less page zero
+8963 bytes less page zero
 
-cycle count  = 102618241
-time @ 4MHz  = 102618241 / 4*10^6 = 25.65 sec
-stdcbench score = 3.1
+cycle count  = 99889975
+time @ 4MHz  = 99889975 / 4*10^6 = 24.97 sec
+stdcbench score = 3.2
 
 
-Z88DK October 29, 2026
+Z88DK October 30, 2026
 80cc frame / classic c library / c90lib
-23346 bytes less page zero
+22437 bytes less page zero
 
-cycle count  = 406156584
-time @ 4MHz  = 406156584 / 4*10^6 = 101.54 sec
-stdcbench score = 3.9
+cycle count  = 396617692
+time @ 4MHz  = 396617692 / 4*10^6 = 99.15 sec
+stdcbench score = 4.0
 
 
-Z88DK October 27, 2026
+Z88DK October 30, 2026
 zsdcc 4.6.0 #16639 / classic c library / c90base
 8627 bytes less page zero
 
@@ -123,7 +124,7 @@ time @ 4MHz  = 91051880 / 4*10^6 = 22.76 sec
 stdcbench score = 3.5
 
 
-Z88DK October 27, 2026
+Z88DK October 30, 2026
 zsdcc 4.6.0 #16639 / classic c library / c90lib
 20657 bytes less page zero
 

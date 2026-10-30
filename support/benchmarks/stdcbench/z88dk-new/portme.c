@@ -30,9 +30,18 @@
 
 #define CON_PORT 1
 
+#if defined(__Z180) || defined(__Z80N)
+extern void bench_putc(unsigned char c) __z88dk_fastcall;
+extern unsigned int bench_in2(unsigned int port) __z88dk_fastcall;
+#endif
+
 static void con_putc(unsigned char c)
 {
+#if defined(__Z180) || defined(__Z80N)
+	bench_putc(c);
+#else
 	z80_outp(CON_PORT, c);
+#endif
 }
 
 static void con_write(const char *s)
@@ -73,7 +82,11 @@ static unsigned long tstates(void)
 {
 	unsigned long n;
 
+#if defined(__Z180) || defined(__Z80N)
+	bench_in2(IOTIMER_PORT);
+#else
 	z80_inp(IOTIMER_PORT);
+#endif
 	n = (unsigned long)tickbuf[0]
 	    | ((unsigned long)tickbuf[1] << 8)
 	    | ((unsigned long)tickbuf[2] << 16)
