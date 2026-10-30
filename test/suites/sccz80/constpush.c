@@ -84,6 +84,11 @@ void test_constpush(void)
     Assert((1L && 1L) == 1 && (0L || 0) == 0, "logical operators yield int");
     Assert((char *)10 - (char *)4 == 6, "char pointer difference");
     Assert((int *)10 - (int *)4 == 3, "int pointer difference");
+    Assert((int *)0 - (int *)10 == -5, "negative int pointer difference");
+    Assert((long)((int *)0 - (int *)10) == -5L, "negative int pointer difference widens");
+    Assert((char *)4 - (char *)10 == -6, "negative char pointer difference");
+    Assert((long)((char *)4 - (char *)10) == -6L, "negative char pointer difference widens");
+    Assert((long *)34 - (long *)2 == 8, "long pointer difference");
 
     sprintf(buf, "%ld", (long)MAINBANK_ADDR);
     expect(buf, "98304", "%ld of 65536 - 16384*2");

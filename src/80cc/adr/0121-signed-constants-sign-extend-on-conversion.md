@@ -41,8 +41,12 @@ Follow the integer conversion rules. The same rules apply in both front ends.
 - Unary `~` and unary `-` promote a `char` to `int` before the operation.
   `(long)~(unsigned char)0` is -1. `(long)-(unsigned char)200` is -200.
   `&&` and `||` yield `int`.
-- A pointer difference counts elements. `(int *)10 - (int *)4` is 3.
-  `(char *)10 - (char *)4` is 6.
+- A pointer difference counts elements, and the count is signed.
+  `(int *)10 - (int *)4` is 3. `(char *)10 - (char *)4` is 6.
+  `(int *)0 - (int *)10` is -5. `(char *)4 - (char *)10` is -6.
+  `(long *)34 - (long *)2` is 8. The folded subtraction is a signed
+  `int` before the element scale runs. An unsigned mask of the address
+  delta makes `(int *)0 - (int *)10` into 32763.
 - Default argument promotions do not narrow a `long`. `printf("%ld", 32768)`
   pushes four bytes. A prototype still converts: `unsigned int` keeps the
   low 16 bits of 98304, which are 32768.
@@ -60,4 +64,11 @@ agree on these constants.
 `test/suites/sccz80/constpush.c` runs for sccz80 and for 80cc. It checks the
 values above, the 32-bit push of a decimal long, the unsigned-int cast, a
 prototype conversion, a fastcall long, mixed `/` and `%`, a `char` promotion,
-and a signed right shift whose count is unsigned.
+and a signed right shift whose count is unsigned. It also checks a
+negative constant pointer difference.
+
+A pointer difference that is not folded is a signed element count.
+`p - (p + 5)` for an `int *` is -5. The scale is a signed division.
+
+A `char` variable promotes before unary `-` and unary `~`.
+An `int` widens before a `long` constant is added. `1 + 40000L` is 40001.

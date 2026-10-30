@@ -320,8 +320,11 @@ static int fold_integer_exact(LVALUE *left, LVALUE *right,
         else if (oper == zgt) *result = unsigned_op ? (l > r) : (sl > sr);
         else if (oper == zge) *result = unsigned_op ? (l >= r) : (sl >= sr);
         else return 0;
-        /* A comparison result is an int. A pointer sum keeps its type. */
-        if (operator_is_comparison(oper))
+        /* A comparison result is an int. A pointer difference is a signed
+           element count. A pointer sum keeps its type. Masking a difference
+           to the pointer width loses the sign before scale_ptr_diff divides.
+           (int *)0 - (int *)10 is -5, not 32763. */
+        if (operator_is_comparison(oper) || oper == zsub)
             set_folded_integer_type(left, 16, 0);
         return 1;
     }
@@ -375,9 +378,14 @@ static int fold_integer_exact(LVALUE *left, LVALUE *right,
 }
 
 /* A constant pointer difference is reloaded from the folded value.
-   zdiv_const only emits the scale, so divide the value here. */
+   zdiv_const only emits the scale, so divide the value here.
+   A runtime difference is a signed element count. Pointer types are
+   unsigned, and an unsigned shift turns `p - (p + 5)` into 32763.
+   The register width stays. Only the divide sees a signed type. */
 static void scale_ptr_diff(LVALUE *lval, int scale)
 {
+    Type *saved;
+
     if (scale <= 1)
         return;
     if (lval->is_const) {
@@ -386,7 +394,14 @@ static void scale_ptr_diff(LVALUE *lval, int scale)
         lval->const_val /= scale;
         return;
     }
+    saved = lval->ltype;
+    if (lval->val_type == KIND_CPTR || lval->val_type == KIND_LONG
+        || lval->val_type == KIND_ACCUM32)
+        lval->ltype = type_long;
+    else
+        lval->ltype = type_int;
     zdiv_const(lval, scale);
+    lval->ltype = saved;
 }
 
 static void set_exact_integer_result(LVALUE *left, uint64_t value)
@@ -521,9 +536,19 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 lval->val_type = KIND_LONG;  
                 lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             } else if ( lval2->val_type == KIND_CPTR ) {
-                vlongconst_tostack(lval->const_val); 
-                lval->val_type = KIND_LONG;  
-                lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;  
+                /* A far pointer is 24 bits. A load clears D. Mask the
+                   constant to that width, or `0x01020304 == 0x01020304`
+                   compares a 32-bit value with a 24-bit value and folds
+                   to 0. Both-constant folding keeps the CPTR type so
+                   integer_bits masks both sides. */
+                uint32_t bits = lval->int_const_valid
+                    ? (uint32_t)lval->int_const_val & 0xffffffu
+                    : (uint32_t)lval->const_val & 0xffffffu;
+                vlongconst_tostack(bits);
+                if (!lval2->is_const) {
+                    lval->val_type = KIND_LONG;
+                    lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
+                }
             } else {
                 const2(lval->const_val);
             }
@@ -596,9 +621,15 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;    
                 load_constant(lval2);
             } else if (lval->val_type == KIND_CPTR  || lval2->val_type == KIND_CPTR ) {
+                if (lval2->val_type == KIND_CPTR) {
+                    if (lval2->int_const_valid)
+                        lval2->int_const_val &= 0xffffffULL;
+                    else
+                        lval2->const_val = (uint32_t)lval2->const_val & 0xffffffu;
+                }
                 lval2->val_type = KIND_LONG;
-                lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;    
-                load_constant(lval2); 
+                lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;
+                load_constant(lval2);
             } else if ( kind_is_fixed(lval->val_type)) {
                 lval2->val_type = lval->val_type;
                 lval2->ltype = lval->ltype;
@@ -832,7 +863,8 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
         if (lval->ptr_type != KIND_NONE ) {
             // LHS is a constant pointer, primary is loaded with RHS, need to scale it
-            scale(lval->ptr_type, NULL);
+            scale(lval->ptr_type, lval->ptr_type == KIND_STRUCT && lval->ltype && lval->ltype->ptr
+                                  ? lval->ltype->ptr->tag : NULL);
         } else if (lval2->ptr_type != KIND_NONE ) {
             int ival = lval->const_val;
             /* are adding lval to pointer, adjust size */
@@ -995,6 +1027,27 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 }
                 clearstage(before1, 0);  // Clear back to just after the load of LHS
                 Zsp = savesp1;
+                /* Widen to the constant's type before adding. `1 + 40000L`
+                   is 40001. A 16-bit add sign-extends to -25535. A pointer
+                   keeps its own width, and a real int constant stays in HL. */
+                if (lval->ptr_type == KIND_NONE && lval->ltype && lval2->ltype) {
+                    if (lval2->val_type == KIND_LONGLONG
+                        && lval->val_type != KIND_LONGLONG) {
+                        zconvert_to_llong(lval->ltype->isunsigned, lval->val_type,
+                                          lval->ltype->isunsigned);
+                        lval->ltype = (lval->ltype->isunsigned || lval2->ltype->isunsigned)
+                            ? type_ulonglong : type_longlong;
+                        lval->val_type = KIND_LONGLONG;
+                    } else if (lval2->val_type == KIND_LONG
+                               && lval->val_type != KIND_LONG
+                               && lval->val_type != KIND_CPTR) {
+                        zconvert_to_long(lval2->ltype->isunsigned, lval->val_type,
+                                         lval->ltype->isunsigned);
+                        lval->ltype = (lval->ltype->isunsigned || lval2->ltype->isunsigned)
+                            ? type_ulong : type_long;
+                        lval->val_type = KIND_LONG;
+                    }
+                }
                 zadd_const(lval, val);
             }
         } else {
@@ -1077,7 +1130,11 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else if (lval->ptr_type == KIND_DOUBLE && lval2->ptr_type == KIND_DOUBLE) {
             scale_ptr_diff(lval,c_fp_size); /* div by 6 */
         } else if (lval->ptr_type == KIND_STRUCT && lval2->ptr_type == KIND_STRUCT) {
-            scale_ptr_diff(lval, lval->ltype->ptr->tag->size);
+            /* A folded difference retags the left side as int. The right
+               side still carries the struct, so the size is still there. */
+            Type *st = (lval->ltype && lval->ltype->ptr) ? lval->ltype : lval2->ltype;
+            int sz = (st && st->ptr && st->ptr->tag) ? st->ptr->tag->size : 1;
+            scale_ptr_diff(lval, sz);
         } else if (lval->ptr_type == KIND_CHAR && lval->ptr_type == KIND_CHAR ) {
         } else if (lval->ptr_type && lval2->ptr_type && lval->ptr_type != lval2->ptr_type ) {
             UT_string  *str;

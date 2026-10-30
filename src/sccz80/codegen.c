@@ -2411,8 +2411,8 @@ void zadd_const(LVALUE *lval, int64_t value64)
             break;
         dec(lval);
     case -1:
-      if ( c_speed_optimisation & OPT_SUB32 ) {
-            if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
+            if ( c_speed_optimisation & OPT_SUB32 ) {
                 // 6 bytes, 27T (best), 28T (worst)
                 ol("ld\ta,h");    // 1, 4
                 ol("or\tl");      // 1, 4
@@ -2425,8 +2425,10 @@ void zadd_const(LVALUE *lval, int64_t value64)
                 ol("dec\tde");    // 1, 6
                 return;
             }
+            /* A 16-bit dec drops the borrow. -1 + 1L would stay -65536. */
+            break;
         }
-        dec(lval); // (long) = 3 bytes = (17 + 4 + 4 + 6 + 5 + 6 + 10) = 53T (worst), 38T best
+        dec(lval);
         return;
     case 0:
         return;
@@ -2439,8 +2441,8 @@ void zadd_const(LVALUE *lval, int64_t value64)
             break;
         inc(lval); // (long) = 66T best (6 bytes) vs 51T (10 bytes)
     case 1:
-        if ( c_speed_optimisation & OPT_ADD32 ) {
-            if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
+            if ( c_speed_optimisation & OPT_ADD32 ) {
                 // 6 bytes, 27T (best), 28T (worst)
                 ol("inc\thl");    // 1, 6
                 ol("ld\ta,h");    // 1, 4
@@ -2453,8 +2455,10 @@ void zadd_const(LVALUE *lval, int64_t value64)
                 ol("inc\tde");    // 1, 6
                 return;
             }
+            /* A 16-bit inc drops the carry. 65535u + 1L would become 0. */
+            break;
         }
-        inc(lval);  // (int) =1, 6T, (ling) = 3 + (17 + 4 + 5 + 4 + 5 + 6 + 10) = 51T worst case  (17 + 4 + 11 = 33T = best)
+        inc(lval);  // (int) =1, 6T
         return;
     }
 

@@ -21,10 +21,11 @@ TARGET_KC160 = test_kc160_bitfields.bin test_kc160_rshift.bin test_kc160_lshift.
 
 CFILES = $(wildcard *.c)
 # constpush.c is the #321 fold suite. sccz80 and 80cc run it.
-# sdcc rejects the two-argument __z88dk_fastcall. multi is not this suite.
-# switchinit.c runs under every compiler.
+# conv.c is the same compilers: char promotion, far compare, pointer
+# difference, and the long-constant add. sdcc rejects __far here, and
+# multi is not this suite. switchinit.c runs under every compiler.
 ifeq ($(filter $(COMPILER),sccz80 80cc),)
-CFILES := $(filter-out constpush.c,$(CFILES))
+CFILES := $(filter-out constpush.c conv.c,$(CFILES))
 endif
 TARGET_Z80 := $(foreach test,$(CFILES:.c=),test_$(test).bin)
 

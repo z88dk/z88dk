@@ -935,6 +935,9 @@ Node *ast_fold_constants(Node *node)
                                          : (int64_t)(int32_t)(v & 0xffffffff);
                     }
                 }
+            } else if (dst == KIND_CPTR) {
+                /* Far pointer value is 24 bits. D is cleared on a load. */
+                narrowed = (int64_t)((uint32_t)v & 0xffffffu);
             }
             return fold_int_literal(node, node->type, (uint64_t)narrowed);
         }
