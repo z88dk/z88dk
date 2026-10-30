@@ -297,7 +297,6 @@ typecheck:
 
         if (cmatch('L')) {
             lval->val_type = KIND_LONG;
-            lval->explicit_long = 1;
             if (cmatch('L'))
                 lval->val_type = KIND_LONGLONG;
             break;
@@ -330,6 +329,10 @@ typecheck:
         }
         if (!loop) break;
     }
+    /* An unsuffixed decimal outside signed int is long. `32768U` still
+       fits in unsigned int, and `0x8000` is unsigned int. */
+    if (base == 10 && !isunsigned && lval->val_type == KIND_INT && k > 32767)
+        lval->val_type = KIND_LONG;
     if ( lval->val_type == KIND_LONGLONG ) {
         if ( isunsigned )
             lval->ltype = type_ulonglong;
@@ -346,6 +349,7 @@ typecheck:
         else
             lval->ltype = type_int;
     }
+    NormaliseIntegerConstant(lval);
     return (1);
 }
 

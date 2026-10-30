@@ -97,7 +97,11 @@
 	ex	de,hl
 	and	a
 	sbc	hl,de
-	srl	h
+	bit	7,h
+	jr	z,i_2
+	inc	hl
+.i_2
+	sra	h
 	rr	l
 	ret
 
@@ -164,7 +168,11 @@
 	ex	de,hl
 	and	a
 	sbc	hl,de
-	srl	h
+	bit	7,h
+	jr	z,i_3
+	inc	hl
+.i_3
+	sra	h
 	rr	l
 	ret
 
@@ -231,9 +239,15 @@
 	ex	de,hl
 	and	a
 	sbc	hl,de
-	srl	h
+	bit	7,h
+	jr	z,i_4
+	inc	hl
+	inc	hl
+	inc	hl
+.i_4
+	sra	h
 	rr	l
-	srl	h
+	sra	h
 	rr	l
 	ret
 
@@ -303,7 +317,11 @@
 	ex	de,hl
 	and	a
 	sbc	hl,de
-	srl	h
+	bit	7,h
+	jr	z,i_5
+	inc	hl
+.i_5
+	sra	h
 	rr	l
 	ret
 

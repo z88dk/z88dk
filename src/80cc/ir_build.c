@@ -371,6 +371,22 @@ static int is_register_int_kind(Kind k)
         || k == KIND_ACCUM16 || k == KIND_ACCUM32;
 }
 
+/* Integer promotions. A char is an int before unary - and unary ~.
+   `-(unsigned char)200` is -200. The byte negate of 200 is 56. */
+static int promote_narrow_unary(Builder *b, int v, const Node *operand)
+{
+    if (v < 0 || b->f->vregs[v].width != 1)
+        return v;
+    if (!operand || !operand->type || operand->type->kind != KIND_CHAR)
+        return v;
+    int uns = operand->type->isunsigned;
+    int wtmp = new_temp_kind(b, KIND_INT);
+    Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+    cv->dst = wtmp;
+    cv->src[0] = v;
+    return wtmp;
+}
+
 /* Float kinds the IR can currently lower (register tier only):
    KIND_FLOAT16 (always 2-byte _Float16, l_f16_* helpers, mode-
    independent) and KIND_DOUBLE *when* c_fp_size==4 (IEEE-32 / MBF-single
@@ -769,6 +785,9 @@ static int64_t scale_literal_for_kind(const Node *lit, Kind k)
     double v = (double)lit->zval;
     if (k == KIND_ACCUM16) return (int64_t)(v * 256.0   + (v >= 0 ? 0.5 : -0.5));
     if (k == KIND_ACCUM32) return (int64_t)(v * 65536.0 + (v >= 0 ? 0.5 : -0.5));
+    /* A far pointer is 24 bits. A load clears D. The constant matches. */
+    if (k == KIND_CPTR)
+        return (int64_t)((uint32_t)(int64_t)v & 0xffffffu);
     return (int64_t)v;
 }
 
@@ -4241,6 +4260,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         /* long long: no width-8 IR_NEG lowering — negate via __i64_acc. */
         if ((int)b->f->vregs[v].kind == KIND_LONGLONG)
             return emit_acc_int_unary(b, v, "l_i64_neg");
+        v = promote_narrow_unary(b, v, n->operand);
         int width = b->f->vregs[v].width;
         int dst = get_dest_typed(b, hint, width, b->f->vregs[v].kind);
         ir_emit_unop(cur_bb(b), IR_NEG, dst, v);
@@ -4254,6 +4274,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         /* long long: no width-8 IR_NOT lowering — complement via __i64_acc. */
         if ((int)b->f->vregs[v].kind == KIND_LONGLONG)
             return emit_acc_int_unary(b, v, "l_i64_com");
+        v = promote_narrow_unary(b, v, n->operand);
         int width = b->f->vregs[v].width;
         int dst = get_dest_typed(b, hint, width, b->f->vregs[v].kind);
         ir_emit_unop(cur_bb(b), IR_NOT, dst, v);
@@ -7671,10 +7692,9 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
     if (shr_arith_bit) bop->imm |= shr_arith_bit;   /* variable-count signed >> */
     b->f->vregs[dst].width = (int16_t)dst_w;
     /* Pointer DIFFERENCE: `p - q` yields the element COUNT, not the
-       byte difference — divide the IR_SUB result by sizeof(*p) when
-       both operands are pointer-typed (KIND_PTR/CPTR/ARRAY). A
-       power-of-2 element is a logical shift right (`srl;rr` ×log2,
-       signedness per sccz80), else an l_div_u. */
+       byte difference. The count is signed. `p - (p + 5)` for an
+       int * is -5. A power-of-two element is an arithmetic shift.
+       Any other element size is a signed division. */
     if (n->ast_type == OP_SUB && lhs && rhs && lhs->type && rhs->type
         && (lhs->type->kind == KIND_PTR || lhs->type->kind == KIND_CPTR
             || lhs->type->kind == KIND_ARRAY)
@@ -7688,12 +7708,12 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
             if (e == 1) {                       /* power of two → shift */
                 Op *sh = ir_op_emit(cur_bb(b), IR_SHR);
                 sh->dst = dst; sh->src[0] = dst; sh->src[1] = -1;
-                sh->imm = log2;
-            } else if (dst_w == 2) {            /* odd size → l_div_u */
+                sh->imm = (int64_t)log2 | IR_SHR_ARITH;
+            } else if (dst_w == 2) {            /* odd size → l_div */
                 int dv = new_temp_kind(b, KIND_INT);
                 int kimm = new_temp_kind(b, KIND_INT);
                 ir_emit_ld_imm(cur_bb(b), kimm, elem);
-                /* l_div_u computes DE/HL → HL with HL=divisor (elem),
+                /* l_div computes DE/HL → HL with HL=divisor (elem),
                    DE=dividend (byte-diff); HCALL puts args[0] in HL,
                    args[1] in DE. */
                 int *dargs = calloc(2, sizeof(int));
@@ -7701,7 +7721,7 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
                 Op *dop = ir_op_emit(cur_bb(b), IR_HCALL);
                 dop->dst = dv;
                 HelperInfo *dhi = calloc(1, sizeof(HelperInfo));
-                dhi->name = "l_div_u"; dhi->args = dargs;
+                dhi->name = "l_div"; dhi->args = dargs;
                 dhi->n_args = 2; dhi->ret_vreg = dv;
                 dop->hcall = dhi;
                 return dv;

@@ -20,10 +20,12 @@ TARGET_KC160 = test_kc160_bitfields.bin test_kc160_rshift.bin test_kc160_lshift.
 
 
 CFILES = $(wildcard *.c)
-# constpush.c checks sccz80 issue #321: a fitted folded long is pushed
-# as 16 bits. 80cc keeps 65536 - 32768 as the 32-bit value 0x00018000.
-ifneq ($(COMPILER),sccz80)
-CFILES := $(filter-out constpush.c,$(CFILES))
+# constpush.c is the #321 fold suite. sccz80 and 80cc run it.
+# conv.c is the same compilers: char promotion, far compare, pointer
+# difference, and the long-constant add. sdcc rejects __far here, and
+# multi is not this suite. switchinit.c runs under every compiler.
+ifeq ($(filter $(COMPILER),sccz80 80cc),)
+CFILES := $(filter-out constpush.c conv.c,$(CFILES))
 endif
 TARGET_Z80 := $(foreach test,$(CFILES:.c=),test_$(test).bin)
 

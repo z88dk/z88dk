@@ -239,6 +239,25 @@ static Type *promote_types(Type *t1, Type *t2)
     return type_int;
 }
 
+/* Integer promotions. unsigned char fits in signed int, so a char
+   promotes to signed int. short is the same width as int. */
+static Type *integer_promote_type(const Type *t)
+{
+    if (!t || !kind_is_integer(t->kind))
+        return t ? (Type *)t : type_int;
+    if (t->kind == KIND_CHAR)
+        return type_int;
+    if ((t->kind == KIND_SHORT || t->kind == KIND_INT) && t->isunsigned)
+        return type_uint;
+    if (t->kind == KIND_SHORT || t->kind == KIND_INT)
+        return type_int;
+    if (t->kind == KIND_LONG)
+        return t->isunsigned ? type_ulong : type_long;
+    if (t->kind == KIND_LONGLONG)
+        return t->isunsigned ? type_ulonglong : type_longlong;
+    return type_int;
+}
+
 void ast_normalize_types(Node *node)
 {
     if (!node) return;
@@ -325,9 +344,19 @@ void ast_normalize_types(Node *node)
         if (!node->type) node->type = type_int;
         break;
     case OP_PRE_INC: case OP_POST_INC: case OP_PRE_DEC: case OP_POST_DEC:
-    case OP_COMP: case OP_LNEG: case OP_NEG:
         ast_normalize_types(node->operand);
         if (!node->type) node->type = node->operand->type;
+        break;
+    case OP_LNEG:
+        ast_normalize_types(node->operand);
+        if (!node->type) node->type = type_int;
+        break;
+    case OP_COMP: case OP_NEG:
+        /* ~ and unary minus promote first. `(long)~(unsigned char)0`
+           is -1. `-(unsigned char)200` is -200. */
+        ast_normalize_types(node->operand);
+        if (!node->type)
+            node->type = integer_promote_type(node->operand ? node->operand->type : NULL);
         break;
     case OP_DEREF:
         /* Preserve the storage type the parser stamped on the load
@@ -447,6 +476,35 @@ static int try_fold_binop(int kind, int64_t l, int64_t r, int64_t *out)
     return 0;
 }
 
+/* `l` and `r` are already converted to the common type. Unsigned `/` and
+   `%` are not the low bits of a signed division (`-1 / 2u` is 32767), so an
+   unsigned common type operates on the uint64 values. */
+static int fold_converted_binop(int kind, int64_t l, int64_t r, int is_unsigned,
+                                int64_t *out)
+{
+    if (!is_unsigned)
+        return try_fold_binop(kind, l, r, out);
+
+    uint64_t ul = (uint64_t)l;
+    uint64_t ur = (uint64_t)r;
+    uint64_t uq;
+    if ((kind == OP_DIV || kind == OP_MOD) && ur == 0)
+        return 0;
+    switch (kind) {
+    case OP_ADD:  uq = ul + ur; break;
+    case OP_SUB:  uq = ul - ur; break;
+    case OP_MULT: uq = ul * ur; break;
+    case OP_DIV:  uq = ul / ur; break;
+    case OP_MOD:  uq = ul % ur; break;
+    case OP_AND:  uq = ul & ur; break;
+    case OP_OR:   uq = ul | ur; break;
+    case OP_XOR:  uq = ul ^ ur; break;
+    default: return 0;
+    }
+    *out = (int64_t)uq;
+    return 1;
+}
+
 /* Decimal counterpart for floating / fixed-point literal-pair fold.
    Only the arithmetic and comparison operators apply — modular and
    bitwise ops aren't defined for non-integer operands and bail.
@@ -482,10 +540,41 @@ static int64_t fold_sext(int64_t v, int width)
     return (int64_t)((uint64_t)v << sh) >> sh;
 }
 
+static int fold_type_width(const Type *t)
+{
+    Kind k = t ? t->kind : KIND_INT;
+    if (k == KIND_CHAR) return 8;
+    if (k == KIND_LONG || k == KIND_PTR || k == KIND_CPTR) return 32;
+    if (k == KIND_LONGLONG) return 64;
+    return 16;
+}
+
+static int64_t fold_low_bits(int64_t raw, int width)
+{
+    if (width >= 64) return raw;
+    return (int64_t)((uint64_t)raw & (((uint64_t)1 << width) - 1));
+}
+
+/* Signed operand: sign-extend. Unsigned operand: low bits.
+   `1L + (3 - 5)` is -1. `65536 - (16384 * 2)` is 98304. */
+static int64_t fold_signed_bits(const Node *n)
+{
+    int64_t raw;
+    int width;
+
+    if (!n) return 0;
+    raw = node_int_value(n);
+    width = fold_type_width(n->type);
+    if (n->type && n->type->isunsigned)
+        return fold_low_bits(raw, width);
+    return fold_sext(raw, width);
+}
+
 static int64_t fold_integer_result(int64_t value, const Type *type)
 {
     int width;
     int is_unsigned;
+    uint64_t mask;
 
     if (!type || !kind_is_integer(type->kind)) return value;
     if (type->kind == KIND_CHAR) width = 8;
@@ -493,9 +582,36 @@ static int64_t fold_integer_result(int64_t value, const Type *type)
     else if (type->kind == KIND_LONG) width = 32;
     else width = 64;
     is_unsigned = type->isunsigned;
-    if (width == 64) return value;
+    if (width >= 64) return value;
+    mask = ((uint64_t)1 << width) - 1;
     if (is_unsigned)
-        return (int64_t)((uint64_t)value & (((uint64_t)1 << width) - 1));
+        return (int64_t)((uint64_t)value & mask);
+    /* Two's complement wrap, stored sign-extended. `16384 * 2` is
+       -32768, so a later widen sign-extends. */
+    return fold_sext(value, width);
+}
+
+/* A shift's result is the promoted left operand. The count is not part of
+   the usual arithmetic conversions, so `>> 1u` of a signed value stays
+   signed. Parse-time fold runs before node->type is stamped. */
+static Type *fold_shift_type(const Type *stamped, const Type *left)
+{
+    if (stamped && kind_is_integer(stamped->kind) && stamped->kind != KIND_CHAR)
+        return (Type *)stamped;
+    if (left && left->kind == KIND_CHAR)
+        return type_int;
+    if (left && kind_is_integer(left->kind))
+        return (Type *)left;
+    return type_int;
+}
+
+/* `value` is the operand's own-width mathematical value. Reinterpret it in
+   the common type: unsigned keeps the low bits (`-1` to unsigned int is
+   65535), signed sign-extends. */
+static int64_t fold_as_common(int64_t value, int width, int is_unsigned)
+{
+    if (is_unsigned)
+        return fold_low_bits(value, width);
     return fold_sext(value, width);
 }
 
@@ -599,7 +715,8 @@ static int eval_decimal_exact(Node *node, long double *out)
         if (kind_is_integer(node->type->kind)) {
             *out = node->type->isunsigned
                  ? (long double)node_int_bits(node)
-                 : (long double)node_int_value(node);
+                 : (long double)fold_sext(node_int_value(node),
+                                          fold_type_width(node->type));
             return 1;
         }
         if (kind_is_decimal(node->type->kind)) {
@@ -695,6 +812,16 @@ static int integer_literal_fits_zdouble(const Node *node)
 static int literal_truthy(Node *n);
 static int cse_type_bits(const Type *t);
 
+static Node *fold_int_literal(Node *at, Type *type, uint64_t value)
+{
+    Node *n = ast_literal_int(type ? type : type_int, value);
+    if (at) {
+        n->filename = at->filename;
+        n->line = at->line;
+    }
+    return n;
+}
+
 static void fold_visit(const AstSlot *slot, void *ctx)
 {
     (void)ctx;
@@ -729,10 +856,19 @@ Node *ast_fold_constants(Node *node)
                     return ast_literal(type_int, (zdouble)(fv == 0));
                 return node;
             }
-            int64_t v = node_int_value(node->operand), r;
+            int64_t v = (node->ast_type == OP_LNEG)
+                      ? node_int_value(node->operand)
+                      : fold_signed_bits(node->operand);
+            int64_t r;
             if (try_fold_unop(node->ast_type, v, &r)) {
-                Type *t = node->type ? node->type : node->operand->type;
-                return ast_literal_int(t ? t : type_int, (uint64_t)r);
+                Type *t;
+                if (node->ast_type == OP_LNEG)
+                    return fold_int_literal(node, type_int, (uint64_t)r);
+                /* constexpr folds before ast_normalize_types, so promote
+                   here as well as in the normaliser. */
+                t = integer_promote_type(node->operand->type);
+                r = fold_integer_result(r, t);
+                return fold_int_literal(node, t, (uint64_t)r);
             }
         }
         return node;
@@ -764,7 +900,6 @@ Node *ast_fold_constants(Node *node)
             int64_t v = node_int_value(node->operand);
             int64_t narrowed = v;
             Kind dst = node->type->kind;
-            Kind src = node->operand->type->kind;
             /* Reduce the literal to the TARGET type's representable range:
                mask to its width and reinterpret per its signedness. Not
                gated on dst<src — a same-width signedness change is also a
@@ -775,7 +910,6 @@ Node *ast_fold_constants(Node *node)
                leaves `(unsigned char)-7` as -7 and `(signed char)200` as
                200. In-range values mask to themselves (no-op). KIND src
                ordering: CHAR<SHORT<INT<LONG<LONGLONG. */
-            (void)src;
             if (kind_is_integer(dst)) {
                 int is_un = node->type->isunsigned;
                 int64_t lo = 0, hi = 0;
@@ -801,8 +935,11 @@ Node *ast_fold_constants(Node *node)
                                          : (int64_t)(int32_t)(v & 0xffffffff);
                     }
                 }
+            } else if (dst == KIND_CPTR) {
+                /* Far pointer value is 24 bits. D is cleared on a load. */
+                narrowed = (int64_t)((uint32_t)v & 0xffffffu);
             }
-            return ast_literal_int(node->type, (uint64_t)narrowed);
+            return fold_int_literal(node, node->type, (uint64_t)narrowed);
         }
         /* A narrowing cast of a value ternary moves into the arms, so each
            arm computes only the bits the cast keeps and the join holds the
@@ -896,7 +1033,7 @@ Node *ast_fold_constants(Node *node)
                     node->filename, node->line,
                     "%s shifting by more than size of object, changed to zero",
                     dir);
-                return ast_literal_int(L->type, 0);
+                return fold_int_literal(node, L->type, 0);
             }
         }
         if (L && R && L->ast_type == AST_LITERAL && R->ast_type == AST_LITERAL) {
@@ -933,9 +1070,7 @@ Node *ast_fold_constants(Node *node)
                     return ast_literal(t ? t : type_int, dv);
                 }
             } else {
-                int64_t l = node_int_value(L);
-                int64_t r = node_int_value(R);
-                int64_t v;
+                int64_t l, r, v;
                 int fold_op = node->ast_type;
                 /* `>>` is parsed OP_SSHR unconditionally; for an unsigned
                    LHS it shifts LOGICALLY (and the runtime lowers both to
@@ -948,13 +1083,75 @@ Node *ast_fold_constants(Node *node)
                    below mis-handles mixed signedness (e.g. int vs unsigned
                    int at the 0x8000 boundary). Result type is always int. */
                 if (is_compare_op(fold_op)) {
+                    l = node_int_value(L);
+                    r = node_int_value(R);
                     if (try_fold_compare(fold_op, l, r, L->type, R->type, &v))
-                        return ast_literal_int(type_int, (uint64_t)v);
-                } else if (try_fold_binop(fold_op, l, r, &v)) {
-                    Type *t = node->type ? node->type
-                                         : fold_common_integer_type(L->type, R->type);
-                    v = fold_integer_result(v, t);
-                    return ast_literal_int(t ? t : type_int, (uint64_t)v);
+                        return fold_int_literal(node, type_int, (uint64_t)v);
+                } else if (fold_op == OP_ANDAND || fold_op == OP_OROR) {
+                    /* Each operand is tested against zero. The result is int. */
+                    l = fold_signed_bits(L);
+                    r = fold_signed_bits(R);
+                    if (try_fold_binop(fold_op, l, r, &v))
+                        return fold_int_literal(node, type_int, (uint64_t)v);
+                } else if (fold_op == OP_SSHR || fold_op == OP_USHR
+                        || fold_op == OP_SSHL || fold_op == OP_USHL) {
+                    /* Shifts use the promoted left operand only. An unsigned
+                       count must not turn `>>` into a logical shift. */
+                    if (fold_op == OP_SSHR)
+                        l = fold_signed_bits(L), r = node_int_value(R);
+                    else if (fold_op == OP_USHR)
+                        l = fold_low_bits(node_int_value(L),
+                                          fold_type_width(L->type)),
+                        r = node_int_value(R);
+                    else
+                        l = fold_signed_bits(L), r = fold_signed_bits(R);
+                    if (try_fold_binop(fold_op, l, r, &v)) {
+                        Type *t = fold_shift_type(node->type, L->type);
+                        v = fold_integer_result(v, t);
+                        return fold_int_literal(node, t, (uint64_t)v);
+                    }
+                } else if ((L->type && !kind_is_integer(L->type->kind))
+                        || (R->type && !kind_is_integer(R->type->kind))) {
+                    /* Pointer arithmetic keeps the pointer type. Folding a
+                       far address as int drops the bank. */
+                    l = fold_signed_bits(L);
+                    r = fold_signed_bits(R);
+                    if (try_fold_binop(fold_op, l, r, &v)) {
+                        Type *t = node->type ? node->type
+                                 : fold_common_integer_type(L->type, R->type);
+                        /* ptr - ptr is an element count. The IR scales a
+                           live subtraction; a folded literal has to do it. */
+                        if (fold_op == OP_SUB
+                            && L->type && R->type
+                            && !kind_is_integer(L->type->kind)
+                            && !kind_is_integer(R->type->kind)) {
+                            int elem = (L->type->ptr && L->type->ptr->size > 0)
+                                     ? L->type->ptr->size : 1;
+                            if (elem > 1)
+                                v /= elem;
+                            t = type_int;
+                        }
+                        v = fold_integer_result(v, t);
+                        return fold_int_literal(node, t ? t : type_int,
+                                                 (uint64_t)v);
+                    }
+                } else {
+                    /* Arithmetic and bitwise ops run in the common type.
+                       Read each operand at its own width, then convert.
+                       `(-1) / 2u` is 32767. `(16384 * 2) / 2u` is 16384. */
+                    Type *t = (node->type && kind_is_integer(node->type->kind)
+                               && node->type->kind != KIND_CHAR)
+                              ? node->type
+                              : fold_common_integer_type(L->type, R->type);
+                    int width, uns;
+                    fold_promoted_int_type(t, &width, &uns);
+                    l = fold_as_common(fold_signed_bits(L), width, uns);
+                    r = fold_as_common(fold_signed_bits(R), width, uns);
+                    if (fold_converted_binop(fold_op, l, r, uns, &v)) {
+                        v = fold_integer_result(v, t);
+                        return fold_int_literal(node, t ? t : type_int,
+                                                 (uint64_t)v);
+                    }
                 }
             }
         }
@@ -5657,7 +5854,7 @@ static Node *coerce_literal_to_sym(Node *lit, SYMBOL *sym)
     if (!st) return lit;
     if (lit->type && lit->type->kind == st->kind
         && !!lit->type->isunsigned == !!st->isunsigned)
-        return lit;                              /* already the right type */
+        return lit;
     Node *folded = ast_fold_constants(ast_cast(st, lit));
     if (folded && folded->ast_type == AST_LITERAL
         && folded->type && folded->type->kind == st->kind)

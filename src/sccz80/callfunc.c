@@ -19,7 +19,7 @@
 static int SetWatch(char* sym, int* isscanf);
 static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
 static Kind ForceArgs(Type *dest, Type *src, int isconst);
-static int PassFittedConstantAsInt(char *before, char *start, zdouble val, Type **type);
+
 
 
 /* msys2 tmpfile() is broken:
@@ -247,8 +247,6 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     while ( tmpfiles[argnumber+1] ) {
         Type *type;        
         char *before, *start;
-        int untyped = 1;
-        int explicit_long = 0;
 
         argnumber++;
         rewind(tmpfiles[argnumber]);
@@ -265,7 +263,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         }
         /* ordinary call */
         setstage(&before, &start);
-        expr = expression_exact(&vconst, &val, NULL, NULL, &type, &explicit_long);
+        expr = expression_exact(&vconst, &val, NULL, NULL, &type);
         if (expr == KIND_CARRY) {
             gen_conv_carry2int();
             expr = KIND_INT;
@@ -281,8 +279,6 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             }
             prototype = array_get_byindex(functype->parameters, proto_argnumber);
 
-            if ( prototype->kind != KIND_ELLIPSES )
-                untyped = 0;
             if ( prototype->kind != KIND_ELLIPSES && type->kind != prototype->kind ) {
                 if ( vconst && (kind_is_decimal(prototype->kind) || kind_is_integer(prototype->kind))) {                 
                      LVALUE lval = {0};
@@ -315,15 +311,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__z88dk_callee");
             // }
         }
-        /* Issue #321. An ellipsis or old-style slot has no parameter type,
-           so a folded long is pushed whole. A result that fits in 16 bits
-           is an int. An L suffix or a cast to long stays 32 bits. A
-           fastcall value stays in the registers, wide. */
-        if ( untyped && vconst && explicit_long == 0 && expr == KIND_LONG &&
-             !(tmpfiles[argnumber+1] == NULL &&
-               ((functype->flags & FASTCALL) || (builtin_flags & FASTCALL))) ) {
-            expr = PassFittedConstantAsInt(before, start, val, &type);
-        }
+        /* A long argument stays a long. Default promotions do not narrow it. */
         //clearstage(before,start);
         if ( function_pointer_call == 0 && tmpfiles[argnumber+1] == NULL &&
             ( (functype->flags & FASTCALL) == FASTCALL || (builtin_flags & FASTCALL) == FASTCALL ) ) {
@@ -441,22 +429,6 @@ static int SetWatch(char* sym, int* type)
     if (strcmp(sym, "vsscanf") == 0)
         return 2;
     return 0;
-}
-
-/* Reload a folded long as a 16-bit int when its value fits.
-   Values above 32767 are unsigned so the low word keeps its bits. */
-static int PassFittedConstantAsInt(char *before, char *start, zdouble val, Type **type)
-{
-    LVALUE lval = {0};
-
-    if (val < -32768 || val > 65535)
-        return KIND_LONG;
-    clearstage(before, start);
-    lval.val_type = KIND_INT;
-    lval.const_val = val;
-    load_constant(&lval);
-    *type = val > 32767 ? type_uint : type_int;
-    return KIND_INT;
 }
 
 /*

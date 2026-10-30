@@ -26,7 +26,7 @@ static SYMBOL    *deref(LVALUE *lval, char isaddr);
 
 
 Kind expression_exact(int  *con, zdouble *val, uint64_t *ival,
-                      int *ival_valid, Type **type, int *explicit_long)
+                      int *ival_valid, Type **type)
 {
     LVALUE lval={0};
 
@@ -39,15 +39,13 @@ Kind expression_exact(int  *con, zdouble *val, uint64_t *ival,
         *ival = lval.int_const_val;
     if (ival_valid)
         *ival_valid = lval.int_const_valid;
-    if (explicit_long)
-        *explicit_long = lval.explicit_long;
     *type = lval.ltype;
     return lval.ltype ? lval.ltype->kind : KIND_NONE;
 }
 
 Kind expression(int *con, zdouble *val, Type **type)
 {
-    return expression_exact(con, val, NULL, NULL, type, NULL);
+    return expression_exact(con, val, NULL, NULL, type);
 }
 
 int heir1(LVALUE* lval)
@@ -515,6 +513,18 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
     return lval->symbol;
 }
 
+/* ~ and unary minus promote a char to signed int before the operation.
+   `(long)~(unsigned char)0` is -1. `-(unsigned char)200` is -200. */
+static void promote_unary_integer(LVALUE *lval)
+{
+    if (!lval || !lval->ltype || !kind_is_integer(lval->ltype->kind))
+        return;
+    if (lval->ltype->kind == KIND_CHAR) {
+        lval->val_type = KIND_INT;
+        lval->ltype = type_int;
+    }
+}
+
 int heira(LVALUE *lval)
 {
     int k, j;
@@ -562,10 +572,12 @@ int heira(LVALUE *lval)
             errorfmt("Unary ~ operator is not valid for floating point",1);
         if ( kind_is_fixed(lval->val_type) )
             errorfmt("Unary ~ operator is not valid for fixed point",1);
+        promote_unary_integer(lval);
         com(lval);
         lval->const_val = (int64_t)~(uint64_t)lval->const_val;
         if (lval->int_const_valid)
             lval->int_const_val = ~lval->int_const_val;
+        NormaliseIntegerConstant(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('!')) {
@@ -576,15 +588,18 @@ int heira(LVALUE *lval)
         lval->const_val = !lval->const_val;
         if (lval->int_const_valid)
             lval->int_const_val = lval->int_const_val ? 0 : 1;
+        NormaliseIntegerConstant(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('-')) {
         if (heira(lval))
             rvalue(lval);
+        promote_unary_integer(lval);
         neg(lval);
         lval->const_val = -lval->const_val;
         if (lval->int_const_valid)
             lval->int_const_val = (uint64_t)(0 - lval->int_const_val);
+        NormaliseIntegerConstant(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('*')) { /* unary * */

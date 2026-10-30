@@ -1,6 +1,5 @@
-/* Issue 2440, sccz80 only. Jumping to a case does not run an initializer.
-   Reaching the declaration still does. 80cc on this tree aborts in
-   defassign when that copy sits in the block the dispatcher skips. */
+/* Issue 2440. Jumping to a case does not run an initializer.
+   Reaching the declaration still does. */
 #include "test.h"
 
 static int jump_aggregate(void)

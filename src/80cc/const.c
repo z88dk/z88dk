@@ -153,10 +153,14 @@ int number(LVALUE *lval)
     if (value > UINT32_MAX || value < INT32_MIN) {
         lval->val_type = KIND_LONGLONG;
     }
-    /* Explicit-suffix override: `5L` keeps KIND_LONG even though
-       magnitude says CHAR. */
+    /* `5L` keeps KIND_LONG even though magnitude says CHAR. The tokeniser
+       also ranks an unsuffixed decimal outside signed int as long, so
+       `32768` is long. `32768U` and `0x8000` stay unsigned int. */
     if (tok_kind >= KIND_LONG && tok_kind > lval->val_type)
         lval->val_type = tok_kind;
+    if (tok_base == 10 && !isunsigned && lval->val_type == KIND_INT
+        && value > 32767)
+        lval->val_type = KIND_LONG;
     /* C integer-constant rule: an unsuffixed HEX/OCTAL/BINARY constant whose
        value exceeds the SIGNED range of its size class takes the corresponding
        UNSIGNED type (decimal stays signed and widens instead). Without this,
