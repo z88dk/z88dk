@@ -811,6 +811,13 @@ void debugger_next(uint8_t add_bp)
         {
             // It's a call, so step it over
             char req[64];
+            /* The compilers emit call banked_call and then a defq with the
+               target, and banked_call returns past the defq */
+            int banked_call = symbol_resolve("banked_call", NULL);
+            if (opcode == 0xcd && banked_call >= 0 &&
+                (bk.get_memory(pc + 1, MEM_TYPE_INST) | bk.get_memory(pc + 2, MEM_TYPE_INST) << 8) == banked_call) {
+                len += 4;
+            }
             sprintf(req, "i%d", len);
             schedule_write_packet(req);
             if (add_bp) {
