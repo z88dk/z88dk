@@ -4,8 +4,7 @@
 ; catch up with it however big it is), and the program unpacked at 0.  appmake puts the length of the packed
 ; program in the `ld bc` below.
 ;
-; While it works it shows a bar across the middle of the screen (the video RAM is behind I/O ports and BASIC's text
-; screen is in the way, so the screen is cleared in the 256x192 mode first): a quarter of the width when the unpacker
+; While it works it shows a row of stars across the middle of BASIC's text screen: a quarter of the width when the unpacker
 ; has been moved, half when the packed program has, three quarters as the unpacking starts, all of it when the program is unpacked.  The program clears it.
 
     SECTION BOOTSTRAP
@@ -31,7 +30,8 @@ bootstrap_start:
     ld      bc,unpack_len
     ldir
     ld      sp,__spc1000_bootstrap_reloc
-    call    screen_setup                    ; (the screen routines are in the unpacker, at its new address)
+    ld      a,8
+    call    bar                             ; a quarter (the routine is in the unpacker, at its new address)
     ld      hl,bootstrap_end                ; the packed program follows this code ...
     ld      bc,0                            ; ... its length (appmake's)
     defc    __spc1000_bootstrap_clen = ASMPC-2
@@ -62,40 +62,17 @@ unpack_start:
     call    bar                             ; all of it
     jp      __spc1000_allram_start
 
-; The 256x192 mono mode (white on black), the screen black, and the first quarter of the bar
-screen_setup:
-    ld      bc,$2000
-    ld      a,$8e
-    out     (c),a
-    ld      bc,0
-clear:
-    xor     a
-    out     (c),a
-    inc     bc
-    ld      a,b
-    cp      $18                             ; 6144 bytes
-    jr      nz,clear
-    ld      a,8
-; A bar of a bytes (8 pixels each) and eight lines, from the left of the screen's middle (row 11)
+; A bar of a stars, on the middle row of BASIC's text screen (the video RAM is behind I/O ports: the 32 character codes of row 8 are at 8 * 32): the screen is
+; left in the mode BASIC has it in, and the program clears it when it starts
 bar:
-    ld      e,a
-    ld      bc,$0b00
-    ld      d,8
-bar_line:
-    push    bc
-    ld      l,e
-bar_byte:
-    ld      a,$ff
+    ld      l,a
+    ld      bc,8 * 32
+    ld      a,'*'
+bar_star:
     out     (c),a
     inc     bc
     dec     l
-    jr      nz,bar_byte
-    pop     bc
-    ld      a,c
-    add     a,32
-    ld      c,a
-    dec     d
-    jr      nz,bar_line
+    jr      nz,bar_star
     ret
 
 ; -----------------------------------------------------------------------------
