@@ -49,6 +49,7 @@ loop:
     ld      a, (hl)
     call    nz, __v9938_wait_vdp
     call    l_tms9918_enable_interrupts
+    pop     bc
     pop     ix
     ret
 
