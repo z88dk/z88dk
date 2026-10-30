@@ -222,6 +222,9 @@ int mz2500_exec(char* target)
         /* a bank of more than 8 KB goes on into the next pages (a 16 KB one linked at $4000 fills windows 2 and 3) */
         bytes_read = fread(image + npages * PAGE_SIZE, 1, (MAX_BANKS - npages) * PAGE_SIZE + 1, fb);
         fclose(fb);
+        if (bytes_read == 0) {
+            continue;
+        }
         {
             int n = (bytes_read + PAGE_SIZE - 1) / PAGE_SIZE, k;
 
