@@ -22,6 +22,12 @@ target/msx/obj/msx/x/target/msx/psg/asm_arkos_msx_smc.o
 target/msx/obj/msx/x/target/msx/psg/asm_arkos_msx_rom.o
 sound/ay/obj/${TYPE}/**/*.o
 target/msx/obj/msx/x/target/msx/games/joystick.o
+target/msx/obj/msx/x/target/msx/input/INMouseMSX.o
+target/msx/obj/msx/x/target/msx/input/in_MouseMSX.o
+target/msx/obj/msx/x/target/msx/input/in_MouseMSX_callee.o
+target/msx/obj/msx/x/target/msx/input/in_MouseMSXInit.o
+target/msx/obj/msx/x/target/msx/input/in_MouseMSXSetPos.o
+target/msx/obj/msx/x/target/msx/input/in_MouseMSXSetPos_callee.o
 target/msx/obj/msx/x/target/msx/games/bit_open.o
 target/msx/obj/msx/x/target/msx/games/bit_open_di.o
 target/msx/obj/msx/x/target/msx/games/bit_close.o

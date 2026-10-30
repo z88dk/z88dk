@@ -3,6 +3,7 @@ MSX_GLOBS := \
 	"target/msx/far/*.asm" \
 	"target/msx/fcntl/msxdos1/*.asm" \
 	"target/msx/games/*.asm" \
+	"target/msx/input/*.asm" \
 	"target/msx/psg/*.asm" \
 	"target/msx/stdio/*.asm" \
 	"target/msx/time/*.asm"
@@ -12,6 +13,7 @@ MSX_GLOBS_ex := \
 	target/msx/far/*.asm \
 	target/msx/fcntl/msxdos1/*.asm \
 	target/msx/games/*.asm \
+	target/msx/input/*.asm \
 	target/msx/psg/*.asm \
 	target/msx/stdio/*.asm \
 	target/msx/time/*.asm

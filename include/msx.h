@@ -78,6 +78,21 @@ extern int  __LIB__ msx_get_stick(unsigned int id) __z88dk_fastcall;
 // Get state of joystick button (trigger) number \a id, true = pressed
 extern bool_t  __LIB__ msx_get_trigger(unsigned int id) __z88dk_fastcall;
 
+// Mouse in a joystick connector (the PSG's ports: for the MSX1 and the MSX2), as in input.h: buttons are 00000MRL active high.  The position is 0..255 by
+// 0..191.  The mouse reports how far it has moved, so the library keeps a position and adds the movement to it: in_MouseMSXSetPos moves it.
+// in_MouseMSXInit(port) looks for the mouse in connector 1 or 2 (0 for both) and returns the connector it answered in, or 0 if there is none: with none,
+// in_MouseMSX returns no buttons and leaves the position alone, so a program can fall back to the keyboard.
+extern int  __LIB__ in_MouseMSXInit(int port) __z88dk_fastcall;
+extern int  __LIB__ in_MouseMSXPresent(void);
+extern void __LIB__ in_MouseMSX(unsigned char *buttons, unsigned int *xcoord, unsigned int *ycoord) __smallc;
+extern void __LIB__ in_MouseMSXSetPos(unsigned int xcoord, unsigned int ycoord) __smallc;
+
+extern void __LIB__ in_MouseMSX_callee(unsigned char *buttons, unsigned int *xcoord, unsigned int *ycoord) __smallc __z88dk_callee;
+extern void __LIB__ in_MouseMSXSetPos_callee(unsigned int xcoord, unsigned int ycoord) __smallc __z88dk_callee;
+
+#define in_MouseMSX(a,b,c)     in_MouseMSX_callee(a,b,c)
+#define in_MouseMSXSetPos(a,b) in_MouseMSXSetPos_callee(a,b)
+
 extern unsigned int st_dir[];
 
 enum stick_direction {

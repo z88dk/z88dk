@@ -20,7 +20,6 @@ __v9938_get_vdp_status:
     ld      bc, VDP_CMD
   ENDIF
     VDPOUT  (VDP_CMD)
-    out     (VDP_CMD), a
     ld      a, $8f                      ;Set r15 so status register reads what we want
     VDPOUT  (VDP_CMD)
   IF    VDP_STATUS>=256
