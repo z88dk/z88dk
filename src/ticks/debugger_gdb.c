@@ -498,7 +498,9 @@ uint8_t get_memory(uint32_t at, memtype type)
    start of the banking window in cur_bank, and the window is the 16K segment
    CLIB_BANKING_SEGMENT. A pc in the window is extended with that page, as
    z88dk-ticks -banks does on the ZXN, so a line or symbol at page << 16 |
-   address matches only while its page is mapped. Without banked_call in the
+   address matches only while its page is mapped. Page N also covers the
+   upper 8K of the window, where banked_call maps N+1, because the linker
+   addresses the whole 16K section from N. Without banked_call in the
    map the page cannot be known, and pc stays 16 bits. It also stays 16 bits
    when the map has no code in that page, so a map with 16-bit addresses only
    works as before. */
@@ -967,10 +969,6 @@ void execute_on_main_thread_no_response(trapped_action_t call, const void* data)
 
 static void gdb_execution_stopped(int code)
 {
-    /* The target has run, so the memory read before may have changed. The
-       page in cur_bank, for one, has to be read again at every stop. */
-    mem_requested_amount = 0;
-
     if (debugger_active == 1)
     {
         return;
@@ -987,6 +985,10 @@ static void gdb_execution_stopped(int code)
 void remote_execution_stopped(const void* data, void* response)
 {
     const int* code = data;
+    /* The target has run, so the memory read before may have changed. The
+       page in cur_bank, for one, has to be read again at every stop. Done
+       here because the MI2 front end replaces bk.execution_stopped. */
+    mem_requested_amount = 0;
     bk.execution_stopped(*code);
     free((void*)data);
 }
