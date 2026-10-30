@@ -28,7 +28,9 @@
 ;--------
 ; ORG at 0x8000, to leave space for video memory
 ;--------
+IF !DEFINED_CRT_ORG_CODE
     defc    CRT_ORG_CODE  = 32768
+ENDIF
     defc    TAR__register_sp = -1
 
     defc    CONSOLE_COLUMNS = 40
@@ -44,65 +46,11 @@
     org     CRT_ORG_CODE
     EXTERN  __size
 
-bootstrap:
-IF bootstrap
-    DI
-
-    XOR     A
-    OUT     (0B4h), A
-    OUT     (0B5h), A
-
-    ld      hl, $8100
-    ld      de, $8101
-    ld      (hl),0
-    ld      bc,4096
-    ldir
-
-    ld      bc, $0031       ;Track 3, second sector
-    ld      hl, 32768 + 256
-load_loop:
-    ld      de, $100		;Length
-    ld      ix,($085b)
-    push    bc
-    push    hl
-    rst     $18
-    defb    $7c
-    ;; TODO: Trap error
-    pop     de		;Address
-    inc     d		;Next address
-    ld      hl, bootstrap + __size
-    and     a
-    sbc     hl,de
-    jr      c,loading_complete
-    ex      de,hl
-    pop     bc
-    ld      a,c
-    inc     a
-    and     15
-    ld      d,a		;Save sector
-    jr      nz,not_overflow
-    ; Need to increment the track here
-    ld      a,c
-    and     @11110000
-    add     16
-    ld      c,a
-    jr      nc,not_overflow
-    inc     b
-not_overflow:
-    ld      a,c
-    and     @11110000
-    or      d
-    ld      c,a
-    jr      load_loop
-loading_complete:
+IF CRT_ORG_CODE = 0x0000
     jp      start
-
-
-    defs    $0100-ASMPC
-if (ASMPC<>$0100)
-    defs    CODE_ALIGNMENT_ERROR
-endif	
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
 ENDIF
+
 
 ;--------
 ; Execution starts here
@@ -110,6 +58,9 @@ ENDIF
 start:
     DI
 
+; -pragma-define:CRT_MZ2500_IPL_DISABLED=1: the program has its own memory map (set up by the loader, e.g. the BOOTSTRAP stub below) and its own screen, so
+; start-up neither resets the windows to the IPL's map (RAM page 0 in window 0) nor calls the IPL's text clear, which needs that map
+IF !DEFINED_CRT_MZ2500_IPL_DISABLED
     XOR     A
     OUT     (0B4h), A
     OUT     (0B5h), A
@@ -117,6 +68,7 @@ start:
     xor     a
     rst     18h
     defb    70h     ; clear text
+ENDIF
 
 
     INCLUDE	"crt/classic/crt_init_sp.inc"
@@ -147,17 +99,6 @@ crt0_exit_exit:
     ret
 
 
-;IF (!DEFINED_startup | (startup=1))
-;
-;        defs    56-crt0_exit_exit-1
-;
-;if (ASMPC<>$0038)
-;        defs    CODE_ALIGNMENT_ERROR
-;endif
-;
-;ENDIF
-
-
 
 l_dcal:
         jp      (hl)
@@ -170,6 +111,13 @@ ENDIF
 
     INCLUDE "crt/classic/crt_runtime_selection.inc"
 
+IF DEFINED_CRT_ORG_BSS
+    defc    __crt_org_bss = CRT_ORG_BSS
+ENDIF
+
     INCLUDE	"crt/classic/crt_section.inc"
 
-
+; A program linked at $0000 needs appmake's first stage in the page at $8000
+IF DEFINED_CRT_MZ2500_IPL_DISABLED
+    INCLUDE "target/mz2500/classic/bootstrap.asm"
+ENDIF
