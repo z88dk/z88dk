@@ -27,6 +27,8 @@
     defc __IO_NEXTREG_REG = 0x243b
 
     ; Always use segment 3 - otherwise we have to redo all the orgs for the banks
+    ; banked_call maps new pages into MMU 6/7, so with __banked calls the stack
+    ; must be below 0xc000 (the default is in MMU 7): -pragma-define:REGISTER_SP=0xc000
     PUBLIC  CLIB_BANKING_SEGMENT
     defc    CLIB_BANKING_SEGMENT = 3
 
