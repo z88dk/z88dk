@@ -7,25 +7,31 @@
    ; Define Memory Banks
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   ; Bits 16-23 of a BANK or PAGE origin hold the 8K page that banked_call
+   ; maps at MMU6, with the page after it at MMU7 (CLIB_BANKING_SEGMENT = 3).
+   ; BANK_n, BANK_n_L and BANK_n_H use page 2n.  PAGE_n uses the even page
+   ; of its pair, so PAGE_20 is 0x14c000 and PAGE_21 is 0x14e000.
+   ; appmake places each bank and page by its section name, not by these bits.
+
 Z88DK_FOR(`LOOP', `0', `111',
 `
    IFNDEF CRT_ORG_BANK_`'LOOP
-      defc CRT_ORG_BANK_`'LOOP = 0xc000
+      defc CRT_ORG_BANK_`'LOOP = 0x`'eval(LOOP * 0x20000 + 0xc000, 16)
    ENDIF
    
    IFNDEF CRT_ORG_BANK_`'LOOP`'_L
-      defc CRT_ORG_BANK_`'LOOP`'_L = 0xc000
+      defc CRT_ORG_BANK_`'LOOP`'_L = 0x`'eval(LOOP * 0x20000 + 0xc000, 16)
    ENDIF
    
    IFNDEF CRT_ORG_BANK_`'LOOP`'_H
-      defc CRT_ORG_BANK_`'LOOP`'_H = 0xe000
+      defc CRT_ORG_BANK_`'LOOP`'_H = 0x`'eval(LOOP * 0x20000 + 0xe000, 16)
    ENDIF
 ')
 
 Z88DK_FOR(`LOOP', `0', `223',
 `
    IFNDEF CRT_ORG_PAGE_`'LOOP
-      defc CRT_ORG_PAGE_`'LOOP = ifelse(eval(LOOP&0x01),0,0xc000,0xe000)
+      defc CRT_ORG_PAGE_`'LOOP = 0x`'eval((LOOP & 0xfe) * 0x10000 + ifelse(eval(LOOP&0x01),0,0xc000,0xe000), 16)
    ENDIF
 ')
 
@@ -410,6 +416,12 @@ Z88DK_FOR(`LOOP', `0', `15',
    ;   1: MMU 2 and 3
    ;   2: MMU 4 and 5
    ;   3: MMU 6 and 7
+   ;
+   ; banked_call maps new pages into this segment, so the stack must be
+   ; outside it.  The default stack (0xff58) is in MMU 7: with the default
+   ; segment, move it below 0xc000, e.g. -pragma-define:REGISTER_SP=0xc000.
+   ; With another segment, also give each bank or page that holds banked
+   ; functions an origin in that segment, with the page in bits 16-23.
 
    PUBLIC CLIB_BANKING_SEGMENT
 
