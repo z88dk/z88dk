@@ -1,8 +1,10 @@
 MZ2500_GLOBS := \
-	"target/mz2500/stdio/*.asm"  
+	"target/mz2500/mz2500/*.asm" \
+	"target/mz2500/stdio/*.asm"
 
 MZ2500_GLOBS_ex := \
-	target/mz2500/stdio/*.asm 
+	target/mz2500/mz2500/*.asm \
+	target/mz2500/stdio/*.asm
 
 
 MZ2500_CFILES = $(wildcard target/mz2500/tape/*.c) 

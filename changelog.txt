@@ -45,49 +45,62 @@ z88dk-zx81bas is a new tool for ZX81 BASIC that contains inline assembly. Mark t
 
 More detailed, but still incomplete changelist:
 
+- [80cc] New optimising compiler, using sccz80 calling convention and stack pointer, or optionally using IX frame pointer.
+- [all] -lm is math32 on classic and newlib. +zx81 and +lambda keep genmath_zx81. ROM maths stay on -lmz
+- [all] AI agent support via AGENTS.md and .agents/skills (Grok/Claude discovery symlinks)
+- [all] math16 half-precision floating point support for 8080, 8085, and gbz80
+- [all] math32 and math16 divide and inv use a restoring 1/x
+- [all] math32 floating point support for 8080, 8085, vm1, gbz80, z80n, and Rabbit
+- [all] The toolchain now supports the KR580VM1 (vm1) processor
+- [all] ZX0 host tools and decompressors are v2.2. Forward data uses the v2 format. -c writes classic v1
 - [appmake] +hdos disc writing support
-- [appmake] TeleDisk image support in cpmdisk
+- [appmake] +z88 writes .ap0 only when --installer is set
 - [appmake] cpmdisk can omit unused extents
+- [appmake] TeleDisk image support in cpmdisk
 - [classic] +alphatp2 target working
+- [classic] +aquarius -subtype=allram takes the whole 64K machine
+- [classic] +aquarius can pack an AQX file with ZX0. CRT_AQPLUS_BANK3_RAM maps RAM into bank 3
+- [classic] +aquarius generic console plotting is faster
 - [classic] +gal faster plotting
 - [classic] +hdos fcntl available
 - [classic] +hdos time(), clock(), and default_device()
-- [classic] +phc25 New target
+- [classic] +msx, +sam, and Aquarius Plus have a mouse driver. The +mz2500 mouse driver is untested
+- [classic] +mz2500 has page, palette, and disc routines. BANK_n sections load extra RAM. CRT_ORG_CODE can be 0
 - [classic] +p2000 Inkey keyboard driver available
+- [classic] +pc88 has pc88_disk_read and pc88_disk_write. +multi8 has tape_save and tape_load_to
+- [classic] +phc25 New target
 - [classic] +pps low-memory crt0 layout
 - [classic] +sms now has access to newlib libraries
+- [classic] +spc1000 -subtype=allram links the program at address 0. tape_save and tape_load_to use the cassette
 - [classic] +test Support for KR580VM1 (vm1) processor
 - [classic] +x07 Support much improved
+- [classic] +x1 has x1_disk_read and x1_disk_write
 - [classic] +z88 Support for 512z64 graphics
-- [classic] +zxn Thin sprite wrapper available
-- [classic] +zxn Plotting now support on layer 2 screen
+- [classic] +zxn can write a .nex whose start is below 0x4000
 - [classic] +zxn Hardware headers for the full nextreg set
-- [classic] Rabbit targets now support __banked and __far
-- [classic] targets +hbios, +scz180, +yaz180, +rc2014 migrated
-- [classic] zsdcc selects the printf and scanf float converter from the format string
-- [classic] strtod accepts C90 decimal and C99 hexadecimal text for 8080, 8085, vm1, and gbz80
-- [classic] Extra interrupt support for the 8085 and the NSC800
-- [classic] V9938 palette functions
+- [classic] +zxn Plotting now support on layer 2 screen
+- [classic] +zxn Thin sprite wrapper available
 - [classic] Einstein mode 7
-- [newlib] library products install under lib/clibs/sccz80/ and lib/clibs/sdcc_ix/
+- [classic] Extra interrupt support for the 8085 and the NSC800
+- [classic] font.h gives each font an end label. A 6x8 name uses the matching 8x8 end label
+- [classic] Rabbit targets now support __banked and __far
+- [classic] strtod accepts C90 decimal and C99 hexadecimal text for 8080, 8085, vm1, and gbz80
+- [classic] targets +hbios, +scz180, +yaz180, +rc2014 migrated
+- [classic] V9938 palette functions
+- [classic] zsdcc selects the printf and scanf float converter from the format string
 - [newlib] __CLIB_OPT_MALLOC selects a spare-tail malloc search (0 keeps the small walker)
-- [80cc] New optimising compiler, using sccz80 calling convention and stack pointer, or optionally using IX frame pointer.
-- [all] -lm is math32 on classic and newlib. +zx81 and +lambda keep genmath_zx81. ROM maths stay on -lmz
-- [all] The toolchain now supports the KR580VM1 (vm1) processor
-- [all] math32 floating point support for 8080, 8085, vm1, gbz80, z80n, and Rabbit
-- [all] math16 half-precision floating point support for 8080, 8085, and gbz80
-- [all] math32 and math16 divide and inv use a restoring 1/x
-- [all] AI agent support via AGENTS.md and .agents/skills (Grok/Claude discovery symlinks)
-- [all] ZX0 host tools and decompressors are v2.2. Forward data uses the v2 format. -c writes classic v1
-- [z80asm] Bug fixes
+- [newlib] a routine that assigns IX saves it and restores it
+- [newlib] library products install under lib/clibs/sccz80/ and lib/clibs/sdcc_ix/
 - [z80asm] #define now supported as alias for defc
+- [z80asm] Bug fixes
+- [z80asm] the map names the bank of __section_head, __section_tail, and __section_size
 - [z88dk-copt] Additional conditions for compiler and pattern formats
 - [z88dk-copt] ez80-clang rules for LLVM 19
 - [z88dk-dis] Support for decoding rst calls
 - [z88dk-gdb] IM 2 support, watchpoints, O-packets, and the Z80 I and R registers
+- [z88dk-ticks] -iotimer and -mmtimer read the cycle count from inside the program
 - [z88dk-ticks] 8085, z80n, kc160, r4k, r6k fixes
 - [z88dk-ticks] Support for the Rabbit banking model
-- [z88dk-ticks] -iotimer and -mmtimer read the cycle count from inside the program
 - [z88dk-zsdcc] Upgraded to SDCC 4.6.0 r16639
 - [zcc] add multi compiler selection tool (sccz80, 80cc-sp, 80cc-fp)
 - [zcc] llvm-z80 backend for classic C
