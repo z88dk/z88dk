@@ -1,0 +1,139 @@
+; Sharp MZ-2500 IPL ROM maths package (rst 28h), and the ROM's restart vectors and dispatchers (ipl.rom, 32 KB, ROM pages $34-$37)
+;
+; Worked out from a disassembly of the ROM, not from documentation: entries marked (?) are guesses from what the code does.
+; The ROM image is loaded 3 bytes late for the low part: a runtime address in RAM page 0 is the file offset - 3.
+; The SVC numbers and their registers are in svc.inc; this file has the rest.
+
+; ---- the restart vectors (RAM page 0, copied from the ROM) -----------------------------------------------------------------------
+;   rst 00h  jp $00BB            restart: di, ld sp,($0592) ...
+;   rst 08h, 10h, 20h, 30h, 38h  jp $003B   (unused: $003B is jp $003B, a hang)
+;   rst 18h  jp $0185            SVC dispatcher: rst 18h / defb n   (svc.inc)
+;   rst 28h  jp $01A0            maths dispatcher: rst 28h / defb n (below)
+;
+; Callable entries in page 0:
+defc IPL_BREAKCHK = $0023	; call: SHIFT+BREAK pressed? ($05D2 bit 0, which it clears).  Pressed: A = 0, Cy = 1.  Not pressed: A = $FF, Cy = 0, NZ
+defc IPL_JPHL     = $0040	; jp (hl)
+defc IPL_JPIX     = $0041	; jp (ix)
+
+; ---- rst 18h: the SVC dispatcher ($0185 -> code at $0188) ---------------------------------------------------------------------------
+; The byte after the rst is n; the table at $0300 has 3 bytes a function: the handler address (low, high) and a ROM page.  Page 0 is
+; a handler in page 0, else the dispatcher maps RAM page 1 into window 1 and ROM pages (page, page + 1) into windows 2 and 3 for the call
+; and puts the windows back afterwards (it needs RAM page 0 in window 0 and the stack at $8000 or above).  Handlers at $003B are not implemented.
+defc IPL_SVC_TABLE = $0300
+
+; ---- rst 28h: the maths dispatcher ($01A0 -> code at $01A3) -----------------------------------------------------------------------------
+; The byte after the rst is n; the table at $0480 has 2 bytes a function, a handler in ROM pages $36/$37 (mapped at $4000-$7FFF, RAM page 1 in
+; window 1; windows 1-3 are restored afterwards).  AF, BC, DE and HL are the caller's and the handler's results come straight back.  The
+; stack must be at $8000 or above.  Slots $09, $16-$1F and $2D-$2F are not implemented ($003B); $38 and up are empty.
+;
+; The BASIC maths package.  HL points at operand 1 and DE at operand 2; B is the type of (HL) and C the type of (DE); the result is
+; at HL with its type in B:
+;   2 = 16 bit signed integer (low byte first)
+;   3 = string (a type mismatch error)
+;   5 = single precision: the exponent first (0 = zero, $81 = 1.0 or more), bit 7 of the second byte the sign, the mantissa most significant byte first
+;       with an implied leading 1: the 40 bit Microsoft format of Applesoft and CBM BASIC (pi/2 is 81 49 0F DA A2 at $6D0A, pi/180 is 7B 0E FA 35 12 at $6D1A)
+;   8 = double precision: the same, with a 7 byte mantissa (a single widened is the 5 bytes and 3 zeros)
+;       The fields are Microsoft's: the single is MBF40 and the double MBF64 (z88dk's --mbf64: exponent, sign, 55 bit mantissa, bias $80), but
+;       stored the other way round: z88dk keeps the exponent in the last byte and the mantissa least significant byte first, here the exponent is
+;       the first byte and the mantissa most significant first.
+;
+; The layout of a floating point number in memory (lowest address first):
+;
+;     byte 0   byte 1      byte 2   byte 3   byte 4   [byte 5   byte 6   byte 7]
+;     EEEEEEEE SMMMMMMM    MMMMMMMM MMMMMMMM MMMMMMMM [MMMMMMMM MMMMMMMM MMMMMMMM]
+;     exponent sign+mant.  <---- the rest of the mantissa, most significant first ---->
+;              (bit 7 = S)                              single: bytes 0-4,  double: bytes 0-7
+;
+;   E = 0 is the value zero (the other bytes do not matter); otherwise the value is  (-1)^S * 0.1MMMM... (binary) * 2^(E - $80)
+;   so the mantissa is 0.5 up to just under 1.0, its leading 1 is not stored, and the exponent of 1.0 is $81.  Bit 7 of byte 1 is
+;   the sign, not part of the mantissa: the routines put the leading 1 back with `or $80` before they work on it, and set or clear
+;   bit 7 for the sign afterwards.
+;   Example: pi/2 is 81 49 0F DA A2: S = 0, the mantissa is $C90FDAA2 with the leading 1 put back (0.7853981...),
+;            times 2^($81 - $80) = 2  ->  1.5707963.   -pi/2 is 81 C9 0F DA A2.   1.0 is 81 00 00 00 00.   0.5 is 80 00 00 00 00.
+;   An integer (type 2) is two bytes, low byte first, two's complement.
+;
+; There are no separate entries for doubles: each function takes the type from B (and C for DE), so the same function number does single
+; (B = 5) or double (B = 8).  Tested under z88dk-ticks with B = C = 8: FP_ADD, FP_SUB, FP_MUL and FP_DIV keep the full 55 bit mantissa
+; (1 + 2^-40 is exact, a product or quotient is good to about 1e-17; multiplication truncates), where B = C = 5 gives about 1e-10.
+; The others have not been tried with doubles.  FP_CSNG and FP_CDBL convert between the two; mixed operands (B and C different) seem to be
+; widened to the larger by the routine at $5DD0, but that has not been tried.
+; Errors are `ld a,n` / `jp $00AC` (the error handler in page 0): $677C is error 2 (overflow?), $677F error 3 (illegal argument?), $6782 error 4 (type mismatch).  The degrees/radians flag is in $05A5.
+defc IPL_MATH_TABLE = $0480
+
+; ---- the workspace -------------------------------------------------------------------------------------------------------------------
+; There is no floating point accumulator (nothing like BASIC's FAC): every routine takes its operands in memory, HL for the first (and the
+; result, which is written back there) and DE for the second.  The mantissas are worked on in the registers (the alternate set, with IY a
+; pointer to an operand), and the rest is in RAM page 0 and RAM page 1:
+;
+; Constants (8 byte doubles, in RAM page 0, set up from the ROM image):
+defc FP_ONE       = $0520	; 1.0
+defc FP_65536     = $0528	; 65536.0
+defc FP_PI        = $0530	; pi
+; Constants in the ROM (pages $36/$37, so mapped at $4000-$7FFF during a call):
+;   $6D0A pi/2   $6D12 pi/4   $6D1A pi/180   $6B3B 1/(2 pi)   $6B43 1/360   $6B4B 90.0   $6F6A e   $6F72 log10(e)   $7002 ln 2   $6A5E tan(pi/8)
+;
+; Scratch operands (8 bytes each), used to hold copies for the series and conversions:
+defc FP_TEMP0     = $0896
+defc FP_TEMP1     = $089E
+defc FP_TEMP2     = $08A6
+defc FP_TEMP3     = $08AF
+;
+; State (RAM page 1):
+defc FP_DESTPTR   = $2468	; (2) HL on entry: the operand the result goes back to
+defc FP_SIGN      = $246A	; (1) the sign of the result: bit 7 is the sign byte of one operand XOR the other's
+defc FP_SAVESP    = $246B	; (2) SP on entry, kept for the error exit (?)
+defc FP_EXPWORK   = $2470	; (2) the result's exponent while it is worked out (16 bit, so overflow and underflow can be seen)
+defc FP_GUARD     = $246F	; (1) cleared at the start of a multiply or divide (?)
+defc FP_COUNT     = $247C	; (1) the loop counter of the series and Newton iterations (SQR does 3)
+defc FP_RNDVAL    = $2474	; (8) the last RND
+defc FP_SEED      = $2491	; (2) the RND seed
+defc FP_DIGITS    = $2484	; the digits of a number being converted to a string
+defc FP_ANGLEMODE = $05A5	; non-zero: degrees (SIN, COS, TAN and ATN take and give degrees), 0: radians
+
+defc FP_INT      = $00	; INT (floor); an integer is left as it is			($680A)
+defc FP_ABS      = $01	; ABS								($67F6)
+defc FP_SIN      = $02	; SIN (?)							($6AA0)
+defc FP_COS      = $03	; COS (?): 1 for 0						($6A87)
+defc FP_TAN      = $04	; TAN: runs FP_COS and FP_SIN on copies and divides		($6CAF)
+defc FP_LN       = $05	; LN, the natural log: the exponent times ln 2 ($7002) plus a series for the mantissa	($6EB4)
+defc FP_EXP      = $06	; EXP: e^x, by the power routine with e ($6F6A) for a small integer x	($6D7A)
+defc FP_SQR      = $07	; SQR: three Newton iterations					($693B)
+defc FP_RND      = $08	; RND (?): the next random number (seed at $2491, result at $2474)	($6D22)
+defc FP_ATN      = $0A	; ATN: reduces with tan(pi/8) ($6A5E); the result in degrees if $05A5 says so	($69C9)
+defc FP_SGN      = $0B	; SGN: an integer -1, 0 or 1					($6CC7)
+defc FP_LOG10    = $0C	; LOG10: FP_LN times log10(e) ($6F72)				($6EAB)
+defc FP_FRAC     = $0D	; x - FIX(x) (?)						($67D1)
+defc FP_MULPI     = $0E	; multiplied by pi (the constant at $0530)			($6D00)
+defc FP_MULK6D1A = $0F	; multiplied by the constant at $6D1A, pi/180 (degrees to radians)	($6CFB)
+defc FP_POWINT   = $10	; x^n for an integer n >= 0					($68E6)
+defc FP_DIVK6D1A = $11	; divided by the constant at $6D1A, pi/180 (radians to degrees)	($6CF2)
+defc FP_FIX      = $12	; FIX (truncate towards zero)					($6798)
+defc FP_CINT     = $13	; convert to a 16 bit integer					($5DF4)
+defc FP_CSNG     = $14	; convert to single precision					($5E08)
+defc FP_CDBL     = $15	; convert to double precision					($5E40)
+defc FP_ADD      = $20	; HL = HL + DE (an integer overflow gives a float)		($5E95)
+defc FP_SUB      = $21	; HL = HL - DE							($5EB6)
+defc FP_MUL      = $22	; HL = HL * DE							($5EDB)
+defc FP_DIV      = $23	; HL = HL / DE (integers give a float if not exact)		($5F04)
+defc FP_CMP      = $24	; compare HL with DE (?)					($5F4C)
+defc FP_IDIV     = $25	; integer divide, \ (?)						($5F2F)
+defc FP_MOD      = $26	; MOD (?)							($5F3F)
+defc FP_POW      = $27	; HL = HL ^ DE							($6832)
+defc FP_NEG      = $28	; negate							($5E65)
+defc FP_RANDOMIZE = $29	; HL = the seed (stored at $2491) (?)				($6D53)
+defc FP_TOINT    = $2A	; float at HL to a 16 bit integer in HL (overflow error if too big)	($7057)
+defc FP_2B       = $2B	; not examined (jumps to $7FD6)					($703D)
+defc FP_FROMINT  = $2C	; the integer in DE to a 5 byte float at HL			($70A6)
+defc FP_VAL      = $30	; a string to a single precision number (?)			($7129)
+defc FP_STRNUM   = $31	; a number to a string, a space or '-' first (?)		($7548)
+defc FP_STRNUMH  = $32	; a number to a string with a # overflow marker (?)		($756A)
+defc FP_USINGSTR = $33	; PRINT USING string fields (!, &, @) (?)			($7745)
+defc FP_VALHEX   = $34	; a hexadecimal constant to a number (uses SVC _DEHEX/_CKHEX) (?)	($70E0)
+defc FP_TOLONG   = $35	; a float to a 32 bit integer in the registers (?)		($748C)
+defc FP_STREXP   = $36	; a float to a string with an exponent (digit buffer $2484) (?)	($75AF)
+defc FP_VALD     = $37	; as FP_VAL but double precision (?)				($7123)
+
+; ---- RAM vectors the ROM calls (RAM page 0) ------------------------------------------------------------------------------------------
+defc IPL_VEC_005C = $005C	; called from the string to number routine
+defc IPL_VEC_0073 = $0073	; called by conversions between integers and floats (and for the sign of an integer)
+defc IPL_VEC_0078 = $0078	; the error call: B = the type, HL and the operands kept
