@@ -67,4 +67,13 @@ extern void __LIB__ in_MouseMZ2500SetPos_callee(unsigned int xcoord, unsigned in
 #define in_MouseMZ2500(a,b,c)     in_MouseMZ2500_callee(a,b,c)
 #define in_MouseMZ2500SetPos(a,b) in_MouseMZ2500SetPos_callee(a,b)
 
+// Keyboard: in_Inkey, in_KeyPressed and in_LookupKey as in input.h.  A scan code is the column (0-11) in the low byte, with bit 7 set if SHIFT has to be down
+// and bit 6 if CTRL has to be down (the modifiers must be as it says), and the key's bit in the high byte.  The modifiers' own keys (their column ignores
+// what else is down):
+#define IN_KEY_SCANCODE_GRPH   0x010B
+#define IN_KEY_SCANCODE_SLOCK  0x020B
+#define IN_KEY_SCANCODE_SHIFT  0x040B
+#define IN_KEY_SCANCODE_KANA   0x080B
+#define IN_KEY_SCANCODE_CTRL   0x100B
+
 #endif
