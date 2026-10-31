@@ -1,8 +1,9 @@
 ; Sharp MZ-2500 console: the mode dispatcher
 ;
-; The console has two modes, chosen with ioctl IOCTL_GENCON_SET_MODE (the default is CRT_MZ2500_CON_MODE, see the crt0):
-;   0  the text screen, written directly, with the ROM's glyphs (no UDGs, no custom font), 8 colours (text_console.asm)
-;   1  the graphics screen, 320x200 in 16 colours, with the font and UDGs: 40 x 25 (the gfxcon files)
+; The console has three modes, chosen with ioctl IOCTL_GENCON_SET_MODE (the default is CRT_MZ2500_CON_MODE, see the crt0):
+;   0  the 40-column text screen, with ROM glyphs or an optional custom font and UDGs, 8 colours (text_console.asm)
+;   1  the 80-column text screen, with ROM glyphs or an optional custom font and UDGs
+;   2  the graphics screen, 320x200 in 16 colours, with the font and UDGs: 40 x 25 (the gfxcon files)
 ; These routines send each call to the one for the mode.  Neither uses the IPL.
 
     SECTION code_clib
@@ -33,77 +34,78 @@
 generic_console_cls:
     push    af
     ld      a, (__mz2500_con_mode)
-    and     a
-    jr      z, text_cls
-    pop     af
-    jp      __mz2500_gfxcon_cls
-text_cls:
+    cp      2
+    jr      z, graphics_cls
     pop     af
     jp      __mz2500_textcon_cls
+graphics_cls:
+    pop     af
+    jp      __mz2500_gfxcon_cls
 
 generic_console_scrollup:
     push    af
     ld      a, (__mz2500_con_mode)
-    and     a
-    jr      z, text_scrollup
-    pop     af
-    jp      __mz2500_gfxcon_scrollup
-text_scrollup:
+    cp      2
+    jr      z, graphics_scrollup
     pop     af
     jp      __mz2500_textcon_scrollup
+graphics_scrollup:
+    pop     af
+    jp      __mz2500_gfxcon_scrollup
 
 generic_console_printc:
     push    af
     ld      a, (__mz2500_con_mode)
-    and     a
-    jr      z, text_printc
-    pop     af
-    jp      __mz2500_gfxcon_printc
-text_printc:
+    cp      2
+    jr      z, graphics_printc
     pop     af
     jp      __mz2500_textcon_printc
+graphics_printc:
+    pop     af
+    jp      __mz2500_gfxcon_printc
 
 generic_console_vpeek:
     push    af
     ld      a, (__mz2500_con_mode)
-    and     a
-    jr      z, text_vpeek
-    pop     af
-    jp      __mz2500_gfxcon_vpeek
-text_vpeek:
+    cp      2
+    jr      z, graphics_vpeek
     pop     af
     jp      __mz2500_textcon_vpeek
+graphics_vpeek:
+    pop     af
+    jp      __mz2500_gfxcon_vpeek
 
 generic_console_set_ink:
     push    af
     ld      a, (__mz2500_con_mode)
-    and     a
-    jr      z, text_set_ink
-    pop     af
-    jp      __mz2500_gfxcon_set_ink
-text_set_ink:
+    cp      2
+    jr      z, graphics_set_ink
     pop     af
     jp      __mz2500_textcon_set_ink
+graphics_set_ink:
+    pop     af
+    jp      __mz2500_gfxcon_set_ink
 
 generic_console_set_paper:
     push    af
     ld      a, (__mz2500_con_mode)
-    and     a
-    jr      z, text_set_paper
-    pop     af
-    jp      __mz2500_gfxcon_set_paper
-text_set_paper:
+    cp      2
+    jr      z, graphics_set_paper
     pop     af
     jp      __mz2500_textcon_set_paper
+graphics_set_paper:
+    pop     af
+    jp      __mz2500_gfxcon_set_paper
 
 generic_console_set_attribute:
     ret
 
     SECTION code_crt_init
     ld      a, (__mz2500_con_mode)
-    and     a
-    jr      nz, gfx_init
+    cp      2
+    jr      z, gfx_init
     call    __mz2500_textcon_init
+    call    __mz2500_textcon_cls
     jr      no_gfx_init
 gfx_init:
     call    mz2500_gfx_init             ;320x200 in 16 colours and the palette

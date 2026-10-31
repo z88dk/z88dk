@@ -34,28 +34,24 @@ ENDIF
     defc    TAR__register_sp = -1
 
 
-; The console's mode at start-up: 0 = the text screen (ROM glyphs, 8 colours), 1 = the graphics screen (font and UDGs, 16 colours, 40 x 25).  Both are
-; written directly (the IPL is not called).  ioctl IOCTL_GENCON_SET_MODE changes it.  The text screen is as the CRTC was left (by the IPL), which a
-; program that disables the IPL has to set up itself, so the default is 1 then.  -pragma-define:CRT_MZ2500_CON_MODE=n
-;   __MZ2500_TEXT_COLUMNS  the width of the text screen, 40 or 80: -pragma-define:CRT_MZ2500_TEXT_COLUMNS=n (default 40)
+; The console's mode at start-up: 0 = 40-column text, 1 = 80-column text, 2 = graphics (font and UDGs, 16 colours, 40 x 25).  Both are
+; written directly.  ioctl IOCTL_GENCON_SET_MODE changes it.  With the IPL disabled, the program must set up the text screen itself, so the default
+; is mode 2.  -pragma-define:CRT_MZ2500_CON_MODE=n
 IF !DEFINED_CRT_MZ2500_CON_MODE
   IF DEFINED_CRT_MZ2500_IPL_DISABLED
-    defc    CRT_MZ2500_CON_MODE = 1
+    defc    CRT_MZ2500_CON_MODE = 2
   ELSE
     defc    CRT_MZ2500_CON_MODE = 0
   ENDIF
 ENDIF
-IF !DEFINED_CRT_MZ2500_TEXT_COLUMNS
-    defc    CRT_MZ2500_TEXT_COLUMNS = 40
-ENDIF
     PUBLIC  __MZ2500_CON_MODE
-    PUBLIC  __MZ2500_TEXT_COLUMNS
     defc    __MZ2500_CON_MODE = CRT_MZ2500_CON_MODE
-    defc    __MZ2500_TEXT_COLUMNS = CRT_MZ2500_TEXT_COLUMNS
-IF CRT_MZ2500_CON_MODE
+IF CRT_MZ2500_CON_MODE = 2
     defc    CONSOLE_COLUMNS = 40
+ELSEIF CRT_MZ2500_CON_MODE = 1
+    defc    CONSOLE_COLUMNS = 80
 ELSE
-    defc    CONSOLE_COLUMNS = CRT_MZ2500_TEXT_COLUMNS
+    defc    CONSOLE_COLUMNS = 40
 ENDIF
     defc    CONSOLE_ROWS = 25
 
@@ -120,17 +116,16 @@ IF !DEFINED_CRT_MZ2500_IPL_DISABLED
     OUT     (0B4h), A
     OUT     (0B5h), A
 
-    ; the text screen as the console's mode 0 expects it: 40 or 80 columns, 25 rows, screen 1 (the IPL's _TWID sets all three), cleared (_TCLR)
-IF CRT_MZ2500_TEXT_COLUMNS = 40
-    ld      a, 1
+    ; Select the initial text width directly through PIO port A (CH80 is bit 5)
+    ld      a, $0f
+    out     ($e9), a
+    in      a, ($e8)
+IF CRT_MZ2500_CON_MODE = 1
+    or      $20
 ELSE
-    xor     a
+    and     $df
 ENDIF
-    rst     18h
-    defb    6ch     ; _TWID
-    xor     a
-    rst     18h
-    defb    70h     ; clear text
+    out     ($e8), a
 ENDIF
 
 

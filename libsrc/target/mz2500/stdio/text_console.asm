@@ -1,5 +1,5 @@
 ;
-; Console mode 0: the text screen, written directly (the IPL is not called, so it works with or without it).  The text VRAM is page $38, borrowed
+; Console modes 0 and 1: the 40- and 80-column text screens, written directly.  The text VRAM is page $38, borrowed
 ; through the graphics window like the planes are: three 2 KB arrays, the low byte of the character code at +$0000, the attributes at +$0800 (bits 0-2
 ; colour: blue 1, red 2, green 4; bit 6 reverse) and the high byte of the code at +$1000.  The glyphs are the ROM's (no UDGs, no custom font), in the
 ; kanji ROM where the IPL has them: a character c is the code $8C00 + 4 * c (so a blank is $80 / $07 / $8C).
@@ -7,9 +7,9 @@
 ; A font and UDGs can be had too (ioctl IOCTL_GENCON_SET_FONT32, IOCTL_GENCON_SET_UDGS): __mz2500_textcon_load_pcg copies the font (characters 32-127)
 ; and the UDGs (128-255) into PCG0, the CPU-writable character generator (page $39: 256 glyphs of 8 bytes, the leftmost pixel in bit 7), sets 8 byte
 ; glyphs (port $F7 bit 0) and from then on the cells hold the plain code (high byte 0), blank is 0 / $07 / 0.  __mz2500_textcon_rom goes back to the
-; ROM's glyphs (it assumes the IPL's setting is 16 line glyphs: port $F7 = 0).  Cells already on the screen keep the code they were written with.  The screen is __MZ2500_TEXT_COLUMNS (40 or 80, as the CRTC is set: -pragma-define:CRT_MZ2500_TEXT_COLUMNS) by 25 cells,
-; the cell at the start of the arrays (the CRTC's start address is set to 0).  The width, 25 rows and screen 1 are the CRTC's and PIO's: the crt0 sets them with
-; the IPL's _TWID unless the IPL is disabled, when the program has to.  The text has no background colour: it shows over the graphics.
+; ROM's glyphs (it assumes the IPL's setting is 16 line glyphs: port $F7 = 0).  Cells already on the screen keep the code they were written with.  The screen is 40 or 80 columns, selected by ioctl, by 25 cells,
+; the cell at the start of the arrays (the CRTC's start address is set to 0).  The width is set through PIO port A; __mz2500_textcon_init sets the CRTC
+; to 25 rows and screen 1.  The text has no background colour: it shows over the graphics.
 ;
     SECTION code_clib
 
@@ -33,7 +33,7 @@
     EXTERN  l_push_di
     EXTERN  l_pop_ei
     EXTERN  __MZ2500_GFX_BASE
-    EXTERN  __MZ2500_TEXT_COLUMNS
+    EXTERN  __console_w
 
     defc    TEXT_PAGE = $38
 
@@ -135,24 +135,43 @@ scroll_array:
     ex      af, af'
     ld      d, h
     ld      e, l
-    ld      bc, __MZ2500_TEXT_COLUMNS
+    ld      a, (__console_w)
+    ld      c, a
+    ld      b, 0
     add     hl, bc
-    ld      bc, 24 * __MZ2500_TEXT_COLUMNS
+    ld      b, 24
+scroll_row:
+    push    bc
+    ld      a, (__console_w)
+    ld      c, a
+    ld      b, 0
     ldir
+    pop     bc
+    djnz    scroll_row
     ld      h, d
     ld      l, e
     ex      af, af'
     ld      (hl), a
     inc     de
-    ld      bc, __MZ2500_TEXT_COLUMNS - 1
+    push    hl
+    ld      a, (__console_w)
+    dec     a
+    ld      c, a
+    ld      b, 0
+    ld      h, d
+    ld      l, e
+    dec     hl
     ldir
+    pop     hl
     pop     hl
     ret
 
 ; hl = the address of the cell: c = x, b = y.  Uses a, b, de
 text_xy:
     ld      hl, __MZ2500_GFX_BASE
-    ld      de, __MZ2500_TEXT_COLUMNS
+    ld      a, (__console_w)
+    ld      e, a
+    ld      d, 0
     ld      a, b
     and     a
     jr      z, xy_column
