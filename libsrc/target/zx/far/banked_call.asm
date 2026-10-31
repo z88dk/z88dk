@@ -23,14 +23,15 @@ banked_call:
     inc     hl
     ld      d, (hl)
     inc     hl
-    ld      a, (hl)                     ; ...and page
+    ld      b, (hl)                     ; ...and page
     inc     hl
     inc     hl                          ; Yes this should be here
     push    hl                          ; Push the real return address
     ld      (___z88dk_banked_banksp), sp
     ld      sp, (___z88dk_banked_mainsp)
+    and     @11111000                   ; Only the RAM bank changes
+    or      b
     ld      bc, 32765
-    or      16
     ld      (SV_BANKM), a
     out     (c), a
     ei

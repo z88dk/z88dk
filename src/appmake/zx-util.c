@@ -1688,6 +1688,12 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     memset(mem128, 0, 6144);
     memset(mem128 + 6144, 0x38, 768);
 
+    // 128k zx: SV_BANKM (0x5b5c) holds the last byte written to port 0x7ffd,
+    // which the snapshot sets to 0x10 below; banked_call relies on it
+
+    if (is_128 && !is_zxn)
+        mem128[0x5b5c - 0x4000] = 0x10;
+
     // write main bank into memory image
 
     for (i = 0; i < memory->mainbank.num; ++i)
