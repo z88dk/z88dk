@@ -9,6 +9,9 @@
  * the leftmost pixel and the pixel value is B | R << 1 | G << 2 | I << 3.
  *
  * Build options: -pragma-define:CRT_MZ2500_IPL_DISABLED=1 leaves the memory map and the text screen as the loader set them (no IPL calls at startup).
+ *   -pragma-define:CRT_MZ2500_GFX_WINDOW=n (default 2): the window (0-7) the console and graphics library borrow to reach the video RAM; they map a video page
+ *   into it with interrupts off and put the page that was there back, so it must not hold the stack or the code running while they draw.
+ *   -pragma-define:CRT_MZ2500_GFX_PAGE=n (default $20): the page of the blue plane drawn on (red, green, intensity are +2, +4, +6).
  * Extra RAM pages are loaded with the program by naming a linker section BANK_<page> (org (page << 16) | address, at most 8 KB).
  */
 
@@ -76,9 +79,13 @@ extern void __LIB__ in_MouseMZ2500SetPos_callee(unsigned int xcoord, unsigned in
 #define IN_KEY_SCANCODE_KANA   0x080B
 #define IN_KEY_SCANCODE_CTRL   0x100B
 
-// Graphics (the IPL subtype): <graphics.h>'s clg, plot, unplot, xorplot, point, draw, drawto, drawb, circle, fill and the rest, drawn in software in the
+// Console (stdio, conio): 40 x 25 characters of 8x8 in the graphics screen, with the font and UDGs (ioctl IOCTL_GENCON_SET_FONT32 / SET_UDGS: 8 bytes a
+// character, the font from character 32, the UDGs from 128), 16 colours for text (textcolor, textbackground), inverse, scrolling and cvpeek.  It does
+// not use the IPL, so it works with or without CRT_MZ2500_IPL_DISABLED.  Only the mode 0 (40 columns) of IOCTL_GENCON_SET_MODE.
+//
+// Graphics: <graphics.h>'s clg, plot, unplot, xorplot, point, draw, drawto, drawb, circle, fill and the rest, drawn in software in the
 // video planes: 320x200 in 16 colours, pixel value B | R << 1 | G << 2 | I << 3.  clg() switches to the mode and clears the graphics (the text
-// screen stays on top, so the console and getk still work).  The IPL ROM has no drawing calls of its own (_PSET etc. need an operating system that
+// screen of the IPL stays on top).  The IPL ROM has no drawing calls of its own (_PSET etc. need an operating system that
 // installs them), so these do not use it.  Not supported (they need a 1 bit per pixel byte address): putsprite, getsprite, bksave, bkrestore, clga, fillb.
 // Set the graphics mode, the 4096 colour palette in CGA colours and the pixel to palette map, without clearing (clg does this)
 extern void __LIB__ mz2500_gfx_init(void);

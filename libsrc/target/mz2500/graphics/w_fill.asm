@@ -9,7 +9,7 @@
 ;	A scanline fill: a seed is a pixel; the run of colour 0 pixels in its row is found, filled eight pixels at a time with the read-modify-write page (see
 ;	w_pixel.inc), and the rows above and below it are searched for runs of colour 0 pixels under it, whose first pixels are the new seeds.  Which pixels of a byte
 ;	are colour 0 comes from the latches that reading the page loads.  The seeds are kept in a table of FL_SEEDS: if it fills, seeds are dropped, and the
-;	area is not completely filled (only an area with a great many separate openings in a row needs more).  Interrupts are off, and window 2 is the page, only
+;	area is not completely filled (only an area with a great many separate openings in a row needs more).  Interrupts are off, and the graphics window is the page, only
 ;	while a seed is dealt with.
 ;
 
@@ -23,6 +23,9 @@
     EXTERN  __mz2500_mask_table
     EXTERN  l_push_di
     EXTERN  l_pop_ei
+    EXTERN  __MZ2500_GFX_WINDOW
+    EXTERN  __MZ2500_GFX_BASE
+    EXTERN  __MZ2500_GFX_PAGE
 
     defc    FL_SEEDS = 200
 
@@ -126,16 +129,16 @@ fl_process:
     ld      a, e
     ld      (fl_y), a
     call    l_push_di
-    ld      a, 2
+    ld      a, __MZ2500_GFX_WINDOW
     out     ($b4), a
     in      a, ($b5)
-    push    af                          ; window 2 as it is
-    ld      a, 2
+    push    af                          ; the window as it is
+    ld      a, __MZ2500_GFX_WINDOW
     out     ($b4), a
     ld      a, $30
     out     ($b5), a                    ; the read-modify-write page
     call    fl_body
-    ld      a, 2
+    ld      a, __MZ2500_GFX_WINDOW
     out     ($b4), a
     pop     af
     out     ($b5), a
@@ -188,7 +191,7 @@ fl_hl_div8:
     rr      l
     ret
 
-; a = y: hl = the address of the row in window 2.  Uses de
+; a = y: hl = the address of the row in the window.  Uses de
 fl_rowaddr:
     ld      l, a
     ld      h, 0
@@ -200,7 +203,7 @@ fl_rowaddr:
     add     hl, hl
     add     hl, hl                      ; y * 32
     add     hl, de
-    ld      de, $4000
+    ld      de, __MZ2500_GFX_BASE
     add     hl, de
     ret
 

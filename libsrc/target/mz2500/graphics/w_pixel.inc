@@ -9,9 +9,9 @@
 ; plot and unplot use the video RAM's read-modify-write page ($30, which writes all four planes at once): with the CG registers in PSET mode
 ; (register 5 = $4F: all four planes) and the colour in registers 0-3 (a plane's byte is $FF if that bit of the colour is set), a byte written to the
 ; page is a mask of pixels to set to that colour.  point reads the page, which loads the four plane bytes into latches that ports $BC-$BF return.
-; The page is mapped in window 2 ($4000) and window 2 is put back afterwards.
+; The page is mapped in the graphics window (__MZ2500_GFX_WINDOW, window 2 by default) and that window is put back afterwards.
 ; xorplot has no read-modify-write mode, so it maps each plane page ($20, $22, $24, $26: the blue, red, green and intensity planes of screen A) in
-; turn into window 2.
+; turn into the graphics window.
 ; Exit: point returns the pixel value (0..15) in a, nz if it is not 0.
 
     EXTERN  __gfx_coords
@@ -21,6 +21,9 @@
     EXTERN  __mz2500_mask_table
     EXTERN  l_push_di
     EXTERN  l_pop_ei
+    EXTERN  __MZ2500_GFX_WINDOW
+    EXTERN  __MZ2500_GFX_BASE
+    EXTERN  __MZ2500_GFX_PAGE
 
     ld      a, d                        ;y 0..199 (the high byte must be 0: a negative y is off the screen too)
     or      a
@@ -61,8 +64,8 @@ x_ok:
     add     hl, de                      ;y * 40
     pop     de
     add     hl, de
-    ld      de, $4000
-    add     hl, de                      ;the byte in window 2
+    ld      de, __MZ2500_GFX_BASE
+    add     hl, de                      ;the byte in the window
     ld      b, 0
     ld      de, __mz2500_mask_table
     ex      de, hl
@@ -95,12 +98,12 @@ IF  NEEDpoint
     ld      c, a                        ;c collects the colour
 ENDIF
     call    l_push_di                   ;(interrupts off, their state kept)
-    ld      a, 2
+    ld      a, __MZ2500_GFX_WINDOW
     out     ($b4), a
     in      a, ($b5)
-    push    af                          ;window 2 as it is
+    push    af                          ;the window as it is
 IF  NEEDplot|NEEDunplot|NEEDpoint
-    ld      a, 2
+    ld      a, __MZ2500_GFX_WINDOW
     out     ($b4), a
     ld      a, $30
     out     ($b5), a
@@ -127,9 +130,9 @@ IF  NEEDplot|NEEDunplot|NEEDpoint
   ENDIF
 ENDIF
 IF  NEEDxor
-    ld      b, $20
+    ld      b, __MZ2500_GFX_PAGE
 plane_loop:
-    ld      a, 2
+    ld      a, __MZ2500_GFX_WINDOW
     out     ($b4), a
     ld      a, b
     out     ($b5), a
@@ -142,13 +145,13 @@ next_plane:
     inc     b
     inc     b
     ld      a, b
-    cp      $28
+    cp      __MZ2500_GFX_PAGE + 8
     jr      nz, plane_loop
 ENDIF
-    ld      a, 2
+    ld      a, __MZ2500_GFX_WINDOW
     out     ($b4), a
     pop     af
-    out     ($b5), a                    ;window 2 put back
+    out     ($b5), a                    ;the window put back
     call    l_pop_ei
 IF  NEEDpoint
     ld      a, c                        ;the planes are in the top nibble, plane 0 in bit 4

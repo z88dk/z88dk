@@ -1,4 +1,4 @@
-; Platform specific colour transformation
+; Platform specific colour transformation: conio colours to the pixel values (blue 1, red 2, green 4, intensity 8)
 ;
 ; Entry: a = colour
 ; Exit:  a = colour to use on screen
@@ -25,20 +25,19 @@ conio_map_colour:
 
     SECTION rodata_clib
 table:
-    defb    $0                          ;BLACK -> BLACK
-    defb    $1                          ;BLUE -> BLUE
-    defb    $4                          ;GREEN -> GREEN
-    defb    $5                          ;CYAN -> CYAN
-    defb    $2                          ;RED -> RED
-    defb    $3                          ;MAGENTA -> MAGENTA
-    defb    $2                          ;BROWN -> RED
-    defb    $7                          ;LIGHTGRAY -> WHITE
-    defb    $7                          ;DARKGRAY -> WHITE
-    defb    $1                          ;LIGHTBLUE -> BLUE
-    defb    $4                          ;LIGHTGREEN -> GREEN
-    defb    $5                          ;LIGHTCYAN -> CYAN
-    defb    $2                          ;LIGHTRED -> RED
-    defb    $3                          ;LIGHTMAGENTA -> MAGENTA
-    defb    $6                          ;YELLOW -> YELLOW
-    defb    $7                          ;WHITE -> WHITE
-
+    defb    0                           ;BLACK
+    defb    1                           ;BLUE
+    defb    4                           ;GREEN
+    defb    5                           ;CYAN
+    defb    2                           ;RED
+    defb    3                           ;MAGENTA
+    defb    6                           ;BROWN
+    defb    7                           ;LIGHTGRAY
+    defb    8                           ;DARKGRAY
+    defb    9                           ;LIGHTBLUE
+    defb    12                          ;LIGHTGREEN
+    defb    13                          ;LIGHTCYAN
+    defb    10                          ;LIGHTRED
+    defb    11                          ;LIGHTMAGENTA
+    defb    14                          ;YELLOW
+    defb    15                          ;WHITE

@@ -6,8 +6,8 @@
 ;
 ;	The graphics library draws in software, directly in the video planes: 320x200 in 16 colours, four planes (blue, red, green, intensity) of 40 bytes
 ;	a line, bit 0 of a byte the leftmost pixel, a pixel value B | R << 1 | G << 2 | I << 3.  The IPL's services are not used for drawing (the IPL ROM
-;	does not have the drawing calls: _PSET and the like are only there if an operating system has loaded them), only for the text console and the
-;	keyboard, so the text screen stays on top of the graphics and print/cprintf/getk work.
+;	does not have the drawing calls: _PSET and the like are only there if an operating system has loaded them).  The video RAM is reached through a window
+;	the crt names (__MZ2500_GFX_WINDOW, see mz2500_gwin.asm).  The console (stdio/generic_console_*.asm) draws in the same planes.
 ;
 ;	mz2500_gfx_init sets graphics mode $14 (320x200, 16 colours, screen A), the 4096 colour palette (rather than the fixed digital colours), and the
 ;	pixel to palette map to the identity.  The palette is the IBM CGA one: bits 0-2 are blue, red, green at 2/3 intensity, bit 3 brightens (black + 3 is

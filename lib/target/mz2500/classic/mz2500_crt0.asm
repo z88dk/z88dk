@@ -33,10 +33,58 @@ IF !DEFINED_CRT_ORG_CODE
 ENDIF
     defc    TAR__register_sp = -1
 
-    defc    CONSOLE_COLUMNS = 40
-    defc    CONSOLE_ROWS = 24
 
-; The IPL's services (rst 18h: text, keyboard, disk, sound) are available unless the program has its own memory map (CRT_MZ2500_IPL_DISABLED).
+; The console's mode at start-up: 0 = the text screen (ROM glyphs, 8 colours), 1 = the graphics screen (font and UDGs, 16 colours, 40 x 25).  Both are
+; written directly (the IPL is not called).  ioctl IOCTL_GENCON_SET_MODE changes it.  The text screen is as the CRTC was left (by the IPL), which a
+; program that disables the IPL has to set up itself, so the default is 1 then.  -pragma-define:CRT_MZ2500_CON_MODE=n
+;   __MZ2500_TEXT_COLUMNS  the width of the text screen, 40 or 80: -pragma-define:CRT_MZ2500_TEXT_COLUMNS=n (default 40)
+IF !DEFINED_CRT_MZ2500_CON_MODE
+  IF DEFINED_CRT_MZ2500_IPL_DISABLED
+    defc    CRT_MZ2500_CON_MODE = 1
+  ELSE
+    defc    CRT_MZ2500_CON_MODE = 0
+  ENDIF
+ENDIF
+IF !DEFINED_CRT_MZ2500_TEXT_COLUMNS
+    defc    CRT_MZ2500_TEXT_COLUMNS = 40
+ENDIF
+    PUBLIC  __MZ2500_CON_MODE
+    PUBLIC  __MZ2500_TEXT_COLUMNS
+    defc    __MZ2500_CON_MODE = CRT_MZ2500_CON_MODE
+    defc    __MZ2500_TEXT_COLUMNS = CRT_MZ2500_TEXT_COLUMNS
+IF CRT_MZ2500_CON_MODE
+    defc    CONSOLE_COLUMNS = 40
+ELSE
+    defc    CONSOLE_COLUMNS = CRT_MZ2500_TEXT_COLUMNS
+ENDIF
+    defc    CONSOLE_ROWS = 25
+
+;--------
+; The window model.  The library draws by borrowing one of the eight 8 KB windows of the Z80's address space: it maps a page of video RAM into it, draws,
+; and maps back the page that was there (read from port $B5), with interrupts off while it is borrowed.  Which window, and which pages, is the crt's
+; to say, so that the same library code runs in whatever memory map the program has.  Library code takes these as EXTERNs:
+;
+;   __MZ2500_GFX_WINDOW  the window (0-7) borrowed; the program must not have its code, its stack or anything it uses while drawing in it.
+;                        -pragma-define:CRT_MZ2500_GFX_WINDOW=n.  Default 2 ($4000): with the IPL, the program is at $8000 and up and the IPL's
+;                        services keep windows 1-3 for themselves (they save and restore them), so this is the one a program does not need.
+;   __MZ2500_GFX_BASE    the address of that window (window * $2000)
+;   __MZ2500_GFX_PAGE    the page of the blue plane of the screen drawn on; the red, green and intensity planes are the pages 2, 4 and 6 above
+;                        it.  $20 is screen A, the one mz2500_set_mode shows.  -pragma-define:CRT_MZ2500_GFX_PAGE=n
+;--------
+IF !DEFINED_CRT_MZ2500_GFX_WINDOW
+    defc    CRT_MZ2500_GFX_WINDOW = 2
+ENDIF
+IF !DEFINED_CRT_MZ2500_GFX_PAGE
+    defc    CRT_MZ2500_GFX_PAGE = $20
+ENDIF
+    PUBLIC  __MZ2500_GFX_WINDOW
+    PUBLIC  __MZ2500_GFX_BASE
+    PUBLIC  __MZ2500_GFX_PAGE
+    defc    __MZ2500_GFX_WINDOW = CRT_MZ2500_GFX_WINDOW
+    defc    __MZ2500_GFX_BASE = CRT_MZ2500_GFX_WINDOW * $2000
+    defc    __MZ2500_GFX_PAGE = CRT_MZ2500_GFX_PAGE
+
+; The IPL's services (rst 18h: keyboard, disk, sound, text) are available unless the program has its own memory map (CRT_MZ2500_IPL_DISABLED).
 ; The library routines that call them name this symbol, so linking one of them into a program without the IPL is an error
 IF !DEFINED_CRT_MZ2500_IPL_DISABLED
     PUBLIC  THIS_FUNCTION_ONLY_WORKS_WITH_IPL_SUBTYPE
@@ -72,6 +120,14 @@ IF !DEFINED_CRT_MZ2500_IPL_DISABLED
     OUT     (0B4h), A
     OUT     (0B5h), A
 
+    ; the text screen as the console's mode 0 expects it: 40 or 80 columns, 25 rows, screen 1 (the IPL's _TWID sets all three), cleared (_TCLR)
+IF CRT_MZ2500_TEXT_COLUMNS = 40
+    ld      a, 1
+ELSE
+    xor     a
+ENDIF
+    rst     18h
+    defb    6ch     ; _TWID
     xor     a
     rst     18h
     defb    70h     ; clear text
