@@ -1,9 +1,11 @@
 MZ2500_GLOBS := \
+	"target/mz2500/graphics/*.asm" \
 	"target/mz2500/mz2500/*.asm" \
 	"target/mz2500/input/*.asm" \
 	"target/mz2500/stdio/*.asm"
 
 MZ2500_GLOBS_ex := \
+	target/mz2500/graphics/*.asm \
 	target/mz2500/mz2500/*.asm \
 	target/mz2500/input/*.asm \
 	target/mz2500/stdio/*.asm
@@ -22,7 +24,7 @@ MZ2500_TARGETS := target/mz2500/obj/target-mz2500-mz2500 \
 
 CLEAN += target-mz2500-clean
 TOCREATE += $(call check_target,mz2500,mz2500_clib.lib)
-$(eval $(call gfx_stamp_args,mz2500,TARGET=mz2500))
+$(eval $(call gfx_stamp_args,mz2500,TARGET=mz2500 FLAVOUR=wide))
 $(eval $(call buildtargetasm,target/mz2500,z80,mz2500,-mz80,$(MZ2500_GLOBS),$(MZ2500_GLOBS_ex)))
 $(eval $(call buildtargetc,target/mz2500,mz2500))
 

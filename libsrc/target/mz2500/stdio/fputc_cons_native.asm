@@ -1,5 +1,8 @@
 
     SECTION code_clib
+
+    EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_IPL_SUBTYPE
+    defc    __subtype_protection=THIS_FUNCTION_ONLY_WORKS_WITH_IPL_SUBTYPE
     PUBLIC  fputc_cons_native
 
 

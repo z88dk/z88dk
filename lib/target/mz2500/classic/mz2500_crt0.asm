@@ -36,6 +36,13 @@ ENDIF
     defc    CONSOLE_COLUMNS = 40
     defc    CONSOLE_ROWS = 24
 
+; The IPL's services (rst 18h: text, keyboard, disk, sound) are available unless the program has its own memory map (CRT_MZ2500_IPL_DISABLED).
+; The library routines that call them name this symbol, so linking one of them into a program without the IPL is an error
+IF !DEFINED_CRT_MZ2500_IPL_DISABLED
+    PUBLIC  THIS_FUNCTION_ONLY_WORKS_WITH_IPL_SUBTYPE
+    defc    THIS_FUNCTION_ONLY_WORKS_WITH_IPL_SUBTYPE = 1
+ENDIF
+
     defc	TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__fputc_cons_generic = 1

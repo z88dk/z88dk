@@ -1,3 +1,5 @@
 target/mz2500/obj/${TARGET}/**/*.o
+classic/gfx/wide/obj/${TARGET}/w_dcircle_square
+@classic/gfx/wide/gfx_wide.lst
 @classic/stdio/stdio.lst
 @classic/games/games.lst

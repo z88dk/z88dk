@@ -76,4 +76,15 @@ extern void __LIB__ in_MouseMZ2500SetPos_callee(unsigned int xcoord, unsigned in
 #define IN_KEY_SCANCODE_KANA   0x080B
 #define IN_KEY_SCANCODE_CTRL   0x100B
 
+// Graphics (the IPL subtype): <graphics.h>'s clg, plot, unplot, xorplot, point, draw, drawto, drawb, circle, fill and the rest, drawn in software in the
+// video planes: 320x200 in 16 colours, pixel value B | R << 1 | G << 2 | I << 3.  clg() switches to the mode and clears the graphics (the text
+// screen stays on top, so the console and getk still work).  The IPL ROM has no drawing calls of its own (_PSET etc. need an operating system that
+// installs them), so these do not use it.  Not supported (they need a 1 bit per pixel byte address): putsprite, getsprite, bksave, bkrestore, clga, fillb.
+// Set the graphics mode, the 4096 colour palette in CGA colours and the pixel to palette map, without clearing (clg does this)
+extern void __LIB__ mz2500_gfx_init(void);
+
+// The colour (0-15) that plot and xorplot use, and the one unplot and clg use.  Power on: ink 15, paper 0
+extern void __LIB__ mz2500_gfx_ink(uint8_t ink, uint8_t paper) __smallc;
+
+
 #endif
