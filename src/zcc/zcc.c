@@ -2050,8 +2050,14 @@ static void zsdcc_embed_adb(int filenumber)
     cdbfile = changesuffix(temporary_filenames[filenumber], ".adb");
     if ( (fcdb = fopen(cdbfile, "r")) != NULL ) {
         if ( (fasm = fopen(filelist[filenumber], "a")) != NULL ) {
-            char *tcfile = replace_str(changesuffix(filelist[filenumber], ""), "/", "_");
+            char *tcfile = changesuffix(filelist[filenumber], "");
             char *ocfile = replace_str(changesuffix(original_filenames[filenumber], ""), "/", "_");
+            char *p;
+
+            /* zsdcc --c1mode names the module after the -o path, with every non-alphanumeric character as '_' */
+            for (p = tcfile; *p; ++p)
+                if (!isalnum((unsigned char) *p))
+                    *p = '_';
             fprintf(fasm, "\n\n; Embedding adb file\n");
 
 
