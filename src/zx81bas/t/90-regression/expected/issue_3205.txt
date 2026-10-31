@@ -1,0 +1,7 @@
+% z88dk-zx81bas t/90-regression//input/issue_3205.bas
+Input file:  t/90-regression/input/issue_3205.bas
+Output file: t/90-regression/input/issue_3205.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/90-regression/input/issue_3205.i" "t/90-regression/input/issue_3205.pp"
+% z88dk-z80asm -b -m -o"t/90-regression/input/issue_3205.p" "t/90-regression/input/issue_3205.asm"
+% z88dk-z80asm -b -m -o"t/90-regression/input/issue_3205.p" "t/90-regression/input/issue_3205.asm"
+% z88dk-z80asm -b -m -o"t/90-regression/input/issue_3205.p" "t/90-regression/input/issue_3205.asm"

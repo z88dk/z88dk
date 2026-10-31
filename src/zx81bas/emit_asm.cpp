@@ -311,8 +311,10 @@ static void emit_prog(Prog& prog, int pass,
                 emit(asm_source, "", "DEFB", "_QUOTE");
                 break;
             case TokenType::RemComment:  // REM argument is a RemComment token
-                emit(asm_source, "", "DEFB",
-                     string_to_zx81(token.text, /*check_keywords=*/false, token.loc, do_invert));
+                if (!token.text.empty()) {
+                    emit(asm_source, "", "DEFB",
+                         string_to_zx81(token.text, /*check_keywords=*/false, token.loc, do_invert));
+                }
                 break;
             default:
                 emit(asm_source, "", "DEFB", string_to_zx81(token.text, /*check_keywords=*/true,
@@ -343,7 +345,9 @@ static void emit_prog(Prog& prog, int pass,
                     oss << string_to_zx81(token.svalue, /*check_keywords=*/false, token.loc);
                     break;
                 case TokenType::StringLiteral:
-                    oss << string_to_zx81(token.svalue, /*check_keywords=*/false, token.loc);
+                    if (!token.svalue.empty()) {
+                        oss << string_to_zx81(token.svalue, /*check_keywords=*/false, token.loc);
+                    }
                     break;
                 case TokenType::LabelRefAddr: {
                     auto it = prog.label_addr.find(token.svalue);
@@ -415,9 +419,14 @@ static void emit_display(Prog& prog, std::vector<std::string>& asm_source) {
 
         std::ostringstream oss;
         oss << std::setw(2) << std::setfill('0') << line_num;
-        emit(asm_source, "DSPLY" + oss.str() + ":", "DEFB",
-             string_to_zx81(line_text,
-                            /*check_keywords=*/false, SourceLoc()));
+        if (line_text.empty()) {
+            emit(asm_source, "DSPLY" + oss.str() + ":");
+        }
+        else {
+            emit(asm_source, "DSPLY" + oss.str() + ":", "DEFB",
+                 string_to_zx81(line_text,
+                                /*check_keywords=*/false, SourceLoc()));
+        }
         emit(asm_source, "", "DEFB", "_NL");
     }
     emit(asm_source, "");
@@ -525,7 +534,9 @@ static void emit_var(Prog& prog, int pass, const PragmaStrVarStmt& stmt,
                 oss << string_to_zx81(token.svalue, /*check_keywords=*/false, token.loc);
                 break;
             case TokenType::StringLiteral:
-                oss << string_to_zx81(token.svalue, /*check_keywords=*/false, token.loc);
+                if (!token.svalue.empty()) {
+                    oss << string_to_zx81(token.svalue, /*check_keywords=*/false, token.loc);
+                }
                 break;
             case TokenType::LabelRefAddr: {
                 auto it = prog.label_addr.find(token.svalue);
