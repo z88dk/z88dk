@@ -893,7 +893,7 @@ defc __IO_ACIA_SR_IRQ         = 0x80
 
 defc __IO_ACIA_RX_SIZE     = 0x100
 defc __IO_ACIA_RX_FULLISH  = 0xf0
-defc __IO_ACIA_RX_EMPTYISH = 0x08
+defc __IO_ACIA_RX_EMPTYISH = 0xe0
 defc __IO_ACIA_TX_SIZE     = 0x20
 
 
@@ -1123,8 +1123,8 @@ defc __IO_SIO_RR1_RX_FRAMING_ERROR      = 0x40
 defc __IO_SIO_RR1_SDLC_EOF      = 0x80
 
 defc __IO_SIO_RX_SIZE      = 0x80
-defc __IO_SIO_RX_FULLISH      = 0x68
-defc __IO_SIO_RX_EMPTYISH      = 0x08
+defc __IO_SIO_RX_FULLISH      = 0x70
+defc __IO_SIO_RX_EMPTYISH      = 0x60
 defc __IO_SIO_TX_SIZE      = 0x20
 
 
@@ -1335,8 +1335,8 @@ defc __IO_UART_MSR_RING_INDICATOR = 0x40
 defc __IO_UART_MSR_DCD            = 0x80
 
 defc __IO_UART_RX_SIZE        = 0x80
-defc __IO_UART_RX_FULLISH     = 0x68
-defc __IO_UART_RX_EMPTYISH    = 0x08
+defc __IO_UART_RX_FULLISH     = 0x60
+defc __IO_UART_RX_EMPTYISH    = 0x50
 
 defc __IO_UART_DLL_115200     = 0x01
 defc __IO_UART_DLL_57600      = 0x02

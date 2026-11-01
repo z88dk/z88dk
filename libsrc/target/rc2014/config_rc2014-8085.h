@@ -111,7 +111,7 @@
 
 #define __IO_ACIA_RX_SIZE      0x100
 #define __IO_ACIA_RX_FULLISH   0xf0
-#define __IO_ACIA_RX_EMPTYISH 0x08
+#define __IO_ACIA_RX_EMPTYISH 0xe0
 #define __IO_ACIA_TX_SIZE      0x20
 
 
@@ -231,8 +231,8 @@
 #define __IO_SIO_RR1_SDLC_EOF     0x80
 
 #define __IO_SIO_RX_SIZE        0x80
-#define __IO_SIO_RX_FULLISH     0x68
-#define __IO_SIO_RX_EMPTYISH    0x08
+#define __IO_SIO_RX_FULLISH     0x70
+#define __IO_SIO_RX_EMPTYISH    0x60
 #define __IO_SIO_TX_SIZE        0x20
 
 
@@ -340,8 +340,8 @@
 #define __IO_UART_MSR_DCD               0x80
 
 #define __IO_UART_RX_SIZE        0x80
-#define __IO_UART_RX_FULLISH     0x68
-#define __IO_UART_RX_EMPTYISH    0x08
+#define __IO_UART_RX_FULLISH     0x60
+#define __IO_UART_RX_EMPTYISH    0x50
 
 #define __IO_UART_DLL_115200     0x01
 #define __IO_UART_DLL_57600      0x02
