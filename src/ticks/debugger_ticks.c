@@ -34,7 +34,7 @@ uint16_t get_sp()
 uint8_t get_ticks_memory(uint32_t at, memtype type)
 {
     /* Above 64k the debugger means a bank:address in the banked memory model */
-    if ( at > 0xffff )
+    if ( at > 0xffff && !memory_uses_lua() )
         return *memory_debug_addr(at, type);
     return get_memory(at, type);
 }
@@ -53,7 +53,7 @@ static int get_banked_caller(unsigned depth, uint32_t *caller)
     uint16_t sp, entry, saved;
 
     /* Debugger reads must not trigger watchpoints */
-#define PEEK(a) (*get_memory_addr((uint16_t)(a), MEM_TYPE_DATA))
+#define PEEK(a) peek_memory((uint16_t)(a), MEM_TYPE_DATA)
     if ( var < 0 )
         return 0;
     sp = PEEK(var) | PEEK(var + 1) << 8;

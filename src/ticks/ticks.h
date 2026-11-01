@@ -118,6 +118,7 @@ extern uint8_t  *memory_debug_addr(uint32_t addr, memtype type);
 extern const char *memory_mmu_text(void);
 extern uint32_t  memory_banked_caller(uint16_t saved, uint16_t ret);
 extern int       memory_has_banks(void);
+extern int       memory_uses_lua(void);
 extern void      memory_bank_store(unsigned bank, unsigned offset, uint8_t value);
 extern void      rabbit_set_xpc(uint16_t value);
 extern uint8_t   rabbit_phys_read(uint32_t addr);
@@ -135,6 +136,8 @@ extern int         in(int port);
 extern uint8_t    *get_memory_addr(uint32_t pc, memtype type);
 
 extern uint8_t     get_memory(uint32_t pc, memtype type);
+extern uint8_t     peek_memory(uint16_t pc, memtype type);
+extern void        load_memory(uint32_t pc, uint8_t value, memtype type);
 #define get_memory_inst(x) get_memory(x, MEM_TYPE_INST)
 #define get_memory_data(x) get_memory(x, MEM_TYPE_DATA)
 extern uint8_t     put_memory(uint16_t pc, uint8_t b);

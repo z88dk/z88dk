@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "ticks.h"
+#include "ticks_lua.h"
 #include "cpu.h"
 #include "debugger.h"
 #include "backend.h"
@@ -817,6 +818,8 @@ int    break_required = 0;
 int in(int port){
   int val;
 
+  if ( (val = lua_io_in(port)) != -1 ) return val;
+
   if ( (val = hook_console_in(port)) != -1 ) return val;
   if ( (val = hook_iotimer_in(port)) != -1 ) return val;
   if ( (val = apu_in(port)) != -1 ) return val;
@@ -827,6 +830,7 @@ int in(int port){
 }
 
 void out(int port, int value){
+  if ( lua_io_out(port, value) != -1 ) return;
   if ( hook_console_out(port,value) == 0 ) return;
   if ( hook_iotimer_out(port,value) == 0 ) return;
   if ( apu_out(port,value) == 0 ) return;

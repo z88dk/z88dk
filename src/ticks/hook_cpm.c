@@ -57,9 +57,9 @@ static int get_random(int fcb)
 
 static void set_offset(int fcb, int offset)
 {
-    *get_memory_addr(fcb+32, MEM_TYPE_DATA) = offset & 0x7f;
-    *get_memory_addr(fcb + 12, MEM_TYPE_DATA) = (offset >> 7) & 0x001f;
-    *get_memory_addr(fcb + 14, MEM_TYPE_DATA) = offset >> 12;
+    put_memory((uint16_t)(fcb + 32), offset & 0x7f);
+    put_memory((uint16_t)(fcb + 12), (offset >> 7) & 0x001f);
+    put_memory((uint16_t)(fcb + 14), offset >> 12);
 }
 
 
@@ -275,7 +275,13 @@ static void bdos_read_rand(void)
 
     if ( lseek(fd, posn, SEEK_SET) == -1 ) goto fail;
 
-    if ( read(fd, get_memory_addr(dma_address, MEM_TYPE_DATA), 128) <= 0 ) goto fail;
+    {
+        uint8_t buffer[128];
+        int ret = read(fd, buffer, sizeof(buffer));
+        int i;
+        if ( ret <= 0 ) goto fail;
+        for ( i = 0; i < ret; i++ ) put_memory((uint16_t)(dma_address + i), buffer[i]);
+    }
 
     set_offset(fcb, posn); // Set sequential offset
 
@@ -308,7 +314,12 @@ static void bdos_write_rand(void)
     //printf("Write to fd %d slot %d posn %d\n",fd,slot,posn);
     if ( lseek(fd, posn, SEEK_SET) == -1 ) goto fail;
 
-    if ( write(fd, get_memory_addr(dma_address, MEM_TYPE_DATA), 128) <= 0 ) goto fail;
+    {
+        uint8_t buffer[128];
+        int i;
+        for ( i = 0; i < sizeof(buffer); i++ ) buffer[i] = get_memory_data((uint16_t)(dma_address + i));
+        if ( write(fd, buffer, sizeof(buffer)) <= 0 ) goto fail;
+    }
 
     set_offset(fcb, posn); // Set sequential offset
 
@@ -403,11 +414,11 @@ void hook_cpm(void)
         {
             int addr = d << 8 | e;
             int tp;
-            while ( ( tp = *get_memory_addr(addr, MEM_TYPE_INST)) ) {
+            while ( ( tp = get_memory_inst((uint16_t)addr)) ) {
                 if ( tp == '$' ) 
                     break;
                 fputc(tp, stdout);
-                addr++;
+                addr = (addr + 1) & 0xffff;
             }
             fflush(stdout);
         }
