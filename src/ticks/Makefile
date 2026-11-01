@@ -1,5 +1,7 @@
 include ../Make.common
 
+.DEFAULT_GOAL := all
+
 LUA_SRC = ../../ext/lua
 LUA_OBJS = lua_lapi.o lua_lcode.o lua_lctype.o lua_ldebug.o lua_ldo.o lua_ldump.o \
 	lua_lfunc.o lua_lgc.o lua_llex.o lua_lmem.o lua_lobject.o lua_lopcodes.o \
@@ -33,8 +35,6 @@ else
 endif
 CFLAGS += -I../../ext/uthash/src/ -I$(LUA_SRC) -g -MMD $(UNIXem_CFLAGS)
 
-$(LUA_OBJS): lua_%.o: $(LUA_SRC)/%.c
-	$(CC) $(CFLAGS) -I$(LUA_SRC) -c -o $@ $<
 LDFLAGS = -lm
 
 
@@ -71,6 +71,9 @@ expressions.tab.c expressions.tab.h: expressions.y
 
 lex.yy.c: expressions.l expressions.tab.h
 	flex expressions.l
+
+$(LUA_OBJS): lua_%.o: $(LUA_SRC)/%.c
+	$(CC) $(CFLAGS) -I$(LUA_SRC) -c -o $@ $<
 
 clean:
 	$(RM) z88dk-ticks$(EXESUFFIX) $(OBJS) core
