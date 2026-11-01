@@ -18,7 +18,7 @@ the same library. math32 runs on the 8080, the 8085, the KR580VM1, the gbz80, th
 the Rabbit in addition to the Zilog CPUs. The half-precision library, math16, runs on the 8080, 
 the 8085, and the gbz80. Divide, and the public inverse, use a restoring 1/x in both libraries.
 
-+zx81 and +lambda keep genmath_zx81 when you ask for -lm. The ROM interrupt on those machines 
++zx81 and +lambda continue to use genmath_zx81 with  -lm. The ROM interrupt on those machines 
 does not save AF', and math32 uses ex af,af'. ROM floating point stays on -lmz for the machines 
 that have libraries.
 
@@ -26,7 +26,7 @@ The KR580VM1 (vm1) is a supported processor in this release. z80asm accepts its 
 +test can build for this processor, and math32 supplies its floating point library.
 
 This release builds zsdcc from SDCC 4.6.0 revision r16639. The patched compiler keeps the z88dk
- calling conventions.
+calling conventions.
 
 Newlib products now install next to the classic libraries. sccz80 products go under lib/clibs/sccz80, 
 and sdcc products go under lib/clibs/sdcc_ix. The +hbios, +scz180, +yaz180, +rc2014, and +cpm targets 
@@ -65,9 +65,10 @@ More detailed, but still incomplete changelist:
 - [classic] +hdos fcntl available
 - [classic] +hdos time(), clock(), and default_device()
 - [classic] +msx, +sam, and Aquarius Plus have a mouse driver. The +mz2500 mouse driver is untested
-- [classic] +mz2500 has page, palette, and disc routines. BANK_n sections load extra RAM. CRT_ORG_CODE can be 0
+- [classic] +multi8 tape reading functions available
+- [classic] +mz2500 Improved support: console, graphics and other routines.
 - [classic] +p2000 Inkey keyboard driver available
-- [classic] +pc88 has pc88_disk_read and pc88_disk_write. +multi8 has tape_save and tape_load_to
+- [classic] +pc88 has pc88_disk_read and pc88_disk_write
 - [classic] +phc25 New target
 - [classic] +pps low-memory crt0 layout
 - [classic] +sms now has access to newlib libraries
@@ -76,6 +77,7 @@ More detailed, but still incomplete changelist:
 - [classic] +x07 Support much improved
 - [classic] +x1 has x1_disk_read and x1_disk_write
 - [classic] +z88 Support for 512z64 graphics
+- [classic] +zx Now has access to Bifrost etc libraries
 - [classic] +zxn can write a .nex whose start is below 0x4000
 - [classic] +zxn Hardware headers for the full nextreg set
 - [classic] +zxn Plotting now support on layer 2 screen
@@ -95,7 +97,6 @@ More detailed, but still incomplete changelist:
 - [z80asm] Bug fixes
 - [z80asm] the map names the bank of __section_head, __section_tail, and __section_size
 - [z88dk-copt] Additional conditions for compiler and pattern formats
-- [z88dk-copt] ez80-clang rules for LLVM 19
 - [z88dk-dis] Support for decoding rst calls
 - [z88dk-gdb] IM 2 support, watchpoints, O-packets, and the Z80 I and R registers
 - [z88dk-ticks] -iotimer and -mmtimer read the cycle count from inside the program
@@ -103,7 +104,7 @@ More detailed, but still incomplete changelist:
 - [z88dk-ticks] Support for the Rabbit banking model
 - [z88dk-zsdcc] Upgraded to SDCC 4.6.0 r16639
 - [zcc] add multi compiler selection tool (sccz80, 80cc-sp, 80cc-fp)
-- [zcc] llvm-z80 backend for classic C
+- [zcc] experimental llvm-z80 backend for classic C
 - [zx81bas] Build a ZX81 .p tape from BASIC with inline assembly
 
 
