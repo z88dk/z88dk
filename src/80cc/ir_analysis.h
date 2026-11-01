@@ -11,6 +11,20 @@
 
 #include "ir.h"
 #include <stddef.h>
+#include <stdint.h>
+
+/* Return the index of the least significant set bit. The argument must be
+   non-zero. Keep this compiler-independent: the IR is also built with MSVC,
+   which does not provide GCC's __builtin_ctz. */
+static inline int ir_ctz32(uint32_t value)
+{
+    int bit = 0;
+    while ((value & 1u) == 0) {
+        value >>= 1;
+        bit++;
+    }
+    return bit;
+}
 
 /* Vreg-indexed bit set. Opaque to callers; ir_analysis.c owns layout.
    The BB struct's `live_in` / `live_out` are stored as `BitSet *`. */
