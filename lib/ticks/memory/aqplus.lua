@@ -1,5 +1,7 @@
 -- Aquarius+ Lua-owned 64 KB memory model. Each 16 KB segment is independently banked.
 
+local keyboard = require("keyboard_matrix").new(8, 6)
+
 local banks = { 0, 1, tonumber(os.getenv("AQ_BANK2") or "19") & 0xff, tonumber(os.getenv("AQ_BANK3") or "20") & 0xff }
 local initial_banks = { table.unpack(banks) }
 local vctrl = 0
@@ -62,7 +64,16 @@ end
 
 function io_in(addr)
     local port = addr & 0xff
+    local high = (addr >> 8) & 0xff
     if port >= 0xf0 and port <= 0xf2 then return banks[port - 0xef] end
+    if port == 0xff then return 0xc0 | keyboard:read_selected(high) end
+    local rows = (~port) & 0xff
+    if high == 0xfe and rows ~= 0 and (rows & (rows - 1)) == 0 then
+        return 0xc0 | keyboard:read_selected(port)
+    end
+    if addr == 0x7ffe or addr == 0xfffe then
+        return 0xc0 | keyboard:read(7)
+    end
     return nil
 end
 

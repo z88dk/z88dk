@@ -81,6 +81,21 @@ static void lua_io_add_native_out(const char *name, unsigned handler)
     lua_setfield(lua_state, -2, name);
 }
 
+static void lua_add_ticks_module_path(void)
+{
+    const char *zcccfg = getenv("ZCCCFG");
+
+    if (zcccfg == NULL)
+        return;
+
+    lua_getglobal(lua_state, "package");
+    lua_getfield(lua_state, -1, "path");
+    lua_pushfstring(lua_state, "%s/../ticks/?.lua;%s", zcccfg,
+                    lua_tostring(lua_state, -1));
+    lua_setfield(lua_state, -3, "path");
+    lua_pop(lua_state, 2);
+}
+
 static void lua_io_error(const char *where)
 {
     const char *message = lua_tostring(lua_state, -1);
@@ -104,6 +119,7 @@ int lua_io_init(const char *filename)
         return -1;
     }
     luaL_openlibs(lua_state);
+    lua_add_ticks_module_path();
     lua_newtable(lua_state);
     lua_io_add_native_in("console_in", LUA_IO_CONSOLE);
     lua_io_add_native_in("iotimer_in", LUA_IO_TIMER);

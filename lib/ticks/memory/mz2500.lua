@@ -1,4 +1,7 @@
 -- MZ-2500 8 KB windowed memory and CG RMW page model for z88dk-ticks.
+
+local keyboard = require("keyboard_matrix").new(12, 8)
+local pio_a = 0xff
 local initial_windows = { 0, 1, 2, 3, 0x20, 0x22, 0x24, 0x26 }
 local test_window = tonumber(os.getenv("MZ_WINDOW") or "-1")
 if test_window >= 0 and test_window < 8 then initial_windows[test_window+1] = 8 end
@@ -78,12 +81,16 @@ function memory_write(addr, value, _type, _cycles)
 end
 function io_in(addr)
     local port = addr & 0xff
+    if port == 0xe8 then return pio_a end
+    if port == 0xea then return keyboard:read(pio_a & 0x0f) end
     if port == 0xb5 then return windows[selected+1] end
     if port >= 0xbc and port <= 0xbf then return latches[port-0xbb] end
     return nil
 end
 function io_out(addr, value)
     local port = addr & 0xff; value = value & 0xff
+    if port == 0xe8 then pio_a = value; return 0 end
+    if port == 0xe9 or port == 0xeb then return 0 end
     if port == 0xb4 then selected = value & 7; return 0 end
     if port == 0xb5 then windows[selected+1] = value; selected = (selected + 1) & 7; return 0 end
     if port == 0xbc then regsel = value & 15; return 0 end

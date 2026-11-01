@@ -1,6 +1,8 @@
 -- PC-8801 Lua-owned 64 KB memory model for z88dk-ticks.
 -- The three planes are exposed in $C000-$FFFF via ports $5C-$5F and $32-$35.
 
+local keyboard = require("keyboard_matrix").new(13, 8)
+
 local plane = 0
 local p32, p35, alu = 0x98, 0, 0
 local ram = {}
@@ -65,6 +67,11 @@ function memory_write(addr, value, _type, cycles)
         end
     end
     return 0
+end
+
+function io_in(addr)
+    if addr >= 0 and addr <= 0x0c then return keyboard:read(addr) end
+    return nil
 end
 
 function io_out(addr, value)

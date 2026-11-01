@@ -2,6 +2,8 @@
 -- LMPR ($FA) maps a page pair at $0000-$7FFF; HMPR ($FB) maps a pair at $8000-$FFFF.
 -- ROM images are read from rom0.bin and rom1.bin in the run directory (missing bytes read as zero).
 
+local keyboard = require("keyboard_matrix").new(9, 5)
+
 local page_count = tonumber(os.getenv("SAM_RAM_PAGES") or "16")
 assert(page_count == 16 or page_count == 32, "SAM_RAM_PAGES must be 16 or 32")
 local page_mask = page_count - 1
@@ -76,8 +78,14 @@ function memory_write(addr, value, _type, _cycles)
 end
 
 function io_in(addr)
-    if (addr & 0xff) == 0xfa then return lmpr end
-    if (addr & 0xff) == 0xfb then return hmpr end
+    local port = addr & 0xff
+    if port == 0xfa then return lmpr end
+    if port == 0xfb then return hmpr end
+    if port == 0xfe then
+        local rows = (addr >> 8) & 0xff
+        local value = rows == 0xff and keyboard:read(8) or keyboard:read_selected(rows)
+        return 0xe0 | value
+    end
     return nil
 end
 
