@@ -64,7 +64,9 @@ int find_slot()
 
 static void cmd_openfile(void)
 {
-    char *filename = (char *)get_memory_addr(( l | h <<8), MEM_TYPE_INST);
+    uint16_t filename_addr = (uint16_t)(l | h << 8);
+    char *filename = malloc(65536);
+    int filename_len;
     int   z88dk_flags = e | d << 8;
     int   flags = O_RDONLY;
     int   mode = c | b << 8;
@@ -76,7 +78,21 @@ static void cmd_openfile(void)
     if ( z88dk_flags & Z88DK_O_APPEND ) flags |= O_APPEND;
     if ( z88dk_flags & Z88DK_O_CREAT ) flags |= O_CREAT;
 
-    l = h = 255; 
+    l = h = 255;
+    if ( filename == NULL ) {
+        errno = ENOMEM;
+        SET_ERROR(normalise_errno());
+        return;
+    }
+    for ( filename_len = 0; filename_len < 65536; filename_len++ ) {
+        filename[filename_len] = get_memory_inst((uint16_t)(filename_addr + filename_len));
+        if ( filename[filename_len] == 0 ) break;
+    }
+    if ( filename_len == 65536 ) {
+        free(filename);
+        SET_ERROR(Z88DK_EINVAL);
+        return;
+    }
     if ( slot != -1 ) {
 #ifdef WIN32
         int fd = open(filename, flags|O_BINARY, _S_IREAD | _S_IWRITE);
@@ -96,6 +112,7 @@ static void cmd_openfile(void)
     } else {
         SET_ERROR(Z88DK_ENFILE);
     }
+    free(filename);
 }
 
 static void cmd_closefile(void)
@@ -142,7 +159,17 @@ static void cmd_writeblock(void)
 
     CHECK_FD();
 
-    ret = write(slots[b], (char *)get_memory_addr(e | d<<8, MEM_TYPE_INST), (l | h << 8));
+    {
+        uint16_t addr = (uint16_t)(e | d << 8);
+        unsigned int len = (unsigned int)(l | h << 8), i;
+        uint8_t *buffer = malloc(len ? len : 1);
+        if ( buffer == NULL ) { errno = ENOMEM; ret = -1; }
+        else {
+            for ( i = 0; i < len; i++ ) buffer[i] = get_memory_inst((uint16_t)(addr + i));
+            ret = write(slots[b], buffer, len);
+            free(buffer);
+        }
+    }
     if ( ret != -1 ) {
         SET_ERROR(Z88DK_ENONE);
     } else {
@@ -159,7 +186,17 @@ static void cmd_readblock(void)
 
     CHECK_FD();
 
-    ret = read(slots[b], (char *)get_memory_addr(e | d << 8, MEM_TYPE_INST), (l | h <<8));
+    {
+        uint16_t addr = (uint16_t)(e | d << 8);
+        unsigned int len = (unsigned int)(l | h << 8), i;
+        uint8_t *buffer = malloc(len ? len : 1);
+        if ( buffer == NULL ) { errno = ENOMEM; ret = -1; }
+        else {
+            ret = read(slots[b], buffer, len);
+            if ( ret > 0 ) for ( i = 0; i < (unsigned int)ret; i++ ) put_memory((uint16_t)(addr + i), buffer[i]);
+            free(buffer);
+        }
+    }
     if ( ret != -1 ) {
         SET_ERROR(Z88DK_ENONE);
     } else {
@@ -228,8 +265,14 @@ static void cmd_ide_read(void)
         SET_ERROR(normalise_errno());
         return;
     }
-    if ( read(devices[selected_unit], (char *)get_memory_addr((e | d << 8), MEM_TYPE_INST), 512) != 512 ) {
-        SET_ERROR(normalise_errno());
+    {
+        uint8_t buffer[512];
+        int i;
+        if ( read(devices[selected_unit], buffer, sizeof(buffer)) != sizeof(buffer) ) {
+            SET_ERROR(normalise_errno());
+            return;
+        }
+        for ( i = 0; i < sizeof(buffer); i++ ) put_memory((uint16_t)((e | d << 8) + i), buffer[i]);
     }
     SET_ERROR(Z88DK_ENONE);
 }
@@ -242,8 +285,14 @@ static void cmd_ide_write(void)
         SET_ERROR(normalise_errno());
         return;
     }
-    if ( write(devices[selected_unit], (char *)get_memory_addr((e | d << 8), MEM_TYPE_INST), 512) != 512 ) {
-        SET_ERROR(normalise_errno());
+    {
+        uint8_t buffer[512];
+        int i;
+        for ( i = 0; i < sizeof(buffer); i++ ) buffer[i] = get_memory_inst((uint16_t)((e | d << 8) + i));
+        if ( write(devices[selected_unit], buffer, sizeof(buffer)) != sizeof(buffer) ) {
+            SET_ERROR(normalise_errno());
+            return;
+        }
     }
     SET_ERROR(Z88DK_ENONE);
 }

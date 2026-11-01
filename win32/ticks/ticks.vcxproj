@@ -89,7 +89,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;WIN32_LEAN_AND_MEAN;UNIXEM_WINSOCK_IS_INCLUDED;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\ext\uthash\src;..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\ext\uthash\src;..\..\ext\lua;..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -104,7 +104,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;WIN32_LEAN_AND_MEAN;UNIXEM_WINSOCK_IS_INCLUDED;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\ext\uthash\src;..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\ext\uthash\src;..\..\ext\lua;..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -121,7 +121,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;WIN32_LEAN_AND_MEAN;UNIXEM_WINSOCK_IS_INCLUDED;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\ext\uthash\src;..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\ext\uthash\src;..\..\ext\lua;..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,7 +149,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;WIN32_LEAN_AND_MEAN;UNIXEM_WINSOCK_IS_INCLUDED;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\ext\uthash\src;..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\ext\uthash\src;..\..\ext\lua;..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -201,6 +201,39 @@
     <ClCompile Include="..\..\src\ticks\srcfile.c" />
     <ClCompile Include="..\..\src\ticks\syms.c" />
     <ClCompile Include="..\..\src\ticks\ticks.c" />
+    <ClCompile Include="..\..\src\ticks\ticks_lua.c" />
+    <ClCompile Include="..\..\ext\lua\lapi.c" />
+    <ClCompile Include="..\..\ext\lua\lauxlib.c" />
+    <ClCompile Include="..\..\ext\lua\lbaselib.c" />
+    <ClCompile Include="..\..\ext\lua\lcode.c" />
+    <ClCompile Include="..\..\ext\lua\lctype.c" />
+    <ClCompile Include="..\..\ext\lua\lcorolib.c" />
+    <ClCompile Include="..\..\ext\lua\ldblib.c" />
+    <ClCompile Include="..\..\ext\lua\ldebug.c" />
+    <ClCompile Include="..\..\ext\lua\ldo.c" />
+    <ClCompile Include="..\..\ext\lua\ldump.c" />
+    <ClCompile Include="..\..\ext\lua\lfunc.c" />
+    <ClCompile Include="..\..\ext\lua\lgc.c" />
+    <ClCompile Include="..\..\ext\lua\linit.c" />
+    <ClCompile Include="..\..\ext\lua\liolib.c" />
+    <ClCompile Include="..\..\ext\lua\llex.c" />
+    <ClCompile Include="..\..\ext\lua\lmathlib.c" />
+    <ClCompile Include="..\..\ext\lua\lmem.c" />
+    <ClCompile Include="..\..\ext\lua\loadlib.c" />
+    <ClCompile Include="..\..\ext\lua\lobject.c" />
+    <ClCompile Include="..\..\ext\lua\lopcodes.c" />
+    <ClCompile Include="..\..\ext\lua\loslib.c" />
+    <ClCompile Include="..\..\ext\lua\lparser.c" />
+    <ClCompile Include="..\..\ext\lua\lstate.c" />
+    <ClCompile Include="..\..\ext\lua\lstring.c" />
+    <ClCompile Include="..\..\ext\lua\lstrlib.c" />
+    <ClCompile Include="..\..\ext\lua\ltable.c" />
+    <ClCompile Include="..\..\ext\lua\ltablib.c" />
+    <ClCompile Include="..\..\ext\lua\ltm.c" />
+    <ClCompile Include="..\..\ext\lua\lundump.c" />
+    <ClCompile Include="..\..\ext\lua\lutf8lib.c" />
+    <ClCompile Include="..\..\ext\lua\lvm.c" />
+    <ClCompile Include="..\..\ext\lua\lzio.c" />
     <ClCompile Include="..\..\src\ticks\ticks_main.c" />
     <ClCompile Include="..\..\src\ticks\utf8.c" />
     <ClCompile Include="..\..\src\ticks\vm1_inst.c" />
@@ -210,6 +243,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ext\uthash\src\uthash.h" />
+    <ClInclude Include="..\..\src\ticks\ticks_lua.h" />
+    <ClInclude Include="..\..\ext\lua\lauxlib.h" />
+    <ClInclude Include="..\..\ext\lua\lua.h" />
+    <ClInclude Include="..\..\ext\lua\luaconf.h" />
+    <ClInclude Include="..\..\ext\lua\lualib.h" />
     <ClInclude Include="..\..\src\ticks\backend.h" />
     <ClInclude Include="..\..\src\ticks\breakpoints.h" />
     <ClInclude Include="..\..\src\ticks\cmds.h" />

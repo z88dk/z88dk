@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "ticks.h"
+#include "ticks_lua.h"
 #include "cpu.h"
 #include "debugger.h"
 #include "backend.h"
@@ -25,6 +26,7 @@ int    c_mmtimer = -1;
 int    c_autolabel = 0;
 int    c_z80asm_tests = 0;
 int    c_no_cycles = 0;      /* suppress end-of-run cycle-count printf */
+static const char *c_lua_file = NULL;
 
 static char   cmd_arguments[255];
 static int    cmd_arguments_len = 0;
@@ -42,6 +44,26 @@ static void exit_log(int code, char *fmt, ...)
 
     va_end(ap);
     exit(code);
+}
+
+static void write_memory_range(FILE *fh, uint16_t address, size_t length, memtype type)
+{
+    size_t i;
+    for (i = 0; i < length; i++)
+        fputc(peek_memory((uint16_t)(address + i), type), fh);
+}
+
+static int load_memory_range(FILE *fh, uint16_t address, size_t length, memtype type)
+{
+    size_t i;
+    int value;
+    for (i = 0; i < length; i++) {
+        value = fgetc(fh);
+        if (value == EOF)
+            return 0;
+        load_memory((uint16_t)(address + i), (uint8_t)value, type);
+    }
+    return 1;
 }
 
 static void write_output()
@@ -96,11 +118,11 @@ static void write_output()
             fwrite(&sp, 2, 1, fh),
             fwrite(&im, 1, 1, fh),
             fwrite(&w, 1, 1, fh),
-            fwrite(get_memory_addr(0x4000, MEM_TYPE_INST), 1, 0xc000, fh);
+            write_memory_range(fh, 0x4000, 0xc000, MEM_TYPE_INST);
         } else if ( !strcasecmp(strchr(c_output, '.'), ".scr" ) ) {
-            fwrite(get_memory_addr(0x4000, MEM_TYPE_INST), 1, 0x1b00, fh);
+            write_memory_range(fh, 0x4000, 0x1b00, MEM_TYPE_INST);
         } else {
-            fwrite(get_memory_addr(0, MEM_TYPE_INST), 1, 65536, fh);
+            write_memory_range(fh, 0, 65536, MEM_TYPE_INST);
             w= f();
             fwrite(&w, 1, 1, fh);    // 10000 F
             fwrite(&a, 1, 1, fh);    // 10001 A
@@ -182,6 +204,13 @@ static void usage(void)
     printf("  -mkc160_z80    Emulate a kc160 (z80 mode)\n");
     printf("  -ide0 <file>    file to be ide device 0\n");
     printf("  -ide1 <file>   Set file to be ide device 1\n");
+    printf("  -lua <file>    Load Lua I/O and memory callbacks from <file>\n");
+    printf("                 also searches $ZCCCFG/../ticks/memory\n");
+    printf("                 memory_read(addr, type, cycles) returns byte or nil;\n");
+    printf("                 memory_write(addr, value, type, cycles) returns -1\n");
+    printf("                 type is ticks.MEM_TYPE_* (inst/data/stack/logical/physical).\n");
+    printf("                 if unhandled, otherwise the write is consumed.\n");
+    printf("  -b lua         Use the Lua-backed memory model (requires -lua).\n");
     printf("  -iochar X      Set port X to be character input/output\n");
     printf("  -iotimer X     Set port X to the cycle-count timer (0..255)\n");
     printf("  -mmtimer X     Symbol or hex address for the 8-byte count\n");
@@ -243,6 +272,22 @@ int main (int argc, char **argv){
     exit(EXIT_SUCCESS);
   }
 
+  {
+    int argi;
+    for (argi = 1; argi + 1 < argc; argi++) {
+      if (strcmp(argv[argi], "--") == 0)
+        break;
+      if (strcmp(argv[argi], "-lua") == 0)
+        c_lua_file = argv[argi + 1];
+      if (strcmp(argv[argi], "-b") == 0 && strcmp(argv[argi + 1], "lua") == 0)
+        c_memory_model = "lua";
+    }
+    if (strcmp(c_memory_model, "lua") == 0 && c_lua_file == NULL)
+      exit_log(1, "-b lua requires -lua <file>\n");
+    if (lua_io_init(c_lua_file) != 0)
+      exit(EXIT_FAILURE);
+  }
+
   while (argc > 1){
     if( argv[1][0] == '-' && argv[2] )
       switch (argc--, argv++[1][1]){
@@ -297,7 +342,10 @@ int main (int argc, char **argv){
           }
           break;
         case 'l':
-          load_address = pc = strtol(argv[1], NULL, 0);
+          if (strcmp(&argv[0][1], "lua") == 0)
+            c_lua_file = argv[1];
+          else
+            load_address = pc = strtol(argv[1], NULL, 0);
           break;
         case 'c':
           sscanf(argv[1], "%llu", &c_max_runticks);
@@ -407,10 +455,10 @@ int main (int argc, char **argv){
           }
           if ( pc == 256 ) {
             put_memory(0x80,cmd_arguments_len % 256);
-            memcpy(get_memory_addr(0x81,MEM_TYPE_DATA), cmd_arguments, cmd_arguments_len % 256);
+            { int argi; for (argi = 0; argi < cmd_arguments_len % 256; argi++) load_memory(0x81 + argi, (uint8_t)cmd_arguments[argi], MEM_TYPE_DATA); }
           } else {
             put_memory(65280,cmd_arguments_len % 256);
-            memcpy(get_memory_addr(65281, MEM_TYPE_DATA), cmd_arguments, cmd_arguments_len % 256);
+            { int argi; for (argi = 0; argi < cmd_arguments_len % 256; argi++) load_memory(65281 + argi, (uint8_t)cmd_arguments[argi], MEM_TYPE_DATA); }
           }
           break;
         case 'z':
@@ -441,45 +489,42 @@ int main (int argc, char **argv){
         exit(EXIT_FAILURE);
       else if( strchr(argv[1], '.') && !strcasecmp(strchr(argv[1], '.'), ".com" ) ){
         /* .com before "rc2014" name match: CP/M apps may be named *rc2014*.com */
-        *get_memory_addr(5, MEM_TYPE_INST) = 0xED;
-        *get_memory_addr(6, MEM_TYPE_INST) = 0xFE;
-        *get_memory_addr(7, MEM_TYPE_INST) = 0xC9;
+        load_memory(5, 0xED, MEM_TYPE_INST);
+        load_memory(6, 0xFE, MEM_TYPE_INST);
+        load_memory(7, 0xC9, MEM_TYPE_INST);
         // Trap BIOS entry as well + 3 + 5
-        *get_memory_addr(0, MEM_TYPE_INST) = 0xED;
-        *get_memory_addr(1, MEM_TYPE_INST) = 0x05;
-        *get_memory_addr(2, MEM_TYPE_INST) = 0x00;
+        load_memory(0, 0xED, MEM_TYPE_INST);
+        load_memory(1, 0x05, MEM_TYPE_INST);
+        load_memory(2, 0x00, MEM_TYPE_INST);
 
-        *get_memory_addr(8, MEM_TYPE_INST) = 0xED;
-        *get_memory_addr(9, MEM_TYPE_INST) = 0xFE;
-        *get_memory_addr(10, MEM_TYPE_INST) = 0xC9;
+        load_memory(8, 0xED, MEM_TYPE_INST);
+        load_memory(9, 0xFE, MEM_TYPE_INST);
+        load_memory(10, 0xC9, MEM_TYPE_INST);
 
-        *get_memory_addr(11, MEM_TYPE_INST) = 0xED;
-        *get_memory_addr(12, MEM_TYPE_INST) = 0xFE;
-        *get_memory_addr(13, MEM_TYPE_INST) = 0xC9;
+        load_memory(11, 0xED, MEM_TYPE_INST);
+        load_memory(12, 0xFE, MEM_TYPE_INST);
+        load_memory(13, 0xC9, MEM_TYPE_INST);
 
         pc = 256;
         c_cpm_mode = 1;
         // CP/M emulator
         if (256 + size > 0x10000) { fclose(fh); exit_log(1, "Binary too large: %d bytes at 0x0100 exceeds 64K\n", size); }
-        if (1 != fread(get_memory_addr(256, MEM_TYPE_INST), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
+        if (!load_memory_range(fh, 256, size, MEM_TYPE_INST)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
       } else if( strstr(argv[1], "rc2014") != NULL ) {
-        *get_memory_addr(0x08, MEM_TYPE_INST) = 0xED;
-        *get_memory_addr(0x09, MEM_TYPE_INST) = 0xFE;
-        *get_memory_addr(0x0a, MEM_TYPE_INST) = 0xC9;
-        *get_memory_addr(0x10, MEM_TYPE_INST) = 0xED;
-        *get_memory_addr(0x11, MEM_TYPE_INST) = 0xFE;
-        *get_memory_addr(0x12, MEM_TYPE_INST) = 0xC9;
-        *get_memory_addr(0x18, MEM_TYPE_INST) = 0xED;
-        *get_memory_addr(0x19, MEM_TYPE_INST) = 0xFE;
-        *get_memory_addr(0x1a, MEM_TYPE_INST) = 0xC9;
+        load_memory(0x08, 0xED, MEM_TYPE_INST);
+        load_memory(0x09, 0xFE, MEM_TYPE_INST);
+        load_memory(0x0a, 0xC9, MEM_TYPE_INST);
+        load_memory(0x10, 0xED, MEM_TYPE_INST);
+        load_memory(0x11, 0xFE, MEM_TYPE_INST);
+        load_memory(0x12, 0xC9, MEM_TYPE_INST);
+        load_memory(0x18, 0xED, MEM_TYPE_INST);
+        load_memory(0x19, 0xFE, MEM_TYPE_INST);
+        load_memory(0x1a, 0xC9, MEM_TYPE_INST);
         c_rc2014_mode = 1;
         if (pc + size > 0x10000) { fclose(fh); exit_log(1, "Binary too large: %d bytes at 0x%04X exceeds 64K\n", size, pc); }
-        if (1 != fread(get_memory_addr(pc, MEM_TYPE_INST), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
+        if (!load_memory_range(fh, pc, size, MEM_TYPE_INST)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
       } else {
-        int l;
-        for ( l = 0; l < size; l++ ) {
-          *get_memory_addr(load_address+l, MEM_TYPE_INST) = fgetc(fh);
-        }
+        if (!load_memory_range(fh, load_address, size, MEM_TYPE_INST)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
       }
       if ( c_load_banks ) {
         if ( !memory_has_banks() )

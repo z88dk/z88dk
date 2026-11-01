@@ -70,7 +70,7 @@ void ir_bitset_for_each(const BitSet *bs,
     for (int byte = 0; byte < nbytes; byte++) {
         uint8_t b = bs->bits[byte];
         while (b) {
-            int bit = __builtin_ctz(b);
+            int bit = ir_ctz32(b);
             int v = byte * 8 + bit;
             if (v < bs->n && cb(v, ud) != 0) return;
             b &= (uint8_t)(b - 1);

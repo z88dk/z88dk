@@ -5,6 +5,7 @@
 #include "ticks.h"
 #include "backend.h"
 #include "debugger.h"
+#include "ticks_lua.h"
 #include <stdio.h>
 
 
@@ -52,11 +53,13 @@ static void        (*write_hook)(uint16_t addr, uint8_t value);
 
 // Which banking scheme the debugger has to understand
 static enum { MODEL_OTHER, MODEL_RABBIT, MODEL_ZXN, MODEL_MSX } current_model = MODEL_OTHER;
+static int lua_memory_model = 0;
 static void        (*handle_out)(int port, int value);
 static int         (*handle_in)(int port);
 
 void memory_init(char *model) {
     memory_reset_paging();
+    lua_memory_model = strcmp(model, "lua") == 0;
 
     if ( strcmp(model,"zxn") == 0 ) {
         zxn_init();
@@ -70,22 +73,49 @@ void memory_init(char *model) {
         rabbit_init();
     } else if ( strcmp(model, "msx") == 0 ) {
         msx_init();
+    } else if ( strcmp(model, "lua") == 0 ) {
+        standard_init();
     } else {
         fprintf(stderr, "Unknown memory model %s\n",model);
         exit(1);
     }
 }
 
-uint8_t get_memory(uint32_t pc, memtype type)
+static uint8_t logical_read(uint32_t pc, memtype type, int watchpoint)
 {
-  bk.debugger_read_memory(pc);
-  return  *get_memory_addr(pc,type);
+  int value;
+  if (watchpoint)
+    bk.debugger_read_memory(pc);
+  value = lua_memory_read(pc, type, st);
+  if (value != -1)
+    return (uint8_t)value;
+  return *get_memory_addr(pc, type);
 }
 
+uint8_t get_memory(uint32_t pc, memtype type)
+{
+  return logical_read(pc, type, 1);
+}
+
+/* Debugger bookkeeping reads use Lua memory but do not fire watchpoints. */
+uint8_t peek_memory(uint16_t pc, memtype type)
+{
+  return logical_read(pc, type, 0);
+}
+
+/* Image loading is a logical write, without runtime watchpoints or ROM rules. */
+void load_memory(uint32_t pc, uint8_t value, memtype type)
+{
+  if (lua_memory_write(pc, value, type, st) != -1)
+    return;
+  *get_memory_addr(pc, type) = value;
+}
 
 uint8_t put_memory(uint16_t pc, uint8_t b)
 {
   bk.debugger_write_memory(pc, b);
+  if (lua_memory_write(pc, b, MEM_TYPE_DATA, st) != -1)
+    return b;
   if (pc < c_rom_size)
     return *get_memory_addr(pc, MEM_TYPE_DATA);
   *get_memory_addr(pc, MEM_TYPE_DATA) = b;
@@ -117,6 +147,7 @@ int memory_in(int port)
 void memory_reset_paging() 
 {
     int i;
+    if (lua_memory_model) lua_memory_reset_paging();
     for ( i = 0; i < 8; i++ )  {
         zxnext_mmu[i] = 0xff;
     }
@@ -539,11 +570,23 @@ int rabbit_get_ioi_reg(int reg)
      MSX     16K in the 16K page nn */
 int memory_has_banks(void)
 {
-    return current_model != MODEL_OTHER;
+    return lua_memory_model ? lua_memory_has_banks() : current_model != MODEL_OTHER;
+}
+
+int memory_uses_lua(void)
+{
+    return lua_memory_model;
 }
 
 void memory_bank_store(unsigned bank, unsigned offset, uint8_t value)
 {
+    if (lua_memory_model) {
+        if (lua_memory_bank_store(bank, offset, value) == -1) {
+            fprintf(stderr, "z88dk-ticks Lua memory_write did not handle bank address %u:%04x\n", bank, offset);
+            exit(EXIT_FAILURE);
+        }
+        return;
+    }
     switch ( current_model ) {
     case MODEL_RABBIT:
         /* The bank has to be inside the physical memory (120 banks below 1MB,
@@ -568,6 +611,7 @@ void memory_bank_store(unsigned bank, unsigned offset, uint8_t value)
 // pc extended with the bank mapped in its window, or pc if it is in none
 uint32_t memory_banked_pc(uint16_t pc)
 {
+    if (lua_memory_model) return lua_memory_banked_pc(pc);
     switch ( current_model ) {
     case MODEL_RABBIT:
         return rabbit_banked_pc(pc);
@@ -619,6 +663,7 @@ uint8_t *memory_debug_addr(uint32_t addr, memtype type)
 uint32_t memory_banked_caller(uint16_t saved, uint16_t ret)
 {
     uint32_t bank = 0;
+    if (lua_memory_model) return lua_memory_banked_caller(saved, ret);
 
     switch ( current_model ) {
     case MODEL_RABBIT:
@@ -645,6 +690,9 @@ const char *memory_mmu_text(void)
 {
     static char buf[160];
     int         i, n;
+
+    if (lua_memory_model)
+        return lua_memory_mmu_text();
 
     switch ( current_model ) {
     case MODEL_RABBIT:

@@ -163,7 +163,7 @@ void ir_assign_slots(Func *f)
                     /* Reflect: each set bit in live_w points to a vreg
                        v2; mark v2 → d. Walk bits in live_w. */
                     while (live_w) {
-                        int bit = __builtin_ctz(live_w);
+                        int bit = ir_ctz32(live_w);
                         int v2 = w * 32 + bit;
                         if (v2 != d)
                             INTERF_ROW(v2)[d >> 5] |=

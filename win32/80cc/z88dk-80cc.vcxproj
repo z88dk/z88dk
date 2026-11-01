@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32"><Configuration>Debug</Configuration><Platform>Win32</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32"><Configuration>Release</Configuration><Platform>Win32</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C804ADBF-1F1C-48A0-90BD-F60B8B9FC738}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>z88dk_80cc</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>z88dk-80cc</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\80cc;..\..\src\common;..\..\ext\uthash\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\80cc;..\..\src\common;..\..\ext\uthash\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\80cc;..\..\src\common;..\..\ext\uthash\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\80cc;..\..\src\common;..\..\ext\uthash\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <PropertyGroup><TargetName>z88dk-80cc</TargetName></PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\80cc\callfunc.c" />
+    <ClCompile Include="..\..\src\80cc\cdbfile.c" />
+    <ClCompile Include="..\..\src\80cc\codegen.c" />
+    <ClCompile Include="..\..\src\80cc\const.c" />
+    <ClCompile Include="..\..\src\80cc\data.c" />
+    <ClCompile Include="..\..\src\80cc\declinit.c" />
+    <ClCompile Include="..\..\src\80cc\error.c" />
+    <ClCompile Include="..\..\src\80cc\expr.c" />
+    <ClCompile Include="..\..\src\80cc\goto.c" />
+    <ClCompile Include="..\..\src\80cc\io.c" />
+    <ClCompile Include="..\..\src\80cc\lex.c" />
+    <ClCompile Include="..\..\src\80cc\main.c" />
+    <ClCompile Include="..\..\src\80cc\misc.c" />
+    <ClCompile Include="..\..\src\80cc\plunge.c" />
+    <ClCompile Include="..\..\src\80cc\preproc.c" />
+    <ClCompile Include="..\..\src\80cc\cpp_invoke.c" />
+    <ClCompile Include="..\..\src\80cc\primary.c" />
+    <ClCompile Include="..\..\src\80cc\stmt.c" />
+    <ClCompile Include="..\..\src\80cc\sym.c" />
+    <ClCompile Include="..\..\src\80cc\while.c" />
+    <ClCompile Include="..\..\src\80cc\declparse.c" />
+    <ClCompile Include="..\..\src\common\option.c" />
+    <ClCompile Include="..\..\src\80cc\node.c" />
+    <ClCompile Include="..\..\src\80cc\ast_opt.c" />
+    <ClCompile Include="..\..\src\80cc\ir.c" />
+    <ClCompile Include="..\..\src\80cc\ir_lower.c" />
+    <ClCompile Include="..\..\src\80cc\ir_slots.c" />
+    <ClCompile Include="..\..\src\80cc\ir_build.c" />
+    <ClCompile Include="..\..\src\80cc\ir_analysis.c" />
+    <ClCompile Include="..\..\src\80cc\ir_alloc.c" />
+    <ClCompile Include="..\..\src\80cc\ir_opt.c" />
+    <ClCompile Include="..\..\src\80cc\ir_match.c" />
+    <ClCompile Include="..\..\src\80cc\ir_compiler_glue.c" />
+    <ClCompile Include="..\..\src\80cc\tokeniser.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\80cc\ccdefs.h" />
+    <ClInclude Include="..\..\src\80cc\codegen.h" />
+    <ClInclude Include="..\..\src\80cc\data.h" />
+    <ClInclude Include="..\..\src\80cc\define.h" />
+    <ClInclude Include="..\..\src\80cc\io.h" />
+    <ClInclude Include="..\..\src\80cc\ir.h" />
+    <ClInclude Include="..\..\src\80cc\ir_alloc.h" />
+    <ClInclude Include="..\..\src\80cc\ir_analysis.h" />
+    <ClInclude Include="..\..\src\80cc\ir_build.h" />
+    <ClInclude Include="..\..\src\80cc\ir_kind.h" />
+    <ClInclude Include="..\..\src\80cc\ir_lower.h" />
+    <ClInclude Include="..\..\src\80cc\ir_match.h" />
+    <ClInclude Include="..\..\src\80cc\ir_opt.h" />
+    <ClInclude Include="..\..\src\80cc\misc.h" />
+    <ClInclude Include="..\..\src\80cc\tokeniser.h" />
+    <ClInclude Include="..\..\src\common\die.h" />
+    <ClInclude Include="..\..\src\common\dirname.h" />
+    <ClInclude Include="..\..\src\common\fileutil.h" />
+    <ClInclude Include="..\..\src\common\objfile.h" />
+    <ClInclude Include="..\..\src\common\option.h" />
+    <ClInclude Include="..\..\src\common\stack_trace.h" />
+    <ClInclude Include="..\..\src\common\strpool.h" />
+    <ClInclude Include="..\..\src\common\strtable.h" />
+    <ClInclude Include="..\..\src\common\strutil.h" />
+    <ClInclude Include="..\..\src\common\types.h" />
+    <ClInclude Include="..\..\src\common\xassert.h" />
+    <ClInclude Include="..\..\src\common\xmalloc.h" />
+    <ClInclude Include="..\..\src\common\z80asm_defs.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>
