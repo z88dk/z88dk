@@ -22,7 +22,9 @@
     PUBLIC    l_dcal          ;jp(hl)
 
 
-    defc    CRT_ORG_CODE  = $4000	 ; RAM TODO
+    ; The monitor uses $2c00-$2fff for workspace and starts with SP=$3000.
+    ; Keep code and the CRT stack below that workspace.  $4000 is video RAM.
+    defc    CRT_ORG_CODE  = $2000
 
     defc    CONSOLE_COLUMNS = 32
     defc    CONSOLE_ROWS = 16
@@ -37,7 +39,7 @@
     defc    TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 0
 
-    defc    TAR__register_sp = -1           ;Must be below interrupt table
+    defc    TAR__register_sp = $2bff        ;Top of user RAM, below monitor workspace
     defc    TAR__crt_enable_eidi = 0        ;Do nothing
     defc	__CPU_CLOCK = 4000000
     INCLUDE	"crt/classic/crt_rules.inc"

@@ -15,7 +15,7 @@ ENDIF
 
 
 IF FORphc20
-    INCLUDE "target/phc25/def/phc25.def"
+    INCLUDE "target/phc20/def/phc20.def"
     defc    MC6847_HAS_TEXT_GFX = 1
     defc    MODE0_1x1 = 1
     defc    MC6847_HIRES_YRES = 0
