@@ -93,6 +93,8 @@ static void lua_io_error(const char *where)
 int lua_io_init(const char *filename)
 {
     int status;
+    char *search_path = NULL;
+    const char *loaded_filename = filename;
 
     if (filename == NULL)
         return 0;
@@ -125,10 +127,29 @@ int lua_io_init(const char *filename)
     lua_setfield(lua_state, -2, "MEM_TYPE_PHYSICAL");
     lua_setglobal(lua_state, "ticks");
     status = luaL_loadfile(lua_state, filename);
+    if (status != LUA_OK) {
+        const char *zcccfg = getenv("ZCCCFG");
+        if (zcccfg != NULL) {
+            size_t path_size = strlen(zcccfg) + sizeof("/../ticks/memory/")
+                             + strlen(filename);
+            search_path = malloc(path_size);
+            if (search_path == NULL) {
+                fprintf(stderr, "z88dk-ticks: could not allocate Lua model path\n");
+                exit(EXIT_FAILURE);
+            }
+            snprintf(search_path, path_size, "%s/../ticks/memory/%s",
+                     zcccfg, filename);
+            lua_pop(lua_state, 1);
+            status = luaL_loadfile(lua_state, search_path);
+            if (status == LUA_OK)
+                loaded_filename = search_path;
+        }
+    }
     if (status == LUA_OK)
         status = lua_pcall(lua_state, 0, 0, 0);
     if (status != LUA_OK)
-        lua_io_error(filename);
+        lua_io_error(loaded_filename);
+    free(search_path);
     return 0;
 }
 

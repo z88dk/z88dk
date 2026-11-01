@@ -205,6 +205,7 @@ static void usage(void)
     printf("  -ide0 <file>    file to be ide device 0\n");
     printf("  -ide1 <file>   Set file to be ide device 1\n");
     printf("  -lua <file>    Load Lua I/O and memory callbacks from <file>\n");
+    printf("                 also searches $ZCCCFG/../ticks/memory\n");
     printf("                 memory_read(addr, type, cycles) returns byte or nil;\n");
     printf("                 memory_write(addr, value, type, cycles) returns -1\n");
     printf("                 type is ticks.MEM_TYPE_* (inst/data/stack/logical/physical).\n");
