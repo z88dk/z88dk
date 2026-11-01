@@ -1688,6 +1688,20 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     memset(mem128, 0, 6144);
     memset(mem128 + 6144, 0x38, 768);
 
+    // 128k zx: SV_BANKM holds the last byte written to port 0x7ffd, which the
+    // snapshot sets to 0x10 below; banked_call relies on it. Its address is
+    // taken from the map, as it need not be the ROM sysvar address
+
+    if (is_128 && !is_zxn)
+    {
+        long bankm = parameter_search(zxc->crtfile, ".map", "SV_BANKM");
+
+        if (bankm >= 0x4000 && bankm <= 0xffff)
+            mem128[bankm - 0x4000] = 0x10;
+        else if (bankm != -1)
+            fprintf(stderr, "WARNING: SV_BANKM address 0x%lx is not in snapshot RAM, not initialized.\n", bankm);
+    }
+
     // write main bank into memory image
 
     for (i = 0; i < memory->mainbank.num; ++i)

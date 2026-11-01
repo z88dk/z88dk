@@ -7,10 +7,19 @@
    ; Define Memory Banks
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   ; Bits 16-23 of a BANK origin hold the 16K bank that banked_call
+   ; pages in at 0xc000 through port 0x7ffd, so BANK_3 is 0x3c000, as
+   ; in classic.  appmake places each bank by its section name, not by
+   ; these bits.
+   ;
+   ; banked_call pages a new bank in at 0xc000, so the stack must be
+   ; below 0xc000.  The default stack (0xff58) is not: with __banked
+   ; calls, move it, e.g. -pragma-define:REGISTER_SP=0xc000.
+
 Z88DK_FOR(`LOOP', `0', `7',
 `
    IFNDEF CRT_ORG_BANK_`'LOOP
-      defc CRT_ORG_BANK_`'LOOP = 0xc000
+      defc CRT_ORG_BANK_`'LOOP = 0x`'eval(LOOP * 0x10000 + 0xc000, 16)
    ENDIF
 ')
 
