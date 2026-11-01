@@ -80,7 +80,7 @@ $(eval $(call games_stamp_args,cpm-tim011,TARGET=cpm SUBTYPE=tim011 TARGET_CFLAG
 $(eval $(call games_stamp_args,cpm-x820ii,TARGET=cpm SUBTYPE=x820ii))
 $(eval $(call games_stamp_args,srr,TARGET=srr))
 $(eval $(call games_stamp_args,mz,TARGET=mz))
-$(eval $(call games_stamp_args,cpm-mz2500,TARGET=cpm SUBTYPE=mz2500))
+$(eval $(call games_stamp_args,cpm-mz2500,TARGET=cpm SUBTYPE=mz2500 TARGET_CFLAGS=-subtype=mz2500))
 $(eval $(call games_stamp_args,abc80,TARGET=abc80 SUBSET=joystick.asm))
 $(eval $(call games_stamp_args,abc800,TARGET=abc800 SUBSET=joystick.asm))
 $(eval $(call games_stamp_args,ace,TARGET=ace))
