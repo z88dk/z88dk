@@ -73,7 +73,7 @@ function io_out(addr, value)
     elseif addr == 0x32 then p32 = value
     elseif addr == 0x35 then p35 = value
     elseif addr == 0x34 then alu = value
-    elseif addr == 0xfe then
+    elseif addr == 0xfe and (value == 1 or value == 2) then
         if value == 1 then
             local image = {}
             for p = 1, 3 do for i = 1, 0x4000 do image[#image + 1] = planes[p][i] end end

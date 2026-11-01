@@ -53,7 +53,7 @@ function io_out(addr, value)
     addr = addr & 0xff
     value = value & 0xff
     if addr == 0x2a then port = value
-    elseif addr == 0xfe then
+    elseif addr == 0xfe and (value == 1 or value == 2) then
         if value == 1 then
             snapshot = {}
             for p = 1, 4 do for i = 1, 0x4000 do snapshot[#snapshot + 1] = planes[p][i] end end
