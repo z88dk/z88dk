@@ -81,6 +81,7 @@ PUBLIC asm_am9511_popf
 
     ; A = status & 0x3E.  OVRFL→±Inf, UNDFL→0, NEGRT→NaN, DIV0→±Inf, ZERO→0
 .errors
+    rrca                        ; carry was cleared by the mask
     rrca                        ; OVRFL
     jp C,infinity
     rrca                        ; UNDFL

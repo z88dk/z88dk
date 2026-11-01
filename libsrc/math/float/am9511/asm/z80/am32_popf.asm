@@ -83,6 +83,7 @@ ENDIF
     ;   OVRFL → ±Inf, UNDFL → 0, NEGRT → NaN, DIV0 → ±Inf, ZERO → 0
     ; DIV0 as ±Inf matches IEEE x/0 (0/0 is IEEE-gated before the APU).
 .errors
+    rrca                        ; carry was cleared by the mask
     rrca                        ; OVRFL
     jr C,infinity
     rrca                        ; UNDFL

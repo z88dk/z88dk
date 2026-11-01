@@ -27,6 +27,7 @@ math/float/am9511/asm/z80/am32_popl
 math/float/am9511/asm/z80/am32_pushf
 math/float/am9511/asm/z80/am32_pushi
 math/float/am9511/asm/z80/am32_pushl
+math/float/am9511/asm/z80/am32_pow
 
 @math/float/am9511/asm/am32_stack/am32_stack.lst
 

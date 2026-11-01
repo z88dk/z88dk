@@ -8,7 +8,6 @@ math/float/am9511/asm/am32_tan
 math/float/am9511/asm/am32_exp
 math/float/am9511/asm/am32_log
 math/float/am9511/asm/am32_log10
-math/float/am9511/asm/am32_pow
 
 math/float/am9511/asm/am32_fadd
 math/float/am9511/asm/am32_fdiv
