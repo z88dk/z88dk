@@ -1,5 +1,5 @@
 ;
-; Graphics console (mode 1): clear the whole screen to the paper colour
+; Graphics console (mode 2): clear the whole screen to the paper colour
 ;
     SECTION code_clib
     PUBLIC  __mz2500_gfxcon_cls

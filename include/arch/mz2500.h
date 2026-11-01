@@ -79,9 +79,9 @@ extern void __LIB__ in_MouseMZ2500SetPos_callee(unsigned int xcoord, unsigned in
 #define IN_KEY_SCANCODE_KANA   0x080B
 #define IN_KEY_SCANCODE_CTRL   0x100B
 
-// Console (stdio, conio): 40 x 25 characters of 8x8 in the graphics screen, with the font and UDGs (ioctl IOCTL_GENCON_SET_FONT32 / SET_UDGS: 8 bytes a
-// character, the font from character 32, the UDGs from 128), 16 colours for text (textcolor, textbackground), inverse, scrolling and cvpeek.  It does
-// not use the IPL, so it works with or without CRT_MZ2500_IPL_DISABLED.  Only the mode 0 (40 columns) of IOCTL_GENCON_SET_MODE.
+// Console (stdio, conio): IOCTL_GENCON_SET_MODE selects mode 0 (40-column text), mode 1 (80-column text), or mode 2 (40 x 25 characters of 8x8 in the
+// graphics screen).  Font and UDG ioctls (IOCTL_GENCON_SET_FONT32 / SET_UDGS: 8 bytes a character, font from character 32, UDGs from 128), colours,
+// inverse, scrolling and cvpeek are supported.  Text modes use 8 colours and graphics mode uses 16.  Text width is selected directly through PIO port A.
 //
 // Graphics: <graphics.h>'s clg, plot, unplot, xorplot, point, draw, drawto, drawb, circle, fill and the rest, drawn in software in the
 // video planes: 320x200 in 16 colours, pixel value B | R << 1 | G << 2 | I << 3.  clg() switches to the mode and clears the graphics (the text
