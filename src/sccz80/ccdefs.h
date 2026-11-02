@@ -318,6 +318,8 @@ extern int      intcheck(LVALUE *lval, LVALUE *lval2);
 extern void     force(Kind to, Kind from, char to_sign, char from_sign, int lconst);
 extern int      widen_if_float(LVALUE *lval, LVALUE *lval2, int operator_is_commutative);
 extern void     widenintegers(LVALUE *lval, LVALUE *lval2);
+extern void     set_common_integer(LVALUE *dest, const Type *a, const Type *b);
+extern void     common_integer(const Type *a, const Type *b, int *width, int *is_unsigned);
 extern int      dbltest(LVALUE *lval, LVALUE *lval2);
 extern void     result(LVALUE *lval, LVALUE *lval2);
 extern void     prestep(LVALUE *lval, int n, void (*step)(LVALUE *lval));

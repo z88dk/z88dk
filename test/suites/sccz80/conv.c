@@ -73,6 +73,121 @@ static unsigned char sub_com(unsigned char u)
     unsigned char x = p[~u];
     return x;
 }
+/* Both arms are promoted. The false arm's char type must not win. */
+static unsigned char tern_shift_same(unsigned char c, unsigned char x)
+{
+    return (c ? ~x : x) >> 1;
+}
+static int tern_both_shl(unsigned char c, unsigned char x)
+{
+    return (c ? x : x) << 1;
+}
+static int tern_sc_shr(unsigned char c, signed char x)
+{
+    return (c ? x : x) >> 1;
+}
+static int tern_sc_shl(unsigned char c, signed char x)
+{
+    return (c ? x : x) << 1;
+}
+static unsigned long tern_ul_shr(unsigned char c, unsigned long u, long s)
+{
+    return (c ? u : s) >> 1;
+}
+static int tern_ui_si(unsigned char c, unsigned int u, int s)
+{
+    return (c ? u : s) >> 1;
+}
+static int tern_add_shr(unsigned char c, unsigned char a, unsigned char b)
+{
+    return (c ? (a + b) : a) >> 1;
+}
+static unsigned char tern_sub(unsigned char c, unsigned char x)
+{
+    unsigned char *p = subarr + 256;
+    return p[c ? ~x : x];
+}
+static int add_shr(unsigned char a, unsigned char b)
+{
+    return (a + b) >> 1;
+}
+static int uc_plus_shr(unsigned char a, int b)
+{
+    return (a + b) >> 1;
+}
+static int uc_lt_neg(unsigned char a, int b)
+{
+    return a < b;
+}
+static int shr_u_count(int a, unsigned n)
+{
+    return a >> n;
+}
+static int sc_shr_u(signed char a, unsigned n)
+{
+    return a >> n;
+}
+static long sl_shr_u(long a, unsigned n)
+{
+    return a >> n;
+}
+static unsigned long shr_wide_count(int a, unsigned long n)
+{
+    return a >> n;
+}
+static int lt_long_u(unsigned u)
+{
+    return (-1L) < u;
+}
+#ifndef __8085
+static int shr_c_ull(int a)
+{
+    return a >> 1ULL;
+}
+static int shr_c0_ull(int a)
+{
+    return a >> 0ULL;
+}
+static int shl_c_ull(int a)
+{
+    return a << 1ULL;
+}
+static long shr_c_ll(long a)
+{
+    return a >> 1LL;
+}
+static int shr_ull_rt(int a, unsigned long long n)
+{
+    return a >> n;
+}
+#endif
+static int cmp_arm(unsigned char c, unsigned int a, unsigned int b)
+{
+    return c ? (a < b) : 7;
+}
+static int cmp_both(unsigned char c, unsigned int a, unsigned int b,
+                    unsigned int d, unsigned int e)
+{
+    return c ? (a < b) : (d < e);
+}
+#ifndef __8085
+static int ull_hi_logical(unsigned char c, unsigned long long u, long long s)
+{
+    unsigned long long v = (c ? u : s) >> 1;
+    unsigned long hi;
+
+    memcpy(&hi, (unsigned char *)&v + 4, 4);
+    return hi == 2147483647UL;
+}
+static int mix_ll_logical(long long a, unsigned long long b)
+{
+    unsigned long long v = (a + b) >> 1;
+    unsigned long hi;
+
+    memcpy(&hi, (unsigned char *)&v + 4, 4);
+    return hi == 2147483647UL;
+}
+#endif
 static long neg_sc(signed char c) { return (long)-c; }
 static long com_sc(signed char c) { return (long)~c; }
 
@@ -141,6 +256,46 @@ void test_conv(void)
     subarr[55] = 11;
     subarr[311] = 22;
     Assert(sub_com(vuc) == 11, "subscript of a promoted complement");
+    Assert(tern_shift_same(vone, vff) == 128, "ternary complement of the same char then shift");
+    Assert(tern_shift_same(vzero, vff) == 127, "false arm of that same-char shift");
+    Assert(tern_both_shl(vone, vuc) == 400, "both char arms shift left as int");
+    Assert(tern_sc_shr(vone, vsc) == -64, "signed char ternary then arithmetic shift");
+    Assert(tern_sc_shl(vone, vsc) == -256, "signed char ternary then left shift");
+    Assert(tern_ul_shr(vzero, 1UL, -1L) == 2147483647UL, "unsigned long ternary shift");
+    Assert(tern_ul_shr(vone, 1UL, -1L) == 0UL, "true unsigned long arm then shift");
+    Assert(tern_ui_si(vzero, vu, vm1) == 32767, "unsigned int ternary shift of -1");
+    Assert(tern_ui_si(vone, vu, vm1) == 32767, "unsigned int arm of that shift");
+    Assert(tern_add_shr(vone, vuc, vuc) == 200, "ternary of a char sum then shift");
+    subarr[0] = 33;
+    subarr[511] = 55;
+    Assert(tern_sub(vone, vff) == 33, "subscript of a ternary complement");
+    Assert(tern_sub(vzero, vff) == 55, "subscript of the char arm");
+    Assert(add_shr(vuc, vuc) == 200, "char sum then shift");
+    Assert(uc_plus_shr(vone, vm1 - 2) == -1, "unsigned char plus a negative int");
+    Assert(uc_lt_neg(vuc, vm1) == 0, "unsigned char 200 < -1");
+    Assert(shr_u_count(vm1, vone) == -1, "signed shift by an unsigned count");
+    Assert(sc_shr_u(vsc, vone) == -64, "signed char shift by an unsigned count");
+    Assert(sl_shr_u(-1L, vone) == -1L, "signed long shift by an unsigned count");
+    Assert(lt_long_u(vone) == 1, "signed long less than an unsigned int");
+    Assert(lt_long_u(vu) == 1, "signed long less than unsigned 65535");
+    {
+        volatile unsigned long n = 1;
+        Assert(shr_wide_count(vm1, n) == 4294967295UL, "signed shift by a wider unsigned count");
+    }
+    Assert(cmp_arm(vone, vone, vd) == 1, "unsigned compare in a ternary arm");
+    Assert(cmp_arm(vzero, vone, vd) == 7, "false arm beside an unsigned compare");
+    Assert(cmp_both(vone, vone, vd, (unsigned)vd, (unsigned)vone) == 1, "true unsigned compare arm");
+    Assert(cmp_both(vzero, (unsigned)vd, (unsigned)vone, vone, vd) == 1, "false unsigned compare arm");
+#ifndef __8085
+    Assert(ull_hi_logical(vzero, 1ULL, -1LL), "unsigned long long ternary shift");
+    Assert(mix_ll_logical(-1LL, 0ULL), "signed long long plus unsigned long long");
+    Assert(shr_c_ull(vm1) == -1, "signed shift by a constant long long count");
+    Assert(shr_c_ull(vd) == 1, "positive shift by a constant long long count");
+    Assert(shr_c0_ull(vm1) == -1, "shift by a constant zero long long count");
+    Assert(shl_c_ull(vd) == 4, "left shift by a constant long long count");
+    Assert(shr_c_ll(-2L) == -1L, "signed long shift by a constant long long count");
+    Assert(shr_ull_rt(vd, 1ULL) == 1, "signed shift by a runtime long long count");
+#endif
 
     /* C. Struct pointer difference. The element size is 5. */
     Assert(struct_fold() == 2L, "folded struct pointer difference");
