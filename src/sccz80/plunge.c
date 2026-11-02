@@ -241,6 +241,22 @@ void set_common_integer(LVALUE *dest, const Type *a, const Type *b)
     }
 }
 
+/* A promoted char still occupies the low byte, with the high byte already
+   extended. Comparing that byte with a constant inside the char's range is
+   the same result as the int comparison, and it stays a byte test. */
+static int promoted_char_holds(int is_unsigned, int64_t value)
+{
+    if (is_unsigned)
+        return value >= 0 && value <= 255;
+    return value >= -128 && value <= 127;
+}
+
+static void retag_char_compare(LVALUE *lval, int is_unsigned)
+{
+    lval->val_type = KIND_CHAR;
+    lval->ltype = is_unsigned ? type_uchar : type_char;
+}
+
 /* C90 6.3.7: a shift's type is the promoted left operand. An unsigned
    count must not make it logical. If the value was widened to match a
    constant count, asr_const still shifts it in place, so the result
@@ -511,6 +527,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     int   left_uns = 0;
     int   right_uns = 0;
     int   shift_narrow = 0;
+    Type  *cmp_left = NULL;
+    Type  *cmp_right = NULL;
     struct fold_types fold_types = {0};
 
     savesp = Zsp;
@@ -840,6 +858,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     {
         Type *shift_left = (oper == asr || oper == asl) ? lval->ltype : NULL;
 
+        /* Snapshot the operand types before the common type replaces them.
+           A later byte compare needs the char's own signedness. */
+        cmp_left = lval->ltype;
+        cmp_right = lval2->ltype;
         left_uns = lval->ltype && lval->ltype->isunsigned;
         if (!shift_narrow)
             widenintegers(lval, lval2);
@@ -876,6 +898,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
              && lval->val_type == KIND_LONGLONG
              && integer_constant_needs_exact(lval))) {
         int doconstoper = 0;
+        int byte_cmp = 0;
+        int byte_uns = 0;
         int64_t const_val;
 
         /* Check for comparisions being out of range, if so, return constant */
@@ -914,6 +938,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             } else {
                     const_val = (int64_t)lval2->const_val;
             }
+            if (operator_is_comparison(oper) && cmp_left && cmp_left->kind == KIND_CHAR
+                && promoted_char_holds(cmp_left->isunsigned, const_val)) {
+                byte_cmp = 1;
+                byte_uns = cmp_left->isunsigned;
+            }
             clearstage(before, 0);
             // Promote lhs if it's a smaller integer type than the constant.
             // force() is (dest, src, dest unsigned, src unsigned). The
@@ -921,7 +950,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             // A shift stays at the promoted left width. Widening it to a
             // long long count parks the value in __i64_acc, and asr_const
             // then shifts HL. `x >> 0ULL` must stay x.
-            if (oper != asr && oper != asl && lhs_val_type < rhs_val_type) {
+            // A byte compare must not be widened first: the low byte is
+            // already the promoted value.
+            if (!byte_cmp && oper != asr && oper != asl && lhs_val_type < rhs_val_type) {
                 force(rhs_val_type, lhs_val_type, lval2->ltype->isunsigned, left_uns,1);
             }
         } else if ( lval1_wasconst && kind_is_integer(lval2->val_type) ) {
@@ -937,20 +968,36 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             } else {
                 const_val = (int64_t)lval->const_val;
             }
+            if (operator_is_comparison(oper) && cmp_right && cmp_right->kind == KIND_CHAR
+                && promoted_char_holds(cmp_right->isunsigned, const_val)) {
+                byte_cmp = 1;
+                byte_uns = cmp_right->isunsigned;
+            }
             clearstage(before_constlval, 0);
             /* right_uns is the operand's own signedness. The common type
-               may already have replaced lval2->ltype. */
-            force(lhs_val_type, rhs_val_type, lval->ltype->isunsigned, right_uns,1);
+               may already have replaced lval2->ltype. A byte compare keeps
+               the char load: widening it would only be discarded. */
+            if (!byte_cmp)
+                force(lhs_val_type, rhs_val_type, lval->ltype->isunsigned, right_uns,1);
         }
         // If we should actually do the constant operation, do it
         if ( doconstoper ) {
-            Zsp = savesp;  
-            lval->binop = oper;              
+            Zsp = savesp;
+            if (byte_cmp)
+                retag_char_compare(lval, byte_uns);
+            lval->binop = oper;
             constoper(lval, const_val);
             return;
         }
     }
- 
+
+    /* Two chars of the same signedness. Promotion makes the operation an
+       int, and the low bytes already are those promoted values. */
+    if (operator_is_comparison(oper) && cmp_left && cmp_right
+        && cmp_left->kind == KIND_CHAR && cmp_right->kind == KIND_CHAR
+        && cmp_left->isunsigned == cmp_right->isunsigned)
+        retag_char_compare(lval, cmp_left->isunsigned);
+
     lval->binop = oper;
     (*oper)(lval);
 }
