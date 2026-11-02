@@ -1135,6 +1135,19 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 gen_swap_float(lval->val_type);
             }
             
+        } else if (lval->val_type == KIND_LONGLONG && integer_operand(lval2)
+                   && lval2->val_type != KIND_LONGLONG) {
+            /* `2LL - x` for an int x. The right-hand value is already in
+               the primary. A 16-bit subtract sign-extends the wrong result:
+               2 - (-32768) is 32770. Widen, then push this constant. */
+            zconvert_to_llong(lval2->ltype->isunsigned, lval2->val_type,
+                              lval2->ltype->isunsigned);
+            set_common_integer(lval, lval->ltype, lval2->ltype);
+            doconst_oper = 0;
+            if (lval->int_const_valid)
+                vllongconst_tostack_exact(lval->int_const_val);
+            else
+                vllongconst_tostack(lval->const_val);
         } else if (lval->val_type == KIND_LONG) {
             // LongConstant +/- lvalue
             widenintegers(lval, lval2);

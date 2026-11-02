@@ -3033,6 +3033,15 @@ void zmod_const(LVALUE *lval, int64_t value64)
     LVALUE  templval={0};
     int32_t value = (int32_t)value64;
 
+    /* The 16-bit remainder shortcut drops every bit above the low word.
+       4294967296LL % 10 is 6, and the low word of that dividend is 0. */
+    if ( lval->val_type == KIND_LONGLONG) {
+        llpush();
+        vllongconst_exact((uint64_t)value64);
+        zmod(lval);
+        return;
+    }
+
     templval.val_type = KIND_INT;
     if ( ulvalue(lval) )
         templval.ltype = type_uint;
@@ -3075,11 +3084,6 @@ void zmod_const(LVALUE *lval, int64_t value64)
             zmod(lval);
             return;
         }
-    } else if ( lval->val_type == KIND_LONGLONG) {
-        llpush();
-        vllongconst(value64);
-        zmod(lval);
-        return;
     }
 
     switch ( value ) {
