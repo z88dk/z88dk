@@ -1068,22 +1068,28 @@ int declare_local(int local_static)
                         lval.val_type = type->kind;
                         lval.const_val = val;
                         load_constant(&lval);
-                    } else if ( ispointer(expr_type) && !ispointer(type) ) {
-                        UT_string  *str;
-                        utstring_new(str);
-                        utstring_printf(str,"Incompatible pointer type to non-pointer. From ");
-                        type_describe(expr_type, str);
-                        utstring_printf(str, " to ");
-                        type_describe(type, str);
-                        warningfmt("incompatible-pointer-types","%s", utstring_body(str));
-                        utstring_free(str); 
-                        clearstage(before, start);
-                        //conv type
-                        force(type->kind, expr, type->isunsigned, expr_type->isunsigned, 0);
                     } else {
+                        if ( ispointer(expr_type) && !ispointer(type) ) {
+                            UT_string  *str;
+                            utstring_new(str);
+                            utstring_printf(str,"Incompatible pointer type to non-pointer. From ");
+                            type_describe(expr_type, str);
+                            utstring_printf(str, " to ");
+                            type_describe(type, str);
+                            warningfmt("incompatible-pointer-types","%s", utstring_body(str));
+                            utstring_free(str);
+                        }
+                        /* Convert before the flush so the initializer is still the tail. */
+                        if (before == NULL)
+                            force(type->kind, expr, type->isunsigned, expr_type->isunsigned, 0);
                         clearstage(before, start);
-                        //conv type
-                        force(type->kind, expr, type->isunsigned, expr_type->isunsigned, 0);
+                        if (before != NULL) {
+                            int saved = narrow_byte_unop;
+
+                            narrow_byte_unop = 0;
+                            force(type->kind, expr, type->isunsigned, expr_type->isunsigned, 0);
+                            narrow_byte_unop = saved;
+                        }
                     }
                     gen_store_to_tos(type->kind);
                 }

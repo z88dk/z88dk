@@ -72,6 +72,9 @@ extern void gen_switch_section(const char *section_name);
 extern void gen_store_to_tos(Kind typeobj);
 extern void gen_conv_uint2char(void);
 extern void gen_conv_sint2char(void);
+/* A char conversion may replace a trailing complement or negation.
+   Clear this when the operand was discarded and is no longer the tail. */
+extern int narrow_byte_unop;
 extern void gen_conv_uint2long(void);
 extern void gen_conv_sint2long(void);
 extern void gen_conv_carry2int(void);

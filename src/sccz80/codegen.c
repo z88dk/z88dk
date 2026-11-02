@@ -5221,13 +5221,56 @@ void gen_conv_carry2int(void)
     }
 }
 
+/* The low byte of ~ and unary - depends only on the operand's low byte.
+   Replacing the call is valid only when that call is still the last staged
+   line, because the next action discards the high byte. A shift, a divide,
+   or a test leaves some other line there. 64-bit helpers keep the value in
+   memory, not in L. inc a leaves carry alone, as l_neg does. */
+int narrow_byte_unop = 1;
+
+static int rewind_staged_call(const char *name)
+{
+    char line[48];
+    size_t n;
+    char *at;
+
+    if (!narrow_byte_unop || stagenext == NULL || stagenext <= stage)
+        return 0;
+    n = (size_t)snprintf(line, sizeof(line), "\tcall\t%s\n", name);
+    if (n >= sizeof(line) || (size_t)(stagenext - stage) < n)
+        return 0;
+    at = stagenext - n;
+    if (memcmp(at, line, n) != 0)
+        return 0;
+    if (at != stage && at[-1] != '\n')
+        return 0;
+    clearstage(at, NULL);
+    return 1;
+}
+
+static void narrow_byte_unop_tail(void)
+{
+    if (rewind_staged_call("l_com") || rewind_staged_call("l_long_com")) {
+        ol("ld\ta,l");
+        ol("cpl");
+        ol("ld\tl,a");
+    } else if (rewind_staged_call("l_neg") || rewind_staged_call("l_long_neg")) {
+        ol("ld\ta,l");
+        ol("cpl");
+        ol("inc\ta");
+        ol("ld\tl,a");
+    }
+}
+
 void gen_conv_uint2char(void)
 {
+    narrow_byte_unop_tail();
     ol("ld\th,0");
 }
 
 void gen_conv_sint2char(void)
 {
+    narrow_byte_unop_tail();
     ol("ld\ta,l");
     callrts("l_sxt");
 }
