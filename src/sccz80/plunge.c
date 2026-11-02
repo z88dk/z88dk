@@ -629,13 +629,24 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 vlongconst_tostack(lval->const_val);
         } else {
             if ( lval2->val_type == KIND_LONGLONG ) {
-                if (lval2->int_const_valid)
-                    vllongconst_tostack_exact(lval2->int_const_val);
-                else
-                    vllongconst_tostack(lval2->const_val);
-                if (integer_operand(lval) && integer_operand(lval2))
+                if (integer_operand(lval) && integer_operand(lval2)) {
+                    int width, uns;
+                    int64_t sv = lval->int_const_valid ? integer_signed_value(lval)
+                               : (lval->ltype->isunsigned ? (int64_t)(uint64_t)lval->const_val
+                                                          : (int64_t)lval->const_val);
+                    uint64_t bits;
+
+                    /* The primary already holds the right-hand value. Push
+                       this constant at the common width. `3 / s` is 3. */
+                    common_integer(lval->ltype, lval2->ltype, &width, &uns);
+                    bits = uns ? unsigned_low(sv, width) : (uint64_t)signed_low(sv, width);
                     set_common_integer(lval, lval->ltype, lval2->ltype);
-                else {
+                    vllongconst_tostack_exact(bits);
+                } else {
+                    if (lval2->int_const_valid)
+                        vllongconst_tostack_exact(lval2->int_const_val);
+                    else
+                        vllongconst_tostack(lval2->const_val);
                     lval->val_type = KIND_LONGLONG;
                     lval->ltype = lval->ltype->isunsigned ? type_ulonglong : type_longlong;
                 }
