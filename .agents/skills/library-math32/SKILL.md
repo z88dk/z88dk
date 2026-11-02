@@ -24,6 +24,10 @@ From **v2.5**, **`-lm` and `--math32`** are the same selection
 classic `-lm` linked genmath and newlib `-lm` linked math48. 6-byte
 reruns: `--genmath` or `--math48` (sccz80 or 80cc; zsdcc still stores
 4-byte IEEE). 8-byte: `--mbf64` with either compiler. ROM stays `-lmz`.
+`+zx81` and `+lambda` `-lm` stay `genmath_zx81`: the ROM interrupt does not
+save AF', and math32 uses `ex af,af'`. See `target-zx81` and `target-lambda`.
+Pre-v2.5 8080-family notes that call mbf32 the default mean `--math-mbf32`,
+not this `-lm`.
 
 ### Layout
 

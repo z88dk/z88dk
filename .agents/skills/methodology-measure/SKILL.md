@@ -285,6 +285,8 @@ Z80 CB ops slipped into an 8085 file.
 
 ## 4. Correctness gates
 
+Suite checks stay in the C under `test/suites/` and that suite's makefile. Do not add a language or a dependency the tree does not already build, unless the user specifically and explicitly directs it (`AGENTS.md` house rule 8). Do not add Python, or any other new language, to assert codegen or results. Existing `.agents/scripts/` bench helpers are not a pattern for new checkers.
+
 ### Math suite (`test/suites/math`)
 
 ```bash
@@ -306,7 +308,7 @@ change to integer long helpers or float cores. After `fsdiv` / `f16_div` edits:
 math32 **and** math16 suites on the CPUs that ship the object. After **newlib
 math.h** / `__MATH_MATH32` remaps: always run **`test_math32_rc2014_CODE.bin`**
 (and a newlib math16 link if half API changed). After classic `ftoa`/`ftoe`/`ftog`
-or printf `%f`/`%e`/`%g`: `test/suites/stdio`. From **v2.5**, a recipe that passes `-lm` links math32 (same as `--math32`). Before v2.5, `test_sprintf.bin`’s `-lm` was genmath. `test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` pass `--math32` explicitly.
+or printf `%f`/`%e`/`%g`: `test/suites/stdio`. From **v2.5**, a recipe that passes `-lm` links math32 (same as `--math32`). Before v2.5, `test_sprintf.bin`’s `-lm` was genmath. `test_sprintf_math32.bin` and `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` pass `--math32` explicitly. `+zx81` and `+lambda` keep `-lm` as `genmath_zx81` (`target-zx81`, `target-lambda`): the ROM interrupt does not save AF', and math32 uses `ex af,af'`. ROM maths stays `-lmz`. A pre-v2.5 note that calls mbf32 the 8080-family default means `--math-mbf32`, not `-lm`. `div` and public `inv` are restoring `1/x`; `invsqrt` stays Newton–Raphson (`library-math32`, `library-math16`).
 Integer `sscanf` is `test_scanf*.bin` (no `%f`). `test/suites/string` is `str*` only.
 
 ### Small probes

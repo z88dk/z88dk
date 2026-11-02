@@ -22,8 +22,8 @@ Do not add `CLAUDE.md` or a second copy of these rules.
 4. Write Zilog mnemonics in this tree. Read the matching `cpu-*` skill before you write or review asm for that CPU.
 5. On 8085, use the extended ops. Keep locals and intermediates on the stack. Read `cpu-8085`.
 6. Measure with `z88dk-ticks`. Put the CPU flag before the binary. Read `tool-ticks` and `methodology-measure`.
-7. From v2.5, `-lm` is math32 on classic and newlib. `+zx81` and `+lambda` `-lm` stay `genmath_zx81`. ROM maths stays `-lmz`. math32 divide is restoring. math32 inverse is Newton–Raphson. Read `library-math32` or `library-math16` before you edit those cores.
-8. To see whether z80asm accepts one source line, search `src/z80asm/dev/cpu/cpu_test_<cpu>_ok.asm` or `_err.asm` for that mnemonic. Read `tool-z80asm` for the line format. Do not load a whole `*_err.asm`.
+7. To see whether z80asm accepts one source line, search `src/z80asm/dev/cpu/cpu_test_<cpu>_ok.asm` or `_err.asm` for that mnemonic. Read `tool-z80asm` for the line format. Do not load a whole `*_err.asm`.
+8. Do not add a language or a dependency this tree does not already build, unless the user specifically and explicitly directs it. Compiler and library checks stay in the existing C suites. Do not add Python, or any other new language, to prove codegen or suite results. Existing `.agents/scripts/` helpers are not a reason to add another language or dependency.
 
 ## Prose
 

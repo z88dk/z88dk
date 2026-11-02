@@ -44,9 +44,8 @@ Assume a built tree (`bin/` tools present) unless the task is to build the toolc
 4. **Mnemonics:** **Zilog everywhere** in the z88dk tree. z80asm may accept **Intel** forms on 8080/8085 for **external-code compatibility only** — do not write Intel mnemonics in z88dk sources (`cpu-8085`, `tool-z80asm`).
 5. **8085:** extended ops and **stack-only** locals (`cpu-8085`).
 6. **Measure** with `z88dk-ticks`; put **CPU flag before the binary** (`tool-ticks`, `methodology-measure`).
-7. **math32 / math16**: `div` and public `inv` are restoring `1/x`. Newton–Raphson inv bodies stay on disk, unlinked (`library-math32`, `library-math16`). `invsqrt` stays Newton–Raphson. From **v2.5**, `-lm` is math32 (same defines as `--math32`) on classic and newlib. Before v2.5, classic `-lm` was genmath and newlib `-lm` was math48. ROM maths stays `-lmz`. `+zx81` and `+lambda` `-lm` stay `genmath_zx81`: the ROM interrupt does not save AF', and math32 uses `ex af,af'`. 6-byte reruns are `--genmath` or `--math48` (sccz80 or 80cc). 8-byte is `--mbf64` (either compiler). Pre-v2.5 8080-family notes that call mbf32 the default mean `--math-mbf32`, not this `-lm`.
-8. **CPU opcode capability (last resort):** fixtures in `src/z80asm/dev/cpu/` (`cpu_test_<cpu>_ok.asm` / `_err.asm`) answer “does **z80asm** accept this **source line** for `-m<cpu>`, and what does it emit?” **ok** may be native, multi-byte synthetic, or `call __z80asm__*`. **`_strict_`** = strict mode (**synthetics forbidden**). Fixtures may list Intel spellings for compat tests; emit **Zilog** in tree work. How to read lines: skill **`tool-z80asm`**. `rg` one mnemonic; never bulk-load huge `*_err.asm` files.
-9. **`-compiler=multi` strings:** keep one file literal pool, the data-variant `dumplits` image. Do not emit a pool per selected function. Matching images use that label and the same offsets. A different image is merged by C string (`i_N+off` through the next NUL). Spec: `src/zcc-multi/zcc-compiler-multi.md`. Skills: `tool-zcc`, `compiler-80cc`.
+7. **CPU opcode capability (last resort):** fixtures in `src/z80asm/dev/cpu/` (`cpu_test_<cpu>_ok.asm` / `_err.asm`) answer “does **z80asm** accept this **source line** for `-m<cpu>`, and what does it emit?” **ok** may be native, multi-byte synthetic, or `call __z80asm__*`. **`_strict_`** = strict mode (**synthetics forbidden**). Fixtures may list Intel spellings for compat tests; emit **Zilog** in tree work. How to read lines: skill **`tool-z80asm`**. `rg` one mnemonic; never bulk-load huge `*_err.asm` files.
+8. **No new languages or dependencies.** Do not add a language or a dependency the tree does not already build, unless the user specifically and explicitly directs it. Compiler and library checks stay in the C suites and the makefiles those suites already use. Do not add Python, or any other new language, to prove codegen or suite results. Existing `.agents/scripts/` helpers are not a reason to add another language or dependency.
 
 ## Commit hygiene
 
@@ -128,6 +127,8 @@ Each skill lives at `.agents/skills/<name>/SKILL.md`. The directory name is the 
 | `target-cpm` | `+cpm` |
 | `target-rc2014` | `+rc2014` |
 | `target-zx` | `+zx` (48/128, not Next) |
+| `target-zx81` | `+zx81` (`-lm` is `genmath_zx81`) |
+| `target-lambda` | `+lambda` (`-lm` is `genmath_zx81`) |
 | `target-zxn` | `+zxn` (Next; see also `cpu-z80n`) |
 | `target-sms` | `+sms` / Game Gear |
 

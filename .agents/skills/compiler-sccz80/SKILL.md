@@ -19,6 +19,8 @@ Binary: `z88dk-sccz80` (normally via `zcc`). Source: `src/sccz80/`.
 | Runtime | `libsrc/l/sccz80/` per CPU (`5-z80`, `7-8085`, `8-8080`, …) |
 | Inline ints | May load `z80rules.8` — see `tool-copt` |
 | Float rewrite | sccz80 may rewrite `1.0f/x` → `inv(x)`; force runtime numerator to hit `fsdiv` |
+| `-compiler=multi` | sccz80 is the data-variant. Its `dumplits` image is the one file string pool. Do not emit a second pool for a selected function. Matching images use that label and the same offsets. A different image is merged by C string (`i_N+off` through the next NUL). Spec: `src/zcc-multi/zcc-compiler-multi.md` |
+| Tests | Extend `test/suites/sccz80/*.c`. Do not add a language or a dependency the tree does not already build, unless the user specifically and explicitly directs it (`AGENTS.md` house rule 8) |
 
 ## Condensed wiki
 
