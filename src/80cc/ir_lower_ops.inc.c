@@ -1922,11 +1922,13 @@ static int gen_neg(FILE *out, Func *f, const Op *op)
         /* Byte NEG: A = -src[0], stored as ONE byte. Without this the width-2
            fallback below (commit_hl_word) writes two bytes into a one-byte slot
            — the extra byte clobbers the neighbouring slot (e.g. a byte-narrowed
-           `r` overwriting the low byte of an adjacent long). `cpl;add a,1` is the
-           two's-complement (~x+1), the same portable idiom as the width-4 path. */
+           `r` overwriting the low byte of an adjacent long). `cpl;inc a` is the
+           two's-complement (~x+1); the unused carry makes INC safe here. */
         load_byte_to_a(out, f, op->src[0]);
         emit(out, "cpl");
-        emit(out, "add\ta,1");
+        /* The byte result is the only live value here; add's carry is not
+           modelled by IR_NEG, so INC is equivalent and one byte smaller. */
+        emit(out, "inc\ta");
         return finalize_byte_result(out, f, op, 1);
     }
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {

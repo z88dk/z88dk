@@ -3909,6 +3909,7 @@ derearb_keep.bin: $(SOURCES) derearb.c
 # 8085 BC word reload via LDSI+LHLX. 8080 is the no-LHLX control.
 all: lhlxbc.bin lhlxbc_fp.bin lhlxbc_8085.bin lhlxbc_8085_fp.bin lhlxbc_8085_keep.bin lhlxbc_8080.bin
 all: byteret.bin byteret_fp.bin byteret_8085.bin byteret_8085_fp.bin byteret_keep.bin byteret_8085_keep.bin byteret_fp_keep.bin
+all: unarybyte.bin unarybyte_fp.bin unarybyte_keep.bin unarybyte_8080.bin unarybyte_8085.bin unarybyte_gbz80.bin unarybyte_r2ka.bin unarybyte_r4k.bin unarybyte_r6k.bin
 
 lhlxbc.bin: $(SOURCES) lhlxbc.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
@@ -3961,6 +3962,45 @@ byteret_fp_keep.bin: $(SOURCES) byteret.c
 byteret_8085_keep.bin: $(SOURCES) byteret.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -Cc--opt-disable=byte-ret --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# Byte-only unary results narrow after C integer promotion; wide consumers
+# retain the promoted value. Compile once with narrow-byte disabled so the
+# suite also exercises the unchanged, wider lowering.
+unarybyte.bin: $(SOURCES) unarybyte.c
+	$(compile)
+	$(runtest)
+
+unarybyte_fp.bin: $(SOURCES) unarybyte.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+unarybyte_keep.bin: $(SOURCES) unarybyte.c
+	$(call compile,-Cc--opt-disable=narrow-byte)
+	$(runtest)
+
+unarybyte_8080.bin: $(SOURCES) unarybyte.c
+	$(call compile_8080,)
+	$(runtest_8080)
+
+unarybyte_8085.bin: $(SOURCES) unarybyte.c
+	$(call compile_8085,)
+	$(runtest_8085)
+
+unarybyte_gbz80.bin: $(SOURCES) unarybyte.c
+	$(call compile_gbz80,)
+	$(runtest_gbz80)
+
+unarybyte_r2ka.bin: $(SOURCES) unarybyte.c
+	$(call compile_r2ka,)
+	$(runtest_r2ka)
+
+unarybyte_r4k.bin: $(SOURCES) unarybyte.c
+	$(call compile_r4k,)
+	$(runtest_r4k)
+
+unarybyte_r6k.bin: $(SOURCES) unarybyte.c
+	$(call compile_r6k,)
+	$(runtest_r6k)
 
 aggpromote.bin: $(SOURCES) aggpromote.c
 	$(compile)

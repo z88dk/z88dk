@@ -3741,6 +3741,9 @@ static int narrow_kind(const Op *op)
     switch (op->kind) {
     case IR_ADD: case IR_SUB:
     case IR_AND: case IR_OR: case IR_XOR:
+    /* Unary operations are byte-narrowable when only the low byte is used:
+       ~x and -x modulo 256 depend only on x's low byte. */
+    case IR_NEG: case IR_NOT:
     /* K - x: the low byte of the result depends only on the low byte of x. */
     case IR_RSUB:
     /* Zero/sign-extend feeding only byte uses degrades to a byte copy:
