@@ -53,6 +53,7 @@ static void push(const char *ret);
 static void pop(const char *ret);
 static void immed2(void);
 static void constbc(int32_t val);
+static void push_bc_words(const uint16_t *words, int count);
 static void addbchl(int val);
 static void dcallrts(char *sname,Kind to);
 static void quikmult(int type, int32_t size, char preserve);
@@ -5328,59 +5329,64 @@ void vllongconst_exact(uint64_t val)
 }
 
 
+/* push bc leaves BC alone, so a repeated word is one ld bc. */
+static void push_bc_words(const uint16_t *words, int count)
+{
+    int loaded = 0;
+    uint16_t held = 0;
+    int i;
+
+    for ( i = 0; i < count; i++ ) {
+        if ( loaded == 0 || held != words[i] ) {
+            constbc(words[i]);
+            held = words[i];
+            loaded = 1;
+        }
+        push("bc");
+    }
+}
+
 void vlongconst_tostack(zdouble val)
 {
     uint32_t l = (uint32_t)(int64_t)val;
-    constbc(l / 65536);
-    ol("push\tbc");
-    constbc(l % 65536);
-    ol("push\tbc");
-    Zsp -= 4;
+    uint16_t w[2];
+
+    w[0] = (uint16_t)(l >> 16);
+    w[1] = (uint16_t)l;
+    push_bc_words(w, 2);
 }
 
 void vlongconst_tostack_exact(uint32_t val)
 {
-    constbc(val >> 16);
-    ol("push\tbc");
-    constbc(val & 0xffff);
-    ol("push\tbc");
-    Zsp -= 4;
+    uint16_t w[2];
+
+    w[0] = (uint16_t)(val >> 16);
+    w[1] = (uint16_t)val;
+    push_bc_words(w, 2);
 }
 
 void vllongconst_tostack(zdouble val)
 {
-    uint64_t v,l;
+    uint64_t v;
+    uint16_t w[4];
 
     v = val;
-
-    l = (v >> 32) & 0xffffffff;
-    constbc(l / 65536);
-    push("bc");
-    constbc(l % 65536);
-    push("bc");
-
-    l = v & 0xffffffff;
-    constbc(l / 65536);
-    push("bc");
-    constbc(l % 65536);
-    push("bc");
+    w[0] = (uint16_t)(v >> 48);
+    w[1] = (uint16_t)(v >> 32);
+    w[2] = (uint16_t)(v >> 16);
+    w[3] = (uint16_t)v;
+    push_bc_words(w, 4);
 }
 
 void vllongconst_tostack_exact(uint64_t v)
 {
-    uint64_t l;
+    uint16_t w[4];
 
-    l = (v >> 32) & 0xffffffff;
-    constbc(l / 65536);
-    push("bc");
-    constbc(l % 65536);
-    push("bc");
-
-    l = v & 0xffffffff;
-    constbc(l / 65536);
-    push("bc");
-    constbc(l % 65536);
-    push("bc");
+    w[0] = (uint16_t)(v >> 48);
+    w[1] = (uint16_t)(v >> 32);
+    w[2] = (uint16_t)(v >> 16);
+    w[3] = (uint16_t)v;
+    push_bc_words(w, 4);
 }
 
 
