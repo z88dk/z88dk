@@ -241,6 +241,20 @@ void set_common_integer(LVALUE *dest, const Type *a, const Type *b)
     }
 }
 
+/* Both factors are unsigned chars. Each value is 0..255, so the
+   promoted int product is an unsigned 8x8. */
+static int unsigned_char_factors(const Type *a, const Type *b)
+{
+    return a && b && a->kind == KIND_CHAR && b->kind == KIND_CHAR
+        && a->isunsigned && b->isunsigned;
+}
+
+/* Hardware 8x8 leaves the product in HL. Other CPUs stay on l_mult. */
+static int hardware_uchar_multiply(void)
+{
+    return c_cpu == CPU_Z180 || IS_EZ80() || IS_KC160() || IS_Z80N();
+}
+
 /* A promoted char still occupies the low byte, with the high byte already
    extended. Comparing that byte with a constant inside the char's range is
    the same result as the int comparison, and it stays a byte test. */
@@ -1008,6 +1022,19 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         && cmp_left->kind == KIND_CHAR && cmp_right->kind == KIND_CHAR
         && cmp_left->isunsigned == cmp_right->isunsigned)
         retag_char_compare(lval, cmp_left->isunsigned);
+
+    /* The result type stays a signed int. The unsigned-char tag only
+       selects the 8x8 multiply, which writes the full product into HL. */
+    if (oper == mult && hardware_uchar_multiply()
+        && unsigned_char_factors(cmp_left, cmp_right)) {
+        lval->val_type = KIND_CHAR;
+        lval->ltype = type_uchar;
+        lval->binop = oper;
+        (*oper)(lval);
+        lval->val_type = KIND_INT;
+        lval->ltype = type_int;
+        return;
+    }
 
     lval->binop = oper;
     (*oper)(lval);

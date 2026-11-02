@@ -2685,9 +2685,20 @@ void mult(LVALUE* lval)
         break;
     case KIND_CHAR:
         if ( lval->ltype->isunsigned ) {
-            if (c_cpu == CPU_Z180 || IS_EZ80() || IS_KC160() ) {
+            if (c_cpu == CPU_Z180 || IS_EZ80() ) {
                 ot("ld\th,e\n");
                 ot("mlt\thl\n");
+                break;
+            } else if (IS_KC160()) {
+                /* KC160 8x8 is mul hl. mlt hl is not in that set. */
+                ot("ld\th,e\n");
+                ot("mul\thl\n");
+                break;
+            } else if (IS_Z80N()) {
+                /* mul de is D*E -> DE, the same product as l_mulu_de. */
+                ot("ld\td,l\n");
+                ot("mul\tde\n");
+                ot("ex\tde,hl\n");
                 break;
             } else if ( (c_cpu & CPU_RABBIT) ) {
                 // For Rabbit we want to use the mul instruction
