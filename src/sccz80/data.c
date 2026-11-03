@@ -77,6 +77,7 @@ int nxtlab, /* next avail label # */
     c_verbose; /* Verbose to screen */
 
 int      scope_block; /* */
+int      current_block; /* number of the block being parsed */
 
 FILE    *input; /* iob # for input file */
 FILE    *output; /* iob # for output file (if any) */
