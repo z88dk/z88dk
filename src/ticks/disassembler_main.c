@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -54,8 +55,19 @@ static void usage(char *program)
     exit(1);
 }
 
+// The debug info parser reports its warnings through bk.debug; keep them out of the listing
+static void stderr_log(const char *fmt, ...)
+{
+    va_list args;
+
+    va_start(args, fmt);
+    vfprintf(stderr, fmt, args);
+    va_end(args);
+}
+
 static backend_t disassembler_backend = {
-    .get_memory = get_memory
+    .get_memory = get_memory,
+    .debug = stderr_log
 };
 
 int main(int argc, char **argv)

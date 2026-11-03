@@ -81,7 +81,7 @@ static uint8_t parse_address_space(const char* encoded, const char** result, add
             break;
         }
         default: {
-            printf("Warning: unsupported address space: %s\n", encoded);
+            bk.debug("Warning: unsupported address space: %s\n", encoded);
             *result = NULL;
             return 1;
         }
@@ -141,7 +141,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                         break;
                     }
                     default: {
-                        printf("Warning: unknown type starting with %c.\n", c);
+                        bk.debug("Warning: unknown type starting with %c.\n", c);
                         goto err;
                     }
                 }
