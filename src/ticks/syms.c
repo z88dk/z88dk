@@ -218,6 +218,22 @@ void read_symbol_file(char *filename)
                   HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
                 }
 
+                // A file static is also found by its file, so that two files' statics of one name differ
+                if (sym->islocal && sym->file) {
+                    symbol_file* f = NULL;
+                    HASH_FIND_STR(symbol_files, sym->file, f);
+                    if (f == NULL) {
+                        f = calloc(1, sizeof(symbol_file));
+                        f->name = strdup(sym->file);
+                        HASH_ADD_KEYPTR(hh, symbol_files, f->name, strlen(f->name), f);
+                    }
+                    oldsym = NULL;
+                    HASH_FIND(hh_file, f->symbols, sym->name, strlen(sym->name), oldsym);
+                    if (oldsym == NULL) {
+                        HASH_ADD_KEYPTR(hh_file, f->symbols, sym->name, strlen(sym->name), sym);
+                    }
+                }
+
             } else if ( argc > 9 ) {
                 /* It's a cline/asmline symbol */
                 char   filename[FILENAME_MAX+1];
@@ -241,7 +257,7 @@ symbol *find_symbol_byname(const char *name, const char *filename)
         HASH_FIND_STR(symbol_files, filename, f);
         if (f) {
             symbol *sym = NULL;
-            HASH_FIND_STR(f->symbols, name, sym);
+            HASH_FIND(hh_file, f->symbols, name, strlen(name), sym);
             if (sym) {
                 return sym;
             }
@@ -260,7 +276,7 @@ int symbol_resolve(char *name, const char *filename)
         HASH_FIND_STR(symbol_files, filename, f);
         if (f) {
             symbol *sym = NULL;
-            HASH_FIND_STR(f->symbols, name, sym);
+            HASH_FIND(hh_file, f->symbols, name, strlen(name), sym);
             if (sym) {
                 return sym->address;
             }
@@ -280,7 +296,7 @@ int symbol_resolve(char *name, const char *filename)
         symbol_file* tmp;
         HASH_ITER(hh, symbol_files, f, tmp)
         {
-            HASH_FIND_STR(f->symbols, name, sym);
+            HASH_FIND(hh_file, f->symbols, name, strlen(name), sym);
             if (sym) {
                 return sym->address;
             }
