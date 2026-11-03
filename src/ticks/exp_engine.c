@@ -114,7 +114,7 @@ void expression_primitive_func_call_1(const char* call, struct expression_result
     if (strcmp(call, "sizeof") == 0) {
         if (a->type.first != NULL) {
             to->type.first = malloc_type(TYPE_INT);
-            to->as_int = a->type.first->size;
+            to->as_int = get_type_memory_size(a->type.first);
         } else {
             to->type.first = malloc_type(TYPE_INT);
             to->as_int = (int)a->type.size;
@@ -618,8 +618,9 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
             return buffer;
         }
         case TYPE_ARRAY: {
-            int maxlen = Max(0, Min(10, (int)result->type.size));
-            utstring_printf(buffer, "%#04x [%d] = { ", result->as_pointer.ptr, (int)result->type.size);
+            int count = result->type.first->size;
+            int maxlen = Max(0, Min(10, count));
+            utstring_printf(buffer, "%#04x [%d] = { ", result->as_pointer.ptr, count);
             uint32_t ptr = result->as_pointer.ptr;
             for ( int i = 0; i < maxlen; i++ ) {
                 utstring_printf(buffer, "%s[%d] = ", i != 0 ? ", " : "", i);
@@ -636,7 +637,7 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
                 }
                 expression_result_free(&elr);
             }
-            utstring_printf(buffer, "%s }", maxlen != result->type.size ? " ..." : "");
+            utstring_printf(buffer, "%s }", maxlen != count ? " ..." : "");
             return buffer;
         }
         case TYPE_CHAR:

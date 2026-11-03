@@ -168,7 +168,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                         last->type_ = TYPE_ARRAY;
                         last->size = strtol(rt, &end, 0);
                         rt = end;
-                        if (*rt == 'x') rt++;
+                        if (*rt == 'x' || *rt == 'd') rt++;     // sccz80 DA<n>x, sdcc DA<n>d
                         break;
                     }
                     case 'F': {
@@ -912,8 +912,11 @@ type_chain* copy_type_chain(type_chain* from) {
             ptr->next = copy_ptr;
         }
         *copy_ptr = *from;
-        // recalculate size since malloc_type had NULL data
-        copy_ptr->size = get_type_memory_size(copy_ptr);
+        // recalculate size since malloc_type had NULL data; an array's size
+        // is its element count, which only the record carries
+        if (copy_ptr->type_ != TYPE_ARRAY) {
+            copy_ptr->size = get_type_memory_size(copy_ptr);
+        }
         ptr = copy_ptr;
         ptr->next = NULL;
         from = from->next;
@@ -1035,6 +1038,9 @@ int get_type_memory_size(type_chain* chain) {
         case TYPE_FLOAT:
         case TYPE_LONG: {
             return 4;
+        }
+        case TYPE_ARRAY: {
+            return chain->size * get_type_memory_size(chain->next);
         }
         default: {
             return 0;
