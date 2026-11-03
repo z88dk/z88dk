@@ -71,6 +71,8 @@ struct type_chain_s {
     int   size;
     char* data;
     type_chain* next;
+    int   bit_start;   // SB<start>$<width>: a bitfield, width 0 if not
+    int   bit_width;
 };
 
 struct type_record_s {
