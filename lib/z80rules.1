@@ -1101,6 +1101,42 @@
 	and	a
 	jp	nz,%1	;%3
 
+	pop	de
+	ld	(de),a
+	ld	h,0
+	ld	hl,%1
+=
+	pop	de
+	ld	(de),a
+	ld	hl,%1
+
+	pop	de
+	ld	(de),a
+	ld	h,0
+	ld	hl,%1	;const
+=
+	pop	de
+	ld	(de),a
+	ld	hl,%1	;const
+
+	pop	de
+	ld	(de),a
+	ld	h,0
+	ld	hl,(%1)
+=
+	pop	de
+	ld	(de),a
+	ld	hl,(%1)
+
+	pop	de
+	ld	(de),a
+	ld	h,0
+	pop	hl
+=
+	pop	de
+	ld	(de),a
+	pop	hl
+
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,%1	;const

@@ -1246,6 +1246,62 @@
 	pop	de
 	ld	a,l
 	ld	(de),a
+	ld	h,0
+
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	h,0
+	ld	hl,%1
+=
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%1
+
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	h,0
+	ld	hl,%1	;const
+=
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%1	;const
+
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	h,0
+	ld	hl,(%1)
+=
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,(%1)
+
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	h,0
+	pop	hl
+=
+	pop	de
+	ld	a,l
+	ld	(de),a
+	pop	hl
+
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	h,0
+	jp	%1	;EOS
+=
+	pop	de
+	ld	a,l
+	ld	(de),a
+	jp	%1	;EOS
 
 	ld	de,0
 	call	ufloat

@@ -191,6 +191,29 @@ static int mix_ll_logical(long long a, unsigned long long b)
 static long neg_sc(signed char c) { return (long)-c; }
 static long com_sc(signed char c) { return (long)~c; }
 
+/* The int value of an unsigned char assignment. The stored byte alone
+   does not show a deleted zero-extend. */
+static int asg_neg(signed char d)
+{
+    unsigned char z;
+    return z = (unsigned char)-d;
+}
+static int asg_com(signed char d)
+{
+    unsigned char z;
+    return z = (unsigned char)~d;
+}
+static int asg_sum(unsigned char a, unsigned char b)
+{
+    unsigned char z;
+    return z = (unsigned char)(a + b);
+}
+static int asg_signed(signed char d)
+{
+    signed char z;
+    return z = -d;
+}
+
 static long add_l(int n) { return n + 40000L; }
 static long sub_l(int n) { return n - 40000L; }
 static long add_u1(unsigned n) { return n + 1L; }
@@ -258,6 +281,15 @@ void test_conv(void)
     Assert(sub_com(vuc) == 11, "subscript of a promoted complement");
     Assert(tern_shift_same(vone, vff) == 128, "ternary complement of the same char then shift");
     Assert(tern_shift_same(vzero, vff) == 127, "false arm of that same-char shift");
+    Assert(asg_neg(1) == 255, "assignment of -(signed char)1");
+    Assert(asg_neg((signed char)-1) == 1, "assignment of -(-1)");
+    Assert(asg_neg((signed char)0x80) == 128, "assignment of -(-128)");
+    Assert(asg_com(1) == 254, "assignment of ~(signed char)1");
+    Assert(asg_com((signed char)-1) == 0, "assignment of ~(-1)");
+    Assert(asg_sum(200, 200) == 144, "assignment of a truncated sum");
+    Assert(asg_sum(1, 2) == 3, "assignment of a small sum");
+    Assert(asg_signed(1) == -1, "assignment of a signed negation");
+    Assert(asg_signed((signed char)-1) == 1, "assignment of a signed -(-1)");
     Assert(tern_both_shl(vone, vuc) == 400, "both char arms shift left as int");
     Assert(tern_sc_shr(vone, vsc) == -64, "signed char ternary then arithmetic shift");
     Assert(tern_sc_shl(vone, vsc) == -256, "signed char ternary then left shift");
