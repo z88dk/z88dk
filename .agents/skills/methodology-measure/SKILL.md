@@ -541,7 +541,7 @@ When 8085 asm is written by hand for these benches, compare quality here. ABI, r
 
 **zcc-multi size:** the stitch keeps one string pool, the data-variant `dumplits` image. The map has one `i_1_<data-variant>` pool label, not one pool per variant. On `test/suites/*bench`, the multi `.bin` stays at or under the largest of sccz80, 80cc-sp, and 80cc-fp. The default metric is ticks, so multi can still be larger than the smaller of those three.
 
-1. Copy the bench **`z88dk-classic/readme.txt` `zcc` line**. 8085: never `-fframe-pointer`. Fannkuch 8085 adds `--opt-code-speed`; sieve does not. 80cc 8085 **qsort does not link** — skip that row.
+1. Copy the bench **`z88dk-classic/readme.txt` `zcc` line**. 8085: never `-fframe-pointer`. Fannkuch 8085 sccz80 adds `--opt-code-speed`; sieve does not. 80cc ignores that flag. 80cc 8085 **qsort does not link** — skip that row.
 2. Remeasure **both** sides on the **same** toolchain revision. Readme ticks age.
 3. Mix C and asm **per bench** (`zcc` will not drop a C `PUBLIC` because an `.asm` also defines it):
 
