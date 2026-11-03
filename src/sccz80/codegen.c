@@ -53,6 +53,7 @@ static void push(const char *ret);
 static void pop(const char *ret);
 static void immed2(void);
 static void constbc(int32_t val);
+static void push_bc_words(const uint16_t *words, int count);
 static void addbchl(int val);
 static void dcallrts(char *sname,Kind to);
 static void quikmult(int type, int32_t size, char preserve);
@@ -2684,9 +2685,20 @@ void mult(LVALUE* lval)
         break;
     case KIND_CHAR:
         if ( lval->ltype->isunsigned ) {
-            if (c_cpu == CPU_Z180 || IS_EZ80() || IS_KC160() ) {
+            if (c_cpu == CPU_Z180 || IS_EZ80() ) {
                 ot("ld\th,e\n");
                 ot("mlt\thl\n");
+                break;
+            } else if (IS_KC160()) {
+                /* KC160 8x8 is mul hl. mlt hl is not in that set. */
+                ot("ld\th,e\n");
+                ot("mul\thl\n");
+                break;
+            } else if (IS_Z80N()) {
+                /* mul de is D*E -> DE, the same product as l_mulu_de. */
+                ot("ld\td,l\n");
+                ot("mul\tde\n");
+                ot("ex\tde,hl\n");
                 break;
             } else if ( (c_cpu & CPU_RABBIT) ) {
                 // For Rabbit we want to use the mul instruction
@@ -3021,6 +3033,15 @@ void zmod_const(LVALUE *lval, int64_t value64)
     LVALUE  templval={0};
     int32_t value = (int32_t)value64;
 
+    /* The 16-bit remainder shortcut drops every bit above the low word.
+       4294967296LL % 10 is 6, and the low word of that dividend is 0. */
+    if ( lval->val_type == KIND_LONGLONG) {
+        llpush();
+        vllongconst_exact((uint64_t)value64);
+        zmod(lval);
+        return;
+    }
+
     templval.val_type = KIND_INT;
     if ( ulvalue(lval) )
         templval.ltype = type_uint;
@@ -3063,11 +3084,6 @@ void zmod_const(LVALUE *lval, int64_t value64)
             zmod(lval);
             return;
         }
-    } else if ( lval->val_type == KIND_LONGLONG) {
-        llpush();
-        vllongconst(value64);
-        zmod(lval);
-        return;
     }
 
     switch ( value ) {
@@ -5221,13 +5237,56 @@ void gen_conv_carry2int(void)
     }
 }
 
+/* The low byte of ~ and unary - depends only on the operand's low byte.
+   Replacing the call is valid only when that call is still the last staged
+   line, because the next action discards the high byte. A shift, a divide,
+   or a test leaves some other line there. 64-bit helpers keep the value in
+   memory, not in L. inc a leaves carry alone, as l_neg does. */
+int narrow_byte_unop = 1;
+
+static int rewind_staged_call(const char *name)
+{
+    char line[48];
+    size_t n;
+    char *at;
+
+    if (!narrow_byte_unop || stagenext == NULL || stagenext <= stage)
+        return 0;
+    n = (size_t)snprintf(line, sizeof(line), "\tcall\t%s\n", name);
+    if (n >= sizeof(line) || (size_t)(stagenext - stage) < n)
+        return 0;
+    at = stagenext - n;
+    if (memcmp(at, line, n) != 0)
+        return 0;
+    if (at != stage && at[-1] != '\n')
+        return 0;
+    clearstage(at, NULL);
+    return 1;
+}
+
+static void narrow_byte_unop_tail(void)
+{
+    if (rewind_staged_call("l_com") || rewind_staged_call("l_long_com")) {
+        ol("ld\ta,l");
+        ol("cpl");
+        ol("ld\tl,a");
+    } else if (rewind_staged_call("l_neg") || rewind_staged_call("l_long_neg")) {
+        ol("ld\ta,l");
+        ol("cpl");
+        ol("inc\ta");
+        ol("ld\tl,a");
+    }
+}
+
 void gen_conv_uint2char(void)
 {
+    narrow_byte_unop_tail();
     ol("ld\th,0");
 }
 
 void gen_conv_sint2char(void)
 {
+    narrow_byte_unop_tail();
     ol("ld\ta,l");
     callrts("l_sxt");
 }
@@ -5285,59 +5344,64 @@ void vllongconst_exact(uint64_t val)
 }
 
 
+/* push bc leaves BC alone, so a repeated word is one ld bc. */
+static void push_bc_words(const uint16_t *words, int count)
+{
+    int loaded = 0;
+    uint16_t held = 0;
+    int i;
+
+    for ( i = 0; i < count; i++ ) {
+        if ( loaded == 0 || held != words[i] ) {
+            constbc(words[i]);
+            held = words[i];
+            loaded = 1;
+        }
+        push("bc");
+    }
+}
+
 void vlongconst_tostack(zdouble val)
 {
     uint32_t l = (uint32_t)(int64_t)val;
-    constbc(l / 65536);
-    ol("push\tbc");
-    constbc(l % 65536);
-    ol("push\tbc");
-    Zsp -= 4;
+    uint16_t w[2];
+
+    w[0] = (uint16_t)(l >> 16);
+    w[1] = (uint16_t)l;
+    push_bc_words(w, 2);
 }
 
 void vlongconst_tostack_exact(uint32_t val)
 {
-    constbc(val >> 16);
-    ol("push\tbc");
-    constbc(val & 0xffff);
-    ol("push\tbc");
-    Zsp -= 4;
+    uint16_t w[2];
+
+    w[0] = (uint16_t)(val >> 16);
+    w[1] = (uint16_t)val;
+    push_bc_words(w, 2);
 }
 
 void vllongconst_tostack(zdouble val)
 {
-    uint64_t v,l;
+    uint64_t v;
+    uint16_t w[4];
 
     v = val;
-
-    l = (v >> 32) & 0xffffffff;
-    constbc(l / 65536);
-    push("bc");
-    constbc(l % 65536);
-    push("bc");
-
-    l = v & 0xffffffff;
-    constbc(l / 65536);
-    push("bc");
-    constbc(l % 65536);
-    push("bc");
+    w[0] = (uint16_t)(v >> 48);
+    w[1] = (uint16_t)(v >> 32);
+    w[2] = (uint16_t)(v >> 16);
+    w[3] = (uint16_t)v;
+    push_bc_words(w, 4);
 }
 
 void vllongconst_tostack_exact(uint64_t v)
 {
-    uint64_t l;
+    uint16_t w[4];
 
-    l = (v >> 32) & 0xffffffff;
-    constbc(l / 65536);
-    push("bc");
-    constbc(l % 65536);
-    push("bc");
-
-    l = v & 0xffffffff;
-    constbc(l / 65536);
-    push("bc");
-    constbc(l % 65536);
-    push("bc");
+    w[0] = (uint16_t)(v >> 48);
+    w[1] = (uint16_t)(v >> 32);
+    w[2] = (uint16_t)(v >> 16);
+    w[3] = (uint16_t)v;
+    push_bc_words(w, 4);
 }
 
 

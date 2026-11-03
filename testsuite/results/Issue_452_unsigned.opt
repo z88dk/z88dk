@@ -33,7 +33,7 @@
 	ld	l,(hl)
 	ld	h,0
 	pop	de
-	call	l_div_u
+	call	l_div
 	pop	bc
 	ret
 

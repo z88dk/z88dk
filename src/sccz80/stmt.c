@@ -625,12 +625,24 @@ void doreturn(char type)
                 gen_leave_function(currfn->ctype->return_type->kind, type, incritical);
                 return;
             }
-            clearstage(before, start);
             if (ch() != ',')
                 break;
+            clearstage(before, start);
             inbyte();
         }
-        force(currfn->ctype->return_type->kind, type_ptr->kind, currfn->ctype->return_type->isunsigned, type_ptr->isunsigned, 0);
+        /* The last expression is still staged. Convert it before the flush
+           so a trailing complement is still the last line. */
+        if (before == NULL) {
+            force(currfn->ctype->return_type->kind, type_ptr->kind, currfn->ctype->return_type->isunsigned, type_ptr->isunsigned, 0);
+        }
+        clearstage(before, start);
+        if (before != NULL) {
+            int saved = narrow_byte_unop;
+
+            narrow_byte_unop = 0;
+            force(currfn->ctype->return_type->kind, type_ptr->kind, currfn->ctype->return_type->isunsigned, type_ptr->isunsigned, 0);
+            narrow_byte_unop = saved;
+        }
         gen_leave_function(currfn->ctype->return_type->kind, type, incritical);
     } else {
         gen_leave_function(KIND_INT, type, incritical);

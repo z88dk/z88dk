@@ -20,7 +20,9 @@
 	ld	hl,(sp+2)
 	ex	de,hl
 	ld	hl,(sp+0)
-	call	l_mult
+	ld	bc,hl
+	mul
+	ld	hl,bc
 	add	sp,4
 	ret
 

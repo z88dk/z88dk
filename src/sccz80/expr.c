@@ -201,6 +201,99 @@ int heir1(LVALUE* lval)
     return 0;
 }
 
+/* An integer value already lives in HL, or in DEHL / the i64 accumulator
+   once it is long. KIND_CARRY is only the flag. */
+static int arith_integer(const LVALUE *v)
+{
+    if (!v || !v->ltype || v->ptr_type)
+        return 0;
+    if (ispointer(v->ltype) || v->ltype->kind == KIND_ARRAY
+        || v->ltype->kind == KIND_STRUCT || v->ltype->kind == KIND_FUNC)
+        return 0;
+    if (v->val_type == KIND_CPTR || v->val_type == KIND_PTR)
+        return 0;
+    if (kind_is_decimal(v->val_type) || kind_is_decimal(v->ltype->kind))
+        return 0;
+    if (v->val_type == KIND_CARRY)
+        return 1;
+    return kind_is_integer(v->ltype->kind) || kind_is_integer(v->val_type);
+}
+
+static int integer_reg_width(const LVALUE *v)
+{
+    if (v->val_type == KIND_LONGLONG)
+        return 64;
+    if (v->val_type == KIND_LONG)
+        return 32;
+    if (v->val_type == KIND_CARRY)
+        return 0;
+    return 16;
+}
+
+static void widen_primary_to(const LVALUE *v, int width)
+{
+    int uns = v->ltype && v->ltype->isunsigned;
+    int w = integer_reg_width(v);
+
+    if (v->val_type == KIND_CARRY) {
+        gen_conv_carry2int();
+        uns = 0;
+        w = 16;
+    }
+    if (w >= width)
+        return;
+    if (width <= 32)
+        zconvert_to_long(0, KIND_INT, uns);
+    else if (w >= 32)
+        zconvert_to_llong(0, KIND_LONG, uns);
+    else
+        zconvert_to_llong(0, KIND_INT, uns);
+}
+
+/* C90 6.3.15: both arithmetic arms use the usual arithmetic type.
+   A constant condition still has that type. The kept value is widened
+   when it is live; a folded constant is only retyped. */
+static void retag_conditional(LVALUE *kept, const LVALUE *other)
+{
+    int width, uns;
+
+    if (!arith_integer(kept) || !arith_integer(other))
+        return;
+    common_integer(kept->ltype, other->ltype, &width, &uns);
+    if (!kept->is_const)
+        widen_primary_to(kept, width);
+    set_common_integer(kept, kept->ltype, other->ltype);
+}
+
+/* The true arm has already jumped to endlab. Widen whichever primary is
+   live, then give the result the common type. Char values already occupy
+   HL, so a char arm becomes an int without another extend. */
+static void join_conditional(LVALUE *false_arm, const LVALUE *true_arm, int endlab)
+{
+    int width, uns, tw, fw, skiplab;
+
+    common_integer(true_arm->ltype, false_arm->ltype, &width, &uns);
+    tw = integer_reg_width(true_arm);
+    fw = integer_reg_width(false_arm);
+    if (fw < width && tw < width) {
+        widen_primary_to(false_arm, width);
+        gen_jp_label(skiplab = getlabel(), 0);
+        postlabel(endlab);
+        widen_primary_to(true_arm, width);
+        postlabel(skiplab);
+    } else if (tw < width) {
+        gen_jp_label(skiplab = getlabel(), 0);
+        postlabel(endlab);
+        widen_primary_to(true_arm, width);
+        postlabel(skiplab);
+    } else {
+        if (fw < width)
+            widen_primary_to(false_arm, width);
+        postlabel(endlab);
+    }
+    set_common_integer(false_arm, true_arm->ltype, false_arm->ltype);
+}
+
 /*
  * heir1a - conditional operator
  */
@@ -249,6 +342,7 @@ int heir1a(LVALUE* lval)
                     clearstage(before, 0);
                 }
             }
+            retag_conditional(lval, &lval2);
             return k;
         }
 
@@ -288,6 +382,8 @@ int heir1a(LVALUE* lval)
             postlabel(endlab);
             zconvert_to_decimal(lval2.val_type, lval->val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned);
             postlabel(skiplab);
+        } else if (arith_integer(&lval2) && arith_integer(lval)) {
+            join_conditional(lval, &lval2, endlab);
         } else if (lval2.val_type == KIND_LONG && lval->val_type != KIND_LONG) {
             widenintegers(&lval2, lval);
             lval->val_type = KIND_LONG;

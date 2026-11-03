@@ -4,6 +4,39 @@
 
 #ifndef __8080
   #ifndef __GBZ80
+/* Runtime so the constant folder cannot answer. 2^32 does not fit in the
+   16-bit remainder shortcut. 2LL minus an int does not fit in 16 bits. */
+static long long ll_mod;
+static unsigned long long ull_mod;
+static int ll_sub_i;
+static unsigned ll_sub_u;
+static long ll_sub_l;
+
+void test_llong_narrow(void)
+{
+    ll_mod = 4294967296LL;
+    Assert(ll_mod % 10 == 6, "2^32 % 10");
+    Assert(ll_mod % 3 == 1, "2^32 % 3");
+    Assert(ll_mod % 100000LL == 67296LL, "2^32 % 100000");
+    ll_mod = -5;
+    Assert(ll_mod % 3 == -2, "-5LL % 3");
+    Assert(ll_mod % 2 == -1, "-5LL % 2");
+    ull_mod = 4294967296ULL;
+    Assert(ull_mod % 10ULL == 6, "unsigned 2^32 % 10");
+
+    ll_sub_i = 32767;
+    ll_sub_i = -ll_sub_i - 1;
+    Assert(2LL - ll_sub_i == 32770LL, "2LL - INT_MIN");
+    ll_sub_i = 5;
+    Assert(2LL - ll_sub_i == -3LL, "2LL - 5");
+    ll_sub_i = 32767;
+    Assert(2LL + ll_sub_i == 32769LL, "2LL + INT_MAX");
+    ll_sub_u = 40000;
+    Assert(2LL - ll_sub_u == -39998LL, "2LL - 40000u");
+    ll_sub_l = -2147483647L - 1;
+    Assert(2LL - ll_sub_l == 2147483650LL, "2LL - LONG_MIN");
+}
+
 void test_ullong_division()
 {
      uint64_t val = 0x80000000LL;
@@ -124,6 +157,7 @@ int suite_division()
 
 #ifndef __8080
   #ifndef __GBZ80
+    suite_add_test(test_llong_narrow);
     suite_add_test(test_ullong_division);
   #endif
 #endif

@@ -390,6 +390,24 @@
 =
 	mulu	hl,de
 
+;; R2KA, R3K and R4K signed mul is BC*DE into HL:BC. The low 16 bits
+;; match an unsigned product, so one mul covers both helpers. R6K keeps
+;; mul hl,de above. DE is unchanged, so both compilers can use this.
+
+%cpu r2ka r3k r4k
+	call	l_mult
+=
+	ld	bc,hl
+	mul
+	ld	hl,bc
+
+%cpu r2ka r3k r4k
+	call	l_mult_u
+=
+	ld	bc,hl
+	mul
+	ld	hl,bc
+
 ;; Rabbit 6000 ALU straight against a stack slot. SCCZ80 ONLY.
 ;;
 ;; The fold changes what is left in DE: before it DE holds what the `ex` put
