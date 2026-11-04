@@ -37,7 +37,7 @@ char Filenorig[FILENAME_LEN + 1];
 
 
 int c_notaltreg; /* No alternate registers */
-int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
+int c_standard_escapecodes = 0; /* \n = 13, \r = 10; consoles treat CR as newline */
 int c_disable_builtins = 0;
 int c_cline_directive = 0;
 int c_cpu = CPU_Z80;

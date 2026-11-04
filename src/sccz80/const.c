@@ -517,7 +517,7 @@ unsigned char litchar(void)
     case 't': /* HT */
         gch();
         return 9;
-    case 'r': /* LF */
+    case 'r': /* default LF (10); -standard-escape-chars selects CR */
         gch();
         return c_standard_escapecodes ? 13 : 10;
     case 'v': /* VT */
@@ -526,7 +526,7 @@ unsigned char litchar(void)
     case 'f': /* FF */
         gch();
         return 12;
-    case 'n': /* CR */
+    case 'n': /* default CR (13); -standard-escape-chars selects LF */
         gch();
         return c_standard_escapecodes ? 10 : 13;
     case '\"': /* " */
