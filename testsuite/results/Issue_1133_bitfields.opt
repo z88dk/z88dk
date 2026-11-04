@@ -9,7 +9,7 @@
 	SECTION	data_compiler
 ._x
 	defw	0x7ff
-	defb	0xf60
+	defw	0xf60
 	defw	i_1+0
 	SECTION	code_compiler
 

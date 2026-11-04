@@ -165,6 +165,14 @@ void debug_write_type(Type *type)
         utstring_printf(temp,"[");
         for ( i = 0; i < array_len(type->fields); i++) {
             Type *f = array_get_byindex(type->fields, i);
+            if ( f->bit_size ) {
+                // A bitfield as sdcc writes it: the byte holding its first bit,
+                // its size in bytes, then SB<start bit>$<width>
+                int offset = (int)f->offset + f->bit_offset / 8;
+                int start = f->bit_offset % 8;
+                utstring_printf(temp,"({%d}S:S$%s$0_0$0({%d}SB%d$%d:%s),Z,0,0)",offset,f->name,(f->bit_size + 7) / 8,start,f->bit_size,f->isunsigned ? "U" : "S");
+                continue;
+            }
             utstring_printf(temp,"({%d}S:S$%s$0_0$0({%d}",(int)f->offset,f->name,f->size);
             write_cdb_type(temp, f,0);
             utstring_printf(temp,"),Z,0,0)");
