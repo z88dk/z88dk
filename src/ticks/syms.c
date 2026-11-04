@@ -364,8 +364,8 @@ symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
             if ( preferred_type == SYM_ANY ) {
                 break;
             }
-            // Skip over internal labels?
-            if ( preferred_type == sym->symtype && strncmp(sym->name,"i_",2)) {
+            // Skip over internal labels (sccz80 i_<n>, 80cc L_f<n>_...)
+            if ( preferred_type == sym->symtype && strncmp(sym->name,"i_",2) && strncmp(sym->name,"L_f",3)) {
                 break;
             }
             sym = sym->next;

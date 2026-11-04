@@ -57,6 +57,8 @@ extern void  gen_emit_line(int line);
 extern void  gen_comment(const char *message);
 extern const char *get_source_line(const char *filename, int n);
 extern int   lineno;
+extern int   ncmp;
+extern int   current_block;
 extern FILE *output;   /* gen_emit_line/gen_comment write here via outfmt */
 
 /* Track the (file, line) of the last C_LINE we emitted so we can
@@ -422,7 +424,10 @@ static void emit_op_cline(FILE *out, const Op *op)
     if (op->line == cur_emitted_line && op->file == cur_emitted_file)
         return;
     int saved_lineno = lineno;
+    int saved_ncmp = ncmp, saved_block = current_block;
     lineno = op->line;
+    ncmp = op->level;           /* gen_emit_line prints the op's own scope */
+    current_block = op->block;
     /* gen_comment/gen_emit_line write via outfmt to the global `output`.
        Instructions go to the buffered `out` (a memstream flushed at
        function end), so writing the C_LINE/comment straight to `output`
@@ -438,6 +443,8 @@ static void emit_op_cline(FILE *out, const Op *op)
     gen_emit_line(op->line);
     output = saved_output;
     lineno = saved_lineno;
+    ncmp = saved_ncmp;
+    current_block = saved_block;
     cur_emitted_line = op->line;
     cur_emitted_file = op->file;
 }

@@ -302,6 +302,8 @@ static void generic_apply(Func *f, BB *bb, const PatternDef *P,
     n.label  = -1;
     n.file   = a->file;
     n.line   = a->line;
+    n.level  = a->level;
+    n.block  = a->block;
     *a = n;
 }
 
@@ -766,6 +768,8 @@ static void symoff_apply(Func *f, BB *bb, const int idx[],
     n.label      = -1;
     n.file       = ar->file;
     n.line       = ar->line;
+    n.level      = ar->level;
+    n.block      = ar->block;
     *ar = n;
 }
 
@@ -1123,6 +1127,8 @@ static void incmhl_to_hcall(Op *o, HelperInfo *hi, const Op *loc)
     n.hcall    = hi;
     n.file     = loc->file;
     n.line     = loc->line;
+    n.level    = loc->level;
+    n.block    = loc->block;
     *o = n;
 }
 
@@ -1936,6 +1942,7 @@ static void packbytes_apply(Func *f, BB *bb, const int idx[],
     int dst = root->dst;
     const char *file = root->file;
     int line = root->line;
+    int level = root->level, block = root->block;
 
     /* Big-endian needs TWO ops: the wide load, then a byte reversal. The load
        goes at the LAST of the ops being killed — all of them precede the root,
@@ -1977,6 +1984,8 @@ static void packbytes_apply(Func *f, BB *bb, const int idx[],
     ld->mem.offset = off;
     ld->file       = file;
     ld->line       = line;
+    ld->level      = level;
+    ld->block      = block;
 
     if (is_be) {
         /* A 16-bit byte swap IS a rotate by 8, so the existing ROTL lowering
@@ -1990,6 +1999,8 @@ static void packbytes_apply(Func *f, BB *bb, const int idx[],
         root->label  = -1;
         root->file   = file;
         root->line   = line;
+        root->level  = level;
+        root->block  = block;
     }
 
     for (int i = 0; i < n_lanes; i++) {
@@ -2104,6 +2115,8 @@ static void xbyte_rewrite(BB *bb, int anchor_idx, int v, int k)
     n.label    = -1;
     n.file     = a->file;
     n.line     = a->line;
+    n.level    = a->level;
+    n.block    = a->block;
     *a = n;
 }
 
