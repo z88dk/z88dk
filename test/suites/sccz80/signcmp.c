@@ -5,6 +5,7 @@ int igt0(int x) { return x > 0; }
 int ige0(int x) { return x >= 0; }
 int ilt0(int x) { return x < 0; }
 int ile0(int x) { return x <= 0; }
+long lle0(long x) { return x <= 0; }
 int igt1(int x) { return x > 1; }
 int ige1(int x) { return x >= 1; }
 int ilt1(int x) { return x < 1; }
@@ -68,6 +69,10 @@ void test_signcmp(void)
     assertEqual(ile0(-1), 1);
     assertEqual(ile0(0), 1);
     assertEqual(ile0(1), 0);
+    assertEqual(lle0(-1L), 1);
+    assertEqual(lle0(0L), 1);
+    assertEqual(lle0(1L), 0);
+    assertEqual(lle0(-2147483648L), 1);
 
     assertEqual(igt1(0), 0);
     assertEqual(igt1(1), 0);

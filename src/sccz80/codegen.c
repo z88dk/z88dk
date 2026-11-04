@@ -5207,8 +5207,76 @@ void zge(LVALUE* lval)
  */
 
 
+/* The shorter copt rule rewrites `jr nz / scf / ld hl,0 / rl l` by
+   moving `ld hl,0` under the preceding `jr c`. That skip was counted
+   for the old bytes, so a negative value returns the operand. Emit
+   the corrected value while this compare is still staged. A copy that
+   was flushed first is still repaired by the rule in z80rules.1. */
+static int take_staged_tail(const char *tail, size_t n)
+{
+    char *at;
+
+    if (stage == NULL || stagenext == NULL || stagenext < stage)
+        return 0;
+    if ((size_t)(stagenext - stage) < n)
+        return 0;
+    at = stagenext - n;
+    if (memcmp(at, tail, n) != 0)
+        return 0;
+    if (at != stage && at[-1] != '\n')
+        return 0;
+    clearstage(at, NULL);
+    return 1;
+}
+
+static int fold_signed_le0_value(void)
+{
+    static const char word[] =
+        "\tld\ta,h\n"
+        "\trlca\n"
+        "\tjr\tc,ASMPC+6\n"
+        "\tor\tl\n"
+        "\tjr\tnz,ASMPC+3\n"
+        "\tscf\n";
+    static const char wide[] =
+        "\tld\ta,d\n"
+        "\trlca\n"
+        "\tjr\tc,ASMPC+8\n"
+        "\tor\te\n"
+        "\tor\th\n"
+        "\tor\tl\n"
+        "\tjr\tnz,ASMPC+3\n"
+        "\tscf\n";
+
+    if (take_staged_tail(word, sizeof(word) - 1)) {
+        ol("ld\ta,h");
+        ol("rlca");
+        ol("jr\tc,ASMPC+8");
+        ol("or\tl");
+        vconst(0);
+        ol("jr\tnz,ASMPC+5");
+        vconst(1);
+        return 1;
+    }
+    if (take_staged_tail(wide, sizeof(wide) - 1)) {
+        ol("ld\ta,d");
+        ol("rlca");
+        ol("jr\tc,ASMPC+10");
+        ol("or\te");
+        ol("or\th");
+        ol("or\tl");
+        vconst(0);
+        ol("jr\tnz,ASMPC+5");
+        vconst(1);
+        return 1;
+    }
+    return 0;
+}
+
 void gen_conv_carry2int(void)
 {
+    if (fold_signed_le0_value())
+        return;
     vconst(0);
     if ( !IS_808x() ) {
         ol("rl\tl");
