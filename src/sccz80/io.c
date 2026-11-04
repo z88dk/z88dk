@@ -118,7 +118,8 @@ t_buffer* startbuffer(size_t blocks)
     size_t  size = blocks * STAGESIZE;
     buf->size = size;
     buf->start = MALLOC(size);
-    buf->end = buf->start + blocks * size - 1;
+    /* The last byte stays free so clearbuffer can plant a NUL. */
+    buf->end = buf->start + size - 1;
     buf->next = buf->start;
     buf->before = currentbuffer; /* <-- DON'T USE NULL HERE TO SUPPRESS WARNING !!  */
     currentbuffer = buf;
@@ -164,11 +165,13 @@ int outbuffer(char c)
 {
     if (currentbuffer->next == currentbuffer->end) {
         size_t size = currentbuffer->size * 2;
+        size_t used = (size_t)(currentbuffer->next - currentbuffer->start);
         char* tmp = (char*)MALLOC(size);
-        memcpy(tmp, currentbuffer->start, currentbuffer->size);
+
+        memcpy(tmp, currentbuffer->start, used);
         FREENULL(currentbuffer->start);
-        currentbuffer->next = tmp + (currentbuffer->start - currentbuffer->next);
         currentbuffer->start = tmp;
+        currentbuffer->next = tmp + used;
         currentbuffer->end = tmp + size - 1;
         currentbuffer->size = size;
     }

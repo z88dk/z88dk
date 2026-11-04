@@ -460,7 +460,8 @@ void dofor(void)
         gen_jp_label(wq.loop,1); /*         goto loop                  */
         postlabel(wq.exit); /* .exit                              */
     } else {
-        clearbuffer(buf2); // Condition 
+        clearbuffer(buf2); // Condition
+        discardbuffer(buf3); // modification is not emitted
         buf4 = startbuffer(100);
         statement(); // Evaluate it
         discardbuffer(buf4);
