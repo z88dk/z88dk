@@ -38,6 +38,18 @@ static int  tstr(int32_t *val);
 static int  fnumber(LVALUE *val);
 static int  number(LVALUE *lval);
 
+/* Unary minus is parsed outside number(). An odd depth means this
+   magnitude will be negated an odd number of times. */
+static int unary_minus_depth;
+
+void set_unary_minus(int on)
+{
+    if (on)
+        unary_minus_depth++;
+    else if (unary_minus_depth)
+        unary_minus_depth--;
+}
+
 static void dofloat_ieee(double raw, unsigned char fa[]);
 static void dofloat_ieee16(double raw, unsigned char fa[]);
 static void dofloat_z80(double raw, unsigned char fa[]);
@@ -368,6 +380,28 @@ typecheck:
             lval->ltype = type_uint;
         else
             lval->ltype = type_int;
+    }
+    /* A suffix can force a type that does not hold this value.
+       2147483648L is not a signed long. Warn before the wrap.
+       Unary minus is applied after this returns. An odd count of
+       those minuses turns the magnitude 2^(n-1) into the signed
+       minimum, which does fit. */
+    if (lval->ltype && kind_is_integer(lval->ltype->kind)) {
+        unsigned bits = lval->ltype->size > 0 ? (unsigned)lval->ltype->size * 8 : 64;
+
+        if (bits < 64 && lval->ltype->isunsigned) {
+            if (k > 0 && (uint64_t)k >= (UINT64_C(1) << bits))
+                warningfmt("limited-range", "Integer constant is out of range");
+        } else if (bits < 64) {
+            int64_t max = (int64_t)((UINT64_C(1) << (bits - 1)) - 1);
+            int64_t min = -(int64_t)(UINT64_C(1) << (bits - 1));
+            int64_t magnitude = (int64_t)(UINT64_C(1) << (bits - 1));
+
+            if (k == magnitude && (unary_minus_depth & 1))
+                k = min;
+            if (k > max || k < min)
+                warningfmt("limited-range", "Integer constant is out of range");
+        }
     }
     NormaliseIntegerConstant(lval);
     return (1);

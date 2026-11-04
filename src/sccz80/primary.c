@@ -884,7 +884,7 @@ int test(int label, int parens)
  * return TRUE if it is a constant expression
  */
 int constexpr_exact(double *val, uint64_t *ival, int *ival_valid,
-                    Kind *type, int flag)
+                    Kind *type, int flag, int *isunsigned)
 {
     char *before, *start;
     zdouble valtemp;
@@ -898,6 +898,8 @@ int constexpr_exact(double *val, uint64_t *ival, int *ival_valid,
     *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
     *type = valtype;
+    if (isunsigned)
+        *isunsigned = type_ptr && type_ptr->isunsigned;
     Zsp = savesp;
     if (flag && con == 0)
         errorfmt("Expecting constant expression", 0 );
@@ -906,7 +908,7 @@ int constexpr_exact(double *val, uint64_t *ival, int *ival_valid,
 
 int constexpr(double *val, Kind *type, int flag)
 {
-    return constexpr_exact(val, NULL, NULL, type, flag);
+    return constexpr_exact(val, NULL, NULL, type, flag, NULL);
 }
 
 /*

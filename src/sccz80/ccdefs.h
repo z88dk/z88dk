@@ -332,8 +332,9 @@ extern void     rvalue(LVALUE *lval);
 extern int      test(int label, int parens);
 extern int      constexpr(double *val, Kind *valtype, int flag);
 extern int      constexpr_exact(double *val, uint64_t *ival, int *ival_valid,
-                                Kind *valtype, int flag);
+                                Kind *valtype, int flag, int *isunsigned);
 extern void     set_sizeof_operand(int on);
+extern void     set_unary_minus(int on);
 extern void     cscale(Type *type, int *val);
 extern int      docast(LVALUE *lval,LVALUE *dest_lval);
 extern void     NormaliseIntegerConstant(LVALUE *lval);

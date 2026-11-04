@@ -36,6 +36,22 @@ void test_small(void)
 }
 
 #if !defined(__80CC) && !defined(__8080) && !defined(__8085) && !defined(__GBZ80)
+long wrapped(long x)
+{
+    switch (x) {
+    case 2147483648L: return 1;
+    default: return 0;
+    }
+}
+
+long long unsigned_label(long long x)
+{
+    switch (x) {
+    case 9223372036854775808ULL: return 1;
+    default: return 0;
+    }
+}
+
 void test_wide(void)
 {
     assertEqual(wide(9007199254740992LL), 1);
@@ -43,6 +59,10 @@ void test_wide(void)
     assertEqual(wide(9223372036854775807LL), 3);
     assertEqual(wide(0), 0);
     assertEqual(wide(9007199254740994LL), 0);
+    assertEqual(wrapped(-2147483648L), 1);
+    assertEqual(wrapped(0L), 0);
+    assertEqual(unsigned_label(-9223372036854775807LL - 1), 1);
+    assertEqual(unsigned_label(1), 0);
 }
 #endif
 

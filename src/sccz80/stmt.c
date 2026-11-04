@@ -618,6 +618,7 @@ void docase(void)
     double value;
     uint64_t ival;
     int    ival_valid;
+    int    cuns = 0;
     Kind   valtype;
     int64_t cvalue;
     if (swactive == 0)
@@ -628,7 +629,7 @@ void docase(void)
     }
     postlabel(swnext->label = getlabel());
     swnext->sp = Zsp;
-    constexpr_exact(&value, &ival, &ival_valid, &valtype, 1);
+    constexpr_exact(&value, &ival, &ival_valid, &valtype, 1, &cuns);
     if ( kind_is_decimal(valtype)) 
         warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
     /* A double cannot hold every integer above 2^53. */
@@ -646,7 +647,12 @@ void docase(void)
             }
         }
     }
-    if (swactive && case_fits(swtype, cvalue) == 0)
+    /* An unsigned constant above 2^63-1 becomes negative in int64_t
+       and then looks in range for a signed long long. */
+    if (swactive && cuns && ival_valid && !kind_is_decimal(valtype)
+        && swtype && !isutype(swtype) && (int64_t)ival < 0)
+        warningfmt("limited-range", "Case value is out of range");
+    else if (swactive && case_fits(swtype, cvalue) == 0)
         warningfmt("limited-range", "Case value is out of range");
     swnext->value = cvalue;
     needchar(':');

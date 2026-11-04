@@ -363,7 +363,7 @@ static int init(Type *type, int dump)
 
         if ( rmatch2("sizeof") || rmatch2("__builtin_offsetof")) {
             if ( constexpr_exact(&value, &int_value, &int_value_valid,
-                                 &valtype, 1) ) {
+                                 &valtype, 1, NULL) ) {
                 goto constdecl;
             }
             errorfmt("Expecting a constant expression for static initialisation\n",1);
@@ -473,7 +473,7 @@ again:
             return 0;
         } else if ( lptr= klptr,
                     constexpr_exact(&value, &int_value, &int_value_valid,
-                                    &valtype, 1)) {
+                                    &valtype, 1, NULL)) {
 constdecl:
             check_assign_range(type, value);
             if (dump) {

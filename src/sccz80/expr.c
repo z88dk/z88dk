@@ -688,8 +688,10 @@ int heira(LVALUE *lval)
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('-')) {
+        set_unary_minus(1);
         if (heira(lval))
             rvalue(lval);
+        set_unary_minus(0);
         promote_unary_integer(lval);
         neg(lval);
         lval->const_val = -lval->const_val;
