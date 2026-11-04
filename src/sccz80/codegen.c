@@ -3743,8 +3743,14 @@ void asr_const(LVALUE *lval, int64_t value64)
         }
         Zsp += 8;
     } else {
-        if ( value == 1 && IS_8085() && !ulvalue(lval) ) {
+        if ( value == 1 && IS_8085() ) {
+            /* sra hl sign-fills. An unsigned shift clears the new top bit. */
             ol("sra\thl");
+            if ( ulvalue(lval) ) {
+                ol("ld\ta,127");
+                ol("and\th");
+                ol("ld\th,a");
+            }
         } else if ( value == 1 && IS_808x() && ulvalue(lval) ) {
             ol("xor\ta");
             ol("ld\ta,h");
