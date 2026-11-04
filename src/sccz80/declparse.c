@@ -1033,7 +1033,34 @@ int declare_local(int local_static)
             if ( cmatch('=')) {
                 sym->isassigned = 1;
                 sym->initialised = 1;
-                if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
+                if ( type->kind == KIND_STRUCT && rcmatch('{') == 0 ) {
+                    /* struct S s = t;  Copy the object, as s = t does.
+                       heir1 leaves the source address in the staging buffer. */
+                    Type *expr_type = NULL;
+                    int vconst;
+                    zdouble val;
+                    LVALUE dest = {0};
+                    char *before, *start;
+
+                    Zsp = modstk(Zsp - declared, KIND_NONE, NO, YES);
+                    declared = 0;
+                    getloc(sym, 0);
+                    zpush();
+                    setstage(&before, &start);
+                    expression(&vconst, &val, &expr_type);
+                    clearstage(before, start);
+                    dest.ltype = type;
+                    dest.symbol = sym;
+                    dest.indirect_kind = KIND_STRUCT;
+                    dest.val_type = KIND_STRUCT;
+                    if ( expr_type && expr_type->kind == KIND_STRUCT &&
+                         (type->tag == NULL || expr_type->tag == NULL || type->tag == expr_type->tag) ) {
+                        putstk(&dest);
+                    } else {
+                        errorfmt("Cannot assign to aggregate", 0);
+                        zpop();
+                    }
+                } else if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
                     // Call static initialiser and copy onto stack
                     char newname[NAMESIZE * 2 + 20];
 
