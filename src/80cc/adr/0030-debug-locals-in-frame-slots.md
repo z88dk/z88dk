@@ -66,7 +66,15 @@ the named locals and parameters).
 - **A register-passed parameter** (`__sdcccall(1)`) that the prologue copies
   into a slot is recorded at that slot.
 
-**Parameters.** Not covered yet: a parameter the function reassigns shows its incoming value at a later breakpoint (a read-only one is correct).
+**Parameters** get the same treatment: under `-debug` each parameter vreg is
+`IR_VREG_VOLATILE` (as an `__sdcccall(1)` one already was), so it lives in, and is
+read from, the slot its record names. A reassigned, fastcall, callee-cleanup or
+`long` parameter shows its current value at a later breakpoint. This differs from
+locals (address-taken, not `volatile`) because a parameter already owns a slot
+that no pass can elide: `IR_VREG_PARAM` is pinned in `ir_assign_slots`. A stack
+parameter's slot is the caller's argument area, a fastcall one is the prologue's
+auto-push, an `__sdcccall(1)` one a prologue copy. What was missing was only that later reads
+and writes went through it instead of a register, which `volatile` supplies.
 
 ## Consequences
 
@@ -77,5 +85,5 @@ for a debug build, and it is why the behaviour is tied to the flag.
 With the flag off the compiler is byte-identical, which is what makes the
 feature safe to carry.
 
-Verified on z80 (IX frame), 8080 and gbz80: named locals, including
+Verified on z80 (IX frame), 8080 and gbz80: named locals and parameters, including
 reassigned and constant-initialised ones, resolve at a breakpoint.
