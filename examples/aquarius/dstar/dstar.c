@@ -133,7 +133,6 @@ void Gamekeys(void)
         }
         break;
     case K_EXIT:
-    case K_EXIT | 0x20:
 #ifdef SOUNDB
         bit_fx6(4);
 #endif
@@ -154,7 +153,6 @@ void Gamekeys(void)
         }
         /* fall thrue */
     case K_CLEAR:
-    case K_CLEAR | 0x20:
 #ifdef SOUND
         bit_fx4(3);
 #endif
