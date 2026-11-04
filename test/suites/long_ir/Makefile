@@ -6356,3 +6356,22 @@ stackpark_vm1.bin: $(SOURCES) stackpark.c
 stackpark_keep.bin: $(SOURCES) stackpark.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=stack-spill-multi -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# [dbgfastcall4] -debug: the frame helper must preserve DE across a 4-byte fastcall parameter (gbz80 clobbered it).
+all:	dbgfastcall4.bin dbgfastcall4_8080.bin dbgfastcall4_8085.bin dbgfastcall4_gbz80.bin
+
+dbgfastcall4.bin: $(SOURCES) dbgfastcall4.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dbgfastcall4_8080.bin: $(SOURCES) dbgfastcall4.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dbgfastcall4_8085.bin: $(SOURCES) dbgfastcall4.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dbgfastcall4_gbz80.bin: $(SOURCES) dbgfastcall4.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
