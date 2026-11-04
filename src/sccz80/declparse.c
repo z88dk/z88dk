@@ -323,7 +323,6 @@ static Type *parse_enum(Type *type)
             value++;
         } while (cmatch(',') && !rcmatch('}'));
         needchar('}');
-        ptr->enum_tag = debug_enum_key(ptr->name);    // keyed by the file that defines it
         debug_write_enum(ptr);
         return ptr;
     } 
