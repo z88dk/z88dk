@@ -46,6 +46,10 @@ test_callee.bin: $(SOURCES) callee.c
 	$(call compile,-lm)
 	$(runtest)
 
+test_fastcall_callee.bin: $(SOURCES) fastcall_callee.c
+	$(call compile,-lm)
+	$(runtest)
+
 test_compare.bin: $(SOURCES) compare.c
 	$(call compile, $(OPT_CODE_SPEED),)
 	$(runtest)

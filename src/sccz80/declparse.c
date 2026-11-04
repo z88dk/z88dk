@@ -2042,8 +2042,11 @@ static void declfunc(Type *functype, enum storage_type storage)
             int     i;
 
             if ( ptr ) {
-                ptr->offset.i = -get_parameter_size(functype,fastarg); 
-                where += 2;
+                ptr->offset.i = -get_parameter_size(functype,fastarg);
+                /* The parameter loop already counted this argument, but the
+                   caller left it in registers. modstk releases the prologue
+                   push before callee cleanup, so it is not part of stackargs. */
+                where -= get_parameter_size(functype, fastarg);
             } else {
                 errorfmt("Something has gone very wrong, can't find parameter <%s>\n",1,fastarg->name);
             }
