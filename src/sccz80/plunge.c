@@ -1061,7 +1061,9 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 {
     char *before, *start, *before1, *start1;
     int oldsp = Zsp;
-    double val;
+    /* zdouble (long double on this host) preserves every int64 addend;
+       a plain double rounds constants above 2^53 before zadd_const sees them. */
+    zdouble val;
     int lhs_val_type, rhs_val_type;
     struct fold_types fold_types = {0};
 

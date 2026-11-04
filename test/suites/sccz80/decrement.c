@@ -87,6 +87,44 @@ void test_addconst64(void)
      Assert( c == 4 && i == 4 && l == 6, "narrow constant add");
 }
 
+/* Addends above 2^53 must not round in the host floating type. */
+void test_addconst64_big1(void)
+{
+     long long v;
+
+     v = 5;
+     v += 9007199254740993LL;
+     Assert( v == 9007199254740998LL, "5LL += 2^53+1");
+}
+
+void test_addconst64_big2(void)
+{
+     long long v;
+
+     v = 5;
+     v -= 9007199254740993LL;
+     Assert( v == -9007199254740988LL, "5LL -= 2^53+1");
+}
+
+void test_addconst64_max(void)
+{
+     long long v;
+
+     v = 5;
+     v += 9223372036854775807LL;
+     Assert( v == -9223372036854775804LL, "5LL += INT64_MAX");
+}
+
+/* Multiplication by a 64-bit constant must use the full width. */
+void test_mulconst64(void)
+{
+     long long v;
+
+     v = 2;
+     v *= 4294967297LL;
+     Assert( v == 8589934594LL, "2LL *= 4294967297");
+}
+
 int suite_decrement()
 {
     suite_setup("Increment/Decrement Tests");
@@ -96,6 +134,10 @@ int suite_decrement()
     suite_add_test(test_postdec64);
     suite_add_test(test_preinc64);
     suite_add_test(test_addconst64);
+    suite_add_test(test_addconst64_big1);
+    suite_add_test(test_addconst64_big2);
+    suite_add_test(test_addconst64_max);
+    suite_add_test(test_mulconst64);
   #endif
 #endif
 
