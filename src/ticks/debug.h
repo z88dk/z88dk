@@ -145,7 +145,7 @@ struct debug_sym_enumerator_s {
 /* An N: record. An E: record gives an object this enum: its type chain's
    integer then carries the tag in data. */
 struct debug_sym_enum_s {
-    char                        name[128];
+    char*                       name;       /* F<file>$<tag> */
     debug_sym_enumerator*       first_enumerator;
     UT_hash_handle              hh;
 };
@@ -214,8 +214,8 @@ extern debug_sym_symbol* cdb_get_first_global_symbol();
 extern debug_sym_symbol* cdb_get_first_local_symbol(const char* filename);
 extern debug_sym_symbol* cdb_find_symbol(const char* cname, const char* filename);
 extern debug_sym_type* cdb_find_type(const char* tname);
-extern const char* cdb_enumerator_name(const char* tag, int32_t value);
-extern uint8_t cdb_find_enumerator(const char* name, int32_t* value);
+extern const char* cdb_enumerator_name(const char* key, int32_t value);
+extern uint8_t cdb_find_enumerator(const char* name, const char* filename, int32_t* value);
 
 extern debug_frame_pointer* debug_stack_frames_construct(uint32_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit);
 extern debug_frame_pointer* debug_stack_frames_at(debug_frame_pointer* first, size_t frame);

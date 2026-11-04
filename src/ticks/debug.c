@@ -699,24 +699,42 @@ static void debug_add_module_info(const char* encoded)
 
 }
 
+static char* dup_n(const char* s, size_t n)
+{
+    char* r = malloc(n + 1);
+
+    memcpy(r, s, n);
+    r[n] = 0;
+    return r;
+}
+
 // N:Fu3.c$colour({2}SI:S)[(RED$0)(GREEN$5)(BLUE$6)]
+// An enum is known by its F<file>$<tag> (the text before the "({"): tags are
+// only unique within one file. A key that is already known keeps its first record.
 static void debug_add_enum_info(const char* encoded)
 {
-    char tag[128];
     char name[128];
     int32_t value;
     int end;
     debug_sym_enumerator** last;
-    const char* p = strchr(encoded, '$');
+    const char* open = strstr(encoded, "({");
+    const char* close = open == NULL ? NULL : strchr(open, ')');
 
-    if (p == NULL || sscanf(p + 1, "%127[^(](%*[^)])[%n", tag, &end) != 1 || end == 0) {
+    if (encoded[0] != 'F' || open == NULL || open == encoded || close == NULL || close[1] != '[') {
         bk.debug("Warning: could not add debug info on enum.\n");
         return;
     }
-    p += 1 + end;
+    char* key = dup_n(encoded, open - encoded);
+    debug_sym_enum* e;
+    HASH_FIND_STR(cdb_enums, key, e);
+    if (e != NULL) {
+        free(key);
+        return;
+    }
 
-    debug_sym_enum* e = calloc(1, sizeof(debug_sym_enum));
-    strcpy(e->name, tag);
+    const char* p = close + 2;
+    e = calloc(1, sizeof(debug_sym_enum));
+    e->name = key;
     last = &e->first_enumerator;
     while (sscanf(p, "(%127[^$]$%d)%n", name, &value, &end) == 2) {
         debug_sym_enumerator* en = calloc(1, sizeof(debug_sym_enumerator));
@@ -726,7 +744,7 @@ static void debug_add_enum_info(const char* encoded)
         last = &en->next;
         p += end;
     }
-    HASH_ADD_STR(cdb_enums, name, e);
+    HASH_ADD_KEYPTR(hh, cdb_enums, e->name, strlen(e->name), e);
 }
 
 static enum_object* find_enum_object(const char* record_name)
@@ -757,12 +775,14 @@ static void apply_enum_tag(enum_object* o)
     }
 }
 
-// E:G$gc$0_0$0({2}SEcolour:S),E,0,0 - the S: record of the same name is an enum
+// E:G$gc$0_0$0({2}SEFu3.c$colour:S),E,0,0 - the S: record of the same name is an enum
+// The element is SE<F<file>$<tag>>:<sign>: the key ends at the last ':' of the element
 static void debug_add_enum_object_info(const char* encoded)
 {
     char record_name[255];
-    char tag[128];
     const char* p;
+    const char* end;
+    const char* colon;
     enum_object* o;
 
     if (sscanf(encoded, "%254[^(]", record_name) != 1) {
@@ -771,12 +791,22 @@ static void debug_add_enum_object_info(const char* encoded)
     // The type element that starts with SE, after the {size}
     for (p = strchr(encoded, '}'); p != NULL && strncmp(p + 1, "SE", 2) != 0; p = strchr(p + 1, ',')) {
     }
-    if (p == NULL || sscanf(p + 3, "%127[^:,)]", tag) != 1) {
+    if (p == NULL) {
+        goto err;
+    }
+    p += 3;
+    end = strpbrk(p, ",)");
+    if (end == NULL) {
+        end = p + strlen(p);
+    }
+    for (colon = end; colon > p && *colon != ':'; colon--) {
+    }
+    if (colon == p || *colon != ':') {
         goto err;
     }
     o = find_enum_object(record_name);
     if (o->tag == NULL) {
-        o->tag = strdup(tag);
+        o->tag = dup_n(p, colon - p);
         apply_enum_tag(o);
     }
     return;
@@ -1418,12 +1448,12 @@ debug_sym_type* cdb_find_type(const char* tname) {
     return result;
 }
 
-// The enumerator of an enum that has this value, NULL if none has
-const char* cdb_enumerator_name(const char* tag, int32_t value) {
+// The enumerator of an enum (its F<file>$<tag> key) that has this value, NULL if none has
+const char* cdb_enumerator_name(const char* key, int32_t value) {
     debug_sym_enum* e;
     debug_sym_enumerator* en;
 
-    HASH_FIND_STR(cdb_enums, tag, e);
+    HASH_FIND_STR(cdb_enums, key, e);
     if (e == NULL) {
         return NULL;
     }
@@ -1435,20 +1465,47 @@ const char* cdb_enumerator_name(const char* tag, int32_t value) {
     return NULL;
 }
 
-uint8_t cdb_find_enumerator(const char* name, int32_t* value) {
+/* An enumerator by name. The enums of the file being debugged win; otherwise
+   the enum with the smallest F<file>$<tag> key that has it, so the answer does
+   not depend on the order the records were read in. */
+uint8_t cdb_find_enumerator(const char* name, const char* filename, int32_t* value) {
     debug_sym_enum* e;
     debug_sym_enum* tmp;
-    debug_sym_enumerator* en;
+    debug_sym_enum* best = NULL;
+    debug_sym_enumerator* best_en = NULL;
+    int best_in_file = 0;
+    size_t prefix_len = 0;
+    char prefix[256] = "";
 
-    HASH_ITER(hh, cdb_enums, e, tmp) {
-        for (en = e->first_enumerator; en != NULL; en = en->next) {
-            if (strcmp(en->name, name) == 0) {
-                *value = en->value;
-                return 1;
-            }
+    if (filename != NULL) {
+        prefix_len = snprintf(prefix, sizeof(prefix), "F%s$", filename);
+        if (prefix_len >= sizeof(prefix)) {
+            prefix_len = 0;
         }
     }
-    return 0;
+
+    HASH_ITER(hh, cdb_enums, e, tmp) {
+        debug_sym_enumerator* en;
+        for (en = e->first_enumerator; en != NULL; en = en->next) {
+            if (strcmp(en->name, name) == 0) {
+                break;
+            }
+        }
+        if (en == NULL) {
+            continue;
+        }
+        int in_file = prefix_len != 0 && strncmp(e->name, prefix, prefix_len) == 0;
+        if (best == NULL || (in_file && !best_in_file) || (in_file == best_in_file && strcmp(e->name, best->name) < 0)) {
+            best = e;
+            best_en = en;
+            best_in_file = in_file;
+        }
+    }
+    if (best == NULL) {
+        return 0;
+    }
+    *value = best_en->value;
+    return 1;
 }
 
 debug_sym_symbol* cdb_get_first_global_symbol() {

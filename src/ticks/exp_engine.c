@@ -355,7 +355,8 @@ UT_string* expression_result_type_to_string(type_record* root, type_chain* type)
     }
 
     if (is_primitive_integer_type(type) && type->data != NULL) {
-        utstring_printf(buffer, "enum %s", type->data);
+        const char* tag = strrchr(type->data, '$');   // data is F<file>$<tag>
+        utstring_printf(buffer, "enum %s", tag != NULL ? tag + 1 : type->data);
         return buffer;
     }
 

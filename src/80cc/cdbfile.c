@@ -3,7 +3,7 @@
 
 static void write_cdb_type(UT_string *output, Type *type,int comma);
 
-// Set while an E: record is written: an enum object's type is SE<tag>
+// Set while an E: record is written: an enum object's type is SE<F<file>$<tag>>
 static int write_enum_tags = 0;
 
 
@@ -160,14 +160,28 @@ void debug_write_local_at(const char *fn_name, SYMBOL *sym, int offset)
         write_local_record(fn_name, sym, offset, 1);
 }
 
-// Write an enum's tag, storage and enumerators: N:F<file>$<tag>({size}base)[(name$value)...]
+// An enum's key in the debug records, F<file>$<tag>: tags are only unique within a file,
+// and the file is the one that defines the enum (a header, if it is defined there)
+char *debug_enum_key(const char *tag)
+{
+    UT_string *key;
+    char *ret;
+
+    utstring_new(key);
+    utstring_printf(key,"F%.*s$%s",(int)strlen(Filename)-2,Filename+1,tag);
+    ret = STRDUP(utstring_body(key));
+    utstring_free(key);
+    return ret;
+}
+
+// Write an enum's key, storage and enumerators: N:F<file>$<tag>({size}base)[(name$value)...]
 void debug_write_enum(Type *type)
 {
     int i;
     UT_string *temp;
 
     utstring_new(temp);
-    utstring_printf(temp,"N:F%.*s$%s({%d}",(int)strlen(Filename)-2,Filename+1,type->enum_tag,type->size);
+    utstring_printf(temp,"N:%s({%d}",type->enum_tag,type->size);
     write_cdb_type(temp, type, 0);
     utstring_printf(temp,")[");
     for ( i = 0; i < array_len(type->fields); i++) {

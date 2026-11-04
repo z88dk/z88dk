@@ -62,6 +62,7 @@ extern void     debug_write_symbol(SYMBOL *sym);
 extern int      debug_size_pending(Type *type);
 extern void     debug_write_type(Type *type);
 extern void     debug_write_enum(Type *type);
+extern char    *debug_enum_key(const char *tag);
 
 #include "codegen.h"
 
