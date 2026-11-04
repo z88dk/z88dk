@@ -4585,23 +4585,21 @@ static void cmp_schar_gt(uint32_t value)
     ol("sub\tl");
 }
 
-/* Signed HL <= 0. rlca leaves the sign in carry, and the jumps land
-   on the instruction after scf. A ccf placed immediately after scf
-   inverts the test. On 808x the jump is three bytes. */
+/* Signed HL <= 0. rlca leaves the sign in carry. Both jumps land on
+   the label after scf, so a following ccf inverts the test and
+   ld hl,0 / rl l turns the carry into 0 or 1. A counted skip into
+   that conversion is moved by the peephole. */
 static void cmp_signed_le0(void)
 {
+    int done = getlabel();
+
     ol("ld\ta,h");
     ol("rlca");
-    if ( IS_808x() ) {
-        ol("jp\tc,ASMPC+8");
-        ol("or\tl");
-        ol("jp\tnz,ASMPC+4");
-    } else {
-        ol("jr\tc,ASMPC+6");
-        ol("or\tl");
-        ol("jr\tnz,ASMPC+3");
-    }
+    opjumpr("c,", done);
+    ol("or\tl");
+    opjumpr("nz,", done);
     ol("scf");
+    postlabel(done);
 }
 
 void zlt_const(LVALUE *lval, int64_t value64)
@@ -4786,20 +4784,30 @@ void zle_const(LVALUE *lval, int64_t value64)
     uint32_t value = (uint32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
        if ( value ==  0 && !IS_808x() ) {
+            int done = 0;
+
             if ( lval->val_type == KIND_CPTR) {
                 ol("ld\ta,e");
             } else {
                 ol("ld\ta,d");
                 if ( !ulvalue(lval)) {
+                    /* Same landing point as the int test: the skip must
+                       not be a byte count into the 0/1 conversion. */
+                    done = getlabel();
                     ol("rlca");
-                    ol("jr\tc,ASMPC+8");
+                    opjumpr("c,", done);
                 }
                 ol("or\te"); // We know MSBit was 0, so no point shifting it back in
             }
             ol("or\th");
             ol("or\tl");
-            ol("jr\tnz,ASMPC+3");
+            if (done)
+                opjumpr("nz,", done);
+            else
+                ol("jr\tnz,ASMPC+3");
             ol("scf");
+            if (done)
+                postlabel(done);
             set_carry(lval);
        } else {
             lpush();  // 11 bytes
@@ -4819,15 +4827,8 @@ void zle_const(LVALUE *lval, int64_t value64)
         cmp_schar_gt(value);
         ol("ccf");
         set_carry(lval);
-    } else if ( value == 0 && !ulvalue(lval) && !IS_808x() ) {
-        ol("ld\ta,h"); // 8 bytes
-        ol("rlca");
-        ol("jr\tc,ASMPC+6");
-        ol("or\tl"); // We know MSBit was 0, so no point shifting it back in
-        ol("jr\tnz,ASMPC+3");
-        ol("scf");
-        set_carry(lval);
-    } else if ( value == 0 && !ulvalue(lval) && lval->val_type == KIND_INT ) {
+    } else if ( value == 0 && !ulvalue(lval) &&
+                ( !IS_808x() || lval->val_type == KIND_INT ) ) {
         cmp_signed_le0();
         set_carry(lval);
     } else if ( value == 0 && ulvalue(lval) ) {
@@ -5207,76 +5208,8 @@ void zge(LVALUE* lval)
  */
 
 
-/* The shorter copt rule rewrites `jr nz / scf / ld hl,0 / rl l` by
-   moving `ld hl,0` under the preceding `jr c`. That skip was counted
-   for the old bytes, so a negative value returns the operand. Emit
-   the corrected value while this compare is still staged. A copy that
-   was flushed first is still repaired by the rule in z80rules.1. */
-static int take_staged_tail(const char *tail, size_t n)
-{
-    char *at;
-
-    if (stage == NULL || stagenext == NULL || stagenext < stage)
-        return 0;
-    if ((size_t)(stagenext - stage) < n)
-        return 0;
-    at = stagenext - n;
-    if (memcmp(at, tail, n) != 0)
-        return 0;
-    if (at != stage && at[-1] != '\n')
-        return 0;
-    clearstage(at, NULL);
-    return 1;
-}
-
-static int fold_signed_le0_value(void)
-{
-    static const char word[] =
-        "\tld\ta,h\n"
-        "\trlca\n"
-        "\tjr\tc,ASMPC+6\n"
-        "\tor\tl\n"
-        "\tjr\tnz,ASMPC+3\n"
-        "\tscf\n";
-    static const char wide[] =
-        "\tld\ta,d\n"
-        "\trlca\n"
-        "\tjr\tc,ASMPC+8\n"
-        "\tor\te\n"
-        "\tor\th\n"
-        "\tor\tl\n"
-        "\tjr\tnz,ASMPC+3\n"
-        "\tscf\n";
-
-    if (take_staged_tail(word, sizeof(word) - 1)) {
-        ol("ld\ta,h");
-        ol("rlca");
-        ol("jr\tc,ASMPC+8");
-        ol("or\tl");
-        vconst(0);
-        ol("jr\tnz,ASMPC+5");
-        vconst(1);
-        return 1;
-    }
-    if (take_staged_tail(wide, sizeof(wide) - 1)) {
-        ol("ld\ta,d");
-        ol("rlca");
-        ol("jr\tc,ASMPC+10");
-        ol("or\te");
-        ol("or\th");
-        ol("or\tl");
-        vconst(0);
-        ol("jr\tnz,ASMPC+5");
-        vconst(1);
-        return 1;
-    }
-    return 0;
-}
-
 void gen_conv_carry2int(void)
 {
-    if (fold_signed_le0_value())
-        return;
     vconst(0);
     if ( !IS_808x() ) {
         ol("rl\tl");

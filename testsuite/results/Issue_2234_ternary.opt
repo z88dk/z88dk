@@ -12,17 +12,18 @@
 	call	_testfunc
 	ld	a,h
 	rlca
-	jr	c,ASMPC+6
+	jr	c,i_2
 	or	l
-	jr	nz,ASMPC+3
+	jr	nz,i_2
 	scf
-	ccf
-	jp	nc,i_2	;
-	ld	hl,2	;const
-	jp	i_3	;
 .i_2
-	ld	hl,1	;const
+	ccf
+	jp	nc,i_3	;
+	ld	hl,2	;const
+	jp	i_4	;
 .i_3
+	ld	hl,1	;const
+.i_4
 	push	hl
 	call	_blah
 	pop	bc
@@ -34,12 +35,12 @@
 	call	_testfunc
 	ld	a,h
 	or	l
-	jp	z,i_4	;
+	jp	z,i_5	;
 	ld	hl,2	;const
-	jp	i_5	;
-.i_4
-	ld	hl,1	;const
+	jp	i_6	;
 .i_5
+	ld	hl,1	;const
+.i_6
 	push	hl
 	call	_blah
 	pop	bc
