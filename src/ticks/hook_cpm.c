@@ -15,6 +15,7 @@
 #else
 #include <conio.h>
 #include <io.h>
+#define ftruncate(fd, len) _chsize((fd), (len))
 #endif
 
 static int user_num = 0;
