@@ -104,7 +104,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     char preserve = NO; /* Preserve af when cleaningup */
     int   isconstarg[5];
     zdouble constargval[5];
-    FILE *tmpfiles[100];  // 100 arguments enough I guess */
+    /* Index 0 is unused. The slot after the last argument stays
+       NULL so the replay loop can stop, so 98 arguments fit. */
+    FILE *tmpfiles[100];
     int   tmplinenos[100];
     FILE *save_fps;
     int   i;
@@ -144,6 +146,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         Type *type;
         if (endst()) {
             break;
+        }
+        if (argnumber == 98) {
+            errorfmt("Too many arguments in a call, the limit is 98", 1);
         }
         argnumber++;
         tmpfiles[argnumber] = my_tmpfile();

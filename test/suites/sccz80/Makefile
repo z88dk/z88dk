@@ -27,6 +27,12 @@ CFILES = $(wildcard *.c)
 ifeq ($(filter $(COMPILER),sccz80 80cc),)
 CFILES := $(filter-out constpush.c conv.c,$(CFILES))
 endif
+# calllimit.c is expected to fail. It is checked separately, not run.
+# callargs.c fills sccz80's argument table. 80cc does not compile it.
+CFILES := $(filter-out calllimit.c,$(CFILES))
+ifneq ($(COMPILER),sccz80)
+CFILES := $(filter-out callargs.c,$(CFILES))
+endif
 TARGET_Z80 := $(foreach test,$(CFILES:.c=),test_$(test).bin)
 
 ifeq ($(COMPILER),xcc)
@@ -34,6 +40,17 @@ all: $(TARGET_Z80)
 else
 all: $(TARGET_Z80) $(TARGET_8080) $(TARGET_8085) $(TARGET_VM1) $(TARGET_GBZ80) $(TARGET_Z80N) $(TARGET_R2KA) $(TARGET_RC2014) $(TARGET_R4K) $(TARGET_R6K) $(TARGET_KC160)
 endif
+
+# One past the fixed argument table must be diagnosed, not stored.
+ifeq ($(COMPILER),sccz80)
+all: test_calllimit
+endif
+
+.PHONY: test_calllimit
+test_calllimit: calllimit.c
+	-zcc +test -vn -c -compiler=sccz80 $< -o calllimit.o > calllimit.output 2>&1
+	grep -F "Too many arguments in a call, the limit is 98" calllimit.output
+	rm -f calllimit.o calllimit.output
 
 
 
