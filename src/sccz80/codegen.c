@@ -2284,7 +2284,7 @@ void zadd_const(LVALUE *lval, int64_t value64)
             dec(lval);
         } else if ( value64 != 0 ) {
             llpush();
-            vllongconst(value64);
+            vllongconst_exact((uint64_t)value64);
             zadd(lval);
         }
         return;

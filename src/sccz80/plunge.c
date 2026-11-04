@@ -1073,7 +1073,6 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 {
     char *before, *start, *before1, *start1;
     int oldsp = Zsp;
-    double val;
     int lhs_val_type, rhs_val_type;
     struct fold_types fold_types = {0};
 
@@ -1218,8 +1217,21 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
         }
         if ( doconst_oper ) {
+            int64_t addend;
+
             lval->is_const = 0;
-            zadd_const(lval2, lval->const_val);
+            /* cscale wrote the byte offset into const_val. int_const_val
+               is still the element count, so 2 + (int *)p must add 4.
+               An integer addend keeps int_const_val: const_val is a host
+               floating value and drops bits past 2^53. */
+            if (lval2->ptr_type != KIND_NONE)
+                addend = (int64_t)lval->const_val;
+            else if (lval->int_const_valid && lval->ltype
+                     && kind_is_integer(lval->ltype->kind))
+                addend = integer_signed_value(lval);
+            else
+                addend = (int64_t)lval->const_val;
+            zadd_const(lval2, addend);
             result(lval, lval2);
             return;
         }
@@ -1243,8 +1255,6 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         rhs_val_type = lval2->val_type;
         if (lval2->is_const) {
             /* constant on right */
-            val = lval2->const_val;
-            
             if ( kind_is_decimal(lval2->val_type) ) { 
                 clearstage(before1, 0); // Get rid of primary on the stack
                 Zsp = savesp1;
@@ -1273,16 +1283,25 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 (*oper)(lval);
                 return;
             } else {
-                /* Integer-Lvalue +/- integer constant */
+                /* Integer lvalue +/- integer constant.
+                   int_const_val still has every bit. A double cannot
+                   hold a long long past 2^53, and negating that rounded
+                   value turns INT64_MAX into INT64_MIN. */
+                int64_t addend;
+
                 if (lval->ptr_type != KIND_NONE ) {
-                    int ival = val;
+                    int ival = lval2->const_val;
                     /* are adding lval2 to pointer, adjust size */
                     cscale(lval->ltype, &ival);
-                    val = ival;
+                    addend = ival;
+                } else if (lval2->int_const_valid) {
+                    addend = integer_signed_value(lval2);
+                } else {
+                    addend = (int64_t)lval2->const_val;
                 }
                 if (oper == zsub) {
                     /* addition on Z80 is cheaper than subtraction */
-                    val = (-val);
+                    addend = (int64_t)(0 - (uint64_t)addend);
                     /* skip later diff scaling - constant can't be pointer */
                     oper = zadd;
                 }
@@ -1308,7 +1327,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                         set_common_integer(lval, lval->ltype, lval2->ltype);
                     }
                 }
-                zadd_const(lval, val);
+                zadd_const(lval, addend);
             }
         } else {
             /* non-constant on both sides  */
