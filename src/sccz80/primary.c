@@ -803,13 +803,17 @@ void check_assign_range(Type *type, double const_value)
 {
     Kind lhs_val_type = type->kind;
     int  factor = type->bit_size ? ((1 << type->bit_size) - 1) : 0xffff;
+    /* Width of the signed minimum. A full int is 16 bits, a full char 8.
+       -(32767 & factor) is one short of the two's-complement minimum. */
+    int  bits = type->bit_size ? type->bit_size : (lhs_val_type == KIND_CHAR ? 8 : 16);
+    int  smin = -(int)(1u << (bits - 1));
 
     if ( lhs_val_type == KIND_INT && !isutype(type) ) {
-        CHECK(const_value, -(32767 & factor), (65535 & factor));
+        CHECK(const_value, smin, (65535 & factor));
     } else if ( lhs_val_type == KIND_INT && isutype(type) ) {
         CHECK(const_value, 0, (65535 & factor));
     } else if ( lhs_val_type == KIND_CHAR && !isutype(type) ) {
-        CHECK(const_value, -(127 & factor), (255 & factor));
+        CHECK(const_value, smin, (255 & factor));
     } else if ( lhs_val_type == KIND_CHAR && isutype(type) ) {
         CHECK(const_value, 0, (255 & factor));
     }
