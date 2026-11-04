@@ -1935,7 +1935,7 @@ static void declfunc(Type *functype, enum storage_type storage)
         * to each function
         */
 
-    if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
+    if ( (c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
             (currfn->flags & NAKED) == 0)
         where += 2;
 

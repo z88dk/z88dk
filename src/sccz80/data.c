@@ -104,12 +104,6 @@ int debuglevel;
 
 int c_double_strings;
 
-/*
- *        Framepointer stuff - tis broken!
- */
-int c_framepointer_is_ix;
-
-
 int c_use_r2l_calling_convention;
 
 

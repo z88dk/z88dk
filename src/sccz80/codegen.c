@@ -31,19 +31,10 @@
 
 
 
-#define FRAME_REGISTER ( c_framepointer_is_ix ? "ix" : "iy")
-
 extern int check_lastop_was_comparison(LVALUE* lval);
 
 
 extern char Filenorig[];
-
-#ifdef USEFRAME
-extern int CheckOffset(int);
-extern void PutFrame(char,int);
-extern void OutIndex(int);
-#endif
-
 
 static void swap(void);
 static void ex_sp_hl(void);
@@ -515,48 +506,6 @@ void gen_store_to_tos(Kind typeobj)
  * We already know that it's in range
  */
 
-#ifdef USEFRAME
-void PutFrame(char typeobj, int offset)
-{
-    Type* ctype;
-    char flags;
-
-    ctype = retrstk(&flags); /* Not needed but.. */
-    switch (typeobj) {
-    case KIND_CHAR:
-        ot("ld\t");
-        OutIndex(offset);
-        outstr(",l\n");
-        break;
-    case KIND_INT:
-    case KIND_PTR:
-        ot("ld\t");
-        OutIndex(offset);
-        outstr(",l\n");
-        ot("ld\t");
-        OutIndex(offset + 1);
-        outstr(",h\n");
-        break;
-    case KIND_CPTR:
-    case KIND_LONG:
-        ot("ld\t");
-        OutIndex(offset);
-        outstr(",l\n");
-        ot("ld\t");
-        OutIndex(offset + 1);
-        outstr(",h\n");
-        ot("ld\t");
-        OutIndex(offset + 2);
-        outstr(",e\n");
-        ot("ld\t");
-        if (typeobj == KIND_LONG) {
-            OutIndex(offset + 3);
-            outstr(",d\n");
-        }
-    }
-}
-#endif
-
 /* Store the specified object type in the primary register */
 /*      at the address on the top of the stack */
 void putstk(LVALUE *lval)
@@ -704,17 +653,6 @@ void putstk(LVALUE *lval)
 /* store a two byte object in the primary register at TOS */
 void puttos(void)
 {
-#ifdef USEFRAME
-    if (c_framepointer_is_ix != -1) {
-        ot("ld\t");
-        OutIndex(0);
-        outstr(",l\n");
-        ot("ld\t");
-        OutIndex(1);
-        outstr(",h\n");
-        return;
-    }
-#endif
     ol("pop\tbc");
     ol("push\thl");
 }
@@ -722,17 +660,6 @@ void puttos(void)
 /* store a two byte object in the primary register at 2nd TOS */
 void put2tos(void)
 {
-#ifdef USEFRAME
-    if (c_framepointer_is_ix != -1) {
-        ot("ld\t");
-        OutIndex(2);
-        outstr(",l\n");
-        ot("ld\t");
-        OutIndex(3);
-        outstr(",h\n");
-        return;
-    }
-#endif
     ol("pop\tde");
     puttos();
     ol("push\tde");
@@ -911,11 +838,6 @@ void gen_load_indirect(LVALUE* lval)
         break;
     default:
         ot("call\tl_gint\t;");
-#ifdef USEFRAME
-        if (c_framepointer_is_ix != -1 && CheckOffset(lval->offset)) {
-            OutIndex(lval->offset);
-        }
-#endif
         nl();
     }
 }
@@ -1557,7 +1479,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
             callrts("l_i64_copy");
         }
 
-        if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
+        if ( (c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
             (currfn->flags & NAKED) == 0) {
             gen_pop_frame();
             Zsp += 2;
@@ -1643,32 +1565,6 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
         outstr("\tadd\tsp,"); outdec(k); nl();
         return newsp;
     }
-
-#ifdef USEFRAME
-    if (c_framepointer_is_ix != -1) {
-        if ( saveaf ) {
-            if ( c_noaltreg ) {
-                push("af");
-                pop("bc");
-            } else {
-                 ol("ex\taf,af");
-            }
-        }
-        outfmt("\tld\t%s,%d\n",FRAME_REGISTER, k);
-        outfmt("\tadd\t%s,sp\n", FRAME_REG);
-        outfmt("\tld\tsp,%s\n",FRAME_REGISTER);
-        if ( saveaf ) {
-            if ( c_noaltreg ) {
-                ol("push\tbc");
-                Zsp -= 2;
-                pop("af");
-            } else {
-                 ol("ex\taf,af");
-            }
-        }
-        return newsp;
-    }
-#endif
 
     // Handle short cases
     if (k > 0) {
@@ -5662,57 +5558,12 @@ void gen_switch_section(const char* section_name)
     current_section = section_name;
 }
 
-#ifdef USEFRAME
-/*
- * Check offset is within range for frame pointer
- */
-
-int CheckOffset(int val)
-{
-    if (val >= -126 && val <= 127)
-        return 1;
-    return 0;
-}
-
-/*
- *  Output offset to index register
- *
- *  FRAME POINTER STUFF IS BROKEN - DO NOT USE!!!
- */
-
-void OutIndex(int val)
-{
-    outstr("(");
-    if (c_framepointer_is_ix)
-        outstr("ix ");
-    else
-        outstr("iy ");
-    if (val >= 0)
-        outstr("+");
-    outdec(val);
-    outstr(")");
-}
-
-
-
-#endif
-
 void gen_push_frame(void)
 {
     if ( (currfn->flags & NAKED) == 0) {
-        if ( (currfn->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {
+        if ( currfn->flags & SAVEFRAME ) {
             if ( !IS_808x() && !IS_GBZ80() ) {
-                ot("push\t");
-                outstr(FRAME_REGISTER);
-                nl();
-                if ( c_framepointer_is_ix != -1) {
-                    ot("ld\t");
-                    outstr(FRAME_REGISTER);
-                    outstr(",0\n");
-                    ot("add\t");
-                    outstr(FRAME_REGISTER);
-                    outstr(",sp\n");
-                }
+                ol("push\tix");
             } else {
                 ol("push\taf");
             }
@@ -5725,11 +5576,9 @@ void gen_push_frame(void)
 void gen_pop_frame(void)
 {
     if ( (currfn->flags & NAKED) == 0) {
-        if ( (currfn->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {
+        if ( currfn->flags & SAVEFRAME ) {
             if ( !IS_808x() && !IS_GBZ80() ) {
-                ot("pop\t");
-                outstr(FRAME_REGISTER);
-                nl();
+                ol("pop\tix");
             } else if (CPU_POP_AF_IS_SAFE()) {
                 ol("pop\taf");
             } else {
