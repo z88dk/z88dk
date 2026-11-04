@@ -2381,11 +2381,12 @@ void zadd_const(LVALUE *lval, int64_t value64)
     int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONGLONG ) {
         // TODO: If 2 <= value <= 255 then there's a libsrc call to add a
-        if ( value == 1 ) {
+        /* The low 32 bits of 4294967296 are 0. -1 must decrement. */
+        if ( value64 == 1 ) {
             inc(lval);
-        } else if ( value == -1 ) {
-            inc(lval);
-        } else if ( value != 0 ) {
+        } else if ( value64 == -1 ) {
+            dec(lval);
+        } else if ( value64 != 0 ) {
             llpush();
             vllongconst(value64);
             zadd(lval);

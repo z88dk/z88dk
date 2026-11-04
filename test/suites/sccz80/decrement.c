@@ -53,6 +53,40 @@ void test_preinc64(void)
      Assert( ++v == 0, "-1 + 1");
 }
 
+/* Constant +/ - must use the full 64-bit addend. A truncated test turns
+   x - 1 into an increment and drops x + 4294967296 altogether. */
+void test_addconst64(void)
+{
+     long long v;
+     char c;
+     int i;
+     long l;
+
+     v = 5;
+     v -= 1;
+     Assert( v == 4, "5LL -= 1");
+     v = 5;
+     v += -1;
+     Assert( v == 4, "5LL += -1");
+     v = 5;
+     v += 1;
+     Assert( v == 6, "5LL += 1");
+     v = 5;
+     v += 4294967296LL;
+     Assert( v == 4294967301LL, "5LL += 4294967296");
+     v = 5;
+     v += 4294967297LL;
+     Assert( v == 4294967302LL, "5LL += 4294967297");
+
+     c = 5;
+     i = 5;
+     l = 5;
+     c -= 1;
+     i += -1;
+     l += 1;
+     Assert( c == 4 && i == 4 && l == 6, "narrow constant add");
+}
+
 int suite_decrement()
 {
     suite_setup("Increment/Decrement Tests");
@@ -61,6 +95,7 @@ int suite_decrement()
     suite_add_test(test_predec64);
     suite_add_test(test_postdec64);
     suite_add_test(test_preinc64);
+    suite_add_test(test_addconst64);
   #endif
 #endif
 
