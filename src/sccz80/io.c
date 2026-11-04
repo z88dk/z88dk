@@ -332,8 +332,12 @@ void blanks(void)
             gch();
         else if (ch() == 9)
             gch();
-        else
+        else {
+            /* zcc strips comments. A direct run must say so, not parse '/' . */
+            if (cmode && ch() == '/' && (nch() == '*' || nch() == '/'))
+                errorfmt("Comments require the external preprocessor", 1);
             return;
+        }
     }
 }
 
