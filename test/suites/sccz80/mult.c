@@ -18,6 +18,7 @@ void test_mult_longlong()
      Assert(  val1 * 3  == 9, "3 * 3");
      Assert(  val1 * 5  == 15, "3 * 5");
      Assert(  val1 * 6  == 18, "3 * 6");
+     Assert(  val1 * 4294967297LL == 12884901891LL, "3 * 4294967297");
 
      Assert(  val1 *  val2  ==  15, " 3 *  5");
      Assert(  val1 * -val2  == -15, " 3 * -5");

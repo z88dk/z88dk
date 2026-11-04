@@ -2635,7 +2635,7 @@ void mult_const(LVALUE *lval, int64_t value64)
             Zsp += 8;
         } else {
             llpush();
-            vllongconst(value);
+            vllongconst_exact((uint64_t)value64);
             callrts("l_i64_mult");
             Zsp += 8;
         }
