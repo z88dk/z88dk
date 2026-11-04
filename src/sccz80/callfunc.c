@@ -17,7 +17,7 @@
  */
 
 static int SetWatch(char* sym, int* isscanf);
-static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
+static int SetMiniFunc(unsigned char *arg, unsigned char *end, uint32_t *format_option_ptr);
 static Kind ForceArgs(Type *dest, Type *src, int isconst);
 
 
@@ -323,9 +323,15 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             /* fastcall of single expression OR the last argument of a builtin */
         } else {
             if (argnumber == watcharg) {
+                int off = (int)val + 1;
+
                 if (ptr)
                     debug(DBG_ARG1, "Caughtarg!! %s", litq + (int)val + 1);
-                minifunc = SetMiniFunc(litq + (int)val + 1, &format_option);
+                /* The format is a pool string. Stop at its NUL or at the
+                   last stored literal, so a truncated specifier cannot
+                   read past the pool. */
+                if (off >= 0 && off < litptr)
+                    minifunc = SetMiniFunc(litq + off, litq + litptr, &format_option);
                 if (isscanf) {
                     scanf_format_option |= format_option;
                 } else {
@@ -525,7 +531,7 @@ struct printf_format_s {
     { 0, 0, 0, 0 }
 };
 
-static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr)
+static int SetMiniFunc(unsigned char *arg, unsigned char *end, uint32_t *format_option_ptr)
 {
     char c;
     int complex, islong;
@@ -533,25 +539,29 @@ static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr)
     struct printf_format_s* fmt;
 
     complex = 1; /* mini printf */
-    while ((c = *arg++)) {
+    while (arg < end && (c = *arg++) != 0) {
         if (c != '%')
             continue;
+        if (arg >= end)
+            break;
 
         if (*arg == '-' || *arg == '0' || *arg == '+' || *arg == ' ' || *arg == '*' || *arg == '.') {
             if (complex < 2)
                 complex = 2; /* Switch to standard */
             format_option |= 0x40000000;
-            while (!isalpha(*arg))
+            while (arg < end && *arg && !isalpha(*arg))
                 arg++;
         } else if (isdigit(*arg)) {
             if (complex < 2)
                 complex = 2; /* Switch to standard */
             format_option |= 0x40000000;
-            while (isdigit(*arg) || *arg == '.') {
+            while (arg < end && (isdigit(*arg) || *arg == '.')) {
                 arg++;
             }
         }
 
+        if (arg >= end)
+            break;
         islong = 0;
         if (*arg == 'l') {
             if (complex < 2)
@@ -560,10 +570,12 @@ static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr)
             islong = 1;
         } else if ( *arg == 'h' ) {
             arg++;
-            if ( *arg == 'h' ) arg++;
+            if (arg < end && *arg == 'h') arg++;
         } else if ( *arg == 'z' ) {
             arg++; 
         }
+        if (arg >= end)
+            break;
         fmt = &printf_formats[0];
         while (fmt->fmt) {
             if (fmt->fmt == *arg) {
@@ -571,7 +583,7 @@ static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr)
                     complex = fmt->complex;
                 format_option |= islong ? fmt->lval : fmt->val;
                 if ( *arg == '[') {
-                    while (*arg && *arg != ']') arg++;
+                    while (arg < end && *arg && *arg != ']') arg++;
                 }
                 break;
             }
