@@ -710,7 +710,24 @@ static char* dup_n(const char* s, size_t n)
 
 // N:Fu3.c$colour({2}SI:S)[(RED$0)(GREEN$5)(BLUE$6)]
 // An enum is known by its F<file>$<tag> (the text before the "({"): tags are
-// only unique within one file. A key that is already known keeps its first record.
+// only unique within one file. A key that is already known keeps its first
+// record, and is marked ambiguous (its values print as numbers) when a later
+// record for it differs.
+static void free_enum(debug_sym_enum* e)
+{
+    debug_sym_enumerator* en = e->first_enumerator;
+
+    while (en != NULL) {
+        debug_sym_enumerator* next = en->next;
+        free(en->name);
+        free(en);
+        en = next;
+    }
+    free(e->name);
+    free(e->body);
+    free(e);
+}
+
 static void debug_add_enum_info(const char* encoded)
 {
     char name[128];
@@ -725,24 +742,39 @@ static void debug_add_enum_info(const char* encoded)
         return;
     }
     char* key = dup_n(encoded, open - encoded);
+    const char* list = close + 2;
     debug_sym_enum* e;
     HASH_FIND_STR(cdb_enums, key, e);
     if (e != NULL) {
+        if (strcmp(e->body, list) != 0) {
+            e->ambiguous = 1;
+        }
         free(key);
         return;
     }
 
-    const char* p = close + 2;
     e = calloc(1, sizeof(debug_sym_enum));
     e->name = key;
+    e->body = strdup(list);
     last = &e->first_enumerator;
-    while (sscanf(p, "(%127[^$]$%d)%n", name, &value, &end) == 2) {
+    const char* p = list;
+    for (;;) {
+        // %n is only reached when the whole item matched: end stays 0 on a record cut short
+        end = 0;
+        if (sscanf(p, "(%127[^$]$%d)%n", name, &value, &end) != 2 || end == 0) {
+            break;
+        }
         debug_sym_enumerator* en = calloc(1, sizeof(debug_sym_enumerator));
         en->name = strdup(name);
         en->value = value;
         *last = en;
         last = &en->next;
         p += end;
+    }
+    if (*p != ']') {
+        bk.debug("Warning: could not add debug info on enum.\n");
+        free_enum(e);
+        return;
     }
     HASH_ADD_KEYPTR(hh, cdb_enums, e->name, strlen(e->name), e);
 }
@@ -1454,7 +1486,7 @@ const char* cdb_enumerator_name(const char* key, int32_t value) {
     debug_sym_enumerator* en;
 
     HASH_FIND_STR(cdb_enums, key, e);
-    if (e == NULL) {
+    if (e == NULL || e->ambiguous) {
         return NULL;
     }
     for (en = e->first_enumerator; en != NULL; en = en->next) {

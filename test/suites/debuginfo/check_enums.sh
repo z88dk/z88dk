@@ -4,7 +4,7 @@
 # The files define different enums of the same name (colour), anonymous enums
 # with the same generated tag, and a file static of the same name; they share
 # the enum of enums.h. Two functions of enums_a.c have a static of the same name
-# (st) and different enums. The NOSUCH rows are the unknown-name error paths.
+# (st) and different enums. The unknown-name error paths are check_exprerr.sh's.
 #
 # usage: check_enums.sh <ticks-machine-flag> <bin> <map> <label>
 set -u
@@ -22,9 +22,6 @@ cmd()  { cmds="$cmds$1
 "; }
 # val <expected> <expression>: "print <expression>" gives "$<n> = <expected>"
 val()  { n=$((n + 1)); cmd "print $2"; want="$want""v $n $1
-"; }
-# err <expression>: "print <expression>" gives the NOSUCH error (it takes no history number)
-err()  { cmd "print $1"; want="${want}l Error: Cannot resolve symbol: NOSUCH
 "; }
 # line <expected> <command>: the command prints this line
 line() { cmd "$2"; want="$want""l $1
@@ -74,11 +71,6 @@ val '<enum colour> BLUE'               'ga_arr[1]'
 val '<enum colour*> 0x@(BLUE)'         '&ga_col'
 val '<enum colour> BLUE'               '$1'
 val '<int16_t> 6'                      '$1 + 0'
-err 'ga_col - NOSUCH'
-err 'NOSUCH + 1'
-err '(int)NOSUCH'
-err 'ga_col * NOSUCH'
-err 'ga_col / NOSUCH'
 line '  <enum colour>param = BLUE'     'info locals'
 line '  <enum colour>loc = BLUE'       'info locals'
 line '  <int16_t>plain = 23'           'info locals'
@@ -135,11 +127,14 @@ $want
 EOT
 
 # Malformed N: and E: records are warned about and skipped: an N: with no "[",
-# one cut short, an E: with no tag. The map is the real one plus those records.
+# one cut short, one cut inside its list (two shapes), an E: with no tag.
+# Well-formed ones too, with a drive letter in the file name (the key ends at the
+# last ':'), the E: coming after the S: of its object (the real map has E: first).
+# The map is the real one plus those records.
 bad="$3.bad"
 cp "$3" "$bad"
 tail=$(grep -m 1 '__CDBINFO__' "$3" | sed 's/^[^ ]* = / = /')
-for rec in 'N:Fbad.c$nolist({2}SI:S)' 'N:Fbad.c$cut({2}SI:S' 'E:G$nosuch$0_0$0({2}SEnocolon),E,0,0'; do
+for rec in 'N:Fbad.c$nolist({2}SI:S)' 'N:Fbad.c$cut({2}SI:S' 'N:Fbad.c$cut2({2}SI:S)[(QA$7)(QB$5' 'N:Fbad.c$cut3({2}SI:S)[(QC$9' 'E:G$nosuch$0_0$0({2}SEnocolon),E,0,0' 'N:FC:/inc/w.h$wc({2}SI:S)[(W6$6)(W7$7)]' 'E:G$ga_int$0_0$0({2}SEFC:/inc/w.h$wc:S),E,0,0'; do
     printf '%s\n' "$rec" | awk -v tail="$tail" '
         BEGIN { for (i = 0; i < 256; i++) ord[sprintf("%c", i)] = i }
         { out = ""
@@ -147,14 +142,16 @@ for rec in 'N:Fbad.c$nolist({2}SI:S)' 'N:Fbad.c$cut({2}SI:S' 'E:G$nosuch$0_0$0({
               out = out (c ~ /[A-Za-z]/ ? c : sprintf("_%02x", ord[c])) }
           print "__CDBINFO__" out tail }' >> "$bad"
 done
-out=$(printf 'break enums_b.c:%s\ncont\nprint ga_col\nprint RED\nquit\n' "$LINE_B" \
+out=$(printf 'break enums_b.c:%s\ncont\nprint ga_col\nprint RED\nprint ga_int\nprint QB\nquit\n' "$LINE_B" \
       | z88dk-ticks -w 30 -d "$1" -x "$bad" "$2" 2>&1)
 rm -f "$bad"
-[ "$(printf '%s\n' "$out" | grep -cF 'Warning: could not add debug info on enum.')" = 2 ] \
-    || { echo "  MISSING [$label]: two 'could not add debug info on enum.' warnings, for the N: records"; ok=0; }
+[ "$(printf '%s\n' "$out" | grep -cF 'Warning: could not add debug info on enum.')" = 4 ] \
+    || { echo "  MISSING [$label]: four 'could not add debug info on enum.' warnings, for the N: records"; ok=0; }
 [ "$(printf '%s\n' "$out" | grep -cF 'Warning: could not add debug info on enum object.')" = 1 ] \
     || { echo "  MISSING [$label]: one 'could not add debug info on enum object.' warning, for the E: record"; ok=0; }
 printf '%s\n' "$out" | grep -qF '$1 = <enum colour> BLUE' || { echo "  MISSING [$label]: \$1 = <enum colour> BLUE (malformed records in the map)"; ok=0; }
+printf '%s\n' "$out" | grep -qF '$3 = <enum wc> W6' || { echo "  MISSING [$label]: \$3 = <enum wc> W6 (a drive letter in the key; an E: after its S:)"; ok=0; }
+printf '%s\n' "$out" | grep -qF 'Cannot resolve symbol: QB' || { echo "  MISSING [$label]: QB of a record cut inside its list is not an enumerator"; ok=0; }
 printf '%s\n' "$out" | grep -qF '$2 = <int16_t> 10' || { echo "  MISSING [$label]: \$2 = <int16_t> 10 (malformed records in the map)"; ok=0; }
 
 if [ "$ok" != 1 ]; then

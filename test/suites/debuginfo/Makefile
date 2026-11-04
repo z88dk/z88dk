@@ -52,24 +52,31 @@ gbz80: dbgvars.c
 exprerr: z80
 	@sh ./check_exprerr.sh -mz80 dbgvars_z80.bin dbgvars_z80.map z80
 
-# Enum objects print their enumerator (two modules, same-named enums, a shared header)
-enums: enums_a.c enums_b.c enums_c.c enums.h
-	zcc +test $(DFLAGS) enums_a.c enums_b.c enums_c.c -o enums_z80.bin -m
-	@sh ./check_enums.sh -mz80 enums_z80.bin enums_z80.map z80
+# Enum objects print their enumerator (two modules, same-named enums, a shared header);
+# both compilers, whichever COMPILER the suite runs with, as they write the same records
+enums: enums_a.c enums_b.c enums_c.c enums.h enums_a.records
+	@for c in sccz80 80cc; do \
+	  zcc +test -vn -compiler=$$c -debug -I$(FRAMEWORK_DIR) enums_a.c enums_b.c enums_c.c -o enums_$$c.bin -m || exit 1; \
+	  sh ./check_enums.sh -mz80 enums_$$c.bin enums_$$c.map $$c || exit 1; \
+	  zcc +test -vn -compiler=$$c -debug -I$(FRAMEWORK_DIR) -a enums_a.c -o enums_a_$$c.asm || exit 1; \
+	  sh ./check_enumrecs.sh enums_a_$$c.asm $$c || exit 1; \
+	done
 
 # Sibling-block locals of the same name and different enums (sccz80: 80cc writes no block-local records)
 enumblk: enums_blk.c
 	zcc +test -vn -compiler=sccz80 -debug -I$(FRAMEWORK_DIR) enums_blk.c -o enumblk_z80.bin -m
 	@sh ./check_enumblk.sh -mz80 enumblk_z80.bin enumblk_z80.map z80
 
-# Two modules of the same file name (other directories) have the same enum key
+# Two modules of the same file name (other directories) have the same enum key; both compilers
 dupname: dupname/dup1/dup.c dupname/dup2/dup.c
-	cd dupname/dup1 && zcc +test -vn -compiler=$(COMPILER) -debug -c dup.c -o ../dup1.o
-	cd dupname/dup2 && zcc +test -vn -compiler=$(COMPILER) -debug -c dup.c -o ../dup2.o
-	zcc +test -vn -compiler=$(COMPILER) -debug dupname/dup1.o dupname/dup2.o -o dupname_z80.bin -m
-	@sh ./check_dupname.sh -mz80 dupname_z80.bin dupname_z80.map z80
+	@for c in sccz80 80cc; do \
+	  (cd dupname/dup1 && zcc +test -vn -compiler=$$c -debug -c dup.c -o ../dup1_$$c.o) || exit 1; \
+	  (cd dupname/dup2 && zcc +test -vn -compiler=$$c -debug -c dup.c -o ../dup2_$$c.o) || exit 1; \
+	  zcc +test -vn -compiler=$$c -debug dupname/dup1_$$c.o dupname/dup2_$$c.o -o dupname_$$c.bin -m || exit 1; \
+	  sh ./check_dupname.sh -mz80 dupname_$$c.bin dupname_$$c.map $$c || exit 1; \
+	done
 
 clean:
-	$(RM) *.bin *.map *.o *.sym *.def zcc_opt.def *.lis dupname/*.o dupname/*/*.o
+	$(RM) *.bin *.map *.o *.sym *.def zcc_opt.def *.lis dupname/*.o dupname/*/*.o enums_a_*.asm
 
 .PHONY: all z80 i8080 i8085 gbz80 exprerr enums dupname enumblk clean

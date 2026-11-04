@@ -146,6 +146,8 @@ struct debug_sym_enumerator_s {
    integer then carries the tag in data. */
 struct debug_sym_enum_s {
     char*                       name;       /* F<file>$<tag> */
+    char*                       body;       /* the record's enumerator list, to spot a different record of the key */
+    int                         ambiguous;  /* records of this key disagree: values print as numbers */
     debug_sym_enumerator*       first_enumerator;
     UT_hash_handle              hh;
 };
