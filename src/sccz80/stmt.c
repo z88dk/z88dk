@@ -226,6 +226,7 @@ void ns(void)
 void compound(void)
 {
     SYMBOL* savloc;
+    int     savblock = current_block;
 
     if (ncmp == MAX_LEVELS)
         errorfmt("Maximum nesting level reached (%d)", 1, ncmp);
@@ -233,10 +234,12 @@ void compound(void)
     stkstor[ncmp] = Zsp;
     savloc = locptr;
     declared = 0; /* may declare local variables */
+    current_block = scope_block; /* numbered by statement() */
     ++ncmp; /* new level open */
     while (cmatch('}') == 0)
         statement(); /* do one */
     --ncmp; /* close current level */
+    current_block = savblock;
     if (lastst != STRETURN) {
         modstk(stkstor[ncmp], KIND_NONE, NO, YES); /* delete local variable space */
     }

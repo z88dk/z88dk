@@ -1947,6 +1947,7 @@ static void declfunc(Type *functype, enum storage_type storage)
     } else {
         int i;
         ++scope_block;
+        current_block = scope_block;
         for ( i = 0; i < array_len(functype->parameters); i++ ) {
             SYMBOL    *ptr;
             UT_string *str;            
@@ -2059,6 +2060,7 @@ static void declfunc(Type *functype, enum storage_type storage)
 #endif
     Zsp = 0;
     infunc = 0; /* not in fn. any more */
+    current_block = 0;
 }
 
 
