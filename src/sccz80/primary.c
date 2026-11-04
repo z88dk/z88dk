@@ -177,6 +177,10 @@ zdouble calc(
         left = truncl(left);
         right = truncl(right);
     }
+    if ((oper == zdiv || oper == zmod) && right == 0.0) {
+        warningfmt("division-by-zero","Division by zero, result set to be zero");
+        return 0;
+    }
     if (oper == zdiv && right != 0.0) {
         if ( !kind_is_decimal(left_kind) && !kind_is_decimal(right_kind)) {
             return ((int64_t)left / (int64_t)right);
@@ -215,6 +219,10 @@ zdouble calcun(
     if ( !kind_is_decimal(left_kind) && !kind_is_decimal(right_kind)) {
         left = truncl(left);
         right = truncl(right);
+    }
+    if ((oper == zdiv || oper == zmod) && right == 0.0) {
+        warningfmt("division-by-zero","Division by zero, result set to be zero");
+        return 0;
     }
 
     if (oper == zdiv)   {

@@ -835,6 +835,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 && fold_integer_exact(lval, lval2, oper, &exact_value)) {
                 set_exact_integer_result(lval, exact_value);
             } else if (lval->ltype->isunsigned || lval2->ltype->isunsigned ) {
+                /* The exact integer was the left operand, not this result. */
+                lval->int_const_valid = 0;
                 lval->const_val = calcun(lhs_val_type, lval->const_val, oper, rhs_val_type, lval2->const_val);
                 // Promote char here
                 if ( lval->val_type == KIND_CHAR && lval->const_val >= 256 ) {
@@ -842,6 +844,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                     lval->ltype = type_uint;
                 } 
             } else {
+                lval->int_const_valid = 0;
                 lval->const_val = calc(lhs_val_type, lval->const_val, oper, rhs_val_type, lval2->const_val, is16bit);
                 if ( lval->val_type == KIND_CHAR && (lval->const_val < -127 || lval->const_val > 127) ) {
                     lval->val_type = KIND_INT;
