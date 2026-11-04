@@ -3833,6 +3833,23 @@ void asr_const(LVALUE *lval, int64_t value64)
         } else if ( value == 2 ) { /* 8 bytes, 32T */
             asr_const(lval, 1);
             asr_const(lval, 1);
+        } else if ( value >= 9 && value <= 14 && ulvalue(lval) && c_cpu != CPU_Z80N ) {
+            /* >> 8 is three bytes. H is then zero, so the rest is logical. */
+            int extra;
+
+            ol("ld\tl,h");
+            ol("ld\th,0");
+            for ( extra = 8; extra < value; extra++ ) {
+                if ( IS_8085() )
+                    ol("sra\thl");
+                else if ( IS_8080_CLASS() ) {
+                    ol("ld\ta,l");
+                    ol("and\ta");
+                    ol("rra");
+                    ol("ld\tl,a");
+                } else
+                    ol("srl\tl");
+            }
         } else if ( value != 0 ) {
             if ( c_cpu == CPU_Z80N ) {   // 6 bytes, 22T
                 ol("ex\tde,hl");   // 1, 4T
