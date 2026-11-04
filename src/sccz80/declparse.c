@@ -499,9 +499,11 @@ static int chase_typedef(Type *type)
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
         if (ptr->storage == TYPDEF && amatch(ptr->name)) {
             char wasconst = type->isconst;
+            char wasvolatile = type->isvolatile;
             /* So we've identified it, we should copy it */
             *type = *ptr->ctype;
             type->isconst |= wasconst;
+            type->isvolatile |= wasvolatile;
             if ( type->tag && type->size == -1) 
                 type->size = type->tag->size;
             return 0;
