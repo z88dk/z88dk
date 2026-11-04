@@ -835,13 +835,9 @@ int test(int label, int parens)
     if (lval.is_const) { /* constant expression */
         clearstage(before, 0);
         lval.binop = NULL;
-        if (lval.const_val) {
-            /* true constant, perform body */
-            return lval.const_val;
-        }
-        /* false constant, jump round body */
-      //  gen_jp_label(label);
-        return 0;
+        /* 1 = constant true, 0 = constant false. The value itself is not a
+           tri-state: 2 and 0.5 must not fall through as "not handled". */
+        return lval.const_val != 0;
     }
     
     if (lval.binop == dummy || check_lastop_was_testjump(&lval)) {
