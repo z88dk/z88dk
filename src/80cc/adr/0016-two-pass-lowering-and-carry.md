@@ -62,6 +62,12 @@ re-emitted on a cache miss instead of reloaded from its slot (`--opt-disable=rem
   home) are required for correctness. A stale belief miscompiles the output.
   Historically this is where the subtle residency bugs lived, so new lowering
   paths must maintain the cache and the carry maps, not just emit instructions.
+- **A rung must decide the same in both passes.** Pass 2 drops the stores pass 1
+  found dead, so it can know more about the registers than pass 1 did. A rung
+  that refuses while a cache holds something can then refuse in pass 2 where it
+  fired in pass 1, and read a slot whose store was dropped: `[shl-copy-de]`
+  tested the DEHL cache (#3245). The `[ss-evidence]` check does not catch it,
+  because it skips a use pass 1 recorded as cache-served.
 - This mechanism is what lets ADR 0003's residency *policy* actually pay off
   across control flow: residency picks the home, this render carries it and
   elides the spills.

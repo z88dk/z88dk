@@ -41,6 +41,8 @@ Node *ast_decl(SYMBOL *sym, Node *declvar)
     ret->declvar = declvar;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -51,6 +53,8 @@ Node *ast_undecl(SYMBOL *sym)
     ret->sym = sym;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -64,6 +68,8 @@ Node *ast_function_call(int ast_type, SYMBOL *sym, Type *func_type, array *args)
     ret->args = args;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -76,6 +82,8 @@ Node *ast_local_var(SYMBOL *sym, const char *name)
     ret->type = sym->ctype;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -88,6 +96,8 @@ Node *ast_global_var(SYMBOL *sym, const char *name)
     ret->type = sym->ctype;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -99,6 +109,8 @@ Node *ast_conditional(Node *cond, Node *then, Node *nelse) {
     ret->els = nelse;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -109,6 +121,8 @@ Node *ast_binop(int ast_type, Node *left, Node *right) {
     ret->right = right;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -118,6 +132,8 @@ Node *ast_uop(int ast_type, Node *op) {
     ret->operand = op;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret; 
 }
 
@@ -128,6 +144,8 @@ Node *ast_return(Node *retval, Type *desired_return_type) {
     ret->retval = retval;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret; 
 }
 
@@ -149,6 +167,8 @@ Node *ast_label(int label, const char *slabel)
     ret->labelname = slabel;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -160,6 +180,8 @@ Node *ast_jump(int label, const char *slabel)
     ret->labelname = slabel;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -171,6 +193,8 @@ Node *ast_literal(Type *type, zdouble value)
     ret->zval = value;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -190,6 +214,8 @@ Node *ast_str_lit(int offs)
     ret->zval = (zdouble)offs;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -201,6 +227,8 @@ Node *ast_critical(Node *node)
     ret->operand = node;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -216,6 +244,8 @@ Node *ast_loop_countdown(Node *init, Node *body,
     ret->loop_width8 = width8 ? 1 : 0;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -227,6 +257,8 @@ Node *ast_preserve_bc(Node *child)
     ret->type = child ? child->type : NULL;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -243,6 +275,8 @@ Node *ast_init_static(const char *labelname, int size)
     ret->labelname = labelname;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -257,6 +291,8 @@ Node *ast_asm(const char *text)
     ret->labelname = text ? strdup(text) : strdup("");
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -271,6 +307,8 @@ Node *ast_init_list(array *elems)
     ret->stmts = elems ? elems : array_init(NULL);
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -288,6 +326,8 @@ Node *ast_switch(Type *sw_type, Node *sw_expr, Node *case_code,
     ret->sw_exit_label = exit_label;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
@@ -302,6 +342,8 @@ Node *ast_switch_case(Type *sw_type, Node *value, int label)
     ret->sw_label = label;
     ret->filename = Filename;
     ret->line = lineno;
+    ret->level = ncmp;
+    ret->block = current_block;
     return ret;
 }
 
