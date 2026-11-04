@@ -2520,6 +2520,15 @@ int ir_opt_addr_cse(Func *f)
     return repointed;
 }
 
+/* -debug (ADR 0030): a named local's vreg is its frame slot, so the passes that
+   would drop its stores or change its width leave it alone. Statics (no slot,
+   accessed through their BSS symbol) are not included. */
+static int debug_named_local(const Func *f, int v)
+{
+    return c_debug_adb_defc && v >= 0 && v < f->n_vregs && f->vregs[v].sym
+           && f->vregs[v].sym->storage == STKLOC;
+}
+
 /* sym_offset_fold and vreg_offset_fold migrated to the ir_match
    table as symoff / vregoff_sym / vregoff_imm / vregoff_idx — see
    ir_match.c. */
@@ -2785,9 +2794,13 @@ int ir_opt_dce(Func *f)
             int new_n = 0;
             for (int j = 0; j < bb->n_ops; j++) {
                 Op *op = &bb->ops[j];
+                /* Unlike ir_opt_dead_defs and the mark-sweep, this loop does not
+                   look at IR_VREG_ADDR_TAKEN; under -debug a named local's def is
+                   its slot store even when every reader has been forwarded. */
                 int is_dead = (op->dst >= 0 && op->dst < f->n_vregs
                                && use_count[op->dst] == 0
-                               && dce_pure_kind(op));
+                               && dce_pure_kind(op)
+                               && !debug_named_local(f, op->dst));
                 if (is_dead) { pass_changed++; continue; }
                 if (new_n != j) bb->ops[new_n] = bb->ops[j];
                 new_n++;
@@ -4666,6 +4679,7 @@ int ir_opt_narrow_byte(Func *f)
         for (int d = 0; d < f->n_vregs; d++) {
             if (!hasdef[d] || bad[d]) continue;
             if (f->vregs[d].width != 2) continue;
+            if (debug_named_local(f, d)) continue;   /* its record keeps the declared width */
             if (demands_low_byte_only(f, d) || bitop_of_bytes(f, d)) {
                 f->vregs[d].width = 1;
                 f->vregs[d].kind  = KIND_CHAR;   /* keep kind/width consistent */
@@ -5560,6 +5574,7 @@ int ir_opt_reassoc_reduction(Func *f)
             Op saved_ld[RR_MAX_CHAIN];
             for (int i = 0; i < leaf_n; i++) saved_ld[i] = bb->ops[ord_ld[i]];
             const char *afile = bb->ops[h].file; int aline = bb->ops[h].line;
+            int alevel = bb->ops[h].level, ablock = bb->ops[h].block;
             /* Write the interleaved pairs into the front of the span; NOP-fill
                the trailing slots vacated by the dropped dead temps. */
             int w = span_lo;
@@ -5571,6 +5586,7 @@ int ir_opt_reassoc_reduction(Func *f)
                 ad->dst = acc; ad->src[0] = acc; ad->src[1] = ord_leaf[i];
                 ad->mem.base = -1;
                 ad->file = afile; ad->line = aline;
+                ad->level = alevel; ad->block = ablock;
             }
             for (; w <= span_hi; w++) {
                 Op *nop = &bb->ops[w];
@@ -6141,6 +6157,7 @@ int ir_opt_rmw_narrow(Func *f)
             int x = bo->src[0];
             if (x < 0 || x >= nv || f->vregs[x].width != w) continue;
             if (usecnt[x] != 1 || defcnt[x] != 1) continue;
+            if (debug_named_local(f, x) || debug_named_local(f, r)) continue;
             int ja = rw_find_def(bb, jb, x);
             if (ja < 0) continue;
             Op *ld = &bb->ops[ja];
