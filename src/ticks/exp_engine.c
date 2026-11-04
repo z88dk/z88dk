@@ -29,7 +29,7 @@ struct {
     {"long",            1,              TYPE_LONG},
     {"uint32_t",        0,              TYPE_LONG},
     {"unsigned long",   0,              TYPE_LONG},
-    {"float",           0,              TYPE_FLOAT},
+    {"float",           1,              TYPE_FLOAT},
     {NULL,              0,              TYPE_UNKNOWN},
 };
 
@@ -107,6 +107,7 @@ void expression_value_to_pointer(struct expression_result_t *from, struct expres
 
 void expression_primitive_func_call_1(const char* call, struct expression_result_t* a, struct expression_result_t* to) {
     if (is_expression_result_error(a)) {
+        zero_expression_result(to);
         set_expression_result_error(to);
         snprintf(to->as_error, sizeof(to->as_error), "Can not obtain sizeof: %s", a->as_error);
         return;
@@ -122,6 +123,7 @@ void expression_primitive_func_call_1(const char* call, struct expression_result
         return;
     }
 
+    zero_expression_result(to);
     set_expression_result_error(to);
     sprintf(to->as_error, "Unknown function call: %s", call);
 }
@@ -172,8 +174,8 @@ void expression_dereference_pointer(struct expression_result_t *from, struct exp
             break;
         }
         case TYPE_FLOAT: {
-            set_expression_result_error(to);
-            sprintf(to->as_error, "Cannot dereference float (not implemented)");
+            free_type(to->type.first);
+            debug_resolve_expression_element(&from->type, from->type.first->next, RESOLVE_BY_POINTER, from->as_pointer.ptr, to);
             break;
         }
         default: {

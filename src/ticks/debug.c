@@ -20,6 +20,9 @@ static debug_sym_symbol* cdb_global_symbols = NULL;
 static debug_sym_file* cdb_files = NULL;
 
 static debug_sym_type* cdb_ctypes = NULL;
+/* The width of a float, from the last record that gave one. A record does not
+   give it for a float behind a pointer or a function, nor does a cast. */
+static int cdb_float_size = 4;
 static cline *clines[65536] = {0};
 /* Source lines of banked code, indexed by bank (address >> 16) then by the
    address in the bank window. The arrays are allocated when a bank has lines. */
@@ -247,6 +250,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                     }
                     case 'F': {
                         last->type_ = TYPE_FLOAT;
+                        last->size = 0;     // its width, set below when the record gives it
                         break;
                     }
                     case 'T': {
@@ -310,6 +314,20 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                 bk.debug("Warning: data after sign.\n");
                 goto err;
             }
+        }
+    }
+
+    /* A float's width is the record's size, divided by the element count of
+       each array in front of it */
+    {
+        int width = (int)record->size;
+        type_chain* c;
+        for (c = record->first; c != NULL && c->type_ == TYPE_ARRAY; c = c->next) {
+            width = c->size > 0 ? width / c->size : 0;
+        }
+        if (c != NULL && c->type_ == TYPE_FLOAT && width > 0) {
+            c->size = width;
+            cdb_float_size = width;
         }
     }
 
@@ -929,6 +947,7 @@ type_chain* malloc_type(enum type_record_type type) {
     result->next = NULL;
     result->data = NULL;
     result->type_ = type;
+    result->size = 0;
     result->size = get_type_memory_size(result);
     return result;
 }
@@ -1035,7 +1054,9 @@ int get_type_memory_size(type_chain* chain) {
         case TYPE_SHORT: {
             return 2;
         }
-        case TYPE_FLOAT:
+        case TYPE_FLOAT: {
+            return chain->size > 0 ? chain->size : cdb_float_size;
+        }
         case TYPE_LONG: {
             return 4;
         }
@@ -1046,6 +1067,97 @@ int get_type_memory_size(type_chain* chain) {
             return 0;
         }
     }
+}
+
+enum float_format {
+    FLOAT_FORMAT_UNSUPPORTED = 0,
+    FLOAT_FORMAT_IEEE32,        // IEEE 754 binary32
+    FLOAT_FORMAT_Z80_48,        // math48 and genmath
+};
+
+/* The format of a float of size bytes. A record does not say it, but a map
+   names the float library that was linked with a non-zero
+   __code_fp_<lib>_size, or for z88_math, its FP_ codes. math16 is not listed:
+   it is _Float16, not float. */
+static enum float_format debug_float_format(int size, const char** lib)
+{
+    static const struct {
+        const char*         lib;
+        int                 size;       // 0: no format read here
+        enum float_format   format;
+    } float_libraries[] = {
+        { "math48", 6, FLOAT_FORMAT_Z80_48 },
+        { "math48", 4, FLOAT_FORMAT_IEEE32 },   // zsdcc's float with math48
+        { "math32", 4, FLOAT_FORMAT_IEEE32 },
+        { "am9511", 4, FLOAT_FORMAT_IEEE32 },
+        { "bbc",    0, FLOAT_FORMAT_UNSUPPORTED },
+        { "mbf32",  0, FLOAT_FORMAT_UNSUPPORTED },
+        { "mbf64",  0, FLOAT_FORMAT_UNSUPPORTED },
+        { "dai32",  0, FLOAT_FORMAT_UNSUPPORTED },
+    };
+    int i;
+
+    *lib = NULL;
+    for (i = 0; i < (int)(sizeof(float_libraries) / sizeof(float_libraries[0])); i++) {
+        char name[64];
+        snprintf(name, sizeof(name), "__code_fp_%s_size", float_libraries[i].lib);
+        if (symbol_resolve(name, NULL) > 0) {
+            *lib = float_libraries[i].lib;
+            if (float_libraries[i].size == size) {
+                return float_libraries[i].format;
+            }
+        }
+    }
+    if (*lib != NULL) {
+        return FLOAT_FORMAT_UNSUPPORTED;
+    }
+
+    /* z88_math, the z88's native maths (z88 format), has no fp_<lib> section,
+       but its modules call the floating point package with FP_ codes */
+    {
+        static const char* fpp_codes[] = {
+            "FP_ABS", "FP_ACS", "FP_ADD", "FP_ASN", "FP_ATN", "FP_COS", "FP_DIV", "FP_EQ",
+            "FP_EXP", "FP_FIX", "FP_FLT", "FP_GEQ", "FP_GT", "FP_INT", "FP_LEQ", "FP_LN",
+            "FP_LOG", "FP_LT", "FP_MUL", "FP_NEG", "FP_PI", "FP_PWR", "FP_SIN", "FP_SQR",
+            "FP_STR", "FP_SUB", "FP_TAN", "FP_VAL", NULL
+        };
+        for (i = 0; fpp_codes[i] != NULL; i++) {
+            if (symbol_resolve((char*)fpp_codes[i], NULL) >= 0) {
+                *lib = "z88_math";
+                return FLOAT_FORMAT_UNSUPPORTED;
+            }
+        }
+    }
+
+    /* No float library named: a program that links no float code, or
+       genmath, genmath_zx81 and the ROM maths (mzx, m81, mlambda, cpc_math),
+       which have no fp_<lib> section and store the z80 48-bit format */
+    switch (size) {
+        case 4: return FLOAT_FORMAT_IEEE32;
+        case 6: return FLOAT_FORMAT_Z80_48;
+        default: return FLOAT_FORMAT_UNSUPPORTED;
+    }
+}
+
+/* A 40-bit mantissa, little-endian, with its leading 1 implied and the sign in
+   bit 7 of byte 4; byte 5 is the exponent biased by 128, 0 for zero. Scaled
+   without ldexp(): z88dk-dis links without -lm. */
+static float debug_float_from_z80_48(const uint8_t* b)
+{
+    double v;
+    int exponent;
+
+    if (b[5] == 0) {
+        return 0;
+    }
+    v = (double)(((uint64_t)(b[4] | 0x80) << 32) | ((uint32_t)b[3] << 24) | ((uint32_t)b[2] << 16) | ((uint32_t)b[1] << 8) | b[0]);
+    for (exponent = b[5] - 128 - 40; exponent > 0; exponent--) {
+        v *= 2;
+    }
+    for (; exponent < 0; exponent++) {
+        v /= 2;
+    }
+    return (float)((b[4] & 0x80) ? -v : v);
 }
 
 void debug_resolve_expression_element(type_record* record, type_chain* chain, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into) {
@@ -1153,6 +1265,36 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
             }
             break;
 
+        case TYPE_FLOAT: {
+            int size = get_type_memory_size(chain);
+            const char* lib;
+            enum float_format format = debug_float_format(size, &lib);
+            uint8_t b[6];
+            int i;
+
+            if (resolve_by != RESOLVE_BY_POINTER) {
+                snprintf(into->as_error, sizeof(into->as_error), "Cannot read a float returned by value (not implemented)");
+                set_expression_result_error(into);
+                break;
+            }
+            if (format == FLOAT_FORMAT_UNSUPPORTED) {
+                snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (%d bytes%s%s)",
+                    size, lib ? ", " : "", lib ? lib : "");
+                set_expression_result_error(into);
+                break;
+            }
+            for (i = 0; i < size; i++) {
+                b[i] = bk.get_memory(data + i, MEM_TYPE_DATA);
+            }
+            into->memory_location = data;
+            if (format == FLOAT_FORMAT_IEEE32) {
+                uint32_t v = b[0] | ((uint32_t)b[1] << 8) | ((uint32_t)b[2] << 16) | ((uint32_t)b[3] << 24);
+                memcpy(&into->as_float, &v, sizeof(v));
+            } else {
+                into->as_float = debug_float_from_z80_48(b);
+            }
+            break;
+        }
         case TYPE_STRUCTURE: {
             into->memory_location = data;
             into->as_pointer.ptr = data;
