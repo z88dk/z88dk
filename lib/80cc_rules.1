@@ -297,6 +297,8 @@
 ;; reset overwrites SP. What the cleanup left in HL or BC was junk, so leaving
 ;; those registers alone is no change. A return-value load or the DE-preserving
 ;; `ex de,hl` pair between the cleanup and the reset is kept as it was.
+;; A `pop bc` is not junk when the return-value load READS BC (`ld hl,bc`): it is
+;; the restore of a saved BC, e.g. after an inlined memcpy, so that load blocks the rule.
 %title #FRC drop call cleanup before the frame reset (-4b)
 	ld	hl,%1
 	add	hl,sp
@@ -306,7 +308,7 @@
 	ld	sp,ix
 
 %title #FRC drop call cleanup before a return-value load and the frame reset (-4b)
-%not %2 sp hl "(hl)" "hl[+-][0-9]+"
+%not %2 sp hl (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]" "[(]sp[+-][0-9]+[)]"
 	ld	hl,%1
 	add	hl,sp
 	ld	sp,hl
@@ -333,7 +335,7 @@
 	ld	sp,ix
 
 %title #FRC drop a pop bc cleanup before a return-value load and the frame reset (-1b)
-%not %1 sp hl "(hl)" "hl[+-][0-9]+"
+%not %1 sp hl bc "(hl)" "hl[+-][0-9]+" "[(]sp[+-][0-9]+[)]"
 	pop	bc
 	ld	hl,%1
 	ld	sp,ix
