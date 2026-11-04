@@ -2825,7 +2825,12 @@ static int shl_word_copy_de_ok(const Func *f, const Op *op)
     if (vreg_is_pr_stack(f, t) || vreg_is_pr_de(f, t) || vreg_is_pr_de(f, x)
         || (f->vregs[t].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)))
         return 0;
-    if (L.rs.dehl >= 0 || L.cur_de_byte_home_vreg >= 0 || bc_has(x))
+    /* No test of the DEHL cache: it is only a belief (invalidate_de_cache
+       drops it before the copy), and it is what lazy spill changes between
+       the passes. A store pass 1 keeps can clobber DE; pass 2 drops it, so
+       DEHL still holds a long there. Refusing then would make the add reload
+       x from the slot whose store pass 1 found dead. */
+    if (L.cur_de_byte_home_vreg >= 0 || bc_has(x))
         return 0;
     if (ir_home_at(f, x) != IR_PR_SPILL && ir_home_at(f, x) != IR_PR_STACK)
         return 0;                                   /* x reads from its own home */

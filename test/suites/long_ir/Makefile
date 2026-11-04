@@ -6378,3 +6378,50 @@ gbleastore_8080.bin: $(SOURCES) gbleastore.c
 gbleastore_8085.bin: $(SOURCES) gbleastore.c
 	$(compile_8085)
 	$(runtest_8085)
+
+# [shl-copy-de] same decision in both lazy-spill passes (`(int)l * 3`); the rung is off on 8085, kc160, rabbit.
+all: shlcopy2pass.bin shlcopy2pass_fp.bin shlcopy2pass_z180.bin shlcopy2pass_ez80_z80.bin shlcopy2pass_z80n.bin shlcopy2pass_r800.bin shlcopy2pass_8080.bin shlcopy2pass_gbz80.bin shlcopy2pass_8085.bin shlcopy2pass_kc160.bin shlcopy2pass_r2ka.bin
+
+shlcopy2pass.bin: $(SOURCES) shlcopy2pass.c
+	$(compile)
+	$(runtest)
+
+shlcopy2pass_fp.bin: $(SOURCES) shlcopy2pass.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+shlcopy2pass_z180.bin: $(SOURCES) shlcopy2pass.c
+	$(compile_z180)
+	$(runtest_z180)
+
+shlcopy2pass_ez80_z80.bin: $(SOURCES) shlcopy2pass.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+shlcopy2pass_z80n.bin: $(SOURCES) shlcopy2pass.c
+	$(compile_z80n)
+	$(runtest_z80n)
+
+shlcopy2pass_r800.bin: $(SOURCES) shlcopy2pass.c
+	$(compile_r800)
+	$(runtest_r800)
+
+shlcopy2pass_8080.bin: $(SOURCES) shlcopy2pass.c
+	$(compile_8080)
+	$(runtest_8080)
+
+shlcopy2pass_gbz80.bin: $(SOURCES) shlcopy2pass.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+shlcopy2pass_8085.bin: $(SOURCES) shlcopy2pass.c
+	$(compile_8085)
+	$(runtest_8085)
+
+shlcopy2pass_kc160.bin: $(SOURCES) shlcopy2pass.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+shlcopy2pass_r2ka.bin: $(SOURCES) shlcopy2pass.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
