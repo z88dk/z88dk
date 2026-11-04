@@ -3353,6 +3353,29 @@
 	ld	hl,%2
 	jr	%3z,%4
 
+;; Signed HL <= 0 returns through jr c,ASMPC+6 / or l / jr nz / scf.
+;; The shorter rewrite below moves ld hl,0 under that jr c, so a
+;; negative value returns HL unchanged. Match the whole test first.
+;; jr c,ASMPC+8 skips or l, ld hl,0 and jr nz (6 bytes) onto ld hl,1.
+;; jr nz,ASMPC+5 skips ld hl,1 (3 bytes). ld does not change flags.
+%title Signed int <= 0 as HL
+	ld	a,h
+	rlca
+	jr	c,ASMPC+6
+	or	l
+	jr	nz,ASMPC+3
+	scf
+	ld	hl,0	;const
+	rl	l
+=
+	ld	a,h
+	rlca
+	jr	c,ASMPC+8
+	or	l
+	ld	hl,0	;const
+	jr	nz,ASMPC+5
+	ld	hl,1	;const
+
 	jr	nz,ASMPC+3
 	scf
 	ld	hl,0	;const

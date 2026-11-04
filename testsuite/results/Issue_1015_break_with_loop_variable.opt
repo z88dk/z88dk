@@ -30,9 +30,14 @@
 	push	bc
 	push	bc
 	call	l_gint4sp	;
-	ld	de,5
-	ex	de,hl
-	call	l_ge
+	ld	a,l
+	sub	5
+	ld	a,h
+	rla
+	ccf
+	rra
+	sbc	128
+	ccf
 	jp	nc,i_5	;
 	pop	bc
 	pop	bc

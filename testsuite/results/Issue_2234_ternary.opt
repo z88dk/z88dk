@@ -10,9 +10,13 @@
 
 ._varassign_direct_nonconst
 	call	_testfunc
-	ld	de,0
-	ex	de,hl
-	call	l_gt
+	ld	a,h
+	rlca
+	jr	c,ASMPC+6
+	or	l
+	jr	nz,ASMPC+3
+	scf
+	ccf
 	jp	nc,i_2	;
 	ld	hl,2	;const
 	jp	i_3	;

@@ -4693,6 +4693,66 @@ void zne(LVALUE* lval)
 }
 
 
+/* Carry means signed HL < value. The rotates bias H by 0x8000. */
+static void cmp_signed_lt(uint32_t value)
+{
+    ol("ld\ta,l");
+    outfmt("\tsub\t%d\n", ((uint32_t)value % 256) & 0xff);
+    ol("ld\ta,h");
+    ol("rla");
+    ol("ccf");
+    ol("rra");
+    outfmt("\tsbc\t%d\n", (0x80 + ((uint32_t)value / 256)) & 0xff);
+}
+
+/* Carry means signed HL > value. H is biased, then subtracted from
+   the biased constant. */
+static void cmp_signed_gt(uint32_t value)
+{
+    unsigned hi = (0x80 + ((value >> 8) & 0xff)) & 0xff;
+
+    ol("ld\ta,h");
+    ol("xor\t128");
+    ol("ld\th,a");
+    outfmt("\tld\ta,%d\n", value & 0xff);
+    ol("sub\tl");
+    /* ld a,0 is rewritten to xor a, which clears the borrow from sub. */
+    if ( hi == 0 )
+        ol("ld\ta,0\t;carry");
+    else
+        outfmt("\tld\ta,%d\n", hi);
+    ol("sbc\th");
+}
+
+/* Carry means signed L > value. */
+static void cmp_schar_gt(uint32_t value)
+{
+    ol("ld\ta,l");
+    ol("xor\t128");
+    ol("ld\tl,a");
+    outfmt("\tld\ta,%d\n", (0x80 + (value % 256)) % 256);
+    ol("sub\tl");
+}
+
+/* Signed HL <= 0. rlca leaves the sign in carry, and the jumps land
+   on the instruction after scf. A ccf placed immediately after scf
+   inverts the test. On 808x the jump is three bytes. */
+static void cmp_signed_le0(void)
+{
+    ol("ld\ta,h");
+    ol("rlca");
+    if ( IS_808x() ) {
+        ol("jp\tc,ASMPC+8");
+        ol("or\tl");
+        ol("jp\tnz,ASMPC+4");
+    } else {
+        ol("jr\tc,ASMPC+6");
+        ol("or\tl");
+        ol("jr\tnz,ASMPC+3");
+    }
+    ol("scf");
+}
+
 void zlt_const(LVALUE *lval, int64_t value64)
 {
     uint32_t value = (uint32_t)value64;
@@ -4904,20 +4964,40 @@ void zle_const(LVALUE *lval, int64_t value64)
         llpush();
         vllongconst(value64);
         zle(lval);
-    } else {
-        if ( value ==  0 && !IS_808x() ) {
-            ol("ld\ta,h"); // 8 bytes
-            ol("rlca");
-            ol("jr\tc,ASMPC+6");
-            ol("or\tl"); // We know MSBit was 0, so no point shifting it back in
-            ol("jr\tnz,ASMPC+3");
-            ol("scf");
-            set_carry(lval);
+    } else if ( lval->val_type == KIND_CHAR ) {
+        cmp_schar_gt(value);
+        ol("ccf");
+        set_carry(lval);
+    } else if ( value == 0 && !ulvalue(lval) && !IS_808x() ) {
+        ol("ld\ta,h"); // 8 bytes
+        ol("rlca");
+        ol("jr\tc,ASMPC+6");
+        ol("or\tl"); // We know MSBit was 0, so no point shifting it back in
+        ol("jr\tnz,ASMPC+3");
+        ol("scf");
+        set_carry(lval);
+    } else if ( value == 0 && !ulvalue(lval) && lval->val_type == KIND_INT ) {
+        cmp_signed_le0();
+        set_carry(lval);
+    } else if ( value == 0 && ulvalue(lval) ) {
+        /* Unsigned <= 0 is == 0. The sign test mis-reads a set top bit. */
+        ol("ld\ta,h");
+        ol("or\tl");
+        if ( IS_808x() ) {
+            ol("jp\tnz,ASMPC+4");
         } else {
-            const2(value & 0xffff);  // 7 bytes
-            swap();
-            zle(lval);
+            ol("jr\tnz,ASMPC+3");
         }
+        ol("scf");
+        set_carry(lval);
+    } else if ( !ulvalue(lval) && lval->val_type == KIND_INT ) {
+        cmp_signed_gt(value);
+        ol("ccf");
+        set_carry(lval);
+    } else {
+        const2(value & 0xffff);  // 7 bytes
+        swap();
+        zle(lval);
     }
 }
 
@@ -5031,6 +5111,9 @@ void zgt_const(LVALUE *lval, int64_t value64)
         outfmt("\tld\ta,%d\n", (value % 256));
         ol("sub\tl");
         set_carry(lval);
+    } else if ( lval->val_type == KIND_CHAR ) {
+        cmp_schar_gt(value);
+        set_carry(lval);
     } else if ( value == 0 && lval->val_type == KIND_INT && ulvalue(lval)) {
         ol("ld\ta,h");
         ol("or\tl");
@@ -5041,10 +5124,17 @@ void zgt_const(LVALUE *lval, int64_t value64)
         }
         ol("scf");
         set_carry(lval);
+    } else if ( value == 0 && lval->val_type == KIND_INT ) {
+        cmp_signed_le0();
+        ol("ccf");
+        set_carry(lval);
     } else if ( lval->val_type == KIND_LONGLONG) {
         llpush();
         vllongconst(value64);
         zgt(lval);
+    } else if ( !ulvalue(lval) && lval->val_type == KIND_INT ) {
+        cmp_signed_gt(value);
+        set_carry(lval);
     } else {
         const2(value & 0xffff);  // 7 bytes
         swap();
@@ -5152,7 +5242,7 @@ void zge_const(LVALUE *lval, int64_t value64)
         } else {
             ol("ld\ta,l");
             ol("xor\t128");
-            outfmt("\tsub\t%d\n", 128 | ( value % 256));
+            outfmt("\tsub\t%d\n", (0x80 + (value % 256)) % 256);
             ol("ccf");
         }
         set_carry(lval);
@@ -5170,21 +5260,14 @@ void zge_const(LVALUE *lval, int64_t value64)
                 ol("ccf");
             }
             set_carry(lval);
+        } else if ( !ulvalue(lval) && lval->val_type == KIND_INT ) {
+            cmp_signed_lt(value);
+            ol("ccf");
+            set_carry(lval);
         } else {
-            if ( value == 0 ) {
-                if ( ulvalue(lval) ) {
-                    ol("scf"); // Should not reach here
-                } else {
-                    ol("ld\ta,h");
-                    ol("rla");
-                    ol("ccf");
-                }
-                set_carry(lval);
-            } else {
-                const2(value & 0xffff);  // 7 bytes
-                swap();
-                zge(lval);
-            }
+            const2(value & 0xffff);  // 7 bytes
+            swap();
+            zge(lval);
         }
     }
 }
