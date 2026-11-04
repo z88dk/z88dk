@@ -1010,6 +1010,8 @@ int declare_local(int local_static)
         if ( local_static ) {
             char  namebuf[NAMESIZE * 2 + 10];
             snprintf(namebuf, sizeof(namebuf),"st_%s_%s", currfn->name, type->name);
+            int pending = debug_size_pending(type);
+
             sym = addglb(namebuf, type, ID_VARIABLE, type->kind, 0, LSTATIC);
             if ( cmatch('=')) {
                 sym->isassigned = 1;
@@ -1017,6 +1019,9 @@ int declare_local(int local_static)
                 initials(namebuf, type);                
             } else {
                 sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
+            }
+            if ( pending ) {
+                debug_write_symbol(sym);
             }
         } else {
             int size = type->size;
@@ -1094,6 +1099,8 @@ int declare_local(int local_static)
                     gen_store_to_tos(type->kind);
                 }
             }
+            // Written here: an initialised array has its final offset and size only now
+            debug_write_symbol(sym);
         }
     } while ( cmatch(','));
     needchar(';');
@@ -1156,6 +1163,9 @@ Type *dodeclare(enum storage_type storage)
             return type;
         }
 
+        // A file static sized by its initialiser gets its record once sized; other globals get theirs at the end of the file
+        int pending = storage == LSTATIC && debug_size_pending(type);
+
         sym = addglb(type->name, type, ID_VARIABLE, type->kind, 0, storage);
         sym->isassigned = 1; // Assigned to 0
      
@@ -1201,9 +1211,15 @@ Type *dodeclare(enum storage_type storage)
         if ( cmatch(';')) {
              // Maybe not right
             sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
+            if ( pending ) {
+                debug_write_symbol(sym);
+            }
             return type;
         } else if ( cmatch(',')) {
             sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
+            if ( pending ) {
+                debug_write_symbol(sym);
+            }
             continue;
         } 
 
@@ -1216,6 +1232,9 @@ Type *dodeclare(enum storage_type storage)
         needchar('=');
         sym->initialised = 1;
         alloc_size = initials(drop_name, type);
+        if ( pending ) {
+            debug_write_symbol(sym);
+        }
 
         if ( sym->flags & ASSIGNED_ADDR ) {
             // Copy from local to the supplied address
@@ -2041,6 +2060,16 @@ static void declfunc(Type *functype, enum storage_type storage)
         }
     }
     
+    // Parameter records are written once their offsets are final (a fastcall
+    // parameter has just been moved below the frame)
+    {
+        SYMBOL *ptr;
+
+        for ( ptr = STARTLOC; ptr < locptr; ptr++ ) {
+            debug_write_symbol(ptr);
+        }
+    }
+
     stackargs = where;
     lastst = STEXP;
 
