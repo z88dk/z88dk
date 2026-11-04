@@ -597,14 +597,17 @@ void prestep(
             break;
         case KIND_LONG:
         case KIND_ACCUM32:
-            (*step)(lval);
+            zadd_const(lval, n * 4);
+            break;
         case KIND_CPTR:
-            (*step)(lval);
+            zadd_const(lval, n * 3);
+            break;
         case KIND_INT:
         case KIND_FLOAT16:
         case KIND_PTR:
         case KIND_ACCUM16:
-            (*step)(lval);
+            zadd_const(lval, n * 2);
+            break;
         default:
             (*step)(lval);
             break;
