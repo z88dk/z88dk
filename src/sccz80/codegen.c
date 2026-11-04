@@ -165,6 +165,7 @@ void gen_file_header(void)
 
     donelibheader = 0;
     nl();
+    nl();    /* ctime() used to leave this blank after the ';' lines are stripped */
 }
 
 
