@@ -672,6 +672,9 @@ void doreturn(char type)
     /* if not end of statement, get an expression */
     if (endst() == 0) {
         char *before, *start;
+
+        if (currfn->ctype->return_type->kind == KIND_VOID)
+            errorfmt("Returning a value from a void function", 0);
         zdouble val;
         int    vconst;
         Type   *type_ptr;
