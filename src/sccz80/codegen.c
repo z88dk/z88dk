@@ -2590,7 +2590,7 @@ void mult(LVALUE* lval)
                 ot("ex\tde,hl\n");
                 break;
             } else if ( (c_cpu & CPU_RABBIT) ) {
-                // For Rabbit we want to use the mul instruction
+                /* copt turns call l_mult into mul, also at -O0. */
             } else if ( c_speed_optimisation & OPT_UCHAR_MULT ) {
                 int label1 = getlabel();
                 int label2 = getlabel();
@@ -4610,7 +4610,7 @@ void zlt_const(LVALUE *lval, int64_t value64)
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 ) {
             if ( ulvalue(lval) ) {
-                ol("and\ta"); // Should not reach here
+                ol("and\ta");
             } else {
                 ol("ld\ta,d");
                 ol("rla");
@@ -4662,7 +4662,7 @@ void zlt_const(LVALUE *lval, int64_t value64)
     } else if ( lval->val_type == KIND_INT || lval->val_type == KIND_PTR ) {
         if ( value == 0 ) {
             if ( ulvalue(lval) ) {
-                ol("and\ta"); // Should not reach here
+                ol("and\ta");
                 set_carry(lval);
             } else {
                 ol("ld\ta,h");
@@ -5104,7 +5104,7 @@ void zge_const(LVALUE *lval, int64_t value64)
     } else {
         if ( value == 0 ) {
             if ( ulvalue(lval) ) {
-                ol("scf"); // Should not reach here
+                ol("scf");
             } else {
                 ol("ld\ta,h");
                 ol("rla");

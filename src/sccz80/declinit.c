@@ -538,11 +538,6 @@ constdecl:
                     outdec(value);
                 }
                 nl();
-                /* Dump out a train of zeros as appropriate */
-                // if (ident == ID_ARRAY && more == 0) {
-                //     dumpzero(size, (dim) - 1);
-                // }
-
             }
         } else {
             lptr = klptr;

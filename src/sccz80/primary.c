@@ -25,7 +25,6 @@ int primary(LVALUE* lval)
             k = heir1(lval);
         } while (cmatch(','));
         needchar(')');
-        //if ( k == 1 && lval->cast_type) docast(lval, lval);
         return k;
     }
 
