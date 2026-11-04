@@ -2879,44 +2879,6 @@ void zmod(LVALUE* lval)
     }
 }
 
-void negate_if_negative(LVALUE *lval, int64_t value)
-{
-    int label;
-    // Only need to consider int handling here
-    // We're called for parameters on the lowest byte, so only need to consider l
-    if ( ulvalue(lval) )
-        return;
-    label = getlabel();
-    if ( lval->val_type == KIND_LONG ) {
-        if ( IS_808x() ) {
-            ol("ld\ta,d");
-            ol("rla");
-            ot("jp\tnc,");
-        } else {
-            ol("bit\t7,d");
-            ot("jr\tz,");
-        }
-        printlabel(label);
-        nl();
-    } else {
-        if ( IS_808x() ) {
-            ol("ld\ta,h");
-            ol("rla");
-            ot("jp\tnc,");
-        } else {
-            ol("bit\t7,h");
-            ot("jr\tz,");
-        }
-        printlabel(label);
-        nl();
-    }
-    ol("ld\ta,l");
-    ol("cpl");
-    ol("inc\ta");
-    ol("ld\tl,a");
-    postlabel(label);
-}
-
 void zmod_const(LVALUE *lval, int64_t value64)
 {
     LVALUE  templval={0};
@@ -2980,40 +2942,28 @@ void zmod_const(LVALUE *lval, int64_t value64)
             vconst(0);
             break;
         case 2:
-            negate_if_negative(lval, 1);
             zand_const(&templval,1);
             break;
         case 4:
-            negate_if_negative(lval, 3);
             zand_const(&templval, 3);
             break;
         case 8:
-            negate_if_negative(lval, 7);
             zand_const(&templval,7);
             break;
         case 16:
-            negate_if_negative(lval, 15);
             zand_const(&templval,15);
             break;
         case 32:
-            negate_if_negative(lval, 31);
             zand_const(&templval, 31);
             break;
         case 64:
-            negate_if_negative(lval, 63);
             zand_const(&templval,63);
             break;
         case 128:
-            negate_if_negative(lval, 127);
             zand_const(&templval,127);
             break;
         case 256:
-            if ( ulvalue(lval) ) {
-                ol("ld\th,0");
-            } else {
-                negate_if_negative(lval, 255);
-                ol("ld\th,0");
-            }
+            ol("ld\th,0");
             break;
         default:
             const2(value & 0xffff);
