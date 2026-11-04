@@ -612,6 +612,97 @@ void offset_of(LVALUE *lval)
 
 }
 
+/* A type word, or a typedef, is not an expression operand. */
+static int sizeof_type_word(const char *sname)
+{
+    static const char *words[] = {
+        "const", "volatile", "register", "auto", "signed", "unsigned",
+        "char", "int", "short", "long", "float", "double", "void",
+        "enum", "struct", "union", "far", "near", "__sfr", "__banked",
+        "_Float16", "_Accum",
+        NULL
+    };
+    const char **w;
+    SYMBOL *sym;
+
+    for (w = words; *w != NULL; w++) {
+        if (strcmp(sname, *w) == 0)
+            return 1;
+    }
+    for (sym = symtab; sym != NULL; sym = sym->hh.next) {
+        if (sym->storage == TYPDEF && strcmp(sym->name, sname) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+/* 1 when the operand is an expression whose code must be discarded.
+   This only looks at line[]. symname() would echo into a call's
+   argument file, and that file is parsed again.
+   sizeof n + 1 has no parentheses, so it stays (sizeof n) + 1. */
+static int sizeof_is_expression(int brackets)
+{
+    int p = lptr;
+    char sname[NAMESIZE];
+    int k = 0;
+    char c;
+
+    while (line[p] == ' ' || line[p] == '\t')
+        p++;
+    if (line[p] == 0)
+        return 0;
+    while (line[p] == '*') {
+        p++;
+        while (line[p] == ' ' || line[p] == '\t')
+            p++;
+        if (line[p] == 0)
+            return 0;
+    }
+    c = line[p];
+    if (c == '"' || c == ')' )
+        return 0;
+    if (c == '\'' || c == '(' || c == '.' || numeric(c))
+        return 1;
+    if (alpha(c) == 0)
+        return 1;
+    while (an(line[p])) {
+        if (k < (NAMESIZE - 1))
+            sname[k++] = line[p];
+        p++;
+    }
+    sname[k] = 0;
+    if (sizeof_type_word(sname))
+        return 0;
+    /* No parentheses: the operand is one unary expression (sizeof n + 1). */
+    if (brackets == 0)
+        return 0;
+    while (line[p] == ' ' || line[p] == '\t')
+        p++;
+    c = line[p];
+    if (c == 0 || c == ')' || c == '.' || (c == '-' && line[p + 1] == '>'))
+        return 0;
+    return 1;
+}
+
+/* Parse a sizeof operand as an expression. Keep the type, drop the code. */
+static void size_of_expression(LVALUE *lval)
+{
+    char *before, *start;
+    LVALUE ev = {0};
+    int savesp = Zsp;
+
+    setstage(&before, &start);
+    heir1(&ev);
+    clearstage(before, 0);
+    Zsp = savesp;
+    if (ev.ltype == NULL) {
+        errorfmt("Cannot evaluate sizeof", 0);
+        lval->const_val = 2;
+        return;
+    }
+    lval->const_val = ev.ltype->size;
+}
+
 /* Perform a sizeof (works on variables as well */
 void size_of(LVALUE* lval)
 {
@@ -626,6 +717,11 @@ void size_of(LVALUE* lval)
         brackets = 1;
         needchar('(');        
     }
+    /* An expression is parsed and discarded. A type, a string, or a
+       plain name stays on the path below. */
+    if (sizeof_is_expression(brackets)) {
+        size_of_expression(lval);
+    } else {
     while ( cmatch('*') ) {
         deref++;
     }
@@ -730,8 +826,11 @@ void size_of(LVALUE* lval)
             errorfmt("Unknown symbol: %s", 1, sname);
         }
     }
+    } /* type, string, or plain name */
     if ( brackets )
         needchar(')');
+    /* sizeof yields an int. The expression path does not set this above. */
+    lval->ltype = type_int;
     lval->is_const = 1;
     lval->val_type = KIND_INT;
     lval->ptr_type = KIND_NONE;
