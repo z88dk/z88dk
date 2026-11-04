@@ -105,6 +105,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
 
     record->size = size;
     record->first = NULL;
+    record->signed_ = 0;
     rt += end;
 
     enum record_partning_mode mode = RECORD_PARSING_MODE_BEGIN;
@@ -131,6 +132,8 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                     next->size = 1;
                     next->data = NULL;
                     next->next = NULL;
+                    next->bit_start = 0;
+                    next->bit_width = 0;
                     last = next;
                 }
 
@@ -223,6 +226,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                     SV	void
                     SF	float
                     ST<name> Structure of name <name>
+                    SB<start>$<width> Bitfield
                  */
 
                 mode = RECORD_PARSING_MODE_MAYBE_NEXT;
@@ -256,6 +260,16 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                     case 'T': {
                         last->type_ = TYPE_STRUCTURE;
                         mode = RECORD_PARSING_MODE_STRUCTURE;
+                        break;
+                    }
+                    case 'B': {
+                        char *end;
+                        last->bit_start = strtol(rt, &end, 10);
+                        if (*end != '$') goto err;
+                        last->bit_width = strtol(end + 1, &end, 10);
+                        rt = end;
+                        if (last->bit_width <= 0 || last->bit_start + last->bit_width > 16) goto err;
+                        last->type_ = last->bit_start + last->bit_width > 8 ? TYPE_INT : TYPE_CHAR;
                         break;
                     }
                     default: {
@@ -947,6 +961,8 @@ type_chain* malloc_type(enum type_record_type type) {
     result->next = NULL;
     result->data = NULL;
     result->type_ = type;
+    result->bit_start = 0;
+    result->bit_width = 0;
     result->size = 0;
     result->size = get_type_memory_size(result);
     return result;
@@ -1328,6 +1344,16 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
 
         default: {
             break;
+        }
+    }
+
+    if (chain->bit_width && resolve_by == RESOLVE_BY_POINTER) {
+        // A bitfield: keep its bits and extend its sign
+        uint32_t v = (into->as_uint >> chain->bit_start) & ((1u << chain->bit_width) - 1);
+        if (record->signed_ && (v & (1u << (chain->bit_width - 1)))) {
+            into->as_int = (int32_t)v - (int32_t)(1u << chain->bit_width);
+        } else {
+            into->as_uint = v;
         }
     }
 }
