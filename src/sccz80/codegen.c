@@ -27,7 +27,6 @@
 
 #include "ccdefs.h"
 #include "define.h"
-#include <time.h>
 #include <math.h>
 
 
@@ -159,20 +158,12 @@ void gen_comment(const char *message)
 
 void gen_file_header(void)
 {
-    time_t tim;
-    char* timestr;
-
     outfmt(";%s\n",Banner);
     outfmt(";%s\n",Version);
     outfmt(";\n");
     outfmt(";\tReconstructed for z80 Module Assembler\n");
 
     donelibheader = 0;
-    if ((tim = time(NULL)) != -1) {
-        timestr = ctime(&tim);
-        outfmt(";\n");
-        outfmt(";\tModule compile time: %s\n",timestr);
-    }
     nl();
 }
 
