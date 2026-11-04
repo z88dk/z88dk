@@ -6330,6 +6330,7 @@ static int autopush_frameless(const Func *f)
 {
     if (!autopush_param_on()) return 0;
     if (c_framepointer_is_ix == -1) return 0;   /* sp-mode: no IX anyway */
+    if (c_debug_adb_defc) return 0;   /* -debug: the records need the IX frame base */
     if (!f || f->is_naked || f->is_interrupt || f->uses_acc) return 0;
     if (f->flags & SDCCCALL1) return 0;
     if (frame_has_saved_iy(f)) return 0;
@@ -11384,7 +11385,10 @@ static int flip_cost_budget(void)
 int ir_lower_func_flip(FILE *out, Func *f)
 {
     extern int c_framepointer_is_ix;
-    if (!spflip_enabled() || c_framepointer_is_ix != 1 || !f)
+    /* -debug keeps the IX frame: a flipped function would fall back to
+       l_debug_push_frame, and once __debug_framepointer is linked the debugger
+       resolves every frame through it. */
+    if (!spflip_enabled() || c_framepointer_is_ix != 1 || !f || c_debug_adb_defc)
         return ir_lower_func(out, f);
     const char *nm = f->fn ? ir_sym_name(f->fn) : "";
     int excluded = (strcmp(nm, "main") == 0);
