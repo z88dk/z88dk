@@ -1601,10 +1601,6 @@ void flags_describe(Type *type, int32_t flags, UT_string *output)
         utstring_printf(output,"__z88dk_hl_call(%d,%d) ", type->funcattrs.hlcall_module, type->funcattrs.hlcall_addr);
     }
 
-    if ( flags & HL_CALL ) {
-        utstring_printf(output,"__z88dk_hl_call(%d,%d) ", type->funcattrs.hlcall_module, type->funcattrs.hlcall_addr);
-    }
-
     if ( flags & SHORTCALL_HL ) {
         utstring_printf(output,"__z88dk_shortcall_hl ");
     }
