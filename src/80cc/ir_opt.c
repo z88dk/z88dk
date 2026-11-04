@@ -2520,6 +2520,15 @@ int ir_opt_addr_cse(Func *f)
     return repointed;
 }
 
+/* -debug (ADR 0030): a named local's vreg is its frame slot, so the passes that
+   would drop its stores or change its width leave it alone. Statics (no slot,
+   accessed through their BSS symbol) are not included. */
+static int debug_named_local(const Func *f, int v)
+{
+    return c_debug_adb_defc && v >= 0 && v < f->n_vregs && f->vregs[v].sym
+           && f->vregs[v].sym->storage == STKLOC;
+}
+
 /* sym_offset_fold and vreg_offset_fold migrated to the ir_match
    table as symoff / vregoff_sym / vregoff_imm / vregoff_idx — see
    ir_match.c. */
@@ -2541,15 +2550,6 @@ int ir_opt_addr_cse(Func *f)
    feeding those die) unravel completely. Liveness isn't computed yet
    at opt time, but a function-wide use count of zero means no op
    anywhere reads the vreg — cross-BB liveness can't resurrect it. */
-/* -debug (ADR 0030): a named local's vreg is its frame slot, so the passes that
-   would drop its stores or change its width leave it alone. Statics (no slot,
-   accessed through their BSS symbol) are not included. */
-static int debug_named_local(const Func *f, int v)
-{
-    return c_debug_adb_defc && v >= 0 && v < f->n_vregs && f->vregs[v].sym
-           && f->vregs[v].sym->storage == STKLOC;
-}
-
 static int dce_pure_kind(const Op *op)
 {
     switch (op->kind) {

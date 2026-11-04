@@ -163,10 +163,15 @@ int ir_lower_to_output(Func *f)
             if (!s || s->storage != STKLOC) continue;
             int off;
             if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE)) {
-                /* A register-passed param (__sdcccall(1), fastcall) that the
-                   prologue copies into a slot lives in that slot. */
+                /* A register-passed param (__sdcccall(1), fastcall autopush)
+                   that the prologue copies into a slot lives in that slot. A
+                   stack-passed or in-place param keeps its caller offset: a
+                   spill slot it may get is not written until the spill. */
                 int slot = f->vreg_spill_slot ? f->vreg_spill_slot[v] : -1;
-                off = (slot >= 0) ? slot - f->frame_size : s->offset.i;
+                int reg_passed = !(f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)
+                    && (f->vregs[v].flags & (IR_VREG_VOLATILE | IR_VREG_AUTOPUSH));
+                off = (reg_passed && slot >= 0) ? slot - f->frame_size
+                                                : s->offset.i;
             } else {
                 int slot = f->vreg_spill_slot ? f->vreg_spill_slot[v] : -1;
                 if (slot < 0) continue;
