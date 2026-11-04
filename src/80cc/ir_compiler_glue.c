@@ -154,7 +154,8 @@ int ir_lower_to_output(Func *f)
        is final. Locals get their real frame-base offset (vreg_spill_slot -
        frame_size == slot_ix_off); params keep the frame-independent front-end
        offset (they sit above the frame base, so it stays correct as the frame
-       grows). Register-resident locals with no slot are skipped (best-effort).
+       grows), unless the prologue copied them into a slot. Register-resident
+       locals with no slot are skipped (best-effort).
        Parse-time STKLOC emission is deferred here (cdbfile.c). */
     if (rc == 0 && c_debug_adb_defc && f->fn) {
         for (int v = 0; v < f->n_vregs; v++) {
@@ -162,7 +163,15 @@ int ir_lower_to_output(Func *f)
             if (!s || s->storage != STKLOC) continue;
             int off;
             if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE)) {
-                off = s->offset.i;
+                /* A register-passed param (__sdcccall(1), fastcall autopush)
+                   that the prologue copies into a slot lives in that slot. A
+                   stack-passed or in-place param keeps its caller offset: a
+                   spill slot it may get is not written until the spill. */
+                int slot = f->vreg_spill_slot ? f->vreg_spill_slot[v] : -1;
+                int reg_passed = !(f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)
+                    && (f->vregs[v].flags & (IR_VREG_VOLATILE | IR_VREG_AUTOPUSH));
+                off = (reg_passed && slot >= 0) ? slot - f->frame_size
+                                                : s->offset.i;
             } else {
                 int slot = f->vreg_spill_slot ? f->vreg_spill_slot[v] : -1;
                 if (slot < 0) continue;
