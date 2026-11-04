@@ -57,6 +57,8 @@ val '<int16_t> 6'                      ga_int
 # a typedef of an enum is that enum; integers declared next to it are not
 val '<enum colour> GREEN'              ga_tdef
 line 'type = enum colour'              'whatis ga_tdef'
+val '<int16_t> 6'                      ga_ienum
+line 'type = int16_t'                  'whatis ga_ienum'
 val '<int32_t> 6'                      ga_long
 val '<uint16_t> 6'                     ga_uns
 line 'type = int32_t'                  'whatis ga_long'

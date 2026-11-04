@@ -161,7 +161,7 @@ void debug_write_local_at(const char *fn_name, SYMBOL *sym, int offset)
 }
 
 // An enum's key in the debug records, F<file>$<tag>: tags are only unique within a file,
-// and the file is the one that defines the enum (a header, if it is defined there)
+// and the file is the one the enum is first seen in (a header, if it is defined there)
 char *debug_enum_key(const char *tag)
 {
     UT_string *key;
