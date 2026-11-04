@@ -21,11 +21,14 @@ l_gint:		nop			; 2
 l_gint_1234:	nop			; 3
 l_x_00104:	nop			; 4
 l_00104:	nop			; 5
-		ret			; 6
+l_main00104:	nop			; 6
+lx_main_00104:	nop			; 7
+l__00104:	nop			; 8
+		ret			; 9
 END
 run_ok("z88dk-z80asm -b -m ${test}.asm");
 
-path("${test}.cmd")->spew( join( "", map {"break $_\n"} 1 .. 5 ), "cont\n" x 5, "quit\n" );
+path("${test}.cmd")->spew( join( "", map {"break $_\n"} 1 .. 8 ), "cont\n" x 8, "quit\n" );
 run_ok("z88dk-ticks -x ${test}.map -d ${test}.bin < ${test}.cmd > ${test}.out 2>&1");
 my $out = slurp("${test}.out");
 like $out, qr/0001 \(main\+1\)>/,          "l_main_00104 is skipped";
@@ -33,6 +36,9 @@ like $out, qr/0002 \(l_gint\+0\)>/,        "l_gint is a symbol";
 like $out, qr/0003 \(l_gint_1234\+0\)>/,   "l_gint_1234 has four digits";
 like $out, qr/0004 \(l_gint_1234\+1\)>/,   "l_x_00104 is skipped";
 like $out, qr/0005 \(l_00104\+0\)>/,       "l_00104 has no function name";
+like $out, qr/0006 \(l_main00104\+0\)>/,   "l_main00104 has no '_' before its digits";
+like $out, qr/0007 \(lx_main_00104\+0\)>/, "lx_main_00104 does not start with l_";
+like $out, qr/0008 \(l__00104\+0\)>/,      "l__00104 has an empty function name";
 
 # -------------------------------------------------------------------------
 # a breakpoint inside a loop of a zsdcc build is in function main
