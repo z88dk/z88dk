@@ -29,7 +29,7 @@ ifdef DBG_WINDOWS
 all:
 	@echo "debuginfo: skipped (POSIX-shell debugger harness; not run on Windows)"
 else
-all: z80 i8080 i8085 gbz80
+all: z80 i8080 i8085 gbz80 arrays
 endif
 
 z80: dbgvars.c
@@ -48,7 +48,11 @@ gbz80: dbgvars.c
 	zcc +test $(DFLAGS) -clib=gbz80 $< -o dbgvars_gbz80.bin -m
 	@sh ./check.sh -mgbz80 dbgvars_gbz80.bin dbgvars_gbz80.map gbz80
 
+arrays: dbgarr.c
+	zcc +test $(DFLAGS) $< -o dbgarr.bin -m
+	@sh ./check-arrays.sh dbgarr.bin dbgarr.map
+
 clean:
 	$(RM) *.bin *.map *.o *.sym *.def zcc_opt.def *.lis
 
-.PHONY: all z80 i8080 i8085 gbz80 clean
+.PHONY: all z80 i8080 i8085 gbz80 arrays clean

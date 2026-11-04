@@ -46,6 +46,12 @@ void debug_write_module(void)
 
 /* C = code, E = data, B = stack */
 
+// An array sized by its initialiser: its record waits until initials() has sized it
+int debug_size_pending(Type *type)
+{
+    return type->kind == KIND_ARRAY && type->size == -1;
+}
+
 // Write the cdb declaration
 void debug_write_symbol(SYMBOL *sym)
 {
