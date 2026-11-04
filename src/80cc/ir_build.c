@@ -7928,7 +7928,7 @@ static int build_stmt(Builder *b, Node *n)
        lowerer reads it to drive C_LINE / -cc emission. AST_COMPOUND_STMT
        recurses, so child stmts will override before their ops fire. */
     if (n->filename && n->line > 0) {
-        ir_set_emit_loc(n->filename, n->line);
+        ir_set_emit_loc(n->filename, n->line, n->level, n->block);
         cur_node_file = n->filename;   /* also for build_fail diagnostics */
         cur_node_line = n->line;
     }
@@ -8394,7 +8394,7 @@ static int build_stmt(Builder *b, Node *n)
            the tail line of a multi-line if/else instead of the line the
            condition actually reads from. */
         if (n->cond->filename && n->cond->line > 0)
-            ir_set_emit_loc(n->cond->filename, n->cond->line);
+            ir_set_emit_loc(n->cond->filename, n->cond->line, n->cond->level, n->cond->block);
 
         /* Short-circuit control-context lowering: compound `&&`/`||` become
            direct branches to then_bb/els_bb (targets pre-created so their ids

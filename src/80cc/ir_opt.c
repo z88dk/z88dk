@@ -5560,6 +5560,7 @@ int ir_opt_reassoc_reduction(Func *f)
             Op saved_ld[RR_MAX_CHAIN];
             for (int i = 0; i < leaf_n; i++) saved_ld[i] = bb->ops[ord_ld[i]];
             const char *afile = bb->ops[h].file; int aline = bb->ops[h].line;
+            int alevel = bb->ops[h].level, ablock = bb->ops[h].block;
             /* Write the interleaved pairs into the front of the span; NOP-fill
                the trailing slots vacated by the dropped dead temps. */
             int w = span_lo;
@@ -5571,6 +5572,7 @@ int ir_opt_reassoc_reduction(Func *f)
                 ad->dst = acc; ad->src[0] = acc; ad->src[1] = ord_leaf[i];
                 ad->mem.base = -1;
                 ad->file = afile; ad->line = aline;
+                ad->level = alevel; ad->block = ablock;
             }
             for (; w <= span_hi; w++) {
                 Op *nop = &bb->ops[w];
