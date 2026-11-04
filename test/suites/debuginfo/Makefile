@@ -33,7 +33,9 @@ all: z80 i8080 i8085 gbz80 exprerr
 endif
 
 # the enum targets: their own lines, so exprerr can be reverted alone
+ifndef DBG_WINDOWS
 all: enums dupname enumblk
+endif
 
 z80: dbgvars.c
 	zcc +test $(DFLAGS) $< -o dbgvars_z80.bin -m

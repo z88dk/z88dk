@@ -6,7 +6,7 @@
 # usage: check_enumrecs.sh <asm from -a -debug> <label>
 set -u
 
-got=$(grep -E '^; (N:|E:[GF])' "$1" | sort -u)
+got=$(grep -E '^; (N:|E:[GF])' "$1" | LC_ALL=C sort -u)
 if [ "$got" != "$(cat enums_a.records)" ]; then
     echo "  enum records differ from enums_a.records [$2]:"
     echo "$got" | diff enums_a.records - | sed 's/^/    /'

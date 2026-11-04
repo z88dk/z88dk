@@ -135,7 +135,7 @@ bad="$3.bad"
 cp "$3" "$bad"
 tail=$(grep -m 1 '__CDBINFO__' "$3" | sed 's/^[^ ]* = / = /')
 for rec in 'N:Fbad.c$nolist({2}SI:S)' 'N:Fbad.c$cut({2}SI:S' 'N:Fbad.c$cut2({2}SI:S)[(QA$7)(QB$5' 'N:Fbad.c$cut3({2}SI:S)[(QC$9' 'E:G$nosuch$0_0$0({2}SEnocolon),E,0,0' 'N:FC:/inc/w.h$wc({2}SI:S)[(W6$6)(W7$7)]' 'E:G$ga_int$0_0$0({2}SEFC:/inc/w.h$wc:S),E,0,0'; do
-    printf '%s\n' "$rec" | awk -v tail="$tail" '
+    printf '%s\n' "$rec" | LC_ALL=C awk -v tail="$tail" '
         BEGIN { for (i = 0; i < 256; i++) ord[sprintf("%c", i)] = i }
         { out = ""
           for (i = 1; i <= length($0); i++) { c = substr($0, i, 1)
