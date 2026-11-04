@@ -1,0 +1,54 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._same_mantissa_half
+	ld	hl,i_2+0
+	call	l_f64_load
+	ret
+
+
+
+._same_mantissa_quarter
+	ld	hl,i_3+0
+	call	l_f64_load
+	ret
+
+
+
+._same_mantissa_half_again
+	ld	hl,i_2+0
+	call	l_f64_load
+	ret
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+	SECTION	rodata_compiler
+.i_2
+	;0.500000
+	defb	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x80
+.i_3
+	;0.250000
+	defb	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7f
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_same_mantissa_half
+	GLOBAL	_same_mantissa_quarter
+	GLOBAL	_same_mantissa_half_again
+
+
+
+

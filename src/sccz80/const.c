@@ -1074,7 +1074,9 @@ elem_t *get_elem_for_fa(unsigned char fa[], double value)
     elem_t  *elem;
 
     LL_FOREACH(bigconst_queue, elem ) {
-        if ( elem->kind == KIND_DOUBLE && memcmp(elem->fa, fa, MAX_MANTISSA_SIZE) == 0 ) {
+        /* fa[MAX_MANTISSA_SIZE] holds the mbf64 exponent. Matching the
+           mantissa alone makes 0.5 and 0.25 the same constant. */
+        if ( elem->kind == KIND_DOUBLE && memcmp(elem->fa, fa, MAX_MANTISSA_SIZE + 1) == 0 ) {
             return elem;
         }
     }
