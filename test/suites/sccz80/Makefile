@@ -50,6 +50,11 @@ test_fastcall_callee.bin: $(SOURCES) fastcall_callee.c
 	$(call compile,-lm)
 	$(runtest)
 
+# (long)1E5 is folded by sccz80 and calls ifix on 80cc.
+test_constlit.bin: $(SOURCES) constlit.c
+	$(call compile,-lm)
+	$(runtest)
+
 test_compare.bin: $(SOURCES) compare.c
 	$(call compile, $(OPT_CODE_SPEED),)
 	$(runtest)

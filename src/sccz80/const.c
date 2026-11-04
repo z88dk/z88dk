@@ -114,7 +114,8 @@ int fnumber(LVALUE *lval)
     while (numeric(*s))
         ++s;
 
-    if (*s != '.' && (*s != 'e' && *s != 'f')) { /* Check that it is floating point */
+    /* An exponent may be written with a capital E, as in 1E5. */
+    if (*s != '.' && *s != 'e' && *s != 'E' && *s != 'f') {
         s++;
         return 0;
     }
@@ -235,12 +236,29 @@ int number(LVALUE *lval)
         goto typecheck;
     }
     if (ch() == '0') {
-        base = 8;
-        gch();
-        while (numeric(ch())) {
-            c = inbyte();
-            if (c < '8')
+        char *p = line + lptr + 1;
+        int bad = 0;
+
+        /* 089 is not octal. Skipping 8 and 9 used to leave zero. */
+        while (numeric(*p)) {
+            if (*p >= '8')
+                bad = 1;
+            p++;
+        }
+        if (bad) {
+            warningfmt("invalid-value","Invalid digit in octal constant");
+            base = 10;
+            while (numeric(ch())) {
+                c = inbyte();
+                k = k * 10 + (c - '0');
+            }
+        } else {
+            base = 8;
+            gch();
+            while (numeric(ch())) {
+                c = inbyte();
                 k = k * 8 + (c - '0');
+            }
         }
         lval->const_val = k;
         lval->int_const_val = (uint64_t)k;
@@ -299,6 +317,11 @@ typecheck:
             lval->val_type = KIND_LONG;
             if (cmatch('L'))
                 lval->val_type = KIND_LONGLONG;
+            /* 1LU and 1LLU, as well as 1UL and 1ULL. */
+            if (cmatch('U') || cmatch('u')) {
+                isunsigned = 1;
+                lval->const_val = (uint64_t)k;
+            }
             break;
         }
         if (cmatch('U') || cmatch('u')) {
