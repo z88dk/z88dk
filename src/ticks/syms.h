@@ -25,6 +25,7 @@ struct symbol_s {
     int            unique;
     const char    *name_module;
     UT_hash_handle hh;
+    UT_hash_handle hh_file;     // in symbol_files, when the symbol is local to its file
 };
 
 struct symbol_file_s {
