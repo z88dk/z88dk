@@ -177,6 +177,11 @@ zdouble calc(
         left = truncl(left);
         right = truncl(right);
     }
+    /* C90 has no % for a floating operand. The runtime path rejects it too. */
+    if (oper == zmod && (kind_is_decimal(left_kind) || kind_is_decimal(right_kind))) {
+        errorfmt("Cannot apply operator %% to floating point", 1);
+        return 0;
+    }
     if ((oper == zdiv || oper == zmod) && right == 0.0) {
         warningfmt("division-by-zero","Division by zero, result set to be zero");
         return 0;
@@ -219,6 +224,11 @@ zdouble calcun(
     if ( !kind_is_decimal(left_kind) && !kind_is_decimal(right_kind)) {
         left = truncl(left);
         right = truncl(right);
+    }
+    /* C90 has no % for a floating operand. The runtime path rejects it too. */
+    if (oper == zmod && (kind_is_decimal(left_kind) || kind_is_decimal(right_kind))) {
+        errorfmt("Cannot apply operator %% to floating point", 1);
+        return 0;
     }
     if ((oper == zdiv || oper == zmod) && right == 0.0) {
         warningfmt("division-by-zero","Division by zero, result set to be zero");
