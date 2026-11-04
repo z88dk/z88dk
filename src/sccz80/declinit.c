@@ -70,6 +70,23 @@ static int add_bitfield(Type *bitfield, int *value)
 
 
 /*
+ * Dump a run of bitfields: it starts at byte run_offset and its last bit
+ * is end_bit - 1 (unnamed fields included). Pad up to next_offset, if
+ * there is one: trailing unnamed bits end a run before the next member.
+ * Returns the number of bytes dumped.
+ */
+static int dump_bitfield_run(int run_offset, int end_bit, int value, int next_offset)
+{
+    int bytes = ((end_bit - 1) / 8) + 1;
+
+    outfmt("\t%s\t0x%x\n", bytes == 1 ? "defb" : "defw", value);
+    if ( next_offset > run_offset + bytes ) {
+        defstorage(); outdec(next_offset - run_offset - bytes); nl();
+    }
+    return bytes;
+}
+
+/*
  * initialise structure (also called by init())
  * 
  * Pads out to the size of the structure
@@ -95,21 +112,21 @@ int str_init(Type *tag)
 
 
         if ( ptr->offset == last_offset ) {
-            had_bitfield += ptr->bit_size;
+            had_bitfield = ptr->bit_offset + ptr->bit_size;
             if ( add_bitfield(ptr, &bitfield_value) ) {
                 continue;
             }
         } else if ( had_bitfield ) {
             sz = ptr->offset;
             // We've finished a byte/word of bitfield, we should dump it
-            outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
+            dump_bitfield_run(last_offset, had_bitfield, bitfield_value, ptr->offset);
             had_bitfield = 0;
             bitfield_value = 0;
         }
 
         if ( rcmatch('.') && isalpha(line[lptr+1]) ) {
             char declname[NAMESIZE];
-            int     j, bfsize = ptr->size;
+            int     j;
             Type   *ptr2 = NULL;
 
 
@@ -147,9 +164,9 @@ int str_init(Type *tag)
 
             if ( ptr->bit_size == 0 ) {
                 if ( had_bitfield ) {
-                    sz += bfsize;
                     // We've finished a byte/word of bitfield, we should dump it
-                    outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
+                    dump_bitfield_run(last_offset, had_bitfield, bitfield_value, ptr->offset);
+                    sz = ptr->offset;
                     had_bitfield = 0;
                     bitfield_value = 0;
                 }
@@ -159,9 +176,15 @@ int str_init(Type *tag)
 
 
         if ( ptr->bit_size ) {
+            if ( had_bitfield && ptr->offset != last_offset ) {
+                // A designated jump into another run: the open one goes out first
+                dump_bitfield_run(last_offset, had_bitfield, bitfield_value, ptr->offset);
+                had_bitfield = 0;
+                bitfield_value = 0;
+            }
             sz = ptr->offset;
             last_offset = ptr->offset;
-            had_bitfield = ptr->bit_size;
+            had_bitfield = ptr->bit_offset + ptr->bit_size;
             add_bitfield(ptr, &bitfield_value);
             continue;
         }
@@ -195,8 +218,7 @@ int str_init(Type *tag)
     // And output 
     if ( had_bitfield ) {
         // We've finished a struct initialisation with a bitfield
-        outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
-        sz += ((had_bitfield-1) / 8) + 1;
+        sz += dump_bitfield_run(last_offset, had_bitfield, bitfield_value, -1);
     }
 
     // Pad out the union

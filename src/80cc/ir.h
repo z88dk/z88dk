@@ -622,6 +622,8 @@ typedef struct {
     /* Source location for debug / -gcline output. */
     const char *file;
     int         line;
+    int         level;      /* the line's nesting level and block, for C_LINE */
+    int         block;
 } Op;
 
 /* Phantom zero-trip guard: a BR_ZERO whose tested counter is a proven NONZERO
@@ -852,7 +854,7 @@ Op   *ir_op_emit(BB *bb, OpKind kind);
    statement boundary; subsequent ir_op_emit calls stamp op->file/line
    from these values so ir_lower can emit C_LINE / -cc source comments
    per op. Pass NULL/0 to clear. */
-void  ir_set_emit_loc(const char *file, int line);
+void  ir_set_emit_loc(const char *file, int line, int level, int block);
 void  ir_get_emit_loc(const char **file, int *line);
 
 /* Convenience constructors — fill common fields. All return a pointer

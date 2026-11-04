@@ -421,6 +421,8 @@ static int txt_build(const char *full, Node *stmt, TxtStmt *st)
     Node *n = ast_function_call(AST_FUNC_CALL, fn, fn->ctype, args);
     n->filename = old->filename;
     n->line = old->line;
+    n->level = old->level;
+    n->block = old->block;
     array_set_byindex(stmt->stmts, 0, n);
     st->node = stmt;
     st->start = (int)val + 1;
@@ -497,8 +499,11 @@ Node *compound(void)
     if (ncmp == MAX_LEVELS)
         errorfmt("Maximum nesting level reached (%d)", 1, ncmp);
 
+    int     savblock = current_block;
+
     savloc = locptr;
     declared = 0; /* may declare local variables */
+    current_block = scope_block; /* numbered by statement() */
     ++ncmp; /* new level open */
     TxtStmt txt_prev = { NULL, 0, 0, 0, 0 };
     while (cmatch('}') == 0) {
@@ -516,6 +521,7 @@ Node *compound(void)
         array_add(array, pair->node);
     }
     --ncmp; /* close current level */
+    current_block = savblock;
     sym_undecl_frame(array, savloc, lastst != STRETURN);
 
     sym_leave_scope(savloc); /* hide block locals; keep storage for the AST */
