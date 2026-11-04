@@ -473,6 +473,42 @@ void dofor(void)
     delwhile();
 }
 
+/* Cases belonging to the switch whose body is being parsed. */
+static SW_TAB *swcase;
+static Type   *swtype;
+
+/* A case constant has to fit the switch expression. An unsigned long
+   long holds every bit pattern we can record. */
+static int case_fits(Type *type, int64_t value)
+{
+    int bits;
+
+    if (type == NULL)
+        return 1;
+    if (type->kind == KIND_CHAR)
+        bits = 8;
+    else if (type->kind == KIND_INT || type->kind == KIND_SHORT)
+        bits = 16;
+    else if (type->kind == KIND_LONG)
+        bits = 32;
+    else if (type->kind == KIND_LONGLONG)
+        bits = 64;
+    else
+        return 1;
+
+    if (isutype(type)) {
+        if (bits >= 64)
+            return 1;
+        if (value < 0)
+            return 0;
+        return (uint64_t)value < (UINT64_C(1) << bits);
+    }
+    if (bits >= 64)
+        return 1;
+    return value >= -(int64_t)(UINT64_C(1) << (bits - 1))
+        && value <= (int64_t)((UINT64_C(1) << (bits - 1)) - 1);
+}
+
 /*
  * "switch" statement
  */
@@ -481,13 +517,16 @@ void doswitch(void)
     WHILE_TAB wq;
     int endlab, swact, swdef, swdef_sp, entry_sp;
     SW_TAB *swnex, *swptr, *p;
+    SW_TAB *saved_case = swcase;
+    Type   *saved_type = swtype;
     Type   *switch_type;
     t_buffer* buf;
 
     swact = swactive;
     swdef = swdefault;
     swdef_sp = swdefault_sp;
-    swnex = swptr = swnext;
+    swnex = swptr = swcase = swnext;
+    swtype = NULL;
     addwhile(&wq);
     (wqptr - 1)->loop = 0;
     needchar('(');
@@ -496,6 +535,7 @@ void doswitch(void)
     swdefault = 0;
     swdefault_sp = 0;
     swactive = 1;
+    swtype = switch_type;
     endlab = getlabel();
     /* gen_jp_label(endlab) ; */
 
@@ -565,6 +605,8 @@ void doswitch(void)
     swdefault = swdef;
     swdefault_sp = swdef_sp;
     swactive = swact;
+    swcase = saved_case;
+    swtype = saved_type;
 }
 
 /*
@@ -576,6 +618,7 @@ void docase(void)
     uint64_t ival;
     int    ival_valid;
     Kind   valtype;
+    int64_t cvalue;
     if (swactive == 0)
         errorfmt("Not in switch", 0 );
     if (swnext > swend) {
@@ -589,9 +632,22 @@ void docase(void)
         warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
     /* A double cannot hold every integer above 2^53. */
     if (ival_valid && !kind_is_decimal(valtype))
-        swnext->value = (int64_t)ival;
+        cvalue = (int64_t)ival;
     else
-        swnext->value = (int64_t)value;
+        cvalue = (int64_t)value;
+    if (swactive && swcase) {
+        SW_TAB *p;
+
+        for (p = swcase; p < swnext; p++) {
+            if (p->value == cvalue) {
+                errorfmt("Duplicate case value", 0);
+                break;
+            }
+        }
+    }
+    if (swactive && case_fits(swtype, cvalue) == 0)
+        warningfmt("limited-range", "Case value is out of range");
+    swnext->value = cvalue;
     needchar(':');
     ++swnext;
 }
