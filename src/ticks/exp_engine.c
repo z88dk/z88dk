@@ -354,6 +354,11 @@ UT_string* expression_result_type_to_string(type_record* root, type_chain* type)
         return buffer;
     }
 
+    if (is_primitive_integer_type(type) && type->data != NULL) {
+        utstring_printf(buffer, "enum %s", type->data);
+        return buffer;
+    }
+
     for (int i = 0; primitive_types[i].type_name; i++) {
         if (primitive_types[i].is_signed == root->signed_ && primitive_types[i].type_of == type->type_) {
             utstring_printf(buffer, "%s", primitive_types[i].type_name);
@@ -398,8 +403,23 @@ UT_string* expression_result_type_to_string(type_record* root, type_chain* type)
     return buffer;
 }
 
+/* An operand that failed (an unknown name, say) makes the result fail with
+   its error: it has no type to convert or compute with */
+static uint8_t operand_error(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
+    struct expression_result_t* failed = is_expression_result_error(a) ? a : (is_expression_result_error(b) ? b : NULL);
+
+    if (failed == NULL) {
+        return 0;
+    }
+    set_expression_result_error_str(result, failed->as_error);
+    return 1;
+}
+
 void expression_math_add(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
     zero_expression_result(result);
+    if (operand_error(a, b, result)) {
+        return;
+    }
     if (a->type.first == NULL) {
         return;
     }
@@ -412,6 +432,9 @@ void expression_math_add(struct expression_result_t* a, struct expression_result
     }
     result->type = a->type;
     result->type.first = copy_type_chain(a->type.first);
+    if (is_primitive_integer_type(result->type.first)) {
+        result->type.first->data = NULL;    // an enum's value in arithmetic is an integer
+    }
     switch (a->type.first->type_) {
         case TYPE_FLOAT: {
             result->as_float = a->as_float + b->as_float;
@@ -459,6 +482,9 @@ void expression_math_add(struct expression_result_t* a, struct expression_result
 
 void expression_math_sub(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
     zero_expression_result(result);
+    if (operand_error(a, b, result)) {
+        return;
+    }
     if (a->type.first == NULL) {
         return;
     }
@@ -474,6 +500,9 @@ void expression_math_sub(struct expression_result_t* a, struct expression_result
     }
     result->type = a->type;
     result->type.first = copy_type_chain(a->type.first);
+    if (is_primitive_integer_type(result->type.first)) {
+        result->type.first->data = NULL;    // an enum's value in arithmetic is an integer
+    }
     switch (a->type.first->type_) {
         case TYPE_FLOAT: {
             result->as_float = a->as_float - b->as_float;
@@ -520,6 +549,9 @@ void expression_math_sub(struct expression_result_t* a, struct expression_result
 
 void expression_math_mul(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
     zero_expression_result(result);
+    if (operand_error(a, b, result)) {
+        return;
+    }
     if (!(are_type_records_same(&a->type, &b->type))) {
         struct expression_result_t local_3 = {0};
         convert_expression(b, &local_3, &a->type);
@@ -532,6 +564,9 @@ void expression_math_mul(struct expression_result_t* a, struct expression_result
     }
     result->type = a->type;
     result->type.first = copy_type_chain(a->type.first);
+    if (is_primitive_integer_type(result->type.first)) {
+        result->type.first->data = NULL;    // an enum's value in arithmetic is an integer
+    }
     switch (a->type.first->type_) {
         case TYPE_FLOAT: {
             result->as_float = a->as_float * b->as_float;
@@ -560,6 +595,9 @@ void expression_math_mul(struct expression_result_t* a, struct expression_result
 
 void expression_math_div(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
     zero_expression_result(result);
+    if (operand_error(a, b, result)) {
+        return;
+    }
     if (!(are_type_records_same(&a->type, &b->type))) {
         struct expression_result_t local_3 = {0};
         convert_expression(b, &local_3, &a->type);
@@ -572,6 +610,9 @@ void expression_math_div(struct expression_result_t* a, struct expression_result
     }
     result->type = a->type;
     result->type.first = copy_type_chain(a->type.first);
+    if (is_primitive_integer_type(result->type.first)) {
+        result->type.first->data = NULL;    // an enum's value in arithmetic is an integer
+    }
     switch (a->type.first->type_) {
         case TYPE_FLOAT: {
             result->as_float = a->as_float / b->as_float;
@@ -643,6 +684,12 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
         case TYPE_CHAR:
         case TYPE_INT:
         case TYPE_LONG: {
+            const char* enumerator = result->type.first->data == NULL ? NULL :
+                cdb_enumerator_name(result->type.first->data, result->type.signed_ ? result->as_int : (int32_t)result->as_uint);
+            if (enumerator != NULL) {
+                utstring_printf(buffer, "%s", enumerator);
+                return buffer;
+            }
             if (result->type.signed_) {
                 utstring_printf(buffer, "%i", result->as_int);
                 return buffer;
@@ -752,10 +799,14 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
 
 void convert_expression(struct expression_result_t* from, struct expression_result_t* to, type_record* type) {
     zero_expression_result(to);
+    if (is_expression_result_error(from)) {
+        set_expression_result_error_str(to, from->as_error);
+        return;
+    }
     to->type = *type;
     to->type.first = copy_type_chain(type->first);
     to->memory_location = from->memory_location;
-    if (type->first == NULL) {
+    if (type->first == NULL || from->type.first == NULL) {
         return;
     }
     switch (from->type.first->type_) {

@@ -1147,6 +1147,17 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
 
     debug_stack_frames_free(first_frame_pointer);
 
+    // an enumerator, from its enum's N: record: an int constant, as in C
+    {
+        int32_t value;
+        if (cdb_find_enumerator(lookup->symbol_name, &value)) {
+            result->type.first = malloc_type(TYPE_INT);
+            result->type.signed_ = 1;
+            result->as_int = value;
+            return;
+        }
+    }
+
     sprintf(result->as_error, "Cannot resolve symbol: %s", lookup->symbol_name);
     set_expression_result_error(result);
 }

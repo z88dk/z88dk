@@ -20,6 +20,18 @@ static debug_sym_symbol* cdb_global_symbols = NULL;
 static debug_sym_file* cdb_files = NULL;
 
 static debug_sym_type* cdb_ctypes = NULL;
+
+static debug_sym_enum* cdb_enums = NULL;
+
+/* An E: record gives the S: record of the same name (G$gc$0_0$0) its enum's
+   tag. They can come in either order, so each one waits here for the other. */
+typedef struct {
+    char*               record_name;
+    char*               tag;
+    debug_sym_symbol*   symbol;
+    UT_hash_handle      hh;
+} enum_object;
+static enum_object* cdb_enum_objects = NULL;
 static cline *clines[65536] = {0};
 /* Source lines of banked code, indexed by bank (address >> 16) then by the
    address in the bank window. The arrays are allocated when a bank has lines. */
@@ -673,6 +685,108 @@ static void debug_add_module_info(const char* encoded)
 
 }
 
+// N:Fu3.c$colour({2}SI:S)[(RED$0)(GREEN$5)(BLUE$6)]
+static void debug_add_enum_info(const char* encoded)
+{
+    char tag[128];
+    char name[128];
+    int32_t value;
+    int end;
+    debug_sym_enumerator** last;
+    const char* p = strchr(encoded, '$');
+
+    if (p == NULL || sscanf(p + 1, "%127[^(](%*[^)])[%n", tag, &end) != 1 || end == 0) {
+        bk.debug("Warning: could not add debug info on enum.\n");
+        return;
+    }
+    p += 1 + end;
+
+    debug_sym_enum* e = calloc(1, sizeof(debug_sym_enum));
+    strcpy(e->name, tag);
+    last = &e->first_enumerator;
+    while (sscanf(p, "(%127[^$]$%d)%n", name, &value, &end) == 2) {
+        debug_sym_enumerator* en = calloc(1, sizeof(debug_sym_enumerator));
+        en->name = strdup(name);
+        en->value = value;
+        *last = en;
+        last = &en->next;
+        p += end;
+    }
+    HASH_ADD_STR(cdb_enums, name, e);
+}
+
+static enum_object* find_enum_object(const char* record_name)
+{
+    enum_object* o;
+
+    HASH_FIND_STR(cdb_enum_objects, record_name, o);
+    if (o == NULL) {
+        o = calloc(1, sizeof(enum_object));
+        o->record_name = strdup(record_name);
+        HASH_ADD_KEYPTR(hh, cdb_enum_objects, o->record_name, strlen(o->record_name), o);
+    }
+    return o;
+}
+
+static void apply_enum_tag(enum_object* o)
+{
+    type_chain* c;
+
+    if (o->tag == NULL || o->symbol == NULL || (c = o->symbol->type_record.first) == NULL) {
+        return;
+    }
+    while (c->next) {
+        c = c->next;
+    }
+    if (c->type_ == TYPE_INT || c->type_ == TYPE_CHAR) {
+        c->data = o->tag;
+    }
+}
+
+// E:G$gc$0_0$0({2}SEcolour:S),E,0,0 - the S: record of the same name is an enum
+static void debug_add_enum_object_info(const char* encoded)
+{
+    char record_name[255];
+    char tag[128];
+    const char* p;
+    enum_object* o;
+
+    if (sscanf(encoded, "%254[^(]", record_name) != 1) {
+        goto err;
+    }
+    // The type element that starts with SE, after the {size}
+    for (p = strchr(encoded, '}'); p != NULL && strncmp(p + 1, "SE", 2) != 0; p = strchr(p + 1, ',')) {
+    }
+    if (p == NULL || sscanf(p + 3, "%127[^:,)]", tag) != 1) {
+        goto err;
+    }
+    o = find_enum_object(record_name);
+    if (o->tag == NULL) {
+        o->tag = strdup(tag);
+        apply_enum_tag(o);
+    }
+    return;
+
+err:
+    bk.debug("Warning: could not add debug info on enum object.\n");
+}
+
+// The S: record of an E: record, once both are read: its integer gets the enum's tag
+static void debug_add_enum_tag(const char* encoded, debug_sym_symbol* s)
+{
+    char record_name[255];
+    enum_object* o;
+
+    if (sscanf(encoded, "%254[^(]", record_name) != 1) {
+        return;
+    }
+    o = find_enum_object(record_name);
+    if (o->symbol == NULL) {
+        o->symbol = s;
+        apply_enum_tag(o);
+    }
+}
+
 /* Add debug information, in this case it's encoded */
 void debug_add_info_encoded(char *encoded)
 {
@@ -710,11 +824,22 @@ void debug_add_info_encoded(char *encoded)
             debug_add_module_info(subtype);
             break;
         }
+        case 'N':
+        {
+            debug_add_enum_info(subtype);
+            break;
+        }
+        case 'E':
+        {
+            debug_add_enum_object_info(subtype);
+            break;
+        }
         case 'S':
         {
             const char* res;
             debug_sym_symbol* s = debug_parse_symbol_info(subtype, &res);
             if (s) {
+                debug_add_enum_tag(subtype, s);
                 if (s->scope == SYMBOL_SCOPE_FILE) {
                     debug_sym_file* f = NULL;
                     HASH_FIND_STR(cdb_files, s->scope_value, f);
@@ -1265,6 +1390,39 @@ debug_sym_type* cdb_find_type(const char* tname) {
     debug_sym_type* result;
     HASH_FIND_STR(cdb_ctypes, tname, result);
     return result;
+}
+
+// The enumerator of an enum that has this value, NULL if none has
+const char* cdb_enumerator_name(const char* tag, int32_t value) {
+    debug_sym_enum* e;
+    debug_sym_enumerator* en;
+
+    HASH_FIND_STR(cdb_enums, tag, e);
+    if (e == NULL) {
+        return NULL;
+    }
+    for (en = e->first_enumerator; en != NULL; en = en->next) {
+        if (en->value == value) {
+            return en->name;
+        }
+    }
+    return NULL;
+}
+
+uint8_t cdb_find_enumerator(const char* name, int32_t* value) {
+    debug_sym_enum* e;
+    debug_sym_enum* tmp;
+    debug_sym_enumerator* en;
+
+    HASH_ITER(hh, cdb_enums, e, tmp) {
+        for (en = e->first_enumerator; en != NULL; en = en->next) {
+            if (strcmp(en->name, name) == 0) {
+                *value = en->value;
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
 
 debug_sym_symbol* cdb_get_first_global_symbol() {
