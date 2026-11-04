@@ -45,6 +45,8 @@ int new_sizes(void)
 
 void test_unevaluated(void)
 {
+    char c = 0;
+
     calls = 0;
     n = 3;
     assertEqual((int)sizeof(f()), 2);
@@ -53,6 +55,10 @@ void test_unevaluated(void)
     assertEqual((int)sizeof(a[n]), 2);
     assertEqual((int)sizeof(row[n]), 8);
     assertEqual((int)sizeof(*p + 1), 2);
+    assertEqual((int)sizeof(c + 1), 2);
+    assertEqual((int)sizeof((c)), 1);
+    assertEqual((int)sizeof(c + c), 2);
+    assertEqual((int)sizeof(-c), 2);
     assertEqual(calls, 0);
     assertEqual(n, 3);
 }

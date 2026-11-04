@@ -1057,6 +1057,18 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 /*
  * binary plunge to lower level (for +/-)
  */
+/* sizeof(c+1) is parsed as char+char. The add stays in HL. Only the
+   sizeof operand is retagged, so an ordinary c+1 keeps its code. */
+static int sizeof_operand;
+
+void set_sizeof_operand(int on)
+{
+    if (on)
+        sizeof_operand++;
+    else if (sizeof_operand)
+        sizeof_operand--;
+}
+
 void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval))
 {
     char *before, *start, *before1, *start1;
@@ -1290,6 +1302,9 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                                && lval->val_type != KIND_CPTR) {
                         zconvert_to_long(lval2->ltype->isunsigned, lval->val_type,
                                          lval->ltype->isunsigned);
+                        set_common_integer(lval, lval->ltype, lval2->ltype);
+                    } else if (sizeof_operand && integer_operand(lval)
+                               && integer_operand(lval2)) {
                         set_common_integer(lval, lval->ltype, lval2->ltype);
                     }
                 }

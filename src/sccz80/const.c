@@ -712,7 +712,11 @@ static void size_of_expression(LVALUE *lval)
     int savesp = Zsp;
 
     setstage(&before, &start);
+    /* c+1 is parsed as char. sizeof must report the promoted int.
+       sizeof(c) and sizeof((c)) do not reach an arithmetic operator. */
+    set_sizeof_operand(1);
     heir1(&ev);
+    set_sizeof_operand(0);
     clearstage(before, 0);
     Zsp = savesp;
     if (ev.ltype == NULL) {
