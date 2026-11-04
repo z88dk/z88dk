@@ -3374,7 +3374,9 @@ static int emit_gb_const_word_store(FILE *out, const Func *f, int src,
                                     const char *dsym, int doff) {
     if (!g_hc.remat_def || src < 0 || src >= f->n_vregs) return 0;
     const Op *o = g_hc.remat_def[src];
-    if (!o) return 0;
+    /* An IR_LEA remat_def (&local, [remat-lea]) is sp-relative, not a
+       link-time constant: it has no symbol to print. */
+    if (!o || o->kind == IR_LEA) return 0;
     char v[96];
     if (o->kind == IR_LD_IMM)
         snprintf(v, sizeof v, "%lld", (long long)o->imm);

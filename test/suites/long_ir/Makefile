@@ -6356,3 +6356,25 @@ stackpark_vm1.bin: $(SOURCES) stackpark.c
 stackpark_keep.bin: $(SOURCES) stackpark.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=stack-spill-multi -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+all:	gbleastore.bin gbleastore_fp.bin gbleastore_gbz80.bin gbleastore_8080.bin gbleastore_8085.bin
+
+gbleastore.bin: $(SOURCES) gbleastore.c
+	$(compile)
+	$(runtest)
+
+gbleastore_fp.bin: $(SOURCES) gbleastore.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+gbleastore_gbz80.bin: $(SOURCES) gbleastore.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+gbleastore_8080.bin: $(SOURCES) gbleastore.c
+	$(compile_8080)
+	$(runtest_8080)
+
+gbleastore_8085.bin: $(SOURCES) gbleastore.c
+	$(compile_8085)
+	$(runtest_8085)
