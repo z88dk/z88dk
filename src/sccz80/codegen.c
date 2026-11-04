@@ -3355,6 +3355,51 @@ void zxor_const(LVALUE *lval, int64_t value64)
 }
 
 
+/* A mask whose every byte is 0x00 or 0xff clears those bytes in
+   place. A mixed byte is left to the bit tests below. Returns 1
+   when this mask was handled. */
+static int and_whole_bytes(int bytes, uint32_t mask)
+{
+    unsigned b[4];
+    int i;
+
+    for (i = 0; i < bytes; i++) {
+        b[i] = (mask >> (8 * i)) & 0xff;
+        if (b[i] != 0 && b[i] != 0xff)
+            return 0;
+    }
+    if (bytes == 2) {
+        if (b[0] == 0 && b[1] == 0)
+            vconst(0);
+        else if (b[0] == 0)
+            ol("ld\tl,0");
+        else if (b[1] == 0)
+            ol("ld\th,0");
+        return 1;
+    }
+    if (b[0] == 0 && b[1] == 0 && b[2] == 0 && b[3] == 0) {
+        vlongconst(0);
+        return 1;
+    }
+    if (b[0] == 0 && b[1] == 0)
+        vconst(0);
+    else {
+        if (b[0] == 0)
+            ol("ld\tl,0");
+        if (b[1] == 0)
+            ol("ld\th,0");
+    }
+    if (b[2] == 0 && b[3] == 0)
+        const2(0);
+    else {
+        if (b[2] == 0)
+            ol("ld\te,0");
+        if (b[3] == 0)
+            ol("ld\td,0");
+    }
+    return 1;
+}
+
 /* 'And' the primary and secondary */
 /*      (results in primary) */
 void zand(LVALUE* lval)
@@ -3382,6 +3427,8 @@ void zand_const(LVALUE *lval, int64_t value64)
         vllongconst(value64);
         zand(lval);
     } else if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR || lval->val_type == KIND_ACCUM32) {
+        if ( and_whole_bytes(4, (uint32_t)value) )
+            return;
         if ( value == 0 ) {
             vlongconst(0);
         } else if ( value == 0xff ) {  // 5
@@ -3433,6 +3480,8 @@ void zand_const(LVALUE *lval, int64_t value64)
         }
     } else {
         uint16_t val = value;
+        if ( and_whole_bytes(2, val) )
+            return;
         if ( val == 0 ) {
             vconst(0);
         } else if ( (value % 65536) == 0xff ) {
