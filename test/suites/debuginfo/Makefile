@@ -29,8 +29,11 @@ ifdef DBG_WINDOWS
 all:
 	@echo "debuginfo: skipped (POSIX-shell debugger harness; not run on Windows)"
 else
-all: z80 i8080 i8085 gbz80 exprerr enums dupname enumblk
+all: z80 i8080 i8085 gbz80 exprerr
 endif
+
+# the enum targets: their own lines, so exprerr can be reverted alone
+all: enums dupname enumblk
 
 z80: dbgvars.c
 	zcc +test $(DFLAGS) $< -o dbgvars_z80.bin -m
@@ -51,6 +54,12 @@ gbz80: dbgvars.c
 # An unknown name in an expression gives its error instead of crashing ticks
 exprerr: z80
 	@sh ./check_exprerr.sh -mz80 dbgvars_z80.bin dbgvars_z80.map z80
+
+clean:
+	$(RM) *.bin *.map *.o *.sym *.def zcc_opt.def *.lis
+
+.PHONY: all z80 i8080 i8085 gbz80 exprerr clean
+.PHONY: enums dupname enumblk clean-enums
 
 # Enum objects print their enumerator (two modules, same-named enums, a shared header);
 # both compilers, whichever COMPILER the suite runs with, as they write the same records
@@ -76,7 +85,6 @@ dupname: dupname/dup1/dup.c dupname/dup2/dup.c
 	  sh ./check_dupname.sh -mz80 dupname_$$c.bin dupname_$$c.map $$c || exit 1; \
 	done
 
-clean:
-	$(RM) *.bin *.map *.o *.sym *.def zcc_opt.def *.lis dupname/*.o dupname/*/*.o enums_a_*.asm
-
-.PHONY: all z80 i8080 i8085 gbz80 exprerr enums dupname enumblk clean
+clean: clean-enums
+clean-enums:
+	$(RM) dupname/*.o dupname/*/*.o enums_a_*.asm
