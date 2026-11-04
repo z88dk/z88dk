@@ -797,7 +797,6 @@ int check_range(LVALUE *lval, int32_t min_value, int32_t max_value)
     if ( ( oper == zlt && lval->const_val > max_value) ||
         (oper == zle && lval->const_val > max_value ) ||
         ( oper == zgt && lval->const_val < min_value) ||
-        ( oper == zgt && lval->const_val < min_value) ||
         ( oper == zge && lval->const_val <= min_value) ||
         ( oper == zne && (lval->const_val < min_value || lval->const_val > max_value)) ) {
         always = 1;

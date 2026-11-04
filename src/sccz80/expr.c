@@ -934,7 +934,6 @@ int heirb(LVALUE* lval)
                         utstring_printf(us,"' is not a pointer; did you mean to use '.'?");
                         errorfmt("%s", 1, utstring_body(us));
                         utstring_free(us);
-                        direct = 0;
                         direct = 1;
                     }
                     str = str->tag;

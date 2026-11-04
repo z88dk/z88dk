@@ -1380,7 +1380,8 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             Type *st = (lval->ltype && lval->ltype->ptr) ? lval->ltype : lval2->ltype;
             int sz = (st && st->ptr && st->ptr->tag) ? st->ptr->tag->size : 1;
             scale_ptr_diff(lval, sz);
-        } else if (lval->ptr_type == KIND_CHAR && lval->ptr_type == KIND_CHAR ) {
+        } else if (lval->ptr_type == KIND_CHAR && lval2->ptr_type == KIND_CHAR ) {
+            /* Difference is already in bytes. */
         } else if (lval->ptr_type && lval2->ptr_type && lval->ptr_type != lval2->ptr_type ) {
             UT_string  *str;
             utstring_new(str);

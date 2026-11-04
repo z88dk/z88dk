@@ -3892,20 +3892,8 @@ void asl_const(LVALUE *lval, int64_t value64)
             }
             break;
         case 7:
-            if ( 0 && c_speed_optimisation & OPT_LSHIFT32 && !IS_808x() ) { /* 0 out */
-                ol("rr\td");  // 15 bytes, 59T
-                ol("ld\td,e");
-                ol("ld\te,h");
-                ol("ld\th,l");
-                ol("ld\tl,0");
-                ol("rr\td");
-                ol("rr\te");
-                ol("rr\th");
-                ol("rr\tl");
-            } else {
-                loada( value );
-                callrts("l_long_aslo");
-            }
+            loada( value );
+            callrts("l_long_aslo");
             break;
         case 9:
         case 10:

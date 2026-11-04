@@ -86,7 +86,6 @@ int constant(LVALUE* lval)
 int fnumber(LVALUE *lval)
 {
     int i,k; /* flag and mask */
-    char minus; /* is if negative! */
     char* start; /* copy of pointer to starting point */
     char* s; /* points into source code */
     char* end;
@@ -94,7 +93,6 @@ int fnumber(LVALUE *lval)
 
     start = s = line + lptr; /* save starting point */
     k = 1;
-    minus = 1;
     while (k) {
         k = 0;
         if (*s == '+') {
@@ -104,7 +102,6 @@ int fnumber(LVALUE *lval)
         if (*s == '-') {
             ++s;
             k = 1;
-            minus = (-minus);
         }
     }
 
@@ -919,17 +916,9 @@ static void dofloat_ieee(double raw, unsigned char fa[])
         // quiet nan: 7FC00000
         // signalling nan: 7F800001
         pack32bit_float(0x7fc00000, fa);
-        fa[0] = 0x00;
-        fa[1] = 0x00;
-        fa[2] = 0xc0;
-        fa[3] = 0x7f;
     } else if ( isinf(raw) && raw > 0 ) {
         // positive infinity: 7F800000
         pack32bit_float(0x7f800000, fa);
-        fa[0] = 0x00;
-        fa[1] = 0x00;
-        fa[2] = 0x80;
-        fa[3] = 0x7f;
     } else if ( isinf(raw) && raw < 0 ) {
         // negative infinity: FF800000
         pack32bit_float(0xff800000, fa);

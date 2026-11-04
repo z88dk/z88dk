@@ -738,8 +738,6 @@ static void parse_trailing_modifiers(Type *type)
                 }
             }
             needchar(')');
-        } else if ( amatch("__z88dk_shortcall_hl")) {
-            type->flags |= SHORTCALL_HL;
         } else if (amatch("__preserves_regs")) {
             int c;
             needchar('(');

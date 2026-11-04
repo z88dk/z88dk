@@ -446,10 +446,7 @@ again:
                 errorfmt("Unknown symbol: %s", 1, sname);
                 junk();
             }
-        } else if (rcmatch('}')) {        
-#if 0
-            dumpzero(size,*dim);
-#endif
+        } else if (rcmatch('}')) {
             lptr = klptr;
             return 0;
         } else if ( lptr= klptr,
@@ -546,23 +543,6 @@ constdecl:
                 //     dumpzero(size, (dim) - 1);
                 // }
 
-            } else {
-                if ( type->kind == KIND_DOUBLE ) {
-                    unsigned char  fa[6];
-                    int            i;
-
-                    /* It was a float, lets parse the float and then dump it */
-                      if ( c_double_strings ) {
-                        output_double_string_load(value);
-                    } else {
-                        dofloat(c_maths_mode,value, fa);
-                        for ( i = 0; i < c_fp_size; i++ ) {
-                            stowlit(fa[i], 1);
-                        }
-                    }
-                } else {
-                    stowlit(value, type->size);
-                }
             }
         } else {
             lptr = klptr;
