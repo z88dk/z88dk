@@ -344,11 +344,15 @@ int ir_bb_new(Func *f)
    these at each statement boundary. */
 static const char *ir_emit_file;
 static int         ir_emit_line;
+static int         ir_emit_level;
+static int         ir_emit_block;
 
-void ir_set_emit_loc(const char *file, int line)
+void ir_set_emit_loc(const char *file, int line, int level, int block)
 {
     ir_emit_file = file;
     ir_emit_line = line;
+    ir_emit_level = level;
+    ir_emit_block = block;
 }
 
 void ir_get_emit_loc(const char **file, int *line)
@@ -373,6 +377,8 @@ Op *ir_op_emit(BB *bb, OpKind kind)
     op->label = -1;
     op->file = ir_emit_file;
     op->line = ir_emit_line;
+    op->level = ir_emit_level;
+    op->block = ir_emit_block;
     return op;
 }
 
