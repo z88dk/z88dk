@@ -573,6 +573,8 @@ void doswitch(void)
 void docase(void)
 {
     double value;
+    uint64_t ival;
+    int    ival_valid;
     Kind   valtype;
     if (swactive == 0)
         errorfmt("Not in switch", 0 );
@@ -582,10 +584,14 @@ void docase(void)
     }
     postlabel(swnext->label = getlabel());
     swnext->sp = Zsp;
-    constexpr(&value,&valtype, 1);
+    constexpr_exact(&value, &ival, &ival_valid, &valtype, 1);
     if ( kind_is_decimal(valtype)) 
         warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
-    swnext->value = value;
+    /* A double cannot hold every integer above 2^53. */
+    if (ival_valid && !kind_is_decimal(valtype))
+        swnext->value = (int64_t)ival;
+    else
+        swnext->value = (int64_t)value;
     needchar(':');
     ++swnext;
 }
