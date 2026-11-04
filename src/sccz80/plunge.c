@@ -455,10 +455,21 @@ static int fold_integer_exact(LVALUE *left, LVALUE *right,
     else if (oper == zand) *result = l & r;
     else if (oper == zor)  *result = l | r;
     else if (oper == zxor) *result = l ^ r;
-    else if (oper == asl) *result = l << (unsigned)sr;
-    else if (oper == asr) {
-        if (uns) *result = l >> (unsigned)sr;
-        else *result = (uint64_t)((int64_t)l >> (unsigned)sr);
+    else if (oper == asl || oper == asr) {
+        /* A host shift masks the count to 6 bits. The runtime shifts a
+           count at or above the width out of the value: 0, or -1 when
+           a signed right shift sign-fills. */
+        if (sr >= 0 && (uint64_t)sr >= (uint64_t)width) {
+            if (oper == asr && !uns && ((l >> (width - 1)) & 1))
+                *result = UINT64_MAX;
+            else
+                *result = 0;
+        } else if (oper == asl)
+            *result = l << (unsigned)sr;
+        else if (uns)
+            *result = l >> (unsigned)sr;
+        else
+            *result = (uint64_t)((int64_t)l >> (unsigned)sr);
     } else if (oper == zdiv) *result = uns ? l / r : (uint64_t)((int64_t)l / (int64_t)r);
     else if (oper == zmod) *result = uns ? l % r : (uint64_t)((int64_t)l % (int64_t)r);
     else if (oper == zeq) *result = (l == r);

@@ -202,10 +202,11 @@ zdouble calc(
     else if (oper == zgt)
         return (left > right);
     else if (oper == asr) {
-        if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
-             (left_kind == KIND_LONG && right >= 32) ) {
+        int width = left_kind == KIND_LONGLONG ? 64 : left_kind == KIND_LONG ? 32 : 16;
+        /* Zeroing the count used to keep the original value. */
+        if (right >= width) {
             warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
-            right = 0;
+            return left < 0 ? -1 : 0;
         }
         if ( is16bit ) return ((int16_t)(int64_t)left) >> (int16_t)right;
         else if (left_kind == KIND_LONG) return ((int32_t)(int64_t)left) >> (int)right;
@@ -251,10 +252,11 @@ zdouble calcun(
     else if (oper == zgt)
         return (left > right);
     else if (oper == asr) {
-         if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
-             (left_kind == KIND_LONG && right >= 32) ) {
+        int width = left_kind == KIND_LONGLONG ? 64 : left_kind == KIND_LONG ? 32 : 16;
+        /* Zeroing the count used to keep the original value. */
+        if (right >= width) {
             warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
-            right = 0;
+            return 0;
         }
         return ((uint64_t)left >> (int)right);
     } else
@@ -280,10 +282,11 @@ zdouble CalcStand(
     else if (oper == mult)
         return (left * right);
     else if (oper == asl) {
-        if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
-             (left_kind == KIND_LONG && right >= 32) ) {
+        int width = left_kind == KIND_LONGLONG ? 64 : left_kind == KIND_LONG ? 32 : 16;
+        /* Zeroing the count used to keep the original value. */
+        if (right >= width) {
             warningfmt("limited-range", "Left shifting by more than size of object, changed to zero");
-            right = 0;
+            return 0;
         }
         return (zdouble)((uint64_t)left << (unsigned int)right);
     } else if (oper == zeq)
