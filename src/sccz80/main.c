@@ -183,8 +183,7 @@ int main(int argc, char** argv)
     gargv = argv;
 
     /* allocate space for arrays */
-    litq = MALLOC(FNLITQ); /* literals, these 2 dumped end */
-    dubq = MALLOC(FNLITQ); /* Doubles */
+    litq = MALLOC(FNLITQ); /* literals, dumped at the end */
     tempq = MALLOC(LITABSZ); /* Temp strings... */
     glbq = MALLOC(LITABSZ); /* Used for glb lits, dumped now */
     symtab = NULL;
@@ -1001,7 +1000,6 @@ void DispVersion(char* arg)
 void atexit_deallocate(void)
 {
     FREENULL(litq);
-    FREENULL(dubq);
     FREENULL(tempq);
     FREENULL(glbq);
     FREENULL(loctab);

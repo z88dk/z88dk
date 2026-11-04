@@ -10,7 +10,6 @@ extern int glbcnt;
 extern WHILE_TAB *wqueue;
 extern WHILE_TAB *wqptr;
 extern unsigned char *litq;
-extern unsigned char *dubq;
 extern unsigned char *glbq;
 extern unsigned char *tempq;
 extern int gltptr;
