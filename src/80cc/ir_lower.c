@@ -57,6 +57,8 @@ extern void  gen_emit_line(int line);
 extern void  gen_comment(const char *message);
 extern const char *get_source_line(const char *filename, int n);
 extern int   lineno;
+extern int   ncmp;
+extern int   current_block;
 extern FILE *output;   /* gen_emit_line/gen_comment write here via outfmt */
 
 /* Track the (file, line) of the last C_LINE we emitted so we can
@@ -422,7 +424,10 @@ static void emit_op_cline(FILE *out, const Op *op)
     if (op->line == cur_emitted_line && op->file == cur_emitted_file)
         return;
     int saved_lineno = lineno;
+    int saved_ncmp = ncmp, saved_block = current_block;
     lineno = op->line;
+    ncmp = op->level;           /* gen_emit_line prints the op's own scope */
+    current_block = op->block;
     /* gen_comment/gen_emit_line write via outfmt to the global `output`.
        Instructions go to the buffered `out` (a memstream flushed at
        function end), so writing the C_LINE/comment straight to `output`
@@ -438,6 +443,8 @@ static void emit_op_cline(FILE *out, const Op *op)
     gen_emit_line(op->line);
     output = saved_output;
     lineno = saved_lineno;
+    ncmp = saved_ncmp;
+    current_block = saved_block;
     cur_emitted_line = op->line;
     cur_emitted_file = op->file;
 }
@@ -6323,6 +6330,7 @@ static int autopush_frameless(const Func *f)
 {
     if (!autopush_param_on()) return 0;
     if (c_framepointer_is_ix == -1) return 0;   /* sp-mode: no IX anyway */
+    if (c_debug_adb_defc) return 0;   /* -debug: the records need the IX frame base */
     if (!f || f->is_naked || f->is_interrupt || f->uses_acc) return 0;
     if (f->flags & SDCCCALL1) return 0;
     if (frame_has_saved_iy(f)) return 0;
@@ -11384,7 +11392,10 @@ static int flip_cost_budget(void)
 int ir_lower_func_flip(FILE *out, Func *f)
 {
     extern int c_framepointer_is_ix;
-    if (!spflip_enabled() || c_framepointer_is_ix != 1 || !f)
+    /* -debug keeps the IX frame: a flipped function would fall back to
+       l_debug_push_frame, and once __debug_framepointer is linked the debugger
+       resolves every frame through it. */
+    if (!spflip_enabled() || c_framepointer_is_ix != 1 || !f || c_debug_adb_defc)
         return ir_lower_func(out, f);
     const char *nm = f->fn ? ir_sym_name(f->fn) : "";
     int excluded = (strcmp(nm, "main") == 0);
