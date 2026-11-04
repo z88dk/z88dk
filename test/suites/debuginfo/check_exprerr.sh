@@ -1,6 +1,7 @@
 #!/bin/sh
 # An unknown name inside an expression gives that name's error: ticks used to
-# crash (arithmetic with * or /, a cast) or print "<void> <none>" (+ and -).
+# crash (arithmetic with * or /, a cast), print "<void> <none>" (+ and -) or
+# print a pointer made of the error text ((int*)NOSUCH).
 # Each expression runs in a session of its own, since a crash ends the session.
 #
 # usage: check_exprerr.sh <ticks-machine-flag> <bin> <map> <label>
@@ -10,7 +11,7 @@ BRK=19   # dbgvars.c break line (the `r = r + s;` statement — keep in sync)
 
 label="$4"
 ok=1
-for expr in 'a - NOSUCH' 'NOSUCH + 1' 'a * NOSUCH' 'a / NOSUCH' '(int)NOSUCH' '(char)NOSUCH + 1'; do
+for expr in 'a - NOSUCH' 'NOSUCH + 1' 'a * NOSUCH' 'a / NOSUCH' '(int)NOSUCH' '(char)NOSUCH + 1' '(int*)NOSUCH'; do
     out=$(printf 'break dbgvars.c:%s\ncont\nprint %s\nprint a + b\nquit\n' "$BRK" "$expr" \
           | z88dk-ticks -w 30 -d "$1" -x "$3" "$2" 2>&1)
     rc=$?

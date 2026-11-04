@@ -62,6 +62,10 @@ void expression_result_free(struct expression_result_t* result) {
 
 void expression_value_to_pointer(struct expression_result_t *from, struct expression_result_t *to, type_record* pointer_type) {
     zero_expression_result(to);
+    if (is_expression_result_error(from)) {
+        set_expression_result_error_str(to, from->as_error);
+        return;
+    }
     if (is_type_a_pointer(from->type.first)) {
         *to = *from;
         to->type.first = malloc_type(TYPE_GENERIC_POINTER);
