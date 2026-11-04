@@ -841,6 +841,56 @@ void doasm(void)
     cmode = 1; /* then back to parse level */
 }
 
+/* One slot for each section name. The defaults are literals, and
+   --codeseg stores an argv pointer, so only a name allocated here
+   is freed. */
+static char *heap_section[5];
+
+static void replace_section(char **dest, const char *name)
+{
+    char *copy = STRDUP(name);
+    int   i;
+
+    for (i = 0; i < 5; i++) {
+        if (heap_section[i] == *dest) {
+            free(*dest);
+            heap_section[i] = copy;
+            *dest = copy;
+            return;
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        if (heap_section[i] == NULL) {
+            heap_section[i] = copy;
+            *dest = copy;
+            return;
+        }
+    }
+    *dest = copy;
+}
+
+void free_section_names(void)
+{
+    char **dest[5];
+    int    i, j;
+
+    dest[0] = &c_code_section;
+    dest[1] = &c_rodata_section;
+    dest[2] = &c_data_section;
+    dest[3] = &c_bss_section;
+    dest[4] = &c_init_section;
+    for (i = 0; i < 5; i++) {
+        if (heap_section[i] == NULL)
+            continue;
+        for (j = 0; j < 5; j++) {
+            if (*dest[j] == heap_section[i])
+                *dest[j] = NULL;
+        }
+        free(heap_section[i]);
+        heap_section[i] = NULL;
+    }
+}
+
 static void set_section(char **dest_section) 
 {
     char sname[NAMESIZE];
@@ -851,7 +901,7 @@ static void set_section(char **dest_section)
         return;
     }
 
-    *dest_section = STRDUP(sname);
+    replace_section(dest_section, sname);
 }
 
 /* #pragma statement */
@@ -898,9 +948,9 @@ void dopragma(void)
 
         if ( have_bank ) {
             snprintf(buf,sizeof(buf),"CODE_%d",(int)val);
-            c_code_section = STRDUP(buf);
+            replace_section(&c_code_section, buf);
             snprintf(buf,sizeof(buf),"RODATA_%d",(int)val);
-            c_rodata_section = STRDUP(buf);
+            replace_section(&c_rodata_section, buf);
         }
     }else {
         warningfmt("unknown-pragmas","Unknown #pragma directive");

@@ -1007,6 +1007,7 @@ void atexit_deallocate(void)
 //    FREENULL(swnext);
     FREENULL(stage);
     FREENULL(gotoq);
+    free_section_names();
 }
 
 void* mymalloc(size_t size)

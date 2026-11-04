@@ -69,6 +69,7 @@ extern char *c_code_section;
 extern char *c_bss_section;
 extern char *c_data_section;
 extern char *c_rodata_section;
+extern void free_section_names(void);
 extern int c_disable_builtins;
 extern uint32_t c_speed_optimisation;
 extern int c_fp_size;
