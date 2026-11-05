@@ -41,7 +41,7 @@ doctor() {
         cp "$map" "$bad"
         old_ifs=$IFS; IFS=';'
         for e in $edits; do
-            sed -i "s/^\(${e% *} *= [$]\)[0-9A-F]*\( ; const, local, , floats_a_c,\)/\1${e#* }\2/" "$bad"
+            sed "s/^\(${e% *} *= [$]\)[0-9A-F]*\( ; const, local, , floats_a_c,\)/\1${e#* }\2/" "$bad" > "$bad.tmp" && mv "$bad.tmp" "$bad"
         done
         IFS=$old_ifs
         out=$(printf 'print ga_f\nquit\n' | z88dk-ticks -w 30 -d "$tflag" -x "$bad" "$bin" 2>&1)
