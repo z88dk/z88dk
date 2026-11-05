@@ -10,6 +10,7 @@
     PUBLIC  generic_console_set_attribute
     PUBLIC  __mz2500_con_mode
     EXTERN  __MZ2500_CON_MODE
+    EXTERN  __MZ2500_IPL
     EXTERN  mz2500_gfx_init
     EXTERN  __mz2500_textcon_init
     PUBLIC  generic_console_cls
@@ -101,6 +102,14 @@ generic_console_set_attribute:
     ret
 
     SECTION code_crt_init
+    ld      a, __MZ2500_IPL
+    and     a
+    jr      z, no_ipl
+    ld      c, 2                        ;the IPL's TMOD: the cursor blinking
+    xor     a                           ;off (the console draws its own text and has no use for the IPL's cursor)
+    rst     18h
+    defb    $66                         ;_TMOD
+no_ipl:
     ld      a, (__mz2500_con_mode)
     cp      2
     jr      z, gfx_init

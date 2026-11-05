@@ -71,6 +71,7 @@ jobs:
             mingw-w64-x86_64-pkg-config
             mingw-w64-x86_64-ragel
             re2c
+            unzip
             vim
     - name: Install Strawberry Perl
       shell: powershell
@@ -117,6 +118,15 @@ jobs:
         # Default in 4.x; set everywhere so the behaviour does not depend on
         # which ccache a platform happens to package.
         echo "CCACHE_CPP2=1" >> $GITHUB_ENV
+    # zsdcc is not built on Windows (see build.sh); take the prebuilt one from
+    # the nightly kit, as the msbuild jobs do. Needed by the sdcc library build
+    # and the suites that compile with -compiler=sdcc.
+    - name: Get zsdcc from latest nightly
+      run: |
+        curl -fsSL -o z88dk-win32-latest.zip http://nightly.z88dk.org/z88dk-win32-latest.zip
+        mkdir -p bin
+        unzip -o -q -j z88dk-win32-latest.zip 'z88dk/bin/z88dk-zsdcc.exe' -d bin
+        ls -l bin/z88dk-zsdcc.exe
     - name: Build binaries
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin

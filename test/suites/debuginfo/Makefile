@@ -34,7 +34,7 @@ endif
 
 # the enum targets: their own lines, so exprerr can be reverted alone
 ifndef DBG_WINDOWS
-all: enums dupname enumblk
+all: enums dupname enumblk forblk
 endif
 
 z80: dbgvars.c dbglocals.c dbgparams.c
@@ -96,7 +96,7 @@ clean:
 	$(RM) *.bin *.map *.o *.sym *.def zcc_opt.def *.lis clinescope.asm
 
 .PHONY: all z80 i8080 i8085 gbz80 arrays exprerr clean
-.PHONY: enums dupname enumblk clean-enums
+.PHONY: enums dupname enumblk forblk clean-enums
 
 # Enum objects print their enumerator (two modules, same-named enums, a shared header);
 # both compilers, whichever COMPILER the suite runs with, as they write the same records
@@ -113,6 +113,14 @@ enumblk: enums_blk.c
 	zcc +test -vn -compiler=sccz80 -debug -I$(FRAMEWORK_DIR) enums_blk.c -o enumblk_z80.bin -m
 	@sh ./check_enumblk.sh -mz80 enumblk_z80.bin enumblk_z80.map z80
 
+# A for statement opens a block of its own (#3254); both compilers write the same records
+forblk: forblk.c forblk.records
+	@for c in sccz80 80cc; do \
+	  zcc +test -vn -compiler=$$c -debug -I$(FRAMEWORK_DIR) forblk.c -o forblk_$$c.bin -m || exit 1; \
+	  zcc +test -vn -compiler=$$c -debug -I$(FRAMEWORK_DIR) -a forblk.c -o forblk_$$c.asm || exit 1; \
+	  sh ./check_forblk.sh forblk_$$c.asm forblk_$$c.bin forblk_$$c.map $$c || exit 1; \
+	done
+
 # Two modules of the same file name (other directories) have the same enum key; both compilers
 dupname: dupname/dup1/dup.c dupname/dup2/dup.c
 	@for c in sccz80 80cc; do \
@@ -124,4 +132,4 @@ dupname: dupname/dup1/dup.c dupname/dup2/dup.c
 
 clean: clean-enums
 clean-enums:
-	$(RM) dupname/*.o dupname/*/*.o enums_a_*.asm
+	$(RM) dupname/*.o dupname/*/*.o enums_a_*.asm forblk_*.asm
