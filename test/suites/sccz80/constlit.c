@@ -38,12 +38,23 @@ void test_octal(void)
     assertEqual(89, 89);
 }
 
+#ifndef __80CC
+void test_range(void)
+{
+    /* 2^63 does not fit in signed long long. The bit pattern is kept. */
+    assertEqual((long long)9223372036854775808LL, (long long)0x8000000000000000LL);
+}
+#endif
+
 int suite_constlit(void)
 {
     suite_setup("Literal constants");
     suite_add_test(test_float);
     suite_add_test(test_suffix);
     suite_add_test(test_octal);
+#ifndef __80CC
+    suite_add_test(test_range);
+#endif
     return suite_run();
 }
 

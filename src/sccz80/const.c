@@ -192,22 +192,37 @@ int fnumber(LVALUE *lval)
 }
 
 
+/* Digit into an unsigned magnitude. Signed overflow here is undefined,
+   and the hosts that build sccz80 at -O2 do not wrap it. */
+static void accumulate_digit(uint64_t *mag, int *overflow, unsigned base, unsigned digit)
+{
+    if (*overflow || *mag > (UINT64_MAX - digit) / base)
+        *overflow = 1;
+    *mag = *mag * base + digit;
+}
+
 int number(LVALUE *lval)
 {
     char c;
     int minus;
-    int64_t k;
+    int again;
+    uint64_t mag;
+    uint64_t bits;
+    int64_t sk;
+    int overflow = 0;
     int isunsigned = 0;
+    int explicit_suffix = 0;
     int base = 10;
 
-    k = minus = 1;
-    while (k) {
-        k = 0;
+    mag = 0;
+    again = minus = 1;
+    while (again) {
+        again = 0;
         if (cmatch('+'))
-            k = 1;
+            again = 1;
         if (cmatch('-')) {
             minus = (-minus);
-            k = 1;
+            again = 1;
         }
     }
     if (ch() == '0' && toupper(nch()) == 'X') {
@@ -219,17 +234,13 @@ int number(LVALUE *lval)
         while (hex(ch())) {
             c = inbyte();
             if (c <= '9')
-                k = (k << 4) + (c - '0');
+                accumulate_digit(&mag, &overflow, 16, c - '0');
             else
-                k = (k << 4) + ((c & 95) - '7');
+                accumulate_digit(&mag, &overflow, 16, (c & 95) - '7');
         }
-        lval->const_val = k;
-        lval->int_const_val = (uint64_t)k;
-        lval->int_const_valid = 1;
         goto typecheck;
     }
     if (ch() == '0' && toupper(nch()) == 'B') {
-        int c;
         base = 2;
         gch();
         gch();
@@ -237,11 +248,8 @@ int number(LVALUE *lval)
             return (0);
         while (ch() == '0' || ch() == '1') {
             c = inbyte();
-            k = (k << 1) + (c - '0');
+            accumulate_digit(&mag, &overflow, 2, c - '0');
         }
-        lval->const_val = k;
-        lval->int_const_val = (uint64_t)k;
-        lval->int_const_valid = 1;
         goto typecheck;
     }
     if (ch() == '0') {
@@ -259,49 +267,49 @@ int number(LVALUE *lval)
             base = 10;
             while (numeric(ch())) {
                 c = inbyte();
-                k = k * 10 + (c - '0');
+                accumulate_digit(&mag, &overflow, 10, c - '0');
             }
         } else {
             base = 8;
             gch();
             while (numeric(ch())) {
                 c = inbyte();
-                k = k * 8 + (c - '0');
+                accumulate_digit(&mag, &overflow, 8, c - '0');
             }
         }
-        lval->const_val = k;
-        lval->int_const_val = (uint64_t)k;
-        lval->int_const_valid = 1;
         goto typecheck;
     }
     if (numeric(ch()) == 0)
         return (0);
     while (numeric(ch())) {
         c = inbyte();
-        k = k * 10 + (c - '0');
+        accumulate_digit(&mag, &overflow, 10, c - '0');
     }
-    lval->const_val = k;
-    lval->int_const_val = (uint64_t)k;
-    lval->int_const_valid = 1;
 typecheck:
     /* Apply a leading sign consistently to every integer base.  The
-       hexadecimal, binary and octal paths used to consume '-' but leave k
-       positive, turning e.g. -0x12345678L into an unsigned bit pattern. */
-    if (minus < 0)
-        k = (-k);
-    lval->const_val = k;
-    lval->int_const_val = (uint64_t)k;
+       hexadecimal, binary and octal paths used to consume '-' but leave the
+       magnitude positive, turning e.g. -0x12345678L into an unsigned bit
+       pattern. Negate in unsigned so the signed minimum is defined. */
+    bits = (minus < 0) ? (uint64_t)(0 - mag) : mag;
+    if (!overflow && mag <= (uint64_t)INT64_MAX)
+        sk = (minus < 0) ? -(int64_t)mag : (int64_t)mag;
+    else if (!overflow && minus < 0 && mag == (UINT64_C(1) << 63))
+        sk = INT64_MIN;
+    else
+        sk = (int64_t)bits;
+    lval->const_val = sk;
+    lval->int_const_val = bits;
+    lval->int_const_valid = 1;
     lval->val_type = KIND_CHAR;
     /* Keep type selection independent of zdouble.  The latter may have only
-       53 bits of precision on the build host, while k is the exact parsed
-       integer value. */
-    if ( k >= 256 || k < -127 ) {
+       53 bits of precision on the build host, while the magnitude is exact. */
+    if ( sk >= 256 || sk < -127 ) {
         lval->val_type = KIND_INT;
     }
-    if ( k >= 65536 || k < -32767 ) {
+    if ( sk >= 65536 || sk < -32767 ) {
         lval->val_type = KIND_LONG;
     }
-    if ( (uint64_t)k > UINT32_MAX || k < INT32_MIN ) {
+    if ( overflow || mag > UINT32_MAX || (uint64_t)sk > UINT32_MAX || sk < INT32_MIN ) {
         lval->val_type = KIND_LONGLONG;
     }
 
@@ -314,7 +322,7 @@ typecheck:
     if (!isunsigned && base != 10 && minus >= 0
         && lval->val_type != KIND_LONGLONG) {
         int64_t smax = lval->val_type == KIND_INT ? 32767 : INT32_MAX;
-        if (k > smax)
+        if (sk > smax)
             isunsigned = 1;
     }
     lval->is_const = 1;
@@ -323,21 +331,24 @@ typecheck:
         int loop = 0;
 
         if (cmatch('L')) {
+            explicit_suffix = 1;
             lval->val_type = KIND_LONG;
             if (cmatch('L'))
                 lval->val_type = KIND_LONGLONG;
             /* 1LU and 1LLU, as well as 1UL and 1ULL. */
             if (cmatch('U') || cmatch('u')) {
                 isunsigned = 1;
-                lval->const_val = (uint64_t)k;
+                lval->const_val = (zdouble)bits;
             }
             break;
         }
         if (cmatch('U') || cmatch('u')) {
+            explicit_suffix = 1;
             isunsigned = 1;
-            lval->const_val = (uint64_t)k;
+            lval->const_val = (zdouble)bits;
             loop = 1;
         } else if (cmatch('S')) {
+            explicit_suffix = 1;
             isunsigned = 0;
             loop = 1;
         } else if (amatch("f16")) {
@@ -361,9 +372,17 @@ typecheck:
         }
         if (!loop) break;
     }
+    /* An unsuffixed non-decimal that does not fit in signed long long
+       uses unsigned long long. An L or LL suffix keeps the signed type,
+       so 0x8000000000000000LL stays the signed minimum bit pattern.
+       Decimal does not promote. */
+    if (!explicit_suffix && !overflow && base != 10 && minus >= 0
+        && lval->val_type == KIND_LONGLONG && !isunsigned
+        && mag > (uint64_t)INT64_MAX)
+        isunsigned = 1;
     /* An unsuffixed decimal outside signed int is long. `32768U` still
        fits in unsigned int, and `0x8000` is unsigned int. */
-    if (base == 10 && !isunsigned && lval->val_type == KIND_INT && k > 32767)
+    if (base == 10 && !isunsigned && lval->val_type == KIND_INT && sk > 32767)
         lval->val_type = KIND_LONG;
     if ( lval->val_type == KIND_LONGLONG ) {
         if ( isunsigned )
@@ -387,21 +406,39 @@ typecheck:
        those minuses turns the magnitude 2^(n-1) into the signed
        minimum, which does fit. */
     if (lval->ltype && kind_is_integer(lval->ltype->kind)) {
-        unsigned bits = lval->ltype->size > 0 ? (unsigned)lval->ltype->size * 8 : 64;
+        unsigned width = lval->ltype->size > 0 ? (unsigned)lval->ltype->size * 8 : 64;
+        int out = 0;
 
-        if (bits < 64 && lval->ltype->isunsigned) {
-            if (k > 0 && (uint64_t)k >= (UINT64_C(1) << bits))
-                warningfmt("limited-range", "Integer constant is out of range");
-        } else if (bits < 64) {
-            int64_t max = (int64_t)((UINT64_C(1) << (bits - 1)) - 1);
-            int64_t min = -(int64_t)(UINT64_C(1) << (bits - 1));
-            int64_t magnitude = (int64_t)(UINT64_C(1) << (bits - 1));
+        /* A uint64 of all-ones is -1U, which does fit a narrower unsigned
+           type. Only a positive magnitude that does not fit warns. */
+        if (overflow)
+            out = 1;
+        else if (width < 64 && lval->ltype->isunsigned) {
+            if (sk > 0 && (uint64_t)sk >= (UINT64_C(1) << width))
+                out = 1;
+        } else if (width < 64) {
+            int64_t max = (int64_t)((UINT64_C(1) << (width - 1)) - 1);
+            int64_t min = -(int64_t)(UINT64_C(1) << (width - 1));
+            int64_t magnitude = (int64_t)(UINT64_C(1) << (width - 1));
+            int64_t range = sk;
 
-            if (k == magnitude && (unary_minus_depth & 1))
-                k = min;
-            if (k > max || k < min)
-                warningfmt("limited-range", "Integer constant is out of range");
+            if (range == magnitude && (unary_minus_depth & 1))
+                range = min;
+            if (range > max || range < min)
+                out = 1;
+        } else if (!lval->ltype->isunsigned && base == 10) {
+            /* Exactly one minus, here or in heir1, is the signed minimum.
+               Both is a double negation and does not fit. Hex keeps the
+               low 64 bits without a warning: 0x8000000000000000LL is the
+               signed minimum bit pattern already. */
+            uint64_t lim = UINT64_C(1) << 63;
+            int is_min = ((minus < 0) ? 1 : 0) ^ (unary_minus_depth & 1);
+
+            if (mag > lim || (mag == lim && !is_min))
+                out = 1;
         }
+        if (out)
+            warningfmt("limited-range", "Integer constant is out of range");
     }
     NormaliseIntegerConstant(lval);
     return (1);
