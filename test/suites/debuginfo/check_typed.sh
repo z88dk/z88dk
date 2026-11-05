@@ -31,9 +31,9 @@ check() {
     out=$(printf 'break dbgvars.c:%s\ncont\n%s\nprint a + b\nquit\n' "$BRK" "$cmd" \
           | z88dk-ticks -w 30 -d "$flag" -x "$map" "$bin" 2>&1)
     rc=$?
-    got=$(echo "$out" | sed -n 's/.*Error: //p')
+    got=$(printf '%s\n' "$out" | sed -n 's/.*Error: //p')
     [ "$got" = "$want" ] || { echo "  WRONG [$label] $what: error is <$got>, want <$want> (rc=$rc)"; ok=0; }
-    echo "$out" | grep -qF '= <int16_t> 30' \
+    printf '%s\n' "$out" | grep -qF '= <int16_t> 30' \
         || { echo "  MISSING [$label] $what: the next command, print a + b, did not run (rc=$rc)"; ok=0; }
 }
 
@@ -58,31 +58,31 @@ while [ $i -lt 150 ]; do sum="$sum + 1"; i=$((i + 1)); done
 out=$(printf 'break dbgvars.c:%s\ncont\nprint %s\nprint a + b\nquit\n' "$BRK" "$sum" \
       | z88dk-ticks -w 30 -d "$flag" -x "$map" "$bin" 2>&1)
 rc=$?
-echo "$out" | grep -qF '$1 = <int32_t> 150' \
+printf '%s\n' "$out" | grep -qF '$1 = <int32_t> 150' \
     || { echo "  MISSING [$label] print line of 597: \$1 = <int32_t> 150 (rc=$rc)"; ok=0; }
-echo "$out" | grep -qF '$2 = <int16_t> 30' \
+printf '%s\n' "$out" | grep -qF '$2 = <int16_t> 30' \
     || { echo "  MISSING [$label] print line of 597: the next command, print a + b, did not run (rc=$rc)"; ok=0; }
 
 # z88dk-gdb, MI: no server is needed to read a command or a target address
 mi() { printf '%s\n' "$@" | z88dk-gdb --interpreter=mi2 "$map" 2>&1; }
 t40=$(rep 1 40) t100=$(rep 1 100) host=$(rep h 900)
 out=$(mi "${t40}-gdb-version" '2-gdb-exit'); rc=$?
-echo "$out" | grep -qxF "$(rep 1 31)^done" \
+printf '%s\n' "$out" | grep -qxF "$(rep 1 31)^done" \
     || { echo "  MISSING [$label] MI token of 40 digits: its first 31 digits and ^done (rc=$rc)"; ok=0; }
-echo "$out" | grep -qxF '2^exit' \
+printf '%s\n' "$out" | grep -qxF '2^exit' \
     || { echo "  MISSING [$label] MI token of 40 digits: the next command, -gdb-exit, did not run (rc=$rc)"; ok=0; }
 out=$(mi "1-interpreter-exec mi2 \"${t100}-gdb-version\"" '2-gdb-exit'); rc=$?
-echo "$out" | grep -qxF '2^exit' \
+printf '%s\n' "$out" | grep -qxF '2^exit' \
     || { echo "  MISSING [$label] -interpreter-exec token of 100 digits: the next command, -gdb-exit, did not run (rc=$rc)"; ok=0; }
 out=$(mi "1-target-select remote ${host}:1" '2-gdb-exit'); rc=$?
-echo "$out" | grep -qF '1^error,msg="target-select: cannot connect to' \
+printf '%s\n' "$out" | grep -qF '1^error,msg="target-select: cannot connect to' \
     || { echo "  MISSING [$label] -target-select host of 900: its error (rc=$rc)"; ok=0; }
-echo "$out" | grep -qxF '2^exit' \
+printf '%s\n' "$out" | grep -qxF '2^exit' \
     || { echo "  MISSING [$label] -target-select host of 900: the next command, -gdb-exit, did not run (rc=$rc)"; ok=0; }
 out=$(mi "1-var-create v$(rep q 299) * 1" '2-gdb-exit'); rc=$?
-echo "$out" | grep -qxF '1^error,msg="variable name is too long\n"' \
+printf '%s\n' "$out" | grep -qxF '1^error,msg="variable name is too long\n"' \
     || { echo "  MISSING [$label] -var-create name of 300: its error (rc=$rc)"; ok=0; }
-echo "$out" | grep -qxF '2^exit' \
+printf '%s\n' "$out" | grep -qxF '2^exit' \
     || { echo "  MISSING [$label] -var-create name of 300: the next command, -gdb-exit, did not run (rc=$rc)"; ok=0; }
 
 if [ "$ok" != 1 ]; then
