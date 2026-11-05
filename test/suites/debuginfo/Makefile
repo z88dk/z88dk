@@ -29,7 +29,7 @@ ifdef DBG_WINDOWS
 all:
 	@echo "debuginfo: skipped (POSIX-shell debugger harness; not run on Windows)"
 else
-all: z80 i8080 i8085 gbz80 arrays exprerr clinescope
+all: z80 i8080 i8085 gbz80 arrays exprerr clinescope brkline
 endif
 
 # the enum targets: their own lines, so exprerr can be reverted alone
@@ -83,6 +83,14 @@ clinescope: clinescope.c
 	zcc +test $(DFLAGS) $< -o clinescope.bin -m
 	zcc +test $(DFLAGS) -a $< -o clinescope.asm
 	@sh ./check_clinescope.sh clinescope.asm clinescope.bin clinescope.map
+
+# A breakpoint on a line that opens a function stops in it, not at the file-scope C_LINE; both compilers
+.PHONY: brkline
+brkline: brkline.c
+	@for c in sccz80 80cc; do \
+	  zcc +test -vn -compiler=$$c -debug -I$(FRAMEWORK_DIR) $< -o brkline_$$c.bin -m || exit 1; \
+	  sh ./check_brkline.sh brkline_$$c.bin brkline_$$c.map $$c || exit 1; \
+	done
 
 clean:
 	$(RM) *.bin *.map *.o *.sym *.def zcc_opt.def *.lis clinescope.asm
