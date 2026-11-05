@@ -1,6 +1,7 @@
 #!/bin/sh
-# A breakpoint on the line of addp and on that of twice (brkline.c), each with
-# its { on the signature line, stops in the function and reads its parameter.
+# A breakpoint on the line of addp (brkline.c), which also has a file-scope
+# C_LINE at crt0_init, stops in addp; one on the line of twice, which addp's
+# end shares at the same address, stops in twice. Both read the parameter.
 #
 # usage: check_brkline.sh <bin> <map> <label>
 set -u
