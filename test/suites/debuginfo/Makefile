@@ -73,6 +73,18 @@ arrays: dbgarr.c
 	zcc +test $(DFLAGS) $< -o dbgarr.bin -m
 	@sh ./check-arrays.sh dbgarr.bin dbgarr.map
 
+# Long typed text (a name, a print line, an MI token or host) gives its error instead
+# of overflowing a fixed-size buffer in ticks or z88dk-gdb; both compilers
+ifndef DBG_WINDOWS
+all: typed
+endif
+.PHONY: typed
+typed: dbgvars.c
+	@for c in sccz80 80cc; do \
+	  zcc +test -vn -compiler=$$c -debug -I$(FRAMEWORK_DIR) dbgvars.c -o dbgvars_typed_$$c.bin -m || exit 1; \
+	  sh ./check_typed.sh -mz80 dbgvars_typed_$$c.bin dbgvars_typed_$$c.map $$c || exit 1; \
+	done
+
 # An unknown name in an expression gives its error instead of crashing ticks
 exprerr: z80
 	@sh ./check_exprerr.sh -mz80 dbgvars_z80.bin dbgvars_z80.map z80

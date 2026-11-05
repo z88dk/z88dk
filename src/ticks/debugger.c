@@ -1071,7 +1071,7 @@ void debug_lookup_history(const char* history, struct expression_result_t* resul
         result->type.first = copy_type_chain(he->result.type.first);
         return;
     }
-    sprintf(result->as_error, "Cannot find item <%s> in history", history);
+    snprintf(result->as_error, sizeof(result->as_error), "Cannot find item <%s> in history", history);
     set_expression_result_error(result);
 }
 
@@ -1107,9 +1107,10 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
             }
 
             // try static locals
-            char sname[128];
+            char* sname = malloc(strlen(fn->function_name) + strlen(lookup->symbol_name) + 5);
             sprintf(sname, "st_%s_%s", fn->function_name, lookup->symbol_name);
             debug_sym_symbol *s = cdb_find_symbol(sname, fp->filename);
+            free(sname);
             if (s != NULL && s->address_space.address_space == 'E') {
                 debug_get_symbol_value_expression(s, fp, result);
                 debug_stack_frames_free(first_frame_pointer);
@@ -1159,7 +1160,7 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
         }
     }
 
-    sprintf(result->as_error, "Cannot resolve symbol: %s", lookup->symbol_name);
+    snprintf(result->as_error, sizeof(result->as_error), "Cannot resolve symbol: %s", lookup->symbol_name);
     set_expression_result_error(result);
 }
 
@@ -1170,7 +1171,13 @@ static int cmd_print(int argc, char **argv)
         return 0;
     }
 
-    char* call = malloc(255);
+    size_t len = 0;
+    for (int i = 1; i < argc; i++)
+    {
+        len += strlen(argv[i]) + 1;
+    }
+
+    char* call = malloc(len);
     strcpy(call, argv[1]);
 
     for (int i = 2; i < argc; i++)
@@ -2088,6 +2095,15 @@ static int cmd_monitor(int argc, char **argv)
 
     // reconstruct the command string from argv (handle spaces)
     static char cmd[1024] = {0};
+
+    size_t len = 0;
+    for (int i = 1; i < argc; i++) {
+        len += strlen(argv[i]) + 1;
+    }
+    if (len > sizeof(cmd)) {
+        bk.console("Error: monitor command is too long\n");
+        return 0;
+    }
 
     // reset
     cmd[0] = '\0';

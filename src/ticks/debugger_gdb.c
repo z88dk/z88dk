@@ -1511,7 +1511,7 @@ static uint8_t connect_remote(const char* address)
         addr = address + 4;
     }
     
-    int scanf_res = sscanf(addr, "%[^:]:%d", hostname, &port);
+    int scanf_res = sscanf(addr, "%127[^:]:%d", hostname, &port);
     if (scanf_res != 2) {
         bk.debug("Invalid TCP address format: %s (expected host:port or tcp:host:port)\n", address);
         return 1;
