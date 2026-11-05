@@ -6357,6 +6357,28 @@ stackpark_keep.bin: $(SOURCES) stackpark.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=stack-spill-multi -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+all:	gbleastore.bin gbleastore_fp.bin gbleastore_gbz80.bin gbleastore_8080.bin gbleastore_8085.bin
+
+gbleastore.bin: $(SOURCES) gbleastore.c
+	$(compile)
+	$(runtest)
+
+gbleastore_fp.bin: $(SOURCES) gbleastore.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+gbleastore_gbz80.bin: $(SOURCES) gbleastore.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+gbleastore_8080.bin: $(SOURCES) gbleastore.c
+	$(compile_8080)
+	$(runtest_8080)
+
+gbleastore_8085.bin: $(SOURCES) gbleastore.c
+	$(compile_8085)
+	$(runtest_8085)
+
 # [ixblockcopy] inlined memcpy/strcpy result in an IX frame without sp-flip (copt #FRC must keep `pop bc` before `ld hl,bc`).
 all:	ixblockcopy.bin ixblockcopy_z180.bin ixblockcopy_z80n.bin ixblockcopy_ez80.bin ixblockcopy_8080.bin ixblockcopy_gbz80.bin
 
