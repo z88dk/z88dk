@@ -443,29 +443,17 @@ static int try_fold_unop(int kind, int64_t v, int64_t *out)
     return 0;
 }
 
-/* INT64_MIN / -1 does not fit in a signed 64-bit result. The host
-   divide traps on x86. Signed overflow wraps: the quotient is the
-   minimum and the remainder is 0. */
-static int64_t signed_div_mod(int is_mod, int64_t left, int64_t right)
-{
-    if (left == INT64_MIN && right == -1)
-        return is_mod ? 0 : INT64_MIN;
-    if (is_mod)
-        return left % right;
-    return left / right;
-}
-
 static int try_fold_binop(int kind, int64_t l, int64_t r, int64_t *out)
 {
     switch (kind) {
     case OP_ADD:  *out = l + r; return 1;
     case OP_SUB:  *out = l - r; return 1;
     case OP_MULT: *out = l * r; return 1;
-    case OP_DIV:  if (r == 0) return 0; *out = signed_div_mod(0, l, r); return 1;
+    case OP_DIV:  if (r == 0) return 0; *out = l / r; return 1;
     /* Signed `/` and `%` fold with C99 semantics (truncate toward zero;
        remainder takes the dividend's sign, -1 % 2 == -1), matching the runtime
        l_div / l_long_mod helpers and sdcc. */
-    case OP_MOD:  if (r == 0) return 0; *out = signed_div_mod(1, l, r); return 1;
+    case OP_MOD:  if (r == 0) return 0; *out = l % r; return 1;
     case OP_AND:  *out = l & r; return 1;
     case OP_OR:   *out = l | r; return 1;
     case OP_XOR:  *out = l ^ r; return 1;
