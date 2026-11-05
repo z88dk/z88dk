@@ -1,8 +1,9 @@
 #!/bin/sh
 # The level and block of f's locals in forblk.c are forblk.records, for sccz80
-# and 80cc alike: each for has a block of its own (#3254). 80cc's for headers
-# (init, test, step) carry the for's block, at the level 80cc already gave them,
-# and the code after the loops is back in the function's block.
+# and 80cc alike: each for has a block of its own (#3254), one that declares
+# nothing too. 80cc's for headers (init, test, step) and back jumps carry the
+# for's block, at the level 80cc already gave them, and the code after the
+# loops is back in the function's block.
 # ticks reads i and j at the first stop in the inner loop.
 #
 # usage: check_forblk.sh <asm from -a -debug> <bin> <map> <label>
@@ -19,7 +20,7 @@ if [ "$got" != "$(cat forblk.records)" ]; then
 fi
 
 if [ "$label" = 80cc ]; then
-    for want in '19 f::2::3' '23 f::2::6' '25 f::1::1'; do
+    for want in '21 f::2::3' '23 f::4::5' '24 f::2::3' '25 f::2::6' '27 f::2::7' '30 f::2::7' '31 f::1::1'; do
         line=${want%% *}
         got=$(grep -oE "C_LINE[[:space:]]+$line,\"forblk\.c::f::[0-9]+::[0-9]+\"" "$1" \
               | sed -E 's/.*::(f::[0-9]+::[0-9]+)"/\1/' | sort -u)
@@ -27,7 +28,7 @@ if [ "$label" = 80cc ]; then
     done
 fi
 
-out=$(printf 'break forblk.c:21\ncont\ninfo locals\nquit\n' \
+out=$(printf 'break forblk.c:23\ncont\ninfo locals\nquit\n' \
       | z88dk-ticks -w 30 -d -mz80 -x "$3" "$2" 2>&1)
 for want in '<int16_t>i = 1' '<int16_t>j = 2' '<int16_t>t = 2'; do
     echo "$out" | grep -qF "$want" || { echo "  MISSING [$label]: $want"; ok=0; }
