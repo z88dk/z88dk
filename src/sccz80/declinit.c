@@ -8,10 +8,6 @@ static void output_double_string_load(double value);
 static int init(Type *type, int dump);
 static int agg_init(Type *type, int isflexible);
 
-/* Set for the object initials() is defining. Nested member inits clear it. */
-static const char *init_dropname;
-static int init_copy_ok;
-
 
 /*
  * initialise global object
@@ -35,8 +31,6 @@ int initials(const char *dropname, Type *type)
     col();
     nl();
 
-    init_dropname = dropname;
-    init_copy_ok = 1;
     if (cmatch('{')) {
         if ( type->kind == KIND_STRUCT || ( type->kind == KIND_PTR && type->ptr->kind == KIND_STRUCT)) {
             if ( type->kind == KIND_PTR ) {
@@ -53,7 +47,6 @@ int initials(const char *dropname, Type *type)
         desize = init(type, 1);
     }
     gen_switch_section(currfn && currfn->flags & NONBANKED ? c_home_section : c_code_section);
-    init_copy_ok = 0;
     return (desize);
 }
 
@@ -322,9 +315,6 @@ static int init(Type *type, int dump)
     Kind   valtype;
     int sz = 0; /* number of chars in queue */
     int klptr, parencount;
-    int allow_struct_copy = init_copy_ok;
-
-    init_copy_ok = 0;
 
     if ((sz = qstr(&value)) != -1) {
         sz++;
@@ -468,26 +458,6 @@ again:
                     lptr = klptr;
                     constexpr(&value, &valtype, 1);
                     goto constdecl;
-                } else if (allow_struct_copy && type->kind == KIND_STRUCT && !gotref
-                           && ptr->ctype->kind == KIND_STRUCT
-                           && !rcmatch('.') && !rcmatch('[') && !rcmatch('+')
-                           && !rcmatch('-') && !rmatch2("->")) {
-                    /* struct S g = t;  Not a C90 constant. Copy t into g
-                       once, from the init section. A const object is in
-                       rodata, so it cannot be the destination. */
-                    if (type->isconst || init_dropname == NULL) {
-                        errorfmt("Dodgy declaration (not pointer)", 0);
-                        junk();
-                    } else if (type->tag && ptr->ctype->tag && type->tag != ptr->ctype->tag) {
-                        errorfmt("Cannot assign to aggregate", 0);
-                        junk();
-                    } else {
-                        defstorage();
-                        outdec(type->size);
-                        nl();
-                        gen_switch_section(c_init_section);
-                        copy_to_extern(ptr->name, init_dropname, type->size);
-                    }
                 } else {
                     errorfmt("Dodgy declaration (not pointer)", 0);
                     junk();

@@ -632,36 +632,6 @@ void putstk(LVALUE *lval)
         ol("ld\t(de),a");
         break;
     case KIND_STRUCT:
-        /* A call result occupies the top of the stack. The destination
-           pointer pushed before that call sits just above it. */
-        if (struct_temp_bytes) {
-            int gap = struct_temp_bytes;
-            int n = lval->ltype->size;
-
-            if (n > gap)
-                n = gap;
-            push("hl");
-            vconst(gap + 2);
-            ol("add\thl,sp");
-            ol("ld\te,(hl)");
-            ol("inc\thl");
-            ol("ld\td,(hl)");
-            vconst(0);
-            ol("add\thl,sp");
-            ol("ld\ta,(hl)");
-            ol("inc\thl");
-            ol("ld\th,(hl)");
-            ol("ld\tl,a");
-            if (n > 0) {
-                outfmt("\tld\tbc,%d\n", n);
-                ol("ldir");
-            }
-            pop("bc");
-            Zsp = modstk(Zsp + gap, KIND_NONE, NO, YES);
-            pop("de");
-            struct_temp_bytes = 0;
-            break;
-        }
         pop("de");
         switch ( lval->ltype->size ) {
         case 2:
@@ -981,200 +951,6 @@ void gen_push_float(Kind typeToPush)
     }
 }
 
-/* Exchange DE and HL. Does not touch the stack: GBZ80's swap() is a
-   push/pop and would overwrite a block that sits at SP. */
-static void swap_regs(void)
-{
-    ol("ld\ta,h");
-    ol("ld\th,d");
-    ol("ld\td,a");
-    ol("ld\ta,l");
-    ol("ld\tl,e");
-    ol("ld\te,a");
-}
-
-/* HL = source, DE = destination, BC = count. Inline so a destination
-   at SP is not overwritten by a GBZ80 ldir call. */
-static void copy_mem(void)
-{
-    int loop = getlabel();
-    int done = getlabel();
-
-    ol("ld\ta,b");
-    ol("or\tc");
-    opjumpr("z,", done);
-    postlabel(loop);
-    ol("ld\ta,(hl)");
-    ol("ld\t(de),a");
-    ol("inc\thl");
-    ol("inc\tde");
-    ol("dec\tbc");
-    ol("ld\ta,b");
-    ol("or\tc");
-    opjumpr("nz,", loop);
-    postlabel(done);
-}
-
-/* Move count bytes from SP+from upward by distance. Copy backward. */
-static void slide_up(int from, int count, int distance)
-{
-    int loop = getlabel();
-    int done = getlabel();
-
-    if (count <= 0 || distance <= 0)
-        return;
-    vconst(from + count - 1);
-    ol("add\thl,sp");
-    ol("ld\td,h");
-    ol("ld\te,l");
-    vconst(distance);
-    ol("add\thl,de");
-    swap_regs();
-    constbc(count);
-    ol("ld\ta,b");
-    ol("or\tc");
-    opjumpr("z,", done);
-    postlabel(loop);
-    ol("ld\ta,(hl)");
-    ol("ld\t(de),a");
-    ol("dec\thl");
-    ol("dec\tde");
-    ol("dec\tbc");
-    ol("ld\ta,b");
-    ol("or\tc");
-    opjumpr("nz,", loop);
-    postlabel(done);
-}
-
-/* Exchange the words at SP+a and SP+b. Clobbers HL, DE, BC and A. */
-static void exchange_stack_words(int a, int b)
-{
-    vconst(a);
-    ol("add\thl,sp");
-    ol("ld\td,h");
-    ol("ld\te,l");
-    vconst(b);
-    ol("add\thl,sp");
-    ol("ld\tc,(hl)");
-    ol("ld\ta,(de)");
-    ol("ld\t(hl),a");
-    ol("ld\ta,c");
-    ol("ld\t(de),a");
-    ol("inc\thl");
-    ol("inc\tde");
-    ol("ld\tc,(hl)");
-    ol("ld\ta,(de)");
-    ol("ld\t(hl),a");
-    ol("ld\ta,c");
-    ol("ld\t(de),a");
-}
-
-void release_struct_temp(void)
-{
-    if (struct_temp_bytes == 0)
-        return;
-    Zsp = modstk(Zsp + struct_temp_bytes, KIND_NONE, NO, YES);
-    struct_temp_bytes = 0;
-}
-
-/* Push the address of the struct return buffer.
-   live: 0 free, 2 preserve HL, 4 preserve DEHL.
-   under: leave the current top word above the pointer. */
-void gen_push_struct_hidden(int live, int under)
-{
-    if (!struct_hidden_active)
-        return;
-    if (under) {
-        /* Park DEHL, push the pointer, then put the old top word back on top. */
-        push("de");
-        push("hl");
-        vconst(struct_hidden_zsp - Zsp);
-        ol("add\thl,sp");
-        push("hl");
-        pop("bc");
-        pop("hl");
-        pop("de");
-        push("bc");
-        push("hl");
-        push("de");
-        exchange_stack_words(4, 6);
-        pop("de");
-        pop("hl");
-        return;
-    }
-    if (live >= 4) {
-        push("de");
-        push("hl");
-        vconst(struct_hidden_zsp - Zsp);
-        ol("add\thl,sp");
-        push("hl");
-        pop("bc");
-        pop("hl");
-        pop("de");
-        push("bc");
-        return;
-    }
-    if (live == 2) {
-        ol("ld\tb,h");
-        ol("ld\tc,l");
-        vconst(struct_hidden_zsp - Zsp);
-        ol("add\thl,sp");
-        push("hl");
-        ol("ld\th,b");
-        ol("ld\tl,c");
-        return;
-    }
-    vconst(struct_hidden_zsp - Zsp);
-    ol("add\thl,sp");
-    push("hl");
-}
-
-/* A struct call left struct_temp_bytes at SP. Use that image as the
-   argument. fn_below: a near function pointer sits under the temp.
-   Returns 1 when the caller must not push the argument again. */
-static int consume_struct_temp(int want, int fn_below)
-{
-    int gap = struct_temp_bytes;
-
-    if (gap == 0 || want <= 0)
-        return 0;
-    if (gap == want && !fn_below) {
-        struct_temp_bytes = 0;
-        return 1;
-    }
-    if (gap == want && fn_below) {
-        vconst(gap);
-        ol("add\thl,sp");
-        ol("ld\te,(hl)");
-        ol("inc\thl");
-        ol("ld\td,(hl)");
-        push("de");
-        slide_up(2, gap, 2);
-        pop("hl");
-        Zsp = modstk(Zsp + 2, KIND_NONE, NO, YES);
-        struct_temp_bytes = 0;
-        return 1;
-    }
-    if (fn_below) {
-        errorfmt("Cannot pass this struct result through a function pointer", 1);
-        struct_temp_bytes = 0;
-        return 1;
-    }
-    ol("ld\td,h");
-    ol("ld\te,l");
-    vconst(-want);
-    ol("add\thl,sp");
-    ol("ld\tsp,hl");
-    Zsp -= want;
-    swap_regs();
-    constbc(want);
-    copy_mem();
-    slide_up(0, want, gap);
-    Zsp = modstk(Zsp + gap, KIND_NONE, NO, YES);
-    struct_temp_bytes = 0;
-    return 1;
-}
-
 /* Push an argument for a function pointer call: regular or far pointer */
 int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar)
 {
@@ -1194,8 +970,6 @@ int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar)
         Zsp--;
         return 1;
     } else if (expr == KIND_STRUCT) {
-        if (consume_struct_temp(type->size, 0))
-            return type->size;
         swap();             /* de = stack address */
         vconst(-type->size);
         ol("add\thl,sp");
@@ -1252,8 +1026,6 @@ int push_function_argument_fnptr(Kind expr, Type *type, Type *functype, int push
             return c_fp_size;
         }
     } else if (expr == KIND_STRUCT ) {
-        if (consume_struct_temp(type->size, 1))
-            return type->size;
         // 13 bytes
         swap();             // de = address of struct
         ol("pop\tbc");      // return address
@@ -1460,7 +1232,6 @@ void dcallrts(char* sname, Kind to)
 int callstk(Type *type, int n, int isfarptr, int last_argument_size)
 {
     if ( isfarptr ) {
-        struct_hidden_active = 0;
         // The function address is on the stack at +n
         if ( n > 0 ) {
             vconst(n);
@@ -1477,12 +1248,6 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
     } else if ( type->flags & FASTCALL && last_argument_size <= 4 ) {
         int ret = 0;
         int label = getlabel();
-
-        /* TOS is the function address and DEHL is the argument.
-           Insert the return pointer under that address. */
-        if (struct_hidden_active)
-            gen_push_struct_hidden(4, 1);
-        struct_hidden_active = 0;
 
         // TOS = address, dehl = parameter (or in memory)
         if ( last_argument_size == 2 ) {
@@ -1512,11 +1277,7 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
         return ret;
     } else {
         // Non __z88dk_fastcall function pointers and those qwhich have a
-        // fastcall argument that's stored in memory.
-        // HL is the function address.
-        if (struct_hidden_active)
-            gen_push_struct_hidden(2, 0);
-        struct_hidden_active = 0;
+        // fastcall argument that's stored in memory
         if ( type->funcattrs.hasva )
             loadargc(n);
 
@@ -1684,33 +1445,6 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
     if ( (currfn->flags & NAKED) == NAKED ) {
         return;
-    }
-
-    /* Copy the struct into the caller's buffer before modstk frees the
-       source. A word stays under the source so a GBZ80 ldir call cannot
-       overwrite a temporary that sits at SP. HL comes back as the buffer. */
-    if (save == KIND_STRUCT && struct_return_offset > 0
-        && currfn->ctype->return_type->size > 0) {
-        int n = currfn->ctype->return_type->size;
-
-        push("hl");
-        vconst(struct_return_offset - Zsp);
-        ol("add\thl,sp");
-        ol("ld\te,(hl)");
-        ol("inc\thl");
-        ol("ld\td,(hl)");
-        push("de");
-        vconst(2);
-        ol("add\thl,sp");
-        ol("ld\ta,(hl)");
-        ol("inc\thl");
-        ol("ld\th,(hl)");
-        ol("ld\tl,a");
-        outfmt("\tld\tbc,%d\n", n);
-        ol("ldir");
-        pop("hl");
-        pop("bc");
-        struct_temp_bytes = 0;
     }
 
     if (vartype == KIND_CPTR) /* they are the same in any case! */

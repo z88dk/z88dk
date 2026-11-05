@@ -35,10 +35,8 @@ int primary(LVALUE* lval)
             if (lval->is_const) {
                 if (before)
                     clearstage(before, NULL);
-            } else {
+            } else
                 pure = 0;
-                release_struct_temp();
-            }
         }
         needchar(')');
         if (!pure) {

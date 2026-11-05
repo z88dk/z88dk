@@ -29,10 +29,6 @@ extern char Filename[];
 extern int need_floatpack;
 extern int ncomp;
 extern int stackargs;
-extern int struct_return_offset; /* callee: hidden pointer offset from entry SP */
-extern int struct_temp_bytes;    /* caller: struct result sitting at SP */
-extern int struct_hidden_active;
-extern int struct_hidden_zsp;
 extern int  c_default_unsigned;
 extern int nxtlab;
 extern int glblab;

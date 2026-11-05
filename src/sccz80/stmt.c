@@ -345,21 +345,9 @@ Type *doexpr(void)
     Type   *type_ptr;
 
     while (1) {
-        int saved_zsp = Zsp;
-        int saved_temp = struct_temp_bytes;
-
         setstage(&before, &start);
         expression(&vconst, &val, &type_ptr);
-        if (before) {
-            /* The expression was thrown away. Do not free a temp whose
-               allocation was thrown away with it. */
-            clearstage(before, NULL);
-            Zsp = saved_zsp;
-            struct_temp_bytes = saved_temp;
-        } else {
-            clearstage(before, start);
-            release_struct_temp();
-        }
+        clearstage(before, start);
         if (ch() != ',')
             return type_ptr;
         inbyte();
@@ -703,9 +691,6 @@ void doreturn(char type)
         Type   *type_ptr;
 
         while (1) {
-            int saved_zsp = Zsp;
-            int saved_temp = struct_temp_bytes;
-
             setstage(&before, &start);
             expression(&vconst, &val, &type_ptr);
             // If it's a constant and last, clear the load and load as a constant of the right
@@ -721,14 +706,7 @@ void doreturn(char type)
             }
             if (ch() != ',')
                 break;
-            if (before) {
-                clearstage(before, NULL);
-                Zsp = saved_zsp;
-                struct_temp_bytes = saved_temp;
-            } else {
-                clearstage(before, start);
-                release_struct_temp();
-            }
+            clearstage(before, start);
             inbyte();
         }
         /* The last expression is still staged. Convert it before the flush

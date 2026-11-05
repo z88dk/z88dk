@@ -49,24 +49,6 @@ void test_brace(void)
 }
 
 #ifndef __80CC
-struct S gcopy = gt;
-static struct S gstatic = gt;
-
-struct S ret_s(int n)
-{
-    struct S r;
-
-    r.x = n;
-    r.y = (char)(n + 1);
-    r.z = n + 2;
-    return r;
-}
-
-struct S id_s(struct S v)
-{
-    return v;
-}
-
 void test_copy(void)
 {
     struct S t = {4, 5, 6};
@@ -130,40 +112,6 @@ void test_copy(void)
         assertEqual((int)bg.a, 5);
     }
 }
-
-void test_return(void)
-{
-    struct S s = ret_s(3);
-    struct S t;
-    struct S (*fp)(int) = ret_s;
-    int saved;
-
-    assertEqual(s.x, 3);
-    assertEqual((int)s.y, 4);
-    assertEqual(s.z, 5);
-    t = ret_s(8);
-    assertEqual(t.x, 8);
-    assertEqual((int)t.y, 9);
-    assertEqual(t.z, 10);
-    s = id_s(ret_s(1));
-    assertEqual(s.x, 1);
-    assertEqual((int)s.y, 2);
-    assertEqual(s.z, 3);
-    ret_s(0);
-    s = fp(3);
-    assertEqual(s.x, 3);
-    assertEqual((int)s.y, 4);
-    assertEqual(s.z, 5);
-
-    saved = gt.x;
-    gt.x = 40;
-    assertEqual(gcopy.x, 4);
-    assertEqual((int)gcopy.y, 5);
-    assertEqual(gcopy.z, 6);
-    assertEqual(gstatic.x, 4);
-    assertEqual(gstatic.z, 6);
-    gt.x = saved;
-}
 #endif
 
 int suite_structcopy(void)
@@ -172,7 +120,6 @@ int suite_structcopy(void)
     suite_add_test(test_brace);
 #ifndef __80CC
     suite_add_test(test_copy);
-    suite_add_test(test_return);
 #endif
     return suite_run();
 }
