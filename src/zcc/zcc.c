@@ -204,6 +204,7 @@ static int             fill_80cc_copt_rules(char **rules);
 static void            zsdcc_asm_filter_comments(int filenumber, char *ext);
 static void            zsdcc_asm_filter_sections(int filenumber, char* ext);
 static void            zsdcc_embed_adb(int filenumber);
+static void            zsdcc_c_line_file(int filenumber, const char *path);
 static void            remove_temporary_files(void);
 static void            remove_file_with_extension(char *file, char *suffix);
 static int             copyprepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
@@ -1675,7 +1676,12 @@ int main(int argc, char **argv)
                     exit(1);
                 }
 
-                if ((q = last_path_char(original_filenames[i])) != NULL )
+                /* A zsdcc -debug build names the module by the whole path, as sccz80 does, so that
+                   two files of one name in different directories have a module each, and so a
+                   file-static of each in the map */
+                if (c_generate_debug_info && compiler_type == CC_SDCC && get_filetype_by_suffix(original_filenames[i]) == CFILE)
+                    q = original_filenames[i];
+                else if ((q = last_path_char(original_filenames[i])) != NULL )
                     q++;
                 else
                     q = original_filenames[i];
@@ -2049,9 +2055,23 @@ static void zsdcc_embed_adb(int filenumber)
 
     cdbfile = changesuffix(temporary_filenames[filenumber], ".adb");
     if ( (fcdb = fopen(cdbfile, "r")) != NULL ) {
+        char *ocfile;
+
+        /* The source file is named as given on the command line, as sccz80 does, so that the
+           debugger finds a file-local symbol by the file of the C_LINE it stopped at. A '$'
+           separates the fields of a CDB record, so such a name cannot be written and keeps the
+           old form. */
+        if ( strchr(original_filenames[filenumber], '$') == NULL ) {
+            ocfile = muststrdup(original_filenames[filenumber]);
+            zsdcc_c_line_file(filenumber, ocfile);
+        } else {
+            fprintf(stderr, "Warning: %s: the debug info cannot hold a '$' in a file name, so it names the file without its extension and with '/' as '_'\n",
+                    original_filenames[filenumber]);
+            ocfile = replace_str(changesuffix(original_filenames[filenumber], ""), "/", "_");
+        }
+
         if ( (fasm = fopen(filelist[filenumber], "a")) != NULL ) {
             char *tcfile = changesuffix(filelist[filenumber], "");
-            char *ocfile = replace_str(changesuffix(original_filenames[filenumber], ""), "/", "_");
             char *p;
 
             /* zsdcc --c1mode names the module after the -o path, with every non-alphanumeric character as '_' */
@@ -2070,12 +2090,50 @@ static void zsdcc_embed_adb(int filenumber)
                 free(outline);
             }
             free(tcfile);
-            free(ocfile);
             fclose(fasm);
         }
+        free(ocfile);
         fclose(fcdb);
     }
     free(cdbfile);
+}
+
+
+/* sdcc names the file of a C_LINE by its last path component. Name it as it was given instead:
+   "main.c::x::..." becomes "../src/main.c::x::...". Headers keep their names. */
+static void zsdcc_c_line_file(int filenumber, const char *path)
+{
+    char *tmpfile = changesuffix(temporary_filenames[filenumber], ".tmp");
+    char *base = last_path_char((char *)path);
+    size_t baselen;
+    FILE *fin, *fout;
+    char *line = NULL;
+    unsigned int len = 0;
+
+    base = base ? base + 1 : (char *)path;
+    baselen = strlen(base);
+
+    if ( base != path && (fin = fopen(filelist[filenumber], "r")) != NULL ) {
+        if ( (fout = fopen(tmpfile, "w")) != NULL ) {
+            while ( zcc_getdelim(&line, &len, '\n', fin) > 0 ) {
+                char *q;
+
+                if ( strncmp(line, "C_LINE ", 7) == 0 && (q = strstr(line, ",\"")) != NULL &&
+                     strncmp(q + 2, base, baselen) == 0 && strncmp(q + 2 + baselen, "::", 2) == 0 ) {
+                    fprintf(fout, "%.*s%s%s", (int)(q + 2 - line), line, path, q + 2 + baselen);
+                } else {
+                    fputs(line, fout);
+                }
+            }
+            fclose(fout);
+            fclose(fin);
+            copy_file(tmpfile, "", filelist[filenumber], "");
+        } else {
+            fclose(fin);
+        }
+    }
+    free(line);
+    free(tmpfile);
 }
 
 
