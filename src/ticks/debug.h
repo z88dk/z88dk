@@ -95,7 +95,7 @@ struct debug_sym_function_argument_s {
 };
 
 struct debug_sym_function_s {
-    char                            name[128];
+    char*                           name;
     const char*                     function_name;
     enum function_scope_t           scope;
     const char*                     scope_value;
@@ -106,7 +106,7 @@ struct debug_sym_function_s {
 };
 
 struct debug_sym_symbol_s {
-    char                    name[128];
+    char*                   name;
     const char*             symbol_name;
     enum symbol_scope_t     scope;
     const char*             scope_value;
@@ -117,7 +117,7 @@ struct debug_sym_symbol_s {
 };
 
 struct debug_sym_file_s {
-    char                    name[128];
+    char*                   name;
     debug_sym_symbol*       file_local_symbols;
     UT_hash_handle          hh;
 };

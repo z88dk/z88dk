@@ -993,25 +993,27 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
         }
 
     } else {
-        char location[FILENAME_MAX + 4];
+        UT_string* location;
+        utstring_new(location);
         if (fp->filename) {
             if (fp->lineno) {
-                sprintf(location, "%s:%d", fp->filename, fp->lineno);
+                utstring_printf(location, "%s:%d", fp->filename, fp->lineno);
             } else {
-                sprintf(location, "%s", fp->filename);
+                utstring_printf(location, "%s", fp->filename);
             }
         } else {
             if (fp->symbol && fp->symbol->file) {
-                sprintf(location, "%s", fp->symbol->file);
+                utstring_printf(location, "%s", fp->symbol->file);
             } else {
-                sprintf(location, "%s", "unknown location");
+                utstring_printf(location, "%s", "unknown location");
             }
         }
         if (sym) {
-            bk.console("%s%s+%d\n       at %s\n", frame_marker, sym->name, fp->offset, location);
+            bk.console("%s%s+%d\n       at %s\n", frame_marker, sym->name, fp->offset, utstring_body(location));
         } else {
-            bk.console("%s$%04x\n       at %s\n", frame_marker, fp->address, location);
+            bk.console("%s$%04x\n       at %s\n", frame_marker, fp->address, utstring_body(location));
         }
+        utstring_free(location);
     }
 }
 
@@ -1107,9 +1109,10 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
             }
 
             // try static locals
-            char sname[128];
+            char* sname = malloc(strlen(fn->function_name) + strlen(lookup->symbol_name) + 5);
             sprintf(sname, "st_%s_%s", fn->function_name, lookup->symbol_name);
             debug_sym_symbol *s = cdb_find_symbol(sname, fp->filename);
+            free(sname);
             if (s != NULL && s->address_space.address_space == 'E') {
                 debug_get_symbol_value_expression(s, fp, result);
                 debug_stack_frames_free(first_frame_pointer);
