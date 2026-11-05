@@ -770,7 +770,7 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
                     return buffer;
                 }
                 case TYPE_CHAR: {
-                    char buff [128];
+                    char buff [129];
 
                     int i = 0;
                     while (i < 128) {

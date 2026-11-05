@@ -59,7 +59,7 @@ ok defined $addr6, "line 6 has an address of its own" or die;
 
 path("${test}.cmd")->spew("break 0x$addr6\ncont\nbt\nquit\n");
 run_ok("z88dk-ticks -x ${test}.map -d ${test}.bin < ${test}.cmd > ${test}.out 2>&1");
-like slurp("${test}.out"), qr/^\s*at \Q${test}\E\.c:6$/m, "z88dk-ticks stops at line 6";
+like slurp("${test}.out"), qr/^\s*at \Q${test}\E\.c:6\r?$/m, "z88dk-ticks stops at line 6";
 
 unlink_testfiles;
 done_testing;
