@@ -661,12 +661,15 @@ Node *dofor(void)
     Node *body = NULL;
     array *arr = array_init(NULL);
     SYMBOL *savedloc;
+    int savblock = current_block;
 
     addwhile(&wq);
     l_condition = getlabel();
     savedloc = locptr;
 
     needchar('(');
+    ++scope_block;
+    current_block = scope_block; /* the for scope is a block of its own: header, body and the loop's own code */
     ++ncmp;
     if (cmatch(';') == 0) {
         if ( (init = declare_local(0)) == NULL ) {
@@ -704,6 +707,7 @@ Node *dofor(void)
     sym_undecl_frame(arr, savedloc, 1);
 
     --ncmp;
+    current_block = savblock;
     sym_leave_scope(savedloc); /* hide loop-scope locals; keep storage */
     declared = 0;
     delwhile();

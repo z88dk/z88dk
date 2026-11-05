@@ -365,6 +365,11 @@ IF FORmz
     defc    _GFX_MAXY    = 50
 ENDIF
 
+IF FORmz2500
+    defc    _GFX_MAXX    = 320
+    defc    _GFX_MAXY    = 200
+ENDIF
+
 
 IF FORnascom
     defc    _GFX_MAXX    = 96

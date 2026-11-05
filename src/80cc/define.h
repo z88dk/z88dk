@@ -93,6 +93,7 @@ struct type_s {
     int       len;   // Length of the array
 
     int32_t   value; // For enum, goto position, short call value
+    char     *enum_tag; // An enum, and every object of it: the enum's key, F<file>$<tag>
 
     // bitfields
     int       bit_offset;
