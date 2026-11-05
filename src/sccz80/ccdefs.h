@@ -163,6 +163,8 @@ extern void dummy(LVALUE *);
 
 extern void copy_to_stack(char *label, int stack_offset,  int size);
 extern void copy_to_extern(const char *src, const char *dest, int size);
+extern void gen_push_struct_hidden(int live, int under);
+extern void release_struct_temp(void);
 extern void gen_builtin_strcpy(void); 
 extern void gen_builtin_strchr(int32_t c); 
 extern void gen_builtin_memset(int32_t c, int32_t s);

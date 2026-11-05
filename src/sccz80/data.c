@@ -54,6 +54,10 @@ char Filename[FILENAME_LEN + 1]; /* original file name */
 int need_floatpack, ncomp;
 
 int stackargs;
+int struct_return_offset;
+int struct_temp_bytes;
+int struct_hidden_active;
+int struct_hidden_zsp;
 
 
 int  c_default_unsigned;

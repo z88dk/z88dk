@@ -909,14 +909,6 @@ Type *parse_decl_func(Type *base_type)
         errorfmt("Can't define a function returning an array",1);
         return NULL;
     }
-    if ( base_type->kind == KIND_STRUCT ) {
-        Type *ptr = make_pointer(base_type);
-        warningfmt("conversion","Can't define a function returning an struct, converting to a pointer");
-        strcpy(ptr->name, base_type->name);
-        base_type = ptr;
-    }
-
-
     return parse_parameter_list(base_type);
 }
 
@@ -1866,6 +1858,9 @@ static void declfunc(Type *functype, enum storage_type storage)
 {
     int where;
 
+    struct_return_offset = 0;
+    struct_temp_bytes = 0;
+    struct_hidden_active = 0;
 
     currfn = findglb(functype->name);
     
@@ -1939,6 +1934,12 @@ static void declfunc(Type *functype, enum storage_type storage)
 
     // Functions that return long long have a buffer stuffed into them
     if (functype->return_type->kind == KIND_LONGLONG ) {
+        where += 2;
+    } else if (functype->return_type->kind == KIND_STRUCT
+               && functype->return_type->size > 0
+               && (functype->flags & NAKED) == 0) {
+        /* Same slot as the long long pointer. The caller frees it. */
+        struct_return_offset = where;
         where += 2;
     }
 

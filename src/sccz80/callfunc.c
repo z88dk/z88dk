@@ -113,7 +113,12 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     int   save_fps_num;
     int   function_pointer_call = ptr == NULL ? YES : NO;
     int   savesp;
+    int   saved_struct_temp;
     int   last_argument_size = 0;
+    int   struct_alloc = 0;
+    int   hidden_zsp = 0;
+    int   last_was_fast = 0;
+    int   last_fast_kind = 0;
     int   saveline;
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
@@ -141,6 +146,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         watcharg = SetWatch(funcname, &isscanf);
     }
     savesp = Zsp;
+    saved_struct_temp = struct_temp_bytes;
     while (ch() != ')') {
         char *before, *start;
         Type *type;
@@ -170,6 +176,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     }
     needchar(')'); 
     Zsp = savesp;
+    struct_temp_bytes = saved_struct_temp;
     saveline = lineno;
     reset_namespace();
 
@@ -243,6 +250,37 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         }
     }
     argnumber = 0;
+
+    /* The return buffer sits above the arguments, so parameter offsets
+       stay where the callee was compiled to find them. */
+    if (functype->return_type->kind == KIND_STRUCT
+        && functype->return_type->size > 0
+        && (functype->flags & NAKED) == 0
+        && !(function_pointer_call && fnptr_type->kind == KIND_CPTR)) {
+        int sz = functype->return_type->size;
+        int disp = -sz;
+        int save_fn = function_pointer_call && fnptr_type->kind != KIND_CPTR;
+
+        /* A near function pointer is in HL. Keep it out of the allocation. */
+        if (save_fn) {
+            ol("ld\tb,h");
+            ol("ld\tc,l");
+        }
+        /* `vconst` is a local in this function. Same encoding: a negative
+           displacement is the 16-bit two's complement. */
+        if (disp < 0)
+            disp += 65536;
+        outfmt("\tld\thl,%d\n", disp);
+        ol("add\thl,sp");
+        ol("ld\tsp,hl");
+        if (save_fn) {
+            ol("ld\th,b");
+            ol("ld\tl,c");
+        }
+        Zsp -= sz;
+        hidden_zsp = Zsp;
+        struct_alloc = sz;
+    }
 
     /* Don't rewrite expressions whilst we are evaluating */
     save_fps_num = buffer_fps_num;
@@ -321,6 +359,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         if ( function_pointer_call == 0 && tmpfiles[argnumber+1] == NULL &&
             ( (functype->flags & FASTCALL) == FASTCALL || (builtin_flags & FASTCALL) == FASTCALL ) ) {
             /* fastcall of single expression OR the last argument of a builtin */
+            last_was_fast = 1;
+            last_fast_kind = expr;
         } else {
             if (argnumber == watcharg) {
                 int off = (int)val + 1;
@@ -353,6 +393,27 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     FREENULL(save_fps);
     lineno = saveline;
 
+    if (struct_alloc) {
+        struct_hidden_zsp = hidden_zsp;
+        struct_hidden_active = 1;
+        /* A near function pointer is still in HL, or under the fastcall
+           argument. callstk pushes the hidden pointer itself. */
+        if (!(function_pointer_call && fnptr_type->kind != KIND_CPTR)) {
+            int live = 0;
+
+            if (last_was_fast) {
+                if (last_fast_kind == KIND_LONG || last_fast_kind == KIND_CPTR
+                    || last_fast_kind == KIND_ACCUM32
+                    || (last_fast_kind == KIND_DOUBLE && c_fp_size == 4))
+                    live = 4;
+                else if (last_fast_kind != KIND_LONGLONG
+                         && !(last_fast_kind == KIND_DOUBLE && c_fp_size > 4))
+                    live = 2;
+            }
+            gen_push_struct_hidden(live, 0);
+            struct_hidden_active = 0;
+        }
+    }
 
     if (function_pointer_call == NO ) {
         int va_arg_count = -1;
@@ -390,6 +451,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     if ( functype->return_type->kind == KIND_LONGLONG) {
         nargs += 2;
     }
+    if (struct_alloc)
+        nargs += 2;
     if (functype->flags & CALLEE ) {
         Zsp += nargs;
         // IF we called a far pointer and we had arguments, pop the address off the stack
@@ -402,6 +465,11 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             nargs += 4;
         }
         Zsp = gen_restore_frame_after_call(nargs,functype->return_type->kind, preserve, YES);  /* clean up arguments - we know what type is MOOK */
+    }
+    /* Arguments and the hidden pointer are gone. The buffer is at SP. */
+    if (struct_alloc) {
+        struct_hidden_active = 0;
+        struct_temp_bytes = struct_alloc;
     }
 }
 
