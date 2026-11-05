@@ -261,6 +261,7 @@ Type *make_enum(const char *name)
     type->len = 1;
     type->isconst = 1;
     strcpy(type->name, name);
+    type->enum_tag = debug_enum_key(name);
 
     return type;
 }
@@ -348,6 +349,7 @@ static Type *parse_enum(Type *type)
             value++;
         } while (cmatch(',') && !rcmatch('}'));
         needchar('}');
+        debug_write_enum(ptr);
         return ptr;
     } 
     // We're declaring a type that is an enum
