@@ -387,13 +387,8 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
     else if (t2 == KIND_CPTR && (t1 == KIND_INT || t1 == KIND_PTR))
         warningfmt("incompatible-pointer-types","Narrowing pointer from far to near");
         
-    /* Char conversion */
-    if (t1 == KIND_CHAR && isunsigned2 == NO && !isconst) {
-        if (isunsigned1 == NO)
-            gen_conv_sint2char();
-        else
-            gen_conv_uint2char();
-    } else if (t1 == KIND_CHAR && isunsigned2 == YES && !isconst) {
+    /* Char conversion. The source signedness does not change the call. */
+    if (t1 == KIND_CHAR && !isconst) {
         if (isunsigned1 == NO)
             gen_conv_sint2char();
         else
