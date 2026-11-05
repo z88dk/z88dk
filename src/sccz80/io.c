@@ -341,23 +341,28 @@ void blanks(void)
     }
 }
 
-void outdec(long number)
+/* A host long is 32 bits on Win64. Signed negation of that minimum
+   is undefined, and the digit loop then prints "-0". */
+void outdec(int64_t number)
 {
+    uint64_t magnitude;
+
     if (number < 0) {
-        number = -number;
-        /*        number= (int)( 65536UL-(long)number); */
         outbyte('-');
+        magnitude = (uint64_t)0 - (uint64_t)number;
+    } else {
+        magnitude = (uint64_t)number;
     }
-    outd2(number);
+    outd2(magnitude);
 }
 
-void outd2(long n)
+void outd2(uint64_t n)
 {
     if (n > 9) {
         outd2(n / 10);
         n %= 10;
     }
-    outbyte('0' + (n & 0xff));
+    outbyte('0' + (int)n);
 }
 
 /* convert lower case to upper */
