@@ -195,7 +195,7 @@ SYMBOL* addglb(
     ptr->level = ncmp;
     ptr->scope_block = current_block;
     HASH_ADD_STR(symtab, name, ptr);  
-    if ( id == ID_VARIABLE)
+    if ( id == ID_VARIABLE && !debug_size_pending(type) )
         debug_write_symbol(ptr); 
     ++glbcnt;
     return (ptr);

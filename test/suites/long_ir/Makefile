@@ -6357,6 +6357,118 @@ stackpark_keep.bin: $(SOURCES) stackpark.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=stack-spill-multi -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+all:	fcdeadframe.bin fcdeadframe_fp.bin fcdeadframe_8080.bin fcdeadframe_8085.bin fcdeadframe_gbz80.bin fcdeadframe_z180.bin fcdeadframe_ez80.bin fcdeadframe_r2ka.bin fcdeadframe_r4k.bin fcdeadframe_kc160.bin fcdeadframe_z80n.bin
+
+fcdeadframe.bin: $(SOURCES) fcdeadframe.c
+	$(compile)
+	$(runtest)
+
+fcdeadframe_fp.bin: $(SOURCES) fcdeadframe.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+fcdeadframe_8080.bin: $(SOURCES) fcdeadframe.c
+	$(compile_8080)
+	$(runtest_8080)
+
+fcdeadframe_8085.bin: $(SOURCES) fcdeadframe.c
+	$(compile_8085)
+	$(runtest_8085)
+
+fcdeadframe_gbz80.bin: $(SOURCES) fcdeadframe.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+fcdeadframe_z180.bin: $(SOURCES) fcdeadframe.c
+	$(compile_z180)
+	$(runtest_z180)
+
+fcdeadframe_ez80.bin: $(SOURCES) fcdeadframe.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+fcdeadframe_r2ka.bin: $(SOURCES) fcdeadframe.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+fcdeadframe_r4k.bin: $(SOURCES) fcdeadframe.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+fcdeadframe_kc160.bin: $(SOURCES) fcdeadframe.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+fcdeadframe_z80n.bin: $(SOURCES) fcdeadframe.c
+	$(compile_z80n)
+	$(runtest_z80n)
+
+# [dbgfastcall4] -debug: the frame helper must preserve DE across a 4-byte fastcall parameter (gbz80 clobbered it).
+all:	dbgfastcall4.bin dbgfastcall4_8080.bin dbgfastcall4_8085.bin dbgfastcall4_gbz80.bin
+
+dbgfastcall4.bin: $(SOURCES) dbgfastcall4.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dbgfastcall4_8080.bin: $(SOURCES) dbgfastcall4.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dbgfastcall4_8085.bin: $(SOURCES) dbgfastcall4.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dbgfastcall4_gbz80.bin: $(SOURCES) dbgfastcall4.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+all:	gbleastore.bin gbleastore_fp.bin gbleastore_gbz80.bin gbleastore_8080.bin gbleastore_8085.bin
+
+gbleastore.bin: $(SOURCES) gbleastore.c
+	$(compile)
+	$(runtest)
+
+gbleastore_fp.bin: $(SOURCES) gbleastore.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+gbleastore_gbz80.bin: $(SOURCES) gbleastore.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+gbleastore_8080.bin: $(SOURCES) gbleastore.c
+	$(compile_8080)
+	$(runtest_8080)
+
+gbleastore_8085.bin: $(SOURCES) gbleastore.c
+	$(compile_8085)
+	$(runtest_8085)
+
+# [ixblockcopy] inlined memcpy/strcpy result in an IX frame without sp-flip (copt #FRC must keep `pop bc` before `ld hl,bc`).
+all:	ixblockcopy.bin ixblockcopy_z180.bin ixblockcopy_z80n.bin ixblockcopy_ez80.bin ixblockcopy_8080.bin ixblockcopy_gbz80.bin
+
+ixblockcopy.bin: $(SOURCES) ixblockcopy.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -Cc--opt-disable=sp-flip -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ixblockcopy_z180.bin: $(SOURCES) ixblockcopy.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z180 -fframe-pointer -Cc--opt-disable=sp-flip -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz180 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ixblockcopy_z80n.bin: $(SOURCES) ixblockcopy.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=z80n -fframe-pointer -Cc--opt-disable=sp-flip -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80n $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ixblockcopy_ez80.bin: $(SOURCES) ixblockcopy.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -Cc--opt-disable=sp-flip -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ixblockcopy_8080.bin: $(SOURCES) ixblockcopy.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -fframe-pointer -Cc--opt-disable=sp-flip -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ixblockcopy_gbz80.bin: $(SOURCES) ixblockcopy.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -fframe-pointer -Cc--opt-disable=sp-flip -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 # [shl-copy-de] same decision in both lazy-spill passes (`(int)l * 3`); the rung is off on 8085, kc160, rabbit.
 all: shlcopy2pass.bin shlcopy2pass_fp.bin shlcopy2pass_z180.bin shlcopy2pass_ez80_z80.bin shlcopy2pass_z80n.bin shlcopy2pass_r800.bin shlcopy2pass_8080.bin shlcopy2pass_gbz80.bin shlcopy2pass_8085.bin shlcopy2pass_kc160.bin shlcopy2pass_r2ka.bin
 

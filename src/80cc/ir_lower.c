@@ -6330,6 +6330,7 @@ static int autopush_frameless(const Func *f)
 {
     if (!autopush_param_on()) return 0;
     if (c_framepointer_is_ix == -1) return 0;   /* sp-mode: no IX anyway */
+    if (c_debug_adb_defc) return 0;   /* -debug: the records need the IX frame base */
     if (!f || f->is_naked || f->is_interrupt || f->uses_acc) return 0;
     if (f->flags & SDCCCALL1) return 0;
     if (frame_has_saved_iy(f)) return 0;
@@ -10965,8 +10966,15 @@ static int ir_lower_func_body(FILE *out, Func *f)
        function once with frame_size=0: the spill vregs shed their (dead) slots
        and the existing frame_size==0 IX-elision makes it frameless. Safe by
        construction — a dead slot is never addressed, so dropping it and the
-       frame shifts nothing that is emitted. The scratch render is discarded. */
-    if (deadframe_on() && !df_retry_done && rc == 0
+       frame shifts nothing that is emitted. The scratch render is discarded.
+       Not with an auto-pushed param: the prologue `push` stores it, so a body
+       that never reads its slot leaves the frame "dead", but the re-render
+       still pushes it (the flag stays) while the epilogue, with frame_size=0,
+       reclaims nothing, and `ret` pops the argument. */
+    int df_autopush = 0;
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vregs[v].flags & IR_VREG_AUTOPUSH) df_autopush = 1;
+    if (deadframe_on() && !df_retry_done && rc == 0 && !df_autopush
         && L.frame_fully_dead && f->frame_size > 0 && rout != out) {
         df_retry_done = 1;
         /* Clear every slot. A vreg with a RANGED
@@ -11384,7 +11392,10 @@ static int flip_cost_budget(void)
 int ir_lower_func_flip(FILE *out, Func *f)
 {
     extern int c_framepointer_is_ix;
-    if (!spflip_enabled() || c_framepointer_is_ix != 1 || !f)
+    /* -debug keeps the IX frame: a flipped function would fall back to
+       l_debug_push_frame, and once __debug_framepointer is linked the debugger
+       resolves every frame through it. */
+    if (!spflip_enabled() || c_framepointer_is_ix != 1 || !f || c_debug_adb_defc)
         return ir_lower_func(out, f);
     const char *nm = f->fn ? ir_sym_name(f->fn) : "";
     int excluded = (strcmp(nm, "main") == 0);

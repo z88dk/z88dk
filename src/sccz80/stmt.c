@@ -417,6 +417,7 @@ void dofor(void)
     int l_condition;
     int savedsp;
     int testresult = 1; // Default is true
+    int savblock = current_block;
 
     SYMBOL *savedloc;
     t_buffer *buf2, *buf3,*buf4;
@@ -427,6 +428,8 @@ void dofor(void)
     savedloc = locptr;
 
     needchar('(');
+    ++scope_block;
+    current_block = scope_block; /* the for scope is a block of its own: header and body */
     ++ncmp;
     if (cmatch(';') == 0) {
         if ( declare_local(0) == 0 ) {
@@ -467,6 +470,7 @@ void dofor(void)
         discardbuffer(buf4);
     }
     --ncmp;
+    current_block = savblock;
     modstk(savedsp, KIND_NONE, NO, YES);
     Zsp = savedsp;
     locptr = savedloc;
