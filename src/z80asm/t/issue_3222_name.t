@@ -77,14 +77,19 @@ for my $line ( path("${test}.map")->lines ) {
     elsif ( $line =~ /^__C_LINE_(\d+)_(\S+)\s+=\s+\$([0-9A-F]+)/ ) {
         my ( $n, $name, $addr ) = ( $1, unmangle($2), $3 );
         $name =~ s/::.*//;
+        # ucpp joins the include directory to a header with a backslash on Windows and
+        # sdcc then drops the backslash: "dirhdr.h" where others have "hdr.h"
+        $name =~ s/^\Q$dir\E(?=[^\/])// if $^O eq 'MSWin32';
         push @cline, $name;
         $ret_addr = $addr if $n == 7 && $name eq "$dir/${test}.c";
     }
 }
 is_deeply \@scope, ["$dir/${test}.c"], "file-static counter is in the file as given";
-is_deeply [ sort keys %{ { map { $_ => 1 } @cline } } ],
+my @cline_names = sort keys %{ { map { $_ => 1 } @cline } };
+is_deeply \@cline_names,
     [ sort "$dir/${test}.c", $hdr_same, $hdr_pref ],
-    "C_LINE names the source as given, and the headers by their own names";
+    "C_LINE names the source as given, and the headers by their own names"
+    or diag "C_LINE names: ", join( " | ", map { "[$_]" } @cline_names );
 
 # -------------------------------------------------------------------------
 # z88dk-ticks resolves the file-static at the line of the return
@@ -92,7 +97,7 @@ is_deeply [ sort keys %{ { map { $_ => 1 } @cline } } ],
 ok defined $ret_addr, "line 7 has an address" or die;
 path("${test}.cmd")->spew("break 0x$ret_addr\ncont\nprint counter\nquit\n");
 run_ok("z88dk-ticks -x ${test}.map -d ${test}.bin < ${test}.cmd > ${test}.out 2>&1");
-like slurp("${test}.out"), qr/^.*\$1 = <int16_t> 5$/m, "z88dk-ticks prints counter";
+like slurp("${test}.out"), qr/^.*\$1 = <int16_t> 5\r?$/m, "z88dk-ticks prints counter";
 
 # -------------------------------------------------------------------------
 # two files of one name in different directories, each with a static counter:
@@ -138,7 +143,7 @@ is $counters, 2, "the map has a counter for each file";
 ok defined $addr_fa && defined $addr_main, "the lines of fa and main have an address" or die;
 path("${test}3.cmd")->spew("break 0x$addr_fa\nbreak 0x$addr_main\ncont\nprint counter\ncont\nprint counter\nquit\n");
 run_ok("z88dk-ticks -x ${test}3.map -d ${test}3.bin < ${test}3.cmd > ${test}3.out 2>&1");
-like slurp("${test}3.out"), qr/\$1 = <int16_t> 5\n.*\$2 = <int16_t> 7$/ms, "counter is 5 in fa and 7 in main";
+like slurp("${test}3.out"), qr/\$1 = <int16_t> 5\r?\n.*\$2 = <int16_t> 7\r?$/ms, "counter is 5 in fa and 7 in main";
 
 # -------------------------------------------------------------------------
 # the module is named by the path for a zsdcc -debug C file only: a build
