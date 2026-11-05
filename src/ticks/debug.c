@@ -972,7 +972,16 @@ void debug_add_cline(const char *filename, const char *function, int lineno, int
     cl->address = maddress;
     cl->level = level;
     cl->scope_block = scope_block;
-    HASH_ADD_INT(cf->lines, line, cl);
+
+    /* A line can have several C_LINE symbols (one per function or block whose
+       code it holds): a breakpoint on the line goes to the first of its code */
+    cline *old;
+    HASH_FIND_INT(cf->lines, &lineno, old);
+    if ( old == NULL ) {
+        HASH_ADD_INT(cf->lines, line, cl);
+    } else if ( cl->address < old->address ) {
+        HASH_REPLACE_INT(cf->lines, line, cl, old);
+    }
 
     cline **slot = cline_slot(cl->address, 1);
     if ( slot != NULL )
