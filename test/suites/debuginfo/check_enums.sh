@@ -35,6 +35,8 @@ val '<enum 0__anonenum_4_0> ANA'       ga_anon
 val '<enum colour[]> 0x@[2] = { [0] = RED, [1] = BLUE }' ga_arr
 val '<enum colour> BLUE'               '*ga_ptr'
 val '<enum colour*> 0x@(BLUE)'         ga_ptr
+val '<enum colour[]> 0x@[3] = { [0] = GREEN, [1] = BLUE, [2] = RED }' ga_unsized
+val '<enum colour[]> 0x@[2] = { [0] = BLUE, [1] = GREEN }' stu
 val '<enum colour> GREEN'              s_col
 val '<enum colour> BLUE'               st
 val '<enum colour> BLUE'               param

@@ -1,12 +1,14 @@
 ; E:Fenums_a.c$s_col$0_0$0({2}SEFenums_a.c$colour:S),E,0,0
 ; E:Fenums_a.c$st_fa2_st$1_0$2({2}SEFenums.h$shared:S),E,0,0
 ; E:Fenums_a.c$st_fa_st$1_0$1({2}SEFenums_a.c$colour:S),E,0,0
+; E:Fenums_a.c$st_fa_stu$1_0$1({4}DA2x,SEFenums_a.c$colour:S),E,0,0
 ; E:G$ga_anon$0_0$0({2}SEFenums_a.c$0__anonenum_4_0:S),E,0,0
 ; E:G$ga_arr$0_0$0({4}DA2x,SEFenums_a.c$colour:S),E,0,0
 ; E:G$ga_col$0_0$0({2}SEFenums_a.c$colour:S),E,0,0
 ; E:G$ga_ptr$0_0$0({2}DG,SEFenums_a.c$colour:S),E,0,0
 ; E:G$ga_sh$0_0$0({2}SEFenums.h$shared:S),E,0,0
 ; E:G$ga_tdef$0_0$0({2}SEFenums_a.c$colour:S),E,0,0
+; E:G$ga_unsized$0_0$0({6}DA3x,SEFenums_a.c$colour:S),E,0,0
 ; N:Fenums.h$shared({2}SI:S)[(SH_ONE$1)(SH_TWO$2)]
 ; N:Fenums_a.c$0__anonenum_4_0({2}SI:S)[(ANA$-3)(ANB$300)]
 ; N:Fenums_a.c$colour({2}SI:S)[(RED$0)(GREEN$5)(BLUE$6)]

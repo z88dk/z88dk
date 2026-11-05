@@ -29,7 +29,7 @@ ifdef DBG_WINDOWS
 all:
 	@echo "debuginfo: skipped (POSIX-shell debugger harness; not run on Windows)"
 else
-all: z80 i8080 i8085 gbz80 exprerr
+all: z80 i8080 i8085 gbz80 arrays exprerr
 endif
 
 # the enum targets: their own lines, so exprerr can be reverted alone
@@ -37,21 +37,33 @@ ifndef DBG_WINDOWS
 all: enums dupname enumblk
 endif
 
-z80: dbgvars.c
+z80: dbgvars.c dbglocals.c
 	zcc +test $(DFLAGS) $< -o dbgvars_z80.bin -m
 	@sh ./check.sh -mz80 dbgvars_z80.bin dbgvars_z80.map z80
+	zcc +test $(DFLAGS) dbglocals.c -o dbglocals_z80.bin -m
+	@sh ./check_locals.sh -mz80 dbglocals_z80.bin dbglocals_z80.map z80
 
-i8080: dbgvars.c
+i8080: dbgvars.c dbglocals.c
 	zcc +test $(DFLAGS) -clib=8080 $< -o dbgvars_8080.bin -m
 	@sh ./check.sh -m8080 dbgvars_8080.bin dbgvars_8080.map 8080
+	zcc +test $(DFLAGS) -clib=8080 dbglocals.c -o dbglocals_8080.bin -m
+	@sh ./check_locals.sh -m8080 dbglocals_8080.bin dbglocals_8080.map 8080
 
-i8085: dbgvars.c
+i8085: dbgvars.c dbglocals.c
 	zcc +test $(DFLAGS) -clib=8085 $< -o dbgvars_8085.bin -m
 	@sh ./check.sh -m8085 dbgvars_8085.bin dbgvars_8085.map 8085
+	zcc +test $(DFLAGS) -clib=8085 dbglocals.c -o dbglocals_8085.bin -m
+	@sh ./check_locals.sh -m8085 dbglocals_8085.bin dbglocals_8085.map 8085
 
-gbz80: dbgvars.c
+gbz80: dbgvars.c dbglocals.c
 	zcc +test $(DFLAGS) -clib=gbz80 $< -o dbgvars_gbz80.bin -m
 	@sh ./check.sh -mgbz80 dbgvars_gbz80.bin dbgvars_gbz80.map gbz80
+	zcc +test $(DFLAGS) -clib=gbz80 dbglocals.c -o dbglocals_gbz80.bin -m
+	@sh ./check_locals.sh -mgbz80 dbglocals_gbz80.bin dbglocals_gbz80.map gbz80
+
+arrays: dbgarr.c
+	zcc +test $(DFLAGS) $< -o dbgarr.bin -m
+	@sh ./check-arrays.sh dbgarr.bin dbgarr.map
 
 # An unknown name in an expression gives its error instead of crashing ticks
 exprerr: z80
@@ -60,7 +72,7 @@ exprerr: z80
 clean:
 	$(RM) *.bin *.map *.o *.sym *.def zcc_opt.def *.lis
 
-.PHONY: all z80 i8080 i8085 gbz80 exprerr clean
+.PHONY: all z80 i8080 i8085 gbz80 arrays exprerr clean
 .PHONY: enums dupname enumblk clean-enums
 
 # Enum objects print their enumerator (two modules, same-named enums, a shared header);
