@@ -21,10 +21,28 @@ int primary(LVALUE* lval)
     int k;
 
     if (cmatch('(')) {
-        do {
+        int   pure = 1;
+        char *before, *start;
+
+        /* A parenthesis hides the comma from the caller. The caller
+           drops a constant result, and that drop took the earlier
+           operand with it. (i++, 7) must increment. (1, 2) stays 2. */
+        for (;;) {
+            setstage(&before, &start);
             k = heir1(lval);
-        } while (cmatch(','));
+            if (!cmatch(','))
+                break;
+            if (lval->is_const) {
+                if (before)
+                    clearstage(before, NULL);
+            } else
+                pure = 0;
+        }
         needchar(')');
+        if (!pure) {
+            lval->is_const = 0;
+            lval->int_const_valid = 0;
+        }
         return k;
     }
 

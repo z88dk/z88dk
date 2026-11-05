@@ -92,12 +92,73 @@ void test_trailing(void)
     assertEqual(trailing(), 7);
 }
 
+static int comma_i;
+
+static int comma_ret(void)
+{
+    comma_i = 0;
+    return (comma_i++, 7);
+}
+
+static int comma_top(void)
+{
+    comma_i = 0;
+    return comma_i++, 9;
+}
+
+static int comma_fold(void)
+{
+    return (1, 2);
+}
+
+static int comma_two(void)
+{
+    comma_i = 0;
+    return (comma_i++, comma_i++, 4);
+}
+
+void test_comma(void)
+{
+    int v;
+
+    assertEqual(comma_ret(), 7);
+    assertEqual(comma_i, 1);
+
+    comma_i = 0;
+    v = 0;
+    if ((comma_i++, 0))
+        v = 3;
+    assertEqual(v, 0);
+    assertEqual(comma_i, 1);
+
+    assertEqual(comma_top(), 9);
+    assertEqual(comma_i, 1);
+    assertEqual(comma_fold(), 2);
+    assertEqual(comma_two(), 4);
+    assertEqual(comma_i, 2);
+
+    comma_i = 0;
+    v = 1;
+    if (comma_i++, 0)
+        v = 5;
+    assertEqual(v, 1);
+    assertEqual(comma_i, 1);
+
+    v = 0;
+    if ((1, 0))
+        v = 1;
+    else if ((0, 2))
+        v = 2;
+    assertEqual(v, 2);
+}
+
 int suite_constif(void)
 {
     suite_setup("Constant conditions");
     suite_add_test(test_if_constants);
     suite_add_test(test_loops);
     suite_add_test(test_trailing);
+    suite_add_test(test_comma);
     return suite_run();
 }
 
