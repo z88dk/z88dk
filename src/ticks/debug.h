@@ -81,6 +81,7 @@ struct type_record_s {
     size_t size;
     type_chain* first;
     uint8_t signed_;
+    const char* module;     // the module whose record it is, which gives its float format
 };
 
 struct address_space_s {
@@ -192,7 +193,7 @@ struct debugger_regs_t {
 };
 
 // debug
-extern void debug_add_info_encoded(char *encoded);
+extern void debug_add_info_encoded(char *encoded, const char *module);
 extern int debug_find_source_location(int address, const char **filename, int *lineno);
 extern void debug_add_cline(const char *filename, const char *function, int lineno, int level, int scope, const char *address);
 extern int debug_resolve_source(char *name, const char** corrected_name);
@@ -210,6 +211,8 @@ struct expression_result_t;
 
 extern debug_sym_function* debug_find_function(const char* function_name, const char* file_name);
 extern void debug_resolve_expression_element(type_record* record, type_chain* chain, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into);
+extern void debug_resolve_struct_member(type_record* holder, debug_sym_type* t, debug_sym_symbol* member, uint32_t data, struct expression_result_t* into);
+extern int debug_type_size(type_record* record, type_chain* chain, char* error, size_t error_size);
 extern void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, struct expression_result_t* into);
 extern uint8_t debug_symbol_valid(debug_sym_symbol* sym, uint16_t stack, debug_frame_pointer* frame_pointer);
 extern debug_sym_symbol* cdb_get_first_global_symbol();

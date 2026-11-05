@@ -23,8 +23,17 @@ static debug_sym_type* cdb_ctypes = NULL;
 /* The width of a float, from the last record that gave one. A record does not
    give it for a float behind a pointer or a function, nor does a cast. */
 static int cdb_float_size = 4;
+static int cdb_float_size_known = 0;      // a record has given the width
 
 static debug_sym_enum* cdb_enums = NULL;
+
+// The module of the record being read, which a type_record keeps; one copy of each name
+typedef struct {
+    char*           name;
+    UT_hash_handle  hh;
+} cdb_module;
+static cdb_module* cdb_modules = NULL;
+static const char* cdb_record_module = NULL;
 
 /* An E: record gives the S: record of the same name (G$gc$0_0$0) its enum's
    tag. They can come in either order, so each one waits here for the other. */
@@ -118,6 +127,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
     record->size = size;
     record->first = NULL;
     record->signed_ = 0;
+    record->module = cdb_record_module;
     rt += end;
 
     enum record_partning_mode mode = RECORD_PARSING_MODE_BEGIN;
@@ -354,6 +364,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
         if (c != NULL && c->type_ == TYPE_FLOAT && width > 0) {
             c->size = width;
             cdb_float_size = width;
+            cdb_float_size_known = 1;
         }
     }
 
@@ -882,7 +893,7 @@ static void debug_add_enum_tag(const char* encoded, debug_sym_symbol* s)
 }
 
 /* Add debug information, in this case it's encoded */
-void debug_add_info_encoded(char *encoded)
+void debug_add_info_encoded(char *encoded, const char *module)
 {
     char *ptr = encoded;
     char *drop = encoded;
@@ -905,6 +916,17 @@ void debug_add_info_encoded(char *encoded)
 
     uint8_t record_type = encoded[0];
     const char* subtype = &encoded[2];
+    cdb_record_module = NULL;
+    if (module != NULL && module[0] != 0) {
+        cdb_module* m = NULL;
+        HASH_FIND_STR(cdb_modules, module, m);
+        if (m == NULL) {
+            m = calloc(1, sizeof(cdb_module));
+            m->name = strdup(module);
+            HASH_ADD_KEYPTR(hh, cdb_modules, m->name, strlen(m->name), m);
+        }
+        cdb_record_module = m->name;
+    }
 
     switch (record_type)
     {
@@ -1132,8 +1154,8 @@ type_chain* copy_type_chain(type_chain* from) {
         }
         *copy_ptr = *from;
         // recalculate size since malloc_type had NULL data; an array's size
-        // is its element count, which only the record carries
-        if (copy_ptr->type_ != TYPE_ARRAY) {
+        // is its element count, and a float's its width, which only the record carries
+        if (copy_ptr->type_ != TYPE_ARRAY && copy_ptr->type_ != TYPE_FLOAT) {
             copy_ptr->size = get_type_memory_size(copy_ptr);
         }
         ptr = copy_ptr;
@@ -1151,7 +1173,9 @@ type_chain* malloc_type(enum type_record_type type) {
     result->bit_start = 0;
     result->bit_width = 0;
     result->size = 0;
-    result->size = get_type_memory_size(result);
+    if (type != TYPE_FLOAT) {
+        result->size = get_type_memory_size(result);    // a float's width is its record's, 0 if none
+    }
     return result;
 }
 
@@ -1272,95 +1296,227 @@ int get_type_memory_size(type_chain* chain) {
     }
 }
 
-enum float_format {
-    FLOAT_FORMAT_UNSUPPORTED = 0,
-    FLOAT_FORMAT_IEEE32,        // IEEE 754 binary32
-    FLOAT_FORMAT_Z80_48,        // math48 and genmath
-};
+/* The values of __fp_mode, which sccz80 and 80cc write with __fp_exponent_bias and
+   __fp_mantissa_size into each module, as locals. They are the names of their -fp-mode */
+static const char* fp_mode_names[] = { "z80", "ieee", "mbf32", "mbf40", "mbf64", "z88", "am9511" };
+static const int fp_mode_sizes[] = { 6, 4, 4, 6, 8, 6, 4 };     // a float's width in each
+#define FP_MODE_Z80     0
+#define FP_MODE_IEEE    1
+#define FP_MODE_Z88     5
+#define FP_MODE_AM9511  6
+/* Where the mantissa starts: z88 leaves the first byte (sccz80's c_fp_fudge_offset) */
+#define FP_MODE_OFFSET(mode)    ((mode) == FP_MODE_Z88 ? 1 : 0)
 
-/* The format of a float of size bytes. A record does not say it, but a map
-   names the float library that was linked with a non-zero
-   __code_fp_<lib>_size, or for z88_math, its FP_ codes. math16 is not listed:
-   it is _Float16, not float. */
-static enum float_format debug_float_format(int size, const char** lib)
+/* Read a float of size bytes in the format of module, the module of the record that
+   describes it (through a pointer or a struct, of the pointer's or the struct's object):
+   0 and the format in mode, exponent_bias and mantissa_size, or -1 and the reason in
+   into's error. A float of no record, which only a cast of an integer to a pointer
+   makes, takes the program's format if its modules agree. A module without __fp_mode
+   (zsdcc, older compilers) is IEEE. A float whose record gives no width (*size 0:
+   behind a pointer, or a cast) gets its format's width in *size, or without __fp_mode,
+   the width the records give. */
+static int debug_float_format(const char* module, int* size_ptr, int* mode, int* exponent_bias, int* mantissa_size, struct expression_result_t* into)
 {
-    static const struct {
-        const char*         lib;
-        int                 size;       // 0: no format read here
-        enum float_format   format;
-    } float_libraries[] = {
-        { "math48", 6, FLOAT_FORMAT_Z80_48 },
-        { "math48", 4, FLOAT_FORMAT_IEEE32 },   // zsdcc's float with math48
-        { "math32", 4, FLOAT_FORMAT_IEEE32 },
-        { "am9511", 4, FLOAT_FORMAT_IEEE32 },
-        { "bbc",    0, FLOAT_FORMAT_UNSUPPORTED },
-        { "mbf32",  0, FLOAT_FORMAT_UNSUPPORTED },
-        { "mbf64",  0, FLOAT_FORMAT_UNSUPPORTED },
-        { "dai32",  0, FLOAT_FORMAT_UNSUPPORTED },
-    };
-    int i;
+    symbol *m, *e, *s;
+    int size = *size_ptr;
 
-    *lib = NULL;
-    for (i = 0; i < (int)(sizeof(float_libraries) / sizeof(float_libraries[0])); i++) {
-        char name[64];
-        snprintf(name, sizeof(name), "__code_fp_%s_size", float_libraries[i].lib);
-        if (symbol_resolve(name, NULL) > 0) {
-            *lib = float_libraries[i].lib;
-            if (float_libraries[i].size == size) {
-                return float_libraries[i].format;
-            }
-        }
-    }
-    if (*lib != NULL) {
-        return FLOAT_FORMAT_UNSUPPORTED;
-    }
-
-    /* z88_math, the z88's native maths (z88 format), has no fp_<lib> section,
-       but its modules call the floating point package with FP_ codes */
-    {
-        static const char* fpp_codes[] = {
-            "FP_ABS", "FP_ACS", "FP_ADD", "FP_ASN", "FP_ATN", "FP_COS", "FP_DIV", "FP_EQ",
-            "FP_EXP", "FP_FIX", "FP_FLT", "FP_GEQ", "FP_GT", "FP_INT", "FP_LEQ", "FP_LN",
-            "FP_LOG", "FP_LT", "FP_MUL", "FP_NEG", "FP_PI", "FP_PWR", "FP_SIN", "FP_SQR",
-            "FP_STR", "FP_SUB", "FP_TAN", "FP_VAL", NULL
-        };
-        for (i = 0; fpp_codes[i] != NULL; i++) {
-            if (symbol_resolve((char*)fpp_codes[i], NULL) >= 0) {
-                *lib = "z88_math";
-                return FLOAT_FORMAT_UNSUPPORTED;
-            }
+    if (module != NULL) {
+        m = find_symbol_in_module("__fp_mode", module);
+        e = find_symbol_in_module("__fp_exponent_bias", module);
+        s = find_symbol_in_module("__fp_mantissa_size", module);
+    } else {
+        m = find_symbol_byname("__fp_mode", NULL);
+        e = find_symbol_byname("__fp_exponent_bias", NULL);
+        s = find_symbol_byname("__fp_mantissa_size", NULL);
+        if ((m != NULL && m->differs) || (e != NULL && e->differs) || (s != NULL && s->differs)) {
+            snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (the modules disagree)");
+            return -1;
         }
     }
 
-    /* No float library named: a program that links no float code, or
-       genmath, genmath_zx81 and the ROM maths (mzx, m81, mlambda, cpc_math),
-       which have no fp_<lib> section and store the z80 48-bit format */
-    switch (size) {
-        case 4: return FLOAT_FORMAT_IEEE32;
-        case 6: return FLOAT_FORMAT_Z80_48;
-        default: return FLOAT_FORMAT_UNSUPPORTED;
-    }
-}
-
-/* A 40-bit mantissa, little-endian, with its leading 1 implied and the sign in
-   bit 7 of byte 4; byte 5 is the exponent biased by 128, 0 for zero. Scaled
-   without ldexp(): z88dk-dis links without -lm. */
-static float debug_float_from_z80_48(const uint8_t* b)
-{
-    double v;
-    int exponent;
-
-    if (b[5] == 0) {
+    if (m == NULL) {
+        *mode = FP_MODE_IEEE;
+        if (size == 0) {
+            if (!cdb_float_size_known) {
+                snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (no width, and no __fp_mode)");
+                return -1;
+            }
+            size = *size_ptr = cdb_float_size;      // the width of the floats that records give
+        }
+        if (size != 4) {
+            snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (%d bytes, and no __fp_mode)", size);
+            return -1;
+        }
         return 0;
     }
-    v = (double)(((uint64_t)(b[4] | 0x80) << 32) | ((uint32_t)b[3] << 24) | ((uint32_t)b[2] << 16) | ((uint32_t)b[1] << 8) | b[0]);
-    for (exponent = b[5] - 128 - 40; exponent > 0; exponent--) {
+    if (e == NULL || s == NULL) {
+        snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (no __fp_exponent_bias or __fp_mantissa_size)");
+        return -1;
+    }
+    *mode = (int)m->address;
+    *exponent_bias = (int)e->address;
+    *mantissa_size = (int)s->address;
+    if (size == 0 && *mode >= 0 && *mode < (int)(sizeof(fp_mode_sizes) / sizeof(fp_mode_sizes[0]))) {
+        size = *size_ptr = fp_mode_sizes[*mode];
+    }
+    if ((*mode == FP_MODE_IEEE && size == 4) ||
+        (*mode == FP_MODE_AM9511 && size == 4 && *mantissa_size == 3)) {
+        return 0;
+    }
+    /* z80, mbf32, mbf40, mbf64 and z88: the mantissa, then the exponent */
+    if (*mode >= 0 && *mode <= FP_MODE_Z88 && *mode != FP_MODE_IEEE && *mantissa_size > 0 &&
+        FP_MODE_OFFSET(*mode) + *mantissa_size < size && size <= 8) {
+        return 0;
+    }
+    if (*mode < (int)(sizeof(fp_mode_names) / sizeof(fp_mode_names[0]))) {
+        snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (%d bytes, %s)", size, fp_mode_names[*mode]);
+    } else {
+        snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (%d bytes, __fp_mode %d)", size, *mode);
+    }
+    return -1;
+}
+
+/* The AM9511's own format (--math-dai32): a 24-bit mantissa, little-endian, with its
+   leading 1 stored, then a byte of the sign (bit 7) and a 7-bit two's complement
+   exponent, biased by exponent_bias; a mantissa without its leading 1 is zero */
+static float debug_float_from_am9511(const uint8_t* b, int exponent_bias)
+{
+    uint32_t mantissa = b[0] | ((uint32_t)b[1] << 8) | ((uint32_t)b[2] << 16);
+    double v = mantissa;
+    int exponent = b[3] & 0x7f;
+
+    if ((mantissa & 0x800000) == 0) {
+        return 0;
+    }
+    if (exponent & 0x40) {
+        exponent -= 0x80;
+    }
+    for (exponent = exponent - exponent_bias - 24; exponent > 0; exponent--) {
         v *= 2;
     }
     for (; exponent < 0; exponent++) {
         v /= 2;
     }
-    return (float)((b[4] & 0x80) ? -v : v);
+    return (float)((b[3] & 0x80) ? -v : v);
+}
+
+/* The z80 format (math48, genmath, the ROM maths), which the Microsoft formats
+   (mbf32, mbf40, mbf64) and z88's (after its first byte) share: a mantissa of
+   mantissa_size bytes, little-endian, with its leading 1 implied and the sign in
+   its top bit, then the exponent, biased by exponent_bias, 0 for zero. Scaled
+   without ldexp(): z88dk-dis links without -lm. */
+static float debug_float_from_z80(const uint8_t* b, int exponent_bias, int mantissa_size)
+{
+    uint64_t mantissa = 0;
+    double v;
+    int exponent;
+    int i;
+
+    if (b[mantissa_size] == 0) {
+        return 0;
+    }
+    for (i = mantissa_size - 1; i >= 0; i--) {
+        mantissa = mantissa << 8 | b[i];
+    }
+    v = (double)(mantissa | (uint64_t)1 << (8 * mantissa_size - 1));
+    for (exponent = b[mantissa_size] - exponent_bias - 8 * mantissa_size; exponent > 0; exponent--) {
+        v *= 2;
+    }
+    for (; exponent < 0; exponent++) {
+        v /= 2;
+    }
+    return (float)((b[mantissa_size - 1] & 0x80) ? -v : v);
+}
+
+/* The width of the floats of module: its format's, 4 (IEEE) without __fp_mode, 0 for
+   no module */
+static int debug_module_float_width(const char* module)
+{
+    symbol* m;
+
+    if (module == NULL) {
+        return 0;
+    }
+    m = find_symbol_in_module("__fp_mode", module);
+    if (m == NULL) {
+        return 4;
+    }
+    if ((int)m->address >= 0 && (int)m->address < (int)(sizeof(fp_mode_sizes) / sizeof(fp_mode_sizes[0]))) {
+        return fp_mode_sizes[m->address];
+    }
+    return 0;
+}
+
+/* Whether a struct of type t holds a float, in itself or in a struct member */
+static int debug_struct_has_float(debug_sym_type* t, int depth)
+{
+    debug_sym_type_member* child;
+
+    if (t == NULL || depth > 8) {
+        return 0;
+    }
+    for (child = t->first_child; child != NULL; child = child->next) {
+        type_chain* c = child->symbol->type_record.first;
+        while (c != NULL && c->type_ == TYPE_ARRAY) {
+            c = c->next;
+        }
+        if (c != NULL && c->type_ == TYPE_FLOAT) {
+            return 1;
+        }
+        if (c != NULL && c->type_ == TYPE_STRUCTURE && debug_struct_has_float(cdb_find_type(c->data), depth + 1)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/* ticks keeps one T: record per struct key, so a struct that modules of two formats
+   share has the layout of one of them. 0 and the reason in error when an object of
+   module cannot use the kept layout: the struct holds a float, and the record's module
+   has floats of another width */
+static int debug_struct_layout_fits(const char* module, debug_sym_type* t, char* error, size_t error_size)
+{
+    int kept, own;
+
+    if (t == NULL || t->first_child == NULL || module == NULL) {
+        return 1;
+    }
+    kept = debug_module_float_width(t->first_child->symbol->type_record.module);
+    own = debug_module_float_width(module);
+    if (kept == 0 || own == 0 || kept == own || !debug_struct_has_float(t, 0)) {
+        return 1;
+    }
+    snprintf(error, error_size, "Unsupported float format (struct %s is laid out with %d-byte floats)", t->name, kept);
+    return 0;
+}
+
+/* The size of an object of chain in record's module, as for strides and sizeof: a float
+   that its record gives no width has its module's format's; -1 and the reason in error
+   when it cannot be known (a struct laid out for another format) */
+int debug_type_size(type_record* record, type_chain* chain, char* error, size_t error_size)
+{
+    if (chain == NULL) {
+        return get_type_memory_size(chain);
+    }
+    switch (chain->type_) {
+        case TYPE_FLOAT: {
+            int width = chain->size > 0 ? chain->size : debug_module_float_width(record->module);
+            return width > 0 ? width : get_type_memory_size(chain);
+        }
+        case TYPE_ARRAY: {
+            int size = debug_type_size(record, chain->next, error, error_size);
+            return size < 0 ? size : chain->size * size;
+        }
+        case TYPE_STRUCTURE: {
+            if (!debug_struct_layout_fits(record->module, cdb_find_type(chain->data), error, error_size)) {
+                return -1;
+            }
+            return get_type_memory_size(chain);
+        }
+        default: {
+            return get_type_memory_size(chain);
+        }
+    }
 }
 
 void debug_resolve_expression_element(type_record* record, type_chain* chain, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into) {
@@ -1469,10 +1625,9 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
             break;
 
         case TYPE_FLOAT: {
-            int size = get_type_memory_size(chain);
-            const char* lib;
-            enum float_format format = debug_float_format(size, &lib);
-            uint8_t b[6];
+            int size = chain->size;     // 0 when no record gives it: a cast
+            int mode, exponent_bias, mantissa_size;
+            uint8_t b[8];
             int i;
 
             if (resolve_by != RESOLVE_BY_POINTER) {
@@ -1480,9 +1635,7 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
                 set_expression_result_error(into);
                 break;
             }
-            if (format == FLOAT_FORMAT_UNSUPPORTED) {
-                snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (%d bytes%s%s)",
-                    size, lib ? ", " : "", lib ? lib : "");
+            if (debug_float_format(record->module, &size, &mode, &exponent_bias, &mantissa_size, into) < 0) {
                 set_expression_result_error(into);
                 break;
             }
@@ -1490,11 +1643,22 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
                 b[i] = bk.get_memory(data + i, MEM_TYPE_DATA);
             }
             into->memory_location = data;
-            if (format == FLOAT_FORMAT_IEEE32) {
+            if (mode == FP_MODE_IEEE) {
                 uint32_t v = b[0] | ((uint32_t)b[1] << 8) | ((uint32_t)b[2] << 16) | ((uint32_t)b[3] << 24);
                 memcpy(&into->as_float, &v, sizeof(v));
+            } else if (mode == FP_MODE_AM9511) {
+                into->as_float = debug_float_from_am9511(b, exponent_bias);
+            } else if (mode == FP_MODE_Z88 && b[FP_MODE_OFFSET(mode) + mantissa_size] == 0) {
+                /* z88 (BBC BASIC): exponent 0 marks a 32-bit two's complement integer
+                   in the four mantissa bytes, which floor() and ceil() store */
+                if (mantissa_size != 4) {
+                    snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (a z88 integer with a %d-byte mantissa)", mantissa_size);
+                    set_expression_result_error(into);
+                    break;
+                }
+                into->as_float = (float)(int32_t)(b[1] | ((uint32_t)b[2] << 8) | ((uint32_t)b[3] << 16) | ((uint32_t)b[4] << 24));
             } else {
-                into->as_float = debug_float_from_z80_48(b);
+                into->as_float = debug_float_from_z80(b + FP_MODE_OFFSET(mode), exponent_bias, mantissa_size);
             }
             break;
         }
@@ -1543,6 +1707,22 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
             into->as_uint = v;
         }
     }
+}
+
+/* A member of a struct of type t at data, read in the format of the module of the
+   struct's object (the type's own record may come from another module) */
+void debug_resolve_struct_member(type_record* holder, debug_sym_type* t, debug_sym_symbol* member, uint32_t data, struct expression_result_t* into) {
+    type_record record = member->type_record;
+
+    if (!debug_struct_layout_fits(holder->module, t, into->as_error, sizeof(into->as_error))) {
+        set_expression_result_error(into);
+        return;
+    }
+
+    if (holder->module != NULL) {
+        record.module = holder->module;
+    }
+    debug_resolve_expression_element(&record, record.first, RESOLVE_BY_POINTER, data, into);
 }
 
 static int debug_get_symbol_address(debug_sym_symbol *s) {

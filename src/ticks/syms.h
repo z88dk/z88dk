@@ -23,9 +23,12 @@ struct symbol_s {
     const char    *section;
     symbol        *next;
     int            unique;
+    char           differs;     // another symbol of the name has another value (another module's local)
     const char    *name_module;
     UT_hash_handle hh;
     UT_hash_handle hh_file;     // in symbol_files, when the symbol is local to its file
+    const char    *module_key;  // <module>:<name>, when the symbol is local to its module
+    UT_hash_handle hh_module;   // in module_symbols
 };
 
 struct symbol_file_s {
@@ -38,6 +41,7 @@ extern symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* 
 extern void      read_symbol_file(char *filename);
 extern const char     *find_symbol(int addr, symboltype preferred_symtype);
 extern symbol   *find_symbol_byname(const char *name, const char *filename);
+extern symbol   *find_symbol_in_module(const char *name, const char *module);
 extern int symbol_resolve(char *name, const char *filename);
 extern char **parse_words(char *line, int *argc);
 extern void symbol_add_autolabel(int addr, char *label);
