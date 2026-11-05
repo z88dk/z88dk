@@ -83,6 +83,15 @@ void test_u32(void)
     k = 64;
     assertEqual(u << k, 0UL);
     assertEqual(1UL << 64, 0UL);
+
+    /* A constant count saturates. Masking 32 leaves the original value. */
+    {
+        volatile unsigned long vu = 0x80000001UL;
+
+        assertEqual(vu >> 32, 0UL);
+        assertEqual(vu << 32, 0UL);
+        assertEqual(vu << 33, 0UL);
+    }
 }
 
 void test_u64(void)
@@ -98,6 +107,12 @@ void test_u64(void)
     k = 64;
     assertEqual(u << k, 0ULL);
     assertEqual(1ULL << 64, 0ULL);
+    {
+        volatile unsigned long long vu = 1ULL;
+
+        assertEqual(vu << 64, 0ULL);
+        assertEqual(vu >> 64, 0ULL);
+    }
 }
 
 void test_signed_in_range(void)
@@ -146,6 +161,15 @@ void test_signed_sat(void)
     k = 64;
     assertEqual(sll >> k, -1LL);
     assertEqual((-2LL) >> 64, -1LL);
+    {
+        volatile long vs = -2;
+        volatile long long vll = -2;
+
+        assertEqual(vs >> 32, -1L);
+        assertEqual(vs >> 33, -1L);
+        assertEqual(vll >> 64, -1LL);
+        assertEqual(vll << 64, 0LL);
+    }
 }
 #endif
 

@@ -3428,6 +3428,24 @@ void asr_const(LVALUE *lval, int64_t value64)
     }
 
     if  (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR || lval->val_type == KIND_ACCUM32 ) {
+        /* The library saturates a count at or above the width. Masking
+           it first turns `x >> 32` into `x >> 0`. */
+        if ( value64 >= 32 ) {
+            warningfmt("overflow","Right shifting by more than the size of the object");
+            if ( ulvalue(lval) ) {
+                vconst(0);
+                const2(0);
+            } else {
+                ol("ld\ta,d");
+                ol("rlca");
+                ol("sbc\ta");
+                ol("ld\td,a");
+                ol("ld\te,a");
+                ol("ld\th,a");
+                ol("ld\tl,a");
+            }
+            return;
+        }
         if ( value == 1 && !IS_808x() ) {
             if ( ulvalue(lval) ) { /* 8 bytes, 8 + 8 + 8 + 8 + 8 = 40T */
                 ol("srl\td");
@@ -3628,9 +3646,14 @@ void asr_const(LVALUE *lval, int64_t value64)
             }
         }
     } else if ( lval->val_type == KIND_LONGLONG ) {
-        if ( value >= 64 ) warningfmt("overflow","Left shifting by more than the size of the object");
+        /* Same as the 32-bit arm: a masked count of 64 is a shift by 0. */
+        if ( value64 >= 64 ) {
+            warningfmt("overflow","Right shifting by more than the size of the object");
+            value = 64;
+        } else
+            value &= 63;
         llpush();
-        loada(value & 63);
+        loada(value);
         if (ulvalue(lval)) {
             callrts("l_i64_asr_uo");
         } else {
@@ -3852,6 +3875,12 @@ void asl_const(LVALUE *lval, int64_t value64)
 {
     int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR  ) {
+        if ( value64 >= 32 ) {
+            warningfmt("overflow","Left shifting by more than the size of the object");
+            vconst(0);
+            const2(0);
+            return;
+        }
         switch ( value ) {
         case 0:
             return;
@@ -3910,7 +3939,6 @@ void asl_const(LVALUE *lval, int64_t value64)
             callrts("l_long_aslo");
             break;
         default: //  5 bytes
-            if ( value >= 32 ) warningfmt("overflow","Left shifting by more than the size of the object");
             value &= 31;
             if (  value >= 16 ) {
                 asl_16bit_const(lval, value - 16);
@@ -3923,11 +3951,15 @@ void asl_const(LVALUE *lval, int64_t value64)
             break;
         }
     } else if ( lval->val_type == KIND_LONGLONG ) {
-        if ( value >= 64 ) warningfmt("overflow","Left shifting by more than the size of the object");
-        llpush();
-        loada(value & 63);
-        callrts("l_i64_aslo");
-        Zsp += 8;
+        if ( value64 >= 64 ) {
+            warningfmt("overflow","Left shifting by more than the size of the object");
+            vllongconst_exact(0);
+        } else {
+            llpush();
+            loada(value & 63);
+            callrts("l_i64_aslo");
+            Zsp += 8;
+        }
     } else {
         asl_16bit_const(lval, value);
     }
