@@ -31,7 +31,7 @@ ifdef RMMU_WINDOWS
 all:
 	@echo "rabbit_mmu: skipped (POSIX-shell recipes; not run on Windows)"
 else
-all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests farstrtests lxpctests bankstyletests
+all: $(addprefix run_,$(CPUS)) $(addprefix run4k_,r4k r6k) $(addprefix run4kseg_,r4k r6k) $(addprefix runcrt_,$(CPUS)) $(addprefix runcrt12_,r4k r6k) banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests farstrtests lxpctests bankstyletests banklong
 endif
 
 mmu.bin: mmu.asm
@@ -116,6 +116,23 @@ endef
 $(foreach cpu,$(CPUS),$(foreach comp,$(BANK_COMPILERS),$(eval $(call bank_test,$(cpu),$(comp)))))
 
 banktests: $(BANK_TESTS)
+
+# -banks finds the bank images of a program whose path is longer than 1023
+# characters. Linux only: macOS limits a path to 1024 characters.
+BANKLONGDIR = banklong/$(shell printf '%0200d' 0)/$(shell printf '%0200d' 0)/$(shell printf '%0200d' 0)/$(shell printf '%0200d' 0)/$(shell printf '%0200d' 0)
+banklong: runbank_r2ka_sccz80
+ifeq ($(UNAME),Linux)
+	@mkdir -p $(BANKLONGDIR) && cp bank_r2ka_sccz80.bin bank_r2ka_sccz80_BANK_*.bin $(BANKLONGDIR)/
+	@got=$$(z88dk-ticks -mr2ka -banks $(CURDIR)/$(BANKLONGDIR)/bank_r2ka_sccz80.bin | head -1); \
+	rm -rf banklong; \
+	if [ "$$got" = "$(BANK_EXPECTED)" ]; then \
+		echo "$(GREEN)rabbit_mmu banked long path passed$(RESET)"; \
+	else \
+		echo "$(RED)rabbit_mmu banked long path failed: got '$$got'$(RESET)"; exit 1; \
+	fi
+else
+	@echo "rabbit_mmu banked long path: skipped (Linux only)"
+endif
 
 # Far pointers: 24-bit physical addresses through the XPC window. The window
 # is also the top of the near address space, so the stack stays below it.
@@ -399,5 +416,6 @@ lxpctests: $(LXPC_TESTS)
 
 clean:
 	rm -f *.o m4_*.out lxpc_*.bin lxpcd_*.bin lxpcd_*.map farstr_*.bin farsuite_*.bin farheap_*.bin dbgz_*.bin dbgz_*.map dbgb_*.bin dbgb_*.map dbgv_*.bin dbgv_*.map dbgv_*.out pragma_*.bin dbgl_*.bin dbgl_*.map mmu.bin mmu4k.bin mmu4k_seg.bin mmu_*.out mmu4k_*.out mmu4k_seg_*.out crt_*.bin crt12_*.bin bank_*.bin bank_*_BANK_*.bin far_*.bin far24_*.bin dbg_*.bin dbg_*.map bank_zxn.bin bank_msx.bin *.lis *.o *~ zcc_opt.def
+	rm -rf banklong
 
-.PHONY: all banktests fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests farstrtests lxpctests bankstyletests runbank_zxn runbank_msx clean
+.PHONY: all banktests banklong fartests far24tests debugtests dbglinetests dbgvartests dbgbtests dbgztests pragmatests farstrtests lxpctests bankstyletests runbank_zxn runbank_msx clean

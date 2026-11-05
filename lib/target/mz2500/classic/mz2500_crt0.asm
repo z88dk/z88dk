@@ -87,6 +87,14 @@ IF !DEFINED_CRT_MZ2500_IPL_DISABLED
     defc    THIS_FUNCTION_ONLY_WORKS_WITH_IPL_SUBTYPE = 1
 ENDIF
 
+; 1 if the IPL is there, 0 if not: for library code that uses it only when it can (the console turns the IPL's cursor off at start-up)
+    PUBLIC  __MZ2500_IPL
+IF DEFINED_CRT_MZ2500_IPL_DISABLED
+    defc    __MZ2500_IPL = 0
+ELSE
+    defc    __MZ2500_IPL = 1
+ENDIF
+
     defc	TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__fputc_cons_generic = 1
