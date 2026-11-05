@@ -443,17 +443,29 @@ static int try_fold_unop(int kind, int64_t v, int64_t *out)
     return 0;
 }
 
+/* INT64_MIN / -1 does not fit in a signed 64-bit result. The host
+   divide traps on x86. Signed overflow wraps: the quotient is the
+   minimum and the remainder is 0. */
+static int64_t signed_div_mod(int is_mod, int64_t left, int64_t right)
+{
+    if (left == INT64_MIN && right == -1)
+        return is_mod ? 0 : INT64_MIN;
+    if (is_mod)
+        return left % right;
+    return left / right;
+}
+
 static int try_fold_binop(int kind, int64_t l, int64_t r, int64_t *out)
 {
     switch (kind) {
     case OP_ADD:  *out = l + r; return 1;
     case OP_SUB:  *out = l - r; return 1;
     case OP_MULT: *out = l * r; return 1;
-    case OP_DIV:  if (r == 0) return 0; *out = l / r; return 1;
+    case OP_DIV:  if (r == 0) return 0; *out = signed_div_mod(0, l, r); return 1;
     /* Signed `/` and `%` fold with C99 semantics (truncate toward zero;
        remainder takes the dividend's sign, -1 % 2 == -1), matching the runtime
        l_div / l_long_mod helpers and sdcc. */
-    case OP_MOD:  if (r == 0) return 0; *out = l % r; return 1;
+    case OP_MOD:  if (r == 0) return 0; *out = signed_div_mod(1, l, r); return 1;
     case OP_AND:  *out = l & r; return 1;
     case OP_OR:   *out = l | r; return 1;
     case OP_XOR:  *out = l ^ r; return 1;
@@ -818,6 +830,8 @@ static Node *fold_int_literal(Node *at, Type *type, uint64_t value)
     if (at) {
         n->filename = at->filename;
         n->line = at->line;
+        n->level = at->level;
+        n->block = at->block;
     }
     return n;
 }
@@ -956,6 +970,8 @@ Node *ast_fold_constants(Node *node)
             Node *c2 = ast_cast(node->type, t->els);
             c1->filename = c2->filename = node->filename;
             c1->line = c2->line = node->line;
+            c1->level = c2->level = node->level;
+            c1->block = c2->block = node->block;
             t->then = ast_fold_constants(c1);
             t->els  = ast_fold_constants(c2);
             t->type = node->type;
@@ -1466,6 +1482,8 @@ static Node *try_simplify_ternary(Node *node)
         neg->type = node->type;
         neg->filename = node->filename;
         neg->line = node->line;
+        neg->level = node->level;
+        neg->block = node->block;
         return try_simplify_unop(neg);
     }
     return node;
@@ -1576,6 +1594,8 @@ static Node *try_simplify_binop(Node *node)
             neg->type = node->type;
             neg->filename = node->filename;
             neg->line = node->line;
+            neg->level = node->level;
+            neg->block = node->block;
             return neg;
         }
     }
@@ -1616,6 +1636,8 @@ static Node *try_simplify_binop(Node *node)
         flipped->type = node->type;
         flipped->filename = node->filename;
         flipped->line = node->line;
+        flipped->level = node->level;
+        flipped->block = node->block;
         return flipped;
     }
 
@@ -1702,6 +1724,8 @@ static Node *try_simplify_binop(Node *node)
             new_op_node->type = node->type;
             new_op_node->filename = node->filename;
             new_op_node->line = node->line;
+            new_op_node->level = node->level;
+            new_op_node->block = node->block;
             /* Recurse so derived patterns (e.g. negative literal that
                came out of `IC - OC`) get further simplified. */
             return ast_simplify_algebraic(new_op_node);
@@ -1790,6 +1814,8 @@ static Node *try_strength_reduce(Node *node)
         shl->type = node->type;
         shl->filename = node->filename;
         shl->line = node->line;
+        shl->level = node->level;
+        shl->block = node->block;
         return shl;
     }
     case OP_DIV:
@@ -1806,6 +1832,8 @@ static Node *try_strength_reduce(Node *node)
             shr->type = node->type;
             shr->filename = node->filename;
             shr->line = node->line;
+            shr->level = node->level;
+            shr->block = node->block;
             return shr;
         }
     case OP_MOD:
@@ -1823,6 +1851,8 @@ static Node *try_strength_reduce(Node *node)
             and_node->type = node->type;
             and_node->filename = node->filename;
             and_node->line = node->line;
+            and_node->level = node->level;
+            and_node->block = node->block;
             return and_node;
         }
     }
@@ -2203,6 +2233,8 @@ static Node *bool_step_rewrite(Node *node)
     Node *replacement = ast_conditional(node->right, step, NULL);
     replacement->filename = node->filename;
     replacement->line = node->line;
+    replacement->level = node->level;
+    replacement->block = node->block;
     return replacement;
 }
 
@@ -4081,6 +4113,8 @@ static int synthesize_segment(array *stmts, int start, int end_excl)
         decl->type = cand->type;
         decl->filename = cand->filename;
         decl->line = cand->line;
+        decl->level = cand->level;
+        decl->block = cand->block;
         array_insert(stmts, start, decl);
         start++;
         end_excl++;
@@ -4153,6 +4187,8 @@ static void synthesize_in_compound(array *stmts)
             decl->type = cand->type;
             decl->filename = cand->filename;
             decl->line = cand->line;
+            decl->level = cand->level;
+            decl->block = cand->block;
             array_insert(stmts, i, decl);
             i++;     /* s is now at i+1; bump i to point at s again */
             Node *new_s = cse_replace_walk(array_get_byindex(stmts, i),
@@ -4576,6 +4612,8 @@ static int licm_process_loop(array *stmts, int label_idx, int body_end_excl)
         decl->type = cand->type;
         decl->filename = cand->filename;
         decl->line = cand->line;
+        decl->level = cand->level;
+        decl->block = cand->block;
         array_insert(stmts, label_idx, decl);
         label_idx++;
         body_end_excl++;
@@ -5835,6 +5873,8 @@ static Node *clone_literal(Node *lit)
     c->int_literal = lit->int_literal;
     c->filename = lit->filename;
     c->line = lit->line;
+    c->level = lit->level;
+    c->block = lit->block;
     return c;
 }
 

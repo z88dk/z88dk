@@ -422,6 +422,8 @@ int litlab = 0;
 int c_intermix_ccode = 0;
 int c_cline_directive = 0;
 int lineno = 0;
+int ncmp = 0;
+int current_block = 0;
 int ir_idx2_reg(void) { return 0; }   /* glue lives in ir_compiler_glue.c */
 int ir_idx3_reg(void) { return 0; }   /* glue lives in ir_compiler_glue.c */
 int ir_exx_reg(void)  { return 0; }   /* glue lives in ir_compiler_glue.c */

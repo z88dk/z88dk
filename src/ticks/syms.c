@@ -319,6 +319,19 @@ static symbol *symbol_bucket_at(int addr)
     return sym;
 }
 
+/* zsdcc local label: l_<function>_<nnnnn>, sdcc's <nnnnn>$ label with the '$' removed.
+   A C name has a '_' in front of it, and the runtime helpers (l_gint, l_mult, ...) have no five-digit tail. */
+static int is_zsdcc_label(const char *name)
+{
+    size_t len = strlen(name);
+    size_t digits = 0;
+
+    while ( digits < len && isdigit((unsigned char)name[len - 1 - digits]) ) {
+        digits++;
+    }
+    return strncmp(name, "l_", 2) == 0 && digits >= 5 && len - digits >= 4 && name[len - digits - 1] == '_';
+}
+
 symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
 {
     symbol *sym;
@@ -343,11 +356,16 @@ symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
                 sym = sym->next;
                 continue;
             }
+            // Skip over the labels of zsdcc: they are not the function that contains addr
+            if ( preferred_type != SYM_ANY && is_zsdcc_label(sym->name) ) {
+                sym = sym->next;
+                continue;
+            }
             if ( preferred_type == SYM_ANY ) {
                 break;
             }
-            // Skip over internal labels?
-            if ( preferred_type == sym->symtype && strncmp(sym->name,"i_",2)) {
+            // Skip over internal labels (sccz80 i_<n>, 80cc L_f<n>_...)
+            if ( preferred_type == sym->symtype && strncmp(sym->name,"i_",2) && strncmp(sym->name,"L_f",3)) {
                 break;
             }
             sym = sym->next;

@@ -261,6 +261,7 @@ Type *make_enum(const char *name)
     type->len = 1;
     type->isconst = 1;
     strcpy(type->name, name);
+    type->enum_tag = debug_enum_key(name);
 
     return type;
 }
@@ -348,6 +349,7 @@ static Type *parse_enum(Type *type)
             value++;
         } while (cmatch(',') && !rcmatch('}'));
         needchar('}');
+        debug_write_enum(ptr);
         return ptr;
     } 
     // We're declaring a type that is an enum
@@ -1104,6 +1106,8 @@ Node *declare_local(int local_static)
                              currfn->name, type->name, n++);
                 } while ( findglb(namebuf) );
             }
+            int pending = debug_size_pending(type);
+
             sym = addglb(namebuf, type, ID_VARIABLE, type->kind, 0, LSTATIC);
             stc_declare(type->name, sym);
             if ( cmatch('=')) {
@@ -1112,6 +1116,9 @@ Node *declare_local(int local_static)
                 initials(namebuf, type, &init_node);
             } else {
                 sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
+            }
+            if ( pending ) {
+                debug_write_symbol(sym);
             }
             array_add(arr, ast_decl(sym, init_node));
         } else {
@@ -1255,6 +1262,9 @@ Type *dodeclare(enum storage_type storage)
             return type;
         }
 
+        // A file static sized by its initialiser gets its record once sized; other globals get theirs at the end of the file
+        int pending = storage == LSTATIC && debug_size_pending(type);
+
         sym = addglb(type->name, type, ID_VARIABLE, type->kind, 0, storage);
         sym->isassigned = 1; // Assigned to 0
      
@@ -1300,10 +1310,16 @@ Type *dodeclare(enum storage_type storage)
         if ( cmatch(';')) {
              // Maybe not right
             sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
+            if ( pending ) {
+                debug_write_symbol(sym);
+            }
             emit_global_ast(sym, NULL);     /* Q3b */
             return type;
         } else if ( cmatch(',')) {
             sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
+            if ( pending ) {
+                debug_write_symbol(sym);
+            }
             emit_global_ast(sym, NULL);     /* Q3b */
             continue;
         }
@@ -1322,6 +1338,9 @@ Type *dodeclare(enum storage_type storage)
            gets the bytes via `initials()` itself. */
         Node *global_init = NULL;
         alloc_size = initials(drop_name, type, &global_init);
+        if ( pending ) {
+            debug_write_symbol(sym);
+        }
 
         if ( sym->flags & ASSIGNED_ADDR ) {
             // Copy from local to the supplied address
@@ -2081,6 +2100,7 @@ static void declfunc(Type *functype, enum storage_type storage)
     } else {
         int i;
         ++scope_block;
+        current_block = scope_block;
         for ( i = 0; i < array_len(functype->parameters); i++ ) {
             SYMBOL    *ptr;
             UT_string *str;            
@@ -2210,6 +2230,7 @@ static void declfunc(Type *functype, enum storage_type storage)
 
     Zsp = 0;
     infunc = 0; /* not in fn. any more */
+    current_block = 0;
 }
 
 

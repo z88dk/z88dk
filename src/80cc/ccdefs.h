@@ -64,7 +64,10 @@ extern int64_t  fp32_sign_mask(void);
 extern int      c_debug_adb_defc;   /* -debug: emit sdcc-compatible cdb */
 extern void     debug_write_module(void);
 extern void     debug_write_symbol(SYMBOL *sym);
+extern int      debug_size_pending(Type *type);
 extern void     debug_write_type(Type *type);
+extern void     debug_write_enum(Type *type);
+extern char    *debug_enum_key(const char *tag);
 /* Emit a stack local/param cdb record with an explicit frame-base offset.
    Used post-lowering (ir_lower_to_output) so the ,B,1,d offset reflects the
    backend's real slot placement, not the front-end nominal offset. */

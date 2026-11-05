@@ -313,6 +313,10 @@ int main(int argc, char** argv)
         if ( c_framepointer_is_ix == -1 ) {
             c_framepointer_is_ix = 1;
         }
+        /* ADR 0030: AST dead-store elimination drops a named local's store
+           (and with it the local), and loop reversal replaces a named counter
+           with a temporary, so neither runs under -debug. */
+        c_opt_disable |= OPT_DISABLE_DSE | OPT_DISABLE_LOOP_REVERSE;
     }
 
 

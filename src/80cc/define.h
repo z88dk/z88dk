@@ -93,6 +93,7 @@ struct type_s {
     int       len;   // Length of the array
 
     int32_t   value; // For enum, goto position, short call value
+    char     *enum_tag; // An enum, and every object of it: the enum's key, F<file>$<tag>
 
     // bitfields
     int       bit_offset;
@@ -649,6 +650,8 @@ struct node_s {
     enum asttype ast_type;
     const char *filename;
     int         line;
+    int         level;      /* nesting level and block of the code, for C_LINE */
+    int         block;
     Type       *type;
     SYMBOL     *sym;   // Defining a variable - TODO, may change
     union {
@@ -746,6 +749,7 @@ struct nodepair {
 
 extern UT_string *debug2_utstr;
 extern int        scope_block;
+extern int        current_block;
 extern char       c_debug_entry_points;
 
 

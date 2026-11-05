@@ -7928,7 +7928,7 @@ static int build_stmt(Builder *b, Node *n)
        lowerer reads it to drive C_LINE / -cc emission. AST_COMPOUND_STMT
        recurses, so child stmts will override before their ops fire. */
     if (n->filename && n->line > 0) {
-        ir_set_emit_loc(n->filename, n->line);
+        ir_set_emit_loc(n->filename, n->line, n->level, n->block);
         cur_node_file = n->filename;   /* also for build_fail diagnostics */
         cur_node_line = n->line;
     }
@@ -8394,7 +8394,7 @@ static int build_stmt(Builder *b, Node *n)
            the tail line of a multi-line if/else instead of the line the
            condition actually reads from. */
         if (n->cond->filename && n->cond->line > 0)
-            ir_set_emit_loc(n->cond->filename, n->cond->line);
+            ir_set_emit_loc(n->cond->filename, n->cond->line, n->cond->level, n->cond->block);
 
         /* Short-circuit control-context lowering: compound `&&`/`||` become
            direct branches to then_bb/els_bb (targets pre-created so their ids
@@ -8645,8 +8645,12 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
             b.f->vregs[v].width = (int16_t)(pw ? pw : 2);
             /* __sdcccall(1) register params arrive in A/HL/DE and are placed
                into their slots by emit_prologue; force a spill slot so the
-               placement is a plain store (no register-home juggling). */
-            if (fn_sc1)
+               placement is a plain store (no register-home juggling).
+               -debug (ADR 0030): every parameter keeps its value in its
+               slot, as a named local does, so a breakpoint after a
+               reassignment (or in a callee-cleanup / fastcall function)
+               reads the current value, not the incoming one. */
+            if (fn_sc1 || c_debug_adb_defc)
                 b.f->vregs[v].flags |= IR_VREG_VOLATILE;
             sym_map_set(&b, psym, v);
         }
