@@ -237,25 +237,27 @@ static int c_load_banks = 0;
    memory_bank_store() knows where bank nn goes in the banking model. */
 static void load_bank_images(const char *input)
 {
-  char     base[1024], path[1100];
+  char    *base = strdup(input);
+  char    *path = malloc(strlen(input) + 16);
   char    *dot;
   int      bank, c;
   unsigned i;
   FILE    *bf;
 
-  snprintf(base, sizeof(base), "%s", input);
   dot = strrchr(base, '.');
   if ( dot && !strchr(dot, '/') && !strchr(dot, '\\') )
     *dot = 0;
 
   for ( bank = 1; bank < 4096; bank++ ) {
-    snprintf(path, sizeof(path), "%s_BANK_%02X.bin", base, bank);
+    sprintf(path, "%s_BANK_%02X.bin", base, bank);
     if ( (bf = fopen(path, "rb")) == NULL )
       continue;
     for ( i = 0; (c = fgetc(bf)) != EOF; i++ )
       memory_bank_store(bank, i, c);
     fclose(bf);
   }
+  free(base);
+  free(path);
 }
 
 int main (int argc, char **argv){
