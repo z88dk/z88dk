@@ -408,10 +408,10 @@ static int fold_integer_exact(LVALUE *left, LVALUE *right,
             else *result = (uint64_t)(sl >> (unsigned)r);
         } else if (oper == zdiv) {
             if (r == 0) return 0;
-            *result = unsigned_op ? l / r : (uint64_t)(sl / sr);
+            *result = unsigned_op ? l / r : signed_div_mod(0, sl, sr);
         } else if (oper == zmod) {
             if (r == 0) return 0;
-            *result = unsigned_op ? l % r : (uint64_t)(sl % sr);
+            *result = unsigned_op ? l % r : signed_div_mod(1, sl, sr);
         } else if (oper == zeq) *result = (l == r);
         else if (oper == zne) *result = (l != r);
         else if (oper == zlt) *result = unsigned_op ? (l < r) : (sl < sr);
@@ -470,8 +470,8 @@ static int fold_integer_exact(LVALUE *left, LVALUE *right,
             *result = l >> (unsigned)sr;
         else
             *result = (uint64_t)((int64_t)l >> (unsigned)sr);
-    } else if (oper == zdiv) *result = uns ? l / r : (uint64_t)((int64_t)l / (int64_t)r);
-    else if (oper == zmod) *result = uns ? l % r : (uint64_t)((int64_t)l % (int64_t)r);
+    } else if (oper == zdiv) *result = uns ? l / r : signed_div_mod(0, (int64_t)l, (int64_t)r);
+    else if (oper == zmod) *result = uns ? l % r : signed_div_mod(1, (int64_t)l, (int64_t)r);
     else if (oper == zeq) *result = (l == r);
     else if (oper == zne) *result = (l != r);
     else if (oper == zlt) *result = uns ? (l < r) : ((int64_t)l < (int64_t)r);

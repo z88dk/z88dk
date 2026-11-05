@@ -35,6 +35,14 @@ void test_llong_narrow(void)
     Assert(2LL - ll_sub_u == -39998LL, "2LL - 40000u");
     ll_sub_l = -2147483647L - 1;
     Assert(2LL - ll_sub_l == 2147483650LL, "2LL - LONG_MIN");
+
+    /* Host signed division of the 64-bit minimum traps on x86.
+       The folded result wraps. A 32-bit minimum still fits. */
+    Assert((-9223372036854775807LL - 1) / -1LL
+           == (-9223372036854775807LL - 1), "INT64_MIN / -1 wraps");
+    Assert((-9223372036854775807LL - 1) % -1LL == 0, "INT64_MIN % -1");
+    Assert((-2147483647LL - 1) / -1LL == 2147483648LL, "INT32_MIN / -1");
+    Assert((-2147483647LL - 1) % -1LL == 0, "INT32_MIN % -1");
 }
 
 void test_ullong_division()

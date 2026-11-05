@@ -162,6 +162,19 @@ int primary(LVALUE* lval)
 }
 
 
+/* INT64_MIN / -1 does not fit in a signed 64-bit result. The host
+   divide traps on x86. Signed overflow wraps: the quotient is the
+   minimum and the remainder is 0. A narrower minimum still divides,
+   so INT32_MIN / -1 stays +2147483648. */
+uint64_t signed_div_mod(int is_mod, int64_t left, int64_t right)
+{
+    if (left == INT64_MIN && right == -1)
+        return is_mod ? 0 : (uint64_t)INT64_MIN;
+    if (is_mod)
+        return (uint64_t)(left % right);
+    return (uint64_t)(left / right);
+}
+
 /*
  * calculate constant expression (signed values)
  */
@@ -186,12 +199,11 @@ zdouble calc(
         return 0;
     }
     if (oper == zdiv && right != 0.0) {
-        if ( !kind_is_decimal(left_kind) && !kind_is_decimal(right_kind)) {
-            return ((int64_t)left / (int64_t)right);
-        }
+        if ( !kind_is_decimal(left_kind) && !kind_is_decimal(right_kind))
+            return (zdouble)(int64_t)signed_div_mod(0, (int64_t)left, (int64_t)right);
         return (left / right);
     } else if (oper == zmod)
-        return ((int)left % (int)right);
+        return (zdouble)(int64_t)signed_div_mod(1, (int)left, (int)right);
     else if (oper == zle)
         return (left <= right);
     else if (oper == zge)
