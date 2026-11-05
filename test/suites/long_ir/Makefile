@@ -6403,6 +6403,46 @@ fcdeadframe_z80n.bin: $(SOURCES) fcdeadframe.c
 	$(compile_z80n)
 	$(runtest_z80n)
 
+# [dbgfastcall4] -debug: the frame helper must preserve DE across a 4-byte fastcall parameter (gbz80 clobbered it).
+all:	dbgfastcall4.bin dbgfastcall4_8080.bin dbgfastcall4_8085.bin dbgfastcall4_gbz80.bin
+
+dbgfastcall4.bin: $(SOURCES) dbgfastcall4.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dbgfastcall4_8080.bin: $(SOURCES) dbgfastcall4.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dbgfastcall4_8085.bin: $(SOURCES) dbgfastcall4.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dbgfastcall4_gbz80.bin: $(SOURCES) dbgfastcall4.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+all:	gbleastore.bin gbleastore_fp.bin gbleastore_gbz80.bin gbleastore_8080.bin gbleastore_8085.bin
+
+gbleastore.bin: $(SOURCES) gbleastore.c
+	$(compile)
+	$(runtest)
+
+gbleastore_fp.bin: $(SOURCES) gbleastore.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+gbleastore_gbz80.bin: $(SOURCES) gbleastore.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+gbleastore_8080.bin: $(SOURCES) gbleastore.c
+	$(compile_8080)
+	$(runtest_8080)
+
+gbleastore_8085.bin: $(SOURCES) gbleastore.c
+	$(compile_8085)
+	$(runtest_8085)
+
 # [ixblockcopy] inlined memcpy/strcpy result in an IX frame without sp-flip (copt #FRC must keep `pop bc` before `ld hl,bc`).
 all:	ixblockcopy.bin ixblockcopy_z180.bin ixblockcopy_z80n.bin ixblockcopy_ez80.bin ixblockcopy_8080.bin ixblockcopy_gbz80.bin
 
