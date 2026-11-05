@@ -6357,6 +6357,52 @@ stackpark_keep.bin: $(SOURCES) stackpark.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=stack-spill-multi -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE)  $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
+all:	fcdeadframe.bin fcdeadframe_fp.bin fcdeadframe_8080.bin fcdeadframe_8085.bin fcdeadframe_gbz80.bin fcdeadframe_z180.bin fcdeadframe_ez80.bin fcdeadframe_r2ka.bin fcdeadframe_r4k.bin fcdeadframe_kc160.bin fcdeadframe_z80n.bin
+
+fcdeadframe.bin: $(SOURCES) fcdeadframe.c
+	$(compile)
+	$(runtest)
+
+fcdeadframe_fp.bin: $(SOURCES) fcdeadframe.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+fcdeadframe_8080.bin: $(SOURCES) fcdeadframe.c
+	$(compile_8080)
+	$(runtest_8080)
+
+fcdeadframe_8085.bin: $(SOURCES) fcdeadframe.c
+	$(compile_8085)
+	$(runtest_8085)
+
+fcdeadframe_gbz80.bin: $(SOURCES) fcdeadframe.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+fcdeadframe_z180.bin: $(SOURCES) fcdeadframe.c
+	$(compile_z180)
+	$(runtest_z180)
+
+fcdeadframe_ez80.bin: $(SOURCES) fcdeadframe.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+fcdeadframe_r2ka.bin: $(SOURCES) fcdeadframe.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+fcdeadframe_r4k.bin: $(SOURCES) fcdeadframe.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+fcdeadframe_kc160.bin: $(SOURCES) fcdeadframe.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+fcdeadframe_z80n.bin: $(SOURCES) fcdeadframe.c
+	$(compile_z80n)
+	$(runtest_z80n)
+
 # [dbgfastcall4] -debug: the frame helper must preserve DE across a 4-byte fastcall parameter (gbz80 clobbered it).
 all:	dbgfastcall4.bin dbgfastcall4_8080.bin dbgfastcall4_8085.bin dbgfastcall4_gbz80.bin
 

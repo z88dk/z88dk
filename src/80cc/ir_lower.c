@@ -10966,8 +10966,15 @@ static int ir_lower_func_body(FILE *out, Func *f)
        function once with frame_size=0: the spill vregs shed their (dead) slots
        and the existing frame_size==0 IX-elision makes it frameless. Safe by
        construction — a dead slot is never addressed, so dropping it and the
-       frame shifts nothing that is emitted. The scratch render is discarded. */
-    if (deadframe_on() && !df_retry_done && rc == 0
+       frame shifts nothing that is emitted. The scratch render is discarded.
+       Not with an auto-pushed param: the prologue `push` stores it, so a body
+       that never reads its slot leaves the frame "dead", but the re-render
+       still pushes it (the flag stays) while the epilogue, with frame_size=0,
+       reclaims nothing, and `ret` pops the argument. */
+    int df_autopush = 0;
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vregs[v].flags & IR_VREG_AUTOPUSH) df_autopush = 1;
+    if (deadframe_on() && !df_retry_done && rc == 0 && !df_autopush
         && L.frame_fully_dead && f->frame_size > 0 && rout != out) {
         df_retry_done = 1;
         /* Clear every slot. A vreg with a RANGED
