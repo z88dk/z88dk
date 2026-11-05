@@ -59,6 +59,9 @@ void test_unevaluated(void)
     assertEqual((int)sizeof((c)), 1);
     assertEqual((int)sizeof(c + c), 2);
     assertEqual((int)sizeof(-c), 2);
+    assertEqual((int)sizeof(c < 1), 2);
+    assertEqual((int)sizeof(c == 1), 2);
+    assertEqual((int)sizeof(n > 0), 2);
     assertEqual(calls, 0);
     assertEqual(n, 3);
 }

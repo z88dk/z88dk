@@ -955,10 +955,15 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
             if ( always != -1 ) {
                 warningfmt("limited-range", "Due to limited range of data type, expression is always %s", always ? "true" : "false");
-                // It's always "always"
+                /* The result is the comparison: an int 0 or 1. The
+                   operand constant is still in int_const_val, and a
+                   cast would normalise that instead of this result. */
                 lval->binop = NULL;
+                lval->stage_add = NULL;
                 lval->is_const = 1;
-                lval->const_val = always;
+                lval->val_type = KIND_INT;
+                lval->ltype = type_int;
+                set_exact_integer_result(lval, (uint64_t)always);
                 return;
             }
         }
@@ -1057,17 +1062,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 /*
  * binary plunge to lower level (for +/-)
  */
-/* sizeof(c+1) is parsed as char+char. The add stays in HL. Only the
-   sizeof operand is retagged, so an ordinary c+1 keeps its code. */
-static int sizeof_operand;
-
-void set_sizeof_operand(int on)
-{
-    if (on)
-        sizeof_operand++;
-    else if (sizeof_operand)
-        sizeof_operand--;
-}
 
 void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval))
 {
@@ -1208,9 +1202,13 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                     lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
                 }
             } else {
-                if (!ispointer(lval->ltype)) {
-                    lval->ltype = lval2->ltype->isunsigned ? type_uint : type_int;  
-                }
+                /* A small constant is tagged char. `1 + v` is still an
+                   int, or the compare uses the constant's storage range. */
+                if (!ispointer(lval->ltype) && integer_operand(lval)
+                    && integer_operand(lval2))
+                    set_common_integer(lval, lval->ltype, lval2->ltype);
+                else if (!ispointer(lval->ltype))
+                    lval->ltype = lval2->ltype->isunsigned ? type_uint : type_int;
                 if ( doconst_oper == 0 ) {              
                     const2(lval->const_val);
                 }
@@ -1322,8 +1320,10 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                         zconvert_to_long(lval2->ltype->isunsigned, lval->val_type,
                                          lval->ltype->isunsigned);
                         set_common_integer(lval, lval->ltype, lval2->ltype);
-                    } else if (sizeof_operand && integer_operand(lval)
-                               && integer_operand(lval2)) {
+                    } else if (integer_operand(lval) && integer_operand(lval2)) {
+                        /* The char was extended into HL, so the add stays
+                           there. The sum is an int: unsigned char 255 + 1
+                           is 256, and a char tag would test the low byte. */
                         set_common_integer(lval, lval->ltype, lval2->ltype);
                     }
                 }

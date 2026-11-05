@@ -746,11 +746,7 @@ static void size_of_expression(LVALUE *lval)
     int savesp = Zsp;
 
     setstage(&before, &start);
-    /* c+1 is parsed as char. sizeof must report the promoted int.
-       sizeof(c) and sizeof((c)) do not reach an arithmetic operator. */
-    set_sizeof_operand(1);
     heir1(&ev);
-    set_sizeof_operand(0);
     clearstage(before, 0);
     Zsp = savesp;
     if (ev.ltype == NULL) {
@@ -758,7 +754,14 @@ static void size_of_expression(LVALUE *lval)
         lval->const_val = 2;
         return;
     }
-    lval->const_val = ev.ltype->size;
+    /* A comparison's codegen tag is the flag or the byte test. The
+       result type is int. */
+    if (ev.ltype->kind == KIND_CARRY
+        || ev.binop == zeq || ev.binop == zne || ev.binop == zlt
+        || ev.binop == zgt || ev.binop == zle || ev.binop == zge)
+        lval->const_val = type_int->size;
+    else
+        lval->const_val = ev.ltype->size;
 }
 
 /* Perform a sizeof (works on variables as well */
