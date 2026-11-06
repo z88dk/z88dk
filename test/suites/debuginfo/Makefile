@@ -37,6 +37,10 @@ ifndef DBG_WINDOWS
 all: enums dupname enumblk forblk
 endif
 
+ifndef DBG_WINDOWS
+all: floats
+endif
+
 z80: dbgvars.c dbglocals.c dbgparams.c
 	zcc +test $(DFLAGS) $< -o dbgvars_z80.bin -m
 	@sh ./check.sh -mz80 dbgvars_z80.bin dbgvars_z80.map z80
@@ -109,6 +113,7 @@ clean:
 
 .PHONY: all z80 i8080 i8085 gbz80 arrays exprerr clean
 .PHONY: enums dupname enumblk forblk clean-enums
+.PHONY: floats
 
 # Enum objects print their enumerator (two modules, same-named enums, a shared header);
 # both compilers, whichever COMPILER the suite runs with, as they write the same records
@@ -142,6 +147,40 @@ dupname: dupname/dup1/dup.c dupname/dup2/dup.c
 	  sh ./check_dupname.sh -mz80 dupname_$$c.bin dupname_$$c.map $$c || exit 1; \
 	done
 
+# Floats print their value, each in the format its module gives in the map (z80 48-bit,
+# with any exponent bias and mantissa size, IEEE, mbf32, mbf40, mbf64, z88 and the
+# AM9511's), also in a link of modules built in two formats. Both compilers. floats_a/b/n.c
+# have no float code, so any format links (mbf40 has no library, mbf64's needs a target's
+# ROM); floats_r.c's floats are computed at run time by each library that ticks can run.
+floats: floats_a.c floats_b.c floats_n.c floats.h floats_p.c floats_r.c floats_i.c floats_kinds.c
+	@for c in sccz80 80cc; do \
+	  for m in math48 math32 z80bias129 mbf32 mbf40 mbf64 bbc z88 dai32; do \
+	    case $$m in \
+	      z80bias129) lib="--math48 -Cc-fp-exponent-bias=129 -Cc-fp-mantissa-size=4" ;; \
+	      mbf40) lib="-Cc-fp-mode=mbf40" ;; \
+	      z88) lib="-Cc-math-z88 -lz88_math" ;; \
+	      math48|math32) lib=--$$m ;; \
+	      *) lib=--math-$$m ;; \
+	    esac; \
+	    zcc +test -vn -compiler=$$c -debug $$lib floats_a.c floats_b.c floats_n.c -o floats_$${c}_$$m.bin -m || exit 1; \
+	    sh ./check_floats.sh -mz80 floats_$${c}_$$m.bin floats_$${c}_$$m.map $$c-$$m $$m || exit 1; \
+	  done; \
+	  for m in math48 math32 mbf32 bbc dai32; do \
+	    case $$m in math48|math32) lib=--$$m ;; *) lib=--math-$$m ;; esac; \
+	    zcc +test -vn -compiler=$$c -debug $$lib floats_r.c -o floats_$${c}_run_$$m.bin -m || exit 1; \
+	    sh ./check_floats_run.sh -mz80 floats_$${c}_run_$$m.bin floats_$${c}_run_$$m.map $$c-run-$$m $$m || exit 1; \
+	  done; \
+	  zcc +test -vn -compiler=$$c -debug --math-bbc floats_i.c -o floats_$${c}_z88int.bin -m || exit 1; \
+	  sh ./check_floats.sh -mz80 floats_$${c}_z88int.bin floats_$${c}_z88int.map $$c-z88int z88int || exit 1; \
+	  zcc +test -vn -compiler=$$c -debug --math48 -c floats_a.c -o floats_a_$$c.o || exit 1; \
+	  zcc +test -vn -compiler=$$c -debug --math32 -c floats_b.c -o floats_b_$$c.o || exit 1; \
+	  zcc +test -vn -compiler=$$c -debug --math48 floats_a_$$c.o floats_b_$$c.o floats_n.c -o floats_$${c}_mixed.bin -m || exit 1; \
+	  sh ./check_floats.sh -mz80 floats_$${c}_mixed.bin floats_$${c}_mixed.map $$c-mixed mixed || exit 1; \
+	  zcc +test -vn -compiler=$$c -debug --math48 floats_p.c -o floats_$${c}_nowidth.bin -m || exit 1; \
+	  sh ./check_floats.sh -mz80 floats_$${c}_nowidth.bin floats_$${c}_nowidth.map $$c-nowidth nowidth || exit 1; \
+	  sh ./check_fpkinds.sh $$c || exit 1; \
+	done
+
 clean: clean-enums
 clean-enums:
-	$(RM) dupname/*.o dupname/*/*.o enums_a_*.asm forblk_*.asm
+	$(RM) dupname/*.o dupname/*/*.o enums_a_*.asm fpkinds_*.asm forblk_*.asm

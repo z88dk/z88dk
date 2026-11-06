@@ -9,6 +9,7 @@
 static symbol*          symbols[SYM_TAB_SIZE] = {0};
 static symbol*          global_symbols = NULL;
 static symbol_file*     symbol_files = NULL;
+static symbol*          module_symbols = NULL;    // the module locals, by <module>:<name>
 
 typedef struct section_s section;
 
@@ -162,6 +163,7 @@ void read_symbol_file(char *filename)
 
                     if (oldsym) {
                       oldsym->unique = sym->unique = 0;
+                      oldsym->differs |= oldsym->address != sym->address;
                     } else {
                       sym->unique = 1;
                       HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
@@ -171,7 +173,9 @@ void read_symbol_file(char *filename)
                 continue;
             }
             if ( strncmp(argv[0],"__CDBINFO__",11) == 0 ) {
-                debug_add_info_encoded(argv[0] + 11);
+                char module[FILENAME_MAX];
+                snprintf(module, sizeof(module), "%.*s", (int)strlen(argv[7]) - 1, argv[7]);   // no trailing comma
+                debug_add_info_encoded(argv[0] + 11, module);
             } else if ( strncmp(argv[0], "__C_LINE_",9) && strncmp(argv[0], "__ASM_LINE_",11) ) {
                 symbol *sym = calloc(1,sizeof(*sym));
 
@@ -202,8 +206,24 @@ void read_symbol_file(char *filename)
                   utstring_printf(temp, "%s_%.*s", sym->name, strlen(argv[7])-1 /* don't include trailing comma */, argv[7]);
                   sym->name_module = strdup(utstring_body(temp));
                   utstring_free(temp);
+                  char *module = strdup(argv[7]);
+                  module[strlen(module) - 1] = 0;     // no trailing comma
+                  sym->module = module;
                 } else {
                   sym->name_module = strdup(sym->name);
+                }
+
+                // A module's local is also found by its module (the first, if two modules have one name)
+                if (sym->islocal && sym->module && sym->module[0]) {
+                  symbol *modsym = NULL;
+                  utstring_new(temp);
+                  utstring_printf(temp, "%s:%s", sym->module, sym->name);
+                  sym->module_key = strdup(utstring_body(temp));
+                  utstring_free(temp);
+                  HASH_FIND(hh_module, module_symbols, sym->module_key, strlen(sym->module_key), modsym);
+                  if (modsym == NULL) {
+                    HASH_ADD_KEYPTR(hh_module, module_symbols, sym->module_key, strlen(sym->module_key), sym);
+                  }
                 }
 
                 LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
@@ -213,6 +233,7 @@ void read_symbol_file(char *filename)
 
                 if (oldsym) {
                   oldsym->unique = sym->unique = 0;
+                  oldsym->differs |= oldsym->address != sym->address;
                 } else {
                   sym->unique = 1;
                   HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
@@ -266,6 +287,18 @@ symbol *find_symbol_byname(const char *name, const char *filename)
 
     symbol *sym = NULL;
     HASH_FIND_STR(global_symbols, name, sym);
+    return sym;
+}
+
+symbol *find_symbol_in_module(const char *name, const char *module)
+{
+    symbol *sym = NULL;
+    UT_string *key;
+
+    utstring_new(key);
+    utstring_printf(key, "%s:%s", module, name);
+    HASH_FIND(hh_module, module_symbols, utstring_body(key), utstring_len(key), sym);
+    utstring_free(key);
     return sym;
 }
 
