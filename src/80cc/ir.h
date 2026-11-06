@@ -148,6 +148,8 @@ typedef enum {
                                          gives it none (verified, see ir_lower) */
     IR_VREG_WIDE_MEM       = 1 << 14, /* [wide-mem] marked NO_SLOT by that pass; cleared and
                                          re-decided on every lowering of the function */
+    IR_VREG_CD_COUNTER     = 1 << 15, /* reversed-loop counter: kept a word through allocation so
+                                        it can bid for BC, then narrowed to a byte if it spilled */
 } VRegFlags;
 
 typedef struct {
