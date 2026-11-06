@@ -33,7 +33,7 @@
 typedef struct {
     char name[128];
     int frame;
-    char expression[128];
+    char* expression;
     UT_hash_handle hh;
 } mi2_var;
 
@@ -589,9 +589,11 @@ static void cmd_interpreter_exec(const char* flow, int argc_, char **argv_) {
             memset(evaluation_flow, 0, sizeof(evaluation_flow));
 
             while (isdigit(*command_name)) {
-                *flow_ptr = *command_name;
+                if (flow_ptr < evaluation_flow + sizeof(evaluation_flow) - 1) {
+                    *flow_ptr = *command_name;
+                    flow_ptr++;
+                }
                 command_name++;
-                flow_ptr++;
             }
 
             command *cmd = &mi2_commands[0];
@@ -651,9 +653,15 @@ static void cmd_var_create(const char* flow, int argc, char **argv)
 
     mi2_var* var = calloc(1, sizeof(mi2_var));
 
+    if (strlen(name) >= sizeof(var->name)) {
+        free(var);
+        mi2_printf_error(flow, "variable name is too long");
+        return;
+    }
+
     strcpy(var->name, name);
     var->frame = frame;
-    strcpy(var->expression, expr);
+    var->expression = strdup(expr);
 
     current_frame = frame;
     evaluate_expression_string(expr);
@@ -662,6 +670,8 @@ static void cmd_var_create(const char* flow, int argc, char **argv)
     if (is_expression_result_error(result))
     {
         mi2_printf_response(flow, "done,name=\"%s\",numchild=\"0\",thread-id=\"1\"", name);
+        free(var->expression);
+        free(var);
         return;
     }
 
@@ -694,6 +704,7 @@ static void cmd_var_delete(const char* flow, int argc, char **argv)
     }
 
     HASH_DEL(mi2_vars, var);
+    free(var->expression);
     free(var);
     mi2_printf_response(flow, "done");
 }
@@ -1643,9 +1654,11 @@ static void* debugger_mi2_console_loop(void* arg) {
             memset(flow, 0, sizeof(flow));
 
             while (isdigit(*command_name)) {
-                *flow_ptr = *command_name;
+                if (flow_ptr < flow + sizeof(flow) - 1) {
+                    *flow_ptr = *command_name;
+                    flow_ptr++;
+                }
                 command_name++;
-                flow_ptr++;
             }
 
             *flow_ptr = '\0';

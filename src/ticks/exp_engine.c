@@ -127,7 +127,7 @@ void expression_primitive_func_call_1(const char* call, struct expression_result
     }
 
     set_expression_result_error(to);
-    sprintf(to->as_error, "Unknown function call: %s", call);
+    snprintf(to->as_error, sizeof(to->as_error), "Unknown function call: %s", call);
 }
 
 void expression_dereference_pointer(struct expression_result_t *from, struct expression_result_t *to) {
