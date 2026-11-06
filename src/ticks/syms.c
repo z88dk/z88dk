@@ -182,12 +182,8 @@ void read_symbol_file(char *filename)
                 sym->name = strdup(argv[0]);
 
                 {
-                    char fname[FILENAME_MAX];
-                    if (sscanf(argv[9], "%[^:]", fname) == 1) {
-                        sym->file = strdup(fname);
-                    } else {
-                        sym->file = NULL;
-                    }
+                    size_t len = strcspn(argv[9], ":");
+                    sym->file = len > 0 ? duplen(argv[9], len) : NULL;
                 }
 
                 sym->section = strdup(argv[8]); // TODO, comma
@@ -256,15 +252,17 @@ void read_symbol_file(char *filename)
                 }
 
             } else if ( argc > 9 ) {
-                /* It's a cline/asmline symbol */
-                char   filename[FILENAME_MAX+1];
-                char   funcname[FILENAME_MAX+1];
+                /* It's a cline/asmline symbol: each name is a part of argv[9], so its length fits */
+                char  *filename = malloc(strlen(argv[9]) + 1);
+                char  *funcname = malloc(strlen(argv[9]) + 1);
                 int    lineno;
                 int    level;;
                 int    scope_block;
 
                 demangle_filename(argv[9], filename, funcname, &lineno,&level, &scope_block);;
                 debug_add_cline(filename, funcname, lineno, level, scope_block, argv[2]);
+                free(filename);
+                free(funcname);
             }
             free(argv);
         }

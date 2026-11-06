@@ -115,6 +115,31 @@ static uint8_t parse_address_space(const char* encoded, const char** result, add
     return 0;
 }
 
+static char* dup_n(const char* s, size_t n)
+{
+    char* r = malloc(n + 1);
+
+    memcpy(r, s, n);
+    r[n] = 0;
+    return r;
+}
+
+/* The scope of a record, up to the '$' that ends it, on the heap: a file name
+   or <file>.<function>, as long as the source path. *encoded moves past the
+   '$'. NULL if the scope is empty or has no '$'. */
+static char* dup_scope(const char** encoded)
+{
+    const char* end = strchr(*encoded, '$');
+    char* r;
+
+    if (end == NULL || end == *encoded) {
+        return NULL;
+    }
+    r = dup_n(*encoded, end - *encoded);
+    *encoded = end + 1;
+    return r;
+}
+
 static uint8_t parse_record_type(const char *rt, type_record *record)
 {
     int end;
@@ -131,8 +156,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
     rt += end;
 
     enum record_partning_mode mode = RECORD_PARSING_MODE_BEGIN;
-    char structure[128];
-    uint8_t structure_size = 0;
+    const char* structure = NULL;
 
     type_chain* last = NULL;
 
@@ -282,6 +306,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                     case 'T': {
                         last->type_ = TYPE_STRUCTURE;
                         mode = RECORD_PARSING_MODE_STRUCTURE;
+                        structure = rt;
                         break;
                     }
                     case 'B': {
@@ -321,20 +346,17 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
             case RECORD_PARSING_MODE_STRUCTURE: {
                 switch (c) {
                     case ',': {
-                        structure[structure_size] = 0;
-                        last->data = strdup(structure);
+                        last->data = dup_n(structure, rt - 1 - structure);
                         mode = RECORD_PARSING_MODE_BEGIN;
                         break;
                     }
                     case ':': {
-                        structure[structure_size] = 0;
-                        last->data = strdup(structure);
-                        structure[structure_size] = 0;
+                        last->data = dup_n(structure, rt - 1 - structure);
                         mode = RECORD_PARSING_MODE_SIGN;
                         break;
                     }
                     default: {
-                        structure[structure_size++] = c;
+                        break;
                     }
                 }
                 break;
@@ -393,6 +415,7 @@ static void debug_add_function_info(const char *encoded)
     // F:Fother.c$haha2$0_0$0({0}DF,DV),C,0,0
 
     debug_sym_function* f = malloc(sizeof(debug_sym_function));
+    char* fields = NULL;
 
     char function_scope = *encoded++;
     switch (function_scope)
@@ -400,13 +423,12 @@ static void debug_add_function_info(const char *encoded)
         case 'F':
         {
             // file scope
-            char file_name[FILENAME_MAX];
-            if (sscanf(encoded, "%[^$]$", file_name) != 1) {
+            char* file_name = dup_scope(&encoded);
+            if (file_name == NULL) {
                 goto err;
             }
-            encoded += strlen(file_name) + 1;
             f->scope = FUNCTION_SCOPE_FILE;
-            f->scope_value = strdup(file_name);
+            f->scope_value = file_name;
             break;
         }
         case 'G':
@@ -424,13 +446,12 @@ static void debug_add_function_info(const char *encoded)
         case 'L':
         {
             // function scope
-            char function_name[255];
-            if (sscanf(encoded, "%[^$]$", function_name) != 1) {
+            char* function_name = dup_scope(&encoded);
+            if (function_name == NULL) {
                 goto err;
             }
-            encoded += strlen(function_name) + 1;
             f->scope = FUNCTION_SCOPE_FUNCTION;
-            f->scope_value = strdup(function_name);
+            f->scope_value = function_name;
             break;
         }
         default:
@@ -440,10 +461,13 @@ static void debug_add_function_info(const char *encoded)
         }
     }
 
-    char function_name[255];
-    char level[32];
-    char block[32];
-    char type_record[128];
+    /* Each field is a part of the record, so a buffer of its length fits any of them */
+    size_t n = strlen(encoded) + 1;
+    fields = malloc(4 * n);
+    char* function_name = fields;
+    char* level = fields + n;
+    char* block = fields + 2 * n;
+    char* type_record = fields + 3 * n;
     int end;
 
     if (sscanf(encoded, "%[^$]$%[^$]$%[^(](%[^)]),%n", function_name, level, block, type_record, &end) != 4) {
@@ -454,8 +478,9 @@ static void debug_add_function_info(const char *encoded)
     encoded += end;
 
     if (f->scope == FUNCTION_SCOPE_GLOBAL) {
-        strcpy(f->name, f->function_name);
+        f->name = strdup(f->function_name);
     } else {
+        f->name = malloc(strlen(f->scope_value) + strlen(f->function_name) + 2);
         sprintf(f->name, "%s.%s", f->scope_value, f->function_name);
     }
 
@@ -470,10 +495,12 @@ static void debug_add_function_info(const char *encoded)
     }
 
     HASH_ADD_STR(cfunctions, name, f);
+    free(fields);
 
     return;
 
 err:
+    free(fields);
     free(f);
     bk.debug("Warning: could not add debug info on function.\n");
 }
@@ -484,6 +511,7 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
     // S:Lother.c.haha2$c$0_0$0({2}SI:S),B,1,4
 
     debug_sym_symbol* s = malloc(sizeof(debug_sym_symbol));
+    char* fields = NULL;
 
     s->belongs_to_function = NULL;
 
@@ -493,13 +521,12 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
         case 'F':
         {
             // file scope
-            char file_name[FILENAME_MAX];
-            if (sscanf(encoded, "%[^$]$", file_name) != 1) {
+            char* file_name = dup_scope(&encoded);
+            if (file_name == NULL) {
                 goto err;
             }
-            encoded += strlen(file_name) + 1;
             s->scope = SYMBOL_SCOPE_FILE;
-            s->scope_value = strdup(file_name);
+            s->scope_value = file_name;
             break;
         }
         case 'G':
@@ -529,13 +556,12 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
         case 'L':
         {
             // file scope
-            char localiry_name[FILENAME_MAX];
-            if (sscanf(encoded, "%[^$]$", localiry_name) != 1) {
+            char* localiry_name = dup_scope(&encoded);
+            if (localiry_name == NULL) {
                 goto err;
             }
-            encoded += strlen(localiry_name) + 1;
             s->scope = SYMBOL_SCOPE_LOCAL;
-            s->scope_value = strdup(localiry_name);
+            s->scope_value = localiry_name;
             break;
         }
         default:
@@ -544,10 +570,14 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
         }
     }
 
-    char symbol_name[255];
-    char level[32];
-    char block[32];
-    char type_record[128];
+    /* Each field is a part of the record, so a buffer of its length fits any of
+       them; 16 more for the anon_<n> name */
+    size_t n = strlen(encoded) + 16;
+    fields = malloc(4 * n);
+    char* symbol_name = fields;
+    char* level = fields + n;
+    char* block = fields + 2 * n;
+    char* type_record = fields + 3 * n;
     int end;
 
     if (sscanf(encoded, "%[^$]$%[^$]$%[^(](%[^)]),%n", symbol_name, level, block, type_record, &end) != 4) {
@@ -563,16 +593,13 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
     encoded += end;
 
     if ((s->scope == SYMBOL_SCOPE_GLOBAL) || (s->scope == SYMBOL_SCOPE_SYMBOL)) {
-        strcpy(s->name, s->symbol_name);
+        s->name = strdup(s->symbol_name);
     } else {
         if (s->scope == SYMBOL_SCOPE_LOCAL) {
             const char* dot = strrchr(s->scope_value, '.');
             if (dot != NULL) {
-                size_t l = dot - s->scope_value;
-                char file_name[FILENAME_MAX] = {0};
-                char function_name[128] = {0};
-                memcpy(file_name, s->scope_value, l);
-                strcpy(function_name, dot + 1);
+                char* file_name = dup_n(s->scope_value, dot - s->scope_value);
+                const char* function_name = dot + 1;
 
                 s->belongs_to_function = debug_find_function(function_name, file_name);
                 if (s->belongs_to_function) {
@@ -582,10 +609,11 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
                     bk.debug("Warning: could not find function %s.%s for argument %s.\n",
                         file_name, function_name, s->symbol_name);
                 }
-
+                free(file_name);
             }
         }
 
+        s->name = malloc(strlen(s->scope_value) + strlen(s->symbol_name) + 2);
         sprintf(s->name, "%s.%s", s->scope_value, s->symbol_name);
     }
 
@@ -610,10 +638,12 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
         s->belongs_to_function->arguments = arg;
     }
 
+    free(fields);
     *result = encoded;
     return s;
 
 err:
+    free(fields);
     *result = NULL;
     free(s);
     bk.debug("Warning: could not add debug info on symbol.\n");
@@ -632,13 +662,12 @@ static debug_sym_type* debug_parse_type_info(const char* encoded)
         case 'F':
         {
             // file scope
-            char file_name[FILENAME_MAX];
-            if (sscanf(encoded, "%[^$]$", file_name) != 1) {
+            char* file_name = dup_scope(&encoded);
+            if (file_name == NULL) {
                 goto err;
             }
-            encoded += strlen(file_name) + 1;
             t->scope = SYMBOL_SCOPE_FILE;
-            t->scope_value = strdup(file_name);
+            t->scope_value = file_name;
             break;
         }
         case 'G':
@@ -656,13 +685,12 @@ static debug_sym_type* debug_parse_type_info(const char* encoded)
         case 'L':
         {
             // file scope
-            char localiry_name[FILENAME_MAX];
-            if (sscanf(encoded, "%[^$]$", localiry_name) != 1) {
+            char* localiry_name = dup_scope(&encoded);
+            if (localiry_name == NULL) {
                 goto err;
             }
-            encoded += strlen(localiry_name) + 1;
             t->scope = SYMBOL_SCOPE_LOCAL;
-            t->scope_value = strdup(localiry_name);
+            t->scope_value = localiry_name;
             break;
         }
         default:
@@ -673,7 +701,7 @@ static debug_sym_type* debug_parse_type_info(const char* encoded)
     }
 
     char* type_info = malloc(strlen(encoded));
-    if (sscanf(encoded, "%[^[][%[^]]]", t->name, type_info) != 2) {
+    if (sscanf(encoded, "%127[^[][%[^]]]", t->name, type_info) != 2) {
         goto err_type_info;
     }
 
@@ -726,15 +754,6 @@ err:
 static void debug_add_module_info(const char* encoded)
 {
 
-}
-
-static char* dup_n(const char* s, size_t n)
-{
-    char* r = malloc(n + 1);
-
-    memcpy(r, s, n);
-    r[n] = 0;
-    return r;
 }
 
 // N:Fu3.c$colour({2}SI:S)[(RED$0)(GREEN$5)(BLUE$6)]
@@ -840,13 +859,13 @@ static void apply_enum_tag(enum_object* o)
 // The element is SE<F<file>$<tag>>:<sign>: the key ends at the last ':' of the element
 static void debug_add_enum_object_info(const char* encoded)
 {
-    char record_name[255];
+    char* record_name = dup_n(encoded, strcspn(encoded, "("));
     const char* p;
     const char* end;
     const char* colon;
     enum_object* o;
 
-    if (sscanf(encoded, "%254[^(]", record_name) != 1) {
+    if (*record_name == 0) {
         goto err;
     }
     // The type element that starts with SE, after the {size}
@@ -870,19 +889,22 @@ static void debug_add_enum_object_info(const char* encoded)
         o->tag = dup_n(p, colon - p);
         apply_enum_tag(o);
     }
+    free(record_name);
     return;
 
 err:
+    free(record_name);
     bk.debug("Warning: could not add debug info on enum object.\n");
 }
 
 // The S: record of an E: record, once both are read: its integer gets the enum's tag
 static void debug_add_enum_tag(const char* encoded, debug_sym_symbol* s)
 {
-    char record_name[255];
+    char* record_name = dup_n(encoded, strcspn(encoded, "("));
     enum_object* o;
 
-    if (sscanf(encoded, "%254[^(]", record_name) != 1) {
+    if (*record_name == 0) {
+        free(record_name);
         return;
     }
     o = find_enum_object(record_name);
@@ -890,6 +912,7 @@ static void debug_add_enum_tag(const char* encoded, debug_sym_symbol* s)
         o->symbol = s;
         apply_enum_tag(o);
     }
+    free(record_name);
 }
 
 /* Add debug information, in this case it's encoded */
@@ -961,7 +984,7 @@ void debug_add_info_encoded(char *encoded, const char *module)
                     HASH_FIND_STR(cdb_files, s->scope_value, f);
                     if (f == NULL) {
                         f = calloc(1, sizeof(debug_sym_file));
-                        strcpy(f->name, s->scope_value);
+                        f->name = strdup(s->scope_value);
                         HASH_ADD_STR(cdb_files, name, f);
                     }
                     HASH_ADD_STR(f->file_local_symbols, symbol_name, s);
@@ -1061,11 +1084,11 @@ int debug_resolve_source(char *name, const char** corrected_name)
     char *ptr;
 
     if ( ( ptr = strrchr(name, ':') ) != NULL ) {
-        char filename[FILENAME_MAX+1];
+        char *filename = dup_n(name, ptr - name);
         int  line;
+        int  address = -1;
         cfile *cf;
 
-        snprintf(filename, sizeof(filename),"%.*s", (int)(ptr - name), name);
         line = atoi(ptr+1);
 
         HASH_FIND_STR(cfiles, filename, cf);
@@ -1076,7 +1099,7 @@ int debug_resolve_source(char *name, const char** corrected_name)
             HASH_FIND_INT(cf->lines, &line, cl);
 
             if ( cl != NULL ) {
-                return cl->address;
+                address = cl->address;
             }
         } else {
             // try and do partial match
@@ -1098,12 +1121,14 @@ int debug_resolve_source(char *name, const char** corrected_name)
                     if (corrected_name) {
                         *corrected_name = elem->file;
                     }
-                    return cl->address;
+                    address = cl->address;
                 }
 
                 break;
             }
         }
+        free(filename);
+        return address;
     }
     return -1;
 }
@@ -1135,9 +1160,10 @@ debug_sym_function* debug_find_function(const char* function_name, const char* f
 
     if (file_name != NULL)
     {
-        char name[FILENAME_MAX];
+        char* name = malloc(strlen(file_name) + strlen(function_name) + 2);
         sprintf(name, "%s.%s", file_name, function_name);
         HASH_FIND_STR(cfunctions, name, f);
+        free(name);
     }
 
     if (f == NULL)
@@ -1744,10 +1770,11 @@ static int debug_get_symbol_address(debug_sym_symbol *s) {
         return address;
     }
 
-    char underscored_name[255];
+    char* underscored_name = malloc(strlen(s->symbol_name) + 2);
     sprintf(underscored_name, "_%s", s->symbol_name);
 
     address = symbol_resolve(underscored_name, (s->scope == SYMBOL_SCOPE_FILE) ? s->scope_value : NULL);
+    free(underscored_name);
     if (address >= 0) {
         return address;
     }
@@ -1841,15 +1868,7 @@ uint8_t cdb_find_enumerator(const char* name, const char* filename, int32_t* val
     debug_sym_enum* best = NULL;
     debug_sym_enumerator* best_en = NULL;
     int best_in_file = 0;
-    size_t prefix_len = 0;
-    char prefix[256] = "";
-
-    if (filename != NULL) {
-        prefix_len = snprintf(prefix, sizeof(prefix), "F%s$", filename);
-        if (prefix_len >= sizeof(prefix)) {
-            prefix_len = 0;
-        }
-    }
+    size_t filename_len = filename != NULL ? strlen(filename) : 0;
 
     HASH_ITER(hh, cdb_enums, e, tmp) {
         debug_sym_enumerator* en;
@@ -1861,7 +1880,9 @@ uint8_t cdb_find_enumerator(const char* name, const char* filename, int32_t* val
         if (en == NULL) {
             continue;
         }
-        int in_file = prefix_len != 0 && strncmp(e->name, prefix, prefix_len) == 0;
+        /* the key starts F<filename>$ */
+        int in_file = filename != NULL && e->name[0] == 'F' &&
+            strncmp(e->name + 1, filename, filename_len) == 0 && e->name[1 + filename_len] == '$';
         if (best == NULL || (in_file && !best_in_file) || (in_file == best_in_file && strcmp(e->name, best->name) < 0)) {
             best = e;
             best_en = en;

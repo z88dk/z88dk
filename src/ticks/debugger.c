@@ -993,25 +993,27 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
         }
 
     } else {
-        char location[FILENAME_MAX + 4];
+        UT_string* location;
+        utstring_new(location);
         if (fp->filename) {
             if (fp->lineno) {
-                sprintf(location, "%s:%d", fp->filename, fp->lineno);
+                utstring_printf(location, "%s:%d", fp->filename, fp->lineno);
             } else {
-                sprintf(location, "%s", fp->filename);
+                utstring_printf(location, "%s", fp->filename);
             }
         } else {
             if (fp->symbol && fp->symbol->file) {
-                sprintf(location, "%s", fp->symbol->file);
+                utstring_printf(location, "%s", fp->symbol->file);
             } else {
-                sprintf(location, "%s", "unknown location");
+                utstring_printf(location, "%s", "unknown location");
             }
         }
         if (sym) {
-            bk.console("%s%s+%d\n       at %s\n", frame_marker, sym->name, fp->offset, location);
+            bk.console("%s%s+%d\n       at %s\n", frame_marker, sym->name, fp->offset, utstring_body(location));
         } else {
-            bk.console("%s$%04x\n       at %s\n", frame_marker, fp->address, location);
+            bk.console("%s$%04x\n       at %s\n", frame_marker, fp->address, utstring_body(location));
         }
+        utstring_free(location);
     }
 }
 

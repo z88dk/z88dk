@@ -41,6 +41,11 @@ ifndef DBG_WINDOWS
 all: floats
 endif
 
+# the long-path target: its own lines, so it can be reverted alone
+ifndef DBG_WINDOWS
+all: longpath
+endif
+
 z80: dbgvars.c dbglocals.c dbgparams.c
 	zcc +test $(DFLAGS) $< -o dbgvars_z80.bin -m
 	@sh ./check.sh -mz80 dbgvars_z80.bin dbgvars_z80.map z80
@@ -108,10 +113,28 @@ brkline: brkline.c
 	  sh ./check_brkline.sh brkline_$$c.bin brkline_$$c.map $$c || exit 1; \
 	done
 
+# Sources compiled by an absolute path long enough that <file>.<function>.<local>
+# passes 128 characters and the enum key F<file>$ passes 256, and names at the
+# compilers' limit: ticks reads their maps (locals, a static function, file statics,
+# enumerators in two files and two functions, a long struct tag); both compilers
+LONGDIR = longpath/$(shell printf '%0200d' 0)/$(shell printf '%0200d' 0)
+longpath: dbglongpath.c dbglongenum_a.c dbglongenum_b.c dbglongname.c
+	@for c in sccz80 80cc; do \
+	  mkdir -p $(LONGDIR) && cp dbglongpath.c dbglongenum_a.c dbglongenum_b.c dbglongname.c $(LONGDIR)/ || exit 1; \
+	  zcc +test -vn -compiler=$$c -debug -I$(FRAMEWORK_DIR) $(CURDIR)/$(LONGDIR)/dbglongpath.c -o dbglongpath_$$c.bin -m || exit 1; \
+	  zcc +test -vn -compiler=$$c -debug -I$(FRAMEWORK_DIR) $(CURDIR)/$(LONGDIR)/dbglongenum_a.c $(CURDIR)/$(LONGDIR)/dbglongenum_b.c -o dbglongenum_$$c.bin -m || exit 1; \
+	  zcc +test -vn -compiler=$$c -debug -I$(FRAMEWORK_DIR) $(CURDIR)/$(LONGDIR)/dbglongname.c -o dbglongname_$$c.bin -m || exit 1; \
+	  $(RM) -r longpath; \
+	  sh ./check_longpath.sh -mz80 dbglongpath_$$c.bin dbglongpath_$$c.map $(CURDIR)/$(LONGDIR)/dbglongpath.c $$c || exit 1; \
+	  sh ./check_longenum.sh -mz80 dbglongenum_$$c.bin dbglongenum_$$c.map $(CURDIR)/$(LONGDIR) $$c || exit 1; \
+	  sh ./check_longname.sh -mz80 dbglongname_$$c.bin dbglongname_$$c.map $(CURDIR)/$(LONGDIR)/dbglongname.c $$c || exit 1; \
+	done
+
 clean:
 	$(RM) *.bin *.map *.o *.sym *.def zcc_opt.def *.lis clinescope.asm
+	$(RM) -r longpath
 
-.PHONY: all z80 i8080 i8085 gbz80 arrays exprerr clean
+.PHONY: all z80 i8080 i8085 gbz80 arrays exprerr longpath clean
 .PHONY: enums dupname enumblk forblk clean-enums
 .PHONY: floats
 
