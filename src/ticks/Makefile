@@ -20,7 +20,7 @@ GDBOBJS = cpu.o backend.o syms.o disassembler_alg.o debug.o exp_engine.o debugge
 DISOBJS = disassembler_main.o syms.o disassembler_alg.o debug.o exp_engine.o backend.o
 LEXOBJS = lex.yy.o expressions.tab.o
 
-DEPENDS         := $(OBJS:.o=.d) $(DISOBJS:.o=.d) $(GDBOBJS:.o=.d)
+DEPENDS         := $(OBJS:.o=.d) $(DISOBJS:.o=.d) $(GDBOBJS:.o=.d) $(LEXOBJS:.o=.d)
 
 INSTALL ?= install
 

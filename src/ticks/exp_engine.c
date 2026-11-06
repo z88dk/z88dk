@@ -29,7 +29,7 @@ struct {
     {"long",            1,              TYPE_LONG},
     {"uint32_t",        0,              TYPE_LONG},
     {"unsigned long",   0,              TYPE_LONG},
-    {"float",           0,              TYPE_FLOAT},
+    {"float",           1,              TYPE_FLOAT},
     {NULL,              0,              TYPE_UNKNOWN},
 };
 
@@ -111,14 +111,23 @@ void expression_value_to_pointer(struct expression_result_t *from, struct expres
 
 void expression_primitive_func_call_1(const char* call, struct expression_result_t* a, struct expression_result_t* to) {
     if (is_expression_result_error(a)) {
+        zero_expression_result(to);
         set_expression_result_error(to);
         snprintf(to->as_error, sizeof(to->as_error), "Can not obtain sizeof: %s", a->as_error);
         return;
     }
     if (strcmp(call, "sizeof") == 0) {
         if (a->type.first != NULL) {
+            char error[sizeof(to->as_error)];
+            int size = debug_type_size(&a->type, a->type.first, error, sizeof(error));
+            if (size < 0) {
+                zero_expression_result(to);
+                set_expression_result_error(to);
+                snprintf(to->as_error, sizeof(to->as_error), "Can not obtain sizeof: %s", error);
+                return;
+            }
             to->type.first = malloc_type(TYPE_INT);
-            to->as_int = get_type_memory_size(a->type.first);
+            to->as_int = size;
         } else {
             to->type.first = malloc_type(TYPE_INT);
             to->as_int = (int)a->type.size;
@@ -126,8 +135,9 @@ void expression_primitive_func_call_1(const char* call, struct expression_result
         return;
     }
 
+    zero_expression_result(to);
     set_expression_result_error(to);
-    sprintf(to->as_error, "Unknown function call: %s", call);
+    snprintf(to->as_error, sizeof(to->as_error), "Unknown function call: %s", call);
 }
 
 void expression_dereference_pointer(struct expression_result_t *from, struct expression_result_t *to) {
@@ -176,8 +186,8 @@ void expression_dereference_pointer(struct expression_result_t *from, struct exp
             break;
         }
         case TYPE_FLOAT: {
-            set_expression_result_error(to);
-            sprintf(to->as_error, "Cannot dereference float (not implemented)");
+            free_type(to->type.first);
+            debug_resolve_expression_element(&from->type, from->type.first->next, RESOLVE_BY_POINTER, from->as_pointer.ptr, to);
             break;
         }
         default: {
@@ -238,9 +248,7 @@ void expression_resolve_struct_member(struct expression_result_t *struct_, const
     {
         if (strcmp(child->symbol->symbol_name, member) == 0) {
             uint32_t ptr = struct_->as_pointer.ptr + child->offset;
-            debug_resolve_expression_element(
-                &child->symbol->type_record, child->symbol->type_record.first,
-                RESOLVE_BY_POINTER, ptr, result);
+            debug_resolve_struct_member(&struct_->type, t, child->symbol, ptr, result);
             return;
         }
 
@@ -464,7 +472,12 @@ void expression_math_add(struct expression_result_t* a, struct expression_result
                 break;
             }
             if (is_primitive_integer_type(b->type.first)) {
-                result->as_pointer.ptr = a->as_pointer.ptr + b->as_int * get_type_memory_size(a->type.first->next);
+                int size = debug_type_size(&a->type, a->type.first->next, result->as_error, sizeof(result->as_error));
+                if (size < 0) {
+                    set_expression_result_error(result);
+                    break;
+                }
+                result->as_pointer.ptr = a->as_pointer.ptr + b->as_int * size;
                 /* A near pointer wraps at 64k, the location of a banked array does not */
                 if (a->as_pointer.ptr <= 0xffff) result->as_pointer.ptr &= 0xffff;
             } else {
@@ -532,7 +545,12 @@ void expression_math_sub(struct expression_result_t* a, struct expression_result
                 break;
             }
             if (is_primitive_integer_type(b->type.first)) {
-                result->as_pointer.ptr = a->as_pointer.ptr - b->as_int * get_type_memory_size(a->type.first->next);
+                int size = debug_type_size(&a->type, a->type.first->next, result->as_error, sizeof(result->as_error));
+                if (size < 0) {
+                    set_expression_result_error(result);
+                    break;
+                }
+                result->as_pointer.ptr = a->as_pointer.ptr - b->as_int * size;
                 if (a->as_pointer.ptr <= 0xffff) result->as_pointer.ptr &= 0xffff;
             } else {
                 set_expression_result_error(result);
@@ -679,7 +697,12 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
                     UT_string* sub_value = expression_result_value_to_string(&elr);
                     utstring_printf(buffer, "%s", utstring_body(sub_value));
                     utstring_free(sub_value);
-                    ptr += get_type_memory_size(result->type.first->next);
+                    int size = debug_type_size(&result->type, result->type.first->next, elr.as_error, sizeof(elr.as_error));
+                    if (size < 0) {
+                        expression_result_free(&elr);
+                        break;
+                    }
+                    ptr += size;
                 }
                 expression_result_free(&elr);
             }
@@ -730,8 +753,7 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
                     utstring_printf(buffer, ", %s=", child->symbol->symbol_name);
                 }
                 struct expression_result_t child_result = {0};
-                debug_resolve_expression_element(&child->symbol->type_record, child->symbol->type_record.first,
-                    RESOLVE_BY_POINTER, ptr + child->offset, &child_result);
+                debug_resolve_struct_member(&result->type, t, child->symbol, ptr + child->offset, &child_result);
                 if (is_expression_result_error(&child_result)) {
                     utstring_printf(buffer, "<error:%s>", child_result.as_error);
                     expression_result_free(&child_result);

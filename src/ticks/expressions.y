@@ -79,14 +79,17 @@ value_expression: T_PRIMITIVE_VALUE
 				$$.flags |= EXPRESSION_ERROR;
 				sprintf($$.as_error, "Cannot do math with void");
 			} else {
-				if (is_primitive_integer_type($3.type.first)) {
-					$1.as_pointer.ptr += $3.as_int * get_type_memory_size($1.type.first->next);
+				int size;
+				if (!is_primitive_integer_type($3.type.first)) {
+					$$.flags |= EXPRESSION_ERROR;
+					sprintf($$.as_error, "Cannot index pointer by non-integer");
+				} else if ((size = debug_type_size(&$1.type, $1.type.first->next, $$.as_error, sizeof($$.as_error))) < 0) {
+					$$.flags |= EXPRESSION_ERROR;
+				} else {
+					$1.as_pointer.ptr += $3.as_int * size;
 					expression_dereference_pointer(&$1, &$$);
 					expression_result_free(&$1);
 					expression_result_free(&$3);
-				} else {
-					$$.flags |= EXPRESSION_ERROR;
-					sprintf($$.as_error, "Cannot index pointer by non-integer");
 				}
 			}
 		} else {

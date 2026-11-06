@@ -69,6 +69,7 @@ char *c_home_section = "code_home";
 static void dumpsymdebug(void);
 static void dumpdebug(void);
 static void dumpfns(void);
+static void write_fp_format(void);
 static void dumpvars(void);
 static void parse(void);
 static void errsummary(void);
@@ -331,6 +332,7 @@ int main(int argc, char** argv)
     write_constant_queue();
     dumpvars();
     dumpfns();
+    write_fp_format();
 
     if ( c_debug_adb_defc ) {
         dumpsymdebug();
@@ -592,6 +594,36 @@ static void dumpfns(void)
 
 
     outstr("\n\n; --- End of Scope Defns ---\n\n");
+}
+
+/*
+ * The format of the module's floats, for a debugger to read them from the map:
+ * __fp_mode, __fp_exponent_bias and __fp_mantissa_size. The values of __fp_mode are
+ * fixed by the map format, not by enum maths_mode: 0 z80, 1 ieee, 2 mbf32, 3 mbf40,
+ * 4 mbf64, 5 z88, 6 am9511 (the names of -fp-mode). Every module writes them, so a
+ * debugger reads each float in the format of the module that defines it. They are local,
+ * as every module has them, and z80asm keeps a local constant in the object only once
+ * it is used: hence the IF.
+ */
+static void write_fp_format(void)
+{
+    int mode;
+
+    switch ( c_maths_mode ) {
+    case MATHS_Z80:     mode = 0; break;
+    case MATHS_IEEE:    mode = 1; break;
+    case MATHS_MBFS:    mode = 2; break;
+    case MATHS_MBF40:   mode = 3; break;
+    case MATHS_MBF64:   mode = 4; break;
+    case MATHS_Z88:     mode = 5; break;
+    case MATHS_AM9511:  mode = 6; break;
+    default:            return;
+    }
+    outfmt("\tdefc\t__fp_mode = %d\n", mode);
+    outfmt("\tdefc\t__fp_exponent_bias = %d\n", c_fp_exponent_bias);
+    outfmt("\tdefc\t__fp_mantissa_size = %d\n", c_fp_mantissa_bytes);
+    outfmt("\tIF\t__fp_mode + __fp_exponent_bias + __fp_mantissa_size\n");
+    outfmt("\tENDIF\n");
 }
 
 /*

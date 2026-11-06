@@ -524,8 +524,8 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int8 yyrline[] =
 {
        0,    48,    48,    49,    50,    53,    56,    57,    63,    67,
-      68,    69,    70,    71,    72,    73,    74,    75,    76,    97,
-     104,   105,   107
+      68,    69,    70,    71,    72,    73,    74,    75,    76,   100,
+     107,   108,   110
 };
 #endif
 
@@ -1237,14 +1237,17 @@ yyreduce:
 				(yyval.val).flags |= EXPRESSION_ERROR;
 				sprintf((yyval.val).as_error, "Cannot do math with void");
 			} else {
-				if (is_primitive_integer_type((yyvsp[-1].val).type.first)) {
-					(yyvsp[-3].val).as_pointer.ptr += (yyvsp[-1].val).as_int * get_type_memory_size((yyvsp[-3].val).type.first->next);
+				int size;
+				if (!is_primitive_integer_type((yyvsp[-1].val).type.first)) {
+					(yyval.val).flags |= EXPRESSION_ERROR;
+					sprintf((yyval.val).as_error, "Cannot index pointer by non-integer");
+				} else if ((size = debug_type_size(&(yyvsp[-3].val).type, (yyvsp[-3].val).type.first->next, (yyval.val).as_error, sizeof((yyval.val).as_error))) < 0) {
+					(yyval.val).flags |= EXPRESSION_ERROR;
+				} else {
+					(yyvsp[-3].val).as_pointer.ptr += (yyvsp[-1].val).as_int * size;
 					expression_dereference_pointer(&(yyvsp[-3].val), &(yyval.val));
 					expression_result_free(&(yyvsp[-3].val));
 					expression_result_free(&(yyvsp[-1].val));
-				} else {
-					(yyval.val).flags |= EXPRESSION_ERROR;
-					sprintf((yyval.val).as_error, "Cannot index pointer by non-integer");
 				}
 			}
 		} else {
@@ -1252,11 +1255,11 @@ yyreduce:
 			sprintf((yyval.val).as_error, "Cannot index non-pointer");
 		}
 	}
-#line 1256 "expressions.tab.c"
+#line 1259 "expressions.tab.c"
     break;
 
   case 19: /* value_expression: T_AMPERSAND value_expression  */
-#line 97 "expressions.y"
+#line 100 "expressions.y"
                                                                                 {
 		(yyval.val).type = (yyvsp[0].val).type;
 		(yyval.val).type.first = malloc_type(TYPE_GENERIC_POINTER);
@@ -1264,29 +1267,29 @@ yyreduce:
 		(yyval.val).as_pointer.ptr = (yyvsp[0].val).memory_location;
 		expression_result_free(&(yyvsp[0].val));
 	 }
-#line 1268 "expressions.tab.c"
+#line 1271 "expressions.tab.c"
     break;
 
   case 20: /* value_expression: T_LEFT type_expression T_STAR T_RIGHT value_expression  */
-#line 104 "expressions.y"
+#line 107 "expressions.y"
                                                                                 { expression_value_to_pointer(&(yyvsp[0].val), &(yyval.val), &(yyvsp[-3].type)); free_type((yyvsp[-3].type).first); expression_result_free(&(yyvsp[0].val)); }
-#line 1274 "expressions.tab.c"
+#line 1277 "expressions.tab.c"
     break;
 
   case 21: /* value_expression: T_STRING T_LEFT value_expression T_RIGHT  */
-#line 105 "expressions.y"
+#line 108 "expressions.y"
                                                                                 { expression_primitive_func_call_1((yyvsp[-3].cval), &(yyvsp[-1].val), &(yyval.val)); expression_result_free(&(yyvsp[-1].val)); }
-#line 1280 "expressions.tab.c"
+#line 1283 "expressions.tab.c"
     break;
 
   case 22: /* error_expression: T_ERROR  */
-#line 107 "expressions.y"
+#line 110 "expressions.y"
                                                                                 { strcpy((yyval.errval), (yyvsp[0].errval)); }
-#line 1286 "expressions.tab.c"
+#line 1289 "expressions.tab.c"
     break;
 
 
-#line 1290 "expressions.tab.c"
+#line 1293 "expressions.tab.c"
 
       default: break;
     }
@@ -1479,7 +1482,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 110 "expressions.y"
+#line 113 "expressions.y"
 
 
 void evaluate_expression_string(const char* expr)

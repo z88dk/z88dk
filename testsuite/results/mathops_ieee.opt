@@ -337,4 +337,9 @@
 
 
 
+	defc	__fp_mode = 1
+	defc	__fp_exponent_bias = 126
+	defc	__fp_mantissa_size = 3
+	IF	__fp_mode + __fp_exponent_bias + __fp_mantissa_size
+	ENDIF
 
