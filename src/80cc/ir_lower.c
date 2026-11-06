@@ -61,11 +61,13 @@ extern int   ncmp;
 extern int   current_block;
 extern FILE *output;   /* gen_emit_line/gen_comment write here via outfmt */
 
-/* Track the (file, line) of the last C_LINE we emitted so we can
-   suppress duplicates within a contiguous run on the same line.
+/* Track the (file, line) and scope (level, block) of the last C_LINE we
+   emitted so we can suppress duplicates within a contiguous run on the same
+   line; a line holding code of two blocks gets a C_LINE for each.
    Reset at the start of every ir_lower_func. */
 static const char *cur_emitted_file;
 static int         cur_emitted_line;
+static int         cur_emitted_level, cur_emitted_block;
 
 /* Source location of the op currently being lowered (set in lower_op,
    independent of C_LINE emit mode). Used to annotate lowering aborts. */
@@ -421,7 +423,10 @@ static void emit_op_cline(FILE *out, const Op *op)
 {
     if (!c_intermix_ccode && !c_cline_directive) return;
     if (!op || op->line <= 0) return;
-    if (op->line == cur_emitted_line && op->file == cur_emitted_file)
+    int same_line = op->line == cur_emitted_line && op->file == cur_emitted_file;
+    /* under -debug, a scope change within a line gets a C_LINE of its own */
+    if (same_line && (!c_cline_directive
+                      || (op->level == cur_emitted_level && op->block == cur_emitted_block)))
         return;
     int saved_lineno = lineno;
     int saved_ncmp = ncmp, saved_block = current_block;
@@ -436,7 +441,7 @@ static void emit_op_cline(FILE *out, const Op *op)
        the discarded pass-1 render swallows its own. */
     FILE *saved_output = output;
     output = out;
-    if (c_intermix_ccode && op->file) {
+    if (c_intermix_ccode && op->file && !same_line) {
         const char *src = get_source_line(op->file, op->line);
         if (src) gen_comment(src);
     }
@@ -447,6 +452,8 @@ static void emit_op_cline(FILE *out, const Op *op)
     current_block = saved_block;
     cur_emitted_line = op->line;
     cur_emitted_file = op->file;
+    cur_emitted_level = op->level;
+    cur_emitted_block = op->block;
 }
 
 /* ----- Tiny emit helpers ------------------------------------------------ */
