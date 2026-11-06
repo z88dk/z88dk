@@ -1431,6 +1431,20 @@ static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
                 for (int k = lo; k < hi && span <= 126; k++) span += size[k];
                 if (span > 126) continue;
                 char nl2[1024];
+                /* A counter loop's `dec b` + in-range `jp nz` is `djnz`. */
+                if (!strcmp(cc, "nz") && i > 0
+                    && !strcmp(lines[i - 1], "\tdec\tb\t;cdcnt\n")) {
+                    snprintf(nl2, sizeof nl2, "\tdjnz\t%s\n", tgt);
+                    char *rep = strdup(nl2), *blank = strdup("");
+                    if (rep && blank) {
+                        free(lines[i]); lines[i] = rep;
+                        free(lines[i - 1]); lines[i - 1] = blank;
+                        size[i] = 2; size[i - 1] = 0;
+                        changed = 1;
+                        continue;
+                    }
+                    free(rep); free(blank);
+                }
                 if (cc[0]) snprintf(nl2, sizeof nl2, "\tjr\t%s,%s\n", cc, tgt);
                 else       snprintf(nl2, sizeof nl2, "\tjr\t%s\n", tgt);
                 char *rep = strdup(nl2);

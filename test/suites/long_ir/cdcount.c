@@ -5,6 +5,7 @@
 
 int gc;
 unsigned char gb[8];
+volatile unsigned char gv;
 
 static void bump(void) { ++gc; }
 static void bump_by(int n) { gc += n; }
@@ -89,6 +90,45 @@ static int index_after(void)
     return n;
 }
 
+static int far_body(void)
+{
+    unsigned char i;
+    gv = 0;
+    for (i = 0; i < 3; ++i) {
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+        gv++;
+    }
+    return gv;
+}
+
 static void check(void)
 {
     int k;
@@ -103,6 +143,7 @@ static void check(void)
     assertEqual(with_long(), 700 + 7);
     gc = 0;
     assertEqual(index_after(), 9);
+    assertEqual(far_body(), 90);
 }
 
 int main(int argc, char *argv[])

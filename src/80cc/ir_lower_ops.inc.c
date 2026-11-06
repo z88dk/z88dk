@@ -26,6 +26,39 @@ static int gen_nop(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* A reversed-loop counter homed in BC that only ever sees `ld K`, its own
+   `dec` and the latch test: its value lives in B alone (1..255), so the loop
+   is `ld b,K` .. `djnz`. Any other def or use (a pair copy would put the high
+   byte, 0, in B) leaves it a plain BC word. */
+static int cd_b_counter(const Func *f, int v)
+{
+    if (v < 0 || v >= f->n_vregs || opt_disabled("countdown-b")) return 0;
+    if (!(f->vregs[v].flags & IR_VREG_CD_COUNTER) || f->vregs[v].width != 2) return 0;
+    if (!vreg_in_pr_bc(f, v) || (f->vregs[v].flags & IR_VREG_CALL_SPLIT)) return 0;
+    int n_ld = 0, n_dec = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int u[16], nu = ir_op_uses(o, u, 16), used = 0;
+            for (int k = 0; k < nu; k++) if (u[k] == v) used = 1;
+            if (o->dst == v) {
+                if (o->kind == IR_LD_IMM && o->imm >= 1 && o->imm <= 255) n_ld++;
+                else if (o->kind == IR_DEC && o->src[0] == v) n_dec++;
+                else return 0;
+            }
+            if (used && o->kind != IR_DEC && o->kind != IR_BR_COND
+                && !(o->kind == IR_BR_ZERO && o->imm == IR_BRZ_PHANTOM)) return 0;
+        }
+    return n_ld == 1 && n_dec == 1;
+}
+
+/* The `dec b` of a counter loop, marked where relax can fuse it with the
+   latch into `djnz` once the target is known to be in range. */
+static const char *cd_dec_b_text(void)
+{
+    return (IS_808x() || IS_GBZ80()) ? "dec\tb" : "dec\tb\t;cdcnt";
+}
+
 static int gen_ld_imm(FILE *out, Func *f, const Op *op)
 {
     int dst_w = (op->dst >= 0) ? f->vregs[op->dst].width : 2;
@@ -84,6 +117,11 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
                copy of that contract here. */
             emit(out, "ld\thl,%lld", (long long)op->imm);
             commit_hl_word(out, f, op->dst);
+            return 0;
+        }
+        if (cd_b_counter(f, op->dst)) {
+            emit(out, "ld\tb,%lld", (long long)op->imm);
+            invalidate_bc_cache();
             return 0;
         }
         emit(out, "ld\tbc,%lld", (long long)op->imm);
@@ -446,6 +484,11 @@ static int try_inplace_home_unop(FILE *out, const Func *f, const Op *op,
 static int gen_step(FILE *out, Func *f, const Op *op, int step)
 {
     const char *mnem = step > 0 ? "inc" : "dec";
+    if (step < 0 && op->dst >= 0 && cd_b_counter(f, op->dst)) {
+        emit(out, "%s", cd_dec_b_text());
+        invalidate_bc_cache();
+        return 0;
+    }
     /* width-1: step in A and store ONE byte. store_hl writes TWO
        bytes — clobbering the adjacent packed char slot. */
     if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
@@ -715,6 +758,17 @@ static int gen_br_cond(FILE *out, Func *f, const Op *op)
        here preserve flags; do not generalise this to arbitrary BR_COND ops. */
     if (op->imm == IR_BRCOND_KTRIP && CPU_HAS_JP_K()) {
         emit(out, "jp\tnk,L_f%d_bb_%d", L.func_emit_idx, op->label);
+        return 0;
+    }
+    if (cd_b_counter(f, op->src[0])) {
+        /* Z comes from the `dec b` just before; otherwise test B itself. */
+        if (!(cur_bb && cur_op_idx > 0 && cur_bb->ops[cur_op_idx - 1].kind == IR_DEC
+              && cur_bb->ops[cur_op_idx - 1].dst == op->src[0])) {
+            emit(out, "ld\ta,b");
+            emit(out, "or\ta");
+            invalidate_a_cache();
+        }
+        emit(out, "jp\tnz,L_f%d_bb_%d", L.func_emit_idx, op->label);
         return 0;
     }
     emit_test_zero(out, f, op->src[0]);
