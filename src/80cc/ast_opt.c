@@ -5596,6 +5596,27 @@ static int try_reverse_loop(array *stmts, int label_idx)
     loop_recognized info;
     if (!try_recognize_loop(stmts, label_idx, &info)) return 0;
 
+    if (info.trip_count == 1) {
+        /* One iteration: keep the body, drop the test, step and back-jump.
+           The body has no break and does not read iv; a continue label, if
+           any, stays and now falls through to the exit. */
+        array_set_byindex(stmts, info.init_idx, NULL);
+        array_set_byindex(stmts, info.label_idx, NULL);
+        array_set_byindex(stmts, info.test_idx, NULL);
+        array_set_byindex(stmts, info.step_idx, NULL);
+        array_set_byindex(stmts, info.back_jump_idx, NULL);
+        if (!info.init_is_decl) {
+            Node *iv_lhs = ast_local_var(info.iv, info.iv->name);
+            Node *iv_val = ast_literal(info.iv->ctype, (zdouble)info.bound_value);
+            Node *iv_restore = ast_binop(OP_ASSIGN, iv_lhs, iv_val);
+            iv_restore->type = info.iv->ctype;
+            array_set_byindex(stmts, info.exit_label_idx, iv_restore);
+        } else {
+            array_set_byindex(stmts, info.exit_label_idx, NULL);
+        }
+        return 1;
+    }
+
     int width8 = (info.trip_count <= 255);
     Type *ctype = width8 ? type_uchar : type_uint;
     Node *counter_init = ast_literal(ctype, (zdouble)info.trip_count);
