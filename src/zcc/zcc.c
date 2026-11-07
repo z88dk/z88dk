@@ -1190,6 +1190,9 @@ int main(int argc, char **argv)
 
             if (stat(expanded, &sb) == 0 && S_ISREG(sb.st_mode)) {
                 coptrules_cpu = expanded;
+            } else {
+                fprintf(stderr, "Warning: cannot find CPU rules file <%s>\n", expanded);
+                free(expanded);
             }
         }
     }

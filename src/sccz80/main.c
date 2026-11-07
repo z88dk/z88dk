@@ -37,7 +37,7 @@ char Filenorig[FILENAME_LEN + 1];
 
 
 int c_notaltreg; /* No alternate registers */
-int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
+int c_standard_escapecodes = 0; /* \n = 13, \r = 10; consoles treat CR as newline */
 int c_disable_builtins = 0;
 int c_cline_directive = 0;
 int c_cpu = CPU_Z80;
@@ -140,9 +140,6 @@ static option  sccz80_opts[] = {
     { 0, "initseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the initialisation section name", &c_init_section, NULL, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, NULL, 0 },
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "Optimise for speed not size", NULL, opt_code_speed, 0},
-    { 0, "", OPT_HEADER, "Framepointer configuration (for debugging):", NULL, NULL, 0 },
-    { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, NULL, 1},
-    { 0, "frameiy", OPT_ASSIGN|OPT_INT, "Use iy as the frame pointer", &c_framepointer_is_ix, NULL, 0},
     { 0, "zcc-opt", OPT_STRING, "Location for zcc_opt.def", &c_zcc_opt, NULL, (intptr_t)(void *)"zcc_opt.def"},
 
     { 0, "", OPT_HEADER, "Error/warning handling:", NULL, NULL, 0 },
@@ -184,8 +181,7 @@ int main(int argc, char** argv)
     gargv = argv;
 
     /* allocate space for arrays */
-    litq = MALLOC(FNLITQ); /* literals, these 2 dumped end */
-    dubq = MALLOC(FNLITQ); /* Doubles */
+    litq = MALLOC(FNLITQ); /* literals, dumped at the end */
     tempq = MALLOC(LITABSZ); /* Temp strings... */
     glbq = MALLOC(LITABSZ); /* Used for glb lits, dumped now */
     symtab = NULL;
@@ -235,7 +231,6 @@ int main(int argc, char** argv)
     c_double_strings = 0;
     c_notaltreg = NO;
     debuglevel = NO;
-    c_framepointer_is_ix = -1;
     c_use_r2l_calling_convention = NO;
 
     setup_sym(); /* define some symbols */
@@ -285,9 +280,7 @@ int main(int argc, char** argv)
 
     if ( c_debug_adb_file || c_debug_adb_defc ) {
         c_cline_directive = 1;
-        if ( c_framepointer_is_ix == -1 ) {
-            c_debug_entry_points = 1;
-        }
+        c_debug_entry_points = 1;
     }
 
 
@@ -1033,7 +1026,6 @@ void DispVersion(char* arg)
 void atexit_deallocate(void)
 {
     FREENULL(litq);
-    FREENULL(dubq);
     FREENULL(tempq);
     FREENULL(glbq);
     FREENULL(loctab);
@@ -1041,6 +1033,7 @@ void atexit_deallocate(void)
 //    FREENULL(swnext);
     FREENULL(stage);
     FREENULL(gotoq);
+    free_section_names();
 }
 
 void* mymalloc(size_t size)

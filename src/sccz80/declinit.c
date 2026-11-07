@@ -363,7 +363,7 @@ static int init(Type *type, int dump)
 
         if ( rmatch2("sizeof") || rmatch2("__builtin_offsetof")) {
             if ( constexpr_exact(&value, &int_value, &int_value_valid,
-                                 &valtype, 1) ) {
+                                 &valtype, 1, NULL) ) {
                 goto constdecl;
             }
             errorfmt("Expecting a constant expression for static initialisation\n",1);
@@ -468,15 +468,12 @@ again:
                 errorfmt("Unknown symbol: %s", 1, sname);
                 junk();
             }
-        } else if (rcmatch('}')) {        
-#if 0
-            dumpzero(size,*dim);
-#endif
+        } else if (rcmatch('}')) {
             lptr = klptr;
             return 0;
         } else if ( lptr= klptr,
                     constexpr_exact(&value, &int_value, &int_value_valid,
-                                    &valtype, 1)) {
+                                    &valtype, 1, NULL)) {
 constdecl:
             check_assign_range(type, value);
             if (dump) {
@@ -563,28 +560,6 @@ constdecl:
                     outdec(value);
                 }
                 nl();
-                /* Dump out a train of zeros as appropriate */
-                // if (ident == ID_ARRAY && more == 0) {
-                //     dumpzero(size, (dim) - 1);
-                // }
-
-            } else {
-                if ( type->kind == KIND_DOUBLE ) {
-                    unsigned char  fa[6];
-                    int            i;
-
-                    /* It was a float, lets parse the float and then dump it */
-                      if ( c_double_strings ) {
-                        output_double_string_load(value);
-                    } else {
-                        dofloat(c_maths_mode,value, fa);
-                        for ( i = 0; i < c_fp_size; i++ ) {
-                            stowlit(fa[i], 1);
-                        }
-                    }
-                } else {
-                    stowlit(value, type->size);
-                }
             }
         } else {
             lptr = klptr;

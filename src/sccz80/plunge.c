@@ -408,10 +408,10 @@ static int fold_integer_exact(LVALUE *left, LVALUE *right,
             else *result = (uint64_t)(sl >> (unsigned)r);
         } else if (oper == zdiv) {
             if (r == 0) return 0;
-            *result = unsigned_op ? l / r : (uint64_t)(sl / sr);
+            *result = unsigned_op ? l / r : signed_div_mod(0, sl, sr);
         } else if (oper == zmod) {
             if (r == 0) return 0;
-            *result = unsigned_op ? l % r : (uint64_t)(sl % sr);
+            *result = unsigned_op ? l % r : signed_div_mod(1, sl, sr);
         } else if (oper == zeq) *result = (l == r);
         else if (oper == zne) *result = (l != r);
         else if (oper == zlt) *result = unsigned_op ? (l < r) : (sl < sr);
@@ -455,12 +455,23 @@ static int fold_integer_exact(LVALUE *left, LVALUE *right,
     else if (oper == zand) *result = l & r;
     else if (oper == zor)  *result = l | r;
     else if (oper == zxor) *result = l ^ r;
-    else if (oper == asl) *result = l << (unsigned)sr;
-    else if (oper == asr) {
-        if (uns) *result = l >> (unsigned)sr;
-        else *result = (uint64_t)((int64_t)l >> (unsigned)sr);
-    } else if (oper == zdiv) *result = uns ? l / r : (uint64_t)((int64_t)l / (int64_t)r);
-    else if (oper == zmod) *result = uns ? l % r : (uint64_t)((int64_t)l % (int64_t)r);
+    else if (oper == asl || oper == asr) {
+        /* A host shift masks the count to 6 bits. The runtime shifts a
+           count at or above the width out of the value: 0, or -1 when
+           a signed right shift sign-fills. */
+        if (sr >= 0 && (uint64_t)sr >= (uint64_t)width) {
+            if (oper == asr && !uns && ((l >> (width - 1)) & 1))
+                *result = UINT64_MAX;
+            else
+                *result = 0;
+        } else if (oper == asl)
+            *result = l << (unsigned)sr;
+        else if (uns)
+            *result = l >> (unsigned)sr;
+        else
+            *result = (uint64_t)((int64_t)l >> (unsigned)sr);
+    } else if (oper == zdiv) *result = uns ? l / r : signed_div_mod(0, (int64_t)l, (int64_t)r);
+    else if (oper == zmod) *result = uns ? l % r : signed_div_mod(1, (int64_t)l, (int64_t)r);
     else if (oper == zeq) *result = (l == r);
     else if (oper == zne) *result = (l != r);
     else if (oper == zlt) *result = uns ? (l < r) : ((int64_t)l < (int64_t)r);
@@ -835,6 +846,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 && fold_integer_exact(lval, lval2, oper, &exact_value)) {
                 set_exact_integer_result(lval, exact_value);
             } else if (lval->ltype->isunsigned || lval2->ltype->isunsigned ) {
+                /* The exact integer was the left operand, not this result. */
+                lval->int_const_valid = 0;
                 lval->const_val = calcun(lhs_val_type, lval->const_val, oper, rhs_val_type, lval2->const_val);
                 // Promote char here
                 if ( lval->val_type == KIND_CHAR && lval->const_val >= 256 ) {
@@ -842,6 +855,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                     lval->ltype = type_uint;
                 } 
             } else {
+                lval->int_const_valid = 0;
                 lval->const_val = calc(lhs_val_type, lval->const_val, oper, rhs_val_type, lval2->const_val, is16bit);
                 if ( lval->val_type == KIND_CHAR && (lval->const_val < -127 || lval->const_val > 127) ) {
                     lval->val_type = KIND_INT;
@@ -941,10 +955,15 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
             if ( always != -1 ) {
                 warningfmt("limited-range", "Due to limited range of data type, expression is always %s", always ? "true" : "false");
-                // It's always "always"
+                /* The result is the comparison: an int 0 or 1. The
+                   operand constant is still in int_const_val, and a
+                   cast would normalise that instead of this result. */
                 lval->binop = NULL;
+                lval->stage_add = NULL;
                 lval->is_const = 1;
-                lval->const_val = always;
+                lval->val_type = KIND_INT;
+                lval->ltype = type_int;
+                set_exact_integer_result(lval, (uint64_t)always);
                 return;
             }
         }
@@ -1043,11 +1062,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 /*
  * binary plunge to lower level (for +/-)
  */
+
 void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval))
 {
     char *before, *start, *before1, *start1;
     int oldsp = Zsp;
-    double val;
     int lhs_val_type, rhs_val_type;
     struct fold_types fold_types = {0};
 
@@ -1183,17 +1202,34 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                     lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
                 }
             } else {
-                if (!ispointer(lval->ltype)) {
-                    lval->ltype = lval2->ltype->isunsigned ? type_uint : type_int;  
-                }
+                /* A small constant is tagged char. `1 + v` is still an
+                   int, or the compare uses the constant's storage range. */
+                if (!ispointer(lval->ltype) && integer_operand(lval)
+                    && integer_operand(lval2))
+                    set_common_integer(lval, lval->ltype, lval2->ltype);
+                else if (!ispointer(lval->ltype))
+                    lval->ltype = lval2->ltype->isunsigned ? type_uint : type_int;
                 if ( doconst_oper == 0 ) {              
                     const2(lval->const_val);
                 }
             }
         }
         if ( doconst_oper ) {
+            int64_t addend;
+
             lval->is_const = 0;
-            zadd_const(lval2, lval->const_val);
+            /* cscale wrote the byte offset into const_val. int_const_val
+               is still the element count, so 2 + (int *)p must add 4.
+               An integer addend keeps int_const_val: const_val is a host
+               floating value and drops bits past 2^53. */
+            if (lval2->ptr_type != KIND_NONE)
+                addend = (int64_t)lval->const_val;
+            else if (lval->int_const_valid && lval->ltype
+                     && kind_is_integer(lval->ltype->kind))
+                addend = integer_signed_value(lval);
+            else
+                addend = (int64_t)lval->const_val;
+            zadd_const(lval2, addend);
             result(lval, lval2);
             return;
         }
@@ -1217,8 +1253,6 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         rhs_val_type = lval2->val_type;
         if (lval2->is_const) {
             /* constant on right */
-            val = lval2->const_val;
-            
             if ( kind_is_decimal(lval2->val_type) ) { 
                 clearstage(before1, 0); // Get rid of primary on the stack
                 Zsp = savesp1;
@@ -1247,16 +1281,25 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 (*oper)(lval);
                 return;
             } else {
-                /* Integer-Lvalue +/- integer constant */
+                /* Integer lvalue +/- integer constant.
+                   int_const_val still has every bit. A double cannot
+                   hold a long long past 2^53, and negating that rounded
+                   value turns INT64_MAX into INT64_MIN. */
+                int64_t addend;
+
                 if (lval->ptr_type != KIND_NONE ) {
-                    int ival = val;
+                    int ival = lval2->const_val;
                     /* are adding lval2 to pointer, adjust size */
                     cscale(lval->ltype, &ival);
-                    val = ival;
+                    addend = ival;
+                } else if (lval2->int_const_valid) {
+                    addend = integer_signed_value(lval2);
+                } else {
+                    addend = (int64_t)lval2->const_val;
                 }
                 if (oper == zsub) {
                     /* addition on Z80 is cheaper than subtraction */
-                    val = (-val);
+                    addend = (int64_t)(0 - (uint64_t)addend);
                     /* skip later diff scaling - constant can't be pointer */
                     oper = zadd;
                 }
@@ -1277,9 +1320,14 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                         zconvert_to_long(lval2->ltype->isunsigned, lval->val_type,
                                          lval->ltype->isunsigned);
                         set_common_integer(lval, lval->ltype, lval2->ltype);
+                    } else if (integer_operand(lval) && integer_operand(lval2)) {
+                        /* The char was extended into HL, so the add stays
+                           there. The sum is an int: unsigned char 255 + 1
+                           is 256, and a char tag would test the low byte. */
+                        set_common_integer(lval, lval->ltype, lval2->ltype);
                     }
                 }
-                zadd_const(lval, val);
+                zadd_const(lval, addend);
             }
         } else {
             /* non-constant on both sides  */
@@ -1366,7 +1414,8 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             Type *st = (lval->ltype && lval->ltype->ptr) ? lval->ltype : lval2->ltype;
             int sz = (st && st->ptr && st->ptr->tag) ? st->ptr->tag->size : 1;
             scale_ptr_diff(lval, sz);
-        } else if (lval->ptr_type == KIND_CHAR && lval->ptr_type == KIND_CHAR ) {
+        } else if (lval->ptr_type == KIND_CHAR && lval2->ptr_type == KIND_CHAR ) {
+            /* Difference is already in bytes. */
         } else if (lval->ptr_type && lval2->ptr_type && lval->ptr_type != lval2->ptr_type ) {
             UT_string  *str;
             utstring_new(str);

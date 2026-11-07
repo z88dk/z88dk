@@ -15,9 +15,13 @@
 	push	hl
 .i_4
 	call	l_gint3sp	;
-	ld	de,2
-	ex	de,hl
-	call	l_gt
+	ld	a,h
+	xor	128
+	ld	h,a
+	ld	a,2
+	sub	l
+	ld	a,128
+	sbc	h
 	jp	nc,i_5	;
 	ld	hl,0	;const
 	add	hl,sp

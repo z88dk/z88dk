@@ -625,10 +625,13 @@ char* subst_imp(char* pat, char** vars)
             char expr[1024];
             int  x = 0, r;
             pat += 6;
-            while (*pat != ')') {
+            while (*pat != ')' && *pat != '\0' && x < (int)sizeof(expr) - 1)
                 expr[x++] = *pat++;
-            }
             expr[x] = 0;
+            if (*pat != ')') {
+                fprintf(stderr, "error: unterminated %%eval in \"%s\"\n", start);
+                error("unterminated %eval\n");
+            }
             pat++;
             r = rpn_eval(expr, vars);
             sprintf(expr, "%d", r);
@@ -1124,7 +1127,11 @@ int main(int argc, char** argv)
 
     if (global_again) {
         fprintf(stderr, "error: maximum of %d passes exceeded\n", MAX_PASS);
-        error("       check for recursive substitutions");
+        fprintf(stderr, "       check for recursive substitutions\n");
+        if (activerule) {
+            fputs("active rule:\n", stderr);
+            printrule(activerule, stderr);
+        }
     }
 
     printlines(head.l_next, &tail, stdout);
@@ -1141,7 +1148,8 @@ void push(int l)
 {
     if (sp < STACKSIZE)
         stack[sp++] = l;
-    ;
+    else
+        error("Optimiser error, expression stack overflow\n");
 }
 
 int pop(void)
@@ -1229,7 +1237,7 @@ int rpn_eval(const char* expr, char** vars)
                 return 0; // Divide by zero
             break;
         case '%':
-            if ( isdigit(*ptr) ) {
+            if ( isdigit((unsigned char)*ptr) ) {
                 // It's a variable
                 char v = *ptr++;
                 char *endptr;
@@ -1240,13 +1248,17 @@ int rpn_eval(const char* expr, char** vars)
                     exit(1);
                 }
                 push(n);
-            } else if ( *ptr++ == '%' ) {
+            } else if ( *ptr == '%' ) {
+                ptr++;
                 op2 = pop();
                 if (op2 != 0) {
                     push(pop() % op2);
                 } else {
                     return 0; // Divide by zero
-				}
+                }
+            } else {
+                fprintf(stderr, "Optimiser error, lone %% in expression: %s\n", expr);
+                exit(1);
             }
             break;
         }

@@ -35,6 +35,13 @@ rabbit/%.opt: rabbit/%.c
 	@mv -f $@.tmp1 $@
 	@rm $@.tmp2
 
+mbf64_const.opt: mbf64_const.c
+	zcc +test -fp-mode=mbf64 -vn -a $^ -o $@.tmp1
+	@cat $@.tmp1 | grep -v '^;'  | grep -v MODULE|grep -v C_LINE > $@.tmp2
+	diff -w $@.tmp2 results/$@
+	@mv -f $@.tmp1 $@
+	@rm $@.tmp2
+
 %_ieee.opt:	%_ieee.c
 	zcc +test -fp-mode=ieee -vn -a $^ -o $@.tmp1
 	@cat $@.tmp1 | grep -v '^;'  | grep -v MODULE|grep -v C_LINE > $@.tmp2

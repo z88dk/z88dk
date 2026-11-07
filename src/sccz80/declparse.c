@@ -501,9 +501,11 @@ static int chase_typedef(Type *type)
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
         if (ptr->storage == TYPDEF && amatch(ptr->name)) {
             char wasconst = type->isconst;
+            char wasvolatile = type->isvolatile;
             /* So we've identified it, we should copy it */
             *type = *ptr->ctype;
             type->isconst |= wasconst;
+            type->isvolatile |= wasvolatile;
             if ( type->tag && type->size == -1) 
                 type->size = type->tag->size;
             return 0;
@@ -738,8 +740,6 @@ static void parse_trailing_modifiers(Type *type)
                 }
             }
             needchar(')');
-        } else if ( amatch("__z88dk_shortcall_hl")) {
-            type->flags |= SHORTCALL_HL;
         } else if (amatch("__preserves_regs")) {
             int c;
             needchar('(');
@@ -1035,7 +1035,34 @@ int declare_local(int local_static)
             if ( cmatch('=')) {
                 sym->isassigned = 1;
                 sym->initialised = 1;
-                if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
+                if ( type->kind == KIND_STRUCT && rcmatch('{') == 0 ) {
+                    /* struct S s = t;  Copy the object, as s = t does.
+                       heir1 leaves the source address in the staging buffer. */
+                    Type *expr_type = NULL;
+                    int vconst;
+                    zdouble val;
+                    LVALUE dest = {0};
+                    char *before, *start;
+
+                    Zsp = modstk(Zsp - declared, KIND_NONE, NO, YES);
+                    declared = 0;
+                    getloc(sym, 0);
+                    zpush();
+                    setstage(&before, &start);
+                    expression(&vconst, &val, &expr_type);
+                    clearstage(before, start);
+                    dest.ltype = type;
+                    dest.symbol = sym;
+                    dest.indirect_kind = KIND_STRUCT;
+                    dest.val_type = KIND_STRUCT;
+                    if ( expr_type && expr_type->kind == KIND_STRUCT &&
+                         (type->tag == NULL || expr_type->tag == NULL || type->tag == expr_type->tag) ) {
+                        putstk(&dest);
+                    } else {
+                        errorfmt("Cannot assign to aggregate", 0);
+                        zpop();
+                    }
+                } else if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
                     // Call static initialiser and copy onto stack
                     char newname[NAMESIZE * 2 + 20];
 
@@ -1576,14 +1603,6 @@ void flags_describe(Type *type, int32_t flags, UT_string *output)
         utstring_printf(output,"__z88dk_hl_call(%d,%d) ", type->funcattrs.hlcall_module, type->funcattrs.hlcall_addr);
     }
 
-    if ( flags & HL_CALL ) {
-        utstring_printf(output,"__z88dk_hl_call(%d,%d) ", type->funcattrs.hlcall_module, type->funcattrs.hlcall_addr);
-    }
-
-    if ( flags & SHORTCALL_HL ) {
-        utstring_printf(output,"__z88dk_shortcall_hl ");
-    }
-
     if ( flags & NONBANKED ) {
         utstring_printf(output,"__nonbanked ");
     }
@@ -1908,7 +1927,7 @@ static void declfunc(Type *functype, enum storage_type storage)
         * to each function
         */
 
-    if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
+    if ( (c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
             (currfn->flags & NAKED) == 0)
         where += 2;
 
@@ -2044,8 +2063,11 @@ static void declfunc(Type *functype, enum storage_type storage)
             int     i;
 
             if ( ptr ) {
-                ptr->offset.i = -get_parameter_size(functype,fastarg); 
-                where += 2;
+                ptr->offset.i = -get_parameter_size(functype,fastarg);
+                /* The parameter loop already counted this argument, but the
+                   caller left it in registers. modstk releases the prologue
+                   push before callee cleanup, so it is not part of stackargs. */
+                where -= get_parameter_size(functype, fastarg);
             } else {
                 errorfmt("Something has gone very wrong, can't find parameter <%s>\n",1,fastarg->name);
             }
