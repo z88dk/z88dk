@@ -690,9 +690,13 @@ static char* subst(char* pat, char** vars)
 
 /* C_LINE markers and whole-line comments (-cc) are transparent to pattern
    matching: when a pattern line does not match one of them, it steps over
-   it. rep() re-emits the stepped-over lines ahead of the replacement. A rule
-   whose pattern names such a line (e.g. the optimiser-additions marker)
-   still matches it directly. */
+   it, so the rule still fires. rep() puts each one back with the
+   instruction it labelled. A replacement of the same length keeps that
+   slot. A prefix that survives verbatim keeps the marker after it, which
+   is past the replacement when the suffix was deleted. A rewritten prefix
+   puts the marker on the merged instruction, so the line is not lost. A
+   rule whose pattern names such a line (e.g. the optimiser-additions
+   marker) still matches it directly. */
 static int is_cline(const struct lnode* n)
 {
     const char* t = n->l_text;
@@ -703,10 +707,17 @@ static int is_cline(const struct lnode* n)
     return strncmp(t, "C_LINE", 6) == 0 && (t[6] == ' ' || t[6] == '\t');
 }
 
-static char** skipped;      /* texts stepped over, last to first */
-static int nskipped, skipcap;
+struct skipnote {
+    char* text;
+    int depth; /* matched instructions that followed this line */
+};
 
-static void note_skipped(const char* text)
+static struct skipnote* skipped; /* noted last to first */
+static int nskipped, skipcap;
+static char** matched; /* matched instructions, last to first */
+static int nmatched, matchcap;
+
+static void note_skipped(const char* text, int depth)
 {
     if (nskipped == skipcap) {
         skipcap = skipcap ? skipcap * 2 : 16;
@@ -714,7 +725,38 @@ static void note_skipped(const char* text)
         if (skipped == NULL)
             error("opt: out of memory\n");
     }
-    skipped[nskipped++] = (char*)text;
+    skipped[nskipped].text = (char*)text;
+    skipped[nskipped].depth = depth;
+    nskipped++;
+}
+
+static void note_matched(const char* text)
+{
+    if (nmatched == matchcap) {
+        matchcap = matchcap ? matchcap * 2 : 16;
+        matched = realloc(matched, matchcap * sizeof(*matched));
+        if (matched == NULL)
+            error("opt: out of memory\n");
+    }
+    matched[nmatched++] = (char*)text;
+}
+
+/* Where a marker sits in the replacement. before is how many matched
+   instructions preceded it. pat[] is those instructions, first to last. */
+static int marker_slot(int before, int npat, int nrepl, char** pat, struct lnode** repl)
+{
+    int lead = 0;
+
+    if (nrepl == npat)
+        return before;
+    while (lead < before && lead < nrepl &&
+           strcmp(pat[lead], repl[lead]->l_text) == 0)
+        ++lead;
+    /* The prefix up to the marker was copied. A deleted suffix then
+       leaves the marker after the last surviving instruction. */
+    if (lead == before)
+        return before;
+    return lead;
 }
 
 /* rep - substitute vars into new and replace lines between p1 and p2 */
@@ -734,14 +776,60 @@ struct lnode* rep(
         free(p);
     }
     connect(p1, p2);
-    for (i = nskipped - 1; i >= 0; i--)
-        insert(skipped[i], p2);
     if (debug)
         fputs("=\n", stderr);
-    for (; new; new = new->l_next) {
-        insert(subst(new->l_text, vars), p2);
-        if (debug)
-            fputs(p2->l_prev->l_text, stderr);
+
+    /* Lay the replacement down first, then splice each marker back into
+       its slot. repl[] is snapshotted first: a later marker at the same
+       slot inserts immediately before the same instruction, after markers
+       already placed there. */
+    {
+        struct lnode** repl = NULL;
+        struct lnode* n;
+        int nrepl = 0;
+        int k;
+
+        for (; new; new = new->l_next) {
+            insert(subst(new->l_text, vars), p2);
+            nrepl++;
+            if (debug)
+                fputs(p2->l_prev->l_text, stderr);
+        }
+        if (nrepl) {
+            repl = malloc((unsigned)nrepl * sizeof *repl);
+            if (repl == NULL)
+                error("opt: out of memory\n");
+            for (k = 0, n = p1->l_next; k < nrepl; k++, n = n->l_next)
+                repl[k] = n;
+        }
+        {
+            char** pat = NULL;
+            int npat = nmatched;
+
+            if (npat) {
+                pat = malloc((unsigned)npat * sizeof *pat);
+                if (pat == NULL)
+                    error("opt: out of memory\n");
+                for (k = 0; k < npat; k++)
+                    pat[k] = matched[npat - 1 - k];
+            }
+            for (i = nskipped - 1; i >= 0; i--) {
+                int before = npat - skipped[i].depth;
+                int idx;
+                struct lnode* at;
+
+                if (before < 0)
+                    before = 0;
+                idx = marker_slot(before, npat, nrepl, pat, repl);
+                if (nrepl == 0 || idx >= nrepl)
+                    at = p2;
+                else
+                    at = repl[idx];
+                insert(skipped[i].text, at);
+            }
+            free(pat);
+        }
+        free(repl);
     }
     if (debug)
         putc('\n', stderr);
@@ -810,6 +898,7 @@ static struct lnode* opt(struct lnode* r)
             continue; /* skip empty rules */
         titlebuf[0] = 0;
         nskipped = 0;
+        nmatched = 0;
         for (i = 0; i < 10; i++)
             vars[i] = 0;
         lines = 0;
@@ -889,11 +978,12 @@ static struct lnode* opt(struct lnode* r)
                     if (!skippable)
                         break;
                     memcpy(vars, saved, sizeof saved);  /* a failed try binds nothing */
-                    note_skipped(c->l_text);
+                    note_skipped(c->l_text, lines);
                     c = c->l_prev;
                 }
                 if (!ok)
                     break;
+                note_matched(c->l_text);
                 c = c->l_prev;
                 ++lines;
             }
