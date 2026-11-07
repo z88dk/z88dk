@@ -155,9 +155,10 @@ pointers and arrays, `value` for enums and short-call values, bitfield
 
 Linked per scope, with a `Kind`-typed value, a `Type`, a storage class (`auto`,
 `static`, `extern`, `register`, parameter, global), an offset (`loc`/`offset`), a
-namespace pointer, and flags. `NAMESIZE` bounds identifiers. Local variables live
-at negative offsets from the frame pointer and are tracked in the `loctab` array
-(`NUMLOC` = 512 entries); exceeding that is a hard error, not a fallback.
+namespace pointer, and flags. `NAMESIZE` bounds identifiers. Local variables are
+stack slots. The offset is stored on the symbol and in the `loctab` array
+(`NUMLOC` = 512 entries); `getloc` loads that offset, adjusted by `Zsp`, into
+`HL` and adds `SP`. Exceeding `NUMLOC` is a hard error, not a fallback.
 
 ### `LVALUE` — the compiler's working register
 
@@ -195,11 +196,9 @@ the principle that most determines what changes are cheap and what are not.
   live operands, and all saved intermediate state goes to the stack in a defined
   order, low word first.
 * **Accumulator**: `A`, used only for byte-sized results and comparisons.
-* **`IX`/`IY`**: frame or index register depending on code model; callee-saved on
-  Z80, and something else entirely on CPUs that lack it.
 
 `sccz80` has no register allocator and no live-range analysis. A function's local
-frame is fixed at entry, indexed off the frame pointer, and every expression is
+frame is fixed at entry and addressed from `SP`, and every expression is
 evaluated by pushing its left operand and folding into the right.
 
 ### Virtual stack pointer `Zsp`
@@ -295,7 +294,7 @@ Three layers, deliberately separated:
 165 in the whole compiler. Each one asks "does this CPU have the cheap form?" and
 falls back to the portable form. Examples: `modstk` choosing `add sp,N` versus a
 `pop`-skip versus `inc sp` chains; `POP AF` substitution; `LDIR`/`LDDR` versus byte
-loops; `IX`-relative versus `HL`-based frame access; 8085-specific sequences where
+loops; 8085-specific sequences where
 the CPU offers something the Z80 lacks. **Every fallback must be legal on the
 weakest supported CPU of the class** — the 8080-class path must contain no
 undocumented and no Z80-only instruction.
