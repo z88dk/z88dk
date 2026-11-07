@@ -102,7 +102,6 @@ Rough file roles:
 | `z80rules.1` | Large main sccz80 peephole set |
 | `z80rules.0` | Extra / lower-priority patterns (linked as `COPTRULES3`) |
 | `z80rules.8` | Inline common sccz80 helpers **and** a few general cleanups |
-| `z80rules.frame` | Tiny frame-related snippet (not the main pipeline by itself) |
 
 ### Rules that matter for register hygiene (codegen lessons)
 
