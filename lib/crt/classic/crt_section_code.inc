@@ -22,6 +22,7 @@ ENDIF
     SECTION code_home
     SECTION code_compiler
     SECTION code_clib
+    SECTION code_stdio
     SECTION code_compress_zx7
     SECTION code_compress_zx0
     SECTION code_compress_zx1
