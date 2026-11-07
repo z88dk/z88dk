@@ -3698,6 +3698,38 @@ int ir_opt_narrow_iv(Func *f)
                         && q->imm == IR_BRCOND_KTRIP) { ktrip_latch = 1; break; }
                 }
             if (ktrip_latch) continue;
+            /* A reversed-loop counter (phantom zero guard) stays a word so it
+               can bid for BC; ir_alloc narrows it if it still spills. gbz80 and
+               ez80 in sp mode address the stack cheaply, so their byte slot
+               beats BC. */
+            if (!opt_disabled("countdown-word") && !IS_GBZ80()
+                && !(IS_EZ80() && c_framepointer_is_ix <= 0)) {
+                int cd = 0;
+                for (int b2 = 0; b2 < f->n_bbs && !cd; b2++)
+                    for (int j2 = 0; j2 < f->bbs[b2].n_ops; j2++) {
+                        const Op *q = &f->bbs[b2].ops[j2];
+                        if (q->kind == IR_BR_ZERO && q->src[0] == c
+                            && q->imm == IR_BRZ_PHANTOM) { cd = 1; break; }
+                    }
+                if (cd) {
+                    int ok_cd = 0;
+                    if (pass) {
+                        int dec_first = 0;
+                        for (int k = 0; k < j; k++)
+                            if (hb->ops[k].kind == IR_DEC && hb->ops[k].src[0] == c
+                                && hb->ops[k].dst == c) dec_first = 1;
+                        ok_cd = is_down && dec_first && cl[c].initval >= 1
+                                && cl[c].initval <= 255 && niv_down_exit_ok(f, latch, c);
+                    } else if (!is_down) {
+                        int64_t maxv = 0;
+                        ok_cd = niv_up_bound_ok(f, h, c, &maxv) && maxv <= 255;
+                    } else {
+                        ok_cd = niv_down_exit_ok(f, h, c) && cl[c].initval <= 255;
+                    }
+                    if (ok_cd) f->vregs[c].flags |= IR_VREG_CD_COUNTER;
+                    continue;
+                }
+            }
             int ok = 0;
             if (pass) {
                 /* Latch test: the one DEC of c must come first in this block,

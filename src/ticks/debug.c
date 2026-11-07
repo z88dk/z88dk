@@ -20,8 +20,20 @@ static debug_sym_symbol* cdb_global_symbols = NULL;
 static debug_sym_file* cdb_files = NULL;
 
 static debug_sym_type* cdb_ctypes = NULL;
+/* The width of a float, from the last record that gave one. A record does not
+   give it for a float behind a pointer or a function, nor does a cast. */
+static int cdb_float_size = 4;
+static int cdb_float_size_known = 0;      // a record has given the width
 
 static debug_sym_enum* cdb_enums = NULL;
+
+// The module of the record being read, which a type_record keeps; one copy of each name
+typedef struct {
+    char*           name;
+    UT_hash_handle  hh;
+} cdb_module;
+static cdb_module* cdb_modules = NULL;
+static const char* cdb_record_module = NULL;
 
 /* An E: record gives the S: record of the same name (G$gc$0_0$0) its enum's
    tag. They can come in either order, so each one waits here for the other. */
@@ -103,6 +115,31 @@ static uint8_t parse_address_space(const char* encoded, const char** result, add
     return 0;
 }
 
+static char* dup_n(const char* s, size_t n)
+{
+    char* r = malloc(n + 1);
+
+    memcpy(r, s, n);
+    r[n] = 0;
+    return r;
+}
+
+/* The scope of a record, up to the '$' that ends it, on the heap: a file name
+   or <file>.<function>, as long as the source path. *encoded moves past the
+   '$'. NULL if the scope is empty or has no '$'. */
+static char* dup_scope(const char** encoded)
+{
+    const char* end = strchr(*encoded, '$');
+    char* r;
+
+    if (end == NULL || end == *encoded) {
+        return NULL;
+    }
+    r = dup_n(*encoded, end - *encoded);
+    *encoded = end + 1;
+    return r;
+}
+
 static uint8_t parse_record_type(const char *rt, type_record *record)
 {
     int end;
@@ -115,11 +152,11 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
     record->size = size;
     record->first = NULL;
     record->signed_ = 0;
+    record->module = cdb_record_module;
     rt += end;
 
     enum record_partning_mode mode = RECORD_PARSING_MODE_BEGIN;
-    char structure[128];
-    uint8_t structure_size = 0;
+    const char* structure = NULL;
 
     type_chain* last = NULL;
 
@@ -263,11 +300,13 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                     }
                     case 'F': {
                         last->type_ = TYPE_FLOAT;
+                        last->size = 0;     // its width, set below when the record gives it
                         break;
                     }
                     case 'T': {
                         last->type_ = TYPE_STRUCTURE;
                         mode = RECORD_PARSING_MODE_STRUCTURE;
+                        structure = rt;
                         break;
                     }
                     case 'B': {
@@ -307,20 +346,17 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
             case RECORD_PARSING_MODE_STRUCTURE: {
                 switch (c) {
                     case ',': {
-                        structure[structure_size] = 0;
-                        last->data = strdup(structure);
+                        last->data = dup_n(structure, rt - 1 - structure);
                         mode = RECORD_PARSING_MODE_BEGIN;
                         break;
                     }
                     case ':': {
-                        structure[structure_size] = 0;
-                        last->data = strdup(structure);
-                        structure[structure_size] = 0;
+                        last->data = dup_n(structure, rt - 1 - structure);
                         mode = RECORD_PARSING_MODE_SIGN;
                         break;
                     }
                     default: {
-                        structure[structure_size++] = c;
+                        break;
                     }
                 }
                 break;
@@ -336,6 +372,21 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                 bk.debug("Warning: data after sign.\n");
                 goto err;
             }
+        }
+    }
+
+    /* A float's width is the record's size, divided by the element count of
+       each array in front of it */
+    {
+        int width = (int)record->size;
+        type_chain* c;
+        for (c = record->first; c != NULL && c->type_ == TYPE_ARRAY; c = c->next) {
+            width = c->size > 0 ? width / c->size : 0;
+        }
+        if (c != NULL && c->type_ == TYPE_FLOAT && width > 0) {
+            c->size = width;
+            cdb_float_size = width;
+            cdb_float_size_known = 1;
         }
     }
 
@@ -364,6 +415,7 @@ static void debug_add_function_info(const char *encoded)
     // F:Fother.c$haha2$0_0$0({0}DF,DV),C,0,0
 
     debug_sym_function* f = malloc(sizeof(debug_sym_function));
+    char* fields = NULL;
 
     char function_scope = *encoded++;
     switch (function_scope)
@@ -371,13 +423,12 @@ static void debug_add_function_info(const char *encoded)
         case 'F':
         {
             // file scope
-            char file_name[FILENAME_MAX];
-            if (sscanf(encoded, "%[^$]$", file_name) != 1) {
+            char* file_name = dup_scope(&encoded);
+            if (file_name == NULL) {
                 goto err;
             }
-            encoded += strlen(file_name) + 1;
             f->scope = FUNCTION_SCOPE_FILE;
-            f->scope_value = strdup(file_name);
+            f->scope_value = file_name;
             break;
         }
         case 'G':
@@ -395,13 +446,12 @@ static void debug_add_function_info(const char *encoded)
         case 'L':
         {
             // function scope
-            char function_name[255];
-            if (sscanf(encoded, "%[^$]$", function_name) != 1) {
+            char* function_name = dup_scope(&encoded);
+            if (function_name == NULL) {
                 goto err;
             }
-            encoded += strlen(function_name) + 1;
             f->scope = FUNCTION_SCOPE_FUNCTION;
-            f->scope_value = strdup(function_name);
+            f->scope_value = function_name;
             break;
         }
         default:
@@ -411,10 +461,13 @@ static void debug_add_function_info(const char *encoded)
         }
     }
 
-    char function_name[255];
-    char level[32];
-    char block[32];
-    char type_record[128];
+    /* Each field is a part of the record, so a buffer of its length fits any of them */
+    size_t n = strlen(encoded) + 1;
+    fields = malloc(4 * n);
+    char* function_name = fields;
+    char* level = fields + n;
+    char* block = fields + 2 * n;
+    char* type_record = fields + 3 * n;
     int end;
 
     if (sscanf(encoded, "%[^$]$%[^$]$%[^(](%[^)]),%n", function_name, level, block, type_record, &end) != 4) {
@@ -425,8 +478,9 @@ static void debug_add_function_info(const char *encoded)
     encoded += end;
 
     if (f->scope == FUNCTION_SCOPE_GLOBAL) {
-        strcpy(f->name, f->function_name);
+        f->name = strdup(f->function_name);
     } else {
+        f->name = malloc(strlen(f->scope_value) + strlen(f->function_name) + 2);
         sprintf(f->name, "%s.%s", f->scope_value, f->function_name);
     }
 
@@ -441,10 +495,12 @@ static void debug_add_function_info(const char *encoded)
     }
 
     HASH_ADD_STR(cfunctions, name, f);
+    free(fields);
 
     return;
 
 err:
+    free(fields);
     free(f);
     bk.debug("Warning: could not add debug info on function.\n");
 }
@@ -455,6 +511,7 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
     // S:Lother.c.haha2$c$0_0$0({2}SI:S),B,1,4
 
     debug_sym_symbol* s = malloc(sizeof(debug_sym_symbol));
+    char* fields = NULL;
 
     s->belongs_to_function = NULL;
 
@@ -464,13 +521,12 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
         case 'F':
         {
             // file scope
-            char file_name[FILENAME_MAX];
-            if (sscanf(encoded, "%[^$]$", file_name) != 1) {
+            char* file_name = dup_scope(&encoded);
+            if (file_name == NULL) {
                 goto err;
             }
-            encoded += strlen(file_name) + 1;
             s->scope = SYMBOL_SCOPE_FILE;
-            s->scope_value = strdup(file_name);
+            s->scope_value = file_name;
             break;
         }
         case 'G':
@@ -500,13 +556,12 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
         case 'L':
         {
             // file scope
-            char localiry_name[FILENAME_MAX];
-            if (sscanf(encoded, "%[^$]$", localiry_name) != 1) {
+            char* localiry_name = dup_scope(&encoded);
+            if (localiry_name == NULL) {
                 goto err;
             }
-            encoded += strlen(localiry_name) + 1;
             s->scope = SYMBOL_SCOPE_LOCAL;
-            s->scope_value = strdup(localiry_name);
+            s->scope_value = localiry_name;
             break;
         }
         default:
@@ -515,10 +570,14 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
         }
     }
 
-    char symbol_name[255];
-    char level[32];
-    char block[32];
-    char type_record[128];
+    /* Each field is a part of the record, so a buffer of its length fits any of
+       them; 16 more for the anon_<n> name */
+    size_t n = strlen(encoded) + 16;
+    fields = malloc(4 * n);
+    char* symbol_name = fields;
+    char* level = fields + n;
+    char* block = fields + 2 * n;
+    char* type_record = fields + 3 * n;
     int end;
 
     if (sscanf(encoded, "%[^$]$%[^$]$%[^(](%[^)]),%n", symbol_name, level, block, type_record, &end) != 4) {
@@ -534,16 +593,13 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
     encoded += end;
 
     if ((s->scope == SYMBOL_SCOPE_GLOBAL) || (s->scope == SYMBOL_SCOPE_SYMBOL)) {
-        strcpy(s->name, s->symbol_name);
+        s->name = strdup(s->symbol_name);
     } else {
         if (s->scope == SYMBOL_SCOPE_LOCAL) {
             const char* dot = strrchr(s->scope_value, '.');
             if (dot != NULL) {
-                size_t l = dot - s->scope_value;
-                char file_name[FILENAME_MAX] = {0};
-                char function_name[128] = {0};
-                memcpy(file_name, s->scope_value, l);
-                strcpy(function_name, dot + 1);
+                char* file_name = dup_n(s->scope_value, dot - s->scope_value);
+                const char* function_name = dot + 1;
 
                 s->belongs_to_function = debug_find_function(function_name, file_name);
                 if (s->belongs_to_function) {
@@ -553,10 +609,11 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
                     bk.debug("Warning: could not find function %s.%s for argument %s.\n",
                         file_name, function_name, s->symbol_name);
                 }
-
+                free(file_name);
             }
         }
 
+        s->name = malloc(strlen(s->scope_value) + strlen(s->symbol_name) + 2);
         sprintf(s->name, "%s.%s", s->scope_value, s->symbol_name);
     }
 
@@ -581,10 +638,12 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
         s->belongs_to_function->arguments = arg;
     }
 
+    free(fields);
     *result = encoded;
     return s;
 
 err:
+    free(fields);
     *result = NULL;
     free(s);
     bk.debug("Warning: could not add debug info on symbol.\n");
@@ -603,13 +662,12 @@ static debug_sym_type* debug_parse_type_info(const char* encoded)
         case 'F':
         {
             // file scope
-            char file_name[FILENAME_MAX];
-            if (sscanf(encoded, "%[^$]$", file_name) != 1) {
+            char* file_name = dup_scope(&encoded);
+            if (file_name == NULL) {
                 goto err;
             }
-            encoded += strlen(file_name) + 1;
             t->scope = SYMBOL_SCOPE_FILE;
-            t->scope_value = strdup(file_name);
+            t->scope_value = file_name;
             break;
         }
         case 'G':
@@ -627,13 +685,12 @@ static debug_sym_type* debug_parse_type_info(const char* encoded)
         case 'L':
         {
             // file scope
-            char localiry_name[FILENAME_MAX];
-            if (sscanf(encoded, "%[^$]$", localiry_name) != 1) {
+            char* localiry_name = dup_scope(&encoded);
+            if (localiry_name == NULL) {
                 goto err;
             }
-            encoded += strlen(localiry_name) + 1;
             t->scope = SYMBOL_SCOPE_LOCAL;
-            t->scope_value = strdup(localiry_name);
+            t->scope_value = localiry_name;
             break;
         }
         default:
@@ -644,7 +701,7 @@ static debug_sym_type* debug_parse_type_info(const char* encoded)
     }
 
     char* type_info = malloc(strlen(encoded));
-    if (sscanf(encoded, "%[^[][%[^]]]", t->name, type_info) != 2) {
+    if (sscanf(encoded, "%127[^[][%[^]]]", t->name, type_info) != 2) {
         goto err_type_info;
     }
 
@@ -697,15 +754,6 @@ err:
 static void debug_add_module_info(const char* encoded)
 {
 
-}
-
-static char* dup_n(const char* s, size_t n)
-{
-    char* r = malloc(n + 1);
-
-    memcpy(r, s, n);
-    r[n] = 0;
-    return r;
 }
 
 // N:Fu3.c$colour({2}SI:S)[(RED$0)(GREEN$5)(BLUE$6)]
@@ -811,13 +859,13 @@ static void apply_enum_tag(enum_object* o)
 // The element is SE<F<file>$<tag>>:<sign>: the key ends at the last ':' of the element
 static void debug_add_enum_object_info(const char* encoded)
 {
-    char record_name[255];
+    char* record_name = dup_n(encoded, strcspn(encoded, "("));
     const char* p;
     const char* end;
     const char* colon;
     enum_object* o;
 
-    if (sscanf(encoded, "%254[^(]", record_name) != 1) {
+    if (*record_name == 0) {
         goto err;
     }
     // The type element that starts with SE, after the {size}
@@ -841,19 +889,22 @@ static void debug_add_enum_object_info(const char* encoded)
         o->tag = dup_n(p, colon - p);
         apply_enum_tag(o);
     }
+    free(record_name);
     return;
 
 err:
+    free(record_name);
     bk.debug("Warning: could not add debug info on enum object.\n");
 }
 
 // The S: record of an E: record, once both are read: its integer gets the enum's tag
 static void debug_add_enum_tag(const char* encoded, debug_sym_symbol* s)
 {
-    char record_name[255];
+    char* record_name = dup_n(encoded, strcspn(encoded, "("));
     enum_object* o;
 
-    if (sscanf(encoded, "%254[^(]", record_name) != 1) {
+    if (*record_name == 0) {
+        free(record_name);
         return;
     }
     o = find_enum_object(record_name);
@@ -861,10 +912,11 @@ static void debug_add_enum_tag(const char* encoded, debug_sym_symbol* s)
         o->symbol = s;
         apply_enum_tag(o);
     }
+    free(record_name);
 }
 
 /* Add debug information, in this case it's encoded */
-void debug_add_info_encoded(char *encoded)
+void debug_add_info_encoded(char *encoded, const char *module)
 {
     char *ptr = encoded;
     char *drop = encoded;
@@ -887,6 +939,17 @@ void debug_add_info_encoded(char *encoded)
 
     uint8_t record_type = encoded[0];
     const char* subtype = &encoded[2];
+    cdb_record_module = NULL;
+    if (module != NULL && module[0] != 0) {
+        cdb_module* m = NULL;
+        HASH_FIND_STR(cdb_modules, module, m);
+        if (m == NULL) {
+            m = calloc(1, sizeof(cdb_module));
+            m->name = strdup(module);
+            HASH_ADD_KEYPTR(hh, cdb_modules, m->name, strlen(m->name), m);
+        }
+        cdb_record_module = m->name;
+    }
 
     switch (record_type)
     {
@@ -921,7 +984,7 @@ void debug_add_info_encoded(char *encoded)
                     HASH_FIND_STR(cdb_files, s->scope_value, f);
                     if (f == NULL) {
                         f = calloc(1, sizeof(debug_sym_file));
-                        strcpy(f->name, s->scope_value);
+                        f->name = strdup(s->scope_value);
                         HASH_ADD_STR(cdb_files, name, f);
                     }
                     HASH_ADD_STR(f->file_local_symbols, symbol_name, s);
@@ -972,7 +1035,20 @@ void debug_add_cline(const char *filename, const char *function, int lineno, int
     cl->address = maddress;
     cl->level = level;
     cl->scope_block = scope_block;
-    HASH_ADD_INT(cf->lines, line, cl);
+
+    /* A line can have several C_LINE symbols (one per function or block whose
+       code it holds, and a file-scope one): a breakpoint on the line goes to
+       the first of its code in a function, or to the file-scope one if there
+       is nothing else */
+    cline *old;
+    HASH_FIND_INT(cf->lines, &lineno, old);
+    if ( old == NULL ) {
+        HASH_ADD_INT(cf->lines, line, cl);
+    } else {
+        int old_fn = old->function_name[0] != 0, cl_fn = cl->function_name[0] != 0;
+        if ( cl_fn > old_fn || (cl_fn == old_fn && cl->address < old->address) )
+            HASH_REPLACE_INT(cf->lines, line, cl, old);
+    }
 
     cline **slot = cline_slot(cl->address, 1);
     if ( slot != NULL )
@@ -1008,11 +1084,11 @@ int debug_resolve_source(char *name, const char** corrected_name)
     char *ptr;
 
     if ( ( ptr = strrchr(name, ':') ) != NULL ) {
-        char filename[FILENAME_MAX+1];
+        char *filename = dup_n(name, ptr - name);
         int  line;
+        int  address = -1;
         cfile *cf;
 
-        snprintf(filename, sizeof(filename),"%.*s", (int)(ptr - name), name);
         line = atoi(ptr+1);
 
         HASH_FIND_STR(cfiles, filename, cf);
@@ -1023,7 +1099,7 @@ int debug_resolve_source(char *name, const char** corrected_name)
             HASH_FIND_INT(cf->lines, &line, cl);
 
             if ( cl != NULL ) {
-                return cl->address;
+                address = cl->address;
             }
         } else {
             // try and do partial match
@@ -1045,12 +1121,14 @@ int debug_resolve_source(char *name, const char** corrected_name)
                     if (corrected_name) {
                         *corrected_name = elem->file;
                     }
-                    return cl->address;
+                    address = cl->address;
                 }
 
                 break;
             }
         }
+        free(filename);
+        return address;
     }
     return -1;
 }
@@ -1082,9 +1160,10 @@ debug_sym_function* debug_find_function(const char* function_name, const char* f
 
     if (file_name != NULL)
     {
-        char name[FILENAME_MAX];
+        char* name = malloc(strlen(file_name) + strlen(function_name) + 2);
         sprintf(name, "%s.%s", file_name, function_name);
         HASH_FIND_STR(cfunctions, name, f);
+        free(name);
     }
 
     if (f == NULL)
@@ -1114,8 +1193,8 @@ type_chain* copy_type_chain(type_chain* from) {
         }
         *copy_ptr = *from;
         // recalculate size since malloc_type had NULL data; an array's size
-        // is its element count, which only the record carries
-        if (copy_ptr->type_ != TYPE_ARRAY) {
+        // is its element count, and a float's its width, which only the record carries
+        if (copy_ptr->type_ != TYPE_ARRAY && copy_ptr->type_ != TYPE_FLOAT) {
             copy_ptr->size = get_type_memory_size(copy_ptr);
         }
         ptr = copy_ptr;
@@ -1132,7 +1211,10 @@ type_chain* malloc_type(enum type_record_type type) {
     result->type_ = type;
     result->bit_start = 0;
     result->bit_width = 0;
-    result->size = get_type_memory_size(result);
+    result->size = 0;
+    if (type != TYPE_FLOAT) {
+        result->size = get_type_memory_size(result);    // a float's width is its record's, 0 if none
+    }
     return result;
 }
 
@@ -1238,7 +1320,9 @@ int get_type_memory_size(type_chain* chain) {
         case TYPE_SHORT: {
             return 2;
         }
-        case TYPE_FLOAT:
+        case TYPE_FLOAT: {
+            return chain->size > 0 ? chain->size : cdb_float_size;
+        }
         case TYPE_LONG: {
             return 4;
         }
@@ -1247,6 +1331,229 @@ int get_type_memory_size(type_chain* chain) {
         }
         default: {
             return 0;
+        }
+    }
+}
+
+/* The values of __fp_mode, which sccz80 and 80cc write with __fp_exponent_bias and
+   __fp_mantissa_size into each module, as locals. They are the names of their -fp-mode */
+static const char* fp_mode_names[] = { "z80", "ieee", "mbf32", "mbf40", "mbf64", "z88", "am9511" };
+static const int fp_mode_sizes[] = { 6, 4, 4, 6, 8, 6, 4 };     // a float's width in each
+#define FP_MODE_Z80     0
+#define FP_MODE_IEEE    1
+#define FP_MODE_Z88     5
+#define FP_MODE_AM9511  6
+/* Where the mantissa starts: z88 leaves the first byte (sccz80's c_fp_fudge_offset) */
+#define FP_MODE_OFFSET(mode)    ((mode) == FP_MODE_Z88 ? 1 : 0)
+
+/* Read a float of size bytes in the format of module, the module of the record that
+   describes it (through a pointer or a struct, of the pointer's or the struct's object):
+   0 and the format in mode, exponent_bias and mantissa_size, or -1 and the reason in
+   into's error. A float of no record, which only a cast of an integer to a pointer
+   makes, takes the program's format if its modules agree. A module without __fp_mode
+   (zsdcc, older compilers) is IEEE. A float whose record gives no width (*size 0:
+   behind a pointer, or a cast) gets its format's width in *size, or without __fp_mode,
+   the width the records give. */
+static int debug_float_format(const char* module, int* size_ptr, int* mode, int* exponent_bias, int* mantissa_size, struct expression_result_t* into)
+{
+    symbol *m, *e, *s;
+    int size = *size_ptr;
+
+    if (module != NULL) {
+        m = find_symbol_in_module("__fp_mode", module);
+        e = find_symbol_in_module("__fp_exponent_bias", module);
+        s = find_symbol_in_module("__fp_mantissa_size", module);
+    } else {
+        m = find_symbol_byname("__fp_mode", NULL);
+        e = find_symbol_byname("__fp_exponent_bias", NULL);
+        s = find_symbol_byname("__fp_mantissa_size", NULL);
+        if ((m != NULL && m->differs) || (e != NULL && e->differs) || (s != NULL && s->differs)) {
+            snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (the modules disagree)");
+            return -1;
+        }
+    }
+
+    if (m == NULL) {
+        *mode = FP_MODE_IEEE;
+        if (size == 0) {
+            if (!cdb_float_size_known) {
+                snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (no width, and no __fp_mode)");
+                return -1;
+            }
+            size = *size_ptr = cdb_float_size;      // the width of the floats that records give
+        }
+        if (size != 4) {
+            snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (%d bytes, and no __fp_mode)", size);
+            return -1;
+        }
+        return 0;
+    }
+    if (e == NULL || s == NULL) {
+        snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (no __fp_exponent_bias or __fp_mantissa_size)");
+        return -1;
+    }
+    *mode = (int)m->address;
+    *exponent_bias = (int)e->address;
+    *mantissa_size = (int)s->address;
+    if (size == 0 && *mode >= 0 && *mode < (int)(sizeof(fp_mode_sizes) / sizeof(fp_mode_sizes[0]))) {
+        size = *size_ptr = fp_mode_sizes[*mode];
+    }
+    if ((*mode == FP_MODE_IEEE && size == 4) ||
+        (*mode == FP_MODE_AM9511 && size == 4 && *mantissa_size == 3)) {
+        return 0;
+    }
+    /* z80, mbf32, mbf40, mbf64 and z88: the mantissa, then the exponent */
+    if (*mode >= 0 && *mode <= FP_MODE_Z88 && *mode != FP_MODE_IEEE && *mantissa_size > 0 &&
+        FP_MODE_OFFSET(*mode) + *mantissa_size < size && size <= 8) {
+        return 0;
+    }
+    if (*mode < (int)(sizeof(fp_mode_names) / sizeof(fp_mode_names[0]))) {
+        snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (%d bytes, %s)", size, fp_mode_names[*mode]);
+    } else {
+        snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (%d bytes, __fp_mode %d)", size, *mode);
+    }
+    return -1;
+}
+
+/* The AM9511's own format (--math-dai32): a 24-bit mantissa, little-endian, with its
+   leading 1 stored, then a byte of the sign (bit 7) and a 7-bit two's complement
+   exponent, biased by exponent_bias; a mantissa without its leading 1 is zero */
+static float debug_float_from_am9511(const uint8_t* b, int exponent_bias)
+{
+    uint32_t mantissa = b[0] | ((uint32_t)b[1] << 8) | ((uint32_t)b[2] << 16);
+    double v = mantissa;
+    int exponent = b[3] & 0x7f;
+
+    if ((mantissa & 0x800000) == 0) {
+        return 0;
+    }
+    if (exponent & 0x40) {
+        exponent -= 0x80;
+    }
+    for (exponent = exponent - exponent_bias - 24; exponent > 0; exponent--) {
+        v *= 2;
+    }
+    for (; exponent < 0; exponent++) {
+        v /= 2;
+    }
+    return (float)((b[3] & 0x80) ? -v : v);
+}
+
+/* The z80 format (math48, genmath, the ROM maths), which the Microsoft formats
+   (mbf32, mbf40, mbf64) and z88's (after its first byte) share: a mantissa of
+   mantissa_size bytes, little-endian, with its leading 1 implied and the sign in
+   its top bit, then the exponent, biased by exponent_bias, 0 for zero. Scaled
+   without ldexp(): z88dk-dis links without -lm. */
+static float debug_float_from_z80(const uint8_t* b, int exponent_bias, int mantissa_size)
+{
+    uint64_t mantissa = 0;
+    double v;
+    int exponent;
+    int i;
+
+    if (b[mantissa_size] == 0) {
+        return 0;
+    }
+    for (i = mantissa_size - 1; i >= 0; i--) {
+        mantissa = mantissa << 8 | b[i];
+    }
+    v = (double)(mantissa | (uint64_t)1 << (8 * mantissa_size - 1));
+    for (exponent = b[mantissa_size] - exponent_bias - 8 * mantissa_size; exponent > 0; exponent--) {
+        v *= 2;
+    }
+    for (; exponent < 0; exponent++) {
+        v /= 2;
+    }
+    return (float)((b[mantissa_size - 1] & 0x80) ? -v : v);
+}
+
+/* The width of the floats of module: its format's, 4 (IEEE) without __fp_mode, 0 for
+   no module */
+static int debug_module_float_width(const char* module)
+{
+    symbol* m;
+
+    if (module == NULL) {
+        return 0;
+    }
+    m = find_symbol_in_module("__fp_mode", module);
+    if (m == NULL) {
+        return 4;
+    }
+    if ((int)m->address >= 0 && (int)m->address < (int)(sizeof(fp_mode_sizes) / sizeof(fp_mode_sizes[0]))) {
+        return fp_mode_sizes[m->address];
+    }
+    return 0;
+}
+
+/* Whether a struct of type t holds a float, in itself or in a struct member */
+static int debug_struct_has_float(debug_sym_type* t, int depth)
+{
+    debug_sym_type_member* child;
+
+    if (t == NULL || depth > 8) {
+        return 0;
+    }
+    for (child = t->first_child; child != NULL; child = child->next) {
+        type_chain* c = child->symbol->type_record.first;
+        while (c != NULL && c->type_ == TYPE_ARRAY) {
+            c = c->next;
+        }
+        if (c != NULL && c->type_ == TYPE_FLOAT) {
+            return 1;
+        }
+        if (c != NULL && c->type_ == TYPE_STRUCTURE && debug_struct_has_float(cdb_find_type(c->data), depth + 1)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/* ticks keeps one T: record per struct key, so a struct that modules of two formats
+   share has the layout of one of them. 0 and the reason in error when an object of
+   module cannot use the kept layout: the struct holds a float, and the record's module
+   has floats of another width */
+static int debug_struct_layout_fits(const char* module, debug_sym_type* t, char* error, size_t error_size)
+{
+    int kept, own;
+
+    if (t == NULL || t->first_child == NULL || module == NULL) {
+        return 1;
+    }
+    kept = debug_module_float_width(t->first_child->symbol->type_record.module);
+    own = debug_module_float_width(module);
+    if (kept == 0 || own == 0 || kept == own || !debug_struct_has_float(t, 0)) {
+        return 1;
+    }
+    snprintf(error, error_size, "Unsupported float format (struct %s is laid out with %d-byte floats)", t->name, kept);
+    return 0;
+}
+
+/* The size of an object of chain in record's module, as for strides and sizeof: a float
+   that its record gives no width has its module's format's; -1 and the reason in error
+   when it cannot be known (a struct laid out for another format) */
+int debug_type_size(type_record* record, type_chain* chain, char* error, size_t error_size)
+{
+    if (chain == NULL) {
+        return get_type_memory_size(chain);
+    }
+    switch (chain->type_) {
+        case TYPE_FLOAT: {
+            int width = chain->size > 0 ? chain->size : debug_module_float_width(record->module);
+            return width > 0 ? width : get_type_memory_size(chain);
+        }
+        case TYPE_ARRAY: {
+            int size = debug_type_size(record, chain->next, error, error_size);
+            return size < 0 ? size : chain->size * size;
+        }
+        case TYPE_STRUCTURE: {
+            if (!debug_struct_layout_fits(record->module, cdb_find_type(chain->data), error, error_size)) {
+                return -1;
+            }
+            return get_type_memory_size(chain);
+        }
+        default: {
+            return get_type_memory_size(chain);
         }
     }
 }
@@ -1356,6 +1663,44 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
             }
             break;
 
+        case TYPE_FLOAT: {
+            int size = chain->size;     // 0 when no record gives it: a cast
+            int mode, exponent_bias, mantissa_size;
+            uint8_t b[8];
+            int i;
+
+            if (resolve_by != RESOLVE_BY_POINTER) {
+                snprintf(into->as_error, sizeof(into->as_error), "Cannot read a float returned by value (not implemented)");
+                set_expression_result_error(into);
+                break;
+            }
+            if (debug_float_format(record->module, &size, &mode, &exponent_bias, &mantissa_size, into) < 0) {
+                set_expression_result_error(into);
+                break;
+            }
+            for (i = 0; i < size; i++) {
+                b[i] = bk.get_memory(data + i, MEM_TYPE_DATA);
+            }
+            into->memory_location = data;
+            if (mode == FP_MODE_IEEE) {
+                uint32_t v = b[0] | ((uint32_t)b[1] << 8) | ((uint32_t)b[2] << 16) | ((uint32_t)b[3] << 24);
+                memcpy(&into->as_float, &v, sizeof(v));
+            } else if (mode == FP_MODE_AM9511) {
+                into->as_float = debug_float_from_am9511(b, exponent_bias);
+            } else if (mode == FP_MODE_Z88 && b[FP_MODE_OFFSET(mode) + mantissa_size] == 0) {
+                /* z88 (BBC BASIC): exponent 0 marks a 32-bit two's complement integer
+                   in the four mantissa bytes, which floor() and ceil() store */
+                if (mantissa_size != 4) {
+                    snprintf(into->as_error, sizeof(into->as_error), "Unsupported float format (a z88 integer with a %d-byte mantissa)", mantissa_size);
+                    set_expression_result_error(into);
+                    break;
+                }
+                into->as_float = (float)(int32_t)(b[1] | ((uint32_t)b[2] << 8) | ((uint32_t)b[3] << 16) | ((uint32_t)b[4] << 24));
+            } else {
+                into->as_float = debug_float_from_z80(b + FP_MODE_OFFSET(mode), exponent_bias, mantissa_size);
+            }
+            break;
+        }
         case TYPE_STRUCTURE: {
             into->memory_location = data;
             into->as_pointer.ptr = data;
@@ -1403,16 +1748,33 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
     }
 }
 
+/* A member of a struct of type t at data, read in the format of the module of the
+   struct's object (the type's own record may come from another module) */
+void debug_resolve_struct_member(type_record* holder, debug_sym_type* t, debug_sym_symbol* member, uint32_t data, struct expression_result_t* into) {
+    type_record record = member->type_record;
+
+    if (!debug_struct_layout_fits(holder->module, t, into->as_error, sizeof(into->as_error))) {
+        set_expression_result_error(into);
+        return;
+    }
+
+    if (holder->module != NULL) {
+        record.module = holder->module;
+    }
+    debug_resolve_expression_element(&record, record.first, RESOLVE_BY_POINTER, data, into);
+}
+
 static int debug_get_symbol_address(debug_sym_symbol *s) {
     int address = symbol_resolve((char*)s->symbol_name, (s->scope == SYMBOL_SCOPE_FILE) ? s->scope_value : NULL);
     if (address >= 0) {
         return address;
     }
 
-    char underscored_name[255];
+    char* underscored_name = malloc(strlen(s->symbol_name) + 2);
     sprintf(underscored_name, "_%s", s->symbol_name);
 
     address = symbol_resolve(underscored_name, (s->scope == SYMBOL_SCOPE_FILE) ? s->scope_value : NULL);
+    free(underscored_name);
     if (address >= 0) {
         return address;
     }
@@ -1506,15 +1868,7 @@ uint8_t cdb_find_enumerator(const char* name, const char* filename, int32_t* val
     debug_sym_enum* best = NULL;
     debug_sym_enumerator* best_en = NULL;
     int best_in_file = 0;
-    size_t prefix_len = 0;
-    char prefix[256] = "";
-
-    if (filename != NULL) {
-        prefix_len = snprintf(prefix, sizeof(prefix), "F%s$", filename);
-        if (prefix_len >= sizeof(prefix)) {
-            prefix_len = 0;
-        }
-    }
+    size_t filename_len = filename != NULL ? strlen(filename) : 0;
 
     HASH_ITER(hh, cdb_enums, e, tmp) {
         debug_sym_enumerator* en;
@@ -1526,7 +1880,9 @@ uint8_t cdb_find_enumerator(const char* name, const char* filename, int32_t* val
         if (en == NULL) {
             continue;
         }
-        int in_file = prefix_len != 0 && strncmp(e->name, prefix, prefix_len) == 0;
+        /* the key starts F<filename>$ */
+        int in_file = filename != NULL && e->name[0] == 'F' &&
+            strncmp(e->name + 1, filename, filename_len) == 0 && e->name[1 + filename_len] == '$';
         if (best == NULL || (in_file && !best_in_file) || (in_file == best_in_file && strcmp(e->name, best->name) < 0)) {
             best = e;
             best_en = en;

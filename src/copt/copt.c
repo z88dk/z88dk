@@ -688,6 +688,35 @@ static char* subst(char* pat, char** vars)
     return install(subst_imp(pat, vars));
 }
 
+/* C_LINE markers and whole-line comments (-cc) are transparent to pattern
+   matching: when a pattern line does not match one of them, it steps over
+   it. rep() re-emits the stepped-over lines ahead of the replacement. A rule
+   whose pattern names such a line (e.g. the optimiser-additions marker)
+   still matches it directly. */
+static int is_cline(const struct lnode* n)
+{
+    const char* t = n->l_text;
+    while (*t == ' ' || *t == '\t')
+        ++t;
+    if (*t == ';')
+        return 1;
+    return strncmp(t, "C_LINE", 6) == 0 && (t[6] == ' ' || t[6] == '\t');
+}
+
+static char** skipped;      /* texts stepped over, last to first */
+static int nskipped, skipcap;
+
+static void note_skipped(const char* text)
+{
+    if (nskipped == skipcap) {
+        skipcap = skipcap ? skipcap * 2 : 16;
+        skipped = realloc(skipped, skipcap * sizeof(*skipped));
+        if (skipped == NULL)
+            error("opt: out of memory\n");
+    }
+    skipped[nskipped++] = (char*)text;
+}
+
 /* rep - substitute vars into new and replace lines between p1 and p2 */
 struct lnode* rep(
     struct lnode* p1, struct lnode* p2, struct lnode* new, char** vars)
@@ -705,6 +734,8 @@ struct lnode* rep(
         free(p);
     }
     connect(p1, p2);
+    for (i = nskipped - 1; i >= 0; i--)
+        insert(skipped[i], p2);
     if (debug)
         fputs("=\n", stderr);
     for (; new; new = new->l_next) {
@@ -778,6 +809,7 @@ static struct lnode* opt(struct lnode* r)
         if (p == 0)
             continue; /* skip empty rules */
         titlebuf[0] = 0;
+        nskipped = 0;
         for (i = 0; i < 10; i++)
             vars[i] = 0;
         lines = 0;
@@ -844,7 +876,23 @@ static struct lnode* opt(struct lnode* r)
             } else if ( strncmp(p->l_text, "%title",6) == 0 ) {
                 snprintf(titlebuf,sizeof(titlebuf),"%s",p->l_text + 7);
             } else {
-                if (!match(c->l_text, c->l_len, p->l_text, vars))
+                int ok = 0;
+                for (;;) {
+                    char* saved[10];
+                    int skippable = lines && c->l_prev && is_cline(c);
+                    if (skippable)
+                        memcpy(saved, vars, sizeof saved);
+                    if (match(c->l_text, c->l_len, p->l_text, vars)) {
+                        ok = 1;
+                        break;
+                    }
+                    if (!skippable)
+                        break;
+                    memcpy(vars, saved, sizeof saved);  /* a failed try binds nothing */
+                    note_skipped(c->l_text);
+                    c = c->l_prev;
+                }
+                if (!ok)
                     break;
                 c = c->l_prev;
                 ++lines;

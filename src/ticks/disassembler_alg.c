@@ -569,7 +569,9 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
 
     label = find_symbol(pc, SYM_ADDRESS);
     if (label && (compact <= 1)) {
-        offs += snprintf(bufstart + offs, buflen - offs, "%s:%s",label, compact ? "" : "\n");
+        /* A label (it carries the module, so the source path, when its name is not
+           unique) is cut to half the buffer: the rest is the instruction's */
+        offs += snprintf(bufstart + offs, buflen - offs, "%.*s:%s", (int)(buflen / 2), label, compact ? "" : "\n");
     }
     buf = bufstart + offs;
     buflen -= offs;

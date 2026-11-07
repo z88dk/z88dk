@@ -6939,5 +6939,56 @@ void ir_alloc(Func *f)
     bytepack_pack(f);
     prepush_straddle_demote(f);
     hr_recoverability_verify(f);
+    /* A reversed-loop counter that did not win a register goes back to the
+       byte it would have been: a byte slot and byte inc/dec. */
+    for (int v = 0; v < f->n_vregs; v++)
+        if ((f->vregs[v].flags & IR_VREG_CD_COUNTER) && f->vregs[v].width == 2
+            && f->vreg_to_phys && f->vreg_to_phys[v] == IR_PR_SPILL) {
+            f->vregs[v].width = 1;
+            f->vregs[v].kind  = KIND_CHAR;
+        }
+    /* Only BC suits this counter: a shadow or index-register home makes the
+       latch a copy to HL and a zero test. Any other home: narrow, allocate again. */
+    for (int v = 0; v < f->n_vregs; v++)
+        if ((f->vregs[v].flags & IR_VREG_CD_COUNTER) && f->vregs[v].width == 2
+            && f->vreg_to_phys[v] != IR_PR_SPILL && f->vreg_to_phys[v] != IR_PR_BC) {
+            for (int w = 0; w < f->n_vregs; w++)
+                if ((f->vregs[w].flags & IR_VREG_CD_COUNTER) && f->vregs[w].width == 2) {
+                    f->vregs[w].flags &= (uint16_t)~IR_VREG_CD_COUNTER;
+                    f->vregs[w].width = 1;
+                    f->vregs[w].kind  = KIND_CHAR;
+                }
+            ir_alloc(f);
+            return;
+        }
+    /* With an IX frame that the function needs anyway, the byte slot is
+       `dec (ix+d)` and BC is worth more elsewhere. A counter that won BC only
+       pays when it is the sole reason for the frame: otherwise narrow it and
+       allocate again. */
+    if (c_framepointer_is_ix > 0 && !IS_808x() && !IS_GBZ80() && !IS_KR580VM1()
+        && !opt_disabled("countdown-fp")) {
+        int cd = -1, other_frame = 0;
+        for (int v = 0; v < f->n_vregs; v++) {
+            if ((f->vregs[v].flags & IR_VREG_CD_COUNTER) && f->vregs[v].width == 2
+                && f->vreg_to_phys[v] == IR_PR_BC) { cd = v; continue; }
+            if (f->vregs[v].flags & (IR_VREG_PARAM_IN_PLACE | IR_VREG_NO_SLOT
+                                     | IR_VREG_DEAD_SPILL)) {
+                if (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE) other_frame = 1;
+                continue;
+            }
+            if (f->vreg_to_phys[v] == IR_PR_SPILL && f->vregs[v].width > 0)
+                other_frame = 1;
+        }
+        if (cd >= 0 && other_frame) {
+            for (int v = 0; v < f->n_vregs; v++)
+                if ((f->vregs[v].flags & IR_VREG_CD_COUNTER) && f->vregs[v].width == 2) {
+                    f->vregs[v].flags &= (uint16_t)~IR_VREG_CD_COUNTER;
+                    f->vregs[v].width = 1;
+                    f->vregs[v].kind  = KIND_CHAR;
+                }
+            ir_alloc(f);
+            return;
+        }
+    }
     ir_liveprobe_flush(f->fn ? ir_sym_name(f->fn) : "?");
 }

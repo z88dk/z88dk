@@ -827,7 +827,7 @@ YY_RULE_SETUP
 case 8:
 YY_RULE_SETUP
 #line 50 "expressions.l"
-{ strcpy(yylval.cval, yytext); return T_HISTORY_STRING; }
+{ snprintf(yylval.cval, sizeof(yylval.cval), "%s", yytext); return T_HISTORY_STRING; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
@@ -1910,7 +1910,7 @@ int lookup_word() {
         free_type(type.first);
     }
 
-    strcpy(yylval.cval, yytext);
+    snprintf(yylval.cval, sizeof(yylval.cval), "%s", yytext);
     return T_STRING;
 }
 
