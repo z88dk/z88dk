@@ -24,6 +24,9 @@
     <ClCompile Include="..\..\src\sccz80\const.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\sccz80\cpp_invoke.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\sccz80\data.c">
       <Filter>Source Files</Filter>
     </ClCompile>

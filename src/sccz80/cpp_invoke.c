@@ -9,7 +9,8 @@
 #include "ccdefs.h"
 
 #ifdef _WIN32
-#include <io.h>
+/* _popen and _pclose are in stdio.h. <io.h> declares eof() on MinGW,
+   and sccz80 already has extern int eof. */
 #define POPEN  _popen
 #define PCLOSE _pclose
 #else
