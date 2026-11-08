@@ -1,7 +1,7 @@
+classic/gfx/wide/obj/${TARGET}/w_dcircle_square
 target/fp1100/obj/${TARGET}/x/target/fp1100/allram/graphics/clg.o
 target/fp1100/obj/${TARGET}/x/target/fp1100/allram/graphics/getmaxx.o
 target/fp1100/obj/${TARGET}/x/target/fp1100/allram/graphics/getmaxy.o
-target/fp1100/obj/${TARGET}/x/target/fp1100/allram/graphics/w_dcircle.o
 target/fp1100/obj/${TARGET}/x/target/fp1100/allram/graphics/w_liner.o
 target/fp1100/obj/${TARGET}/x/target/fp1100/allram/graphics/w_liner_generic.o
 target/fp1100/obj/${TARGET}/x/target/fp1100/allram/graphics/w_pixladdr.o

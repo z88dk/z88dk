@@ -25,7 +25,7 @@ fp1100_cpm.lib: fp1100_clib.lib $(TARGET_CLIB_DEPS) $(FP1100_TARGETS)
 	@touch $@
 
 # The all-RAM overlay: linked before fp1100_clib.lib (lib/config/fp1100.cfg, -clib=allram), see doc/target/fp1100/subcpu-plan.md
-fp1100_allram.lib: fp1100_clib.lib $(TARGET_CLIB_DEPS) $(FP1100_TARGETS)
+fp1100_allram.lib: fp1100_clib.lib $(TARGET_CLIB_DEPS) $(FP1100_TARGETS) target/fp1100/fp1100_allram.lst
 	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_allram @$(TARGET_DIRECTORY)/fp1100/fp1100_allram.lst
 	@touch $@
 
