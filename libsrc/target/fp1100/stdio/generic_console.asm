@@ -78,6 +78,8 @@ generic_console_set_paper:
     jr      set_colour
 
 generic_console_cls:
+    ld      hl, -1
+    ld      (__lastxy), hl              ;The cursor position is no longer known
     ld      a, SUB_CLS
     call    TRNC1
     ld      hl, DISPLAY
@@ -90,6 +92,8 @@ generic_console_cls:
 generic_console_scrollup:
     push    de
     push    bc
+    ld      hl, -1
+    ld      (__lastxy), hl              ;The cursor position is no longer known
     ld      a, SUB_SCROLLUP
     call    TRNC1
     ld      hl, DISPLAY+80
@@ -120,7 +124,9 @@ generic_console_plotc:
     ld      (hl), a
     pop     bc
     push    af
-    ld      (__lastxy), bc
+    inc     c
+    ld      (__lastxy), bc              ;Where the cursor is after the character
+    dec     c
     ld      a, SUB_SETXY
     call    TRNC3
     pop     af
@@ -139,17 +145,15 @@ generic_console_printc:
     ld      (hl), a
     pop     bc
     push    af
-    ld      hl, __lastxy
-    ld      a, (hl)
-    inc     a
-    cp      c
-    jr      nz, set_position
-    inc     hl
-    ld      a, (hl)
-    cp      b
-    jr      z, skip_position
-set_position:
-    ld      (__lastxy), bc
+    ld      hl, (__lastxy)
+    or      a
+    sbc     hl, bc
+    inc     c
+    ld      (__lastxy), bc              ;Where the cursor is after the character
+    dec     c
+    ld      a, h
+    or      l
+    jr      z, skip_position            ;The cursor is already there
     ld      a, SUB_SETXY
     call    TRNC3
 skip_position:

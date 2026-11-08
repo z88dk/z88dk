@@ -1,0 +1,541 @@
+; The Casio FP-1100's sub-CPU (uPD7801) program for the all-RAM console: it owns the video RAM, and the Z80 drives it a byte at a time
+; (target/fp1100/allram/stdio/takeover.asm sends it).  It runs from the spare VRAM at BASE (stored inverted: the VRAM bus inverts a
+; read), and the stack is at the top of the sub-CPU's RAM.  Each command byte is the low address of its handler (dispatched with JB, so the
+; entry points are all in the first page); Rcv fetches a byte from the Z80 with the handshake (writing $80 to $E800 says ready, the Z80's INT2
+; pulse is the byte, writing 0 acknowledges it).
+;
+; VRAM: three planes, blue $2000, red $6000, green $A000, each 40x25 cells of 8 bytes (a cell's lines).  A byte is 1 = lit when read and a direct write needs the
+; complement, so a copy from one place on the screen to another inverts the pixels (and a copy from the glyph store, which holds them raw, is right).  The glyphs live in the spare VRAM above the screen, as 32 byte
+; slots from $C000 + 32 * code (the same 8 bytes for blue, red and green, then 8 spare), bit 0 the leftmost pixel.
+;
+;   Addr lo hi      DE = a VRAM address (a cell's blue plane line 0)
+;   Pat             8 bytes to (DE+)
+;   Glyph c         glyph c: 8 bytes, stored in the slot of c for the three planes (DE is not touched)
+;   Text n-1 a c... n characters (glyph codes) at DE, DE advancing a cell each, in the colours a: ink bits 0 to 2 (blue, red, green), paper bits 3 to 5
+;   Fill n-1 a      n cells at DE, DE advancing, each plane all lit if its bit of a (0 to 2: blue, red, green) is set, else blank
+;   Scroll          the screen up a cell row (the last row is left as it was: Fill it)
+;   Pix a_lo a_hi m c   a pixel: the byte at a (a blue plane address; the red and green bytes are 8 KB * 2 on: +$4000, +$8000), the pixel mask m (a bit: the
+;                   leftmost pixel of a byte is bit 0) takes the colour c: bits 0 to 2 (blue, red, green), each plane's pixel set where its bit is 1 and
+;                   cleared where it is 0, or, if bit 3 of c is set, flipped where the bit is 1 (the planes with a 0 are left alone)
+;   Point a_lo a_hi m   returns the colour of that pixel, bits 0 to 2 (blue, red, green)
+;   Line a_lo a_hi m c flags n_lo n_hi minor major_lo major_hi err_lo err_hi
+;                   a line from the pixel at a, m (not drawn itself): n steps along the major axis; each adds `minor` to the error, which at `major` or more
+;                   takes `major` off and steps the minor axis too.  flags: bit 0 x is the major axis, bit 1 x steps up (else down), bit 2 y steps down (else up).
+;                   c as for Pix.
+;   Keys            scans the key matrix and returns the number n of rows with a key down, then for each a row byte (the matrix row, 1 to 12, and $40 if bit 7
+;                   of the keys is set) and the keys (bits 0 to 6; bit 7 is in the row byte); every reply byte is 7 bits
+        PUBLIC Main, P1End, Page2, SubEnd, Addr, Pat, Glyph, Text, Fill, Scroll, Keys, Pix, Point, Line
+        ORG BASE
+Main:   CALL Rcv
+        MOV C,A
+        MVI B,PAGE
+        JB
+Pat:    CALL P8
+        JR Main
+Addr:   CALL Rcv
+        MOV E,A
+        CALL Rcv
+        MOV D,A
+        JR Main
+Keys:   JMP KeysBody
+Fill:   JMP FillBody
+Text:   JMP TextBody
+Glyph:  JMP GlyphBody
+Scroll: JMP ScrollBody
+Pix:    JMP PixBody
+Point:  JMP PointBody
+Line:   JMP LineBody
+P8:     MVI B,7                 ; 8 bytes to (DE+)
+P81:    CALL Rcv
+        STAX DE+
+        DCR B
+        JR P81
+        RET
+Rcv:    MVI C,$80
+        MOV $E800,C
+Rw:     SKIT F2
+        JR Rw
+        MOV A,$E800
+        MVI C,0
+        MOV $E800,C
+        RET
+
+P1End:
+; ---- the second page ----
+        ORG BASE2
+Page2:
+KeysBody:
+        EXX                     ; (the alternate registers: DE is the address, and the Z80 counts on it staying)
+        MVI D,0                 ; rows found
+        LXI HL,$FF80            ; their bytes, in the sub-CPU's RAM
+        MVI B,11                ; rows 12 down to 1 (B + 1)
+Kk1:    MOV A,B
+        ADI A,$21               ; (bit 5 opens the key data line)
+        MOV $E400,A
+        CALL Settle
+        MOV A,PB
+        EQI A,0
+        JRE Kkf
+Kk2:    DCR B
+        JRE Kk1
+        MOV A,D
+        CALL Snd
+        MOV A,D
+        EQI A,0
+        JRE Ks0
+        EXX
+        JMP Main
+Ks0:    ADD A,D
+        MOV B,A
+        DCR B                   ; (twice the rows, less one: the loop runs until the borrow)
+        LXI HL,$FF80
+Ks1:    LDAX HL+
+        CALL Snd
+        DCR B
+        JRE Ks1
+        EXX
+        JMP Main
+Kkf:    MOV C,A
+        MOV A,B
+        ADI A,1
+        MOV E,A                 ; the row
+        MOV A,C
+        ANI A,$80
+        EQI A,0
+        JRE Kkh
+Kkw:    MOV A,E
+        STAX HL+
+        MOV A,C
+        ANI A,$7F
+        STAX HL+
+        ADI D,1
+        JRE Kk2
+Kkh:    ADI E,$40
+        JRE Kkw
+Settle: MVI C,12
+St1:    DCR C
+        JRE St1
+        RET
+Snd:    ORI A,$80               ; a byte to the Z80: bit 7 is the ready flag
+        MOV $E800,A
+Sn1:    SKIT F2
+        JRE Sn1
+        MVI C,0
+        MOV $E800,C
+        RET
+FillBody:
+        CALL Rcv
+        MOV B,A                 ; cells - 1
+        CALL Rcv
+        MOV $FFC1,A             ; the planes to light
+Fl1:    MOV A,$FFC1
+        CALL FlP
+        ADI D,$40
+        MOV A,$FFC1
+        SLR A
+        CALL FlP
+        ADI D,$40
+        MOV A,$FFC1
+        SLR A
+        SLR A
+        CALL FlP
+        ADI D,$80
+        INX DE                  ; (the next cell)
+        INX DE
+        INX DE
+        INX DE
+        INX DE
+        INX DE
+        INX DE
+        INX DE
+        DCR B
+        JMP Fl1
+        JMP Main
+FlP:    ANI A,1                 ; one plane: lit (a direct write of 0) or blank ($FF)
+        PUSH DE
+        EQI A,1
+        JRE Fl0
+        MVI A,0
+        JRE Fl2
+Fl0:    MVI A,$FF
+Fl2:    MVI C,7
+Fl3:    STAX DE+
+        DCR C
+        JRE Fl3
+        POP DE
+        RET
+TextBody:
+        CALL Rcv
+        MOV B,A                 ; characters - 1
+        CALL Rcv
+        MOV $FFC1,A             ; the attribute
+Tx1:    CALL Rcv
+        MVI C,0
+        SLR A
+        RLR C
+        SLR A
+        RLR C
+        SLR A
+        RLR C
+        ADI A,$C0
+        MOV H,A
+        MOV A,C
+        MOV L,A                 ; HL = the glyph's slot ($C000 + 32 * code), blue, red and green planes in turn
+        MOV A,$FFC1
+        CALL TxP
+        ADI D,$40
+        MOV A,$FFC1
+        SLR A
+        CALL TxP
+        ADI D,$40
+        MOV A,$FFC1
+        SLR A
+        SLR A
+        CALL TxP
+        ADI D,$80
+        INX DE                  ; (the next cell)
+        INX DE
+        INX DE
+        INX DE
+        INX DE
+        INX DE
+        INX DE
+        INX DE
+        DCR B
+        JMP Tx1
+        JMP Main
+TxP:    ANI A,9                 ; one plane: ink bit 0, paper bit 3 of A
+        PUSH DE
+        EQI A,1
+        JRE Tp1
+        MVI C,7                 ; ink: the glyph
+        BLOCK
+        POP DE
+        RET
+Tp1:    EQI A,8
+        JRE Tp2
+        MVI C,7                 ; paper: the glyph's inverse
+        BLOCK
+        POP DE
+        PUSH DE
+        MVI C,7
+Tp1a:   LDAX DE
+        STAX DE+
+        DCR C
+        JRE Tp1a
+        POP DE
+        RET
+Tp2:    EQI A,9
+        JRE Tp3
+        MVI A,0                 ; both: all lit (a direct write of 0)
+        JRE Tp4
+Tp3:    MVI A,$FF               ; neither: blank
+Tp4:    MVI C,7
+Tp4a:   STAX DE+
+        DCR C
+        JRE Tp4a
+        MOV A,L                 ; (the glyph's next plane)
+        ADI A,8
+        MOV L,A
+        POP DE
+        RET
+GlyphBody:
+        EXX
+        CALL Rcv
+        MVI C,0
+        SLR A
+        RLR C
+        SLR A
+        RLR C
+        SLR A
+        RLR C
+        ADI A,$C0
+        MOV D,A
+        MOV A,C
+        MOV E,A                 ; DE = the glyph's slot
+        LXI HL,$FF90            ; the 8 bytes into the sub-CPU's RAM first
+        MVI B,7
+Gl1:    CALL Rcv
+        STAX HL+
+        DCR B
+        JRE Gl1
+        MVI B,2                 ; then three times into the slot
+Gl2:    LXI HL,$FF90
+        MVI C,7
+        BLOCK
+        DCR B
+        JRE Gl2
+        EXX
+        JMP Main
+ScrollBody:                     ; (a copy inverts, so the rows go through the spare VRAM at $4000: written to the screen once, with no inverted stage.  Six bands of
+        EXX                     ; four rows, the three planes of a band staged and then written back together, so a colour fringe lasts only for a band)
+        LXI HL,$2140
+        LXI DE,$2000
+        CALL ScBand
+        LXI HL,$2640
+        LXI DE,$2500
+        CALL ScBand
+        LXI HL,$2B40
+        LXI DE,$2A00
+        CALL ScBand
+        LXI HL,$3040
+        LXI DE,$2F00
+        CALL ScBand
+        LXI HL,$3540
+        LXI DE,$3400
+        CALL ScBand
+        LXI HL,$3A40
+        LXI DE,$3900
+        CALL ScBand
+        EXX
+        JMP Main
+ScBand: PUSH DE                 ; HL = the band's source (blue plane), DE = its destination
+        LXI DE,$4000
+        CALL ScS
+        ADI H,$3B               ; (the next plane: $4000 on, less the 1280 bytes done)
+        CALL ScS
+        ADI H,$3B
+        CALL ScS
+        POP DE
+        LXI HL,$4000
+        CALL ScS
+        ADI D,$3B
+        CALL ScS
+        ADI D,$3B
+        CALL ScS
+        RET
+ScS:    MVI B,4                 ; 1280 bytes: 5 blocks of 256
+Sc1:    MVI C,255
+        BLOCK
+        DCR B
+        JRE Sc1
+        RET
+PixBody:
+        EXX
+        CALL Rcv
+        MOV L,A
+        CALL Rcv
+        MOV H,A
+        CALL Rcv
+        MOV E,A                 ; the mask
+        CALL Rcv
+        MOV $FFC2,A             ; the colour
+        CALL PlotPix
+        EXX
+        JMP Main
+; PlotPix: HL = the blue plane byte, E = the mask, $FFC2 = the colour.  Uses A, B, C, D (not HL, E).
+PlotPix:
+        MOV A,E
+        XRI A,$FF
+        MOV D,A                 ; D = the mask's complement
+        MOV A,$FFC2
+        MOV C,A
+        MVI B,2                 ; three planes
+Pp1:    MOV A,$FFC2
+        ANI A,8
+        EQI A,0
+        JR PpX                  ; flip mode
+        MOV A,C
+        ANI A,1
+        EQI A,0
+        JRE PpSet
+        LDAX HL                 ; (a read gives 1 = lit; a write takes the complement)
+        ANA A,D
+        JRE PpW
+PpSet:  LDAX HL
+        ORA A,E
+        JRE PpW
+PpX:    MOV A,C
+        ANI A,1
+        EQI A,0
+        JRE PpF
+        JRE PpN
+PpF:    LDAX HL
+        XRA A,E
+PpW:    XRI A,$FF
+        STAX HL
+PpN:    MOV A,H
+        ADI A,$40
+        MOV H,A
+        SLR C
+        DCR B
+        JRE Pp1
+        ADI H,$40               ; (3 * $40 on: back to the blue plane)
+        RET
+PointBody:
+        EXX
+        CALL Rcv
+        MOV L,A
+        CALL Rcv
+        MOV H,A
+        CALL Rcv
+        MOV E,A
+        MVI D,0
+        MVI B,2
+Pt1:    MOV A,D
+        SLR A
+        MOV D,A
+        LDAX HL
+        ANA A,E
+        EQI A,0
+        JRE PtL
+        JRE PtN
+PtL:    MOV A,D
+        ORI A,4
+        MOV D,A
+PtN:    MOV A,H
+        ADI A,$40
+        MOV H,A
+        DCR B
+        JRE Pt1
+        MOV A,D
+        CALL Snd
+        EXX
+        JMP Main
+LineBody:
+        EXX
+        CALL Rcv
+        MOV L,A
+        CALL Rcv
+        MOV H,A
+        CALL Rcv
+        MOV E,A
+        CALL Rcv
+        MOV $FFC2,A             ; colour
+        CALL Rcv
+        MOV $FFC3,A             ; flags
+        CALL Rcv
+        MOV $FFC4,A             ; steps left
+        CALL Rcv
+        MOV $FFC5,A
+        CALL Rcv
+        MOV $FFC6,A             ; minor
+        CALL Rcv
+        MOV $FFC8,A             ; major
+        CALL Rcv
+        MOV $FFC9,A
+        CALL Rcv
+        MOV $FFCA,A             ; error
+        CALL Rcv
+        MOV $FFCB,A
+Ln1:    MOV A,$FFC5
+        MOV B,A
+        MOV A,$FFC4
+        ORA A,B
+        EQI A,0
+        JRE Ln2
+        EXX
+        JMP Main
+Ln2:    MOV A,$FFC4
+        SUI A,1
+        MOV $FFC4,A
+        MOV A,$FFC5
+        SBI A,0
+        MOV $FFC5,A
+        MOV A,$FFC3
+        ANI A,1
+        EQI A,0
+        JRE LnXm
+        CALL StepY              ; y is the major axis
+        JRE LnE
+LnXm:   CALL StepX
+LnE:    MOV A,$FFCA             ; error += minor
+        MOV B,A
+        MOV A,$FFC6
+        ADD A,B
+        MOV $FFCA,A
+        MOV A,$FFCB
+        ACI A,0
+        MOV $FFCB,A
+        MOV A,$FFC8             ; error - major
+        MOV B,A
+        MOV A,$FFCA
+        SUB A,B
+        MOV C,A
+        MOV A,$FFC9
+        MOV B,A
+        MOV A,$FFCB
+        SBB A,B
+        SKN CY
+        JR LnP                  ; (a borrow: the error is less, no minor step)
+        MOV $FFCB,A
+        MOV A,C
+        MOV $FFCA,A
+        MOV A,$FFC3
+        ANI A,1
+        EQI A,0
+        JRE LnMy
+        CALL StepX              ; y is the major: x is the minor
+        JRE LnP
+LnMy:   CALL StepY
+LnP:    CALL PlotPix
+        JMP Ln1
+StepX:  MOV A,$FFC3
+        ANI A,2
+        EQI A,0
+        JRE SxR
+        MOV A,E                 ; x decreases: the mask moves to a lower bit
+        SLR A
+        MOV E,A
+        EQI A,0
+        RET
+        MVI E,$80
+        MOV A,L
+        SUI A,8
+        MOV L,A
+        MOV A,H
+        SBI A,0
+        MOV H,A
+        RET
+SxR:    MOV A,E
+        SLL A
+        MOV E,A
+        EQI A,0
+        RET
+        MVI E,1
+        MOV A,L
+        ADI A,8
+        MOV L,A
+        MOV A,H
+        ACI A,0
+        MOV H,A
+        RET
+StepY:  MOV A,$FFC3
+        ANI A,4
+        EQI A,0
+        JRE SyD
+        MOV A,L                 ; up: a byte down the cell, at the top of it the cell above (312 on from the cell's last line)
+        SUI A,1
+        MOV L,A
+        MOV A,H
+        SBI A,0
+        MOV H,A
+        MOV A,L
+        ANI A,7
+        EQI A,7
+        RET
+        MOV A,L
+        SUI A,$38
+        MOV L,A
+        MOV A,H
+        SBI A,1
+        MOV H,A
+        RET
+SyD:    MOV A,L
+        ADI A,1
+        MOV L,A
+        MOV A,H
+        ACI A,0
+        MOV H,A
+        MOV A,L
+        ANI A,7
+        EQI A,0
+        RET
+        MOV A,L
+        ADI A,$38
+        MOV L,A
+        MOV A,H
+        ACI A,1
+        MOV H,A
+        RET
+SubEnd:
