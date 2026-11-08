@@ -1,62 +1,73 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
-z88dk v2.5 - xx.11.2026
+z88dk v2.5 - 11.11.2026
 
 Headline features for this release:
 
-80cc is a new optimising C compiler in this release. By default it uses the sccz80 calling 
-convention, so can be treated as drop-in replacement for sccz80. On CPUs with the index 
-registers, the -fframe-pointer option allows the use of a frame-register should a function 
-need one.
+80cc is a new optimising C compiler in this release. By default it uses the
+sccz80 calling convention, so can be treated as drop-in replacement for sccz80.
+On CPUs with the index registers, the -fframe-pointer option allows the use of a
+frame-register should a function need one.
 
-In addtion to 80cc, the zcc driver supports the third-party xcc compiler for creation
-of z80 programs. Support for preliminary versions of llvm-z80 has also been added.
+In addition to 80cc, the zcc driver supports the third-party xcc compiler for
+creation of z80 programs. Support for preliminary versions of llvm-z80 has also
+been added.
 
-Source level debugging now works for sdcc, sccz80 and 80cc compilations using either remote
-gdb or the builtin debugger within the jnext emulator.
+Source level debugging now works for sdcc, sccz80 and 80cc compilations using
+either remote gdb or the builtin debugger within the jnext emulator.
 
-From this release, -lm selects math32 on classic and on newlib. The --math32 option selects 
-the same library. math32 runs on the 8080, the 8085, the KR580VM1, the gbz80, the Z80N, and 
-the Rabbit in addition to the Zilog CPUs. The half-precision library, math16, runs on the 8080, 
-the 8085, and the gbz80. Divide, and the public inverse, use a restoring 1/x in both libraries.
+From this release, -lm selects math32 on classic and on newlib. The --math32
+option selects the same library. math32 runs on the 8080, the 8085, the
+KR580VM1, the gbz80, the Z80N, and the Rabbit in addition to the Zilog CPUs. The
+half-precision library, math16, runs on the 8080, the 8085, and the gbz80.
+Divide, and the public inverse, use a restoring 1/x in both libraries.
 
-+zx81 and +lambda continue to use genmath_zx81 with  -lm. The ROM interrupt on those machines 
-does not save AF', and math32 uses ex af,af'. ROM floating point stays on -lmz for the machines 
-that have libraries.
++zx81 and +lambda continue to use genmath_zx81 with -lm. The ROM interrupt on
+those machines does not save AF', and math32 uses ex af,af'. ROM floating point
+stays on -lmz for the machines that have libraries.
 
-The KR580VM1 (vm1) is a supported processor in this release. z80asm accepts its opcodes. Classic 
-+test can build for this processor, and math32 supplies its floating point library.
+The KR580VM1 (vm1) is a supported processor in this release. z80asm accepts its
+opcodes. Classic +test can build for this processor, and math32 supplies its
+floating point library.
 
-This release builds zsdcc from SDCC 4.6.0 revision r16639. The patched compiler keeps the z88dk
-calling conventions.
+This release builds zsdcc from SDCC 4.6.0 revision r16639. The patched compiler
+keeps the z88dk calling conventions.
 
-Newlib products now install next to the classic libraries. sccz80 products go under lib/clibs/sccz80, 
-and sdcc products go under lib/clibs/sdcc_ix. The +hbios, +scz180, +yaz180, +rc2014, and +cpm targets 
-now live in the classic tree, and their newlib drivers moved with them.
+Newlib products now install next to the classic libraries. sccz80 products go
+under lib/clibs/sccz80, and sdcc products go under lib/clibs/sdcc_ix. The
++hbios, +scz180, +yaz180, +rc2014, and +cpm targets now live in the classic
+tree, and their newlib drivers moved with them.
 
-Classic strtod reads a C90 decimal number and a C99 hexadecimal number. The hexadecimal form 
-starts with 0x and can take a decimal power after p or P. The C parser links for mbf32 and 
-daimath32 on the 8080, the 8085, the KR580VM1, and the gbz80. Z80-family math32, math48, and 
-am9511 keep the assembly strtod in the crt0.
+Classic strtod reads a C90 decimal number and a C99 hexadecimal number. The
+hexadecimal form starts with 0x and can take a decimal power after p or P. The C
+parser links for mbf32 and daimath32 on the 8080, the 8085, the KR580VM1, and
+the gbz80. Z80-family math32, math48, and am9511 keep the assembly strtod in the
+crt0.
 
-Classic zsdcc now reads printf and scanf format strings during the compile. A literal %f, %e, 
-or %g links the matching float converter.
+Classic zsdcc now reads printf and scanf format strings during the compile. A
+literal %f, %e, or %g links the matching float converter.
 
-z88dk-zx81bas is a new tool for ZX81 BASIC that contains inline assembly. Mark the assembly with 
-#ASM and #ENDASM. The tool sends that code to z80asm and writes a .p tape image.
+z88dk-zx81bas is a new tool for ZX81 BASIC that contains inline assembly. Mark
+the assembly with #ASM and #ENDASM. The tool sends that code to z80asm and
+writes a .p tape image.
 
 More detailed, but still incomplete changelist:
 
-- [80cc] New optimising compiler, using sccz80 calling convention and stack pointer, or optionally using IX frame pointer.
+- [80cc] New optimising compiler, using sccz80 calling convention and stack
+  pointer, or optionally using IX frame pointer.
 - [all] Symbolic debugging improved across sdcc, sccz80, 80cc
-- [all] -lm is math32 on classic and newlib. +zx81 and +lambda keep genmath_zx81. ROM maths stay on -lmz
-- [all] AI agent support via AGENTS.md and .agents/skills (Grok/Claude discovery symlinks)
+- [all] -lm is math32 on classic and newlib. +zx81 and +lambda keep
+  genmath_zx81. ROM maths stay on -lmz
+- [all] AI agent support via AGENTS.md and .agents/skills (Grok/Claude discovery
+  symlinks)
 - [all] math16 half-precision floating point support for 8080, 8085, and gbz80
 - [all] math32 and math16 divide and inv use a restoring 1/x
-- [all] math32 floating point support for 8080, 8085, vm1, gbz80, z80n, and Rabbit
+- [all] math32 floating point support for 8080, 8085, vm1, gbz80, z80n, and
+  Rabbit
 - [all] The toolchain now supports the KR580VM1 (vm1) processor
-- [all] ZX0 host tools and decompressors are v2.2. Forward data uses the v2 format. -c writes classic v1
+- [all] ZX0 host tools and decompressors are v2.2. Forward data uses the v2
+  format. -c writes classic v1
 - [appmake] +hdos disc writing support
 - [appmake] +z88 writes .ap0 only when --installer is set
 - [appmake] cpmdisk can omit unused extents
@@ -64,13 +75,15 @@ More detailed, but still incomplete changelist:
 - [asm7801] Simple assembler for the FP-1100 subcpu
 - [classic] +alphatp2 target working
 - [classic] +aquarius -subtype=allram takes the whole 64K machine
-- [classic] +aquarius can pack an AQX file with ZX0. CRT_AQPLUS_BANK3_RAM maps RAM into bank 3
+- [classic] +aquarius can pack an AQX file with ZX0. CRT_AQPLUS_BANK3_RAM maps
+  RAM into bank 3
 - [classic] +aquarius generic console plotting is faster
 - [classic] +fp1100 -subtype=allram, 64k support and subcpu rewrite
 - [classic] +gal faster plotting
 - [classic] +hdos fcntl available
 - [classic] +hdos time(), clock(), and default_device()
-- [classic] +msx, +sam, and Aquarius Plus have a mouse driver. The +mz2500 mouse driver is untested
+- [classic] +msx, +sam, and Aquarius Plus have a mouse driver. The +mz2500 mouse
+  driver is untested
 - [classic] +multi8 tape reading functions available
 - [classic] +mz2500 Improved support: console, graphics and other routines.
 - [classic] +p2000 Inkey keyboard driver available
@@ -78,7 +91,8 @@ More detailed, but still incomplete changelist:
 - [classic] +phc25 New target
 - [classic] +pps low-memory crt0 layout
 - [classic] +sms now has access to newlib libraries
-- [classic] +spc1000 -subtype=allram links the program at address 0. tape_save and tape_load_to use the cassette
+- [classic] +spc1000 -subtype=allram links the program at address 0. tape_save
+  and tape_load_to use the cassette
 - [classic] +test Support for KR580VM1 (vm1) processor
 - [classic] +x07 Support much improved
 - [classic] +x1 has x1_disk_read and x1_disk_write
@@ -90,23 +104,31 @@ More detailed, but still incomplete changelist:
 - [classic] +zxn Thin sprite wrapper available
 - [classic] Einstein mode 7
 - [classic] Extra interrupt support for the 8085 and the NSC800
-- [classic] font.h gives each font an end label. A 6x8 name uses the matching 8x8 end label
+- [classic] font.h gives each font an end label. A 6x8 name uses the matching
+  8x8 end label
 - [classic] Rabbit targets now support __banked and __far
-- [classic] strtod accepts C90 decimal and C99 hexadecimal text for 8080, 8085, vm1, and gbz80
+- [classic] strtod accepts C90 decimal and C99 hexadecimal text for 8080, 8085,
+  vm1, and gbz80
 - [classic] targets +hbios, +scz180, +yaz180, +rc2014 migrated
 - [classic] V9938 palette functions
-- [classic] zsdcc selects the printf and scanf float converter from the format string
-- [newlib] __CLIB_OPT_MALLOC selects a spare-tail malloc search (0 keeps the small walker)
+- [classic] zsdcc selects the printf and scanf float converter from the format
+  string
+- [newlib] __CLIB_OPT_MALLOC selects a spare-tail malloc search (0 keeps the
+  small walker)
 - [newlib] a routine that assigns IX saves it and restores it
-- [newlib] library products install under lib/clibs/sccz80/ and lib/clibs/sdcc_ix/
+- [newlib] library products install under lib/clibs/sccz80/ and
+  lib/clibs/sdcc_ix/
 - [sccz80] Improved C90 compliance & peephole update
 - [z80asm] #define now supported as alias for defc
 - [z80asm] Bug fixes
-- [z80asm] the map names the bank of __section_head, __section_tail, and __section_size
+- [z80asm] the map names the bank of __section_head, __section_tail, and
+  __section_size
 - [z88dk-copt] Additional conditions for compiler and pattern formats
 - [z88dk-dis] Support for decoding rst calls
-- [z88dk-gdb] IM 2 support, watchpoints, O-packets, and the Z80 I and R registers
-- [z88dk-ticks] -iotimer and -mmtimer read the cycle count from inside the program
+- [z88dk-gdb] IM 2 support, watchpoints, O-packets, and the Z80 I and R
+  registers
+- [z88dk-ticks] -iotimer and -mmtimer read the cycle count from inside the
+  program
 - [z88dk-ticks] 8085, z80n, kc160, r4k, r6k fixes
 - [z88dk-ticks] Support for the Rabbit banking model
 - [z88dk-ticks] IO and memory model can be supplied by a lua script
