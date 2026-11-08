@@ -1,3 +1,5 @@
+;; Z80N peepholes for add hl and an immediate push. The testsuite passes this file with -custom-copt-rules.
+
 	ld	bc,%1	; Would be better if ZXN opcode affected carry
 	add	hl,bc
 =

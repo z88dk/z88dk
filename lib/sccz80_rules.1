@@ -1,3 +1,5 @@
+;; sccz80 peepholes for -O1. Also run after sccz80_rules.2 at -O2 and after sccz80_rules.3 at -O3.
+
 	ld	a,0
 =
 	xor	a
@@ -7031,7 +7033,7 @@
 =
 	ret	%%2
 
-%title Moved from z80rules.0, structure setting
+%title Moved from sccz80_rules.3, structure setting
 %check 0 <= %1 <= 65535
 %check 0 <= %3 <= 65535
 	pop	hl
@@ -7056,7 +7058,7 @@
 	ld	bc,%eval(%3 %1 - 1 -)
 	add	hl,bc
 
-%title Moved from z80rules.0, structure setting
+%title Moved from sccz80_rules.3, structure setting
 %check 0 <= %1 <= 65535
 %check 0 <= %3 <= 65535
 	pop	hl
@@ -7077,7 +7079,7 @@
 	ld	bc,%eval(%3 %1 -)
 	add	hl,bc
 
-%title moved from z80rules.0 inc/dec
+%title moved from sccz80_rules.3 inc/dec
 %notcpu gbz80
 	ld	hl,_%1
 	push	hl
@@ -7090,7 +7092,7 @@
 	%3c	hl
 	ld	(_%1),hl
 
-%title Moved from z80rules.0 static uint8_t inc/dec
+%title Moved from sccz80_rules.3 static uint8_t inc/dec
 	ld	hl,(_%1)
 	ld	h,0
 	%2c	hl
@@ -7102,14 +7104,14 @@
 	%2c	hl
 	ld	hl,%3
 
-%title Moved from z80rules.0, redundant uint8 load
+%title Moved from sccz80_rules.3, redundant uint8 load
 	ld	l,(hl)
 	ld	h,0
 	ld	hl,%1
 =
 	ld	hl,%1
 
-%title Moved from z80rules.0 optimise 8 bit increment
+%title Moved from sccz80_rules.3 optimise 8 bit increment
 	ld	hl,(%1)
 	ld	h,0
 	%3c	hl

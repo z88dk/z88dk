@@ -64,7 +64,7 @@ add( "add bc,32767", 0xED, 0x36, 0xFF, 0x7F );
 #   like `ld hl,nn; push hl` - the LO byte ends at the final SP and a
 #   little-endian pop returns the value unchanged (`push 0x1234; pop hl` ->
 #   HL = 0x1234, bytes at SP = 34 12).  copt may therefore use `push nn` to
-#   replace register pushes in value moves (z80n_rules.1 rules 2/3).
+#   replace register pushes in value moves (z80n_peephole rules 2/3).
 add( "push 1",     0xED, 0x8A, 0x00, 0x01 );
 add( "push 256",   0xED, 0x8A, 0x01, 0x00 );
 add( "push 32767", 0xED, 0x8A, 0x7F, 0xFF );

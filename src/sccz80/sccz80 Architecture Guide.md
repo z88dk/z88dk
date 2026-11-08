@@ -301,8 +301,9 @@ undocumented and no Z80-only instruction.
 
 **Layer 2 — peephole rules per architecture.** `lib/arch/<cpu>/<cpu>_rules.1`.
 The files that contain rules are `8085`, `gbz80`, `kc160`, `r800`, `rabbit`,
-`z180`, `z80n`, and `ez80`. `z80`, `8080`, and `vm1` are comment-only
-placeholders. `z80`, `z80_ixiy`, and `z80_strict` share
+`z180`, and `ez80`. z80n loads `lib/arch/z80n/z80n_intrinsic` (nextreg and MMU).
+`lib/arch/z80n/z80n_peephole` is the testsuite custom file. `z80`, `8080`, and
+`vm1` are comment-only placeholders. `z80`, `z80_ixiy`, and `z80_strict` share
 `lib/arch/z80/z80_rules.1`. copt leaves a comment-only file unchanged. zcc
 warns when a named rules file is missing. The rules run *after* sccz80 has
 finished, so they can exploit instruction sequences the compiler emitted
@@ -361,20 +362,20 @@ a window of assembly lines until no rule fires or `MAX_PASS` (16) is reached.
 From `fill_sccz80_copt_rules()`:
 
 ```
-lib/z80rules.9                        always   (intrinsics and RST substitution)
+lib/z88dk_intrinsic                  always   (intrinsics and RST substitution)
   -O 0:  (nothing)
-  -O 1:  lib/z80rules.1
-  -O 2:  lib/z80rules.2, lib/z80rules.1
-  -O 3+: lib/z80rules.2, lib/z80rules.1, lib/z80rules.0
+  -O 1:  lib/sccz80_rules.1
+  -O 2:  lib/sccz80_rules.2, lib/sccz80_rules.1
+  -O 3+: lib/sccz80_rules.2, lib/sccz80_rules.1, lib/sccz80_rules.3
   target rules        (from the target's config)
   cpu rules           (from cpu_map[], e.g. lib/arch/8085/8085_rules.1)
-  lib/z80rules.8                        (sccz80 op inlining, via -Ch)
+  lib/sccz80_inline                     (sccz80 op inlining, via -Ch)
   user rules
 ```
 
 `-O` is the peephole level; `--opt-code-speed` is a different axis entirely and
 lives in the compiler, not in copt. `80cc` uses a different chain
-(`z80rules.9`, then `80cc_rules.1`, then target/cpu/user), which is why a rule that
+(`z88dk_intrinsic`, then `80cc_rules.1`, then target/cpu/user), which is why a rule that
 helps one front end can be wrong for the other.
 
 ### What this means for review
@@ -384,7 +385,7 @@ helps one front end can be wrong for the other.
 * A rules-file change is invisible to sccz80's own test suite unless the tests run
   the full `zcc` pipeline.
 * Rules must remain correct under every `-O` level and every CPU whose chain
-  includes them. A rule in `z80rules.1` runs on 8080 too.
+  includes them. A rule in `sccz80_rules.1` runs on 8080 too.
 * Anything that changes emitted text must keep **`-O 0` output byte-identical**
   after the assembly suite drops `^;` lines. `;	Module compile time:` is one of
   those comments, printed from `ctime` in `gen_file_header`. The project treats

@@ -410,7 +410,7 @@ flowchart TD
     Z1 --> S["sccz80 -ext=opt"]
     Z2 --> P["80cc -fomit-frame-pointer"]
     Z2 --> F["80cc -fframe-pointer if allowed"]
-    S --> CS["copt z80rules.* -compiler=sccz80"]
+    S --> CS["copt sccz80_rules.* -compiler=sccz80"]
     P --> CP["copt 80cc_rules.1 -compiler=80cc"]
     F --> CF["copt 80cc_rules.1 -compiler=80cc"]
     CS --> M["z88dk-zcc-multi"]
@@ -486,7 +486,7 @@ The link defines MUST be `-D__SCCZ80 -D__80CC -D__COMPILER_MULTI`.
 
 Each variant MUST run `apply_copt_rules()` with the matching set.
 
-sccz80 uses `c_coptrules9` plus the `-O` set from `z80rules.2`, `z80rules.1`, and `z80rules.0`.
+sccz80 uses `c_coptrules9` plus the `-O` set from `sccz80_rules.2`, `sccz80_rules.1`, and `sccz80_rules.3`.
 
 sccz80 also uses `COPTRULESTARGET`, CPU rules, `COPTRULESINLINE` when set, and user rules.
 
@@ -1705,7 +1705,7 @@ This section records strategies that were considered for how multi picks a body.
 - `src/80cc/adr/0012-frame-pointer-default-by-cpu.md`
 - `src/80cc/main.c` (frame-pointer pin per CPU)
 - `src/80cc/ir_lower.c` (`IS_808x()`, `IS_GBZ80()` refuse IX)
-- `lib/80cc_rules.1`, `lib/z80rules.*`
+- `lib/80cc_rules.1`, `lib/sccz80_rules.*`, `lib/z88dk_intrinsic`
 - `lib/config/alias.inc`
 - `libsrc/l/sccz80/`
 - `libsrc/math/integer/` (small / fast / CPU leaves)

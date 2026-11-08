@@ -88,7 +88,7 @@ Prove the object is current: `z88dk-z80nm lib/clibs/math32_8085.lib | rg 'f32_fs
 | Call-level profile (function enter/leave) | ticks debugger **`profiler`** (needs debug symbols) |
 | Confirm a symbol is **actually linked** | `.map` + `z88dk-z80nm` on `.o` / `.lib` |
 | See codegen / library expansion | `z88dk-dis`, assembler **`-l` listing**, map file refs |
-| Peephole compiler output (sccz80 path) | **`z88dk-copt`** + `lib/z80rules.*` (see §9) |
+| Peephole compiler output (sccz80 path) | **`z88dk-copt`** + `lib/sccz80_rules.*` (see §9) |
 | Correctness of float/int libraries | `test/suites/math` (`make test_*_8085.bin` etc.) |
 | Publishable microbenchmarks | `support/benchmarks/*` + classic `+test` TIMER recipes; matrix scripts under `.agents/scripts/` |
 | A/B “did this patch matter?” | Swap one `.asm`, rebuild lib, **same** `zcc` line, compare ticks **and** `cmp` binaries |
@@ -608,8 +608,8 @@ Hand-written `libsrc/**` is **not** copt'd. Full peephole rules and finalisation
 | Pitfall | Note |
 |---------|------|
 | Reformatting library asm to tabs “so copt can see it” | Wrong pipeline; breaks house style |
-| Assuming `-O2` applies `z80rules.8` | `.8` is inline-ints path, not default `-O2` |
-| Assuming all copy-backs die at `-O3` | Only `l,a`/`a,l` in `.0` unless `.8` is on |
+| Assuming `-O2` applies `sccz80_inline` | `sccz80_inline` is the inline-ints path, not default `-O2` |
+| Assuming all copy-backs die at `-O3` | Only `l,a`/`a,l` in `sccz80_rules.3` unless `sccz80_inline` is on |
 | Inserting labels or `;` comments between pattern lines | Blocks whole-line multi-line matches on compiler output |
 | Using copt output as proof a library edit is unnecessary | Library never sees that pass |
 | Shipping hand asm without a copt-equivalent scan | Required finalisation step above |
@@ -626,7 +626,7 @@ Hand-written `libsrc/**` is **not** copt'd. Full peephole rules and finalisation
   `z88dk-ticks` interactive `hotspot on` usage
 - Classic benchmarks: `support/benchmarks/` in the z88dk tree
 - Math suite: `test/suites/math/` · I/O suite: `test/suites/target_io/`
-- copt rules: `lib/z80rules.{0,1,2,8,9,frame}` · driver wiring: `src/zcc/zcc.c`
+- copt rules: `lib/sccz80_rules.{1,2,3}`, `lib/sccz80_inline`, `lib/z88dk_intrinsic` · driver wiring: `src/zcc/zcc.c`
   (`apply_copt_rules`, `COPTRULES*`)
 
 

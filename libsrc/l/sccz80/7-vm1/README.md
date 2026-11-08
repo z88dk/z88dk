@@ -15,7 +15,7 @@ Every VM1 word instruction reads or writes DE — DCMP, DSUB, LHLX and SHLX all
 do — so each routine here clobbers DE where the common version did not. That
 is affordable because **sccz80 guarantees very little about register state
 across a helper call** unless a copt rule has rewritten the sequence. Checked
-rather than assumed: no rule in `lib/z80rules.*` keeps DE live across `l_gint`
+rather than assumed: no rule in `lib/sccz80_rules.*` keeps DE live across `l_gint`
 (the three that come close all write DE afterwards, with `pop de` or
 `ld de,N`), and the hand-written callers do not either — two of the three are
 commented out, the third is compiler output.

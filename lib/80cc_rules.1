@@ -1316,7 +1316,7 @@
 ;; and nothing reads h between), and the word load's high byte is discarded — so
 ;; read the byte straight into A. HL is fully re-established at the tail, so this
 ;; is context-free safe. Collapses the flag-mask idiom (`zflag & 1` etc.).
-;; %"and|or|xor"3 captures the mnemonic (group 3) — see z80rules.1, which 80cc
+;; %"and|or|xor"3 captures the mnemonic (group 3) — see sccz80_rules.1, which 80cc
 ;; does not thread, so the equivalent fold there never reaches 80cc output.
 %title #W1 byte-global mask re-widen: byte load, drop dead ld h,0 (-3b)
 	%"ld	hl,\(([_0-9][_0-9a-zA-Z+]*)\)"1
@@ -1453,7 +1453,7 @@
 
 ;; Load a double and push it, as one library call. The load leaves the value in
 ;; the accumulator and the push copies it, so the combined helper is the same
-;; sequence: -3b and one call. (sccz80 has this rule in z80rules.1.)
+;; sequence: -3b and one call. (sccz80 has this rule in sccz80_rules.1.)
 %title #DLP dload then dpush -> dldpsh (-3b)
 	call	dload
 	call	dpush

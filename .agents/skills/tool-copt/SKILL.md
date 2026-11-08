@@ -1,7 +1,7 @@
 ---
 name: tool-copt
 description: >
-  z88dk-copt text peephole optimiser: rule files lib/z80rules.*, what zcc applies
+  z88dk-copt text peephole optimiser: rule files lib/sccz80_rules.*, lib/sccz80_inline, and lib/z88dk_intrinsic, what zcc applies
   by -O, and required hand-asm finalisation (library never runs copt). Use when
   writing sccz80 rules, reviewing compiler dumps, or cleaning library asm.
 ---
@@ -18,7 +18,7 @@ improved assembly on **stdout**. `zcc` runs it on **compiler-generated** output
 (sccz80 `.opt` / similar), not on hand-written library sources.
 
 Source and man page: `src/copt/copt.c`, `src/copt/copt.1`. Rule files live under
-`lib/z80rules.*` (plus target/CPU/user extras).
+`lib/sccz80_rules.*`, `lib/sccz80_inline`, and `lib/z88dk_intrinsic` (plus target/CPU/user extras).
 
 ### What agents must remember when writing library asm
 
@@ -63,8 +63,8 @@ run until quiet (capped).
 
 ```bash
 # Rules as argv; source on stdin. -m sets %cpu checks; -D prints firings.
-z88dk-copt -m8085 [-D] lib/z80rules.9 lib/z80rules.2 lib/z80rules.1 \
-  lib/z80rules.0 [lib/z80rules.8] < input.asm > output.asm
+z88dk-copt -m8085 [-D] lib/z88dk_intrinsic lib/sccz80_rules.2 lib/sccz80_rules.1 \
+  lib/sccz80_rules.3 [lib/sccz80_inline] < input.asm > output.asm
 ```
 
 Expect **no change** if you feed space-indented, commented library asm into
@@ -76,38 +76,38 @@ Configured via `COPTEXE` / `COPTRULES*` (defaults in `src/zcc/zcc.c`):
 
 | Peephole `-O` | Rule set (order matters) |
 |--------------:|--------------------------|
-| 0 | `z80rules.9` |
-| 1 | `.9` + `.1` |
-| 2 (common default in target `OPTIONS`) | `.9` + `.2` + `.1` |
-| 3+ | `.9` + `.2` + `.1` + `.0` |
+| 0 | `z88dk_intrinsic` |
+| 1 | `z88dk_intrinsic` + `sccz80_rules.1` |
+| 2 (common default in target `OPTIONS`) | `z88dk_intrinsic` + `sccz80_rules.2` + `sccz80_rules.1` |
+| 3+ | `z88dk_intrinsic` + `sccz80_rules.2` + `sccz80_rules.1` + `sccz80_rules.3` |
 
 Also, when present:
 
 | Config | Role |
 |--------|------|
-| `COPTRULESINLINE` → `z80rules.8` | sccz80 **inline ints** path only (`c_sccz80_inline_ints`); otherwise not loaded |
+| `COPTRULESINLINE` → `sccz80_inline` | sccz80 **inline ints** path only (`c_sccz80_inline_ints`); otherwise not loaded |
 | `COPTRULESTARGET` | Target-specific (e.g. z88) |
 | CPU map rules | CPU-specific if the file exists |
 | `-custom-copt-rules=` | User file |
 
 Other compilers have their own sets (`lib/sdcc/…`, `80cc_rules.1`,
-`clang_rules.1`, …). This section is about the classic **z80rules.*** family.
+`clang_rules.1`, …). This section is about the sccz80 peephole family.
 
 Rough file roles:
 
 | File | Role |
 |------|------|
-| `z80rules.9` | Intrinsics / RST-style substitutions (always first among the numbered set) |
-| `z80rules.2` | Aggressive / higher-O peepholes (includes dead re-load into same dest) |
-| `z80rules.1` | Large main sccz80 peephole set |
-| `z80rules.0` | Extra / lower-priority patterns (linked as `COPTRULES3`) |
-| `z80rules.8` | Inline common sccz80 helpers **and** a few general cleanups |
+| `z88dk_intrinsic` | Intrinsics / RST-style substitutions (always first; also loaded for 80cc) |
+| `sccz80_rules.2` | Peepholes for `-O2` and above (includes dead re-load into same dest) |
+| `sccz80_rules.1` | Large main sccz80 peephole set, from `-O1` |
+| `sccz80_rules.3` | Peepholes for `-O3` and above (linked as `COPTRULES3`) |
+| `sccz80_inline` | Inline common sccz80 helpers **and** a few general cleanups |
 
 ### Rules that matter for register hygiene (codegen lessons)
 
 These teach what **not** to emit in hand-written cores either.
 
-**Copy-back is a no-op** (`z80rules.8` — only if that file is loaded):
+**Copy-back is a no-op** (`sccz80_inline` — only if that file is loaded):
 
 ```asm
 	ld	%1,%2
@@ -119,7 +119,7 @@ These teach what **not** to emit in hand-written cores either.
 Example: `ld b,a` / `ld a,b` → keep only `ld b,a`. On 8085/8080/gbz80 long-div
 prologue this is exactly the redundant high-byte re-load after building BC.
 
-**Register-specific variant** already in `z80rules.0` (always available at `-O3+`):
+**Register-specific variant** already in `sccz80_rules.3` (always available at `-O3+`):
 
 ```asm
 	ld	l,a
@@ -129,9 +129,9 @@ prologue this is exactly the redundant high-byte re-load after building BC.
 ```
 
 Only **L↔A**, not a general B/C/D/E/H rule — so do not assume every copy-back is
-stripped unless `.8` is active or you remove it by hand.
+stripped unless `sccz80_inline` is active or you remove it by hand.
 
-**Dead second load into the same destination** (`z80rules.2`):
+**Dead second load into the same destination** (`sccz80_rules.2`):
 
 ```asm
 	ld	%1,%2
@@ -169,19 +169,19 @@ Hand-written **math16 / math32 / sccz80 runtime** asm is **not** passed through
 `z88dk-copt`. Before calling an edit done (and before staging / TIMER publish):
 
 1. **Scan** the touched hand sources for **copt-equivalent** idioms (semantic
-   matches to `lib/z80rules.{0,1,2,8}`, not mechanical tab reformatting).
+   matches to `lib/sccz80_rules.{1,2,3}` and `lib/sccz80_inline`, not mechanical tab reformatting).
 2. **Apply** safe cleanups in the library file itself. Typical wins:
 
 | Smell | Prefer |
 |-------|--------|
-| `ld r,a` then `ld a,r` (copy-back) | Drop second insn (`z80rules.8` / `.0`) |
+| `ld r,a` then `ld a,r` (copy-back) | Drop second insn (`sccz80_inline` / `sccz80_rules.3`) |
 | `add a,a` / `rla` then `ld e,a` then **`ld a,e`** before next shift/test | Drop `ld a,e` — **A** still holds the value |
 | `ld b,a` then `ld a,b` when A unchanged | Drop `ld a,b` |
 | `push de` / `pop hl` (DE→HL, DE dead) | `ex de,hl` (or `ld h,d` / `ld l,e` if DE must live) |
 | `push hl` / `pop bc` (HL→BC) | synthetic **`ld bc,hl`** |
 | Triple unstack ending `push hl` / `pop bc` / `pop de` / `pop hl` | `ld bc,hl` then two pops |
 | `ld h,0` / `ld l,0` (and DE/BC pairs) | `ld hl,0` / `ld de,0` / `ld bc,0` |
-| Dead second `ld` into same dest | Keep only the last load (`z80rules.2`) |
+| Dead second `ld` into same dest | Keep only the last load (`sccz80_rules.2`) |
 
 3. **Do not** blindly apply `ld a,0` → `xor a`: `ld` **preserves** flags; `xor a`
    **clears C**. Unsafe before `sbc` / `rla` / `rra` that need the prior carry
