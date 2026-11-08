@@ -4,7 +4,7 @@ Read this file at the start of a page edit. Add rows when new commits or pull re
 
 The subject line is a filter. Each "Parsed patch" row below was taken from the diff (`git show` or the pull-request files), not from the commit comment. Procedure: skill `docs-wiki`, heading "Change index".
 
-Index built **2026-10-04**. Added **2026-10-15** through product `origin/master` `2a5638fa37`, then **2026-10-31** through `e0e198e7fa`, then **2026-11-09** through `345d45e220`. Wiki `origin/master` is `ce7c5ad`. `262d364` renamed `CRT_OPEN_MAX` to `CLIB_OPEN_MAX` on `Platform---CPM`. Wiki clone: `/tmp/z88dk.wiki`. Printf pages: `6a20572`. #3040 page split and `draft:imported` removal: `eaa1cb0`. `draft:verified` removal: `811d405`. Earlier page edits `d9ebfaf` and `a7d0299` stay as recorded below. That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts. The 2026-10-31 page sentences are on the wiki as `8ae3d02`. The 2026-11-09 page sentences are on the wiki as `00b8f10` and `ce7c5ad`.
+Index built **2026-10-04**. Added **2026-10-15** through product `origin/master` `2a5638fa37`, then **2026-10-31** through `e0e198e7fa`, then **2026-11-09** through `345d45e220`. Wiki `origin/master` is `c2512eb`. `262d364` renamed `CRT_OPEN_MAX` to `CLIB_OPEN_MAX` on `Platform---CPM`. Wiki clone: `/tmp/z88dk.wiki`. Printf pages: `6a20572`. #3040 page split and `draft:imported` removal: `eaa1cb0`. `draft:verified` removal: `811d405`. Earlier page edits `d9ebfaf` and `a7d0299` stay as recorded below. That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts. The 2026-10-31 page sentences are on the wiki as `8ae3d02`. The 2026-11-09 page sentences are on the wiki as `00b8f10`, `ce7c5ad`, and `c2512eb`.
 
 #3187 merged as `49678ddd96` and #3186 merged as `8ab2e80f99`. Both size and malloc sentences are already on the wiki as `d9ebfaf`. The rows below from closed issues #29, #1881, and #201 are on the wiki as `a7d0299`, pushed to `origin/master`.
 
@@ -157,7 +157,7 @@ The hunk is the fact. Rows that asked for a sentence are on the wiki as `8ae3d02
 
 ## Parsed patches — product commits `e0e198e7fa`..`345d45e220`
 
-Added **2026-11-09**. Product `origin/master` is `345d45e220` (merge of #3266). Wiki `origin/master` is `ce7c5ad`. Read a live page with `git -C /tmp/z88dk.wiki show origin/master:<page>`. The page sentences are on the wiki as `00b8f10` and `ce7c5ad`.
+Added **2026-11-09**. Product `origin/master` is `345d45e220` (merge of #3266). Wiki `origin/master` is `c2512eb`. Read a live page with `git -C /tmp/z88dk.wiki show origin/master:<page>`. The page sentences are on the wiki as `00b8f10`, `ce7c5ad`, and `c2512eb`.
 
 ### Wiki commits `8ae3d02`..`e0950eb`
 
@@ -169,6 +169,7 @@ These commits **are** the wiki text. Do not add a second sentence from the subje
 | `160d282` | Adds the classic checklist. Mode 0 is text 40 by 25. Mode 1 is text 80 by 25. Mode 2 is written as "Graphics 40x25". Hardware joystick is unchecked in this commit. | `Platform---Sharp-MZ2500`. Already the page. `00b8f10` replaces the mode 2 line. |
 | `00b8f10` | Writes the allram and disc sentences, and the mode 2 pixel size. | `Platform---Casio-FP1000` and `Platform---Sharp-MZ2500`. Checked. |
 | `ce7c5ad` | Adds the classic sccz80 and 80cc Dhrystone rows, z80 and 8085. | `Benchmarks`, "Dhrystone 2.1". Checked. |
+| `c2512eb` | Removes the sccz80 frame-pointer help lines. The multi list says sccz80 uses stack locals. | `Tool---sccz80` and `Tool---zcc`. Checked. |
 | `e0950eb` | Checks Hardware joystick. | `Platform---Sharp-MZ2500`. Already the page. Product `267af6f07c` is this check. |
 
 ### Product commits
@@ -188,6 +189,7 @@ These commits **are** the wiki text. Do not add a second sentence from the subje
 | `8ed64442b3` | PHC-20 `CRT_ORG_CODE` moves from `$4000` to `$2000`. The stack is `$2bff`. `$4000` is video RAM. The commit comment says a Takeda `.cas` still cannot be loaded. | `Platform---Unsupported` says the PHC-20 is not a supported machine. It does not quote `$4000`. Do not write a support page from this address change. Do not add the cassette note. |
 | `dbfc894185` | Integer `pow` with the absolute exponent below 2^24 is exponentiation by squaring. Every other exponent uses the APU `PWR` operation. | `math.md` has the `pow` heading and no sentence about the old result. No edit. |
 | `4f6eec2486` (#3205) | zx81bas writes no `DEFB` when the list is empty. | No tool page states the old empty `DEFB`. No edit. |
+| `646efdf1b1` | sccz80 drops `-frameix` and `-frameiy`, and the help header "Framepointer configuration (for debugging)". `-zcc-opt` stays with the code generation options. Locals stay on the stack. A debug build still writes entry points when adb output is on. | `Tool---sccz80`, "Help". The frame-pointer heading and the two flags are removed. `Tool---zcc` multi item 1 says stack locals. Checked `c2512eb`. |
 | `cf8e9dd1da`, `633a14ec26`, `0444094b3b`, merge `345d45e220` (#3266) | Classic Dhrystone 2.1 TIMER scores for sccz80 and 80cc, on z80 and 8085, are in `support/benchmarks/dhrystone21/` (8 Nov 2026). sccz80 z80 is 8366 bytes, 473021519 cycles, 118.26 s, 169.1255 dhry/s, 0.0963 DMIPS. sccz80 8085 is 7972, 385680196, 96.42 s, 207.4257, 0.1181. 80cc z80 is 8159, 284380153, 71.10 s, 281.3136, 0.1601. The Z80 80cc row uses the stack pointer. 80cc 8085 is 7802, 287860112, 71.97 s, 277.9128, 0.1582. `z88dk-new/readme.txt` still says sccz80 cannot compile the newlib port. That line was not retested. | `Benchmarks`, "Dhrystone 2.1". Four rows written. The 8085 speed bold is the 80cc row. The z80 speed bold stays on `Z88DK/SDCC_NEW`. Checked `ce7c5ad`. Do not mark the newlib port as fixed. |
 
 Still open, and still not for the wiki until they merge: #2850, #2162, #2155. Their rows above still apply. #3217, #3218, #3219, and #3266 have merged.
