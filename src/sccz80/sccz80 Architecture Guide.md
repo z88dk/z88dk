@@ -69,11 +69,12 @@ itself the main architectural fact about the codebase:
 | `stmt.c` | 864 | statements: if/while/for/switch/return/block |
 | `declinit.c` | 594 | initialisers |
 | `callfunc.c` | 578 | function call argument marshalling and call emission |
-| `preproc.c` | 352 | preprocessor |
+| `preproc.c` | 363 | directives that remain after ucpp |
 | `error.c` | 195 | diagnostics |
 | `lex.c` | 152 | scanner |
 | `sym.c` | 142 | symbol table primitives |
 | `data.c` | 125 | data/bss section bookkeeping |
+| `cpp_invoke.c` | 93 | spawn `z88dk-ucpp` on a direct compile |
 | `misc.c` | 76 | small helpers |
 | `while.c` | 37 | loop helper |
 | headers | 1,052 | `define.h` 498, `ccdefs.h` 363, `data.h` 78, `codegen.h` 63, `io.h` 48 |
@@ -91,25 +92,30 @@ tree, no per-function IR, and no separate optimisation stage on the C side.
 
 Flow for one translation unit:
 
-1. **`io.c`** owns the input file stack (includes, macro-expanded text), so the
-   scanner always has a single character source.
-2. **`preproc.c`** handles `#define`, `#include`, conditionals and the pragma
-   vocabulary. Macro expansion happens before the scanner sees tokens.
-3. **`lex.c`** produces tokens: identifiers, numbers, strings, punctuators. It is
+1. **`cpp_invoke.c`** starts `z88dk-ucpp` on a direct compile. `--c1mode` reads
+   the file as given. zcc passes `--c1mode` after its own ucpp run, on a normal
+   sccz80 compile and on the sccz80 half of `-compiler=multi`. `-D`, `-U` and
+   `-I` are forwarded. `Z80` and `SMALL_C` are predefined for the preprocessor
+   and for the compiler's own conditionals.
+2. **`io.c`** owns the character source after that. A comment that still reaches
+   the lexer is reported as requiring the external preprocessor.
+3. **`preproc.c`** handles the directives that remain: `#pragma`, `#undef`,
+   `#ifdef` / `#ifndef` / `#else` / `#endif`, and `#` line markers.
+4. **`lex.c`** produces tokens: identifiers, numbers, strings, punctuators. It is
    deliberately thin; most language knowledge lives in the parser.
-4. **`declparse.c`** builds `Type` objects for declarations: base kind, pointer
+5. **`declparse.c`** builds `Type` objects for declarations: base kind, pointer
    depth, arrays, struct fields, function signatures, qualifiers, far pointers,
    bitfields. `declinit.c` handles initialiser lists, which emit data rather than
    code.
-5. **`stmt.c`** dispatches statements. Each statement form immediately calls into
+6. **`stmt.c`** dispatches statements. Each statement form immediately calls into
    codegen for its control flow, using labels allocated from a global counter.
-6. **`expr.c`** holds the expression grammar as a precedence chain of mutually
+7. **`expr.c`** holds the expression grammar as a precedence chain of mutually
    recursive functions — `heir1`, `heir1a`, `heir2`…`heir9`, `heira`, `heirb` —
    plus the integer promotion and conditional-join helpers
    (`arith_integer`, `integer_reg_width`, `widen_primary_to`, `retag_conditional`,
    `join_conditional`). Every binary operator ends up either folded at compile time
    (`const.c`) or emitted as a `binop` function pointer stored in the lvalue.
-7. **`primary.c`** produces the leaves: identifiers, literals, and the operands a
+8. **`primary.c`** produces the leaves: identifiers, literals, and the operands a
    call needs.
 
 The important consequence: **the parser's state is the only state**. There is no
@@ -373,6 +379,23 @@ lib/z88dk_intrinsic                  always   (intrinsics and RST substitution)
   user rules
 ```
 
+`sccz80_rules.1` is the main set. It runs at `-O 1`, and after `sccz80_rules.2`
+at `-O 2` and `-O 3`. `ld a,0` becomes `xor a` in this file. A zero that must
+survive that rewrite is written `ld a,0 ;carry`.
+
+`sccz80_rules.2` runs first at `-O 2` and above. It folds
+`ld hl,0 ;const` / `ld a,0 ;carry` / `rla` / `ld l,a` into the carry shift and
+`ld h,0`. The `;carry` comment keeps the following `xor a` rule from matching.
+
+`sccz80_rules.3` runs last, and only from `-O 3`. On 8085,
+`ld hl,N ;const` / `add hl,sp` / `call l_gint` becomes `call l_gintNsp` for N
+of 2, 3, 4, 5, 6 and 8. The general form becomes `call l_gintsp` on every other
+CPU, vm1 included. The char and long stack folds still exclude vm1 and 8085.
+
+A line that begins with `;` is a pattern. A banner begins with `;;`, so copt
+does not treat it as a rule. A `;` later on an instruction is part of the match.
+That is why `;const` and `;carry` stay on the lines above.
+
 `-O` is the peephole level; `--opt-code-speed` is a different axis entirely and
 lives in the compiler, not in copt. `80cc` uses a different chain
 (`z88dk_intrinsic`, then `80cc_rules.1`, then target/cpu/user), which is why a rule that
@@ -454,7 +477,7 @@ a local fix.
 
 Useful as a triage map for reviewers.
 
-* **`codegen.c` at 6,248 lines with 193 functions and 156 CPU branch sites.** It
+* **`codegen.c` at 6,224 lines with 193 functions and 156 CPU branch sites.** It
   is simultaneously the largest file, the densest conditional logic, and the only
   place instruction legality lives. Almost every historical codegen bug has been a
   missing or over-broad predicate here.
