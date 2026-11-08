@@ -99,6 +99,7 @@ More detailed, but still incomplete changelist:
 - [newlib] __CLIB_OPT_MALLOC selects a spare-tail malloc search (0 keeps the small walker)
 - [newlib] a routine that assigns IX saves it and restores it
 - [newlib] library products install under lib/clibs/sccz80/ and lib/clibs/sdcc_ix/
+- [sccz80] Improved C90 compliance & peephole update
 - [z80asm] #define now supported as alias for defc
 - [z80asm] Bug fixes
 - [z80asm] the map names the bank of __section_head, __section_tail, and __section_size
