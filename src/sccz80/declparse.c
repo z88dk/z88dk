@@ -187,6 +187,47 @@ Type *find_tag_field(Type *tag, const char *fieldname)
     return NULL;
 }
 
+/* A member such as `struct node *next`, parsed while `node` is still open,
+   keeps the incomplete size (-1). Completing the tag updates the tag only.
+   Publish the real size into the types that already point at it. */
+static void publish_one(Type *node, Type *tag, int depth)
+{
+    size_t i;
+
+    if (node == NULL || node == tag || depth > 64)
+        return;
+    if (node->kind == KIND_STRUCT && node->tag == tag)
+        node->size = tag->size;
+    publish_one(node->ptr, tag, depth + 1);
+    publish_one(node->return_type, tag, depth + 1);
+    if (node->kind == KIND_ARRAY && node->len > 0 && node->ptr &&
+        node->ptr->kind == KIND_STRUCT && node->ptr->tag == tag)
+        node->size = node->len * tag->size;
+    if (node->parameters == NULL)
+        return;
+    for (i = 0; i < array_len(node->parameters); i++)
+        publish_one(array_get_byindex(node->parameters, i), tag, depth + 1);
+}
+
+static void publish_struct_size(Type *tag)
+{
+    Type *t;
+    SYMBOL *sym;
+
+    for (t = tag_hash; t != NULL; t = t->hh.next) {
+        size_t i;
+
+        if (t->fields == NULL)
+            continue;
+        for (i = 0; i < array_len(t->fields); i++)
+            publish_one(array_get_byindex(t->fields, i), tag, 0);
+    }
+    for (sym = symtab; sym != NULL; sym = sym->hh.next)
+        publish_one(sym->ctype, tag, 0);
+    for (sym = STARTLOC; sym < locptr; sym++)
+        publish_one(sym->ctype, tag, 0);
+}
+
 
 
 
@@ -483,6 +524,7 @@ Type *parse_struct(Type *type, char isstruct)
         }
         str->size = size;  // It's now defined
         str->weak = 0;
+        publish_struct_size(str);
         debug_write_type(str);
     }
     // TODO: Only pointers to weak structures are valid
