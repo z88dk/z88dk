@@ -1,3 +1,5 @@
+;; sccz80 peepholes for -O1. At -O2 and -O3 this file runs after sccz80_rules.2 and before sccz80_rules.3.
+
 	ld	a,0
 =
 	xor	a
@@ -230,7 +232,7 @@
 	jp	z,%2	;%4
 .%1
 =
-	jp	z,%4	;%4
+	jp	z,%2	;%4
 .%1
 
 	jp	z,%1	;%3
@@ -252,13 +254,6 @@
 .%1
 =
 	call	z,%2
-.%1
-
-	jp	z,%1	;%3
-	jp	%2	;%4
-.%1
-=
-	jp	nz,%2	;%4
 .%1
 
 	ld	hl,%1	;const
@@ -551,11 +546,6 @@
 	add	hl,sp
 	ld	sp,hl
 	exx
-
-	ld	de,%1
-	pop	de
-=
-	pop	de
 
 	call	l_int2long_s
 	pop	de
@@ -944,13 +934,6 @@
 	ex	de,hl
 	ld	hl,(_%1
 
-	pop	hl
-	push	hl
-	ex	de,hl
-=
-	pop	de
-	push	de
-
 	ld	hl,0	;const
 	add	hl,sp
 	ld	a,(hl)
@@ -1109,15 +1092,6 @@
 	pop	de
 	ld	(de),a
 	ld	hl,%1
-
-	pop	de
-	ld	(de),a
-	ld	h,0
-	ld	hl,%1	;const
-=
-	pop	de
-	ld	(de),a
-	ld	hl,%1	;const
 
 	pop	de
 	ld	(de),a
@@ -1296,11 +1270,9 @@
 	push	hl
 .%1
 
-; Rules for optimizing the tail of if statements (valid for && and || )
-; These are only valid if we don't try to set a variable to the logical result, if
-; we do then it's a tad pointless and you'll suffer!!! <cackle?
-=
-;
+;; Rules for optimizing the tail of if statements (valid for && and || )
+;; These are only valid if we don't try to set a variable to the logical result, if
+;; we do then it's a tad pointless and you'll suffer!!! <cackle?
 
 	ld	de,%1	;const
 	ld	(hl),e
@@ -1880,10 +1852,8 @@
 	jp	%4	;%6
 .%2
 
-; These next few rules deal with optimizing for testing a
-; signed int for being < 0, we end up with saving of 7 bytes
-=
-;
+;; These next few rules deal with optimizing for testing a
+;; signed int for being < 0, we end up with saving of 7 bytes
 
 %notcpu 8080
 %notcpu vm1
@@ -2166,30 +2136,32 @@
 	ld	hl,%4
 
 %title Optimise int <= 0
-	jr	c,ASMPC+6
+	jr	c,%1
 	or	l
-	jr	nz,ASMPC+3
+	jr	nz,%1
 	scf
-	jp	c,%1	;%2
+	.%1
+	jp	c,%2	;%3
 =
-	jp	c,%1
+	jp	c,%2
 	or	l
-	jp	z,%1
+	jp	z,%2
 
 %title Optimise long <= 0
-	jr	c,ASMPC+8
+	jr	c,%1
 	or	e
 	or	h
 	or	l
-	jr	nz,ASMPC+3
+	jr	nz,%1
 	scf
-	jp	c,%1	;%2
+	.%1
+	jp	c,%2	;%3
 =
-	jp	c,%1
+	jp	c,%2
 	or	e
 	or	h
 	or	l
-	jp	z,%1
+	jp	z,%2
 
 	jr	z,ASMPC+3
 	scf
@@ -2480,13 +2452,6 @@
 	jp	%1	;%5
 .%3
 
-	jp	z,%1	;%5
-	jp	%2	;%6
-.%1
-=
-	jp	nz,%2	;%6
-.%1
-
 	jp	%1	;%5
 .%2
 .%1
@@ -2718,14 +2683,6 @@
 	call	l_sxt
 =
 	ld	hl,%1	;const
-
-%notcpu gbz80
-	push	hl
-	ld	hl,%1
-	pop	de
-=
-	ex	de,hl
-	ld	hl,%1
 
 	ld	hl,%1	;const
 	ld	a,l
@@ -4943,12 +4900,6 @@
 =
 	ld	hl,0	;const
 
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	hl,%2	;const
-=
-	ld	hl,%2	;const
-
 	ld	a,(hl)
 	and	0
 	ld	l,a
@@ -5272,11 +5223,6 @@
 	jp	z,%1	;%4
 	pop	hl
 
-	jp	i_%1	;%4
-	jp	i_%3	;%5
-=
-	jp	i_%1	;%4
-
 	ld	hl,%1	;const
 	call	l_gintspsp	;%2
 	ld	hl,%3	;const
@@ -5331,9 +5277,7 @@
 	ld	l,a
 	ld	h,0
 
-; Try to eliminate dead loads
-=
-; XXXX
+;; Try to eliminate dead loads
 
 	inc	%"h|l"2
 	jp	%1	;EOS
@@ -5390,9 +5334,7 @@
 	ld	bc,_%1
 	ld	hl,%2
 
-; bit fields
-=
-;
+;; bit fields
 
 	ld	de,%2	;const
 	ex	de,hl
@@ -5543,9 +5485,7 @@
 	jp	%2z,%3
 	ld	hl,%4
 
-; Char operators
-=
-;
+;; Char operators
 
 	ld	l,a
 	pop	de
@@ -5573,9 +5513,7 @@
 	jp	%2z,%3	;%4
 	ld	hl,%5
 
-; Char constant comparisons
-=
-;
+;; Char constant comparisons
 
 	ld	l,(hl)
 	ld	h,0
@@ -5673,9 +5611,7 @@
 	ld	(de),a
 	jp	%2	;EOS
 
-; long logical operations
-=
-;
+;; long logical operations
 
 	call	l_glong
 	ld	a,l
@@ -5693,9 +5629,7 @@
 	and	%2
 	jp	%1	;%4
 
-; 16 bit port operations
-=
-;
+;; 16 bit port operations
 
 %title 16 bit out, remove redundant hl load
 	ld	hl,%1	;const
@@ -5710,9 +5644,7 @@
 	ld	hl,%3
 
 
-; Use stack less when we can
-=
-;
+;; Use stack less when we can
 
 %title Stack load bypass push/pop cycle
 	ld	e,(hl)
@@ -5733,9 +5665,7 @@
 	ld	l,(hl)
 	ld	h,0
 
-; Odd constructs observed in ping
-=
-;
+;; Odd constructs observed in ping
 
 %title Replace uint16_t global or with uint8_t -> de
 	ld	hl,(_%1)
@@ -7029,7 +6959,7 @@
 =
 	ret	%%2
 
-%title Moved from z80rules.0, structure setting
+%title Moved from sccz80_rules.3, structure setting
 %check 0 <= %1 <= 65535
 %check 0 <= %3 <= 65535
 	pop	hl
@@ -7054,7 +6984,7 @@
 	ld	bc,%eval(%3 %1 - 1 -)
 	add	hl,bc
 
-%title Moved from z80rules.0, structure setting
+%title Moved from sccz80_rules.3, structure setting
 %check 0 <= %1 <= 65535
 %check 0 <= %3 <= 65535
 	pop	hl
@@ -7075,7 +7005,7 @@
 	ld	bc,%eval(%3 %1 -)
 	add	hl,bc
 
-%title moved from z80rules.0 inc/dec
+%title moved from sccz80_rules.3 inc/dec
 %notcpu gbz80
 	ld	hl,_%1
 	push	hl
@@ -7088,7 +7018,7 @@
 	%3c	hl
 	ld	(_%1),hl
 
-%title Moved from z80rules.0 static uint8_t inc/dec
+%title Moved from sccz80_rules.3 static uint8_t inc/dec
 	ld	hl,(_%1)
 	ld	h,0
 	%2c	hl
@@ -7100,14 +7030,7 @@
 	%2c	hl
 	ld	hl,%3
 
-%title Moved from z80rules.0, redundant uint8 load
-	ld	l,(hl)
-	ld	h,0
-	ld	hl,%1
-=
-	ld	hl,%1
-
-%title Moved from z80rules.0 optimise 8 bit increment
+%title Moved from sccz80_rules.3 optimise 8 bit increment
 	ld	hl,(%1)
 	ld	h,0
 	%3c	hl

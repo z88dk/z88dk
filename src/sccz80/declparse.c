@@ -187,6 +187,47 @@ Type *find_tag_field(Type *tag, const char *fieldname)
     return NULL;
 }
 
+/* A member such as `struct node *next`, parsed while `node` is still open,
+   keeps the incomplete size (-1). Completing the tag updates the tag only.
+   Publish the real size into the types that already point at it. */
+static void publish_one(Type *node, Type *tag, int depth)
+{
+    size_t i;
+
+    if (node == NULL || node == tag || depth > 64)
+        return;
+    if (node->kind == KIND_STRUCT && node->tag == tag)
+        node->size = tag->size;
+    publish_one(node->ptr, tag, depth + 1);
+    publish_one(node->return_type, tag, depth + 1);
+    if (node->kind == KIND_ARRAY && node->len > 0 && node->ptr &&
+        node->ptr->kind == KIND_STRUCT && node->ptr->tag == tag)
+        node->size = node->len * tag->size;
+    if (node->parameters == NULL)
+        return;
+    for (i = 0; i < array_len(node->parameters); i++)
+        publish_one(array_get_byindex(node->parameters, i), tag, depth + 1);
+}
+
+static void publish_struct_size(Type *tag)
+{
+    Type *t;
+    SYMBOL *sym;
+
+    for (t = tag_hash; t != NULL; t = t->hh.next) {
+        size_t i;
+
+        if (t->fields == NULL)
+            continue;
+        for (i = 0; i < array_len(t->fields); i++)
+            publish_one(array_get_byindex(t->fields, i), tag, 0);
+    }
+    for (sym = symtab; sym != NULL; sym = sym->hh.next)
+        publish_one(sym->ctype, tag, 0);
+    for (sym = STARTLOC; sym < locptr; sym++)
+        publish_one(sym->ctype, tag, 0);
+}
+
 
 
 
@@ -483,6 +524,7 @@ Type *parse_struct(Type *type, char isstruct)
         }
         str->size = size;  // It's now defined
         str->weak = 0;
+        publish_struct_size(str);
         debug_write_type(str);
     }
     // TODO: Only pointers to weak structures are valid
@@ -501,9 +543,11 @@ static int chase_typedef(Type *type)
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
         if (ptr->storage == TYPDEF && amatch(ptr->name)) {
             char wasconst = type->isconst;
+            char wasvolatile = type->isvolatile;
             /* So we've identified it, we should copy it */
             *type = *ptr->ctype;
             type->isconst |= wasconst;
+            type->isvolatile |= wasvolatile;
             if ( type->tag && type->size == -1) 
                 type->size = type->tag->size;
             return 0;
@@ -738,8 +782,6 @@ static void parse_trailing_modifiers(Type *type)
                 }
             }
             needchar(')');
-        } else if ( amatch("__z88dk_shortcall_hl")) {
-            type->flags |= SHORTCALL_HL;
         } else if (amatch("__preserves_regs")) {
             int c;
             needchar('(');
@@ -1035,7 +1077,34 @@ int declare_local(int local_static)
             if ( cmatch('=')) {
                 sym->isassigned = 1;
                 sym->initialised = 1;
-                if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
+                if ( type->kind == KIND_STRUCT && rcmatch('{') == 0 ) {
+                    /* struct S s = t;  Copy the object, as s = t does.
+                       heir1 leaves the source address in the staging buffer. */
+                    Type *expr_type = NULL;
+                    int vconst;
+                    zdouble val;
+                    LVALUE dest = {0};
+                    char *before, *start;
+
+                    Zsp = modstk(Zsp - declared, KIND_NONE, NO, YES);
+                    declared = 0;
+                    getloc(sym, 0);
+                    zpush();
+                    setstage(&before, &start);
+                    expression(&vconst, &val, &expr_type);
+                    clearstage(before, start);
+                    dest.ltype = type;
+                    dest.symbol = sym;
+                    dest.indirect_kind = KIND_STRUCT;
+                    dest.val_type = KIND_STRUCT;
+                    if ( expr_type && expr_type->kind == KIND_STRUCT &&
+                         (type->tag == NULL || expr_type->tag == NULL || type->tag == expr_type->tag) ) {
+                        putstk(&dest);
+                    } else {
+                        errorfmt("Cannot assign to aggregate", 0);
+                        zpop();
+                    }
+                } else if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
                     // Call static initialiser and copy onto stack
                     char newname[NAMESIZE * 2 + 20];
 
@@ -1576,14 +1645,6 @@ void flags_describe(Type *type, int32_t flags, UT_string *output)
         utstring_printf(output,"__z88dk_hl_call(%d,%d) ", type->funcattrs.hlcall_module, type->funcattrs.hlcall_addr);
     }
 
-    if ( flags & HL_CALL ) {
-        utstring_printf(output,"__z88dk_hl_call(%d,%d) ", type->funcattrs.hlcall_module, type->funcattrs.hlcall_addr);
-    }
-
-    if ( flags & SHORTCALL_HL ) {
-        utstring_printf(output,"__z88dk_shortcall_hl ");
-    }
-
     if ( flags & NONBANKED ) {
         utstring_printf(output,"__nonbanked ");
     }
@@ -1908,7 +1969,7 @@ static void declfunc(Type *functype, enum storage_type storage)
         * to each function
         */
 
-    if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
+    if ( (c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
             (currfn->flags & NAKED) == 0)
         where += 2;
 
@@ -2044,8 +2105,11 @@ static void declfunc(Type *functype, enum storage_type storage)
             int     i;
 
             if ( ptr ) {
-                ptr->offset.i = -get_parameter_size(functype,fastarg); 
-                where += 2;
+                ptr->offset.i = -get_parameter_size(functype,fastarg);
+                /* The parameter loop already counted this argument, but the
+                   caller left it in registers. modstk releases the prologue
+                   push before callee cleanup, so it is not part of stackargs. */
+                where -= get_parameter_size(functype, fastarg);
             } else {
                 errorfmt("Something has gone very wrong, can't find parameter <%s>\n",1,fastarg->name);
             }

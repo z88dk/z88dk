@@ -162,6 +162,31 @@ void test_rshift16_const(void)
 //     Assert( val >> 17 == (int)0x8000 >> 17, ">>17"); // Undefined
 }
 
+void test_rshift16_const_unsigned(void)
+{
+     unsigned val;
+
+     val = 0x8000u;
+     Assert( val >> 9 == 64, "8000>>9");
+     Assert( val >> 10 == 32, "8000>>10");
+     Assert( val >> 11 == 16, "8000>>11");
+     Assert( val >> 12 == 8, "8000>>12");
+     Assert( val >> 13 == 4, "8000>>13");
+     Assert( val >> 14 == 2, "8000>>14");
+     val = 0xffffu;
+     Assert( val >> 9 == 127, "ffff>>9");
+     Assert( val >> 10 == 63, "ffff>>10");
+     Assert( val >> 11 == 31, "ffff>>11");
+     Assert( val >> 12 == 15, "ffff>>12");
+     Assert( val >> 13 == 7, "ffff>>13");
+     Assert( val >> 14 == 3, "ffff>>14");
+     val = 0xabcdu;
+     Assert( val >> 9 == 85, "abcd>>9");
+     Assert( val >> 14 == 2, "abcd>>14");
+     val = 1;
+     Assert( val >> 9 == 0, "1>>9");
+}
+
 void test_rshift32_const(void)
 {
      long val = 0x80000000;
@@ -543,6 +568,7 @@ int suite_rshift()
     suite_add_test(test_rshift32_const_unsigned);
     suite_add_test(test_rshift32_var);
     suite_add_test(test_rshift16_const);
+    suite_add_test(test_rshift16_const_unsigned);
     suite_add_test(test_rshift16_var);
     suite_add_test(test_rshift8_const);
 

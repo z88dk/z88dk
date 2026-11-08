@@ -94,10 +94,21 @@ void vinline(void)
         ++lineno; 
 
         if (k <= 0) {
-            fclose(unit);
-            if (inpt2 != NULL)
+            if (inpt2 != NULL) {
+                fclose(unit);
                 endinclude();
-            else {
+            } else {
+                /* A spawned preprocessor is a pipe. fclose would drop
+                   the child without its status, so a failed ucpp could
+                   compile as an empty success. */
+                if (input_is_pipe) {
+                    if (cpp_close(input) != 0) {
+                        fprintf(stderr, "Preprocessor failed for %s\n", Filename);
+                        errcnt++;
+                    }
+                } else {
+                    fclose(input);
+                }
                 input = 0;
                 eof = 1;
             }

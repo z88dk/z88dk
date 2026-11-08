@@ -37,7 +37,7 @@ char Filenorig[FILENAME_LEN + 1];
 
 
 int c_notaltreg; /* No alternate registers */
-int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
+int c_standard_escapecodes = 0; /* \n = 13, \r = 10; consoles treat CR as newline */
 int c_disable_builtins = 0;
 int c_cline_directive = 0;
 int c_cpu = CPU_Z80;
@@ -81,6 +81,7 @@ static void openout(void);
 static void SetWarning(option *arg, char* val);
 static void SetDefine(option *arg, char *val);
 static void SetUndefine(option *arg, char *val);
+static void SetIncludePath(option *arg, char *val);
 static void DispInfo(option *arg, char *val);
 static void opt_code_speed(option *arg, char* val);
 static void atexit_deallocate(void);
@@ -140,9 +141,6 @@ static option  sccz80_opts[] = {
     { 0, "initseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the initialisation section name", &c_init_section, NULL, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, NULL, 0 },
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "Optimise for speed not size", NULL, opt_code_speed, 0},
-    { 0, "", OPT_HEADER, "Framepointer configuration (for debugging):", NULL, NULL, 0 },
-    { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, NULL, 1},
-    { 0, "frameiy", OPT_ASSIGN|OPT_INT, "Use iy as the frame pointer", &c_framepointer_is_ix, NULL, 0},
     { 0, "zcc-opt", OPT_STRING, "Location for zcc_opt.def", &c_zcc_opt, NULL, (intptr_t)(void *)"zcc_opt.def"},
 
     { 0, "", OPT_HEADER, "Error/warning handling:", NULL, NULL, 0 },
@@ -162,6 +160,9 @@ static option  sccz80_opts[] = {
     { 0, "ext", OPT_STRING, "=<ext> Set the file extension for the generated output", &c_output_extension, NULL, 0 },
     { 0, "D", OPT_FUNCTION, "Define a preprocessor directive", NULL, SetDefine, 0 },
     { 0, "U", OPT_FUNCTION, "Undefine a preprocessor directive", NULL, SetUndefine, 0 },
+    { 0, "I", OPT_FUNCTION, "Add an include path (forwarded to the preprocessor)", NULL, SetIncludePath, 0 },
+    { 0, "c1mode", OPT_BOOL|OPT_DOUBLE_DASH, "Input is already preprocessed; skip the internal ucpp invocation", &c_c1mode, NULL, 0 },
+    { 0, "cpp", OPT_STRING|OPT_DOUBLE_DASH, "=<path> Override the preprocessor binary (default z88dk-ucpp)", &c_cpp_exe, NULL, 0 },
     { 0, "", OPT_HEADER, "Assignments can either be = or as next argument", NULL, NULL, 0},
     { 0 }
 };
@@ -184,8 +185,7 @@ int main(int argc, char** argv)
     gargv = argv;
 
     /* allocate space for arrays */
-    litq = MALLOC(FNLITQ); /* literals, these 2 dumped end */
-    dubq = MALLOC(FNLITQ); /* Doubles */
+    litq = MALLOC(FNLITQ); /* literals, dumped at the end */
     tempq = MALLOC(LITABSZ); /* Temp strings... */
     glbq = MALLOC(LITABSZ); /* Used for glb lits, dumped now */
     symtab = NULL;
@@ -235,7 +235,6 @@ int main(int argc, char** argv)
     c_double_strings = 0;
     c_notaltreg = NO;
     debuglevel = NO;
-    c_framepointer_is_ix = -1;
     c_use_r2l_calling_convention = NO;
 
     setup_sym(); /* define some symbols */
@@ -285,9 +284,7 @@ int main(int argc, char** argv)
 
     if ( c_debug_adb_file || c_debug_adb_defc ) {
         c_cline_directive = 1;
-        if ( c_framepointer_is_ix == -1 ) {
-            c_debug_entry_points = 1;
-        }
+        c_debug_entry_points = 1;
     }
 
 
@@ -356,8 +353,13 @@ void ccabort(void)
 {
     if (inpt2 != NULL)
         endinclude();
-    if (input != NULL)
-        fclose(input);
+    if (input != NULL) {
+        if (input_is_pipe)
+            cpp_close(input);
+        else
+            fclose(input);
+        input = NULL;
+    }
     closeout();
     fprintf(stderr, "Compilation aborted\n");
     exit(1);
@@ -450,6 +452,11 @@ void setup_sym(void)
 {
     defmac("Z80");
     defmac("SMALL_C");
+    /* ucpp owns #ifdef on a direct compile. These two are the macros
+       this compiler has always predefined; user -D/-U are appended
+       after them. */
+    cpp_add_arg("-DZ80");
+    cpp_add_arg("-DSMALL_C");
 
     addglb("asm", asm_function("asm"), 0, KIND_LONG, 0, LSTATIC);
     addglb("__asm__", asm_function("__asm__"), 0, KIND_LONG, 0, LSTATIC);
@@ -847,21 +854,33 @@ void openin(void)
                 info();
             exit(1);
         }
-        if ((input = fopen(Filename, "r")) == NULL) {
-            fprintf(stderr, "Can't open: %s\n", Filename);
-            exit(1);
+        /* A raw .c file is read through z88dk-ucpp. --c1mode is the
+           zcc path: the driver already ran ucpp, so open the file. */
+        if (c_c1mode) {
+            if ((input = fopen(Filename, "r")) == NULL) {
+                fprintf(stderr, "Can't open: %s\n", Filename);
+                exit(1);
+            }
+            input_is_pipe = 0;
         } else {
+            input = cpp_open(c_cpp_exe, Filename);
+            if (input == NULL)
+                exit(1);
+            input_is_pipe = 1;
+        }
+        {
             unsigned char bombuf[4];
             unsigned char utf8bom[] = { 0xef, 0xbb, 0xbf };
             if (c_verbose)
                 fprintf(stderr, "Compiling: %s\n", Filename);
             ncomp++;
-            // (void) ! to suppress warn unused result
-            (void) !fread(bombuf, sizeof(char), 3, input);
-            if ( memcmp(bombuf, utf8bom, 3) ) {
-                rewind(input);
+            /* ucpp does not emit a BOM. rewind is not valid on a pipe. */
+            if (!input_is_pipe) {
+                (void) !fread(bombuf, sizeof(char), 3, input);
+                if ( memcmp(bombuf, utf8bom, 3) ) {
+                    rewind(input);
+                }
             }
-            
             newfile();
         }
     }
@@ -991,13 +1010,27 @@ static void opt_code_speed(option *arg, char* val)
 
 void SetDefine(option *arg, char* val)
 {
+    char buf[512];
+    snprintf(buf, sizeof(buf), "-D%s", val);
+    cpp_add_arg(buf);
+    /* Still recorded for --c1mode, where this compiler's own #ifdef runs. */
     defmac(val);
 }
 
 void SetUndefine(option *arg, char* val)
 {
+    char buf[512];
+    snprintf(buf, sizeof(buf), "-U%s", val);
+    cpp_add_arg(buf);
     strcpy(line, val);
     delmac();
+}
+
+void SetIncludePath(option *arg, char *val)
+{
+    char buf[1024];
+    snprintf(buf, sizeof(buf), "-I%s", val);
+    cpp_add_arg(buf);
 }
 
 
@@ -1033,7 +1066,6 @@ void DispVersion(char* arg)
 void atexit_deallocate(void)
 {
     FREENULL(litq);
-    FREENULL(dubq);
     FREENULL(tempq);
     FREENULL(glbq);
     FREENULL(loctab);
@@ -1041,6 +1073,7 @@ void atexit_deallocate(void)
 //    FREENULL(swnext);
     FREENULL(stage);
     FREENULL(gotoq);
+    free_section_names();
 }
 
 void* mymalloc(size_t size)

@@ -25,8 +25,8 @@ extern void col(void);
 extern void ol(char *ptr);
 extern void ot(char *ptr);
 extern void blanks(void);
-extern void outdec(long number);
-extern void outd2(long n);
+extern void outdec(int64_t number);
+extern void outd2(uint64_t n);
 extern void queuelabel(int);
 
 typedef struct t_buffer_s t_buffer;

@@ -1,3 +1,5 @@
+;; Inline common sccz80 helpers. Loaded only for --opt-code-speed=inlineints or all.
+
 ; Optimisation file for inlining some very common sccz80 operations
 ; Inlines a couple of common operations
 ; l_gint rule saves 27T at the cost of 1 byte

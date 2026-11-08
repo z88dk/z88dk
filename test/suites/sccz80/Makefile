@@ -7,16 +7,16 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 # --opt-code-speed is an sccz80-only knob; 80cc (and other compilers) reject it.
 OPT_CODE_SPEED := $(if $(filter sccz80,$(COMPILER)),-Cc--opt-code-speed=all)
 
-TARGET_Z80N = test_z80n_rshift.bin test_z80n_lshift.bin
-TARGET_8080 = test_8080_bitfields.bin test_8080_rshift.bin test_8080_lshift.bin test_8080_compare.bin test_8080_compare0.bin test_8080_compare_const.bin test_8080_compare_mconst.bin test_8080_compare_castconst.bin test_8080_mult.bin test_8080_division.bin test_8080_bitwise.bin
-TARGET_8085 = test_8085_bitfields.bin test_8085_rshift.bin test_8085_lshift.bin test_8085_compare.bin test_8085_compare0.bin test_8085_compare_const.bin test_8085_compare_mconst.bin test_8085_compare_castconst.bin test_8085_mult.bin test_8085_division.bin test_8085_bitwise.bin
-TARGET_VM1 = test_vm1_bitfields.bin test_vm1_rshift.bin test_vm1_lshift.bin test_vm1_compare.bin test_vm1_compare0.bin test_vm1_compare_const.bin test_vm1_compare_mconst.bin test_vm1_compare_castconst.bin test_vm1_mult.bin test_vm1_division.bin test_vm1_bitwise.bin
-TARGET_GBZ80 = test_gbz80_rshift.bin test_gbz80_lshift.bin test_gbz80_compare.bin test_gbz80_compare0.bin test_gbz80_compare_const.bin test_gbz80_compare_mconst.bin test_gbz80_compare_castconst.bin test_gbz80_mult.bin test_gbz80_division.bin test_gbz80_bitfields.bin test_gbz80_bitwise.bin test_gbz80_uminus.bin test_gbz80_loops.bin
-TARGET_R2KA = test_r2ka_bitfields.bin test_r2ka_rshift.bin test_r2ka_lshift.bin test_r2ka_compare.bin test_r2ka_compare0.bin test_r2ka_compare_const.bin test_r2ka_compare_mconst.bin test_r2ka_compare_castconst.bin test_r2ka_mult.bin test_r2ka_division.bin test_r2ka_bitwise.bin
-TARGET_R4K = test_r4k_bitfields.bin test_r4k_rshift.bin test_r4k_lshift.bin test_r4k_compare.bin test_r4k_compare0.bin test_r4k_compare_const.bin test_r4k_compare_mconst.bin test_r4k_compare_castconst.bin test_r4k_mult.bin test_r4k_division.bin test_r4k_bitwise.bin
-TARGET_R6K = test_r6k_bitfields.bin test_r6k_rshift.bin test_r6k_lshift.bin test_r6k_compare.bin test_r6k_compare0.bin test_r6k_compare_const.bin test_r6k_compare_mconst.bin test_r6k_compare_castconst.bin test_r6k_mult.bin test_r6k_division.bin test_r6k_bitwise.bin
-TARGET_RC2014 = test_rc2014_rshift_CODE.bin test_rc2014_lshift_CODE.bin test_rc2014_compare_CODE.bin test_rc2014_compare0_CODE.bin test_rc2014_compare_const_CODE.bin test_rc2014_compare_mconst_CODE.bin test_rc2014_compare_castconst_CODE.bin test_rc2014_mult_CODE.bin test_rc2014_division_CODE.bin test_rc2014_bitfields_CODE.bin test_rc2014_bitwise_CODE.bin test_rc2014_uminus_CODE.bin test_rc2014_loops_CODE.bin
-TARGET_KC160 = test_kc160_bitfields.bin test_kc160_rshift.bin test_kc160_lshift.bin test_kc160_compare.bin test_kc160_compare0.bin test_kc160_compare_const.bin test_kc160_compare_mconst.bin test_kc160_compare_castconst.bin test_kc160_mult.bin test_kc160_division.bin test_kc160_bitwise.bin
+TARGET_Z80N = test_z80n_rshift.bin test_z80n_lshift.bin test_z80n_selfstruct.bin
+TARGET_8080 = test_8080_bitfields.bin test_8080_rshift.bin test_8080_lshift.bin test_8080_compare.bin test_8080_compare0.bin test_8080_compare_const.bin test_8080_compare_mconst.bin test_8080_compare_castconst.bin test_8080_signcmp.bin test_8080_ptrinc.bin test_8080_mult.bin test_8080_division.bin test_8080_bitwise.bin test_8080_selfstruct.bin
+TARGET_8085 = test_8085_bitfields.bin test_8085_rshift.bin test_8085_lshift.bin test_8085_compare.bin test_8085_compare0.bin test_8085_compare_const.bin test_8085_compare_mconst.bin test_8085_compare_castconst.bin test_8085_signcmp.bin test_8085_ptrinc.bin test_8085_mult.bin test_8085_division.bin test_8085_bitwise.bin test_8085_selfstruct.bin
+TARGET_VM1 = test_vm1_bitfields.bin test_vm1_rshift.bin test_vm1_lshift.bin test_vm1_compare.bin test_vm1_compare0.bin test_vm1_compare_const.bin test_vm1_compare_mconst.bin test_vm1_compare_castconst.bin test_vm1_signcmp.bin test_vm1_ptrinc.bin test_vm1_mult.bin test_vm1_division.bin test_vm1_bitwise.bin test_vm1_selfstruct.bin
+TARGET_GBZ80 = test_gbz80_rshift.bin test_gbz80_lshift.bin test_gbz80_compare.bin test_gbz80_compare0.bin test_gbz80_compare_const.bin test_gbz80_compare_mconst.bin test_gbz80_compare_castconst.bin test_gbz80_signcmp.bin test_gbz80_ptrinc.bin test_gbz80_mult.bin test_gbz80_division.bin test_gbz80_bitfields.bin test_gbz80_bitwise.bin test_gbz80_uminus.bin test_gbz80_loops.bin test_gbz80_selfstruct.bin
+TARGET_R2KA = test_r2ka_bitfields.bin test_r2ka_rshift.bin test_r2ka_lshift.bin test_r2ka_compare.bin test_r2ka_compare0.bin test_r2ka_compare_const.bin test_r2ka_compare_mconst.bin test_r2ka_compare_castconst.bin test_r2ka_mult.bin test_r2ka_division.bin test_r2ka_bitwise.bin test_r2ka_selfstruct.bin
+TARGET_R4K = test_r4k_bitfields.bin test_r4k_rshift.bin test_r4k_lshift.bin test_r4k_compare.bin test_r4k_compare0.bin test_r4k_compare_const.bin test_r4k_compare_mconst.bin test_r4k_compare_castconst.bin test_r4k_mult.bin test_r4k_division.bin test_r4k_bitwise.bin test_r4k_selfstruct.bin
+TARGET_R6K = test_r6k_bitfields.bin test_r6k_rshift.bin test_r6k_lshift.bin test_r6k_compare.bin test_r6k_compare0.bin test_r6k_compare_const.bin test_r6k_compare_mconst.bin test_r6k_compare_castconst.bin test_r6k_mult.bin test_r6k_division.bin test_r6k_bitwise.bin test_r6k_selfstruct.bin
+TARGET_RC2014 = test_rc2014_rshift_CODE.bin test_rc2014_lshift_CODE.bin test_rc2014_compare_CODE.bin test_rc2014_compare0_CODE.bin test_rc2014_compare_const_CODE.bin test_rc2014_compare_mconst_CODE.bin test_rc2014_compare_castconst_CODE.bin test_rc2014_mult_CODE.bin test_rc2014_division_CODE.bin test_rc2014_bitfields_CODE.bin test_rc2014_bitwise_CODE.bin test_rc2014_uminus_CODE.bin test_rc2014_loops_CODE.bin test_rc2014_selfstruct_CODE.bin
+TARGET_KC160 = test_kc160_bitfields.bin test_kc160_rshift.bin test_kc160_lshift.bin test_kc160_compare.bin test_kc160_compare0.bin test_kc160_compare_const.bin test_kc160_compare_mconst.bin test_kc160_compare_castconst.bin test_kc160_mult.bin test_kc160_division.bin test_kc160_bitwise.bin test_kc160_selfstruct.bin
 
 
 CFILES = $(wildcard *.c)
@@ -27,6 +27,13 @@ CFILES = $(wildcard *.c)
 ifeq ($(filter $(COMPILER),sccz80 80cc),)
 CFILES := $(filter-out constpush.c conv.c,$(CFILES))
 endif
+# calllimit.c is expected to fail. It is checked separately, not run.
+# callargs.c fills sccz80's argument table. 80cc does not compile it.
+# selfstruct.c stays in CFILES, so the default z80 target runs it too.
+CFILES := $(filter-out calllimit.c,$(CFILES))
+ifneq ($(COMPILER),sccz80)
+CFILES := $(filter-out callargs.c,$(CFILES))
+endif
 TARGET_Z80 := $(foreach test,$(CFILES:.c=),test_$(test).bin)
 
 ifeq ($(COMPILER),xcc)
@@ -34,6 +41,17 @@ all: $(TARGET_Z80)
 else
 all: $(TARGET_Z80) $(TARGET_8080) $(TARGET_8085) $(TARGET_VM1) $(TARGET_GBZ80) $(TARGET_Z80N) $(TARGET_R2KA) $(TARGET_RC2014) $(TARGET_R4K) $(TARGET_R6K) $(TARGET_KC160)
 endif
+
+# One past the fixed argument table must be diagnosed, not stored.
+ifeq ($(COMPILER),sccz80)
+all: test_calllimit
+endif
+
+.PHONY: test_calllimit
+test_calllimit: calllimit.c
+	-zcc +test -vn -c -compiler=sccz80 $< -o calllimit.o > calllimit.output 2>&1
+	grep -F "Too many arguments in a call, the limit is 98" calllimit.output
+	rm -f calllimit.o calllimit.output
 
 
 
@@ -43,6 +61,15 @@ test_autoinit.bin: $(SOURCES) autoinit.c
 	$(runtest)
 
 test_callee.bin: $(SOURCES) callee.c
+	$(call compile,-lm)
+	$(runtest)
+
+test_fastcall_callee.bin: $(SOURCES) fastcall_callee.c
+	$(call compile,-lm)
+	$(runtest)
+
+# (long)1E5 is folded by sccz80 and calls ifix on 80cc.
+test_constlit.bin: $(SOURCES) constlit.c
 	$(call compile,-lm)
 	$(runtest)
 

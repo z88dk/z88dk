@@ -295,6 +295,11 @@ extern void     plnge2a(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, 
 extern void     plnge2b(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval));
 extern void     load_constant(LVALUE *lval);
 
+/* cpp_invoke.c */
+extern void     cpp_add_arg(const char *arg);
+extern FILE    *cpp_open(const char *cpp_exe, const char *input_file);
+extern int      cpp_close(FILE *fp);
+
 /* preproc.c */
 extern void     junk(void);
 extern char     ch(void);
@@ -315,6 +320,7 @@ extern void     pop_buffer_fp(void);
 
 /* primary.c */
 extern int      primary(LVALUE *lval);
+extern uint64_t signed_div_mod(int is_mod, int64_t left, int64_t right);
 extern zdouble  calc(Kind left_kind, zdouble left, void (*oper)(LVALUE *), Kind right_kind, zdouble right, int is16bit);
 extern zdouble  calcun(Kind left_kind, zdouble left, void (*oper)(LVALUE *), Kind right_kind, zdouble right);
 extern int      intcheck(LVALUE *lval, LVALUE *lval2);
@@ -334,7 +340,8 @@ extern void     rvalue(LVALUE *lval);
 extern int      test(int label, int parens);
 extern int      constexpr(double *val, Kind *valtype, int flag);
 extern int      constexpr_exact(double *val, uint64_t *ival, int *ival_valid,
-                                Kind *valtype, int flag);
+                                Kind *valtype, int flag, int *isunsigned);
+extern void     set_unary_minus(int on);
 extern void     cscale(Type *type, int *val);
 extern int      docast(LVALUE *lval,LVALUE *dest_lval);
 extern void     NormaliseIntegerConstant(LVALUE *lval);

@@ -245,7 +245,7 @@ No `lib/arch/vm1/vm1_rules.1`. Missing CPU rules file means no extra peepholes; 
 
 ## Usage (from `libsrc/l/sccz80/7-vm1/`)
 
-Cite the named file as the example. Every word extra **reads or writes DE**, so these helpers clobber DE. sccz80 does not keep DE live across them (checked against `lib/z80rules.*`).
+Cite the named file as the example. Every word extra **reads or writes DE**, so these helpers clobber DE. sccz80 does not keep DE live across them (checked against `lib/sccz80_rules.*`).
 
 ### 1. 16-bit compare — `cp hl,de` (HL survives)
 

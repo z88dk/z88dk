@@ -37,6 +37,9 @@ When compiling dhrystone 2.1, several defines are possible:
  *
  * -DNOSTRUCTASSIGN
  * Use memcpy instead of struct assignment.
+ * The stock SDCC copy still honors this. The z88dk classic and newlib
+ * copies, and the HI-TECH v3.09 and v7.80 copies, always use struct
+ * assignment.
  *
  * -DNOENUM
  * Use defines instead of enumeration.
@@ -52,8 +55,10 @@ When compiling dhrystone 2.1, several defines are possible:
  *
  */
 
-NOSTRUCTASSIGN and NOENUM can be defined freely depending on whether the
-compiler supports struct assignment or enumerations.
+NOENUM can be defined freely depending on whether the compiler supports
+enumerations. NOSTRUCTASSIGN is honored by the stock SDCC copy. The z88dk classic
+and newlib copies, and the HI-TECH v3.09 and v7.80 copies, always use
+struct assignment.
 
 All compiles are first checked for correctness by running the program
 with PRINTF defined.  After correctness is verified, time should be
@@ -84,6 +89,20 @@ This time can be plugged into the dhrystone formulas above to compute
 exact dhrystone performance.
 
 (Number_Of_Runs = 20000 when PRINTF is disabled).
+
+
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test. Full RESULT blocks: z88dk-classic/readme.txt.
+
+Compiler | CPU  | Ticks
+---------|------|------------
+sccz80   | z80  | 473_021_519  (Nov 8, 2026)
+sccz80   | 8085 | 385_680_196  (Nov 8, 2026)
+80cc     | z80  | 284_380_153  (Nov 8, 2026)
+80cc     | 8085 | 287_860_112  (Nov 8, 2026)
+zsdcc    | z80  | 246_162_688  (Aug 16, 2026)
 
 
 RESULTS
@@ -144,3 +163,43 @@ cycle count  = 356235065
 time @ 4MHz  = 356235065 / 4*10^6 = 89.0588 sec
 dhrystones/s = 20000 / 89.0588 = 224.5708
 DMIPS        = 224.5708 / 1757 = 0.1278
+
+7.
+Z88DK November 8, 2026
+sccz80 / classic c library
+8366 bytes less page zero
+
+cycle count  = 473021519
+time @ 4MHz  = 473021519 / 4x10^6 = 118.26 seconds
+dhrystones/s = 20000 / (473021519 / 4x10^6) = 169.1255
+DMIPS        = 169.1255 / 1757 = 0.0963
+
+8.
+Z88DK November 8, 2026
+sccz80 / classic c library / 8085
+7972 bytes less page zero
+
+cycle count  = 385680196
+time @ 4MHz  = 385680196 / 4x10^6 = 96.42 seconds
+dhrystones/s = 20000 / (385680196 / 4x10^6) = 207.4257
+DMIPS        = 207.4257 / 1757 = 0.1181
+
+9.
+Z88DK November 8, 2026
+80cc / classic c library
+8159 bytes less page zero
+
+cycle count  = 284380153
+time @ 4MHz  = 284380153 / 4x10^6 = 71.10 seconds
+dhrystones/s = 20000 / (284380153 / 4x10^6) = 281.3136
+DMIPS        = 281.3136 / 1757 = 0.1601
+
+10.
+Z88DK November 8, 2026
+80cc / classic c library / 8085
+7802 bytes less page zero
+
+cycle count  = 287860112
+time @ 4MHz  = 287860112 / 4x10^6 = 71.97 seconds
+dhrystones/s = 20000 / (287860112 / 4x10^6) = 277.9128
+DMIPS        = 277.9128 / 1757 = 0.1582

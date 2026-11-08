@@ -1,3 +1,5 @@
+;; sccz80 peepholes for -O2 and above. zcc runs this file before sccz80_rules.1.
+
 	ld	l,(hl)
 	ld	h,0
 	push	hl
@@ -1148,9 +1150,8 @@
 =
 	ld	hl,%eval(%1 %2 +)	;const
 
-;Special rules for UZI here to optimize..
-;saves abt 1k on scall1.c alone..
-=
+;;Special rules for UZI here to optimize..
+;;saves abt 1k on scall1.c alone..
 
 	ld	hl,(__udata_)
 =
@@ -1258,17 +1259,6 @@
 	ld	a,l
 	ld	(de),a
 	ld	hl,%1
-
-	pop	de
-	ld	a,l
-	ld	(de),a
-	ld	h,0
-	ld	hl,%1	;const
-=
-	pop	de
-	ld	a,l
-	ld	(de),a
-	ld	hl,%1	;const
 
 	pop	de
 	ld	a,l
@@ -1455,6 +1445,16 @@
 =
 	ld	hl,0	;const
 	rl	l
+
+	ld	hl,0	;const
+	ld	a,0	;carry
+	rla
+	ld	l,a
+=
+	ld	a,0	;carry
+	rla
+	ld	l,a
+	ld	h,0
 
 	ld	l,(hl)
 	ld	h,0

@@ -32,19 +32,10 @@
 
 
 
-#define FRAME_REGISTER ( c_framepointer_is_ix ? "ix" : "iy")
-
 extern int check_lastop_was_comparison(LVALUE* lval);
 
 
 extern char Filenorig[];
-
-#ifdef USEFRAME
-extern int CheckOffset(int);
-extern void PutFrame(char,int);
-extern void OutIndex(int);
-#endif
-
 
 static void swap(void);
 static void ex_sp_hl(void);
@@ -523,48 +514,6 @@ void gen_store_to_tos(Kind typeobj)
  * We already know that it's in range
  */
 
-#ifdef USEFRAME
-void PutFrame(char typeobj, int offset)
-{
-    Type* ctype;
-    char flags;
-
-    ctype = retrstk(&flags); /* Not needed but.. */
-    switch (typeobj) {
-    case KIND_CHAR:
-        ot("ld\t");
-        OutIndex(offset);
-        outstr(",l\n");
-        break;
-    case KIND_INT:
-    case KIND_PTR:
-        ot("ld\t");
-        OutIndex(offset);
-        outstr(",l\n");
-        ot("ld\t");
-        OutIndex(offset + 1);
-        outstr(",h\n");
-        break;
-    case KIND_CPTR:
-    case KIND_LONG:
-        ot("ld\t");
-        OutIndex(offset);
-        outstr(",l\n");
-        ot("ld\t");
-        OutIndex(offset + 1);
-        outstr(",h\n");
-        ot("ld\t");
-        OutIndex(offset + 2);
-        outstr(",e\n");
-        ot("ld\t");
-        if (typeobj == KIND_LONG) {
-            OutIndex(offset + 3);
-            outstr(",d\n");
-        }
-    }
-}
-#endif
-
 /* Store the specified object type in the primary register */
 /*      at the address on the top of the stack */
 void putstk(LVALUE *lval)
@@ -712,17 +661,6 @@ void putstk(LVALUE *lval)
 /* store a two byte object in the primary register at TOS */
 void puttos(void)
 {
-#ifdef USEFRAME
-    if (c_framepointer_is_ix != -1) {
-        ot("ld\t");
-        OutIndex(0);
-        outstr(",l\n");
-        ot("ld\t");
-        OutIndex(1);
-        outstr(",h\n");
-        return;
-    }
-#endif
     ol("pop\tbc");
     ol("push\thl");
 }
@@ -730,17 +668,6 @@ void puttos(void)
 /* store a two byte object in the primary register at 2nd TOS */
 void put2tos(void)
 {
-#ifdef USEFRAME
-    if (c_framepointer_is_ix != -1) {
-        ot("ld\t");
-        OutIndex(2);
-        outstr(",l\n");
-        ot("ld\t");
-        OutIndex(3);
-        outstr(",h\n");
-        return;
-    }
-#endif
     ol("pop\tde");
     puttos();
     ol("push\tde");
@@ -919,11 +846,6 @@ void gen_load_indirect(LVALUE* lval)
         break;
     default:
         ot("call\tl_gint\t;");
-#ifdef USEFRAME
-        if (c_framepointer_is_ix != -1 && CheckOffset(lval->offset)) {
-            OutIndex(lval->offset);
-        }
-#endif
         nl();
     }
 }
@@ -1565,7 +1487,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
             callrts("l_i64_copy");
         }
 
-        if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
+        if ( (c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
             (currfn->flags & NAKED) == 0) {
             gen_pop_frame();
             Zsp += 2;
@@ -1651,32 +1573,6 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
         outstr("\tadd\tsp,"); outdec(k); nl();
         return newsp;
     }
-
-#ifdef USEFRAME
-    if (c_framepointer_is_ix != -1) {
-        if ( saveaf ) {
-            if ( c_noaltreg ) {
-                push("af");
-                pop("bc");
-            } else {
-                 ol("ex\taf,af");
-            }
-        }
-        outfmt("\tld\t%s,%d\n",FRAME_REGISTER, k);
-        outfmt("\tadd\t%s,sp\n", FRAME_REG);
-        outfmt("\tld\tsp,%s\n",FRAME_REGISTER);
-        if ( saveaf ) {
-            if ( c_noaltreg ) {
-                ol("push\tbc");
-                Zsp -= 2;
-                pop("af");
-            } else {
-                 ol("ex\taf,af");
-            }
-        }
-        return newsp;
-    }
-#endif
 
     // Handle short cases
     if (k > 0) {
@@ -2389,13 +2285,14 @@ void zadd_const(LVALUE *lval, int64_t value64)
     int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONGLONG ) {
         // TODO: If 2 <= value <= 255 then there's a libsrc call to add a
-        if ( value == 1 ) {
+        /* The low 32 bits of 4294967296 are 0. -1 must decrement. */
+        if ( value64 == 1 ) {
             inc(lval);
-        } else if ( value == -1 ) {
-            inc(lval);
-        } else if ( value != 0 ) {
+        } else if ( value64 == -1 ) {
+            dec(lval);
+        } else if ( value64 != 0 ) {
             llpush();
-            vllongconst(value64);
+            vllongconst_exact((uint64_t)value64);
             zadd(lval);
         }
         return;
@@ -2701,7 +2598,7 @@ void mult(LVALUE* lval)
                 ot("ex\tde,hl\n");
                 break;
             } else if ( (c_cpu & CPU_RABBIT) ) {
-                // For Rabbit we want to use the mul instruction
+                /* copt turns call l_mult into mul, also at -O0. */
             } else if ( c_speed_optimisation & OPT_UCHAR_MULT ) {
                 int label1 = getlabel();
                 int label2 = getlabel();
@@ -2746,7 +2643,7 @@ void mult_const(LVALUE *lval, int64_t value64)
             Zsp += 8;
         } else {
             llpush();
-            vllongconst(value);
+            vllongconst_exact((uint64_t)value64);
             callrts("l_i64_mult");
             Zsp += 8;
         }
@@ -2990,44 +2887,6 @@ void zmod(LVALUE* lval)
     }
 }
 
-void negate_if_negative(LVALUE *lval, int64_t value)
-{
-    int label;
-    // Only need to consider int handling here
-    // We're called for parameters on the lowest byte, so only need to consider l
-    if ( ulvalue(lval) )
-        return;
-    label = getlabel();
-    if ( lval->val_type == KIND_LONG ) {
-        if ( IS_808x() ) {
-            ol("ld\ta,d");
-            ol("rla");
-            ot("jp\tnc,");
-        } else {
-            ol("bit\t7,d");
-            ot("jr\tz,");
-        }
-        printlabel(label);
-        nl();
-    } else {
-        if ( IS_808x() ) {
-            ol("ld\ta,h");
-            ol("rla");
-            ot("jp\tnc,");
-        } else {
-            ol("bit\t7,h");
-            ot("jr\tz,");
-        }
-        printlabel(label);
-        nl();
-    }
-    ol("ld\ta,l");
-    ol("cpl");
-    ol("inc\ta");
-    ol("ld\tl,a");
-    postlabel(label);
-}
-
 void zmod_const(LVALUE *lval, int64_t value64)
 {
     LVALUE  templval={0};
@@ -3091,40 +2950,28 @@ void zmod_const(LVALUE *lval, int64_t value64)
             vconst(0);
             break;
         case 2:
-            negate_if_negative(lval, 1);
             zand_const(&templval,1);
             break;
         case 4:
-            negate_if_negative(lval, 3);
             zand_const(&templval, 3);
             break;
         case 8:
-            negate_if_negative(lval, 7);
             zand_const(&templval,7);
             break;
         case 16:
-            negate_if_negative(lval, 15);
             zand_const(&templval,15);
             break;
         case 32:
-            negate_if_negative(lval, 31);
             zand_const(&templval, 31);
             break;
         case 64:
-            negate_if_negative(lval, 63);
             zand_const(&templval,63);
             break;
         case 128:
-            negate_if_negative(lval, 127);
             zand_const(&templval,127);
             break;
         case 256:
-            if ( ulvalue(lval) ) {
-                ol("ld\th,0");
-            } else {
-                negate_if_negative(lval, 255);
-                ol("ld\th,0");
-            }
+            ol("ld\th,0");
             break;
         default:
             const2(value & 0xffff);
@@ -3362,6 +3209,51 @@ void zxor_const(LVALUE *lval, int64_t value64)
 }
 
 
+/* A mask whose every byte is 0x00 or 0xff clears those bytes in
+   place. A mixed byte is left to the bit tests below. Returns 1
+   when this mask was handled. */
+static int and_whole_bytes(int bytes, uint32_t mask)
+{
+    unsigned b[4];
+    int i;
+
+    for (i = 0; i < bytes; i++) {
+        b[i] = (mask >> (8 * i)) & 0xff;
+        if (b[i] != 0 && b[i] != 0xff)
+            return 0;
+    }
+    if (bytes == 2) {
+        if (b[0] == 0 && b[1] == 0)
+            vconst(0);
+        else if (b[0] == 0)
+            ol("ld\tl,0");
+        else if (b[1] == 0)
+            ol("ld\th,0");
+        return 1;
+    }
+    if (b[0] == 0 && b[1] == 0 && b[2] == 0 && b[3] == 0) {
+        vlongconst(0);
+        return 1;
+    }
+    if (b[0] == 0 && b[1] == 0)
+        vconst(0);
+    else {
+        if (b[0] == 0)
+            ol("ld\tl,0");
+        if (b[1] == 0)
+            ol("ld\th,0");
+    }
+    if (b[2] == 0 && b[3] == 0)
+        const2(0);
+    else {
+        if (b[2] == 0)
+            ol("ld\te,0");
+        if (b[3] == 0)
+            ol("ld\td,0");
+    }
+    return 1;
+}
+
 /* 'And' the primary and secondary */
 /*      (results in primary) */
 void zand(LVALUE* lval)
@@ -3389,6 +3281,8 @@ void zand_const(LVALUE *lval, int64_t value64)
         vllongconst(value64);
         zand(lval);
     } else if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR || lval->val_type == KIND_ACCUM32) {
+        if ( and_whole_bytes(4, (uint32_t)value) )
+            return;
         if ( value == 0 ) {
             vlongconst(0);
         } else if ( value == 0xff ) {  // 5
@@ -3440,6 +3334,8 @@ void zand_const(LVALUE *lval, int64_t value64)
         }
     } else {
         uint16_t val = value;
+        if ( and_whole_bytes(2, val) )
+            return;
         if ( val == 0 ) {
             vconst(0);
         } else if ( (value % 65536) == 0xff ) {
@@ -3540,6 +3436,24 @@ void asr_const(LVALUE *lval, int64_t value64)
     }
 
     if  (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR || lval->val_type == KIND_ACCUM32 ) {
+        /* The library saturates a count at or above the width. Masking
+           it first turns `x >> 32` into `x >> 0`. */
+        if ( value64 >= 32 ) {
+            warningfmt("overflow","Right shifting by more than the size of the object");
+            if ( ulvalue(lval) ) {
+                vconst(0);
+                const2(0);
+            } else {
+                ol("ld\ta,d");
+                ol("rlca");
+                ol("sbc\ta");
+                ol("ld\td,a");
+                ol("ld\te,a");
+                ol("ld\th,a");
+                ol("ld\tl,a");
+            }
+            return;
+        }
         if ( value == 1 && !IS_808x() ) {
             if ( ulvalue(lval) ) { /* 8 bytes, 8 + 8 + 8 + 8 + 8 = 40T */
                 ol("srl\td");
@@ -3740,9 +3654,14 @@ void asr_const(LVALUE *lval, int64_t value64)
             }
         }
     } else if ( lval->val_type == KIND_LONGLONG ) {
-        if ( value >= 64 ) warningfmt("overflow","Left shifting by more than the size of the object");
+        /* Same as the 32-bit arm: a masked count of 64 is a shift by 0. */
+        if ( value64 >= 64 ) {
+            warningfmt("overflow","Right shifting by more than the size of the object");
+            value = 64;
+        } else
+            value &= 63;
         llpush();
-        loada(value & 63);
+        loada(value);
         if (ulvalue(lval)) {
             callrts("l_i64_asr_uo");
         } else {
@@ -3750,8 +3669,14 @@ void asr_const(LVALUE *lval, int64_t value64)
         }
         Zsp += 8;
     } else {
-        if ( value == 1 && IS_8085() && !ulvalue(lval) ) {
+        if ( value == 1 && IS_8085() ) {
+            /* sra hl sign-fills. An unsigned shift clears the new top bit. */
             ol("sra\thl");
+            if ( ulvalue(lval) ) {
+                ol("ld\ta,127");
+                ol("and\th");
+                ol("ld\th,a");
+            }
         } else if ( value == 1 && IS_808x() && ulvalue(lval) ) {
             ol("xor\ta");
             ol("ld\ta,h");
@@ -3785,6 +3710,23 @@ void asr_const(LVALUE *lval, int64_t value64)
         } else if ( value == 2 ) { /* 8 bytes, 32T */
             asr_const(lval, 1);
             asr_const(lval, 1);
+        } else if ( value >= 9 && value <= 14 && ulvalue(lval) && c_cpu != CPU_Z80N ) {
+            /* >> 8 is three bytes. H is then zero, so the rest is logical. */
+            int extra;
+
+            ol("ld\tl,h");
+            ol("ld\th,0");
+            for ( extra = 8; extra < value; extra++ ) {
+                if ( IS_8085() )
+                    ol("sra\thl");
+                else if ( IS_8080_CLASS() ) {
+                    ol("ld\ta,l");
+                    ol("and\ta");
+                    ol("rra");
+                    ol("ld\tl,a");
+                } else
+                    ol("srl\tl");
+            }
         } else if ( value != 0 ) {
             if ( c_cpu == CPU_Z80N ) {   // 6 bytes, 22T
                 ol("ex\tde,hl");   // 1, 4T
@@ -3941,6 +3883,12 @@ void asl_const(LVALUE *lval, int64_t value64)
 {
     int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR  ) {
+        if ( value64 >= 32 ) {
+            warningfmt("overflow","Left shifting by more than the size of the object");
+            vconst(0);
+            const2(0);
+            return;
+        }
         switch ( value ) {
         case 0:
             return;
@@ -3981,20 +3929,8 @@ void asl_const(LVALUE *lval, int64_t value64)
             }
             break;
         case 7:
-            if ( 0 && c_speed_optimisation & OPT_LSHIFT32 && !IS_808x() ) { /* 0 out */
-                ol("rr\td");  // 15 bytes, 59T
-                ol("ld\td,e");
-                ol("ld\te,h");
-                ol("ld\th,l");
-                ol("ld\tl,0");
-                ol("rr\td");
-                ol("rr\te");
-                ol("rr\th");
-                ol("rr\tl");
-            } else {
-                loada( value );
-                callrts("l_long_aslo");
-            }
+            loada( value );
+            callrts("l_long_aslo");
             break;
         case 9:
         case 10:
@@ -4011,7 +3947,6 @@ void asl_const(LVALUE *lval, int64_t value64)
             callrts("l_long_aslo");
             break;
         default: //  5 bytes
-            if ( value >= 32 ) warningfmt("overflow","Left shifting by more than the size of the object");
             value &= 31;
             if (  value >= 16 ) {
                 asl_16bit_const(lval, value - 16);
@@ -4024,11 +3959,15 @@ void asl_const(LVALUE *lval, int64_t value64)
             break;
         }
     } else if ( lval->val_type == KIND_LONGLONG ) {
-        if ( value >= 64 ) warningfmt("overflow","Left shifting by more than the size of the object");
-        llpush();
-        loada(value & 63);
-        callrts("l_i64_aslo");
-        Zsp += 8;
+        if ( value64 >= 64 ) {
+            warningfmt("overflow","Left shifting by more than the size of the object");
+            vllongconst_exact(0);
+        } else {
+            llpush();
+            loada(value & 63);
+            callrts("l_i64_aslo");
+            Zsp += 8;
+        }
     } else {
         asl_16bit_const(lval, value);
     }
@@ -4645,13 +4584,71 @@ void zne(LVALUE* lval)
 }
 
 
+/* Carry means signed HL < value. The rotates bias H by 0x8000. */
+static void cmp_signed_lt(uint32_t value)
+{
+    ol("ld\ta,l");
+    outfmt("\tsub\t%d\n", ((uint32_t)value % 256) & 0xff);
+    ol("ld\ta,h");
+    ol("rla");
+    ol("ccf");
+    ol("rra");
+    outfmt("\tsbc\t%d\n", (0x80 + ((uint32_t)value / 256)) & 0xff);
+}
+
+/* Carry means signed HL > value. H is biased, then subtracted from
+   the biased constant. */
+static void cmp_signed_gt(uint32_t value)
+{
+    unsigned hi = (0x80 + ((value >> 8) & 0xff)) & 0xff;
+
+    ol("ld\ta,h");
+    ol("xor\t128");
+    ol("ld\th,a");
+    outfmt("\tld\ta,%d\n", value & 0xff);
+    ol("sub\tl");
+    /* ld a,0 is rewritten to xor a, which clears the borrow from sub. */
+    if ( hi == 0 )
+        ol("ld\ta,0\t;carry");
+    else
+        outfmt("\tld\ta,%d\n", hi);
+    ol("sbc\th");
+}
+
+/* Carry means signed L > value. */
+static void cmp_schar_gt(uint32_t value)
+{
+    ol("ld\ta,l");
+    ol("xor\t128");
+    ol("ld\tl,a");
+    outfmt("\tld\ta,%d\n", (0x80 + (value % 256)) % 256);
+    ol("sub\tl");
+}
+
+/* Signed HL <= 0. rlca leaves the sign in carry. Both jumps land on
+   the label after scf, so a following ccf inverts the test and
+   ld hl,0 / rl l turns the carry into 0 or 1. A counted skip into
+   that conversion is moved by the peephole. */
+static void cmp_signed_le0(void)
+{
+    int done = getlabel();
+
+    ol("ld\ta,h");
+    ol("rlca");
+    opjumpr("c,", done);
+    ol("or\tl");
+    opjumpr("nz,", done);
+    ol("scf");
+    postlabel(done);
+}
+
 void zlt_const(LVALUE *lval, int64_t value64)
 {
     uint32_t value = (uint32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 ) {
             if ( ulvalue(lval) ) {
-                ol("and\ta"); // Should not reach here
+                ol("and\ta");
             } else {
                 ol("ld\ta,d");
                 ol("rla");
@@ -4703,7 +4700,7 @@ void zlt_const(LVALUE *lval, int64_t value64)
     } else if ( lval->val_type == KIND_INT || lval->val_type == KIND_PTR ) {
         if ( value == 0 ) {
             if ( ulvalue(lval) ) {
-                ol("and\ta"); // Should not reach here
+                ol("and\ta");
                 set_carry(lval);
             } else {
                 ol("ld\ta,h");
@@ -4827,20 +4824,30 @@ void zle_const(LVALUE *lval, int64_t value64)
     uint32_t value = (uint32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
        if ( value ==  0 && !IS_808x() ) {
+            int done = 0;
+
             if ( lval->val_type == KIND_CPTR) {
                 ol("ld\ta,e");
             } else {
                 ol("ld\ta,d");
                 if ( !ulvalue(lval)) {
+                    /* Same landing point as the int test: the skip must
+                       not be a byte count into the 0/1 conversion. */
+                    done = getlabel();
                     ol("rlca");
-                    ol("jr\tc,ASMPC+8");
+                    opjumpr("c,", done);
                 }
                 ol("or\te"); // We know MSBit was 0, so no point shifting it back in
             }
             ol("or\th");
             ol("or\tl");
-            ol("jr\tnz,ASMPC+3");
+            if (done)
+                opjumpr("nz,", done);
+            else
+                ol("jr\tnz,ASMPC+3");
             ol("scf");
+            if (done)
+                postlabel(done);
             set_carry(lval);
        } else {
             lpush();  // 11 bytes
@@ -4856,20 +4863,33 @@ void zle_const(LVALUE *lval, int64_t value64)
         llpush();
         vllongconst(value64);
         zle(lval);
-    } else {
-        if ( value ==  0 && !IS_808x() ) {
-            ol("ld\ta,h"); // 8 bytes
-            ol("rlca");
-            ol("jr\tc,ASMPC+6");
-            ol("or\tl"); // We know MSBit was 0, so no point shifting it back in
-            ol("jr\tnz,ASMPC+3");
-            ol("scf");
-            set_carry(lval);
+    } else if ( lval->val_type == KIND_CHAR ) {
+        cmp_schar_gt(value);
+        ol("ccf");
+        set_carry(lval);
+    } else if ( value == 0 && !ulvalue(lval) &&
+                ( !IS_808x() || lval->val_type == KIND_INT ) ) {
+        cmp_signed_le0();
+        set_carry(lval);
+    } else if ( value == 0 && ulvalue(lval) ) {
+        /* Unsigned <= 0 is == 0. The sign test mis-reads a set top bit. */
+        ol("ld\ta,h");
+        ol("or\tl");
+        if ( IS_808x() ) {
+            ol("jp\tnz,ASMPC+4");
         } else {
-            const2(value & 0xffff);  // 7 bytes
-            swap();
-            zle(lval);
+            ol("jr\tnz,ASMPC+3");
         }
+        ol("scf");
+        set_carry(lval);
+    } else if ( !ulvalue(lval) && lval->val_type == KIND_INT ) {
+        cmp_signed_gt(value);
+        ol("ccf");
+        set_carry(lval);
+    } else {
+        const2(value & 0xffff);  // 7 bytes
+        swap();
+        zle(lval);
     }
 }
 
@@ -4983,6 +5003,9 @@ void zgt_const(LVALUE *lval, int64_t value64)
         outfmt("\tld\ta,%d\n", (value % 256));
         ol("sub\tl");
         set_carry(lval);
+    } else if ( lval->val_type == KIND_CHAR ) {
+        cmp_schar_gt(value);
+        set_carry(lval);
     } else if ( value == 0 && lval->val_type == KIND_INT && ulvalue(lval)) {
         ol("ld\ta,h");
         ol("or\tl");
@@ -4993,10 +5016,17 @@ void zgt_const(LVALUE *lval, int64_t value64)
         }
         ol("scf");
         set_carry(lval);
+    } else if ( value == 0 && lval->val_type == KIND_INT ) {
+        cmp_signed_le0();
+        ol("ccf");
+        set_carry(lval);
     } else if ( lval->val_type == KIND_LONGLONG) {
         llpush();
         vllongconst(value64);
         zgt(lval);
+    } else if ( !ulvalue(lval) && lval->val_type == KIND_INT ) {
+        cmp_signed_gt(value);
+        set_carry(lval);
     } else {
         const2(value & 0xffff);  // 7 bytes
         swap();
@@ -5104,7 +5134,7 @@ void zge_const(LVALUE *lval, int64_t value64)
         } else {
             ol("ld\ta,l");
             ol("xor\t128");
-            outfmt("\tsub\t%d\n", 128 | ( value % 256));
+            outfmt("\tsub\t%d\n", (0x80 + (value % 256)) % 256);
             ol("ccf");
         }
         set_carry(lval);
@@ -5115,28 +5145,21 @@ void zge_const(LVALUE *lval, int64_t value64)
     } else {
         if ( value == 0 ) {
             if ( ulvalue(lval) ) {
-                ol("scf"); // Should not reach here
+                ol("scf");
             } else {
                 ol("ld\ta,h");
                 ol("rla");
                 ol("ccf");
             }
             set_carry(lval);
+        } else if ( !ulvalue(lval) && lval->val_type == KIND_INT ) {
+            cmp_signed_lt(value);
+            ol("ccf");
+            set_carry(lval);
         } else {
-            if ( value == 0 ) {
-                if ( ulvalue(lval) ) {
-                    ol("scf"); // Should not reach here
-                } else {
-                    ol("ld\ta,h");
-                    ol("rla");
-                    ol("ccf");
-                }
-                set_carry(lval);
-            } else {
-                const2(value & 0xffff);  // 7 bytes
-                swap();
-                zge(lval);
-            }
+            const2(value & 0xffff);  // 7 bytes
+            swap();
+            zge(lval);
         }
     }
 }
@@ -5514,57 +5537,12 @@ void gen_switch_section(const char* section_name)
     current_section = section_name;
 }
 
-#ifdef USEFRAME
-/*
- * Check offset is within range for frame pointer
- */
-
-int CheckOffset(int val)
-{
-    if (val >= -126 && val <= 127)
-        return 1;
-    return 0;
-}
-
-/*
- *  Output offset to index register
- *
- *  FRAME POINTER STUFF IS BROKEN - DO NOT USE!!!
- */
-
-void OutIndex(int val)
-{
-    outstr("(");
-    if (c_framepointer_is_ix)
-        outstr("ix ");
-    else
-        outstr("iy ");
-    if (val >= 0)
-        outstr("+");
-    outdec(val);
-    outstr(")");
-}
-
-
-
-#endif
-
 void gen_push_frame(void)
 {
     if ( (currfn->flags & NAKED) == 0) {
-        if ( (currfn->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {
+        if ( currfn->flags & SAVEFRAME ) {
             if ( !IS_808x() && !IS_GBZ80() ) {
-                ot("push\t");
-                outstr(FRAME_REGISTER);
-                nl();
-                if ( c_framepointer_is_ix != -1) {
-                    ot("ld\t");
-                    outstr(FRAME_REGISTER);
-                    outstr(",0\n");
-                    ot("add\t");
-                    outstr(FRAME_REGISTER);
-                    outstr(",sp\n");
-                }
+                ol("push\tix");
             } else {
                 ol("push\taf");
             }
@@ -5577,11 +5555,9 @@ void gen_push_frame(void)
 void gen_pop_frame(void)
 {
     if ( (currfn->flags & NAKED) == 0) {
-        if ( (currfn->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {
+        if ( currfn->flags & SAVEFRAME ) {
             if ( !IS_808x() && !IS_GBZ80() ) {
-                ot("pop\t");
-                outstr(FRAME_REGISTER);
-                nl();
+                ol("pop\tix");
             } else if (CPU_POP_AF_IS_SAFE()) {
                 ol("pop\taf");
             } else {

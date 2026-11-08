@@ -463,7 +463,8 @@ void dofor(void)
         gen_jp_label(wq.loop,1); /*         goto loop                  */
         postlabel(wq.exit); /* .exit                              */
     } else {
-        clearbuffer(buf2); // Condition 
+        clearbuffer(buf2); // Condition
+        discardbuffer(buf3); // modification is not emitted
         buf4 = startbuffer(100);
         statement(); // Evaluate it
         discardbuffer(buf4);
@@ -477,6 +478,42 @@ void dofor(void)
     delwhile();
 }
 
+/* Cases belonging to the switch whose body is being parsed. */
+static SW_TAB *swcase;
+static Type   *swtype;
+
+/* A case constant has to fit the switch expression. An unsigned long
+   long holds every bit pattern we can record. */
+static int case_fits(Type *type, int64_t value)
+{
+    int bits;
+
+    if (type == NULL)
+        return 1;
+    if (type->kind == KIND_CHAR)
+        bits = 8;
+    else if (type->kind == KIND_INT || type->kind == KIND_SHORT)
+        bits = 16;
+    else if (type->kind == KIND_LONG)
+        bits = 32;
+    else if (type->kind == KIND_LONGLONG)
+        bits = 64;
+    else
+        return 1;
+
+    if (isutype(type)) {
+        if (bits >= 64)
+            return 1;
+        if (value < 0)
+            return 0;
+        return (uint64_t)value < (UINT64_C(1) << bits);
+    }
+    if (bits >= 64)
+        return 1;
+    return value >= -(int64_t)(UINT64_C(1) << (bits - 1))
+        && value <= (int64_t)((UINT64_C(1) << (bits - 1)) - 1);
+}
+
 /*
  * "switch" statement
  */
@@ -485,13 +522,16 @@ void doswitch(void)
     WHILE_TAB wq;
     int endlab, swact, swdef, swdef_sp, entry_sp;
     SW_TAB *swnex, *swptr, *p;
+    SW_TAB *saved_case = swcase;
+    Type   *saved_type = swtype;
     Type   *switch_type;
     t_buffer* buf;
 
     swact = swactive;
     swdef = swdefault;
     swdef_sp = swdefault_sp;
-    swnex = swptr = swnext;
+    swnex = swptr = swcase = swnext;
+    swtype = NULL;
     addwhile(&wq);
     (wqptr - 1)->loop = 0;
     needchar('(');
@@ -500,6 +540,7 @@ void doswitch(void)
     swdefault = 0;
     swdefault_sp = 0;
     swactive = 1;
+    swtype = switch_type;
     endlab = getlabel();
     /* gen_jp_label(endlab) ; */
 
@@ -569,6 +610,8 @@ void doswitch(void)
     swdefault = swdef;
     swdefault_sp = swdef_sp;
     swactive = swact;
+    swcase = saved_case;
+    swtype = saved_type;
 }
 
 /*
@@ -577,7 +620,11 @@ void doswitch(void)
 void docase(void)
 {
     double value;
+    uint64_t ival;
+    int    ival_valid;
+    int    cuns = 0;
     Kind   valtype;
+    int64_t cvalue;
     if (swactive == 0)
         errorfmt("Not in switch", 0 );
     if (swnext > swend) {
@@ -586,10 +633,32 @@ void docase(void)
     }
     postlabel(swnext->label = getlabel());
     swnext->sp = Zsp;
-    constexpr(&value,&valtype, 1);
+    constexpr_exact(&value, &ival, &ival_valid, &valtype, 1, &cuns);
     if ( kind_is_decimal(valtype)) 
         warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
-    swnext->value = value;
+    /* A double cannot hold every integer above 2^53. */
+    if (ival_valid && !kind_is_decimal(valtype))
+        cvalue = (int64_t)ival;
+    else
+        cvalue = (int64_t)value;
+    if (swactive && swcase) {
+        SW_TAB *p;
+
+        for (p = swcase; p < swnext; p++) {
+            if (p->value == cvalue) {
+                errorfmt("Duplicate case value", 0);
+                break;
+            }
+        }
+    }
+    /* An unsigned constant above 2^63-1 becomes negative in int64_t
+       and then looks in range for a signed long long. */
+    if (swactive && cuns && ival_valid && !kind_is_decimal(valtype)
+        && swtype && !isutype(swtype) && (int64_t)ival < 0)
+        warningfmt("limited-range", "Case value is out of range");
+    else if (swactive && case_fits(swtype, cvalue) == 0)
+        warningfmt("limited-range", "Case value is out of range");
+    swnext->value = cvalue;
     needchar(':');
     ++swnext;
 }
@@ -614,6 +683,9 @@ void doreturn(char type)
     /* if not end of statement, get an expression */
     if (endst() == 0) {
         char *before, *start;
+
+        if (currfn->ctype->return_type->kind == KIND_VOID)
+            warningfmt("void", "Returning a value from a void function");
         zdouble val;
         int    vconst;
         Type   *type_ptr;
@@ -779,6 +851,56 @@ void doasm(void)
     cmode = 1; /* then back to parse level */
 }
 
+/* One slot for each section name. The defaults are literals, and
+   --codeseg stores an argv pointer, so only a name allocated here
+   is freed. */
+static char *heap_section[5];
+
+static void replace_section(char **dest, const char *name)
+{
+    char *copy = STRDUP(name);
+    int   i;
+
+    for (i = 0; i < 5; i++) {
+        if (heap_section[i] == *dest) {
+            free(*dest);
+            heap_section[i] = copy;
+            *dest = copy;
+            return;
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        if (heap_section[i] == NULL) {
+            heap_section[i] = copy;
+            *dest = copy;
+            return;
+        }
+    }
+    *dest = copy;
+}
+
+void free_section_names(void)
+{
+    char **dest[5];
+    int    i, j;
+
+    dest[0] = &c_code_section;
+    dest[1] = &c_rodata_section;
+    dest[2] = &c_data_section;
+    dest[3] = &c_bss_section;
+    dest[4] = &c_init_section;
+    for (i = 0; i < 5; i++) {
+        if (heap_section[i] == NULL)
+            continue;
+        for (j = 0; j < 5; j++) {
+            if (*dest[j] == heap_section[i])
+                *dest[j] = NULL;
+        }
+        free(heap_section[i]);
+        heap_section[i] = NULL;
+    }
+}
+
 static void set_section(char **dest_section) 
 {
     char sname[NAMESIZE];
@@ -789,7 +911,7 @@ static void set_section(char **dest_section)
         return;
     }
 
-    *dest_section = STRDUP(sname);
+    replace_section(dest_section, sname);
 }
 
 /* #pragma statement */
@@ -836,9 +958,9 @@ void dopragma(void)
 
         if ( have_bank ) {
             snprintf(buf,sizeof(buf),"CODE_%d",(int)val);
-            c_code_section = STRDUP(buf);
+            replace_section(&c_code_section, buf);
             snprintf(buf,sizeof(buf),"RODATA_%d",(int)val);
-            c_rodata_section = STRDUP(buf);
+            replace_section(&c_rodata_section, buf);
         }
     }else {
         warningfmt("unknown-pragmas","Unknown #pragma directive");

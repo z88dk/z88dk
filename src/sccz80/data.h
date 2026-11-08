@@ -10,7 +10,6 @@ extern int glbcnt;
 extern WHILE_TAB *wqueue;
 extern WHILE_TAB *wqptr;
 extern unsigned char *litq;
-extern unsigned char *dubq;
 extern unsigned char *glbq;
 extern unsigned char *tempq;
 extern int gltptr;
@@ -47,6 +46,9 @@ extern int lineno;
 extern int infunc;
 
 extern int c_verbose;
+extern int c_c1mode;      /* skip popen-ucpp; treat input as preprocessed */
+extern char *c_cpp_exe;   /* preprocessor binary to spawn (when !c_c1mode) */
+extern int input_is_pipe; /* input came from popen; reap with cpp_close */
 extern FILE *input;
 extern FILE *output;
 extern FILE *inpt2;
@@ -55,7 +57,6 @@ extern SYMBOL *currfn;
 
 extern int debuglevel;
 extern int c_assembler_type;
-extern int c_framepointer_is_ix;
 extern int c_double_strings;
 extern int c_standard_escapecodes;
 extern uint32_t scanf_format_option;
@@ -70,6 +71,7 @@ extern char *c_code_section;
 extern char *c_bss_section;
 extern char *c_data_section;
 extern char *c_rodata_section;
+extern void free_section_names(void);
 extern int c_disable_builtins;
 extern uint32_t c_speed_optimisation;
 extern int c_fp_size;

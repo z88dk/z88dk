@@ -17,11 +17,11 @@ stream, not the IR. Two facilities live here.
 z88dk ships `z88dk-copt`, a pattern-matching optimiser that rewrites runs of
 assembly lines by rule files. Two properties matter for the back end:
 
-- **80cc uses only `lib/80cc_rules.1`.** The much larger `z80rules.*` rule set is
+- **80cc uses `lib/z88dk_intrinsic` and `lib/80cc_rules.1`.** The much larger `sccz80_rules.*` rule set is
   sccz80's; it is *not* applied to 80cc output (see zcc's compiler dispatch).
   sccz80 rules assume sccz80's label naming (`i_N`) and code shapes, so porting
   one means re-authoring it for 80cc, not referencing it. This is a recurring
-  trap: a rule "already exists" in z80rules but does nothing for 80cc.
+  trap: a rule "already exists" in sccz80_rules but does nothing for 80cc.
 - **copt matches whole lines.** A rule pattern must match a line in full, so a
   line carrying a trailing comment does not match a comment-free pattern. This is
   exploited deliberately: the `;volatile` stamp (ADR 0014) makes volatile
@@ -56,7 +56,7 @@ otherwise-consecutive instructions, letting copt's line-adjacent patterns fire.
 
 Jump threading **rewrites the jump operand** (`jp cc,X → jp cc,Y`) and leaves
 `X`'s `jp Y` body in place. It must **never** thread by aliasing `X` to `Y`
-(`defc X = Y`, dropping the body), even though that is how sccz80's z80rules
+(`defc X = Y`, dropping the body), even though that is how sccz80's sccz80_rules
 threading works.
 
 The reason is structural and specific to 80cc: **its diamond joins are reached by
@@ -72,7 +72,7 @@ label then drops via the elision above.
 
 - Peephole rewrites that need CFG/aliasing knowledge belong in the compiler-side
   text filter (which knows the layout); purely local instruction rewrites belong
-  in `80cc_rules.1`. Do not reach for `z80rules.*`.
+  in `80cc_rules.1`. Do not reach for `sccz80_rules.*`.
 - Anything added to the filter or to copt must preserve the `;volatile` stamp
   (ADR 0014) and must not assume sccz80-style jump-only trampolines — 80cc joins
   fall through.

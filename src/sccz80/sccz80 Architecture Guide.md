@@ -69,11 +69,12 @@ itself the main architectural fact about the codebase:
 | `stmt.c` | 864 | statements: if/while/for/switch/return/block |
 | `declinit.c` | 594 | initialisers |
 | `callfunc.c` | 578 | function call argument marshalling and call emission |
-| `preproc.c` | 352 | preprocessor |
+| `preproc.c` | 363 | directives that remain after ucpp |
 | `error.c` | 195 | diagnostics |
 | `lex.c` | 152 | scanner |
 | `sym.c` | 142 | symbol table primitives |
 | `data.c` | 125 | data/bss section bookkeeping |
+| `cpp_invoke.c` | 93 | spawn `z88dk-ucpp` on a direct compile |
 | `misc.c` | 76 | small helpers |
 | `while.c` | 37 | loop helper |
 | headers | 1,052 | `define.h` 498, `ccdefs.h` 363, `data.h` 78, `codegen.h` 63, `io.h` 48 |
@@ -91,25 +92,30 @@ tree, no per-function IR, and no separate optimisation stage on the C side.
 
 Flow for one translation unit:
 
-1. **`io.c`** owns the input file stack (includes, macro-expanded text), so the
-   scanner always has a single character source.
-2. **`preproc.c`** handles `#define`, `#include`, conditionals and the pragma
-   vocabulary. Macro expansion happens before the scanner sees tokens.
-3. **`lex.c`** produces tokens: identifiers, numbers, strings, punctuators. It is
+1. **`cpp_invoke.c`** starts `z88dk-ucpp` on a direct compile. `--c1mode` reads
+   the file as given. zcc passes `--c1mode` after its own ucpp run, on a normal
+   sccz80 compile and on the sccz80 half of `-compiler=multi`. `-D`, `-U` and
+   `-I` are forwarded. `Z80` and `SMALL_C` are predefined for the preprocessor
+   and for the compiler's own conditionals.
+2. **`io.c`** owns the character source after that. A comment that still reaches
+   the lexer is reported as requiring the external preprocessor.
+3. **`preproc.c`** handles the directives that remain: `#pragma`, `#undef`,
+   `#ifdef` / `#ifndef` / `#else` / `#endif`, and `#` line markers.
+4. **`lex.c`** produces tokens: identifiers, numbers, strings, punctuators. It is
    deliberately thin; most language knowledge lives in the parser.
-4. **`declparse.c`** builds `Type` objects for declarations: base kind, pointer
+5. **`declparse.c`** builds `Type` objects for declarations: base kind, pointer
    depth, arrays, struct fields, function signatures, qualifiers, far pointers,
    bitfields. `declinit.c` handles initialiser lists, which emit data rather than
    code.
-5. **`stmt.c`** dispatches statements. Each statement form immediately calls into
+6. **`stmt.c`** dispatches statements. Each statement form immediately calls into
    codegen for its control flow, using labels allocated from a global counter.
-6. **`expr.c`** holds the expression grammar as a precedence chain of mutually
+7. **`expr.c`** holds the expression grammar as a precedence chain of mutually
    recursive functions — `heir1`, `heir1a`, `heir2`…`heir9`, `heira`, `heirb` —
    plus the integer promotion and conditional-join helpers
    (`arith_integer`, `integer_reg_width`, `widen_primary_to`, `retag_conditional`,
    `join_conditional`). Every binary operator ends up either folded at compile time
    (`const.c`) or emitted as a `binop` function pointer stored in the lvalue.
-7. **`primary.c`** produces the leaves: identifiers, literals, and the operands a
+8. **`primary.c`** produces the leaves: identifiers, literals, and the operands a
    call needs.
 
 The important consequence: **the parser's state is the only state**. There is no
@@ -155,9 +161,10 @@ pointers and arrays, `value` for enums and short-call values, bitfield
 
 Linked per scope, with a `Kind`-typed value, a `Type`, a storage class (`auto`,
 `static`, `extern`, `register`, parameter, global), an offset (`loc`/`offset`), a
-namespace pointer, and flags. `NAMESIZE` bounds identifiers. Local variables live
-at negative offsets from the frame pointer and are tracked in the `loctab` array
-(`NUMLOC` = 512 entries); exceeding that is a hard error, not a fallback.
+namespace pointer, and flags. `NAMESIZE` bounds identifiers. Local variables are
+stack slots. The offset is stored on the symbol and in the `loctab` array
+(`NUMLOC` = 512 entries); `getloc` loads that offset, adjusted by `Zsp`, into
+`HL` and adds `SP`. Exceeding `NUMLOC` is a hard error, not a fallback.
 
 ### `LVALUE` — the compiler's working register
 
@@ -195,11 +202,9 @@ the principle that most determines what changes are cheap and what are not.
   live operands, and all saved intermediate state goes to the stack in a defined
   order, low word first.
 * **Accumulator**: `A`, used only for byte-sized results and comparisons.
-* **`IX`/`IY`**: frame or index register depending on code model; callee-saved on
-  Z80, and something else entirely on CPUs that lack it.
 
 `sccz80` has no register allocator and no live-range analysis. A function's local
-frame is fixed at entry, indexed off the frame pointer, and every expression is
+frame is fixed at entry and addressed from `SP`, and every expression is
 evaluated by pushing its left operand and folding into the right.
 
 ### Virtual stack pointer `Zsp`
@@ -295,15 +300,16 @@ Three layers, deliberately separated:
 165 in the whole compiler. Each one asks "does this CPU have the cheap form?" and
 falls back to the portable form. Examples: `modstk` choosing `add sp,N` versus a
 `pop`-skip versus `inc sp` chains; `POP AF` substitution; `LDIR`/`LDDR` versus byte
-loops; `IX`-relative versus `HL`-based frame access; 8085-specific sequences where
+loops; 8085-specific sequences where
 the CPU offers something the Z80 lacks. **Every fallback must be legal on the
 weakest supported CPU of the class** — the 8080-class path must contain no
 undocumented and no Z80-only instruction.
 
 **Layer 2 — peephole rules per architecture.** `lib/arch/<cpu>/<cpu>_rules.1`.
 The files that contain rules are `8085`, `gbz80`, `kc160`, `r800`, `rabbit`,
-`z180`, `z80n`, and `ez80`. `z80`, `8080`, and `vm1` are comment-only
-placeholders. `z80`, `z80_ixiy`, and `z80_strict` share
+`z180`, and `ez80`. z80n loads `lib/arch/z80n/z80n_intrinsic` (nextreg and MMU).
+`lib/arch/z80n/z80n_peephole` is the testsuite custom file. `z80`, `8080`, and
+`vm1` are comment-only placeholders. `z80`, `z80_ixiy`, and `z80_strict` share
 `lib/arch/z80/z80_rules.1`. copt leaves a comment-only file unchanged. zcc
 warns when a named rules file is missing. The rules run *after* sccz80 has
 finished, so they can exploit instruction sequences the compiler emitted
@@ -362,20 +368,37 @@ a window of assembly lines until no rule fires or `MAX_PASS` (16) is reached.
 From `fill_sccz80_copt_rules()`:
 
 ```
-lib/z80rules.9                        always   (intrinsics and RST substitution)
+lib/z88dk_intrinsic                  always   (intrinsics and RST substitution)
   -O 0:  (nothing)
-  -O 1:  lib/z80rules.1
-  -O 2:  lib/z80rules.2, lib/z80rules.1
-  -O 3+: lib/z80rules.2, lib/z80rules.1, lib/z80rules.0
+  -O 1:  lib/sccz80_rules.1
+  -O 2:  lib/sccz80_rules.2, lib/sccz80_rules.1
+  -O 3+: lib/sccz80_rules.2, lib/sccz80_rules.1, lib/sccz80_rules.3
   target rules        (from the target's config)
   cpu rules           (from cpu_map[], e.g. lib/arch/8085/8085_rules.1)
-  lib/z80rules.8                        (sccz80 op inlining, via -Ch)
+  lib/sccz80_inline                     (sccz80 op inlining, via -Ch)
   user rules
 ```
 
+`sccz80_rules.1` is the main set. It runs at `-O 1`, and after `sccz80_rules.2`
+at `-O 2` and `-O 3`. `ld a,0` becomes `xor a` in this file. A zero that must
+survive that rewrite is written `ld a,0 ;carry`.
+
+`sccz80_rules.2` runs first at `-O 2` and above. It folds
+`ld hl,0 ;const` / `ld a,0 ;carry` / `rla` / `ld l,a` into the carry shift and
+`ld h,0`. The `;carry` comment keeps the following `xor a` rule from matching.
+
+`sccz80_rules.3` runs last, and only from `-O 3`. On 8085,
+`ld hl,N ;const` / `add hl,sp` / `call l_gint` becomes `call l_gintNsp` for N
+of 2, 3, 4, 5, 6 and 8. The general form becomes `call l_gintsp` on every other
+CPU, vm1 included. The char and long stack folds still exclude vm1 and 8085.
+
+A line that begins with `;` is a pattern. A banner begins with `;;`, so copt
+does not treat it as a rule. A `;` later on an instruction is part of the match.
+That is why `;const` and `;carry` stay on the lines above.
+
 `-O` is the peephole level; `--opt-code-speed` is a different axis entirely and
 lives in the compiler, not in copt. `80cc` uses a different chain
-(`z80rules.9`, then `80cc_rules.1`, then target/cpu/user), which is why a rule that
+(`z88dk_intrinsic`, then `80cc_rules.1`, then target/cpu/user), which is why a rule that
 helps one front end can be wrong for the other.
 
 ### What this means for review
@@ -385,7 +408,7 @@ helps one front end can be wrong for the other.
 * A rules-file change is invisible to sccz80's own test suite unless the tests run
   the full `zcc` pipeline.
 * Rules must remain correct under every `-O` level and every CPU whose chain
-  includes them. A rule in `z80rules.1` runs on 8080 too.
+  includes them. A rule in `sccz80_rules.1` runs on 8080 too.
 * Anything that changes emitted text must keep **`-O 0` output byte-identical**
   after the assembly suite drops `^;` lines. `;	Module compile time:` is one of
   those comments, printed from `ctime` in `gen_file_header`. The project treats
@@ -454,7 +477,7 @@ a local fix.
 
 Useful as a triage map for reviewers.
 
-* **`codegen.c` at 6,248 lines with 193 functions and 156 CPU branch sites.** It
+* **`codegen.c` at 6,224 lines with 193 functions and 156 CPU branch sites.** It
   is simultaneously the largest file, the densest conditional logic, and the only
   place instruction legality lives. Almost every historical codegen bug has been a
   missing or over-broad predicate here.

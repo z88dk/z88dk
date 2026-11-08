@@ -1,3 +1,5 @@
+;; RST substitution, section sizes, and intrinsic calls. Loaded for every -O, for sccz80 and 80cc.
+
 ;;;
 ;;; RST substitution
 ;;;

@@ -141,9 +141,6 @@
  *                      Note that an optimal "register" strategy is
  *                      compiler-dependent, and that "register" declarations
  *                      do not necessarily lead to faster execution.
- *              -DNOSTRUCTASSIGN        (default: Not defined)
- *                      Define if the C compiler does not support
- *                      assignment of structures.
  *              -DNOENUM                (default: Not defined)
  *                      Define if the C compiler does not support
  *                      enumeration types.
@@ -355,9 +352,6 @@
  * -DSTATIC
  * Makes REG variables static instead of register.  Overrides REGISTER.
  *
- * -DNOSTRUCTASSIGN
- * Use memcpy instead of struct assignment.
- *
  * -DNOENUM
  * Use defines instead of enumeration.
  *
@@ -374,11 +368,7 @@
 
 /* Compiler and system dependent definitions: */
 
-#ifdef  NOSTRUCTASSIGN
-#define structassign(d, s)      memcpy(&(d), &(s), sizeof(d))
-#else
 #define structassign(d, s)      d = s
-#endif
 
 #ifdef  NOENUM
 #define Ident_1 0

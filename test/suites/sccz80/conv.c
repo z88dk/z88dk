@@ -223,6 +223,10 @@ static long add_sc(signed char n) { return n + 1L; }
 /* 8085 +test does not link the long-long helpers. Z80 does. */
 #ifndef __8085
 static long add_ll(int n) { return (long)(n + 40000LL); }
+static long long add_i64max(long long v) { return v + 9223372036854775807LL; }
+static long long sub_i64max(long long v) { return v - 9223372036854775807LL; }
+static long long add_i64max_l(long long v) { return 9223372036854775807LL + v; }
+static long long add_past53(long long v) { return v + 9007199254740993LL; }
 #endif
 
 static long struct_fold(void)
@@ -378,6 +382,10 @@ void test_conv(void)
     Assert(add_sc((signed char)200) == -55L, "signed char + 1L");
 #ifndef __8085
     Assert(add_ll(vi) == 40001L, "(long)(vi + 40000LL)");
+    Assert(add_i64max(0) == 9223372036854775807LL, "0 + INT64_MAX");
+    Assert(sub_i64max(0) == -9223372036854775807LL, "0 - INT64_MAX");
+    Assert(add_i64max_l(1) == -9223372036854775807LL - 1, "INT64_MAX + 1 wraps");
+    Assert(add_past53(0) == 9007199254740993LL, "0 + (2^53+1)");
 #endif
 
     sprintf(buf, "%ld", vi + 40000L);

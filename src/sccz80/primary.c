@@ -21,11 +21,28 @@ int primary(LVALUE* lval)
     int k;
 
     if (cmatch('(')) {
-        do {
+        int   pure = 1;
+        char *before, *start;
+
+        /* A parenthesis hides the comma from the caller. The caller
+           drops a constant result, and that drop took the earlier
+           operand with it. (i++, 7) must increment. (1, 2) stays 2. */
+        for (;;) {
+            setstage(&before, &start);
             k = heir1(lval);
-        } while (cmatch(','));
+            if (!cmatch(','))
+                break;
+            if (lval->is_const) {
+                if (before)
+                    clearstage(before, NULL);
+            } else
+                pure = 0;
+        }
         needchar(')');
-        //if ( k == 1 && lval->cast_type) docast(lval, lval);
+        if (!pure) {
+            lval->is_const = 0;
+            lval->int_const_valid = 0;
+        }
         return k;
     }
 
@@ -163,6 +180,19 @@ int primary(LVALUE* lval)
 }
 
 
+/* INT64_MIN / -1 does not fit in a signed 64-bit result. The host
+   divide traps on x86. Signed overflow wraps: the quotient is the
+   minimum and the remainder is 0. A narrower minimum still divides,
+   so INT32_MIN / -1 stays +2147483648. */
+uint64_t signed_div_mod(int is_mod, int64_t left, int64_t right)
+{
+    if (left == INT64_MIN && right == -1)
+        return is_mod ? 0 : (uint64_t)INT64_MIN;
+    if (is_mod)
+        return (uint64_t)(left % right);
+    return (uint64_t)(left / right);
+}
+
 /*
  * calculate constant expression (signed values)
  */
@@ -177,13 +207,21 @@ zdouble calc(
         left = truncl(left);
         right = truncl(right);
     }
+    /* C90 has no % for a floating operand. The runtime path rejects it too. */
+    if (oper == zmod && (kind_is_decimal(left_kind) || kind_is_decimal(right_kind))) {
+        errorfmt("Cannot apply operator %% to floating point", 1);
+        return 0;
+    }
+    if ((oper == zdiv || oper == zmod) && right == 0.0) {
+        warningfmt("division-by-zero","Division by zero, result set to be zero");
+        return 0;
+    }
     if (oper == zdiv && right != 0.0) {
-        if ( !kind_is_decimal(left_kind) && !kind_is_decimal(right_kind)) {
-            return ((int64_t)left / (int64_t)right);
-        }
+        if ( !kind_is_decimal(left_kind) && !kind_is_decimal(right_kind))
+            return (zdouble)(int64_t)signed_div_mod(0, (int64_t)left, (int64_t)right);
         return (left / right);
     } else if (oper == zmod)
-        return ((int)left % (int)right);
+        return (zdouble)(int64_t)signed_div_mod(1, (int)left, (int)right);
     else if (oper == zle)
         return (left <= right);
     else if (oper == zge)
@@ -193,10 +231,11 @@ zdouble calc(
     else if (oper == zgt)
         return (left > right);
     else if (oper == asr) {
-        if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
-             (left_kind == KIND_LONG && right >= 32) ) {
+        int width = left_kind == KIND_LONGLONG ? 64 : left_kind == KIND_LONG ? 32 : 16;
+        /* Zeroing the count used to keep the original value. */
+        if (right >= width) {
             warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
-            right = 0;
+            return left < 0 ? -1 : 0;
         }
         if ( is16bit ) return ((int16_t)(int64_t)left) >> (int16_t)right;
         else if (left_kind == KIND_LONG) return ((int32_t)(int64_t)left) >> (int)right;
@@ -216,6 +255,15 @@ zdouble calcun(
         left = truncl(left);
         right = truncl(right);
     }
+    /* C90 has no % for a floating operand. The runtime path rejects it too. */
+    if (oper == zmod && (kind_is_decimal(left_kind) || kind_is_decimal(right_kind))) {
+        errorfmt("Cannot apply operator %% to floating point", 1);
+        return 0;
+    }
+    if ((oper == zdiv || oper == zmod) && right == 0.0) {
+        warningfmt("division-by-zero","Division by zero, result set to be zero");
+        return 0;
+    }
 
     if (oper == zdiv)   {
         if ( !kind_is_decimal(left_kind) && !kind_is_decimal(right_kind)) {
@@ -233,10 +281,11 @@ zdouble calcun(
     else if (oper == zgt)
         return (left > right);
     else if (oper == asr) {
-         if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
-             (left_kind == KIND_LONG && right >= 32) ) {
+        int width = left_kind == KIND_LONGLONG ? 64 : left_kind == KIND_LONG ? 32 : 16;
+        /* Zeroing the count used to keep the original value. */
+        if (right >= width) {
             warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
-            right = 0;
+            return 0;
         }
         return ((uint64_t)left >> (int)right);
     } else
@@ -262,10 +311,11 @@ zdouble CalcStand(
     else if (oper == mult)
         return (left * right);
     else if (oper == asl) {
-        if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
-             (left_kind == KIND_LONG && right >= 32) ) {
+        int width = left_kind == KIND_LONGLONG ? 64 : left_kind == KIND_LONG ? 32 : 16;
+        /* Zeroing the count used to keep the original value. */
+        if (right >= width) {
             warningfmt("limited-range", "Left shifting by more than size of object, changed to zero");
-            right = 0;
+            return 0;
         }
         return (zdouble)((uint64_t)left << (unsigned int)right);
     } else if (oper == zeq)
@@ -337,13 +387,8 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
     else if (t2 == KIND_CPTR && (t1 == KIND_INT || t1 == KIND_PTR))
         warningfmt("incompatible-pointer-types","Narrowing pointer from far to near");
         
-    /* Char conversion */
-    if (t1 == KIND_CHAR && isunsigned2 == NO && !isconst) {
-        if (isunsigned1 == NO)
-            gen_conv_sint2char();
-        else
-            gen_conv_uint2char();
-    } else if (t1 == KIND_CHAR && isunsigned2 == YES && !isconst) {
+    /* Char conversion. The source signedness does not change the call. */
+    if (t1 == KIND_CHAR && !isconst) {
         if (isunsigned1 == NO)
             gen_conv_sint2char();
         else
@@ -576,14 +621,17 @@ void prestep(
             break;
         case KIND_LONG:
         case KIND_ACCUM32:
-            (*step)(lval);
+            zadd_const(lval, n * 4);
+            break;
         case KIND_CPTR:
-            (*step)(lval);
+            zadd_const(lval, n * 3);
+            break;
         case KIND_INT:
         case KIND_FLOAT16:
         case KIND_PTR:
         case KIND_ACCUM16:
-            (*step)(lval);
+            zadd_const(lval, n * 2);
+            break;
         default:
             (*step)(lval);
             break;
@@ -773,7 +821,6 @@ int check_range(LVALUE *lval, int32_t min_value, int32_t max_value)
     if ( ( oper == zlt && lval->const_val > max_value) ||
         (oper == zle && lval->const_val > max_value ) ||
         ( oper == zgt && lval->const_val < min_value) ||
-        ( oper == zgt && lval->const_val < min_value) ||
         ( oper == zge && lval->const_val <= min_value) ||
         ( oper == zne && (lval->const_val < min_value || lval->const_val > max_value)) ) {
         always = 1;
@@ -795,13 +842,17 @@ void check_assign_range(Type *type, double const_value)
 {
     Kind lhs_val_type = type->kind;
     int  factor = type->bit_size ? ((1 << type->bit_size) - 1) : 0xffff;
+    /* Width of the signed minimum. A full int is 16 bits, a full char 8.
+       -(32767 & factor) is one short of the two's-complement minimum. */
+    int  bits = type->bit_size ? type->bit_size : (lhs_val_type == KIND_CHAR ? 8 : 16);
+    int  smin = -(int)(1u << (bits - 1));
 
     if ( lhs_val_type == KIND_INT && !isutype(type) ) {
-        CHECK(const_value, -(32767 & factor), (65535 & factor));
+        CHECK(const_value, smin, (65535 & factor));
     } else if ( lhs_val_type == KIND_INT && isutype(type) ) {
         CHECK(const_value, 0, (65535 & factor));
     } else if ( lhs_val_type == KIND_CHAR && !isutype(type) ) {
-        CHECK(const_value, -(127 & factor), (255 & factor));
+        CHECK(const_value, smin, (255 & factor));
     } else if ( lhs_val_type == KIND_CHAR && isutype(type) ) {
         CHECK(const_value, 0, (255 & factor));
     }
@@ -835,13 +886,9 @@ int test(int label, int parens)
     if (lval.is_const) { /* constant expression */
         clearstage(before, 0);
         lval.binop = NULL;
-        if (lval.const_val) {
-            /* true constant, perform body */
-            return lval.const_val;
-        }
-        /* false constant, jump round body */
-      //  gen_jp_label(label);
-        return 0;
+        /* 1 = constant true, 0 = constant false. The value itself is not a
+           tri-state: 2 and 0.5 must not fall through as "not handled". */
+        return lval.const_val != 0;
     }
     
     if (lval.binop == dummy || check_lastop_was_testjump(&lval)) {
@@ -862,7 +909,7 @@ int test(int label, int parens)
  * return TRUE if it is a constant expression
  */
 int constexpr_exact(double *val, uint64_t *ival, int *ival_valid,
-                    Kind *type, int flag)
+                    Kind *type, int flag, int *isunsigned)
 {
     char *before, *start;
     zdouble valtemp;
@@ -876,6 +923,8 @@ int constexpr_exact(double *val, uint64_t *ival, int *ival_valid,
     *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
     *type = valtype;
+    if (isunsigned)
+        *isunsigned = type_ptr && type_ptr->isunsigned;
     Zsp = savesp;
     if (flag && con == 0)
         errorfmt("Expecting constant expression", 0 );
@@ -884,7 +933,7 @@ int constexpr_exact(double *val, uint64_t *ival, int *ival_valid,
 
 int constexpr(double *val, Kind *type, int flag)
 {
-    return constexpr_exact(val, NULL, NULL, type, flag);
+    return constexpr_exact(val, NULL, NULL, type, flag, NULL);
 }
 
 /*

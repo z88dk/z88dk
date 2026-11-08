@@ -1,3 +1,5 @@
+;; Z80N nextreg and MMU intrinsic rewrites. zcc loads this for -mz80n.
+
 ;;
 ;; ZXN_NEXTREG(reg,val)
 ;;

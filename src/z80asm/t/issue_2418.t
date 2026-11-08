@@ -61,7 +61,7 @@ END
             #	defc	i_11 = i_9
         }
         elsif (
-            /z88dk-copt\s+.*z80rules.9.*<\s*"([^"\n]+)"\s*>\s*"([^"\n]+)"\s*$/)
+            /z88dk-copt\s+.*z88dk_intrinsic.*<\s*"([^"\n]+)"\s*>\s*"([^"\n]+)"\s*$/)
         {
             my ( $f1, $f2 ) = norm_filenames( $1, $2 );
 
@@ -70,7 +70,7 @@ END
             # no difference in defc
         }
         elsif (
-            /z88dk-copt\s+.*z80rules.2.*<\s*"([^"\n]+)"\s*>\s*"([^"\n]+)"\s*$/)
+            /z88dk-copt\s+.*sccz80_rules\.2.*<\s*"([^"\n]+)"\s*>\s*"([^"\n]+)"\s*$/)
         {
             my ( $f1, $f2 ) = norm_filenames( $1, $2 );
 
@@ -79,7 +79,7 @@ END
             # no difference in defc
         }
         elsif (
-            /z88dk-copt\s+.*z80rules.1.*<\s*"([^"\n]+)"\s*>\s*"([^"\n]+)"\s*$/)
+            /z88dk-copt\s+.*sccz80_rules\.1.*<\s*"([^"\n]+)"\s*>\s*"([^"\n]+)"\s*$/)
         {
             my ( $f1, $f2 ) = norm_filenames( $1, $2 );
 
@@ -88,7 +88,7 @@ END
             # no difference in defc
         }
         elsif (
-            /z88dk-copt\s+.*z80rules.0.*<\s*"([^"\n]+)"\s*>\s*"([^"\n]+)"\s*$/)
+            /z88dk-copt\s+.*sccz80_rules\.3.*<\s*"([^"\n]+)"\s*>\s*"([^"\n]+)"\s*$/)
         {
             my ( $f1, $f2 ) = norm_filenames( $1, $2 );
 
@@ -97,7 +97,7 @@ END
             # no difference in defc
         }
         elsif (
-            /z88dk-copt\s+.*z80rules.8.*<\s*"([^"\n]+)"\s*>\s*"([^"\n]+)"\s*$/)
+            /z88dk-copt\s+.*sccz80_inline.*<\s*"([^"\n]+)"\s*>\s*"([^"\n]+)"\s*$/)
         {
             my ( $f1, $f2 ) = norm_filenames( $1, $2 );
 

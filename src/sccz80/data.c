@@ -27,10 +27,10 @@ int glbcnt; /* number of globals used */
 WHILE_TAB* wqueue; /* start of while queue */
 WHILE_TAB* wqptr; /* ptr to next entry */
 
-unsigned char *litq, *dubq; /* literal pool */
+unsigned char *litq; /* literal pool */
 unsigned char* glbq; /* global literal queue */
 unsigned char* tempq; /* Temp store string lits */
-int gltptr, litptr, dubptr; /* index of next entry */
+int gltptr, litptr; /* index of next entry */
 
 char macq[MACQSIZE]; /* macro string buffer */
 int macptr; /* and its index */
@@ -76,6 +76,12 @@ int nxtlab, /* next avail label # */
     infunc, /* "inside function" flag */
     c_verbose; /* Verbose to screen */
 
+/* Default is to spawn z88dk-ucpp. --c1mode opens the file directly
+   because zcc has already run the preprocessor. */
+int c_c1mode;
+char *c_cpp_exe = "z88dk-ucpp";
+int input_is_pipe;
+
 int      scope_block; /* */
 int      current_block; /* number of the block being parsed */
 
@@ -103,12 +109,6 @@ int debuglevel;
 /* Doubles stored as strings? */
 
 int c_double_strings;
-
-/*
- *        Framepointer stuff - tis broken!
- */
-int c_framepointer_is_ix;
-
 
 int c_use_r2l_calling_convention;
 

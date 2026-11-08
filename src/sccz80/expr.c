@@ -688,8 +688,10 @@ int heira(LVALUE *lval)
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('-')) {
+        set_unary_minus(1);
         if (heira(lval))
             rvalue(lval);
+        set_unary_minus(0);
         promote_unary_integer(lval);
         neg(lval);
         lval->const_val = -lval->const_val;
@@ -934,7 +936,6 @@ int heirb(LVALUE* lval)
                         utstring_printf(us,"' is not a pointer; did you mean to use '.'?");
                         errorfmt("%s", 1, utstring_body(us));
                         utstring_free(us);
-                        direct = 0;
                         direct = 1;
                     }
                     str = str->tag;

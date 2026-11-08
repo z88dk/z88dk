@@ -17,6 +17,7 @@ OBJS =	callfunc.o     	\
 	cdbfile.o     	\
 	codegen.o	\
 	const.o		\
+	cpp_invoke.o	\
 	data.o		\
 	declinit.o	\
 	error.o		\
