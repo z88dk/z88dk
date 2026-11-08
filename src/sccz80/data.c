@@ -76,6 +76,12 @@ int nxtlab, /* next avail label # */
     infunc, /* "inside function" flag */
     c_verbose; /* Verbose to screen */
 
+/* Default is to spawn z88dk-ucpp. --c1mode opens the file directly
+   because zcc has already run the preprocessor. */
+int c_c1mode;
+char *c_cpp_exe = "z88dk-ucpp";
+int input_is_pipe;
+
 int      scope_block; /* */
 int      current_block; /* number of the block being parsed */
 

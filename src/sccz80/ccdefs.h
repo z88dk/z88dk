@@ -295,6 +295,11 @@ extern void     plnge2a(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, 
 extern void     plnge2b(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval));
 extern void     load_constant(LVALUE *lval);
 
+/* cpp_invoke.c */
+extern void     cpp_add_arg(const char *arg);
+extern FILE    *cpp_open(const char *cpp_exe, const char *input_file);
+extern int      cpp_close(FILE *fp);
+
 /* preproc.c */
 extern void     junk(void);
 extern char     ch(void);

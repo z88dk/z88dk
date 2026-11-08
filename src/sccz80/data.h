@@ -46,6 +46,9 @@ extern int lineno;
 extern int infunc;
 
 extern int c_verbose;
+extern int c_c1mode;      /* skip popen-ucpp; treat input as preprocessed */
+extern char *c_cpp_exe;   /* preprocessor binary to spawn (when !c_c1mode) */
+extern int input_is_pipe; /* input came from popen; reap with cpp_close */
 extern FILE *input;
 extern FILE *output;
 extern FILE *inpt2;

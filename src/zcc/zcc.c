@@ -3434,6 +3434,8 @@ static char *multi_compiler_args(int is_80cc, int frame_ix)
         BuildOptions(&args, "-debug-defc");
     if (is_80cc)
         BuildOptions(&args, frame_ix ? "-fframe-pointer" : "-fomit-frame-pointer");
+    else
+        BuildOptions(&args, "--c1mode");
     return args;
 }
 
@@ -3634,7 +3636,7 @@ static void configure_compiler(void)
         BuildOptions(&asmargs, "-D__SCCZ80");
         BuildOptions(&linkargs, "-D__SCCZ80");
         /* Indicate to sccz80 what assembler we want */
-        snprintf(buf, sizeof(buf), "-ext=opt %s -zcc-opt=\"%s\"", select_cpu(CPU_MAP_TOOL_SCCZ80),zcc_opt_def);
+        snprintf(buf, sizeof(buf), "-ext=opt %s -zcc-opt=\"%s\" --c1mode", select_cpu(CPU_MAP_TOOL_SCCZ80),zcc_opt_def);
         add_option_to_compiler(buf);
 
         // section redirect is fine in sccz80 so add it as a compiler option
