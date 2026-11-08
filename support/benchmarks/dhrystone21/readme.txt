@@ -38,7 +38,8 @@ When compiling dhrystone 2.1, several defines are possible:
  * -DNOSTRUCTASSIGN
  * Use memcpy instead of struct assignment.
  * The stock SDCC copy still honors this. The z88dk classic and newlib
- * copies always use struct assignment.
+ * copies, and the HI-TECH v3.09 and v7.80 copies, always use struct
+ * assignment.
  *
  * -DNOENUM
  * Use defines instead of enumeration.
@@ -55,8 +56,9 @@ When compiling dhrystone 2.1, several defines are possible:
  */
 
 NOENUM can be defined freely depending on whether the compiler supports
-enumerations. NOSTRUCTASSIGN is honored by the stock SDCC copy. The z88dk
-classic and newlib copies always use struct assignment.
+enumerations. NOSTRUCTASSIGN is honored by the stock SDCC copy. The z88dk classic
+and newlib copies, and the HI-TECH v3.09 and v7.80 copies, always use
+struct assignment.
 
 All compiles are first checked for correctness by running the program
 with PRINTF defined.  After correctness is verified, time should be
