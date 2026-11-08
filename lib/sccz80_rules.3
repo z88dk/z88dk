@@ -617,7 +617,6 @@
 	ld	hl,%1	;const
 	call	l_gcharsp	;
 
-%notcpu vm1
 %notcpu 8085
 	ld	hl,%1	;const
 	add	hl,sp
@@ -625,6 +624,48 @@
 =
 	ld	hl,%1	;const
 	call	l_gintsp	;
+
+%cpu 8085
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint2sp
+
+%cpu 8085
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint4sp
+
+%cpu 8085
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint6sp
+
+%cpu 8085
+	ld	hl,8	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint8sp
+
+%cpu 8085
+	ld	hl,3	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint3sp
+
+%cpu 8085
+	ld	hl,5	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint5sp
 
 %notcpu vm1
 %notcpu 8085

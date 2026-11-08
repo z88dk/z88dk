@@ -1446,6 +1446,16 @@
 	ld	hl,0	;const
 	rl	l
 
+	ld	hl,0	;const
+	ld	a,0	;carry
+	rla
+	ld	l,a
+=
+	ld	a,0	;carry
+	rla
+	ld	l,a
+	ld	h,0
+
 	ld	l,(hl)
 	ld	h,0
 	ld	a,l
