@@ -7607,8 +7607,10 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             store_dehl_finalize(out, f, op->dst);
             return 0;
         }
+        /* A producer that expected the byte-direct path skipped the BC stash;
+           HL then still advertises the low half, so take it from there. */
         emit(out, "push\tde");
-        if (src0_cached)
+        if (src0_cached && !hl_has(bsrc0))
             emit(out, "push\tbc");
         else
             emit(out, "push\thl");

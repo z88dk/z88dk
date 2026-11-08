@@ -1131,7 +1131,7 @@ Node *declare_local(int local_static)
             return NULL;
         }
         if ( local_static ) {
-            char  namebuf[NAMESIZE * 2 + 10];
+            char  namebuf[NAMESIZE * 2 + 20];
             Node *init_node = NULL;
             /* The name is scoped to the BLOCK, so a function may declare
                several statics called the same thing in sibling or nested

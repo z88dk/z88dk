@@ -1946,7 +1946,7 @@ static int bb_de_carry_compare_first(const BB *bb, int v)
 {
     for (int i = 0; i < bb->n_ops; i++) {
         const Op *op = &bb->ops[i];
-        int uses = op->src[0] == v || op->src[1] == v || op->src[2] == v;
+        int uses = op->src[0] == v || op->src[1] == v;
         if (!uses) continue;
         switch (op->kind) {
         case IR_CMP_EQ: case IR_CMP_NE:
