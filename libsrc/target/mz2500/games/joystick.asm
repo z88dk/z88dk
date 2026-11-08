@@ -54,10 +54,10 @@ no_down:
 no_up:
     bit     4, b
     jr      z, no_fire
-    set     4, l
+    set     5, l
 no_fire:
     bit     5, b
     jr      z, joy_done
-    set     5, l
+    set     4, l
 joy_done:
     ret
