@@ -1,7 +1,7 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
-z88dk v2.5 - xx.xx.202x
+z88dk v2.5 - xx.11.2026
 
 Headline features for this release:
 
@@ -12,6 +12,9 @@ need one.
 
 In addtion to 80cc, the zcc driver supports the third-party xcc compiler for creation
 of z80 programs. Support for preliminary versions of llvm-z80 has also been added.
+
+Source level debugging now works for sdcc, sccz80 and 80cc compilations using either remote
+gdb or the builtin debugger within the jnext emulator.
 
 From this release, -lm selects math32 on classic and on newlib. The --math32 option selects 
 the same library. math32 runs on the 8080, the 8085, the KR580VM1, the gbz80, the Z80N, and 
@@ -46,6 +49,7 @@ z88dk-zx81bas is a new tool for ZX81 BASIC that contains inline assembly. Mark t
 More detailed, but still incomplete changelist:
 
 - [80cc] New optimising compiler, using sccz80 calling convention and stack pointer, or optionally using IX frame pointer.
+- [all] Symbolic debugging improved across sdcc, sccz80, 80cc
 - [all] -lm is math32 on classic and newlib. +zx81 and +lambda keep genmath_zx81. ROM maths stay on -lmz
 - [all] AI agent support via AGENTS.md and .agents/skills (Grok/Claude discovery symlinks)
 - [all] math16 half-precision floating point support for 8080, 8085, and gbz80
@@ -57,10 +61,12 @@ More detailed, but still incomplete changelist:
 - [appmake] +z88 writes .ap0 only when --installer is set
 - [appmake] cpmdisk can omit unused extents
 - [appmake] TeleDisk image support in cpmdisk
+- [asm7801] Simple assembler for the FP-1100 subcpu
 - [classic] +alphatp2 target working
 - [classic] +aquarius -subtype=allram takes the whole 64K machine
 - [classic] +aquarius can pack an AQX file with ZX0. CRT_AQPLUS_BANK3_RAM maps RAM into bank 3
 - [classic] +aquarius generic console plotting is faster
+- [classic] +fp1100 -subtype=allram, 64k support and subcpu rewrite
 - [classic] +gal faster plotting
 - [classic] +hdos fcntl available
 - [classic] +hdos time(), clock(), and default_device()
