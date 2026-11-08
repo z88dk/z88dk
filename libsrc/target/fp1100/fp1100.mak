@@ -5,7 +5,7 @@ FP1100_TARGETS := target/fp1100/obj/target-fp1100-fp1100 \
 
 $(eval $(call gfx_stamp_args,fp1100,TARGET=fp1100 FLAVOUR=wide))
 CLEAN += target-fp1100-clean
-TOCREATE += $(call check_target,fp1100,fp1100_clib.lib fp1100_cpm.lib)
+TOCREATE += $(call check_target,fp1100,fp1100_clib.lib fp1100_cpm.lib fp1100_allram.lib)
 $(eval $(call buildtargetasm,target/fp1100,z80,fp1100,-mz80,$(FP1100_SOURCES),$(FP1100_SOURCES)))
 
 fp1100_clib.lib: $(TARGET_CLIB_DEPS) $(FP1100_TARGETS)
@@ -14,6 +14,11 @@ fp1100_clib.lib: $(TARGET_CLIB_DEPS) $(FP1100_TARGETS)
 
 fp1100_cpm.lib: fp1100_clib.lib $(TARGET_CLIB_DEPS) $(FP1100_TARGETS)
 	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_cpm @$(TARGET_DIRECTORY)/fp1100/fp1100_cpm.lst
+	@touch $@
+
+# The all-RAM overlay: linked before fp1100_clib.lib (lib/config/fp1100.cfg, -clib=allram), see doc/target/fp1100/subcpu-plan.md
+fp1100_allram.lib: fp1100_clib.lib $(TARGET_CLIB_DEPS) $(FP1100_TARGETS)
+	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_allram @$(TARGET_DIRECTORY)/fp1100/fp1100_allram.lst
 	@touch $@
 
 target-fp1100: $(FP1100_TARGETS)

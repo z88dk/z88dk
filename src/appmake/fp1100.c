@@ -97,7 +97,7 @@ int fp1100_exec(char *target)
     char    loadername[FILENAME_MAX+1];
     FILE    *fpin, *bootstrap_fp, *loader_fp;
     disc_handle *h;
-    long    pos, bootlen;
+    long    pos, bootlen, org;
     int     t,s,w,head = 0;
 
     if ( help )
@@ -130,7 +130,9 @@ int fp1100_exec(char *target)
 
     strcpy(loadername, binname);
     suffix_change(loadername, "_BOOTSTRAP2.bin");
-    if ( (loader_fp = fopen(loadername, "rb")) != NULL ) {
+    // (a _BOOTSTRAP2.bin left by an earlier all-RAM build is ignored for a program at $9000 or above: that is the ROM-based layout)
+    org = get_org_addr(crtfile);
+    if ( (org == -1 || org < 0x9000) && (loader_fp = fopen(loadername, "rb")) != NULL ) {
         // The all-RAM layout
         unsigned char *loader, *prog, *extra = NULL;
         long loaderlen, proglen, extralen = 0;

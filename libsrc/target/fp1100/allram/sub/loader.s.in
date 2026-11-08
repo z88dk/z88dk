@@ -1,0 +1,20 @@
+; Stage 1: runs from VRAM at $3A60 (placed there with the ROM's "define character" command),
+; receives @SUBLEN@ bytes into @BASE@ (VRAM, sent inverted) and jumps to them.
+        ORG $3A60
+L0:     DI
+        LXI SP,0
+        LXI HL,@BASE@
+        MVI C,@SUBLEN1@
+L1:     CALL RcvL
+        STAX HL+
+        DCR C
+        JR L1
+        JMP @BASE@
+RcvL:   MVI E,$80
+        MOV $E800,E
+RwL:    SKIT F2
+        JR RwL
+        MOV A,$E800
+        MVI E,0
+        MOV $E800,E
+        RET
