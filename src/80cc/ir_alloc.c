@@ -3704,11 +3704,11 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                     blocked = 1;
             }
             if (blocked) continue;
-            long displaced = 0; int nd = 0;
+            long displaced = 0;
             for (int k = 0; k < nc; k++) {
                 if (!is_packed[k]) continue;
                 if (cand[k].flo <= cand[i].fhi && cand[i].flo <= cand[k].fhi) {
-                    displaced += BCH_WORTH(cand[k].vreg); nd++;
+                    displaced += BCH_WORTH(cand[k].vreg);
                 }
             }
             if (BCH_WORTH(v) <= displaced) continue;
