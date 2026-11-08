@@ -51,7 +51,7 @@ all:	mulconst.bin mulconst_8080.bin mulconst_gbz80.bin mulconst_r2ka.bin mulcons
 all:	condvalue.bin condvalue_8080.bin condvalue_gbz80.bin condvalue_r2ka.bin condvalue_ez80.bin condvalue_8085.bin condvalue_kc160.bin condvalue_z180.bin condvalue_r4k.bin condvalue_fp.bin
 all:	idx2param.bin idx2param_8080.bin idx2param_gbz80.bin idx2param_r2ka.bin idx2param_ez80.bin idx2param_8085.bin idx2param_kc160.bin idx2param_z180.bin idx2param_r4k.bin idx2param_fp.bin
 all:	densify.bin densify_8080.bin densify_gbz80.bin densify_r2ka.bin densify_ez80.bin densify_8085.bin densify_kc160.bin densify_z180.bin densify_r4k.bin densify_fp.bin
-all:	foldshift.bin foldshift_8080.bin foldshift_gbz80.bin foldshift_r2ka.bin foldshift_ez80.bin foldshift_8085.bin foldshift_kc160.bin foldshift_z180.bin foldshift_r4k.bin foldshift_fp.bin
+all:	foldshift.bin foldshift_8080.bin foldshift_gbz80.bin foldshift_r2ka.bin foldshift_ez80.bin foldshift_8085.bin foldshift_kc160.bin foldshift_z180.bin foldshift_r4k.bin foldshift_fp.bin foldshift_dbg.bin
 all:	countborrow.bin countborrow_gbz80.bin
 all:	strremat.bin strremat_fp.bin strremat_8080.bin strremat_gbz80.bin
 all:	fnptrdead.bin fnptrdead_fp.bin fnptrdead_8080.bin fnptrdead_gbz80.bin
@@ -5644,6 +5644,10 @@ foldshift_r4k.bin: $(SOURCES) foldshift.c
 
 foldshift_fp.bin: $(SOURCES) foldshift.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+foldshift_dbg.bin: $(SOURCES) foldshift.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -debug --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 
