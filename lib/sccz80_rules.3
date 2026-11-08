@@ -596,10 +596,6 @@
 	ld	(%2),hl
 	ld	(%3),hl
 
-	ex	de,hl
-	ex	de,hl
-=
-
 	call	l_gint	;
 	ld	b,h
 	ld	c,l
@@ -660,28 +656,6 @@
 	ld	d,0
 	ld	e,h
 	ld	hl,(%1)
-
-	ld	a,l
-	call	l_sxt
-	ld	a,l
-	ld	(%1),a
-	ld	h%2
-=
-	ld	a,l
-	ld	(%1),a
-	ld	h%2
-
-	ld	a,l
-	call	l_sxt
-	pop	de
-	ld	a,l
-	ld	(de),a
-	ld	h%2
-=
-	pop	de
-	ld	a,l
-	ld	(de),a
-	ld	h%2
 
 	ld	a,l
 	call	l_sxt

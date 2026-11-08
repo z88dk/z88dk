@@ -1150,9 +1150,8 @@
 =
 	ld	hl,%eval(%1 %2 +)	;const
 
-;Special rules for UZI here to optimize..
-;saves abt 1k on scall1.c alone..
-=
+;;Special rules for UZI here to optimize..
+;;saves abt 1k on scall1.c alone..
 
 	ld	hl,(__udata_)
 =
@@ -1260,17 +1259,6 @@
 	ld	a,l
 	ld	(de),a
 	ld	hl,%1
-
-	pop	de
-	ld	a,l
-	ld	(de),a
-	ld	h,0
-	ld	hl,%1	;const
-=
-	pop	de
-	ld	a,l
-	ld	(de),a
-	ld	hl,%1	;const
 
 	pop	de
 	ld	a,l
