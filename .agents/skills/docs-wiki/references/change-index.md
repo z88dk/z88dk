@@ -4,7 +4,7 @@ Read this file at the start of a page edit. Add rows when new commits or pull re
 
 The subject line is a filter. Each "Parsed patch" row below was taken from the diff (`git show` or the pull-request files), not from the commit comment. Procedure: skill `docs-wiki`, heading "Change index".
 
-Index built **2026-10-04**. Added **2026-10-15** through product `origin/master` `2a5638fa37`, then **2026-10-31** through `e0e198e7fa`. Wiki `origin/master` is `8ae3d02`. `262d364` renamed `CRT_OPEN_MAX` to `CLIB_OPEN_MAX` on `Platform---CPM`. Wiki clone: `/tmp/z88dk.wiki`. Printf pages: `6a20572`. #3040 page split and `draft:imported` removal: `eaa1cb0`. `draft:verified` removal: `811d405`. Earlier page edits `d9ebfaf` and `a7d0299` stay as recorded below. That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts. The 2026-10-31 page sentences are on the wiki as `8ae3d02`.
+Index built **2026-10-04**. Added **2026-10-15** through product `origin/master` `2a5638fa37`, then **2026-10-31** through `e0e198e7fa`, then **2026-11-09** through `345d45e220`. Wiki `origin/master` is `e0950eb`. The clone working tree was left at `8ae3d02`. `262d364` renamed `CRT_OPEN_MAX` to `CLIB_OPEN_MAX` on `Platform---CPM`. Wiki clone: `/tmp/z88dk.wiki`. Printf pages: `6a20572`. #3040 page split and `draft:imported` removal: `eaa1cb0`. `draft:verified` removal: `811d405`. Earlier page edits `d9ebfaf` and `a7d0299` stay as recorded below. That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts. The 2026-10-31 page sentences are on the wiki as `8ae3d02`. The 2026-11-09 sentences are not on the wiki yet.
 
 #3187 merged as `49678ddd96` and #3186 merged as `8ab2e80f99`. Both size and malloc sentences are already on the wiki as `d9ebfaf`. The rows below from closed issues #29, #1881, and #201 are on the wiki as `a7d0299`, pushed to `origin/master`.
 
@@ -44,6 +44,7 @@ Read from the issue comments, not from a commit subject.
 | `47901a27c1`, `6343d0ef10` | `z88dk-ticks` Z180 state counts. Host emulator. No platform page. |
 | `0936a566b0`, `4025e3ca60` | `src/ticks/reltool.c` only. Host tool. |
 | `2a5638fa37`..`e0e198e7fa`, except the rows below | 80cc opts (#3194, #3195, #3200, #3212), sccz80 and 80cc constant folding (#3204, #3207, #321, #2440), zsdcc shift peephole (#3213), stdcbench and the other benchmark pastes, ticks help and the debugger (#3179, #3199, #3208, reltool), zx81bas TODO, the zcc `-debug` alias, tests, and agent text. No CLIB default and no wiki sentence. |
+| `e0e198e7fa`..`345d45e220`, except the 2026-11-09 rows | sccz80, 80cc, copt, ticks, gdb, dis, debug, zx81bas, agents, changelog, and the Dhrystone readme scores (#3266). No CLIB default and no wiki sentence from those commits. |
 
 ## Parsed patches — wiki commits already applied
 
@@ -95,9 +96,9 @@ Do not write these onto the wiki until they merge. The title is not the change. 
 | z88dk#2850 "Vz200 new asm files" | `include/arch/vz.h` and `libsrc/target/vz/vz200.lst`. Drops `vz_bgrd`, `vz_brick`, `vz_clrscr`, `vz_color` from the header and the list. Adds coarse scroll, smooth scroll, sprite draw, text, paper, irq on/off, `vz_waitvb`, and the matching callees. Comments inside the new asm disagree (1 pixel vs 4 pixels; `vz_coursescroll` comments say smooth scroll). Document only symbols that agree in the header and the `.lst` | `Platform---VZ200` |
 | z88dk#2162 "Add filesystem API and improve console output" | The file list is `libsrc/target/ticalc/fcntl/` plus TI-83 Plus and TI-86 `.def` files. It adds AppVar `open` / `read` / `write` / `close` / `lseek` / `remove` / `rename`. There is no console-output diff in the file list. Do not add a "small text" claim from the title | `Platform---TI-Calculators` or `ti_calculators` |
 | z88dk#3186 merged as `8ab2e80f99` "80cc: Floating point optimisations" | `zcc --opt-code-size` passes `--opt-code-size` to 80cc as well as to sdcc. 80cc then uses a helper call when that call is shorter than the inline code. `OPTIONS.md` opt-out names stay off the wiki. `-fframe-pointer` was already on the page. | `Tool---80cc`. The size sentence is already there. Checked `d9ebfaf`. No further edit. |
-| z88dk#3217 "(zxn) BANK/PAGE origins carry the page, so __banked calls work (#3214)" | Classic `memory_map.asm` changes `ORG CRT_ORG_BANK_n_*` to `ORG (page base) + (CRT_ORG_BANK_n & 0xffff)`. Bank 0 is `0x000000`, bank 1 is `0x020000`, bank 3 is `0x060000`. The high bits carry the page. Also touches `zxn_crt0.asm` and `libsrc/newlib/target/zxn/zxn_rules.inc`. | Not merged. Do not write it onto `Platform---ZX-Spectrum-Next-zxn` or `Platform---Sinclair-ZX-Spectrum-Next`. |
-| z88dk#3218 "z88dk-gdb: match 24-bit lines while their ZXN page is mapped, and step over call banked_call" | `src/ticks/debugger_gdb.c` and `src/ticks/debugger_mi2.c` only. Host debugger. | Not merged. No platform page. |
-| z88dk#3219 "(zx) newlib: default BANK origins carry the bank, so __banked calls work" | `CRT_ORG_BANK_n` changes from `0xc000` to `n * 0x10000 + 0xc000`. `BANK_3` is `0x3c000`. Bits 16–23 hold the 16K bank that `banked_call` pages in at `0xc000` through port `0x7ffd`. The default stack `0xff58` is not below `0xc000`. With `__banked` calls the stack moves, for example `-pragma-define:REGISTER_SP=0xc000`. Also adds `target/zx/far/banked_call` to the sdcc_ix list. | Not merged. Do not write it onto `Platform---Sinclair-ZX-Spectrum` or `Newlib-Overview`. |
+| z88dk#3217 "(zxn) BANK/PAGE origins carry the page, so __banked calls work (#3214)" | Classic `memory_map.asm` changes `ORG CRT_ORG_BANK_n_*` to `ORG (page base) + (CRT_ORG_BANK_n & 0xffff)`. Bank 0 is `0x000000`, bank 1 is `0x020000`, bank 3 is `0x060000`. The high bits carry the page. Also touches `zxn_crt0.asm` and `libsrc/newlib/target/zxn/zxn_rules.inc`. | Merged `85ca52e4ae` (2026-10-31). See the 2026-11-09 section. No page states the old origin. |
+| z88dk#3218 "z88dk-gdb: match 24-bit lines while their ZXN page is mapped, and step over call banked_call" | `src/ticks/debugger_gdb.c` and `src/ticks/debugger_mi2.c` only. Host debugger. | Merged `5b06f051f0` (2026-10-31). No platform page. |
+| z88dk#3219 "(zx) newlib: default BANK origins carry the bank, so __banked calls work" | `CRT_ORG_BANK_n` changes from `0xc000` to `n * 0x10000 + 0xc000`. `BANK_3` is `0x3c000`. Bits 16–23 hold the 16K bank that `banked_call` pages in at `0xc000` through port `0x7ffd`. The default stack `0xff58` is not below `0xc000`. With `__banked` calls the stack moves, for example `-pragma-define:REGISTER_SP=0xc000`. Also adds `target/zx/far/banked_call` to the sdcc_ix list. | Merged `5c7855a7d1` (2026-11-01). See the 2026-11-09 section. No page states the old origin. |
 
 ## Closed issues since 2026-10-14
 
@@ -153,6 +154,51 @@ The hunk is the fact. Rows that asked for a sentence are on the wiki as `8ae3d02
 | `e517d50ab1` | Banked-call stack symbols are `___z88dk_banked_mainsp` and `___z88dk_banked_banksp` on every target that had the old names. | No page names the old symbols. No edit. |
 | `3c3f8bb47c` | Parsed with #3209 above. | No edit. |
 | `2d7967c6fa` | Parsed with #167 above. | No edit. |
+
+## Parsed patches — product commits `e0e198e7fa`..`345d45e220`
+
+Added **2026-11-09**. Product `origin/master` is `345d45e220` (merge of #3266). Wiki `origin/master` is `e0950eb`. Read a live page with `git -C /tmp/z88dk.wiki show origin/master:<page>`. The clone working tree was left at `8ae3d02`. Sentences below are not on the wiki yet.
+
+### Wiki commits `8ae3d02`..`e0950eb`
+
+These commits **are** the wiki text. Do not add a second sentence from the subject.
+
+| Source | What the patch says | Page |
+|--------|---------------------|------|
+| `e4844d1` | Moves the Libraries and Subtypes block down the page. The words are the same. | `Platform---Sinclair-ZX-Spectrum`. No new fact. |
+| `160d282` | Adds the classic checklist. Mode 0 is text 40 by 25. Mode 1 is text 80 by 25. Mode 2 is written as "Graphics 40x25". Hardware joystick is unchecked in this commit. | `Platform---Sharp-MZ2500`. Already the page. The pixel size of mode 2 is the product row below. |
+| `e0950eb` | Checks Hardware joystick. | `Platform---Sharp-MZ2500`. Already the page. Product `267af6f07c` is this check. |
+
+### Product commits
+
+| Source | What the patch says | Page |
+|--------|---------------------|------|
+| `d65f4ad0f5`, `c2ce03852f` | `+fp1100 -subtype=allram` links `-clib=allram` and `-startup=2`. The program starts at address 0, the stack is `0xfff0`, the console has 25 rows, and exit halts. The allram library has an inkey driver. `include/arch/fp1100.h` adds `fp1100_disk_read` and `fp1100_disk_write`. A call moves `count` sectors (1 to 255) of 256 bytes, from `sector` (1 to 16) of `track` (`2 * cylinder + side`) on drive `unit` (0 to 3). It returns 0, or 1 the pack is not there, 2 not ready, 3 the seek failed, 4 the controller refused, 5 timed out. Default startup stays 1: origin `$b000`, 24 rows, stack `-1`. allram `getmaxx` returns 319 and `getmaxy` returns 199. `d4d4fe5b2a` and `95ffb4e7c8` rebuild the sub-CPU program. `497489d13a` records the last cursor position and skips a repeat move. | `Platform---Casio-FP1000`, "Compilation" and "Limitations". Sentences due. File I/O stays unchecked. The default Inkey box stays unchecked. The mode list stays 24 rows. The SubCPU limitation stays. |
+| `d6bfff4b09`, `2bceca081f`, `33588fb17c`, `f7518a4ca1`, `267af6f07c` | Inkey, hires graphics, text plus graphics console, 80-column mode 1, and the joystick. | Already on `Platform---Sharp-MZ2500` as `160d282` and `e0950eb`. No second sentence. |
+| `bac1789665`, `e80e690468` | The public comment in `include/arch/mz2500.h` says mode 0 is 40-column text, mode 1 is 80-column text, and mode 2 is 40 by 25 characters on the graphics screen. Graphics are 320 by 200 in 16 colours. Text modes use 8 colours. `grafix.inc` sets `_GFX_MAXX` 320 and `_GFX_MAXY` 200 for `FORmz2500`. The same commit defines `__MZ2500_IPL` and turns the IPL cursor off at startup. | `Platform---Sharp-MZ2500`, "Generic console". Replace `Mode 2: Graphics 40x25`. The page does not mention the IPL cursor. No cursor sentence. |
+| `f88dd282c8` | The bank-image buffer is one byte past the last page. | The page says `BANK_n` loads extra RAM. It does not state the buffer length. No edit. |
+| `af347370ee` | A printf sign helper stays in the main program. | No page states the old placement. No edit. |
+| `57f8443317` | `lib/target/mz2500/def/maths.def` lists IPL ROM maths entries. The file says the entries are guesses from a disassembly. | No page lists those entries. Do not publish the guessed addresses. No edit. |
+| `04c3ea549f` | SIO receive size stays `0x80` and transmit size stays `0x20`. SIO `RX_FULLISH` changes from size minus 24 to size minus 16. SIO `RX_EMPTYISH` changes from `0x08` to size minus 32. ACIA `RX_EMPTYISH` changes from `0x08` to size minus 32. UART `RX_FULLISH` changes from size minus 24 to size minus 32, and `RX_EMPTYISH` from `0x08` to size minus 48. | No page states these sizes. No edit. |
+| `6d0413c3dd`, `735dd65fd5`, `e26f0fa414`, `a2b0f8aa48`, merge `5c7855a7d1` (#3219) | Classic `banked_call` changes only the RAM bank bits of port `0x7ffd` (`@11111000`). It no longer uses `or 16`. A 128K SNA writes `SV_BANKM` (`0x5b5c`) to match the byte written to that port. `e26f0fa414` takes the `SV_BANKM` address from the map. Newlib `CRT_ORG_BANK_n` defaults to `n * 0x10000 + 0xc000`. | `Platform---Sinclair-ZX-Spectrum` says banks page in at `c000`–`ffff` and that a `.tap` can hold banked data. It does not state the old origin or the old `or 16`. `Newlib-Overview` does not either. No edit. |
+| `ed2c3ebe87`, merge `85ca52e4ae` (#3217, #3214) | Newlib default BANK and PAGE origins carry the page. | `Platform---ZX-Spectrum-Next-zxn` and `Platform---Sinclair-ZX-Spectrum-Next` do not state the old origin. No edit. |
+| `5b06f051f0` (#3218) | Host `z88dk-gdb` only. | No platform page. No edit. |
+| `8ed64442b3` | PHC-20 `CRT_ORG_CODE` moves from `$4000` to `$2000`. The stack is `$2bff`. `$4000` is video RAM. The commit comment says a Takeda `.cas` still cannot be loaded. | `Platform---Unsupported` says the PHC-20 is not a supported machine. It does not quote `$4000`. Do not write a support page from this address change. Do not add the cassette note. |
+| `dbfc894185` | Integer `pow` with the absolute exponent below 2^24 is exponentiation by squaring. Every other exponent uses the APU `PWR` operation. | `math.md` has the `pow` heading and no sentence about the old result. No edit. |
+| `4f6eec2486` (#3205) | zx81bas writes no `DEFB` when the list is empty. | No tool page states the old empty `DEFB`. No edit. |
+| `cf8e9dd1da`, `633a14ec26`, `0444094b3b`, merge `345d45e220` (#3266) | Classic Dhrystone 2.1 TIMER scores for sccz80 and 80cc, on z80 and 8085, are in `support/benchmarks/dhrystone21/` (8 Nov 2026). `z88dk-new/readme.txt` still says sccz80 cannot compile the newlib port. That line was not retested. | `Benchmarks` has a Dhrystone table and does not list sccz80 or 80cc. Number paste stays with `methodology-measure`. Do not paste these scores in this pass. Do not mark the newlib port as fixed. |
+
+Still open, and still not for the wiki until they merge: #2850, #2162, #2155. Their rows above still apply. #3217, #3218, #3219, and #3266 have merged.
+
+### Closed issues since 2026-10-31
+
+The issue title is a filter. The merged patch is the fact.
+
+| Source | What the patch says | Page |
+|--------|---------------------|------|
+| #3267, #3259, #3256, #3255, #3254, #3248, #3247, #3246, #3245, #3239, #3236, #3234, #3233, #3232, #3228, #3222, #3220, #3215 | ticks, gdb, dis, sccz80, and 80cc. The merged patches are compiler or host-debugger fixes. #3239 is the struct-copy review, merged as #3266 `345d45e220`. | No platform page states the old behaviour. No edit. |
+| #3214, merge `85ca52e4ae` (#3217) | Parsed with `ed2c3ebe87` above. | Next pages do not state the old page origin. No edit. |
+| #3205, `4f6eec2486` | Parsed above. | No tool page. No edit. |
 
 ## Page rows from #3040
 
