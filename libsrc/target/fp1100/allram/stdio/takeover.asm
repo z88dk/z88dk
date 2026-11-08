@@ -23,6 +23,9 @@
 
     INCLUDE "../sub/sub.inc"
 
+    defc    SUB_SIZE = SUB_P1END - SUB_MAIN                       ; page 1
+    defc    SUB2_SIZE = (SUB_SUBEND - SUB_PAGE2 + 7) & $FFF8       ; the rest, in 8 byte units
+
 ; A to the sub program: wait until it is ready (bit 7 of port $FF80 set), put the byte on port $FFC0, pulse INT2 ($FF80: $C0 then $20), wait for the
 ; acknowledgement (bit 7 clear).  Keeps BC, DE and HL.
 fp1100_sub_send:
@@ -72,7 +75,7 @@ fr2:
 
 ; DE = a VRAM address for the program.  Keeps BC, DE and HL.
 fp1100_sub_addr:
-    ld      a, SUB_ADDR
+    ld      a, SUB_ADDR & $FF
     call    fp1100_sub_send
     ld      a, e
     call    fp1100_sub_send
@@ -83,7 +86,7 @@ fp1100_sub_addr:
 fp1100_sub_glyph:
     push    bc
     push    af
-    ld      a, SUB_GLYPH
+    ld      a, SUB_GLYPH & $FF
     call    fp1100_sub_send
     pop     af
     call    fp1100_sub_send
@@ -130,7 +133,7 @@ fp1100_sub_cls:
     ld      c, a
     ld      b, 4                        ; 1000 cells: 3 of 256 and one of 232
 fc1:
-    ld      a, SUB_FILL
+    ld      a, SUB_FILL & $FF
     call    fp1100_sub_send
     ld      a, b
     cp      1
@@ -245,7 +248,7 @@ fb_sp:
     ld      a, d
     or      e
     jr      nz, fb_sp
-    ld      a, SUB_ADDR                 ; the rest: into the video RAM at $9100, from the command that takes 8 bytes a time
+    ld      a, SUB_ADDR & $FF                 ; the rest: into the video RAM at $9100, from the command that takes 8 bytes a time
     call    fp1100_sub_send
     xor     a
     call    fp1100_sub_send
@@ -254,7 +257,7 @@ fb_sp:
     ld      hl, sub_page2
     ld      c, SUB2_SIZE / 8
 fb_p2:
-    ld      a, SUB_PAT
+    ld      a, SUB_PAT & $FF
     call    fp1100_sub_send
     ld      b, 8
 fb_p3:

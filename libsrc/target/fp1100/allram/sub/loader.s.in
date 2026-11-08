@@ -1,15 +1,16 @@
 ; Stage 1: runs from VRAM at $3A60 (placed there with the ROM's "define character" command),
-; receives @SUBLEN@ bytes into @BASE@ (VRAM, sent inverted) and jumps to them.
+; receives the first page (SUB_P1END - SUB_MAIN bytes) into SUB_MAIN (VRAM, sent inverted) and jumps to it.  sub.inc is the sub program's define file.
+        INCLUDE "sub.inc"
         ORG $3A60
 L0:     DI
         LXI SP,0
-        LXI HL,@BASE@
-        MVI C,@SUBLEN1@
+        LXI HL,SUB_MAIN
+        MVI C,SUB_P1END-SUB_MAIN-1
 L1:     CALL RcvL
         STAX HL+
         DCR C
         JR L1
-        JMP @BASE@
+        JMP SUB_MAIN
 RcvL:   MVI E,$80
         MOV $E800,E
 RwL:    SKIT F2

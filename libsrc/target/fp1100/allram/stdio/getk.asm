@@ -18,7 +18,7 @@
 
 ; Ask the sub program for the keys: fp1100_keybuf = the count of rows, then a pair for each (row | $40 if bit 7 is set, the keys' bits 0 to 6).
 fp1100_keys:
-    ld      a, SUB_KEYS
+    ld      a, SUB_KEYS & $FF
     call    fp1100_sub_send
     call    fp1100_sub_read
     ld      (fp1100_keybuf), a

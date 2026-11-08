@@ -87,11 +87,11 @@ sc_b:
     ld      (hl), 32
     inc     hl
     djnz    sc_b
-    ld      a, SUB_SCROLL
+    ld      a, SUB_SCROLL & $FF
     call    fp1100_sub_send
     ld      de, $2000 + 24 * 320
     call    fp1100_sub_addr
-    ld      a, SUB_FILL
+    ld      a, SUB_FILL & $FF
     call    fp1100_sub_send
     ld      a, 39
     call    fp1100_sub_send
@@ -165,7 +165,7 @@ printc_go:
     add     hl, de
     ex      de, hl
     call    fp1100_sub_addr
-    ld      a, SUB_TEXT
+    ld      a, SUB_TEXT & $FF
     call    fp1100_sub_send
     xor     a                           ; one character
     call    fp1100_sub_send

@@ -84,7 +84,7 @@ wp_ok:
 
 ; hl = the byte, c = the mask, b = the colour (bits 0 to 2, bit 3: flip): the sub program's Pix.
 fp1100_pixel_send:
-    ld      a, SUB_PIX
+    ld      a, SUB_PIX & $FF
     call    fp1100_sub_send
     ld      a, l
     call    fp1100_sub_send

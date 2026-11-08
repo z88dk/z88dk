@@ -15,7 +15,7 @@ w_pointxy:
     xor     a
     ret
 pt_on:
-    ld      a, SUB_POINT
+    ld      a, SUB_POINT & $FF
     call    fp1100_sub_send
     ld      a, l
     call    fp1100_sub_send

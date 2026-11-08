@@ -119,7 +119,7 @@ lr_go2:
     ld      (ln_addr), hl
     ld      a, c
     ld      (ln_mask), a
-    ld      a, SUB_LINE
+    ld      a, SUB_LINE & $FF
     call    fp1100_sub_send
     ld      a, (ln_addr)
     call    fp1100_sub_send

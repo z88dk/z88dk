@@ -1,5 +1,5 @@
 ; The Casio FP-1100's sub-CPU (uPD7801) program for the all-RAM console: it owns the video RAM, and the Z80 drives it a byte at a time
-; (target/fp1100/allram/stdio/takeover.asm sends it).  It runs from the spare VRAM at @BASE@ (stored inverted: the VRAM bus inverts a
+; (target/fp1100/allram/stdio/takeover.asm sends it).  It runs from the spare VRAM at BASE (stored inverted: the VRAM bus inverts a
 ; read), and the stack is at the top of the sub-CPU's RAM.  Each command byte is the low address of its handler (dispatched with JB, so the
 ; entry points are all in the first page); Rcv fetches a byte from the Z80 with the handshake (writing $80 to $E800 says ready, the Z80's INT2
 ; pulse is the byte, writing 0 acknowledges it).
@@ -24,10 +24,11 @@
 ;                   c as for Pix.
 ;   Keys            scans the key matrix and returns the number n of rows with a key down, then for each a row byte (the matrix row, 1 to 12, and $40 if bit 7
 ;                   of the keys is set) and the keys (bits 0 to 6; bit 7 is in the row byte); every reply byte is 7 bits
-        ORG @BASE@
+        PUBLIC Main, P1End, Page2, SubEnd, Addr, Pat, Glyph, Text, Fill, Scroll, Keys, Pix, Point, Line
+        ORG BASE
 Main:   CALL Rcv
         MOV C,A
-        MVI B,@PAGE@
+        MVI B,PAGE
         JB
 Pat:    CALL P8
         JR Main
@@ -61,7 +62,8 @@ Rw:     SKIT F2
 
 P1End:
 ; ---- the second page ----
-        ORG @BASE2@
+        ORG BASE2
+Page2:
 KeysBody:
         EXX                     ; (the alternate registers: DE is the address, and the Z80 counts on it staying)
         MVI D,0                 ; rows found
@@ -536,3 +538,4 @@ SyD:    MOV A,L
         ACI A,1
         MOV H,A
         RET
+SubEnd:
