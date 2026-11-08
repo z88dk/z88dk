@@ -146,7 +146,9 @@ int mz2500_exec(char* target)
     /* The disk file is a stream of 8 KB pages. The IPL loads the n-th page of the stream into the RAM page named by the n-th byte of the bank
        list in the directory entry: the program's pages first (RAM pages 12... which the initial map shows at $8000...), then each extra bank
        (the linker's <name>_BANK_<n>.bin, linked at (n << 16) | the address the program maps it at) into RAM page n. */
-    image = calloc(MAX_BANKS, PAGE_SIZE);
+    /* The bank read asks for one byte past the last page, to tell a
+       page list that does not fit from one that does. */
+    image = calloc(1, (size_t)MAX_BANKS * PAGE_SIZE + 1);
     if (image == NULL || len > (lowprog ? 2 : 4) * PAGE_SIZE) {
         fclose(fpin);
         if (lowprog) {

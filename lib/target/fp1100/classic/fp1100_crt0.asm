@@ -25,7 +25,17 @@
 ; Set an origin for the application (-zorg=) default to 32768
 ;--------
 
+IFNDEF CRT_ORG_CODE
     defc    CRT_ORG_CODE = 0xb000
+ENDIF
+
+; A program below $9000 is an all-RAM one: the ROM's routines (RAM copies at $0000-$8FFF) are overwritten by it, so it makes no ROM calls, and the bootstrap loads it with a
+; RAM loader (BOOTSTRAP2, see bootstrap.asm).  It is started at CRT_ORG_CODE by that loader, and has the whole machine: the stack at the top of RAM (-pragma-define:REGISTER_SP=n).
+IF CRT_ORG_CODE < $9000
+    defc    FP1100_ALLRAM = 1
+ELSE
+    defc    FP1100_ALLRAM = 0
+ENDIF
 
     defc    CONSOLE_ROWS = 24
     defc    CONSOLE_COLUMNS = 40
@@ -48,7 +58,9 @@
 
     jp      start
 start:
+IF !FP1100_ALLRAM
     ld      (__restore_sp_onexit+1),sp   ; Save entry stack
+ENDIF
     INCLUDE "crt/classic/crt_init_sp.inc"
 
     call    crt0_init
@@ -58,8 +70,10 @@ start:
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
+IF !FP1100_ALLRAM
     ld      a,SUB_BEEPOFF
     call    TRNC1
+ENDIF
 
 
     call    _main           ; Call user program
@@ -68,9 +82,15 @@ __Exit:
     call    crt0_exit
     pop     bc
     INCLUDE "crt/classic/crt_exit_eidi.inc"
+IF FP1100_ALLRAM
+__halt:
+    halt                    ; (there is nothing to return to)
+    jr      __halt
+ELSE
 __restore_sp_onexit:
     ld      sp,0            ;Restore stack to entry value
     ret
+ENDIF
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls

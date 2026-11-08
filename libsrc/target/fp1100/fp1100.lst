@@ -6,6 +6,7 @@ target/fp1100/obj/${TARGET}/x/target/fp1100/stdio/conio_map_colour.o
 target/fp1100/obj/${TARGET}/x/target/fp1100/stdio/fputc_cons_native.o
 target/fp1100/obj/${TARGET}/x/target/fp1100/stdio/fgetc_cons.o
 target/fp1100/obj/${TARGET}/x/target/fp1100/stdio/getk.o
+target/fp1100/obj/${TARGET}/x/target/fp1100/disk/fp1100_disk.o
 @classic/stdio/stdio.lst
 target/fp1100/obj/${TARGET}/x/target/fp1100/graphics/clg.o
 target/fp1100/obj/${TARGET}/x/target/fp1100/graphics/textpixl.o
