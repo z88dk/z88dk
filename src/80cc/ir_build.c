@@ -2589,11 +2589,18 @@ static int agg_lvalue_addr(Builder *b, Node *node)
         op->dst = addr; op->src[0] = src;
         return addr;
     }
-    /* `*ptr` as an aggregate lvalue: its address is the pointer value, i.e.
-       the deref's operand — NOT a load through it (build_expr on the deref
-       itself would try to load the aggregate). */
-    if (node->ast_type == OP_DEREF)
+    /* `*ptr` as an aggregate lvalue. rvalue() wraps the pointer expression
+       in OP_DEREF and stamps that node with the pointer type, so the loaded
+       value is the address of the aggregate. An offset-0 member folds onto
+       the struct object: the operand is then that struct, and evaluating
+       it yields the struct's address rather than the pointer stored there.
+       A deref stamped with the aggregate type already denotes the address,
+       so that shape still evaluates the operand. */
+    if (node->ast_type == OP_DEREF || node->ast_type == AST_DEREF) {
+        if (node->type && ispointer(node->type))
+            return build_expr(b, node);
         return build_expr(b, node->operand);
+    }
     /* `&arr[i]` / `&s.m` fold to an additive address expression that already
        computes the address. */
     if (node->ast_type == OP_ADD || node->ast_type == OP_SUB)
