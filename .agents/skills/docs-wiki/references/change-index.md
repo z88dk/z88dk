@@ -4,7 +4,7 @@ Read this file at the start of a page edit. Add rows when new commits or pull re
 
 The subject line is a filter. Each "Parsed patch" row below was taken from the diff (`git show` or the pull-request files), not from the commit comment. Procedure: skill `docs-wiki`, heading "Change index".
 
-Index built **2026-10-04**. Added **2026-10-15** through product `origin/master` `2a5638fa37`, then **2026-10-31** through `e0e198e7fa`, then **2026-11-09** through `345d45e220`. Wiki `origin/master` is `c2512eb`. `262d364` renamed `CRT_OPEN_MAX` to `CLIB_OPEN_MAX` on `Platform---CPM`. Wiki clone: `/tmp/z88dk.wiki`. Printf pages: `6a20572`. #3040 page split and `draft:imported` removal: `eaa1cb0`. `draft:verified` removal: `811d405`. Earlier page edits `d9ebfaf` and `a7d0299` stay as recorded below. That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts. The 2026-10-31 page sentences are on the wiki as `8ae3d02`. The 2026-11-09 page sentences are on the wiki as `00b8f10`, `ce7c5ad`, and `c2512eb`.
+Index built **2026-10-04**. Added **2026-10-15** through product `origin/master` `2a5638fa37`, then **2026-10-31** through `e0e198e7fa`, then **2026-11-09** through `345d45e220`. Wiki `origin/master` is `f9a6a2b`. `262d364` renamed `CRT_OPEN_MAX` to `CLIB_OPEN_MAX` on `Platform---CPM`. Wiki clone: `/tmp/z88dk.wiki`. Printf pages: `6a20572`. #3040 page split and `draft:imported` removal: `eaa1cb0`. `draft:verified` removal: `811d405`. Earlier page edits `d9ebfaf` and `a7d0299` stay as recorded below. That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts. The 2026-10-31 page sentences are on the wiki as `8ae3d02`. The 2026-11-09 page sentences are on the wiki as `00b8f10`, `ce7c5ad`, `c2512eb`, and `f9a6a2b`.
 
 #3187 merged as `49678ddd96` and #3186 merged as `8ab2e80f99`. Both size and malloc sentences are already on the wiki as `d9ebfaf`. The rows below from closed issues #29, #1881, and #201 are on the wiki as `a7d0299`, pushed to `origin/master`.
 
@@ -157,7 +157,7 @@ The hunk is the fact. Rows that asked for a sentence are on the wiki as `8ae3d02
 
 ## Parsed patches — product commits `e0e198e7fa`..`345d45e220`
 
-Added **2026-11-09**. Product `origin/master` is `345d45e220` (merge of #3266). Wiki `origin/master` is `c2512eb`. Read a live page with `git -C /tmp/z88dk.wiki show origin/master:<page>`. The page sentences are on the wiki as `00b8f10`, `ce7c5ad`, and `c2512eb`.
+Added **2026-11-09**. Product `origin/master` is `345d45e220` (merge of #3266). Wiki `origin/master` is `f9a6a2b`. Read a live page with `git -C /tmp/z88dk.wiki show origin/master:<page>`. The page sentences are on the wiki as `00b8f10`, `ce7c5ad`, `c2512eb`, and `f9a6a2b`.
 
 ### Wiki commits `8ae3d02`..`e0950eb`
 
@@ -170,6 +170,7 @@ These commits **are** the wiki text. Do not add a second sentence from the subje
 | `00b8f10` | Writes the allram and disc sentences, and the mode 2 pixel size. | `Platform---Casio-FP1000` and `Platform---Sharp-MZ2500`. Checked. |
 | `ce7c5ad` | Adds the classic sccz80 and 80cc Dhrystone rows, z80 and 8085. | `Benchmarks`, "Dhrystone 2.1". Checked. |
 | `c2512eb` | Removes the sccz80 frame-pointer help lines. The multi list says sccz80 uses stack locals. | `Tool---sccz80` and `Tool---zcc`. Checked. |
+| `f9a6a2b` | The help paste also lists `-mvm1`, `-mr800`, the ignored `--reserve-regs-ix` and `--reserve-regs-iy`, `-I`, `--c1mode`, and `--cpp`. | `Tool---sccz80`, "Help". Checked. The version stamp on the page stays the July 2026 paste. `-h` prints the build stamp and the path used to start the compiler. |
 | `e0950eb` | Checks Hardware joystick. | `Platform---Sharp-MZ2500`. Already the page. Product `267af6f07c` is this check. |
 
 ### Product commits
