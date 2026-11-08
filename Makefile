@@ -60,7 +60,8 @@ BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) \
 	bin/z88dk-z80nm$(EXESUFFIX) bin/z88dk-zobjcopy$(EXESUFFIX)  \
 	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
 	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
-	bin/z88dk-lib$(EXESUFFIX) bin/z88dk-zx0$(EXESUFFIX) bin/z88dk-zx81bas$(EXESUFFIX)
+	bin/z88dk-lib$(EXESUFFIX) bin/z88dk-zx0$(EXESUFFIX) bin/z88dk-zx81bas$(EXESUFFIX) \
+	bin/z88dk-asm7801$(EXESUFFIX)
 
 ALL = $(EXTRA_ALL) $(BINS) testsuite
 
@@ -172,6 +173,9 @@ bin/z88dk-zx7$(EXESUFFIX): src/config.h | bin
 bin/z88dk-zx0$(EXESUFFIX): src/config.h | bin
 	$(MAKE) -C src/zx0 PREFIX=`pwd` install
 
+bin/z88dk-asm7801$(EXESUFFIX): src/config.h | bin
+	$(MAKE) -C src/asm7801 PREFIX=`pwd` install
+
 bin/z88dk-z80nm$(EXESUFFIX): src/config.h | bin
 	$(MAKE) -C src/z80nm PREFIX=`pwd` install
 
@@ -214,6 +218,7 @@ install: install-clean
 	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C src/zx0 PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/asm7801 PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C src/z80nm PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C src/zobjcopy PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C src/ticks PREFIX=$(DESTDIR)$(PREFIX) install
@@ -274,6 +279,7 @@ bins-clean:
 	$(MAKE) -C src/zpragma clean
 	$(MAKE) -C src/zx7 clean
 	$(MAKE) -C src/zx0 clean
+	$(MAKE) -C src/asm7801 clean
 	$(MAKE) -C src/zx81bas clean
 	$(MAKE) -C examples clean
 	$(MAKE) -C support clean
