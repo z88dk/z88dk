@@ -1199,6 +1199,12 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
     char* bfilename = malloc(MBBUFFERMAX);
     int  c,i;
     struct stat st;
+    struct stat mapst;
+    int map_time_ok;
+
+    /* Section files are written after the map. A file older than the
+       map belongs to an earlier link and must not overlap this binary. */
+    map_time_ok = fstat(fileno(fmap), &mapst) == 0;
 
     // organize output binaries into banks
 
@@ -1265,6 +1271,12 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
 
                     if ((type == TYPE_HEAD) && (stat(bfilename, &st) >= 0) && (S_IFREG == (st.st_mode & S_IFMT)) && (st.st_size > 0))
                     {
+                        if (map_time_ok && st.st_mtime < mapst.st_mtime)
+                        {
+                            fprintf(stderr, "Warning: %s is older than the map and is left out\n", bfilename);
+                        }
+                        else
+                        {
                         // found a section binary
                         // find out which memory bank it belongs to
 
@@ -1307,6 +1319,7 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
                         sb->section_name = must_strdup(section_name);
                         sb->org = symbol_value;
                         sb->size = st.st_size;
+                        }
                     }
 
                     // record an aligned section
