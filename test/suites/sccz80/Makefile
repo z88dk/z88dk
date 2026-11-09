@@ -29,10 +29,11 @@ CFILES := $(filter-out constpush.c conv.c,$(CFILES))
 endif
 # calllimit.c is expected to fail. It is checked separately, not run.
 # callargs.c fills sccz80's argument table. 80cc does not compile it.
+# declspec.c is issue #2335. 80cc still rejects qualifier-before-storage.
 # selfstruct.c stays in CFILES, so the default z80 target runs it too.
 CFILES := $(filter-out calllimit.c,$(CFILES))
 ifneq ($(COMPILER),sccz80)
-CFILES := $(filter-out callargs.c,$(CFILES))
+CFILES := $(filter-out callargs.c declspec.c,$(CFILES))
 endif
 TARGET_Z80 := $(foreach test,$(CFILES:.c=),test_$(test).bin)
 

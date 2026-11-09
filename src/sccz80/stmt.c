@@ -55,7 +55,6 @@ static int incritical = 0;  /* Are we in a __critical block */
 int statement(void)
 {
     int st;
-    int locstatic; /* have we had the static keyword */
 
     blanks();
     if (lineno != lastline) {
@@ -67,18 +66,7 @@ int statement(void)
         return (lastst = STEXP);
     } else {
 
-        if (amatch("extern")) {
-            dodeclare(EXTERNAL);
-            return lastst;
-        }
-        /* Ignore the register and auto keywords! */
-        swallow("register");
-        swallow("auto");
-
-        /* Check to see if specified as static, and also for far and near */
-        locstatic = amatch("static");
-
-        if ( declare_local(locstatic) ) {
+        if ( declare_local(0, 1) ) {
             return lastst;
         }        
         /* not a definition */
@@ -432,7 +420,8 @@ void dofor(void)
     current_block = scope_block; /* the for scope is a block of its own: header and body */
     ++ncmp;
     if (cmatch(';') == 0) {
-        if ( declare_local(0) == 0 ) {
+        /* for (int ...) is an existing extension. C90 has no storage class here. */
+        if ( declare_local(0, 0) == 0 ) {
             doexpr(); /*         initialization             */
             ns();
         }
