@@ -720,6 +720,10 @@ static int sizeof_type_word(const char *sname)
         if (strcmp(sname, *w) == 0)
             return 1;
     }
+    for (sym = locptr - 1; sym >= STARTLOC; sym--) {
+        if (sym->storage == TYPDEF && strcmp(sym->name, sname) == 0)
+            return 1;
+    }
     for (sym = symtab; sym != NULL; sym = sym->hh.next) {
         if (sym->storage == TYPDEF && strcmp(sym->name, sname) == 0)
             return 1;

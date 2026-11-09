@@ -29,14 +29,57 @@ const static int (*ops[])(void) = { one, two };
 const extern int ext_value;
 const int ext_value = 12;
 
+int unsigned iu = 21;
+long unsigned int lui = 22;
+int long il = 23;
+char signed sc = -5;
+short unsigned su = 25;
+
+/* +test is org 0 and the stack sits at 0xff00. 0x2d is inside that crt. */
+static __at(0xc000) unsigned char at_a;
+const static __at(0xc001) unsigned char at_b = 0x5a;
+
+__sfr __at 0x00 char io_port;
+
+static int smallc_f(void) __smallc
+{
+    return 9;
+}
+
+static int preserves_g(void) __preserves_regs(b, c)
+{
+    return 8;
+}
+
 static int local_orders(void)
 {
     const static int local = 13;
     volatile static int step = 1;
+    typedef int Tloc;
+    Tloc n = 4;
 
     Assert(local == 13, "local const static");
     Assert(step == 1, "local volatile static");
-    return local + step;
+    Assert(sizeof(n) == 2, "block typedef");
+    {
+        typedef char Tloc;
+        Tloc c = 2;
+
+        Assert(sizeof(c) == 1, "inner typedef");
+        n = n + c;
+    }
+    Assert(sizeof(n) == 2, "outer typedef remains");
+    return local + step + n;
+}
+
+static int placed_orders(void)
+{
+    unsigned char saw;
+
+    at_a = 0x3c;
+    io_port = 0x5a;
+    saw = io_port;
+    return at_a == 0x3c && at_b == 0x5a && saw == io_port;
 }
 
 void test_declspec(void)
@@ -51,7 +94,18 @@ void test_declspec(void)
     Assert(ops[0]() == 1, "const static function pointer");
     Assert(ops[1]() == 2, "const static function pointer 2");
     Assert(ext_value == 12, "const extern");
-    Assert(local_orders() == 14, "local specifier order");
+    Assert(iu == 21, "int unsigned");
+    Assert(lui == 22, "long unsigned int");
+    Assert(il == 23, "int long");
+    Assert(sizeof(il) == 4, "int long width");
+    Assert(sc < 0, "char signed");
+    Assert(sizeof(sc) == 1, "char signed width");
+    Assert(su == 25, "short unsigned");
+    Assert(sizeof(su) == 2, "short unsigned width");
+    Assert(smallc_f() == 9, "static __smallc");
+    Assert(preserves_g() == 8, "static __preserves_regs");
+    Assert(placed_orders() == 1, "at and sfr");
+    Assert(local_orders() == 20, "local specifier order");
 }
 
 int suite_declspec(void)
