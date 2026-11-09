@@ -28,11 +28,14 @@ ifeq ($(filter $(COMPILER),sccz80 80cc),)
 CFILES := $(filter-out constpush.c conv.c,$(CFILES))
 endif
 # calllimit.c is expected to fail. It is checked separately, not run.
+# declbad.c is expected to fail. It is checked separately, not run.
+# declskip_*.c each fail with one diagnostic. They are not run.
 # callargs.c fills sccz80's argument table. 80cc does not compile it.
+# declspec.c is issue #2335. 80cc still rejects qualifier-before-storage.
 # selfstruct.c stays in CFILES, so the default z80 target runs it too.
-CFILES := $(filter-out calllimit.c,$(CFILES))
+CFILES := $(filter-out calllimit.c declbad.c declskip_str.c declskip_brace.c,$(CFILES))
 ifneq ($(COMPILER),sccz80)
-CFILES := $(filter-out callargs.c,$(CFILES))
+CFILES := $(filter-out callargs.c declspec.c,$(CFILES))
 endif
 TARGET_Z80 := $(foreach test,$(CFILES:.c=),test_$(test).bin)
 
@@ -43,8 +46,9 @@ all: $(TARGET_Z80) $(TARGET_8080) $(TARGET_8085) $(TARGET_VM1) $(TARGET_GBZ80) $
 endif
 
 # One past the fixed argument table must be diagnosed, not stored.
+# declbad.c must diagnose specifier errors and must not leak a block typedef.
 ifeq ($(COMPILER),sccz80)
-all: test_calllimit
+all: test_calllimit test_declbad test_declskip test_declspec_sfr
 endif
 
 .PHONY: test_calllimit
@@ -53,7 +57,41 @@ test_calllimit: calllimit.c
 	grep -F "Too many arguments in a call, the limit is 98" calllimit.output
 	rm -f calllimit.o calllimit.output
 
+.PHONY: test_declbad
+test_declbad: declbad.c
+	-zcc +test -vn -c -compiler=sccz80 $< -o declbad.o > declbad.output 2>&1
+	grep -F "Function modifier __preserves_regs must follow the declarator" declbad.output
+	grep -F "More than one storage class in declaration" declbad.output
+	grep -F "Storage class specifier is not permitted here" declbad.output
+	grep -F "Missing token, expecting ( got l" declbad.output
+	grep -F "Typedef 'Tval' is not a variable" declbad.output
+	grep -F "Found K&R declaration" declbad.output && exit 1 || true
+	rm -f declbad.o declbad.output
 
+# Each file is already invalid. Recovery must add no second diagnostic.
+.PHONY: test_declskip
+test_declskip: declskip_str.c declskip_brace.c
+	-zcc +test -vn -c -compiler=sccz80 declskip_str.c -o declskip_str.o > declskip_str.output 2>&1
+	grep -F "Typedef 'Tstr' is not a variable" declskip_str.output
+	test `grep -c -E ": (fatal )?error:" declskip_str.output` -eq 1
+	-zcc +test -vn -c -compiler=sccz80 declskip_brace.c -o declskip_brace.o > declskip_brace.output 2>&1
+	grep -F "Typedef 'Tbr' is not a variable" declskip_brace.output
+	test `grep -c -E ": (fatal )?error:" declskip_brace.output` -eq 1
+	rm -f declskip_str.o declskip_brace.o declskip_str.output declskip_brace.output
+
+# Ticks does not loop an I/O port back to in. Lock the spelling in the asm.
+.PHONY: test_declspec_sfr
+test_declspec_sfr: declspec.c
+	zcc +test -vn -a -I../../framework -compiler=sccz80 declspec.c -o declspec_sfr.opt
+	grep -F "defc	_io_port" declspec_sfr.opt
+	grep -F "in	a,(_io_port)" declspec_sfr.opt
+	grep -F "out	(_io_port),a" declspec_sfr.opt
+	grep -F "defc	_sfr_ul" declspec_sfr.opt
+	grep -F "defc	_sfr_cc" declspec_sfr.opt
+	grep -F "defc	_sfr_l" declspec_sfr.opt
+	grep -F "call	l_push_di" declspec_sfr.opt
+	grep -F "call	l_pop_ei" declspec_sfr.opt
+	rm -f declspec_sfr.opt
 
 # double_t is 6 bytes here (four values, 24 bytes). --genmath keeps that width.
 test_autoinit.bin: $(SOURCES) autoinit.c
