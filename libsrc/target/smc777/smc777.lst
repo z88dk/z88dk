@@ -26,6 +26,9 @@ target/smc777/obj/${TARGET}/x/target/smc777/graphics/w_xorpixl_MODE4.o
 target/smc777/obj/${TARGET}/x/target/smc777/graphics/w_xorpixl_MODE8.o
 @classic/gfx/wide/gfx_wide.lst
 target/smc777/obj/${TARGET}/x/target/smc777/games/joystick.o
+target/smc777/obj/${TARGET}/x/target/smc777/disk/smc777_disk_run.o
+target/smc777/obj/${TARGET}/x/target/smc777/disk/smc777_disk_read.o
+target/smc777/obj/${TARGET}/x/target/smc777/disk/smc777_disk_write.o
 
 sound/sn76489/obj/${TYPE}_16bit/**/*.o
 @classic/games/games.lst

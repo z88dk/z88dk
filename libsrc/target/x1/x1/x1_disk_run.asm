@@ -6,6 +6,9 @@
 ;	status for the data request: a byte every 32 us in double density, so interrupts are off for the length of the call (and
 ;	come back if they were on).  The ports are decoded from all 16 bits, so a port is read with IN A,($F8) after LD A,$0F.
 ;
+; 	Sectors are moved one command each, and the controller's head settling delay (the E bit) is asked for only on the first sector of
+;	a call: asked for on every one, the delay is longer than the gap to the next sector, which then costs a whole turn of the disk.
+;
 ; 	A failure to read or write a sector is tried again up to TRIES times, from a restore.
 ;
 ;	The heads' position is remembered (the first call restores to track 0); the motor bit is dropped at the end of each call,
@@ -60,6 +63,8 @@ asm_x1_disk_regs:
 run:
 	ld	a,TRIES
 	ld	(tries),a
+	ld	a,$04
+	ld	(efl),a			;(the head settling delay for the first sector of the call only)
 	ld	a,i			;(the interrupt flag, kept on the stack)
 	push	af
 	di
@@ -77,7 +82,8 @@ next:
 	ld	a,(mode)
 	or	a
 	jr	nz,write
-	ld	a,$84			;read sector, with the head settling delay
+	ld	a,(efl)
+	or	$80			;read sector, with the head settling delay for the first
 	call	fdc_cmd
 	ld	bc,$0FFB
 	ld	d,0
@@ -100,7 +106,8 @@ read_got:
 	jp	nz,retry
 	jr	moved
 write:
-	ld	a,$A4			;write sector
+	ld	a,(efl)
+	or	$A0			;write sector
 	call	fdc_cmd
 	ld	bc,$0FFB
 	ld	d,0
@@ -122,6 +129,8 @@ write_got:
 	and	$7D			;lost data, CRC, record not found, write fault, write protected, or never finished
 	jp	nz,retry
 moved:
+	xor	a
+	ld	(efl),a			;(the head is settled)
 	ld	a,TRIES			;(the next sector has its own attempts)
 	ld	(tries),a
 	ld	(buf),hl
@@ -150,6 +159,8 @@ retry:
 	call	fdc_cmd
 	xor	a
 	ld	(cyl1),a
+	ld	a,$04
+	ld	(efl),a
 	jp	next
 error:
 	ld	a,$D0			;force interrupt: the controller is idle again
@@ -304,3 +315,4 @@ ctl:	defb	0
 cyl1:	defb	0			;the cylinder the heads are on, plus one (0: not known)
 buf:	defw	0
 tries:	defb	0			;the attempts left at this sector
+efl:	defb	0			;4 until the first sector is through: the E bit of the command
