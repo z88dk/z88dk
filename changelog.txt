@@ -70,6 +70,7 @@ More detailed, but still incomplete changelist:
 - [classic] +gal faster plotting
 - [classic] +hdos fcntl available
 - [classic] +hdos time(), clock(), and default_device()
+- [classic] +lynx allram support Lynx 128k, disc routines
 - [classic] +msx, +sam, and Aquarius Plus have a mouse driver. The +mz2500 mouse driver is untested
 - [classic] +multi8 tape reading functions available
 - [classic] +mz2500 Improved support: console, graphics and other routines.
@@ -78,6 +79,7 @@ More detailed, but still incomplete changelist:
 - [classic] +phc25 New target
 - [classic] +pps low-memory crt0 layout
 - [classic] +sms now has access to newlib libraries
+- [classic] +smc777 disc read/write and faster bootstrap
 - [classic] +spc1000 -subtype=allram links the program at address 0. tape_save and tape_load_to use the cassette
 - [classic] +test Support for KR580VM1 (vm1) processor
 - [classic] +x07 Support much improved

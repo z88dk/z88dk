@@ -1,6 +1,7 @@
 LYNX_GLOBS := \
 	"target/lynx/*.asm" \
 	"target/lynx/games/*.asm" \
+	"target/lynx/disk/*.asm" \
 	"target/lynx/graphics/*.asm" \
 	"target/lynx/input/*.asm" \
 	"target/lynx/stdio/*.asm" 
@@ -8,6 +9,7 @@ LYNX_GLOBS := \
 LYNX_GLOBS_ex := \
 	target/lynx/*.asm \
 	target/lynx/games/*.asm \
+	target/lynx/disk/*.asm \
 	target/lynx/graphics/*.asm \
 	target/lynx/input/*.asm \
 	target/lynx/stdio/*.asm 
