@@ -32,6 +32,7 @@ typedef struct {
     int permit_storage;
     int allow_at;
     int banked;            /* leading __banked: FARACC on the declarator */
+    int consumed;          /* a bad statement was diagnosed and skipped */
 } DeclSpecs;
 
 static void set_storage(DeclSpecs *ds, enum storage_type storage)
@@ -51,6 +52,8 @@ static void set_storage(DeclSpecs *ds, enum storage_type storage)
 /* One qualifier or storage-class specifier. Type keywords stay for the caller. */
 static int take_qual_or_storage(Type *type, DeclSpecs *ds)
 {
+    /* const in any position sets isconst. Trailing const
+       (`static int const`) is rodata, the same as a leading const. */
     if (swallow("const")) {
         if (type)
             type->isconst = 1;
@@ -671,8 +674,10 @@ static int consume_misplaced_modifier(void)
         "__z88dk_shortcall_hl", "__z88dk_shortcall",
         NULL
     };
+    /* __critical is a statement (stmt.c) and a trailing function
+       attribute. Swallowing it here eats a block __critical. */
     static char *plain[] = {
-        "__smallc", "__naked", "__stdc", "__critical", "__nonbanked",
+        "__smallc", "__naked", "__stdc", "__nonbanked",
         "__LIB__", "__FASTCALL__", "__CALLEE__", "__SAVEFRAME__",
         "__z88dk_fastcall", "__z88dk_callee", "__z88dk_saveframe",
         "__z88dk_sdccdecl",
@@ -703,8 +708,9 @@ static int consume_misplaced_modifier(void)
 
 /* C90 integer specifiers, in any order.
    0: none. 1: only signed or unsigned (a later float, typedef, or _Accum still applies).
-   2: char, short, int, or long was seen. long double stays a long.
-   short and long do not combine. A second int is only the old `int int`. */
+   2: char, short, int, or long was seen.
+   short and long do not combine. A second int is only the old `int int`.
+   `long double` is not a type: the leftover `double` stays a name. */
 static int parse_int_specs(Type *type, DeclSpecs *ds)
 {
     int nsigned = 0, nunsigned = 0, nchar = 0, nshort = 0, nint = 0, nlong = 0;
@@ -1267,6 +1273,7 @@ int declare_local(int local_static, int permit_storage)
     ds.permit_storage = permit_storage;
     ds.allow_at = 0;
     ds.banked = 0;
+    ds.consumed = 0;
 
     do {
         if ( first )
@@ -1274,6 +1281,9 @@ int declare_local(int local_static, int permit_storage)
         else
             type = dodeclare2(&base_type, MODE_NONE, NULL);
         if ( type == NULL ) {
+            /* T = 1; was diagnosed. The ';' is already consumed. */
+            if ( ds.consumed )
+                return 1;
             return 0;
         }
         if ( first ) {
@@ -1568,11 +1578,12 @@ Type *dodeclare(enum storage_type storage)
     ds.permit_storage = 1;
     ds.allow_at = 1;
     ds.banked = 0;
+    ds.consumed = 0;
 
     gen_emit_line(lineno);
     type = dodeclare2(&base_type, MODE_NONE, &ds);
     if ( type == NULL )
-        return NULL;
+        return ds.consumed ? type_void : NULL;
     if ( ds.storage >= 0 )
         storage = (enum storage_type)ds.storage;
     if ( storage == TYPDEF )
@@ -1624,12 +1635,42 @@ Type *make_type(Kind kind, Type *tag)
 // mode = 0 = normal
 // mode = 1 = typedef
 // mode = 2 = cast
+/* `T = 1;` names a typedef, not an object. Diagnose it and consume
+   the statement so it is not stored as an unnamed local. */
+static int reject_typedef_assignment(Type *type, char *namebuf, DeclSpecs *ds)
+{
+    SYMBOL *sym;
+
+    if (ds == NULL || namebuf[0] != 0 || type->name[0] == 0)
+        return 0;
+    blanks();
+    if (ch() != '=' || nch() == '=')
+        return 0;
+    sym = findloc(type->name);
+    if (sym == NULL)
+        sym = findglb(type->name);
+    if (sym == NULL || sym->storage != TYPDEF)
+        return 0;
+    errorfmt("Typedef '%s' is not a variable", 0, type->name);
+    while (ch() != ';' && eof == 0) {
+        if (ch() == 0)
+            preprocess();
+        else
+            gch();
+    }
+    needchar(';');
+    ds->consumed = 1;
+    return 1;
+}
+
 Type *dodeclare2(Type **base_type, decl_mode mode, DeclSpecs *ds)
 {
     char namebuf[NAMESIZE];
     Type *type;
     int   flags = 0;
     int   banked = 0;
+
+    namebuf[0] = 0;
 
     if ( base_type != NULL && *base_type != NULL ) {
         type = CALLOC(1,sizeof(*type));
@@ -1645,6 +1686,7 @@ Type *dodeclare2(Type **base_type, decl_mode mode, DeclSpecs *ds)
             nested.permit_storage = 0;
             nested.allow_at = 0;
             nested.banked = 0;
+            nested.consumed = 0;
             ds = &nested;
         }
         if ( (type = parse_type(ds)) == NULL ) {
@@ -1690,9 +1732,12 @@ Type *dodeclare2(Type **base_type, decl_mode mode, DeclSpecs *ds)
             warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
         type->value = dval;
 
-        /* `__sfr __at 0x00 char name` — the cell type is not the name. */
-        while (swallow("unsigned") || swallow("signed") ||
-               swallow("char") || swallow("int"))
+        /* The cell type is not the port name: `char name`,
+           `unsigned long p`, `const char p`, or `long p`. */
+        while (swallow("const") || swallow("volatile") ||
+               swallow("unsigned") || swallow("signed") ||
+               swallow("char") || swallow("short") ||
+               swallow("int") || swallow("long"))
             ;
 
         if ( symname(type->name) == 0 ) 
@@ -1705,6 +1750,9 @@ Type *dodeclare2(Type **base_type, decl_mode mode, DeclSpecs *ds)
     }
 
     type = parse_decl(namebuf, type);
+
+    if ( type != NULL && reject_typedef_assignment(type, namebuf, ds) )
+        return NULL;
 
     if ( type != NULL ) {
         strcpy(type->name, namebuf);
@@ -1810,6 +1858,7 @@ void declare_func_kr(void)
         specs.permit_storage = 0;
         specs.allow_at = 0;
         specs.banked = 0;
+        specs.consumed = 0;
         param = parse_type(&specs);
 
         if ( param != NULL ) {

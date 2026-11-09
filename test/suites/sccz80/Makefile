@@ -63,6 +63,7 @@ test_declbad: declbad.c
 	grep -F "More than one storage class in declaration" declbad.output
 	grep -F "Storage class specifier is not permitted here" declbad.output
 	grep -F "Missing token, expecting ( got l" declbad.output
+	grep -F "Typedef 'Tval' is not a variable" declbad.output
 	grep -F "Found K&R declaration" declbad.output && exit 1 || true
 	rm -f declbad.o declbad.output
 
@@ -73,6 +74,11 @@ test_declspec_sfr: declspec.c
 	grep -F "defc	_io_port" declspec_sfr.opt
 	grep -F "in	a,(_io_port)" declspec_sfr.opt
 	grep -F "out	(_io_port),a" declspec_sfr.opt
+	grep -F "defc	_sfr_ul" declspec_sfr.opt
+	grep -F "defc	_sfr_cc" declspec_sfr.opt
+	grep -F "defc	_sfr_l" declspec_sfr.opt
+	grep -F "call	l_push_di" declspec_sfr.opt
+	grep -F "call	l_pop_ei" declspec_sfr.opt
 	rm -f declspec_sfr.opt
 
 # double_t is 6 bytes here (four values, 24 bytes). --genmath keeps that width.

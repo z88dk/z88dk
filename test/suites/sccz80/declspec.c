@@ -40,6 +40,12 @@ static __at(0xc000) unsigned char at_a;
 const static __at(0xc001) unsigned char at_b = 0x5a;
 
 __sfr __at 0x00 char io_port;
+__sfr __at 0x12 unsigned long sfr_ul;
+__sfr __at 0x13 const char sfr_cc;
+__sfr __at 0x14 long sfr_l;
+
+/* Trailing const is rodata, the same as a leading const. */
+static int const trail_c = 16;
 
 static int smallc_f(void) __smallc
 {
@@ -49,6 +55,45 @@ static int smallc_f(void) __smallc
 static int preserves_g(void) __preserves_regs(b, c)
 {
     return 8;
+}
+
+const static int cs_defined(void)
+{
+    return 17;
+}
+
+static unsigned named_register(unsigned register)
+{
+    return register;
+}
+
+static int named_reg_char(unsigned char register, unsigned char value)
+{
+    return register + value;
+}
+
+static int critical_fn(int a, int b) __critical
+{
+    return a + b;
+}
+
+static int critical_block(void)
+{
+    int n;
+
+    n = 1;
+    __critical {
+        n = n + 1;
+    }
+    if (n)
+        __critical {
+            n = n + 2;
+        }
+    while (n < 8)
+        __critical {
+            n = n + 1;
+        }
+    return n;
 }
 
 static int local_orders(void)
@@ -104,6 +149,12 @@ void test_declspec(void)
     Assert(sizeof(su) == 2, "short unsigned width");
     Assert(smallc_f() == 9, "static __smallc");
     Assert(preserves_g() == 8, "static __preserves_regs");
+    Assert(cs_defined() == 17, "const static function");
+    Assert(trail_c == 16, "static int const");
+    Assert(named_register(41) == 41, "unsigned register");
+    Assert(named_reg_char(20, 3) == 23, "unsigned char register");
+    Assert(critical_fn(40, 2) == 42, "function __critical");
+    Assert(critical_block() == 8, "__critical block");
     Assert(placed_orders() == 1, "at and sfr");
     Assert(local_orders() == 20, "local specifier order");
 }

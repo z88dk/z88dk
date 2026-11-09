@@ -18,4 +18,11 @@ void hide(void)
     typedef int Tloc;
 }
 
+void as_value(void)
+{
+    typedef int Tval;
+
+    Tval = 1;
+}
+
 Tloc leaked;
