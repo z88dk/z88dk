@@ -78,6 +78,7 @@ __z88_open_map256:
     jr      opengfx1
 
 opengfx:
+    dec     a
     jr      nz,__z88_open_map512
     ld      l, (ix+wind_w)
     ld      h, 0
