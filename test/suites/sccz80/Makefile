@@ -29,10 +29,11 @@ CFILES := $(filter-out constpush.c conv.c,$(CFILES))
 endif
 # calllimit.c is expected to fail. It is checked separately, not run.
 # declbad.c is expected to fail. It is checked separately, not run.
+# declskip_*.c each fail with one diagnostic. They are not run.
 # callargs.c fills sccz80's argument table. 80cc does not compile it.
 # declspec.c is issue #2335. 80cc still rejects qualifier-before-storage.
 # selfstruct.c stays in CFILES, so the default z80 target runs it too.
-CFILES := $(filter-out calllimit.c declbad.c,$(CFILES))
+CFILES := $(filter-out calllimit.c declbad.c declskip_str.c declskip_brace.c,$(CFILES))
 ifneq ($(COMPILER),sccz80)
 CFILES := $(filter-out callargs.c declspec.c,$(CFILES))
 endif
@@ -47,7 +48,7 @@ endif
 # One past the fixed argument table must be diagnosed, not stored.
 # declbad.c must diagnose specifier errors and must not leak a block typedef.
 ifeq ($(COMPILER),sccz80)
-all: test_calllimit test_declbad test_declspec_sfr
+all: test_calllimit test_declbad test_declskip test_declspec_sfr
 endif
 
 .PHONY: test_calllimit
@@ -66,6 +67,17 @@ test_declbad: declbad.c
 	grep -F "Typedef 'Tval' is not a variable" declbad.output
 	grep -F "Found K&R declaration" declbad.output && exit 1 || true
 	rm -f declbad.o declbad.output
+
+# Each file is already invalid. Recovery must add no second diagnostic.
+.PHONY: test_declskip
+test_declskip: declskip_str.c declskip_brace.c
+	-zcc +test -vn -c -compiler=sccz80 declskip_str.c -o declskip_str.o > declskip_str.output 2>&1
+	grep -F "Typedef 'Tstr' is not a variable" declskip_str.output
+	test `grep -c -E ": (fatal )?error:" declskip_str.output` -eq 1
+	-zcc +test -vn -c -compiler=sccz80 declskip_brace.c -o declskip_brace.o > declskip_brace.output 2>&1
+	grep -F "Typedef 'Tbr' is not a variable" declskip_brace.output
+	test `grep -c -E ": (fatal )?error:" declskip_brace.output` -eq 1
+	rm -f declskip_str.o declskip_brace.o declskip_str.output declskip_brace.output
 
 # Ticks does not loop an I/O port back to in. Lock the spelling in the asm.
 .PHONY: test_declspec_sfr

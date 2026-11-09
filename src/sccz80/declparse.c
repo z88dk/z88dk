@@ -41,8 +41,8 @@ static void set_storage(DeclSpecs *ds, enum storage_type storage)
         errorfmt("Storage class specifier is not permitted here", 0);
         return;
     }
-    /* C90 allows one storage class. A repeated class is diagnosed and the
-       first one is kept. Older sccz80 accepted the repeat. */
+    /* C90 allows one storage class. A repeated class is an error and the
+       first one is kept. Older sccz80 accepted `static static`. */
     if (ds->storage >= 0)
         errorfmt("More than one storage class in declaration", 0);
     else
@@ -53,7 +53,8 @@ static void set_storage(DeclSpecs *ds, enum storage_type storage)
 static int take_qual_or_storage(Type *type, DeclSpecs *ds)
 {
     /* const in any position sets isconst. Trailing const
-       (`static int const`) is rodata, the same as a leading const. */
+       (`static int const`) is kept, so the object is rodata_compiler
+       rather than data_compiler. */
     if (swallow("const")) {
         if (type)
             type->isconst = 1;
@@ -675,7 +676,9 @@ static int consume_misplaced_modifier(void)
         NULL
     };
     /* __critical is a statement (stmt.c) and a trailing function
-       attribute. Swallowing it here eats a block __critical. */
+       attribute. Swallowing it here eats a block __critical.
+       A leading `__critical` at file scope keeps the old missing-token
+       diagnostic. That position is not a modifier. */
     static char *plain[] = {
         "__smallc", "__naked", "__stdc", "__nonbanked",
         "__LIB__", "__FASTCALL__", "__CALLEE__", "__SAVEFRAME__",
@@ -1635,11 +1638,38 @@ Type *make_type(Kind kind, Type *tag)
 // mode = 0 = normal
 // mode = 1 = typedef
 // mode = 2 = cast
-/* `T = 1;` names a typedef, not an object. Diagnose it and consume
-   the statement so it is not stored as an unnamed local. */
+/* A bare `T;` is not diagnosed and emits nothing. `T = ...` is. */
+static void skip_quoted(char quote)
+{
+    gch();
+    while (eof == 0) {
+        if (ch() == 0) {
+            preprocess();
+            continue;
+        }
+        if (ch() == '\\') {
+            gch();
+            if (ch() == 0)
+                preprocess();
+            else
+                gch();
+            continue;
+        }
+        if (ch() == quote) {
+            gch();
+            return;
+        }
+        gch();
+    }
+}
+
+/* `T = 1;` names a typedef, not an object. Skip the statement without
+   storing it. A `;` inside quotes is not the end, and a `}` we did not
+   open closes the block. */
 static int reject_typedef_assignment(Type *type, char *namebuf, DeclSpecs *ds)
 {
     SYMBOL *sym;
+    int depth = 0;
 
     if (ds == NULL || namebuf[0] != 0 || type->name[0] == 0)
         return 0;
@@ -1652,13 +1682,33 @@ static int reject_typedef_assignment(Type *type, char *namebuf, DeclSpecs *ds)
     if (sym == NULL || sym->storage != TYPDEF)
         return 0;
     errorfmt("Typedef '%s' is not a variable", 0, type->name);
-    while (ch() != ';' && eof == 0) {
-        if (ch() == 0)
+    while (eof == 0) {
+        if (ch() == 0) {
             preprocess();
-        else
+            continue;
+        }
+        if (ch() == '"' || ch() == '\'') {
+            skip_quoted(ch());
+            continue;
+        }
+        if (ch() == '{') {
+            depth++;
             gch();
+            continue;
+        }
+        if (ch() == '}') {
+            if (depth == 0)
+                break;
+            depth--;
+            gch();
+            continue;
+        }
+        if (ch() == ';' && depth == 0)
+            break;
+        gch();
     }
-    needchar(';');
+    if (ch() == ';')
+        gch();
     ds->consumed = 1;
     return 1;
 }
@@ -1732,8 +1782,8 @@ Type *dodeclare2(Type **base_type, decl_mode mode, DeclSpecs *ds)
             warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
         type->value = dval;
 
-        /* The cell type is not the port name: `char name`,
-           `unsigned long p`, `const char p`, or `long p`. */
+        /* Words after the address are the cell type, not the port name.
+           `unsigned __sfr` and `__sfr __at ... __banked` keep their old order. */
         while (swallow("const") || swallow("volatile") ||
                swallow("unsigned") || swallow("signed") ||
                swallow("char") || swallow("short") ||
