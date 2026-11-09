@@ -469,7 +469,8 @@ void main_usage(void)
     int   i;
 
     fprintf(stderr,"appmake [+target] [options]\n\n");
-    fprintf(stderr,"The z88dk application generator\n\n");
+    fprintf(stderr,"The z88dk application generator\n");
+    fprintf(stderr,"Version: %s\n\n", Z88DK_VERSION);
     fprintf(stderr,
             "This program is used to produce files which are suitable for use in\n"
             "emulators or on the real hardware. ");
