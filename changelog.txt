@@ -54,20 +54,15 @@ writes a .p tape image.
 
 More detailed, but still incomplete changelist:
 
-- [80cc] New optimising compiler, using sccz80 calling convention and stack
-  pointer, or optionally using IX frame pointer.
+- [80cc] New compiler. sccz80 convention, SP, optional IX frame pointer.
 - [all] Symbolic debugging improved across sdcc, sccz80, 80cc
-- [all] -lm is math32 on classic and newlib. +zx81 and +lambda keep
-  genmath_zx81. ROM maths stay on -lmz
-- [all] AI agent support via AGENTS.md and .agents/skills (Grok/Claude discovery
-  symlinks)
+- [all] -lm is math32. +zx81, +lambda keep genmath_zx81. ROM maths stay -lmz
+- [all] AI agent support via AGENTS.md and .agents/skills
 - [all] math16 half-precision floating point support for 8080, 8085, and gbz80
 - [all] math32 and math16 divide and inv use a restoring 1/x
-- [all] math32 floating point support for 8080, 8085, vm1, gbz80, z80n, and
-  Rabbit
+- [all] math32 floating point support for 8080, 8085, vm1, gbz80, z80n, Rabbit
 - [all] The toolchain now supports the KR580VM1 (vm1) processor
-- [all] ZX0 host tools and decompressors are v2.2. Forward data uses the v2
-  format. -c writes classic v1
+- [all] ZX0 host tools are v2.2. Forward data is v2. -c writes classic v1
 - [appmake] +hdos disc writing support
 - [appmake] +z88 writes .ap0 only when --installer is set
 - [appmake] cpmdisk can omit unused extents
@@ -75,15 +70,13 @@ More detailed, but still incomplete changelist:
 - [asm7801] Simple assembler for the FP-1100 subcpu
 - [classic] +alphatp2 target working
 - [classic] +aquarius -subtype=allram takes the whole 64K machine
-- [classic] +aquarius can pack an AQX file with ZX0. CRT_AQPLUS_BANK3_RAM maps
-  RAM into bank 3
+- [classic] +aquarius ZX0 AQX pack. CRT_AQPLUS_BANK3_RAM maps bank 3 RAM
 - [classic] +aquarius generic console plotting is faster
 - [classic] +fp1100 -subtype=allram, 64k support and subcpu rewrite
 - [classic] +gal faster plotting
 - [classic] +hdos fcntl available
 - [classic] +hdos time(), clock(), and default_device()
-- [classic] +msx, +sam, and Aquarius Plus have a mouse driver. The +mz2500 mouse
-  driver is untested
+- [classic] +msx, +sam, Aquarius Plus mouse driver. +mz2500 mouse untested
 - [classic] +multi8 tape reading functions available
 - [classic] +mz2500 Improved support: console, graphics and other routines.
 - [classic] +p2000 Inkey keyboard driver available
@@ -91,8 +84,7 @@ More detailed, but still incomplete changelist:
 - [classic] +phc25 New target
 - [classic] +pps low-memory crt0 layout
 - [classic] +sms now has access to newlib libraries
-- [classic] +spc1000 -subtype=allram links the program at address 0. tape_save
-  and tape_load_to use the cassette
+- [classic] +spc1000 -subtype=allram at address 0. tape_save, tape_load_to
 - [classic] +test Support for KR580VM1 (vm1) processor
 - [classic] +x07 Support much improved
 - [classic] +x1 has x1_disk_read and x1_disk_write
@@ -104,31 +96,23 @@ More detailed, but still incomplete changelist:
 - [classic] +zxn Thin sprite wrapper available
 - [classic] Einstein mode 7
 - [classic] Extra interrupt support for the 8085 and the NSC800
-- [classic] font.h gives each font an end label. A 6x8 name uses the matching
-  8x8 end label
+- [classic] font.h end label per font. 6x8 name uses the 8x8 end label
 - [classic] Rabbit targets now support __banked and __far
-- [classic] strtod accepts C90 decimal and C99 hexadecimal text for 8080, 8085,
-  vm1, and gbz80
+- [classic] strtod accepts C90 decimal, C99 hex on 8080, 8085, vm1, gbz80
 - [classic] targets +hbios, +scz180, +yaz180, +rc2014 migrated
 - [classic] V9938 palette functions
-- [classic] zsdcc selects the printf and scanf float converter from the format
-  string
-- [newlib] __CLIB_OPT_MALLOC selects a spare-tail malloc search (0 keeps the
-  small walker)
+- [classic] zsdcc selects printf and scanf float converters from the format
+- [newlib] __CLIB_OPT_MALLOC spare-tail malloc search (0 keeps small walker)
 - [newlib] a routine that assigns IX saves it and restores it
-- [newlib] library products install under lib/clibs/sccz80/ and
-  lib/clibs/sdcc_ix/
+- [newlib] products install under lib/clibs/sccz80/ and lib/clibs/sdcc_ix/
 - [sccz80] Improved C90 compliance & peephole update
 - [z80asm] #define now supported as alias for defc
 - [z80asm] Bug fixes
-- [z80asm] the map names the bank of __section_head, __section_tail, and
-  __section_size
+- [z80asm] map bank of __section_head, __section_tail, __section_size
 - [z88dk-copt] Additional conditions for compiler and pattern formats
 - [z88dk-dis] Support for decoding rst calls
-- [z88dk-gdb] IM 2 support, watchpoints, O-packets, and the Z80 I and R
-  registers
-- [z88dk-ticks] -iotimer and -mmtimer read the cycle count from inside the
-  program
+- [z88dk-gdb] IM 2 support, watchpoints, O-packets, Z80 I and R registers
+- [z88dk-ticks] -iotimer, -mmtimer read the cycle count from the program
 - [z88dk-ticks] 8085, z80n, kc160, r4k, r6k fixes
 - [z88dk-ticks] Support for the Rabbit banking model
 - [z88dk-ticks] IO and memory model can be supplied by a lua script
