@@ -4,7 +4,7 @@ Read this file at the start of a page edit. Add rows when new commits or pull re
 
 The subject line is a filter. Each "Parsed patch" row below was taken from the diff (`git show` or the pull-request files), not from the commit comment. Procedure: skill `docs-wiki`, heading "Change index".
 
-Index built **2026-10-04**. Added **2026-10-15** through product `origin/master` `2a5638fa37`, then **2026-10-31** through `e0e198e7fa`, then **2026-11-09** through `345d45e220`. Wiki `origin/master` is `5366634`. `262d364` renamed `CRT_OPEN_MAX` to `CLIB_OPEN_MAX` on `Platform---CPM`. Wiki clone: `/tmp/z88dk.wiki`. Printf pages: `6a20572`. #3040 page split and `draft:imported` removal: `eaa1cb0`. `draft:verified` removal: `811d405`. Earlier page edits `d9ebfaf` and `a7d0299` stay as recorded below. That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts. The 2026-10-31 page sentences are on the wiki as `8ae3d02`. The 2026-11-09 page sentences are on the wiki as `00b8f10`, `ce7c5ad`, `c2512eb`, `f9a6a2b`, and `5366634`.
+Index built **2026-10-04**. Added **2026-10-15** through product `origin/master` `2a5638fa37`, then **2026-10-31** through `e0e198e7fa`, then **2026-11-09** through `345d45e220`, then **2026-11-09** through `2d933257ab`. Wiki `origin/master` is `5366634`. `262d364` renamed `CRT_OPEN_MAX` to `CLIB_OPEN_MAX` on `Platform---CPM`. Wiki clone: `/tmp/z88dk.wiki`. Printf pages: `6a20572`. #3040 page split and `draft:imported` removal: `eaa1cb0`. `draft:verified` removal: `811d405`. Earlier page edits `d9ebfaf` and `a7d0299` stay as recorded below. That clone is shallow. `2137fdf` ("Add some more details.") has no parent here, so its patch was not parsed. Do not treat that subject as a list of facts. The 2026-10-31 page sentences are on the wiki as `8ae3d02`. The 2026-11-09 page sentences are on the wiki as `00b8f10`, `ce7c5ad`, `c2512eb`, `f9a6a2b`, and `5366634`.
 
 #3187 merged as `49678ddd96` and #3186 merged as `8ab2e80f99`. Both size and malloc sentences are already on the wiki as `d9ebfaf`. The rows below from closed issues #29, #1881, and #201 are on the wiki as `a7d0299`, pushed to `origin/master`.
 
@@ -45,6 +45,7 @@ Read from the issue comments, not from a commit subject.
 | `0936a566b0`, `4025e3ca60` | `src/ticks/reltool.c` only. Host tool. |
 | `2a5638fa37`..`e0e198e7fa`, except the rows below | 80cc opts (#3194, #3195, #3200, #3212), sccz80 and 80cc constant folding (#3204, #3207, #321, #2440), zsdcc shift peephole (#3213), stdcbench and the other benchmark pastes, ticks help and the debugger (#3179, #3199, #3208, reltool), zx81bas TODO, the zcc `-debug` alias, tests, and agent text. No CLIB default and no wiki sentence. |
 | `e0e198e7fa`..`345d45e220`, except the 2026-11-09 rows | sccz80, 80cc, copt, ticks, gdb, dis, debug, zx81bas, agents, changelog, and the Dhrystone readme scores (#3266). No CLIB default and no wiki sentence from those commits. |
+| `345d45e220`..`2d933257ab`, except the rows in that section | Agent index commits, the sccz80 C90 changelog line, 80cc #3278, sccz80 declaration specifiers (#3280), appmake, PSGlib, MTX `psg_init`, and z80asm `UNDEFINE`. No page states the old behaviour. |
 
 ## Parsed patches — wiki commits already applied
 
@@ -206,6 +207,45 @@ The issue title is a filter. The merged patch is the fact.
 | #3267, #3259, #3256, #3255, #3254, #3248, #3247, #3246, #3245, #3239, #3236, #3234, #3233, #3232, #3228, #3222, #3220, #3215 | ticks, gdb, dis, sccz80, and 80cc. The merged patches are compiler or host-debugger fixes. #3239 is the struct-copy review, merged as #3266 `345d45e220`. | No platform page states the old behaviour. No edit. |
 | #3214, merge `85ca52e4ae` (#3217) | Parsed with `ed2c3ebe87` above. | Next pages do not state the old page origin. No edit. |
 | #3205, `4f6eec2486` | Parsed above. | No tool page. No edit. |
+
+## Parsed patches — product commits `345d45e220`..`2d933257ab`
+
+Added **2026-11-09**. Product `origin/master` at this scan is `2d933257ab` (merge of #3280). Wiki `origin/master` is `5366634`. There are no new wiki commits. Read a live page with `git -C /tmp/z88dk.wiki show origin/master:<page>`.
+
+The hunk is the fact. No page in this section states the old behaviour, so none of these rows is a wiki edit.
+
+| Source | What the patch says | Page |
+|--------|---------------------|------|
+| `f76ae92783`, `bf5d214778`, `e3fbbc09bb`, `4e3b0461de`, `89416052f3`, `b2490a094a` | The change index itself. | No page. |
+| `91916c1f16` | `changelog.txt` gains one sccz80 C90 line. | No page reprints that line. |
+| `b35b726733`, `01c53a8e84`, merge `2b3bdcce03` (#3278) | 80cc host warnings, and a long bit operation pushes HL when the BC stash was skipped. | No page states the old push. |
+| `065e40d454`, `6b5167b38c`, `97296209d8`, `ba13b6aa97`, merge `2d933257ab` (#3280, closes #2335) | sccz80 accepts storage, qualifiers, and type specifiers in any C90 order. One storage class. A repeated class is an error. `const` after the type word still marks the object read-only. `__critical` stays a statement and a trailing function attribute. `T = ...` on a typedef is an error, and recovery stops at a real semicolon. | `Tool---sccz80` does not state the old order. No edit. |
+| `1156df409e` (#258) | appmake with no arguments prints `Version:` and `Z88DK_VERSION` in the usage text. | `Tool---appmake` does not say the banner has no version. No edit. |
+| `08ea120093` (#470) | PSGlib masks the saved volume with `0x0F` before it adds attenuation. SFX stop on channel 2 uses the channel 2 latch. | `Classic---PSG-Library` and `Platform---SMS` name PSGlib and do not state the old sum. No edit. |
+| `7eaaabfed8` (#2143) | `psg_init` writes `$BF` and then reads the latch port. The channel 1 silence byte reaches the chip. | `Platform---Memotech-MTX` leaves one-bit sound unchecked. The feature flag stays off. Do not check that box from this latch fix. |
+| `7a0f28ccab` (#702) | `UNDEFINE` clears a PUBLIC constant owned by this module and keeps the declaration. A later `defc` can replace the value. Another module's public is left alone. | `Tool---z80asm---preprocessor` already says the directive removes the definition. No edit. |
+| `83e6a3651a` (#2539) | A section binary older than the map is left out, with a warning. A file from this link is kept. A newer extra file can still overlap. | No page says an older DATA or BSS file is packed into the new image. No edit. |
+| `35f7a2d653` | `+mz2500` `joystick()`: hardware bit 4 sets result bit 5, and hardware bit 5 sets result bit 4. The QAOP words are right P, left O, down A, up Q, then M and N. | `Platform---Sharp-MZ2500` checks Hardware joystick and does not state the old bits. No edit. |
+
+### Closed issues since 2026-11-08
+
+The issue title is a filter. The merged patch is the fact.
+
+| Source | What the patch says | Page |
+|--------|---------------------|------|
+| #2335, #258, #470, #2143, #702, #2539 | Parsed in the table above. | No edit. |
+| #3275 | Signed-minimum range warning. The fix is inside #3266 (`64e33284e3`), already under the previous cutoff. The issue also asked for a version print. #3266 did not add one. | No wiki sentence. Do not claim a version print. |
+| #3239 | Already the #3266 row. | No second sentence. |
+| #3172, #2959, #2867, #2377, #2288, #2175, #2131, #2063, #1784, #1622, #1460, #934, #746, #704, #595, #346, #273, #149, #124, #3040 | Closed 2026-11-08. #3040 is the page-split rule. The others are compiler, host, or target fixes already in the tree. | `Platform---Canon-X07` already names the NSC800. `Platform---CPM` does not state the old argument count. No edit. |
+
+### Open pull requests at this scan
+
+Do not write these onto the wiki until they merge.
+
+| Source | What the patch says | Page when it merges |
+|--------|---------------------|---------------------|
+| #3279 `version-2.5-prep` | Version numbers and the 80-column changelog list. Not merged. | Do not copy the branch's version strings onto the wiki. |
+| #2850, #2162, #2155 | Still open. The earlier rows still apply. | No edit until merge. |
 
 ## Page rows from #3040
 
