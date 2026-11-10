@@ -530,6 +530,12 @@ static const Op *lower_cur_op;   /* the op currently being lowered */
 static int  verify_on = -1;
 static char verify_buf[8192];
 static int  verify_len;
+/* Lines buffered for the current op, and for HL, DE, BC, A the value of that count
+   when the cache belief was last (re)set. A belief set AFTER the last write to its
+   register is the lowerer re-establishing it (a reload of the claimed vreg), which
+   is not a stale cache. */
+static int  verify_nlines;
+static int  belief_line[4];
 
 /* IR_CLOB_VERIFY (inert, log-only): flag where an op's emitted code ACTUALLY
    writes a physical reg (per lra_line_writes — the SAME decomposer ir_verify_op
@@ -540,6 +546,10 @@ static int  verify_len;
 static int  clob_verify_on = -1;
 static long clob_verify_count;
 static int  clob_snap_hl, clob_snap_de, clob_snap_bc, clob_snap_a;
+/* Set by the call lowering when its own `pop bc` restores a BC that an earlier op
+   (the first pre-pushed argument) saved. The save and the restore are then in
+   different ops, which the per-op push/pop pairing below cannot see. */
+static int  clob_call_bc_restored;
 
 /* Unified instruction-effects query (P0 Step 2 — decomposer consolidation).
    ONE query every consumer uses (ir_verify_op, IR_CLOB_VERIFY, the re-renderer's
@@ -703,8 +713,28 @@ static int  hlde_belief_droppable(int v)
     if (f->vregs && (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)) return 1;
     return vreg_is_remat(f, v);
 }
+/* A function may be lowered more than once (a throw-away pass 1, then a final pass,
+   and some retries after that), and only the last render's code is kept. Hold each
+   function's reports and drop them if the same function is rendered again, so a
+   report always describes code that is actually emitted. */
+static char        clob_pend[16384];
+static int         clob_pend_len, clob_pend_n;
+static const Func *clob_pend_f;
+static void clob_pend_flush(void)
+{
+    if (clob_pend_len) fputs(clob_pend, stderr);
+    clob_verify_count += clob_pend_n;
+    clob_pend_len = 0; clob_pend[0] = 0; clob_pend_n = 0; clob_pend_f = NULL;
+}
+static void clob_render_begin(const Func *f)
+{
+    if (f == clob_pend_f) { clob_pend_len = 0; clob_pend[0] = 0; clob_pend_n = 0; }
+    else clob_pend_flush();
+    clob_pend_f = f;
+}
 static void clob_verify_report(void)
 {
+    clob_pend_flush();
     fprintf(stderr, "IR_CLOB_VERIFY: %ld cross-op stale-cache site(s)\n",
             clob_verify_count);
 }
@@ -852,8 +882,9 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
         }
         if ((verify_on || clob_verify_on || getenv("IR_HOME_SLOT_VERIFY"))
             && verify_len + (int)strlen(buf) + 2 < (int)sizeof verify_buf)
-            verify_len += snprintf(verify_buf + verify_len,
+            { verify_len += snprintf(verify_buf + verify_len,
                                    sizeof verify_buf - verify_len, "%s\n", buf);
+              verify_nlines++; }
         if (emit_trace_on) emit_trace_check(buf);
         if (park_verify_on) {
             int d = pv_line_delta(buf);
@@ -8025,6 +8056,7 @@ static void home_slot_verify_actual(const Func *f, const Op *op,
 static void ir_verify_op(const Func *f, const Op *op, const char *buf)
 {
     RegMask actual = 0, pushed = 0; int unknown = 0;
+    int nline = 0, last_write_line[4] = {0, 0, 0, 0};
     RegMask self_pres = 0, swapped = 0;   /* value-change refinements (instr_effects) */
     char line[256]; const char *p = buf;
     while (*p) {
@@ -8043,7 +8075,22 @@ static void ir_verify_op(const Func *f, const Op *op, const char *buf)
         }
         { InstrEffects e = instr_effects(line);
           actual |= e.writes; self_pres |= e.self_pres; swapped |= e.swapped;
-          if (e.unknown) unknown = 1; }
+          if (e.unknown) unknown = 1;
+          nline++;
+          { RegMask w = e.writes & ~e.self_pres & ~e.swapped;
+            if (w & IR_R_HL) last_write_line[0] = nline;
+            if (w & IR_R_DE) last_write_line[1] = nline;
+            if (w & IR_R_BC) last_write_line[2] = nline;
+            if (w & IR_R_A)  last_write_line[3] = nline; } }
+    }
+    /* A callee declared __preserves_regs keeps those registers, so the call is
+       not a write to them (the declaration is trusted here, not re-derived from
+       the callee's code). */
+    if (op->kind == IR_CALL && op->call)
+        actual &= ~(RegMask)op->call->preserved;
+    if (clob_call_bc_restored) {
+        actual &= ~IR_R_BC;          /* saved by an earlier op, popped back here */
+        clob_call_bc_restored = 0;
     }
     home_slot_verify_actual(f, op, actual, swapped);
     /* IR_CLOB_VERIFY stale-cache check: the op's emitted code ACTUALLY wrote a
@@ -8067,6 +8114,28 @@ static void ir_verify_op(const Func *f, const Op *op, const char *buf)
             if (!((vchg & ck[i].m) && ck[i].snap >= 0 && ck[i].post == ck[i].snap
                   && op->dst != ck[i].snap))   /* not a re-def of its own claimed vreg */
                 continue;
+            /* The belief was set again after this register was last written: the
+               lowerer reloaded the claimed vreg and said so. */
+            if (last_write_line[i] > 0 && belief_line[i] >= last_write_line[i])
+                continue;
+            /* A push writes a register only to load its own source, so pushing
+               the vreg the cache already claims re-establishes the same value. */
+            if (op->kind == IR_PUSH_ARG && op->src[0] == ck[i].snap)
+                continue;
+            /* The fused copy step (`*d++ = *s++`) advances both pointers, so each
+               register holds that pointer's next value. */
+            if (op->kind == IR_COPY_STEP_BRZ
+                && (op->src[0] == ck[i].snap || op->src[1] == ck[i].snap))
+                continue;
+            /* The shift-and-add expansion of a constant multiply starts by copying
+               its source into DE as scratch, so DE still holds the claimed vreg. */
+            if (op->kind == IR_SHL && op->src[0] == ck[i].snap)
+                continue;
+            /* A post-stepped access (`*p++`) writes the base register with the
+               base's own next value, so the claim stays true. */
+            if ((op->kind == IR_LD_MEM || op->kind == IR_ST_MEM)
+                && op->mem.post_step != 0 && op->mem.base == ck[i].snap)
+                continue;
             /* Forward-liveness gate: a stale claim is only HARMFUL if the claimed
                vreg is LIVE after the op — a dead claim is never read back, so the
                stale cache can't miscompile. (Necessary-not-sufficient: a live vreg
@@ -8082,12 +8151,16 @@ static void ir_verify_op(const Func *f, const Op *op, const char *buf)
                     && ir_bitset_get((const BitSet *)cur_bb->live_out, ck[i].snap);
             } else live_out = 1;
             if (!live_out) continue;   /* dead claim → benign */
-            fprintf(stderr,
+            if (L.ss_phase == 1) continue;   /* the throw-away pass 1 render */
+            { int room = (int)sizeof clob_pend - clob_pend_len;
+              int w = snprintf(clob_pend + clob_pend_len, room > 0 ? room : 0,
                 "IR_CLOB_VERIFY: %s (bb%d op%d dst=%d) wrote %s but rs.%s still "
-                "claims v%d (LIVE) — STALE CACHE\n",
+                "claims v%d (LIVE) — STALE CACHE [in %s]\n",
                 ir_op_name(op->kind), cur_bb ? cur_bb->id : -1, cur_op_idx,
-                op->dst, ck[i].nm, ck[i].nm, ck[i].snap);
-            clob_verify_count++;
+                op->dst, ck[i].nm, ck[i].nm, ck[i].snap,
+                f->fn ? ir_sym_name(f->fn) : "?");
+              if (w > 0 && w < room) clob_pend_len += w;
+              clob_pend_n++; }
         }
     }
 
@@ -11543,6 +11616,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                              const int *bb_alias)
 {
     const int de_carry_on = !opt_disabled("de-carry");
+    if (clob_verify_on > 0) clob_render_begin(f);
     accdrop_begin(f);
     wpp_n = 0;
     dpp_n = 0; dpp_next = 0;
@@ -12964,6 +13038,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             L.ss_cur_g = L.ss_op_base ? L.ss_op_base[bb->id] + j : -1;
             if (verify_on > 0 || clob_verify_on > 0 || home_slot_verify_enabled()) {
                 verify_len = 0;   /* capture this op's emitted asm */
+                verify_nlines = 0;
+                belief_line[0] = belief_line[1] = belief_line[2] = belief_line[3] = 0;
                 clob_snap_hl = L.rs.hl; clob_snap_de = L.rs.de;   /* rs.* at op entry */
                 clob_snap_bc = L.rs.bc; clob_snap_a  = L.rs.a;
             }

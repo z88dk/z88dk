@@ -311,6 +311,7 @@ static void hl_about_to_change(int v_new)
     if (L.lazy_spill_on && L.pending_spill_v >= 0 && L.pending_spill_v != v_new)
         pending_spill_resolve();
     L.rs.hl = v_new;
+    belief_line[0] = verify_nlines;
     L.cur_hl_addr_off = -1;    /* HL no longer holds a cached slot address */
 }
 

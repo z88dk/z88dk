@@ -2842,7 +2842,7 @@ static int de_has(int v)
 
 /* Any DE change invalidates the long-DEHL cache (DE holds the high
    half — clobbering it breaks the cache). */
-static void cache_de(int v) { L.rs.de = v; L.rs.dehl = -1; g_de_epoch++; }
+static void cache_de(int v) { L.rs.de = v; L.rs.dehl = -1; g_de_epoch++; belief_line[1] = verify_nlines; }
 static void invalidate_de_cache(void) { L.rs.de = -1; L.rs.dehl = -1; }
 
 static int dehl_has(int v) { return v >= 0 && L.rs.dehl == v; }
@@ -2855,7 +2855,7 @@ static void cache_dehl(int v) { L.rs.dehl = v; }
 static int bc_has(int v) { return v >= 0 && L.rs.bc == v; }
 /* BC is the long cache's low half (DE high, BC low): a new BC tenant or a
    clobbered BC ends that claim too. */
-static void cache_bc(int v) { L.rs.bc = v; L.rs.dehl = -1; }
+static void cache_bc(int v) { L.rs.bc = v; L.rs.dehl = -1; belief_line[2] = verify_nlines; }
 static void invalidate_bc_cache(void) { L.rs.bc = -1; L.rs.dehl = -1; }
 
 /* Byte (A) value cache. Tracks which width-1 vreg A holds. Set when a
@@ -2864,7 +2864,7 @@ static void invalidate_bc_cache(void) { L.rs.bc = -1; L.rs.dehl = -1; }
    invalidated: most lowerer paths clear it via invalidate_hl_cache
    (which also clears A). */
 static int a_has(int v) { return v >= 0 && L.rs.a == v; }
-static void cache_a(int v) { L.rs.a = v; }
+static void cache_a(int v) { L.rs.a = v; belief_line[3] = verify_nlines; }
 static void invalidate_a_cache(void) { L.rs.a = -1; }
 
 /* Byte-register residency. A width-1 vreg pinned to a byte register keeps
