@@ -7,6 +7,7 @@
 
 #include "ccdefs.h"
 
+#include <limits.h>
 #include <math.h>
 #include "utlist.h"
 
@@ -1259,20 +1260,21 @@ static void decompose_float(double raw, struct fp_decomposed *fs)
 
     norm = x / pow(2, exp);
 
-    /* A bias of INT_MAX must not overflow the signed add. The stored
-       exponent is a byte. */
+    /* A bias of INT_MAX must not overflow the signed add. AM9511 keeps a
+       negative exponent, so the result is only limited to the int range. */
     {
-        long sum = (long)exp_bias;
-        if (exp > 255.0)
-            sum += 255;
-        else if (exp < -255.0)
-            sum -= 255;
+        long long sum = (long long)exp_bias;
+
+        if (exp > 1.0e6)
+            sum += 1000000LL;
+        else if (exp < -1.0e6)
+            sum -= 1000000LL;
         else
-            sum += (long)exp;
-        if (sum > 255)
-            sum = 255;
-        else if (sum < 0)
-            sum = 0;
+            sum += (long long)exp;
+        if (sum > INT_MAX)
+            sum = INT_MAX;
+        else if (sum < INT_MIN)
+            sum = INT_MIN;
         fs->exponent = (int)sum;
     }
     for (i = 0; i < (mant_bytes * 2) + 1; i++) {
