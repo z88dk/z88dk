@@ -6,9 +6,9 @@ divert(-1)
 #
 
 # Version 1.99C, A=0 B=1 C=2
-# Version 2.40
+# Version 2.50
 
-define(`__Z88DK', 2400)
+define(`__Z88DK', 2500)
 
 #
 # END OF USER CONFIGURATION
