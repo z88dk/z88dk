@@ -2429,7 +2429,7 @@ static void zsdcc_embed_adb(int filenumber)
     char buffer2[16384 + 1];
     FILE *fasm;
     FILE *fcdb;
-    char *cdbfile, *asmfile;
+    char *cdbfile;
 
     cdbfile = changesuffix(temporary_filenames[filenumber], ".adb");
     if ( (fcdb = fopen(cdbfile, "r")) != NULL ) {
@@ -2553,8 +2553,8 @@ void zsdcc_asm_filter_comments(int filenumber, char *ext)
         unsigned int quote_type = 0;
         unsigned int quote_count = 0;
 
-        unsigned int dst = 0;
-        unsigned int src = 0;
+        int dst = 0;
+        int src = 0;
 
         // issue #807 on github
         // nop with comment can be used to inline asm; allow opting out
