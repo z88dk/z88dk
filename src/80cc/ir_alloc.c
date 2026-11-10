@@ -462,6 +462,7 @@ enum {
     CF_DE_PTR         = 1u << 5,   /* DE-home: a walking byte pointer (loop regalloc) */
     CF_DE_OPERAND     = 1u << 6,   /* DE-fold hint: reused deref/binop (DENSITY §4) */
     CF_IDX2_INDUCTION = 1u << 7,   /* idx2: an IVSR second induction pointer */
+    CF_BYTE_NONENTRY  = 1u << 8,   /* byte: defined after the entry block (B or C only, never E) */
 };
 /* Cost-model per-access weights (relative T-state savings of reg vs slot; the
    orchestrator's benefit = Σ depth-weighted access weights). A DEREF of a base
@@ -1347,6 +1348,52 @@ static int exx_home_realizable(const Func *f, int v, const int *use_count,
 }
 
 
+int ir_bcbyte_homes_enabled(void)
+{
+    /* The CPUs where a frame slot is dear. Elsewhere a register home does not
+       repay the BC it takes, and the benchmarks lose. */
+    return !opt_disabled("byte-bc-home")
+        && (c_cpu == CPU_Z80 || IS_R800() || IS_Z80N() || c_cpu == CPU_Z180);
+}
+
+/* Does the block holding v's first def (linear op index gdef) dominate every read
+   of v? True when no block that reads v can be reached from the entry without
+   passing through the def's block. */
+static int byte_def_dominates_reads(const Func *f, int v, int gdef)
+{
+    int g = 0, dbb = -1;
+    for (int i = 0; i < f->n_bbs; i++) {
+        if (gdef < g + f->bbs[i].n_ops) { dbb = i; break; }
+        g += f->bbs[i].n_ops;
+    }
+    if (dbb < 0) return 0;
+    if (dbb == 0) return 1;
+    int n = f->n_bbs;
+    char *reach = calloc((size_t)n, 1);
+    int *stack = malloc((size_t)n * sizeof(int));
+    if (!reach || !stack) { free(reach); free(stack); return 0; }
+    int sp = 0; reach[0] = 1; stack[sp++] = 0;
+    while (sp > 0) {
+        int b = stack[--sp];
+        int ns = ir_bb_n_succ(&f->bbs[b]);
+        for (int k = 0; k < ns; k++) {
+            int t = ir_bb_succ_at(&f->bbs[b], k);
+            if (t < 0 || t >= n || t == dbb || reach[t]) continue;
+            reach[t] = 1; stack[sp++] = t;
+        }
+    }
+    int ok = 1;
+    for (int b = 0; b < n && ok; b++) {
+        if (b == dbb || !reach[b]) continue;
+        for (int j = 0; j < f->bbs[b].n_ops && ok; j++) {
+            int u[16], nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
+            for (int k = 0; k < nu; k++) if (u[k] == v) { ok = 0; break; }
+        }
+    }
+    free(reach); free(stack);
+    return ok;
+}
+
 /* B4 — byte-home realizability (extracted from byte_home_propose's per-vreg
    gate). TRUE iff width-1 v can ride a byte home (C slotless / E slot-backed):
    call-free function, not addr-taken/volatile, not homed, hot (>=8 reads),
@@ -1364,9 +1411,10 @@ static int byte_home_realizable(const Func *f, int v,
     if (write_count[v] < 1) return 0;
     if (!func_is_call_free(f)) return 0;              /* BC/DE must survive */
     DefUseIdx du = vreg_def_first(f, v);
-    if (du.first_def >= f->bbs[0].n_ops) return 0;    /* def in entry bb0 */
+    int nonentry = du.first_def >= f->bbs[0].n_ops;   /* defined after the entry block */
+    if (nonentry && !(ir_bcbyte_homes_enabled() && byte_def_dominates_reads(f, v, du.first_def))) return 0;
     if (du.first_def >= du.first_read) return 0;      /* def-first */
-    return 1;
+    return nonentry ? 2 : 1;     /* 2: only a slotless B or C will do */
 }
 
 
@@ -1743,10 +1791,12 @@ static int collect_home_candidates(const Func *f,
     /* (4) byte home (C slotless if single-BB, else E slot-backed). */
     if (c_byte_resident && !opt_disabled("byte-resident"))
         for (int v = 0; v < f->n_vregs; v++)
-            if (byte_home_realizable(f, v, use_count, write_count))
+            { int bhr = byte_home_realizable(f, v, use_count, write_count);
+              if (bhr)
                 add_cand(pool, &n, pool_cap, v, use_count[v], first_use[v], last_use[v],
                          RC_BYTE,
-                         (vreg_single_bb(f, v) >= 0) ? CF_BYTE_SINGLE_BB : 0);
+                         ((vreg_single_bb(f, v) >= 0) ? CF_BYTE_SINGLE_BB : 0)
+                         | (bhr == 2 ? CF_BYTE_NONENTRY : 0)); }
     /* (5) DE-class — three sub-shapes in pool order: acc, general, ptr. */
     if (de_home_available(f) && !de_class_veto) {
         if (c_word_resident && !opt_disabled("word-resident"))
@@ -2368,6 +2418,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
         pool[j] = c;
     }
     int byte_reg = 0;                    /* 0 / 'C' / 'E' */
+    int have_c = 0, have_b = 0;
     int idx2_defer = -1;                 /* best param that yielded to a counter */
     int idx3_taken = 0;                  /* the second index (IY) home */
     int idx2_reuse_on = !opt_disabled("idx2-reuse");
@@ -2517,13 +2568,35 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
         }
 
         if (c->allowed & RC_BYTE) {
-            if (byte_reg) continue;                 /* one byte home per fn */
-            int single_bb = (c->flags & CF_BYTE_SINGLE_BB) != 0;
-            int bc_used = 0;
+            if (!ir_bcbyte_homes_enabled()) {
+                if (byte_reg) continue;                 /* one byte home per fn */
+                int single_bb = (c->flags & CF_BYTE_SINGLE_BB) != 0;
+                int bc_used = 0;
+                for (int j = 0; j < f->n_vregs; j++)
+                    if (f->vreg_to_phys[j] == IR_PR_BC) { bc_used = 1; break; }
+                if (single_bb && !bc_used) { f->vreg_to_phys[v] = IR_PR_C; byte_reg = 'C'; }
+                else if (de_acc_vreg < 0)  { f->vreg_to_phys[v] = IR_PR_E; byte_reg = 'E'; }
+                /* else: no byte register free (DE reserved) → slot fallback */
+                continue;
+            }
+            if (byte_reg == 'E' || (have_c && have_b)) continue;   /* C and B, or one E */
+            int bc_used = 0, bc_long = 0;
             for (int j = 0; j < f->n_vregs; j++)
-                if (f->vreg_to_phys[j] == IR_PR_BC) { bc_used = 1; break; }
-            if (single_bb && !bc_used) { f->vreg_to_phys[v] = IR_PR_C; byte_reg = 'C'; }
-            else if (de_acc_vreg < 0)  { f->vreg_to_phys[v] = IR_PR_E; byte_reg = 'E'; }
+                if (f->vreg_to_phys[j] == IR_PR_BC) {
+                    bc_used = 1;
+                    if (!(f->vregs[j].width == 2 && vreg_single_bb(f, j) >= 0)) bc_long = 1;
+                }
+            /* BC held only by single-block temporaries: give C to the counter and
+               let them go elsewhere. */
+            if (bc_used && !bc_long)
+                for (int j = 0; j < f->n_vregs; j++)
+                    if (f->vreg_to_phys[j] == IR_PR_BC) f->vreg_to_phys[j] = IR_PR_SPILL;
+            if (!bc_long) {
+                if (!have_c) { f->vreg_to_phys[v] = IR_PR_C; have_c = 1; }
+                else         { f->vreg_to_phys[v] = IR_PR_B; have_b = 1; }
+                byte_reg = 'C';
+            }
+            else if (de_acc_vreg < 0 && !byte_reg && !(c->flags & CF_BYTE_NONENTRY)) { f->vreg_to_phys[v] = IR_PR_E; byte_reg = 'E'; }
             /* else: no byte register free (DE reserved) → slot fallback */
             continue;
         }
@@ -5063,6 +5136,21 @@ static void bytepack_verify(const Func *f)
    dependency.  D is a single slot-backed tenant per function: its lazy-spill
    state can flush and reload around DE-clobbering gaps, but it is not mixed
    with B/C homes until the lowerer has separate residency latches. */
+/* A byte homed in B or C is resident for the whole function, so BC is not free for
+   a word. Passes that ran after the byte home was chosen may still have given BC
+   to a word tenant; revert those to their slots (always sound: slots are assigned
+   afterwards, and a reversed-loop counter that spills is narrowed back to a byte). */
+static void reconcile_bc_byte_homes(Func *f)
+{
+    if (!f || !f->vreg_to_phys || !ir_bcbyte_homes_enabled()) return;
+    int have = 0;
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vreg_to_phys[v] == IR_PR_C || f->vreg_to_phys[v] == IR_PR_B) { have = 1; break; }
+    if (!have) return;
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vreg_to_phys[v] == IR_PR_BC) f->vreg_to_phys[v] = IR_PR_SPILL;
+}
+
 static int bytepack_on(void)
 {
     return !opt_disabled("byte-pack");
@@ -6346,7 +6434,10 @@ void ir_alloc(Func *f)
            5a cost-benefit eviction (default on, --opt-disable=bc-evict): it may
            first evict a picker-placed BC tenant that a denser disjoint temp group
            out-benefits, then pack the freed BC. */
-        if (bc_region_ok || bcpercand_on())
+        int byte_bc_home = 0;                  /* a byte lives in B or C all through */
+        for (int j = 0; j < f->n_vregs; j++)
+            if (f->vreg_to_phys[j] == IR_PR_C || f->vreg_to_phys[j] == IR_PR_B) byte_bc_home = 1;
+        if (!(ir_bcbyte_homes_enabled() && byte_bc_home) && (bc_region_ok || bcpercand_on()))
         ir_bc_pack(f, first_use, last_use, bb_first_op, def_kind,
                    write_count, use_count, cost_benefit, !bc_region_ok, bb_loop_depth, bb_cond_shift);
         /* LRA Phase 2c (default on, IR_NO_LRA opts out): home a DE-dirty
@@ -6973,6 +7064,7 @@ void ir_alloc(Func *f)
                     f->home_hi ? f->home_hi[v] : -1,
                     lr ? lr->start : -1, lr ? lr->end : -1, f->vregs[v].flags);
         }
+    reconcile_bc_byte_homes(f);
     assign_idxhalf_homes(f);
     bytepack_verify(f);   /* size the spill candidates before placement */
     bytepack_pack(f);

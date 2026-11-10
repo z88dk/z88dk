@@ -49,6 +49,9 @@ void ir_alloc_veto_add(int vreg);
    spilled and reloaded around the ops that clobber it, and a call-split value
    keeps its slot as its canonical home outside the split span. */
 int ir_home_requires_slot(const Func *f, int v);
+/* A byte may be homed in B or C across blocks, two at once, on the Z80 family.
+   `--opt-disable=byte-bc-home` restores the one single-block C home. */
+int ir_bcbyte_homes_enabled(void);
 
 /* Where is v homed at flat op index g? Pass g < 0 for no ambient point. This
    is the POINT query and the only one that honours the home interval. */

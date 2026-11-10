@@ -2982,7 +2982,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             int e_home = de_home >= 0
                       && byte_home_phys(f, de_home) == IR_PR_E;
             int use_e = stage_value && L.rs.bc >= 0 && L.rs.de < 0 && !e_home;
-            int bc_live = (L.rs.bc >= 0);
+            int bc_live = (L.rs.bc >= 0) || func_has_bc_byte_home(f);
             int source_b_home = !use_e && byte_home == op->src[0]
                              && byte_home >= 0
                              && byte_home_phys(f, byte_home) == IR_PR_B;

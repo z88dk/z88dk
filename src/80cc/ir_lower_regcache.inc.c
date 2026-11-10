@@ -2906,9 +2906,28 @@ static int byte_home_is_de_lane(int v)
     if (g_hc.home_is_word && v == g_hc.func_whome) return 1;
     return byte_home_slotbacked(byte_home_phys(cur_lazy_func, v));
 }
+/* Does this function keep a byte in B or C all through? Code that borrows B as a
+   scratch counter must then save BC, whichever of the homes was written last. */
+static int func_has_bc_byte_home(const Func *f)
+{
+    if (!f || !f->vreg_to_phys || !ir_bcbyte_homes_enabled()) return 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        PhysReg p = f->vreg_to_phys[v];
+        if (p == IR_PR_B || p == IR_PR_C) return 1;
+    }
+    return 0;
+}
 static int byte_home_holds(int v)
 {
     if (v < 0) return 0;
+    /* A slotless B or C home is always resident from its definition on (the
+       function is call-free and nothing else uses BC), so there is no belief to
+       lose across a block edge, and two of them can coexist. */
+    { PhysReg bp = byte_home_phys(cur_lazy_func, v);
+      /* ...unless its definition is rematerialised at the use and so never
+         writes the register. */
+      if (ir_bcbyte_homes_enabled() && (bp == IR_PR_B || bp == IR_PR_C)
+          && !byte_remat_of(cur_lazy_func, v)) return 1; }
     return byte_home_is_de_lane(v)
         ? L.cur_de_byte_home_vreg == v
         : L.cur_byte_home_vreg == v;

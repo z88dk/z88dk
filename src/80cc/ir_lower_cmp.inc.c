@@ -1440,7 +1440,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         && op->src[1] >= 0 && CPU_HAS_CB_SHIFTS()
         && !IS_Z80N() && !IS_RABBIT() && !opt_disabled("var-byte-shift")) {
         int n = L.cmp_label_counter++;
-        int bc_live = (L.rs.bc >= 0);
+        int bc_live = (L.rs.bc >= 0) || func_has_bc_byte_home(f);
         int byte_home = L.cur_byte_home_vreg;
         int de_home = L.cur_de_byte_home_vreg;
         int e_home = de_home >= 0

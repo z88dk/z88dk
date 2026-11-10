@@ -187,6 +187,7 @@ exists (ADR 0010).
 | `idxhalf` | no byte homes in IX/IY halves (sp mode, z80/z80n/ez80) |
 | `iy-temp-pack` | no IY packing for a short-lived temporary |
 | `iy-lone-temp` | in frame-pointer mode, an IY pack whose only tenant is one one-use temp computed from single-definition values is kept (push hl;pop iy and push iy;pop hl) instead of parking the temp on the stack |
+| `byte-bc-home` | on the Z80 family (not 8080/8085/gbz80/Rabbit/eZ80), a byte may be homed in B and C across blocks, two at once, in functions without calls; off restores the single-block C home |
 | `iy-long` | do not run the IY packs in a function the BC veto excludes |
 | `lra` | no linear-scan-style IY interval picking |
 | `graph-alloc` | no interference-graph-driven index benefit |
