@@ -186,6 +186,7 @@ exists (ADR 0010).
 | `idx-deref` | an index-homed pointer is not dereferenced in place, and its cost term goes with it (ADR 0026) |
 | `idxhalf` | no byte homes in IX/IY halves (sp mode, z80/z80n/ez80) |
 | `iy-temp-pack` | no IY packing for a short-lived temporary |
+| `iy-lone-temp` | in frame-pointer mode, an IY pack whose only tenant is one one-use temp computed from single-definition values is kept (push hl;pop iy and push iy;pop hl) instead of parking the temp on the stack |
 | `iy-long` | do not run the IY packs in a function the BC veto excludes |
 | `lra` | no linear-scan-style IY interval picking |
 | `graph-alloc` | no interference-graph-driven index benefit |

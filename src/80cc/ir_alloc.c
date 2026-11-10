@@ -4350,7 +4350,8 @@ static long g0_index_benefit(const long *tally_v)
    lra_iy_available. */
 static void ir_iy_temp_pack(Func *f, const int *bb_first_op,
                             const int *bb_in_loop, const int *def_kind,
-                            const int *write_count, const int *use_count)
+                            const int *write_count, const int *use_count,
+                            int leave_single_use)
 {
     if (opt_disabled("iy-temp-pack")) return;
     if (!lra_iy_available(f)) return;
@@ -4375,6 +4376,7 @@ static void ir_iy_temp_pack(Func *f, const int *bb_first_op,
     g0_access_tally(f, bb_in_loop, g0t);
     int nc = collect_bc_temp_cands(f, bb_first_op, def_kind, write_count,
                                    use_count, itloc, itlo, ithi, cand);
+    SpillShape *sh = leave_single_use ? compute_spill_shapes(f) : NULL;
 
     /* Greedy: pack the BC LEFTOVERS (still SPILL) that clear the cost gate into
        IY over disjoint tight ranges. Same flo-ordered non-overlap greedy as
@@ -4396,6 +4398,9 @@ static void ir_iy_temp_pack(Func *f, const int *bb_first_op,
                 if (f->bbs[b].ops[j].kind == IR_RET) n_ret++;
         iy_open_cost = 2 + 2 * (n_ret > 0 ? n_ret : 1);
     }
+    int *pick = calloc((size_t)(nc > 0 ? nc : 1), sizeof(int));
+    int npick = 0;
+    if (!pick) { free(g0t); free(itloc); free(itlo); free(ithi); free(cand); free(sh); return; }
     for (int i = 0; i < nc; i++) {
         int v = cand[i].vreg;
         if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;      /* BC took it */
@@ -4467,14 +4472,42 @@ static void ir_iy_temp_pack(Func *f, const int *bb_first_op,
         for (int k = lo + 1; k <= hi && clean; k++)
             if (op_clobbers(f, &bb->ops[k]) & IR_R_IY) clean = 0;
         if (!clean) continue;
-        alloc_note_late_home(f, v, IR_PR_IY);
-        f->idx3_reg = IR_PR_IY;
+        pick[npick++] = v;
         last_fhi = cand[i].fhi;
         packed++;
     }
+    /* An IY home hosting ONE one-use temp never repays opening IY (push hl;pop iy,
+       push iy;pop hl and the prologue save, against 2 bytes parked on the stack).
+       With several tenants the save is shared and the pack stays as it was. */
+    if (leave_single_use && npick == 1 && sh && sh[pick[0]].local && sh[pick[0]].uses == 1) {
+        /* ...unless the temp is computed from a loop-carried variable (one with
+           more than one definition, an accumulator): that variable lives in IY
+           too, and the chain is `add iy,de` with no HL traffic. */
+        const Op *dop = &f->bbs[sh[pick[0]].bb_of].ops[sh[pick[0]].lo];
+        int carried = 0;
+        for (int k = 0; k < 2 && !carried; k++) {
+            int sv = dop->src[k];
+            if (sv < 0 || sv >= f->n_vregs) continue;
+            int nd = 0;
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    int ds[8], n = ir_op_defs(&f->bbs[b].ops[j], ds, 8);
+                    for (int q = 0; q < n; q++) if (ds[q] == sv) nd++;
+                }
+            if (nd > 1) carried = 1;
+        }
+        if (!carried) {
+            npick = 0;
+            packed = 0;
+        }
+    }
+    for (int k = 0; k < npick; k++) {
+        alloc_note_late_home(f, pick[k], IR_PR_IY);
+        f->idx3_reg = IR_PR_IY;
+    }
     if (packed && getenv("IR_ALLOC_PROBE"))
         fprintf(stderr, "IY_TEMP_PACK packed=%d of candidates=%d\n", packed, nc);
-    free(g0t); free(itloc); free(itlo); free(ithi); free(cand);
+    free(g0t); free(itloc); free(itlo); free(ithi); free(cand); free(sh); free(pick);
 }
 
 
@@ -6325,8 +6358,14 @@ void ir_alloc(Func *f)
         /* S3 Tier A (default on, --opt-disable=iy-temp-pack opts out): pack the
            born-killed word temps BC declined into IY over disjoint ranges, if a
            reduction pack didn't already claim IY. Cost-gated to dear-slot CPUs. */
+        /* In fp mode a lone one-use temp is cheaper parked on the stack than in
+           IY, so the IY pack leaves it to the stack pass below. */
+        int leave_single_use = (c_framepointer_is_ix != -1)
+                            && !IS_808x() && !IS_GBZ80() && bc_region_ok
+                            && !opt_disabled("iy-lone-temp");
         if (iy_region_ok)
-        ir_iy_temp_pack(f, bb_first_op, bb_in_loop, def_kind, write_count, use_count);
+        ir_iy_temp_pack(f, bb_first_op, bb_in_loop, def_kind, write_count, use_count,
+                        leave_single_use);
         /* Stack-transient spill (default on, IR_NO_STACK_SPILL opts out): the
            register-pressure fallback below BC-pack — a single-def/single-use
            word transient with no register free goes on the stack (push/pop)
