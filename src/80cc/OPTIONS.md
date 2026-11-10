@@ -191,6 +191,7 @@ exists (ADR 0010).
 | `shr-byte-src` | on the CB-shift CPUs, a word-wide constant logical `>>` whose source fits a byte shifts the low byte alone (`srl l`, or rotate and mask) instead of the 16-bit `srl h; rra` chain |
 | `shift-djnz` | a variable-count byte shift whose counter is B uses `djnz` (top-tested) instead of `dec b; jr nz`; with `--opt-code-size` every variable byte shift loop is tested at the bottom, which saves a byte or two and costs a taken jump on entry |
 | `pack-be32` | a big-endian four-byte read assembled by shifts and ORs (`p[0]<<24 \| p[1]<<16 \| p[2]<<8 \| p[3]`) is a four-byte load plus a byte reverse, as the two-byte form already is, instead of four byte loads, shifts and a four-byte OR walk |
+| `pack-regs` | a shift-and-OR of zero-extended bytes or words held in variables (`((u32)a<<24)\|((u32)b<<16)\|((u32)c<<8)\|d`, `((u16)x<<8)\|y`, `((u32)hi<<16)\|lo`) is built in registers by the PACK8 and JOIN16 operations, not as full-width terms merged through memory |
 | `bit-hi0` | a word AND/OR/XOR whose second operand fits a byte skips the high-byte half of the sequence (the operands are swapped to put the byte one second; not on Rabbit, and no swap on ez80 in sp mode) |
 | `shl8-byte-src` | a word `<< 8` or more of a value not yet in a register pair reads only its low byte (`ld h,a; ld l,0`), not the whole word and a dead `ld h,0`; not on Rabbit or kc160, which load the word natively |
 | `asr-nonneg` | a signed `>>` of a value that fits a byte is treated as the logical shift, so the byte routes can narrow it (`0x80 >> n`) |

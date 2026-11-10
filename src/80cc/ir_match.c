@@ -2014,6 +2014,213 @@ static void packbytes_apply(Func *f, BB *bb, const int idx[],
     /* The base producer stays live — the wide load uses it. */
 }
 
+/* ----- packregs: bytes or words held in vregs, joined into a wider value ----
+     ((u16)b1<<8)|b0                                 -> PACK8
+     ((u32)b3<<24)|((u32)b2<<16)|((u32)b1<<8)|b0     -> PACK8, PACK8, JOIN16
+     ((u32)hi<<16)|lo                                -> JOIN16
+   (b_i bytes, hi/lo words, each reaching the OR through a zero-extend and an
+   optional shift). The lowerer builds PACK8/JOIN16 in registers; the shift-and-OR
+   form builds each term as a full-width value and merges them through memory.
+   Memory byte reads are left to packbytes, which runs first. */
+
+typedef struct {
+    int conv_idx, shl_idx;     /* op indices; shl_idx -1 when the lane is unshifted */
+    int src, src_w, shift;
+    int src_def;                /* op index of src's definition in this BB, or -1 */
+} RegLane;
+
+static int regpack_match_lane(Func *f, BB *bb, const int *def_idx, const int *uc,
+                              int v, int w, RegLane *out)
+{
+    if (v < 0 || v >= f->n_vregs || uc[v] != 1) return -1;
+    int di = def_idx[v];
+    if (di < 0) return -1;
+    const Op *d = &bb->ops[di];
+    int shift = 0, shl_idx = -1;
+    if (d->kind == IR_SHL && d->src[1] == -1 && (d->imm & 7) == 0
+        && d->imm >= 8 && d->imm <= 8 * (w - 1)) {
+        shift = (int)d->imm; shl_idx = di;
+        v = d->src[0];
+        if (v < 0 || v >= f->n_vregs || uc[v] != 1) return -1;
+        di = def_idx[v];
+        if (di < 0) return -1;
+        d = &bb->ops[di];
+    }
+    if (d->kind != IR_CONV_ZX || d->dst < 0 || f->vregs[d->dst].width != w) return -1;
+    int src = d->src[0];
+    if (src < 0 || src >= f->n_vregs) return -1;
+    int sw = f->vregs[src].width;
+    if (sw != 1 && sw != 2) return -1;
+    out->conv_idx = di; out->shl_idx = shl_idx;
+    out->src = src; out->src_w = sw; out->shift = shift;
+    out->src_def = def_idx[src];
+    return 0;
+}
+
+/* Walk the OR tree at root_idx. On success fills the lanes and the OR indices;
+   *kind is 1 (two bytes -> word), 2 (four bytes -> long) or 3 (two words -> long). */
+static int regpack_analyze(Func *f, BB *bb, const int *def_idx, const int *uc,
+                           int root_idx, RegLane lanes[4], int *n_lanes,
+                           int or_idx[3], int *n_ors, int *kind,
+                           int *slot_lo, int *slot_hi)
+{
+    const Op *root = &bb->ops[root_idx];
+    if (root->kind != IR_OR || root->dst < 0 || root->src[0] < 0 || root->src[1] < 0)
+        return -1;
+    int w = f->vregs[root->dst].width;
+    if (w != 2 && w != 4) return -1;
+    int nl = 0, no = 0, sp = 0, stack[8], ok = 1;
+    stack[sp++] = root->src[0];
+    stack[sp++] = root->src[1];
+    while (sp > 0 && ok) {
+        int v = stack[--sp];
+        if (v < 0 || v >= f->n_vregs) { ok = 0; break; }
+        int di = (uc[v] == 1) ? def_idx[v] : -1;
+        const Op *d = (di >= 0) ? &bb->ops[di] : NULL;
+        if (d && d->kind == IR_OR && d->dst >= 0 && f->vregs[d->dst].width == w
+            && d->src[0] >= 0 && d->src[1] >= 0) {
+            if (no >= 3 || sp > 5) { ok = 0; break; }
+            or_idx[no++] = di;
+            stack[sp++] = d->src[0];
+            stack[sp++] = d->src[1];
+        } else {
+            if (nl >= 4 || regpack_match_lane(f, bb, def_idx, uc, v, w, &lanes[nl]) < 0) {
+                ok = 0; break;
+            }
+            nl++;
+        }
+    }
+    if (!ok || nl != no + 2) return -1;    /* the root OR is not in `no` */
+
+    int seen = 0, all_bytes = 1, all_words = 1;
+    for (int i = 0; i < nl; i++) {
+        if (lanes[i].src_w != 1) all_bytes = 0;
+        if (lanes[i].src_w != 2) all_words = 0;
+        int bit = 1 << (lanes[i].shift / 8);
+        if (seen & bit) return -1;
+        seen |= bit;
+    }
+    if (w == 2 && nl == 2 && all_bytes && seen == 0x3) *kind = 1;
+    else if (w == 4 && nl == 4 && all_bytes && seen == 0xf) *kind = 2;
+    else if (w == 4 && nl == 2 && all_words && seen == 0x5) *kind = 3;
+    else return -1;
+    /* Each lane's byte or word is read at the join, later than where its
+       zero-extend read it: nothing may redefine it in between. */
+    for (int i = 0; i < nl; i++)
+        for (int k = lanes[i].conv_idx + 1; k <= root_idx; k++)
+            if (bb->ops[k].dst == lanes[i].src) return -1;
+    *n_lanes = nl; *n_ors = no;
+    *slot_lo = *slot_hi = -1;
+    if (*kind == 2) {
+        /* The two packs reuse killed op slots (the engine inserts no ops). A
+           pack reads its two source bytes, so its slot must come after both of
+           their definitions; the join at the root follows both packs. */
+        int kill[16], nk = 0;
+        for (int i = 0; i < nl; i++) {
+            kill[nk++] = lanes[i].conv_idx;
+            if (lanes[i].shl_idx >= 0) kill[nk++] = lanes[i].shl_idx;
+        }
+        for (int i = 0; i < no; i++) kill[nk++] = or_idx[i];
+        int lane_at[4] = { -1, -1, -1, -1 };
+        for (int i = 0; i < nl; i++) lane_at[lanes[i].shift / 8] = i;
+        int m_lo = -1, m_hi = -1;
+        for (int b = 0; b < 2; b++) {
+            if (lanes[lane_at[b]].src_def > m_lo) m_lo = lanes[lane_at[b]].src_def;
+            if (lanes[lane_at[b + 2]].src_def > m_hi) m_hi = lanes[lane_at[b + 2]].src_def;
+        }
+        /* The pack with the later source goes first and takes the latest slot
+           after it; the other takes the latest remaining slot after its own. */
+        int *first_m = (m_lo >= m_hi) ? &m_lo : &m_hi;
+        int *first_s = (m_lo >= m_hi) ? slot_lo : slot_hi;
+        int *other_m = (m_lo >= m_hi) ? &m_hi : &m_lo;
+        int *other_s = (m_lo >= m_hi) ? slot_hi : slot_lo;
+        for (int k = 0; k < nk; k++)
+            if (kill[k] > *first_m && kill[k] < root_idx && kill[k] > *first_s) *first_s = kill[k];
+        if (*first_s < 0) return -1;
+        for (int k = 0; k < nk; k++)
+            if (kill[k] > *other_m && kill[k] < root_idx && kill[k] != *first_s
+                && kill[k] > *other_s) *other_s = kill[k];
+        if (*other_s < 0) return -1;
+    }
+    return 0;
+}
+
+static int regpack_check(Func *f, BB *bb, const int idx[], const int64_t imm[],
+                         const int bind[], const int uc[])
+{
+    (void)imm; (void)bind;
+    if (opt_disabled("pack-regs")) return 0;
+    int *def_idx = pack_def_idx(f, bb);
+    if (!def_idx) return 0;
+    RegLane lanes[4]; int or_idx[3], nl, no, kind, s_lo, s_hi;
+    int rc = regpack_analyze(f, bb, def_idx, uc, idx[0], lanes, &nl, or_idx, &no, &kind,
+                             &s_lo, &s_hi);
+    free(def_idx);
+    return rc == 0;
+}
+
+static void regpack_set(Op *o, OpKind k, int dst, int s0, int s1, const Op *like)
+{
+    memset(o, 0, sizeof(*o));
+    o->kind = k; o->dst = dst; o->src[0] = s0; o->src[1] = s1; o->label = -1;
+    o->file = like->file; o->line = like->line;
+    o->level = like->level; o->block = like->block;
+}
+
+static void regpack_apply(Func *f, BB *bb, const int idx[], const int64_t imm[],
+                          const int bind[])
+{
+    (void)imm; (void)bind;
+    int *uc = calloc(f->n_vregs > 0 ? (size_t)f->n_vregs : 1, sizeof(int));
+    int *def_idx = pack_def_idx(f, bb);
+    if (!uc || !def_idx) { free(uc); free(def_idx); return; }
+    compute_use_counts(f, uc);
+    RegLane lanes[4]; int or_idx[3], nl, no, kind, s_lo, s_hi;
+    int rc = regpack_analyze(f, bb, def_idx, uc, idx[0], lanes, &nl, or_idx, &no, &kind,
+                             &s_lo, &s_hi);
+    free(def_idx); free(uc);
+    if (rc != 0) return;
+
+    int root_idx = idx[0];
+    Op like = bb->ops[root_idx];
+    int dst = like.dst;
+    int lane_of[4] = { -1, -1, -1, -1 };             /* by shift/8 */
+    for (int i = 0; i < nl; i++) lane_of[lanes[i].shift / 8] = lanes[i].src;
+
+    /* Every killed op index except the root, ascending. */
+    int kill[16], nk = 0;
+    for (int i = 0; i < nl; i++) {
+        kill[nk++] = lanes[i].conv_idx;
+        if (lanes[i].shl_idx >= 0) kill[nk++] = lanes[i].shl_idx;
+    }
+    for (int i = 0; i < no; i++) kill[nk++] = or_idx[i];
+    for (int a = 1; a < nk; a++)
+        for (int b = a; b > 0 && kill[b] < kill[b - 1]; b--) {
+            int t = kill[b]; kill[b] = kill[b - 1]; kill[b - 1] = t;
+        }
+
+    int reuse_a = -1, reuse_b = -1;                  /* slots for the two packs */
+    int t_lo = -1, t_hi = -1;
+    if (kind == 2) {
+        reuse_a = s_lo; reuse_b = s_hi;
+        t_lo = ir_vreg_new(f, KIND_INT, NULL, 0);
+        t_hi = ir_vreg_new(f, KIND_INT, NULL, 0);
+        f->vregs[t_lo].width = 2;
+        f->vregs[t_hi].width = 2;
+    }
+    if (kind == 1) {
+        regpack_set(&bb->ops[root_idx], IR_PACK8, dst, lane_of[0], lane_of[1], &like);
+    } else if (kind == 3) {
+        regpack_set(&bb->ops[root_idx], IR_JOIN16, dst, lane_of[0], lane_of[2], &like);
+    } else {
+        regpack_set(&bb->ops[reuse_a], IR_PACK8, t_lo, lane_of[0], lane_of[1], &like);
+        regpack_set(&bb->ops[reuse_b], IR_PACK8, t_hi, lane_of[2], lane_of[3], &like);
+        regpack_set(&bb->ops[root_idx], IR_JOIN16, dst, t_lo, t_hi, &like);
+    }
+    for (int k = 0; k < nk; k++)
+        if (kill[k] != reuse_a && kill[k] != reuse_b) ir_match_mark_dead(kill[k]);
+}
+
 static const PatternDef ir_patterns_packbytes[] = {
     { .name = "packbytes", .n_ops = 1,
       .flags = IR_PAT_KEEP_SATELLITES | IR_PAT_APPLY_KILLS,
@@ -2021,11 +2228,17 @@ static const PatternDef ir_patterns_packbytes[] = {
       .ops = { { .kind = IR_OR, .dst = IR_MS_ANY,
                  .src0 = IR_MS_ANY, .src1 = IR_MS_ANY } },
       .check = packbytes_check, .apply = packbytes_apply },
+    { .name = "packregs", .n_ops = 1,
+      .flags = IR_PAT_KEEP_SATELLITES | IR_PAT_APPLY_KILLS,
+      .ops = { { .kind = IR_OR, .dst = IR_MS_ANY,
+                 .src0 = IR_MS_ANY, .src1 = IR_MS_ANY } },
+      .check = regpack_check, .apply = regpack_apply },
 };
 
 int ir_match_run_packbytes(Func *f)
 {
-    return run_table_rounds(f, ir_patterns_packbytes, 1, 1);
+    return run_table_rounds(f, ir_patterns_packbytes,
+                            (int)(sizeof ir_patterns_packbytes / sizeof ir_patterns_packbytes[0]), 1);
 }
 
 /* ----- Late phase (post-cse/packs) ---------------------------------------

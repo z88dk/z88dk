@@ -51,6 +51,8 @@ static const OpInfo op_table[] = {
     [IR_INC]                = { "INC",                  1, 0 },
     [IR_DEC]                = { "DEC",                  1, 0 },
     [IR_BSWAP]              = { "BSWAP",                1, 0 },
+    [IR_PACK8]              = { "PACK8",                0, 0 },
+    [IR_JOIN16]             = { "JOIN16",               0, 0 },
 
     /* conversions */
     [IR_CONV_ZX]            = { "CONV_ZX",              0, 0 },

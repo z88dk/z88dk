@@ -2477,6 +2477,45 @@ static int gen_conv_byte_to_high(FILE *out, Func *f, const Op *op)
     return -1;
 }
 
+/* dst (word) = (src[1] << 8) | src[0], both sources bytes. load_binop_operands
+   zero-extends each into a register pair (HL = low byte, DE = high byte), so the
+   pack is one move. */
+static int gen_pack8(FILE *out, Func *f, const Op *op)
+{
+    if (op->dst < 0 || op->src[0] < 0 || op->src[1] < 0
+        || f->vregs[op->dst].width != 2
+        || f->vregs[op->src[0]].width != 1 || f->vregs[op->src[1]].width != 1) {
+        fprintf(stderr, "ir_lower: PACK8 needs two bytes and a word\n");
+        return -1;
+    }
+    load_binop_operands(out, f, op);
+    if (vreg_is_pr_de(f, op->dst)) {
+        emit(out, "ld\td,e");              /* D = high byte */
+        emit(out, "ld\te,l");              /* E = low byte */
+        cache_de(op->dst);                  /* HL still holds src[0] */
+        return 0;
+    }
+    emit(out, "ld\th,e");
+    commit_hl_word(out, f, op->dst);
+    if (de_has(op->dst)) invalidate_de_cache();       /* DE holds the old value */
+    return 0;
+}
+
+/* dst (long) = (src[1] << 16) | src[0], both sources words: the long lives in
+   DE:HL, so loading the two operands IS the join. */
+static int gen_join16(FILE *out, Func *f, const Op *op)
+{
+    if (op->dst < 0 || op->src[0] < 0 || op->src[1] < 0
+        || f->vregs[op->dst].width != 4
+        || f->vregs[op->src[0]].width != 2 || f->vregs[op->src[1]].width != 2) {
+        fprintf(stderr, "ir_lower: JOIN16 needs two words and a long\n");
+        return -1;
+    }
+    load_binop_operands(out, f, op);
+    store_dehl_finalize(out, f, op->dst);
+    return 0;
+}
+
 /* A barrel-shift result whose only reader is the call-argument push right after
    it is pushed straight from DE. Returns 1 when it did (the push op is
    skipped). */
