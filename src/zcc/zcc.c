@@ -147,9 +147,10 @@ static void            AddPreProc(option *arg, char *);
 static void            AddPreProcGen(option *arg, char *);
 static void            AddPreProcIncPath(option *arg, char *);
 static void            AddToArgs(option *arg, char *);
-static void            AddToArgsQuoted(option *arg, char *);
 static void            AddToArgsVerbatim(option *argument, char *arg);
 static void            AddCppOpt(option *arg, char *);
+static void            AddAsmOpt(option *arg, char *);
+static void            AddLinkOpt(option *arg, char *);
 static void            AddMfOpt(option *arg, char *);
 static void            AddLinkLibrary(option *arg, char *);
 static void            AddLinkSearchPath(option *arg, char *);
@@ -573,8 +574,8 @@ static option options[] = {
     { 0, "D", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Define a preprocessor option" , NULL, AddPreProc, 0},
     { 0, "U", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Undefine a preprocessor option" , NULL, AddPreProc, 0},
     { 0, "I", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add an include directory for the preprocessor" , NULL, AddPreProcIncPath, 0},
-    { 0, "iquote", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a quoted include path for the preprocessor" , &cpparg, AddToArgsQuoted, 0},
-    { 0, "isystem", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a system include path for the preprocessor" , &cpparg, AddToArgsQuoted, 0},
+    { 0, "iquote", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a quoted include path for the preprocessor" , &cpparg, AddToArgs, 0},
+    { 0, "isystem", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a system include path for the preprocessor" , &cpparg, AddToArgs, 0},
 
     { 0, "", OPT_HEADER, "Compiler (all) options:", NULL, NULL, 0 },
     { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc,ez80clang,80cc,multi)" , &c_compiler_type, NULL, 0},
@@ -610,10 +611,10 @@ static option options[] = {
     { 0, "Cx", OPT_FUNCTION,  "Add an option to xcc" , &xccarg, AddToArgs, 0},
 
     { 0, "", OPT_HEADER, "Assembler options:", NULL, NULL, 0 },
-    { 0, "Ca", OPT_FUNCTION,  "Add an option to the assembler" , &asmargs, AddToArgsQuoted, 0},
+    { 0, "Ca", OPT_FUNCTION,  "Add an option to the assembler" , &asmargs, AddAsmOpt, 0},
     { 0, "z80-verb", OPT_BOOL,  "Make the assembler more verbose" , &z80verbose, NULL, 0},
     { 0, "", OPT_HEADER, "Linker options:", NULL, NULL, 0 },
-    { 0, "Cl", OPT_FUNCTION,  "Add an option to the linker" , &linkargs, AddToArgsQuoted, 0},
+    { 0, "Cl", OPT_FUNCTION,  "Add an option to the linker" , &linkargs, AddLinkOpt, 0},
     { 0, "L", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library search path" , NULL, AddLinkSearchPath, 0},
     { 0, "l", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library" , NULL, AddLinkLibrary, 0},
     { 0, "bn", OPT_STRING,  "Set the output file for the linker stage" , &c_linker_output_file, NULL, 0},
@@ -967,8 +968,8 @@ static void refuse_same_as_input(const char *name)
 static void refuse_output_is_input(void)
 {
     /* -M/-MM do not write -o. -MD/-MMD do. -MF names a file either way.
-       ucpp opens -MF before include names exist, so a header cannot
-       be refused here. */
+       ucpp opens -MF before include names exist, so -MF of a header
+       cannot be refused here. -Cp cannot forward that option. */
     if (!dependencyonly)
         refuse_same_as_input(outputfile);
     refuse_same_as_input(c_mf_output);
@@ -3148,54 +3149,109 @@ void conf_opt_code_speed(option *argument, char *arg)
 }
 
 
-/* First word of -Cp, quotes removed. Exactly -o or -l is refused.
-   -lg and -DX=1 are passed through. */
-static int cpp_forbids_token(const char *value)
+/* One shell word with its quotes removed. The caller frees it. */
+static char *unquoted_span(const char *s, const char *end)
+{
+    size_t n = (size_t)(end - s);
+    char *buf = mustmalloc(n + 1);
+    size_t i = 0;
+
+    for (; s < end; s++) {
+        if (*s == '"' || *s == '\'')
+            continue;
+        buf[i++] = *s;
+    }
+    buf[i] = '\0';
+    return buf;
+}
+
+/* Same word split as append_shell_words. */
+static int each_opt_word(const char *value, int (*bad)(const char *))
 {
     const char *p = value ? value : "";
-    const char *start;
-    const char *end;
-    char quote = 0;
-    char tok[2];
-    size_t n = 0;
 
-    while (*p == ' ' || *p == '\t')
-        p++;
-    if (*p == '\0')
-        return 0;
-    start = p;
     while (*p) {
-        if (quote) {
-            if (*p == quote)
-                quote = 0;
+        const char *start;
+        char quote = 0;
+        char *word;
+        int hit;
+
+        while (*p == ' ' || *p == '\t')
             p++;
-            continue;
-        }
-        if (*p == '"' || *p == '\'') {
-            quote = *p++;
-            continue;
-        }
-        if (*p == ' ' || *p == '\t')
+        if (*p == '\0')
             break;
-        p++;
+        start = p;
+        while (*p) {
+            if (quote) {
+                if (*p == quote)
+                    quote = 0;
+                p++;
+                continue;
+            }
+            if (*p == '"' || *p == '\'') {
+                quote = *p++;
+                continue;
+            }
+            if (*p == ' ' || *p == '\t')
+                break;
+            p++;
+        }
+        word = unquoted_span(start, p);
+        hit = bad(word);
+        free(word);
+        if (hit)
+            return 1;
     }
-    end = p;
-    for (p = start; p < end; p++) {
-        if (*p == '"' || *p == '\'')
-            continue;
-        if (n < 2)
-            tok[n] = *p;
-        n++;
-        if (n > 2)
-            return 0;
+    return 0;
+}
+
+/* -o, -l, and the dependency switches. -lg and -DX=1 are not these. */
+static int cpp_word_forbidden(const char *w)
+{
+    static const char *exact[] = {
+        "-o", "-l", "-M", "-MM", "-MD", "-MMD", "-MF", "-Ma", NULL
+    };
+    int i;
+
+    if (w[0] == '-' && w[1] == 'M' && w[2] == 'F' && w[3] != '\0')
+        return 1;
+    for (i = 0; exact[i] != NULL; i++) {
+        if (strcmp(w, exact[i]) == 0)
+            return 1;
     }
-    return n == 2 && tok[0] == '-' && (tok[1] == 'o' || tok[1] == 'l');
+    return 0;
+}
+
+/* z80asm -o, -o=file and -ofile. -opt-speed is a different switch. */
+static int asm_word_is_output(const char *w)
+{
+    if (strcmp(w, "-opt-speed") == 0)
+        return 0;
+    return w[0] == '-' && w[1] == 'o';
 }
 
 void AddCppOpt(option *argument, char *arg)
 {
-    if (cpp_forbids_token(arg)) {
-        fprintf(stderr, "Option -Cp cannot pass -o/-l to the preprocessor\n");
+    if (each_opt_word(arg, cpp_word_forbidden)) {
+        fprintf(stderr, "Option -Cp cannot pass -o/-l/-M/-MF to the preprocessor\n");
+        exit(1);
+    }
+    append_shell_words(argument->value, arg);
+}
+
+void AddAsmOpt(option *argument, char *arg)
+{
+    if (each_opt_word(arg, asm_word_is_output)) {
+        fprintf(stderr, "Option -Ca cannot pass -o to the assembler\n");
+        exit(1);
+    }
+    append_shell_words(argument->value, arg);
+}
+
+void AddLinkOpt(option *argument, char *arg)
+{
+    if (each_opt_word(arg, asm_word_is_output)) {
+        fprintf(stderr, "Option -Cl cannot pass -o to the linker\n");
         exit(1);
     }
     append_shell_words(argument->value, arg);
@@ -3209,11 +3265,6 @@ void AddMfOpt(option *argument, char *arg)
 }
 
 void AddToArgs(option *argument, char *arg)
-{
-    append_shell_words(argument->value, arg);
-}
-
-void AddToArgsQuoted(option *argument, char *arg)
 {
     append_shell_words(argument->value, arg);
 }
