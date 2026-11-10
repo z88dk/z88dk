@@ -374,7 +374,13 @@ Type *make_array(Type *base_type,int32_t len)
     type->flags = base_type->flags;
     type->len = len;
     if ( len > 0 ) {
-        type->size = len * base_type->size;
+        /* The product is stored in a signed int. A wrapped size becomes a negative defs. */
+        if (base_type->size <= 0 || len > INT32_MAX / base_type->size) {
+            type->size = -1;
+            errorfmt("Array size is too large", 1);
+            return type;
+        }
+        type->size = (int)(len * base_type->size);
     } else {
         type->size = -1;
     }

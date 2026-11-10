@@ -35,6 +35,7 @@ extern int glblab;
 extern int litlab;
 extern int Zsp;
 extern int ncmp;
+extern int expr_nest;     /* parentheses and calls currently open */
 extern int errcnt;
 extern int c_errstop;
 extern int eof;

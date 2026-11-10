@@ -7,6 +7,11 @@
 
 #include "../config.h"
 #include "ccdefs.h"
+#include <sys/stat.h>
+
+#if !defined(S_ISREG)
+#define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+#endif
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
 extern unsigned _stklen = 8192U; /* Default stack size 4096 bytes is too small. */
@@ -73,7 +78,7 @@ static void write_fp_format(void);
 static void dumpvars(void);
 static void parse(void);
 static void errsummary(void);
-static char *nextarg(int n, char *s, int size);
+static char *nextarg(int n, char *s, size_t size);
 static void setup_sym(void);
 static void info(void);
 static void openout(void);
@@ -191,7 +196,8 @@ int main(int argc, char** argv)
     symtab = NULL;
     loctab = MALLOC(NUMLOC * sizeof(SYMBOL));
     wqueue = MALLOC(NUMWHILE * sizeof(WHILE_TAB));
-    gotoq = MALLOC(NUMGOTO * sizeof(GOTO_TAB));
+    /* Entries are stored at indexes 1..NUMGOTO. */
+    gotoq = MALLOC((NUMGOTO + 1) * sizeof(GOTO_TAB));
 
     swnext = MALLOC(NUMCASE * sizeof(SW_TAB));
     swend = swnext + (NUMCASE - 1);
@@ -421,20 +427,16 @@ void errsummary(void)
  * if the n-th argument doesn't exist.
  */
 
-char *nextarg(int n, char* s, int size)
+char *nextarg(int n, char* s, size_t size)
 {
-    char* str;
-    char* str2;
-    int i;
-
     if (n < 0 || n >= gargc)
         return NULL;
-    i = 0;
-    str = str2 = gargv[n];
-    while (++i < size && (*s++ = *str++))
-        ;
-    if (*str2 == '\0')
+    if (gargv[n][0] == '\0')
         return NULL;
+    if (!copy_fit(s, size, gargv[n])) {
+        fprintf(stderr, "File name is too long\n");
+        exit(1);
+    }
     return s;
 }
 
@@ -805,11 +807,19 @@ void openout(void)
     FILE* fp;
     clear(); /* erase line */
     output = 0; /* start with none */
-    if (nextarg(filenum, filen2, FILENAME_LEN) == NULL)
+    if (nextarg(filenum, filen2, sizeof(filen2)) == NULL)
         return;
     if ((fp = fopen(filen2, "r")) == NULL) {
         fprintf(stderr, "Cannot open source file: %s\n", filen2);
         exit(1);
+    }
+    {
+        struct stat st;
+        if (fstat(fileno(fp), &st) != 0 || !S_ISREG(st.st_mode)) {
+            fprintf(stderr, "Not a regular file: %s\n", filen2);
+            fclose(fp);
+            exit(1);
+        }
     }
     fclose(fp); /* Close it again... */
 
@@ -818,14 +828,14 @@ void openout(void)
 
     if ( c_output_file != NULL ) {
         if ((output = fopen(c_output_file, "w")) == NULL && (!eof)) {
-            fprintf(stderr, "Cannot open output file: %s\n", line);
+            fprintf(stderr, "Cannot open output file: %s\n", c_output_file);
             exit(1);
         }
     } else {
         strcpy(Filenorig, filen2);
-        changesuffix(filen2, extension); /* Change appendix to .asm */
+        changesuffix(filen2, sizeof(filen2), extension); /* Change appendix to .asm */
         if ((output = fopen(filen2, "w")) == NULL && (!eof)) {
-            fprintf(stderr, "Cannot open output file: %s\n", line);
+            fprintf(stderr, "Cannot open output file: %s\n", filen2);
             exit(1);
         }
     }
@@ -910,7 +920,10 @@ void doinclude(void)
         errorfmt("Can't nest include files", 1);
     } else {
         /* ignore quotes or angle brackets round file name */
-        strcpy(name, line + lptr);
+        if (!copy_fit(name, sizeof(name), line + lptr)) {
+            fprintf(stderr, "File name is too long\n");
+            exit(1);
+        }
         cp = name;
         if (*cp == '"' || *cp == '<') {
             name[strlen(name) - 1] = '\0';
@@ -1005,6 +1018,10 @@ static void opt_code_speed(option *arg, char* val)
 void SetDefine(option *arg, char* val)
 {
     char buf[512];
+    if (val == NULL || val[0] == '\0' || val[0] == '-') {
+        fprintf(stderr, "Option -D requires a value\n");
+        exit(1);
+    }
     snprintf(buf, sizeof(buf), "-D%s", val);
     cpp_add_arg(buf);
     /* Still recorded for --c1mode, where this compiler's own #ifdef runs. */
@@ -1014,9 +1031,16 @@ void SetDefine(option *arg, char* val)
 void SetUndefine(option *arg, char* val)
 {
     char buf[512];
+    if (val == NULL || val[0] == '\0' || val[0] == '-') {
+        fprintf(stderr, "Option -U requires a value\n");
+        exit(1);
+    }
     snprintf(buf, sizeof(buf), "-U%s", val);
     cpp_add_arg(buf);
-    strcpy(line, val);
+    if (!copy_fit(line, LINESIZE, val)) {
+        fprintf(stderr, "Macro definition is too long\n");
+        exit(1);
+    }
     delmac();
 }
 

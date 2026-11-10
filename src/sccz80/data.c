@@ -64,6 +64,7 @@ int nxtlab, /* next avail label # */
     litlab, /* label # assigned to literal pool */
     Zsp, /* compiler relative stk ptr */
     ncmp, /* # open compound statements */
+    expr_nest, /* parentheses and calls currently open */
     errcnt, /* # errors in compilation */
     c_errstop, /* stop on error */
     eof, /* set non-zero on final input eof */

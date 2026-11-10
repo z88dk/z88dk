@@ -75,7 +75,7 @@ int option_parse(option *args, int argc, char **argv)
                             val = argv[i];
                         } else {
                             fprintf(stderr, "Insufficient number of arguments supplied\n");
-                            break;
+                            exit(1);
                          }
                     }
                     set_option(myarg, val);
@@ -108,7 +108,7 @@ int option_parse(option *args, int argc, char **argv)
                             val = argv[i];
                         } else {
                             fprintf(stderr, "Insufficient number of arguments supplied\n");
-                            break;
+                            exit(1);
                         }
                     }
                     set_option(myarg, val);

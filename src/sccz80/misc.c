@@ -8,19 +8,69 @@
 
 #include "ccdefs.h"
 
-/* Generic change suffix routine */
-
-void changesuffix(char *name, char *suffix)
+/* Copy src into dst. Always terminates. 0 when src does not fit. */
+int copy_fit(char *dst, size_t cap, const char *src)
 {
+    size_t i;
+
+    if (cap == 0)
+        return 0;
+    if (src == NULL)
+        src = "";
+    for (i = 0; src[i] != '\0'; i++) {
+        if (i + 1 >= cap) {
+            dst[cap - 1] = '\0';
+            return 0;
+        }
+        dst[i] = src[i];
+    }
+    dst[i] = '\0';
+    return 1;
+}
+
+/* Generic change suffix routine. cap is the size of name. */
+
+void changesuffix(char *name, size_t cap, const char *suffix)
+{
+    size_t len;
     size_t j;
-    j = strlen(name) - 1;
+
+    len = strlen(name);
+    if (len >= cap) {
+        fprintf(stderr, "File name is too long\n");
+        exit(1);
+    }
+    j = len;
     while (j && name[j - 1] != '.')
         j--;
 
     if (j) {
         name[j - 1] = '\0';
+        len = j - 1;
     }
-    strcat(name, suffix);
+    if (suffix == NULL)
+        suffix = "";
+    if (len + strlen(suffix) >= cap) {
+        fprintf(stderr, "File name is too long\n");
+        exit(1);
+    }
+    memcpy(name + len, suffix, strlen(suffix) + 1);
+}
+
+/* Parentheses and calls share one ceiling. errorfmt is dropped while
+   an argument is being copied, so this path exits itself. */
+void enter_expr_nest(void)
+{
+    if (++expr_nest > MAX_LEVELS) {
+        fprintf(stderr, "Expression is too deeply nested\n");
+        ccabort();
+    }
+}
+
+void leave_expr_nest(void)
+{
+    if (expr_nest > 0)
+        --expr_nest;
 }
 
 /* These two used to keep track of what goes on stack, and what comes
