@@ -77,6 +77,8 @@ exists (ADR 0010).
 | `lftr-signed` | LFTR only where the bound is a constant, never a signed variable |
 | `smax0` | LFTR's `max(0,n)` clamp for a signed variable bound is built as a logical shift, a subtract and an AND, instead of one sign test over a zero load |
 | `cmp-unsign` | keep the sign tail on a comparison that cannot go negative |
+| `cmp-noovf` | a signed 16-bit compare whose operands are both within +-16383 keeps the overflow repair (`ld a,h; jp po; xor 0x80; rla`) instead of reading the sign of the difference with `add hl,hl` |
+| `const-diamond` | `v = c ? K1 : K2` keeps both arms and the jump over the second, instead of loading one constant ahead of the test and overwriting it |
 | `conv-mask-fold` | keep a widening conversion feeding a mask |
 | `sym-addr-fold` | keep `&sym + K` as an add instead of a symbol address |
 | `symidx-mem-late` | keep a displaced indexed-global load instead of folding the displacement into the symbol address |
@@ -210,6 +212,7 @@ exists (ADR 0010).
 | `idx2-base` | an index home is not offered to a dereference base |
 | `byte-remat` | a byte loaded from a global is spilled instead of re-loaded at the use |
 | `byte-remat-arith` | a single-use global byte feeding a byte add or subtract is loaded and spilled to a slot instead of read at the operation |
+| `byte-remat-conv` | a single-use global byte feeding a zero- or sign-extend is loaded and spilled to a slot instead of read at the extend |
 | `remat` | no rematerialisation of constants and symbol addresses |
 | `slot-prune` | keep a frame slot for a byte that only ever rides A |
 | `dead-de-reload` | keep a dead DE reload before a later use |
@@ -373,6 +376,9 @@ exists (ADR 0010).
 | `byte-store-reg` | a byte held in L is stored to its frame slot through A instead of `ld (ix+d),l` |
 | `long-fold-sp` | the zero-extend / byte-shift fold into a long bitop or add is used in frame-pointer mode only; sp-addressed code builds the operand |
 | `byte-clean` | the byte clean-up after narrowing is skipped altogether |
+| `byte-lsr-rot` | a logical byte right shift of 3 to 7 bits is a run of `srl a` instead of rotates and a mask |
+| `ret-byte-l` | a byte truncated and returned straight away is also copied through A (`ld a,l`) although only L is returned |
+| `ldimm-dead-store` | a constant whose slot store is dead is loaded with `ld de,K; ex de,hl` instead of `ld hl,K` |
 | `byte-ext-src` | a byte op reading a widened byte reads the widened word, not the byte it came from |
 | `frame-byte-trunc-sp` | in sp mode the low byte of a word in the frame is read by loading the whole word, as in fp mode before the byte read |
 | `lhlx-long` | no LDSI-based long load on 8085 |
