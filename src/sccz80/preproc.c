@@ -217,7 +217,32 @@ void ifline(void)
             /* #if is not evaluated here (ucpp does that on the normal path).
                Count it so #endif matches. In raw --c1mode a literal 0 skips
                and a literal 1 does not; any other expression is refused.
+               #elif is matched first only in --c1mode: #if is a prefix of
+               it, and a non-c1mode #elif must keep falling into #if.
                #ifdef / #ifndef are matched above; streq is a prefix test. */
+            if (c_c1mode && match("#elif")) {
+                int is_zero = 0;
+
+                if (iflevel == 0) {
+                    noiferr();
+                    continue;
+                }
+                /* An outer skip does not read this condition. A taken
+                   arm skips the rest without reading it either. */
+                if (skiplevel != 0 && skiplevel != iflevel)
+                    continue;
+                if (skiplevel == 0) {
+                    skiplevel = iflevel;
+                    continue;
+                }
+                if (!c1_if_literal(&is_zero)) {
+                    fprintf(stderr, "Cannot evaluate #elif\n");
+                    ccabort();
+                }
+                if (!is_zero)
+                    skiplevel = 0;
+                continue;
+            }
             if (match("#if")) {
                 int is_zero = 0;
 

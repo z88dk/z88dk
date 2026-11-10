@@ -345,9 +345,10 @@ struct gototab_s {
 #define MAX_LEVELS 100
 
 /* Parentheses and calls are separate. A shared ceiling of 100 rejected
-   valid parenthesis nests and never fired on the call nest that hangs. */
-#define MAX_PAREN_LEVELS 1000
-#define MAX_CALL_LEVELS  16
+   valid parenthesis nests and never fired on the call nest that hangs.
+   20 calls and 1900 parentheses stay below that hang and that crash. */
+#define MAX_PAREN_LEVELS 1900
+#define MAX_CALL_LEVELS  20
 
 /* Brace-less if/while and a cast or unary chain each take a C stack
    frame. A flat else-if is one frame per arm. 10000 is still far below
