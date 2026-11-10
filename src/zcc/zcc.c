@@ -147,8 +147,11 @@ static void            AddPreProc(option *arg, char *);
 static void            AddPreProcGen(option *arg, char *);
 static void            AddPreProcIncPath(option *arg, char *);
 static void            AddToArgs(option *arg, char *);
-static void            AddToArgsQuoted(option *arg, char *);
 static void            AddToArgsVerbatim(option *argument, char *arg);
+static void            AddCppOpt(option *arg, char *);
+static void            AddAsmOpt(option *arg, char *);
+static void            AddLinkOpt(option *arg, char *);
+static void            AddMfOpt(option *arg, char *);
 static void            AddLinkLibrary(option *arg, char *);
 static void            AddLinkSearchPath(option *arg, char *);
 static void            usage(const char *program);
@@ -185,6 +188,9 @@ static void            parse_cmdline_arg(char *option);
 static void            BuildOptions(char **, const char *);
 static void            BuildOptions_start(char **, char *);
 static void            BuildOptionsQuoted(char **, char *);
+static char           *shell_quote(const char *s);
+static void            append_shell_arg(char **dest, const char *value);
+static int             argv_requests_help(int argc, char **argv);
 static void            copy_output_files_to_destdir(char *suffix, int die_on_fail);
 static void            parse_configfile(const char *config_line);
 static void            parse_configfile_line(char *config_line);
@@ -197,6 +203,7 @@ static void            configure_compiler(void);
 static int             compile_c_multi(int filenumber);
 static void            configure_misc_options(void);
 static void            configure_maths_library(char **libstring);
+static const char     *quoted_linklib(const char *libs, const char *name);
 
 static void            apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext);
 static int             fill_sccz80_copt_rules(char **rules);
@@ -256,6 +263,7 @@ static int             mapon = 0;
 static int             globaldefon = 0;
 static char           *globaldefrefile = NULL;
 static int             dependencyonly = 0;
+static char           *c_mf_output = NULL;
 static int             preprocessonly = 0;
 static int             printmacros = 0;
 static int             relocate = 0;
@@ -486,7 +494,7 @@ static arg_t  config[] = {
     { "Z88MATHLIB", AF_DEPRECATED, SetStringConfig, &c_altmathlib, NULL, "Name of the alt maths library (use ALTMATHLIB)" },
     { "Z88MATHFLG", AF_DEPRECATED, SetStringConfig, &c_altmathflags, NULL, "Additional options for non-generic maths (use ALTMATHFLG)" },
     { "STARTUPLIB", 0, SetStringConfig, &c_startuplib, NULL, "" },
-    { "GENMATHLIB", 0, SetStringConfig, &c_genmathlib, NULL, "" },
+    { "GENMATHLIB", 0, SetStringConfig, &c_genmathlib, NULL, "Name of the -lm library (default math32)" },
     { "SUBTYPE",  0, AddArray, &c_subtype_array, &c_subtype_array_num, "Add a sub-type alias and config" },
     { "CLIB",  0, AddArray, &c_clib_array, &c_clib_array_num, "Add a clib variant config" },
     { "ALIAS",  0, AddArray, &c_aliases_array, &c_aliases_array_num, "Add an alias and options" },
@@ -558,16 +566,16 @@ static option options[] = {
 
     { 0, "M", OPT_FUNCTION|OPT_BOOL|OPT_INCLUDE_OPT, "Emit Makefile dependencies (implies no further processing)", NULL, AddPreProcGen, 0 },
     { 0, "MM", OPT_FUNCTION|OPT_BOOL|OPT_INCLUDE_OPT, "Emit Makefile dependencies, including system headers (implies no further processing)", NULL, AddPreProcGen, 0 },
-    { 0, "MF", OPT_FUNCTION, "Emit Makefile dependencies, including system headers (implies -E)", &cpparg, AddToArgsVerbatim },
+    { 0, "MF", OPT_FUNCTION, "Emit Makefile dependencies, including system headers (implies -E)", &cpparg, AddMfOpt },
     { 0, "MD", OPT_FUNCTION|OPT_INCLUDE_OPT|OPT_BOOL,  "Generate a .d file with dependencies, including system headers" , NULL, AddPreProc, 0},
     { 0, "MMD", OPT_FUNCTION|OPT_INCLUDE_OPT|OPT_BOOL,  "Generate a .d file with dependencies" , NULL, AddPreProc, 0},
     { 0, "MT", OPT_FUNCTION,  "Specify the dependency target" , &cpparg, AddToArgsVerbatim, 0},
-    { 0, "Cp", OPT_FUNCTION,  "Add an option to the preprocessor" , &cpparg, AddToArgs, 0},
+    { 0, "Cp", OPT_FUNCTION,  "Add an option to the preprocessor" , &cpparg, AddCppOpt, 0},
     { 0, "D", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Define a preprocessor option" , NULL, AddPreProc, 0},
     { 0, "U", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Undefine a preprocessor option" , NULL, AddPreProc, 0},
     { 0, "I", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add an include directory for the preprocessor" , NULL, AddPreProcIncPath, 0},
-    { 0, "iquote", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a quoted include path for the preprocessor" , &cpparg, AddToArgsQuoted, 0},
-    { 0, "isystem", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a system include path for the preprocessor" , &cpparg, AddToArgsQuoted, 0},
+    { 0, "iquote", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a quoted include path for the preprocessor" , &cpparg, AddToArgs, 0},
+    { 0, "isystem", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a system include path for the preprocessor" , &cpparg, AddToArgs, 0},
 
     { 0, "", OPT_HEADER, "Compiler (all) options:", NULL, NULL, 0 },
     { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc,ez80clang,80cc,multi)" , &c_compiler_type, NULL, 0},
@@ -603,10 +611,10 @@ static option options[] = {
     { 0, "Cx", OPT_FUNCTION,  "Add an option to xcc" , &xccarg, AddToArgs, 0},
 
     { 0, "", OPT_HEADER, "Assembler options:", NULL, NULL, 0 },
-    { 0, "Ca", OPT_FUNCTION,  "Add an option to the assembler" , &asmargs, AddToArgsQuoted, 0},
+    { 0, "Ca", OPT_FUNCTION,  "Add an option to the assembler" , &asmargs, AddAsmOpt, 0},
     { 0, "z80-verb", OPT_BOOL,  "Make the assembler more verbose" , &z80verbose, NULL, 0},
     { 0, "", OPT_HEADER, "Linker options:", NULL, NULL, 0 },
-    { 0, "Cl", OPT_FUNCTION,  "Add an option to the linker" , &linkargs, AddToArgsQuoted, 0},
+    { 0, "Cl", OPT_FUNCTION,  "Add an option to the linker" , &linkargs, AddLinkOpt, 0},
     { 0, "L", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library search path" , NULL, AddLinkSearchPath, 0},
     { 0, "l", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library" , NULL, AddLinkLibrary, 0},
     { 0, "bn", OPT_STRING,  "Set the output file for the linker stage" , &c_linker_output_file, NULL, 0},
@@ -780,12 +788,313 @@ static char* get_explicit_file_type(void)
     return NULL;
 }
 
+/* One shell word. POSIX single quotes, with ' written as '\''.
+   Windows double quotes: % is doubled, and a backslash is doubled
+   only when it would escape a quote. */
+static char *shell_quote(const char *s)
+{
+    const char *p;
+    char *out, *d;
+    size_t n;
+
+    if (s == NULL)
+        s = "";
+    n = strlen(s);
+#ifdef _WIN32
+    out = mustmalloc(n * 2 + 3);
+    d = out;
+    *d++ = '"';
+    {
+        size_t bs = 0;
+
+        for (p = s; ; p++) {
+            if (*p == '\\') {
+                bs++;
+                continue;
+            }
+            if (*p == '"' || *p == '\0') {
+                while (bs > 0) {
+                    *d++ = '\\';
+                    *d++ = '\\';
+                    bs--;
+                }
+                if (*p == '\0')
+                    break;
+                *d++ = '\\';
+                *d++ = '"';
+                continue;
+            }
+            while (bs > 0) {
+                *d++ = '\\';
+                bs--;
+            }
+            if (*p == '%')
+                *d++ = '%';
+            *d++ = *p;
+        }
+    }
+    *d++ = '"';
+    *d = '\0';
+#else
+    n = 2;
+    for (p = s; *p; p++)
+        n += (*p == '\'') ? 4 : 1;
+    out = mustmalloc(n + 1);
+    d = out;
+    *d++ = '\'';
+    for (p = s; *p; p++) {
+        if (*p == '\'') {
+            *d++ = '\'';
+            *d++ = '\\';
+            *d++ = '\'';
+            *d++ = '\'';
+        } else {
+            *d++ = *p;
+        }
+    }
+    *d++ = '\'';
+    *d = '\0';
+#endif
+    return out;
+}
+
+static void append_shell_arg(char **dest, const char *value)
+{
+    char *orig = *dest;
+    char *q = shell_quote(value);
+
+    zcc_asprintf(dest, "%s%s ", orig ? orig : "", q);
+    free(orig);
+    free(q);
+}
+
+/* A -C* value is a list of tool arguments (-Ca"-DPLUS3 -DSTRIPVECTOR",
+   -Cz"+zx --plus3"). Those quotes are removed before zcc sees the value.
+   A quote that is still present belongs to one argument (-DSTR="hi there").
+   One -I, -L, -iquote or -isystem value stays one argument, including a
+   path that contains spaces. */
+static int leading_path_option(const char *s)
+{
+    if (strchr(s, '"') != NULL || strchr(s, '\'') != NULL)
+        return 0;
+    if (strncmp(s, "-iquote", 7) == 0 || strncmp(s, "-isystem", 8) == 0)
+        return 1;
+    if (strncmp(s, "-I", 2) == 0 || strncmp(s, "-L", 2) == 0)
+        return 1;
+    return 0;
+}
+
+static void append_shell_span(char **dest, const char *s, size_t n)
+{
+    char *word = mustmalloc(n + 1);
+
+    memcpy(word, s, n);
+    word[n] = '\0';
+    append_shell_arg(dest, word);
+    free(word);
+}
+
+static void append_shell_words(char **dest, const char *value)
+{
+    const char *p;
+
+    if (value == NULL)
+        value = "";
+    if (leading_path_option(value)) {
+        append_shell_arg(dest, value);
+        return;
+    }
+    for (p = value; *p; ) {
+        const char *start;
+        char quote = 0;
+
+        while (*p == ' ' || *p == '\t')
+            p++;
+        if (*p == '\0')
+            break;
+        start = p;
+        while (*p) {
+            if (quote) {
+                if (*p == quote)
+                    quote = 0;
+                p++;
+                continue;
+            }
+            if (*p == '"' || *p == '\'') {
+                quote = *p++;
+                continue;
+            }
+            if (*p == ' ' || *p == '\t')
+                break;
+            p++;
+        }
+        append_shell_span(dest, start, (size_t)(p - start));
+    }
+}
+
+static int same_existing_file(const struct stat *a, const char *path)
+{
+    struct stat b;
+
+    if (path == NULL || stat(path, &b) != 0)
+        return 0;
+    if (a->st_ino == 0 || b.st_ino == 0)
+        return 0;
+    return a->st_dev == b.st_dev && a->st_ino == b.st_ino;
+}
+
+static void refuse_same_as_input(const char *name)
+{
+    struct stat out;
+    int have_out;
+    int i;
+
+    if (name == NULL || name[0] == '\0')
+        return;
+    have_out = stat(name, &out) == 0;
+    for (i = 0; i < nfiles; i++) {
+        const char *in = original_filenames[i];
+
+        if (in == NULL)
+            continue;
+        if (strcmp(name, in) == 0 ||
+            (have_out && same_existing_file(&out, in))) {
+            fprintf(stderr, "Output file is the same as the input file: %s\n", name);
+            exit(1);
+        }
+    }
+}
+
+static void refuse_output_is_input(void)
+{
+    /* -M/-MM do not write -o. -MD/-MMD do. -MF names a file either way.
+       ucpp opens -MF before include names exist, so -MF of a header
+       cannot be refused here. -Cp cannot forward that option. */
+    if (!dependencyonly)
+        refuse_same_as_input(outputfile);
+    refuse_same_as_input(c_mf_output);
+}
+
+/* ucpp records every included name as # <num> "file" or #line <num> "file".
+   sccz80's -o is a temporary, so the driver's output name is checked here. */
+static int line_directive_name(const char *text, char *name, size_t cap)
+{
+    const char *p = text;
+    const char *start;
+    size_t n;
+
+    while (*p == ' ' || *p == '\t')
+        p++;
+    if (*p != '#')
+        return 0;
+    p++;
+    while (*p == ' ' || *p == '\t')
+        p++;
+    if (strncmp(p, "line", 4) == 0 && (p[4] == ' ' || p[4] == '\t'))
+        p += 4;
+    while (*p == ' ' || *p == '\t')
+        p++;
+    if (*p < '0' || *p > '9')
+        return 0;
+    while (*p >= '0' && *p <= '9')
+        p++;
+    while (*p == ' ' || *p == '\t')
+        p++;
+    if (*p != '"')
+        return 0;
+    start = ++p;
+    while (*p && *p != '"') {
+        if (*p == '\\' && p[1] != '\0')
+            p += 2;
+        else
+            p++;
+    }
+    if (*p != '"')
+        return 0;
+    n = (size_t)(p - start);
+    if (n == 0 || n >= cap)
+        return 0;
+    memcpy(name, start, n);
+    name[n] = '\0';
+    return 1;
+}
+
+static void refuse_preprocessed_includes(int number)
+{
+    char *path;
+    char buf[8192];
+    char name[FILENAME_MAX + 1];
+    FILE *fp;
+    struct stat out;
+    int have_out;
+
+    if (dependencyonly)
+        return;
+    if (outputfile == NULL || outputfile[0] == '\0')
+        return;
+    if (temporary_filenames == NULL || temporary_filenames[number] == NULL)
+        return;
+    path = changesuffix(temporary_filenames[number], ".i2");
+    fp = fopen(path, "r");
+    free(path);
+    if (fp == NULL)
+        return;
+    have_out = stat(outputfile, &out) == 0;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        if (!line_directive_name(buf, name, sizeof(name)))
+            continue;
+        if (strcmp(name, outputfile) == 0 ||
+            (have_out && same_existing_file(&out, name))) {
+            fprintf(stderr, "Output file is the same as an include file: %s\n", name);
+            fclose(fp);
+            exit(1);
+        }
+    }
+    fclose(fp);
+}
+
+static void command_fit(char *dest, size_t cap, const char *fmt, ...)
+{
+    va_list ap;
+    int n;
+
+    va_start(ap, fmt);
+    n = vsnprintf(dest, cap, fmt, ap);
+    va_end(ap);
+    if (n < 0 || (size_t)n >= cap) {
+        fprintf(stderr, "Command is too long\n");
+        exit(1);
+    }
+}
+
+static size_t append_command(char *dest, size_t cap, size_t off, const char *fmt, ...)
+{
+    va_list ap;
+    int n;
+
+    if (off >= cap) {
+        fprintf(stderr, "Command is too long\n");
+        exit(1);
+    }
+    va_start(ap, fmt);
+    n = vsnprintf(dest + off, cap - off, fmt, ap);
+    va_end(ap);
+    if (n < 0 || (size_t)n >= cap - off) {
+        fprintf(stderr, "Command is too long\n");
+        exit(1);
+    }
+    return off + (size_t)n;
+}
+
 int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum iostyle ios, int number, int needsuffix, int src_is_original)
 {
     int             status, errs;
     int             tstore;
     char            buffer[8192], *outname;
     char           *bin_dir = c_binary_dir;
+    char           *qfile = NULL;
+    char           *qout;
+    const char     *args = extraargs ? extraargs : "";
 
     errs = 0;
 
@@ -800,6 +1109,7 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
 #endif
 
     outname = changesuffix(temporary_filenames[number], nextsuffix);
+    qout = shell_quote(outname);
 
     switch (ios) {
     case outimplied:
@@ -807,26 +1117,34 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
         tstore = (int)strlen(filelist[number]) - (int)strlen(suffix);
         if (!needsuffix)
             filelist[number][tstore] = 0;
-        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\"", bin_dir, processor, extraargs, filelist[number]);
+        qfile = shell_quote(filelist[number]);
+        command_fit(buffer, sizeof(buffer), "%s%s %s %s", bin_dir, processor, args, qfile);
         filelist[number][tstore] = '.';
         break;
     case outspecified:
-        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
+        qfile = shell_quote(filelist[number]);
+        command_fit(buffer, sizeof(buffer), "%s%s %s %s %s", bin_dir, processor, args, qfile, qout);
         break;
     case outspecified_flag:
-        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" -o \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
+        qfile = shell_quote(filelist[number]);
+        command_fit(buffer, sizeof(buffer), "%s%s %s %s -o %s", bin_dir, processor, args, qfile, qout);
         break;
     case filter:
-        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" > \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
+        qfile = shell_quote(filelist[number]);
+        command_fit(buffer, sizeof(buffer), "%s%s %s < %s > %s", bin_dir, processor, args, qfile, qout);
         break;
     case filter_out:
         // This is only used by copy command, which is cat/type so not a z88dk binary
-        snprintf(buffer, sizeof(buffer), "%s %s \"%s\" > \"%s\"", processor, extraargs, filelist[number], outname);
+        qfile = shell_quote(filelist[number]);
+        command_fit(buffer, sizeof(buffer), "%s %s %s > %s", processor, args, qfile, qout);
         break;
     case filter_outspecified_flag:
-        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" -o \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
+        qfile = shell_quote(filelist[number]);
+        command_fit(buffer, sizeof(buffer), "%s%s %s < %s -o %s", bin_dir, processor, args, qfile, qout);
         break;
     }
+    free(qfile);
+    free(qout);
 
     if (verbose) {
         fprintf(stderr, "%s\n", buffer);
@@ -851,28 +1169,30 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
 
 int linkthem(char *linker)
 {
-    int             i, len, offs, status;
+    int             i, status;
     char           *temp, *cmdline;
+    char           *qout;
     char            tname[FILENAME_MAX + 1];
     FILE           *out, *prj;
 
+    qout = shell_quote(outputfile);
     if (compileonly)
     {
-        len = offs = zcc_asprintf(&temp, "%s %s -o\"%s\" %s",
+        zcc_asprintf(&temp, "%s %s -o%s %s",
             linker,
             select_cpu(CPU_MAP_TOOL_Z80ASM),
-            outputfile,
-            linkargs);
+            qout,
+            linkargs ? linkargs : "");
     }
     else if (makelib)
     {
-        len = offs = zcc_asprintf(&temp, "%s %s %s -d %s %s -x\"%s\"",
+        zcc_asprintf(&temp, "%s %s %s -d %s %s -x%s",
             linker,
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v" : "",
             select_cpu(CPU_MAP_TOOL_Z80ASM),
             IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
-            linkargs,
-            outputfile);
+            linkargs ? linkargs : "",
+            qout);
     }
     else
     {
@@ -883,22 +1203,23 @@ int linkthem(char *linker)
         if (verbose) puts("");
         free(c_crt_incpath);
 
-        len = offs = zcc_asprintf(&temp, "%s %s -b -d %s -o%s\"%s\" %s%s%s%s%s%s%s%s%s",
+        zcc_asprintf(&temp, "%s %s -b -d %s -o%s%s %s%s%s%s%s%s%s%s%s",
             linker,
             select_cpu(CPU_MAP_TOOL_Z80ASM),
             IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
             linker_output_separate_arg ? " " : "",
-            outputfile,
+            qout,
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
             (relocate && IS_ASM(ASM_Z80ASM)) ? "-R " : "",
             globaldefon ? "-g " : "",
             (createapp || mapon) ? "-m " : "",
             (createapp || symbolson) ? "-s " : "",
             relocinfo ? "--reloc-info " : "",
-            linkargs,
+            linkargs ? linkargs : "",
             (c_nostdlib == 0) ? c_linkopts : "",
-            linklibs);
+            linklibs ? linklibs : "");
     }
+    free(qout);
 
     tname[0] = '\0';
     prj = z80verbose ? fopen(PROJFILE, "w") : NULL;
@@ -922,31 +1243,32 @@ int linkthem(char *linker)
 
         fclose(out);
 
-        len += (int)strlen(tname) + 5;
-        cmdline = calloc(len, sizeof(char));
-
-        snprintf(cmdline, len, "%s \"@%s\"", temp, tname);
+        {
+            char *at, *qat;
+            zcc_asprintf(&at, "@%s", tname);
+            qat = shell_quote(at);
+            zcc_asprintf(&cmdline, "%s %s", temp, qat);
+            free(at);
+            free(qat);
+        }
     }
     else
     {
     USE_COMMANDLINE:
 
         /* place source files on the command line */
-
-        for (i = 0; i < nfiles; i++)
-            len += (int)strlen(filelist[i]) + 7;
-        len++;
-
-        /* So the total length we need is now in len, let's malloc and do it */
-
-        cmdline = calloc(len, sizeof(char));
-        strcpy(cmdline, temp);
+        cmdline = muststrdup(temp);
 
         for (i = 0; i < nfiles; ++i)
         {
             if (hassuffix(filelist[i], c_extension) )
             {
-                offs += snprintf(cmdline + offs, len - offs, " \"%s\"", filelist[i]);
+                char *q = shell_quote(filelist[i]);
+                char *next;
+                zcc_asprintf(&next, "%s %s", cmdline, q);
+                free(cmdline);
+                free(q);
+                cmdline = next;
                 if (prj) fprintf(prj, "%s\n", original_filenames[i]);
             }
         }
@@ -967,6 +1289,21 @@ int linkthem(char *linker)
     free(temp);
 
     return (status);
+}
+
+static int argv_requests_help(int argc, char **argv)
+{
+    int i;
+
+    for (i = 1; i < argc; i++) {
+        const char *s = argv[i];
+
+        if (strcmp(s, "-h") == 0 || strcmp(s, "--help") == 0 ||
+            strcmp(s, "-help") == 0 || strcmp(s, "--version") == 0 ||
+            strcmp(s, "-version") == 0)
+            return 1;
+    }
+    return 0;
 }
 
 int main(int argc, char **argv)
@@ -1034,20 +1371,39 @@ int main(int argc, char **argv)
     for (gargc = 0 ; gargc < argc; gargc++) {
         char* aa = argv[gargc];
         if (aa[0] == '+') {
-            strcpy(configuration, aa);
+            if (strlen(aa) >= sizeof(configuration)) {
+                fprintf(stderr, "Target name is too long\n");
+                exit(1);
+            }
+            memcpy(configuration, aa, strlen(aa) + 1);
             break;
         } else if ( strncmp(aa, "-target=", 8) == 0 ) {
-            strcpy(configuration, "+");
-            strcat(configuration, aa + 8);
+            if (strlen(aa + 8) + 1 >= sizeof(configuration)) {
+                fprintf(stderr, "Target name is too long\n");
+                exit(1);
+            }
+            configuration[0] = '+';
+            memcpy(configuration + 1, aa + 8, strlen(aa + 8) + 1);
             break;
         } else if (aa[0] == '@') {
-            struct tokens_list_s* tokens = gather_from_list_file(aa + 1);
-
+            struct stat lst;
+            struct tokens_list_s* tokens;
             struct tokens_list_s* token;
+
+            if (stat(aa + 1, &lst) == 0 && !S_ISREG(lst.st_mode)) {
+                fprintf(stderr, "Not a regular file: %s\n", aa + 1);
+                exit(1);
+            }
+            tokens = gather_from_list_file(aa + 1);
+
             LL_FOREACH(tokens, token) {
                 char* tk = token->token;
                 if (tk[0] == '+') {
-                    strcpy(configuration, tk);
+                    if (strlen(tk) >= sizeof(configuration)) {
+                        fprintf(stderr, "Target name is too long\n");
+                        exit(1);
+                    }
+                    memcpy(configuration, tk, strlen(tk) + 1);
                 }
             }
             cmd_free_tokens(tokens);
@@ -1057,7 +1413,7 @@ int main(int argc, char **argv)
     if (strlen(configuration) == 0) {
         fprintf(stderr, "A config file must be specified with +file or with -target=[target]\n\n");
         print_help_text(argv[0]);
-        exit(1);
+        exit(argv_requests_help(argc, argv) ? 0 : 1);
     }
 
     find_zcc_config_fileFile(argv[0], configuration, config_filename, sizeof(config_filename));
@@ -1098,6 +1454,11 @@ int main(int argc, char **argv)
     }
 
     argc = option_parse(&options[0], argc, argv);
+
+    if (outputfile != NULL && strlen(outputfile) >= sizeof(filenamebuf)) {
+        fprintf(stderr, "Filename is too long \"%s\"\n", outputfile);
+        exit(1);
+    }
     for (gargc = 0; gargc < argc; gargc++) {
         char* aa = argv[gargc];
         // We have some options left over, it may well be an alias
@@ -1125,14 +1486,14 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    /* -lm is math32 on every target.  The library rename happens later in
+    /* -lm is math32 unless a cfg sets GENMATHLIB.  The library rename happens later in
      * configure_maths_library(); the IEEE width has to be chosen here, before
      * configure_compiler().  An explicit fp-mode (command line or an alias
      * such as --math-mbf32 / --genmath / --math48) wins.  parse_option()
      * edits its argument, so the flags are a writable copy.
      * ROM maths stays on -lmz (Z88MATHLIB / ALTMATHLIB), not on -lm. */
     if (linker_linklib_first != NULL
-        && strstr(linker_linklib_first, "-lm ") != NULL
+        && quoted_linklib(linker_linklib_first, "lm") != NULL
         && c_genmathlib != NULL
         && strcmp(c_genmathlib, "math32@{ZCC_LIBCPU}") == 0
         && !c_user_fp_mode_explicit
@@ -1235,11 +1596,17 @@ int main(int argc, char **argv)
     {
         char cmdline[FILENAME_MAX + 128];
 
+        {
+            char *qz = shell_quote(zcc_opt_def);
+            char *qp = shell_quote(pragincname);
 #ifdef _WIN32
-        snprintf(cmdline, FILENAME_MAX + 127, "%s -zcc-opt=\"%s\" < \"%s\" > nul",c_zpragma_exe, zcc_opt_def, pragincname);
+            command_fit(cmdline, sizeof(cmdline), "%s -zcc-opt=%s < %s > nul", c_zpragma_exe, qz, qp);
 #else
-        snprintf(cmdline, FILENAME_MAX + 127, "%s -zcc-opt=\"%s\" < \"%s\" > /dev/null",c_zpragma_exe, zcc_opt_def, pragincname);
+            command_fit(cmdline, sizeof(cmdline), "%s -zcc-opt=%s < %s > /dev/null", c_zpragma_exe, qz, qp);
 #endif
+            free(qz);
+            free(qp);
+        }
         if (verbose) { printf("%s\n", cmdline); fflush(stdout); }
         if (-1 == system(cmdline)) {
             fprintf(stderr, "Could not execute %s\n", cmdline);
@@ -1250,10 +1617,10 @@ int main(int argc, char **argv)
 
     if (nfiles <= 0 || c_help) {
         print_help_text(argv[0]);
-        exit(0);
+        exit(c_help ? 0 : 1);
     }
 
-    /* -lm → GENMATHLIB (math32@{ZCC_LIBCPU} unless a cfg overrides it).
+    /* -lm is math32@{ZCC_LIBCPU} unless a cfg sets GENMATHLIB.
      * Classic and newlib both.  -lmz stays the ROM library. */
     if (linker_linklib_first) configure_maths_library(&linker_linklib_first);
 
@@ -1384,6 +1751,9 @@ int main(int argc, char **argv)
     /*                                                                                                           */
     /* This nastiness is marked "HACK" in the loop below.  Maybe something better will come along later.         */
 
+    /* Before any child: -o is copied onto the source only after the link. */
+    refuse_output_is_input();
+
     /* Parse through the files, handling each one in turn */
     for (i = 1; (i <= nfiles) && (i != 0); i += (i != 0)) { /* HACK 1 OF 2 */
         char   temp_filename[FILENAME_MAX+1];
@@ -1444,6 +1814,7 @@ int main(int argc, char **argv)
                     snprintf(zpragma_args, sizeof(zpragma_args),"-sccz80 -zcc-opt=\"%s\"", zcc_opt_def);
                     if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                         exit(1);
+                    refuse_preprocessed_includes(i);
                     if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
                         exit(1);
                     continue;
@@ -1460,6 +1831,7 @@ int main(int argc, char **argv)
                          (compiler_type == CC_SDCC || compiler_type == CC_LLVMZ80) ? " -autoformat" : "");
                 if (process(ft == CXXFILE ? ".cpp" : ".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
+                refuse_preprocessed_includes(i);
                 if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
                     exit(1);
             } else {
@@ -1468,6 +1840,7 @@ int main(int argc, char **argv)
 
                 if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
+                refuse_preprocessed_includes(i);
                 if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
                     exit(1);
             }
@@ -1862,12 +2235,14 @@ int main(int argc, char **argv)
         if ((nfiles > 1) && (outputfile != NULL)) {
             /* consolidated object file */
             outputfile = changesuffix(outputfile, ".o");
+            refuse_output_is_input();
             if (linkthem(c_linker))
                 exit(1);
         }
         else
         {
             /* independent object files */
+            refuse_output_is_input();
             copy_output_files_to_destdir(c_extension, 1);
             copy_output_files_to_destdir(".d", 1);
         }
@@ -1879,7 +2254,12 @@ int main(int argc, char **argv)
     if (outputfile == NULL)
         outputfile = c_linker_output_file ? c_linker_output_file : defaultout;
 
-    strcpy(filenamebuf, outputfile);
+    if (strlen(outputfile) >= sizeof(filenamebuf)) {
+        fprintf(stderr, "Filename is too long \"%s\"\n", outputfile);
+        exit(1);
+    }
+    refuse_output_is_input();
+    memcpy(filenamebuf, outputfile, strlen(outputfile) + 1);
 
     if ((ptr = find_file_ext(filenamebuf)) != NULL)
         *ptr = 0;
@@ -1932,7 +2312,13 @@ int main(int argc, char **argv)
         if (createapp) {
             /* Building an application - run the appmake command on it */
 			/* z80asm now generates map file with same basename as output binary, i.e. a.map */
-            snprintf(buffer, sizeof(buffer), "%s %s -b \"%s\" -c \"%s\"", c_appmake_exe, appmakeargs ? appmakeargs : "", outputfile, filenamebuf);
+            {
+                char *qb = shell_quote(outputfile);
+                char *qc = shell_quote(filenamebuf);
+                command_fit(buffer, sizeof(buffer), "%s %s -b %s -c %s", c_appmake_exe, appmakeargs ? appmakeargs : "", qb, qc);
+                free(qb);
+                free(qc);
+            }
             if (verbose) {
                 printf("%s\n", buffer);
                 fflush(stdout);
@@ -2054,7 +2440,7 @@ static void zsdcc_embed_adb(int filenumber)
     char buffer2[16384 + 1];
     FILE *fasm;
     FILE *fcdb;
-    char *cdbfile, *asmfile;
+    char *cdbfile;
 
     cdbfile = changesuffix(temporary_filenames[filenumber], ".adb");
     if ( (fcdb = fopen(cdbfile, "r")) != NULL ) {
@@ -2178,8 +2564,8 @@ void zsdcc_asm_filter_comments(int filenumber, char *ext)
         unsigned int quote_type = 0;
         unsigned int quote_count = 0;
 
-        unsigned int dst = 0;
-        unsigned int src = 0;
+        int dst = 0;
+        int src = 0;
 
         // issue #807 on github
         // nop with comment can be used to inline asm; allow opting out
@@ -2511,11 +2897,18 @@ int copyprepend_file(char *name1, char *ext1, char *name2, char *ext2, char *pre
     fprintf(out, "%s", prepend);
     fclose(out);
 
-#ifdef WIN32
-    snprintf(buffer, sizeof(buffer), "%s \"%s%s\" >> \"%s%s\"", c_copycmd, name1, ext1, name2, ext2);
-#else
-    snprintf(buffer, sizeof(buffer), "%s \"%s%s\" >> \"%s%s\"", c_copycmd, name1, ext1, name2, ext2);
-#endif
+    {
+        char *left, *right, *qleft, *qright;
+        zcc_asprintf(&left, "%s%s", name1, ext1);
+        zcc_asprintf(&right, "%s%s", name2, ext2);
+        qleft = shell_quote(left);
+        qright = shell_quote(right);
+        command_fit(buffer, sizeof(buffer), "%s %s >> %s", c_copycmd, qleft, qright);
+        free(left);
+        free(right);
+        free(qleft);
+        free(qright);
+    }
 #ifdef WIN32
     /* Argh....annoying */
     if ((strcmp(c_copycmd, "type") == 0) || (strcmp(c_copycmd, "copy") == 0)){
@@ -2600,20 +2993,40 @@ int add_variant_args(char *wanted, int num_choices, char **choices)
 }
 
 
+static void append_fit(char *dest, size_t cap, size_t *offs, const char *fmt, ...)
+{
+    va_list ap;
+    int n;
+
+    if (*offs >= cap) {
+        fprintf(stderr, "Assembler options are too long\n");
+        exit(1);
+    }
+    va_start(ap, fmt);
+    n = vsnprintf(dest + *offs, cap - *offs, fmt, ap);
+    va_end(ap);
+    if (n < 0 || (size_t)n >= cap - *offs) {
+        fprintf(stderr, "Assembler options are too long\n");
+        exit(1);
+    }
+    *offs += (size_t)n;
+}
+
 void BuildAsmLine(char *dest, size_t destlen, char *prefix)
 {
-    size_t offs;
-    offs = snprintf(dest, destlen, "%s", asmargs ? asmargs : " ");
+    size_t offs = 0;
+
+    append_fit(dest, destlen, &offs, "%s", asmargs ? asmargs : " ");
 
     if (IS_ASM(ASM_Z80ASM)) {
-        offs += snprintf(dest + offs, destlen - offs, "%s%s%s%s",
+        append_fit(dest, destlen, &offs, "%s%s%s%s",
             prefix,
             z80verbose ? " -v " : " ",
             select_cpu(CPU_MAP_TOOL_Z80ASM),
             symbolson ? " -s " : " ");
     }
 
-    snprintf(dest + offs, destlen - offs, "%s", c_asmopts);
+    append_fit(dest, destlen, &offs, "%s", c_asmopts ? c_asmopts : "");
 }
 
 
@@ -2736,14 +3149,124 @@ void conf_opt_code_speed(option *argument, char *arg)
 }
 
 
-void AddToArgs(option *argument, char *arg)
+/* One shell word with its quotes removed. The caller frees it. */
+static char *unquoted_span(const char *s, const char *end)
 {
-    BuildOptions(argument->value, arg);
+    size_t n = (size_t)(end - s);
+    char *buf = mustmalloc(n + 1);
+    size_t i = 0;
+
+    for (; s < end; s++) {
+        if (*s == '"' || *s == '\'')
+            continue;
+        buf[i++] = *s;
+    }
+    buf[i] = '\0';
+    return buf;
 }
 
-void AddToArgsQuoted(option *argument, char *arg)
+/* Same word split as append_shell_words. */
+static int each_opt_word(const char *value, int (*bad)(const char *))
 {
-    BuildOptionsQuoted(argument->value, arg);
+    const char *p = value ? value : "";
+
+    while (*p) {
+        const char *start;
+        char quote = 0;
+        char *word;
+        int hit;
+
+        while (*p == ' ' || *p == '\t')
+            p++;
+        if (*p == '\0')
+            break;
+        start = p;
+        while (*p) {
+            if (quote) {
+                if (*p == quote)
+                    quote = 0;
+                p++;
+                continue;
+            }
+            if (*p == '"' || *p == '\'') {
+                quote = *p++;
+                continue;
+            }
+            if (*p == ' ' || *p == '\t')
+                break;
+            p++;
+        }
+        word = unquoted_span(start, p);
+        hit = bad(word);
+        free(word);
+        if (hit)
+            return 1;
+    }
+    return 0;
+}
+
+/* -o, -l, and the dependency switches. -lg and -DX=1 are not these. */
+static int cpp_word_forbidden(const char *w)
+{
+    static const char *exact[] = {
+        "-o", "-l", "-M", "-MM", "-MD", "-MMD", "-MF", "-Ma", NULL
+    };
+    int i;
+
+    if (w[0] == '-' && w[1] == 'M' && w[2] == 'F' && w[3] != '\0')
+        return 1;
+    for (i = 0; exact[i] != NULL; i++) {
+        if (strcmp(w, exact[i]) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+/* z80asm -o, -o=file and -ofile. -opt-speed is a different switch. */
+static int asm_word_is_output(const char *w)
+{
+    if (strcmp(w, "-opt-speed") == 0)
+        return 0;
+    return w[0] == '-' && w[1] == 'o';
+}
+
+void AddCppOpt(option *argument, char *arg)
+{
+    if (each_opt_word(arg, cpp_word_forbidden)) {
+        fprintf(stderr, "Option -Cp cannot pass -o/-l/-M/-MF to the preprocessor\n");
+        exit(1);
+    }
+    append_shell_words(argument->value, arg);
+}
+
+void AddAsmOpt(option *argument, char *arg)
+{
+    if (each_opt_word(arg, asm_word_is_output)) {
+        fprintf(stderr, "Option -Ca cannot pass -o to the assembler\n");
+        exit(1);
+    }
+    append_shell_words(argument->value, arg);
+}
+
+void AddLinkOpt(option *argument, char *arg)
+{
+    if (each_opt_word(arg, asm_word_is_output)) {
+        fprintf(stderr, "Option -Cl cannot pass -o to the linker\n");
+        exit(1);
+    }
+    append_shell_words(argument->value, arg);
+}
+
+void AddMfOpt(option *argument, char *arg)
+{
+    free(c_mf_output);
+    c_mf_output = muststrdup(arg != NULL ? arg : "");
+    AddToArgsVerbatim(argument, arg);
+}
+
+void AddToArgs(option *argument, char *arg)
+{
+    append_shell_words(argument->value, arg);
 }
 
 // Add both the argument and the value
@@ -2753,28 +3276,29 @@ void AddToArgsVerbatim(option *argument, char *arg)
 
     snprintf(buf,sizeof(buf),"-%s", argument->long_name);
     BuildOptions(argument->value, buf);
-    BuildOptions(argument->value, arg);
+    append_shell_arg(argument->value, arg);
 }
 
 
 void AddPreProcIncPath(option *argument, char *arg)
 {
-    /* user-supplied inc path takes precedence over system-supplied inc path */
+    /* user-supplied inc path takes precedence over system-supplied inc path.
+       The config value is already a shell fragment. */
     if (processing_user_command_line_arg)
-        BuildOptionsQuoted(&cpp_incpath_first, arg);
+        append_shell_arg(&cpp_incpath_first, arg);
     else
         BuildOptionsQuoted(&cpp_incpath_last, arg);
 }
 
 void AddPreProc(option *argument, char *arg)
 {
-    BuildOptions(&cpparg, arg);
+    append_shell_arg(&cpparg, arg);
 }
 
 void AddPreProcGen(option *argument, char *arg)
 {
     dependencyonly = 1;
-    BuildOptions(&cpparg, arg);
+    append_shell_arg(&cpparg, arg);
 }
 
 
@@ -2782,7 +3306,7 @@ void AddLinkLibrary(option *argument, char *arg)
 {
     /* user-supplied lib takes precedence over system-supplied lib */
     if (processing_user_command_line_arg)
-        BuildOptionsQuoted(&linker_linklib_first, arg);
+        append_shell_arg(&linker_linklib_first, arg);
     else
         BuildOptionsQuoted(&linker_linklib_last, arg);
 }
@@ -2791,7 +3315,7 @@ void AddLinkSearchPath(option *argument, char *arg)
 {
     /* user-supplied lib path takes precedence over system-supplied lib path */
     if (processing_user_command_line_arg)
-        BuildOptionsQuoted(&linker_libpath_first, arg);
+        append_shell_arg(&linker_libpath_first, arg);
     else
         BuildOptionsQuoted(&linker_libpath_last, arg);
 }
@@ -2959,6 +3483,38 @@ static struct tokens_list_s* gather_from_list_file(char *filename)
     return tokens;
 }
 
+#define MAX_LIST_NEST 100
+static char *list_stack[MAX_LIST_NEST];
+static int list_depth;
+
+static void list_enter(const char *path)
+{
+    int i;
+
+    if (path == NULL)
+        path = "";
+    for (i = 0; i < list_depth; i++) {
+        if (strcmp(list_stack[i], path) == 0) {
+            fprintf(stderr, "List file includes itself: %s\n", path);
+            exit(1);
+        }
+    }
+    if (list_depth >= MAX_LIST_NEST) {
+        fprintf(stderr, "List files are nested too deeply\n");
+        exit(1);
+    }
+    list_stack[list_depth++] = muststrdup(path);
+}
+
+static void list_leave(void)
+{
+    if (list_depth <= 0)
+        return;
+    list_depth--;
+    free(list_stack[list_depth]);
+    list_stack[list_depth] = NULL;
+}
+
 void add_file_to_process(char *filename, char process_extension)
 {
     FILE *fclaim;
@@ -2971,7 +3527,15 @@ void add_file_to_process(char *filename, char process_extension)
         p = strip_outer_quotes(filename);
 
         if (*p == '@') {
-            struct tokens_list_s* tokens = gather_from_list_file(p + 1);
+            struct tokens_list_s* tokens;
+            struct stat lst;
+
+            if (stat(p + 1, &lst) == 0 && !S_ISREG(lst.st_mode)) {
+                fprintf(stderr, "Not a regular file: %s\n", p + 1);
+                exit(1);
+            }
+            list_enter(p + 1);
+            tokens = gather_from_list_file(p + 1);
 
             char outname[FILENAME_MAX * 2 + 2];
 
@@ -3020,6 +3584,7 @@ void add_file_to_process(char *filename, char process_extension)
             }
 
             cmd_free_tokens(tokens);
+            list_leave();
         } else if ((*p != ';') && (*p != '#')) { /* ignore filename leading with semicolon or hash */
             /* Expand memory for filenames */
             if ((original_filenames = realloc(original_filenames, (nfiles + 1) * sizeof(char *))) == NULL) {
@@ -3065,6 +3630,10 @@ void add_file_to_process(char *filename, char process_extension)
 
             /* Working file is the original file */
             filelist[nfiles] = muststrdup(original_filenames[nfiles]);
+            if (stat(original_filenames[nfiles], &tmp) == 0 && !S_ISREG(tmp.st_mode)) {
+                fprintf(stderr, "Not a regular file: %s\n", original_filenames[nfiles]);
+                exit(1);
+            }
 
             /* Now work out temporary filename */
             tempname(tname);
@@ -3131,8 +3700,6 @@ void print_help_text(const char *program)
             fprintf(stderr,"-subtype=%-11s\n", buf);
         }
     }
-
-    exit(0);
 }
 
 
@@ -3266,16 +3833,34 @@ static void configure_misc_options(void)
     }
 }
 
+/* User -lm is one word: -lm , '-lm' , or "-lm" (Windows). */
+static const char *quoted_linklib(const char *libs, const char *name)
+{
+    static char form[3][64];
+    const char *fmt[] = { "-%s ", "'-%s' ", "\"-%s\" " };
+    int i;
+
+    if (libs == NULL || name == NULL)
+        return NULL;
+    for (i = 0; i < 3; i++) {
+        snprintf(form[i], sizeof(form[i]), fmt[i], name);
+        if (strstr(libs, form[i]) != NULL)
+            return form[i];
+    }
+    return NULL;
+}
+
 static void configure_maths_library(char **libstring)
 {
     char   buf[1024];
 
-    /* -lm is GENMATHLIB (math32 by default).  -lmz is Z88MATHLIB/ALTMATHLIB. */
+    /* -lm is math32 unless a cfg sets GENMATHLIB.  -lmz is Z88MATHLIB/ALTMATHLIB. */
 
     if (c_altmathlib) {
-        if (strstr(*libstring, "-lmz ") != NULL) {
+        const char *from = quoted_linklib(*libstring, "lmz");
+        if (from != NULL) {
             snprintf(buf, sizeof(buf), "-l\"%s\" ", c_altmathlib);
-            if ((*libstring = replace_str(*libstring, "-lmz ", buf)) == NULL) {
+            if ((*libstring = replace_str(*libstring, from, buf)) == NULL) {
                 fprintf(stderr, "Malloc failed\n");
                 exit(1);
             }
@@ -3284,9 +3869,10 @@ static void configure_maths_library(char **libstring)
     }
 
     if (c_genmathlib) {
-        if (strstr(*libstring, "-lm ") != NULL) {
+        const char *from = quoted_linklib(*libstring, "lm");
+        if (from != NULL) {
             snprintf(buf, sizeof(buf), "-l\"%s\" ", c_genmathlib);
-            if ((*libstring = replace_str(*libstring, "-lm ", buf)) == NULL) {
+            if ((*libstring = replace_str(*libstring, from, buf)) == NULL) {
                 fprintf(stderr, "Malloc failed\n");
                 exit(1);
             }
@@ -3464,6 +4050,7 @@ static int multi_run_variant(int filenumber, char *src_c, const char *vname, int
     snprintf(cppbuf, sizeof(cppbuf), "%s%s", cpparg ? cpparg : "", cpp_extra ? cpp_extra : "");
     if (process(".c", ".i2", c_cpp_exe, cppbuf, c_stylecpp, filenumber, YES, YES))
         return 1;
+    refuse_preprocessed_includes(filenumber);
     snprintf(zpragma_args, sizeof(zpragma_args), "-sccz80 -zcc-opt=\"%s\"", zpragma_opt);
     if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, filenumber, YES, NO))
         return 1;
@@ -3536,24 +4123,65 @@ static int compile_c_multi(int filenumber)
         char cpu_tok[32];
         const char *asm_flags;
         multi_cpu_from_map(cpu_tok, sizeof(cpu_tok), &asm_flags);
+        char *qflags = shell_quote(asm_flags);
+        char *qout = shell_quote(out_asm);
+        char *qsrc = shell_quote(original_filenames[filenumber]);
         off = 0;
-        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off,
-            "%s%s --cpu=%s --asm-flags=\"%s\" --metric=%s --data-variant=sccz80 --output=\"%s\" --source=\"%s\"%s",
-            c_binary_dir, c_zccmulti_exe, cpu_tok, asm_flags, c_compiler_metric, out_asm,
-            original_filenames[filenumber], verbose ? " --verbose" : "");
+        off = append_command(cmd, sizeof(cmd), off,
+            "%s%s --cpu=%s --asm-flags=%s --metric=%s --data-variant=sccz80 --output=%s --source=%s%s",
+            c_binary_dir, c_zccmulti_exe, cpu_tok, qflags, c_compiler_metric, qout,
+            qsrc, verbose ? " --verbose" : "");
+        free(qflags);
+        free(qout);
+        free(qsrc);
     }
-    if (c_compiler_multi_report)
-        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --report=\"%s\"", c_compiler_multi_report);
-    off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --z80asm=\"%s%s\"", c_binary_dir, c_z80asm_exe);
-    if (c_install_dir)
-        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --asm-include=\"%slib\"", c_install_dir);
-    off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --asm-include=\"%s\"", zcc_opt_dir);
-    off += (size_t)snprintf(cmd + off, sizeof(cmd) - off,
-        " --variant=sccz80:\"%s.sccz80.asm\" --variant=80cc-sp:\"%s.80cc-sp.asm\"",
-        temporary_filenames[filenumber], temporary_filenames[filenumber]);
-    if (want_fp)
-        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off,
-            " --variant=80cc-fp:\"%s.80cc-fp.asm\"", temporary_filenames[filenumber]);
+    if (c_compiler_multi_report) {
+        char *qr = shell_quote(c_compiler_multi_report);
+        off = append_command(cmd, sizeof(cmd), off, " --report=%s", qr);
+        free(qr);
+    }
+    {
+        char *joined, *q;
+        zcc_asprintf(&joined, "%s%s", c_binary_dir ? c_binary_dir : "", c_z80asm_exe);
+        q = shell_quote(joined);
+        off = append_command(cmd, sizeof(cmd), off, " --z80asm=%s", q);
+        free(joined);
+        free(q);
+    }
+    if (c_install_dir) {
+        char *joined, *q;
+        zcc_asprintf(&joined, "%slib", c_install_dir);
+        q = shell_quote(joined);
+        off = append_command(cmd, sizeof(cmd), off, " --asm-include=%s", q);
+        free(joined);
+        free(q);
+    }
+    {
+        char *q = shell_quote(zcc_opt_dir);
+        off = append_command(cmd, sizeof(cmd), off, " --asm-include=%s", q);
+        free(q);
+    }
+    {
+        char *a, *b, *qa, *qb;
+        zcc_asprintf(&a, "%s.sccz80.asm", temporary_filenames[filenumber]);
+        zcc_asprintf(&b, "%s.80cc-sp.asm", temporary_filenames[filenumber]);
+        qa = shell_quote(a);
+        qb = shell_quote(b);
+        off = append_command(cmd, sizeof(cmd), off,
+            " --variant=sccz80:%s --variant=80cc-sp:%s", qa, qb);
+        free(a);
+        free(b);
+        free(qa);
+        free(qb);
+    }
+    if (want_fp) {
+        char *a, *q;
+        zcc_asprintf(&a, "%s.80cc-fp.asm", temporary_filenames[filenumber]);
+        q = shell_quote(a);
+        off = append_command(cmd, sizeof(cmd), off, " --variant=80cc-fp:%s", q);
+        free(a);
+        free(q);
+    }
 
     if (verbose) {
         fprintf(stderr, "%s\n", cmd);
@@ -3990,7 +4618,11 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
                         strcpy(fname, name);
                         free(name);
                     } else {
-                        strcpy(fname, outputfile);                                  /* use supplied output filename */
+                        if (strlen(outputfile) >= sizeof(fname)) {
+                            fprintf(stderr, "Filename is too long \"%s\"\n", outputfile);
+                            exit(1);
+                        }
+                        memcpy(fname, outputfile, strlen(outputfile) + 1);
                     }
                 } else {
                     /* using original filename to create output filename */
@@ -4237,17 +4869,27 @@ void parse_option(char *option)
 
 void add_zccopt(char *fmt, ...)
 {
-    char   buf[4096];
-    size_t len = zccopt ? strlen(zccopt) : 0;
-    size_t extra;
     va_list ap;
+    int n;
+    size_t len = zccopt ? strlen(zccopt) : 0;
+    char *neu;
 
     va_start(ap, fmt);
-    extra = vsnprintf(buf, sizeof(buf), fmt, ap);
+    n = vsnprintf(NULL, 0, fmt, ap);
     va_end(ap);
-
-    zccopt = realloc(zccopt, len + extra + 1);
-    strcpy(zccopt + len, buf);
+    if (n < 0) {
+        fprintf(stderr, "Cannot format option\n");
+        exit(1);
+    }
+    neu = realloc(zccopt, len + (size_t)n + 1);
+    if (neu == NULL) {
+        fprintf(stderr, "Out of memory\n");
+        exit(1);
+    }
+    zccopt = neu;
+    va_start(ap, fmt);
+    vsnprintf(zccopt + len, (size_t)n + 1, fmt, ap);
+    va_end(ap);
 }
 
 /* From: http://creativeandcritical.net/str-replace-c/ */

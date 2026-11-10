@@ -7,6 +7,7 @@
 
 #include "ccdefs.h"
 
+#include <limits.h>
 #include <math.h>
 #include "utlist.h"
 
@@ -453,6 +454,8 @@ int hex(char c)
 }
 
 
+static void raw_string_eol(void);
+
 int pstr(LVALUE *lval)
 {
     int k;
@@ -465,8 +468,13 @@ int pstr(LVALUE *lval)
     }
     if (cmatch('\'')) {
         k = 0;
-        while (ch() && ch() != '\'')
+        while (ch() != '\'') {
+            if (ch() == 0) {
+                raw_string_eol();
+                break;
+            }
             k = (k & 255) * 256 + litchar();
+        }
         gch();
         lval->const_val = k;
         return (1);
@@ -478,6 +486,14 @@ int pstr(LVALUE *lval)
  * check to see if present elsewhere, if so do the merge as for doubles
  */
 
+static void raw_string_eol(void)
+{
+    if (c_c1mode && ch() == 0) {
+        fprintf(stderr, "Unterminated string\n");
+        ccabort();
+    }
+}
+
 int tstr(int32_t* val)
 {
     int k = 0;
@@ -486,8 +502,15 @@ int tstr(int32_t* val)
         return (0);
     do {
         while (ch() != '"') {
-            if (ch() == 0)
+            if (ch() == 0) {
+                raw_string_eol();
                 break;
+            }
+            /* Room for this byte and the terminating NUL. */
+            if (k >= LITABSZ - 1) {
+                fprintf(stderr, "Literal Queue Overflow\n");
+                ccabort();
+            }
             tempq[k] = litchar();
             k++; /* counter */
         }
@@ -528,7 +551,8 @@ int storeq(int length, unsigned char* queue, int32_t* val)
     for (j = 0; j < k; j++) {
         /* Have to dump it in our special queue here for function literals */
         if ((litptr + 1) >= FNMAX) {
-            errorfmt("Literal Queue Overflow", 1);
+            fprintf(stderr, "Literal Queue Overflow\n");
+            ccabort();
         }
         *(litq + litptr) = *(queue + j);
         litptr++;
@@ -546,14 +570,20 @@ int qstr(double *val)
     *val = gltptr;
     do {
         while (ch() != '"') {
-            if (ch() == 0)
+            if (ch() == 0) {
+                raw_string_eol();
                 break;
+            }
             cnt++;
             stowlit(litchar(), 1);
         }
         gch();
     } while (cmatch('"') || (cmatch('\\') && cmatch('"')));
 
+    if (gltptr >= LITABSZ) {
+        fprintf(stderr, "Literal Queue Overflow\n");
+        ccabort();
+    }
     glbq[gltptr++] = 0;
     return (cnt);
 }
@@ -562,7 +592,8 @@ int qstr(double *val)
 void stowlit(int value, int size)
 {
     if ((gltptr + size) >= LITMAX) {
-        errorfmt("Literal Queue Overflow", 1);
+        fprintf(stderr, "Literal Queue Overflow\n");
+        ccabort();
     }
     putint(value, glbq + gltptr, size);
     gltptr += size;
@@ -1229,7 +1260,23 @@ static void decompose_float(double raw, struct fp_decomposed *fs)
 
     norm = x / pow(2, exp);
 
-    fs->exponent = (int)exp + exp_bias;
+    /* A bias of INT_MAX must not overflow the signed add. AM9511 keeps a
+       negative exponent, so the result is only limited to the int range. */
+    {
+        long long sum = (long long)exp_bias;
+
+        if (exp > 1.0e6)
+            sum += 1000000LL;
+        else if (exp < -1.0e6)
+            sum -= 1000000LL;
+        else
+            sum += (long long)exp;
+        if (sum > INT_MAX)
+            sum = INT_MAX;
+        else if (sum < INT_MIN)
+            sum = INT_MIN;
+        fs->exponent = (int)sum;
+    }
     for (i = 0; i < (mant_bytes * 2) + 1; i++) {
         double mult = norm * 16.;
         double res = floor(mult);

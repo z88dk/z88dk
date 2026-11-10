@@ -180,8 +180,27 @@ void DoLibHeader(void)
      * over the quotes!
      */
 
-    strncpy(filen, Filename + 1, strlen(Filename) - 2);
-    filen[strlen(Filename) - 2] = '\0';
+    {
+        const char *src = Filename;
+        size_t n;
+
+        /* #line names are quoted. A short or unquoted name must not
+           walk off the front of the string. */
+        if (src[0] == '"') {
+            src++;
+            n = strlen(src);
+            if (n > 0 && src[n - 1] == '"')
+                n--;
+        } else {
+            n = strlen(src);
+        }
+        if (n >= sizeof(filen)) {
+            fprintf(stderr, "File name is too long\n");
+            exit(1);
+        }
+        memcpy(filen, src, n);
+        filen[n] = '\0';
+    }
     if (1) {
         char* ptr = filen;
         if (!isalpha(*ptr) && *ptr != '_') {

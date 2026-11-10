@@ -8,19 +8,107 @@
 
 #include "ccdefs.h"
 
-/* Generic change suffix routine */
-
-void changesuffix(char *name, char *suffix)
+/* Copy src into dst. Always terminates. 0 when src does not fit. */
+int copy_fit(char *dst, size_t cap, const char *src)
 {
+    size_t i;
+
+    if (cap == 0)
+        return 0;
+    if (src == NULL)
+        src = "";
+    for (i = 0; src[i] != '\0'; i++) {
+        if (i + 1 >= cap) {
+            dst[cap - 1] = '\0';
+            return 0;
+        }
+        dst[i] = src[i];
+    }
+    dst[i] = '\0';
+    return 1;
+}
+
+/* Generic change suffix routine. cap is the size of name. */
+
+void changesuffix(char *name, size_t cap, const char *suffix)
+{
+    size_t len;
     size_t j;
-    j = strlen(name) - 1;
+
+    len = strlen(name);
+    if (len >= cap) {
+        fprintf(stderr, "File name is too long\n");
+        exit(1);
+    }
+    j = len;
     while (j && name[j - 1] != '.')
         j--;
 
     if (j) {
         name[j - 1] = '\0';
+        len = j - 1;
     }
-    strcat(name, suffix);
+    if (suffix == NULL)
+        suffix = "";
+    if (len + strlen(suffix) >= cap) {
+        fprintf(stderr, "File name is too long\n");
+        exit(1);
+    }
+    memcpy(name + len, suffix, strlen(suffix) + 1);
+}
+
+/* errorfmt is dropped while an argument is being copied, so these
+   paths exit themselves. */
+static void nest_limit(int *depth, int limit, const char *message)
+{
+    if (++(*depth) > limit) {
+        fprintf(stderr, "%s\n", message);
+        ccabort();
+    }
+}
+
+void enter_paren_nest(void)
+{
+    nest_limit(&paren_nest, MAX_PAREN_LEVELS, "Expression is too deeply nested");
+}
+
+void leave_paren_nest(void)
+{
+    if (paren_nest > 0)
+        --paren_nest;
+}
+
+void enter_call_nest(void)
+{
+    nest_limit(&call_nest, MAX_CALL_LEVELS, "Calls are nested too deeply");
+}
+
+void leave_call_nest(void)
+{
+    if (call_nest > 0)
+        --call_nest;
+}
+
+void enter_stmt_nest(void)
+{
+    nest_limit(&stmt_nest, MAX_STMT_LEVELS, "Statements are nested too deeply");
+}
+
+void leave_stmt_nest(void)
+{
+    if (stmt_nest > 0)
+        --stmt_nest;
+}
+
+void enter_heira_nest(void)
+{
+    nest_limit(&unary_nest, MAX_UNARY_LEVELS, "Expression is too deeply nested");
+}
+
+void leave_heira_nest(void)
+{
+    if (unary_nest > 0)
+        --unary_nest;
 }
 
 /* These two used to keep track of what goes on stack, and what comes

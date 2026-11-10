@@ -51,9 +51,11 @@ int symname(char* sname)
         return (*sname = 0);
     k = 0;
     while (an(ch())) {
-        sname[k] = gch();
-        if (k < (NAMESIZE-1))
-            ++k;
+        if (k >= (NAMESIZE - 1)) {
+            fprintf(stderr, "Symbol name is too long\n");
+            ccabort();
+        }
+        sname[k++] = gch();
     }
     sname[k] = 0;
     return 1;

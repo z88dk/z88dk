@@ -10,17 +10,33 @@
 
 /* Generic change suffix routine */
 
-void changesuffix(char *name, char *suffix)
+void changesuffix(char *name, size_t cap, const char *suffix)
 {
+    size_t len;
     size_t j;
-    j = strlen(name) - 1;
+
+    if (cap == 0)
+        return;
+    len = strlen(name);
+    if (len >= cap) {
+        fprintf(stderr, "File name is too long\n");
+        exit(1);
+    }
+    j = len;
     while (j && name[j - 1] != '.')
         j--;
 
     if (j) {
         name[j - 1] = '\0';
+        len = j - 1;
     }
-    strcat(name, suffix);
+    if (suffix == NULL)
+        suffix = "";
+    if (len + strlen(suffix) >= cap) {
+        fprintf(stderr, "File name is too long\n");
+        exit(1);
+    }
+    memcpy(name + len, suffix, strlen(suffix) + 1);
 }
 
 /* These two used to keep track of what goes on stack, and what comes

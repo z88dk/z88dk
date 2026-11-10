@@ -24,6 +24,7 @@ int primary(LVALUE* lval)
         int   pure = 1;
         char *before, *start;
 
+        enter_paren_nest();
         /* A parenthesis hides the comma from the caller. The caller
            drops a constant result, and that drop took the earlier
            operand with it. (i++, 7) must increment. (1, 2) stays 2. */
@@ -43,6 +44,7 @@ int primary(LVALUE* lval)
             lval->is_const = 0;
             lval->int_const_valid = 0;
         }
+        leave_paren_nest();
         return k;
     }
 

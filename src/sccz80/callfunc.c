@@ -118,7 +118,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
     Type   *functype = ptr ? ptr->ctype: fnptr_type->ptr;
-    
+
+    enter_call_nest();
     if ( functype->kind != KIND_FUNC ) {
         warningfmt("incompatible-pointer-types","Calling via non-function pointer");
         functype = default_function_with_type("(funcpointer)", functype);
@@ -133,6 +134,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     if (ptr && (strcmp(ptr->name, "asm") == 0 || strcmp(ptr->name,"__asm__") == 0) ) {
         /* We're calling asm("code") */
         doasmfunc(NO);
+        leave_call_nest();
         return;
     }
 
@@ -148,10 +150,16 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             break;
         }
         if (argnumber == 98) {
-            errorfmt("Too many arguments in a call, the limit is 98", 1);
+            /* errorfmt is dropped while an outer argument is copied. */
+            fprintf(stderr, "Too many arguments in a call, the limit is 98\n");
+            ccabort();
         }
         argnumber++;
         tmpfiles[argnumber] = my_tmpfile();
+        if (tmpfiles[argnumber] == NULL) {
+            fprintf(stderr, "Cannot create temporary file\n");
+            ccabort();
+        }
         tmplinenos[argnumber] = lineno;
         push_buffer_fp(tmpfiles[argnumber]);
 
@@ -403,6 +411,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         }
         Zsp = gen_restore_frame_after_call(nargs,functype->return_type->kind, preserve, YES);  /* clean up arguments - we know what type is MOOK */
     }
+    leave_call_nest();
 }
 
 static int SetWatch(char* sym, int* type)

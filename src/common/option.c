@@ -5,6 +5,19 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <limits.h>
+
+static void require_number(option *arg)
+{
+    if (arg->long_name != NULL && arg->long_name[0] != '\0')
+        fprintf(stderr, "Option -%s requires a number\n", arg->long_name);
+    else if (arg->short_name)
+        fprintf(stderr, "Option -%c requires a number\n", arg->short_name);
+    else
+        fprintf(stderr, "Option requires a number\n");
+    exit(1);
+}
 
 static void set_option(option *arg, char *value)
 {
@@ -32,10 +45,14 @@ static void set_option(option *arg, char *value)
         char  *end;
         long val;
 
-        val = strtol(value,&end,0);
-        if ( end != value ) {
-            *(int *)arg->value = val;
-        }
+        if (value == NULL || *value == '\0')
+            require_number(arg);
+        errno = 0;
+        val = strtol(value, &end, 0);
+        if (end == value || *end != '\0' || errno == ERANGE ||
+            val < INT_MIN || val > INT_MAX)
+            require_number(arg);
+        *(int *)arg->value = (int)val;
     } else if ( arg->type & OPT_STRING ) {
         *(char **)arg->value = value;
     } 
@@ -75,7 +92,7 @@ int option_parse(option *args, int argc, char **argv)
                             val = argv[i];
                         } else {
                             fprintf(stderr, "Insufficient number of arguments supplied\n");
-                            break;
+                            exit(1);
                          }
                     }
                     set_option(myarg, val);
@@ -108,7 +125,7 @@ int option_parse(option *args, int argc, char **argv)
                             val = argv[i];
                         } else {
                             fprintf(stderr, "Insufficient number of arguments supplied\n");
-                            break;
+                            exit(1);
                         }
                     }
                     set_option(myarg, val);

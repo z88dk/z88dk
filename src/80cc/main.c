@@ -847,7 +847,7 @@ void openout(void)
         }
     } else {
         strcpy(Filenorig, filen2);
-        changesuffix(filen2, extension); /* Change appendix to .asm */
+        changesuffix(filen2, sizeof(filen2), extension); /* Change appendix to .asm */
         if ((output = fopen(filen2, "w")) == NULL && (!c_eof)) {
             fprintf(stderr, "Cannot open output file: %s\n", line);
             exit(1);
