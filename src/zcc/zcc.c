@@ -149,6 +149,8 @@ static void            AddPreProcIncPath(option *arg, char *);
 static void            AddToArgs(option *arg, char *);
 static void            AddToArgsQuoted(option *arg, char *);
 static void            AddToArgsVerbatim(option *argument, char *arg);
+static void            AddCppOpt(option *arg, char *);
+static void            AddMfOpt(option *arg, char *);
 static void            AddLinkLibrary(option *arg, char *);
 static void            AddLinkSearchPath(option *arg, char *);
 static void            usage(const char *program);
@@ -260,6 +262,7 @@ static int             mapon = 0;
 static int             globaldefon = 0;
 static char           *globaldefrefile = NULL;
 static int             dependencyonly = 0;
+static char           *c_mf_output = NULL;
 static int             preprocessonly = 0;
 static int             printmacros = 0;
 static int             relocate = 0;
@@ -562,11 +565,11 @@ static option options[] = {
 
     { 0, "M", OPT_FUNCTION|OPT_BOOL|OPT_INCLUDE_OPT, "Emit Makefile dependencies (implies no further processing)", NULL, AddPreProcGen, 0 },
     { 0, "MM", OPT_FUNCTION|OPT_BOOL|OPT_INCLUDE_OPT, "Emit Makefile dependencies, including system headers (implies no further processing)", NULL, AddPreProcGen, 0 },
-    { 0, "MF", OPT_FUNCTION, "Emit Makefile dependencies, including system headers (implies -E)", &cpparg, AddToArgsVerbatim },
+    { 0, "MF", OPT_FUNCTION, "Emit Makefile dependencies, including system headers (implies -E)", &cpparg, AddMfOpt },
     { 0, "MD", OPT_FUNCTION|OPT_INCLUDE_OPT|OPT_BOOL,  "Generate a .d file with dependencies, including system headers" , NULL, AddPreProc, 0},
     { 0, "MMD", OPT_FUNCTION|OPT_INCLUDE_OPT|OPT_BOOL,  "Generate a .d file with dependencies" , NULL, AddPreProc, 0},
     { 0, "MT", OPT_FUNCTION,  "Specify the dependency target" , &cpparg, AddToArgsVerbatim, 0},
-    { 0, "Cp", OPT_FUNCTION,  "Add an option to the preprocessor" , &cpparg, AddToArgs, 0},
+    { 0, "Cp", OPT_FUNCTION,  "Add an option to the preprocessor" , &cpparg, AddCppOpt, 0},
     { 0, "D", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Define a preprocessor option" , NULL, AddPreProc, 0},
     { 0, "U", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Undefine a preprocessor option" , NULL, AddPreProc, 0},
     { 0, "I", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add an include directory for the preprocessor" , NULL, AddPreProcIncPath, 0},
@@ -939,29 +942,36 @@ static int same_existing_file(const struct stat *a, const char *path)
     return a->st_dev == b.st_dev && a->st_ino == b.st_ino;
 }
 
-static void refuse_output_is_input(void)
+static void refuse_same_as_input(const char *name)
 {
     struct stat out;
     int have_out;
     int i;
 
-    /* -M/-MM print dependencies and do not write -o. -MD/-MMD do write. */
-    if (dependencyonly)
+    if (name == NULL || name[0] == '\0')
         return;
-    if (outputfile == NULL || outputfile[0] == '\0')
-        return;
-    have_out = stat(outputfile, &out) == 0;
+    have_out = stat(name, &out) == 0;
     for (i = 0; i < nfiles; i++) {
         const char *in = original_filenames[i];
 
         if (in == NULL)
             continue;
-        if (strcmp(outputfile, in) == 0 ||
+        if (strcmp(name, in) == 0 ||
             (have_out && same_existing_file(&out, in))) {
-            fprintf(stderr, "Output file is the same as the input file: %s\n", outputfile);
+            fprintf(stderr, "Output file is the same as the input file: %s\n", name);
             exit(1);
         }
     }
+}
+
+static void refuse_output_is_input(void)
+{
+    /* -M/-MM do not write -o. -MD/-MMD do. -MF names a file either way.
+       ucpp opens -MF before include names exist, so a header cannot
+       be refused here. */
+    if (!dependencyonly)
+        refuse_same_as_input(outputfile);
+    refuse_same_as_input(c_mf_output);
 }
 
 /* ucpp records every included name as # <num> "file" or #line <num> "file".
@@ -3137,6 +3147,66 @@ void conf_opt_code_speed(option *argument, char *arg)
     BuildOptions(&sdccarg, "--opt-code-speed");
 }
 
+
+/* First word of -Cp, quotes removed. Exactly -o or -l is refused.
+   -lg and -DX=1 are passed through. */
+static int cpp_forbids_token(const char *value)
+{
+    const char *p = value ? value : "";
+    const char *start;
+    const char *end;
+    char quote = 0;
+    char tok[2];
+    size_t n = 0;
+
+    while (*p == ' ' || *p == '\t')
+        p++;
+    if (*p == '\0')
+        return 0;
+    start = p;
+    while (*p) {
+        if (quote) {
+            if (*p == quote)
+                quote = 0;
+            p++;
+            continue;
+        }
+        if (*p == '"' || *p == '\'') {
+            quote = *p++;
+            continue;
+        }
+        if (*p == ' ' || *p == '\t')
+            break;
+        p++;
+    }
+    end = p;
+    for (p = start; p < end; p++) {
+        if (*p == '"' || *p == '\'')
+            continue;
+        if (n < 2)
+            tok[n] = *p;
+        n++;
+        if (n > 2)
+            return 0;
+    }
+    return n == 2 && tok[0] == '-' && (tok[1] == 'o' || tok[1] == 'l');
+}
+
+void AddCppOpt(option *argument, char *arg)
+{
+    if (cpp_forbids_token(arg)) {
+        fprintf(stderr, "Option -Cp cannot pass -o/-l to the preprocessor\n");
+        exit(1);
+    }
+    append_shell_words(argument->value, arg);
+}
+
+void AddMfOpt(option *argument, char *arg)
+{
+    free(c_mf_output);
+    c_mf_output = muststrdup(arg != NULL ? arg : "");
+    AddToArgsVerbatim(argument, arg);
+}
 
 void AddToArgs(option *argument, char *arg)
 {
