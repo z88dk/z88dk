@@ -7722,10 +7722,50 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
         }
         width = 2;
     }
+    /* A bitwise op on two promoted bytes is computed at byte width, but its
+       value is an int. Whatever widens it later reads the signedness off the
+       expression type (int, signed), which sign-extends a result that is not
+       negative: `(long)(a | b)` for unsigned bytes a=0xff, b=1 gave 0xffffffff.
+       Fix the extension here, where the operand signedness is known. */
+    int widen_bitop_zx = 0;
+    if (!is_cmp && (k == IR_AND || k == IR_OR || k == IR_XOR)
+        && width == 1 && dst_w == 1 && b->f->vregs[r].width == 1
+        && n->type && is_register_int_kind(n->type->kind)
+        && (int)type_width(n->type) >= 2 && lhs && rhs
+        && !opt_disabled("bitop-promote")) {
+        int nl = (lhs->ast_type == AST_LITERAL) ? (node_int_value(lhs) >= 0)
+               : (lhs->type && lhs->type->isunsigned);
+        int nr = (rhs->ast_type == AST_LITERAL) ? (node_int_value(rhs) >= 0)
+               : (rhs->type && rhs->type->isunsigned);
+        int result_nonneg = (k == IR_AND) ? (nl || nr) : (nl && nr);
+        if (result_nonneg) {
+            widen_bitop_zx = 1;           /* extend the byte result by zero */
+        } else if (nl || nr) {
+            /* Mixed signedness (OR/XOR): the sign of the int result comes from
+               the signed operand alone, so no single extension of a byte result
+               is right. Promote both operands, as ADD does. */
+            int *side[2] = { &l, &r };
+            const int nonneg[2] = { nl, nr };
+            for (int i = 0; i < 2; i++) {
+                int wtmp = new_temp_kind(b, KIND_INT);
+                Op *cv = ir_op_emit(cur_bb(b), nonneg[i] ? IR_CONV_ZX : IR_CONV_SX);
+                cv->dst = wtmp; cv->src[0] = *side[i];
+                *side[i] = wtmp;
+            }
+            width = 2;
+            dst_w = 2;
+        }
+    }
     int dst = get_dest_vreg(b, hint, dst_w);
     Op *bop = ir_emit_binop(cur_bb(b), k, dst, l, r);
     if (shr_arith_bit) bop->imm |= shr_arith_bit;   /* variable-count signed >> */
     b->f->vregs[dst].width = (int16_t)dst_w;
+    if (widen_bitop_zx) {
+        int wd = new_temp_kind(b, KIND_INT);
+        Op *cv = ir_op_emit(cur_bb(b), IR_CONV_ZX);
+        cv->dst = wd; cv->src[0] = dst;
+        return wd;
+    }
     /* Pointer DIFFERENCE: `p - q` yields the element COUNT, not the
        byte difference. The count is signed. `p - (p + 5)` for an
        int * is -5. A power-of-two element is an arithmetic shift.

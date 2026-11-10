@@ -5015,7 +5015,19 @@ int ir_opt_narrow_byte(Func *f)
             if (!hasdef[d] || bad[d]) continue;
             if (f->vregs[d].width != 2) continue;
             if (debug_named_local(f, d)) continue;   /* its record keeps the declared width */
-            if (demands_low_byte_only(f, d) || bitop_of_bytes(f, d)) {
+            int low_only = demands_low_byte_only(f, d);
+            int of_bytes = !low_only && bitop_of_bytes(f, d);
+            if (low_only || of_bytes) {
+                /* bitop_of_bytes proves the value is 0..255. A reader that
+                   widens it with CONV_SX would sign-extend the narrowed byte
+                   (`(long)(a | 0x80)` read 0xffffff81), so it zero-extends. */
+                if (of_bytes && !opt_disabled("bitop-promote"))
+                    for (int b2 = 0; b2 < f->n_bbs; b2++) {
+                        BB *bb2 = &f->bbs[b2];
+                        for (int j2 = 0; j2 < bb2->n_ops; j2++)
+                            if (bb2->ops[j2].kind == IR_CONV_SX && bb2->ops[j2].src[0] == d)
+                                bb2->ops[j2].kind = IR_CONV_ZX;
+                    }
                 f->vregs[d].width = 1;
                 f->vregs[d].kind  = KIND_CHAR;   /* keep kind/width consistent */
                 pass_changed++;
