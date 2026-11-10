@@ -863,6 +863,55 @@ static void append_shell_arg(char **dest, const char *value)
     free(q);
 }
 
+/* A -C* value is already a list of tool arguments (-Ca"-DPLUS3 -DSTRIPVECTOR",
+   -Cz"+zx --plus3"). Quote each word so the shell still splits them.
+   One -I, -L, -iquote or -isystem value stays one argument, including a
+   path that contains spaces. */
+static int leading_path_option(const char *s)
+{
+    if (strchr(s, '"') != NULL || strchr(s, '\'') != NULL)
+        return 0;
+    if (strncmp(s, "-iquote", 7) == 0 || strncmp(s, "-isystem", 8) == 0)
+        return 1;
+    if (strncmp(s, "-I", 2) == 0 || strncmp(s, "-L", 2) == 0)
+        return 1;
+    return 0;
+}
+
+static void append_shell_span(char **dest, const char *s, size_t n)
+{
+    char *word = mustmalloc(n + 1);
+
+    memcpy(word, s, n);
+    word[n] = '\0';
+    append_shell_arg(dest, word);
+    free(word);
+}
+
+static void append_shell_words(char **dest, const char *value)
+{
+    const char *p;
+
+    if (value == NULL)
+        value = "";
+    if (leading_path_option(value)) {
+        append_shell_arg(dest, value);
+        return;
+    }
+    for (p = value; *p; ) {
+        const char *start;
+
+        while (*p == ' ' || *p == '\t')
+            p++;
+        if (*p == '\0')
+            break;
+        start = p;
+        while (*p && *p != ' ' && *p != '\t')
+            p++;
+        append_shell_span(dest, start, (size_t)(p - start));
+    }
+}
+
 static int same_existing_file(const struct stat *a, const char *path)
 {
     struct stat b;
@@ -2995,12 +3044,12 @@ void conf_opt_code_speed(option *argument, char *arg)
 
 void AddToArgs(option *argument, char *arg)
 {
-    append_shell_arg(argument->value, arg);
+    append_shell_words(argument->value, arg);
 }
 
 void AddToArgsQuoted(option *argument, char *arg)
 {
-    append_shell_arg(argument->value, arg);
+    append_shell_words(argument->value, arg);
 }
 
 // Add both the argument and the value
