@@ -4077,6 +4077,12 @@ static int v_fits_byte_d(const Func *f, int v, int depth)
                a bool is nearly always consumed. */
             if (cmp_result_kind(op))
                 continue;
+            /* A logical right shift only shrinks its source, so it fits a
+               byte whenever the source does. */
+            if (op->kind == IR_SHR && !(op->imm & IR_SHR_ARITH) && depth < 4
+                && op->src[0] >= 0 && op->src[0] < f->n_vregs
+                && v_fits_byte_d(f, op->src[0], depth + 1))
+                continue;
             /* A copy of a value that fits a byte fits a byte too. CSE folds a
                duplicate CONV_ZX into a MOV from the first one, so without this
                the SECOND byte shift of the same value in a function is refused
@@ -4197,6 +4203,16 @@ static int demands_low_byte_only(const Func *f, int v)
                 && (v_fits_byte(f, u->src[0]) || shr_result_masked_below(f, u)))
                 continue;
             if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
+                continue;
+            /* The 16-bit integer helpers take their operands through
+               gen_hcall, which zero-extends a byte argument: exact for a
+               value that fits a byte. A constant stays wide: `ld hl,K` loads
+               it directly, and a byte def would clobber A for nothing. */
+            if (byte_val && u->kind == IR_HCALL && u->hcall && u->hcall->name
+                && !v_is_literal_imm(f, v)
+                && (!strcmp(u->hcall->name, "l_div")
+                    || !strcmp(u->hcall->name, "l_div_u")
+                    || !strcmp(u->hcall->name, "l_mult")))
                 continue;
             /* Switch index: the dispatch reads v then widens it to full width
                for the jump-table / case comparisons, so a byte-producing v is
@@ -4545,6 +4561,26 @@ static OpKind cs_unsigned_of(OpKind k)
      still holds the value at this use; its live range grows to cover it. */
 static int bc_single_def(const int *ndef, int v) { return v >= 0 && ndef[v] == 1; }
 
+/* The bits byte vreg v can have set: 0xff unless its one def limits them. An
+   immediate AND keeps its mask; a logical right shift of a byte keeps the low
+   (8-n) bits. */
+static int bc_byte_bits(const Func *f, const int *ndef, const Op *const *def, int v)
+{
+    if (!bc_single_def(ndef, v) || !def[v]) return 0xff;
+    const Op *d = def[v];
+    if (d->kind == IR_AND && d->src[1] == -1) return (int)(d->imm & 0xff);
+    /* A shift marked MASKED leaves the wrap-around bits for the reader's AND to
+       clear, so its result has no bound of its own. */
+    if (d->kind == IR_SHR && d->src[1] == -1 && !(d->imm & IR_SHR_ARITH)
+        && !(d->imm & (IR_SHR_MASKED | IR_SHR_TOPBYTE))
+        && d->src[0] >= 0 && d->src[0] < f->n_vregs
+        && (f->vregs[d->src[0]].width == 1 || v_fits_byte(f, d->src[0]))) {
+        int n = (int)(d->imm & 0xff);
+        return n >= 8 ? 0 : (0xff >> n);
+    }
+    return 0xff;
+}
+
 int ir_opt_byte_cleanup(Func *f)
 {
     if (opt_disabled("byte-clean")) return 0;
@@ -4565,7 +4601,8 @@ int ir_opt_byte_cleanup(Func *f)
             if (o->dst < 0 || o->dst >= nv || f->vregs[o->dst].width != 1) continue;
             if (f->vregs[o->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
             if (o->src[1] == -1 && o->src[0] >= 0
-                && ((o->kind == IR_AND && (o->imm & 0xff) == 0xff)
+                && ((o->kind == IR_AND
+                     && (bc_byte_bits(f, ndef, def, o->src[0]) & ~(int)o->imm & 0xff) == 0)
                     || ((o->kind == IR_OR || o->kind == IR_XOR) && (o->imm & 0xff) == 0))
                 && !opt_disabled("byte-mask-ident")) {
                 /* a copy, not a CONV_TRUNC: a truncation feeding a store is
@@ -4595,6 +4632,145 @@ int ir_opt_byte_cleanup(Func *f)
             }
         }
     free(ndef); free(def);
+    return changed;
+}
+
+/* ---- Constant diamond (ir_opt_const_diamond) ------------------------
+   `v = c ? K1 : K2` builds a diamond whose two arms each hold one constant load:
+
+       A:  ...  BR_ZERO c -> X ; BR Y
+       Y:  v = K1 ; BR J          X:  v = K2 ; BR J
+
+   (A constant here is an immediate, a string or a symbol address.) Load the
+   branched-to arm's constant in A, ahead of the test, and let the
+   branch skip straight to J; the other arm then overwrites it on the way:
+
+       A:  v = K2 ; ... BR_ZERO c -> J ; BR Y
+       Y:  v = K1 ; BR J
+
+   One arm and the jump over it are gone. The constant is loaded before the
+   test, which is only free when that load cannot disturb what the test reads,
+   so the condition must be a byte (a flag or a byte in A) and v a word. v must
+   be unused in A, and each arm have A as its only predecessor.
+   `--opt-disable=const-diamond` opts out. */
+static int cd_is_branch(const Op *o)
+{
+    return o->kind == IR_BR || o->kind == IR_BR_COND || o->kind == IR_BR_ZERO
+        || o->kind == IR_SWITCH;
+}
+
+static int cd_const_load(const Op *o)
+{
+    return o->kind == IR_LD_IMM || o->kind == IR_LD_STR || o->kind == IR_LD_SYM;
+}
+
+int ir_opt_const_diamond(Func *f)
+{
+    if (!f || f->n_bbs < 4 || opt_disabled("const-diamond")) return 0;
+    int n = f->n_bbs, changed = 0;
+    int *npred = calloc((size_t)n, sizeof *npred);
+    if (!npred) return 0;
+    for (int b = 0; b < n; b++) {
+        const BB *bb = &f->bbs[b];
+        int seen[64], ns = 0, overflow = 0;
+        #define CD_EDGE(t) do { int _t = (t); if (_t >= 0 && _t < n) {          \
+            int _d = 0; for (int _i = 0; _i < ns; _i++) if (seen[_i] == _t) _d = 1; \
+            if (!_d) { if (ns < 64) seen[ns++] = _t; else overflow = 1; } } } while (0)
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (o->kind == IR_BR || o->kind == IR_BR_COND || o->kind == IR_BR_ZERO)
+                CD_EDGE(o->label);
+            else if (o->kind == IR_SWITCH && o->sw) {
+                for (int c = 0; c < o->sw->n_cases; c++) CD_EDGE(o->sw->target_bb[c]);
+                CD_EDGE(o->sw->default_bb);
+            }
+        }
+        CD_EDGE(bb->succ[0]);
+        CD_EDGE(bb->succ[1]);
+        #undef CD_EDGE
+        for (int i = 0; i < ns; i++) npred[seen[i]] += overflow ? 2 : 1;
+    }
+    for (int a = 0; a < n; a++) {
+        BB *A = &f->bbs[a];
+        if (A->n_ops < 3) continue;
+        Op *br = &A->ops[A->n_ops - 1];
+        Op *cb = &A->ops[A->n_ops - 2];
+        if (br->kind != IR_BR) continue;
+        if (cb->kind != IR_BR_ZERO && cb->kind != IR_BR_COND) continue;
+        int bad = 0;
+        for (int j = 0; j < A->n_ops - 2; j++) if (cd_is_branch(&A->ops[j])) bad = 1;
+        if (bad) continue;
+        int X = cb->label, Y = br->label;
+        if (X < 0 || Y < 0 || X >= n || Y >= n || X == Y || X == a || Y == a) continue;
+        BB *BX = &f->bbs[X], *BY = &f->bbs[Y];
+        if (BX->n_ops != 2 || BY->n_ops != 2) continue;
+        if (npred[X] != 1 || npred[Y] != 1) continue;
+        const Op *lx = &BX->ops[0], *ly = &BY->ops[0];
+        if (!cd_const_load(lx) || !cd_const_load(ly)) continue;
+        if (BX->ops[1].kind != IR_BR || BY->ops[1].kind != IR_BR) continue;
+        int J = BX->ops[1].label;
+        if (J != BY->ops[1].label || J < 0 || J >= n || J == a || J == X || J == Y) continue;
+        int v = lx->dst, c = cb->src[0];
+        if (v < 0 || v != ly->dst || v >= f->n_vregs || c < 0 || c >= f->n_vregs) continue;
+        if (c == v || f->vregs[v].width != 2 || f->vregs[c].width != 1) continue;
+        if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+        if (lx->imm_sym || ly->imm_sym) continue;
+        /* v untouched anywhere in A */
+        int touched = 0;
+        for (int j = 0; j < A->n_ops && !touched; j++) {
+            int us[16], ds[8];
+            int nu = ir_op_uses(&A->ops[j], us, 16), nd = ir_op_defs(&A->ops[j], ds, 8);
+            for (int k = 0; k < nu; k++) if (us[k] == v) touched = 1;
+            for (int k = 0; k < nd; k++) if (ds[k] == v) touched = 1;
+        }
+        if (touched) continue;
+        /* Insert ahead of the op that computes the condition when it sits right
+           before the branch, so a compare still fuses with it. */
+        int at = A->n_ops - 2;
+        if (at >= 1 && A->ops[at - 1].dst == c) at--;
+        /* The early constant lives across everything from `at` to the branch,
+           so that stretch must be one plain condition computation: a call or
+           anything heavier would force the constant into a slot and cost more
+           than the jump saved. */
+        {
+            int ok = (A->n_ops - 2 - at) <= 1;
+            for (int j = at; j < A->n_ops - 2 && ok; j++) {
+                OpKind k = A->ops[j].kind;
+                if (k != IR_LD_MEM && k != IR_MOV && k != IR_CONV_ZX
+                    && k != IR_CONV_TRUNC && k != IR_AND && k != IR_OR
+                    && k != IR_XOR && !(k >= IR_CMP_EQ && k <= IR_CMP_UGE))
+                    ok = 0;
+            }
+            /* ...and a byte computation throughout: a word operand would want
+               the register the early constant is sitting in. */
+            for (int j = at; j < A->n_ops - 2 && ok; j++) {
+                int us[16];
+                int nu = ir_op_uses(&A->ops[j], us, 16);
+                for (int k = 0; k < nu; k++)
+                    if (us[k] >= 0 && us[k] < f->n_vregs
+                        && f->vregs[us[k]].width != 1) ok = 0;
+                if (A->ops[j].dst >= 0 && A->ops[j].dst < f->n_vregs
+                    && f->vregs[A->ops[j].dst].width != 1) ok = 0;
+            }
+            if (!ok) continue;
+        }
+        if (A->n_ops + 1 > A->cap_ops) {
+            int nc = A->cap_ops ? A->cap_ops * 2 : 8;
+            Op *nops = realloc(A->ops, (size_t)nc * sizeof(Op));
+            if (!nops) continue;
+            A->ops = nops; A->cap_ops = nc;
+            br = &A->ops[A->n_ops - 1]; cb = &A->ops[A->n_ops - 2];
+        }
+        memmove(&A->ops[at + 1], &A->ops[at], (size_t)(A->n_ops - at) * sizeof(Op));
+        A->n_ops++;
+        A->ops[at] = BX->ops[0];
+        cb = &A->ops[A->n_ops - 2];
+        cb->label = J;
+        for (int s = 0; s < 2; s++) if (A->succ[s] == X) A->succ[s] = J;
+        npred[X] = 0;
+        changed++;
+    }
+    free(npred);
     return changed;
 }
 
@@ -4737,8 +4913,9 @@ int ir_opt_narrow_byte(Func *f)
                 if (f->vregs[op->dst].width != 1) continue;
                 if (shr_result_masked_below(f, op))
                     op->imm |= IR_SHR_MASKED;
-                else if (shr_result_byte_wide(f, op))
-                    op->imm |= IR_SHR_TOPBYTE;
+                else if (shr_result_byte_wide(f, op)
+                         && (IS_808x() || !v_fits_byte(f, op->src[0])))
+                    op->imm |= IR_SHR_TOPBYTE;   /* a byte source rotates instead */
             }
         }
     }

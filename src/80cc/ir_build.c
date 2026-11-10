@@ -1504,6 +1504,7 @@ static int sr_shift_left(Builder *b, int v, int sh, int w)
     return t;
 }
 
+static int expr_nonneg_max(Node *e);
 /* Constant-multiply strength reduction: rewrite x*C into shifts + one
    add/sub when C decomposes into <=2 power-of-two terms — cheaper than the
    l_mult / l_long_mult helper on targets without a hardware multiply. v is
@@ -7169,6 +7170,23 @@ static int build_muldiv_integer(Builder *b, Node *n)
     int unsigned_op = (n->type && n->type->isunsigned)
         || (n->left  && n->left->type  && n->left->type->isunsigned)
         || (n->right && n->right->type && n->right->type->isunsigned);
+    /* Two provably non-negative operands divide the same signed or unsigned,
+       and the unsigned form is the cheaper one. */
+    if (!unsigned_op && (n->ast_type == OP_DIV || n->ast_type == OP_MOD)
+        && !is_flt && !is_fix16 && !is_fix32
+        && expr_nonneg_max(n->left) >= 0 && expr_nonneg_max(n->right) >= 0) {
+        unsigned_op = 1;
+        int shift;
+        if ((width == 2 || width == 4) && n->right
+            && n->right->ast_type == AST_LITERAL
+            && extract_pow2(node_int_value(n->right), &shift) && shift > 0) {
+            int d = new_temp_kind(b, width == 4 ? KIND_LONG : KIND_INT);
+            Op *o = ir_op_emit(cur_bb(b), n->ast_type == OP_MOD ? IR_AND : IR_SHR);
+            o->dst = d; o->src[0] = l; o->src[1] = -1;
+            o->imm = n->ast_type == OP_MOD ? ((((int64_t)1) << shift) - 1) : shift;
+            return d;
+        }
+    }
     /* Signed division / remainder by a power of two: bias-and-shift instead of
        the bit-serial helper. The unsigned forms never reach here — ast_opt
        rewrites them to a shift and a mask — so this covers the signed half the
@@ -7293,6 +7311,16 @@ static int expr_nonneg_max(Node *e)
         if (e->type && e->type->isunsigned && type_width(e->type) == 1)
             return 255;
         return -1;
+    case OP_USHR: case OP_SSHR: {
+        /* A right shift of a non-negative value only shrinks it. */
+        int a = expr_nonneg_max(e->left);
+        if (a < 0) return -1;
+        if (e->right && e->right->ast_type == AST_LITERAL) {
+            int64_t k = node_int_value(e->right);
+            return (k >= 0 && k < 16) ? (a >> k) : 0;
+        }
+        return a;
+    }
     default:
         break;
     }

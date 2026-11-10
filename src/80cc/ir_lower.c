@@ -9685,6 +9685,9 @@ static int ir_lower_func_body(FILE *out, Func *f)
         /* A truncation of a constant that narrowing created is itself a
            constant; fold it so every store of it is an immediate. */
         if (!opt_disabled("cf-late") && ir_opt_const_fold(f)) dce += ir_opt_dce(f);
+        /* A constant diamond becomes a default load plus an overwrite; the arm it
+           empties is pruned at once so the CFG stays clean for liveness. */
+        if (ir_opt_const_diamond(f)) { (void)ir_opt_prune_unreachable(f); dce++; }
         /* Mark consecutive fixed-offset aggregate stores so the lowerer can
            walk one destination pointer across the chain. Run after DCE and
            copy propagation, when the final base/offset form is visible. */
@@ -9824,6 +9827,13 @@ static int ir_lower_func_body(FILE *out, Func *f)
                     && uop->dst >= 0 && uop->dst < f->n_vregs
                     && f->vregs[uop->dst].width == 1
                     && !opt_disabled("byte-remat-arith"))
+                    use_ok = 1;
+                /* A byte zero- or sign-extend reads its byte source through
+                   load_byte_to_a, which rematerialises, so the global is read at
+                   the extend and never takes a slot. byte-remat-conv opts out. */
+                if (!use_ok && (uop->kind == IR_CONV_ZX || uop->kind == IR_CONV_SX)
+                    && uop->src[0] == d && uop->dst >= 0 && uop->dst < f->n_vregs
+                    && !opt_disabled("byte-remat-conv"))
                     use_ok = 1;
                 /* [IR_CALL_BREMAT] A call ARGUMENT is a terminal consumer too:
                    the marshaller reads the byte once and pushes it, through

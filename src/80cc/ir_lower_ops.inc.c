@@ -154,8 +154,17 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
        so it addressed sp-1 and read below the stack (`ld hl,-1; add hl,sp`).
        Only visible where no index register was free to take the value instead,
        i.e. the non-z80 targets. */
+    /* A slot store that pass 2 proved dead leaves the DE route as the same bare
+       `ex de,hl`, so the HL load serves (spill_de_unless_dead asks the same). */
+    int dead_store = 0;
+    if (hl_free && !hl_dst && !vreg_is_pr_stack(f, op->dst)
+        && !L.la.cur_dst_dead && !vreg_in_register_pool(f, op->dst)
+        && !opt_disabled("ldimm-dead-store")) {
+        ss_note_store(f, op->dst);
+        dead_store = ss_store_dead_here();
+    }
     if (!vreg_is_pr_stack(f, op->dst)
-        && (L.la.cur_dst_dead || (hl_free && hl_dst))) {
+        && (L.la.cur_dst_dead || (hl_free && hl_dst) || dead_store)) {
         emit(out, "ld\thl,%lld", (long long)op->imm);
     } else {
         emit(out, "ld\tde,%lld", (long long)op->imm);
@@ -2338,6 +2347,30 @@ static int trunc_fuses_to_store(const Func *f, const Op *tr, const Op *st)
     return bc_has(tr->src[0]) && st->mem.base != tr->src[0];
 }
 
+/* Is the value just truncated into byte vreg v returned straight away? The ops
+   after the current one must be nothing but byte-wide copies or extends of it,
+   each its only reader, ending in the RET of a byte-returning function. The
+   char-return ABI hands the byte back in L and A is dead at the return, so a
+   byte written to A for such a value is never read; nothing between can clobber
+   HL either, as there is nothing between. */
+static int byte_feeds_only_ret(const Func *f, int v)
+{
+    if (f->ret_width != 1 || !cur_bb || opt_disabled("ret-byte-l")) return 0;
+    for (int j = cur_op_idx + 1; j < cur_bb->n_ops; j++) {
+        const Op *u = &cur_bb->ops[j];
+        if (f->vregs[v].width != 1 || vreg_use_count_fn(f, v) != 1) return 0;
+        int us[16];
+        int nu = ir_op_uses(u, us, 16);
+        if (nu != 1 || us[0] != v) return 0;
+        if (u->kind == IR_RET) return 1;
+        if ((u->kind != IR_CONV_ZX && u->kind != IR_CONV_SX && u->kind != IR_MOV)
+            || u->dst < 0)
+            return 0;
+        v = u->dst;
+    }
+    return 0;
+}
+
 static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
 {
     int src_w = f->vregs[op->src[0]].width;
@@ -2358,6 +2391,11 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
            and the result is its HIGH byte, not its low one. */
         if (src_w == 1) {
             load_byte_to_a(out, f, op->src[0]);
+        } else if (op->kind != IR_CONV_TRUNC_HI && hl_has(op->src[0])
+                   && byte_feeds_only_ret(f, op->dst)) {
+            /* the byte is returned straight from L: no copy through A */
+            cache_hl(op->dst);
+            return 0;
         } else if (op->kind != IR_CONV_TRUNC_HI && hl_has(op->src[0])) {
             /* the word is in HL: its low byte goes to the slot straight from L */
             ss_note_cache_read(f, op->src[0]);

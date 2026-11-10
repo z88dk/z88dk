@@ -1587,6 +1587,12 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             if (arith) emit(out, "sub\t%d", 0x80 >> count);
             return finalize_byte_result(out, f, op, count == 0);
         }
+        /* Logical, three or more bits: min(r,8-r) 1-byte rotates and a mask
+           beat r 2-byte `srl a`, in bytes and in ticks. */
+        if (!arith && count >= 3 && count <= 7 && !opt_disabled("byte-lsr-rot")) {
+            emit_byte_lsr_a(out, count, 0);
+            return finalize_byte_result(out, f, op, 0);
+        }
         for (int k = 0; k < count; k++)
             emit(out, arith ? "sra\ta" : "srl\ta");
         return finalize_byte_result(out, f, op, count == 0);
