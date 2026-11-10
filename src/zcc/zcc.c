@@ -200,6 +200,7 @@ static void            configure_compiler(void);
 static int             compile_c_multi(int filenumber);
 static void            configure_misc_options(void);
 static void            configure_maths_library(char **libstring);
+static const char     *quoted_linklib(const char *libs, const char *name);
 
 static void            apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext);
 static int             fill_sccz80_copt_rules(char **rules);
@@ -1388,8 +1389,7 @@ int main(int argc, char **argv)
      * edits its argument, so the flags are a writable copy.
      * ROM maths stays on -lmz (Z88MATHLIB / ALTMATHLIB), not on -lm. */
     if (linker_linklib_first != NULL
-        && (strstr(linker_linklib_first, "-lm ") != NULL ||
-            strstr(linker_linklib_first, "'-lm' ") != NULL)
+        && quoted_linklib(linker_linklib_first, "lm") != NULL
         && c_genmathlib != NULL
         && strcmp(c_genmathlib, "math32@{ZCC_LIBCPU}") == 0
         && !c_user_fp_mode_explicit
@@ -3616,6 +3616,23 @@ static void configure_misc_options(void)
     }
 }
 
+/* User -lm is one word: -lm , '-lm' , or "-lm" (Windows). */
+static const char *quoted_linklib(const char *libs, const char *name)
+{
+    static char form[3][64];
+    const char *fmt[] = { "-%s ", "'-%s' ", "\"-%s\" " };
+    int i;
+
+    if (libs == NULL || name == NULL)
+        return NULL;
+    for (i = 0; i < 3; i++) {
+        snprintf(form[i], sizeof(form[i]), fmt[i], name);
+        if (strstr(libs, form[i]) != NULL)
+            return form[i];
+    }
+    return NULL;
+}
+
 static void configure_maths_library(char **libstring)
 {
     char   buf[1024];
@@ -3623,11 +3640,7 @@ static void configure_maths_library(char **libstring)
     /* -lm is GENMATHLIB (math32 by default).  -lmz is Z88MATHLIB/ALTMATHLIB. */
 
     if (c_altmathlib) {
-        const char *from = NULL;
-        if (strstr(*libstring, "-lmz ") != NULL)
-            from = "-lmz ";
-        else if (strstr(*libstring, "'-lmz' ") != NULL)
-            from = "'-lmz' ";
+        const char *from = quoted_linklib(*libstring, "lmz");
         if (from != NULL) {
             snprintf(buf, sizeof(buf), "-l\"%s\" ", c_altmathlib);
             if ((*libstring = replace_str(*libstring, from, buf)) == NULL) {
@@ -3639,11 +3652,7 @@ static void configure_maths_library(char **libstring)
     }
 
     if (c_genmathlib) {
-        const char *from = NULL;
-        if (strstr(*libstring, "-lm ") != NULL)
-            from = "-lm ";
-        else if (strstr(*libstring, "'-lm' ") != NULL)
-            from = "'-lm' ";
+        const char *from = quoted_linklib(*libstring, "lm");
         if (from != NULL) {
             snprintf(buf, sizeof(buf), "-l\"%s\" ", c_genmathlib);
             if ((*libstring = replace_str(*libstring, from, buf)) == NULL) {
