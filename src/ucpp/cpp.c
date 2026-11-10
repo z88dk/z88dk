@@ -2730,6 +2730,11 @@ int main(int argc, char *argv[])
         else basename = fn;
 
         if ( dependency_file ) {
+            if (same_path(dependency_file, fn)) {
+                fprintf(stderr, "dependency file '%s' is the input file\n",
+                    dependency_file);
+                return EXIT_FAILURE;
+            }
             emit_output = fopen(dependency_file, "w");
             if ( emit_output == NULL ) {
                 fprintf(stderr, "Cannot open dependency file %s for writing\n", dependency_file);
@@ -2742,6 +2747,10 @@ int main(int argc, char *argv[])
                 file = changesuffix(output_file, ".d");
             } else {
                 file = changesuffix(basename, ".d");
+            }
+            if (same_path(file, fn)) {
+                fprintf(stderr, "dependency file '%s' is the input file\n", file);
+                return EXIT_FAILURE;
             }
             if ( ( emit_output = fopen(file, "w")) == NULL ) {
                 fprintf(stderr, "Cannot open dependency file %s for writing\n", file);
