@@ -132,7 +132,10 @@ static void initialise_sym(
     Kind kind,
     enum storage_type storage)
 {
-    strcpy(ptr->name, sname);
+    if (!copy_fit(ptr->name, sizeof(ptr->name), sname)) {
+        fprintf(stderr, "Symbol name is too long\n");
+        ccabort();
+    }
     ptr->ident = id;
     ptr->type = kind;
     ptr->storage = storage;

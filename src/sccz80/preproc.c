@@ -84,9 +84,14 @@ void vinline(void)
         if ((unit = inpt2) == NULL)
             unit = input;
         clear();
-        while ((k = getc(unit)) > 0) {
+        while ((k = getc(unit)) != EOF && k != '\n') {
             if (k == '\r') continue;
-            if (k == '\n' ||lptr >= LINEMAX)
+            if (k == '\0') {
+                fprintf(stderr, "NUL in source file: %s\n",
+                    (inpt2 != NULL && include_name[0]) ? include_name : Filename);
+                exit(1);
+            }
+            if (lptr >= LINEMAX)
                 break;
             line[lptr++] = k;
         }
@@ -95,7 +100,8 @@ void vinline(void)
 
         if (k <= 0) {
             if (ferror(unit)) {
-                fprintf(stderr, "Cannot read source file: %s\n", Filename);
+                fprintf(stderr, "Cannot read source file: %s\n",
+                    (inpt2 != NULL && include_name[0]) ? include_name : Filename);
                 if (inpt2 != NULL)
                     fclose(unit);
                 else if (input_is_pipe)
@@ -222,8 +228,20 @@ void ifline(void)
                 while (*p == ' ' || *p == '\t')
                     p++;
                 start = p;
-                while (*p && *p != ' ' && *p != '\t')
+                if (*p == '"') {
                     p++;
+                    while (*p && *p != '"') {
+                        if (*p == '\\' && p[1] != '\0')
+                            p += 2;
+                        else
+                            p++;
+                    }
+                    if (*p == '"')
+                        p++;
+                } else {
+                    while (*p && *p != ' ' && *p != '\t')
+                        p++;
+                }
                 nlen = (size_t)(p - start);
                 if (nlen >= sizeof(string)) {
                     fprintf(stderr, "File name is too long\n");
@@ -318,9 +336,9 @@ void delmac(void)
 
 char putmac(char c)
 {
-    macq[macptr] = c;
-    if (macptr < MACMAX)
-        ++macptr;
+    if (macptr >= MACMAX)
+        return 0;
+    macq[macptr++] = c;
     return (c);
 }
 
@@ -400,6 +418,10 @@ void restore_input(void)
 
 void push_buffer_fp(FILE *fp)
 {
+    if (buffer_fps_num >= BUFFER_FPS_MAX) {
+        fprintf(stderr, "Expression is too deeply nested\n");
+        ccabort();
+    }
     buffer_fps[buffer_fps_num++] = fp;
 }
 

@@ -341,8 +341,13 @@ struct gototab_s {
 /* Maximum number of (non fatal) errors before we quit */
 #define MAXERRORS 10
 
-/* Maximum number of nested levels */
+/* Maximum number of nested compound statements */
 #define MAX_LEVELS 100
+
+/* Parentheses and calls are separate. A shared ceiling of 100 rejected
+   valid parenthesis nests and never fired on the call nest that hangs. */
+#define MAX_PAREN_LEVELS 1000
+#define MAX_CALL_LEVELS  16
 
 
 

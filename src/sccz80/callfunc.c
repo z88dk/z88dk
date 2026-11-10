@@ -119,7 +119,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     char   *funcname = "(unknown)";
     Type   *functype = ptr ? ptr->ctype: fnptr_type->ptr;
 
-    enter_expr_nest();
+    enter_call_nest();
     if ( functype->kind != KIND_FUNC ) {
         warningfmt("incompatible-pointer-types","Calling via non-function pointer");
         functype = default_function_with_type("(funcpointer)", functype);
@@ -134,7 +134,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     if (ptr && (strcmp(ptr->name, "asm") == 0 || strcmp(ptr->name,"__asm__") == 0) ) {
         /* We're calling asm("code") */
         doasmfunc(NO);
-        leave_expr_nest();
+        leave_call_nest();
         return;
     }
 
@@ -150,7 +150,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             break;
         }
         if (argnumber == 98) {
-            errorfmt("Too many arguments in a call, the limit is 98", 1);
+            /* errorfmt is dropped while an outer argument is copied. */
+            fprintf(stderr, "Too many arguments in a call, the limit is 98\n");
+            ccabort();
         }
         argnumber++;
         tmpfiles[argnumber] = my_tmpfile();
@@ -405,7 +407,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         }
         Zsp = gen_restore_frame_after_call(nargs,functype->return_type->kind, preserve, YES);  /* clean up arguments - we know what type is MOOK */
     }
-    leave_expr_nest();
+    leave_call_nest();
 }
 
 static int SetWatch(char* sym, int* type)

@@ -57,20 +57,36 @@ void changesuffix(char *name, size_t cap, const char *suffix)
     memcpy(name + len, suffix, strlen(suffix) + 1);
 }
 
-/* Parentheses and calls share one ceiling. errorfmt is dropped while
-   an argument is being copied, so this path exits itself. */
-void enter_expr_nest(void)
+/* errorfmt is dropped while an argument is being copied, so these
+   paths exit themselves. */
+static void nest_limit(int *depth, int limit, const char *message)
 {
-    if (++expr_nest > MAX_LEVELS) {
-        fprintf(stderr, "Expression is too deeply nested\n");
+    if (++(*depth) > limit) {
+        fprintf(stderr, "%s\n", message);
         ccabort();
     }
 }
 
-void leave_expr_nest(void)
+void enter_paren_nest(void)
 {
-    if (expr_nest > 0)
-        --expr_nest;
+    nest_limit(&paren_nest, MAX_PAREN_LEVELS, "Expression is too deeply nested");
+}
+
+void leave_paren_nest(void)
+{
+    if (paren_nest > 0)
+        --paren_nest;
+}
+
+void enter_call_nest(void)
+{
+    nest_limit(&call_nest, MAX_CALL_LEVELS, "Calls are nested too deeply");
+}
+
+void leave_call_nest(void)
+{
+    if (call_nest > 0)
+        --call_nest;
 }
 
 /* These two used to keep track of what goes on stack, and what comes

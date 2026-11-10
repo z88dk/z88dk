@@ -26,6 +26,7 @@ extern char mline[];
 extern int lptr;
 extern int mptr;
 extern char Filename[];
+extern char include_name[];
 extern int need_floatpack;
 extern int ncomp;
 extern int stackargs;
@@ -35,7 +36,8 @@ extern int glblab;
 extern int litlab;
 extern int Zsp;
 extern int ncmp;
-extern int expr_nest;     /* parentheses and calls currently open */
+extern int paren_nest;    /* parentheses currently open */
+extern int call_nest;     /* calls currently open */
 extern int errcnt;
 extern int c_errstop;
 extern int eof;
@@ -62,6 +64,7 @@ extern int c_double_strings;
 extern int c_standard_escapecodes;
 extern uint32_t scanf_format_option;
 extern uint32_t printf_format_option;
+#define BUFFER_FPS_MAX 200
 extern FILE * buffer_fps[];
 extern int buffer_fps_num;
 extern struct parser_stack *pstack;

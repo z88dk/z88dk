@@ -46,6 +46,7 @@ char line[LINESIZE]; /* parsing buffer */
 char mline[LINESIZE]; /* temp macro buffer */
 int lptr, mptr; /* indexes into buffers */
 char Filename[FILENAME_LEN + 1]; /* original file name */
+char include_name[FILENAME_LEN + 1]; /* file opened by #include */
 
 /*      Misc storage    */
 
@@ -64,7 +65,8 @@ int nxtlab, /* next avail label # */
     litlab, /* label # assigned to literal pool */
     Zsp, /* compiler relative stk ptr */
     ncmp, /* # open compound statements */
-    expr_nest, /* parentheses and calls currently open */
+    paren_nest, /* parentheses currently open */
+    call_nest, /* calls currently open */
     errcnt, /* # errors in compilation */
     c_errstop, /* stop on error */
     eof, /* set non-zero on final input eof */
@@ -120,7 +122,7 @@ int c_use_r2l_calling_convention;
 uint32_t scanf_format_option;
 uint32_t printf_format_option;
 
-FILE *buffer_fps[200];
+FILE *buffer_fps[BUFFER_FPS_MAX];
 int   buffer_fps_num = 0 ;
 
 struct parser_stack *pstack; /**< Stack of previous saved parsers */

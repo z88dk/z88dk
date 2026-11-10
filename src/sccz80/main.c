@@ -43,6 +43,7 @@ static Type *type_double4 = &(Type){ KIND_DOUBLE, 4, 0, .len=1 };
 static Type *type_double8 = &(Type){ KIND_DOUBLE, 8, 0, .len=1 }; 
 
 char Filenorig[FILENAME_LEN + 1];
+static char output_name[FILENAME_LEN + 1];
 
 
 int c_notaltreg; /* No alternate registers */
@@ -259,6 +260,19 @@ int main(int argc, char** argv)
         info();
         exit(1);
     }
+    if (gargc != 1) {
+        int i;
+        for (i = 0; i < gargc; i++) {
+            if (gargv[i][0] == '-') {
+                fprintf(stderr, "Unknown option %s\n", gargv[i]);
+                exit(1);
+            }
+        }
+        fprintf(stderr, "Expected one source file\n");
+        exit(1);
+    }
+    if (gargv[0][0] == '-')
+        exit(1);
 
     if ( c_maths_mode == MATHS_IEEE ) {
         c_fp_size = 4;
@@ -290,6 +304,12 @@ int main(int argc, char** argv)
         c_fp_exponent_bias = 0;
         c_fp_mantissa_bytes = 3;
         c_fp_size = 4;
+    }
+
+    if (c_fp_mantissa_bytes < 1 ||
+        c_fp_mantissa_bytes > MAX_MANTISSA_SIZE - c_fp_fudge_offset) {
+        fprintf(stderr, "Option -fp-mantissa-size is out of range\n");
+        exit(1);
     }
 
     if ( c_debug_adb_file || c_debug_adb_defc ) {
@@ -802,46 +822,67 @@ int dumpzero(int size, int count)
 /*
  *      Get output filename
  */
+static int same_existing_file(const struct stat *a, const char *path)
+{
+    struct stat b;
+
+    if (stat(path, &b) != 0)
+        return 0;
+    if (a->st_ino == 0 || b.st_ino == 0)
+        return 0;
+    return a->st_dev == b.st_dev && a->st_ino == b.st_ino;
+}
+
 void openout(void)
 {
     char filen2[FILENAME_LEN + 1];
+    char outpath[FILENAME_LEN + 1];
     char extension[FILENAME_LEN+1];
+    struct stat src_st;
 
     snprintf(extension,sizeof(extension),".%s",c_output_extension);
-    FILE* fp;
     clear(); /* erase line */
     output = 0; /* start with none */
+    output_name[0] = '\0';
     if (nextarg(filenum, filen2, sizeof(filen2)) == NULL)
         return;
-    if ((fp = fopen(filen2, "r")) == NULL) {
+    /* stat before open: a fifo would block inside fopen. */
+    if (stat(filen2, &src_st) != 0) {
         fprintf(stderr, "Cannot open source file: %s\n", filen2);
         exit(1);
     }
-    {
-        struct stat st;
-        if (fstat(fileno(fp), &st) != 0 || !S_ISREG(st.st_mode)) {
-            fprintf(stderr, "Not a regular file: %s\n", filen2);
-            fclose(fp);
-            exit(1);
-        }
+    if (!S_ISREG(src_st.st_mode)) {
+        fprintf(stderr, "Not a regular file: %s\n", filen2);
+        exit(1);
     }
-    fclose(fp); /* Close it again... */
 
     /* copy file name to string */
     strcpy(Filename, filen2);
 
     if ( c_output_file != NULL ) {
-        if ((output = fopen(c_output_file, "w")) == NULL && (!eof)) {
-            fprintf(stderr, "Cannot open output file: %s\n", c_output_file);
+        if (!copy_fit(outpath, sizeof(outpath), c_output_file)) {
+            fprintf(stderr, "File name is too long\n");
             exit(1);
         }
     } else {
         strcpy(Filenorig, filen2);
-        changesuffix(filen2, sizeof(filen2), extension); /* Change appendix to .asm */
-        if ((output = fopen(filen2, "w")) == NULL && (!eof)) {
-            fprintf(stderr, "Cannot open output file: %s\n", filen2);
+        if (!copy_fit(outpath, sizeof(outpath), filen2)) {
+            fprintf(stderr, "File name is too long\n");
             exit(1);
         }
+        changesuffix(outpath, sizeof(outpath), extension); /* Change appendix to .asm */
+    }
+    if (strcmp(outpath, filen2) == 0 || same_existing_file(&src_st, outpath)) {
+        fprintf(stderr, "Output file is the same as the input file: %s\n", outpath);
+        exit(1);
+    }
+    if ((output = fopen(outpath, "w")) == NULL) {
+        fprintf(stderr, "Cannot open output file: %s\n", outpath);
+        exit(1);
+    }
+    if (!copy_fit(output_name, sizeof(output_name), outpath)) {
+        fprintf(stderr, "File name is too long\n");
+        exit(1);
     }
     clear(); /* erase line */
 }
@@ -865,6 +906,16 @@ void openin(void)
         /* A raw .c file is read through z88dk-ucpp. --c1mode is the
            zcc path: the driver already ran ucpp, so open the file. */
         if (c_c1mode) {
+            struct stat st;
+
+            if (stat(Filename, &st) != 0) {
+                fprintf(stderr, "Can't open: %s\n", Filename);
+                exit(1);
+            }
+            if (!S_ISREG(st.st_mode)) {
+                fprintf(stderr, "Not a regular file: %s\n", Filename);
+                exit(1);
+            }
             if ((input = fopen(Filename, "r")) == NULL) {
                 fprintf(stderr, "Can't open: %s\n", Filename);
                 exit(1);
@@ -929,12 +980,32 @@ void doinclude(void)
             exit(1);
         }
         cp = name;
-        if (*cp == '"' || *cp == '<') {
-            name[strlen(name) - 1] = '\0';
+        if ((*cp == '"' || *cp == '<') && strlen(cp) >= 2) {
+            size_t n = strlen(cp);
+            if (cp[n - 1] == '"' || cp[n - 1] == '>')
+                cp[n - 1] = '\0';
             ++cp;
         }
+        {
+            struct stat st;
+            if (stat(cp, &st) != 0) {
+                fprintf(stderr, "Can't open include file: %s\n", cp);
+                closeout();
+                exit(1);
+            }
+            if (!S_ISREG(st.st_mode)) {
+                fprintf(stderr, "Not a regular file: %s\n", cp);
+                closeout();
+                exit(1);
+            }
+        }
+        if (!copy_fit(include_name, FILENAME_LEN + 1, cp)) {
+            fprintf(stderr, "File name is too long\n");
+            exit(1);
+        }
         if ((inpt2 = fopen(cp, "r")) == NULL) {
-            errorfmt( "Can't open include file", 1 );
+            fprintf(stderr, "Can't open include file: %s\n", cp);
+            include_name[0] = '\0';
             closeout();
             exit(1);
         } else {
@@ -961,6 +1032,7 @@ void endinclude(void)
     }
 
     inpt2 = 0;
+    include_name[0] = '\0';
     lineno = saveline;
     currfn = savecurr;
     infunc = saveinfn;
@@ -971,12 +1043,22 @@ void endinclude(void)
  */
 void closeout(void)
 {
+    int bad;
+
     tofile(); /* if diverted, return to file */
     if (output) {
-        /* if open, close it */
-        fclose(output);
+        bad = ferror(output);
+        if (fflush(output) != 0)
+            bad = 1;
+        if (fclose(output) != 0)
+            bad = 1;
+        output = 0;
+        if (bad) {
+            fprintf(stderr, "Cannot write output file: %s\n",
+                output_name[0] ? output_name : "(unknown)");
+            exit(1);
+        }
     }
-    output = 0; /* mark as closed */
 }
 
 
@@ -984,7 +1066,13 @@ void closeout(void)
 
 static void opt_code_speed(option *arg, char* val)
 {
-    char   *ptr = val - 1;
+    char   *ptr;
+
+    if (val == NULL || val[0] == '\0') {
+        fprintf(stderr, "Option --opt-code-speed requires a value\n");
+        exit(1);
+    }
+    ptr = val - 1;
 
     c_speed_optimisation = 0;
 
@@ -1019,28 +1107,49 @@ static void opt_code_speed(option *arg, char* val)
 
 
 
+static void forward_cpp_arg(const char *flag, const char *val, const char *too_long)
+{
+    size_t need = strlen(flag) + strlen(val) + 1;
+    char *buf;
+    int n;
+
+    if (need > LINESIZE) {
+        fprintf(stderr, "%s\n", too_long);
+        exit(1);
+    }
+    buf = malloc(need);
+    if (buf == NULL) {
+        fprintf(stderr, "%s\n", too_long);
+        exit(1);
+    }
+    n = snprintf(buf, need, "%s%s", flag, val);
+    if (n < 0 || (size_t)n >= need) {
+        free(buf);
+        fprintf(stderr, "%s\n", too_long);
+        exit(1);
+    }
+    cpp_add_arg(buf);
+    free(buf);
+}
+
 void SetDefine(option *arg, char* val)
 {
-    char buf[512];
     if (val == NULL || val[0] == '\0' || val[0] == '-') {
         fprintf(stderr, "Option -D requires a value\n");
         exit(1);
     }
-    snprintf(buf, sizeof(buf), "-D%s", val);
-    cpp_add_arg(buf);
+    forward_cpp_arg("-D", val, "Macro definition is too long");
     /* Still recorded for --c1mode, where this compiler's own #ifdef runs. */
     defmac(val);
 }
 
 void SetUndefine(option *arg, char* val)
 {
-    char buf[512];
     if (val == NULL || val[0] == '\0' || val[0] == '-') {
         fprintf(stderr, "Option -U requires a value\n");
         exit(1);
     }
-    snprintf(buf, sizeof(buf), "-U%s", val);
-    cpp_add_arg(buf);
+    forward_cpp_arg("-U", val, "Macro definition is too long");
     if (!copy_fit(line, LINESIZE, val)) {
         fprintf(stderr, "Macro definition is too long\n");
         exit(1);
@@ -1050,9 +1159,11 @@ void SetUndefine(option *arg, char* val)
 
 void SetIncludePath(option *arg, char *val)
 {
-    char buf[1024];
-    snprintf(buf, sizeof(buf), "-I%s", val);
-    cpp_add_arg(buf);
+    if (val == NULL || val[0] == '\0' || val[0] == '-') {
+        fprintf(stderr, "Option -I requires a value\n");
+        exit(1);
+    }
+    forward_cpp_arg("-I", val, "Include path is too long");
 }
 
 

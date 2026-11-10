@@ -488,6 +488,11 @@ int tstr(int32_t* val)
         while (ch() != '"') {
             if (ch() == 0)
                 break;
+            /* Room for this byte and the terminating NUL. */
+            if (k >= LITABSZ - 1) {
+                fprintf(stderr, "Literal Queue Overflow\n");
+                ccabort();
+            }
             tempq[k] = litchar();
             k++; /* counter */
         }
@@ -528,7 +533,8 @@ int storeq(int length, unsigned char* queue, int32_t* val)
     for (j = 0; j < k; j++) {
         /* Have to dump it in our special queue here for function literals */
         if ((litptr + 1) >= FNMAX) {
-            errorfmt("Literal Queue Overflow", 1);
+            fprintf(stderr, "Literal Queue Overflow\n");
+            ccabort();
         }
         *(litq + litptr) = *(queue + j);
         litptr++;
@@ -554,6 +560,10 @@ int qstr(double *val)
         gch();
     } while (cmatch('"') || (cmatch('\\') && cmatch('"')));
 
+    if (gltptr >= LITABSZ) {
+        fprintf(stderr, "Literal Queue Overflow\n");
+        ccabort();
+    }
     glbq[gltptr++] = 0;
     return (cnt);
 }
@@ -562,7 +572,8 @@ int qstr(double *val)
 void stowlit(int value, int size)
 {
     if ((gltptr + size) >= LITMAX) {
-        errorfmt("Literal Queue Overflow", 1);
+        fprintf(stderr, "Literal Queue Overflow\n");
+        ccabort();
     }
     putint(value, glbq + gltptr, size);
     gltptr += size;

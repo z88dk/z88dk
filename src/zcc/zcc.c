@@ -1034,11 +1034,19 @@ int main(int argc, char **argv)
     for (gargc = 0 ; gargc < argc; gargc++) {
         char* aa = argv[gargc];
         if (aa[0] == '+') {
-            strcpy(configuration, aa);
+            if (strlen(aa) >= sizeof(configuration)) {
+                fprintf(stderr, "Target name is too long\n");
+                exit(1);
+            }
+            memcpy(configuration, aa, strlen(aa) + 1);
             break;
         } else if ( strncmp(aa, "-target=", 8) == 0 ) {
-            strcpy(configuration, "+");
-            strcat(configuration, aa + 8);
+            if (strlen(aa + 8) + 1 >= sizeof(configuration)) {
+                fprintf(stderr, "Target name is too long\n");
+                exit(1);
+            }
+            configuration[0] = '+';
+            memcpy(configuration + 1, aa + 8, strlen(aa + 8) + 1);
             break;
         } else if (aa[0] == '@') {
             struct tokens_list_s* tokens = gather_from_list_file(aa + 1);
@@ -1047,7 +1055,11 @@ int main(int argc, char **argv)
             LL_FOREACH(tokens, token) {
                 char* tk = token->token;
                 if (tk[0] == '+') {
-                    strcpy(configuration, tk);
+                    if (strlen(tk) >= sizeof(configuration)) {
+                        fprintf(stderr, "Target name is too long\n");
+                        exit(1);
+                    }
+                    memcpy(configuration, tk, strlen(tk) + 1);
                 }
             }
             cmd_free_tokens(tokens);
@@ -1098,6 +1110,11 @@ int main(int argc, char **argv)
     }
 
     argc = option_parse(&options[0], argc, argv);
+
+    if (outputfile != NULL && strlen(outputfile) >= sizeof(filenamebuf)) {
+        fprintf(stderr, "Filename is too long \"%s\"\n", outputfile);
+        exit(1);
+    }
     for (gargc = 0; gargc < argc; gargc++) {
         char* aa = argv[gargc];
         // We have some options left over, it may well be an alias
@@ -1879,7 +1896,11 @@ int main(int argc, char **argv)
     if (outputfile == NULL)
         outputfile = c_linker_output_file ? c_linker_output_file : defaultout;
 
-    strcpy(filenamebuf, outputfile);
+    if (strlen(outputfile) >= sizeof(filenamebuf)) {
+        fprintf(stderr, "Filename is too long \"%s\"\n", outputfile);
+        exit(1);
+    }
+    memcpy(filenamebuf, outputfile, strlen(outputfile) + 1);
 
     if ((ptr = find_file_ext(filenamebuf)) != NULL)
         *ptr = 0;
@@ -2600,20 +2621,40 @@ int add_variant_args(char *wanted, int num_choices, char **choices)
 }
 
 
+static void append_fit(char *dest, size_t cap, size_t *offs, const char *fmt, ...)
+{
+    va_list ap;
+    int n;
+
+    if (*offs >= cap) {
+        fprintf(stderr, "Assembler options are too long\n");
+        exit(1);
+    }
+    va_start(ap, fmt);
+    n = vsnprintf(dest + *offs, cap - *offs, fmt, ap);
+    va_end(ap);
+    if (n < 0 || (size_t)n >= cap - *offs) {
+        fprintf(stderr, "Assembler options are too long\n");
+        exit(1);
+    }
+    *offs += (size_t)n;
+}
+
 void BuildAsmLine(char *dest, size_t destlen, char *prefix)
 {
-    size_t offs;
-    offs = snprintf(dest, destlen, "%s", asmargs ? asmargs : " ");
+    size_t offs = 0;
+
+    append_fit(dest, destlen, &offs, "%s", asmargs ? asmargs : " ");
 
     if (IS_ASM(ASM_Z80ASM)) {
-        offs += snprintf(dest + offs, destlen - offs, "%s%s%s%s",
+        append_fit(dest, destlen, &offs, "%s%s%s%s",
             prefix,
             z80verbose ? " -v " : " ",
             select_cpu(CPU_MAP_TOOL_Z80ASM),
             symbolson ? " -s " : " ");
     }
 
-    snprintf(dest + offs, destlen - offs, "%s", c_asmopts);
+    append_fit(dest, destlen, &offs, "%s", c_asmopts ? c_asmopts : "");
 }
 
 
@@ -2959,6 +3000,38 @@ static struct tokens_list_s* gather_from_list_file(char *filename)
     return tokens;
 }
 
+#define MAX_LIST_NEST 100
+static char *list_stack[MAX_LIST_NEST];
+static int list_depth;
+
+static void list_enter(const char *path)
+{
+    int i;
+
+    if (path == NULL)
+        path = "";
+    for (i = 0; i < list_depth; i++) {
+        if (strcmp(list_stack[i], path) == 0) {
+            fprintf(stderr, "List file includes itself: %s\n", path);
+            exit(1);
+        }
+    }
+    if (list_depth >= MAX_LIST_NEST) {
+        fprintf(stderr, "List files are nested too deeply\n");
+        exit(1);
+    }
+    list_stack[list_depth++] = muststrdup(path);
+}
+
+static void list_leave(void)
+{
+    if (list_depth <= 0)
+        return;
+    list_depth--;
+    free(list_stack[list_depth]);
+    list_stack[list_depth] = NULL;
+}
+
 void add_file_to_process(char *filename, char process_extension)
 {
     FILE *fclaim;
@@ -2971,7 +3044,10 @@ void add_file_to_process(char *filename, char process_extension)
         p = strip_outer_quotes(filename);
 
         if (*p == '@') {
-            struct tokens_list_s* tokens = gather_from_list_file(p + 1);
+            struct tokens_list_s* tokens;
+
+            list_enter(p + 1);
+            tokens = gather_from_list_file(p + 1);
 
             char outname[FILENAME_MAX * 2 + 2];
 
@@ -3020,6 +3096,7 @@ void add_file_to_process(char *filename, char process_extension)
             }
 
             cmd_free_tokens(tokens);
+            list_leave();
         } else if ((*p != ';') && (*p != '#')) { /* ignore filename leading with semicolon or hash */
             /* Expand memory for filenames */
             if ((original_filenames = realloc(original_filenames, (nfiles + 1) * sizeof(char *))) == NULL) {
@@ -3990,7 +4067,11 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
                         strcpy(fname, name);
                         free(name);
                     } else {
-                        strcpy(fname, outputfile);                                  /* use supplied output filename */
+                        if (strlen(outputfile) >= sizeof(fname)) {
+                            fprintf(stderr, "Filename is too long \"%s\"\n", outputfile);
+                            exit(1);
+                        }
+                        memcpy(fname, outputfile, strlen(outputfile) + 1);
                     }
                 } else {
                     /* using original filename to create output filename */
