@@ -7,7 +7,11 @@
 
 #include "../config.h"
 #include "ccdefs.h"
+/* MinGW <sys/stat.h> includes <io.h>. <io.h> declares int eof(int),
+   and sccz80 already has extern int eof. */
+#define eof sccz80_mingw_io_eof
 #include <sys/stat.h>
+#undef eof
 
 #if !defined(S_ISREG)
 #define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
