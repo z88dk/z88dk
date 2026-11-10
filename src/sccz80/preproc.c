@@ -17,7 +17,9 @@ static int        findmac(char *sname);
 
 
 static int iflevel = 0; /* current #if nest level */
-static int skiplevel = 0; /* level at which #if skipping started */
+/* Positive: skipping while no arm of that #if has been chosen.
+   Negative of the same level: an arm was chosen, so #else stays shut. */
+static int skiplevel = 0;
 
 
 void junk(void)
@@ -228,11 +230,13 @@ void ifline(void)
                     continue;
                 }
                 /* An outer skip does not read this condition. A taken
-                   arm skips the rest without reading it either. */
+                   arm skips the rest without reading it either. The
+                   sign keeps that skip distinct from "no arm yet",
+                   which is what #else turns on. */
                 if (skiplevel != 0 && skiplevel != iflevel)
                     continue;
                 if (skiplevel == 0) {
-                    skiplevel = iflevel;
+                    skiplevel = -iflevel;
                     continue;
                 }
                 if (!c1_if_literal(&is_zero)) {
@@ -271,7 +275,7 @@ void ifline(void)
 
             if (match("#endif")) {
                 if (iflevel) {
-                    if (skiplevel == iflevel)
+                    if (skiplevel == iflevel || skiplevel == -iflevel)
                         skiplevel = 0;
                     --iflevel;
                 } else
