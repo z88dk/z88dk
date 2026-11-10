@@ -211,7 +211,7 @@ extern Type      *default_function_with_type(const char *name, Type *return_type
 extern Type     *asm_function(const char *name);
 extern Type      *make_pointer(Type *base_type);
 extern Type      *dodeclare(enum storage_type storage);
-extern int        declare_local(int local_static);
+extern int        declare_local(int local_static, int permit_storage);
 extern void       declare_func_kr(void);
 extern int        ispointer(Type *type);
 extern void       type_describe(Type *type, UT_string *output);

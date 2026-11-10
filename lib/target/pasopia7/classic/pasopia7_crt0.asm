@@ -87,6 +87,10 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
     INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
+IF DEFINED_CRT_ORG_BSS
+    defc    __crt_org_bss = CRT_ORG_BSS
+ENDIF
+
     INCLUDE "crt/classic/crt_section.inc"
 
     SECTION bss_crt

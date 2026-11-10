@@ -2,6 +2,7 @@
 
 80cc/ir_selftest
 80cc/z88dk-80cc
+asm7801/z88dk-asm7801
 
 common/t/test
 config.h
@@ -38,3 +39,4 @@ zcc/zcc
 zobjcopy/z88dk-zobjcopy
 zobjcopy/zobjcopy
 zpragma/z88dk-zpragma
+zx81bas/build/

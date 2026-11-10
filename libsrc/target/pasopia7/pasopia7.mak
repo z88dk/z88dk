@@ -1,8 +1,10 @@
 PASOPIA7_GLOBS := \
+	"target/pasopia7/disk/*.asm" \
 	"target/pasopia7/games/*.asm" \
 	"target/pasopia7/stdio/*.asm"
 
 PASOPIA7_GLOBS_ex := \
+	target/pasopia7/disk/*.asm \
 	target/pasopia7/games/*.asm \
 	target/pasopia7/stdio/*.asm
 

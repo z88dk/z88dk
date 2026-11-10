@@ -29,9 +29,6 @@ ___psg_init:
     in      a, (PSGLatchPort)
   ENDIF
     LD      A, $BF
-  IF    SN76489_HAS_LATCH_PORT
-    in      a, (PSGLatchPort)
-  ENDIF
     OUT     (C), A
   IF    SN76489_HAS_LATCH_PORT
     in      a, (PSGLatchPort)

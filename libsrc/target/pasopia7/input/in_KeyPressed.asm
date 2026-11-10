@@ -4,7 +4,7 @@
     PUBLIC  in_KeyPressed
     PUBLIC  _in_KeyPressed
     EXTERN  in_getrow
-    INCLUDE "target/pasopia7/def/pasopia7.def"
+    INCLUDE "target/pasopia7/def/pasopia7.h"
 
 ; Determines if a key is pressed using the scan code
 ; returned by in_LookupKey.

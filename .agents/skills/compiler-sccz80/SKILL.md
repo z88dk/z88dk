@@ -20,7 +20,22 @@ Binary: `z88dk-sccz80` (normally via `zcc`). Source: `src/sccz80/`.
 | Inline ints | May load `sccz80_inline` — see `tool-copt` |
 | Float rewrite | sccz80 may rewrite `1.0f/x` → `inv(x)`; force runtime numerator to hit `fsdiv` |
 | `-compiler=multi` | sccz80 is the data-variant. Its `dumplits` image is the one file string pool. Do not emit a second pool for a selected function. Matching images use that label and the same offsets. A different image is merged by C string (`i_N+off` through the next NUL). Spec: `src/zcc-multi/zcc-compiler-multi.md` |
-| Tests | Extend `test/suites/sccz80/*.c`. Do not add a language or a dependency the tree does not already build, unless the user specifically and explicitly directs it (`AGENTS.md` house rule 8) |
+| Tests | Extend `test/suites/sccz80/*.c`. Do not add a language or a dependency the tree does not already build, unless the user specifically and explicitly directs it (`AGENTS.md` house rule 8). `declspec.c` is sccz80 only. 80cc still rejects a qualifier before the storage class |
+| Architecture | `src/sccz80/sccz80 Architecture Guide.md` is the model to keep. Later work maintains that model |
+
+## Settled model
+
+Keep these. Do not reopen them as a redesign.
+
+- Declaration specifiers may stand in any C90 order. `DeclSpecs` and `parse_type` in `declparse.c` are that reader. One storage class. A repeated class is an error. `const` and `volatile` may follow the type word, and that object is `rodata_compiler`.
+- `auto` and `register` are storage only before the type word. After the type word they are names.
+- `__critical` is a statement (`docritical` in `stmt.c`) or a trailing function attribute. It is not a declaration specifier. A block calls `l_push_di` then `l_pop_ei`. Rabbit uses `ipset 3` and `ipres`.
+- Locals are stack slots from SP. There is no `-frameix` or `-frameiy`. `__z88dk_saveframe` preserves the caller's IX only.
+- A struct return is a pointer in HL. There is no hidden result pointer.
+- A fastcall argument stays in registers and is not part of the stack cleanup count.
+- An integer constant is `int_const_val` (`uint64_t`). `sizeof` parses its operand and does not evaluate it.
+- `publish_struct_size` writes a completed struct size back into types parsed while the tag was open.
+- Peephole files are `lib/z88dk_intrinsic`, then `lib/sccz80_rules.1`, `.2`, and `.3` as in the architecture guide. The compiler has no peephole pass.
 
 ## Condensed wiki
 

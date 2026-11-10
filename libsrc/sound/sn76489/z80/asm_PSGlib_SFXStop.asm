@@ -72,6 +72,7 @@ ENDIF
    
    ld a,(__PSGlib_Chan2Volume)
    
+   and 0x0F                         ; keep lower nibble
    add a,l
    cp 16
    
@@ -83,7 +84,7 @@ silchan2:
 
 outchan2:
 
-   or PSGLatch|PSGChannel3|PSGVolumeData
+   or PSGLatch|PSGChannel2|PSGVolumeData
 IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
@@ -126,6 +127,7 @@ ENDIF
    
    ld a,(__PSGlib_Chan3Volume)
    
+   and 0x0F                         ; keep lower nibble
    add a,l
    cp 16
    

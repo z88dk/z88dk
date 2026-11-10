@@ -70,6 +70,16 @@ int primary(LVALUE* lval)
             nl();
             return 0;
         } else if ((ptr = findloc(sname))) {
+            if (ptr->storage == TYPDEF) {
+                errorfmt("Typedef '%s' is not a variable", 0, sname);
+                lval->ltype = type_int;
+                lval->val_type = KIND_INT;
+                lval->indirect_kind = KIND_INT;
+                lval->is_const = 1;
+                lval->const_val = 0;
+                vconst(0);
+                return 0;
+            }
             lval->base_offset = getloc(ptr, 0);
             lval->offset = 0;
             lval->symbol = ptr;

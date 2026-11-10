@@ -19,7 +19,7 @@
     EXTERN  __pasopia_page
     EXTERN  __console_w
 
-    INCLUDE "target/pasopia7/def/pasopia7.def"
+    INCLUDE "target/pasopia7/def/pasopia7.h"
 
 generic_console_set_attribute:
     ld      a, (generic_console_flags)

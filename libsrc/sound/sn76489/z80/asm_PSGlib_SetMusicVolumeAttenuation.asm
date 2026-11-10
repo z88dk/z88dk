@@ -33,6 +33,7 @@ asm_PSGlib_SetMusicVolumeAttenuation:
 	
    ld a,(__PSGlib_Chan0Volume)
 
+   and 0x0F                         ; keep lower nibble
    add a,l
    cp 16
    
@@ -55,6 +56,7 @@ ELSE
 ENDIF
 	ld a,(__PSGlib_Chan1Volume)
    
+   and 0x0F                         ; keep lower nibble
    add a,l
    cp 16
    
@@ -81,6 +83,7 @@ ENDIF
 
 	ld a,(__PSGlib_Chan2Volume)
    
+   and 0x0F                         ; keep lower nibble
    add a,l
    cp 16
    
@@ -110,6 +113,7 @@ skipchan2:
 	
 	ld a,(__PSGlib_Chan3Volume)
    
+   and 0x0F                         ; keep lower nibble
    add a,l
    cp 16
    

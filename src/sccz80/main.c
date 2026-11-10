@@ -375,13 +375,7 @@ void ccabort(void)
 void parse(void)
 {
     while (eof == 0) { /* do until no more input */
-        if (amatch("extern")) {
-            dodeclare(EXTERNAL);
-        } else if (amatch("static")) {
-            dodeclare(LSTATIC);
-        } else if (amatch("typedef")) {
-            dodeclare(TYPDEF);
-        } else if (dodeclare(STATIK)) {
+        if (dodeclare(STATIK)) {
             ;
         } else if ( amatch("__addressmod")) {
             parse_addressmod();

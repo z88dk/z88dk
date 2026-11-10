@@ -204,8 +204,26 @@ Symbol1* define_local_def_sym(const char* name, long value ) {
 }
 
 void undefine_local_def_sym(const char* name) {
+    Symbol1* sym;
+
     if (CURRENTMODULE) {
         Symbol1Hash_remove(CURRENTMODULE->local_symtab, name);
+    }
+
+    /* A PUBLIC constant is stored in the global table. Clear the value
+       and keep the declaration, so a later defc can replace it. */
+    if (global_symtab == NULL || CURRENTMODULE == NULL)
+        return;
+    sym = Symbol1Hash_get(global_symtab, name);
+    if (sym != NULL && sym->module == CURRENTMODULE && sym->is_defined
+            && !sym->is_global_def
+            && (sym->type == TYPE_CONSTANT || sym->type == TYPE_COMPUTED)
+            && (sym->scope == SCOPE_PUBLIC || sym->scope == SCOPE_GLOBAL)) {
+        sym->is_defined = false;
+        sym->value = 0;
+        sym->type = TYPE_UNDEFINED;
+        sym->is_computed = false;
+        sym->is_touched = false;
     }
 }
 

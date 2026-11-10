@@ -12,7 +12,7 @@
     EXTERN  l_push_di
     EXTERN  l_pop_ei
 
-    INCLUDE "target/pasopia7/def/pasopia7.def"
+    INCLUDE "target/pasopia7/def/pasopia7.h"
 
 ; exit : carry set and HL = 0 for no keys registered
 ;        else HL = ASCII character code

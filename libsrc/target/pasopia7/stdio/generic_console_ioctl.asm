@@ -11,7 +11,7 @@
     EXTERN  __console_h
     EXTERN  __console_w
 
-    INCLUDE "target/pasopia7/def/pasopia7.def"
+    INCLUDE "target/pasopia7/def/pasopia7.h"
 
     PUBLIC  CLIB_GENCON_CAPS
     defc    CLIB_GENCON_CAPS=CAP_GENCON_CUSTOM_FONT|CAP_GENCON_UDGS|CAP_GENCON_FG_COLOUR|CAP_GENCON_INVERSE

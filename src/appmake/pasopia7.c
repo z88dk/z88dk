@@ -11,6 +11,7 @@ static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static int               origin       = -1;
+static char             *datafile     = NULL;
 static char              help         = 0;
 
 
@@ -21,6 +22,7 @@ option_t pasopia7_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
+    {  0 , "data",     "A file for the disk after the program, from the next track (16 sectors of 256 bytes a track: the program has 8)", OPT_STR, &datafile },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -116,6 +118,41 @@ int pasopia7_exec(char *target)
             t++;
         }
         w += 256;
+    }
+
+    if ( datafile != NULL ) {
+        // after the program (8 sectors a track from track 2): from the next track, sector 1 on, all 16 sectors a track
+        FILE *fpd;
+        long dlen, dw = 0;
+        unsigned char *dbuf;
+
+        t = 2 + (int)((pos + 2047) / 2048);
+        if ( (fpd = fopen(datafile, "rb")) == NULL ) {
+            exit_log(1, "Can't open the data file %s\n", datafile);
+        }
+        fseek(fpd, 0, SEEK_END);
+        dlen = ftell(fpd);
+        fseek(fpd, 0L, SEEK_SET);
+        dbuf = must_malloc_block(dlen, pasopia_spec.sector_size);
+        memset(dbuf, 0xe5, ((dlen / pasopia_spec.sector_size) + 1) * pasopia_spec.sector_size);
+        if ( dlen != fread(dbuf, 1, dlen, fpd) ) {
+            exit_log(1, "Can't read %s\n", datafile);
+        }
+        fclose(fpd);
+        s = 0;
+        while ( dw < dlen ) {
+            if ( t >= pasopia_spec.tracks ) {
+                exit_log(1, "The data does not fit on the disk\n");
+            }
+            disc_write_sector(h, t, s, 0, dbuf + dw);
+            s++;
+            if ( s == 16 ) {
+                s = 0;
+                t++;
+            }
+            dw += 256;
+        }
+        free(dbuf);
     }
 
     suffix_change(filename, ".dsk");

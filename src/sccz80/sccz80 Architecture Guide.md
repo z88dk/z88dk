@@ -1,15 +1,15 @@
 # sccz80 architecture guide
 
-Purpose: explain how sccz80 is built today and what architectural model it uses to
-generate assembly for several 8-bit CPUs, so that reviews of the compiler keep its
-principles in view instead of drifting into a redesign.
+This is the architecture of sccz80 after the C90 work. It is the model to keep.
+Later work maintains this model. It does not add a pass, a frame pointer, or a
+second declaration grammar.
 
-This is a review aid, not a specification. It describes the code as it stands.
+sccz80 reads C and writes assembly for several 8-bit CPUs. It has no
+intermediate representation and no register allocator. `z88dk-copt` rewrites
+the assembly after sccz80 has finished.
 
-Audience: humans and agents doing review, bug triage, or codegen work on sccz80.
-Read this before proposing a change; most "obvious" cleanups here are constrained
-by stack discipline, multi-CPU legality, or the fact that optimisation mostly
-happens *after* this compiler is done.
+Read this before a change. Stack depth, CPU legality, and the call conventions
+constrain every edit.
 
 ---
 
@@ -34,7 +34,7 @@ each a standalone program, driven by `zcc`:
  z88dk-z80asm       assembler + linker, emits the final image
 ```
 
-Consequences that matter for review:
+Consequences:
 
 * **sccz80 contains no peephole optimiser.** Grep for `peep` or `rules` across
   `src/sccz80/*.c` and there are no hits. Every pattern-based optimisation is
@@ -54,33 +54,34 @@ Consequences that matter for review:
 
 ## 2. Size and shape of the tree
 
-19,160 lines of C across 25 files. Distribution is very uneven, and that shape is
-itself the main architectural fact about the codebase:
+20,347 lines in 27 files. 21 of those files are C. The counts are the sources
+beside this guide, after the C90 declaration work. `codegen.c` is the largest
+file. It emits the instructions.
 
 | file | lines | role |
 |---|---:|---|
-| `codegen.c` | 6,248 | all instruction emission, 193 functions |
-| `declparse.c` | 2,154 | declarators, types, storage classes |
-| `plunge.c` | 1,392 | statement-level codegen helpers (goto/labels/loop scaffolding) |
-| `const.c` | 1,264 | constant folding and constant emission |
-| `primary.c` | 1,034 | primary expressions: identifiers, calls' operands, literals |
-| `main.c` | 1,026 | options, CPU selection, driver-level orchestration |
-| `expr.c` | 1,002 | the recursive-descent expression chain |
-| `stmt.c` | 864 | statements: if/while/for/switch/return/block |
-| `declinit.c` | 594 | initialisers |
-| `callfunc.c` | 578 | function call argument marshalling and call emission |
-| `preproc.c` | 363 | directives that remain after ucpp |
-| `error.c` | 195 | diagnostics |
+| `codegen.c` | 6,224 | instruction emission |
+| `declparse.c` | 2,645 | declarations and specifiers |
+| `const.c` | 1,459 | literals, `sizeof`, folding |
+| `plunge.c` | 1,441 | binary expressions |
+| `primary.c` | 1,093 | primaries |
+| `main.c` | 1,085 | options, CPU, driver |
+| `expr.c` | 1,003 | expression precedence |
+| `stmt.c` | 982 | statements |
+| `callfunc.c` | 595 | call arguments |
+| `declinit.c` | 591 | initialisers |
+| `io.c` | 372 | character source |
+| `cdbfile.c` | 368 | debug records |
+| `preproc.c` | 363 | directives left after ucpp |
+| `goto.c` | 226 | goto and labels |
+| `error.c` | 201 | diagnostics |
 | `lex.c` | 152 | scanner |
-| `sym.c` | 142 | symbol table primitives |
-| `data.c` | 125 | data/bss section bookkeeping |
-| `cpp_invoke.c` | 93 | spawn `z88dk-ucpp` on a direct compile |
+| `sym.c` | 141 | symbol table |
+| `data.c` | 126 | data and bss |
+| `cpp_invoke.c` | 94 | spawn `z88dk-ucpp` |
 | `misc.c` | 76 | small helpers |
-| `while.c` | 37 | loop helper |
-| headers | 1,052 | `define.h` 498, `ccdefs.h` 363, `data.h` 78, `codegen.h` 63, `io.h` 48 |
-
-`codegen.c` is two thirds of the compiler's logic and 156 of the 165 CPU-dependent
-conditional sites. It is the file that decides what this compiler is.
+| `while.c` | 38 | loop helper |
+| headers | 1,072 | `define.h` 500, `ccdefs.h` 373, `data.h` 80, `codegen.h` 63, `io.h` 48, `misc.h` 8 |
 
 ---
 
@@ -103,10 +104,9 @@ Flow for one translation unit:
    `#ifdef` / `#ifndef` / `#else` / `#endif`, and `#` line markers.
 4. **`lex.c`** produces tokens: identifiers, numbers, strings, punctuators. It is
    deliberately thin; most language knowledge lives in the parser.
-5. **`declparse.c`** builds `Type` objects for declarations: base kind, pointer
-   depth, arrays, struct fields, function signatures, qualifiers, far pointers,
-   bitfields. `declinit.c` handles initialiser lists, which emit data rather than
-   code.
+5. **`declparse.c`** reads one declaration. Storage class, qualifiers, and
+   type specifiers may stand in any C90 order. The rules are under
+   Declaration specifiers below. `declinit.c` writes initialisers as data.
 6. **`stmt.c`** dispatches statements. Each statement form immediately calls into
    codegen for its control flow, using labels allocated from a global counter.
 7. **`expr.c`** holds the expression grammar as a precedence chain of mutually
@@ -118,10 +118,70 @@ Flow for one translation unit:
 8. **`primary.c`** produces the leaves: identifiers, literals, and the operands a
    call needs.
 
-The important consequence: **the parser's state is the only state**. There is no
-place where a whole expression or function exists as a data structure that could be
-inspected, reordered, or optimised. Optimisation opportunities are therefore
-captured locally, at the moment of parsing, or lost.
+The parser's state is the only state. No whole expression or function exists as
+a data structure that a later pass could reorder. A choice is made when the
+parser sees the construct, or it is lost.
+
+### Declaration specifiers
+
+`parse_type` in `declparse.c` reads one declaration. Storage class, type
+qualifiers, and type specifiers may stand in any C90 order. One `DeclSpecs`
+holds that declaration.
+
+`storage` starts at -1. The caller then keeps its default storage.
+`ataddress` starts at -1. `permit_storage` is set for a real declaration.
+A nested declarator clears it, so a storage class there is an error.
+`allow_at` allows `__at`. `banked` records one leading `__banked`.
+`consumed` means a bad statement was diagnosed and skipped.
+
+Before the type word, and in any order, the reader accepts these words.
+
+- `const` and `volatile`. They set `isconst` and `isvolatile`.
+- `extern`, `static`, and `typedef`. C90 allows one storage class. A second
+  class is an error. The first class is kept.
+- `auto` and `register`. In this position they are storage. After the type
+  word the same spellings are names.
+- An address-space name.
+- One `__banked`.
+- `__at(constant)` when `allow_at` is set.
+- A function modifier in the wrong place. The compiler reports it and
+  consumes it.
+
+`__critical` is not in that modifier list. A block `__critical` is a statement
+in `stmt.c`. On a function, `__critical` is a trailing attribute, in the same
+place as `__z88dk_fastcall`, `__z88dk_callee`, and `__naked`. A leading
+`__critical` at file scope is not a modifier. The compiler keeps the
+missing-token diagnostic.
+
+The integer words are `signed`, `unsigned`, `char`, `short`, `int`, and
+`long`. They may mix with `const`, `volatile`, and the storage class.
+`char` is 8 bits. One `long` is 32 bits. Two `long` words are 64 bits.
+Any other word in this group is a 16-bit `int`. `short` is in that group.
+`short` and `long` do not combine. A sign word alone does not finish the type.
+`float`, a typedef, or `_Accum` can still apply. `int _Accum` and
+`short _Accum` are 16 bits. One `long` and then `_Accum` is 32 bits.
+`long double` is not a type. The leftover `double` stays a name.
+
+`end_specs` still accepts `const` and `volatile` after the type word.
+`static int const x` sets `isconst`. The object goes in `rodata_compiler`,
+the same place as a leading `const`.
+
+`__sfr` is an 8-bit port. `__sfr __banked` is a 16-bit port. `__at` supplies
+the address. Words after the address are the cell type, not the port name.
+The reader discards `const`, `volatile`, `unsigned`, `signed`, `char`,
+`short`, `int`, and `long` there. `unsigned __sfr` keeps that order.
+`__sfr __at` and then `__banked` also keeps the old order.
+
+`enum`, `struct`, and `union` also keep a trailing qualifier on this
+declaration.
+
+`T = ...` is an error when `T` is a typedef. The diagnostic is
+`Typedef '%s' is not a variable`. The skip stops at a semicolon that is not
+inside quotes. A `}` that this skip did not open stays for the statement
+parser. A bare `T;` emits nothing.
+
+`dodeclare` uses the storage class from `DeclSpecs` when one was seen.
+`declare_local` is the same reader inside a block.
 
 ---
 
@@ -205,7 +265,8 @@ the principle that most determines what changes are cheap and what are not.
 
 `sccz80` has no register allocator and no live-range analysis. A function's local
 frame is fixed at entry and addressed from `SP`, and every expression is
-evaluated by pushing its left operand and folding into the right.
+evaluated by pushing its left operand and folding into the right. There is no
+index-register frame. `-frameix` and `-frameiy` are not options.
 
 ### Virtual stack pointer `Zsp`
 
@@ -296,14 +357,13 @@ Z180/Rabbit but not Z80), some for availability (no `IX` on 8080/8085).
 
 Three layers, deliberately separated:
 
-**Layer 1 — instruction selection in `codegen.c`.** 156 conditional sites out of
-165 in the whole compiler. Each one asks "does this CPU have the cheap form?" and
-falls back to the portable form. Examples: `modstk` choosing `add sp,N` versus a
-`pop`-skip versus `inc sp` chains; `POP AF` substitution; `LDIR`/`LDDR` versus byte
-loops; 8085-specific sequences where
-the CPU offers something the Z80 lacks. **Every fallback must be legal on the
-weakest supported CPU of the class** — the 8080-class path must contain no
-undocumented and no Z80-only instruction.
+**Layer 1 — instruction selection in `codegen.c`.** The CPU choices sit in this
+file. Each one asks whether this CPU has the short form, and otherwise emits a
+form the weaker CPU can run. Examples are `modstk` choosing `add sp,N`, a
+`pop` skip, or an `inc sp` chain, `POP AF` substitution, and `LDIR`/`LDDR`
+versus a byte loop. An 8085 sequence is used only where that CPU has the
+instruction. Every fallback must be legal on the weakest CPU of the class.
+The 8080 path has no undocumented opcode and no Z80-only instruction.
 
 **Layer 2 — peephole rules per architecture.** `lib/arch/<cpu>/<cpu>_rules.1`.
 The files that contain rules are `8085`, `gbz80`, `kc160`, `r800`, `rabbit`,
@@ -446,10 +506,9 @@ the design, not an omission to be corrected.
 
 ---
 
-## 9. Invariants a review must not break
+## 9. Invariants
 
-These hold today and hold the compiler together. A change that violates one is not
-a local fix.
+These hold the compiler together. A change that violates one is not a local fix.
 
 1. **Stack discipline.** `Zsp` equals real stack depth after every codegen return,
    across every `Kind` and every CPU. Wide types are pushed low-word-first.
@@ -475,12 +534,11 @@ a local fix.
 
 ## 10. Where the risk concentrates
 
-Useful as a triage map for reviewers.
+These are the places a change is most likely to go wrong.
 
-* **`codegen.c` at 6,224 lines with 193 functions and 156 CPU branch sites.** It
-  is simultaneously the largest file, the densest conditional logic, and the only
-  place instruction legality lives. Almost every historical codegen bug has been a
-  missing or over-broad predicate here.
+* **`codegen.c` at 6,224 lines.** It is the largest file, and it is where
+  instruction legality lives. A wrong or missing CPU predicate here is the
+  usual shape of a codegen bug.
 * **Parallel operator implementations.** For each width there are near-duplicate
   add/sub/mul/div/shift/compare paths with different staging. A fix applied to the
   16-bit path and not the 8-bit or 32-bit path is the single most common shape of
@@ -496,6 +554,9 @@ Useful as a triage map for reviewers.
 * **Library boundary.** Divides, wide multiplies and floating point call into
   prebuilt libraries whose behaviour for extreme operands is not part of the
   compiler's own tests.
+* **`declparse.c`.** The declaration grammar is the C90 specifier reader in
+  section 3. Do not put the storage class back in front of the type as a
+  required order.
 
 ---
 
@@ -519,3 +580,38 @@ The design targets are unusual and should be the yardstick for every proposal.
 A recommendation is in the spirit of this design when it makes an existing sequence
 shorter, a predicate more precise, a duplicated path shared, or a dead path gone —
 with no new global state, no new pass, and no change to the ABI.
+
+---
+
+## 12. The model to keep
+
+These choices are the compiler. A later change keeps them.
+
+1. One code generator. No intermediate representation. No register allocator.
+   Locals are stack slots from `SP`. There is no IX or IY frame. `-frameix`
+   and `-frameiy` are not options. `__z88dk_saveframe` saves the caller's IX.
+   It is not a frame for locals.
+2. A function that returns a struct returns a pointer in `HL`. The compiler
+   warns and converts the return type. There is no hidden result pointer.
+   An automatic assignment of two struct objects copies the bytes. A file-scope
+   initialiser from a returned struct is not that copy.
+3. Declaration specifiers follow section 3. Storage, qualifiers, and the type
+   words may stand in any C90 order. One storage class is allowed. A second
+   class is an error, and the first class is kept.
+4. `__critical` is a statement and a trailing function attribute. It is not a
+   type specifier. A block calls `l_push_di` and then `l_pop_ei`. Rabbit uses
+   `ipset 3` and `ipres`.
+5. A fastcall argument stays in the registers. The caller does not push it.
+   It is not part of the stack cleanup count. A `__z88dk_callee` function pops
+   the stacked arguments. The caller does not pop them.
+6. `int` is 16 bits. A `char` promotes to `int` before an arithmetic operator.
+   An integer constant is a `uint64_t` in `int_const_val`. The compiler does
+   not keep that constant as a host floating value.
+7. `sizeof` parses its operand and discards the code. sccz80 has no
+   variable-length arrays.
+8. When a struct tag is complete, `publish_struct_size` writes that size into
+   types that already point at the tag.
+9. Peephole rules stay in `z88dk-copt`, in the files named in section 7.
+   The compiler does not grow a peephole pass.
+10. Call conventions stay the library conventions. A change here changes
+    sccz80, 80cc, zsdcc, and the libraries together.
