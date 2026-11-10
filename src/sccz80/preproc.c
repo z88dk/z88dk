@@ -151,6 +151,22 @@ void vinline(void)
     }
 }
 
+/* Raw --c1mode does not evaluate expressions. Only a literal 0 or 1. */
+static int c1_if_literal(int *is_zero)
+{
+    const char *p = line + lptr;
+
+    while (*p == ' ' || *p == '\t')
+        p++;
+    if (*p != '0' && *p != '1')
+        return 0;
+    *is_zero = (*p == '0');
+    p++;
+    while (*p == ' ' || *p == '\t' || *p == '\r')
+        p++;
+    return *p == '\0';
+}
+
 /*
  * ifline - part of preprocessor to handle #ifdef, etc
  */
@@ -198,11 +214,22 @@ void ifline(void)
                 continue;
             }
 
-            /* #if is not evaluated here (ucpp does that). Count it so an
-               unclosed directive fails at end of file, and so #endif matches.
+            /* #if is not evaluated here (ucpp does that on the normal path).
+               Count it so #endif matches. In raw --c1mode a literal 0 skips
+               and a literal 1 does not; any other expression is refused.
                #ifdef / #ifndef are matched above; streq is a prefix test. */
             if (match("#if")) {
+                int is_zero = 0;
+
                 ++iflevel;
+                if (c_c1mode && skiplevel == 0) {
+                    if (!c1_if_literal(&is_zero)) {
+                        fprintf(stderr, "Cannot evaluate #if\n");
+                        ccabort();
+                    }
+                    if (is_zero)
+                        skiplevel = iflevel;
+                }
                 continue;
             }
 

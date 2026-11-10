@@ -38,6 +38,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <sys/stat.h>
 #include <setjmp.h>
 #include <stddef.h>
 #include <limits.h>
@@ -2417,6 +2418,8 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 {
 	int i, ret = 0;
 	char *filename = 0;
+	char *extra = 0;
+	int saw_output = 0;
 	int with_std_incpath = 0;
 	int print_version = 0, print_defs = 0, print_asserts = 0;
 	int system_macros = 0, standard_assertions = 1;
@@ -2520,6 +2523,7 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 				error(-1, "missing filename after -o");
 				return 2;
 			}
+			saw_output = 1;
 			if (argv[i][0] == '-' && argv[i][1] == 0) {
                 ls->output = stdout;
 			} else {
@@ -2541,19 +2545,35 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 			warning(-1, "unknown option '%s'", argv[i]);
 	} else {
 		if (filename != 0) {
-			if ( ls->output != NULL ) {
-				ls->output = fopen(argv[i], "w");
-				if (!ls->output) {
-					error(-1, "failed to open for "
-						"writing: %s", argv[i]);
-					return 2;
-				}
-			} else {
+			if (extra != 0) {
 				error(-1, "spurious filename '%s'", argv[i]);
 				return 2;
 			}
+			extra = argv[i];
 		} else {
 			filename = argv[i];
+		}
+	}
+	/* cpp infile outfile still writes outfile. A later -o, or a second
+	   name that is the input, must not open that name for write: the
+	   old branch truncated it before -o was seen. */
+	if (extra != 0) {
+		struct stat a, b;
+		int same = filename != 0 && strcmp(extra, filename) == 0;
+
+		if (!same && filename != 0 && stat(filename, &a) == 0
+		    && stat(extra, &b) == 0 && a.st_ino != 0
+		    && a.st_ino == b.st_ino && a.st_dev == b.st_dev)
+			same = 1;
+		if (saw_output || same) {
+			error(-1, "spurious filename '%s'", extra);
+			return 2;
+		}
+		output_file = extra;
+		ls->output = fopen(extra, "w");
+		if (!ls->output) {
+			error(-1, "failed to open for writing: %s", extra);
+			return 2;
 		}
 	}
 	init_tables(ls->flags & HANDLE_ASSERTIONS);

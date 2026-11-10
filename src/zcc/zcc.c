@@ -864,8 +864,9 @@ static void append_shell_arg(char **dest, const char *value)
     free(q);
 }
 
-/* A -C* value is already a list of tool arguments (-Ca"-DPLUS3 -DSTRIPVECTOR",
-   -Cz"+zx --plus3"). Quote each word so the shell still splits them.
+/* A -C* value is a list of tool arguments (-Ca"-DPLUS3 -DSTRIPVECTOR",
+   -Cz"+zx --plus3"). Those quotes are removed before zcc sees the value.
+   A quote that is still present belongs to one argument (-DSTR="hi there").
    One -I, -L, -iquote or -isystem value stays one argument, including a
    path that contains spaces. */
 static int leading_path_option(const char *s)
@@ -901,14 +902,28 @@ static void append_shell_words(char **dest, const char *value)
     }
     for (p = value; *p; ) {
         const char *start;
+        char quote = 0;
 
         while (*p == ' ' || *p == '\t')
             p++;
         if (*p == '\0')
             break;
         start = p;
-        while (*p && *p != ' ' && *p != '\t')
+        while (*p) {
+            if (quote) {
+                if (*p == quote)
+                    quote = 0;
+                p++;
+                continue;
+            }
+            if (*p == '"' || *p == '\'') {
+                quote = *p++;
+                continue;
+            }
+            if (*p == ' ' || *p == '\t')
+                break;
             p++;
+        }
         append_shell_span(dest, start, (size_t)(p - start));
     }
 }
@@ -947,6 +962,84 @@ static void refuse_output_is_input(void)
             exit(1);
         }
     }
+}
+
+/* ucpp records every included name as # <num> "file" or #line <num> "file".
+   sccz80's -o is a temporary, so the driver's output name is checked here. */
+static int line_directive_name(const char *text, char *name, size_t cap)
+{
+    const char *p = text;
+    const char *start;
+    size_t n;
+
+    while (*p == ' ' || *p == '\t')
+        p++;
+    if (*p != '#')
+        return 0;
+    p++;
+    while (*p == ' ' || *p == '\t')
+        p++;
+    if (strncmp(p, "line", 4) == 0 && (p[4] == ' ' || p[4] == '\t'))
+        p += 4;
+    while (*p == ' ' || *p == '\t')
+        p++;
+    if (*p < '0' || *p > '9')
+        return 0;
+    while (*p >= '0' && *p <= '9')
+        p++;
+    while (*p == ' ' || *p == '\t')
+        p++;
+    if (*p != '"')
+        return 0;
+    start = ++p;
+    while (*p && *p != '"') {
+        if (*p == '\\' && p[1] != '\0')
+            p += 2;
+        else
+            p++;
+    }
+    if (*p != '"')
+        return 0;
+    n = (size_t)(p - start);
+    if (n == 0 || n >= cap)
+        return 0;
+    memcpy(name, start, n);
+    name[n] = '\0';
+    return 1;
+}
+
+static void refuse_preprocessed_includes(int number)
+{
+    char *path;
+    char buf[8192];
+    char name[FILENAME_MAX + 1];
+    FILE *fp;
+    struct stat out;
+    int have_out;
+
+    if (dependencyonly)
+        return;
+    if (outputfile == NULL || outputfile[0] == '\0')
+        return;
+    if (temporary_filenames == NULL || temporary_filenames[number] == NULL)
+        return;
+    path = changesuffix(temporary_filenames[number], ".i2");
+    fp = fopen(path, "r");
+    free(path);
+    if (fp == NULL)
+        return;
+    have_out = stat(outputfile, &out) == 0;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        if (!line_directive_name(buf, name, sizeof(name)))
+            continue;
+        if (strcmp(name, outputfile) == 0 ||
+            (have_out && same_existing_file(&out, name))) {
+            fprintf(stderr, "Output file is the same as an include file: %s\n", name);
+            fclose(fp);
+            exit(1);
+        }
+    }
+    fclose(fp);
 }
 
 static void command_fit(char *dest, size_t cap, const char *fmt, ...)
@@ -1710,6 +1803,7 @@ int main(int argc, char **argv)
                     snprintf(zpragma_args, sizeof(zpragma_args),"-sccz80 -zcc-opt=\"%s\"", zcc_opt_def);
                     if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                         exit(1);
+                    refuse_preprocessed_includes(i);
                     if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
                         exit(1);
                     continue;
@@ -1726,6 +1820,7 @@ int main(int argc, char **argv)
                          (compiler_type == CC_SDCC || compiler_type == CC_LLVMZ80) ? " -autoformat" : "");
                 if (process(ft == CXXFILE ? ".cpp" : ".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
+                refuse_preprocessed_includes(i);
                 if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
                     exit(1);
             } else {
@@ -1734,6 +1829,7 @@ int main(int argc, char **argv)
 
                 if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
+                refuse_preprocessed_includes(i);
                 if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
                     exit(1);
             }
@@ -3833,6 +3929,7 @@ static int multi_run_variant(int filenumber, char *src_c, const char *vname, int
     snprintf(cppbuf, sizeof(cppbuf), "%s%s", cpparg ? cpparg : "", cpp_extra ? cpp_extra : "");
     if (process(".c", ".i2", c_cpp_exe, cppbuf, c_stylecpp, filenumber, YES, YES))
         return 1;
+    refuse_preprocessed_includes(filenumber);
     snprintf(zpragma_args, sizeof(zpragma_args), "-sccz80 -zcc-opt=\"%s\"", zpragma_opt);
     if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, filenumber, YES, NO))
         return 1;

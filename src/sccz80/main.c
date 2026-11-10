@@ -1110,13 +1110,7 @@ void doinclude(void)
                 closeout();
                 exit(1);
             }
-            if (output_name[0] &&
-                (strcmp(cp, output_name) == 0 ||
-                 (output_exists && st.st_ino != 0 &&
-                  st.st_dev == output_dev && st.st_ino == output_ino))) {
-                fprintf(stderr, "Output file is the same as an include file: %s\n", cp);
-                ccabort();
-            }
+            refuse_include_output(cp);
         }
         if (!copy_fit(include_name, FILENAME_LEN + 1, cp)) {
             fprintf(stderr, "File name is too long\n");
