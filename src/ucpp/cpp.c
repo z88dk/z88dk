@@ -2406,6 +2406,21 @@ static void version(void)
 		fprintf(stderr, "  %s\n", include_path[i]);
 }
 
+/* Same path: equal strings, or two existing files with one non-zero inode. */
+static int same_path(const char *a, const char *b)
+{
+	struct stat sa, sb;
+
+	if (a == 0 || b == 0)
+		return 0;
+	if (strcmp(a, b) == 0)
+		return 1;
+	if (stat(a, &sa) == 0 && stat(b, &sb) == 0 && sa.st_ino != 0
+	    && sa.st_ino == sb.st_ino && sa.st_dev == sb.st_dev)
+		return 1;
+	return 0;
+}
+
 /*
  * parse_opt() initializes many things according to the command-line
  * options.
@@ -2419,7 +2434,7 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 	int i, ret = 0;
 	char *filename = 0;
 	char *extra = 0;
-	int saw_output = 0;
+	char *outarg = 0;
 	int with_std_incpath = 0;
 	int print_version = 0, print_defs = 0, print_asserts = 0;
 	int system_macros = 0, standard_assertions = 1;
@@ -2523,18 +2538,7 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 				error(-1, "missing filename after -o");
 				return 2;
 			}
-			saw_output = 1;
-			if (argv[i][0] == '-' && argv[i][1] == 0) {
-                ls->output = stdout;
-			} else {
-                output_file = argv[i];
-				ls->output = fopen(argv[i], "w");
-				if (!ls->output) {
-					error(-1, "failed to open for "
-						"writing: %s", argv[i]);
-					return 2;
-				}
-			}
+			outarg = argv[i];
 		} else if (!strcmp(argv[i], "-v")) {
 			print_version = 1;
 		} else if (argv[i][1] != 'I' && argv[i][1] != 'J'
@@ -2554,26 +2558,36 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 			filename = argv[i];
 		}
 	}
-	/* cpp infile outfile still writes outfile. A later -o, or a second
-	   name that is the input, must not open that name for write: the
-	   old branch truncated it before -o was seen. */
-	if (extra != 0) {
-		struct stat a, b;
-		int same = filename != 0 && strcmp(extra, filename) == 0;
+	/* Open the output after every name is known. cpp infile outfile
+	   still writes outfile. -o, or a name that is the input, is not
+	   opened for write. */
+	{
+		char *dest = 0;
 
-		if (!same && filename != 0 && stat(filename, &a) == 0
-		    && stat(extra, &b) == 0 && a.st_ino != 0
-		    && a.st_ino == b.st_ino && a.st_dev == b.st_dev)
-			same = 1;
-		if (saw_output || same) {
-			error(-1, "spurious filename '%s'", extra);
-			return 2;
+		if (extra != 0) {
+			if (outarg != 0 || same_path(extra, filename)) {
+				error(-1, "spurious filename '%s'", extra);
+				return 2;
+			}
+			dest = extra;
+		} else if (outarg != 0) {
+			if (outarg[0] == '-' && outarg[1] == 0) {
+				ls->output = stdout;
+			} else if (same_path(outarg, filename)) {
+				error(-1, "output file '%s' is the input file",
+					outarg);
+				return 2;
+			} else {
+				dest = outarg;
+			}
 		}
-		output_file = extra;
-		ls->output = fopen(extra, "w");
-		if (!ls->output) {
-			error(-1, "failed to open for writing: %s", extra);
-			return 2;
+		if (dest != 0) {
+			ls->output = fopen(dest, "w");
+			if (!ls->output) {
+				error(-1, "failed to open for writing: %s", dest);
+				return 2;
+			}
+			output_file = dest;
 		}
 	}
 	init_tables(ls->flags & HANDLE_ASSERTIONS);
