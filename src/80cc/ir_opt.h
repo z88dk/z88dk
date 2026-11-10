@@ -173,6 +173,9 @@ int ir_opt_prune_unreachable(Func *f);
  * arm's constant moves ahead of the test and the branch skips to the join.
  * `--opt-disable=const-diamond` opts out. Returns diamonds rewritten. */
 int ir_opt_const_diamond(Func *f);
+/* 1 when src0 - src1 of this signed 16-bit compare provably cannot overflow, so the
+ * sign of the difference is the answer. `--opt-disable=cmp-noovf` opts out. */
+int ir_cmp_diff_fits(const Func *f, const Op *op);
 int ir_opt_switch_unreachable(Func *f);
 
 /* Byte-width narrowing: a promoted int binop (add/sub/and/or/xor/shl)

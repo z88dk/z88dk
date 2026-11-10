@@ -799,9 +799,11 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
     }
     int sflip_lt = signed_cmp_signflip(out, f, is_signed);
     int cmp_kept_hl = 0;               /* the compare left HL/A untouched */
+    int sbc_hl = 0;                    /* the difference is in HL */
     if (!(IS_808x() || IS_GBZ80())) {
         emit(out, "and\ta");
         emit(out, "sbc\thl,de");
+        sbc_hl = 1;
     } else if (CPU_HAS_CP_HL_DE()) {
         /* VM1 DCMP: HL-DE into the flags in ONE byte, landing the same CF
            (unsigned borrow = src0<src1) as the four-instruction byte-wise
@@ -820,7 +822,11 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         emit(out, "ld\ta,h");
         emit(out, "sbc\ta,d");
     }
-    if (is_signed && !sflip_lt) signed_result_to_carry(out);
+    if (is_signed && !sflip_lt) {
+        /* No overflow possible: the sign of HL is the answer. */
+        if (sbc_hl && ir_cmp_diff_fits(f, op)) emit(out, "add\thl,hl");
+        else signed_result_to_carry(out);
+    }
     int cf_true = cf_true_long;
     if (g_hc.branch_test_kind != 0) {
         const char *cc;
@@ -997,9 +1003,11 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
     }
     int sflip_gt = signed_cmp_signflip(out, f, is_signed);
     int cmp_kept_hl = 0;               /* the compare left HL/A untouched */
+    int sbc_hl = 0;
     if (!(IS_808x() || IS_GBZ80())) {
         emit(out, "and\ta");
         emit(out, "sbc\thl,de");
+        sbc_hl = 1;
     } else if (CPU_HAS_CP_HL_DE()) {
         emit(out, "cp\thl,de");       /* VM1 DCMP, see gen_cmp_lt_ge */
         cmp_kept_hl = !sflip_gt;       /* HL holds src1 here (swap-load) */
@@ -1011,7 +1019,10 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
         emit(out, "ld\ta,h");
         emit(out, "sbc\ta,d");
     }
-    if (is_signed && !sflip_gt) signed_result_to_carry(out);
+    if (is_signed && !sflip_gt) {
+        if (sbc_hl && ir_cmp_diff_fits(f, op)) emit(out, "add\thl,hl");
+        else signed_result_to_carry(out);
+    }
     int cf_true = cf_true_gt;
     if (g_hc.branch_test_kind != 0) {
         int br_true = (g_hc.branch_test_kind == IR_BR_COND);

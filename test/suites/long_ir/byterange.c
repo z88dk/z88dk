@@ -137,6 +137,42 @@ static void check_diamond(void)
     assertEqual(bad, 0);
 }
 
+/* Signed word compares of small-range operands skip the overflow repair. */
+volatile u8 fc;
+static int c_gt(void) { return fb > 96 - fc; }
+static int c_lt(void) { return fb < 96 - fc; }
+static int c_ge(void) { return fb >= 96 - fc; }
+static int c_le(void) { return fb <= 96 - fc; }
+static int c_rev(void) { return 96 - fc < fb; }
+static int c_sub(void) { return (int)fc - 50 < (int)fb - 100; }
+static int c_add(void) { return (int)fb + 16000 > 16100 - (int)fc; }
+
+/* The difference overflows here, so the repair must stay. */
+static int c_big(void) { return (int)fb + 30000 > -30000 - (int)fc; }
+static int c_big2(void) { return -30000 - (int)fc < (int)fb + 30000; }
+
+static void check_cmp(void)
+{
+    int bad = 0;
+    unsigned a, b;
+    for (a = 0; a < 256; a += 5)
+        for (b = 0; b < 256; b += 3) {
+            long d = (long)a - (long)(96 - (int)b);
+            long e = ((long)b - 50) - ((long)a - 100);
+            long g = ((long)a + 16000) - (16100 - (long)b);
+            fb = (u8)a; fc = (u8)b;
+            if ((c_gt() != 0) != (d > 0)) ++bad;
+            if ((c_lt() != 0) != (d < 0)) ++bad;
+            if ((c_ge() != 0) != (d >= 0)) ++bad;
+            if ((c_le() != 0) != (d <= 0)) ++bad;
+            if ((c_rev() != 0) != (d > 0)) ++bad;
+            if ((c_sub() != 0) != (e < 0)) ++bad;
+            if ((c_add() != 0) != (g > 0)) ++bad;
+            if (!c_big() || !c_big2()) ++bad;
+        }
+    assertEqual(bad, 0);
+}
+
 static void check_remat(void)
 {
     unsigned a, b;
@@ -223,6 +259,7 @@ int main(int argc, char *argv[])
     suite_add_test(check_signed);
     suite_add_test(check_ret);
     suite_add_test(check_remat);
+    suite_add_test(check_cmp);
     suite_add_test(check_diamond);
     suite_add_test(check_tern);
     return suite_run();

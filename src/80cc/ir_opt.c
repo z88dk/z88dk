@@ -4204,15 +4204,14 @@ static int demands_low_byte_only(const Func *f, int v)
                 continue;
             if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
                 continue;
-            /* The 16-bit integer helpers take their operands through
+            /* The 16-bit divide helpers take their operands through
                gen_hcall, which zero-extends a byte argument: exact for a
                value that fits a byte. A constant stays wide: `ld hl,K` loads
                it directly, and a byte def would clobber A for nothing. */
             if (byte_val && u->kind == IR_HCALL && u->hcall && u->hcall->name
                 && !v_is_literal_imm(f, v)
                 && (!strcmp(u->hcall->name, "l_div")
-                    || !strcmp(u->hcall->name, "l_div_u")
-                    || !strcmp(u->hcall->name, "l_mult")))
+                    || !strcmp(u->hcall->name, "l_div_u")))
                 continue;
             /* Switch index: the dispatch reads v then widens it to full width
                for the jump-table / case comparisons, so a byte-producing v is
@@ -4772,6 +4771,86 @@ int ir_opt_const_diamond(Func *f)
     }
     free(npred);
     return changed;
+}
+
+/* ---- Small value ranges (ir_cmp_diff_fits) ---------------------------
+   A signed 16-bit compare subtracts the operands and then repairs the sign for
+   an overflow that cannot happen when both are small: `origin > 96 - view_h`
+   subtracts a byte from a value in [-159,96]. Track the exact range of a vreg
+   through the few ops that keep it small and tell the lowerer when the
+   difference always fits, so it can read the sign straight off the result. */
+static int sr_norm(const Func *f, int v, int64_t x)
+{
+    if (f->vregs[v].width == 2 && x > 32767 && x <= 65535) return (int)(x - 65536);
+    return (int)x;
+}
+
+static int sr_range(const Func *f, int v, long *lo, long *hi, int depth)
+{
+    if (v < 0 || v >= f->n_vregs || depth > 4) return 0;
+    if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
+        return 0;
+    const Op *d = NULL;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int ds[8], nd = ir_op_defs(o, ds, 8);
+            for (int k = 0; k < nd; k++)
+                if (ds[k] == v) { if (d) return 0; d = o; }
+        }
+    if (!d) return 0;
+    long l0, h0, l1, h1;
+    switch (d->kind) {
+    case IR_CONV_ZX:
+        if (d->src[0] >= 0 && d->src[0] < f->n_vregs && f->vregs[d->src[0]].width == 1) {
+            *lo = 0; *hi = 255; return 1;
+        }
+        return sr_range(f, d->src[0], lo, hi, depth + 1);
+    case IR_MOV:
+        return sr_range(f, d->src[0], lo, hi, depth + 1);
+    case IR_LD_IMM:
+        if (f->vregs[v].width != 2 || d->imm_sym) return 0;
+        *lo = *hi = sr_norm(f, v, d->imm); return 1;
+    case IR_AND:
+        if (d->src[1] != -1 || d->imm < 0 || d->imm > 32767) return 0;
+        *lo = 0; *hi = d->imm; return 1;
+    case IR_SHR:
+        if (d->src[1] != -1 || (d->imm & IR_SHR_ARITH)) return 0;
+        if (!sr_range(f, d->src[0], &l0, &h0, depth + 1) || l0 < 0) return 0;
+        *lo = 0; *hi = h0 >> (d->imm & 0xff); return 1;
+    case IR_RSUB:
+        if (d->src[1] != -1 || !sr_range(f, d->src[0], &l0, &h0, depth + 1)) return 0;
+        *lo = sr_norm(f, v, d->imm) - h0; *hi = sr_norm(f, v, d->imm) - l0; break;
+    case IR_ADD: case IR_SUB: {
+        if (!sr_range(f, d->src[0], &l0, &h0, depth + 1)) return 0;
+        if (d->src[1] >= 0) {
+            if (!sr_range(f, d->src[1], &l1, &h1, depth + 1)) return 0;
+        } else {
+            l1 = h1 = sr_norm(f, v, d->imm);
+        }
+        if (d->kind == IR_ADD) { *lo = l0 + l1; *hi = h0 + h1; }
+        else                   { *lo = l0 - h1; *hi = h0 - l1; }
+        break;
+    }
+    default:
+        return 0;
+    }
+    return *lo >= -32768 && *hi <= 32767;
+}
+
+/* Does src0 - src1 of this 16-bit compare always fit a signed word? Both
+   operands within +-16383 guarantees it. */
+int ir_cmp_diff_fits(const Func *f, const Op *op)
+{
+    if (!f || !op || opt_disabled("cmp-noovf")) return 0;
+    long l0, h0, l1, h1;
+    if (!sr_range(f, op->src[0], &l0, &h0, 0)) return 0;
+    if (op->src[1] >= 0) {
+        if (!sr_range(f, op->src[1], &l1, &h1, 0)) return 0;
+    } else {
+        l1 = h1 = op->imm;
+    }
+    return l0 >= -16384 && h0 <= 16383 && l1 >= -16384 && h1 <= 16383;
 }
 
 /* ---- Signed compares that need no sign correction (ir_opt_cmp_unsign) ----
