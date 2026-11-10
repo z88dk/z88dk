@@ -272,6 +272,7 @@ extern int      dumpzero(int size, int count);
 extern void     openin(void);
 extern void     newfile(void);
 extern void     doinclude(void);
+extern void     refuse_include_output(const char *name);
 extern void     endinclude(void);
 extern void     closeout(void);
 extern void     WriteDefined(char *sname, int value);

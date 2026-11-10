@@ -453,6 +453,8 @@ int hex(char c)
 }
 
 
+static void raw_string_eol(void);
+
 int pstr(LVALUE *lval)
 {
     int k;
@@ -465,8 +467,13 @@ int pstr(LVALUE *lval)
     }
     if (cmatch('\'')) {
         k = 0;
-        while (ch() && ch() != '\'')
+        while (ch() != '\'') {
+            if (ch() == 0) {
+                raw_string_eol();
+                break;
+            }
             k = (k & 255) * 256 + litchar();
+        }
         gch();
         lval->const_val = k;
         return (1);
@@ -1252,7 +1259,22 @@ static void decompose_float(double raw, struct fp_decomposed *fs)
 
     norm = x / pow(2, exp);
 
-    fs->exponent = (int)exp + exp_bias;
+    /* A bias of INT_MAX must not overflow the signed add. The stored
+       exponent is a byte. */
+    {
+        long sum = (long)exp_bias;
+        if (exp > 255.0)
+            sum += 255;
+        else if (exp < -255.0)
+            sum -= 255;
+        else
+            sum += (long)exp;
+        if (sum > 255)
+            sum = 255;
+        else if (sum < 0)
+            sum = 0;
+        fs->exponent = (int)sum;
+    }
     for (i = 0; i < (mant_bytes * 2) + 1; i++) {
         double mult = norm * 16.;
         double res = floor(mult);

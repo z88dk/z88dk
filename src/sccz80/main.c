@@ -905,6 +905,35 @@ static int same_existing_file(const struct stat *a, const char *path)
     return a->st_dev == b.st_dev && a->st_ino == b.st_ino;
 }
 
+/* #line names from ucpp include the quotes. The raw #include path does not. */
+void refuse_include_output(const char *name)
+{
+    char buf[FILENAME_LEN + 1];
+    const char *cp = name;
+    size_t n;
+    struct stat st;
+
+    if (name == NULL || output_name[0] == '\0' || name[0] == '\0')
+        return;
+    n = strlen(name);
+    if (n >= 2 && name[0] == '"' && name[n - 1] == '"') {
+        n -= 2;
+        if (n >= sizeof(buf))
+            return;
+        memcpy(buf, name + 1, n);
+        buf[n] = '\0';
+        cp = buf;
+    }
+    if (cp[0] == '\0')
+        return;
+    if (strcmp(cp, output_name) == 0 ||
+        (stat(cp, &st) == 0 && output_exists && st.st_ino != 0 &&
+         st.st_dev == output_dev && st.st_ino == output_ino)) {
+        fprintf(stderr, "Output file is the same as an include file: %s\n", cp);
+        ccabort();
+    }
+}
+
 void openout(void)
 {
     char filen2[FILENAME_LEN + 1];
@@ -1304,10 +1333,8 @@ static int looks_like_option(const char *val)
         n = strlen(o->long_name);
         if (strncmp(p, o->long_name, n) != 0)
             continue;
+        /* -D and -D=name are options. -DEBUG is a path. */
         if (p[n] == '\0' || p[n] == '=')
-            return 1;
-        /* -DFOO is the -D option. A longer name must match in full. */
-        if (n == 1)
             return 1;
     }
     return 0;

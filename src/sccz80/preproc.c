@@ -239,7 +239,8 @@ void ifline(void)
                 errno = 0;
                 lnum = strtol(line + lptr, &end, 10);
                 if (end != line + lptr) {
-                    if (errno == ERANGE || lnum < 0 || lnum > INT_MAX) {
+                    /* The next line does ++lineno, so INT_MAX itself overflows. */
+                    if (errno == ERANGE || lnum < 0 || lnum > INT_MAX - 1) {
                         fprintf(stderr, "Line number is out of range\n");
                         exit(1);
                     }
@@ -278,6 +279,7 @@ void ifline(void)
                     lineno = num - 1;
 
                 if (strlen(string)) {
+                    refuse_include_output(string);
                     if ( strcmp(Filename, string)) {
                         emitline = 1;
                     }
