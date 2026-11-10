@@ -1794,6 +1794,7 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
    [dead-store] write context (save/restore — nests via pending_spill_resolve)
    so every slot_off it makes counts as a write, not a read. */
 static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id);
+static int byte_home_is_de_lane(int v);
 /* Store the byte held in register `reg` (l, e, c ...) as vreg's value. Where the
    frame slot is a plain (ix+d) the store is `ld (ix+d),reg` and A is never
    touched; every other path loads A first and goes through store_a_byte. */
@@ -1873,6 +1874,8 @@ static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id)
     PhysReg bh = byte_home_phys(f, vreg_id);
     if (bh != IR_PR_NONE) {
         emit(out, "ld\t%s,a", byte_home_reg(bh));
+        /* Writing E or D makes whatever the pair belief names stale. */
+        if (byte_home_is_de_lane(vreg_id)) invalidate_de_cache();
         byte_home_note(vreg_id);
         if (byte_home_slotbacked(bh)) L.cur_de_byte_home_dirty = 1;
         cache_a(vreg_id);   /* A still holds the value — next read elides */
