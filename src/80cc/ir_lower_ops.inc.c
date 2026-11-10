@@ -3017,14 +3017,35 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\tb,l");
                 load_byte_to_a(out, f, op->src[0]);
             }
-            emit(out, "inc\t%s", counter);
-            emit(out, "dec\t%s", counter);
-            emit(out, "jr\tz,L_f%d_bshl_end_%d", L.func_emit_idx, n);
-            fprintf(out, "L_f%d_bshl_loop_%d:\n", L.func_emit_idx, n);
-            emit(out, "add\ta,a");
-            emit(out, "dec\t%s", counter);
-            emit(out, "jr\tnz,L_f%d_bshl_loop_%d", L.func_emit_idx, n);
-            fprintf(out, "L_f%d_bshl_end_%d:\n", L.func_emit_idx, n);
+            if (c_opt_code_size) {
+                /* Test at the bottom: counter+1 into the decrement runs the body
+                   `counter` times, and zero runs it not at all. Smallest, but it
+                   pays a taken jump on entry. */
+                emit(out, "inc\t%s", counter);
+                emit(out, "jr\tL_f%d_bshl_test_%d", L.func_emit_idx, n);
+                fprintf(out, "L_f%d_bshl_loop_%d:\n", L.func_emit_idx, n);
+                emit(out, "add\ta,a");
+                fprintf(out, "L_f%d_bshl_test_%d:\n", L.func_emit_idx, n);
+                if (!use_e && shift_djnz_ok()) {
+                    emit(out, "djnz\tL_f%d_bshl_loop_%d", L.func_emit_idx, n);
+                } else {
+                    emit(out, "dec\t%s", counter);
+                    emit(out, "jr\tnz,L_f%d_bshl_loop_%d", L.func_emit_idx, n);
+                }
+            } else {
+                emit(out, "inc\t%s", counter);
+                emit(out, "dec\t%s", counter);
+                emit(out, "jr\tz,L_f%d_bshl_end_%d", L.func_emit_idx, n);
+                fprintf(out, "L_f%d_bshl_loop_%d:\n", L.func_emit_idx, n);
+                emit(out, "add\ta,a");
+                if (!use_e && shift_djnz_ok()) {
+                    emit(out, "djnz\tL_f%d_bshl_loop_%d", L.func_emit_idx, n);
+                } else {
+                    emit(out, "dec\t%s", counter);
+                    emit(out, "jr\tnz,L_f%d_bshl_loop_%d", L.func_emit_idx, n);
+                }
+                fprintf(out, "L_f%d_bshl_end_%d:\n", L.func_emit_idx, n);
+            }
             if (!use_e) {
                 if (bc_live) emit_sp(out, -2, "pop\tbc");
                 else         invalidate_bc_cache();

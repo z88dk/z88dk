@@ -189,6 +189,7 @@ exists (ADR 0010).
 | `iy-lone-temp` | in frame-pointer mode, an IY pack whose only tenant is one one-use temp computed from single-definition values is kept (push hl;pop iy and push iy;pop hl) instead of parking the temp on the stack |
 | `byte-bc-home` | on the Z80 family (not 8080/8085/gbz80/Rabbit/eZ80), a byte may be homed in B and C across blocks, two at once, in functions without calls; off restores the single-block C home |
 | `shr-byte-src` | on the CB-shift CPUs, a word-wide constant logical `>>` whose source fits a byte shifts the low byte alone (`srl l`, or rotate and mask) instead of the 16-bit `srl h; rra` chain |
+| `shift-djnz` | a variable-count byte shift whose counter is B uses `djnz` (top-tested) instead of `dec b; jr nz`; with `--opt-code-size` every variable byte shift loop is tested at the bottom, which saves a byte or two and costs a taken jump on entry |
 | `bit-hi0` | a word AND/OR/XOR whose second operand fits a byte skips the high-byte half of the sequence (the operands are swapped to put the byte one second; not on Rabbit, and no swap on ez80 in sp mode) |
 | `shl8-byte-src` | a word `<< 8` or more of a value not yet in a register pair reads only its low byte (`ld h,a; ld l,0`), not the whole word and a dead `ld h,0`; not on Rabbit or kc160, which load the word natively |
 | `asr-nonneg` | a signed `>>` of a value that fits a byte is treated as the logical shift, so the byte routes can narrow it (`0x80 >> n`) |

@@ -7089,6 +7089,12 @@ static void emit_frame_addr_hl(FILE *out, const Func *f, int canon_off)
     emit(out, "add\thl,sp");
 }
 
+/* `djnz` exists on the Z80 family and Rabbits; the 8080 family and gbz80 lack it. */
+static int shift_djnz_ok(void)
+{
+    return !IS_808x() && !IS_GBZ80() && !opt_disabled("shift-djnz");
+}
+
 #include "ir_lower_regcache.inc.c"
 #include "ir_lower_analysis.inc.c"
 #include "ir_lower_ops.inc.c"

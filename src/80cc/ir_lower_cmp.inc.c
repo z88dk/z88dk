@@ -1470,14 +1470,33 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         if (save_a) emit_sp(out, -2, "pop\taf");
         else         load_byte_to_a(out, f, op->src[0]);
         cache_a(op->src[0]);
-        emit(out, "inc\t%s", counter);
-        emit(out, "dec\t%s", counter);
-        emit(out, "jr\tz,L_f%d_bshr_end_%d", L.func_emit_idx, n);
-        fprintf(out, "L_f%d_bshr_loop_%d:\n", L.func_emit_idx, n);
-        emit(out, arith ? "sra\ta" : "srl\ta");
-        emit(out, "dec\t%s", counter);
-        emit(out, "jr\tnz,L_f%d_bshr_loop_%d", L.func_emit_idx, n);
-        fprintf(out, "L_f%d_bshr_end_%d:\n", L.func_emit_idx, n);
+        if (c_opt_code_size) {
+            /* Test at the bottom, as in gen_shl's byte loop. */
+            emit(out, "inc\t%s", counter);
+            emit(out, "jr\tL_f%d_bshr_test_%d", L.func_emit_idx, n);
+            fprintf(out, "L_f%d_bshr_loop_%d:\n", L.func_emit_idx, n);
+            emit(out, arith ? "sra\ta" : "srl\ta");
+            fprintf(out, "L_f%d_bshr_test_%d:\n", L.func_emit_idx, n);
+            if (!use_e && shift_djnz_ok()) {
+                emit(out, "djnz\tL_f%d_bshr_loop_%d", L.func_emit_idx, n);
+            } else {
+                emit(out, "dec\t%s", counter);
+                emit(out, "jr\tnz,L_f%d_bshr_loop_%d", L.func_emit_idx, n);
+            }
+        } else {
+            emit(out, "inc\t%s", counter);
+            emit(out, "dec\t%s", counter);
+            emit(out, "jr\tz,L_f%d_bshr_end_%d", L.func_emit_idx, n);
+            fprintf(out, "L_f%d_bshr_loop_%d:\n", L.func_emit_idx, n);
+            emit(out, arith ? "sra\ta" : "srl\ta");
+            if (!use_e && shift_djnz_ok()) {
+                emit(out, "djnz\tL_f%d_bshr_loop_%d", L.func_emit_idx, n);
+            } else {
+                emit(out, "dec\t%s", counter);
+                emit(out, "jr\tnz,L_f%d_bshr_loop_%d", L.func_emit_idx, n);
+            }
+            fprintf(out, "L_f%d_bshr_end_%d:\n", L.func_emit_idx, n);
+        }
         if (!use_e) {
             if (bc_live) emit_sp(out, -2, "pop\tbc");
             else         invalidate_bc_cache();
