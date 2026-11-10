@@ -490,7 +490,7 @@ static arg_t  config[] = {
     { "Z88MATHLIB", AF_DEPRECATED, SetStringConfig, &c_altmathlib, NULL, "Name of the alt maths library (use ALTMATHLIB)" },
     { "Z88MATHFLG", AF_DEPRECATED, SetStringConfig, &c_altmathflags, NULL, "Additional options for non-generic maths (use ALTMATHFLG)" },
     { "STARTUPLIB", 0, SetStringConfig, &c_startuplib, NULL, "" },
-    { "GENMATHLIB", 0, SetStringConfig, &c_genmathlib, NULL, "" },
+    { "GENMATHLIB", 0, SetStringConfig, &c_genmathlib, NULL, "Name of the -lm library (default math32)" },
     { "SUBTYPE",  0, AddArray, &c_subtype_array, &c_subtype_array_num, "Add a sub-type alias and config" },
     { "CLIB",  0, AddArray, &c_clib_array, &c_clib_array_num, "Add a clib variant config" },
     { "ALIAS",  0, AddArray, &c_aliases_array, &c_aliases_array_num, "Add an alias and options" },
@@ -1475,7 +1475,7 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    /* -lm is math32 on every target.  The library rename happens later in
+    /* -lm is math32 unless a cfg sets GENMATHLIB.  The library rename happens later in
      * configure_maths_library(); the IEEE width has to be chosen here, before
      * configure_compiler().  An explicit fp-mode (command line or an alias
      * such as --math-mbf32 / --genmath / --math48) wins.  parse_option()
@@ -1609,7 +1609,7 @@ int main(int argc, char **argv)
         exit(c_help ? 0 : 1);
     }
 
-    /* -lm → GENMATHLIB (math32@{ZCC_LIBCPU} unless a cfg overrides it).
+    /* -lm is math32@{ZCC_LIBCPU} unless a cfg sets GENMATHLIB.
      * Classic and newlib both.  -lmz stays the ROM library. */
     if (linker_linklib_first) configure_maths_library(&linker_linklib_first);
 
@@ -3733,7 +3733,7 @@ static void configure_maths_library(char **libstring)
 {
     char   buf[1024];
 
-    /* -lm is GENMATHLIB (math32 by default).  -lmz is Z88MATHLIB/ALTMATHLIB. */
+    /* -lm is math32 unless a cfg sets GENMATHLIB.  -lmz is Z88MATHLIB/ALTMATHLIB. */
 
     if (c_altmathlib) {
         const char *from = quoted_linklib(*libstring, "lmz");
