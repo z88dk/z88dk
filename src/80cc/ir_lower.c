@@ -1139,10 +1139,10 @@ static int hlde_full_reload(const char *s, const char *pair)
    z80n `jr` is slower than `jp`. A CONDITIONAL branch can amortise it — its
    not-taken path is cheaper — so those are relaxed everywhere.
    Per-CPU timings and the measurement that refused a global override:
-   ADR 0033. */
+   ADR 0033. `--opt-code-size` asks for the shorter form regardless. */
 static int relax_uncond_ok(void)
 {
-    return IS_GBZ80() || IS_EZ80() || IS_KC160() || IS_RABBIT()
+    return c_opt_code_size || IS_GBZ80() || IS_EZ80() || IS_KC160() || IS_RABBIT()
         || c_cpu == CPU_Z180;
 }
 

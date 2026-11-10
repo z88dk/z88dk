@@ -2067,7 +2067,18 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                chain's flags are dead at the closing `ld l,a`. */
             int use_a_chain = cb_shift_cpu() && count >= 2 && count < 8
                               && !opt_disabled("shr-a-chain");
-            if (use_a_chain) {
+            if ((op->imm & IR_SHR_BYTESRC) && cb_shift_cpu() && count >= 1 && count < 8
+                && !opt_disabled("shr-byte-src")) {
+                /* H is already zero: shift the low byte alone. */
+                if (count < 4) {
+                    for (int k = 0; k < count; k++) emit(out, "srl\tl");
+                } else {
+                    emit(out, "ld\ta,l");
+                    emit_byte_lsr_a(out, count, 0);
+                    emit(out, "ld\tl,a");
+                    invalidate_a_cache();
+                }
+            } else if (use_a_chain) {
                 emit(out, "ld\ta,l");
                 for (int k = 0; k < count; k++) {
                     emit(out, "srl\th");

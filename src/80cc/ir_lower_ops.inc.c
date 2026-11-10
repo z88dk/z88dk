@@ -3286,6 +3286,18 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
                 }
             }
         }
+        /* The high byte shifts out, so a source that is not already in a pair
+           needs only its low byte, not the whole word and a dead `ld h,0`. */
+        if (count >= 8 && !hl_has(op->src[0]) && !bc_has(op->src[0])
+            && !de_has(op->src[0]) && !opt_disabled("shl8-byte-src")
+            && !IS_RABBIT() && !IS_KC160()) {   /* native (sp+N) word loads */
+            load_byte_to_a(out, f, op->src[0]);
+            emit(out, "ld\th,a");
+            emit(out, "ld\tl,0");
+            invalidate_a_cache();
+            invalidate_hl_cache();
+            goto shl_int_bit_remainder;
+        }
         load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
         if (count > 0 && shl_word_copy_de_ok(f, op)) {
             invalidate_de_cache();
@@ -7904,9 +7916,14 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
     emit(out, "ld\ta,l");
     emit(out, "%s\te", mnem);
     emit(out, "ld\tl,a");
-    emit(out, "ld\ta,h");
-    emit(out, "%s\td", mnem);
-    emit(out, "ld\th,a");
+    if (op->imm & IR_BIT_HI0) {
+        /* The second operand's high byte is zero. */
+        if (op->kind == IR_AND) emit(out, "ld\th,0");
+    } else {
+        emit(out, "ld\ta,h");
+        emit(out, "%s\td", mnem);
+        emit(out, "ld\th,a");
+    }
     commit_hl_word(out, f, op->dst);
     if (de_has(op->dst)) invalidate_de_cache();       /* DE holds the old value */
     return 0;

@@ -188,6 +188,11 @@ exists (ADR 0010).
 | `iy-temp-pack` | no IY packing for a short-lived temporary |
 | `iy-lone-temp` | in frame-pointer mode, an IY pack whose only tenant is one one-use temp computed from single-definition values is kept (push hl;pop iy and push iy;pop hl) instead of parking the temp on the stack |
 | `byte-bc-home` | on the Z80 family (not 8080/8085/gbz80/Rabbit/eZ80), a byte may be homed in B and C across blocks, two at once, in functions without calls; off restores the single-block C home |
+| `shr-byte-src` | on the CB-shift CPUs, a word-wide constant logical `>>` whose source fits a byte shifts the low byte alone (`srl l`, or rotate and mask) instead of the 16-bit `srl h; rra` chain |
+| `bit-hi0` | a word AND/OR/XOR whose second operand fits a byte skips the high-byte half of the sequence (the operands are swapped to put the byte one second; not on Rabbit, and no swap on ez80 in sp mode) |
+| `shl8-byte-src` | a word `<< 8` or more of a value not yet in a register pair reads only its low byte (`ld h,a; ld l,0`), not the whole word and a dead `ld h,0`; not on Rabbit or kc160, which load the word natively |
+| `asr-nonneg` | a signed `>>` of a value that fits a byte is treated as the logical shift, so the byte routes can narrow it (`0x80 >> n`) |
+| `and-byte-shr` | a word AND with a byte-fitting operand narrows its other operand when a right shift produced it, and the AND itself narrows to a byte |
 | `iy-long` | do not run the IY packs in a function the BC veto excludes |
 | `lra` | no linear-scan-style IY interval picking |
 | `graph-alloc` | no interference-graph-driven index benefit |
@@ -406,7 +411,7 @@ exists (ADR 0010).
 | `tm-thread` | a jump to a label whose block is a lone `jp` is not sent straight to that target after tail merging |
 | `block-layout` | no trace movement to delete a jump |
 | `block-layout-rounds` | block layout runs once, so a trace ending in a jump that another move replaced stays put |
-| `jr-relax` | `jp` is never relaxed to `jr` |
+| `jr-relax` | `jp` is never relaxed to `jr` (with `--opt-code-size`, an unconditional `jp` is relaxed on every CPU that has `jr`, not only where `jr` is no slower) |
 | `label-elide` | dead basic-block labels are kept in the output |
 | `ret-thread` | a jump to a `ret` is not threaded |
 | `defassign-verify` | not an optimisation: no stderr warning for a local that is read but never written on any path (`IR_DEFASSIGN_VERIFY=1` widens it, `=2` aborts) |

@@ -3951,6 +3951,22 @@ static int v_is_const_shr(const Func *f, int v)
     return seen;
 }
 
+/* True when every definition of v is a logical right shift (any count). */
+static int v_is_logical_shr(const Func *f, int v)
+{
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *d = &bb->ops[j];
+            if (d->dst != v) continue;
+            if (d->kind != IR_SHR || (d->imm & IR_SHR_ARITH)) return 0;
+            seen = 1;
+        }
+    }
+    return seen;
+}
+
 static int shrwide_on(void)
 { return !opt_disabled("shr-wide"); }                                   /* default ON */
 
@@ -4202,6 +4218,14 @@ static int demands_low_byte_only(const Func *f, int v)
                    the high byte supplies. */
                 && (v_fits_byte(f, u->src[0]) || shr_result_masked_below(f, u)))
                 continue;
+            /* A two-operand AND whose OTHER operand fits a byte reads only v's
+               low byte, and its own result fits a byte too. Limited to values a
+               right shift produced, where the byte form is the cheaper one. */
+            if (u->kind == IR_AND && u->src[0] >= 0 && u->src[1] >= 0
+                && !opt_disabled("and-byte-shr") && v_is_logical_shr(f, v)) {
+                int other = (u->src[0] == v) ? u->src[1] : u->src[0];
+                if (other != v && v_fits_byte(f, other)) continue;
+            }
             if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
                 continue;
             /* The 16-bit divide helpers take their operands through
@@ -4924,6 +4948,13 @@ static int bitop_of_bytes(const Func *f, int v)
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *op = &bb->ops[j];
             if (op->dst != v) continue;
+            /* AND: one byte operand zeroes the high byte whatever the other is. */
+            if (op->kind == IR_AND && !opt_disabled("and-byte-shr")
+                && op->src[0] >= 0 && op->src[1] >= 0
+                && (v_fits_byte(f, op->src[0]) || v_fits_byte(f, op->src[1]))) {
+                seen = 1;
+                continue;
+            }
             if (op->kind != IR_OR
                 || op->src[0] < 0 || !v_fits_byte(f, op->src[0])) return 0;
             if (op->src[1] >= 0 ? !v_fits_byte(f, op->src[1])
@@ -4938,6 +4969,23 @@ int ir_opt_narrow_byte(Func *f)
 {
     if (!f) return 0;
     if (opt_disabled("narrow-byte")) return 0;
+    /* A signed `>>` of a value that fits a byte is non-negative, so it is the
+       same as the logical shift. Dropping the arithmetic marker lets the byte
+       routes below see it: an unsigned-byte proof exists for it (a constant
+       such as 0x80 is no sign-extended byte, but it is a byte). */
+    if (!opt_disabled("asr-nonneg")) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                if (op->kind != IR_SHR || !(op->imm & IR_SHR_ARITH)) continue;
+                if (op->src[0] < 0 || op->src[0] >= f->n_vregs) continue;
+                if (op->dst < 0 || f->vregs[op->dst].width != 2) continue;
+                if (f->vregs[op->src[0]].width != 2) continue;
+                if (v_fits_byte(f, op->src[0])) op->imm &= ~IR_SHR_ARITH;
+            }
+        }
+    }
     /* A vreg is a candidate iff it has ≥1 def and EVERY def is a
        narrowable op (so each def has an 8-bit lowering). Multi-def is
        allowed — the diamond `if(c&m) c=(c<<1)^p; else c<<=1;` defines
@@ -4981,6 +5029,46 @@ int ir_opt_narrow_byte(Func *f)
        and that AND is the only reader (shr_result_masked_below proved it).
        Logical only — a rotate does not propagate a sign. Runs after the fixed
        point, so `width == 1` here means the vreg really did narrow. */
+    /* [IR_BIT_HI0] A word AND/OR/XOR with one operand that fits a byte. The
+       operands commute, so the byte one goes second. */
+    if (!opt_disabled("bit-hi0") && !IS_RABBIT()) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                if (op->kind != IR_AND && op->kind != IR_OR && op->kind != IR_XOR) continue;
+                if (op->src[0] < 0 || op->src[1] < 0 || op->dst < 0) continue;
+                if (op->src[0] >= f->n_vregs || op->src[1] >= f->n_vregs) continue;
+                if (f->vregs[op->dst].width != 2) continue;
+                if (f->vregs[op->src[0]].width != 2 || f->vregs[op->src[1]].width != 2) continue;
+                if (v_fits_byte(f, op->src[1])) op->imm |= IR_BIT_HI0;
+                else if (!(IS_EZ80() && c_framepointer_is_ix == -1)   /* sp mode: the swap costs bytes */
+                         && v_fits_byte(f, op->src[0])) {
+                    int t = op->src[0]; op->src[0] = op->src[1]; op->src[1] = t;
+                    op->imm |= IR_BIT_HI0;
+                }
+            }
+        }
+    }
+    /* Only the CB-shift CPUs lower the flag; elsewhere the count is read from
+       the whole immediate. */
+    if (!opt_disabled("shr-byte-src")
+        && (c_cpu == CPU_Z80 || IS_R800() || c_cpu == CPU_Z180 || IS_EZ80()
+            || IS_GBZ80() || IS_KC160())) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                int cnt = (int)(op->imm & 0x1f);
+                if (op->kind != IR_SHR || op->src[1] != -1) continue;
+                if (op->imm & (IR_SHR_ARITH | IR_SHR_MASKED | IR_SHR_TOPBYTE)) continue;
+                if (cnt < 1 || cnt > 7) continue;
+                if (op->dst < 0 || op->dst >= f->n_vregs || op->src[0] < 0) continue;
+                if (f->vregs[op->dst].width != 2) continue;
+                if (v_fits_byte(f, op->src[0])) op->imm |= IR_SHR_BYTESRC;
+            }
+        }
+    }
     if (shrmask_on()) {
         for (int b = 0; b < f->n_bbs; b++) {
             BB *bb = &f->bbs[b];

@@ -465,6 +465,14 @@ typedef enum {
    which costs (8-n) one-byte `add hl,hl` instead of n four-byte `srl h; rr l`
    — and on 808x replaces a call to the l_asr_u runtime loop outright. */
 #define IR_SHR_TOPBYTE ((int64_t)1 << 42)
+/* Set on a WORD-wide constant-count LOGICAL shift whose source provably fits a
+   byte: the high byte is zero before and after, so the shift is a byte shift on
+   L alone (`srl l`, or a rotate and mask) and H is never touched. */
+#define IR_SHR_BYTESRC ((int64_t)1 << 43)
+/* Set on a WORD-wide two-operand AND/OR/XOR whose second operand provably fits a
+   byte: its high byte is zero, so OR/XOR leave the first operand's high byte
+   alone and AND clears it, and the high-byte half of the sequence is not needed. */
+#define IR_BIT_HI0 ((int64_t)1 << 44)
 
 /* ----- ABI / call descriptors ------------------------------------------ */
 
