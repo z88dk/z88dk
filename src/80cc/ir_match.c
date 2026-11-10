@@ -1862,9 +1862,9 @@ static int pack_analyze(Func *f, BB *bb, const int *def_idx,
     if (le_ok)      { is_be = 0; base_off = le_off; }
     else if (be_ok) { is_be = 1; base_off = be_end - (want_lanes - 1); }
     else return -1;
-    /* A byte-reversed load is emitted as LD_MEM + a 16-bit ROTL by 8, which
-       only exists at width 2; width-4 reversal needs its own op (unbuilt). */
-    if (is_be && w != 2) return -1;
+    /* A byte-reversed load is a wide load plus a reversal: a 16-bit ROTL by 8
+       at width 2, IR_BSWAP at width 4. */
+    if (is_be && w != 2 && (w != 4 || opt_disabled("pack-be32"))) return -1;
 
     /* Window safety: between the first matched load and the root OR,
        no stores / calls / asm / io and no redef of base. */
@@ -1991,11 +1991,11 @@ static void packbytes_apply(Func *f, BB *bb, const int idx[],
         /* A 16-bit byte swap IS a rotate by 8, so the existing ROTL lowering
            does the work — no new IR op for the width-2 case. */
         memset(root, 0, sizeof(*root));
-        root->kind   = IR_ROTL;
+        root->kind   = (w == 4) ? IR_BSWAP : IR_ROTL;
         root->dst    = dst;
         root->src[0] = load_dst;
         root->src[1] = -1;
-        root->imm    = 8;
+        root->imm    = (w == 4) ? 0 : 8;
         root->label  = -1;
         root->file   = file;
         root->line   = line;
