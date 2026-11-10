@@ -156,6 +156,10 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         }
         argnumber++;
         tmpfiles[argnumber] = my_tmpfile();
+        if (tmpfiles[argnumber] == NULL) {
+            fprintf(stderr, "Cannot create temporary file\n");
+            ccabort();
+        }
         tmplinenos[argnumber] = lineno;
         push_buffer_fp(tmpfiles[argnumber]);
 

@@ -89,6 +89,28 @@ void leave_call_nest(void)
         --call_nest;
 }
 
+void enter_stmt_nest(void)
+{
+    nest_limit(&stmt_nest, MAX_STMT_LEVELS, "Statements are nested too deeply");
+}
+
+void leave_stmt_nest(void)
+{
+    if (stmt_nest > 0)
+        --stmt_nest;
+}
+
+void enter_heira_nest(void)
+{
+    nest_limit(&unary_nest, MAX_UNARY_LEVELS, "Expression is too deeply nested");
+}
+
+void leave_heira_nest(void)
+{
+    if (unary_nest > 0)
+        --unary_nest;
+}
+
 /* These two used to keep track of what goes on stack, and what comes
  * off of stack, guess 100 is enough to be going on with?
  */

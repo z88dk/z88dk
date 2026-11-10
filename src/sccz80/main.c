@@ -12,6 +12,10 @@
 #define eof sccz80_mingw_io_eof
 #include <sys/stat.h>
 #undef eof
+#ifdef _WIN32
+#include <time.h>
+#include <process.h>
+#endif
 
 #if !defined(S_ISREG)
 #define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
@@ -44,6 +48,12 @@ static Type *type_double8 = &(Type){ KIND_DOUBLE, 8, 0, .len=1 };
 
 char Filenorig[FILENAME_LEN + 1];
 static char output_name[FILENAME_LEN + 1];
+/* The destination is created only when compilation finishes. An abort
+   must not truncate -o, because that file may also be an include. */
+static int output_publish;
+static int output_exists;
+static dev_t output_dev;
+static ino_t output_ino;
 
 
 int c_notaltreg; /* No alternate registers */
@@ -369,6 +379,8 @@ int main(int argc, char** argv)
     }
 
     gen_file_footer(); /* follow-up code */
+    check_if_nest();
+    output_publish = 1;
     closeout();
     errsummary(); /* summarize errors */
     if (errcnt)
@@ -822,6 +834,66 @@ int dumpzero(int size, int count)
 /*
  *      Get output filename
  */
+#ifdef _WIN32
+/* msys2 tmpfile() returns NULL. Same pattern as callfunc.c. */
+static char **output_temps;
+static int output_temps_num;
+
+static void cleanup_output_temps(void)
+{
+    int i;
+
+    for (i = 0; i < output_temps_num; i++) {
+        unlink(output_temps[i]);
+        free(output_temps[i]);
+    }
+}
+
+static FILE *output_tmpfile(void)
+{
+    static char prefix[FILENAME_MAX + 1];
+    static int inited = 0;
+    char *tmpnam_path;
+    char *saved;
+    FILE *fp;
+
+    if (!inited) {
+        snprintf(prefix, sizeof(prefix), "sccz80%08X%04X",
+            (unsigned)_getpid(), ((unsigned)time(NULL)) & 0xffffu);
+        inited = 1;
+        atexit(cleanup_output_temps);
+    }
+    tmpnam_path = _tempnam(".\\", prefix);
+    if (tmpnam_path == NULL) {
+        fprintf(stderr, "Cannot create temporary file\n");
+        exit(1);
+    }
+    saved = strdup(tmpnam_path);
+    free(tmpnam_path);
+    if (saved == NULL) {
+        fprintf(stderr, "Cannot create temporary file\n");
+        exit(1);
+    }
+    output_temps = realloc(output_temps, (output_temps_num + 1) * sizeof(output_temps[0]));
+    if (output_temps == NULL) {
+        fprintf(stderr, "Cannot create temporary file\n");
+        exit(1);
+    }
+    output_temps[output_temps_num++] = saved;
+    fp = fopen(saved, "w+");
+    if (fp == NULL) {
+        fprintf(stderr, "Cannot create temporary file\n");
+        exit(1);
+    }
+    return fp;
+}
+#else
+static FILE *output_tmpfile(void)
+{
+    return tmpfile();
+}
+#endif
+
 static int same_existing_file(const struct stat *a, const char *path)
 {
     struct stat b;
@@ -876,12 +948,23 @@ void openout(void)
         fprintf(stderr, "Output file is the same as the input file: %s\n", outpath);
         exit(1);
     }
-    if ((output = fopen(outpath, "w")) == NULL) {
-        fprintf(stderr, "Cannot open output file: %s\n", outpath);
-        exit(1);
+    output_exists = 0;
+    output_publish = 0;
+    {
+        struct stat out_st;
+
+        if (stat(outpath, &out_st) == 0 && out_st.st_ino != 0) {
+            output_exists = 1;
+            output_dev = out_st.st_dev;
+            output_ino = out_st.st_ino;
+        }
     }
     if (!copy_fit(output_name, sizeof(output_name), outpath)) {
         fprintf(stderr, "File name is too long\n");
+        exit(1);
+    }
+    if ((output = output_tmpfile()) == NULL) {
+        fprintf(stderr, "Cannot create temporary file\n");
         exit(1);
     }
     clear(); /* erase line */
@@ -998,6 +1081,13 @@ void doinclude(void)
                 closeout();
                 exit(1);
             }
+            if (output_name[0] &&
+                (strcmp(cp, output_name) == 0 ||
+                 (output_exists && st.st_ino != 0 &&
+                  st.st_dev == output_dev && st.st_ino == output_ino))) {
+                fprintf(stderr, "Output file is the same as an include file: %s\n", cp);
+                ccabort();
+            }
         }
         if (!copy_fit(include_name, FILENAME_LEN + 1, cp)) {
             fprintf(stderr, "File name is too long\n");
@@ -1043,21 +1133,53 @@ void endinclude(void)
  */
 void closeout(void)
 {
+    FILE *dest;
+    int c;
     int bad;
 
     tofile(); /* if diverted, return to file */
-    if (output) {
-        bad = ferror(output);
-        if (fflush(output) != 0)
+    if (output == NULL)
+        return;
+    if (!output_publish) {
+        fclose(output);
+        output = NULL;
+        return;
+    }
+    bad = ferror(output);
+    if (fflush(output) != 0)
+        bad = 1;
+    if (bad) {
+        fprintf(stderr, "Cannot write output file: %s\n",
+            output_name[0] ? output_name : "(unknown)");
+        fclose(output);
+        output = NULL;
+        exit(1);
+    }
+    rewind(output);
+    dest = fopen(output_name, "w");
+    if (dest == NULL) {
+        fprintf(stderr, "Cannot open output file: %s\n", output_name);
+        fclose(output);
+        output = NULL;
+        exit(1);
+    }
+    while ((c = fgetc(output)) != EOF) {
+        if (fputc(c, dest) == EOF) {
             bad = 1;
-        if (fclose(output) != 0)
-            bad = 1;
-        output = 0;
-        if (bad) {
-            fprintf(stderr, "Cannot write output file: %s\n",
-                output_name[0] ? output_name : "(unknown)");
-            exit(1);
+            break;
         }
+    }
+    if (ferror(output))
+        bad = 1;
+    if (fflush(dest) != 0 || ferror(dest) || fclose(dest) != 0)
+        bad = 1;
+    fclose(output);
+    output = NULL;
+    output_publish = 0;
+    if (bad) {
+        fprintf(stderr, "Cannot write output file: %s\n",
+            output_name[0] ? output_name : "(unknown)");
+        exit(1);
     }
 }
 
@@ -1157,9 +1279,43 @@ void SetUndefine(option *arg, char* val)
     delmac();
 }
 
+/* -I-incdir is a path. -I -o is the next option, and is not a path. */
+static int looks_like_option(const char *val)
+{
+    const option *o;
+    const char *p;
+
+    if (val == NULL || val[0] != '-')
+        return 0;
+    p = val + 1;
+    if (*p == '-')
+        ++p;
+    if (*p == '\0')
+        return 1;
+    for (o = sccz80_opts; o->description != NULL; ++o) {
+        size_t n;
+
+        if (o->type & OPT_HEADER)
+            continue;
+        if (o->short_name && p[0] == o->short_name && p[1] == '\0')
+            return 1;
+        if (o->long_name == NULL || o->long_name[0] == '\0')
+            continue;
+        n = strlen(o->long_name);
+        if (strncmp(p, o->long_name, n) != 0)
+            continue;
+        if (p[n] == '\0' || p[n] == '=')
+            return 1;
+        /* -DFOO is the -D option. A longer name must match in full. */
+        if (n == 1)
+            return 1;
+    }
+    return 0;
+}
+
 void SetIncludePath(option *arg, char *val)
 {
-    if (val == NULL || val[0] == '\0' || val[0] == '-') {
+    if (val == NULL || val[0] == '\0' || looks_like_option(val)) {
         fprintf(stderr, "Option -I requires a value\n");
         exit(1);
     }

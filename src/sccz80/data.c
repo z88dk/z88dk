@@ -67,6 +67,8 @@ int nxtlab, /* next avail label # */
     ncmp, /* # open compound statements */
     paren_nest, /* parentheses currently open */
     call_nest, /* calls currently open */
+    stmt_nest, /* statement recursion */
+    unary_nest, /* cast and unary recursion */
     errcnt, /* # errors in compilation */
     c_errstop, /* stop on error */
     eof, /* set non-zero on final input eof */

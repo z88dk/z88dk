@@ -780,6 +780,92 @@ static char* get_explicit_file_type(void)
     return NULL;
 }
 
+/* Double quotes do not stop these in sh or in cmd.exe. A single-quoted
+   command would survive sh and fail on cmd.exe, so the name is refused. */
+static int name_has_shell_meta(const char *s)
+{
+    static const char meta[] = "\"$`\\\n\r&|;<>%^";
+
+    if (s == NULL)
+        return 0;
+    return s[strcspn(s, meta)] != '\0';
+}
+
+static void refuse_shell_meta(const char *path)
+{
+    if (name_has_shell_meta(path)) {
+        fprintf(stderr, "File name contains a shell metacharacter: %s\n", path);
+        exit(1);
+    }
+}
+
+static int same_existing_file(const struct stat *a, const char *path)
+{
+    struct stat b;
+
+    if (path == NULL || stat(path, &b) != 0)
+        return 0;
+    if (a->st_ino == 0 || b.st_ino == 0)
+        return 0;
+    return a->st_dev == b.st_dev && a->st_ino == b.st_ino;
+}
+
+static void refuse_output_is_input(void)
+{
+    struct stat out;
+    int have_out;
+    int i;
+
+    if (outputfile == NULL || outputfile[0] == '\0')
+        return;
+    refuse_shell_meta(outputfile);
+    have_out = stat(outputfile, &out) == 0;
+    for (i = 0; i < nfiles; i++) {
+        const char *in = original_filenames[i];
+
+        if (in == NULL)
+            continue;
+        if (strcmp(outputfile, in) == 0 ||
+            (have_out && same_existing_file(&out, in))) {
+            fprintf(stderr, "Output file is the same as the input file: %s\n", outputfile);
+            exit(1);
+        }
+    }
+}
+
+static void command_fit(char *dest, size_t cap, const char *fmt, ...)
+{
+    va_list ap;
+    int n;
+
+    va_start(ap, fmt);
+    n = vsnprintf(dest, cap, fmt, ap);
+    va_end(ap);
+    if (n < 0 || (size_t)n >= cap) {
+        fprintf(stderr, "Command is too long\n");
+        exit(1);
+    }
+}
+
+static size_t append_command(char *dest, size_t cap, size_t off, const char *fmt, ...)
+{
+    va_list ap;
+    int n;
+
+    if (off >= cap) {
+        fprintf(stderr, "Command is too long\n");
+        exit(1);
+    }
+    va_start(ap, fmt);
+    n = vsnprintf(dest + off, cap - off, fmt, ap);
+    va_end(ap);
+    if (n < 0 || (size_t)n >= cap - off) {
+        fprintf(stderr, "Command is too long\n");
+        exit(1);
+    }
+    return off + (size_t)n;
+}
+
 int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum iostyle ios, int number, int needsuffix, int src_is_original)
 {
     int             status, errs;
@@ -807,24 +893,24 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
         tstore = (int)strlen(filelist[number]) - (int)strlen(suffix);
         if (!needsuffix)
             filelist[number][tstore] = 0;
-        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\"", bin_dir, processor, extraargs, filelist[number]);
+        command_fit(buffer, sizeof(buffer), "%s%s %s \"%s\"", bin_dir, processor, extraargs, filelist[number]);
         filelist[number][tstore] = '.';
         break;
     case outspecified:
-        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
+        command_fit(buffer, sizeof(buffer), "%s%s %s \"%s\" \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     case outspecified_flag:
-        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" -o \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
+        command_fit(buffer, sizeof(buffer), "%s%s %s \"%s\" -o \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     case filter:
-        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" > \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
+        command_fit(buffer, sizeof(buffer), "%s%s %s < \"%s\" > \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     case filter_out:
         // This is only used by copy command, which is cat/type so not a z88dk binary
-        snprintf(buffer, sizeof(buffer), "%s %s \"%s\" > \"%s\"", processor, extraargs, filelist[number], outname);
+        command_fit(buffer, sizeof(buffer), "%s %s \"%s\" > \"%s\"", processor, extraargs, filelist[number], outname);
         break;
     case filter_outspecified_flag:
-        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" -o \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
+        command_fit(buffer, sizeof(buffer), "%s%s %s < \"%s\" -o \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     }
 
@@ -1049,9 +1135,16 @@ int main(int argc, char **argv)
             memcpy(configuration + 1, aa + 8, strlen(aa + 8) + 1);
             break;
         } else if (aa[0] == '@') {
-            struct tokens_list_s* tokens = gather_from_list_file(aa + 1);
-
+            struct stat lst;
+            struct tokens_list_s* tokens;
             struct tokens_list_s* token;
+
+            if (stat(aa + 1, &lst) == 0 && !S_ISREG(lst.st_mode)) {
+                fprintf(stderr, "Not a regular file: %s\n", aa + 1);
+                exit(1);
+            }
+            tokens = gather_from_list_file(aa + 1);
+
             LL_FOREACH(tokens, token) {
                 char* tk = token->token;
                 if (tk[0] == '+') {
@@ -1252,10 +1345,11 @@ int main(int argc, char **argv)
     {
         char cmdline[FILENAME_MAX + 128];
 
+        refuse_shell_meta(pragincname);
 #ifdef _WIN32
-        snprintf(cmdline, FILENAME_MAX + 127, "%s -zcc-opt=\"%s\" < \"%s\" > nul",c_zpragma_exe, zcc_opt_def, pragincname);
+        command_fit(cmdline, sizeof(cmdline), "%s -zcc-opt=\"%s\" < \"%s\" > nul",c_zpragma_exe, zcc_opt_def, pragincname);
 #else
-        snprintf(cmdline, FILENAME_MAX + 127, "%s -zcc-opt=\"%s\" < \"%s\" > /dev/null",c_zpragma_exe, zcc_opt_def, pragincname);
+        command_fit(cmdline, sizeof(cmdline), "%s -zcc-opt=\"%s\" < \"%s\" > /dev/null",c_zpragma_exe, zcc_opt_def, pragincname);
 #endif
         if (verbose) { printf("%s\n", cmdline); fflush(stdout); }
         if (-1 == system(cmdline)) {
@@ -1400,6 +1494,9 @@ int main(int argc, char **argv)
     /* the number of files.  When the one larger number is hit, set the index to zero to do the crt.             */
     /*                                                                                                           */
     /* This nastiness is marked "HACK" in the loop below.  Maybe something better will come along later.         */
+
+    /* Before any child: -o is copied onto the source only after the link. */
+    refuse_output_is_input();
 
     /* Parse through the files, handling each one in turn */
     for (i = 1; (i <= nfiles) && (i != 0); i += (i != 0)) { /* HACK 1 OF 2 */
@@ -1879,12 +1976,14 @@ int main(int argc, char **argv)
         if ((nfiles > 1) && (outputfile != NULL)) {
             /* consolidated object file */
             outputfile = changesuffix(outputfile, ".o");
+            refuse_output_is_input();
             if (linkthem(c_linker))
                 exit(1);
         }
         else
         {
             /* independent object files */
+            refuse_output_is_input();
             copy_output_files_to_destdir(c_extension, 1);
             copy_output_files_to_destdir(".d", 1);
         }
@@ -1900,6 +1999,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "Filename is too long \"%s\"\n", outputfile);
         exit(1);
     }
+    refuse_output_is_input();
     memcpy(filenamebuf, outputfile, strlen(outputfile) + 1);
 
     if ((ptr = find_file_ext(filenamebuf)) != NULL)
@@ -1953,7 +2053,7 @@ int main(int argc, char **argv)
         if (createapp) {
             /* Building an application - run the appmake command on it */
 			/* z80asm now generates map file with same basename as output binary, i.e. a.map */
-            snprintf(buffer, sizeof(buffer), "%s %s -b \"%s\" -c \"%s\"", c_appmake_exe, appmakeargs ? appmakeargs : "", outputfile, filenamebuf);
+            command_fit(buffer, sizeof(buffer), "%s %s -b \"%s\" -c \"%s\"", c_appmake_exe, appmakeargs ? appmakeargs : "", outputfile, filenamebuf);
             if (verbose) {
                 printf("%s\n", buffer);
                 fflush(stdout);
@@ -2533,9 +2633,9 @@ int copyprepend_file(char *name1, char *ext1, char *name2, char *ext2, char *pre
     fclose(out);
 
 #ifdef WIN32
-    snprintf(buffer, sizeof(buffer), "%s \"%s%s\" >> \"%s%s\"", c_copycmd, name1, ext1, name2, ext2);
+    command_fit(buffer, sizeof(buffer), "%s \"%s%s\" >> \"%s%s\"", c_copycmd, name1, ext1, name2, ext2);
 #else
-    snprintf(buffer, sizeof(buffer), "%s \"%s%s\" >> \"%s%s\"", c_copycmd, name1, ext1, name2, ext2);
+    command_fit(buffer, sizeof(buffer), "%s \"%s%s\" >> \"%s%s\"", c_copycmd, name1, ext1, name2, ext2);
 #endif
 #ifdef WIN32
     /* Argh....annoying */
@@ -3045,7 +3145,12 @@ void add_file_to_process(char *filename, char process_extension)
 
         if (*p == '@') {
             struct tokens_list_s* tokens;
+            struct stat lst;
 
+            if (stat(p + 1, &lst) == 0 && !S_ISREG(lst.st_mode)) {
+                fprintf(stderr, "Not a regular file: %s\n", p + 1);
+                exit(1);
+            }
             list_enter(p + 1);
             tokens = gather_from_list_file(p + 1);
 
@@ -3142,6 +3247,11 @@ void add_file_to_process(char *filename, char process_extension)
 
             /* Working file is the original file */
             filelist[nfiles] = muststrdup(original_filenames[nfiles]);
+            refuse_shell_meta(original_filenames[nfiles]);
+            if (stat(original_filenames[nfiles], &tmp) == 0 && !S_ISREG(tmp.st_mode)) {
+                fprintf(stderr, "Not a regular file: %s\n", original_filenames[nfiles]);
+                exit(1);
+            }
 
             /* Now work out temporary filename */
             tempname(tname);
@@ -3208,8 +3318,6 @@ void print_help_text(const char *program)
             fprintf(stderr,"-subtype=%-11s\n", buf);
         }
     }
-
-    exit(0);
 }
 
 
@@ -3614,22 +3722,24 @@ static int compile_c_multi(int filenumber)
         const char *asm_flags;
         multi_cpu_from_map(cpu_tok, sizeof(cpu_tok), &asm_flags);
         off = 0;
-        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off,
+        off = append_command(cmd, sizeof(cmd), off,
             "%s%s --cpu=%s --asm-flags=\"%s\" --metric=%s --data-variant=sccz80 --output=\"%s\" --source=\"%s\"%s",
             c_binary_dir, c_zccmulti_exe, cpu_tok, asm_flags, c_compiler_metric, out_asm,
             original_filenames[filenumber], verbose ? " --verbose" : "");
     }
-    if (c_compiler_multi_report)
-        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --report=\"%s\"", c_compiler_multi_report);
-    off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --z80asm=\"%s%s\"", c_binary_dir, c_z80asm_exe);
+    if (c_compiler_multi_report) {
+        refuse_shell_meta(c_compiler_multi_report);
+        off = append_command(cmd, sizeof(cmd), off, " --report=\"%s\"", c_compiler_multi_report);
+    }
+    off = append_command(cmd, sizeof(cmd), off, " --z80asm=\"%s%s\"", c_binary_dir, c_z80asm_exe);
     if (c_install_dir)
-        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --asm-include=\"%slib\"", c_install_dir);
-    off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --asm-include=\"%s\"", zcc_opt_dir);
-    off += (size_t)snprintf(cmd + off, sizeof(cmd) - off,
+        off = append_command(cmd, sizeof(cmd), off, " --asm-include=\"%slib\"", c_install_dir);
+    off = append_command(cmd, sizeof(cmd), off, " --asm-include=\"%s\"", zcc_opt_dir);
+    off = append_command(cmd, sizeof(cmd), off,
         " --variant=sccz80:\"%s.sccz80.asm\" --variant=80cc-sp:\"%s.80cc-sp.asm\"",
         temporary_filenames[filenumber], temporary_filenames[filenumber]);
     if (want_fp)
-        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off,
+        off = append_command(cmd, sizeof(cmd), off,
             " --variant=80cc-fp:\"%s.80cc-fp.asm\"", temporary_filenames[filenumber]);
 
     if (verbose) {
@@ -4318,17 +4428,27 @@ void parse_option(char *option)
 
 void add_zccopt(char *fmt, ...)
 {
-    char   buf[4096];
-    size_t len = zccopt ? strlen(zccopt) : 0;
-    size_t extra;
     va_list ap;
+    int n;
+    size_t len = zccopt ? strlen(zccopt) : 0;
+    char *neu;
 
     va_start(ap, fmt);
-    extra = vsnprintf(buf, sizeof(buf), fmt, ap);
+    n = vsnprintf(NULL, 0, fmt, ap);
     va_end(ap);
-
-    zccopt = realloc(zccopt, len + extra + 1);
-    strcpy(zccopt + len, buf);
+    if (n < 0) {
+        fprintf(stderr, "Cannot format option\n");
+        exit(1);
+    }
+    neu = realloc(zccopt, len + (size_t)n + 1);
+    if (neu == NULL) {
+        fprintf(stderr, "Out of memory\n");
+        exit(1);
+    }
+    zccopt = neu;
+    va_start(ap, fmt);
+    vsnprintf(zccopt + len, (size_t)n + 1, fmt, ap);
+    va_end(ap);
 }
 
 /* From: http://creativeandcritical.net/str-replace-c/ */

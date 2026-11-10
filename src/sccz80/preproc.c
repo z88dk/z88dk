@@ -7,6 +7,9 @@
  */
 
 #include "ccdefs.h"
+#include <errno.h>
+#include <limits.h>
+#include <stdlib.h>
 
 static void       ifline(void);
 static void       noiferr(void);
@@ -91,8 +94,10 @@ void vinline(void)
                     (inpt2 != NULL && include_name[0]) ? include_name : Filename);
                 exit(1);
             }
-            if (lptr >= LINEMAX)
-                break;
+            if (lptr >= LINEMAX) {
+                fprintf(stderr, "Line is too long\n");
+                exit(1);
+            }
             line[lptr++] = k;
         }
         line[lptr] = 0; /* append null */
@@ -193,6 +198,14 @@ void ifline(void)
                 continue;
             }
 
+            /* #if is not evaluated here (ucpp does that). Count it so an
+               unclosed directive fails at end of file, and so #endif matches.
+               #ifdef / #ifndef are matched above; streq is a prefix test. */
+            if (match("#if")) {
+                ++iflevel;
+                continue;
+            }
+
             if (match("#else")) {
                 if (iflevel) {
                     if (skiplevel == iflevel)
@@ -214,17 +227,27 @@ void ifline(void)
                 continue;
             }
             if (match("# ") || match("#line")) {
-                int num = 0, emitline = 0, consumed = 0;
+                int num = 0, emitline = 0;
                 char string[FILENAME_LEN + 1];
                 const char *p;
                 const char *start;
                 size_t nlen;
+                char *end = NULL;
+                long lnum;
 
                 string[0] = 0;
-                if (sscanf(line + lptr, "%d%n", &num, &consumed) >= 1)
-                    p = line + lptr + consumed;
-                else
+                errno = 0;
+                lnum = strtol(line + lptr, &end, 10);
+                if (end != line + lptr) {
+                    if (errno == ERANGE || lnum < 0 || lnum > INT_MAX) {
+                        fprintf(stderr, "Line number is out of range\n");
+                        exit(1);
+                    }
+                    num = (int)lnum;
+                    p = end;
+                } else {
                     p = line + lptr;
+                }
                 while (*p == ' ' || *p == '\t')
                     p++;
                 start = p;
@@ -286,6 +309,14 @@ void ifline(void)
 void noiferr(void)
 {
     errorfmt( "No matching #if", 0 );
+}
+
+void check_if_nest(void)
+{
+    if (iflevel != 0) {
+        fprintf(stderr, "Unclosed #if\n");
+        ccabort();
+    }
 }
 
 void keepch(char c)

@@ -349,6 +349,12 @@ struct gototab_s {
 #define MAX_PAREN_LEVELS 1000
 #define MAX_CALL_LEVELS  16
 
+/* Brace-less if/while and a cast or unary chain each take a C stack
+   frame. 1000 matches the parenthesis ceiling. A shared ceiling of 100
+   is too low, and an unbounded chain overflows the process stack. */
+#define MAX_STMT_LEVELS  1000
+#define MAX_UNARY_LEVELS 1000
+
 
 
 

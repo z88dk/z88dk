@@ -478,6 +478,14 @@ int pstr(LVALUE *lval)
  * check to see if present elsewhere, if so do the merge as for doubles
  */
 
+static void raw_string_eol(void)
+{
+    if (c_c1mode && ch() == 0) {
+        fprintf(stderr, "Unterminated string\n");
+        ccabort();
+    }
+}
+
 int tstr(int32_t* val)
 {
     int k = 0;
@@ -486,8 +494,10 @@ int tstr(int32_t* val)
         return (0);
     do {
         while (ch() != '"') {
-            if (ch() == 0)
+            if (ch() == 0) {
+                raw_string_eol();
                 break;
+            }
             /* Room for this byte and the terminating NUL. */
             if (k >= LITABSZ - 1) {
                 fprintf(stderr, "Literal Queue Overflow\n");
@@ -552,8 +562,10 @@ int qstr(double *val)
     *val = gltptr;
     do {
         while (ch() != '"') {
-            if (ch() == 0)
+            if (ch() == 0) {
+                raw_string_eol();
                 break;
+            }
             cnt++;
             stowlit(litchar(), 1);
         }

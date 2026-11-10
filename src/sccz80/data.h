@@ -38,6 +38,8 @@ extern int Zsp;
 extern int ncmp;
 extern int paren_nest;    /* parentheses currently open */
 extern int call_nest;     /* calls currently open */
+extern int stmt_nest;     /* statement recursion */
+extern int unary_nest;    /* cast and unary recursion */
 extern int errcnt;
 extern int c_errstop;
 extern int eof;

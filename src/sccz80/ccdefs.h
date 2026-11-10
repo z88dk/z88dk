@@ -309,6 +309,7 @@ extern void     clear(void);
 extern char     inbyte(void);
 extern void     vinline(void);
 extern void     preprocess(void);
+extern void     check_if_nest(void);
 extern void     addmac(void);
 extern void     delmac(void);
 extern char     putmac(char c);

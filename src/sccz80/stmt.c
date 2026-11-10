@@ -52,7 +52,19 @@ static int incritical = 0;  /* Are we in a __critical block */
  * this routine performs that statement
  * and returns a number telling which one
  */
+static int statement_impl(void);
+
 int statement(void)
+{
+    int st;
+
+    enter_stmt_nest();
+    st = statement_impl();
+    leave_stmt_nest();
+    return st;
+}
+
+static int statement_impl(void)
 {
     int st;
 

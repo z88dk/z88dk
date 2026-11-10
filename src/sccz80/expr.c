@@ -621,7 +621,19 @@ static void promote_unary_integer(LVALUE *lval)
     }
 }
 
+static int heira_impl(LVALUE *lval);
+
 int heira(LVALUE *lval)
+{
+    int k;
+
+    enter_heira_nest();
+    k = heira_impl(lval);
+    leave_heira_nest();
+    return k;
+}
+
+static int heira_impl(LVALUE *lval)
 {
     int k, j;
     LVALUE  cast_lval={0};
