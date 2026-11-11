@@ -238,6 +238,18 @@
 =
 	ld	de,0
 
+;; #IR: the last word of a frame is read with `pop de; push de` and the frame is then
+;; released by `pop af; ret`. A and F are junk at the return, so the push and the
+;; pop af only undo each other (-2b).
+%title #IR pop de ; push de ; pop af ; ret -> pop de ; ret (-2b)
+	pop	de
+	push	de
+	pop	af
+	ret
+=
+	pop	de
+	ret
+
 ;; #IR: `ld de,0` followed by loads of both D and E: neither survives. %1 must
 ;; not read D or E (-3b).
 %title #IR drop ld de,0 before ld d,%1 ; ld e,0 (-3b)

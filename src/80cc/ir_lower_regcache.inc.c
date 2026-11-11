@@ -1239,6 +1239,21 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
             return;
         }
     }
+    /* A word slot at the top of the stack: `pop de; push de` reads it without
+       touching HL, so there is nothing to save around it. */
+    if (!opt_disabled("tos-de-keep-hl") && !fp_active(f)
+        && f->vregs[vreg_id].width == 2 && slot_off(f, vreg_id) >= 0
+        && slot_off(f, vreg_id) + L.cur_sp_adjust == 0
+        && tos_pushpop_ok(f) && f->frame_size >= 2
+        && !vreg_is_pr_stack(f, vreg_id) && !vreg_in_pr_bc(f, vreg_id)
+        && !vreg_in_idx2(f, vreg_id) && !vreg_in_exx(f, vreg_id)
+        && !vreg_is_remat(f, vreg_id)) {
+        ss_note_reload(f, vreg_id);
+        emit(out, "pop\tde");
+        emit(out, "push\tde");
+        cache_de(vreg_id);
+        return;
+    }
     /* kc160 native ld de,(sp+d) preserves HL on its own — no push/pop. */
     if (IS_KC160() && f->vregs[vreg_id].width == 2
         && slot_off(f, vreg_id) >= 0) {
