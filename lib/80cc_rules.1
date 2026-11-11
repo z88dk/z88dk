@@ -250,6 +250,25 @@
 	pop	de
 	ret
 
+;; #IR: a comparison's carry turned into a 0/1 byte. `ld a,0; jr c,$+3; inc a` is 1 when the
+;; carry is clear: `sbc a,a` makes 0 or -1 from the carry and `inc a` turns that into 1 or 0 (-3b).
+%title #IR carry clear -> 1 as sbc a,a ; inc a (-3b)
+	ld	a,0
+	jr	c,ASMPC+3
+	inc	a
+=
+	sbc	a,a
+	inc	a
+
+;; #IR: the same with the carry set: `ld a,0; jr nc,$+3; inc a` is the carry itself (-2b).
+%title #IR carry set -> 1 as sbc a,a ; neg (-2b)
+	ld	a,0
+	jr	nc,ASMPC+3
+	inc	a
+=
+	sbc	a,a
+	neg
+
 ;; #IR: `ld de,0` followed by loads of both D and E: neither survives. %1 must
 ;; not read D or E (-3b).
 %title #IR drop ld de,0 before ld d,%1 ; ld e,0 (-3b)

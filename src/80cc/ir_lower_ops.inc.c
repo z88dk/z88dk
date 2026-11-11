@@ -2184,6 +2184,42 @@ static int gen_smax0(FILE *out, Func *f, const Op *op)
 }
 
 static int fold_producer_skip(Func *f, const Op *prod);
+/* Does anything besides the current op read v? Then the byte a load-through-A
+   leaves in A may serve that read, and its slot store must stay avoidable. */
+static int read_again_soon(const Func *f, int v)
+{
+    if (!cur_bb || cur_op_idx < 0 || cur_op_idx >= cur_bb->n_ops) return 1;
+    /* Only this op reads v: nothing later can use the byte left in A. */
+    return find_unique_use(f, v) != &cur_bb->ops[cur_op_idx];
+}
+
+static int pack8_direct_ok(const Func *f, int v);
+static int pack8_sp_direct_ok(const Func *f, int v);
+
+/* A frame byte read once more than here and not again soon: load it straight
+   into register `r` (e, l, d) instead of through A. Returns 1 when it did. */
+static int byte_to_reg_direct_ex(FILE *out, const Func *f, int v, const char *r, int check_soon)
+{
+    if (opt_disabled("byte-direct-l") || (check_soon && read_again_soon(f, v))) return 0;
+    if (check_soon == 2 && opt_disabled("byte-direct-st")) return 0;
+    if (!(pack8_direct_ok(f, v) || pack8_sp_direct_ok(f, v))) return 0;
+    ss_note_reload(f, v);
+    if (fp_active(f)) {
+        emit(out, "ld\t%s,(%s%+d)", r, frame_reg(), slot_ix_off(f, v));
+    } else {
+        pending_spill_resolve();
+        emit_byte_slot_addr(out, f, v);
+        emit(out, "ld\t%s,(hl)", r);
+        hl_about_to_change(-1);
+    }
+    return 1;
+}
+
+static int byte_to_reg_direct(FILE *out, const Func *f, int v, const char *r)
+{
+    return byte_to_reg_direct_ex(out, f, v, r, !strcmp(r, "e") ? 2 : 1);
+}
+
 static int gen_conv_zx(FILE *out, Func *f, const Op *op)
 {
     int src_w = f->vregs[op->src[0]].width;
@@ -2195,6 +2231,20 @@ static int gen_conv_zx(FILE *out, Func *f, const Op *op)
            source IS the result — a byte copy through A, no widening. */
         load_byte_to_a(out, f, op->src[0]);
         return finalize_byte_result(out, f, op, 1);
+    }
+    if (src_w == 1 && dst_w == 2 && byte_to_reg_direct(out, f, op->src[0],
+                                                       vreg_is_pr_de(f, op->dst) ? "e" : "l")) {
+        /* A frame byte read once: straight into the low half, not through A. */
+        if (vreg_is_pr_de(f, op->dst)) {
+            emit(out, "ld\td,0");
+            cache_de(op->dst);
+            return 0;
+        }
+        const Op *use = find_unique_use(f, op->dst);
+        if (!(use && use->kind == IR_PUSH_ARG && use->hi_dc))
+            emit(out, "ld\th,0");
+        commit_hl_word(out, f, op->dst);
+        return 0;
     }
     if (src_w == 1 && dst_w == 2) {
         load_byte_to_a(out, f, op->src[0]);
@@ -2478,11 +2528,19 @@ static int gen_conv_byte_to_high(FILE *out, Func *f, const Op *op)
 }
 
 /* A byte read straight from its IX frame slot: held nowhere else. */
+/* Slot offset without the accounting slot_off/slot_ix_off do: a predicate must
+   not count as an IX access or as a use of the slot. */
+static int slot_raw(const Func *f, int v)
+{
+    return (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE) ? param_caller_off(f, v)
+                                                         : f->vreg_spill_slot[v];
+}
+
 static int pack8_direct_ok(const Func *f, int v)
 {
     if (opt_disabled("pack8-direct") || !fp_active(f) || v < 0) return 0;
-    if (f->vregs[v].width != 1 || slot_off(f, v) < 0) return 0;
-    if (!fp_offset_fits(slot_ix_off(f, v))) return 0;
+    if (f->vregs[v].width != 1 || slot_raw(f, v) < 0) return 0;
+    if (!fp_offset_fits(slot_raw(f, v) - f->frame_size)) return 0;
     if (L.af_park_depth > 0 || a_has(v) || hl_has(v) || de_has(v) || bc_has(v)) return 0;
     if (vreg_is_pr_stack(f, v) || vreg_is_remat(f, v) || byte_remat_of(f, v)) return 0;
     if (idxhalf_phys(f, v) != IR_PR_NONE || byte_home_phys(f, v) != IR_PR_NONE) return 0;
@@ -2494,7 +2552,7 @@ static int pack8_direct_ok(const Func *f, int v)
 static int pack8_sp_direct_ok(const Func *f, int v)
 {
     if (opt_disabled("pack8-direct") || fp_active(f) || v < 0) return 0;
-    if (f->vregs[v].width != 1 || slot_off(f, v) < 0) return 0;
+    if (f->vregs[v].width != 1 || slot_raw(f, v) < 0) return 0;
     if (L.af_park_depth > 0 || a_has(v) || hl_has(v) || de_has(v) || bc_has(v)) return 0;
     if (vreg_is_pr_stack(f, v) || vreg_is_remat(f, v) || byte_remat_of(f, v)) return 0;
     if (idxhalf_phys(f, v) != IR_PR_NONE || byte_home_phys(f, v) != IR_PR_NONE) return 0;
@@ -5239,6 +5297,22 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                     /* Pointer stepped: a stale HL value-cache of base is now
                        wrong (points one short). */
                     if (hl_had_base) invalidate_hl_cache();
+                }
+                return 0;
+            }
+            if (!(hl_has(op->mem.base) && !st_step && op->mem.offset == 0
+                  && !opt_disabled("st-byte-nostash"))
+                && byte_to_reg_direct(out, f, op->src[0], "e")) {
+                /* the frame byte went straight into E: the stash is done */
+                invalidate_de_cache();
+                load_to_hl(out, f, op->mem.base);
+                emit_hl_add_offset(out, op->mem.offset, 1, 1);
+                emit(out, "ld\t(hl),e");
+                if (st_step) {
+                    emit(out, st_step > 0 ? "inc\thl" : "dec\thl");
+                    commit_hl_word(out, f, op->mem.base);
+                } else if (op->mem.offset != 0) {
+                    invalidate_hl_cache();
                 }
                 return 0;
             }
