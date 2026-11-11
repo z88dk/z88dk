@@ -2235,8 +2235,128 @@ static const PatternDef ir_patterns_packbytes[] = {
       .check = regpack_check, .apply = regpack_apply },
 };
 
+/* ----- Accumulate-and-shift chains ---------------------------------------
+   r = a; r = (r << 8) | b; r = (r << 8) | c; r = (r << 8) | d;
+   reuses one vreg for every step. Each earlier definition of it is given a
+   fresh vreg (its readers all lie before the next definition), then the
+   nested shifts are redistributed over the ORs,
+       ((a << 8 | b) << 8 | c) << 8 | d  ==  a << 24 | b << 16 | c << 8 | d,
+   op for op in place, so the pack matchers see their usual flat shape. */
+
+static int chain_is_shl8(const Op *o)
+{
+    return o->kind == IR_SHL && o->src[1] == -1 && o->imm == 8 && o->src[0] >= 0;
+}
+
+static int chain_split(Func *f, BB *bb)
+{
+    int n = 0;
+    for (int k = 0; k < bb->n_ops; k++) {
+        Op *o = &bb->ops[k];
+        int d = o->dst;
+        if (d < 0 || d >= f->n_vregs || f->vregs[d].width != 4) continue;
+        if (o->kind != IR_CONV_ZX && o->kind != IR_OR) continue;
+        int k2 = -1, sig = 0;
+        for (int j = k + 1; j < bb->n_ops; j++) {
+            const Op *p = &bb->ops[j];
+            if (p->call || p->hcall) break;
+            if (p->src[0] == d && chain_is_shl8(p)) sig = 1;
+            if (p->src[0] == d || p->src[1] == d
+                || (p->mem.kind == IR_MEM_VREG && p->mem.base == d)) {
+                if (p->kind != IR_SHL && p->kind != IR_OR && p->kind != IR_MOV
+                    && p->kind != IR_CONV_ZX) { sig = 0; break; }
+            }
+            if (p->dst == d) { k2 = j; break; }
+        }
+        if (k2 < 0 || !sig) continue;
+        int nv = ir_vreg_new(f, KIND_LONG, NULL, 0);
+        f->vregs[nv].width = 4;
+        bb->ops[k].dst = nv;
+        for (int j = k + 1; j <= k2; j++) {
+            Op *p = &bb->ops[j];
+            if (p->src[0] == d) p->src[0] = nv;
+            if (p->src[1] == d) p->src[1] = nv;
+        }
+        n++;
+    }
+    return n;
+}
+
+/* One OR level: op o is OR(SHL8(x), CONV_ZX(byte)) with single-use temps. */
+static int chain_level(Func *f, BB *bb, const int *def_idx, const int *uc,
+                       int oi, int *shl_i, int *conv_i, int *next_i)
+{
+    const Op *o = &bb->ops[oi];
+    if (o->kind != IR_OR || o->dst < 0 || f->vregs[o->dst].width != 4) return -1;
+    for (int sw = 0; sw < 2; sw++) {
+        int sv = o->src[sw], yv = o->src[1 - sw];
+        if (sv < 0 || yv < 0 || sv >= f->n_vregs || yv >= f->n_vregs) continue;
+        if (uc[sv] != 1 || uc[yv] != 1) continue;
+        int si = def_idx[sv], yi = def_idx[yv];
+        if (si < 0 || yi < 0 || si >= oi || yi >= oi) continue;
+        const Op *s = &bb->ops[si], *y = &bb->ops[yi];
+        if (!chain_is_shl8(s) || f->vregs[sv].width != 4) continue;
+        if (y->kind != IR_CONV_ZX || f->vregs[yv].width != 4
+            || y->src[0] < 0 || f->vregs[y->src[0]].width != 1) continue;
+        int xv = s->src[0];
+        if (uc[xv] != 1 || def_idx[xv] < 0 || def_idx[xv] >= si) continue;
+        *shl_i = si; *conv_i = yi; *next_i = def_idx[xv];
+        return 0;
+    }
+    return -1;
+}
+
+static int chain_flatten(Func *f, BB *bb, const int *def_idx, const int *uc)
+{
+    int n = 0;
+    for (int r = 0; r < bb->n_ops; r++) {
+        int s3, c3, o2, s2, c2, o1, s1, c1, c0;
+        if (chain_level(f, bb, def_idx, uc, r, &s3, &c3, &o2) < 0) continue;
+        if (chain_level(f, bb, def_idx, uc, o2, &s2, &c2, &o1) < 0) continue;
+        if (chain_level(f, bb, def_idx, uc, o1, &s1, &c1, &c0) < 0) continue;
+        const Op *b = &bb->ops[c0];
+        if (b->kind != IR_CONV_ZX || f->vregs[b->dst].width != 4
+            || b->src[0] < 0 || f->vregs[b->src[0]].width != 1
+            || uc[b->dst] != 1 || c0 >= s1) continue;
+        if (!(s1 < o1 && o1 < s2 && s2 < o2 && o2 < s3 && s3 < r)) continue;
+        Op like = bb->ops[s1];
+        int v_c0 = bb->ops[c0].dst, v_c1 = bb->ops[c1].dst;
+        int v_c2 = bb->ops[c2].dst, v_c3 = bb->ops[c3].dst;
+        int v_s1 = bb->ops[s1].dst, v_o1 = bb->ops[o1].dst;
+        int v_s2 = bb->ops[s2].dst, v_o2 = bb->ops[o2].dst;
+        int v_s3 = bb->ops[s3].dst, root = bb->ops[r].dst;
+        regpack_set(&bb->ops[s1], IR_SHL, v_s1, v_c0, -1, &like); bb->ops[s1].imm = 24;
+        regpack_set(&bb->ops[o1], IR_SHL, v_o1, v_c1, -1, &like); bb->ops[o1].imm = 16;
+        regpack_set(&bb->ops[s2], IR_OR,  v_s2, v_s1, v_o1, &like);
+        regpack_set(&bb->ops[o2], IR_SHL, v_o2, v_c2, -1, &like); bb->ops[o2].imm = 8;
+        regpack_set(&bb->ops[s3], IR_OR,  v_s3, v_s2, v_o2, &like);
+        regpack_set(&bb->ops[r],  IR_OR,  root, v_s3, v_c3, &like);
+        n++;
+    }
+    return n;
+}
+
+static int pack_chains(Func *f)
+{
+    if (opt_disabled("pack-chain")) return 0;
+    int n = 0;
+    for (int b = 0; b < f->n_bbs; b++) n += chain_split(f, &f->bbs[b]);
+    int *uc = calloc(f->n_vregs > 0 ? (size_t)f->n_vregs : 1, sizeof(int));
+    if (!uc) return n;
+    compute_use_counts(f, uc);
+    for (int b = 0; b < f->n_bbs; b++) {
+        int *def_idx = pack_def_idx(f, &f->bbs[b]);
+        if (!def_idx) continue;
+        n += chain_flatten(f, &f->bbs[b], def_idx, uc);
+        free(def_idx);
+    }
+    free(uc);
+    return n;
+}
+
 int ir_match_run_packbytes(Func *f)
 {
+    pack_chains(f);
     return run_table_rounds(f, ir_patterns_packbytes,
                             (int)(sizeof ir_patterns_packbytes / sizeof ir_patterns_packbytes[0]), 1);
 }
