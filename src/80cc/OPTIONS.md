@@ -192,6 +192,7 @@ exists (ADR 0010).
 | `shift-djnz` | a variable-count byte shift whose counter is B uses `djnz` (top-tested) instead of `dec b; jr nz`; with `--opt-code-size` every variable byte shift loop is tested at the bottom, which saves a byte or two and costs a taken jump on entry |
 | `pack-be32` | a big-endian four-byte read assembled by shifts and ORs (`p[0]<<24 \| p[1]<<16 \| p[2]<<8 \| p[3]`) is a four-byte load plus a byte reverse, as the two-byte form already is, instead of four byte loads, shifts and a four-byte OR walk |
 | `pack-regs` | a shift-and-OR of zero-extended bytes or words held in variables (`((u32)a<<24)\|((u32)b<<16)\|((u32)c<<8)\|d`, `((u16)x<<8)\|y`, `((u32)hi<<16)\|lo`) is built in registers by the PACK8 and JOIN16 operations, not as full-width terms merged through memory |
+| `pack-b2h` | a byte shifted left by 8 in a word (`(int)b<<8`, already one byte-to-high-half operation) counts as a lane of the register pack |
 | `pack-chain` | an accumulate-and-shift chain on one variable (`r=a; r=(r<<8)\|b; r=(r<<8)\|c; r=(r<<8)\|d`) is split into separate values and redistributed into the flat shift-and-OR form, so the register packs above apply to it |
 | `pack8-direct` | a byte pair packed into a word is read straight from its frame slots into the two register halves (IX slots in fp mode, one walked slot address in sp mode), without zero-extension |
 | `tos-de-keep-hl` | a word slot at the top of the stack is loaded into DE with `pop de; push de` while HL is kept, instead of saving HL around a slot-address read |

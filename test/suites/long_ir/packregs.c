@@ -23,6 +23,10 @@ static u16 w_or2(u8 x, u8 y)  { return y | ((u16)x << 8); }
 static u16 w_calc(u8 x, u8 y) { return ((u16)(x + 1) << 8) | (u8)(y ^ 0x5a); }
 static u16 w_glob(void)       { return ((u16)gb << 8) | arr[3]; }
 static u16 w_same(u8 x)       { return ((u16)x << 8) | x; }
+/* the shift is done in int: a byte moved to the high half of a word */
+static u16 w_int(u8 x, u8 y)  { return (u16)(((x) << 8) | (y)); }
+static u16 w_int2(u8 x, u8 y) { return (u16)((y) | ((x) << 8)); }
+static u16 w_int3(u8 x, u8 y) { return (u16)(((u8)(x + 1) << 8) | (u8)(y ^ 0x21)); }
 /* four bytes -> long, every lane order */
 static u32 l_abcd(u8 a, u8 b, u8 c, u8 d) { return ((u32)a<<24)|((u32)b<<16)|((u32)c<<8)|d; }
 static u32 l_dcba(u8 a, u8 b, u8 c, u8 d) { return d|((u32)c<<8)|((u32)b<<16)|((u32)a<<24); }
@@ -71,6 +75,9 @@ static void check(void)
             if (w_or2(a, b)  != (u16)(a*j8 + b))  ++bad;
             if (w_calc(a, b) != (u16)((u8)(a+1)*j8 + (u8)(b^0x5a))) ++bad;
             if (w_glob()     != (u16)(gb*j8 + arr[3])) ++bad;
+            if (w_int(a, b)  != (u16)(a*j8 + b))  ++bad;
+            if (w_int2(a, b) != (u16)(a*j8 + b))  ++bad;
+            if (w_int3(a, b) != (u16)((u8)(a+1)*j8 + (u8)(b^0x21))) ++bad;
             if (w_same(a)    != (u16)(a*j8 + a))  ++bad;
             if (w_use(a, b)  != (u16)(a*j8 + b + 5)) ++bad;
             if (l_abcd(a,b,c,d) != R(a,b,c,d)) ++bad;

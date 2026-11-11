@@ -2037,6 +2037,15 @@ static int regpack_match_lane(Func *f, BB *bb, const int *def_idx, const int *uc
     if (di < 0) return -1;
     const Op *d = &bb->ops[di];
     int shift = 0, shl_idx = -1;
+    /* A byte shifted left by 8 into a word (`(int)b << 8`) is already one op. */
+    if (d->kind == IR_CONV_BYTE_TO_HIGH && w == 2 && d->dst >= 0
+        && f->vregs[d->dst].width == 2 && d->src[0] >= 0 && d->src[0] < f->n_vregs
+        && f->vregs[d->src[0]].width == 1 && !opt_disabled("pack-b2h")) {
+        out->conv_idx = di; out->shl_idx = -1;
+        out->src = d->src[0]; out->src_w = 1; out->shift = 8;
+        out->src_def = def_idx[d->src[0]];
+        return 0;
+    }
     if (d->kind == IR_SHL && d->src[1] == -1 && (d->imm & 7) == 0
         && d->imm >= 8 && d->imm <= 8 * (w - 1)) {
         shift = (int)d->imm; shl_idx = di;
