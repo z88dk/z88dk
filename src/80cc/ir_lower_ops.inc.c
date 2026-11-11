@@ -2477,6 +2477,19 @@ static int gen_conv_byte_to_high(FILE *out, Func *f, const Op *op)
     return -1;
 }
 
+/* A byte read straight from its IX frame slot: held nowhere else. */
+static int pack8_direct_ok(const Func *f, int v)
+{
+    if (opt_disabled("pack8-direct") || !fp_active(f) || v < 0) return 0;
+    if (f->vregs[v].width != 1 || slot_off(f, v) < 0) return 0;
+    if (!fp_offset_fits(slot_ix_off(f, v))) return 0;
+    if (L.af_park_depth > 0 || a_has(v) || hl_has(v) || de_has(v) || bc_has(v)) return 0;
+    if (vreg_is_pr_stack(f, v) || vreg_is_remat(f, v) || byte_remat_of(f, v)) return 0;
+    if (idxhalf_phys(f, v) != IR_PR_NONE || byte_home_phys(f, v) != IR_PR_NONE) return 0;
+    if (vreg_in_idx2(f, v)) return 0;
+    return 1;
+}
+
 /* dst (word) = (src[1] << 8) | src[0], both sources bytes. load_binop_operands
    zero-extends each into a register pair (HL = low byte, DE = high byte), so the
    pack is one move. */
@@ -2487,6 +2500,25 @@ static int gen_pack8(FILE *out, Func *f, const Op *op)
         || f->vregs[op->src[0]].width != 1 || f->vregs[op->src[1]].width != 1) {
         fprintf(stderr, "ir_lower: PACK8 needs two bytes and a word\n");
         return -1;
+    }
+    if (pack8_direct_ok(f, op->src[0]) && pack8_direct_ok(f, op->src[1])) {
+        /* Both bytes sit in IX-addressed frame slots: load each straight into
+           its half of the target pair, no zero-extension. */
+        int o0 = slot_ix_off(f, op->src[0]), o1 = slot_ix_off(f, op->src[1]);
+        ss_note_reload(f, op->src[0]);
+        ss_note_reload(f, op->src[1]);
+        if (vreg_is_pr_de(f, op->dst)) {
+            emit(out, "ld\te,(%s%+d)", frame_reg(), o0);
+            emit(out, "ld\td,(%s%+d)", frame_reg(), o1);
+            cache_de(op->dst);
+            return 0;
+        }
+        hl_about_to_change(-1);
+        emit(out, "ld\tl,(%s%+d)", frame_reg(), o0);
+        emit(out, "ld\th,(%s%+d)", frame_reg(), o1);
+        if (de_has(op->dst)) invalidate_de_cache();
+        commit_hl_word(out, f, op->dst);
+        return 0;
     }
     load_binop_operands(out, f, op);
     if (vreg_is_pr_de(f, op->dst)) {
