@@ -1241,7 +1241,7 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
     }
     /* A word slot at the top of the stack: `pop de; push de` reads it without
        touching HL, so there is nothing to save around it. */
-    if (!opt_disabled("tos-de-keep-hl") && !fp_active(f)
+    if (L.join_tos_ok && !opt_disabled("tos-de-keep-hl") && !fp_active(f)
         && f->vregs[vreg_id].width == 2 && slot_off(f, vreg_id) >= 0
         && slot_off(f, vreg_id) + L.cur_sp_adjust == 0
         && tos_pushpop_ok(f) && f->frame_size >= 2

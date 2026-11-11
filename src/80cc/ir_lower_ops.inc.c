@@ -2582,7 +2582,9 @@ static int gen_join16(FILE *out, Func *f, const Op *op)
         fprintf(stderr, "ir_lower: JOIN16 needs two words and a long\n");
         return -1;
     }
+    L.join_tos_ok = 1;
     load_binop_operands(out, f, op);
+    L.join_tos_ok = 0;
     store_dehl_finalize(out, f, op->dst);
     return 0;
 }

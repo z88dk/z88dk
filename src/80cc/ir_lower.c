@@ -110,6 +110,7 @@ typedef struct {
        write of one C var hits. A cached address implies rs.hl==-1 — value and
        address caches are never both live. */
     int cur_hl_addr_off;
+    int join_tos_ok;           /* JOIN16 operand load: a TOS word may be popped into DE */
     /* Data-stack depth in bytes from inline long pushes: the z80 stack doubles
        as an operand stack (DEHL = implicit TOS). ir_opt inserts IR_PUSH/
        POP_DEHL_LONG across DEHL-clobbering long live ranges (+4 each); sp-rel
