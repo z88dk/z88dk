@@ -169,6 +169,40 @@ int lua_io_init(const char *filename)
     return 0;
 }
 
+/* The model's interrupt: when an interrupt could be taken (interrupts enabled, a -int period gone by) the global function interrupt(cycles) of the Lua model is asked.  It returns
+   nil or false for none now, or the byte the device puts on the data bus (0..255: the low byte of the IM 2 vector); a model without the function gets the old interrupt every period
+   with the byte 255.  Returns -1 for the old behaviour, -2 for no interrupt, else the byte. */
+int lua_interrupt(long long cycles)
+{
+    int value;
+
+    if (lua_state == NULL)
+        return -1;
+    lua_getglobal(lua_state, "interrupt");
+    if (!lua_isfunction(lua_state, -1)) {
+        lua_pop(lua_state, 1);
+        return -1;
+    }
+    lua_pushinteger(lua_state, cycles);
+    if (lua_pcall(lua_state, 1, 1, 0) != LUA_OK)
+        lua_io_error("interrupt");
+    if (lua_isnil(lua_state, -1) || (lua_isboolean(lua_state, -1) && !lua_toboolean(lua_state, -1))) {
+        value = -2;
+    } else {
+        if (!lua_isinteger(lua_state, -1)) {
+            fprintf(stderr, "z88dk-ticks Lua interrupt must return nil, false or an integer\n");
+            exit(EXIT_FAILURE);
+        }
+        value = (int)lua_tointeger(lua_state, -1);
+        if (value < 0 || value > 255) {
+            fprintf(stderr, "z88dk-ticks Lua interrupt returned a value outside 0..255\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+    lua_pop(lua_state, 1);
+    return value;
+}
+
 int lua_io_in(int port)
 {
     int value;

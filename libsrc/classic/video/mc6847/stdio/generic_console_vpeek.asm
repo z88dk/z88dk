@@ -16,6 +16,7 @@ IFNDEF FORphc20
     EXTERN  vpeek_MODE1
     EXTERN  vpeek_MODE2
     EXTERN  __tms9918_console_vpeek
+    EXTERN  __pc6001mk2_vpeek
 
 
 ;Entry: c = x,
@@ -26,6 +27,10 @@ IFNDEF FORphc20
 ;        c = failure
 generic_console_vpeek:
     ld      a, (__mc6847_mode)
+IF FORpc6001
+    cp      MC6847_MODE_MK2
+    jp      z, __pc6001mk2_vpeek
+ENDIF
 IF MC6847_HAS_HIRES
     cp      1
     jp      z, vpeek_MODE1

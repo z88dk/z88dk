@@ -6,6 +6,7 @@
 
 int lua_io_init(const char *filename);
 int lua_io_in(int port);
+int lua_interrupt(long long cycles);
 int lua_io_out(int port, int value);
 int lua_memory_read(uint32_t address, memtype type, long long cycles);
 int lua_memory_write(uint32_t address, uint8_t value, memtype type, long long cycles);

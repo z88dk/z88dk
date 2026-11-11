@@ -6,6 +6,7 @@
     PUBLIC  _getmaxy
     EXTERN  __mc6847_mode
     EXTERN  __tms9918_getmaxy
+    EXTERN  __pc6001mk2_getmaxy
 
     INCLUDE "classic/gfx/grafix.inc"
     INCLUDE "classic/video/mc6847/mc6847.inc"
@@ -13,6 +14,10 @@
 getmaxy:
 _getmaxy:
     ld      a, (__mc6847_mode)
+IF FORpc6001
+    cp      MC6847_MODE_MK2
+    jp      z, __pc6001mk2_getmaxy
+ENDIF
     and     a
 IF MODE0_3x2
     ld      hl, 47

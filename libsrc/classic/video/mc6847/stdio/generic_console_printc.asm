@@ -8,6 +8,7 @@
     EXTERN  printc_MODE1
     EXTERN  printc_MODE2
     EXTERN  __mc6847_mode
+    EXTERN  __pc6001mk2_printc
 
 
     INCLUDE "classic/video/mc6847/mc6847.inc"
@@ -20,6 +21,10 @@
 ; e = raw
 generic_console_printc:
     ld      a, (__mc6847_mode)
+IF FORpc6001
+    cp      MC6847_MODE_MK2
+    jp      z, __pc6001mk2_printc
+ENDIF
 IF MC6847_HAS_HIRES
     cp      1
     jp      z, printc_MODE1

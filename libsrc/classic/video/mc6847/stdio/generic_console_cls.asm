@@ -5,6 +5,7 @@ IFNDEF MC6847_IOSPACE
     SECTION code_driver
 
     PUBLIC  generic_console_cls
+    EXTERN  __pc6001mk2_cls
 
     EXTERN  __mc6847_mode
     EXTERN  __mc6847_modeval
@@ -16,6 +17,11 @@ IFNDEF MC6847_IOSPACE
 
 
 generic_console_cls:
+IF FORpc6001
+    ld      a, (__mc6847_mode)
+    cp      MC6847_MODE_MK2
+    jp      z, __pc6001mk2_cls
+ENDIF
     GETSCREENADDRESS
     ld      a, (__mc6847_mode)
     and     a

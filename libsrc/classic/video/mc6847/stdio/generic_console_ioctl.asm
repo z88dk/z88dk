@@ -13,6 +13,7 @@
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
     EXTERN  __tms9918_console_ioctl
+    EXTERN  __pc6001mk2_set_mode
 
     INCLUDE "classic/video/mc6847/mc6847.inc"
     INCLUDE "ioctl.def"
@@ -93,6 +94,12 @@ check_mode:
     jr      nz, failure
     ld      a, c                        ; The mode
     and     31
+IF FORpc6001
+    ; the mkII's 320x200: its own routine sets the mode, the size and the
+    ; capabilities (a stub that fails on the PC-6001)
+    cp      MC6847_MODE_MK2
+    jp      z, __pc6001mk2_set_mode
+ENDIF
 
     ;; Text mode
     ld      hl, +( (MODE_TEXT << 8) + CAPS_TEXT)

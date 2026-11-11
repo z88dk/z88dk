@@ -1,7 +1,12 @@
 
 
 @classic/video/mc6847/mc6847.lst
-target/pc6001/obj/${TARGET}/**/*.o
+target/pc6001/obj/${TARGET}/x/target/pc6001/games/*.o
+target/pc6001/obj/${TARGET}/x/target/pc6001/graphics/*.o
+target/pc6001/obj/${TARGET}/x/target/pc6001/mk2stubs/*.o
+target/pc6001/obj/${TARGET}/x/target/pc6001/psg/*.o
+target/pc6001/obj/${TARGET}/x/target/pc6001/stdio/*.o
+target/pc6001/obj/${TARGET}/x/target/pc6001/stdio/ansi/*.o
 @classic/stdio/ansicore.lst
 @classic/stdio/stdio.lst
 
