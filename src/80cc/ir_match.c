@@ -2537,7 +2537,48 @@ static void xbyte_shr_apply(Func *f, BB *bb, const int idx[],
     xbyte_rewrite(bb, idx[1], bind[XV_V], (int)imm[0] / 8);
 }
 
+
+/* ----- Signed division by a power of two ----------------------------------
+   x / 2^k is built as (x + ((x >> 15) & (2^k - 1))) >> k. The three ops that
+   compute the bias and add it become one BIASNEG, which adds the mask only
+   when x is negative. */
+enum { SB_V = 1, SB_W, SB_T };
+
+static int sbias_check(Func *f, BB *bb, const int idx[], const int64_t imm[],
+                       const int bind[], const int uc[])
+{
+    (void)bb; (void)idx; (void)uc;
+    if (opt_disabled("sdiv-bias")) return 0;
+    if (f->vregs[bind[SB_V]].width != 2) return 0;
+    if (imm[0] != (IR_SHR_ARITH | 15)) return 0;
+    int64_t m = imm[1] & 0xFFFF;
+    return m == 1 || m == 3 || m == 7 || m == 15;
+}
+
+static void sbias_apply(Func *f, BB *bb, const int idx[], const int64_t imm[],
+                        const int bind[])
+{
+    (void)f;
+    Op *a = &bb->ops[idx[2]];
+    Op like = *a;
+    memset(a, 0, sizeof(*a));
+    a->kind = IR_BIASNEG; a->dst = like.dst; a->src[0] = bind[SB_V]; a->src[1] = -1;
+    a->imm = imm[1] & 0xFFFF; a->mem.base = -1; a->label = -1;
+    a->file = like.file; a->line = like.line; a->level = like.level; a->block = like.block;
+}
+
 static const PatternDef ir_patterns_late[] = {
+    { .name = "sbias", .n_ops = 3,
+      .flags = IR_PAT_GAP_OK | IR_PAT_GAP_VALUES,
+      .ops = {
+          { .kind = IR_SHR, .dst = SB_W, .src0 = SB_V,
+            .imm_pred = IR_IMM_ANY, .width = 2 },
+          { .kind = IR_AND, .dst = SB_T, .src0 = SB_W,
+            .imm_pred = IR_IMM_ANY, .width = 2 },
+          { .kind = IR_ADD, .dst = IR_MS_ANY, .src0 = SB_V, .src1 = SB_T },
+      },
+      .check = sbias_check, .apply = sbias_apply },
+
     { .name = "xbyte", .n_ops = 3,
       .flags = IR_PAT_GAP_OK | IR_PAT_GAP_VALUES,
       .ops = {

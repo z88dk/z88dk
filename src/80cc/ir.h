@@ -258,6 +258,9 @@ typedef enum {
     IR_BSWAP,           /* dst = byte-reverse of src[0], width 4: bytes 0..3 -> 3..0
                            (intrinsic_swap_endian_32, __builtin_bswap32). Width 2 is
                            IR_ROTL by 8. */
+    IR_BIASNEG,         /* dst (width 2) = src[0] + (src[0] < 0 ? imm : 0), imm = 2^k - 1:
+                           the bias that makes an arithmetic shift by k round toward zero
+                           (signed division by 2^k). Built by ir_match. */
     IR_PACK8,           /* dst (width 2) = (src[1] << 8) | src[0]; both sources are
                            bytes. Built by ir_match from a shift-and-OR of two
                            zero-extended bytes, so the lowerer joins them in

@@ -2560,6 +2560,34 @@ static int pack8_sp_direct_ok(const Func *f, int v)
     return 1;
 }
 
+/* dst = src + (src < 0 ? mask : 0), width 2: the rounding bias of a signed
+   division by 2^k (mask = 2^k - 1), added only when the value is negative. */
+static int gen_biasneg(FILE *out, Func *f, const Op *op)
+{
+    if (op->dst < 0 || op->src[0] < 0 || f->vregs[op->dst].width != 2
+        || f->vregs[op->src[0]].width != 2 || op->imm < 1 || op->imm > 15) {
+        fprintf(stderr, "ir_lower: BIASNEG needs a word and a mask of 1..15\n");
+        return -1;
+    }
+    load_to_hl(out, f, op->src[0]);
+    int lbl = L.cmp_label_counter++;
+    emit(out, "ld\ta,h");
+    emit(out, "rla");                           /* carry = sign */
+    emit(out, "jr\tnc,L_f%d_cmp_ok_%d", L.func_emit_idx, lbl);
+    if (op->imm <= 3) {
+        for (int i = 0; i < (int)op->imm; i++) emit(out, "inc\thl");
+    } else {
+        emit(out, "ld\tde,%d", (int)op->imm);
+        emit(out, "add\thl,de");
+        invalidate_de_cache();
+    }
+    fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, lbl);
+    invalidate_a_cache();
+    hl_about_to_change(-1);
+    commit_hl_word(out, f, op->dst);
+    return 0;
+}
+
 /* dst (word) = (src[1] << 8) | src[0], both sources bytes. load_binop_operands
    zero-extends each into a register pair (HL = low byte, DE = high byte), so the
    pack is one move. */
