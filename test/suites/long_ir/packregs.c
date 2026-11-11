@@ -30,6 +30,10 @@ static u32 l_bdac(u8 a, u8 b, u8 c, u8 d) { return ((u32)b<<24)|((u32)d<<16)|((u
 static u32 l_calc(u8 a, u8 b)             { return ((u32)(u8)(a+1)<<24)|((u32)(u8)(b^0xff)<<16)|((u32)(u8)(a|b)<<8)|(u8)(a-b); }
 static u32 l_same(u8 a)                   { return ((u32)a<<24)|((u32)a<<16)|((u32)a<<8)|a; }
 static u32 l_arr(void)                    { return ((u32)arr[0]<<24)|((u32)gb<<16)|((u32)arr[5]<<8)|arr[7]; }
+/* three bytes -> long (the top byte is zero) */
+static u32 l_three(u8 a, u8 b, u8 c)      { return ((u32)a<<16)|((u32)b<<8)|c; }
+static u32 l_three2(u8 a, u8 b, u8 c)     { return c|((u32)b<<8)|((u32)a<<16); }
+static u32 l_three3(u8 a, u8 b)           { return ((u32)(u8)(a+b)<<16)|((u32)a<<8)|(u8)(b^0x33); }
 /* two words -> long */
 static u32 j_hl(u16 hi, u16 lo)   { return ((u32)hi << 16) | lo; }
 static u32 j_lh(u16 hi, u16 lo)   { return lo | ((u32)hi << 16); }
@@ -75,6 +79,9 @@ static void check(void)
             if (l_calc(a, b)    != R((u8)(a+1), (u8)(b^0xff), (u8)(a|b), (u8)(a-b))) ++bad;
             if (l_same(a)       != R(a,a,a,a)) ++bad;
             if (l_arr()         != R(arr[0], gb, arr[5], arr[7])) ++bad;
+            if (l_three(a,b,c)  != R(0,a,b,c)) ++bad;
+            if (l_three2(a,b,c) != R(0,a,b,c)) ++bad;
+            if (l_three3(a,b)   != R(0,(u8)(a+b), a, (u8)(b^0x33))) ++bad;
             if (l_use(a,b,c,d)  != R(a,b,c,d) + 1) ++bad;
             if (l_redef(a, b)   != R(a, (u8)(a+1), b, (u8)((u8)(a+1)+b))) ++bad;
             if (w_redef(a)      != (u16)(a*j8 + (u8)(a+7))) ++bad;

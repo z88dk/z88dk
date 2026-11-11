@@ -2103,6 +2103,7 @@ static int regpack_analyze(Func *f, BB *bb, const int *def_idx, const int *uc,
     if (w == 2 && nl == 2 && all_bytes && seen == 0x3) *kind = 1;
     else if (w == 4 && nl == 4 && all_bytes && seen == 0xf) *kind = 2;
     else if (w == 4 && nl == 2 && all_words && seen == 0x5) *kind = 3;
+    else if (w == 4 && nl == 3 && all_bytes && seen == 0x7) *kind = 4;
     else return -1;
     /* Each lane's byte or word is read at the join, later than where its
        zero-extend read it: nothing may redefine it in between. */
@@ -2141,6 +2142,27 @@ static int regpack_analyze(Func *f, BB *bb, const int *def_idx, const int *uc,
             if (kill[k] > *other_m && kill[k] < root_idx && kill[k] != *first_s
                 && kill[k] > *other_s) *other_s = kill[k];
         if (*other_s < 0) return -1;
+    }
+    if (*kind == 4) {
+        /* Three bytes -> long: the two low bytes are packed into a word, the
+           top byte is zero-extended in place. The pack reuses a killed slot
+           after both of its sources are defined. */
+        int lane_at[3] = { -1, -1, -1 };
+        for (int i = 0; i < nl; i++) lane_at[lanes[i].shift / 8] = i;
+        int m = -1;
+        for (int b = 0; b < 2; b++)
+            if (lanes[lane_at[b]].src_def > m) m = lanes[lane_at[b]].src_def;
+        for (int i = 0; i < nl; i++) {
+            int c[2] = { lanes[i].conv_idx, lanes[i].shl_idx };
+            for (int j = 0; j < 2; j++) {
+                if (i == lane_at[2] && j == 0) continue;   /* kept */
+                if (c[j] > m && c[j] < root_idx && c[j] > *slot_lo) *slot_lo = c[j];
+            }
+        }
+        for (int i = 0; i < no; i++)
+            if (or_idx[i] > m && or_idx[i] < root_idx && or_idx[i] > *slot_lo)
+                *slot_lo = or_idx[i];
+        if (*slot_lo < 0) return -1;
     }
     return 0;
 }
@@ -2190,7 +2212,7 @@ static void regpack_apply(Func *f, BB *bb, const int idx[], const int64_t imm[],
     /* Every killed op index except the root, ascending. */
     int kill[16], nk = 0;
     for (int i = 0; i < nl; i++) {
-        kill[nk++] = lanes[i].conv_idx;
+        if (!(kind == 4 && lanes[i].shift == 16)) kill[nk++] = lanes[i].conv_idx;
         if (lanes[i].shl_idx >= 0) kill[nk++] = lanes[i].shl_idx;
     }
     for (int i = 0; i < no; i++) kill[nk++] = or_idx[i];
@@ -2198,6 +2220,20 @@ static void regpack_apply(Func *f, BB *bb, const int idx[], const int64_t imm[],
         for (int b = a; b > 0 && kill[b] < kill[b - 1]; b--) {
             int t = kill[b]; kill[b] = kill[b - 1]; kill[b - 1] = t;
         }
+    if (kind == 4) {
+        int t_lo4 = ir_vreg_new(f, KIND_INT, NULL, 0);
+        int t_hi4 = ir_vreg_new(f, KIND_INT, NULL, 0);
+        f->vregs[t_lo4].width = 2;
+        f->vregs[t_hi4].width = 2;
+        int conv2 = -1;
+        for (int i = 0; i < nl; i++) if (lanes[i].shift == 16) conv2 = lanes[i].conv_idx;
+        regpack_set(&bb->ops[s_lo], IR_PACK8, t_lo4, lane_of[0], lane_of[1], &like);
+        bb->ops[conv2].dst = t_hi4;
+        regpack_set(&bb->ops[root_idx], IR_JOIN16, dst, t_lo4, t_hi4, &like);
+        for (int k = 0; k < nk; k++)
+            if (kill[k] != s_lo) ir_match_mark_dead(kill[k]);
+        return;
+    }
 
     int reuse_a = -1, reuse_b = -1;                  /* slots for the two packs */
     int t_lo = -1, t_hi = -1;
@@ -2313,7 +2349,25 @@ static int chain_flatten(Func *f, BB *bb, const int *def_idx, const int *uc)
         int s3, c3, o2, s2, c2, o1, s1, c1, c0;
         if (chain_level(f, bb, def_idx, uc, r, &s3, &c3, &o2) < 0) continue;
         if (chain_level(f, bb, def_idx, uc, o2, &s2, &c2, &o1) < 0) continue;
-        if (chain_level(f, bb, def_idx, uc, o1, &s1, &c1, &c0) < 0) continue;
+        if (chain_level(f, bb, def_idx, uc, o1, &s1, &c1, &c0) < 0) {
+            /* three lanes: r=a; r=(r<<8)|b; r=(r<<8)|c */
+            const Op *b3 = &bb->ops[o1];
+            if (b3->kind != IR_CONV_ZX || f->vregs[b3->dst].width != 4
+                || b3->src[0] < 0 || f->vregs[b3->src[0]].width != 1
+                || uc[b3->dst] != 1 || o1 >= s2 || !(s2 < o2 && o2 < s3 && s3 < r))
+                continue;
+            /* o1 = lane a, s2/c2 = first step, s3/c3 = second step */
+            Op like = bb->ops[s2];
+            int v_a = bb->ops[o1].dst, v_b = bb->ops[c2].dst, v_c = bb->ops[c3].dst;
+            int v_s2 = bb->ops[s2].dst, v_o2 = bb->ops[o2].dst;
+            int v_s3 = bb->ops[s3].dst, root = bb->ops[r].dst;
+            regpack_set(&bb->ops[s2], IR_SHL, v_s2, v_a, -1, &like); bb->ops[s2].imm = 16;
+            regpack_set(&bb->ops[o2], IR_SHL, v_o2, v_b, -1, &like); bb->ops[o2].imm = 8;
+            regpack_set(&bb->ops[s3], IR_OR,  v_s3, v_s2, v_o2, &like);
+            regpack_set(&bb->ops[r],  IR_OR,  root, v_s3, v_c, &like);
+            n++;
+            continue;
+        }
         const Op *b = &bb->ops[c0];
         if (b->kind != IR_CONV_ZX || f->vregs[b->dst].width != 4
             || b->src[0] < 0 || f->vregs[b->src[0]].width != 1
