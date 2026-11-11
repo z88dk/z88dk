@@ -197,7 +197,7 @@ exists (ADR 0010).
 | `byte-direct-st` | a frame byte stored through a pointer is loaded straight into E, not through A |
 | `sdiv-bias` | the rounding bias of a signed word division by 2, 4, 8 or 16 (`x + ((x >> 15) & mask)`) is added only when x is negative, by a test and one or a few `inc hl`, not built through A |
 | `cse-imm` | two single-definition constants of the same width and value are not treated as one operand by CSE, so `K >> n` written twice is computed twice |
-| `licm-min-size` | under `--opt-code-size`, loop-invariant expressions of fewer than 6 nodes are hoisted into temporaries like any other (AST layer) |
+| `licm-min-size` | under `--opt-code-size`, loop-invariant expressions of fewer than 6 nodes are left in place instead of hoisted into a temporary (AST layer) |
 | `pack-chain` | an accumulate-and-shift chain on one variable (`r=a; r=(r<<8)\|b; r=(r<<8)\|c; r=(r<<8)\|d`) is split into separate values and redistributed into the flat shift-and-OR form, so the register packs above apply to it |
 | `pack8-direct` | a byte pair packed into a word is read straight from its frame slots into the two register halves (IX slots in fp mode, one walked slot address in sp mode), without zero-extension |
 | `tos-de-keep-hl` | a word slot at the top of the stack is loaded into DE with `pop de; push de` while HL is kept, instead of saving HL around a slot-address read |
@@ -310,7 +310,7 @@ exists (ADR 0010).
 | `fabs-fa-clear` | fabs of a 64-bit MBF value calls the library routine, not a sign bit clear in the accumulator (--opt-code-size also calls) |
 | `shift-const-bsxa` | z80n shift of a constant by a variable count loads the constant and count via HL and DE, then swaps, instead of loading the constant straight into DE |
 | `switch-unreachable` | a switch case or default that is __builtin_unreachable still gets its compare |
-| `size-glong` | with `--opt-code-size`, a four-byte load through HL is the inline byte sequence, not `call l_glong` |
+| `size-glong` | with `--opt-code-size`, a four-byte load through HL is `call l_glong`, not the inline byte sequence |
 | `call-sp-cleanup` | use `pop bc` chains instead of HL-based stack cleanup when the result does not occupy HL |
 | `bc-save-live` | BC is saved around a call even when it holds nothing live |
 | `bc-step-param` | a stepped pointer parameter is reloaded from its slot each iteration instead of riding BC (ADR 0031) |
@@ -424,7 +424,7 @@ exists (ADR 0010).
 | `tm-thread` | a jump to a label whose block is a lone `jp` is not sent straight to that target after tail merging |
 | `block-layout` | no trace movement to delete a jump |
 | `block-layout-rounds` | block layout runs once, so a trace ending in a jump that another move replaced stays put |
-| `jr-relax` | `jp` is never relaxed to `jr` (with `--opt-code-size`, an unconditional `jp` is relaxed on every CPU that has `jr`, not only where `jr` is no slower) |
+| `jr-relax` | `jp` is never relaxed to `jr` (with `--opt-jr-uncond` or `--opt-code-size`, an unconditional `jp` is relaxed on every CPU that has `jr`, not only where `jr` is no slower) |
 | `label-elide` | dead basic-block labels are kept in the output |
 | `ret-thread` | a jump to a `ret` is not threaded |
 | `defassign-verify` | not an optimisation: no stderr warning for a local that is read but never written on any path (`IR_DEFASSIGN_VERIFY=1` widens it, `=2` aborts) |

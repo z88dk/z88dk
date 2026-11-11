@@ -96,6 +96,7 @@ int debuglevel;
  *        Framepointer stuff - tis broken!
  */
 int c_framepointer_is_ix;
+int c_opt_jr_uncond;     /* --opt-jr-uncond: relax unconditional jp to jr on every CPU with jr */
 int c_opt_code_size;     /* --opt-code-size: prefer shorter helper calls to inline sequences */
 
 /* Platform-reserved index registers: when set, the compiler must not use that
