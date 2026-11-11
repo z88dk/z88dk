@@ -4415,6 +4415,10 @@ static void licm_collect_invariants(Node *node, sym_set *modified, int has_call,
     if (is_cse_interesting(node)
         && is_safe_to_hoist(node)
         && !subtree_reads_modified(node, modified, has_call)) {
+        /* Under --opt-code-size a small invariant is cheaper recomputed than
+           stored to a temporary at the loop entry and reloaded at each use. */
+        if (c_opt_code_size && !opt_disabled("licm-min-size")
+            && subtree_size(node) < 6) return;
         array_add(bag, node);
         return;
     }

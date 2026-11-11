@@ -196,6 +196,8 @@ exists (ADR 0010).
 | `byte-direct-l` | a frame byte that is read once and widened to a word is loaded straight into L (or E), not through A |
 | `byte-direct-st` | a frame byte stored through a pointer is loaded straight into E, not through A |
 | `sdiv-bias` | the rounding bias of a signed word division by 2, 4, 8 or 16 (`x + ((x >> 15) & mask)`) is added only when x is negative, by a test and one or a few `inc hl`, not built through A |
+| `cse-imm` | two single-definition constants of the same width and value are not treated as one operand by CSE, so `K >> n` written twice is computed twice |
+| `licm-min-size` | under `--opt-code-size`, loop-invariant expressions of fewer than 6 nodes are hoisted into temporaries like any other (AST layer) |
 | `pack-chain` | an accumulate-and-shift chain on one variable (`r=a; r=(r<<8)\|b; r=(r<<8)\|c; r=(r<<8)\|d`) is split into separate values and redistributed into the flat shift-and-OR form, so the register packs above apply to it |
 | `pack8-direct` | a byte pair packed into a word is read straight from its frame slots into the two register halves (IX slots in fp mode, one walked slot address in sp mode), without zero-extension |
 | `tos-de-keep-hl` | a word slot at the top of the stack is loaded into DE with `pop de; push de` while HL is kept, instead of saving HL around a slot-address read |

@@ -1985,6 +1985,31 @@ static void cse_sym_canon(const Func *f, CseAlias *a)
                 reps[nr].rep = d; nr++;
             }
         }
+    /* Likewise two single-definition constants of one width and value. A
+       constant is loaded again for each use, so `K >> n` written twice
+       would otherwise compare as two different operands. */
+    if (!opt_disabled("cse-imm")) {
+        struct { int w; int64_t imm; int rep; } ireps[64];
+        int ni = 0;
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                const Op *op = &f->bbs[b].ops[j];
+                int d = op->dst;
+                if (op->kind != IR_LD_IMM || op->imm_sym || d < 0 || d >= nv
+                    || ndef[d] != 1 || !cse_vreg_stable(f, d)) continue;
+                int w = f->vregs[d].width;
+                if (w < 1 || w > 4) continue;
+                int k;
+                for (k = 0; k < ni; k++)
+                    if (ireps[k].w == w && ireps[k].imm == op->imm) break;
+                if (k < ni) {
+                    a->canon[d] = ireps[k].rep;
+                    a->fixed[d] = 1;
+                } else if (ni < 64) {
+                    ireps[ni].w = w; ireps[ni].imm = op->imm; ireps[ni].rep = d; ni++;
+                }
+            }
+    }
     free(ndef);
 }
 
