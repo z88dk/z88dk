@@ -183,6 +183,10 @@ extern uint __LIB__  in_JoyKeyboard(struct in_UDK *u) __z88dk_fastcall;
    #include <arch/mz2500.h>
    // Adds the scan codes of the modifiers (IN_KEY_SCANCODE_SHIFT...)
 #endif
+#ifdef __MZ800__
+   #include <arch/mz800.h>
+   // Adds the scan codes of the modifiers (IN_KEY_SCANCODE_SHIFT...)
+#endif
 
 
 /*
@@ -324,6 +328,11 @@ extern void __LIB__  in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uin
 #endif
 
 #ifdef __MZ2500__
+   #define IN_MAX_X    319  /* largest x coord  */
+   #define IN_MAX_Y    199  /* largest y coord  */
+#endif
+
+#ifdef __MZ800__
    #define IN_MAX_X    319  /* largest x coord  */
    #define IN_MAX_Y    199  /* largest y coord  */
 #endif
