@@ -6521,6 +6521,11 @@ int ir_opt_sink_trunc(Func *f)
                 continue;
             if (usecnt[d] != 1) continue;
             if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            /* A shift feeding the truncation is narrowed to the bytes the
+               truncation keeps, but only while the two stay together. */
+            if (j > 0 && bb->ops[j - 1].dst == s
+                && (bb->ops[j - 1].kind == IR_SHR || bb->ops[j - 1].kind == IR_SHL))
+                continue;
             int k, ok = 0;
             for (k = j + 1; k < bb->n_ops; k++) {
                 const Op *o = &bb->ops[k];
