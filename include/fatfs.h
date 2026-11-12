@@ -26,25 +26,28 @@
 #include <stdint.h>
 
 /*
- * Public C API for mini-FAT. Include this header. Link
- * libsrc/classic/minifat/z80/fatfs.asm or the 8085 file, and
- * libsrc/classic/minifat/fat_bss.asm. The long form is
- * libsrc/classic/minifat/mini-fat.md.
+ * Public C API for mini-FAT. Include this header. Link one core
+ * (`z80`, `8085`, `8080`, `gbz80`, or `vm1` `fatfs.asm`) and
+ * `libsrc/classic/minifat/fat_bss.asm`. The long form is
+ * `libsrc/classic/minifat/mini-fat.md`.
  *
  * asm_disk_initialize, ide_read_sector, and ide_write_sector are
  * assembly calls. They have no C prototype and they do not follow
  * the C ABI. The register contract is in mini-fat.md.
  *
  * fs_type is 1 for FAT12, 2 for FAT16, 3 for FAT32, and 0 until
- * mount succeeds. f_open, f_read, and the other ChaN file calls are
- * added to this header as a later extension. Each one is CPU-specific
- * assembly, one function per file.
+ * mount succeeds.
  *
+ * The sector calls below take a pointer in HL (__z88dk_fastcall).
+ * DWORD cluster and LBA values are little-endian at that pointer.
+ * fat_getfree writes the free-cluster count through that pointer.
  * Success is 0 in L. 80cc and sccz80 return that byte in L, and
  * sccz80 widens it to an int, so H is 0.
- * Pointer arguments are __z88dk_fastcall (HL).
- * DWORD cluster/LBA marshals load little-endian *(uint32_t *) into BCDE.
- * fat_getfree writes the free-cluster count through that pointer.
+ *
+ * f_mount and the other f_* calls are a separate contract. Each one
+ * is CPU-specific assembly, one function per file, and the caller
+ * removes the arguments. A pointer is not fastcall. FRESULT is the
+ * low byte of HL, 0 on success.
  */
 
 typedef struct {
@@ -113,5 +116,85 @@ extern void fat_clusters(uint32_t *bytes) __z88dk_fastcall;
 #define AM_DIR  0x10
 #define AM_ARC  0x20
 #define AM_LFN  0x0F
+
+#define FA_READ             0x01
+#define FA_WRITE            0x02
+#define FA_CREATE_NEW       0x04
+#define FA_CREATE_ALWAYS    0x08
+#define FA_OPEN_ALWAYS      0x10
+#define FA_SEEKEND          0x20
+#define FA_OPEN_APPEND      0x30
+
+typedef uint8_t FRESULT;
+typedef uint32_t FSIZE_t;
+typedef unsigned int UINT;
+typedef char TCHAR;
+
+/* Natural alignment. Offsets are the DEFC values in minifat.inc. */
+typedef struct {
+    uint8_t  fs_type;
+    uint8_t  pdrv;
+    uint16_t id;
+} FATFS;
+
+typedef struct {
+    uint16_t id;
+    uint8_t  flag;
+    uint8_t  err;
+    uint8_t  attr;
+    uint8_t  pad;
+    uint32_t fptr;
+    uint32_t objsize;
+    uint32_t sclust;
+    uint32_t clust;
+    uint32_t sect;
+    uint32_t dir_sect;
+    uint16_t dir_ofs;
+} FIL;
+
+typedef struct {
+    uint16_t id;
+    uint16_t pad;
+    uint32_t dptr;
+    uint32_t sclust;
+    uint32_t clust;
+    uint32_t sect;
+} DIR;
+
+typedef struct {
+    uint32_t fsize;
+    uint16_t fdate;
+    uint16_t ftime;
+    uint8_t  fattrib;
+    TCHAR    fname[13];
+} FILINFO;
+
+extern FRESULT f_mount(FATFS *fs, const TCHAR *path, uint8_t opt);
+extern FRESULT f_open(FIL *fp, const TCHAR *path, uint8_t mode);
+extern FRESULT f_close(FIL *fp);
+extern FRESULT f_read(FIL *fp, void *buff, UINT btr, UINT *br);
+extern FRESULT f_write(FIL *fp, const void *buff, UINT btw, UINT *bw);
+extern FRESULT f_lseek(FIL *fp, FSIZE_t ofs);
+extern FRESULT f_sync(FIL *fp);
+extern FRESULT f_opendir(DIR *dp, const TCHAR *path);
+extern FRESULT f_closedir(DIR *dp);
+extern FRESULT f_readdir(DIR *dp, FILINFO *fno);
+extern FRESULT f_mkdir(const TCHAR *path);
+extern FRESULT f_unlink(const TCHAR *path);
+extern FRESULT f_rename(const TCHAR *path_old, const TCHAR *path_new);
+extern FRESULT f_stat(const TCHAR *path, FILINFO *fno);
+extern FRESULT f_chmod(const TCHAR *path, uint8_t attr, uint8_t mask);
+extern FRESULT f_utime(const TCHAR *path, const FILINFO *fno);
+extern FRESULT f_chdir(const TCHAR *path);
+extern FRESULT f_chdrive(const TCHAR *path);
+extern FRESULT f_getcwd(TCHAR *buff, UINT len);
+extern FRESULT f_getfree(const TCHAR *path, uint32_t *nclst, FATFS **fatfs);
+extern FRESULT f_expand(FIL *fp, FSIZE_t fsz, uint8_t opt);
+
+#define f_eof(fp)   ((fp)->fptr == (fp)->objsize)
+#define f_error(fp) ((fp)->err)
+#define f_tell(fp)  ((fp)->fptr)
+#define f_size(fp)  ((fp)->objsize)
+#define f_rewind(fp) f_lseek((fp), 0)
 
 #endif

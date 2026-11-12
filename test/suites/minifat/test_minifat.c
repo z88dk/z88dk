@@ -74,6 +74,238 @@ static void put_fat32(uint8_t *s, uint8_t csize, uint16_t nroot, uint16_t fsver)
     s[511] = 0xAA;
 }
 
+#ifdef MINIFAT_API
+static FATFS api_fs;
+static FIL api_fil;
+static DIR api_dir;
+static FILINFO api_info;
+static char api_cwd[64];
+static uint8_t api_buf[600];
+static uint8_t api_got[600];
+static uint32_t api_nfree;
+static FATFS *api_pfs;
+
+static void api_reset(void)
+{
+    rt_invalidate();
+    memset(ram_image, 0, sizeof ram_image);
+    memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
+    put_vbr(ram_image, 1, 16, 1, 43);
+    ram_image[512] = 0xF8;
+    ram_image[513] = 0xFF;
+    ram_image[514] = 0xFF;
+    ram_nsect = 48;
+    memset(&api_fs, 0, sizeof api_fs);
+}
+
+static void test_api(void)
+{
+    FRESULT fr;
+    UINT n;
+    int i;
+
+    api_reset();
+    fr = f_mount(&api_fs, "0:", 1);
+    expect("api_mount", fr == FR_OK && api_fs.fs_type == 1);
+
+    fr = f_open(0, "NOPE.TXT", FA_READ);
+    expect("api_null", fr == FR_INVALID_OBJECT);
+
+    fr = f_open(&api_fil, "NOPE.TXT", FA_READ);
+    expect("api_miss", fr == FR_NO_FILE);
+
+    fr = f_chdrive("0:");
+    expect("api_drive", fr == FR_OK);
+    fr = f_chdrive("1:");
+    expect("api_drive1", fr == FR_INVALID_DRIVE);
+
+    api_nfree = 0;
+    api_pfs = 0;
+    fr = f_getfree("0:", &api_nfree, &api_pfs);
+    expect("api_free0", fr == FR_OK && api_nfree == 40 && api_pfs == &api_fs);
+
+    fr = f_open(&api_fil, "HELLO.TXT", FA_WRITE | FA_CREATE_ALWAYS);
+    expect("api_creat", fr == FR_OK);
+    n = 0;
+    fr = f_write(&api_fil, "Hi", 2, &n);
+    expect("api_wr", fr == FR_OK && n == 2);
+    fr = f_close(&api_fil);
+    expect("api_close", fr == FR_OK);
+
+    fr = f_open(&api_fil, "HELLO.TXT", FA_READ);
+    expect("api_open", fr == FR_OK);
+    n = 0;
+    memset(api_got, 0, 8);
+    fr = f_read(&api_fil, api_got, 8, &n);
+    expect("api_rd", fr == FR_OK && n == 2 && api_got[0] == 'H' && api_got[1] == 'i');
+    expect("api_eof", f_eof(&api_fil));
+    fr = f_lseek(&api_fil, 1);
+    expect("api_seek", fr == FR_OK);
+    n = 0;
+    fr = f_read(&api_fil, api_got, 1, &n);
+    expect("api_rdi", fr == FR_OK && n == 1 && api_got[0] == 'i');
+    fr = f_close(&api_fil);
+    expect("api_close2", fr == FR_OK);
+
+    memset(&api_info, 0, sizeof api_info);
+    fr = f_stat("HELLO.TXT", &api_info);
+    expect("api_stat", fr == FR_OK && api_info.fsize == 2 && api_info.fname[0] == 'H');
+
+    fr = f_chmod("HELLO.TXT", AM_RDO, AM_RDO);
+    expect("api_chmod", fr == FR_OK);
+    fr = f_stat("HELLO.TXT", &api_info);
+    expect("api_rdo", fr == FR_OK && (api_info.fattrib & AM_RDO) != 0);
+    fr = f_open(&api_fil, "HELLO.TXT", FA_WRITE | FA_OPEN_ALWAYS);
+    expect("api_rdo_open", fr == FR_DENIED);
+    fr = f_chmod("HELLO.TXT", 0, AM_RDO);
+    expect("api_unrdo", fr == FR_OK);
+    memset(&api_info, 0, sizeof api_info);
+    fr = f_stat("HELLO.TXT", &api_info);
+    expect("api_rdo_clr", fr == FR_OK && (api_info.fattrib & AM_RDO) == 0);
+
+    api_info.fdate = 0x5891;
+    api_info.ftime = 0x8800;
+    fr = f_utime("HELLO.TXT", &api_info);
+    expect("api_utime", fr == FR_OK);
+    memset(&api_info, 0, sizeof api_info);
+    fr = f_stat("HELLO.TXT", &api_info);
+    expect("api_time", fr == FR_OK && api_info.fdate == 0x5891 && api_info.ftime == 0x8800);
+
+    fr = f_open(&api_fil, "HELLO.TXT", FA_WRITE | FA_OPEN_APPEND);
+    expect("api_app_open", fr == FR_OK);
+    n = 0;
+    fr = f_write(&api_fil, "!", 1, &n);
+    expect("api_app", fr == FR_OK && n == 1);
+    fr = f_close(&api_fil);
+    expect("api_app_cl", fr == FR_OK);
+    fr = f_open(&api_fil, "HELLO.TXT", FA_READ);
+    n = 0;
+    memset(api_got, 0, 8);
+    fr = f_read(&api_fil, api_got, 8, &n);
+    expect("api_app_rd", fr == FR_OK && n == 3 &&
+           api_got[0] == 'H' && api_got[1] == 'i' && api_got[2] == '!');
+    fr = f_close(&api_fil);
+    expect("api_app_rd_cl", fr == FR_OK);
+
+    fr = f_mkdir("SUB");
+    expect("api_mkdir", fr == FR_OK);
+    fr = f_mkdir("SUB");
+    expect("api_mkdir2", fr == FR_EXIST);
+
+    fr = f_open(&api_fil, "SUB/A.TXT", FA_WRITE | FA_CREATE_ALWAYS);
+    expect("api_sub", fr == FR_OK);
+    n = 0;
+    fr = f_write(&api_fil, "A", 1, &n);
+    expect("api_suba", fr == FR_OK && n == 1);
+    fr = f_close(&api_fil);
+    expect("api_sub_cl", fr == FR_OK);
+
+    fr = f_chdir("SUB");
+    expect("api_cd", fr == FR_OK);
+    fr = f_getcwd(api_cwd, (UINT)sizeof api_cwd);
+    expect("api_cwd", fr == FR_OK && strcmp(api_cwd, "0:/SUB") == 0);
+    fr = f_chdir("..");
+    expect("api_cdup", fr == FR_OK);
+    fr = f_getcwd(api_cwd, (UINT)sizeof api_cwd);
+    expect("api_cwd0", fr == FR_OK && strcmp(api_cwd, "0:/") == 0);
+
+    fr = f_opendir(&api_dir, "SUB");
+    expect("api_od", fr == FR_OK);
+    memset(&api_info, 0, sizeof api_info);
+    fr = f_readdir(&api_dir, &api_info);
+    expect("api_rd_a", fr == FR_OK && strcmp(api_info.fname, "A.TXT") == 0);
+    memset(&api_info, 0, sizeof api_info);
+    fr = f_readdir(&api_dir, &api_info);
+    expect("api_rd_end", fr == FR_OK && api_info.fname[0] == 0);
+    fr = f_closedir(&api_dir);
+    expect("api_cdir", fr == FR_OK);
+
+    fr = f_open(&api_fil, "GROW.DAT", FA_WRITE | FA_CREATE_ALWAYS);
+    expect("api_grow_open", fr == FR_OK);
+    fr = f_expand(&api_fil, 512, 2);
+    expect("api_expand_bad", fr == FR_INVALID_PARAMETER);
+    fr = f_expand(&api_fil, 512, 0);
+    expect("api_expand0", fr == FR_OK && api_fil.objsize == 0);
+    fr = f_expand(&api_fil, 512, 1);
+    expect("api_expand", fr == FR_OK && api_fil.objsize == 512);
+    fr = f_close(&api_fil);
+    expect("api_grow_cl", fr == FR_OK);
+    fr = f_open(&api_fil, "GROW.DAT", FA_READ);
+    expect("api_grow_rd_open", fr == FR_OK);
+    n = 0;
+    memset(api_got, 0x5A, 512);
+    fr = f_read(&api_fil, api_got, 512, &n);
+    expect("api_grow_rd", fr == FR_OK && n == 512 && api_got[0] == 0 && api_got[511] == 0);
+    expect("api_grow_eof", f_eof(&api_fil) != 0);
+    fr = f_close(&api_fil);
+    expect("api_grow_rd_cl", fr == FR_OK);
+
+    for (i = 0; i < 600; ++i)
+        api_buf[i] = (uint8_t)(i * 3 + 1);
+    fr = f_open(&api_fil, "BIG.DAT", FA_WRITE | FA_CREATE_ALWAYS);
+    expect("api_big_open", fr == FR_OK);
+    n = 0;
+    fr = f_write(&api_fil, api_buf, 600, &n);
+    expect("api_big_wr", fr == FR_OK && n == 600);
+    fr = f_close(&api_fil);
+    expect("api_big_cl", fr == FR_OK);
+    fr = f_open(&api_fil, "BIG.DAT", FA_READ);
+    expect("api_big_rd_open", fr == FR_OK);
+    n = 0;
+    memset(api_got, 0, 600);
+    fr = f_read(&api_fil, api_got, 600, &n);
+    expect("api_big_rd", fr == FR_OK && n == 600 && memcmp(api_buf, api_got, 600) == 0);
+    expect("api_big_eof", f_eof(&api_fil) != 0);
+    fr = f_close(&api_fil);
+    expect("api_big_rd_cl", fr == FR_OK);
+
+    fr = f_open(&api_fil, "GAP.DAT", FA_WRITE | FA_CREATE_ALWAYS);
+    expect("api_gap_open", fr == FR_OK);
+    fr = f_lseek(&api_fil, 100);
+    expect("api_gap_seek", fr == FR_OK && api_fil.objsize == 100);
+    n = 0;
+    fr = f_write(&api_fil, "Z", 1, &n);
+    expect("api_gap_wr", fr == FR_OK && n == 1 && api_fil.objsize == 101);
+    fr = f_close(&api_fil);
+    expect("api_gap_cl", fr == FR_OK);
+    fr = f_open(&api_fil, "GAP.DAT", FA_READ);
+    expect("api_gap_rd_open", fr == FR_OK);
+    fr = f_lseek(&api_fil, 100);
+    n = 0;
+    api_got[0] = 0;
+    fr = f_read(&api_fil, api_got, 1, &n);
+    expect("api_gap_rd", fr == FR_OK && n == 1 && api_got[0] == 'Z');
+    fr = f_close(&api_fil);
+    expect("api_gap_rd_cl", fr == FR_OK);
+
+    fr = f_rename("HELLO.TXT", "BYE.TXT");
+    expect("api_ren", fr == FR_OK);
+    fr = f_stat("HELLO.TXT", &api_info);
+    expect("api_ren_old", fr == FR_NO_FILE);
+    fr = f_stat("BYE.TXT", &api_info);
+    expect("api_ren_new", fr == FR_OK && api_info.fsize == 3 && api_info.fname[0] == 'B');
+
+    fr = f_unlink("SUB");
+    expect("api_ul_busy", fr == FR_DENIED);
+    fr = f_unlink("SUB/A.TXT");
+    expect("api_ul_a", fr == FR_OK);
+    fr = f_unlink("SUB");
+    expect("api_ul_sub", fr == FR_OK);
+    fr = f_unlink("BYE.TXT");
+    expect("api_ul_bye", fr == FR_OK);
+    fr = f_unlink("GROW.DAT");
+    expect("api_ul_grow", fr == FR_OK);
+    fr = f_unlink("BIG.DAT");
+    expect("api_ul_big", fr == FR_OK);
+    fr = f_unlink("GAP.DAT");
+    expect("api_ul_gap", fr == FR_OK);
+
+    api_nfree = 0;
+    fr = f_getfree("0:", &api_nfree, 0);
+    expect("api_free1", fr == FR_OK && api_nfree == 40);
+}
+#endif
+
 int main(void)
 {
     uint8_t n[11];
@@ -1031,6 +1263,9 @@ int main(void)
            ram_image[6 * 512] == 0x52 && ram_image[6 * 512 + 484] == 0x72 &&
            ram_image[6 * 512 + 510] == 0x55 && ram_image[6 * 512 + 511] == 0xAA);
 
+#ifdef MINIFAT_API
+    test_api();
+#endif
     puts(fails ? "MINIFAT_BAD" : "MINIFAT_OK");
     return fails ? 1 : 0;
 }

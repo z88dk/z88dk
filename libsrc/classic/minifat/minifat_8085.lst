@@ -1,3 +1,26 @@
-; Mini-FAT for the 8085 classic library. One core module.
+; Mini-FAT for the 8085 classic library. The core is one module.
+; Each f_* object is linked only when the program calls that symbol.
 classic/minifat/8085/obj/8085/fatfs
+classic/minifat/8085/obj/8085/minifat_file
+classic/minifat/8085/obj/8085/f_chdir
+classic/minifat/8085/obj/8085/f_chdrive
+classic/minifat/8085/obj/8085/f_chmod
+classic/minifat/8085/obj/8085/f_close
+classic/minifat/8085/obj/8085/f_closedir
+classic/minifat/8085/obj/8085/f_expand
+classic/minifat/8085/obj/8085/f_getcwd
+classic/minifat/8085/obj/8085/f_getfree
+classic/minifat/8085/obj/8085/f_lseek
+classic/minifat/8085/obj/8085/f_mkdir
+classic/minifat/8085/obj/8085/f_mount
+classic/minifat/8085/obj/8085/f_open
+classic/minifat/8085/obj/8085/f_opendir
+classic/minifat/8085/obj/8085/f_read
+classic/minifat/8085/obj/8085/f_readdir
+classic/minifat/8085/obj/8085/f_rename
+classic/minifat/8085/obj/8085/f_stat
+classic/minifat/8085/obj/8085/f_sync
+classic/minifat/8085/obj/8085/f_unlink
+classic/minifat/8085/obj/8085/f_utime
+classic/minifat/8085/obj/8085/f_write
 classic/minifat/obj/8085/fat_bss

@@ -1569,10 +1569,10 @@ get_fat12:
     ret     NC                      ;FAT sector not read
     call    fat12_value             ;DE = 12-bit link
     ld      a,d
-    or      a
+    cp      $0F                     ;high nibble of $FF8..$FFF
     jr      NZ,get_fat12_ok
     ld      a,e
-    cp      $F7                     ;FAT12 bad cluster
+    cp      $F7                     ;FAT12 bad cluster $FF7
     jp      Z,get_fat_bad
     cp      $F8                     ;FAT12 EOC $FF8..$FFF
     jr      C,get_fat12_ok
@@ -1754,9 +1754,9 @@ put_fat12_old:
     push    hl
     call    fat12_store
     pop     hl                      ;source
-    pop     bc                      ;C = old free. pop af would clear carry
+    pop     bc                      ;B = old free. pop af would clear carry
     ret     NC
-    ld      a,c
+    ld      a,b
     push    af
     push    hl
     jp      put_fat_wrote

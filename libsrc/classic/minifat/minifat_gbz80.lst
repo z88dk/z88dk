@@ -1,0 +1,26 @@
+; Mini-FAT for the gbz80 classic library. The core is one module.
+; Each f_* object is linked only when the program calls that symbol.
+classic/minifat/gbz80/obj/gbz80/fatfs
+classic/minifat/gbz80/obj/gbz80/minifat_file
+classic/minifat/gbz80/obj/gbz80/f_chdir
+classic/minifat/gbz80/obj/gbz80/f_chdrive
+classic/minifat/gbz80/obj/gbz80/f_chmod
+classic/minifat/gbz80/obj/gbz80/f_close
+classic/minifat/gbz80/obj/gbz80/f_closedir
+classic/minifat/gbz80/obj/gbz80/f_expand
+classic/minifat/gbz80/obj/gbz80/f_getcwd
+classic/minifat/gbz80/obj/gbz80/f_getfree
+classic/minifat/gbz80/obj/gbz80/f_lseek
+classic/minifat/gbz80/obj/gbz80/f_mkdir
+classic/minifat/gbz80/obj/gbz80/f_mount
+classic/minifat/gbz80/obj/gbz80/f_open
+classic/minifat/gbz80/obj/gbz80/f_opendir
+classic/minifat/gbz80/obj/gbz80/f_read
+classic/minifat/gbz80/obj/gbz80/f_readdir
+classic/minifat/gbz80/obj/gbz80/f_rename
+classic/minifat/gbz80/obj/gbz80/f_stat
+classic/minifat/gbz80/obj/gbz80/f_sync
+classic/minifat/gbz80/obj/gbz80/f_unlink
+classic/minifat/gbz80/obj/gbz80/f_utime
+classic/minifat/gbz80/obj/gbz80/f_write
+classic/minifat/obj/gbz80/fat_bss

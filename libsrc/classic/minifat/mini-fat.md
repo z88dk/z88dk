@@ -1,10 +1,10 @@
 # Mini-FAT
 
-Mini-FAT is the FAT12, FAT16, and FAT32 layer in the classic library. The Z80 core is `libsrc/classic/minifat/z80/fatfs.asm`. The 8085 core is `libsrc/classic/minifat/8085/fatfs.asm`. The two files are one program. The 8085 file uses `rra` and `rl de` where the Z80 file uses `srl` and `sla`. The labels, the branch decisions, and the bytes a caller sees are the same. RAM for the volume and the sector window is `libsrc/classic/minifat/fat_bss.asm`. The C names are `include/fatfs.h`.
+Mini-FAT is the FAT12, FAT16, and FAT32 layer in the classic library. The cores are `libsrc/classic/minifat/z80/fatfs.asm`, `8085/fatfs.asm`, `8080/fatfs.asm`, `gbz80/fatfs.asm`, and `vm1/fatfs.asm`. The Z80 file and the 8085 file are one program. The 8085 file uses `rra` and `rl de` where the Z80 file uses `srl` and `sla`. The labels, the branch decisions, and the bytes a caller sees are the same on every core. RAM for the volume and the sector window is `libsrc/classic/minifat/fat_bss.asm`. The C names are `include/fatfs.h`.
 
-The on-disk work follows [ChaN FatFs R0.16](http://elm-chan.org/fsw/ff/00index_e.html) for `check_fs`, `find_volume`, `mount_volume`, `move_window`, `sync_window`, `clst2sect`, `get_fat`, `put_fat`, `create_chain`, `remove_chain`, `dir_sdi`, `dir_next`, `dir_find`, and `dir_create`. The core stops at the sector and directory layer. `f_open` and `f_read` are a later extension of `fatfs.h`, one call per file. They are not in the core.
+The on-disk work follows [ChaN FatFs R0.16](http://elm-chan.org/fsw/ff/00index_e.html) for `check_fs`, `find_volume`, `mount_volume`, `move_window`, `sync_window`, `clst2sect`, `get_fat`, `put_fat`, `create_chain`, `remove_chain`, `dir_sdi`, `dir_next`, `dir_find`, and `dir_create`. The core stops at the sector and directory layer. The file calls are CPU-specific assembly, one function per file, in the same directory as that CPU's core. They are not part of `fatfs.asm`.
 
-`include/fatfs.h` is the public C header. Link one core, not both, and link `fat_bss.asm` or provide the same public names. A target that wants the objects in its library lists `classic/minifat/minifat.lst` (or `minifat_8085.lst`).
+`include/fatfs.h` is the public C header. Link one core and link `fat_bss.asm`, or provide the same public names. A target that wants the objects in its library lists `classic/minifat/minifat.lst` for Z80, or `minifat_8085.lst`, `minifat_8080.lst`, `minifat_gbz80.lst`, or `minifat_vm1.lst`.
 
 ## What is in scope
 
@@ -16,9 +16,9 @@ A cluster number and an LBA are a 32-bit value in BCDE, with E as the low byte. 
 
 Success is `L = 0` and carry set. Failure is `L = 1` and carry clear. A 64 KiB cluster is the exception: `L = 19` (`FR_INVALID_PARAMETER`) and carry clear. sccz80 treats a `char` return as an `int`, so the exits also clear H. 80cc returns the byte in L. Test L, or test carry, and you will agree.
 
-## What ChaN does that this does not
+## File calls
 
-ChaN's [application interface](http://elm-chan.org/fsw/ff/00index_e.html) opens a file, seeks, reads, writes, and closes it, and it can do that for several files at once. Mini-FAT does not. You walk the cluster chain and you read the sectors.
+The file calls open a file, seek, read, write, and close it. Each call is CPU-specific assembly, one function per file, beside that CPU's core. The calls share one file-sector window, separate from `fatwin`. The core still stops before those calls, so you can walk the cluster chain and read the sectors yourself. Find, label, forward, `f_mkfs`, `f_fdisk`, `f_setcp`, and the string helpers are outside this library. `f_eof`, `f_tell`, `f_size`, `f_error`, and `f_rewind` are macros in `fatfs.h`.
 
 Also out of scope for the core: exFAT, long file names, GPT, extended partitions, and a current directory stack. `BPB_Media` is not read. The jump instruction at the start of the boot sector is not required. The `55 AA` signature is required. ChaN accepts some boot sectors that have no signature. This code does not. There is no `ffconf.h` and no option set.
 
@@ -26,7 +26,7 @@ Also out of scope for the core: exFAT, long file names, GPT, extended partitions
 
 ## Calling it from your own program
 
-Link one of the two assembly files, not both. Link `fat_bss.asm`, or provide the same public names yourself. The block may be placed at `FAT_BSS_ORG`. A program that runs where it was linked can leave the block in ordinary BSS.
+Link one core. Link `fat_bss.asm`, or provide the same public names yourself. The block may be placed at `FAT_BSS_ORG`. A program that runs where it was linked can leave the block in ordinary BSS. A program that calls an `f_*` name links that function's file from the same CPU directory. The list file names each call, and the linker pulls a call in only when the program uses it.
 
 You supply the disk. The core calls three assembly routines. They have no C prototype and they do not follow the C ABI. A C program does not call them.
 

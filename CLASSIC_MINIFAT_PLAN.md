@@ -1,6 +1,6 @@
 # Classic mini-FAT
 
-Branch `classic-minifat`. Do not commit. Do not push. The review is of location and files.
+Branch `classic-minifat`.
 
 The core stays one file per CPU. Splitting `fatfs.asm` is later work. That later split removes only optional functions, and only when a program does not call them. The core remains one file.
 
@@ -8,7 +8,7 @@ This is mini-FAT, not ChaN FatFs. There is no option set and no `ffconf.h`. Do n
 
 ## Jobs
 
-1. Copy the CPM-IDE mini-FAT source (`fatfs.asm`, `fatfs_85.asm`, `fat_bss.asm`, `fatfs.h`) and the test harness into the classic library and `test/suites/minifat`. Done as a copy. Comments and the FAT12 reject are the parts still being brought up to date.
+1. Copy the CPM-IDE mini-FAT source (`fatfs.asm`, `fatfs_85.asm`, `fat_bss.asm`, `fatfs.h`) and the test harness into the classic library and `test/suites/minifat`. Done.
 
 2. Teach the existing Z80 and 8085 cores FAT12. Update `include/fatfs.h` and `libsrc/classic/minifat/mini-fat.md`.
 
@@ -28,17 +28,26 @@ libsrc/classic/minifat/mini-fat.md
 libsrc/classic/minifat/minifat.mak
 libsrc/classic/minifat/minifat.lst
 libsrc/classic/minifat/minifat_8085.lst
+libsrc/classic/minifat/minifat_8080.lst
+libsrc/classic/minifat/minifat_gbz80.lst
+libsrc/classic/minifat/minifat_vm1.lst
 libsrc/classic/minifat/z80/fatfs.asm
 libsrc/classic/minifat/8085/fatfs.asm
-libsrc/classic/minifat/z80/f_*.asm    job 3, one call per file, Z80
-libsrc/classic/minifat/8085/f_*.asm   job 3, one call per file, 8085
+libsrc/classic/minifat/8080/fatfs.asm
+libsrc/classic/minifat/gbz80/fatfs.asm
+libsrc/classic/minifat/vm1/fatfs.asm
+libsrc/classic/minifat/z80/f_*.asm
+libsrc/classic/minifat/8085/f_*.asm
+libsrc/classic/minifat/8080/f_*.asm
+libsrc/classic/minifat/gbz80/f_*.asm
+libsrc/classic/minifat/vm1/f_*.asm
 
 test/suites/minifat/
 ```
 
 `libsrc/Makefile` includes `classic/minifat/minifat.mak` after `sdcard.mak`.
 
-Objects are built. They are not pulled into every classic link. A target that wants the core lists `@classic/minifat/minifat.lst` (or `minifat_8085.lst`), the way osca lists sdcard. `classic/z80.lst` is shared by ixiy, z80n, and kc160, so this list does not belong there. The suite compiles the asm on the zcc line and does not need the archive.
+Objects are built. They are not pulled into every classic link. A target that wants the core lists `@classic/minifat/minifat.lst`, `minifat_8085.lst`, `minifat_8080.lst`, `minifat_gbz80.lst`, or `minifat_vm1.lst`, the way osca lists sdcard. `classic/z80.lst` is shared by ixiy, z80n, and kc160, so this list does not belong there. The suite compiles the asm on the zcc line and does not need the archive.
 
 `fat_bss.asm` is the only asm in the parent directory. The core file for a CPU is not split in this work.
 
@@ -124,4 +133,4 @@ Do not claim the suite passes until ticks prints `MINIFAT_OK`.
 
 ## State
 
-Copied and wired: `include/fatfs.h`, both cores, `fat_bss.asm`, the doc, the makefiles, the list files, and the suite harness. `include/ff.h`, `include/ffconf.h`, and `include/diskio.h` were removed. The Z80 and 8085 cores assemble with FAT12 mount, get, put, and getfree. `include/fatfs.h` and `mini-fat.md` describe FAT12 and the assembly disk contract. `test/suites/minifat` prints `MINIFAT_OK` for Z80 and 8085 under sccz80. Job 3 has not been started. Nothing has been committed.
+Jobs 1 to 4 are done. Each CPU has one core, `fatfs.asm`, under `z80`, `8085`, `8080`, `gbz80`, and `vm1`. The `f_*` calls are CPU-specific assembly, one function per file, in that same directory. `include/fatfs.h` declares them. Find, label, forward, `f_mkfs`, `f_fdisk`, `f_setcp`, and the string helpers stay out. `test/suites/minifat` prints `MINIFAT_OK` for all five CPUs under sccz80 and under 80cc. `make -C libsrc classic-minifat` builds the objects. Do not `make install`.

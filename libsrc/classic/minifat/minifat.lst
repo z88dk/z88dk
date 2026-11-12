@@ -1,6 +1,30 @@
 ; Mini-FAT for a Z80-class target (TYPE=z80). The core is one module.
-; Do not list this from an ixiy or z80n link: the object is assembled
-; for z80. Optional f_* files are added here, one path each, when they
-; exist. 8085 uses minifat_8085.lst.
+; Each f_* object is linked only when the program calls that symbol.
+; 8085 lists the same calls in minifat_8085.lst.
+; 8080 lists the same calls in minifat_8080.lst.
+; gbz80 lists the same calls in minifat_gbz80.lst.
+; vm1 lists the same calls in minifat_vm1.lst.
 classic/minifat/z80/obj/z80/fatfs
+classic/minifat/z80/obj/z80/minifat_file
+classic/minifat/z80/obj/z80/f_chdir
+classic/minifat/z80/obj/z80/f_chdrive
+classic/minifat/z80/obj/z80/f_chmod
+classic/minifat/z80/obj/z80/f_close
+classic/minifat/z80/obj/z80/f_closedir
+classic/minifat/z80/obj/z80/f_expand
+classic/minifat/z80/obj/z80/f_getcwd
+classic/minifat/z80/obj/z80/f_getfree
+classic/minifat/z80/obj/z80/f_lseek
+classic/minifat/z80/obj/z80/f_mkdir
+classic/minifat/z80/obj/z80/f_mount
+classic/minifat/z80/obj/z80/f_open
+classic/minifat/z80/obj/z80/f_opendir
+classic/minifat/z80/obj/z80/f_read
+classic/minifat/z80/obj/z80/f_readdir
+classic/minifat/z80/obj/z80/f_rename
+classic/minifat/z80/obj/z80/f_stat
+classic/minifat/z80/obj/z80/f_sync
+classic/minifat/z80/obj/z80/f_unlink
+classic/minifat/z80/obj/z80/f_utime
+classic/minifat/z80/obj/z80/f_write
 classic/minifat/obj/z80/fat_bss

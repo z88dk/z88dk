@@ -1,0 +1,207 @@
+;
+; f_readdir. Outline is ChaN ff.c f_readdir (R0.16) with FF_USE_LFN 0.
+; dir_read skips a deleted entry, a dot name, AM_LFN, and a volume
+; label. End of directory is FR_OK and an empty name. fno == NULL
+; rewinds. fno at sp+2, dp at sp+4. The caller cleans.
+;
+; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+
+INCLUDE "minifat.inc"
+
+SECTION code_lib
+EXTERN  fat_ldhl
+
+EXTERN  mf_subhlbc
+
+PUBLIC  _f_readdir
+PUBLIC  f_readdir
+
+EXTERN  mf_ok
+EXTERN  mf_err
+EXTERN  mf_fill_info
+EXTERN  dir_sdi
+EXTERN  dir_next
+EXTERN  fat_dp
+EXTERN  fat_user
+EXTERN  fat_mount_id
+EXTERN  _cpm_fat_vol
+EXTERN  dir_ptr
+EXTERN  dir_ofs
+
+_f_readdir:
+f_readdir:
+    ld      hl,sp+2
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    ld      (fat_user),de
+    inc     hl
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    ld      a,d
+    or      e
+    jp      Z,fr_bad
+    ld      (fat_dp),de
+    ld      a,(de)
+    ld      l,a
+    inc     de
+    ld      a,(de)
+    ld      h,a
+    or      l
+    jp      Z,fr_bad
+    ld      de,(fat_mount_id)
+    or      a
+    push    bc
+    ld      bc,de
+    call    mf_subhlbc
+    pop     bc
+    jp      NZ,fr_bad
+    ld      a,(_cpm_fat_vol)
+    or      a
+    jp      Z,fr_bad
+    call    fat_ldhl
+    defw    fat_user
+    ld      a,h
+    or      l
+    jp      Z,fr_rewind
+    ld      de,FI_NAME
+    add     hl,de
+    ld      (hl),0
+    call    fat_ldhl
+    defw    fat_dp
+    ld      de,DIR_DPTR+2
+    add     hl,de
+    ld      a,(hl)
+    inc     hl
+    or      (hl)
+    jp      NZ,mf_ok
+    call    fr_sdi_dptr
+    jp      NC,fr_sdi_nc
+fr_loop:
+    call    fat_ldhl
+    defw    dir_ptr
+    ld      a,(hl)
+    or      a
+    jp      Z,mf_ok
+    cp      $E5
+    jp      Z,fr_skip
+    cp      '.'
+    jp      Z,fr_skip
+    ld      de,DIR_Attr
+    add     hl,de
+    ld      a,(hl)
+    cp      $0F
+    jp      Z,fr_skip
+    and     $DF
+    cp      AM_VOL
+    jp      Z,fr_skip
+    call    fat_ldhl
+    defw    fat_user
+    call    mf_fill_info
+    call    dir_next
+    jp      NC,fr_mark
+    call    fr_store
+    jp      mf_ok
+fr_skip:
+    call    dir_next
+    jp      NC,mf_ok
+    call    fr_store
+    jp      fr_loop
+fr_sdi_nc:
+    call    fat_ldhl
+    defw    fat_dp
+    ld      de,DIR_DPTR
+    add     hl,de
+    ld      a,(hl)
+    inc     hl
+    or      (hl)
+    inc     hl
+    or      (hl)
+    inc     hl
+    or      (hl)
+    jp      NZ,mf_ok
+    ld      a,FR_DISK_ERR
+    jp      mf_err
+fr_mark:
+    call    fat_ldhl
+    defw    fat_dp
+    ld      de,DIR_DPTR+2
+    add     hl,de
+    ld      (hl),1
+    inc     hl
+    ld      (hl),0
+    jp      mf_ok
+fr_rewind:
+    call    fat_ldhl
+    defw    fat_dp
+    ld      de,DIR_DPTR
+    add     hl,de
+    xor     a
+    ld      (hl),a
+    inc     hl
+    ld      (hl),a
+    inc     hl
+    ld      (hl),a
+    inc     hl
+    ld      (hl),a
+    call    fat_ldhl
+    defw    fat_dp
+    ld      de,DIR_SCLUST
+    add     hl,de
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    inc     hl
+    ld      c,(hl)
+    inc     hl
+    ld      b,(hl)
+    ld      hl,0
+    call    dir_sdi
+    jp      C,mf_ok
+    ld      a,FR_DISK_ERR
+    jp      mf_err
+fr_bad:
+    ld      a,FR_INVALID_OBJECT
+    jp      mf_err
+
+; Open the directory at the low 16 bits of dptr.
+fr_sdi_dptr:
+    call    fat_ldhl
+    defw    fat_dp
+    ld      de,DIR_DPTR
+    add     hl,de
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    push    de
+    call    fat_ldhl
+    defw    fat_dp
+    ld      de,DIR_SCLUST
+    add     hl,de
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    inc     hl
+    ld      c,(hl)
+    inc     hl
+    ld      b,(hl)
+    pop     hl
+    jp      dir_sdi
+
+; Copy dir_ofs into the low half of dptr. The high half stays 0.
+fr_store:
+    call    fat_ldhl
+    defw    fat_dp
+    ld      de,DIR_DPTR
+    add     hl,de
+    ld      de,(dir_ofs)
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    inc     hl
+    xor     a
+    ld      (hl),a
+    inc     hl
+    ld      (hl),a
+    ret
