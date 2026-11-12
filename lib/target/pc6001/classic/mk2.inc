@@ -5,6 +5,19 @@
 
     defc        __pc6001mk2=1
 
+; 1 for the boot disc (startup 5: all RAM, no ROM), 0 for a cartridge: the library's keyboard
+; reader (pc6001mk2_key.asm) is the sub-CPU's interrupt for the disc and the ROM's routine for
+; the cartridge
+    PUBLIC      __pc6001mk2_disc
+  IF    (startup=5)
+    defc        __pc6001mk2_disc=1
+  ELSE
+    defc        __pc6001mk2_disc=0
+    ; (the library's keyboard module refers to the disc's vector table)
+    PUBLIC      __pc6001mk2_irq_table
+    defc        __pc6001mk2_irq_table=0
+  ENDIF
+
     ; the 40x25 cells of 8x8 pixels (libsrc/target/pc6001/mk2)
     defc        CONSOLE_COLUMNS=40
     defc        CONSOLE_ROWS=25

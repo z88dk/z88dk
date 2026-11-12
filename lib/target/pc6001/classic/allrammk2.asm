@@ -11,6 +11,7 @@
     defc        CRT_ORG_CODE=$0000
   ENDIF
     defc        TAR__register_sp=$c000
+    defc        CRT_KEY_DEL=12          ; the key reader's backspace
 
     INCLUDE     "target/pc6001/classic/mk2.inc"
 
@@ -75,8 +76,162 @@ noop:
     ; (there is nothing to go back to: the ROM is not there)
     jr          noop
 
+IF    !DEFINED_CRT_PC6001MK2_NO_KEYBOARD
+    ; The free space below the interrupt vector table (it is at a page
+    ; boundary, so what comes before it is padded): copies of small library
+    ; routines.  Their library modules are not linked, as the symbols are
+    ; defined here first.
+    PUBLIC      l_gint, l_gint1, l_gint2, l_gint3
+    PUBLIC      l_gchar, l_gchar_sxt, l_gchar1, l_gchar2, l_gchar3
+    PUBLIC      l_pint, l_pint_pop, l_pint_pop_pint
+    PUBLIC      l_glong, l_glonghlp
+    PUBLIC      l_plong, l_ret, l_jpix, l_jphl
+    PUBLIC      l_neg_hl, l_neg_de
+l_gchar3:
+    inc         hl
+l_gchar2:
+    inc         hl
+l_gchar1:
+    inc         hl
+l_gchar:
+    ld          a, (hl)
+l_gchar_sxt:
+    ld          l, a
+    rlca
+    sbc         a, a
+    ld          h, a
+    ret
+l_gint3:
+    inc         hl
+l_gint2:
+    inc         hl
+l_gint1:
+    inc         hl
+l_gint:
+    ld          a, (hl)
+    inc         hl
+    ld          h, (hl)
+    ld          l, a
+    ret
+l_pint_pop:
+    pop         bc                      ; return address
+    pop         de                      ; where to put it
+    push        bc
+l_pint:
+l_pint_pop_pint:
+    ld          a, l
+    ld          (de), a
+    inc         de
+    ld          a, h
+    ld          (de), a
+    ret
+;Fetch long dehl from (hl)
+.l_glonghlp
+    ld a,(hl)
+    inc hl
+    ld h,(hl)
+    ld l,a
+.l_glong
+    ld e,(hl)
+    inc hl
+    ld d,(hl)
+    inc hl
+    ld a,(hl)
+    inc hl
+    ld h,(hl)
+    ld l,a
+    ex de,hl
+    ret
+l_plong:
+    ld          a, l
+    ld          (bc), a
+    inc         bc
+    ld          a, h
+    ld          (bc), a
+    inc         bc
+    ld          a, e
+    ld          (bc), a
+    inc         bc
+    ld          a, d
+    ld          (bc), a
+    ret
+    ; (not dead: the entries l_ret-1 to l_ret-3 pop that many words and return)
+    pop         hl
+    pop         hl
+    pop         hl
+l_ret:
+    ret
+l_jpix:
+    defb        0xdd
+l_jphl:
 l_dcal:
     jp          (hl)
+l_neg_hl:
+    ld          a, l
+    cpl
+    ld          l, a
+    ld          a, h
+    cpl
+    ld          h, a
+    inc         hl
+    ret
+l_neg_de:
+    ld          a, e
+    cpl
+    ld          e, a
+    ld          a, d
+    cpl
+    ld          d, a
+    inc         de
+    ret
+    ; the console's cell address (libsrc/target/pc6001/mk2/pc6001mk2_xypos.asm)
+    PUBLIC      __pc6001mk2_xypos
+__pc6001mk2_xypos:
+    ld          l, b
+    ld          h, 0
+    ld          d, h
+    ld          e, l
+    add         hl, hl
+    add         hl, hl
+    add         hl, de                  ; y * 5
+    add         hl, hl
+    add         hl, hl
+    add         hl, hl
+    add         hl, hl
+    add         hl, hl
+    add         hl, hl                  ; y * 320
+    ld          a, h
+    add         a, +(__pc6001mk2_vram/256)
+    ld          h, a
+    ld          a, l
+    add         a, c
+    ld          l, a
+    ret         nc
+    inc         h
+    ret
+
+    ; The interrupt vector table for the keyboard reader (IM 2, library
+    ; pc6001mk2_key.asm: getk and fgetc_cons): 20 vectors ($00 to $26) at a page
+    ; boundary, all of them "ei, reti" until the library puts its keyboard
+    ; routine at $02.  Padding makes the alignment, so this costs up to 295
+    ; bytes of the disc and the RAM: -pragma-define:CRT_PC6001MK2_NO_KEYBOARD=1
+    ; leaves it out for a program that has no use for the library's keyboard
+    ; routines (it has no getk, and sets up its own interrupts).
+    PUBLIC      __pc6001mk2_irq_table
+    defs        ((ASMPC+255)&$ff00)-ASMPC
+__pc6001mk2_irq_table:
+    REPT        20
+    defw        irq_return
+    ENDR
+irq_return:
+    ei
+    reti
+ELSE
+    PUBLIC      l_jphl
+l_dcal:
+l_jphl:
+    jp          (hl)
+ENDIF
 
     SECTION     rodata_clib
 __pc6001mk2_overlay_table:
