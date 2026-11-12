@@ -4902,6 +4902,134 @@ int ir_cmp_diff_fits(const Func *f, const Op *op)
     return l0 >= -16384 && h0 <= 16383 && l1 >= -16384 && h1 <= 16383;
 }
 
+/* ---- Non-negative after a sign test ---------------------------------------
+   `if (v < 0) v = 0; if (v > K)`: v is >= 0 at the second compare whichever way
+   the first went, so the signed compare may run unsigned. A forward must-analysis
+   per block: v is non-negative at entry when it is on every incoming edge, an
+   edge being non-negative when v was last set to a non-negative value, or when
+   the branch is the false edge of `v < 0` (true edge of `v >= 0`) on a compare
+   still intact at the branch. The entry block knows nothing. */
+static int cn_nonneg_def(const Func *f, const Op *op)
+{
+    switch (op->kind) {
+    case IR_LD_IMM:
+        return !op->imm_sym && op->imm >= 0 && op->imm <= 32767;
+    case IR_CONV_ZX:
+        return op->src[0] >= 0 && op->src[0] < f->n_vregs
+            && f->vregs[op->src[0]].width == 1;
+    case IR_AND:
+        return op->src[1] == -1 && op->imm >= 0 && op->imm <= 32767;
+    default:
+        return 0;
+    }
+}
+
+/* Is the branch compare `c`, last set at op index `ci`, a sign test of x?
+   Returns +1 for "c != 0 means x < 0", -1 for "c != 0 means x >= 0", else 0. */
+static int cn_sign_test(const Op *o, int x)
+{
+    if (o->src[0] != x || o->src[1] != -1) return 0;
+    if (o->kind == IR_CMP_LT && o->imm == 0)  return +1;
+    if (o->kind == IR_CMP_LE && o->imm == -1) return +1;
+    if (o->kind == IR_CMP_GE && o->imm == 0)  return -1;
+    if (o->kind == IR_CMP_GT && o->imm == -1) return -1;
+    return 0;
+}
+
+/* x >= 0 immediately before op `cj` of block `cb`? */
+static int cn_prove(const Func *f, int cb, int cj, int x)
+{
+    int n = f->n_bbs;
+    if (x < 0 || x >= f->n_vregs || n <= 0 || cb < 0 || cb >= n) return 0;
+    if (f->vregs[x].width != 2) return 0;
+    if (f->vregs[x].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    char *in = malloc((size_t)n);
+    if (!in) return 0;
+    for (int b = 0; b < n; b++) in[b] = (b != 0);
+    int ok = 0, changed = 1, rounds = 0;
+    while (changed && rounds++ < 32) {
+        changed = 0;
+        for (int b = 1; b < n; b++) {
+            int acc = 1, npred = 0;
+            for (int p = 0; p < n && acc; p++) {
+                const BB *pb = &f->bbs[p];
+                int ns = ir_bb_n_succ((BB *)pb), is_succ = 0, on_taken = 0, on_fall = 0;
+                for (int k = 0; k < ns; k++)
+                    if (ir_bb_succ_at((BB *)pb, k) == b) {
+                        is_succ = 1;
+                        if (k == 0) on_taken = 1; else on_fall = 1;
+                    }
+                if (!is_succ) continue;
+                npred++;
+                /* state at the end of p, and the sign test that is still live */
+                int s = in[p], tc = -1, tk = 0;
+                const Op *br = NULL;
+                for (int j = 0; j < pb->n_ops; j++) {
+                    const Op *o = &pb->ops[j];
+                    int ds[8], nd = ir_op_defs(o, ds, 8);
+                    for (int d = 0; d < nd; d++) {
+                        if (ds[d] == x) { s = cn_nonneg_def(f, o); tc = -1; }
+                        if (ds[d] == tc) tc = -1;
+                    }
+                    if (o->dst >= 0 && o->dst != x && cn_sign_test(o, x)) {
+                        tc = o->dst; tk = cn_sign_test(o, x);
+                    }
+                    if (o->kind == IR_BR_ZERO || o->kind == IR_BR_COND) br = o;
+                }
+                int es = s;
+                if (br && tc >= 0 && br->src[0] == tc && ns == 2
+                    && pb->n_ops >= 2 && br == &pb->ops[pb->n_ops - 2]
+                    && pb->ops[pb->n_ops - 1].kind == IR_BR) {
+                    /* branch taken when c != 0 (BR_COND) or c == 0 (BR_ZERO) */
+                    int taken_c_nonzero = (br->kind == IR_BR_COND);
+                    /* c != 0 means x < 0 when tk > 0, x >= 0 when tk < 0 */
+                    int taken_nonneg = taken_c_nonzero ? (tk < 0) : (tk > 0);
+                    int fall_nonneg  = !taken_nonneg;
+                    int e = 1;
+                    if (on_taken) e = e && (taken_nonneg || s);
+                    if (on_fall)  e = e && (fall_nonneg || s);
+                    es = e;
+                }
+                acc = acc && es;
+            }
+            int nv = npred ? acc : 1;
+            if (nv != in[b]) { in[b] = (char)nv; changed = 1; }
+        }
+    }
+    if (!changed) {
+        int s = in[cb];
+        const BB *bb = &f->bbs[cb];
+        for (int j = 0; j < cj && j < bb->n_ops; j++) {
+            int ds[8], nd = ir_op_defs(&bb->ops[j], ds, 8);
+            for (int d = 0; d < nd; d++)
+                if (ds[d] == x) s = cn_nonneg_def(f, &bb->ops[j]);
+        }
+        ok = s;
+    }
+    free(in);
+    return ok;
+}
+
+/* Every definition of c is a non-negative constant. */
+static int cn_const_nonneg(const Func *f, int c)
+{
+    if (c < 0 || c >= f->n_vregs || f->vregs[c].width != 2) return 0;
+    if (f->vregs[c].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+        return 0;
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int ds[8], nd = ir_op_defs(o, ds, 8);
+            for (int d = 0; d < nd; d++)
+                if (ds[d] == c) {
+                    if (o->kind != IR_LD_IMM || !cn_nonneg_def(f, o)) return 0;
+                    seen = 1;
+                }
+        }
+    return seen;
+}
+
 /* ---- Signed compares that need no sign correction (ir_opt_cmp_unsign) ----
    A signed 16-bit compare lowers to `and a; sbc hl,de` plus SEVEN BYTES of pure
    sign correction — `ld a,h; jp po,L; xor 0x80; L: rla` — because the carry out
@@ -4944,9 +5072,16 @@ int ir_opt_cmp_unsign(Func *f)
                                          | IR_VREG_VOLATILE)) continue;
                 if (f->vregs[c].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
                                          | IR_VREG_VOLATILE)) continue;
-                if (!v_fits_byte(f, a) || !v_fits_byte(f, c)) continue;
+                int oka = v_fits_byte(f, a)
+                       || (!opt_disabled("cmp-unsign-sign") && cn_prove(f, b, j, a));
+                int okc = v_fits_byte(f, c)
+                       || (!opt_disabled("cmp-unsign-sign")
+                           && (cn_const_nonneg(f, c) || cn_prove(f, b, j, c)));
+                if (!oka || !okc) continue;
             } else {
-                if (!cs_operand_safe(f, b, a, op->imm, bound, NULL)) continue;
+                if (!cs_operand_safe(f, b, a, op->imm, bound, NULL)
+                    && !(!opt_disabled("cmp-unsign-sign") && cn_prove(f, b, j, a)))
+                    continue;
                 if (bound < 0) continue;
             }
             cv[ncv++] = op;
