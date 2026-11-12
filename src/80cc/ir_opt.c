@@ -6359,7 +6359,7 @@ int ir_opt_insert_long_pushes(Func *f, int allow_regular)
 /* ROTATE_LEFT triple fusion (fuse_rotl) migrated to the ir_match
    table as the `rotl` pattern — see ir_match.c. */
 
-/* Move a single-use word->byte CONV_TRUNC down to the byte store that reads
+/* Move a single-use word or long -> byte CONV_TRUNC down to the byte store that reads
    it, so the byte is not held (and spilled) across the address arithmetic
    between them. Only within one block, with the source word unchanged and no
    call or asm in between. */
@@ -6378,7 +6378,12 @@ int ir_opt_sink_trunc(Func *f)
             if (op->kind != IR_CONV_TRUNC) continue;
             int d = op->dst, s = op->src[0];
             if (d < 0 || d >= nv || s < 0 || s >= nv) continue;
-            if (f->vregs[d].width != 1 || f->vregs[s].width != 2) continue;
+            /* A long source pays off only with a frame pointer: a store into
+               a frame slot then needs no register for its address. */
+            if (f->vregs[d].width != 1
+                || (f->vregs[s].width != 2
+                    && !(f->vregs[s].width == 4 && c_framepointer_is_ix != -1)))
+                continue;
             if (usecnt[d] != 1) continue;
             if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
             int k, ok = 0;

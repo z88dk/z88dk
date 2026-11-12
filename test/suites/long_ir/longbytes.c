@@ -37,12 +37,24 @@ static u32 split_use(u8 *p, u32 v)
     return v + 1;
 }
 
+/* The long changes between the truncation and the store of its byte. */
+static void split_defer(u8 *p, u32 v)
+{
+    u8 b = (u8)v;
+    u8 c = (u8)(v >> 8);
+    v += 0x101;
+    p[0] = b;
+    p[1] = (u8)v;
+    p[2] = c;
+    p[3] = (u8)(v >> 8);
+}
+
 static u32 vals[] = { 0, 1, 0xFF, 0x100, 0x1234, 0x10000, 0x123456, 0x12345678,
                       0xFEDCBA98, 0x80000000, 0xFFFFFFFF, 0x00FF00FF };
 
 static void check(void)
 {
-    int b1 = 0, b2 = 0, b3 = 0;
+    int b1 = 0, b2 = 0, b3 = 0, b4 = 0;
     unsigned i;
     for (i = 0; i < sizeof vals / sizeof vals[0]; ++i) {
         u32 v = vals[i];
@@ -55,10 +67,14 @@ static void check(void)
             || t[3] != (u8)(v >> 16) || t[4] != (u8)(v >> 24)) ++b2;
         if (split_use(t, v) != v + 1) ++b3;
         if (t[0] != (u8)v || t[1] != (u8)(v >> 8) || t[2] != (u8)(v >> 16)) ++b3;
+        split_defer(t, v);
+        if (t[0] != (u8)v || t[1] != (u8)(v + 0x101) || t[2] != (u8)(v >> 8)
+            || t[3] != (u8)((v + 0x101) >> 8)) ++b4;
     }
     assertEqual(b1, 0);
     assertEqual(b2, 0);
     assertEqual(b3, 0);
+    assertEqual(b4, 0);
 }
 
 int main(int argc, char *argv[])
