@@ -149,6 +149,9 @@
     <ClCompile Include="..\..\src\appmake\pasopia7.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\appmake\pc6001mk2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\appmake\pc88.c">
       <Filter>Source Files</Filter>
     </ClCompile>
