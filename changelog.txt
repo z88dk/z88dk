@@ -1,6 +1,17 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
+z88dk v2.6 - xx.xx.2027
+
+...
+
+More detailed, but still incomplete changelist:
+
+- [classic] +mz800 support for the Sharp MZ-800
+- [classic] +pc6001 support for the PC-6001mk2
+
+
+
 z88dk v2.5 - 11.11.2026
 
 Headline features for this release:
