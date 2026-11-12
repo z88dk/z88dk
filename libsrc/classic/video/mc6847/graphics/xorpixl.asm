@@ -8,11 +8,16 @@
 
     EXTERN  __mc6847_mode
     EXTERN  __tms9918_xorpixel
+    EXTERN  __pc6001mk2_xorpixel
     INCLUDE "classic/video/mc6847/mc6847.inc"
 
 
 xorpixel:
     ld      a, (__mc6847_mode)
+IF FORpc6001
+    cp      MC6847_MODE_MK2
+    jp      z, __pc6001mk2_xorpixel
+ENDIF
 IF FORspc1000
     cp      10
     jp      z,__tms9918_xorpixel

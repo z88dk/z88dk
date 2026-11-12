@@ -58,6 +58,9 @@ ENDIF
 IF FORpc6001
     INCLUDE "target/pc6001/def/pc6001.def"
     defc    MODE0_3x2 = 1
+    ; the PC-6001mkII's 320x200 mode (pc6001mk2.lib has it: -subtype=mk2disc;
+    ; pc6001_clib has stubs that do nothing)
+    defc    MC6847_MODE_MK2 = 3
     defc    MC6847_HAS_HIRES = 1
     defc    MC6847_HAS_CG = 1
     defc    MC6847_HAS_TEXT_GFX = 1

@@ -1018,6 +1018,7 @@ void setf(int a){
 void cpu_run(long long counter, long long stint, int intr, int start, int end)
 {
   uint8_t opc;
+  int lua_vec = -1;                 /* the data bus byte of an interrupt: -1 is the Spectrum's floating $FF */
 
   do{
     if ( ih ) {
@@ -1036,7 +1037,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
 
     if( intr && st>stint && ih && (alts == 0 && altd == 0 && ioi == 0 && ioe == 0 && vm1_prefix_pending() == 0)){
       stint= st+intr;
-      if( iff ){
+      if( iff && (lua_vec= lua_interrupt(st)) != -2 ){      /* (a Lua model may say none now, or what is on the data bus) */
         halted && (pc++, halted= 0);
         iff= 0;
         put_memory(--sp,pc>>8);
@@ -1050,7 +1051,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
             st+= 12;
             break;
           default:
-            pc= get_memory_data(t= 255 | i << 8);
+            pc= get_memory_data(t= (lua_vec < 0 ? 255 : lua_vec) | i << 8);
             pc|= get_memory_data(++t) << 8;
             st+= 19;
         }

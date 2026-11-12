@@ -12,10 +12,20 @@ IF FORpc6001
 
 
     EXTERN  generic_console_text_xypos
+    EXTERN  __mc6847_mode
+    EXTERN  __pc6001mk2_set_attribute
+    EXTERN  __pc6001mk2_set_ink
+    EXTERN  __pc6001mk2_set_paper
+    EXTERN  __pc6001mk2_plotc
+    EXTERN  __pc6001mk2_console_pointxy
+    INCLUDE "classic/video/mc6847/mc6847.inc"
     EXTERN  __mc6847_MODE2_attr
     EXTERN  mc6847_map_colour
 
 generic_console_set_attribute:
+    ld      a, (__mc6847_mode)
+    cp      MC6847_MODE_MK2             ; (the mkII's 320x200 has its own pens)
+    jp      z, __pc6001mk2_set_attribute
     ld      a, (hl)
     ld      c, 0
     rlca
@@ -27,6 +37,11 @@ generic_console_set_attribute:
     ret
 
 generic_console_set_ink:
+    ld      b, a
+    ld      a, (__mc6847_mode)
+    cp      MC6847_MODE_MK2
+    ld      a, b
+    jp      z, __pc6001mk2_set_ink
     call    mc6847_map_colour
     ld      a, b
     and     7
@@ -49,6 +64,11 @@ set_css:
 
 
 generic_console_set_paper:
+    ld      b, a
+    ld      a, (__mc6847_mode)
+    cp      MC6847_MODE_MK2
+    ld      a, b
+    jp      z, __pc6001mk2_set_paper
     call    mc6847_map_colour
     ld      a, b
     rrca
@@ -75,6 +95,11 @@ printc_MODE0:
 ; a = graphic glyph to print
 ; e = 0, 2x2 mode, e = 1, 3x2 mode
 generic_console_plotc:
+    ld      d, a
+    ld      a, (__mc6847_mode)
+    cp      MC6847_MODE_MK2
+    ld      a, d
+    jp      z, __pc6001mk2_plotc
     call    generic_console_text_xypos
     ld      c, a
     ld      a, (__mc6847_MODE2_attr)           ;It's shifted for us
@@ -97,6 +122,9 @@ generic_console_plotc:
 ;       nc = found
 ;        c = not found
 generic_console_pointxy:
+    ld      a, (__mc6847_mode)
+    cp      MC6847_MODE_MK2
+    jp      z, __pc6001mk2_console_pointxy
     call    generic_console_text_xypos
     ld      c, (hl)                     ;glyph
     dec     h

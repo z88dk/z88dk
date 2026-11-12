@@ -174,6 +174,8 @@ extern int       mz2500_exec(char *target);
 extern int       mz800_exec(char *target);
 extern option_t  mz800_options[];
 extern option_t  mz2500_options[];
+extern int       pc6001mk2_exec(char *target);
+extern option_t  pc6001mk2_options[];
 
 extern int       nascom_exec(char *target);
 extern option_t  nascom_options[];
@@ -537,6 +539,10 @@ struct {
       "Create a PC88 bootable d88 disc",
       NULL,
       pc88disc_exec,    pc88disc_options },
+    { "bin2d88mk2", "pc6001mk2", "(C) 2026 z88dk",
+      "Create a bootable d88 disc for the NEC PC-6001mkII",
+      NULL,
+      pc6001mk2_exec,    pc6001mk2_options },
     { "bin2phc",   "phc25",       "(C) 2025 z88dk",
       "Create a .phc file for Sanyo PHC-25",
       NULL,

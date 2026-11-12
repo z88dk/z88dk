@@ -7,12 +7,17 @@
     EXTERN  pointxy_MODE2
 
     EXTERN  __tms9918_pointxy
+    EXTERN  __pc6001mk2_pointxy
     EXTERN  __mc6847_mode
     INCLUDE "classic/video/mc6847/mc6847.inc"
 
 
 pointxy:
     ld      a, (__mc6847_mode)
+IF FORpc6001
+    cp      MC6847_MODE_MK2
+    jp      z, __pc6001mk2_pointxy
+ENDIF
 IF FORspc1000
     cp      10
     jp      z,__tms9918_pointxy

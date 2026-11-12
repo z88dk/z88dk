@@ -13,10 +13,16 @@ IFNDEF MC6847_IOSPACE
     EXTERN      __phc25_attr
     EXTERN      __mc6847_modeval
     EXTERN      __tms9918_cls
+    EXTERN      __pc6001mk2_scrollup
     EXTERN      __console_font_h
 
 
 generic_console_scrollup:
+IF FORpc6001
+    ld      a, (__mc6847_mode)
+    cp      MC6847_MODE_MK2
+    jp      z, __pc6001mk2_scrollup
+ENDIF
     push    de
     push    bc
     ld      a, (__mc6847_mode)
