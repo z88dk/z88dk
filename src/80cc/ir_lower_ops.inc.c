@@ -485,6 +485,7 @@ static int try_inplace_home_unop(FILE *out, const Func *f, const Op *op,
     PhysReg pr = byte_home_phys(f, op->dst);
     if (pr == IR_PR_NONE) return 0;
     emit(out, "%s\t%s", mnem, byte_home_reg(pr));
+    byte_home_bc_written(pr);
     if (byte_home_slotbacked(pr)) L.cur_de_byte_home_dirty = 1;
     invalidate_a_cache();   /* result is in the home reg, not A */
     return 1;
@@ -2497,8 +2498,8 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
     if (src_w == 4 && dst_w == 1) {
         /* Long → char: take low byte of low half. */
         load_to_dehl(out, f, op->src[0]);
-        store_byte_from_reg(out, f, op->dst, "l");
         invalidate_hl_cache();
+        store_byte_from_reg(out, f, op->dst, "l");
         return 0;
     }
     fprintf(stderr, "ir_lower: CONV_TRUNC %d→%d not supported\n", src_w, dst_w);
@@ -7463,6 +7464,7 @@ static int try_byte_shift_test_fuse(FILE *out, const Func *f, const Op *op)
     } else {
         emit(out, "sla\t%s", byte_home_reg(pr));
     }
+    byte_home_bc_written(pr);
     if (byte_home_slotbacked(pr)) L.cur_de_byte_home_dirty = 1;
     invalidate_a_cache();
     const char *cc = (g_hc.branch_test_kind == IR_BR_ZERO) ? "nc" : "c";
