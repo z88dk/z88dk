@@ -3083,8 +3083,10 @@ static int op_is_ixd_slot(const Func *f, int v)
 static int cmp_byte_src(const Func *f, int v, int idxhalf_ok,
                         char *lo, char *hi, size_t n)
 {
-    if (bc_has(v)) { snprintf(lo,n,"c"); snprintf(hi,n,"b"); return 1; }
+    /* HL first: a value just computed there may not have been written back to
+       its BC home yet, so BC can hold the previous value while HL holds this one. */
     if (hl_has(v)) { snprintf(lo,n,"l"); snprintf(hi,n,"h"); return 1; }
+    if (bc_has(v)) { snprintf(lo,n,"c"); snprintf(hi,n,"b"); return 1; }
     if (de_has(v)) { snprintf(lo,n,"e"); snprintf(hi,n,"d"); return 1; }
     /* Resident word DE-home: the DE regcache belief may be dropped at a region
        header (residency is asserted via byte_home_holds, not cache_de), so
