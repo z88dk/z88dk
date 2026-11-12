@@ -3220,7 +3220,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
                    `counter` times, and zero runs it not at all. Smallest, but it
                    pays a taken jump on entry. */
                 emit(out, "inc\t%s", counter);
-                emit(out, "jr\tL_f%d_bshl_test_%d", L.func_emit_idx, n);
+                emit(out, "jp\tL_f%d_bshl_test_%d", L.func_emit_idx, n);
                 fprintf(out, "L_f%d_bshl_loop_%d:\n", L.func_emit_idx, n);
                 emit(out, "add\ta,a");
                 fprintf(out, "L_f%d_bshl_test_%d:\n", L.func_emit_idx, n);
