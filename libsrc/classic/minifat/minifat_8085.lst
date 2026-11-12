@@ -1,0 +1,3 @@
+; Mini-FAT for the 8085 classic library. One core module.
+classic/minifat/8085/obj/8085/fatfs
+classic/minifat/obj/8085/fat_bss
