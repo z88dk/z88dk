@@ -3,7 +3,7 @@
 ; is FR_NO_PATH. A file is FR_NO_PATH. "." and the root are the
 ; directory itself. path at sp+2, dp at sp+4. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -26,19 +26,16 @@ EXTERN  fat_mount_id
 
 _f_opendir:
 f_opendir:
-    ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_path),de
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      a,d
-    or      e
+    ld      de,sp+2
+    ld      hl,(de)
+    ld      (fat_path),hl
+    ld      de,sp+4
+    ld      hl,(de)
+    ld      a,h
+    or      l
     jp      Z,od_bad
-    ld      (fat_dp),de
+    ld      (fat_dp),hl
+    ex      de,hl
     ld      b,20
     xor     a
 od_z:
@@ -64,8 +61,8 @@ od_dir:
     inc     hl
     ld      (hl),d
     ld      hl,(fat_dp)
-    ld      de,DIR_SCLUST
-    add     hl,de
+    ld      de,hl+DIR_SCLUST
+    ex      de,hl
     ld      de,(fat_here)
     ld      (hl),e
     inc     hl
@@ -76,8 +73,8 @@ od_dir:
     inc     hl
     ld      (hl),d
     ld      hl,(fat_dp)
-    ld      de,DIR_CLUST
-    add     hl,de
+    ld      de,hl+DIR_CLUST
+    ex      de,hl
     ld      de,(fat_here)
     ld      (hl),e
     inc     hl

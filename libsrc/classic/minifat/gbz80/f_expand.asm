@@ -5,7 +5,7 @@
 ; rejected. create_chain is not used. The directory entry is not
 ; synced here. opt at sp+2, fsz at sp+4, fp at sp+8. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -61,8 +61,7 @@ f_expand:
     jp      mf_err
 fe_opt:
     ld      hl,fat_seek
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     or      (hl)
     inc     hl
     or      (hl)
@@ -80,8 +79,7 @@ fe_opt:
     defw    fat_fp
     ld      de,FIL_SIZE
     add     hl,de
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     or      (hl)
     inc     hl
     or      (hl)
@@ -92,8 +90,7 @@ fe_opt:
     defw    fat_fp
     ld      de,FIL_SCLUST
     add     hl,de
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     or      (hl)
     inc     hl
     or      (hl)
@@ -424,8 +421,7 @@ fe_ceil:
     inc     (hl)
 fe_tcl_cp:
     ld      hl,fat_zeros
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     or      (hl)
     inc     hl
     or      (hl)

@@ -4,7 +4,7 @@
 ; follow_path, validate): 80cc stack-pointer order, caller cleans.
 ; The delivered code calls this core. It is not the 80cc listing.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

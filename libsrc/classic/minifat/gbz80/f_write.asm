@@ -4,7 +4,7 @@
 ; A short write at the end of the disk is FR_OK. FA_MODIFIED is set
 ; even when btw is 0. bw at sp+2, btw at sp+4, buff at sp+6, fp at sp+8.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -54,8 +54,7 @@ f_write:
     or      l
     jp      Z,fw_chk
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a
 fw_chk:
     call    fat_ldhl
@@ -76,8 +75,7 @@ fw_clip:
     defw    fat_fp
     ld      de,FIL_FPTR+2
     add     hl,de
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     and     (hl)
     inc     a
     jp      NZ,fw_go

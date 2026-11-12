@@ -4,7 +4,7 @@
 ; label. End of directory is FR_OK and an empty name. fno == NULL
 ; rewinds. fno at sp+2, dp at sp+4. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -72,8 +72,7 @@ f_readdir:
     defw    fat_dp
     ld      de,DIR_DPTR+2
     add     hl,de
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     or      (hl)
     jp      NZ,mf_ok
     call    fr_sdi_dptr
@@ -113,8 +112,7 @@ fr_sdi_nc:
     defw    fat_dp
     ld      de,DIR_DPTR
     add     hl,de
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     or      (hl)
     inc     hl
     or      (hl)
@@ -138,12 +136,9 @@ fr_rewind:
     ld      de,DIR_DPTR
     add     hl,de
     xor     a
-    ld      (hl),a
-    inc     hl
-    ld      (hl),a
-    inc     hl
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
+    ld      (hl+),a
+    ld      (hl+),a
     ld      (hl),a
     call    fat_ldhl
     defw    fat_dp
@@ -201,7 +196,6 @@ fr_store:
     ld      (hl),d
     inc     hl
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a
     ret

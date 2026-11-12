@@ -4,7 +4,7 @@
 ; A short write at the end of the disk is FR_OK. FA_MODIFIED is set
 ; even when btw is 0. bw at sp+2, btw at sp+4, buff at sp+6, fp at sp+8.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -24,26 +24,18 @@ EXTERN  fat_write
 
 _f_write:
 f_write:
-    ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_out),de
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_left),de
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_user),de
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_fp),de
+    ld      de,sp+2
+    ld      hl,(de)
+    ld      (fat_out),hl
+    ld      de,sp+4
+    ld      hl,(de)
+    ld      (fat_left),hl
+    ld      de,sp+6
+    ld      hl,(de)
+    ld      (fat_user),hl
+    ld      de,sp+8
+    ld      hl,(de)
+    ld      (fat_fp),hl
     ld      hl,(fat_out)
     ld      a,h
     or      l
@@ -57,8 +49,8 @@ fw_chk:
     call    mf_fil_check
     ret     NC
     ld      hl,(fat_fp)
-    ld      de,FIL_FLAG
-    add     hl,de
+    ld      de,hl+FIL_FLAG
+    ex      de,hl
     ld      a,(hl)
     and     FA_WRITE
     jr      NZ,fw_clip
@@ -66,16 +58,16 @@ fw_chk:
     jp      mf_err
 fw_clip:
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR+2
-    add     hl,de
+    ld      de,hl+FIL_FPTR+2
+    ex      de,hl
     ld      a,(hl)
     inc     hl
     and     (hl)
     inc     a
     jr      NZ,fw_go
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)

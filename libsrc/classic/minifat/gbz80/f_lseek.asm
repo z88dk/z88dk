@@ -4,7 +4,7 @@
 ; end uses the byte before that offset. ofs low at sp+2, ofs high at
 ; sp+4, fp at sp+6. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -144,16 +144,13 @@ fl_step:
     add     hl,de
     ld      a,(hl)
     add     a,c
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,b
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,0
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,0
     ld      (hl),a

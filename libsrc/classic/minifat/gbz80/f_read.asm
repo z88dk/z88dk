@@ -3,7 +3,7 @@
 ; FA_READ, clip to the bytes still in the file, copy through the cache.
 ; br at sp+2, btr at sp+4, buff at sp+6, fp at sp+8. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -50,8 +50,7 @@ f_read:
     or      l
     jp      Z,fr_chk
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a
 fr_chk:
     call    fat_ldhl

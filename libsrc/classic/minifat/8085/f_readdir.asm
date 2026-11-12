@@ -4,7 +4,7 @@
 ; label. End of directory is FR_OK and an empty name. fno == NULL
 ; rewinds. fno at sp+2, dp at sp+4. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -27,19 +27,16 @@ EXTERN  dir_ofs
 
 _f_readdir:
 f_readdir:
-    ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_user),de
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      a,d
-    or      e
+    ld      de,sp+2
+    ld      hl,(de)
+    ld      (fat_user),hl
+    ld      de,sp+4
+    ld      hl,(de)
+    ld      a,h
+    or      l
     jp      Z,fr_bad
-    ld      (fat_dp),de
+    ld      (fat_dp),hl
+    ex      de,hl
     ld      a,(de)
     ld      l,a
     inc     de
@@ -61,12 +58,12 @@ f_readdir:
     ld      a,h
     or      l
     jr      Z,fr_rewind
-    ld      de,FI_NAME
-    add     hl,de
+    ld      de,hl+FI_NAME
+    ex      de,hl
     ld      (hl),0
     ld      hl,(fat_dp)
-    ld      de,DIR_DPTR+2
-    add     hl,de
+    ld      de,hl+DIR_DPTR+2
+    ex      de,hl
     ld      a,(hl)
     inc     hl
     or      (hl)
@@ -82,8 +79,8 @@ fr_loop:
     jr      Z,fr_skip
     cp      '.'
     jr      Z,fr_skip
-    ld      de,DIR_Attr
-    add     hl,de
+    ld      de,hl+DIR_Attr
+    ex      de,hl
     ld      a,(hl)
     cp      $0F
     jr      Z,fr_skip
@@ -103,8 +100,8 @@ fr_skip:
     jr      fr_loop
 fr_sdi_nc:
     ld      hl,(fat_dp)
-    ld      de,DIR_DPTR
-    add     hl,de
+    ld      de,hl+DIR_DPTR
+    ex      de,hl
     ld      a,(hl)
     inc     hl
     or      (hl)
@@ -117,16 +114,16 @@ fr_sdi_nc:
     jp      mf_err
 fr_mark:
     ld      hl,(fat_dp)
-    ld      de,DIR_DPTR+2
-    add     hl,de
+    ld      de,hl+DIR_DPTR+2
+    ex      de,hl
     ld      (hl),1
     inc     hl
     ld      (hl),0
     jp      mf_ok
 fr_rewind:
     ld      hl,(fat_dp)
-    ld      de,DIR_DPTR
-    add     hl,de
+    ld      de,hl+DIR_DPTR
+    ex      de,hl
     xor     a
     ld      (hl),a
     inc     hl
@@ -136,8 +133,8 @@ fr_rewind:
     inc     hl
     ld      (hl),a
     ld      hl,(fat_dp)
-    ld      de,DIR_SCLUST
-    add     hl,de
+    ld      de,hl+DIR_SCLUST
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -157,15 +154,15 @@ fr_bad:
 ; Open the directory at the low 16 bits of dptr.
 fr_sdi_dptr:
     ld      hl,(fat_dp)
-    ld      de,DIR_DPTR
-    add     hl,de
+    ld      de,hl+DIR_DPTR
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
     push    de
     ld      hl,(fat_dp)
-    ld      de,DIR_SCLUST
-    add     hl,de
+    ld      de,hl+DIR_SCLUST
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -179,8 +176,8 @@ fr_sdi_dptr:
 ; Copy dir_ofs into the low half of dptr. The high half stays 0.
 fr_store:
     ld      hl,(fat_dp)
-    ld      de,DIR_DPTR
-    add     hl,de
+    ld      de,hl+DIR_DPTR
+    ex      de,hl
     ld      de,(dir_ofs)
     ld      (hl),e
     inc     hl

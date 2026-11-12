@@ -2,7 +2,7 @@
 ; f_getfree. Outline is ChaN ff.c f_getfree. The count comes from the
 ; core walk. fatfs at sp+2, nclst at sp+4, path at sp+6.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

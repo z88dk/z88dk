@@ -5,7 +5,7 @@
 ; opt at sp+2, path at sp+4, fs at sp+6.
 ; A dirty file cache is discarded. Close a file before mounting again.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -31,20 +31,15 @@ EXTERN  _cpm_fat_vol
 
 _f_mount:
 f_mount:
-    ld      hl,sp+2
-    ld      a,(hl)
+    ld      de,sp+2
+    ld      a,(de)
     ld      (fat_kind),a
-    inc     hl
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_path),de
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_dp),de
+    ld      de,sp+4
+    ld      hl,(de)
+    ld      (fat_path),hl
+    ld      de,sp+6
+    ld      hl,(de)
+    ld      (fat_dp),hl
     ld      hl,(fat_path)
     ld      a,h
     or      l

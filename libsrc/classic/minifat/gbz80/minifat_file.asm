@@ -4,7 +4,7 @@
 ; follow_path, validate): 80cc stack-pointer order, caller cleans.
 ; The delivered code calls this core. It is not the 80cc listing.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -187,8 +187,7 @@ mf_publish:
     or      l
     ret     Z
     ld      a,(_cpm_fat_vol)
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),0
     inc     hl
     ld      de,(fat_mount_id)
@@ -355,8 +354,7 @@ mf_comp_name:
     ld      b,11
     ld      a,' '
 mf_cfill:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jp      nz,mf_cfill
     pop     hl
@@ -476,8 +474,7 @@ mf_dotdot:
     ld      b,9
     ld      a,' '
 mf_ddsp:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jp      nz,mf_ddsp
     call    mf_lookup_here
@@ -683,8 +680,7 @@ mf_bind:
     ld      b,FIL_BYTES
     xor     a
 mf_bz:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jp      nz,mf_bz
     call    fat_ldhl
@@ -813,16 +809,14 @@ mf_zero_alloc:
     ld      de,DIR_ClusHI
     add     hl,de
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a
     call    fat_ldhl
     defw    dir_ptr
     ld      de,DIR_ClusLO
     add     hl,de
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a
     call    fat_ldhl
     defw    dir_ptr
@@ -831,8 +825,7 @@ mf_zero_alloc:
     ld      b,4
     xor     a
 mf_za4:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jp      nz,mf_za4
     call    fat_ldhl
@@ -854,8 +847,7 @@ mf_za4:
     xor     a
     ld      b,16
 mf_zf:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jp      nz,mf_zf
     ret
@@ -1152,8 +1144,7 @@ mf_sector_for_fptr:
     defw    fat_fp
     ld      de,FIL_FPTR
     add     hl,de
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     or      (hl)
     inc     hl
     or      (hl)
@@ -1368,8 +1359,7 @@ mf_place:
     defw    fat_fp
     ld      de,FIL_FPTR
     add     hl,de
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     or      (hl)
     inc     hl
     or      (hl)
@@ -1502,8 +1492,7 @@ mf_transfer:
     or      l
     jp      Z,mf_tr_loop
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a
 mf_tr_loop:
     call    fat_ldhl
@@ -1623,16 +1612,13 @@ mf_tr_adv:
     add     hl,de
     ld      a,(hl)
     add     a,c
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,b
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,0
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,0
     ld      (hl),a
@@ -1853,8 +1839,7 @@ mf_cwd_put:
     add     hl,de
     pop     de
     jp      NC,mf_cwd_long
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     scf
     ret
 mf_cwd_long:
@@ -1920,8 +1905,7 @@ mf_fill_info:
     defw    dir_ptr
     ld      b,8
 mf_fn8:
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     cp      ' '
     jp      Z,mf_fn8n
     cp      $05
@@ -1940,8 +1924,7 @@ mf_fn8n:
     ld      c,0
     ld      b,3
 mf_fn3:
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     cp      ' '
     jp      Z,mf_fn3n
     push    af
@@ -1969,10 +1952,8 @@ mf_copy:
     or      c
     ret     Z
 mf_copy_lp:
-    ld      a,(hl)
-    ld      (de),a
-    inc     hl
-    inc     de
+    ld      a,(hl+)
+    ld      (de+),a
     dec     bc
     ld      a,b
     or      c

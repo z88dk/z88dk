@@ -2,7 +2,7 @@
 ; f_closedir. Outline is ChaN ff.c f_closedir: a live object is dropped.
 ; dp at sp+2. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

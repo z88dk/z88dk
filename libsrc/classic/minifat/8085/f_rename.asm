@@ -5,7 +5,7 @@
 ; directory moves to another parent. The old entry is then deleted.
 ; new path at sp+2, old path at sp+4. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -42,16 +42,12 @@ EXTERN  fatwin
 
 _f_rename:
 f_rename:
-    ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_dp),de
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_path),de
+    ld      de,sp+2
+    ld      hl,(de)
+    ld      (fat_dp),hl
+    ld      de,sp+4
+    ld      hl,(de)
+    ld      (fat_path),hl
     call    mf_ensure
     ret     NC
     ld      hl,(fat_path)
@@ -135,8 +131,8 @@ rn_copy:
     ld      bc,19
     call    mf_copy
     ld      hl,(dir_ptr)
-    ld      de,DIR_Attr
-    add     hl,de
+    ld      de,hl+DIR_Attr
+    ex      de,hl
     ld      a,(rn_attr)
     ld      (hl),a
     and     AM_DIR

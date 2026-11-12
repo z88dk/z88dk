@@ -5,7 +5,7 @@
 ; mode at sp+2, path at sp+4, fp at sp+6. The caller cleans.
 ; An error leaves the object id at 0.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

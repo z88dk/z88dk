@@ -1,5 +1,5 @@
 /*
- * Copyright (c) October 2026 Phillip Stevens (feilipu)
+ * Copyright (c) November 2026 Phillip Stevens (feilipu)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal

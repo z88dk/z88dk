@@ -2,7 +2,7 @@
 ; f_stat. Outline is ChaN ff.c f_stat: mount, follow, reject a bare
 ; directory origin, fill FILINFO from the entry. fno at sp+2, path at sp+4.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

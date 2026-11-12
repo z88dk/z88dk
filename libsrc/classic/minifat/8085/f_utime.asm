@@ -2,7 +2,7 @@
 ; f_utime. Outline is ChaN ff.c f_utime. A zero date leaves the stamp.
 ; fno at sp+2, path at sp+4. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -24,16 +24,12 @@ EXTERN  dir_ptr
 
 _f_utime:
 f_utime:
-    ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_user),de
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_path),de
+    ld      de,sp+2
+    ld      hl,(de)
+    ld      (fat_user),hl
+    ld      de,sp+4
+    ld      hl,(de)
+    ld      (fat_path),hl
     call    mf_ensure
     ret     NC
     ld      hl,(fat_path)
@@ -49,8 +45,8 @@ fu_set:
     ld      a,h
     or      l
     jr      Z,fu_sync
-    ld      de,FI_DATE
-    add     hl,de
+    ld      de,hl+FI_DATE
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -59,8 +55,8 @@ fu_set:
     jr      Z,fu_sync
     push    de
     ld      hl,(fat_user)
-    ld      de,FI_TIME
-    add     hl,de
+    ld      de,hl+FI_TIME
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)

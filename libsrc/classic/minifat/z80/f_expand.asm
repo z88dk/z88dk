@@ -5,7 +5,7 @@
 ; rejected. create_chain is not used. The directory entry is not
 ; synced here. opt at sp+2, fsz at sp+4, fp at sp+8. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

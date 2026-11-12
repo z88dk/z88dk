@@ -1,5 +1,5 @@
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu)
+; Copyright (c) November 2026 Phillip Stevens (feilipu)
 ;
 ; Permission is hereby granted, free of charge, to any person obtaining a copy
 ; of this software and associated documentation files (the "Software"), to deal
@@ -2712,8 +2712,8 @@ dir_next:
 dir_next_same:
     ld      (dir_ofs),hl
     ld      hl,(dir_ptr)
-    ld      de,hl+32
-    ex      de,hl
+    ld      de,32
+    add     hl,de
     ld      (dir_ptr),hl
     scf                             ;C: next dirent is in this sector
     ret
@@ -2833,8 +2833,9 @@ df_loop:
     jr      Z,df_miss               ;0x00 ends the directory
     cp      $E5                     ;deleted
     jr      Z,df_next               ;deleted slot
-    ld      de,hl+DIR_Attr
-    ld      a,(de)
+    ld      de,DIR_Attr
+    add     hl,de
+    ld      a,(hl)
     and     AM_VOL
     jr      NZ,df_next              ;volume label or LFN
     ld      hl,(dir_ptr)
@@ -2867,7 +2868,9 @@ df_cmp:
     dec     b
     jp      NZ,df_cmp               ;ten bytes still to match
     ld      hl,(dir_ptr)
-    ld      de,hl+DIR_ClusLO
+    ld      de,DIR_ClusLO
+    add     hl,de
+    ex      de,hl
     ld      hl,(de)                 ;ff ld_16 DIR_FstClusLO
     ld      (fat_found_sclust),hl
     ld      a,(_cpm_fat_vol)
@@ -2875,12 +2878,16 @@ df_cmp:
     ld      hl,0
     jr      NZ,df_hi                ;FAT16 cluster is 16 bits
     ld      hl,(dir_ptr)
-    ld      de,hl+DIR_ClusHI
+    ld      de,DIR_ClusHI
+    add     hl,de
+    ex      de,hl
     ld      hl,(de)                 ;ff ld_16 DIR_FstClusHI
 df_hi:
     ld      (fat_found_sclust+2),hl
     ld      hl,(dir_ptr)
-    ld      de,hl+DIR_FileSize
+    ld      de,DIR_FileSize
+    add     hl,de
+    ex      de,hl
     ld      hl,(de)
     ld      (fat_found_size),hl
     inc     de

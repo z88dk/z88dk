@@ -4,7 +4,7 @@
 ; end uses the byte before that offset. ofs low at sp+2, ofs high at
 ; sp+4, fp at sp+6. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -27,27 +27,22 @@ EXTERN  fat_off
 
 _f_lseek:
 f_lseek:
-    ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_seek),de
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_seek+2),de
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_fp),de
-    ex      de,hl
+    ld      de,sp+2
+    ld      hl,(de)
+    ld      (fat_seek),hl
+    inc     de
+    inc     de
+    ld      hl,(de)
+    ld      (fat_seek+2),hl
+    inc     de
+    inc     de
+    ld      hl,(de)
+    ld      (fat_fp),hl
     call    mf_fil_check
     ret     NC
     ld      hl,(fat_fp)
-    ld      de,FIL_FLAG
-    add     hl,de
+    ld      de,hl+FIL_FLAG
+    ex      de,hl
     ld      a,(hl)
     and     FA_WRITE
     jr      Z,fl_clip
@@ -58,8 +53,8 @@ fl_clip:
     call    fl_past
     jr      NC,fl_set
     ld      hl,(fat_fp)
-    ld      de,FIL_SIZE
-    add     hl,de
+    ld      de,hl+FIL_SIZE
+    ex      de,hl
     ld      de,fat_seek
     ld      bc,4
     call    mf_copy
@@ -79,8 +74,8 @@ fl_ext:
     ld      a,1
     ld      (fat_write),a
     ld      hl,(fat_fp)
-    ld      de,FIL_SIZE
-    add     hl,de
+    ld      de,hl+FIL_SIZE
+    ex      de,hl
     ld      de,fat_hold
     ld      bc,4
     call    mf_copy
@@ -98,8 +93,8 @@ fl_loop:
     call    fl_before
     jp      NC,mf_place
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      a,(hl)
     ld      (fat_off),a
     inc     hl
@@ -129,8 +124,8 @@ fl_loop:
 fl_step:
     ld      bc,(fat_hold)
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      a,(hl)
     add     a,c
     ld      (hl),a
@@ -147,8 +142,8 @@ fl_step:
     adc     a,0
     ld      (hl),a
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      de,(fat_fp)
     ld      a,e
     add     a,FIL_SIZE
@@ -159,8 +154,8 @@ fl_step:
     ld      bc,4
     call    mf_copy
     ld      hl,(fat_fp)
-    ld      de,FIL_FLAG
-    add     hl,de
+    ld      de,hl+FIL_FLAG
+    ex      de,hl
     ld      a,(hl)
     or      FA_MODIFIED
     ld      (hl),a
@@ -169,8 +164,8 @@ fl_step:
 ; C when fat_seek > FIL size.
 fl_past:
     ld      hl,(fat_fp)
-    ld      de,FIL_SIZE
-    add     hl,de
+    ld      de,hl+FIL_SIZE
+    ex      de,hl
     ld      de,fat_seek
     or      a
     ld      a,(de)
@@ -200,8 +195,8 @@ fl_past:
 ; C when FIL fptr < fat_seek.
 fl_before:
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      de,fat_seek
     or      a
     ld      a,(de)
@@ -231,8 +226,8 @@ fl_before:
 ; fat_hold = min(fat_hold, fat_seek - fptr). fptr < seek here.
 fl_gap:
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      de,fat_seek
     or      a
     ld      a,(de)

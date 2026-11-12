@@ -1,5 +1,5 @@
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu)
+; Copyright (c) November 2026 Phillip Stevens (feilipu)
 ;
 ; Permission is hereby granted, free of charge, to any person obtaining a copy
 ; of this software and associated documentation files (the "Software"), to deal
@@ -2936,8 +2936,8 @@ dir_next_same:
     defw    dir_ofs
     call    fat_ldhl
     defw    dir_ptr
-    ld      de,hl+32
-    ex      de,hl
+    ld      de,32
+    add     hl,de
     call    fat_sthl
     defw    dir_ptr
     scf                             ;C: next dirent is in this sector
@@ -3079,8 +3079,9 @@ df_loop:
     jp      Z,df_miss               ;0x00 ends the directory
     cp      $E5                     ;deleted
     jp      Z,df_next               ;deleted slot
-    ld      de,hl+DIR_Attr
-    ld      a,(de)
+    ld      de,DIR_Attr
+    add     hl,de
+    ld      a,(hl)
     and     AM_VOL
     jp      NZ,df_next              ;volume label or LFN
     call    fat_ldhl
@@ -3116,8 +3117,11 @@ df_cmp:
     jp      NZ,df_cmp               ;ten bytes still to match
     call    fat_ldhl
     defw    dir_ptr
-    ld      de,hl+DIR_ClusLO
-    ld      hl,(de)                 ;ff ld_16 DIR_FstClusLO
+    ld      de,DIR_ClusLO
+    add     hl,de
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a                     ;ff ld_16 DIR_FstClusLO
     call    fat_sthl
     defw    fat_found_sclust
     ld      a,(_cpm_fat_vol)
@@ -3126,20 +3130,32 @@ df_cmp:
     jp      NZ,df_hi                ;FAT16 cluster is 16 bits
     call    fat_ldhl
     defw    dir_ptr
-    ld      de,hl+DIR_ClusHI
-    ld      hl,(de)                 ;ff ld_16 DIR_FstClusHI
+    ld      de,DIR_ClusHI
+    add     hl,de
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a                     ;ff ld_16 DIR_FstClusHI
 df_hi:
     call    fat_sthl
     defw    fat_found_sclust+2
     call    fat_ldhl
     defw    dir_ptr
-    ld      de,hl+DIR_FileSize
-    ld      hl,(de)
+    ld      de,DIR_FileSize
+    add     hl,de
+    ld      de,hl
+    ld      a,(de)
+    inc     de
+    ld      l,a
+    ld      a,(de)
+    inc     de
+    ld      h,a
     call    fat_sthl
     defw    fat_found_size
+    ld      a,(de)
     inc     de
-    inc     de
-    ld      hl,(de)
+    ld      l,a
+    ld      a,(de)
+    ld      h,a
     call    fat_sthl
     defw    fat_found_size+2
     ld      hl,0

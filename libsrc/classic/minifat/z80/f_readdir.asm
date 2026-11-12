@@ -4,7 +4,7 @@
 ; label. End of directory is FR_OK and an empty name. fno == NULL
 ; rewinds. fno at sp+2, dp at sp+4. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

@@ -2,7 +2,7 @@
 ; f_utime. Outline is ChaN ff.c f_utime. A zero date leaves the stamp.
 ; fno at sp+2, path at sp+4. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

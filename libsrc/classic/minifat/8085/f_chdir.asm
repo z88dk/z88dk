@@ -2,7 +2,7 @@
 ; f_chdir. Outline is ChaN ff.c f_chdir. A file is FR_NO_PATH.
 ; The cluster is fat_cwd. The text is fat_cwd_str. path at sp+2.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -24,11 +24,9 @@ EXTERN  fat_cwd
 
 _f_chdir:
 f_chdir:
-    ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_path),de
+    ld      de,sp+2
+    ld      hl,(de)
+    ld      (fat_path),hl
     call    mf_ensure
     ret     NC
     ld      hl,(fat_path)

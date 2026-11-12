@@ -2,7 +2,7 @@
 ; f_closedir. Outline is ChaN ff.c f_closedir: a live object is dropped.
 ; dp at sp+2. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -19,14 +19,13 @@ EXTERN  _cpm_fat_vol
 
 _f_closedir:
 f_closedir:
-    ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      a,d
-    or      e
+    ld      de,sp+2
+    ld      hl,(de)
+    ld      a,h
+    or      l
     jr      Z,fd_bad
-    ld      (fat_dp),de
+    ld      (fat_dp),hl
+    ex      de,hl
     ld      a,(de)
     ld      l,a
     inc     de

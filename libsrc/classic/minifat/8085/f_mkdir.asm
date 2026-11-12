@@ -4,7 +4,7 @@
 ; the parent entry is registered. No timestamp is invented. A failed
 ; register frees the cluster. path at sp+2. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -36,11 +36,9 @@ EXTERN  fatwin
 
 _f_mkdir:
 f_mkdir:
-    ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_path),de
+    ld      de,sp+2
+    ld      hl,(de)
+    ld      (fat_path),hl
     call    mf_ensure
     ret     NC
     ld      hl,(fat_path)
@@ -119,19 +117,19 @@ mk_sp2:
     call    dir_create
     jr      NC,mk_deny
     ld      hl,(dir_ptr)
-    ld      de,DIR_Attr
-    add     hl,de
+    ld      de,hl+DIR_Attr
+    ex      de,hl
     ld      (hl),AM_DIR
     ld      hl,(dir_ptr)
-    ld      de,DIR_ClusLO
-    add     hl,de
+    ld      de,hl+DIR_ClusLO
+    ex      de,hl
     ld      de,(fat_hold)
     ld      (hl),e
     inc     hl
     ld      (hl),d
     ld      hl,(dir_ptr)
-    ld      de,DIR_ClusHI
-    add     hl,de
+    ld      de,hl+DIR_ClusHI
+    ex      de,hl
     ld      de,(fat_hold+2)
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT32

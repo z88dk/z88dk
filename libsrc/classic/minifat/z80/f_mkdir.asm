@@ -4,7 +4,7 @@
 ; the parent entry is registered. No timestamp is invented. A failed
 ; register frees the cluster. path at sp+2. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

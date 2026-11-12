@@ -1,5 +1,5 @@
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu)
+; Copyright (c) November 2026 Phillip Stevens (feilipu)
 ;
 ; Permission is hereby granted, free of charge, to any person obtaining a copy
 ; of this software and associated documentation files (the "Software"), to deal
@@ -815,7 +815,7 @@ fat_mount_sy2:
     ld      hl,(fat_work+8)
     ld      bc,hl
     ld      hl,(fat_work+4)         ;tsect - sysect
-    call    fat_subhlbc                   ;tsect - sysect
+    sub     hl,bc                   ;tsect - sysect
     ld      (fat_work+12),hl
     ld      hl,(fat_work+10)
     ld      bc,hl
@@ -889,11 +889,11 @@ fat_mount_band:
     jr      NZ,fat_mount_fat32      ;nclst above 65535
     ld      hl,de                   ;low still in DE
     ld      bc,MAX_FAT12+1
-    call    fat_subhlbc                   ;nclst - ($0FF5+1)
+    sub     hl,bc                   ;nclst - ($0FF5+1)
     jp      C,fat_mount_fat12       ;nclst <= $0FF5
     ld      hl,de
     ld      bc,MAX_FAT16
-    call    fat_subhlbc                   ;nclst - $FFF5
+    sub     hl,bc                   ;nclst - $FFF5
     jr      Z,fat_mount_fat16       ;$FFF5 stays FAT16
     jr      NC,fat_mount_fat32      ;above $FFF5 is FAT32
 fat_mount_fat16:
@@ -1073,7 +1073,7 @@ fat_mount_needc:
     ld      a,c
     rra
     ld      c,a
-    call    fat_subhlbc                   ;database - root sectors
+    sub     hl,bc                   ;database - root sectors
     ld      (_cpm_fat_vol+12),hl
     ld      hl,(_cpm_fat_vol+18)
     ld      a,l
@@ -2051,13 +2051,13 @@ cfo_ci:
     ld      hl,(fat_work+4)
     ld      bc,hl
     ld      hl,(clst_cache_ci)
-    call    fat_subhlbc                   ;cache_ci - want_ci
+    sub     hl,bc                   ;cache_ci - want_ci
     jr      Z,cfo_cached            ;cached index is this offset
     jr      NC,cfo_from0            ;want is behind the cache
     ld      hl,(clst_cache_ci)
     ld      bc,hl
     ld      hl,(fat_work+4)
-    call    fat_subhlbc                   ;steps still to walk
+    sub     hl,bc                   ;steps still to walk
     ld      (fat_work+8),hl         ;steps from cached cluster
     ld      hl,(clst_cache_clst+2)
     ld      bc,hl
@@ -2533,7 +2533,7 @@ frm_clamp:
     ld      hl,(_cpm_fat_vol+12)
     ld      bc,hl
     ld      hl,(_cpm_fat_vol+16)
-    call    fat_subhlbc                   ;database - dirbase (sectors)
+    sub     hl,bc                   ;database - dirbase (sectors)
     jr      C,frm_keep              ;dirbase above database
     jr      Z,frm_keep              ;database == dirbase
     ld      a,h
@@ -2550,7 +2550,7 @@ frm_clamp:
     jr      C,frm_span              ;count was 64K: span is tighter
     ld      bc,de
     push    hl
-    call    fat_subhlbc                   ;span - count
+    sub     hl,bc                   ;span - count
     pop     hl
     jr      C,frm_clear             ;span is shorter than the entry end
     ex      de,hl
@@ -2597,7 +2597,7 @@ dsdi_root16:
     ld      bc,hl                   ;max
     pop     hl                      ;ofs
     ld      de,hl
-    call    fat_subhlbc                   ;ofs - root byte end
+    sub     hl,bc                   ;ofs - root byte end
     jp      NC,dsdi_end             ;unsigned ofs >= max
     ex      de,hl                   ;HL = ofs
     jr      dsdi_root
@@ -2712,8 +2712,8 @@ dir_next:
 dir_next_same:
     ld      (dir_ofs),hl
     ld      hl,(dir_ptr)
-    ld      de,hl+32
-    ex      de,hl
+    ld      de,32
+    add     hl,de
     ld      (dir_ptr),hl
     scf                             ;C: next dirent is in this sector
     ret
@@ -2730,7 +2730,7 @@ dir_next_sect:
     jr      C,dir_next_inc          ;2048 entries: ofs still inside
     ld      bc,hl                   ;max
     ld      hl,(dir_ofs)
-    call    fat_subhlbc                   ;ofs - root byte end
+    sub     hl,bc                   ;ofs - root byte end
     jp      NC,dir_next_end         ;unsigned ofs >= max
 dir_next_inc:
     ld      hl,(dir_sect)
@@ -2833,8 +2833,9 @@ df_loop:
     jr      Z,df_miss               ;0x00 ends the directory
     cp      $E5                     ;deleted
     jr      Z,df_next               ;deleted slot
-    ld      de,hl+DIR_Attr
-    ld      a,(de)
+    ld      de,DIR_Attr
+    add     hl,de
+    ld      a,(hl)
     and     AM_VOL
     jr      NZ,df_next              ;volume label or LFN
     ld      hl,(dir_ptr)
@@ -2867,7 +2868,9 @@ df_cmp:
     dec     b
     jp      NZ,df_cmp               ;ten bytes still to match
     ld      hl,(dir_ptr)
-    ld      de,hl+DIR_ClusLO
+    ld      de,DIR_ClusLO
+    add     hl,de
+    ex      de,hl
     ld      hl,(de)                 ;ff ld_16 DIR_FstClusLO
     ld      (fat_found_sclust),hl
     ld      a,(_cpm_fat_vol)
@@ -2875,12 +2878,16 @@ df_cmp:
     ld      hl,0
     jr      NZ,df_hi                ;FAT16 cluster is 16 bits
     ld      hl,(dir_ptr)
-    ld      de,hl+DIR_ClusHI
+    ld      de,DIR_ClusHI
+    add     hl,de
+    ex      de,hl
     ld      hl,(de)                 ;ff ld_16 DIR_FstClusHI
 df_hi:
     ld      (fat_found_sclust+2),hl
     ld      hl,(dir_ptr)
-    ld      de,hl+DIR_FileSize
+    ld      de,DIR_FileSize
+    add     hl,de
+    ex      de,hl
     ld      hl,(de)
     ld      (fat_found_size),hl
     inc     de
@@ -3285,7 +3292,7 @@ gf_wide:
     or      a
     jr      NZ,gf_full              ;remaining above 65535
     ld      hl,(fat_work+8)
-    call    fat_subhlbc                   ;C set when remaining < width
+    sub     hl,bc                   ;C set when remaining < width
     jr      NC,gf_full              ;sector is full of entries
     ld      a,(fat_work+8)          ;tail is 1..width-1
     ld      b,a
@@ -3301,7 +3308,7 @@ gf_full:
     call    gf_add                  ;add that tally to nfree
     pop     bc
     ld      hl,(fat_work+8)
-    call    fat_subhlbc                   ;remaining - entries just scanned
+    sub     hl,bc                   ;remaining - entries just scanned
     ld      (fat_work+8),hl
     jp      NC,gf_loop              ;high half unchanged
     ld      hl,(fat_work+10)
@@ -3509,32 +3516,6 @@ fc_z1:
     pop     hl
     jp      fat_st32
 
-
-; HL = HL - BC. No borrow in. C is the borrow. Z is set when the
-; result is 0. A, BC, and DE stay.
-fat_subhlbc:
-    push    de
-    ld      d,a
-    ld      a,l
-    sub     c
-    ld      l,a
-    ld      a,h
-    sbc     a,b
-    ld      h,a
-    jr      C,fat_subhlbc_c
-    ld      a,h
-    or      l
-    ld      a,d
-    pop     de
-    ret
-
-fat_subhlbc_c:
-    ld      a,h
-    or      l
-    scf
-    ld      a,d
-    pop     de
-    ret
 
 ; DE rotated left through C. A and Z stay. C is the bit shifted out.
 fat_rlde:

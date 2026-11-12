@@ -4,7 +4,7 @@
 ; A directory must be empty. "." and ".." do not count. The entry is
 ; marked deleted and the cluster chain is freed. path at sp+2.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

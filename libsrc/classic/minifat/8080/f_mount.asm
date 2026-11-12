@@ -5,7 +5,7 @@
 ; opt at sp+2, path at sp+4, fs at sp+6.
 ; A dirty file cache is discarded. Close a file before mounting again.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

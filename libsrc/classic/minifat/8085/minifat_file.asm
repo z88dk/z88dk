@@ -4,7 +4,7 @@
 ; follow_path, validate): 80cc stack-pointer order, caller cleans.
 ; The delivered code calls this core. It is not the 80cc listing.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -629,8 +629,8 @@ mf_fil_check:
     or      a
     jr      Z,mf_fil_bad
     ld      hl,(fat_fp)
-    ld      de,FIL_ERR
-    add     hl,de
+    ld      de,hl+FIL_ERR
+    ex      de,hl
     ld      a,(hl)
     or      a
     jp      NZ,mf_err
@@ -667,13 +667,13 @@ mf_bz:
     inc     hl
     ld      (hl),d
     ld      hl,(fat_fp)
-    ld      de,FIL_FLAG
-    add     hl,de
+    ld      de,hl+FIL_FLAG
+    ex      de,hl
     ld      a,(fat_mode)
     ld      (hl),a
     ld      hl,(fat_fp)
-    ld      de,FIL_ATTR
-    add     hl,de
+    ld      de,hl+FIL_ATTR
+    ex      de,hl
     ld      a,(fat_attr)
     ld      (hl),a
     ld      hl,fat_found_size
@@ -697,8 +697,8 @@ mf_bz:
     ld      bc,4
     call    mf_copy
     ld      hl,(fat_fp)
-    ld      de,FIL_SCLUST
-    add     hl,de
+    ld      de,hl+FIL_SCLUST
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -708,8 +708,8 @@ mf_bz:
     ld      b,(hl)
     ld      hl,(fat_fp)
     push    de
-    ld      de,FIL_CLUST
-    add     hl,de
+    ld      de,hl+FIL_CLUST
+    ex      de,hl
     pop     de
     ld      (hl),e
     inc     hl
@@ -729,8 +729,8 @@ mf_bz:
     ld      bc,4
     call    mf_copy
     ld      hl,(fat_fp)
-    ld      de,FIL_DIROFS
-    add     hl,de
+    ld      de,hl+FIL_DIROFS
+    ex      de,hl
     ld      de,(fat_dirofs)
     ld      (hl),e
     inc     hl
@@ -740,8 +740,8 @@ mf_bz:
 ; Drop the chain FIL still names, then publish a zero length.
 mf_trunc:
     ld      hl,(fat_fp)
-    ld      de,FIL_SCLUST
-    add     hl,de
+    ld      de,hl+FIL_SCLUST
+    ex      de,hl
     ld      de,fat_hold
     ld      bc,4
     call    mf_copy
@@ -762,8 +762,8 @@ mf_trunc:
     jr      NC,mf_trunc_disk
 mf_trunc_mod:
     ld      hl,(fat_fp)
-    ld      de,FIL_FLAG
-    add     hl,de
+    ld      de,hl+FIL_FLAG
+    ex      de,hl
     ld      a,(hl)
     or      FA_MODIFIED
     ld      (hl),a
@@ -775,22 +775,22 @@ mf_trunc_disk:
 
 mf_zero_alloc:
     ld      hl,(dir_ptr)
-    ld      de,DIR_ClusHI
-    add     hl,de
+    ld      de,hl+DIR_ClusHI
+    ex      de,hl
     xor     a
     ld      (hl),a
     inc     hl
     ld      (hl),a
     ld      hl,(dir_ptr)
-    ld      de,DIR_ClusLO
-    add     hl,de
+    ld      de,hl+DIR_ClusLO
+    ex      de,hl
     xor     a
     ld      (hl),a
     inc     hl
     ld      (hl),a
     ld      hl,(dir_ptr)
-    ld      de,DIR_FileSize
-    add     hl,de
+    ld      de,hl+DIR_FileSize
+    ex      de,hl
     ld      b,4
     xor     a
 mf_za4:
@@ -799,18 +799,18 @@ mf_za4:
     dec     b
     jr      nz,mf_za4
     ld      hl,(dir_ptr)
-    ld      de,DIR_Attr
-    add     hl,de
+    ld      de,hl+DIR_Attr
+    ex      de,hl
     ld      (hl),AM_ARC
     ld      a,1
     ld      (fat_wflag),a
     ld      hl,(fat_fp)
-    ld      de,FIL_ATTR
-    add     hl,de
+    ld      de,hl+FIL_ATTR
+    ex      de,hl
     ld      (hl),AM_ARC
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     xor     a
     ld      b,16
 mf_zf:
@@ -822,8 +822,8 @@ mf_zf:
 
 mf_load_dir:
     ld      hl,(fat_fp)
-    ld      de,FIL_DIRSEC
-    add     hl,de
+    ld      de,hl+FIL_DIRSEC
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -834,8 +834,8 @@ mf_load_dir:
     call    fat_move_window
     ret     NC
     ld      hl,(fat_fp)
-    ld      de,FIL_DIROFS
-    add     hl,de
+    ld      de,hl+FIL_DIROFS
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      a,(hl)
@@ -849,8 +849,8 @@ mf_load_dir:
 
 mf_write_entry:
     ld      hl,(fat_fp)
-    ld      de,FIL_SCLUST
-    add     hl,de
+    ld      de,hl+FIL_SCLUST
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -872,23 +872,21 @@ mf_write_entry:
     ld      bc,0
 mf_we_hi:
     ld      hl,(dir_ptr)
-    ld      de,DIR_ClusHI
-    add     hl,de
+    ld      de,hl+DIR_ClusHI
+    ex      de,hl
     ld      (hl),c
     inc     hl
     ld      (hl),b
     ld      hl,(dir_ptr)
-    ld      de,DIR_FileSize
-    add     hl,de
-    ex      de,hl
+    ld      de,hl+DIR_FileSize
     ld      hl,(fat_fp)
     ld      bc,FIL_SIZE
     add     hl,bc
     ld      bc,4
     call    mf_copy
     ld      hl,(dir_ptr)
-    ld      de,DIR_Attr
-    add     hl,de
+    ld      de,hl+DIR_Attr
+    ex      de,hl
     ld      a,(hl)
     or      AM_ARC
     ld      (hl),a
@@ -898,8 +896,8 @@ mf_sync_fil:
     call    mf_flush
     ret     NC
     ld      hl,(fat_fp)
-    ld      de,FIL_FLAG
-    add     hl,de
+    ld      de,hl+FIL_FLAG
+    ex      de,hl
     ld      a,(hl)
     and     FA_MODIFIED
     jp      Z,mf_ok
@@ -911,8 +909,8 @@ mf_sync_fil:
     call    fat_sync_window
     jr      NC,mf_sync_disk
     ld      hl,(fat_fp)
-    ld      de,FIL_FLAG
-    add     hl,de
+    ld      de,hl+FIL_FLAG
+    ex      de,hl
     ld      a,(hl)
     and     FA_MODE_MASK
     ld      (hl),a
@@ -937,8 +935,8 @@ mf_flush:
     ld      a,h
     or      l
     jr      Z,mf_flush_ok
-    ld      de,FIL_FLAG
-    add     hl,de
+    ld      de,hl+FIL_FLAG
+    ex      de,hl
     ld      a,(hl)
     and     $7F
     ld      (hl),a
@@ -974,14 +972,14 @@ mf_same_no:
 ; fat_remain = size - fptr. C if fptr > size.
 mf_size_minus_fptr:
     ld      hl,(fat_fp)
-    ld      de,FIL_SIZE
-    add     hl,de
+    ld      de,hl+FIL_SIZE
+    ex      de,hl
     ld      de,fat_hold
     ld      bc,4
     call    mf_copy
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     or      a
     ld      a,(fat_hold)
     sbc     a,(hl)
@@ -1037,8 +1035,8 @@ mf_store_sclust:
     push    de
     push    bc
     ld      hl,(fat_fp)
-    ld      de,FIL_SCLUST
-    add     hl,de
+    ld      de,hl+FIL_SCLUST
+    ex      de,hl
     pop     bc
     pop     de
     ld      (hl),e
@@ -1055,8 +1053,8 @@ mf_store_sclust:
 ; C: BCDE = LBA. NC and HL = 0: disk full. NC and HL != 0: FRESULT.
 mf_sector_for_fptr:
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -1092,8 +1090,8 @@ mf_sector_for_fptr:
     or      (hl)
     jp      NZ,mf_sec_same
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      a,(hl)
     inc     hl
     or      (hl)
@@ -1103,8 +1101,8 @@ mf_sector_for_fptr:
     or      (hl)
     jr      NZ,mf_sec_next
     ld      hl,(fat_fp)
-    ld      de,FIL_SCLUST
-    add     hl,de
+    ld      de,hl+FIL_SCLUST
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -1131,8 +1129,8 @@ mf_sec_next:
     or      a
     jr      NZ,mf_sec_same
     ld      hl,(fat_fp)
-    ld      de,FIL_CLUST
-    add     hl,de
+    ld      de,hl+FIL_CLUST
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -1171,8 +1169,8 @@ mf_sec_have:
     jr      mf_sec_lba
 mf_sec_same:
     ld      hl,(fat_fp)
-    ld      de,FIL_CLUST
-    add     hl,de
+    ld      de,hl+FIL_CLUST
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -1214,8 +1212,8 @@ mf_sec_int:
 ; C if this sector still holds bytes below the current size.
 mf_need_read:
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -1230,8 +1228,8 @@ mf_need_read:
     ld      (fat_hold),de
     ld      (fat_hold+2),bc
     ld      hl,(fat_fp)
-    ld      de,FIL_SIZE
-    add     hl,de
+    ld      de,hl+FIL_SIZE
+    ex      de,hl
     or      a
     ld      a,(fat_hold)
     sub     (hl)
@@ -1299,8 +1297,8 @@ mf_cache_hit:
 ; Position fil->clust for the current fptr.
 mf_place:
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      a,(hl)
     inc     hl
     or      (hl)
@@ -1310,8 +1308,8 @@ mf_place:
     or      (hl)
     jr      NZ,mf_place_mid
     ld      hl,(fat_fp)
-    ld      de,FIL_SCLUST
-    add     hl,de
+    ld      de,hl+FIL_SCLUST
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -1323,8 +1321,8 @@ mf_place:
     jp      mf_ok
 mf_place_mid:
     ld      hl,(fat_fp)
-    ld      de,FIL_SCLUST
-    add     hl,de
+    ld      de,hl+FIL_SCLUST
+    ex      de,hl
     ld      de,fat_cfo
     ld      bc,4
     call    mf_copy
@@ -1346,8 +1344,8 @@ mf_place_mid:
 ; BCDE = fptr, or fptr-1 when fptr is the cluster-aligned end.
 mf_place_src:
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -1358,8 +1356,8 @@ mf_place_src:
     push    bc
     push    de
     ld      hl,(fat_fp)
-    ld      de,FIL_SIZE
-    add     hl,de
+    ld      de,hl+FIL_SIZE
+    ex      de,hl
     pop     de
     pop     bc
     ld      a,(hl)
@@ -1453,8 +1451,8 @@ mf_tr_loop:
     jp      Z,mf_tr_done
 mf_tr_room:
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      a,(hl)
     ld      (fat_off),a
     inc     hl
@@ -1529,16 +1527,16 @@ mf_tr_w:
     ld      a,1
     ld      (fat_file_dirty),a
     ld      hl,(fat_fp)
-    ld      de,FIL_FLAG
-    add     hl,de
+    ld      de,hl+FIL_FLAG
+    ex      de,hl
     ld      a,(hl)
     or      FA_DIRTY
     ld      (hl),a
 mf_tr_adv:
     ld      bc,(fat_hold)
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      a,(hl)
     add     a,c
     ld      (hl),a
@@ -1578,8 +1576,8 @@ mf_tr_size:
     call    mf_size_minus_fptr
     jp      NC,mf_tr_loop
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      de,fat_hold
     ld      bc,4
     call    mf_copy
@@ -1601,8 +1599,8 @@ mf_tr_stop:
 mf_tr_seterr:
     ld      a,l
     ld      hl,(fat_fp)
-    ld      de,FIL_ERR
-    add     hl,de
+    ld      de,hl+FIL_ERR
+    ex      de,hl
     ld      (hl),a
     ld      l,a
     ld      h,0
@@ -1613,8 +1611,8 @@ mf_tr_done:
     or      a
     jp      Z,mf_ok
     ld      hl,(fat_fp)
-    ld      de,FIL_FLAG
-    add     hl,de
+    ld      de,hl+FIL_FLAG
+    ex      de,hl
     ld      a,(hl)
     or      FA_MODIFIED
     ld      (hl),a
@@ -1777,14 +1775,14 @@ mf_cwd_long:
 mf_fill_info:
     ld      (fat_user),hl
     ld      hl,(dir_ptr)
-    ld      de,DIR_FileSize
-    add     hl,de
+    ld      de,hl+DIR_FileSize
+    ex      de,hl
     ld      de,(fat_user)
     ld      bc,4
     call    mf_copy
     ld      hl,(dir_ptr)
-    ld      de,DIR_WrtDate
-    add     hl,de
+    ld      de,hl+DIR_WrtDate
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -1795,8 +1793,8 @@ mf_fill_info:
     inc     hl
     ld      (hl),d
     ld      hl,(dir_ptr)
-    ld      de,DIR_WrtTime
-    add     hl,de
+    ld      de,hl+DIR_WrtTime
+    ex      de,hl
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
@@ -1807,17 +1805,15 @@ mf_fill_info:
     inc     hl
     ld      (hl),d
     ld      hl,(dir_ptr)
-    ld      de,DIR_Attr
-    add     hl,de
+    ld      de,hl+DIR_Attr
+    ex      de,hl
     ld      a,(hl)
     ld      hl,(fat_user)
-    ld      de,FI_ATTR
-    add     hl,de
+    ld      de,hl+FI_ATTR
+    ex      de,hl
     ld      (hl),a
     ld      hl,(fat_user)
-    ld      de,FI_NAME
-    add     hl,de
-    ex      de,hl
+    ld      de,hl+FI_NAME
     ld      hl,(dir_ptr)
     ld      b,8
 mf_fn8:

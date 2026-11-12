@@ -2,7 +2,7 @@
 ; f_close. Outline is ChaN ff.c f_close: f_sync, then drop the object
 ; only when that sync returned FR_OK. fp at sp+2. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

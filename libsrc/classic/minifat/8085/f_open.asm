@@ -5,7 +5,7 @@
 ; mode at sp+2, path at sp+4, fp at sp+6. The caller cleans.
 ; An error leaves the object id at 0.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -39,25 +39,19 @@ EXTERN  fat_write
 
 _f_open:
 f_open:
-    ld      hl,sp+2
-    ld      a,(hl)
+    ld      de,sp+2
+    ld      a,(de)
     and     FA_MODE_MASK
     ld      (fat_mode),a
-    inc     hl
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_path),de
-    inc     hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      a,d
-    or      e
+    ld      de,sp+4
+    ld      hl,(de)
+    ld      (fat_path),hl
+    ld      de,sp+6
+    ld      hl,(de)
+    ld      a,h
+    or      l
     jp      Z,fo_null
-    ld      (fat_fp),de
-    ld      hl,(fat_fp)
+    ld      (fat_fp),hl
     ld      b,FIL_BYTES
     xor     a
 fo_z:
@@ -135,8 +129,8 @@ fo_tail:
     and     FA_SEEKEND
     jp      Z,mf_ok
     ld      hl,(fat_fp)
-    ld      de,FIL_SIZE
-    add     hl,de
+    ld      de,hl+FIL_SIZE
+    ex      de,hl
     ld      a,(hl)
     inc     hl
     or      (hl)
@@ -146,8 +140,8 @@ fo_tail:
     or      (hl)
     jp      Z,mf_ok
     ld      hl,(fat_fp)
-    ld      de,FIL_SIZE
-    add     hl,de
+    ld      de,hl+FIL_SIZE
+    ex      de,hl
     ld      de,fat_found_size
     ld      bc,4
     call    mf_copy
@@ -164,8 +158,8 @@ fo_tail:
     call    mf_place
     jp      NC,fo_keep
     ld      hl,(fat_fp)
-    ld      de,FIL_FPTR
-    add     hl,de
+    ld      de,hl+FIL_FPTR
+    ex      de,hl
     ld      a,(hl)
     inc     hl
     jr      NZ,fo_fill

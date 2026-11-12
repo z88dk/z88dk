@@ -3,7 +3,7 @@
 ; and ARC. DIR and VOL stay as they are. mask at sp+2, attr at sp+4,
 ; path at sp+6.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

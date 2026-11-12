@@ -4,7 +4,7 @@
 ; the parent entry is registered. No timestamp is invented. A failed
 ; register frees the cluster. path at sp+2. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -88,8 +88,7 @@ mk_got:
     ld      b,10
     ld      a,' '
 mk_sp1:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jp      nz,mk_sp1
     ld      (hl),AM_DIR
@@ -107,8 +106,7 @@ mk_sp1:
     ld      b,9
     ld      a,' '
 mk_sp2:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jp      nz,mk_sp2
     ld      (hl),AM_DIR

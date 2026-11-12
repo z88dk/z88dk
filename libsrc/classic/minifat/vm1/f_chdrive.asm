@@ -3,7 +3,7 @@
 ; path with no drive prefix are FR_OK. Any other "digit:" is rejected.
 ; path at sp+2. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 

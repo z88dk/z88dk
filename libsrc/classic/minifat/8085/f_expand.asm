@@ -5,7 +5,7 @@
 ; rejected. create_chain is not used. The directory entry is not
 ; synced here. opt at sp+2, fsz at sp+4, fp at sp+8. The caller cleans.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -34,21 +34,23 @@ EXTERN  _cpm_fat_vol
 
 _f_expand:
 f_expand:
-    ld      hl,sp+2
-    ld      a,(hl)
+    ld      de,sp+2
+    ld      a,(de)
     ld      (fat_trail),a
-    ld      hl,sp+4
-    ld      de,fat_seek
-    ld      bc,4
-    call    mf_copy
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      a,d
-    or      e
+    ld      de,sp+4
+    ld      hl,(de)
+    ld      (fat_seek),hl
+    inc     de
+    inc     de
+    ld      hl,(de)
+    ld      (fat_seek+2),hl
+    inc     de
+    inc     de
+    ld      hl,(de)
+    ld      a,h
+    or      l
     jp      Z,fe_bad
-    ld      (fat_fp),de
-    ld      hl,(fat_fp)
+    ld      (fat_fp),hl
     call    mf_fil_check
     ret     NC
     ld      a,(fat_trail)
@@ -67,14 +69,14 @@ fe_opt:
     or      (hl)
     jp      Z,fe_deny
     ld      hl,(fat_fp)
-    ld      de,FIL_FLAG
-    add     hl,de
+    ld      de,hl+FIL_FLAG
+    ex      de,hl
     ld      a,(hl)
     and     FA_WRITE
     jp      Z,fe_deny
     ld      hl,(fat_fp)
-    ld      de,FIL_SIZE
-    add     hl,de
+    ld      de,hl+FIL_SIZE
+    ex      de,hl
     ld      a,(hl)
     inc     hl
     or      (hl)
@@ -84,8 +86,8 @@ fe_opt:
     or      (hl)
     jp      NZ,fe_deny
     ld      hl,(fat_fp)
-    ld      de,FIL_SCLUST
-    add     hl,de
+    ld      de,hl+FIL_SCLUST
+    ex      de,hl
     ld      a,(hl)
     inc     hl
     or      (hl)
@@ -258,29 +260,23 @@ fe_anxt:
     jp      fe_aput
 fe_afile:
     ld      hl,(fat_fp)
-    ld      de,FIL_SCLUST
-    add     hl,de
-    ex      de,hl
+    ld      de,hl+FIL_SCLUST
     ld      hl,fat_hold
     ld      bc,4
     call    mf_copy
     ld      hl,(fat_fp)
-    ld      de,FIL_CLUST
-    add     hl,de
-    ex      de,hl
+    ld      de,hl+FIL_CLUST
     ld      hl,fat_hold
     ld      bc,4
     call    mf_copy
     ld      hl,(fat_fp)
-    ld      de,FIL_SIZE
-    add     hl,de
-    ex      de,hl
+    ld      de,hl+FIL_SIZE
     ld      hl,fat_seek
     ld      bc,4
     call    mf_copy
     ld      hl,(fat_fp)
-    ld      de,FIL_FLAG
-    add     hl,de
+    ld      de,hl+FIL_FLAG
+    ex      de,hl
     ld      a,(hl)
     or      FA_MODIFIED
     ld      (hl),a

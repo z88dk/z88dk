@@ -4,7 +4,7 @@
 ; A directory must be empty. "." and ".." do not count. The entry is
 ; marked deleted and the cluster chain is freed. path at sp+2.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -36,11 +36,9 @@ EXTERN  fatwin
 
 _f_unlink:
 f_unlink:
-    ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      (fat_path),de
+    ld      de,sp+2
+    ld      hl,(de)
+    ld      (fat_path),hl
     call    mf_ensure
     ret     NC
     ld      hl,(fat_path)
@@ -93,8 +91,8 @@ ul_walk:
     jr      Z,ul_next
     cp      '.'
     jr      Z,ul_next
-    ld      de,DIR_Attr
-    add     hl,de
+    ld      de,hl+DIR_Attr
+    ex      de,hl
     ld      a,(hl)
     cp      $0F
     jr      Z,ul_next

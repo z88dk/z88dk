@@ -5,7 +5,7 @@
 ; mode at sp+2, path at sp+4, fp at sp+6. The caller cleans.
 ; An error leaves the object id at 0.
 ;
-; Copyright (c) October 2026 Phillip Stevens (feilipu), MIT.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
 
@@ -63,8 +63,7 @@ f_open:
     ld      b,FIL_BYTES
     xor     a
 fo_z:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jp      nz,fo_z
     call    mf_ensure
@@ -103,8 +102,7 @@ fo_new:
     ld      b,8
     xor     a
 fo_zf:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jp      nz,fo_zf
     call    mf_mark_arc
@@ -141,8 +139,7 @@ fo_tail:
     defw    fat_fp
     ld      de,FIL_SIZE
     add     hl,de
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     or      (hl)
     inc     hl
     or      (hl)
@@ -172,8 +169,7 @@ fo_tail:
     defw    fat_fp
     ld      de,FIL_FPTR
     add     hl,de
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     jp      NZ,fo_fill
     ld      a,(hl)
     and     1
