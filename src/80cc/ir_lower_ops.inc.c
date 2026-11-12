@@ -2496,9 +2496,11 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (src_w == 4 && dst_w == 1) {
-        /* Long → char: take low byte of low half. */
+        /* Long → char: take low byte of low half. The store reads L and
+           leaves DEHL as it was, so a later byte of the same long is still
+           taken from the registers. */
         load_to_dehl(out, f, op->src[0]);
-        invalidate_hl_cache();
+        ss_note_cache_read(f, op->src[0]);
         store_byte_from_reg(out, f, op->dst, "l");
         return 0;
     }
