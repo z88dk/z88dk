@@ -18,7 +18,6 @@
     PUBLIC      _pc6001mk2_key_init
     PUBLIC      pc6001mk2_key_take
     PUBLIC      _pc6001mk2_key_take
-    PUBLIC      __pc6001mk2_key_map
     EXTERN      __pc6001mk2_disc
     EXTERN      __pc6001mk2_irq_table
 
@@ -61,45 +60,6 @@ _pc6001mk2_key_take:
     ei
     ld          a, l
     and         a
-    ret
-
-; The sub-CPU's code in a to the code getk returns, in a: the cursor keys 8 left,
-; 9 right, 10 down, 11 up as the other targets have them, backspace 12 (delete),
-; the function keys and kana (from $80 up) nothing.  z if nothing.
-__pc6001mk2_key_map:
-    cp          $1d
-    jr          nz, not_left
-    ld          a, 8
-    and         a                       ; (nz: a key)
-    ret
-not_left:
-    cp          $1c
-    jr          nz, not_right
-    ld          a, 9
-    and         a                       ; (nz: a key)
-    ret
-not_right:
-    cp          $1f
-    jr          nz, not_down
-    ld          a, 10
-    and         a                       ; (nz: a key)
-    ret
-not_down:
-    cp          $1e
-    jr          nz, not_up
-    ld          a, 11
-    and         a                       ; (nz: a key)
-    ret
-not_up:
-    cp          $7f
-    jr          nz, not_delete
-    ld          a, 12
-    and         a                       ; (nz: a key)
-    ret
-not_delete:
-    cp          $80
-    ret         c
-    xor         a
     ret
 
     SECTION     code_crt_init
