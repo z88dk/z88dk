@@ -155,6 +155,7 @@ include target/multi8/multi8.mak
 include target/myvision/myvision.mak
 include target/mz/mz.mak
 include target/mz2500/mz2500.mak
+include target/mz800/mz800.mak
 include target/nascom/nascom.mak
 include target/nc/nc.mak
 include target/nabu/nabu.mak
