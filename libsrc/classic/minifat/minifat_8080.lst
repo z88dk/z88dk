@@ -1,6 +1,19 @@
-; Mini-FAT for the 8080 classic library. The core is one module.
-; Each f_* object is linked only when the program calls that symbol.
+; Mini-FAT for the 8080 classic library. fat_sync stays in fatfs.
+; The other C calls, and each f_* object, are linked only when called.
 classic/minifat/8080/obj/8080/fatfs
+classic/minifat/8080/obj/8080/fat_dirty
+classic/minifat/8080/obj/8080/fat_mount
+classic/minifat/8080/obj/8080/dir_find
+classic/minifat/8080/obj/8080/dir_create
+classic/minifat/8080/obj/8080/dir_zap
+classic/minifat/8080/obj/8080/fat_dir_open
+classic/minifat/8080/obj/8080/fat_dir_read
+classic/minifat/8080/obj/8080/fat_next
+classic/minifat/8080/obj/8080/fat_alloc
+classic/minifat/8080/obj/8080/fat_free
+classic/minifat/8080/obj/8080/fat_clst2sect
+classic/minifat/8080/obj/8080/fat_getfree
+classic/minifat/8080/obj/8080/fat_clusters
 classic/minifat/8080/obj/8080/minifat_file
 classic/minifat/8080/obj/8080/f_chdir
 classic/minifat/8080/obj/8080/f_chdrive

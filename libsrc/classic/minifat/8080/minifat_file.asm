@@ -2,7 +2,7 @@
 ; Shared file-layer helpers for the 8080 mini-FAT calls.
 ; Outline is ChaN ff.c (f_open, f_read, f_write, f_sync, f_lseek,
 ; follow_path, validate): 80cc stack-pointer order, caller cleans.
-; The delivered code calls this core. It is not the 80cc listing.
+; The delivered code calls this core.
 ;
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 

@@ -1,6 +1,19 @@
-; Mini-FAT for the gbz80 classic library. The core is one module.
-; Each f_* object is linked only when the program calls that symbol.
+; Mini-FAT for the gbz80 classic library. fat_sync stays in fatfs.
+; The other C calls, and each f_* object, are linked only when called.
 classic/minifat/gbz80/obj/gbz80/fatfs
+classic/minifat/gbz80/obj/gbz80/fat_dirty
+classic/minifat/gbz80/obj/gbz80/fat_mount
+classic/minifat/gbz80/obj/gbz80/dir_find
+classic/minifat/gbz80/obj/gbz80/dir_create
+classic/minifat/gbz80/obj/gbz80/dir_zap
+classic/minifat/gbz80/obj/gbz80/fat_dir_open
+classic/minifat/gbz80/obj/gbz80/fat_dir_read
+classic/minifat/gbz80/obj/gbz80/fat_next
+classic/minifat/gbz80/obj/gbz80/fat_alloc
+classic/minifat/gbz80/obj/gbz80/fat_free
+classic/minifat/gbz80/obj/gbz80/fat_clst2sect
+classic/minifat/gbz80/obj/gbz80/fat_getfree
+classic/minifat/gbz80/obj/gbz80/fat_clusters
 classic/minifat/gbz80/obj/gbz80/minifat_file
 classic/minifat/gbz80/obj/gbz80/f_chdir
 classic/minifat/gbz80/obj/gbz80/f_chdrive

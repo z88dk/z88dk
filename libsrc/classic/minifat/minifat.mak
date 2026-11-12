@@ -1,7 +1,7 @@
-# Classic mini-FAT. The core is one object per CPU, under
-# z80, 8085, 8080, gbz80, and vm1. The f_* calls are separate
-# files in that CPU directory and are linked only when a program
-# calls them.
+# Classic mini-FAT. One core per CPU, under z80, 8085, 8080, gbz80,
+# and vm1. fat_sync stays in that core. The other C calls and the
+# f_* calls are one file each in that CPU directory, and are linked
+# only when a program calls them.
 # fat_bss.asm is the shared RAM block. A target that wants the core
 # in its library lists classic/minifat/minifat.lst (or the 8085,
 # 8080, gbz80, or vm1 list), the same way osca lists sdcard.

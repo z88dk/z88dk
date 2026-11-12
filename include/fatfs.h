@@ -27,9 +27,12 @@
 
 /*
  * Public C API for mini-FAT. Include this header. Link one core
- * (`z80`, `8085`, `8080`, `gbz80`, or `vm1` `fatfs.asm`) and
- * `libsrc/classic/minifat/fat_bss.asm`. The long form is
- * `libsrc/classic/minifat/mini-fat.md`.
+ * (`z80`, `8085`, `8080`, `gbz80`, or `vm1` `fatfs.asm`), the call
+ * files in that same directory, and
+ * `libsrc/classic/minifat/fat_bss.asm`. `fat_sync` is
+ * `fat_sync_window` in the core. Each other call below is its own
+ * file, so a low-level program can call it without the `f_*` layer.
+ * The long form is `libsrc/classic/minifat/mini-fat.md`.
  *
  * asm_disk_initialize, ide_read_sector, and ide_write_sector are
  * assembly calls. They have no C prototype and they do not follow
