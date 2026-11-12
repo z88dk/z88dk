@@ -799,9 +799,11 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
     }
     int sflip_lt = signed_cmp_signflip(out, f, is_signed);
     int cmp_kept_hl = 0;               /* the compare left HL/A untouched */
+    int sbc_hl = 0;                    /* the difference is in HL */
     if (!(IS_808x() || IS_GBZ80())) {
         emit(out, "and\ta");
         emit(out, "sbc\thl,de");
+        sbc_hl = 1;
     } else if (CPU_HAS_CP_HL_DE()) {
         /* VM1 DCMP: HL-DE into the flags in ONE byte, landing the same CF
            (unsigned borrow = src0<src1) as the four-instruction byte-wise
@@ -820,7 +822,11 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         emit(out, "ld\ta,h");
         emit(out, "sbc\ta,d");
     }
-    if (is_signed && !sflip_lt) signed_result_to_carry(out);
+    if (is_signed && !sflip_lt) {
+        /* No overflow possible: the sign of HL is the answer. */
+        if (sbc_hl && ir_cmp_diff_fits(f, op)) emit(out, "add\thl,hl");
+        else signed_result_to_carry(out);
+    }
     int cf_true = cf_true_long;
     if (g_hc.branch_test_kind != 0) {
         const char *cc;
@@ -997,9 +1003,11 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
     }
     int sflip_gt = signed_cmp_signflip(out, f, is_signed);
     int cmp_kept_hl = 0;               /* the compare left HL/A untouched */
+    int sbc_hl = 0;
     if (!(IS_808x() || IS_GBZ80())) {
         emit(out, "and\ta");
         emit(out, "sbc\thl,de");
+        sbc_hl = 1;
     } else if (CPU_HAS_CP_HL_DE()) {
         emit(out, "cp\thl,de");       /* VM1 DCMP, see gen_cmp_lt_ge */
         cmp_kept_hl = !sflip_gt;       /* HL holds src1 here (swap-load) */
@@ -1011,7 +1019,10 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
         emit(out, "ld\ta,h");
         emit(out, "sbc\ta,d");
     }
-    if (is_signed && !sflip_gt) signed_result_to_carry(out);
+    if (is_signed && !sflip_gt) {
+        if (sbc_hl && ir_cmp_diff_fits(f, op)) emit(out, "add\thl,hl");
+        else signed_result_to_carry(out);
+    }
     int cf_true = cf_true_gt;
     if (g_hc.branch_test_kind != 0) {
         int br_true = (g_hc.branch_test_kind == IR_BR_COND);
@@ -1429,7 +1440,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         && op->src[1] >= 0 && CPU_HAS_CB_SHIFTS()
         && !IS_Z80N() && !IS_RABBIT() && !opt_disabled("var-byte-shift")) {
         int n = L.cmp_label_counter++;
-        int bc_live = (L.rs.bc >= 0);
+        int bc_live = (L.rs.bc >= 0) || func_has_bc_byte_home(f);
         int byte_home = L.cur_byte_home_vreg;
         int de_home = L.cur_de_byte_home_vreg;
         int e_home = de_home >= 0
@@ -1459,14 +1470,33 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         if (save_a) emit_sp(out, -2, "pop\taf");
         else         load_byte_to_a(out, f, op->src[0]);
         cache_a(op->src[0]);
-        emit(out, "inc\t%s", counter);
-        emit(out, "dec\t%s", counter);
-        emit(out, "jr\tz,L_f%d_bshr_end_%d", L.func_emit_idx, n);
-        fprintf(out, "L_f%d_bshr_loop_%d:\n", L.func_emit_idx, n);
-        emit(out, arith ? "sra\ta" : "srl\ta");
-        emit(out, "dec\t%s", counter);
-        emit(out, "jr\tnz,L_f%d_bshr_loop_%d", L.func_emit_idx, n);
-        fprintf(out, "L_f%d_bshr_end_%d:\n", L.func_emit_idx, n);
+        if (c_opt_code_size) {
+            /* Test at the bottom, as in gen_shl's byte loop. */
+            emit(out, "inc\t%s", counter);
+            emit(out, "jr\tL_f%d_bshr_test_%d", L.func_emit_idx, n);
+            fprintf(out, "L_f%d_bshr_loop_%d:\n", L.func_emit_idx, n);
+            emit(out, arith ? "sra\ta" : "srl\ta");
+            fprintf(out, "L_f%d_bshr_test_%d:\n", L.func_emit_idx, n);
+            if (!use_e && shift_djnz_ok()) {
+                emit(out, "djnz\tL_f%d_bshr_loop_%d", L.func_emit_idx, n);
+            } else {
+                emit(out, "dec\t%s", counter);
+                emit(out, "jr\tnz,L_f%d_bshr_loop_%d", L.func_emit_idx, n);
+            }
+        } else {
+            emit(out, "inc\t%s", counter);
+            emit(out, "dec\t%s", counter);
+            emit(out, "jr\tz,L_f%d_bshr_end_%d", L.func_emit_idx, n);
+            fprintf(out, "L_f%d_bshr_loop_%d:\n", L.func_emit_idx, n);
+            emit(out, arith ? "sra\ta" : "srl\ta");
+            if (!use_e && shift_djnz_ok()) {
+                emit(out, "djnz\tL_f%d_bshr_loop_%d", L.func_emit_idx, n);
+            } else {
+                emit(out, "dec\t%s", counter);
+                emit(out, "jr\tnz,L_f%d_bshr_loop_%d", L.func_emit_idx, n);
+            }
+            fprintf(out, "L_f%d_bshr_end_%d:\n", L.func_emit_idx, n);
+        }
         if (!use_e) {
             if (bc_live) emit_sp(out, -2, "pop\tbc");
             else         invalidate_bc_cache();
@@ -1586,6 +1616,12 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             emit_byte_lsr_a(out, count, !arith && (op->imm & IR_SHR_MASKED));
             if (arith) emit(out, "sub\t%d", 0x80 >> count);
             return finalize_byte_result(out, f, op, count == 0);
+        }
+        /* Logical, three or more bits: min(r,8-r) 1-byte rotates and a mask
+           beat r 2-byte `srl a`, in bytes and in ticks. */
+        if (!arith && count >= 3 && count <= 7 && !opt_disabled("byte-lsr-rot")) {
+            emit_byte_lsr_a(out, count, 0);
+            return finalize_byte_result(out, f, op, 0);
         }
         for (int k = 0; k < count; k++)
             emit(out, arith ? "sra\ta" : "srl\ta");
@@ -2050,7 +2086,18 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                chain's flags are dead at the closing `ld l,a`. */
             int use_a_chain = cb_shift_cpu() && count >= 2 && count < 8
                               && !opt_disabled("shr-a-chain");
-            if (use_a_chain) {
+            if ((op->imm & IR_SHR_BYTESRC) && cb_shift_cpu() && count >= 1 && count < 8
+                && !opt_disabled("shr-byte-src")) {
+                /* H is already zero: shift the low byte alone. */
+                if (count < 4) {
+                    for (int k = 0; k < count; k++) emit(out, "srl\tl");
+                } else {
+                    emit(out, "ld\ta,l");
+                    emit_byte_lsr_a(out, count, 0);
+                    emit(out, "ld\tl,a");
+                    invalidate_a_cache();
+                }
+            } else if (use_a_chain) {
                 emit(out, "ld\ta,l");
                 for (int k = 0; k < count; k++) {
                     emit(out, "srl\th");

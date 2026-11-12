@@ -540,6 +540,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        held at call entry. */
     if (bc_saved) {
         emit(out, "pop\tbc");
+        clob_call_bc_restored = 1;
         L.rs.bc = bc_vreg_at_call_entry;
     }
 
@@ -669,6 +670,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         int tenant = bc_args_save_stack[--bc_args_save_depth];
         if (saved) {
             emit(out, "pop\tbc");
+            clob_call_bc_restored = 1;
             L.rs.bc = tenant;
             L.cur_sp_adjust -= 2;
         } else if (!callbc_fresh_stamp) {
@@ -1506,6 +1508,7 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
     L.cur_sp_adjust -= popped_bytes;
     if (hc_bc_saved) {
         emit_sp(out, -2, "pop\tbc");
+        clob_call_bc_restored = 1;
     }
     invalidate_hl_cache();
     if (!hc_bc_saved)

@@ -77,6 +77,8 @@ exists (ADR 0010).
 | `lftr-signed` | LFTR only where the bound is a constant, never a signed variable |
 | `smax0` | LFTR's `max(0,n)` clamp for a signed variable bound is built as a logical shift, a subtract and an AND, instead of one sign test over a zero load |
 | `cmp-unsign` | keep the sign tail on a comparison that cannot go negative |
+| `cmp-noovf` | a signed 16-bit compare whose operands are both within +-16383 keeps the overflow repair (`ld a,h; jp po; xor 0x80; rla`) instead of reading the sign of the difference with `add hl,hl` |
+| `const-diamond` | `v = c ? K1 : K2` keeps both arms and the jump over the second, instead of loading one constant ahead of the test and overwriting it |
 | `conv-mask-fold` | keep a widening conversion feeding a mask |
 | `sym-addr-fold` | keep `&sym + K` as an add instead of a symbol address |
 | `symidx-mem-late` | keep a displaced indexed-global load instead of folding the displacement into the symbol address |
@@ -184,6 +186,26 @@ exists (ADR 0010).
 | `idx-deref` | an index-homed pointer is not dereferenced in place, and its cost term goes with it (ADR 0026) |
 | `idxhalf` | no byte homes in IX/IY halves (sp mode, z80/z80n/ez80) |
 | `iy-temp-pack` | no IY packing for a short-lived temporary |
+| `iy-lone-temp` | in frame-pointer mode, an IY pack whose only tenant is one one-use temp computed from single-definition values is kept (push hl;pop iy and push iy;pop hl) instead of parking the temp on the stack |
+| `byte-bc-home` | on the Z80 family (not 8080/8085/gbz80/Rabbit/eZ80), a byte may be homed in B and C across blocks, two at once, in functions without calls; off restores the single-block C home |
+| `shr-byte-src` | on the CB-shift CPUs, a word-wide constant logical `>>` whose source fits a byte shifts the low byte alone (`srl l`, or rotate and mask) instead of the 16-bit `srl h; rra` chain |
+| `shift-djnz` | a variable-count byte shift whose counter is B uses `djnz` (top-tested) instead of `dec b; jr nz`; with `--opt-code-size` every variable byte shift loop is tested at the bottom, which saves a byte or two and costs a taken jump on entry |
+| `pack-be32` | a big-endian four-byte read assembled by shifts and ORs (`p[0]<<24 \| p[1]<<16 \| p[2]<<8 \| p[3]`) is a four-byte load plus a byte reverse, as the two-byte form already is, instead of four byte loads, shifts and a four-byte OR walk |
+| `pack-regs` | a shift-and-OR of zero-extended bytes or words held in variables (`((u32)a<<24)\|((u32)b<<16)\|((u32)c<<8)\|d`, `((u16)x<<8)\|y`, `((u32)hi<<16)\|lo`) is built in registers by the PACK8 and JOIN16 operations, not as full-width terms merged through memory |
+| `pack-b2h` | a byte shifted left by 8 in a word (`(int)b<<8`, already one byte-to-high-half operation) counts as a lane of the register pack |
+| `byte-direct-l` | a frame byte that is read once and widened to a word is loaded straight into L (or E), not through A |
+| `byte-direct-st` | a frame byte stored through a pointer is loaded straight into E, not through A |
+| `sdiv-bias` | the rounding bias of a signed word division by 2, 4, 8 or 16 (`x + ((x >> 15) & mask)`) is added only when x is negative, by a test and one or a few `inc hl`, not built through A |
+| `cse-imm` | two single-definition constants of the same width and value are not treated as one operand by CSE, so `K >> n` written twice is computed twice |
+| `licm-min-size` | under `--opt-code-size`, loop-invariant expressions of fewer than 6 nodes are left in place instead of hoisted into a temporary (AST layer) |
+| `pack-chain` | an accumulate-and-shift chain on one variable (`r=a; r=(r<<8)\|b; r=(r<<8)\|c; r=(r<<8)\|d`) is split into separate values and redistributed into the flat shift-and-OR form, so the register packs above apply to it |
+| `pack8-direct` | a byte pair packed into a word is read straight from its frame slots into the two register halves (IX slots in fp mode, one walked slot address in sp mode), without zero-extension |
+| `tos-de-keep-hl` | a word slot at the top of the stack is loaded into DE with `pop de; push de` while HL is kept, instead of saving HL around a slot-address read |
+| `bitop-promote` | an AND/OR/XOR of two bytes that is widened to a wider int is no longer sign-extended when its operands cannot be negative (`(long)(a\|b)` of unsigned bytes gave 0xffffffff); mixed-signedness OR/XOR promotes both operands first |
+| `bit-hi0` | a word AND/OR/XOR whose second operand fits a byte skips the high-byte half of the sequence (the operands are swapped to put the byte one second; not on Rabbit, and no swap on ez80 in sp mode) |
+| `shl8-byte-src` | a word `<< 8` or more of a value not yet in a register pair reads only its low byte (`ld h,a; ld l,0`), not the whole word and a dead `ld h,0`; not on Rabbit or kc160, which load the word natively |
+| `asr-nonneg` | a signed `>>` of a value that fits a byte is treated as the logical shift, so the byte routes can narrow it (`0x80 >> n`) |
+| `and-byte-shr` | a word AND with a byte-fitting operand narrows its other operand when a right shift produced it, and the AND itself narrows to a byte |
 | `iy-long` | do not run the IY packs in a function the BC veto excludes |
 | `lra` | no linear-scan-style IY interval picking |
 | `graph-alloc` | no interference-graph-driven index benefit |
@@ -210,6 +232,7 @@ exists (ADR 0010).
 | `idx2-base` | an index home is not offered to a dereference base |
 | `byte-remat` | a byte loaded from a global is spilled instead of re-loaded at the use |
 | `byte-remat-arith` | a single-use global byte feeding a byte add or subtract is loaded and spilled to a slot instead of read at the operation |
+| `byte-remat-conv` | a single-use global byte feeding a zero- or sign-extend is loaded and spilled to a slot instead of read at the extend |
 | `remat` | no rematerialisation of constants and symbol addresses |
 | `slot-prune` | keep a frame slot for a byte that only ever rides A |
 | `dead-de-reload` | keep a dead DE reload before a later use |
@@ -287,7 +310,7 @@ exists (ADR 0010).
 | `fabs-fa-clear` | fabs of a 64-bit MBF value calls the library routine, not a sign bit clear in the accumulator (--opt-code-size also calls) |
 | `shift-const-bsxa` | z80n shift of a constant by a variable count loads the constant and count via HL and DE, then swaps, instead of loading the constant straight into DE |
 | `switch-unreachable` | a switch case or default that is __builtin_unreachable still gets its compare |
-| `size-glong` | with `--opt-code-size`, a four-byte load through HL is the inline byte sequence, not `call l_glong` |
+| `size-glong` | with `--opt-code-size`, a four-byte load through HL is `call l_glong`, not the inline byte sequence |
 | `call-sp-cleanup` | use `pop bc` chains instead of HL-based stack cleanup when the result does not occupy HL |
 | `bc-save-live` | BC is saved around a call even when it holds nothing live |
 | `bc-step-param` | a stepped pointer parameter is reloaded from its slot each iteration instead of riding BC (ADR 0031) |
@@ -373,6 +396,9 @@ exists (ADR 0010).
 | `byte-store-reg` | a byte held in L is stored to its frame slot through A instead of `ld (ix+d),l` |
 | `long-fold-sp` | the zero-extend / byte-shift fold into a long bitop or add is used in frame-pointer mode only; sp-addressed code builds the operand |
 | `byte-clean` | the byte clean-up after narrowing is skipped altogether |
+| `byte-lsr-rot` | a logical byte right shift of 3 to 7 bits is a run of `srl a` instead of rotates and a mask |
+| `ret-byte-l` | a byte truncated and returned straight away is also copied through A (`ld a,l`) although only L is returned |
+| `ldimm-dead-store` | a constant whose slot store is dead is loaded with `ld de,K; ex de,hl` instead of `ld hl,K` |
 | `byte-ext-src` | a byte op reading a widened byte reads the widened word, not the byte it came from |
 | `frame-byte-trunc-sp` | in sp mode the low byte of a word in the frame is read by loading the whole word, as in fp mode before the byte read |
 | `lhlx-long` | no LDSI-based long load on 8085 |
@@ -398,7 +424,7 @@ exists (ADR 0010).
 | `tm-thread` | a jump to a label whose block is a lone `jp` is not sent straight to that target after tail merging |
 | `block-layout` | no trace movement to delete a jump |
 | `block-layout-rounds` | block layout runs once, so a trace ending in a jump that another move replaced stays put |
-| `jr-relax` | `jp` is never relaxed to `jr` |
+| `jr-relax` | `jp` is never relaxed to `jr` (with `--opt-jr-uncond` or `--opt-code-size`, an unconditional `jp` is relaxed on every CPU that has `jr`, not only where `jr` is no slower) |
 | `label-elide` | dead basic-block labels are kept in the output |
 | `ret-thread` | a jump to a `ret` is not threaded |
 | `defassign-verify` | not an optimisation: no stderr warning for a local that is read but never written on any path (`IR_DEFASSIGN_VERIFY=1` widens it, `=2` aborts) |

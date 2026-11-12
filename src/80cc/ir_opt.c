@@ -1985,6 +1985,31 @@ static void cse_sym_canon(const Func *f, CseAlias *a)
                 reps[nr].rep = d; nr++;
             }
         }
+    /* Likewise two single-definition constants of one width and value. A
+       constant is loaded again for each use, so `K >> n` written twice
+       would otherwise compare as two different operands. */
+    if (!opt_disabled("cse-imm")) {
+        struct { int w; int64_t imm; int rep; } ireps[64];
+        int ni = 0;
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                const Op *op = &f->bbs[b].ops[j];
+                int d = op->dst;
+                if (op->kind != IR_LD_IMM || op->imm_sym || d < 0 || d >= nv
+                    || ndef[d] != 1 || !cse_vreg_stable(f, d)) continue;
+                int w = f->vregs[d].width;
+                if (w < 1 || w > 4) continue;
+                int k;
+                for (k = 0; k < ni; k++)
+                    if (ireps[k].w == w && ireps[k].imm == op->imm) break;
+                if (k < ni) {
+                    a->canon[d] = ireps[k].rep;
+                    a->fixed[d] = 1;
+                } else if (ni < 64) {
+                    ireps[ni].w = w; ireps[ni].imm = op->imm; ireps[ni].rep = d; ni++;
+                }
+            }
+    }
     free(ndef);
 }
 
@@ -3951,6 +3976,22 @@ static int v_is_const_shr(const Func *f, int v)
     return seen;
 }
 
+/* True when every definition of v is a logical right shift (any count). */
+static int v_is_logical_shr(const Func *f, int v)
+{
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *d = &bb->ops[j];
+            if (d->dst != v) continue;
+            if (d->kind != IR_SHR || (d->imm & IR_SHR_ARITH)) return 0;
+            seen = 1;
+        }
+    }
+    return seen;
+}
+
 static int shrwide_on(void)
 { return !opt_disabled("shr-wide"); }                                   /* default ON */
 
@@ -4077,6 +4118,12 @@ static int v_fits_byte_d(const Func *f, int v, int depth)
                a bool is nearly always consumed. */
             if (cmp_result_kind(op))
                 continue;
+            /* A logical right shift only shrinks its source, so it fits a
+               byte whenever the source does. */
+            if (op->kind == IR_SHR && !(op->imm & IR_SHR_ARITH) && depth < 4
+                && op->src[0] >= 0 && op->src[0] < f->n_vregs
+                && v_fits_byte_d(f, op->src[0], depth + 1))
+                continue;
             /* A copy of a value that fits a byte fits a byte too. CSE folds a
                duplicate CONV_ZX into a MOV from the first one, so without this
                the SECOND byte shift of the same value in a function is refused
@@ -4196,7 +4243,24 @@ static int demands_low_byte_only(const Func *f, int v)
                    the high byte supplies. */
                 && (v_fits_byte(f, u->src[0]) || shr_result_masked_below(f, u)))
                 continue;
+            /* A two-operand AND whose OTHER operand fits a byte reads only v's
+               low byte, and its own result fits a byte too. Limited to values a
+               right shift produced, where the byte form is the cheaper one. */
+            if (u->kind == IR_AND && u->src[0] >= 0 && u->src[1] >= 0
+                && !opt_disabled("and-byte-shr") && v_is_logical_shr(f, v)) {
+                int other = (u->src[0] == v) ? u->src[1] : u->src[0];
+                if (other != v && v_fits_byte(f, other)) continue;
+            }
             if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
+                continue;
+            /* The 16-bit divide helpers take their operands through
+               gen_hcall, which zero-extends a byte argument: exact for a
+               value that fits a byte. A constant stays wide: `ld hl,K` loads
+               it directly, and a byte def would clobber A for nothing. */
+            if (byte_val && u->kind == IR_HCALL && u->hcall && u->hcall->name
+                && !v_is_literal_imm(f, v)
+                && (!strcmp(u->hcall->name, "l_div")
+                    || !strcmp(u->hcall->name, "l_div_u")))
                 continue;
             /* Switch index: the dispatch reads v then widens it to full width
                for the jump-table / case comparisons, so a byte-producing v is
@@ -4545,6 +4609,26 @@ static OpKind cs_unsigned_of(OpKind k)
      still holds the value at this use; its live range grows to cover it. */
 static int bc_single_def(const int *ndef, int v) { return v >= 0 && ndef[v] == 1; }
 
+/* The bits byte vreg v can have set: 0xff unless its one def limits them. An
+   immediate AND keeps its mask; a logical right shift of a byte keeps the low
+   (8-n) bits. */
+static int bc_byte_bits(const Func *f, const int *ndef, const Op *const *def, int v)
+{
+    if (!bc_single_def(ndef, v) || !def[v]) return 0xff;
+    const Op *d = def[v];
+    if (d->kind == IR_AND && d->src[1] == -1) return (int)(d->imm & 0xff);
+    /* A shift marked MASKED leaves the wrap-around bits for the reader's AND to
+       clear, so its result has no bound of its own. */
+    if (d->kind == IR_SHR && d->src[1] == -1 && !(d->imm & IR_SHR_ARITH)
+        && !(d->imm & (IR_SHR_MASKED | IR_SHR_TOPBYTE))
+        && d->src[0] >= 0 && d->src[0] < f->n_vregs
+        && (f->vregs[d->src[0]].width == 1 || v_fits_byte(f, d->src[0]))) {
+        int n = (int)(d->imm & 0xff);
+        return n >= 8 ? 0 : (0xff >> n);
+    }
+    return 0xff;
+}
+
 int ir_opt_byte_cleanup(Func *f)
 {
     if (opt_disabled("byte-clean")) return 0;
@@ -4565,7 +4649,8 @@ int ir_opt_byte_cleanup(Func *f)
             if (o->dst < 0 || o->dst >= nv || f->vregs[o->dst].width != 1) continue;
             if (f->vregs[o->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
             if (o->src[1] == -1 && o->src[0] >= 0
-                && ((o->kind == IR_AND && (o->imm & 0xff) == 0xff)
+                && ((o->kind == IR_AND
+                     && (bc_byte_bits(f, ndef, def, o->src[0]) & ~(int)o->imm & 0xff) == 0)
                     || ((o->kind == IR_OR || o->kind == IR_XOR) && (o->imm & 0xff) == 0))
                 && !opt_disabled("byte-mask-ident")) {
                 /* a copy, not a CONV_TRUNC: a truncation feeding a store is
@@ -4596,6 +4681,225 @@ int ir_opt_byte_cleanup(Func *f)
         }
     free(ndef); free(def);
     return changed;
+}
+
+/* ---- Constant diamond (ir_opt_const_diamond) ------------------------
+   `v = c ? K1 : K2` builds a diamond whose two arms each hold one constant load:
+
+       A:  ...  BR_ZERO c -> X ; BR Y
+       Y:  v = K1 ; BR J          X:  v = K2 ; BR J
+
+   (A constant here is an immediate, a string or a symbol address.) Load the
+   branched-to arm's constant in A, ahead of the test, and let the
+   branch skip straight to J; the other arm then overwrites it on the way:
+
+       A:  v = K2 ; ... BR_ZERO c -> J ; BR Y
+       Y:  v = K1 ; BR J
+
+   One arm and the jump over it are gone. The constant is loaded before the
+   test, which is only free when that load cannot disturb what the test reads,
+   so the condition must be a byte (a flag or a byte in A) and v a word. v must
+   be unused in A, and each arm have A as its only predecessor.
+   `--opt-disable=const-diamond` opts out. */
+static int cd_is_branch(const Op *o)
+{
+    return o->kind == IR_BR || o->kind == IR_BR_COND || o->kind == IR_BR_ZERO
+        || o->kind == IR_SWITCH;
+}
+
+static int cd_const_load(const Op *o)
+{
+    return o->kind == IR_LD_IMM || o->kind == IR_LD_STR || o->kind == IR_LD_SYM;
+}
+
+int ir_opt_const_diamond(Func *f)
+{
+    if (!f || f->n_bbs < 4 || opt_disabled("const-diamond")) return 0;
+    int n = f->n_bbs, changed = 0;
+    int *npred = calloc((size_t)n, sizeof *npred);
+    if (!npred) return 0;
+    for (int b = 0; b < n; b++) {
+        const BB *bb = &f->bbs[b];
+        int seen[64], ns = 0, overflow = 0;
+        #define CD_EDGE(t) do { int _t = (t); if (_t >= 0 && _t < n) {          \
+            int _d = 0; for (int _i = 0; _i < ns; _i++) if (seen[_i] == _t) _d = 1; \
+            if (!_d) { if (ns < 64) seen[ns++] = _t; else overflow = 1; } } } while (0)
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (o->kind == IR_BR || o->kind == IR_BR_COND || o->kind == IR_BR_ZERO)
+                CD_EDGE(o->label);
+            else if (o->kind == IR_SWITCH && o->sw) {
+                for (int c = 0; c < o->sw->n_cases; c++) CD_EDGE(o->sw->target_bb[c]);
+                CD_EDGE(o->sw->default_bb);
+            }
+        }
+        CD_EDGE(bb->succ[0]);
+        CD_EDGE(bb->succ[1]);
+        #undef CD_EDGE
+        for (int i = 0; i < ns; i++) npred[seen[i]] += overflow ? 2 : 1;
+    }
+    for (int a = 0; a < n; a++) {
+        BB *A = &f->bbs[a];
+        if (A->n_ops < 3) continue;
+        Op *br = &A->ops[A->n_ops - 1];
+        Op *cb = &A->ops[A->n_ops - 2];
+        if (br->kind != IR_BR) continue;
+        if (cb->kind != IR_BR_ZERO && cb->kind != IR_BR_COND) continue;
+        int bad = 0;
+        for (int j = 0; j < A->n_ops - 2; j++) if (cd_is_branch(&A->ops[j])) bad = 1;
+        if (bad) continue;
+        int X = cb->label, Y = br->label;
+        if (X < 0 || Y < 0 || X >= n || Y >= n || X == Y || X == a || Y == a) continue;
+        BB *BX = &f->bbs[X], *BY = &f->bbs[Y];
+        if (BX->n_ops != 2 || BY->n_ops != 2) continue;
+        if (npred[X] != 1 || npred[Y] != 1) continue;
+        const Op *lx = &BX->ops[0], *ly = &BY->ops[0];
+        if (!cd_const_load(lx) || !cd_const_load(ly)) continue;
+        if (BX->ops[1].kind != IR_BR || BY->ops[1].kind != IR_BR) continue;
+        int J = BX->ops[1].label;
+        if (J != BY->ops[1].label || J < 0 || J >= n || J == a || J == X || J == Y) continue;
+        int v = lx->dst, c = cb->src[0];
+        if (v < 0 || v != ly->dst || v >= f->n_vregs || c < 0 || c >= f->n_vregs) continue;
+        if (c == v || f->vregs[v].width != 2 || f->vregs[c].width != 1) continue;
+        if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+        if (lx->imm_sym || ly->imm_sym) continue;
+        /* v untouched anywhere in A */
+        int touched = 0;
+        for (int j = 0; j < A->n_ops && !touched; j++) {
+            int us[16], ds[8];
+            int nu = ir_op_uses(&A->ops[j], us, 16), nd = ir_op_defs(&A->ops[j], ds, 8);
+            for (int k = 0; k < nu; k++) if (us[k] == v) touched = 1;
+            for (int k = 0; k < nd; k++) if (ds[k] == v) touched = 1;
+        }
+        if (touched) continue;
+        /* Insert ahead of the op that computes the condition when it sits right
+           before the branch, so a compare still fuses with it. */
+        int at = A->n_ops - 2;
+        if (at >= 1 && A->ops[at - 1].dst == c) at--;
+        /* The early constant lives across everything from `at` to the branch,
+           so that stretch must be one plain condition computation: a call or
+           anything heavier would force the constant into a slot and cost more
+           than the jump saved. */
+        {
+            int ok = (A->n_ops - 2 - at) <= 1;
+            for (int j = at; j < A->n_ops - 2 && ok; j++) {
+                OpKind k = A->ops[j].kind;
+                if (k != IR_LD_MEM && k != IR_MOV && k != IR_CONV_ZX
+                    && k != IR_CONV_TRUNC && k != IR_AND && k != IR_OR
+                    && k != IR_XOR && !(k >= IR_CMP_EQ && k <= IR_CMP_UGE))
+                    ok = 0;
+            }
+            /* ...and a byte computation throughout: a word operand would want
+               the register the early constant is sitting in. */
+            for (int j = at; j < A->n_ops - 2 && ok; j++) {
+                int us[16];
+                int nu = ir_op_uses(&A->ops[j], us, 16);
+                for (int k = 0; k < nu; k++)
+                    if (us[k] >= 0 && us[k] < f->n_vregs
+                        && f->vregs[us[k]].width != 1) ok = 0;
+                if (A->ops[j].dst >= 0 && A->ops[j].dst < f->n_vregs
+                    && f->vregs[A->ops[j].dst].width != 1) ok = 0;
+            }
+            if (!ok) continue;
+        }
+        if (A->n_ops + 1 > A->cap_ops) {
+            int nc = A->cap_ops ? A->cap_ops * 2 : 8;
+            Op *nops = realloc(A->ops, (size_t)nc * sizeof(Op));
+            if (!nops) continue;
+            A->ops = nops; A->cap_ops = nc;
+            br = &A->ops[A->n_ops - 1]; cb = &A->ops[A->n_ops - 2];
+        }
+        memmove(&A->ops[at + 1], &A->ops[at], (size_t)(A->n_ops - at) * sizeof(Op));
+        A->n_ops++;
+        A->ops[at] = BX->ops[0];
+        cb = &A->ops[A->n_ops - 2];
+        cb->label = J;
+        for (int s = 0; s < 2; s++) if (A->succ[s] == X) A->succ[s] = J;
+        npred[X] = 0;
+        changed++;
+    }
+    free(npred);
+    return changed;
+}
+
+/* ---- Small value ranges (ir_cmp_diff_fits) ---------------------------
+   A signed 16-bit compare subtracts the operands and then repairs the sign for
+   an overflow that cannot happen when both are small: `origin > 96 - view_h`
+   subtracts a byte from a value in [-159,96]. Track the exact range of a vreg
+   through the few ops that keep it small and tell the lowerer when the
+   difference always fits, so it can read the sign straight off the result. */
+static int sr_norm(const Func *f, int v, int64_t x)
+{
+    if (f->vregs[v].width == 2 && x > 32767 && x <= 65535) return (int)(x - 65536);
+    return (int)x;
+}
+
+static int sr_range(const Func *f, int v, long *lo, long *hi, int depth)
+{
+    if (v < 0 || v >= f->n_vregs || depth > 4) return 0;
+    if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
+        return 0;
+    const Op *d = NULL;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int ds[8], nd = ir_op_defs(o, ds, 8);
+            for (int k = 0; k < nd; k++)
+                if (ds[k] == v) { if (d) return 0; d = o; }
+        }
+    if (!d) return 0;
+    long l0, h0, l1, h1;
+    switch (d->kind) {
+    case IR_CONV_ZX:
+        if (d->src[0] >= 0 && d->src[0] < f->n_vregs && f->vregs[d->src[0]].width == 1) {
+            *lo = 0; *hi = 255; return 1;
+        }
+        return sr_range(f, d->src[0], lo, hi, depth + 1);
+    case IR_MOV:
+        return sr_range(f, d->src[0], lo, hi, depth + 1);
+    case IR_LD_IMM:
+        if (f->vregs[v].width != 2 || d->imm_sym) return 0;
+        *lo = *hi = sr_norm(f, v, d->imm); return 1;
+    case IR_AND:
+        if (d->src[1] != -1 || d->imm < 0 || d->imm > 32767) return 0;
+        *lo = 0; *hi = d->imm; return 1;
+    case IR_SHR:
+        if (d->src[1] != -1 || (d->imm & IR_SHR_ARITH)) return 0;
+        if (!sr_range(f, d->src[0], &l0, &h0, depth + 1) || l0 < 0) return 0;
+        *lo = 0; *hi = h0 >> (d->imm & 0xff); return 1;
+    case IR_RSUB:
+        if (d->src[1] != -1 || !sr_range(f, d->src[0], &l0, &h0, depth + 1)) return 0;
+        *lo = sr_norm(f, v, d->imm) - h0; *hi = sr_norm(f, v, d->imm) - l0; break;
+    case IR_ADD: case IR_SUB: {
+        if (!sr_range(f, d->src[0], &l0, &h0, depth + 1)) return 0;
+        if (d->src[1] >= 0) {
+            if (!sr_range(f, d->src[1], &l1, &h1, depth + 1)) return 0;
+        } else {
+            l1 = h1 = sr_norm(f, v, d->imm);
+        }
+        if (d->kind == IR_ADD) { *lo = l0 + l1; *hi = h0 + h1; }
+        else                   { *lo = l0 - h1; *hi = h0 - l1; }
+        break;
+    }
+    default:
+        return 0;
+    }
+    return *lo >= -32768 && *hi <= 32767;
+}
+
+/* Does src0 - src1 of this 16-bit compare always fit a signed word? Both
+   operands within +-16383 guarantees it. */
+int ir_cmp_diff_fits(const Func *f, const Op *op)
+{
+    if (!f || !op || opt_disabled("cmp-noovf")) return 0;
+    long l0, h0, l1, h1;
+    if (!sr_range(f, op->src[0], &l0, &h0, 0)) return 0;
+    if (op->src[1] >= 0) {
+        if (!sr_range(f, op->src[1], &l1, &h1, 0)) return 0;
+    } else {
+        l1 = h1 = op->imm;
+    }
+    return l0 >= -16384 && h0 <= 16383 && l1 >= -16384 && h1 <= 16383;
 }
 
 /* ---- Signed compares that need no sign correction (ir_opt_cmp_unsign) ----
@@ -4669,6 +4973,13 @@ static int bitop_of_bytes(const Func *f, int v)
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *op = &bb->ops[j];
             if (op->dst != v) continue;
+            /* AND: one byte operand zeroes the high byte whatever the other is. */
+            if (op->kind == IR_AND && !opt_disabled("and-byte-shr")
+                && op->src[0] >= 0 && op->src[1] >= 0
+                && (v_fits_byte(f, op->src[0]) || v_fits_byte(f, op->src[1]))) {
+                seen = 1;
+                continue;
+            }
             if (op->kind != IR_OR
                 || op->src[0] < 0 || !v_fits_byte(f, op->src[0])) return 0;
             if (op->src[1] >= 0 ? !v_fits_byte(f, op->src[1])
@@ -4683,6 +4994,23 @@ int ir_opt_narrow_byte(Func *f)
 {
     if (!f) return 0;
     if (opt_disabled("narrow-byte")) return 0;
+    /* A signed `>>` of a value that fits a byte is non-negative, so it is the
+       same as the logical shift. Dropping the arithmetic marker lets the byte
+       routes below see it: an unsigned-byte proof exists for it (a constant
+       such as 0x80 is no sign-extended byte, but it is a byte). */
+    if (!opt_disabled("asr-nonneg")) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                if (op->kind != IR_SHR || !(op->imm & IR_SHR_ARITH)) continue;
+                if (op->src[0] < 0 || op->src[0] >= f->n_vregs) continue;
+                if (op->dst < 0 || f->vregs[op->dst].width != 2) continue;
+                if (f->vregs[op->src[0]].width != 2) continue;
+                if (v_fits_byte(f, op->src[0])) op->imm &= ~IR_SHR_ARITH;
+            }
+        }
+    }
     /* A vreg is a candidate iff it has ≥1 def and EVERY def is a
        narrowable op (so each def has an 8-bit lowering). Multi-def is
        allowed — the diamond `if(c&m) c=(c<<1)^p; else c<<=1;` defines
@@ -4712,7 +5040,19 @@ int ir_opt_narrow_byte(Func *f)
             if (!hasdef[d] || bad[d]) continue;
             if (f->vregs[d].width != 2) continue;
             if (debug_named_local(f, d)) continue;   /* its record keeps the declared width */
-            if (demands_low_byte_only(f, d) || bitop_of_bytes(f, d)) {
+            int low_only = demands_low_byte_only(f, d);
+            int of_bytes = !low_only && bitop_of_bytes(f, d);
+            if (low_only || of_bytes) {
+                /* bitop_of_bytes proves the value is 0..255. A reader that
+                   widens it with CONV_SX would sign-extend the narrowed byte
+                   (`(long)(a | 0x80)` read 0xffffff81), so it zero-extends. */
+                if (of_bytes && !opt_disabled("bitop-promote"))
+                    for (int b2 = 0; b2 < f->n_bbs; b2++) {
+                        BB *bb2 = &f->bbs[b2];
+                        for (int j2 = 0; j2 < bb2->n_ops; j2++)
+                            if (bb2->ops[j2].kind == IR_CONV_SX && bb2->ops[j2].src[0] == d)
+                                bb2->ops[j2].kind = IR_CONV_ZX;
+                    }
                 f->vregs[d].width = 1;
                 f->vregs[d].kind  = KIND_CHAR;   /* keep kind/width consistent */
                 pass_changed++;
@@ -4726,6 +5066,46 @@ int ir_opt_narrow_byte(Func *f)
        and that AND is the only reader (shr_result_masked_below proved it).
        Logical only — a rotate does not propagate a sign. Runs after the fixed
        point, so `width == 1` here means the vreg really did narrow. */
+    /* [IR_BIT_HI0] A word AND/OR/XOR with one operand that fits a byte. The
+       operands commute, so the byte one goes second. */
+    if (!opt_disabled("bit-hi0") && !IS_RABBIT()) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                if (op->kind != IR_AND && op->kind != IR_OR && op->kind != IR_XOR) continue;
+                if (op->src[0] < 0 || op->src[1] < 0 || op->dst < 0) continue;
+                if (op->src[0] >= f->n_vregs || op->src[1] >= f->n_vregs) continue;
+                if (f->vregs[op->dst].width != 2) continue;
+                if (f->vregs[op->src[0]].width != 2 || f->vregs[op->src[1]].width != 2) continue;
+                if (v_fits_byte(f, op->src[1])) op->imm |= IR_BIT_HI0;
+                else if (!(IS_EZ80() && c_framepointer_is_ix == -1)   /* sp mode: the swap costs bytes */
+                         && v_fits_byte(f, op->src[0])) {
+                    int t = op->src[0]; op->src[0] = op->src[1]; op->src[1] = t;
+                    op->imm |= IR_BIT_HI0;
+                }
+            }
+        }
+    }
+    /* Only the CB-shift CPUs lower the flag; elsewhere the count is read from
+       the whole immediate. */
+    if (!opt_disabled("shr-byte-src")
+        && (c_cpu == CPU_Z80 || IS_R800() || c_cpu == CPU_Z180 || IS_EZ80()
+            || IS_GBZ80() || IS_KC160())) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                int cnt = (int)(op->imm & 0x1f);
+                if (op->kind != IR_SHR || op->src[1] != -1) continue;
+                if (op->imm & (IR_SHR_ARITH | IR_SHR_MASKED | IR_SHR_TOPBYTE)) continue;
+                if (cnt < 1 || cnt > 7) continue;
+                if (op->dst < 0 || op->dst >= f->n_vregs || op->src[0] < 0) continue;
+                if (f->vregs[op->dst].width != 2) continue;
+                if (v_fits_byte(f, op->src[0])) op->imm |= IR_SHR_BYTESRC;
+            }
+        }
+    }
     if (shrmask_on()) {
         for (int b = 0; b < f->n_bbs; b++) {
             BB *bb = &f->bbs[b];
@@ -4737,8 +5117,9 @@ int ir_opt_narrow_byte(Func *f)
                 if (f->vregs[op->dst].width != 1) continue;
                 if (shr_result_masked_below(f, op))
                     op->imm |= IR_SHR_MASKED;
-                else if (shr_result_byte_wide(f, op))
-                    op->imm |= IR_SHR_TOPBYTE;
+                else if (shr_result_byte_wide(f, op)
+                         && (IS_808x() || !v_fits_byte(f, op->src[0])))
+                    op->imm |= IR_SHR_TOPBYTE;   /* a byte source rotates instead */
             }
         }
     }

@@ -1239,6 +1239,21 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
             return;
         }
     }
+    /* A word slot at the top of the stack: `pop de; push de` reads it without
+       touching HL, so there is nothing to save around it. */
+    if (L.join_tos_ok && !opt_disabled("tos-de-keep-hl") && !fp_active(f)
+        && f->vregs[vreg_id].width == 2 && slot_off(f, vreg_id) >= 0
+        && slot_off(f, vreg_id) + L.cur_sp_adjust == 0
+        && tos_pushpop_ok(f) && f->frame_size >= 2
+        && !vreg_is_pr_stack(f, vreg_id) && !vreg_in_pr_bc(f, vreg_id)
+        && !vreg_in_idx2(f, vreg_id) && !vreg_in_exx(f, vreg_id)
+        && !vreg_is_remat(f, vreg_id)) {
+        ss_note_reload(f, vreg_id);
+        emit(out, "pop\tde");
+        emit(out, "push\tde");
+        cache_de(vreg_id);
+        return;
+    }
     /* kc160 native ld de,(sp+d) preserves HL on its own — no push/pop. */
     if (IS_KC160() && f->vregs[vreg_id].width == 2
         && slot_off(f, vreg_id) >= 0) {
@@ -1794,6 +1809,7 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
    [dead-store] write context (save/restore — nests via pending_spill_resolve)
    so every slot_off it makes counts as a write, not a read. */
 static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id);
+static int byte_home_is_de_lane(int v);
 /* Store the byte held in register `reg` (l, e, c ...) as vreg's value. Where the
    frame slot is a plain (ix+d) the store is `ld (ix+d),reg` and A is never
    touched; every other path loads A first and goes through store_a_byte. */
@@ -1873,6 +1889,8 @@ static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id)
     PhysReg bh = byte_home_phys(f, vreg_id);
     if (bh != IR_PR_NONE) {
         emit(out, "ld\t%s,a", byte_home_reg(bh));
+        /* Writing E or D makes whatever the pair belief names stale. */
+        if (byte_home_is_de_lane(vreg_id)) invalidate_de_cache();
         byte_home_note(vreg_id);
         if (byte_home_slotbacked(bh)) L.cur_de_byte_home_dirty = 1;
         cache_a(vreg_id);   /* A still holds the value — next read elides */
@@ -2839,7 +2857,7 @@ static int de_has(int v)
 
 /* Any DE change invalidates the long-DEHL cache (DE holds the high
    half — clobbering it breaks the cache). */
-static void cache_de(int v) { L.rs.de = v; L.rs.dehl = -1; g_de_epoch++; }
+static void cache_de(int v) { L.rs.de = v; L.rs.dehl = -1; g_de_epoch++; belief_line[1] = verify_nlines; }
 static void invalidate_de_cache(void) { L.rs.de = -1; L.rs.dehl = -1; }
 
 static int dehl_has(int v) { return v >= 0 && L.rs.dehl == v; }
@@ -2852,7 +2870,7 @@ static void cache_dehl(int v) { L.rs.dehl = v; }
 static int bc_has(int v) { return v >= 0 && L.rs.bc == v; }
 /* BC is the long cache's low half (DE high, BC low): a new BC tenant or a
    clobbered BC ends that claim too. */
-static void cache_bc(int v) { L.rs.bc = v; L.rs.dehl = -1; }
+static void cache_bc(int v) { L.rs.bc = v; L.rs.dehl = -1; belief_line[2] = verify_nlines; }
 static void invalidate_bc_cache(void) { L.rs.bc = -1; L.rs.dehl = -1; }
 
 /* Byte (A) value cache. Tracks which width-1 vreg A holds. Set when a
@@ -2861,7 +2879,7 @@ static void invalidate_bc_cache(void) { L.rs.bc = -1; L.rs.dehl = -1; }
    invalidated: most lowerer paths clear it via invalidate_hl_cache
    (which also clears A). */
 static int a_has(int v) { return v >= 0 && L.rs.a == v; }
-static void cache_a(int v) { L.rs.a = v; }
+static void cache_a(int v) { L.rs.a = v; belief_line[3] = verify_nlines; }
 static void invalidate_a_cache(void) { L.rs.a = -1; }
 
 /* Byte-register residency. A width-1 vreg pinned to a byte register keeps
@@ -2903,9 +2921,28 @@ static int byte_home_is_de_lane(int v)
     if (g_hc.home_is_word && v == g_hc.func_whome) return 1;
     return byte_home_slotbacked(byte_home_phys(cur_lazy_func, v));
 }
+/* Does this function keep a byte in B or C all through? Code that borrows B as a
+   scratch counter must then save BC, whichever of the homes was written last. */
+static int func_has_bc_byte_home(const Func *f)
+{
+    if (!f || !f->vreg_to_phys || !ir_bcbyte_homes_enabled()) return 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        PhysReg p = f->vreg_to_phys[v];
+        if (p == IR_PR_B || p == IR_PR_C) return 1;
+    }
+    return 0;
+}
 static int byte_home_holds(int v)
 {
     if (v < 0) return 0;
+    /* A slotless B or C home is always resident from its definition on (the
+       function is call-free and nothing else uses BC), so there is no belief to
+       lose across a block edge, and two of them can coexist. */
+    { PhysReg bp = byte_home_phys(cur_lazy_func, v);
+      /* ...unless its definition is rematerialised at the use and so never
+         writes the register. */
+      if (ir_bcbyte_homes_enabled() && (bp == IR_PR_B || bp == IR_PR_C)
+          && !byte_remat_of(cur_lazy_func, v)) return 1; }
     return byte_home_is_de_lane(v)
         ? L.cur_de_byte_home_vreg == v
         : L.cur_byte_home_vreg == v;

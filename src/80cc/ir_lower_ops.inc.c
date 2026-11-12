@@ -154,8 +154,17 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
        so it addressed sp-1 and read below the stack (`ld hl,-1; add hl,sp`).
        Only visible where no index register was free to take the value instead,
        i.e. the non-z80 targets. */
+    /* A slot store that pass 2 proved dead leaves the DE route as the same bare
+       `ex de,hl`, so the HL load serves (spill_de_unless_dead asks the same). */
+    int dead_store = 0;
+    if (hl_free && !hl_dst && !vreg_is_pr_stack(f, op->dst)
+        && !L.la.cur_dst_dead && !vreg_in_register_pool(f, op->dst)
+        && !opt_disabled("ldimm-dead-store")) {
+        ss_note_store(f, op->dst);
+        dead_store = ss_store_dead_here();
+    }
     if (!vreg_is_pr_stack(f, op->dst)
-        && (L.la.cur_dst_dead || (hl_free && hl_dst))) {
+        && (L.la.cur_dst_dead || (hl_free && hl_dst) || dead_store)) {
         emit(out, "ld\thl,%lld", (long long)op->imm);
     } else {
         emit(out, "ld\tde,%lld", (long long)op->imm);
@@ -2175,6 +2184,42 @@ static int gen_smax0(FILE *out, Func *f, const Op *op)
 }
 
 static int fold_producer_skip(Func *f, const Op *prod);
+/* Does anything besides the current op read v? Then the byte a load-through-A
+   leaves in A may serve that read, and its slot store must stay avoidable. */
+static int read_again_soon(const Func *f, int v)
+{
+    if (!cur_bb || cur_op_idx < 0 || cur_op_idx >= cur_bb->n_ops) return 1;
+    /* Only this op reads v: nothing later can use the byte left in A. */
+    return find_unique_use(f, v) != &cur_bb->ops[cur_op_idx];
+}
+
+static int pack8_direct_ok(const Func *f, int v);
+static int pack8_sp_direct_ok(const Func *f, int v);
+
+/* A frame byte read once more than here and not again soon: load it straight
+   into register `r` (e, l, d) instead of through A. Returns 1 when it did. */
+static int byte_to_reg_direct_ex(FILE *out, const Func *f, int v, const char *r, int check_soon)
+{
+    if (opt_disabled("byte-direct-l") || (check_soon && read_again_soon(f, v))) return 0;
+    if (check_soon == 2 && opt_disabled("byte-direct-st")) return 0;
+    if (!(pack8_direct_ok(f, v) || pack8_sp_direct_ok(f, v))) return 0;
+    ss_note_reload(f, v);
+    if (fp_active(f)) {
+        emit(out, "ld\t%s,(%s%+d)", r, frame_reg(), slot_ix_off(f, v));
+    } else {
+        pending_spill_resolve();
+        emit_byte_slot_addr(out, f, v);
+        emit(out, "ld\t%s,(hl)", r);
+        hl_about_to_change(-1);
+    }
+    return 1;
+}
+
+static int byte_to_reg_direct(FILE *out, const Func *f, int v, const char *r)
+{
+    return byte_to_reg_direct_ex(out, f, v, r, !strcmp(r, "e") ? 2 : 1);
+}
+
 static int gen_conv_zx(FILE *out, Func *f, const Op *op)
 {
     int src_w = f->vregs[op->src[0]].width;
@@ -2186,6 +2231,20 @@ static int gen_conv_zx(FILE *out, Func *f, const Op *op)
            source IS the result — a byte copy through A, no widening. */
         load_byte_to_a(out, f, op->src[0]);
         return finalize_byte_result(out, f, op, 1);
+    }
+    if (src_w == 1 && dst_w == 2 && byte_to_reg_direct(out, f, op->src[0],
+                                                       vreg_is_pr_de(f, op->dst) ? "e" : "l")) {
+        /* A frame byte read once: straight into the low half, not through A. */
+        if (vreg_is_pr_de(f, op->dst)) {
+            emit(out, "ld\td,0");
+            cache_de(op->dst);
+            return 0;
+        }
+        const Op *use = find_unique_use(f, op->dst);
+        if (!(use && use->kind == IR_PUSH_ARG && use->hi_dc))
+            emit(out, "ld\th,0");
+        commit_hl_word(out, f, op->dst);
+        return 0;
     }
     if (src_w == 1 && dst_w == 2) {
         load_byte_to_a(out, f, op->src[0]);
@@ -2338,6 +2397,30 @@ static int trunc_fuses_to_store(const Func *f, const Op *tr, const Op *st)
     return bc_has(tr->src[0]) && st->mem.base != tr->src[0];
 }
 
+/* Is the value just truncated into byte vreg v returned straight away? The ops
+   after the current one must be nothing but byte-wide copies or extends of it,
+   each its only reader, ending in the RET of a byte-returning function. The
+   char-return ABI hands the byte back in L and A is dead at the return, so a
+   byte written to A for such a value is never read; nothing between can clobber
+   HL either, as there is nothing between. */
+static int byte_feeds_only_ret(const Func *f, int v)
+{
+    if (f->ret_width != 1 || !cur_bb || opt_disabled("ret-byte-l")) return 0;
+    for (int j = cur_op_idx + 1; j < cur_bb->n_ops; j++) {
+        const Op *u = &cur_bb->ops[j];
+        if (f->vregs[v].width != 1 || vreg_use_count_fn(f, v) != 1) return 0;
+        int us[16];
+        int nu = ir_op_uses(u, us, 16);
+        if (nu != 1 || us[0] != v) return 0;
+        if (u->kind == IR_RET) return 1;
+        if ((u->kind != IR_CONV_ZX && u->kind != IR_CONV_SX && u->kind != IR_MOV)
+            || u->dst < 0)
+            return 0;
+        v = u->dst;
+    }
+    return 0;
+}
+
 static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
 {
     int src_w = f->vregs[op->src[0]].width;
@@ -2358,6 +2441,11 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
            and the result is its HIGH byte, not its low one. */
         if (src_w == 1) {
             load_byte_to_a(out, f, op->src[0]);
+        } else if (op->kind != IR_CONV_TRUNC_HI && hl_has(op->src[0])
+                   && byte_feeds_only_ret(f, op->dst)) {
+            /* the byte is returned straight from L: no copy through A */
+            cache_hl(op->dst);
+            return 0;
         } else if (op->kind != IR_CONV_TRUNC_HI && hl_has(op->src[0])) {
             /* the word is in HL: its low byte goes to the slot straight from L */
             ss_note_cache_read(f, op->src[0]);
@@ -2437,6 +2525,154 @@ static int gen_conv_byte_to_high(FILE *out, Func *f, const Op *op)
     fprintf(stderr, "ir_lower: CONV_BYTE_TO_HIGH %d→%d not supported\n",
             src_w, dst_w);
     return -1;
+}
+
+/* A byte read straight from its IX frame slot: held nowhere else. */
+/* Slot offset without the accounting slot_off/slot_ix_off do: a predicate must
+   not count as an IX access or as a use of the slot. */
+static int slot_raw(const Func *f, int v)
+{
+    return (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE) ? param_caller_off(f, v)
+                                                         : f->vreg_spill_slot[v];
+}
+
+static int pack8_direct_ok(const Func *f, int v)
+{
+    if (opt_disabled("pack8-direct") || !fp_active(f) || v < 0) return 0;
+    if (f->vregs[v].width != 1 || slot_raw(f, v) < 0) return 0;
+    if (!fp_offset_fits(slot_raw(f, v) - f->frame_size)) return 0;
+    if (L.af_park_depth > 0 || a_has(v) || hl_has(v) || de_has(v) || bc_has(v)) return 0;
+    if (vreg_is_pr_stack(f, v) || vreg_is_remat(f, v) || byte_remat_of(f, v)) return 0;
+    if (idxhalf_phys(f, v) != IR_PR_NONE || byte_home_phys(f, v) != IR_PR_NONE) return 0;
+    if (vreg_in_idx2(f, v)) return 0;
+    return 1;
+}
+
+/* A byte read from its sp-relative frame slot: held nowhere else. */
+static int pack8_sp_direct_ok(const Func *f, int v)
+{
+    if (opt_disabled("pack8-direct") || fp_active(f) || v < 0) return 0;
+    if (f->vregs[v].width != 1 || slot_raw(f, v) < 0) return 0;
+    if (L.af_park_depth > 0 || a_has(v) || hl_has(v) || de_has(v) || bc_has(v)) return 0;
+    if (vreg_is_pr_stack(f, v) || vreg_is_remat(f, v) || byte_remat_of(f, v)) return 0;
+    if (idxhalf_phys(f, v) != IR_PR_NONE || byte_home_phys(f, v) != IR_PR_NONE) return 0;
+    if (vreg_in_idx2(f, v)) return 0;
+    return 1;
+}
+
+/* dst = src + (src < 0 ? mask : 0), width 2: the rounding bias of a signed
+   division by 2^k (mask = 2^k - 1), added only when the value is negative. */
+static int gen_biasneg(FILE *out, Func *f, const Op *op)
+{
+    if (op->dst < 0 || op->src[0] < 0 || f->vregs[op->dst].width != 2
+        || f->vregs[op->src[0]].width != 2 || op->imm < 1 || op->imm > 15) {
+        fprintf(stderr, "ir_lower: BIASNEG needs a word and a mask of 1..15\n");
+        return -1;
+    }
+    load_to_hl(out, f, op->src[0]);
+    int lbl = L.cmp_label_counter++;
+    emit(out, "ld\ta,h");
+    emit(out, "rla");                           /* carry = sign */
+    emit(out, "jr\tnc,L_f%d_cmp_ok_%d", L.func_emit_idx, lbl);
+    if (op->imm <= 3) {
+        for (int i = 0; i < (int)op->imm; i++) emit(out, "inc\thl");
+    } else {
+        emit(out, "ld\tde,%d", (int)op->imm);
+        emit(out, "add\thl,de");
+        invalidate_de_cache();
+    }
+    fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, lbl);
+    invalidate_a_cache();
+    hl_about_to_change(-1);
+    commit_hl_word(out, f, op->dst);
+    return 0;
+}
+
+/* dst (word) = (src[1] << 8) | src[0], both sources bytes. load_binop_operands
+   zero-extends each into a register pair (HL = low byte, DE = high byte), so the
+   pack is one move. */
+static int gen_pack8(FILE *out, Func *f, const Op *op)
+{
+    if (op->dst < 0 || op->src[0] < 0 || op->src[1] < 0
+        || f->vregs[op->dst].width != 2
+        || f->vregs[op->src[0]].width != 1 || f->vregs[op->src[1]].width != 1) {
+        fprintf(stderr, "ir_lower: PACK8 needs two bytes and a word\n");
+        return -1;
+    }
+    if (pack8_direct_ok(f, op->src[0]) && pack8_direct_ok(f, op->src[1])) {
+        /* Both bytes sit in IX-addressed frame slots: load each straight into
+           its half of the target pair, no zero-extension. */
+        int o0 = slot_ix_off(f, op->src[0]), o1 = slot_ix_off(f, op->src[1]);
+        ss_note_reload(f, op->src[0]);
+        ss_note_reload(f, op->src[1]);
+        if (vreg_is_pr_de(f, op->dst)) {
+            emit(out, "ld\te,(%s%+d)", frame_reg(), o0);
+            emit(out, "ld\td,(%s%+d)", frame_reg(), o1);
+            cache_de(op->dst);
+            return 0;
+        }
+        hl_about_to_change(-1);
+        emit(out, "ld\tl,(%s%+d)", frame_reg(), o0);
+        emit(out, "ld\th,(%s%+d)", frame_reg(), o1);
+        if (de_has(op->dst)) invalidate_de_cache();
+        commit_hl_word(out, f, op->dst);
+        return 0;
+    }
+    if (pack8_sp_direct_ok(f, op->src[0]) && pack8_sp_direct_ok(f, op->src[1])
+       ) {
+        /* sp mode: read each byte through one slot address, walking from the
+           first to the second; the first goes through A, the second straight
+           into its register half. */
+        pending_spill_resolve();
+        ss_note_reload(f, op->src[0]);
+        ss_note_reload(f, op->src[1]);
+        int de = vreg_is_pr_de(f, op->dst);
+        emit_byte_slot_addr(out, f, op->src[0]);
+        if (de) {
+            emit(out, "ld\te,(hl)");
+            emit_byte_slot_addr(out, f, op->src[1]);
+            emit(out, "ld\td,(hl)");
+            hl_about_to_change(-1);
+            cache_de(op->dst);
+            return 0;
+        }
+        emit(out, "ld\ta,(hl)");
+        emit_byte_slot_addr(out, f, op->src[1]);
+        emit(out, "ld\th,(hl)");
+        emit(out, "ld\tl,a");
+        invalidate_a_cache();
+        if (de_has(op->dst)) invalidate_de_cache();
+        commit_hl_word(out, f, op->dst);
+        return 0;
+    }
+    load_binop_operands(out, f, op);
+    if (vreg_is_pr_de(f, op->dst)) {
+        emit(out, "ld\td,e");              /* D = high byte */
+        emit(out, "ld\te,l");              /* E = low byte */
+        cache_de(op->dst);                  /* HL still holds src[0] */
+        return 0;
+    }
+    emit(out, "ld\th,e");
+    commit_hl_word(out, f, op->dst);
+    if (de_has(op->dst)) invalidate_de_cache();       /* DE holds the old value */
+    return 0;
+}
+
+/* dst (long) = (src[1] << 16) | src[0], both sources words: the long lives in
+   DE:HL, so loading the two operands IS the join. */
+static int gen_join16(FILE *out, Func *f, const Op *op)
+{
+    if (op->dst < 0 || op->src[0] < 0 || op->src[1] < 0
+        || f->vregs[op->dst].width != 4
+        || f->vregs[op->src[0]].width != 2 || f->vregs[op->src[1]].width != 2) {
+        fprintf(stderr, "ir_lower: JOIN16 needs two words and a long\n");
+        return -1;
+    }
+    L.join_tos_ok = 1;
+    load_binop_operands(out, f, op);
+    L.join_tos_ok = 0;
+    store_dehl_finalize(out, f, op->dst);
+    return 0;
 }
 
 /* A barrel-shift result whose only reader is the call-argument push right after
@@ -2944,7 +3180,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             int e_home = de_home >= 0
                       && byte_home_phys(f, de_home) == IR_PR_E;
             int use_e = stage_value && L.rs.bc >= 0 && L.rs.de < 0 && !e_home;
-            int bc_live = (L.rs.bc >= 0);
+            int bc_live = (L.rs.bc >= 0) || func_has_bc_byte_home(f);
             int source_b_home = !use_e && byte_home == op->src[0]
                              && byte_home >= 0
                              && byte_home_phys(f, byte_home) == IR_PR_B;
@@ -2979,14 +3215,35 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\tb,l");
                 load_byte_to_a(out, f, op->src[0]);
             }
-            emit(out, "inc\t%s", counter);
-            emit(out, "dec\t%s", counter);
-            emit(out, "jr\tz,L_f%d_bshl_end_%d", L.func_emit_idx, n);
-            fprintf(out, "L_f%d_bshl_loop_%d:\n", L.func_emit_idx, n);
-            emit(out, "add\ta,a");
-            emit(out, "dec\t%s", counter);
-            emit(out, "jr\tnz,L_f%d_bshl_loop_%d", L.func_emit_idx, n);
-            fprintf(out, "L_f%d_bshl_end_%d:\n", L.func_emit_idx, n);
+            if (c_opt_code_size) {
+                /* Test at the bottom: counter+1 into the decrement runs the body
+                   `counter` times, and zero runs it not at all. Smallest, but it
+                   pays a taken jump on entry. */
+                emit(out, "inc\t%s", counter);
+                emit(out, "jr\tL_f%d_bshl_test_%d", L.func_emit_idx, n);
+                fprintf(out, "L_f%d_bshl_loop_%d:\n", L.func_emit_idx, n);
+                emit(out, "add\ta,a");
+                fprintf(out, "L_f%d_bshl_test_%d:\n", L.func_emit_idx, n);
+                if (!use_e && shift_djnz_ok()) {
+                    emit(out, "djnz\tL_f%d_bshl_loop_%d", L.func_emit_idx, n);
+                } else {
+                    emit(out, "dec\t%s", counter);
+                    emit(out, "jr\tnz,L_f%d_bshl_loop_%d", L.func_emit_idx, n);
+                }
+            } else {
+                emit(out, "inc\t%s", counter);
+                emit(out, "dec\t%s", counter);
+                emit(out, "jr\tz,L_f%d_bshl_end_%d", L.func_emit_idx, n);
+                fprintf(out, "L_f%d_bshl_loop_%d:\n", L.func_emit_idx, n);
+                emit(out, "add\ta,a");
+                if (!use_e && shift_djnz_ok()) {
+                    emit(out, "djnz\tL_f%d_bshl_loop_%d", L.func_emit_idx, n);
+                } else {
+                    emit(out, "dec\t%s", counter);
+                    emit(out, "jr\tnz,L_f%d_bshl_loop_%d", L.func_emit_idx, n);
+                }
+                fprintf(out, "L_f%d_bshl_end_%d:\n", L.func_emit_idx, n);
+            }
             if (!use_e) {
                 if (bc_live) emit_sp(out, -2, "pop\tbc");
                 else         invalidate_bc_cache();
@@ -3247,6 +3504,18 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
                     goto shl_int_bit_remainder;
                 }
             }
+        }
+        /* The high byte shifts out, so a source that is not already in a pair
+           needs only its low byte, not the whole word and a dead `ld h,0`. */
+        if (count >= 8 && !hl_has(op->src[0]) && !bc_has(op->src[0])
+            && !de_has(op->src[0]) && !opt_disabled("shl8-byte-src")
+            && !IS_RABBIT() && !IS_KC160()) {   /* native (sp+N) word loads */
+            load_byte_to_a(out, f, op->src[0]);
+            emit(out, "ld\th,a");
+            emit(out, "ld\tl,0");
+            invalidate_a_cache();
+            invalidate_hl_cache();
+            goto shl_int_bit_remainder;
         }
         load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
         if (count > 0 && shl_word_copy_de_ok(f, op)) {
@@ -5056,6 +5325,22 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                     /* Pointer stepped: a stale HL value-cache of base is now
                        wrong (points one short). */
                     if (hl_had_base) invalidate_hl_cache();
+                }
+                return 0;
+            }
+            if (!(hl_has(op->mem.base) && !st_step && op->mem.offset == 0
+                  && !opt_disabled("st-byte-nostash"))
+                && byte_to_reg_direct(out, f, op->src[0], "e")) {
+                /* the frame byte went straight into E: the stash is done */
+                invalidate_de_cache();
+                load_to_hl(out, f, op->mem.base);
+                emit_hl_add_offset(out, op->mem.offset, 1, 1);
+                emit(out, "ld\t(hl),e");
+                if (st_step) {
+                    emit(out, st_step > 0 ? "inc\thl" : "dec\thl");
+                    commit_hl_word(out, f, op->mem.base);
+                } else if (op->mem.offset != 0) {
+                    invalidate_hl_cache();
                 }
                 return 0;
             }
@@ -7866,9 +8151,14 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
     emit(out, "ld\ta,l");
     emit(out, "%s\te", mnem);
     emit(out, "ld\tl,a");
-    emit(out, "ld\ta,h");
-    emit(out, "%s\td", mnem);
-    emit(out, "ld\th,a");
+    if (op->imm & IR_BIT_HI0) {
+        /* The second operand's high byte is zero. */
+        if (op->kind == IR_AND) emit(out, "ld\th,0");
+    } else {
+        emit(out, "ld\ta,h");
+        emit(out, "%s\td", mnem);
+        emit(out, "ld\th,a");
+    }
     commit_hl_word(out, f, op->dst);
     if (de_has(op->dst)) invalidate_de_cache();       /* DE holds the old value */
     return 0;

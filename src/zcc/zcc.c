@@ -254,6 +254,7 @@ static struct explicit_extension* explicit_extensions = NULL;
 static int             build_bin = 0;
 static int             c_code_in_asm = 0;
 static int             opt_code_size = 0;
+static int             opt_jr_uncond = 0;
 static int             verbose = 0;
 static int             peepholeopt = 0;
 static int             sdccpeepopt = 0;
@@ -601,6 +602,7 @@ static option options[] = {
     { 0, "", OPT_HEADER, "Compiler (sdcc) options:", NULL, NULL, 0 },
     { 0, "Cs", OPT_FUNCTION,  "Add an option to sdcc" , &sdccarg, AddToArgs, 0},
     { 0, "opt-code-size", OPT_BOOL|OPT_DOUBLE_DASH,  "Optimize for code size (sdcc only)" , &opt_code_size, NULL, 0},
+    { 0, "opt-jr-uncond", OPT_BOOL|OPT_DOUBLE_DASH,  "Relax unconditional jp to jr (80cc only; smaller, slower on z80)" , &opt_jr_uncond, NULL, 0},
     { 0, "SO", OPT_INT,  "Set the peephole optimiser setting for sdcc-peephole" , &sdccpeepopt, NULL, 0},
     { 0, "fsigned-char", OPT_BOOL|OPT_DOUBLE_DASH,  "Use signed chars by default" , &sdcc_signed_char, NULL, 0},
 
@@ -4354,6 +4356,9 @@ static void configure_compiler(void)
         }
         if (opt_code_size) {
             add_option_to_compiler("--opt-code-size");
+        }
+        if (opt_jr_uncond) {
+            add_option_to_compiler("--opt-jr-uncond");
         }
         compiler_type = CC_80CC;
         c_compiler = c_80cc_exe;

@@ -211,6 +211,75 @@
 	ld	l,%2
 	ld	h,0
 
+;; #IR: a byte widened into HL (`ld l,B; ld h,0`) and then shifted left by 8
+;; (`ld h,l; ld l,0`): the `ld h,0` is overwritten by the next line and nothing
+;; reads H in between. Drop it (-1b).
+%title #IR drop dead ld h,0 before ld h,l (-1b)
+	ld	h,0
+	ld	h,l
+=
+	ld	h,l
+
+;; #IR: the form the rule above leaves from `ld l,a; ld h,0; ld h,l; ld l,0`: H takes
+;; A and L is cleared, so the copy through L is dead (-1b).
+%title #IR byte<<8 through A after the dead ld h,0 is gone (-1b)
+	ld	l,a
+	ld	h,l
+	ld	l,0
+=
+	ld	h,a
+	ld	l,0
+
+;; #IR: a long byte shift builds DE from zero and then overwrites it. `ld de,0`
+;; already leaves D == E == 0, so the following `ld d,e` writes what is there (-1b).
+%title #IR drop ld d,e after ld de,0 (d is already 0) (-1b)
+	ld	de,0
+	ld	d,e
+=
+	ld	de,0
+
+;; #IR: the last word of a frame is read with `pop de; push de` and the frame is then
+;; released by `pop af; ret`. A and F are junk at the return, so the push and the
+;; pop af only undo each other (-2b).
+%title #IR pop de ; push de ; pop af ; ret -> pop de ; ret (-2b)
+	pop	de
+	push	de
+	pop	af
+	ret
+=
+	pop	de
+	ret
+
+;; #IR: a comparison's carry turned into a 0/1 byte. `ld a,0; jr c,$+3; inc a` is 1 when the
+;; carry is clear: `sbc a,a` makes 0 or -1 from the carry and `inc a` turns that into 1 or 0 (-3b).
+%title #IR carry clear -> 1 as sbc a,a ; inc a (-3b)
+	ld	a,0
+	jr	c,ASMPC+3
+	inc	a
+=
+	sbc	a,a
+	inc	a
+
+;; #IR: the same with the carry set: `ld a,0; jr nc,$+3; inc a` is the carry itself (-2b).
+%title #IR carry set -> 1 as sbc a,a ; neg (-2b)
+	ld	a,0
+	jr	nc,ASMPC+3
+	inc	a
+=
+	sbc	a,a
+	neg
+
+;; #IR: `ld de,0` followed by loads of both D and E: neither survives. %1 must
+;; not read D or E (-3b).
+%title #IR drop ld de,0 before ld d,%1 ; ld e,0 (-3b)
+%not %1 d e de
+	ld	de,0
+	ld	d,%1
+	ld	e,0
+=
+	ld	d,%1
+	ld	e,0
+
 ;; #BSX1: z80n barrel shift count. The shift leaves HL dead (the result is in
 ;; DE and HL is swapped or reloaded), so the zero-extended count load goes
 ;; straight into B and HL stays untouched.

@@ -258,6 +258,15 @@ typedef enum {
     IR_BSWAP,           /* dst = byte-reverse of src[0], width 4: bytes 0..3 -> 3..0
                            (intrinsic_swap_endian_32, __builtin_bswap32). Width 2 is
                            IR_ROTL by 8. */
+    IR_BIASNEG,         /* dst (width 2) = src[0] + (src[0] < 0 ? imm : 0), imm = 2^k - 1:
+                           the bias that makes an arithmetic shift by k round toward zero
+                           (signed division by 2^k). Built by ir_match. */
+    IR_PACK8,           /* dst (width 2) = (src[1] << 8) | src[0]; both sources are
+                           bytes. Built by ir_match from a shift-and-OR of two
+                           zero-extended bytes, so the lowerer joins them in
+                           registers instead of forming two words first. */
+    IR_JOIN16,          /* dst (width 4) = (src[1] << 16) | src[0]; both sources
+                           are words: DE takes the high one, HL the low one. */
 
     /* conversions (paper-trace finding #3) */
     IR_CONV_ZX,         /* zero-extend smaller→larger */
@@ -465,6 +474,14 @@ typedef enum {
    which costs (8-n) one-byte `add hl,hl` instead of n four-byte `srl h; rr l`
    — and on 808x replaces a call to the l_asr_u runtime loop outright. */
 #define IR_SHR_TOPBYTE ((int64_t)1 << 42)
+/* Set on a WORD-wide constant-count LOGICAL shift whose source provably fits a
+   byte: the high byte is zero before and after, so the shift is a byte shift on
+   L alone (`srl l`, or a rotate and mask) and H is never touched. */
+#define IR_SHR_BYTESRC ((int64_t)1 << 43)
+/* Set on a WORD-wide two-operand AND/OR/XOR whose second operand provably fits a
+   byte: its high byte is zero, so OR/XOR leave the first operand's high byte
+   alone and AND clears it, and the high-byte half of the sequence is not needed. */
+#define IR_BIT_HI0 ((int64_t)1 << 44)
 
 /* ----- ABI / call descriptors ------------------------------------------ */
 
