@@ -1,4 +1,4 @@
-; High-RAM cells for +test (no PHASE). Layout matches BIOS BSS names.
+; High-RAM cells for +test (no PHASE). Layout matches the mini-FAT names.
 
 SECTION bss_compiler
 
@@ -40,47 +40,3 @@ _fat_fsi_lba:
 fat_fsi_lba:            defs 4      ;absolute FSInfo LBA, or 0 if none
 _fat_fsi_dirty:
 fat_fsi_dirty:          defs 1      ;1 = free count or next-free needs a write
-
-; v2.6 deblock names. This branch's cpm22bios.asm does not define hstbuf.
-; The BDOS disk harness defines BDOS_NO_DEBLOCK. It does not link bios_disk.
-IFNDEF BDOS_NO_DEBLOCK
-PUBLIC hstbuf, _hstbuf, hstdsk, _hstdsk, hsttrk, _hsttrk, hstsec, _hstsec
-PUBLIC hstwrt, _hstwrt
-PUBLIC wrtype, dmaadr, erflag, hstact, _hstact
-PUBLIC _cpm_dsk0_base
-PUBLIC sekdsk, sektrk, seksec, sekhst
-PUBLIC unacnt, unadsk, unatrk, unasec
-PUBLIC rsflag, readop
-PUBLIC DIRBUF, _dirbuf
-PUBLIC ldi_body, _ldi_body
-_cpm_dsk0_base:         defs 16     ; 4 x 32-bit LBA bases
-_hstbuf:
-hstbuf:                 defs 512
-_hstdsk:
-hstdsk:                 defs 1
-_hsttrk:
-hsttrk:                 defs 1
-_hstsec:
-hstsec:                 defs 1
-_hstwrt:
-hstwrt:                 defs 1
-wrtype:                 defs 1
-dmaadr:                 defs 2
-erflag:                 defs 1
-sekdsk:                 defs 1
-sektrk:                 defs 2
-seksec:                 defs 2
-sekhst:                 defs 1
-_hstact:
-hstact:                 defs 1
-unacnt:                 defs 1
-unadsk:                 defs 1
-unatrk:                 defs 2
-unasec:                 defs 2
-rsflag:                 defs 1
-readop:                 defs 1
-DIRBUF:
-_dirbuf:                defs 2
-_ldi_body:
-ldi_body:               defs 65     ;Z80 33; 8085 65; copy_build fills this
-ENDIF

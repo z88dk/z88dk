@@ -25,10 +25,6 @@
 
 #include <stdint.h>
 
-#if defined(__SDCC)
-#error mini-FAT f_* calls use the sccz80 argument order
-#endif
-
 /*
  * Public C API for mini-FAT. Include this header. Link one core
  * (`z80`, `8085`, `8080`, `gbz80`, or `vm1` `fatfs.asm`), the call
@@ -52,9 +48,9 @@
  * sccz80 widens it to an int, so H is 0.
  *
  * f_mount and the other f_* calls are a separate contract. Each one
- * is CPU-specific assembly, one function per file, and the caller
- * removes the arguments. A pointer is not fastcall. FRESULT is the
- * low byte of HL, 0 on success.
+ * is CPU-specific assembly, one function per file. The prototypes are
+ * __smallc, so the caller removes the arguments. A pointer is not
+ * fastcall. FRESULT is the low byte of HL, 0 on success.
  */
 
 typedef struct {
@@ -79,12 +75,12 @@ extern uint32_t   fat_found_sclust;
 extern uint32_t   fat_found_size;
 extern uint8_t  * fat_dir_ptr;
 
-extern uint8_t fat_mount(void);
+extern uint8_t fat_mount(void) __smallc;
 extern uint8_t dir_find(uint8_t *name11) __z88dk_fastcall;
 extern uint8_t dir_create(uint8_t *name11) __z88dk_fastcall;
-extern uint8_t dir_zap(void);
-extern uint8_t fat_sync(void);
-extern void fat_dirty(void);
+extern uint8_t dir_zap(void) __smallc;
+extern uint8_t fat_sync(void) __smallc;
+extern void fat_dirty(void) __smallc;
 extern uint8_t fat_dir_open(uint32_t *sclust) __z88dk_fastcall;
 extern uint8_t fat_dir_read(uint8_t *ent32) __z88dk_fastcall;
 extern uint8_t fat_next(uint32_t *clst) __z88dk_fastcall;
@@ -176,27 +172,27 @@ typedef struct {
     TCHAR    fname[13];
 } FILINFO;
 
-extern FRESULT f_mount(FATFS *fs, const TCHAR *path, uint8_t opt);
-extern FRESULT f_open(FIL *fp, const TCHAR *path, uint8_t mode);
-extern FRESULT f_close(FIL *fp);
-extern FRESULT f_read(FIL *fp, void *buff, UINT btr, UINT *br);
-extern FRESULT f_write(FIL *fp, const void *buff, UINT btw, UINT *bw);
-extern FRESULT f_lseek(FIL *fp, FSIZE_t ofs);
-extern FRESULT f_sync(FIL *fp);
-extern FRESULT f_opendir(DIR *dp, const TCHAR *path);
-extern FRESULT f_closedir(DIR *dp);
-extern FRESULT f_readdir(DIR *dp, FILINFO *fno);
-extern FRESULT f_mkdir(const TCHAR *path);
-extern FRESULT f_unlink(const TCHAR *path);
-extern FRESULT f_rename(const TCHAR *path_old, const TCHAR *path_new);
-extern FRESULT f_stat(const TCHAR *path, FILINFO *fno);
-extern FRESULT f_chmod(const TCHAR *path, uint8_t attr, uint8_t mask);
-extern FRESULT f_utime(const TCHAR *path, const FILINFO *fno);
-extern FRESULT f_chdir(const TCHAR *path);
-extern FRESULT f_chdrive(const TCHAR *path);
-extern FRESULT f_getcwd(TCHAR *buff, UINT len);
-extern FRESULT f_getfree(const TCHAR *path, uint32_t *nclst, FATFS **fatfs);
-extern FRESULT f_expand(FIL *fp, FSIZE_t fsz, uint8_t opt);
+extern FRESULT f_mount(FATFS *fs, const TCHAR *path, uint8_t opt) __smallc;
+extern FRESULT f_open(FIL *fp, const TCHAR *path, uint8_t mode) __smallc;
+extern FRESULT f_close(FIL *fp) __smallc;
+extern FRESULT f_read(FIL *fp, void *buff, UINT btr, UINT *br) __smallc;
+extern FRESULT f_write(FIL *fp, const void *buff, UINT btw, UINT *bw) __smallc;
+extern FRESULT f_lseek(FIL *fp, FSIZE_t ofs) __smallc;
+extern FRESULT f_sync(FIL *fp) __smallc;
+extern FRESULT f_opendir(DIR *dp, const TCHAR *path) __smallc;
+extern FRESULT f_closedir(DIR *dp) __smallc;
+extern FRESULT f_readdir(DIR *dp, FILINFO *fno) __smallc;
+extern FRESULT f_mkdir(const TCHAR *path) __smallc;
+extern FRESULT f_unlink(const TCHAR *path) __smallc;
+extern FRESULT f_rename(const TCHAR *path_old, const TCHAR *path_new) __smallc;
+extern FRESULT f_stat(const TCHAR *path, FILINFO *fno) __smallc;
+extern FRESULT f_chmod(const TCHAR *path, uint8_t attr, uint8_t mask) __smallc;
+extern FRESULT f_utime(const TCHAR *path, const FILINFO *fno) __smallc;
+extern FRESULT f_chdir(const TCHAR *path) __smallc;
+extern FRESULT f_chdrive(const TCHAR *path) __smallc;
+extern FRESULT f_getcwd(TCHAR *buff, UINT len) __smallc;
+extern FRESULT f_getfree(const TCHAR *path, uint32_t *nclst, FATFS **fatfs) __smallc;
+extern FRESULT f_expand(FIL *fp, FSIZE_t fsz, uint8_t opt) __smallc;
 
 #define f_eof(fp)   ((fp)->fptr == (fp)->objsize)
 #define f_error(fp) ((fp)->err)
