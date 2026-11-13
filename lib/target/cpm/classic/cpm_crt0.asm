@@ -192,26 +192,36 @@ __Exit:
     pop     hl
     INCLUDE "crt/classic/crt_exit_eidi.inc"
 
-; For CP/M 3 return the exit value via BDOS P_CODE
+; CP/M 3 stores the status with BDOS 108. MP/M ends with BDOS 0.
 PUBLIC __restore_sp_onexit
 __restore_sp_onexit:
-    ld      sp,0	;Pick up entry sp
-    ld      c,12        ;Get CPM version
+    ld      sp,0                ;Pick up entry sp
+    push    hl                  ;main status, kept across BDOS 12
+    ld      c,12                ;Get version. H bit 0 means MP/M
     call    __bdos
-    cp      $30 
-    jp      c,__cpm_base_address    ;Warm boot for CP/M < 3
+    ld      a,b
+    and     1
+    jr      nz,mpm_exit
+    ld      a,l                 ;Version low byte
+    cp      $30
+    pop     hl                  ;pop does not change flags
+    jp      c,__cpm_base_address
     ld      a,l
     and     127
     ld      e,a
-    ld      a,h         ;Exit with d=$ff for error, or d=$00 for no error
+    ld      a,h                 ;D = 0 when the status is 0, else 255
     or      l
     jr      z,do_exit_v3
-    ld      a,255       ;Indicate error
+    ld      a,255
 do_exit_v3:
     ld      d,a
     ld      c,108
-    call    __bdos           ;Report error
+    call    __bdos
     jp      __cpm_base_address
+mpm_exit:
+    pop     hl
+    ld      c,0                 ;MP/M terminates the process
+    jp      __bdos
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
