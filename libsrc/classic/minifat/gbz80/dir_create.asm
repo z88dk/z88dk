@@ -42,7 +42,7 @@ dir_create:
     ld      bc,hl
     call    fat_ldhl
     defw    dir_sclust
-    ex      de,hl
+    ld      de,hl
     ld      hl,0
     call    dir_sdi                 ;rewind to the first dirent
     ld      hl,1
@@ -52,9 +52,9 @@ dc_loop:
     defw    dir_ptr
     ld      a,(hl)
     or      a                       ;free: 0x00 or 0xE5
-    jp      Z,dc_fill               ;0x00 slot
+    jr      Z,dc_fill               ;0x00 slot
     cp      $E5                     ;deleted mark
-    jp      Z,dc_fill               ;reusable slot
+    jr      Z,dc_fill               ;reusable slot
     call    fat_ldhl
     defw    dir_ofs
     push    hl
@@ -71,14 +71,18 @@ dc_loop:
     defw    dir_sect+2
     push    hl
     call    dir_next                ;C: a later dirent
-    jp      NC,dc_at_end            ;no free slot in this chain
+    jr      C,dc_resume
+    jr      Z,dc_at_end             ;clean end: stretch or fail
+    jr      dc_full                 ;disk error: do not stretch
+dc_resume:
     ld      hl,10
     add     hl,sp
     ld      sp,hl
-    jp      dc_loop
+    jr      dc_loop
 dc_at_end:
     call    dir_stretch             ;C: FAT32 grew a cluster
-    jp      C,dc_stretched          ;new cluster is zeroed
+    jr      C,dc_stretched          ;new cluster is zeroed
+dc_full:
     ld      hl,10
     add     hl,sp
     ld      sp,hl
@@ -89,7 +93,7 @@ dc_stretched:
     ld      hl,10
     add     hl,sp
     ld      sp,hl
-    jp      dc_loop
+    jr      dc_loop
 dc_fill:
     call    fat_ldhl
     defw    dir_ptr
@@ -98,10 +102,10 @@ dc_fill:
 dc_z:
     ld      (hl+),a
     dec     b
-    jp      NZ,dc_z                 ;32-byte slot
+    jr      NZ,dc_z                 ;32-byte slot
     call    fat_ldhl
     defw    dir_ptr
-    ex      de,hl
+    ld      de,hl
     call    fat_ldhl
     defw    pack_sv
     ld      bc,11
@@ -110,7 +114,7 @@ dc_z:
     defw    dir_ptr
     ld      a,(hl)
     cp      $E5                     ;KANJI lead byte is stored as $05
-    jp      NZ,dc_stored            ;lead byte is not $E5
+    jr      NZ,dc_stored            ;lead byte is not $E5
     ld      (hl),$05
 dc_stored:
     ld      a,1
@@ -126,55 +130,65 @@ dc_stored:
 dir_stretch:
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT32                ;fs_type
-    jp      Z,ds_32                 ;FAT32 may grow
+    jr      Z,ds_32                 ;FAT32 may grow
 ds_no:
     or      a                       ;NC: FAT16 does not stretch
     ret
 ds_32:
-    ld      de,sp+2
-    ld      hl,(de)
+    ld      hl,sp+2
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
     ld      a,(dir_sect+2)
     cp      l                       ;snapshot sect high vs now
-    jp      NZ,ds_no                ;sector changed
+    jr      NZ,ds_no                ;sector changed
     ld      a,(dir_sect+3)
     cp      h                       ;snapshot sect high vs now
-    jp      NZ,ds_no                ;sector changed
-    ld      de,sp+4
-    ld      hl,(de)
+    jr      NZ,ds_no                ;sector changed
+    ld      hl,sp+4
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
     ld      a,(dir_sect)
     cp      l                       ;snapshot sect low vs now
-    jp      NZ,ds_no                ;sector changed
+    jr      NZ,ds_no                ;sector changed
     ld      a,(dir_sect+1)
     cp      h                       ;snapshot sect low vs now
-    jp      NZ,ds_no                ;sector changed
-    ld      de,sp+6
-    ld      hl,(de)
+    jr      NZ,ds_no                ;sector changed
+    ld      hl,sp+6
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
     ld      a,(dir_clust+2)
     cp      l                       ;snapshot clust high vs now
-    jp      NZ,ds_no                ;cluster changed
+    jr      NZ,ds_no                ;cluster changed
     ld      a,(dir_clust+3)
     cp      h                       ;snapshot clust high vs now
-    jp      NZ,ds_no                ;cluster changed
-    ld      de,sp+8
-    ld      hl,(de)
+    jr      NZ,ds_no                ;cluster changed
+    ld      hl,sp+8
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
     ld      a,(dir_clust)
     cp      l                       ;snapshot clust low vs now
-    jp      NZ,ds_no                ;cluster changed
+    jr      NZ,ds_no                ;cluster changed
     ld      a,(dir_clust+1)
     cp      h                       ;snapshot clust low vs now
-    jp      NZ,ds_no                ;cluster changed
-    ld      de,sp+10
-    ld      hl,(de)
+    jr      NZ,ds_no                ;cluster changed
+    ld      hl,sp+10
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
     ld      a,(dir_ofs)
     cp      l                       ;snapshot ofs vs now
-    jp      NZ,ds_moved             ;ofs moved
+    jr      NZ,ds_moved             ;ofs moved
     ld      a,(dir_ofs+1)
     cp      h                       ;snapshot ofs vs now
-    jp      Z,ds_no                 ;ofs unchanged
+    jr      Z,ds_no                 ;ofs unchanged
 ds_moved:
     ld      a,(dir_ofs)
     or      a
-    jp      NZ,ds_no                ;ofs not on a sector edge
+    jr      NZ,ds_no                ;ofs not on a sector edge
     ld      a,(dir_ofs+1)
     or      a                       ;clear C; ofs >> 9 via rra
     rra
@@ -182,13 +196,13 @@ ds_moved:
     ld      l,(hl)
     dec     l
     and     l
-    jp      NZ,ds_no                ;not the first sector of the cluster
+    jr      NZ,ds_no                ;not the first sector of the cluster
     call    fat_ldhl
     defw    dir_clust+2
     ld      bc,hl
     call    fat_ldhl
     defw    dir_clust
-    ex      de,hl
+    ld      de,hl
     call    get_fat                 ;NC: link unreadable
     ret     NC                      ;FAT read failed
     ld      a,b
@@ -204,7 +218,7 @@ ds_moved:
     ld      bc,hl
     call    fat_ldhl
     defw    dir_clust
-    ex      de,hl
+    ld      de,hl
     call    create_chain            ;allocate the next cluster
     ret     NC                      ;no free cluster
     ld      hl,de

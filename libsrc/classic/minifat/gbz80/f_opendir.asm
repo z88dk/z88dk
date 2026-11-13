@@ -46,7 +46,7 @@ od_z:
     ld      (de),a
     inc     de
     dec     b
-    jp      nz,od_z
+    jr      nz,od_z
     call    mf_ensure
     ret     NC
     call    fat_ldhl
@@ -55,7 +55,7 @@ od_z:
     jp      NC,od_miss
     ld      a,(fat_noname)
     or      a
-    jp      NZ,od_dir
+    jr      NZ,od_dir
     ld      a,(fat_attr)
     and     AM_DIR
     jp      Z,od_nopath
@@ -110,7 +110,7 @@ od_nopath:
 od_miss:
     ld      a,l
     cp      FR_NO_FILE
-    jp      NZ,od_err
+    jr      NZ,od_err
     ld      a,FR_NO_PATH
 od_err:
     jp      mf_err

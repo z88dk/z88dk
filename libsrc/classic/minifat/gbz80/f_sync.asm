@@ -23,7 +23,7 @@ f_sync:
     inc     hl
     ld      d,(hl)
     ld      (fat_fp),de
-    ex      de,hl
+    ld      hl,de
     call    mf_fil_check
     ret     NC
     jp      mf_sync_fil

@@ -52,7 +52,7 @@ f_write:
     defw    fat_out
     ld      a,h
     or      l
-    jp      Z,fw_chk
+    jr      Z,fw_chk
     xor     a
     ld      (hl+),a
     ld      (hl),a
@@ -67,7 +67,7 @@ fw_chk:
     add     hl,de
     ld      a,(hl)
     and     FA_WRITE
-    jp      NZ,fw_clip
+    jr      NZ,fw_clip
     ld      a,FR_DENIED
     jp      mf_err
 fw_clip:
@@ -78,7 +78,7 @@ fw_clip:
     ld      a,(hl+)
     and     (hl)
     inc     a
-    jp      NZ,fw_go
+    jr      NZ,fw_go
     call    fat_ldhl
     defw    fat_fp
     ld      de,FIL_FPTR
@@ -88,7 +88,7 @@ fw_clip:
     ld      d,(hl)
     ld      a,d
     or      e
-    jp      Z,fw_go
+    jr      Z,fw_go
     ld      hl,0
     or      a
     push    bc
@@ -101,7 +101,7 @@ fw_clip:
     ld      bc,de
     call    mf_subhlbc
     pop     bc
-    jp      NC,fw_go
+    jr      NC,fw_go
     add     hl,de
     call    fat_sthl
     defw    fat_left

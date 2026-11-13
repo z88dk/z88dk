@@ -21,13 +21,13 @@ _fat_clusters:
     push    hl
     ld      a,(_cpm_fat_vol+1)
     or      a
-    jp      Z,fc_z1                 ;csize is 0
+    jr      Z,fc_z1                 ;csize is 0
     ld      b,9
 fc_log:
     rrca                            ;walk the one bit of csize
-    jp      C,fc_have               ;that bit is the shift count
+    jr      C,fc_have               ;that bit is the shift count
     inc     b
-    jp      fc_log
+    jr      fc_log
 fc_have:
     ld      c,b                     ;C = shift
     ld      hl,0
@@ -35,7 +35,7 @@ fc_mask:
     add     hl,hl                   ;mask = (mask<<1) + 1
     inc     hl                      ;(1<<shift)-1
     dec     b
-    jp      NZ,fc_mask              ;mask bits left
+    jr      NZ,fc_mask              ;mask bits left
     push    hl                      ;mask
     push    bc                      ;shift in C
     ld      hl,4
@@ -48,7 +48,7 @@ fc_mask:
     or      c
     or      d
     or      e
-    jp      Z,fc_z3                 ;file size is 0
+    jr      Z,fc_z3                 ;file size is 0
     ld      hl,2
     add     hl,sp                   ;mask
     ld      a,e
@@ -63,7 +63,7 @@ fc_mask:
     ld      a,b
     adc     a,0
     ld      b,a
-    jp      C,fc_z3                 ;round-up wrapped
+    jr      C,fc_z3                 ;round-up wrapped
 fc_shr:
     or      a                       ;clear C; count >>= 1 via rra
     ld      a,b
@@ -81,7 +81,7 @@ fc_shr:
     ld      hl,0
     add     hl,sp
     dec     (hl)                    ;shift--
-    jp      NZ,fc_shr               ;shifts left
+    jr      NZ,fc_shr               ;shifts left
     pop     hl
     pop     hl
     pop     hl

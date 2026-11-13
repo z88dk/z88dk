@@ -48,7 +48,7 @@ f_read:
     defw    fat_out
     ld      a,h
     or      l
-    jp      Z,fr_chk
+    jr      Z,fr_chk
     xor     a
     ld      (hl+),a
     ld      (hl),a
@@ -63,7 +63,7 @@ fr_chk:
     add     hl,de
     ld      a,(hl)
     and     FA_READ
-    jp      NZ,fr_go
+    jr      NZ,fr_go
     ld      a,FR_DENIED
     jp      mf_err
 fr_go:

@@ -56,7 +56,7 @@ f_expand:
     ret     NC
     ld      a,(fat_trail)
     cp      2
-    jp      C,fe_opt
+    jr      C,fe_opt
     ld      a,FR_INVALID_PARAMETER
     jp      mf_err
 fe_opt:
@@ -120,10 +120,10 @@ fe_loop:
     ld      a,b
     or      c
     or      d
-    jp      NZ,fe_used
+    jr      NZ,fe_used
     ld      a,e
     or      a
-    jp      Z,fe_free
+    jr      Z,fe_free
     cp      1
     jp      Z,fe_int
 fe_used:
@@ -132,7 +132,7 @@ fe_used:
     defw    fat_cfo
     call    fat_sthl
     defw    fat_cfo+2
-    jp      fe_adv
+    jr      fe_adv
 fe_free:
     call    fat_ldhl
     defw    fat_cfo
@@ -142,7 +142,7 @@ fe_free:
     defw    fat_cfo+2
     or      h
     or      l
-    jp      NZ,fe_count
+    jr      NZ,fe_count
     call    fat_ldhl
     defw    fat_want
     call    fat_sthl
@@ -159,7 +159,7 @@ fe_count:
     defw    fat_cfo
     ld      a,h
     or      l
-    jp      NZ,fe_cmp
+    jr      NZ,fe_cmp
     call    fat_ldhl
     defw    fat_cfo+2
     inc     hl
@@ -167,7 +167,7 @@ fe_count:
     defw    fat_cfo+2
 fe_cmp:
     call    fe_eq
-    jp      Z,fe_found
+    jr      Z,fe_found
 fe_adv:
     call    fat_ldhl
     defw    fat_want
@@ -186,7 +186,7 @@ fe_adv:
 fe_found:
     ld      a,(fat_trail)
     or      a
-    jp      NZ,fe_alloc
+    jr      NZ,fe_alloc
     call    fat_ldhl
     defw    fat_hold
     ld      de,(fat_hold+2)
@@ -235,18 +235,18 @@ fe_aput:
     jp      Z,fe_afile
     ld      a,(fat_cfo)
     cp      1
-    jp      NZ,fe_anext
+    jr      NZ,fe_anext
     ld      a,(fat_cfo+1)
     or      a
-    jp      NZ,fe_anext
+    jr      NZ,fe_anext
     ld      a,(fat_cfo+2)
     or      a
-    jp      NZ,fe_anext
+    jr      NZ,fe_anext
     ld      a,(fat_cfo+3)
     or      a
-    jp      NZ,fe_anext
+    jr      NZ,fe_anext
     ld      hl,fe_eoc
-    jp      fe_put
+    jr      fe_put
 fe_anext:
     call    fat_ldhl
     defw    fat_want
@@ -254,7 +254,7 @@ fe_anext:
     inc     hl
     ld      a,h
     or      l
-    jp      NZ,fe_ast
+    jr      NZ,fe_ast
     inc     de
 fe_ast:
     call    fat_sthl
@@ -284,7 +284,7 @@ fe_put:
     ld      h,a
     call    fat_sthl
     defw    fat_cfo
-    jp      NC,fe_anxt
+    jr      NC,fe_anxt
     call    fat_ldhl
     defw    fat_cfo+2
     dec     hl
@@ -310,7 +310,7 @@ fe_afile:
     defw    fat_fp
     ld      de,FIL_SCLUST
     add     hl,de
-    ex      de,hl
+    ld      de,hl
     ld      hl,fat_hold
     ld      bc,4
     call    mf_copy
@@ -318,7 +318,7 @@ fe_afile:
     defw    fat_fp
     ld      de,FIL_CLUST
     add     hl,de
-    ex      de,hl
+    ld      de,hl
     ld      hl,fat_hold
     ld      bc,4
     call    mf_copy
@@ -326,7 +326,7 @@ fe_afile:
     defw    fat_fp
     ld      de,FIL_SIZE
     add     hl,de
-    ex      de,hl
+    ld      de,hl
     ld      hl,fat_seek
     ld      bc,4
     call    mf_copy
@@ -365,20 +365,20 @@ fe_tcl:
     ld      b,9
 fe_blog:
     cp      1
-    jp      Z,fe_sh0
+    jr      Z,fe_sh0
     or      a
-    jp      Z,fe_tcl_no
+    jr      Z,fe_tcl_no
     or      a
     rra
     inc     b
-    jp      fe_blog
+    jr      fe_blog
 fe_sh0:
     xor     a
     ld      (fat_csect),a
 fe_sh:
     ld      a,b
     or      a
-    jp      Z,fe_ceil
+    jr      Z,fe_ceil
     push    bc
     ld      hl,fat_zeros+3
     ld      a,(hl)
@@ -397,26 +397,26 @@ fe_sh:
     ld      a,(hl)
     rra
     ld      (hl),a
-    jp      NC,fe_sh_nc
+    jr      NC,fe_sh_nc
     ld      a,1
     ld      (fat_csect),a
 fe_sh_nc:
     pop     bc
     dec     b
-    jp      fe_sh
+    jr      fe_sh
 fe_ceil:
     ld      a,(fat_csect)
     or      a
-    jp      Z,fe_tcl_cp
+    jr      Z,fe_tcl_cp
     ld      hl,fat_zeros
     inc     (hl)
-    jp      NZ,fe_tcl_cp
+    jr      NZ,fe_tcl_cp
     inc     hl
     inc     (hl)
-    jp      NZ,fe_tcl_cp
+    jr      NZ,fe_tcl_cp
     inc     hl
     inc     (hl)
-    jp      NZ,fe_tcl_cp
+    jr      NZ,fe_tcl_cp
     inc     hl
     inc     (hl)
 fe_tcl_cp:
@@ -427,7 +427,7 @@ fe_tcl_cp:
     or      (hl)
     inc     hl
     or      (hl)
-    jp      Z,fe_tcl_no
+    jr      Z,fe_tcl_no
     ld      hl,fat_zeros
     ld      de,fat_remain
     ld      bc,4
@@ -470,6 +470,6 @@ fe_eq1:
     inc     hl
     inc     de
     dec     b
-    jp      nz,fe_eq1
+    jr      nz,fe_eq1
     xor     a
     ret

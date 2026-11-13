@@ -57,7 +57,10 @@ dc_loop:
     ld      hl,(dir_sect+2)
     push    hl
     call    dir_next                ;next dirent
-    jr      NC,dc_at_end            ;table has no free slot
+    jr      C,dc_resume
+    jr      Z,dc_at_end             ;clean end: stretch or fail
+    jr      dc_full                 ;disk error: do not stretch
+dc_resume:
     ld      hl,10
     add     hl,sp
     ld      sp,hl
@@ -65,6 +68,7 @@ dc_loop:
 dc_at_end:
     call    dir_stretch             ;grow a FAT32 directory
     jr      C,dc_stretched          ;new cluster is ready
+dc_full:
     ld      hl,10
     add     hl,sp
     ld      sp,hl

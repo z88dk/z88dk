@@ -24,18 +24,23 @@ _fat_dir_read:
     defw    dir_ptr
     ld      a,(hl)
     or      a
-    jp      Z,fat_dir_read_end      ;0x00 is end of directory
+    jr      Z,fat_dir_read_end      ;0x00 is end of directory
     pop     de
     ld      bc,32
     call    fat_copy                ;32-byte dirent; not ldir
     call    dir_next                ;C: a following dirent exists
-    jp      C,fat_dir_read_ok       ;advance succeeded
+    jr      C,fat_dir_read_ok       ;advance succeeded
+    jr      NZ,fat_dir_read_err     ;disk error is not the end
     ld      hl,cc_zero              ;no trailing 0x00: next read is end
     call    fat_sthl
     defw    dir_ptr
 fat_dir_read_ok:
     ld      hl,0
     scf                             ;C: dirent copied
+    ret
+fat_dir_read_err:
+    ld      hl,1
+    or      a
     ret
 fat_dir_read_end:
     pop     hl

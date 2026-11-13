@@ -60,23 +60,24 @@ dc_loop:
     ld      hl,(dir_sect+2)
     push    hl
     call    dir_next                ;C: a later dirent
-    jr      NC,dc_at_end            ;no free slot in this chain
-    ld      hl,10
-    add     hl,sp
+    jr      C,dc_resume
+    jr      Z,dc_at_end             ;clean end: stretch or fail
+    jr      dc_full                 ;disk error: do not stretch
+dc_resume:
+    ld      hl,sp+10
     ld      sp,hl
     jr      dc_loop
 dc_at_end:
     call    dir_stretch             ;C: FAT32 grew a cluster
     jr      C,dc_stretched          ;new cluster is zeroed
-    ld      hl,10
-    add     hl,sp
+dc_full:
+    ld      hl,sp+10
     ld      sp,hl
     ld      hl,1
     or      a                       ;NC: directory is full
     ret
 dc_stretched:
-    ld      hl,10
-    add     hl,sp
+    ld      hl,sp+10
     ld      sp,hl
     jr      dc_loop
 dc_fill:
@@ -116,40 +117,50 @@ ds_no:
     or      a                       ;NC: FAT16 does not stretch
     ret
 ds_32:
-    ld      de,sp+2
-    ld      hl,(de)
+    ld      hl,sp+2
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
     ld      a,(dir_sect+2)
     cp      l                       ;snapshot sect high vs now
     jr      NZ,ds_no                ;sector changed
     ld      a,(dir_sect+3)
     cp      h                       ;snapshot sect high vs now
     jr      NZ,ds_no                ;sector changed
-    ld      de,sp+4
-    ld      hl,(de)
+    ld      hl,sp+4
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
     ld      a,(dir_sect)
     cp      l                       ;snapshot sect low vs now
     jr      NZ,ds_no                ;sector changed
     ld      a,(dir_sect+1)
     cp      h                       ;snapshot sect low vs now
     jr      NZ,ds_no                ;sector changed
-    ld      de,sp+6
-    ld      hl,(de)
+    ld      hl,sp+6
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
     ld      a,(dir_clust+2)
     cp      l                       ;snapshot clust high vs now
     jr      NZ,ds_no                ;cluster changed
     ld      a,(dir_clust+3)
     cp      h                       ;snapshot clust high vs now
     jr      NZ,ds_no                ;cluster changed
-    ld      de,sp+8
-    ld      hl,(de)
+    ld      hl,sp+8
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
     ld      a,(dir_clust)
     cp      l                       ;snapshot clust low vs now
     jr      NZ,ds_no                ;cluster changed
     ld      a,(dir_clust+1)
     cp      h                       ;snapshot clust low vs now
     jr      NZ,ds_no                ;cluster changed
-    ld      de,sp+10
-    ld      hl,(de)
+    ld      hl,sp+10
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
     ld      a,(dir_ofs)
     cp      l                       ;snapshot ofs vs now
     jr      NZ,ds_moved             ;ofs moved

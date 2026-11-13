@@ -90,12 +90,22 @@ fr_loop:
     ld      hl,(fat_user)
     call    mf_fill_info
     call    dir_next
-    jr      NC,fr_mark
+    jr      C,fr_kept
+    jr      Z,fr_mark               ;clean end of the directory
+    ld      a,FR_DISK_ERR
+    jp      mf_err
+fr_kept:
     call    fr_store
     jp      mf_ok
 fr_skip:
     call    dir_next
-    jp      NC,mf_ok
+    jr      C,fr_more
+    jr      Z,fr_end                ;clean end of the directory
+    ld      a,FR_DISK_ERR
+    jp      mf_err
+fr_end:
+    jp      mf_ok
+fr_more:
     call    fr_store
     jr      fr_loop
 fr_sdi_nc:

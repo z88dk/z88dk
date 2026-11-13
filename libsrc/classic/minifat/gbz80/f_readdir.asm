@@ -76,7 +76,7 @@ f_readdir:
     or      (hl)
     jp      NZ,mf_ok
     call    fr_sdi_dptr
-    jp      NC,fr_sdi_nc
+    jr      NC,fr_sdi_nc
 fr_loop:
     call    fat_ldhl
     defw    dir_ptr
@@ -84,29 +84,39 @@ fr_loop:
     or      a
     jp      Z,mf_ok
     cp      $E5
-    jp      Z,fr_skip
+    jr      Z,fr_skip
     cp      '.'
-    jp      Z,fr_skip
+    jr      Z,fr_skip
     ld      de,DIR_Attr
     add     hl,de
     ld      a,(hl)
     cp      $0F
-    jp      Z,fr_skip
+    jr      Z,fr_skip
     and     $DF
     cp      AM_VOL
-    jp      Z,fr_skip
+    jr      Z,fr_skip
     call    fat_ldhl
     defw    fat_user
     call    mf_fill_info
     call    dir_next
-    jp      NC,fr_mark
+    jr      C,fr_kept
+    jr      Z,fr_mark               ;clean end of the directory
+    ld      a,FR_DISK_ERR
+    jp      mf_err
+fr_kept:
     call    fr_store
     jp      mf_ok
 fr_skip:
     call    dir_next
-    jp      NC,mf_ok
+    jr      C,fr_more
+    jr      Z,fr_end                ;clean end of the directory
+    ld      a,FR_DISK_ERR
+    jp      mf_err
+fr_end:
+    jp      mf_ok
+fr_more:
     call    fr_store
-    jp      fr_loop
+    jr      fr_loop
 fr_sdi_nc:
     call    fat_ldhl
     defw    fat_dp

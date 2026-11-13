@@ -46,7 +46,7 @@ f_lseek:
     inc     hl
     ld      d,(hl)
     ld      (fat_fp),de
-    ex      de,hl
+    ld      hl,de
     call    mf_fil_check
     ret     NC
     call    fat_ldhl
@@ -55,13 +55,13 @@ f_lseek:
     add     hl,de
     ld      a,(hl)
     and     FA_WRITE
-    jp      Z,fl_clip
+    jr      Z,fl_clip
     call    fl_past
-    jp      NC,fl_set
-    jp      fl_ext
+    jr      NC,fl_set
+    jr      fl_ext
 fl_clip:
     call    fl_past
-    jp      NC,fl_set
+    jr      NC,fl_set
     call    fat_ldhl
     defw    fat_fp
     ld      de,FIL_SIZE
@@ -118,7 +118,9 @@ fl_loop:
     defw    fat_off
     ld      de,512
     or      a
-    ex      de,hl
+    push    de
+    ld      de,hl
+    pop     hl
     push    bc
     ld      bc,de
     call    mf_subhlbc
@@ -129,12 +131,12 @@ fl_loop:
     ld      a,(fat_off)
     ld      hl,fat_off+1
     or      (hl)
-    jp      NZ,fl_step
+    jr      NZ,fl_step
     call    mf_sector_for_fptr
-    jp      C,fl_step
+    jr      C,fl_step
     ld      a,h
     or      l
-    jp      Z,mf_place
+    jp      Z,mf_place              ;disk full: FR_OK at the size reached
     jp      mf_err
 fl_step:
     ld      bc,(fat_hold)

@@ -45,7 +45,7 @@ f_getfree:
     defw    fat_path
     ld      a,h
     or      l
-    jp      Z,fg_cnt
+    jr      Z,fg_cnt
     call    mf_drive
     ret     NC
 fg_cnt:
@@ -53,12 +53,12 @@ fg_cnt:
     defw    fat_user
     ld      a,h
     or      l
-    jp      NZ,fg_call
+    jr      NZ,fg_call
     ld      a,FR_INVALID_PARAMETER
     jp      mf_err
 fg_call:
     call    _fat_getfree
-    jp      C,fg_ptr
+    jr      C,fg_ptr
     ld      a,FR_DISK_ERR
     jp      mf_err
 fg_ptr:

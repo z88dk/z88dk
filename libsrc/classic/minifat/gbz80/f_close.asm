@@ -24,7 +24,7 @@ f_close:
     inc     hl
     ld      d,(hl)
     ld      (fat_fp),de
-    ex      de,hl
+    ld      hl,de
     call    mf_fil_check
     ret     NC
     call    mf_sync_fil

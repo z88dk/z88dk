@@ -165,32 +165,21 @@ fat_copy_lp:
     jp      NZ,fat_copy_lp          ;more pages
     ret
 
-; ff.c ld_32 / st_32 as *(DWORD *). Word cursor DE, native ld hl,(de) /
-; ld (de),hl. Last byte has no post-increment: HL at offset +3. Streamed
-; callers inc hl to the next dword. BCDE is E LSB.
+; ff.c ld_32 / st_32 as *(DWORD *). Byte stream through HL. Last byte
+; has no post-increment: HL at offset +3. Streamed callers inc hl to
+; the next dword. BCDE is E LSB.
 fat_ld32:
-    ex      de,hl
-    ld      hl,(de)
-    inc     de
-    inc     de
-    push    hl
-    ld      hl,(de)
-    inc     de
-    ld      bc,hl
-    pop     hl
-    ex      de,hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
+    ld      b,(hl)
     ret
 
 fat_st32:
-    push    bc
-    ex      de,hl
-    ld      (de),hl
-    inc     de
-    inc     de
-    pop     hl
-    ld      (de),hl
-    inc     de
-    ex      de,hl
+    ld      (hl+),e
+    ld      (hl+),d
+    ld      (hl+),c
+    ld      (hl),b
     ret
 
 
@@ -411,7 +400,7 @@ fat_fsi_free:
     ld      a,b
     or      c
     or      d
-    jr      NZ,fat_fsi_nxt          ;hint is above 255
+    jr      NZ,fat_fsi_nxt          ;hint is above 65535
     ld      a,e
     cp      2                       ;hint below 2 is unknown
     jr      NC,fat_fsi_nxt          ;hint >= 2
@@ -940,15 +929,15 @@ get_fat:
     jp      Z,get_fat12             ;12-bit packed entry
     call    fat_fatent              ;C: FAT entry in fatwin
     ret     NC                      ;window failed
-    ex      de,hl                   ;DE = word cursor in fatwin
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT32                ;fs_type
     jr      Z,get_fat32             ;FAT32 dword
-    ld      hl,(de)                 ;ff ld_16
-    ld      a,h
+    ld      e,(hl+)
+    ld      d,(hl)                  ;ff ld_16
+    ld      a,d
     cp      $FF                     ;high byte of the FAT16 link
     jr      NZ,get_fat16ok          ;not an $FFxx link
-    ld      a,l
+    ld      a,e
     cp      $F7                     ;FAT16 bad cluster
     jr      Z,get_fat_bad           ;$FFF7 is bad, not a link
     cp      $F8                     ;FAT16 EOC $FFF8..$FFFF
@@ -958,21 +947,16 @@ get_fat:
     scf                             ;C: FAT16 end of chain
     ret
 get_fat16ok:
-    ex      de,hl                   ;DE = cluster
     ld      bc,0
     scf                             ;C: link in DE, high half 0
     ret
 get_fat32:
-    ld      hl,(de)                 ;low
-    inc     de
-    inc     de
-    push    hl
-    ld      hl,(de)                 ;high
-    ld      a,h
+    ld      e,(hl+)                 ;low
+    ld      d,(hl+)
+    ld      c,(hl+)
+    ld      a,(hl)
     and     $0F                     ;ff ld_32 & 0x0FFFFFFF
     ld      b,a
-    ld      c,l
-    pop     de
     cp      $0F                     ;masked high byte
     jr      NZ,get_fat32ok          ;not an EOC pattern
     ld      a,c
@@ -1029,12 +1013,10 @@ put_fat_adj:
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT32                ;fs_type
     jr      Z,put_fat32             ;keep the FAT32 high nibble
-    ex      de,hl                   ;HL = src dword, DE = dest in window
-    push    de
-    ex      de,hl                   ;DE = src
-    ld      hl,(de)                 ;ff st_16
-    pop     de
-    ld      (de),hl
+    ld      a,(de+)                 ;ff st_16
+    ld      (hl+),a
+    ld      a,(de)
+    ld      (hl),a
 put_fat_wrote:
     pop     de
     pop     af
@@ -1200,6 +1182,19 @@ cfo_shr:
     dec     b
     jp      NZ,cfo_shr              ;shifts left
 cfo_ci:
+    ld      a,c
+    or      a
+    jp      NZ,cfo_bad              ;cluster index does not fit in 16 bits
+    ld      a,(_cpm_fat_vol+6)
+    ld      hl,_cpm_fat_vol+7
+    or      (hl)
+    jr      NZ,cfo_ci_ok            ;n_fatent above 65535
+    ld      hl,(_cpm_fat_vol+4)
+    ld      bc,de
+    call    fat_subhlbc             ;n_fatent - index
+    jp      C,cfo_bad               ;index is past the FAT
+    jp      Z,cfo_bad
+cfo_ci_ok:
     ex      de,hl
     ld      (fat_work+4),hl         ;want_ci — kept for the cache store
     ld      hl,clst_cache_sclust
@@ -1810,12 +1805,9 @@ dsdi_chain_save:
     ld      (dir_sclust+2),hl
     ex      de,hl
     ld      (dir_sclust),hl
-    ld      de,dir_sclust
-    ld      hl,(de)                 ;copy sclust; Z80 twin uses ldir
+    ld      hl,(dir_sclust)         ;copy sclust; Z80 twin uses ldir
     ld      (fat_work),hl
-    inc     de
-    inc     de
-    ld      hl,(de)
+    ld      hl,(dir_sclust+2)
     ld      (fat_work+2),hl         ;sclust; fptr follows
     ld      hl,(dir_ofs)
     ld      (fat_work+4),hl
@@ -1927,7 +1919,7 @@ dir_next_dyn:
     ld      hl,(dir_clust)
     ex      de,hl
     call    get_fat                 ;NC: next link unreadable
-    jr      NC,dir_next_end         ;FAT read failed
+    jp      NC,dir_next_io          ;FAT read failed
     ld      a,b
     cp      $0F                     ;EOC high byte
     jr      NZ,dir_next_got         ;link is a cluster number
@@ -1945,13 +1937,13 @@ dir_next_got:
     sbc     a,0
     ld      a,b
     sbc     a,0
-    jr      C,dir_next_end          ;cluster < 2
+    jp      C,dir_next_io           ;cluster < 2
     ld      hl,de
     ld      (dir_clust),hl
     ld      hl,bc
     ld      (dir_clust+2),hl
     call    clst2sect               ;NC: next cluster has no LBA
-    jr      NC,dir_next_end         ;no sector for the next cluster
+    jp      NC,dir_next_io          ;no sector for the next cluster
     ld      hl,de
     ld      (dir_sect),hl
     ld      hl,bc
@@ -1962,13 +1954,18 @@ dir_next_win:
     ld      hl,(dir_sect)
     ex      de,hl
     call    fat_move_window         ;C: next directory sector in fatwin
-    ret     NC                      ;directory sector unread
+    jp      NC,dir_next_io          ;directory sector unread
     ld      hl,fatwin               ;ofs % 512 == 0
     ld      (dir_ptr),hl
     scf                             ;C: dir_ptr at the new sector
     ret
 dir_next_end:
-    or      a                       ;NC: no next dirent
+    xor     a                       ;NC+Z: end of the directory
+    ret
+
+dir_next_io:
+    ld      a,1
+    or      a                       ;NC+NZ: disk or chain error
     ret
 
 

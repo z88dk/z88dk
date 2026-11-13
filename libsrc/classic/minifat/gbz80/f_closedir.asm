@@ -28,7 +28,7 @@ f_closedir:
     ld      d,(hl)
     ld      a,d
     or      e
-    jp      Z,fd_bad
+    jr      Z,fd_bad
     ld      (fat_dp),de
     ld      a,(de)
     ld      l,a
@@ -36,17 +36,17 @@ f_closedir:
     ld      a,(de)
     ld      h,a
     or      l
-    jp      Z,fd_bad
+    jr      Z,fd_bad
     ld      de,(fat_mount_id)
     or      a
     push    bc
     ld      bc,de
     call    mf_subhlbc
     pop     bc
-    jp      NZ,fd_bad
+    jr      NZ,fd_bad
     ld      a,(_cpm_fat_vol)
     or      a
-    jp      Z,fd_bad
+    jr      Z,fd_bad
     call    fat_ldhl
     defw    fat_dp
     ld      (hl),0

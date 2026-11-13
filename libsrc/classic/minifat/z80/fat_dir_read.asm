@@ -26,11 +26,16 @@ _fat_dir_read:
     ldir
     call    dir_next                ;step to the next dirent
     jr      C,fat_dir_read_ok       ;next dirent is in range
+    jr      NZ,fat_dir_read_err     ;disk error is not the end
     ld      hl,cc_zero              ;no trailing 0x00: next read is end
     ld      (dir_ptr),hl
 fat_dir_read_ok:
     ld      hl,0
     scf
+    ret
+fat_dir_read_err:
+    ld      hl,1
+    or      a
     ret
 fat_dir_read_end:
     pop     hl

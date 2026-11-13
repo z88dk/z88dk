@@ -27,7 +27,9 @@ _fat_next:
     call    fat_ld32                ;cluster into BCDE
     push    de
     push    bc
-    ex      de,hl
+    push    de
+    ld      de,hl
+    pop     hl
     call    fat_sthl
     defw    pack_sv
     pop     hl
@@ -38,19 +40,19 @@ _fat_next:
     pop     de
     call    get_fat                 ;NC: link unreadable or bad
     pop     hl
-    jp      NC,fat_next_fail        ;leave the caller's dword
+    jr      NC,fat_next_fail        ;leave the caller's dword
     ld      a,(pack_sv)
     cp      e                       ;next vs this, byte 0
-    jp      NZ,fat_next_store       ;link moved
+    jr      NZ,fat_next_store       ;link moved
     ld      a,(pack_sv+1)
     cp      d                       ;next vs this, byte 1
-    jp      NZ,fat_next_store       ;link moved
+    jr      NZ,fat_next_store       ;link moved
     ld      a,(pack_sv+2)
     cp      c                       ;next vs this, byte 2
-    jp      NZ,fat_next_store       ;link moved
+    jr      NZ,fat_next_store       ;link moved
     ld      a,(pack_sv+3)
     cp      b                       ;next vs this, byte 3
-    jp      Z,fat_next_fail         ;chain points at itself
+    jr      Z,fat_next_fail         ;chain points at itself
 fat_next_store:
     call    fat_st32                ;store the next cluster
     ld      hl,0

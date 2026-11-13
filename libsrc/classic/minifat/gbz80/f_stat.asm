@@ -34,14 +34,14 @@ f_stat:
     ld      d,(hl)
     ld      (fat_path),de
     call    mf_ensure
-    jp      NC,fs_bad
+    jr      NC,fs_bad
     call    fat_ldhl
     defw    fat_path
     call    mf_follow
-    jp      NC,fs_bad
+    jr      NC,fs_bad
     ld      a,(fat_noname)
     or      a
-    jp      NZ,fs_name
+    jr      NZ,fs_name
     call    fat_ldhl
     defw    fat_user
     ld      a,h
@@ -50,7 +50,7 @@ f_stat:
     jp      mf_fill_info
 fs_name:
     ld      a,FR_INVALID_NAME
-    jp      fs_clr
+    jr      fs_clr
 fs_bad:
     ld      a,l
 fs_clr:
@@ -59,7 +59,7 @@ fs_clr:
     defw    fat_user
     ld      a,h
     or      l
-    jp      Z,fs_ret
+    jr      Z,fs_ret
     ld      bc,FI_NAME
     add     hl,bc
     ld      (hl),0

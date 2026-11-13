@@ -3,6 +3,8 @@
 ; 32-byte entry is copied, the new name is registered, bytes 13..31
 ; and the attribute are written onto it, and ".." is updated when a
 ; directory moves to another parent. The old entry is then deleted.
+; A directory may be moved into its own descendant. FatFs R0.16 does
+; the same.
 ; new path at sp+2, old path at sp+4. The caller cleans.
 ;
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.

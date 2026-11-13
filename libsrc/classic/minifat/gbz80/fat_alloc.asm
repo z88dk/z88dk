@@ -27,7 +27,7 @@ _fat_alloc:
     call    fat_ld32                ;cluster to extend
     call    create_chain            ;NC: no free cluster
     pop     hl
-    jp      NC,fat_alloc_fail       ;leave the caller's dword
+    jr      NC,fat_alloc_fail       ;leave the caller's dword
     call    fat_st32                ;store the new cluster
     ld      hl,0
     ret

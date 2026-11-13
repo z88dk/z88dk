@@ -51,7 +51,7 @@ f_mount:
     defw    fat_path
     ld      a,h
     or      l
-    jp      Z,fm_reg
+    jr      Z,fm_reg
     call    mf_drive
     ret     NC
 fm_reg:
@@ -63,14 +63,14 @@ fm_reg:
     defw    fat_fs
     ld      a,h
     or      l
-    jp      Z,fm_new
+    jr      Z,fm_new
     ld      (hl),0
 fm_new:
     call    fat_ldhl
     defw    fat_dp
     ld      a,h
     or      l
-    jp      Z,fm_off
+    jr      Z,fm_off
     call    fat_sthl
     defw    fat_fs
     ld      (hl),0
@@ -80,18 +80,12 @@ fm_new:
     or      a
     jp      Z,mf_ok
     call    fat_mount
-    jp      NC,fm_fail
+    jr      NC,fm_fail
     call    mf_publish
     call    mf_cwd_reset
     jp      mf_ok
 fm_fail:
-    ld      a,l
-    cp      19
-    jp      Z,fm_par
-    ld      a,FR_NO_FILESYSTEM
-    jp      mf_err
-fm_par:
-    ld      a,FR_INVALID_PARAMETER
+    ld      a,l                     ;1 disk, 3 not ready, 13 no filesystem, 19 csize
     jp      mf_err
 fm_off:
     ld      hl,0

@@ -35,7 +35,8 @@ fat_fold:
 ; AM_VOL skips labels and long names ($0F includes that bit).
 ; Disk $05 compares as $E5. Both sides are folded A-Z.
 ; IN: HL -> 11-byte 8.3
-; OUT C and L=0, H=0: found, fat_found_* and dir_ptr filled. L=1: miss.
+; OUT C and L=0, H=0: found, fat_found_* and dir_ptr filled.
+; NC+Z and L=1: the name is not there. NC+NZ and L=1: the sector was not read.
 _dir_find:
 dir_find:
     call    fat_sthl
@@ -45,7 +46,7 @@ dir_find:
     ld      bc,hl
     call    fat_ldhl
     defw    dir_sclust
-    ex      de,hl
+    ld      de,hl
     ld      hl,0
     call    dir_sdi                 ;rewind to the first dirent
     ld      hl,1
@@ -65,12 +66,12 @@ df_loop:
     jp      NZ,df_next              ;volume label or LFN
     call    fat_ldhl
     defw    dir_ptr
-    ex      de,hl
+    ld      de,hl
     call    fat_ldhl
     defw    pack_sv
     ld      a,(de)
     cp      $05                     ;KANJI: stored $05 is the character $E5
-    jp      NZ,df_cmp1              ;lead byte is not stored $05
+    jr      NZ,df_cmp1              ;lead byte is not stored $05
     ld      a,$E5
 df_cmp1:
     call    fat_fold                ;fold the disk byte
@@ -78,7 +79,7 @@ df_cmp1:
     ld      a,(hl)
     call    fat_fold                ;fold the name byte
     cp      c                       ;folded bytes
-    jp      NZ,df_next              ;first byte differs
+    jr      NZ,df_next              ;first byte differs
     inc     de
     inc     hl
     ld      b,10
@@ -89,11 +90,11 @@ df_cmp:
     ld      a,(hl)
     call    fat_fold                ;fold the name byte
     cp      c                       ;folded bytes
-    jp      NZ,df_next              ;name differs
+    jr      NZ,df_next              ;name differs
     inc     de
     inc     hl
     dec     b
-    jp      NZ,df_cmp               ;ten bytes still to match
+    jr      NZ,df_cmp               ;ten bytes still to match
     call    fat_ldhl
     defw    dir_ptr
     ld      de,DIR_ClusLO
@@ -106,7 +107,7 @@ df_cmp:
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT32                ;fs_type
     ld      hl,0
-    jp      NZ,df_hi                ;FAT16 cluster is 16 bits
+    jr      NZ,df_hi                ;FAT16 cluster is 16 bits
     call    fat_ldhl
     defw    dir_ptr
     ld      de,DIR_ClusHI
@@ -143,7 +144,13 @@ df_hi:
 df_next:
     call    dir_next                ;C: another dirent
     jp      C,df_loop               ;keep scanning
+    jr      NZ,df_io                ;sector was not read
 df_miss:
     ld      hl,1
-    or      a                       ;NC: name not in this directory
+    xor     a                       ;NC+Z: name is not in this directory
+    ret
+df_io:
+    ld      hl,1
+    ld      a,1
+    or      a                       ;NC+NZ: directory sector was not read
     ret

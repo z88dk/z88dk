@@ -38,19 +38,17 @@ fc_mask:
     jp      NZ,fc_mask              ;mask bits left
     push    hl                      ;mask
     push    bc                      ;shift in C
-    ld      hl,4
-    add     hl,sp                   ;saved pointer
-    ld      a,(hl+)
-    ld      h,(hl)
-    ld      l,a
+    ld      de,sp+4                 ;saved pointer
+    ld      hl,(de)
     call    fat_ld32                ;BCDE = bytes
     ld      a,b
     or      c
     or      d
     or      e
     jp      Z,fc_z3                 ;file size is 0
-    ld      hl,2
-    add     hl,sp                   ;mask
+    ex      de,hl
+    ld      de,sp+2                 ;mask
+    ex      de,hl
     ld      a,e
     add     a,(hl+)                 ;bytes + (cluster-1) mask
     ld      e,a
@@ -78,8 +76,9 @@ fc_shr:
     ld      a,e
     rra
     ld      e,a
-    ld      hl,0
-    add     hl,sp
+    ex      de,hl
+    ld      de,sp+0                 ;shift count
+    ex      de,hl
     dec     (hl)                    ;shift--
     jp      NZ,fc_shr               ;shifts left
     pop     hl

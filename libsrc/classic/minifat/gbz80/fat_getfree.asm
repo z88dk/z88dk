@@ -30,10 +30,10 @@ _fat_getfree:
     push    hl
     ld      a,(_cpm_fat_vol+25)
     or      a
-    jp      Z,gf_scan               ;free count is not cached
+    jr      Z,gf_scan               ;free count is not cached
     call    fat_ldhl
     defw    _cpm_fat_vol+28
-    ex      de,hl
+    ld      de,hl
     call    fat_ldhl
     defw    _cpm_fat_vol+30
     ld      bc,hl
@@ -78,7 +78,7 @@ gf_loop:
     ld      bc,hl
     call    fat_ldhl
     defw    fat_work+4
-    ex      de,hl
+    ld      de,hl
     call    fat_move_window         ;C: this FAT sector in fatwin
     jp      NC,gf_fail              ;FAT sector unread
     call    fat_ldhl
@@ -88,7 +88,7 @@ gf_loop:
     defw    fat_work+4
     ld      a,h
     or      l
-    jp      NZ,gf_sect              ;sect low did not wrap
+    jr      NZ,gf_sect              ;sect low did not wrap
     call    fat_ldhl
     defw    fat_work+6
     inc     hl
@@ -99,25 +99,25 @@ gf_sect:
     ld      bc,256
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT32                ;fs_type
-    jp      NZ,gf_wide              ;FAT16: 256 entries
+    jr      NZ,gf_wide              ;FAT16: 256 entries
     ld      bc,128
 gf_wide:
     ld      a,(fat_work+10)         ;remaining >= 65536 fills this sector
     or      a
-    jp      NZ,gf_full              ;remaining above 65535
+    jr      NZ,gf_full              ;remaining above 65535
     ld      a,(fat_work+11)
     or      a
-    jp      NZ,gf_full              ;remaining above 65535
+    jr      NZ,gf_full              ;remaining above 65535
     call    fat_ldhl
     defw    fat_work+8
     call    fat_subhlbc                   ;C set when remaining < width
-    jp      NC,gf_full              ;sector is full of entries
+    jr      NC,gf_full              ;sector is full of entries
     ld      a,(fat_work+8)          ;tail is 1..width-1
     ld      b,a
     ld      hl,fatwin
     call    gf_tally                ;count free slots in the tail
     call    gf_add                  ;add that tally to nfree
-    jp      gf_scanned
+    jr      gf_scanned
 gf_full:
     push    bc
     ld      b,c                     ;0 = 256 FAT16 entries, 128 FAT32
@@ -144,7 +144,7 @@ gf_scanned:
     defw    fat_work
     call    fat_sthl
     defw    _cpm_fat_vol+28
-    ex      de,hl
+    ld      de,hl
     call    fat_ldhl
     defw    fat_work+2
     call    fat_sthl
@@ -192,10 +192,10 @@ gf12_lp:
     sbc     a,e
     ld      a,h
     sbc     a,d
-    jp      NC,gf_scanned           ;cursor >= n_fatent
+    jr      NC,gf_scanned           ;cursor >= n_fatent
     call    fat_ldhl
     defw    fat_work+8
-    ex      de,hl
+    ld      de,hl
     call    fat_ldhl
     defw    fat_work+10
     ld      bc,hl
@@ -204,12 +204,12 @@ gf12_lp:
     call    get_fat
     pop     hl
     pop     bc
-    jp      NC,gf_fail              ;disk error or bad cluster
+    jr      NC,gf_fail              ;disk error or bad cluster
     ld      a,d
     or      e
     or      c
     or      b
-    jp      NZ,gf12_used
+    jr      NZ,gf12_used
     ld      de,1
     call    gf_add
 gf12_used:
@@ -220,28 +220,28 @@ gf12_used:
     defw    fat_work+8
     ld      a,h
     or      l
-    jp      NZ,gf12_lp
+    jr      NZ,gf12_lp
     call    fat_ldhl
     defw    fat_work+10
     inc     hl
     call    fat_sthl
     defw    fat_work+10
-    jp      gf12_lp
+    jr      gf12_lp
 
 ; HL = FAT window, B = entries (0 means 256). DE = free count on return.
 gf_tally:
     ld      de,0
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT32                ;fs_type
-    jp      Z,gf32_lp               ;FAT32 entries are dwords
+    jr      Z,gf32_lp               ;FAT32 entries are dwords
 gf16_lp:
     ld      a,(hl+)                 ;FAT16 free: both bytes zero
     or      (hl+)
-    jp      NZ,gf16_used            ;FAT16 entry in use
+    jr      NZ,gf16_used            ;FAT16 entry in use
     inc     de
 gf16_used:
     dec     b
-    jp      NZ,gf16_lp              ;entries left in this sector
+    jr      NZ,gf16_lp              ;entries left in this sector
     ret
 gf32_lp:
     ld      a,(hl+)                 ;FAT32 free: 28-bit value zero
@@ -251,11 +251,11 @@ gf32_lp:
     ld      a,(hl+)
     and     $0F
     or      c
-    jp      NZ,gf32_used            ;FAT32 entry in use
+    jr      NZ,gf32_used            ;FAT32 entry in use
     inc     de
 gf32_used:
     dec     b
-    jp      NZ,gf32_lp              ;entries left in this sector
+    jr      NZ,gf32_lp              ;entries left in this sector
     ret
 
 ; fat_work (nfree) += DE. DE is at most one sector of entries.

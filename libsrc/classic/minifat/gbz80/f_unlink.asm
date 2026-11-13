@@ -51,13 +51,13 @@ f_unlink:
     ret     NC
     ld      a,(fat_noname)
     or      a
-    jp      Z,ul_real
+    jr      Z,ul_real
     ld      a,FR_INVALID_NAME
     jp      mf_err
 ul_real:
     ld      a,(fat_attr)
     and     AM_RDO
-    jp      Z,ul_hold
+    jr      Z,ul_hold
     ld      a,FR_DENIED
     jp      mf_err
 ul_hold:
@@ -71,18 +71,18 @@ ul_hold:
     defw    fat_hold+2
     ld      a,(fat_attr)
     and     AM_DIR
-    jp      Z,ul_zap
+    jr      Z,ul_zap
     ld      hl,fat_here
     ld      de,fat_cwd
     ld      b,4
 ul_cmp:
     ld      a,(de)
     cp      (hl)
-    jp      NZ,ul_empty
+    jr      NZ,ul_empty
     inc     hl
     inc     de
     dec     b
-    jp      nz,ul_cmp
+    jr      nz,ul_cmp
     ld      a,FR_DENIED
     jp      mf_err
 ul_empty:
@@ -96,30 +96,31 @@ ul_walk:
     defw    dir_ptr
     ld      a,(hl)
     or      a
-    jp      Z,ul_zap
+    jr      Z,ul_zap
     cp      $E5
-    jp      Z,ul_next
+    jr      Z,ul_next
     cp      '.'
-    jp      Z,ul_next
+    jr      Z,ul_next
     ld      de,DIR_Attr
     add     hl,de
     ld      a,(hl)
     cp      $0F
-    jp      Z,ul_next
+    jr      Z,ul_next
     and     $DF
     cp      AM_VOL
-    jp      Z,ul_next
+    jr      Z,ul_next
     ld      a,FR_DENIED
     jp      mf_err
 ul_next:
     call    dir_next
-    jp      NC,ul_zap
-    jp      ul_walk
+    jr      C,ul_walk
+    jr      Z,ul_zap                ;clean end: the directory is empty
+    jr      ul_disk
 ul_zap:
     ld      de,(fat_dirsec)
     ld      bc,(fat_dirsec+2)
     call    fat_move_window
-    jp      NC,ul_disk
+    jr      NC,ul_disk
     call    fat_ldhl
     defw    fat_dirofs
     ld      a,h
@@ -136,9 +137,9 @@ ul_zap:
     or      c
     or      d
     or      e
-    jp      Z,ul_sync
+    jr      Z,ul_sync
     call    remove_chain
-    jp      NC,ul_disk
+    jr      NC,ul_disk
 ul_sync:
     call    fat_sync_window
     jp      C,mf_ok

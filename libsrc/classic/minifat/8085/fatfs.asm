@@ -409,7 +409,7 @@ fat_fsi_free:
     ld      a,b
     or      c
     or      d
-    jr      NZ,fat_fsi_nxt          ;hint is above 255
+    jr      NZ,fat_fsi_nxt          ;hint is above 65535
     ld      a,e
     cp      2                       ;hint below 2 is unknown
     jr      NC,fat_fsi_nxt          ;hint >= 2
@@ -1198,6 +1198,19 @@ cfo_shr:
     dec     b
     jp      NZ,cfo_shr              ;shifts left
 cfo_ci:
+    ld      a,c
+    or      a
+    jp      NZ,cfo_bad              ;cluster index does not fit in 16 bits
+    ld      a,(_cpm_fat_vol+6)
+    ld      hl,_cpm_fat_vol+7
+    or      (hl)
+    jr      NZ,cfo_ci_ok            ;n_fatent above 65535
+    ld      hl,(_cpm_fat_vol+4)
+    ld      bc,de
+    sub     hl,bc                   ;n_fatent - index
+    jp      C,cfo_bad               ;index is past the FAT
+    jp      Z,cfo_bad
+cfo_ci_ok:
     ex      de,hl
     ld      (fat_work+4),hl         ;want_ci — kept for the cache store
     ld      hl,clst_cache_sclust
@@ -1925,7 +1938,7 @@ dir_next_dyn:
     ld      hl,(dir_clust)
     ex      de,hl
     call    get_fat                 ;NC: next link unreadable
-    jr      NC,dir_next_end         ;FAT read failed
+    jp      NC,dir_next_io          ;FAT read failed
     ld      a,b
     cp      $0F                     ;EOC high byte
     jr      NZ,dir_next_got         ;link is a cluster number
@@ -1943,13 +1956,13 @@ dir_next_got:
     sbc     a,0
     ld      a,b
     sbc     a,0
-    jr      C,dir_next_end          ;cluster < 2
+    jp      C,dir_next_io           ;cluster < 2
     ld      hl,de
     ld      (dir_clust),hl
     ld      hl,bc
     ld      (dir_clust+2),hl
     call    clst2sect               ;NC: next cluster has no LBA
-    jr      NC,dir_next_end         ;no sector for the next cluster
+    jp      NC,dir_next_io          ;no sector for the next cluster
     ld      hl,de
     ld      (dir_sect),hl
     ld      hl,bc
@@ -1960,11 +1973,16 @@ dir_next_win:
     ld      hl,(dir_sect)
     ex      de,hl
     call    fat_move_window         ;C: next directory sector in fatwin
-    ret     NC                      ;directory sector unread
+    jp      NC,dir_next_io          ;directory sector unread
     ld      hl,fatwin               ;ofs % 512 == 0
     ld      (dir_ptr),hl
     scf                             ;C: dir_ptr at the new sector
     ret
 dir_next_end:
-    or      a                       ;NC: no next dirent
+    xor     a                       ;NC+Z: end of the directory
+    ret
+
+dir_next_io:
+    ld      a,1
+    or      a                       ;NC+NZ: disk or chain error
     ret

@@ -21,7 +21,9 @@ f_chdrive:
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
-    ex      de,hl
+    push    de
+    ld      de,hl
+    pop     hl
     ld      a,h
     or      l
     jp      Z,mf_ok

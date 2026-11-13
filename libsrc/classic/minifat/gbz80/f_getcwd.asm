@@ -33,13 +33,13 @@ f_getcwd:
     ld      (fat_user),de
     ld      a,d
     or      e
-    jp      Z,fg_par
+    jr      Z,fg_par
     ld      a,(fat_left)
     or      a
     call    fat_ldhl
     defw    fat_left
     or      h
-    jp      Z,fg_par
+    jr      Z,fg_par
     call    mf_ensure
     ret     NC
     call    fat_ldhl
@@ -49,7 +49,7 @@ f_getcwd:
     dec     de
     ld      a,d
     or      e
-    jp      Z,fg_core
+    jr      Z,fg_core
     ld      hl,fat_cwd_str
     ld      bc,(fat_user)
 fg_cp:
@@ -62,7 +62,7 @@ fg_cp:
     dec     de
     ld      a,d
     or      e
-    jp      NZ,fg_cp
+    jr      NZ,fg_cp
 fg_core:
     call    fat_ldhl
     defw    fat_user

@@ -36,13 +36,13 @@ f_chdir:
     call    fat_ldhl
     defw    fat_path
     call    mf_follow
-    jp      NC,fh_miss
+    jr      NC,fh_miss
     ld      a,(fat_noname)
     or      a
-    jp      NZ,fh_ok
+    jr      NZ,fh_ok
     ld      a,(fat_attr)
     and     AM_DIR
-    jp      NZ,fh_ok
+    jr      NZ,fh_ok
     ld      a,FR_NO_PATH
     jp      mf_err
 fh_ok:

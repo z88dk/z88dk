@@ -48,10 +48,10 @@ f_mkdir:
     call    fat_ldhl
     defw    fat_path
     call    mf_follow
-    jp      NC,mk_miss
+    jr      NC,mk_miss
     ld      a,(fat_noname)
     or      a
-    jp      NZ,mk_name
+    jr      NZ,mk_name
     ld      a,FR_EXIST
     jp      mf_err
 mk_name:
@@ -72,7 +72,7 @@ mk_miss:
     ld      de,0
     ld      bc,0
     call    create_chain
-    jp      C,mk_got
+    jr      C,mk_got
     ld      a,FR_DENIED
     jp      mf_err
 mk_got:
@@ -90,7 +90,7 @@ mk_got:
 mk_sp1:
     ld      (hl+),a
     dec     b
-    jp      nz,mk_sp1
+    jr      nz,mk_sp1
     ld      (hl),AM_DIR
     ld      hl,fatwin+DIR_ClusLO
     ld      de,(fat_hold)
@@ -108,7 +108,7 @@ mk_sp1:
 mk_sp2:
     ld      (hl+),a
     dec     b
-    jp      nz,mk_sp2
+    jr      nz,mk_sp2
     ld      (hl),AM_DIR
     ld      hl,fatwin+32+DIR_ClusLO
     ld      de,(fat_cfo)
@@ -119,10 +119,10 @@ mk_sp2:
     ld      a,1
     ld      (fat_wflag),a
     call    fat_sync_window
-    jp      NC,mk_disk
+    jr      NC,mk_disk
     ld      hl,fat_name11
     call    dir_create
-    jp      NC,mk_deny
+    jr      NC,mk_deny
     call    fat_ldhl
     defw    dir_ptr
     ld      de,DIR_Attr
@@ -143,7 +143,7 @@ mk_sp2:
     ld      de,(fat_hold+2)
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT32
-    jp      Z,mk_ent_hi
+    jr      Z,mk_ent_hi
     ld      de,0
 mk_ent_hi:
     ld      (hl),e
@@ -177,7 +177,7 @@ mk_free:
 mk_hi_self:
     ld      hl,fatwin+DIR_ClusHI
     ld      de,(fat_hold+2)
-    jp      mk_hi_put
+    jr      mk_hi_put
 
 ; High cluster word of ".." . The parent cluster is fat_cfo.
 mk_hi_parent:
@@ -186,7 +186,7 @@ mk_hi_parent:
 mk_hi_put:
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT32
-    jp      Z,mk_hi_st
+    jr      Z,mk_hi_st
     ld      de,0
 mk_hi_st:
     ld      (hl),e

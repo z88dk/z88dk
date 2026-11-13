@@ -65,16 +65,16 @@ f_open:
 fo_z:
     ld      (hl+),a
     dec     b
-    jp      nz,fo_z
+    jr      nz,fo_z
     call    mf_ensure
     jp      NC,fo_keep
     call    fat_ldhl
     defw    fat_path
     call    mf_follow
-    jp      NC,fo_absent
+    jr      NC,fo_absent
     ld      a,(fat_mode)
     and     FA_CREATE_MASK
-    jp      Z,fo_old
+    jr      Z,fo_old
     ld      a,(fat_noname)
     or      a
     jp      NZ,fo_name
@@ -86,11 +86,11 @@ fo_z:
     jp      NZ,fo_deny
     ld      a,(fat_mode)
     and     FA_CREATE_ALWAYS
-    jp      Z,fo_bound
+    jr      Z,fo_bound
     call    mf_bind
     call    mf_trunc
     jp      NC,fo_keep
-    jp      fo_tail
+    jr      fo_tail
 fo_new:
     ld      a,l
     cp      FR_NO_FILE
@@ -104,18 +104,18 @@ fo_new:
 fo_zf:
     ld      (hl+),a
     dec     b
-    jp      nz,fo_zf
+    jr      nz,fo_zf
     call    mf_mark_arc
     call    mf_save_dir
     ld      a,(fat_mode)
     or      FA_MODIFIED
     ld      (fat_mode),a
-    jp      fo_bound
+    jr      fo_bound
 fo_absent:
     ld      a,(fat_mode)
     and     FA_CREATE_MASK
     jp      Z,fo_keep
-    jp      fo_new
+    jr      fo_new
 fo_old:
     ld      a,(fat_noname)
     or      a
@@ -125,7 +125,7 @@ fo_old:
     jp      NZ,fo_nofile
     ld      a,(fat_mode)
     and     FA_WRITE
-    jp      Z,fo_bound
+    jr      Z,fo_bound
     ld      a,(fat_attr)
     and     AM_RDO
     jp      NZ,fo_deny
@@ -164,13 +164,13 @@ fo_tail:
     ld      bc,4
     call    mf_copy
     call    mf_place
-    jp      NC,fo_keep
+    jr      NC,fo_keep
     call    fat_ldhl
     defw    fat_fp
     ld      de,FIL_FPTR
     add     hl,de
     ld      a,(hl+)
-    jp      NZ,fo_fill
+    jr      NZ,fo_fill
     ld      a,(hl)
     and     1
     jp      Z,mf_ok
@@ -178,25 +178,25 @@ fo_fill:
     xor     a
     ld      (fat_write),a
     call    mf_sector_for_fptr
-    jp      NC,fo_sec
+    jr      NC,fo_sec
     call    mf_cache_prepare
     jp      C,mf_ok
-    jp      fo_keep
+    jr      fo_keep
 fo_sec:
     ld      a,h
     or      l
-    jp      NZ,fo_keep
+    jr      NZ,fo_keep
     ld      a,FR_INT_ERR
-    jp      fo_bad
+    jr      fo_bad
 fo_name:
     ld      a,FR_INVALID_NAME
-    jp      fo_bad
+    jr      fo_bad
 fo_exist:
     ld      a,FR_EXIST
-    jp      fo_bad
+    jr      fo_bad
 fo_deny:
     ld      a,FR_DENIED
-    jp      fo_bad
+    jr      fo_bad
 fo_nofile:
     ld      a,FR_NO_FILE
 fo_bad:
@@ -215,7 +215,7 @@ fo_kill:
     defw    fat_fp
     ld      a,h
     or      l
-    jp      Z,fo_kill0
+    jr      Z,fo_kill0
     ld      (hl),0
     inc     hl
     ld      (hl),0

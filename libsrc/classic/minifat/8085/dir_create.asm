@@ -60,23 +60,27 @@ dc_loop:
     ld      hl,(dir_sect+2)
     push    hl
     call    dir_next                ;C: a later dirent
-    jr      NC,dc_at_end            ;no free slot in this chain
-    ld      hl,10
-    add     hl,sp
+    jr      C,dc_resume
+    jr      Z,dc_at_end             ;clean end: stretch or fail
+    jr      dc_full                 ;disk error: do not stretch
+dc_resume:
+    ld      de,sp+10
+    ex      de,hl
     ld      sp,hl
     jr      dc_loop
 dc_at_end:
     call    dir_stretch             ;C: FAT32 grew a cluster
     jr      C,dc_stretched          ;new cluster is zeroed
-    ld      hl,10
-    add     hl,sp
+dc_full:
+    ld      de,sp+10
+    ex      de,hl
     ld      sp,hl
     ld      hl,1
     or      a                       ;NC: directory is full
     ret
 dc_stretched:
-    ld      hl,10
-    add     hl,sp
+    ld      de,sp+10
+    ex      de,hl
     ld      sp,hl
     jr      dc_loop
 dc_fill:

@@ -3,6 +3,8 @@
 ; 32-byte entry is copied, the new name is registered, bytes 13..31
 ; and the attribute are written onto it, and ".." is updated when a
 ; directory moves to another parent. The old entry is then deleted.
+; A directory may be moved into its own descendant. FatFs R0.16 does
+; the same.
 ; new path at sp+2, old path at sp+4. The caller cleans.
 ;
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
@@ -64,7 +66,7 @@ f_rename:
     ret     NC
     ld      a,(fat_noname)
     or      a
-    jp      Z,rn_save
+    jr      Z,rn_save
     ld      a,FR_INVALID_NAME
     jp      mf_err
 rn_save:
@@ -106,7 +108,7 @@ rn_save:
     call    fat_ldhl
     defw    fat_dp
     call    mf_follow
-    jp      NC,rn_miss
+    jr      NC,rn_miss
     call    fat_ldhl
     defw    dir_sect
     ld      de,(rn_sect)
@@ -115,7 +117,7 @@ rn_save:
     ld      bc,de
     call    mf_subhlbc
     pop     bc
-    jp      NZ,rn_exist
+    jr      NZ,rn_exist
     call    fat_ldhl
     defw    dir_sect+2
     ld      de,(rn_sect+2)
@@ -124,7 +126,7 @@ rn_save:
     ld      bc,de
     call    mf_subhlbc
     pop     bc
-    jp      NZ,rn_exist
+    jr      NZ,rn_exist
     call    fat_ldhl
     defw    dir_ofs
     ld      de,(rn_ofs)
@@ -133,7 +135,7 @@ rn_save:
     ld      bc,de
     call    mf_subhlbc
     pop     bc
-    jp      Z,rn_create
+    jr      Z,rn_create
 rn_exist:
     ld      a,FR_EXIST
     jp      mf_err
@@ -144,7 +146,7 @@ rn_miss:
 rn_create:
     ld      hl,fat_name11
     call    dir_create
-    jp      C,rn_copy
+    jr      C,rn_copy
     ld      a,FR_DENIED
     jp      mf_err
 rn_copy:
@@ -165,7 +167,7 @@ rn_copy:
     ld      a,(rn_attr)
     ld      (hl),a
     and     AM_DIR
-    jp      NZ,rn_dirty
+    jr      NZ,rn_dirty
     ld      a,(hl)
     or      AM_ARC
     ld      (hl),a
@@ -183,7 +185,7 @@ rn_dirty:
     ld      bc,de
     call    mf_subhlbc
     pop     bc
-    jp      NZ,rn_dot
+    jr      NZ,rn_dot
     call    fat_ldhl
     defw    fat_parent+2
     ld      de,(rn_parent+2)
@@ -192,17 +194,17 @@ rn_dirty:
     ld      bc,de
     call    mf_subhlbc
     pop     bc
-    jp      Z,rn_old
+    jr      Z,rn_old
 rn_dot:
     ld      de,(rn_clust)
     ld      bc,(rn_clust+2)
     call    clst2sect
-    jp      NC,rn_int
+    jr      NC,rn_int
     call    fat_move_window
-    jp      NC,rn_disk
+    jr      NC,rn_disk
     ld      a,(fatwin+33)
     cp      '.'
-    jp      NZ,rn_old
+    jr      NZ,rn_old
     ld      hl,fatwin+32+DIR_ClusLO
     ld      de,(fat_parent)
     ld      (hl),e
@@ -211,7 +213,7 @@ rn_dot:
     ld      de,(fat_parent+2)
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT32
-    jp      Z,rn_phi
+    jr      Z,rn_phi
     ld      de,0
 rn_phi:
     ld      hl,fatwin+32+DIR_ClusHI
@@ -224,7 +226,7 @@ rn_old:
     ld      de,(rn_sect)
     ld      bc,(rn_sect+2)
     call    fat_move_window
-    jp      NC,rn_disk
+    jr      NC,rn_disk
     call    fat_ldhl
     defw    rn_ofs
     ld      a,h

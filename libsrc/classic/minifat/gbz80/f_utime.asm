@@ -43,7 +43,7 @@ f_utime:
     ret     NC
     ld      a,(fat_noname)
     or      a
-    jp      Z,fu_set
+    jr      Z,fu_set
     ld      a,FR_INVALID_NAME
     jp      mf_err
 fu_set:
@@ -51,7 +51,7 @@ fu_set:
     defw    fat_user
     ld      a,h
     or      l
-    jp      Z,fu_sync
+    jr      Z,fu_sync
     ld      de,FI_DATE
     add     hl,de
     ld      e,(hl)
@@ -59,7 +59,7 @@ fu_set:
     ld      d,(hl)
     ld      a,d
     or      e
-    jp      Z,fu_sync
+    jr      Z,fu_sync
     push    de
     call    fat_ldhl
     defw    fat_user

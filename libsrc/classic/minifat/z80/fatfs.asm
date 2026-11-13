@@ -1112,6 +1112,19 @@ cfo_shr:
     rr      e
     djnz    cfo_shr                 ;index is still shifting
 cfo_ci:
+    ld      a,c
+    or      a
+    jp      NZ,cfo_bad              ;cluster index does not fit in 16 bits
+    ld      a,(_cpm_fat_vol+6)
+    ld      hl,_cpm_fat_vol+7
+    or      (hl)
+    jr      NZ,cfo_ci_ok            ;n_fatent above 65535
+    ld      hl,(_cpm_fat_vol+4)
+    or      a
+    sbc     hl,de                   ;n_fatent - index
+    jp      C,cfo_bad               ;index is past the FAT
+    jp      Z,cfo_bad
+cfo_ci_ok:
     ld      (fat_work+4),de         ;want_ci — kept for the cache store
     ld      hl,clst_cache_sclust
     ld      a,(fat_work)
@@ -1768,7 +1781,7 @@ dir_next_dyn:
     ld      de,(dir_clust)
     ld      bc,(dir_clust+2)
     call    get_fat                 ;next cluster of this directory
-    jp      NC,dir_next_end         ;bad cluster or unreadable
+    jp      NC,dir_next_io          ;bad cluster or unreadable
     ld      a,b
     cp      $0F                     ;top nibble vs $0F
     jr      NZ,dir_next_got         ;not an end mark
@@ -1786,22 +1799,27 @@ dir_next_got:
     sbc     a,0
     ld      a,b
     sbc     a,0
-    jp      C,dir_next_end          ;cluster < 2
+    jp      C,dir_next_io           ;cluster < 2
     ld      (dir_clust),de
     ld      (dir_clust+2),bc
     call    clst2sect               ;LBA of the next cluster
-    jp      NC,dir_next_end         ;next cluster has no LBA
+    jp      NC,dir_next_io          ;next cluster has no LBA
     ld      (dir_sect),de
     ld      (dir_sect+2),bc
 dir_next_win:
     ld      de,(dir_sect)
     ld      bc,(dir_sect+2)
     call    fat_move_window         ;directory sector into fatwin
-    ret     NC                      ;directory sector not read
+    jp      NC,dir_next_io          ;directory sector not read
     ld      hl,fatwin               ;ofs % 512 == 0
     ld      (dir_ptr),hl
     scf
     ret
 dir_next_end:
-    or      a
+    xor     a                       ;NC+Z: end of the directory
+    ret
+
+dir_next_io:
+    ld      a,1
+    or      a                       ;NC+NZ: disk or chain error
     ret

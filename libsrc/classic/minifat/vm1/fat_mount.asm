@@ -144,8 +144,13 @@ fat_mount:
 fat_mount_cold:
     push    bc
     call    fat_ide_bringup         ;C: drive came ready
-    jp      NC,fat_mount_cold1      ;not ready yet
+    jp      C,fat_mount_up
+    ld      a,3                     ;FR_NOT_READY
+    ld      (_cpm_fat_vol+27),a
+    jp      fat_mount_cold1
+fat_mount_up:
     xor     a
+    ld      (_cpm_fat_vol+27),a     ;a later check is not a disk error
     ld      (fat_wflag),a
     ld      (_cpm_fat_vol+25),a     ;free_valid
     ld      (fat_last_clst),a
@@ -168,7 +173,11 @@ fat_mount_cold:
     ld      bc,0
     ld      de,0
     call    fat_move_window         ;read LBA 0 into fatwin
-    jp      NC,fat_mount_cold1      ;LBA 0 unread
+    jp      C,fat_mount_lba0
+    ld      a,1                     ;FR_DISK_ERR
+    ld      (_cpm_fat_vol+27),a
+    jp      fat_mount_cold1
+fat_mount_lba0:
     call    fat_check_vbr           ;C: LBA 0 looks like a VBR
     pop     bc
     jp      C,fat_parse_bpb         ;superfloppy VBR
@@ -217,7 +226,13 @@ fat_mount_trypt:
     cp      (MAX_LBA28>>24)+1       ;high byte past $0FFFFFFF
     jr      NC,fat_mount_nextpt     ;start LBA above 28 bits
     call    fat_move_window         ;read that partition VBR
-    jr      NC,fat_mount_nextpt     ;partition unread
+    jr      C,fat_mount_ptok
+    ld      a,1                     ;FR_DISK_ERR
+    ld      (_cpm_fat_vol+27),a
+    jr      fat_mount_nextpt
+fat_mount_ptok:
+    xor     a
+    ld      (_cpm_fat_vol+27),a     ;this sector was read
     call    fat_check_vbr           ;C: this PTE is a FAT VBR
     jr      C,fat_mount_gotpt       ;use this partition
 fat_mount_nextpt:
@@ -424,16 +439,16 @@ fat_mount_ncl:
     or      e
     jp      Z,fat_mount_fail        ;no data clusters
     ld      a,h
-    or      a
-    jp      NZ,fat_mount_fail       ;nclst >= $01000000
-    ld      a,l
     cp      $10
-    jp      NC,fat_mount_fail       ;nclst >= $00100000
+    jp      NC,fat_mount_fail       ;nclst >= $10000000
     cp      $0F
-    jr      NZ,fat_mount_band       ;high word is not $0FFF
+    jr      NZ,fat_mount_band       ;below $0F000000
+    ld      a,l
+    inc     a
+    jr      NZ,fat_mount_band       ;byte 2 is not $FF
     ld      a,d
     inc     a
-    jr      NZ,fat_mount_band       ;low word < $FF00
+    jr      NZ,fat_mount_band       ;byte 1 is not $FF
     ld      a,e
     cp      (MAX_FAT32 & $FF)+1     ;low byte past $0FFFFFF5
     jp      NC,fat_mount_fail       ;nclst > $0FFFFFF5
@@ -651,6 +666,22 @@ fat_mount_r32:
     sbc     a,0
     jp      C,fat_mount_fail        ;RootClus < 2
     ld      hl,(fatwin+BPB_RootClus32)
+    ld      de,(_cpm_fat_vol+4)     ;n_fatent low
+    or      a
+    ld      a,l
+    sub     e
+    ld      a,h
+    sbc     a,d
+    push    af
+    ld      hl,(fatwin+BPB_RootClus32+2)
+    ld      de,(_cpm_fat_vol+6)     ;n_fatent high
+    pop     af
+    ld      a,l
+    sbc     a,e
+    ld      a,h
+    sbc     a,d
+    jp      NC,fat_mount_fail       ;RootClus >= n_fatent
+    ld      hl,(fatwin+BPB_RootClus32)
     ld      (_cpm_fat_vol+12),hl
     ld      hl,(fatwin+BPB_RootClus32+2)
     ld      (_cpm_fat_vol+14),hl
@@ -723,8 +754,8 @@ fat_mount_fail:
     ld      (_cpm_fat_vol+27),a
     ld      a,l
     or      a
-    jr      NZ,fat_mount_code       ;L already holds FR 19
-    ld      l,1
+    jr      NZ,fat_mount_code       ;1, 3, or 19 already in L
+    ld      l,13                    ;FR_NO_FILESYSTEM
 fat_mount_code:
     ld      h,0
     or      a                       ;NC: mount failed

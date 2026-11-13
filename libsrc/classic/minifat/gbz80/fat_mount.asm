@@ -62,39 +62,39 @@ DEFC    PTE_StLba       = 8
 fat_check_vbr:
     ld      a,(fatwin+BS_55AA)
     cp      $55                     ;55AA low byte
-    jp      NZ,fat_check_fail       ;not a VBR
+    jr      NZ,fat_check_fail       ;not a VBR
     ld      a,(fatwin+BS_55AA+1)
     cp      $AA                     ;55AA high byte
-    jp      NZ,fat_check_fail       ;not a VBR
+    jr      NZ,fat_check_fail       ;not a VBR
     ld      a,(fatwin+BPB_BytsPerSec)
     or      a
-    jp      NZ,fat_check_fail       ;BytsPerSec low byte nonzero
+    jr      NZ,fat_check_fail       ;BytsPerSec low byte nonzero
     ld      a,(fatwin+BPB_BytsPerSec+1)
     cp      2                       ;512
-    jp      NZ,fat_check_fail       ;not 512 bytes/sector
+    jr      NZ,fat_check_fail       ;not 512 bytes/sector
     ld      a,(fatwin+BPB_SecPerClus)
     or      a
-    jp      Z,fat_check_fail        ;SecPerClus is 0
+    jr      Z,fat_check_fail        ;SecPerClus is 0
     ld      b,a
     dec     a
     and     b
-    jp      NZ,fat_check_fail       ;not 2^n
+    jr      NZ,fat_check_fail       ;not 2^n
     ld      a,b
     cp      65                      ;64 KiB clusters do not fit the 16-bit math
-    jp      C,fat_check_rsvd        ;csize below 65
+    jr      C,fat_check_rsvd        ;csize below 65
     ld      a,19                    ;FR_INVALID_PARAMETER
     ld      (_cpm_fat_vol+27),a
-    jp      fat_check_fail
+    jr      fat_check_fail
 fat_check_rsvd:
     ld      a,(fatwin+BPB_RsvdSecCnt)
     ld      hl,fatwin+BPB_RsvdSecCnt+1
     or      (hl)
-    jp      Z,fat_check_fail        ;reserved count is 0
+    jr      Z,fat_check_fail        ;reserved count is 0
     ld      a,(fatwin+BPB_NumFATs)
     cp      1                       ;NumFATs
-    jp      Z,fat_check_ok          ;one FAT
+    jr      Z,fat_check_ok          ;one FAT
     cp      2                       ;NumFATs
-    jp      NZ,fat_check_fail       ;not 1 or 2 FATs
+    jr      NZ,fat_check_fail       ;not 1 or 2 FATs
 fat_check_ok:
     scf                             ;C: VBR shape accepted
     ret
@@ -107,10 +107,12 @@ fat_check_fail:
 fat_ide_delay:
     xor     a
 fat_ide_d0:
-    ex      (sp),hl
-    ex      (sp),hl
+    push    hl
+    pop     hl
+    push    hl
+    pop     hl
     dec     a
-    jp      NZ,fat_ide_d0           ;delay not finished
+    jr      NZ,fat_ide_d0           ;delay not finished
     ret
 
 ; 8 tries of disk_initialize with delay. C: ready. NC: still busy.
@@ -124,7 +126,7 @@ fat_ide_br1:
     ret     C                       ;ready
     call    fat_ide_delay           ;pause before the next try
     dec     b
-    jp      NZ,fat_ide_br1          ;tries left
+    jr      NZ,fat_ide_br1          ;tries left
     or      a                       ;NC: drive stayed busy
     ret
 
@@ -147,8 +149,13 @@ fat_mount:
 fat_mount_cold:
     push    bc
     call    fat_ide_bringup         ;C: drive came ready
-    jp      NC,fat_mount_cold1      ;not ready yet
+    jr      C,fat_mount_up
+    ld      a,3                     ;FR_NOT_READY
+    ld      (_cpm_fat_vol+27),a
+    jr      fat_mount_cold1
+fat_mount_up:
     xor     a
+    ld      (_cpm_fat_vol+27),a     ;a later check is not a disk error
     ld      (fat_wflag),a
     ld      (_cpm_fat_vol+25),a     ;free_valid
     ld      (fat_last_clst),a
@@ -173,22 +180,26 @@ fat_mount_cold:
     ld      bc,0
     ld      de,0
     call    fat_move_window         ;read LBA 0 into fatwin
-    jp      NC,fat_mount_cold1      ;LBA 0 unread
+    jr      C,fat_mount_lba0
+    ld      a,1                     ;FR_DISK_ERR
+    ld      (_cpm_fat_vol+27),a
+    jr      fat_mount_cold1
+fat_mount_lba0:
     call    fat_check_vbr           ;C: LBA 0 looks like a VBR
     pop     bc
-    jp      C,fat_parse_bpb         ;superfloppy VBR
+    jr      C,fat_parse_bpb         ;superfloppy VBR
     ld      a,(fatwin+BS_55AA)
     cp      $55                     ;55AA low byte
-    jp      NZ,fat_mount_cold2      ;not an MBR either
+    jr      NZ,fat_mount_cold2      ;not an MBR either
     ld      a,(fatwin+BS_55AA+1)
     cp      $AA                     ;55AA high byte
-    jp      NZ,fat_mount_cold2      ;not an MBR either
-    jp      fat_mount_mbr
+    jr      NZ,fat_mount_cold2      ;not an MBR either
+    jr      fat_mount_mbr
 fat_mount_cold1:
     pop     bc
 fat_mount_cold2:
     dec     b
-    jp      NZ,fat_mount_cold       ;cold-start tries left
+    jr      NZ,fat_mount_cold       ;cold-start tries left
     jp      fat_mount_fail
 
 fat_mount_mbr:
@@ -203,7 +214,7 @@ fat_mount_savept:
     add     hl,bc
     pop     bc
     dec     b
-    jp      NZ,fat_mount_savept     ;four primary PTEs
+    jr      NZ,fat_mount_savept     ;four primary PTEs
     ld      hl,fat_work
     ld      b,4
 fat_mount_trypt:
@@ -217,21 +228,27 @@ fat_mount_trypt:
     or      c
     or      d
     or      e
-    jp      Z,fat_mount_nextpt      ;empty partition
+    jr      Z,fat_mount_nextpt      ;empty partition
     ld      a,b
     cp      (MAX_LBA28>>24)+1       ;high byte past $0FFFFFFF
-    jp      NC,fat_mount_nextpt     ;start LBA above 28 bits
+    jr      NC,fat_mount_nextpt     ;start LBA above 28 bits
     call    fat_move_window         ;read that partition VBR
-    jp      NC,fat_mount_nextpt     ;partition unread
+    jr      C,fat_mount_ptok
+    ld      a,1                     ;FR_DISK_ERR
+    ld      (_cpm_fat_vol+27),a
+    jr      fat_mount_nextpt
+fat_mount_ptok:
+    xor     a
+    ld      (_cpm_fat_vol+27),a     ;this sector was read
     call    fat_check_vbr           ;C: this PTE is a FAT VBR
-    jp      C,fat_mount_gotpt       ;use this partition
+    jr      C,fat_mount_gotpt       ;use this partition
 fat_mount_nextpt:
     pop     hl
     ld      bc,4
     add     hl,bc
     pop     bc
     dec     b
-    jp      NZ,fat_mount_trypt      ;more primary PTEs
+    jr      NZ,fat_mount_trypt      ;more primary PTEs
     jp      fat_mount_fail
 fat_mount_gotpt:
     pop     hl
@@ -247,21 +264,27 @@ fat_parse_bpb:
     defw    _cpm_fat_vol+2     ;n_rootent
     call    fat_ldhl
     defw    fatwin+BPB_FATSz16
-    ex      de,hl
+    push    de
+    ld      de,hl
+    pop     hl
     ld      a,d
     or      e
-    jp      NZ,fat_mount_fsz        ;FATSz16 is nonzero
+    jr      NZ,fat_mount_fsz        ;FATSz16 is nonzero
     call    fat_ldhl
     defw    fatwin+BPB_FATSz32+2
     ld      bc,hl
     call    fat_ldhl
     defw    fatwin+BPB_FATSz32
-    ex      de,hl
-    jp      fat_mount_fsz32
+    push    de
+    ld      de,hl
+    pop     hl
+    jr      fat_mount_fsz32
 fat_mount_fsz:
     ld      bc,0
 fat_mount_fsz32:
-    ex      de,hl
+    push    de
+    ld      de,hl
+    pop     hl
     call    fat_sthl
     defw    _cpm_fat_vol+20    ;fatsz
     ld      hl,bc
@@ -277,29 +300,31 @@ fat_mount_fsz32:
     defw    fatwin+BPB_TotSec16
     ld      a,h
     or      l
-    jp      NZ,fat_mount_tsz16      ;TotSec16 is nonzero
+    jr      NZ,fat_mount_tsz16      ;TotSec16 is nonzero
     call    fat_ldhl
     defw    fatwin+BPB_TotSec32+2
-    ex      de,hl
+    ld      de,hl
     call    fat_ldhl
     defw    fatwin+BPB_TotSec32
-    jp      fat_mount_tsz
+    jr      fat_mount_tsz
 fat_mount_tsz16:
     ld      de,0
 fat_mount_tsz:
     call    fat_sthl
     defw    fat_work+4         ;tsect
-    ex      de,hl
+    push    de
+    ld      de,hl
+    pop     hl
     call    fat_sthl
     defw    fat_work+6
     call    fat_ldhl
     defw    _cpm_fat_vol+22
-    ex      de,hl
+    ld      de,hl
     call    fat_ldhl
     defw    _cpm_fat_vol+20    ;fatsz
     ld      a,(_cpm_fat_vol+24)
     cp      2                       ;two FATs
-    jp      NZ,fat_mount_fatarea    ;single FAT
+    jr      NZ,fat_mount_fatarea    ;single FAT
     add     hl,hl                   ;fatsz<<1; high half is rl de
     call    fat_rlde                      ;fatsz * n_fats
     jp      C,fat_mount_fail        ;CVE-2026-6682 analog
@@ -308,7 +333,7 @@ fat_mount_fatarea:
     call    fat_ldhl
     defw    fatwin+BPB_RsvdSecCnt
     add     hl,bc                   ;reserved + FAT area
-    jp      NC,fat_mount_sy1        ;sum fits in 16 bits
+    jr      NC,fat_mount_sy1        ;sum fits in 16 bits
     inc     de
     ld      a,d
     or      e
@@ -320,16 +345,16 @@ fat_mount_sy1:
     ld      a,h
     or      l
     pop     hl
-    jp      Z,fat_mount_r32root     ;FATSz16 == 0
+    jr      Z,fat_mount_r32root     ;FATSz16 == 0
     push    hl
     call    fat_ldhl
     defw    _cpm_fat_vol+2     ;n_rootent
     ld      a,h
     or      l
-    jp      Z,fat_mount_rootbad     ;FAT16 root count is 0
+    jr      Z,fat_mount_rootbad     ;FAT16 root count is 0
     ld      a,l
     and     $0F
-    jp      NZ,fat_mount_rootbad    ;not a whole number of sectors
+    jr      NZ,fat_mount_rootbad    ;not a whole number of sectors
     ld      bc,hl
     pop     hl
     ld      a,b
@@ -360,27 +385,27 @@ fat_mount_sy1:
     ld      a,c
     rra
     ld      c,a                     ;root sectors = n_rootent/16
-    jp      fat_mount_addroot
+    jr      fat_mount_addroot
 fat_mount_r32root:
     push    hl
     call    fat_ldhl
     defw    fatwin+BPB_RootEntCnt
     ld      a,h
     or      l
-    jp      NZ,fat_mount_rootbad    ;FAT32 root count must be 0
+    jr      NZ,fat_mount_rootbad    ;FAT32 root count must be 0
     ld      a,(fatwin+BPB_FSVer)
     ld      hl,fatwin+BPB_FSVer+1
     or      (hl)
-    jp      NZ,fat_mount_rootbad    ;FSVer must be 0
+    jr      NZ,fat_mount_rootbad    ;FSVer must be 0
     pop     hl
     ld      bc,0                    ;FAT32 has no static root
-    jp      fat_mount_addroot
+    jr      fat_mount_addroot
 fat_mount_rootbad:
     pop     hl
     jp      fat_mount_fail
 fat_mount_addroot:
     add     hl,bc                   ;add static root sectors
-    jp      NC,fat_mount_sy2        ;sum fits in 16 bits
+    jr      NC,fat_mount_sy2        ;sum fits in 16 bits
     inc     de
     ld      a,d
     or      e
@@ -388,7 +413,9 @@ fat_mount_addroot:
 fat_mount_sy2:
     call    fat_sthl
     defw    fat_work+8         ;sysect
-    ex      de,hl
+    push    de
+    ld      de,hl
+    pop     hl
     call    fat_sthl
     defw    fat_work+10
     call    fat_ldhl
@@ -419,18 +446,18 @@ fat_mount_log:
     or      a                       ;csize >> 1; rra leaves Z stale
     rra
     or      a
-    jp      Z,fat_mount_shr         ;log2(csize) is in B
+    jr      Z,fat_mount_shr         ;log2(csize) is in B
     inc     b
-    jp      fat_mount_log
+    jr      fat_mount_log
 fat_mount_shr:
     call    fat_ldhl
     defw    fat_work+14
-    ex      de,hl
+    ld      de,hl
     call    fat_ldhl
     defw    fat_work+12
     ld      a,b
     or      a
-    jp      Z,fat_mount_ncl         ;no divide: nclst = data sectors
+    jr      Z,fat_mount_ncl         ;no divide: nclst = data sectors
 fat_mount_shrl:
     ld      a,d
     or      a                       ;nclst >>= 1 through rra
@@ -446,11 +473,13 @@ fat_mount_shrl:
     rra
     ld      l,a
     dec     b
-    jp      NZ,fat_mount_shrl       ;shifts left
+    jr      NZ,fat_mount_shrl       ;shifts left
 fat_mount_ncl:
     call    fat_sthl
     defw    fat_work+12        ;nclst low
-    ex      de,hl
+    push    de
+    ld      de,hl
+    pop     hl
     call    fat_sthl
     defw    fat_work+14        ;nclst high
     ld      a,h
@@ -459,32 +488,32 @@ fat_mount_ncl:
     or      e
     jp      Z,fat_mount_fail        ;no data clusters
     ld      a,h
-    or      a
-    jp      NZ,fat_mount_fail       ;nclst >= $01000000
-    ld      a,l
     cp      $10
-    jp      NC,fat_mount_fail       ;nclst >= $00100000
+    jp      NC,fat_mount_fail       ;nclst >= $10000000
     cp      $0F
-    jp      NZ,fat_mount_band       ;high word is not $0FFF
+    jr      NZ,fat_mount_band       ;below $0F000000
+    ld      a,l
+    inc     a
+    jr      NZ,fat_mount_band       ;byte 2 is not $FF
     ld      a,d
     inc     a
-    jp      NZ,fat_mount_band       ;low word < $FF00
+    jr      NZ,fat_mount_band       ;byte 1 is not $FF
     ld      a,e
     cp      (MAX_FAT32 & $FF)+1     ;low byte past $0FFFFFF5
     jp      NC,fat_mount_fail       ;nclst > $0FFFFFF5
 fat_mount_band:
     ld      a,h
     or      l
-    jp      NZ,fat_mount_fat32      ;nclst above 65535
+    jr      NZ,fat_mount_fat32      ;nclst above 65535
     ld      hl,de                   ;low still in DE
     ld      bc,MAX_FAT12+1
     call    fat_subhlbc                   ;nclst - ($0FF5+1)
-    jp      C,fat_mount_fat12       ;nclst <= $0FF5
+    jr      C,fat_mount_fat12       ;nclst <= $0FF5
     ld      hl,de
     ld      bc,MAX_FAT16
     call    fat_subhlbc                   ;nclst - $FFF5
-    jp      Z,fat_mount_fat16       ;$FFF5 stays FAT16
-    jp      NC,fat_mount_fat32      ;above $FFF5 is FAT32
+    jr      Z,fat_mount_fat16       ;$FFF5 stays FAT16
+    jr      NC,fat_mount_fat32      ;above $FFF5 is FAT32
 fat_mount_fat16:
     call    fat_ldhl
     defw    _cpm_fat_vol+2     ;FAT32 shape, count in the FAT16 band
@@ -492,7 +521,7 @@ fat_mount_fat16:
     or      l
     jp      Z,fat_mount_fail        ;FAT16 with an empty root
     ld      a,FS_FAT16
-    jp      fat_mount_type
+    jr      fat_mount_type
 fat_mount_fat32:
     call    fat_ldhl
     defw    fatwin+BPB_FATSz16 ;FAT16 shape, count in the FAT32 band
@@ -500,7 +529,7 @@ fat_mount_fat32:
     or      l
     jp      NZ,fat_mount_fail       ;FAT32 shape still has FATSz16
     ld      a,FS_FAT32
-    jp      fat_mount_type
+    jr      fat_mount_type
 fat_mount_fat12:
     call    fat_ldhl
     defw    _cpm_fat_vol+2     ;FAT12 uses the FAT16 root shape
@@ -512,12 +541,12 @@ fat_mount_type:
     ld      (_cpm_fat_vol+26),a     ;publish to +0 only at fat_mount_ok
     call    fat_ldhl
     defw    fat_work+14
-    ex      de,hl
+    ld      de,hl
     call    fat_ldhl
     defw    fat_work+12
     ld      bc,2
     add     hl,bc                   ;nclst + 2 = n_fatent
-    jp      NC,fat_mount_nfe        ;sum fits in 16 bits
+    jr      NC,fat_mount_nfe        ;sum fits in 16 bits
     inc     de
     ld      a,d
     or      e
@@ -525,7 +554,9 @@ fat_mount_type:
 fat_mount_nfe:
     call    fat_sthl
     defw    _cpm_fat_vol+4     ;n_fatent
-    ex      de,hl
+    push    de
+    ld      de,hl
+    pop     hl
     call    fat_sthl
     defw    _cpm_fat_vol+6
     call    fat_ldhl
@@ -533,19 +564,19 @@ fat_mount_nfe:
     ld      de,(_cpm_fat_vol+6)
     ld      a,(_cpm_fat_vol+26)     ;pending type
     cp      FS_FAT12                ;pending type vs FAT12
-    jp      Z,fat_mount_need12      ;FAT12 entries are 12 bits
+    jr      Z,fat_mount_need12      ;FAT12 entries are 12 bits
     cp      FS_FAT32                ;pending type
-    jp      Z,fat_mount_need32      ;FAT32 entries are 4 bytes
+    jr      Z,fat_mount_need32      ;FAT32 entries are 4 bytes
     ld      bc,255
     add     hl,bc                   ;round FAT16 bytes up
-    jp      NC,fat_mount_need16     ;sum fits in 16 bits
+    jr      NC,fat_mount_need16     ;sum fits in 16 bits
     inc     de
 fat_mount_need16:
     ld      l,h
     ld      h,e
     ld      e,d
     ld      d,0
-    jp      fat_mount_needc
+    jr      fat_mount_needc
 fat_mount_need12:
     push    hl
     add     hl,hl                   ;n_fatent * 2
@@ -567,11 +598,11 @@ fat_mount_need12:
     ld      l,a                     ;(bytes + 511) >> 9
     ld      h,0
     ld      de,0
-    jp      fat_mount_needc
+    jr      fat_mount_needc
 fat_mount_need32:
     ld      bc,127
     add     hl,bc                   ;round FAT32 bytes up
-    jp      NC,fat_mount_need32s    ;sum fits in 16 bits
+    jr      NC,fat_mount_need32s    ;sum fits in 16 bits
     inc     de
 fat_mount_need32s:
     ld      b,7
@@ -590,7 +621,7 @@ fat_mount_need32l:
     rra
     ld      l,a
     dec     b
-    jp      NZ,fat_mount_need32l    ;seven shifts left
+    jr      NZ,fat_mount_need32l    ;seven shifts left
 fat_mount_needc:
     ld      bc,(_cpm_fat_vol+20)    ;fatsz - needed (C if fatsz < needed)
     ld      a,c
@@ -649,7 +680,7 @@ fat_mount_needc:
     defw    _cpm_fat_vol+18
     ld      a,(_cpm_fat_vol+26)     ;pending type
     cp      FS_FAT32                ;pending type
-    jp      Z,fat_mount_r32         ;FAT32 dirbase is RootClus
+    jr      Z,fat_mount_r32         ;FAT32 dirbase is RootClus
     call    fat_ldhl
     defw    _cpm_fat_vol+2
     ld      bc,hl
@@ -711,6 +742,28 @@ fat_mount_r32:
     sbc     a,0
     jp      C,fat_mount_fail        ;RootClus < 2
     call    fat_ldhl
+    defw    _cpm_fat_vol+4          ;n_fatent low
+    push    hl
+    call    fat_ldhl
+    defw    _cpm_fat_vol+6          ;n_fatent high
+    ld      b,h
+    ld      c,l
+    pop     de
+    call    fat_ldhl
+    defw    fatwin+BPB_RootClus32
+    or      a
+    ld      a,l
+    sub     e
+    ld      a,h
+    sbc     a,d
+    call    fat_ldhl                ;carry and BC stay
+    defw    fatwin+BPB_RootClus32+2
+    ld      a,l
+    sbc     a,c
+    ld      a,h
+    sbc     a,b
+    jp      NC,fat_mount_fail       ;RootClus >= n_fatent
+    call    fat_ldhl
     defw    fatwin+BPB_RootClus32
     call    fat_sthl
     defw    _cpm_fat_vol+12
@@ -723,17 +776,17 @@ fat_mount_r32:
     ld      (_cpm_fat_vol+3),a
     ld      a,(fatwin+BPB_ExtFlags+1)
     and     $80                     ;mirroring disabled: one active FAT
-    jp      Z,fat_mount_ok          ;mirroring on
+    jr      Z,fat_mount_ok          ;mirroring on
     ld      a,(fatwin+BPB_ExtFlags)
     and     $0F
     ld      b,a
     ld      a,(_cpm_fat_vol+24)     ;n_fats
     cp      b                       ;active index vs n_fats
     jp      C,fat_mount_fail        ;active index >= n_fats
-    jp      Z,fat_mount_fail        ;active index == n_fats
+    jr      Z,fat_mount_fail        ;active index == n_fats
     ld      a,b
     or      a                       ;active index 0
-    jp      Z,fat_mount_act0        ;active FAT is already fatbase
+    jr      Z,fat_mount_act0        ;active FAT is already fatbase
     call    fat_ldhl
     defw    _cpm_fat_vol+8
     ld      de,(_cpm_fat_vol+20)
@@ -749,7 +802,7 @@ fat_mount_r32:
     ld      a,h
     adc     a,d
     cp      (MAX_LBA28>>24)+1       ;high byte past $0FFFFFFF
-    jp      NC,fat_mount_fail       ;active FAT above 28 bits
+    jr      NC,fat_mount_fail       ;active FAT above 28 bits
     ld      h,a
     call    fat_sthl
     defw    _cpm_fat_vol+10
@@ -764,7 +817,7 @@ fat_mount_ok:
     ld      (_cpm_fat_vol+27),a
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT32                ;mounted type
-    jp      Z,fat_mount_cwd32       ;cwd is the FAT32 root cluster
+    jr      Z,fat_mount_cwd32       ;cwd is the FAT32 root cluster
     xor     a
     ld      (fat_cwd),a
     ld      (fat_cwd+1),a
@@ -795,8 +848,8 @@ fat_mount_fail:
     ld      (_cpm_fat_vol+27),a
     ld      a,l
     or      a
-    jp      NZ,fat_mount_code       ;L already holds FR 19
-    ld      l,1
+    jr      NZ,fat_mount_code       ;1, 3, or 19 already in L
+    ld      l,13                    ;FR_NO_FILESYSTEM
 fat_mount_code:
     ld      h,0
     or      a                       ;NC: mount failed
@@ -818,11 +871,11 @@ fat_seed_fsinfo:
     or      l
     ret     Z                       ;offset was $FFFF
     dec     hl
-    ex      de,hl                   ;DE = sector offset
+    ld      de,hl                   ;DE = sector offset
     call    fat_ldhl
     defw    fat_winsect
     add     hl,de                   ;volbase + FSInfo offset
-    ex      de,hl                   ;DE = low sum; carry stays
+    ld      de,hl                   ;DE = low sum; carry stays
     call    fat_ldhl
     defw    fat_winsect+2
     ld      a,l
@@ -885,9 +938,9 @@ fat_seed_fsinfo:
     and     c
     and     b
     cp      $FF                     ;all $FF means unknown
-    jp      Z,seed_free             ;no next-free hint
+    jr      Z,seed_free             ;no next-free hint
     call    fat_clst_ok             ;C: hint is not a cluster
-    jp      C,seed_free             ;hint out of range
+    jr      C,seed_free             ;hint out of range
     ld      hl,de
     call    fat_sthl
     defw    fat_last_clst

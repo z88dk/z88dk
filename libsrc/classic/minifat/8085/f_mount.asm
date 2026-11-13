@@ -74,13 +74,7 @@ fm_new:
     call    mf_cwd_reset
     jp      mf_ok
 fm_fail:
-    ld      a,l
-    cp      19
-    jr      Z,fm_par
-    ld      a,FR_NO_FILESYSTEM
-    jp      mf_err
-fm_par:
-    ld      a,FR_INVALID_PARAMETER
+    ld      a,l                     ;1 disk, 3 not ready, 13 no filesystem, 19 csize
     jp      mf_err
 fm_off:
     ld      hl,0

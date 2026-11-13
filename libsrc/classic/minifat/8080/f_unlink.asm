@@ -105,8 +105,9 @@ ul_walk:
     jp      mf_err
 ul_next:
     call    dir_next
-    jr      NC,ul_zap
-    jr      ul_walk
+    jr      C,ul_walk
+    jr      Z,ul_zap                ;clean end: the directory is empty
+    jr      ul_disk
 ul_zap:
     ld      de,(fat_dirsec)
     ld      bc,(fat_dirsec+2)

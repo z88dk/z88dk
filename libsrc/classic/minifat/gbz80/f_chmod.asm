@@ -49,7 +49,7 @@ f_chmod:
     ret     NC
     ld      a,(fat_noname)
     or      a
-    jp      Z,fc_set
+    jr      Z,fc_set
     ld      a,FR_INVALID_NAME
     jp      mf_err
 fc_set:

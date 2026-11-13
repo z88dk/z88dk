@@ -412,6 +412,7 @@ mf_lookup_here:
     ld      hl,fat_name11
     call    dir_find
     ret     C
+    jr      NZ,mf_lu_disk           ;directory sector was not read
     ld      hl,FR_NO_FILE
     or      a
     ret

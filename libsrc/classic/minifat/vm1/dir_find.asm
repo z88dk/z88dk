@@ -33,7 +33,8 @@ fat_fold:
 ; AM_VOL skips labels and long names ($0F includes that bit).
 ; Disk $05 compares as $E5. Both sides are folded A-Z.
 ; IN: HL -> 11-byte 8.3
-; OUT C and L=0, H=0: found, fat_found_* and dir_ptr filled. L=1: miss.
+; OUT C and L=0, H=0: found, fat_found_* and dir_ptr filled.
+; NC+Z and L=1: the name is not there. NC+NZ and L=1: the sector was not read.
 _dir_find:
 dir_find:
     ld      (pack_sv),hl            ;8.3; dir_sdi clobbers fat_work
@@ -119,7 +120,13 @@ df_hi:
 df_next:
     call    dir_next                ;C: another dirent
     jr      C,df_loop               ;keep scanning
+    jr      NZ,df_io                ;sector was not read
 df_miss:
     ld      hl,1
-    or      a                       ;NC: name not in this directory
+    xor     a                       ;NC+Z: name is not in this directory
+    ret
+df_io:
+    ld      hl,1
+    ld      a,1
+    or      a                       ;NC+NZ: directory sector was not read
     ret

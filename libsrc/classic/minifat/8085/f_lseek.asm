@@ -119,7 +119,7 @@ fl_loop:
     jr      C,fl_step
     ld      a,h
     or      l
-    jp      Z,mf_place
+    jp      Z,mf_place              ;disk full: FR_OK at the size reached
     jp      mf_err
 fl_step:
     ld      bc,(fat_hold)

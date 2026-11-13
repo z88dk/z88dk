@@ -818,19 +818,19 @@ int main(void)
     memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
     put_vbr(ram_image, 1, 1, 16, 4104);
     rc = fat_mount();
-    expect("mount_root1", rc == 1);
+    expect("mount_root1", rc == 13);
 
     memset(ram_image, 0, sizeof ram_image);
     memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
     put_vbr(ram_image, 1, 17, 16, 4104);
     rc = fat_mount();
-    expect("mount_root17", rc == 1);
+    expect("mount_root17", rc == 13);
 
     memset(ram_image, 0, sizeof ram_image);
     memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
     put_vbr(ram_image, 1, 0, 16, 4104);
     rc = fat_mount();
-    expect("mount_root0", rc == 1);
+    expect("mount_root0", rc == 13);
 
     memset(ram_image, 0, sizeof ram_image);
     memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
@@ -848,13 +848,13 @@ int main(void)
     memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
     put_fat32(ram_image, 64, 16, 0);
     rc = fat_mount();
-    expect("mount_fat32_root", rc == 1);
+    expect("mount_fat32_root", rc == 13);
 
     memset(ram_image, 0, sizeof ram_image);
     memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
     put_fat32(ram_image, 64, 0, 1);
     rc = fat_mount();
-    expect("mount_fat32_fsver", rc == 1);
+    expect("mount_fat32_fsver", rc == 13);
 
     memset(ram_image, 0, sizeof ram_image);
     memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
@@ -918,7 +918,7 @@ int main(void)
     put_le32(ram_image + 36, 0x00200000u);
     put_le32(ram_image + 32, 0x00200000u + 1u + 0xFFF6u);
     rc = fat_mount();
-    expect("mount_fatsz_cap", rc == 1 && cpm_fat_vol.fs_type == 0);
+    expect("mount_fatsz_cap", rc == 13 && cpm_fat_vol.fs_type == 0);
 
     /* fatsz $001FFFFF is the last size under that cap. nclst $FFF6 is FAT32. */
     memset(ram_image, 0, sizeof ram_image);
@@ -936,7 +936,24 @@ int main(void)
     put_le32(ram_image + 36, 0x001FFFFFu);
     put_le32(ram_image + 32, 0xFFFFFFFFu);
     rc = fat_mount();
-    expect("mount_nclst_max", rc == 1 && cpm_fat_vol.fs_type == 0);
+    expect("mount_nclst_max", rc == 13 && cpm_fat_vol.fs_type == 0);
+
+    /* nclst $00100000 is inside $0FFFFFF5. fatsz $2002 covers n_fatent $100002. */
+    memset(ram_image, 0, sizeof ram_image);
+    memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
+    put_fat32(ram_image, 1, 0, 0);
+    put_le32(ram_image + 36, 0x00002002u);
+    put_le32(ram_image + 32, 0x00102003u);
+    rc = fat_mount();
+    expect("mount_nclst_1m", rc == 0 && cpm_fat_vol.fs_type == 3);
+
+    /* Root cluster at $10000 is past n_fatent on this small FAT32 volume. */
+    memset(ram_image, 0, sizeof ram_image);
+    memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
+    put_fat32(ram_image, 64, 0, 0);
+    put_le32(ram_image + 44, 0x00010000u);
+    rc = fat_mount();
+    expect("mount_rootclus_hi", rc == 13 && cpm_fat_vol.fs_type == 0);
 
     /* 2048 FAT16 root entries: 65536 bytes must not wrap to an empty root. */
     rt_invalidate();

@@ -24,7 +24,7 @@ _fat_clst2sect:
     call    fat_ld32                ;cluster into BCDE
     call    clst2sect               ;NC: no LBA
     pop     hl
-    jp      NC,fat_c2s_fail         ;leave the caller's dword
+    jr      NC,fat_c2s_fail         ;leave the caller's dword
     call    fat_st32                ;store the LBA
     ld      hl,0
     ret
