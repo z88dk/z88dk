@@ -22,7 +22,7 @@
 ;
 ; RAM for the shell mini-FAT. CRT BSS (after data, at the rc2014 RAM
 ; origin). The BIOS high page has no room under the serial rings.
-; The +test harness does not link this file; it defines the same names
+; The +test harness does not link this file. It defines the same names
 ; in bss_ram.asm.
 ;
 
@@ -70,28 +70,35 @@ PUBLIC clst_cache_clst
 PUBLIC _cpm_dir_sclust
 
 _cpm_dir_sclust:        defs 64     ;A: through P:, one start cluster each. 0 is not mounted
-_cpm_fat_vol:           defs 32
+; Mounted volume. 32 bytes.
+; +0 fs_type. 1 is FAT12. 2 is FAT16. 3 is FAT32.
+; +1 csize. csize is 2^n sectors per cluster.
+; +2 n_rootent. +4 n_fatent. n_fatent is nclst + 2.
+; +8 fatbase. +12 dirbase. +16 database. +20 fatsz.
+; +24 n_fats. +25 free_valid. 1 means free_clst is live.
+; +26 is unused. +28 free_clst.
+_cpm_fat_vol:           defs 32     ;mounted volume record
 _fatwin:
-fatwin:                 defs 512
-fat_winsect:            defs 4
-fat_wflag:              defs 1
-dir_sclust:             defs 4
-dir_clust:              defs 4
-dir_sect:               defs 4
-dir_ofs:                defs 2
+fatwin:                 defs 512    ;sector window
+fat_winsect:            defs 4      ;sector number in the window
+fat_wflag:              defs 1      ;1 means the window needs a write
+dir_sclust:             defs 4      ;start cluster of the open directory
+dir_clust:              defs 4      ;cluster that holds the current entry
+dir_sect:               defs 4      ;sector of the current directory entry
+dir_ofs:                defs 2      ;byte offset in the open directory
 _fat_dir_ptr:
-dir_ptr:                defs 2
+dir_ptr:                defs 2      ;address of the current directory entry
 _fat_found_sclust:
-fat_found_sclust:       defs 4
+fat_found_sclust:       defs 4      ;start cluster from the last find
 _fat_found_size:
-fat_found_size:         defs 4
-clst_cache_sclust:      defs 4
-clst_cache_ci:          defs 2
-clst_cache_clst:        defs 4
+fat_found_size:         defs 4      ;byte length from the last find
+clst_cache_sclust:      defs 4      ;start cluster of the cached chain walk
+clst_cache_ci:          defs 2      ;cluster index in that walk
+clst_cache_clst:        defs 4      ;cluster number at that index
 _fat_cwd:
-fat_cwd:                defs 4
-fat_work:               defs 16
-pack_sv:                defs 16
+fat_cwd:                defs 4      ;start cluster of the current directory
+fat_work:               defs 16     ;scratch dwords for the core
+pack_sv:                defs 16     ;scratch for a pointer or a cluster
 _fat_last_clst:
 fat_last_clst:          defs 4      ;last cluster this session allocated
 _fat_fsi_lba:

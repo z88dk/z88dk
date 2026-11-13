@@ -1,6 +1,6 @@
 ;
-; f_getfree. Outline is ChaN ff.c f_getfree. The count comes from the
-; core walk. fatfs at sp+2, nclst at sp+4, path at sp+6.
+; f_getfree. Outline is ChaN ff.c f_getfree. The free cluster count
+; comes from the core walk.
 ;
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
@@ -21,6 +21,12 @@ EXTERN  fat_path
 EXTERN  fat_user
 EXTERN  fat_dp
 
+; Call. The FATFS pointer is at sp+2. The nclst pointer is at sp+4.
+; The path is at sp+6. The caller removes the arguments.
+; Return. HL = FRESULT and H = 0. Carry is set only on the mf_ok path.
+; Clobber. AF, BC, DE, HL.
+; Writes. Success stores the free cluster count through nclst.
+; Success stores the volume address through a non-null FATFS pointer.
 _f_getfree:
 f_getfree:
     ld      hl,sp+2
@@ -39,32 +45,32 @@ f_getfree:
     ld      d,(hl)
     ld      (fat_path),de
     call    mf_ensure
-    ret     NC
+    ret     NC                      ; the volume is not mounted. HL holds the FRESULT
     ld      hl,(fat_path)
     ld      a,h
     or      l
-    jr      Z,fg_cnt
+    jr      Z,fg_cnt                ; the path pointer is 0
     call    mf_drive
-    ret     NC
+    ret     NC                      ; the prefix is not drive 0. HL holds the FRESULT
 fg_cnt:
     ld      hl,(fat_user)
     ld      a,h
     or      l
-    jr      NZ,fg_call
-    ld      a,FR_INVALID_PARAMETER
+    jr      NZ,fg_call              ; the nclst pointer is present
+    ld      a,FR_INVALID_PARAMETER  ; the nclst pointer is 0
     jp      mf_err
 fg_call:
-    call    _fat_getfree
-    jr      C,fg_ptr
-    ld      a,FR_DISK_ERR
+    call    _fat_getfree            ; HL is the nclst pointer
+    jr      C,fg_ptr                ; the free count was stored
+    ld      a,FR_DISK_ERR           ; the count walk failed
     jp      mf_err
 fg_ptr:
     ld      hl,(fat_dp)
     ld      a,h
     or      l
-    jp      Z,mf_ok
+    jp      Z,mf_ok                 ; the FATFS pointer is 0
     ld      de,(fat_fs)
-    ld      (hl),e
+    ld      (hl),e                  ; store the volume address
     inc     hl
     ld      (hl),d
     jp      mf_ok

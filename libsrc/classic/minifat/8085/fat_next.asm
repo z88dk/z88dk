@@ -15,15 +15,22 @@ EXTERN  fat_st32
 EXTERN  get_fat
 EXTERN  pack_sv
 
-; Next cluster in a chain.
-; HL points at a little-endian cluster. On success that dword
-; becomes the next cluster and L is 0. An end mark is stored as
-; 0x0FFFFFFF (FAT16 $FFF8-$FFFF and FAT32 >= $0FFFFFF8 both fold
-; to that value). On a disk error the dword is left alone and L
-; is 1. A chain that points at itself fails.
+; Store the next cluster of a chain.
+; An end mark is stored as $0FFFFFFF.
+; FAT16 end marks are $FFF8 to $FFFF.
+; FAT32 end marks from $0FFFFFF8 fold to the same value.
+; A chain that points at itself fails.
+; Call. HL points at a little-endian cluster.
+; Return. L = 0 and H = 0 when the next cluster is stored.
+; Return. Carry follows the last unequal cp. fat_st32 does not change flags.
+; Return. The later ld does not change flags.
+; Return. L = 1 and H = 0 on a disk error or a self link. Carry is clear.
+; Writes. On success the dword becomes the next cluster.
+; Return. The dword stays unchanged on failure.
+; Clobber. AF, BC, DE, HL.
 _fat_next:
     push    hl
-    call    fat_ld32                ;cluster into BCDE
+    call    fat_ld32                        ; cluster into BCDE
     push    de
     push    bc
     ex      de,hl
@@ -33,25 +40,25 @@ _fat_next:
     ld      (pack_sv+2),hl
     pop     bc
     pop     de
-    call    get_fat                 ;NC: link unreadable or bad
+    call    get_fat                         ; next link. Carry clear means an error.
     pop     hl
-    jr      NC,fat_next_fail        ;leave the caller's dword
+    jr      NC,fat_next_fail                ; disk error. Leave the dword.
     ld      a,(pack_sv)
-    cp      e                       ;next vs this, byte 0
-    jr      NZ,fat_next_store       ;link moved
+    cp      e                               ; caller byte 0 vs next
+    jr      NZ,fat_next_store               ; not a self link
     ld      a,(pack_sv+1)
-    cp      d                       ;next vs this, byte 1
-    jr      NZ,fat_next_store       ;link moved
+    cp      d                               ; caller byte 1 vs next
+    jr      NZ,fat_next_store               ; not a self link
     ld      a,(pack_sv+2)
-    cp      c                       ;next vs this, byte 2
-    jr      NZ,fat_next_store       ;link moved
+    cp      c                               ; caller byte 2 vs next
+    jr      NZ,fat_next_store               ; not a self link
     ld      a,(pack_sv+3)
-    cp      b                       ;next vs this, byte 3
-    jr      Z,fat_next_fail         ;chain points at itself
+    cp      b                               ; caller byte 3 vs next
+    jr      Z,fat_next_fail                 ; chain points at itself
 fat_next_store:
-    call    fat_st32                ;store the next cluster
-    ld      hl,0
+    call    fat_st32                        ; store the next cluster
+    ld      hl,0                            ; L = 0. ld does not change flags.
     ret
 fat_next_fail:
-    ld      hl,1
+    ld      hl,1                            ; L = 1. Carry stays clear.
     ret

@@ -2,6 +2,8 @@
 ; f_getcwd. The string kept by f_chdir is copied. len includes the NUL.
 ; len at sp+2, buff at sp+4. The caller cleans.
 ;
+; 8085 reads a stacked argument with ld de,sp+n and ld hl,(de).
+;
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 
 INCLUDE "minifat.inc"
@@ -18,6 +20,11 @@ EXTERN  fat_cwd_str
 EXTERN  fat_user
 EXTERN  fat_left
 
+; Call. The length is at sp+2. The buffer is at sp+4. The caller removes the arguments.
+; Return. HL = FRESULT and H = 0. Carry is set only on the mf_ok path.
+; Clobber. AF, BC, DE, HL.
+; Writes. Success copies the current directory text into the buffer.
+; FR_NOT_ENOUGH_CORE stores 0 in the first byte.
 _f_getcwd:
 f_getcwd:
     ld      de,sp+2
@@ -28,39 +35,41 @@ f_getcwd:
     ld      (fat_user),hl
     ld      a,h
     or      l
-    jr      Z,fg_par
+    jr      Z,fg_par                        ; the buffer pointer is 0
     ld      a,(fat_left)
     or      a
-    ld      hl,(fat_left)
-    or      h
-    jr      Z,fg_par
+    ld      hl,(fat_left)                   ; ld does not change flags
+    or      h                               ; include the high byte of the length
+    jr      Z,fg_par                        ; the length is 0
     call    mf_ensure
-    ret     NC
+    ret     NC                              ; the volume is not mounted. HL holds the FRESULT
     ld      hl,(fat_user)
-    ld      (hl),0
+    ld      (hl),0                          ; store 0 at the first byte
     ld      de,(fat_left)
-    dec     de
+    dec     de                              ; the copy writes at most len-1 bytes
     ld      a,d
     or      e
-    jr      Z,fg_core
+    jr      Z,fg_core                       ; the length is 1
     ld      hl,fat_cwd_str
     ld      bc,(fat_user)
 fg_cp:
     ld      a,(hl)
     ld      (bc),a
     or      a
-    jp      Z,mf_ok
+    jp      Z,mf_ok                         ; the copied byte is the terminating 0
     inc     hl
     inc     bc
     dec     de
     ld      a,d
     or      e
-    jr      NZ,fg_cp
+    jr      NZ,fg_cp                        ; bytes of the length remain
+; the text does not fit in len-1 bytes
 fg_core:
     ld      hl,(fat_user)
-    ld      (hl),0
+    ld      (hl),0                          ; clear the first byte of the buffer
     ld      a,FR_NOT_ENOUGH_CORE
     jp      mf_err
+; the buffer pointer or the length is 0
 fg_par:
     ld      a,FR_INVALID_PARAMETER
     jp      mf_err

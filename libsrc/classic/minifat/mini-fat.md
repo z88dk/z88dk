@@ -1,6 +1,6 @@
 # Mini-FAT
 
-Mini-FAT is the FAT12, FAT16, and FAT32 layer in the classic library. The cores are `libsrc/classic/minifat/z80/fatfs.asm`, `8085/fatfs.asm`, `8080/fatfs.asm`, `gbz80/fatfs.asm`, and `vm1/fatfs.asm`. `fat_sync` stays in the core. `fat_mount`, `dir_find`, `dir_create`, `dir_zap`, `fat_dirty`, `fat_dir_open`, `fat_dir_read`, `fat_next`, `fat_alloc`, `fat_free`, `fat_clst2sect`, `fat_getfree`, and `fat_clusters` are one file each, beside that core. The Z80 file and the 8085 file are one program. The 8085 file uses `rra` and `rl de` where the Z80 file uses `srl` and `sla`. The labels, the branch decisions, and the bytes a caller sees are the same on every core. RAM for the volume and the sector window is `libsrc/classic/minifat/fat_bss.asm`. The C names are `include/fatfs.h`.
+Mini-FAT is the FAT12, FAT16, and FAT32 layer in the classic library. The cores are `libsrc/classic/minifat/z80/fatfs.asm`, `8085/fatfs.asm`, `8080/fatfs.asm`, `gbz80/fatfs.asm`, and `vm1/fatfs.asm`. `fat_sync` stays in the core. `fat_mount`, `dir_find`, `dir_create`, `dir_zap`, `fat_dirty`, `fat_dir_open`, `fat_dir_read`, `fat_next`, `fat_alloc`, `fat_free`, `fat_clst2sect`, `fat_getfree`, and `fat_clusters` are one file each, beside that core. The Z80 file and the 8085 file are one program. The 8085 file uses `rra` and `rl de` where the Z80 file uses `srl` and `sla`. The labels, the branch decisions, and the bytes a caller sees are the same on every core. vm1 shifts a cluster with an open-coded rotate through A. It has no `rl de`: opcode `$18` is `sub hl,de`. A value already in BC is subtracted with `sub hl,bc`. A value in DE is subtracted with `sub hl,de`, or compared with `cp hl,de`. gbz80 loads an absolute word with `fat_ldhl`. A loop reloads the word because the body updates it. RAM for the volume and the sector window is `libsrc/classic/minifat/fat_bss.asm`. The C names are `include/fatfs.h`.
 
 The on-disk work follows [ChaN FatFs R0.16](http://elm-chan.org/fsw/ff/00index_e.html) for `check_fs`, `find_volume`, `mount_volume`, `move_window`, `sync_window`, `clst2sect`, `get_fat`, `put_fat`, `create_chain`, `remove_chain`, `dir_sdi`, `dir_next`, `dir_find`, and `dir_create`. The core keeps the sector window, the FAT chain, `dir_sdi`, and `dir_next`. Mount, directory search, directory create, and the C dword calls are separate files in that same directory. The `f_*` file calls are CPU-specific assembly, one function per file, in that directory. They are not part of `fatfs.asm`.
 
@@ -36,7 +36,7 @@ The partition type byte is not read. The sector window is `fatwin`, 512 bytes. E
 
 A cluster number and an LBA are a 32-bit value in BCDE, with E as the low byte. From C, the dword functions take a pointer in HL (`__z88dk_fastcall`) and load that little-endian dword themselves.
 
-Success is `L = 0` and carry set. Failure is `L = 1` and carry clear. A 64 KiB cluster is the exception: `L = 19` (`FR_INVALID_PARAMETER`) and carry clear. `fat_mount` reports a bad volume as `L = 13` (`FR_NO_FILESYSTEM`), a sector read that failed as `L = 1`, and a drive that did not come ready as `L = 3`. `f_mount` returns that same code. sccz80 treats a `char` return as an `int`, so the exits also clear H. 80cc returns the byte in L. Test L, or test carry, and you will agree.
+Success is `L = 0` and carry set. Failure is `L = 1` and carry clear. A 64 KiB cluster is the exception: `L = 19` (`FR_INVALID_PARAMETER`) and carry clear. `fat_mount` reports a bad volume as `L = 13` (`FR_NO_FILESYSTEM`), a sector read that failed as `L = 1`, and a drive that did not come ready as `L = 3`. `f_mount` returns that same code. A later `f_*` call that has to mount the volume returns that same code. sccz80 treats a `char` return as an `int`, so the exits also clear H. 80cc returns the byte in L. Test L, or test carry, and you will agree.
 
 ## File calls
 
@@ -68,7 +68,7 @@ Also out of scope for the core: exFAT, long file names, GPT, extended partitions
 
 `f_readdir` skips a deleted slot, a dot name, a long name, and a label. The end of the directory is `FR_OK` and an empty name. A null `FILINFO` rewinds the directory. `f_closedir` drops the object.
 
-`f_mkdir` creates a directory and writes `"."` and `".."`. It does not invent a timestamp. `f_unlink` rejects a dot name, a read-only object, and the current directory. A directory must contain only `"."` and `".."`. The call deletes the entry and frees the chain.
+`f_mkdir` creates a directory and writes `"."` and `".."`. Create, write, close, and sync do not write a time or a date. `f_utime` is the only call that stores one. `f_unlink` rejects a dot name, a read-only object, and the current directory. A directory must contain only `"."` and `".."`. The call deletes the entry and frees the chain.
 
 `f_rename` registers the new name and copies the old entry onto it. It updates `".."` when a directory changes parent. It then deletes the old name. A directory may be moved into its own descendant. FatFs R0.16 does the same.
 
@@ -78,7 +78,7 @@ Also out of scope for the core: exFAT, long file names, GPT, extended partitions
 
 `f_getfree` writes the free cluster count.
 
-`f_expand` finds one contiguous run for the file. The search starts at cluster 2 and does not wrap. `opt` 0 records the start cluster. `opt` 1 links the run. `opt` above 1 returns `FR_INVALID_PARAMETER`. The call does not write the directory entry.
+`f_expand` finds one contiguous run for the file. The search starts at cluster 2 and does not wrap. `opt` 0 stores one less than the start cluster in the allocation hint. It does not change the file's start cluster or size. `opt` 1 links the run. `opt` above 1 returns `FR_INVALID_PARAMETER`. The call does not write the directory entry.
 
 An assembly caller places the last C argument at `sp+2`. The header of each file gives that order. A C program leaves the stack to the compiler.
 
@@ -170,7 +170,7 @@ Then:
 
 1. Call `fat_mount` (C: `fat_mount()`). On success `_cpm_fat_vol` describes the volume. `fs_type` is stored only after every check has passed, so a failed mount leaves it zero.
 2. Open a directory with `fat_dir_open`. Cluster 0 is the FAT32 root. A FAT16 root is the fixed `dirbase` LBA, and the shell treats cluster 0 as that root as well.
-3. `dir_find` looks up an 11-byte name in the directory you opened. `fat_dir_read` copies one 32-byte entry and returns 0. The next call returns 1 when that entry starts with `$00`. A sector that cannot be read returns 1. That is not the end of the directory.
+3. `dir_find` looks up an 11-byte name in the directory you opened. `fat_dir_read` copies one 32-byte entry and returns 0. The next call returns 1 when that entry starts with `$00`. The end path writes 0 into the first byte of the buffer and returns 1. A sector that cannot be read returns 1 and leaves the buffer unchanged. A buffer that already starts with 0 does not show which of those two happened. The `f_*` layer does not use this call.
 4. To read a file, take its start cluster and size from the entry (`fat_found_sclust`, `fat_found_size` after a successful find). `fat_next` is `get_fat`. `fat_clst2sect` is the first sector of that cluster. Read `csize` sectors, then ask for the next cluster. The end of a FAT12 chain is `$FF8`–`$FFF`, folded to `$0FFFFFFF`. The end of a FAT16 chain is `$FFF8`–`$FFFF`. The end of a FAT32 chain is `$0FFFFFF8` and up. A bad cluster (`$FF7` / `$FFF7` / `$0FFFFFF7`) is an error, not a link. A file offset uses a 16-bit cluster index. An index past 65535, or past `n_fatent`, is rejected. A chain that loops inside that range is not detected. `remove_chain` stops when the step count reaches `n_fatent`.
 5. To write a new file, `dir_create` makes an 8.3 entry, `fat_alloc` / `create_chain` links clusters, you write the sectors, you store the size back into the directory entry, and `fat_sync` commits the window. `dir_zap` marks the entry `$E5`. It does not free the chain. Call `fat_free` yourself.
 6. `fat_getfree` counts free clusters into the dword you point at. `fat_clusters` turns a byte length into the number of clusters that length needs.
@@ -179,7 +179,7 @@ The directory entry layout is Microsoft's. Byte 0 is the name. `$00` ends the di
 
 `n_fatent` is the cluster count plus 2. Cluster numbers below 2 are not data. `csize` is a power of two. `SecPerClus` of 65 or more is refused, because a 64 KiB cluster is 0 in the 16-bit sector arithmetic.
 
-Two boundaries follow ChaN rather than Microsoft FAT specification 1.03. A cluster count of `$0FF5` or below is FAT12. The specification would still call 4085 clusters FAT16. A count of `$FFF5` stays FAT16. The specification would call that FAT32. A count from `$00100000` through `$0FFFFFF5` is FAT32 and is accepted. A count above `$0FFFFFF5` is rejected. `put_fat` stores 28 bits on FAT32 and 12 bits on FAT12. A FAT of `$200000` sectors or more is rejected before the copies are added.
+Two boundaries follow ChaN rather than Microsoft FAT specification 1.03. A cluster count of `$0FF5` or below is FAT12. The specification would still call 4085 clusters FAT16. A count of `$FFF5` stays FAT16. The specification would call that FAT32. A count above `$FFF5` is FAT32 and is accepted up to `$0FFFFFF5`. A count above `$0FFFFFF5` is rejected. `put_fat` stores 28 bits on FAT32 and 12 bits on FAT12. A FAT of `$200000` sectors or more is rejected before the copies are added.
 
 A FAT12 entry is 12 bits packed as `clst + clst/2` bytes from the start of the FAT. An even cluster owns the low 12 bits. An odd cluster owns the high 12 bits. The two bytes can sit in different sectors. The size of the FAT is `(n_fatent * 3 + 1) / 2` bytes, rounded up to sectors. A free count on FAT12 walks clusters 2 through `n_fatent - 1`. Clusters 0 and 1 are reserved.
 
@@ -280,10 +280,10 @@ The core is one object. A call that uses the core links all of the core bytes. `
 
 | Part | Z80 | 8085 | 8080 | gbz80 | vm1 |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Core `fatfs.asm`, with `fat_sync` | 2540 | 2756 | 2808 | 3128 | 2780 |
-| Low-level calls, 13 files | 2533 | 2700 | 2768 | 3018 | 2736 |
-| `f_*` calls, 21 files | 3649 | 3734 | 3990 | 4577 | 3990 |
-| File layer `minifat_file.asm` | 2738 | 2951 | 3041 | 3239 | 3041 |
+| Core `fatfs.asm`, with `fat_sync` | 2540 | 2754 | 2814 | 3139 | 2766 |
+| Low-level calls, 13 files | 2533 | 2700 | 2774 | 3024 | 2731 |
+| `f_*` calls, 21 files | 3649 | 3734 | 3990 | 4577 | 3917 |
+| File layer `minifat_file.asm` | 2727 | 2939 | 3039 | 3238 | 2959 |
 
 | RAM | Bytes | When it is linked |
 | --- | ---: | --- |
@@ -297,7 +297,7 @@ Low-level call files:
 
 | Call | Z80 | 8085 | 8080 | gbz80 | vm1 |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `fat_mount` | 1367 | 1490 | 1500 | 1640 | 1492 |
+| `fat_mount` | 1367 | 1490 | 1500 | 1640 | 1487 |
 | `dir_find` | 178 | 172 | 193 | 215 | 183 |
 | `dir_create` | 300 | 333 | 361 | 370 | 351 |
 | `dir_zap` | 15 | 15 | 15 | 17 | 15 |
@@ -308,7 +308,7 @@ Low-level call files:
 | `fat_alloc` | 21 | 22 | 22 | 21 | 22 |
 | `fat_free` | 12 | 12 | 12 | 12 | 12 |
 | `fat_clst2sect` | 21 | 22 | 22 | 21 | 22 |
-| `fat_getfree` | 382 | 388 | 392 | 476 | 388 |
+| `fat_getfree` | 382 | 388 | 398 | 482 | 388 |
 | `fat_clusters` | 119 | 114 | 119 | 111 | 119 |
 
 `f_*` call files:
@@ -319,15 +319,15 @@ Low-level call files:
 | `f_open` | 344 | 353 | 368 | 370 | 368 |
 | `f_close` | 31 | 25 | 32 | 38 | 32 |
 | `f_read` | 77 | 67 | 83 | 104 | 83 |
-| `f_write` | 124 | 122 | 144 | 172 | 144 |
-| `f_lseek` | 373 | 376 | 403 | 458 | 403 |
+| `f_write` | 124 | 122 | 144 | 172 | 130 |
+| `f_lseek` | 373 | 376 | 403 | 458 | 393 |
 | `f_sync` | 19 | 13 | 20 | 24 | 20 |
 | `f_opendir` | 160 | 167 | 177 | 225 | 177 |
-| `f_closedir` | 54 | 58 | 65 | 71 | 65 |
-| `f_readdir` | 291 | 290 | 310 | 334 | 310 |
+| `f_closedir` | 54 | 58 | 65 | 71 | 58 |
+| `f_readdir` | 291 | 290 | 310 | 334 | 303 |
 | `f_mkdir` | 300 | 318 | 327 | 380 | 327 |
 | `f_unlink` | 205 | 229 | 236 | 263 | 236 |
-| `f_rename` | 349 | 389 | 409 | 509 | 409 |
+| `f_rename` | 349 | 389 | 409 | 509 | 374 |
 | `f_stat` | 72 | 70 | 79 | 88 | 79 |
 | `f_chmod` | 87 | 82 | 89 | 95 | 89 |
 | `f_utime` | 107 | 101 | 112 | 127 | 112 |

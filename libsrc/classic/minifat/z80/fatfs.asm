@@ -32,8 +32,9 @@
 ; (RAM). The sector window is fatwin.
 ;
 ; C: PUBLIC _names. Pointers are __z88dk_fastcall (HL).
-; DWORD cluster/LBA is BCDE (E LSB); _fat_next/_fat_alloc/_fat_free/
-; _fat_clst2sect/_fat_dir_open load that little-endian dword from (HL).
+; DWORD cluster/LBA is BCDE (E LSB).
+; _fat_next, _fat_alloc, _fat_free, _fat_clst2sect, and _fat_dir_open
+; load that little-endian dword from (HL).
 ; Success: L=0 and carry set. Fail: L=1 and carry clear.
 ; A 64 KiB cluster is the exception: L=19 and carry clear.
 ; sccz80 treats a char return as an int, so these exits also clear H.
@@ -52,14 +53,15 @@
 ; FSI_Nxt_Free when the free count or fat_last_clst has changed.
 ;
 ; FatFs cases we honour:
-;   cluster < 2 invalid; n_fatent = nclst + 2
-;   FAT16 EOC $FFF8..$FFFF; FAT32 EOC $0FFFFFF8..F (put_fat keeps bits 28-31)
-;   nclst <= $0FF5 is FAT12 (ChaN MAX_FAT12; spec 1.03 treats 4085 as FAT16)
-;   nclst == $FFF5 stays FAT16 (ChaN MAX_FAT16; spec 1.03 would use FAT32)
-;   nclst > $0FFFFFF5 is rejected (ChaN MAX_FAT32; put_fat keeps 28 bits)
+;   A cluster below 2 is invalid. n_fatent is nclst + 2.
+;   FAT16 end-of-chain is $FFF8 to $FFFF.
+;   FAT32 end-of-chain is $0FFFFFF8 to $0FFFFFFF. put_fat keeps bits 28-31.
+;   nclst <= $0FF5 is FAT12 (ChaN MAX_FAT12). Spec 1.03 treats 4085 as FAT16.
+;   nclst == $FFF5 stays FAT16 (ChaN MAX_FAT16). Spec 1.03 would use FAT32.
+;   nclst > $0FFFFFF5 is rejected (ChaN MAX_FAT32). put_fat keeps 28 bits.
 ;   fatsz >= $200000 is rejected (ChaN ff16p2, before fatsz is doubled)
 ;   a partition, fatbase, database, or active FAT at LBA >= $10000000 fails
-;   an FSInfo LBA >= $10000000 leaves the hint clear; the mount still succeeds
+;   An FSInfo LBA >= $10000000 leaves the hint clear. The mount still succeeds.
 ;   Neither boundary is built by test/fatfs. BPB_Media is never read.
 ;   FAT16 root count is a non-zero multiple of 16. A FAT32-shaped VBR
 ;   whose cluster count falls in the FAT16 band is rejected.
@@ -69,16 +71,16 @@
 ;   FAT32 with mirroring off uses the active FAT in BPB_ExtFlags and
 ;   does not write the other copy. A bad cluster ($FFF7 / $0FFFFFF7)
 ;   is an error, not a link. fs_type is stored only after every check.
-;   DIR_Name[0] == $05 compares as $E5; dir_create stores $E5 as $05
+;   DIR_Name[0] == $05 compares as $E5. dir_create stores $E5 as $05.
 ;   FAT16 root of 2048 entries is the whole 16-bit offset (65536 bytes)
-;   dirent 0x00 = end of directory; 0xE5 = deleted (reusable)
+;   A directory entry of $00 ends the directory. $E5 is deleted and reusable.
 ;   A long-name entry is attribute $0F, which includes the volume bit.
 ;   The volume-bit test therefore skips both labels and long names.
 ;   dir_next stops on 16-bit ofs wrap (2048 dirents) for long directories
-;   FAT32 root is BPB_RootClus32; cluster 0 means that root (ff dir_sdi)
+;   FAT32 root is BPB_RootClus32. Cluster 0 means that root (ff dir_sdi).
 ;   FAT16 root is static dirbase LBA
 ;   SFD (VBR at LBA 0) then four MBR primary partitions
-;   1 or 2 FATs; csize power of 2; BytsPerSec == 512
+;   1 or 2 FATs. csize is a power of 2. BytsPerSec == 512.
 ;
 ; Checks this file does not make:
 ;   JumpBoot. 55AA is required. ChaN accepts some VBRs that have no 55AA.
@@ -86,17 +88,17 @@
 ;
 ; Other limits:
 ;   dir_next itself does not stretch (dir_create does, FAT32 only)
-;   dir_zap is E5 only; the caller frees the chain with _fat_free
+;   dir_zap writes $E5 only. The caller frees the chain with _fat_free.
 ;
 ; How to read this file. Each operation is one label, top to bottom:
 ; clst2sect, sync_window, get_fat, put_fat, create_chain, remove_chain,
 ; dir_sdi, dir_next. mount, dir_find, dir_create, dir_zap, and the
 ; C dword calls are the next files in this directory. fat_sync stays
 ; here because move_window and create_chain call fat_sync_window.
-; fat_ld32, fat_st32, and fat_move_window stay shared. Every cluster
-; and every LBA is a dword in BCDE with E as the low byte, and every
-; FAT or directory byte is read from the one sector window. Inlining
-; those two jobs would paste the FAT16/FAT32 cases into every caller.
+; fat_ld32, fat_st32, and fat_move_window stay shared.
+; Every cluster and every LBA is a dword in BCDE with E as the low byte.
+; The one sector window supplies every FAT or directory byte.
+; Inlining those two jobs would paste the FAT16/FAT32 cases into every caller.
 ; fat_ld32 leaves HL on the last byte, so a caller that reads the
 ; next dword has to inc hl first.
 ;
@@ -129,7 +131,7 @@ EXTERN  clst_cache_ci
 EXTERN  clst_cache_clst
 
 PUBLIC  clst2sect                   ;cluster -> first sector LBA
-PUBLIC  fat_sync_window             ;write fatwin if dirty; mirror FAT#2
+PUBLIC  fat_sync_window             ;write fatwin if dirty, then mirror FAT#2
 PUBLIC  _fat_sync                   ;C: fat_sync_window
 PUBLIC  fat_move_window             ;flush dirty, read LBA into fatwin
 PUBLIC  get_fat                     ;next cluster from FAT entry
@@ -177,12 +179,13 @@ DEFC    DIR_FileSize    = 28
 DEFC    AM_VOL          = $08
 
 
-; ff.c clst2sect: if (clst < 2 || clst >= n_fatent) fail;
-; clst -= 2; return database + csize * clst. csize is 2^n.
-; IN:  BCDE = cluster (B MSB … E LSB)
-; OUT: C: BCDE = LBA of first sector of cluster
-;      NC: fail
-; clobbers AF, HL
+; Turn a cluster into the first sector of that cluster.
+; Call. BCDE is the cluster. E is the low byte.
+; Return. Carry set: BCDE is database plus (cluster-2) times csize.
+; Return. csize is 2^n.
+; Return. Carry clear: the cluster is below 2, or at or past n_fatent.
+; Return. Carry clear: (cluster-2) times csize wrapped, or the add wrapped.
+; Clobber. AF, BC, DE, HL.
 clst2sect:
     ld      hl,_cpm_fat_vol+4       ;n_fatent, little-endian
     ld      a,e
@@ -193,9 +196,9 @@ clst2sect:
     sbc     a,(hl+)
     ld      a,b
     sbc     a,(hl)
-    ret     NC                      ;cluster >= n_fatent
+    ret     NC                      ;cluster is at or past n_fatent
     ld      a,e
-    sub     2                       ;cluster - 2
+    sub     2                       ;cluster below 2 is invalid
     ld      e,a
     ld      a,d
     sbc     a,0
@@ -206,21 +209,21 @@ clst2sect:
     ld      a,b
     sbc     a,0
     ld      b,a
-    jr      C,clst2sect_ov          ;cluster < 2
+    jr      C,clst2sect_ov          ;cluster is below 2
     ld      a,(_cpm_fat_vol+1)      ;csize is 2^n
 clst2sect_mul:
     srl     a
-    jr      Z,clst2sect_base        ;csize bits are consumed
-    sla     e                       ;(clst-2) << 1
+    jr      Z,clst2sect_base        ;every csize bit is consumed
+    sla     e                       ;(cluster-2) times two
     rl      d
     rl      c
     rl      b
-    jr      C,clst2sect_ov          ;csize*(clst-2) wrapped
-    jr      clst2sect_mul
+    jr      C,clst2sect_ov          ;(cluster-2) times csize wrapped
+    jr      clst2sect_mul           ;shift the next csize bit
 clst2sect_base:
     ld      hl,_cpm_fat_vol+16      ;database
     ld      a,(hl+)
-    add     a,e                     ;database + scaled cluster
+    add     a,e                     ;database plus the scaled cluster
     ld      e,a
     ld      a,(hl+)
     adc     a,d
@@ -231,39 +234,42 @@ clst2sect_base:
     ld      a,(hl)
     adc     a,b
     ld      b,a
-    jr      C,clst2sect_ov          ;database + off wrapped
+    jr      C,clst2sect_ov          ;database plus the product wrapped
     scf
     ret
 
 clst2sect_ov:
-    or      a
+    or      a                       ;clear carry. This cluster has no sector.
     ret
 
-; ff.c sync_window, fail closed. Writes FAT #1 first. wflag stays set
-; until every copy succeeds (ff clears it before FAT #2 and ignores a
-; failed mirror). n_fats >= 2 and winsect in FAT #1 (unsigned
-; winsect - fatbase < fatsz): write winsect + fatsz. Directory windows
-; are not mirrored. Mount only allows 1 or 2 FATs.
-; OUT: C: OK; NC: write failed
-; clobbers AF, BC, DE, HL (ide_write_sector contract)
-
+; Write the dirty window. Write the first FAT copy, then the mirror.
+; The dirty flag stays set until every copy succeeds.
+; ChaN clears that flag before the second FAT and ignores a failed mirror.
+; A directory window is not mirrored. Mount allows 1 or 2 FAT copies.
+; Call. No arguments. _fat_sync is this same entry.
+; Return. Carry set and HL = 0: the window is clean or every copy was written.
+; Return. A failed info-sector write still takes that carry-set exit.
+; Return. Carry clear and HL = 1: a sector write failed. The dirty flag stays set.
+; Return. A failed mirror leaves the first FAT copy written.
+; Clobber. AF, BC, DE, HL.
+; Writes. fat_wflag, and the window sector when it was dirty.
 _fat_sync:
 fat_sync_window:
     ld      a,(fat_wflag)
     or      a
-    jr      Z,fat_sync_ok           ;nothing dirty
-    ld      de,(fat_winsect)        ;E LSB, D
-    ld      bc,(fat_winsect+2)      ;C, B MSB
-    ld      hl,fatwin               ;high RAM FAT window
-    call    ide_write_sector        ;C: OK; HL += 512
+    jr      Z,fat_sync_ok           ;the window is already clean
+    ld      de,(fat_winsect)        ;E is the low byte
+    ld      bc,(fat_winsect+2)      ;C, then B
+    ld      hl,fatwin               ;sector window
+    call    ide_write_sector        ;carry set: sector written. HL is fatwin plus 512.
     ld      hl,1
-    ret     NC                      ;leave flag dirty
+    ret     NC                      ;the write failed. Leave the window dirty.
     ld      a,(_cpm_fat_vol+24)     ;n_fats
-    cp      2                       ;n_fats vs 2
-    jr      C,fat_sync_clear        ;n_fats < 2
-    ld      hl,_cpm_fat_vol+8       ;winsect - fatbase
+    cp      2                       ;one FAT has no mirror
+    jr      C,fat_sync_clear        ;n_fats is below 2
+    ld      hl,_cpm_fat_vol+8       ;winsect minus fatbase
     ld      a,(fat_winsect)
-    sub     (hl+)                   ;winsect - fatbase
+    sub     (hl+)                   ;winsect minus fatbase
     ld      e,a
     ld      a,(fat_winsect+1)
     sbc     a,(hl+)
@@ -273,69 +279,72 @@ fat_sync_window:
     ld      c,a
     ld      a,(fat_winsect+3)
     sbc     a,(hl)
-    jr      C,fat_sync_clear        ;winsect < fatbase
-    ld      b,a                     ;BCDE = winsect - fatbase
-    ld      hl,_cpm_fat_vol+20      ;compare to fatsz
+    jr      C,fat_sync_clear        ;the sector is below fatbase
+    ld      b,a                     ;BCDE is winsect minus fatbase
+    ld      hl,_cpm_fat_vol+20      ;compare with fatsz
     ld      a,e
-    sub     (hl+)                   ;offset in FAT - fatsz
+    sub     (hl+)                   ;offset in the FAT minus fatsz
     ld      a,d
     sbc     a,(hl+)
     ld      a,c
     sbc     a,(hl+)
     ld      a,b
     sbc     a,(hl)
-    jr      NC,fat_sync_clear       ;not in FAT #1
+    jr      NC,fat_sync_clear       ;the sector is not in the first FAT
     ld      hl,(fat_winsect)
     ld      de,(_cpm_fat_vol+20)
-    add     hl,de                   ;mirror LBA = winsect + fatsz
+    add     hl,de                   ;mirror LBA is winsect plus fatsz
     ex      de,hl
     ld      hl,(fat_winsect+2)
     ld      bc,(_cpm_fat_vol+22)
     adc     hl,bc
     ld      bc,hl
     ld      hl,fatwin
-    call    ide_write_sector        ;C: mirror OK; HL += 512
+    call    ide_write_sector        ;carry set: mirror written. HL is fatwin plus 512.
     ld      hl,1
-    ret     NC                      ;FAT#2 failed: FAT #1 is on disk, retry mirror
+    ret     NC                      ;the mirror failed. The first FAT copy is on disk.
 fat_sync_clear:
-    xor     a
+    xor     a                       ;no mirror is required
     ld      (fat_wflag),a
 fat_sync_ok:
-    call    fat_fsi_write           ;write FSInfo if it is dirty
+    call    fat_fsi_write           ;write FSInfo when it is dirty
     ld      hl,0
-    scf
+    scf                             ;sync success. H is 0 and L is 0.
     ret
 
-; Write FSI_Free_Count and FSI_Nxt_Free. A failed write leaves the dirty
-; flag set and does not fail the FAT sync that called this. Dirty is
-; cleared before fat_move_window so that call cannot re-enter here.
-; free_valid clear stores $FFFFFFFF (unknown). A next-free hint below
-; 2 stores $FFFFFFFF. LBA 0 means this volume has no info sector.
+; Write FSI_Free_Count and FSI_Nxt_Free when the info sector is dirty.
+; Call. No arguments.
+; Return. Carry clear and Z: the sector is clean, or its LBA is 0.
+; Return. Those exits are not disk errors. fat_sync_window ignores the flags.
+; Return. Carry set: the info sector is written and the dirty flag is clear.
+; Return. Carry clear after a failed read or write: the dirty flag is set again.
+; Clobber. AF, BC, DE, HL.
+; Writes. The free-count and next-free fields. fat_fsi_dirty. The info sector.
 fat_fsi_write:
     ld      a,(fat_fsi_dirty)
     or      a
-    ret     Z                       ;FSInfo is clean
+    ret     Z                       ;the info sector is already clean
     ld      hl,(fat_fsi_lba)
     ld      a,h
     or      l
     ld      hl,(fat_fsi_lba+2)
     or      h
     or      l
-    ret     Z                       ;no info sector
+    ret     Z                       ;LBA 0 means this volume has no info sector
     xor     a
-    ld      (fat_fsi_dirty),a
+    ld      (fat_fsi_dirty),a       ;clear dirty before the read, so it cannot re-enter
     ld      de,(fat_fsi_lba)
     ld      bc,(fat_fsi_lba+2)
     call    fat_move_window         ;read the info sector
-    jr      NC,fat_fsi_again        ;info sector not read
+    jr      NC,fat_fsi_again        ;the info sector was not read
     ld      a,(_cpm_fat_vol+25)
     or      a
-    jr      Z,fat_fsi_unk           ;free count is unknown
+    jr      Z,fat_fsi_unk           ;free_valid is clear, so the count is unknown
     ld      de,(_cpm_fat_vol+28)
     ld      bc,(_cpm_fat_vol+30)
-    jr      fat_fsi_free
+    jr      fat_fsi_free            ;store the known free count
 fat_fsi_unk:
-    ld      de,$FFFF
+    ld      de,$FFFF                ;$FFFFFFFF means the free count is unknown
     ld      bc,$FFFF
 fat_fsi_free:
     ld      hl,fatwin+488
@@ -345,11 +354,11 @@ fat_fsi_free:
     ld      a,b
     or      c
     or      d
-    jr      NZ,fat_fsi_nxt          ;hint is above 65535
+    jr      NZ,fat_fsi_nxt          ;the hint is above 255
     ld      a,e
-    cp      2                       ;hint vs cluster 2
-    jr      NC,fat_fsi_nxt          ;hint is a real cluster
-    ld      de,$FFFF
+    cp      2                       ;a hint below cluster 2 is not a cluster
+    jr      NC,fat_fsi_nxt          ;the hint is a real cluster
+    ld      de,$FFFF                ;store $FFFFFFFF for a hint below cluster 2
     ld      bc,$FFFF
 fat_fsi_nxt:
     ld      hl,fatwin+492
@@ -357,54 +366,60 @@ fat_fsi_nxt:
     ld      de,(fat_fsi_lba)
     ld      bc,(fat_fsi_lba+2)
     ld      hl,fatwin
-    call    ide_write_sector        ;C: info sector written; HL += 512
-    ret     C                       ;info sector is on disk
+    call    ide_write_sector        ;carry set: info sector written. HL is fatwin plus 512.
+    ret     C                       ;the info sector is on disk
 fat_fsi_again:
-    ld      a,1
+    ld      a,1                     ;the info sector was not written
     ld      (fat_fsi_dirty),a
     ret
 
+; Mark the info sector dirty.
+; Call. No arguments.
+; Return. fat_fsi_dirty is 1. Flags are unchanged.
+; Clobber. AF. BC, DE, and HL stay.
+; Writes. fat_fsi_dirty.
 fat_fsi_mark:
     ld      a,1
     ld      (fat_fsi_dirty),a
     ret
 
-; ff.c move_window: flush if dirty, then read LBA into fatwin.
-; IN:  BCDE = LBA (B MSB … E LSB)
-; OUT: C: fatwin holds that sector
-;      NC: read failed
-; clobbers AF, HL; BCDE may be clobbered
+; Read one sector into the window. Write the dirty window first.
+; Call. BCDE is the LBA. E is the low byte.
+; Return. Carry set: fatwin holds that sector and fat_wflag is clear.
+; Return. Carry clear: the dirty window was not written, or the read failed.
+; Clobber. AF, HL. BC and DE stay.
+; Writes. fatwin, fat_winsect, and fat_wflag when a new sector is read.
 fat_move_window:
     ld      hl,(fat_winsect)
     ld      a,l
-    cp      e                       ;LBA +0 vs window
-    jr      NZ,fat_move_do          ;window byte 0 differs
+    cp      e                       ;LBA byte 0 against the window
+    jr      NZ,fat_move_do          ;byte 0 differs, so read the new LBA
     ld      a,h
-    cp      d                       ;LBA +1 vs window
-    jr      NZ,fat_move_do          ;window byte 1 differs
+    cp      d                       ;LBA byte 1 against the window
+    jr      NZ,fat_move_do          ;byte 1 differs, so read the new LBA
     ld      hl,(fat_winsect+2)
     ld      a,l
-    cp      c                       ;LBA +2 vs window
-    jr      NZ,fat_move_do          ;window byte 2 differs
+    cp      c                       ;LBA byte 2 against the window
+    jr      NZ,fat_move_do          ;byte 2 differs, so read the new LBA
     ld      a,h
-    cp      b                       ;LBA +3 vs window
-    jr      NZ,fat_move_do          ;window byte 3 differs
-    scf                             ;already in window
+    cp      b                       ;LBA byte 3 against the window
+    jr      NZ,fat_move_do          ;byte 3 differs, so read the new LBA
+    scf                             ;this LBA is already in the window
     ret
 fat_move_do:
     push    bc
-    push    de                      ;save LBA (ide_* and sync clobber)
-    call    fat_sync_window         ;flush the dirty window
+    push    de                      ;keep the LBA. sync and the disk call write BCDE.
+    call    fat_sync_window         ;write the dirty window first
     pop     de
     pop     bc
-    ret     NC                      ;dirty window not written
+    ret     NC                      ;the dirty window was not written
     push    bc
     push    de
-    ld      hl,fatwin               ;high RAM FAT window
-    call    ide_read_sector         ;C: sector in fatwin; HL += 512
+    ld      hl,fatwin               ;sector window
+    call    ide_read_sector         ;carry set: sector read. HL is fatwin plus 512.
     pop     de
     pop     bc
-    ret     NC                      ;sector was not read
+    ret     NC                      ;the sector was not read
     ld      (fat_winsect),de
     ld      (fat_winsect+2),bc
     xor     a
@@ -412,68 +427,72 @@ fat_move_do:
     scf
     ret
 
-;------------------------------------------------------------------------------
-; fat_fatent: map cluster BCDE onto fatwin (ff get_fat/put_fat window).
-; Byte offset = clst*2 (FAT16) or clst*4 (FAT32); LBA = fatbase + offset/512.
-; Rejects cluster < 2 or cluster >= n_fatent. OUT C: HL -> the entry in fatwin.
-;------------------------------------------------------------------------------
+; Map a cluster onto its FAT entry in the window.
+; A FAT16 entry is 2 bytes. A FAT32 entry is 4 bytes. A sector is 512 bytes.
+; Call. BCDE is the cluster. E is the low byte.
+; Return. Carry set and the cluster is in range: HL points at the entry.
+; Return. Carry set and the cluster is below 2: HL is not an entry.
+; Return. That carry is still set from the cluster-2 subtract. It is not success.
+; Return. Carry clear: the cluster is at or past n_fatent, or the sector was not read.
+; Clobber. AF, BC, DE, HL.
+; Writes. fatwin and fat_winsect when the FAT sector is read.
 fat_fatent:
-    ld      a,e                     ;reject clst < 2
-    sub     2                       ;cluster - 2
+    ld      a,e                     ;a cluster below 2 is not in the FAT
+    sub     2                       ;cluster below 2 sets carry
     ld      a,d
     sbc     a,0
     ld      a,c
     sbc     a,0
     ld      a,b
     sbc     a,0
-    ret     C                       ;cluster < 2
-    ld      hl,_cpm_fat_vol+4       ;clst - n_fatent (BCDE live)
+    ret     C                       ;below 2. Carry stays set from the subtract.
+    ld      hl,_cpm_fat_vol+4       ;cluster minus n_fatent. BCDE stays.
     ld      a,e
-    sub     (hl+)                   ;cluster - n_fatent
+    sub     (hl+)                   ;cluster minus n_fatent
     ld      a,d
     sbc     (hl+)
     ld      a,c
     sbc     (hl+)
     ld      a,b
     sbc     a,(hl)
-    ret     NC                      ;clst >= n_fatent
+    ret     NC                      ;the cluster is at or past n_fatent
     ld      a,(_cpm_fat_vol)
-    cp      FS_FAT32                ;fs_type vs FAT32
-    jr      Z,fat_fatent32          ;FAT32 uses dword entries
-    ; FAT16: pff/ff WORD array. sect = fatbase + clst/256; off = (BYTE)clst*2
+    cp      FS_FAT32                ;fs_type against FAT32
+    jr      Z,fat_fatent32          ;FAT32 uses a 4-byte entry
+    ; FAT16. The sector is fatbase plus cluster/256. The offset is the low byte times 2.
     ld      l,e
     ld      h,0
-    add     hl,hl                   ;off = (BYTE)clst * 2  (< 512)
+    add     hl,hl                   ;offset is below 512
     push    hl
     ld      e,d
     ld      d,c
     ld      c,b
-    ld      b,0                     ;BCDE = clst >> 8
-    jr      fat_fatent_sec
+    ld      b,0                     ;BCDE is cluster >> 8
+    jr      fat_fatent_sec          ;add fatbase and read that sector
 fat_fatent32:
-    ; FAT32: pff DWORD array. sect = fatbase + clst/128; off = (clst%128)*4
-    ; (clst%128)*4 is 0..508 — must be 16-bit; add a,a wraps at 64.
+    ; FAT32. 128 entries fill one 512-byte sector. The offset is (cluster mod 128)*4.
+    ; That offset is 0 to 508. An 8-bit add would wrap, so the shift uses HL.
     ld      a,e
-    and     127
+    and     127                     ;128 FAT32 entries fill one sector
     ld      l,a
     ld      h,0
     add     hl,hl
     add     hl,hl
-    push    hl                      ;off 0..508
+    push    hl                      ;offset 0 to 508
     ld      a,e
-    rla                             ;C = clst bit 7
+    rla                             ;carry is cluster bit 7
     ld      e,d
     ld      d,c
     ld      c,b
-    ld      b,0                     ;clst >> 8
+    ld      b,0                     ;cluster >> 8
     rl      e
     rl      d
     rl      c
-    rl      b                       ;clst >> 7
+    rl      b                       ;cluster >> 7
 fat_fatent_sec:
-    ld      hl,_cpm_fat_vol+8       ;+ fatbase
+    ld      hl,_cpm_fat_vol+8       ;fatbase
     ld      a,(hl+)
-    add     a,e                     ;fatbase + FAT sector
+    add     a,e                     ;fatbase plus the FAT sector
     ld      e,a
     ld      a,(hl+)
     adc     a,d
@@ -484,38 +503,43 @@ fat_fatent_sec:
     ld      a,(hl)
     adc     a,b
     ld      b,a
-    call    fat_move_window         ;FAT sector into fatwin
-    pop     de                      ;offset in sector (< 512)
-    ret     NC                      ;FAT sector not read
+    call    fat_move_window         ;read the FAT sector into fatwin
+    pop     de                      ;byte offset in the 512-byte sector
+    ret     NC                      ;the FAT sector was not read
     ld      hl,fatwin
     add     hl,de
     scf
     ret
 
-; ff.c get_fat. FAT12 packed 12-bit; FAT16 word; FAT32 dword & $0FFFFFFF.
-; EOC is folded to $0FFFFFFF (FAT12 $FF8..$FFF; FAT16 $FFF8..$FFFF;
-; FAT32 >= $0FFFFFF8).
+; Read the FAT link for one cluster.
+; Call. BCDE is the cluster. E is the low byte.
+; Return. Carry set: BCDE is the link. An end-of-chain link is $0FFFFFFF.
+; Return. FAT12 end-of-chain is $FF8 to $FFF. FAT16 end-of-chain is $FFF8 to $FFFF.
+; Return. FAT32 end-of-chain is $0FFFFFF8 and above. A bad cluster is $FFF7 or $0FFFFFF7.
+; Return. Carry clear: the cluster is bad, at or past n_fatent, or the sector was not read.
+; Return. A cluster below 2 does not take that carry-clear exit.
+; Clobber. AF, BC, DE, HL.
 get_fat:
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT12                ;fs_type vs FAT12
-    jp      Z,get_fat12             ;12-bit packed entry
+    jp      Z,get_fat12             ;FAT12 stores a 12-bit packed entry
     call    fat_fatent              ;map the cluster into fatwin
-    ret     NC                      ;FAT entry not available
+    ret     NC                      ;at or past n_fatent, or the sector was not read
     ld      a,(_cpm_fat_vol)
-    cp      FS_FAT32                ;fs_type vs FAT32
-    jr      Z,get_fat32             ;read a FAT32 entry
+    cp      FS_FAT32                ;fs_type against FAT32
+    jr      Z,get_fat32             ;read a 28-bit FAT32 entry
     ld      e,(hl+)
     ld      d,(hl)
     ld      a,d
-    cp      $FF                     ;FAT16 high byte vs $FF
-    jr      NZ,get_fat16ok          ;not EOC and not bad
+    cp      $FF                     ;FAT16 end range starts at high byte $FF
+    jr      NZ,get_fat16ok          ;not an end mark and not a bad cluster
     ld      a,e
-    cp      $F7                     ;FAT16 bad cluster
-    jr      Z,get_fat_bad           ;bad cluster $FFF7
-    cp      $F8                     ;FAT16 EOC $FFF8..$FFFF
-    jr      C,get_fat16ok           ;link is below $FFF8
+    cp      $F7                     ;FAT16 bad cluster is $FFF7
+    jr      Z,get_fat_bad           ;$FFF7 is an error, not a link
+    cp      $F8                     ;FAT16 end-of-chain is $FFF8 to $FFFF
+    jr      C,get_fat16ok           ;the link is below $FFF8
     ld      de,$FFFF
-    ld      bc,$0FFF                ;fold to EOC32 for callers
+    ld      bc,$0FFF                ;fold $FFF8..$FFFF to $0FFFFFFF
     scf
     ret
 get_fat16ok:
@@ -527,9 +551,9 @@ get_fat32:
     ld      d,(hl+)
     ld      c,(hl+)
     ld      a,(hl)
-    and     $0F
+    and     $0F                     ;a FAT32 link keeps 28 bits
     ld      b,a
-    cp      $0F                     ;top nibble vs $0F
+    cp      $0F                     ;the top nibble of an end range is $0F
     jr      NZ,get_fat32ok          ;not an end-range entry
     ld      a,c
     inc     a
@@ -538,31 +562,26 @@ get_fat32:
     inc     a
     jr      NZ,get_fat32ok          ;byte 1 is not $FF
     ld      a,e
-    cp      $F7                     ;FAT32 bad cluster $0FFFFFF7
-    jr      Z,get_fat_bad           ;bad cluster $0FFFFFF7
-    cp      $F8                     ;low byte vs $F8
-    jr      C,get_fat32ok           ;link is below $0FFFFFF8
+    cp      $F7                     ;a FAT32 bad cluster is $0FFFFFF7
+    jr      Z,get_fat_bad           ;$0FFFFFF7 is an error, not a link
+    cp      $F8                     ;FAT32 end-of-chain is $0FFFFFF8 and above
+    jr      C,get_fat32ok           ;the link is below $0FFFFFF8
     ld      de,$FFFF
-    ld      bc,$0FFF
+    ld      bc,$0FFF                ;fold the end mark to $0FFFFFFF
 get_fat32ok:
     scf
     ret
 get_fat_bad:
-    or      a
+    or      a                       ;a bad cluster is not a link. Carry is clear.
     ret
 
-; FAT12 entry. Two clusters share three bytes. Byte offset is
-; clst + clst/2 (ChaN, and Microsoft FAT specification 1.03).
-; An even cluster owns the low 12 bits. An odd cluster owns the
-; high 12 bits. The two bytes can sit in different sectors when
-; the offset ends on byte 511.
-; IN: BCDE = cluster, already in range for fat12_load.
-; OUT C: E = first raw byte, D = second raw byte, C = 1 if odd.
-;     The window sits on the second sector when the entry spans,
-;     and on the entry's sector otherwise.
-; NC: the FAT sector was not read. BCDE is not preserved.
+; Test that a FAT12 cluster is inside the FAT.
+; Call. BCDE is the cluster. E is the low byte.
+; Return. Carry set: the cluster is in range. BCDE is unchanged.
+; Return. Carry clear: the cluster is below 2, or at or past n_fatent.
+; Clobber. AF, HL. BC and DE stay.
 fat12_range:
-    ld      a,e                     ;clst < 2
+    ld      a,e                     ;a cluster below 2 is not in the FAT
     sub     2
     ld      a,d
     sbc     a,0
@@ -570,8 +589,8 @@ fat12_range:
     sbc     a,0
     ld      a,b
     sbc     a,0
-    jr      C,fat12_range_lo        ;cluster < 2
-    ld      hl,_cpm_fat_vol+4       ;clst - n_fatent
+    jr      C,fat12_range_lo        ;the cluster is below 2
+    ld      hl,_cpm_fat_vol+4       ;cluster minus n_fatent
     ld      a,e
     sub     (hl+)
     ld      a,d
@@ -580,23 +599,33 @@ fat12_range:
     sbc     a,(hl+)
     ld      a,b
     sbc     a,(hl)
-    ret     NC                      ;clst >= n_fatent
+    ret     NC                      ;the cluster is at or past n_fatent
     scf
     ret
 fat12_range_lo:
-    or      a
+    or      a                       ;clear the subtract carry. The cluster is below 2.
     ret
 
+; Load the two raw bytes of one FAT12 entry.
+; Two clusters share three bytes. The packed offset is cluster plus cluster/2.
+; An even cluster owns the low 12 bits. An odd cluster owns the high 12 bits.
+; Cluster 341 ends on byte 511 and spans two FAT sectors.
+; Call. BCDE is a cluster already known to be in range.
+; Return. Carry set: E is the first raw byte and D is the second.
+; Return. C is 1 when the cluster is odd. C is 0 when it is even.
+; Return. A span leaves the window on the second sector.
+; Return. Carry clear: a FAT sector was not read. BCDE is the cluster again.
+; Clobber. AF, C, DE, HL. B stays.
 fat12_load:
     push    bc
     push    de
     ld      l,e
     ld      h,d
     srl     h
-    rr      l                       ;clst / 2
-    add     hl,de                   ;byte offset = clst + clst/2
+    rr      l                       ;cluster / 2
+    add     hl,de                   ;packed offset is cluster plus cluster/2
     ld      a,h
-    srl     a                       ;sector = offset >> 9
+    srl     a                       ;sector is offset / 512
     ld      e,a
     ld      d,0
     ld      bc,0
@@ -614,7 +643,7 @@ fat12_load:
     adc     a,b
     ld      b,a
     call    fat_move_window
-    jr      NC,fat12_load_fail
+    jr      NC,fat12_load_fail      ;the FAT sector was not read
     pop     de                      ;cluster low
     pop     bc                      ;cluster high
     push    bc
@@ -623,32 +652,32 @@ fat12_load:
     ld      h,d
     srl     h
     rr      l
-    add     hl,de                   ;byte offset again
+    add     hl,de                   ;packed offset is cluster plus cluster/2
     ld      a,h
     and     1
-    ld      h,a                     ;offset in the sector
+    ld      h,a                     ;offset inside the 512-byte sector
     ld      a,l
     inc     a
-    jr      NZ,fat12_same           ;not byte 255 or 511
+    jr      NZ,fat12_same           ;the offset is not 255 or 511
     ld      a,h
     or      a
-    jr      Z,fat12_off255          ;offset 255, still this sector
+    jr      Z,fat12_off255          ;offset 255 stays in this sector
     ld      de,fatwin
     add     hl,de
-    ld      c,(hl)                  ;first byte at offset 511
+    ld      c,(hl)                  ;cluster 341. The first byte is at offset 511.
     push    bc
     ld      hl,(fat_winsect)
     inc     hl
     ld      a,h
     or      l
-    jr      NZ,fat12_span_lba
+    jr      NZ,fat12_span_lba       ;the next sector does not wrap the low word
     ld      a,(fat_winsect+2)
     add     a,1
     ld      c,a
     ld      a,(fat_winsect+3)
     adc     a,0
     ld      b,a
-    jr      fat12_span_go
+    jr      fat12_span_go           ;the low word wrapped, so carry into the high word
 fat12_span_lba:
     ld      a,(fat_winsect+2)
     ld      c,a
@@ -658,17 +687,17 @@ fat12_span_go:
     ld      e,l
     ld      d,h
     call    fat_move_window
-    jr      NC,fat12_span_err
-    ld      a,(fatwin)              ;second byte at offset 0
+    jr      NC,fat12_span_err       ;the second FAT sector was not read
+    ld      a,(fatwin)              ;the second byte is at offset 0
     pop     bc
     ld      e,c
     ld      d,a
     ld      b,1
-    jr      fat12_par
+    jr      fat12_par               ;join the common parity exit
 fat12_off255:
-    ld      l,255
+    ld      l,255                   ;offset 255. dec a below restores that offset.
 fat12_same:
-    dec     a                       ;A was L+1 when we came from inc
+    dec     a                       ;A was one past the low offset byte
     ld      l,a
     ld      de,fatwin
     add     hl,de
@@ -681,23 +710,28 @@ fat12_par:
     pop     bc                      ;cluster high, discarded
     ld      a,l
     and     1
-    ld      c,a                     ;1 = odd cluster
+    ld      c,a                     ;1 means an odd cluster
     scf
     ret
 fat12_span_err:
     pop     bc
 fat12_load_fail:
-    pop     de
+    pop     de                      ;restore the cluster
     pop     bc
-    or      a
+    or      a                       ;clear carry. A FAT sector was not read.
     ret
 
-; Shift the raw word in DE to the 12-bit value. C = 1 if odd.
+; Turn the raw FAT12 word into a 12-bit link.
+; Call. DE is the raw word. E is the first byte. C is 1 when the cluster is odd.
+; Return. DE is the 12-bit link. An odd entry is a nibble shift.
+; Return. An even entry keeps the low 12 bits.
+; Return. The even path clears carry. The odd path leaves carry from the shift.
+; Clobber. AF, DE. BC and HL stay.
 fat12_value:
     ld      a,c
     or      a
-    jr      Z,fat12_even
-    srl     d                       ;odd: >> 4
+    jr      Z,fat12_even            ;an even cluster keeps the low 12 bits
+    srl     d                       ;odd entry: nibble shift
     rr      e
     srl     d
     rr      e
@@ -708,26 +742,32 @@ fat12_value:
     ret
 fat12_even:
     ld      a,d
-    and     $0F
+    and     $0F                     ;keep the low 12 bits
     ld      d,a
     ret
 
+; Read one FAT12 link and fold an end mark to $0FFFFFFF.
+; Call. BCDE is the cluster. E is the low byte.
+; Return. Carry set: BCDE is the link. A normal link has BC = 0.
+; Return. End-of-chain $FF8 to $FFF comes back as $0FFFFFFF.
+; Return. Carry clear: the cluster is out of range, the sector was not read, or the link is $FF7.
+; Clobber. AF, BC, DE, HL.
 get_fat12:
     call    fat12_range
-    ret     NC                      ;cluster is not in the FAT
+    ret     NC                      ;the cluster is not in the FAT
     call    fat12_load
-    ret     NC                      ;FAT sector not read
-    call    fat12_value             ;DE = 12-bit link
+    ret     NC                      ;a FAT sector was not read
+    call    fat12_value             ;DE is the 12-bit link
     ld      a,d
-    cp      $0F                     ;high nibble of $FF8..$FFF
-    jr      NZ,get_fat12_ok
+    cp      $0F                     ;an end range has high nibble $0F
+    jr      NZ,get_fat12_ok         ;not an end mark and not a bad cluster
     ld      a,e
-    cp      $F7                     ;FAT12 bad cluster $FF7
-    jp      Z,get_fat_bad
-    cp      $F8                     ;FAT12 EOC $FF8..$FFF
-    jr      C,get_fat12_ok
+    cp      $F7                     ;a FAT12 bad cluster is $FF7
+    jp      Z,get_fat_bad           ;$FF7 is an error, not a link
+    cp      $F8                     ;FAT12 end-of-chain is $FF8 to $FFF
+    jr      C,get_fat12_ok          ;the link is below $FF8
     ld      de,$FFFF
-    ld      bc,$0FFF                ;fold to EOC32 for callers
+    ld      bc,$0FFF                ;fold $FF8..$FFF to $0FFFFFFF
     scf
     ret
 get_fat12_ok:
@@ -735,32 +775,35 @@ get_fat12_ok:
     scf
     ret
 
-; Write the low 12 bits of the dword at HL into cluster BCDE.
-; Keeps the neighbour nibble. A span writes the first byte and marks
-; the window dirty before the window moves.
-; IN: BCDE = cluster, HL -> new link. OUT: C on the bytes, NC on disk error.
+; Store the low 12 bits of a link. The neighbour nibble stays as it was.
+; Call. BCDE is the cluster. HL points at the new link.
+; Return. Carry set: the bytes are in the window and the window is dirty.
+; Return. A span marks the first byte dirty before the window moves.
+; Return. Carry clear: the cluster is out of range, or a sector was not read.
+; Clobber. AF, BC, DE, HL.
+; Writes. The FAT bytes in fatwin. fat_wflag. A span may write the first sector.
 fat12_store:
     push    hl                      ;source
     push    bc
     push    de
     call    fat12_range
-    jp      NC,fat12_store_fail     ;cluster is not in the FAT
-    call    fat12_load              ;DE = old raw, C = parity
-    jp      NC,fat12_store_fail
+    jp      NC,fat12_store_fail     ;the cluster is not in the FAT
+    call    fat12_load              ;DE is the old raw word. C is the odd flag.
+    jp      NC,fat12_store_fail     ;a FAT sector was not read
     ld      a,c
     pop     hl                      ;cluster low
     pop     bc                      ;cluster high
-    ex      (sp),hl                 ;HL = source, stack = cluster low
+    ex      (sp),hl                 ;HL is the source. The stack keeps the cluster low.
     push    bc
-    push    af                      ;parity
-    push    de                      ;old raw (E first, D second)
+    push    af                      ;odd flag
+    push    de                      ;old raw word. E is the first byte.
     ld      e,(hl)
     inc     hl
     ld      d,(hl)                  ;new link
-    pop     hl                      ;old raw
-    pop     af                      ;parity
+    pop     hl                      ;old raw word
+    pop     af                      ;odd flag
     or      a
-    jr      Z,fat12_st_even
+    jr      Z,fat12_st_even         ;an even cluster keeps the low 12 bits
     ld      a,e
     and     $0F
     rlca
@@ -805,12 +848,12 @@ fat12_st_wr:
     ld      h,d
     srl     h
     rr      l
-    add     hl,de                   ;byte offset. FAT12 cluster fits in DE
+    add     hl,de                   ;packed offset is cluster plus cluster/2
     ld      a,l
     cp      255
-    jr      NZ,fat12_st_same
+    jr      NZ,fat12_st_same        ;the offset is not 255, so it is not byte 511
     bit     0,h
-    jr      NZ,fat12_st_span        ;offset ends on byte 511 of its sector
+    jr      NZ,fat12_st_span        ;cluster 341. Byte 511 spans two sectors.
 fat12_st_same:
     ld      a,h
     and     1
@@ -821,18 +864,18 @@ fat12_st_same:
     ld      (hl),e
     inc     hl
     ld      (hl),d
-    jr      fat12_st_dirty
+    jr      fat12_st_dirty          ;both bytes are in this sector
 fat12_st_span:
-    ; fat12_load left the window on the second sector.
+    ; fat12_load left the window on the second sector. Step back for byte 511.
     ld      hl,(fat_winsect)
     ld      a,h
     or      l
-    jr      Z,fat12_st_backhi
+    jr      Z,fat12_st_backhi       ;the low word is 0, so the previous sector borrows
     dec     hl
     ld      e,l
     ld      d,h
     ld      bc,(fat_winsect+2)
-    jr      fat12_st_back
+    jr      fat12_st_back           ;read the sector that holds byte 511
 fat12_st_backhi:
     ld      de,$FFFF
     ld      hl,(fat_winsect+2)
@@ -840,23 +883,23 @@ fat12_st_backhi:
     ld      b,h
     ld      c,l
 fat12_st_back:
-    call    fat_move_window         ;first sector, still clean
-    jr      NC,fat12_st_pop
+    call    fat_move_window         ;the first sector is still clean
+    jr      NC,fat12_st_pop         ;the first sector was not read
     pop     hl
     push    hl
     ld      a,l
     ld      (fatwin+511),a
     ld      a,1
-    ld      (fat_wflag),a           ;flush this byte before the window moves
+    ld      (fat_wflag),a           ;mark the first byte dirty before the window moves
     ld      hl,(fat_winsect)
     inc     hl
     ld      a,h
     or      l
-    jr      Z,fat12_st_fwdhi
+    jr      Z,fat12_st_fwdhi        ;the next sector wraps the low word
     ld      e,l
     ld      d,h
     ld      bc,(fat_winsect+2)
-    jr      fat12_st_fwd
+    jr      fat12_st_fwd            ;return to the second sector
 fat12_st_fwdhi:
     ld      de,0
     ld      hl,(fat_winsect+2)
@@ -864,15 +907,15 @@ fat12_st_fwdhi:
     ld      b,h
     ld      c,l
 fat12_st_fwd:
-    call    fat_move_window         ;writes the first sector, then the second
-    jr      NC,fat12_st_pop
+    call    fat_move_window         ;write the first sector, then read the second
+    jr      NC,fat12_st_pop         ;the second sector was not read
     pop     hl
     ld      a,h
     ld      (fatwin),a
-    jr      fat12_st_dirty
+    jr      fat12_st_dirty          ;the second byte is stored
 fat12_st_pop:
     pop     hl
-    or      a
+    or      a                       ;clear carry. A spanned sector was not read.
     ret
 fat12_st_dirty:
     ld      a,1
@@ -883,69 +926,81 @@ fat12_store_fail:
     pop     de
     pop     bc
     pop     hl
-    or      a
+    or      a                       ;clear carry. The entry was not stored.
     ret
 
+; Store a FAT12 link and remember whether the old entry was free.
+; The old-free flag is kept for put_fat_wrote, which stores it in C.
+; A is reloaded from B only after the write.
+; The path is pop bc, then ld a,b, then jp put_fat_wrote.
+; Call. BCDE is the cluster. HL points at the new link.
+; Return. Carry set: the entry is stored. The exit is put_fat_wrote.
+; Return. Carry clear: the store failed. The free count is not changed.
+; Clobber. AF, BC, DE, HL.
+; Writes. The FAT12 entry, fat_wflag, and the free count when it changes.
 put_fat12:
     push    hl
     push    bc
     push    de
-    call    get_fat                 ;old link; NC is bad or unread
+    call    get_fat                 ;the old link. Carry clear means bad or unread.
     ld      a,0
-    jr      NC,put_fat12_old        ;treat a bad entry as in use
+    jr      NC,put_fat12_old        ;a bad or unread entry counts as in use
     ld      a,b
     or      c
     or      d
     or      e
     ld      a,0
-    jr      NZ,put_fat12_old
-    inc     a                       ;old entry was free
+    jr      NZ,put_fat12_old        ;the old link is not 0, so the cluster is in use
+    inc     a                       ;the old entry was free
 put_fat12_old:
     pop     de
     pop     bc
     pop     hl
-    push    af
+    push    af                      ;A is 1 when the old entry was free
     push    hl
     call    fat12_store
     pop     hl                      ;source
-    pop     bc                      ;B = old free. pop af would clear carry
-    ret     NC
-    ld      a,b
+    pop     bc                      ;B is the old-free flag
+    ret     NC                      ;the store failed. Do not change the free count.
+    ld      a,b                     ;reload A from B only after the write
     push    af
     push    hl
-    jp      put_fat_wrote
+    jp      put_fat_wrote           ;put_fat_wrote keeps the old-free flag in C
 
-; ff.c put_fat. FAT16 stores 16 bits; FAT32 stores 28 bits and keeps
-; the on-disk high nibble (bits 28-31).
-; IN: BCDE=cluster, HL->DWORD next (LE)
-; If free_valid, bump free_clst when a free entry becomes used or
-; a used entry becomes free (create_chain / remove_chain).
+; Store a FAT link for one cluster.
+; FAT16 stores 16 bits. FAT32 stores 28 bits and keeps the high nibble.
+; Call. BCDE is the cluster. HL points at the new link.
+; Return. Carry set: the entry is in the window and the window is dirty.
+; Return. Carry clear: the cluster is at or past n_fatent, or the sector was not read.
+; Return. A cluster below 2 does not take that carry-clear exit.
+; Clobber. AF, BC, DE, HL.
+; Writes. The FAT entry, fat_wflag, and the free count when free_valid is set.
 put_fat:
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT12                ;fs_type vs FAT12
-    jp      Z,put_fat12             ;12-bit packed entry
+    jp      Z,put_fat12             ;FAT12 stores a 12-bit packed entry
     push    hl
     call    fat_fatent              ;map the cluster into fatwin
-    pop     de                      ;DE -> next dword
-    ret     NC                      ;FAT entry not available
+    pop     de                      ;DE points at the new link
+    ret     NC                      ;at or past n_fatent, or the sector was not read
     ld      a,(_cpm_fat_vol+25)
     or      a
-    jr      Z,put_fat_cold          ;free count is not valid
+    jr      Z,put_fat_cold          ;free_valid is clear, so skip the old-entry test
     push    de
     push    hl
-    call    fat_win_is_free         ;Z: old FAT entry is free
+    call    fat_win_is_free         ;Z: the old FAT entry is free
     ld      a,0
-    jr      NZ,put_fat_old          ;old entry is in use
+    jr      NZ,put_fat_old          ;the old entry is in use
     inc     a
 put_fat_old:
     pop     hl
     pop     de
-    jr      put_fat_adj
+    jr      put_fat_adj             ;adjust the free count from the old flag
 put_fat_cold:
-    xor     a                       ;dummy old_free; stack always has AF
+    xor     a                       ;the old flag is 0. The stack still receives AF.
 put_fat_adj:
-    push    af                      ;A = 1 if old entry was free
-    push    de                      ;src for new-free test
+    push    af                      ;A is 1 when the old entry was free
+    push    de                      ;source for the new-link test
     ld      a,(_cpm_fat_vol)
     cp      FS_FAT32                ;fs_type vs FAT32
     jr      Z,put_fat32             ;store a 28-bit link
@@ -956,23 +1011,23 @@ put_fat_adj:
 put_fat_wrote:
     pop     de
     pop     af
-    ld      c,a                     ;old free
+    ld      c,a                     ;keep the old-free flag in C
     ld      a,(_cpm_fat_vol+25)
     or      a
-    jr      Z,put_fat_dirty         ;free count is not valid
+    jr      Z,put_fat_dirty         ;free_valid is clear, so do not adjust the count
     push    bc
-    call    fat_src_is_free         ;Z: new link is free
+    call    fat_src_is_free         ;Z: the new link is free
     pop     bc
     ld      a,c
-    jr      Z,put_fat_new0          ;new link is free
+    jr      Z,put_fat_new0          ;the new link is free
     or      a
-    jr      Z,put_fat_dirty         ;used -> used
-    call    fat_nfree_dec           ;free -> used
+    jr      Z,put_fat_dirty         ;used to used. The free count stays.
+    call    fat_nfree_dec           ;free to used
     jr      put_fat_dirty
 put_fat_new0:
     or      a
-    jr      NZ,put_fat_dirty        ;free -> free
-    call    fat_nfree_inc           ;used -> free
+    jr      NZ,put_fat_dirty        ;free to free. The free count stays.
+    call    fat_nfree_inc           ;used to free
 put_fat_dirty:
     ld      a,1
     ld      (fat_wflag),a
@@ -994,11 +1049,14 @@ put_fat32:
     ld      (hl),a
     jr      put_fat_wrote
 
-; Z if FAT entry at HL is free (ff ld_16==0 / ld_32&0x0FFFFFFF==0).
-; Preserves HL. put_fat cache and f_getfree window scan.
+; Test whether the FAT entry at HL is free.
+; Call. HL points at the entry in memory.
+; Return. Z means the entry is free. Carry is clear. HL returns to the first byte.
+; Return. FAT32 tests the low 28 bits. FAT16 tests both bytes.
+; Clobber. AF. BC, DE, and HL stay.
 fat_win_is_free:
     ld      a,(_cpm_fat_vol)
-    cp      FS_FAT32                ;fs_type vs FAT32
+    cp      FS_FAT32                ;fs_type against FAT32
     jr      Z,fat_win_free32        ;test the low 28 bits
     ld      a,(hl+)
     or      (hl-)
@@ -1010,22 +1068,30 @@ fat_win_free32:
     or      (hl+)
     ld      b,a
     ld      a,(hl-)
-    and     $0F
+    and     $0F                     ;FAT32 free means the low 28 bits are 0
     dec     hl
     dec     hl
     or      b
     pop     bc
     ret
 
-; Z if LE dword at DE is a free next-cluster. Preserves DE, HL.
+; Test whether the link at DE is free.
+; Call. DE points at a little-endian dword.
+; Return. Z means the link is free. Carry is clear. DE and HL stay.
+; Clobber. AF. BC, DE, and HL stay.
 fat_src_is_free:
     push    hl
     ex      de,hl
-    call    fat_win_is_free         ;Z: dword at DE is free
+    call    fat_win_is_free         ;Z: the dword at DE is free
     ex      de,hl
     pop     hl
     ret
 
+; Add one to the free-cluster count.
+; Call. No arguments. The caller has a valid free count.
+; Return. The count is one higher. fat_fsi_dirty is 1.
+; Clobber. AF, HL. BC and DE stay.
+; Writes. The free count and fat_fsi_dirty.
 fat_nfree_inc:
     ld      hl,(_cpm_fat_vol+28)
     inc     hl
@@ -1038,8 +1104,14 @@ fat_nfree_inc_hi:
     ld      hl,(_cpm_fat_vol+30)
     inc     hl
     ld      (_cpm_fat_vol+30),hl
-    jp      fat_fsi_mark
+    jp      fat_fsi_mark            ;mark the info sector after the high half increments
 
+; Subtract one from the free-cluster count.
+; Call. No arguments.
+; Return. Z and carry clear: the count was already 0. It is not changed.
+; Return. Otherwise the count is one lower and fat_fsi_dirty is 1.
+; Clobber. AF, DE, HL. BC stays.
+; Writes. The free count, unless it was already 0.
 fat_nfree_dec:
     ld      hl,(_cpm_fat_vol+28)
     ld      a,h
@@ -1047,10 +1119,10 @@ fat_nfree_dec:
     ld      de,(_cpm_fat_vol+30)
     or      d
     or      e
-    ret     Z                       ;free count is already 0
+    ret     Z                       ;the free count is already 0
     ld      a,h
     or      l
-    jr      NZ,fat_nfree_dec_lo     ;low half is not zero
+    jr      NZ,fat_nfree_dec_lo     ;the low half is not zero, so decrement it
     ld      hl,(_cpm_fat_vol+30)
     dec     hl
     ld      (_cpm_fat_vol+30),hl
@@ -1060,9 +1132,12 @@ fat_nfree_dec_lo:
     ld      (_cpm_fat_vol+28),hl
     jp      fat_fsi_mark
 
-; ff.c ld_32 / st_32 as *(DWORD *). Byte stream through HL (no ld hl,(de)
-; on Z80). Last byte has no post-increment: HL at offset +3. Streamed
-; callers inc hl to the next dword. BCDE is E LSB.
+; Load a little-endian dword into BCDE.
+; Call. HL points at the dword.
+; Return. E is the low byte. HL is left on the last byte.
+; Return. A caller that reads the next dword must inc hl first.
+; Return. Flags are unchanged.
+; Clobber. BC, DE, HL. AF stays.
 fat_ld32:
     ld      e,(hl+)
     ld      d,(hl+)
@@ -1070,6 +1145,11 @@ fat_ld32:
     ld      b,(hl)
     ret
 
+; Store BCDE as a little-endian dword at HL.
+; Call. HL points at the destination. E is the low byte.
+; Return. HL is left on the last byte. Flags are unchanged.
+; Clobber. HL. AF, BC, and DE stay.
+; Writes. Four bytes at HL.
 fat_st32:
     ld      (hl+),e
     ld      (hl+),d
@@ -1077,24 +1157,28 @@ fat_st32:
     ld      (hl),b
     ret
 
-; IN: HL -> {sclust:4, fptr:4} LE
-; OUT C: BCDE = cluster containing fptr
-; Cluster index is (fptr >> 9) / csize. Sequential CP/M I/O hits
-; clst_cache_* so we do not re-walk from sclust.
+; Find the cluster that holds a file offset.
+; The index is (file pointer >> 9) / csize. A sector is 512 bytes.
+; Call. HL points at a start cluster and a file pointer. Both are little-endian dwords.
+; Return. Carry set: BCDE is that cluster. E is the low byte. The cache records the walk.
+; Return. Carry clear: the index does not fit, the chain ended, or a link was not read.
+; Clobber. AF, BC, DE, HL.
+; Writes. fat_work. On success, the cluster cache.
 clst_from_off:
     call    fat_ld32                ;load the start cluster
     ld      (fat_work),de           ;sclust
     ld      (fat_work+2),bc
     inc     hl
-    call    fat_ld32                ;fptr
-    ; cluster index = (fptr >> 9) / csize. >>8 is a byte slide; >>1 after that.
+    call    fat_ld32                ;file pointer
+    ; The index is (file pointer >> 9) / csize. A sector is 512 bytes.
+    ; The first shift is a byte slide. One more shift completes >> 9.
     ld      e,d
     ld      d,c
     ld      c,b
-    ld      b,0                     ;fptr >> 8
-    srl     c                       ;sector index from fptr >> 9
+    ld      b,0                     ;file pointer >> 8
+    srl     c                       ;divide by 512. This is the sector index.
     rr      d
-    rr      e                       ;fptr >> 9 = sector index in CDE
+    rr      e                       ;sector index in CDE
     ld      a,(_cpm_fat_vol+1)
     ld      b,0
 cfo_log:
@@ -1122,10 +1206,11 @@ cfo_ci:
     ld      hl,(_cpm_fat_vol+4)
     or      a
     sbc     hl,de                   ;n_fatent - index
-    jp      C,cfo_bad               ;index is past the FAT
-    jp      Z,cfo_bad
+    jp      C,cfo_bad               ;the index is past the FAT
+    jp      Z,cfo_bad               ;the index equals n_fatent, so it is not in the FAT
 cfo_ci_ok:
-    ld      (fat_work+4),de         ;want_ci — kept for the cache store
+    ; n_fatent above 65535 skips the range subtract. DE is still the index.
+    ld      (fat_work+4),de         ;the store writes that index
     ld      hl,clst_cache_sclust
     ld      a,(fat_work)
     cp      (hl)                    ;cache vs sclust +0
@@ -1150,7 +1235,7 @@ cfo_ci_ok:
     jr      NC,cfo_from0            ;want is behind the cache
     ld      hl,(fat_work+4)
     ld      de,(clst_cache_ci)
-    or      a                       ;C still set from cache_ci-want
+    or      a                       ;clear carry left by cache_ci minus want
     sbc     hl,de
     ld      (fat_work+8),hl         ;steps from cached cluster
     ld      de,(clst_cache_clst)
@@ -1165,22 +1250,22 @@ cfo_loop:
     ld      a,(fat_work+8)
     ld      hl,fat_work+9
     or      (hl)
-    jr      Z,cfo_have              ;offset is consumed
-    call    get_fat                 ;next cluster in the chain
-    ret     NC                      ;bad cluster or unreadable
+    jr      Z,cfo_have              ;the offset is consumed
+    call    get_fat                 ;next cluster. This walk has no cycle counter.
+    ret     NC                      ;a bad cluster, or the entry was not read
     ld      a,b
-    cp      $0F                     ;top nibble vs $0F
+    cp      $0F                     ;an end mark has top nibble $0F
     jr      NZ,cfo_store            ;not an end mark
     ld      a,c
     and     d
     and     e
     inc     a
-    jr      Z,cfo_bad               ;link is $0FFFFFFF
+    jr      Z,cfo_bad               ;the link is $0FFFFFFF
 cfo_store:
     ld      hl,(fat_work+8)
     dec     hl
     ld      (fat_work+8),hl
-    jr      cfo_loop
+    jr      cfo_loop                ;one cluster remains in the walk
 cfo_cached:
     ld      de,(clst_cache_clst)
     ld      bc,(clst_cache_clst+2)
@@ -1196,20 +1281,24 @@ cfo_have:
     scf
     ret
 cfo_bad:
-    or      a
+    or      a                       ;clear carry. The offset is not in the chain.
     ret
 
-; Allocate one cluster and link it.
-; IN: BCDE = cluster to link after, or 0 to start a new chain.
-; A new chain starts at fat_last_clst when that hint is a real cluster
-; (fatgen103 FSI_Nxt_Free: start where the driver last allocated).
-; Otherwise it starts at cluster 2. Extending a chain starts at clst+1,
-; so the next cluster is taken when it is free.
-; The scan wraps once to cluster 2 and stops at the cluster where this
-; search started, so the tail is not read twice.
-; The new cluster is marked EOC ($0FFFFFFF), remembered as fat_last_clst,
-; and linked from the previous cluster when there is one.
-; OUT C: BCDE = new cluster. A failed FAT#2 mirror still returns it.
+; Allocate one cluster and link it on the chain.
+; A new chain starts at fat_last_clst when that hint is a real cluster.
+; That hint is FSI_Nxt_Free. Otherwise the scan starts at cluster 2.
+; An extension starts at the next cluster, and takes it when it is free.
+; The scan wraps once to cluster 2 and stops at the start cluster.
+; The tail is not read twice.
+; Call. BCDE is the previous cluster. Zero starts a new chain.
+; Return. Carry set: BCDE is the new cluster.
+; Return. The new cluster is marked end-of-chain, then linked.
+; Return. A failed second FAT copy leaves the first copy written.
+; Return. This exit is still success. fat_sync_window does not decide it.
+; Return. Carry clear: no free cluster remains, a read failed, cc_wipe failed, or put_fat did not store the link.
+; Return. If the link store fails, the end mark may already sit in the window.
+; Clobber. AF, BC, DE, HL.
+; Writes. The FAT, fat_last_clst, the cluster data, and fat_fsi_dirty.
 create_chain:
     ld      (fat_work+8),de         ;link-from
     ld      (fat_work+10),bc
@@ -1223,19 +1312,19 @@ create_chain:
     inc     de
     ld      a,d
     or      e
-    jr      NZ,cc_mark              ;clst+1 fits in the low word
-    inc     bc
-    jr      cc_mark
+    jr      NZ,cc_mark              ;cluster+1 fits in the low word
+    inc     bc                      ;cluster+1 wrapped the low word
+    jr      cc_mark                 ;search from the next cluster
 cc_hint:
     ld      de,(fat_last_clst)
     ld      bc,(fat_last_clst+2)
     ld      a,b
     or      c
     or      d
-    jr      NZ,cc_hint_hi           ;hint is above 65535
+    jr      NZ,cc_hint_hi           ;hint is above 255
     ld      a,e
-    cp      2                       ;hint vs cluster 2
-    jr      C,cc_from2              ;no hint, or hint is 0/1
+    cp      2                       ;a hint below cluster 2 is not a cluster
+    jr      C,cc_from2              ;no hint, or the hint is 0 or 1
 cc_hint_hi:
     push    bc
     push    de
@@ -1255,15 +1344,15 @@ cc_hint_hi:
     or      c
     or      h
     or      l
-    jr      Z,cc_hint_bad           ;hint >= n_fatent
+    jr      Z,cc_hint_bad           ;the hint is at or past n_fatent
     pop     de
     pop     bc
-    jr      cc_mark
+    jr      cc_mark                 ;the hint is inside the FAT
 cc_hint_bad:
     pop     de
     pop     bc
 cc_from2:
-    ld      de,2
+    ld      de,2                    ;cluster 2 is the first real cluster
     ld      bc,0
 cc_mark:
     ld      (fat_work),de           ;search origin
@@ -1322,8 +1411,8 @@ cc_look:
     ld      de,(fat_work+12)
     ld      bc,(fat_work+14)
     ld      hl,cc_eoc
-    call    put_fat                 ;mark the cluster end-of-chain
-    ret     NC                      ;end mark was not stored
+    call    put_fat                 ;mark the new cluster end-of-chain first
+    ret     NC                      ;the end mark was not stored
     ld      a,(fat_work+8)
     ld      hl,fat_work+9
     or      (hl+)
@@ -1335,21 +1424,21 @@ cc_look:
     ld      de,(fat_work+8)
     ld      bc,(fat_work+10)
     ld      hl,fat_work+12
-    call    put_fat                 ;point the previous cluster here
+    call    put_fat                 ;link the previous cluster after the end mark
     pop     de
     pop     bc
-    ret     NC                      ;previous link was not stored
+    ret     NC                      ;the link was not stored. The end mark may already be written.
 cc_ok:
     ld      de,(fat_work+12)
     ld      bc,(fat_work+14)
     ld      (fat_last_clst),de
     ld      (fat_last_clst+2),bc
     call    fat_fsi_mark            ;mark FSInfo for rewrite
-    call    fat_sync_window         ;FAT#1 has the link; a failed mirror stays dirty
+    call    fat_sync_window         ;a failed second copy leaves the first FAT written
 cc_ret_cl:
-    ld      de,(fat_work+12)        ;mirror failure still returns the cluster
+    ld      de,(fat_work+12)        ;the sync result is ignored
     ld      bc,(fat_work+14)
-    scf
+    scf                             ;this exit is still success
     ret
 cc_next:
     ld      de,(fat_work+12)
@@ -1357,9 +1446,9 @@ cc_next:
     inc     de
     ld      a,d
     or      e
-    jp      NZ,cc_scan              ;candidate low did not wrap
+    jp      NZ,cc_scan              ;the candidate low word did not wrap
     inc     bc
-    jp      cc_scan
+    jp      cc_scan                 ;the candidate low word wrapped
 cc_wrap:
     ld      a,(fat_work+7)
     or      a
@@ -1377,21 +1466,23 @@ cc_wrap:
     jr      NZ,cc_wrap2             ;origin byte 2 is not 0
     ld      a,(fat_work+3)
     or      a
-    jr      Z,cc_fail               ;origin was 2: the FAT is full
+    jr      Z,cc_fail               ;the origin was cluster 2, so the FAT is full
 cc_wrap2:
-    ld      de,2
+    ld      de,2                    ;resume at cluster 2
     ld      bc,0
-    jp      cc_scan
+    jp      cc_scan                 ;the scan has wrapped once
 cc_fail:
-    or      a
+    or      a                       ;clear carry. The scan found no free cluster.
     ret
 cc_eoc:
-    defb    $FF,$FF,$FF,$0F
+    defb    $FF,$FF,$FF,$0F         ;end-of-chain link $0FFFFFFF
 
-; Zero every sector of cluster BCDE before put_fat publishes it.
-; NC leaves the FAT unchanged. fat_work is not used. csize 0 fails.
-; The window is invalidated before the zero fill so fatwin is not a
-; cached FAT sector full of zeros.
+; Write zeros over every sector of one cluster before the FAT link is published.
+; Call. BCDE is the cluster. E is the low byte.
+; Return. Carry set: those sectors are zero on disk. The window is not a cached sector.
+; Return. Carry clear: csize is 0, the cluster has no LBA, or a write failed.
+; Clobber. AF, BC, DE, HL.
+; Writes. The cluster sectors. fatwin is filled with zeros. fat_winsect becomes $FFFF.
 cc_wipe:
     ld      a,(_cpm_fat_vol+1)
     or      a
@@ -1399,11 +1490,11 @@ cc_wipe:
     push    bc
     push    de
     call    clst2sect               ;LBA of this cluster
-    jr      C,cc_wipe_lba           ;cluster is on the volume
+    jr      C,cc_wipe_lba           ;the cluster has an LBA
     pop     de
     pop     bc
 cc_wipe_bad:
-    or      a
+    or      a                       ;clear carry. The cluster was not cleared.
     ret
 cc_wipe_lba:
     pop     hl
@@ -1417,10 +1508,10 @@ cc_wipe_lba:
     pop     af
     pop     de
     pop     bc
-    or      a
+    or      a                       ;clear carry. The dirty window was not written.
     ret
 cc_wipe_clr:
-    ld      hl,$FFFF
+    ld      hl,$FFFF                ;the window must not stay a cached FAT sector
     ld      (fat_winsect),hl
     ld      (fat_winsect+2),hl
     xor     a
@@ -1429,7 +1520,7 @@ cc_wipe_clr:
     ld      de,hl
     inc     de
     ld      (hl),a
-    ld      bc,511
+    ld      bc,511                  ;one more byte makes a 512-byte sector
     ldir
 cc_wipe_wr:
     pop     af
@@ -1439,12 +1530,12 @@ cc_wipe_wr:
     push    de
     push    af
     ld      hl,fatwin
-    call    ide_write_sector        ;C: zero sector stored; HL += 512
-    jr      C,cc_wipe_adv           ;zero sector is on disk
+    call    ide_write_sector        ;carry set: zero sector written. HL is fatwin plus 512.
+    jr      C,cc_wipe_adv           ;the zero sector is on disk
     pop     af
     pop     de
     pop     bc
-    or      a
+    or      a                       ;clear carry. A zero sector was not written.
     ret
 cc_wipe_adv:
     pop     af
@@ -1456,29 +1547,35 @@ cc_wipe_adv:
     inc     de
     ld      a,d
     or      e
-    jr      NZ,cc_wipe_push         ;LBA low did not wrap
+    jr      NZ,cc_wipe_push         ;the LBA low word did not wrap
     inc     bc
 cc_wipe_push:
     pop     af
     push    bc
     push    de
     push    af
-    jr      cc_wipe_wr
+    jr      cc_wipe_wr              ;write the next sector of this cluster
 cc_wipe_ok:
     scf
     ret
 
-; ff.c remove_chain (entire chain, pclst=0). Walks until 0 or a link
-; that is not a cluster (EOC, bad, or >= n_fatent). The step stops at
-; n_fatent so a long FAT32 chain is not cut at 65535.
-; IN: BCDE = start cluster
+; Free a cluster chain.
+; The walk stops at 0 or at a link that is not a real cluster.
+; A link at or past n_fatent is not a real cluster.
+; The step stops at n_fatent so a long FAT32 chain is not cut at 65535.
+; Call. BCDE is the first cluster. E is the low byte.
+; Return. Carry set and Z: the cluster is 0. Nothing is freed.
+; Return. Carry set: clusters were freed until the next link stopped the walk.
+; Return. Carry clear: a link was bad or not read, the free store failed, or the step reached n_fatent.
+; Clobber. AF, BC, DE, HL.
+; Writes. Each freed FAT entry, and the free count when free_valid is set.
 remove_chain:
     ld      a,b
     or      c
     or      d
     or      e
     scf
-    ret     Z                       ;cluster 0: nothing to free
+    ret     Z                       ;cluster 0 frees nothing. Carry stays set.
     ld      hl,0
     ld      (fat_work),hl           ;32-bit step
     ld      (fat_work+2),hl
@@ -1508,11 +1605,11 @@ rc_cmp:
     sbc     a,(hl)
     pop     de
     pop     bc
-    jr      NC,rc_fail              ;step >= n_fatent
+    jr      NC,rc_fail              ;the step is at or past n_fatent
     ld      (fat_work+8),de
     ld      (fat_work+10),bc
-    call    get_fat                 ;next link in the chain
-    ret     NC                      ;bad cluster or unreadable
+    call    get_fat                 ;the next link. Stop on 0 or on a link that is not real.
+    ret     NC                      ;a bad cluster, or the entry was not read
     ld      (fat_work+12),de        ;next
     ld      (fat_work+14),bc
     ld      de,(fat_work+8)
@@ -1526,7 +1623,7 @@ rc_cmp:
     or      c
     or      d
     or      e
-    jr      Z,rc_done               ;next link is 0
+    jr      Z,rc_done               ;the next link is 0, so the chain ends
     ld      hl,_cpm_fat_vol+4       ;next >= n_fatent ends the walk
     ld      a,e
     sub     (hl+)                   ;next link - n_fatent
@@ -1536,38 +1633,41 @@ rc_cmp:
     sbc     (hl+)
     ld      a,b
     sbc     a,(hl)
-    jr      C,rc_loop               ;next link is still a cluster
+    jr      C,rc_loop               ;the next link is below n_fatent, so it is a real cluster
 rc_done:
-    scf
+    scf                             ;stopped on 0 or on a link that is not a real cluster
     ret
 rc_fail:
-    or      a
+    or      a                       ;clear carry. The step reached n_fatent.
     ret
 cc_zero:
-    defb    0,0,0,0
+    defb    0,0,0,0                 ;zero dword. A free link and a fake end of directory.
 
-; Exclusive byte end of the FAT16 static root.
-; Carry set: the end is 65536, so every 16-bit offset is inside
-; (2048 entries). Carry clear: offset >= HL is past the root.
-; A shorter database-dirbase span still clamps the end.
+; Exclusive byte end of the FAT16 root.
+; A shorter database minus dirbase span can clamp that end.
+; Call. No arguments.
+; Return. Carry set: the root has 2048 entries. HL is 0. Every 16-bit offset fits.
+; Return. Carry clear: HL is the exclusive byte end.
+; Return. An offset at or past HL is outside the root.
+; Clobber. AF, DE, HL. BC stays.
 fat_root16_max:
     ld      hl,(_cpm_fat_vol+2)
     ld      a,l
-    and     $F0
+    and     $F0                     ;a FAT16 root count is a multiple of 16
     ld      l,a
     ld      a,h
-    cp      8                       ;2048 entries * 32 = 65536
+    cp      8                       ;2048 entries times 32 bytes is 65536
     jr      C,frm_mul               ;fewer than 2048 root entries
     ld      hl,0
     scf
-    jr      frm_clamp
+    jr      frm_clamp               ;2048 entries cover every 16-bit offset
 frm_mul:
     add     hl,hl
     add     hl,hl
     add     hl,hl
     add     hl,hl
-    add     hl,hl                   ;*32, fits in 16 bits
-    or      a
+    add     hl,hl                   ;times 32. One directory entry is 32 bytes.
+    or      a                       ;the byte count fits in 16 bits
 frm_clamp:
     push    hl
     push    af                      ;C = entry count covers 64K
@@ -1585,36 +1685,38 @@ frm_clamp:
     or      a
     jr      NZ,frm_keep             ;>= 256 sectors
     ld      a,l
-    cp      128                     ;span sectors vs 128
-    jr      NC,frm_keep             ;>= 128 sectors is >= 64K bytes
+    cp      128                     ;128 sectors times 512 bytes is 65536
+    jr      NC,frm_keep             ;128 sectors or more is at least 64 KiB
     ld      h,l
     ld      l,0
     add     hl,hl                   ;span << 9, fits in 16 bits
     pop     af
     pop     de                      ;DE = count end
-    jr      C,frm_span              ;count was 64K: span is tighter
+    jr      C,frm_span              ;the count was 65536, so the span is tighter
     push    hl
     or      a
-    sbc     hl,de                   ;span - count
+    sbc     hl,de                   ;span minus the count end
     pop     hl
-    jr      C,frm_clear             ;byte span is the tighter end
-    ex      de,hl
+    jr      C,frm_clear             ;the byte span is the tighter end
+    ex      de,hl                   ;the count end is tighter, or the two ends match
 frm_clear:
-    or      a
+    or      a                       ;clear carry. HL is the exclusive end.
     ret
 frm_span:
-    or      a
+    or      a                       ;clear carry. The span is the exclusive end.
     ret
 frm_keep:
-    pop     af
+    pop     af                      ;restore carry when 2048 entries cover the root
     pop     hl
     ret
 
-; ff.c dir_sdi. Cluster 0 = FAT16 static root at dirbase LBA.
-; FAT32 cluster 0 is the root cluster (dirbase), matching ff dir_sdi.
-; FAT32 / subdir: follow the chain (clst_from_off). Offset must be
-; 32-byte aligned by the caller.
-; IN: BCDE = dir start cluster (0 = FAT16 root / FAT32 root), HL = byte offset
+; Seek a directory to a byte offset. Cluster 0 means the root.
+; The caller aligns the offset to one directory entry of 32 bytes.
+; Call. BCDE is the start cluster. HL is the byte offset.
+; Return. Carry set: the window holds that sector and dir_ptr points at the offset.
+; Return. Carry clear: the offset is outside the root or the chain, or the sector was not read.
+; Clobber. AF, BC, DE, HL.
+; Writes. dir_sclust, dir_ofs, dir_clust, dir_sect, and dir_ptr.
 dir_sdi:
     ld      (dir_sclust),de
     ld      (dir_sclust+2),bc
@@ -1623,17 +1725,17 @@ dir_sdi:
     or      c
     or      d
     or      e
-    jr      NZ,dsdi_chain           ;start cluster is not 0
+    jr      NZ,dsdi_chain           ;cluster 0 means the root. This cluster is not 0.
     ld      a,(_cpm_fat_vol)
-    cp      FS_FAT32                ;fs_type vs FAT32
-    jr      NZ,dsdi_root16          ;FAT16 static root
-    ld      de,(_cpm_fat_vol+12)
+    cp      FS_FAT32                ;fs_type against FAT32
+    jr      NZ,dsdi_root16          ;FAT16 root is the static dirbase
+    ld      de,(_cpm_fat_vol+12)    ;FAT32 root is BPB_RootClus, stored in dirbase
     ld      bc,(_cpm_fat_vol+14)
     ld      (dir_sclust),de
     ld      (dir_sclust+2),bc
-    jr      dsdi_chain
+    jr      dsdi_chain              ;follow that root cluster
 dsdi_root16:
-    ld      (dir_clust),bc          ;BC is 0. Static FAT16 root.
+    ld      (dir_clust),bc          ;BC is 0. The FAT16 root is not a cluster chain.
     ld      (dir_clust+2),bc
     push    hl                      ;ofs
     call    fat_root16_max          ;C: any 16-bit offset fits
@@ -1676,7 +1778,7 @@ dsdi_chain:
     ld      hl,dir_sclust
     ld      de,fat_work
     ld      bc,4
-    ldir                            ;sclust at fat_work; fptr follows
+    ldir                            ;copy the start cluster. The file pointer follows.
     ld      hl,(dir_ofs)
     ld      (fat_work+4),hl
     ld      hl,0
@@ -1690,11 +1792,11 @@ dsdi_chain:
     ret     NC                      ;cluster has no LBA
     ; add sector-in-cluster: (dir_ofs >> 9) % csize
     ld      a,(dir_ofs+1)
-    srl     a                       ;offset/512 low
+    srl     a                       ;offset / 512. A sector is 512 bytes.
     ld      hl,_cpm_fat_vol+1
-    ld      l,(hl)                  ;csize
+    ld      l,(hl)                  ;csize is 2^n
     dec     l
-    and     l                       ;mod csize if csize 2^n
+    and     l                       ;sector inside the cluster
     ld      l,a
     ld      h,0
     add     hl,de                   ;cluster LBA + sector
@@ -1717,28 +1819,32 @@ dsdi_sec:
     scf
     ret
 dsdi_end:
-    or      a
+    or      a                       ;clear carry. The offset is past the FAT16 root.
     ret
 
-; ff.c dir_next with stretch=0. No create_chain + dir_clear when a
-; clustered directory hits EOC — the table is fixed size.
-; Same-sector: pointer walk (SZDIRE). Sector change: sect++.
-; Cluster change: get_fat(dir_clust) then clst2sect (no stretch).
+; Step to the next directory entry. This does not stretch the directory.
+; A 16-bit offset wrap stops a long directory at 2048 entries.
+; Call. No arguments. The position is dir_ofs, dir_ptr, dir_clust, and dir_sect.
+; Return. Carry set means another entry.
+; Return. Carry clear and Z means a clean end. dir_next_end is xor a.
+; Return. Carry clear and NZ means a disk or chain error.
+; Clobber. AF, BC, DE, HL.
+; Writes. dir_ofs and dir_ptr. A new sector also writes dir_sect, dir_clust, and the window.
 dir_next:
     ld      hl,(dir_ofs)
-    ld      bc,32
+    ld      bc,32                   ;one directory entry is 32 bytes
     add     hl,bc
-    jp      C,dir_next_end          ;ofs wrap: 2048 dirents (LFN-heavy dirs)
+    jp      C,dir_next_end          ;a 16-bit wrap stops the directory at 2048 entries
     ld      a,l
     or      a
-    jr      NZ,dir_next_same        ;ofs % 512 != 0
+    jr      NZ,dir_next_same        ;still inside this 512-byte sector
     ld      a,h
-    and     1
-    jr      Z,dir_next_sect         ;offset is on a sector boundary
+    and     1                       ;bit 9 of the offset. A sector is 512 bytes.
+    jr      Z,dir_next_sect         ;the offset is on a sector boundary
 dir_next_same:
     ld      (dir_ofs),hl
     ld      hl,(dir_ptr)
-    ld      de,32
+    ld      de,32                   ;one directory entry is 32 bytes
     add     hl,de
     ld      (dir_ptr),hl
     scf
@@ -1765,14 +1871,14 @@ dir_next_inc:
     ld      (dir_sect),hl
     ld      a,h
     or      l
-    jr      NZ,dir_next_win         ;sector low did not wrap
+    jr      NZ,dir_next_win         ;the sector low word did not wrap
     ld      hl,(dir_sect+2)
     inc     hl
     ld      (dir_sect+2),hl
-    jr      dir_next_win
+    jr      dir_next_win            ;the sector low word wrapped
 dir_next_dyn:
     ld      a,(dir_ofs+1)
-    srl     a                       ;ofs / 512
+    srl     a                       ;offset / 512. A sector is 512 bytes.
     ld      hl,_cpm_fat_vol+1
     ld      l,(hl)                  ;csize
     dec     l
@@ -1783,23 +1889,23 @@ dir_next_dyn:
     call    get_fat                 ;next cluster of this directory
     jp      NC,dir_next_io          ;bad cluster or unreadable
     ld      a,b
-    cp      $0F                     ;top nibble vs $0F
+    cp      $0F                     ;an end mark has top nibble $0F
     jr      NZ,dir_next_got         ;not an end mark
     ld      a,c
     and     d
     and     e
     inc     a
-    jp      Z,dir_next_end          ;EOC
+    jp      Z,dir_next_end          ;the link is $0FFFFFFF, so the directory ends
 dir_next_got:
     ld      a,e
-    sub     2                       ;next cluster - 2
+    sub     2                       ;a cluster below 2 is not real
     ld      a,d
     sbc     a,0
     ld      a,c
     sbc     a,0
     ld      a,b
     sbc     a,0
-    jp      C,dir_next_io           ;cluster < 2
+    jp      C,dir_next_io           ;the next cluster is below 2
     ld      (dir_clust),de
     ld      (dir_clust+2),bc
     call    clst2sect               ;LBA of the next cluster
@@ -1811,15 +1917,15 @@ dir_next_win:
     ld      bc,(dir_sect+2)
     call    fat_move_window         ;directory sector into fatwin
     jp      NC,dir_next_io          ;directory sector not read
-    ld      hl,fatwin               ;ofs % 512 == 0
+    ld      hl,fatwin               ;the offset is on a 512-byte boundary
     ld      (dir_ptr),hl
-    scf
+    scf                             ;carry set means another entry
     ret
 dir_next_end:
-    xor     a                       ;NC+Z: end of the directory
+    xor     a                       ;carry clear and Z. This is a clean end.
     ret
 
 dir_next_io:
     ld      a,1
-    or      a                       ;NC+NZ: disk or chain error
+    or      a                       ;carry clear and NZ. This is a disk or chain error.
     ret
