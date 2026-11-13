@@ -1,0 +1,6 @@
+target/spc1500/obj/${TARGET}/**/*.o
+classic/gfx/wide/obj/${TARGET}/w_dcircle_square
+@classic/gfx/wide/gfx_wide.lst
+@classic/stdio/stdio.lst
+sound/ay/obj/${TYPE}/**/*.o
+@classic/games/games.lst

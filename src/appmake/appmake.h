@@ -254,6 +254,8 @@ extern option_t  sol20_options[];
 
 extern int       spc1000_exec(char *target);
 extern option_t  spc1000_options[];
+extern int       spc1500_exec(char *target);
+extern option_t  spc1500_options[];
 
 extern int       svi_exec(char *target);
 extern option_t  svi_options[];
@@ -587,6 +589,10 @@ struct {
       "Create a .SPC file suitable for emulators",
       NULL,
       spc1000_exec,    spc1000_options },
+    { "bin2spc15", "spc1500",   "(C) 2026 Dominic Morris",
+      "Create a cassette (.tap for MAME, optional .wav) for the Samsung SPC-1500",
+      NULL,
+      spc1500_exec,    spc1500_options },
     { "dgos",   "srr",       "(C) 2011, 2017 Stefano Bodrato",
       "DGOS, KCS variant for Sorcerer Exidy and Microbee, also WAV format",
       NULL,

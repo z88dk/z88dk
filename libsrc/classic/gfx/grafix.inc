@@ -375,6 +375,11 @@ IF FORmz800
     defc    _GFX_MAXY    = 200
 ENDIF
 
+IF FORspc1500
+    defc    _GFX_MAXX    = 320
+    defc    _GFX_MAXY    = 200
+ENDIF
+
 
 IF FORnascom
     defc    _GFX_MAXX    = 96
