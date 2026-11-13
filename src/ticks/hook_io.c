@@ -14,6 +14,12 @@
 #include        <unistd.h>
 #endif
 
+/* MinGW open() is text mode unless this bit is set. A line feed in a
+   sector is then expanded and the next LBA is misaligned. */
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 #define CHECK_FD() do {                 \
         if ( slots[b] == -1 ) { \
             SET_ERROR(Z88DK_EBADF);   \
@@ -336,7 +342,7 @@ static void cmd_ide_write(void)
 
 void hook_io_set_ide_device(int unit, const char *file)
 {
-    devices[unit] = open(file, O_RDWR);
+    devices[unit] = open(file, O_RDWR | O_BINARY);
     if ( devices[unit] == -1 ) {
         printf("Cannot open <%s>",file);
         exit(1);
