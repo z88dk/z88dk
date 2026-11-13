@@ -33,18 +33,15 @@ EXTERN  fat_dp
 _f_getfree:
 f_getfree:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_dp),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_user),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_path),de
     call    mf_ensure
@@ -76,7 +73,6 @@ fg_ptr:
     or      l
     jp      Z,mf_ok                         ; the FATFS pointer is 0
     ld      de,(fat_fs)
-    ld      (hl),e                          ; store the volume address
-    inc     hl
+    ld      (hl+),e                         ; store the volume address
     ld      (hl),d
     jp      mf_ok

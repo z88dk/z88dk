@@ -53,13 +53,11 @@ EXTERN  fatwin
 _f_rename:
 f_rename:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_dp),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_path),de
     call    mf_ensure
@@ -171,8 +169,7 @@ rn_dot:
     jr      NZ,rn_old                       ; there is no ".." entry to update
     ld      hl,fatwin+32+DIR_ClusLO
     ld      de,(fat_parent)
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     ld      de,(fat_parent+2)
     ld      a,(_cpm_fat_vol)
@@ -181,8 +178,7 @@ rn_dot:
     ld      de,0                            ; FAT12 and FAT16 store a high word of 0
 rn_phi:
     ld      hl,fatwin+32+DIR_ClusHI
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     ld      a,1
     ld      (fat_wflag),a

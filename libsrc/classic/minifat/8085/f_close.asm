@@ -33,7 +33,6 @@ f_close:
     call    mf_sync_fil
     ret     NC                              ; mf_sync_fil failed. HL holds the FRESULT
     ld      hl,(fat_fp)
-    ld      (hl),0                          ; clear the file id
-    inc     hl
+    ld      (hl+),0                         ; clear the file id
     ld      (hl),0
     jp      mf_ok

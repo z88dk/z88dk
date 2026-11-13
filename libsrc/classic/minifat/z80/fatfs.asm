@@ -81,10 +81,12 @@
 ;   FAT16 root is static dirbase LBA
 ;   SFD (VBR at LBA 0) then four MBR primary partitions
 ;   1 or 2 FATs. csize is a power of 2. BytsPerSec == 512.
+;   Specification 1.03 also allows sectors of 1024, 2048, and 4096 bytes.
 ;
 ; Checks this file does not make:
 ;   JumpBoot. 55AA is required. ChaN accepts some VBRs that have no 55AA.
 ;   BPB_Media. Partition type. GPT and extended partitions fail the VBR check.
+;   FAT entry 0 is not compared with BPB_Media.
 ;
 ; Other limits:
 ;   dir_next itself does not stretch (dir_create does, FAT32 only)
@@ -619,8 +621,7 @@ fat12_range_lo:
 fat12_load:
     push    bc
     push    de
-    ld      l,e
-    ld      h,d
+    ld      hl,de
     srl     h
     rr      l                       ;cluster / 2
     add     hl,de                   ;packed offset is cluster plus cluster/2
@@ -648,8 +649,7 @@ fat12_load:
     pop     bc                      ;cluster high
     push    bc
     push    de
-    ld      l,e
-    ld      h,d
+    ld      hl,de
     srl     h
     rr      l
     add     hl,de                   ;packed offset is cluster plus cluster/2
@@ -684,8 +684,7 @@ fat12_span_lba:
     ld      a,(fat_winsect+3)
     ld      b,a
 fat12_span_go:
-    ld      e,l
-    ld      d,h
+    ld      de,hl
     call    fat_move_window
     jr      NC,fat12_span_err       ;the second FAT sector was not read
     ld      a,(fatwin)              ;the second byte is at offset 0
@@ -797,8 +796,7 @@ fat12_store:
     push    bc
     push    af                      ;odd flag
     push    de                      ;old raw word. E is the first byte.
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                  ;new link
     pop     hl                      ;old raw word
     pop     af                      ;odd flag
@@ -844,8 +842,7 @@ fat12_st_wr:
     pop     bc                      ;cluster high
     pop     de                      ;cluster low
     push    hl                      ;new raw: L first, H second
-    ld      l,e
-    ld      h,d
+    ld      hl,de
     srl     h
     rr      l
     add     hl,de                   ;packed offset is cluster plus cluster/2
@@ -861,8 +858,7 @@ fat12_st_same:
     ld      de,fatwin
     add     hl,de
     pop     de                      ;E first, D second
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     jr      fat12_st_dirty          ;both bytes are in this sector
 fat12_st_span:
@@ -872,16 +868,14 @@ fat12_st_span:
     or      l
     jr      Z,fat12_st_backhi       ;the low word is 0, so the previous sector borrows
     dec     hl
-    ld      e,l
-    ld      d,h
+    ld      de,hl
     ld      bc,(fat_winsect+2)
     jr      fat12_st_back           ;read the sector that holds byte 511
 fat12_st_backhi:
     ld      de,$FFFF
     ld      hl,(fat_winsect+2)
     dec     hl
-    ld      b,h
-    ld      c,l
+    ld      bc,hl
 fat12_st_back:
     call    fat_move_window         ;the first sector is still clean
     jr      NC,fat12_st_pop         ;the first sector was not read
@@ -896,16 +890,14 @@ fat12_st_back:
     ld      a,h
     or      l
     jr      Z,fat12_st_fwdhi        ;the next sector wraps the low word
-    ld      e,l
-    ld      d,h
+    ld      de,hl
     ld      bc,(fat_winsect+2)
     jr      fat12_st_fwd            ;return to the second sector
 fat12_st_fwdhi:
     ld      de,0
     ld      hl,(fat_winsect+2)
     inc     hl
-    ld      b,h
-    ld      c,l
+    ld      bc,hl
 fat12_st_fwd:
     call    fat_move_window         ;write the first sector, then read the second
     jr      NC,fat12_st_pop         ;the second sector was not read

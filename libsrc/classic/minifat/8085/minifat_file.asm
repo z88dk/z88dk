@@ -246,13 +246,10 @@ mf_publish:
     or      l
     ret     Z                               ; no FATFS object
     ld      a,(_cpm_fat_vol)
-    ld      (hl),a
-    inc     hl
-    ld      (hl),0
-    inc     hl
+    ld      (hl+),a
+    ld      (hl+),0
     ld      de,(fat_mount_id)
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     ret
 
@@ -263,12 +260,9 @@ mf_publish:
 ; Clobber. HL. AF, BC, and DE stay.
 mf_cwd_reset:
     ld      hl,fat_cwd_str
-    ld      (hl),'0'
-    inc     hl
-    ld      (hl),':'
-    inc     hl
-    ld      (hl),'/'
-    inc     hl
+    ld      (hl+),'0'
+    ld      (hl+),':'
+    ld      (hl+),'/'
     ld      (hl),0
     ret
 
@@ -451,8 +445,7 @@ mf_comp_name:
     ld      a,' '
 ; Pad the 11-byte name with spaces.
 mf_cfill:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jr      nz,mf_cfill
     pop     hl
@@ -468,8 +461,7 @@ mf_cn:
     call    mf_okchar
     jr      NC,mf_badname                   ; body byte is not legal
     call    mf_fold
-    ld      (de),a
-    inc     de
+    ld      (de+),a
     inc     hl
     dec     b
     jr      nz,mf_cn
@@ -493,8 +485,7 @@ mf_ce:
     call    mf_okchar
     jr      NC,mf_badname                   ; extension byte is not legal
     call    mf_fold
-    ld      (de),a
-    inc     de
+    ld      (de+),a
     inc     hl
     dec     b
     jr      nz,mf_ce
@@ -574,23 +565,18 @@ mf_take_found:
 mf_dotdot:
     ld      a,(fat_here)
     ld      hl,fat_here+1
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jr      Z,mf_dot_root                   ; already at the root
     ld      hl,fat_name11
-    ld      (hl),'.'
-    inc     hl
-    ld      (hl),'.'
-    inc     hl
+    ld      (hl+),'.'
+    ld      (hl+),'.'
     ld      b,9
     ld      a,' '
 ; Pad the rest of the dot-dot name with spaces.
 mf_ddsp:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jr      nz,mf_ddsp
     call    mf_lookup_here
@@ -776,8 +762,7 @@ mf_fil_check:
     or      l
     jr      Z,mf_fil_bad                    ; no FIL pointer
     ld      (fat_fp),hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      a,d
     or      e
@@ -834,14 +819,12 @@ mf_bind:
     xor     a
 ; Clear the next FIL byte.
 mf_bz:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jr      nz,mf_bz
     ld      hl,(fat_fp)
     ld      de,(fat_mount_id)
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     ld      hl,(fat_fp)
     ld      de,hl+FIL_FLAG
@@ -876,24 +859,18 @@ mf_bz:
     ld      hl,(fat_fp)
     ld      de,hl+FIL_SCLUST
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)
     ld      hl,(fat_fp)
     push    de
     ld      de,hl+FIL_CLUST
     ex      de,hl
     pop     de
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-    inc     hl
-    ld      (hl),c
-    inc     hl
+    ld      (hl+),e
+    ld      (hl+),d
+    ld      (hl+),c
     ld      (hl),b
     ld      hl,fat_dirsec
     ld      de,(fat_fp)
@@ -909,8 +886,7 @@ mf_bz:
     ld      de,hl+FIL_DIROFS
     ex      de,hl
     ld      de,(fat_dirofs)
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     jp      mf_ok                           ; FIL fields are filled
 
@@ -935,10 +911,8 @@ mf_trunc:
     call    mf_zero_alloc
     ld      a,(fat_hold)
     ld      hl,fat_hold+1
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jr      Z,mf_trunc_mod                  ; start cluster is 0, so there is no chain
     ld      de,(fat_hold)
@@ -971,15 +945,13 @@ mf_zero_alloc:
     ld      de,hl+DIR_ClusHI
     ex      de,hl
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a
     ld      hl,(dir_ptr)
     ld      de,hl+DIR_ClusLO
     ex      de,hl
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a
     ld      hl,(dir_ptr)
     ld      de,hl+DIR_FileSize
@@ -988,8 +960,7 @@ mf_zero_alloc:
     xor     a
 ; Clear the next size byte.
 mf_za4:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jr      nz,mf_za4
     ld      hl,(dir_ptr)
@@ -1009,8 +980,7 @@ mf_za4:
     ld      b,16
 ; Clear the next byte of the pointer and the clusters.
 mf_zf:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jr      nz,mf_zf
     ret
@@ -1024,20 +994,16 @@ mf_load_dir:
     ld      hl,(fat_fp)
     ld      de,hl+FIL_DIRSEC
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)
     call    fat_move_window
     ret     NC                              ; sector was not read. HL is not a FRESULT
     ld      hl,(fat_fp)
     ld      de,hl+FIL_DIROFS
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      a,(hl)
     and     1                               ; keep the offset inside the 512-byte sector
     ld      d,a
@@ -1058,19 +1024,15 @@ mf_write_entry:
     ld      hl,(fat_fp)
     ld      de,hl+FIL_SCLUST
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)
     push    bc
     ld      hl,(dir_ptr)
     ld      bc,DIR_ClusLO
     add     hl,bc
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     pop     bc
     ld      a,(_cpm_fat_vol)
@@ -1082,8 +1044,7 @@ mf_we_hi:
     ld      hl,(dir_ptr)
     ld      de,hl+DIR_ClusHI
     ex      de,hl
-    ld      (hl),c
-    inc     hl
+    ld      (hl+),c
     ld      (hl),b
     ld      hl,(dir_ptr)
     ld      de,hl+DIR_FileSize
@@ -1272,12 +1233,9 @@ mf_store_clust:
     add     hl,de                           ; FIL address plus FIL_CLUST
     pop     bc
     pop     de
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-    inc     hl
-    ld      (hl),c
-    inc     hl
+    ld      (hl+),e
+    ld      (hl+),d
+    ld      (hl+),c
     ld      (hl),b
     ret
 
@@ -1295,12 +1253,9 @@ mf_store_sclust:
     ex      de,hl
     pop     bc
     pop     de
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-    inc     hl
-    ld      (hl),c
-    inc     hl
+    ld      (hl+),e
+    ld      (hl+),d
+    ld      (hl+),c
     ld      (hl),b
     call    mf_store_clust
     ret
@@ -1318,12 +1273,9 @@ mf_sector_for_fptr:
     ld      hl,(fat_fp)
     ld      de,hl+FIL_FPTR
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)
     ld      a,e
     ld      (fat_off),a
@@ -1355,23 +1307,17 @@ mf_sector_for_fptr:
     ld      hl,(fat_fp)
     ld      de,hl+FIL_FPTR
     ex      de,hl
-    ld      a,(hl)
-    inc     hl
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    ld      a,(hl+)
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jr      NZ,mf_sec_next                  ; fptr is not 0
     ld      hl,(fat_fp)
     ld      de,hl+FIL_SCLUST
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)
     ld      a,b
     or      c
@@ -1395,12 +1341,9 @@ mf_sec_next:
     ld      hl,(fat_fp)
     ld      de,hl+FIL_CLUST
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)
     push    bc
     push    de
@@ -1439,12 +1382,9 @@ mf_sec_same:
     ld      hl,(fat_fp)
     ld      de,hl+FIL_CLUST
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)
     ld      a,b
     or      c
@@ -1491,12 +1431,9 @@ mf_need_read:
     ld      hl,(fat_fp)
     ld      de,hl+FIL_FPTR
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)
     ld      e,0
     ld      a,d
@@ -1509,14 +1446,11 @@ mf_need_read:
     ex      de,hl
     or      a
     ld      a,(fat_hold)
-    sub     (hl)
-    inc     hl
+    sub     (hl+)
     ld      a,(fat_hold+1)
-    sbc     a,(hl)
-    inc     hl
+    sbc     a,(hl+)
     ld      a,(fat_hold+2)
-    sbc     a,(hl)
-    inc     hl
+    sbc     a,(hl+)
     ld      a,(fat_hold+3)
     sbc     a,(hl)
     ret
@@ -1593,23 +1527,17 @@ mf_place:
     ld      hl,(fat_fp)
     ld      de,hl+FIL_FPTR
     ex      de,hl
-    ld      a,(hl)
-    inc     hl
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    ld      a,(hl+)
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jr      NZ,mf_place_mid                 ; fptr is not 0
     ld      hl,(fat_fp)
     ld      de,hl+FIL_SCLUST
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)
     call    mf_store_clust
     jp      mf_ok                           ; fptr 0 uses the start cluster
@@ -1623,12 +1551,9 @@ mf_place_mid:
     call    mf_copy
     call    mf_place_src
     ld      hl,fat_cfo+4
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-    inc     hl
-    ld      (hl),c
-    inc     hl
+    ld      (hl+),e
+    ld      (hl+),d
+    ld      (hl+),c
     ld      (hl),b
     ld      hl,fat_cfo
     call    clst_from_off
@@ -1644,12 +1569,9 @@ mf_place_src:
     ld      hl,(fat_fp)
     ld      de,hl+FIL_FPTR
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)
     push    bc
     push    de
@@ -1742,8 +1664,7 @@ mf_transfer:
     or      l
     jr      Z,mf_tr_loop                    ; no count pointer
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a
 ; Move the next chunk, or stop when the request is done.
 mf_tr_loop:
@@ -1758,10 +1679,8 @@ mf_tr_loop:
     jp      C,mf_tr_done                    ; fptr is already past the size
     ld      a,(fat_remain)
     ld      hl,fat_remain+1
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jp      Z,mf_tr_done                    ; no bytes remain in the file
 ; Limit this chunk to the sector, the request, and the bytes left.
@@ -1793,8 +1712,7 @@ mf_tr_room:
     pop     bc
     pop     hl
     jr      NC,mf_tr_clipr                  ; the request does not fit in this sector
-    ld      e,l
-    ld      d,h
+    ld      de,hl
 ; The chunk is the space left in the sector or the request.
 mf_tr_clipr:
     ld      a,(fat_write)
@@ -1860,16 +1778,13 @@ mf_tr_adv:
     ex      de,hl
     ld      a,(hl)
     add     a,c
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,b
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,0
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,0
     ld      (hl),a
@@ -1881,14 +1796,12 @@ mf_tr_adv:
     ld      a,h
     or      l
     jr      Z,mf_tr_size                    ; no count pointer
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ex      de,hl
     add     hl,bc
     ex      de,hl
-    ld      (hl),d
-    dec     hl
+    ld      (hl-),d
     ld      (hl),e
 ; Grow the file size when fptr has moved past it.
 mf_tr_size:
@@ -2068,8 +1981,7 @@ mf_cwd_pat:
     cp      '/'
     jr      Z,mf_cwd_copy                   ; the text already ends with a slash
     inc     hl
-    ld      (hl),'/'
-    inc     hl
+    ld      (hl+),'/'
 ; Copy the body and then the extension.
 mf_cwd_copy:
     inc     hl
@@ -2129,8 +2041,7 @@ mf_cwd_put:
     add     hl,de                           ; restore HL. Carry still matches the subtract
     pop     de
     jr      NC,mf_cwd_long                  ; no free byte remains before the terminating 0
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     scf
     ret
 ; The 64-byte text has no free character.
@@ -2157,26 +2068,22 @@ mf_fill_info:
     ld      hl,(dir_ptr)
     ld      de,hl+DIR_WrtDate
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      hl,(fat_user)
     ld      bc,FI_DATE
     add     hl,bc
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     ld      hl,(dir_ptr)
     ld      de,hl+DIR_WrtTime
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      hl,(fat_user)
     ld      bc,FI_TIME
     add     hl,bc
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     ld      hl,(dir_ptr)
     ld      de,hl+DIR_Attr
@@ -2192,8 +2099,7 @@ mf_fill_info:
     ld      b,8
 ; Copy the next body character and skip spaces.
 mf_fn8:
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     cp      ' '
     jr      Z,mf_fn8n                       ; skip a space in the body
     cp      $05
@@ -2205,8 +2111,7 @@ mf_fn8:
     ld      a,$E5                           ; a stored first byte of $05 is shown as $E5
 ; Store this body character.
 mf_fn8s:
-    ld      (de),a
-    inc     de
+    ld      (de+),a
 ; Advance to the next body byte.
 mf_fn8n:
     dec     b
@@ -2215,8 +2120,7 @@ mf_fn8n:
     ld      b,3
 ; Copy the next extension character and skip spaces.
 mf_fn3:
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     cp      ' '
     jr      Z,mf_fn3n                       ; skip a space in the extension
     push    af
@@ -2224,14 +2128,12 @@ mf_fn3:
     or      a
     jr      NZ,mf_fn3d                      ; the dot is already stored
     ld      a,'.'
-    ld      (de),a
-    inc     de
+    ld      (de+),a
     ld      c,1
 ; Store this extension character.
 mf_fn3d:
     pop     af
-    ld      (de),a
-    inc     de
+    ld      (de+),a
 ; Advance to the next extension byte.
 mf_fn3n:
     dec     b

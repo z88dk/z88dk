@@ -44,13 +44,11 @@ f_mount:
     ld      (fat_kind),a
     inc     hl
     inc     hl                      ;a byte argument occupies a word
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                  ;path at sp+4
     ld      (fat_path),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                  ;fs at sp+6
     ld      (fat_dp),de
     ld      hl,(fat_path)
@@ -77,8 +75,7 @@ fm_new:
     or      l
     jr      Z,fm_off                ;fs is null
     ld      (fat_fs),hl
-    ld      (hl),0                  ;fs_type stays 0 until the publish
-    inc     hl
+    ld      (hl+),0                 ;fs_type stays 0 until the publish
     ld      (hl),0                  ;the drive byte is 0
     ld      a,(fat_kind)
     or      a

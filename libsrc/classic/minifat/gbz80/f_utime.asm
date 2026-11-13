@@ -34,13 +34,11 @@ EXTERN  dir_ptr
 _f_utime:
 f_utime:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_user),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_path),de
     call    mf_ensure
@@ -62,8 +60,7 @@ fu_set:
     jr      Z,fu_sync                       ; the FILINFO pointer is 0
     ld      de,FI_DATE
     add     hl,de                           ; the date word in FILINFO
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      a,d
     or      e
@@ -73,23 +70,20 @@ fu_set:
     defw    fat_user
     ld      de,FI_TIME
     add     hl,de                           ; the time word in FILINFO
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     call    fat_ldhl
     defw    dir_ptr
     ld      bc,DIR_WrtTime
     add     hl,bc
-    ld      (hl),e                          ; store the write time
-    inc     hl
+    ld      (hl+),e                         ; store the write time
     ld      (hl),d
     pop     de
     call    fat_ldhl
     defw    dir_ptr
     ld      bc,DIR_WrtDate
     add     hl,bc
-    ld      (hl),e                          ; store the write date
-    inc     hl
+    ld      (hl+),e                         ; store the write date
     ld      (hl),d
 fu_sync:
     ld      a,1                             ; mark the window dirty

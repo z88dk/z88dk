@@ -41,8 +41,7 @@ f_chmod:
     ld      (fat_hold),a
     inc     hl
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_path),de
     call    mf_ensure

@@ -26,8 +26,7 @@ EXTERN  _cpm_fat_vol
 _f_closedir:
 f_closedir:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      a,d
     or      e
@@ -51,8 +50,7 @@ f_closedir:
     or      a
     jr      Z,fd_bad                        ; fs_type is 0. No volume is mounted
     ld      hl,(fat_dp)
-    ld      (hl),0                          ; clear the directory id
-    inc     hl
+    ld      (hl+),0                         ; clear the directory id
     ld      (hl),0
     jp      mf_ok
 ; the directory object is not live

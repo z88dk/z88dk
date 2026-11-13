@@ -58,13 +58,11 @@ f_open:
     ld      (fat_mode),a
     inc     hl
     inc     hl                              ; a byte argument occupies a word
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; path at sp+4
     ld      (fat_path),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; fp at sp+6
     ld      a,d
     or      e
@@ -159,10 +157,8 @@ fo_tail:
     ld      de,FIL_SIZE
     add     hl,de
     ld      a,(hl+)
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jp      Z,mf_ok                         ; the size is 0. The pointer is already there.
     call    fat_ldhl
@@ -244,8 +240,7 @@ fo_kill:
     ld      a,h
     or      l
     jr      Z,fo_kill0                      ; fp is null
-    ld      (hl),0
-    inc     hl
+    ld      (hl+),0
     ld      (hl),0                          ; the object id is 0
 fo_kill0:
     pop     af

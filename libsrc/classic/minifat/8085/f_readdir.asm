@@ -72,8 +72,7 @@ f_readdir:
     ld      hl,(fat_dp)
     ld      de,hl+DIR_DPTR+2
     ex      de,hl
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     or      (hl)
     jp      NZ,mf_ok                        ; the high half of dptr is not 0. This is the end.
     call    fr_sdi_dptr
@@ -126,12 +125,9 @@ fr_sdi_nc:
     ld      hl,(fat_dp)
     ld      de,hl+DIR_DPTR
     ex      de,hl
-    ld      a,(hl)
-    inc     hl
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    ld      a,(hl+)
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jp      NZ,mf_ok                        ; dptr is not 0. Return the empty name.
     ld      a,FR_DISK_ERR
@@ -141,8 +137,7 @@ fr_mark:
     ld      hl,(fat_dp)
     ld      de,hl+DIR_DPTR+2
     ex      de,hl
-    ld      (hl),1
-    inc     hl
+    ld      (hl+),1
     ld      (hl),0                          ; the high half of dptr is 1
     jp      mf_ok
 ; fno is null. Rewind dptr and open the first entry.
@@ -151,22 +146,16 @@ fr_rewind:
     ld      de,hl+DIR_DPTR
     ex      de,hl
     xor     a
-    ld      (hl),a
-    inc     hl
-    ld      (hl),a
-    inc     hl
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
+    ld      (hl+),a
+    ld      (hl+),a
     ld      (hl),a                          ; dptr is 0
     ld      hl,(fat_dp)
     ld      de,hl+DIR_SCLUST
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)                          ; BCDE is the start cluster
     ld      hl,0
     call    dir_sdi
@@ -186,19 +175,15 @@ fr_sdi_dptr:
     ld      hl,(fat_dp)
     ld      de,hl+DIR_DPTR
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; the low half of dptr
     push    de
     ld      hl,(fat_dp)
     ld      de,hl+DIR_SCLUST
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)                          ; BCDE is the start cluster
     pop     hl                              ; HL is the byte offset
     jp      dir_sdi
@@ -213,12 +198,9 @@ fr_store:
     ld      de,hl+DIR_DPTR
     ex      de,hl
     ld      de,(dir_ofs)
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-    inc     hl
+    ld      (hl+),e
+    ld      (hl+),d
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a                          ; the high half of dptr is 0
     ret

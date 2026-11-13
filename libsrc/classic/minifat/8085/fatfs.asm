@@ -82,10 +82,12 @@
 ;   FAT16 root is static dirbase LBA
 ;   SFD (VBR at LBA 0) then four MBR primary partitions
 ;   1 or 2 FATs. csize is a power of 2. BytsPerSec == 512.
+;   Specification 1.03 also allows sectors of 1024, 2048, and 4096 bytes.
 ;
 ; Checks this file does not make:
 ;   JumpBoot. 55AA is required. ChaN accepts some VBRs that have no 55AA.
 ;   BPB_Media. Partition type. GPT and extended partitions fail the VBR check.
+;   FAT entry 0 is not compared with BPB_Media.
 ;
 ; Other limits:
 ;   dir_next itself does not stretch (dir_create does, FAT32 only)
@@ -651,8 +653,7 @@ fat12_shr1:
 fat12_load:
     push    bc
     push    de
-    ld      l,e
-    ld      h,d
+    ld      hl,de
     call    fat12_shr1                      ; clst / 2
     add     hl,de                           ; packed offset is cluster plus cluster/2
     ld      a,h
@@ -680,8 +681,7 @@ fat12_load:
     pop     bc                              ; cluster high
     push    bc
     push    de
-    ld      l,e
-    ld      h,d
+    ld      hl,de
     call    fat12_shr1
     add     hl,de                           ; packed offset is cluster plus cluster/2
     ld      a,h
@@ -704,15 +704,13 @@ fat12_load:
     jr      NZ,fat12_span_lba               ; the next sector does not wrap the low word
     ld      hl,(fat_winsect+2)
     inc     hl
-    ld      b,h
-    ld      c,l
+    ld      bc,hl
     ld      hl,0
     jr      fat12_span_go                   ; the low word wrapped, so carry into the high word
 fat12_span_lba:
     ld      de,hl
     ld      hl,(fat_winsect+2)
-    ld      b,h
-    ld      c,l
+    ld      bc,hl
     ex      de,hl
 fat12_span_go:
     ld      de,hl
@@ -827,8 +825,7 @@ fat12_store:
     push    bc
     push    af                              ; odd flag
     push    de                              ; old raw word. E is the first byte.
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; new link
     pop     hl                              ; old raw word
     pop     af                              ; odd flag
@@ -874,8 +871,7 @@ fat12_st_wr:
     pop     bc                              ; cluster high
     pop     de                              ; cluster low
     push    hl                              ; new raw: L first, H second
-    ld      l,e
-    ld      h,d
+    ld      hl,de
     call    fat12_shr1
     add     hl,de                           ; packed offset is cluster plus cluster/2
     ld      a,l
@@ -891,8 +887,7 @@ fat12_st_same:
     ld      de,fatwin
     add     hl,de
     pop     de                              ; E first, D second
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     jr      fat12_st_dirty                  ; both bytes are in this sector
 fat12_st_span:

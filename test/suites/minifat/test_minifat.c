@@ -233,8 +233,35 @@ static void test_api(void)
     n = 0;
     fr = f_write(&api_fil, "Hi", 2, &n);
     expect("api_wr", fr == FR_OK && n == 2);
+    expect("api_tell", f_tell(&api_fil) == 2);
+    expect("api_size", f_size(&api_fil) == 2);
+    expect("api_err", f_error(&api_fil) == 0);
+    fr = f_sync(&api_fil);
+    expect("api_sync", fr == FR_OK && f_tell(&api_fil) == 2);
+    fr = f_rewind(&api_fil);
+    expect("api_rew", fr == FR_OK && f_tell(&api_fil) == 0 && f_size(&api_fil) == 2);
     fr = f_close(&api_fil);
     expect("api_close", fr == FR_OK);
+    fr = f_sync(&api_fil);
+    expect("api_sync_cl", fr == FR_INVALID_OBJECT);
+    fr = f_sync(0);
+    expect("api_sync_null", fr == FR_INVALID_OBJECT);
+
+    fr = f_open(&api_fil, "HELLO.TXT", FA_CREATE_NEW | FA_WRITE);
+    expect("api_new_ex", fr == FR_EXIST);
+    fr = f_open(&api_fil, "NEW.TXT", FA_CREATE_NEW | FA_WRITE);
+    expect("api_new_ok", fr == FR_OK);
+    fr = f_close(&api_fil);
+    expect("api_new_cl", fr == FR_OK);
+    fr = f_open(&api_fil, "NOFILE.TXT", FA_OPEN_EXISTING);
+    expect("api_old_miss", fr == FR_NO_FILE);
+    fr = f_open(&api_fil, "HELLO.TXT", FA_OPEN_EXISTING);
+    expect("api_old_ok", fr == FR_OK);
+    n = 0;
+    fr = f_read(&api_fil, api_got, 1, &n);
+    expect("api_old_rd", fr == FR_DENIED);
+    fr = f_close(&api_fil);
+    expect("api_old_cl", fr == FR_OK);
 
     fr = f_open(&api_fil, "HELLO.TXT", FA_READ);
     expect("api_open", fr == FR_OK);
@@ -403,6 +430,8 @@ static void test_api(void)
     expect("api_ul_big", fr == FR_OK);
     fr = f_unlink("GAP.DAT");
     expect("api_ul_gap", fr == FR_OK);
+    fr = f_unlink("NEW.TXT");
+    expect("api_ul_new", fr == FR_OK);
 
     api_nfree = 0;
     fr = f_getfree("0:", &api_nfree, 0);
@@ -456,6 +485,11 @@ int main(void)
     expect("fat12_alloc", rc == 0 && clst == 2);
     rc = fat_sync();
     expect("fat12_alloc_eoc", rc == 0 &&
+           disk_get(512 + 3) == 0xFF && disk_get(512 + 4) == 0x0F);
+    fat_dirty();
+    expect("fat_dirty", rt_wflag() != 0);
+    rc = fat_sync();
+    expect("fat_dirty_sync", rc == 0 && rt_wflag() == 0 &&
            disk_get(512 + 3) == 0xFF && disk_get(512 + 4) == 0x0F);
 
     /* Cluster 341 is odd. Offset 511 spans FAT sectors 1 and 2.

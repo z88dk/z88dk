@@ -53,8 +53,7 @@ f_write:
     or      l
     jr      Z,fw_chk                        ; bw is null. Do not store a count.
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a                          ; *bw = 0
 ; The object must belong to this mount and FIL_ERR must be 0.
 fw_chk:
@@ -74,16 +73,14 @@ fw_clip:
     ld      hl,(fat_fp)
     ld      de,hl+FIL_FPTR+2
     ex      de,hl
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     and     (hl)
     inc     a                               ; both high bytes were $FF
     jr      NZ,fw_go                        ; the high word is not $FFFF
     ld      hl,(fat_fp)
     ld      de,hl+FIL_FPTR
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; DE is the low word of the file pointer
     ld      a,d
     or      e

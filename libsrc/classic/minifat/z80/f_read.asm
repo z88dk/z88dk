@@ -34,23 +34,19 @@ EXTERN  fat_write
 _f_read:
 f_read:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                  ;br at sp+2
     ld      (fat_out),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                  ;btr at sp+4
     ld      (fat_left),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                  ;buff at sp+6
     ld      (fat_user),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                  ;fp at sp+8
     ld      (fat_fp),de
     ld      hl,(fat_out)
@@ -58,8 +54,7 @@ f_read:
     or      l
     jr      Z,fr_chk                ;br is null. Do not store a count.
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a                  ;*br = 0
 ; The object must belong to this mount and FIL_ERR must be 0.
 fr_chk:

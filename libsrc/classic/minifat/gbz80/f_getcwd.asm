@@ -29,13 +29,11 @@ EXTERN  fat_left
 _f_getcwd:
 f_getcwd:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_left),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_user),de
     ld      a,d

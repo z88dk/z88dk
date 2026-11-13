@@ -51,8 +51,7 @@ f_opendir:
     xor     a
 ; Zero the next DIR byte.
 od_z:
-    ld      (de),a
-    inc     de
+    ld      (de+),a
     dec     b
     jr      nz,od_z
     call    mf_ensure
@@ -70,32 +69,25 @@ od_z:
 od_dir:
     ld      hl,(fat_dp)
     ld      de,(fat_mount_id)
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d                          ; the object id
     ld      hl,(fat_dp)
     ld      de,hl+DIR_SCLUST
     ex      de,hl
     ld      de,(fat_here)
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-    inc     hl
+    ld      (hl+),e
+    ld      (hl+),d
     ld      de,(fat_here+2)
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d                          ; the start cluster
     ld      hl,(fat_dp)
     ld      de,hl+DIR_CLUST
     ex      de,hl
     ld      de,(fat_here)
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-    inc     hl
+    ld      (hl+),e
+    ld      (hl+),d
     ld      de,(fat_here+2)
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d                          ; the current cluster
     ld      de,(fat_here)
     ld      bc,(fat_here+2)
@@ -103,8 +95,7 @@ od_dir:
     call    dir_sdi
     jp      C,mf_ok                         ; the first sector is in the window
     ld      hl,(fat_dp)
-    ld      (hl),0
-    inc     hl
+    ld      (hl+),0
     ld      (hl),0                          ; clear the object id
     ld      a,FR_DISK_ERR
     jp      mf_err

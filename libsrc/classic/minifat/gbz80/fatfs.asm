@@ -84,10 +84,12 @@
 ;   FAT16 root is static dirbase LBA
 ;   SFD (VBR at LBA 0) then four MBR primary partitions
 ;   1 or 2 FATs. csize is a power of 2. BytsPerSec == 512.
+;   Specification 1.03 also allows sectors of 1024, 2048, and 4096 bytes.
 ;
 ; Checks this file does not make:
 ;   JumpBoot. 55AA is required. ChaN accepts some VBRs that have no 55AA.
 ;   BPB_Media. Partition type. GPT and extended partitions fail the VBR check.
+;   FAT entry 0 is not compared with BPB_Media.
 ;
 ; Other limits:
 ;   dir_next itself does not stretch (dir_create does, FAT32 only)
@@ -257,7 +259,7 @@ clst2sect:
     ld      hl,de                           ; DEHL = clst-2
     ld      de,bc
     ld      a,(_cpm_fat_vol+1)              ; csize is 2^n
-    ld      b,a                            ; csize stays in B. The high half rotates through A.
+    ld      b,a                             ; csize stays in B
 clst2sect_mul:
     ld      a,b
     or      a                               ; rra forces Z = 0, so Z is taken after the shift
@@ -265,13 +267,9 @@ clst2sect_mul:
     ld      b,a
     or      a                              ; Z comes from the bits still to shift. Carry is clear for the add.
     jr      Z,clst2sect_base                ; every csize bit is consumed
-    add     hl,hl                           ; (clst-2)<<1
-    ld      a,e
-    rla
-    ld      e,a
-    ld      a,d
-    rla
-    ld      d,a
+    add     hl,hl                           ; (clst-2)<<1. Carry enters the high half.
+    rl      e                               ; high half << 1. A stays.
+    rl      d
     jr      C,clst2sect_ov                  ; (cluster-2) times csize wrapped
     jr      clst2sect_mul                   ; shift the next csize bit
 clst2sect_base:
@@ -579,13 +577,10 @@ fat_fatent32:
     ld      d,c
     ld      c,b
     ld      b,0                             ; cluster >> 8
-    call    fat_rlde                        ; low *2 + bit 7
-    ld      a,c
-    rla
-    ld      c,a
-    ld      a,b
-    rla
-    ld      b,a                             ; clst >> 7
+    rl      e                               ; low *2 + bit 7. A stays.
+    rl      d
+    rl      c
+    rl      b                               ; clst >> 7
 fat_fatent_sec:
     ld      hl,_cpm_fat_vol+8               ; fatbase
     ld      a,(hl+)
@@ -654,8 +649,7 @@ fat12_shr1:
 fat12_load:
     push    bc
     push    de
-    ld      l,e
-    ld      h,d
+    ld      hl,de
     call    fat12_shr1                      ; clst / 2
     add     hl,de                           ; byte offset = clst + clst/2
     ld      a,h
@@ -683,8 +677,7 @@ fat12_load:
     pop     bc                              ; cluster high
     push    bc
     push    de
-    ld      l,e
-    ld      h,d
+    ld      hl,de
     call    fat12_shr1
     add     hl,de                           ; byte offset again
     ld      a,h
@@ -709,16 +702,14 @@ fat12_load:
     call    fat_ldhl
     defw    fat_winsect+2
     inc     hl
-    ld      b,h
-    ld      c,l
+    ld      bc,hl
     ld      hl,0
     jr      fat12_span_go
 fat12_span_lba:
     ld      de,hl
     call    fat_ldhl
     defw    fat_winsect+2
-    ld      b,h
-    ld      c,l
+    ld      bc,hl
     ld      hl,de
 fat12_span_go:
     ld      de,hl
@@ -840,8 +831,7 @@ fat12_store:
     push    bc
     push    af                              ; parity
     push    de                              ; old raw (E first, D second)
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; new link
     pop     hl                              ; old raw
     pop     af                              ; parity
@@ -887,8 +877,7 @@ fat12_st_wr:
     pop     bc                              ; cluster high
     pop     de                              ; cluster low
     push    hl                              ; new raw: L first, H second
-    ld      l,e
-    ld      h,d
+    ld      hl,de
     call    fat12_shr1
     add     hl,de                           ; byte offset. FAT12 cluster fits in DE
     ld      a,l
@@ -904,8 +893,7 @@ fat12_st_same:
     ld      de,fatwin
     add     hl,de
     pop     de                              ; E first, D second
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     jr      fat12_st_dirty
 fat12_st_span:
@@ -2297,31 +2285,6 @@ fat_subhlbc_c:
     pop     de
     ret
 
-; Rotate DE left through carry.
-; Call. DE is the word. Carry is the bit that enters at the low end.
-; Return. DE is rotated. Carry is the bit that left the high end.
-; Return. A and Z stay as the caller left them.
-; Clobber. DE and carry. A, BC, and HL stay. Z stays.
-fat_rlde:
-    push    af
-    ld      a,e
-    rla
-    ld      e,a
-    ld      a,d
-    rla
-    ld      d,a
-    jr      C,fat_rlde_c
-    pop     af
-    jr      NC,fat_rlde_ret
-    ccf
-fat_rlde_ret:
-    ret
-
-fat_rlde_c:
-    pop     af
-    scf
-    ret
-
 ; Absolute ld hl,(nn) is a long synthetic on gbz80. call plus defw is shorter.
 ; Call. The return address points at the defw address.
 ; Return. HL is that word. AF, BC, and DE stay, including carry.
@@ -2369,7 +2332,6 @@ PUBLIC  cc_zero
 PUBLIC  fat_clst_ok
 PUBLIC  fat_copy
 PUBLIC  fat_ld32
-PUBLIC  fat_rlde
 PUBLIC  fat_st32
 PUBLIC  fat_subhlbc
 fat_sthl:

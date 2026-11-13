@@ -39,13 +39,11 @@ EXTERN  dir_ofs
 _f_readdir:
 f_readdir:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; fno at sp+2
     ld      (fat_user),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; dp at sp+4
     ld      a,d
     or      e
@@ -137,10 +135,8 @@ fr_sdi_nc:
     ld      de,DIR_DPTR
     add     hl,de
     ld      a,(hl+)
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jp      NZ,mf_ok                        ; dptr is not 0. Return the empty name.
     ld      a,FR_DISK_ERR
@@ -151,8 +147,7 @@ fr_mark:
     defw    fat_dp
     ld      de,DIR_DPTR+2
     add     hl,de
-    ld      (hl),1
-    inc     hl
+    ld      (hl+),1
     ld      (hl),0                          ; the high half of dptr is 1
     jp      mf_ok
 ; fno is null. Rewind dptr and open the first entry.
@@ -170,12 +165,9 @@ fr_rewind:
     defw    fat_dp
     ld      de,DIR_SCLUST
     add     hl,de
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)                          ; BCDE is the start cluster
     ld      hl,0
     call    dir_sdi
@@ -196,20 +188,16 @@ fr_sdi_dptr:
     defw    fat_dp
     ld      de,DIR_DPTR
     add     hl,de
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; the low half of dptr
     push    de
     call    fat_ldhl
     defw    fat_dp
     ld      de,DIR_SCLUST
     add     hl,de
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      c,(hl)
-    inc     hl
+    ld      e,(hl+)
+    ld      d,(hl+)
+    ld      c,(hl+)
     ld      b,(hl)                          ; BCDE is the start cluster
     pop     hl                              ; HL is the byte offset
     jp      dir_sdi
@@ -225,10 +213,8 @@ fr_store:
     ld      de,DIR_DPTR
     add     hl,de
     ld      de,(dir_ofs)
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-    inc     hl
+    ld      (hl+),e
+    ld      (hl+),d
     xor     a
     ld      (hl+),a
     ld      (hl),a                          ; the high half of dptr is 0

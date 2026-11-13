@@ -23,8 +23,7 @@ EXTERN  fat_fp
 _f_sync:
 f_sync:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_fp),de
     ex      de,hl

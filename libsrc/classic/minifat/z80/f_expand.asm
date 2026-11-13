@@ -50,8 +50,7 @@ f_expand:
     ld      de,fat_seek
     ld      bc,4
     ldir                            ;the requested size
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      a,d
     or      e
@@ -67,12 +66,9 @@ f_expand:
     jp      mf_err
 fe_opt:
     ld      hl,fat_seek
-    ld      a,(hl)
-    inc     hl
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    ld      a,(hl+)
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jp      Z,fe_deny               ;a size of 0 is refused
     ld      hl,(fat_fp)
@@ -84,23 +80,17 @@ fe_opt:
     ld      hl,(fat_fp)
     ld      de,FIL_SIZE
     add     hl,de
-    ld      a,(hl)
-    inc     hl
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    ld      a,(hl+)
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jp      NZ,fe_deny              ;the file is not empty
     ld      hl,(fat_fp)
     ld      de,FIL_SCLUST
     add     hl,de
-    ld      a,(hl)
-    inc     hl
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    ld      a,(hl+)
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jp      NZ,fe_deny              ;the file already has a chain
     call    fe_tcl
@@ -377,12 +367,9 @@ fe_ceil:
     inc     (hl)
 fe_tcl_cp:
     ld      hl,fat_zeros
-    ld      a,(hl)
-    inc     hl
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    ld      a,(hl+)
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jr      Z,fe_tcl_no             ;the cluster count is 0
     ld      hl,fat_zeros

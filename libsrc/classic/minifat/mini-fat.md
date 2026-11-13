@@ -44,7 +44,7 @@ Success is `L = 0` and carry set. Failure is `L = 1` and carry clear. A 64 KiB c
 
 The file calls open a file, seek, read, write, and close it. Each call is CPU-specific assembly, one function per file, beside that CPU's core. The calls share one file-sector window, separate from `fatwin`. The core still stops before those calls, so you can walk the cluster chain and read the sectors yourself. Find, label, forward, `f_mkfs`, `f_fdisk`, `f_setcp`, and the string helpers are outside this library. `f_eof`, `f_tell`, `f_size`, `f_error`, and `f_rewind` are macros in `fatfs.h`.
 
-Also out of scope for the core: exFAT, long file names, GPT, extended partitions, and a current directory stack. `BPB_Media` is not read. The jump instruction at the start of the boot sector is not required. The `55 AA` signature is required. ChaN accepts some boot sectors that have no signature. This code does not. There is no `ffconf.h` and no option set.
+Also out of scope for the core: exFAT, long file names, GPT, extended partitions, and a current directory stack. `BPB_Media` is not read. FAT entry 0 is not compared with `BPB_Media`. The jump instruction at the start of the boot sector is not required. The `55 AA` signature is required. ChaN accepts some boot sectors that have no signature. This code does not. There is no `ffconf.h` and no option set.
 
 `dir_next` does not grow a directory. `dir_create` grows a FAT32 directory when the chain is already at its end. A FAT16 root and a FAT16 subdirectory stay the size they were formatted.
 
@@ -59,6 +59,8 @@ Also out of scope for the core: exFAT, long file names, GPT, extended partitions
 `f_open` takes a `FIL`, a path, and a mode. `FA_READ` opens an existing file. `FA_WRITE` opens it for write and refuses a read-only file. `FA_CREATE_NEW` creates a file and returns `FR_EXIST` when the name is already there.
 
 `FA_CREATE_ALWAYS` creates a file or truncates the old one. `FA_OPEN_ALWAYS` opens a file or creates one. `FA_OPEN_APPEND` does that open and then seeks to the end. An error leaves the object id at 0.
+
+`FA_OPEN_EXISTING` is 0. It opens a file that is already there. A missing name returns `FR_NO_FILE`. That mode has no `FA_READ` bit. A following `f_read` returns `FR_DENIED`.
 
 `f_read` writes 0 to the byte count, then copies the bytes that remain in the file. The mode must include `FA_READ`.
 
@@ -179,9 +181,13 @@ Then:
 
 The directory entry layout is Microsoft's. Byte 0 is the name. `$00` ends the directory. `$E5` is a deleted slot and can be reused. A real name that begins with `$E5` is stored as `$05`, and a compare treats `$05` as `$E5`. An 8.3 name may use digits, letters, and `_ - ! # $ % &`. A lower-case letter is folded. Other bytes are rejected. Attribute `$0F` is a long name. Attribute `$08` is a label and `$10` is a directory. The volume bit is set on a long name, so a test of that bit skips both labels and long names. The archive bit is `$20`.
 
+Specification 1.03 also allows a space, an apostrophe, @, a tilde, a grave, parentheses, and braces. This code rejects those marks. A space pads an 8.3 name in the specification.
+
 `n_fatent` is the cluster count plus 2. Cluster numbers below 2 are not data. `csize` is a power of two. `SecPerClus` of 65 or more is refused, because a 64 KiB cluster is 0 in the 16-bit sector arithmetic.
 
-Two boundaries follow ChaN rather than Microsoft FAT specification 1.03. A cluster count of `$0FF5` or below is FAT12. The specification would still call 4085 clusters FAT16. A count of `$FFF5` stays FAT16. The specification would call that FAT32. A count above `$FFF5` is FAT32 and is accepted up to `$0FFFFFF5`. A count above `$0FFFFFF5` is rejected. `put_fat` stores 28 bits on FAT32 and 12 bits on FAT12. A FAT of `$200000` sectors or more is rejected before the copies are added.
+Microsoft FAT specification 1.03 also allows a sector of 1024, 2048, or 4096 bytes. This code accepts a sector of 512 bytes only.
+
+Two boundaries follow ChaN rather than Microsoft FAT specification 1.03. A cluster count of `$0FF5` or below is FAT12. The specification would still call 4085 clusters FAT16. A count of `$FFF5` stays FAT16. The specification would call that FAT32. A count above `$FFF5` is FAT32 and is accepted up to `$0FFFFFF5`. A count above `$0FFFFFF5` is rejected. `put_fat` writes the low 28 bits of a FAT32 entry and leaves bits 28 to 31 unchanged. On FAT12, `put_fat` writes 12 bits. A FAT of `$200000` sectors or more is rejected before the copies are added.
 
 A FAT12 entry is 12 bits packed as `clst + clst/2` bytes from the start of the FAT. An even cluster owns the low 12 bits. An odd cluster owns the high 12 bits. The two bytes can sit in different sectors. The size of the FAT is `(n_fatent * 3 + 1) / 2` bytes, rounded up to sectors. A free count on FAT12 walks clusters 2 through `n_fatent - 1`. Clusters 0 and 1 are reserved.
 
@@ -282,10 +288,10 @@ The core is one object. A call that uses the core links all of the core bytes. `
 
 | Part | Z80 | 8085 | 8080 | gbz80 | vm1 |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Core `fatfs.asm`, with `fat_sync` | 2540 | 2754 | 2814 | 3139 | 2766 |
-| Low-level calls, 13 files | 2533 | 2700 | 2774 | 3024 | 2731 |
-| `f_*` calls, 21 files | 3649 | 3734 | 3990 | 4577 | 3917 |
-| File layer `minifat_file.asm` | 2727 | 2939 | 3039 | 3238 | 2959 |
+| Core `fatfs.asm`, with `fat_sync` | 2540 | 2754 | 2814 | 3119 | 2766 |
+| Low-level calls, 13 files | 2533 | 2700 | 2774 | 3025 | 2731 |
+| `f_*` calls, 21 files | 3649 | 3734 | 3990 | 4574 | 3917 |
+| File layer `minifat_file.asm` | 2727 | 2939 | 3035 | 3234 | 2953 |
 
 | RAM | Bytes | When it is linked |
 | --- | ---: | --- |
@@ -299,7 +305,7 @@ Low-level call files:
 
 | Call | Z80 | 8085 | 8080 | gbz80 | vm1 |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `fat_mount` | 1367 | 1490 | 1500 | 1640 | 1487 |
+| `fat_mount` | 1367 | 1490 | 1500 | 1641 | 1487 |
 | `dir_find` | 178 | 172 | 193 | 215 | 183 |
 | `dir_create` | 300 | 333 | 361 | 370 | 351 |
 | `dir_zap` | 15 | 15 | 15 | 17 | 15 |
@@ -337,7 +343,7 @@ Low-level call files:
 | `f_chdrive` | 20 | 15 | 20 | 21 | 20 |
 | `f_getcwd` | 86 | 87 | 96 | 114 | 96 |
 | `f_getfree` | 82 | 77 | 89 | 110 | 89 |
-| `f_expand` | 686 | 718 | 739 | 856 | 739 |
+| `f_expand` | 686 | 718 | 739 | 853 | 739 |
 
 ## The volume block
 

@@ -20,8 +20,7 @@ EXTERN  mf_ok
 _f_chdrive:
 f_chdrive:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ex      de,hl
     ld      a,h

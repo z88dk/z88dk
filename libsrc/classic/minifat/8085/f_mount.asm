@@ -74,8 +74,7 @@ fm_new:
     or      l
     jr      Z,fm_off                        ; fs is null
     ld      (fat_fs),hl
-    ld      (hl),0                          ; fs_type stays 0 until the publish
-    inc     hl
+    ld      (hl+),0                         ; fs_type stays 0 until the publish
     ld      (hl),0                          ; the drive byte is 0
     ld      a,(fat_kind)
     or      a

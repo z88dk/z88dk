@@ -130,16 +130,13 @@ df_hi:
     ld      de,DIR_FileSize
     add     hl,de
     ld      de,hl
-    ld      a,(de)
-    inc     de
+    ld      a,(de+)
     ld      l,a
-    ld      a,(de)
-    inc     de
+    ld      a,(de+)
     ld      h,a
     call    fat_sthl
     defw    fat_found_size
-    ld      a,(de)
-    inc     de
+    ld      a,(de+)
     ld      l,a
     ld      a,(de)
     ld      h,a

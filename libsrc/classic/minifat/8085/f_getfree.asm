@@ -66,7 +66,6 @@ fg_ptr:
     or      l
     jp      Z,mf_ok                         ; the FATFS pointer is 0
     ld      de,(fat_fs)
-    ld      (hl),e                          ; store the volume address
-    inc     hl
+    ld      (hl+),e                         ; store the volume address
     ld      (hl),d
     jp      mf_ok

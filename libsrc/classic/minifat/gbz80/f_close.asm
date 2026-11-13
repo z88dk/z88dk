@@ -27,8 +27,7 @@ EXTERN  fat_fp
 _f_close:
 f_close:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_fp),de
     ld      hl,de
@@ -38,7 +37,6 @@ f_close:
     ret     NC                              ; mf_sync_fil failed. HL holds the FRESULT
     call    fat_ldhl
     defw    fat_fp
-    ld      (hl),0                          ; clear the file id
-    inc     hl
+    ld      (hl+),0                         ; clear the file id
     ld      (hl),0
     jp      mf_ok

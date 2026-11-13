@@ -51,8 +51,7 @@ EXTERN  fatwin
 _f_unlink:
 f_unlink:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; path at sp+2
     ld      (fat_path),de
     call    mf_ensure

@@ -41,23 +41,19 @@ EXTERN  fat_write
 _f_write:
 f_write:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; bw at sp+2
     ld      (fat_out),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; btw at sp+4
     ld      (fat_left),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; buff at sp+6
     ld      (fat_user),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; fp at sp+8
     ld      (fat_fp),de
     call    fat_ldhl
@@ -97,8 +93,7 @@ fw_clip:
     defw    fat_fp
     ld      de,FIL_FPTR
     add     hl,de
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; DE is the low word of the file pointer
     ld      a,d
     or      e

@@ -50,8 +50,7 @@ f_read:
     or      l
     jr      Z,fr_chk                        ; br is null. Do not store a count.
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a                          ; *br = 0
 ; The object must belong to this mount and FIL_ERR must be 0.
 fr_chk:

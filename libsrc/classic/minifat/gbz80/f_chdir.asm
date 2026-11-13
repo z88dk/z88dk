@@ -33,8 +33,7 @@ EXTERN  fat_cwd
 _f_chdir:
 f_chdir:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_path),de
     call    mf_ensure

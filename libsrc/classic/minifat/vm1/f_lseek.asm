@@ -36,18 +36,15 @@ EXTERN  fat_off
 _f_lseek:
 f_lseek:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_seek),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_seek+2),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      (fat_fp),de
     ex      de,hl
@@ -138,16 +135,13 @@ fl_step:
     add     hl,de
     ld      a,(hl)
     add     a,c
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,b
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,0
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,0
     ld      (hl),a

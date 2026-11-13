@@ -22,7 +22,6 @@ EXTERN  fat_last_clst
 EXTERN  fat_ld32
 EXTERN  fat_ldhl
 EXTERN  fat_move_window
-EXTERN  fat_rlde
 EXTERN  fat_sthl
 EXTERN  fat_subhlbc
 EXTERN  fat_wflag
@@ -369,7 +368,8 @@ fat_mount_tsz:
     cp      2                               ; two FATs
     jr      NZ,fat_mount_fatarea            ; there is one FAT
     add     hl,hl                           ; double the low half
-    call    fat_rlde                        ; fatsz * n_fats
+    rl      e                               ; fatsz * n_fats. Carry leaves the high half.
+    rl      d
     jp      C,fat_mount_fail                ; two FAT copies do not fit
 ; Add the reserved sector count to the FAT area.
 fat_mount_fatarea:
@@ -818,8 +818,7 @@ fat_mount_r32:
     push    hl
     call    fat_ldhl
     defw    _cpm_fat_vol+6                  ; n_fatent high
-    ld      b,h
-    ld      c,l
+    ld      bc,hl
     pop     de
     call    fat_ldhl
     defw    fatwin+BPB_RootClus32

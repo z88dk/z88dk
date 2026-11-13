@@ -46,8 +46,7 @@ EXTERN  fatwin
 _f_mkdir:
 f_mkdir:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; path at sp+2
     ld      (fat_path),de
     call    mf_ensure
@@ -86,40 +85,33 @@ mk_got:
     call    fat_move_window
     jp      NC,mk_disk                      ; the sector was not read
     ld      hl,fatwin
-    ld      (hl),'.'                        ; the first directory entry is "."
-    inc     hl
+    ld      (hl+),'.'                       ; the first directory entry is "."
     ld      b,10
     ld      a,' '
 ; The rest of the 8.3 name is spaces.
 mk_sp1:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jr      nz,mk_sp1
     ld      (hl),AM_DIR
     ld      hl,fatwin+DIR_ClusLO
     ld      de,(fat_hold)
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d                          ; the low cluster word of "."
     call    mk_hi_self
     ld      hl,fatwin+32                    ; 32 is the size of one directory entry
-    ld      (hl),'.'
-    inc     hl
-    ld      (hl),'.'                        ; the next directory entry is ".."
-    inc     hl
+    ld      (hl+),'.'
+    ld      (hl+),'.'                       ; the next directory entry is ".."
     ld      b,9
     ld      a,' '
 mk_sp2:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jr      nz,mk_sp2
     ld      (hl),AM_DIR
     ld      hl,fatwin+32+DIR_ClusLO
     ld      de,(fat_cfo)
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d                          ; the low cluster word of ".."
     call    mk_hi_parent
     ld      a,1
@@ -137,8 +129,7 @@ mk_sp2:
     ld      de,DIR_ClusLO
     add     hl,de
     ld      de,(fat_hold)
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     ld      hl,(dir_ptr)
     ld      de,DIR_ClusHI
@@ -149,8 +140,7 @@ mk_sp2:
     jr      Z,mk_ent_hi                     ; the volume is FAT32. Keep the high word.
     ld      de,0                            ; FAT12 and FAT16 store 0 in the high word
 mk_ent_hi:
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     ld      a,1
     ld      (fat_wflag),a
@@ -206,7 +196,6 @@ mk_hi_put:
     jr      Z,mk_hi_st                      ; the volume is FAT32
     ld      de,0
 mk_hi_st:
-    ld      (hl),e
-    inc     hl
+    ld      (hl+),e
     ld      (hl),d
     ret

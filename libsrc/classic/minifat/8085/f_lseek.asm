@@ -137,16 +137,13 @@ fl_step:
     ex      de,hl
     ld      a,(hl)
     add     a,c
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,b
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,0
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      a,(hl)
     adc     a,0
     ld      (hl),a

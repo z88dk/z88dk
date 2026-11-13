@@ -37,23 +37,19 @@ EXTERN  fat_write
 _f_write:
 f_write:
     ld      hl,sp+2
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; bw at sp+2
     ld      (fat_out),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; btw at sp+4
     ld      (fat_left),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; buff at sp+6
     ld      (fat_user),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; fp at sp+8
     ld      (fat_fp),de
     ld      hl,(fat_out)
@@ -61,8 +57,7 @@ f_write:
     or      l
     jr      Z,fw_chk                        ; bw is null. Do not store a count.
     xor     a
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     ld      (hl),a                          ; *bw = 0
 ; The object must belong to this mount and FIL_ERR must be 0.
 fw_chk:
@@ -82,16 +77,14 @@ fw_clip:
     ld      hl,(fat_fp)
     ld      de,FIL_FPTR+2
     add     hl,de
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     and     (hl)
     inc     a                               ; both high bytes were $FF
     jr      NZ,fw_go                        ; the high word is not $FFFF
     ld      hl,(fat_fp)
     ld      de,FIL_FPTR
     add     hl,de
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                          ; DE is the low word of the file pointer
     ld      a,d
     or      e

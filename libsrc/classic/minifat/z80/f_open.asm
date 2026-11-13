@@ -55,13 +55,11 @@ f_open:
     ld      (fat_mode),a
     inc     hl
     inc     hl                      ;a byte argument occupies a word
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                  ;path at sp+4
     ld      (fat_path),de
     inc     hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)                  ;fp at sp+6
     ld      a,d
     or      e
@@ -72,8 +70,7 @@ f_open:
     xor     a
 ; Zero the next byte of the FIL object.
 fo_z:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     djnz    fo_z                    ;more FIL bytes remain
     call    mf_ensure
     jp      NC,fo_keep              ;mount failed. L is 1, 3, 13, or 19, or FR_NOT_ENABLED.
@@ -112,8 +109,7 @@ fo_new:
     xor     a
 ; Zero the next found-cluster or found-size byte.
 fo_zf:
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     djnz    fo_zf
     call    mf_mark_arc
     call    mf_save_dir
@@ -152,12 +148,9 @@ fo_tail:
     ld      hl,(fat_fp)
     ld      de,FIL_SIZE
     add     hl,de
-    ld      a,(hl)
-    inc     hl
-    or      (hl)
-    inc     hl
-    or      (hl)
-    inc     hl
+    ld      a,(hl+)
+    or      (hl+)
+    or      (hl+)
     or      (hl)
     jp      Z,mf_ok                 ;the size is 0. The pointer is already there.
     ld      hl,(fat_fp)
@@ -181,8 +174,7 @@ fo_tail:
     ld      hl,(fat_fp)
     ld      de,FIL_FPTR
     add     hl,de
-    ld      a,(hl)
-    inc     hl
+    ld      a,(hl+)
     jr      NZ,fo_fill              ;the low byte is not 0. The sector is partial.
     ld      a,(hl)
     and     1                       ;bit 8 of the file pointer
@@ -237,8 +229,7 @@ fo_kill:
     ld      a,h
     or      l
     jr      Z,fo_kill0              ;fp is null
-    ld      (hl),0
-    inc     hl
+    ld      (hl+),0
     ld      (hl),0                  ;the object id is 0
 fo_kill0:
     pop     af

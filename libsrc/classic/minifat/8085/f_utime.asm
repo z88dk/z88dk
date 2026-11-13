@@ -55,8 +55,7 @@ fu_set:
     jr      Z,fu_sync                       ; the FILINFO pointer is 0
     ld      de,hl+FI_DATE
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      a,d
     or      e
@@ -65,21 +64,18 @@ fu_set:
     ld      hl,(fat_user)
     ld      de,hl+FI_TIME
     ex      de,hl
-    ld      e,(hl)
-    inc     hl
+    ld      e,(hl+)
     ld      d,(hl)
     ld      hl,(dir_ptr)
     ld      bc,DIR_WrtTime
     add     hl,bc
-    ld      (hl),e                          ; store the write time
-    inc     hl
+    ld      (hl+),e                         ; store the write time
     ld      (hl),d
     pop     de
     ld      hl,(dir_ptr)
     ld      bc,DIR_WrtDate
     add     hl,bc
-    ld      (hl),e                          ; store the write date
-    inc     hl
+    ld      (hl+),e                         ; store the write date
     ld      (hl),d
 fu_sync:
     ld      a,1                             ; mark the window dirty
