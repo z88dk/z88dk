@@ -9,6 +9,7 @@ More detailed, but still incomplete changelist:
 
 - [classic] +mz800 support for the Sharp MZ-800
 - [classic] +pc6001 support for the PC-6001mk2
+- [classic] +spc1500 support the Samsung SPC-1500
 
 
 

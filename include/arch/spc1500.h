@@ -3,6 +3,7 @@
 
 #include <sys/compiler.h>
 #include <stdint.h>
+#include <stddef.h>
 
 /*
  *	Samsung SPC-1500 (Z80 at 4 MHz, 64 KB RAM, MC6845 CRTC, AY-3-8910,
@@ -50,6 +51,18 @@ extern void __LIB__ spc1500_set_palette(uint8_t pen, uint8_t colour) __smallc;
 
 // Wait for the start of the vertical blank (the 8255's port B bit 7 falling)
 extern void __LIB__ spc1500_wait_vblank(void);
+
+// The cassette, in the machine's own format (the one the IPL's "C: cassette
+// system" loads).  A file is two blocks: a header (the name, up to 14
+// characters, the length, and up to 96 bytes of the program's own: user and
+// ulen) and the data.  save returns 0, or -1 if the player stopped it (Shift
+// and Break together).  load_to passes over files with other names, gives back
+// the header's user bytes and reads the data into buf: it returns the bytes
+// read (len if the file is whole) or -1 if no header was read.  The player
+// presses PLAY (and RECORD to save); the motor is turned on and off through
+// the AY's port B.  Interrupts are off while they work.
+extern int __LIB__ spc1500_tape_save(const char *name, const void *addr, size_t len, const void *user, size_t ulen) __smallc;
+extern int __LIB__ spc1500_tape_load_to(const char *name, void *buf, size_t len, void *user, size_t ulen) __smallc;
 
 // The modifiers' scan codes for in_KeyPressed: (key mask << 8) | row (row 0 of
 // the keyboard matrix)

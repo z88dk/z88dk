@@ -118,6 +118,10 @@ Z88DKTARGET_pc6001_rom = pc6001
 ZCFLAGS_pc6001_rom = -subtype=rom
 ZLDFLAGS_pc6001_rom = 
 
+Z88DKTARGET_pc6001mk2_disc = pc6001
+ZCFLAGS_pc6001mk2_disc = -subtype=mk2disc
+ZLDFLAGS_pc6001mk2_disc = 
+
 Z88DKTARGET_pc88_disk = pc88
 ZCFLAGS_pc88_disk = -subtype=disk
 ZLDFLAGS_pc88_disk = 
