@@ -198,6 +198,7 @@ include target/special/special.mak
 include target/sol20/sol20.mak
 include target/sos/sos.mak
 include target/spc1000/spc1000.mak
+include target/spc1500/spc1500.mak
 include target/srr/srr.mak
 include target/super80/super80.mak
 include target/sv8000/sv8000.mak

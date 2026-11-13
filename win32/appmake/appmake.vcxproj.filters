@@ -191,6 +191,9 @@
     <ClCompile Include="..\..\src\appmake\spc1000.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\appmake\spc1500.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\appmake\svi.c">
       <Filter>Source Files</Filter>
     </ClCompile>
