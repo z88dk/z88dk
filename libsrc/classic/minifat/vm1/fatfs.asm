@@ -150,7 +150,6 @@ PUBLIC  cc_zero
 PUBLIC  fat_clst_ok
 PUBLIC  fat_copy
 PUBLIC  fat_ld32
-PUBLIC  fat_rlde
 PUBLIC  fat_st32
 
 
@@ -276,9 +275,11 @@ clst2sect:
     sbc     a,0
     ld      b,a
     jr      C,clst2sect_ov                  ; cluster is below 2
+    ld      a,(_cpm_fat_vol+1)              ; csize is 2^n
+    cp      1
+    jr      Z,clst2sect_add                 ; one sector. The product is clst-2.
     ld      hl,de                           ; DEHL = clst-2
     ld      de,bc
-    ld      a,(_cpm_fat_vol+1)              ; csize is 2^n
     ld      b,a                             ; csize stays in B. The high half rotates through A. $18 is sub hl,de
 clst2sect_mul:
     ld      a,b
@@ -299,6 +300,7 @@ clst2sect_mul:
 clst2sect_base:
     ld      bc,de
     ex      de,hl                           ; BCDE = (clst-2)*csize
+clst2sect_add:
     ld      hl,_cpm_fat_vol+16              ; database
     ld      a,(hl+)
     add     a,e                             ; database plus the scaled cluster
@@ -580,7 +582,12 @@ fat_fatent32:
     ld      d,c
     ld      c,b
     ld      b,0                             ; cluster >> 8
-    call    fat_rlde                        ; low *2 + bit 7
+    ld      a,e                             ; low *2 + bit 7
+    rla
+    ld      e,a
+    ld      a,d
+    rla
+    ld      d,a
     ld      a,c
     rla
     ld      c,a
@@ -640,16 +647,6 @@ fat12_range_lo:
     or      a                               ; clear the subtract carry. The cluster is below 2.
     ret
 
-fat12_shr1:
-    or      a
-    ld      a,h
-    rra
-    ld      h,a
-    ld      a,l
-    rra
-    ld      l,a
-    ret
-
 ; Load the two raw bytes of one FAT12 entry.
 ; Two clusters share three bytes. The packed offset is cluster plus cluster/2.
 ; An even cluster owns the low 12 bits. An odd cluster owns the high 12 bits.
@@ -664,7 +661,13 @@ fat12_load:
     push    bc
     push    de
     ld      hl,de
-    call    fat12_shr1                      ; clst / 2
+    or      a                               ; clst / 2
+    ld      a,h
+    rra
+    ld      h,a
+    ld      a,l
+    rra
+    ld      l,a
     add     hl,de                           ; packed offset is cluster plus cluster/2
     ld      a,h
     or      a
@@ -692,7 +695,13 @@ fat12_load:
     push    bc
     push    de
     ld      hl,de
-    call    fat12_shr1
+    or      a                               ; clst / 2
+    ld      a,h
+    rra
+    ld      h,a
+    ld      a,l
+    rra
+    ld      l,a
     add     hl,de                           ; packed offset is cluster plus cluster/2
     ld      a,h
     and     1
@@ -759,25 +768,36 @@ fat12_load_fail:
 
 ; Turn the raw FAT12 word into a 12-bit link.
 ; Call. DE is the raw word. E is the first byte. C is 1 when the cluster is odd.
-; Return. DE is the 12-bit link. An odd entry is a nibble shift.
+; Return. DE is the 12-bit link. An odd entry shifts right by four bits.
 ; Return. An even entry keeps the low 12 bits.
-; Return. The even path clears carry. The odd path leaves carry from the shift.
-; Clobber. AF, DE. BC and HL stay.
+; Return. Both paths clear carry.
+; Clobber. AF and DE. BC and HL stay.
 fat12_value:
     ld      a,c
     or      a
     jr      Z,fat12_even                    ; an even cluster keeps the low 12 bits
-    ld      b,4
-fat12_shr4:
-    or      a
+    ld      a,e
+    rrca
+    rrca
+    rrca
+    rrca
+    ld      e,a
     ld      a,d
-    rra
+    rrca
+    rrca
+    rrca
+    rrca
     ld      d,a
     ld      a,e
-    rra
+    and     $0F
     ld      e,a
-    dec     b
-    jp      NZ,fat12_shr4                   ; four logical shifts left
+    ld      a,d
+    and     $F0
+    or      e
+    ld      e,a
+    ld      a,d
+    and     $0F
+    ld      d,a
     ret
 fat12_even:
     ld      a,d
@@ -883,7 +903,13 @@ fat12_st_wr:
     pop     de                              ; cluster low
     push    hl                              ; new raw: L first, H second
     ld      hl,de
-    call    fat12_shr1
+    or      a                               ; clst / 2
+    ld      a,h
+    rra
+    ld      h,a
+    ld      a,l
+    rra
+    ld      l,a
     add     hl,de                           ; packed offset is cluster plus cluster/2
     ld      a,l
     cp      255
@@ -2105,30 +2131,4 @@ dir_next_end:
 dir_next_io:
     ld      a,1
     or      a                               ; carry clear and NZ. This is a disk or chain error.
-    ret
-
-
-; Rotate DE left through carry.
-; Call. DE is the word. Carry is the bit that enters at the low end.
-; Return. DE is rotated. Carry is the bit that left the high end.
-; Return. A and Z stay as the caller left them.
-; Clobber. DE and carry. A, BC, and HL stay. Z stays.
-fat_rlde:
-    push    af
-    ld      a,e
-    rla
-    ld      e,a
-    ld      a,d
-    rla
-    ld      d,a
-    jr      C,fat_rlde_c
-    pop     af
-    jr      NC,fat_rlde_ret
-    ccf
-fat_rlde_ret:
-    ret
-
-fat_rlde_c:
-    pop     af
-    scf
     ret

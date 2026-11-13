@@ -1,6 +1,6 @@
 # Mini-FAT
 
-Mini-FAT is the FAT12, FAT16, and FAT32 layer in the classic library. The cores are `libsrc/classic/minifat/z80/fatfs.asm`, `8085/fatfs.asm`, `8080/fatfs.asm`, `gbz80/fatfs.asm`, and `vm1/fatfs.asm`. `fat_sync` stays in the core. `fat_mount`, `dir_find`, `dir_create`, `dir_zap`, `fat_dirty`, `fat_dir_open`, `fat_dir_read`, `fat_next`, `fat_alloc`, `fat_free`, `fat_clst2sect`, `fat_getfree`, and `fat_clusters` are one file each, beside that core. The Z80 file and the 8085 file are one program. The 8085 file uses `rra` and `rl de` where the Z80 file uses `srl` and `sla`. The labels, the branch decisions, and the bytes a caller sees are the same on every core. vm1 shifts a cluster with an open-coded rotate through A. It has no `rl de`: opcode `$18` is `sub hl,de`. A value already in BC is subtracted with `sub hl,bc`. A value in DE is subtracted with `sub hl,de`, or compared with `cp hl,de`. gbz80 loads an absolute word with `fat_ldhl`. A loop reloads the word because the body updates it. RAM for the volume and the sector window is `libsrc/classic/minifat/fat_bss.asm`. The C names are `include/fatfs.h`.
+Mini-FAT is the FAT12, FAT16, and FAT32 layer in the classic library. The cores are `libsrc/classic/minifat/z80/fatfs.asm`, `8085/fatfs.asm`, `8080/fatfs.asm`, `gbz80/fatfs.asm`, and `vm1/fatfs.asm`. `fat_sync` stays in the core. `fat_mount`, `dir_find`, `dir_create`, `dir_zap`, `fat_dirty`, `fat_dir_open`, `fat_dir_read`, `fat_next`, `fat_alloc`, `fat_free`, `fat_clst2sect`, `fat_getfree`, and `fat_clusters` are one file each, beside that core. The 8085 file uses `rra` and `rl de` where the Z80 file uses `srl` and `sla`. The labels, the branch decisions, and the bytes a caller sees are the same on every core. vm1 shifts a cluster with an open-coded rotate through A. It has no `rl de`: opcode `$18` is `sub hl,de`. A value already in BC is subtracted with `sub hl,bc`. A value in DE is subtracted with `sub hl,de`, or compared with `cp hl,de`. gbz80 loads an absolute word with `fat_ldhl`. A loop usually reloads the word. The body may store a new value. RAM for the volume and the sector window is `libsrc/classic/minifat/fat_bss.asm`. The C names are `include/fatfs.h`.
 
 The on-disk work follows [ChaN FatFs R0.16](http://elm-chan.org/fsw/ff/00index_e.html) for `check_fs`, `find_volume`, `mount_volume`, `move_window`, `sync_window`, `clst2sect`, `get_fat`, `put_fat`, `create_chain`, `remove_chain`, `dir_sdi`, `dir_next`, `dir_find`, and `dir_create`. The core keeps the sector window, the FAT chain, `dir_sdi`, and `dir_next`. Mount, directory search, directory create, and the C dword calls are separate files in that same directory. The `f_*` file calls are CPU-specific assembly, one function per file, in that directory. They are not part of `fatfs.asm`.
 
@@ -288,8 +288,8 @@ The core is one object. A call that uses the core links all of the core bytes. `
 
 | Part | Z80 | 8085 | 8080 | gbz80 | vm1 |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Core `fatfs.asm`, with `fat_sync` | 2540 | 2754 | 2814 | 3119 | 2766 |
-| Low-level calls, 13 files | 2533 | 2700 | 2774 | 3025 | 2731 |
+| Core `fatfs.asm`, with `fat_sync` | 2540 | 2740 | 2819 | 3118 | 2771 |
+| Low-level calls, 13 files | 2533 | 2700 | 2777 | 3025 | 2734 |
 | `f_*` calls, 21 files | 3649 | 3734 | 3990 | 4574 | 3917 |
 | File layer `minifat_file.asm` | 2727 | 2939 | 3035 | 3234 | 2953 |
 
@@ -305,7 +305,7 @@ Low-level call files:
 
 | Call | Z80 | 8085 | 8080 | gbz80 | vm1 |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `fat_mount` | 1367 | 1490 | 1500 | 1641 | 1487 |
+| `fat_mount` | 1367 | 1490 | 1503 | 1641 | 1490 |
 | `dir_find` | 178 | 172 | 193 | 215 | 183 |
 | `dir_create` | 300 | 333 | 361 | 370 | 351 |
 | `dir_zap` | 15 | 15 | 15 | 17 | 15 |
@@ -363,12 +363,12 @@ Low-level call files:
 | `free_valid` | 1 when `free_clst` is live |
 | `free_clst` | free clusters |
 
-`_cpm_dir_sclust` is sixteen dwords. The shell stores the start cluster of drive A: in the first and drive P: in the last. Zero means that letter is not mounted. Mini-FAT does not interpret drive letters. The BDOS does.
+`_cpm_dir_sclust` is sixteen dwords. This library does not read them. A later shell may store one start cluster per drive letter. Zero means that letter is not mounted.
 
 ## On the RC2014
 
-The product copies the CCP, the BDOS stub, and the BIOS into high RAM. Mini-FAT stays in the ROM and runs where it was linked. From `cboot` until `wboot` latches the ROM back in, RAM covers the ROM window. That stretch of the boot must not call mini-FAT.
+This library does not include the RC2014 boot or the BDOS. A later target may keep mini-FAT in ROM. The boot must not call mini-FAT while RAM covers that ROM window.
 
-`fatwin` is also the buffer the BDOS uses for the function 27 allocation vector. That routine invalidates the window before it returns. The next disk call loads a real sector again.
+A later BDOS may use `fatwin` as the function 27 buffer. That routine must invalidate the window before it returns. The next disk call loads a real sector again.
 
-The shell follows a cluster chain that is more than one run. A file does not have to be contiguous.
+A file does not have to be contiguous.

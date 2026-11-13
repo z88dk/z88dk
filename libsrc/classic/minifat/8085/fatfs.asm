@@ -630,16 +630,6 @@ fat12_range_lo:
     or      a                               ; clear the subtract carry. The cluster is below 2.
     ret
 
-fat12_shr1:
-    or      a
-    ld      a,h
-    rra
-    ld      h,a
-    ld      a,l
-    rra
-    ld      l,a
-    ret
-
 ; Load the two raw bytes of one FAT12 entry.
 ; Two clusters share three bytes. The packed offset is cluster plus cluster/2.
 ; An even cluster owns the low 12 bits. An odd cluster owns the high 12 bits.
@@ -654,7 +644,7 @@ fat12_load:
     push    bc
     push    de
     ld      hl,de
-    call    fat12_shr1                      ; clst / 2
+    sra     hl                              ; clst / 2. The value is below $8000.
     add     hl,de                           ; packed offset is cluster plus cluster/2
     ld      a,h
     or      a
@@ -682,7 +672,7 @@ fat12_load:
     push    bc
     push    de
     ld      hl,de
-    call    fat12_shr1
+    sra     hl                              ; clst / 2. The value is below $8000.
     add     hl,de                           ; packed offset is cluster plus cluster/2
     ld      a,h
     and     1
@@ -872,7 +862,7 @@ fat12_st_wr:
     pop     de                              ; cluster low
     push    hl                              ; new raw: L first, H second
     ld      hl,de
-    call    fat12_shr1
+    sra     hl                              ; clst / 2. The value is below $8000.
     add     hl,de                           ; packed offset is cluster plus cluster/2
     ld      a,l
     cp      255

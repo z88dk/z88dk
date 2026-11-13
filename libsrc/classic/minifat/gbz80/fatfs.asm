@@ -256,9 +256,11 @@ clst2sect:
     sbc     a,0
     ld      b,a
     jr      C,clst2sect_ov                  ; cluster is below 2
+    ld      a,(_cpm_fat_vol+1)              ; csize is 2^n
+    cp      1
+    jr      Z,clst2sect_add                 ; one sector. The product is clst-2.
     ld      hl,de                           ; DEHL = clst-2
     ld      de,bc
-    ld      a,(_cpm_fat_vol+1)              ; csize is 2^n
     ld      b,a                             ; csize stays in B
 clst2sect_mul:
     ld      a,b
@@ -275,6 +277,7 @@ clst2sect_mul:
 clst2sect_base:
     ld      bc,de
     ld      de,hl                           ; BCDE = (clst-2)*csize
+clst2sect_add:
     ld      hl,_cpm_fat_vol+16              ; database
     ld      a,(hl+)
     add     a,e                             ; database plus the scaled cluster
@@ -636,21 +639,11 @@ fat12_range_lo:
     or      a
     ret
 
-fat12_shr1:
-    or      a
-    ld      a,h
-    rra
-    ld      h,a
-    ld      a,l
-    rra
-    ld      l,a
-    ret
-
 fat12_load:
     push    bc
     push    de
     ld      hl,de
-    call    fat12_shr1                      ; clst / 2
+    sra     hl                              ; clst / 2. Bit 15 of a FAT12 cluster is clear.
     add     hl,de                           ; byte offset = clst + clst/2
     ld      a,h
     or      a
@@ -678,7 +671,7 @@ fat12_load:
     push    bc
     push    de
     ld      hl,de
-    call    fat12_shr1
+    sra     hl                              ; clst / 2. Bit 15 of a FAT12 cluster is clear.
     add     hl,de                           ; byte offset again
     ld      a,h
     and     1
@@ -878,7 +871,7 @@ fat12_st_wr:
     pop     de                              ; cluster low
     push    hl                              ; new raw: L first, H second
     ld      hl,de
-    call    fat12_shr1
+    sra     hl                              ; clst / 2. Bit 15 of a FAT12 cluster is clear.
     add     hl,de                           ; byte offset. FAT12 cluster fits in DE
     ld      a,l
     cp      255

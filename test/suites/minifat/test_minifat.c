@@ -202,11 +202,46 @@ static void api_reset(void)
     memset(&api_fs, 0, sizeof api_fs);
 }
 
+/* MBR with one partition at LBA 40. The boot sector is not a volume. */
+static void put_dead_mbr(void)
+{
+    uint8_t s[512];
+
+    memset(s, 0, 512);
+    s[510] = 0x55;
+    s[511] = 0xAA;
+    put_le32(s + 454, 40);
+    disk_put_sector(0, s);
+}
+
 static void test_api(void)
 {
     FRESULT fr;
     UINT n;
     int i;
+
+    api_reset();
+    ram_nsect = 0;
+    fr = f_mount(&api_fs, "0:", 1);
+    expect("api_not_ready", fr == FR_NOT_READY);
+    ram_nsect = 48;
+    fr = f_mount(&api_fs, "0:", 0);
+    expect("api_lazy_reg", fr == FR_OK);
+    ram_nsect = 0;
+    fr = f_open(&api_fil, "HELLO.TXT", FA_READ);
+    expect("api_lazy_nr", fr == FR_NOT_READY);
+    ram_nsect = 48;
+
+    api_reset();
+    put_dead_mbr();
+    ram_nsect = 10;
+    fr = f_mount(&api_fs, "0:", 0);
+    expect("api_lazy_disk_reg", fr == FR_OK);
+    fr = f_open(&api_fil, "HELLO.TXT", FA_READ);
+    expect("api_lazy_disk", fr == FR_DISK_ERR);
+    fr = f_mount(&api_fs, "0:", 1);
+    expect("api_dead_media", fr == FR_DISK_ERR);
+    ram_nsect = 48;
 
     api_reset();
     fr = f_mount(&api_fs, "0:", 1);
@@ -915,6 +950,47 @@ int main(void)
         rc = fat_dir_read(ent);
         expect("fullroot_end", bad == 0 && rc != 0);
     }
+
+    /* Sector 2 holds 16 names. Sector 3 is past ram_nsect. The next read is a disk error. */
+    rt_invalidate();
+    disk_zero();
+    memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
+    cpm_fat_vol.fs_type = 2;
+    cpm_fat_vol.csize = 1;
+    cpm_fat_vol.n_rootent = 32;
+    cpm_fat_vol.n_fatent = 16;
+    cpm_fat_vol.fatbase = 1;
+    cpm_fat_vol.dirbase = 2;
+    cpm_fat_vol.database = 4;
+    cpm_fat_vol.fatsz = 1;
+    cpm_fat_vol.n_fats = 1;
+    ram_nsect = 3;
+    {
+        uint8_t ent[32];
+        uint8_t i, bad;
+
+        for (i = 0; i < 16; ++i) {
+            uint8_t e[32];
+
+            memset(e, 0, 32);
+            memset(e, ' ', 11);
+            e[0] = (uint8_t)('A' + i);
+            e[11] = 0x20;
+            disk_write(1024 + (unsigned)i * 32, e, 32);
+        }
+        parent = 0;
+        rc = fat_dir_open(&parent);
+        expect("dir_io_open", rc == 0);
+        bad = 0;
+        for (i = 0; i < 15; ++i) {
+            rc = fat_dir_read(ent);
+            if (rc || ent[0] != (uint8_t)('A' + i))
+                bad = 1;
+        }
+        rc = fat_dir_read(ent);
+        expect("dir_io_err", bad == 0 && rc != 0 && ent[0] == (uint8_t)('A' + 15));
+    }
+    ram_nsect = 48;
 
     /* Disk $05 is the character $E5. A search for $05 itself misses. */
     rt_invalidate();

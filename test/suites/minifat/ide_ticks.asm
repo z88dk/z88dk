@@ -22,10 +22,17 @@ ticks_ide:
 
 asm_disk_initialize:
 ide_init:
+    ld      a,(_ram_nsect)
+    or      a
+    jr      Z,ide_absent        ;no sectors. The drive is not ready.
     ld      a,40                ;CMD_IDE_SELECT, unit in L
     ld      l,0
     call    ticks_ide
     ld      hl,0                ;ld hl,nn does not touch flags
+    ret
+ide_absent:
+    ld      hl,0
+    or      a                   ;carry clear
     ret
 
 ; Library entry. Flush the C sector cache, then transfer.
