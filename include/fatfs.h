@@ -41,16 +41,20 @@
  * fs_type is 1 for FAT12, 2 for FAT16, 3 for FAT32, and 0 until
  * mount succeeds.
  *
- * The sector calls below take a pointer in HL (__z88dk_fastcall).
- * DWORD cluster and LBA values are little-endian at that pointer.
+ * A dword call takes a pointer in HL (__z88dk_fastcall).
+ * Cluster and LBA values are little-endian at that pointer.
  * fat_getfree writes the free-cluster count through that pointer.
- * Success is 0 in L. 80cc and sccz80 return that byte in L, and
- * sccz80 widens it to an int, so H is 0.
+ * fat_clusters writes the cluster count and returns no status.
+ * fat_mount, dir_zap, fat_sync, and fat_dirty take no arguments.
+ * They are __smallc. fat_dirty returns no status.
+ * Success is 0 in L. sccz80 widens that byte to an int, so H is 0.
+ * 80cc and zsdcc return the byte in L.
  *
  * f_mount and the other f_* calls are a separate contract. Each one
  * is CPU-specific assembly, one function per file. The prototypes are
  * __smallc, so the caller removes the arguments. A pointer is not
  * fastcall. FRESULT is the low byte of HL, 0 on success.
+ * zsdcc builds these calls for Z80 only.
  */
 
 typedef struct {

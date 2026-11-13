@@ -26,7 +26,9 @@ The objects are not in a classic library until a target lists them. The list nam
 
 The program also links the three disk routines, or it uses a target that already defines them. `+cpm` uses the BIOS glue in `libsrc/target/cpm/disk/`. `+rc2014` uses the CompactFlash driver. On `+yaz180` the two sector calls are the YABIOS ROM entries `$FE0F` and `$FE3F`.
 
-sccz80 and 80cc both accept the calls. sdcc does not: the argument order is the sccz80 order. The compiler passes the arguments. For an `f_*` call the caller removes them. A low-level pointer arrives in HL. There is one volume. The core brings up drive 0 only.
+sccz80 and 80cc accept the calls on each CPU. zsdcc accepts them on Z80. The `f_*` prototypes are `__smallc`, so the caller removes the arguments.
+
+`fat_mount`, `dir_zap`, `fat_sync`, and `fat_dirty` take no arguments and are `__smallc`. A dword call takes a pointer in HL. `fat_dirty` and `fat_clusters` return no status. There is one volume. The core brings up drive 0 only.
 
 ## What is in scope
 
@@ -36,7 +38,7 @@ The partition type byte is not read. The sector window is `fatwin`, 512 bytes. E
 
 A cluster number and an LBA are a 32-bit value in BCDE, with E as the low byte. From C, the dword functions take a pointer in HL (`__z88dk_fastcall`) and load that little-endian dword themselves.
 
-Success is `L = 0` and carry set. Failure is `L = 1` and carry clear. A 64 KiB cluster is the exception: `L = 19` (`FR_INVALID_PARAMETER`) and carry clear. `fat_mount` reports a bad volume as `L = 13` (`FR_NO_FILESYSTEM`), a sector read that failed as `L = 1`, and a drive that did not come ready as `L = 3`. `f_mount` returns that same code. A later `f_*` call that has to mount the volume returns that same code. sccz80 treats a `char` return as an `int`, so the exits also clear H. 80cc returns the byte in L. Test L, or test carry, and you will agree.
+Success is `L = 0` and carry set. Failure is `L = 1` and carry clear. A 64 KiB cluster is the exception: `L = 19` (`FR_INVALID_PARAMETER`) and carry clear. `fat_mount` reports a bad volume as `L = 13` (`FR_NO_FILESYSTEM`), a sector read that failed as `L = 1`, and a drive that did not come ready as `L = 3`. `f_mount` returns that same code. A later `f_*` call that has to mount the volume returns that same code. sccz80 widens that byte to an int, so H is 0. 80cc and zsdcc return the byte in L. Test L, or test carry.
 
 ## File calls
 
@@ -108,7 +110,7 @@ void read_note(void)
 }
 ```
 
-The low-level calls take a pointer in HL. The 11-byte name is eight characters, then the extension, with spaces and no dot. `fat_clst2sect` replaces the cluster with the first LBA. `fat_next` replaces it with the next cluster, or `$0FFFFFFF` at the end of the chain.
+`fat_mount` takes no argument. `dir_find`, `fat_dir_open`, `fat_clst2sect`, and `fat_next` take a pointer in HL. The 11-byte name is eight characters, then the extension, with spaces and no dot. `fat_clst2sect` replaces the cluster with the first LBA. `fat_next` replaces it with the next cluster, or `$0FFFFFFF` at the end of the chain.
 
 Copy the cluster before either call if you still need it. `ide_read_sector` then reads that LBA. It has no C prototype.
 
