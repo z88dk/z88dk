@@ -8454,6 +8454,11 @@ TokFile {
                 ws_before: "	"
                 location: test_t_input_04_t.bas:289
             }
+            Token {
+                type: RemComment
+                text: ""
+                location: test_t_input_04_t.bas:289
+            }
         ]
     }
     TokLine {
@@ -8472,51 +8477,8 @@ TokFile {
                 location: test_t_input_04_t.bas:290
             }
             Token {
-                type: Identifier
-                text: "COMMENT"
-                ws_before: " "
-                location: test_t_input_04_t.bas:290
-            }
-            Token {
-                type: Identifier
-                text: "TEXT"
-                ws_before: " "
-                location: test_t_input_04_t.bas:290
-            }
-            Token {
-                type: :
-                text: ":"
-                ws_before: " "
-                location: test_t_input_04_t.bas:290
-            }
-            Token {
-                type: Identifier
-                text: "COLONS"
-                ws_before: " "
-                location: test_t_input_04_t.bas:290
-            }
-            Token {
-                type: Identifier
-                text: "ARE"
-                ws_before: " "
-                location: test_t_input_04_t.bas:290
-            }
-            Token {
-                type: Identifier
-                text: "PART"
-                ws_before: " "
-                location: test_t_input_04_t.bas:290
-            }
-            Token {
-                type: Identifier
-                text: "OF"
-                ws_before: " "
-                location: test_t_input_04_t.bas:290
-            }
-            Token {
-                type: Identifier
-                text: "COMMENT"
-                ws_before: " "
+                type: RemComment
+                text: "COMMENT TEXT : COLONS ARE PART OF COMMENT"
                 location: test_t_input_04_t.bas:290
             }
         ]

@@ -256,6 +256,21 @@ collect_token:
             token.type = TokenType::Identifier;
             token.text = str_toupper(std::string(start, p));    // BASIC is case insensitive
             token.keyword = lookup_keyword(token.text);
+
+            // need to collect the rest of the line untokenized if it is a REM statement
+            if (source_type == SourceType::BASIC && token.keyword == Keyword::REM) {
+                tokens.push_back(token);        // push the REM token
+
+                // create a new token for the rest of the line
+                if (isspace(*p)) {
+                    ++p; // skip one only space after REM if present
+                }
+
+                token.type = TokenType::RemComment;
+                token.keyword = Keyword::None;
+                token.text = std::string(p, limit); p = limit;
+                token.ws_before.clear(); // no whitespace before the comment
+            }
             goto push_token;
         }
 

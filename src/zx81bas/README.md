@@ -149,7 +149,9 @@ The sequences recognized by t2p.exe (documentation in docs) are accepted:
 
 - Double double quote: "\"\""
 
-- Hexadecimal code: "\hh"
+- Hexadecimal code: "\hh" inside strings and in REM statements; hexadecimal 
+  codes elsewhere are not supported as the backslash has been repurposed as 
+  the integer division operator
 
 - "%X" : encodes character X in inverted mode (i.e. +0x80).
 
