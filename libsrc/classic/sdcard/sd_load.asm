@@ -21,17 +21,17 @@
     EXTERN  sd_get_cid_csd
     EXTERN  card_select
     EXTERN  sd_card_info
+    EXTERN  sd_c_ret
+    EXTERN  sd_c_return_hl
 
     INCLUDE "sdcard.def"
 
 sd_load:
 _sd_load:
-    pop     bc
+    pop     hl
+    ld      (sd_c_ret), hl
     pop     hl                          ; ptr to SD_INFO struct
     pop     de                          ; slot number
-    push    de
-    push    hl
-    push    bc
 
     ld      a, e
 
@@ -43,7 +43,11 @@ _sd_load:
     ld      h, 0
     call    sd_initialize
     pop     hl
-    ret     nz
+    jr      z, sd_load_ok
+    ld      hl, -1
+    jp      sd_c_return_hl
+
+sd_load_ok:
 
 ; retrieve other values which might be set by the initialization routines
 ; and load them in the SD_INFO structure
@@ -55,9 +59,9 @@ _sd_load:
     ld      (hl+), a
 
     call    sd_check
-    ld      h, 0
     ld      l, a
-    ret
+    ld      h, 0
+    jp      sd_c_return_hl
 
 ;-------------------------------------------------------------------------------------------
 ; Load CID and CSD into sd structure

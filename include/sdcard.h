@@ -151,7 +151,7 @@ int				csdfoo;		// Terminate with two extra bytes, to avoid overflows.
 extern int __LIB__ sd_initialize(int slot) __smallc __z88dk_fastcall;
 
 // Initialize the SD card (0 = OK)
-extern int __LIB__ sd_load(unsigned char slot, struct SD_INFO *descriptor) __smallc;
+extern int __LIB__ sd_load(unsigned char slot, struct SD_INFO *descriptor) __smallc __z88dk_callee;
 
 // Compute the SD/MMC card size (in bytes).
 //  Valid only for SD and MMC and only if size is <= 2GB, otherwise 0.
