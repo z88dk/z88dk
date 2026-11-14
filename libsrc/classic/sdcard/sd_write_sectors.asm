@@ -10,8 +10,10 @@
     PUBLIC  sd_write_sectors
     PUBLIC  _sd_write_sectors
 
-    EXTERN  sd_write_sectors_callee
+    EXTERN  sd_write_sectors_body
 
 sd_write_sectors:
 _sd_write_sectors:
-    jp      sd_write_sectors_callee
+    defc    SD_WANT_COUNT = 1
+    INCLUDE "sd_keep_sector.inc"
+    jp      sd_write_sectors_body

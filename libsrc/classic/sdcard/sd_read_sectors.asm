@@ -10,8 +10,10 @@
     PUBLIC  sd_read_sectors
     PUBLIC  _sd_read_sectors
 
-    EXTERN  sd_read_sectors_callee
+    EXTERN  sd_read_sectors_body
 
 sd_read_sectors:
 _sd_read_sectors:
-    jp      sd_read_sectors_callee
+    defc    SD_WANT_COUNT = 1
+    INCLUDE "sd_keep_sector.inc"
+    jp      sd_read_sectors_body

@@ -19,16 +19,30 @@
     EXTERN  sd_hbios_return_hl
 
     defc    HB_DIOREAD = $13
+    defc    SD_WANT_COUNT = 0
 
 sd_read_sector:
 _sd_read_sector:
-    jp      sd_read_sector_callee
+    ld      hl, 1
+    ld      (sd_hbios_count), hl
+    INCLUDE "sd_hbios_keep.inc"
+    push    bc
+    ld      bc, hl
+    pop     hl
+    call    asm_sd_hbios_read
+    jr      z, sd_hb_rd_keep_ok
+    ld      l, a
+    ld      h, 0
+    jp      sd_hbios_return_hl
+
+sd_hb_rd_keep_ok:
+    ld      hl, 0
+    jp      sd_hbios_return_hl
 
 sd_read_sector_callee:
 _sd_read_sector_callee:
     ld      hl, 1
     ld      (sd_hbios_count), hl
-    defc    SD_WANT_COUNT = 0
     INCLUDE "sd_hbios_pop.inc"
     push    bc
     ld      bc, hl

@@ -16,13 +16,26 @@
     EXTERN  asm_sd_hbios_read
     EXTERN  sd_hbios_return_hl
 
+    defc    SD_WANT_COUNT = 1
+
 sd_read_sectors:
 _sd_read_sectors:
-    jp      sd_read_sectors_callee
+    INCLUDE "sd_hbios_keep.inc"
+    push    bc
+    ld      bc, hl
+    pop     hl
+    call    asm_sd_hbios_read
+    jr      z, sd_hb_mrd_keep_ok
+    ld      l, a
+    ld      h, 0
+    jp      sd_hbios_return_hl
+
+sd_hb_mrd_keep_ok:
+    ld      hl, 0
+    jp      sd_hbios_return_hl
 
 sd_read_sectors_callee:
 _sd_read_sectors_callee:
-    defc    SD_WANT_COUNT = 1
     INCLUDE "sd_hbios_pop.inc"
     push    bc
     ld      bc, hl

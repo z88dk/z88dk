@@ -17,8 +17,19 @@
     PUBLIC  sd_write_block_2gb
     PUBLIC  _sd_write_block_2gb
 
-    EXTERN  sd_write_block_2gb_callee
+    EXTERN  asm_sd_write_block_2gb
+    EXTERN  sd_c_return_hl
 
 sd_write_block_2gb:
 _sd_write_block_2gb:
-    jp      sd_write_block_2gb_callee
+    defc    SD_WANT_COUNT = 0
+    INCLUDE "sd_keep_sector.inc"
+    call    asm_sd_write_block_2gb
+    jr      z, sd_wb_caller_ok
+    ld      l, a
+    ld      h, 0
+    jp      sd_c_return_hl
+
+sd_wb_caller_ok:
+    ld      hl, 0
+    jp      sd_c_return_hl

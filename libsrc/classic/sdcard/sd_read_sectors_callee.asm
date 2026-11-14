@@ -9,6 +9,7 @@
 
     PUBLIC  sd_read_sectors_callee
     PUBLIC  _sd_read_sectors_callee
+    PUBLIC  sd_read_sectors_body
 
     EXTERN  sd_set_sector_addr_regs
     EXTERN  sd_send_command_null_args
@@ -26,6 +27,8 @@ sd_read_sectors_callee:
 _sd_read_sectors_callee:
     defc    SD_WANT_COUNT = 1
     INCLUDE "sd_pop_sector.inc"
+
+sd_read_sectors_body:
     push    bc
     scf
     call    sd_set_sector_addr_regs

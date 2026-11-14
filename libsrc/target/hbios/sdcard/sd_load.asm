@@ -4,7 +4,7 @@
 ;	int sd_load(unsigned char slot, struct SD_INFO *descriptor)
 ;	Store the unit, set block addressing, and reset the unit.
 ;	There is no CID on this path.
-;	__smallc __z88dk_callee: this function removes the two words.
+;	The plain name leaves both words for the caller.
 ;
 
     SECTION code_clib
@@ -14,16 +14,16 @@
     PUBLIC  _sd_load
 
     EXTERN  sd_initialize
-    EXTERN  sd_hbios_ret
-    EXTERN  sd_hbios_return_hl
     EXTERN  sd_hbios_unit
 
 sd_load:
 _sd_load:
-    pop     hl
-    ld      (sd_hbios_ret), hl
+    pop     bc
     pop     hl
     pop     de
+    push    de
+    push    hl
+    push    bc
     ld      a, e
     ld      (hl+), a
     push    hl
@@ -33,11 +33,11 @@ _sd_load:
     pop     hl
     jr      z, sd_hb_load_ok
     ld      hl, -1
-    jp      sd_hbios_return_hl
+    ret
 
 sd_hb_load_ok:
     ld      a, (sd_hbios_unit)
     ld      (hl+), a
     ld      (hl), $12
     ld      hl, 0
-    jp      sd_hbios_return_hl
+    ret

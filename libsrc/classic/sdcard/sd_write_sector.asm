@@ -17,8 +17,19 @@
     PUBLIC  sd_write_sector
     PUBLIC  _sd_write_sector
 
-    EXTERN  sd_write_sector_callee
+    EXTERN  asm_sd_write_sector
+    EXTERN  sd_c_return_hl
 
 sd_write_sector:
 _sd_write_sector:
-    jp      sd_write_sector_callee
+    defc    SD_WANT_COUNT = 0
+    INCLUDE "sd_keep_sector.inc"
+    call    asm_sd_write_sector
+    jr      z, sd_wr_caller_ok
+    ld      l, a
+    ld      h, 0
+    jp      sd_c_return_hl
+
+sd_wr_caller_ok:
+    ld      hl, 0
+    jp      sd_c_return_hl
