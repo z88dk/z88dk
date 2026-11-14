@@ -115,15 +115,16 @@ sd_hvl2:
     ret
 
 sd_cid_copy:
-;	8080: (hl+) and (de+), not ldir. The nibble path uses rrca, not srl.
-    ld      a, b
-    or      c
-    ret     z
+;	8080 ldir. A count of 0 runs 65536 times, the same as ldir.
+;	The nibble path uses rrca, not srl.
+    dec     bc
+    inc     b
+    inc     c
 sd_cid_cp:
     ld      a, (hl+)
     ld      (de+), a
-    dec     bc
-    ld      a, b
-    or      c
+    dec     c
+    jr      nz, sd_cid_cp
+    dec     b
     jr      nz, sd_cid_cp
     ret
