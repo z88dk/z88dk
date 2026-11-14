@@ -152,7 +152,7 @@ static void emit_sysvars(Prog& prog,
     emit(asm_source, "DF_SZ:", "DEFB", std::to_string(get_byte(2)));
     emit(asm_source, "S_TOP:", "DEFW", std::to_string(get_word(0)));
     emit(asm_source, "LAST_K:", "DEFW", int16_to_hex(get_word(0xFFFF)));
-    emit(asm_source, "DBOUNCE:", "DEFB", int8_to_hex(get_byte(0)));
+    emit(asm_source, "DB_ST:", "DEFB", int8_to_hex(get_byte(0)));
     emit(asm_source, "MARGIN:", "DEFB", std::to_string(get_byte(55)));
 
     // auto execute line

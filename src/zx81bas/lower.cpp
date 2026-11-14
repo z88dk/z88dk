@@ -36,7 +36,7 @@ void LoweringPass::lower_prog() {
                                    out.back()->loc;
 
     // if last statement is a REM and has assembly lines,
-    // must move it to after the proc defintions
+    // must move it to after the proc definitions
     std::vector<StmtPtr> footer;
     if (!out.empty()) {
         if (auto rem_stmt = dynamic_cast<RemStmt*>(out.back().get())) {
