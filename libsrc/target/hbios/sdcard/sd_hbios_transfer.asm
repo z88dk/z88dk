@@ -1,5 +1,6 @@
 ;
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
+;	Modified November 2026 feilipu.
 ;
 ;	Seek once, then read or write in chunks of at most 127 sectors.
 ;	Entry: A is $13 or $14. BCDE is the LBA. E is the low byte.
@@ -93,18 +94,16 @@ sd_hb_chunk:
     jr      nc, sd_hb_err0
     ld      c, a
     pop     hl
-    add     a, a
+    add     a, a                        ; Z180: count * 512. mlt is 8x8 and is not this shift
     ld      d, a
     ld      e, 0
     add     hl, de
     push    hl
-    ld      hl, sd_hbios_count
-    ld      a, (hl)
-    sub     c
-    ld      (hl+), a
-    ld      a, (hl)
-    sbc     a, 0
-    ld      (hl), a
+    ld      b, 0                        ; Z180: B still holds the bank
+    or      a
+    ld      hl, (sd_hbios_count)
+    sbc     hl, bc
+    ld      (sd_hbios_count), hl
     jp      nc, sd_hb_loop
     pop     hl
     ld      a, sd_error_bad_command_response

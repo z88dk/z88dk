@@ -1,5 +1,6 @@
 ;
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
+;	Modified November 2026 feilipu.
 ;
 ;	Mini-FAT names for one RomWBW disk unit.
 ;	L = 0 selects the unit. Carry is set when the transfer is ready.
@@ -32,20 +33,16 @@ sd_hb_mf_init:
     ret
 
 ide_read_sector:
-    ld      a, 1
-    ld      (sd_hbios_count), a
-    xor     a
-    ld      (sd_hbios_count+1), a
+    ld      hl, 1                       ; Z180: one word store
+    ld      (sd_hbios_count), hl
     call    asm_sd_hbios_read
     ret     nz
     scf
     ret
 
 ide_write_sector:
-    ld      a, 1
-    ld      (sd_hbios_count), a
-    xor     a
-    ld      (sd_hbios_count+1), a
+    ld      hl, 1                       ; Z180: one word store
+    ld      (sd_hbios_count), hl
     call    asm_sd_hbios_write
     ret     nz
     scf

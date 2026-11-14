@@ -1,5 +1,6 @@
 ;
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
+;	Modified November 2026 feilipu.
 ;
 ;	Pop one __smallc sector frame for the HBIOS port.
 ;	The caller defines SD_WANT_COUNT as 1 or 0 before the include.
@@ -36,17 +37,7 @@ ENDIF
     pop     bc
     pop     de
     pop     hl
-    push    hl
-    push    de
-    push    bc
-    ld      hl, sp+6
-    ld      a, (hl+)
-    ld      h, (hl)
-    ld      l, a
+    ex      (sp), hl                    ; Z180: HL is the card, the sector high word stays
     ld      a, (hl)
     ld      (sd_hbios_unit), a
-    pop     bc
-    pop     de
     pop     hl
-    inc     sp
-    inc     sp
