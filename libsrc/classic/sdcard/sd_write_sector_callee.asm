@@ -45,6 +45,10 @@ sd_wr_ok:
     ld      hl, 0
     jp      sd_c_return_hl
 
+; HL = high word, DE = low word, BC = buffer.
+;	8080 entry: no IX and no exx. The C call still returns HL = 0 or the error.
+;	Accepted data token is $05. 8080: and/cp, not srl.
+
 asm_sd_write_sector:
     scf
 

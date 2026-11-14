@@ -29,20 +29,14 @@ sd_get_cid_csd:
     push    hl
     call    sd_send_command_null_args
     pop     hl
-    jr      z, sd_gcc_tok
     ld      a, sd_error_bad_command_response
-    or      a
-    ret
+    ret     nz                          ; ZF set if command response = 00
 
-sd_gcc_tok:
     call    sd_wait_data_token          ; wait for the data token
-    jr      z, sd_gcc_rd
     ld      a, sd_error_data_token_timeout
-    or      a
-    ret
+    ret     nz
 
-sd_gcc_rd:
-    ld      b, 18
+    ld      b, 18                       ; read the card info to sector buffer (16 bytes + 2 CRC)
     call    sd_read_bytes
     xor     a
     ret

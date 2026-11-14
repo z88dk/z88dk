@@ -17,13 +17,13 @@
     EXTERN  sector_buffer_loc
 
 sd_read_bytes_to_sector_buffer:
-    ld      hl, (sector_buffer_loc)
+    ld      hl, (sector_buffer_loc)     ; the word is the buffer address
 
 sd_read_bytes:
     push    hl
 sd_rblp:
     call    sd_get_byte
-    ld      (hl+), a
+    ld      (hl+), a                    ; 8080: (hl+) is the cheap synthetic
     djnz    sd_rblp
     pop     hl
     ret

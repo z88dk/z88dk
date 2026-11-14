@@ -24,7 +24,7 @@ sd_read_sector_main:
     inc     h
     ld      b, 0
     call    sd_read_bytes
-    inc     h
+    inc     h                           ; HL = buffer + 512, as the OSCA ini loop leaves it
     call    sd_get_byte
     call    sd_get_byte
     xor     a

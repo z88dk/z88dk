@@ -45,6 +45,8 @@ sd_rd_ok:
 ; HL = high word, DE = low word, BC = buffer.
 ; Carry is set here so the helper multiplies by 512.
 ; Success: Z, A = 0, HL = buffer + 512.
+;	8080 entry: no IX and no exx. vm1 keeps the return address in sd_c_ret.
+;	The C call still returns HL = 0 or the error.
 
 asm_sd_read_sector:
     scf

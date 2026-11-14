@@ -49,6 +49,7 @@ _sd_size:
     or      l
     jr      nz, sd_sz0
 sd_sz_fit:
+;	8080: add hl,hl and rla. djnz is the cheap synthetic. Above 2GB returns 0.
     ld      b, 9
 sd_sz_sh:
     add     hl, hl

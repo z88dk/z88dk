@@ -71,7 +71,7 @@ sd_mwr_lp:
     call    sd_write_sector_main
     pop     hl
     call    sd_get_byte
-    and     $1f
+    and     $1f                         ; 8080: and/cp, not srl. Accepted token is $05.
     cp      $05
     jr      nz, sd_mwr_rej
     call    sd_wait_not_busy

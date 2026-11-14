@@ -11,7 +11,7 @@
 
 UNSTUFF_BITS:
 _UNSTUFF_BITS:
-    pop     hl
+    pop     hl                          ; vm1: return address, not pop af
     ld      (sd_c_ret), hl
     pop     bc
     pop     de

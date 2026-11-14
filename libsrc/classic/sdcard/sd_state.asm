@@ -5,6 +5,8 @@
 ;	a good place to put them is in the vars declared in the CRT0 stub
 ;
 ;	The return address stays in sd_c_ret.
+;	vm1: a return address is not popped into AF.
+;	8080: ld de,hl and ld hl,bc are the cheap pair copies.
 ;
 
     PUBLIC  sd_c_return_hl

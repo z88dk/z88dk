@@ -41,6 +41,7 @@ _sd_sectors:
     jp      asm_sd_csd_sectors
 
 ; HL points at CSD[0]. Result is a sector count in DEHL. L is the low byte.
+;	8080: byte add and rla, not IX, sla, or srl. C returns this DEHL.
 
 asm_sd_csd_sectors:
     push    hl

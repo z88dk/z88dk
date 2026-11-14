@@ -57,5 +57,7 @@ ENDIF
     pop     hl
 
 ; BC, DE and HL are live. Two inc sp drop the card pointer.
+;	vm1 concession: inc sp, not pop af.
+;	8080: ld hl,sp+6 is the cheap synthetic. It clobbers C, so the three words were pushed back first.
     inc     sp
     inc     sp

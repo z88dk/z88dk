@@ -17,7 +17,7 @@
 sd_write_sector_main:
     ld      b, 0
 sd_wslp:
-    ld      a, (hl+)
+    ld      a, (hl+)                    ; 8080: (hl+) is the cheap synthetic
     call    sd_send_byte
     ld      a, (hl+)
     call    sd_send_byte

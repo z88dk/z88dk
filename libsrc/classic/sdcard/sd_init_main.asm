@@ -34,19 +34,17 @@ sd_init_main:
     ld      (sd_card_info), a
 
     call    sd_power_off
-    ld      b, 4
+    ld      b, 128                      ; wait approx 0.5 seconds
 sd_init_off:
-    push    bc
+    push    bc                          ; pause_4ms can change BC
     call    pause_4ms
     pop     bc
     djnz    sd_init_off
 
     call    sd_power_on
-    ld      b, 10
+    ld      b, 10                       ; send 80 clocks to ensure card has stabilized
 sd_init_clk:
-    push    bc
     call    sd_send_eight_clocks
-    pop     bc
     djnz    sd_init_clk
 
     ld      b, 32
@@ -90,6 +88,7 @@ sd_cmd8:
     ret
 
 sd_v2:
+;	8080: the four R7 bytes sit on the stack. ld hl,sp+n is the cheap synthetic.
     ld      hl, -4
     add     hl, sp
     ld      sp, hl
@@ -132,7 +131,7 @@ sd_v2_lp:
     jr      z, sd_v2_do41
     cp      1
     jr      z, sd_v2_do41
-    and     $04
+    and     $04                         ; 8080: and $04, not bit 2
     jr      nz, sd_v2_fail
     jr      sd_v2_wait
 sd_v2_do41:
@@ -237,6 +236,7 @@ sd_mmc_ready:
     xor     a
     ld      (sd_card_info), a
 
+;	Byte-addressed cards are set to 512-byte blocks. Block cards skip CMD16.
 sd_cmd16_512:
     ld      a, (sd_card_info)
     and     $10

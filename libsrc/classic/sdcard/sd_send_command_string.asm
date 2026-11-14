@@ -49,6 +49,8 @@ sd_send_command_string:
     call    sd_send_eight_clocks
 
     push    bc
+;	8080: add a,a, not sla. The R1 test is and $80, not bit 7.
+;	The first response byte is kept. The poll is 256 bytes, as before.
     ld      c, 0
     ld      b, 5
 sd_sclp:
@@ -83,17 +85,13 @@ sd_isz:
     or      c
     call    sd_send_byte
 
-    ld      b, 8
+    ld      b, 0
 sd_wncrl:
     call    sd_get_byte
     ld      c, a
     and     $80
     jr      z, sd_gcr
     djnz    sd_wncrl
-    ld      a, $ff
-    or      a
-    pop     bc
-    ret
 
 sd_gcr:
     ld      a, c

@@ -15,6 +15,7 @@
     EXTERN  sector_lba0
     EXTERN  sd_set_sector_addr_regs
 
+;	8080: ld de,hl. ld bc,(nn) is not an 8080 load.
 sd_set_sector_addr_lba0:
     ld      hl, (sector_lba0)
     ld      de, hl

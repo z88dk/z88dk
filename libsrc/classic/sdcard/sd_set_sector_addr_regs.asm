@@ -38,11 +38,12 @@ sd_set_sector_addr_regs:
     ld      a, d
     add     hl, hl
     adc     a, a
-    ld      de, hl
+    ld      de, hl                      ; 8080: cheap pair copy, not ex de,hl
     ld      b, a
     ld      c, 0
 
 sd_addr_store:
+;	8080: (hl+) is the cheap synthetic.
     ld      hl, cmd_generic_args
     ld      (hl+), b
     ld      (hl+), d

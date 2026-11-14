@@ -26,7 +26,7 @@ _sd_initialize:
     jr      z, sd_inok
     call    sd_power_off                ; if init failed shut down the SPI port
     ld      hl, -1
-    or      a
+    or      a                           ; flags follow A after power off
     ret
 
 sd_inok:
@@ -40,6 +40,6 @@ sd_inok:
 
 sd_done:
     call    sd_deselect_card            ; Routines always deselect card on return
-    xor     a
+    xor     a                           ; HL = 0. The CID string calls stay commented out.
     ld      hl, 0
     ret

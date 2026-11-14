@@ -43,7 +43,7 @@ sd_read_cid:
     push    hl
     ld      bc, $20
     add     hl, bc
-    ld      de, hl                      ; DE = sector buffer + 20
+    ld      de, hl                      ; 8080: cheap pair copy. DE = sector buffer + 20
     pop     hl
     ld      bc, 3
     add     hl, bc                      ; HL = sector buffer + 3
@@ -115,6 +115,7 @@ sd_hvl2:
     ret
 
 sd_cid_copy:
+;	8080: (hl+) and (de+), not ldir. The nibble path uses rrca, not srl.
     ld      a, b
     or      c
     ret     z

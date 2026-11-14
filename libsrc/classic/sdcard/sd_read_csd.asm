@@ -17,11 +17,16 @@
 
     INCLUDE "sdcard.def"
 
-; Returns DEHL = Total capacity of card (in sectors)
+; Returns BC:DE = Total capacity of card (in sectors)
+;	8080: asm_sd_csd_sectors returns DEHL. ld bc,de and ld de,hl keep this exit.
 
 sd_read_csd:
     ld      hl, (sector_buffer_loc)
     ld      a, CMD9                     ; send "read CSD" command: 49 00 00 00 00 01 to read card info
     call    sd_get_cid_csd
     ret     nz
-    jp      asm_sd_csd_sectors
+    call    asm_sd_csd_sectors
+    ld      bc, de
+    ld      de, hl
+    xor     a
+    ret

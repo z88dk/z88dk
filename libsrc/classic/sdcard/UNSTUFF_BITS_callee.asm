@@ -17,7 +17,7 @@
 
 UNSTUFF_BITS_callee:
 _UNSTUFF_BITS_callee:
-    pop     hl
+    pop     hl                          ; gbz80 has no ex (sp),hl. vm1: not pop af
     ld      (sd_c_ret), hl
     pop     bc
     pop     de
@@ -28,6 +28,7 @@ _UNSTUFF_BITS_callee:
 asm_UNSTUFF_BITS:
     push    hl
     ld      hl, 128                     ; bit count start on the rightmost bit of the 16 bytes block
+;	8080: sub then sbc, not sbc hl. ld de,hl is the cheap pair copy.
     ld      a, l
     sub     e
     ld      l, a

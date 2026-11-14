@@ -21,33 +21,29 @@
     EXTERN  sd_get_cid_csd
     EXTERN  card_select
     EXTERN  sd_card_info
-    EXTERN  sd_c_ret
-    EXTERN  sd_c_return_hl
 
     INCLUDE "sdcard.def"
 
 sd_load:
 _sd_load:
-    pop     hl
-    ld      (sd_c_ret), hl
+    pop     bc
     pop     hl                          ; ptr to SD_INFO struct
     pop     de                          ; slot number
+    push    de
+    push    hl
+    push    bc
 
     ld      a, e
 
 ;slot;		// 0 or 1
-    ld      (hl+), a                    ; Current slot number (human readable)
+    ld      (hl+), a                    ; 8080: (hl+) is the cheap synthetic
 
     push    hl
     ld      l, a
     ld      h, 0
     call    sd_initialize
     pop     hl
-    jr      z, sd_load_ok
-    ld      hl, -1
-    jp      sd_c_return_hl
-
-sd_load_ok:
+    ret     nz
 
 ; retrieve other values which might be set by the initialization routines
 ; and load them in the SD_INFO structure
@@ -59,9 +55,9 @@ sd_load_ok:
     ld      (hl+), a
 
     call    sd_check
-    ld      l, a
     ld      h, 0
-    jp      sd_c_return_hl
+    ld      l, a
+    ret
 
 ;-------------------------------------------------------------------------------------------
 ; Load CID and CSD into sd structure
