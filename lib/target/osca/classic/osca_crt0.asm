@@ -344,27 +344,3 @@ current_asciicode	ds.b 1
 	SECTION  code_crt_init
 	ld	hl,$2000
 	ld	(base_graphics),hl
-
-
-
-; SD CARD interface
-IF DEFINED_NEED_SDCARD
-	SECTION bss_crt
-	PUBLIC card_select
-	PUBLIC sd_card_info
-
-	PUBLIC sector_buffer_loc
-
-; Keep the following 2 bytes in the right order (1-card_select, 2-sd_card_info) !!!
-card_select:		defb    0    ; Currently selected MMC/SD slot
-sd_card_info:		defb    0    ; Card type flags..
-
-sector_buffer_loc:	defw	0
-sector_buffer:		defs	513
-
-	SECTION code_crt_init
-	ld	hl,sector_buffer
-	ld	(sector_buffer_loc),hl
-
-ENDIF
-

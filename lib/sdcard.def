@@ -3,6 +3,7 @@ lstoff
 ; SD Card common definitions
 
 ; $Id: sdcard.def,v 1.3 2012-09-21 14:02:22 stefano Exp $
+;	Modified November 2026 feilipu.
 
 
 	defc	sd_error_spi_mode_failed	= $01
@@ -51,6 +52,9 @@ lstoff
 
 	defc	CMD18                    = $52
 	defc	SD_READ_MULTIPLE_BLOCK   = $52
+
+	defc	CMD23                    = $57
+	defc	SD_SET_BLOCK_COUNT       = $57
 
 	defc	CMD24                    = $58
 	defc	SD_WRITE_SINGLE_BLOCK    = $58

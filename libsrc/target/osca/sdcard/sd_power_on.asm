@@ -3,6 +3,7 @@
 ;	Taken from the OSCA Bootcode by Phil Ruston 2011
 ;
 ;	Ported by Stefano Bodrato, 2012
+;	Modified November 2026 feilipu.
 ;
 ;	Power on the sdcard slot
 ;
@@ -11,6 +12,7 @@
 
 
 	PUBLIC	sd_power_on
+	EXTERN	sd_bytes_per_4ms
     INCLUDE "target/osca/def/osca.def"
 
 
@@ -25,5 +27,9 @@ sd_power_on:
 	ld a,@01000000			; (6) = 1 FPGA Output enabled, (7) = 0: 250Khz SPI clock
 
 	out (sys_sdcard_ctrl1),a
+	push hl
+	ld hl,125			; 250 kHz: 125 bytes in 4 ms
+	ld (sd_bytes_per_4ms),hl
+	pop hl
 	pop af
 	ret

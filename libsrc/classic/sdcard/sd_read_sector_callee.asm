@@ -2,6 +2,7 @@
 ;	Old School Computer Architecture - SD Card driver
 ;	Taken from the OSCA Bootcode by Phil Ruston 2011
 ;	Port by Stefano Bodrato, 2012
+;	Modified November 2026 feilipu.
 ;
 ;	int sd_read_sector(struct SD_INFO descriptor, long sector, unsigned char *address);
 ;
@@ -16,60 +17,58 @@
     PUBLIC  sd_read_sector_callee
     PUBLIC  _sd_read_sector_callee
     PUBLIC  asm_sd_read_sector
-
-    EXTERN  sd_card_info
-    EXTERN  card_select
+    PUBLIC  asm_sd_read_lba
 
     EXTERN  sd_read_sector_main
     EXTERN  sd_set_sector_addr_regs
     EXTERN  sd_send_command_current_args
     EXTERN  sd_wait_data_token
     EXTERN  sd_deselect_card
+    EXTERN  sd_c_return_hl
 
     INCLUDE "sdcard.def"
-    INCLUDE "target/osca/def/osca.def"
 
 sd_read_sector_callee:
 _sd_read_sector_callee:
-    pop     af                          ; ret addr
-    pop     hl                          ; dst addr
-    exx
-    pop     hl                          ; sector pos lsb
-    pop     de                          ; sector pos msb
-    pop     ix                          ; SD_INFO struct
-    push    af
+    defc    SD_WANT_COUNT = 0
+    INCLUDE "sd_pop_sector.inc"
+    call    asm_sd_read_sector
+    jr      z, sd_rd_ok
+    ld      l, a
+    ld      h, 0
+    jp      sd_c_return_hl
+
+sd_rd_ok:
+    ld      hl, 0
+    jp      sd_c_return_hl
+
+; HL = high word, DE = low word, BC = buffer.
+; Carry is set here so the helper multiplies by 512.
+; Success: Z, A = 0, HL = buffer + 512.
 
 asm_sd_read_sector:
-						; ptr to MMC mask to be used to select port
-    ld      a, (ix+1)                   ; or any other hw dependent reference to current slot
-    ld      (card_select), a
-    ld      a, (ix+2)
-    ld      (sd_card_info), a
-
     scf
+
+asm_sd_read_lba:
+    push    bc
     call    sd_set_sector_addr_regs
-
-    ld      a, CMD17                    ; Send CMD17 read sector command
+    ld      a, CMD17
     call    sd_send_command_current_args
-    ld      a, sd_error_bad_command_response
-    jr      nz, read_end                ; if ZF set command response is $00
-
-    call    sd_wait_data_token          ; wait for the data token
-    ld      a, sd_error_data_token_timeout
-    jr      nz, read_end                ; ZF set if data token reeceived
-
-;..............................................................................................
-
-    exx
+    jr      nz, sd_rd_cmd
+    pop     hl
+    call    sd_wait_data_token
+    jr      nz, sd_rd_tok
     call    sd_read_sector_main
+    jp      sd_deselect_card
 
-;..............................................................................................
+sd_rd_cmd:
+    pop     bc
+    ld      a, sd_error_bad_command_response
+    jr      sd_rd_err
 
-read_end:
-    call    sd_deselect_card            ; Routines always deselect card on return
+sd_rd_tok:
+    ld      a, sd_error_data_token_timeout
 
-    ld      h, 0
-    ld      l, a
-    ret
-
-
+sd_rd_err:
+    or      a
+    jp      sd_deselect_card

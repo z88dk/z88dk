@@ -2,6 +2,7 @@
 ;	Old School Computer Architecture - SD Card driver
 ;	Taken from the OSCA Bootcode by Phil Ruston 2011
 ;	Port by Stefano Bodrato, 2012
+;	Modified November 2026 feilipu.
 ;
 ;	set HL to dest address for data
 ;	set B to number of bytes required
@@ -13,21 +14,16 @@
     PUBLIC  sd_read_bytes_to_sector_buffer
 
     EXTERN  sd_get_byte
-
     EXTERN  sector_buffer_loc
 
-
-
 sd_read_bytes_to_sector_buffer:
-    ld      hl, sector_buffer_loc
-
+    ld      hl, (sector_buffer_loc)
 
 sd_read_bytes:
     push    hl
 sd_rblp:
     call    sd_get_byte
-    ld      (hl), a
-    inc     hl
+    ld      (hl+), a
     djnz    sd_rblp
     pop     hl
     ret

@@ -20,3 +20,15 @@ target/hbios/c/sdcc/hbios_e_dehl
 target/hbios/c/sdcc/hbios_e_dehl_callee
 target/hbios/c/sdcc/hbios_e_de_hl
 target/hbios/c/sdcc/hbios_e_de_hl_callee
+
+target/hbios/sdcard/sd_hbios_state
+target/hbios/sdcard/sd_initialize
+target/hbios/sdcard/sd_load
+target/hbios/sdcard/sd_sectors
+target/hbios/sdcard/sd_size
+target/hbios/sdcard/sd_read_sector
+target/hbios/sdcard/sd_write_sector
+target/hbios/sdcard/sd_read_sectors
+target/hbios/sdcard/sd_write_sectors
+target/hbios/sdcard/sd_hbios_transfer
+target/hbios/sdcard/sd_hbios_minifat

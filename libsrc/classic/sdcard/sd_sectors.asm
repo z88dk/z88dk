@@ -2,6 +2,7 @@
 ;
 ;	ZX Spectrum ZXMMC specific routines
 ;	code by Stefano Bodrato,   Mar 2010
+;	Modified November 2026 feilipu.
 ;
 ;	$Id: sd_sectors.asm,v 1.3 2017-01-03 00:27:43 aralbrec Exp $
 ;
@@ -11,7 +12,7 @@
 ; Offset in bytes for the CSD field in the MMC struct.
 ; 1 (slot number) + 1 (slot port) + 1 (flags) + 16 (CID) = 19
 
-    defc    CSD_OFFSET=19
+    defc    CSD_OFFSET = 19
 
 ;
 ;	Original code:
@@ -29,91 +30,157 @@
 ;	return ( (unsigned long)++c_size * (unsigned long)c_size_mult * (unsigned long)block_len );
 ;
 
-
     PUBLIC  sd_sectors
     PUBLIC  _sd_sectors
-    INCLUDE "z80_crt0.hdr"
+    PUBLIC  asm_sd_csd_sectors
 
 sd_sectors:
 _sd_sectors:
-		; __FASTCALL__
-
     ld      de, CSD_OFFSET
     add     hl, de
-    push    hl                          ; MMC struct
-    pop     ix
+    jp      asm_sd_csd_sectors
 
-    bit     6, (ix)
-    jr      z, sd_csd_v1
+; HL points at CSD[0]. Result is a sector count in DEHL. L is the low byte.
 
-sd_csd_v2:
-    ld      l, (ix+9)                   ; for CSD v2.00
-    ld      h, (ix+8)
-    inc     hl
-    ld      a, 10
-    ld      bc, 0
-sd_csd2lp:
+asm_sd_csd_sectors:
+    push    hl
+    ld      a, (hl)
+    and     $40
+    jp      z, sd_csd_v1
+
+    ld      de, 7
+    add     hl, de
+    ld      a, (hl+)
+    and     63
+    ld      b, a
+    ld      a, (hl+)
+    ld      e, a
+    ld      a, (hl)
+    ld      l, a
+    ld      h, e
+    ld      e, b
+    ld      d, 0
+    ld      a, l
+    add     a, 1
+    ld      l, a
+    ld      a, h
+    adc     a, 0
+    ld      h, a
+    ld      a, e
+    adc     a, 0
+    ld      e, a
+    ld      a, d
+    adc     a, 0
+    jp      c, sd_csd_pop0
+    ld      d, a
+    ld      b, 10
+sd_csd2sh:
     add     hl, hl
-    rl      c
-    rl      b
-    dec     a
-    jr      nz, sd_csd2lp
-    ex      de, hl                      ; Return Capacity (number of sectors) in BC:DE
-    xor     a
+    ld      a, e
+    rla
+    ld      e, a
+    ld      a, d
+    rla
+    jp      c, sd_csd_pop0
+    ld      d, a
+    djnz    sd_csd2sh
+    pop     bc
     ret
 
 sd_csd_v1:
-    ld      a, (ix+6)                   ; For CSD v1.00
-    and     @00000011
+    ld      de, 5
+    add     hl, de
+    ld      a, (hl+)
+    and     15
+    ld      b, a
+    ld      a, (hl+)
+    and     3
     ld      d, a
-    ld      e, (ix+7)
-    ld      a, (ix+8)
-    and     @11000000
-    sla     a
-    rl      e
-    rl      d
-    sla     a
-    rl      e
-    rl      d                           ; DE = 12 bit value: "C_SIZE"
-
-    ld      a, (ix+9)
-    and     @00000011
+    ld      e, (hl)
+    inc     hl
+    ld      a, (hl)
+    and     $c0
+    rlca
+    ld      c, a
+    ld      a, e
+    rla
+    ld      e, a
+    ld      a, d
+    rla
+    ld      d, a
+    ld      a, c
+    rlca
+    ld      c, a
+    ld      a, e
+    rla
+    ld      e, a
+    ld      a, d
+    rla
+    ld      d, a
+    ld      a, d
+    cp      $0f
+    jr      nz, sd_csd_v1sz
+    ld      a, e
+    cp      $ff
+    jp      z, sd_csd_pop0
+sd_csd_v1sz:
+    ld      a, e
+    add     a, 1
+    ld      e, a
+    ld      a, d
+    adc     a, 0
+    jp      c, sd_csd_pop0
+    ld      d, a
+    inc     hl
+    ld      a, (hl+)
+    and     3
+    add     a, a
+    ld      c, a
+    ld      a, (hl)
+    rlca
+    ld      a, c
+    adc     a, 0
+    add     a, b
+    sub     7
+    ld      hl, de
+    ld      de, 0
+    jr      c, sd_csd_right
     ld      b, a
-    ld      a, (ix+10)
-    and     @10000000
-    sla     a
-    rl      b                           ; B = 3 bit value: "C_MULT"
+    or      a
+    jr      z, sd_csd_done
+sd_csd_left:
+    add     hl, hl
+    ld      a, e
+    rla
+    ld      e, a
+    ld      a, d
+    rla
+    jp      c, sd_csd_pop0
+    ld      d, a
+    djnz    sd_csd_left
+    jr      sd_csd_done
 
-    inc     b
-    inc     b
+sd_csd_right:
+    ld      b, a
+    ld      a, 0
+    sub     b
+    ld      b, a
+sd_csd_rsh:
+    ld      a, h
+    or      a
+    rra
+    ld      h, a
+    ld      a, l
+    rra
+    ld      l, a
+    djnz    sd_csd_rsh
+
+sd_csd_done:
+    pop     bc
+    ret
+
+sd_csd_pop0:
+    pop     bc
+    ld      de, 0
     ld      hl, 0
-sd_cmsh:
-    sla     e
-    rl      d
-    rl      l
-    rl      h
-    djnz    sd_cmsh                     ; HL:DE = ("C_MULT"+1) * (2 ^ (C_MULT+2))
-
-    ld      a, (ix+5)
-    and     @00001111                   ; A = "READ_BL_LEN"
-    jr      z, sd_nbls
-    ld      b, a
-sd_blsh:
-    sla     e
-    rl      d
-    rl      l
-    rl      h
-    djnz    sd_blsh                     ; Cap (bytes) HL:DE = ("C_MULT"+1) * (2 ^ (C_MULT+2)) * (2^READ_BL_LEN)
-
-    ld      b, 9                        ; convert number of bytes to numer of sectors
-sd_cbsec:
-    srl     h
-    rr      l
-    rr      d
-    rr      e
-    djnz    sd_cbsec
-
-sd_nbls:
-
-	; Return Capacity (number of sectors) in HL:DE
     ret

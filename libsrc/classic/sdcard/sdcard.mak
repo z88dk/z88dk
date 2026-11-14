@@ -11,7 +11,11 @@ SDCARD_OBJS := $(addprefix classic/sdcard/obj/z80/, $(SDCARD_OBJECTS)) \
 	$(addprefix classic/sdcard/obj/z80n/,$(SDCARD_OBJECTS)) \
 	$(addprefix classic/sdcard/obj/z180/,$(SDCARD_OBJECTS)) \
 	$(addprefix classic/sdcard/obj/kc160/,$(SDCARD_OBJECTS)) \
-	$(addprefix classic/sdcard/obj/ez80_z80/,$(SDCARD_OBJECTS))
+	$(addprefix classic/sdcard/obj/ez80_z80/,$(SDCARD_OBJECTS)) \
+	$(addprefix classic/sdcard/obj/8080/,$(SDCARD_OBJECTS)) \
+	$(addprefix classic/sdcard/obj/8085/,$(SDCARD_OBJECTS)) \
+	$(addprefix classic/sdcard/obj/gbz80/,$(SDCARD_OBJECTS)) \
+	$(addprefix classic/sdcard/obj/vm1/,$(SDCARD_OBJECTS))
 
 OBJS += $(SDCARD_OBJS)
 CLEAN += sdcard-clean
@@ -24,6 +28,10 @@ $(eval $(call buildbit,classic/sdcard,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,classic/sdcard,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/sdcard,kc160,test,-clib=kc160,-mkc160))
 $(eval $(call buildbit,classic/sdcard,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,classic/sdcard,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,classic/sdcard,8085,test,-clib=8085,-m8085))
+$(eval $(call buildbit,classic/sdcard,gbz80,test,-clib=gbz80,-mgbz80))
+$(eval $(call buildbit,classic/sdcard,vm1,test,-clib=vm1,-mvm1))
 
 sdcard: $(SDCARD_OBJS)
 

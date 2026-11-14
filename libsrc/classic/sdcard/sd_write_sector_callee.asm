@@ -2,6 +2,7 @@
 ;	Old School Computer Architecture - SD Card driver
 ;	Taken from the OSCA Bootcode by Phil Ruston 2011
 ;	Port by Stefano Bodrato, 2012
+;	Modified November 2026 feilipu.
 ;
 ;	int sd_write_sector(struct SD_INFO descriptor, long sector, unsigned char *address);
 ;
@@ -16,92 +17,69 @@
     PUBLIC  sd_write_sector_callee
     PUBLIC  _sd_write_sector_callee
     PUBLIC  asm_sd_write_sector
-
-    EXTERN  sd_card_info
-    EXTERN  card_select
+    PUBLIC  asm_sd_write_lba
 
     EXTERN  sd_write_sector_main
-    EXTERN  sd_deselect_card
     EXTERN  sd_set_sector_addr_regs
     EXTERN  sd_send_command_current_args
     EXTERN  sd_send_eight_clocks
     EXTERN  sd_send_byte
     EXTERN  sd_get_byte
+    EXTERN  sd_wait_not_busy
+    EXTERN  sd_deselect_card
+    EXTERN  sd_c_return_hl
 
     INCLUDE "sdcard.def"
 
 sd_write_sector_callee:
 _sd_write_sector_callee:
-
-    pop     af                          ; ret addr
-    pop     hl                          ; dst addr
-    exx
-    pop     hl                          ; sector pos lsb
-    pop     de                          ; sector pos msb
-    pop     ix                          ; SD_INFO struct
-    push    af
-
-asm_sd_write_sector:
-						; ptr to MMC mask to be used to select port
-    ld      a, (ix+1)                   ; or any other hw dependent reference to current slot
-    ld      (card_select), a
-    ld      a, (ix+2)
-    ld      (sd_card_info), a
-
-    scf
-    call    sd_set_sector_addr_regs
-
-    ld      a, CMD24                    ; Send CMD24 write sector command
-    call    sd_send_command_current_args
-    ld      a, sd_error_bad_command_response
-    jr      nz, write_end
-
-    call    sd_send_eight_clocks        ; wait 8 clocks before proceding
-
-    ld      a, $fe
-    call    sd_send_byte                ; send $FE = packet header code
-
-;..............................................................................................
-
-    exx
-    call    sd_write_sector_main
-
-;.............................................................................................
-
-    call    sd_get_byte                 ; get packet response
-    and     $1f
-    srl     a
-    cp      $02
+    defc    SD_WANT_COUNT = 0
+    INCLUDE "sd_pop_sector.inc"
+    call    asm_sd_write_sector
     jr      z, sd_wr_ok
-
-sd_write_fail:
-    ld      a, sd_error_write_failed
-    jr      write_end
+    ld      l, a
+    ld      h, 0
+    jp      sd_c_return_hl
 
 sd_wr_ok:
-    ld      bc, 65535                   ; read bytes until $ff is received
-sd_wcbsy:
-    call    sd_get_byte                 ; until that time, card is busy
-    cp      $ff
-    jr      nz, sd_busy
-    xor     a                           ; A = 0, all OK
-    jr      write_end
+    ld      hl, 0
+    jp      sd_c_return_hl
 
-sd_busy:
-    dec     bc
-    ld      a, b
-    or      c
-    jr      nz, sd_wcbsy
+asm_sd_write_sector:
+    scf
 
-sd_card_busy_timeout:
+asm_sd_write_lba:
+    push    bc
+    call    sd_set_sector_addr_regs
+    ld      a, CMD24
+    call    sd_send_command_current_args
+    jr      nz, sd_wr_cmd
+    pop     hl
+    call    sd_send_eight_clocks
+    ld      a, $fe
+    call    sd_send_byte
+    call    sd_write_sector_main
+    call    sd_get_byte
+    and     $1f
+    cp      $05
+    jr      nz, sd_wr_rej
+    call    sd_wait_not_busy
+    jr      nz, sd_wr_busy
+    xor     a
+    jp      sd_deselect_card
+
+sd_wr_cmd:
+    pop     bc
+    ld      a, sd_error_bad_command_response
+    jr      sd_wr_err
+
+sd_wr_rej:
+    ld      a, sd_error_write_failed
+    jr      sd_wr_err
+
+sd_wr_busy:
     ld      a, sd_error_write_timeout
 
-write_end:
-    call    sd_deselect_card            ; Routines always deselect card on return
-
-;	or a				; If A = 0 on SD routine exit, ZF set on return: No error
-    ld      h, 0
-    ld      l, a
-    ret
-
-
+sd_wr_err:
+    or      a
+    jp      sd_deselect_card

@@ -2,6 +2,7 @@
 ;	SD Card driver
 ;	Taken from the OSCA Bootcode by Phil Ruston 2011
 ;	Port by Stefano Bodrato, 2012
+;	Modified November 2026 feilipu.
 ;
 ;	Returns HL = Pointer to device ID string
 ;
@@ -13,7 +14,6 @@
 
     EXTERN  sector_buffer_loc
     EXTERN  sd_card_info
-
     EXTERN  sd_send_command_null_args
     EXTERN  sd_wait_data_token
     EXTERN  sd_read_bytes_to_sector_buffer
@@ -25,7 +25,6 @@ sd_vnchars:
     defb    0, 0
 
 sd_read_cid:
-
     ld      a, CMD10                    ; send "read CID" $4a 00 00 00 00 00 command for more card data
     call    sd_send_command_null_args
 
@@ -44,37 +43,38 @@ sd_read_cid:
     push    hl
     ld      bc, $20
     add     hl, bc
-    ex      de, hl                      ; DE = sector buffer + 20
+    ld      de, hl                      ; DE = sector buffer + 20
     pop     hl
-    ld      c, 3
+    ld      bc, 3
     add     hl, bc                      ; HL = sector buffer + 3
-    ld      c, 5
+    ld      bc, 5
     ld      a, (sd_card_info)
-    and     $f
+    and     $0f
     jr      nz, sd_cn5
     inc     bc
 sd_cn5:
-    ldir
+    call    sd_cid_copy
     push    hl
     push    de
     ld      hl, sd_vnchars
     ld      bc, 20
-    ldir
+    call    sd_cid_copy
     pop     de
     pop     hl
     inc     de
     inc     de
     ld      a, (hl)
-    srl     a
-    srl     a
-    srl     a
-    srl     a
+    rrca
+    rrca
+    rrca
+    rrca
+    and     $0f
     add     a, $30                      ; put in version digit 1
     ld      (de), a
     inc     de
     inc     de
     ld      a, (hl)
-    and     $f
+    and     $0f
     add     a, $30
     ld      (de), a                     ; put in version digit 2
     inc     de
@@ -86,26 +86,25 @@ sd_cn5:
     ld      b, 4
 sd_snulp:
     ld      a, (hl)                     ; put in 32 bit serial number
-    srl     a
-    srl     a
-    srl     a
-    srl     a
+    rrca
+    rrca
+    rrca
+    rrca
+    and     $0f
     add     a, $30
     cp      $3a
     jr      c, sd_hvl1
     add     a, $7
 sd_hvl1:
-    ld      (de), a
-    inc     de
+    ld      (de+), a
     ld      a, (hl)
-    and     $f
+    and     $0f
     add     a, $30
     cp      $3a
     jr      c, sd_hvl2
     add     a, $7
 sd_hvl2:
-    ld      (de), a
-    inc     de
+    ld      (de+), a
     inc     hl
     djnz    sd_snulp
 
@@ -113,4 +112,17 @@ sd_hvl2:
     ld      de, $20
     add     hl, de
     xor     a
+    ret
+
+sd_cid_copy:
+    ld      a, b
+    or      c
+    ret     z
+sd_cid_cp:
+    ld      a, (hl+)
+    ld      (de+), a
+    dec     bc
+    ld      a, b
+    or      c
+    jr      nz, sd_cid_cp
     ret

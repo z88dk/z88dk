@@ -8,5 +8,8 @@ font/fzx/obj/${TYPE}/**/*.o
 @classic/games/games.lst
 sound/ay/obj/${TYPE}/**/*.o
 
+@classic/sdcard/sdcard.lst
+@classic/sdcard/sdcard_minifat.lst
+
 
 

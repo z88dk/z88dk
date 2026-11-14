@@ -1,0 +1,41 @@
+;
+;	Old School Computer Architecture - SD Card driver
+;	Taken from the OSCA Bootcode by Phil Ruston 2011
+;	Port by Stefano Bodrato, 2012
+;	Modified November 2026 feilipu.
+;
+;	Write count sectors through RomWBW.
+;	A count of 0 returns 0 and does not call HBIOS.
+;
+
+    SECTION code_clib
+    SECTION code_arch
+
+    PUBLIC  sd_write_sectors
+    PUBLIC  _sd_write_sectors
+    PUBLIC  sd_write_sectors_callee
+    PUBLIC  _sd_write_sectors_callee
+
+    EXTERN  asm_sd_hbios_write
+    EXTERN  sd_hbios_return_hl
+
+sd_write_sectors:
+_sd_write_sectors:
+    jp      sd_write_sectors_callee
+
+sd_write_sectors_callee:
+_sd_write_sectors_callee:
+    defc    SD_WANT_COUNT = 1
+    INCLUDE "sd_hbios_pop.inc"
+    push    bc
+    ld      bc, hl
+    pop     hl
+    call    asm_sd_hbios_write
+    jr      z, sd_hb_mwr_ok
+    ld      l, a
+    ld      h, 0
+    jp      sd_hbios_return_hl
+
+sd_hb_mwr_ok:
+    ld      hl, 0
+    jp      sd_hbios_return_hl
