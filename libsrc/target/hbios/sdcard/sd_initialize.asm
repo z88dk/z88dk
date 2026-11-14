@@ -1,8 +1,5 @@
 ;
-;	Old School Computer Architecture - SD Card driver
-;	Taken from the OSCA Bootcode by Phil Ruston 2011
-;	Port by Stefano Bodrato, 2012
-;	Modified November 2026 feilipu.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 ;
 ;	Reset one RomWBW disk unit.
 ;	HL is the unit on entry. HL is 0 on success and -1 on error.

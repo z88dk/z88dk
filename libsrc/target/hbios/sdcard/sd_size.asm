@@ -1,8 +1,5 @@
 ;
-;	Old School Computer Architecture - SD Card driver
-;	Taken from the OSCA Bootcode by Phil Ruston 2011
-;	Port by Stefano Bodrato, 2012
-;	Modified November 2026 feilipu.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 ;
 ;	unsigned long sd_size(struct SD_INFO *descriptor)
 ;	Return the byte count for a card of at most 2 GB.

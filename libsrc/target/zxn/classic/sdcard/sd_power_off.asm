@@ -1,8 +1,5 @@
 ;
-;	Old School Computer Architecture - SD Card driver
-;	Taken from the OSCA Bootcode by Phil Ruston 2011
-;	Port by Stefano Bodrato, 2012
-;	Modified November 2026 feilipu.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 ;
 ;	Deselect the bus. The Next core supplies card power.
 ;	AF stays as it was, including the flags.

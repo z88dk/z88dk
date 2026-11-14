@@ -1,8 +1,5 @@
 ;
-;	Old School Computer Architecture - SD Card driver
-;	Taken from the OSCA Bootcode by Phil Ruston 2011
-;	Port by Stefano Bodrato, 2012
-;	Modified November 2026 feilipu.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 ;
 ;	Wait until the card releases the data line.
 ;	A free line reads as $FF. Z is set when that byte arrives.

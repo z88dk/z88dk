@@ -1,8 +1,5 @@
 ;
-;	Old School Computer Architecture - SD Card driver
-;	Taken from the OSCA Bootcode by Phil Ruston 2011
-;	Port by Stefano Bodrato, 2012
-;	Modified November 2026 feilipu.
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 ;
 ;	unsigned long sd_sectors(struct SD_INFO *descriptor)
 ;	Ask RomWBW for the block count. L is the low byte.
