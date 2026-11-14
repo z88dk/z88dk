@@ -126,7 +126,7 @@
 struct SD_INFO {
 unsigned char	slot;		// 0, 1, etc..
 unsigned char	port;		// SD_0 or SD_1 (as above, but specifies HW address)
-unsigned char	flags;		// (sd_card_info) bit4: Block mode access, bit 0:3 card type (0:MMC,1:SD,2:SDHC)
+unsigned char	flags;		// bit 4: block address. bits 0-3: 0 MMC, 1 SDv1, 2 SDv2
 
 // CID - Card Identification section (overall 16 bytes)
 unsigned char	CID[1];		// First byte in CID is the Manufacturer ID (MID)
@@ -147,34 +147,42 @@ int				csdfoo;		// Terminate with two extra bytes, to avoid overflows.
 #define SD_TYPE_SDHC   2
 
 
-// Initialize the SD card (Returns -1 on error, or ptr to card ID string)
-extern char __LIB__  *sd_initialize(int slot);
+// Initialize the SD card. HL is 0 on success and -1 on error.
+extern int __LIB__ sd_initialize(int slot) __smallc __z88dk_fastcall;
 
 // Initialize the SD card (0 = OK)
-extern int __LIB__ sd_load(unsigned char slot, struct SD_INFO descriptor) __smallc;
+extern int __LIB__ sd_load(unsigned char slot, struct SD_INFO *descriptor) __smallc;
 
 // Compute the SD/MMC card size (in bytes).
 //  Valid only for SD and MMC and only if size is <= 2GB, otherwise 0.
-extern unsigned long __LIB__  sd_size(struct SD_INFO descriptor);
+extern unsigned long __LIB__ sd_size(struct SD_INFO *descriptor) __smallc __z88dk_fastcall;
 
 // Compute the SD/MMC card size (in sectors).
-extern unsigned long __LIB__  sd_sectors(struct SD_INFO descriptor);
+extern unsigned long __LIB__ sd_sectors(struct SD_INFO *descriptor) __smallc __z88dk_fastcall;
 
 // Given a linear address, read 512 bytes from the SD or MMC card (only for cards < 2GB)
-extern int __LIB__            sd_read_block_2gb(struct SD_INFO descriptor, long sector, unsigned char *address) __smallc;
-extern int __LIB__  sd_read_block_2gb_callee(struct SD_INFO descriptor, long sector, unsigned char *address) __smallc __z88dk_callee;
+extern int __LIB__ sd_read_block_2gb(struct SD_INFO *descriptor, long sector, unsigned char *address) __smallc;
+extern int __LIB__ sd_read_block_2gb_callee(struct SD_INFO *descriptor, long sector, unsigned char *address) __smallc __z88dk_callee;
 
 // Given a linear address, write 512 bytes to the SD or MMC  card (only for cards < 2GB)
-extern int __LIB__            sd_write_block_2gb(struct SD_INFO descriptor, long sector, unsigned char *address) __smallc;
-extern int __LIB__  sd_write_block_2gb_callee(struct SD_INFO descriptor, long sector, unsigned char *address) __smallc __z88dk_callee;
+extern int __LIB__ sd_write_block_2gb(struct SD_INFO *descriptor, long sector, unsigned char *address) __smallc;
+extern int __LIB__ sd_write_block_2gb_callee(struct SD_INFO *descriptor, long sector, unsigned char *address) __smallc __z88dk_callee;
 
 // Read a given sector from the SD card
-extern int __LIB__            sd_read_sector(struct SD_INFO descriptor, long sector, unsigned char *address) __smallc;
-extern int __LIB__  sd_read_sector_callee(struct SD_INFO descriptor, long sector, unsigned char *address) __smallc __z88dk_callee;
+extern int __LIB__ sd_read_sector(struct SD_INFO *descriptor, long sector, unsigned char *address) __smallc;
+extern int __LIB__ sd_read_sector_callee(struct SD_INFO *descriptor, long sector, unsigned char *address) __smallc __z88dk_callee;
 
 // Write a given sector to the SD card
-extern int __LIB__            sd_write_sector(struct SD_INFO descriptor, long sector, unsigned char *address) __smallc;
-extern int __LIB__  sd_write_sector_callee(struct SD_INFO descriptor, long sector, unsigned char *address) __smallc __z88dk_callee;
+extern int __LIB__ sd_write_sector(struct SD_INFO *descriptor, long sector, unsigned char *address) __smallc;
+extern int __LIB__ sd_write_sector_callee(struct SD_INFO *descriptor, long sector, unsigned char *address) __smallc __z88dk_callee;
+
+// Read count sectors. count 0 returns 0 and does not select the card.
+extern int __LIB__ sd_read_sectors(struct SD_INFO *descriptor, long sector, unsigned char *address, unsigned int count) __smallc;
+extern int __LIB__ sd_read_sectors_callee(struct SD_INFO *descriptor, long sector, unsigned char *address, unsigned int count) __smallc __z88dk_callee;
+
+// Write count sectors. The multi-block token is $FC. count 0 returns 0.
+extern int __LIB__ sd_write_sectors(struct SD_INFO *descriptor, long sector, unsigned char *address, unsigned int count) __smallc;
+extern int __LIB__ sd_write_sectors_callee(struct SD_INFO *descriptor, long sector, unsigned char *address, unsigned int count) __smallc __z88dk_callee;
 
 // Unpack bits to read CID or CSD or other, bit count begins on the less signigicant position
 // of a 16 byte (128 bit) long block, thus on the rightmost bit
@@ -185,6 +193,8 @@ extern unsigned long __LIB__   UNSTUFF_BITS_callee(unsigned char *data, unsigned
 #define sd_write_block_2gb(a,b,c)  sd_write_block_2gb_callee(a,b,c)
 #define sd_read_sector(a,b,c)  sd_read_sector_callee(a,b,c)
 #define sd_write_sector(a,b,c)  sd_write_sector_callee(a,b,c)
+#define sd_read_sectors(a,b,c,d)  sd_read_sectors_callee(a,b,c,d)
+#define sd_write_sectors(a,b,c,d)  sd_write_sectors_callee(a,b,c,d)
 #define UNSTUFF_BITS(a,b,c)    UNSTUFF_BITS_callee(a,b,c)
 
 

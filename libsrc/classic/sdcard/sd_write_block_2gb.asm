@@ -2,6 +2,7 @@
 ;	Old School Computer Architecture - SD Card driver
 ;	Taken from the OSCA Bootcode by Phil Ruston 2011
 ;	Port by Stefano Bodrato, 2012
+;	Modified November 2026 feilipu.
 ;
 ;	int sd_write_sector(struct SD_INFO descriptor, long sector, unsigned char *address);
 ;
@@ -17,17 +18,18 @@
     PUBLIC  _sd_write_block_2gb
 
     EXTERN  asm_sd_write_block_2gb
+    EXTERN  sd_c_return_hl
 
 sd_write_block_2gb:
 _sd_write_block_2gb:
-    pop     af                          ; ret addr
-    pop     hl                          ; dst addr
-    exx
-    pop     hl                          ; sector pos lsb
-    pop     de                          ; sector pos msb
-    pop     ix                          ; SD_INFO struct
+    defc    SD_WANT_COUNT = 0
+    INCLUDE "sd_keep_sector.inc"
+    call    asm_sd_write_block_2gb
+    jr      z, sd_wb_caller_ok
+    ld      l, a
+    ld      h, 0
+    jp      sd_c_return_hl
 
-    push    af
-
-    jp      asm_sd_write_block_2gb
-
+sd_wb_caller_ok:
+    ld      hl, 0
+    jp      sd_c_return_hl

@@ -2,6 +2,7 @@
 ;	Old School Computer Architecture - SD Card driver
 ;	Taken from the OSCA Bootcode by Phil Ruston 2011
 ;	Port by Stefano Bodrato, 2012
+;	Modified November 2026 feilipu.
 ;
 ;	Init SD card communications
 ;	Input: HL = card slot number
@@ -15,10 +16,7 @@
     EXTERN  sd_init_main
     EXTERN  sd_power_off
     EXTERN  sd_spi_port_fast
-    EXTERN  sd_read_cid
-    EXTERN  sd_read_csd
     EXTERN  sd_deselect_card
-
 
 sd_initialize:
 _sd_initialize:
@@ -28,6 +26,7 @@ _sd_initialize:
     jr      z, sd_inok
     call    sd_power_off                ; if init failed shut down the SPI port
     ld      hl, -1
+    or      a                           ; flags follow A after power off
     ret
 
 sd_inok:
@@ -41,8 +40,6 @@ sd_inok:
 
 sd_done:
     call    sd_deselect_card            ; Routines always deselect card on return
-    or      a                           ; If A = 0 on SD routine exit, ZF set on return: No error
-    ret     z
-    ld      hl, -1
-    ret                                 ; if A <> set carry flag
-
+    xor     a                           ; HL = 0. The CID string calls stay commented out.
+    ld      hl, 0
+    ret

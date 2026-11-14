@@ -262,23 +262,19 @@ The same RC2014 source has a 16-bit path. The build uses it when `__IO_CF_8_BIT`
 
 ### SD card
 
-`libsrc/classic/sdcard/` is a different contract. `sd_initialize`, `sd_read_sector`, and `sd_write_sector` are C calls. A is 0 when the card accepts the command. Mini-FAT does not call those names.
+The SPI driver is `libsrc/classic/sdcard/`. The C calls take a pointer to `SD_INFO`. `__smallc` pushes a long high word first on sccz80 and on zsdcc. That order is not the cause of a reversed sector address. `sd_set_sector_addr_regs` wants the high word in HL and the low word in DE.
 
-Publish the three assembly names in the driver. Call the sdcard routines from that driver when you want their SPI code.
+`sd_minifat.asm` publishes `asm_disk_initialize`, `ide_read_sector`, and `ide_write_sector`. `sdcard.lst` does not list that file. `+rc2014` and `+yaz180` keep their own disk routines. `+zxn -clib=classic` lists `sdcard_minifat.lst`. The HBIOS port uses RomWBW disk calls. It does not use the SPI glue.
 
-1. When L is 0, initialise the SPI slot.
-2. Read the status from `sd_initialize` in A and HL. That call does not use carry.
-3. Set carry only when the status says the card is ready.
-4. Send CMD17 (`$51`) to read one block.
-5. Send CMD24 (`$58`) to write one block.
-6. On an SDHC card, pass the LBA as the argument.
-7. On a card of 2 GB or less, pass the LBA shifted left by 9.
-8. `sd_set_sector_addr_regs` does that shift when carry is set and the card is not SDHC.
-9. On a read, wait for the data token and store 512 bytes.
-10. Then read the two CRC bytes.
-11. On a write, send token `$FE`, then the 512 bytes, then the CRC.
-12. Set carry only when the card accepts the transfer.
-13. Add 512 to HL on that path.
+OSCA keeps the port files in `libsrc/target/osca/sdcard/`. The fast read stays `sd_read_sector_main` in that directory.
+
+1. When L is not 0, return with carry clear.
+2. Call `sd_initialize` with H = 0.
+3. Set carry only when that call returns with the zero flag set.
+4. Pass the sector in BCDE. E is the low byte.
+5. The glue calls `asm_sd_read_sector` or `asm_sd_write_sector`.
+6. On success the buffer in HL is already 512 bytes higher.
+7. Set carry and return. Do not add 512 again.
 
 ## Size
 

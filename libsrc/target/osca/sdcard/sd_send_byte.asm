@@ -3,10 +3,11 @@
 ;	Taken from the OSCA Bootcode by Phil Ruston 2011
 ;
 ;	Ported by Stefano Bodrato, 2012
+;	Modified November 2026 feilipu.
 ;
 ;	Put byte to send to card in A
 ;	C holds the checksum, do not alter it in a command sequence
-;   Corrupts H and B
+;	Changes A and the flags
 ;
 ;	$Id: sd_send_byte.asm,v 1.5 2015-01-19 01:33:07 pauloscustodio Exp $
 ;

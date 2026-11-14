@@ -14,6 +14,13 @@ classic/sdcard/obj/${TYPE}/sd_read_sector_callee
 classic/sdcard/obj/${TYPE}/sd_write_sector
 classic/sdcard/obj/${TYPE}/sd_write_sector_callee
 classic/sdcard/obj/${TYPE}/sd_write_sector_main
+classic/sdcard/obj/${TYPE}/sd_read_sector_main
+classic/sdcard/obj/${TYPE}/sd_read_sectors
+classic/sdcard/obj/${TYPE}/sd_read_sectors_callee
+classic/sdcard/obj/${TYPE}/sd_write_sectors
+classic/sdcard/obj/${TYPE}/sd_write_sectors_callee
+classic/sdcard/obj/${TYPE}/sd_state
+classic/sdcard/obj/${TYPE}/sd_wait_not_busy
 classic/sdcard/obj/${TYPE}/sd_send_command_string
 classic/sdcard/obj/${TYPE}/sd_send_eight_clocks
 classic/sdcard/obj/${TYPE}/sd_set_sector_addr_regs

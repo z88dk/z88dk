@@ -2,6 +2,7 @@
 ;	SD Card driver
 ;	by Stefano Bodrato, 2012
 ;	portions of the code are by Alessandro Poppi and Phil Ruston
+;	Modified November 2026 feilipu.
 ;
 ;	int sd_load(slot, struct SD_INFO sd_descriptor)
 ;		result: 0-OK,
@@ -15,18 +16,18 @@
 
     PUBLIC  sd_load
     PUBLIC  _sd_load
+
     EXTERN  sd_initialize
     EXTERN  sd_get_cid_csd
-
     EXTERN  card_select
     EXTERN  sd_card_info
 
     INCLUDE "sdcard.def"
 
+;	The plain name leaves both words for the caller.
 
 sd_load:
 _sd_load:
-
     pop     bc
     pop     hl                          ; ptr to SD_INFO struct
     pop     de                          ; slot number
@@ -37,42 +38,38 @@ _sd_load:
     ld      a, e
 
 ;slot;		// 0 or 1
-    ld      (hl), a                     ; Current slot number (human readable)
-    inc     hl
+    ld      (hl+), a                    ; 8080: (hl+) is the cheap synthetic
 
     push    hl
     ld      l, a
+    ld      h, 0
     call    sd_initialize
     pop     hl
-    ret     nz
+    jr      z, sd_load_ok
+    ld      hl, -1
+    ret
+
+sd_load_ok:
 
 ; retrieve other values which might be set by the initialization routines
 ; and load them in the SD_INFO structure
 ; card hw port for current slot (or similar hw specific)
     ld      a, (card_select)
-    ld      (hl), a
-    inc     hl
+    ld      (hl+), a
 
     ld      a, (sd_card_info)
-    ld      (hl), a
-    inc     hl
+    ld      (hl+), a
 
     call    sd_check
-
-    ld      h, 0
     ld      l, a
-
+    ld      h, 0
     ret
-
-
-
 
 ;-------------------------------------------------------------------------------------------
 ; Load CID and CSD into sd structure
 ;
 ; Returns A = 0 if OK
 ;-------------------------------------------------------------------------------------------
-;
 
 sd_check:
     push    hl
@@ -85,4 +82,3 @@ sd_check:
     add     hl, de
     ld      a, CMD9                     ;	SD_READ_CSD
     jp      sd_get_cid_csd              ; load also CSD info and return
-
