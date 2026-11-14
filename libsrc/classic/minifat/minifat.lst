@@ -1,0 +1,43 @@
+; Mini-FAT for a Z80-class target (TYPE=z80). fat_sync stays in fatfs.
+; The other C calls, and each f_* object, are linked only when called.
+; 8085 lists the same calls in minifat_8085.lst.
+; 8080 lists the same calls in minifat_8080.lst.
+; gbz80 lists the same calls in minifat_gbz80.lst.
+; vm1 lists the same calls in minifat_vm1.lst.
+classic/minifat/z80/obj/z80/fatfs
+classic/minifat/z80/obj/z80/fat_dirty
+classic/minifat/z80/obj/z80/fat_mount
+classic/minifat/z80/obj/z80/dir_find
+classic/minifat/z80/obj/z80/dir_create
+classic/minifat/z80/obj/z80/dir_zap
+classic/minifat/z80/obj/z80/fat_dir_open
+classic/minifat/z80/obj/z80/fat_dir_read
+classic/minifat/z80/obj/z80/fat_next
+classic/minifat/z80/obj/z80/fat_alloc
+classic/minifat/z80/obj/z80/fat_free
+classic/minifat/z80/obj/z80/fat_clst2sect
+classic/minifat/z80/obj/z80/fat_getfree
+classic/minifat/z80/obj/z80/fat_clusters
+classic/minifat/z80/obj/z80/minifat_file
+classic/minifat/z80/obj/z80/f_chdir
+classic/minifat/z80/obj/z80/f_chdrive
+classic/minifat/z80/obj/z80/f_chmod
+classic/minifat/z80/obj/z80/f_close
+classic/minifat/z80/obj/z80/f_closedir
+classic/minifat/z80/obj/z80/f_expand
+classic/minifat/z80/obj/z80/f_getcwd
+classic/minifat/z80/obj/z80/f_getfree
+classic/minifat/z80/obj/z80/f_lseek
+classic/minifat/z80/obj/z80/f_mkdir
+classic/minifat/z80/obj/z80/f_mount
+classic/minifat/z80/obj/z80/f_open
+classic/minifat/z80/obj/z80/f_opendir
+classic/minifat/z80/obj/z80/f_read
+classic/minifat/z80/obj/z80/f_readdir
+classic/minifat/z80/obj/z80/f_rename
+classic/minifat/z80/obj/z80/f_stat
+classic/minifat/z80/obj/z80/f_sync
+classic/minifat/z80/obj/z80/f_unlink
+classic/minifat/z80/obj/z80/f_utime
+classic/minifat/z80/obj/z80/f_write
+classic/minifat/obj/z80/fat_bss

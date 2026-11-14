@@ -14,6 +14,12 @@
 #include        <unistd.h>
 #endif
 
+/* MinGW open() is text mode unless this bit is set. A line feed in a
+   sector is then expanded and the next LBA is misaligned. */
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 #define CHECK_FD() do {                 \
         if ( slots[b] == -1 ) { \
             SET_ERROR(Z88DK_EBADF);   \
@@ -25,7 +31,18 @@
 static int slots[NUM_SLOTS];
 
 static int selected_unit = 0;
-static int devices[2];
+static int devices[2] = { -1, -1 };
+
+static int ide_fd(void)
+{
+    int fd = devices[selected_unit & 1];
+
+    if ( fd < 0 ) {
+        SET_ERROR(Z88DK_EBADF);
+        return -1;
+    }
+    return fd;
+}
 
 
 static int normalise_errno()
@@ -247,7 +264,23 @@ static void cmd_seek(void)
 
 static void cmd_ide_identify(void)
 {
+    int fd = ide_fd();
+    off_t sz;
+    unsigned long blocks;
 
+    if ( fd < 0 )
+        return;
+    sz = lseek(fd, 0, SEEK_END);
+    if ( sz < 0 ) {
+        SET_ERROR(normalise_errno());
+        return;
+    }
+    blocks = (unsigned long)(sz / 512);
+    l = (int)(blocks & 255);
+    h = (int)((blocks >> 8) & 255);
+    e = (int)((blocks >> 16) & 255);
+    d = (int)((blocks >> 24) & 255);
+    SET_ERROR(Z88DK_ENONE);
 }
 
 static void cmd_ide_select(void)
@@ -259,16 +292,21 @@ static void cmd_ide_select(void)
 
 static void cmd_ide_read(void)
 {
-    off_t  dest = (( ( c | b << 8) << 16 ) | (l | h << 8)) * 512;
+    int fd = ide_fd();
+    off_t dest;
 
-    if ( lseek(devices[selected_unit], dest, SEEK_SET) != dest ) {
+    if ( fd < 0 )
+        return;
+    dest = (( ( c | b << 8) << 16 ) | (l | h << 8)) * 512;
+
+    if ( lseek(fd, dest, SEEK_SET) != dest ) {
         SET_ERROR(normalise_errno());
         return;
     }
     {
         uint8_t buffer[512];
         int i;
-        if ( read(devices[selected_unit], buffer, sizeof(buffer)) != sizeof(buffer) ) {
+        if ( read(fd, buffer, sizeof(buffer)) != sizeof(buffer) ) {
             SET_ERROR(normalise_errno());
             return;
         }
@@ -279,9 +317,14 @@ static void cmd_ide_read(void)
 
 static void cmd_ide_write(void)
 {
-    off_t  dest = (( ( c | b << 8) << 16 ) | (l | h << 8)) * 512;
+    int fd = ide_fd();
+    off_t dest;
 
-    if ( lseek(devices[selected_unit], dest, SEEK_SET) != dest ) {
+    if ( fd < 0 )
+        return;
+    dest = (( ( c | b << 8) << 16 ) | (l | h << 8)) * 512;
+
+    if ( lseek(fd, dest, SEEK_SET) != dest ) {
         SET_ERROR(normalise_errno());
         return;
     }
@@ -289,7 +332,7 @@ static void cmd_ide_write(void)
         uint8_t buffer[512];
         int i;
         for ( i = 0; i < sizeof(buffer); i++ ) buffer[i] = get_memory_inst((uint16_t)((e | d << 8) + i));
-        if ( write(devices[selected_unit], buffer, sizeof(buffer)) != sizeof(buffer) ) {
+        if ( write(fd, buffer, sizeof(buffer)) != sizeof(buffer) ) {
             SET_ERROR(normalise_errno());
             return;
         }
@@ -299,7 +342,7 @@ static void cmd_ide_write(void)
 
 void hook_io_set_ide_device(int unit, const char *file)
 {
-    devices[unit] = open(file, O_RDWR);
+    devices[unit] = open(file, O_RDWR | O_BINARY);
     if ( devices[unit] == -1 ) {
         printf("Cannot open <%s>",file);
         exit(1);

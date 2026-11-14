@@ -8,6 +8,11 @@ target/cpm/obj/${TYPE}/stdio/stdpun_dev.o
 target/cpm/obj/${TYPE}/stdio/stdrdr_dev.o
 target/cpm/obj/${TYPE}/stdio/stdlst_dev.o
 target/cpm/obj/${TYPE}/x/target/cpm/cpm/__bdos.o
+target/cpm/obj/${TYPE}/x/target/cpm/disk/cpm_bios.o
+target/cpm/obj/${TYPE}/x/target/cpm/disk/asm_disk_initialize.o
+target/cpm/obj/${TYPE}/x/target/cpm/disk/cpm_bios_xfer.o
+target/cpm/obj/${TYPE}/x/target/cpm/disk/ide_read_sector.o
+target/cpm/obj/${TYPE}/x/target/cpm/disk/ide_write_sector.o
 @classic/stdio/stdio_binary.lst
 
 target/cpm/obj/${TYPE}/x/target/cpm/time/clock.o
