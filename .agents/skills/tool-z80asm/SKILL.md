@@ -73,6 +73,43 @@ Prefer these over hand two-byte moves and over swap dances when parking one pair
 (and related) in normal mode — coding rules still differ per **cpu-*** skill.
 
 Other examples: `ld a,(hl+)` (load + inc). Listings (`-l`) show the expansion.
+
+### Cheap set on a shared 8080 or Z80 source
+
+Write the synthetic. Do not hand-expand it, and do not drop it to satisfy `-no-synth`. On 8080 the expansion is the hand sequence. On Z80, gbz80, 8085, or Rabbit the same source becomes the native or shorter form when that CPU has it. Coding limits are in `cpu-8080`. The set is:
+
+- `ld` among `bc` / `de` / `hl`, any to any. Not `af`, not `sp`.
+- `ld r,(hl+)` / `ld (hl+),r` and `(hl-)` for A, B, C, D, E. Not an immediate store. Not into H or L: `ld l,(hl+)` is `6E 23`, and `inc hl` then uses the new L. Park the byte in A.
+- `ld a,(de+)` / `ld a,(de-)` / `ld (de+),a` / `ld (de-),a`. A only.
+- ALU `(hl+)` (`cp (hl+)`, `add a,(hl+)`, and the same pattern).
+- `djnz` when B is the counter and the decrement and the test are adjacent.
+- `jr` / `jr cc` when the distance below fits on every CPU that builds the file.
+- `ld hl,sp+n` when carry and Z are dead. It clobbers carry. gbz80 native `F8 n` also clobbers Z.
+
+### Relative branch distance
+
+`jr`, `jr cc`, and `djnz` encode a signed 8-bit displacement where the branch is relative. Measure from the byte **after** the 2-byte instruction:
+
+```text
+disp = target - (addr(branch) + 2)     ; must be -128 .. +127
+```
+
+Same file and same `SECTION` only. `INCLUDE` text is that assembly unit. A label in another file, section, or assembly block is `jp`, because the linker may place those blocks in any order.
+
+8080 and 8085 assemble `jr` as `jp` and do not range-check it. gbz80 `djnz` is `dec b` / `jr nz`, so the `jr` half has this limit. Check every `-m` in the makefile for which the branch is relative. A Z80 listing does not prove Rabbit.
+
+**`7F` page, Rabbit 4000 and later** (`-mr4k`, `-mr5k`, `-mr6k`). Rabbit 2000 and 3000 are unchanged. These forms are one byte longer than Z80, so a span counted on Z80 can miss:
+
+| Source | Z80 | r4k / r5k / r6k |
+|--------|-----|-----------------|
+| `ld r,r` among A–L | 1 byte | `7F` + that byte |
+| `add`/`adc`/`sbc a,r` and `(hl)` | 1 | `7F` + that byte |
+| `sub`/`and`/`xor`/`or`/`cp` of `r` or `(hl)` | 1 | `7F` + that byte |
+| `cp (hl+)` | `BE 23` | `7F BE 23` |
+| `ld a,(hl)`, `ld (hl),r` | 1 | 1 |
+| `ld hl,de` | `62 6B` | `A1` |
+
+`sd_sectors.asm`: the CSD version-2 `jr c,sd_csd_pop0` was displacement `$7F` on Z80 (the last legal forward byte) and `$A8` / `$99` on r4k. The assembler error is `integer range: $a8`. Those two branches are `jp`. Later `jr` in the file still fit. Prove a shared file with `z88dk-z80asm -mr4k -l` and delete the `.lis` if it lands beside the source.
 ## CPU capability fixtures (how to read them)
 
 **Question these answer:** “If I assemble this **source line** with `z88dk-z80asm -m<cpu>`, does the assembler accept it, and what does it emit?”
