@@ -3,7 +3,10 @@
 
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -1
-    defc    __bdos=5
+    ; __bdos is provided by the library (target/msx/fcntl/msxdos1/__bdos.asm)
+    ; as a wrapper around the call to 0005h that saves/restores ix and iy:
+    ; the MSX-DOS 1.x kernel destroys iy on every bdos call and ix on file
+    ; calls, which breaks SDCC compilations (ix is the frame pointer).
 
     IFNDEF CRT_ORG_CODE
         defc CRT_ORG_CODE = $100   ; MSXDOS
