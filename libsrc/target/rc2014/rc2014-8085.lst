@@ -11,3 +11,4 @@ target/rc2014/stdio/fgetc_cons_uartb
 @target/rc2014/driver/driver_8085_sccz80.lst
 
 @classic/stdio/stdio.lst
+@classic/minifat/minifat_8085.lst

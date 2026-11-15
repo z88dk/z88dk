@@ -4,7 +4,7 @@ Mini-FAT is the FAT12, FAT16, and FAT32 layer in the classic library. The cores 
 
 The on-disk work follows [ChaN FatFs R0.16](http://elm-chan.org/fsw/ff/00index_e.html) for `check_fs`, `find_volume`, `mount_volume`, `move_window`, `sync_window`, `clst2sect`, `get_fat`, `put_fat`, `create_chain`, `remove_chain`, `dir_sdi`, `dir_next`, `dir_find`, and `dir_create`. The core keeps the sector window, the FAT chain, `dir_sdi`, and `dir_next`. Mount, directory search, directory create, and the C dword calls are separate files in that same directory. The `f_*` file calls are CPU-specific assembly, one function per file, in that directory. They are not part of `fatfs.asm`.
 
-`include/fatfs.h` is the public C header. Link one core and link `fat_bss.asm`, or provide the same public names. A target that wants the objects in its library lists `classic/minifat/minifat.lst` for Z80, or `minifat_8085.lst`, `minifat_8080.lst`, `minifat_gbz80.lst`, or `minifat_vm1.lst`.
+`include/fatfs.h` is the public C header. Link one core and link `fat_bss.asm`, or provide the same public names. A target that wants the objects in its library lists `classic/minifat/minifat.lst` for Z80, or `minifat_8085.lst`, `minifat_8080.lst`, `minifat_gbz80.lst`, `minifat_vm1.lst`, or `minifat_ixiy.lst`.
 
 ## Layers
 
@@ -22,7 +22,7 @@ Include `fatfs.h`. Link one core: `libsrc/classic/minifat/z80/fatfs.asm`, or the
 
 An `f_*` call also needs `minifat_file.asm` from that directory. A low-level program does not link that file. Each of those asm files includes `minifat.inc` from its own directory. Pass that directory to z80asm with `-Ca-I`.
 
-The objects are not in a classic library until a target lists them. The list names are above. The linker then pulls a call file only when the program uses that name. A file that you pass on the zcc line is linked.
+The linker pulls a call file only when the program uses that name. A file that you pass on the zcc line is linked. `+cpm`, `+zxn -clib=classic`, `+osca`, `+hbios`, `+rc2014`, and `+yaz180` list a core. The CPU each one uses is under Disk drivers.
 
 The program also links the three disk routines, or it uses a target that already defines them. `+cpm` uses the BIOS glue in `libsrc/target/cpm/disk/`. `+rc2014` uses the CompactFlash driver. On `+yaz180` the two sector calls are the YABIOS ROM entries `$FE0F` and `$FE3F`.
 
@@ -201,7 +201,11 @@ The core calls three assembly names. They have no C prototype. The registers are
 
 Set carry when the transfer worked, and add 512 to HL. Clear carry when it did not. The driver may change AF, BC, DE, and HL. The core saves BC across `asm_disk_initialize`. It also saves the LBA across a sector call.
 
-`+rc2014` and `+yaz180` already publish these names. A second definition makes the link fail. A new board supplies its own three routines.
+`+cpm`, `+rc2014`, `+yaz180`, `+hbios`, `+zxn -clib=classic`, and `+osca` publish these names. A second definition makes the link fail. Do not list `floppy256.lst` on those targets.
+
+The same libraries list a mini-FAT core. The librarian keeps an object only when that CPU can run it, so each library lists one core. `+zxn -clib=classic` and `+osca` list `minifat.lst`. A Z80N link accepts those Z80 objects. `+hbios` lists `minifat.lst`. `+scz180` lists `minifat_8080.lst`, because a Z180 link does not accept Z80 objects. `+cpm` lists `minifat.lst`. `-clib=ixiy` lists `minifat_ixiy.lst`. `-clib=z180` lists `minifat_8080.lst`. `-clib=8080` lists `minifat_8080.lst`. `-clib=8085` lists `minifat_8085.lst`. `+rc2014` lists `minifat.lst`. `+rc2014 -clib=rc2014-8085` lists `minifat_8085.lst`. `+yaz180` lists `minifat_8080.lst`.
+
+A 256-byte floppy target that does not already publish the three names lists `floppy256.lst` and supplies `floppy256_sector`.
 
 ### Floppy
 
@@ -232,7 +236,7 @@ Every 512-byte transfer starts with SELDSK, C = 0 and E = 1, and reads the DPH a
 
 ### 256-byte floppy
 
-`libsrc/classic/floppy/floppy256_xfer.asm` turns one 512-byte LBA into two 256-byte sectors. The source is 8080 with the cheap synthetics. A target lists `floppy256.lst` and supplies `floppy256_sector`. The two entries are `floppy256_read` and `floppy256_write`. They do not publish `ide_read_sector`. The target glue does that.
+`libsrc/classic/floppy/floppy256_xfer.asm` turns one 512-byte LBA into two 256-byte sectors. The source is 8080 with the cheap synthetics. `floppy256_minifat.asm` publishes the three names. `ide_read_sector` is `floppy256_read`. `ide_write_sector` is `floppy256_write`. `asm_disk_initialize` sets carry for unit 0 and does not call the drive. A target lists `floppy256.lst` and supplies `floppy256_sector`.
 
 1. Shift the LBA left by one bit. That value is the first physical sector.
 2. When that shift carries out of B, return with carry clear.
@@ -278,7 +282,7 @@ The same RC2014 source has a 16-bit path. The build uses it when `__IO_CF_8_BIT`
 
 The SPI driver is `libsrc/classic/sdcard/`. The C calls take a pointer to `SD_INFO`. `__smallc` pushes a long high word first on sccz80 and on zsdcc. That order is not the cause of a reversed sector address. `sd_set_sector_addr_regs` wants the high word in HL and the low word in DE.
 
-`sd_minifat.asm` publishes `asm_disk_initialize`, `ide_read_sector`, and `ide_write_sector`. `sdcard.lst` does not list that file. `+rc2014` and `+yaz180` keep their own disk routines. `+zxn -clib=classic` lists `sdcard_minifat.lst`. The HBIOS port uses RomWBW disk calls. It does not use the SPI glue.
+`sd_minifat.asm` publishes `asm_disk_initialize`, `ide_read_sector`, and `ide_write_sector`. `sdcard.lst` does not list that file. `+rc2014` and `+yaz180` keep their own disk routines. `+zxn -clib=classic` and `+osca` list `sdcard_minifat.lst`. The HBIOS port uses RomWBW disk calls. It does not use the SPI glue.
 
 OSCA keeps the port files in `libsrc/target/osca/sdcard/`. The fast read stays `sd_read_sector_main` in that directory.
 

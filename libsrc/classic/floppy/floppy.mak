@@ -1,6 +1,8 @@
-# 256-byte floppy to 512-byte LBA. One 8080 source, built into each
-# classic library. A target supplies floppy256_sector and lists
-# classic/floppy/floppy256.lst when it builds from a list.
+# 256-byte floppy to 512-byte LBA. The 8080 sources are built into each
+# classic library. floppy256.lst publishes asm_disk_initialize,
+# ide_read_sector, and ide_write_sector. A target supplies
+# floppy256_sector and lists classic/floppy/floppy256.lst.
+# Do not list it on a target that already publishes those three names.
 
 FLOPPY_AFILES := $(notdir $(wildcard classic/floppy/*.asm))
 

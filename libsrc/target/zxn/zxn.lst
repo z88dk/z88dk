@@ -10,6 +10,7 @@ sound/ay/obj/${TYPE}/**/*.o
 
 @classic/sdcard/sdcard.lst
 @classic/sdcard/sdcard_minifat.lst
+@classic/minifat/minifat.lst
 
 
 

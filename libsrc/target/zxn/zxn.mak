@@ -45,7 +45,7 @@ TOCREATE += $(call check_target,zxn, zxn_clib.lib)
 $(eval $(call buildtargetasm,target/zxn,z80n,zxn,-mz80n,$(ZXN_GLOBS) $(ZX_MULTICOLOUR_GLOBS),$(ZXN_GLOBS_ex) $(ZX_MULTICOLOUR_GLOBS_ex) $(addprefix target/zxn/obj/zxn/, $(BIFROST2_GEN))))
 $(eval $(call bifrost_zx0,zxn))
 
-zxn_clib.lib: $(TARGET_CLIB_DEPS) $(ZXN_TARGETS) zx_clib.lib
+zxn_clib.lib: $(TARGET_CLIB_DEPS) $(MINIFAT_OBJS) $(ZXN_TARGETS) zx_clib.lib
 	@echo ''
 	@echo '--- Building ZX Spectrum Next Library ---'
 	@echo ''

@@ -104,11 +104,11 @@ gfxgsx.lib: $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-cpm-gsx
 	TARGET=gsx TYPE=z80 $(LIBLINKER) -DFORcpm -DFORgsx -x$(OUTPUT_DIRECTORY)/gfxgsx @$(TARGET_DIRECTORY)/cpm/gfxgsx.lst
 	@touch $@
 
-cpm_clib.lib: $(TARGET_CLIB_DEPS) $(CPM_TARGETS)
+cpm_clib.lib: $(TARGET_CLIB_DEPS) $(MINIFAT_OBJS) $(CPM_TARGETS)
 	@echo ''
 	@echo '--- Building CP/M Library ---'
 	@echo ''
-	TARGET=cpm TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst
+	TARGET=cpm TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst @classic/minifat/minifat.lst
 
 cpmdevice.lib: cpm_clib.lib
 	@echo ''
@@ -144,13 +144,13 @@ cpmixiy_clib.lib: $(TARGET_CLIB_DEPS) cpm_clib.lib
 	@echo ''
 	@echo '--- Building CP/M Library (IXIY)---'
 	@echo ''
-	TARGET=cpm TYPE=ixiy DEVICE=nodevice $(LIBLINKER) -IXIY -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpmixiy_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst
+	TARGET=cpm TYPE=ixiy DEVICE=nodevice $(LIBLINKER) -IXIY -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpmixiy_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst @classic/minifat/minifat_ixiy.lst
 
 cpmz180_clib.lib: $(TARGET_CLIB_DEPS) cpm_clib.lib
 	@echo ''
 	@echo '--- Building CP/M Library (z180)---'
 	@echo ''
-	TARGET=cpm TYPE=z180 DEVICE=nodevice $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpmz180_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst
+	TARGET=cpm TYPE=z180 DEVICE=nodevice $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpmz180_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst @classic/minifat/minifat_8080.lst
 
 cpmdevice_z180.lib: cpmz180_clib.lib
 	@echo ''

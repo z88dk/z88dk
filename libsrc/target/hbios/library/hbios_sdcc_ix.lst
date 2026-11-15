@@ -1,6 +1,7 @@
 @../adt/adt_sdcc_ix.lst
 @../alloc/alloc_sdcc_ix.lst
 @../target/hbios/hbios_sdcc.lst
+@../classic/minifat/minifat.lst
 @../compress/compress_sdcc_ix.lst
 @../ctype/ctype_sdcc_ix.lst
 @../newlib/drivers/drivers.lst

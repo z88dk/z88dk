@@ -16,7 +16,7 @@ flosdos.lib:
 flosxdos.lib:
 	$(MAKE) -C target/osca/fcntl/flosmulti all
 
-osca_clib.lib: $(TARGET_CLIB_DEPS) $(SDCARD_OBJS) $(OSCA_TARGETS)
+osca_clib.lib: $(TARGET_CLIB_DEPS) $(SDCARD_OBJS) $(MINIFAT_OBJS) $(OSCA_TARGETS)
 	@echo ''
 	@echo '--- Building Old School Computer Architecture Library ---'
 	@echo ''

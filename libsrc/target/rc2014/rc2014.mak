@@ -1,6 +1,6 @@
 $(eval $(call gfx_stamp_portable,rc2014,rc2014))
 TOCREATE += $(call check_target,rc2014,rc2014-8085_clib.lib)
-rc2014-8085_clib.lib: $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-rc2014
+rc2014-8085_clib.lib: $(TARGET_CLIB_DEPS) $(MINIFAT_OBJS) classic/gfx/obj/.stamp-rc2014
 	@echo ''
 	@echo '--- Building RC2014-8085 Library ---'
 	@echo ''

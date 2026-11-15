@@ -2,6 +2,7 @@
 @../alloc/alloc_sdcc_ix.lst
 @../target/cpm-libs/cpm_sdcc_ix.lst
 @../target/hbios/hbios_sdcc.lst
+@../classic/minifat/minifat_8080.lst
 @../compress/compress_sdcc_ix.lst
 @../ctype/ctype_sdcc_ix.lst
 @../newlib/drivers/drivers.lst

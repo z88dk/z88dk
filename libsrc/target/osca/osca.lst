@@ -91,4 +91,6 @@ target/osca/obj/${TARGET}/x/target/osca/sdcard/sd_select_card.o
 target/osca/obj/${TARGET}/x/target/osca/sdcard/sd_send_byte.o
 target/osca/obj/${TARGET}/x/target/osca/sdcard/sd_spi_port_fast.o
 @classic/sdcard/sdcard.lst
+@classic/sdcard/sdcard_minifat.lst
+@classic/minifat/minifat.lst
 
