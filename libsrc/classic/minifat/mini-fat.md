@@ -230,6 +230,20 @@ Set carry when the transfer worked, and add 512 to HL. Clear carry when it did n
 
 Every 512-byte transfer starts with SELDSK, C = 0 and E = 1, and reads the DPH again. Step 1 is only the bring-up select.
 
+### 256-byte floppy
+
+`libsrc/classic/floppy/floppy256_xfer.asm` turns one 512-byte LBA into two 256-byte sectors. The source uses 8080 opcodes. A target lists `floppy256.lst` and supplies `floppy256_sector`. The two entries are `floppy256_read` and `floppy256_write`. They do not publish `ide_read_sector`. The target glue does that.
+
+1. Shift the LBA left by one bit. That value is the first physical sector.
+2. When that shift carries out of B, return with carry clear.
+3. Call `floppy256_sector`. A = 0 reads. A = 1 writes. BCDE is the linear sector, E low. HL is a 256-byte buffer.
+4. The target turns that linear sector into its own track, head, and sector. Sector 0 is the first sector on the disk.
+5. When the sector call returns carry clear, or the verify mismatches, call `floppy256_sector` with A = 2, the same linear sector, and the same buffer. The target waits. Then try that half again.
+6. Four tries on each half, then return with carry clear.
+7. After a write, read that half back into `floppy256_verify` and compare all 256 bytes. A mismatch uses the same retry. The window is BSS.
+8. Add 256 to the buffer and one to the physical sector.
+9. When both halves are done, set carry and return with HL 512 bytes higher.
+
 ### CompactFlash
 
 `libsrc/target/rc2014/driver/ide/` is the 8-bit driver. `__IO_CF_8_BIT` selects that path. `+rc2014` already publishes the three names. Each IDE word is two reads of the 8-bit data port. `ide_init` can wait forever when no card is fitted.
