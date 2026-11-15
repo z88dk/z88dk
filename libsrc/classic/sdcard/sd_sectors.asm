@@ -72,7 +72,7 @@ asm_sd_csd_sectors:
     ld      e, a
     ld      a, d
     adc     a, 0
-    jr      c, sd_csd_pop0
+    jp      c, sd_csd_pop0
     ld      d, a
     ld      b, 10
 sd_csd2sh:
@@ -82,7 +82,7 @@ sd_csd2sh:
     ld      e, a
     ld      a, d
     rla
-    jr      c, sd_csd_pop0
+    jp      c, sd_csd_pop0
     ld      d, a
     djnz    sd_csd2sh
     pop     bc
