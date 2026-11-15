@@ -150,7 +150,7 @@ cpmz180_clib.lib: $(TARGET_CLIB_DEPS) cpm_clib.lib
 	@echo ''
 	@echo '--- Building CP/M Library (z180)---'
 	@echo ''
-	TARGET=cpm TYPE=z180 DEVICE=nodevice $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpmz180_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst @classic/minifat/minifat_8080.lst
+	TARGET=cpm TYPE=z180 DEVICE=nodevice $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpmz180_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst @classic/minifat/minifat.lst
 
 cpmdevice_z180.lib: cpmz180_clib.lib
 	@echo ''

@@ -4,7 +4,7 @@ Mini-FAT is the FAT12, FAT16, and FAT32 layer in the classic library. The cores 
 
 The on-disk work follows [ChaN FatFs R0.16](http://elm-chan.org/fsw/ff/00index_e.html) for `check_fs`, `find_volume`, `mount_volume`, `move_window`, `sync_window`, `clst2sect`, `get_fat`, `put_fat`, `create_chain`, `remove_chain`, `dir_sdi`, `dir_next`, `dir_find`, and `dir_create`. The core keeps the sector window, the FAT chain, `dir_sdi`, and `dir_next`. Mount, directory search, directory create, and the C dword calls are separate files in that same directory. The `f_*` file calls are CPU-specific assembly, one function per file, in that directory. They are not part of `fatfs.asm`.
 
-`include/fatfs.h` is the public C header. Link one core and link `fat_bss.asm`, or provide the same public names. A target that wants the objects in its library lists `classic/minifat/minifat.lst` for Z80, or `minifat_8085.lst`, `minifat_8080.lst`, `minifat_gbz80.lst`, `minifat_vm1.lst`, or `minifat_ixiy.lst`.
+`include/fatfs.h` is the public C header. Link one core and link `fat_bss.asm`, or provide the same public names. A target that wants the objects in its library lists `classic/minifat/minifat.lst` for Z80 and for Z180. That list names `obj/${TYPE}`. The Z180 objects are the Z80 sources assembled for the Z180. An 8085 library lists `minifat_8085.lst`. An 8080 library lists `minifat_8080.lst`. A gbz80 library lists `minifat_gbz80.lst`. A vm1 library lists `minifat_vm1.lst`. An IXIY library lists `minifat_ixiy.lst`.
 
 ## Layers
 
@@ -205,7 +205,7 @@ Set carry when the transfer worked, and add 512 to HL. Clear carry when it did n
 
 Bring-up is not the same on every glue. The SPI glue and the HBIOS glue turn the backend zero flag into carry. The CP/M, RC2014, and YAZ180 glues return carry from their own init. The floppy glue sets carry for unit 0 and does not ask the drive. The core calls that bring-up up to eight times. `FR_NOT_READY` means every try returned with carry clear. A later failed read is `FR_DISK_ERR`.
 
-The same libraries list a mini-FAT core. The librarian keeps an object only when that CPU can run it, so each library lists one core. `+zxn -clib=classic` and `+osca` list `minifat.lst`. A Z80N link accepts those Z80 objects. `+hbios` lists `minifat.lst`. `+scz180` lists `minifat_8080.lst`, because a Z180 link does not accept Z80 objects. `+cpm` lists `minifat.lst`. `-clib=ixiy` lists `minifat_ixiy.lst`. `-clib=z180` lists `minifat_8080.lst`. `-clib=8080` lists `minifat_8080.lst`. `-clib=8085` lists `minifat_8085.lst`. `+rc2014` lists `minifat.lst`. `+rc2014 -clib=rc2014-8085` lists `minifat_8085.lst`. `+yaz180` lists `minifat_8080.lst`.
+The same libraries list one mini-FAT core. `+zxn -clib=classic`, `+osca`, `+hbios`, `+cpm`, `+rc2014`, `+scz180`, and `+yaz180` list `minifat.lst`. `+cpm -clib=z180` lists `minifat.lst`. `-clib=ixiy` lists `minifat_ixiy.lst`. `-clib=8080` lists `minifat_8080.lst`. `-clib=8085` lists `minifat_8085.lst`. `+rc2014 -clib=rc2014-8085` lists `minifat_8085.lst`.
 
 A 256-byte floppy target that does not already publish the three names lists `floppy256.lst` and supplies `floppy256_sector`.
 
