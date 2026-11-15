@@ -22,7 +22,7 @@
 
 sd_read_csd:
     ld      hl, (sector_buffer_loc)
-    ld      a, CMD9                     ; send "read CSD" command: 49 00 00 00 00 01 to read card info
+    ld      a, CMD9                     ; SEND_CSD. R1 pending. $00, then TOKEN_DATA.
     call    sd_get_cid_csd
     ret     nz
     call    asm_sd_csd_sectors

@@ -47,7 +47,9 @@ sd_wr_ok:
 
 ; HL = high word, DE = low word, BC = buffer.
 ;	8080 entry: no IX and no exx. The C call still returns HL = 0 or the error.
-;	Accepted data token is $05. 8080: and/cp, not srl.
+;	CMD24 WRITE_BLOCK. R1 must be $00.
+;	TOKEN_DATA follows one $FF. Up to 8 $FF bytes may precede the data response.
+;	Accepted data response is $05 in the low 5 bits. 8080: and/cp, not srl.
 
 asm_sd_write_sector:
     scf
@@ -55,17 +57,24 @@ asm_sd_write_sector:
 asm_sd_write_lba:
     push    bc
     call    sd_set_sector_addr_regs
-    ld      a, CMD24
+    ld      a, CMD24                    ; WRITE_BLOCK. R1 pending.
     call    sd_send_command_current_args
     jr      nz, sd_wr_cmd
     pop     hl
-    call    sd_send_eight_clocks
-    ld      a, $fe
+    call    sd_send_eight_clocks        ; one byte between R1 and the data packet
+    ld      a, TOKEN_DATA
     call    sd_send_byte
     call    sd_write_sector_main
+    ld      b, 8                        ; data response pending. Up to 8 $FF bytes.
+sd_wr_rsp:
     call    sd_get_byte
+    cp      $ff
+    jr      nz, sd_wr_tok
+    djnz    sd_wr_rsp
+    call    sd_get_byte
+sd_wr_tok:
     and     $1f
-    cp      $05
+    cp      TOKEN_ACCEPTED
     jr      nz, sd_wr_rej
     call    sd_wait_not_busy
     jr      nz, sd_wr_busy

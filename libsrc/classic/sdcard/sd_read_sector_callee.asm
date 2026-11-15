@@ -54,7 +54,7 @@ asm_sd_read_sector:
 asm_sd_read_lba:
     push    bc
     call    sd_set_sector_addr_regs
-    ld      a, CMD17
+    ld      a, CMD17                    ; READ_SINGLE_BLOCK. R1 pending. $00, then TOKEN_DATA.
     call    sd_send_command_current_args
     jr      nz, sd_rd_cmd
     pop     hl

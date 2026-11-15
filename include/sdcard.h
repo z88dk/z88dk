@@ -14,6 +14,12 @@
 #include <sys/compiler.h>
 
 
+// SPI command byte = index | 0x40.
+// An ACMD is CMD55 (APP_CMD, 0x77) and then that command.
+// R1 is one status byte. Bit 7 set means the byte is not R1 yet.
+// R1b is R1 plus busy. R3 is R1 plus the OCR (CMD58). R7 is R1 plus 32 bits (CMD8).
+// Assembler names and response notes are in lib/sdcard.def.
+
 // Commands for the SD/MMC card
 #define	SD_GO_IDLE_STATE			0x40
 #define	SD_SEND_OP_COND			0x41

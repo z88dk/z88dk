@@ -14,6 +14,8 @@
 ;	Carry set requests a byte address. That is the sector times 512.
 ;	Carry clear stores the words unchanged.
 ;	Bit 4 of sd_card_info selects block address and skips the shift.
+;	SDHC and SDXC set that bit. The LBA is the 512-byte block number.
+;	SDSC and MMC leave it clear. The shift is the sector times 512.
 ;	The shift keeps 24 bits. The top byte is dropped.
 ;
 

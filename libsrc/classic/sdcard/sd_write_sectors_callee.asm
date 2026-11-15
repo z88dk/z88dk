@@ -6,6 +6,11 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
+;	CMD55 then ACMD23 is a pre-erase hint. A rejected hint still allows CMD25.
+;	CMD25 WRITE_MULTIPLE_BLOCK. Each block is TOKEN_MULTI and a data response.
+;	TOKEN_STOP ends the write. Busy after the stop uses the same 250 ms wait.
+;	Modified November 2026 feilipu.
+;
 
     PUBLIC  sd_write_sectors_callee
     PUBLIC  _sd_write_sectors_callee
@@ -35,7 +40,7 @@ sd_write_sectors_body:
     push    hl
     push    de
     push    bc
-    ld      a, CMD55
+    ld      a, CMD55                    ; APP_CMD. R1 pending. $00 makes the next command ACMD23.
     call    sd_send_command_null_args
     or      a
     jr      nz, sd_mwr_no23
@@ -47,7 +52,7 @@ sd_write_sectors_body:
     ld      (cmd_generic_args+2), a
     ld      a, l
     ld      (cmd_generic_args+3), a
-    ld      a, CMD23
+    ld      a, ACMD23                   ; SET_WR_BLK_ERASE_COUNT. R1 is not required.
     call    sd_send_command_current_args
 sd_mwr_no23:
     pop     bc
@@ -56,7 +61,7 @@ sd_mwr_no23:
     push    bc
     scf
     call    sd_set_sector_addr_regs
-    ld      a, CMD25
+    ld      a, CMD25                    ; WRITE_MULTIPLE_BLOCK. R1 pending.
     call    sd_send_command_current_args
     jr      z, sd_mwr_go
     pop     bc
@@ -68,14 +73,21 @@ sd_mwr_go:
     pop     hl
 sd_mwr_lp:
     call    sd_send_eight_clocks
-    ld      a, $fc
+    ld      a, TOKEN_MULTI
     call    sd_send_byte
     push    hl
     call    sd_write_sector_main
     pop     hl
+    ld      b, 8                        ; data response pending. Up to 8 $FF bytes.
+sd_mwr_rsp:
     call    sd_get_byte
+    cp      $ff
+    jr      nz, sd_mwr_tok
+    djnz    sd_mwr_rsp
+    call    sd_get_byte
+sd_mwr_tok:
     and     $1f                         ; 8080: and/cp, not srl. Accepted token is $05.
-    cp      $05
+    cp      TOKEN_ACCEPTED
     jr      nz, sd_mwr_rej
     call    sd_wait_not_busy
     jr      nz, sd_mwr_busy
@@ -118,6 +130,6 @@ sd_mwr_end:
 
 sd_mwr_stop:
     call    sd_send_eight_clocks
-    ld      a, $fd
+    ld      a, TOKEN_STOP               ; end of CMD25. Busy follows. No R1.
     call    sd_send_byte
     jp      sd_wait_not_busy

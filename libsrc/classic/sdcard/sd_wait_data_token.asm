@@ -4,8 +4,10 @@
 ;	Port by Stefano Bodrato, 2012
 ;	Modified November 2026 feilipu.
 ;
-;	Read SD card until data token ($FE) arrives,
-;	if no answer is given after a timeout period, exit keeping ZF not set
+;	Read until the data token ($FE) arrives.
+;	$FF or $00 is delay and stays inside the timeout. $00 is the line held low.
+;	$01-$0F is a data error token. Any other byte fails at once.
+;	No token after the timeout returns with Z clear.
 ;
 ;	$Id: sd_wait_data_token.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
@@ -15,17 +17,23 @@
     EXTERN  sd_get_byte
     EXTERN  sd_bytes_per_4ms
 
+    INCLUDE "sdcard.def"
+
 sd_wait_data_token:
     push    bc                          ; BC is preserved
-    ld      b, 25                       ; 25 times 4 ms, from sd_bytes_per_4ms
+    ld      b, 25                       ; 100 ms. CMD17 and CMD18 both use this token.
 sd_wdt_out:
     ld      hl, (sd_bytes_per_4ms)
 sd_wdt_in:
     call    sd_get_byte
-    cp      $fe
+    cp      TOKEN_DATA
     jr      z, sd_wdt_ok
-    cp      $ff                         ; any other byte is a bad token
-    jr      nz, sd_wdt_bad
+    cp      $ff
+    jr      z, sd_wdt_next
+    or      a                           ; $00: still busy. Not an error token.
+    jr      z, sd_wdt_next
+    jr      sd_wdt_bad
+sd_wdt_next:
     dec     hl
     ld      a, h
     or      l

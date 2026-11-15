@@ -2,7 +2,10 @@
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 ;
 ;	Wait until the card releases the data line.
+;	Busy is $00. This is the R1b tail and the write program time.
 ;	A free line reads as $FF. Z is set when that byte arrives.
+;	63 passes of 4 ms cover the 250 ms single-block busy limit.
+;	Modified November 2026 feilipu.
 ;
 
     PUBLIC  sd_wait_not_busy

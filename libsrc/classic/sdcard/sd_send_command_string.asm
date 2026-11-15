@@ -4,8 +4,13 @@
 ;	Port by Stefano Bodrato, 2012
 ;	Modified November 2026 feilipu.
 ;
-;	set HL = location of 6 byte command string
-;	returns command response in A (ZF set if $00)
+;	set HL = location of 5 command bytes. CRC7 is added here.
+;	returns R1 in A (Z set if $00)
+;
+;	Bit 6 of the command byte is already set. One $FF is sent after select.
+;	Up to 256 $FF bytes may precede R1. Bit 7 clear marks R1.
+;	CMD12 discards one stuff byte before that search, then R1b busy is left.
+;	R3 and R7 payloads are left for the caller. A non-zero R1 has no payload.
 ;
 ;	$Id: sd_send_command_string.asm,v 1.8 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
@@ -22,6 +27,8 @@
     EXTERN  sd_send_eight_clocks
     EXTERN  sd_send_byte
     EXTERN  sd_get_byte
+
+    INCLUDE "sdcard.def"
 
 sd_send_command_null_args:
     ld      hl, 0
@@ -49,6 +56,8 @@ sd_send_command_string:
     call    sd_send_eight_clocks
 
     push    bc
+    ld      a, (hl)
+    push    af                          ; command byte. CMD12 has a stuff byte.
 ;	8080: add a,a, not sla. The R1 test is and $80, not bit 7.
 ;	The first response byte is kept. The poll is 256 bytes, as before.
     ld      c, 0
@@ -85,7 +94,13 @@ sd_isz:
     or      c
     call    sd_send_byte
 
-    ld      b, 0
+    pop     af
+    cp      CMD12                       ; STOP_TRANSMISSION. Stuff byte, then R1.
+    jr      nz, sd_r1_poll
+    call    sd_get_byte
+
+sd_r1_poll:
+    ld      b, 0                        ; R1 pending. $FF is delay. Bit 7 clear is R1.
 sd_wncrl:
     call    sd_get_byte
     ld      c, a

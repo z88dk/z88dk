@@ -6,6 +6,10 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
+;	CMD18 READ_MULTIPLE_BLOCK. R1 must be $00. Each block is TOKEN_DATA.
+;	CMD12 STOP_TRANSMISSION ends the read. R1b. The sender drops one stuff byte.
+;	Modified November 2026 feilipu.
+;
 
     PUBLIC  sd_read_sectors_callee
     PUBLIC  _sd_read_sectors_callee
@@ -32,7 +36,7 @@ sd_read_sectors_body:
     push    bc
     scf
     call    sd_set_sector_addr_regs
-    ld      a, CMD18
+    ld      a, CMD18                    ; READ_MULTIPLE_BLOCK. R1 pending.
     call    sd_send_command_current_args
     jr      z, sd_mrd_go
     pop     bc
@@ -76,7 +80,7 @@ sd_mrd_end:
     jp      sd_c_return_hl
 
 sd_mrd_stop:
-    ld      a, CMD12
+    ld      a, CMD12                    ; STOP_TRANSMISSION. R1 pending, then R1b busy.
     call    sd_send_command_null_args
     push    af
     call    sd_wait_not_busy

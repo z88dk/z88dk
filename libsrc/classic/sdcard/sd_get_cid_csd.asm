@@ -8,7 +8,8 @@
 ;	$Id: sd_get_cid_csd.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 ;--------------------------------------------------------------------------------------------------------
-; READ MMC CID subroutine. Data is stored at address (HL), command in A (READ_CID or READ_CSD).
+; Read CID or CSD. HL is the buffer. A is CMD10 or CMD9.
+; R1 must be $00. TOKEN_DATA follows. 16 bytes and 2 CRC bytes are stored.
 ;
 ; Returns error code in A (0 = no error).
 ; HL = 0 on success

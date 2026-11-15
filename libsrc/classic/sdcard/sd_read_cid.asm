@@ -25,7 +25,7 @@ sd_vnchars:
     defb    0, 0
 
 sd_read_cid:
-    ld      a, CMD10                    ; send "read CID" $4a 00 00 00 00 00 command for more card data
+    ld      a, CMD10                    ; SEND_CID. R1 pending. $00, then TOKEN_DATA.
     call    sd_send_command_null_args
 
     ld      a, sd_error_bad_command_response
