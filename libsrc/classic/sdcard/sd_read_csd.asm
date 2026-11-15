@@ -9,6 +9,8 @@
 ;	$Id: sd_read_csd.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_read_csd
 
     EXTERN  sector_buffer_loc

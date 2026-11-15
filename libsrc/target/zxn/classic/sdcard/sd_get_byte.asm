@@ -5,6 +5,8 @@
 ;	BC, DE and HL stay as they were.
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_get_byte
 
     EXTERN  sd_send_byte

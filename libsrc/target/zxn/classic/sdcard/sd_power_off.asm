@@ -6,6 +6,8 @@
 ;	AF stays as it was, including the flags.
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_power_off
 
     EXTERN  sd_deselect_card

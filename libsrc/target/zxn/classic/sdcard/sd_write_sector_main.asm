@@ -6,6 +6,8 @@
 ;	HL ends 512 bytes higher. Two $FF CRC clocks follow.
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_write_sector_main
 
     EXTERN  sd_send_eight_clocks

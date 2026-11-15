@@ -10,6 +10,8 @@
 ;	CMD12 STOP_TRANSMISSION ends the read. R1b. The sender drops one stuff byte.
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_read_sectors_callee
     PUBLIC  _sd_read_sectors_callee
     PUBLIC  sd_read_sectors_body

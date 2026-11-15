@@ -30,6 +30,8 @@
 ;	return ( (unsigned long)++c_size * (unsigned long)c_size_mult * (unsigned long)block_len );
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_sectors
     PUBLIC  _sd_sectors
     PUBLIC  asm_sd_csd_sectors
@@ -38,7 +40,6 @@ sd_sectors:
 _sd_sectors:
     ld      de, CSD_OFFSET
     add     hl, de
-    jr      asm_sd_csd_sectors
 
 ; HL points at CSD[0]. Result is a sector count in DEHL. L is the low byte.
 ;	8080: byte add and rla, not IX, sla, or srl. C returns this DEHL.

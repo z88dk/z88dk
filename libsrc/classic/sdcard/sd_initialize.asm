@@ -10,6 +10,8 @@
 ;	$Id: sd_initialize.asm,v 1.8 2017-01-03 00:27:43 aralbrec Exp $
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_initialize
     PUBLIC  _sd_initialize
 

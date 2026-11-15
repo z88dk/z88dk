@@ -9,6 +9,8 @@
 ;	$Id: sd_read_sector_main.asm,v 1.5 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_read_sector_main
 
     EXTERN  sd_read_bytes

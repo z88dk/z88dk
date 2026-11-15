@@ -7,6 +7,8 @@
 ;	AF is restored. BC, DE and HL stay as they were.
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_select_card
 
     EXTERN  card_select

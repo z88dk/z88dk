@@ -82,5 +82,5 @@ Shell may seed **`bios_iobyte`** before handing off to CCP; BIOS copies it to pa
 ## Related
 
 - Newlib world: `library-newlib`
-- Layout: `style-libsrc-layout`
+- Layout and CRT sections: `style-libsrc-layout`
 - Targets: `target-cpm`, `target-rc2014`; host TIMER / suites use `+test`

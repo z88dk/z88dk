@@ -19,6 +19,8 @@
 ;	The shift keeps 24 bits. The top byte is dropped.
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_set_sector_addr_regs
 
     EXTERN  cmd_generic_args

@@ -5,6 +5,8 @@
 ;	BC, DE and HL stay as they were. AF may change.
 ;
 
+    SECTION code_driver
+
     PUBLIC  pause_4ms
 
 pause_4ms:

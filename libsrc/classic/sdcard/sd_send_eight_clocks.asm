@@ -8,6 +8,8 @@
 ;	$Id: sd_send_eight_clocks.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_send_eight_clocks
 
     EXTERN  sd_send_byte

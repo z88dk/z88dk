@@ -15,6 +15,8 @@
 ;	$Id: sd_send_command_string.asm,v 1.8 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_send_command_string
     PUBLIC  sd_send_command_null_args
     PUBLIC  sd_send_command_int_args
@@ -115,7 +117,7 @@ sd_gcr:
     ret
 
 
-    SECTION data_compiler
+    SECTION data_driver
 
 cmd_generic:
     defb    0

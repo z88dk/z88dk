@@ -17,6 +17,8 @@
 ;--------------------------------------------------------------------------------------------------------
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_get_cid_csd
 
     EXTERN  sd_send_command_null_args

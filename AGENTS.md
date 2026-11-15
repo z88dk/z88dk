@@ -38,7 +38,7 @@ Assume a built tree (`bin/` tools present) unless the task is to build the toolc
 
 ## Hard house rules (always)
 
-1. **`libsrc/`**: one major function / logical operation per source file (`style-libsrc-layout`).
+1. **`libsrc/`**: one major function / logical operation per source file, and a CRT section on every code, rodata, data, or bss block. One file may hold several sections when code and data are mixed (`style-libsrc-layout`).
 2. **Hand-written library asm** is assembled as-is — **`z88dk-copt` never runs on it** (`tool-copt`).
 3. **Classic vs newlib**: do not merge stdio/fcntl cores in one link without a designed bridge (`library-classic`, `library-newlib`).
 4. **Mnemonics:** **Zilog everywhere** in the z88dk tree. z80asm may accept **Intel** forms on 8080/8085 for **external-code compatibility only** — do not write Intel mnemonics in z88dk sources (`cpu-8085`, `tool-z80asm`).
@@ -142,7 +142,7 @@ Host TIMER / suites: `+test` + `methodology-measure` / `tool-ticks`.
 
 | Skill | When |
 |-------|------|
-| `style-libsrc-layout` | New or split library files |
+| `style-libsrc-layout` | New or split library files; CRT section on every block |
 | `style-ste-writing` | Human prose only (not code) |
 | `docs-wiki` | z88dk.wiki pages: human prose, classic/newlib page split, change index |
 | `methodology-measure` | A/B, hotspots, z88dk benches, suites, wiki numbers |

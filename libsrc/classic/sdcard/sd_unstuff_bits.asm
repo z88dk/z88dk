@@ -2,6 +2,8 @@
 ; CALLER linkage for function pointers
 ;	Modified November 2026 feilipu.
 
+    SECTION code_driver
+
     PUBLIC  unstuff_bits
     PUBLIC  _unstuff_bits
 

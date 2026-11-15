@@ -22,6 +22,8 @@
 ;	$Id: sd_init_main.asm,v 1.6 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_init_main
 
     EXTERN  pause_4ms
@@ -309,6 +311,8 @@ sd_cmd16_bad:
     ld      a, sd_error_bad_command_response
     or      a
     ret
+
+    SECTION rodata_driver
 
 sd_cmd8_str:
     defb    CMD8, $00, $00, $01, $aa    ; VHS 2.7-3.6 V, check pattern $AA

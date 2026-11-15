@@ -11,6 +11,8 @@
 ;
 
 
+	SECTION code_driver
+
 	PUBLIC	sd_power_on
 	EXTERN	sd_bytes_per_4ms
     INCLUDE "target/osca/def/osca.def"

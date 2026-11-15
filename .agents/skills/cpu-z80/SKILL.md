@@ -194,7 +194,7 @@ A standard Z80 file that the makefile also builds for 8080, gbz80, 8085, or Rabb
 disp = target - (addr(branch) + 2)
 ```
 
-The target is in the same file and the same `SECTION`. `INCLUDE` text is that unit. Another file or section is `jp`.
+The target is in the same file and the same `SECTION`. `INCLUDE` text is that unit. Another file or section is `jp`. Every code, rodata, data, or bss block names a section from the CRT list before its first byte. One file may hold several. The names are in `style-libsrc-layout`.
 
 On Rabbit 4000 and later (`-mr4k`, `-mr5k`, `-mr6k`) each `ld r,r` and each 8-bit ALU op on a register or `(hl)` gains a `7F` prefix. `cp (hl+)` is `7F BE 23`. `ld a,(hl)` stays one byte. `ld hl,de` shrinks to `A1`. Rabbit 2000 and 3000 keep the Z80 sizes. A Z80 displacement of `$7F` can become `$A8` on r4k. The assembler then says `error: integer range: $a8`. That branch is `jp`.
 

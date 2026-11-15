@@ -14,6 +14,8 @@
 ;	$Id: sd_wait_data_token.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_wait_data_token
 
     EXTERN  sd_get_byte

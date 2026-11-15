@@ -14,6 +14,8 @@
 ;	$Id: sd_read_sector.asm,v 1.7 2017-01-03 00:27:43 aralbrec Exp $
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_read_sector
     PUBLIC  _sd_read_sector
 

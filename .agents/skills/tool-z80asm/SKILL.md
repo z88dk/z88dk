@@ -94,7 +94,7 @@ Write the synthetic. Do not hand-expand it, and do not drop it to satisfy `-no-s
 disp = target - (addr(branch) + 2)     ; must be -128 .. +127
 ```
 
-Same file and same `SECTION` only. `INCLUDE` text is that assembly unit. A label in another file, section, or assembly block is `jp`, because the linker may place those blocks in any order.
+Same file and same `SECTION` only. `INCLUDE` text is that assembly unit. A label in another file, section, or assembly block is `jp`, because the linker may place those blocks in any order. Every code, rodata, data, or bss block names a section from the classic or newlib CRT list before its first byte. One file switches section when those blocks are mixed. The names are in `style-libsrc-layout`.
 
 8080 and 8085 assemble `jr` as `jp` and do not range-check it. gbz80 `djnz` is `dec b` / `jr nz`, so the `jr` half has this limit. Check every `-m` in the makefile for which the branch is relative. A Z80 listing does not prove Rabbit.
 

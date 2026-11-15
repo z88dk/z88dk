@@ -7,6 +7,8 @@
 ;	on exit: 0 if all OK or error code
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_write_sectors
     PUBLIC  _sd_write_sectors
 

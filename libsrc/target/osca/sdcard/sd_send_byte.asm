@@ -13,6 +13,8 @@
 ;
 
 
+	SECTION code_driver
+
 	PUBLIC	sd_send_byte
 	PUBLIC	sd_waitserend
 	

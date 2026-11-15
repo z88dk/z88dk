@@ -14,6 +14,8 @@
 ;	$Id: sd_read_block_2gb.asm,v 1.4 2017-01-03 00:27:43 aralbrec Exp $
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_read_block_2gb
     PUBLIC  _sd_read_block_2gb
 

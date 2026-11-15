@@ -437,7 +437,6 @@ sdhl_sp_ok:
     ld      de, 2
     add     hl, de
     ld      de, (sdhl_sp)
-    jp      sdhl_eq
 
 ; HL is the pointer under test. DE is the expected value.
 sdhl_eq:

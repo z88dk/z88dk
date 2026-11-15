@@ -11,6 +11,8 @@
 ;
 
 
+	SECTION code_driver
+
 	PUBLIC	sd_spi_port_fast
 	EXTERN	sd_bytes_per_4ms
     INCLUDE "target/osca/def/osca.def"

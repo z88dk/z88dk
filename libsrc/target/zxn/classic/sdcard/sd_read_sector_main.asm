@@ -7,6 +7,8 @@
 ;	HL ends 512 bytes higher. A is 0 and Z is set.
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_read_sector_main
 
 sd_read_sector_main:

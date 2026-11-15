@@ -30,6 +30,8 @@
 ;	return ( (unsigned long)++c_size * (unsigned long)c_size_mult * (unsigned long)block_len );
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_size
     PUBLIC  _sd_size
 

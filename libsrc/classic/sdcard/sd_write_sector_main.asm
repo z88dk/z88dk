@@ -9,6 +9,8 @@
 ;	$Id: sd_write_sector_main.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_write_sector_main
 
     EXTERN  sd_send_eight_clocks

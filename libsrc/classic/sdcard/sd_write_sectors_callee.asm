@@ -11,6 +11,8 @@
 ;	TOKEN_STOP ends the write. Busy after the stop uses the same 250 ms wait.
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_write_sectors_callee
     PUBLIC  _sd_write_sectors_callee
     PUBLIC  sd_write_sectors_body

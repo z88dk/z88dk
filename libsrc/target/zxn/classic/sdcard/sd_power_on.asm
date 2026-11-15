@@ -6,6 +6,8 @@
 ;	AF, BC, DE and HL stay as they were.
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_power_on
 
     EXTERN  sd_deselect_card

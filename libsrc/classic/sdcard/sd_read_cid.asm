@@ -20,9 +20,13 @@
 
     INCLUDE "sdcard.def"
 
+    SECTION rodata_driver
+
 sd_vnchars:
     defm    " vx.x SN:00000000 "
     defb    0, 0
+
+    SECTION code_driver
 
 sd_read_cid:
     ld      a, CMD10                    ; SEND_CID. R1 pending. $00, then TOKEN_DATA.

@@ -7,6 +7,8 @@
 ; unsigned long unstuff_bits(unsigned char *resp, unsigned int start, unsigned int size)
 ;
 
+    SECTION code_driver
+
     PUBLIC  unstuff_bits_callee
     PUBLIC  _unstuff_bits_callee
     PUBLIC  asm_unstuff_bits
@@ -41,7 +43,6 @@ _unstuff_bits_callee:
     pop     hl
     inc     sp
     inc     sp
-    jp      asm_unstuff_bits
 
 asm_unstuff_bits:
     push    hl

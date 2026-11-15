@@ -5,6 +5,8 @@
 ;	sd_spi_budget stores the bytes that fit in 4 ms. AF stays as it was.
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_spi_port_fast
 
     EXTERN  sd_spi_budget

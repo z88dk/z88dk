@@ -10,6 +10,8 @@
 ;	The byte count in HL is private. The next block pointer stays in HL.
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_wait_not_busy
 
     EXTERN  sd_get_byte

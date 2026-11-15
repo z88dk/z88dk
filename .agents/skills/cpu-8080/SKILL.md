@@ -416,7 +416,7 @@ disp = target - (addr(branch) + 2)
 
 `disp` must be **−128 … +127**. Forward, the target may sit 127 bytes after that following byte. Backward, it may sit 128 bytes before it.
 
-The branch and the target stay in the **same file and the same `SECTION`**. `INCLUDE` text is that same assembly unit. Another file, another `SECTION`, or another assembly block is `jp`. The linker places those blocks in any order.
+The branch and the target stay in the **same file and the same `SECTION`**. `INCLUDE` text is that same assembly unit. Another file, another `SECTION`, or another assembly block is `jp`. The linker places those blocks in any order. Every code, rodata, data, or bss block names a section from the CRT list before its first byte. One file may hold several. The names are in `style-libsrc-layout`.
 
 On 8080 and 8085, `jr` assembles as `jp`, so the assembler does **not** check the range. A file that also builds for Z80 or Rabbit must be checked on those CPUs. gbz80 `djnz` is `dec b` / `jr nz`, so that `jr` has the same limit.
 
