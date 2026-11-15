@@ -2,6 +2,7 @@
 ;	SD Card driver
 ;	Taken from the OSCA Bootcode by Phil Ruston 2011
 ;	Port by Stefano Bodrato, 2012
+;	Modified November 2026 feilipu.
 ;
 ;	Returns HL = Pointer to device ID string
 ;
@@ -13,20 +14,22 @@
 
     EXTERN  sector_buffer_loc
     EXTERN  sd_card_info
-
     EXTERN  sd_send_command_null_args
     EXTERN  sd_wait_data_token
     EXTERN  sd_read_bytes_to_sector_buffer
 
     INCLUDE "sdcard.def"
 
+    SECTION rodata_driver
+
 sd_vnchars:
     defm    " vx.x SN:00000000 "
     defb    0, 0
 
-sd_read_cid:
+    SECTION code_driver
 
-    ld      a, CMD10                    ; send "read CID" $4a 00 00 00 00 00 command for more card data
+sd_read_cid:
+    ld      a, CMD10                    ; SEND_CID. R1 pending. $00, then TOKEN_DATA.
     call    sd_send_command_null_args
 
     ld      a, sd_error_bad_command_response
@@ -44,73 +47,83 @@ sd_read_cid:
     push    hl
     ld      bc, $20
     add     hl, bc
-    ex      de, hl                      ; DE = sector buffer + 20
+    ld      de, hl                      ; 8080: cheap pair copy. DE = sector buffer + 20
     pop     hl
-    ld      c, 3
+    ld      bc, 3
     add     hl, bc                      ; HL = sector buffer + 3
-    ld      c, 5
+    ld      bc, 5
     ld      a, (sd_card_info)
-    and     $f
+    and     $0f
     jr      nz, sd_cn5
     inc     bc
 sd_cn5:
-    ldir
+    call    sd_cid_copy
     push    hl
     push    de
     ld      hl, sd_vnchars
     ld      bc, 20
-    ldir
+    call    sd_cid_copy
     pop     de
     pop     hl
     inc     de
     inc     de
     ld      a, (hl)
-    srl     a
-    srl     a
-    srl     a
-    srl     a
+    rrca
+    rrca
+    rrca
+    rrca
+    and     $0f
     add     a, $30                      ; put in version digit 1
-    ld      (de), a
+    ld      (de+), a
     inc     de
-    inc     de
-    ld      a, (hl)
-    and     $f
+    ld      a, (hl+)
+    and     $0f
     add     a, $30
-    ld      (de), a                     ; put in version digit 2
+    ld      (de+), a                    ; put in version digit 2
     inc     de
     inc     de
     inc     de
     inc     de
-    inc     de
-    inc     hl
     ld      b, 4
 sd_snulp:
     ld      a, (hl)                     ; put in 32 bit serial number
-    srl     a
-    srl     a
-    srl     a
-    srl     a
+    rrca
+    rrca
+    rrca
+    rrca
+    and     $0f
     add     a, $30
     cp      $3a
     jr      c, sd_hvl1
     add     a, $7
 sd_hvl1:
-    ld      (de), a
-    inc     de
-    ld      a, (hl)
-    and     $f
+    ld      (de+), a
+    ld      a, (hl+)
+    and     $0f
     add     a, $30
     cp      $3a
     jr      c, sd_hvl2
     add     a, $7
 sd_hvl2:
-    ld      (de), a
-    inc     de
-    inc     hl
+    ld      (de+), a
     djnz    sd_snulp
 
     ld      hl, (sector_buffer_loc)     ; Drive (hardware) name string at HL
     ld      de, $20
     add     hl, de
     xor     a
+    ret
+
+sd_cid_copy:
+;	8080 ldir. A count of 0 runs 65536 times, the same as ldir.
+;	The nibble path uses rrca, not srl.
+    dec     bc
+    inc     b
+    inc     c
+sd_cid_cp:
+    ld      a, (hl+)
+    ld      (de+), a
+    dec     c
+    jr      nz, sd_cid_cp
+    djnz    sd_cid_cp
     ret

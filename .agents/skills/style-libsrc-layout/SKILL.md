@@ -2,8 +2,10 @@
 name: style-libsrc-layout
 description: >
   z88dk libsrc house rule: one major function (or one logical operation) per
-  source file, including CPU-specific copies. Use when adding, splitting, or
-  reorganising library asm/C under libsrc.
+  source file, including CPU-specific copies. Every code, rodata, data, or
+  bss block names a CRT section. A file may hold several sections when code
+  and data are mixed. Use when adding, splitting, or reorganising library
+  asm/C under libsrc.
 ---
 
 # Style — libsrc one major function per file
@@ -38,6 +40,40 @@ Examples (math16-style, but the rule is general):
 5. List files (`.lst`) and products reference modules by path — one op per file keeps nm/map/hotspot attribution sane.
 
 This is an **implicit z88dk library requirement**, not a math16-only note. Apply it to sccz80 runtime, float cores, target drivers, and new work under `libsrc/`.
+
+---
+
+## CRT section on every block
+
+Every code, rodata, initialized-data, or uninitialised block has a `SECTION` before its first byte. With no section, those bytes sit in `""` and the linker leaves them in an unordered place.
+
+Take the name from the CRT section list for classic or newlib. Prefer a name that is on both lists.
+
+| Kind | Classic | Newlib | Names on both, for a driver |
+|------|---------|--------|------------------------------|
+| Code | `lib/crt/classic/crt_section_code.inc` | `lib/crt/newlib/crt_memory_model_z80.inc` and the z180 model | `code_driver`, `code_clib`, `code_compiler`, `code_user` |
+| Constants | `crt_section_rodata.inc`. `rodata_driver` is in the code list so it stays in low memory | inside `CODE` in the same memory model | `rodata_driver`, `rodata_clib`, `rodata_compiler`, `rodata_user` |
+| Initialized data | `crt_section_data.inc` | `DATA` in the memory model | `data_driver`, `data_clib`, `data_compiler`, `data_user` |
+| Uninitialised, zeroed | `crt_section_bss.inc` | `BSS` in the memory model | `bss_driver`, `bss_clib`, `bss_compiler`, `bss_user` |
+
+There is no separate code-uninitialised section. Storage that must survive the call, and that the CRT zeroes, is a `bss_*` section. `defb` / `defw` the program writes is `data_*`. Bytes that are only read are `rodata_*`.
+
+A file may contain more than one `SECTION`. Switch when code and data are mixed in that file. Do not leave the code unsectioned because a later data block already has a section. Do not put a writable or constant block in the code section just to keep one name for the file.
+
+```asm
+    SECTION code_driver
+
+    ret
+
+    SECTION data_driver
+
+slot:
+    defb    0
+```
+
+Keep a constant in the code section when a `jr`, `jr cc`, or `djnz` in that file spans it. Those branches stay in one file and one section. `INCLUDE` text is that same unit and keeps the parent's section. Do not put a `SECTION` in an include that the parent includes after choosing one. A `ld hl,name` of a label in another section is a normal relocatable address.
+
+Do not invent a name the CRT lists do not contain.
 
 ---
 

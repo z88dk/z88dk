@@ -11,6 +11,8 @@
 ;
 
 
+	SECTION code_driver
+
 	PUBLIC	sd_deselect_card
 	
 	EXTERN		sd_send_eight_clocks

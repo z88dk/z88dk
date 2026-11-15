@@ -355,6 +355,7 @@ Caller-cleanup stdio symbols and the non-callee adt and fzx symbols still `pop i
 ## Related
 
 - Classic: `library-classic`
+- Layout and CRT sections: `style-libsrc-layout`
 - Float products / calling: `library-math32`, `library-math16`
 - Measure I/O: `test/suites/target_io` (see `methodology-measure`)
 - Targets: `target-cpm`, `target-rc2014`

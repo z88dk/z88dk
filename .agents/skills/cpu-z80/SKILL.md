@@ -184,6 +184,22 @@ Prefer `ld bc,hl` / `ld hl,bc` to park and restore one pair.
 
 Other synthetics exist (example `ld a,(hl+)`). Listings (`-l`) show the expansion. **`tool-z80asm`**.
 
+### Shared source — cheap set and `jr` distance
+
+A standard Z80 file that the makefile also builds for 8080, gbz80, 8085, or Rabbit uses the **cheap set** in `cpu-8080` (pair copies, `(hl+)`, `ld a,(de+)`, ALU `(hl+)`, `djnz`, `jr`, `ld hl,sp+n`). Do not hand-expand those lines. The richer CPU then emits its short form. A file that already uses `ix`, `exx`, or other Z80-only ops is not that shared source.
+
+`jr`, `jr cc`, and `djnz` take a signed displacement of **−128 … +127**, counted from the byte after the 2-byte branch:
+
+```text
+disp = target - (addr(branch) + 2)
+```
+
+The target is in the same file and the same `SECTION`. `INCLUDE` text is that unit. Another file or section is `jp`. Every code, rodata, data, or bss block names a section from the CRT list before its first byte. One file may hold several. The names are in `style-libsrc-layout`.
+
+On Rabbit 4000 and later (`-mr4k`, `-mr5k`, `-mr6k`) each `ld r,r` and each 8-bit ALU op on a register or `(hl)` gains a `7F` prefix. `cp (hl+)` is `7F BE 23`. `ld a,(hl)` stays one byte. `ld hl,de` shrinks to `A1`. Rabbit 2000 and 3000 keep the Z80 sizes. A Z80 displacement of `$7F` can become `$A8` on r4k. The assembler then says `error: integer range: $a8`. That branch is `jp`.
+
+Classic `sdcard.mak` and `floppy.mak` are the shared case. Prove the branch with `-mr4k -l`, not with a Z80 listing alone. The formula and the `7F` page are in `cpu-8080` and `tool-z80asm`.
+
 ## Contrast with 8085
 
 Do **not** use `exx`, IX/IY, `djnz`, `sbc hl,de`, CB/ED/DD/FD prefixes, or block I/O in `asm/8085/` trees.

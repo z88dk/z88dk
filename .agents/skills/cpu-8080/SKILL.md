@@ -388,6 +388,53 @@ Assembler sugar. **Strict** / `-no-synth` forbids free synthetics. Listings (`-l
 | `djnz **` | `dec b` / `jp nz` | sugar; not the Z80 opcode |
 | `neg` | `cpl` / `inc a` | |
 
+### Cheap set — one source, richer CPUs
+
+A file that is standard 8080, or standard Z80, and that the makefile also builds for a richer CPU, is written with this set. Do not hand-expand it. On 8080 the assembler emits the long form. On Z80, gbz80, 8085, or Rabbit the same line becomes the native or shorter form when that CPU has it. `-no-synth` only proves the expansion is 8080. It is not a reason to avoid the set.
+
+| Write this | Do not write the hand form |
+|------------|----------------------------|
+| `ld` among `bc` / `de` / `hl`, any to any | `ex de,hl` for a one-way copy. Not `af`, not `sp` |
+| `ld r,(hl+)` / `ld (hl+),r` and the `(hl-)` forms, for A, B, C, D, E | `ld r,(hl)` / `inc hl`. No `ld (hl+),n` |
+| `ld a,(de+)` / `ld a,(de-)` / `ld (de+),a` / `ld (de-),a` | A only. No `ld b,(de+)` and no `ld (de+),n` |
+| ALU `(hl+)`: `add a,(hl+)`, `cp (hl+)`, and the other `(hl)` ALU ops | `cp (hl)` / `inc hl` |
+| `djnz` when B is the counter and nothing sits between the decrement and the test | `dec b` / `jr nz`. Not for D or HL |
+| `jr` / `jr cc` when the distance fits on every CPU that builds the file | `jp` when it may not. See the distance rule below |
+| `ld hl,sp+n`, including a negative `n` | `ld hl,nn` / `add hl,sp` when C and Z are dead. It clobbers C. On gbz80 the native `F8 n` also clobbers Z |
+
+`(hl+)` and `(hl-)` into **H or L** are `ld r,(hl)` then `inc hl` / `dec hl` (`ld l,(hl+)` is `6E 23`). The increment then uses the new H or L. Park that byte in A: `ld a,(hl+)` / `ld h,(hl)` / `ld l,a`.
+
+Leave these out of the shared source. They are paid sugar or they are not 8080: `ld (de),l`, `ld de,sp+n`, `ld de,hl+n`, `sub hl,bc`, `rl de`, `sra hl`, `ld hl,(de)`, `ld (de),hl`, `ldir`, and `sla` / `srl` / `bit` written as if they were 8080. A true swap may stay `ex de,hl`.
+
+### Relative branch distance
+
+`jr`, `jr cc`, and `djnz` are a signed 8-bit displacement on every CPU where they are relative. The displacement is measured from the byte after the 2-byte branch:
+
+```text
+disp = target - (addr(branch) + 2)
+```
+
+`disp` must be **−128 … +127**. Forward, the target may sit 127 bytes after that following byte. Backward, it may sit 128 bytes before it.
+
+The branch and the target stay in the **same file and the same `SECTION`**. `INCLUDE` text is that same assembly unit. Another file, another `SECTION`, or another assembly block is `jp`. The linker places those blocks in any order. Every code, rodata, data, or bss block names a section from the CRT list before its first byte. One file may hold several. The names are in `style-libsrc-layout`.
+
+On 8080 and 8085, `jr` assembles as `jp`, so the assembler does **not** check the range. A file that also builds for Z80 or Rabbit must be checked on those CPUs. gbz80 `djnz` is `dec b` / `jr nz`, so that `jr` has the same limit.
+
+**Rabbit 4000, 5000, and 6000** (`-mr4k`, `-mr5k`, `-mr6k`) put these ops in the `7F` page. Each one is one byte longer than on Z80. Rabbit 2000 and 3000 do not.
+
+| Form | Z80 | r4k and later |
+|------|-----|----------------|
+| `ld r,r` among A, B, C, D, E, H, L | 1 | `7F` + the Z80 byte |
+| `add` / `adc` / `sbc a,r` and the same with `(hl)` | 1 | `7F` + the Z80 byte |
+| `sub` / `and` / `xor` / `or` / `cp` of a register or `(hl)` | 1 | `7F` + the Z80 byte |
+| `cp (hl+)` | `BE 23` | `7F BE 23` |
+| `ld a,(hl)` / `ld (hl),r` | 1 | still 1 |
+| `ld hl,de` | `62 6B` | `A1` (one byte shorter) |
+
+A span that is exactly +127 on Z80 can miss on r4k. `sd_sectors.asm` in the CSD version-2 path assembled `jr c,sd_csd_pop0` as displacement `$7F` on Z80 and as `$A8` and `$99` on r4k. Those two branches are `jp`. Later `jr` in that file still fit. The assembler reports a miss as `error: integer range: $a8`. That hex is the displacement.
+
+Classic `sdcard.mak` and `floppy.mak` build one source for z80, ixiy (`-IXIY` on z80, not `-mixiy`), r2ka, r4k, z80n, z180, kc160, ez80_z80, 8080, 8085, gbz80, and vm1. Prove a new `jr` with `z88dk-z80asm -mr4k -l` and read the `.lis`. Do not leave the `.lis` beside the library source. A Z80 listing alone does not prove the Rabbit build.
+
 ### Helper calls (`CD @__z80asm__…`) — avoid in hot paths
 
 | Source form | Why not |
@@ -404,7 +451,7 @@ Assembler sugar. **Strict** / `-no-synth` forbids free synthetics. Listings (`-l
 2. **`dec rr` does not set Z** (and does not set 8085 K). Test through A, or use inner/outer 8-bit loops.
 3. **`rla` / `rra` / `rlca` / `rrca` do not set Z.** Never `rla; jp z`.
 4. **`add hl,sp` / `ld hl,sp+n` clobber C.** Save C with `rra`/`rla`.
-5. **`jr` is a `jp` synthetic, not a short branch.** Normal mode: emit `jr` (allowed; 3-byte `jp`; shared Z80 source). Strict: write `jp`. Do not cost it as Z80’s 2-byte `jr`.
+5. **`jr` is a `jp` synthetic on 8080, and a relative branch on every richer CPU that builds the same file.** Normal mode: emit `jr` when the distance fits on all of those CPUs. The check is in **Relative branch distance** above. Strict: write `jp`. Do not cost the 8080 form as Z80’s 2-byte `jr`.
 6. **`$08`/`$10`/`$18`/…/`$38`/`$CB`/`$D9`/`$DD`/`$ED`/`$FD` are unused alts.** Emitting 8085 `ld de,sp+n` here is `*NOP` plus the next byte.
 7. **`(de)` stores only A.** A “working” assemble that used `ld (de),l` was not 8080-checked (or expanded through `ex`).
 8. **`cpl` does not touch flags.** Do not expect Z80 H/N.

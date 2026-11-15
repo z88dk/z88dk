@@ -47,7 +47,6 @@
 
 
 ; FLOS system variables
-        PUBLIC	sector_lba0		; keep this byte order
         PUBLIC	sector_lba1
         PUBLIC	sector_lba2
         PUBLIC	sector_lba3
@@ -305,7 +304,7 @@ ENDIF
 DEFVARS FLOSvarsaddr
 {
 
-sector_lba0	ds.b 1		; keep this byte order
+osca_flos_lba0	ds.b 1		; FLOS byte. Nothing in this tree reads it.
 sector_lba1	ds.b 1
 sector_lba2	ds.b 1
 sector_lba3	ds.b 1
@@ -344,27 +343,3 @@ current_asciicode	ds.b 1
 	SECTION  code_crt_init
 	ld	hl,$2000
 	ld	(base_graphics),hl
-
-
-
-; SD CARD interface
-IF DEFINED_NEED_SDCARD
-	SECTION bss_crt
-	PUBLIC card_select
-	PUBLIC sd_card_info
-
-	PUBLIC sector_buffer_loc
-
-; Keep the following 2 bytes in the right order (1-card_select, 2-sd_card_info) !!!
-card_select:		defb    0    ; Currently selected MMC/SD slot
-sd_card_info:		defb    0    ; Card type flags..
-
-sector_buffer_loc:	defw	0
-sector_buffer:		defs	513
-
-	SECTION code_crt_init
-	ld	hl,sector_buffer
-	ld	(sector_buffer_loc),hl
-
-ENDIF
-

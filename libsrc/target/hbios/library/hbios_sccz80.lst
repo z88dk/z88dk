@@ -1,6 +1,7 @@
 @../adt/adt_sccz80.lst
 @../alloc/alloc_sccz80.lst
 @../target/hbios/hbios_sccz80.lst
+@../classic/minifat/minifat.lst
 @../compress/compress_sccz80.lst
 @../ctype/ctype_sccz80.lst
 @../newlib/drivers/drivers.lst

@@ -10,6 +10,8 @@
 ;
 
 
+	SECTION code_driver
+
 	PUBLIC	sd_power_off
     INCLUDE "target/osca/def/osca.def"
 

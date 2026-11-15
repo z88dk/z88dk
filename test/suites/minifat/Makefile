@@ -1,7 +1,11 @@
 include ../make.config
 
-# One host image. The five CPU runs are serial and each recreates it.
-IDEIMG = /tmp/minifat-ide.img
+# One image per binary. The five CPU runs may overlap under -j.
+# TMPDIR defaults to /tmp. IDEIMG is the prefix; the target is appended
+# so the five CPUs do not share a file.
+
+TMPDIR ?= /tmp
+IDEIMG ?= $(TMPDIR)/minifat-ide-$(COMPILER)
 
 SRC = test_minifat.c ide_ticks.asm bss_ram.asm redteam_wipe.asm
 
@@ -14,9 +18,9 @@ SRCVM = $(SRC) $(wildcard ../../../libsrc/classic/minifat/vm1/*.asm)
 all: minifat.bin minifat85.bin minifat80.bin minifatgb.bin minifatvm.bin
 
 define run_ide
-	dd if=/dev/zero of=$(IDEIMG) bs=512 count=48 status=none
+	dd if=/dev/zero of=$(IDEIMG)-$@ bs=512 count=48 status=none
 	@echo "$(GREEN)" `date +%H:%M:%S` " Starting test $(RESET)"
-	@$(MACHINE) -b msx $(1) -ide0 $(IDEIMG) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+	@$(MACHINE) -b msx $(1) -ide0 $(IDEIMG)-$@ $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 	@echo "$(GREEN)" `date +%H:%M:%S` " Test completed $(RESET)"
 endef
 

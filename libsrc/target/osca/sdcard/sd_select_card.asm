@@ -10,6 +10,8 @@
 ;
 
 
+	SECTION code_driver
+
 	PUBLIC	sd_select_card	
 	
 	

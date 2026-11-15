@@ -10,6 +10,8 @@
 ;
 
 
+	SECTION code_driver
+
 	PUBLIC	pause_4ms
 	
     INCLUDE "target/osca/def/flos.def"

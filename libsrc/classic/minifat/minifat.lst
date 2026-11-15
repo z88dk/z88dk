@@ -2,6 +2,7 @@
 ; The other C calls, and each f_* object, are linked only when called.
 ; 8085 lists the same calls in minifat_8085.lst.
 ; 8080 lists the same calls in minifat_8080.lst.
+; ixiy lists the same calls in minifat_ixiy.lst.
 ; gbz80 lists the same calls in minifat_gbz80.lst.
 ; vm1 lists the same calls in minifat_vm1.lst.
 classic/minifat/z80/obj/z80/fatfs

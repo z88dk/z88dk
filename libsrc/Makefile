@@ -81,6 +81,7 @@ include classic/rect/rect.mak
 include regex/regex.mak
 include classic/sdcard/sdcard.mak
 include classic/minifat/minifat.mak
+include classic/floppy/floppy.mak
 include setjmp/setjmp.mak
 include classic/string/string.mak
 include string/string.mak

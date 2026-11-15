@@ -10,6 +10,8 @@
 ;
 
 
+	SECTION code_driver
+
 	PUBLIC	sd_get_byte
 	PUBLIC	sd_before_get
 	

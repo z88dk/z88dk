@@ -8,6 +8,8 @@
 ;	$Id: sd_read_sector_main.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
+	SECTION code_driver
+
 	PUBLIC	sd_read_sector_main
 
 

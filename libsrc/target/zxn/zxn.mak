@@ -10,7 +10,8 @@ ZXN_GLOBS := $(ZX_GLOBS) \
 	"target/ts2068/display/z80/*.asm" "target/ts2068/display/c/sccz80/*.asm" \
 	"target/zxn/sprites/c/sccz80/*.asm" \
 	"target/zxn/classic/stdio/*.asm" \
-	"target/zxn/classic/graphics/*.asm"
+	"target/zxn/classic/graphics/*.asm" \
+	"target/zxn/classic/sdcard/*.asm"
 
 ZXN_GLOBS_ex := $(ZX_GLOBS_ex) \
 	target/zxn/esxdos/z80/*.asm target/zxn/esxdos/c/sccz80/*.asm \
@@ -23,7 +24,8 @@ ZXN_GLOBS_ex := $(ZX_GLOBS_ex) \
 	target/ts2068/display/z80/*.asm target/ts2068/display/c/sccz80/*.asm \
 	target/zxn/sprites/c/sccz80/*.asm  \
 	target/zxn/classic/stdio/*.asm \
-	target/zxn/classic/graphics/*.asm
+	target/zxn/classic/graphics/*.asm \
+	target/zxn/classic/sdcard/*.asm
 
 
 
@@ -43,7 +45,7 @@ TOCREATE += $(call check_target,zxn, zxn_clib.lib)
 $(eval $(call buildtargetasm,target/zxn,z80n,zxn,-mz80n,$(ZXN_GLOBS) $(ZX_MULTICOLOUR_GLOBS),$(ZXN_GLOBS_ex) $(ZX_MULTICOLOUR_GLOBS_ex) $(addprefix target/zxn/obj/zxn/, $(BIFROST2_GEN))))
 $(eval $(call bifrost_zx0,zxn))
 
-zxn_clib.lib: $(TARGET_CLIB_DEPS) $(ZXN_TARGETS) zx_clib.lib
+zxn_clib.lib: $(TARGET_CLIB_DEPS) $(MINIFAT_OBJS) $(ZXN_TARGETS) zx_clib.lib
 	@echo ''
 	@echo '--- Building ZX Spectrum Next Library ---'
 	@echo ''
