@@ -2,18 +2,15 @@
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 ;
 ;	Deselect the bus. The Next core supplies card power.
+;	sd_spi_budget stores the bytes that fit in 4 ms.
 ;	AF stays as it was, including the flags.
 ;
 
     PUBLIC  sd_power_off
 
     EXTERN  sd_deselect_card
-    EXTERN  sd_bytes_per_4ms
+    EXTERN  sd_spi_budget
 
 sd_power_off:
     call    sd_deselect_card
-    push    hl
-    ld      hl, 16384
-    ld      (sd_bytes_per_4ms), hl
-    pop     hl
-    ret
+    jp      sd_spi_budget

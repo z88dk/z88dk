@@ -24,11 +24,11 @@ An `f_*` call also needs `minifat_file.asm` from that directory. A low-level pro
 
 The linker pulls a call file only when the program uses that name. A file that you pass on the zcc line is linked. `+cpm`, `+zxn -clib=classic`, `+osca`, `+hbios`, `+rc2014`, and `+yaz180` list a core. The CPU each one uses is under Disk drivers.
 
-The program also links the three disk routines, or it uses a target that already defines them. `+cpm` uses the BIOS glue in `libsrc/target/cpm/disk/`. `+rc2014` uses the CompactFlash driver. On `+yaz180` the two sector calls are the YABIOS ROM entries `$FE0F` and `$FE3F`.
+The program also links the three disk routines, or it uses a target that already defines them. `+cpm` uses the BIOS glue in `libsrc/target/cpm/disk/`. `+rc2014` uses the CompactFlash driver. On `+yaz180` the library links the 8255 IDE driver. Those linked routines are not the YABIOS ROM entries. YABIOS exports `ide_read_sector` at `$FE0F` and `ide_write_sector` at `$FE3F` for a program that calls the ROM.
 
 sccz80 and 80cc accept the calls on each CPU. zsdcc accepts them on Z80. The `f_*` prototypes are `__smallc`, so the caller removes the arguments.
 
-`fat_mount`, `dir_zap`, `fat_sync`, and `fat_dirty` take no arguments and are `__smallc`. A dword call takes a pointer in HL. `fat_dirty` and `fat_clusters` return no status. There is one volume. The core brings up drive 0 only.
+`fat_mount`, `dir_zap`, `fat_sync`, and `fat_dirty` take no arguments and are `__smallc`. A dword call takes a pointer in HL. `fat_dirty` and `fat_clusters` return no status. There is one volume and one drive. The core brings up drive 0 only. `f_chdrive` rejects `"1:"` through `"9:"`. Every glue rejects a unit other than 0. The HBIOS C calls can store a unit. Mini-FAT's bring-up stores unit 0, so that other unit is not used.
 
 ## What is in scope
 
@@ -203,6 +203,8 @@ Set carry when the transfer worked, and add 512 to HL. Clear carry when it did n
 
 `+cpm`, `+rc2014`, `+yaz180`, `+hbios`, `+zxn -clib=classic`, and `+osca` publish these names. A second definition makes the link fail. Do not list `floppy256.lst` on those targets.
 
+Bring-up is not the same on every glue. The SPI glue and the HBIOS glue turn the backend zero flag into carry. The CP/M, RC2014, and YAZ180 glues return carry from their own init. The floppy glue sets carry for unit 0 and does not ask the drive. The core calls that bring-up up to eight times. `FR_NOT_READY` means every try returned with carry clear. A later failed read is `FR_DISK_ERR`.
+
 The same libraries list a mini-FAT core. The librarian keeps an object only when that CPU can run it, so each library lists one core. `+zxn -clib=classic` and `+osca` list `minifat.lst`. A Z80N link accepts those Z80 objects. `+hbios` lists `minifat.lst`. `+scz180` lists `minifat_8080.lst`, because a Z180 link does not accept Z80 objects. `+cpm` lists `minifat.lst`. `-clib=ixiy` lists `minifat_ixiy.lst`. `-clib=z180` lists `minifat_8080.lst`. `-clib=8080` lists `minifat_8080.lst`. `-clib=8085` lists `minifat_8085.lst`. `+rc2014` lists `minifat.lst`. `+rc2014 -clib=rc2014-8085` lists `minifat_8085.lst`. `+yaz180` lists `minifat_8080.lst`.
 
 A 256-byte floppy target that does not already publish the three names lists `floppy256.lst` and supplies `floppy256_sector`.
@@ -236,7 +238,7 @@ Every 512-byte transfer starts with SELDSK, C = 0 and E = 1, and reads the DPH a
 
 ### 256-byte floppy
 
-`libsrc/classic/floppy/floppy256_xfer.asm` turns one 512-byte LBA into two 256-byte sectors. The source is 8080 with the cheap synthetics. `floppy256_minifat.asm` publishes the three names. `ide_read_sector` is `floppy256_read`. `ide_write_sector` is `floppy256_write`. `asm_disk_initialize` sets carry for unit 0 and does not call the drive. A target lists `floppy256.lst` and supplies `floppy256_sector`.
+`libsrc/classic/floppy/floppy256_xfer.asm` turns one 512-byte LBA into two 256-byte sectors. The source is 8080 with the cheap synthetics. `floppy256_minifat.asm` publishes the three names. `ide_read_sector` is `floppy256_read`. `ide_write_sector` is `floppy256_write`. `asm_disk_initialize` sets carry for unit 0 and does not call the drive. That bring-up is always ready. `FR_NOT_READY` does not occur on this glue. The first failed sector is `FR_DISK_ERR`. A target lists `floppy256.lst` and supplies `floppy256_sector`. The hook may change AF, BC, DE, and HL. It must not change SP. A 512-byte sector floppy does not use this glue. A skewed disk hides the skew inside `floppy256_sector`.
 
 1. Shift the LBA left by one bit. That value is the first physical sector.
 2. When that shift carries out of B, return with carry clear.
@@ -244,7 +246,7 @@ Every 512-byte transfer starts with SELDSK, C = 0 and E = 1, and reads the DPH a
 4. The target turns that linear sector into its own track, head, and sector. Sector 0 is the first sector on the disk.
 5. When the sector call returns carry clear, or the verify mismatches, call `floppy256_sector` with A = 2, the same linear sector, and the same buffer. The target waits. Then try that half again.
 6. Four tries on each half, then return with carry clear.
-7. After a write, read that half back into `floppy256_verify` and compare all 256 bytes. A mismatch uses the same retry. The window is BSS.
+7. After a write, read that half back into `floppy256_verify` and compare all 256 bytes. A mismatch uses the same retry. The window is 256 bytes of `bss_clib`. Every link of this glue pays for it.
 8. Add 256 to the buffer and one to the physical sector.
 9. When both halves are done, set carry and return with HL 512 bytes higher.
 
@@ -274,7 +276,7 @@ The task file matches CompactFlash. The data register is 16 bits. One sector is 
 
 `libsrc/target/yaz180/driver/ppide/` drives that register through the 8255. The word transfer is `ide_read_block` in `libsrc/target/yaz180/device/8255/8255_ide_read_block.asm`.
 
-On `+yaz180`, `ide_read_sector` is ROM entry `$FE0F` and `ide_write_sector` is `$FE3F`. Do not define those names in the application. `asm_disk_initialize` remains the library routine.
+On `+yaz180` the linked `ide_read_sector` is the 8255 driver, and that driver is what a `+yaz180` program calls. YABIOS exports the same names at `$FE0F` and `$FE3F`. Do not define those names in the application. `asm_disk_initialize` remains the library routine.
 
 The same RC2014 source has a 16-bit path. The build uses it when `__IO_CF_8_BIT` is 0.
 
@@ -282,9 +284,17 @@ The same RC2014 source has a 16-bit path. The build uses it when `__IO_CF_8_BIT`
 
 The SPI driver is `libsrc/classic/sdcard/`. The C calls take a pointer to `SD_INFO`. `__smallc` pushes a long high word first on sccz80 and on zsdcc. That order is not the cause of a reversed sector address. `sd_set_sector_addr_regs` wants the high word in HL and the low word in DE.
 
-`sd_minifat.asm` publishes `asm_disk_initialize`, `ide_read_sector`, and `ide_write_sector`. `sdcard.lst` does not list that file. `+rc2014` and `+yaz180` keep their own disk routines. `+zxn -clib=classic` and `+osca` list `sdcard_minifat.lst`. The HBIOS port uses RomWBW disk calls. It does not use the SPI glue.
+`sd_minifat.asm` publishes `asm_disk_initialize`, `ide_read_sector`, and `ide_write_sector`. That file is `SECTION code_driver`. `sdcard.lst` does not list that file. `+rc2014` and `+yaz180` keep their own disk routines. `+zxn -clib=classic` and `+osca` list `sdcard_minifat.lst`. The HBIOS port uses RomWBW disk calls. It does not use the SPI glue. HBIOS `sd_sectors` reads DIOCAP. DE:HL is the block count and BC is the block size. A size other than 512 returns a count of 0.
 
-OSCA keeps the port files in `libsrc/target/osca/sdcard/`. The fast read stays `sd_read_sector_main` in that directory.
+A SPI target supplies eight port files: `sd_send_byte`, `sd_get_byte`, `sd_power_on`, `sd_power_off`, `sd_select_card`, `sd_deselect_card`, `sd_spi_port_fast`, and `pause_4ms`. `sd_deselect_card` keeps AF. `sd_send_byte` and `sd_get_byte` keep HL. `sd_get_byte` also keeps BC. The token wait and the busy wait hold a counter in those registers, and a multi-block write holds the buffer in HL across the data response. OSCA keeps those files in `libsrc/target/osca/sdcard/`. The Next port is `libsrc/target/zxn/classic/sdcard/`.
+
+`sdcard.lst` does not list `sd_read_sector_main` or `sd_write_sector_main`. The target lists its own main, or it lists the generic object. One library holds one object of each name. Membership is the override. List order is not an override. OSCA lists its own read main and the generic write main. The Next lists both of its own mains.
+
+The four command bytes go out with the most significant byte first. With carry set, `sd_set_sector_addr_regs` sends the sector times 512 on a byte-addressed card. LBA 1 is `00 00 02 00`. An SDHC card sends the LBA unchanged, so LBA 1 is `00 00 00 01`.
+
+The Next SPI master clocks one byte in 16 CPU clocks. `sd_spi_budget` reads turbo register 7 and stores the bytes that fit in 4 ms: 875 at 3.5 MHz, 1750 at 7 MHz, 3500 at 14 MHz, or 7000 at 28 MHz. `sd_power_on`, `sd_power_off`, and `sd_spi_port_fast` all store that count. A slower byte loop only waits longer.
+
+`sd_initialize` returns an int. HL is 0 on success and -1 on an error. The descriptor arguments are pointers. `sd_read_sectors` and `sd_write_sectors` move more than one sector. `sd_wait_data_token` and `sd_wait_not_busy` keep the caller's HL. Z is set when the waited byte arrives. A timeout returns with Z clear.
 
 1. When L is not 0, return with carry clear.
 2. Call `sd_initialize` with H = 0.
@@ -312,6 +322,7 @@ The core is one object. A call that uses the core links all of the core bytes. `
 | `fat_bss.asm` | 692 | With the core. 512 bytes are `fatwin`. |
 | File-layer BSS | 674 | With any `f_*` call. 512 bytes are `fat_filewin`. |
 | `f_rename` BSS | 47 | With `f_rename` only. |
+| `floppy256_verify` | 256 | With the 256-byte floppy glue. |
 
 The RAM figures are the same on each CPU.
 

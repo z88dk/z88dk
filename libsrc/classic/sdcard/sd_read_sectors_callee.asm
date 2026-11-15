@@ -50,11 +50,7 @@ sd_mrd_lp:
     call    sd_wait_data_token
     jr      nz, sd_mrd_tok
     pop     hl
-    push    hl
-    call    sd_read_sector_main
-    pop     hl
-    ld      de, 512
-    add     hl, de
+    call    sd_read_sector_main         ; HL comes back at the next byte
     push    hl
     ld      hl, (sd_block_count)
     dec     hl

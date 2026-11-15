@@ -12,7 +12,7 @@
 ; BCDE is the linear sector, E low. Sector 0 is the first on the disk.
 ; HL is the 256-byte buffer. Carry is set when the sector worked.
 ; The target turns the linear sector into its track, head, and sector.
-; The hook may change AF, BC, DE, and HL.
+; The hook may change AF, BC, DE, and HL. It must not change SP.
 ;
 ; Four tries on each half. A sector error or a verify mismatch
 ; waits, then tries that half again. The wait is A = 2 with the
@@ -21,9 +21,11 @@
 ; A write is read back into floppy256_verify and compared.
 ; That window is BSS. A classic stack cannot hold 256 bytes here.
 ; The source is 8080 with the cheap synthetics. A richer CPU
-; assembles the short form. The frame is 8 bytes and every exit pops it.
-;   0 mode, 2 physical low, 4 physical high, 6 buffer
-; During a try the attempts word and the half count sit above that.
+; assembles the short form. The live frame is 10 bytes.
+;   0 halves, 2 mode, 4 physical low, 6 physical high, 8 buffer
+; During a try the attempts word sits above that frame.
+; The done exit pops the halves word, then drops the other 8 bytes.
+; A hook that moves SP breaks the ld sp,hl exit.
 
 	MODULE	floppy256_xfer
 

@@ -12,6 +12,7 @@ More detailed, but still incomplete changelist:
 - [classic] +spc1500 support the Samsung SPC-1500
 - [classic] minifat FAT12, FAT16, and FAT32 for z80, 8085, 8080, gbz80, vm1
 - [classic] SD card and 256-byte floppy access for the FAT file system
+- [classic] sd_initialize returns int; sector calls take a pointer
 
 
 

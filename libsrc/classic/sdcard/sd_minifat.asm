@@ -5,6 +5,8 @@
 ;	L = 0 selects the slot. Carry is set when the transfer is ready.
 ;
 
+    SECTION code_driver
+
     PUBLIC  asm_disk_initialize
     PUBLIC  ide_read_sector
     PUBLIC  ide_write_sector

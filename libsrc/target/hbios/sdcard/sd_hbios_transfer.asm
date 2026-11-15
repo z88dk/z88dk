@@ -88,9 +88,9 @@ sd_hb_chunk:
     jr      nz, sd_hb_err
     ld      a, e
     or      a
-    jr      z, sd_hb_err0
+    jr      z, sd_hb_none               ; the call was accepted and moved nothing
     cp      128
-    jr      nc, sd_hb_err0
+    jr      nc, sd_hb_big
     ld      c, a
     pop     hl
     add     a, a                        ; Z180: count * 512. mlt is 8x8 and is not this shift
@@ -105,7 +105,7 @@ sd_hb_chunk:
     ld      (sd_hbios_count), hl
     jr      nc, sd_hb_loop
     pop     hl
-    ld      a, sd_error_bad_command_response
+    ld      a, sd_error_too_big         ; the device returned more blocks than remain
     or      a
     ret
 
@@ -119,8 +119,14 @@ sd_hb_err:
     or      a
     ret
 
-sd_hb_err0:
+sd_hb_none:
     pop     hl
-    ld      a, sd_error_bad_command_response
+    ld      a, sd_error_write_failed
+    or      a
+    ret
+
+sd_hb_big:
+    pop     hl
+    ld      a, sd_error_too_big
     or      a
     ret

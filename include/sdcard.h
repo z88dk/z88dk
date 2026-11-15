@@ -203,19 +203,4 @@ extern unsigned long __LIB__   UNSTUFF_BITS_callee(unsigned char *data, unsigned
 #define sd_write_sectors(a,b,c,d)  sd_write_sectors_callee(a,b,c,d)
 #define UNSTUFF_BITS(a,b,c)    UNSTUFF_BITS_callee(a,b,c)
 
-
-// Reserved functions, internal use only
-//extern void __LIB__  sd_initialize(int card);
-/*
-extern void __LIB__ sd_deselect_card();
-extern void __LIB__ sd_send_eight_clocks();
-extern void __LIB__ sd_wait_data_token();
-extern void __LIB__ pause_4ms();
-// WIP, perhaps a card number parameter should be added
-extern void __LIB__ sd_power_off();
-extern void __LIB__ sd_power_on();
-*/
-// Asks CRT0 stub to reserve some service variables for SDCARD
-#pragma output NEED_SDCARD
-
 #endif /* __SDCARD_H__ */
