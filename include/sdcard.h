@@ -96,6 +96,7 @@
 #define sd_error_bad_command_response		0x21
 #define sd_error_data_token_timeout			0x22
 #define sd_error_write_timeout				0x23
+#define sd_error_no_blocks				0x24
 #define sd_error_write_failed				0x24
 #define sd_error_too_big					0x25
 
@@ -192,8 +193,8 @@ extern int __LIB__ sd_write_sectors_callee(struct SD_INFO *descriptor, long sect
 
 // Unpack bits to read CID or CSD or other, bit count begins on the less signigicant position
 // of a 16 byte (128 bit) long block, thus on the rightmost bit
-extern unsigned long __LIB__             UNSTUFF_BITS(unsigned char *data, unsigned int start, unsigned int size) __smallc;
-extern unsigned long __LIB__   UNSTUFF_BITS_callee(unsigned char *data, unsigned int start, unsigned int size) __smallc __z88dk_callee;
+extern unsigned long __LIB__ unstuff_bits(unsigned char *data, unsigned int start, unsigned int size) __smallc;
+extern unsigned long __LIB__ unstuff_bits_callee(unsigned char *data, unsigned int start, unsigned int size) __smallc __z88dk_callee;
 
 #define sd_read_block_2gb(a,b,c)  sd_read_block_2gb_callee(a,b,c)
 #define sd_write_block_2gb(a,b,c)  sd_write_block_2gb_callee(a,b,c)
@@ -201,6 +202,6 @@ extern unsigned long __LIB__   UNSTUFF_BITS_callee(unsigned char *data, unsigned
 #define sd_write_sector(a,b,c)  sd_write_sector_callee(a,b,c)
 #define sd_read_sectors(a,b,c,d)  sd_read_sectors_callee(a,b,c,d)
 #define sd_write_sectors(a,b,c,d)  sd_write_sectors_callee(a,b,c,d)
-#define UNSTUFF_BITS(a,b,c)    UNSTUFF_BITS_callee(a,b,c)
+#define unstuff_bits(a,b,c)    unstuff_bits_callee(a,b,c)
 
 #endif /* __SDCARD_H__ */

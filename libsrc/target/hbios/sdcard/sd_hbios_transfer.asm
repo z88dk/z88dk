@@ -121,7 +121,7 @@ sd_hb_err:
 
 sd_hb_none:
     pop     hl
-    ld      a, sd_error_write_failed
+    ld      a, sd_error_no_blocks
     or      a
     ret
 

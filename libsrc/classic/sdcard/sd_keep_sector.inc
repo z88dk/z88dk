@@ -6,57 +6,49 @@
 ;
 ;	The arguments stay on the stack. The C caller pops them.
 ;	Exit matches sd_pop_sector.inc: HL high, DE low, BC buffer.
-;	The return address is in sd_c_ret.
+;	The return address stays on the stack.
 ;	A count of 0 returns 0 and does not touch the card.
 ;
 
-    EXTERN  sd_c_ret
-    EXTERN  sd_c_return_hl
     EXTERN  card_select
     EXTERN  sd_card_info
     EXTERN  sd_block_count
 
-    pop     hl
-    ld      (sd_c_ret), hl
-
 IF SD_WANT_COUNT
-    pop     hl
-    ld      a, h
-    or      l
-    jr      nz, sd_keep_count
-    push    hl
-    ld      hl, 0
-    jp      sd_c_return_hl
-sd_keep_count:
-    ld      (sd_block_count), hl
-ENDIF
-
-    pop     bc
-    pop     de
-    pop     hl
-    push    hl
-    push    de
-    push    bc
-    ld      hl, sp+6
+    ld      hl, 2
+    add     hl, sp                      ; 8080: ld hl,sp+n clobbers C
     ld      a, (hl+)
     ld      h, (hl)
     ld      l, a
+    ld      a, h
+    or      l
+    jr      nz, sd_keep_count
+    ld      hl, 0
+    ret
+sd_keep_count:
+    ld      (sd_block_count), hl
+    ld      hl, 10
+    add     hl, sp
+ELSE
+    ld      hl, 8
+    add     hl, sp
+ENDIF
+    ld      a, (hl+)
+    ld      h, (hl)
+    ld      l, a                        ; descriptor pointer
     inc     hl
     ld      a, (hl+)
     ld      (card_select), a
     ld      a, (hl)
     ld      (sd_card_info), a
-    pop     bc
-    pop     de
-    pop     hl
-    push    hl
-    push    de
-    push    bc
 
 IF SD_WANT_COUNT
-    ld      hl, (sd_block_count)
-    push    hl
-    ld      hl, sp+2                    ; 8080: ld hl,sp+n clobbers C
+    ld      hl, 4
+    add     hl, sp
+ELSE
+    ld      hl, 2
+    add     hl, sp
+ENDIF
     ld      c, (hl+)
     ld      b, (hl+)
     ld      e, (hl+)
@@ -64,4 +56,3 @@ IF SD_WANT_COUNT
     ld      a, (hl+)
     ld      h, (hl)
     ld      l, a
-ENDIF

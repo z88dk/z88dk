@@ -47,7 +47,6 @@
 
 
 ; FLOS system variables
-        PUBLIC	sector_lba0		; keep this byte order
         PUBLIC	sector_lba1
         PUBLIC	sector_lba2
         PUBLIC	sector_lba3
@@ -305,7 +304,7 @@ ENDIF
 DEFVARS FLOSvarsaddr
 {
 
-sector_lba0	ds.b 1		; keep this byte order
+osca_flos_lba0	ds.b 1		; FLOS byte. Nothing in this tree reads it.
 sector_lba1	ds.b 1
 sector_lba2	ds.b 1
 sector_lba3	ds.b 1

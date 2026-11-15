@@ -18,7 +18,6 @@
     PUBLIC  _sd_write_block_2gb
 
     EXTERN  asm_sd_write_block_2gb
-    EXTERN  sd_c_return_hl
 
 sd_write_block_2gb:
 _sd_write_block_2gb:
@@ -28,8 +27,8 @@ _sd_write_block_2gb:
     jr      z, sd_wb_caller_ok
     ld      l, a
     ld      h, 0
-    jp      sd_c_return_hl
+    ret
 
 sd_wb_caller_ok:
     ld      hl, 0
-    jp      sd_c_return_hl
+    ret

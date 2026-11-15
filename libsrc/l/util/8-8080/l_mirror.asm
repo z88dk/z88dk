@@ -9,9 +9,6 @@
 ;	73 cycles on 8080 and vm1, 70 on 8085. ret is not counted.
 ;	ld r,r is 4 cycles on the 8085.
 ;
-;	Adapted from
-;	https://wikiti.brandonw.net/index.php?title=Z80_Routines:Optimized:reverseA
-;
 ;	enter :  a = byte
 ;	exit  :  a, l = byte reversed
 ;	uses  :  af, l

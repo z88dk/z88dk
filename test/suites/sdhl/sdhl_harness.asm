@@ -19,13 +19,16 @@
     PUBLIC  cmd_generic_args
 
     EXTERN  asm_sd_read_sector
+    EXTERN  sd_read_sectors
+    EXTERN  sd_read_sectors_callee
     EXTERN  sd_read_sectors_body
     EXTERN  sd_write_sectors_body
     EXTERN  sd_wait_data_token
     EXTERN  sd_wait_not_busy
     EXTERN  sd_bytes_per_4ms
     EXTERN  sd_block_count
-    EXTERN  sd_c_ret
+    EXTERN  card_select
+    EXTERN  sd_card_info
 
 _sdhl_run:
     call    sdhl_token
@@ -48,7 +51,15 @@ _sdhl_run:
     ld      a, h
     or      l
     ret     nz
-    jp      sdhl_mwrite
+    call    sdhl_mwrite
+    ld      a, h
+    or      l
+    ret     nz
+    call    sdhl_callee_frame
+    ld      a, h
+    or      l
+    ret     nz
+    jp      sdhl_caller_frame
 
 ; HL = marker. A leading $FF then $FE must leave HL there and Z set.
 sdhl_token:
@@ -176,7 +187,6 @@ sdhl_bad4:
     ret
 
 ; Two blocks. The second 512 bytes must follow the first.
-; The body returns through sd_c_ret, so the entry jumps to it.
 sdhl_mread:
     ld      hl, sdhl_dest
     ld      a, $11
@@ -213,12 +223,10 @@ sdhl_mread:
     ld      (hl), 0
     inc     hl
     ld      (hl), $ff
-    ld      hl, sdhl_mread_back
-    ld      (sd_c_ret), hl
     ld      bc, sdhl_dest
     ld      de, 1
     ld      hl, 0
-    jp      sd_read_sectors_body
+    call    sd_read_sectors_body
 
 sdhl_mread_back:
     ld      a, h
@@ -262,12 +270,10 @@ sdhl_mwrite:
     ld      (hl), $ff
     inc     hl
     ld      (hl), $ff
-    ld      hl, sdhl_mwrite_back
-    ld      (sd_c_ret), hl
     ld      bc, sdhl_dest
     ld      de, 1
     ld      hl, 0
-    jp      sd_write_sectors_body
+    call    sd_write_sectors_body
 
 sdhl_mwrite_back:
     ld      a, h
@@ -289,6 +295,149 @@ sdhl_mwrite_back:
 sdhl_bad6:
     ld      hl, 6
     ret
+
+; Count 0 leaves the descriptor alone and returns 0.
+; Count 2 copies port and flags, and the callee drops the frame.
+sdhl_callee_frame:
+    ld      a, $a5
+    ld      (card_select), a
+    ld      (sd_card_info), a
+    ld      hl, 0
+    add     hl, sp
+    ld      (sdhl_sp), hl
+    xor     a
+    call    sdhl_push_frame
+    call    sd_read_sectors_callee
+    ld      a, h
+    or      l
+    jr      nz, sdhl_bad7
+    call    sdhl_sp_ok
+    jr      nz, sdhl_bad7
+    ld      a, (card_select)
+    cp      $a5
+    jr      nz, sdhl_bad7
+    ld      a, (sd_card_info)
+    cp      $a5
+    jr      nz, sdhl_bad7
+    ld      hl, 1
+    ld      (sd_bytes_per_4ms), hl
+    ld      hl, sdhl_script
+    ld      (sdhl_script_p), hl
+    ld      (hl), $01
+    ld      hl, 0
+    add     hl, sp
+    ld      (sdhl_sp), hl
+    ld      a, 2
+    call    sdhl_push_frame
+    call    sd_read_sectors_callee
+    call    sdhl_sp_ok
+    jr      nz, sdhl_bad7
+    ld      a, (card_select)
+    cp      $3c
+    jr      nz, sdhl_bad7
+    ld      a, (sd_card_info)
+    cp      $10
+    jr      nz, sdhl_bad7
+    ld      hl, 0
+    ret
+
+sdhl_bad7:
+    ld      hl, 7
+    ret
+
+; The caller leaves the five argument words for its caller to pop.
+sdhl_caller_frame:
+    ld      a, $a5
+    ld      (card_select), a
+    ld      (sd_card_info), a
+    ld      hl, 0
+    add     hl, sp
+    ld      (sdhl_sp), hl
+    xor     a
+    call    sdhl_push_frame
+    call    sd_read_sectors
+    ld      bc, hl
+    call    sdhl_drop5
+    ld      hl, bc
+    ld      a, h
+    or      l
+    jr      nz, sdhl_bad8
+    call    sdhl_sp_ok
+    jr      nz, sdhl_bad8
+    ld      a, (card_select)
+    cp      $a5
+    jr      nz, sdhl_bad8
+    ld      hl, 1
+    ld      (sd_bytes_per_4ms), hl
+    ld      hl, sdhl_script
+    ld      (sdhl_script_p), hl
+    ld      (hl), $01
+    ld      hl, 0
+    add     hl, sp
+    ld      (sdhl_sp), hl
+    ld      a, 2
+    call    sdhl_push_frame
+    call    sd_read_sectors
+    call    sdhl_drop5
+    call    sdhl_sp_ok
+    jr      nz, sdhl_bad8
+    ld      a, (card_select)
+    cp      $3c
+    jr      nz, sdhl_bad8
+    ld      a, (sd_card_info)
+    cp      $10
+    jr      nz, sdhl_bad8
+    ld      hl, 0
+    ret
+
+sdhl_bad8:
+    ld      hl, 8
+    ret
+
+; A is the count. The descriptor is slot 1, port $3C, flags $10.
+; The five argument words stay on the stack.
+sdhl_push_frame:
+    pop     de
+    ld      c, a
+    ld      hl, sdhl_info
+    ld      (hl), 1
+    inc     hl
+    ld      (hl), $3c
+    inc     hl
+    ld      (hl), $10
+    ld      hl, sdhl_info
+    push    hl
+    ld      hl, 0
+    push    hl
+    ld      hl, 1
+    push    hl
+    ld      hl, sdhl_dest
+    push    hl
+    ld      l, c
+    ld      h, 0
+    push    hl
+    push    de
+    ret
+
+; Drop the five argument words and keep this routine's return address.
+sdhl_drop5:
+    pop     de
+    pop     hl
+    pop     hl
+    pop     hl
+    pop     hl
+    pop     hl
+    push    de
+    ret
+
+; Z when SP, ignoring this call, is still the saved value.
+sdhl_sp_ok:
+    ld      hl, 0
+    add     hl, sp
+    ld      de, 2
+    add     hl, de
+    ld      de, (sdhl_sp)
+    jp      sdhl_eq
 
 ; HL is the pointer under test. DE is the expected value.
 sdhl_eq:
@@ -373,5 +522,9 @@ sdhl_wlog:
     defs    4
 sdhl_widx:
     defs    1
+sdhl_sp:
+    defs    2
+sdhl_info:
+    defs    3
 cmd_generic_args:
     defs    4

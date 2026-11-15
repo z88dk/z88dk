@@ -24,7 +24,6 @@
     EXTERN  sd_send_command_current_args
     EXTERN  sd_wait_data_token
     EXTERN  sd_deselect_card
-    EXTERN  sd_c_return_hl
 
     INCLUDE "sdcard.def"
 
@@ -36,16 +35,16 @@ _sd_read_sector_callee:
     jr      z, sd_rd_ok
     ld      l, a
     ld      h, 0
-    jp      sd_c_return_hl
+    ret
 
 sd_rd_ok:
     ld      hl, 0
-    jp      sd_c_return_hl
+    ret
 
 ; HL = high word, DE = low word, BC = buffer.
 ; Carry is set here so the helper multiplies by 512.
 ; Success: Z, A = 0, HL = buffer + 512.
-;	8080 entry: no IX and no exx. vm1 keeps the return address in sd_c_ret.
+;	8080 entry: no IX and no exx. The return address stays on the stack.
 ;	The C call still returns HL = 0 or the error.
 
 asm_sd_read_sector:

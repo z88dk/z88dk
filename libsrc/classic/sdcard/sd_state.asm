@@ -4,34 +4,9 @@
 ;	sd_card_info and card_select must be accessible,
 ;	a good place to put them is in the vars declared in the CRT0 stub
 ;
-;	The return address stays in sd_c_ret.
+;	The return address stays on the stack.
 ;	vm1: a return address is not popped into AF.
-;	8080: ld de,hl and ld hl,bc are the cheap pair copies.
 ;
-
-    PUBLIC  sd_c_return_hl
-    PUBLIC  sd_c_return_dehl
-
-    EXTERN  sd_c_ret
-
-sd_c_return_hl:
-    push    hl
-    ld      hl, (sd_c_ret)
-    ld      de, hl
-    pop     hl
-    push    de
-    ret
-
-sd_c_return_dehl:
-    push    de
-    push    hl
-    ld      hl, (sd_c_ret)
-    pop     bc
-    pop     de
-    push    hl
-    ld      hl, bc
-    ret
-
 
     SECTION data_compiler
 
@@ -56,14 +31,10 @@ sd_bytes_per_4ms:
     SECTION bss_compiler
 
     PUBLIC  sector_buffer
-    PUBLIC  sd_c_ret
     PUBLIC  sd_block_count
 
 sector_buffer:
     defs    513
-
-sd_c_ret:
-    defs    2
 
 sd_block_count:
     defs    2

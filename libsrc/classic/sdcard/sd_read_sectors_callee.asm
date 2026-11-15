@@ -21,7 +21,6 @@
     EXTERN  sd_wait_not_busy
     EXTERN  sd_read_sector_main
     EXTERN  sd_deselect_card
-    EXTERN  sd_c_return_hl
     EXTERN  sd_block_count
 
     INCLUDE "sdcard.def"
@@ -72,7 +71,7 @@ sd_mrd_end:
     call    sd_deselect_card
     ld      l, a
     ld      h, 0
-    jp      sd_c_return_hl
+    ret
 
 sd_mrd_stop:
     ld      a, CMD12                    ; STOP_TRANSMISSION. R1 pending, then R1b busy.

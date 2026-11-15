@@ -24,7 +24,6 @@
     EXTERN  sd_write_sector_main
     EXTERN  sd_wait_not_busy
     EXTERN  sd_deselect_card
-    EXTERN  sd_c_return_hl
     EXTERN  sd_block_count
     EXTERN  cmd_generic_args
 
@@ -125,7 +124,7 @@ sd_mwr_end:
     call    sd_deselect_card
     ld      l, a
     ld      h, 0
-    jp      sd_c_return_hl
+    ret
 
 sd_mwr_stop:
     call    sd_send_eight_clocks

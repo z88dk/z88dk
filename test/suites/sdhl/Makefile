@@ -7,6 +7,7 @@ SRC = test_sdhl.c sdhl_harness.asm \
 	../../../libsrc/classic/sdcard/sd_read_bytes.asm \
 	../../../libsrc/classic/sdcard/sd_read_sector_callee.asm \
 	../../../libsrc/classic/sdcard/sd_read_sectors_callee.asm \
+	../../../libsrc/classic/sdcard/sd_read_sectors.asm \
 	../../../libsrc/classic/sdcard/sd_write_sectors_callee.asm \
 	../../../libsrc/classic/sdcard/sd_state.asm
 

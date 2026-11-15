@@ -18,7 +18,8 @@ lstoff
 	defc	sd_error_bad_command_response	= $21
 	defc	sd_error_data_token_timeout		= $22
 	defc	sd_error_write_timeout			= $23
-	defc	sd_error_write_failed			= $24
+	defc	sd_error_no_blocks			= $24	; accepted, and no block moved
+	defc	sd_error_write_failed			= sd_error_no_blocks
 	defc	sd_error_too_big				= $25
 
 

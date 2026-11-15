@@ -12,6 +12,8 @@
 ;	AF, BC, DE and HL stay as they were.
 ;
 
+    SECTION code_driver
+
     PUBLIC  sd_spi_budget
 
     EXTERN  sd_bytes_per_4ms

@@ -20,7 +20,6 @@
 
     EXTERN  asm_sd_read_lba
     EXTERN  sd_card_info
-    EXTERN  sd_c_return_hl
 
     INCLUDE "sdcard.def"
 
@@ -32,11 +31,11 @@ _sd_read_block_2gb_callee:
     jr      z, sd_rb_ok
     ld      l, a
     ld      h, 0
-    jp      sd_c_return_hl
+    ret
 
 sd_rb_ok:
     ld      hl, 0
-    jp      sd_c_return_hl
+    ret
 
 asm_sd_read_block_2gb:
     ld      a, (sd_card_info)

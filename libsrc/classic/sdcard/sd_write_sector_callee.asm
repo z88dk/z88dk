@@ -27,7 +27,6 @@
     EXTERN  sd_get_byte
     EXTERN  sd_wait_not_busy
     EXTERN  sd_deselect_card
-    EXTERN  sd_c_return_hl
 
     INCLUDE "sdcard.def"
 
@@ -39,11 +38,11 @@ _sd_write_sector_callee:
     jr      z, sd_wr_ok
     ld      l, a
     ld      h, 0
-    jp      sd_c_return_hl
+    ret
 
 sd_wr_ok:
     ld      hl, 0
-    jp      sd_c_return_hl
+    ret
 
 ; HL = high word, DE = low word, BC = buffer.
 ;	8080 entry: no IX and no exx. The C call still returns HL = 0 or the error.

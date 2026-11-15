@@ -18,7 +18,6 @@
     PUBLIC  _sd_write_sector
 
     EXTERN  asm_sd_write_sector
-    EXTERN  sd_c_return_hl
 
 sd_write_sector:
 _sd_write_sector:
@@ -28,8 +27,8 @@ _sd_write_sector:
     jr      z, sd_wr_caller_ok
     ld      l, a
     ld      h, 0
-    jp      sd_c_return_hl
+    ret
 
 sd_wr_caller_ok:
     ld      hl, 0
-    jp      sd_c_return_hl
+    ret
