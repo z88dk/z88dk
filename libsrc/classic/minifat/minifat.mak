@@ -2,10 +2,11 @@
 # and vm1. fat_sync stays in that core. The other C calls and the
 # f_* calls are one file each in that CPU directory, and are linked
 # only when a program calls them.
-# fat_bss.asm is the shared RAM block. A target that wants the core
-# in its library lists classic/minifat/minifat.lst (or the 8085,
-# 8080, gbz80, or vm1 list). +cpm -clib=ixiy lists minifat_ixiy.lst.
-# Those objects are the Z80 sources assembled with -IXIY.
+# fat_bss.asm is the shared RAM block. A Z80, Z180, or Z80N target
+# lists classic/minifat/minifat.lst. The object directory follows TYPE.
+# The Z180 and Z80N objects are the Z80 sources, assembled -mz180
+# or -mz80n. An 8085, 8080, gbz80, or vm1 target lists its own file.
+# +cpm -clib=ixiy lists minifat_ixiy.lst (the Z80 sources, -IXIY).
 
 MINIFAT_SHARED_AFILES := fat_bss.asm
 MINIFAT_Z80_AFILES := $(notdir $(wildcard classic/minifat/z80/*.asm))
@@ -16,12 +17,16 @@ MINIFAT_VM1_AFILES := $(notdir $(wildcard classic/minifat/vm1/*.asm))
 
 MINIFAT_OBJS := \
 	$(addprefix classic/minifat/z80/obj/z80/, $(MINIFAT_Z80_AFILES:.asm=.o)) \
+	$(addprefix classic/minifat/z80/obj/z180/, $(MINIFAT_Z80_AFILES:.asm=.o)) \
+	$(addprefix classic/minifat/z80/obj/z80n/, $(MINIFAT_Z80_AFILES:.asm=.o)) \
 	$(addprefix classic/minifat/z80/obj/ixiy/, $(MINIFAT_Z80_AFILES:.asm=.o)) \
 	$(addprefix classic/minifat/8085/obj/8085/, $(MINIFAT_8085_AFILES:.asm=.o)) \
 	$(addprefix classic/minifat/8080/obj/8080/, $(MINIFAT_8080_AFILES:.asm=.o)) \
 	$(addprefix classic/minifat/gbz80/obj/gbz80/, $(MINIFAT_GBZ80_AFILES:.asm=.o)) \
 	$(addprefix classic/minifat/vm1/obj/vm1/, $(MINIFAT_VM1_AFILES:.asm=.o)) \
 	$(addprefix classic/minifat/obj/z80/, $(MINIFAT_SHARED_AFILES:.asm=.o)) \
+	$(addprefix classic/minifat/obj/z180/, $(MINIFAT_SHARED_AFILES:.asm=.o)) \
+	$(addprefix classic/minifat/obj/z80n/, $(MINIFAT_SHARED_AFILES:.asm=.o)) \
 	$(addprefix classic/minifat/obj/ixiy/, $(MINIFAT_SHARED_AFILES:.asm=.o)) \
 	$(addprefix classic/minifat/obj/8085/, $(MINIFAT_SHARED_AFILES:.asm=.o)) \
 	$(addprefix classic/minifat/obj/8080/, $(MINIFAT_SHARED_AFILES:.asm=.o)) \
@@ -32,11 +37,15 @@ OBJS += $(MINIFAT_OBJS)
 CLEAN += classic-minifat-clean
 
 $(eval $(call buildbit,classic/minifat,z80,test))
+$(eval $(call buildbit,classic/minifat,z180,test,-clib=z180,-mz180))
+$(eval $(call buildbit,classic/minifat,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,classic/minifat,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/minifat,8085,test,,-m8085))
 $(eval $(call buildbit,classic/minifat,8080,test,,-m8080))
 $(eval $(call buildbit,classic/minifat,gbz80,test,,-mgbz80))
 $(eval $(call buildbit,classic/minifat/z80,z80,test))
+$(eval $(call buildbit,classic/minifat/z80,z180,test,-clib=z180,-mz180))
+$(eval $(call buildbit,classic/minifat/z80,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,classic/minifat/z80,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/minifat/8085,8085,test,,-m8085))
 $(eval $(call buildbit,classic/minifat/8080,8080,test,,-m8080))
