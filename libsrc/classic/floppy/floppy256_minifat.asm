@@ -17,6 +17,9 @@
 	EXTERN	floppy256_read
 	EXTERN	floppy256_write
 
+	defc	ide_read_sector = floppy256_read
+	defc	ide_write_sector = floppy256_write
+
 asm_disk_initialize:
 	ld	a,l
 	or	a
@@ -26,9 +29,3 @@ asm_disk_initialize:
 f256_mf_init:
 	scf
 	ret
-
-ide_read_sector:
-	jp	floppy256_read
-
-ide_write_sector:
-	jp	floppy256_write
