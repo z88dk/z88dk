@@ -13,7 +13,7 @@
     PUBLIC  sd_read_sectors_callee
     PUBLIC  _sd_read_sectors_callee
 
-    EXTERN  asm_sd_hbios_read
+    EXTERN  asm_sd_hbios_read_n
     EXTERN  sd_hbios_return_hl
 
     defc    SD_WANT_COUNT = 1
@@ -24,7 +24,7 @@ _sd_read_sectors:
     push    bc
     ld      bc, hl
     pop     hl
-    call    asm_sd_hbios_read
+    call    asm_sd_hbios_read_n
     jr      z, sd_hb_mrd_keep_ok
     ld      l, a
     ld      h, 0
@@ -40,7 +40,7 @@ _sd_read_sectors_callee:
     push    bc
     ld      bc, hl
     pop     hl
-    call    asm_sd_hbios_read
+    call    asm_sd_hbios_read_n
     jr      z, sd_hb_mrd_ok
     ld      l, a
     ld      h, 0

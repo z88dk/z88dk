@@ -13,7 +13,7 @@
     PUBLIC  sd_write_sectors_callee
     PUBLIC  _sd_write_sectors_callee
 
-    EXTERN  asm_sd_hbios_write
+    EXTERN  asm_sd_hbios_write_n
     EXTERN  sd_hbios_return_hl
 
     defc    SD_WANT_COUNT = 1
@@ -24,7 +24,7 @@ _sd_write_sectors:
     push    bc
     ld      bc, hl
     pop     hl
-    call    asm_sd_hbios_write
+    call    asm_sd_hbios_write_n
     jr      z, sd_hb_mwr_keep_ok
     ld      l, a
     ld      h, 0
@@ -40,7 +40,7 @@ _sd_write_sectors_callee:
     push    bc
     ld      bc, hl
     pop     hl
-    call    asm_sd_hbios_write
+    call    asm_sd_hbios_write_n
     jr      z, sd_hb_mwr_ok
     ld      l, a
     ld      h, 0

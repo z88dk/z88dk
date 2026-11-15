@@ -3,7 +3,8 @@
 ;
 ;	Mini-FAT names for one RomWBW disk unit.
 ;	L = 0 selects the unit. Carry is set when the transfer is ready.
-;	The unit comes from sd_initialize. HL is already 512 bytes higher.
+;	BCDE is the LBA, E low. HL is the buffer.
+;	The one-sector entry stores the count and leaves HL 512 bytes higher.
 ;
 
     SECTION code_clib
@@ -16,7 +17,6 @@
     EXTERN  sd_initialize
     EXTERN  asm_sd_hbios_read
     EXTERN  asm_sd_hbios_write
-    EXTERN  sd_hbios_count
 
 asm_disk_initialize:
     ld      a, l
@@ -32,16 +32,12 @@ sd_hb_mf_init:
     ret
 
 ide_read_sector:
-    ld      hl, 1                       ; Z180: one word store
-    ld      (sd_hbios_count), hl
     call    asm_sd_hbios_read
     ret     nz
     scf
     ret
 
 ide_write_sector:
-    ld      hl, 1                       ; Z180: one word store
-    ld      (sd_hbios_count), hl
     call    asm_sd_hbios_write
     ret     nz
     scf
