@@ -1,6 +1,5 @@
 ;
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
-;	Modified November 2026 feilipu.
 ;
 ;	Pop one __smallc sector frame for the HBIOS port.
 ;	The caller defines SD_WANT_COUNT as 1 or 0 before the include.

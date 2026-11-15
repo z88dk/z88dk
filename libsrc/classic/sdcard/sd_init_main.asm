@@ -66,7 +66,7 @@ sd_cmd0_lp:
     call    sd_send_command_null_args
     pop     bc
     cp      R1_IDLE
-    jp      z, sd_cmd8
+    jr      z, sd_cmd8
     push    bc
     call    pause_4ms
     pop     bc
@@ -105,8 +105,7 @@ sd_cmd8_wait:
 sd_v2:
 ;	R7 payload: command version, reserved, VHS, check pattern.
 ;	8080: the four R7 bytes sit on the stack. ld hl,sp+n is the cheap synthetic.
-    ld      hl, -4
-    add     hl, sp
+    ld      hl, sp-4
     ld      sp, hl
     ld      b, 4
     call    sd_read_bytes
@@ -120,7 +119,7 @@ sd_v2:
     jr      nz, sd_v2_pat
     ld      hl, sp+4
     ld      sp, hl
-    jp      sd_v2_acmd
+    jr      sd_v2_acmd
 
 sd_v2_vr:
     ld      hl, sp+4
@@ -198,8 +197,7 @@ sd_cmd58_bad:
 sd_v2_ocr:
 ;	R3 payload. First byte is OCR bits 31-24.
 ;	Bit 6 is CCS. Set: SDHC or SDXC, block address. Clear: SDSC, byte address.
-    ld      hl, -4
-    add     hl, sp
+    ld      hl, sp-4
     ld      sp, hl
     ld      b, 4
     call    sd_read_bytes
@@ -211,7 +209,7 @@ sd_v2_ocr:
     ld      (sd_card_info), a
     ld      hl, sp+4
     ld      sp, hl
-    jp      sd_cmd16_512
+    jr      sd_cmd16_512
 
 sd_v1:
 ;	HCS stays clear. A v1 card rejects the v2 argument.
@@ -228,7 +226,7 @@ sd_v1_lp:
     cp      $80
     jr      nc, sd_v1_wait
     and     R1_ILLEGAL                  ; not an SD card. Try MMC CMD1.
-    jp      nz, sd_mmc
+    jr      nz, sd_mmc
     jr      sd_v1_wait
 sd_v1_do41:
     push    bc
@@ -240,7 +238,7 @@ sd_v1_do41:
     cp      $80
     jr      nc, sd_v1_wait
     and     R1_ILLEGAL
-    jp      nz, sd_mmc
+    jr      nz, sd_mmc
 sd_v1_wait:
     push    bc
     call    pause_4ms
@@ -253,7 +251,7 @@ sd_v1_wait:
 sd_v1_ready:
     ld      a, 1
     ld      (sd_card_info), a
-    jp      sd_cmd16_512
+    jr      sd_cmd16_512
 
 sd_mmc:
 ;	CMD1 SEND_OP_COND. R1 pending. $00 is ready. Idle and $FF keep waiting.

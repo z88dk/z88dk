@@ -70,19 +70,16 @@ sd_cn5:
     rrca
     and     $0f
     add     a, $30                      ; put in version digit 1
-    ld      (de), a
+    ld      (de+), a
     inc     de
-    inc     de
-    ld      a, (hl)
+    ld      a, (hl+)
     and     $0f
     add     a, $30
-    ld      (de), a                     ; put in version digit 2
+    ld      (de+), a                    ; put in version digit 2
     inc     de
     inc     de
     inc     de
     inc     de
-    inc     de
-    inc     hl
     ld      b, 4
 sd_snulp:
     ld      a, (hl)                     ; put in 32 bit serial number
@@ -97,7 +94,7 @@ sd_snulp:
     add     a, $7
 sd_hvl1:
     ld      (de+), a
-    ld      a, (hl)
+    ld      a, (hl+)
     and     $0f
     add     a, $30
     cp      $3a
@@ -105,7 +102,6 @@ sd_hvl1:
     add     a, $7
 sd_hvl2:
     ld      (de+), a
-    inc     hl
     djnz    sd_snulp
 
     ld      hl, (sector_buffer_loc)     ; Drive (hardware) name string at HL
@@ -125,6 +121,5 @@ sd_cid_cp:
     ld      (de+), a
     dec     c
     jr      nz, sd_cid_cp
-    dec     b
-    jr      nz, sd_cid_cp
+    djnz    sd_cid_cp
     ret

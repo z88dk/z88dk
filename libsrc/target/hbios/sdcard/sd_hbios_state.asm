@@ -1,6 +1,5 @@
 ;
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
-;	Modified November 2026 feilipu.
 ;
 ;	RomWBW HBIOS disk state for one unit.
 ;	The C return address stays in sd_hbios_ret.

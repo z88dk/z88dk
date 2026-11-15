@@ -16,12 +16,12 @@ sd_read_sector_main:
 sd_zxn_rd1:
     out     (c), a
     ini
-    jp      nz, sd_zxn_rd1
+    jr      nz, sd_zxn_rd1
     ld      b, 0
 sd_zxn_rd2:
     out     (c), a
     ini
-    jp      nz, sd_zxn_rd2
+    jr      nz, sd_zxn_rd2
     out     (c), a                      ; first CRC byte
     in      a, (c)
     ld      a, $ff

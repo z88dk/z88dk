@@ -232,7 +232,7 @@ Every 512-byte transfer starts with SELDSK, C = 0 and E = 1, and reads the DPH a
 
 ### 256-byte floppy
 
-`libsrc/classic/floppy/floppy256_xfer.asm` turns one 512-byte LBA into two 256-byte sectors. The source uses 8080 opcodes. A target lists `floppy256.lst` and supplies `floppy256_sector`. The two entries are `floppy256_read` and `floppy256_write`. They do not publish `ide_read_sector`. The target glue does that.
+`libsrc/classic/floppy/floppy256_xfer.asm` turns one 512-byte LBA into two 256-byte sectors. The source is 8080 with the cheap synthetics. A target lists `floppy256.lst` and supplies `floppy256_sector`. The two entries are `floppy256_read` and `floppy256_write`. They do not publish `ide_read_sector`. The target glue does that.
 
 1. Shift the LBA left by one bit. That value is the first physical sector.
 2. When that shift carries out of B, return with carry clear.

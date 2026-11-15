@@ -1,6 +1,5 @@
 ;
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
-;	Modified November 2026 feilipu.
 ;
 ;	Mini-FAT names for one RomWBW disk unit.
 ;	L = 0 selects the unit. Carry is set when the transfer is ready.

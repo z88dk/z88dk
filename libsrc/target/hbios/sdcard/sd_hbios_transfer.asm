@@ -1,6 +1,5 @@
 ;
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
-;	Modified November 2026 feilipu.
 ;
 ;	Seek once, then read or write in chunks of at most 127 sectors.
 ;	Entry: A is $13 or $14. BCDE is the LBA. E is the low byte.
@@ -104,7 +103,7 @@ sd_hb_chunk:
     ld      hl, (sd_hbios_count)
     sbc     hl, bc
     ld      (sd_hbios_count), hl
-    jp      nc, sd_hb_loop
+    jr      nc, sd_hb_loop
     pop     hl
     ld      a, sd_error_bad_command_response
     or      a

@@ -45,16 +45,11 @@ IF SD_WANT_COUNT
     ld      hl, (sd_hbios_count)
     push    hl
     ld      hl, sp+2
-    ld      c, (hl)
-    inc     hl
-    ld      b, (hl)
-    inc     hl
-    ld      e, (hl)
-    inc     hl
-    ld      d, (hl)
-    inc     hl
-    ld      a, (hl)
-    inc     hl
+    ld      c, (hl+)
+    ld      b, (hl+)
+    ld      e, (hl+)
+    ld      d, (hl+)
+    ld      a, (hl+)
     ld      h, (hl)
     ld      l, a
 ENDIF

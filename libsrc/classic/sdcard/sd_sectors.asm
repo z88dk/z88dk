@@ -38,7 +38,7 @@ sd_sectors:
 _sd_sectors:
     ld      de, CSD_OFFSET
     add     hl, de
-    jp      asm_sd_csd_sectors
+    jr      asm_sd_csd_sectors
 
 ; HL points at CSD[0]. Result is a sector count in DEHL. L is the low byte.
 ;	8080: byte add and rla, not IX, sla, or srl. C returns this DEHL.
@@ -47,7 +47,7 @@ asm_sd_csd_sectors:
     push    hl
     ld      a, (hl)
     and     $40
-    jp      z, sd_csd_v1
+    jr      z, sd_csd_v1
 
     ld      de, 7
     add     hl, de
@@ -72,7 +72,7 @@ asm_sd_csd_sectors:
     ld      e, a
     ld      a, d
     adc     a, 0
-    jp      c, sd_csd_pop0
+    jr      c, sd_csd_pop0
     ld      d, a
     ld      b, 10
 sd_csd2sh:
@@ -82,7 +82,7 @@ sd_csd2sh:
     ld      e, a
     ld      a, d
     rla
-    jp      c, sd_csd_pop0
+    jr      c, sd_csd_pop0
     ld      d, a
     djnz    sd_csd2sh
     pop     bc
@@ -97,8 +97,7 @@ sd_csd_v1:
     ld      a, (hl+)
     and     3
     ld      d, a
-    ld      e, (hl)
-    inc     hl
+    ld      e, (hl+)
     ld      a, (hl)
     and     $c0
     rlca
@@ -123,14 +122,14 @@ sd_csd_v1:
     jr      nz, sd_csd_v1sz
     ld      a, e
     cp      $ff
-    jp      z, sd_csd_pop0
+    jr      z, sd_csd_pop0
 sd_csd_v1sz:
     ld      a, e
     add     a, 1
     ld      e, a
     ld      a, d
     adc     a, 0
-    jp      c, sd_csd_pop0
+    jr      c, sd_csd_pop0
     ld      d, a
     inc     hl
     ld      a, (hl+)
@@ -156,7 +155,7 @@ sd_csd_left:
     ld      e, a
     ld      a, d
     rla
-    jp      c, sd_csd_pop0
+    jr      c, sd_csd_pop0
     ld      d, a
     djnz    sd_csd_left
     jr      sd_csd_done

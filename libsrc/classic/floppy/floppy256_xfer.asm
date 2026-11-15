@@ -20,7 +20,8 @@
 ; that command has finished.
 ; A write is read back into floppy256_verify and compared.
 ; That window is BSS. A classic stack cannot hold 256 bytes here.
-; 8080 opcodes only. The frame is 8 bytes and every exit pops it.
+; The source is 8080 with the cheap synthetics. A richer CPU
+; assembles the short form. The frame is 8 bytes and every exit pops it.
 ;   0 mode, 2 physical low, 4 physical high, 6 buffer
 ; During a try the attempts word and the half count sit above that.
 
@@ -38,7 +39,7 @@
 
 floppy256_read:
 	xor	a
-	jp	floppy256_go
+	jr	floppy256_go
 
 floppy256_write:
 	ld	a,1
@@ -70,58 +71,44 @@ f256_try:
 	push	bc
 	call	f256_args
 	call	floppy256_sector
-	jp	nc,f256_retry
-	ld	hl,4
-	add	hl,sp
+	jr	nc,f256_retry
+	ld	hl,sp+4
 	ld	a,(hl)			; mode. 0 is a read.
 	or	a
-	jp	z,f256_half_ok
+	jr	z,f256_half_ok
 
 	call	f256_args		; write verify. Read the same physical sector.
 	ld	hl,floppy256_verify
 	xor	a
 	call	floppy256_sector
-	jp	nc,f256_retry
-	ld	hl,10
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
+	jr	nc,f256_retry
+	ld	hl,sp+10
+	ld	e,(hl+)
 	ld	d,(hl)			; DE = source half
 	ld	hl,floppy256_verify
 	ld	b,0			; 256 bytes
 
 f256_cmp:
-	ld	a,(de)
-	cp	(hl)
-	jp	nz,f256_retry		; verify mismatch
-	inc	de
-	inc	hl
-	dec	b
-	jp	nz,f256_cmp
+	ld	a,(de+)
+	cp	(hl+)
+	jr	nz,f256_retry		; verify mismatch
+	djnz	f256_cmp
 
 f256_half_ok:
 	pop	bc			; attempts
-	ld	hl,0
-	add	hl,sp
+	ld	hl,sp+0
 	dec	(hl)			; halves left
-	jp	z,f256_done
-	ld	hl,8
-	add	hl,sp			; buffer, attempts word already popped
-	ld	e,(hl)
-	inc	hl
+	jr	z,f256_done
+	ld	hl,sp+8			; buffer, attempts word already popped
+	ld	e,(hl+)
 	ld	d,(hl)
 	inc	d			; next half is 256 bytes higher
-	ld	(hl),d
-	dec	hl
+	ld	(hl-),d
 	ld	(hl),e
-	ld	hl,4
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	inc	hl
-	ld	c,(hl)
-	inc	hl
+	ld	hl,sp+4
+	ld	e,(hl+)
+	ld	d,(hl+)
+	ld	c,(hl+)
 	ld	b,(hl)			; BCDE = physical sector
 	ld	a,e
 	add	a,1
@@ -135,30 +122,22 @@ f256_half_ok:
 	ld	a,b
 	adc	a,0
 	ld	b,a
-	ld	hl,4
-	add	hl,sp
-	ld	(hl),e
-	inc	hl
-	ld	(hl),d
-	inc	hl
-	ld	(hl),c
-	inc	hl
+	ld	hl,sp+4
+	ld	(hl+),e
+	ld	(hl+),d
+	ld	(hl+),c
 	ld	(hl),b
-	jp	f256_attempts
+	jr	f256_attempts
 
 f256_done:
 	pop	bc			; halves
-	ld	hl,6
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
+	ld	hl,sp+6
+	ld	e,(hl+)
 	ld	d,(hl)
 	inc	d			; this half, so HL returns buffer + 512
-	ld	hl,8
-	add	hl,sp
+	ld	hl,sp+8
 	ld	sp,hl
-	push	de
-	pop	hl
+	ld	hl,de
 	scf
 	ret
 
@@ -172,8 +151,7 @@ f256_retry:
 	pop	bc			; halves
 
 f256_drop:
-	ld	hl,8
-	add	hl,sp
+	ld	hl,sp+8
 	ld	sp,hl
 	or	a
 	ret
@@ -202,24 +180,17 @@ f256_shl:
 ; The try frame is under the return address.
 ; Returns A = mode, BCDE = physical sector, HL = buffer.
 f256_args:
-	ld	hl,8
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	inc	hl
-	ld	c,(hl)
-	inc	hl
+	ld	hl,sp+8
+	ld	e,(hl+)
+	ld	d,(hl+)
+	ld	c,(hl+)
 	ld	b,(hl)
-	ld	hl,12
-	add	hl,sp
-	ld	a,(hl)
-	inc	hl
+	ld	hl,sp+12
+	ld	a,(hl+)
 	ld	h,(hl)
 	ld	l,a
 	push	hl
-	ld	hl,8			; mode, plus the saved buffer
-	add	hl,sp
+	ld	hl,sp+8			; mode, plus the saved buffer
 	ld	a,(hl)
 	pop	hl
 	ret

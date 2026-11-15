@@ -9,7 +9,6 @@
 ;	CMD55 then ACMD23 is a pre-erase hint. A rejected hint still allows CMD25.
 ;	CMD25 WRITE_MULTIPLE_BLOCK. Each block is TOKEN_MULTI and a data response.
 ;	TOKEN_STOP ends the write. Busy after the stop uses the same 250 ms wait.
-;	Modified November 2026 feilipu.
 ;
 
     PUBLIC  sd_write_sectors_callee
@@ -67,7 +66,7 @@ sd_mwr_no23:
     pop     bc
     ld      a, sd_error_bad_command_response
     or      a
-    jp      sd_mwr_end
+    jr      sd_mwr_end
 
 sd_mwr_go:
     pop     hl

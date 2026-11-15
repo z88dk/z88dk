@@ -8,7 +8,6 @@
 ;
 ;	CMD18 READ_MULTIPLE_BLOCK. R1 must be $00. Each block is TOKEN_DATA.
 ;	CMD12 STOP_TRANSMISSION ends the read. R1b. The sender drops one stuff byte.
-;	Modified November 2026 feilipu.
 ;
 
     PUBLIC  sd_read_sectors_callee
@@ -42,7 +41,7 @@ sd_read_sectors_body:
     pop     bc
     ld      a, sd_error_bad_command_response
     or      a
-    jp      sd_mrd_end
+    jr      sd_mrd_end
 
 sd_mrd_go:
     pop     hl

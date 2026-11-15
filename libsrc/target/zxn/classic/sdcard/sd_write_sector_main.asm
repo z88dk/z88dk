@@ -13,12 +13,10 @@
 sd_write_sector_main:
     ld      b, 0
 sd_zxn_wr:
-    ld      a, (hl)
-    inc     hl
+    ld      a, (hl+)
     out     ($eb), a
     in      a, ($eb)
-    ld      a, (hl)
-    inc     hl
+    ld      a, (hl+)
     out     ($eb), a
     in      a, ($eb)
     djnz    sd_zxn_wr
