@@ -95,6 +95,9 @@ extern option_t  cpc_options[];
 extern int       cpm2_exec(char *target);
 extern option_t  cpm2_options[];
 
+extern int       prl_exec(char *target);
+extern option_t  prl_options[];
+
 extern int       dai_exec(char *target);
 extern option_t  dai_options[];
 
@@ -381,6 +384,11 @@ struct {
       "CPM disk image creation",
       NULL,
       cpm2_exec,     cpm2_options },
+    { "prl",      "prl",       "(C) 2026 z88dk",
+      "Creates an MP/M page relocatable program",
+      "zcc +cpm -subtype=prl prog.c -o prog -create-app builds both images automatically.\n"
+      "For direct use, pass a 0x100 image with -b, a 0x200 image with -p, and the 0x100 map basename with -c.\n",
+      prl_exec,      prl_options },
     { "bin2dai",  "dai",   "(C) 2020 z88dk",
       "DAI cassete image creater",
       NULL,

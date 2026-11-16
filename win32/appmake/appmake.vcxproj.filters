@@ -161,6 +161,9 @@
     <ClCompile Include="..\..\src\appmake\pmd85.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\appmake\prl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\appmake\px.c">
       <Filter>Source Files</Filter>
     </ClCompile>

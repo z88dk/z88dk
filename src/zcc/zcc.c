@@ -242,6 +242,7 @@ struct explicit_extension
 };
 
 static int             createapp = 0;    /* Go the next stage and create the app */
+static int             c_prl_secondary = 0;
 static int             z80verbose = 0;
 static int             cleanup = 1;
 static int             assembleonly = 0;
@@ -558,6 +559,7 @@ static option options[] = {
     { 'x', NULL, OPT_BOOL,  "Make a library out of source files" , &makelib, NULL, 0},
     { 0, "xc", OPT_BOOL,  "Explicitly specify file type as C" , &explicit_file_type_c, NULL, 0},
     { 0, "create-app", OPT_BOOL,  "Run appmake on the resulting binary to create emulator usable file" , &createapp, NULL, 0},
+    { 0, "prl-secondary", OPT_BOOL|OPT_PRIVATE, "Build the 0x200 PRL comparison image (internal)", &c_prl_secondary, NULL, 0},
 
     { 0, "", OPT_HEADER, "M4 options:", NULL, NULL, 0 },
     { 0, "Cm", OPT_FUNCTION,  "Add an option to m4" , &m4arg, AddToArgs, 0},
@@ -1312,6 +1314,7 @@ int main(int argc, char **argv)
 {
     int             i, ft;
     char           *ptr;
+    char           *original_command = NULL;
     char            config_filename[FILENAME_MAX + 1];
     char            asmarg[4096];    /* Hell, that should be long enough! */
     char            buffer[LINEMAX + 1];    /* For reading in option file */
@@ -1455,6 +1458,10 @@ int main(int argc, char **argv)
         }
     }
 
+    /* option_parse compacts argv, so retain the full invocation for PRL's
+       second build before parsing removes options. */
+    for (i = 0; i < argc; ++i)
+        append_shell_arg(&original_command, argv[i]);
     argc = option_parse(&options[0], argc, argv);
 
     if (outputfile != NULL && strlen(outputfile) >= sizeof(filenamebuf)) {
@@ -1483,8 +1490,22 @@ int main(int argc, char **argv)
         fprintf(stderr, "Cannot find definition for target -subtype=%s\n", c_subtype);
         exit(1);
     }
+    if (c_subtype && strcmp(c_subtype, "prl") == 0 && c_clib &&
+        (strcmp(c_clib, "new") == 0 || strcmp(c_clib, "sdcc_ix") == 0 ||
+         strcmp(c_clib, "sdcc_iy") == 0)) {
+        fprintf(stderr, "The CP/M prl subtype requires a classic clib\n");
+        exit(1);
+    }
     if (add_variant_args(c_clib, c_clib_array_num, c_clib_array) == -1) {
         fprintf(stderr, "Cannot find definition for -clib=%s\n", c_clib);
+        exit(1);
+    }
+    if (c_prl_secondary) {
+        createapp = 0;
+        mapon = symbolson = lston = globaldefon = 0;
+    } else if (createapp && c_subtype && strcmp(c_subtype, "prl") == 0 &&
+               c_zorg != -1 && c_zorg != 0x100) {
+        fprintf(stderr, "The CP/M prl subtype requires the first image at 0x100\n");
         exit(1);
     }
 
@@ -2314,21 +2335,51 @@ int main(int argc, char **argv)
         if (createapp) {
             /* Building an application - run the appmake command on it */
 			/* z80asm now generates map file with same basename as output binary, i.e. a.map */
-            {
-                char *qb = shell_quote(outputfile);
-                char *qc = shell_quote(filenamebuf);
-                command_fit(buffer, sizeof(buffer), "%s %s -b %s -c %s", c_appmake_exe, appmakeargs ? appmakeargs : "", qb, qc);
-                free(qb);
-                free(qc);
+            char prl_secondary[FILENAME_MAX + 1] = { 0 };
+            if (c_subtype && strcmp(c_subtype, "prl") == 0) {
+                char *cmd = muststrdup(original_command);
+                char *secondary_output;
+                tempname(prl_secondary);
+                append_shell_arg(&cmd, "-prl-secondary");
+                append_shell_arg(&cmd, "-zorg=0x200");
+                zcc_asprintf(&secondary_output, "-o%s", prl_secondary);
+                append_shell_arg(&cmd, secondary_output);
+                free(secondary_output);
+                if (verbose) {
+                    printf("%s\n", cmd);
+                    fflush(stdout);
+                }
+                if (system(cmd)) {
+                    fprintf(stderr, "Building the 0x200 PRL image failed\n");
+                    status = 1;
+                }
+                free(cmd);
             }
-            if (verbose) {
-                printf("%s\n", buffer);
-                fflush(stdout);
+            if (!status) {
+                {
+                    char *qb = shell_quote(outputfile);
+                    char *qc = shell_quote(filenamebuf);
+                    if (*prl_secondary) {
+                        char *qp = shell_quote(prl_secondary);
+                        command_fit(buffer, sizeof(buffer), "%s %s -b %s -c %s -p %s", c_appmake_exe, appmakeargs ? appmakeargs : "", qb, qc, qp);
+                        free(qp);
+                    } else {
+                        command_fit(buffer, sizeof(buffer), "%s %s -b %s -c %s", c_appmake_exe, appmakeargs ? appmakeargs : "", qb, qc);
+                    }
+                    free(qb);
+                    free(qc);
+                }
+                if (verbose) {
+                    printf("%s\n", buffer);
+                    fflush(stdout);
+                }
+                if (system(buffer)) {
+                    fprintf(stderr, "Building application code failed\n");
+                    status = 1;
+                }
             }
-            if (system(buffer)) {
-                fprintf(stderr, "Building application code failed\n");
-                status = 1;
-            }
+            if (*prl_secondary)
+                remove(prl_secondary);
         }
         if ( !mapon ) {
             remove_file_with_extension(outputfile, ".map");
