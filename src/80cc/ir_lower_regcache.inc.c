@@ -1810,6 +1810,7 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
    so every slot_off it makes counts as a write, not a read. */
 static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id);
 static int byte_home_is_de_lane(int v);
+static void byte_home_bc_written(PhysReg bh);
 /* Store the byte held in register `reg` (l, e, c ...) as vreg's value. Where the
    frame slot is a plain (ix+d) the store is `ld (ix+d),reg` and A is never
    touched; every other path loads A first and goes through store_a_byte. */
@@ -1891,6 +1892,7 @@ static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id)
         emit(out, "ld\t%s,a", byte_home_reg(bh));
         /* Writing E or D makes whatever the pair belief names stale. */
         if (byte_home_is_de_lane(vreg_id)) invalidate_de_cache();
+        byte_home_bc_written(bh);
         byte_home_note(vreg_id);
         if (byte_home_slotbacked(bh)) L.cur_de_byte_home_dirty = 1;
         cache_a(vreg_id);   /* A still holds the value — next read elides */
@@ -2915,6 +2917,11 @@ static const char *byte_home_reg(PhysReg pr)
     default:      return NULL;
     }
 }
+/* A cached DEHL carries its low half in BC; writing B or C ends that. */
+static void byte_home_bc_written(PhysReg bh)
+{
+    if (bh == IR_PR_B || bh == IR_PR_C) L.rs.dehl = -1;
+}
 static int byte_home_is_de_lane(int v)
 {
     if (v < 0) return 0;
@@ -3076,8 +3083,10 @@ static int op_is_ixd_slot(const Func *f, int v)
 static int cmp_byte_src(const Func *f, int v, int idxhalf_ok,
                         char *lo, char *hi, size_t n)
 {
-    if (bc_has(v)) { snprintf(lo,n,"c"); snprintf(hi,n,"b"); return 1; }
+    /* HL first: a value just computed there may not have been written back to
+       its BC home yet, so BC can hold the previous value while HL holds this one. */
     if (hl_has(v)) { snprintf(lo,n,"l"); snprintf(hi,n,"h"); return 1; }
+    if (bc_has(v)) { snprintf(lo,n,"c"); snprintf(hi,n,"b"); return 1; }
     if (de_has(v)) { snprintf(lo,n,"e"); snprintf(hi,n,"d"); return 1; }
     /* Resident word DE-home: the DE regcache belief may be dropped at a region
        header (residency is asserted via byte_home_holds, not cache_de), so

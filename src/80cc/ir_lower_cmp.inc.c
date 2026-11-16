@@ -1473,7 +1473,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         if (c_opt_code_size) {
             /* Test at the bottom, as in gen_shl's byte loop. */
             emit(out, "inc\t%s", counter);
-            emit(out, "jr\tL_f%d_bshr_test_%d", L.func_emit_idx, n);
+            emit(out, "jp\tL_f%d_bshr_test_%d", L.func_emit_idx, n);
             fprintf(out, "L_f%d_bshr_loop_%d:\n", L.func_emit_idx, n);
             emit(out, arith ? "sra\ta" : "srl\ta");
             fprintf(out, "L_f%d_bshr_test_%d:\n", L.func_emit_idx, n);
