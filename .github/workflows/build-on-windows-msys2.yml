@@ -73,6 +73,7 @@ jobs:
             re2c
             unzip
             vim
+            dos2unix
     - name: Install Strawberry Perl
       shell: powershell
       run: |
