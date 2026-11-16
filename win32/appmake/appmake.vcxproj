@@ -84,6 +84,7 @@
     <ClCompile Include="..\..\src\appmake\phc25.c" />
     <ClCompile Include="..\..\src\appmake\pmd85.c" />
     <ClCompile Include="..\..\src\appmake\primo.c" />
+    <ClCompile Include="..\..\src\appmake\prl.c" />
     <ClCompile Include="..\..\src\appmake\px.c" />
     <ClCompile Include="..\..\src\appmake\residos.c" />
     <ClCompile Include="..\..\src\appmake\rex6000.c" />
