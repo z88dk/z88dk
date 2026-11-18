@@ -2349,6 +2349,15 @@ int main(int argc, char **argv)
                     printf("%s\n", cmd);
                     fflush(stdout);
                 }
+#ifdef _WIN32
+                {
+                    /* cmd /c strips the first and last quote when the line starts with one */
+                    char *wrapped;
+                    zcc_asprintf(&wrapped, "\"%s\"", cmd);
+                    free(cmd);
+                    cmd = wrapped;
+                }
+#endif
                 if (system(cmd)) {
                     fprintf(stderr, "Building the 0x200 PRL image failed\n");
                     status = 1;
