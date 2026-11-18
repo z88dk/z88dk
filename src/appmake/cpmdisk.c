@@ -1280,9 +1280,16 @@ disc_handle *fat_create(disc_spec* spec)
     char         buf[1024];
     FRESULT      res;
 
+    MKFS_PARM    opt;
+
     current_fat_handle = h;
+    opt.fmt = (BYTE)spec->fat_format_flags;
+    opt.n_fat = spec->number_of_fats;
+    opt.align = 1;
+    opt.n_root = spec->directory_entries;
+    opt.au_size = spec->cluster_size;
     // Create a file system
-    if ( (res = f_mkfs("1", (BYTE)spec->fat_format_flags, spec->cluster_size, buf, sizeof(buf), spec->number_of_fats, spec->directory_entries)) != FR_OK) {
+    if ( (res = f_mkfs("1", &opt, buf, sizeof(buf))) != FR_OK) {
         exit_log(1, "Cannot create FAT filesystem: %d\n",res);
     }
 
@@ -1346,7 +1353,7 @@ DSTATUS disk_initialize (
 DRESULT disk_read (
     BYTE pdrv,        /* Physical drive number to identify the drive */
     BYTE *buff,        /* Data buffer to store read data */
-    DWORD sector,    /* Start sector in LBA */
+    LBA_t sector,    /* Start sector in LBA */
     UINT count        /* Number of sectors to read */
 )
 {
@@ -1359,7 +1366,7 @@ DRESULT disk_read (
 DRESULT disk_write (
     BYTE pdrv,            /* Physical drive number to identify the drive */
     const BYTE *buff,    /* Data to be written */
-    DWORD sector,        /* Start sector in LBA */
+    LBA_t sector,        /* Start sector in LBA */
     UINT count            /* Number of sectors to write */
 )
 {
