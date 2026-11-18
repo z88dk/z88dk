@@ -7,15 +7,28 @@
 memopi:
 _memopi:
 
-    pop     af
-    pop     ix
-    pop     bc
-    pop     de
-    pop     hl
-    push    hl
+    ; asm_memopi loads ix with the op, so keep the caller's ix (frame pointer)
+    push    ix
+    ld      hl, 4                       ; skip saved ix and return address
+    add     hl, sp
+    ld      e, (hl)
+    inc     hl
+    ld      d, (hl)                     ; de = op
+    inc     hl
+    ld      c, (hl)
+    inc     hl
+    ld      b, (hl)                     ; bc = n
+    inc     hl
     push    de
-    push    bc
-    push    bc
-    push    af
-
-    jp      asm_memopi
+    pop     ix                          ; ix = op
+    ld      e, (hl)
+    inc     hl
+    ld      d, (hl)                     ; de = src
+    inc     hl
+    ld      a, (hl)
+    inc     hl
+    ld      h, (hl)
+    ld      l, a                        ; hl = dst
+    call    asm_memopi
+    pop     ix
+    ret

@@ -37,11 +37,22 @@ The interim IX-save bodge is superseded; all of these files are now RETIRED:
 
 ## Tier 2 — less common callback routines
 
-- [ ] `string/memopi_callee.asm`, `string/memopd_callee.asm`  (mem-op with fn ptr)
-- [ ] `adt/linkedlist/adt_ListDeleteS_callee.asm`             (delete + destructor cb)
-- [ ] `adt/queue/adt_QueueDeleteS_callee.asm`
-- [ ] `adt/stack/adt_StackDeleteS_callee.asm`
-- [ ] `algorithm/AStarSearch/astar_Search.asm`                (A* callbacks; also `ld ix,`)
+- [x] `string/memop{i,d}{,_callee}.asm` — DONE: the entries did `pop ix` to load the
+      op pointer. Non-callee now `push ix`, reads the args by offset into registers,
+      `call asm_memop*`, `pop ix`. Callee pops the args (af as spare storage), leaves the
+      saved ix below the return address, `call`s the core, then `pop ix; ret`. The
+      `asm_memop*` core keeps its `ix = op` convention. Verified on z88dk-ticks (IX
+      sentinel + data check, op code and fn-pointer op); the old code fails the same test.
+      Regression suite: `test/suites/ixsave` (z80/z180/z80n/ez80_z80/r2ka/r4k/r6k/kc160;
+      the `ix_get()` helper checks IX around each call, locals are re-read for fp mode).
+      Two pre-existing bugs fixed on the way: `memopd`'s Rabbit/Z180/KC160 builtin-op path
+      tested `h` and swapped `h`/`l`; and the `memops` table assumed 2-byte entries, but the
+      Rabbit 4000/6000 encode `or/xor/and/add/adc/sub/sbc (hl)` as 2-byte `7F xx` opcodes,
+      so builtin ops hit the wrong entry. The table is now padded to 4 bytes per entry and
+      indexed `memops + 4*op`.
+- [x] `adt/linkedlist/adt_ListDeleteS_callee.asm`, `adt/queue/adt_QueueDeleteS_callee.asm`,
+      `adt/stack/adt_StackDeleteS_callee.asm` — already `push ix`/`pop ix` (TODO was stale).
+- [x] `algorithm/AStarSearch/astar_Search.asm` — already wraps the body in `push ix`/`pop ix`.
 
 ## Tier 3 — gfx / games (niche, low priority)
 
@@ -53,9 +64,15 @@ low-level primitive (which just consumes the incoming IX and doesn't outlive the
 wrapper). `games/beeper.asm` already does exactly this (balanced push/pop ix) and
 is safe — use it as the model.
 
-- [ ] gfx dispatchers that `ld ix,<plotfn>`: `gfx/gray/{g_plot,g_drawb,g_drawr,...}`
-      and equivalents — bracket the `ld ix,` + primitive call with `push ix`/`pop ix`.
-- [ ] gfx primitives consuming IX via `jp (ix)` (`gfx/narrow/{liner,dcircle2,drawbox}`,
+- [x] gfx dispatchers that `ld ix,<plotfn>`: `gfx/gray/{g_plot,g_point,g_page,g_draw,g_drawb,g_drawr,g_circle}`
+      — DONE: `push ix; ld ix,2; add ix,sp` at entry (keeps the `(ix+n)` arg offsets),
+      every exit now `pop ix`, tail `jp prim` became `call prim; pop ix; ret`.
+- [x] `gfx/wide/w_putsprite3.asm` — DONE: loaded the sprite pointer into IX and never
+      restored it; now `push ix` at entry (arg offset 2→4) and `pop ix` before each `ret`.
+- [x] The rest of `gfx/narrow` and `gfx/wide` audited: every routine either pairs
+      push/pop ix or exits via `__graphics_end` (which pops IX). `narrow/dcircle`'s
+      `ex (sp),ix` dispatch and `stencil_render` are also safe.
+- [x] gfx primitives consuming IX via `jp (ix)` (`gfx/narrow/{liner,dcircle2,drawbox}`,
       `gfx/wide/{w_drawbox,w_area,w_dcircle,w_liner,w_dcircle_square}`) — NO change
       needed themselves; they receive IX from the wrapper.
 - [x] `games/beeper.asm` — already balances push/pop ix (safe).

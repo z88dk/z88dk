@@ -30,7 +30,8 @@ putsprite:
 _putsprite:
 ___putsprite:
 
-    ld      hl, 2
+    push    ix
+    ld      hl, 4
     add     hl, sp
     ld      e, (hl)
     inc     hl
@@ -128,6 +129,7 @@ noblockx:
     pop     af
     pop     bc                          ;Restore data
     djnz    oloopx
+    pop     ix
     ret
 
 
@@ -200,6 +202,7 @@ noblocka:
     pop     af
     pop     bc                          ;Restore data
     djnz    oloopa
+    pop     ix
     ret
 
 
@@ -273,6 +276,7 @@ noblocko:
     pop     af
     pop     bc                          ;Restore data
     djnz    oloopo
+    pop     ix
     ret
 
 

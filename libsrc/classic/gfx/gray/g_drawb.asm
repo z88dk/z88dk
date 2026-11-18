@@ -21,7 +21,8 @@
 
 g_drawb:
 _g_drawb:
-    ld      ix, 0
+    push    ix
+    ld      ix, 2
     add     ix, sp
     ld      a, (ix+2)                   ;GrayLevel
     ld      b, (ix+4)                   ;H
@@ -56,4 +57,6 @@ set1:
     jr      nc, set2
     ld      ix, respixel
 set2:
-    jp      drawbox
+    call    drawbox
+    pop     ix
+    ret

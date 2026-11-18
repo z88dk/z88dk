@@ -19,7 +19,8 @@
 
 g_plot:
 _g_plot:
-    ld      ix, 0
+    push    ix
+    ld      ix, 2
     add     ix, sp
     ld      a, (ix+2)                   ;GrayLevel
     ld      l, (ix+4)                   ;y
@@ -50,5 +51,11 @@ page2:
     call    graypage
     pop     af
     rra
-    jp      nc, plotpixel
-    jp      respixel
+    jr      nc, set3
+    call    respixel
+    pop     ix
+    ret
+set3:
+    call    plotpixel
+    pop     ix
+    ret

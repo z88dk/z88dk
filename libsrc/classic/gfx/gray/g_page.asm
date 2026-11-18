@@ -17,8 +17,11 @@
 
 g_page:
 _g_page:
-    ld      ix, 0
+    push    ix
+    ld      ix, 2
     add     ix, sp
     ld      a, (ix+2)
 
-    jp      graypage
+    call    graypage
+    pop     ix
+    ret

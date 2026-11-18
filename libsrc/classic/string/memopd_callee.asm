@@ -12,11 +12,21 @@
 memopd_callee:
 _memopd_callee:
 
-    pop     hl
+    ; asm_memopd loads ix with the op, so keep the caller's ix (frame pointer)
+    ; on the stack below the return address
+    pop     hl                          ; return address
+    pop     de                          ; op
+    pop     bc                          ; n
+    pop     af                          ; src (af used as spare storage)
+    ex      (sp), hl                    ; hl = dst, return address replaces dst
+    push    ix                          ; save caller's ix
+    push    de
+    pop     ix                          ; ix = op
+    push    af
+    pop     de                          ; de = src
+    call    asm_memopd
     pop     ix
-    pop     bc
-    pop     de
-    ex      (sp), hl
+    ret
 
 asm_memopd:
 
@@ -40,16 +50,17 @@ IF  __CPU_RABBIT__|__CPU_Z180__|__CPU_KC160__
     or      a
     jr      nz, func_enter
 
-    ld      a, h
+    ld      a, l
     cp      10
     jr      nc, func_enter
 
     add     a, a
+    add     a, a                        ; 4 bytes per memops entry
     add     a, memops%256
-    ld      h, a
+    ld      l, a
     ld      a, 0
     adc     a, memops/256
-    ld      l, a
+    ld      h, a
 
     push    hl
     pop     ix
@@ -68,6 +79,7 @@ ELSE
     jr      nc, func
 
     add     a, a
+    add     a, a                        ; 4 bytes per memops entry
     add     a, memops%256
     ld      ixl, a
     ld      a, 0

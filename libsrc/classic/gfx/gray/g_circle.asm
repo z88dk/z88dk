@@ -21,7 +21,8 @@
 
 g_circle:
 _g_circle:
-    ld      ix, 0
+    push    ix
+    ld      ix, 2
     add     ix, sp
     ld      a, (ix+2)                   ;GrayLevel
     ld      e, (ix+4)                   ;skip
@@ -55,4 +56,6 @@ set1:
     jr      nc, set2
     ld      ix, respixel
 set2:
-    jp      draw_circle
+    call    draw_circle
+    pop     ix
+    ret

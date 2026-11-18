@@ -22,7 +22,8 @@
 
 g_drawr:
 _g_drawr:
-    ld      ix, 0
+    push    ix
+    ld      ix, 2
     add     ix, sp
     ld      a, (ix+2)                   ;GrayLevel
     ld      e, (ix+4)                   ;py
@@ -62,4 +63,6 @@ set1:
     jr      nc, set2
     ld      ix, respixel
 set2:
-    jp      Line_r
+    call    Line_r
+    pop     ix
+    ret

@@ -19,7 +19,8 @@
 
 g_point:
 _g_point:
-    ld      ix, 0
+    push    ix
+    ld      ix, 2
     add     ix, sp
     ld      l, (ix+2)
     ld      h, (ix+4)
@@ -43,5 +44,5 @@ jpover1:
     rl      l
     inc     l
 jpover2:
+    pop     ix
     ret
-

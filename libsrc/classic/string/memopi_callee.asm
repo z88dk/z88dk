@@ -12,11 +12,21 @@
 memopi_callee:
 _memopi_callee:
 
-    pop     hl
+    ; asm_memopi loads ix with the op, so keep the caller's ix (frame pointer)
+    ; on the stack below the return address
+    pop     hl                          ; return address
+    pop     de                          ; op
+    pop     bc                          ; n
+    pop     af                          ; src (af used as spare storage)
+    ex      (sp), hl                    ; hl = dst, return address replaces dst
+    push    ix                          ; save caller's ix
+    push    de
+    pop     ix                          ; ix = op
+    push    af
+    pop     de                          ; de = src
+    call    asm_memopi
     pop     ix
-    pop     bc
-    pop     de
-    ex      (sp), hl
+    ret
 
 asm_memopi:
 
@@ -45,6 +55,7 @@ IF  __CPU_RABBIT__|__CPU_Z180__|__CPU_KC160__
     jr      nc, func_enter
 
     add     a, a
+    add     a, a                        ; 4 bytes per memops entry
     add     a, memops%256
     ld      l, a
     ld      a, 0
@@ -68,6 +79,7 @@ ELSE
     jr      nc, func
 
     add     a, a
+    add     a, a                        ; 4 bytes per memops entry
     add     a, memops%256
     ld      ixl, a
     ld      a, 0
