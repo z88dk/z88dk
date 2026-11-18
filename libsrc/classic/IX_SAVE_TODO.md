@@ -76,16 +76,30 @@ is safe — use it as the model.
       `gfx/wide/{w_drawbox,w_area,w_dcircle,w_liner,w_dcircle_square}`) — NO change
       needed themselves; they receive IX from the wrapper.
 - [x] `games/beeper.asm` — already balances push/pop ix (safe).
-- video (31 files) — work-register use; `push ix`/`pop ix` if a routine loads IX
-      and is C-callable from fp.
+- [x] video — audited: only `video/mc6847/graphics` (3 files) and `video/tms9918` (~27
+      files) touch IX/IY at all. Every C-callable routine either `push ix`/`pop ix`es on all
+      exits or leaves via `gfx/common/__graphics_end` (which pops IX); the remaining plain
+      `ret`s are inner subroutines. Nothing to fix.
 
 Niche: not hot fp-C paths, so do this sweep only if a concrete gfx/games fp
 miscompile is observed.
 
+## rect — audited, one fix
+
+- [x] `rect/r_IntersectRect16.asm` — DONE: the C wrapper loads the result pointer into IX
+      for `RIntersectRect16` and never restored it. Now `push ix` at entry (stack arg offset
+      7→9) and `pop ix` at the single exit. Regression test: `test/suites/ixsave/rect.c`.
+      The other 11 `r_*` wrappers do not touch IX; `RIntersectRect16` itself only reads IX
+      as an input pointer.
+
 ## Not in scope
 
 - stdio (printf/scanf/fputc/…) — balanced push/pop ix, preserve IX in practice.
-- sdcard / debug / rect — work-register IX; same push/pop ix fix if ever needed.
+- debug — audited: only `disz80` and `z80undoc` touch IX, and both `push ix`/`pop ix`.
+- sdcard — audited: none of the 34 asm/inc files use IX/IY (only 3 comments mention it). The
+  per-target SPI primitives they call (`sd_send_byte`, `sd_get_byte`, `sd_select_card`, ...)
+  exist only for zxn and osca, and neither uses IX/IY. `minifat` (built on sdcard) does not
+  mention IX/IY either. Nothing to fix.
 
 ## After fixing
 

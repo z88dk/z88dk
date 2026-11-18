@@ -9,5 +9,6 @@
 extern unsigned ix_get(void);
 
 extern int test_memop();
+extern int test_rect();
 
 #endif

@@ -12,7 +12,8 @@ EXTERN RIntersectRect16
 .r_IntersectRect16
 ._r_IntersectRect16
 
-   ld hl,7
+   push ix                  ; RIntersectRect16 takes the result pointer in ix
+   ld hl,9                  ; skip saved ix and return address
    add hl,sp
    ld d,(hl)
    dec hl
@@ -88,6 +89,8 @@ ENDIF
    
    call RIntersectRect16
    ld hl,0
-   ret nc
+   jr nc,done
    inc l
+.done
+   pop ix
    ret
