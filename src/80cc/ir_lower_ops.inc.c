@@ -4902,10 +4902,18 @@ static int try_store_chain(FILE *out, Func *f, const Op *op)
     if (!store_chain_in_de)
         emit_hl_add_offset(out, op->mem.offset - store_chain_hl_off, 0, 0);
     if (f->vregs[op->src[0]].width == 2) {
-        if (store_chain_in_de) {
-            emit_sp(out, 2, "push\tde");
+        /* A value parked at TOS must be popped before anything else is
+           pushed, so take it straight into the register the pointer is not in. */
+        int parked = vreg_is_pr_stack(f, op->src[0]) && stack_parked(op->src[0]);
+        if (parked && !store_chain_in_de) {
+            load_to_de(out, f, op->src[0]);
+            emit(out, "ld\t(hl),e");
+            emit(out, "inc\thl");
+            emit(out, "ld\t(hl),d");
+        } else if (store_chain_in_de) {
+            if (!parked) emit_sp(out, 2, "push\tde");
             load_to_hl(out, f, op->src[0]);
-            emit_sp(out, -2, "pop\tde");
+            if (!parked) emit_sp(out, -2, "pop\tde");
             emit(out, "ld\t(de),hl");
             emit(out, "inc\tde");
             emit(out, "inc\tde");
