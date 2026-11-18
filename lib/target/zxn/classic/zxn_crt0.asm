@@ -82,7 +82,9 @@
 
     INCLUDE     "target/zxn/def/colours.def"
 
-IF __ESXDOS_DOT_COMMAND
+IF __NEXTOS_DOTN
+    INCLUDE	"target/zxn/classic/dotn_crt0.asm"
+ELIF __ESXDOS_DOT_COMMAND
     INCLUDE	"target/zxn/classic/dot_crt0.asm"
 ELSE
     INCLUDE	"target/zxn/classic/ram_crt0.asm"
