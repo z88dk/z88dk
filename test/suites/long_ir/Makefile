@@ -25,6 +25,7 @@ all:	ivstep.bin ivstep_fp.bin ivstep_8080.bin ivstep_z180.bin ivstep_ez80.bin iv
 all:	farptr.bin farptr_8080.bin farptr_8085.bin farptr_gbz80.bin farptr_r2ka.bin farptr_r4k.bin farptr_ez80.bin farptr_z180.bin farptr_z80n.bin farptr_kc160.bin farptr_fp.bin
 all:	farlp.bin farlp_r2ka.bin farlp_r4k.bin farlp_z80n.bin farlp_fp.bin
 all:	complement.bin complement_fp.bin complement_z80n.bin complement_z180.bin complement_ez80.bin complement_8080.bin
+all:	f16lit.bin f16lit_fp.bin f16lit_z80n.bin f16lit_z180.bin f16lit_ez80.bin f16lit_8080.bin f16lit_8085.bin f16lit_gbz80.bin f16lit_r2ka.bin f16lit_kc160.bin
 all:	ternary.bin ternary_fp.bin ternary_z80n.bin ternary_z180.bin ternary_ez80.bin ternary_8080.bin
 all:	iytemp.bin iytemp_fp.bin iytemp_z80n.bin iytemp_z180.bin iytemp_ez80.bin iytemp_8080.bin
 all:	joinacc.bin joinacc_fp.bin joinacc_reserve_iy.bin joinacc_reserve_iy_fp.bin joinacc_z80n.bin joinacc_8080.bin joinacc_gbz80.bin joinacc_r2ka.bin joinacc_asm.bin
@@ -5085,6 +5086,48 @@ joinacc_asm.bin: joinacc.c
 	  zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) $$f -DASMONLY -I$(FRAMEWORK_DIR) -S $< -o joinacc_a.asm || exit 1; \
 	  test `grep -ci '[^a-z]iy' joinacc_a.asm` -eq 0 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: join value homed in IY ($$f) $(RESET)" ; exit 1; }; \
 	done; rm -f joinacc_a.asm
+
+f16lit.bin: $(SOURCES) f16lit.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -I$(FRAMEWORK_DIR) -S f16lit.c -o f16lit_a.asm
+	@if grep -Eq 'l_f48_|l_f64_|[[:space:]](dadd|dsub|dmul|ddiv|dload|dpush)([[:space:]]|$$)' f16lit_a.asm; then rm -f f16lit_a.asm; echo "$(RED)" `date +%H:%M:%S` " Test failure: double-tier helper used for _Float16 op literal $(RESET)" ; exit 1; fi; rm -f f16lit_a.asm
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -lmath16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f16lit_fp.bin: $(SOURCES) f16lit.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -lmath16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f16lit_z80n.bin: $(SOURCES) f16lit.c
+	$(call compile_z80n,--math16)
+	$(runtest_z80n)
+
+f16lit_z180.bin: $(SOURCES) f16lit.c
+	$(call compile_z180,--math16)
+	$(runtest_z180)
+
+f16lit_ez80.bin: $(SOURCES) f16lit.c
+	$(call compile_ez80_z80,--math16)
+	$(runtest_ez80_z80)
+
+f16lit_8080.bin: $(SOURCES) f16lit.c
+	$(call compile_8080,--math16)
+	$(runtest_8080)
+
+f16lit_8085.bin: $(SOURCES) f16lit.c
+	$(call compile_8085,--math16)
+	$(runtest_8085)
+
+f16lit_gbz80.bin: $(SOURCES) f16lit.c
+	$(call compile_gbz80,--math16)
+	$(runtest_gbz80)
+
+f16lit_r2ka.bin: $(SOURCES) f16lit.c
+	$(call compile_r2ka,--math16)
+	$(runtest_r2ka)
+
+f16lit_kc160.bin: $(SOURCES) f16lit.c
+	$(call compile_kc160,--math16)
+	$(runtest_kc160)
 
 ternary.bin: $(SOURCES) ternary.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m

@@ -318,6 +318,22 @@ void ast_normalize_types(Node *node)
     case OP_OR: case OP_AND: case OP_XOR:
         ast_normalize_types(node->left);
         ast_normalize_types(node->right);
+        /* `_Float16 OP <double literal>`: keep the literal in _Float16 (as
+           sccz80 does) rather than promoting to double. Strict C would
+           promote, but the double tier (math48) is not linked under
+           --math16, and the result is stored back to _Float16 anyway. */
+        if (node->ast_type == OP_MULT || node->ast_type == OP_DIV
+            || node->ast_type == OP_ADD || node->ast_type == OP_SUB) {
+            Node *l = node->left, *r = node->right;
+            if (l->type && r->type) {
+                if (r->ast_type == AST_LITERAL && r->type->kind == KIND_DOUBLE
+                    && l->type->kind == KIND_FLOAT16)
+                    r->type = type_float16;
+                else if (l->ast_type == AST_LITERAL && l->type->kind == KIND_DOUBLE
+                    && r->type->kind == KIND_FLOAT16)
+                    l->type = type_float16;
+            }
+        }
         node->type = promote_types(node->left->type, node->right->type);
         /* `ptr - ptr` is the one case where promote_types over-counts:
            C semantics say the result is ptrdiff_t (integer), not a
