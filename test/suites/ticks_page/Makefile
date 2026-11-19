@@ -51,7 +51,7 @@ all:
 	@echo "ticks_page: skipped (POSIX-shell recipes; not run on Windows)"
 else
 all: z180_auto z180_explicit z180_flat z180_common rc_z80 rc_8085 rc_romsize \
-	rc_fw_z80 rc_fw_8085 disk85 ez80_ed28 zxn_auto zxn_explicit zxn_flat
+	rc_ramonly rc_fw_z80 rc_fw_8085 disk85 ez80_ed28 zxn_auto zxn_explicit zxn_flat
 endif
 
 z180_mmu.bin: z180_mmu.asm
@@ -131,6 +131,16 @@ rc_8085: rc2014_page.bin
 		echo "$(GREEN)ticks_page rc2014 8085 passed$(RESET)"; \
 	else \
 		echo "$(RED)ticks_page rc2014 8085 failed: got '$$got'$(RESET)"; exit 1; \
+	fi
+
+# One -disk file is a RAM image. The ROM stays off. No -pc keeps PC at 0.
+rc_ramonly: rc2014_page.bin
+	@z88dk-ticks -mz80 -b rc2014 -end 807e -output rc_ramonly.out -disk rc2014_page.bin > /dev/null
+	@got=$$(od -An -tx1 -j33024 -N6 rc_ramonly.out | tr -s ' \n' ' ' | sed 's/^ //;s/ $$//'); \
+	if [ "$$got" = "$(RC_EXPECTED)" ]; then \
+		echo "$(GREEN)ticks_page rc2014 ram image passed$(RESET)"; \
+	else \
+		echo "$(RED)ticks_page rc2014 ram image failed: got '$$got'$(RESET)"; exit 1; \
 	fi
 
 # -romsize 2000 is hex. The write at 0x1000 is inside that ROM. It must still
@@ -266,5 +276,5 @@ clean:
 	rm -f *.bin *.o *.lis *.out *.sym *.map *.txt zcc_opt.def
 
 .PHONY: all clean z180_auto z180_explicit z180_flat z180_common \
-	rc_z80 rc_8085 rc_romsize rc_fw_z80 rc_fw_8085 rc_fw_check \
+	rc_z80 rc_8085 rc_romsize rc_ramonly rc_fw_z80 rc_fw_8085 rc_fw_check \
 	disk85 ez80_ed28 zxn_auto zxn_explicit zxn_flat

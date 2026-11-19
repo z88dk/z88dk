@@ -114,19 +114,27 @@ RAM page 1 is 64 kB and starts at offset `0x29000`.
 Pass `-b rc2014` with `-disk`.
 
 ```text
+z88dk-ticks -mz80 -b rc2014 -disk ram.bin
 z88dk-ticks -m8085 -b rc2014 -disk rom.bin ram.bin
 ```
 
-The first file is the ROM image.
-ticks writes that file at the start of the 32 kB ROM.
-The file is at most 32 kB.
-Bytes past the end of the file read as `0xFF`.
-The second file is the RAM image for page 0.
-ticks writes that file at the start of the 64 kB page.
+One file is a RAM image.
+ticks writes that file to both RAM pages.
 The file is at most 64 kB.
+The ROM stays off.
+`-pc` sets the start address.
+With no `-pc`, the program counter stays 0.
+This is the same start as a RAM program.
+
+Two files are a ROM image and a RAM image.
+ticks writes the first file at the start of the 32 kB ROM.
+That file is at most 32 kB.
+Bytes past the end of the file read as `0xFF`.
+ticks writes the second file at the start of RAM page 0.
+That file is at most 64 kB.
 A third file is the RAM image for page 1.
 Page 1 stays clear when that file is absent.
-The RAM images stay out of the ROM store.
+The RAM image stays out of the ROM store.
 Execution starts at address 0 in the ROM.
 `-pc` selects another start address.
 ticks turns the ROM on and selects page 0.
@@ -146,6 +154,7 @@ Run `make -C test/suites/ticks_page`.
 The suite checks the Z180 map and `-b standard` with `-mz180`.
 It checks the SCZ180 common-1 window.
 It checks the RC2014 ROM page and shadow RAM on the Z80 and the 8085.
+It checks a RAM-only image. The ROM stays off and the program counter stays 0.
 It checks the firmware start, and `-romsize` on the ROM page.
 It checks an 8085 ROM image and RAM image (`-disk`).
 It checks `ED 28` on `-mez80_z80`.

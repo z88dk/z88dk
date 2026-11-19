@@ -103,7 +103,9 @@ static void apply_memory_model(void)
 
 /* One RC2014 image. A file longer than 65536 bytes is rejected.
    max_file is 32768 for the ROM and 65536 for a RAM page.
-   Byte 0 of the file is address 0 of that store. */
+   Byte 0 of the file is address 0 of that store.
+   page < 0 writes the ROM. page 0 or 1 writes that RAM page.
+   page > 1 writes both RAM pages, which is the RAM-program load. */
 static void load_rc2014_image(const char *path, long max_file, int page)
 {
     FILE *slice;
@@ -135,6 +137,9 @@ static void load_rc2014_image(const char *path, long max_file, int page)
             ok = 0;
         else if ( page < 0 )
             ok = memory_rc2014_load_rom((uint16_t)i, (uint8_t)value);
+        else if ( page > 1 )
+            ok = memory_rc2014_load_ram(0, (uint16_t)i, (uint8_t)value)
+              && memory_rc2014_load_ram(1, (uint16_t)i, (uint8_t)value);
         else
             ok = memory_rc2014_load_ram(page, (uint16_t)i, (uint8_t)value);
         if ( !ok ) {
@@ -145,16 +150,21 @@ static void load_rc2014_image(const char *path, long max_file, int page)
     fclose(slice);
 }
 
-/* ROM image and RAM image. An optional third file is RAM page 1.
-   Hardware reset: ROM on, page 0, PC 0. -pc replaces that PC.
+/* One file is a RAM image on both pages. ROM stays off and PC is unchanged.
+   A ROM image plus a RAM image is the hardware reset: ROM on, page 0, PC 0.
+   -pc replaces that PC. An optional third file is RAM page 1.
    The name hook stays off. */
 static void load_rc2014_disk(void)
 {
-    load_rc2014_image(c_disk_rom, 32768, -1);
-    load_rc2014_image(c_disk_ram, 65536, 0);
-    if ( c_disk_page1 )
-        load_rc2014_image(c_disk_page1, 65536, 1);
-    memory_rc2014_disk_start();
+    if ( !c_disk_rom ) {
+        load_rc2014_image(c_disk_ram, 65536, 2);
+    } else {
+        load_rc2014_image(c_disk_rom, 32768, -1);
+        load_rc2014_image(c_disk_ram, 65536, 0);
+        if ( c_disk_page1 )
+            load_rc2014_image(c_disk_page1, 65536, 1);
+        memory_rc2014_disk_start();
+    }
     c_rc2014_mode = 0;
 }
 
@@ -299,9 +309,9 @@ static void usage(void)
     printf("  -b <model>     Memory model (standard/zxn/zx/z180/msx/rc2014)\n");
     printf("                 -mz80n selects zxn, -mz180 selects z180, unless -b is set\n");
     printf("                 -b rc2014: a file of at most 32 kB loaded at 0 is the ROM\n");
-    printf("  -disk <rom> <ram> [ram1]\n");
-    printf("                 -b rc2014 images. The ROM is at most 32 kB.\n");
-    printf("                 A RAM image is at most 64 kB. Start is 0, or -pc\n");
+    printf("  -disk <image> [<ram> [ram1]]\n");
+    printf("                 One file is RAM. The ROM stays off. -pc leads\n");
+    printf("                 A ROM image starts at 0 unless -pc is set\n");
     printf("  -banks         Load <input>_BANK_nn.bin bank images (Rabbit, ZX Next or MSX model)\n");
     printf("  -m8080         Emulate an 8080\n");
     printf("  -m8085         Emulate an 8085 (mostly)\n");
@@ -474,18 +484,23 @@ int main (int argc, char **argv){
           break;
         case 'd':
           if ( strcmp(&argv[0][1], "disk") == 0 ) {
-            /* argv[0] is -disk. The loop consumes one more token after this. */
-            if ( argc < 3 || argv[1][0] == '-' || argv[2][0] == '-' )
-              exit_log(1, "-disk needs a ROM image and a RAM image\n");
-            c_disk_rom = argv[1];
-            c_disk_ram = argv[2];
-            if ( argc >= 4 && argv[3][0] != '-' ) {
-              c_disk_page1 = argv[3];
-              argv += 2;
-              argc -= 2;
+            /* argv[0] is -disk. The loop consumes one more token after this.
+               One file is RAM. Two files are a ROM image and a RAM image. */
+            if ( argc < 2 || argv[1][0] == '-' )
+              exit_log(1, "-disk needs a RAM image\n");
+            if ( argc >= 3 && argv[2][0] != '-' ) {
+              c_disk_rom = argv[1];
+              c_disk_ram = argv[2];
+              if ( argc >= 4 && argv[3][0] != '-' ) {
+                c_disk_page1 = argv[3];
+                argv += 2;
+                argc -= 2;
+              } else {
+                argv += 1;
+                argc -= 1;
+              }
             } else {
-              argv += 1;
-              argc -= 1;
+              c_disk_ram = argv[1];
             }
             break;
           }
@@ -676,7 +691,7 @@ int main (int argc, char **argv){
     --argc;
   }
 
-  if ( c_disk_rom ) {
+  if ( c_disk_rom || c_disk_ram ) {
     if ( size )
       exit_log(1, "-disk does not take an input file\n");
     apply_memory_model();
