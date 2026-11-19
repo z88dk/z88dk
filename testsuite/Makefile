@@ -29,7 +29,7 @@ z80n/%.opt: z80n/%.c
 	@rm $@.tmp2
 
 rabbit/%.opt: rabbit/%.c
-	zcc +rcmx000 -vn -a $^ -o $@.tmp1
+	zcc +rcmx000 -compiler=sccz80 -vn -a $^ -o $@.tmp1
 	@cat $@.tmp1 | grep -v '^;'  | grep -v MODULE|grep -v C_LINE > $@.tmp2
 	diff -w $@.tmp2 results/$@
 	@mv -f $@.tmp1 $@
