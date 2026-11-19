@@ -114,7 +114,7 @@ RAM page 1 is 64 kB and starts at offset `0x29000`.
 Pass `-b rc2014` with `-disk`.
 
 ```text
-z88dk-ticks -m8085 -b rc2014 -pc 8000 -disk rom.bin ram.bin
+z88dk-ticks -m8085 -b rc2014 -disk rom.bin ram.bin
 ```
 
 The first file is the ROM image.
@@ -127,9 +127,9 @@ The file is at most 64 kB.
 A third file is the RAM image for page 1.
 Page 1 stays clear when that file is absent.
 The RAM images stay out of the ROM store.
-ticks does not choose a start address.
-Set the program counter with `-pc`.
-ticks leaves the ROM off and selects page 0.
+Execution starts at address 0 in the ROM.
+`-pc` selects another start address.
+ticks turns the ROM on and selects page 0.
 The hook traps stay off.
 `-disk` does not take another input file.
 One file of at most 32 kB loaded at 0 remains the firmware start.
@@ -156,4 +156,4 @@ Before it writes the hotspot list, ticks restores the map from after the load.
 The Z180 list uses CBAR `0xF0`, BBR 0, CBR 0, and ICR 0.
 An RC2014 RAM program lists with the ROM off.
 An RC2014 firmware image lists from the ROM.
-A disk harness lists with the ROM off.
+A disk image lists from the ROM.

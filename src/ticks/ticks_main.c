@@ -146,7 +146,8 @@ static void load_rc2014_image(const char *path, long max_file, int page)
 }
 
 /* ROM image and RAM image. An optional third file is RAM page 1.
-   ROM off, page 0. The program counter is left to -pc. The name hook stays off. */
+   Hardware reset: ROM on, page 0, PC 0. -pc replaces that PC.
+   The name hook stays off. */
 static void load_rc2014_disk(void)
 {
     load_rc2014_image(c_disk_rom, 32768, -1);
@@ -300,7 +301,7 @@ static void usage(void)
     printf("                 -b rc2014: a file of at most 32 kB loaded at 0 is the ROM\n");
     printf("  -disk <rom> <ram> [ram1]\n");
     printf("                 -b rc2014 images. The ROM is at most 32 kB.\n");
-    printf("                 A RAM image is at most 64 kB. -pc sets the start\n");
+    printf("                 A RAM image is at most 64 kB. Start is 0, or -pc\n");
     printf("  -banks         Load <input>_BANK_nn.bin bank images (Rabbit, ZX Next or MSX model)\n");
     printf("  -m8080         Emulate an 8080\n");
     printf("  -m8085         Emulate an 8085 (mostly)\n");

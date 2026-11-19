@@ -197,7 +197,7 @@ void memory_reset_paging()
     /* Hotspot listing reads through this map. Restore the map from after
        the load, the same way the ZX Next slots return to 0xFF. A RAM program
        lists from page 0 with the ROM off. A firmware image lists from the ROM.
-       A disk harness lists with the ROM off.
+       A disk image lists from the ROM.
        A normal -output dump does not call this, so it still shows the final map. */
     z180_CBAR = 0xf0;
     z180_CBR = 0x00;
@@ -313,8 +313,8 @@ void memory_z180_seal_common1(void)
 
 // RC2014. Port 0x38 is the standard 32 kB ROM page, on every pageable-ROM
 // machine. Bit 0 = 0 maps that ROM over 0x0000-0x7FFF for reads. Bit 0 = 1
-// maps RAM. Reset leaves the ROM off so a RAM program runs. A firmware image
-// is loaded into the ROM store and starts with the ROM on. A write in the
+// maps RAM. A RAM program leaves the ROM off. A firmware image and a disk
+// image start at address 0 with the ROM on. A write in the
 // window goes to RAM and leaves the ROM store unchanged.
 // Port 0x30 bit 0 is shadow RAM: a second 64 kB page on the SC108, the
 // Memory Module, and the other 128 kB RAM boards. The other data bits
@@ -391,13 +391,13 @@ int memory_rc2014_load_ram(int page, uint16_t addr, uint8_t value)
     return 1;
 }
 
-/* ROM off, page 0. The hotspot listing returns to this latch. */
+/* ROM on, page 0. PC stays 0 unless -pc set it. The hotspot listing returns here. */
 void memory_rc2014_disk_start(void)
 {
     rc_page = 0;
-    rc_rom_on = 0;
+    rc_rom_on = 1;
     rc_reset_page = 0;
-    rc_reset_rom_on = 0;
+    rc_reset_rom_on = 1;
 }
 
 uint8_t *memory_rc2014_rom(void)

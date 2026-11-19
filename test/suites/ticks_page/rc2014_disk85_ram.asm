@@ -2,7 +2,7 @@
 ; Byte 0 of this file is RAM address 0 on page 0.
 ; The name contains rc2014. A positional load would plant the hook.
 ; Offset 0 is the initialised byte. Offset 8 stays 0.
-; The runner sits at offset 0x8000. -pc 8000 starts it.
+; The runner sits at offset 0x8000. The ROM image jumps here.
 ; The pass line is BDOS_DISK_OK through the syscall trap.
 ; Port 0x30 is not used. SP starts at 0.
 ; -end 8100 stops on the jump. The six bytes there are the results.

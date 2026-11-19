@@ -1,9 +1,10 @@
 ; ROM image for the 8085 disk harness.
-; Byte 0 of this file is ROM address 0.
-; The string pool sits in the image. ticks does not place the file.
+; Byte 0 of this file is ROM address 0. Execution starts there.
+; The jump to the runner is in this image. ticks does not place the file.
 
     org 0
 
+    jp $8000
     defs $7131 - $
     defm "BDOS_DISK_OK"
     defb 0

@@ -194,9 +194,9 @@ z180_common: z180_common.bin
 
 # 8085 disk harness. The ROM image and the RAM image include the layout.
 # The RAM file name contains rc2014. The hook at 0x0008 stays off.
-# -pc 8000 is the runner inside the RAM image.
+# Execution starts at ROM address 0. That image jumps to the runner.
 disk85: disk85_rom.bin rc2014_disk85_ram.bin
-	@z88dk-ticks -m8085 -b rc2014 -pc 8000 -end 8100 -output disk85.out -disk disk85_rom.bin rc2014_disk85_ram.bin > disk85.txt
+	@z88dk-ticks -m8085 -b rc2014 -end 8100 -output disk85.out -disk disk85_rom.bin rc2014_disk85_ram.bin > disk85.txt
 	@grep -qx 'BDOS_DISK_OK' disk85.txt
 	@got=$$(od -An -tx1 -j33024 -N6 disk85.out | tr -s ' \n' ' ' | sed 's/^ //;s/ $$//'); \
 	if [ "$$got" != "$(DISK85)" ]; then \
@@ -208,7 +208,9 @@ disk85: disk85_rom.bin rc2014_disk85_ram.bin
 			echo "$(RED)ticks_page disk85 $$3: got '$$got'$(RESET)"; exit 1; \
 		fi; \
 	}; \
-	check $$((0x11000)) 00 "ROM 0"; \
+	check $$((0x11000)) c3 "ROM reset"; \
+	check $$((0x11001)) 00 "ROM reset low"; \
+	check $$((0x11002)) 80 "ROM reset high"; \
 	check $$((0x18131)) 42 "ROM literal"; \
 	check $$((0x18628)) d1 "ROM fatwin"; \
 	check $$((0x18893)) c3 "ROM copy"; \
