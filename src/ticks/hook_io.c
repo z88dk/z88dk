@@ -8,10 +8,15 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#ifdef WIN32
+#if defined(_WIN32) || defined(WIN32)
 #include        <io.h>
+/* A 28-bit LBA times 512 needs 37 bits. off_t may be 32 bits. */
+#  define TICKS_LSEEK _lseeki64
+   typedef int64_t ide_off_t;
 #else
 #include        <unistd.h>
+#  define TICKS_LSEEK lseek
+   typedef off_t ide_off_t;
 #endif
 
 /* MinGW open() is text mode unless this bit is set. A line feed in a
@@ -262,20 +267,30 @@ static void cmd_seek(void)
     }
 }
 
+/* Byte offset of the LBA in c:b:l:h. The LBA fits in 32 bits.
+   The byte offset needs 37 bits, so the multiply stays in uint64_t. */
+static ide_off_t ide_byte_offset(void)
+{
+    uint64_t lba = ((uint64_t)(unsigned)(c | (b << 8)) << 16)
+                 |  (unsigned)(l | (h << 8));
+    return (ide_off_t)(lba * 512u);
+}
+
 static void cmd_ide_identify(void)
 {
     int fd = ide_fd();
-    off_t sz;
-    unsigned long blocks;
+    ide_off_t sz;
+    uint64_t blocks;
 
     if ( fd < 0 )
         return;
-    sz = lseek(fd, 0, SEEK_END);
+    sz = TICKS_LSEEK(fd, 0, SEEK_END);
     if ( sz < 0 ) {
         SET_ERROR(normalise_errno());
         return;
     }
-    blocks = (unsigned long)(sz / 512);
+    /* dehl holds the low 32 bits of the sector count. */
+    blocks = (uint64_t)sz / 512u;
     l = (int)(blocks & 255);
     h = (int)((blocks >> 8) & 255);
     e = (int)((blocks >> 16) & 255);
@@ -293,13 +308,13 @@ static void cmd_ide_select(void)
 static void cmd_ide_read(void)
 {
     int fd = ide_fd();
-    off_t dest;
+    ide_off_t dest;
 
     if ( fd < 0 )
         return;
-    dest = (( ( c | b << 8) << 16 ) | (l | h << 8)) * 512;
+    dest = ide_byte_offset();
 
-    if ( lseek(fd, dest, SEEK_SET) != dest ) {
+    if ( TICKS_LSEEK(fd, dest, SEEK_SET) != dest ) {
         SET_ERROR(normalise_errno());
         return;
     }
@@ -318,13 +333,13 @@ static void cmd_ide_read(void)
 static void cmd_ide_write(void)
 {
     int fd = ide_fd();
-    off_t dest;
+    ide_off_t dest;
 
     if ( fd < 0 )
         return;
-    dest = (( ( c | b << 8) << 16 ) | (l | h << 8)) * 512;
+    dest = ide_byte_offset();
 
-    if ( lseek(fd, dest, SEEK_SET) != dest ) {
+    if ( TICKS_LSEEK(fd, dest, SEEK_SET) != dest ) {
         SET_ERROR(normalise_errno());
         return;
     }
