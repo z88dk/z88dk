@@ -88,8 +88,8 @@ ENDIF
     SECTION code_bifrost2
     SECTION code_bifrost_h
     SECTION code_bifrost_l
-    SECTION code_nivrvanm
-    SECTION code_nivrvanp
+    SECTION code_nirvanam
+    SECTION code_nirvanap
     SECTION code_SMSlib
     SECTION code_user
     SECTION CODE_END
