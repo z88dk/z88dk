@@ -191,9 +191,9 @@ Two boundaries follow ChaN rather than Microsoft FAT specification 1.03. A clust
 
 A FAT12 entry is 12 bits packed as `clst + clst/2` bytes from the start of the FAT. An even cluster owns the low 12 bits. An odd cluster owns the high 12 bits. The two bytes can sit in different sectors. The size of the FAT is `(n_fatent * 3 + 1) / 2` bytes, rounded up to sectors. A free count on FAT12 walks clusters 2 through `n_fatent - 1`. Clusters 0 and 1 are reserved.
 
-The IDE address is 28 bits. A partition, FAT, or data area at LBA `$10000000` or above fails the mount. An FSInfo sector past that LBA leaves the hint clear and the mount still succeeds. `$0FFFFFFF` is the last sector the interface can name.
+The IDE address is 28 bits. The boot sector LBA plus the sector count must end at or below `$10000000`. That end covers the FAT, the data area, and the second FAT. An end of `$10000000` still mounts. One sector past that returns 19. A sum that wraps 32 bits returns 19. A partition start at `$10000000` or above is skipped. An FSInfo sector past that LBA leaves the hint clear. The mount still succeeds. `$0FFFFFFF` is the last sector the interface can name.
 
-A FAT16 root entry count has to be a non-zero multiple of 16. Every directory stops at 2048 entries, because the directory offset is 16 bits. FAT32 requires `FATSz16 = 0`, `FSVer = 0`, and a root entry count of 0. The root cluster is `BPB_RootClus`. A root cluster below 2, or at or above `n_fatent`, is rejected. When mirroring is off, the active FAT is the one in `BPB_ExtFlags`, and the other copy is not written. FAT32 FSInfo is read at mount. A sync writes the free count and the next free cluster when either has changed.
+A FAT16 root entry count has to be a non-zero multiple of 16. Every directory stops at 2048 entries, because the directory offset is 16 bits. FAT32 requires `FATSz16 = 0`, `FSVer = 0`, and a root entry count of 0. The root cluster is `BPB_RootClus`. A root cluster below 2, or at or above `n_fatent`, is rejected. When mirroring is off, bit 7 of the low byte of `BPB_ExtFlags` selects one FAT. The active index is in bits 0 to 3 of that byte. The other copy is not written. FAT32 FSInfo is read at mount. The lead signature is `52 52 61 41`. A sync writes the free count and the next free cluster when either has changed.
 
 ## Disk drivers
 

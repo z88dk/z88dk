@@ -61,15 +61,16 @@
 ;   nclst == $FFF5 stays FAT16 (ChaN MAX_FAT16). Spec 1.03 would use FAT32.
 ;   nclst > $0FFFFFF5 is rejected (ChaN MAX_FAT32). put_fat keeps 28 bits.
 ;   fatsz >= $200000 is rejected (ChaN ff16p2, before fatsz is doubled)
-;   a partition, fatbase, database, or active FAT at LBA >= $10000000 fails
+;   bsect + TotSec at or below $10000000. That covers the FAT and the data.
+;   A partition start at or past $10000000 is skipped.
 ;   An FSInfo LBA >= $10000000 leaves the hint clear. The mount still succeeds.
-;   Neither boundary is built by test/fatfs. BPB_Media is never read.
+;   A volume past the limit returns L = 19. BPB_Media is never read.
 ;   FAT16 root count is a non-zero multiple of 16. A FAT32-shaped VBR
 ;   whose cluster count falls in the FAT16 band is rejected.
 ;   FAT32 requires FATSz16 == 0, FSVer == 0 and RootEntCnt == 0
 ;   csize is 2^n. SecPerClus >= 65 (64 KiB clusters) is refused with
 ;   L = 19. A 64 KiB cluster is 0 in the 16-bit sector math.
-;   FAT32 with mirroring off uses the active FAT in BPB_ExtFlags and
+;   FAT32 with mirroring off uses bit 7 of the low BPB_ExtFlags byte and
 ;   does not write the other copy. A bad cluster ($FFF7 / $0FFFFFF7)
 ;   is an error, not a link. fs_type is stored only after every check.
 ;   DIR_Name[0] == $05 compares as $E5. dir_create stores $E5 as $05.

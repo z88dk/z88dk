@@ -178,6 +178,23 @@ static void put_fat32(uint8_t csize, uint16_t nroot, uint16_t fsver)
     disk_put_sector(0, s);
 }
 
+/* Lead bytes 1 and 2 select RRaA (52 52) or the old RaAA fixture (61 41). */
+static void plant_fsinfo(uint8_t b1, uint8_t b2)
+{
+    disk_set(48, 6);
+    disk_set(49, 0);
+    disk_set(6 * 512 + 0, 0x52);
+    disk_set(6 * 512 + 1, b1);
+    disk_set(6 * 512 + 2, b2);
+    disk_set(6 * 512 + 3, 0x41);
+    disk_set(6 * 512 + 484, 0x72);
+    disk_set(6 * 512 + 485, 0x72);
+    disk_set(6 * 512 + 486, 0x41);
+    disk_set(6 * 512 + 487, 0x61);
+    disk_set(6 * 512 + 510, 0x55);
+    disk_set(6 * 512 + 511, 0xAA);
+}
+
 #ifdef MINIFAT_API
 static FATFS api_fs;
 static FIL api_fil;
@@ -1147,14 +1164,99 @@ int main(void)
     rc = fat_mount();
     expect("mount_fatsz_fit", rc == 0 && cpm_fat_vol.fs_type == 3);
 
-    /* nclst past 28 bits. fatsz stays under the cap, so the cover check would pass. */
+    /* TotSec $FFFFFFFF ends past $10000000. The end test returns 19. */
     disk_zero();
     memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
     put_fat32(1, 0, 0);
     disk_put_le32(36, 0x001FFFFFu);
     disk_put_le32(32, 0xFFFFFFFFu);
     rc = fat_mount();
-    expect("mount_nclst_max", rc == 13 && cpm_fat_vol.fs_type == 0);
+    expect("mount_nclst_max", rc == 19 && cpm_fat_vol.fs_type == 0);
+
+    /* bsect 0 + TotSec $10000000 is the last end that mounts.
+       csize 64 and fatsz $80000 give nclst $003FDFFF. */
+    disk_zero();
+    memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
+    put_fat32(64, 0, 0);
+    disk_put_le32(36, 0x00080000u);
+    disk_put_le32(32, 0x10000000u);
+    rc = fat_mount();
+    expect("mount_end_exact", rc == 0 && cpm_fat_vol.fs_type == 3);
+
+    disk_zero();
+    memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
+    put_fat32(64, 0, 0);
+    disk_put_le32(36, 0x00080000u);
+    disk_put_le32(32, 0x10000001u);
+    rc = fat_mount();
+    expect("mount_end_over", rc == 19 && cpm_fat_vol.fs_type == 0);
+
+    /* Partition start 1 plus TotSec $FFFFFFFF wraps the 32-bit sum. */
+    disk_zero();
+    memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
+    put_fat32(64, 0, 0);
+    {
+        uint8_t vbr[512];
+
+        memcpy(vbr, sec, 512);
+        put_le32(vbr + 32, 0xFFFFFFFFu);
+        disk_put_sector(1, vbr);
+    }
+    disk_fill(0, 0, 512);
+    disk_set(510, 0x55);
+    disk_set(511, 0xAA);
+    disk_put_le32(454, 1);
+    rc = fat_mount();
+    expect("mount_end_wrap", rc == 19 && cpm_fat_vol.fs_type == 0);
+
+    /* Lead signature 52 61 41 41 is not an info sector. 52 52 61 41 is. */
+    disk_zero();
+    memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
+    ram_nsect = 48;
+    fat_last_clst = 0;
+    fat_fsi_lba = 0;
+    put_fat32(1, 0, 0);
+    plant_fsinfo(0x61, 0x41);
+    rc = fat_mount();
+    expect("mount_fsinfo_bad", rc == 0 && cpm_fat_vol.fs_type == 3
+        && fat_last_clst == 0 && cpm_fat_vol.free_valid == 0 && fat_fsi_lba == 0);
+
+    disk_zero();
+    memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
+    ram_nsect = 48;
+    put_fat32(1, 0, 0);
+    plant_fsinfo(0x52, 0x61);
+    disk_put_le32(6 * 512 + 488, 10);
+    disk_put_le32(6 * 512 + 492, 5);
+    rc = fat_mount();
+    expect("mount_fsinfo", rc == 0 && fat_last_clst == 5
+        && cpm_fat_vol.free_clst == 10 && cpm_fat_vol.free_valid == 1
+        && fat_fsi_lba == 6);
+
+    /* Bit 7 of the low ExtFlags byte selects one FAT. Bit 15 does not. */
+    disk_zero();
+    memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
+    ram_nsect = 48;
+    put_fat32(1, 0, 0);
+    disk_set(16, 2);
+    disk_set(40, 0x80);
+    disk_set(41, 0);
+    disk_put_le32(32, 66551u);
+    rc = fat_mount();
+    expect("mount_extflags", rc == 0 && cpm_fat_vol.fs_type == 3
+        && cpm_fat_vol.n_fats == 1);
+
+    disk_zero();
+    memset(&cpm_fat_vol, 0, sizeof cpm_fat_vol);
+    ram_nsect = 48;
+    put_fat32(1, 0, 0);
+    disk_set(16, 2);
+    disk_set(40, 0);
+    disk_set(41, 0x80);
+    disk_put_le32(32, 66551u);
+    rc = fat_mount();
+    expect("mount_extflags_hi", rc == 0 && cpm_fat_vol.fs_type == 3
+        && cpm_fat_vol.n_fats == 2);
 
     /* nclst $00100000 is inside $0FFFFFF5. fatsz $2002 covers n_fatent $100002. */
     disk_zero();
@@ -1473,8 +1575,8 @@ int main(void)
     disk_set(518,  0xFF);
     disk_set(519,  0x0F);
     disk_set(6 * 512 + 0,  0x52);
-    disk_set(6 * 512 + 1,  0x61);
-    disk_set(6 * 512 + 2,  0x41);
+    disk_set(6 * 512 + 1,  0x52);
+    disk_set(6 * 512 + 2,  0x61);
     disk_set(6 * 512 + 3,  0x41);
     disk_set(6 * 512 + 484,  0x72);
     disk_set(6 * 512 + 485,  0x72);
@@ -1495,7 +1597,9 @@ int main(void)
            disk_get(6 * 512 + 492) == 2 && disk_get(6 * 512 + 493) == 0 &&
            disk_get(6 * 512 + 494) == 0 && disk_get(6 * 512 + 495) == 0);
     expect("fsinfo_sig",
-           disk_get(6 * 512) == 0x52 && disk_get(6 * 512 + 484) == 0x72 &&
+           disk_get(6 * 512) == 0x52 && disk_get(6 * 512 + 1) == 0x52 &&
+           disk_get(6 * 512 + 2) == 0x61 && disk_get(6 * 512 + 3) == 0x41 &&
+           disk_get(6 * 512 + 484) == 0x72 &&
            disk_get(6 * 512 + 510) == 0x55 && disk_get(6 * 512 + 511) == 0xAA);
 
 #ifdef MINIFAT_API

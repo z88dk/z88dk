@@ -319,6 +319,21 @@ fat_mount_tsz16:
 fat_mount_tsz:
     ld      (fat_work+4),hl         ;total sectors
     ld      (fat_work+6),de
+    ld      bc,(fat_winsect)        ;bsect + tsect at or below $10000000
+    add     hl,bc                   ;sum low
+    ex      de,hl                   ;DE is the low sum. Carry stays.
+    ld      bc,(fat_winsect+2)
+    adc     hl,bc                   ;sum high
+    jp      C,fat_mount_vol_bad     ;the sum wrapped past 32 bits
+    ld      a,h
+    cp      (MAX_LBA28>>24)+1       ;end versus $10000000
+    jr      C,fat_mount_volok       ;the end is below the limit
+    jp      NZ,fat_mount_vol_bad    ;the end is above the limit
+    ld      a,l
+    or      d
+    or      e
+    jp      NZ,fat_mount_vol_bad    ;the end is above the limit
+fat_mount_volok:
     ld      hl,(_cpm_fat_vol+20)    ;fatsz
     ld      de,(_cpm_fat_vol+22)
     ld      a,(_cpm_fat_vol+24)
@@ -640,7 +655,7 @@ fat_mount_r32:
     xor     a
     ld      (_cpm_fat_vol+2),a      ;FAT32 has no static root count
     ld      (_cpm_fat_vol+3),a
-    ld      a,(fatwin+BPB_ExtFlags+1)
+    ld      a,(fatwin+BPB_ExtFlags) ;bit 7 of the low byte
     and     $80                     ;offset 40 bit 7 disables mirroring
     jr      Z,fat_mount_ok          ;mirroring stays enabled
     ld      a,(fatwin+BPB_ExtFlags)
@@ -696,6 +711,10 @@ fat_mount_cwd32:
     ld      hl,0                    ;L is 0 and H is 0
     scf                             ;carry is set
     ret
+; The volume end is past 28 bits. 19 is the same code as a refused csize.
+fat_mount_vol_bad:
+    ld      a,19                    ;the volume end is past $10000000
+    ld      (_cpm_fat_vol+27),a
 ; Copy the stored code into L, then clear +27.
 fat_mount_fail:
     ld      a,(_cpm_fat_vol+27)     ;1, 3, 19, or 0
@@ -754,10 +773,10 @@ fat_seed_fsinfo:
     cp      $52                     ;lead byte 'R'
     jp      NZ,seed_drop            ;the lead signature is not RRaA
     ld      a,(hl+)
-    cp      $61                     ;lead byte 'a'
+    cp      $52                     ;lead byte 'R'
     jp      NZ,seed_drop            ;the lead signature is not RRaA
     ld      a,(hl+)
-    cp      $41                     ;lead byte 'A'
+    cp      $61                     ;lead byte 'a'
     jp      NZ,seed_drop            ;the lead signature is not RRaA
     ld      a,(hl)
     cp      $41                     ;lead byte 'A'
