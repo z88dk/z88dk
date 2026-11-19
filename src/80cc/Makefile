@@ -69,8 +69,9 @@ ir_selftest$(EXESUFFIX): $(IR_SELFTEST_SRCS)
 install: z88dk-80cc$(EXESUFFIX)
 	$(INSTALL) -m 755 z88dk-80cc$(EXESUFFIX) $(PREFIX)/bin/z88dk-80cc$(EXESUFFIX)
 
-test:
-	regression/run-all.sh
+test: ir_selftest$(EXESUFFIX)
+	./ir_selftest$(EXESUFFIX)
+	$(MAKE) -C ../../test/suites/long_ir
 
 clean :
 	$(RM) *.o *~ core z88dk-80cc$(EXESUFFIX) ir_selftest$(EXESUFFIX)
