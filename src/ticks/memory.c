@@ -7,6 +7,7 @@
 #include "debugger.h"
 #include "ticks_lua.h"
 #include <stdio.h>
+#include <string.h>
 
 
 
@@ -25,6 +26,10 @@ static void     zx_handle_out(int port, int value);
 static void     z180_init(void);
 static uint8_t *z180_get_memory_addr(uint32_t pc, memtype type);
 static void     z180_handle_out(int port, int value);
+static int      z180_handle_in(int port);
+static void     rc2014_init(void);
+static uint8_t *rc2014_get_memory_addr(uint32_t pc, memtype type);
+static void     rc2014_handle_out(int port, int value);
 static void     rabbit_init(void);
 static uint8_t *rabbit_get_memory_addr(uint32_t pc, memtype type);
 static void     rabbit_write_hook(uint16_t addr, uint8_t value);
@@ -48,11 +53,32 @@ static unsigned char *zx_rom[2];
 
 static int            inst_mode = 1;       // We're reading an instruction
 
+/* Declared here so load_memory can mirror an image onto both RC2014 pages.
+   rc2014_init() allocates them. A firmware load writes rc_rom only.
+   An image load writes one 32 kB ROM or one 64 kB RAM page from address 0. */
+static uint8_t       *rc_ram[2];
+static uint8_t       *rc_rom;
+static int            rc_page;
+static int            rc_rom_on;
+/* Latch after the image is loaded. The hotspot listing returns here. */
+static int            rc_reset_page;
+static int            rc_reset_rom_on;
+
+/* Declared here so memory_reset_paging can restore the power-on map.
+   z180_init() allocates the store. */
+static uint8_t       *z180_mem = NULL;
+static uint8_t        z180_CBAR = 0xf0;
+static uint8_t        z180_CBR = 0x00;
+static uint8_t        z180_BBR = 0x00;
+static uint8_t        z180_ICR = 0x00;
+
 static memory_func   get_mem_addr;
 static void        (*write_hook)(uint16_t addr, uint8_t value);
+static int         memory_is_write;   /* put/load: write-through under a ROM window */
 
-// Which banking scheme the debugger has to understand
-static enum { MODEL_OTHER, MODEL_RABBIT, MODEL_ZXN, MODEL_MSX } current_model = MODEL_OTHER;
+// Which banking scheme the debugger has to understand.
+// Z180 and RC2014 have their own maps. They are not z80asm BANK images.
+static enum { MODEL_OTHER, MODEL_RABBIT, MODEL_ZXN, MODEL_MSX, MODEL_Z180, MODEL_RC2014 } current_model = MODEL_OTHER;
 static int lua_memory_model = 0;
 static void        (*handle_out)(int port, int value);
 static int         (*handle_in)(int port);
@@ -69,6 +95,8 @@ void memory_init(char *model) {
         standard_init();
     } else if ( strcmp(model, "z180") == 0 ) {
         z180_init();
+    } else if ( strcmp(model, "rc2014") == 0 ) {
+        rc2014_init();
     } else if ( strcmp(model, "rabbit") == 0 ) {
         rabbit_init();
     } else if ( strcmp(model, "msx") == 0 ) {
@@ -108,7 +136,16 @@ void load_memory(uint32_t pc, uint8_t value, memtype type)
 {
   if (lua_memory_write(pc, value, type, st) != -1)
     return;
+  memory_is_write = 1;
   *get_memory_addr(pc, type) = value;
+  /* Port 0x30 on the 128 kB boards switches the whole 64 kB. The loaded
+     image is written to both pages so the instruction after OUT 0x30 is
+     still there. A later store goes to the selected page only. */
+  if ( current_model == MODEL_RC2014 && rc_ram[0] != NULL ) {
+    rc_ram[0][pc & 0xffff] = value;
+    rc_ram[1][pc & 0xffff] = value;
+  }
+  memory_is_write = 0;
 }
 
 uint8_t put_memory(uint16_t pc, uint8_t b)
@@ -116,9 +153,15 @@ uint8_t put_memory(uint16_t pc, uint8_t b)
   bk.debugger_write_memory(pc, b);
   if (lua_memory_write(pc, b, MEM_TYPE_DATA, st) != -1)
     return b;
-  if (pc < c_rom_size)
+  /* -romsize protects a low ROM on the flat models. On the RC2014 a write
+     in the 32 kB window still reaches the RAM page. The ROM store is not
+     written. An address at 0x8000 or above keeps the -romsize rule. */
+  if (pc < c_rom_size &&
+      !(current_model == MODEL_RC2014 && pc < 0x8000))
     return *get_memory_addr(pc, MEM_TYPE_DATA);
+  memory_is_write = 1;
   *get_memory_addr(pc, MEM_TYPE_DATA) = b;
+  memory_is_write = 0;
   if (write_hook)
     write_hook(pc, b);
   return b;
@@ -151,60 +194,223 @@ void memory_reset_paging()
     for ( i = 0; i < 8; i++ )  {
         zxnext_mmu[i] = 0xff;
     }
+    /* Hotspot listing reads through this map. Restore the map from after
+       the load, the same way the ZX Next slots return to 0xFF. A RAM program
+       lists from page 0 with the ROM off. A RAM-only image lists the same way.
+       A firmware image, and a disk load that includes a ROM, list from the ROM.
+       A normal -output dump does not call this, so it still shows the final map. */
+    z180_CBAR = 0xf0;
+    z180_CBR = 0x00;
+    z180_BBR = 0x00;
+    z180_ICR = 0x00;
+    rc_page = rc_reset_page;
+    rc_rom_on = rc_reset_rom_on;
 }
 
-// Z180 MMU support
-static uint8_t *z180_mem = NULL;
-static uint8_t z180_CBAR = 0xf0;
-static uint8_t z180_CBR = 0x00;
-static uint8_t z180_BBR = 0x00;
+// Z180 MMU. 1 MB physical, 64 kB logical.
+// CBAR[3:0] is the bank-area base and CBAR[7:4] is the common-1 base, in 4 kB units.
+// Physical A19-A12 = (base + logical A15-A12) mod 256. A11-A0 pass through.
+// Common 0 uses base 0, the bank area uses BBR, common 1 uses CBR.
+// Reset CBAR is 0xF0 with BBR and CBR at 0, which is the low 64 kB.
 
-#define Z180_IO_CBR 56
-#define Z180_IO_BBR 57
-#define Z180_IO_CBAR 58
+#define Z180_OFF_CBR  0x38
+#define Z180_OFF_BBR  0x39
+#define Z180_OFF_CBAR 0x3a
+#define Z180_OFF_ICR  0x3f
+
+/* ICR[7:6] places the 64 internal registers at 0x00, 0x40, 0x80, or 0xC0.
+   The low 8 port bits are the address. The high byte is not compared. */
+static int z180_internal_offset(int port)
+{
+    if ( (port & 0xc0) != (z180_ICR & 0xc0) )
+        return -1;
+    return port & 0x3f;
+}
 
 static uint8_t *z180_get_memory_addr(uint32_t pc, memtype type)
 {
-    /*
-    CBAR is an 8 bit I/O port that can be accessed by the processor's OUT and IN instructions. 
-    The lower 4 bits specify the starting address of the bank area, and the upper 4 give the start of common 1. 
-   */
-    // Are we in bank area?
-    int bank_start = ((z180_CBAR) & 0x0f) << 12;
-    int common1_start =  ((z180_CBAR) & 0xf0) << 8;
-    if ( pc >= bank_start && pc < common1_start ) {
-        // Bank area
-        // Physical = Logical + (BBR * 4096)
-        return &z180_mem[ (pc & 0x0fff) + (z180_BBR * 4096)];
-    } else if ( pc >= common1_start ) {
-        // Common 1
-        // Physical = Logical + (CBR * 4096)
-        return &z180_mem[ (pc & 0x0fff) + (z180_CBR * 4096)];
-    }
-    // Otherwise, it's common 0
-    return &z180_mem[pc & 0xffff];
+    unsigned la = pc & 0xffff;
+    unsigned page = la >> 12;
+    unsigned ba = z180_CBAR & 0x0f;
+    unsigned ca = z180_CBAR >> 4;
+    uint8_t base = 0;
+    uint32_t phys;
+
+    if ( type == MEM_TYPE_PHYSICAL && pc > 0xffff )
+        return &z180_mem[pc & 0xfffff];
+
+    if ( page < ba )
+        base = 0;
+    else if ( page < ca )
+        base = z180_BBR;
+    else
+        base = z180_CBR;
+
+    phys = ((uint32_t)(uint8_t)(base + page) << 12) | (la & 0x0fff);
+    return &z180_mem[phys & 0xfffff];
 }
 
 static void z180_handle_out(int port, int value)
 {
-    switch (port) {
-    case Z180_IO_CBR:
-        z180_CBR = value;
+    switch ( z180_internal_offset(port) ) {
+    case Z180_OFF_CBR:
+        z180_CBR = (uint8_t)value;
         break;
-    case Z180_IO_BBR:
-        z180_BBR = value;
+    case Z180_OFF_BBR:
+        z180_BBR = (uint8_t)value;
         break;
-    case Z180_IO_CBAR:
-        z180_CBAR = value;
+    case Z180_OFF_CBAR:
+        z180_CBAR = (uint8_t)value;
         break;
+    case Z180_OFF_ICR:
+        z180_ICR = (uint8_t)value;
+        break;
+    default:
+        break;
+    }
+}
+
+static int z180_handle_in(int port)
+{
+    switch ( z180_internal_offset(port) ) {
+    case Z180_OFF_CBR:
+        return z180_CBR;
+    case Z180_OFF_BBR:
+        return z180_BBR;
+    case Z180_OFF_CBAR:
+        return z180_CBAR;
+    case Z180_OFF_ICR:
+        return z180_ICR;
+    default:
+        return -1;
     }
 }
 
 static void z180_init(void) 
 {
     z180_mem = calloc(1024*1024, sizeof(char));
+    z180_CBAR = 0xf0;
+    z180_CBR = 0x00;
+    z180_BBR = 0x00;
+    z180_ICR = 0x00;
+    current_model = MODEL_Z180;
     get_mem_addr = z180_get_memory_addr;
     handle_out = z180_handle_out;
+    handle_in = z180_handle_in;
+}
+
+/* The SCZ180 preamble sets CBAR to 0xE0 and CBR to 0xF0. Logical
+   0xE000-0xFFFF then reads physical 0xFE000-0xFFFFF. A flat ticks file is
+   one image, so that window starts as a copy of the loaded 64 kB. A later
+   write to one store does not change the other. Any other bank stays 0
+   until the program writes it. -b standard does not call this. */
+void memory_z180_seal_common1(void)
+{
+    if ( current_model != MODEL_Z180 || z180_mem == NULL )
+        return;
+    memcpy(z180_mem + 0xF0000, z180_mem, 65536);
+}
+
+// RC2014. Port 0x38 is the standard 32 kB ROM page, on every pageable-ROM
+// machine. Bit 0 = 0 maps that ROM over 0x0000-0x7FFF for reads. Bit 0 = 1
+// maps RAM. A RAM program, and a -disk load of only a RAM image, leave the
+// ROM off. A firmware image and a -disk ROM image start at address 0 with
+// the ROM on. A write in the
+// window goes to RAM and leaves the ROM store unchanged.
+// Port 0x30 bit 0 is shadow RAM: a second 64 kB page on the SC108, the
+// Memory Module, and the other 128 kB RAM boards. The other data bits
+// are ignored.
+
+static uint8_t *rc2014_get_memory_addr(uint32_t pc, memtype type)
+{
+    (void)type;
+    pc &= 0xffff;
+    if ( rc_rom_on && !memory_is_write && pc < 0x8000 )
+        return &rc_rom[pc];
+    return &rc_ram[rc_page & 1][pc];
+}
+
+static void rc2014_handle_out(int port, int value)
+{
+    switch ( port & 0xff ) {
+    case 0x30:
+        rc_page = value & 1;
+        break;
+    case 0x38:
+        rc_rom_on = (value & 1) == 0;
+        break;
+    default:
+        break;
+    }
+}
+
+static void rc2014_init(void)
+{
+    rc_ram[0] = calloc(65536, 1);
+    rc_ram[1] = calloc(65536, 1);
+    rc_rom = calloc(32768, 1);
+    memset(rc_rom, 0xff, 32768);
+    rc_page = 0;
+    rc_rom_on = 0;
+    rc_reset_page = 0;
+    rc_reset_rom_on = 0;
+    current_model = MODEL_RC2014;
+    get_mem_addr = rc2014_get_memory_addr;
+    handle_out = rc2014_handle_out;
+}
+
+int memory_is_rc2014(void)
+{
+    return current_model == MODEL_RC2014;
+}
+
+/* Firmware image byte. Does not touch either RAM page. */
+int memory_rc2014_load_rom(uint16_t addr, uint8_t value)
+{
+    if ( current_model != MODEL_RC2014 || rc_rom == NULL || addr >= 32768 )
+        return 0;
+    rc_rom[addr] = value;
+    return 1;
+}
+
+/* ROM on, page 0. Both RAM pages stay clear. The hotspot listing
+   returns to this latch, which is where the image was loaded. */
+void memory_rc2014_firmware_start(void)
+{
+    rc_page = 0;
+    rc_rom_on = 1;
+    rc_reset_page = 0;
+    rc_reset_rom_on = 1;
+}
+
+/* One RAM page. The ROM store is left alone. */
+int memory_rc2014_load_ram(int page, uint16_t addr, uint8_t value)
+{
+    if ( current_model != MODEL_RC2014 || page < 0 || page > 1 || rc_ram[page] == NULL )
+        return 0;
+    rc_ram[page][addr] = value;
+    return 1;
+}
+
+/* ROM on, page 0. PC stays 0 unless -pc set it. The hotspot listing returns here. */
+void memory_rc2014_disk_start(void)
+{
+    rc_page = 0;
+    rc_rom_on = 1;
+    rc_reset_page = 0;
+    rc_reset_rom_on = 1;
+}
+
+uint8_t *memory_rc2014_rom(void)
+{
+    return rc_rom;
+}
+
+uint8_t *memory_rc2014_ram(int page)
+{
+    if ( page < 0 || page > 1 )
+        return NULL;
+    return rc_ram[page];
 }
 
 
@@ -570,7 +776,8 @@ int rabbit_get_ioi_reg(int reg)
      MSX     16K in the 16K page nn */
 int memory_has_banks(void)
 {
-    return lua_memory_model ? lua_memory_has_banks() : current_model != MODEL_OTHER;
+    if (lua_memory_model) return lua_memory_has_banks();
+    return current_model == MODEL_RABBIT || current_model == MODEL_ZXN || current_model == MODEL_MSX;
 }
 
 int memory_uses_lua(void)
@@ -705,6 +912,14 @@ const char *memory_mmu_text(void)
     case MODEL_MSX:
         snprintf(buf, sizeof(buf), "pages: 0=%02x 1=%02x 2=%02x 3=%02x",
             msx_mmu[0], msx_mmu[1], msx_mmu[2], msx_mmu[3]);
+        return buf;
+    case MODEL_Z180:
+        snprintf(buf, sizeof(buf), "cbar=%02X cbr=%02X bbr=%02X icr=%02X",
+            z180_CBAR, z180_CBR, z180_BBR, z180_ICR);
+        return buf;
+    case MODEL_RC2014:
+        snprintf(buf, sizeof(buf), "ram page=%d rom=%s",
+            rc_page, rc_rom_on ? "on" : "off");
         return buf;
     default:
         return NULL;

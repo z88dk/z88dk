@@ -59,18 +59,44 @@ void z180_otdmr(uint8_t opcode)
 }
 
 
+/* Register field of IN0/OUT0. Official ops use B, C, D, E, H, L, and A. */
+static uint8_t *z180_io_reg(uint8_t opcode)
+{
+    switch ( (opcode >> 3) & 7 ) {
+    case 0: return &b;
+    case 1: return &c;
+    case 2: return &d;
+    case 3: return &e;
+    case 4: return &h;
+    case 5: return &l;
+    case 7: return &a;
+    default: return NULL;
+    }
+}
+
 void z180_in0(uint8_t opcode)
 {
     uint8_t p = get_memory_inst(pc++);
+    uint8_t *rp = z180_io_reg(opcode);
+    uint8_t v = (uint8_t)in(p);
 
-    UNIMPLEMENTED(0xed00|opcode, "in0");
+    if ( rp ) {
+        *rp = v;
+        /* Same lazy flags as IN r,(C). Carry stays. */
+        ff = (ff & -256) | (fr = v);
+        fa = v | 256;
+        fb = 0;
+    }
     st += 12;
 }
 
 void z180_out0(uint8_t opcode)
 {
     uint8_t p = get_memory_inst(pc++);
-    UNIMPLEMENTED(0xed00|opcode, "out0");
+    uint8_t *rp = z180_io_reg(opcode);
+
+    if ( rp )
+        out(p, *rp);
     st += 13;
 }
 

@@ -65,3 +65,4 @@ zcc +rc2014 -subtype=cpm -clib=sdcc_iy -create-app …
 1. Hybrid classic 8085 consoles: FILE flags / cook layer — see `library-classic`.  
 2. Mixed multi-CPU trees: isolate via **lst**, not globs.  
 3. Related: `cpu-8085`, `library-newlib`, `library-classic`.
+4. ticks: `-b rc2014`. Port `0x38` is the standard 32 kB ROM page. A file of at most 32 kB loaded at 0 is that ROM (ROM on, RAM clear, no hook traps). A longer file is a RAM program. `-disk` with one file loads a RAM image (at most 64 kB) on both pages. The ROM stays off and `-pc` sets the start. Two files are a ROM image (at most 32 kB) and a RAM image. Execution then starts at ROM address 0 unless `-pc` is set. An optional third file is RAM page 1. The hook traps stay off. Port `0x30` is shadow RAM on the SC108, the Memory Module, and the other 128 kB boards. See `doc/ticks-paging.md`.

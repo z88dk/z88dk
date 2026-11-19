@@ -15,6 +15,7 @@ extern backend_t ticks_debugger_backend;
 static long long c_max_runticks = 1e8;
 static char  *c_output = NULL;
 static char  *c_memory_model = "standard";
+static int    c_memory_model_set = 0;
 
 
 int    c_rc2014_mode = 0;
@@ -27,6 +28,9 @@ int    c_autolabel = 0;
 int    c_z80asm_tests = 0;
 int    c_no_cycles = 0;      /* suppress end-of-run cycle-count printf */
 static const char *c_lua_file = NULL;
+static const char *c_disk_rom = NULL;
+static const char *c_disk_ram = NULL;
+static const char *c_disk_page1 = NULL;
 
 static char   cmd_arguments[255];
 static int    cmd_arguments_len = 0;
@@ -64,6 +68,104 @@ static int load_memory_range(FILE *fh, uint16_t address, size_t length, memtype 
         load_memory((uint16_t)(address + i), (uint8_t)value, type);
     }
     return 1;
+}
+
+/* RC2014 firmware. The file is the 32 kB ROM. RAM pages stay clear.
+   The name trap is not planted. */
+static int load_rc2014_rom_file(FILE *fh, size_t length)
+{
+    size_t i;
+    int value;
+
+    for (i = 0; i < length; i++) {
+        value = fgetc(fh);
+        if (value == EOF)
+            return 0;
+        if (!memory_rc2014_load_rom((uint16_t)i, (uint8_t)value))
+            return 0;
+    }
+    memory_rc2014_firmware_start();
+    return 1;
+}
+
+/* Rabbit always pages. Z180 and ZX Next page only when -b was left unset,
+   so -b standard keeps the flat 64 kB. -b after either CPU flag still wins. */
+static void apply_memory_model(void)
+{
+    if ( israbbit() )
+        c_memory_model = "rabbit";
+    else if ( !c_memory_model_set && isz180() )
+        c_memory_model = "z180";
+    else if ( !c_memory_model_set && isz80n() )
+        c_memory_model = "zxn";
+    memory_init(c_memory_model);
+}
+
+/* One RC2014 image. A file longer than 65536 bytes is rejected.
+   max_file is 32768 for the ROM and 65536 for a RAM page.
+   Byte 0 of the file is address 0 of that store.
+   page < 0 writes the ROM. page 0 or 1 writes that RAM page.
+   page > 1 writes both RAM pages, which is the RAM-program load. */
+static void load_rc2014_image(const char *path, long max_file, int page)
+{
+    FILE *slice;
+    long size;
+    long i;
+    int value;
+    int ok;
+
+    slice = fopen(path, "rb");
+    if ( !slice )
+        exit_log(1, "File not found: %s\n", path);
+    if ( fseek(slice, 0, SEEK_END) != 0 ) {
+        fclose(slice);
+        exit_log(1, "Could not read required data from <%s>\n", path);
+    }
+    size = ftell(slice);
+    rewind(slice);
+    if ( size <= 0 || size > 65536 ) {
+        fclose(slice);
+        exit_log(1, "Incorrect length: %ld\n", size);
+    }
+    if ( size > max_file ) {
+        fclose(slice);
+        exit_log(1, "File longer than %ld bytes: %s\n", max_file, path);
+    }
+    for ( i = 0; i < size; i++ ) {
+        value = fgetc(slice);
+        if ( value == EOF )
+            ok = 0;
+        else if ( page < 0 )
+            ok = memory_rc2014_load_rom((uint16_t)i, (uint8_t)value);
+        else if ( page > 1 )
+            ok = memory_rc2014_load_ram(0, (uint16_t)i, (uint8_t)value)
+              && memory_rc2014_load_ram(1, (uint16_t)i, (uint8_t)value);
+        else
+            ok = memory_rc2014_load_ram(page, (uint16_t)i, (uint8_t)value);
+        if ( !ok ) {
+            fclose(slice);
+            exit_log(1, "Could not read required data from <%s>\n", path);
+        }
+    }
+    fclose(slice);
+}
+
+/* One file is a RAM image on both pages. ROM stays off and PC is unchanged.
+   A ROM image plus a RAM image is the hardware reset: ROM on, page 0, PC 0.
+   -pc replaces that PC. An optional third file is RAM page 1.
+   The name hook stays off. */
+static void load_rc2014_disk(void)
+{
+    if ( !c_disk_rom ) {
+        load_rc2014_image(c_disk_ram, 65536, 2);
+    } else {
+        load_rc2014_image(c_disk_rom, 32768, -1);
+        load_rc2014_image(c_disk_ram, 65536, 0);
+        if ( c_disk_page1 )
+            load_rc2014_image(c_disk_page1, 65536, 1);
+        memory_rc2014_disk_start();
+    }
+    c_rc2014_mode = 0;
 }
 
 static void write_output()
@@ -163,7 +265,28 @@ static void write_output()
 
             long l = 0;
             fwrite(&l, 4, 1, fh);  // 1001e wavlen
-            fwrite(&l, 4, 1, fh);   // 10022 sttap                      
+            fwrite(&l, 4, 1, fh);   // 10022 sttap
+
+            /* RC2014 second view. Bytes 0-65535 stay the logical map.
+               The register block ends near 0x10026. Pad to 0x11000, then
+               the 32 kB ROM, RAM page 0, and RAM page 1. */
+            if (memory_is_rc2014() && memory_rc2014_rom() != NULL) {
+                long pos = ftell(fh);
+                long target = 0x11000L;
+                uint8_t *view;
+
+                if (pos >= 0 && pos < target) {
+                    long pad = target - pos;
+                    while (pad-- > 0)
+                        fputc(0, fh);
+                }
+                view = memory_rc2014_rom();
+                fwrite(view, 1, 32768, fh);
+                view = memory_rc2014_ram(0);
+                fwrite(view, 1, 65536, fh);
+                view = memory_rc2014_ram(1);
+                fwrite(view, 1, 65536, fh);
+            }
         }
         fclose(fh);
     }
@@ -183,7 +306,12 @@ static void usage(void)
     printf("  -d             Enable debugger\n");
     printf("  -v             Verbose logging\n");
     printf("  -l X           Load file to address\n");
-    printf("  -b <model>     Memory model (zxn/zx/z180/msx)\n");
+    printf("  -b <model>     Memory model (standard/zxn/zx/z180/msx/rc2014)\n");
+    printf("                 -mz80n selects zxn, -mz180 selects z180, unless -b is set\n");
+    printf("                 -b rc2014: a file of at most 32 kB loaded at 0 is the ROM\n");
+    printf("  -disk <image> [<ram> [ram1]]\n");
+    printf("                 One file is RAM. The ROM stays off. -pc leads\n");
+    printf("                 A ROM image starts at 0 unless -pc is set\n");
     printf("  -banks         Load <input>_BANK_nn.bin bank images (Rabbit, ZX Next or MSX model)\n");
     printf("  -m8080         Emulate an 8080\n");
     printf("  -m8085         Emulate an 8085 (mostly)\n");
@@ -263,7 +391,7 @@ static void load_bank_images(const char *input)
 int main (int argc, char **argv){
   int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0, symbol_addr = -1;
   uint8_t opc, w, r, u;
-  FILE * fh;
+  FILE * fh = NULL;
 
   hook_init();
   set_backend(ticks_debugger_backend);
@@ -304,6 +432,7 @@ int main (int argc, char **argv){
             argc++;
           } else {
             c_memory_model = argv[1];
+            c_memory_model_set = 1;
           }
           break;
         case 'p':
@@ -354,6 +483,27 @@ int main (int argc, char **argv){
           c_max_runticks<0 && (c_max_runticks= 9e18);
           break;
         case 'd':
+          if ( strcmp(&argv[0][1], "disk") == 0 ) {
+            /* argv[0] is -disk. The loop consumes one more token after this.
+               One file is RAM. Two files are a ROM image and a RAM image. */
+            if ( argc < 2 || argv[1][0] == '-' )
+              exit_log(1, "-disk needs a RAM image\n");
+            if ( argc >= 3 && argv[2][0] != '-' ) {
+              c_disk_rom = argv[1];
+              c_disk_ram = argv[2];
+              if ( argc >= 4 && argv[3][0] != '-' ) {
+                c_disk_page1 = argv[3];
+                argv += 2;
+                argc -= 2;
+              } else {
+                argv += 1;
+                argc -= 1;
+              }
+            } else {
+              c_disk_ram = argv[1];
+            }
+            break;
+          }
           debugger_active = 1;
           debugger_init();
           argv--;
@@ -396,7 +546,6 @@ int main (int argc, char **argv){
             c_cpu = CPU_Z180;
           } else if ( strcmp(&argv[0][1],"mz80n") == 0 ) {
             c_cpu = CPU_Z80N;
-            c_memory_model = "zxn";
           } else if ( strcmp(&argv[0][1],"mr2ka") == 0 ) {
             c_cpu = CPU_R2KA;
           } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
@@ -475,9 +624,7 @@ int main (int argc, char **argv){
           exit(EXIT_FAILURE);
       }
     else{
-      if ( israbbit() )
-        c_memory_model = "rabbit";
-      memory_init(c_memory_model);
+      apply_memory_model();
 
       fh= fopen(argv[1], "rb");
       if( !fh )
@@ -512,6 +659,11 @@ int main (int argc, char **argv){
         // CP/M emulator
         if (256 + size > 0x10000) { fclose(fh); exit_log(1, "Binary too large: %d bytes at 0x0100 exceeds 64K\n", size); }
         if (!load_memory_range(fh, 256, size, MEM_TYPE_INST)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
+      } else if ( memory_is_rc2014() && load_address == 0 && pc == 0 &&
+                  size > 0 && size <= 32768 ) {
+        /* Firmware start. A longer file, or a load address other than 0,
+           stays a RAM program. The name trap is the RAM-program path. */
+        if (!load_rc2014_rom_file(fh, (size_t)size)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
       } else if( strstr(argv[1], "rc2014") != NULL ) {
         load_memory(0x08, 0xED, MEM_TYPE_INST);
         load_memory(0x09, 0xFE, MEM_TYPE_INST);
@@ -533,12 +685,29 @@ int main (int argc, char **argv){
           exit_log(1, "-banks needs a Rabbit, ZX Next or MSX memory model\n");
         load_bank_images(argv[1]);
       }
+      memory_z180_seal_common1();
     }
     ++argv;
     --argc;
   }
 
-  fclose(fh);
+  if ( c_disk_rom || c_disk_ram ) {
+    if ( size )
+      exit_log(1, "-disk does not take an input file\n");
+    apply_memory_model();
+    if ( !memory_is_rc2014() )
+      exit_log(1, "-disk needs -b rc2014\n");
+    load_rc2014_disk();
+    size = 1;
+    if ( c_load_banks ) {
+      if ( !memory_has_banks() )
+        exit_log(1, "-banks needs a Rabbit, ZX Next or MSX memory model\n");
+    }
+    memory_z180_seal_common1();
+  }
+
+  if ( fh )
+    fclose(fh);
   if (!size) {
     fprintf(stderr, "\nFile not specified or zero length\n");
     exit(EXIT_FAILURE);
