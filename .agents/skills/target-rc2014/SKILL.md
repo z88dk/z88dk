@@ -65,3 +65,4 @@ zcc +rc2014 -subtype=cpm -clib=sdcc_iy -create-app …
 1. Hybrid classic 8085 consoles: FILE flags / cook layer — see `library-classic`.  
 2. Mixed multi-CPU trees: isolate via **lst**, not globs.  
 3. Related: `cpu-8085`, `library-newlib`, `library-classic`.
+4. ticks: `-b rc2014`. Port `0x38` is the standard 32 kB ROM page. Port `0x30` is shadow RAM on the SC108, the Memory Module, and the other 128 kB boards. See `doc/ticks-paging.md`.

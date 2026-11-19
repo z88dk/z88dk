@@ -3692,9 +3692,10 @@ static void handle_ed_page(void)
         else if ( isz80n() )  z80n_mirror();
         else st += 8;
         break;
-    case 0x28:    // (ZXN) bsla de,b // (R4K) LDF PY,(lmn) // (KC160) LD AHL,(IY+d)
+    case 0x28:    // (ZXN) bsla de,b // (R4K) LDF PY,(lmn) // (Z180) IN0 L,(n) // (KC160) LD AHL,(IY+d)
         if ( iskc160() ) kc160_ld_r24_ixysd(opc);
         else if ( israbbit4k()) r4k_ldf_pd_ilmn(opc);
+        else if ( canz180()) z180_in0(opc);
         else if ( isz80n() ) { // BSLA DE,B
             long long old_st = st;
             unsigned short old_ff = ff, old_fa = fa, old_fb = fb, old_fr = fr;

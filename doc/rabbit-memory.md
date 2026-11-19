@@ -283,7 +283,9 @@ hexadecimal with a `$` or `0x` prefix. A hit message prints the address in
 the same style, for example `Hit breakpoint 1: @$1:$E000 (_bank1_inc)`.
 
 The ZXN and MSX memory models of `z88dk-ticks` use the same notation, and
-`-banks` loads their bank images in the same way. On the ZXN, bank N is the 8K
+`-banks` loads their bank images in the same way. The Z180 MMU and the
+RC2014 ROM page are separate models. They do not use `-banks`. See
+[ticks-paging.md](ticks-paging.md). On the ZXN, bank N is the 8K
 page N (and N + 1) in MMU slots 6 and 7. On the MSX, the bank is the 16K page
 at 0x8000, and pages 0 to 3 hold the 64K image. The ZXN is tested with the
 real `zxn_banked_call.asm`. The MSX is not tested with a real MSX banked

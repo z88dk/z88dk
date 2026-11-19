@@ -58,7 +58,7 @@ Run **`z88dk-ticks`** with no arguments to print usage.
 |------|---------------------------|
 | CPUs | `-m8080`, `-m8085`, `-mgbz80`, `-mz80`, `-mz80_strict`, `-mz180`, `-mz80n`, `-mez80_z80`, `-mr800`, `-mkc160`, `-mkc160_z80`, Rabbit `-mr2ka` … `-mr6k` |
 | Control | `-pc`, `-start`, `-end`, `-counter`, `-w`, `-trace`, `-d` / `-debug` debugger |
-| Memory | `-l` load address, `-b` model, `-rom`, `-output` dump |
+| Memory | `-l` load address, `-b` model, `-rom`, `-output` dump. `-mz180` selects `z180` and `-mz80n` selects `zxn` unless `-b` is set. `-b rc2014` is the 32 kB ROM page plus 128 kB shadow RAM. Detail: `doc/ticks-paging.md` |
 | Symbols | `-x` map/symbol file (use **before** `-start`/`-end` when symbols name those addresses) |
 | I/O | `-iochar`, `-ide0`, `-ide1` |
 

@@ -15,7 +15,7 @@ Z80-compatible with extras (e.g. **`mlt`**). Used by `+z180`, `+yaz180`, `+scz18
 
 | Topic | Detail |
 |-------|--------|
-| ticks | `z88dk-ticks -mz180` (eZ80 Z80-mode: `-mez80_z80`) |
+| ticks | `z88dk-ticks -mz180` selects the 1 MB MMU unless `-b` is set. Reset CBAR `0xF0`, BBR 0, CBR 0, ICR 0 is the low 64 kB. `in0` and `out0` do I/O. ICR bits 7–6 move the internal block (YAZ180 base `0x00`, SCZ180 `0xC0`). See `doc/ticks-paging.md`. `-mez80_z80` executes `in0`/`out0` and does not select this map |
 | classic TIMER | `+test -clib=z180` then `-mz180`. Do not paste **ez80_z80** ticks into a z180 row |
 | HW mul | `mlt bc/de/hl/sp` = `ED 4C/5C/6C/7C` — same encodings on **eZ80 Z80-mode**. Helps mul/inv-heavy float; restoring div does not use it |
 | math32 | `math32_z180.lib`; eZ80 Z80-mode product is **`math32_ez80_z80.lib`** (`newlibfiles_ez80_z80.lst` → same Z180 `mlt` helpers) |

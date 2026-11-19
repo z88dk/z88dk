@@ -7,6 +7,7 @@
 #include "debugger.h"
 #include "ticks_lua.h"
 #include <stdio.h>
+#include <string.h>
 
 
 
@@ -25,6 +26,10 @@ static void     zx_handle_out(int port, int value);
 static void     z180_init(void);
 static uint8_t *z180_get_memory_addr(uint32_t pc, memtype type);
 static void     z180_handle_out(int port, int value);
+static int      z180_handle_in(int port);
+static void     rc2014_init(void);
+static uint8_t *rc2014_get_memory_addr(uint32_t pc, memtype type);
+static void     rc2014_handle_out(int port, int value);
 static void     rabbit_init(void);
 static uint8_t *rabbit_get_memory_addr(uint32_t pc, memtype type);
 static void     rabbit_write_hook(uint16_t addr, uint8_t value);
@@ -48,11 +53,17 @@ static unsigned char *zx_rom[2];
 
 static int            inst_mode = 1;       // We're reading an instruction
 
+/* Declared here so load_memory can mirror an image onto both RC2014 pages.
+   rc2014_init() allocates them. */
+static uint8_t       *rc_ram[2];
+
 static memory_func   get_mem_addr;
 static void        (*write_hook)(uint16_t addr, uint8_t value);
+static int         memory_is_write;   /* put/load: write-through under a ROM window */
 
-// Which banking scheme the debugger has to understand
-static enum { MODEL_OTHER, MODEL_RABBIT, MODEL_ZXN, MODEL_MSX } current_model = MODEL_OTHER;
+// Which banking scheme the debugger has to understand.
+// Z180 and RC2014 have their own maps. They are not z80asm BANK images.
+static enum { MODEL_OTHER, MODEL_RABBIT, MODEL_ZXN, MODEL_MSX, MODEL_Z180, MODEL_RC2014 } current_model = MODEL_OTHER;
 static int lua_memory_model = 0;
 static void        (*handle_out)(int port, int value);
 static int         (*handle_in)(int port);
@@ -69,6 +80,8 @@ void memory_init(char *model) {
         standard_init();
     } else if ( strcmp(model, "z180") == 0 ) {
         z180_init();
+    } else if ( strcmp(model, "rc2014") == 0 ) {
+        rc2014_init();
     } else if ( strcmp(model, "rabbit") == 0 ) {
         rabbit_init();
     } else if ( strcmp(model, "msx") == 0 ) {
@@ -108,7 +121,16 @@ void load_memory(uint32_t pc, uint8_t value, memtype type)
 {
   if (lua_memory_write(pc, value, type, st) != -1)
     return;
+  memory_is_write = 1;
   *get_memory_addr(pc, type) = value;
+  /* Port 0x30 on the 128 kB boards switches the whole 64 kB. The loaded
+     image is written to both pages so the instruction after OUT 0x30 is
+     still there. A later store goes to the selected page only. */
+  if ( current_model == MODEL_RC2014 && rc_ram[0] != NULL ) {
+    rc_ram[0][pc & 0xffff] = value;
+    rc_ram[1][pc & 0xffff] = value;
+  }
+  memory_is_write = 0;
 }
 
 uint8_t put_memory(uint16_t pc, uint8_t b)
@@ -118,7 +140,9 @@ uint8_t put_memory(uint16_t pc, uint8_t b)
     return b;
   if (pc < c_rom_size)
     return *get_memory_addr(pc, MEM_TYPE_DATA);
+  memory_is_write = 1;
   *get_memory_addr(pc, MEM_TYPE_DATA) = b;
+  memory_is_write = 0;
   if (write_hook)
     write_hook(pc, b);
   return b;
@@ -153,58 +177,148 @@ void memory_reset_paging()
     }
 }
 
-// Z180 MMU support
+// Z180 MMU. 1 MB physical, 64 kB logical.
+// CBAR[3:0] is the bank-area base and CBAR[7:4] is the common-1 base, in 4 kB units.
+// Physical A19-A12 = (base + logical A15-A12) mod 256. A11-A0 pass through.
+// Common 0 uses base 0, the bank area uses BBR, common 1 uses CBR.
+// Reset CBAR is 0xF0 with BBR and CBR at 0, which is the low 64 kB.
 static uint8_t *z180_mem = NULL;
 static uint8_t z180_CBAR = 0xf0;
 static uint8_t z180_CBR = 0x00;
 static uint8_t z180_BBR = 0x00;
+static uint8_t z180_ICR = 0x00;
 
-#define Z180_IO_CBR 56
-#define Z180_IO_BBR 57
-#define Z180_IO_CBAR 58
+#define Z180_OFF_CBR  0x38
+#define Z180_OFF_BBR  0x39
+#define Z180_OFF_CBAR 0x3a
+#define Z180_OFF_ICR  0x3f
+
+/* ICR[7:6] places the 64 internal registers at 0x00, 0x40, 0x80, or 0xC0.
+   The low 8 port bits are the address. The high byte is not compared. */
+static int z180_internal_offset(int port)
+{
+    if ( (port & 0xc0) != (z180_ICR & 0xc0) )
+        return -1;
+    return port & 0x3f;
+}
 
 static uint8_t *z180_get_memory_addr(uint32_t pc, memtype type)
 {
-    /*
-    CBAR is an 8 bit I/O port that can be accessed by the processor's OUT and IN instructions. 
-    The lower 4 bits specify the starting address of the bank area, and the upper 4 give the start of common 1. 
-   */
-    // Are we in bank area?
-    int bank_start = ((z180_CBAR) & 0x0f) << 12;
-    int common1_start =  ((z180_CBAR) & 0xf0) << 8;
-    if ( pc >= bank_start && pc < common1_start ) {
-        // Bank area
-        // Physical = Logical + (BBR * 4096)
-        return &z180_mem[ (pc & 0x0fff) + (z180_BBR * 4096)];
-    } else if ( pc >= common1_start ) {
-        // Common 1
-        // Physical = Logical + (CBR * 4096)
-        return &z180_mem[ (pc & 0x0fff) + (z180_CBR * 4096)];
-    }
-    // Otherwise, it's common 0
-    return &z180_mem[pc & 0xffff];
+    unsigned la = pc & 0xffff;
+    unsigned page = la >> 12;
+    unsigned ba = z180_CBAR & 0x0f;
+    unsigned ca = z180_CBAR >> 4;
+    uint8_t base = 0;
+    uint32_t phys;
+
+    if ( type == MEM_TYPE_PHYSICAL && pc > 0xffff )
+        return &z180_mem[pc & 0xfffff];
+
+    if ( page < ba )
+        base = 0;
+    else if ( page < ca )
+        base = z180_BBR;
+    else
+        base = z180_CBR;
+
+    phys = ((uint32_t)(uint8_t)(base + page) << 12) | (la & 0x0fff);
+    return &z180_mem[phys & 0xfffff];
 }
 
 static void z180_handle_out(int port, int value)
 {
-    switch (port) {
-    case Z180_IO_CBR:
-        z180_CBR = value;
+    switch ( z180_internal_offset(port) ) {
+    case Z180_OFF_CBR:
+        z180_CBR = (uint8_t)value;
         break;
-    case Z180_IO_BBR:
-        z180_BBR = value;
+    case Z180_OFF_BBR:
+        z180_BBR = (uint8_t)value;
         break;
-    case Z180_IO_CBAR:
-        z180_CBAR = value;
+    case Z180_OFF_CBAR:
+        z180_CBAR = (uint8_t)value;
         break;
+    case Z180_OFF_ICR:
+        z180_ICR = (uint8_t)value;
+        break;
+    default:
+        break;
+    }
+}
+
+static int z180_handle_in(int port)
+{
+    switch ( z180_internal_offset(port) ) {
+    case Z180_OFF_CBR:
+        return z180_CBR;
+    case Z180_OFF_BBR:
+        return z180_BBR;
+    case Z180_OFF_CBAR:
+        return z180_CBAR;
+    case Z180_OFF_ICR:
+        return z180_ICR;
+    default:
+        return -1;
     }
 }
 
 static void z180_init(void) 
 {
     z180_mem = calloc(1024*1024, sizeof(char));
+    z180_CBAR = 0xf0;
+    z180_CBR = 0x00;
+    z180_BBR = 0x00;
+    z180_ICR = 0x00;
+    current_model = MODEL_Z180;
     get_mem_addr = z180_get_memory_addr;
     handle_out = z180_handle_out;
+    handle_in = z180_handle_in;
+}
+
+// RC2014. Port 0x38 is the standard 32 kB ROM page, on every pageable-ROM
+// machine. Bit 0 = 0 maps that ROM over 0x0000-0x7FFF for reads. Bit 0 = 1
+// maps RAM. Reset leaves the ROM off so a loaded binary runs. A write in
+// the window goes to RAM.
+// Port 0x30 bit 0 is shadow RAM: a second 64 kB page on the SC108, the
+// Memory Module, and the other 128 kB RAM boards. The other data bits
+// are ignored.
+static uint8_t *rc_rom;
+static int      rc_page;
+static int      rc_rom_on;
+
+static uint8_t *rc2014_get_memory_addr(uint32_t pc, memtype type)
+{
+    (void)type;
+    pc &= 0xffff;
+    if ( rc_rom_on && !memory_is_write && pc < 0x8000 )
+        return &rc_rom[pc];
+    return &rc_ram[rc_page & 1][pc];
+}
+
+static void rc2014_handle_out(int port, int value)
+{
+    switch ( port & 0xff ) {
+    case 0x30:
+        rc_page = value & 1;
+        break;
+    case 0x38:
+        rc_rom_on = (value & 1) == 0;
+        break;
+    default:
+        break;
+    }
+}
+
+static void rc2014_init(void)
+{
+    rc_ram[0] = calloc(65536, 1);
+    rc_ram[1] = calloc(65536, 1);
+    rc_rom = calloc(32768, 1);
+    memset(rc_rom, 0xff, 32768);
+    rc_page = 0;
+    rc_rom_on = 0;
+    current_model = MODEL_RC2014;
+    get_mem_addr = rc2014_get_memory_addr;
+    handle_out = rc2014_handle_out;
 }
 
 
@@ -570,7 +684,8 @@ int rabbit_get_ioi_reg(int reg)
      MSX     16K in the 16K page nn */
 int memory_has_banks(void)
 {
-    return lua_memory_model ? lua_memory_has_banks() : current_model != MODEL_OTHER;
+    if (lua_memory_model) return lua_memory_has_banks();
+    return current_model == MODEL_RABBIT || current_model == MODEL_ZXN || current_model == MODEL_MSX;
 }
 
 int memory_uses_lua(void)
@@ -705,6 +820,14 @@ const char *memory_mmu_text(void)
     case MODEL_MSX:
         snprintf(buf, sizeof(buf), "pages: 0=%02x 1=%02x 2=%02x 3=%02x",
             msx_mmu[0], msx_mmu[1], msx_mmu[2], msx_mmu[3]);
+        return buf;
+    case MODEL_Z180:
+        snprintf(buf, sizeof(buf), "cbar=%02X cbr=%02X bbr=%02X icr=%02X",
+            z180_CBAR, z180_CBR, z180_BBR, z180_ICR);
+        return buf;
+    case MODEL_RC2014:
+        snprintf(buf, sizeof(buf), "ram page=%d rom=%s",
+            rc_page, rc_rom_on ? "on" : "off");
         return buf;
     default:
         return NULL;

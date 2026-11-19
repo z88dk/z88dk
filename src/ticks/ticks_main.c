@@ -15,6 +15,7 @@ extern backend_t ticks_debugger_backend;
 static long long c_max_runticks = 1e8;
 static char  *c_output = NULL;
 static char  *c_memory_model = "standard";
+static int    c_memory_model_set = 0;
 
 
 int    c_rc2014_mode = 0;
@@ -183,7 +184,8 @@ static void usage(void)
     printf("  -d             Enable debugger\n");
     printf("  -v             Verbose logging\n");
     printf("  -l X           Load file to address\n");
-    printf("  -b <model>     Memory model (zxn/zx/z180/msx)\n");
+    printf("  -b <model>     Memory model (standard/zxn/zx/z180/msx/rc2014)\n");
+    printf("                 -mz80n selects zxn, -mz180 selects z180, unless -b is set\n");
     printf("  -banks         Load <input>_BANK_nn.bin bank images (Rabbit, ZX Next or MSX model)\n");
     printf("  -m8080         Emulate an 8080\n");
     printf("  -m8085         Emulate an 8085 (mostly)\n");
@@ -304,6 +306,7 @@ int main (int argc, char **argv){
             argc++;
           } else {
             c_memory_model = argv[1];
+            c_memory_model_set = 1;
           }
           break;
         case 'p':
@@ -396,7 +399,6 @@ int main (int argc, char **argv){
             c_cpu = CPU_Z180;
           } else if ( strcmp(&argv[0][1],"mz80n") == 0 ) {
             c_cpu = CPU_Z80N;
-            c_memory_model = "zxn";
           } else if ( strcmp(&argv[0][1],"mr2ka") == 0 ) {
             c_cpu = CPU_R2KA;
           } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
@@ -475,8 +477,14 @@ int main (int argc, char **argv){
           exit(EXIT_FAILURE);
       }
     else{
+      /* Rabbit always pages. Z180 and ZX Next page only when -b was left unset,
+         so -b standard keeps the flat 64 kB. -b after either CPU flag still wins. */
       if ( israbbit() )
         c_memory_model = "rabbit";
+      else if ( !c_memory_model_set && isz180() )
+        c_memory_model = "z180";
+      else if ( !c_memory_model_set && isz80n() )
+        c_memory_model = "zxn";
       memory_init(c_memory_model);
 
       fh= fopen(argv[1], "rb");
