@@ -8,21 +8,21 @@ OUTPUT = $(SOURCES:.c=.opt)
 all: $(OUTPUT)
 
 8080/%.opt: 8080/%.c
-	zcc +test -m8080 -vn -a $^ -o $@.tmp1
+	zcc +test -compiler=sccz80 -m8080 -vn -a $^ -o $@.tmp1
 	@cat $@.tmp1 | grep -v '^;'  | grep -v MODULE|grep -v C_LINE > $@.tmp2
 	diff -w $@.tmp2 results/$@
 	@mv -f $@.tmp1 $@
 	@rm $@.tmp2
 
 z180/%.opt: z180/%.c
-	zcc +test -mz180 -vn -a $^ -o $@.tmp1
+	zcc +test -compiler=sccz80 -mz180 -vn -a $^ -o $@.tmp1
 	@cat $@.tmp1 | grep -v '^;'  | grep -v MODULE|grep -v C_LINE > $@.tmp2
 	diff -w $@.tmp2 results/$@
 	@mv -f $@.tmp1 $@
 	@rm $@.tmp2
 
 z80n/%.opt: z80n/%.c
-	zcc +test -custom-copt-rules=../lib/arch/z80n/z80n_peephole -vn -a $^ -o $@.tmp1
+	zcc +test -compiler=sccz80 -custom-copt-rules=../lib/arch/z80n/z80n_peephole -vn -a $^ -o $@.tmp1
 	@cat $@.tmp1 | grep -v '^;'  | grep -v MODULE|grep -v C_LINE > $@.tmp2
 	diff -w $@.tmp2 results/$@
 	@mv -f $@.tmp1 $@
@@ -36,14 +36,14 @@ rabbit/%.opt: rabbit/%.c
 	@rm $@.tmp2
 
 mbf64_const.opt: mbf64_const.c
-	zcc +test -fp-mode=mbf64 -vn -a $^ -o $@.tmp1
+	zcc +test -compiler=sccz80 -fp-mode=mbf64 -vn -a $^ -o $@.tmp1
 	@cat $@.tmp1 | grep -v '^;'  | grep -v MODULE|grep -v C_LINE > $@.tmp2
 	diff -w $@.tmp2 results/$@
 	@mv -f $@.tmp1 $@
 	@rm $@.tmp2
 
 %_ieee.opt:	%_ieee.c
-	zcc +test -fp-mode=ieee -vn -a $^ -o $@.tmp1
+	zcc +test -compiler=sccz80 -fp-mode=ieee -vn -a $^ -o $@.tmp1
 	@cat $@.tmp1 | grep -v '^;'  | grep -v MODULE|grep -v C_LINE > $@.tmp2
 	diff -w $@.tmp2 results/$@
 	@mv -f $@.tmp1 $@
@@ -51,7 +51,7 @@ mbf64_const.opt: mbf64_const.c
 
 
 %.opt:	%.c
-	zcc +test -vn -a $^ -o $@.tmp1
+	zcc +test -compiler=sccz80 -vn -a $^ -o $@.tmp1
 	@cat $@.tmp1 | grep -v '^;'  | grep -v MODULE|grep -v C_LINE > $@.tmp2
 	diff -w $@.tmp2 results/$@
 	@mv -f $@.tmp1 $@
