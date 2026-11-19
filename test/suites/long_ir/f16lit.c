@@ -7,6 +7,8 @@
 
 volatile _Float16 a, b;
 
+static _Float16 twice(_Float16 x) { return x + x; }
+
 static void lit(void)
 {
     b = 3;
@@ -16,10 +18,26 @@ static void lit(void)
     a = b / 3.0;  assertEqual((int)a, 1);
 }
 
+/* Compound assignment, initialiser, comparison, call result, and a constant
+ * expression of double literals all stay in _Float16 too. */
+static void more(void)
+{
+    volatile _Float16 x = 0.5;
+    b = 3;
+    a = 1;     a += 0.5;  assertEqual((int)(a * 2), 3);
+    a = 3;     a *= 0.5;  assertEqual((int)(a * 2), 3);
+    assertEqual((int)(x * 2), 1);
+    assertEqual(b < 3.5, 1);
+    assertEqual(b > 3.5, 0);
+    a = twice(b) * 2.0;   assertEqual((int)a, 12);
+    a = (8.0 - 2.0 * 1.5) * b + 1.0;   assertEqual((int)a, 16);
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
     suite_setup("_Float16 double-literal operand");
     suite_add_test(lit);
+    suite_add_test(more);
     return suite_run();
 }

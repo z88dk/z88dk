@@ -30,7 +30,7 @@ static int f_inc(void){ _Float16 f = 5; f++; ++f; --f; return (int)f; }         
 
 /* --- cross-tier f16 <-> double --- */
 static int f16_to_d(void){ _Float16 a = (_Float16)6; double d = a; return (int)d; }  /* 6 */
-static int d_to_f16(void){ double d = 7.0; _Float16 a = d; return (int)a; }          /* 7 */
+static int d_to_f16(void){ volatile double d = 7.0; _Float16 a = d; return (int)a; }          /* 7 */
 static _Float16 f16xd(_Float16 a){ return a * g; }   /* f16*double->double->f16 */
 static int f16xd_use(void){ g = 5.0; return (int)f16xd((_Float16)4); }               /* 20 */
 static int f16_cmp_d(_Float16 a){ return (a == g) + (a < g); }   /* f16 vs double compare */

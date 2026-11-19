@@ -258,6 +258,44 @@ static Type *integer_promote_type(const Type *t)
     return type_int;
 }
 
+/* True for a tree made only of double literals and arithmetic/negation of
+   them, i.e. something ast_fold_constants will collapse to one double
+   literal. */
+static int is_double_const_tree(Node *n)
+{
+    if (!n || !n->type || n->type->kind != KIND_DOUBLE) return 0;
+    switch (n->ast_type) {
+    case AST_LITERAL: return 1;
+    case OP_NEG:      return is_double_const_tree(n->operand);
+    case OP_MULT: case OP_DIV: case OP_ADD: case OP_SUB:
+        return is_double_const_tree(n->left) && is_double_const_tree(n->right);
+    default:          return 0;
+    }
+}
+
+static void retype_const_tree_f16(Node *n)
+{
+    n->type = type_float16;
+    if (n->ast_type == OP_NEG) retype_const_tree_f16(n->operand);
+    else if (n->ast_type != AST_LITERAL) {
+        retype_const_tree_f16(n->left);
+        retype_const_tree_f16(n->right);
+    }
+}
+
+/* `_Float16 OP <double constant>`: keep the constant in _Float16 (as sccz80
+   does) rather than promoting to double. Strict C would promote, but the
+   double tier (math48) is not linked under --math16, and the result is
+   stored back to _Float16 anyway. */
+static void narrow_double_const_vs_f16(Node *l, Node *r)
+{
+    if (!l || !r || !l->type || !r->type) return;
+    if (l->type->kind == KIND_FLOAT16 && is_double_const_tree(r))
+        retype_const_tree_f16(r);
+    else if (r->type->kind == KIND_FLOAT16 && is_double_const_tree(l))
+        retype_const_tree_f16(l);
+}
+
 void ast_normalize_types(Node *node)
 {
     if (!node) return;
@@ -318,22 +356,9 @@ void ast_normalize_types(Node *node)
     case OP_OR: case OP_AND: case OP_XOR:
         ast_normalize_types(node->left);
         ast_normalize_types(node->right);
-        /* `_Float16 OP <double literal>`: keep the literal in _Float16 (as
-           sccz80 does) rather than promoting to double. Strict C would
-           promote, but the double tier (math48) is not linked under
-           --math16, and the result is stored back to _Float16 anyway. */
         if (node->ast_type == OP_MULT || node->ast_type == OP_DIV
-            || node->ast_type == OP_ADD || node->ast_type == OP_SUB) {
-            Node *l = node->left, *r = node->right;
-            if (l->type && r->type) {
-                if (r->ast_type == AST_LITERAL && r->type->kind == KIND_DOUBLE
-                    && l->type->kind == KIND_FLOAT16)
-                    r->type = type_float16;
-                else if (l->ast_type == AST_LITERAL && l->type->kind == KIND_DOUBLE
-                    && r->type->kind == KIND_FLOAT16)
-                    l->type = type_float16;
-            }
-        }
+            || node->ast_type == OP_ADD || node->ast_type == OP_SUB)
+            narrow_double_const_vs_f16(node->left, node->right);
         node->type = promote_types(node->left->type, node->right->type);
         /* `ptr - ptr` is the one case where promote_types over-counts:
            C semantics say the result is ptrdiff_t (integer), not a
@@ -357,6 +382,8 @@ void ast_normalize_types(Node *node)
            signedness-aware lowering. */
         ast_normalize_types(node->left);
         ast_normalize_types(node->right);
+        if (node->ast_type != OP_OROR && node->ast_type != OP_ANDAND)
+            narrow_double_const_vs_f16(node->left, node->right);
         if (!node->type) node->type = type_int;
         break;
     case OP_PRE_INC: case OP_POST_INC: case OP_PRE_DEC: case OP_POST_DEC:
