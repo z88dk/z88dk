@@ -1,6 +1,6 @@
 
 APPMAKE = z88dk-appmake
-COMPILER = -compiler=sccz80
+COMPILER = -compiler=80cc
 
 
 all: demo.tap
