@@ -27,7 +27,7 @@ int f(int a)
 int main(void) { g = f(1); return 0; }
 END
 
-run_ok("zcc +z80 -clib=new -debug -m ${test}.c -o ${test}.bin");
+run_ok("zcc +z80 -compiler=sccz80 -clib=new -debug -m ${test}.c -o ${test}.bin");
 
 my @map = path("${test}.map")->lines;
 
