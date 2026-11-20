@@ -5293,9 +5293,14 @@ int ir_opt_copy_prop(Func *f)
         for (int i = 0; i < f->n_vregs; i++) copy_of[i] = -1;
         for (int j = 0; j < bb->n_ops; j++) {
             Op *op = &bb->ops[j];
-            /* Rewrite value operands to the copy root. */
+            /* Rewrite value operands to the copy root. IR_POSTSTEP's src[0]
+               is also its def (the variable stepped in place), so it names
+               the variable itself, not a value that may be read from the
+               copy root: `q = p; *q++ = x; return p;` would otherwise step
+               p. */
             for (int s = 0; s < 2; s++) {
                 int v = op->src[s];
+                if (op->kind == IR_POSTSTEP && s == 0) continue;
                 if (v >= 0 && v < f->n_vregs && copy_of[v] >= 0) {
                     op->src[s] = copy_of[v];
                     changed++;
