@@ -31,6 +31,7 @@ static void more(void)
     assertEqual(b > 3.5, 0);
     a = twice(b) * 2.0;   assertEqual((int)a, 12);
     a = (8.0 - 2.0 * 1.5) * b + 1.0;   assertEqual((int)a, 16);
+    a = (_Float16)0.75;                assertEqual((int)(a * 4), 3);
 }
 
 int main(int argc, char *argv[])

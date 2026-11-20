@@ -943,7 +943,8 @@ Node *ast_fold_constants(Node *node)
            fold integer→integer and integer→pointer casts; the
            latter covers `(T*)0` patterns (e.g. NULL written as
            `((void*)0)`) so they reduce to a literal usable as a
-           constant initialiser. Float and fixed-point casts keep
+           constant initialiser. A float literal cast to an integer
+           folds too (below); other float and fixed-point casts keep
            their OP_CAST so the walker emits the proper conversion
            helper. */
         if (node->operand
@@ -953,7 +954,15 @@ Node *ast_fold_constants(Node *node)
                 || node->type->kind == KIND_PTR
                 || node->type->kind == KIND_CPTR)
             && node->operand->type
-            && kind_is_integer(node->operand->type->kind)) {
+            && (kind_is_integer(node->operand->type->kind)
+                /* A float literal cast to an integer type folds to its
+                   truncated value (as sccz80 does), instead of a runtime
+                   dload + ifix that needs the double library linked. */
+                || (kind_is_floating(node->operand->type->kind)
+                    && kind_is_integer(node->type->kind)
+                    && !node->operand->int_literal
+                    && (double)node->operand->zval > -9.0e18
+                    && (double)node->operand->zval <  9.0e18))) {
             int64_t v = node_int_value(node->operand);
             int64_t narrowed = v;
             Kind dst = node->type->kind;
@@ -997,6 +1006,17 @@ Node *ast_fold_constants(Node *node)
                 narrowed = (int64_t)((uint32_t)v & 0xffffffu);
             }
             return fold_int_literal(node, node->type, (uint64_t)narrowed);
+        }
+        /* `(_Float16)<float literal>`: the literal becomes an f16 literal
+           (rounded when emitted) rather than dload + l_f48_ftof16, which
+           --math16 does not link. */
+        if (node->operand && node->operand->ast_type == AST_LITERAL
+            && node->type && node->type->kind == KIND_FLOAT16
+            && node->operand->type
+            && kind_is_floating(node->operand->type->kind)
+            && !node->operand->int_literal) {
+            node->operand->type = type_float16;
+            return node->operand;
         }
         /* A narrowing cast of a value ternary moves into the arms, so each
            arm computes only the bits the cast keeps and the join holds the

@@ -5087,6 +5087,90 @@ joinacc_asm.bin: joinacc.c
 	  test `grep -ci '[^a-z]iy' joinacc_a.asm` -eq 0 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: join value homed in IY ($$f) $(RESET)" ; exit 1; }; \
 	done; rm -f joinacc_a.asm
 
+all:	poststep_copy.bin poststep_copy_fp.bin poststep_copy_z80n.bin poststep_copy_z180.bin poststep_copy_ez80.bin poststep_copy_8080.bin poststep_copy_8085.bin poststep_copy_gbz80.bin poststep_copy_r2ka.bin poststep_copy_kc160.bin
+poststep_copy.bin: $(SOURCES) poststep_copy.c
+	$(compile)
+	$(runtest)
+
+poststep_copy_fp.bin: $(SOURCES) poststep_copy.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+poststep_copy_z80n.bin: $(SOURCES) poststep_copy.c
+	$(compile_z80n)
+	$(runtest_z80n)
+
+poststep_copy_z180.bin: $(SOURCES) poststep_copy.c
+	$(compile_z180)
+	$(runtest_z180)
+
+poststep_copy_ez80.bin: $(SOURCES) poststep_copy.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+poststep_copy_8080.bin: $(SOURCES) poststep_copy.c
+	$(compile_8080)
+	$(runtest_8080)
+
+poststep_copy_8085.bin: $(SOURCES) poststep_copy.c
+	$(compile_8085)
+	$(runtest_8085)
+
+poststep_copy_gbz80.bin: $(SOURCES) poststep_copy.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+poststep_copy_r2ka.bin: $(SOURCES) poststep_copy.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+poststep_copy_kc160.bin: $(SOURCES) poststep_copy.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+all:	fcast_const.bin fcast_const_fp.bin fcast_const_z80n.bin fcast_const_z180.bin fcast_const_ez80.bin fcast_const_8080.bin fcast_const_8085.bin fcast_const_gbz80.bin fcast_const_r2ka.bin fcast_const_kc160.bin
+fcast_const.bin: $(SOURCES) fcast_const.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -I$(FRAMEWORK_DIR) -S fcast_const.c -o fcast_const_a.asm
+	@if grep -Eq 'call[[:space:]]+(ifix|dload|dpush|dadd|dmul|ddiv|dsub|float)([[:space:]]|$$)|l_f48_' fcast_const_a.asm; then rm -f fcast_const_a.asm; echo "$(RED)" `date +%H:%M:%S` " Test failure: runtime double helper for a constant cast $(RESET)" ; exit 1; fi; rm -f fcast_const_a.asm
+	$(compile)
+	$(runtest)
+
+fcast_const_fp.bin: $(SOURCES) fcast_const.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fcast_const_z80n.bin: $(SOURCES) fcast_const.c
+	$(compile_z80n)
+	$(runtest_z80n)
+
+fcast_const_z180.bin: $(SOURCES) fcast_const.c
+	$(compile_z180)
+	$(runtest_z180)
+
+fcast_const_ez80.bin: $(SOURCES) fcast_const.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+fcast_const_8080.bin: $(SOURCES) fcast_const.c
+	$(compile_8080)
+	$(runtest_8080)
+
+fcast_const_8085.bin: $(SOURCES) fcast_const.c
+	$(compile_8085)
+	$(runtest_8085)
+
+fcast_const_gbz80.bin: $(SOURCES) fcast_const.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+fcast_const_r2ka.bin: $(SOURCES) fcast_const.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+fcast_const_kc160.bin: $(SOURCES) fcast_const.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
 f16lit.bin: $(SOURCES) f16lit.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -I$(FRAMEWORK_DIR) -S f16lit.c -o f16lit_a.asm
 	@if grep -Eq 'l_f48_|l_f64_|[[:space:]](dadd|dsub|dmul|ddiv|dload|dpush)([[:space:]]|$$)' f16lit_a.asm; then rm -f f16lit_a.asm; echo "$(RED)" `date +%H:%M:%S` " Test failure: double-tier helper used for _Float16 op literal $(RESET)" ; exit 1; fi; rm -f f16lit_a.asm
