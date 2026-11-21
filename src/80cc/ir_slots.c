@@ -8,6 +8,7 @@
  * shared frame slots and sets f->vreg_spill_slot[] + f->frame_size.
  */
 
+#include "ccdefs.h"
 #include "ir_lower.h"
 #include "ir_alloc.h"
 #include "ir_analysis.h"
@@ -31,7 +32,9 @@ static int sp0_fastpath_possible(const Func *f)
 {
     int fp_active = (c_framepointer_is_ix != -1) && !f->is_naked
                   && !f->uses_acc;
-    if (fp_active) return 0;
+    /* In an IX frame the offset-0 slot pays only where `ld hl,(ix+d)` is the
+       two-instruction synthetic: not on ez80, which has it natively. */
+    if (fp_active && (opt_disabled("slot0-fp") || IS_EZ80())) return 0;
     return tos_pushpop_ok(f);
 }
 
