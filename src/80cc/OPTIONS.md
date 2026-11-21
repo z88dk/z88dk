@@ -378,6 +378,7 @@ exists (ADR 0010).
 | `cmp-byte-narrow` | a compare of a zero-extended byte with a word temp defined only by byte constants widens both and compares as words, instead of reading both as bytes |
 | `st-byte-keep-hl` | with an IX frame, the address of a byte store `p[n] = k` is parked on the stack around the load of `k` instead of riding HL into the store |
 | `slot0-fp` | in an IX frame (not ez80) the hottest word local is not placed at the top-of-stack slot, so a first-fit slot class takes offset 0 by chance |
+| `slot0-pick` | when the top-of-stack seeding fired, the function is not also rendered without it, so the seeded layout is kept even where the unseeded one is smaller (the unseeded render is kept when it saves more than 6 bytes, or any bytes with `--opt-code-size`) |
 | `cmp-unsign-sign` | a signed compare is made unsigned only when each operand fits a byte or is bounded by the loop, not when a dominating compare proves it non-negative |
 | `countdown-word` | a reversed-loop counter (phantom zero guard) is narrowed to a byte up front, so it cannot bid for BC |
 | `countdown-fp` | with an IX frame, a reversed-loop counter that won BC keeps it even when the function needs the frame for other values, instead of narrowing to a byte slot |

@@ -11561,6 +11561,7 @@ int ir_lower_func(FILE *out, Func *f)
     whome_rejected = 0;
     sff_used = 0;
     ir_cse_alias_fired = 0;
+    ir_slot0_fired = 0;
     int rc = ir_lower_func_body(buf, f);
     long so = render_size(buf) + rearb_bias;
     FILE *src = buf;
@@ -11584,6 +11585,49 @@ int ir_lower_func(FILE *out, Func *f)
             }
         }
         if (!alias_off && ca) ir_free_cloned_func(ca);
+    }
+    /* [slot0-pick] The hottest word at offset 0 is chosen from access counts,
+       which do not say what each access costs, so it can lose to the layout it
+       replaced. When it fired, render a pristine clone without it and keep that
+       one only when it is smaller (by a margin, unless --opt-code-size is on).
+       The DE re-arbitration below then works from
+       the kept render, with the veto still in force for the renders it makes.
+       `--opt-disable=slot0-pick` keeps the seeded render unconditionally. */
+    FILE *s0buf = NULL;
+    Func *s0fin = NULL;
+    if (rc == 0 && ir_slot0_fired && !alias_off && !opt_disabled("slot0-pick")) {
+        Func *cs = ir_clone_func(c);
+        FILE *bs = cs ? tmpfile() : NULL;
+        if (bs) {
+            /* Each body render overwrites the per-function statistics the DE
+               re-arbitration reads afterwards: keep the first render's unless
+               this one is the one kept. */
+            int sv_wr = whome_rejected, sv_sff = sff_used;
+            int sv_ix = ds_ixaccess, sv_fr = ds_last_framed;
+            long sv_bias = rearb_bias;
+            ir_slot0_veto = 1;
+            int rcs = ir_lower_func_body(bs, cs);
+            long sv = render_size(bs) + rearb_bias;
+            /* Without --opt-code-size a few bytes do not outweigh the speed the
+               seeded layout buys, so the unseeded render must save more than a
+               small margin; with it, any saving wins. */
+            long s0m = c_opt_code_size ? 0 : 6;
+            if (rcs == 0 && sv + s0m < so) {
+                src = bs; s0buf = bs; s0fin = cs; so = sv;     /* veto stays on */
+                f->frame_size = cs->frame_size;
+                if (cs->n_vregs == f->n_vregs && cs->vreg_spill_slot && f->vreg_spill_slot)
+                    memcpy(f->vreg_spill_slot, cs->vreg_spill_slot,
+                           (size_t)f->n_vregs * sizeof(int));
+            } else {
+                ir_slot0_veto = 0;
+                fclose(bs);
+                ir_free_cloned_func(cs);
+                whome_rejected = sv_wr; sff_used = sv_sff; rearb_bias = sv_bias;
+                ds_ixaccess = sv_ix; ds_last_framed = sv_fr;
+            }
+        } else if (cs) {
+            ir_free_cloned_func(cs);
+        }
     }
     if (rc == 0 && whome_rejected && !alias_off && !opt_disabled("de-rearb")) {
         /* With the frame forms on, compare like with like: both again
@@ -11622,8 +11666,11 @@ int ir_lower_func(FILE *out, Func *f)
     rewind(src);
     char ch[4096]; size_t n;
     while ((n = fread(ch, 1, sizeof ch, src)) > 0) fwrite(ch, 1, n, out);
+    ir_slot0_veto = 0;
     if (src != buf) fclose(src);
+    if (s0buf && s0buf != src) fclose(s0buf);
     fclose(buf);
+    if (s0fin) ir_free_cloned_func(s0fin);
     if (alias_off && fin) ir_free_cloned_func(fin);
     ir_free_cloned_func(c);
     return rc;
