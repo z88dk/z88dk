@@ -376,6 +376,7 @@ exists (ADR 0010).
 | `const-diamond-bare` | the constant diamond skips a branch whose condition is a bare byte with no computation in front of it |
 | `cmp-byte-de` | an unsigned byte compare whose second operand is already in A takes the widened 16-bit compare instead of parking it in E |
 | `cmp-byte-narrow` | a compare of a zero-extended byte with a word temp defined only by byte constants widens both and compares as words, instead of reading both as bytes |
+| `st-byte-keep-hl` | with an IX frame, the address of a byte store `p[n] = k` is parked on the stack around the load of `k` instead of riding HL into the store |
 | `cmp-unsign-sign` | a signed compare is made unsigned only when each operand fits a byte or is bounded by the loop, not when a dominating compare proves it non-negative |
 | `countdown-word` | a reversed-loop counter (phantom zero guard) is narrowed to a byte up front, so it cannot bid for BC |
 | `countdown-fp` | with an IX frame, a reversed-loop counter that won BC keeps it even when the function needs the frame for other values, instead of narrowing to a byte slot |
