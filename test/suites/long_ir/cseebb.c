@@ -41,6 +41,15 @@ static int join(u16 r, u16 c, u16 key, int f)
     return 1;
 }
 
+static u16 shortc(u16 a, u16 r, u16 c)
+{
+    u16 s = 0;
+
+    if (a || tab[(u16)(((r - 6) * 5 + c) * 4 + (r - 6))] == 1)
+        s = (u16)(((r - 6) * 5 + c) * 4 + (r - 6) + 7);
+    return s;
+}
+
 static void check(void)
 {
     int k;
@@ -64,6 +73,11 @@ static void check(void)
     assertEqual(join(8, 4, 12, 0), 0);
     assertEqual(join(8, 4, 12, 1), 1);
     assertEqual(tab[idx(8, 4)], 14);
+    for (k = 0; k < 200; k++) tab[k] = 0;
+    assertEqual(shortc(1, 8, 3), idx(8, 3) + 7);
+    assertEqual(shortc(0, 8, 3), 0);
+    tab[idx(8, 3)] = 1;
+    assertEqual(shortc(0, 8, 3), idx(8, 3) + 7);
 }
 
 int main(int argc, char *argv[])
