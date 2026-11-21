@@ -600,9 +600,11 @@ typedef struct {
     int     has_imm;    /* 1 if imm is meaningful */
     int     dst;        /* vreg holding the computed value */
     int     width;
+    int     inh;        /* 0 local; 1 inherited chain link; 2 inherited chain end */
 } CSEntry;
 
 #define MAX_CSE 32
+#define CSE_EBB_MIN 8
 
 static int cse_eligible(OpKind k)
 {
@@ -2064,11 +2066,48 @@ int ir_opt_cse(Func *f)
         }
     }
 
+    /* [cse-ebb] A block reached only from one earlier block starts with that
+       block's table: nothing runs between the branch and its target, and
+       arithmetic is pure, so every entry still names the same value. The alias
+       state is not carried, which can only cost a hit, never add one. */
+    int nbb = f->n_bbs;
+    int ebb = !opt_disabled("cse-ebb") && nbb > 1;
+    int *npred = ebb ? calloc((size_t)nbb, sizeof(int)) : NULL;
+    int *pred1 = ebb ? calloc((size_t)nbb, sizeof(int)) : NULL;
+    CSEntry **snap = ebb ? calloc((size_t)nbb, sizeof(*snap)) : NULL;
+    int *snap_n = ebb ? calloc((size_t)nbb, sizeof(int)) : NULL;
+    if (!npred || !pred1 || !snap || !snap_n) {
+        free(npred); free(pred1); free(snap); free(snap_n);
+        npred = pred1 = snap_n = NULL; snap = NULL; ebb = 0;
+    } else {
+        for (int b = 0; b < nbb; b++) {
+            int ns = ir_bb_n_succ(&f->bbs[b]);
+            for (int t = 0; t < ns; t++) {
+                int sid = ir_bb_succ_at(&f->bbs[b], t);
+                if (sid >= 0 && sid < nbb) { npred[sid]++; pred1[sid] = b; }
+            }
+        }
+    }
+
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
         int n = 0;
+        Op *save_ops = NULL;
+        int rw0 = rewritten, used_carry = 0, heavy_hit = 0;
+        for (int attempt = 0; ; attempt++) {
+        n = 0;
         cse_alias_reset(&al, nv);
         if (al.glb) memset(al.glb, 0, (size_t)nv);
+        if (ebb && attempt == 0 && b > 0 && npred[b] == 1 && pred1[b] < b
+            && snap[pred1[b]] && bb->n_ops > 0) {
+            save_ops = malloc((size_t)bb->n_ops * sizeof(Op));
+            if (save_ops) {
+                memcpy(save_ops, bb->ops, (size_t)bb->n_ops * sizeof(Op));
+                n = snap_n[pred1[b]];
+                memcpy(tbl, snap[pred1[b]], (size_t)n * sizeof(CSEntry));
+                used_carry = 1;
+            }
+        }
 
         for (int j = 0; j < bb->n_ops; j++) {
             Op *op = &bb->ops[j];
@@ -2121,6 +2160,7 @@ int ir_opt_cse(Func *f)
                     }
                 if (hit >= 0) {
                     int src_dst = tbl[hit].dst;
+                    if (tbl[hit].inh == 2) heavy_hit = 1;
                     op->kind = IR_MOV; op->src[0] = src_dst; op->src[1] = -1;
                     op->imm = 0;
                     op->mem.kind = IR_MEM_FRAME; op->mem.sym = NULL;
@@ -2134,7 +2174,7 @@ int ir_opt_cse(Func *f)
                     if (n < MAX_CSE && bc != op->dst) {
                         tbl[n].kind = IR_LD_MEM; tbl[n].src0 = bc; tbl[n].src1 = -1;
                         tbl[n].imm = op->mem.offset; tbl[n].has_imm = 1;
-                        tbl[n].dst = op->dst; tbl[n].width = dw;
+                        tbl[n].dst = op->dst; tbl[n].width = dw; tbl[n].inh = 0;
                         n++;
                     }
                     goto cse_invalidated;
@@ -2199,6 +2239,7 @@ int ir_opt_cse(Func *f)
                     /* Rewrite to IR_MOV dst <- existing dst; the lowerer
                        branches on dst width for long vs int. */
                     int src_dst = tbl[hit].dst;
+                    if (tbl[hit].inh == 2) heavy_hit = 1;
                     from_hit = 1;
                     if (al.canon && (s0 != op->src[0] || s1 != op->src[1])) ir_cse_alias_fired = 1;
                     op->kind   = IR_MOV;
@@ -2234,6 +2275,7 @@ int ir_opt_cse(Func *f)
                         tbl[n].has_imm = has_imm;
                         tbl[n].dst     = op->dst;
                         tbl[n].width   = dst_w;
+                        tbl[n].inh     = 0;
                         n++;
                     }
                     goto cse_invalidated;
@@ -2285,7 +2327,62 @@ int ir_opt_cse(Func *f)
                 }
             }
         }
+        if (attempt == 0 && used_carry && !heavy_hit) {
+            /* Nothing of weight was shared: redo this block on its own. */
+            memcpy(bb->ops, save_ops, (size_t)bb->n_ops * sizeof(Op));
+            rewritten = rw0;
+            used_carry = 0;
+            continue;
+        }
+        break;
+        }
+        free(save_ops);
+        if (ebb && n > 0) {
+            /* Sharing a value across a branch lengthens its live range, which
+               costs a register or a slot. It pays only for a chain of real work,
+               so an entry is carried when it is part of the dependency chain of
+               an entry whose total cost reaches CSE_EBB_MIN. A compare result is
+               never carried: it is cheaper to redo than to hold as a value. */
+            int cost[MAX_CSE], wgt[MAX_CSE], mark[MAX_CSE], keep = 0;
+            for (int k = 0; k < n; k++) {
+                OpKind kd = tbl[k].kind;
+                wgt[k] = ((kd == IR_SHL || kd == IR_SHR) && tbl[k].has_imm
+                          && tbl[k].imm > 1 && tbl[k].imm < 16) ? (int)tbl[k].imm : 1;
+                cost[k] = wgt[k];
+            }
+            for (int pass = 0; pass < 6; pass++)
+                for (int k = 0; k < n; k++) {
+                    int c = wgt[k];
+                    for (int m = 0; m < n; m++) {
+                        if (m == k) continue;
+                        if (tbl[m].dst == tbl[k].src0 || tbl[m].dst == tbl[k].src1)
+                            c += cost[m];
+                    }
+                    cost[k] = c > 64 ? 64 : c;
+                }
+            for (int k = 0; k < n; k++)
+                mark[k] = tbl[k].width >= 2 && cost[k] >= CSE_EBB_MIN
+                          && !(tbl[k].kind >= IR_CMP_EQ && tbl[k].kind <= IR_CMP_UGE);
+            for (int pass = 0; pass < 8; pass++)
+                for (int k = 0; k < n; k++) {
+                    if (!mark[k]) continue;
+                    for (int m = 0; m < n; m++)
+                        if (!mark[m] && (tbl[m].dst == tbl[k].src0 || tbl[m].dst == tbl[k].src1)
+                            && !(tbl[m].kind >= IR_CMP_EQ && tbl[m].kind <= IR_CMP_UGE))
+                            mark[m] = 1;
+                }
+            CSEntry *cp = malloc((size_t)n * sizeof(CSEntry));
+            for (int k = 0; cp && k < n; k++)
+                if (mark[k]) {
+                    cp[keep] = tbl[k];
+                    cp[keep++].inh = cost[k] >= CSE_EBB_MIN ? 2 : 1;
+                }
+            if (cp && keep > 0) { snap[b] = cp; snap_n[b] = keep; }
+            else free(cp);
+        }
     }
+    if (snap) for (int b = 0; b < nbb; b++) free(snap[b]);
+    free(snap); free(snap_n); free(npred); free(pred1);
     free(al.canon); free(al.aliased); free(al.glb); free(al.fixed);
     return rewritten;
 }
