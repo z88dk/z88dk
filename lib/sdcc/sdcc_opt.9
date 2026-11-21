@@ -43,6 +43,38 @@
 %0rst%1 0x38  ; call __RST38%2
 
 ;;
+;; ZX Next defc aliases. sdcc_opt.1 has already turned `name = symbol`
+;; into defc. The peepholer never sees that line. Expand to the final
+;; bytes here. A missed call _ZXN_* is left for the linker.
+;;
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_NEXTREGA_%"[A-Fa-f0-9xX]+"5
+=
+%2:
+	ld	a,l
+	nextreg	%5,a
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_READ_REG_fastcall
+=
+%2:
+	ld	bc,0x243b
+	out	(c),l
+	inc	b
+	in	l,(c)
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_READ_MMU%"[0-9]+"5
+=
+%2:
+	ld	bc,0x243b
+	ld	a,0x50+%5
+	out	(c),a
+	inc	b
+	in	l,(c)
+	ret
+
+;;
 ;; sdcc bugfixes
 ;;
 

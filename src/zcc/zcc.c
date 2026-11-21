@@ -70,6 +70,7 @@ enum {
     CPU_MAP_TOOL_CPURULES,
     CPU_MAP_TOOL_LIBNAME,
     CPU_MAP_TOOL_EZ80CLANG,
+    CPU_MAP_TOOL_CPUINTRINSIC,
     CPU_MAP_TOOL_SIZE,
 };
 
@@ -392,6 +393,7 @@ static char  *c_coptrules_user = NULL;
 static char  *c_coptrules_sccz80 = NULL;
 static char  *c_coptrules_target = NULL;
 static char  *coptrules_cpu = NULL;
+static char  *coptrules_cpu_intrinsic = NULL;
 static char  *c_ez80clang_opt = NULL;
 static char  *c_80cc_opt = NULL;
 static char  *c_xcc_opt = NULL;
@@ -648,7 +650,7 @@ static option options[] = {
 
 cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     {{ "-mz80"   , "-mz80"   , "-mz80"   , "-mz80", "DESTDIR/lib/arch/z80/z80_rules.1", "", "-triple z80"   }},          /* CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT, CPU_TOOL_LIBNAME */
-    {{ "-mz80n"  , "-mz80n"  , "-mz80n"  , "-mz80n","DESTDIR/lib/arch/z80n/z80n_intrinsic", "_z80n", "-triple z80"  }},          /* CPU_TYPE_Z80N    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC                */
+    {{ "-mz80n"  , "-mz80n"  , "-mz80n"  , "-mz80n","DESTDIR/lib/arch/z80n/z80n_rules.1", "_z80n", "-triple z80", "DESTDIR/lib/arch/z80n/z80n_intrinsic" }}, /* CPU_TYPE_Z80N */
     {{ "-mz180"  , "-mz180"  , "-mz180 -portmode=z180", "-mz180", "DESTDIR/lib/arch/z180/z180_rules.1", "_z180", "-triple z180" }},    /* CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mr2ka"  , "-mr2ka"  , "-mr2ka"  , "-mr2ka", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r2ka", NULL  }},          /* CPU_TYPE_R2KA     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mr3k"   , "-mr3k"   , "-mr3ka"  , "-mr3k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r2ka", NULL   }},          /* CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
@@ -1565,7 +1567,9 @@ int main(int argc, char **argv)
         c_coptrules_sccz80 = NULL;
     }
 
-    // Find the CPU specific rules
+    // Find the CPU specific rules. The intrinsic file is call substitution.
+    // sccz80 and 80cc run it before the main peephole. zsdcc expands those
+    // calls inside its own peepholer and does not load this file.
     {
         char *rules = select_cpu(CPU_MAP_TOOL_CPURULES);
         if ( rules ) {
@@ -1576,6 +1580,18 @@ int main(int argc, char **argv)
                 coptrules_cpu = expanded;
             } else {
                 fprintf(stderr, "Warning: cannot find CPU rules file <%s>\n", expanded);
+                free(expanded);
+            }
+        }
+        rules = select_cpu(CPU_MAP_TOOL_CPUINTRINSIC);
+        if ( rules ) {
+            char *expanded = expand_macros(rules);
+            struct stat sb;
+
+            if (stat(expanded, &sb) == 0 && S_ISREG(sb.st_mode)) {
+                coptrules_cpu_intrinsic = expanded;
+            } else {
+                fprintf(stderr, "Warning: cannot find CPU intrinsic rules file <%s>\n", expanded);
                 free(expanded);
             }
         }
@@ -2405,8 +2421,11 @@ static int fill_sccz80_copt_rules(char **rules)
 {
     int num_rules = 0;
 
-    /* z88dk_intrinsic implements intrinsics and RST substitution */
+    /* z88dk_intrinsic implements intrinsics and RST substitution.
+       CPU intrinsics expand next, before any rule that can emit jr. */
     rules[num_rules++] = c_coptrules9;
+    if (coptrules_cpu_intrinsic)
+        rules[num_rules++] = coptrules_cpu_intrinsic;
 
     switch (peepholeopt) {
     case 0:
@@ -2441,6 +2460,8 @@ static int fill_80cc_copt_rules(char **rules)
     int num_rules = 0;
 
     rules[num_rules++] = c_coptrules9;
+    if (coptrules_cpu_intrinsic)
+        rules[num_rules++] = coptrules_cpu_intrinsic;
     rules[num_rules++] = c_80cc_opt;
     if (c_coptrules_target)
         rules[num_rules++] = c_coptrules_target;

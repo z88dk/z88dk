@@ -1,0 +1,5 @@
+	call	_ZXN_NEXTREG_R_0x07
+	call	_ZXN_NEXTREG_V_0x03
+	call	ZXN_READ_REG
+	call	ZXN_WRITE_REG_callee
+	call	ZXN_READ_MMU0
