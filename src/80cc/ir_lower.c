@@ -11180,7 +11180,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 for (int j = 0; j < f->bbs[b].n_ops; j++) {
                     const Op *so = &f->bbs[b].ops[j];
                     if (so->kind == IR_ST_MEM && so->mem.kind == IR_MEM_VREG
-                        && so->mem.base >= 0 && so->mem.base < f->n_vregs)
+                        && so->mem.base >= 0 && so->mem.base < f->n_vregs
+                        && !ir_st_byte_keeps_hl(f, &f->bbs[b], j))
                         st_base[so->mem.base] = 1;
                 }
         int marked = 0;

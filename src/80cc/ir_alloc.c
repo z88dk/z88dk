@@ -211,6 +211,21 @@ void ir_alloc_word_home_done(void)
     late_pair_home = NULL;
 }
 
+/* A byte store through the address the previous op just made (`buf[n++] = k`):
+   with an IX frame the byte reaches A from its slot without touching HL, so the
+   address rides HL into the store, with no park and no slot of its own. `j` is
+   the store's index in `bb`. IR_OFF=st-byte-keep-hl opts out. */
+int ir_st_byte_keeps_hl(const Func *f, const BB *bb, int j)
+{
+    if (c_framepointer_is_ix <= 0 || opt_disabled("st-byte-keep-hl")) return 0;
+    if (j < 1 || j >= bb->n_ops) return 0;
+    const Op *uo = &bb->ops[j], *def = &bb->ops[j - 1];
+    int v = uo->mem.base;
+    return uo->kind == IR_ST_MEM && uo->mem.kind == IR_MEM_VREG
+        && v >= 0 && def->dst == v && uo->mem.offset == 0 && uo->mem.post_step == 0
+        && uo->src[0] >= 0 && uo->src[0] != v && f->vregs[uo->src[0]].width == 1;
+}
+
 /* Returns 1 if the spill of op->dst at bb->ops[op_idx] is dead — its
    value is never read from the frame, only consumed via the HL cache
    by the immediately-following op. Requires liveness computed. */
@@ -3985,6 +4000,7 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
             if (uk == IR_ADD || uk == IR_AND || uk == IR_OR || uk == IR_XOR)
                 continue;
         }
+        if (hi == lo + 1 && ir_st_byte_keeps_hl(f, bb, hi)) continue;
         /* The same with a byte truncation between (`*p = (char)i`): the byte
            is read from its register through A, leaving HL alone. */
         if (hi == lo + 2 && !opt_disabled("stack-spill-base")) {
