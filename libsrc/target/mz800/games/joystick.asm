@@ -2,7 +2,7 @@
 ;
 ; int joystick(int game_device) __z88dk_fastcall;
 ;   1-2: the hardware ports ($F0 and $F1; $F0 is also the palette on writes)
-;   3-6: QAOP-space, 8246-05 (no keypad here: reads nothing), hjkl-sd, cursor keys and space
+;   3-6: QAOP-MN, 8246-05 (no keypad here: reads nothing), hjkl-sd, cursor keys and space
 ;
 ; A port's bits are active low (the MSX style that MAME's MZ-800 has): 0 up, 1 down, 2 left, 3 right, 4 fire, 5 fire 2.  The result is as for the other targets:
 ; bit 0 right, 1 left, 2 down, 3 up, 4 fire 2, 5 fire.
