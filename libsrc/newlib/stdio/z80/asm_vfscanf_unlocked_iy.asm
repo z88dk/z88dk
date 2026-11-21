@@ -19,7 +19,7 @@ PUBLIC asm_vfscanf_unlocked
 PUBLIC asm0_vfscanf_unlocked, asm1_vfscanf_unlocked
 
 EXTERN __stdio_verify_input, __stdio_scanf_sm_format, __stdio_recv_input_eatc
-EXTERN __stdio_scanf_sm_format_pct, error_einval_zc
+EXTERN __stdio_scanf_sm_format_pct, error_einval_zc, asm_isspace
 EXTERN __stdio_nextarg_bc, __stdio_length_modifier, error_erange_zc, l_atou
 
 asm_vfscanf_unlocked:
@@ -119,7 +119,21 @@ percent_join_scanf:
    ;  a = next char of format string
    ; de = char *format (address of next char)
    ; stack = WORKSPACE_40, stack_param
-      
+
+percent_ws_eof_scanf:
+
+   ; whitespace here was not taken by the qualifier, so it matches
+   ; an empty tail. That includes EOF, and %n still runs.
+
+   call asm_isspace
+   jr c, percent_char_scanf
+
+   inc de
+   ld a,(de)
+   jr percent_ws_eof_scanf
+
+percent_char_scanf:
+
    cp '%'
    jr z, possible_conversion_0_scanf
 
