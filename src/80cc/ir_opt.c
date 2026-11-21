@@ -5222,6 +5222,136 @@ int ir_opt_cmp_unsign(Func *f)
 }
 
 
+/* ---- Byte compare of two byte-valued operands (ir_opt_cmp_byte) ----------
+   `k >= (s ? ' ' : '!')` compares a zero-extended byte with a word temp whose
+   every def is a constant in [0,255]. Both values are 0..255, so the signed,
+   unsigned and byte-wise answers agree, and the compare can read both as bytes
+   (`ld a,k; cp e`) instead of widening and walking `sbc` on a word temp that
+   takes a frame slot. An operand qualifies if it is a byte vreg, the single
+   CONV_ZX of one earlier in the block (the byte is read in its place), or a
+   word vreg defined only by byte constants whose every reader is such a compare
+   (it is then narrowed). IR_OFF=cmp-byte-narrow opts out. */
+static int cbn_single_def(const Func *f, int v, int *ob, int *oj)
+{
+    int n = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++)
+            if (f->bbs[b].ops[j].dst == v) { n++; *ob = b; *oj = j; }
+    return n == 1;
+}
+
+/* A word vreg with at least one def, all of them constants in [0,255]. */
+static int cbn_const_word(const Func *f, int v)
+{
+    if (v < 0 || v >= f->n_vregs || f->vregs[v].width != 2) return 0;
+    if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+        return 0;
+    if (debug_named_local(f, v)) return 0;
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            if (o->dst != v) continue;
+            if (o->kind != IR_LD_IMM || (o->imm & ~0xFFLL)) return 0;
+            seen = 1;
+        }
+    return seen;
+}
+
+/* The byte vreg to read in place of operand v at op (b,j), or -1. */
+static int cbn_byte_of(const Func *f, int b, int j, int v)
+{
+    if (v < 0 || v >= f->n_vregs) return -1;
+    if (f->vregs[v].width == 1) return v;
+    int db, dj;
+    if (f->vregs[v].width != 2 || !cbn_single_def(f, v, &db, &dj)) return -1;
+    const Op *d = &f->bbs[db].ops[dj];
+    if (db != b || dj >= j || d->kind != IR_CONV_ZX) return -1;
+    int s = d->src[0];
+    if (s < 0 || s >= f->n_vregs || f->vregs[s].width != 1) return -1;
+    for (int k = dj + 1; k < j; k++)
+        if (f->bbs[b].ops[k].dst == s) return -1;      /* the byte changed since */
+    return s;
+}
+
+int ir_opt_cmp_byte(Func *f)
+{
+    if (!f || opt_disabled("cmp-byte-narrow") || opt_disabled("cmp-byte")) return 0;
+    int cap = 0;
+    for (int b = 0; b < f->n_bbs; b++) cap += f->bbs[b].n_ops;
+    Op **cand = malloc((size_t)(cap > 0 ? cap : 1) * sizeof(Op *));
+    int *cb = malloc((size_t)(cap > 0 ? cap : 1) * sizeof(int));
+    int *cj = malloc((size_t)(cap > 0 ? cap : 1) * sizeof(int));
+    int *raw = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(int));
+    int *viaq = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(int));
+    int n = 0, changed = 0;
+    if (!cand || !cb || !cj || !raw || !viaq) goto out;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *op = &f->bbs[b].ops[j];
+            int u[16], nu = ir_op_uses(op, u, 16);
+            for (int k = 0; k < nu; k++)
+                if (u[k] >= 0 && u[k] < f->n_vregs) raw[u[k]]++;
+            switch (op->kind) {
+            case IR_CMP_LT: case IR_CMP_LE: case IR_CMP_GT: case IR_CMP_GE:
+            case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+            case IR_CMP_EQ: case IR_CMP_NE: break;
+            default: continue;
+            }
+            if (op->src[0] < 0 || op->src[1] < 0) continue;
+            cand[n] = op; cb[n] = b; cj[n] = j; n++;
+        }
+    /* A candidate needs both operands byte-valued and at least one to change. A
+       constant word temp is narrowed only if all its readers are candidates
+       that survive, so drop candidates until that holds. */
+    char *live = calloc((size_t)(n > 0 ? n : 1), 1);
+    if (!live) goto out;
+    for (int i = 0; i < n; i++) {
+        int a = cand[i]->src[0], c = cand[i]->src[1];
+        int ra = cbn_const_word(f, a) ? a : cbn_byte_of(f, cb[i], cj[i], a);
+        int rc = cbn_const_word(f, c) ? c : cbn_byte_of(f, cb[i], cj[i], c);
+        live[i] = (ra >= 0 && rc >= 0 && (f->vregs[a].width == 2 || f->vregs[c].width == 2));
+    }
+    int again;
+    do {
+        again = 0;
+        memset(viaq, 0, sizeof(int) * (size_t)f->n_vregs);
+        for (int i = 0; i < n; i++) {
+            if (!live[i]) continue;
+            for (int s = 0; s < 2; s++) {
+                int v = cand[i]->src[s];
+                if (cbn_const_word(f, v)) viaq[v]++;
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            if (!live[i]) continue;
+            for (int s = 0; s < 2; s++) {
+                int v = cand[i]->src[s];
+                if (cbn_const_word(f, v) && viaq[v] != raw[v]) { live[i] = 0; again = 1; }
+            }
+        }
+    } while (again);
+    for (int i = 0; i < n; i++) {
+        if (!live[i]) continue;
+        Op *op = cand[i];
+        for (int s = 0; s < 2; s++) {
+            int v = op->src[s];
+            if (cbn_const_word(f, v)) {
+                f->vregs[v].width = 1;
+                f->vregs[v].kind  = KIND_CHAR;
+            } else {
+                op->src[s] = cbn_byte_of(f, cb[i], cj[i], v);
+            }
+        }
+        if (cs_is_signed_cmp(op->kind)) op->kind = cs_unsigned_of(op->kind);
+        changed++;
+    }
+    free(live);
+out:
+    free(cand); free(cb); free(cj); free(raw); free(viaq);
+    return changed;
+}
+
 /* Is every def of v an OR of two values that each fit a byte? The result
    then fits a byte too, so v may be byte-wide whatever reads it; a wide reader
    zero-extends. */

@@ -195,6 +195,10 @@ void ir_opt_cmpsign_probe(Func *f);
    number rewritten. --opt-disable=cmp-unsign / IR_CMPUNSIGN=0 opts out. */
 int ir_opt_cmp_unsign(Func *f);
 
+/* Compare two byte-valued operands as bytes: a zero-extended byte and a word
+   temp defined only by byte constants. IR_OFF=cmp-byte-narrow opts out. */
+int ir_opt_cmp_byte(Func *f);
+
 /* Range-narrow a loop counter proven to fit [0,256) to a byte (width-1):
  * byte inc/dec step, 1-byte slot, int uses auto-widen. IR_NO_IV_NARROW opts
  * out. Returns the number of counters narrowed. */

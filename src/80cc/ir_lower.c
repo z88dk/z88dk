@@ -9897,6 +9897,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
         int narrow  = ir_opt_narrow_byte(f);
         narrow += ir_opt_byte_cleanup(f);   /* identity masks; byte reads skip a widening */
         ir_opt_cmp_unsign(f);           /* drop the signed-compare sign tail */
+        dce += ir_opt_cmp_byte(f) ? ir_opt_dce(f) : 0;   /* byte-valued operands compare as bytes */
         (void)ir_opt_step_cmp(f);       /* x++ == K  ->  stepped value == K+1 */
         /* narrow_byte turns promoting CONV_SX|ZX operands into
            byte-identity copies; propagate them away (else they spill to a
