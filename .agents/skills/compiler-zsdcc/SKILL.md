@@ -31,7 +31,7 @@ Sources / patches: `src/zsdcc/`. Pin: root `Makefile` `SDCC_VERSION`.
 | Current patch | `src/zsdcc/sdcc-z88dk.patch` |
 | Snapshot name | `src/zsdcc/sdcc-16639-z88dk.patch` |
 | Makefile pin | `SDCC_VERSION=16639` |
-| CI / HTTP tarball | `zsdcc_r16639_src.tar.gz` (nightly `http://nightly.z88dk.org/zsdcc/`) |
+| CI / HTTP tarball | `zsdcc_r16639_src.tar.gz` from `http://nightly.z88dk.org/zsdcc/`. Checksum: `src/zsdcc/zsdcc_r16639_src.tar.gz.sha256`. `src/zsdcc/ensure-src-tarball.sh` reuses a root copy when the sum matches. A missing hash file, or a failed download when a copy is already present, keeps that copy and prints a warning. `bins-clean` does not remove the archive. |
 
 Historical snapshots stay under `src/zsdcc/sdcc-*-z88dk.patch` for rebuild of older pins. Human notes: `src/zsdcc/readme.md`.
 
@@ -188,11 +188,12 @@ svn revert -R .
 patch -p0 --dry-run < ../../src/zsdcc/sdcc-z88dk.patch   # must be clean
 patch -p0 < ../../src/zsdcc/sdcc-z88dk.patch
 
-# 7. Tarball for nightly / CI (from z88dk root; no .o/.a)
+# 7. Tarball for the HTTP build (from z88dk root; no .o/.a)
 cd ../..
 tar --exclude=.svn --exclude='*.o' --exclude='*.a' \
   -czf zsdcc_r<rev>_src.tar.gz src/sdcc-build
-# Upload to nightly server; force-add only if packaging in git: git add -f zsdcc_r<rev>_src.tar.gz
+sha256sum zsdcc_r<rev>_src.tar.gz > src/zsdcc/zsdcc_r<rev>_src.tar.gz.sha256
+# Upload the archive. The sha256 file is committed. The archive stays gitignored.
 
 # 8. Smoke
 #    configure (same flags as Makefile BUILD_SDCC), make -j2

@@ -2,7 +2,8 @@
 
 Current baseline: **SDCC 4.6.0** (svn **r16639**, final release tag).  
 Patch: `sdcc-z88dk.patch` (snapshot `sdcc-16639-z88dk.patch`).  
-Makefile pin: `SDCC_VERSION=16639`.
+Makefile pin: `SDCC_VERSION=16639`.  
+`zsdcc_r16639_src.tar.gz.sha256` is the checksum of the HTTP source archive. A copy of that archive in the z88dk root is reused when the sum matches.
 
 ## Instructions
 

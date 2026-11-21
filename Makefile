@@ -42,10 +42,13 @@ endif
 Z88DK_PATH	= $(shell pwd)
 SDCC_PATH	= $(Z88DK_PATH)/src/sdcc-build
 SDCC_VERSION	= 16639
+SDCC_TARBALL	= zsdcc_r$(SDCC_VERSION)_src.tar.gz
+SDCC_SHAFILE	= src/zsdcc/$(SDCC_TARBALL).sha256
+SDCC_URL	= http://nightly.z88dk.org/zsdcc/$(SDCC_TARBALL)
 
 ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
-SDCC_DEPS	= zsdcc_r$(SDCC_VERSION)_src.tar.gz
+SDCC_DEPS	= $(SDCC_TARBALL)
 endif
 endif
 
@@ -95,7 +98,8 @@ bin/m4$(EXESUFFIX): | bin
 $(SDCC_PATH)/configure: $(SDCC_DEPS)
 ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
-	tar xzf $^
+	sh $(Z88DK_PATH)/src/zsdcc/ensure-src-tarball.sh $(SDCC_TARBALL) $(SDCC_SHAFILE) $(SDCC_URL)
+	tar xzf $(SDCC_TARBALL)
 	touch $@
 else
 	svn checkout -r $(SDCC_VERSION) https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
@@ -103,8 +107,8 @@ else
 endif
 endif
 
-zsdcc_r$(SDCC_VERSION)_src.tar.gz:
-	curl http://nightly.z88dk.org/zsdcc/zsdcc_r$(SDCC_VERSION)_src.tar.gz -o zsdcc_r$(SDCC_VERSION)_src.tar.gz
+$(SDCC_TARBALL):
+	sh $(Z88DK_PATH)/src/zsdcc/ensure-src-tarball.sh $(SDCC_TARBALL) $(SDCC_SHAFILE) $(SDCC_URL)
 
 # Helper rule to build the zsdcc tarball for ci builds
 zsdcc-tarball: $(SDCC_PATH)/configure
@@ -287,11 +291,6 @@ bins-clean:
 	$(MAKE) -C testsuite clean
 	$(MAKE) -C src/z88dk-lib clean
 	$(RM) -r $(SDCC_PATH)
-ifdef BUILD_SDCC
-ifdef BUILD_SDCC_HTTP
-	$(RM) $(SDCC_DEPS)
-endif
-endif
 	#if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
 
 test-clean:
