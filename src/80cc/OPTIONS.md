@@ -372,6 +372,9 @@ exists (ADR 0010).
 | `inc-mem-call` | `inc-mem` treats every direct call as reading A, so a memory step before a call keeps `ld a,MEM; inc a; ld MEM,a` |
 | `mul-pushpop` | a word times 2^n+1 keeps `push hl; ... ex de,hl; pop hl` around the shift instead of adding the copy already in DE |
 | `cse-ebb` | the arithmetic CSE table is reset at every block instead of carried into a block with one predecessor |
+| `br-known` | a branch on a value the same block already branched on is kept, instead of folded to a jump or dropped |
+| `const-diamond-bare` | the constant diamond skips a branch whose condition is a bare byte with no computation in front of it |
+| `cmp-byte-de` | an unsigned byte compare whose second operand is already in A takes the widened 16-bit compare instead of parking it in E |
 | `sink-trunc` | a word-to-byte truncation is not moved down next to the byte store that reads it, so the byte lives across the address arithmetic |
 | `ivsr-suppress-lea` | a stepped pointer is made for a local array addressed from the frame, instead of rebuilding the address from sp (ez80 sp always keeps it) |
 | `ivsr-share` | two derived induction addresses with the same base, index, scale and step each get their own stepped pointer |

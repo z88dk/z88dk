@@ -9860,6 +9860,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
         int reassoc = ir_opt_reassoc_reduction(f);
         int rcoal   = ir_opt_reduce_coalesce(f);
         int cse     = ir_opt_cse(f);
+        if (ir_opt_known_branch(f)) (void)ir_opt_prune_unreachable(f);
         /* After cse so duplicate per-lane address ADDs have been
            merged; before the long-push inserter. */
         int packs   = ir_match_run_packbytes(f);
