@@ -77,7 +77,7 @@ int main() {
 }
 END
 
-    run_ok("zcc +zx -m -debug ${test}.c ${test}1.asm -o ${test}.bin");
+    run_ok("zcc +zx -compiler=sccz80 -m -debug ${test}.c ${test}1.asm -o ${test}.bin");
 
     ( my $test_expanded = $test ) =~
         s/([^a-z0-9])/ sprintf("_%02x", ord($1)) /ige;

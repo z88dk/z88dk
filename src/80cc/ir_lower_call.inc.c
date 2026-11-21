@@ -436,7 +436,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                 && f->vregs[ci->args[ci->n_args - 1]].width == 4)
                 de_arg = 1;
             if (ci->preserved & IR_R_DE) de_arg = 1;
-            decall_note("l_jphl", !de_arg, 0);
+            decall_note("l_jphl", !de_arg, 0, 0);
             emit(out, "call\tl_jphl");
         }
     } else if ((ci->flags & SHORTCALL) && !(ci->flags & SHORTCALL_HL)) {
@@ -499,7 +499,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         {
             char sym[64];
             snprintf(sym, sizeof sym, "%s%s", pfx ? pfx : "", nm ? nm : "");
-            decall_note(sym, !de_arg, !(ci->preserved & IR_R_BC));
+            decall_note(sym, !de_arg, !(ci->preserved & IR_R_BC),
+                       !(sc1 || (ci->preserved & IR_R_A)));
         }
         emit(out, "call\t%s%s", pfx, nm);
     }

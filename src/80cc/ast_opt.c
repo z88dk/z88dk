@@ -258,6 +258,44 @@ static Type *integer_promote_type(const Type *t)
     return type_int;
 }
 
+/* True for a tree made only of double literals and arithmetic/negation of
+   them, i.e. something ast_fold_constants will collapse to one double
+   literal. */
+static int is_double_const_tree(Node *n)
+{
+    if (!n || !n->type || n->type->kind != KIND_DOUBLE) return 0;
+    switch (n->ast_type) {
+    case AST_LITERAL: return 1;
+    case OP_NEG:      return is_double_const_tree(n->operand);
+    case OP_MULT: case OP_DIV: case OP_ADD: case OP_SUB:
+        return is_double_const_tree(n->left) && is_double_const_tree(n->right);
+    default:          return 0;
+    }
+}
+
+static void retype_const_tree_f16(Node *n)
+{
+    n->type = type_float16;
+    if (n->ast_type == OP_NEG) retype_const_tree_f16(n->operand);
+    else if (n->ast_type != AST_LITERAL) {
+        retype_const_tree_f16(n->left);
+        retype_const_tree_f16(n->right);
+    }
+}
+
+/* `_Float16 OP <double constant>`: keep the constant in _Float16 (as sccz80
+   does) rather than promoting to double. Strict C would promote, but the
+   double tier (math48) is not linked under --math16, and the result is
+   stored back to _Float16 anyway. */
+static void narrow_double_const_vs_f16(Node *l, Node *r)
+{
+    if (!l || !r || !l->type || !r->type) return;
+    if (l->type->kind == KIND_FLOAT16 && is_double_const_tree(r))
+        retype_const_tree_f16(r);
+    else if (r->type->kind == KIND_FLOAT16 && is_double_const_tree(l))
+        retype_const_tree_f16(l);
+}
+
 void ast_normalize_types(Node *node)
 {
     if (!node) return;
@@ -318,6 +356,9 @@ void ast_normalize_types(Node *node)
     case OP_OR: case OP_AND: case OP_XOR:
         ast_normalize_types(node->left);
         ast_normalize_types(node->right);
+        if (node->ast_type == OP_MULT || node->ast_type == OP_DIV
+            || node->ast_type == OP_ADD || node->ast_type == OP_SUB)
+            narrow_double_const_vs_f16(node->left, node->right);
         node->type = promote_types(node->left->type, node->right->type);
         /* `ptr - ptr` is the one case where promote_types over-counts:
            C semantics say the result is ptrdiff_t (integer), not a
@@ -341,6 +382,8 @@ void ast_normalize_types(Node *node)
            signedness-aware lowering. */
         ast_normalize_types(node->left);
         ast_normalize_types(node->right);
+        if (node->ast_type != OP_OROR && node->ast_type != OP_ANDAND)
+            narrow_double_const_vs_f16(node->left, node->right);
         if (!node->type) node->type = type_int;
         break;
     case OP_PRE_INC: case OP_POST_INC: case OP_PRE_DEC: case OP_POST_DEC:
@@ -900,7 +943,8 @@ Node *ast_fold_constants(Node *node)
            fold integer→integer and integer→pointer casts; the
            latter covers `(T*)0` patterns (e.g. NULL written as
            `((void*)0)`) so they reduce to a literal usable as a
-           constant initialiser. Float and fixed-point casts keep
+           constant initialiser. A float literal cast to an integer
+           folds too (below); other float and fixed-point casts keep
            their OP_CAST so the walker emits the proper conversion
            helper. */
         if (node->operand
@@ -910,7 +954,15 @@ Node *ast_fold_constants(Node *node)
                 || node->type->kind == KIND_PTR
                 || node->type->kind == KIND_CPTR)
             && node->operand->type
-            && kind_is_integer(node->operand->type->kind)) {
+            && (kind_is_integer(node->operand->type->kind)
+                /* A float literal cast to an integer type folds to its
+                   truncated value (as sccz80 does), instead of a runtime
+                   dload + ifix that needs the double library linked. */
+                || (kind_is_floating(node->operand->type->kind)
+                    && kind_is_integer(node->type->kind)
+                    && !node->operand->int_literal
+                    && (double)node->operand->zval > -9.0e18
+                    && (double)node->operand->zval <  9.0e18))) {
             int64_t v = node_int_value(node->operand);
             int64_t narrowed = v;
             Kind dst = node->type->kind;
@@ -954,6 +1006,17 @@ Node *ast_fold_constants(Node *node)
                 narrowed = (int64_t)((uint32_t)v & 0xffffffu);
             }
             return fold_int_literal(node, node->type, (uint64_t)narrowed);
+        }
+        /* `(_Float16)<float literal>`: the literal becomes an f16 literal
+           (rounded when emitted) rather than dload + l_f48_ftof16, which
+           --math16 does not link. */
+        if (node->operand && node->operand->ast_type == AST_LITERAL
+            && node->type && node->type->kind == KIND_FLOAT16
+            && node->operand->type
+            && kind_is_floating(node->operand->type->kind)
+            && !node->operand->int_literal) {
+            node->operand->type = type_float16;
+            return node->operand;
         }
         /* A narrowing cast of a value ternary moves into the arms, so each
            arm computes only the bits the cast keeps and the join holds the

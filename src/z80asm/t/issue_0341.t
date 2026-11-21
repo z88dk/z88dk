@@ -30,7 +30,7 @@ int main()
 END
 
 run_ok(
-"zcc +z80 -m -clib=new -Cc-gcline -Ca-debug ${test}.c ${test}1.asm -o${test}.bin"
+"zcc +z80 -compiler=sccz80 -m -clib=new -Cc-gcline -Ca-debug ${test}.c ${test}1.asm -o${test}.bin"
 );
 
 ( my $test_expanded = $test ) =~ s/([^a-z0-9])/ sprintf("_%02x", ord($1)) /ige;

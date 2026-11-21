@@ -70,6 +70,7 @@ int ir_opt_st2ld(Func *f);
  * Returns the number of ops rewritten to IR_MOV.
  */
 int ir_opt_cse(Func *f);
+int ir_opt_known_branch(Func *f);
 extern int ir_cse_alias_fired, ir_cse_alias_veto;
 
 /* Spatial address CSE (clustered array access, e.g. a stencil's a[k], a[k-1],

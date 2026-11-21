@@ -1832,6 +1832,7 @@ static int xline_c_call(const char *line);
    `--opt-disable=de-ret` opts out, byte for byte. Evidence: adr/0084. */
 static int xf_ret_de_static = 1;    /* per-function, read off the Func */
 static int xf_ret_dispatch  = 0;    /* set by the fc_ret dispatch emitter */
+static int xf_ret_a_static  = 1;    /* per-function: does a `ret` read A? */
 
 static int xline_ret_reads_de(void)
 {
@@ -1856,19 +1857,20 @@ static int xline_ret_reads_de(void)
 
    `--opt-disable=de-call` opts out, byte for byte. Evidence: adr/0084. */
 #define DECALL_MAX 96
-static struct { char name[56]; unsigned char dirty, bc_dirty; } xf_decall[DECALL_MAX];
+static struct { char name[56]; unsigned char dirty, bc_dirty, a_dirty; } xf_decall[DECALL_MAX];
 static int xf_decall_n;
 static int xf_decall_full;
 static const char *xline_call_operand(const char *line);
 static int xline_plain_call(const char *line);
 
-static void decall_note(const char *sym, int clean, int bc_clean)
+static void decall_note(const char *sym, int clean, int bc_clean, int a_clean)
 {
     if (!sym || !*sym) return;
     for (int i = 0; i < xf_decall_n; i++)
         if (!strcmp(xf_decall[i].name, sym)) {
             if (!clean) xf_decall[i].dirty = 1;
             if (!bc_clean) xf_decall[i].bc_dirty = 1;
+            if (!a_clean) xf_decall[i].a_dirty = 1;
             return;
         }
     if (xf_decall_n >= DECALL_MAX || strlen(sym) + 1 > sizeof xf_decall[0].name) {
@@ -1878,6 +1880,7 @@ static void decall_note(const char *sym, int clean, int bc_clean)
     strcpy(xf_decall[xf_decall_n].name, sym);
     xf_decall[xf_decall_n].dirty = (unsigned char)!clean;
     xf_decall[xf_decall_n].bc_dirty = (unsigned char)!bc_clean;
+    xf_decall[xf_decall_n].a_dirty = (unsigned char)!a_clean;
     xf_decall_n++;
 }
 
@@ -1903,6 +1906,28 @@ static int xline_call_bc_fact(const char *line)
     for (int i = 0; i < xf_decall_n; i++)
         if (!strcmp(xf_decall[i].name, sym)) return !xf_decall[i].bc_dirty;
     return -1;
+}
+
+/* [inc-mem-call] Is THIS line a direct call whose target the emitter proved
+   not to read A? An `__sdcccall(1)` target passes a byte in A, and
+   `__preserves_regs(a)` makes A matter after the call; neither is recorded as
+   clean. A clean call also clobbers A, so a value held there is dead. */
+static int xline_call_a_clean(const char *line)
+{
+    if (xf_decall_full || opt_disabled("inc-mem-call") || !xline_plain_call(line))
+        return 0;
+    const char *p = xline_call_operand(line);
+    if (!p) return 0;
+    char sym[56]; size_t k = 0;
+    while (p[k] && p[k] != '\n' && p[k] != '\r' && p[k] != ' '
+           && p[k] != '\t' && p[k] != ';' && k + 1 < sizeof sym) {
+        sym[k] = p[k]; k++;
+    }
+    if (p[k] && p[k] != '\n' && p[k] != '\r') return 0;
+    sym[k] = '\0';
+    for (int i = 0; i < xf_decall_n; i++)
+        if (!strcmp(xf_decall[i].name, sym)) return !xf_decall[i].a_dirty;
+    return 0;
 }
 
 /* 0: not an unconditional `call name`; 2: a call to l_case / l_setjmp;
@@ -1955,6 +1980,20 @@ static int xline_call_de_clean(const char *line)
     sym[k] = '\0';
     for (int i = 0; i < xf_decall_n; i++)
         if (!strcmp(xf_decall[i].name, sym)) return !xf_decall[i].dirty;
+    return 0;
+}
+
+/* [inc-mem-ret] Does a `ret` of this function read A? Only an __sdcccall(1)
+   return (a byte comes back in A), an interrupt or naked body, a banked
+   function or a raw asm block can; the default convention returns a byte in L. */
+static int func_ret_reads_a(const Func *f)
+{
+    if (!f || opt_disabled("inc-mem-ret")) return 1;
+    if (f->flags & (SDCCCALL1 | BANKED)) return 1;
+    if (f->is_interrupt || f->is_naked) return 1;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int o = 0; o < f->bbs[b].n_ops; o++)
+            if (f->bbs[b].ops[o].kind == IR_ASM) return 1;
     return 0;
 }
 
@@ -2260,6 +2299,11 @@ static int im_a_live_walk(char **lines, int n, int start,
             if (!strchr(lines[j], ',') && strncmp(lines[j] + 1, "djnz", 4))
                 return 0;                          /* unconditional: no fall-through */
             continue;                              /* conditional: also fall through */
+        }
+        if (xline_call_a_clean(lines[j])) return 0;       /* callee ignores A, then clobbers it */
+        if (!xf_ret_a_static && !xf_ret_dispatch) {
+            if (!strcmp(lines[j], "\tret\n")) return 0;   /* A is not a return register */
+            if (!strncmp(lines[j], "\tret\t", 5)) continue;   /* ret cc falls through */
         }
         if (!gw_no_a_read(lines[j])) return 1;     /* reads A, or unrecognised */
     }
@@ -3050,6 +3094,96 @@ static void fold_mulchain_de(char **lines, char *drop, int n)
     }
 }
 
+/* [ld-a-fwd] A second `ld a,(_sym)` is dropped when A still holds that load.
+   Between the two loads only lines that leave A and memory alone may appear:
+   `or a`, `and a`, `cp n`, a conditional branch or return, and a label that
+   nothing else refers to (a block reached only by falling through). Any other
+   line, a referenced label, or an operand that is not a plain symbol ends the
+   search. `--opt-disable=ld-a-fwd` opts out. */
+static int lf_token_at(const char *base, const char *name, size_t len)
+{
+    const char *s = base;
+    for (; (s = strstr(s, name)) != NULL; s += len) {
+        int pre = (s != base) && (s[-1] == '_' || isalnum((unsigned char)s[-1]));
+        int post = (s[len] == '_' || isalnum((unsigned char)s[len]));
+        if (!pre && !post) return 1;
+    }
+    return 0;
+}
+
+static int lf_label_referenced(char **lines, int n, int at, const char *name)
+{
+    size_t len = strlen(name);
+    for (int k = 0; k < n; k++) {
+        if (k == at) continue;
+        if (lf_token_at(lines[k] + 0, name, len)) return 1;
+    }
+    return 0;
+}
+
+static int lf_plain_sym_load(const char *l)
+{
+    if (strncmp(l, "\tld\ta,(_", 8)) return 0;
+    const char *e = strchr(l, ')');
+    return e && e[1] == '\n' && !strchr(l, '+') && !strchr(l, '-');
+}
+
+static int lf_keeps_a(const char *l)
+{
+    if (!strcmp(l, "\tor\ta\n") || !strcmp(l, "\tand\ta\n")) return 1;
+    if (!strncmp(l, "\tcp\t", 4) && l[4] != '(' && !strchr(l, ',')) return 1;
+    if (!strncmp(l, "\tret\t", 5)) return 1;               /* ret cc */
+    char tgt[64];
+    return xline_branch_target(l, tgt, sizeof tgt) && strchr(l, ',')
+        && strncmp(l + 1, "djnz", 4);
+}
+
+static void fold_dup_a_load(char **lines, char *drop, int n)
+{
+    if (opt_disabled("ld-a-fwd")) return;
+    for (int i = 0; i < n; i++) {
+        if (drop[i] || !lf_plain_sym_load(lines[i])) continue;
+        for (int j = i + 1; j < n; j++) {
+            if (drop[j]) continue;
+            if (!strcmp(lines[j], lines[i])) { drop[j] = 1; break; }
+            char nm[64];
+            if (xline_label(lines[j], nm, sizeof nm)) {
+                if (lf_label_referenced(lines, n, j, nm)) break;
+                continue;
+            }
+            if (!lf_keeps_a(lines[j])) break;
+        }
+    }
+}
+
+static int de_halves_dead_after(char **lines, int n, const char *drop, int start);
+
+/* [mul-pushpop] A word times 2^n+1 whose multiplicand was saved on the stack:
+     push hl; ld de,hl; add hl,hl (n times); ex de,hl; pop hl; add hl,de
+   DE already holds the multiplicand after the copy, so the save, the exchange
+   and the restore are dead:
+     ld de,hl; add hl,hl (n times); add hl,de
+   HL and the flags are the same; DE ends holding the multiplicand instead of
+   the shifted value, so DE must be dead after the add, and the stack ends the
+   same. `--opt-disable=mul-pushpop` opts out. */
+static void fold_mul_pushpop(char **lines, char *drop, int n)
+{
+    if (opt_disabled("mul-pushpop")) return;
+    for (int i = 0; i + 5 < n; i++) {
+        if (drop[i] || strcmp(lines[i], "\tpush\thl\n")) continue;
+        int j = i + 1;
+        if (drop[j] || strcmp(lines[j], "\tld\tde,hl\n")) continue;
+        int k = j + 1, shifts = 0;
+        while (k < n && !drop[k] && !strcmp(lines[k], "\tadd\thl,hl\n")) { k++; shifts++; }
+        if (!shifts || k + 2 >= n) continue;
+        if (drop[k] || strcmp(lines[k], "\tex\tde,hl\n")) continue;
+        if (drop[k + 1] || strcmp(lines[k + 1], "\tpop\thl\n")) continue;
+        if (drop[k + 2] || strcmp(lines[k + 2], "\tadd\thl,de\n")) continue;
+        if (!de_halves_dead_after(lines, n, drop, k + 3)) continue;
+        drop[i] = drop[k] = drop[k + 1] = 1;
+    }
+}
+
 static void fold_tos_rmw(char **lines, char *drop, int n);
 static void fold_slot_bitop_de(char **lines, char *drop, int n);
 static void fold_mask_shl_a(char **lines, char *drop, int n);
@@ -3066,6 +3200,8 @@ void ir_lower_fold_mulchain_de(FILE *out, FILE *src)
     if (drop) {
         fold_mulchain_de(lines, drop, n);
         fold_tos_rmw(lines, drop, n);   /* after: it must not take a chain reload */
+        fold_dup_a_load(lines, drop, n);
+        fold_mul_pushpop(lines, drop, n);
     }
     for (int i = 0; i < n; i++)
         if (!drop || !drop[i]) fputs(lines[i], out);
@@ -9600,6 +9736,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
        read it, and the emitter may raise xf_ret_dispatch in between. */
     xf_ret_de_static = func_ret_reads_de(f);
     xf_ret_dispatch  = 0;
+    xf_ret_a_static  = func_ret_reads_a(f);
     /* [de-call] the proved-clean call targets are per function too. */
     xf_decall_n = 0; xf_decall_full = 0;
     /* L.cur_frameless is the previous function's answer until this one has had
@@ -9723,6 +9860,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
         int reassoc = ir_opt_reassoc_reduction(f);
         int rcoal   = ir_opt_reduce_coalesce(f);
         int cse     = ir_opt_cse(f);
+        if (ir_opt_known_branch(f)) (void)ir_opt_prune_unreachable(f);
         /* After cse so duplicate per-lane address ADDs have been
            merged; before the long-push inserter. */
         int packs   = ir_match_run_packbytes(f);
@@ -13221,12 +13359,18 @@ static int rmw_chain_to_store(const Func *f, const BB *bb, int start, int vreg,
             && o->mem.offset == off && o->src[0] == cur && !o->mem.volatile_
             && !o->mem.bank_fn && k > start)
             return find_unique_use(f, vreg) != NULL;
-        int alu = (o->kind == IR_AND || o->kind == IR_OR || o->kind == IR_XOR
+        int step = (o->kind == IR_INC || o->kind == IR_DEC)
+                   && !opt_disabled("rmw-hl-step");
+        int alu = step || (o->kind == IR_AND || o->kind == IR_OR || o->kind == IR_XOR
                    || o->kind == IR_ADD || o->kind == IR_SUB);
         if (!alu || o->dst < 0 || f->vregs[o->dst].width != 1) return 0;
         int comm = (o->kind != IR_SUB);
         int other;
-        if (o->src[0] == cur) other = o->src[1];
+        if (step) {
+            if (o->src[0] != cur) return 0;
+            if (!find_unique_use(f, o->dst)) return 0;   /* the result is also tested */
+            other = -1;
+        } else if (o->src[0] == cur) other = o->src[1];
         else if (comm && o->src[1] == cur) other = o->src[0];
         else return 0;
         if (other >= 0 && !rmw_operand_hl_free(f, other)) return 0;

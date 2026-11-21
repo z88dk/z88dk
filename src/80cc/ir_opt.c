@@ -600,9 +600,11 @@ typedef struct {
     int     has_imm;    /* 1 if imm is meaningful */
     int     dst;        /* vreg holding the computed value */
     int     width;
+    int     inh;        /* 0 local; 1 inherited chain link; 2 inherited chain end */
 } CSEntry;
 
 #define MAX_CSE 32
+#define CSE_EBB_MIN 8
 
 static int cse_eligible(OpKind k)
 {
@@ -2064,11 +2066,77 @@ int ir_opt_cse(Func *f)
         }
     }
 
+    /* [cse-ebb] A block reached only from one earlier block starts with that
+       block's table: nothing runs between the branch and its target, and
+       arithmetic is pure, so every entry still names the same value. The alias
+       state is not carried, which can only cost a hit, never add one. */
+    int nbb = f->n_bbs;
+    int ebb = !opt_disabled("cse-ebb") && nbb > 1;
+    int *npred = ebb ? calloc((size_t)nbb, sizeof(int)) : NULL;
+    int *pred1 = ebb ? calloc((size_t)nbb, sizeof(int)) : NULL;
+    int *stamp = ebb ? calloc((size_t)nbb, sizeof(int)) : NULL;
+    unsigned char *bad = ebb ? calloc((size_t)nbb, 1) : NULL;
+    CSEntry **snap = ebb ? calloc((size_t)nbb, sizeof(*snap)) : NULL;
+    int *snap_n = ebb ? calloc((size_t)nbb, sizeof(int)) : NULL;
+    if (!npred || !pred1 || !stamp || !bad || !snap || !snap_n) {
+        free(npred); free(pred1); free(stamp); free(bad); free(snap); free(snap_n);
+        npred = pred1 = stamp = snap_n = NULL; bad = NULL; snap = NULL; ebb = 0;
+    } else {
+        /* Edges come from the branch OPS, as in prune_unreachable: a short-circuit
+           lowering leaves several branch ops, some mid-block, in one block, and
+           succ[] holds only two targets. An edge leaves from a point where the
+           table equals the block's final table only when nothing but branches
+           follows it; any other edge marks its target unfit to inherit. */
+        #define CSE_EDGE(t, term) do {                                       \
+            int _t = (t);                                                    \
+            if (_t >= 0 && _t < nbb) {                                       \
+                if (stamp[_t] != b + 1) { stamp[_t] = b + 1; npred[_t]++; pred1[_t] = b; } \
+                if (!(term)) bad[_t] = 1;                                    \
+            }                                                                \
+        } while (0)
+        for (int b = 0; b < nbb; b++) {
+            const BB *pb = &f->bbs[b];
+            int tail = pb->n_ops;
+            while (tail > 0) {
+                OpKind tk = pb->ops[tail - 1].kind;
+                if (tk != IR_BR && tk != IR_BR_COND && tk != IR_BR_ZERO && tk != IR_SWITCH) break;
+                tail--;
+            }
+            for (int j = 0; j < pb->n_ops; j++) {
+                const Op *o = &pb->ops[j];
+                if (o->kind == IR_BR || o->kind == IR_BR_COND || o->kind == IR_BR_ZERO)
+                    CSE_EDGE(o->label, j >= tail);
+                else if (o->kind == IR_SWITCH && o->sw) {
+                    for (int c = 0; c < o->sw->n_cases; c++)
+                        CSE_EDGE(o->sw->target_bb[c], j >= tail);
+                    CSE_EDGE(o->sw->default_bb, j >= tail);
+                }
+            }
+            CSE_EDGE(pb->succ[0], 1);
+            CSE_EDGE(pb->succ[1], 1);
+        }
+        #undef CSE_EDGE
+    }
+
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
         int n = 0;
+        Op *save_ops = NULL;
+        int rw0 = rewritten, used_carry = 0, heavy_hit = 0;
+        for (int attempt = 0; ; attempt++) {
+        n = 0;
         cse_alias_reset(&al, nv);
         if (al.glb) memset(al.glb, 0, (size_t)nv);
+        if (ebb && attempt == 0 && b > 0 && npred[b] == 1 && !bad[b] && pred1[b] < b
+            && snap[pred1[b]] && bb->n_ops > 0) {
+            save_ops = malloc((size_t)bb->n_ops * sizeof(Op));
+            if (save_ops) {
+                memcpy(save_ops, bb->ops, (size_t)bb->n_ops * sizeof(Op));
+                n = snap_n[pred1[b]];
+                memcpy(tbl, snap[pred1[b]], (size_t)n * sizeof(CSEntry));
+                used_carry = 1;
+            }
+        }
 
         for (int j = 0; j < bb->n_ops; j++) {
             Op *op = &bb->ops[j];
@@ -2121,6 +2189,7 @@ int ir_opt_cse(Func *f)
                     }
                 if (hit >= 0) {
                     int src_dst = tbl[hit].dst;
+                    if (tbl[hit].inh == 2) heavy_hit = 1;
                     op->kind = IR_MOV; op->src[0] = src_dst; op->src[1] = -1;
                     op->imm = 0;
                     op->mem.kind = IR_MEM_FRAME; op->mem.sym = NULL;
@@ -2134,7 +2203,7 @@ int ir_opt_cse(Func *f)
                     if (n < MAX_CSE && bc != op->dst) {
                         tbl[n].kind = IR_LD_MEM; tbl[n].src0 = bc; tbl[n].src1 = -1;
                         tbl[n].imm = op->mem.offset; tbl[n].has_imm = 1;
-                        tbl[n].dst = op->dst; tbl[n].width = dw;
+                        tbl[n].dst = op->dst; tbl[n].width = dw; tbl[n].inh = 0;
                         n++;
                     }
                     goto cse_invalidated;
@@ -2199,6 +2268,7 @@ int ir_opt_cse(Func *f)
                     /* Rewrite to IR_MOV dst <- existing dst; the lowerer
                        branches on dst width for long vs int. */
                     int src_dst = tbl[hit].dst;
+                    if (tbl[hit].inh == 2) heavy_hit = 1;
                     from_hit = 1;
                     if (al.canon && (s0 != op->src[0] || s1 != op->src[1])) ir_cse_alias_fired = 1;
                     op->kind   = IR_MOV;
@@ -2234,6 +2304,7 @@ int ir_opt_cse(Func *f)
                         tbl[n].has_imm = has_imm;
                         tbl[n].dst     = op->dst;
                         tbl[n].width   = dst_w;
+                        tbl[n].inh     = 0;
                         n++;
                     }
                     goto cse_invalidated;
@@ -2285,7 +2356,62 @@ int ir_opt_cse(Func *f)
                 }
             }
         }
+        if (attempt == 0 && used_carry && !heavy_hit) {
+            /* Nothing of weight was shared: redo this block on its own. */
+            memcpy(bb->ops, save_ops, (size_t)bb->n_ops * sizeof(Op));
+            rewritten = rw0;
+            used_carry = 0;
+            continue;
+        }
+        break;
+        }
+        free(save_ops);
+        if (ebb && n > 0) {
+            /* Sharing a value across a branch lengthens its live range, which
+               costs a register or a slot. It pays only for a chain of real work,
+               so an entry is carried when it is part of the dependency chain of
+               an entry whose total cost reaches CSE_EBB_MIN. A compare result is
+               never carried: it is cheaper to redo than to hold as a value. */
+            int cost[MAX_CSE], wgt[MAX_CSE], mark[MAX_CSE], keep = 0;
+            for (int k = 0; k < n; k++) {
+                OpKind kd = tbl[k].kind;
+                wgt[k] = ((kd == IR_SHL || kd == IR_SHR) && tbl[k].has_imm
+                          && tbl[k].imm > 1 && tbl[k].imm < 16) ? (int)tbl[k].imm : 1;
+                cost[k] = wgt[k];
+            }
+            for (int pass = 0; pass < 6; pass++)
+                for (int k = 0; k < n; k++) {
+                    int c = wgt[k];
+                    for (int m = 0; m < n; m++) {
+                        if (m == k) continue;
+                        if (tbl[m].dst == tbl[k].src0 || tbl[m].dst == tbl[k].src1)
+                            c += cost[m];
+                    }
+                    cost[k] = c > 64 ? 64 : c;
+                }
+            for (int k = 0; k < n; k++)
+                mark[k] = tbl[k].width >= 2 && cost[k] >= CSE_EBB_MIN
+                          && !(tbl[k].kind >= IR_CMP_EQ && tbl[k].kind <= IR_CMP_UGE);
+            for (int pass = 0; pass < 8; pass++)
+                for (int k = 0; k < n; k++) {
+                    if (!mark[k]) continue;
+                    for (int m = 0; m < n; m++)
+                        if (!mark[m] && (tbl[m].dst == tbl[k].src0 || tbl[m].dst == tbl[k].src1)
+                            && !(tbl[m].kind >= IR_CMP_EQ && tbl[m].kind <= IR_CMP_UGE))
+                            mark[m] = 1;
+                }
+            CSEntry *cp = malloc((size_t)n * sizeof(CSEntry));
+            for (int k = 0; cp && k < n; k++)
+                if (mark[k]) {
+                    cp[keep] = tbl[k];
+                    cp[keep++].inh = cost[k] >= CSE_EBB_MIN ? 2 : 1;
+                }
+            if (cp && keep > 0) { snap[b] = cp; snap_n[b] = keep; }
+            else free(cp);
+        }
     }
+    if (snap) for (int b = 0; b < nbb; b++) free(snap[b]);
+    free(snap); free(snap_n); free(npred); free(pred1); free(stamp); free(bad);
     free(al.canon); free(al.aliased); free(al.glb); free(al.fixed);
     return rewritten;
 }
@@ -4740,7 +4866,7 @@ int ir_opt_const_diamond(Func *f)
     }
     for (int a = 0; a < n; a++) {
         BB *A = &f->bbs[a];
-        if (A->n_ops < 3) continue;
+        if (A->n_ops < (opt_disabled("const-diamond-bare") ? 3 : 2)) continue;
         Op *br = &A->ops[A->n_ops - 1];
         Op *cb = &A->ops[A->n_ops - 2];
         if (br->kind != IR_BR) continue;
@@ -5293,9 +5419,14 @@ int ir_opt_copy_prop(Func *f)
         for (int i = 0; i < f->n_vregs; i++) copy_of[i] = -1;
         for (int j = 0; j < bb->n_ops; j++) {
             Op *op = &bb->ops[j];
-            /* Rewrite value operands to the copy root. */
+            /* Rewrite value operands to the copy root. IR_POSTSTEP's src[0]
+               is also its def (the variable stepped in place), so it names
+               the variable itself, not a value that may be read from the
+               copy root: `q = p; *q++ = x; return p;` would otherwise step
+               p. */
             for (int s = 0; s < 2; s++) {
                 int v = op->src[s];
+                if (op->kind == IR_POSTSTEP && s == 0) continue;
                 if (v >= 0 && v < f->n_vregs && copy_of[v] >= 0) {
                     op->src[s] = copy_of[v];
                     changed++;
@@ -7006,4 +7137,90 @@ int ir_opt_self_ops(Func *f)
     return changed;
 #undef SO_OK
 #undef SO_LIVE
+}
+
+/* ---- [br-known] branches whose outcome the block already decided ---------
+   After `BR_COND v, T` falls through, v is zero; after `BR_ZERO v, T` falls
+   through, v is non-zero. A later branch on v, or on a copy of it, in the same
+   block has a known outcome: always taken, or never. `a == K || a == K`, or the
+   same test written twice, then needs one compare and one jump. The facts die
+   at any write to the vreg; a vreg whose address is taken or that is volatile
+   is never trusted. `--opt-disable=br-known` opts out. */
+static void bk_op_to_nop(Op *o)
+{
+    if (o->call)  { free(o->call->args);  free(o->call);  o->call = NULL; }
+    if (o->hcall) { free(o->hcall->args); free(o->hcall); o->hcall = NULL; }
+    if (o->sw)    { free(o->sw->values); free(o->sw->target_bb); free(o->sw); o->sw = NULL; }
+    if (o->mem.port) { free(o->mem.port); o->mem.port = NULL; }
+    o->kind = IR_NOP;
+    o->dst = -1; o->src[0] = -1; o->src[1] = -1;
+    o->imm = 0;
+    o->label = -1;
+}
+
+int ir_opt_known_branch(Func *f)
+{
+    if (!f || f->n_bbs <= 0 || f->n_vregs <= 0 || opt_disabled("br-known")) return 0;
+    int nv = f->n_vregs, changed = 0;
+    signed char *fact = calloc((size_t)nv, 1);       /* 0 unknown, 1 zero, 2 non-zero */
+    if (!fact) return 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        int touched = 0, has_sw = 0;
+        memset(fact, 0, (size_t)nv);
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *o = &bb->ops[j];
+            if (o->kind == IR_SWITCH) has_sw = 1;
+            if (o->kind == IR_BR_COND || o->kind == IR_BR_ZERO) {
+                int v = o->src[0];
+                if (v >= 0 && v < nv && cse_vreg_stable(f, v)) {
+                    int known = fact[v];
+                    if (known) {
+                        int nonzero = (known == 2);
+                        int taken = (o->kind == IR_BR_COND) ? nonzero : !nonzero;
+                        if (taken) {
+                            o->kind = IR_BR; o->src[0] = -1; o->src[1] = -1;
+                            for (int k = j + 1; k < bb->n_ops; k++) bk_op_to_nop(&bb->ops[k]);
+                        } else {
+                            bk_op_to_nop(o);
+                        }
+                        touched = changed = 1;
+                        if (taken) break;
+                        continue;
+                    }
+                    fact[v] = (o->kind == IR_BR_COND) ? 1 : 2;   /* the fall-through side */
+                }
+                continue;
+            }
+            if (o->kind == IR_ASM) { memset(fact, 0, (size_t)nv); continue; }
+            int defs[8];
+            int nd = ir_op_defs(o, defs, 8);
+            signed char inherit = 0;
+            if (o->kind == IR_MOV && o->dst >= 0 && o->dst < nv && o->src[0] >= 0
+                && o->src[0] < nv && o->dst != o->src[0]
+                && cse_vreg_stable(f, o->dst) && cse_vreg_stable(f, o->src[0])
+                && f->vregs[o->dst].width == f->vregs[o->src[0]].width)
+                inherit = fact[o->src[0]];
+            for (int d = 0; d < nd; d++)
+                if (defs[d] >= 0 && defs[d] < nv) fact[defs[d]] = 0;
+            if (o->kind == IR_CALL && o->call && o->call->ret_vreg >= 0 && o->call->ret_vreg < nv)
+                fact[o->call->ret_vreg] = 0;
+            if (o->kind == IR_HCALL && o->hcall && o->hcall->ret_vreg >= 0 && o->hcall->ret_vreg < nv)
+                fact[o->hcall->ret_vreg] = 0;
+            if (inherit) fact[o->dst] = inherit;
+        }
+        if (touched && !has_sw) {
+            /* The successor pair follows the branch ops left in the block. */
+            bb->succ[0] = bb->succ[1] = -1;
+            for (int j = 0; j < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j];
+                if (o->kind != IR_BR && o->kind != IR_BR_COND && o->kind != IR_BR_ZERO) continue;
+                if (bb->succ[0] == o->label || bb->succ[1] == o->label) continue;
+                if (bb->succ[0] < 0) bb->succ[0] = o->label;
+                else if (bb->succ[1] < 0) bb->succ[1] = o->label;
+            }
+        }
+    }
+    free(fact);
+    return changed;
 }

@@ -21,7 +21,7 @@ unsigned char fb(void)
 }
 END
 
-run_ok("zcc +zx -c -clib=new ${test}a.c ${test}b.c -o ${test}cons.o");
+run_ok("zcc +zx -compiler=sccz80 -c -clib=new ${test}a.c ${test}b.c -o ${test}cons.o");
 
 capture_ok( "z88dk-z80nm -a ${test}cons.o", <<'END' );
 Object  file test_t_issue_0999_tcons.o at $0000: Z80RMF18

@@ -2055,6 +2055,14 @@ static int coerce_int_to_float_kind(Builder *b, int v, Node *src, Kind dst_k)
         int c = emit_float_const(b, (double)src->zval, dst_k);
         if (c >= 0) return c;
     }
+    /* Constant acc-double literal → _Float16: fold at compile time rather
+       than dload the 48-bit constant and call l_f48_ftof16 (which --math16
+       does not link). */
+    if (src && src->ast_type == AST_LITERAL && is_acc_float_kind(sk)
+        && dst_k == KIND_FLOAT16) {
+        int c = emit_float_const(b, (double)src->zval, dst_k);
+        if (c >= 0) return c;
+    }
     if (is_acc_float_kind(dst_k)) {                     /* → 5/6/8-byte double */
         if (sk == KIND_FLOAT16) return emit_acc_from_f16(b, v);
         if (sk == KIND_ACCUM16 || sk == KIND_ACCUM32) return emit_acc_from_accum(b, v, sk);
