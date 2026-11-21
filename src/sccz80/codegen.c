@@ -1356,7 +1356,11 @@ void opjump(char* cc, int label, int end_of_scope)
 
 void opjumpr(char* cc, int label)
 {
-    /* 8080/8085/VM1 have no JR. Emit JP (no trailing comment, unlike
+    /* jr only across a fixed span that contains no call. copt may grow
+     * a call after this file is emitted, and z80asm does not widen an
+     * out-of-range jr. A longer branch is jp (opjump). A peephole may
+     * shorten a jp when the matched window cannot grow.
+     * 8080/8085/VM1 have no JR. Emit JP (no trailing comment, unlike
      * opjump) so copt can fold &&/|| 0/1 sandwiches on the real insn.
      * z80asm would map a compiler JR to JP later; JR-sized folds then
      * alias labels. GBZ80 has JR, so it keeps jr. */
