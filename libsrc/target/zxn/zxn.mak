@@ -11,7 +11,8 @@ ZXN_GLOBS := $(ZX_GLOBS) \
 	"target/zxn/sprites/c/sccz80/*.asm" \
 	"target/zxn/classic/stdio/*.asm" \
 	"target/zxn/classic/graphics/*.asm" \
-	"target/zxn/classic/sdcard/*.asm"
+	"target/zxn/classic/sdcard/*.asm" \
+	"target/zxn/misc/z80/*.asm"
 
 ZXN_GLOBS_ex := $(ZX_GLOBS_ex) \
 	target/zxn/esxdos/z80/*.asm target/zxn/esxdos/c/sccz80/*.asm \
@@ -25,7 +26,8 @@ ZXN_GLOBS_ex := $(ZX_GLOBS_ex) \
 	target/zxn/sprites/c/sccz80/*.asm  \
 	target/zxn/classic/stdio/*.asm \
 	target/zxn/classic/graphics/*.asm \
-	target/zxn/classic/sdcard/*.asm
+	target/zxn/classic/sdcard/*.asm \
+	target/zxn/misc/z80/*.asm
 
 
 
