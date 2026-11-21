@@ -90,6 +90,19 @@ static char *handle_rot(dcontext *state,  uint8_t z)
     return instr;
 }
 
+/* An address symbol wins. A map constant is the fallback for a ROM equate.
+   SYM_ANY also matches the internal i_ and L_f names. */
+static const char *find_address_or_const(int addr)
+{
+    const char *label;
+
+    label = find_symbol(addr, SYM_ADDRESS);
+    if ( label == NULL ) {
+        label = find_symbol(addr, SYM_CONST);
+    }
+    return label;
+}
+
 static char *handle_rel8(dcontext *state, char *buf, size_t buflen)
 {
     const char   *label;
@@ -99,7 +112,7 @@ static char *handle_rel8(dcontext *state, char *buf, size_t buflen)
 
     READ_BYTE(state, displacement);
 
-    if ( (label = find_symbol(state->pc + displacement, SYM_ADDRESS)) != NULL ) {
+    if ( (label = find_address_or_const(state->pc + displacement)) != NULL ) {
         BUF_PRINTF("%s",label);
     } else {
         char temp[10];
@@ -133,7 +146,7 @@ static char *handle_rel16(dcontext *state, char *buf, size_t buflen)
 
     displacement = (d2<<8)|d1;
 
-    if ( (label = find_symbol(state->pc + displacement, SYM_ADDRESS)) != NULL ) {
+    if ( (label = find_address_or_const(state->pc + displacement)) != NULL ) {
         BUF_PRINTF("%s",label);
     } else {
         char temp[10];
@@ -168,7 +181,7 @@ static char *handle_addr16(dcontext *state, char *buf, size_t buflen)
         READ_BYTE(state, mmsb);
     }
 
-    if ( (label = find_symbol(lsb + msb * 256 + mmsb * 65536, SYM_ADDRESS)) != NULL ) {
+    if ( (label = find_address_or_const(lsb + msb * 256 + mmsb * 65536)) != NULL ) {
         BUF_PRINTF("%s",label);
     } else {
         char temp[10];
@@ -202,7 +215,7 @@ static char *handle_addr24(dcontext *state, char *buf, size_t buflen)
     READ_BYTE(state, msb);
     READ_BYTE(state, mmsb);
 
-    if ( (label = find_symbol(lsb + msb * 256 + mmsb * 65536, SYM_ADDRESS)) != NULL ) {
+    if ( (label = find_address_or_const(lsb + msb * 256 + mmsb * 65536)) != NULL ) {
         BUF_PRINTF("%s",label);
     } else {
         char temp[10];
@@ -567,7 +580,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
     state->adl = c_adl_mode;
     state->kc_prefix = 0xff;
 
-    label = find_symbol(pc, SYM_ADDRESS);
+    label = find_address_or_const(pc);
     if (label && (compact <= 1)) {
         /* A label (it carries the module, so the source path, when its name is not
            unique) is cut to half the buffer: the rest is the instruction's */
