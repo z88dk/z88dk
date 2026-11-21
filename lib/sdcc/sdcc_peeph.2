@@ -633,6 +633,15 @@ replace restart {
 }
 
 replace restart {
+	ld	l,a
+	ld	a,l
+	nextreg	#%1,a
+} by {
+	nextreg	#%1,a
+	; peephole z88dk-intrinsic-nextrega-dead-l %1
+}
+
+replace restart {
 	jp	_ZXN_READ_REG_fastcall
 } by {
 	call	_ZXN_READ_REG_fastcall
