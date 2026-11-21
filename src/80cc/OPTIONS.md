@@ -109,6 +109,7 @@ exists (ADR 0010).
 | `z80n-add-a` | z80n zero-extended byte adds go via DE instead of `add hl,a` |
 | `de-widen` | a byte widened into DE and copied to HL keeps `ld e,S; ld d,0; ld hl,de` |
 | `inc-mem` | a memory increment stays `ld a,MEM; inc a; ld MEM,a` instead of `inc MEM` |
+| `ld-a-fwd` | a second `ld a,(_sym)` is kept even when A still holds it across a test and a single-entry block |
 | `l-call-flags` | a `call l_*` runtime helper is assumed to read the flags, as any asm-linkage call is |
 | `gb-word-mem` | gbz80 word `++`/`--` and zero/constant word stores go through HL and DE instead of `inc (hl)`, `ld (hl+),a` and immediate stores |
 | `dsub-bc` | An 8085 signed compare with one operand already in BC copies the RHS into BC (push/pop if BC is live) instead of subtracting BC where it is |
@@ -313,6 +314,7 @@ exists (ADR 0010).
 | `size-glong` | with `--opt-code-size`, a four-byte load through HL is `call l_glong`, not the inline byte sequence |
 | `call-sp-cleanup` | use `pop bc` chains instead of HL-based stack cleanup when the result does not occupy HL |
 | `bc-save-live` | BC is saved around a call even when it holds nothing live |
+| `bc-save-arg` | BC is saved around a call even when its only tenant is that call's own argument or result |
 | `bc-step-param` | a stepped pointer parameter is reloaded from its slot each iteration instead of riding BC (ADR 0031) |
 | `bc-live` | no BC park sweep in the final peephole |
 | `bc-flow` | no BC liveness flow into the lowering decisions |
@@ -365,6 +367,11 @@ exists (ADR 0010).
 | `sym-addr-walk` | consecutive constant stores to nearby bytes of one global reload HL with the address, instead of stepping it with inc/dec |
 | `swap-swap` | two 16-bit byte swaps in a row are both emitted, instead of cancelling |
 | `rmw-hl` | a byte read-modify-write of a global reads and writes through absolute addresses, instead of one `ld hl,g` shared by the load and the store |
+| `rmw-hl-step` | a byte `++`/`--` of a global reads and writes through absolute addresses, instead of sharing `ld hl,g` |
+| `inc-mem-ret` | `inc-mem` treats every `ret` as reading A, so a memory step in a function returning in L keeps `ld a,MEM; inc a; ld MEM,a` |
+| `inc-mem-call` | `inc-mem` treats every direct call as reading A, so a memory step before a call keeps `ld a,MEM; inc a; ld MEM,a` |
+| `mul-pushpop` | a word times 2^n+1 keeps `push hl; ... ex de,hl; pop hl` around the shift instead of adding the copy already in DE |
+| `cse-ebb` | the arithmetic CSE table is reset at every block instead of carried into a block with one predecessor |
 | `sink-trunc` | a word-to-byte truncation is not moved down next to the byte store that reads it, so the byte lives across the address arithmetic |
 | `ivsr-suppress-lea` | a stepped pointer is made for a local array addressed from the frame, instead of rebuilding the address from sp (ez80 sp always keeps it) |
 | `ivsr-share` | two derived induction addresses with the same base, index, scale and step each get their own stepped pointer |

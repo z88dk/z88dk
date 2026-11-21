@@ -1785,7 +1785,16 @@ static int bc_tenant_live_here(const Func *f)
     if (!bcsave_live_on() || !f || !f->vreg_to_phys || !cur_bb) return 1;
     int g = bc_op_global_index(f, cur_bb, cur_op_idx);
     if (g < 0) return 1;
-    return bc_tenant_live_over(f, g, g);
+    if (opt_disabled("bc-save-arg")) return bc_tenant_live_over(f, g, g);
+    /* A tenant that starts or ends at this call is its own argument or result:
+       nothing of it is live across the call. */
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (!bc_plain_tenant(f, v)) continue;
+        const LiveRange *lr = ir_live_range(f, v);
+        if (!lr || lr->start < 0) return 1;
+        if (lr->start < g && lr->end > g) return 1;
+    }
+    return 0;
 }
 
 /* For the pre-pushed variant, where the save is emitted at the call's FIRST arg
