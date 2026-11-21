@@ -16,8 +16,10 @@
 ; bits 1-0, and it stops at 14 MHz. The current description is
 ; https://wiki.specnext.dev/CPU_Speed_Register
 ;
-; Core 3.0.5 adds a wait on each opcode fetch at 28 MHz, so that
-; setting runs long. asm_z80_delay_tstate is unchanged.
+; Core 3.03.03 (System/Next 26.11a) runs 28 MHz with zero wait states.
+; 28000 states is one millisecond on that core. Core 3.0.5 inserted one
+; wait on each opcode fetch and memory read, and that older core runs
+; this count long. asm_z80_delay_tstate is unchanged.
 ; ===============================================================
 
 SECTION code_clib
@@ -56,7 +58,7 @@ asm_cpu_delay_ms:
    cp $20
    jr z, ms_14
 
-   ; 28 MHz. 28000 states is one millisecond at that clock.
+   ; 28 MHz, zero wait states. 28000 states is one millisecond.
 ms_28:
 
    dec de
