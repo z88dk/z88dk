@@ -11699,7 +11699,7 @@ int ir_lower_func_flip(FILE *out, Func *f)
     if (!spflip_enabled() || c_framepointer_is_ix != 1 || !f || c_debug_adb_defc)
         return ir_lower_func(out, f);
     const char *nm = f->fn ? ir_sym_name(f->fn) : "";
-    int excluded = (strcmp(nm, "main") == 0);
+    int excluded = (strcmp(nm, "main") == 0 && !c_opt_code_size);
     if (excluded) return ir_lower_func(out, f);
     Func *spc = ir_clone_func(f);
     FILE *fpbuf = tmpfile();
@@ -11714,7 +11714,9 @@ int ir_lower_func_flip(FILE *out, Func *f)
     /* Also exclude the register-arg entry conventions (mirror frameless_ok):
        fastcall (arg in HL/DEHL) and __sdcccall(1) have special prologues that
        juggle the register arg assuming the fp frame — flipping mishandles it. */
-    int candidate = (rc == 0 && ds_last_framed && 2 * ds_ixaccess < flip_cost_budget()
+    int cheap = (2 * ds_ixaccess < flip_cost_budget());
+    int by_size = c_opt_code_size && !opt_disabled("sp-flip-size");
+    int candidate = (rc == 0 && ds_last_framed && (cheap || by_size)
                      && !f->uses_acc
                      && fastcall_arg_vreg(f) < 0 && !(f->flags & SDCCCALL1));
     if (candidate) {
@@ -11742,6 +11744,8 @@ int ir_lower_func_flip(FILE *out, Func *f)
             }
             if ((uix && !six) || (uiy && !siy)) ok = 0;
         }
+        /* Beyond the cheap-access budget the sp form wins only when it renders smaller. */
+        if (ok && !cheap && render_size(spbuf) >= render_size(fpbuf)) ok = 0;
         if (ok && getenv("IR_SPFLIP_LOG"))
             fprintf(stderr, "SPFLIP: %s flipped to sp\n", nm);
         if (ok) { rewind(spbuf); char ch[4096]; size_t n;
