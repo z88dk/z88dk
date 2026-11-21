@@ -375,6 +375,11 @@ exists (ADR 0010).
 | `br-known` | a branch on a value the same block already branched on is kept, instead of folded to a jump or dropped |
 | `const-diamond-bare` | the constant diamond skips a branch whose condition is a bare byte with no computation in front of it |
 | `cmp-byte-de` | an unsigned byte compare whose second operand is already in A takes the widened 16-bit compare instead of parking it in E |
+| `cmp-byte-narrow` | a compare of a zero-extended byte with a word temp defined only by byte constants widens both and compares as words, instead of reading both as bytes |
+| `cmp-unsign-sign` | a signed compare is made unsigned only when each operand fits a byte or is bounded by the loop, not when a dominating compare proves it non-negative |
+| `countdown-word` | a reversed-loop counter (phantom zero guard) is narrowed to a byte up front, so it cannot bid for BC |
+| `countdown-fp` | with an IX frame, a reversed-loop counter that won BC keeps it even when the function needs the frame for other values, instead of narrowing to a byte slot |
+| `countdown-b` | a reversed-loop counter in BC that only sees `ld K`, `dec` and the latch test stays a BC word instead of living in B for `djnz` |
 | `sink-trunc` | a word-to-byte truncation is not moved down next to the byte store that reads it, so the byte lives across the address arithmetic |
 | `ivsr-suppress-lea` | a stepped pointer is made for a local array addressed from the frame, instead of rebuilding the address from sp (ez80 sp always keeps it) |
 | `ivsr-share` | two derived induction addresses with the same base, index, scale and step each get their own stepped pointer |
