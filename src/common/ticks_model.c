@@ -207,6 +207,7 @@ int parse_control(const char *src, int *kind, int *cond, int *indirect,
     char mnem[16];
     const char *p;
     char tok[64];
+    int lk = CTL_NONE;
 
     if (kind)
         *kind = CTL_NONE;
@@ -223,19 +224,24 @@ int parse_control(const char *src, int *kind, int *cond, int *indirect,
     if (strcmp(mnem, "jp") == 0) {
         if (kind)
             *kind = CTL_JP;
+        lk = CTL_JP;
     } else if (strcmp(mnem, "jr") == 0) {
         if (kind)
             *kind = CTL_JR;
+        lk = CTL_JR;
     } else if (strcmp(mnem, "djnz") == 0) {
         if (kind)
             *kind = CTL_DJNZ;
+        lk = CTL_DJNZ;
     } else if (strcmp(mnem, "call") == 0) {
         if (kind)
             *kind = CTL_CALL;
+        lk = CTL_CALL;
     } else if (strcmp(mnem, "ret") == 0 || strcmp(mnem, "reti") == 0 ||
                strcmp(mnem, "retn") == 0) {
         if (kind)
             *kind = CTL_RET;
+        lk = CTL_RET;
     } else {
         return 0;
     }
@@ -264,7 +270,7 @@ int parse_control(const char *src, int *kind, int *cond, int *indirect,
             snprintf(target, target_sz, "%s", tok);
         return 1;
     }
-    if (kind && *kind == CTL_RET) {
+    if (lk == CTL_RET) {
         if (tok[0] && is_cc_token(tok, strlen(tok))) {
             if (cond)
                 *cond = 1;
@@ -811,6 +817,8 @@ static int ticks_z180_ext(const char *mnem, const char *rest, int *fallback)
             return 7;
         if (ka == OP_IMM)
             return 9;
+        if (ka == OP_MEM_HL)
+            return 10;
     }
     return -1;
 }
@@ -870,7 +878,7 @@ static int ticks_z80n_ext(const char *mnem, const char *rest)
 }
 
 /* Z80, Z80N, Z180, Rabbit. Halt, jp (hl)/(ix)/(iy), and unknown set *fallback. */
-static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
+static int ticks_z80ish_base(int cpu, const char *mnem, const char *rest,
                         int cond, int indirect, int backward, int *fallback)
 {
     int taken = backward || !cond;
@@ -1000,6 +1008,126 @@ static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
         return -1;
     }
     return -1;
+}
+
+/* Z180 T-states as the change from the Z80 time of the same instruction, measured in
+   z88dk-ticks.  Register-register, push of a pair, the 16-bit stores of HL and A, and the
+   9-bit forms with no memory operand are the same as the Z80. */
+static int z180_delta(const char *mnem, const char *rest, int cond, int taken)
+{
+    char a[64], b[64];
+    const char *p = copy_op(rest, a, sizeof(a));
+    int ka, kb, ixa = 0, ixb = 0, m_hl_a, m_hl_b;
+
+    copy_op(p, b, sizeof(b));
+    ka = classify(a, &ixa);
+    kb = classify(b, &ixb);
+    m_hl_a = (ka == OP_MEM_HL);
+    m_hl_b = (kb == OP_MEM_HL);
+
+    if (!strcmp(mnem, "jp"))
+        return (!cond || taken) ? -1 : -4;
+    if (!strcmp(mnem, "jr"))
+        return (!cond || taken) ? -4 : -1;
+    if (!strcmp(mnem, "djnz"))
+        return taken ? -4 : -1;
+    if (!strcmp(mnem, "call"))
+        return (!cond || taken) ? -1 : -4;
+    if (!strcmp(mnem, "ret"))
+        return !cond ? -1 : (taken ? -1 : 0);
+    if (!strcmp(mnem, "reti") || !strcmp(mnem, "retn") || !strcmp(mnem, "im"))
+        return -2;
+    if (!strcmp(mnem, "di") || !strcmp(mnem, "ei"))
+        return -1;
+    if (!strcmp(mnem, "ini") || !strcmp(mnem, "ind") || !strcmp(mnem, "outi") ||
+        !strcmp(mnem, "outd"))
+        return -4;
+    if (!strcmp(mnem, "nop") || !strcmp(mnem, "exx") || !strcmp(mnem, "scf") ||
+        !strcmp(mnem, "ccf") || !strcmp(mnem, "cpl") || !strcmp(mnem, "rlca") ||
+        !strcmp(mnem, "rrca") || !strcmp(mnem, "rla") || !strcmp(mnem, "rra"))
+        return -1;
+    if (!strcmp(mnem, "neg") || !strcmp(mnem, "rld") || !strcmp(mnem, "rrd"))
+        return -2;
+    if (!strcmp(mnem, "ldi") || !strcmp(mnem, "ldd") || !strcmp(mnem, "cpi") ||
+        !strcmp(mnem, "cpd"))
+        return -4;
+    if (!strcmp(mnem, "push"))
+        return ixa ? -1 : 0;
+    if (!strcmp(mnem, "pop"))
+        return ixa ? -2 : (ident_eq(a, "af") || ka == OP_RP ? -1 : 0);
+    if (!strcmp(mnem, "ex")) {
+        if (ka == OP_MEM_SP)
+            return ixb ? -4 : -3;
+        return ident_eq(a, "de") ? -1 : 0;
+    }
+    if (!strcmp(mnem, "inc") || !strcmp(mnem, "dec")) {
+        if (ka == OP_MEM_IX) return -5;
+        if (ka == OP_MEM_HL) return -1;
+        if (ka == OP_IX) return -3;
+        if (ka == OP_RP) return -2;
+        return 0;
+    }
+    if (!strcmp(mnem, "add") || !strcmp(mnem, "adc") || !strcmp(mnem, "sbc")) {
+        if (ka == OP_IX) return -5;
+        if (ka == OP_RP) return !strcmp(mnem, "add") ? -4 : -5;
+        if (kb == OP_MEM_IX) return -5;
+        return kb == OP_R8 ? 0 : -1;
+    }
+    if (is_alu8(mnem)) {
+        int k = (kb != OP_EMPTY) ? kb : ka;
+        if (k == OP_MEM_IX) return -5;
+        return k == OP_R8 ? 0 : -1;
+    }
+    if (!strcmp(mnem, "bit")) {
+        if (kb == OP_MEM_IX) return -5;
+        return m_hl_b ? -3 : -2;
+    }
+    if (!strcmp(mnem, "res") || !strcmp(mnem, "set")) {
+        if (kb == OP_MEM_IX) return -4;
+        return m_hl_b ? -2 : -1;
+    }
+    if (is_shift8(mnem) && ka != OP_RP) {
+        if (ka == OP_MEM_IX) return -4;
+        return m_hl_a ? -2 : -1;
+    }
+    if (!strcmp(mnem, "in") || !strcmp(mnem, "out")) {
+        if (ka == OP_MEM_C || kb == OP_MEM_C)
+            return !strcmp(mnem, "in") ? -3 : -2;
+        return !strcmp(mnem, "in") ? -2 : -1;
+    }
+    if (!strcmp(mnem, "ld")) {
+        if (ka == OP_R8 && kb == OP_R8) return 0;
+        if (ka == OP_R8 && kb == OP_IMM) return -1;
+        if (ka == OP_R8 && kb == OP_MEM_HL) return hl_postop(b) ? -3 : -1;
+        if (ka == OP_MEM_HL && kb == OP_R8) return hl_postop(a) ? -2 : 0;
+        if (ka == OP_MEM_HL && kb == OP_IMM) return -1;
+        if (ka == OP_R8 && kb == OP_MEM_IX) return -5;
+        if (ka == OP_MEM_IX) return -4;
+        if (ka == OP_R8 && kb == OP_MEM_RP) return -1;
+        if (ka == OP_MEM_RP) return 0;
+        if (ka == OP_R8 && kb == OP_MEM_ABS) return -1;
+        if (ka == OP_MEM_ABS && kb == OP_R8) return 0;
+        if ((ka == OP_R8 && kb == OP_IR) || (ka == OP_IR && kb == OP_R8)) return -3;
+        if (ka == OP_RP && kb == OP_IMM) return -1;
+        if (ka == OP_IX && kb == OP_IMM) return -2;
+        if (ka == OP_RP && kb == OP_MEM_ABS) return ident_eq(a, "hl") ? -1 : -2;
+        if (ka == OP_IX && kb == OP_MEM_ABS) return -2;
+        if (ka == OP_MEM_ABS && kb == OP_RP) return ident_eq(b, "hl") ? 0 : -1;
+        if (ka == OP_MEM_ABS && kb == OP_IX) return -1;
+        if (ident_eq(a, "sp") && ident_eq(b, "hl")) return -2;
+        if (ident_eq(a, "sp") && kb == OP_IX) return -3;
+    }
+    return 0;
+}
+
+static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
+                        int cond, int indirect, int backward, int *fallback)
+{
+    int t = ticks_z80ish_base(cpu, mnem, rest, cond, indirect, backward, fallback);
+
+    if (cpu == TICKS_CPU_Z180 && t > 0)
+        t += z180_delta(mnem, rest, cond, backward || !cond);
+    return t;
 }
 
 static int ticks_808x_ld(int cpu, int ka, int kb, const char *a, const char *b)
