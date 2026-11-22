@@ -246,7 +246,8 @@ srahl.ok: ../../../src/zcc-multi/t/srahl.asm ../../../src/zcc-multi/t/nops.asm
 	touch $@
 
 # Pair copy and word rotate: native T-states when the CPU has the op,
-# else two 8-bit / CB ops. Rabbit rr hl is 2 T. ld de,hl is 4 T. bool hl is 2 T.
+# else two 8-bit / CB ops. Rabbit rr hl is 2 T. ld de,hl is 4 T. bool hl is 2 T. A Rabbit ret is 8 T and nop 2 T, so mix_fast (20 T)
+# stands in where nops (12 T) would tie the 80cc body.
 r2ka.ok: ../../../src/zcc-multi/t/r2ka_rrhl.asm ../../../src/zcc-multi/t/r2ka_ldrr.asm \
 	../../../src/zcc-multi/t/r2ka_bool.asm ../../../src/zcc-multi/t/nops.asm
 	z88dk-zcc-multi --cpu=r2ka --metric=ticks --data-variant=sccz80 \
@@ -254,33 +255,33 @@ r2ka.ok: ../../../src/zcc-multi/t/r2ka_rrhl.asm ../../../src/zcc-multi/t/r2ka_ld
 	  --variant=sccz80:../../../src/zcc-multi/t/nops.asm \
 	  --variant=80cc-sp:../../../src/zcc-multi/t/r2ka_rrhl.asm
 	test `awk '/^_foo/ {print $$3}' r2ka_rrhl.tsv` = metric
-	test `awk '/^_foo/ {print $$7}' r2ka_rrhl.tsv` -eq 12
+	test `awk '/^_foo/ {print $$7}' r2ka_rrhl.tsv` -eq 10
 	grep -q '^_foo.80cc-sp' r2ka_rrhl.tsv
 	z88dk-zcc-multi --cpu=r2ka --metric=ticks --data-variant=sccz80 \
 	  --output=r2ka_ldrr_stitch.asm --report=r2ka_ldrr.tsv \
-	  --variant=sccz80:../../../src/zcc-multi/t/nops.asm \
+	  --variant=sccz80:../../../src/zcc-multi/t/mix_fast.asm \
 	  --variant=80cc-sp:../../../src/zcc-multi/t/r2ka_ldrr.asm
-	test `awk '/^_foo/ {print $$7}' r2ka_ldrr.tsv` -eq 14
+	test `awk '/^_foo/ {print $$7}' r2ka_ldrr.tsv` -eq 12
 	grep -q '^_foo.80cc-sp' r2ka_ldrr.tsv
 	z88dk-zcc-multi --cpu=r2ka --metric=ticks --data-variant=sccz80 \
 	  --output=r2ka_bool_stitch.asm --report=r2ka_bool.tsv \
 	  --variant=sccz80:../../../src/zcc-multi/t/nops.asm \
 	  --variant=80cc-sp:../../../src/zcc-multi/t/r2ka_bool.asm
-	test `awk '/^_foo/ {print $$7}' r2ka_bool.tsv` -eq 12
+	test `awk '/^_foo/ {print $$7}' r2ka_bool.tsv` -eq 10
 	grep -q '^_foo.80cc-sp' r2ka_bool.tsv
 	z88dk-zcc-multi --cpu=r2ka --metric=ticks --data-variant=sccz80 \
 	  --output=r2ka_addsp_stitch.asm --report=r2ka_addsp.tsv \
-	  --variant=sccz80:../../../src/zcc-multi/t/nops.asm \
+	  --variant=sccz80:../../../src/zcc-multi/t/mix_fast.asm \
 	  --variant=80cc-sp:../../../src/zcc-multi/t/r2ka_addsp.asm
 	test `awk '/^_foo/ {print $$3}' r2ka_addsp.tsv` = metric
-	test `awk '/^_foo/ {print $$7}' r2ka_addsp.tsv` -eq 14
+	test `awk '/^_foo/ {print $$7}' r2ka_addsp.tsv` -eq 12
 	grep -q '^_foo.80cc-sp' r2ka_addsp.tsv
 	z88dk-zcc-multi --cpu=r2ka --metric=ticks --data-variant=sccz80 \
 	  --output=r2ka_ldix_stitch.asm --report=r2ka_ldix.tsv \
 	  --variant=sccz80:../../../src/zcc-multi/t/mix_fast.asm \
 	  --variant=80cc-sp:../../../src/zcc-multi/t/r2ka_ldix.asm
 	test `awk '/^_foo/ {print $$3}' r2ka_ldix.tsv` = metric
-	test `awk '/^_foo/ {print $$7}' r2ka_ldix.tsv` -eq 21
+	test `awk '/^_foo/ {print $$7}' r2ka_ldix.tsv` -eq 17
 	grep -q '^_foo.80cc-sp' r2ka_ldix.tsv
 	touch $@
 
@@ -333,7 +334,7 @@ iy.ok: ../../../src/zcc-multi/t/iyld.asm ../../../src/zcc-multi/t/iyword.asm \
 	  --variant=sccz80:../../../src/zcc-multi/t/nops.asm \
 	  --variant=80cc-sp:../../../src/zcc-multi/t/iyld.asm
 	test `awk '/^_foo/ {print $$3}' iyld_r2ka.tsv` = metric
-	test `awk '/^_foo/ {print $$7}' iyld_r2ka.tsv` -eq 14
+	test `awk '/^_foo/ {print $$7}' iyld_r2ka.tsv` -eq 12
 	touch $@
 
 # 8085 extended ops (Zilog) have documented T-states. Unknown would
