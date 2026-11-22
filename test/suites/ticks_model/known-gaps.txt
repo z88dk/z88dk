@@ -1,10 +1,8 @@
 # Instructions the T-state model scores differently from the emulator, per CPU. check.c fails
 # when a count changes, either way: lower an entry when the model improves.
 #
-# z80 and z180 match the emulator on every instruction in instructions.txt, so they have no entry.
+# z80, z80n and z180 match the emulator on every instruction in instructions.txt, so they have no entry.
 #
-# z80n: the model says tst n is 11 T-states, the emulator 18.
-z80n 1
 # 8080, 8085, vm1, gbz80: z80asm expands adc/sbc hl,rr, ld rr,(nn), neg, rld, ldi and cpd into
 # inline sequences that the model does not score (the compiler does not emit them), and a few
 # branch forms differ from the emulator.

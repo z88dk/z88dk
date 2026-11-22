@@ -840,7 +840,7 @@ static int ticks_z80n_ext(const char *mnem, const char *rest)
         return 8;
     if (strcmp(mnem, "swapnib") == 0 || strcmp(mnem, "mirror") == 0)
         return 8;
-    if (strcmp(mnem, "test") == 0)
+    if (strcmp(mnem, "test") == 0 || strcmp(mnem, "tst") == 0)
         return 11;
     if (strcmp(mnem, "bsla") == 0 || strcmp(mnem, "bsra") == 0 ||
         strcmp(mnem, "bsrl") == 0 || strcmp(mnem, "bsrf") == 0 ||
