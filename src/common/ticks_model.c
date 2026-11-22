@@ -1261,6 +1261,11 @@ static int ticks_gbz80_ld(const char *mnem, int ka, int kb,
         return 8;
     if (ka == OP_MEM_ABS && kb == OP_RP && ident_eq(b, "sp"))
         return 20;
+    /* No native 16-bit absolute load or store: z80asm calls a helper. */
+    if (ka == OP_RP && kb == OP_MEM_ABS && ident_eq(a, "hl"))
+        return 68;
+    if (ka == OP_MEM_ABS && kb == OP_RP && ident_eq(b, "hl"))
+        return 67;
     if ((ka == OP_R8 && kb == OP_MEM_ABS) || (ka == OP_MEM_ABS && kb == OP_R8))
         return 16;
     if (ka == OP_RP && kb == OP_RP)
