@@ -58,7 +58,9 @@ extern int __LIB__ getarg(void);
 
 typedef unsigned char * va_list;
 #define va_start(ap,last)       ap=(getarg()*2)+(unsigned char *)&last-4
-#define va_arg(ap,type)         (*(type*)(ap-=sizeof(type),ap))
+/* Read the object the list is on, then move down by its size.
+   The high word of a long stays on the old pointer. */
+#define va_arg(ap,type)         ((ap) -= sizeof(type), *(type *)((ap) + 2))
 #define va_copy(dst, src)       dst = src
 #define va_end(ap)
 
