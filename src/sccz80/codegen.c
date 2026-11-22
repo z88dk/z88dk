@@ -1507,8 +1507,8 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
     /* Locals sit above the saved interrupt word. Pop them, then let
        l_pop_ei take the word. Popping the word here makes l_pop_ei
-       consume the return address. A later return in this function
-       emits its own copy, so the marks and Zsp come back afterwards. */
+       consume the return address. The marks go back when the drain
+       ends. Zsp goes back after the epilogue. */
     saved_marks = critical_marks;
     saved_Zsp = Zsp;
     saved_critical = CPU_KEEPS_INT_STATE() && critical_marks > 0;
@@ -1593,8 +1593,8 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
     ol("ret"); nl(); nl(); /* and exit function */
     if ( saved_critical ) {
-        /* This path ends in ret. The next return still has the
-           straight-line Zsp and the full set of marks. */
+        /* This path ends in ret. The marks are already back.
+           Restore Zsp for the next return. */
         Zsp = saved_Zsp;
     }
 }

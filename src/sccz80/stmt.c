@@ -731,6 +731,8 @@ void doreturn(char type)
 
 
 
+/* break, continue and goto leave a statement __critical without a restore.
+   The same paths do that on master. */
 /*
  *      "break" statement
  */
@@ -775,9 +777,14 @@ static void docritical(void)
         errorfmt("Cannot nest __critical sections", 1);
     }
     incritical = 1;
-    /* Rabbit, 8080, VM1 and gbz80 have one di/ei for the whole function.
-       An inner leave would enable interrupts before the function ends. */
-    nested_bare = ((currfn->flags & CRITICAL) == CRITICAL) && !CPU_KEEPS_INT_STATE();
+    /* A flagless cpu cannot put the old enable flag back.
+       A critical function, and an __interrupt(n) handler, stay disabled
+       until the epilogue. An inner leave would enable too early.
+       A bare __interrupt has executed ei, so the block keeps di and ei. */
+    nested_bare = !CPU_KEEPS_INT_STATE() &&
+        ( ((currfn->flags & CRITICAL) == CRITICAL) ||
+          (((currfn->flags & INTERRUPT) == INTERRUPT) &&
+           currfn->ctype->funcattrs.interrupt >= 0) );
     saved_Zsp = Zsp;
     saved_marks = gen_critical_marks();
     if ( !nested_bare ) {

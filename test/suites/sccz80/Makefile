@@ -33,9 +33,10 @@ endif
 # callargs.c fills sccz80's argument table. 80cc does not compile it.
 # declspec.c is issue #2335. 80cc still rejects qualifier-before-storage.
 # selfstruct.c stays in CFILES, so the default z80 target runs it too.
-CFILES := $(filter-out calllimit.c declbad.c declskip_str.c declskip_brace.c,$(CFILES))
+# critical_isr.c is an asm lock. It has no main.
+CFILES := $(filter-out calllimit.c declbad.c declskip_str.c declskip_brace.c critical_isr.c,$(CFILES))
 ifneq ($(COMPILER),sccz80)
-CFILES := $(filter-out callargs.c declspec.c,$(CFILES))
+CFILES := $(filter-out callargs.c declspec.c critical.c,$(CFILES))
 endif
 TARGET_Z80 := $(foreach test,$(CFILES:.c=),test_$(test).bin)
 
@@ -48,7 +49,7 @@ endif
 # One past the fixed argument table must be diagnosed, not stored.
 # declbad.c must diagnose specifier errors and must not leak a block typedef.
 ifeq ($(COMPILER),sccz80)
-all: test_calllimit test_declbad test_declskip test_declspec_sfr
+all: test_calllimit test_declbad test_declskip test_declspec_sfr test_critical_isr test_critical_asm
 endif
 
 .PHONY: test_calllimit
@@ -92,6 +93,28 @@ test_declspec_sfr: declspec.c
 	grep -F "call	l_push_di" declspec_sfr.opt
 	grep -F "call	l_pop_ei" declspec_sfr.opt
 	rm -f declspec_sfr.opt
+
+# A bare __interrupt keeps one di/ei pair. __interrupt(0) stays disabled
+# until the epilogue ei, so the block adds no second di.
+.PHONY: test_critical_isr
+test_critical_isr: critical_isr.c
+	zcc +test -vn -clib=8080 -compiler=sccz80 -S $< -o critical_isr.asm
+	test `grep -c '^	di$$' critical_isr.asm` -eq 1
+	test `grep -c '^	ei$$' critical_isr.asm` -eq 3
+	grep -F "reti" critical_isr.asm
+	rm -f critical_isr.asm
+
+# Master puts the critical argument at sp+4 and emits l_gint8sp.
+# This compiler keeps that argument at sp+2. The nested pair loads l_gint6sp.
+.PHONY: test_critical_asm
+test_critical_asm: critical.c
+	zcc +test -vn -I../../framework -compiler=sccz80 -S $< -o critical.asm
+	grep -F "parameter 'int x' at sp+2 size(2)" critical.asm
+	grep -F "call	l_gint6sp" critical.asm
+	grep -F "at sp+4 size(2)" critical.asm && exit 1 || true
+	grep -F "l_gint8sp" critical.asm && exit 1 || true
+	grep -F "	push	bc" critical.asm && exit 1 || true
+	rm -f critical.asm
 
 # double_t is 6 bytes here (four values, 24 bytes). --genmath keeps that width.
 test_autoinit.bin: $(SOURCES) autoinit.c
