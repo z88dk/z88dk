@@ -652,8 +652,8 @@ static int mem_rp_is(const char *tok, const char *rp)
 }
 
 /* Native and synthetic ld on Z80-family / Rabbit. Return -1 if unknown. */
-static int ticks_z80_ld(int cpu, const char *a, const char *b, int ka, int kb,
-                        int ixa, int ixb)
+static int ticks_z80_ld_base(int cpu, const char *a, const char *b, int ka, int kb,
+                             int ixa, int ixb)
 {
     if (ka == OP_R8 && kb == OP_R8)
         return (ixa || ixb) ? 8 : 4;
@@ -708,6 +708,27 @@ static int ticks_z80_ld(int cpu, const char *a, const char *b, int ka, int kb,
             return t;
     }
     return -1;
+}
+
+/* `(hl+)` / `(hl-)` are z80asm synthetics of the access plus inc/dec hl. */
+static int hl_postop(const char *t)
+{
+    t = skip_ws(t);
+    return t[0] == '(' && ident_eq(skip_ws(t + 1), "hl") &&
+           (strchr(t, '+') || strchr(t, '-')) && strchr(t, ')') &&
+           strpbrk(t, "+-") < strchr(t, ')');
+}
+
+static int ticks_z80_ld(int cpu, const char *a, const char *b, int ka, int kb,
+                        int ixa, int ixb)
+{
+    int t = ticks_z80_ld_base(cpu, a, b, ka, kb, ixa, ixb);
+
+    if (ka == OP_MEM_HL && hl_postop(a))
+        t += 6;
+    if (kb == OP_MEM_HL && hl_postop(b))
+        t += 6;
+    return t;
 }
 
 /* inc/dec. *ix selects the prefixed 8-bit time (ixh / (ix+d) already classified). */
@@ -1180,8 +1201,12 @@ static int ticks_808x(int cpu, const char *mnem, const char *rest,
         ka = classify(a, NULL);
         kb = classify(b, NULL);
 
-        if (strcmp(mnem, "ld") == 0)
+        if (strcmp(mnem, "ld") == 0) {
             t = ticks_808x_ld(cpu, ka, kb, a, b);
+            /* (hl+) / (hl-) are z80asm synthetics: the access plus inc/dec hl. */
+            if (t >= 0 && ((ka == OP_MEM_HL && hl_postop(a)) || (kb == OP_MEM_HL && hl_postop(b))))
+                t += i8085 ? 6 : 5;
+        }
         else if (strcmp(mnem, "inc") == 0 || strcmp(mnem, "dec") == 0) {
             if (ka == OP_RP)
                 t = i8085 ? 6 : 5;
