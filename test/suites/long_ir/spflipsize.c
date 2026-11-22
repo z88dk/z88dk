@@ -1,9 +1,10 @@
-/* Under --opt-code-size an IX-frame function may be emitted in its sp form when
- * that renders smaller. The sp form must hand IX back as it found it: callers
- * in an IX frame read their locals through it after every call. Each helper
- * here is a small multi-exit function with a byte local, so it is a flip
- * candidate, and some make calls that use IX in sp mode (far access, fnptr
- * dispatch, float). Each driver keeps locals in its own frame across the call.
+/* Under --opt-code-size (by size) or, on a Z80 without it (by estimated T-states), an
+ * IX-frame function may be emitted in its sp form when that is better. The sp form
+ * must hand IX back as it found it: callers in an IX frame read their locals through
+ * it after every call. Each helper here is a small multi-exit function with a byte
+ * local, so it is a flip candidate, and some make calls that use IX in sp mode (far
+ * access, fnptr dispatch, float). Each driver keeps locals in its own frame across
+ * the call.
  */
 #include "test.h"
 

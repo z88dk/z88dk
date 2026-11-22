@@ -38,6 +38,7 @@
     <ClCompile Include="..\..\src\80cc\ir_opt.c"><Filter>Source Files</Filter></ClCompile>
     <ClCompile Include="..\..\src\80cc\ir_match.c"><Filter>Source Files</Filter></ClCompile>
     <ClCompile Include="..\..\src\80cc\ir_compiler_glue.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\zcc-multi\zccmulti_ticks.c"><Filter>Source Files</Filter></ClCompile>
     <ClCompile Include="..\..\src\80cc\tokeniser.c"><Filter>Source Files</Filter></ClCompile>
   </ItemGroup>
   <ItemGroup>

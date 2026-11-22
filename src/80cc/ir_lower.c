@@ -19,6 +19,7 @@
 #include "ir_alloc.h"
 #include "ir_opt.h"
 #include "ir_match.h"
+#include "zccmulti_ticks.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -6664,6 +6665,88 @@ static int slot_off(const Func *f, int vreg_id)
     return f->vreg_spill_slot[vreg_id];
 }
 
+/* Static T-state estimate of a rendered function, from the T-state model
+   zcc-multi uses. A line inside a backward-branch span counts as many trips as
+   the loop is assumed to run (LOOP_TRIPS per level), so a per-iteration cost
+   outweighs a one-off prologue or epilogue cost. */
+#define LOOP_TRIPS 16
+static long render_ticks(FILE *fp)
+{
+    char ln[1024];
+    int kind = c_cpu == CPU_Z180 ? TICKS_CPU_Z180 : IS_Z80N() ? TICKS_CPU_Z80N
+             : IS_8085() ? TICKS_CPU_8085 : IS_GBZ80() ? TICKS_CPU_GBZ80
+             : IS_808x() ? TICKS_CPU_8080
+             : IS_RABBIT4K() ? TICKS_CPU_R4K : IS_RABBIT() ? TICKS_CPU_R2KA
+             : TICKS_CPU_Z80;
+    int cap = 256, n = 0;
+    char **src = malloc(cap * sizeof *src);     /* instruction text, or NULL */
+    char **lab = malloc(cap * sizeof *lab);     /* label defined at this line, or NULL */
+    long *w, total = 0;
+    if (!src || !lab) { free(src); free(lab); return 0; }
+    rewind(fp);
+    while (fgets(ln, sizeof ln, fp)) {
+        const char *p = ln;
+        if (n == cap) {
+            cap *= 2;
+            src = realloc(src, cap * sizeof *src);
+            lab = realloc(lab, cap * sizeof *lab);
+            if (!src || !lab) return 0;
+        }
+        src[n] = lab[n] = NULL;
+        if (*p != '\t' && *p != ' ') {                 /* a label */
+            size_t k = strcspn(p, ":\n");
+            if (k && *p != ';') { lab[n] = malloc(k + 1); memcpy(lab[n], p, k); lab[n][k] = 0; n++; }
+            continue;
+        }
+        while (*p == '\t' || *p == ' ') p++;
+        if (!*p || *p == '\n' || *p == ';' || !isalpha((unsigned char)*p)) continue;
+        if (!strncmp(p, "C_LINE", 6) || !strncmp(p, "SECTION", 7) || !strncmp(p, "EXTERN", 6)
+            || !strncmp(p, "GLOBAL", 6) || !strncmp(p, "PUBLIC", 6) || !strncmp(p, "defc", 4))
+            continue;
+        src[n++] = strdup(p);
+    }
+    w = malloc((n ? n : 1) * sizeof *w);
+    for (int i = 0; i < n; i++) w[i] = 1;
+    /* One loop per header: a header with several back edges is weighted once, over
+       the span of its farthest back edge. Different headers nest and multiply. */
+    int *end = malloc((n ? n : 1) * sizeof *end);
+    for (int i = 0; i < n; i++) end[i] = -1;
+    for (int i = 0; i < n; i++) {
+        int ck = 0, cc = 0, ind = 0; char tgt[64], c[8];
+        if (!src[i] || !parse_control(src[i], &ck, &cc, &ind, tgt, sizeof tgt, c, sizeof c)
+            || ind || (ck != CTL_JP && ck != CTL_JR && ck != CTL_DJNZ))
+            continue;
+        for (int d = 0; d <= i; d++)
+            if (lab[d] && !strcmp(lab[d], tgt)) {
+                /* A backward jump to a block that ends in a return is a shared exit, not a loop. */
+                int exit_blk = 0;
+                for (int j = d; j <= i; j++) {
+                    int k2 = 0, c2 = 0, i2 = 0; char t2[64], cc2[8];
+                    if (!src[j] || !parse_control(src[j], &k2, &c2, &i2, t2, sizeof t2, cc2, sizeof cc2)
+                        || cc2[0])
+                        continue;
+                    exit_blk = (k2 == CTL_RET);
+                    break;                      /* first unconditional transfer ends the block */
+                }
+                if (!exit_blk && i > end[d]) end[d] = i;
+                break;
+            }
+    }
+    for (int d = 0; d < n; d++)
+        for (int j = d; end[d] >= 0 && j <= end[d]; j++)
+            if (w[j] < 100000) w[j] *= LOOP_TRIPS;
+    free(end);
+    for (int i = 0; i < n; i++) {
+        if (src[i]) {
+            int fb = 0;
+            total += (long)ticks_for_src(kind, src[i], 0, &fb) * w[i];
+        }
+        free(src[i]); free(lab[i]);
+    }
+    free(src); free(lab); free(w);
+    return total;
+}
+
 /* sp-relative offset of a vreg's slot, or -1 when it has none. slot_off is -1
    for a slot-less vreg, and adding the sp adjustment to that gave a positive
    offset that passed every `off >= 0` test and read the wrong word. */
@@ -11715,7 +11798,17 @@ int ir_lower_func_flip(FILE *out, Func *f)
        fastcall (arg in HL/DEHL) and __sdcccall(1) have special prologues that
        juggle the register arg assuming the fp frame — flipping mishandles it. */
     int cheap = (2 * ds_ixaccess < flip_cost_budget());
-    int by_size = c_opt_code_size && !opt_disabled("sp-flip-size");
+    /* Metric for the wider flip: size under --opt-code-size, otherwise estimated T-states.
+       The T-state model has timings for the Z80 only among the CPUs that have IX (the Z180,
+       eZ80, KC160, Rabbit and R800 would be scored with Z80 numbers), so elsewhere the
+       function stays fp. */
+    int metric = 0;
+    if (c_opt_code_size) {
+        if (!opt_disabled("sp-flip-size")) metric = 1;
+    } else if ((c_cpu == CPU_Z80 || IS_Z80N()) && !opt_disabled("sp-flip-ticks")) {
+        metric = 2;
+    }
+    int by_size = metric != 0;
     int candidate = (rc == 0 && ds_last_framed && (cheap || by_size)
                      && !f->uses_acc
                      && fastcall_arg_vreg(f) < 0 && !(f->flags & SDCCCALL1));
@@ -11745,7 +11838,17 @@ int ir_lower_func_flip(FILE *out, Func *f)
             if ((uix && !six) || (uiy && !siy)) ok = 0;
         }
         /* Beyond the cheap-access budget the sp form wins only when it renders smaller. */
-        if (ok && !cheap && render_size(spbuf) >= render_size(fpbuf)) ok = 0;
+        if (ok && !cheap) {
+            long a = metric == 2 ? render_ticks(spbuf) : render_size(spbuf);
+            long b = metric == 2 ? render_ticks(fpbuf) : render_size(fpbuf);
+            if (getenv("IR_SPFLIP_LOG")) fprintf(stderr, "SPFLIP-DECIDE %s sp=%ld fp=%ld metric=%d\n", nm, a, b, metric);
+            if (metric == 2) {
+                /* The estimate is a static sum, so a small gain is noise: the sp form must be
+                   clearly faster, or no slower and no bigger. */
+                if (!(a * 100 <= b * 98 || (a <= b && render_size(spbuf) <= render_size(fpbuf))))
+                    ok = 0;
+            } else if (a >= b) ok = 0;
+        }
         if (ok && getenv("IR_SPFLIP_LOG"))
             fprintf(stderr, "SPFLIP: %s flipped to sp\n", nm);
         if (ok) { rewind(spbuf); char ch[4096]; size_t n;
