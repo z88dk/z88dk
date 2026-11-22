@@ -1101,6 +1101,9 @@ static int z180_delta(const char *mnem, const char *rest, int cond, int taken)
         if (ka == OP_R8 && kb == OP_MEM_HL) return hl_postop(b) ? -3 : -1;
         if (ka == OP_MEM_HL && kb == OP_R8) return hl_postop(a) ? -2 : 0;
         if (ka == OP_MEM_HL && kb == OP_IMM) return -1;
+        /* ld rr,(ix+d) and ld (ix+d),rr are two byte accesses. */
+        if (ka == OP_RP && kb == OP_MEM_IX) return -10;
+        if (ka == OP_MEM_IX && kb == OP_RP) return -8;
         if (ka == OP_R8 && kb == OP_MEM_IX) return -5;
         if (ka == OP_MEM_IX) return -4;
         if (ka == OP_R8 && kb == OP_MEM_RP) return -1;
