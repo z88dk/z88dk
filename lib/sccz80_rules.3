@@ -749,3 +749,120 @@
 	ld	sp,hl
 	ld	hl,%1
 
+;; Rules found by a superoptimizer search on sccz80 -O3 output.
+;; Each rule was checked equal on the Z80 for every value of its variables,
+;; with the 16 bytes below the final SP counted as dead.
+;; A rule that needs a dead register keeps the instructions that show it
+;; in its pattern.
+
+;; Reuse a value that a register already holds.
+
+%title Use the zero high byte of a small 16-bit constant (de)
+%notcpu gbz80 kc160 r2ka r3k r4k r6k
+%check 0 <= %1 <= 255
+	ld	h,0
+	ld	de,%"([0-9]+(	;const)?)"1
+=
+	ld	de,%1
+	ld	h,d
+
+%title Use the zero high byte of a small 16-bit constant (hl)
+%notcpu kc160 r2ka r3k r4k r6k
+%check 0 <= %1 <= 255
+	ld	d,0
+	ld	hl,%"([0-9]+(	;const)?)"1
+=
+	ld	hl,%1
+	ld	d,h
+
+%title Use the zero high byte of a small 16-bit constant (bc)
+%notcpu r2ka r3k r4k r6k
+%check 0 <= %1 <= 255
+	ld	bc,%"([0-9]+(	;const)?)"1
+	add	hl,bc
+	ld	l,(hl)
+	ld	h,0
+=
+	ld	bc,%1
+	add	hl,bc
+	ld	l,(hl)
+	ld	h,b
+
+%title Use the zero high byte of a small 16-bit constant (stack offset)
+%notcpu gbz80 kc160 r2ka r3k r4k r6k
+%check 0 <= %1 <= 255
+	ld	hl,%"([0-9]+(	;const)?)"1
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	ld	b,h
+=
+	ld	hl,%1
+	ld	b,h
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,b
+
+%title Load hl from a de with a zero low byte
+%notcpu r3k r4k r6k
+%eval 0 = %1 255 &
+	ld	hl,0	;const
+	ld	de,%"[0-9]+"1
+=
+	ld	de,%1
+	ld	h,e
+	ld	l,e
+
+%title Zero hl from d after a small constant in de
+%notcpu r3k r4k r6k
+%check 0 <= %1 <= 255
+	ld	hl,0	;const
+	push	hl
+	ld	de,%"([0-9]+(	;const)?)"1
+	push	de
+=
+	ld	de,%1
+	ld	h,d
+	ld	l,d
+	push	hl
+	push	de
+
+%title Zero a register from a after xor a
+%notcpu kc160 r2ka r3k r4k r6k
+	ld	%"b|c|d|e|h|l"1,0
+	xor	a
+=
+	xor	a
+	ld	%1,a
+
+%title hl is 0 after dec
+%notcpu r3k r4k r6k
+	ld	hl,1	;const
+	push	hl
+	dec	hl
+=
+	ld	hl,1	;const
+	push	hl
+	ld	l,h
+
+%title l already holds the constant
+%notcpu 8085 gbz80 kc160 r2ka r3k r4k r6k
+%check 0 <= %1 <= 255
+	ld	l,%1
+	push	hl
+	ld	hl,%"[0-9]+"1	;const
+=
+	ld	l,%1
+	push	hl
+	ld	h,0
+
+%title Next address is inc hl
+%not %1 "\(.*"
+	ld	hl,%1
+	ld	(hl),%2
+	ld	hl,%1+1
+=
+	ld	hl,%1
+	ld	(hl),%2
+	inc	hl
+
