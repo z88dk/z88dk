@@ -47,6 +47,7 @@ parts:
       cpanm -n Path::Tiny App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny Test::HexDifferences Test::PureASCII
       ./build.sh -t -e -i $SNAP
       make DESTDIR=$SNAPCRAFT_PART_INSTALL PREFIX= install
+      install -m 755 snap/snap-tmpdir "$SNAPCRAFT_PART_INSTALL/bin/snap-tmpdir"
     build-packages:
       - cpanminus
       - build-essential
@@ -87,60 +88,77 @@ parts:
 
 apps:
   zcc:
+    command-chain: [bin/snap-tmpdir]
     command: bin/zcc
     environment:
       ZCCCFG: "$SNAP/share/z88dk/lib/config"
     plugs: [home, removable-media]
   z88dk-appmake:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-appmake
     plugs: [home, removable-media]
   z88dk-z80asm:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-z80asm
     plugs: [home, removable-media]
   z88dk-dis:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-dis
     plugs: [home, removable-media]
   z88dk-ticks:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-ticks
     plugs: [home, removable-media]
   z88dk-zx0:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-zx0
     plugs: [home, removable-media]
   z88dk-dzx0:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-dzx0
     plugs: [home, removable-media]
   z88dk-zx7:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-zx7
     plugs: [home, removable-media]
   z88dk-dzx7:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-dzx7
     plugs: [home, removable-media]
   z88dk-lib:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-lib
     plugs: [home, removable-media]
   z88dk-z80nm:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-z80nm
     plugs: [home, removable-media]
   z88dk-zobjcopy:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-zobjcopy
     plugs: [home, removable-media]
   z88dk-basck:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-basck
     plugs: [home, removable-media]
   z88dk-z80svg:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-z80svg
     plugs: [home, removable-media]
   z88dk-font2pv1000:
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-font2pv1000
     plugs: [home, removable-media]
   z88dk-asmpp:
     environment:
       PERL5LIB: "$SNAP/perl5/lib/perl5:$SNAP/usr/share/perl5:$SNAP/usr/share/perl/5.38:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.38"
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-asmpp
     plugs: [home, removable-media]
   z88dk-asmstyle:
     environment:
       PERL5LIB: "$SNAP/perl5/lib/perl5:$SNAP/usr/share/perl/5.38:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.38"
+    command-chain: [bin/snap-tmpdir]
     command: bin/z88dk-asmstyle
     plugs: [home, removable-media]
 
