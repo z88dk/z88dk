@@ -2676,7 +2676,7 @@
 	ld	l,%2
 	push	hl
 =
-	ld	hl,%eval(%1 256 * %2 +)
+	ld	hl,%eval(%1 255 & 256 * %2 255 & +)
 	push	hl
 
 %check 0 <= %1 <= 127
@@ -4456,6 +4456,7 @@
 	add	hl,sp
 	ld	sp,hl
 
+%eval 0 = %1 128 &
 	ld	de,%1	;const
 	ex	de,hl
 	ld	a,l
@@ -5006,7 +5007,7 @@
 	push	bc
 	inc	sp
 =
-	ld	bc,%eval(%1 256 * %2 +)
+	ld	bc,%eval(%1 255 & 256 * %2 255 & +)
 	push	bc
 
 %eval 2 = %2 %1 -
