@@ -13,8 +13,11 @@ gbz80 23
 # ez80_z80: the emulator does not implement tstio, so it runs the next byte as an instruction (9).
 ez80_z80 1
 #
-# kc160, r2ka, r800: the model has no timings for these CPUs, so it scores them with
-# the Z180 (kc160) or Z80 numbers.  Replace an entry with 0 as the timings are added.
-kc160 194
+# kc160: the model and the emulator follow the KC160 instruction table (Appendix A, odd/even clock
+# pair, first column). ldi, cpd, ini and outd are not in the model's table: their clock counts are not
+# in the text of the manual that could be read.
+kc160 4
+# r2ka, r800: the model has no timings for these CPUs, so it scores them with Z80 numbers.
+# Replace an entry with 0 as the timings are added.
 r2ka 173
 r800 190
