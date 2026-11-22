@@ -11837,27 +11837,33 @@ int ir_lower_func_flip(FILE *out, Func *f)
             }
             if ((uix && !six) || (uiy && !siy)) ok = 0;
         }
-        /* Beyond the cheap-access budget the sp form wins only when it scores better. Both forms
-           are scored as they will be emitted: the caller folds the chosen one with
-           ir_lower_fold_mulchain_de, and that fold removes far more from fp than from sp. */
+        /* Beyond the cheap-access budget the sp form wins only when it scores better. */
         if (ok && !cheap) {
-            FILE *spf = tmpfile(), *fpf = tmpfile();
-            if (spf && fpf) {
-                rewind(spbuf); ir_lower_fold_mulchain_de(spf, spbuf);
-                rewind(fpbuf); ir_lower_fold_mulchain_de(fpf, fpbuf);
-            } else {
-                if (spf) fclose(spf);
-                if (fpf) fclose(fpf);
-                spf = spbuf; fpf = fpbuf;
+            /* On the eZ80 both forms are scored as they will be emitted: the caller folds the
+               chosen one with ir_lower_fold_mulchain_de, and that fold removes far more from
+               fp than from sp. The other CPUs score the text as rendered. */
+            int fold = metric == 2 && IS_EZ80();
+            FILE *spf = spbuf, *fpf = fpbuf;
+            if (fold) {
+                spf = tmpfile(); fpf = tmpfile();
+                if (spf && fpf) {
+                    rewind(spbuf); ir_lower_fold_mulchain_de(spf, spbuf);
+                    rewind(fpbuf); ir_lower_fold_mulchain_de(fpf, fpbuf);
+                } else {
+                    if (spf) fclose(spf);
+                    if (fpf) fclose(fpf);
+                    spf = spbuf; fpf = fpbuf; fold = 0;
+                }
             }
             long a = metric == 2 ? render_ticks(spf) : render_size(spf);
             long b = metric == 2 ? render_ticks(fpf) : render_size(fpf);
-            if (spf != spbuf) { fclose(spf); fclose(fpf); }
+            long as = render_size(spf), bs = render_size(fpf);
+            if (fold) { fclose(spf); fclose(fpf); }
             if (getenv("IR_SPFLIP_LOG")) fprintf(stderr, "SPFLIP-DECIDE %s sp=%ld fp=%ld metric=%d\n", nm, a, b, metric);
             if (metric == 2) {
                 /* The estimate is a static sum (both arms of a conditional count), so a small
-                   gain is noise: the sp form must be clearly faster. */
-                if (!(a * 100 <= b * 95))
+                   gain is noise: the sp form must be clearly faster, or no slower and no bigger. */
+                if (!(a * 100 <= b * 98 || (a <= b && as <= bs)))
                     ok = 0;
             } else if (a >= b) ok = 0;
         }
