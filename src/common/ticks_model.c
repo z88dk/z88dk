@@ -62,6 +62,8 @@ int ticks_cpu_from_name(const char *cpu)
         return TICKS_CPU_Z180;
     if (strcmp(cpu, "z80n") == 0)
         return TICKS_CPU_Z80N;
+    if (strcmp(cpu, "ez80_z80") == 0 || strcmp(cpu, "ez80") == 0)
+        return TICKS_CPU_EZ80;
     /* r2ka / r3k share the Rabbit 2000 word ops. r4k / r6k add more. */
     if (strncmp(cpu, "r4", 2) == 0 || strncmp(cpu, "r5", 2) == 0 ||
         strncmp(cpu, "r6", 2) == 0)
@@ -877,6 +879,126 @@ static int ticks_z80n_ext(const char *mnem, const char *rest)
     return -1;
 }
 
+/* eZ80 in Z80 mode: cycles from the eZ80 CPU User Manual (UM0077) instruction pages, ADL = 0.
+   Returns -1 for an instruction this table does not cover. */
+static int ez80_time(const char *mnem, const char *rest, int cond, int taken)
+{
+    char a[64], b[64];
+    const char *p = copy_op(rest, a, sizeof(a));
+    int ka, kb, ixa = 0, ixb = 0;
+
+    copy_op(p, b, sizeof(b));
+    ka = classify(a, &ixa);
+    kb = classify(b, &ixb);
+
+    if (!strcmp(mnem, "nop") || !strcmp(mnem, "scf") || !strcmp(mnem, "ccf") ||
+        !strcmp(mnem, "cpl") || !strcmp(mnem, "rlca") || !strcmp(mnem, "rrca") ||
+        !strcmp(mnem, "rla") || !strcmp(mnem, "rra") || !strcmp(mnem, "exx") ||
+        !strcmp(mnem, "di") || !strcmp(mnem, "ei") || !strcmp(mnem, "daa"))
+        return 1;
+    if (!strcmp(mnem, "neg") || !strcmp(mnem, "im"))
+        return 2;
+    if (!strcmp(mnem, "jp") && !cond)
+        return ka == OP_MEM_HL ? 3 : (ixa ? 4 : 4);
+    if (!strcmp(mnem, "jp"))
+        return taken ? 4 : 3;
+    if (!strcmp(mnem, "jr"))
+        return (!cond || taken) ? 3 : 2;
+    if (!strcmp(mnem, "djnz"))
+        return taken ? 4 : 2;
+    if (!strcmp(mnem, "call"))
+        return !cond ? 5 : (taken ? 6 : 3);
+    if (!strcmp(mnem, "ret"))
+        return !cond ? 5 : (taken ? 6 : 2);
+    if (!strcmp(mnem, "reti") || !strcmp(mnem, "retn"))
+        return 6;
+    if (!strcmp(mnem, "ex")) {
+        if (ka == OP_MEM_SP)
+            return ixb ? 6 : 5;
+        return 1;
+    }
+    if (!strcmp(mnem, "push") || !strcmp(mnem, "pop"))
+        return ixa ? 4 : 3;
+    if (!strcmp(mnem, "lea"))
+        return 3;
+    if (!strcmp(mnem, "pea"))
+        return 5;
+    if (!strcmp(mnem, "inc") || !strcmp(mnem, "dec")) {
+        if (ka == OP_MEM_HL) return 4;
+        if (ka == OP_MEM_IX) return 6;
+        if (ka == OP_IX) return 2;
+        if (ka == OP_R8) return ixa ? 2 : 1;
+        return 1;
+    }
+    if (!strcmp(mnem, "add") || !strcmp(mnem, "adc") || !strcmp(mnem, "sbc")) {
+        if (ka == OP_IX) return 2;
+        if (ka == OP_RP) return !strcmp(mnem, "add") ? 1 : 2;
+    }
+    if (is_alu8(mnem)) {
+        int k = (kb != OP_EMPTY) ? kb : ka, ix = (kb != OP_EMPTY) ? ixb : ixa;
+        if (k == OP_MEM_IX) return 4;
+        if (k == OP_MEM_HL) return 2;
+        if (k == OP_IMM) return 2;
+        return ix ? 2 : 1;
+    }
+    if (!strcmp(mnem, "bit") || !strcmp(mnem, "res") || !strcmp(mnem, "set")) {
+        if (kb == OP_MEM_IX) return 5;
+        return kb == OP_MEM_HL ? 3 : 2;
+    }
+    if (is_shift8(mnem) && ka != OP_RP) {
+        if (ka == OP_MEM_IX) return 7;
+        return ka == OP_MEM_HL ? 5 : 2;
+    }
+    if (!strcmp(mnem, "ldi") || !strcmp(mnem, "ldd") || !strcmp(mnem, "ini") ||
+        !strcmp(mnem, "ind") || !strcmp(mnem, "outi") || !strcmp(mnem, "outd") ||
+        !strcmp(mnem, "rld") || !strcmp(mnem, "rrd"))
+        return 5;
+    if (!strcmp(mnem, "cpi") || !strcmp(mnem, "cpd"))
+        return 3;
+    if (!strcmp(mnem, "in") || !strcmp(mnem, "out"))
+        return 3;
+    if (!strcmp(mnem, "in0") || !strcmp(mnem, "out0") || !strcmp(mnem, "tstio"))
+        return 4;
+    if (!strcmp(mnem, "mlt"))
+        return 6;
+    if (!strcmp(mnem, "tst"))
+        return ka == OP_R8 ? 2 : 3;
+    if (!strcmp(mnem, "ld")) {
+        int post = (ka == OP_MEM_HL && hl_postop(a)) || (kb == OP_MEM_HL && hl_postop(b));
+        int t = -1;
+
+        if (ka == OP_R8 && kb == OP_R8) t = (ixa || ixb) ? 2 : 1;
+        else if (ka == OP_R8 && kb == OP_IMM) t = 2;
+        else if (ka == OP_R8 && kb == OP_MEM_HL) t = 2;
+        else if (ka == OP_MEM_HL && kb == OP_R8) t = 2;
+        else if (ka == OP_MEM_HL && kb == OP_IMM) t = 3;
+        else if (ka == OP_R8 && kb == OP_MEM_IX) t = 4;
+        else if (ka == OP_MEM_IX && kb == OP_R8) t = 4;
+        else if (ka == OP_MEM_IX && kb == OP_IMM) t = 5;
+        else if (ka == OP_R8 && kb == OP_MEM_RP) t = 2;
+        else if (ka == OP_MEM_RP && kb == OP_R8) t = 2;
+        else if (ka == OP_R8 && kb == OP_MEM_ABS) t = 4;
+        else if (ka == OP_MEM_ABS && kb == OP_R8) t = 4;
+        else if ((ka == OP_R8 && kb == OP_IR) || (ka == OP_IR && kb == OP_R8)) t = 2;
+        else if (ka == OP_RP && kb == OP_IMM) t = 3;
+        else if (ka == OP_IX && kb == OP_IMM) t = 4;
+        else if (ka == OP_RP && kb == OP_MEM_ABS)
+            t = (ident_eq(a, "hl") || ident_eq(a, "sp")) ? 5 : 6;
+        else if (ka == OP_IX && kb == OP_MEM_ABS) t = 6;
+        else if (ka == OP_MEM_ABS && kb == OP_RP) t = ident_eq(b, "hl") ? 5 : 6;
+        else if (ka == OP_MEM_ABS && kb == OP_IX) t = 6;
+        else if (ident_eq(a, "sp") && ident_eq(b, "hl")) t = 1;
+        else if (ident_eq(a, "sp") && kb == OP_IX) t = 2;
+        /* native word access through (hl) and (ix+d) */
+        else if ((ka == OP_RP || ka == OP_IX) && kb == OP_MEM_HL) t = 4;
+        else if (ka == OP_MEM_HL && (kb == OP_RP || kb == OP_IX)) t = 4;
+        else if ((ka == OP_RP || ka == OP_IX) && kb == OP_MEM_IX) t = 5;
+        else if (ka == OP_MEM_IX && (kb == OP_RP || kb == OP_IX)) t = 5;
+        return (t >= 0 && post) ? t + 1 : t;
+    }
+    return -1;
+}
+
 /* Z80, Z80N, Z180, Rabbit. Halt, jp (hl)/(ix)/(iy), and unknown set *fallback. */
 static int ticks_z80ish_base(int cpu, const char *mnem, const char *rest,
                         int cond, int indirect, int backward, int *fallback)
@@ -1126,7 +1248,14 @@ static int z180_delta(const char *mnem, const char *rest, int cond, int taken)
 static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
                         int cond, int indirect, int backward, int *fallback)
 {
-    int t = ticks_z80ish_base(cpu, mnem, rest, cond, indirect, backward, fallback);
+    int t;
+
+    if (cpu == TICKS_CPU_EZ80 && strcmp(mnem, "halt") != 0 && !indirect) {
+        t = ez80_time(mnem, rest, cond, backward || !cond);
+        if (t >= 0)
+            return t;
+    }
+    t = ticks_z80ish_base(cpu, mnem, rest, cond, indirect, backward, fallback);
 
     if (cpu == TICKS_CPU_Z180 && t > 0)
         t += z180_delta(mnem, rest, cond, backward || !cond);

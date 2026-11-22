@@ -12,7 +12,8 @@ enum {
     TICKS_CPU_VM1,
     TICKS_CPU_GBZ80,
     TICKS_CPU_R2KA,
-    TICKS_CPU_R4K
+    TICKS_CPU_R4K,
+    TICKS_CPU_EZ80
 };
 
 enum {
