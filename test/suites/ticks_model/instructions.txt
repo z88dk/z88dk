@@ -181,3 +181,8 @@ tstio 5
 in0 b,(5)
 out0 (5),b
 otim
+ld hl,(ix+100)
+ld (ix+100),hl
+ld de,(ix+100)
+ld (ix+100),de
+ld bc,(ix+100)

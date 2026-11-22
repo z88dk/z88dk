@@ -4,6 +4,8 @@
 # Prints "cpu|instruction|cycles"; an instruction the CPU cannot assemble or run to the end is left out. The emulator is the reference.
 # A line may be several statements separated by " ; " (a setup the model scores too); a
 # statement that starts with "!" is a branch that is taken, which the assembler never sees.
+# IX is 0 in these programs, so an indexed store with a small displacement writes into the
+# program itself: use a displacement of 100 or more in a store that follows another instruction.
 # usage: bench.sh <cpu>...
 limit=; command -v timeout > /dev/null 2>&1 && limit="timeout 20"
 tmp=${TMPDIR:-/tmp}/ticks_model.$$

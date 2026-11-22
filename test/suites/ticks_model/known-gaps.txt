@@ -12,7 +12,7 @@ vm1 15
 gbz80 23
 # kc160, r2ka, ez80_z80, r800: the model has no timings for these CPUs, so it scores them with
 # the Z180 (kc160) or Z80 numbers.  Replace an entry with 0 as the timings are added.
-kc160 175
-r2ka 161
-ez80_z80 168
-r800 171
+kc160 180
+r2ka 165
+ez80_z80 173
+r800 176
