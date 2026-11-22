@@ -958,3 +958,37 @@
 	inc	sp
 	ld	hl,%2
 
+;; Copy a register pair without the stack.
+
+%title Copy bc to de without the stack
+%notcpu kc160 r2ka r3k r4k r6k
+	push	bc
+	add	hl,hl
+	pop	de
+	add	hl,de
+=
+	ld	d,b
+	ld	e,c
+	add	hl,hl
+	add	hl,de
+
+%title Copy hl to de with ex when hl is reloaded
+%notcpu gbz80
+%not %1 h l "\(hl.*"
+%not %2 "\(hl.*"
+	ld	d,h
+	ld	e,l
+	ld	a,%1
+	ld	(de),a
+	ld	hl,%2
+=
+	ex	de,hl
+	ld	a,%1
+	ld	(de),a
+	ld	hl,%2
+
+%title A push and pop of the same pair does nothing
+	push	hl
+	pop	hl
+=
+
