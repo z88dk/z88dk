@@ -4343,8 +4343,7 @@ static void handle_ed_page(void)
         else if ( isez80() ) ez80_ld_rr_ihl(opc);  // LD HL,(HL)
         else if ( isz80n() ) { // TST n
             uint8_t v = get_memory_inst(pc++);
-            TEST(v, 7);
-            st += 11;
+            TEST(v, 11);
         } else {
             st += 8;
         }
