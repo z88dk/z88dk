@@ -6035,13 +6035,14 @@
 	ld	hl,%3
 
 %title Repeated logical operation
+%not %1 (hl)
 	and	%1
 	ld	l,a
 	ld	a,l
-	and	%2
+	and	%1
 	ld	l,a
 =
-	and	%2
+	and	%1
 	ld	l,a
 
 %title Redundant 8bit load into hl
