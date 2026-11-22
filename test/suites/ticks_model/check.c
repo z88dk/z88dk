@@ -1,7 +1,7 @@
 /* Compare the T-state model (src/common/ticks_model.c) with cycles measured in the
    z88dk-ticks emulator.  usage: check <measured> <known-gaps>
    <measured> lines are "cpu|instruction|cycles" (bench.sh).  <known-gaps> lines are
-   "cpu count": the number of instructions the model is known to get wrong on that CPU
+   "cpu count" (lines that start with # are comments): the number of instructions the model is known to get wrong on that CPU
    (0 when a CPU is not listed).  The check fails when a count differs from its entry,
    in either direction, so fixing the model means lowering the entry. */
 #include <stdio.h>
@@ -22,6 +22,26 @@ static int cpu_index(const char *name)
     return ncpu++;
 }
 
+/* The model's time for an instruction line: its statements, separated by " ; ", added
+   up.  A statement that starts with "!" is a taken branch. */
+static int score(int cpu, const char *line)
+{
+    char buf[256], *p = buf, *end;
+    int total = 0;
+
+    snprintf(buf, sizeof buf, "%s", line);
+    for (;;) {
+        int taken = 0, fb = 0;
+        end = strstr(p, " ; ");
+        if (end) *end = 0;
+        if (*p == '!') { taken = 1; p++; }
+        total += ticks_for_src(cpu, p, taken, &fb);
+        if (!end) break;
+        p = end + 3;
+    }
+    return total;
+}
+
 int main(int argc, char **argv)
 {
     char ln[512];
@@ -32,17 +52,17 @@ int main(int argc, char **argv)
     if (!(f = fopen(argv[2], "r"))) { perror(argv[2]); return 2; }
     while (fgets(ln, sizeof ln, f)) {
         char name[32]; int n;
-        if (sscanf(ln, "%31s %d", name, &n) == 2) cpu_known[cpu_index(name)] = n;
+        if (ln[0] != '#' && sscanf(ln, "%31s %d", name, &n) == 2) cpu_known[cpu_index(name)] = n;
     }
     fclose(f);
     if (!(f = fopen(argv[1], "r"))) { perror(argv[1]); return 2; }
     while (fgets(ln, sizeof ln, f)) {
         char *cpu = strtok(ln, "|"), *ins = strtok(NULL, "|"), *cyc = strtok(NULL, "|\n");
-        int fb = 0, k, model, measured;
+        int k, model, measured;
         if (!cpu || !ins || !cyc) continue;
         k = cpu_index(cpu);
         measured = atoi(cyc);
-        model = ticks_for_src(ticks_cpu_from_name(cpu), ins, 0, &fb);
+        model = score(ticks_cpu_from_name(cpu), ins);
         cpu_total[k]++;
         if (model != measured) {
             cpu_bad[k]++;

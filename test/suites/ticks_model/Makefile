@@ -9,12 +9,15 @@ all: model.ok
 check$(EXESUFFIX): check.c ../../../src/common/ticks_model.c ../../../src/common/ticks_model.h
 	$(CC) -std=gnu11 -Wall -I../../../src/common -o $@ check.c ../../../src/common/ticks_model.c
 
+# One bench.sh per CPU, all at once: each is a few thousand assemble-and-run steps.
 measured.txt: bench.sh instructions.txt
-	./bench.sh $(CPUS) > $@
+	rm -f measured.*.txt
+	for c in $(CPUS); do ./bench.sh $$c > measured.$$c.txt & done; wait
+	cat $(foreach c,$(CPUS),measured.$(c).txt) > $@
 
 model.ok: check$(EXESUFFIX) measured.txt known-gaps.txt
 	./check$(EXESUFFIX) measured.txt known-gaps.txt
 	touch $@
 
 clean:
-	$(RM) check$(EXESUFFIX) measured.txt model.ok
+	$(RM) check$(EXESUFFIX) measured.txt measured.*.txt model.ok

@@ -1,21 +1,26 @@
 #!/bin/sh
 # Measure each instruction in instructions.txt on each CPU in the z88dk-ticks emulator:
-# the cycles for 100 more copies of it, divided by 100. Prints "cpu|instruction|cycles";
-# an instruction the CPU cannot assemble is left out. The emulator is the reference.
+# the cycles it takes to run once, from the start of the program to the end address.
+# Prints "cpu|instruction|cycles"; an instruction the CPU cannot assemble or run to the end is left out. The emulator is the reference.
+# A line may be several statements separated by " ; " (a setup the model scores too); a
+# statement that starts with "!" is a branch that is taken, which the assembler never sees.
 # usage: bench.sh <cpu>...
+limit=; command -v timeout > /dev/null 2>&1 && limit="timeout 20"
 tmp=${TMPDIR:-/tmp}/ticks_model.$$
 mkdir -p "$tmp" || exit 1
 trap 'rm -rf "$tmp"' EXIT
 for cpu in "$@"; do
   while IFS= read -r ins; do
-    t10= t110=
-    for n in 10 110; do
-      { echo "org 0"; i=0; while [ $i -lt $n ]; do echo "$ins"; i=$((i+1)); done; echo "nop"; } > "$tmp/t.asm"
-      z88dk-z80asm -m$cpu -b "$tmp/t.asm" > /dev/null 2>&1 || continue 2
-      end=$(( $(wc -c < "$tmp/t.bin") - 1 ))
-      t=$(z88dk-ticks -m$cpu -end $(printf '%x' $end) "$tmp/t.bin" 2>&1 | tail -1)
-      if [ $n -eq 10 ]; then t10=$t; else t110=$t; fi
-    done
-    echo "$cpu|$ins|$(( (t110 - t10) / 100 ))"
+    body=$(printf '%s\n' "$ins" | sed 's/!//g; s/ ; /\n/g')
+    { echo "org 0"; echo "$body"; echo "nop"; } > "$tmp/t.asm"
+    z88dk-z80asm -m$cpu -b "$tmp/t.asm" > /dev/null 2>&1 || continue
+    # A helper that z80asm calls but a bare binary does not link is a call to address 0,
+    # which restarts the program: leave such an instruction out.
+    od -An -v -tx1 "$tmp/t.bin" | tr -d '\n' | grep -q ' cd 00 00 ' && continue
+    end=$(( $(wc -c < "$tmp/t.bin") - 1 ))
+    t=$($limit z88dk-ticks -m$cpu -counter 1000000 -end $(printf '%x' $end) "$tmp/t.bin" 2>&1 | tail -1)
+    case $t in ''|*[!0-9]*) continue ;; esac
+    [ $t -gt 0 ] || continue
+    echo "$cpu|$ins|$t"
   done < instructions.txt
 done
