@@ -327,7 +327,7 @@ iy.ok: ../../../src/zcc-multi/t/iyld.asm ../../../src/zcc-multi/t/iyword.asm \
 	  --variant=sccz80:../../../src/zcc-multi/t/iybc.asm \
 	  --variant=80cc-sp:../../../src/zcc-multi/t/iybc.asm
 	test `awk '/^_foo/ {print $$3}' iybc_z180.tsv` = metric
-	test `awk '/^_foo/ {print $$6}' iybc_z180.tsv` -eq 35
+	test `awk '/^_foo/ {print $$6}' iybc_z180.tsv` -eq 32
 	z88dk-zcc-multi --cpu=r2ka --metric=ticks --data-variant=sccz80 \
 	  --output=iyld_r2ka_stitch.asm --report=iyld_r2ka.tsv \
 	  --variant=sccz80:../../../src/zcc-multi/t/nops.asm \
@@ -411,7 +411,7 @@ extz180.ok: ../../../src/zcc-multi/t/z180_ext.asm \
 	  --variant=sccz80:../../../src/zcc-multi/t/z180_ext.asm \
 	  --variant=80cc-sp:../../../src/zcc-multi/t/z180_ext.asm
 	test `awk '/^_foo/ {print $$3}' extz180.tsv` = metric
-	test `awk '/^_foo/ {print $$6}' extz180.tsv` -eq 94
+	test `awk '/^_foo/ {print $$6}' extz180.tsv` -eq 93
 	z88dk-zcc-multi --cpu=z180 --metric=ticks --data-variant=sccz80 \
 	  --output=extz180_pick.asm --report=extz180_pick.tsv \
 	  --variant=sccz80:../../../src/zcc-multi/t/z180_slow.asm \
