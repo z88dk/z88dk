@@ -853,6 +853,16 @@ int israbbit6k(void)
 #define israbbit4k() ((c_cpu & (CPU_R6K|CPU_R4K)) && rabbit_get_ioi_reg(RABBIT_EDMR) == 0xc0)
 #define israbbit6k() ((c_cpu & CPU_R6K) && rabbit_get_ioi_reg(RABBIT_EDMR) == 0xc0)
 
+/* P/V after a logical result. The Z80 sets parity. A Rabbit sets L/V when one
+   or more of the four most significant bits of the result are one: the LZ and
+   LO conditions of the Rabbit Instruction Reference Manual (019-0098). */
+static int pv_logic(int r)
+{
+    if ( israbbit() && !c_z80asm_tests )
+        return r & 0xf0 ? 4 : 0;
+    return 154020 >> ((r ^ r >> 4) & 15);
+}
+
 int f(void){
     if ( is8085() ) {
         int pv = (fa & -256
@@ -945,7 +955,7 @@ int f(void){
                 | fb >> 8 & 2 // N (subtract flag) bit 1, value 512
                 | (fr ^ fa ^ fb ^ fb >> 8) & 16 // H (half carry) bit 4
                 | (fa & -256
-                    ? 154020 >> ((fr ^ fr >> 4) & 15)
+                    ? pv_logic(fr)
                     : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4; // P/V bit 2
                     ;
     }
@@ -958,7 +968,7 @@ int f_(void){
         | fb_ >> 8 & 2
         | (fr_ ^ fa_ ^ fb_ ^ fb_ >> 8) & 16
         | (fa_ & -256
-            ? 154020 >> ((fr_ ^ fr_ >> 4) & 15)
+            ? pv_logic(fr_)
             : ((fr_ ^ fa_) & (fr_ ^ fb_)) >> 5) & 4;
 }
 
