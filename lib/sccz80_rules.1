@@ -934,6 +934,7 @@
 	ex	de,hl
 	ld	hl,(_%1
 
+%not %1 h l (hl)
 	ld	hl,0	;const
 	add	hl,sp
 	ld	a,(hl)
@@ -2637,6 +2638,7 @@
 =
 	call	memcpy_callee
 
+%not %1 d e
 	push	hl
 	pop	de
 	ld	a,%1
@@ -2936,6 +2938,7 @@
 	ld	d,(hl)
 	ld	hl,%2
 
+%not %2 e l (hl)
 	ld	l,%1
 	ld	h,%2
 	pop	de
@@ -2991,6 +2994,7 @@
 	ld	(hl),%eval(%2 256 /)
 	ld	hl,%3
 
+%not %2 h (hl)
 	ld	h,%1
 	ld	h,%2
 =
@@ -3063,6 +3067,7 @@
 	add	hl,sp
 	call	l_gint
 
+%not %1 h l (hl)
 	ld	l,(hl)
 	ld	h,0
 	ld	a,l
@@ -3191,6 +3196,7 @@
 	ld	h,0
 	ld	de,255
 
+%not %1 h l (hl)
 	ld	l,a
 	ld	h,0
 	ld	a,l
@@ -3319,6 +3325,7 @@
 	jr	nz,ASMPC+3
 	inc	l
 
+%not %1 h l (hl)
 	ld	l,(hl)
 	ld	h,0
 	ld	a,%1
@@ -3329,6 +3336,7 @@
 	sub	(hl)
 	ld	hl,%2	;const
 
+%not %1 h l (hl)
 	ld	l,(hl)
 	ld	h,0
 	ld	a,l
@@ -3339,6 +3347,7 @@
 	sub	%1
 	ld	hl,%2
 
+%not %1 h l (hl)
 	ld	l,(hl)
 	ld	h,0
 	ld	a,%1
@@ -3843,6 +3852,7 @@
 	jp	z,%2	;%5
 	ld	hl,%3
 
+%not %2 h l (hl)
 	ld	hl,(_%1)
 	ld	h,0
 	ld	a,%2
@@ -4908,6 +4918,7 @@
 =
 	ld	hl,0	;const
 
+%not %2 h (hl)
 	ld	h,%1
 	%"and|or|xor"3	%2
 	ld	l,a
