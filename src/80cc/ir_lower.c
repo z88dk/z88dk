@@ -19,7 +19,7 @@
 #include "ir_alloc.h"
 #include "ir_opt.h"
 #include "ir_match.h"
-#include "zccmulti_ticks.h"
+#include "ticks_model.h"
 
 #include <stdarg.h>
 #include <stdio.h>

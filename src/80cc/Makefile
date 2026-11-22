@@ -46,14 +46,14 @@ OBJS =	callfunc.o     	\
 	ir_opt.o	\
 	ir_match.o	\
 	ir_compiler_glue.o \
-	../zcc-multi/zccmulti_ticks.o \
+	../common/ticks_model.o \
 	tokeniser.o
 
 DEPENDS := $(OBJS:.o=.d)
 
 all: z88dk-80cc$(EXESUFFIX)
 
-CFLAGS += -MMD -Wall -I../common -I../zcc-multi -I../../ext/uthash/src/ -g -pedantic -std=gnu11
+CFLAGS += -MMD -Wall -I../common -I../../ext/uthash/src/ -g -pedantic -std=gnu11
 
 z88dk-80cc$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o z88dk-80cc$(EXESUFFIX) $(OBJS) -lm
@@ -62,7 +62,7 @@ z88dk-80cc$(EXESUFFIX): $(OBJS)
 # selftest provides its own SYMBOL/global stubs). Run after touching
 # ir*.c: `make ir_selftest && ./ir_selftest`.
 IR_SELFTEST_SRCS = ir_selftest.c ir.c ir_lower.c ir_slots.c ir_analysis.c \
-	ir_alloc.c ir_opt.c ir_match.c ../zcc-multi/zccmulti_ticks.c
+	ir_alloc.c ir_opt.c ir_match.c ../common/ticks_model.c
 
 ir_selftest$(EXESUFFIX): $(IR_SELFTEST_SRCS)
 	$(CC) $(CFLAGS) -o $@ $(IR_SELFTEST_SRCS) -lm

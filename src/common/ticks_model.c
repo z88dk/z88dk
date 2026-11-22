@@ -1,10 +1,10 @@
 /*
- * Listing parse and a static T-state model for z88dk-zcc-multi.
+ * Listing parse and a static T-state model, shared by z88dk-zcc-multi and 80cc.
  * Times are documented chip values from the mnemonic and operands.
  * The listing byte count is not an input (80cc line numbers are not trusted).
  */
 
-#include "zccmulti_ticks.h"
+#include "ticks_model.h"
 
 #include <ctype.h>
 #include <stdio.h>

@@ -1,5 +1,5 @@
-#ifndef ZCCMULTI_TICKS_H
-#define ZCCMULTI_TICKS_H
+#ifndef TICKS_MODEL_H
+#define TICKS_MODEL_H
 
 #include <stddef.h>
 
