@@ -1,0 +1,9 @@
+lea hl,ix+5
+lea ix,ix+5
+pea ix+5
+ld hl,(hl)
+ld (hl),hl
+ld ix,(hl)
+ld (hl),ix
+ld ix,(ix+100)
+ld (ix+100),ix

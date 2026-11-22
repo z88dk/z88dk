@@ -6,12 +6,15 @@
 # statement that starts with "!" is a branch that is taken, which the assembler never sees.
 # IX is 0 in these programs, so an indexed store with a small displacement writes into the
 # program itself: use a displacement of 100 or more in a store that follows another instruction.
+# A CPU can have extra forms of its own in instructions.<cpu>.txt, such as the eZ80's native
+# word accesses, which z80asm builds from several instructions on the other CPUs.
 # usage: bench.sh <cpu>...
 limit=; command -v timeout > /dev/null 2>&1 && limit="timeout 20"
 tmp=${TMPDIR:-/tmp}/ticks_model.$$
 mkdir -p "$tmp" || exit 1
 trap 'rm -rf "$tmp"' EXIT
 for cpu in "$@"; do
+  list="$tmp/list"; cat instructions.txt > "$list"; [ -f instructions.$cpu.txt ] && cat instructions.$cpu.txt >> "$list"
   while IFS= read -r ins; do
     body=$(printf '%s\n' "$ins" | sed 's/!//g; s/ ; /\n/g')
     { echo "org 0"; echo "$body"; echo "nop"; } > "$tmp/t.asm"
@@ -24,5 +27,5 @@ for cpu in "$@"; do
     case $t in ''|*[!0-9]*) continue ;; esac
     [ $t -gt 0 ] || continue
     echo "$cpu|$ins|$t"
-  done < instructions.txt
+  done < "$list"
 done

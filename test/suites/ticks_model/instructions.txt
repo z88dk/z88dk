@@ -186,3 +186,4 @@ ld (ix+100),hl
 ld de,(ix+100)
 ld (ix+100),de
 ld bc,(ix+100)
+ld hl,$+6 ; push hl ; retn

@@ -10,7 +10,7 @@ check$(EXESUFFIX): check.c ../../../src/common/ticks_model.c ../../../src/common
 	$(CC) -std=gnu11 -Wall -I../../../src/common -o $@ check.c ../../../src/common/ticks_model.c
 
 # One bench.sh per CPU, all at once: each is a few thousand assemble-and-run steps.
-measured.txt: bench.sh instructions.txt
+measured.txt: bench.sh instructions.txt $(wildcard instructions.*.txt)
 	rm -f measured.*.txt
 	for c in $(CPUS); do ./bench.sh $$c > measured.$$c.txt & done; wait
 	cat $(foreach c,$(CPUS),measured.$(c).txt) > $@

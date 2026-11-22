@@ -10,9 +10,11 @@
 8085 15
 vm1 15
 gbz80 23
-# kc160, r2ka, ez80_z80, r800: the model has no timings for these CPUs, so it scores them with
+# ez80_z80: the emulator does not implement tstio, so it runs the next byte as an instruction (9).
+ez80_z80 1
+#
+# kc160, r2ka, r800: the model has no timings for these CPUs, so it scores them with
 # the Z180 (kc160) or Z80 numbers.  Replace an entry with 0 as the timings are added.
-kc160 180
+kc160 181
 r2ka 165
-ez80_z80 173
-r800 176
+r800 177
