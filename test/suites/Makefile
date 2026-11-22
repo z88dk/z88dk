@@ -1,7 +1,7 @@
 
 
 
-SUBDIRS = string ixsave ctype stdio stdlib malloc target_io math imath md5 regex sccz80 zx far zcc-multi rabbit_mmu minifat sdhl floppy256 ticks_page ticks_ide
+SUBDIRS = string ixsave ctype stdio stdlib malloc target_io math imath md5 regex sccz80 zx far zcc-multi ticks_model rabbit_mmu minifat sdhl floppy256 ticks_page ticks_ide
 # benchmark suites (also self-checking via host-verified assertEqual)
 BENCH = charbench crcbench intbench ptrbench sieve rle \
            sortbench queenbench searchbench switchbench \
