@@ -24,7 +24,6 @@ ti_refresh:
     ldir
     call    ti_find
     jr      c, tr_miss
-    ld      (tr_vat), hl
     call    ti_geom
     jr      c, tr_miss
     ld      (tr_flags), a
@@ -55,14 +54,9 @@ ti_refresh:
     and     TI_OPEN | TI_WRITE | TI_READ
     ld      c, a
     ld      a, (tr_flags)
-    and     TI_ARCH | TI_GROW | TI_HSIZE
+    and     TI_ARCH | TI_GROW
     or      c
     ld      (hl), a
-    inc     hl
-    ld      de, (tr_vat)
-    ld      (hl), e
-    inc     hl
-    ld      (hl), d
     pop     hl
     push    hl
     ld      de, fs_pos
@@ -98,9 +92,6 @@ tr_miss:
     ret
 
     SECTION bss_clib
-
-tr_vat:
-    defw    0
 
 tr_addr:
     defw    0

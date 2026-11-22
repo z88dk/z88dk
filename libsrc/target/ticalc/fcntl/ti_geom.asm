@@ -3,7 +3,7 @@
 ;
 ; In:  A = type, B = page, HL = symbol entry, DE = data.
 ;      Page 0 is RAM. An archived DE is the flag byte, not the payload.
-; Out: A = TI_ARCH / TI_GROW / TI_HSIZE, B = page of the payload,
+; Out: A = TI_ARCH / TI_GROW, B = page of the payload,
 ;      DE = first payload byte, HL = payload size. Carry set on a bad
 ;      header (a matrix whose dimension is 0 or greater than 99).
 ;
@@ -128,7 +128,7 @@ tg_flex:
     or      a
     jr      nz, tg_sized
     ld      a, (tg_flagsb)
-    or      TI_GROW | TI_HSIZE
+    or      TI_GROW
     ld      (tg_flagsb), a
 
 tg_sized:
@@ -323,6 +323,7 @@ tg_mul_c:
 
 ; BHL = archive flag. as_type = object type.
 ; DE = data length, BHL = first data byte.
+; ti_arch_add's address is swapped under the size, then popped back.
 arch_span:
     call    ti_arch_inc
     call    ti_arch_byte
@@ -348,14 +349,9 @@ arch_span:
     jr      z, as_named
     ld      de, 10
     call    ti_arch_add
-    pop     hl
+    ex      (sp), hl
     ld      de, 9
-    or      a
-    sbc     hl, de
-    ex      de, hl
-    ret     nc
-    scf
-    ret
+    jr      as_len
 
 as_list:
     ld      c, 1
@@ -389,13 +385,15 @@ as_skip:
     add     a, e
     ld      e, a
     call    ti_arch_add
-    pop     hl
+    ex      (sp), hl
     ld      a, (as_head)
     ld      e, a
     ld      d, 0
+as_len:
     or      a
     sbc     hl, de
     ex      de, hl
+    pop     hl
     ret     nc
     scf
     ret

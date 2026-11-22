@@ -71,7 +71,6 @@ ___write:
     jr      nc, wr_have
     ld      hl, 0
 wr_have:
-    ld      (wr_room), hl
     ld      de, (wr_len)
     or      a
     sbc     hl, de
@@ -169,9 +168,6 @@ wr_pos:
     defw    0
 
 wr_size:
-    defw    0
-
-wr_room:
     defw    0
 
 wr_new:

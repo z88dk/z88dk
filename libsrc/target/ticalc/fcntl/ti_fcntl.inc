@@ -1,5 +1,5 @@
 ; TI-83 Plus file slots.
-; A slot is 19 bytes. The CRT zeroes bss, so a slot starts closed.
+; A slot is 17 bytes. The CRT zeroes bss, so a slot starts closed.
 ;
 ;  0  name     9   OP1 image (type and up to 8 tokens)
 ;  9  page     1   0 is RAM, otherwise the archive page
@@ -7,17 +7,15 @@
 ; 12  position 2
 ; 14  size     2   payload bytes
 ; 16  flags    1
-; 17  vat      2   symbol-table entry
 
 defc    TI_NSLOTS   = 8
-defc    TI_SLOT     = 19
+defc    TI_SLOT     = 17
 defc    TI_MIN_FD   = 3
 
 defc    TI_OPEN     = 1
 defc    TI_WRITE    = 2
 defc    TI_GROW     = 4
 defc    TI_ARCH     = 8
-defc    TI_HSIZE    = 16
 defc    TI_READ     = 32
 
 defc    fs_page     = 9
@@ -25,7 +23,6 @@ defc    fs_off      = 10
 defc    fs_pos      = 12
 defc    fs_size     = 14
 defc    fs_flags    = 16
-defc    fs_vat      = 17
 
 ; include/fcntl.h and include/errno.h. This unit is not compiled as C.
 defc    O_RDONLY    = 0

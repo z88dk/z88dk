@@ -64,7 +64,6 @@ ___open:
     jp      c, op_nomem
 
 op_got:
-    ld      (op_vat), hl
     call    ti_geom
     jp      c, op_inval
     ld      (op_geom), a
@@ -112,7 +111,7 @@ op_acc:
 op_setpos:
     ld      (op_posn), hl
     ld      a, (op_geom)
-    and     TI_ARCH | TI_GROW | TI_HSIZE
+    and     TI_ARCH | TI_GROW
     or      TI_OPEN
     ld      c, a
     ld      a, (op_low)
@@ -156,11 +155,6 @@ op_save:
     ld      (hl), d
     inc     hl
     ld      (hl), c
-    inc     hl
-    ld      de, (op_vat)
-    ld      (hl), e
-    inc     hl
-    ld      (hl), d
     ld      a, (op_fd)
     ld      l, a
     ld      h, 0
@@ -188,9 +182,6 @@ op_name:
     defw    0
 
 op_slot:
-    defw    0
-
-op_vat:
     defw    0
 
 op_addr:

@@ -21,21 +21,15 @@ ti_slot:
     ccf
     ret     c
     sub     TI_MIN_FD
-    ld      c, a
-    ld      l, a
-    ld      h, 0
-    add     hl, hl
-    ld      e, l
-    ld      d, h
-    add     hl, hl
-    add     hl, hl
-    add     hl, hl
+    ld      hl, ti_files
+    ld      de, TI_SLOT
+    or      a
+    jr      z, ts_flags
+    ld      b, a
+ts_span:
     add     hl, de
-    ld      e, c
-    ld      d, 0
-    add     hl, de
-    ld      de, ti_files
-    add     hl, de
+    djnz    ts_span
+ts_flags:
     push    hl
     ld      de, fs_flags
     add     hl, de
