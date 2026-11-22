@@ -40,6 +40,22 @@ IF  __CPU_RABBIT__
 
 ELSE
 
+IF __CPU_8085__
+
+   ; F bit 3 is always 0, so the saved HL and the return address stay out of AF.
+   ; The status word is the AF image from push_di. IE is bit 3 of A.
+   ;
+   ; enter : stack = ei_di_status, ret
+   ;
+   ; uses  : af, bc
+
+   pop bc
+   pop af
+   push bc
+   jp ei_restore
+
+ELSE
+
    ; enter  : stack = ei_di_status, ret
    ;
    ; uses  : af
@@ -52,23 +68,33 @@ ELSE
    
    ex (sp),hl                  ; hl restored
 
+ENDIF
+
 asm0_z80_pop_ei:
 asm0_cpu_pop_ei:
 asm_z80_pop_ei_jp:
 asm_cpu_pop_ei_jp:
+
+IF __CPU_8085__
+
+   ; enter : stack = ret, ei_di_status
+   ;
+   ; uses  : af
+
+   pop af
+
+ei_restore:
+
+   and $08                     ; RIM bit 3 is IE
+   jp Z,di_state
+
+ELSE
 
    ; enter : stack = ret, ei_di_status
    ;
    ; uses  : af
 
    pop af                      ; af = ei_di_status
-
-IF __CPU_8085__
-
-   and $08                     ; isolate IE bit
-   jp Z,di_state               ; or fall through to ei_state
-
-ELSE
 
    IF __Z80 & __Z80_NMOS
    

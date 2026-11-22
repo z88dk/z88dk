@@ -36,7 +36,12 @@ ELSE
 
 IF __CPU_8085__
 
+   ; RIM bit 3 is IE. Return that byte in L.
+   ; push af / pop hl would leave the flags in L and the RIM byte in H.
    rim
+   ld l,a
+   ld h,0
+   ret
 
 ELSE
 
@@ -75,13 +80,13 @@ ELSE
 
    ENDIF
 
-ENDIF
-
 continue:
-   
+
    push af
    pop hl
 
    ret
+
+ENDIF
 
 ENDIF

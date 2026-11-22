@@ -2359,6 +2359,7 @@ static void declfunc(Type *functype, enum storage_type storage)
 
 
     infunc = 1; /* In a function for sure! */
+    gen_critical_reset();
     
     where = c_params_offset + currfn->ctype->funcattrs.params_offset;
 

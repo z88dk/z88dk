@@ -35,7 +35,8 @@ ELSE
 
 IF __CPU_8085__
 
-   and $80                     ; isolate IE bit
+   ld a,l
+   and $08                     ; RIM bit 3 is IE
 
 ELSE
 

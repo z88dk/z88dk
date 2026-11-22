@@ -1460,6 +1460,26 @@ void point(void)
 }
 
 
+/* Rabbit keeps the old priority in the IP register. The 8080, the VM1
+   and the gbz80 cannot read the enable flag, so they use di / ei and
+   no stack word. Every other cpu calls l_push_di / l_pop_ei.
+   Zsp is the only record of that word. Parameter symbols are read as
+   offset - Zsp, so zcriticaloffset() stays 0. */
+#define CRITICAL_MARKS 4
+static int critical_mark[CRITICAL_MARKS];
+static int critical_marks;
+
+static int critical_saves_on_stack(void)
+{
+    if ( c_cpu & CPU_RABBIT ) {
+        return 0;
+    }
+    if ( IS_8080_CLASS() || IS_GBZ80() ) {
+        return 0;
+    }
+    return 1;
+}
+
 /*
  * \brief Generate the leave state for a function
  *
@@ -1494,6 +1514,17 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     } else if (vartype == KIND_ACCUM32) {
         vartype = KIND_LONG;
     }
+
+    /* Locals sit above the saved interrupt word. Pop them, then let
+       l_pop_ei take the word. Popping the word here makes l_pop_ei
+       consume the return address. */
+    if ( critical_saves_on_stack() ) {
+        while ( critical_marks > 0 ) {
+            Zsp = modstk(critical_mark[critical_marks - 1], vartype, NO, YES);
+            gen_critical_leave();
+        }
+    }
+
     modstk(0, vartype, NO,YES);
 
     if (callee_cleanup) {
@@ -1544,8 +1575,9 @@ void gen_leave_function(Kind vartype, char type, int incritical)
         return;
     }
 
-    /* Naked has already returned */
-    if ( (currfn->flags & CRITICAL) == CRITICAL || incritical) {
+    /* Naked has already returned. Stack cpus already called l_pop_ei. */
+    if ( ((currfn->flags & CRITICAL) == CRITICAL || incritical) &&
+         !critical_saves_on_stack() ) {
         gen_critical_leave();
     }
 
@@ -5891,13 +5923,23 @@ void gen_interrupt_leave(SYMBOL *func)
 
 
 
+void gen_critical_reset(void)
+{
+    critical_marks = 0;
+}
+
 void gen_critical_enter(void)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ipset\t3");
+    } else if ( !critical_saves_on_stack() ) {
+        ol("di");
     } else {
         callrts("l_push_di");
         Zsp -= 2;
+        if ( critical_marks < CRITICAL_MARKS ) {
+            critical_mark[critical_marks++] = Zsp;
+        }
     }
 }
 
@@ -5905,18 +5947,20 @@ void gen_critical_leave(void)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ipres");
+    } else if ( !critical_saves_on_stack() ) {
+        ol("ei");
     } else {
         callrts("l_pop_ei");
         Zsp += 2;
+        if ( critical_marks > 0 ) {
+            critical_marks--;
+        }
     }
 }
 
 int zcriticaloffset(void)
 {
-    if ( c_cpu & CPU_RABBIT ) {
-        return 0;
-    }
-    return 2;
+    return 0;
 }
 
 
