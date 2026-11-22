@@ -2,7 +2,7 @@ include ../make.config
 
 # The T-state model in src/common/ticks_model.c, checked against cycles measured in the
 # z88dk-ticks emulator.  bench.sh needs z88dk-z80asm and z88dk-ticks on the PATH.
-CPUS = z80 z80n 8080 8085 vm1 gbz80 z180 kc160 r2ka ez80_z80 r800
+CPUS = z80 z80n 8080 8085 vm1 gbz80 z180 kc160 r2ka r4k r6k ez80_z80 r800
 
 all: model.ok
 

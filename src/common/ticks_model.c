@@ -74,9 +74,10 @@ int ticks_cpu_from_name(const char *cpu)
         return TICKS_CPU_Z80N;
     if (strcmp(cpu, "ez80_z80") == 0 || strcmp(cpu, "ez80") == 0)
         return TICKS_CPU_EZ80;
-    /* r2ka / r3k share the Rabbit 2000 word ops. r4k / r6k add more. */
-    if (strncmp(cpu, "r4", 2) == 0 || strncmp(cpu, "r5", 2) == 0 ||
-        strncmp(cpu, "r6", 2) == 0)
+    /* r2ka / r3k share the Rabbit 2000 word ops. r4k and r6k add more. ticks times r5k as r4k, so this does too. */
+    if (strncmp(cpu, "r6", 2) == 0)
+        return TICKS_CPU_R6K;
+    if (strncmp(cpu, "r4", 2) == 0 || strncmp(cpu, "r5", 2) == 0)
         return TICKS_CPU_R4K;
     if (strncmp(cpu, "r2", 2) == 0 || strncmp(cpu, "r3", 2) == 0)
         return TICKS_CPU_R2KA;
@@ -478,7 +479,7 @@ static int rp_copy_ok(const char *a, const char *b)
 
 static int cpu_is_rabbit(int cpu)
 {
-    return cpu == TICKS_CPU_R2KA || cpu == TICKS_CPU_R4K;
+    return cpu == TICKS_CPU_R2KA || cpu == TICKS_CPU_R4K || cpu == TICKS_CPU_R6K;
 }
 
 /* z80asm expansion of `ex`. Native 4 T on Z80-family / 808x; gbz80 has
@@ -553,7 +554,7 @@ static int ticks_rp_shift(int cpu, const char *mnem, const char *rp)
             return 2;
         if (strcmp(mnem, "rr") == 0 && (ident_eq(rp, "de") || ident_eq(rp, "hl")))
             return 2;
-        if (cpu == TICKS_CPU_R4K) {
+        if (cpu == TICKS_CPU_R4K || cpu == TICKS_CPU_R6K) {
             if (strcmp(mnem, "rl") == 0 &&
                 (ident_eq(rp, "bc") || ident_eq(rp, "hl")))
                 return 2;
@@ -1151,6 +1152,189 @@ static int kc160_time(const char *mnem, const char *rest, int cond, int taken)
     return -1;
 }
 
+/* Rabbit, with 8-bit instruction fetch. The Rabbit instruction manual lists clocks for the
+   R2000/R3000/R4000, which time most instructions alike; the R4000 slowed the register and (hl)
+   forms of the ALU ops. The R5000 and R6000 (one table here, from the Rabbit 6000 instruction
+   spreadsheet) are faster on the register and (hl) forms and one clock slower on (ix+d).
+   Returns -1 for an instruction this table does not cover. */
+/* A Rabbit (hl+d) operand: classify() calls it (hl), but it carries a displacement. */
+static int rabbit_hl_disp(const char *s)
+{
+    s = skip_ws(s);
+    if (strncasecmp(s, "(hl", 3) != 0)
+        return 0;
+    s = skip_ws(s + 3);
+    if (*s != '+' && *s != '-')
+        return 0;
+    s = skip_ws(s + 1);
+    return *s != ')' && *s != 0;
+}
+
+static int rabbit_iy_operand(const char *s)
+{
+    s = skip_ws(s);
+    return strncasecmp(s, "(iy", 3) == 0;
+}
+
+static int rabbit_time(int cpu, const char *mnem, const char *rest, int cond, int taken)
+{
+    char a[64], b[64];
+    const char *p = copy_op(rest, a, sizeof(a));
+    int ka, kb, ixa = 0, ixb = 0;
+    int r4 = (cpu == TICKS_CPU_R4K), r6 = (cpu == TICKS_CPU_R6K);
+
+    copy_op(p, b, sizeof(b));
+    ka = classify(a, &ixa);
+    kb = classify(b, &ixb);
+
+    if (!strcmp(mnem, "nop") || !strcmp(mnem, "scf") || !strcmp(mnem, "ccf") ||
+        !strcmp(mnem, "cpl") || !strcmp(mnem, "rlca") || !strcmp(mnem, "rrca") ||
+        !strcmp(mnem, "rla") || !strcmp(mnem, "rra") || !strcmp(mnem, "exx"))
+        return 2;
+    if (!strcmp(mnem, "neg"))
+        return 4;
+    /* daa, rld and rrd do not exist on a Rabbit: z80asm emits a long helper sequence for each.
+       They are scored at what that sequence costs, which keeps them out of chosen code. */
+    if (!strcmp(mnem, "daa"))
+        return r6 ? 411 : r4 ? 418 : 340;
+    if (!strcmp(mnem, "rld") || !strcmp(mnem, "rrd"))
+        return r6 ? 90 : r4 ? 95 : 93;
+    if (!strcmp(mnem, "jp") && !cond) {
+        if (ka == OP_MEM_HL) return 4;
+        if (ka == OP_MEM_IX) return 6;
+        return 7;
+    }
+    if (!strcmp(mnem, "jp"))
+        return 7;
+    if (!strcmp(mnem, "jr"))
+        return 5;
+    if (!strcmp(mnem, "djnz"))
+        return r6 ? 6 : 5;
+    /* There is no conditional call: z80asm emits jr !cc over a call. The jr takes 5 either way. */
+    if (!strcmp(mnem, "call")) {
+        int c = r6 ? 11 : 12;
+
+        if (!cond)
+            return c;
+        return taken ? 5 + c : 5;
+    }
+    if (!strcmp(mnem, "ret"))
+        return !cond ? (r6 ? 7 : 8) : (taken ? 8 : 2);
+    if (!strcmp(mnem, "reti"))
+        return 12;
+    if (!strcmp(mnem, "rst"))
+        return r6 ? 9 : 8;
+    if (!strcmp(mnem, "ex")) {
+        if (ka == OP_MEM_SP)
+            return r6 ? 13 : 15;
+        return 2;
+    }
+    if (!strcmp(mnem, "push"))
+        return ixa ? (r6 ? 11 : 12) : (r6 ? 9 : 10);
+    if (!strcmp(mnem, "pop"))
+        return ixa ? 9 : 7;
+    if (!strcmp(mnem, "inc") || !strcmp(mnem, "dec")) {
+        if (ka == OP_MEM_HL) return r6 ? 7 : 8;
+        if (ka == OP_MEM_IX) return 12;
+        if (ka == OP_IX) return 4;
+        if (ka != OP_R8 && ka != OP_RP) return -1;
+        return 2;
+    }
+    if (!strcmp(mnem, "add") || !strcmp(mnem, "adc") || !strcmp(mnem, "sbc")) {
+        if (ka == OP_IX) return 4;
+        if (ka == OP_RP) return !strcmp(mnem, "add") ? 2 : 4;
+    }
+    /* and/or hl,de are native; xor and sub hl,de are native from the R4000, a helper before it */
+    if (ident_eq(a, "hl") && ident_eq(b, "de")) {
+        if (!strcmp(mnem, "and") || !strcmp(mnem, "or")) return 2;
+        if (!strcmp(mnem, "xor")) return (r4 || r6) ? 4 : 29;
+        if (!strcmp(mnem, "sub")) return (r4 || r6) ? 2 : 45;
+    }
+    if (is_alu8(mnem)) {
+        int k = (kb != OP_EMPTY) ? kb : ka;
+        if (k == OP_MEM_IX) return r6 ? 10 : 9;
+        if (k == OP_MEM_SP) return r6 ? 10 : -1;        /* the R6000's (sp+n) ALU forms */
+        if (k == OP_MEM_HL) return (r6 || (r4 && strcmp(mnem, "and") != 0)) ? 7 : 5;
+        if (k == OP_IMM) return 4;
+        if (k != OP_R8) return -1;
+        return (r4 || r6) ? 4 : 2;
+    }
+    if (!strcmp(mnem, "bit")) {
+        if (kb == OP_MEM_IX) return r6 ? 12 : 10;
+        if (kb != OP_MEM_HL && kb != OP_R8) return -1;
+        return kb == OP_MEM_HL ? 7 : 4;
+    }
+    if (!strcmp(mnem, "res") || !strcmp(mnem, "set")) {
+        if (kb == OP_MEM_IX) return r6 ? 14 : 13;
+        if (kb != OP_MEM_HL && kb != OP_R8) return -1;
+        return kb == OP_MEM_HL ? (r6 ? 9 : 10) : 4;
+    }
+    if (is_shift8(mnem) && ka != OP_RP) {
+        if (ka == OP_MEM_IX) return r6 ? 14 : 13;
+        if (ka != OP_MEM_HL && ka != OP_R8) return -1;
+        return ka == OP_MEM_HL ? (r6 ? 9 : 10) : 4;
+    }
+    if (!strcmp(mnem, "ldi") || !strcmp(mnem, "ldd"))
+        return r6 ? 9 : 10;
+    if (!strcmp(mnem, "mul"))
+        return r6 ? 3 : 12;
+    if (!strcmp(mnem, "mulu"))
+        return 12;
+    if (!strcmp(mnem, "ld")) {
+        int t = -1;
+        int post = (ka == OP_MEM_HL && hl_postop(a) && !rabbit_hl_disp(a)) ||
+                   (kb == OP_MEM_HL && hl_postop(b) && !rabbit_hl_disp(b));
+        int ldx = r6 ? 10 : 9, stx = 10;       /* ld r,(ix+d) and ld (ix+d),r */
+
+        if (ka == OP_R8 && kb == OP_R8) t = (r4 || r6) ? 4 : 2;
+        else if (ka == OP_R8 && kb == OP_IMM) t = 4;
+        else if (ka == OP_R8 && kb == OP_MEM_HL) t = 5;
+        else if (ka == OP_MEM_HL && kb == OP_R8) t = r6 ? 5 : 6;
+        else if (ka == OP_MEM_HL && kb == OP_IMM) t = r6 ? 6 : 7;
+        else if (ka == OP_R8 && kb == OP_MEM_IX) t = r6 ? 10 : 9;
+        else if (ka == OP_MEM_IX && kb == OP_R8) t = 10;
+        else if (ka == OP_MEM_IX && kb == OP_IMM) t = r6 ? 12 : 11;
+        else if (ka == OP_R8 && kb == OP_MEM_RP) t = 6;
+        else if (ka == OP_MEM_RP && kb == OP_R8) t = r6 ? 6 : 7;
+        else if (ka == OP_R8 && kb == OP_MEM_ABS) t = 9;
+        else if (ka == OP_MEM_ABS && kb == OP_R8) t = r6 ? 9 : 10;
+        else if (ka == OP_RP && kb == OP_IMM) t = 6;
+        else if (ka == OP_IX && kb == OP_IMM) t = 8;
+        else if (ka == OP_RP && kb == OP_MEM_ABS) t = ident_eq(a, "hl") ? 11 : 13;
+        else if (ka == OP_IX && kb == OP_MEM_ABS) t = 13;
+        else if (ka == OP_MEM_ABS && kb == OP_RP) t = ident_eq(b, "hl") ? (r6 ? 11 : 13) : (r6 ? 13 : 15);
+        else if (ka == OP_MEM_ABS && kb == OP_IX) t = r6 ? 13 : 15;
+        else if (ident_eq(a, "sp") && ident_eq(b, "hl")) t = 2;
+        else if (ident_eq(a, "sp") && kb == OP_IX) t = 4;
+        else if (ka == OP_RP && !ident_eq(a, "hl") && !ident_eq(a, "sp") && kb == OP_MEM_IX) t = 2 * ldx;
+        else if (ka == OP_MEM_IX && kb == OP_RP && !ident_eq(b, "hl") && !ident_eq(b, "sp")) t = 2 * stx;
+        /* (iy+d) takes the 2-clock prefix that (ix+d) does not */
+        else if (ident_eq(a, "hl") && kb == OP_MEM_IX)
+            t = (r6 ? 10 : 9) + (rabbit_iy_operand(b) ? 2 : 0);
+        else if (ka == OP_MEM_IX && ident_eq(b, "hl"))
+            t = (r6 ? 10 : 11) + (rabbit_iy_operand(a) ? 2 : 0);
+        else if (ident_eq(a, "hl") && kb == OP_MEM_HL && rabbit_hl_disp(b)) t = r6 ? 12 : 11;
+        else if (ka == OP_MEM_HL && rabbit_hl_disp(a) && ident_eq(b, "hl")) t = r6 ? 12 : 13;
+        else if (ident_eq(a, "hl") && kb == OP_MEM_SP) t = r6 ? 10 : 9;
+        else if (ka == OP_MEM_SP && ident_eq(b, "hl")) t = r6 ? 10 : 11;
+        /* a pair to or from IX/IY: native for hl, otherwise through the stack */
+        else if (ka == OP_IX && kb == OP_IX) t = (r6 ? 11 : 12) + 9;
+        else if (ka == OP_IX && kb == OP_RP && !ident_eq(b, "sp"))
+            t = ident_eq(b, "hl") ? 4 : (r6 ? 9 : 10) + 9;
+        else if (ka == OP_RP && kb == OP_IX && !ident_eq(a, "sp"))
+            t = ident_eq(a, "hl") ? 4 : (r6 ? 11 : 12) + 7;
+        /* ld de,hl, ld hl,bc and their kin are native from the R4000; elsewhere two byte moves */
+        else if (ka == OP_RP && kb == OP_RP && !ident_eq(a, "sp") && !ident_eq(b, "sp")) {
+            int native = (r4 || r6) &&
+                ((ident_eq(b, "hl") && (ident_eq(a, "bc") || ident_eq(a, "de"))) ||
+                 (ident_eq(a, "hl") && (ident_eq(b, "bc") || ident_eq(b, "de"))));
+            t = native ? 2 : ((r4 || r6) ? 8 : 4);
+        }
+        return (t >= 0 && post) ? t + 2 : t;
+    }
+    return -1;
+}
+
 /* Z80, Z80N, Z180, Rabbit. Halt, jp (hl)/(ix)/(iy), and unknown set *fallback. */
 static int ticks_z80ish_base(int cpu, const char *mnem, const char *rest,
                         int cond, int indirect, int backward, int *fallback)
@@ -1410,6 +1594,14 @@ static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
         t = ez80_time(mnem, rest, cond, backward || !cond);
         if (t >= 0)
             return t;
+    }
+    if (cpu_is_rabbit(cpu) && strcmp(mnem, "halt") != 0) {
+        t = rabbit_time(cpu, mnem, rest, cond, backward || !cond);
+        if (t >= 0)
+            return t;
+#ifdef TICKS_DIAG
+        fprintf(stderr, "RABBIT-UNCOVERED %s %s\n", mnem, rest);
+#endif
     }
     if (cpu == TICKS_CPU_KC160 && strcmp(mnem, "halt") != 0) {
         t = kc160_time(mnem, rest, cond, backward || !cond);

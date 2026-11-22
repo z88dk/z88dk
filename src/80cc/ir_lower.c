@@ -6676,7 +6676,7 @@ static long render_ticks(FILE *fp)
     int kind = c_cpu == CPU_Z180 ? TICKS_CPU_Z180 : IS_EZ80() ? TICKS_CPU_EZ80 : IS_KC160() ? TICKS_CPU_KC160 : IS_Z80N() ? TICKS_CPU_Z80N
              : IS_8085() ? TICKS_CPU_8085 : IS_GBZ80() ? TICKS_CPU_GBZ80
              : IS_808x() ? TICKS_CPU_8080
-             : IS_RABBIT4K() ? TICKS_CPU_R4K : IS_RABBIT() ? TICKS_CPU_R2KA
+             : IS_R6K() ? TICKS_CPU_R6K : IS_RABBIT4K() ? TICKS_CPU_R4K : IS_RABBIT() ? TICKS_CPU_R2KA
              : TICKS_CPU_Z80;
     int cap = 256, n = 0;
     char **src = malloc(cap * sizeof *src);     /* instruction text, or NULL */

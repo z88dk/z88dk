@@ -17,7 +17,15 @@ ez80_z80 1
 # pair, first column). ldi, cpd, ini and outd are not in the model's table: their clock counts are not
 # in the text of the manual that could be read.
 kc160 4
-# r2ka, r800: the model has no timings for these CPUs, so it scores them with Z80 numbers.
-# Replace an entry with 0 as the timings are added.
-r2ka 173
+# r2ka, r4k, r6k: the model follows the Rabbit instruction manual (R2000/R3000/R4000) and the Rabbit
+# 6000 instruction spreadsheet (R6000, 8-bit fetch). The R4000 and R6000 runs set EDMR first, as the
+# startup code does. The Rabbit has no daa, rld or rrd: z80asm emits a helper sequence, scored at its
+# cost. It has no conditional call either: z80asm emits jr !cc over a call, scored as that. The one
+# difference left is the taken call in instructions.txt: its target $+3 is the end of the call on a
+# Z80 but the middle of the five-byte Rabbit expansion, so the emulator runs two stray instructions.
+r2ka 1
+r4k 1
+r6k 1
+# r800: the model has no timings for this CPU, so it scores it with Z80 numbers.
+# Replace the entry with 0 as the timings are added.
 r800 190

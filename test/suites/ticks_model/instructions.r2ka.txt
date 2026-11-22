@@ -1,0 +1,10 @@
+ld hl,(hl+4)
+ld (hl+4),hl
+ld hl,(iy+100)
+ld (iy+100),hl
+ld hl,(ix+100)
+ld (ix+100),hl
+and hl,de
+or hl,de
+xor hl,de
+sub hl,de

@@ -15,9 +15,20 @@ mkdir -p "$tmp" || exit 1
 trap 'rm -rf "$tmp"' EXIT
 for cpu in "$@"; do
   list="$tmp/list"; cat instructions.txt > "$list"; [ -f instructions.$cpu.txt ] && cat instructions.$cpu.txt >> "$list"
+  # The Rabbit 4000 and later run in their own mode only once EDMR is set, as the startup code does.
+  # The setup is measured on its own and taken off every result.
+  pre=; base=0
+  case $cpu in r4k|r5k|r6k)
+    pre="ld a,0xc0
+ioi ld (0x420),a"
+    { echo "org 0"; echo "$pre"; echo "nop"; } > "$tmp/t.asm"
+    z88dk-z80asm -m$cpu -b "$tmp/t.asm" > /dev/null 2>&1
+    end=$(( $(wc -c < "$tmp/t.bin") - 1 ))
+    base=$($limit z88dk-ticks -m$cpu -counter 1000000 -end $(printf '%x' $end) "$tmp/t.bin" 2>&1 | tail -1) ;;
+  esac
   while IFS= read -r ins; do
     body=$(printf '%s\n' "$ins" | sed 's/!//g; s/ ; /\n/g')
-    { echo "org 0"; echo "$body"; echo "nop"; } > "$tmp/t.asm"
+    { echo "org 0"; [ -n "$pre" ] && echo "$pre"; echo "$body"; echo "nop"; } > "$tmp/t.asm"
     z88dk-z80asm -m$cpu -b "$tmp/t.asm" > /dev/null 2>&1 || continue
     # A helper that z80asm calls but a bare binary does not link is a call to address 0,
     # which restarts the program: leave such an instruction out.
@@ -25,6 +36,7 @@ for cpu in "$@"; do
     end=$(( $(wc -c < "$tmp/t.bin") - 1 ))
     t=$($limit z88dk-ticks -m$cpu -counter 1000000 -end $(printf '%x' $end) "$tmp/t.bin" 2>&1 | tail -1)
     case $t in ''|*[!0-9]*) continue ;; esac
+    t=$((t - base))
     [ $t -gt 0 ] || continue
     echo "$cpu|$ins|$t"
   done < "$list"
