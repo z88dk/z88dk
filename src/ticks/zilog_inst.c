@@ -35,7 +35,7 @@ void zilog_rld(uint8_t opcode)
 {
     uint16_t t;
 
-    st+= isr800() ? 5 : iskc160() ? 7 : isz180() ? 16 : 18;
+    st+= isez80() ? 5 : isr800() ? 5 : iskc160() ? 7 : isz180() ? 16 : 18;
     t= get_memory_data(mp= l|h<<8)<<4
     | (a&15);
     a= (a &240)
@@ -51,7 +51,7 @@ void zilog_rld(uint8_t opcode)
 void zilog_rrd(uint8_t opcode)
 {
     uint16_t t;
-    st+= isr800() ? 5 : iskc160() ? 7 : isz180() ? 16 : 18;
+    st+= isez80() ? 5 : isr800() ? 5 : iskc160() ? 7 : isz180() ? 16 : 18;
     t= get_memory_data(mp= l|h<<8)
     | a<<8;
     a= (a &240)
@@ -69,7 +69,7 @@ void zilog_cpi(uint8_t opcode)
     uint8_t w;
     uint16_t t;
 
-    st+=  isr800() ? 4 : isz180() ? 12 : 16;
+    st+=  isez80() ? 3 : isr800() ? 4 : isz180() ? 12 : 16;
     w= a-(t= get_memory_data(l|h<<8));
     ++l || h++;
     c-- || b--;
@@ -92,7 +92,7 @@ void zilog_cpd(uint8_t opcode)
     uint8_t w;
     uint16_t t;
 
-    st+=  isr800() ? 4 : isz180() ? 12 : 16;
+    st+=  isez80() ? 3 : isr800() ? 4 : isz180() ? 12 : 16;
     w= a-(t= get_memory_data(l|h<<8));
     l-- || h--;
     c-- || b--;
@@ -162,7 +162,7 @@ void zilog_cpdr(uint8_t opcode)
 void zilog_ini(uint8_t opcode)
 {
     uint16_t t,u;
-    st+=  isr800() ? 4 : isz180() ? 12 : 16;
+    st+=  isez80() ? 5 : isr800() ? 4 : isz180() ? 12 : 16;
 
     put_memory(l | h<<8,t= in(mp= c | b<<8));
     ++l || h++;
@@ -181,7 +181,7 @@ void zilog_ind(uint8_t opcode)
 {
     uint16_t t,u;
 
-    st+=  isr800() ? 4 : isz180() ? 12 : 16;
+    st+=  isez80() ? 5 : isr800() ? 4 : isz180() ? 12 : 16;
     put_memory(l | h<<8, t= in(mp= c | b<<8));
     l-- || h--;
     --mp;
@@ -235,7 +235,7 @@ void zilog_outi(uint8_t opcode)
 {
     uint16_t t,u;
 
-    st+=  isr800() ? 4 : isz180() ? 12 : 16;
+    st+=  isez80() ? 5 : isr800() ? 4 : isz180() ? 12 : 16;
     --b;
     out( mp= c | b<<8,
         t = get_memory_data(l | h<<8));
@@ -255,7 +255,7 @@ void zilog_outd(uint8_t opcode)
 {
     uint16_t t,u;
 
-    st+=  isr800() ? 4 : isz180() ? 12 : 16;
+    st+=  isez80() ? 5 : isr800() ? 4 : isz180() ? 12 : 16;
     --b;
     out( mp= c | b<<8,
         t = get_memory_data(l | h<<8));
