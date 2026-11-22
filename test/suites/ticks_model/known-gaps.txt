@@ -15,6 +15,6 @@ ez80_z80 1
 #
 # kc160, r2ka, r800: the model has no timings for these CPUs, so it scores them with
 # the Z180 (kc160) or Z80 numbers.  Replace an entry with 0 as the timings are added.
-kc160 181
+kc160 186
 r2ka 165
-r800 177
+r800 182

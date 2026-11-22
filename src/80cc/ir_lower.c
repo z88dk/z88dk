@@ -6673,7 +6673,7 @@ static int slot_off(const Func *f, int vreg_id)
 static long render_ticks(FILE *fp)
 {
     char ln[1024];
-    int kind = c_cpu == CPU_Z180 ? TICKS_CPU_Z180 : IS_Z80N() ? TICKS_CPU_Z80N
+    int kind = c_cpu == CPU_Z180 ? TICKS_CPU_Z180 : IS_EZ80() ? TICKS_CPU_EZ80 : IS_Z80N() ? TICKS_CPU_Z80N
              : IS_8085() ? TICKS_CPU_8085 : IS_GBZ80() ? TICKS_CPU_GBZ80
              : IS_808x() ? TICKS_CPU_8080
              : IS_RABBIT4K() ? TICKS_CPU_R4K : IS_RABBIT() ? TICKS_CPU_R2KA

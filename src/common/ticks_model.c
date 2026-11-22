@@ -989,6 +989,8 @@ static int ez80_time(const char *mnem, const char *rest, int cond, int taken)
         else if (ka == OP_MEM_ABS && kb == OP_IX) t = 6;
         else if (ident_eq(a, "sp") && ident_eq(b, "hl")) t = 1;
         else if (ident_eq(a, "sp") && kb == OP_IX) t = 2;
+        /* a register pair copy is two byte moves */
+        else if (ka == OP_RP && kb == OP_RP && !ident_eq(a, "sp") && !ident_eq(b, "sp")) t = 2;
         /* native word access through (hl) and (ix+d) */
         else if ((ka == OP_RP || ka == OP_IX) && kb == OP_MEM_HL) t = 4;
         else if (ka == OP_MEM_HL && (kb == OP_RP || kb == OP_IX)) t = 4;
