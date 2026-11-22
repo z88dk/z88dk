@@ -866,3 +866,95 @@
 	ld	(hl),%2
 	inc	hl
 
+;; Use a byte value without widening it to 16 bits first.
+
+%title Byte test without the 16-bit widening
+%not %1 "\(hl.*"
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	and	a
+	ld	hl,%1
+=
+	ld	a,(hl)
+	and	a
+	ld	hl,%1
+
+%title Byte push without the 16-bit widening, from memory
+	ld	l,(hl)
+	ld	h,0
+	dec	sp
+	ld	a,l
+	pop	hl
+=
+	dec	sp
+	ld	a,(hl)
+	pop	hl
+
+%title Dead ld h,0 before a byte push
+	ld	h,0
+	dec	sp
+	ld	a,l
+	pop	hl
+=
+	dec	sp
+	ld	a,l
+	pop	hl
+
+%title Byte push of a constant goes through a
+%not %1 "\(hl[^)].*"
+	push	hl
+	ld	l,%1
+	dec	sp
+	ld	a,l
+	pop	hl
+=
+	push	hl
+	ld	a,%1
+	dec	sp
+	pop	hl
+
+%title Byte push without the pop
+%not %1 "\(hl.*"
+	dec	sp
+	ld	a,l
+	pop	hl
+	ld	l,a
+	push	hl
+	ld	hl,%1
+=
+	ld	h,l
+	ld	a,h
+	push	hl
+	inc	sp
+	ld	hl,%1
+
+%title Byte push of the low byte without the pop
+%notcpu r3k r4k r6k
+%not %1 "\(hl.*"
+	push	hl
+	dec	sp
+	pop	hl
+	ld	l,%1
+	push	hl
+=
+	push	hl
+	ld	h,l
+	ld	l,%1
+	inc	sp
+	push	hl
+
+%title Load a byte argument straight into b
+%not %2 "\(hl.*"
+%check 0 <= %1 <= 255
+	ld	hl,%"([0-9]+(	;const)?)"1
+	ld	b,l
+	push	bc
+	inc	sp
+	ld	hl,%2
+=
+	ld	b,%1
+	push	bc
+	inc	sp
+	ld	hl,%2
+
