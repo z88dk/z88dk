@@ -1460,6 +1460,13 @@ void point(void)
 }
 
 
+/* Zsp is the only record of a saved interrupt word. Parameter symbols
+   are read as offset - Zsp. docritical() rejects a nested block, so
+   the mark array is the backstop. */
+#define CRITICAL_MARKS 4
+static int critical_mark[CRITICAL_MARKS];
+static int critical_marks;
+
 /*
  * \brief Generate the leave state for a function
  *
@@ -1473,6 +1480,9 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     Kind save = vartype;
     int callee_cleanup = (currfn->ctype->flags & CALLEE) && (stackargs > 2);
     int saved_hl = 0;
+    int saved_marks;
+    int saved_Zsp;
+    int saved_critical;
 
     if ( (currfn->flags & NAKED) == NAKED ) {
         return;
@@ -1494,6 +1504,22 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     } else if (vartype == KIND_ACCUM32) {
         vartype = KIND_LONG;
     }
+
+    /* Locals sit above the saved interrupt word. Pop them, then let
+       l_pop_ei take the word. Popping the word here makes l_pop_ei
+       consume the return address. The marks go back when the drain
+       ends. Zsp goes back after the epilogue. */
+    saved_marks = critical_marks;
+    saved_Zsp = Zsp;
+    saved_critical = CPU_KEEPS_INT_STATE() && critical_marks > 0;
+    if ( saved_critical ) {
+        while ( critical_marks > 0 ) {
+            Zsp = modstk(critical_mark[critical_marks - 1], vartype, NO, YES);
+            gen_critical_leave();
+        }
+        critical_marks = saved_marks;
+    }
+
     modstk(0, vartype, NO,YES);
 
     if (callee_cleanup) {
@@ -1541,11 +1567,15 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
     if ( (currfn->flags & INTERRUPT) == INTERRUPT ) {
         gen_interrupt_leave(currfn);
+        if ( saved_critical ) {
+            Zsp = saved_Zsp;
+        }
         return;
     }
 
-    /* Naked has already returned */
-    if ( (currfn->flags & CRITICAL) == CRITICAL || incritical) {
+    /* Naked has already returned. Stack cpus already called l_pop_ei. */
+    if ( ((currfn->flags & CRITICAL) == CRITICAL || incritical) &&
+         !CPU_KEEPS_INT_STATE() ) {
         gen_critical_leave();
     }
 
@@ -1562,6 +1592,11 @@ void gen_leave_function(Kind vartype, char type, int incritical)
         setcond(type);
 
     ol("ret"); nl(); nl(); /* and exit function */
+    if ( saved_critical ) {
+        /* This path ends in ret. The marks are already back.
+           Restore Zsp for the next return. */
+        Zsp = saved_Zsp;
+    }
 }
 
 
@@ -5891,13 +5926,37 @@ void gen_interrupt_leave(SYMBOL *func)
 
 
 
+void gen_critical_reset(void)
+{
+    critical_marks = 0;
+}
+
+int gen_critical_marks(void)
+{
+    return critical_marks;
+}
+
+void gen_critical_marks_set(int n)
+{
+    critical_marks = n;
+}
+
 void gen_critical_enter(void)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ipset\t3");
+    } else if ( !CPU_KEEPS_INT_STATE() ) {
+        ol("di");
     } else {
         callrts("l_push_di");
         Zsp -= 2;
+        /* docritical() rejects a nested block. A silent drop here
+           would leave a word that no return can pop. */
+        if ( critical_marks >= CRITICAL_MARKS ) {
+            errorfmt("Too many nested __critical sections", 1);
+        } else {
+            critical_mark[critical_marks++] = Zsp;
+        }
     }
 }
 
@@ -5905,18 +5964,15 @@ void gen_critical_leave(void)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ipres");
+    } else if ( !CPU_KEEPS_INT_STATE() ) {
+        ol("ei");
     } else {
         callrts("l_pop_ei");
         Zsp += 2;
+        if ( critical_marks > 0 ) {
+            critical_marks--;
+        }
     }
-}
-
-int zcriticaloffset(void)
-{
-    if ( c_cpu & CPU_RABBIT ) {
-        return 0;
-    }
-    return 2;
 }
 
 

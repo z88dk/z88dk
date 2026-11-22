@@ -2359,6 +2359,7 @@ static void declfunc(Type *functype, enum storage_type storage)
 
 
     infunc = 1; /* In a function for sure! */
+    gen_critical_reset();
     
     where = c_params_offset + currfn->ctype->funcattrs.params_offset;
 
@@ -2372,8 +2373,6 @@ static void declfunc(Type *functype, enum storage_type storage)
 
     if ( functype->flags & INTERRUPT ) {
         where += zinterruptoffset(currfn);
-    } else if ( (functype->flags & (CRITICAL|NAKED)) == CRITICAL ) {
-        where += zcriticaloffset();
     }
 
 
