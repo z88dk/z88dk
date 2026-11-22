@@ -11,6 +11,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if defined(_WIN32) || defined(WIN32)
+#ifndef strncasecmp
+#define strncasecmp(a, b, n) strnicmp((a), (b), (n))
+#endif
+#else
+#include <strings.h>
+#endif
+
 enum {
     OP_EMPTY = 0,
     OP_R8,
