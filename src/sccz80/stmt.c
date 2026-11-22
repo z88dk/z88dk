@@ -778,12 +778,20 @@ static void docritical(void)
     }
     incritical = 1;
     /* A flagless cpu cannot put the old enable flag back.
-       A critical function, and an __interrupt(n) handler, stay disabled
+       A critical function on 8080, gbz80 and VM1 stays disabled
        until the epilogue. An inner leave would enable too early.
-       A bare __interrupt has executed ei, so the block keeps di and ei. */
+       An __interrupt(n) handler on those cpus does the same.
+       A Rabbit critical function executes ipset 3, so the block skips.
+       A Rabbit interrupt does not execute ipset 3.
+       The block still emits ipset 3 and ipres, also in a critical interrupt.
+       A bare __interrupt has executed ei. Rabbit executes ipres.
+       That block still emits di and ei. Rabbit emits ipset 3 and ipres. */
     nested_bare = !CPU_KEEPS_INT_STATE() &&
-        ( ((currfn->flags & CRITICAL) == CRITICAL) ||
-          (((currfn->flags & INTERRUPT) == INTERRUPT) &&
+        ( (((currfn->flags & CRITICAL) == CRITICAL) &&
+           !((c_cpu & CPU_RABBIT) &&
+             ((currfn->flags & INTERRUPT) == INTERRUPT))) ||
+          (!(c_cpu & CPU_RABBIT) &&
+           ((currfn->flags & INTERRUPT) == INTERRUPT) &&
            currfn->ctype->funcattrs.interrupt >= 0) );
     saved_Zsp = Zsp;
     saved_marks = gen_critical_marks();
