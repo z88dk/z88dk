@@ -18,6 +18,7 @@ defc    TI_WRITE    = 2
 defc    TI_GROW     = 4
 defc    TI_ARCH     = 8
 defc    TI_HSIZE    = 16
+defc    TI_READ     = 32
 
 defc    fs_page     = 9
 defc    fs_off      = 10

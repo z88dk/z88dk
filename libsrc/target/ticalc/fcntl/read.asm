@@ -35,9 +35,19 @@ ___read:
     jr      c, rd_bad
     call    ti_refresh
     jr      c, rd_bad
+    push    hl
+    ld      de, fs_flags
+    add     hl, de
+    bit     5, (hl)
+    pop     hl
+    jr      z, rd_acces
     ld      de, (rd_ptr)
     ld      bc, (rd_len)
     jp      ti_load
+
+rd_acces:
+    ld      a, EACCES
+    jp      ti_errno
 
 rd_bad:
     ld      a, EBADF

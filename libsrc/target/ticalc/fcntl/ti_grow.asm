@@ -1,7 +1,7 @@
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
-; Insert HL bytes at DE. Carry set when there is not enough free RAM.
-; EnoughMem is called first. CreateAppVar and InsertMem do not return
-; when they run out of memory.
+; Ask if HL bytes fit. Carry set when there is not enough free RAM.
+; EnoughMem is called before any address is used. CreateAppVar and
+; InsertMem do not return when they run out of memory.
 
 IF FORti83p
 
@@ -14,18 +14,14 @@ IF FORti83p
     PUBLIC  ti_shrink
     PUBLIC  ti_create
 
-; HL = bytes to insert, DE = address. Carry set on failure.
+; HL = bytes that InsertMem will add. Carry set when free RAM is short.
+; EnoughMem can delete temporary variables and move every later address,
+; so the caller finds the variable again before it uses an address.
 ti_grow:
     ld      a, h
     or      l
     ret     z
-    push    hl
-    push    de
     TICALL  _EnoughMem
-    pop     de
-    pop     hl
-    ret     c
-    TICALL  InsertMem
     ret
 
 ; HL = bytes to delete, DE = address. A zero length does nothing.

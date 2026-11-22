@@ -86,47 +86,51 @@ wr_past:
     ld      de, fs_flags
     add     hl, de
     bit     2, (hl)
-    jr      z, wr_none
+    jp      z, wr_none
     ld      hl, (wr_pos)
     ld      de, (wr_len)
     add     hl, de
-    jr      c, wr_short
+    jp      c, wr_short
     ld      (wr_new), hl
     ld      de, (wr_size)
     or      a
     sbc     hl, de
-    jr      c, wr_short
+    jp      c, wr_short
     ld      (wr_extra), hl
-    ld      hl, (wr_slot)
-    ld      de, fs_off
-    add     hl, de
-    ld      e, (hl)
-    inc     hl
-    ld      d, (hl)
-    ld      hl, (wr_size)
-    add     hl, de
-    jr      c, wr_short
-    ex      de, hl
     ld      hl, (wr_extra)
     call    ti_grow
-    jr      c, wr_short
+    jp      c, wr_short
     ld      hl, (wr_slot)
+    call    ti_refresh
+    jp      c, wr_bad
     ld      de, fs_off
     add     hl, de
     ld      e, (hl)
     inc     hl
     ld      d, (hl)
-    dec     de
-    dec     de
-    ld      hl, (wr_new)
-    ld      a, l
-    ld      (de), a
-    inc     de
-    ld      a, h
-    ld      (de), a
+    ld      (wr_at), de
+    ld      hl, (wr_slot)
+    ld      de, fs_size
+    add     hl, de
+    ld      e, (hl)
+    inc     hl
+    ld      d, (hl)
+    ld      hl, (wr_at)
+    add     hl, de
+    jp      c, wr_short
+    ex      de, hl
+    ld      hl, (wr_extra)
+    TICALL  InsertMem
+    ld      hl, (wr_at)
+    dec     hl
+    dec     hl
+    ld      de, (wr_new)
+    ld      (hl), e
+    inc     hl
+    ld      (hl), d
     ld      hl, (wr_slot)
     call    ti_refresh
-    jr      c, wr_bad
+    jp      c, wr_bad
     ld      hl, (wr_slot)
     ld      de, (wr_ptr)
     ld      bc, (wr_len)
@@ -174,6 +178,9 @@ wr_new:
     defw    0
 
 wr_extra:
+    defw    0
+
+wr_at:
     defw    0
 
 ENDIF

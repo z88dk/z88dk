@@ -1,6 +1,7 @@
 ; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 ; int remove(const char *name);
 ; An open descriptor for that name is closed, so a later read fails.
+; A graph equation is left in place. Deleting one crashes the calculator.
 
 IF FORti83p
 
@@ -33,6 +34,10 @@ _remove:
     ldir
     call    ti_find
     jr      c, rm_inval
+    cp      EquObj
+    jr      z, rm_nosup
+    cp      NewEquObj
+    jr      z, rm_nosup
     ld      (rm_vat), hl
     ld      (rm_data), de
     ld      a, b
@@ -45,6 +50,10 @@ _remove:
     TICALL  _DelVarArc
     ld      hl, 0
     ret
+
+rm_nosup:
+    ld      a, ENOTSUP
+    jp      ti_errno
 
 rm_inval:
     ld      a, EINVAL

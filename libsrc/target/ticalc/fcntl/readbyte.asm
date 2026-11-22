@@ -25,6 +25,12 @@ _readbyte:
     jr      c, rb_bad
     call    ti_refresh
     jr      c, rb_bad
+    push    hl
+    ld      de, fs_flags
+    add     hl, de
+    bit     5, (hl)
+    pop     hl
+    jr      z, rb_acces
     ld      de, ti_one
     ld      bc, 1
     call    ti_load
@@ -39,6 +45,10 @@ _readbyte:
 rb_eof:
     ld      hl, -1
     ret
+
+rb_acces:
+    ld      a, EACCES
+    jp      ti_errno
 
 rb_bad:
     ld      a, EBADF

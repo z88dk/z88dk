@@ -3,7 +3,7 @@
 ;
 ; A bare name is an AppVar. "T:name" selects the type in ti_name.
 ; Only an AppVar is created, and only when O_CREAT is set.
-; O_TRUNC on an archived variable or a fixed-size type fails.
+; A write on an archived variable fails. O_TRUNC on a fixed-size type fails.
 ; The mode argument is ignored.
 
 IF FORti83p
@@ -97,6 +97,13 @@ op_got:
     ld      (hl), a
 
 op_place:
+    ld      a, (op_low)
+    and     3
+    jr      z, op_acc
+    ld      a, (op_geom)
+    bit     3, a
+    jp      nz, op_acces
+op_acc:
     ld      hl, 0
     ld      a, (op_high)
     bit     0, a
@@ -111,10 +118,22 @@ op_setpos:
     ld      a, (op_low)
     and     3
     jr      z, op_ro
+    cp      1
+    jr      z, op_wo
+    ld      a, c
+    or      TI_READ | TI_WRITE
+    ld      c, a
+    jr      op_save
+op_wo:
     ld      a, c
     or      TI_WRITE
     ld      c, a
+    jr      op_save
 op_ro:
+    ld      a, c
+    or      TI_READ
+    ld      c, a
+op_save:
     ld      hl, (op_slot)
     ld      de, fs_page
     add     hl, de

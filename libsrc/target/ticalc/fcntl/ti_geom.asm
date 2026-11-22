@@ -7,9 +7,11 @@
 ;      DE = first payload byte, HL = payload size. Carry set on a bad
 ;      header (a matrix whose dimension is 0 or greater than 99).
 ;
-; WikiTI stores an archived variable as flag, size, then a forward
-; symbol entry: T, T2, version, address, page, name length, name.
-; The name length is the byte at offset 9. Payload follows the name.
+; An archived variable is flag, size, then a forward symbol entry.
+; Programs, AppVars, groups and temporary programs store a name length
+; at offset 9, and the payload follows the name.
+; Lists store that same length, then one formula byte, then the payload.
+; Every other type stores a 9-byte entry and the payload is at offset 12.
 ; GDB and group files are the whole data block and do not grow.
 
 IF FORti83p
@@ -31,6 +33,9 @@ ti_geom:
     ld      a, b
     or      a
     jr      z, tg_ram
+    pop     af
+    push    af
+    ld      (as_type), a
     call    arch_span
     jr      nc, tg_body
     pop     af
@@ -71,7 +76,7 @@ tg_flags:
     cp      ProgObj
     jp      z, tg_flex
     cp      StrngObj
-    jp      z, tg_flex
+    jp      z, tg_sized
     cp      EquObj
     jp      z, tg_flex
     cp      NewEquObj
@@ -316,7 +321,8 @@ tg_mul_c:
     scf
     ret
 
-; BHL = archive flag. DE = data length, BHL = first data byte.
+; BHL = archive flag. as_type = object type.
+; DE = data length, BHL = first data byte.
 arch_span:
     call    ti_arch_inc
     call    ti_arch_byte
@@ -325,32 +331,71 @@ arch_span:
     call    ti_arch_byte
     ld      d, a
     push    de
-    ld      c, 7
-as_nl:
-    call    ti_arch_inc
-    dec     c
-    jr      nz, as_nl
-    call    ti_arch_byte
-    cp      9
-    jr      nc, as_bad
-    push    af
-    ld      e, a
-    ld      d, 0
-    inc     de
+    ld      a, (as_type)
+    cp      ListObj
+    jr      z, as_list
+    cp      CListObj
+    jr      z, as_list
+    cp      ProgObj
+    jr      z, as_named
+    cp      ProtProgObj
+    jr      z, as_named
+    cp      AppVarObj
+    jr      z, as_named
+    cp      GroupObj
+    jr      z, as_named
+    cp      TempProgObj
+    jr      z, as_named
+    ld      de, 10
     call    ti_arch_add
-    pop     af
-    add     a, 7
-    push    hl
-    push    bc
-    ld      e, a
-    ld      d, 0
-    pop     bc
     pop     hl
-    ex      (sp), hl
+    ld      de, 9
     or      a
     sbc     hl, de
     ex      de, hl
+    ret     nc
+    scf
+    ret
+
+as_list:
+    ld      c, 1
+    jr      as_walk
+
+as_named:
+    ld      c, 0
+
+; C = bytes after the name. Lists have one formula byte there.
+; B stays the archive page. ti_arch_inc advances it on a page cross.
+as_walk:
+    ld      a, c
+    push    af
+    ld      c, 7
+as_skip:
+    call    ti_arch_inc
+    dec     c
+    jr      nz, as_skip
+    pop     af
+    ld      c, a
+    call    ti_arch_byte
+    cp      9
+    jr      nc, as_bad
+    ld      e, a
+    add     a, 7
+    add     a, c
+    ld      (as_head), a
+    ld      d, 0
+    inc     de
+    ld      a, c
+    add     a, e
+    ld      e, a
+    call    ti_arch_add
     pop     hl
+    ld      a, (as_head)
+    ld      e, a
+    ld      d, 0
+    or      a
+    sbc     hl, de
+    ex      de, hl
     ret     nc
     scf
     ret
@@ -375,6 +420,12 @@ tg_flagsb:
     defb    0
 
 tg_elem:
+    defb    0
+
+as_type:
+    defb    0
+
+as_head:
     defb    0
 
 ENDIF

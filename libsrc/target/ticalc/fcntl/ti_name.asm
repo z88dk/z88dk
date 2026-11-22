@@ -216,8 +216,22 @@ cr_loop:
     scf
     ret
 
+; First token is A-Z or theta. Each later token is A-Z, theta, or a digit.
 raw_ok:
-    ld      a, (OP1+1)
+    ld      hl, OP1+1
+    call    tok_lead
+    ret     c
+ro_more:
+    inc     hl
+    ld      a, (hl)
+    or      a
+    ret     z
+    call    tok_body
+    ret     c
+    jr      ro_more
+
+tok_lead:
+    ld      a, (hl)
     or      a
     scf
     ret     z
@@ -227,6 +241,27 @@ raw_ok:
     ret     c
     cp      'Z'+1
     ccf
+    ret
+
+tok_body:
+    cp      $5b
+    ret     z
+    cp      '0'
+    jr      c, tb_no
+    cp      '9'+1
+    jr      c, tb_yes
+    cp      'A'
+    ret     c
+    cp      'Z'+1
+    ccf
+    ret
+
+tb_yes:
+    or      a
+    ret
+
+tb_no:
+    scf
     ret
 
 ; One letter, A-Z or the theta token.
@@ -291,14 +326,17 @@ ln_copy:
     scf
     ret     nz
 ln_lead:
-    ld      a, (OP1+2)
-    cp      $5b
-    ret     z
-    cp      'A'
+    ld      hl, OP1+2
+    call    tok_lead
     ret     c
-    cp      'Z'+1
-    ccf
-    ret
+ln_rest:
+    inc     hl
+    ld      a, (hl)
+    or      a
+    ret     z
+    call    tok_body
+    ret     c
+    jr      ln_rest
 
 mat_name:
     call    peek_up
@@ -350,11 +388,30 @@ equ_name:
     scf
     ret
 
+; E:U and E:U(n) are the same equation. V and W match that pair.
 en_one:
+    ld      a, (hl)
+    or      a
+    jr      z, en_bare
+    cp      '('
+    scf
+    ret     nz
+    inc     hl
+    call    peek_up
+    cp      'N'
+    scf
+    ret     nz
+    inc     hl
+    ld      a, (hl)
+    cp      ')'
+    scf
+    ret     nz
+    inc     hl
     ld      a, (hl)
     or      a
     scf
     ret     nz
+en_bare:
     ld      a, c
     jr      en_store
 
@@ -430,15 +487,24 @@ sys_index:
     cp      b
     jr      nz, one_index
     inc     hl
+    ld      a, (OP1)
+    cp      PictObj
+    jr      z, si_pic
+    cp      GDBObj
+    jr      z, si_gdb
     call    peek_up
     cp      'T'
-    jr      z, si_mid
+    jr      si_mid
+si_pic:
+    call    peek_up
     cp      'I'
-    jr      z, si_mid
+    jr      si_mid
+si_gdb:
+    call    peek_up
     cp      'D'
+si_mid:
     scf
     ret     nz
-si_mid:
     inc     hl
     call    peek_up
     cp      c

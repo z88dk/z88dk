@@ -52,7 +52,7 @@ ti_refresh:
     ld      (hl), d
     inc     hl
     ld      a, (hl)
-    and     TI_OPEN | TI_WRITE
+    and     TI_OPEN | TI_WRITE | TI_READ
     ld      c, a
     ld      a, (tr_flags)
     and     TI_ARCH | TI_GROW | TI_HSIZE
