@@ -34,16 +34,7 @@ IF  __CPU_RABBIT__
 
 ELSE
 
-IF __CPU_8085__
-
-   ; RIM bit 3 is IE. Return that byte in L.
-   ; push af / pop hl would leave the flags in L and the RIM byte in H.
-   rim
-   ld l,a
-   ld h,0
-   ret
-
-ELSE
+   ; 8085 bodies are arch/8085/8085/.
 
    IF __Z80 & __Z80_NMOS
    
@@ -86,7 +77,5 @@ continue:
    pop hl
 
    ret
-
-ENDIF
 
 ENDIF

@@ -28,24 +28,8 @@ IF  __CPU_RABBIT__
 
 ELSE
 
-IF __CPU_8085__
-
-   ; F bit 3 is always 0, so a return address parked in AF loses that bit.
-   ; Read RIM while the return address is still on the stack, then di.
-   ; The RIM byte stays in A. pop_ei tests bit 3.
+   ; 8085 bodies are arch/8085/8085/.
    ;
-   ; exit  : stack = ei_di_status
-   ;
-   ; uses  : af, bc
-
-   rim
-   di
-   pop bc
-   push af
-   push bc
-
-ELSE
-
    ; exit  : stack = ei_di_status
    ;
    ; uses  : af
@@ -99,8 +83,6 @@ continue:
    ex (sp),hl                  ; restore hl, push ei_di_status
    
    push af
-
-ENDIF
 
 ENDIF
 
