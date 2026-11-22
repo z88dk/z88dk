@@ -437,17 +437,20 @@
           mp= b | a<<8;         \
         } while (0)
 
+/* Rotates and shifts: ff holds the 9-bit result (carry in bit 8) and Z is
+   !fr, so fr must get the 8-bit result. The (HL) and (IX+d) forms pass an
+   unsigned short temporary, which keeps bit 8 without the & 255. */
 #define RLC(r,r_) do  {         \
           st+= CBr_TICKS;               \
           if (altd) {           \
             ff_= r_*257>>7,     \
             fa_= 256            \
-              | (fr_= r_= ff_), \
+              | (fr_= r_= ff_ & 255), \
             fb_= 0;             \
           } else {              \
             ff= r*257>>7,       \
             fa= 256             \
-              | (fr= r= ff),    \
+              | (fr= r= ff & 255),    \
             fb= 0;              \
           }                     \
         } while (0)
@@ -464,7 +467,7 @@
             ff=  r >> 1              \
                 | ((r&1)+1 ^ 1)<<7,  \
             fa= 256                  \
-                | (fr= r= ff),       \
+                | (fr= r= ff & 255),       \
             fb= 0;                   \
           }                          \
         } while (0)
@@ -475,13 +478,13 @@
             ff_= r_ << 1          \
                 | ff_  >> 8 & 1,  \
             fa_= 256              \
-                | (fr_= r_= ff_), \
+                | (fr_= r_= ff_ & 255), \
             fb_= 0;               \
           } else {                \
             ff= r << 1            \
                 | ff  >> 8 & 1,   \
             fa= 256               \
-                | (fr= r= ff),    \
+                | (fr= r= ff & 255),    \
             fb= 0;                \
           }                       \
         } while (0)
@@ -491,12 +494,12 @@
           if ( altd ) {         \
             ff_= (r_*513 | ff_&256)>>1, \
             fa_= 256            \
-                | (fr_= r_= ff_),  \
+                | (fr_= r_= ff_ & 255),  \
             fb_= 0;             \
           } else {              \
             ff= (r*513 | ff&256)>>1, \
             fa= 256             \
-                | (fr= r= ff),  \
+                | (fr= r= ff & 255),  \
             fb= 0;              \
           }                     \
         } while (0)
@@ -506,12 +509,12 @@
           if (altd) {           \
             ff_= r_<<1,           \
             fa_= 256             \
-                | (fr_= r_= ff_),  \
+                | (fr_= r_= ff_ & 255),  \
             fb_= 0;              \
           } else {              \
             ff= r<<1,           \
             fa= 256             \
-                | (fr= r= ff),  \
+                | (fr= r= ff & 255),  \
             fb= 0;              \
           }                     \
         } while (0) 
@@ -521,12 +524,12 @@
           if (altd) {           \
             ff_= (r_*513+128^128)>>1, \
             fa_= 256            \
-                | (fr_= r_= ff_),  \
+                | (fr_= r_= ff_ & 255),  \
             fb_= 0;             \
           } else {              \
             ff= (r*513+128^128)>>1, \
             fa= 256             \
-                | (fr= r= ff),  \
+                | (fr= r= ff & 255),  \
             fb= 0;              \
           }                     \
         } while (0)
@@ -536,7 +539,7 @@
             st+= 8,             \
             ff= r<<1 | 1,       \
             fa= 256             \
-              | (fr= r= ff),    \
+              | (fr= r= ff & 255),    \
             fb= 0;              \
         } while (0)
 
@@ -550,12 +553,12 @@
           if (altd) {           \
             ff_= r_*513 >> 1,   \
             fa_= 256            \
-                | (fr_= r_= ff_),  \
+                | (fr_= r_= ff_ & 255),  \
             fb_= 0;             \
           } else {              \
             ff= r*513 >> 1,     \
             fa= 256             \
-                | (fr= r= ff),  \
+                | (fr= r= ff & 255),  \
             fb= 0;              \
           }                     \
         } while (0)
