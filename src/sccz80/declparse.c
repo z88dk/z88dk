@@ -2373,8 +2373,6 @@ static void declfunc(Type *functype, enum storage_type storage)
 
     if ( functype->flags & INTERRUPT ) {
         where += zinterruptoffset(currfn);
-    } else if ( (functype->flags & (CRITICAL|NAKED)) == CRITICAL ) {
-        where += zcriticaloffset();
     }
 
 

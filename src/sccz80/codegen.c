@@ -1460,25 +1460,12 @@ void point(void)
 }
 
 
-/* Rabbit keeps the old priority in the IP register. The 8080, the VM1
-   and the gbz80 cannot read the enable flag, so they use di / ei and
-   no stack word. Every other cpu calls l_push_di / l_pop_ei.
-   Zsp is the only record of that word. Parameter symbols are read as
-   offset - Zsp, so zcriticaloffset() stays 0. */
+/* Zsp is the only record of a saved interrupt word. Parameter symbols
+   are read as offset - Zsp. docritical() rejects a nested block, so
+   the mark array is the backstop. */
 #define CRITICAL_MARKS 4
 static int critical_mark[CRITICAL_MARKS];
 static int critical_marks;
-
-static int critical_saves_on_stack(void)
-{
-    if ( c_cpu & CPU_RABBIT ) {
-        return 0;
-    }
-    if ( IS_8080_CLASS() || IS_GBZ80() ) {
-        return 0;
-    }
-    return 1;
-}
 
 /*
  * \brief Generate the leave state for a function
@@ -1493,6 +1480,9 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     Kind save = vartype;
     int callee_cleanup = (currfn->ctype->flags & CALLEE) && (stackargs > 2);
     int saved_hl = 0;
+    int saved_marks;
+    int saved_Zsp;
+    int saved_critical;
 
     if ( (currfn->flags & NAKED) == NAKED ) {
         return;
@@ -1517,12 +1507,17 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
     /* Locals sit above the saved interrupt word. Pop them, then let
        l_pop_ei take the word. Popping the word here makes l_pop_ei
-       consume the return address. */
-    if ( critical_saves_on_stack() ) {
+       consume the return address. A later return in this function
+       emits its own copy, so the marks and Zsp come back afterwards. */
+    saved_marks = critical_marks;
+    saved_Zsp = Zsp;
+    saved_critical = CPU_KEEPS_INT_STATE() && critical_marks > 0;
+    if ( saved_critical ) {
         while ( critical_marks > 0 ) {
             Zsp = modstk(critical_mark[critical_marks - 1], vartype, NO, YES);
             gen_critical_leave();
         }
+        critical_marks = saved_marks;
     }
 
     modstk(0, vartype, NO,YES);
@@ -1572,12 +1567,15 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
     if ( (currfn->flags & INTERRUPT) == INTERRUPT ) {
         gen_interrupt_leave(currfn);
+        if ( saved_critical ) {
+            Zsp = saved_Zsp;
+        }
         return;
     }
 
     /* Naked has already returned. Stack cpus already called l_pop_ei. */
     if ( ((currfn->flags & CRITICAL) == CRITICAL || incritical) &&
-         !critical_saves_on_stack() ) {
+         !CPU_KEEPS_INT_STATE() ) {
         gen_critical_leave();
     }
 
@@ -1594,6 +1592,11 @@ void gen_leave_function(Kind vartype, char type, int incritical)
         setcond(type);
 
     ol("ret"); nl(); nl(); /* and exit function */
+    if ( saved_critical ) {
+        /* This path ends in ret. The next return still has the
+           straight-line Zsp and the full set of marks. */
+        Zsp = saved_Zsp;
+    }
 }
 
 
@@ -5928,16 +5931,30 @@ void gen_critical_reset(void)
     critical_marks = 0;
 }
 
+int gen_critical_marks(void)
+{
+    return critical_marks;
+}
+
+void gen_critical_marks_set(int n)
+{
+    critical_marks = n;
+}
+
 void gen_critical_enter(void)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ipset\t3");
-    } else if ( !critical_saves_on_stack() ) {
+    } else if ( !CPU_KEEPS_INT_STATE() ) {
         ol("di");
     } else {
         callrts("l_push_di");
         Zsp -= 2;
-        if ( critical_marks < CRITICAL_MARKS ) {
+        /* docritical() rejects a nested block. A silent drop here
+           would leave a word that no return can pop. */
+        if ( critical_marks >= CRITICAL_MARKS ) {
+            errorfmt("Too many nested __critical sections", 1);
+        } else {
             critical_mark[critical_marks++] = Zsp;
         }
     }
@@ -5947,7 +5964,7 @@ void gen_critical_leave(void)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ipres");
-    } else if ( !critical_saves_on_stack() ) {
+    } else if ( !CPU_KEEPS_INT_STATE() ) {
         ol("ei");
     } else {
         callrts("l_pop_ei");
@@ -5956,11 +5973,6 @@ void gen_critical_leave(void)
             critical_marks--;
         }
     }
-}
-
-int zcriticaloffset(void)
-{
-    return 0;
 }
 
 

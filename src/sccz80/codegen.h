@@ -53,8 +53,9 @@ extern void opjumpr(char *, int);
 extern void function_appendix(SYMBOL *func);
 
 
-extern int zcriticaloffset(void);
 extern void gen_critical_reset(void);
+extern int gen_critical_marks(void);
+extern void gen_critical_marks_set(int n);
 extern void zconvert_to_decimal(Kind from, Kind to, unsigned char isunsigned, unsigned char tounsigned);
 extern void zconvert_from_decimal(Kind from, Kind to, unsigned char isunsigned);
 extern int push_function_argument_fnptr(Kind expr, Type *type, Type *functype, int push_sdccchar, int is_last_argument);

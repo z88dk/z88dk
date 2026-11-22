@@ -767,13 +767,31 @@ void docont(void)
 
 static void docritical(void)
 {
+    int saved_Zsp;
+    int saved_marks;
+    int nested_bare;
+
     if ( incritical ) {
         errorfmt("Cannot nest __critical sections", 1);
     }
     incritical = 1;
-    gen_critical_enter();
+    /* Rabbit, 8080, VM1 and gbz80 have one di/ei for the whole function.
+       An inner leave would enable interrupts before the function ends. */
+    nested_bare = ((currfn->flags & CRITICAL) == CRITICAL) && !CPU_KEEPS_INT_STATE();
+    saved_Zsp = Zsp;
+    saved_marks = gen_critical_marks();
+    if ( !nested_bare ) {
+        gen_critical_enter();
+    }
     statement();
-    gen_critical_leave();
+    if ( !nested_bare ) {
+        gen_critical_leave();
+    }
+    /* A return inside the block already emitted its own leave and then
+       put the straight-line depth back. This restore is the depth from
+       before the block, for the fall-through path. */
+    Zsp = saved_Zsp;
+    gen_critical_marks_set(saved_marks);
     incritical = 0;
 }
 

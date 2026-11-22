@@ -414,6 +414,9 @@ struct gototab_s {
 #define IS_8080_CLASS() (IS_8080() || IS_KR580VM1())
 #define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085 || c_cpu == CPU_KR580VM1)
 #define IS_GBZ80() (c_cpu == CPU_GBZ80)
+/* Rabbit keeps the old priority in IP. The 8080, the VM1 and the gbz80
+   cannot read the enable flag. Every other cpu can save it on the stack. */
+#define CPU_KEEPS_INT_STATE() (!((c_cpu) & CPU_RABBIT) && !IS_8080_CLASS() && !IS_GBZ80())
 #define IS_Z80N() (c_cpu == CPU_Z80N)
 #define IS_EZ80() (c_cpu == CPU_EZ80_Z80)
 #define IS_KC160() (c_cpu == CPU_KC160)
