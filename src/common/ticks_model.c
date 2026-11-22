@@ -1240,6 +1240,8 @@ static int rabbit_time(int cpu, const char *mnem, const char *rest, int cond, in
         if (ka != OP_R8 && ka != OP_RP) return -1;
         return 2;
     }
+    if (!strcmp(mnem, "add") && ident_eq(a, "sp") && kb == OP_IMM)
+        return 4;
     if (!strcmp(mnem, "add") || !strcmp(mnem, "adc") || !strcmp(mnem, "sbc")) {
         if (ka == OP_IX) return 4;
         if (ka == OP_RP) return !strcmp(mnem, "add") ? 2 : 4;

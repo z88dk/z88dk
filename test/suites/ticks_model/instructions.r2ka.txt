@@ -8,3 +8,4 @@ and hl,de
 or hl,de
 xor hl,de
 sub hl,de
+add sp,2
