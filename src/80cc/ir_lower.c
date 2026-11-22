@@ -11799,13 +11799,13 @@ int ir_lower_func_flip(FILE *out, Func *f)
        juggle the register arg assuming the fp frame — flipping mishandles it. */
     int cheap = (2 * ds_ixaccess < flip_cost_budget());
     /* Metric for the wider flip: size under --opt-code-size, otherwise estimated T-states.
-       The T-state model has timings for the Z80 only among the CPUs that have IX (the Z180,
-       eZ80, KC160, Rabbit and R800 would be scored with Z80 numbers), so elsewhere the
+       Among the CPUs that have IX, the T-state model has timings for the Z80, Z80N and Z180
+       (the eZ80, KC160, Rabbit and R800 would be scored with Z80 numbers), so elsewhere the
        function stays fp. */
     int metric = 0;
     if (c_opt_code_size) {
         if (!opt_disabled("sp-flip-size")) metric = 1;
-    } else if ((c_cpu == CPU_Z80 || IS_Z80N()) && !opt_disabled("sp-flip-ticks")) {
+    } else if ((c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180) && !opt_disabled("sp-flip-ticks")) {
         metric = 2;
     }
     int by_size = metric != 0;

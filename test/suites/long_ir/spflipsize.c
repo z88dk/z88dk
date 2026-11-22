@@ -45,6 +45,7 @@ static int via_ptr(ifn f, int x)
     return c;
 }
 
+#ifndef NO_FAR_FLOAT
 /* Far access. */
 static int far_buf[4] = { 5, 6, 7, 8 };
 
@@ -69,6 +70,7 @@ static double fl_pick(double x, double y)
     if (c == 3) return x - y;
     return x + y;
 }
+#endif
 
 /* Fastcall argument. */
 static int fc(int x) __z88dk_fastcall
@@ -132,6 +134,7 @@ static int drv_ptr(void)
     return r + (a - 1234) + (b - 4321) + (k - 9);
 }
 
+#ifndef NO_FAR_FLOAT
 static int drv_far(void)
 {
     int a = 1234, b = 4321;
@@ -149,6 +152,7 @@ static int drv_fl(void)
 
     return (int)d + (a - 1234) + (b - 4321) + (k - 9);
 }
+#endif
 
 static int drv_fc(void)
 {
@@ -177,8 +181,10 @@ static void check(void)
     assertEqual(drv_plain(), 20 + 10 + 5);
     assertEqual(drv_call(), 11 + 22 + 100);
     assertEqual(drv_ptr(), 1 + 2 + 10);
+#ifndef NO_FAR_FLOAT
     assertEqual(drv_far(), 5 + 7 + 8);
     assertEqual(drv_fl(), 6 + 2 + 6);
+#endif
     assertEqual(drv_fc(), 7 + 9 + 10);
     assertEqual(drv_key(), 98 + 101);
 }
